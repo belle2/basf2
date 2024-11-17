@@ -22,10 +22,16 @@ namespace Belle2::SVD {
   private:
     std::string m_fileName;
     std::string m_treeName;
-    std::string m_variables;
+    int m_basketSize{1600};
 
     std::shared_ptr<TFile> m_file{nullptr};
     StoreObjPtr<RootMergeable<TTree>> m_tree;
-    std::map<std::string, std::variant<int, double>> m_branches;
+
+    std::map<std::string, double> m_branchesDouble;
+    std::map<std::string, int> m_branchesInt;
+    std::map<std::string, bool> m_branchesBool;
+
+    void registerBranch(const Variables::ComputableVariable&);
+    void updateBranch(const std::string&, const Variables::ReturnType&);
   };
 }

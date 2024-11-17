@@ -35,9 +35,14 @@ namespace Belle2::SVD {
     virtual void terminate() override;
 
   private:
+    std::string m_fileName;
+    std::string m_treeName;
     std::string m_storageType;
-    std::string m_variables;
+    std::vector<std::string> m_variableNames;
+    Variables::ComputableVariables m_computableVariables;
     Counters m_counters;
+
+    std::string m_recoTracksStoreArrayName{"RecoTracks"};
 
     std::unique_ptr<PersistenceManager> persistenceManager;
   };

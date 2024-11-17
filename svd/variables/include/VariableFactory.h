@@ -4,7 +4,7 @@
 
 namespace Belle2::SVD::Variables {
   class VariableFactory {
-    public::
+  public:
     static std::vector<ComputableVariable> create(const std::vector<std::string>& variableNames);
   };
 

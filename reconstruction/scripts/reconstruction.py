@@ -739,7 +739,7 @@ def add_pid_module(path, components=None, run_klm_dnn=True):
     """
     if components is None or 'SVD' in components or 'CDC' in components:
         path.add_module('MdstPID')
-    if components is None or 'KLM' in components:
+    if (components is None or 'KLM' in components) and run_klm_dnn:
         path.add_module('KLMMuonIDDNNExpert')
 
 

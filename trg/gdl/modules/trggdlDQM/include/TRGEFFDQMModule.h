@@ -122,6 +122,14 @@ namespace Belle2 {
     TH1F* m_nobha_hP3_y_psnecl      = nullptr;
     TH1F* m_nobha_hP3_y_psnecl_ftdf = nullptr;
 
+    TH1F* m_nobha_phi_z             = nullptr;
+    TH1F* m_nobha_phi_z_psnecl      = nullptr;
+    TH1F* m_nobha_phi_z_psnecl_ftdf = nullptr;
+
+    TH1F* m_nobha_phi_y             = nullptr;
+    TH1F* m_nobha_phi_y_psnecl      = nullptr;
+    TH1F* m_nobha_phi_y_psnecl_ftdf = nullptr;
+
 
     //-"fyo" with track deleta_phi distribution
     TH1F* m_fyo_dphi                    = nullptr;

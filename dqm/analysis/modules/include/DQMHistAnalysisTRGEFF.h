@@ -118,6 +118,12 @@ namespace Belle2 {
     TCanvas* m_nobha_cP3_y_eff      = nullptr;  /**< remove the bha_veto, canvas for TRGEFF efficiency,  y bit */
     TEfficiency* m_nobha_hP3_y_eff  = nullptr;  /**< remove the bha_veto, the efficiency of p for y bit */
 
+    TCanvas* m_c_nobha_phi_z_eff    = nullptr;  /**< remove the bha_veto, canvas for TRGEFF efficiency,  z bit */
+    TEfficiency* m_nobha_phi_z_eff  = nullptr;  /**< remove the bha_veto, the efficiency of phi for z bit */
+
+    TCanvas* m_c_nobha_phi_y_eff    = nullptr;  /**< remove the bha_veto, canvas for TRGEFF efficiency,  y bit */
+    TEfficiency* m_nobha_phi_y_eff  = nullptr;  /**< remove the bha_veto, the efficiency of phi for y bit */
+
 
     //-"fyo" with track deleta_phi distribution
     /** for CDC TRG, the histograms for the largest dphi in an event with ecl mask bits,
@@ -201,8 +207,8 @@ namespace Belle2 {
     TCanvas* m_c_eklmhit_theta_eff      = nullptr;    /**< canvas for TRGEFF efficiency,  eklmhit bit */
     TEfficiency* m_eklmhit_theta_eff    = nullptr;    /**< the efficiency of theta for eklmhit bit */
 
-    std::vector<std::tuple<std::string, TEfficiency**, TCanvas*, std::string>>
-        m_efficiencyList; /**< Combined efficiency list,the histogram, efficiency, Canvas, title  */
+    std::vector<std::tuple<std::string, TEfficiency**, TCanvas*, std::string, std::string>>
+        m_efficiencyList; /**< Combined efficiency list,the histogram, efficiency, Canvas, title, Xtitle  */
 
     //mirabelle
     Belle2::MonitoringObject* m_mon_trgeff = nullptr; /**< MonitoringObject for trg */

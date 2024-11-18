@@ -204,10 +204,13 @@ void ParticleLoaderModule::initialize()
            || (abs(pdgCode) == abs(Const::photon.getPDGCode()) && m_addDaughters == true)))
         mdstSourceIsV0 = true;
 
-      // if we're not loading MCParticles, and we are loading decay with one daughter,
+      // if we're not loading MCParticles, and we are loading kaon/pion/muon/charged sigmas with one daughter,
       // then this decaystring is a kink
       bool mdstSourceIsKink = false;
-      if (!m_useMCParticles && nProducts == 1)
+      if (!m_useMCParticles &&
+          (abs(pdgCode) == abs(Const::kaon.getPDGCode()) || abs(pdgCode) == abs(Const::pion.getPDGCode())
+           || abs(pdgCode) == abs(Const::muon.getPDGCode()) || abs(pdgCode) == abs(3222) || abs(pdgCode) == abs(3112))
+          && nProducts == 1)
         mdstSourceIsKink = true;
 
       if (mdstSourceIsV0) {

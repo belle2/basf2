@@ -9,6 +9,7 @@ Untested method Particle::forEachDaughter
 Untested method Particle::getAllDaughters
 Untested method Particle::getArrayPointer
 Untested method Particle::getEnergyLossCorrection
+Untested method Particle::getKink
 Untested method Particle::getMomentumLossCorrectionFactor
 Untested method Particle::getMostLikelyTrackFitResult
 Untested method Particle::getPDGLifetime

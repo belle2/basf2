@@ -266,7 +266,7 @@ def setupEventInfo(noEvents, path):
     Prepare to generate events. This function sets up the EventInfoSetter.
     You should call this before adding a generator from generators.
     The experiment and run numbers are set to 0 (run independent generic MC in phase 3).
-    https://confluence.desy.de/display/BI/Experiment+numbering
+    https://xwiki.desy.de/xwiki/rest/p/59192
 
     Parameters:
         noEvents (int): number of events to be generated

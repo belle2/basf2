@@ -245,8 +245,8 @@ namespace Belle2 {
     /** StoreArray ECLDigit. */
     StoreArray<ECLDigit> m_eclDigits;
 
-    /** u0 parameter for regularization function. */
-    double m_u0;
+    /** u1 parameter for regularization function. */
+    double m_u1;
 
   };
 

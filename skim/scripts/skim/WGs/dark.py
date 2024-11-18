@@ -198,6 +198,45 @@ class DimuonPlusMissingEnergy(BaseSkim):
 
 
 @fancy_skim_header
+class DimuonRecoilMassSquared(BaseSkim):
+    """
+    **Physics channel**: :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-} \\gamma`.
+    """
+    __authors__ = ["Robin Leboucher"]
+    __description__ = (
+        "Dimuon skim, needed for :math:`e^{+}e^{-} \\to A^{\\prime} \\to \\mu^{+}\\mu^{-} (\\gamma)` "
+        "and other searches."
+    )
+    __contact__ = __liaison__
+    __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
+
+    def build_lists(self, path):
+        dimuon_list = []
+        skim_label = "forDimuonRecoilMassSquared"
+        dimuon_name = "vpho:" + skim_label
+
+        # Define some cuts
+        fromIP_cut = "[abs(dz) < 5.0] and [abs(dr) < 2.0]"
+        muonID_cut = "[muonID > 0.3]"
+        # We want exactly 2 tracks from IP
+        dimuon_cut = "[nCleanedTracks(" + fromIP_cut + ") < 4]"
+        # And the recoil mass squared must be below 20 GeV^2/c^4
+        dimuon_cut += " and [m2Recoil < 20]"
+
+        # Reconstruct the dimuon candidate
+        ma.cutAndCopyList("mu+:" + skim_label, "mu+:all", fromIP_cut + " and " + muonID_cut, path=path)
+        ma.reconstructDecay(dimuon_name + " -> mu+:" + skim_label + " mu-:" + skim_label, dimuon_cut, path=path)
+
+        # And return the dimuon list
+        dimuon_list.append(dimuon_name)
+        return dimuon_list
+
+
+@fancy_skim_header
 class ElectronMuonPlusMissingEnergy(BaseSkim):
     __authors__ = ["Giacomo De Pietro"]
     __description__ = (

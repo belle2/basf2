@@ -66,20 +66,6 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationCrystalElect
            FileSystem::findFile("/data/ecl/background_norm.root"));
   addParam("simulatePure", m_simulatePure, "Flag to simulate pure CsI option", false);
 
-  // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
-  addParam("energyDependenceTimeOffsetFitParam_p1", m_energyDependenceTimeOffsetFitParam_p1,
-           "Fit parameter (p1) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
-  addParam("energyDependenceTimeOffsetFitParam_p2", m_energyDependenceTimeOffsetFitParam_p2,
-           "Fit parameter (p2) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
-  addParam("energyDependenceTimeOffsetFitParam_p3", m_energyDependenceTimeOffsetFitParam_p3,
-           "Fit parameter (p3) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
-  addParam("energyDependenceTimeOffsetFitParam_p4", m_energyDependenceTimeOffsetFitParam_p4,
-           "Fit parameter (p4) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
-  addParam("energyDependenceTimeOffsetFitParam_p5", m_energyDependenceTimeOffsetFitParam_p5,
-           "Fit parameter (p5) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
-  addParam("energyDependenceTimeOffsetFitParam_p6", m_energyDependenceTimeOffsetFitParam_p6,
-           "Fit parameter (p6) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
-
   // Parallel processing certification
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -155,27 +141,6 @@ void ECLDigitCalibratorModule::initialize()
     m_pol2Max = -c_pol2Var2 / (2 * c_pol2Var3);
   } else {
     m_pol2Max = 0.;
-  }
-
-  if ((m_energyDependenceTimeOffsetFitParam_p1 != -999) &&
-      (m_energyDependenceTimeOffsetFitParam_p2 != -999) &&
-      (m_energyDependenceTimeOffsetFitParam_p3 != -999) &&
-      (m_energyDependenceTimeOffsetFitParam_p4 != -999) &&
-      (m_energyDependenceTimeOffsetFitParam_p5 != -999) &&
-      (m_energyDependenceTimeOffsetFitParam_p6 != -999)) {
-    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p1 = " << m_energyDependenceTimeOffsetFitParam_p1);
-    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p2 = " << m_energyDependenceTimeOffsetFitParam_p2);
-    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p3 = " << m_energyDependenceTimeOffsetFitParam_p3);
-    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p4 = " << m_energyDependenceTimeOffsetFitParam_p4);
-    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p5 = " << m_energyDependenceTimeOffsetFitParam_p5);
-    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p6 = " << m_energyDependenceTimeOffsetFitParam_p6);
-
-    ECLTimeUtil->setTimeWalkFuncParams(m_energyDependenceTimeOffsetFitParam_p1,
-                                       m_energyDependenceTimeOffsetFitParam_p2,
-                                       m_energyDependenceTimeOffsetFitParam_p3,
-                                       m_energyDependenceTimeOffsetFitParam_p4,
-                                       m_energyDependenceTimeOffsetFitParam_p5,
-                                       m_energyDependenceTimeOffsetFitParam_p6);
   }
 }
 

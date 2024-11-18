@@ -3379,6 +3379,36 @@ namespace Belle2 {
       return func;
     }
 
+
+    Manager::FunctionPtr convertToInt(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        int default_val = Belle2::convertString<int>(arguments[1]);
+        auto func = [var, default_val](const Particle * particle) -> int {
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+          {
+            double value = std::get<double>(var_result);
+            if (value > std::numeric_limits<int>::max())
+              value = std::numeric_limits<int>::max();
+            if (value < std::numeric_limits<int>::min())
+              value = std::numeric_limits<int>::min();
+            if (std::isnan(value))
+              value = default_val;
+            return static_cast<int>(value);
+          } else if (std::holds_alternative<int>(var_result))
+            return std::get<int>(var_result);
+          else if (std::holds_alternative<bool>(var_result))
+            return static_cast<int>(std::get<bool>(var_result));
+          else return default_val;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function int, please provide variable name and replacement value for NaN!");
+      }
+    }
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_METAVARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
                           "[Eventbased] Returns the number of clean Clusters in the event\n"
@@ -3735,6 +3765,13 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("int(variable, nan_replacement)", convertToInt, R"DOC(
+                      Casts the output of the variable to an integer value. 
+
+                      .. note::
+                        Overflow and underflow are clipped at maximum and minimum values, respectively. NaN values are replaced with the value of the 2nd argument.
+
+                      )DOC",  Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
                       "Useful for debugging.", Manager::VariableDataType::c_bool);

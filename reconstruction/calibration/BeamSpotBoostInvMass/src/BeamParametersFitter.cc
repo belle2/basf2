@@ -7,7 +7,7 @@
  **************************************************************************/
 
 /* Own header. */
-#include <mdst/calibration/BeamParametersFitter.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/BeamParametersFitter.h>
 
 /* Basf2 headers. */
 #include <framework/database/Database.h>

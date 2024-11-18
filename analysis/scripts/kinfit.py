@@ -17,6 +17,7 @@ def fitKinematic4C(
     constraint='HardBeam',
     daughtersUpdate=True,
     addUnmeasuredPhoton=False,
+    variablePrefix="",
     path=None,
 ):
     """
@@ -27,6 +28,7 @@ def fitKinematic4C(
     @param constraint       HardBeam or RecoilMass
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (uses up three constraints)
+    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
     @param path         modules are added to this path
     """
 
@@ -39,6 +41,7 @@ def fitKinematic4C(
     orca.param('listName', list_name)
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', addUnmeasuredPhoton)
+    orca.param('variablePrefix', variablePrefix)
     path.add_module(orca)
 
 
@@ -47,6 +50,7 @@ def UnmeasuredfitKinematic1C(
     fitterEngine='NewFitterGSL',
     constraint='HardBeam',
     daughtersUpdate=True,
+    variablePrefix="",
     path=None,
 ):
     """
@@ -56,6 +60,7 @@ def UnmeasuredfitKinematic1C(
     @param fitterEngine which fitter engine to use? 'NewFitterGSL' or 'OPALFitterGSL'
     @param constraint       HardBeam or RecoilMass
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
+    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
     @param path         modules are added to this path
     """
 
@@ -68,6 +73,7 @@ def UnmeasuredfitKinematic1C(
     orca.param('listName', list_name)
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', True)
+    orca.param('variablePrefix', variablePrefix)
     path.add_module(orca)
 
 
@@ -78,6 +84,7 @@ def fitKinematic3C(
         daughtersUpdate=True,
         addUnmeasuredPhoton=False,
         add3CPhoton=True,
+        variablePrefix="",
         path=None,
 ):
     """
@@ -90,6 +97,7 @@ def fitKinematic3C(
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (uses up three constraints)
     @param add3CPhoton add one photon with unmeasured energy (uses up a constraint)
+    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
     @param path         modules are added to this path
     """
 
@@ -103,6 +111,7 @@ def fitKinematic3C(
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', addUnmeasuredPhoton)
     orca.param('add3CPhoton', add3CPhoton)
+    orca.param('variablePrefix', variablePrefix)
     path.add_module(orca)
 
 
@@ -112,6 +121,7 @@ def fitKinematic2C(
         constraint='HardBeam',
         daughtersUpdate=True,
         addUnmeasuredPhotonAlongBeam="",
+        variablePrefix="",
         path=None,
 ):
     """
@@ -126,6 +136,7 @@ def fitKinematic2C(
     @param constraint       HardBeam or RecoilMass
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhotonAlongBeam add an unmeasured photon along beam if 'HER' or 'LER' is set
+    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
     @param path         modules are added to this path
     """
 
@@ -149,6 +160,7 @@ def fitKinematic2C(
             orca.param('fixUnmeasuredToHER', True)
         else:  # should be LER
             orca.param('fixUnmeasuredToLER', True)
+    orca.param('variablePrefix', variablePrefix)
     path.add_module(orca)
 
 
@@ -158,6 +170,7 @@ def MassfitKinematic1CRecoil(
     fitterEngine='NewFitterGSL',
     constraint='RecoilMass',
     daughtersUpdate=True,
+    variablePrefix="",
     path=None,
 ):
     """
@@ -168,6 +181,7 @@ def MassfitKinematic1CRecoil(
     @param constraint       HardBeam or RecoilMass
     @param recoilMass       RecoilMass (GeV)
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
+    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
     @param path         modules are added to this path
     """
 
@@ -181,6 +195,7 @@ def MassfitKinematic1CRecoil(
     orca.param('listName', list_name)
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', False)
+    orca.param('variablePrefix', variablePrefix)
     path.add_module(orca)
 
 
@@ -190,6 +205,7 @@ def MassfitKinematic1C(
     fitterEngine='NewFitterGSL',
     constraint='Mass',
     daughtersUpdate=True,
+    variablePrefix="",
     path=None,
 ):
     """
@@ -200,6 +216,7 @@ def MassfitKinematic1C(
     @param constraint       HardBeam or RecoilMass or Mass
     @param invMass       Invariant Mass (GeV)
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
+    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
     @param path         modules are added to this path
     """
 
@@ -213,6 +230,7 @@ def MassfitKinematic1C(
     orca.param('listName', list_name)
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', False)
+    orca.param('variablePrefix', variablePrefix)
     path.add_module(orca)
 
 

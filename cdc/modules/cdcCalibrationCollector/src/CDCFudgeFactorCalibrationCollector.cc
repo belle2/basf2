@@ -194,7 +194,7 @@ void CDCFudgeFactorCalibrationCollectorModule::collect()
       //get Cluter Energy
       eclTrack +=  d0->getECLClusterEnergy();
       double muid = Variable::muonID(d0);
-      double eid = Variable::muonID(d0);
+      double eid = Variable::electronID(d0);
 
       if (chg > 0) {
         ndfPos = fitresult->getNDF();

@@ -52,6 +52,10 @@ void TRGEFFDQMModule::defineHisto()
   m_hPt_psnecl                   = new TH1F("hPt_psnecl", "", 50, 0, 5);
   m_hPt_psnecl_ftdf              = new TH1F("hPt_psnecl_ftdf", "", 50, 0, 5);
 
+  m_nobha_f_phi                  = new TH1F("nobha_f_phi", "", 36, -180., 180.);
+  m_nobha_f_phi_psnecl           = new TH1F("nobha_f_phi_psnecl", "", 36, -180., 180.);
+  m_nobha_f_phi_psnecl_ftdf      = new TH1F("nobha_f_phi_psnecl_ftdf", "", 36, -180., 180.);
+
   m_nobha_hPt                    = new TH1F("nobha_hPt", "", 50, 0, 5);
   m_nobha_hPt_psnecl             = new TH1F("nobha_hPt_psnecl", "", 50, 0, 5);
   m_nobha_hPt_psnecl_ftdf        = new TH1F("nobha_hPt_psnecl_ftdf", "", 50, 0, 5);
@@ -186,13 +190,10 @@ void TRGEFFDQMModule::beginRun()
     return;
   }
 
-  m_hPhi->Reset();
 }
 
 void TRGEFFDQMModule::event()
 {
-  // bool debug = 1;   // if(debug)cout<<"line "<<__LINE__<<endl;
-
   if (!m_trgSummary.isValid()) {
     B2WARNING("TRGSummary object not available but require to estimate trg efficiency");
     return;
@@ -209,9 +210,6 @@ void TRGEFFDQMModule::event()
     B2WARNING("TRGEFFDQMModule: Can't find required bhabha or mumu or hadron trigger identifier");
     return;
   }
-
-  const bool IsBhabha = (m_TrgResult->getResult("software_trigger_cut&skim&accept_bhabha") == SoftwareTriggerCutResult::c_accept);
-  const bool IsHadron = (m_TrgResult->getResult("software_trigger_cut&skim&accept_hadron") == SoftwareTriggerCutResult::c_accept);
 
 
   /*///////////////////////////////////////////////////////////////////
@@ -458,6 +456,7 @@ void TRGEFFDQMModule::event()
 
       m_hPt->Fill(pt);
       m_nobha_hPt->Fill(pt);
+      m_nobha_f_phi->Fill(phiDegree);
 
       m_hP3_z->Fill(p3);
       m_hP3_y->Fill(p3);
@@ -480,6 +479,7 @@ void TRGEFFDQMModule::event()
       if (trg_psnecl) {
         m_hPt_psnecl->Fill(pt);
         m_nobha_hPt_psnecl->Fill(pt);
+        m_nobha_f_phi_psnecl->Fill(phiDegree);
 
         m_hP3_z_psnecl->Fill(p3);           // for z bit
         m_hP3_y_psnecl->Fill(p3);           // for y bit
@@ -504,6 +504,7 @@ void TRGEFFDQMModule::event()
       }
       if (trg_psnecl && trg_itdt2) {
         m_nobha_hPt_psnecl_ftdf->Fill(pt);
+        m_nobha_f_phi_psnecl_ftdf->Fill(phiDegree);
       }
 
       if (trg_psnecl && trg_ftdz) {

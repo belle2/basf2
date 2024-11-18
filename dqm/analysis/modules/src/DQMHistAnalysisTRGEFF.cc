@@ -53,6 +53,7 @@ void DQMHistAnalysisTRGEFFModule::initialize()
 
   m_cPt_eff               = new TCanvas("TRGEFF/c_hPt_eff");
   m_cPhi_eff              = new TCanvas("TRGEFF/c_hPhi_eff");
+  m_c_nobha_f_phi_eff     = new TCanvas("TRGEFF/c_nobha_f_phi_eff");
   m_nobha_cPt_eff         = new TCanvas("TRGEFF/c_nobha_hPt_eff");
   m_cP3_z_eff             = new TCanvas("TRGEFF/c_hP3_z_eff");
   m_cP3_y_eff             = new TCanvas("TRGEFF/c_hP3_y_eff");
@@ -82,7 +83,7 @@ void DQMHistAnalysisTRGEFFModule::initialize()
   /////////////////
   // the MonitoringObject
   m_mon_trgeff = getMonitoringObject("trg");
-  m_mon_trgeff->addCanvas(m_cPhi_eff);
+  m_mon_trgeff->addCanvas(m_c_nobha_f_phi_eff);
   m_mon_trgeff->addCanvas(m_nobha_cPt_eff);
   m_mon_trgeff->addCanvas(m_nobha_cP3_z_eff);
   m_mon_trgeff->addCanvas(m_nobha_cP3_y_eff);
@@ -107,6 +108,7 @@ void DQMHistAnalysisTRGEFFModule::initialize()
     // Histogram names, efficiency pointers,  corresponding canvases  title and X-title
     {"TRGEFF/hPt_psnecl",             &m_hPt_eff,               m_cPt_eff,                  "f bit",            "Pt (GeV)"},
     {"TRGEFF/hPhi_psnecl",            &m_hPhi_eff,              m_cPhi_eff,                 "f bit",            "#phi (degree)"},
+    {"TRGEFF/nobha_f_phi_psnecl",     &m_nobha_f_phi_eff,       m_c_nobha_f_phi_eff,        "nobha f bit",      "#phi (degree)"},
     {"TRGEFF/nobha_hPt_psnecl",       &m_nobha_hPt_eff,         m_nobha_cPt_eff,            "nobha f bit",      "Pt (GeV)"},
     {"TRGEFF/hP3_z_psnecl",           &m_hP3_z_eff,             m_cP3_z_eff,                "z bit",            "Pt (GeV)"},
     {"TRGEFF/hP3_y_psnecl",           &m_hP3_y_eff,             m_cP3_y_eff,                "y bit",            "Pt (GeV)"},

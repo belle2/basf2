@@ -96,6 +96,10 @@ namespace Belle2 {
     TEfficiency* m_hPt_eff          = nullptr;   /**< the efficiency of Pt for f bit */
 
     //  CDC TRG, remove the bhabha veto for f bit
+    TCanvas* m_c_nobha_f_phi_eff    = nullptr;  /**< remove the bha_veto, canvas for TRGEFF efficiency,  f bit */
+    TEfficiency* m_nobha_f_phi_eff  = nullptr;  /**< remove the bha_veto, the efficiency of phi for f bit */
+
+    //  CDC TRG, remove the bhabha veto for f bit
     TCanvas* m_nobha_cPt_eff        = nullptr;   /**< remove the bha_veto, Canvas for TRGEFF efficiency, Pt */
     TEfficiency* m_nobha_hPt_eff    = nullptr;   /**< remove the bha_veto, the efficiency of Pt for f bit */
 

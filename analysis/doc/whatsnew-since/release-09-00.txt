@@ -1,6 +1,13 @@
 Changes in the analysis package in light-2411-aldebaran
 -------------------------------------------------------
 
+Modular Analysis
+++++++++++++++++
+* Add options to `modularAnalysis.writePi0EtaVeto` to:
+    * Require the soft photon being in the current RestOfEvent.
+    * Add separate selections to be applied during `modularAnalysis.reconstructDecay` for both the :math:`\pi^0` as well as
+      the :math:`\eta` reconstruction.
+
 Kinematic Fitting tools
 +++++++++++++++++++++++
 * Added option to prepend label to OrkaKinfit variables to allow multiple fits to be performed in same path.

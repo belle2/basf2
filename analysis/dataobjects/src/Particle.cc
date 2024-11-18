@@ -785,6 +785,26 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
 
   } else if (this->getMdstSource() != oParticle->getMdstSource() and !doDetailedComparison) {
     // has no daughters: it's a FSP, compare MDST source and index
+    // Check if this or compared particle is a kink. If so, check that the particle is not a copy of daughter or mother.
+    // For consistency, return true if the daughter or mother is a copy of the target particle.
+    if (this->getParticleSource() == EParticleSourceObject::c_Kink &&
+        oParticle->getParticleSource() == EParticleSourceObject::c_Track) {
+      const Kink* kink = this->getKink();
+      const short motherTrackIndex = kink->getMotherTrackIndex();
+      const short daughterTrackIndex = kink->getDaughterTrackIndex();
+      const short trackIndex = oParticle->getTrack()->getArrayIndex();
+      if (trackIndex == motherTrackIndex || trackIndex == daughterTrackIndex)
+        return true;
+    }
+    if (this->getParticleSource() == EParticleSourceObject::c_Track &&
+        oParticle->getParticleSource() == EParticleSourceObject::c_Kink) {
+      const Kink* kink = oParticle->getKink();
+      const short motherTrackIndex = kink->getMotherTrackIndex();
+      const short daughterTrackIndex = kink->getDaughterTrackIndex();
+      const short trackIndex = this->getTrack()->getArrayIndex();
+      if (trackIndex == motherTrackIndex || trackIndex == daughterTrackIndex)
+        return true;
+    }
     return false;
   }
   // Stop here if we do not want a detailed comparison
@@ -806,6 +826,26 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
     return this->getMCParticle() == oParticle->getMCParticle();
   }
   if (this->getParticleSource() != oParticle->getParticleSource()) {
+    // Check if this or compared particle is a kink. If so, check that the particle is not a copy of daughter or mother.
+    // For consistency, return true if the daughter or mother is a copy of the target particle.
+    if (this->getParticleSource() == EParticleSourceObject::c_Kink &&
+        oParticle->getParticleSource() == EParticleSourceObject::c_Track) {
+      const Kink* kink = this->getKink();
+      const short motherTrackIndex = kink->getMotherTrackIndex();
+      const short daughterTrackIndex = kink->getDaughterTrackIndex();
+      const short trackIndex = oParticle->getTrack()->getArrayIndex();
+      if (trackIndex == motherTrackIndex || trackIndex == daughterTrackIndex)
+        return true;
+    }
+    if (this->getParticleSource() == EParticleSourceObject::c_Track &&
+        oParticle->getParticleSource() == EParticleSourceObject::c_Kink) {
+      const Kink* kink = oParticle->getKink();
+      const short motherTrackIndex = kink->getMotherTrackIndex();
+      const short daughterTrackIndex = kink->getDaughterTrackIndex();
+      const short trackIndex = this->getTrack()->getArrayIndex();
+      if (trackIndex == motherTrackIndex || trackIndex == daughterTrackIndex)
+        return true;
+    }
     return false;
   }
   if (this->getMdstSource() == oParticle->getMdstSource()) {

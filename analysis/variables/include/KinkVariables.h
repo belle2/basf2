@@ -147,46 +147,58 @@ namespace Belle2 {
     // Kink Decay Kinematics
 
     /**
-    * returns kink daughter momentum in mother rest frame with pion and kaon mass hypothesis, respectively
+    * returns kink daughter momentum in mother rest frame
+    * with default pair of mass hypotheses, set by a user in the decay string
+    */
+    double kinkDaughterMomentumInMotherRF(const Particle* part);
+
+    /**
+    * returns kink daughter direction in mother rest frame with respect to mother momentum direction in the lab frame
+    * with default pair of mass hypotheses, set by a user in the decay string
+    */
+    double kinkDaughterCosThetaInMotherRF(const Particle* part);
+
+    /**
+    * returns kink daughter momentum in mother rest frame with pion and kaon mass hypotheses, respectively
     */
     double kinkDaughterMomentumInMotherRFKPi(const Particle* part);
 
     /**
     * returns kink daughter direction in mother rest frame with respect to mother momentum direction in the lab frame
-    * with pion and kaon mass hypothesis, respectively
+    * with pion and kaon mass hypotheses, respectively
     */
     double kinkDaughterCosThetaInMotherRFKPi(const Particle* part);
 
     /**
-    * returns kink daughter momentum in mother rest frame with muon and kaon mass hypothesis, respectively
+    * returns kink daughter momentum in mother rest frame with muon and kaon mass hypotheses, respectively
     */
     double kinkDaughterMomentumInMotherRFKMu(const Particle* part);
 
     /**
     * returns kink daughter direction in mother rest frame with respect to mother momentum direction in the lab frame
-    * with muon and kaon mass hypothesis, respectively
+    * with muon and kaon mass hypotheses, respectively
     */
     double kinkDaughterCosThetaInMotherRFKMu(const Particle* part);
 
     /**
-    * returns kink daughter momentum in mother rest frame with muon and pion mass hypothesis, respectively
+    * returns kink daughter momentum in mother rest frame with muon and pion mass hypotheses, respectively
     */
     double kinkDaughterMomentumInMotherRFPiMu(const Particle* part);
 
     /**
     * returns kink daughter direction in mother rest frame with respect to mother momentum direction in the lab frame
-    * with muon and pion mass hypothesis, respectively
+    * with muon and pion mass hypotheses, respectively
     */
     double kinkDaughterCosThetaInMotherRFPiMu(const Particle* part);
 
     /**
-    * returns kink daughter momentum in mother rest frame with electron and muon mass hypothesis, respectively
+    * returns kink daughter momentum in mother rest frame with electron and muon mass hypotheses, respectively
     */
     double kinkDaughterMomentumInMotherRFMuE(const Particle* part);
 
     /**
     * returns kink daughter direction in mother rest frame with respect to mother momentum direction in the lab frame
-    * with electron and muon mass hypothesis, respectively
+    * with electron and muon mass hypotheses, respectively
     */
     double kinkDaughterCosThetaInMotherRFMuE(const Particle* part);
 

@@ -11,10 +11,10 @@
 import modularAnalysis as ma
 
 
-def stdKKinks(path=None, writeOut=False):
+def stdKKinks(path=None, writeOut=False, daughter='pi+'):
     """
     Load a list of the Kaon kinks from Kink objects using only kinks created from track pairs (Filter 1 and 2).
-    Kaon to muon and kaon to pion decays hard to distinguish, so they are both saved.
+    Kaon to muon and kaon to pion decays hard to distinguish, so they are both saved by default.
 
     The ParticleList is named ``K+:kinks``. A simple clone suppression is applied based on the
     combined fit result flag. Loose kinemtic cuts to suppress pion decays :math:`pPimu > 0.05~GeV` and
@@ -24,9 +24,11 @@ def stdKKinks(path=None, writeOut=False):
     Parameters:
         path (basf2.Path): the path to load the modules
         writeOut (bool): whether RootOutput module should save the created ParticleList
+        daughter (str): the daughter to use in the decay string
     """
     # Fill list from Kinks
-    ma.fillParticleList('K+:kinks -> pi+', '', writeOut=writeOut, path=path)
+    decayString = 'K+:kinks -> ' + daughter
+    ma.fillParticleList(decayString, '', writeOut=writeOut, path=path)
     clonesCut = ('kinkCombinedFitResultFlag > 15 or kinkCombinedFitResultFlagB1==0 and '
                  'kinkCombinedFitResultFlagB2==0 and kinkCombinedFitResultFlagB4==0')
     ma.applyCuts('K+:kinks',
@@ -37,7 +39,7 @@ def stdKKinks(path=None, writeOut=False):
                  path=path)
 
 
-def stdPiKinks(path=None, writeOut=False):
+def stdPiKinks(path=None, writeOut=False, daughter='mu+'):
     """
     Load a list of the Pion kinks from Kink objects using only kinks created from track pairs (Filter 1 and 2).
 
@@ -47,9 +49,11 @@ def stdPiKinks(path=None, writeOut=False):
     Parameters:
         path (basf2.Path): the path to load the modules
         writeOut (bool): whether RootOutput module should save the created ParticleList
+        daughter (str): the daughter to use in the decay string
     """
     # Fill list from Kinks
-    ma.fillParticleList('pi+:kinks -> mu+', '', writeOut=writeOut, path=path)
+    decayString = 'pi+:kinks -> ' + daughter
+    ma.fillParticleList(decayString, '', writeOut=writeOut, path=path)
     clonesCut = ('kinkCombinedFitResultFlag > 15 or kinkCombinedFitResultFlagB1==0 and '
                  'kinkCombinedFitResultFlagB2==0 and kinkCombinedFitResultFlagB4==0')
     ma.applyCuts('pi+:kinks',
@@ -58,7 +62,7 @@ def stdPiKinks(path=None, writeOut=False):
     ma.applyCuts('pi+:kinks', 'pPimu < 0.1 and kinkFilterID < 3', path=path)
 
 
-def stdMuKinks(path=None, writeOut=False):
+def stdMuKinks(path=None, writeOut=False, daughter='e+'):
     """
     Load a list of the Muon kinks from Kink objects using only kinks created from track pairs (Filter 1 and 2).
 
@@ -69,9 +73,11 @@ def stdMuKinks(path=None, writeOut=False):
     Parameters:
         path (basf2.Path): the path to load the modules
         writeOut (bool): whether RootOutput module should save the created ParticleList
+        daughter (str): the daughter to use in the decay string
     """
     # Fill list from Kinks
-    ma.fillParticleList('mu+:kinks -> e+', '', writeOut=writeOut, path=path)
+    decayString = 'mu+:kinks -> ' + daughter
+    ma.fillParticleList(decayString, '', writeOut=writeOut, path=path)
     clonesCut = ('kinkCombinedFitResultFlag > 15 or kinkCombinedFitResultFlagB1==0 and '
                  'kinkCombinedFitResultFlagB2==0 and kinkCombinedFitResultFlagB4==0')
     ma.applyCuts('mu+:kinks',

@@ -253,6 +253,24 @@ namespace Belle2 {
 
     // Kink Decay Kinematics
 
+    double kinkDaughterMomentumInMotherRF(const Particle* part)
+    {
+      if (!(part->hasExtraInfo("kinkDaughterPDGCode")))
+        return Const::doubleNaN;
+      Const::ChargedStable daughterType(abs(part->getExtraInfo("kinkDaughterPDGCode")));
+      Const::ChargedStable motherType(abs(part->getPDGCode()));
+      return kinkDaughterMomentumAndCosThetaInMotherRF(part, motherType, daughterType, false);
+    }
+
+    double kinkDaughterCosThetaInMotherRF(const Particle* part)
+    {
+      if (!(part->hasExtraInfo("kinkDaughterPDGCode")))
+        return Const::doubleNaN;
+      Const::ChargedStable daughterType(abs(part->getExtraInfo("kinkDaughterPDGCode")));
+      Const::ChargedStable motherType(abs(part->getPDGCode()));
+      return kinkDaughterMomentumAndCosThetaInMotherRF(part, motherType, daughterType, true);
+    }
+
     double kinkDaughterMomentumInMotherRFKPi(const Particle* part)
     {
       return kinkDaughterMomentumAndCosThetaInMotherRF(part, Const::kaon, Const::pion, false);
@@ -986,6 +1004,12 @@ namespace Belle2 {
                       "Check if charges of mother and daughter tracks are the same");
 
     // Kink Decay Kinematics
+    REGISTER_VARIABLE("pMD", kinkDaughterMomentumInMotherRF,
+                      "Kink daughter momentum in mother rest frame with default pair of mass hypotheses,"
+                      " set by a user in the decay string");
+    REGISTER_VARIABLE("cosMD", kinkDaughterCosThetaInMotherRF,
+                      "Kink daughter direction in mother rest frame with respect to mother momentum direction in the lab frame"
+                      " with default pair of mass hypotheses, set by a user in the decay string");
     REGISTER_VARIABLE("pKpi", kinkDaughterMomentumInMotherRFKPi,
                       "Kink daughter momentum in mother rest frame with pion and kaon mass hypotheses");
     REGISTER_VARIABLE("cosKpi", kinkDaughterCosThetaInMotherRFKPi,

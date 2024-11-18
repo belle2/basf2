@@ -204,12 +204,10 @@ void ParticleLoaderModule::initialize()
            || (abs(pdgCode) == abs(Const::photon.getPDGCode()) && m_addDaughters == true)))
         mdstSourceIsV0 = true;
 
-      // if we're not loading MCParticles, and we are loading kaon/pion/muon with one daughter,
+      // if we're not loading MCParticles, and we are loading decay with one daughter,
       // then this decaystring is a kink
       bool mdstSourceIsKink = false;
-      if (!m_useMCParticles &&
-          (abs(pdgCode) == abs(Const::kaon.getPDGCode()) || abs(pdgCode) == abs(Const::pion.getPDGCode())
-           || abs(pdgCode) == abs(Const::muon.getPDGCode())) && nProducts == 1)
+      if (!m_useMCParticles && nProducts == 1)
         mdstSourceIsKink = true;
 
       if (mdstSourceIsV0) {
@@ -693,6 +691,7 @@ void ParticleLoaderModule::kinksToParticles()
       if (motherMCParticleWithWeight.first)
         newPart->addRelationTo(motherMCParticleWithWeight.first, motherMCParticleWithWeight.second);
       newPart->addRelationTo(motherTrackFit);
+      newPart->writeExtraInfo("kinkDaughterPDGCode", m_decaydescriptor.getDaughter(0)->getMother()->getPDGCode());
     }
 
     plist->setEditable(false); // set the :kink list as not editable.

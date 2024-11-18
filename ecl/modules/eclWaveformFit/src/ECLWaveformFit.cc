@@ -288,6 +288,7 @@ void ECLWaveformFitModule::beginRun()
           } else {
             m_AutoCovariance->getAutoCovariance(idToLoad += 1, buf);
           }
+          std::memcpy(reg, buf, c_NFitPoints * sizeof(double));
         }
 
       }

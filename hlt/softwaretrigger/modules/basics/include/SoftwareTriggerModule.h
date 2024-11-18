@@ -110,7 +110,7 @@ namespace Belle2 {
       /// requiring all store arrays.
       void initializeCalculation();
 
-      /// Helper function to initliaze debug output creation by creating a TTree
+      /// Helper function to initialize debug output creation by creating a TTree
       /// and an object in the data store if needed.
       void initializeDebugOutput();
 

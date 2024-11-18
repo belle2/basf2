@@ -7,7 +7,7 @@
  **************************************************************************/
 
 // needed to build variables here
-#include <cdc/variables/DedxVariables.h>
+#include <reconstruction/variables/DedxVariables.h>
 #include <analysis/VariableManager/Manager.h>
 
 // framework - DataStore

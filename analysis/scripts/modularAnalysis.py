@@ -3171,8 +3171,8 @@ def writePi0EtaVeto(
                                     (default is None)
     @param requireSoftPhotonIsInROE specify if the soft photons used to build pi0 and eta candidates have to be in the current ROE
                                     or not. Default is False, i.e. all soft photons in the event are used.
-    @param pi0Selection     Selection for the pi0 reconstruction.
-    @param etaSelection     Selection for the eta reconstruction.
+    @param pi0Selection     Selection for the pi0 reconstruction. Default is ''.
+    @param etaSelection     Selection for the eta reconstruction. Default is ''.
     """
 
     import b2bii
@@ -3182,9 +3182,9 @@ def writePi0EtaVeto(
     if (requireSoftPhotonIsInROE):
         B2WARNING("Requiring the soft photon to being in the ROE was not done for the MVA training. "
                   "Please check the results carefully.")
-    if (pi0Selection is not None or etaSelection is not None):
+    if (pi0Selection != '' or etaSelection != ''):
         B2WARNING(
-            "Additional selection criteria for the pi0 or the eta during reconstructDecay were not done for the MVA training. "
+            "Additional selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
             "Please check the results carefully.")
 
     renameSuffix = False

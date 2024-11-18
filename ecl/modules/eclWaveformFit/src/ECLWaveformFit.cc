@@ -269,6 +269,7 @@ void ECLWaveformFitModule::beginRun()
       std::memcpy(reg, buf, c_NFitPoints * sizeof(double));
       bool invertSuccess = makecovariance(m_PackedCovariance[id - 1], c_NFitPoints, reg);
       double param_u2 = 1.0;
+      int idToLoad = id;
       while (invertSuccess == false) {
 
         /* as x0-=1 iterates off-diagonal are suppressed. */
@@ -279,7 +280,15 @@ void ECLWaveformFitModule::beginRun()
         if (x0 == 1)  param_u2 = 0.0;
 
         /* Indicates problem with matrix as identity should be invertible*/
-        if (x0 == 0) B2FATAL("Could not invert matrix for id " << id);
+        if (x0 == 0) {
+          B2WARNING("Could not invert matrix for id " << id);
+          B2WARNING("Loading neighbour matrix for id " << id);
+          if (idToLoad > 1) {
+            m_AutoCovariance->getAutoCovariance(idToLoad = -1, buf);
+          } else {
+            m_AutoCovariance->getAutoCovariance(idToLoad += 1, buf);
+          }
+        }
 
       }
     }

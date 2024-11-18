@@ -31,7 +31,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
+#include <cdc/dataobjects/CDCDedxTrack.h>
 
 #include <numeric>
 #include <TDatabasePDG.h>
@@ -485,7 +485,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         double p2_dedxnosat = dedxTrack2->getDedxNoSat();
 
         if ((p1_dedxnosat > lowdEdxEdge && p1_dedxnosat < highdEdxEdge)  || (p2_dedxnosat > lowdEdxEdge
-            && p2_dedxnosat < highdEdxEdge))radee = 1;
+            && p2_dedxnosat < highdEdxEdge)) radee = 1;
 
       }
     }

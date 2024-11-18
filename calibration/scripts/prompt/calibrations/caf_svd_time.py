@@ -15,13 +15,6 @@ import sys
 import datetime
 import random
 
-from ROOT import Belle2  # noqa: make the Belle2 namespace available
-from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
-from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
-from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
-from ROOT.Belle2 import SVDClusterTimeShifterAlgorithm
-from ROOT.Belle2 import SVDTimeValidationAlgorithm
-
 import basf2 as b2
 
 import rawdata as raw
@@ -152,6 +145,10 @@ def create_algorithm(
     Returns:
         ROOT.Belle2.SVDCoGTimeCalibrationAlgorithm
     """
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
+    from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
+    from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
+    from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
     if "CoG6" in prefix:
         algorithm = SVDCoGTimeCalibrationAlgorithm(unique_id)
     if "CoG3" in prefix:
@@ -178,6 +175,8 @@ def create_validation_algorithm(prefix="", min_entries=10000):
     Returns:
         ROOT.Belle2.SVDCoGTimeValidationAlgorithm
     """
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
+    from ROOT.Belle2 import SVDTimeValidationAlgorithm
     algorithm = SVDTimeValidationAlgorithm()
     if prefix:
         algorithm.setPrefix(prefix)
@@ -224,7 +223,7 @@ def create_pre_collector_path(
         is_validation=False):
     """
     Create a basf2 path that runs a common reconstruction path and also runs several SVDSimpleClusterizer
-    modules with different configurations. This way they re-use the same reconstructed objects.
+    modules with different configurations. This way they reuse the same reconstructed objects.
 
     Parameters:
         clusterizers (list[pybasf2.Module]): All the differently configured
@@ -306,6 +305,9 @@ def create_pre_collector_path(
 
 
 def get_calibrations(input_data, **kwargs):
+
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
+    from ROOT.Belle2 import SVDClusterTimeShifterAlgorithm
 
     file_to_iov_physics = input_data["hadron_calib"]
     expert_config = kwargs.get("expert_config")

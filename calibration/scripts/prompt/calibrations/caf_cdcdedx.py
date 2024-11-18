@@ -8,10 +8,10 @@
 
 """
 Airflow script for automatic CDC dEdx calibration. It is currently for the electron based
-calibration, where at present only RunGain, injection time, Cosine and WireGain are implimented.
-The remaining two 2D and 1D will be implimented in the near future.
+calibration, where at present only RunGain, injection time, Cosine and WireGain are implemented.
+The remaining two 2D and 1D will be implemented in the near future.
 
-Second part called "Hadron calibration" are not compitable with CAF/AirFlow
+Second part called "Hadron calibration" are not compatible with CAF/AirFlow
 and will be done offline for a while.
 """
 
@@ -386,7 +386,7 @@ def wiregain_algo():
 
 def onedcell_algo():
     """
-    Create oned cell calibration algorithim.
+    Create oned cell calibration algorithm.
     Returns:
         algo : oned cell correction algorithm
     """
@@ -411,10 +411,10 @@ class CDCDedxCalibration(Calibration):
         '''
         parameters:
             name: name of calibration
-            algorithims: algorithm of calibration
+            algorithms: algorithm of calibration
             input_file_dict: input files list
             max_iterations: maximum number of iterations
-            dependenices: depends on the previous calibration
+            dependencies: depends on the previous calibration
             collector_granularity: granularity : all or run
         '''
         super().__init__(name=name,

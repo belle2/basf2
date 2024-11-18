@@ -300,17 +300,25 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     if components and not ('SVD' in components or 'CDC' in components):
         return
 
+    flip_and_refit_temporary_RecoTracks = "RecoTracks_flipped"
+    v0finder_temporary_RecoTracks = "CopiedRecoTracks"
+    kinkfinder_temporary_RecoTracks = "RecoTracksKinkTmp"
+    temporary_reco_track_list = []
+
     # flip & refit to fix the charge of some tracks
     if flip_recoTrack and not mcTrackFinding and is_pxd_used(components):
-        add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
+        add_flipping_of_recoTracks(path, reco_tracks="RecoTracks", reco_tracks_flipped=flip_and_refit_temporary_RecoTracks)
+        temporary_reco_track_list.append(flip_and_refit_temporary_RecoTracks)
 
     # V0 finding
     if v0_finding:
-        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
+        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1, CopiedRecoTracks=v0finder_temporary_RecoTracks)
+        temporary_reco_track_list.append(v0finder_temporary_RecoTracks)
 
     # Kink finding
     if kink_finding:
-        path.add_module('KinkFinder', RecoTracks=reco_tracks)
+        path.add_module('KinkFinder', RecoTracks=reco_tracks, CopiedRecoTracks=kinkfinder_temporary_RecoTracks)
+        temporary_reco_track_list.append(kinkfinder_temporary_RecoTracks)
 
     # estimate the track time
     path.add_module('TrackTimeEstimator')
@@ -324,6 +332,10 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
 
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")
+
+    if prune_temporary_tracks:
+        for temporary_reco_tracks in temporary_reco_track_list:
+            path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_tracks)
 
 
 def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=None,

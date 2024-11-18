@@ -228,7 +228,7 @@ namespace Belle2 {
   public:
 
     /** constructor. */
-    explicit SecMapTrainer(const std::string& setupName, const std::string& appendix = "") :
+    explicit SecMapTrainer(const std::string& setupName, const std::string& appendix = "", const std::string& outputdir = "./") :
       m_nameSetup(setupName),
       m_config(m_filtersContainer.getFilters(m_nameSetup)->getConfig()),
       m_factory(
@@ -238,7 +238,7 @@ namespace Belle2 {
         m_config.mField),
 
       m_filterMill(),
-      m_rootInterface(m_config.secMapName, appendix),
+      m_rootInterface(m_config.secMapName, appendix, outputdir),
       m_expNo(std::numeric_limits<unsigned>::max()),
       m_runNo(std::numeric_limits<unsigned>::max()),
       m_evtNo(std::numeric_limits<unsigned>::max())

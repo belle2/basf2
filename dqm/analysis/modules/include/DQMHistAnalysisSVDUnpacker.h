@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <dqm/core/DQMHistAnalysis.h>
+#include <dqm/analysis/modules/DQMHistAnalysisSVD.h>
 
 #include <TFile.h>
 #include <TText.h>
@@ -23,7 +23,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisSVDUnpackerModule final : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDUnpackerModule final : public DQMHistAnalysisSVDModule {
 
     // Public functions
   public:
@@ -64,7 +64,6 @@ namespace Belle2 {
     void terminate() override final;
 
   private:
-
     // parameters
     bool m_printCanvas; /**< if true print the pdf of the canvases */
     bool m_3Samples; /**< if true enable 3 samples histograms analysis */
@@ -74,8 +73,6 @@ namespace Belle2 {
     //  protected:
 
     TCanvas* m_cUnpacker = nullptr; /**<unpacker plot canvas */
-    TPaveText* m_legError = nullptr; /**<  plot legend, error*/
-    TString m_runtype = nullptr; /**< string with runtype: physics or cosmic */
 
     std::string m_pvPrefix; /**< string prefix for EPICS PVs */
 

@@ -51,6 +51,7 @@ namespace Belle2 {
     double m_maxTime; /**< maximum cluster time diff abs(t1-t0)/dt99 (10) */
     bool m_useCalDigits; /**< use eclCalDigit to determine MC deposited energy (false) */
     bool m_requireL1; /**< require events to satisfy a level 1 trigger (false) */
+    double m_expectedEnergyScale; /**< scale expected energies for non-4S calibration (1.) */
 
     /** Required arrays */
     StoreArray<ECLCluster> m_eclClusterArray; /**< Required input array of ECLClusters */

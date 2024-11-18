@@ -35,7 +35,7 @@ REG_MODULE(DQMHistAnalysisSVDClustersOnTrack);
 //-----------------------------------------------------------------
 
 DQMHistAnalysisSVDClustersOnTrackModule::DQMHistAnalysisSVDClustersOnTrackModule()
-  : DQMHistAnalysisModule()
+  : DQMHistAnalysisSVDModule(true)
 {
   //Parameter definition
   B2DEBUG(10, "DQMHistAnalysisSVDClustersOnTrack: Constructor done.");
@@ -87,38 +87,22 @@ void DQMHistAnalysisSVDClustersOnTrackModule::beginRun()
   B2DEBUG(10, "  CLUSTER TIME ON TRACK: error > " << m_timeThreshold << " ns with minimum statistics of " << m_statThreshold);
 
   // cluster time on tracks legend
-  m_legTiProblem = new TPaveText(0.15, 0.65, 0.35, 0.80, "brNDC");
-  m_legTiProblem->AddText("ERROR!");
-  m_legTiProblem->AddText(Form("abs(Mean) > %3.1f ns", m_timeThreshold));
-  m_legTiProblem->SetFillColor(c_ColorDefault);
-  m_legTiProblem->SetLineColor(kBlack);
+  m_legProblem->Clear();
+  m_legProblem->AddText("ERROR!");
+  m_legProblem->AddText(Form("abs(Mean) > %3.1f ns", m_timeThreshold));
 
-  m_legTiNormal = new TPaveText(0.15, 0.65, 0.35, 0.80, "brNDC");
-  m_legTiNormal->AddText("TIME SHIFT UNDER LIMIT");
-  m_legTiNormal->AddText(Form("abs(Mean) < %3.1f ns", m_timeThreshold));
-  m_legTiNormal->SetFillColor(c_ColorDefault);
-  m_legTiNormal->SetLineColor(kBlack);
+  m_legWarning->Clear();
+  m_legWarning->AddText("WARNING!");
 
-  m_legTiEmpty = new TPaveText(0.15, 0.65, 0.35, 0.80, "brNDC");
-  m_legTiEmpty->AddText("Not enough statistics");
-  m_legTiEmpty->SetTextColor(c_ColorDefault);
-  m_legTiEmpty->SetFillColor(kBlack);
+  m_legNormal->Clear();
+  m_legNormal->AddText("TIME SHIFT UNDER LIMIT");
+  m_legNormal->AddText(Form("abs(Mean) < %3.1f ns", m_timeThreshold));
 
-  m_legTi3Problem = new TPaveText(0.15, 0.65, 0.35, 0.80, "brNDC");
-  m_legTi3Problem->AddText("ERROR!");
-  m_legTi3Problem->AddText(Form("abs(Mean) > %3.1f ns", m_timeThreshold));
-  m_legTi3Problem->SetFillColor(c_ColorDefault);
+  m_legLowStat->Clear();
+  m_legLowStat->AddText("Not enough statistics");
 
-  m_legTi3Normal = new TPaveText(0.15, 0.65, 0.35, 0.80, "brNDC");
-  m_legTi3Normal->AddText("TIME SHIFT UNDER LIMIT");
-  m_legTi3Normal->AddText(Form("abs(Mean) < %3.1f ns", m_timeThreshold));
-  m_legTi3Normal->SetFillColor(c_ColorDefault);
-  m_legTi3Normal->SetLineColor(kBlack);
-
-  m_legTi3Empty = new TPaveText(0.15, 0.65, 0.35, 0.80, "brNDC");
-  m_legTi3Empty->AddText("Not enough statistics");
-  m_legTi3Empty->SetTextColor(c_ColorDefault);
-  m_legTi3Empty->SetFillColor(kBlack);
+  m_legEmpty->Clear();
+  m_legEmpty->AddText("No data recieved");
 }
 
 void DQMHistAnalysisSVDClustersOnTrackModule::event()
@@ -134,11 +118,11 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
     B2DEBUG(10, "SVDExpReco/SVDDQM_nEvents found");
   }
 
-  TH1* rtype = findHist("DQMInfo/rtype");
-  if (rtype)
-    B2DEBUG(10, "DQMInfo/rtype found");
+  string rtype = getRunType();
+  m_runtype = !rtype.empty() ? rtype.c_str() : "physics"; // per default
 
-  m_runtype = rtype ? rtype->GetTitle() : "physics"; // per default
+  if (rtype.empty())
+    B2INFO("no run type found, put defaultwise physics");
 
   TString tmp = hnEvnts->GetTitle();
   Int_t pos = tmp.Last('~');
@@ -152,67 +136,29 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
   double ratio3_6 = 0.;
   TH1* m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
 
+  int status;
   if (m_h != NULL) {
-    bool hasError = false;
-    bool lowStat = false;
 
     m_hClusterOnTrackTime_L456V.Clear();
     m_h->Copy(m_hClusterOnTrackTime_L456V);
-    m_hClusterOnTrackTime_L456V.GetXaxis()->SetRange(110, 190); // [-40 ns,40 ns]
-    Float_t mean_PeakInCenter = m_hClusterOnTrackTime_L456V.GetMean(); //
-    m_hClusterOnTrackTime_L456V.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
     m_hClusterOnTrackTime_L456V.SetName("ClusterOnTrackTime_L456V");
     m_hClusterOnTrackTime_L456V.SetTitle(Form("ClusterOnTrack Time L456V %s", runID.Data()));
 
-    if (nEvents > m_statThreshold) {
-      if (m_runtype == "physics") {
-        Float_t difference_physics = fabs(mean_PeakInCenter - m_refMeanP);
-        if (difference_physics > m_timeThreshold) {
-          hasError = true;
-        }
-      } else if (m_runtype == "cosmic") {
-        Float_t difference_cosmic = fabs(mean_PeakInCenter - m_refMeanC);
-        if (difference_cosmic > m_timeThreshold) {
-          hasError = true;
-        }
-      } else { // taking cosmic limits
-        B2WARNING("Run type:" << m_runtype << "taken cosmics criteria");
-        Float_t difference_cosmic = fabs(mean_PeakInCenter - m_refMeanC);
-        if (difference_cosmic > m_timeThreshold)
-          hasError = true;
-      }
-    } else {
-      lowStat = true;
-    }
+    if (nEvents > m_statThreshold)
+      status = getCanvasStatus(m_hClusterOnTrackTime_L456V);
+    else
+      status = lowStat;
 
-    if (! hasError) {
-      m_cClusterOnTrackTime_L456V->cd();
-      m_hClusterOnTrackTime_L456V.Draw();
-      colorizeCanvas(m_cClusterOnTrackTime_L456V, c_StatusGood);
-      m_legTiNormal->Draw();
-    } else {
-      m_cClusterOnTrackTime_L456V->cd();
-      m_hClusterOnTrackTime_L456V.Draw();
-      colorizeCanvas(m_cClusterOnTrackTime_L456V, c_StatusError);
-      m_legTiProblem->Draw();
-    }
-
-    if (lowStat) {
-      m_cClusterOnTrackTime_L456V->cd();
-      m_hClusterOnTrackTime_L456V.Draw();
-      colorizeCanvas(m_cClusterOnTrackTime_L456V, c_StatusTooFew);
-      m_legTiEmpty->Draw();
-    }
+    m_cClusterOnTrackTime_L456V->cd();
+    m_hClusterOnTrackTime_L456V.Draw();
+    setStatusOfCanvas(status, m_cClusterOnTrackTime_L456V);
 
   } else {
     B2INFO("Histogram SVDClsTrk/c_SVDTRK_ClusterTimeV456 from SVDDQMClustersOnTrack module not found!");
     m_cClusterOnTrackTime_L456V->cd();
     m_hClusterOnTrackTime_L456V.Draw();
-    colorizeCanvas(m_cClusterOnTrackTime_L456V, c_StatusDefault);
+    setStatusOfCanvas(noStat, m_cClusterOnTrackTime_L456V);
   }
-
-  m_cClusterOnTrackTime_L456V->Modified();
-  m_cClusterOnTrackTime_L456V->Update();
 
   if (m_printCanvas)
     m_cClusterOnTrackTime_L456V->Print("c_SVDClusterOnTrackTime_L456V.pdf");
@@ -223,61 +169,25 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
     m_h = findHist("SVDClsTrk/SVDTRK_Cluster3TimeV456");
 
     if (m_h != NULL) {
-      bool hasError3 = false;
-      bool lowStat3 = false;
-
       m_hClusterOnTrackTimeL456V3Samples.Clear();
       m_h->Copy(m_hClusterOnTrackTimeL456V3Samples);
-      m_hClusterOnTrackTimeL456V3Samples.GetXaxis()->SetRange(110, 190); // [-40 ns,40 ns]
-      Float_t mean_PeakInCenter = m_hClusterOnTrackTimeL456V3Samples.GetMean(); //
-      m_hClusterOnTrackTimeL456V3Samples.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
       m_hClusterOnTrackTimeL456V3Samples.SetTitle(Form("ClusterOnTrack Time L456V 3 samples %s", runID.Data()));
 
-      if (nEvents > m_statThreshold) {
-        if (m_runtype == "physics") {
-          Float_t difference_physics = fabs(mean_PeakInCenter - m_refMeanP);
-          if (difference_physics > m_timeThreshold) {
-            hasError3 = true;
-          }
-        } else if (m_runtype == "cosmic") {
-          Float_t difference_cosmic = fabs(mean_PeakInCenter - m_refMeanC);
-          if (difference_cosmic > m_timeThreshold) {
-            hasError3 = true;
-          }
-        } else {
-          B2WARNING("Run type:" << m_runtype);
-        }
-      } else {
-        lowStat3 = true;
-      }
-      if (! hasError3) {
-        m_cClusterOnTrackTimeL456V3Samples->cd();
-        m_hClusterOnTrackTimeL456V3Samples.Draw();
-        colorizeCanvas(m_cClusterOnTrackTimeL456V3Samples, c_StatusGood);
-        m_legTi3Normal->Draw();
-      } else {
-        m_cClusterOnTrackTimeL456V3Samples->cd();
-        m_hClusterOnTrackTimeL456V3Samples.Draw();
-        colorizeCanvas(m_cClusterOnTrackTimeL456V3Samples, c_StatusError);
-        m_legTi3Problem->Draw();
-      }
+      if (nEvents > m_statThreshold)
+        status = getCanvasStatus(m_hClusterOnTrackTimeL456V3Samples);
+      else
+        status = lowStat;
 
-      if (lowStat3) {
-        m_cClusterOnTrackTimeL456V3Samples->cd();
-        m_hClusterOnTrackTimeL456V3Samples.Draw();
-        colorizeCanvas(m_cClusterOnTrackTimeL456V3Samples, c_StatusTooFew);
-        m_legTi3Empty->Draw();
-      }
+      m_cClusterOnTrackTimeL456V3Samples->cd();
+      m_hClusterOnTrackTimeL456V3Samples.Draw();
+      setStatusOfCanvas(status, m_cClusterOnTrackTimeL456V3Samples);
 
     } else {
       B2INFO("Histogram SVDClsTrk/c_SVDTRK_Cluster3TimeV456 from SVDDQMClustersOnTrack module not found!");
       m_cClusterOnTrackTimeL456V3Samples->cd();
       m_hClusterOnTrackTimeL456V3Samples.Draw();
-      colorizeCanvas(m_cClusterOnTrackTimeL456V3Samples, c_StatusDefault);
+      setStatusOfCanvas(noStat, m_cClusterOnTrackTimeL456V3Samples);
     }
-
-    m_cClusterOnTrackTimeL456V3Samples->Modified();
-    m_cClusterOnTrackTimeL456V3Samples->Update();
 
     if (m_printCanvas)
       m_cClusterOnTrackTimeL456V3Samples->Print("c_SVDClusterOnTrack3Time_L456V.pdf");
@@ -298,11 +208,33 @@ void DQMHistAnalysisSVDClustersOnTrackModule::terminate()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDClustersOnTrack: terminate called");
 
-  delete m_legTiProblem;
-  delete m_legTiNormal;
-  delete m_legTiEmpty;
-
   delete m_cClusterOnTrackTime_L456V;
   delete m_cClusterOnTrackTimeL456V3Samples;
 }
 
+int DQMHistAnalysisSVDClustersOnTrackModule::getCanvasStatus(TH1F& histo)
+{
+  int status = good;
+  histo.GetXaxis()->SetRange(110, 190); // [-40 ns,40 ns]
+  Float_t mean_PeakInCenter = histo.GetMean(); //
+  histo.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
+  Float_t difference = 0;
+
+  if (m_runtype == "physics")
+    difference = fabs(mean_PeakInCenter - m_refMeanP);
+
+  else if (m_runtype == "cosmic")
+    difference = fabs(mean_PeakInCenter - m_refMeanC);
+
+  else {// taking cosmic limits
+    B2WARNING("Run type:" << m_runtype << "taken cosmics criteria");
+    difference = fabs(mean_PeakInCenter - m_refMeanC);
+  }
+
+  if (difference > m_timeThreshold)
+    status = error;
+  else
+    status = good;
+
+  return status;
+}

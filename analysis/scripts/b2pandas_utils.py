@@ -14,6 +14,7 @@ import numpy as np
 import warnings
 from pyarrow.parquet import ParquetWriter
 from pyarrow.csv import CSVWriter
+from pyarrow import ipc
 import pyarrow as pa
 
 
@@ -45,7 +46,8 @@ class VariablesToTable(basf2.Module):
         variables: List[str],
         filename: str,
         hdf_table_name: Optional[str] = None,
-        event_buffer_size: int = 10,
+        event_buffer_size: int = 100,
+        **writer_kwargs,
     ):
         """Constructor to initialize the internal state
 
@@ -54,11 +56,14 @@ class VariablesToTable(basf2.Module):
             variables(list(str)): list of variables to save for each particle
             filename(str): name of the output file to be created.
                 Needs to end with `.csv` for csv output, `.parquet` or `.pq` for parquet output,
-                and `.h5`, `.hdf` or `.hdf5` for hdf5 output
+                `.h5`, `.hdf` or `.hdf5` for hdf5 output and `.feather` or `.arrow` for feather output
             hdf_table_name(str): name of the table in the hdf5 file.
                 If not provided, it will be the same as the listname
             event_buffer_size(int): number of events to buffer before writing to disk,
                 higher values will use more memory but write faster and result in smaller files
+            **writer_kwargs: additional keyword arguments to pass to the writer.
+                For details, see the documentation of the writer in the apache arrow documentation.
+                Only use, if you know what you are doing!
         """
         super().__init__()
         #: Output filename
@@ -75,9 +80,11 @@ class VariablesToTable(basf2.Module):
             self._format = "parquet"
         elif file_type in ["h5", "hdf", "hdf5"]:
             self._format = "hdf5"
+        elif file_type in ["feather", "arrow"]:
+            self._format = "feather"
         else:
             raise ValueError(
-                f"Unknown file type ending .{file_type}, supported types are 'csv', 'parquet', 'hdf5'."
+                f"Unknown file type ending .{file_type}, supported types are 'csv', 'parquet', 'hdf5' and 'feather'."
             )
         #: Table name in the hdf5 file
         self._table_name = (
@@ -87,6 +94,8 @@ class VariablesToTable(basf2.Module):
         self._event_buffer_size = event_buffer_size
         #: Event buffer counter
         self._event_buffer_counter = 0
+        #: writer kwargs
+        self._writer_kwargs = writer_kwargs
 
     def initialize(self):
         """Create the hdf5 file and list of variable objects to be used during
@@ -132,10 +141,27 @@ class VariablesToTable(basf2.Module):
             self.initialize_parquet_writer()
         elif self._format == "csv":
             self.initialize_csv_writer()
+        elif self._format == "feather":
+            self.initialize_feather_writer()
         else:
             raise ValueError(
                 f"Unknown format {self._format}, supported formats are 'hdf5', 'parquet', 'csv'."
             )
+
+    def initialize_feather_writer(self):
+        """
+        Initialize the feather writer using pyarrow
+        """
+        #: A list of tuples and py.DataTypes to define the pyarrow schema
+        self._schema = [
+            (name, numpy_to_pyarrow_type_map[dt]) for name, dt in self._dtypes
+        ]
+        #: a writer object to write data into a feather file
+        self._feather_writer = ipc.new_stream(
+            sink=self._filename,
+            schema=pa.schema(self._schema),
+            **self._writer_kwargs
+        )
 
     def initialize_parquet_writer(self):
         """
@@ -147,7 +173,7 @@ class VariablesToTable(basf2.Module):
         ]
         #: a writer object to write data into a parquet file
         self._parquet_writer = ParquetWriter(
-            self._filename, schema=pa.schema(self._schema)
+            self._filename, schema=pa.schema(self._schema), **self._writer_kwargs
         )
 
     def initialize_csv_writer(self):
@@ -159,7 +185,7 @@ class VariablesToTable(basf2.Module):
             (name, numpy_to_pyarrow_type_map[dt]) for name, dt in self._dtypes
         ]
         #: a writer object to write data into a csv file
-        self._csv_writer = CSVWriter(self._filename, schema=pa.schema(self._schema))
+        self._csv_writer = CSVWriter(self._filename, schema=pa.schema(self._schema), **self._writer_kwargs)
 
     def initialize_hdf5_writer(self):
         """
@@ -177,7 +203,7 @@ class VariablesToTable(basf2.Module):
             warnings.simplefilter("ignore")
             #: The pytable
             self._table = self._hdf5_writer.create_table(
-                "/", self._table_name, obj=np.zeros(0, self._dtypes), filters=filters
+                "/", self._table_name, obj=np.zeros(0, self._dtypes), filters=filters, **self._writer_kwargs
             )
 
     def fill_event_buffer(self):
@@ -218,14 +244,7 @@ class VariablesToTable(basf2.Module):
             return self._buffer
         return None
 
-    def event(self):
-        """
-        Event processing function
-        executes the fill_buffer function and writes the data to the output file
-        """
-        buf = self.fill_buffer()
-        if buf is None:
-            return
+    def write_buffer(self, buf):
         if self._format == "hdf5":
             """Create a new row in the hdf5 file with for each particle in the list"""
             self._table.append(buf)
@@ -237,10 +256,26 @@ class VariablesToTable(basf2.Module):
             table = {name: buf[name] for name, _ in self._dtypes}
             pa_table = pa.table(table, schema=pa.schema(self._schema))
             self._csv_writer.write(pa_table)
+        elif self._format == "feather":
+            table = {name: buf[name] for name, _ in self._dtypes}
+            pa_table = pa.table(table, schema=pa.schema(self._schema))
+            self._feather_writer.write_table(pa_table)
+
+    def event(self):
+        """
+        Event processing function
+        executes the fill_buffer function and writes the data to the output file
+        """
+        buf = self.fill_buffer()
+        if buf is None:
+            return
+        self.write_buffer(buf)
 
     def terminate(self):
         """save and close the output"""
         import ROOT  # noqa
+        if self._buffer is not None:
+            self.write_buffer(self._buffer)
 
         if self._format == "hdf5":
             self._table.flush()
@@ -249,6 +284,8 @@ class VariablesToTable(basf2.Module):
             self._parquet_writer.close()
         elif self._format == "csv":
             self._csv_writer.close()
+        elif self._format == "feather":
+            self._feather_writer.close()
         ROOT.Belle2.MetadataService.Instance().addNtuple(self._filename)
 
 

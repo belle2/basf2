@@ -49,7 +49,7 @@ namespace Belle2 {
   private:
 
     std::string m_id; /**< Parameter given to set the UniqueID of the payload*/
-    bool theHSFinder(double* stripOccAfterAbsCut, int* hsflag, int nstrips); /**< returns true if the strip is hot*/
+    bool theHSFinder(double* stripOccAfterAbsCut, bool* hsflag, int nstrips); /**< returns true if the strip is hot*/
     bool m_computeAverageOccupancyPerChip = false; /**< granularity used to estimate average occupancy.
                   True: the avg. occupancy per chip is considered.
                   False: the the avg. occupancy per sensor/side is considered.*/

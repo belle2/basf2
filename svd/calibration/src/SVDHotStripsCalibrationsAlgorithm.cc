@@ -27,8 +27,8 @@ SVDHotStripsCalibrationsAlgorithm::SVDHotStripsCalibrationsAlgorithm(const std::
 CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
 {
 
-  int isHotStrip = 0;
-  int vecHS[768];
+  bool isHotStrip = 0;
+  bool vecHS[768];
   double stripOccAfterAbsCut[768];
 
   // float occCal = 1.;
@@ -67,11 +67,11 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
   for (int i = 0; i < tree->GetEntries(); i++) {
     tree->GetEntry(i);
 
-    TH1F*& h = map_hocc[std::make_tuple(layer, ladder, sensor, side)];
-    if (h == nullptr) {
-      h = (TH1F*)hocc->Clone(Form("hocc_L%dL%dS%d_%d", layer, ladder, sensor, side));
+    TH1F*& hOccupancy = map_hocc[std::make_tuple(layer, ladder, sensor, side)];
+    if (hOccupancy == nullptr) {
+      hOccupancy = (TH1F*)hocc->Clone(Form("hocc_L%dL%dS%d_%d", layer, ladder, sensor, side));
     } else {
-      h->Add(hocc);
+      hOccupancy->Add(hocc);
     }
   }
 
@@ -92,16 +92,18 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
     int nstrips = 768;
     if (!side && layer != 3) nstrips = 512;
 
-    TH1F* h = (TH1F*)key.second;
-    h->Scale(1. / nevents);
+    TH1F* hOccupancy = (TH1F*)key.second;
+    if (nevents != 0) hOccupancy->Scale(1. / nevents);
+    else B2ERROR("No events to compute the occupancy as strip_count/nevents");
 
-    f->WriteTObject(h);
+    f->WriteTObject(hOccupancy);
 
     for (int i = 0; i < nstrips; i++) { vecHS[i] = 0;}
 
     for (int iterStrip = 0; iterStrip < nstrips; iterStrip++) {
-      float occCal = h->GetBinContent(iterStrip + 1);
-      // B2INFO("Occupancy for: " << layer << "." << ladder << "." << sensor << "." << side << ", strip:" << iterStrip << ": " << occCal);
+      float occCal = hOccupancy->GetBinContent(iterStrip + 1);
+      B2DEBUG(40, "Occupancy for: " << layer << "." << ladder << "." << sensor << "." << side << ", strip:" << iterStrip << ": " <<
+              occCal);
 
       if (occCal > occThr) {
         vecHS[iterStrip] = 1;
@@ -110,8 +112,6 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
     }
 
     // iterative procedure
-    // B2INFO("Starting iterative procedure for hot strips finding");
-
     while (theHSFinder(stripOccAfterAbsCut, vecHS, nstrips)) {}
 
     for (int l = 0; l < nstrips; l++) {
@@ -124,12 +124,12 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
   saveCalibration(payload, "SVDHotStripsCalibrations");
 
   // probably not needed - would trigger re-doing the collection
-  //if ( ... too large corrections ... ) return c_Iterate;
+  // if ( ... too large corrections ... ) return c_Iterate;
   return c_OK;
 }
 
 
-bool SVDHotStripsCalibrationsAlgorithm::theHSFinder(double* stripOccAfterAbsCut, int* hsflag, int nstrips)
+bool SVDHotStripsCalibrationsAlgorithm::theHSFinder(double* stripOccAfterAbsCut, bool* hsflag, int nstrips)
 {
   bool found = false;
 

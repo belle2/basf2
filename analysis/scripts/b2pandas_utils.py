@@ -143,10 +143,6 @@ class VariablesToTable(basf2.Module):
             self.initialize_csv_writer()
         elif self._format == "feather":
             self.initialize_feather_writer()
-        else:
-            raise ValueError(
-                f"Unknown format {self._format}, supported formats are 'hdf5', 'parquet', 'csv'."
-            )
 
     def initialize_feather_writer(self):
         """

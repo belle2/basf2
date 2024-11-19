@@ -37,7 +37,7 @@ with b2test_utils.clean_working_directory():
 
     # Testing
     assert os.path.isfile('particleDF.feather'), "particleDF.feather wasn't created"
-    df1 = pandas.read_parquet('particleDF.feather')
+    df1 = pandas.read_feather('particleDF.feather')
     assert len(df1) > 0, "electron dataframe contains zero entries"
     assert 'electronID' in df1.columns, "electronID column is missing from electron dataframe"
     assert 'p' in df1.columns, "p column is missing from electron dataframe"

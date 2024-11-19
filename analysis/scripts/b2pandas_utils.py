@@ -84,7 +84,8 @@ class VariablesToTable(basf2.Module):
             self._format = "feather"
         else:
             raise ValueError(
-                f"Unknown file type ending .{file_type}, supported types are 'csv', 'parquet', 'hdf5' and 'feather'."
+                f"Unknown file type ending .{file_type}, supported types are 'csv', "
+                "'parquet', 'pq', 'h5', 'hdf', 'hdf5', 'feather' or 'arrow'"
             )
         #: Table name in the hdf5 file
         self._table_name = (
@@ -92,6 +93,8 @@ class VariablesToTable(basf2.Module):
         )
         #: Event buffer size
         self._event_buffer_size = event_buffer_size
+        #: Event buffer
+        self._buffer = None
         #: Event buffer counter
         self._event_buffer_counter = 0
         #: writer kwargs
@@ -241,6 +244,9 @@ class VariablesToTable(basf2.Module):
         return None
 
     def write_buffer(self, buf):
+        """
+        write the buffer to the output file
+        """
         if self._format == "hdf5":
             """Create a new row in the hdf5 file with for each particle in the list"""
             self._table.append(buf)

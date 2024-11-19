@@ -38,6 +38,7 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
   auto payload = new Belle2::SVDHotStripsCalibrations::t_payload(isHotStrip, m_id);
 
   auto tree = getObjectPtr<TTree>("HTreeOccupancyCalib");
+  auto hNEvents = getObjectPtr<TH1F>("HNEvents");
 
   TH1F* hocc = new TH1F("", "", 768, 0, 768);
 
@@ -45,6 +46,9 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
     B2WARNING("No tree object.");
   } else if (!tree->GetEntries()) {
     B2WARNING("No data in the tree.");
+  }
+  if (!hNEvents) {
+    B2WARNING("No histogram object containing the number of events.");
   }
 
   int layer = 0;
@@ -77,12 +81,19 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
     cal_rev++;
   std::unique_ptr<TFile> f(new TFile(Form("algorithm_SVDHotStripsCalibrations_output_rev_%d.root", cal_rev), "RECREATE"));
 
+  int nevents = 0;
+  if (hNEvents) {
+    f->WriteTObject(hNEvents.get());
+    nevents = ((TH1F*)hNEvents.get())->GetEntries();
+  }
+
   for (const auto& key : map_hocc) {
     std::tie(layer, ladder, sensor, side) = key.first;
     int nstrips = 768;
     if (!side && layer != 3) nstrips = 512;
 
     TH1F* h = (TH1F*)key.second;
+    h->Scale(1. / nevents);
 
     f->WriteTObject(h);
 

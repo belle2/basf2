@@ -227,7 +227,7 @@ class VariablesToTable(basf2.Module):
 
     def fill_buffer(self):
         """
-        fill a buffer ofer multiple events and return it, when self.
+        fill a buffer over multiple events and return it, when self.
         """
         if self._event_buffer_counter == 0:
             self._buffer = self.fill_event_buffer()

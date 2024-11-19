@@ -182,6 +182,34 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
     std::vector<float> avgOffOccL6102UV = highOccupancySensor(6, h_zs5countsU, h_zs5countsV, 139, nE); // L6.10.2
 
+    // average occupancy for low DCDC
+    // L3.2.1 above
+    // L3.2.2 above
+    std::vector<float> avgOffOccL411UV = getOccupancySensorUV(4, h_zs5countsU, h_zs5countsV, 1, 5, nE); // L4.1.1
+
+    std::vector<float> avgOffOccL4102UV = getOccupancySensorUV(4, h_zs5countsU, h_zs5countsV, 10, 6, nE); // L4.10.2
+
+    // average occupancy for peculiar sensors
+    std::vector<float> avgOffOccL433UV = getOccupancySensorUV(4, h_zs5countsU, h_zs5countsV, 3, 7, nE); // L4.3.3
+
+    std::vector<float> avgOffOccL513UV = getOccupancySensorUV(5, h_zs5countsU, h_zs5countsV, 1, 11, nE); // L5.1.3
+
+    std::vector<float> avgOffOccL514UV = getOccupancySensorUV(5, h_zs5countsU, h_zs5countsV, 3, 12, nE); // L5.1.4
+
+    std::vector<float> avgOffOccL592UV = getOccupancySensorUV(5, h_zs5countsU, h_zs5countsV, 9, 10, nE); // L5.9.2
+
+    std::vector<float> avgOffOccL594UV = getOccupancySensorUV(5, h_zs5countsU, h_zs5countsV, 9, 12, nE); // L5.9.4
+
+    std::vector<float> avgOffOccL643UV = getOccupancySensorUV(6, h_zs5countsU, h_zs5countsV, 4, 16, nE); // L6.4.3
+
+    std::vector<float> avgOffOccL664UV = getOccupancySensorUV(6, h_zs5countsU, h_zs5countsV, 6, 17, nE); // L6.6.4
+
+    std::vector<float> avgOffOccL6103UV = getOccupancySensorUV(6, h_zs5countsU, h_zs5countsV, 10, 16, nE); // L6.10.3
+
+    std::vector<float> avgOffOccL6115UV = getOccupancySensorUV(6, h_zs5countsU, h_zs5countsV, 11, 18, nE); // L6.11.5
+
+    std::vector<float> avgOffOccL6124UV = getOccupancySensorUV(6, h_zs5countsU, h_zs5countsV, 12, 17, nE); // L6.12.4
+
     m_monObj->setVariable("avgOffOccL3U", avgOffOccL3UV[0]);
     m_monObj->setVariable("avgOffOccL4U", avgOffOccL4UV[0]);
     m_monObj->setVariable("avgOffOccL5U", avgOffOccL5UV[0]);
@@ -251,6 +279,24 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgOffOccL582V", avgOffOccL582UV[1]);
     m_monObj->setVariable("avgOffOccL6101V", avgOffOccL6101UV[1]);
     m_monObj->setVariable("avgOffOccL6102V", avgOffOccL6102UV[1]);
+
+    // DCDC
+    m_monObj->setVariable("avgOffOccL411U", avgOffOccL411UV[0]);
+    m_monObj->setVariable("avgOffOccL4102U", avgOffOccL4102UV[0]);
+    m_monObj->setVariable("avgOffOccL411V", avgOffOccL411UV[1]);
+    m_monObj->setVariable("avgOffOccL4102V", avgOffOccL4102UV[1]);
+
+    //peculiar
+    m_monObj->setVariable("avgOffOccL433V", avgOffOccL433UV[1]);
+    m_monObj->setVariable("avgOffOccL513U", avgOffOccL513UV[0]);
+    m_monObj->setVariable("avgOffOccL514V", avgOffOccL514UV[1]);
+    m_monObj->setVariable("avgOffOccL592V", avgOffOccL592UV[1]);
+    m_monObj->setVariable("avgOffOccL594V", avgOffOccL594UV[1]);
+    m_monObj->setVariable("avgOffOccL643U", avgOffOccL643UV[0]);
+    m_monObj->setVariable("avgOffOccL664U", avgOffOccL664UV[0]);
+    m_monObj->setVariable("avgOffOccL6103U", avgOffOccL6103UV[0]);
+    m_monObj->setVariable("avgOffOccL6115U", avgOffOccL6115UV[0]);
+    m_monObj->setVariable("avgOffOccL6124U", avgOffOccL6124UV[0]);
   }
 
 
@@ -335,7 +381,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     std::vector<float> avgEffL6X5 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 16, 18, 18);
 
     // average efficiency for high occupancy sensors
-
     std::vector<float> avgEffL311UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 1, 2,
                                                       2); // L3.1.1
 
@@ -365,6 +410,46 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
     std::vector<float> avgEffL6102UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 10, 10, 15,
                                                        15); // L6.10.2
+
+    // average efficiency for low DCDC
+    // L3.2.1 above
+    // L3.2.2 above
+    std::vector<float> avgEffL411UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 1, 5,
+                                                      5); // L4.1.1
+
+    std::vector<float> avgEffL4102UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 10, 10, 6,
+                                                       6); // L4.10.2
+
+    // average efficiency for peculiar sensors
+    std::vector<float> avgEffL433UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 3, 3, 7,
+                                                      7); // L4.3.3
+
+    std::vector<float> avgEffL513UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 1, 11,
+                                                      11); // L5.1.3
+
+    std::vector<float> avgEffL514UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 3, 3, 12,
+                                                      12); // L5.1.4
+
+    std::vector<float> avgEffL592UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 9, 9, 10,
+                                                      10); // L5.9.2
+
+    std::vector<float> avgEffL594UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 9, 9, 12,
+                                                      12); // L5.9.4
+
+    std::vector<float> avgEffL643UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 4, 4, 16,
+                                                      16); // L6.4.3
+
+    std::vector<float> avgEffL664UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 6, 6, 17,
+                                                      17); // L6.6.4
+
+    std::vector<float> avgEffL6103UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 10, 10, 16,
+                                                       16); // L6.10.3
+
+    std::vector<float> avgEffL6115UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 11, 11, 18,
+                                                       18); // L6.11.5
+
+    std::vector<float> avgEffL6124UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 12, 12, 17,
+                                                       17); // L6.12.4
 
     m_monObj->setVariable("avgEffL3U", avgEffL3[0]);
     m_monObj->setVariable("avgEffL4U", avgEffL4[0]);
@@ -425,6 +510,23 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgEffL582V", avgEffL582UV[1]);
     m_monObj->setVariable("avgEffL6101V", avgEffL6101UV[1]);
     m_monObj->setVariable("avgEffL6102V", avgEffL6102UV[1]);
+    // DCDC
+    m_monObj->setVariable("avgEffL411U", avgEffL411UV[0]);
+    m_monObj->setVariable("avgEffL4102U", avgEffL4102UV[0]);
+    m_monObj->setVariable("avgEffL411V", avgEffL411UV[1]);
+    m_monObj->setVariable("avgEffL4102V", avgEffL4102UV[1]);
+
+    //peculiar
+    m_monObj->setVariable("avgEffL433V", avgEffL433UV[1]);
+    m_monObj->setVariable("avgEffL513U", avgEffL513UV[0]);
+    m_monObj->setVariable("avgEffL514V", avgEffL514UV[1]);
+    m_monObj->setVariable("avgEffL592V", avgEffL592UV[1]);
+    m_monObj->setVariable("avgEffL594V", avgEffL594UV[1]);
+    m_monObj->setVariable("avgEffL643U", avgEffL643UV[0]);
+    m_monObj->setVariable("avgEffL664U", avgEffL664UV[0]);
+    m_monObj->setVariable("avgEffL6103U", avgEffL6103UV[0]);
+    m_monObj->setVariable("avgEffL6115U", avgEffL6115UV[0]);
+    m_monObj->setVariable("avgEffL6124U", avgEffL6124UV[0]);
   }
 
   // MPV cluster charge for clusters on track
@@ -755,6 +857,27 @@ void DQMHistAnalysisSVDOnMiraBelleModule::terminate()
   B2INFO("DQMHistAnalysisSVDOnMiraBelle: terminate called");
 }
 
+
+std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::getOccupancySensorUV(int iLayer, TH1F* hU, TH1F* hV, int binX, int binY,
+    int nEvents) const
+{
+  int nStripsV = -1;
+  if (iLayer == 3) {
+    nStripsV = 768;
+  } else if (iLayer >= 4 && iLayer <= 6) {
+    nStripsV = 512;
+  } else {
+    B2DEBUG(20, "Layer out of range [3,6].");
+  }
+  std::vector<float> avgOffOccUV(2, 0.0);
+  int iBin = hU->GetBin(binX, binY);
+
+  avgOffOccUV[0] = 0;
+  if (hU) avgOffOccUV[0] = hU->GetBinContent(iBin) * 1.0 / 768 / nEvents * 100;
+  avgOffOccUV[1] = 0;
+  if (hV) avgOffOccUV[1] = hV->GetBinContent(iBin) * 1.0 / nStripsV / nEvents * 100;
+  return avgOffOccUV;
+}
 
 std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::highOccupancySensor(int iLayer, TH1F* hU, TH1F* hV, int iBin,
     int nEvents) const

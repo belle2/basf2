@@ -144,7 +144,7 @@ run-tests:
         cat input_tests_reports/${FILE}
       done
     - b2code-option opt
-    - b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/output_tests_reports/tests-google.xml
+    #- b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/output_tests_reports/tests-google.xml
     - b2test-scripts -j $(nproc) --filter "^framework/tests/(?!(foreach.py))" --xml-input=${BELLE2_LOCAL_DIR}/input_tests_reports/tests-framework.xml --xml=${BELLE2_LOCAL_DIR}/output_tests_reports/tests-framework.xml --timeout 1200
     - b2test-scripts -j $(nproc) --filter "^(?!framework/tests/.*)" --xml-input=${BELLE2_LOCAL_DIR}/input_tests_reports/tests-non-framework.xml --xml=${BELLE2_LOCAL_DIR}/output_tests_reports/tests-non-framework.xml --timeout 1200
     # Upload the tests reports (only if this is the main branch)

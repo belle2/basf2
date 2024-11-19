@@ -83,6 +83,12 @@ namespace Belle2 {
     int m_candidate{ -1};            /**< candidate counter */
     unsigned int m_ncandidates{0};   /**< total n candidates */
     unsigned int m_eventCount{0};    /**< event counter */
+    int m_experimentLow{1};          /**< lowest experiment number */
+    int m_experimentHigh{0};         /**< highest experiment number */
+    int m_runLow{0};                 /**< lowest run number */
+    int m_runHigh{0};                /**< highest run number */
+    int m_eventLow{0};               /**< lowest event number */
+    int m_eventHigh{0};              /**< highest event number */
 
     /** Branch addresses of variables of type float. */
     std::vector<float> m_branchAddressesFloat;

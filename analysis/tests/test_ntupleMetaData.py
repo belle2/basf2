@@ -51,12 +51,12 @@ with clean_working_directory() as tmpdir:
 
     # generate input files
     evtNumList = [9, 1]
-    runList = [1, 15]
+    runList = [1, 30]
     expList = [7, 7]
     generate_test_data(inputFile1, evtNumList, runList, expList)
 
     evtNumList = [19, 11]
-    runList = [17, 30]
+    runList = [17, 19]
     expList = [9, 9]
     generate_test_data(inputFile2, evtNumList, runList, expList)
 
@@ -65,12 +65,12 @@ with clean_working_directory() as tmpdir:
     main.add_module('RootInput', inputFileNames=[inputFile1, inputFile2])
     main.add_module('VariablesToNtuple',
                     fileName=testFile,
-                    treeName='tree',
+                    treeName='ntupleTree',
                     dataDescription=dataDescription1
                     )
     main.add_module('VariablesToNtuple',
                     fileName=testFile,
-                    treeName='anotherTree',
+                    treeName='anotherNtupleTree',
                     dataDescription=dataDescription2
                     )
     safe_process(main)
@@ -85,15 +85,15 @@ with clean_working_directory() as tmpdir:
     assert 1 == metadata.getRunLow()
     assert 1 == metadata.getEventLow()
     assert 9 == metadata.getExperimentHigh()
-    assert 30 == metadata.getRunHigh()
+    assert 19 == metadata.getRunHigh()
     assert 11 == metadata.getEventHigh()  # highest evt. no in highest run
     assert metadata.containsEvent(7, 1, 1)
     assert metadata.containsEvent(7, 1, 9)
     assert metadata.containsEvent(7, 15, 1)
     assert metadata.containsEvent(7, 16, 6)
     assert metadata.containsEvent(9, 16, 12)
-    assert metadata.containsEvent(9, 29, 19)
-    assert metadata.containsEvent(9, 30, 11)
+    assert metadata.containsEvent(9, 18, 19)
+    assert metadata.containsEvent(9, 19, 11)
     assert not metadata.containsEvent(7, 0, 10)
     assert not metadata.containsEvent(10, 16, 6)
     assert not metadata.containsEvent(0, 15, 6)
@@ -128,7 +128,7 @@ with clean_working_directory() as tmpdir:
     assert 1 == m['runLow']
     assert 1 == m['eventLow']
     assert 9 == m['experimentHigh']
-    assert 30 == m['runHigh']
+    assert 19 == m['runHigh']
     assert 11 == m['eventHigh']
     assert 'something random' == m['randomSeed']
     assert 40 == m['nEvents']

@@ -100,24 +100,20 @@ def create_testfile_ntuple(input, output, treeNames=["tree1", "tree2"], **argk):
         f.write(testfile_ntuple_steering)
 
     subprocess.call(
-        ["basf2", "-i", input, "-o", "tmp.root", steering_file] + treeNames, env=env
+        ["basf2", "-i", input, "-o", output, steering_file] + treeNames, env=env
     )
 
     # update release in metadata to avoid 'modified-xxx' warnings
-    metadata = get_metadata("tmp.root")
+    metadata = get_metadata(output)
     metadata.setCreationData(
         metadata.getDate(), metadata.getSite(), metadata.getUser(), "test-release"
     )
-    f = ROOT.TFile(output, "RECREATE")
+    f = ROOT.TFile(output, "UPDATE")
     t = ROOT.TTree("persistent", "persistent")
     t.Branch("FileMetaData", metadata)
     t.Fill()
     t.Write()
     f.Close()
-    opts = ROOT.RDF.RSnapshotOptions()
-    opts.fMode = "update"
-    for tree in treeNames:
-        ROOT.RDataFrame(tree, "tmp.root").Snapshot(tree, output, "", opts)
 
 
 def get_metadata(name="output.root"):

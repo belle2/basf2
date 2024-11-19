@@ -121,9 +121,10 @@ void VariablesToNtupleModule::initialize()
   TDirectory::TContext directoryGuard(m_file.get());
 
   // check if TTree with that name already exists
-  if (m_file->Get(m_treeName.c_str())) {
+  if (m_file->Get(m_treeName.c_str()) || m_treeName == "persistent" || m_treeName == "tree") {
     B2FATAL("Tree with the name \"" << m_treeName
             << "\" already exists in the file \"" << m_fileName << "\"\n"
+            << "or is one of the reserved names - [persistent, tree].\n"
             << "\nYou probably want to either set the output fileName or the treeName to something else:\n\n"
             << "   from modularAnalysis import variablesToNtuple\n"
             << "   variablesToNtuple('pi+:all', ['p'], treename='pions', filename='variablesToNtuple.root')\n"
@@ -289,6 +290,25 @@ void VariablesToNtupleModule::event()
   m_experiment = m_eventMetaData->getExperiment();
   m_production = m_eventMetaData->getProduction();
 
+  if (m_experimentLow > m_experimentHigh) { //starting condition
+    m_experimentLow = m_experimentHigh = m_experiment;
+    m_runLow = m_runHigh = m_run;
+    m_eventLow = m_eventHigh = m_event;
+  } else {
+    if ((m_experiment < m_experimentLow) ||
+        ((m_experiment == m_experimentLow) && ((m_run < m_runLow) || ((m_run == m_runLow) && (m_event < m_eventLow))))) {
+      m_experimentLow = m_experiment;
+      m_runLow = m_run;
+      m_eventLow = m_event;
+    }
+    if ((m_experiment > m_experimentHigh) ||
+        ((m_experiment == m_experimentHigh) && ((m_run > m_runHigh) || ((m_run == m_runHigh) && (m_event > m_eventHigh))))) {
+      m_experimentHigh = m_experiment;
+      m_runHigh = m_run;
+      m_eventHigh = m_event;
+    }
+  }
+
   if (m_inputFileMetaData.isValid()) {
     std::string lfn = m_inputFileMetaData->getLfn();
     if (not lfn.empty() and (m_parentLfns.empty() or (m_parentLfns.back() != lfn))) {
@@ -407,19 +427,8 @@ void VariablesToNtupleModule::fillFileMetaData()
   bool isMC = (m_inputFileMetaData) ? m_inputFileMetaData->isMC() : true;
   if (!isMC) outputFileMetaData.declareRealData();
 
-  auto runHigh = m_tree->get().GetMaximum("__run__");
-  double eventHigh{-1};
-  gROOT->SetBatch();
-  std::string cut = "__run__ == " + std::to_string(runHigh);
-  const unsigned runHighEvents = m_tree->get().Draw("__event__", cut.c_str());
-  if (runHighEvents) {
-    double* event = m_tree->get().GetV1();
-    eventHigh = *(std::max_element(event, event + runHighEvents));
-  }
-
-  outputFileMetaData.setLow(int(m_tree->get().GetMinimum("__experiment__")), int(m_tree->get().GetMinimum("__run__")),
-                            int(m_tree->get().GetMinimum("__event__")));
-  outputFileMetaData.setHigh(int(m_tree->get().GetMaximum("__experiment__")), int(runHigh), int(eventHigh));
+  outputFileMetaData.setLow(m_experimentLow, m_runLow, m_eventLow);
+  outputFileMetaData.setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
   outputFileMetaData.setNEvents(m_tree->get().GetEntries());
   outputFileMetaData.setNFullEvents(m_eventCount);
 

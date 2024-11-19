@@ -82,7 +82,7 @@ void DQMHistAnalysisPhysicsModule::event()
 {
 
 
-  bool m_IsPhysicsRun = (getRunType() == "physics") || (getRunType() == "cosmic") || (getRunType() == "debug");
+  bool m_IsPhysicsRun = (getRunType() == "physics") || (getRunType() == "debug");
   if (m_IsPhysicsRun == true) {
 
     m_cmUPS_text->Clear();

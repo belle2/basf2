@@ -149,7 +149,10 @@ def configure_logging_for_tests(user_replacements=None):
     # current directory should go first and might be overridden if for example
     # the BELLE2_LOCAL_DIR is identical to the current working directory
     replacements = OrderedDict()
-    replacements[get_version()] = "${release_version}"
+    try:
+        replacements[get_version()] = "${release_version}"
+    except Exception:
+        pass
     replacements[", ".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
     # add a special replacement for the CDB metadata provider URL, since it's not set via env. variable
     replacements[basf2.conditions.default_metadata_provider_url] = "${BELLE2_CONDB_METADATA}"

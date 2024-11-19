@@ -3,7 +3,6 @@ stages:
   - build-gcc
   - run-tests
   - build-clang
-  - build-doc
   - release-validation
 
 variables:
@@ -88,34 +87,34 @@ default:
     - source ${GITLAB_BELLE2_TOOLS_B2SETUP}
   interruptible: true  # All the jobs can be interrupted by newer pipelines
 
-prepare-pipeline:
-  stage: prepare-pipeline
-  needs: []
-  variables:
-    GITLAB_IS_FIRST_STAGE: "yes"
-  script:
-    - echo "stage start time -> $(date +%H:%M:%S)"
-    # Identify the current HEAD of the target branch and cache it
-    - |
-      if [ "${CI_PIPELINE_SOURCE}" == "merge_request_event" ]; then
-        git rev-parse origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} > target_head_hash.txt
-        echo "The current HEAD of the branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} is $(< target_head_hash.txt)"
-      fi
-    - echo "stage stop time -> $(date +%H:%M:%S)"
+#prepare-pipeline:
+#  stage: prepare-pipeline
+#  needs: []
+#  variables:
+#    GITLAB_IS_FIRST_STAGE: "yes"
+#  script:
+#    - echo "stage start time -> $(date +%H:%M:%S)"
+#    # Identify the current HEAD of the target branch and cache it
+#    - |
+#      if [ "${CI_PIPELINE_SOURCE}" == "merge_request_event" ]; then
+#        git rev-parse origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} > target_head_hash.txt
+#        echo "The current HEAD of the branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} is $(< target_head_hash.txt)"
+#      fi
+#    - echo "stage stop time -> $(date +%H:%M:%S)"
 
-build-gcc:
-  stage: build-gcc
-  needs: [prepare-pipeline]
-  script:
-    - echo "stage start time -> $(date +%H:%M:%S)"
-    - b2code-option opt
-    - scons --no-debuginfo
-    - basf2 --info
-    - echo "stage stop time -> $(date +%H:%M:%S)"
+#build-gcc:
+#  stage: build-gcc
+#  needs: [prepare-pipeline]
+#  script:
+#    - echo "stage start time -> $(date +%H:%M:%S)"
+#    - b2code-option opt
+#    - scons --no-debuginfo
+#    - basf2 --info
+#    - echo "stage stop time -> $(date +%H:%M:%S)"
 
 run-tests:
   stage: run-tests
-  needs: [build-gcc]
+#  needs: [build-gcc]
   artifacts:
     when: always
     reports:
@@ -138,6 +137,11 @@ run-tests:
       for FILE in "${FILES[@]}"; do
         curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --output "input_tests_reports/${FILE}" \
         "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE}/${VERSION}/${FILE}"
+      done
+    - ls input_tests_reports
+    - |
+      for FILE in "${FILES[@]}"; do
+        cat input_tests_reports/${FILE}
       done
     - b2code-option opt
     - b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/output_tests_reports/tests-google.xml

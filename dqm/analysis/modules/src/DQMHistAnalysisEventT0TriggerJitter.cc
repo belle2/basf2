@@ -69,6 +69,17 @@ void DQMHistAnalysisEventT0TriggerJitterModule::event()
   }
 }
 
+void DQMHistAnalysisEventT0TriggerJitterModule::endRun()
+{
+  analyseECLTRGEventT0Distributions();
+  analyseCDCTRGEventT0Distributions();
+  analyseTOPTRGEventT0Distributions();
+
+  if (m_printCanvas) {
+    printCanvases();
+  }
+}
+
 void DQMHistAnalysisEventT0TriggerJitterModule::terminate()
 {
   deleteCanvases();

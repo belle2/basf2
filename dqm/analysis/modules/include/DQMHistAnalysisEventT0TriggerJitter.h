@@ -37,6 +37,9 @@ namespace Belle2 {
     /** fit the histograms in the event */
     void event() override final;
 
+    /** final fit of T0 distributions */
+    void endRun() override final;
+
     /** delete pointers */
     void terminate() override final;
 

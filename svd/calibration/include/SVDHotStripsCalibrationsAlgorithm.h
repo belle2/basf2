@@ -52,7 +52,7 @@ namespace Belle2 {
     bool theHSFinder(double* stripOccAfterAbsCut, bool* hsflag, int nstrips); /**< returns true if the strip is hot*/
     bool m_computeAverageOccupancyPerChip = false; /**< granularity used to estimate average occupancy.
                   True: the avg. occupancy per chip is considered.
-                  False: the the avg. occupancy per sensor/side is considered.*/
+                  False: the avg. occupancy per sensor/side is considered.*/
     float m_relativeOccupancyThreshold = 5.0; /**< occupancy relative to the average sensor occupancy used
                to define a strip as hot.*/
     float m_absoluteOccupancyThreshold = 0.2; /**< absolute occupancy thresold to define a strip as hot.*/

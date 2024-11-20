@@ -84,6 +84,18 @@ void DQMHistAnalysisEventT0TriggerJitterModule::endRun()
   analyseCDCTRGEventT0Distributions();
   analyseTOPTRGEventT0Distributions();
 
+  // Set the deltaT0 values to be accissble in MiraBelle, with SVD EventT0 being the reference
+  // As we are only interested in trends, just the raw difference is used, no (error) weighted values
+  m_monObj->setVariable("hadron_Delta_ECLT0_SVDT0", m_ECLTRGHLThadronECLT0 - m_ECLTRGHLThadronSVDT0);
+  m_monObj->setVariable("hadron_Delta_CDCT0_SVDT0", m_ECLTRGHLThadronCDCT0 - m_ECLTRGHLThadronSVDT0);
+  m_monObj->setVariable("hadron_Delta_TOPT0_SVDT0", m_ECLTRGHLThadronTOPT0 - m_ECLTRGHLThadronSVDT0);
+  m_monObj->setVariable("bhabha_Delta_ECLT0_SVDT0", m_ECLTRGHLTbhabhaECLT0 - m_ECLTRGHLTbhabhaSVDT0);
+  m_monObj->setVariable("bhabha_Delta_CDCT0_SVDT0", m_ECLTRGHLTbhabhaCDCT0 - m_ECLTRGHLTbhabhaSVDT0);
+  m_monObj->setVariable("bhabha_Delta_TOPT0_SVDT0", m_ECLTRGHLTbhabhaTOPT0 - m_ECLTRGHLTbhabhaSVDT0);
+  m_monObj->setVariable("mumu_Delta_ECLT0_SVDT0", m_ECLTRGHLTmumuECLT0 - m_ECLTRGHLTmumuSVDT0);
+  m_monObj->setVariable("mumu_Delta_CDCT0_SVDT0", m_ECLTRGHLTmumuCDCT0 - m_ECLTRGHLTmumuSVDT0);
+  m_monObj->setVariable("mumu_Delta_TOPT0_SVDT0", m_ECLTRGHLTmumuTOPT0 - m_ECLTRGHLTmumuSVDT0);
+
   if (m_printCanvas) {
     printCanvases();
   }

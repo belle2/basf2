@@ -11,11 +11,10 @@ namespace Belle2 {
 
   double CDCDedxHit::getSignedDOCAXY() const
   {
-    //TODO...
     double doca = sqrt(m_dx * m_dx + m_dy * m_dy);
-    double phidiff = getPOCAOnTrack().Phi() - getPOCAOnWire().Phi();
-    // be careful about "wrap around" cases when the poca and wire are close, but the difference in phi is largy
-    if (phidiff > -3.1416 and (phidiff < 0 or phidiff > 3.1416)) return -doca;
+    double z = m_dx * m_y - m_dy * m_x;
+    if (z < 0) doca = -doca;
+
     return doca;
   }
 

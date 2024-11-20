@@ -106,13 +106,14 @@ namespace Belle2 {
 
     /**
      * Returns signed distance-of-closest-approach in XY projection.
-     * The sign is defined here to be positive in the +x dir in the cell.
+     * Keeping here the same sign definition as in CDCDedxPIDModule (positive in +phi direction)
      * @return signed DOCA in XY projection
      */
     double getSignedDOCAXY() const;
 
     /**
      * Returns entrance angle to the cell in XY projection.
+     * Keeping here the same angle definition as in CDCDedxPIDModule
      * @return entracne angle
      */
     double getEntranceAngle() const;

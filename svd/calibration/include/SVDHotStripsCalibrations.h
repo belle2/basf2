@@ -21,7 +21,7 @@
 
 namespace Belle2 {
 
-  /** This class defines the wrapper to retrieve the the list
+  /** This class defines the wrapper to retrieve the list
    *  of the hot strips flagged offline.
    *
    */

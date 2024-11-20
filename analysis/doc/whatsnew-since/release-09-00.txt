@@ -1,8 +1,7 @@
-Changes in the analysis package in light-24011-spirelli
--------------------------------------------------------
+
 Modules
 +++++++
-* Added a tunable buffer to the ``VariabesToTable`` module to improve compression efficiency and feather as output format.
+* Added a tunable buffer to the ``VariabesToTable`` module to improve compression efficiency and feather as new output format.
 
 
 

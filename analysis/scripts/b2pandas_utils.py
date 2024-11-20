@@ -156,7 +156,7 @@ class VariablesToTable(basf2.Module):
             (name, numpy_to_pyarrow_type_map[dt]) for name, dt in self._dtypes
         ]
         #: a writer object to write data into a feather file
-        self._feather_writer = ipc.new_stream(
+        self._feather_writer = ipc.RecordBatchFileWriter(
             sink=self._filename,
             schema=pa.schema(self._schema),
             **self._writer_kwargs
@@ -247,21 +247,19 @@ class VariablesToTable(basf2.Module):
         """
         write the buffer to the output file
         """
+
         if self._format == "hdf5":
             """Create a new row in the hdf5 file with for each particle in the list"""
             self._table.append(buf)
-        elif self._format == "parquet":
+        else:
             table = {name: buf[name] for name, _ in self._dtypes}
             pa_table = pa.table(table, schema=pa.schema(self._schema))
-            self._parquet_writer.write_table(pa_table)
-        elif self._format == "csv":
-            table = {name: buf[name] for name, _ in self._dtypes}
-            pa_table = pa.table(table, schema=pa.schema(self._schema))
-            self._csv_writer.write(pa_table)
-        elif self._format == "feather":
-            table = {name: buf[name] for name, _ in self._dtypes}
-            pa_table = pa.table(table, schema=pa.schema(self._schema))
-            self._feather_writer.write_table(pa_table)
+            if self._format == "parquet":
+                self._parquet_writer.write_table(pa_table)
+            elif self._format == "csv":
+                self._csv_writer.write(pa_table)
+            elif self._format == "feather":
+                self._feather_writer.write_table(pa_table)
 
     def event(self):
         """

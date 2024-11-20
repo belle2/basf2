@@ -15,6 +15,9 @@
 #include <dqm/core/DQMHistAnalysis.h>
 #include <TEfficiency.h>
 
+#include <tuple>
+#include <optional>
+
 namespace Belle2 {
 
   /** Class definition */
@@ -58,7 +61,7 @@ namespace Belle2 {
      * @param tag to distinguish results
      * @return false if the histogram is not found or the fit is not converged
      **/
-    bool processHistogram(TH1* h, TString tag);
+    bool processHistogram(TH1* h, TString tag, bool retrieveMeanT0 = false);
 
     /** double gaussian fitting function for the jitter distribution
      * @param x Data used to fit double gaussians

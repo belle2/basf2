@@ -93,7 +93,7 @@ double DQMHistAnalysisEventT0TriggerJitterModule::fDoubleGaus(double* x, double*
   return N * frac * TMath::Gaus(x[0], mean, sigma) + N * (1 - frac) * TMath::Gaus(x[0], mean2, sigma2);
 }
 
-bool DQMHistAnalysisEventT0TriggerJitterModule::processHistogram(TH1* h,  TString tag)
+bool DQMHistAnalysisEventT0TriggerJitterModule::processHistogram(TH1* h,  TString tag, bool retrieveMeanT0)
 {
 
   if (h == nullptr) {

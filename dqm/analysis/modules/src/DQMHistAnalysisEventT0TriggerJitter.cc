@@ -177,13 +177,19 @@ std::tuple<bool, std::optional<double>>
 
 void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distributions(bool retrieveDeltas)
 {
+
+  const bool retrieveMeanT0 = retrieveDeltas;
+  bool processingSuccessful = false;
+  std::optional<double> currentT0;
+
   // --- ECL EventT0 plots for ECLTRG ---
 
   // find ECL EventT0 Hadrons ECLTRG histogram and process it
   TH1* h = findHist("EventT0/m_histEventT0_ECL_hadron_L1_ECLTRG");
   TString tag = "hadronECLTRG_ECLT0";
   m_cECLTimeHadronsECLTRG->cd();
-  if (std::get<0>(processHistogram(h, tag))) {
+  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
+  if (processingSuccessful) {
     m_cECLTimeHadronsECLTRG->SetFillColor(0);
     m_cECLTimeHadronsECLTRG->Modified();
     m_cECLTimeHadronsECLTRG->Update();
@@ -198,7 +204,8 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_ECL_bhabha_L1_ECLTRG");
   tag = "bhabhaECLTRG_ECLT0";
   m_cECLTimeBhaBhaECLTRG->cd();
-  if (std::get<0>(processHistogram(h, tag))) {
+  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
+  if (processingSuccessful) {
     m_cECLTimeBhaBhaECLTRG->SetFillColor(0);
     m_cECLTimeBhaBhaECLTRG->Modified();
     m_cECLTimeBhaBhaECLTRG->Update();
@@ -213,7 +220,8 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_ECL_mumu_L1_ECLTRG");
   tag = "mumuECLTRG_ECLT0";
   m_cECLTimeMuMuECLTRG->cd();
-  if (std::get<0>(processHistogram(h, tag))) {
+  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
+  if (processingSuccessful) {
     m_cECLTimeMuMuECLTRG->SetFillColor(0);
     m_cECLTimeMuMuECLTRG->Modified();
     m_cECLTimeMuMuECLTRG->Update();
@@ -231,7 +239,8 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_CDC_hadron_L1_ECLTRG");
   tag = "hadronECLTRG_CDCT0";
   m_cCDCTimeHadronsECLTRG->cd();
-  if (std::get<0>(processHistogram(h, tag))) {
+  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
+  if (processingSuccessful) {
     m_cCDCTimeHadronsECLTRG->SetFillColor(0);
     m_cCDCTimeHadronsECLTRG->Modified();
     m_cCDCTimeHadronsECLTRG->Update();
@@ -246,7 +255,8 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_CDC_bhabha_L1_ECLTRG");
   tag = "bhabhaECLTRG_CDCT0";
   m_cCDCTimeBhaBhaECLTRG->cd();
-  if (std::get<0>(processHistogram(h, tag))) {
+  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
+  if (processingSuccessful) {
     m_cCDCTimeBhaBhaECLTRG->SetFillColor(0);
     m_cCDCTimeBhaBhaECLTRG->Modified();
     m_cCDCTimeBhaBhaECLTRG->Update();
@@ -261,7 +271,8 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_CDC_mumu_L1_ECLTRG");
   tag = "mumuECLTRG_CDCT0";
   m_cCDCTimeMuMuECLTRG->cd();
-  if (std::get<0>(processHistogram(h, tag))) {
+  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
+  if (processingSuccessful) {
     m_cCDCTimeMuMuECLTRG->SetFillColor(0);
     m_cCDCTimeMuMuECLTRG->Modified();
     m_cCDCTimeMuMuECLTRG->Update();
@@ -279,7 +290,8 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_TOP_hadron_L1_ECLTRG");
   tag = "hadronECLTRG_TOPT0";
   m_cTOPTimeHadronsECLTRG->cd();
-  if (std::get<0>(processHistogram(h, tag))) {
+  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
+  if (processingSuccessful) {
     m_cTOPTimeHadronsECLTRG->SetFillColor(0);
     m_cTOPTimeHadronsECLTRG->Modified();
     m_cTOPTimeHadronsECLTRG->Update();
@@ -294,7 +306,8 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_ECLTRG");
   tag = "bhabhaECLTRG_TOPT0";
   m_cTOPTimeBhaBhaECLTRG->cd();
-  if (std::get<0>(processHistogram(h, tag))) {
+  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
+  if (processingSuccessful) {
     m_cTOPTimeBhaBhaECLTRG->SetFillColor(0);
     m_cTOPTimeBhaBhaECLTRG->Modified();
     m_cTOPTimeBhaBhaECLTRG->Update();
@@ -309,7 +322,8 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_ECLTRG");
   tag = "mumuECLTRG_TOPT0";
   m_cTOPTimeMuMuECLTRG->cd();
-  if (std::get<0>(processHistogram(h, tag))) {
+  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
+  if (processingSuccessful) {
     m_cTOPTimeMuMuECLTRG->SetFillColor(0);
     m_cTOPTimeMuMuECLTRG->Modified();
     m_cTOPTimeMuMuECLTRG->Update();
@@ -327,7 +341,8 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_SVD_hadron_L1_ECLTRG");
   tag = "hadronECLTRG_SVDT0";
   m_cSVDTimeHadronsECLTRG->cd();
-  if (std::get<0>(processHistogram(h, tag))) {
+  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
+  if (processingSuccessful) {
     m_cSVDTimeHadronsECLTRG->SetFillColor(0);
     m_cSVDTimeHadronsECLTRG->Modified();
     m_cSVDTimeHadronsECLTRG->Update();
@@ -342,7 +357,8 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_ECLTRG");
   tag = "bhabhaECLTRG_SVDT0";
   m_cSVDTimeBhaBhaECLTRG->cd();
-  if (std::get<0>(processHistogram(h, tag))) {
+  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
+  if (processingSuccessful) {
     m_cSVDTimeBhaBhaECLTRG->SetFillColor(0);
     m_cSVDTimeBhaBhaECLTRG->Modified();
     m_cSVDTimeBhaBhaECLTRG->Update();
@@ -357,7 +373,8 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_ECLTRG");
   tag = "mumuECLTRG_SVDT0";
   m_cSVDTimeMuMuECLTRG->cd();
-  if (std::get<0>(processHistogram(h, tag))) {
+  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
+  if (processingSuccessful) {
     m_cSVDTimeMuMuECLTRG->SetFillColor(0);
     m_cSVDTimeMuMuECLTRG->Modified();
     m_cSVDTimeMuMuECLTRG->Update();

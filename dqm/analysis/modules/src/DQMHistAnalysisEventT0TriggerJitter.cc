@@ -193,12 +193,16 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
     m_cECLTimeHadronsECLTRG->SetFillColor(0);
     m_cECLTimeHadronsECLTRG->Modified();
     m_cECLTimeHadronsECLTRG->Update();
+    if (*currentT0) {
+      m_ECLTRGHLThadronECLT0 = *currentT0;
+    }
   } else {
     B2DEBUG(29, Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
     m_cECLTimeHadronsECLTRG->SetFillColor(kGray);
     m_cECLTimeHadronsECLTRG->Draw();
   }
+
 
   // find ECL EventT0 Bhabhas ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_ECL_bhabha_L1_ECLTRG");
@@ -209,6 +213,9 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
     m_cECLTimeBhaBhaECLTRG->SetFillColor(0);
     m_cECLTimeBhaBhaECLTRG->Modified();
     m_cECLTimeBhaBhaECLTRG->Update();
+    if (*currentT0) {
+      m_ECLTRGHLTbhabhaECLT0 = *currentT0;
+    }
   } else {
     B2DEBUG(29, Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -225,6 +232,9 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
     m_cECLTimeMuMuECLTRG->SetFillColor(0);
     m_cECLTimeMuMuECLTRG->Modified();
     m_cECLTimeMuMuECLTRG->Update();
+    if (*currentT0) {
+      m_ECLTRGHLTmumuECLT0 = *currentT0;
+    }
   } else {
     B2DEBUG(29, Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -244,6 +254,9 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
     m_cCDCTimeHadronsECLTRG->SetFillColor(0);
     m_cCDCTimeHadronsECLTRG->Modified();
     m_cCDCTimeHadronsECLTRG->Update();
+    if (*currentT0) {
+      m_ECLTRGHLThadronCDCT0 = *currentT0;
+    }
   } else {
     B2DEBUG(29, Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -260,6 +273,9 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
     m_cCDCTimeBhaBhaECLTRG->SetFillColor(0);
     m_cCDCTimeBhaBhaECLTRG->Modified();
     m_cCDCTimeBhaBhaECLTRG->Update();
+    if (*currentT0) {
+      m_ECLTRGHLTbhabhaCDCT0 = *currentT0;
+    }
   } else {
     B2DEBUG(29, Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -276,6 +292,9 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
     m_cCDCTimeMuMuECLTRG->SetFillColor(0);
     m_cCDCTimeMuMuECLTRG->Modified();
     m_cCDCTimeMuMuECLTRG->Update();
+    if (*currentT0) {
+      m_ECLTRGHLTmumuCDCT0 = *currentT0;
+    }
   } else {
     B2DEBUG(29, Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -295,6 +314,9 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
     m_cTOPTimeHadronsECLTRG->SetFillColor(0);
     m_cTOPTimeHadronsECLTRG->Modified();
     m_cTOPTimeHadronsECLTRG->Update();
+    if (*currentT0) {
+      m_ECLTRGHLThadronTOPT0 = *currentT0;
+    }
   } else {
     B2DEBUG(29, Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -311,6 +333,9 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
     m_cTOPTimeBhaBhaECLTRG->SetFillColor(0);
     m_cTOPTimeBhaBhaECLTRG->Modified();
     m_cTOPTimeBhaBhaECLTRG->Update();
+    if (*currentT0) {
+      m_ECLTRGHLTbhabhaTOPT0 = *currentT0;
+    }
   } else {
     B2DEBUG(29, Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -327,6 +352,9 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
     m_cTOPTimeMuMuECLTRG->SetFillColor(0);
     m_cTOPTimeMuMuECLTRG->Modified();
     m_cTOPTimeMuMuECLTRG->Update();
+    if (*currentT0) {
+      m_ECLTRGHLTmumuTOPT0 = *currentT0;
+    }
   } else {
     B2DEBUG(29, Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -346,6 +374,9 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
     m_cSVDTimeHadronsECLTRG->SetFillColor(0);
     m_cSVDTimeHadronsECLTRG->Modified();
     m_cSVDTimeHadronsECLTRG->Update();
+    if (*currentT0) {
+      m_ECLTRGHLThadronSVDT0 = *currentT0;
+    }
   } else {
     B2DEBUG(29, Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -362,6 +393,9 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
     m_cSVDTimeBhaBhaECLTRG->SetFillColor(0);
     m_cSVDTimeBhaBhaECLTRG->Modified();
     m_cSVDTimeBhaBhaECLTRG->Update();
+    if (*currentT0) {
+      m_ECLTRGHLTbhabhaSVDT0 = *currentT0;
+    }
   } else {
     B2DEBUG(29, Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -378,6 +412,9 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
     m_cSVDTimeMuMuECLTRG->SetFillColor(0);
     m_cSVDTimeMuMuECLTRG->Modified();
     m_cSVDTimeMuMuECLTRG->Update();
+    if (*currentT0) {
+      m_ECLTRGHLTmumuSVDT0 = *currentT0;
+    }
   } else {
     B2DEBUG(29, Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();

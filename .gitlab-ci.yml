@@ -3,7 +3,6 @@ stages:
   - build-gcc
   - run-tests
   - build-clang
-  - build-doc
   - release-validation
 
 variables:
@@ -136,7 +135,7 @@ run-tests:
       VERSION="main"
       FILES=("tests-google.xml" "tests-framework.xml" "tests-non-framework.xml")
       for FILE in "${FILES[@]}"; do
-        curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --output "input_tests_reports/${FILE}" \
+        curl -L --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --output "input_tests_reports/${FILE}" \
         "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE}/${VERSION}/${FILE}"
       done
     - b2code-option opt

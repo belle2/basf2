@@ -192,7 +192,7 @@ def get_calibrations(input_data, **kwargs):
         sys.exit(1)
 
     uniqueID = f"SVDHotStripsCalibrations_{now.isoformat()}_INFO:"\
-               f"_ZS{snrThreshold}_{avgOcc}_relOccPrec={relativeOccupancyThreshold}"\
+               f"_ZS{snrThreshold}_{avgOcc}_relOccThr={relativeOccupancyThreshold}"\
                f"_absOccThr={absoluteOccupancyThreshold}_Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID:\n{uniqueID}")
 

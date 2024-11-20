@@ -59,7 +59,8 @@ namespace Belle2 {
      * filling the MonitoringObject
      * @param h EventT0 histogram
      * @param tag to distinguish results
-     * @return false if the histogram is not found or the fit is not converged
+     * @param retrieveMeanT0 if true, calculate meanT0 values for checking T0 drifts wrt SVD, default: false
+     * @return tuple of a bool indicating whether the fit was successful, and an std::optional<double> to retrieve the meanT0 value
      **/
     std::tuple<bool, std::optional<double>> processHistogram(TH1* h, TString tag, bool retrieveMeanT0 = false);
 
@@ -69,8 +70,11 @@ namespace Belle2 {
     */
     static double fDoubleGaus(double* x, double* par);
 
-    /// Analyse the ECLTRG EventT0 distributions
-    /// The only function to retrieve deltaT values ECL-SVD, CDC-SVD, TOP-SVD as the ECLTRG is the most abundant.
+    /** Analyse the ECLTRG EventT0 distributions
+     * The only function to retrieve deltaT values ECL-SVD, CDC-SVD, TOP-SVD as the ECLTRG is the most abundant.
+     * @param retrieveDeltas if true, calculate deltaT values (ECL-SVD, CDC-SVD, TOP-SVD) in case of ECLTRG, default: false
+     *                       value is forwarded to processHistogram to retrieve the individual values
+     */
     void analyseECLTRGEventT0Distributions(bool retrieveDeltas = false);
     void analyseCDCTRGEventT0Distributions(); /**< Analyse the CDCTRG EventT0 distributions*/
     void analyseTOPTRGEventT0Distributions(); /**< Analyse the TOPTRG EventT0 distributions*/
@@ -124,18 +128,18 @@ namespace Belle2 {
     TCanvas* m_cSVDTimeBhaBhaTOPTRG  = nullptr; /**< Canvas for SVD time TOPTRG jitter bhabhas */
     TCanvas* m_cSVDTimeMuMuTOPTRG    = nullptr; /**< Canvas for SVD time TOPTRG jitter mumu */
 
-    double m_ECLTRGHLThadronECLT0 = -999.;
-    double m_ECLTRGHLThadronCDCT0 = -999.;
-    double m_ECLTRGHLThadronTOPT0 = -999.;
-    double m_ECLTRGHLThadronSVDT0 = -999.;
-    double m_ECLTRGHLTbhabhaECLT0 = -999.;
-    double m_ECLTRGHLTbhabhaCDCT0 = -999.;
-    double m_ECLTRGHLTbhabhaTOPT0 = -999.;
-    double m_ECLTRGHLTbhabhaSVDT0 = -999.;
-    double m_ECLTRGHLTmumuECLT0 = -999.;
-    double m_ECLTRGHLTmumuCDCT0 = -999.;
-    double m_ECLTRGHLTmumuTOPT0 = -999.;
-    double m_ECLTRGHLTmumuSVDT0 = -999.;
+    double m_ECLTRGHLThadronECLT0 = -999.; /**< ECL T0 for ECLTRG jitter for HLT hadron events */
+    double m_ECLTRGHLThadronCDCT0 = -999.; /**< CDC T0 for ECLTRG jitter for HLT hadron events */
+    double m_ECLTRGHLThadronTOPT0 = -999.; /**< TOP T0 for ECLTRG jitter for HLT hadron events */
+    double m_ECLTRGHLThadronSVDT0 = -999.; /**< SVD T0 for ECLTRG jitter for HLT hadron events */
+    double m_ECLTRGHLTbhabhaECLT0 = -999.; /**< ECL T0 for ECLTRG jitter for HLT bhabha events */
+    double m_ECLTRGHLTbhabhaCDCT0 = -999.; /**< CDC T0 for ECLTRG jitter for HLT bhabha events */
+    double m_ECLTRGHLTbhabhaTOPT0 = -999.; /**< TOP T0 for ECLTRG jitter for HLT bhabha events */
+    double m_ECLTRGHLTbhabhaSVDT0 = -999.; /**< SVD T0 for ECLTRG jitter for HLT bhabha events */
+    double m_ECLTRGHLTmumuECLT0 = -999.; /**< ECL T0 for ECLTRG jitter for HLT mumu events */
+    double m_ECLTRGHLTmumuCDCT0 = -999.; /**< CDC T0 for ECLTRG jitter for HLT mumu events */
+    double m_ECLTRGHLTmumuTOPT0 = -999.; /**< TOP T0 for ECLTRG jitter for HLT mumu events */
+    double m_ECLTRGHLTmumuSVDT0 = -999.; /**< SVD T0 for ECLTRG jitter for HLT mumu events */
   };
 } // end namespace Belle2
 

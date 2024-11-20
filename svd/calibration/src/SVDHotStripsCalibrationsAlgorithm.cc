@@ -154,7 +154,7 @@ bool SVDHotStripsCalibrationsAlgorithm::theHSFinder(double* stripOccAfterAbsCut,
     for (int l = sector * base; l < sector * base + base; l++) {
 
       // flag additional HS by comparing each strip occupancy with the sensor/side-based average occupancy
-      if (stripOccAfterAbsCut[l] > sensorOccAverage * m_relativeOccupancyWrtAvgOccupancy) {
+      if (stripOccAfterAbsCut[l] > sensorOccAverage * m_relativeOccupancyThreshold) {
         hsflag[l] = 1;
         found = true;
         stripOccAfterAbsCut[l] = 0;

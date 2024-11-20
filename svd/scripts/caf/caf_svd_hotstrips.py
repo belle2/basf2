@@ -46,7 +46,7 @@ settings = CalibrationSettings(name="caf_svd_hotstrips",
                                expert_config={
                                    "snrThreshold": 5,
                                    "computeAverageOccupancyPerChip": False,
-                                   "relativeOccupancyWrtAvgOccupancy": 5.0,
+                                   "relativeOccupancyThreshold": 5.0,
                                    "absoluteOccupancyThreshold": 0.2
                                })
 
@@ -72,7 +72,7 @@ def create_collector(name="SVDOccupancyCalibrationsCollector",
 
 def create_algorithm(unique_id,
                      computeAvgOccupancyPerChip=False,
-                     relativeOccupacyWrtAvgOccupancy=5.,
+                     relativeOccupancyThreshold=5.,
                      absoluteOccupancyThreshold=0.2):
     """
     Simply creates a SVDHotStripsCalibrationsAlgorithm class.
@@ -81,8 +81,8 @@ def create_algorithm(unique_id,
         unique_id: name of the uniqueID written in the payload to identify it
         computeAvgOccupancyPerChip: true, compute the average occupancy per chip;
                                     false, compute the average occupancy per sensor/side
-        relativeOccupacyWrtAvgOccupancy: relative occupancy threshold wrt the average sensor/side
-                                         or chip occupancy to define a strp as hot
+        relativeOccupancyThreshold: relative occupancy threshold wrt the average sensor/side
+                                    or chip occupancy to define a strip as hot
         absoluteOccupancyThreshold: absolute occupancy threshold to define a strip as hot
 
     Returns:
@@ -91,7 +91,7 @@ def create_algorithm(unique_id,
 
     algorithm = SVDHotStripsCalibrationsAlgorithm(unique_id)
     algorithm.computeAverageOccupancyPerChip(computeAvgOccupancyPerChip)
-    algorithm.setRelativeOccupancyWrtAvgOccupancy(relativeOccupacyWrtAvgOccupancy)
+    algorithm.setRelativeOccupancyThreshold(relativeOccupancyThreshold)
     algorithm.setAbsoluteOccupancyThreshold(absoluteOccupancyThreshold)
 
     return algorithm
@@ -173,7 +173,7 @@ def get_calibrations(input_data, **kwargs):
     expert_config = kwargs.get("expert_config")
     snrThreshold = expert_config["snrThreshold"]
     computeAverageOccupancyPerChip = expert_config["computeAverageOccupancyPerChip"]
-    relativeOccupancyWrtAvgOccupancy = expert_config["relativeOccupancyWrtAvgOccupancy"]
+    relativeOccupancyThreshold = expert_config["relativeOccupancyThreshold"]
     absoluteOccupancyThreshold = expert_config["absoluteOccupancyThreshold"]
 
     avgOcc = "avgOccPerSensor"
@@ -192,7 +192,7 @@ def get_calibrations(input_data, **kwargs):
         sys.exit(1)
 
     uniqueID = f"SVDHotStripsCalibrations_{now.isoformat()}_INFO:"\
-               f"_ZS{snrThreshold}_{avgOcc}_relOccPrec={relativeOccupancyWrtAvgOccupancy}"\
+               f"_ZS{snrThreshold}_{avgOcc}_relOccPrec={relativeOccupancyThreshold}"\
                f"_absOccThr={absoluteOccupancyThreshold}_Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID:\n{uniqueID}")
 
@@ -206,7 +206,7 @@ def get_calibrations(input_data, **kwargs):
 
     algo = create_algorithm(uniqueID,
                             computeAverageOccupancyPerChip,
-                            relativeOccupancyWrtAvgOccupancy,
+                            relativeOccupancyThreshold,
                             absoluteOccupancyThreshold)
 
     calibration = Calibration("SVDHotStripsCalibrations",

@@ -26,8 +26,8 @@ namespace Belle2 {
     /** Setter of m_computeAverageOccupancyPerChip */
     void computeAverageOccupancyPerChip(bool value) {m_computeAverageOccupancyPerChip = value;}
 
-    /** Setter of m_relativeOccupancyWrtAvgOccupancy */
-    void setRelativeOccupancyWrtAvgOccupancy(float value) {m_relativeOccupancyWrtAvgOccupancy = value;}
+    /** Setter of m_relativeOccupancyThreshold */
+    void setRelativeOccupancyThreshold(float value) {m_relativeOccupancyThreshold = value;}
 
     /** Setter of m_absoluteOccupancyThreshold */
     void setAbsoluteOccupancyThreshold(float value) {m_absoluteOccupancyThreshold = value;}
@@ -35,10 +35,10 @@ namespace Belle2 {
     /** Setter of m_computeAverageOccupancyPerChip */
     bool getComputeAverageOccupancyPerChip() {return m_computeAverageOccupancyPerChip;}
 
-    /** Setter of m_relativeOccupancyWrtAvgOccupancy */
-    float getRelativeOccupancyWrtAvgOccupancy() {return m_relativeOccupancyWrtAvgOccupancy;}
+    /** Setter of m_relativeOccupancyThreshold */
+    float getRelativeOccupancyThreshold() {return m_relativeOccupancyThreshold;}
 
-    /** Setter of m_relativeOccupancyWrtAvgOccupancy */
+    /** Setter of m_relativeOccupancyThreshold */
     float getAbsoluteOccupancyThreshold() {return m_absoluteOccupancyThreshold;}
 
   protected:
@@ -53,7 +53,7 @@ namespace Belle2 {
     bool m_computeAverageOccupancyPerChip = false; /**< granularity used to estimate average occupancy.
                   True: the avg. occupancy per chip is considered.
                   False: the the avg. occupancy per sensor/side is considered.*/
-    float m_relativeOccupancyWrtAvgOccupancy = 5.0; /**< occupancy relative to the average sensor occupancy used
+    float m_relativeOccupancyThreshold = 5.0; /**< occupancy relative to the average sensor occupancy used
                to define a strip as hot.*/
     float m_absoluteOccupancyThreshold = 0.2; /**< absolute occupancy thresold to define a strip as hot.*/
   };

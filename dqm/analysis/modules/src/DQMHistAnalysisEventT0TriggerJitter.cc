@@ -57,18 +57,18 @@ void DQMHistAnalysisEventT0TriggerJitterModule::beginRun()
 {
   clearCanvases();
 
-  m_ECLTRGHLThadronECLT0 = 0.;
-  m_ECLTRGHLThadronCDCT0 = 0.;
-  m_ECLTRGHLThadronTOPT0 = 0.;
-  m_ECLTRGHLThadronSVDT0 = 0.;
-  m_ECLTRGHLTbhabhaECLT0 = 0.;
-  m_ECLTRGHLTbhabhaCDCT0 = 0.;
-  m_ECLTRGHLTbhabhaTOPT0 = 0.;
-  m_ECLTRGHLTbhabhaSVDT0 = 0.;
-  m_ECLTRGHLTmumuECLT0 = 0.;
-  m_ECLTRGHLTmumuCDCT0 = 0.;
-  m_ECLTRGHLTmumuTOPT0 = 0.;
-  m_ECLTRGHLTmumuSVDT0 = 0.;
+  m_ECLTRGHLThadronECLT0 = -999.;
+  m_ECLTRGHLThadronCDCT0 = -999.;
+  m_ECLTRGHLThadronTOPT0 = -999.;
+  m_ECLTRGHLThadronSVDT0 = -999.;
+  m_ECLTRGHLTbhabhaECLT0 = -999.;
+  m_ECLTRGHLTbhabhaCDCT0 = -999.;
+  m_ECLTRGHLTbhabhaTOPT0 = -999.;
+  m_ECLTRGHLTbhabhaSVDT0 = -999.;
+  m_ECLTRGHLTmumuECLT0 = -999.;
+  m_ECLTRGHLTmumuCDCT0 = -999.;
+  m_ECLTRGHLTmumuTOPT0 = -999.;
+  m_ECLTRGHLTmumuSVDT0 = -999.;
 }
 
 void DQMHistAnalysisEventT0TriggerJitterModule::event()

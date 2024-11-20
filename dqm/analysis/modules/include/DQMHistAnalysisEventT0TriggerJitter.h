@@ -123,18 +123,18 @@ namespace Belle2 {
     TCanvas* m_cSVDTimeBhaBhaTOPTRG  = nullptr; /**< Canvas for SVD time TOPTRG jitter bhabhas */
     TCanvas* m_cSVDTimeMuMuTOPTRG    = nullptr; /**< Canvas for SVD time TOPTRG jitter mumu */
 
-    double m_ECLTRGHLThadronECLT0 = 0.;
-    double m_ECLTRGHLThadronCDCT0 = 0.;
-    double m_ECLTRGHLThadronTOPT0 = 0.;
-    double m_ECLTRGHLThadronSVDT0 = 0.;
-    double m_ECLTRGHLTbhabhaECLT0 = 0.;
-    double m_ECLTRGHLTbhabhaCDCT0 = 0.;
-    double m_ECLTRGHLTbhabhaTOPT0 = 0.;
-    double m_ECLTRGHLTbhabhaSVDT0 = 0.;
-    double m_ECLTRGHLTmumuECLT0 = 0.;
-    double m_ECLTRGHLTmumuCDCT0 = 0.;
-    double m_ECLTRGHLTmumuTOPT0 = 0.;
-    double m_ECLTRGHLTmumuSVDT0 = 0.;
+    double m_ECLTRGHLThadronECLT0 = -999.;
+    double m_ECLTRGHLThadronCDCT0 = -999.;
+    double m_ECLTRGHLThadronTOPT0 = -999.;
+    double m_ECLTRGHLThadronSVDT0 = -999.;
+    double m_ECLTRGHLTbhabhaECLT0 = -999.;
+    double m_ECLTRGHLTbhabhaCDCT0 = -999.;
+    double m_ECLTRGHLTbhabhaTOPT0 = -999.;
+    double m_ECLTRGHLTbhabhaSVDT0 = -999.;
+    double m_ECLTRGHLTmumuECLT0 = -999.;
+    double m_ECLTRGHLTmumuCDCT0 = -999.;
+    double m_ECLTRGHLTmumuTOPT0 = -999.;
+    double m_ECLTRGHLTmumuSVDT0 = -999.;
   };
 } // end namespace Belle2
 

@@ -1,3 +1,11 @@
+Changes in the analysis package in light-24011-spirelli
+-------------------------------------------------------
+Modules
++++++++
+* Added a tunable buffer to the ``VariabesToTable`` module to improve compression efficiency and feather as output format.
+
+
+
 Changes in the analysis package in light-2409-toyger
 ----------------------------------------------------
 
@@ -37,3 +45,5 @@ Charm Flavor Tagger
 * Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
   function ``charmFlavorTagger``) to ``CFT_ragdoll``. This value must be used for all releases as recent as
   light-2406-ragdoll and release-09.
+
+

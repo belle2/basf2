@@ -78,6 +78,7 @@ namespace Belle2 {
     void clearCanvases(); /**< Initialise canvases */
     void printCanvases(); /**< Print canvases if required */
     void deleteCanvases(); /**< Delete canvases */
+    void setDeltaT0Values(); /**< Set the deltaT0 values in the monObj */
 
     MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
 

@@ -63,10 +63,6 @@ void DQMHistAnalysisEventT0TriggerJitterModule::event()
   analyseECLTRGEventT0Distributions();
   analyseCDCTRGEventT0Distributions();
   analyseTOPTRGEventT0Distributions();
-
-  if (m_printCanvas) {
-    printCanvases();
-  }
 }
 
 void DQMHistAnalysisEventT0TriggerJitterModule::endRun()

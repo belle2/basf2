@@ -58,7 +58,16 @@ namespace Belle2 {
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
 
-
+    /**
+     * Calculate avg offline occupancy for one specific sensor, especially with high occupancy
+     * @param iLayer index of layer
+     * @param hU, hV pointers to histograms
+     * @param binX index of binX corresponding to sensor (layer, ladder, sensor)
+     * @param binY index of binY corresponding to sensor (layer, ladder, sensor)
+     * @param nEvents number of events
+     * @return vector with values for U and V sides
+     */
+    std::vector<float> getOccupancySensorUV(int iLayer, TH1F* hU, TH1F* hV, int binX, int binY, int nEvents) const;
     /**
     * Calculate avg offline occupancy for one specific sensor, especially with high occupancy
     * @param iLayer index of layer

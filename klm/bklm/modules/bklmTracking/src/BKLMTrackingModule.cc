@@ -239,11 +239,10 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
         m_track->setNumHitOnTrack(m_fitter->getNumHit());
         m_track->setIsValid(m_fitter->isValid());
         m_track->setIsGood(m_fitter->isGood());
-        std::list<KLMHit2d*>::iterator j;
         m_hits.sort(sortByLayer);
-        for (j = m_hits.begin(); j != m_hits.end(); ++j) {
-          (*j)->isOnStaTrack(true);
-          m_track->addRelationTo((*j));
+        for (KLMHit2d* hit2d : m_hits) {
+          hit2d->isOnStaTrack(true);
+          m_track->addRelationTo(hit2d);
         }
         //tracks.push_back(m_track);
         //m_track->getTrackParam().Print();
@@ -254,9 +253,9 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
           if (m_MatchToRecoTrack) {
             if (findClosestRecoTrack(m_track, closestTrack)) {
               m_track->addRelationTo(closestTrack);
-              for (j = m_hits.begin(); j != m_hits.end(); ++j) {
+              for (KLMHit2d* hit2d : m_hits) {
                 unsigned int sortingParameter = closestTrack->getNumberOfTotalHits();
-                closestTrack->addBKLMHit((*j), sortingParameter, RecoHitInformation::OriginTrackFinder::c_LocalTrackFinder);
+                closestTrack->addBKLMHit(hit2d, sortingParameter, RecoHitInformation::OriginTrackFinder::c_LocalTrackFinder);
               }
             }
           }//end match

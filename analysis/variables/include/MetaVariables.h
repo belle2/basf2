@@ -565,5 +565,12 @@ namespace Belle2 {
      */
     Manager::FunctionPtr useMCancestorBRestFrame(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns function which returns the integer value of a variable of the given particle
+     * First argument in the argument vector must be the name of variable
+     * Second argument is the value for NaN replacement
+     */
+    Manager::FunctionPtr convertToInt(const std::vector<std::string>& arguments);
+
   }
 }

@@ -112,7 +112,7 @@ void CalibrationCollectorModule::beginRun()
       m_runCollectOnRun = false;
     }
   }
-  // Granularity=all removes data spliting by runs by setting
+  // Granularity=all removes data splitting by runs by setting
   // always the same exp, run for calibration data objects
   if (m_granularity == "all") {
     m_expRun = { -1, -1};

@@ -683,7 +683,6 @@ TrgEclDigitizer::FADC(int flag_gen,
     double tt = u_max(u_max(td, t1), u_max(t2, ts)) * 2;
     int flag_once = 0;
     while (flag_once == 0) {
-      double   dt = tt / 1000;
       double tm = 0;
       for (int j = 1; j <= 1000; j++) {
         tc2 = tc - dft;
@@ -697,6 +696,7 @@ TrgEclDigitizer::FADC(int flag_gen,
           tm = tc;
           im = j;
         }
+        double   dt = tt / 1000;
         tc = tc + dt;
       }
       if (im >= 1000) {
@@ -707,7 +707,6 @@ TrgEclDigitizer::FADC(int flag_gen,
       if (ij == 0) {
         ij = 1;
         tc = 0.99 * tm;
-        dt = tm * 0.02 / 1000;
         flag_once = 0;
         continue;
       }

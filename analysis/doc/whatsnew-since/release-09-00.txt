@@ -1,3 +1,26 @@
+Changes in the analysis package in light-2411-aldebaran
+-------------------------------------------------------
+
+Modular Analysis
+++++++++++++++++
+* Add options to `modularAnalysis.writePi0EtaVeto` to:
+    * Require the soft photon being in the current RestOfEvent.
+    * Add separate selections to be applied during `modularAnalysis.reconstructDecay` for both the :math:`\pi^0` as well as
+      the :math:`\eta` reconstruction.
+
+Kinematic Fitting tools
++++++++++++++++++++++++
+* Added option to prepend label to OrkaKinfit variables to allow multiple fits to be performed in same path.
+
+Variables
++++++++++
+* Added variables `tSigB`, `tTagB` which represent reconstructed proper decay times of individual B mesons.
+* Added `DeltaT3D` = `tSigB` - `tTagB` as an alternative to the `DeltaT` variable.
+* Added the reconstructed coordinates of the Y4S vertex `Y4SvtxX`, `Y4SvtxY`, `Y4SvtxZ` and the Tag vertex
+  covariance matrix `TagVCov`.
+* Added `int` metavariable that can convert the floating point variables output to an integer value, 
+  that can be saved correctly by `VariablesToNtuple` module into an integer branch of a TTree. 
+
 Changes in the analysis package in light-2409-toyger
 ----------------------------------------------------
 

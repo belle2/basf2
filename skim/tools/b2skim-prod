@@ -159,7 +159,6 @@ import yaml
 import jinja2
 
 from basf2 import B2ERROR, B2INFO, B2WARNING, find_file
-from conditions_db import ConditionsDB, encode_name
 from skim import CombinedSkim
 from skim.registry import Registry
 from skim.utils.misc import dry_run_steering_file, resolve_skim_modules
@@ -483,7 +482,7 @@ def get_lpn_list(sampleInfo, mcri, mcrd):
             sampleInfo["prodNumber"] = "prod" + str(
                 sampleInfo["prodNumber"]
             ).zfill(8)
-        
+
         if not str(sampleInfo["inputDBGlobalTag"]).startswith("DB"):
             sampleInfo["inputDBGlobalTag"] = "DB" + str(
                 sampleInfo["inputDBGlobalTag"]
@@ -567,12 +566,10 @@ def get_lpn_list(sampleInfo, mcri, mcrd):
 
 
 @lru_cache()
-
 def get_DBGlobalTag(inputDBGlobalTag):
     if not str(inputDBGlobalTag).startswith("DB"):
         inputDBGlobalTag = "DB" + str(inputDBGlobalTag).zfill(8)
     return inputDBGlobalTag
-
 
 
 def get_beam_energy_from_registry(sampleRegistry):
@@ -638,7 +635,7 @@ def get_individual_skims(SkimName, CombinedSkimDefinitions):
     want. Otherwise, retrieve the list of individual skims from
     ``CombinedSkimDefinitions``.
     """
-    if SkimName in Registry.names:
+    if SkimName in Registry.names and 'f_' not in SkimName:
         SingleSkims = [SkimName]
     else:
         SingleSkims = CombinedSkimDefinitions[SkimName]
@@ -665,20 +662,29 @@ def produce_on_tau_samples(skims):
     return SkimObject.produce_on_tau_samples
 
 
-def make_data_description_block(skims, sampleInfo):
+def make_data_description_block(skims, sampleInfo, skimName, flagged=False):
     DataDescription = []
     GeneralSkim = sampleInfo.get("generalSkimName", None)
 
-    for skim in skims:
+    if flagged:
         DescriptionDict = {
-            "": skim,
-            "SkimDecayMode": Registry.encode_skim_name(skim),
-            "DataLevel": get_skim_output_datalevel(skim),
-        }
-
-        if GeneralSkim is not None:
-            DescriptionDict["GeneralSkimName"] = GeneralSkim
+                "": skimName,
+                "SkimDecayMode": Registry.encode_skim_name(skimName),
+                "DataLevel": 'mdst',
+                "GeneralSkimName": GeneralSkim
+            }
         DataDescription.append(DescriptionDict)
+    else:
+        for skim in skims:
+            DescriptionDict = {
+                "": skim,
+                "SkimDecayMode": Registry.encode_skim_name(skim),
+                "DataLevel": get_skim_output_datalevel(skim),
+            }
+
+            if GeneralSkim is not None:
+                DescriptionDict["GeneralSkimName"] = GeneralSkim
+            DataDescription.append(DescriptionDict)
 
     return DataDescription
 
@@ -721,6 +727,7 @@ def make_combined_steering_file(
     LocalModule=None,
     analysis_globaltag="",
     pid_globaltag="",
+    flagged=False,
 ):
     """Construct a steering file for the requested combined skim."""
     SteeringFileDirectory = Path(SteeringFileDirectory)
@@ -750,7 +757,10 @@ def make_combined_steering_file(
         data=(not mc),
         stats=False,
         hints=False,
-        mdstOutput=False,
+        mdstOutput=flagged,
+        udstOutput=not flagged,
+        CombinedSkimName=flagged,
+        CombinedSkimNameString=SkimName,
         analysis_globaltag=analysis_globaltag,
         pid_globaltag=pid_globaltag,
         backward_compatibility=True,
@@ -806,7 +816,7 @@ def make_request_dict(
     if args.mcri or args.mcrd:
         fabricationType = "MCSkim"
         LPNPrefix = "/belle/MC"
-        parts = sampleLabel.split('_')[0:2] # so that we select, for example, MC15rd_b and not just MC15rd
+        parts = sampleLabel.split('_')[0:2]  # so that we select, for example, MC15rd_b and not just MC15rd
         campaign = '_'.join(parts)
     else:
         fabricationType = "DataSkim"
@@ -815,11 +825,9 @@ def make_request_dict(
 
     SkimScriptsDirectory = f"skim/{args.campaign}/{args.release}/SkimScripts"
 
-    
-
     skimRequestDict = {
         "FabricationType": fabricationType,
-        "ProductionName": f"{skimName}_skim_on_{key}", # no whitespace allowed in ProductionName #add here _v1, _v2 if the production must be resubmitted (since the name is unique)
+        "ProductionName": f"{skimName}_skim_on_{key}",  # no whitespace allowed in ProductionName #add here _v1, _v2 if the production must be resubmitted (since the name is unique)
         "ProductionGroup": "skim",
         "Description": f"{skimName} skim on {key}",
         "Release": args.release,
@@ -840,8 +848,8 @@ def make_request_dict(
         "SteeringFilePrefix": SkimScriptsDirectory,
         "LPNPrefix": LPNPrefix,
         "DataStructureByRun": "False",
-	    "VolumeDependentMerge": "True", 
-        "DataDescription": make_data_description_block(individualSkims, sampleInfo)
+        "VolumeDependentMerge": "True",
+        "DataDescription": make_data_description_block(individualSkims, sampleInfo, skimName, args.flagged)
     }
 
     # We only want the MCEventType to include the beam background level if the sample is BGx0
@@ -887,7 +895,7 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             f"Producing JSON files with {args.lpns_per_json} "
             f"LPN{'s'*(args.lpns_per_json>1)} per JSON file."
         )
-    
+
     for skimName in args.skims:
         _, CombinedSkimDefinitions = get_skim_stats_dict(args.SkimStatsJson)
         SteeringFileDirectory = Path(
@@ -901,6 +909,7 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             LocalModule=args.local_skim_script,
             analysis_globaltag=args.analysis_globaltag,
             pid_globaltag=args.pid_globaltag,
+            flagged=args.flagged
         )
         dry_run_steering_file(SteeringFile)
 
@@ -919,7 +928,7 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             if args.mcrd:
                 pattern = r'r\d+$'
                 key = re.sub(pattern, '', sampleLabel)
-                print(key) # MC15rd_b_4S_offres_exp18_ssbar_29600
+                print(key)  # MC15rd_b_4S_offres_exp18_ssbar_29600
             else:
                 if '5S_scan' in sampleLabel:
                     match = re.match(r"(\w+\d+)_5S_scan_(\d+)_exp(\d+)", sampleLabel)
@@ -938,10 +947,10 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                     else:
                         campaign, exp_number = match.groups()
                         key = f"{campaign}_exp{exp_number}"
-                
+
             # Generate the SampleLPNList for the current sampleInfo
             SampleLPNList = get_lpn_list(sampleInfo, args.mcri, args.mcrd)
-            
+
             # Initialize the list for the key if it doesn't exist, then extend it
             if key not in grouped_LPNLists:
                 grouped_LPNLists[key] = []
@@ -953,7 +962,7 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             # MC campaign number is likely already in skim campaign name, so don't include it in sample label
             sampleLabelForFilename = strip_campaign(sampleLabel)
 
-            if args.lpns_per_json: # need to split up JSONs if requested (number of LPNs per JSON specified)
+            if args.lpns_per_json:  # need to split up JSONs if requested (number of LPNs per JSON specified)
                 for LPNBlockNumber, LPNList in enumerate(grouped_LPNLists[key]):
 
                     # If we have broken up the LPNs into some number per JSON file, then we
@@ -1113,10 +1122,17 @@ def get_argument_parser():
         help="Starting number to count from for batch label appended to prod names.",
     )
 
+    parser.add_argument(
+        "-flagged",
+        "--flagged",
+        action="store_true",
+        help="if added use flagged skim",
+    )
+
     mcDataGroup = parser.add_mutually_exclusive_group(required=True)
     mcDataGroup.add_argument(
         "--mcri", "--MCri", action="store_true", help="Produce JSON files for run-independent MC."
-    )    
+    )
     mcDataGroup.add_argument(
         "--mcrd", "--MCrd", action="store_true", help="Produce JSON files for run-dependent MC."
     )

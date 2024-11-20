@@ -180,7 +180,7 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   return findHist(histname, updated);
 }
 
-TH1* DQMHistAnalysisModule::scaleReference(int scaling, const TH1* hist, TH1* ref)
+TH1* DQMHistAnalysisModule::scaleReference(ERefScaling scaling, const TH1* hist, TH1* ref)
 {
   // if hist/ref is nullptr, nothing to do
   if (!hist || !ref)
@@ -188,14 +188,15 @@ TH1* DQMHistAnalysisModule::scaleReference(int scaling, const TH1* hist, TH1* re
 
   switch (scaling) {
     // default: do nothing
-    // case 0: do nothing
-    case 1: // Integral
+    case ERefScaling::c_RefScaleNone: //do nothing
+      break;
+    case ERefScaling::c_RefScaleEntries: // Integral
       // only if we have entries in reference
       if (hist->Integral() != 0 and ref->Integral() != 0) {
         ref->Scale(hist->Integral() / ref->Integral());
       }
       break;
-    case 2: // Maximum
+    case ERefScaling::c_RefScaleMax: // Maximum
       // only if we have entries in reference
       if (hist->GetMaximum() != 0 and ref->GetMaximum() != 0) {
         ref->Scale(hist->GetMaximum() / ref->GetMaximum());
@@ -205,7 +206,7 @@ TH1* DQMHistAnalysisModule::scaleReference(int scaling, const TH1* hist, TH1* re
   return ref;
 }
 
-TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, int scaling, const TH1* hist)
+TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, ERefScaling scaling, const TH1* hist)
 {
   if (s_refList.find(histname) != s_refList.end()) {
     // get a copy of the reference which we can modify
@@ -213,11 +214,11 @@ TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, int scaling
     // then do the scaling
     return scaleReference(scaling, hist, s_refList[histname].getReference());
   }
-  B2INFO("Ref Histogram " << histname << " not in list.");
   return nullptr;
 }
 
-TH1* DQMHistAnalysisModule::findRefHist(const std::string& dirname, const std::string& histname, int scaling, const TH1* hist)
+TH1* DQMHistAnalysisModule::findRefHist(const std::string& dirname, const std::string& histname, ERefScaling scaling,
+                                        const TH1* hist)
 {
   if (dirname.size() > 0) {
     return findRefHist(dirname + "/" + histname, scaling, hist);
@@ -287,7 +288,7 @@ MonitoringObject* DQMHistAnalysisModule::findMonitoringObject(const std::string&
     return &s_monObjList[objName];
   }
   B2INFO("MonitoringObject " << objName << " not in memfile.");
-  return NULL;
+  return nullptr;
 }
 
 double DQMHistAnalysisModule::getSigma68(TH1* h) const

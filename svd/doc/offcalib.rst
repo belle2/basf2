@@ -74,3 +74,30 @@ The steps are in the following:
    #. else shift is the mean of the histogram.
 
 The shift-values are stored in :ref:`SVDClusterTimeShifter<svdclustertimeshifter>` DBObject.
+
+
+.. _svdhotstripscalbration:
+
+SVD Calibration of Hot-Strips
+-----------------------------
+The SVD hot strips are only used in the context of the SVD beam-background studies, **NOT** in reconstruction.
+The calibration of SVD hot strips produces a list of hot strips per SVD sensor/side that are evaluated using ``pedestal runs`` as input. Pedestal runs are ``beam``-runs for beam-background studies, where data are collected without beams and with detectors on PEAK.
+
+The calculation of hot-strips is implemented in the :ref:`calibration_caf`. It is **NOT** run in Airflow during prompt calibrations since this calibration does not use physics runs, and the payload produced in not used in recontruction.
+
+The calibration uses only ``RawSVD``, which is unpacked and converted to :ref:`SVDShaperDigits<svdshapers>`.
+
+For the calibration we build 1D occupancy distributions per sensor/side. Per each sensor/side we loop over the strips and classify them as hot based on their occupancy. The criteria to classify the strips as the following are based on three parameters:
+
+#. absolute occupancy threshold, set at 0.2 by default. If the occupancy, :math:`O` of the strip is :math:`O>0.2` it is classified as hot;
+#. relative occupancy threshold, set at 5 by default. If the occupancy of the strips is :math:`O>5\times\bar{O}`, where :math:`\bar{O}` is the average occupancy considered, it is classifiedas hot;
+#. a parameter that that is used to select the strips to compute the average occupancy. By default it is `False` and the average occupancy per sensor/side is computed. It can be set to `True` to compute the average occupancy per chip (considering 128 strips).
+
+The calibration steps are the following:
+
+#. loop over the strips and tag as hot the strips with an occupancy :math:`O>0.2`, and remove them from the computation of the average occupancy;
+#. Classify the other hot strips iteratively:
+   #. loop over the strips and and tag as hot the strips with an occupancy :math:`O>5\times\bar{O}`, and remove them from the computation of the average occupancy;
+   #. repeat until no hot-strips are found.
+                
+The list of hot-strips is stored in the :ref:`SVDHotStripsCalibrations<svdhotstrips>` DBObject.

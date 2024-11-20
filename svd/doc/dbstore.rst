@@ -223,3 +223,18 @@ Check `ELS3Time@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVD3SampleELSTime
 	       Time shift adjustment depending on cluster-size, with sensor-on-ladder granularity_
 
    Check `SVDClusterTimeShifter@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDClusterTimeShifter&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** is used for experiment 0 and 1002/3/4 which corresponds to no shift, revision **3** is calculated from *Exp24,Run1726* and should only be used for data.
+
+SVD background study calibrations
+----------------------------------------
+
+.. _svdhotstrips:
+
+.. cpp:class:: SVDHotStripsCalibrations
+
+               Calibration of SVD hot strips wth sensor-side granularty_
+
+Check `SVDHotStrips@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHotStripsCalibrations&perpage=25&>`_ all revisions available in the Conditions Database
+
+The :ref:`SVDHotStripsCalibrations<svdhotstrips>` DBObject  contains a list of hot-strips per sensor/side. The list of hot-strips is splitted in two 64-bit decimal numbers per APV25-radout-chip. For example: the list for Layer3 contains 7 lists, one per Ladder, where each of them contains 2 lists, one per sensor, and each of the sensor-lists contains 2 more lists, one per side. Each of the side-lists contains 12 numbers, corresponding to the 64-bit decimal numbers. For Layer-3 there are 12 numbers for both sides because 6 APV25-chips per side are used. For the other SVD layers, there are 8 numbers for the V-side and 12 numbers for the U-side.
+
+This DBObject is used only for SVD background studies. It is **NOT** used in reconstruction.

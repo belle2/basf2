@@ -67,7 +67,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::event()
 
 void DQMHistAnalysisEventT0TriggerJitterModule::endRun()
 {
-  analyseECLTRGEventT0Distributions();
+  analyseECLTRGEventT0Distributions(true);
   analyseCDCTRGEventT0Distributions();
   analyseTOPTRGEventT0Distributions();
 
@@ -170,7 +170,7 @@ bool DQMHistAnalysisEventT0TriggerJitterModule::processHistogram(TH1* h,  TStrin
 
 }
 
-void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distributions()
+void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distributions(bool retrieveDeltas)
 {
   // --- ECL EventT0 plots for ECLTRG ---
 

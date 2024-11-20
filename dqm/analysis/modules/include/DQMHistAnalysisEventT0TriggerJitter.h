@@ -66,7 +66,9 @@ namespace Belle2 {
     */
     static double fDoubleGaus(double* x, double* par);
 
-    void analyseECLTRGEventT0Distributions(); /**< Analyse the ECLTRG EventT0 distributions*/
+    /// Analyse the ECLTRG EventT0 distributions
+    /// The only function to retrieve deltaT values ECL-SVD, CDC-SVD, TOP-SVD as the ECLTRG is the most abundant.
+    void analyseECLTRGEventT0Distributions(bool retrieveDeltas = false);
     void analyseCDCTRGEventT0Distributions(); /**< Analyse the CDCTRG EventT0 distributions*/
     void analyseTOPTRGEventT0Distributions(); /**< Analyse the TOPTRG EventT0 distributions*/
     void initializeCanvases(); /**< Initialise canvases */

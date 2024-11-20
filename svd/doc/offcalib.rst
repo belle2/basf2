@@ -76,7 +76,7 @@ The steps are in the following:
 The shift-values are stored in :ref:`SVDClusterTimeShifter<svdclustertimeshifter>` DBObject.
 
 
-.. _svdhotstripscalbration:
+.. _svdhotstripscalibrations:
 
 SVD Calibration of Hot-Strips
 -----------------------------

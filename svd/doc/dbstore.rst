@@ -173,12 +173,6 @@ Check `HitTimeSelection@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHitTim
 	       
 	       wrapper with the strip occupancy averaged over a run, strip granularity_
 
-.. _svdhotstrips:
-
-.. cpp:class:: SVDHotStripsCalibrations
-
-	       wrapper with the hot strips as determined by ``SVDHotStripFinder``, strip granularity_
-
 .. _svdtimegroupingconfiguration:
 
 .. cpp:class:: SVDTimeGroupingConfiguration
@@ -231,7 +225,7 @@ SVD background study calibrations
 
 .. cpp:class:: SVDHotStripsCalibrations
 
-               Calibration of SVD hot strips wth sensor-side granularty_
+                DBobject with the hot strips as determined by the :ref:`svdhotstripscalibrations` with strip granularity_
 
 Check `SVDHotStrips@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHotStripsCalibrations&perpage=25&>`_ all revisions available in the Conditions Database
 

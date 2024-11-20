@@ -11,12 +11,11 @@
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <reconstruction/modules/CDCDedxPID/LineHelper.h>
-
+#include <TRandom.h>
 #include <cmath>
 #include <algorithm>
 #include <map>
 #include <vector>
-#include <iostream> //TODO rm
 
 using namespace std;
 
@@ -48,6 +47,9 @@ namespace Belle2 {
              "Portion of events with high dE/dx that should be discarded", double(0.25));
     addParam("useBackHalfCurlers", m_useBackHalfCurlers,
              "Whether to use the back half of curlers", false);
+    addParam("trackLevel", m_trackLevel,
+             "ONLY USEFUL FOR MC: Use track-level MC (generate truncated mean from predicted mean and sigma using MC truth). "
+             "If false, use hit-level MC (use truncated mean determined from hits)", true);
     addParam("enableDebugOutput", m_enableDebugOutput,
              "Option to write out debugging information to CDCDedxTracks", true);
     addParam("likelihoodsName", m_likelihoodsName,
@@ -76,28 +78,7 @@ namespace Belle2 {
       m_nLayerWires[i] = m_nLayerWires[i - 1] + 6 * (160 + (i - 1) * 32);
     }
 
-    /* TODO
-    // make sure the mean and resolution parameters are reasonable
-    if (!m_DBMeanPars || m_DBMeanPars->getSize() == 0) {
-      B2WARNING("No dE/dx mean parameters!");
-      for (int i = 0; i < 15; ++i)
-    m_meanpars.push_back(1.0);
-    } else m_meanpars = m_DBMeanPars->getMeanPars();
-
-    if (!m_DBSigmaPars || m_DBSigmaPars->getSize() == 0) {
-      B2WARNING("No dE/dx sigma parameters!");
-      for (int i = 0; i < 12; ++i)
-    m_sigmapars.push_back(1.0);
-    } else m_sigmapars = m_DBSigmaPars->getSigmaPars();
-
-    // get the hadron correction parameters
-    if (!m_DBHadronCor || m_DBHadronCor->getSize() == 0) {
-      B2WARNING("No hadron correction parameters!");
-      for (int i = 0; i < 4; ++i)
-    m_hadronpars.push_back(0.0);
-      m_hadronpars.push_back(1.0);
-    } else m_hadronpars = m_DBHadronCor->getHadronPars();
-    */
+    if (not m_trackLevel) B2WARNING("Hit-level MC may not perform well. Precise calibration maybe still not available.");
 
   }
 
@@ -113,12 +94,12 @@ namespace Belle2 {
     RealisticTDCCountTranslator tdcTranslator;
 
     // is data or MC ?
-    bool isData = m_mcParticles.getEntries() == 0; //TODO: get it from framework/core/Environment.h
+    bool isData = m_mcParticles.getEntries() == 0;
 
     // track independent calibration constants
     double runGain = isData ? m_DBRunGain->getRunGain() : 1.0;
     double timeGain = 1;
-    double timeReso = 1; // TODO default value?
+    double timeReso = 1; // this is multiplicative constant
     if (isData and m_TTDInfo.isValid() and m_TTDInfo->hasInjection()) {
       timeGain = m_DBInjectTime->getCorrection("mean", m_TTDInfo->isHER(), m_TTDInfo->getTimeSinceLastInjectionInMicroSeconds());
       timeReso = m_DBInjectTime->getCorrection("reso", m_TTDInfo->isHER(), m_TTDInfo->getTimeSinceLastInjectionInMicroSeconds());
@@ -153,6 +134,9 @@ namespace Belle2 {
       bool isEdge = std::abs(cosTheta + 0.860) < 0.010 or std::abs(cosTheta - 0.955) <= 0.005;
       double cosEdgeCor = (isData and isEdge) ? m_DBCosEdgeCor->getMean(cosTheta) : 1.0;
 
+      // MC particle
+      const auto* mcParticle = isData ? nullptr : track.getRelated<MCParticle>();
+
       // debug output
       CDCDedxTrack* dedxTrack = m_enableDebugOutput ? m_dedxTracks.appendNew() : nullptr;
       if (dedxTrack) {
@@ -164,7 +148,6 @@ namespace Belle2 {
           dedxTrack->m_injring = m_TTDInfo->isHER();
           dedxTrack->m_injtime = m_TTDInfo->getTimeSinceLastInjectionInMicroSeconds();
         }
-        const auto* mcParticle = track.getRelated<MCParticle>();
         if (mcParticle) {
           dedxTrack->m_pdg = mcParticle->getPDG();
           dedxTrack->m_mcmass = mcParticle->getMass();
@@ -173,7 +156,6 @@ namespace Belle2 {
           const auto& trueMom = mcParticle->getMomentum();
           dedxTrack->m_pTrue = trueMom.R();
           dedxTrack->m_cosThetaTrue = cos(trueMom.Theta());
-          /// dedxTrack->m_simDedx =
         }
         dedxTrack->m_scale = scale;
         dedxTrack->m_cosCor = cosCor;
@@ -217,10 +199,10 @@ namespace Belle2 {
         // length of a track within the drift cell
         double doca = hit.getSignedDOCAXY();
         double entAng = hit.getEntranceAngle();
-        double celldx = cell.dx(doca, entAng) / sinTheta; // length of track in the cell
+        double celldx = cell.dx(doca, entAng) / sinTheta; // length of a track in the cell
         if (not cell.isValid()) continue;
 
-        // wire gain calibration
+        // wire gain calibration (iwire is a continuous wire number)
         int wire = wireID.getIWire();
         int iwire = (superlayer == 0) ? 160 * layer + wire : m_nLayerWires[superlayer - 1] + (160 + 32 * (superlayer - 1)) * layer + wire;
         double wiregain = isData ? m_DBWireGains->getWireGain(iwire) : 1.0;
@@ -229,10 +211,7 @@ namespace Belle2 {
         double cellHalfWidth = M_PI * wireRadius / nWires;
         double cellHeight = topHeight + bottomHeight;
         double cellR = 2 * cellHalfWidth / cellHeight;
-        double tana = 100.0; // TODO
-        if (std::abs(2 * atan(1) - std::abs(entAng)) < 0.01) tana = 100 * (entAng / std::abs(entAng)); //avoid infinity at pi/2
-        else tana =  std::tan(entAng);
-        // double tana = std::max(std::min(tan(entAng), 1e10), -1e10);
+        double tana = std::max(std::min(tan(entAng), 1e10), -1e10); // this fixes bug in CDCDedxPIDModule near +-pi/2
         double docaRS = doca * sqrt((1 + cellR * cellR * tana * tana) / (1 + tana * tana));
         double normDocaRS = docaRS / cellHalfWidth;
         double entAngRS = atan(tana / cellR);
@@ -248,7 +227,7 @@ namespace Belle2 {
         double adcCount = isData ? m_DBNonlADC->getCorrectedADC(hit.getADCCount(), currentLayer) : hit.getADCCount();
         double adcCalibrated = correction != 0 ? adcCount / scale / correction : 0;
 
-        // dEdx measurements of single wires - active wires only
+        // merge dEdx measurements on single wires; take active wires only
         if (correction != 0) dedxWires[iwire].add(hit, iwire, currentLayer, celldx, adcCalibrated);
 
         // debug output
@@ -278,7 +257,7 @@ namespace Belle2 {
         dedxLayers[dedx.cLayer].add(dedx);
       }
 
-      // push dEdx values to vector
+      // push dEdx values to a vector
       std::vector<double> dedxValues;
       for (const auto& dedxLayer : dedxLayers) {
         const auto& dedx = dedxLayer.second;
@@ -318,18 +297,32 @@ namespace Belle2 {
       }
       double truncatedError = numValues > 1 ? sqrt(sumOfSquares / numValues - truncatedMean * truncatedMean) / (numValues - 1) : 0;
 
-      // apply the "hadron correction" only to data
-      double correctedMean = isData ? D2I(cosTheta, I2D(cosTheta, 1.00) * truncatedMean) : truncatedMean;
+      // apply the saturation correction only to data (the so called "hadron correction")
+      double correctedMean = isData ? m_DBHadronCor->getCorrectedMean(truncatedMean, cosTheta) : truncatedMean;
+
+      // track level MC (e.g. replacing truncated mean with a generated one)
+      if (m_trackLevel and mcParticle) {
+        double mass = mcParticle->getMass();
+        if (mass > 0) {
+          double mcMean = m_DBMeanPars->getMean(pCDC / mass);
+          double mcSigma = m_DBSigmaPars->getSigma(mcMean, numValues, cosTheta, timeReso);
+          correctedMean = gRandom->Gaus(mcMean, mcSigma);
+          while (correctedMean < 0) correctedMean = gRandom->Gaus(mcMean, mcSigma);
+          // debug output
+          if (dedxTrack) dedxTrack->m_simDedx = correctedMean;
+        }
+      }
 
       // calculate log likelihoods
       double cdcLogL[Const::ChargedStable::c_SetSize] = {0};
       for (const auto& chargedStable : Const::chargedStableSet) {
         double betagamma = pCDC / chargedStable.getMass();
-        double predictedMean = getMean(betagamma);
-        double predictedSigma = getSigma(predictedMean, numValues, cosTheta, timeReso);
-        double chi = predictedSigma != 0 ? (correctedMean - predictedMean) / predictedSigma : 0; // TODO sigma = 0 ?
+        double predictedMean = m_DBMeanPars->getMean(betagamma);
+        double predictedSigma = m_DBSigmaPars->getSigma(predictedMean, numValues, cosTheta, timeReso);
+        if (predictedSigma <= 0) B2ERROR("Predicted sigma is not positive for PDG = " << chargedStable.getPDGCode());
+        double chi = (correctedMean - predictedMean) / predictedSigma;
         int index = chargedStable.getIndex();
-        cdcLogL[index] = -0.5 * chi * chi; // TODO normalization ?
+        cdcLogL[index] = -0.5 * chi * chi; // TODO add PDF normalization: - log(predictedSigma);
         // debug output
         if (dedxTrack) {
           dedxTrack->m_predmean[index] = predictedMean;
@@ -359,196 +352,6 @@ namespace Belle2 {
     } // end of loop over tracks
 
   }
-
-
-  // TODO --> move these functions to DB classes
-
-  double CDCDedxPIDCreatorModule::D2I(double cosTheta, double D) const
-  {
-    const auto& params = m_DBHadronCor->getHadronPars();
-    if (params.size() < 5) {
-      B2WARNING("Vector of dE/dx hadron constants too short!");
-      return D;
-    }
-
-    double projection = pow(fabs(cosTheta), params[3]) + params[2];
-    if (projection == 0) {
-      B2WARNING("Something wrong with dE/dx hadron constants!");
-      return D;
-    }
-
-    double chargeDensity = D / projection;
-    double numerator = 1 + params[0] * chargeDensity;
-    double denominator = 1 + params[1] * chargeDensity;
-
-    if (denominator == 0) {
-      B2WARNING("Something wrong with dE/dx hadron constants!");
-      return D;
-    }
-
-    double I = D * params[4] * numerator / denominator;
-    return I;
-  }
-
-
-  double CDCDedxPIDCreatorModule::I2D(double cosTheta, double I) const
-  {
-    const auto& params = m_DBHadronCor->getHadronPars();
-    if (params.size() < 5) {
-      B2WARNING("Vector of dE/dx hadron constants too short!");
-      return I;
-    }
-
-    double projection  = pow(fabs(cosTheta), params[3]) + params[2];
-    if (projection == 0 or params[4] == 0) {
-      B2WARNING("Something wrong with dE/dx hadron constants!");
-      return I;
-    }
-
-    double a =  params[0] / projection;
-    double b =  1 - params[1] / projection * (I / params[4]);
-    double c = -1.0 * I / params[4];
-
-    if (b == 0 and a == 0) {
-      B2WARNING("both a and b coefficiants for hadron correction are 0");
-      return I;
-    }
-
-    double discr = b * b - 4.0 * a * c;
-    if (discr < 0) {
-      B2WARNING("negative discriminant; return uncorrectecd value");
-      return I;
-    }
-
-    double D = (a != 0) ? (-b + sqrt(discr)) / (2.0 * a) : -c / b;
-    if (D < 0) {
-      D = (a != 0) ? (-b - sqrt(discr)) / (2.0 * a) : -c / b;
-      if (D < 0) {
-        B2WARNING("D is less than 0; return uncorrectecd value");
-        return I;
-      }
-    }
-
-    return D;
-  }
-
-
-  double CDCDedxPIDCreatorModule::meanCurve(double x, const double* par, int version) const
-  {
-    // calculate the predicted mean value as a function of beta-gamma (bg)
-    // this is done with a different function depending on the value of bg
-    double f = 0;
-
-    if (version == 0) {
-      if (par[0] == 1)
-        f = par[1] * std::pow(std::sqrt(x * x + 1), par[3]) / std::pow(x, par[3]) *
-            (par[2] - par[5] * std::log(1 / x)) - par[4] + std::exp(par[6] + par[7] * x);
-      else if (par[0] == 2)
-        f = par[1] * std::pow(x, 3) + par[2] * x * x + par[3] * x + par[4];
-      else if (par[0] == 3)
-        f = -1.0 * par[1] * std::log(par[4] + std::pow(1 / x, par[2])) + par[3];
-    }
-
-    return f;
-  }
-
-  double CDCDedxPIDCreatorModule::getMean(double bg) const
-  {
-    // define the section of the mean to use
-    double A = 0, B = 0, C = 0;
-    if (bg < 4.5)
-      A = 1;
-    else if (bg < 10)
-      B = 1;
-    else
-      C = 1;
-
-    double parsA[9];
-    double parsB[5];
-    double parsC[5];
-
-    const auto& params = m_DBMeanPars->getMeanPars();
-    if (params.size() < 15) B2FATAL("getMean: vector of parameters too short");
-
-    parsA[0] = 1; parsB[0] = 2; parsC[0] = 3;
-    for (int i = 0; i < 15; ++i) {
-      if (i < 7) parsA[i + 1] = params[i];
-      else if (i < 11) parsB[i % 7 + 1] = params[i];
-      else parsC[i % 11 + 1] = params[i];
-    }
-
-    // calculate dE/dx from the Bethe-Bloch mean
-    double partA = meanCurve(bg, parsA, 0);
-    double partB = meanCurve(bg, parsB, 0);
-    double partC = meanCurve(bg, parsC, 0);
-
-    return (A * partA + B * partB + C * partC);
-  }
-
-  double CDCDedxPIDCreatorModule::sigmaCurve(double x, const double* par, int version) const
-  {
-    // calculate the predicted mean value as a function of beta-gamma (bg)
-    // this is done with a different function depending dE/dx, nhit, and sin(theta)
-    double f = 0;
-
-    if (version == 0) {
-      if (par[0] == 1) { // return dedx parameterization
-        f = par[1] + par[2] * x;
-      } else if (par[0] == 2) { // return nhit or sin(theta) parameterization
-        f = par[1] * std::pow(x, 4) + par[2] * std::pow(x, 3) +
-            par[3] * x * x + par[4] * x + par[5];
-      } else if (par[0] == 3) { // return cos(theta) parameterization
-        f = par[1] * exp(-0.5 * pow(((x - par[2]) / par[3]), 2)) +
-            par[4] * pow(x, 6) + par[5] * pow(x, 5) + par[6] * pow(x, 4) +
-            par[7] * pow(x, 3) + par[8] * x * x + par[9] * x + par[10];
-      }
-    }
-
-    return f;
-  }
-
-  double CDCDedxPIDCreatorModule::getSigma(double dedx, double nhit, double cos, double timereso) const
-  {
-
-    double x;
-    double dedxpar[3];
-    double nhitpar[6];
-    double cospar[11];
-
-    const auto& params = m_DBSigmaPars->getSigmaPars();
-    if (params.size() < 17) B2FATAL("getSigma: vector of parameters too short");
-
-    dedxpar[0] = 1; nhitpar[0] = 2; cospar[0] = 3;
-    for (int i = 0; i < 10; ++i) {
-      if (i < 2) dedxpar[i + 1] = params[i];
-      if (i < 5) nhitpar[i + 1] = params[i + 2];
-      cospar[i + 1] = params[i + 7];
-    }
-
-    // determine sigma from the parameterization
-    x = dedx;
-    double corDedx = sigmaCurve(x, dedxpar, 0);
-
-    x = nhit;
-    double corNHit;
-    int nhit_min = 8, nhit_max = 37;
-
-    if (nhit <  nhit_min) {
-      x = nhit_min;
-      corNHit = sigmaCurve(x, nhitpar, 0) * sqrt(nhit_min / nhit);
-    } else if (nhit > nhit_max) {
-      x = nhit_max;
-      corNHit = sigmaCurve(x, nhitpar, 0) * sqrt(nhit_max / nhit);
-    } else corNHit = sigmaCurve(x, nhitpar, 0);
-
-    x = cos;
-    double corCos = sigmaCurve(x, cospar, 0);
-
-    return (corDedx * corCos * corNHit * timereso);
-  }
-
-
-
 
 } // end Belle2 namespace
 

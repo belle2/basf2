@@ -446,6 +446,8 @@ void VariablesToNtupleModule::fillFileMetaData()
     outputFileMetaData.setDataDescription(item.first, item.second);
   }
   outputFileMetaData.setDataDescription("isNtupleMetaData", "True");
+  std::sort(m_parentLfns.begin(), m_parentLfns.end());
+  m_parentLfns.erase(std::unique(m_parentLfns.begin(), m_parentLfns.end()), m_parentLfns.end());
   outputFileMetaData.setParents(m_parentLfns);
   outputFileMetaData.setLfn(m_file->GetName());
 

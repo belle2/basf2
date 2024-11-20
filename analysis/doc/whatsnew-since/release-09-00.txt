@@ -21,6 +21,17 @@ Variables
 * Added `int` metavariable that can convert the floating point variables output to an integer value, 
   that can be saved correctly by `VariablesToNtuple` module into an integer branch of a TTree. 
 
+Modules
++++++++
+* Add support for storing ``FileMetaData`` to `VariablesToNtuple` module. Ntuples will now have a ``persistent``
+  tree with ``FileMetaData`` branch with the relevant metadata information. 
+    * Add a new option ``dataDescription`` to `VariablesToNtuple` which accepts a dictionary of `key:value` pairs,
+      allowing users to store additional information in the ntuple metadata.
+
+Command line tools
+++++++++++++++++++
+* Add ntuple file support to `b2file-merge`, `b2file-metadata-show` and `b2file-metadata-add`.
+
 Changes in the analysis package in light-2409-toyger
 ----------------------------------------------------
 

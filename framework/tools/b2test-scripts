@@ -300,11 +300,11 @@ def process_dir(dir, release_dir):
             continue
         if entry in ("tests", "prepare"):
             # search for files with .py (basf2 steering files) and .ipynb (jupyter notebooks) extensions
-            for root, _, files in os.walk(dir_entry):
-                if root.startswith(os.path.join(dir_entry, 'prepare')) or root == dir_entry:
+            for root_dir, _, files in os.walk(dir_entry):
+                if root_dir.startswith(os.path.join(dir_entry, 'prepare')) or root_dir == dir_entry:
                     for file in files:
                         if file.endswith('.py') or file.endswith('.ipynb'):
-                            full_path = os.path.join(root, file)
+                            full_path = os.path.join(root_dir, file)
                             name = full_path[len(release_dir):].lstrip('/')
                             tests.append(TestInformation(name, release_dir))
         else:
@@ -357,6 +357,9 @@ class TestInformation:
         self._suite: str = os.path.dirname(self.name)
         if self._suite.endswith("/tests"):
             self._suite = os.path.dirname(self._suite)
+
+    def __str__(self) -> str:
+        return self.name
 
     @property
     def filename(self) -> str:
@@ -526,7 +529,7 @@ class TestResult:
                                  skipped=str(self.skipped),
                                  timestamp=datetime.datetime.now().isoformat(),
                                  time=str(self.time),
-                                 name="Basf2 Tests")
+                                 name="basf2 Tests")
 
         for suite in self.suites.values():
             suite.create_testsuite_xml_element(root_el)
@@ -578,20 +581,23 @@ class TestScheduler:
         self.release_dir: str = os.environ.get("BELLE2_RELEASE_DIR") or os.environ.get("BELLE2_LOCAL_DIR")
 
     def filter_tests(self, tests: List[TestInformation]) -> List[TestInformation]:
-        filter_stred_tests = tests
+        filtered_tests = tests
 
         if self.filter_str:
-            filter_stred_tests = [
-                test for test in filter_stred_tests
-                if re.search(self.filter_str, test.filename)
-            ]
+            try:
+                filter_regex = re.compile(self.filter_str)
+            except re.error as e:
+                print(f"The --filter argument '{self.filter_str}' is not a valid regular expression: {e}")
+            filtered_tests = [test for test in filtered_tests if filter_regex.search(test.name)]
 
         if self.exclude_str:
-            filter_stred_tests = [
-                test for test in filter_stred_tests
-                if not re.search(self.exclude_str, test.filename)
-            ]
-        return filter_stred_tests
+            try:
+                exclude_regex = re.compile(self.exclude_str)
+            except re.error as e:
+                print(f"The --exclude argument '{self.exclude_str}' is not a valid regular expression: {e}")
+            filtered_tests = [test for test in filtered_tests if not exclude_regex.search(test.name)]
+
+        return filtered_tests
 
     def read_results_xml(self) -> None:
         if self.xml_input_file:
@@ -684,15 +690,15 @@ class TestScheduler:
     def execute_tests(self):
         tests_to_execute = self.get_tests_to_execute()
         prepare_tests = self.filter_tests(tests_to_execute[0])
-        other_tests = self.filter_tests(tests_to_execute[1])
+        all_tests = self.filter_tests(tests_to_execute[1])
 
         print(f"Running steering file tests in {self.nprocess} processes", flush=True)
         xml_report_el = None
         if prepare_tests:
             xml_report_el = self._run_tests(tests=prepare_tests, prepare_step=True, root_el=xml_report_el)
 
-        if other_tests:
-            _ = self._run_tests(tests=other_tests, prepare_step=False, root_el=xml_report_el)
+        if all_tests:
+            _ = self._run_tests(tests=all_tests, prepare_step=False, root_el=xml_report_el)
 
 
 if __name__ == "__main__":

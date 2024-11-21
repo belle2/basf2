@@ -44,6 +44,7 @@ CDST_TRACKING_OBJECTS = (
     'V0s',
     'TrackFitResults',
     'EventT0',
+    'CDCDedxHits',
     'CDCDedxTracks',
     'SVDShaperDigitsFromTracks',
     'PXDClustersFromTracks',
@@ -301,7 +302,7 @@ def add_postfilter_reconstruction(path,
 
     # Skip postfilter posttracking modules except dedx for raw format cdst reconstruction
     if reconstruct_cdst == 'rawFormat':
-        add_dedx_modules(path, components=components)
+        add_dedx_modules(path, components=components, enableDebugOutput=True)
         if pruneTracks:
             add_prune_tracks(path, components)
         return
@@ -386,7 +387,7 @@ def add_cosmics_reconstruction(
     if posttracking:
         if reconstruct_cdst:
             add_special_vxd_modules(path, components=components)
-            add_dedx_modules(path, components=components)
+            add_dedx_modules(path, components=components, enableDebugOutput=True)
             add_prune_tracks(path, components=components)
 
         else:
@@ -507,10 +508,7 @@ def add_postfilter_posttracking_reconstruction(path,
       MVA based charged particle ID (false).
     """
 
-    # Add dEdx modules, if this function is not called from prepare_cdst_analysis()
-    if not for_cdst_analysis:
-        add_dedx_modules(path, components)
-
+    add_dedx_modules(path, components, for_cdst_analysis=for_cdst_analysis)
     add_top_modules(path, components, cosmics=cosmics)
     add_arich_modules(path, components)
 
@@ -839,22 +837,27 @@ def add_ext_module(path, components=None):
         path.add_module('Ext')
 
 
-def add_dedx_modules(path, components=None):
+def add_dedx_modules(path, components=None, for_cdst_analysis=False, enableDebugOutput=False):
     """
     Add the dE/dX reconstruction modules to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
+    :param for_cdst_analysis: if True, add only DedxPIDCreator module, otherwise add both
+    :param enableDebugOutput: enable/disable writing out debugging information to CDCDedxTracks
     """
     # CDC dE/dx PID
     if components is None or 'CDC' in components:
-        path.add_module('CDCDedxHitSaver')
-        path.add_module('CDCDedxPIDCreator', dedxTracksName='cdcDedxTracks', likelihoodsName='cdcDedxLikelihoods')
-        path.add_module('CDCDedxPID')
+        if for_cdst_analysis:
+            path.add_module('CDCDedxPIDCreator', enableDebugOutput=True)
+        else:
+            path.add_module('CDCDedxHitSaver')
+            path.add_module('CDCDedxPIDCreator', enableDebugOutput=enableDebugOutput)
     # VXD dE/dx PID
     # only run this if the SVD is enabled - PXD is disabled by default
     if components is None or 'SVD' in components:
-        path.add_module('VXDDedxPID')
+        if not for_cdst_analysis:
+            path.add_module('VXDDedxPID')
 
 
 def add_special_vxd_modules(path, components=None):

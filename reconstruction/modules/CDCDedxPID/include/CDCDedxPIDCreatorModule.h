@@ -159,6 +159,7 @@ namespace Belle2 {
 
     // other
     int m_nLayerWires[9] = {0}; /**< lookup table for number of wires per superlayer (indexed by superlayer) */
+    int m_warnCount = 0; /**< warning message count */
 
   };
 

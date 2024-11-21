@@ -121,10 +121,10 @@ void VariablesToNtupleModule::initialize()
   TDirectory::TContext directoryGuard(m_file.get());
 
   // check if TTree with that name already exists
-  if (m_file->Get(m_treeName.c_str()) || m_treeName == "persistent" || m_treeName == "tree") {
+  if (m_file->Get(m_treeName.c_str()) || m_treeName == "persistent") {
     B2FATAL("Tree with the name \"" << m_treeName
             << "\" already exists in the file \"" << m_fileName << "\"\n"
-            << "or is one of the reserved names - [persistent, tree].\n"
+            << "or is reserved for FileMetaData.\n"
             << "\nYou probably want to either set the output fileName or the treeName to something else:\n\n"
             << "   from modularAnalysis import variablesToNtuple\n"
             << "   variablesToNtuple('pi+:all', ['p'], treename='pions', filename='variablesToNtuple.root')\n"

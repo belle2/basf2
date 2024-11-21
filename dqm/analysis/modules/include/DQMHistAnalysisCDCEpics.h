@@ -19,6 +19,7 @@
 #include <TH1F.h>
 #include <TStyle.h>
 #include <TLine.h>
+#include <TEllipse.h>
 #include <numeric>
 #include <iostream>
 
@@ -122,6 +123,7 @@ namespace Belle2 {
     TH2F* m_hist_attach_eff[3] = {nullptr}; /**< for above*/
     TH2Poly* m_hist_attach_eff_Poly[3] = {nullptr}; /**< for above*/
     TH1F* m_hist_wire_attach_eff_1d = nullptr; /**< for above*/
+    double lbinEdges[56] = {0.0}; /**< vector for radius edge 56*/
 
     TLine* m_line_ladc  = nullptr; /**< line for lower ADC window */
     TLine* m_line_hadc  = nullptr; /**< line for higher ADC window */

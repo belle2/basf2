@@ -274,7 +274,7 @@ class VariablesToTable(basf2.Module):
     def terminate(self):
         """save and close the output"""
         import ROOT  # noqa
-        if self._buffer is not None:
+        if self._event_buffer_counter > 0:
             self.write_buffer(self._buffer)
 
         if self._format == "hdf5":

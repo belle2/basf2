@@ -155,6 +155,9 @@ run-tests:
 build-clang:
   stage: build-clang
   needs: [run-tests]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: always
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
     - b2code-option clang

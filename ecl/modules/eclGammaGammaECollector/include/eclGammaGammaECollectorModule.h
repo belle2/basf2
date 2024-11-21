@@ -44,6 +44,7 @@ namespace Belle2 {
     double m_maxTime; /**< maximum photon (time - \<t\>)/dt99 (1) */
     bool m_measureTrueEnergy; /**< use eclCalDigit to determine MC deposited energy (false) */
     bool m_requireL1; /**< require events to satisfy a level 1 trigger (true) */
+    double m_expectedEnergyScale; /**< scale expected energies for non-4S calibration (1.) */
 
     /** Required arrays */
     StoreArray<Track> m_trackArray; /**< Required input array of Tracks */

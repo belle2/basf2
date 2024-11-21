@@ -99,40 +99,16 @@ namespace Belle2 {
     TCanvas* m_cEfficiencyErrRPhiViewV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
 
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
-    std::tuple<std::vector<TText*>, std::vector<TText*>> textModuleNumbers(); /**< create vectors of TText to write on the canvas */
-    void drawText(); /**< draw text on the RPhi view */
 
-    std::vector<TText*> m_laddersText; /**< list of ladders to write on the canvas */
-    std::vector<TText*> m_sensorsText; /**< list of sensors to write on the cancas */
+    svdStatus m_effUstatus; /**< number representing the status of the efficiency U side */
+    svdStatus m_effVstatus;/**< number representing the status of the efficiency V side */
 
-    TLine* m_lx = nullptr; /**< y-axis */
-    TLine* m_ly = nullptr; /**< x-axis */
-    TArrow* m_arrowx = nullptr; /**< x-axis direction */
-    TArrow* m_arrowy = nullptr; /**< y-axis direction */
-
-    int m_efficiencyMin = 0; /**< Minimum of the efficiency histogram */
-    int m_efficiencyMax = -1111; /**< Maximum of the efficiency histogram. -1111 adjust the maximum depennding on the content */
-    bool m_setEfficiencyRange = false; /**< set the range of the efficiency histogram */
-
-    /** efficiency status flags */
-    enum effStatus {
-      good = 0,    /**< green frame */
-      warning = 1, /**< orange frame */
-      error = 2,   /**< red frame */
-      lowStat = 3,  /**< gray frame */
-      noStat = 4 /**< purple frame */
-    };
-    effStatus m_effUstatus; /**< number representing the status of the efficiency U side */
-    effStatus m_effVstatus;/**< number representing the status of the efficiency V side */
-
-    void setEffStatus(float den, float eff, bool sideU = false); /**< set efficiency status */
+    void setEffStatus(float den, float eff, bool isU = false); /**< set efficiency status */
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
 
     std::string m_pvPrefix; /**< string prefix for EPICS PVs */
-
-
   };
 } // end namespace Belle2
 

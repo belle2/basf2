@@ -133,6 +133,8 @@ The following restrictions apply:
       RootIOUtilities::RootFileInfo fileInfo(input);
       // Ok, load the FileMetaData from the tree
       const auto &fileMetaData = fileInfo.getFileMetaData();
+      auto description = fileMetaData.getDataDescription();
+      auto isNtuple = description.find("isNtupleMetaData");
       // File looks usable, start checking metadata ...
       B2INFO("adding file " << std::quoted(input));
       if(LogSystem::Instance().isLevelEnabled(LogConfig::c_Info)) fileMetaData.Print("all");
@@ -147,7 +149,9 @@ The following restrictions apply:
         }
       }
       for(const auto& tree : allEventTrees) {
-        auto branches = (tree=="tree") ? fileInfo.getBranchNames() : fileInfo.getNtupleBranchNames(tree);
+        auto branches = ((tree=="tree") &&
+                         ((isNtuple==description.end()) || (isNtuple->second != "True"))
+                        ) ? fileInfo.getBranchNames() : fileInfo.getNtupleBranchNames(tree);
         if(branches.empty()) {
           throw std::runtime_error("Could not find any branches in " + tree);
         }

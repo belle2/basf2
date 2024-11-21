@@ -152,7 +152,8 @@ long RootIOUtilities::getEntryNumberWithEvtRunExp(TTree* tree, long event, long 
 void RootIOUtilities::buildIndex(TTree* tree)
 {
   std::string treeName = tree->GetName();
-  if (strcmp(treeName.c_str(), "tree") == 0) {
+  TBranch* EventMetaDataBranch = tree->GetBranch("EventMetaData");
+  if ((strcmp(treeName.c_str(), "tree") == 0) && EventMetaDataBranch) {
     tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run", "EventMetaData.m_event");
   }
   // for ntuple trees that do not have EventMetaData branch we use the tree level branches

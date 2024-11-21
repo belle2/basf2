@@ -47,12 +47,14 @@ settings = CalibrationSettings(name="caf_svd_hotstrips",
                                    "snrThreshold": 5,
                                    "computeAverageOccupancyPerChip": False,
                                    "relativeOccupancyThreshold": 5.0,
-                                   "absoluteOccupancyThreshold": 0.2
+                                   "absoluteOccupancyThreshold": 0.2,
+                                   "skipHLTRejectedEvents": False
                                })
 
 
 def create_collector(name="SVDOccupancyCalibrationsCollector",
-                     svdShaperDigits="SVDShaperDigits"):
+                     svdShaperDigits="SVDShaperDigits",
+                     skipHLTRejectedEvents=False):
     """
     Simply creates a SVDOccupancyCalibrationsCollector module with some options.
 
@@ -66,6 +68,7 @@ def create_collector(name="SVDOccupancyCalibrationsCollector",
 
     collector = b2.register_module('SVDOccupancyCalibrationsCollector')
     collector.param("SVDShaperDigitsName", svdShaperDigits)
+    collector.param("skipHLTRejectedEvents", skipHLTRejectedEvents)
 
     return collector
 
@@ -175,6 +178,7 @@ def get_calibrations(input_data, **kwargs):
     computeAverageOccupancyPerChip = expert_config["computeAverageOccupancyPerChip"]
     relativeOccupancyThreshold = expert_config["relativeOccupancyThreshold"]
     absoluteOccupancyThreshold = expert_config["absoluteOccupancyThreshold"]
+    skipHLTRejectedEvents = expert_config["skipHLTRejectedEvents"]
 
     avgOcc = "avgOccPerSensor"
     if (computeAverageOccupancyPerChip):
@@ -202,7 +206,8 @@ def get_calibrations(input_data, **kwargs):
     pre_collector_path = create_pre_collector_path(snrThreshold=snrThreshold)
 
     coll = create_collector(name="SVDOccupancyCalibrationsCollector",
-                            svdShaperDigits="SVDShaperDigitsZS")
+                            svdShaperDigits="SVDShaperDigitsZS",
+                            skipHLTRejectedEvents=skipHLTRejectedEvents)
 
     algo = create_algorithm(uniqueID,
                             computeAverageOccupancyPerChip,

@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <svd/modules/svdOccupancyCalibrationsCollector/SVDOccupancyCalibrationsCollectorModule.h>
+#include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 
 #include <TH2F.h>
 
@@ -29,8 +30,8 @@ SVDOccupancyCalibrationsCollectorModule::SVDOccupancyCalibrationsCollectorModule
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("SVDShaperDigitsName", m_svdShaperDigitName, "Name of the SVDClusters list", std::string("SVDShaperDigits"));
-
   addParam("HistogramTree", m_tree, "Name of the tree in which the histograms are saved", std::string("tree"));
+  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If True, skip events rejected by HLT.", bool(false));
 }
 
 void SVDOccupancyCalibrationsCollectorModule::prepare()
@@ -89,8 +90,13 @@ void SVDOccupancyCalibrationsCollectorModule::startRun()
 void SVDOccupancyCalibrationsCollectorModule::collect()
 {
 
+  if (m_skipRejectedEvents && (m_resultStoreObjectPointer.isValid())) {
+    const bool eventAccepted = SoftwareTrigger::FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
+    if (!eventAccepted) return;
+  }
+
   int nDigits = m_storeDigits.getEntries();
-  getObjectPtr<TH1F>("HNEvents")->Fill(1); // check if HLT did not filter out the event (no rawSVD)
+  getObjectPtr<TH1F>("HNEvents")->Fill(1);
 
   if (nDigits == 0)
     return;

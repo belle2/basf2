@@ -150,6 +150,7 @@ run-tests:
           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE}/${VERSION}/${FILE}"
         done
       fi
+    - echo "dummy" > build/html/dummy.txt
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
 build-clang:

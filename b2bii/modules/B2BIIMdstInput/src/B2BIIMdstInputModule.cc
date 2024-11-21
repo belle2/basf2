@@ -142,6 +142,8 @@ void B2BIIMdstInputModule::initialize()
   // Also, make sure we register a filemetadata object. We don't have most information
   // to go into it but we need it for real/MC flag
   m_fileMetadata.registerInDataStore();
+
+  m_eventExtraInfo.registerInDataStore();
 }
 
 void B2BIIMdstInputModule::initializeDataStore()

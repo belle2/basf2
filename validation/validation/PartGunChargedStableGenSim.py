@@ -51,7 +51,7 @@ for idx in range(len(Belle2.Const.chargedStableSet)):
 main = basf2.create_path()
 
 # Event setting and info.
-main.add_module("EventInfoSetter", evtNumList=[1000], runList=[1])
+main.add_module("EventInfoSetter", evtNumList=[3000], runList=[1])
 
 # Fixed random seed.
 basf2.set_random_seed("Pe@ce&Love")

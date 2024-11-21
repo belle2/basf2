@@ -256,6 +256,10 @@ void SVDBackgroundModule::event()
           }
         }
       }
+      if (!simhit) {
+        B2WARNING("No related SVDSimHit found");
+        continue; //skip this true hit if the simhit is null
+      }
       // FIXME: Is there a difference between positrons and electrons wrt. NIEL?
       // We fill neutronFluxBars with summary NIEL deposit for all kinds of particles by layer and component.
       // Fluency plots are by component and are deposition histograms for a particular type of particle and compoonent.

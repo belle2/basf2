@@ -1,3 +1,47 @@
+Changes in the analysis package in light-2411-aldebaran
+-------------------------------------------------------
+
+Modular Analysis
+++++++++++++++++
+* Add options to `modularAnalysis.writePi0EtaVeto` to:
+    * Require the soft photon being in the current RestOfEvent.
+    * Add separate selections to be applied during `modularAnalysis.reconstructDecay` for both the :math:`\pi^0` as well as
+      the :math:`\eta` reconstruction.
+
+Kinematic Fitting tools
++++++++++++++++++++++++
+* Added option to prepend label to OrkaKinfit variables to allow multiple fits to be performed in same path.
+
+Variables
++++++++++
+* Added variables `tSigB`, `tTagB` which represent reconstructed proper decay times of individual B mesons.
+* Added `DeltaT3D` = `tSigB` - `tTagB` as an alternative to the `DeltaT` variable.
+* Added the reconstructed coordinates of the Y4S vertex `Y4SvtxX`, `Y4SvtxY`, `Y4SvtxZ` and the Tag vertex
+  covariance matrix `TagVCov`.
+* Added `int` metavariable that can convert the floating point variables output to an integer value, 
+  that can be saved correctly by `VariablesToNtuple` module into an integer branch of a TTree. 
+
+Modules
++++++++
+* Add support for storing ``FileMetaData`` to `VariablesToNtuple` module. Ntuples will now have a ``persistent``
+  tree with ``FileMetaData`` branch with the relevant metadata information. 
+    * Add a new option ``dataDescription`` to `VariablesToNtuple` which accepts a dictionary of key:value pairs,
+      allowing users to store additional information in the ntuple metadata.
+    * Add ntuple file support to ``b2file-merge``, which is now the recommended tool to merge ntuples over
+      ``hadd``. ``b2file-metadata-show`` and ``b2file-metadata-add`` will also work with ntuples. 
+
+Changes in the analysis package in light-2409-toyger
+----------------------------------------------------
+
+Modules
++++++++
+* Added a module ``VariabesToTable`` that writes Ntuples to hdf5, csv or parquet.
+* Added support for the FEI table format of the corrections repository to the analysis reweighting script
+
+Graph Neural Network based Flavor Tagger
+++++++++++++++++++++++++++++++++++++++++
+* Fixed a memory leak that affected light-2406-ragdoll and light-2408-savannah by upgrading the tensorflow version
+
 Changes in the analysis package in light-2408-savannah
 ------------------------------------------------------
 
@@ -5,15 +49,23 @@ Modules
 +++++++
 * Fixed a bug in `MCDecayFinder`, which previously didn't find all true candidates when using the default arrow.
 * Fixed a bug in :ref:`analysis_reweighting` where the weights were not correctly assigned 
-  if a selection cut was applied on the input DataFrame. 
+  if a selection cut was applied on the input DataFrame.
 
 Variables
 +++++++++
 * Added track variables `d0FromIP`, `z0FromIP` and `phi0FromIP`; which return the tracking parameters of the
   point-of-closest-approach (POCA), with respect to the measured beam interaction point.
 * Added energy [in tau rest frame] of radiated photon from tau+/- decays: 'tauPlusEgstar'/'tauMinusEgstar'
+* Added a meta variable `useMCancestorBRestFrame` which returns the given variable in the rest frame of the
+  ancestor B MC particle.
 
 Command line tools
 ++++++++++++++++++
 * Improved output and content of the :ref:`b2help-recommendation`.
+* Added new tool to list available FEI modes :ref:`b2help-print-fei-mode-names` and corresponding function `get_mode_names`.
 
+Charm Flavor Tagger
++++++++++++++++++++
+* Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
+  function ``charmFlavorTagger``) to ``CFT_ragdoll``. This value must be used for all releases as recent as
+  light-2406-ragdoll and release-09.

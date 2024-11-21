@@ -235,7 +235,7 @@ void SVGPrimitivePlotter::endGroup()
 
 const std::string SVGPrimitivePlotter::save(const std::string& fileName)
 {
-  // Check indention
+  // Check indentation
   if (m_nIndentationSpaces != s_defaultNIndentationSpaces) {
     B2WARNING("Mismatching calls to startGroup and endGroup detected. "
               << "Proceeding to write the illforamed result.");
@@ -353,7 +353,7 @@ void SVGPrimitivePlotter::writeOpeningTag(std::ostream& outputStream,
   // Indentation
   outputStream << std::string(m_nIndentationSpaces, ' ');
 
-  // Opening braket
+  // Opening bracket
   outputStream << '<';
 
   // Write contained part
@@ -397,7 +397,7 @@ void SVGPrimitivePlotter::writeStandAloneTag(std::ostream& outputStream,
     // Indentation
     outputStream << std::string(m_nIndentationSpaces, ' ');
 
-    // Opening braket
+    // Opening bracket
     outputStream << '<';
 
     // Write contained part
@@ -467,7 +467,7 @@ void SVGPrimitivePlotter::writeClosingTag(std::ostream& outputStream, const std:
   // Indentation
   outputStream << std::string(m_nIndentationSpaces, ' ');
 
-  // Opening braket
+  // Opening bracket
   outputStream << '<' << '/';
 
   // Tag name

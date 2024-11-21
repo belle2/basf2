@@ -107,10 +107,10 @@ void TrackDQMModule::DefineFlags()
 {
   // only monitor if any flag was set so only 2 bins needed
   const char* flagTitle =
-    "Tracking error summary. Mean = errors/event (should be 0 or very close to 0); Error occured yes or no; Number of events";
+    "Tracking error summary. Mean = errors/event (should be 0 or very close to 0); Error occurred yes or no; Number of events";
 
   m_trackingErrorFlags = Create("NumberTrackingErrorFlags", flagTitle, 2, -0.5, 1.5, "", "");
 
   m_trackingErrorFlags->GetXaxis()->SetBinLabel(1, "No Error");
-  m_trackingErrorFlags->GetXaxis()->SetBinLabel(2, "Error occured");
+  m_trackingErrorFlags->GetXaxis()->SetBinLabel(2, "Error occurred");
 }

@@ -98,7 +98,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
 
   PerigeeJacobian moveByTwoYJacobian = circle.passiveMoveByJacobian(Vector2D(0.0, -2.0));
 
-  // Hand caluclated intermediate quantities;
+  // Hand calculated intermediate quantities;
   double deltaParallel = 2;
   double A = 4;
   double u = 1;

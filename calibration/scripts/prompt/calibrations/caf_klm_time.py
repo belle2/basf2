@@ -24,7 +24,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name='KLM time',
-                               expert_username='seemac',
+                               expert_username='amubarak',
                                description=__doc__,
                                input_data_formats=['cdst'],
                                input_data_names=['hlt_mumu'],
@@ -86,7 +86,7 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Algorithm setup
-
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import KLMTimeAlgorithm
 
     alg = KLMTimeAlgorithm()

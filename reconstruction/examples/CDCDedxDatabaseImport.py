@@ -16,6 +16,7 @@
 # as first and second argument respectively.
 ########################################################
 
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import CDCDedxDatabaseImporter
 
 dedxScaleImporter = CDCDedxDatabaseImporter("DedxPDFs.root", "DedxPDFs")

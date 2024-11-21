@@ -44,7 +44,7 @@ namespace Belle2 {
       return FilterInfo();
     };
 
-    /** function to access the filter infos directly, as inderect access seems not to work within the Draw of root:
+    /** function to access the filter infos directly, as indirect access seems not to work within the Draw of root:
      * @param i: the index under which the filter was stored in m_filterinfos
     */
     std::string getFilterName(int i)

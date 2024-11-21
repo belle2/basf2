@@ -1,0 +1,56 @@
+f_SLME_p1 : 
+  HLT: all
+  MCType: Main
+  GT: [analysis]
+
+f_EWP_p1 : 
+  HLT: all
+  MCType: Main
+  GT: [analysis]
+
+f_TDCPV_p1 : 
+  HLT: hadron
+  MCType: Main
+  GT: [analysis]
+
+f_TDCPV_p2 : 
+  HLT: hadron
+  MCType: Main
+  GT: [analysis]
+
+f_bhadronic_p1 : 
+  HLT: hadron
+  MCType: Main
+  GT: []
+  
+f_bhadronic_p2 : 
+  HLT: hadron
+  MCType: Main
+  GT: []
+
+f_quarkonium_p1 : 
+  HLT: all
+  MCType: Main_LowMult_Excited
+  GT: [PID]
+
+f_charm_p1 : 
+  HLT: all
+  MCType: Main
+  GT: [analysis]
+
+f_dark_p1 : 
+  HLT: all
+  MCType: Main_LowMult
+  GT: [PID]
+
+f_tau_p1 : 
+  HLT: all
+  MCType: Main_LowMult
+  GT: []
+
+GT :
+  FEI : 'analysis_tools_light-2212-foldex'
+  analysis : 'analysis_tools_light-2305-korat'
+  PID : 'chargedpidmva_rel6_v5'
+
+release : 'build-light-2405q'

@@ -29,9 +29,9 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     *  Class representating the sense wire arrangement in the whole of the central drift chamber.
+     *  Class representing the sense wire arrangement in the whole of the central drift chamber.
      *  This class represents the the whole CDC layer geometry and the neighborhood relations in it. \n
-     *  Since their is only one CDC at a time it is implemented as a singletone object, with getInstance(). \n
+     *  Since their is only one CDC at a time it is implemented as a singleton object, with getInstance(). \n
      *  Their should rarely be the need to construct additional instances. \n
      *  It provides getters for all wires, layers and superlayers and can check the validity of wire id combinations. \n
      *  Also there are methods for getting to the closest and secondary of each wire. \n
@@ -82,7 +82,7 @@ namespace Belle2 {
        */
       ///@{
 
-      /// Checks the validity of a wireID convinience object.
+      /// Checks the validity of a wireID convenience object.
       bool isValidWireID(const WireID& wireID) const
       { return isValidIWire(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
@@ -103,7 +103,7 @@ namespace Belle2 {
       { return getWireLayer(iCLayer).getWire(iWire) ; }
 
       /// Getter for wire getter by superlayer id, layer id and wire id.
-      const CDCWire& getWire(ISuperLayer iSuperLayer, ILayer iLayer , IWire iWire) const
+      const CDCWire& getWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire) const
       { return getWireSuperLayer(iSuperLayer).getWireLayer(iLayer).getWire(iWire) ; }
 
       /// Getter for the underlying storing wire vector.

@@ -22,7 +22,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**
-     * A two dimensional vector which is equipped with functions for correct handeling \n
+     * A two dimensional vector which is equipped with functions for correct handling \n
      * of orientation related issues in addition to the expected vector methods. \n
      */
     class Vector2D {
@@ -54,7 +54,7 @@ namespace Belle2 {
       {
       }
 
-      /// Constucts a unit vector with azimuth angle equal to phi
+      /// Constructs a unit vector with azimuth angle equal to phi
       static Vector2D Phi(const double phi)
       {
         return std::isnan(phi) ? Vector2D(0.0, 0.0) : Vector2D(cos(phi), sin(phi));
@@ -116,9 +116,9 @@ namespace Belle2 {
       }
 
       /// Total ordering based on cylindrical radius first and azimuth angle second
-      /** Total order achiving a absolute lower bound Vector2D(0.0, 0.0). By first taking the
+      /** Total order achieving a absolute lower bound Vector2D(0.0, 0.0). By first taking the
        * cylindrical radius \n
-       *  for comparision the null vector is smaller than all other possible \n
+       *  for comparison the null vector is smaller than all other possible \n
        *  vectors. Secondly the azimuth angle is considered to have a total ordering \n
        *  for all vectors.\n
        */
@@ -129,7 +129,7 @@ namespace Belle2 {
       }
 
       /// Getter for the lowest possible vector
-      /** The lowest possilbe vector according to the comparision is the null vector */
+      /** The lowest possible vector according to the comparison is the null vector */
       static Vector2D getLowest()
       {
         return Vector2D(0.0, 0.0);
@@ -175,7 +175,7 @@ namespace Belle2 {
 
       /** @name Angle functions
        *  These functions measure the angle between two vectors from *this* to rhs
-       *  in the mathematical positve counterclockwise direction. So a positiv angle means
+       *  in the mathematical positive counterclockwise direction. So a positive angle means
        *  rhs is more counterclockwise than this.
        */
       ///@{

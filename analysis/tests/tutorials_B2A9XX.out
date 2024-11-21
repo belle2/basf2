@@ -265,3 +265,42 @@ TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_s
 TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_stat_dn, 0.9664
 TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_up, 1.011
 TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_dn, 0.9941
+TFile: B2A913-CharmFlavorTagger.root
+TTree: D0tree
+TBranch: __experiment__, 0
+TBranch: __run__, 0
+TBranch: __event__, 9
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: px, -1.565
+TBranch: py, 1.745
+TBranch: pz, 1.209
+TBranch: pt, 2.344
+TBranch: p, 2.637
+TBranch: E, 3.23
+TBranch: isSignal, 1
+TBranch: mcErrors, 0
+TBranch: mcPDG, 421
+TBranch: CFT_qr, 0.5695
+TBranch: CFT_prob, 0.7848
+TBranch: K_px, -0.9924
+TBranch: K_py, 2.049
+TBranch: K_pz, 0.8923
+TBranch: K_pt, 2.277
+TBranch: K_p, 2.446
+TBranch: K_E, 2.495
+TBranch: K_isSignal, 1
+TBranch: K_mcErrors, 0
+TBranch: K_mcPDG, -321
+TBranch: pi_px, -0.5723
+TBranch: pi_py, -0.304
+TBranch: pi_pz, 0.3165
+TBranch: pi_pt, 0.648
+TBranch: pi_p, 0.7212
+TBranch: pi_E, 0.7346
+TBranch: pi_isSignal, 1
+TBranch: pi_mcErrors, 0
+TBranch: pi_mcPDG, 211

@@ -26,7 +26,7 @@ using namespace TrackFindingCDC;
 
 std::string AxialTrackMerger::getDescription()
 {
-  return "Merges axial tracks found in the legendre search";
+  return "Merges axial tracks found in the Legendre search";
 }
 
 void AxialTrackMerger::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -42,7 +42,7 @@ void AxialTrackMerger::apply(std::vector<CDCTrack>& axialTracks,
                              const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
   // Check quality of the track basing on holes on the trajectory;
-  // if holes exist then track is splitted
+  // if holes exist then track is split
   for (CDCTrack& track : axialTracks) {
     if (track.size() < 5) continue;
     AxialTrackUtil::removeHitsAfterSuperLayerBreak(track);

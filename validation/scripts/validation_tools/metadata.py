@@ -30,7 +30,7 @@ def file_description_set(
     rootfile: Union[ROOT.TFile, str, pathlib.PurePath], description: str
 ) -> None:
     """
-    Add file description validation metdata to a ROOT file.
+    Add file description validation metadata to a ROOT file.
 
     Args:
         rootfile (ROOT.TFile, str or pathlib.PurePath): Name of the root file

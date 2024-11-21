@@ -9,7 +9,7 @@
 ##########################################################################
 
 
-from ROOT import Belle2  # make Belle2 namespace available # noqa
+from ROOT import Belle2  # noqa: make Belle2 namespace available # noqa
 from ROOT.Belle2 import TrackFindingCDC as TFCDC
 
 import sys
@@ -110,7 +110,7 @@ class LegendreBinningValidationModule(harvesting.HarvestingModule):
         #: cached copy of upper bounds
         self.upper_curv_bounds = np.array([bin[1] for bin in bin_bounds])
 
-        assert(len(self.lower_curv_bounds) == len(self.upper_curv_bounds))
+        assert (len(self.lower_curv_bounds) == len(self.upper_curv_bounds))
 
     def initialize(self):
         """Receive signal at the start of event processing"""

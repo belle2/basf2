@@ -169,7 +169,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
 
   // find ECL EventT0 Hadrons ECLTRG histogram and process it
   TH1* h = findHist("EventT0/m_histEventT0_ECL_hadron_L1_ECLTRG");
-  TString tag = "hadronECLTRG";
+  TString tag = "hadronECLTRG_ECLT0";
   m_cECLTimeHadronsECLTRG->cd();
   if (processHistogram(h, tag)) {
     m_cECLTimeHadronsECLTRG->SetFillColor(0);
@@ -184,7 +184,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
 
   // find ECL EventT0 Bhabhas ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_ECL_bhabha_L1_ECLTRG");
-  tag = "bhabhaECLTRG";
+  tag = "bhabhaECLTRG_ECLT0";
   m_cECLTimeBhaBhaECLTRG->cd();
   if (processHistogram(h, tag)) {
     m_cECLTimeBhaBhaECLTRG->SetFillColor(0);
@@ -199,7 +199,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
 
   // find ECL EventT0 Mumus ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_ECL_mumu_L1_ECLTRG");
-  tag = "mumuECLTRG";
+  tag = "mumuECLTRG_ECLT0";
   m_cECLTimeMuMuECLTRG->cd();
   if (processHistogram(h, tag)) {
     m_cECLTimeMuMuECLTRG->SetFillColor(0);
@@ -217,7 +217,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
 
   // find CDC EventT0 Hadrons ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_CDC_hadron_L1_ECLTRG");
-  tag = "hadronECLTRG";
+  tag = "hadronECLTRG_CDCT0";
   m_cCDCTimeHadronsECLTRG->cd();
   if (processHistogram(h, tag)) {
     m_cCDCTimeHadronsECLTRG->SetFillColor(0);
@@ -232,7 +232,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
 
   // find CDC EventT0 Bhabhas ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_CDC_bhabha_L1_ECLTRG");
-  tag = "bhabhaECLTRG";
+  tag = "bhabhaECLTRG_CDCT0";
   m_cCDCTimeBhaBhaECLTRG->cd();
   if (processHistogram(h, tag)) {
     m_cCDCTimeBhaBhaECLTRG->SetFillColor(0);
@@ -247,7 +247,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
 
   // find CDC EventT0 Mumus ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_CDC_mumu_L1_ECLTRG");
-  tag = "mumuECLTRG";
+  tag = "mumuECLTRG_CDCT0";
   m_cCDCTimeMuMuECLTRG->cd();
   if (processHistogram(h, tag)) {
     m_cCDCTimeMuMuECLTRG->SetFillColor(0);
@@ -265,7 +265,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
 
   // find TOP EventT0 Hadrons ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_hadron_L1_ECLTRG");
-  tag = "hadronECLTRG";
+  tag = "hadronECLTRG_TOPT0";
   m_cTOPTimeHadronsECLTRG->cd();
   if (processHistogram(h, tag)) {
     m_cTOPTimeHadronsECLTRG->SetFillColor(0);
@@ -280,7 +280,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
 
   // find TOP EventT0 Bhabhas ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_ECLTRG");
-  tag = "bhabhaECLTRG";
+  tag = "bhabhaECLTRG_TOPT0";
   m_cTOPTimeBhaBhaECLTRG->cd();
   if (processHistogram(h, tag)) {
     m_cTOPTimeBhaBhaECLTRG->SetFillColor(0);
@@ -295,7 +295,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
 
   // find TOP EventT0 Mumus ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_ECLTRG");
-  tag = "mumuECLTRG";
+  tag = "mumuECLTRG_TOPT0";
   m_cTOPTimeMuMuECLTRG->cd();
   if (processHistogram(h, tag)) {
     m_cTOPTimeMuMuECLTRG->SetFillColor(0);
@@ -313,7 +313,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
 
   // find SVD EventT0 Hadrons ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_hadron_L1_ECLTRG");
-  tag = "hadronECLTRG";
+  tag = "hadronECLTRG_SVDT0";
   m_cSVDTimeHadronsECLTRG->cd();
   if (processHistogram(h, tag)) {
     m_cSVDTimeHadronsECLTRG->SetFillColor(0);
@@ -328,7 +328,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
 
   // find SVD EventT0 Bhabhas ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_ECLTRG");
-  tag = "bhabhaECLTRG";
+  tag = "bhabhaECLTRG_SVDT0";
   m_cSVDTimeBhaBhaECLTRG->cd();
   if (processHistogram(h, tag)) {
     m_cSVDTimeBhaBhaECLTRG->SetFillColor(0);
@@ -343,7 +343,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
 
   // find SVD EventT0 Mumus ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_ECLTRG");
-  tag = "mumuECLTRG";
+  tag = "mumuECLTRG_SVDT0";
   m_cSVDTimeMuMuECLTRG->cd();
   if (processHistogram(h, tag)) {
     m_cSVDTimeMuMuECLTRG->SetFillColor(0);
@@ -365,7 +365,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseCDCTRGEventT0Distribution
 
   // find ECL EventT0 Hadrons CDCTRG histogram and process it
   TH1* h = findHist("EventT0/m_histEventT0_ECL_hadron_L1_CDCTRG");
-  TString tag = "hadronCDCTRG";
+  TString tag = "hadronCDCTRG_ECLT0";
   m_cECLTimeHadronsCDCTRG->cd();
   if (processHistogram(h, tag)) {
     m_cECLTimeHadronsCDCTRG->SetFillColor(0);
@@ -381,7 +381,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseCDCTRGEventT0Distribution
 
   // find ECL EventT0 Bhabhas CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_ECL_bhabha_L1_CDCTRG");
-  tag = "bhabhaCDCTRG";
+  tag = "bhabhaCDCTRG_ECLT0";
   m_cECLTimeBhaBhaCDCTRG->cd();
   if (processHistogram(h, tag)) {
     m_cECLTimeBhaBhaCDCTRG->SetFillColor(0);
@@ -397,7 +397,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseCDCTRGEventT0Distribution
 
   // find ECL EventT0 Mumus CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_ECL_mumu_L1_CDCTRG");
-  tag = "mumuCDCTRG";
+  tag = "mumuCDCTRG_ECLT0";
   m_cECLTimeMuMuCDCTRG->cd();
   if (processHistogram(h, tag)) {
     m_cECLTimeMuMuCDCTRG->SetFillColor(0);
@@ -415,7 +415,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseCDCTRGEventT0Distribution
 
   // find CDC EventT0 Hadrons CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_CDC_hadron_L1_CDCTRG");
-  tag = "hadronCDCTRG";
+  tag = "hadronCDCTRG_CDCT0";
   m_cCDCTimeHadronsCDCTRG->cd();
   if (processHistogram(h, tag)) {
     m_cCDCTimeHadronsCDCTRG->SetFillColor(0);
@@ -431,7 +431,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseCDCTRGEventT0Distribution
 
   // find CDC EventT0 Bhabhas CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_CDC_bhabha_L1_CDCTRG");
-  tag = "bhabhaCDCTRG";
+  tag = "bhabhaCDCTRG_CDCT0";
   m_cCDCTimeBhaBhaCDCTRG->cd();
   if (processHistogram(h, tag)) {
     m_cCDCTimeBhaBhaCDCTRG->SetFillColor(0);
@@ -447,7 +447,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseCDCTRGEventT0Distribution
 
   // find CDC EventT0 Mumus CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_CDC_mumu_L1_CDCTRG");
-  tag = "mumuCDCTRG";
+  tag = "mumuCDCTRG_CDCT0";
   m_cCDCTimeMuMuCDCTRG->cd();
   if (processHistogram(h, tag)) {
     m_cCDCTimeMuMuCDCTRG->SetFillColor(0);
@@ -465,7 +465,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseCDCTRGEventT0Distribution
 
   // find TOP EventT0 Hadrons CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_hadron_L1_CDCTRG");
-  tag = "hadronCDCTRG";
+  tag = "hadronCDCTRG_TOPT0";
   m_cTOPTimeHadronsCDCTRG->cd();
   if (processHistogram(h, tag)) {
     m_cTOPTimeHadronsCDCTRG->SetFillColor(0);
@@ -481,7 +481,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseCDCTRGEventT0Distribution
 
   // find TOP EventT0 Bhabhas CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_CDCTRG");
-  tag = "bhabhaCDCTRG";
+  tag = "bhabhaCDCTRG_TOPT0";
   m_cTOPTimeBhaBhaCDCTRG->cd();
   if (processHistogram(h, tag)) {
     m_cTOPTimeBhaBhaCDCTRG->SetFillColor(0);
@@ -497,7 +497,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseCDCTRGEventT0Distribution
 
   // find TOP EventT0 Mumus CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_CDCTRG");
-  tag = "mumuCDCTRG";
+  tag = "mumuCDCTRG_TOPT0";
   m_cTOPTimeMuMuCDCTRG->cd();
   if (processHistogram(h, tag)) {
     m_cTOPTimeMuMuCDCTRG->SetFillColor(0);
@@ -515,7 +515,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseCDCTRGEventT0Distribution
 
   // find SVD EventT0 Hadrons CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_hadron_L1_CDCTRG");
-  tag = "hadronCDCTRG";
+  tag = "hadronCDCTRG_SVDT0";
   m_cSVDTimeHadronsCDCTRG->cd();
   if (processHistogram(h, tag)) {
     m_cSVDTimeHadronsCDCTRG->SetFillColor(0);
@@ -531,7 +531,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseCDCTRGEventT0Distribution
 
   // find SVD EventT0 Bhabhas CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_CDCTRG");
-  tag = "bhabhaCDCTRG";
+  tag = "bhabhaCDCTRG_SVDT0";
   m_cSVDTimeBhaBhaCDCTRG->cd();
   if (processHistogram(h, tag)) {
     m_cSVDTimeBhaBhaCDCTRG->SetFillColor(0);
@@ -547,7 +547,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseCDCTRGEventT0Distribution
 
   // find SVD EventT0 Mumus CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_CDCTRG");
-  tag = "mumuCDCTRG";
+  tag = "mumuCDCTRG_SVDT0";
   m_cSVDTimeMuMuCDCTRG->cd();
   if (processHistogram(h, tag)) {
     m_cSVDTimeMuMuCDCTRG->SetFillColor(0);
@@ -567,7 +567,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseTOPTRGEventT0Distribution
 
   // find ECL EventT0 Hadrons TOPTRG histogram and process it
   TH1* h = findHist("EventT0/m_histEventT0_ECL_hadron_L1_TOPTRG");
-  TString tag = "hadronTOPTRG";
+  TString tag = "hadronTOPTRG_ECLT0";
   m_cECLTimeHadronsTOPTRG->cd();
   if (processHistogram(h, tag)) {
     m_cECLTimeHadronsTOPTRG->SetFillColor(0);
@@ -583,7 +583,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseTOPTRGEventT0Distribution
 
   // find ECL EventT0 Bhabhas TOPTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_ECL_bhabha_L1_TOPTRG");
-  tag = "bhabhaTOPTRG";
+  tag = "bhabhaTOPTRG_ECLT0";
   m_cECLTimeBhaBhaTOPTRG->cd();
   if (processHistogram(h, tag)) {
     m_cECLTimeBhaBhaTOPTRG->SetFillColor(0);
@@ -599,7 +599,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseTOPTRGEventT0Distribution
 
   // find ECL EventT0 Mumus TOPTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_ECL_mumu_L1_TOPTRG");
-  tag = "mumuTOPTRG";
+  tag = "mumuTOPTRG_ECLT0";
   m_cECLTimeMuMuTOPTRG->cd();
   if (processHistogram(h, tag)) {
     m_cECLTimeMuMuTOPTRG->SetFillColor(0);
@@ -617,7 +617,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseTOPTRGEventT0Distribution
 
   // find CDC EventT0 Hadrons TOPTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_CDC_hadron_L1_TOPTRG");
-  tag = "hadronTOPTRG";
+  tag = "hadronTOPTRG_CDCT0";
   m_cCDCTimeHadronsTOPTRG->cd();
   if (processHistogram(h, tag)) {
     m_cCDCTimeHadronsTOPTRG->SetFillColor(0);
@@ -633,7 +633,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseTOPTRGEventT0Distribution
 
   // find CDC EventT0 Bhabhas TOPTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_CDC_bhabha_L1_TOPTRG");
-  tag = "bhabhaTOPTRG";
+  tag = "bhabhaTOPTRG_CDCT0";
   m_cCDCTimeBhaBhaTOPTRG->cd();
   if (processHistogram(h, tag)) {
     m_cCDCTimeBhaBhaTOPTRG->SetFillColor(0);
@@ -649,7 +649,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseTOPTRGEventT0Distribution
 
   // find CDC EventT0 Mumus TOPTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_CDC_mumu_L1_TOPTRG");
-  tag = "mumuTOPTRG";
+  tag = "mumuTOPTRG_CDCT0";
   m_cCDCTimeMuMuTOPTRG->cd();
   if (processHistogram(h, tag)) {
     m_cCDCTimeMuMuTOPTRG->SetFillColor(0);
@@ -667,7 +667,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseTOPTRGEventT0Distribution
 
   // find TOP EventT0 Hadrons TOPTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_hadron_L1_TOPTRG");
-  tag = "hadronTOPTRG";
+  tag = "hadronTOPTRG_TOPT0";
   m_cTOPTimeHadronsTOPTRG->cd();
   if (processHistogram(h, tag)) {
     m_cTOPTimeHadronsTOPTRG->SetFillColor(0);
@@ -683,7 +683,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseTOPTRGEventT0Distribution
 
   // find TOP EventT0 Bhabhas TOPTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_TOPTRG");
-  tag = "bhabhaTOPTRG";
+  tag = "bhabhaTOPTRG_TOPT0";
   m_cTOPTimeBhaBhaTOPTRG->cd();
   if (processHistogram(h, tag)) {
     m_cTOPTimeBhaBhaTOPTRG->SetFillColor(0);
@@ -699,7 +699,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseTOPTRGEventT0Distribution
 
   // find TOP EventT0 Mumus TOPTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_TOPTRG");
-  tag = "mumuTOPTRG";
+  tag = "mumuTOPTRG_TOPT0";
   m_cTOPTimeMuMuTOPTRG->cd();
   if (processHistogram(h, tag)) {
     m_cTOPTimeMuMuTOPTRG->SetFillColor(0);
@@ -717,7 +717,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseTOPTRGEventT0Distribution
 
   // find SVD EventT0 Hadrons TOPTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_hadron_L1_TOPTRG");
-  tag = "hadronTOPTRG";
+  tag = "hadronTOPTRG_SVDT0";
   m_cSVDTimeHadronsTOPTRG->cd();
   if (processHistogram(h, tag)) {
     m_cSVDTimeHadronsTOPTRG->SetFillColor(0);
@@ -733,7 +733,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseTOPTRGEventT0Distribution
 
   // find SVD EventT0 Bhabhas TOPTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_TOPTRG");
-  tag = "bhabhaTOPTRG";
+  tag = "bhabhaTOPTRG_SVDT0";
   m_cSVDTimeBhaBhaTOPTRG->cd();
   if (processHistogram(h, tag)) {
     m_cSVDTimeBhaBhaTOPTRG->SetFillColor(0);
@@ -749,7 +749,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseTOPTRGEventT0Distribution
 
   // find SVD EventT0 Mumus TOPTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_TOPTRG");
-  tag = "mumuTOPTRG";
+  tag = "mumuTOPTRG_SVDT0";
   m_cSVDTimeMuMuTOPTRG->cd();
   if (processHistogram(h, tag)) {
     m_cSVDTimeMuMuTOPTRG->SetFillColor(0);

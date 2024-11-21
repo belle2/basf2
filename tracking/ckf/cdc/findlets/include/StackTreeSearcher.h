@@ -100,7 +100,7 @@ namespace Belle2 {
     }
 
   private:
-    /// algorthim to create CDC-CDF states while traversing the path
+    /// algorithm to create CDC-CDF states while traversing the path
     CDCCKFStateCreator m_stateCreator;
     /// algorithm to perform state filtering
     CDCCKFStateFilter m_stateFilter;

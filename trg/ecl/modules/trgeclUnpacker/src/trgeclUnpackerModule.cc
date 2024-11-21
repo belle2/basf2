@@ -61,10 +61,10 @@ void TRGECLUnpackerModule::event()
   for (int i = 0; i < raw_trgarray.getEntries(); i++) { // # of readout boards
     iFiness = i;
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) { // Basically 1 entry
-      nodeid     = ((raw_trgarray[i]->GetNodeID(j)) >> 24) & 0x1F;
+      nodeid     = raw_trgarray[i]->GetNodeID(j);
       trgtype    = raw_trgarray[i]->GetTRGType(j);
       n_basf2evt = raw_trgarray[i]->GetEveNo(j);
-      if (nodeid == 0x13) {
+      if (nodeid == 0x13000001) {
         for (int ch = 0; ch < raw_trgarray[i]->GetMaxNumOfCh(j); ch++) { // ch in a readout board
           nwords     = raw_trgarray[i]->GetDetectorNwords(j, ch);
           if (nwords == 0) {

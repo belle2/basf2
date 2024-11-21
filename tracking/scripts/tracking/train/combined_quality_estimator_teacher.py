@@ -13,8 +13,8 @@ combined_module_quality_estimator_teacher
 -----------------------------------------
 
 Information on the MVA Track Quality Indicator / Estimator can be found
-on `Confluence
-<https://confluence.desy.de/display/BI/MVA+Track+Quality+Indicator>`_.
+on `XWiki
+<https://xwiki.desy.de/xwiki/rest/p/0d3f4>`_.
 
 Purpose of this script
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -57,7 +57,7 @@ b2luigi: Understanding the steering file
 All trainings and validations are done in the correct order in this steering
 file. For the purpose of creating a dependency graph, the `b2luigi
 <https://b2luigi.readthedocs.io>`_ python package is used, which extends the
-`luigi <https://luigi.readthedocs.io>`_ packag developed by spotify.
+`luigi <https://luigi.readthedocs.io>`_ package developed by spotify.
 
 Each task that has to be done is represented by a special class, which defines
 which defines parameters, output files and which other tasks with which
@@ -1336,7 +1336,7 @@ class VXDQETeacherTask(TrackQETeacherBaseTask):
     tree_name = "tree"
     #: Random basf2 seed used to create the training data set.
     random_seed = "train_vxd"
-    #: Defines DataCollectionTask to require by tha base class to collect
+    #: Defines DataCollectionTask to require by the base class to collect
     # features for the MVA training.
     data_collection_task = VXDQEDataCollectionTask
 
@@ -1352,7 +1352,7 @@ class CDCQETeacherTask(TrackQETeacherBaseTask):
     tree_name = "records"
     #: Random basf2 seed used to create the training data set.
     random_seed = "train_cdc"
-    #: Defines DataCollectionTask to require by tha base class to collect
+    #: Defines DataCollectionTask to require by the base class to collect
     # features for the MVA training.
     data_collection_task = CDCQEDataCollectionTask
 
@@ -2386,7 +2386,7 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
         default="BBBAR"
         #: \endcond
     )
-    #: Feature/vaiable to use as truth label for the CDC track quality estimator.
+    #: Feature/variable to use as truth label for the CDC track quality estimator.
     cdc_training_target = b2luigi.Parameter()
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
     fast_bdt_option = b2luigi.ListParameter(

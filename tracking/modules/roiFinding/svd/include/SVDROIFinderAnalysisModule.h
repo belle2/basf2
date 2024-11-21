@@ -68,7 +68,7 @@ namespace Belle2 {
 
   private:
 
-    StoreArray<SVDShaperDigit> m_shapers; /**< shaper digits sotre array*/
+    StoreArray<SVDShaperDigit> m_shapers; /**< shaper digits store array*/
     StoreArray<ROIid> m_ROIs; /**< rois store array*/
     StoreArray<RecoTrack> m_trackList;/**< reco track store array */
     StoreArray<SVDIntercept> m_SVDIntercepts; /**< svd intercept store array */
@@ -182,7 +182,7 @@ namespace Belle2 {
     TH2F* m_h2ROIuMinMax; /**< min VS max of the U coordinate */
     TH2F* m_h2ROIvMinMax; /**< min VS max of the V coordinate */
     TH1F* m_h1totROIs; /**< distribution of number of all ROIs*/
-    TH1F* m_h1okROIs; /**< distribution of number of ROIs containin a SVDShaperDigit*/
+    TH1F* m_h1okROIs; /**< distribution of number of ROIs containing a SVDShaperDigit*/
     TH1F* m_h1totUstrips; /**< distribution of number of u strips of all ROIs*/
     TH1F* m_h1totVstrips; /**< distribution of number of v strips of all ROIs*/
 
@@ -210,15 +210,15 @@ namespace Belle2 {
     double m_phimc;  /**< true phi */
     double m_lambdamc;  /**< true lambda = pi/2 - theta*/
 
-    unsigned int Ntrack; /**< nuner of tracks with svd digits */
-    unsigned int NtrackHit; /**< nuner of tracks with hits */
-    unsigned int n_notINtrack2; /**< nuner of tracks with no digits in ROI (correct vxdID) */
-    unsigned int n_notINtrack3; /**< nuner of tracks with no digits in ROI (wrong vxdID) */
-    unsigned int n_notINtrack4; /**< nuner of tracks with no ROI (intercept with correct vxdID) */
-    unsigned int n_notINtrack5; /**< nuner of tracks with no ROI (intercept with wrong vxdID) */
+    unsigned int Ntrack; /**< number of tracks with svd digits */
+    unsigned int NtrackHit; /**< number of tracks with hits */
+    unsigned int n_notINtrack2; /**< number of tracks with no digits in ROI (correct vxdID) */
+    unsigned int n_notINtrack3; /**< number of tracks with no digits in ROI (wrong vxdID) */
+    unsigned int n_notINtrack4; /**< number of tracks with no ROI (intercept with correct vxdID) */
+    unsigned int n_notINtrack5; /**< number of tracks with no ROI (intercept with wrong vxdID) */
 
 
-    unsigned int n_rois; /**< numner of rois */
+    unsigned int n_rois; /**< number of rois */
     unsigned int n_OKrois; /**<  good rois (simulation) */
     unsigned int m_nGoodROIs; /**< good rois (data) */
     unsigned int n_intercepts; /**< number of intercepts*/

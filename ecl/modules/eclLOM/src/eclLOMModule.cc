@@ -47,7 +47,7 @@ ECLLOMModule::~ECLLOMModule()
 void ECLLOMModule::initialize()
 {
   if (!(m_MCParticles.isRequired() && m_TrgEclWaveforms.isRequired())) {
-    //Fatal is not neccessary here as the storeArrays should just look
+    //Fatal is not necessary here as the storeArrays should just look
     //empty if not registered but let's make sure everything is present
     B2FATAL("Not all collections found, exiting processing");
   }
@@ -113,7 +113,7 @@ void ECLLOMModule::event()
       // check opposite running sum:
       int iBESector = (iFESector + 8) % 16;
       if (m_SumCoincidenceMatrix[iFESector][iBESector] == 1 && m_isBhabhaPatternFE && m_isBhabhaPatternBE) {
-        //coinsidence at first tick
+        //coincidence at first tick
         m_isBhabha = true;
         m_BhNum++;
       }

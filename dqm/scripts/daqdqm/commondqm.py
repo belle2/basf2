@@ -26,7 +26,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             "expressreco" (default) if running on the ExpressReco system
                             "hlt" if running on the HLT online reconstructon nodes
                             If running on the hlt, you may want to output less or other DQM plots
-                            due to the limited bandwith of the HLT nodes.
+                            due to the limited bandwidth of the HLT nodes.
     @param dqm_mode: How to split up the path for online/HLT.
                      For dqm_mode == "dont_care" all the DQM modules should be added.
                      For dqm_mode == "all_events" only the DQM modules which should run on all events
@@ -115,6 +115,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             histogramDirectoryName="TrackingAbort_before_filter",
         ).set_name("TrackingAbortDQM_before_filter")
 
+        path.add_module("DetectorOccupanciesDQM", histogramDirectoryName="DetectorOccupancies_before_filter").set_name(
+            "DetectorOccupanciesDQM_before_filter")
+
         path.add_module("StatisticsTimingHLTDQM",
                         createHLTUnitHistograms=create_hlt_unit_histograms,
                         )
@@ -188,14 +191,20 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module(
             "SoftwareTriggerHLTDQM",
             cutResultIdentifiers=cutResultIdentifiers,
-            l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"],
+            l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp", "passive_veto"],
             additionalL1Identifiers=additionalL1Identifiers,
             createHLTUnitHistograms=create_hlt_unit_histograms,
             cutResultIdentifiersPerUnit=hlt_trigger_lines_per_unit_in_plot,
             pathLocation="after filter",
         )
 
+        path.add_module("StatisticsTimingHLTDQM",
+                        histogramDirectoryName="timing_statistics_after_filter"
+                        ).set_name("StatisticsTimingHLTDQM_after_filter")
+
         path.add_module("TrackingAbortDQM")
+
+        path.add_module("DetectorOccupanciesDQM")
 
         # Skim plots where bhabha contamination is removed
         path.add_module(
@@ -265,10 +274,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         trggdldqm = b2.register_module('TRGGDLDQM')
         trggdldqm.param('skim', 0)
         path.add_module(trggdldqm)
-        # TRGTOP
-        trgtopdqm = b2.register_module('TRGTOPDQM')
-        trgtopdqm.param('skim', 0)
-        path.add_module(trgtopdqm)
         # TRGGRL
         trggrldqm = b2.register_module('TRGGRLDQM')
         path.add_module(trggrldqm)
@@ -319,10 +324,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         trggdldqm_skim = b2.register_module('TRGGDLDQM')
         trggdldqm_skim.param('skim', 1)
         path.add_module(trggdldqm_skim)
-        # TRGTOP
-        trgtopdqm_skim = b2.register_module('TRGTOPDQM')
-        trgtopdqm_skim.param('skim', 1)
-        path.add_module(trgtopdqm_skim)
+        trgeffdqm = b2.register_module("TRGEFFDQM")
+        path.add_module(trgeffdqm)
 
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
@@ -335,7 +338,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             tracksStoreArrayName="TracksFromIP", histogramTitleSuffix=" - Tracks from IP") \
                 .set_name("TrackingExpressRecoDQM_FromIP")
             path.add_module('TrackingExpressRecoDQM', histogramDirectoryName="TrackingERDQM_NotFromIP",
-                            tracksStoreArrayName="TracksNotFromIP", histogramTitleSuffix=" - Tracks not from IP") \
+                            tracksStoreArrayName="TracksNotFromIP", histogramTitleSuffix=" - Tracks not from IP",
+                            produce1Dresiduals=False, produce2Dresiduals=False, produceTRClusterPlots=False) \
                 .set_name("TrackingExpressRecoDQM_NotFromIP")
 
     # ARICH

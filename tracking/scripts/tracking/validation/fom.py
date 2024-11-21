@@ -116,7 +116,7 @@ class ValidationFiguresOfMerit(collections.abc.MutableMapping):
             tntuple.Write("", write_option)
 
     def __setitem__(self, figure_name, value):
-        """Braketed item assignement for figures of merit"""
+        """Braketed item assignment for figures of merit"""
 
         self.figures_by_name[figure_name] = value
 

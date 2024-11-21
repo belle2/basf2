@@ -210,7 +210,7 @@ def _process_graph(self, idx):
     # Get the true mcPDG pf FSPs
     y_mass = masses_to_classes(x_item["mc_pdg"][evt][x_rows])
 
-    # Get the specificed row/cols, this inserts dummy rows/cols for secondaries
+    # Get the specified row/cols, this inserts dummy rows/cols for secondaries
     y_edge = y_edge[locs, :][:, locs]
     # if self.allow_secondaries:
     # Set everything that's not primary (unmatched and secondaries) rows.cols to 0

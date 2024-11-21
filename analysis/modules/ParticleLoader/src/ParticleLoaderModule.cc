@@ -119,7 +119,6 @@ void ParticleLoaderModule::initialize()
 
   m_particles.registerInDataStore();
   m_particleExtraInfoMap.registerInDataStore();
-  m_eventExtraInfo.registerInDataStore();
   //register relations if these things exists
   if (m_mcparticles.isOptional()) {
     m_particles.registerRelationTo(m_mcparticles);

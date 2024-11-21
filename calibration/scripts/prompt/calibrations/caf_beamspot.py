@@ -11,6 +11,10 @@ Airflow script to perform BeamSpot calibration.
 """
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
+from prompt.calibrations.caf_cdc_dedx import settings as caf_cdc_dedx
+# todo: add svd dedx in release-9
+from prompt.calibrations.caf_top import settings as caf_top
+from prompt.calibrations.caf_klm_strip_efficiency import settings as caf_klm_strip_efficiency
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
@@ -29,7 +33,7 @@ settings = CalibrationSettings(
         "outerLoss": "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)",
         "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)",
         "minPXDhits": 0},
-    depends_on=[])
+    depends_on=[caf_cdc_dedx, caf_top, caf_klm_strip_efficiency])
 
 ##############################
 

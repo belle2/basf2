@@ -11,7 +11,7 @@ Airflow script to perform BeamSpot calibration.
 """
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
-from prompt.calibrations.caf_cdc_dedx import settings as caf_cdc_dedx
+from prompt.calibrations.caf_cdcdedx import settings as caf_cdc_dedx
 # todo: add svd dedx in release-9
 from prompt.calibrations.caf_top import settings as caf_top
 from prompt.calibrations.caf_klm_strip_efficiency import settings as caf_klm_strip_efficiency

@@ -65,7 +65,7 @@ namespace Belle2 {
   void CDCDedxPIDCreatorModule::initialize()
   {
     m_tracks.isRequired();
-    m_hits.isRequired();
+    m_hits.isOptional(); // in order to run also with old cdst's where this collection doesn't exist
     m_mcParticles.isOptional();
     m_TTDInfo.isOptional();
     m_likelihoods.registerInDataStore(m_likelihoodsName);
@@ -84,6 +84,17 @@ namespace Belle2 {
 
   void CDCDedxPIDCreatorModule::event()
   {
+    // check if CDCDedxHits are present; return if not.
+    if (not m_hits.isValid()) {
+      m_warnCount++;
+      if (m_warnCount < 10) {
+        B2WARNING("StoreArray 'CDCDedxHits' does not exist, returning. Probably running on old cdst.");
+      } else if (m_warnCount == 10) {
+        B2WARNING("StoreArray 'CDCDedxHits' does not exist, returning. ...message will be suppresed now.");
+      }
+      return;
+    }
+
     // clear output collections
     m_likelihoods.clear();
     m_dedxTracks.clear();

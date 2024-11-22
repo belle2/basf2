@@ -1024,69 +1024,39 @@ void DQMHistAnalysisEventT0TriggerJitterModule::setDeltaT0Values()
   if (m_ECLTRGHLThadronSVDT0 > -998) {
     if (m_ECLTRGHLThadronECLT0 > -998) {
       m_monObj->setVariable("hadron_Delta_ECLT0_SVDT0", m_ECLTRGHLThadronECLT0 - m_ECLTRGHLThadronSVDT0);
-    } else {
-      m_monObj->setVariable("hadron_Delta_ECLT0_SVDT0", -100);
     }
     if (m_ECLTRGHLThadronCDCT0 > -998) {
       m_monObj->setVariable("hadron_Delta_CDCT0_SVDT0", m_ECLTRGHLThadronCDCT0 - m_ECLTRGHLThadronSVDT0);
-    } else {
-      m_monObj->setVariable("hadron_Delta_CDCT0_SVDT0", -100);
     }
     if (m_ECLTRGHLThadronTOPT0 > -998) {
       m_monObj->setVariable("hadron_Delta_TOPT0_SVDT0", m_ECLTRGHLThadronTOPT0 - m_ECLTRGHLThadronSVDT0);
-    } else {
-      m_monObj->setVariable("hadron_Delta_TOPT0_SVDT0", -100);
     }
-  } else {
-    m_monObj->setVariable("hadron_Delta_ECLT0_SVDT0", -100);
-    m_monObj->setVariable("hadron_Delta_CDCT0_SVDT0", -100);
-    m_monObj->setVariable("hadron_Delta_TOPT0_SVDT0", -100);
   }
 
 
   if (m_ECLTRGHLTbhabhaSVDT0 > -998) {
     if (m_ECLTRGHLTbhabhaECLT0 > -998) {
       m_monObj->setVariable("bhabha_Delta_ECLT0_SVDT0", m_ECLTRGHLTbhabhaECLT0 - m_ECLTRGHLTbhabhaSVDT0);
-    } else {
-      m_monObj->setVariable("bhabha_Delta_ECLT0_SVDT0", -100);
     }
     if (m_ECLTRGHLTbhabhaCDCT0 > -998) {
       m_monObj->setVariable("bhabha_Delta_CDCT0_SVDT0", m_ECLTRGHLTbhabhaCDCT0 - m_ECLTRGHLTbhabhaSVDT0);
-    } else {
-      m_monObj->setVariable("bhabha_Delta_CDCT0_SVDT0", -100);
     }
     if (m_ECLTRGHLTbhabhaTOPT0 > -998) {
       m_monObj->setVariable("bhabha_Delta_TOPT0_SVDT0", m_ECLTRGHLTbhabhaTOPT0 - m_ECLTRGHLTbhabhaSVDT0);
-    } else {
-      m_monObj->setVariable("bhabha_Delta_TOPT0_SVDT0", -100);
     }
-  } else {
-    m_monObj->setVariable("bhabha_Delta_ECLT0_SVDT0", -100);
-    m_monObj->setVariable("bhabha_Delta_CDCT0_SVDT0", -100);
-    m_monObj->setVariable("bhabha_Delta_TOPT0_SVDT0", -100);
   }
 
 
   if (m_ECLTRGHLTmumuSVDT0 > -998) {
     if (m_ECLTRGHLTmumuECLT0 > -998) {
       m_monObj->setVariable("mumu_Delta_ECLT0_SVDT0", m_ECLTRGHLTmumuECLT0 - m_ECLTRGHLTmumuSVDT0);
-    } else {
-      m_monObj->setVariable("mumu_Delta_ECLT0_SVDT0", -100);
     }
     if (m_ECLTRGHLTmumuCDCT0 > -998) {
       m_monObj->setVariable("mumu_Delta_CDCT0_SVDT0", m_ECLTRGHLTmumuCDCT0 - m_ECLTRGHLTmumuSVDT0);
-    } else {
-      m_monObj->setVariable("mumu_Delta_CDCT0_SVDT0", -100);
     }
     if (m_ECLTRGHLTmumuTOPT0 > -998) {
       m_monObj->setVariable("mumu_Delta_TOPT0_SVDT0", m_ECLTRGHLTmumuTOPT0 - m_ECLTRGHLTmumuSVDT0);
-    } else {
-      m_monObj->setVariable("mumu_Delta_TOPT0_SVDT0", -100);
     }
-  } else {
-    m_monObj->setVariable("mumu_Delta_ECLT0_SVDT0", -100);
-    m_monObj->setVariable("mumu_Delta_CDCT0_SVDT0", -100);
-    m_monObj->setVariable("mumu_Delta_TOPT0_SVDT0", -100);
   }
 
 }

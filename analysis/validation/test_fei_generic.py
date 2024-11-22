@@ -30,6 +30,7 @@ if __name__ == '__main__':
     process = subprocess.run(['basf2', steering_file])
 
     os.chdir(cwd)
+    input()
     shutil.rmtree(tempdir)
 
     sys.exit(process.returncode)

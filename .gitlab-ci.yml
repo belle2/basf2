@@ -124,10 +124,10 @@ run-tests:
           - output_tests_reports/tests-non-framework.xml
     expose_as: 'sphinx documentation'
     paths:
-        - build/html/
+        - build_html/
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
-    - export BELLE2_SPHINX_OUTPUTDIR=build/html/
+    - export BELLE2_SPHINX_OUTPUTDIR=${BELLE2_LOCAL_DIR}/build_html/
     - mkdir -p input_tests_reports output_tests_reports
     # Download the tests reports from the main branch
     - |

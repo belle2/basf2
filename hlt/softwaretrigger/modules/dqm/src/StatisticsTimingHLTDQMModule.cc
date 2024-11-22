@@ -338,5 +338,14 @@ void StatisticsTimingHLTDQMModule::beginRun()
 
     m_processesPerUnitHistogram->Fill(m_hlt_unit);
   }
+  m_processingTimePassiveVeto->Reset();
+  m_processingTimeNotPassiveVeto->Reset();
+  m_procTimeVsnSVDShaperDigitsPassiveVeto->Reset();
+  m_procTimeVsnSVDShaperDigitsNotPassiveVeto->Reset();
+  m_procTimeVsnCDCHitsPassiveVeto->Reset();
+  m_procTimeVsnCDCHitsNotPassiveVeto->Reset();
+  m_procTimeVsnECLDigitsPassiveVeto->Reset();
+  m_procTimeVsnECLDigitsNotPassiveVeto->Reset();
+
 }
 

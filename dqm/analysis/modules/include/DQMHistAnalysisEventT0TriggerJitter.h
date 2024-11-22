@@ -15,9 +15,6 @@
 #include <dqm/core/DQMHistAnalysis.h>
 #include <TEfficiency.h>
 
-#include <tuple>
-#include <optional>
-
 namespace Belle2 {
 
   /** Class definition */
@@ -40,9 +37,6 @@ namespace Belle2 {
     /** fit the histograms in the event */
     void event() override final;
 
-    /** final fit of T0 distributions */
-    void endRun() override final;
-
     /** delete pointers */
     void terminate() override final;
 
@@ -59,10 +53,9 @@ namespace Belle2 {
      * filling the MonitoringObject
      * @param h EventT0 histogram
      * @param tag to distinguish results
-     * @param retrieveMeanT0 if true, calculate meanT0 values for checking T0 drifts wrt SVD, default: false
-     * @return tuple of a bool indicating whether the fit was successful, and an std::optional<double> to retrieve the meanT0 value
+     * @return false if the histogram is not found or the fit is not converged
      **/
-    std::tuple<bool, std::optional<double>> processHistogram(TH1* h, TString tag, bool retrieveMeanT0 = false);
+    bool processHistogram(TH1* h, TString tag);
 
     /** double gaussian fitting function for the jitter distribution
      * @param x Data used to fit double gaussians
@@ -70,19 +63,13 @@ namespace Belle2 {
     */
     static double fDoubleGaus(double* x, double* par);
 
-    /** Analyse the ECLTRG EventT0 distributions
-     * The only function to retrieve deltaT values ECL-SVD, CDC-SVD, TOP-SVD as the ECLTRG is the most abundant.
-     * @param retrieveDeltas if true, calculate deltaT values (ECL-SVD, CDC-SVD, TOP-SVD) in case of ECLTRG, default: false
-     *                       value is forwarded to processHistogram to retrieve the individual values
-     */
-    void analyseECLTRGEventT0Distributions(bool retrieveDeltas = false);
+    void analyseECLTRGEventT0Distributions(); /**< Analyse the ECLTRG EventT0 distributions*/
     void analyseCDCTRGEventT0Distributions(); /**< Analyse the CDCTRG EventT0 distributions*/
     void analyseTOPTRGEventT0Distributions(); /**< Analyse the TOPTRG EventT0 distributions*/
     void initializeCanvases(); /**< Initialise canvases */
     void clearCanvases(); /**< Initialise canvases */
     void printCanvases(); /**< Print canvases if required */
     void deleteCanvases(); /**< Delete canvases */
-    void setDeltaT0Values(); /**< Set the deltaT0 values in the monObj */
 
     MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
 
@@ -127,19 +114,6 @@ namespace Belle2 {
     TCanvas* m_cSVDTimeHadronsTOPTRG = nullptr; /**< Canvas for SVD time TOPTRG jitter hadrons */
     TCanvas* m_cSVDTimeBhaBhaTOPTRG  = nullptr; /**< Canvas for SVD time TOPTRG jitter bhabhas */
     TCanvas* m_cSVDTimeMuMuTOPTRG    = nullptr; /**< Canvas for SVD time TOPTRG jitter mumu */
-
-    double m_ECLTRGHLThadronECLT0 = -999.; /**< ECL T0 for ECLTRG jitter for HLT hadron events */
-    double m_ECLTRGHLThadronCDCT0 = -999.; /**< CDC T0 for ECLTRG jitter for HLT hadron events */
-    double m_ECLTRGHLThadronTOPT0 = -999.; /**< TOP T0 for ECLTRG jitter for HLT hadron events */
-    double m_ECLTRGHLThadronSVDT0 = -999.; /**< SVD T0 for ECLTRG jitter for HLT hadron events */
-    double m_ECLTRGHLTbhabhaECLT0 = -999.; /**< ECL T0 for ECLTRG jitter for HLT bhabha events */
-    double m_ECLTRGHLTbhabhaCDCT0 = -999.; /**< CDC T0 for ECLTRG jitter for HLT bhabha events */
-    double m_ECLTRGHLTbhabhaTOPT0 = -999.; /**< TOP T0 for ECLTRG jitter for HLT bhabha events */
-    double m_ECLTRGHLTbhabhaSVDT0 = -999.; /**< SVD T0 for ECLTRG jitter for HLT bhabha events */
-    double m_ECLTRGHLTmumuECLT0 = -999.; /**< ECL T0 for ECLTRG jitter for HLT mumu events */
-    double m_ECLTRGHLTmumuCDCT0 = -999.; /**< CDC T0 for ECLTRG jitter for HLT mumu events */
-    double m_ECLTRGHLTmumuTOPT0 = -999.; /**< TOP T0 for ECLTRG jitter for HLT mumu events */
-    double m_ECLTRGHLTmumuSVDT0 = -999.; /**< SVD T0 for ECLTRG jitter for HLT mumu events */
   };
 } // end namespace Belle2
 

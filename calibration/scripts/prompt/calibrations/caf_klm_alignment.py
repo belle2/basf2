@@ -26,7 +26,9 @@ from prompt.utils import events_in_basf2_file
 # Will be used to construct the calibration in the automated system, as well as set up the submission web forms.
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
-from prompt.calibrations.vxdcdc_alignment import settings as vxdcdc_alignment
+from prompt.calibrations.caf_vxdcdc_alignment import settings as caf_vxdcdc_alignment
+from prompt.calibrations.caf_cdc import settings as caf_cdc
+from prompt.calibrations.caf_klm_channel_status import settings as caf_klm_channel_status
 
 #: Tells the automated system some details of this script
 # Expert configuration:
@@ -49,7 +51,7 @@ settings = CalibrationSettings(name="KLM alignmnent",
                                                   INPUT_DATA_FILTERS['Data Tag']['cosmic_calib'],
                                                   INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
                                },
-                               depends_on=[vxdcdc_alignment],
+                               depends_on=[caf_vxdcdc_alignment, caf_cdc, caf_klm_channel_status],
                                expert_config={
                                    "required_events": 5000000,
                                    "required_events_experiment": 500000,

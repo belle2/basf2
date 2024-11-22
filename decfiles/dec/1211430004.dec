@@ -1,0 +1,29 @@
+# EventType: 1211430003
+# Descriptor: [B+ -> psi(2S) [-> mu+ mu-] K+]
+# NickName: Bu_psi2sKp_mumu
+# Documentation: B -> charmonium decays.
+# Tested: Yes
+# PhysicsWG: Quarkonium
+# Responsible: Kirill Chilikin
+# Email: K.A.Chilikin@inp.nsk.su
+# Cuts: None
+# Date: 20241122
+#
+# This decay model is intended for phase-space-dependent efficiency
+# determination. All exclusive decays have the PHSP distributuion.
+# Do not use it for one-dimensional analyses without proper reweighting.
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0 psi(2S)sig K+ PHOTOS PHSP;
+Enddecay
+
+CDecay B-sig
+
+Decay psi(2S)sig
+1.0 mu+ mu- PHOTOS PHSP;
+Enddecay

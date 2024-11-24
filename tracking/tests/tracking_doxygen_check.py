@@ -13,11 +13,7 @@ Perform code doxygen checks for every commit to the tracking package.
 """
 
 import re
-from b2test_utils import check_error_free, is_ci, skip_test
-
-
-if is_ci():
-    skip_test("The test is too slow for running on our pipeline")
+from b2test_utils import check_error_free
 
 if __name__ == "__main__":
     ignoreme = 'IGNORE_NOTHING'

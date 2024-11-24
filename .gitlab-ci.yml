@@ -124,10 +124,11 @@ run-tests:
           - output_tests_reports/tests-non-framework.xml
     expose_as: 'sphinx documentation'
     paths:
-        - build_html/
-  script:
+        - build_doc/html/
+    variables:
+      BELLE2_SPHINX_OUTPUTDIR: "${BELLE2_LOCAL_DIR}/build_doc/"
+    script:
     - echo "stage start time -> $(date +%H:%M:%S)"
-    - export BELLE2_SPHINX_OUTPUTDIR=${BELLE2_LOCAL_DIR}/build_html/
     - mkdir -p input_tests_reports output_tests_reports
     # Download the tests reports from the main branch
     - |
@@ -138,6 +139,7 @@ run-tests:
         curl -L --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --output "input_tests_reports/${FILE}" \
         "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE}/${VERSION}/${FILE}"
       done
+    # Run the "google" tests and the "scripts" tests
     - b2code-option opt
     - b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/output_tests_reports/tests-google.xml
     - b2test-scripts -j $(nproc) --filter "^framework/tests/(?!(foreach.py))" --xml-input=${BELLE2_LOCAL_DIR}/input_tests_reports/tests-framework.xml --xml=${BELLE2_LOCAL_DIR}/output_tests_reports/tests-framework.xml --timeout 1200

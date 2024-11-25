@@ -236,7 +236,7 @@ namespace Belle2 {
     ROOT::Math::XYZVector mirpoint = m_mirrorPoints[mirrorID - 1];
     ROOT::Math::Rotation3D rot = TransformToFixed(mirnorm);
     ROOT::Math::XYZVector dirTr = rot * dir;
-    if (dirTr.Z() < 0) return 0; // comes from outter side
+    if (dirTr.Z() < 0) return 0; // comes from outer side
     ROOT::Math::XYZVector posTr =  rot * (pos - mirpoint);
     ROOT::Math::XYZVector pointOnMirr = posTr - (posTr.Z() / dirTr.Z()) * dirTr;
     if (fabs(pointOnMirr.Y()) < m_arichgp->getMirrors().getPlateLength() / 2.
@@ -272,7 +272,7 @@ namespace Belle2 {
     double dwin    = m_arichgp->getHAPDGeometry().getWinThickness();
     double refractiveInd0 = m_arichgp->getHAPDGeometry().getWinRefIndex();
 
-    // iteration is stoped when the difference of photon positions on first aerogel exit
+    // iteration is stopped when the difference of photon positions on first aerogel exit
     // between two iterations is smaller than this value.
     const double dmin  = 0.0000001;
     const int    niter = 100; // maximal number of iterations
@@ -385,7 +385,7 @@ namespace Belle2 {
     if (tileID > 0) correctEmissionPoint(tileID, r);
 
     //------------------------------------------------------
-    // Calculate number of expected detected photons (emmited x geometrical acceptance).
+    // Calculate number of expected detected photons (emitted x geometrical acceptance).
     // -----------------------------------------------------
 
     float nphot_scaling = 20.; // number of photons to be traced is (expected number of emitted photons * nphot_scaling)
@@ -394,7 +394,7 @@ namespace Belle2 {
     // loop over all particle hypotheses
     for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
 
-      // absorbtion factor (scattering)
+      // absorption factor (scattering)
       double abs = 1;
 
       // loop over aerogel layers
@@ -410,18 +410,18 @@ namespace Belle2 {
 
         // step length
         double dxx = pathLengthRadiator / double(nStep);
-        // number of photons to be emmited per step (number of expected photons * nphot_scaling)
+        // number of photons to be emitted per step (number of expected photons * nphot_scaling)
         double nPhot = m_n0[iAerogel] * sin(thetaCh[iHyp][iAerogel]) * sin(thetaCh[iHyp][iAerogel]) * dxx * nphot_scaling;
         ROOT::Math::XYZVector exit_point = getTrackPositionAtZ(arichTrack, m_zaero[iAerogel]);
 
-        // loop over emmision point steps
+        // loop over emission point steps
         for (int iepoint = 0; iepoint < nStep; iepoint++) {
 
           ROOT::Math::XYZVector epoint = exit_point - (0.5 + iepoint) * dxx * edir;
           abs *= exp(-dxx / m_transmissionLen[iAerogel]);
-          unsigned int genPhot = nPhot * abs; // number of photons to emmit in current step, including scattering  correction
+          unsigned int genPhot = nPhot * abs; // number of photons to emit in current step, including scattering  correction
 
-          // loop over emmited "photons"
+          // loop over emitted "photons"
           for (unsigned int iPhoton = 0; iPhoton < genPhot; iPhoton++) {
             double fi = 2 * M_PI * iPhoton / float(genPhot); // uniformly distributed in phi
             ROOT::Math::XYZVector adirf = setThetaPhi(thetaCh[iHyp][iAerogel], fi); // photon direction in track system
@@ -717,7 +717,7 @@ namespace Belle2 {
 
   void ARICHReconstruction::transformTrackToLocal(ARICHTrack& arichTrack, bool align)
   {
-    // tranform track from Belle II to local ARICH frame
+    // transform track from Belle II to local ARICH frame
     ROOT::Math::XYZVector locPos = m_arichgp->getMasterVolume().pointToLocal(arichTrack.getPosition());
     ROOT::Math::XYZVector locDir = m_arichgp->getMasterVolume().momentumToLocal(arichTrack.getDirection());
 

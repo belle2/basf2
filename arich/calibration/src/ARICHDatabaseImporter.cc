@@ -117,7 +117,7 @@ void ARICHDatabaseImporter::setExperimentAndRun(int experiment, int run)
   B2INFO("Experiment " << experiment << ", run " << run);
 }
 
-// classses for simulation/reconstruction software
+// classes for simulation/reconstruction software
 void ARICHDatabaseImporter::importModulesInfo()
 {
 
@@ -1498,7 +1498,7 @@ void ARICHDatabaseImporter::importAerogelInfoEventDep()
 void ARICHDatabaseImporter::exportAerogelInfoEventDep()
 {
   // Definition:
-  // This function extracts intrarun dependant data from the database.
+  // This function extracts intrarun dependent data from the database.
   // It converts between different class types to get the saved
   // TClonesArray for chosen event, run and experiment.
 

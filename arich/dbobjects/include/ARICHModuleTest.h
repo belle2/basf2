@@ -168,52 +168,52 @@ namespace Belle2 {
     int getStrangeChsSize() const {return m_strangeCh.size();}
 
     /**
-     * Get guard bias during treshold scan.
-     * @return TGraph guard bias during treshold scan.
+     * Get guard bias during threshold scan.
+     * @return TGraph guard bias during threshold scan.
      */
     TGraph* getGuardBiasTH() const {return m_guardBias_th;}
 
     /**
-     * Set guard bias during treshold scan.
-     * @param[in] guardBias_th TGraph guard bias during treshold scan.
+     * Set guard bias during threshold scan.
+     * @param[in] guardBias_th TGraph guard bias during threshold scan.
      */
     void setGuardBiasTH(TGraph* guardBias_th) { m_guardBias_th = guardBias_th;}
 
     /**
-     * Get Chip Vmon - Vset difference during treshold scan.
+     * Get Chip Vmon - Vset difference during threshold scan.
      * @return Chip Vmon - Vset difference
      */
     TGraph* getChipVdiffTH(unsigned int i) const;
 
     /**
-     * Set Chip Vmon - Vset difference during treshold scan.
+     * Set Chip Vmon - Vset difference during threshold scan.
      * @param[in] i chip id
      * @param[in] chipVdiff_th Chip Vmon - Vset difference.
      */
     void setChipVdiffTH(unsigned int i, TGraph* chipVdiff_th);
 
     /**
-     * Get leakage current during treshold scan.
+     * Get leakage current during threshold scan.
      * @return Leakage current.
      */
     TGraph* getChipLeakTH(unsigned int i) const;
 
     /**
-     * Set leakage current during treshold scan.
+     * Set leakage current during threshold scan.
      * @param[in] i chip id
      * @param[in] chipLeak_th Leakage current.
      */
     void setChipLeakTH(unsigned int i, TGraph* chipLeak_th);
 
     /**
-     * Get high voltage during treshold scan.
-     * @return TGraph high voltage during treshold scan.
+     * Get high voltage during threshold scan.
+     * @return TGraph high voltage during threshold scan.
      */
     TGraph* getHighVoltageTH() const {return m_HV_th;}
 
     /**
-     * Set high voltage during treshold scan.
-     * @param[in] HV_th TGraph high voltage during treshold scan.
+     * Set high voltage during threshold scan.
+     * @param[in] HV_th TGraph high voltage during threshold scan.
      */
     void setHighVoltageTH(TGraph* HV_th) { m_HV_th = HV_th;}
 
@@ -342,14 +342,14 @@ namespace Belle2 {
     void setChargeScan(TH2D* charge) { m_charge = charge;}
 
     /**
-     * Get treshold scan.
-     * @return Treshold scan.
+     * Get threshold scan.
+     * @return Threshold scan.
      */
     TH2D* getTresholdScan() const {return m_th;}
 
     /**
-     * Set treshold scan.
-     * @param[in] th Treshold scan.
+     * Set threshold scan.
+     * @param[in] th Threshold scan.
      */
     void setTresholdScan(TH2D* th) { m_th = th;}
 
@@ -400,10 +400,10 @@ namespace Belle2 {
     std::vector<int> m_deadCh;     /**< List of dead channels (mapping: channels on HAPD) */
     std::vector<int> m_strangeCh;  /**< List of strange channels (mapping: channels on HAPD) */
 
-    TGraph* m_guardBias_th;        /**< Guard bias during treshold scan */
-    TGraph* m_chipVdiff_th[4];     /**< Chip Vmon - Vset difference during treshold scan */
-    TGraph* m_chipLeak_th[4];      /**< Chip leakage current during treshold scan */
-    TGraph* m_HV_th;               /**< High voltage during treshold scan */
+    TGraph* m_guardBias_th;        /**< Guard bias during threshold scan */
+    TGraph* m_chipVdiff_th[4];     /**< Chip Vmon - Vset difference during threshold scan */
+    TGraph* m_chipLeak_th[4];      /**< Chip leakage current during threshold scan */
+    TGraph* m_HV_th;               /**< High voltage during threshold scan */
     TGraph* m_guardBias_2Dx;       /**< Guard bias during 2D x scan */
     TGraph* m_chipVdiff_2Dx[4];    /**< Chip Vmon - Vset difference during 2D x scan */
     TGraph* m_chipLeak_2Dx[4];     /**< Chip leakage current during 2D x scan */
@@ -414,7 +414,7 @@ namespace Belle2 {
     TGraph* m_HV_2Dy;              /**< High voltage during 2D y scan */
     TH1F* m_gain;                  /**< Gain for each channel */
     TH2D* m_charge;                /**< Charge scan 2D */
-    TH2D* m_th;                    /**< Treshold scan 2D */
+    TH2D* m_th;                    /**< Threshold scan 2D */
     TH2D* m_scanX;                 /**< Laser scan 2D - x direction */
     TH2D* m_scanY;                 /**< Laser scan 2D - y direction */
 

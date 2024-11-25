@@ -249,7 +249,7 @@ namespace Belle2 {
 
     /**
      * Set radiuses at which "r" aluminum walls between tiles are placed
-     * (+inner+outter aluminum ring).
+     * (+inner+outer aluminum ring).
      *
      * @param[in] rs
      * Vector of aluminum rings between aerogel tiles radiuses (inner radius!).
@@ -518,9 +518,9 @@ namespace Belle2 {
     double getMaximumTotalTileThickness() const;
 
     /**
-     * Set imaginary tube thikness just after aerogel layers used
+     * Set imaginary tube thickness just after aerogel layers used
      * as volume to which tracks are extrapolated.
-     * @param[in] imgTubeThickness imaginary tube thikness.
+     * @param[in] imgTubeThickness imaginary tube thickness.
      */
     void setImgTubeThickness(double imgTubeThickness)
     {
@@ -528,9 +528,9 @@ namespace Belle2 {
     }
 
     /**
-     * Get imaginary tube thikness just after aerogel layers used
+     * Get imaginary tube thickness just after aerogel layers used
      * as volume to which tracks are extrapolated.
-     * @return Imaginary tube thikness.
+     * @return Imaginary tube thickness.
      */
     double getImgTubeThickness() const
     {
@@ -617,7 +617,7 @@ namespace Belle2 {
       0; /**< Full aerogel material description key : 1 - use material explicitly for each aerogel tile, 0 - use two types of aerogel material */
 
     double m_imgTubeThickness =
-      0.0; /**< imaginary tube thikness just after aerogel layers used as volume to which tracks are extrapolated */
+      0.0; /**< imaginary tube thickness just after aerogel layers used as volume to which tracks are extrapolated */
 
     double m_compensationARICHairVolumeThick_min = 0; /**< Minimum thickness of the compensation volume with ARICH air */
 

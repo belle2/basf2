@@ -36,8 +36,8 @@ namespace Belle2 {
     void setMergerPCBMaterialName(const std::string& materialName) {m_mergerPCBMaterialName = materialName;}
 
     /**
-     * Set merger PCB lenght
-     * @param sizeL merger PCB lenght
+     * Set merger PCB length
+     * @param sizeL merger PCB length
      */
     void setMergerPCBLenght(double sizeL) {m_sizeL = sizeL;}
 
@@ -166,8 +166,8 @@ namespace Belle2 {
     const std::string& getMergerPCBMaterialName() const {return m_mergerPCBMaterialName;}
 
     /**
-     * Returns merger PCB lenght
-     * @return merger PCB lenght
+     * Returns merger PCB length
+     * @return merger PCB length
      */
     double getSizeL() const {return m_sizeL;}
 

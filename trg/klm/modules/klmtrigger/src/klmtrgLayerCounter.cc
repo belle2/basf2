@@ -10,7 +10,7 @@
 #include "trg/klm/modules/klmtrigger/ntuples_full.h"
 
 
-#include "trg/klm/modules/klmtrigger/KLM_Trig.h"
+#include "trg/klm/modules/klmtrigger/klmtrgLayerCounter.h"
 #include "trg/klm/modules/klmtrigger/IO_csv.h"
 #include "trg/klm/modules/klmtrigger/bit_operations.h"
 
@@ -32,22 +32,22 @@ using namespace Belle2::KLM_TRG_definitions;
 
 namespace Belle2 {
 
-  void klmtrg_layer_counter_t::clear_layersUsed()
+  void klmtrgLayerCounter::clear_layersUsed()
   {
     m_layersUsed.clear();
   }
 
-  void klmtrg_layer_counter_t::add_layersUsed(int layersUsed)
+  void klmtrgLayerCounter::add_layersUsed(int layersUsed)
   {
     m_layersUsed.emplace_back(layersUsed);
   }
 
-  void klmtrg_layer_counter_t::set_NLayerTrigger(int NlayerTrigger)
+  void klmtrgLayerCounter::set_NLayerTrigger(int NlayerTrigger)
   {
     m_NlayerTrigger = NlayerTrigger;
   }
 
-  void klmtrg_layer_counter_t::run(const KLM_Digit_compact_ts& hits)
+  void klmtrgLayerCounter::run(const KLM_Digit_compact_ts& hits)
   {
 
 
@@ -74,7 +74,7 @@ namespace Belle2 {
                    ).apply_append(
                      hits1,
     [](const auto & e1) {
-      auto bit_mask = to_bit_mask<layer>(e1);
+      auto bit_mask = to_bit_mask(nt_span(e1, layer));
       return nt::ntuple(
                ax_maker(layer_count) = countBits(bit_mask),
                ax_maker(layer_mask) = bit_mask
@@ -96,7 +96,8 @@ namespace Belle2 {
                       ).apply_append(
                         grouped,
     [&](const auto & e1) {
-      auto bit_mask = to_bit_mask<sector>(e1);
+
+      auto bit_mask = to_bit_mask(nt_span(e1, sector));
       n_sections_trig  nsector = countBits(bit_mask);
       return  nt::ntuple(
                 sector_mask(bit_mask),
@@ -114,7 +115,7 @@ namespace Belle2 {
                  ).apply_append(
                    m_sections_trig,
     [](const auto & e1) {
-      auto bit_mask = countBits(to_bit_mask<section>(e1));
+      auto bit_mask = countBits(to_bit_mask(nt_span(e1, section)));
       n_sections_trig  nsector = nt::algorithms::sum(e1, [](auto&& e) {return e.n_sections_trig; });
 
       return  nt::ntuple(
@@ -130,7 +131,7 @@ namespace Belle2 {
 
   }
 
-  int klmtrg_layer_counter_t::get_n_sections_trig(int subdetector)
+  int klmtrgLayerCounter::get_n_sections_trig(int subdetector)
   {
     for (const auto& e : m_summary1) {
       if (e.subdetector == subdetector) {
@@ -140,7 +141,7 @@ namespace Belle2 {
     return 0;
   }
 
-  int klmtrg_layer_counter_t::get_triggermask(int subdetector, int section)
+  int klmtrgLayerCounter::get_triggermask(int subdetector, int section)
   {
     for (const auto& e : m_sections_trig) {
       if (e.subdetector == subdetector && e.section == section) {
@@ -150,7 +151,7 @@ namespace Belle2 {
     return 0;
   }
 
-  int klmtrg_layer_counter_t::get_BKLM_back_to_back_flag(int subdetector)
+  int klmtrgLayerCounter::get_BKLM_back_to_back_flag(int subdetector)
   {
     for (const auto& e : m_summary1) {
       if (e.subdetector == subdetector) {

@@ -8,7 +8,7 @@
 
 
 
-#include "trg/klm/modules/klmtrigger/klm_trig_linear_fit.h"
+#include "trg/klm/modules/klmtrigger/klmtrgLinearFit.h"
 #include "trg/klm/modules/klmtrigger/IO_csv.h"
 #include "trg/klm/modules/klmtrigger/bit_operations.h"
 
@@ -52,10 +52,10 @@ namespace Belle2 {
   };
 
   struct track_maker_t {
-    double y_cutoff = 0;
+    int32_t y_cutoff = 0;
     int m_number_of_tracks = 4;
     struct internal {
-      double last_x = 0, last_y = 0;
+      int32_t last_x = 0, last_y = 0;
       int nDigits = 0;
     };
 
@@ -141,13 +141,13 @@ namespace Belle2 {
 
 
 
-  void klm_trig_linear_fit_t::clear_geometry()
+  void klmtrgLinearFit::clear_geometry()
   {
     m_KLMgeomap.clear();
 
   }
 
-  void klm_trig_linear_fit_t::add_geometry(const KLM_geo_fit_t& geometry)
+  void klmtrgLinearFit::add_geometry(const KLM_geo_fit_t& geometry)
   {
 
     m_KLMgeomap[get_index(geometry)] = geo_KLM_t{
@@ -160,7 +160,7 @@ namespace Belle2 {
 
   }
 
-  void klm_trig_linear_fit_t::run(const KLM_Digit_compact_ts& hits)
+  void klmtrgLinearFit::run(const KLM_Digit_compact_ts& hits)
   {
 
     __CSV__WRITE__(hits);
@@ -257,8 +257,8 @@ namespace Belle2 {
         KLM_TRG_definitions::sector_mask_or{}
       };
       auto trig_and = nt::algorithms::filter_copy(e, [](const auto & x) { return x.trigger_and > 0; });
-      ret.sector_mask.v = Belle2::to_bit_mask< sector >(trig_and);
-      ret.sector_mask_or.v = Belle2::to_bit_mask< sector >(e);
+      ret.sector_mask.v = Belle2::to_bit_mask(nt_span(trig_and, sector));
+      ret.sector_mask_or.v = Belle2::to_bit_mask(nt_span(trig_and, sector));
       return ret;
 
     }
@@ -268,14 +268,14 @@ namespace Belle2 {
 
   }
 
-  const KLM_trig_linear_fits& klm_trig_linear_fit_t::get_result() const
+  const KLM_trig_linear_fits& klmtrgLinearFit::get_result() const
   {
     return m_linear_fits;
   }
 
 
 
-  int klm_trig_linear_fit_t::get_triggermask(int subdetector, int section)
+  int klmtrgLinearFit::get_triggermask(int subdetector, int section)
   {
     for (const auto& e : m_sections_trig) {
       if (e.subdetector == subdetector && e.section == section) {
@@ -285,7 +285,7 @@ namespace Belle2 {
     return 0;
   }
 
-  int klm_trig_linear_fit_t::get_triggermask_or(int subdetector, int section)
+  int klmtrgLinearFit::get_triggermask_or(int subdetector, int section)
   {
     for (const auto& e : m_sections_trig) {
       if (e.subdetector == subdetector && e.section == section) {
@@ -295,12 +295,12 @@ namespace Belle2 {
     return 0;
   }
 
-  void klm_trig_linear_fit_t::set_y_cutoff(int cutoff)
+  void klmtrgLinearFit::set_y_cutoff(int cutoff)
   {
     y_cutoff = cutoff;
   }
 
-  void klm_trig_linear_fit_t::set_intercept_cutoff(int cutoff)
+  void klmtrgLinearFit::set_intercept_cutoff(int cutoff)
   {
     m_intercept_cutoff = cutoff;
   }

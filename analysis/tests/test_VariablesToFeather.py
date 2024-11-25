@@ -21,14 +21,14 @@ path.add_module('ParticleLoader', decayStrings=['e+'])
 
 # Write out electron id and momentum of all true electron candidates
 v2parquet_e = VariablesToTable(
-    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.pq")
+    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.feather")
 path.add_module(v2parquet_e)
 
 # event-wise mode is not supported at the moment. when it is add something like
 # the following comment and test file creation
 # Write out number of tracks and ecl-clusters in every event
 # v2parquet_e = VariablesToNotRoot(
-# "", ['nTracks', 'nKLMClusters'], "eventDF.pq", "parquet")
+# "", ['nTracks', 'nKLMClusters'], "eventDF.feather")
 # path.add_module(v2parquet_e)
 
 
@@ -36,8 +36,8 @@ with b2test_utils.clean_working_directory():
     basf2.process(path, 10)  # v2hdf5 is a python module, so don't run over everything... remove this if it gets implemented in C++
 
     # Testing
-    assert os.path.isfile('particleDF.pq'), "particleDF.pq wasn't created"
-    df1 = pandas.read_parquet('particleDF.pq')
+    assert os.path.isfile('particleDF.feather'), "particleDF.feather wasn't created"
+    df1 = pandas.read_feather('particleDF.feather')
     assert len(df1) > 0, "electron dataframe contains zero entries"
     assert 'electronID' in df1.columns, "electronID column is missing from electron dataframe"
     assert 'p' in df1.columns, "p column is missing from electron dataframe"

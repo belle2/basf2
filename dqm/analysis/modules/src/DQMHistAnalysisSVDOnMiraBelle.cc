@@ -287,16 +287,27 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgOffOccL4102V", avgOffOccL4102UV[1]);
 
     //peculiar
-    m_monObj->setVariable("avgOffOccL433V", avgOffOccL433UV[1]);
+    m_monObj->setVariable("avgOffOccL433U", avgOffOccL433UV[0]);
     m_monObj->setVariable("avgOffOccL513U", avgOffOccL513UV[0]);
-    m_monObj->setVariable("avgOffOccL514V", avgOffOccL514UV[1]);
-    m_monObj->setVariable("avgOffOccL592V", avgOffOccL592UV[1]);
-    m_monObj->setVariable("avgOffOccL594V", avgOffOccL594UV[1]);
+    m_monObj->setVariable("avgOffOccL514U", avgOffOccL514UV[0]);
+    m_monObj->setVariable("avgOffOccL592U", avgOffOccL592UV[0]);
+    m_monObj->setVariable("avgOffOccL594U", avgOffOccL594UV[0]);
     m_monObj->setVariable("avgOffOccL643U", avgOffOccL643UV[0]);
     m_monObj->setVariable("avgOffOccL664U", avgOffOccL664UV[0]);
     m_monObj->setVariable("avgOffOccL6103U", avgOffOccL6103UV[0]);
     m_monObj->setVariable("avgOffOccL6115U", avgOffOccL6115UV[0]);
     m_monObj->setVariable("avgOffOccL6124U", avgOffOccL6124UV[0]);
+
+    m_monObj->setVariable("avgOffOccL433V", avgOffOccL433UV[1]);
+    m_monObj->setVariable("avgOffOccL513V", avgOffOccL513UV[1]);
+    m_monObj->setVariable("avgOffOccL514V", avgOffOccL514UV[1]);
+    m_monObj->setVariable("avgOffOccL592V", avgOffOccL592UV[1]);
+    m_monObj->setVariable("avgOffOccL594V", avgOffOccL594UV[1]);
+    m_monObj->setVariable("avgOffOccL643V", avgOffOccL643UV[1]);
+    m_monObj->setVariable("avgOffOccL664V", avgOffOccL664UV[1]);
+    m_monObj->setVariable("avgOffOccL6103V", avgOffOccL6103UV[1]);
+    m_monObj->setVariable("avgOffOccL6115V", avgOffOccL6115UV[1]);
+    m_monObj->setVariable("avgOffOccL6124V", avgOffOccL6124UV[1]);
   }
 
 
@@ -517,16 +528,27 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgEffL4102V", avgEffL4102UV[1]);
 
     //peculiar
-    m_monObj->setVariable("avgEffL433V", avgEffL433UV[1]);
+    m_monObj->setVariable("avgEffL433U", avgEffL433UV[0]);
     m_monObj->setVariable("avgEffL513U", avgEffL513UV[0]);
-    m_monObj->setVariable("avgEffL514V", avgEffL514UV[1]);
-    m_monObj->setVariable("avgEffL592V", avgEffL592UV[1]);
-    m_monObj->setVariable("avgEffL594V", avgEffL594UV[1]);
+    m_monObj->setVariable("avgEffL514U", avgEffL514UV[0]);
+    m_monObj->setVariable("avgEffL592U", avgEffL592UV[0]);
+    m_monObj->setVariable("avgEffL594U", avgEffL594UV[0]);
     m_monObj->setVariable("avgEffL643U", avgEffL643UV[0]);
     m_monObj->setVariable("avgEffL664U", avgEffL664UV[0]);
     m_monObj->setVariable("avgEffL6103U", avgEffL6103UV[0]);
     m_monObj->setVariable("avgEffL6115U", avgEffL6115UV[0]);
     m_monObj->setVariable("avgEffL6124U", avgEffL6124UV[0]);
+
+    m_monObj->setVariable("avgEffL433V", avgEffL433UV[1]);
+    m_monObj->setVariable("avgEffL513V", avgEffL513UV[1]);
+    m_monObj->setVariable("avgEffL514V", avgEffL514UV[1]);
+    m_monObj->setVariable("avgEffL592V", avgEffL592UV[1]);
+    m_monObj->setVariable("avgEffL594V", avgEffL594UV[1]);
+    m_monObj->setVariable("avgEffL643V", avgEffL643UV[1]);
+    m_monObj->setVariable("avgEffL664V", avgEffL664UV[1]);
+    m_monObj->setVariable("avgEffL6103V", avgEffL6103UV[1]);
+    m_monObj->setVariable("avgEffL6115V", avgEffL6115UV[1]);
+    m_monObj->setVariable("avgEffL6124V", avgEffL6124UV[1]);
   }
 
   // MPV cluster charge for clusters on track
@@ -870,12 +892,12 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::getOccupancySensorUV(int
     B2DEBUG(20, "Layer out of range [3,6].");
   }
   std::vector<float> avgOffOccUV(2, 0.0);
-  int iBin = hU->GetBin(binX, binY);
+  int binXY = hU->GetBin(binX, binY);
 
   avgOffOccUV[0] = 0;
-  if (hU) avgOffOccUV[0] = hU->GetBinContent(iBin) * 1.0 / 768 / nEvents * 100;
+  if (hU) avgOffOccUV[0] = hU->GetBinContent(binXY) * 1.0 / 768 / nEvents * 100;
   avgOffOccUV[1] = 0;
-  if (hV) avgOffOccUV[1] = hV->GetBinContent(iBin) * 1.0 / nStripsV / nEvents * 100;
+  if (hV) avgOffOccUV[1] = hV->GetBinContent(binXY) * 1.0 / nStripsV / nEvents * 100;
   return avgOffOccUV;
 }
 

@@ -68,6 +68,8 @@ namespace Belle2 {
      * @return vector with values for U and V sides
      */
     std::vector<float> getOccupancySensorUV(int iLayer, TH1F* hU, TH1F* hV, int binX, int binY, int nEvents) const;
+
+
     /**
     * Calculate avg offline occupancy for one specific sensor, especially with high occupancy
     * @param iLayer index of layer

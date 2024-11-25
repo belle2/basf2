@@ -11,6 +11,7 @@
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <reconstruction/modules/CDCDedxPID/LineHelper.h>
+#include <framework/core/Environment.h>
 #include <TRandom.h>
 #include <cmath>
 #include <algorithm>
@@ -78,7 +79,8 @@ namespace Belle2 {
       m_nLayerWires[i] = m_nLayerWires[i - 1] + 6 * (160 + (i - 1) * 32);
     }
 
-    if (not m_trackLevel) B2WARNING("Hit-level MC may not perform well. Precise calibration maybe still not available.");
+    if (not m_trackLevel)
+      B2WARNING("Hit-level MC still needs a precise calibration to perform well! Until then please use track-level MC.");
 
   }
 
@@ -105,7 +107,7 @@ namespace Belle2 {
     RealisticTDCCountTranslator tdcTranslator;
 
     // is data or MC ?
-    bool isData = m_mcParticles.getEntries() == 0;
+    bool isData = not Environment::Instance().isMC();
 
     // track independent calibration constants
     double runGain = isData ? m_DBRunGain->getRunGain() : 1.0;
@@ -117,7 +119,7 @@ namespace Belle2 {
     }
     double scale = m_DBScaleFactor->getScaleFactor(); // scale factor to make electron dE/dx ~ 1
     if (scale == 0) {
-      B2WARNING("Scale factor from DB is zero! Will be set to one");
+      B2ERROR("Scale factor from DB is zero! Will be set to one");
       scale = 1;
     }
 
@@ -126,7 +128,7 @@ namespace Belle2 {
       // track fit result
       const auto* fitResult = track.getTrackFitResultWithClosestMass(Const::pion);
       if (not fitResult) {
-        B2WARNING("No related fit for track ...");
+        B2WARNING("No related fit for track, skip it.");
         continue;
       }
 
@@ -333,7 +335,7 @@ namespace Belle2 {
         if (predictedSigma <= 0) B2ERROR("Predicted sigma is not positive for PDG = " << chargedStable.getPDGCode());
         double chi = (correctedMean - predictedMean) / predictedSigma;
         int index = chargedStable.getIndex();
-        cdcLogL[index] = -0.5 * chi * chi; // TODO add PDF normalization: - log(predictedSigma);
+        cdcLogL[index] = -0.5 * chi * chi;
         // debug output
         if (dedxTrack) {
           dedxTrack->m_predmean[index] = predictedMean;

@@ -703,9 +703,7 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
   // loop over all ParticleLists
   for (auto eclKLMCluster2Plist : m_ECLKLMClusters2Plists) {
     string listName = get<c_PListName>(eclKLMCluster2Plist);
-    string antiListName = get<c_AntiPListName>(eclKLMCluster2Plist);
     int pdgCode = get<c_PListPDGCode>(eclKLMCluster2Plist);
-    bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(eclKLMCluster2Plist);
     Const::ParticleType thisType(pdgCode);
 
     StoreObjPtr<ParticleList> plist(listName);
@@ -715,15 +713,6 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
       continue;
     plist.create();
     plist->initialize(pdgCode, listName);
-
-    // create anti-particle list if necessary
-    if (!isSelfConjugatedParticle) {
-      StoreObjPtr<ParticleList> antiPlist(antiListName);
-      antiPlist.create();
-      antiPlist->initialize(-1 * pdgCode, antiListName);
-
-      antiPlist->bindAntiParticleList(*(plist));
-    }
 
     plist->setEditable(true); // :all list is originally reserved. we have to set it as editable.
 

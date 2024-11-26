@@ -277,7 +277,7 @@ void DQMHistAnalysisECLSummaryModule::event()
                               "if (channels_summary) channels_summary->SetDrawOption(\"col\");");
   h_channels_summary->GetListOfFunctions()->Add(m_ecl_style);
   m_default_style = new TExec("default_style",
-                              "gStyle->SetPalette(kBird);");
+                              "gStyle->SetPalette(kBird);"); // " Changing back to the default color palette
 
   //=== Draw with special style
   //    https://root.cern.ch/js/latest/examples.htm#th2_colpal77
@@ -492,9 +492,9 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
       if (main_hist && main_hist->GetEntries() > 0) {
         for (auto& overlay : {overlay_hist, overlay_hist_green}) {
           for (int bin_id = 1; bin_id <= ECL::ECL_TOTAL_CHANNELS; bin_id++) {
-            // if (overlay->GetBinContent(bin_id) == 0) continue;
+            if (overlay->GetBinContent(bin_id) == 0) continue;
             // Do not adjust bin height for dead channels
-            if (overlay->GetBinContent(bin_id) == 1) continue;
+            if (main_hist->GetBinContent(bin_id) < 1e-6) continue;
             overlay->SetBinContent(bin_id, main_hist->GetBinContent(bin_id));
           }
         }

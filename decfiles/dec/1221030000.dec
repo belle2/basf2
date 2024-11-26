@@ -1,0 +1,23 @@
+# EventType: 1221030000
+# Descriptor: [B- -> J/psi Lambda0 anti-p-] and cc
+# NickName: Bu_Jpsi_Lambda_abti-p
+# Documentation: B -> pentaquark baryon.
+# Tested: Yes
+# PhysicsWG: Quarkonium
+# Responsible: Jitendra Kumar
+# Email: jkumar@iitj.ac.in
+# Cuts: None
+# Date: 20240708
+# This decay model is intended for pentaquark studies
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B-sig
+1.0 J/psi Lambda0 anti-p- PHSP;
+Enddecay
+CDecay B+sig
+
+End

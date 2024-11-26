@@ -140,7 +140,7 @@ void RT2SPTCConverterModule::event()
     }
     std::pair<std::vector<const SpacePoint*>, ConversionState> spacePointStatePair;
 
-    // the hit informations from the recotrack, the option "true" will result in a sorted vector
+    // the hit information from the recotrack, the option "true" will result in a sorted vector
     std::vector<RecoHitInformation*> hitInfos = recoTrack.getRecoHitInformations(true);
 
     // if requested remove the PXD hits

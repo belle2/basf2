@@ -851,6 +851,8 @@ int TrgEclBhabha::GetBhabhaAddition(void)
 
   std::vector<int> MaxThetaId;
   MaxThetaId.clear();
+  ClusterEnergy.clear();
+
   int bit_bhabha_addition = 0;
 
   StoreArray<TRGECLCluster> trgeclClusterArray;
@@ -860,6 +862,8 @@ int TrgEclBhabha::GetBhabhaAddition(void)
     MaxTCId.push_back(maxTCId);
     int maxThetaId = aTRGECLCluster->getMaxThetaId();
     MaxThetaId.push_back(maxThetaId);
+    double clusterenergy  = aTRGECLCluster->getEnergyDep();
+    ClusterEnergy.push_back(clusterenergy);
   }
   int NofCluster1to17 = MaxThetaId.size();
 
@@ -880,12 +884,14 @@ int TrgEclBhabha::GetBhabhaAddition(void)
               dphi,
               thetaSum);
 
+    // for hie1
     if ((dphi     > m_3DBhabhaAddAngleCut[0] &&
          dphi     < m_3DBhabhaAddAngleCut[1]) &&
         (thetaSum > m_3DBhabhaAddAngleCut[2] &&
          thetaSum < m_3DBhabhaAddAngleCut[3])) {
       bit_bhabha_addition |= 0x02;
     }
+    // for hie2
     if ((dphi     > m_3DBhabhaAddAngleCut[0] &&
          dphi     < m_3DBhabhaAddAngleCut[1]) ||
         (thetaSum > m_3DBhabhaAddAngleCut[2] &&
@@ -893,17 +899,26 @@ int TrgEclBhabha::GetBhabhaAddition(void)
       bit_bhabha_addition |= 0x04;
     }
 
+    // for hie3 and hie4
+    // get thetaID of lower energy cluster
     int lowe_MaxThetaId = 0;
-    if (energy1 < energy2) {
+    if (ClusterEnergy[0] < ClusterEnergy[1]) {
       lowe_MaxThetaId = MaxThetaId[0];
     } else {
       lowe_MaxThetaId = MaxThetaId[1];
     }
+    // select cluster in endcap region
     if (lowe_MaxThetaId <= 3 ||
         lowe_MaxThetaId >= 16) {
+      // for hie3
       bit_bhabha_addition |= 0x08;
+      // for hie4
+      // require low energy bound for cluster
+      if (ClusterEnergy[0] > 0.5 &&
+          ClusterEnergy[1] > 0.5) {
+        bit_bhabha_addition |= 0x10;
+      }
     }
-
   }
 
   return bit_bhabha_addition;

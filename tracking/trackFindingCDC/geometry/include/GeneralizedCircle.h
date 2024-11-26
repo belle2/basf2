@@ -36,10 +36,10 @@ namespace Belle2 {
      *  n1 = -m_x/r \n
      *  n2 = -m_y/r \n
      *  n3 = 1/2r \n
-     *  where the normalization condtion is n1*n1 + n2*n2 - 4 * n0 * n3 = 1.
+     *  where the normalization condition is n1*n1 + n2*n2 - 4 * n0 * n3 = 1.
      *  The overall sign is fixed in the following way:
-     *  If the last parameter is positiv the circle is assummed to be orientated counterclockwise
-     *  else the circle is assummed to be orientated clockwise.
+     *  If the last parameter is positive the circle is assumed to be orientated counterclockwise
+     *  else the circle is assumed to be orientated clockwise.
      *  The parameters n1 and n2 are indeed a vector in two dimensions and
      *  we keep them stored as Vector2D.
      *  Additionally we can represent a line with same parameters by setting n3 = 0. Compare Line2D.
@@ -68,7 +68,7 @@ namespace Belle2 {
        *  However the generalized circle does.
        *  This constructor makes an orientated representation from them.
        *  If not given the orientation defaults to
-       *  mathematical positiv counterclockwise.
+       *  mathematical positive counterclockwise.
        */
       static GeneralizedCircle
       fromCenterAndRadius(const Vector2D& center,
@@ -241,8 +241,8 @@ namespace Belle2 {
       /**
        *  Normalizes the circle parameters.
        *
-       *  The normalization is only made if the circle parameters have a valid positiv
-       *  norm. If the normalization of the cirlce is negativ or zero all circle
+       *  The normalization is only made if the circle parameters have a valid positive
+       *  norm. If the normalization of the circle is negative or zero all circle
        *  parameters are not changed.
        */
       void normalize()
@@ -362,7 +362,7 @@ namespace Belle2 {
       /**
        *  Tangential vector to the circle near the given position.
        *  Gives the unit tangential vector to the circle line.
-       *  It always points in the direction of positiv advance
+       *  It always points in the direction of positive advance
        *  at the point of closest approach from the given point.
        *  @param point Point in the plane to calculate the tangential
        *  @return Unit tangential vector to the circle line
@@ -412,8 +412,8 @@ namespace Belle2 {
        *  Returns the end point which is first reached
        *  if one follows the forward direction of the circle starting from the start point.
        *  Evaluates which of the given end points end1 and end2 is closer to start
-       *  This espicially treats the discontinuity on the far side of the circle correctly.
-       *  If the generalized circle is truely a line none of the points might lie
+       *  This especially treats the discontinuity on the far side of the circle correctly.
+       *  If the generalized circle is truly a line none of the points might lie
        *  in the forward direction and Vector2D(NAN,NAN) is returned.
        *  @param start Point to start the traversal
        *  @param end1 One possible end point
@@ -529,7 +529,7 @@ namespace Belle2 {
 
       /**
        *  Indicates if the point is on the right or left side of the circle.
-       *  This is also refered to as alpha.
+       *  This is also referred to as alpha.
        */
       ERightLeft isRightOrLeft(const Vector2D& point) const
       {
@@ -618,7 +618,7 @@ namespace Belle2 {
 
       /**
        *  Calculates the arc length between two points of closest approach on the circle.
-       *  The arc length is signed positiv for travel in orientation direction.
+       *  The arc length is signed positive for travel in orientation direction.
        *  In the circle case the arc length is between -pi*radius and pi*radius,
        *  hence the discontinuity is on the far side of the circle relative to the given from point.
        *  The points are essentially first taken to their closest approach
@@ -643,7 +643,7 @@ namespace Belle2 {
        *  the length on the arc.
        *  Smooth function expressing the relation between arc length and direct length
        *  only using the curvature of the circle as additional information.
-       *  It enables better handling of the line limit compared to the former implementaiton
+       *  It enables better handling of the line limit compared to the former implementation
        *  which used the opening angle of the arc.
        */
       double arcLengthFactor(const double directDistance) const
@@ -656,7 +656,7 @@ namespace Belle2 {
        *  the length on the arc.
        *  Smooth function expressing the relation between arc length and direct length
        *  only using the curvature of the circle as additional information.
-       *  It enables better handling of the line limit compared to the former implementaiton
+       *  It enables better handling of the line limit compared to the former implementation
        *  which used the opening angle of the arc.
        */
       static double arcLengthFactor(double directDistance, double curvature);

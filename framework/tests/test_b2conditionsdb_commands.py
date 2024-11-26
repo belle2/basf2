@@ -33,7 +33,7 @@ def call_command(command):
     output = subprocess.check_output(shlex.split(command), encoding='utf-8').strip().split('\n')
     for line in output:
         if "created" not in line and "modified" not in line:
-            print(line)
+            print(line.strip())
 
 
 if __name__ == '__main__':

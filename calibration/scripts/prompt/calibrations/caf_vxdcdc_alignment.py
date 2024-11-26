@@ -22,6 +22,8 @@ import ROOT
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_cdc import settings as cdc_calibration
+from prompt.calibrations.caf_svd_time import settings as svd_time_calibration
+
 from prompt.utils import events_in_basf2_file
 from caf.utils import IoV
 from caf import strategies
@@ -43,11 +45,12 @@ import alignment.parameters
 collection_names = ["cosmic", "hadron", "mumu", "offip"]
 
 default_config = {
+    "only_prompt": False,
     "cosmic.max_processed_events_per_file": 4000,
     "hadron.max_processed_events_per_file": 1000,
     "mumu.max_processed_events_per_file": 5000,
     "offip.max_processed_events_per_file": 2000,
-    "stage1.method": "fullLAPACK"
+    "stage1.method": "decomposition"
 }
 
 quality_flags = [INPUT_DATA_FILTERS["Run Type"]["physics"],
@@ -68,7 +71,7 @@ settings = CalibrationSettings(name="Full VXD and CDC Alignment",
                                },
 
                                expert_config=default_config,
-                               depends_on=[cdc_calibration])
+                               depends_on=[cdc_calibration, svd_time_calibration])
 
 
 def select_files(all_input_files, min_events, max_processed_events_per_file):
@@ -472,6 +475,9 @@ def get_calibrations(input_data, **kwargs):
     # Do not save BeamSpot payloads in the final output database
     # because alignment is changed -> BeamSpot payloads now invalid
     beamspot.save_payloads = False
+
+    if cfg["only_prompt"]:
+        return [prompt]
 
     return [prompt, beamspot, stage1, stage2]
 

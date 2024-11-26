@@ -66,7 +66,7 @@ void DQMHistAnalysisARICHModule::initialize()
   m_c_apdHist = new TCanvas("ARICH/c_apdHist");
 
   addDeltaPar("ARICH", "bitsPerChannel", HistDelta::c_Events,
-              100000, 1); // update each 100k events (from daq histogram)
+              1000000, 1); // update each 100k events (from daq histogram)
 
   // addDeltaPar(m_histogramDirectoryName, m_histogramName, HistDelta::c_Entries, 10000, 1); // update each 10000 entries
 
@@ -270,6 +270,8 @@ void DQMHistAnalysisARICHModule::event()
     if (nhits + 3. * sqrt(nhits) < ringApdAvg[ring] * m_badApdOccLimit) nbadApd++;
   }
   setEpicsPV("badAPDs", nbadApd);
+
+  delete apdHits;
 
 }
 

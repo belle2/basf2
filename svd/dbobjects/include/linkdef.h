@@ -76,6 +76,8 @@
 
 #pragma link C++ class Belle2::SVDSpacePointSNRFractionSelector +; // checksum=0x217f15e4, version=1
 
+#pragma link C++ class Belle2::SVDdEdxPDFs+; // checksum=0x6d7012eb, version=1
+
 #endif
 
 

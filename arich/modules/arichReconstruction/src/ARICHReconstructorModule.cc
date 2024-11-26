@@ -28,9 +28,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-// ROOT
-#include <TVector3.h>
-
 using namespace boost;
 
 namespace Belle2 {

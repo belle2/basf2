@@ -10,7 +10,6 @@
 // Description : DQM module, which gives histograms showing the efficiency of PXD sensors
 //-
 
-
 #include <dqm/analysis/modules/DQMHistAnalysisPXDEff.h>
 #include <TROOT.h>
 #include <TLatex.h>
@@ -50,10 +49,6 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
   addParam("excluded", m_excluded, "the list of excluded modules, indices from 0 to 39");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
-}
-
-DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule()
-{
 }
 
 void DQMHistAnalysisPXDEffModule::initialize()
@@ -298,7 +293,7 @@ void DQMHistAnalysisPXDEffModule::event()
   {
     // First create some 2d overview of efficiency for all modules
     // This is not taken into account for efficiency calculation as
-    // there may be update glitches dues to seperate histograms
+    // there may be update glitches dues to separate histograms
     // The histograms
     bool updateinner = false, updateouter = false;
     for (auto aPXDModule : m_PXDModules) {
@@ -314,13 +309,13 @@ void DQMHistAnalysisPXDEffModule::event()
         locationMatches = m_histogramDirectoryName + "/" + locationMatches;
       }
 
-      auto Hits = (TH1*)findHist(locationHits, true);// check if updated
-      auto Matches = (TH1*)findHist(locationMatches, true);// check if updated
+      auto Hits = findHist(locationHits, true);// check if updated
+      auto Matches = findHist(locationMatches, true);// check if updated
 
       if (Hits == nullptr && Matches == nullptr) continue; // none updated
 
-      if (Hits == nullptr) Hits = (TH1*)findHist(locationHits); // actually, this should not happen ...
-      if (Matches == nullptr) Matches = (TH1*)findHist(locationMatches); // ... as updates should coincide
+      if (Hits == nullptr) Hits = findHist(locationHits); // actually, this should not happen ...
+      if (Matches == nullptr) Matches = findHist(locationMatches); // ... as updates should coincide
 
       // Finding only one of them should only happen in very strange situations... still better check
       if (Hits && Matches) {
@@ -385,7 +380,7 @@ void DQMHistAnalysisPXDEffModule::event()
 // (avoid possible update glitches from daq/dqm framework side)
 // The bins per module are read out and filled into an TEfficiency as total and passed events into bin
 // Summaries for L1, L2, Overall are added, too
-  auto Combined = (TH1*)findHist(m_histogramDirectoryName, "PXD_Eff_combined", true);// only if updated
+  auto Combined = findHist(m_histogramDirectoryName, "PXD_Eff_combined", true);// only if updated
 
   if (Combined) {
     // only if histogram was changed
@@ -437,7 +432,7 @@ void DQMHistAnalysisPXDEffModule::event()
       // workaround for excluded module
       if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
 
-      // get the errors and check for limits for each bin seperately ...
+      // get the errors and check for limits for each bin separately ...
 
       if (nhit >= m_minEntries) {
         error_flag |= check_error_level(bin, aModule);
@@ -497,10 +492,17 @@ void DQMHistAnalysisPXDEffModule::event()
         gr->Draw("AP");
 
         for (auto& it : m_excluded) {
-          auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
-          tt->SetTextSize(0.035);
-          tt->SetTextAngle(90);// Rotated
-          tt->SetTextAlign(12);// Centered
+          static std::map <int, TLatex*> ltmap;
+          auto tt = ltmap[it];
+          if (!tt) {
+            tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+            tt->SetTextSize(0.035);
+            tt->SetTextAngle(90);// Rotated
+            tt->SetTextAlign(12);// Centered
+            ltmap[it] = tt;
+          } else {
+            tt->SetY(scale_min);
+          }
           tt->Draw();
         }
 
@@ -571,10 +573,16 @@ void DQMHistAnalysisPXDEffModule::event()
       if (gr3) gr3->Draw("P"); // both in one plot
 
       for (auto& it : m_excluded) {
-        auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
-        tt->SetTextSize(0.035);
-        tt->SetTextAngle(90);// Rotated
-        tt->SetTextAlign(12);// Centered
+        std::map <int, TLatex*> ltmap;
+        auto tt = ltmap[it];
+        if (!tt) {
+          tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+          tt->SetTextSize(0.035);
+          tt->SetTextAngle(90);// Rotated
+          tt->SetTextAlign(12);// Centered
+        } else {
+          tt->SetY(scale_min);
+        }
         tt->Draw();
       }
 
@@ -610,5 +618,27 @@ void DQMHistAnalysisPXDEffModule::event()
 void DQMHistAnalysisPXDEffModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
+
+  for (VxdID& aPXDModule : m_PXDModules) {
+    if (m_cEffModules[aPXDModule]) delete m_cEffModules[aPXDModule];
+    if (m_eEffModules[aPXDModule]) delete m_eEffModules[aPXDModule];
+  }
+
+  if (m_hEffAllLastTotal) delete m_hEffAllLastTotal;
+  if (m_hEffAllLastPassed) delete m_hEffAllLastPassed;
+
+  if (m_cInnerMap) delete m_cInnerMap;
+  if (m_cOuterMap) delete m_cOuterMap;
+  if (m_hInnerMap) delete m_hInnerMap;
+  if (m_hOuterMap) delete m_hOuterMap;
+
+  if (m_hErrorLine) delete m_hErrorLine;
+  if (m_hWarnLine) delete m_hWarnLine;
+
+  if (m_cEffAll) delete m_cEffAll;
+  if (m_eEffAll) delete m_eEffAll;
+
+  if (m_cEffAllUpdate) delete m_cEffAllUpdate;
+  if (m_eEffAllUpdate) delete m_eEffAllUpdate;
 }
 

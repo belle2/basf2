@@ -175,7 +175,7 @@ class HitInfoHarvester(harvesting.HarvestingModule):
 
     def __init__(self, output_file_name, reco_tracks_name="RecoTracks"):
         """Expecting a name for the output file and the name of the RecoTracks StoreArray
-           to operate on. The latter dafaults to 'RecoTracks'"""
+           to operate on. The latter defaults to 'RecoTracks'"""
         super().__init__(foreach=reco_tracks_name,
                          output_file_name=output_file_name)
 
@@ -191,7 +191,7 @@ class HitInfoHarvester(harvesting.HarvestingModule):
 
         # Getting residuals for each hit of the RecoTrack
         for hit_info in reco_track.getRelationsWith("RecoHitInformations"):
-            layer = np.float("nan")
+            layer = float("nan")
             if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_SVD:
                 hit = hit_info.getRelated("SVDClusters")
                 layer = hit.getSensorID().getLayerNumber()

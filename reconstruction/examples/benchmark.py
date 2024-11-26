@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,6 +29,7 @@ parser = ArgumentParser(description='Measure the execution time.')
 parser.add_argument('-m', '--multiplicity', default='high', choices=['high', 'low', 'data'], help='Multiplicity or type of events')
 parser.add_argument('-l', '--limits', help='Name of file containing limits')
 parser.add_argument('-f', '--file', help='Name of benchmark output file')
+parser.add_argument('-c', '--csv', help='Name of statistics csv file')
 args = parser.parse_args()
 
 # create path and reduce log level
@@ -71,9 +71,11 @@ else:
 # reconstruction
 add_reconstruction(main)
 
-# process events and print call statistics
+# process events, print call statistics, and write statistics to a csv file
 b2.process(main)
 print(b2.statistics)
+if args.csv is not None:
+    b2.statistics.csv(args.csv)
 
 # read limits
 limits = {}
@@ -108,7 +110,7 @@ for module in b2.statistics.modules:
 # open output file
 output = None
 if args.file is not None:
-    output = open(args.file, 'wt')
+    output = open(args.file, 'w')
 
 # print benchmark results and write them to the output file
 b2.set_log_level(b2.LogLevel.INFO)
@@ -117,13 +119,13 @@ for category in categories:
     if category not in times.keys():
         continue
     time = times[category]
-    message = 'Execution time per event for %s is %.f ms' % (category, time)
+    message = f'Execution time per event for {category} is {time:.0f} ms'
     fraction = -1
     if category in limits.keys():
         fraction = time / limits[category]
         if fraction > max_fraction:
             max_fraction = fraction
-        message += ' = %.f%% of the limit.' % (100 * fraction)
+        message += f' = {fraction:.0%} of the limit.'
         if fraction <= 0.9:
             b2.B2INFO(message)
         elif fraction <= 1:
@@ -134,9 +136,9 @@ for category in categories:
         b2.B2INFO(message)
 
     if output is not None:
-        output.write('%s %.2f' % (category, time))
+        output.write(f'{category} {time:.2f}')
         if fraction >= 0:
-            output.write(' %.4f' % fraction)
+            output.write(f' {fraction:.4f}')
         output.write('\n')
 
 # fail if above limit

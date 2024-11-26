@@ -26,6 +26,34 @@ void PIDNeuralNetwork::loadParametersFromDB()
                                            false,
   [](const std::string&) {}  // disable logger
                                                                         ));
+
+  // Rename some of the input variables such that they match the basf2 internal names
+  // This is needed for backwards compatibility with older payloads where the input variable names are different from the basf2 internal names
+  std::map<std::string, std::string> inputNameMap; // maps old -> new names
+  for (const Const::EDetector& detector : Const::PIDDetectorSet::set()) {
+    for (const auto& hypeType : Const::chargedStableSet) {
+      const auto oldName = "pidLogLikelihood_Of_" + std::to_string(abs(hypeType.getPDGCode())) + "_From_" + Const::parseDetectors(
+                             detector);
+      const auto newName = "pidLogLikelihoodValueExpert(" + std::to_string(abs(hypeType.getPDGCode())) + ',' + Const::parseDetectors(
+                             detector) + ")";
+      inputNameMap[oldName] = newName;
+    }
+  }
+  inputNameMap["momentum"] = "p";
+
+  // Build list of input variable names in Basf2 naming scheme
+  m_inputBasf2Names.reserve(getInputSize());
+  for (std::string name : (*m_pidNeuralNetworkParametersDB)->getInputNames()) {
+    const auto itr = inputNameMap.find(name);
+    if (itr != inputNameMap.end()) name = itr->second;
+    m_inputBasf2Names.push_back(name);
+  }
+
+  // Build extraInfo names for this network for all predicted PDG codes
+  for (const auto outputPdgCode : getOutputSpeciesPdg()) {
+    m_extraInfoNames[outputPdgCode] = "pidNeuralNetworkValueExpert(" + std::to_string(outputPdgCode) \
+                                      + "," + m_pidNeuralNetworkParametersName + ")";
+  }
 }
 
 

@@ -38,11 +38,6 @@ namespace Belle2 {
     void initialize() override final;
 
     /**
-     * Event action.
-     */
-    void event() override final;
-
-    /**
      * Read Only local flag for EPICS
      */
     bool m_useEpicsRO;

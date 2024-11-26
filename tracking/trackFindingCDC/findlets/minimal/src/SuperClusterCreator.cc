@@ -21,6 +21,9 @@
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
+// for std::ignore
+#include <utility>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -112,8 +115,7 @@ void SuperClusterCreator::apply(std::vector<CDCWireHit>& inputWireHits,
         return false;
       };
       // the return value is not needed
-      // cppcheck-suppress ignoredReturnValue
-      std::adjacent_find(wireHitChains.begin(), wireHitChains.end(), connectWireHitChains);
+      std::ignore = std::adjacent_find(wireHitChains.begin(), wireHitChains.end(), connectWireHitChains);
 
       if (not frontWrapChain.empty()) {
         connectWireHitChains(frontWrapChain, wireHitChains.front());

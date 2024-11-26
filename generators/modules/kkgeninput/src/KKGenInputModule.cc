@@ -37,7 +37,7 @@ REG_MODULE(KKGenInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-KKGenInputModule::KKGenInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
+KKGenInputModule::KKGenInputModule() : GeneratorBaseModule(), m_initial(BeamParameters::c_smearVertex)
 {
   //Set module properties
   setDescription("KKGenInput module. This an interface for KK2f Event Generator for basf2. The generated events are stored into MCParticles. You can find an expample of its decay file (tau_decaytable.dat) for tau-pair events at ${BELLE2_RELEASE_DIR}/data/generators/kkmc. On the other hand, when you like to generate mu-pair events, ${BELLE2_RELEASE_DIR}/data/generators/kkmc/mu.input.dat should be set to tauinputFile in your steering file.");
@@ -51,10 +51,11 @@ KKGenInputModule::KKGenInputModule() : Module(), m_initial(BeamParameters::c_sme
   addParam("taudecaytableFile", m_taudecaytableFileName, "tau-decay-table file name",
            FileSystem::findFile("/data/generators/kkmc/tau.input.dat"));
   addParam("kkmcoutputfilename", m_KKMCOutputFileName, "KKMC output filename", string(""));
+
 }
 
 
-void KKGenInputModule::initialize()
+void KKGenInputModule::generatorInitialize()
 {
   //Initialize MCParticle collection
   StoreArray<MCParticle> mcparticle;
@@ -70,7 +71,7 @@ void KKGenInputModule::beginRun()
 
 }
 
-void KKGenInputModule::event()
+void KKGenInputModule::generatorEvent()
 {
 
   // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)

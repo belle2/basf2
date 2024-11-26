@@ -380,7 +380,8 @@ void DQMHistAnalysisECLModule::event()
   for (unsigned short i = 0; i < 52; i++) h_crate_time_offsets->GetXaxis()->SetBinLabel(i + 1, std::to_string(i + 1).c_str());
   h_crate_time_offsets->GetXaxis()->LabelsOption("v");
 
-  h_crate_time_offsets->Draw("AP");
+  h_crate_time_offsets->GetHistogram()->Draw();
+  h_crate_time_offsets->Draw("P");
 
   if (!m_low.empty()) {
     auto tg = new TLatex(5, 40, "Low statistics");
@@ -493,7 +494,6 @@ void DQMHistAnalysisECLModule::terminate()
   delete m_lower_boundary_time_offsets;
   delete m_upper_boundary_time_offsets;
   delete c_crate_time_offsets;
-  delete h_time_crate_Thr1GeV;
   delete h_crate_time_offsets;
   delete c_logic_summary;
   delete h_logic_summary;

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -17,7 +16,7 @@ from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm
 
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -261,10 +260,10 @@ class SingleTagPseudoScalar(BaseSkim):
         for dmID, (mode, cut) in enumerate(ModesAndCuts):
             ma.reconstructDecay(mode, cut, dmID=dmID, path=path)
 
-        ma.cutAndCopyList(f"pi0:{label}_highE", f"pi0:{label}_loose", "E > 0.5", path=path)
+        ma.cutAndCopyList(f"pi0:{label}_highE_SingleTagPseudoScalar", f"pi0:{label}_loose", "E > 0.5", path=path)
 
         particles = [
-            f"pi0:{label}_highE",
+            f"pi0:{label}_highE_SingleTagPseudoScalar",
             "eta:gg",
             "eta:pipipi0",
             "eta:pipig",

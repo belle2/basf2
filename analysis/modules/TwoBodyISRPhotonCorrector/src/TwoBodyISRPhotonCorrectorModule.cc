@@ -45,7 +45,7 @@ void TwoBodyISRPhotonCorrectorModule::initialize()
   StoreArray<Particle>().isRequired();
   DecayDescriptor inputDD, outputDD;
 
-  // Ouput list checks
+  // Output list checks
   bool outputValid = outputDD.init(m_outputGammaListName);
   if (!outputValid)
     B2ERROR("Invalid output ParticleList: " << m_outputGammaListName);

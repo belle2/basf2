@@ -19,22 +19,29 @@
 #include <framework/pcore/ProcHandler.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/core/Environment.h>
+#include <framework/core/RandomNumbers.h>
+#include <framework/database/Database.h>
 
 // framework - root utilities
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/RootFileCreationManager.h>
+#include <framework/io/RootIOUtilities.h>
+#include <framework/io/RootFileInfo.h>
+
 
 #include <cmath>
+#include <filesystem>
 
 using namespace std;
 using namespace Belle2;
+using namespace RootIOUtilities;
 
 // Register module in the framework
 REG_MODULE(VariablesToNtuple);
 
 
 VariablesToNtupleModule::VariablesToNtupleModule() :
-  Module(), m_tree("", DataStore::c_Persistent)
+  Module(), m_tree("", DataStore::c_Persistent), m_outputFileMetaData("", DataStore::c_Persistent)
 {
   //Set module properties
   setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved into separate rows.");
@@ -68,6 +75,17 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
   addParam("useFloat", m_useFloat,
            "Use float type for floating-point numbers.", false);
 
+  addParam("storeEventType", m_storeEventType,
+           "If true, the branch __eventType__ is added. The eventType information is available from MC16 on.", true);
+
+  addParam("dataDescription", m_dataDescription,
+           "Additional dictionary of "
+           "name->value pairs to be added to the file metadata to describe the data",
+           m_dataDescription);
+
+  addParam("ignoreCommandLineOverride", m_ignoreCommandLineOverride,
+           "Ignore override of file name via command line argument -o. Useful if you have multiple output modules in one path.", false);
+
 }
 
 void VariablesToNtupleModule::initialize()
@@ -79,9 +97,11 @@ void VariablesToNtupleModule::initialize()
   // Initializing the output root file
 
   // override the output file name with what's been provided with the -o option
-  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
-  if (!outputFileArgument.empty())
-    m_fileName = outputFileArgument;
+  if (!m_ignoreCommandLineOverride) {
+    const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
+    if (!outputFileArgument.empty())
+      m_fileName = outputFileArgument;
+  }
 
   if (!m_fileNameSuffix.empty())
     m_fileName = m_fileName.insert(m_fileName.rfind(".root"), m_fileNameSuffix);
@@ -101,9 +121,10 @@ void VariablesToNtupleModule::initialize()
   TDirectory::TContext directoryGuard(m_file.get());
 
   // check if TTree with that name already exists
-  if (m_file->Get(m_treeName.c_str())) {
+  if (m_file->Get(m_treeName.c_str()) || m_treeName == "persistent") {
     B2FATAL("Tree with the name \"" << m_treeName
             << "\" already exists in the file \"" << m_fileName << "\"\n"
+            << "or is reserved for FileMetaData.\n"
             << "\nYou probably want to either set the output fileName or the treeName to something else:\n\n"
             << "   from modularAnalysis import variablesToNtuple\n"
             << "   variablesToNtuple('pi+:all', ['p'], treename='pions', filename='variablesToNtuple.root')\n"
@@ -120,6 +141,12 @@ void VariablesToNtupleModule::initialize()
   m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
   m_tree.construct(m_treeName.c_str(), "");
   m_tree->get().SetCacheSize(100000);
+
+  if (!StoreObjPtr<FileMetaData>(m_fileName + c_treeNames[DataStore::c_Persistent].c_str(), DataStore::c_Persistent).isValid()) {
+    m_outputFileMetaData.registerInDataStore(m_fileName + c_treeNames[DataStore::c_Persistent].c_str(), DataStore::c_DontWriteOut);
+    m_outputFileMetaData.create();
+  }
+  m_outputFileMetaData.isRequired(m_fileName + c_treeNames[DataStore::c_Persistent].c_str());
 
   // declare counter branches - pass through variable list, remove counters added by user
   m_tree->get().Branch("__experiment__", &m_experiment, "__experiment__/I");
@@ -143,6 +170,12 @@ void VariablesToNtupleModule::initialize()
 
   if (m_stringWrapper.isOptional("MCDecayString"))
     m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
+
+  if (m_storeEventType) {
+    m_tree->get().Branch("__eventType__", &m_eventType);
+    if (not m_eventExtraInfo.isOptional())
+      B2INFO("EventExtraInfo is not registered. __eventType__ will be empty. The eventType is available from MC16 on.");
+  }
 
   for (const auto& variable : m_variables)
     if (Variable::isCounterVariable(variable)) {
@@ -221,6 +254,7 @@ void VariablesToNtupleModule::initialize()
   } else {
     m_sampling_variable = nullptr;
   }
+
 }
 
 
@@ -256,10 +290,45 @@ void VariablesToNtupleModule::event()
   m_experiment = m_eventMetaData->getExperiment();
   m_production = m_eventMetaData->getProduction();
 
+  if (m_experimentLow > m_experimentHigh) { //starting condition
+    m_experimentLow = m_experimentHigh = m_experiment;
+    m_runLow = m_runHigh = m_run;
+    m_eventLow = m_eventHigh = m_event;
+  } else {
+    if ((m_experiment < m_experimentLow) ||
+        ((m_experiment == m_experimentLow) && ((m_run < m_runLow) || ((m_run == m_runLow) && (m_event < m_eventLow))))) {
+      m_experimentLow = m_experiment;
+      m_runLow = m_run;
+      m_eventLow = m_event;
+    }
+    if ((m_experiment > m_experimentHigh) ||
+        ((m_experiment == m_experimentHigh) && ((m_run > m_runHigh) || ((m_run == m_runHigh) && (m_event > m_eventHigh))))) {
+      m_experimentHigh = m_experiment;
+      m_runHigh = m_run;
+      m_eventHigh = m_event;
+    }
+  }
+
+  if (m_inputFileMetaData.isValid()) {
+    std::string lfn = m_inputFileMetaData->getLfn();
+    if (not lfn.empty() and (m_parentLfns.empty() or (m_parentLfns.back() != lfn))) {
+      m_parentLfns.push_back(lfn);
+    }
+  }
+
+  // check if the event is a full event or not: if yes, increase the counter
+  if (m_eventMetaData->getErrorFlag() == 0) // no error flag -> this is a full event
+    m_eventCount++;
+
   if (m_stringWrapper.isValid())
     m_MCDecayString = m_stringWrapper->getString();
   else
     m_MCDecayString = "";
+
+  if (m_storeEventType and m_eventExtraInfo.isValid())
+    m_eventType = m_eventExtraInfo->getEventType();
+  else
+    m_eventType = "";
 
   if (not m_signalSideParticleList.empty()) {
     if (m_roe.isValid()) {
@@ -351,11 +420,51 @@ void VariablesToNtupleModule::event()
   }
 }
 
+void VariablesToNtupleModule::fillFileMetaData()
+{
+
+  FileMetaData outputFileMetaData;
+  bool isMC = (m_inputFileMetaData) ? m_inputFileMetaData->isMC() : true;
+  if (!isMC) outputFileMetaData.declareRealData();
+
+  outputFileMetaData.setLow(m_experimentLow, m_runLow, m_eventLow);
+  outputFileMetaData.setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
+  outputFileMetaData.setNEvents(m_tree->get().GetEntries());
+  outputFileMetaData.setNFullEvents(m_eventCount);
+
+  //fill more file level metadata
+  RootIOUtilities::setCreationData(outputFileMetaData);
+  outputFileMetaData.setRandomSeed(RandomNumbers::getSeed());
+  outputFileMetaData.setSteering(Environment::Instance().getSteering());
+  auto mcEvents = Environment::Instance().getNumberOfMCEvents();
+  outputFileMetaData.setMcEvents(mcEvents);
+  outputFileMetaData.setDatabaseGlobalTag(Database::Instance().getGlobalTags());
+  for (const auto& item : m_dataDescription) {
+    m_outputFileMetaData->setDataDescription(item.first, item.second);
+  }
+  for (const auto& item : m_outputFileMetaData->getDataDescription()) {
+    outputFileMetaData.setDataDescription(item.first, item.second);
+  }
+  outputFileMetaData.setDataDescription("isNtupleMetaData", "True");
+  std::sort(m_parentLfns.begin(), m_parentLfns.end());
+  m_parentLfns.erase(std::unique(m_parentLfns.begin(), m_parentLfns.end()), m_parentLfns.end());
+  outputFileMetaData.setParents(m_parentLfns);
+  outputFileMetaData.setLfn(m_file->GetName());
+
+  TTree* persistent = new TTree(c_treeNames[DataStore::c_Persistent].c_str(), c_treeNames[DataStore::c_Persistent].c_str());
+  persistent->Branch("FileMetaData", &outputFileMetaData);
+  persistent->Fill();
+  persistent->Write("persistent", TObject::kWriteDelete);
+}
+
 void VariablesToNtupleModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
-    B2INFO("Writing NTuple " << m_treeName);
+
     TDirectory::TContext directoryGuard(m_file.get());
+    fillFileMetaData();
+
+    B2INFO("Writing NTuple " << m_treeName);
     m_tree->write(m_file.get());
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);

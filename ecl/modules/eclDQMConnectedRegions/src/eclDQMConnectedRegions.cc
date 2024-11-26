@@ -11,15 +11,16 @@
 
 /* Basf2 headers. */
 #include <framework/core/HistoModule.h>
-#include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 
-#include <string>
 /* ROOT headers. */
 #include <TDirectory.h>
+
+/* C++ headers. */
+#include <string>
 
 //NAMESPACE(S)
 using namespace Belle2;

@@ -155,6 +155,7 @@ import itertools
 import subprocess
 import os
 
+import basf2_mva
 import basf2
 from tracking import add_track_finding
 from tracking.path_utils import add_hit_preparation_modules
@@ -163,6 +164,7 @@ import background
 import simulation
 
 from ckf_training import my_basf2_mva_teacher, create_fbdt_option_string
+from tracking_mva_filter_payloads.write_tracking_mva_filter_payloads_to_db import write_tracking_mva_filter_payloads_to_db
 
 # wrap python modules that are used here but not in the externals into a try except block
 install_helpstring_formatter = ("\nCould not find {module} python module.Try installing it via\n"
@@ -234,10 +236,12 @@ class GenerateSimTask(Basf2PathTask):
         )
         path.add_module("EvtGenInput")
         bkg_files = ""
+        # \cond suppress doxygen warning
         if self.experiment_number == 0:
             bkg_files = background.get_background_files()
         else:
             bkg_files = background.get_background_files(self.bkgfiles_dir)
+        # \endcond
 
         simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, usePXDDataReduction=False)
 
@@ -546,19 +550,21 @@ class CKFStateFilterTeacherTask(Basf2Task):
         #: \endcond
     )
 
-    def get_weightfile_xml_identifier(self, fast_bdt_option=None, filter_number=1):
+    def get_weightfile_identifier(self, fast_bdt_option=None, filter_number=None):
         """
-        Name of the xml weightfile that is created by the teacher task.
-        It is subsequently used as a local weightfile in the following validation tasks.
+        Name of weightfile that is created by the teacher task.
 
         :param fast_bdt_option: FastBDT option that is used to train this MVA
         :param filter_number: Filter number (first=1, second=2, third=3) to be trained
+
         """
         if fast_bdt_option is None:
             fast_bdt_option = self.fast_bdt_option_state_filter
         fast_bdt_string = create_fbdt_option_string(fast_bdt_option)
+        if filter_number is None:
+            filter_number = self.filter_number
         weightfile_name = f"trk_CDCToSVDSpacePointStateFilter_{filter_number}" + fast_bdt_string
-        return weightfile_name + ".xml"
+        return weightfile_name
 
     def requires(self):
         """
@@ -578,7 +584,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
         Generate list of output files that the task should produce.
         The task is considered finished if and only if the outputs all exist.
         """
-        yield self.add_to_output(self.get_weightfile_xml_identifier(filter_number=self.filter_number))
+        yield self.add_to_output(self.get_weightfile_identifier() + ".root")
 
     def process(self):
         """
@@ -589,17 +595,19 @@ class CKFStateFilterTeacherTask(Basf2Task):
         is inherited from ``Basf2Task``.
         """
         records_files = self.get_input_file_names(f"records{self.filter_number}.root")
+        weightfile_identifier = self.get_weightfile_identifier(filter_number=self.filter_number)
         tree_name = f"records{self.filter_number}"
-        print(f"Processed records files: {records_files=},\nfeature tree name: {tree_name=}")
+        print(f"Processed records files: {records_files},\nfeature tree name: {tree_name}")
 
         my_basf2_mva_teacher(
             records_files=records_files,
             tree_name=tree_name,
-            weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier(filter_number=self.filter_number)),
+            weightfile_identifier=weightfile_identifier,
             target_variable=self.training_target,
             exclude_variables=self.exclude_variables,
             fast_bdt_option=self.fast_bdt_option_state_filter,
         )
+        basf2_mva.download(weightfile_identifier, self.get_output_file_name(weightfile_identifier + ".root"))
 
 
 class ResultRecordingTask(Basf2PathTask):
@@ -624,6 +632,9 @@ class ResultRecordingTask(Basf2PathTask):
     )
     #: Name of the records file for training the final result filter
     result_filter_records_name = b2luigi.Parameter()
+
+    # prepend the testing payloads
+    basf2.conditions.prepend_testing_payloads("localdb/database.txt")
 
     def output(self):
         """
@@ -689,6 +700,32 @@ class ResultRecordingTask(Basf2PathTask):
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCRecoTracks")
 
         fast_bdt_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
+        # write the tracking MVA filter parameters and the cut on MVA classifier to be applied on a local db
+        iov = [0, 0, 0, -1]
+        write_tracking_mva_filter_payloads_to_db(
+            f"trk_CDCToSVDSpacePointStateFilter_1_Parameter{fast_bdt_string}",
+            iov,
+            f"trk_CDCToSVDSpacePointStateFilter_1{fast_bdt_string}",
+            0.001)
+
+        write_tracking_mva_filter_payloads_to_db(
+            f"trk_CDCToSVDSpacePointStateFilter_2_Parameter{fast_bdt_string}",
+            iov,
+            f"trk_CDCToSVDSpacePointStateFilter_2{fast_bdt_string}",
+            0.001)
+
+        write_tracking_mva_filter_payloads_to_db(
+            f"trk_CDCToSVDSpacePointStateFilter_3_Parameter{fast_bdt_string}",
+            iov,
+            f"trk_CDCToSVDSpacePointStateFilter_3{fast_bdt_string}",
+            0.001)
+
+        basf2.conditions.prepend_testing_payloads("localdb/database.txt")
+        first_high_filter_parameters = {"DBPayloadName": f"trk_CDCToSVDSpacePointStateFilter_1_Parameter{fast_bdt_string}",
+                                        "direction": "backward"}
+        second_high_filter_parameters = {"DBPayloadName": f"trk_CDCToSVDSpacePointStateFilter_2_Parameter{fast_bdt_string}"}
+        third_high_filter_parameters = {"DBPayloadName": f"trk_CDCToSVDSpacePointStateFilter_3_Parameter{fast_bdt_string}"}
+
         path.add_module("CDCToSVDSpacePointCKF",
                         inputRecoTrackStoreArrayName="CDCRecoTracks",
                         outputRecoTrackStoreArrayName="VXDRecoTracks",
@@ -699,27 +736,20 @@ class ResultRecordingTask(Basf2PathTask):
                         writeOutDirection="backward",
 
                         firstHighFilter="mva_with_direction_check",
-                        firstHighFilterParameters={
-                            "identifier": self.get_input_file_names(f"trk_CDCToSVDSpacePointStateFilter_1{fast_bdt_string}.xml")[0],
-                            "cut": 0.001,
-                            "direction": "backward"},
+                        firstHighFilterParameters=first_high_filter_parameters,
                         firstHighUseNStates=10,
 
                         advanceHighFilter="advance",
                         advanceHighFilterParameters={"direction": "backward"},
 
                         secondHighFilter="mva",
-                        secondHighFilterParameters={
-                            "identifier": self.get_input_file_names(f"trk_CDCToSVDSpacePointStateFilter_2{fast_bdt_string}.xml")[0],
-                            "cut": 0.001},
+                        secondHighFilterParameters=second_high_filter_parameters,
                         secondHighUseNStates=10,
 
                         updateHighFilter="fit",
 
                         thirdHighFilter="mva",
-                        thirdHighFilterParameters={
-                            "identifier": self.get_input_file_names(f"trk_CDCToSVDSpacePointStateFilter_3{fast_bdt_string}.xml")[0],
-                            "cut": 0.001},
+                        thirdHighFilterParameters=third_high_filter_parameters,
                         thirdHighUseNStates=10,
 
                         filter="recording",
@@ -785,10 +815,9 @@ class CKFResultFilterTeacherTask(Basf2Task):
         #: \endcond
     )
 
-    def get_weightfile_xml_identifier(self, fast_bdt_option=None):
+    def get_weightfile_identifier(self, fast_bdt_option=None):
         """
-        Name of the xml weightfile that is created by the teacher task.
-        It is subsequently used as a local weightfile in the following validation tasks.
+        Name of weightfile that is created by the teacher task.
 
         :param fast_bdt_option: FastBDT option that is used to train this MVA
         """
@@ -796,7 +825,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
             fast_bdt_option = self.fast_bdt_option_result_filter
         fast_bdt_string = create_fbdt_option_string(fast_bdt_option)
         weightfile_name = "trk_CDCToSVDSpacePointResultFilter" + fast_bdt_string
-        return weightfile_name + ".xml"
+        return weightfile_name
 
     def requires(self):
         """
@@ -815,7 +844,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
         Generate list of output files that the task should produce.
         The task is considered finished if and only if the outputs all exist.
         """
-        yield self.add_to_output(self.get_weightfile_xml_identifier())
+        yield self.add_to_output(self.get_weightfile_identifier() + ".root")
 
     def process(self):
         """
@@ -827,16 +856,18 @@ class CKFResultFilterTeacherTask(Basf2Task):
         """
         records_files = self.get_input_file_names(self.result_filter_records_name)
         tree_name = "records"
-        print(f"Processed records files for result filter training: {records_files=},\nfeature tree name: {tree_name=}")
-
+        print(f"Processed records files for result filter training: {records_files},\nfeature tree name: {tree_name}")
+        weightfile_identifier = self.get_weightfile_identifier()
         my_basf2_mva_teacher(
             records_files=records_files,
             tree_name=tree_name,
-            weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier()),
+            weightfile_identifier=weightfile_identifier,
             target_variable=self.training_target,
             exclude_variables=self.exclude_variables,
             fast_bdt_option=self.fast_bdt_option_result_filter,
         )
+
+        basf2_mva.download(weightfile_identifier, self.get_output_file_name(weightfile_identifier + ".root"))
 
 
 class ValidationAndOptimisationTask(Basf2PathTask):
@@ -870,6 +901,9 @@ class ValidationAndOptimisationTask(Basf2PathTask):
     result_filter_cut = b2luigi.FloatParameter()
     #: How many results should be kept at maximum to search for overlaps.
     use_n_best_results = b2luigi.IntParameter()
+
+    # prepend the testing payloads
+    basf2.conditions.prepend_testing_payloads("localdb/database.txt")
 
     def output(self):
         """
@@ -933,6 +967,41 @@ class ValidationAndOptimisationTask(Basf2PathTask):
 
         fbdt_state_filter_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
         fbdt_result_filter_string = create_fbdt_option_string(self.fast_bdt_option_result_filter)
+
+        # write the tracking MVA filter parameters and the cut on MVA classifier to be applied on a local db
+        iov = [0, 0, 0, -1]
+        write_tracking_mva_filter_payloads_to_db(
+            f"trk_CDCToSVDSpacePointStateFilter_1_Parameter{fbdt_state_filter_string}",
+            iov,
+            f"trk_CDCToSVDSpacePointStateFilter_1{fbdt_state_filter_string}",
+            self.state_filter_cut)
+
+        write_tracking_mva_filter_payloads_to_db(
+            f"trk_CDCToSVDSpacePointStateFilter_2_Parameter{fbdt_state_filter_string}",
+            iov,
+            f"trk_CDCToSVDSpacePointStateFilter_2{fbdt_state_filter_string}",
+            self.state_filter_cut)
+
+        write_tracking_mva_filter_payloads_to_db(
+            f"trk_CDCToSVDSpacePointStateFilter_3_Parameter{fbdt_state_filter_string}",
+            iov,
+            f"trk_CDCToSVDSpacePointStateFilter_3{fbdt_state_filter_string}",
+            self.state_filter_cut)
+
+        write_tracking_mva_filter_payloads_to_db(
+            f"trk_CDCToSVDSpacePointResultFilter_Parameter{fbdt_result_filter_string}",
+            iov,
+            f"trk_CDCToSVDSpacePointResultFilter{fbdt_result_filter_string}",
+            self.result_filter_cut)
+
+        basf2.conditions.prepend_testing_payloads("localdb/database.txt")
+        first_high_filter_parameters = {"DBPayloadName": f"trk_CDCToSVDSpacePointStateFilter_1_Parameter{fbdt_state_filter_string}",
+                                        "direction": "backward"}
+        second_high_filter_parameters = {
+            "DBPayloadName": f"trk_CDCToSVDSpacePointStateFilter_2_Parameter{fbdt_state_filter_string}"}
+        third_high_filter_parameters = {"DBPayloadName": f"trk_CDCToSVDSpacePointStateFilter_3_Parameter{fbdt_state_filter_string}"}
+        filter_parameters = {"DBPayloadName":  f"trk_CDCToSVDSpacePointResultFilter_Parameter{fbdt_result_filter_string}"}
+
         path.add_module("CDCToSVDSpacePointCKF",
 
                         inputRecoTrackStoreArrayName="CDCRecoTracks",
@@ -944,37 +1013,24 @@ class ValidationAndOptimisationTask(Basf2PathTask):
                         writeOutDirection="backward",
 
                         firstHighFilter="mva_with_direction_check",
-                        firstHighFilterParameters={
-                            "identifier": self.get_input_file_names(
-                                f"trk_CDCToSVDSpacePointStateFilter_1{fbdt_state_filter_string}.xml")[0],
-                            "cut": self.state_filter_cut,
-                            "direction": "backward"},
+                        firstHighFilterParameters=first_high_filter_parameters,
                         firstHighUseNStates=self.use_n_best_states,
 
                         advanceHighFilter="advance",
                         advanceHighFilterParameters={"direction": "backward"},
 
                         secondHighFilter="mva",
-                        secondHighFilterParameters={
-                            "identifier": self.get_input_file_names(
-                                f"trk_CDCToSVDSpacePointStateFilter_2{fbdt_state_filter_string}.xml")[0],
-                            "cut": self.state_filter_cut},
+                        secondHighFilterParameters=second_high_filter_parameters,
                         secondHighUseNStates=self.use_n_best_states,
 
                         updateHighFilter="fit",
 
                         thirdHighFilter="mva",
-                        thirdHighFilterParameters={
-                            "identifier": self.get_input_file_names(
-                                f"trk_CDCToSVDSpacePointStateFilter_3{fbdt_state_filter_string}.xml")[0],
-                            "cut": self.state_filter_cut},
+                        thirdHighFilterParameters=third_high_filter_parameters,
                         thirdHighUseNStates=self.use_n_best_states,
 
                         filter="mva",
-                        filterParameters={
-                            "identifier": self.get_input_file_names(
-                                f"trk_CDCToSVDSpacePointResultFilter{fbdt_result_filter_string}.xml")[0],
-                            "cut": self.result_filter_cut},
+                        filterParameters=filter_parameters,
                         useBestNInSeed=self.use_n_best_results,
 
                         exportTracks=True,
@@ -1093,7 +1149,8 @@ class MainTask(b2luigi.WrapperTask):
 
 
 if __name__ == "__main__":
+
     b2luigi.set_setting("env_script", "./setup_basf2.sh")
-    b2luigi.set_setting("batch_system", "htcondor")
+    b2luigi.get_setting("batch_system", "lsf")
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MainTask(), workers=workers, batch=True)

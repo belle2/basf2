@@ -7,13 +7,14 @@
 #                                                                        #
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
-# #########################################################################
+##########################################################################
 
 import copy
 import math
 
 import pandas
 import numpy
+import itertools
 import matplotlib.pyplot as plt
 import matplotlib.artist
 import matplotlib.figure
@@ -34,7 +35,6 @@ import matplotlib
 # Do not use standard backend TkAgg, because it is NOT thread-safe
 # You will get an RuntimeError: main thread is not in main loop otherwise!
 matplotlib.use("svg")
-matplotlib.rcParams.update({'font.size': 36})
 
 # Use the Belle II style while producing the plots
 plt.style.use("belle2")
@@ -82,19 +82,25 @@ class Plotter:
         """
         b2.B2INFO("Create new figure for class " + str(type(self)))
         if figure is None:
-            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
-            self.figure.set_tight_layout(False)
+            #: create figure
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
+            self.figure.set_tight_layout(True)
         else:
             self.figure = figure
 
         if axis is None:
+            #: divide figure into subplots
             self.axis = self.figure.add_subplot(1, 1, 1)
         else:
             self.axis = axis
 
+        #: create empty list for plots
         self.plots = []
+        #: create empty list for labels
         self.labels = []
+        #: set x limits
         self.xmin, self.xmax = float(0), float(1)
+        #: set y limits
         self.ymin, self.ymax = float(0), float(1)
         #: y limit scale
         self.yscale = 0.1
@@ -114,6 +120,9 @@ class Plotter:
         self.set_errorbar_options()
         self.set_errorband_options()
         self.set_fill_options()
+
+        #: Property cycler used to give plots unique colors
+        self.prop_cycler = itertools.cycle(plt.rcParams["axes.prop_cycle"])
 
     def add_subplot(self, gridspecs):
         """
@@ -185,7 +194,7 @@ class Plotter:
         fill_kwargs = copy.copy(self.fill_kwargs)
 
         if plot_kwargs is None or 'color' not in plot_kwargs:
-            color = next(axis._get_lines.prop_cycler)
+            color = next(self.prop_cycler)
             color = color['color']
             plot_kwargs['color'] = color
         else:
@@ -212,7 +221,10 @@ class Plotter:
                 xerr = xerr*numpy.ones(len(x))
             mask = numpy.logical_and.reduce([numpy.isfinite(v) for v in [x, y, xerr, yerr]])
 
-            e = axis.errorbar(x[mask], y[mask], xerr=xerr[mask], yerr=yerr[mask], rasterized=True, **errorbar_kwargs)
+            e = axis.errorbar(
+                x[mask], y[mask], xerr=numpy.where(
+                    xerr[mask] < 0, 0.0, xerr[mask]), yerr=numpy.where(
+                    yerr[mask] < 0, 0.0, yerr[mask]), rasterized=True, **errorbar_kwargs)
             patches.append(e)
 
         if errorband_kwargs is not None and yerr is not None:
@@ -487,7 +499,8 @@ class Multiplot(Plotter):
         @param figure default draw figure which is used
         """
         if figure is None:
-            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
+            #: create figure
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
             self.figure.set_tight_layout(True)
         else:
             self.figure = figure
@@ -503,6 +516,7 @@ class Multiplot(Plotter):
 
         #: the subplots which are displayed in the grid
         self.sub_plots = [cls(self.figure, self.figure.add_subplot(gs[i // 3, i % 3])) for i in range(number_of_plots)]
+        #: the axis of the first subplot
         self.axis = self.sub_plots[0].axis
         super().__init__(self.figure, self.axis)
 
@@ -691,7 +705,7 @@ class Box(Plotter):
     #: @var x_axis_label
     #: Label on x axis
 
-    def __init__(self, figure=None, axis=None):
+    def __init__(self, figure=None, axis=None, x_axis_label=None):
         """
         Creates a new figure and axis if None is given, sets the default plot parameters
         @param figure default draw figure which is used
@@ -700,7 +714,7 @@ class Box(Plotter):
         super().__init__(figure=figure, axis=axis)
 
         #: Label on x axis
-        self.x_axis_label = ""
+        self.x_axis_label = x_axis_label
 
     def add(self, data, column, mask=None, weight_column=None):
         """
@@ -721,14 +735,16 @@ class Box(Plotter):
             b2.B2WARNING("Ignore empty boxplot.")
             return self
 
+        # we don't plot outliers as they cause the file size to explode if large datasets are used
         p = self.axis.boxplot(x, sym='k.', whis=1.5, vert=False, patch_artist=True, showmeans=True, widths=1,
-                              boxprops=dict(facecolor='blue', alpha=0.5),
+                              boxprops=dict(facecolor='blue', alpha=0.5), showfliers=False,
                               # medianprobs=dict(color='blue'),
                               # meanprobs=dict(color='red'),
                               )
         self.plots.append(p)
         self.labels.append(column)
-        self.x_axis_label = column
+        if not self.x_axis_label:
+            self.x_axis_label = column
         r"""
         self.axis.text(0.1, 0.9, (r'$     \mu = {:.2f}$' + '\n' + r'$median = {:.2f}$').format(x.mean(), x.median()),
                        fontsize=28, verticalalignment='top', horizontalalignment='left', transform=self.axis.transAxes)
@@ -835,7 +851,7 @@ class Difference(Plotter):
         self.axis.set_title("Difference Plot")
         self.axis.get_yaxis().set_major_locator(matplotlib.ticker.MaxNLocator(5))
         self.axis.get_xaxis().set_label_text(self.x_axis_label)
-        self.axis.get_yaxis().set_label_text('Difference')
+        self.axis.get_yaxis().set_label_text('Diff.')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
 
@@ -860,14 +876,18 @@ class Overtraining(Plotter):
         @param figure default draw figure which is used
         """
         if figure is None:
-            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
+            #: create figure
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
             self.figure.set_tight_layout(True)
         else:
             self.figure = figure
 
         gs = matplotlib.gridspec.GridSpec(5, 1)
+        #: define first subplot
         self.axis = self.figure.add_subplot(gs[:3, :])
+        #: define second subplot
         self.axis_d1 = self.figure.add_subplot(gs[3, :], sharex=self.axis)
+        #: define third subplot
         self.axis_d2 = self.figure.add_subplot(gs[4, :], sharex=self.axis)
 
         super().__init__(self.figure, self.axis)
@@ -936,14 +956,14 @@ class Overtraining(Plotter):
             else:
                 ks = scipy.stats.ks_2samp(data[column][train_mask & signal_mask], data[column][test_mask & signal_mask])
                 props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
-                self.axis_d1.text(0.1, 0.9, r'signal (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36, bbox=props,
+                self.axis_d1.text(0.1, 0.9, r'signal (train - test) difference $p={:.2f}$'.format(ks[1]),  bbox=props,
                                   verticalalignment='top', horizontalalignment='left', transform=self.axis_d1.transAxes)
             if len(data[column][train_mask & bckgrd_mask]) == 0 or len(data[column][test_mask & bckgrd_mask]) == 0:
                 b2.B2WARNING("Cannot calculate kolmogorov smirnov test for background due to missing data")
             else:
                 ks = scipy.stats.ks_2samp(data[column][train_mask & bckgrd_mask], data[column][test_mask & bckgrd_mask])
                 props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
-                self.axis_d2.text(0.1, 0.9, r'background (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36,
+                self.axis_d2.text(0.1, 0.9, r'background (train - test) difference $p={:.2f}$'.format(ks[1]),
                                   bbox=props,
                                   verticalalignment='top', horizontalalignment='left', transform=self.axis_d2.transAxes)
         except ImportError:
@@ -974,7 +994,7 @@ class VerboseDistribution(Plotter):
     #: Axes for the boxplots
     box_axes = None
 
-    def __init__(self, figure=None, axis=None, normed=False, range_in_std=None):
+    def __init__(self, figure=None, axis=None, normed=False, range_in_std=None, x_axis_label=None):
         """
         Creates a new figure and axis if None is given, sets the default plot parameters
         @param figure default draw figure which is used
@@ -987,9 +1007,12 @@ class VerboseDistribution(Plotter):
         self.normed = normed
         #: Show only a certain range in terms of standard deviations of the data
         self.range_in_std = range_in_std
+        #: create empty list for box axes
         self.box_axes = []
         #: The distribution plot
         self.distribution = Distribution(self.figure, self.axis, normed_to_all_entries=self.normed, range_in_std=self.range_in_std)
+        #: x axis label
+        self.x_axis_label = x_axis_label
 
     def add(self, data, column, mask=None, weight_column=None, label=None):
         """
@@ -1014,7 +1037,7 @@ class VerboseDistribution(Plotter):
             mean, std = histogram.weighted_mean_and_std(data[column], None if weight_column is None else data[weight_column])
             # Everything outside mean +- range_in_std * std is considered not inside the mask
             mask = mask & (data[column] > (mean - self.range_in_std * std)) & (data[column] < (mean + self.range_in_std * std))
-        box = Box(self.figure, box_axis)
+        box = Box(self.figure, box_axis, x_axis_label=self.x_axis_label)
         box.add(data, column, mask, weight_column)
         if len(box.plots) > 0:
             box.plots[0]['boxes'][0].set_facecolor(self.distribution.plots[-1][0][0].get_color())
@@ -1060,14 +1083,18 @@ class Correlation(Plotter):
         @param figure default draw figure which is used
         """
         if figure is None:
-            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
+            #: create figure
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
             self.figure.set_tight_layout(True)
         else:
             self.figure = figure
 
         gs = matplotlib.gridspec.GridSpec(3, 2)
+        #: define first subplot
         self.axis = self.figure.add_subplot(gs[0, :])
+        #: define second subplot
         self.axis_d1 = self.figure.add_subplot(gs[1, :], sharex=self.axis)
+        #: define third subplot
         self.axis_d2 = self.figure.add_subplot(gs[2, :], sharex=self.axis)
 
         super().__init__(self.figure, self.axis)
@@ -1232,13 +1259,16 @@ class CorrelationMatrix(Plotter):
         @param figure default draw figure which is used
         """
         if figure is None:
-            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
+            #: create figure
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
             self.figure.set_tight_layout(True)
         else:
             self.figure = figure
 
         gs = matplotlib.gridspec.GridSpec(8, 2)
+        #: add signal subplot
         self.signal_axis = self.figure.add_subplot(gs[:6, 0])
+        #: add background subplot
         self.bckgrd_axis = self.figure.add_subplot(gs[:6, 1], sharey=self.signal_axis)
         #: Colorbar axis contains the colorbar
         self.colorbar_axis = self.figure.add_subplot(gs[7, :])

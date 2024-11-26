@@ -14,7 +14,10 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <string>
+
 #include <memory>
+
+#include <vector>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -61,6 +64,9 @@ namespace Belle2 {
 
       /// Const version of operator
       Weight operator()(const Object& object) const;
+
+      /// Evaluate the MVA method over a vector of objects. Returns float weight or NAN (when object is rejected) for each object
+      virtual std::vector<float> operator()(const std::vector <Object*>& objs) override;
 
     public:
       /// Return name of the selected filter

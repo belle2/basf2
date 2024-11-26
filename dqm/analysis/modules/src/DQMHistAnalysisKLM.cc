@@ -51,8 +51,6 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   addParam("MessageThreshold", m_MessageThreshold,
            "Max number of messages to show up in channel occupancy plots", 12);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
-  addParam("RefHistogramDirectoryPrefix", m_refHistogramDirectoryPrefix, "Prefix to account for reference file", std::string("ref/"));
-  addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
   m_2DHitsLine.SetLineColor(kRed);
@@ -77,10 +75,6 @@ void DQMHistAnalysisKLMModule::initialize()
             << LogVar("Threshold for hot channels", m_ThresholdForHot)
             << LogVar("Threshold for masked channels", m_ThresholdForMasked));
 
-  if (m_refFileName != "") {
-    m_refFile = TFile::Open(m_refFileName.data(), "READ");
-  }
-
   // register plots for delta histogramming
   addDeltaPar(m_histogramDirectoryName, "time_rpc", HistDelta::c_Entries, m_minEntries, 1);
   addDeltaPar(m_histogramDirectoryName, "time_scintillator_bklm", HistDelta::c_Entries, m_minEntries, 1);
@@ -90,7 +84,6 @@ void DQMHistAnalysisKLMModule::initialize()
   registerEpicsPV("KLM:MaskedChannels", "MaskedChannels");
   registerEpicsPV("KLM:DeadBarrelModules", "DeadBarrelModules");
   registerEpicsPV("KLM:DeadEndcapModules", "DeadEndcapModules");
-  updateEpicsPVs(5.0);
 
   gROOT->cd();
 
@@ -113,21 +106,10 @@ void DQMHistAnalysisKLMModule::initialize()
     }
   }
 
-
-  //search for reference
-  if (m_refFile && m_refFile->IsOpen()) {
-    B2INFO("DQMHistAnalysisKLM: reference root file (" << m_refFileName << ") FOUND, able to read ref histograms");
-
-  } else
-    B2WARNING("DQMHistAnalysisKLM: reference root file (" << m_refFileName << ") not found, or closed");
 }
 
 void DQMHistAnalysisKLMModule::terminate()
 {
-  if (m_refFile) {
-    m_refFile->Close();
-    delete m_refFile;
-  }
 }
 
 void DQMHistAnalysisKLMModule::beginRun()
@@ -160,7 +142,7 @@ void DQMHistAnalysisKLMModule::endRun()
     m_monObj->setVariable("BKLM_Scint_Time_Peak", max_position);
   }
 
-  TH1* time_scint_eklm = findHist(m_histogramDirectoryName + "/time_scintillator_bklm");
+  TH1* time_scint_eklm = findHist(m_histogramDirectoryName + "/time_scintillator_eklm");
   if (time_scint_eklm) {
     hist_max_bin = time_scint_eklm->GetMaximumBin();
     max_position = time_scint_eklm->GetXaxis()->GetBinCenter(hist_max_bin);
@@ -213,15 +195,10 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   deltaDrawer(delta, histogram, canvas); //draw normalized delta on top
   n = histogram->GetXaxis()->GetNbins();
 
-  /* call reference histograms */
-  TH1* ref_histogram = nullptr;
+  /* call reference histograms from base class*/
+  TH1* ref_histogram = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+  if (ref_histogram) {ref_histogram->Draw("hist,same");}
   float ref_average = 0;
-  if (m_refFile && m_refFile->IsOpen()) {
-    ref_histogram = (TH1*)m_refFile->Get((m_refHistogramDirectoryPrefix + histogram->GetName()).data());
-    if (!ref_histogram) {
-      B2WARNING("Unable to find " << m_refHistogramDirectoryPrefix << histogram->GetName() << " in reference file.");
-    }
-  }
 
   if (ref_histogram != nullptr) {
     for (i = 1; i <= n; i++) {
@@ -344,7 +321,6 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     std::string verbose_message = " more messages";
     verbose_message = std::to_string(message_counter - m_MessageThreshold) + verbose_message;
     latex.DrawLatexNDC(x, y, verbose_message.c_str());
-    y -= 0.05;
   }
 
 
@@ -376,8 +352,8 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       divisions = 7;
       shift = 1;
     } else {
-      divisions = 8;
-      shift = 8;
+      divisions = BKLMElementNumbers::getMaximalSectorNumber();
+      shift = BKLMElementNumbers::getMaximalSectorNumber();
     }
     for (int k = 0; k < divisions; k++) {
       xLine = (histogram->GetXaxis()->GetBinLowEdge(bin) - canvas->GetX1()) / (canvas->GetX2() - canvas->GetX1());
@@ -445,6 +421,9 @@ void DQMHistAnalysisKLMModule::processTimeHistogram(
       B2INFO("DQMHistAnalysisKLM: Time Delta Entries is " << delta->GetEntries());
       deltaDrawer(delta, histogram, canvas);
     }
+    //reference check
+    TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+    if (ref) {ref->Draw("hist,same");}
   }
 }
 
@@ -509,6 +488,9 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
     canvas->cd();
     histogram->SetStats(false);
     histogram->Draw();
+    //reference check
+    TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+    if (ref) {ref->Draw("hist,same");}
 
     int message_counter = 0;
     if (histName.find("bklm") != std::string::npos) {
@@ -522,11 +504,11 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         if (sector > 0)
           m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
         name = "B";
-        if (sector < 8)
+        if (sector < BKLMElementNumbers::getMaximalSectorNumber())
           name += "B";
         else
           name += "F";
-        name += std::to_string(sector % 8);
+        name += std::to_string(sector % BKLMElementNumbers::getMaximalSectorNumber());
         m_PlaneText.DrawText(xText, yText, name.c_str());
       }
       /* Then, color the canvas with red if there is a dead module
@@ -601,7 +583,6 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       std::string verbose_string = " more messages";
       verbose_string = std::to_string(message_counter - m_MessageThreshold) + verbose_string;
       latex.DrawLatexNDC(xAlarm, yAlarm, verbose_string.c_str());
-      yAlarm -= 0.05;
     }
     canvas->Modified();
     canvas->Update();
@@ -707,6 +688,11 @@ void DQMHistAnalysisKLMModule::event()
 
   B2DEBUG(20, "Updating EPICS PVs for DQMHistAnalysisKLM");
   // only update PVs if there's enough statistics and datasize != 0
+  // Check if it's a null run, if so, don't update EPICS PVs
+  if (m_IsNullRun) {
+    B2INFO("DQMHistAnalysisKLM: Null run detected. No PV Update.");
+    return;
+  }
   auto* daqDataSize = findHist("DAQ/KLMDataSize");
   double meanDAQDataSize = 0.;
   if (daqDataSize != nullptr) {

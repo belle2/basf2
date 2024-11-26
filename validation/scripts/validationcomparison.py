@@ -52,7 +52,7 @@ class ObjectsNotSupported(Exception):
 class DifferingBinCount(Exception):
     """
     The two ROOT objects provided have a different bin count
-    and therefor, cannot be compared using the Chi2 test
+    and therefore, cannot be compared using the Chi2 test
     """
 
 

@@ -86,7 +86,7 @@ namespace {
     if (nTangents == 0) {
       //pass
     } else if (nTangents == 1) {
-      // Only one tangent no averaging necesssary
+      // Only one tangent no averaging necessary
       const CDCTangent& tangent = *tangentIt;
       result.push_back(tangent.getFromRecoHit2D());
       result.push_back(tangent.getToRecoHit2D());
@@ -149,7 +149,7 @@ namespace {
       const CDCFacet& secondFacet = *secondFacetIt;
 
       result.push_back(firstFacet.getStartRecoHit2D());
-      result.push_back(CDCRecoHit2D::average(secondFacet.getStartRecoHit2D() ,
+      result.push_back(CDCRecoHit2D::average(secondFacet.getStartRecoHit2D(),
                                              firstFacet.getMiddleRecoHit2D()));
 
       result.push_back(CDCRecoHit2D::average(secondFacet.getMiddleRecoHit2D(),

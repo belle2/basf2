@@ -50,7 +50,7 @@ def get_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument('-c', '--compile', dest='compile', action='store_true',
                         help='Compile latex to pdf directly')
     parser.add_argument('-a', '--abbreviation_length', dest='abbreviation_length',
-                        action='store', type=int, default=5,
+                        action='store', type=int, default=10,
                         help='Number of characters to which variable names are abbreviated.')
     return parser
 
@@ -247,7 +247,7 @@ if __name__ == '__main__':
             variable_abbr = variable_abbreviations[v]
             o += b2latex.SubSection(format.string(v))
             graphics = b2latex.Graphics()
-            p = plotting.VerboseDistribution(normed=True, range_in_std=3)
+            p = plotting.VerboseDistribution(normed=True, range_in_std=3, x_axis_label=v)
             p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 1, label="Signal")
             p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 0, label="Background")
             p.finish()

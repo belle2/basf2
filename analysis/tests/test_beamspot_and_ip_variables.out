@@ -1,13 +1,13 @@
 [INFO] Steering file: analysis/tests/test_beamspot_and_ip_variables.py
 [INFO] The random number seed is set to ":-)"
 [INFO] Starting event processing, random seed is set to ':-)'
-[INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst14.root
+[INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst16.root
 [INFO] Conditions Database: found working metadata provider
 	provider = ${BELLE2_CONDB_METADATA}
-[INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, Legacy_CollisionAxisCMS
+[INFO] Conditions data: configured globaltag is release-08-00-09
 [INFO]      o) IPX = -0.05
 [INFO]      o) IPY = 0.017
 [INFO]      o) IPZ = -0.01
-[INFO]      o) genIPX = -0.0502637
-[INFO]      o) genIPY = 0.017112
-[INFO]      o) genIPZ = -0.0197804
+[INFO]      o) genIPX = -0.0507967
+[INFO]      o) genIPY = 0.017184
+[INFO]      o) genIPZ = 0.0116924

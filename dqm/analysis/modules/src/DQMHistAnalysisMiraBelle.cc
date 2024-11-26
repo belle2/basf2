@@ -28,6 +28,8 @@ DQMHistAnalysisMiraBelleModule::DQMHistAnalysisMiraBelleModule()
   setDescription("Modify and analyze the data quality histograms of MiraBelle");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("scale_dst", m_scale_dst, "Scale factor signal/sideband", 0.09375);
+  addParam("m_reference_hadb", m_reference_hadb, "reference for hadronb2_tight bhabha ratio", 0.193);
+  addParam("m_reference_mumu", m_reference_mumu, "reference for mumu inv mass", 10.568);
 }
 
 DQMHistAnalysisMiraBelleModule::~DQMHistAnalysisMiraBelleModule()
@@ -67,7 +69,7 @@ void DQMHistAnalysisMiraBelleModule::initialize()
   //bhabha,hadrons
   mon_bhabha->addCanvas(bhabha_main);
   mon_bhabha->addCanvas(bhabha_resolution);
-  mon_hadron->addCanvas(hadron_main);
+  mon_bhabha->addCanvas(hadron_main);
 
   B2DEBUG(20, "DQMHistAnalysisMiraBelle: initialized.");
 
@@ -309,14 +311,17 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   }
   //Calculate M(mumu)
   double peak_mumu = hist_inv_p->GetXaxis()->GetBinCenter(hist_inv_p->GetMaximumBin());
-  TF1* f_mumuInvM = new TF1("f_mumuInvM", "gaus", peak_mumu - 0.04, peak_mumu + 0.04);
+  TF1* f_mumuInvM = new TF1("f_mumuInvM", "gaus", peak_mumu - 0.05, peak_mumu + 0.05);
   f_mumuInvM->SetParameters(hist_inv_p->GetMaximum(), peak_mumu, 0.045);
-  f_mumuInvM->SetParLimits(1, peak_mumu - 0.04, peak_mumu + 0.04);
-  f_mumuInvM->SetParLimits(2, 0.01, 0.06);
+  f_mumuInvM->SetParLimits(1, peak_mumu - 0.05, peak_mumu + 0.05);
+  f_mumuInvM->SetParLimits(2, 0.01, 0.08);
   hist_inv_p->Fit(f_mumuInvM, "R");
   double fit_mumumass = f_mumuInvM->GetParameter(1);
   if (fit_mumumass < 9.) fit_mumumass = 9.;
   if (fit_mumumass > 12.) fit_mumumass = 12.;
+  double fit_mumumass_error = f_mumuInvM->GetParError(1);
+  double pull_mumumass = (fit_mumumass - m_reference_mumu) / fit_mumumass_error;
+  double fit_sigma_mumu = f_mumuInvM->GetParameter(2);
 
   // set values
   mon_mumu->setVariable("mean_npxd", mean_npxd);
@@ -354,6 +359,9 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_mumu->setVariable("notop_frac", notop_frac);
   mon_mumu->setVariable("noarich_frac", noarich_frac);
   mon_mumu->setVariable("fit_mumumass", fit_mumumass);
+  mon_mumu->setVariable("fit_mumumass_error", fit_mumumass_error);
+  mon_mumu->setVariable("pull_mumumass", pull_mumumass);
+  mon_mumu->setVariable("sigma_mumumass", fit_sigma_mumu);
 
   // ========== D*
   // get existing histograms produced by DQM modules
@@ -951,8 +959,10 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   double bh_sigma68_dd0 = getSigma68(histbh_dD0);
   double bh_sigma68_dz0 = getSigma68(histbh_dZ0);
   double bh_sigma68_dpt = getSigma68(histbh_dPtcms);
-  int bh_ntot = histbh_nsvd->GetEntries();
+  int bh_ntot = histbh_nECLClusters->GetEntries();
   double bh_neve_bhabha = bh_ntot;
+  int bh_ntot_sign = histbh_nsvd->GetEntries();
+  double bh_neve_bhabha_sign = bh_ntot_sign;
   double bh_goode_frac = -1.;
   double bh_pval_frac_0 = -1.;
   double bh_pval_frac_1 = -1.;
@@ -970,13 +980,13 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   double bh_pval_less05 = 0.0;
   for (int i = 95; i < 100; i++) bh_pval_more95 += histbh_Pval->GetBinContent(i + 1);
   for (int i = 0; i < 5; i++) bh_pval_less05 += histbh_Pval->GetBinContent(i + 1);
-  if (bh_neve_bhabha != 0) {
-    bh_goode_frac = histbh_electronid->GetBinContent(20) / bh_neve_bhabha;
-    bh_pval_frac_0 = bh_pval_less05 / bh_neve_bhabha;
-    bh_pval_frac_1 = bh_pval_more95 / bh_neve_bhabha;
-    bh_nocdc_frac = histbh_ncdc->GetBinContent(1) / bh_neve_bhabha;
-    bh_notop_frac = histbh_topdig->GetBinContent(1) / bh_neve_bhabha;
-    bh_noarich_frac = histbh_DetPhotonARICH->GetBinContent(1) / bh_neve_bhabha;
+  if (bh_neve_bhabha_sign != 0) {
+    bh_goode_frac = histbh_electronid->GetBinContent(20) / bh_neve_bhabha_sign;
+    bh_pval_frac_0 = bh_pval_less05 / bh_neve_bhabha_sign;
+    bh_pval_frac_1 = bh_pval_more95 / bh_neve_bhabha_sign;
+    bh_nocdc_frac = histbh_ncdc->GetBinContent(1) / bh_neve_bhabha_sign;
+    bh_notop_frac = histbh_topdig->GetBinContent(1) / bh_neve_bhabha_sign;
+    bh_noarich_frac = histbh_DetPhotonARICH->GetBinContent(1) / bh_neve_bhabha_sign;
   } else {
     bh_goode_frac = 0.0;
     bh_pval_frac_0 = 0.0;
@@ -1009,6 +1019,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_bhabha->setVariable("bh_sigma68_dz0", bh_sigma68_dz0);
   mon_bhabha->setVariable("bh_sigma68_dpt", bh_sigma68_dpt);
   mon_bhabha->setVariable("bh_neve_bhabha", bh_neve_bhabha);
+  mon_bhabha->setVariable("bh_neve_bhabha_sign", bh_neve_bhabha_sign);
   mon_bhabha->setVariable("bh_goode_frac", bh_goode_frac);
   mon_bhabha->setVariable("bh_goode_o_bade", bh_goode_o_bade);
   mon_bhabha->setVariable("bh_pval_frac_0", bh_pval_frac_0);
@@ -1054,16 +1065,21 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   hadron_main->cd(4);  histhad_R2->Draw();
   // calculate the values of monitoring variables
   double had_ntot = histhad_physicsresultsH->GetBinContent(3);
-
-  double ratio_hadron_bhabha = -1.;
+  double ratio_hadron_bhabha = 0.;
+  //pull
+  double ratio_pull_hadBhabha = -10.;
+  double error_ratio = -10.;
   if (bh_ntot != 0) {
     ratio_hadron_bhabha = had_ntot / bh_neve_bhabha;
-  } else {
-    ratio_hadron_bhabha = 0.0;
+    //pull
+    error_ratio = ratio_hadron_bhabha * sqrt((1 / had_ntot) + (1 / bh_neve_bhabha));
+    ratio_pull_hadBhabha = (ratio_hadron_bhabha - m_reference_hadb) / error_ratio;
   }
   // set values
   mon_bhabha->setVariable("had_ntot", had_ntot);
   mon_hadron->setVariable("ratio_hadron_bhabha", ratio_hadron_bhabha);
+  mon_hadron->setVariable("error_ratio", error_ratio);
+  mon_hadron->setVariable("ratio_pull_hadBhabha", ratio_pull_hadBhabha);
 
   B2DEBUG(20, "DQMHistAnalysisMiraBelle : endRun called");
 }

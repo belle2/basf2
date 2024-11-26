@@ -1,34 +1,19 @@
 [INFO] Steering file: framework/tests/root_input.py
 [INFO] The random number seed is set to "something important"
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
-[INFO] EXP:        0        RUN:        1        EVT:        1
-[INFO] ============================================================================
-[INFO] DataStore collections in event 1
-[INFO] ============================================================================
-[INFO] Type                 Name                       #Entries           <Event>
-[INFO] EventMetaData        EventMetaData
-[INFO] PXDDigit[]           PXDDigits                  165
-[INFO] PXDTrueHit[]         PXDTrueHits                37
-[INFO] 
-[INFO] ----------------------------------------------------------------------------
-[INFO] Type                 Name                       #Entries      <Persistent>
-[INFO] FileMetaData         FileMetaData
-[INFO] ProcessStatistics    ProcessStatistics
-[INFO] 
-[INFO] ============================================================================
 [INFO] EXP:        0        RUN:        1        EVT:        2
 [INFO] ============================================================================
 [INFO] DataStore collections in event 2
 [INFO] ============================================================================
 [INFO] Type                 Name                       #Entries           <Event>
 [INFO] EventMetaData        EventMetaData
-[INFO] PXDDigit[]           PXDDigits                  150
-[INFO] PXDTrueHit[]         PXDTrueHits                59
+[INFO] RelationContainer    PXDDigitsToPXDTrueHits
+[INFO] PXDDigit[]           PXDDigits                  2
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
 [INFO] ----------------------------------------------------------------------------
 [INFO] Type                 Name                       #Entries      <Persistent>
@@ -42,8 +27,9 @@
 [INFO] ============================================================================
 [INFO] Type                 Name                       #Entries           <Event>
 [INFO] EventMetaData        EventMetaData
-[INFO] PXDDigit[]           PXDDigits                  103
-[INFO] PXDTrueHit[]         PXDTrueHits                18
+[INFO] RelationContainer    PXDDigitsToPXDTrueHits
+[INFO] PXDDigit[]           PXDDigits                  5
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
 [INFO] ----------------------------------------------------------------------------
 [INFO] Type                 Name                       #Entries      <Persistent>
@@ -57,8 +43,25 @@
 [INFO] ============================================================================
 [INFO] Type                 Name                       #Entries           <Event>
 [INFO] EventMetaData        EventMetaData
-[INFO] PXDDigit[]           PXDDigits                  165
-[INFO] PXDTrueHit[]         PXDTrueHits                48
+[INFO] RelationContainer    PXDDigitsToPXDTrueHits
+[INFO] PXDDigit[]           PXDDigits                  6
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        5
+[INFO] ============================================================================
+[INFO] DataStore collections in event 5
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDDigitsToPXDTrueHits
+[INFO] PXDDigit[]           PXDDigits                  4
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
 [INFO] ----------------------------------------------------------------------------
 [INFO] Type                 Name                       #Entries      <Persistent>
@@ -71,19 +74,19 @@
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.  { module: RootInput }
-[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
-[INFO] EXP:        0        RUN:        1        EVT:        3
+[INFO] EXP:        0        RUN:        1        EVT:        4
 [INFO] ============================================================================
-[INFO] DataStore collections in event 3
+[INFO] DataStore collections in event 4
 [INFO] ============================================================================
 [INFO] Type                 Name                       #Entries           <Event>
 [INFO] EventMetaData        EventMetaData
-[INFO] PXDDigit[]           PXDDigits                  103
-[INFO] PXDTrueHit[]         PXDTrueHits                18
+[INFO] RelationContainer    PXDDigitsToPXDTrueHits
+[INFO] PXDDigit[]           PXDDigits                  6
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
 [INFO] ----------------------------------------------------------------------------
 [INFO] Type                 Name                       #Entries      <Persistent>
@@ -91,14 +94,15 @@
 [INFO] ProcessStatistics    ProcessStatistics
 [INFO] 
 [INFO] ============================================================================
-[INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] EXP:        0        RUN:        1        EVT:        5
 [INFO] ============================================================================
-[INFO] DataStore collections in event 4
+[INFO] DataStore collections in event 5
 [INFO] ============================================================================
 [INFO] Type                 Name                       #Entries           <Event>
 [INFO] EventMetaData        EventMetaData
-[INFO] PXDDigit[]           PXDDigits                  165
-[INFO] PXDTrueHit[]         PXDTrueHits                48
+[INFO] RelationContainer    PXDDigitsToPXDTrueHits
+[INFO] PXDDigit[]           PXDDigits                  4
+[INFO] PXDTrueHit[]         PXDTrueHits                2
 [INFO] 
 [INFO] ----------------------------------------------------------------------------
 [INFO] Type                 Name                       #Entries      <Persistent>
@@ -110,7 +114,6 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -119,11 +122,11 @@
 [INFO] EXP:        0        RUN:        1        EVT:        2
 [INFO] EXP:        0        RUN:        1        EVT:        3
 [INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] EXP:        0        RUN:        1        EVT:        5
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -131,42 +134,49 @@
 [INFO] EXP:        0        RUN:        1        EVT:        2
 [INFO] EXP:        0        RUN:        1        EVT:        3
 [INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] EXP:        0        RUN:        1        EVT:        5
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
 [INFO] EXP:        0        RUN:        1        EVT:        3
 [INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] EXP:        0        RUN:        1        EVT:        5
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
 [INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] EXP:        0        RUN:        1        EVT:        5
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
-[ERROR] Couldn't find entry (5, 1, 0) in file! Loading entry 0 instead.  { module: RootInput }
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        1        EVT:        5
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================
+[INFO] Starting event processing, random seed is set to 'something important'
+[ERROR] Couldn't find entry (6, 1, 0) in file! Loading entry 0 instead.  { module: RootInput }
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.  { module: RootInput }
-[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
  ... message repeated 1 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
  ... message repeated 1 times
 [INFO] Starting event processing, random seed is set to 'something important'
@@ -178,7 +188,6 @@
 [WARNING] File appears to be empty, skipping
 	filename = chaintest_empty.root  { module: RootInput }
 [INFO] Added file chaintest_1.root
-[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -191,7 +200,7 @@
 [INFO] EXP:        0        RUN:        1        EVT:       11
 [INFO] EXP:        0        RUN:        1        EVT:        8
 [INFO] EXP:        0        RUN:        1        EVT:       12
-[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] EXP:        0        RUN:        1        EVT:        1
 [INFO] EXP:        0        RUN:        1        EVT:       13
 [INFO] EXP:        0        RUN:        1        EVT:       15
 [INFO] EXP:        0        RUN:        1        EVT:       16
@@ -204,7 +213,6 @@
 	filename = chaintest_empty.root  { module: RootInput }
 [INFO] Added file chaintest_1.root
 [INFO] Added file chaintest_2.root
-[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -217,7 +225,7 @@
 [INFO] EXP:        0        RUN:        1        EVT:       11
 [INFO] EXP:        0        RUN:        1        EVT:        8
 [INFO] EXP:        0        RUN:        1        EVT:       12
-[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] EXP:        0        RUN:        1        EVT:        1
 [INFO] EXP:        0        RUN:        1        EVT:       13
 [INFO] EXP:        0        RUN:        1        EVT:       15
 [INFO] EXP:        0        RUN:        1        EVT:       16
@@ -250,7 +258,6 @@
 [INFO] Added file chaintest_2.root
 [INFO] Added file chaintest_1.root
 [WARNING] The input file 'chaintest_1.root' was specified more than once  { module: RootInput }
-[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible  { module: RootInput }
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -263,7 +270,7 @@
 [INFO] EXP:        0        RUN:        1        EVT:       11
 [INFO] EXP:        0        RUN:        1        EVT:        8
 [INFO] EXP:        0        RUN:        1        EVT:       12
-[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] EXP:        0        RUN:        1        EVT:        1
 [INFO] EXP:        0        RUN:        1        EVT:       13
 [INFO] EXP:        0        RUN:        1        EVT:       15
 [INFO] EXP:        0        RUN:        1        EVT:       16
@@ -296,7 +303,7 @@
 [INFO] EXP:        0        RUN:        1        EVT:       11
 [INFO] EXP:        0        RUN:        1        EVT:        8
 [INFO] EXP:        0        RUN:        1        EVT:       12
-[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] EXP:        0        RUN:        1        EVT:        1
 [INFO] EXP:        0        RUN:        1        EVT:       13
 [INFO] EXP:        0        RUN:        1        EVT:       15
 [INFO] EXP:        0        RUN:        1        EVT:       16

@@ -420,7 +420,7 @@ class SystematicsRadEE(BaseSkim):
     selection on the photon as the sample must be unbiased.
 
     As this retains a lot of bhabha events (by construction) we allow for prescaling
-    (and prefer prescaled rather than a biased sampe by requiring any selection on the
+    (and prefer prescaled rather than a biased sample by requiring any selection on the
     photon or too much of a cut on the recoil momentum).
 
     Prescales are given in standard trigger terms (reciprocal), so prescale of 100 is 1%

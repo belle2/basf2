@@ -52,7 +52,7 @@ class CustomHelpFormatter(argparse.HelpFormatter):
 
 
 class CustomArgumentParser(argparse.ArgumentParser):
-    """Argument parser which propogates help formatter to all subparsers."""
+    """Argument parser which propagates help formatter to all subparsers."""
 
     def __init__(self, **kwargs):
         kwargs["formatter_class"] = CustomHelpFormatter

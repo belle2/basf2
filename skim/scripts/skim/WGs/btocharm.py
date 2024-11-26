@@ -114,7 +114,7 @@ class BtoD0h_Kspi0(BaseSkim):
                 ('daughter(0, InvM)', 100, 1.8, 1.9, 'D0_InvM', self.__contact__, 'D0 invariant mass', '', 'InvM', 'Candidates')],
             variables_2d=[
                 ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7, 'Mbc vs deltaE', self.__contact__,
-                 'Beam constrainted mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
+                 'Beam constrained mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
             path=path)
 
 
@@ -186,7 +186,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
                 ('daughter(0, InvM)', 100, 1.8, 1.9, 'D0_InvM', self.__contact__, 'D0 invariant mass', '', 'InvM', 'Candidates')],
             variables_2d=[
                 ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7, 'Mbc vs deltaE', self.__contact__,
-                 'Beam constrainted mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
+                 'Beam constrained mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
             path=path)
 
 
@@ -813,7 +813,7 @@ class BtoD0h_hh(BaseSkim):
                 ('daughter(0, InvM)', 100, 1.8, 1.9, 'D0_InvM', self.__contact__, 'D0 invariant mass', '', 'InvM', 'Candidates')],
             variables_2d=[
                 ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7, 'Mbc vs deltaE', self.__contact__,
-                 'Beam constrainted mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
+                 'Beam constrained mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
             path=path)
 
 
@@ -1000,7 +1000,7 @@ class BtoD0h_Kshh(BaseSkim):
                 ('daughter(0, InvM)', 100, 1.8, 1.9, 'D0_InvM', self.__contact__, 'D0 invariant mass', '', 'InvM', 'Candidates')],
             variables_2d=[
                 ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7, 'Mbc vs deltaE', self.__contact__,
-                 'Beam constrainted mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
+                 'Beam constrained mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
             path=path)
 
 

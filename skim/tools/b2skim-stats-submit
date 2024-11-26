@@ -106,7 +106,7 @@ def getArgumentParser():
             "List of combined skims to run. This flag expects as its first argument "
             "the path to a YAML defining the combined skims. All remaining arguments "
             "are the combined skims to test. The YAML file is simply a mapping of "
-            "combined skim names to the invidivual skims comprising them. For example, "
+            "combined skim names to the individual skims comprising them. For example, "
             "``feiSL: [feiSLB0, feiSLBplus]``."
         ),
     )
@@ -370,7 +370,7 @@ def submit_jobs(skims, samples, nEventsPerSample, DryRun, *, CombinedSkimDefinit
                     stdout = proc.stdout.decode("utf-8")
                     stderr = proc.stderr.decode("utf-8")
                     raise RuntimeError(
-                        f"An error occured while dry-running skim {skim}\n"
+                        f"An error occurred while dry-running skim {skim}\n"
                         f"Script output:\n{stdout}\n{stderr}"
                     )
 

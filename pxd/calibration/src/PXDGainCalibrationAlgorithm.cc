@@ -204,14 +204,15 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
       B2RESULT("Gain calibration on sensor=" << sensorID << " and vBin=" << vBin << " was successful on " << nGood << "/" << nBinsU <<
                " uBins.");
 
-      // Check if we can repair bad calibrations with a local avarage
+      // Check if we can repair bad calibrations with a local average
       if (nGood > 0 && nBad > 0) {
         meanGain /= nGood;
         for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
           auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
           if (gain == 1.0) {
             gainMapPar->setContent(sensorID.getID(), uBin, vBin, meanGain);
-            B2RESULT("Gain calibration on sensor=" << sensorID << ", vBin=" << vBin << " uBin " << uBin << ": Replace default gain wih average "
+            B2RESULT("Gain calibration on sensor=" << sensorID << ", vBin=" << vBin << " uBin " << uBin <<
+                     ": Replace default gain with average "
                      << meanGain);
           }
         }

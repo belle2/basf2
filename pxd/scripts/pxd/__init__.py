@@ -212,7 +212,7 @@ def add_roi_payload_assembler(path, ignore_hlt_decision):
 
 def add_roi_finder(path):
     """
-    Add the PXDDataReduction module to preserve the tracking informaiton for ROI calculation
+    Add the PXDDataReduction module to preserve the tracking information for ROI calculation
     :param path: The path to which the module should be added
     :param calcROIs: True: turn on the ROI calculation, False: turn off
     """

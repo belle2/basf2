@@ -29,7 +29,7 @@ namespace Belle2 {
    *    Then we would have m_MaskRows, m_MaskCols etc.
    *  - lambdas for ranges of cols/rows can be simplified (2 less comparisons)
    * or even
-   *  - instead hash tables, one could use directly vectors/arrays/std::bitset and only pixels, but
+   *  - instead hash tables, one could use directly vectors/arrays/std\::bitset and only pixels, but
    *    with much more memory for map of all sensors (at least 8Mbit for whole Belle2 PXD & std::bitset)
    */
   class PXDIgnoredPixelsMap {

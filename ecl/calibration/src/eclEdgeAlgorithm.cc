@@ -14,11 +14,9 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
 /* ROOT headers. */
-#include <TDirectory.h>
 #include <TFile.h>
 #include <TH1F.h>
 #include <TMath.h>
-#include <TString.h>
 
 /* C++ headers. */
 #include <iostream>

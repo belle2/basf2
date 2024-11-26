@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -8,6 +7,8 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
+import math
 
 
 def add_datcon(path):
@@ -28,8 +29,8 @@ def add_datcon(path):
                     vSideNVerticalSectors=64,
                     vSideMinimumHSClusterSize=5,
                     vSideMaximumHSClusterSize=50,
-                    vSideMinimumX=-75. / 180. * 3.14159265359,  # corresponds to  +15° for theta (default values are for u side)
-                    vSideMaximumX=65. / 180. * 3.14159265359,  # corresponds to +155° for theta (default values are for u side)
+                    vSideMinimumX=-75. / 180. * math.pi,  # corresponds to  +15° for theta (default values are for u side)
+                    vSideMaximumX=65. / 180. * math.pi,  # corresponds to +155° for theta (default values are for u side)
                     vSideVerticalHoughSpaceSize=20000000,
                     createPXDIntercepts=False,
                     extrapolationPhiCutL1=1.,

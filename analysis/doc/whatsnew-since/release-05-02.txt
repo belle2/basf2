@@ -114,7 +114,7 @@ Modules
   and stores them in a new list.
 * In :b2:mod:`ParticleStats` add functionality to produce a json containing the information printed on stdout. Added also a
   tool :ref:`b2plot-particleStats` to analyze the json and produce some plots.
-* The :b2:mod:`TrackingMomentum` module has been extended. A ParticleList of composite particles can now be processed as well. In
+* The :b2:mod:`TrackingMomentumScaleFactors` module has been extended. A ParticleList of composite particles can now be processed as well. In
   that case the momenta of all track-based daughter particles are scaled by the provided factor.
 * The wrapper functions for the tracking systematics modules have been renamed from ``trackingMomentum`` to `scaleTrackMomenta`
   and from ``trackingEfficiency`` to `removeTracksForTrackingEfficiencyCalculation`.

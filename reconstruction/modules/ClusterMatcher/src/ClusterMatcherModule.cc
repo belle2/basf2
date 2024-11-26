@@ -15,6 +15,7 @@
 #include <mdst/dataobjects/Cluster.h>
 #include <mdst/dataobjects/KlId.h>
 
+#include <Math/VectorUtil.h>
 
 using namespace Belle2;
 using namespace std;
@@ -58,7 +59,7 @@ void ClusterMatcherModule::event()
 
   for (const ECLCluster& eclCluster : m_eclClusters) {
 
-    const TVector3& eclClusterPos = eclCluster.getClusterPosition();
+    const ROOT::Math::XYZVector& eclClusterPos = eclCluster.getClusterPosition();
 
     Cluster* clusterecl = m_Clusters.appendNew();
     //Once available we will have to set ECL likelihoods here as is done for KLM
@@ -66,9 +67,9 @@ void ClusterMatcherModule::event()
 
     for (KLMCluster& klmcluster : m_klmClusters) {
 
-      const TVector3& klmClusterPos = klmcluster.getClusterPosition();
+      const ROOT::Math::XYZVector& klmClusterPos = klmcluster.getClusterPosition();
 
-      angleDist = eclClusterPos.Angle(klmClusterPos);
+      angleDist = ROOT::Math::VectorUtil::Angle(eclClusterPos, klmClusterPos);
 
       if (angleDist < (m_coneInRad / 2.0)) {
 

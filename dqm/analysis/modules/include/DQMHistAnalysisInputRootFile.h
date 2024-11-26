@@ -13,15 +13,14 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 
-#include <TFile.h>
 #include <TCanvas.h>
+#include <TFile.h>
 
 #include <string>
 #include <map>
 #include <vector>
 
 namespace Belle2 {
-
   /**
    * Class to read histograms from a root file for offline testing of analysis modules.
    */
@@ -50,16 +49,6 @@ namespace Belle2 {
      */
     void event() override final;
 
-    /**
-     * End-of-run action.
-     */
-    void endRun() override final;
-
-    /**
-     * Termination action.
-     */
-    void terminate() override final;
-
   private:
     /**
      * Pattern match for histogram name
@@ -75,19 +64,20 @@ namespace Belle2 {
     /** The TFile object for the input file. */
     TFile* m_file = nullptr;
 
+    /** Whether to enable the run info to be displayed. */
+    bool m_enable_run_info;
+    /** The canvas hold the basic DQM info. */
+    TCanvas* m_c_info{nullptr};
+
     /** Global EventMetaData for run number and event number. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
-
-    /** The map between canvas name and canvas object. */
-    std::map<std::string, TCanvas*> m_cs;
 
     /** List of histogram name patterns to process. */
     std::vector<std::string> m_histograms;
 
-    /** Exp number. */
+    /** Exp number */
     unsigned int m_expno = 0;
-
-    /** Evt number. */
+    /** Event number */
     unsigned int m_count = 0;
 
     /** Run Type Override*/
@@ -114,8 +104,14 @@ namespace Belle2 {
     /** Test mode for null histograms */
     bool m_nullHistoMode = false;
 
-    /** Whether to automatically generate canvases for histograms */
-    bool m_autocanvas = true;
+    /** Whether to add the run control histograms. */
+    bool m_add_runcontrol_hist;
+    /** emulated histogram from runcontrol, expno */
+    TH1F* m_h_expno{nullptr};
+    /** emulated histogram from runcontrol, runno */
+    TH1F* m_h_runno{nullptr};
+    /** emulated histogram from runcontrol, runtype */
+    TH1F* m_h_rtype{nullptr};
   };
 } // end namespace Belle2
 

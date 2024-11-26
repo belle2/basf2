@@ -230,7 +230,7 @@ namespace Belle2 {
     /**
      * In the case input daughter particle lists collide (two or more lists contain copies of Particles)
      * the Particle's Store Array index can not be longer used as its unique identifier, which is needed
-     * to check for uniqueness of accpeted combinations. Instead unique identifier is created for all particles
+     * to check for uniqueness of accepted combinations. Instead unique identifier is created for all particles
      * in the input particle lists and use those when checking for uniqueness of current combination.
      */
     void initIndicesToUniqueIDMap();

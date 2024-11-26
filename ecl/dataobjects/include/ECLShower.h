@@ -8,10 +8,15 @@
 
 #pragma once
 
+/* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
-#include <TVector3.h>
-#include <math.h>
+
+/* ROOT headers. */
+#include <Math/Vector3D.h>
 #include <TMatrixDSym.h>
+
+/* C++ headers. */
+#include <cmath>
 
 namespace Belle2 {
 
@@ -209,7 +214,7 @@ namespace Belle2 {
      */
     void setPulseShapeDiscriminationMVA(double mvaVal) { m_PulseShapeDiscriminationMVA = mvaVal; }
 
-    /*! Set numver of hadron digits
+    /*! Set number of hadron digits
      */
     void setNumberOfHadronDigits(double NumberOfHadronDigits) { m_NumberOfHadronDigits = NumberOfHadronDigits; }
 
@@ -237,7 +242,7 @@ namespace Belle2 {
      */
     void setListOfCrystalsForEnergy(const std::vector<unsigned int>& listofcrystals) { m_listOfCrystalsForEnergy = listofcrystals;}
 
-    /*! Set list of indexes of related ECLCalDigit objects sorted by calibrated energy with flag for PSD useability for charged PID.
+    /*! Set list of indexes of related ECLCalDigit objects sorted by calibrated energy with flag for PSD usability for charged PID.
      */
     void setListOfCrystalEnergyRankAndQuality(std::vector<std::pair<unsigned int, bool>>
                                               listOfCrystalEnergyRankAndQuality) {m_listOfCrystalEnergyRankAndQuality = listOfCrystalEnergyRankAndQuality;}
@@ -298,7 +303,7 @@ namespace Belle2 {
     double getR() const { return m_r; }
 
     /*! Get Error Array for Energy->[0], Phi->[2], Theta->[5]
-     * @return Error Array for Energy->[0], Phi->[2], Theta->[5]
+     * @param covArray array which gets filled with errors for Energy->[0], Phi->[2], Theta->[5]
      */
     void getCovarianceMatrixAsArray(double covArray[6]) const
     {
@@ -348,12 +353,12 @@ namespace Belle2 {
     double getMinTrkDistance() const { return m_minTrkDistance; }
 
     /*! path on track extrapolation to POCA to average cluster direction
-     * @return path lenght in cm
+     * @return path length in cm
      */
     double getTrkDepth() const { return m_trkDepth; }
 
     /*! path on track extrapolation to POCA to average cluster direction
-     * @return path lenght in cm starting from cluster center
+     * @return path length in cm starting from cluster center
      */
     double getShowerDepth() const { return m_showerDepth; }
 
@@ -432,20 +437,20 @@ namespace Belle2 {
      */
     std::vector<unsigned int>& getListOfCrystalsForEnergy()  { return m_listOfCrystalsForEnergy; }
 
-    /*! Get list of indexes of related ECLCalDigit objects sorted by calibrated energy with flag for PSD useability for charged PID.
+    /*! Get list of indexes of related ECLCalDigit objects sorted by calibrated energy with flag for PSD usability for charged PID.
      *  @return m_listOfCrystalEnergyRankAndQuality
      */
     std::vector<std::pair<unsigned int, bool>> getListOfCrystalEnergyRankAndQuality() {return m_listOfCrystalEnergyRankAndQuality; }
 
 
 
-    //! The method to get return  TVector3 Momentum
-    TVector3 getMomentum() const
+    //! The method to get return  ROOT::Math::XYZVector Momentum
+    ROOT::Math::XYZVector getMomentum() const
     {
-      return TVector3(
-               m_energy * sin(m_theta) * cos(m_phi),
-               m_energy * sin(m_theta) * sin(m_phi),
-               m_energy * cos(m_theta)
+      return ROOT::Math::XYZVector(
+               m_energy * std::sin(m_theta) * std::cos(m_phi),
+               m_energy * std::sin(m_theta) * std::sin(m_phi),
+               m_energy * std::cos(m_theta)
              );
     }
 

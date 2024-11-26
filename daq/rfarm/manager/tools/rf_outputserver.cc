@@ -15,7 +15,7 @@ using namespace Belle2;
 
 static RFOutputServer* ots = NULL;
 
-extern "C" void sighandler(int sig)
+extern "C" void sighandler(int /*sig*/)
 {
   printf("SIGTERM handler here\n");
   ots->cleanup();
@@ -23,6 +23,8 @@ extern "C" void sighandler(int sig)
 
 int main(int argc, char** argv)
 {
+  if (argc < 2) return 1;
+
   RFConf conf(argv[1]);
 
   // Creation of event server instance. evs contains the instance

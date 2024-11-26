@@ -382,9 +382,9 @@ namespace VXDTFObserversTest {
   template<class T> unsigned int counter<T>::wasNan(0);
 
   template<class T> CountContainer counterMC< T >::pdGacceptedRejected =
-    CountContainer(); /**< counts nCases accepted/rejected for each pdgCode-combination occured */
+    CountContainer(); /**< counts nCases accepted/rejected for each pdgCode-combination occurred */
   template<class T> CountContainer counterMC< T >::mcIDacceptedRejected =
-    CountContainer(); /**< counts nCases accepted/rejected for each particleID-combination occured */
+    CountContainer(); /**< counts nCases accepted/rejected for each particleID-combination occurred */
 
 
 
@@ -576,7 +576,7 @@ namespace VXDTFObserversTest {
       }
     }
 
-    /** for two hits given, a key for the CountContainer is returned. if usePDG == true, PDGcode will be used as identifyer, if false, the ParticleID will be used */
+    /** for two hits given, a key for the CountContainer is returned. if usePDG == true, PDGcode will be used as identifier, if false, the ParticleID will be used */
     template <class hitType>
     static CountContainer::Key createKey(const hitType& hitA, const hitType& hitB, bool usePDG)
     {
@@ -687,7 +687,7 @@ namespace VXDTFObserversTest {
    * */
 
 
-  /** this observer does simply collect other observers which are to be executed during ::notify */
+  /** this observer does simply collect other observers which are to be executed during the call of the corresponding notify function(s) */
   template<class FilterType> class VectorOfObservers : public VoidObserver {
   public:
 

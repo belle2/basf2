@@ -22,8 +22,6 @@
 #include <TTree.h>
 #include <framework/logging/Logger.h>
 
-# define M_PI           3.14159265358979323846
-
 using namespace std;
 
 namespace Belle2 {
@@ -182,6 +180,7 @@ namespace Belle2 {
         for (unsigned j = 0; j < n_cluster; j++) {
           TRGGRLMatch* match = new TRGGRLMatch(trackList[i], ClusterArray[j], 0);
           if (match->getDr() < old_dr) {best_j = j; old_dr = match->getDr();}
+          delete match;
         }
         TRGGRLMatch* match = new TRGGRLMatch(trackList[i], ClusterArray[best_j], 0);
         matchList.push_back(match);
@@ -199,6 +198,7 @@ namespace Belle2 {
         for (unsigned j = 0; j < n_cluster; j++) {
           TRGGRLMatch* match = new TRGGRLMatch(trackList3D[i], ClusterArray[j], 0);
           if (match->getDr() < old_dr) {best_j = j; old_dr = match->getDr();}
+          delete match;
         }
         TRGGRLMatch* match = new TRGGRLMatch(trackList3D[i], ClusterArray[best_j], 0);
         matchList3D.push_back(match);

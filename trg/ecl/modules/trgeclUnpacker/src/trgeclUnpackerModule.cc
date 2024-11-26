@@ -45,6 +45,10 @@ void TRGECLUnpackerModule::initialize()
   m_TRGECLTCArray.registerInDataStore();
   m_TRGECLEvtArray.registerInDataStore();
   m_TRGECLClusterArray.registerInDataStore();
+  // This object is registered by few packages. Let's be agnostic about the
+  // execution order of the modules: the first package run registers the module
+  m_eventLevelClusteringInfo.isOptional() ? m_eventLevelClusteringInfo.isRequired() :
+  m_eventLevelClusteringInfo.registerInDataStore();
 }
 
 void TRGECLUnpackerModule::beginRun() {}
@@ -57,10 +61,10 @@ void TRGECLUnpackerModule::event()
   for (int i = 0; i < raw_trgarray.getEntries(); i++) { // # of readout boards
     iFiness = i;
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) { // Basically 1 entry
-      nodeid     = ((raw_trgarray[i]->GetNodeID(j)) >> 24) & 0x1F;
+      nodeid     = raw_trgarray[i]->GetNodeID(j);
       trgtype    = raw_trgarray[i]->GetTRGType(j);
       n_basf2evt = raw_trgarray[i]->GetEveNo(j);
-      if (nodeid == 0x13) {
+      if (nodeid == 0x13000001) {
         for (int ch = 0; ch < raw_trgarray[i]->GetMaxNumOfCh(j); ch++) { // ch in a readout board
           nwords     = raw_trgarray[i]->GetDetectorNwords(j, ch);
           if (nwords == 0) {
@@ -76,6 +80,28 @@ void TRGECLUnpackerModule::event()
       }
     }
   }
+
+  // Count number of trigger cells in each ECL region for EventLevelClusteringInfo
+  uint16_t nTCsPerRegion[3] = {};
+  const int firstBarrelId = 81; // First TCId in the barrel
+  const int lastBarrelId = 512; // Last TCId in the barrel
+  for (auto& trgeclhit : m_TRGECLTCArray) {
+    const int tcId = trgeclhit.getTCId();
+    if (tcId < firstBarrelId) {
+      nTCsPerRegion[0]++;
+    } else if (tcId > lastBarrelId) {
+      nTCsPerRegion[2]++;
+    } else {
+      nTCsPerRegion[1]++;
+    }
+  }
+
+  // Store
+  if (!m_eventLevelClusteringInfo) { m_eventLevelClusteringInfo.create();}
+  m_eventLevelClusteringInfo->setNECLTriggerCellsFWD(nTCsPerRegion[0]);
+  m_eventLevelClusteringInfo->setNECLTriggerCellsBarrel(nTCsPerRegion[1]);
+  m_eventLevelClusteringInfo->setNECLTriggerCellsBWD(nTCsPerRegion[2]);
+
 }
 
 void TRGECLUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i, int nnn, int ch)

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,6 +29,7 @@ inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('InputRootFile', sys.argv[1])
 inroot.param('SelectFolders', 'ARICH')
 main.add_module(inroot)
+main.add_module("DQMHistAutoCanvas")  # Plot all Histo from Input
 
 # add DQM analysis module
 arich = b2.register_module('DQMHistAnalysisMonObj')

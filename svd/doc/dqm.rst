@@ -3,13 +3,13 @@
 SVD DQM
 =======
 
-The SVD DQM modules produce plots to assess the quality of the data. 
+The SVD DQM modules produce plots to assess the quality of the data.
 Only ``SVDUnpackerDQM`` is executed on HLT, the rest of the modules are executed on ExpressReco on a fraction of events.
 
 DQM Modules
 -----------
 
-This is a list of the ``svd`` dqm modules. 
+This is a list of the ``svd`` dqm modules.
 
 .. b2-modules::
    :package: svd

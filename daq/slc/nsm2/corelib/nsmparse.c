@@ -5,6 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 /*
   nsmparse.c for NSM2
 
@@ -14,7 +15,7 @@
   20140304 a simple #define can be used
   20131229 stdint.h definitions are added
   20140428 nsmparse_malloc fix
-  20140902 memset fix
+  20140902 memset fix (T.Konno)
   20140903 n_same fix for nested struct
   20140917 -1 to skip revision check
   20140918 nsmparse_struct fix (uninitialized malloc for ->next)
@@ -32,7 +33,7 @@
 #include <sys/fcntl.h>
 #include <unistd.h>
 
-#include "nsmparse.h"
+#include "nsm2/nsmparse.h"
 
 static int  nsmparse_errcode;
 static char nsmparse_errstr[256];
@@ -140,6 +141,7 @@ nsmparse_readfile(const char *file, off_t *filelenp)
   char *filebuf;
   int fd;
   int i;
+  int len;
   int blksiz = 65536;
   
   if (filelenp) *filelenp = 0;
@@ -168,7 +170,7 @@ nsmparse_readfile(const char *file, off_t *filelenp)
   
   for (i = 0; i < statbuf.st_size; i += blksiz) {
     int siz = (i + blksiz < statbuf.st_size) ? blksiz : statbuf.st_size - i;
-    int len = read(fd, filebuf + i, siz);
+    len = read(fd, filebuf + i, siz);
     if (len != siz) {
       printf("can't read at %d bytes\n", i + (len > 0 ? len : 0));
       close(fd);
@@ -479,7 +481,7 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
     { 0, 0, 0 }};
   char sym_prev = 0;
   int n_same = 0;
-  char fmtstr[256];
+  char fmtstr[1024];
   int fmtlen = 63;
   int offset = 0;
   NSMparse *parsetop = 0;
@@ -715,6 +717,7 @@ nsmlib_parsestr(const char *datname, int revision,
 		const char *filebuf, const char *filepath, char *fmtstr,
                 int *revisionp)
 {
+  char *datlist;
   char *strbegin;
   int ret;
   off_t filelen;
@@ -778,6 +781,7 @@ NSMparse *
 nsmlib_parsefile(const char *datname, int revision, const char *incpath,
 		 char *fmtstr, int *revisionp)
 {
+  off_t filelen;
   char *filepath;
   char *filebuf;
   NSMparse *parsep;

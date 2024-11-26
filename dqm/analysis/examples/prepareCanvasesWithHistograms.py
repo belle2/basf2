@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -21,9 +20,9 @@ if len(argv) < 3:
     print()
     print('To make this script work, first build dqm package b2code-package-add daq; scons')
     print()
-    print('For more information see https://confluence.desy.de/display/BI/Develop+DQM+Analysis+Modules')
+    print('For more information see https://xwiki.desy.de/xwiki/rest/p/a331d')
     print()
-    print('Usage: %s input_filename output_filename' % argv[0])
+    print(f'Usage: {argv[0]} input_filename output_filename')
     print()
     exit(1)
 
@@ -43,6 +42,7 @@ inroot.param('InputRootFile', argv[1])
 # inroot.param('SelectHistograms', ['TRGTOP/h_*'])
 
 main.add_module(inroot)
+main.add_module("DQMHistAutoCanvas")  # Plot all Histo from Input
 
 outroot = b2.register_module('DQMHistAnalysisOutputFile')
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -203,7 +202,7 @@ class printSVDLadders(b2.Module):
                     # sensor ID string
                     sensorID = str(layerNumber) + "." + str(ladderNumber)
                     # get global coordinates:
-                    local = r.TVector3(0, 0, 0)
+                    local = r.Math.XYZVector(0, 0, 0)
                     glob = geoCache.getSensorInfo(sensor).pointToGlobal(local)
 
                     angleRad = m.atan2(glob.Y(), glob.X())
@@ -214,10 +213,10 @@ class printSVDLadders(b2.Module):
 
                     angleDeg = m.degrees(angleRad)
 
-                    xStr = "{0:.2f}".format(round(glob.X(), 2))
-                    yStr = "{0:.2f}".format(round(glob.Y(), 2))
-                    radStr = "{0:.2f}".format(round(angleRad, 4))
-                    degStr = "{0:.2f}".format(round(angleDeg, 2))
+                    xStr = f"{round(glob.X(), 2):.2f}"
+                    yStr = f"{round(glob.Y(), 2):.2f}"
+                    radStr = f"{round(angleRad, 4):.2f}"
+                    degStr = f"{round(angleDeg, 2):.2f}"
                     print(sensorID + '     ' + xStr + '     ' + yStr + '     ' + radStr + '     ' + degStr)
 
 

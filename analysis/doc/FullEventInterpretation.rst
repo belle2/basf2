@@ -98,8 +98,8 @@ After the FEI path the following lists are available
 
 Each candidate has two extra infos which are interesting:
 
-*    SignalProbability is the signal probability calculated using FastBDT
-*    decayModeID is the tag :math:`B` decay channel
+*    SignalProbability is the signal probability calculated using FastBDT;
+*    decayModeID is the tag :math:`B` decay channel, labels of which can be listed with `get_mode_names` function.
 
 
 You can use a different decay channel configuration during the application. In particular you can omit decay channels (e.g. the semileptonic ones if you are only interested in the hadronic tag).
@@ -115,7 +115,7 @@ FEI and the conditions database
 ###############################
 
 The FEI is frequently retrained and updated to give the best performance with the latest reconstruction, etc. You will need to use the relevant database in which the FEI training weights are located.
-FEI training weights are distributed by the `basf2.conditions` database under an `analysis global tag <https://confluence.desy.de/x/MhqdAw>`_.
+FEI training weights are distributed by the `basf2.conditions` database under an `analysis global tag <https://xwiki.desy.de/xwiki/rest/p/88ebe>`_.
 In order to find the latest, recommended FEI training, you can use the `b2conditionsdb-recommend` tool.
 
 ``b2conditionsdb-recommend input_file.mdst.root``
@@ -126,7 +126,7 @@ the tool `b2conditionsdb-recommend` or the function `modularAnalysis.getAnalysis
 You will need to prepend this tag to your global tags list.
 This is done inside the FEI steering script.
 
-.. code-block:: python3
+.. code-block:: python
 
         import basf2
         import fei
@@ -187,7 +187,7 @@ Another interesting configuration is given by ``get_fr_channels``, which will re
 
 In the training and application steering file you probably will use:
 
-.. code-block:: python3
+.. code-block:: python
 
    import fei
    particles = fei.get_default_channels(hadronic=True, semileptonic=True, chargedB=True, neutralB=True)
@@ -340,7 +340,7 @@ In this section, we will consider, how to run the FEI training workflow on the g
 
 .. seealso::
 
-    * `gbasf2 documentation <https://confluence.desy.de/display/BI/Computing+GBasf2>`_
+    * `gbasf2 documentation <https://gbasf2.belle2.org/>`_
     * `b2luigi documentation <https://b2luigi.readthedocs.io/en/latest/>`_
 
 The example adapted for this section is ``analysis/examples/FEI/B_generic_train.py``, but feel free to adapt
@@ -380,10 +380,10 @@ that they do not work properly because of missing ``python`` packages. In that c
 
 
 The last step is to install `gbasf2`_. For that purpose, please switch to a new terminal window with fresh environment
-on your machine, and follow the steps for `gbasf2 installation <https://confluence.desy.de/display/BI/Computing+GBasf2#ComputingGBasf2-gBasf2installationprocedure>`_.
+on your machine, and follow the steps for `gbasf2 installation <https://xwiki.desy.de/xwiki/rest/p/78b3b/#HgBasf2installationprocedure>`_.
 
-In the following, an adaption for the `gbasf2`_ package is discussed, which is required until the JIRA issue
-`BIIDCD-1256 <https://agira.desy.de/browse/BIIDCD-1256>`_ is resolved. It enables to upload non-basf2 data to remote SE's on the grid.
+In the following, an adaption for the `gbasf2`_ package is discussed, which is required until the GitLab issue
+`BIIDCD-1256 <https://gitlab.desy.de/belle2/computing/distributed-computing/belledirac/-/issues/1256>`_ is resolved. It enables to upload non-basf2 data to remote SE's on the grid.
 
 Within the file ``BelleDIRAC/gbasf2/lib/ds/manager.py`` in function ``putDatasetMetadata(...)``, the lines
 
@@ -402,12 +402,12 @@ should be replaced with:
             else:
                 experiment_min, experiment_max, run_min, run_max = -1, -1, -1, -1
 
-After installing all prerequisites, you would need to get the example `feiongridworkflow <https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse>`_:
+After installing all prerequisites, you would need to get the example `feiongridworkflow <https://gitlab.desy.de/belle2/performance/fei/grid-workflow>`_:
 
 .. code-block:: bash
 
     cd </path/to/your/work/directory>
-    git clone ssh://git@stash.desy.de:7999/~aakhmets/feiongridworkflow.git
+    git clone git@gitlab.desy.de:belle2/performance/fei/grid-workflow.git feiongridworkflow
     cd feiongridworkflow
 
 General Workflow Concept
@@ -683,7 +683,7 @@ all other tasks will be constructed from the requirements, down to the ``FEIAnal
 
 To run the full workflow, the wrapper contains the following piece of code:
 
-.. code-block:: python3
+.. code-block:: python
 
         yield FEITrainingTask(
             mode="Training",
@@ -699,7 +699,7 @@ Tips and Tricks
 In this concluding section of running FEI training on the grid, a few tips and tricks are given, such that you get a better feeling what to expect from the workflow and which pitfalls you may encounter,
 especially when running on the grid.
 
-* In general, you should always test the setup locally before submitting it to the grid. Therefore, please adapt your steering file equivalent to `B_generic_train.py <https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse/B_generic_train.py>`_ in such a way, that you would be able to run it both locally (potentially with a development version of `basf2`) and on the grid (using an official `basf2` release).
+* In general, you should always test the setup locally before submitting it to the grid. Therefore, please adapt your steering file equivalent to `B_generic_train.py <https://gitlab.desy.de/belle2/performance/fei/grid-workflow/-/blob/main/B_generic_train.py>`_ in such a way, that you would be able to run it both locally (potentially with a development version of `basf2`) and on the grid (using an official `basf2` release).
 * To test the workflow on the grid in a fast way, you can construct the dataset list provided to the ``gbasf2_input_dslist`` setting using individual file paths as content instead of dataset paths, and setting the maximum number of events to a small value, e.g. 10. There are several possibilities to do that. You can either set it directly for the ``FEIAnalysisTask`` using the ``max_event`` task parameter (see `b2luigi documentation <https://b2luigi.readthedocs.io/en/latest/>`_), or extend the setting ``gbasf2_basf2opt`` from ``"-l ERROR"`` to ``"-l ERROR -n 10"``. The training itself will then have no meaning, since too few events for training, but you would be able to test the technical setup with that approach.
 * To run instances of ``FEIAnalysisTask`` efficiently on the grid, you should prepare yourself well for that.
 
@@ -779,7 +779,7 @@ To access the old Belle database anyway you have to forward to server to you loc
 Depending on how you use b2bii, the BELLE_POSTGRES_SERVER will be overridden by b2bii. Hence you have to enforce that localhost is used anyway.
 You can ensure this by adding:
 
-.. code-block:: python3
+.. code-block:: python
 
     import os
 
@@ -831,7 +831,7 @@ Resources, Publications etc.
 
 .. _luigi: https://luigi.readthedocs.io/en/latest/
 .. _b2luigi: https://b2luigi.readthedocs.io/en/latest/
-.. _gbasf2: https://confluence.desy.de/display/BI/Computing+GBasf2
-.. _settings.json: https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse/settings.json
-.. _fei_grid_workflow.py: https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse/fei_grid_workflow.py
+.. _gbasf2: https://xwiki.desy.de/xwiki/rest/p/78b3b
+.. _settings.json: https://gitlab.desy.de/belle2/performance/fei/grid-workflow/-/blob/main/settings.json
+.. _fei_grid_workflow.py: https://gitlab.desy.de/belle2/performance/fei/grid-workflow/-/blob/main/fei_grid_workflow.py
 .. _Belle II DIRAC: https://dirac.cc.kek.jp:8443/DIRAC/

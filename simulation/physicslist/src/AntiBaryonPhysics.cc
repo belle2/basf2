@@ -9,19 +9,7 @@
 #include <simulation/physicslist/AntiBaryonPhysics.h>
 
 #include "G4ProcessManager.hh"
-#include "G4AntiProtonInelasticProcess.hh"
-#include "G4AntiNeutronInelasticProcess.hh"
-#include "G4AntiLambdaInelasticProcess.hh"
-#include "G4AntiSigmaPlusInelasticProcess.hh"
-#include "G4AntiSigmaMinusInelasticProcess.hh"
-#include "G4AntiXiZeroInelasticProcess.hh"
-#include "G4AntiXiMinusInelasticProcess.hh"
-#include "G4AntiOmegaMinusInelasticProcess.hh"
-
-#include "G4AntiDeuteronInelasticProcess.hh"
-#include "G4AntiTritonInelasticProcess.hh"
-#include "G4AntiHe3InelasticProcess.hh"
-#include "G4AntiAlphaInelasticProcess.hh"
+#include "G4HadronInelasticProcess.hh"
 #include "G4HadronElasticProcess.hh"
 
 #include "G4TheoFSGenerator.hh"
@@ -120,7 +108,7 @@ void AntiBaryonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(apProcEl);
 
   // inelastic
-  G4AntiProtonInelasticProcess* apProcInel = new G4AntiProtonInelasticProcess;
+  G4HadronInelasticProcess* apProcInel = new G4HadronInelasticProcess("anti_protonInelastic", G4AntiProton::Definition());
   apProcInel->RegisterMe(m_ftfp);
   apProcInel->AddDataSet(antiNucleonData);
   procMan->AddDiscreteProcess(apProcInel);
@@ -142,7 +130,7 @@ void AntiBaryonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(anProcEl);
 
   // inelastic
-  G4AntiNeutronInelasticProcess* anProcInel = new G4AntiNeutronInelasticProcess;
+  G4HadronInelasticProcess* anProcInel = new G4HadronInelasticProcess("anti_neutronInelastic", G4AntiNeutron::Definition());
   anProcInel->RegisterMe(m_ftfp);
   anProcInel->AddDataSet(antiNucleonData);
   procMan->AddDiscreteProcess(anProcInel);
@@ -161,7 +149,7 @@ void AntiBaryonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(adProcEl);
 
   // inelastic
-  G4AntiDeuteronInelasticProcess* adProcInel = new G4AntiDeuteronInelasticProcess;
+  G4HadronInelasticProcess* adProcInel = new G4HadronInelasticProcess("anti_deuteronInelastic", G4AntiDeuteron::Definition());
   adProcInel->RegisterMe(m_ftfp);
   adProcInel->AddDataSet(antiNucleonData);
   procMan->AddDiscreteProcess(adProcInel);
@@ -184,7 +172,7 @@ void AntiBaryonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(atProcEl);
 
   // inelastic
-  G4AntiTritonInelasticProcess* atProcInel = new G4AntiTritonInelasticProcess;
+  G4HadronInelasticProcess* atProcInel = new G4HadronInelasticProcess("anti_tritonInelastic", G4AntiTriton::Definition());
   atProcInel->RegisterMe(m_ftfp);
   atProcInel->AddDataSet(antiNucleonData);
   procMan->AddDiscreteProcess(atProcInel);
@@ -207,7 +195,7 @@ void AntiBaryonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(ahe3ProcEl);
 
   // inelastic
-  G4AntiHe3InelasticProcess* ahe3ProcInel = new G4AntiHe3InelasticProcess;
+  G4HadronInelasticProcess* ahe3ProcInel = new G4HadronInelasticProcess("anti_He3Inelastic", G4AntiHe3::Definition());
   ahe3ProcInel->RegisterMe(m_ftfp);
   ahe3ProcInel->AddDataSet(antiNucleonData);
   procMan->AddDiscreteProcess(ahe3ProcInel);
@@ -230,7 +218,7 @@ void AntiBaryonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(aaProcEl);
 
   // inelastic
-  G4AntiAlphaInelasticProcess* aaProcInel = new G4AntiAlphaInelasticProcess;
+  G4HadronInelasticProcess* aaProcInel = new G4HadronInelasticProcess("anti_alpha_Inelastic", G4AntiAlpha::Definition());
   aaProcInel->RegisterMe(m_ftfp);
   aaProcInel->AddDataSet(antiNucleonData);
   procMan->AddDiscreteProcess(aaProcInel);
@@ -252,7 +240,7 @@ void AntiBaryonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(alamProcEl);
 
   // inelastic
-  G4AntiLambdaInelasticProcess* alamProcInel = new G4AntiLambdaInelasticProcess;
+  G4HadronInelasticProcess* alamProcInel = new G4HadronInelasticProcess("anti-lambdaInelastic", G4AntiLambda::Definition());
   alamProcInel->RegisterMe(m_ftfp);
   alamProcInel->AddDataSet(hchipsInelastic);
   procMan->AddDiscreteProcess(alamProcInel);
@@ -270,7 +258,7 @@ void AntiBaryonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(aspProcEl);
 
   // inelastic
-  G4AntiSigmaPlusInelasticProcess* aspProcInel = new G4AntiSigmaPlusInelasticProcess;
+  G4HadronInelasticProcess* aspProcInel = new G4HadronInelasticProcess("anti_sigma+Inelastic", G4AntiSigmaPlus::Definition());
   aspProcInel->RegisterMe(m_ftfp);
   aspProcInel->AddDataSet(hchipsInelastic);
   procMan->AddDiscreteProcess(aspProcInel);
@@ -292,7 +280,7 @@ void AntiBaryonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(asmProcEl);
 
   // inelastic
-  G4AntiSigmaMinusInelasticProcess* asmProcInel = new G4AntiSigmaMinusInelasticProcess;
+  G4HadronInelasticProcess* asmProcInel = new G4HadronInelasticProcess("anti_sigma-Inelastic", G4AntiSigmaMinus::Definition());
   asmProcInel->RegisterMe(m_ftfp);
   asmProcInel->AddDataSet(hchipsInelastic);
   procMan->AddDiscreteProcess(asmProcInel);
@@ -310,7 +298,7 @@ void AntiBaryonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(axzProcEl);
 
   // inelastic
-  G4AntiXiZeroInelasticProcess* axzProcInel = new G4AntiXiZeroInelasticProcess;
+  G4HadronInelasticProcess* axzProcInel = new G4HadronInelasticProcess("anti_xi0Inelastic", G4AntiXiZero::Definition());
   axzProcInel->RegisterMe(m_ftfp);
   axzProcInel->AddDataSet(hchipsInelastic);
   procMan->AddDiscreteProcess(axzProcInel);
@@ -328,7 +316,7 @@ void AntiBaryonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(axmProcEl);
 
   // inelastic
-  G4AntiXiMinusInelasticProcess* axmProcInel = new G4AntiXiMinusInelasticProcess;
+  G4HadronInelasticProcess* axmProcInel = new G4HadronInelasticProcess("anti_xi-Inelastic", G4AntiXiMinus::Definition());
   axmProcInel->RegisterMe(m_ftfp);
   axmProcInel->AddDataSet(hchipsInelastic);
   procMan->AddDiscreteProcess(axmProcInel);
@@ -346,7 +334,7 @@ void AntiBaryonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(aomProcEl);
 
   // inelastic
-  G4AntiOmegaMinusInelasticProcess* aomProcInel = new G4AntiOmegaMinusInelasticProcess;
+  G4HadronInelasticProcess* aomProcInel = new G4HadronInelasticProcess("anti_omega-Inelastic", G4AntiOmegaMinus::Definition());
   aomProcInel->RegisterMe(m_ftfp);
   aomProcInel->AddDataSet(hchipsInelastic);
   procMan->AddDiscreteProcess(aomProcInel);

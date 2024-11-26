@@ -1,7 +1,17 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 import basf2
 from ROOT import Belle2
+from ROOT import TVector3
+from ROOT.Math import XYZVector
 import numpy as np
 import pickle
+import os
 
 
 class nntd(basf2.Module):
@@ -62,6 +72,13 @@ class nntd(basf2.Module):
     varnum["swtwodphi"] = [47, r'$\phi_{SW2D}$', r'$[°]$']
     varnum["swtwodpt"] = [48, r'$P_{t, SW2D}$', r'$[GeV]$']
     varnum["swtwodfot"] = [49, r'FoundOldTrack', '']
+    varnum["neuroats"] = [50, r'NumberOfAxials', '']
+    varnum["hwneuroats"] = [51, r'NumberOfAxials', '']
+    varnum["swneuroats"] = [52, r'NumberOfAxials', '']
+    varnum["neuroetfcc"] = [53, r'ETF Eventtime from CC', 'clocks']
+    varnum["neurohwtime"] = [54, r'Reconstructed HW Eventtime', 'clocks']
+    varnum["hwneuroetfcc"] = [55, r'ETF Eventtime', 'clocks']
+    varnum["hwneurohwtime"] = [56, r'Reconstructed HW Eventtime', 'clocks']
     nonelist = []
     for x in varnum:
         nonelist.append(None)
@@ -78,6 +95,8 @@ class nntd(basf2.Module):
         # setup histograms
         self.data = None  # np.array([[[]]])
         self.eventlist = []
+        self.networkname = "unspecified net"
+        self.dataname = "unspecified runs"
         # TODO
         # # dict of plots, which should be plotted during the processing and updated every 5000 events.
         # self.plotdict = {}
@@ -93,13 +112,34 @@ class nntd(basf2.Module):
 
         # storearrays
         self.recotracks = Belle2.PyStoreArray(self.recotracksname)
-        self.neurotracks = Belle2.PyStoreArray(self.neurotracksname)
-        self.hwneurotracks = Belle2.PyStoreArray(self.hwneurotracksname)
-        self.swneurotracks = Belle2.PyStoreArray(self.swneurotracksname)
-        self.twodtracks = Belle2.PyStoreArray(self.twodtracksname)
-        self.swtwodtracks = Belle2.PyStoreArray(self.swtwodtracksname)
-        self.ts = Belle2.PyStoreArray(self.tsname)
-        self.etf = Belle2.PyStoreObj(self.etfname)
+        try:
+            self.neurotracks = Belle2.PyStoreArray(self.neurotracksname)
+        except ValueError:
+            self.neurotracks = None
+        try:
+            self.hwneurotracks = Belle2.PyStoreArray(self.hwneurotracksname)
+        except ValueError:
+            self.hwneurotracks = None
+        try:
+            self.swneurotracks = Belle2.PyStoreArray(self.swneurotracksname)
+        except ValueError:
+            self.swneurotracks = None
+        try:
+            self.twodtracks = Belle2.PyStoreArray(self.twodtracksname)
+        except ValueError:
+            self.twodtracks = None
+        try:
+            self.swtwodtracks = Belle2.PyStoreArray(self.swtwodtracksname)
+        except ValueError:
+            self.swtwodtracks = None
+        try:
+            self.ts = Belle2.PyStoreArray(self.tsname)
+        except ValueError:
+            self.ts = None
+        try:
+            self.etf = Belle2.PyStoreObj(self.etfname)
+        except ValueError:
+            self.etf = None
 
         self.varnum = nntd.varnum
 
@@ -122,14 +162,22 @@ class nntd(basf2.Module):
                     x = np.round(x)
                 return 180. / np.pi * np.arccos(x)
 
-    def getrecovals(self, evlist, fitres):
+    def getrecovalsold(self, evlist, fitres):
         if fitres:
             evlist[self.varnum["recoz"][0]] = fitres.getPosition().Z()
-            evlist[self.varnum["recotheta"][0]] = self.costotheta(fitres.getMomentum().CosTheta())
+            evlist[self.varnum["recotheta"][0]] = fitres.getMomentum().Theta()  # self.costotheta(fitres.getMomentum().CosTheta())
             evlist[self.varnum["recophi"][0]] = fitres.getMomentum().Phi()
-            evlist[self.varnum["recopt"][0]] = fitres.getMomentum().Pt()
-            evlist[self.varnum["recop"][0]] = np.sqrt(fitres.getMomentum(
-            ).X()**2+fitres.getMomentum().Y()**2+fitres.getMomentum().Z()**2)
+            evlist[self.varnum["recopt"][0]] = fitres.getTransverseMomentum()
+            evlist[self.varnum["recop"][0]] = fitres.getMomentum().R()
+        return evlist
+
+    def getrecovals(self, evlist, state):
+        if state:
+            evlist[self.varnum["recoz"][0]] = state.getPos().Z()
+            evlist[self.varnum["recotheta"][0]] = state.getMom().Theta()  # self.costotheta(fitres.getMomentum().CosTheta())
+            evlist[self.varnum["recophi"][0]] = state.getMom().Phi()
+            evlist[self.varnum["recopt"][0]] = state.getMom().Pt()
+            evlist[self.varnum["recop"][0]] = state.getMomMag()
         return evlist
 
     def getneurovals(self, evlist, neuro, status=""):
@@ -144,9 +192,13 @@ class nntd(basf2.Module):
                                                                                           np.sqrt(1 + neuro.getCotTheta()**2)))
             evlist[self.varnum[pre + "neuroval"][0]] = neuro.getValidStereoBit()
             evlist[self.varnum[pre + "neuroqual"][0]] = neuro.getQualityVector()
-            # evlist[self.varnum[pre + "neurots"][0]] = int(neuro.getTSVector())
+            evlist[self.varnum[pre + "neurots"][0]] = int("".join([str(x) for x in neuro.getTSVector()]))
+            xx = sum([int(i != 0) for i in neuro.getTSVector()][::2])
+            if xx is None:
+                xx = 0
+            evlist[self.varnum[pre + "neuroats"][0]] = xx
             evlist[self.varnum[pre + "neuroexp"][0]] = neuro.getExpert()
-            # evlist[self.varnum[pre + "neurodriftth"][0]] = int(neuro.getDriftThreshold())
+            evlist[self.varnum[pre + "neurodriftth"][0]] = int("".join([str(int(x)) for x in neuro.getDriftThreshold()]))
             evlist[self.varnum[pre + "neuroquad"][0]] = neuro.getQuadrant()
             fpt = 9999
             for ts in neuro.getRelationsTo(self.tsname):
@@ -156,8 +208,14 @@ class nntd(basf2.Module):
                 eft = self.etf.getBinnedEventT0(Belle2.Const.CDC)
             else:
                 eft = None
+
+            # overwrite the etf temporarily with the etfcc
+
             evlist[self.varnum[pre + "neurofp"][0]] = fpt
             evlist[self.varnum[pre + "neuroetf"][0]] = eft
+            if pre != "sw":
+                evlist[self.varnum[pre + "neuroetfcc"][0]] = neuro.getETF_unpacked()
+                evlist[self.varnum[pre + "neurohwtime"][0]] = neuro.getETF_recalced()
         return evlist
 
     def gettwodvals(self, evlist, twod):
@@ -184,14 +242,42 @@ class nntd(basf2.Module):
         event = []
         for reco in self.recotracks:
             track = reco.getRelatedFrom("Tracks")
-            if not track:
-                print("no track found for recotrack")
-                continue
-            whishPdg = 211  # pion
-            fitres = track.getTrackFitResultWithClosestMass(Belle2.Const.ChargedStable(whishPdg))
-            if not fitres:
-                continue
-            # neuro = reco.getRelatedTo(self.neurotracksname)
+
+            fitres = None
+            state = None
+
+            # method should be either 'old' for the old method or anything else for the new one
+            method = 'old'
+
+            if method == 'old':
+                # # old way: ########################################################################
+
+                if not track:
+                    print("no track found for recotrack")
+                    continue
+                whishPdg = 211  # pion
+                fitres = track.getTrackFitResultWithClosestMass(Belle2.Const.ChargedStable(whishPdg))
+                if not fitres:
+                    continue
+            else:
+                # # new way: ########################################################################
+
+                reps = reco.getRepresentations()
+                irep = 0
+                for irep, rep in enumerate(reps):
+                    if not reco.wasFitSuccessful(rep):
+                        continue
+                    try:
+                        state = reco.getMeasuredStateOnPlaneClosestTo(XYZVector(0, 0, 0), rep)
+                        rep.extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000))
+                    except BaseException:
+                        continue
+                if not state:
+                    continue
+
+            ####################################################################################
+
+            neuro = reco.getRelatedTo(self.neurotracksname)
             event.append(self.nonelist.copy())
             try:
                 neuro = reco.getRelatedTo(self.neurotracksname)
@@ -209,7 +295,10 @@ class nntd(basf2.Module):
                 twod = reco.getRelatedTo(self.twodtracksname)
             except BaseException:
                 twod = None
-            event[-1] = self.getrecovals(event[-1], fitres)
+            if method == 'old':
+                event[-1] = self.getrecovalsold(event[-1], fitres)
+            else:
+                event[-1] = self.getrecovals(event[-1], state)
             event[-1] = self.getneurovals(event[-1], neuro)
             event[-1] = self.gettwodvals(event[-1], twod)
             event[-1] = self.getneurovals(event[-1], hwneuro, status="hw")
@@ -283,17 +372,20 @@ class nntd(basf2.Module):
         # both save histograms to file and show them in the plots
         self.save()
 
-    def save(self, filename=None, netname=None):
+    def save(self, filename=None, netname=None, dataname=None):
         if not filename:
             filename = self.filename
         if not netname:
             netname = self.netname
+        if not dataname:
+            dataname = self.dataname
         # save the dataset as an array, the corresponding varnum,
         # and a description about the dataset into a pickle file
         savedict = {}
         savedict["eventlist"] = self.eventlist
         savedict["varnum"] = self.varnum
         savedict["networkname"] = netname
+        savedict["dataname"] = dataname
         savedict["version"] = nntd.version
         f = open(filename, 'wb')
         pickle.dump(savedict, f)
@@ -301,6 +393,24 @@ class nntd(basf2.Module):
         print('file ' + filename + ' has been saved. ')
 
     def loadmore(self, filenames):
+        # first, check the amount of events and limit them to NNTD_EVLIMIT
+        evlim = 0
+        evnumber = 0
+        skipev = 0
+        if "NNTD_EVLIMIT" in os.environ:
+            evlim = int(os.environ["NNTD_EVLIMIT"])
+        else:
+            evlim = 50000
+        for i, x in enumerate(filenames):
+            print("checking file: " + str(i) + "/" + str(len(filenames)))
+            f = open(x, 'rb')
+            evnumber += len(pickle.load(f)["eventlist"])
+        if evnumber > evlim:
+            print("total number of available events is " + str(evnumber))
+            skipev = int(evnumber/evlim)
+            print("Number of events more than " + str(evlim) + " only taking every " + str(skipev) + " event")
+        else:
+            skipev = 1
         for x in filenames:
             f = open(x, 'rb')
             savedict = pickle.load(f)
@@ -309,10 +419,18 @@ class nntd(basf2.Module):
                 print("Error! loaded file was made with different version of nntd! exiting ... ")
                 exit()
             self.networkname = savedict["networkname"]
-            self.eventlist += savedict["eventlist"]
+            if "dataname" in savedict:
+                self.dataname = savedict["dataname"]
+            templim = evlim-len(self.eventlist)
+            self.eventlist += savedict["eventlist"][::skipev][:templim]
             self.varnum = savedict["varnum"]
             print("Loaded file: " + x)
+            print("length of eventlist: " + str(len(self.eventlist)))
+            if evlim <= len(self.eventlist):
+                print("stop loading, maximum event number reached")
+                break
         self.makearray(self.eventlist)
+        print("all files loaded, array.size: " + str(self.data.size) + ", array.shape: " + str(self.data.shape))
 
     def load(self, filename):
         # load a given pickle file
@@ -325,6 +443,7 @@ class nntd(basf2.Module):
         self.eventlist = savedict["eventlist"]
         self.varnum = savedict["varnum"]
         self.networkname = savedict["networkname"]
+        self.dataname = savedict["dataname"]
         # self.eventfilters()
         self.makearray(self.eventlist)
 

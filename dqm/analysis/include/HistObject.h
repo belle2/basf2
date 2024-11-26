@@ -16,7 +16,7 @@ namespace Belle2 {
    */
   class HistObject {
   public:
-    TH1* m_hist{};/**< Pointer to histogram */
+    std::unique_ptr <TH1> m_hist;/**< Pointer to histogram */
     bool m_updated = false; /**< flag if update since last event */
     double m_entries = -1; /**< entries in previous/current for update check */
   public:
@@ -25,10 +25,15 @@ namespace Belle2 {
      */
     HistObject(void) : m_hist(nullptr), m_updated(false), m_entries(-1) {};
 
+    /** Destructor
+     */
+    ~HistObject(void);
+
     /** Check if update of histogram is necessary
      * @param hist pointer to histogram
+     * @return histogram was updated flag (return m_updated)
      */
-    void update(TH1* hist);
+    bool update(TH1* hist);
 
     /** Reset histogram and update flag, not the entries
      */
@@ -42,7 +47,7 @@ namespace Belle2 {
     /** Get hist pointer
     * @return hist ptr
     */
-    TH1* getHist(void) { return m_hist;};
+    TH1* getHist(void) { return m_hist.get();};
 
   };
 }

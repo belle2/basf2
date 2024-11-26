@@ -200,7 +200,6 @@ namespace Belle2 {
 
       /**
        * Make transformations global from local.
-       * @param[in,out] dat Transformation data.
        */
       void transformsToGlobal();
 

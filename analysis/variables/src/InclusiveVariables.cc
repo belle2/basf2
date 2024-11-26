@@ -122,7 +122,7 @@ namespace Belle2 {
           double sum = 0.0;
           if (particle->getNDaughters() == 0)
           {
-            return std::numeric_limits<double>::quiet_NaN();
+            return Const::doubleNaN;
           }
           if (std::holds_alternative<double>(var->function(particle->getDaughter(0))))
           {

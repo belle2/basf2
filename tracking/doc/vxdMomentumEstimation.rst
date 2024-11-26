@@ -1,4 +1,4 @@
-.. _tracking_vxdMomentumEstimation: 
+.. _tracking_vxdMomentumEstimation:
 
 VXD Momentum Estimation
 =======================

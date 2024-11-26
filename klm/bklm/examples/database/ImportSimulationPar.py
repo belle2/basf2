@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,6 +11,7 @@
 # Import BKLM simulation parameters payloads.
 
 import basf2
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import BKLMDatabaseImporter
 
 basf2.set_log_level(basf2.LogLevel.INFO)

@@ -32,7 +32,7 @@ namespace Belle2 {
      *  boost::variant from all the users, which reduced the compilation time by a good 20%.
      *
      *  The parameters can still be inspected by getValues(), but the user must include the
-     *  implementation (e.g. #include <boost/variant/variant.hpp>) to be able to inspect them.
+     *  implementation (e.g. "#include <boost/variant/variant.hpp>") to be able to inspect them.
      */
     class FilterParamMap {
 
@@ -43,7 +43,7 @@ namespace Belle2 {
       /// Default destructor
       ~FilterParamMap();
 
-      /// Create one parameter in the parameter list for the module with the given name and desciption.
+      /// Create one parameter in the parameter list for the module with the given name and description.
       void
       addParameter(ModuleParamList* moduleParamList, const std::string& name, const std::string& description);
 
@@ -54,7 +54,7 @@ namespace Belle2 {
       // std::map<std::string, FilterParamVariant> getValues() const;
 
     private:
-      /// Forward declartion of implementation.
+      /// Forward declaration of implementation.
       class Impl;
 
       /// Pointer to implementation hiding the details.

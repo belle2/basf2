@@ -6,30 +6,23 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclChargedPIDMVA/ECLChargedPIDMVAModule.h>
 
-// FRAMEWORK
-#include <framework/gearbox/Const.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-
-// ANALYSIS
+/* Basf2 headers. */
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
-
-// MVA
-#include <mva/interface/Interface.h>
-#include <mva/methods/TMVA.h>
-
-// MDST
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 #include <mdst/dataobjects/Track.h>
+#include <mva/interface/Interface.h>
 
-// C++
+/* ROOT headers. */
+#include <TMath.h>
+
+/* C++ headers. */
 #include <limits>
 #include <string>
-#include <math.h>
-#include "TMath.h"
 
 using namespace Belle2;
 typedef ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode transformModes;

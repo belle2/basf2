@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
+#include <vector>
 
 enum { OFFSET_LENGTH = 0, OFFSET_HEADER = 1, OFFSET_TRIGNR = 2, OFFSET_RUNNR = 3, OFFSET_ROIS = 4};
 enum {
@@ -43,7 +44,7 @@ char* timestamp()
 
 int main(int /*argc*/, char** /*argv*/)
 {
-  unsigned int buf[400000];
+  vector<unsigned int> buf(400000);
   int infn = fileno(stdin);
   printf("infn = %d\n", infn);
 

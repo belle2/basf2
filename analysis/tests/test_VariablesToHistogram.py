@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -14,7 +13,7 @@ import basf2
 import ROOT
 import b2test_utils
 
-inputFile = b2test_utils.require_file('mdst14.root', 'validation')
+inputFile = b2test_utils.require_file('mdst16.root', 'validation')
 path = basf2.create_path()
 path.add_module('RootInput', inputFileName=inputFile)
 path.add_module('ParticleLoader', decayStrings=['e+'])
@@ -82,5 +81,5 @@ with b2test_utils.clean_working_directory():
     ntracks_12_2d = []
     for i in range(53):
         ntracks_12_2d.append(t.GetBinContent(13, i))
-    assert ntracks_12_1d == sum(ntracks_12_2d),\
+    assert ntracks_12_1d == sum(ntracks_12_2d), \
         f'Expected same amount of events with 12 tracks in 1D and 2D histograms got {ntracks_12_1d} {sum(ntracks_12_2d)}'

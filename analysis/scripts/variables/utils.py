@@ -142,7 +142,7 @@ def create_daughter_aliases(
       [INFO] =========================
 
     * create aliases for the second grand grand daughter of the third grand
-      daughter of the fifth daugther, starting with my and including the
+      daughter of the fifth daughter, starting with my and including the
       indices, resulting in "my_d4_d2_d1_E", "my_d4_d2_d1_m"
 
       >>> create_daughter_aliases(["E", "m"], [4, 2, 1], prefix="my")
@@ -157,7 +157,7 @@ def create_daughter_aliases(
 
     """
 
-    if not isinstance(indices, collections.Iterable):
+    if not isinstance(indices, collections.abc.Iterable):
         indices = [indices]
 
     if include_indices:
@@ -198,7 +198,7 @@ class DecayParticleNode:
 
         This function will make sure that prefix names are unique: If there are
         multiple siblings of one node with the same particle name they will be
-        distinguised by either suffixing them with the decay index (if
+        distinguished by either suffixing them with the decay index (if
         ``use_relative_indices=False``) or they will just be enumerated
         starting at 0 otherwise.
 
@@ -248,7 +248,7 @@ class DecayParticleNode:
             prefix = current_prefix + c.name
             # is this particle name ambiguous or are all indices requested? add index
             if always_include_indices or names[c.name] > 1:
-                prefix += "_{}".format(relative_indices[c.name] if use_relative_indices else index)
+                prefix += f"_{relative_indices[c.name] if use_relative_indices else index}"
                 # always increase the relative indices
                 relative_indices[c.name] += 1
 
@@ -573,4 +573,4 @@ def create_isSignal_alias(aliasName, flags):
             informationString += "Now one of the input flags is " + str(int) + " ."
             raise ValueError(informationString)
 
-    variables.variables.addAlias(aliasName, "passesCut(unmask(mcErrors, %d) == %d)" % (mask, 0))
+    variables.variables.addAlias(aliasName, f"passesCut(unmask(mcErrors, {int(mask)}) == {int(0)})")

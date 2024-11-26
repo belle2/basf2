@@ -112,7 +112,7 @@ void vxdDigitMaskingModule::defineHisto()
       int iLadder = id.getLadderNumber();
       int iSensor = id.getSensorNumber();
       VxdID sensorID(iLayer, iLadder, iSensor);
-      PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
 
       int nPixelsU = SensorInfo.getUCells();
@@ -152,7 +152,7 @@ void vxdDigitMaskingModule::defineHisto()
       int iLadder = id.getLadderNumber();
       int iSensor = id.getSensorNumber();
       VxdID sensorID(iLayer, iLadder, iSensor);
-      SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
 
       int nStripsU = SensorInfo.getUCells();
@@ -392,7 +392,6 @@ void vxdDigitMaskingModule::endRun()
       fprintf(MaskList, "        <!--pixels vStart = \"100\" vEnd = \"120\"></pixels-->\n");
       fprintf(MaskList, "        <!--pixels uStart = \"120\" uEnd = \"202\"></pixels-->\n");
       fprintf(MaskList, "\n");
-      int nMasked = 0;
       for (int i1 = 0; i1 < m_PXDMaskUV[i]->GetNbinsX(); ++i1) {
         for (int i2 = 0; i2 < m_PXDMaskUV[i]->GetNbinsY(); ++i2) {
           int ExistMask = 0;
@@ -407,7 +406,6 @@ void vxdDigitMaskingModule::endRun()
           if (ExistMask || (m_PXDHitMapUV[i]->GetBinContent(i1 + 1, i2 + 1) > PXDCut)) {
             fprintf(MaskList, "        <pixels uStart = \"%04i\" vStart = \"%04i\"></pixels>\n", i1, i2);
             m_PXDMaskUV[i]->SetBinContent(i1 + 1, i2 + 1, 1 + ExistMask);
-            nMasked++;
           }
         }
       }

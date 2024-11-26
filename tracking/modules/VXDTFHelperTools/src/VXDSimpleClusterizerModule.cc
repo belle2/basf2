@@ -158,7 +158,7 @@ void VXDSimpleClusterizerModule::event()
     double energy = aPxdTrueHit->getEnergyDep();
 
 
-    if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
+    if (m_onlyPrimaries == true) { // ignore hits not coming from primary particles (e.g material effects particles)
       if (aMcParticle == nullptr or aMcParticle->hasStatus(MCParticle::c_PrimaryParticle) == false) {
         m_fakePXDHitCtr++;
         discardedPXDFake++;
@@ -197,26 +197,11 @@ void VXDSimpleClusterizerModule::event()
     }
 
     if (m_setMeasSigma == 0 and m_uniSigma == 0) {
-      // in this case, the hits will not be smeared, but still we need some measurement error-values to be able to do some fitting... WARNING currently arbritary values here, better solution recommended!
+      // in this case, the hits will not be smeared, but still we need some measurement error-values to be able to do some fitting... WARNING currently arbitrary values here, better solution recommended!
       sigmaU = 0.000001;
       sigmaV = 0.000001;
     }
 
-    /** Constructor.
-     * @param sensorID Sensor compact ID.
-     * @param uPosition Cluster u coordinate (r-phi).
-     * @param vPosition Cluster v coordinate (z).
-     * @param uError Error (estimate) of uPosition.
-     * @param vError Error (estiamte) of vPosition.
-     * @param uvRho u-v error correlation coefficient.
-     * @param clsCharge The cluster charge.
-     * @param seedCharge The charge of the cluster seed.
-     * @param clsSize size of the cluster in pixels.
-     * @param uSize number of pixel columns contributing to the cluster.
-     * @param vSize number of pixel rows contributing to the cluster.
-     *     unsigned short m_uStart;    Start column of the cluster
-     * unsigned short m_vStart;   Start row of the cluster
-     */
     // Save as new 2D-PXD-cluster
     PXDCluster* newCluster = m_pxdClusters.appendNew(aVXDId, u, v, sigmaU, sigmaV, 0, 1, 1, 1, 1, 1, 1, 1);
     // add relations
@@ -239,7 +224,7 @@ void VXDSimpleClusterizerModule::event()
     const MCParticle* aMcParticle = aSvdTrueHit->getRelatedFrom<MCParticle>();
     unsigned int particleID = std::numeric_limits<unsigned int>::max();
 
-    if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
+    if (m_onlyPrimaries == true) { // ignore hits not coming from primary particles (e.g material effects particles)
       if (aMcParticle == nullptr or aMcParticle->hasStatus(MCParticle::c_PrimaryParticle) == false) {
         m_fakeSVDHitCtr++;
         discardedSVDFake++;
@@ -282,26 +267,13 @@ void VXDSimpleClusterizerModule::event()
     }
 
     if (m_setMeasSigma == 0) {
-      // in this case, the hits will not be smeared, but still we need some measurement error-values to be able to do some fitting... WARNING currently arbritary values here, better solution recommended!
+      // in this case, the hits will not be smeared, but still we need some measurement error-values to be able to do some fitting... WARNING currently arbitrary values here, better solution recommended!
       sigmaU = 0.000001;
       sigmaV = 0.000001;
     }
 
     // Save as two new 1D-SVD-clusters
     double timeStamp = m_svdTrueHits[currentTrueHit]->getGlobalTime();
-
-    /** Constructor.
-     * @param sensorID Sensor compact ID.
-     * @param isU True if u strips, otherwise false.
-     * @param position Seed strip coordinate.
-     * @param positionSigma Error in strip coordinate.
-     * @param clsTime The average of waveform maxima times of strips in the cluster.
-     * @param clsTimeSigma The standard deviation of waveform maxima times.
-     * @param clsCharge The cluster charge in electrons.
-     * @param seedCharge The charge of the seed strip in electrons.
-     * @param clsSize The size of the cluster in the corresponding strip pitch units.
-     * @param clsSNR The cluster charge SNR
-     */
 
     SVDCluster* newClusterU =  m_svdClusters.appendNew(aVXDId, true, u, sigmaU, timeStamp, 0, 1, 1,
                                                        3, 1); // in a typical situation 3-5 Strips are excited per Hit -> set to 3

@@ -31,7 +31,7 @@ bool ParticleWeightingAxis::isOverlappingBin(ParticleWeightingBinLimits* bin)
       return true;
     }
     /**
-     * Checking if new bin covers exiting bin completely
+     * Checking if new bin covers existing bin completely
      * existing binning:          |   |
      * new binning:            |        |
      */

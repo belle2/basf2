@@ -16,7 +16,7 @@ using namespace TrackFindingCDC;
 
 double SinEqLine::computeSmallestPositiveRoot(int maxIHalfPeriod) const
 {
-  /// Smallest positive root might before the first positive extermum
+  /// Smallest positive root might before the first positive extremum
   double root = computeRootLargerThanExtemumInHalfPeriod(-1);
   if (root > 0) return root;
 
@@ -28,7 +28,7 @@ double SinEqLine::computeSmallestPositiveRoot(int maxIHalfPeriod) const
   for (int iHalfPeriod = 1; iHalfPeriod <= maxIHalfPeriod; ++iHalfPeriod) {
     root = computeRootLargerThanExtemumInHalfPeriod(iHalfPeriod);
 
-    /// Check if the solution returned is positiv, that implies that it is not NAN.
+    /// Check if the solution returned is positive, that implies that it is not NAN.
     if (root > 0) return root;
   }
 
@@ -106,14 +106,14 @@ double SinEqLine::computeRootInInterval(double lowerX, double upperX) const
 
     if (not updatedBound) {
 
-      // fall back to sekant.
+      // fall back to secant.
       next.setX(secantX(last, current));
       next.setY(map(next.x()));
 
       updatedBound = updateBounds(lower, upper, next);
 
       if (not updatedBound) {
-        // fallback to interval devision.
+        // fallback to interval division.
         next.setX(middleX(lower, upper));
         next.setY(map(next.x()));
         updatedBound = updateBounds(lower, upper, next);
@@ -148,7 +148,7 @@ double SinEqLine::newtonX(const Vector2D& pos) const
 
 bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& next)
 {
-  /// Only update if the next point is inbetween the lower and upper bound
+  /// Only update if the next point is in-between the lower and upper bound
   if (not isBetween(lower, next, upper)) return false;
 
   EIncDec incDecInfo = getEIncDec(lower, upper);

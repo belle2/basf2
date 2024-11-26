@@ -14,11 +14,6 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 #include <vxd/dataobjects/VxdID.h>
 #include <TLine.h>
 
@@ -66,18 +61,18 @@ namespace Belle2 {
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
-    //! prefix for EPICS PVs
-    std::string m_pvPrefix;
     //! low warn limit for alarm
-    double m_lowarnlimit;
+    double m_meanLowerWarn{NAN};
     //! low error limit for alarm
-    double m_loerrorlimit;
+    double m_meanLowerAlarm{NAN};
     //! high warn limit for alarm
-    double m_hiwarnlimit;
+    double m_meanUpperWarn{NAN};
     //! high error limit for alarm
-    double m_hierrorlimit;
-    /** Update entry intervall */
+    double m_meanUpperAlarm{NAN};
+    /** Update entry interval */
     int m_minEntries = 1000;
+    /** Indizes of excluded PXD Modules */
+    std::vector<int> m_excluded;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -88,21 +83,18 @@ namespace Belle2 {
     TCanvas* m_cReduction = nullptr;
 
     //! Line in the Canvas to guide the eye
-    TLine* m_line1 = nullptr;
+    TLine* m_meanLine = nullptr;
+    //! Line in the Canvas to indicate limits
+    TLine* m_meanLowerWarnLine = nullptr;
+    //! Line in the Canvas to indicate limits
+    TLine* m_meanUpperWarnLine = nullptr;
+    //! Line in the Canvas to indicate limits
+    TLine* m_meanLowerAlarmLine = nullptr;
+    //! Line in the Canvas to indicate limits
+    TLine* m_meanUpperAlarmLine = nullptr;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-    /** flag if to export to EPICS */
-    bool m_useEpics;
-
-    /** flag if to import from EPICS only */
-    bool m_useEpicsRO;
-
-#ifdef _BELLE2_EPICS
-    //! EPICS PVs
-    std::vector <chid>  mychid;
-#endif
   };
 } // end namespace Belle2
 

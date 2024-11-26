@@ -8,6 +8,7 @@
 import os
 import argparse
 import multiprocessing
+import tempfile
 
 import basf2
 
@@ -55,8 +56,14 @@ def setup_basf2_and_db(zmq=False):
     parser.add_argument('--local-db-path', type=str,
                         help="set path to the local payload locations to use for the ConditionDB",
                         default=constants.DEFAULT_DB_FILE_LOCATION)
+    parser.add_argument('--local-db-tag', type=str, nargs="*",
+                        help="Use the local db with a specific tag (can be applied multiple times, order is relevant)")
     parser.add_argument('--central-db-tag', type=str, nargs="*",
                         help="Use the central db with a specific tag (can be applied multiple times, order is relevant)")
+    parser.add_argument('--udp-hostname', type=str,
+                        help="set hostname for UDP logging connection", default=None)
+    parser.add_argument('--udp-port', type=int,
+                        help="set port number for UDP logging connection", default=None)
 
     args = parser.parse_args()
 
@@ -66,18 +73,26 @@ def setup_basf2_and_db(zmq=False):
         for central_tag in args.central_db_tag:
             basf2.conditions.prepend_globaltag(central_tag)
     else:
-        basf2.conditions.globaltags = ["online"]
+        if args.local_db_tag:
+            for local_tag in args.local_db_tag:
+                basf2.conditions.prepend_globaltag(local_tag)
+        else:
+            basf2.conditions.globaltags = ["online"]
         basf2.conditions.metadata_providers = ["file://" + basf2.find_file(args.local_db_path + "/metadata.sqlite")]
         basf2.conditions.payload_locations = [basf2.find_file(args.local_db_path)]
 
     # Number of processes
     basf2.set_nprocesses(args.number_processes)
 
-    # Logging
+    # basf2 logging setup
     basf2.set_log_level(basf2.LogLevel.ERROR)
     # And because reasons we want every log message to be only one line,
     # otherwise the LogFilter in daq_slc throws away the other lines
     basf2.logging.enable_escape_newlines = True
+
+    # UDP logging
+    if (args.udp_hostname is not None) and (args.udp_port is not None):
+        basf2.logging.add_udp(args.udp_hostname, args.udp_port)
 
     # Online realm
     basf2.set_realm("online")
@@ -110,7 +125,7 @@ def start_path(args, location):
 
     # Histogram Handling
     if not args.histo_output_file:
-        path.add_module('DqmHistoManager', Port=args.histo_port, DumpInterval=1000, workDirName="/tmp/")
+        path.add_module('DqmHistoManager', Port=args.histo_port, DumpInterval=1000, workDirName=tempfile.gettempdir()+"/")
     else:
         workdir = os.path.dirname(args.histo_output_file)
         filename = os.path.basename(args.histo_output_file)
@@ -148,6 +163,14 @@ def add_hlt_processing(path,
     """
     Add all modules for processing on HLT filter machines
     """
+
+    # Check if the run is cosmic and set the Environment accordingly
+    if run_type == constants.RunTypes.cosmic:
+        basf2.declare_cosmics()
+
+    # Check if the run is beam and set the Environment accordingly
+    if run_type == constants.RunTypes.beam:
+        basf2.declare_beam()
 
     # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
@@ -229,7 +252,7 @@ def add_hlt_processing(path,
     add_roi_payload_assembler(path, ignore_hlt_decision=pxd_ignores_hlt_decision)
     path.add_module('StatisticsSummary').set_name('Sum_ROI_Payload_Assembler')
 
-    # Add the part of the dqm modules, which should run on all events, not only on the accepted onces
+    # Add the part of the dqm modules, which should run on all events, not only on the accepted ones
     path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events,
                            create_hlt_unit_histograms=create_hlt_unit_histograms)
 
@@ -251,6 +274,15 @@ def add_expressreco_processing(path,
     """
     Add all modules for processing on the ExpressReco machines
     """
+
+    # Check if the run is cosmic and set the Environment accordingly
+    if run_type == constants.RunTypes.cosmic:
+        basf2.declare_cosmics()
+
+    # Check if the run is beam and set the Environment accordingly
+    if run_type == constants.RunTypes.beam:
+        basf2.declare_beam()
+
     if unpacker_components is None:
         unpacker_components = constants.DEFAULT_EXPRESSRECO_COMPONENTS
     if reco_components is None:
@@ -287,6 +319,9 @@ def add_expressreco_processing(path,
                                        skipGeometryAdding=True, **kwargs)
         else:
             basf2.B2FATAL(f"Run Type {run_type} not supported.")
+
+        basf2.set_module_parameters(path, "SVDTimeGrouping", forceGroupingFromDB=False,
+                                    isEnabledIn6Samples=True, isEnabledIn3Samples=True)
 
     path_utils.add_expressreco_dqm(path, run_type, components=reco_components)
 
@@ -343,8 +378,8 @@ def finalize_zmq_path(path, args, location):
     basf2.set_streamobjs(save_objects)
 
     if location == constants.Location.expressreco:
-        path.add_module("HLTDs2ZMQ", output=args.output, raw=False)
+        path.add_module("HLTDs2ZMQ", output=args.output, raw=False, outputConfirmation=False)
     elif location == constants.Location.hlt:
-        path.add_module("HLTDs2ZMQ", output=args.output, raw=True)
+        path.add_module("HLTDs2ZMQ", output=args.output, raw=True, outputConfirmation=True)
     else:
         basf2.B2FATAL(f"Does not know location {location}")

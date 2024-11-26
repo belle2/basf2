@@ -174,7 +174,7 @@ if __name__ == "__main__":
     db_file = os.path.join(args.output, "database.txt")
     missing_benergy = os.path.join(args.output, "missing_benergy.txt")
     missing_ip = os.path.join(args.output, "missing_ip.txt")
-    # specfiy where to store new payloads
+    # specify where to store new payloads
     b2.conditions.expert_settings(save_payloads=db_file)
     # disable database access, we only create, don't use
     b2.conditions.metadata_providers = []
@@ -188,7 +188,7 @@ if __name__ == "__main__":
     b2.B2INFO(f"{len(rundata)} runs in total")
 
     if args.exp is not None:
-        rundata = set(e for e in rundata if e[0] == args.exp)
+        rundata = {e for e in rundata if e[0] == args.exp}
         b2.B2INFO(f"{len(rundata)} runs for experiment {args.exp}")
 
     # and subtract all excluded runs from that

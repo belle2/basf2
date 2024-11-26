@@ -1,5 +1,4 @@
 # !/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -66,7 +65,7 @@ class ConvNet(nn.Module):
         fc represents fully-connected layer
         conv represents convolutional layer
         """
-        super(ConvNet, self).__init__()
+        super().__init__()
         C_in, H_in, W_in = params['input_shape']
         num_emb_theta = params['num_emb_theta']
         dim_emb_theta = params['dim_emb_theta']

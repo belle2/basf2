@@ -144,7 +144,7 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 void PrintDataTemplateModule::checkFTSWver2(RawFTSW* rawftsw, int i)
 {
   //
-  // Double check by comparing extracted values with ones at https://confluence.desy.de/display/BI/DAQ+TimingDistribution (ver.26)
+  // Double check by comparing extracted values with ones at https://xwiki.desy.de/xwiki/rest/p/a2bb3
   //
 
   int* buf = rawftsw->GetBuffer(i);
@@ -337,14 +337,14 @@ void PrintDataTemplateModule::printPXDEvent(RawPXD* raw_pxd)
         ctime_type = ((temp_buf[ pos + 2 ] & 0xff) << 24) |
                      (((temp_buf[ pos + 2 ] >> 8) & 0xff) << 16) |
                      (((temp_buf[ pos + 1 ] >> 16) & 0xff) << 8) |
-                     (((temp_buf[ pos + 1 ] >> 24) & 0xff));
+                     ((temp_buf[ pos + 1 ] >> 24) & 0xff);
       }
 
       if (((temp_buf[ pos ] >> 4)  & 0x7) == 1) {
         dhe_time = ((temp_buf[ pos + 2 ] & 0xff) << 24) |
                    (((temp_buf[ pos + 2 ] >> 8) & 0xff) << 16) |
                    (((temp_buf[ pos + 1 ] >> 16) & 0xff) << 8) |
-                   (((temp_buf[ pos + 1 ] >> 24) & 0xff));
+                   ((temp_buf[ pos + 1 ] >> 24) & 0xff);
       }
 
 //         printf("Event mixing is occured. hlt %.8x dhh %.8x onsen %.8x %.8x %.8x nf %d\n", hlttrg, dhh_trg, onsen_trg,

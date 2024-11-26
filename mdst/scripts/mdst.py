@@ -18,6 +18,7 @@ MDST_OBJECTS = (
     'EventLevelTrackingInfo',
     'EventLevelTriggerTimeInfo',
     'KLMClusters',
+    'Kinks',
     'KlIds',
     'PIDLikelihoods',
     'SoftwareTriggerResult',
@@ -74,6 +75,7 @@ def add_mdst_dump(path, print_untested=False):
     """
 
     # Always avoid the top-level 'import ROOT'.
+    from ROOT import Belle2  # noqa: make Belle2 namespace available
     from ROOT.Belle2 import Const  # noqa
 
     # prepare a list of PID detector sets and charged stable particles
@@ -103,9 +105,17 @@ def add_mdst_dump(path, print_untested=False):
             "getTrackFitResultWithClosestMass": charged_stables,
             "getRelationsWith": ["ECLClusters", "KLMClusters", "MCParticles", "PIDLikelihoods"],
         }),
-        DataStorePrinter("V0", ["getTracks", "getTrackFitResults", "getV0Hypothesis"], {
+        DataStorePrinter("V0", [
+            "getTracks", "getTrackFitResults", "getV0Hypothesis",
+            "getFittedVertexX", "getFittedVertexY", "getFittedVertexZ"
+            ], {
             "getRelationsWith": ["MCParticles"],
         }),
+        DataStorePrinter("Kinks", [
+            "getMotherTrackIndex", "getDaughterTrackIndex", "getTrackFitResultIndexMotherStart",
+            "getTrackFitResultIndexMotherEnd", "getTrackFitResultIndexDaughter",
+            "getFittedVertexX", "getFittedVertexY", "getFittedVertexZ", "getFilterFlag"
+            ]),
         DataStorePrinter("TrackFitResult", [
             "getPosition", "getMomentum", "get4Momentum", "getEnergy", "getTransverseMomentum",
             "getCovariance6", "getParticleType", "getChargeSign", "getPValue", "getD0", "getPhi0",
@@ -119,14 +129,16 @@ def add_mdst_dump(path, print_untested=False):
             "hasSVDCKFAbortionFlag", "hasPXDCKFAbortionFlag", "hasSVDSpacePointCreatorAbortionFlag"], {
             "hasCDCLayer": range(56)
         }, array=False),
-        DataStorePrinter("PIDLikelihood", ["getMostLikely"], {
+        DataStorePrinter("PIDLikelihood", ["getMostLikely", "isAvailable", "areAllAvailable"], {
             "isAvailable": pid_detectors,
+            "areAllAvailable": pid_detectors,
             "getLogL": charged_stables,
             "getProbability": charged_stables,
+            "getLogarithmicProbability": charged_stables,
         }),
         DataStorePrinter("ECLCluster", [
             "isTrack", "isNeutral", "getStatus", "getConnectedRegionId",
-            "getClusterId", "getMinTrkDistance", "getDeltaL",
+            "getClusterId", "getUniqueClusterId", "getMinTrkDistance", "getDeltaL",
             "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getE1oE9",
             "getE9oE21", "getNumberOfHadronDigits", "getR", "getHypotheses",
             "getSecondMoment", "getLAT", "getNumberOfCrystals", "getTime",
@@ -145,7 +157,15 @@ def add_mdst_dump(path, print_untested=False):
             "getNECLCalDigitsOutOfTimeFWD", "getNECLCalDigitsOutOfTimeBarrel",
             "getNECLCalDigitsOutOfTimeBWD", "getNECLCalDigitsOutOfTime",
             "getNECLShowersRejectedFWD", "getNECLShowersRejectedBarrel",
-            "getNECLShowersRejectedBWD", "getNECLShowersRejected"
+            "getNECLShowersRejectedBWD", "getNECLShowersRejected",
+            "getNKLMDigitsMultiStripFWD", "getNKLMDigitsMultiStripBarrel",
+            "getNKLMDigitsMultiStripBWD", "getNKLMDigitsMultiStrip",
+            "getNECLShowersFWD", "getNECLShowersBarrel",
+            "getNECLShowersBWD", "getNECLShowers",
+            "getNECLLocalMaximumsFWD", "getNECLLocalMaximumsBarrel",
+            "getNECLLocalMaximumsBWD", "getNECLLocalMaximums",
+            "getNECLTriggerCellsFWD", "getNECLTriggerCellsBarrel",
+            "getNECLTriggerCellsBWD", "getNECLTriggerCells"
         ], array=False),
         DataStorePrinter("KLMCluster", [
             "getTime", "getLayers", "getInnermostLayer",

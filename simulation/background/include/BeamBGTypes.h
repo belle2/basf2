@@ -51,6 +51,14 @@ namespace Belle2 {
         m_tags["InjectionHER"] = BackgroundMetaData::bg_InjectionHER;
         m_tags["Brems_LER"] = BackgroundMetaData::bg_Brems_LER;
         m_tags["Brems_HER"] = BackgroundMetaData::bg_Brems_HER;
+        m_tags["Brems_base_LER"] = BackgroundMetaData::bg_Brems_base_LER;
+        m_tags["Brems_dynamic_LER"] = BackgroundMetaData::bg_Brems_dynamic_LER;
+        m_tags["Brems_base_HER"] = BackgroundMetaData::bg_Brems_base_HER;
+        m_tags["Brems_dynamic_HER"] = BackgroundMetaData::bg_Brems_dynamic_HER;
+        m_tags["Coulomb_base_LER"] = BackgroundMetaData::bg_Coulomb_base_LER;
+        m_tags["Coulomb_dynamic_LER"] = BackgroundMetaData::bg_Coulomb_dynamic_LER;
+        m_tags["Coulomb_base_HER"] = BackgroundMetaData::bg_Coulomb_base_HER;
+        m_tags["Coulomb_dynamic_HER"] = BackgroundMetaData::bg_Coulomb_dynamic_HER;
         m_tags["other"] = BackgroundMetaData::bg_other;
       }
 

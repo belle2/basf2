@@ -46,7 +46,8 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   addParam("EventFilled", m_fillEvent, "Event override", 0);
   addParam("EventInterval", m_interval, "Time between events (seconds)", 20u);
   addParam("NullHistogramMode", m_nullHistoMode, "Test mode for null histograms", false);
-  addParam("AutoCanvas", m_autocanvas, "Automatic creation of canvas", true);
+  addParam("EnableRunInfo", m_enable_run_info, "Enable Run Info", false);
+  addParam("AddRunControlHist", m_add_runcontrol_hist, "Add Hists from Run Control", false);
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }
 
@@ -61,6 +62,17 @@ void DQMHistAnalysisInputRootFileModule::initialize()
   m_run_idx = 0;
   m_file = new TFile(m_fileList[m_run_idx].c_str());
   m_eventMetaDataPtr.registerInDataStore();
+
+  if (m_enable_run_info) {
+    m_c_info = new TCanvas("DQMInfo/c_info", "");
+    m_c_info->SetTitle("");
+  }
+  if (m_add_runcontrol_hist) {
+    m_h_expno = new TH1F("DQMInfo/expno", "", 1, 0, 1);
+    m_h_runno = new TH1F("DQMInfo/runno", "", 1, 0, 1);
+    m_h_rtype = new TH1F("DQMInfo/rtype", "", 1, 0, 1);
+  }
+
   B2INFO("DQMHistAnalysisInputRootFile: initialized.");
 }
 
@@ -92,11 +104,13 @@ void DQMHistAnalysisInputRootFileModule::beginRun()
 {
   B2INFO("DQMHistAnalysisInputRootFile: beginRun called. Run: " << m_runList[m_run_idx]);
   clearHistList();
+  clearRefList();
 }
 
 void DQMHistAnalysisInputRootFileModule::event()
 {
   B2INFO("DQMHistAnalysisInputRootFile: event called.");
+  TH1::AddDirectory(false);
 
   sleep(m_interval);
 
@@ -115,7 +129,7 @@ void DQMHistAnalysisInputRootFileModule::event()
     m_file = new TFile(m_fileList[m_run_idx].c_str());
   }
 
-  // Clear only after EndOfRun check, otherwise we wont have any histograms for MiraBelle
+  // Clear only after EndOfRun check, otherwise we won't have any histograms for MiraBelle
   // which expects analysis run in endRun function
   initHistListBeforeEvent();
 
@@ -178,33 +192,12 @@ void DQMHistAnalysisInputRootFileModule::event()
 
       if (hname.find("/") == std::string::npos) h->SetName((dirname + "/" + hname).c_str());
       hs.push_back(h);
-
-      if (m_autocanvas) {
-        std::string name = dirname + "_" + hname;
-        if (m_cs.find(name) == m_cs.end()) {
-          TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
-          m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
-        }
-
-        TCanvas* c = m_cs[name]; // access already created canvas
-        B2DEBUG(1, "DQMHistAnalysisInputRoot: new canvas " << c->GetName());
-        c->cd();
-        if (h->GetDimension() == 1) {
-          // assume users are expecting non-0-suppressed axis
-          if (h->GetMinimum() > 0) h->SetMinimum(0);
-          h->Draw("hist");
-        } else if (h->GetDimension() == 2) {
-          // ... but not in 2d
-          h->Draw("colz");
-        }
-        c->Update();
-      }
     }
     m_file->cd();
   }
 
   // if no histograms are found in the sub-directories
-  // searc the top folder
+  // search the top folder
   if (hs.size() == 0) {
     TIter nexth(m_file->GetListOfKeys());
     TKey* keyh = NULL;
@@ -230,24 +223,12 @@ void DQMHistAnalysisInputRootFileModule::event()
       hs.push_back(h);
       Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
       h->Scale(scale);
-      if (m_autocanvas) {
-        std::string name = h->GetName();
-        name.replace(name.find("/"), 1, "/c_");
-        if (m_cs.find(name) == m_cs.end()) {
-          TCanvas* c = new TCanvas(name.c_str(), name.c_str());
-          m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
-        }
-        TCanvas* c = m_cs[name];
-        c->cd();
-        if (h->GetDimension() == 1) {
-          h->Draw("hist");
-        } else if (h->GetDimension() == 2) {
-          h->Draw("colz");
-        }
-        c->Update();
-      }
     }
   }
+
+  auto runno = m_runList[m_run_idx];
+  if (m_c_info != NULL) m_c_info->SetTitle(("OFFLINE: Exp " + std::to_string(m_expno) + ", Run " + std::to_string(
+                                                runno) + ", RunType " + m_runType + ", Last Changed NEVER, Last Updated NEVER, Last DQM event NEVER").c_str());
 
   m_count++;
   m_eventMetaDataPtr.create();
@@ -256,6 +237,14 @@ void DQMHistAnalysisInputRootFileModule::event()
   m_eventMetaDataPtr->setEvent(m_count);
   m_eventMetaDataPtr->setTime(ts * 1e9);
 
+  if (m_add_runcontrol_hist) {
+    m_h_expno->SetTitle(std::to_string(m_expno).c_str());
+    hs.push_back(m_h_expno);
+    m_h_runno->SetTitle(std::to_string(runno).c_str());
+    hs.push_back(m_h_runno);
+    m_h_rtype->SetTitle(m_runType.c_str());
+    hs.push_back(m_h_rtype);
+  }
   //setExpNr(m_expno); // redundant access from MetaData
   //setRunNr(m_runno); // redundant access from MetaData
   if (m_runType == "") ExtractRunType(hs);
@@ -270,15 +259,3 @@ void DQMHistAnalysisInputRootFileModule::event()
 
   B2INFO("DQMHistAnalysisInputRootFile: event finished. count: " << m_count);
 }
-
-void DQMHistAnalysisInputRootFileModule::endRun()
-{
-  B2INFO("DQMHistAnalysisInputRootFile : endRun called");
-}
-
-
-void DQMHistAnalysisInputRootFileModule::terminate()
-{
-  B2INFO("terminate called");
-}
-

@@ -14,7 +14,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 // Geant4
 #include <G4Types.hh>
@@ -61,10 +61,10 @@ namespace Belle2 {
       const G4ThreeVector postStepPosLocal = postStep.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(postStepPos);
       const G4ThreeVector momInLocal = preStep.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformAxis(momIn);
       const G4ThreeVector momOutLocal = preStep.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformAxis(momOut);
-      TVector3 posInVec(preStepPosLocal.x() * Unit::mm, preStepPosLocal.y() * Unit::mm, preStepPosLocal.z() * Unit::mm);
-      TVector3 posOutVec(postStepPosLocal.x() * Unit::mm, postStepPosLocal.y() * Unit::mm, postStepPosLocal.z() * Unit::mm);
-      TVector3 momInVec(momInLocal.x() * Unit::MeV, momInLocal.y() * Unit::MeV, momInLocal.z() * Unit::MeV);
-      TVector3 momOutVec(momOutLocal.x() * Unit::MeV, momOutLocal.y() * Unit::MeV, momOutLocal.z() * Unit::MeV);
+      ROOT::Math::XYZVector posInVec(preStepPosLocal.x() * Unit::mm, preStepPosLocal.y() * Unit::mm, preStepPosLocal.z() * Unit::mm);
+      ROOT::Math::XYZVector posOutVec(postStepPosLocal.x() * Unit::mm, postStepPosLocal.y() * Unit::mm, postStepPosLocal.z() * Unit::mm);
+      ROOT::Math::XYZVector momInVec(momInLocal.x() * Unit::MeV, momInLocal.y() * Unit::MeV, momInLocal.z() * Unit::MeV);
+      ROOT::Math::XYZVector momOutVec(momOutLocal.x() * Unit::MeV, momOutLocal.y() * Unit::MeV, momOutLocal.z() * Unit::MeV);
 
       // B2INFO("Step in volume: " << g4Volume.GetName())
       // check that user limits are set properly

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,6 +11,7 @@
 # Import KLM strip efficiency payloads.
 
 import sys
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import KLMDatabaseImporter, KLMStripEfficiency, KLMChannelIndex
 
 mc = False

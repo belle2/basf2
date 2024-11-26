@@ -82,7 +82,7 @@ namespace Belle2 {
     }
 
     auto h = getObjectPtr<TH1F>("recBuckets");
-    h->Fill(m_recBunch->getAbsoluteBunchNo(0, m_bunchStructure->getRFBucketsPerRevolution()));
+    h->Fill(m_recBunch->getBucketNumber(0, m_bunchStructure->getRFBucketsPerRevolution()));
   }
 
 }

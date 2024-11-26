@@ -1144,7 +1144,7 @@ void ARICHDatabaseImporter::dumpQEMap(bool simple)
         for (int j = 0; j < 144; j++) {
           int xCh, yCh;
           chMap->getXYFromAsic(j, xCh, yCh);
-          TVector2 chPos = geoConfig->getChannelPosition(i, xCh, yCh);
+          ROOT::Math::XYVector chPos = geoConfig->getChannelPosition(i, xCh, yCh);
           gr->SetPoint(point, chPos.X(), chPos.Y(), modInfo->getChannelQE(i, j));
           point++;
         }

@@ -108,8 +108,6 @@ namespace Belle2 {
     TH1F* m_time{nullptr};
     /**  track separation distance plot   */
     TH1F* m_trackSep{nullptr};
-    /**  energy plot   */
-    TH1F* m_energy{nullptr};
     /**  layer count plot   */
     TH1F* m_nLayer{nullptr};
     /**  innermostlayer  */
@@ -147,6 +145,9 @@ namespace Belle2 {
 
     /** output file name */
     std::string m_outputName = "K_long_full_validation_sample.root";
+
+    /** contact email address */
+    std::string m_contact = "";
 
     /** root tree etc. */
     TFile* m_f = nullptr;

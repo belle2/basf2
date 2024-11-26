@@ -18,19 +18,24 @@ using namespace Belle2;
 void ARICHReconstructionPar::initializeDefault()
 {
 
-  double parsBkg[8] = {1, 0, 0.0062, 5.0, 0.10364, 20.0596, 0.002103, -0.0031283};
+  double parsBkg[10] = {0, 1, 8.764830e+00, -4.815370e+00, 3.268570e-06, 8.518560e+00, -9.609710e+00, 9.769060e-06, 1.095350e-02, -1.322410e-02};
   m_bkgPDF = new TF1("bkgPDF",
-                     "((1-[1])*[2]*exp(-[3]*x) + [1]*([4]*exp(-[5]*x)+[6]+[7]*x))*(1-1/1.5/1.5/[0]/[0])*TMath::Floor(1.5*[0])");
+                     "0*[0] + (1-[1])*(exp([2]+[3]*x)*[4]) + [1]*(exp([5]+[6]*x)*[7]+x*[8]+x*x*[9])");
   m_bkgPDF->SetParameters(parsBkg);
 
   double parsRes[4] = {1.12147e-01, 3.81701e+00, 0.0093, -6.14984e-04};
-  m_thcResolution = new TF1("thcResolution", "[0]*exp(-[1]*x)+[2]+[3]*x");
+  m_thcResolution = new TF1("thcResolution", "([p0]*exp(-[p1]*x)+[p2]+[p3]*x-((x>3)?[p3]*(x-3):0))*1.35");
   m_thcResolution->SetParameters(parsRes);
 
-  m_pars = {0.18, 0.13};
-  m_flatBkgPerPad = 0.0014;
+  double parsBkgPhi[8] = {0, 0, 6.68258e-02, 6.50048e+00, -1.04876e-01, -7.06652e-03, 1.34111e-01, 1.83823e-01};
+  m_bkgPhiPDF = new TF2("m_bkgPhiPDF",
+                        "[0]*0 + [1]*0 + 1/( ([2]*exp(y*[3]) + [4])*cos(x/2)*cos(x/2)*cos(x/2)*cos(x/2) + sqrt([5] + [6]*y + [7]*y*y ) )");
+  m_bkgPhiPDF->SetParameters(parsBkgPhi);
 
-  m_aerogelFOM = {11.3, 13.0};
+  m_pars = {0.098304138, 5.973590e-02, 21, 0.88, 3.7, 0.357, 0.46, 1, 0.12, 0.12, 0.02, 1.5, 0.0288};
+  m_flatBkgPerPad = 0.000892;
+
+  m_aerogelFOM = {13.200797, 15.186757};
 }
 
 double ARICHReconstructionPar::getBackgroundPerPad(double th_cer, const std::vector<double>& pars) const
@@ -42,6 +47,18 @@ double ARICHReconstructionPar::getBackgroundPerPad(double th_cer, const std::vec
     ipar++;
   }
   return m_bkgPDF->Eval(th_cer) + m_flatBkgPerPad;
+}
+
+double ARICHReconstructionPar::getPhiCorrectedBackgroundPerPad(double fi_cer_trk, double th_cer,
+    const std::vector<double>& pars) const
+{
+
+  int ipar = 0;
+  for (auto par : pars) {
+    m_bkgPhiPDF->SetParameter(ipar, par);
+    ipar++;
+  }
+  return m_flatBkgPerPad * m_bkgPhiPDF->Eval(fi_cer_trk, th_cer);
 }
 
 double ARICHReconstructionPar::getExpectedBackgroundHits(const std::vector<double>& pars, double minThc, double maxThc) const
@@ -85,10 +102,17 @@ void ARICHReconstructionPar::print() const
   m_bkgPDF->GetParameters(bkgPars.data());
   for (int i = 0; i < Npar; i++)cout << Form("bkg Pars %d = %e", i, bkgPars[i]) << endl;
 
+  cout << endl << "-----bkg phi corr PDF-----" << endl;
+  m_bkgPhiPDF->Print();
+  int Npar2 = m_bkgPhiPDF->GetNpar();
+  std::vector<double> bkgPhiCorPars(Npar2, 0);
+  m_bkgPhiPDF->GetParameters(bkgPhiCorPars.data());
+  for (int i = 0; i < Npar2; i++)cout << Form("bkg Pars %d = %e", i, bkgPhiCorPars[i]) << endl;
+
   cout << endl << "-----flat backgroud per pad-----"  << endl;
   cout << " flat background per pad is " << m_flatBkgPerPad << endl;
 
-  cout << endl << "----additional parameters (for wide gaus)-----"  << endl;
+  cout << endl << "----additional parameters (for wide gaus, quartz etc.)-----"  << endl;
   for (int i = 0; i < (int)m_pars.size(); i++) {
     printf("m_pars[%d] = %e\n", i, m_pars[i]);
   }
@@ -105,3 +129,4 @@ void ARICHReconstructionPar::print() const
   for (int i = 0; i < 4; i++)cout << Form("resolution Pars %d = %e", i, resPars[i]) << endl;
 
 }
+

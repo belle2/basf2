@@ -69,7 +69,7 @@ namespace Belle2 {
       // get trigger result object
       StoreObjPtr<SoftwareTriggerResult> swtr;
       if (!swtr)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       // check that the trigger ID provided by the user exists in the SWTR
       SoftwareTriggerCutResult swtcr;
@@ -81,7 +81,7 @@ namespace Belle2 {
         }
       } catch (const std::out_of_range&) {
         // then the trigger identifier is wrong -- silently return nan
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return double(swtcr); // see mdst/dataobjects/include/SoftwareTriggerResult.h
     };
@@ -93,7 +93,7 @@ namespace Belle2 {
     {
       StoreObjPtr<TRGSummary> trg;
       if (!trg)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return trg->test();
     }
 
@@ -104,14 +104,14 @@ namespace Belle2 {
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
-            return std::numeric_limits<double>::quiet_NaN();
+            return Const::doubleNaN;
           try
           {
             return trg->testPsnm(name);
           } catch (const std::exception&)
           {
             // Something went wrong, return NaN.
-            return std::numeric_limits<double>::quiet_NaN();
+            return Const::doubleNaN;
           }
         };
         return func;
@@ -127,12 +127,12 @@ namespace Belle2 {
 
         StoreObjPtr<TRGSummary> trg;
         if (!trg)
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         try {
           return trg->testPsnm(testBit);
         } catch (const std::exception&) {
           // Something went wrong, return NaN.
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
       } else {
         B2FATAL("Wrong number of arguments for L1PSNMBit function. The only argument must be the number of the PSNM trigger bit.");
@@ -146,14 +146,14 @@ namespace Belle2 {
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
-            return std::numeric_limits<double>::quiet_NaN();
+            return Const::doubleNaN;
           try
           {
             return trg->testFtdl(name);
           } catch (const std::exception&)
           {
             // Something went wrong, return NaN.
-            return std::numeric_limits<double>::quiet_NaN();
+            return Const::doubleNaN;
           }
         };
         return func;
@@ -169,12 +169,12 @@ namespace Belle2 {
 
         StoreObjPtr<TRGSummary> trg;
         if (!trg)
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         try {
           return trg->testFtdl(testBit);
         } catch (const std::exception&) {
           // Something went wrong, return NaN.
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
       } else {
         B2FATAL("Wrong number of arguments for L1FTDLBit function. The only argument must be the number of the FTDL trigger bit.");
@@ -188,14 +188,14 @@ namespace Belle2 {
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
-            return std::numeric_limits<double>::quiet_NaN();
+            return Const::doubleNaN;
           try
           {
             return trg->testInput(name);
           } catch (const std::exception&)
           {
             // Something went wrong, return NaN.
-            return std::numeric_limits<double>::quiet_NaN();
+            return Const::doubleNaN;
           }
         };
         return func;
@@ -211,12 +211,12 @@ namespace Belle2 {
 
         StoreObjPtr<TRGSummary> trg;
         if (!trg)
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         try {
           return trg->testInput(testBit);
         } catch (const std::exception&) {
           // Something went wrong, return NaN.
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
       } else {
         B2FATAL("Wrong number of arguments for L1Input function. The only argument must be the number of the input trigger bit.");
@@ -230,16 +230,16 @@ namespace Belle2 {
         auto func = [name](const Particle*) -> double {
           static DBObjPtr<TRGGDLDBFTDLBits> ftdlBits;
           if (!ftdlBits.isValid())
-            return std::numeric_limits<double>::quiet_NaN();
+            return Const::doubleNaN;
           static DBObjPtr<TRGGDLDBPrescales> prescales;
           if (!prescales.isValid())
-            return std::numeric_limits<double>::quiet_NaN();
+            return Const::doubleNaN;
           for (unsigned int bit = 0; bit < TRGSummary::c_trgWordSize * TRGSummary::c_ntrgWords; bit++)
           {
             if (std::string(ftdlBits->getoutbitname((int)bit)) == name)
               return prescales->getprescales(bit);
           }
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         };
         return func;
       } else {
@@ -253,10 +253,10 @@ namespace Belle2 {
         int testBit = std::lround(arguments[0]);
 
         if (testBit < 0 or testBit >= (int)TRGSummary::c_trgWordSize * (int)TRGSummary::c_ntrgWords)
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         static DBObjPtr<TRGGDLDBPrescales> prescales;
         if (!prescales.isValid())
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         return prescales->getprescales(testBit);
       } else {
         B2FATAL("Wrong number of arguments for L1BitPrescale function. The only argument must be the number of the PSNM trigger bit.");
@@ -267,7 +267,7 @@ namespace Belle2 {
     {
       StoreObjPtr<TRGSummary> trg;
       if (!trg)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return trg->getTimType();
     }
 
@@ -275,7 +275,7 @@ namespace Belle2 {
     {
       StoreObjPtr<TRGSummary> trg;
       if (!trg)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return trg->getTimQuality();
     }
 
@@ -283,7 +283,7 @@ namespace Belle2 {
     {
       StoreObjPtr<TRGSummary> trg;
       if (!trg)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return trg->isPoissonInInjectionVeto();
     }
 
@@ -349,7 +349,7 @@ namespace Belle2 {
 
         DBObjPtr<DBRepresentationOfSoftwareTriggerCut> downloadedCut(fullFormatIdentifier(triggerIdentifier));
         if (not downloadedCut)
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         return double(downloadedCut->getPreScaleFactor());
       };
 
@@ -369,17 +369,17 @@ Prescale factor of a given output trigger bit could be different in different da
 It is recommended to use prescaled trigger bits (L1PSNM) or un-prescaled trigger bits (L1FTDL) for your analysis. 
 In run-independent MC, configuration of the prescales in TSIM (trigger simulation) can be different from data, so L1 FTDL is recommended. 
 In run-dependent MC, configuration of the prescales in TSIM is consistent with data, so L1PSNM is recommended.
-Please check on `the dedicated Confluence page <https://confluence.desy.de/display/BI/TriggerBitTable>`__ or or `the dedicated Belle II notes <https://docs.belle2.org/search?ln=en&p=%22Trigger+Summary%22&f=&action_search=Search&c=Belle+II+Notes>`__ to find out the definition of trigger bits.
+Please check on `the dedicated XWiki page <https://xwiki.desy.de/xwiki/rest/p/2471f>`__ or `the dedicated Belle II notes <https://docs.belle2.org/search?ln=en&p=%22Trigger+Summary%22&f=&action_search=Search&c=Belle+II+Notes>`__ to find out the definition of trigger bits.
 )DOC",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("L1FTDL(name)", L1FTDL,
                           R"DOC(
-[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status (1 or 0) of the output trigger bit with the given name. Output bits are the outputs of GDL, combining different input trigger bits for final decision. For example, ``ty_0/1/2/3`` is one of the input trigger bits meaning the number of neuro 3D tracks is one/two/three/more than three. While ``yyy`` is one of the output trigger bits meaning ``(ty_2 or ty_3) and !veto``. Please check on `the dedicated Confluence page <https://confluence.desy.de/display/BI/TriggerBitTable>`__ or or `the dedicated Belle II notes <https://docs.belle2.org/search?ln=en&p=%22Trigger+Summary%22&f=&action_search=Search&c=Belle+II+Notes>`__ to find out the definition of trigger bits.
+[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status (1 or 0) of the output trigger bit with the given name. Output bits are the outputs of GDL, combining different input trigger bits for final decision. For example, ``ty_0/1/2/3`` is one of the input trigger bits meaning the number of neuro 3D tracks is one/two/three/more than three. While ``yyy`` is one of the output trigger bits meaning ``(ty_2 or ty_3) and !veto``. Please check on `the dedicated XWiki page <https://xwiki.desy.de/xwiki/rest/p/2471f>`__ or `the dedicated Belle II notes <https://docs.belle2.org/search?ln=en&p=%22Trigger+Summary%22&f=&action_search=Search&c=Belle+II+Notes>`__ to find out the definition of trigger bits.
 )DOC",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("L1Input(name)", L1Input,
                           R"DOC(
-[Eventbased] Returns the input bit status (1 or 0) of the trigger bit with the given name. Input trigger bits are predefined selections from each sub-detector, with adjustment of the delay and width, in order to fix latency on GDL. For example, ``ty_0/1/2/3`` is one of the input trigger bits meaning the number of neuro 3D tracks is one/two/three/more than three. Please check on `the dedicated Confluence page <https://confluence.desy.de/display/BI/TriggerBitTable>`__ or or `the dedicated Belle II notes <https://docs.belle2.org/search?ln=en&p=%22Trigger+Summary%22&f=&action_search=Search&c=Belle+II+Notes>`__ to find out the definition of trigger bits.
+[Eventbased] Returns the input bit status (1 or 0) of the trigger bit with the given name. Input trigger bits are predefined selections from each sub-detector, with adjustment of the delay and width, in order to fix latency on GDL. For example, ``ty_0/1/2/3`` is one of the input trigger bits meaning the number of neuro 3D tracks is one/two/three/more than three. Please check on `the dedicated XWiki page <https://xwiki.desy.de/xwiki/rest/p/2471f>`__ or `the dedicated Belle II notes <https://docs.belle2.org/search?ln=en&p=%22Trigger+Summary%22&f=&action_search=Search&c=Belle+II+Notes>`__ to find out the definition of trigger bits.
 )DOC", 
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("L1Prescale(name)", L1PSNMPrescale,

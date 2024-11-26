@@ -64,12 +64,12 @@ namespace Belle2 {
     double isAncestorOf(const Particle* part, const std::vector<double>& daughterIDs)
     {
       if (part == nullptr)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       // If particle has no MC relation, MC chain doesn't exist
       const MCParticle* mcpart = part->getMCParticle();
       if (mcpart == nullptr)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       if (daughterIDs.empty())
         B2FATAL("Wrong number of arguments for parameter function isAncestorOf. At least one needed!");
@@ -87,14 +87,14 @@ namespace Belle2 {
                   << " daughters, but daughter at position " << daughterIDs[i] << " expected!");
         const Particle* curDaughter = curParticle->getDaughter(daughterIDs[i]);
         if (curDaughter == nullptr)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         curParticle = curDaughter;
       }
 
       // Daughter obtained, get MC particle of daughter
       const MCParticle* finalMCDaughter = curParticle->getMCParticle();
       if (finalMCDaughter == nullptr)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       // Go up the MC chain, check for ancestor
       const MCParticle* curMCParticle = finalMCDaughter;
@@ -119,12 +119,12 @@ namespace Belle2 {
     double hasAncestor(const Particle* part, const std::vector<double>& args)
     {
       if (part == nullptr)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       // If particle has no MC relation, MC chain doesn't exist
       const MCParticle* mcpart = part->getMCParticle();
       if (mcpart == nullptr)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       int m_PDG, m_sign = 0;
 
@@ -174,7 +174,7 @@ namespace Belle2 {
     double daughterInvariantMass(const Particle* particle, const std::vector<double>& daughter_indexes)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       ROOT::Math::PxPyPzEVector sum;
       const auto& daughters = particle->getDaughters();
@@ -183,7 +183,7 @@ namespace Belle2 {
       for (auto& double_daughter : daughter_indexes) {
         long daughter = std::lround(double_daughter);
         if (daughter >= nDaughters)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         sum += daughters[daughter]->get4Vector();
       }
@@ -194,7 +194,7 @@ namespace Belle2 {
     double daughterMCInvariantMass(const Particle* particle, const std::vector<double>& daughter_indexes)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       ROOT::Math::PxPyPzEVector sum;
       const auto& daughters = particle->getDaughters();
@@ -203,11 +203,11 @@ namespace Belle2 {
       for (auto& double_daughter : daughter_indexes) {
         long daughter = std::lround(double_daughter);
         if (daughter >= nDaughters)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         const MCParticle* mcdaughter = daughters[daughter]->getMCParticle();
         if (!mcdaughter)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         sum += mcdaughter->get4Vector();
       }
@@ -219,11 +219,11 @@ namespace Belle2 {
     double massDifference(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       double motherMass = particle->getMass();
       double daughterMass = particle->getDaughter(daughter)->getMass();
@@ -234,11 +234,11 @@ namespace Belle2 {
     double massDifferenceError(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       float result = 0.0;
 
@@ -283,11 +283,11 @@ namespace Belle2 {
     double massDifferenceSignificance(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       double massDiff = massDifference(particle, daughters);
       double massDiffErr = massDifferenceError(particle, daughters);
@@ -301,7 +301,7 @@ namespace Belle2 {
     double particleDecayAngle(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       PCmsLabTransform T;
       ROOT::Math::PxPyPzEVector m = - T.getBeamFourMomentum();
@@ -311,7 +311,7 @@ namespace Belle2 {
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       ROOT::Math::PxPyPzEVector daugMomentum = particle->getDaughter(daughter)->get4Vector();
       daugMomentum = ROOT::Math::Boost(motherBoost) * daugMomentum;
@@ -324,14 +324,14 @@ namespace Belle2 {
     double pointingAngle(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       if (particle->getDaughter(daughter)->getNDaughters() < 2)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       B2Vector3D productionVertex = particle->getVertex();
       B2Vector3D decayVertex = particle->getDaughter(daughter)->getVertex();
@@ -347,14 +347,14 @@ namespace Belle2 {
     double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       int nDaughters = static_cast<int>(particle->getNDaughters());
 
       long daughter1 = std::lround(daughters[0]);
       long daughter2 = std::lround(daughters[1]);
       if (daughter1 >= nDaughters || daughter2 >= nDaughters)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       PCmsLabTransform T;
       ROOT::Math::PxPyPzEVector m = T.getBeamFourMomentum();

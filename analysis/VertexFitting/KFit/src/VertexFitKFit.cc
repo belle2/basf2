@@ -262,8 +262,8 @@ VertexFitKFit::doFit3() {
   HepMatrix tmp2_V_D(m_V_D), tmp2_V_E(m_V_E);
   HepMatrix tmp2_lam0(m_lam0), tmp2_v_a(m_v_a);
 
-  double tmp_each_chisq[KFitConst::kMaxTrackCount2];
-  double tmp2_each_chisq[KFitConst::kMaxTrackCount2];
+  std::vector<double> tmp_each_chisq(m_TrackCount);
+  std::vector<double> tmp2_each_chisq(m_TrackCount);
 
   for (int j = 0; j < KFitConst::kMaxIterationCount; j++)   // j'th loop start
   {
@@ -429,7 +429,7 @@ VertexFitKFit::doFit4() {
   m_v[1][0] = m_BeforeVertex.y();
   m_v[2][0] = m_BeforeVertex.z();
 
-  double tmp_each_chisq[KFitConst::kMaxTrackCount2];
+  std::vector<double> tmp_each_chisq(m_TrackCount);
   double tmp_vertex_chisq = 1.e+30; // An init-value is not needed but the C++ compiler requires the init-value.
 
   // to avoid overestimation of vertex-z error.
@@ -511,7 +511,7 @@ VertexFitKFit::doFit4() {
   m_V_al_1 = m_V_al_0 - m_V_al_0 * (m_D.T()) * m_V_Dt * m_D * m_V_al_0;
   m_Cov_v_al_1 = -m_BeamError * (m_E.T()) * m_V_Dt * m_D * m_V_al_0;
   // m_V_v is m_V_E
-  // --> need to replace m_V_E for my implimentaion.
+  // --> need to replace m_V_E for my implementation.
   m_V_E = m_BeamError - m_BeamError * (m_E.T()) * m_V_Dt * m_E * m_BeamError;
 
   if (prepareOutputMatrix() != KFitError::kNoError) return m_ErrorCode;
@@ -548,7 +548,7 @@ VertexFitKFit::doFit5() {
   HepMatrix tmp_al_0(m_al_1);
   HepMatrix tmp_V_al_0(m_V_al_1);
 
-  double tmp_each_chisq[KFitConst::kMaxTrackCount2];
+  std::vector<double> tmp_each_chisq(m_TrackCount);
 
   for (int i = 0; i < KFitConst::kMaxIterationCount; i++)
   {

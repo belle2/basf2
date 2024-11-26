@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -45,7 +44,7 @@ eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Simulation
-add_simulation(main, bkgfiles=bg, bkgOverlay=False)
+add_simulation(main, bkgfiles=bg, bkgOverlay=False, simulateT0jitter=False)
 
 # Reconstruction
 add_reconstruction(main)

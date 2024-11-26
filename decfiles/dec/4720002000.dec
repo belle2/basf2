@@ -1,0 +1,21 @@
+# EventType: 4720002000
+# Descriptor: [vpho_[eta-> pi+pi-pi0]h_b]
+# NickName: vpho_eta3pih_b
+# Cuts: None
+# Documentation: eta3pih_b process
+# PhysicsWG: Quarkonium
+# Tested: Yes
+# Responsible: Alessandro Boschetti 
+# Email: boschett@to.infn.it
+# Date: 20230401
+
+Alias myEta eta
+
+Decay vpho
+1.000 myEta  h_b  PARTWAVE 1. 0. 0. 0. 0. 0.;
+Enddecay
+
+Decay myEta
+1.000 pi- pi+ pi0 ETA_FULLDALITZ  -1.128  0.153  0.0  0.085  0.0  0.173;
+Enddecay
+End

@@ -75,7 +75,7 @@ corresponding longitudinal-profile and transverse-scattering PDF values:
 
 .. math::
 
-   L(H; O, l, D, \vec{x}, \chi^{2}, n) = P_{L}(\vec{x}; O, l, H)\cdot P_{T}(\chi^{2}, n; D, H). 
+   L(H; O, l, D, \vec{x}, \chi^{2}, n) = P_{L}(\vec{x}; O, l, H)\cdot P_{T}(\chi^{2}, n; D, H).
 
 The natural logarithm of this value is stored in the ``KLMMuidLikelihood`` data-object. Then, the
 six likelihood values are normalized by dividing by their sum and stored in the
@@ -113,7 +113,7 @@ between sectors and in the barrel-endcap overlap region where KLM is thinner.
 
 Muid Likelihoods are constructed by ``MuidBuilder`` class.
 
-.. cpp:class:: MuidBuilder 
+.. cpp:class:: MuidBuilder
 
 Build the Muid likelihoods starting from the hit pattern and the transverse scattering in KLM.
 

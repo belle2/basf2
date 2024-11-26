@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -89,7 +88,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         """Receive signal at the start of event processing"""
         TrackingValidationModule.initialize(self)
 
-        # Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
+        # Use dequeues in favour of lists to prevent repeated memory allocation of cost O(n)
         #: number of all hits
         self.number_of_total_hits = collections.deque()
         #: number of hits on MC track
@@ -127,7 +126,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         #: This number gives information about the "badness" of the fake.
         self.number_of_wrong_hits = collections.deque()
         # It is calculated by going through all hits of the fake track and the connected mc track cands and counting the number.
-        # These numbers are than summed up and substracted by the biggest number
+        # These numbers are than summed up and subtracted by the biggest number
         # of hits this candidates shares with the mc track cands.
         #: list of the number of pattern-reconstructed hits
         self.pr_number_of_hits = collections.deque()
@@ -200,7 +199,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         totalHitListPRFake = set(totalHitListPRFake)
 
         # # All CDC Hits
-        totalHitList = set([cdcHit.getArrayIndex() for cdcHit in cdcHits])
+        totalHitList = {cdcHit.getArrayIndex() for cdcHit in cdcHits}
 
         number_of_mc_hits = len(totalHitListMC)
         number_of_pr_hits = len(totalHitListPR)
@@ -341,7 +340,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         if self.write_tables:
             # MC Figures of merit
             mc_figures_of_merit = \
-                ValidationManyFiguresOfMerit('%s_mc_figures_of_merit' % self.validation_name)
+                ValidationManyFiguresOfMerit(f'{self.validation_name}_mc_figures_of_merit')
 
             mc_figures_of_merit['mc_pts'] = self.mc_pts
             mc_figures_of_merit['mc_d0s'] = self.mc_d0s
@@ -350,7 +349,6 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             mc_figures_of_merit['mc_multiplicities'] = self.mc_multiplicities
             mc_figures_of_merit['mc_phis'] = self.mc_phi
             mc_figures_of_merit['mc_tan_lambdas'] = self.mc_tan_lambdas
-            mc_figures_of_merit['mc_thetas'] = self.mc_theta
             mc_figures_of_merit['mc_missing'] = self.mc_missing
             mc_figures_of_merit['mc_is_primary'] = self.mc_is_primary
             mc_figures_of_merit['mc_number_of_hits'] = self.mc_number_of_hits
@@ -365,7 +363,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
             # PR Figures of merit
             pr_figures_of_merit = \
-                ValidationManyFiguresOfMerit('%s_pr_figures_of_merit' % self.validation_name)
+                ValidationManyFiguresOfMerit(f'{self.validation_name}_pr_figures_of_merit')
 
             pr_figures_of_merit['pr_clones_and_matches'] = \
                 self.pr_clones_and_matches
@@ -376,7 +374,6 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 self.pr_number_of_matched_hits
             pr_figures_of_merit['pr_seed_tan_lambdas'] = self.pr_seed_tan_lambdas
             pr_figures_of_merit['pr_seed_phi'] = self.pr_seed_phi
-            pr_figures_of_merit['pr_seed_theta'] = self.pr_seed_theta
 
             pr_figures_of_merit['number_of_connected_tracks'] = \
                 self.number_of_connected_tracks
@@ -386,7 +383,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
             # Hit Figures of merit
             hit_figures_of_merit = \
-                ValidationFiguresOfMerit('%s_hit_figures_of_merit' % self.validation_name)
+                ValidationFiguresOfMerit(f'{self.validation_name}_hit_figures_of_merit')
 
             hit_figures_of_merit['number_of_total_hits'] = \
                 np.sum(self.number_of_total_hits)

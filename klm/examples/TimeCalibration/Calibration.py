@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,6 +11,7 @@
 import sys
 
 import basf2
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import KLMTimeAlgorithm
 from klm_calibration_utils import get_time_pre_collector_path
 from prompt.calibrations.caf_klm_time import get_collector

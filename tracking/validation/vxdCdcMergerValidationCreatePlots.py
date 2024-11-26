@@ -12,12 +12,15 @@
 <header>
   <contact>software-tracking@belle2.org</contact>
   <input>VxdCdcValidationHarvested.root</input>
+  <output>VxdCdcMergerValidation.root</output>
   <description>This module creates efficiency plots for the V0 validation.</description>
 </header>
 """
 
 
 import ROOT
+
+ACTIVE = True
 
 
 class VxdCdcMergerValidationPlots:
@@ -53,12 +56,11 @@ class VxdCdcMergerValidationPlots:
     def histogram_plot(hist, title, x_variable, x_unit=None, description='', check='', contact='', meta_options=''):
         """Label and annotate the histograms"""
         hist.SetName("".join(title.split()))
-        xlabel = '{} / ({})'.format(x_variable, x_unit) if x_unit is not None else '{}'.format(x_variable)
-        ylabel = 'Entries / ({} {})'.format((hist.GetXaxis().GetXmax() -
-                                             hist.GetXaxis().GetXmin()) /
-                                            hist.GetNbinsX(), x_unit) if x_unit is not None \
-            else 'Entries / ({})'.format((hist.GetXaxis().GetXmax() - hist.GetXaxis().GetXmin()) / hist.GetNbinsX())
-        hist.SetTitle("{};{};{}".format(title, xlabel, ylabel))
+        xlabel = f'{x_variable} / ({x_unit})' if x_unit is not None else f'{x_variable}'
+        ylabel = f'Entries / ({(hist.GetXaxis().GetXmax() - hist.GetXaxis().GetXmin()) / hist.GetNbinsX()} {x_unit})' \
+            if x_unit is not None \
+            else f'Entries / ({(hist.GetXaxis().GetXmax() - hist.GetXaxis().GetXmin()) / hist.GetNbinsX()})'
+        hist.SetTitle(f"{title};{xlabel};{ylabel}")
         hist.GetListOfFunctions().Add(ROOT.TNamed('Description', description))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Check', check))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))
@@ -72,19 +74,19 @@ class VxdCdcMergerValidationPlots:
         VxdCdcMergerValidationPlots.histogram_plot(self.hist_merged_hits, "Number of hits of merged tracks", "Number of Hits", None,
                                                    description='Number of hits of merged tracks',
                                                    check='',
-                                                   contact='',
+                                                   contact='software-tracking@belle2.org',
                                                    meta_options='').Write()
 
         VxdCdcMergerValidationPlots.histogram_plot(self.hist_good_over_pt, "Good Merge over Pt", "MC Track Pt (GeV)", None,
                                                    description='Good Merge over Pt',
                                                    check='',
-                                                   contact='',
+                                                   contact='software-tracking@belle2.org',
                                                    meta_options='').Write()
 
         VxdCdcMergerValidationPlots.histogram_plot(self.hist_good_over_theta, "Good Merge over Theta", "MC Track Theta (1)", None,
                                                    description='Good Merge over Theta',
                                                    check='',
-                                                   contact='',
+                                                   contact='software-tracking@belle2.org',
                                                    meta_options='').Write()
 
         output_root_file.Write()
@@ -93,4 +95,9 @@ class VxdCdcMergerValidationPlots:
 
 
 if __name__ == '__main__':
-    VxdCdcMergerValidationPlots().collect_histograms().plot()
+    if ACTIVE:
+        VxdCdcMergerValidationPlots().collect_histograms().plot()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

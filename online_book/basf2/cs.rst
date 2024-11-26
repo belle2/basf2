@@ -269,7 +269,6 @@ Now that we have created our ntuple, we can look at the data and see how well th
 
     .. literalinclude:: cs/plotting_R2.py
         :language: python
-        :linenos:
 
     Your plot should look similar to this:
 
@@ -382,7 +381,6 @@ continuum events, simply add a cut on the continuum probability at the end.
 
     .. literalinclude:: steering_files/091_cs.py
        :language: python
-       :linenos:
 
 
 .. admonition:: Exercise
@@ -423,7 +421,6 @@ continuum events, simply add a cut on the continuum probability at the end.
 
     .. literalinclude:: steering_files/092_cs.py
                 :language: python
-                :linenos:
 
 To use the trained weights, we need to use the MVA-expert module after building
 the continuum suppression in the main steering file. In our case this looks
@@ -465,7 +462,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    In case you've forgotten, the files ``uubar_sample.root`` and ``B02ks0pi0_sample.root``
+    In case you've forgotten, the files ``B02ks0pi0_sample.root`` and ``uubar_sample.root``
     consist of 2000 and 30000 events respectively. You can choose half for each
     by using the ``entrySequences`` option in the ``inputMdstList`` function.
     See the documentation at :ref:`mawrappers`.
@@ -475,7 +472,6 @@ in the very same way that we previously did a cut on R2 in previous exercise.
 
     .. literalinclude:: steering_files/093_cs.py
         :language: python
-        :linenos:
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -498,7 +494,6 @@ in the very same way that we previously did a cut on R2 in previous exercise.
 
     .. literalinclude:: cs/plotting.py
         :language: python
-        :linenos:
 
     The resulting plot should look similar to this one:
 

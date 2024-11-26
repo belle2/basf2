@@ -214,7 +214,7 @@ void DataWriterModule::event()
 
     if (!m_useKLM) {continue;}
 
-    const TVector3& clusterPos = cluster.getClusterPosition();
+    const ROOT::Math::XYZVector& clusterPos = cluster.getClusterPosition();
 
     m_KLMPhi                         = clusterPos.Phi();
     m_KLMTheta                       = clusterPos.Theta();
@@ -226,7 +226,7 @@ void DataWriterModule::event()
     m_KLMtime                        = cluster.getTime();
     m_KLMinvM                        = cluster.getMomentum().M2();
     m_KLMenergy                      = cluster.getEnergy();
-    m_KLMhitDepth                    = cluster.getClusterPosition().Mag();
+    m_KLMhitDepth                    = cluster.getClusterPosition().R();
     m_KLMtrackFlag                   = cluster.getAssociatedTrackFlag();
     m_KLMeclFlag                     = cluster.getAssociatedEclClusterFlag();
 
@@ -388,7 +388,7 @@ void DataWriterModule::event()
       m_ECLKLid = -999;
     }
 
-    const TVector3& clusterPos = cluster.getClusterPosition();
+    const ROOT::Math::XYZVector& clusterPos = cluster.getClusterPosition();
 
     m_ECLPhi               = clusterPos.Phi();
     m_ECLTheta             = clusterPos.Theta();

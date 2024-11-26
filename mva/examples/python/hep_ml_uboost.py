@@ -14,7 +14,7 @@ import subprocess
 import time
 
 if __name__ == "__main__":
-    from basf2 import conditions
+    from basf2 import conditions, find_file
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -31,8 +31,14 @@ if __name__ == "__main__":
                  'daughter(0, kaonID)', 'daughter(0, pionID)',
                  'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
 
+    train_file = find_file("mva/train_D0toKpipi.root", "examples")
+    test_file = find_file("mva/test_D0toKpipi.root", "examples")
+
+    training_data = basf2_mva.vector(train_file)
+    testing_data = basf2_mva.vector(test_file)
+
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train.root")
+    general_options.m_datafiles = training_data
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     # Spectators are the variables for which the selection should be uniform
@@ -54,10 +60,10 @@ if __name__ == "__main__":
     training_time = training_stop - training_start
     method = basf2_mva_util.Method(general_options.m_identifier)
     inference_start = time.time()
-    p, t = method.apply_expert(basf2_mva.vector("test.root"), general_options.m_treename)
+    p, t = method.apply_expert(testing_data, general_options.m_treename)
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
     auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
     print("HepML", training_time, inference_time, auc)
 
-    subprocess.call('basf2_mva_evaluate.py -c -o latex.pdf -train train.root -data test.root -i HepMLUBoost', shell=True)
+    subprocess.call(f'basf2_mva_evaluate.py -c -o latex.pdf -train {train_file} -data {test_file} -i HepMLUBoost', shell=True)

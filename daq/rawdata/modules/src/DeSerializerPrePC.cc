@@ -26,7 +26,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DeSerializerPrePC)
+REG_MODULE(DeSerializerPrePC);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -306,7 +306,7 @@ int* DeSerializerPrePCModule::recvData(int* delete_flag, int* total_buf_nwords, 
       printf("[DEBUG]*******BODY***********\n ");
       printData(temp_buf, (int)(total_recvd_byte / sizeof(int)));
       char err_buf[500];
-      sprintf(err_buf, "[FATAL] CORRUPTED DATA: Length written on SendHeader(%d) is invalid. Actual data size is %d. Exting...",
+      sprintf(err_buf, "[FATAL] CORRUPTED DATA: Length written on SendHeader(%d) is invalid. Actual data size is %u. Exting...",
               (int)(*total_buf_nwords * sizeof(int)), temp_length);
       print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
@@ -376,9 +376,6 @@ void DeSerializerPrePCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int
 
 void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0)
 {
-  int data_size_copper_0 = -1;
-  int data_size_copper_1 = -1;
-
   //
   // Data check
   //
@@ -426,7 +423,7 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
         try {
           temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
-        } catch (string err_str) {
+        } catch (const string& err_str) {
           print_err.PrintError(m_shmflag, &g_status, err_str);
           exit(1);
         }
@@ -453,7 +450,7 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
         try {
           temp_rawtlu->CheckData(0, m_prev_evenum, &cur_evenum);
           eve_array[ entry_id ] = cur_evenum;
-        } catch (string err_str) {
+        } catch (const string& err_str) {
           print_err.PrintError(m_shmflag, &g_status, err_str);
           exit(1);
         }
@@ -466,13 +463,13 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
         //
         // RawCOPPER
         //
-        int block_id = 0;
 
         RawCOPPER* temp_rawcopper = new RawCOPPER;
         temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
 
 #ifdef DUMHSLB
+        int block_id = 0;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_EXP_RUN_NO ] = exp_run_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTUTIME ] = utime_ftsw;
@@ -487,7 +484,7 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
                                     m_prev_copper_ctr, &cur_copper_ctr,
                                     m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
-        } catch (string err_str) {
+        } catch (const string& err_str) {
           print_err.PrintError(m_shmflag, &g_status, err_str);
           exit(1);
         }
@@ -497,10 +494,10 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
         ctime_type_array[ entry_id ] = temp_rawcopper->GetTTCtimeTRGType(0);
 
         if (cpr_num == 0) {
-          data_size_copper_0 = raw_datablk->GetBlockNwords(entry_id);
+          raw_datablk->GetBlockNwords(entry_id); // returns data_size_copper_0
           *eve_copper_0 = (raw_datablk->GetBuffer(entry_id))[ 3 ];
         } else if (cpr_num == 1) {
-          data_size_copper_1 = raw_datablk->GetBlockNwords(entry_id);
+          raw_datablk->GetBlockNwords(entry_id); // returns data_size_copper_1
         }
         cpr_num++;
         delete temp_rawcopper;
@@ -518,7 +515,7 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
           ctime_type_array[ 0 ] != ctime_type_array[ l ]) {
         char err_buf[500];
         for (int m = 0; m < num_nodes_in_sendblock; m++) {
-          printf("[DEBUG] node %d eve # %d utime %x ctime %x\n",
+          printf("[DEBUG] node %d eve # %u utime %x ctime %x\n",
                  m,  eve_array[ m ], utime_array[ m ], ctime_type_array[ m ]);
         }
         sprintf(err_buf, "[FATAL] CORRUPTED DATA: Event or Time record mismatch. Exiting...");

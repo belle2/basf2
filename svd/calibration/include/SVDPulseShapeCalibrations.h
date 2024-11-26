@@ -119,7 +119,6 @@ namespace Belle2 {
      * calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
-     * @param charge: the charge in electrons
      *
      * Output: a float number corresponding to the peaking time
      */

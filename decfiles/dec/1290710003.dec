@@ -16,16 +16,16 @@ Enddecay
 #
 Decay B+sig
 0.000078   pi0    e+    nu_e      PHOTOS   BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #[FF values from HFLAV 2016]
-0.000158   rho0   e+    nu_e      PHOTOS   BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907; #[FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288)]
+0.000158   rho0   e+    nu_e      PHOTOS   BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #[FF values from arxiv:2104.05739; values updated in June 2023]
 0.000038   eta    e+    nu_e      PHOTOS   ISGW2;
 0.000023   eta'   e+    nu_e      PHOTOS   ISGW2;
-0.000119   omega  e+    nu_e      PHOTOS   BCL -0.963 1.849 0.242 0.269 -0.039 0.250 0.517 -0.045 0.304 -0.920 1.901; #[FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1205.6245)]
+0.000119   omega  e+    nu_e      PHOTOS   BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #[FF values from arxiv:2104.05739; values updated in June 2023]
 #
 0.000078   pi0    mu+   nu_mu     PHOTOS   BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #[FF values from HFLAV 2016]
-0.000158   rho0   mu+   nu_mu     PHOTOS   BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907; #[FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288)]
+0.000158   rho0   mu+   nu_mu     PHOTOS   BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #[FF values from arxiv:2104.05739; values updated in June 2023]
 0.000038   eta    mu+   nu_mu     PHOTOS   ISGW2;
 0.000023   eta'   mu+   nu_mu     PHOTOS   ISGW2;
-0.000119   omega  mu+   nu_mu     PHOTOS   BCL -0.963 1.849 0.242 0.269 -0.039 0.250 0.517 -0.045 0.304 -0.920 1.901; #[FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1205.6245)]
+0.000119   omega  mu+   nu_mu     PHOTOS   BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #[FF values from arxiv:2104.05739; values updated in June 2023]
 Enddecay
 CDecay B-sig
 #

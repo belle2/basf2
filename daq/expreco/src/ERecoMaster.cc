@@ -85,7 +85,7 @@ void ERecoMaster::Log_Handler(NSMmsg* /*msg*/, NSMcontext* /*ctx*/)
 
 int ERecoMaster::Configure(NSMmsg*, NSMcontext*)
 {
-  int* pars;
+  int* pars = nullptr;
 
   // 0. Configure DqmServer
   char* dqmserver = m_conf->getconf("dqmserver", "nodename");
@@ -147,7 +147,7 @@ int ERecoMaster::Configure(NSMmsg*, NSMcontext*)
 
 int ERecoMaster::UnConfigure(NSMmsg*, NSMcontext*)
 {
-  int* pars;
+  int* pars = nullptr;
 
   // Unconfigure sampler
   char* sampler = m_conf->getconf("eventsampler", "nodename");
@@ -255,7 +255,7 @@ int ERecoMaster::Stop(NSMmsg* msg, NSMcontext*)
 
 int ERecoMaster::Restart(NSMmsg*, NSMcontext*)
 {
-  int* pars;
+  int* pars = nullptr;
 
   // 0. Configure DqmServer
   char* dqmserver = m_conf->getconf("dqmserver", "nodename");

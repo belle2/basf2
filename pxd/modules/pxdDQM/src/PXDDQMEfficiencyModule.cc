@@ -208,14 +208,14 @@ void PXDDQMEfficiencyModule::event()
 
         //Now check if the sensor measured a hit here
 
-        int bestcluster = findClosestCluster(aVxdID, TVector3(u_fit, v_fit, 0));
+        int bestcluster = findClosestCluster(aVxdID, ROOT::Math::XYZVector(u_fit, v_fit, 0));
         if (bestcluster >= 0) {
           double u_clus = m_pxdclusters[bestcluster]->getU();
           double v_clus = m_pxdclusters[bestcluster]->getV();
 
           //is the closest cluster close enough to the track to count as measured?
-          TVector3 dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
-          if (dist_clus.Mag() <= m_distcut)  {
+          ROOT::Math::XYZVector dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
+          if (dist_clus.R() <= m_distcut)  {
             m_h_matched_cluster[aVxdID]->Fill(ucell_fit, vcell_fit);
             m_h_combined->Fill(sensor_index * 2 + 1);
             if (m_verboseHistos) {
@@ -279,7 +279,7 @@ void PXDDQMEfficiencyModule::defineHisto()
 
 
 int
-PXDDQMEfficiencyModule::findClosestCluster(const VxdID& avxdid, TVector3 intersection)
+PXDDQMEfficiencyModule::findClosestCluster(const VxdID& avxdid, ROOT::Math::XYZVector intersection)
 {
   int closest = -1;
   double mindist = 999999999999; //definitely outside of the sensor
@@ -300,10 +300,10 @@ PXDDQMEfficiencyModule::findClosestCluster(const VxdID& avxdid, TVector3 interse
 
     double u = m_pxdclusters[iclus]->getU();
     double v = m_pxdclusters[iclus]->getV();
-    TVector3 current(u, v, 0);
+    ROOT::Math::XYZVector current(u, v, 0);
 
     //2D dist sqared
-    double dist = (intersection - current).Mag();
+    double dist = (intersection - current).R();
     if (dist < mindist) {
       closest = iclus;
       mindist = dist;

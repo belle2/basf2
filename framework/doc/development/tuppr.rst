@@ -7,7 +7,7 @@ Updating the main globaltag
    Please have a look to :ref:`this page<conditionsdb_overview>` for a broader overview about the Conditions Database.
 
 basf2 needs payloads to work so we need a special globaltag (usually called "main" globaltag) for software development.
-The main globaltag is also used as baseline for our run-independent MC productions. Due to the development model there 
+The main globaltag is also used as baseline for our run-independent MC productions. Due to the development model there
 are a few requirements for this globaltag:
 
 - The contents of the database should work correctly for any commit on the main basf2 branch. We have to be sure that
@@ -17,8 +17,8 @@ are a few requirements for this globaltag:
 - The globaltag should not contain run-dependent calibrations for data.
 
 - The globaltag should clearly fail when running on data. Running with wrong calibrations is worse than not running
-  at all. The main globaltag only contains payloads for experiment 0 (nominal Phase 3), 1002 (Phase 2) and 1003 (early
-  Phase 3).
+  at all. The main globaltag only contains payloads for experiment 0 (nominal Phase 3), 1003 (early
+  Phase 3, pre LS1) and 1004 (early Phase 3, post LS1).
 
 .. tip::
    If you want to know who is the manager of the main globaltag, please browse
@@ -30,8 +30,8 @@ are a few requirements for this globaltag:
 Preparation of payloads
 -----------------------
 
-Before requesting any changes of payloads, or introduction of new payloads, the the payload code needs to be prepared.
-Please create a pull request which contains the changes to the code which are required. In all cases you should create
+Before requesting any changes of payloads, or introduction of new payloads, the payload code needs to be prepared.
+Please create a merge request which contains the changes to the code which are required. In all cases you should create
 a local database containing the new payload versions. This is one text file containing a description of which payload
 is valid for which experiment and run range and the payloads themselves as root files named
 ``dbstore_${payloadName}_rev_${revision}.root`` where the revision number is just an alphanumeric string (the first few
@@ -42,6 +42,7 @@ look something like this:
 
   dbstore/KLMStripEfficiency b82d5b 0,0,0,-1
   dbstore/KLMStripEfficiency b82d5b 1003,0,1003,-1
+  dbstore/KLMStripEfficiency b82d5b 1004,0,1004,-1
   dbstore/ECLLeakageCorrections a211cd3 0,0,-1,-1
 
 Each line describes one interval of validity for one payload and consists of:
@@ -62,14 +63,14 @@ Each line describes one interval of validity for one payload and consists of:
 
 Valid values for IoVs to be included in the main globaltag are listed in the following table:
 
-==============  ==============================
+==============  ======================================
 IoV             Valid for
-==============  ==============================
+==============  ======================================
 0,0,0,-1        Valid only for nominal Phase 3
-1002,0,1002,-1  Valid only for Phase 2
-1003,0,1003,-1  Valid only for early Phase 3
+1003,0,1003,-1  Valid only for early Phase 3, pre LS1
+1004,0,1004,-1  Valid only for early Phase 3, post LS1
 0,0,-1,-1       Valid for all the phases
-==============  ==============================
+==============  ======================================
 
 Mostly the ``database.txt`` file should be generated automatically if you use the ``DBImport`` interface but please
 review it and make sure all payloads have the correct IoV and make sure it contains all the payloads you want to add
@@ -77,18 +78,21 @@ and nothing else. The ``database.txt`` and the corresponding payload files shoul
 manager (using the :ref:`b2conditionsdb-request <b2conditionsdb-request>` tool) for each of the three following use
 cases:
 
+.. warning::
+   The IoV (1002,0,1002,-1), covering Phase 2, was supported until the globaltag ``main_2023-06-29``.
+
 
 Create a new payload
 ~~~~~~~~~~~~~~~~~~~~
 
 If you create new payloads it is advisable to split the creation of the payloads and the usage of the payloads in
-separate pull requests:
+separate merge requests:
 
-1. Create, review and merge a pull request to create the payload definition without using it.
+1. Create, review and merge a merge request to create the payload definition without using it.
 
 2. Request payloads to be added to the globaltag by just providing the payloads.
 
-3. Create, review and merge a pull request to actually use the payload already in the globaltag.
+3. Create, review and merge a merge request to actually use the payload already in the globaltag.
 
 This allows to merge the actual code changes without any coordination with the globaltag manager and greatly speeds
 up and simplifies the globaltag update procedure.
@@ -99,9 +103,9 @@ up and simplifies the globaltag update procedure.
 
 .. warning::
    
-   If you cannot manage to split the pull requests please create a pull request with the code changes and make sure
+   If you cannot manage to split the merge requests please create a merge request with the code changes and make sure
    that, apart from the missing payload, it is approved by all necessary people and can be merged on short notice.
-   Only then should you ask for an update of the globaltag by providing the pull request number and the new payloads
+   Only then should you ask for an update of the globaltag by providing the merge request number and the new payloads
    to the globaltag manager.
 
 
@@ -136,9 +140,9 @@ just provide the new payloads to the globaltag manager.
 
    If you cannot ensure backwards compatibility, you should discuss about this with the globaltag manager or during a
    `Software Developers meeting <https://indico.belle2.org/category/18/>`__. Then, after having found a proper
-   solution, please create a pull request with the code changes and make sure that, apart from the missing payload, it
+   solution, please create a merge request with the code changes and make sure that, apart from the missing payload, it
    is approved by all necessary people and can be merged on short notice. Only then you should ask for an update of
-   the globaltag by providing the pull request number and the new payloads to the globaltag manager.
+   the globaltag by providing the merge request number and the new payloads to the globaltag manager.
 
 
 Testing of all changes
@@ -156,7 +160,7 @@ using the tool ``b2conditionsdb-dump`` (see the full documentation :ref:`here <b
    
    You can also pipe the output of this command into a file to compare different revisions with ``diff``.
 
-All pull requests and payload requests must be tested. Once you have prepared your local database file please run the
+All merge requests and payload requests must be tested. Once you have prepared your local database file please run the
 following snippet:
 
 .. code-block:: bash
@@ -179,7 +183,7 @@ parallel.
 Update procedure
 ----------------
 
-Once you have prepared all the payloads, and the pull request if one is required, you need to notify the globaltag
+Once you have prepared all the payloads, and the merge request if one is required, you need to notify the globaltag
 manager that you need a change to payloads on main using the :ref:`b2conditionsdb-request <b2conditionsdb-request>`
 tool by calling
 
@@ -194,7 +198,7 @@ globaltags:
 
 1. The new payloads.
 
-2. Is a pull request needed (see above)?
+2. Is a merge request needed (see above)?
 
 3. Does a previous version of this payload exist? If so, is the new code compatible or will it crash if the old
    version is found?
@@ -202,8 +206,8 @@ globaltags:
 4. Is this payload required when processing existing data? If so, can a common payload be prepared for existing data
    processing or is a dedicated calibration needed?
 
-The globaltag manager for software development will create a new main globaltag and a pull request to change the
-software to use this globaltag, the "Tag Update Procedure Pull Request" (TUPPR). This pull request is like a box to
+The globaltag manager for software development will create a new main globaltag and a merge request to change the
+software to use this globaltag, the "Tag Update Procedure Pull Request" (TUPPR). This merge request is like a box to
 contain a set of changes to the globaltag in an airtight way to make sure they all stay fresh and don't break other
 branches until the change to the globaltag is actually added to main.
 
@@ -211,21 +215,21 @@ Additional changes to the main globaltag by other developers can thus join in on
 
 .. tip::
 
-   All the TUPPRs names start with the tag ``TUPPR`` for clearly distinguishing them from the other pull requests.
+   All the TUPPRs names start with the tag ``TUPPR`` for clearly distinguishing them from the other merge requests.
 
 .. warning::
 
-   All pull requests to join into this globaltag update will be modified to not merge against main but against the
-   TUPPR branch. After these changes the pull requests should be able to see any payloads uploaded to the new
+   All merge requests to join into this globaltag update will be modified to not merge against main but against the
+   TUPPR branch. After these changes the merge requests should be able to see any payloads uploaded to the new
    globaltag.
 
 .. warning::
 
-   Review of the separate pull requests can then proceed as usual: once all reviewers have approved the pull request
+   Review of the separate merge requests can then proceed as usual: once all reviewers have approved the merge request
    can be merged as usual. However this will not directly make these changes available on main. Instead the changes
    will be aggregated into TUPPR first.
 
-Once all pull requests requiring changes are approved and merged, the globaltag manager for software development will
+Once all merge requests requiring changes are approved and merged, the globaltag manager for software development will
 review the changes in the globaltag.
 
 1. IoVs for common payloads will be split into separate Phase 2 and Phase 3 IoVs.

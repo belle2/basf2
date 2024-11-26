@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,7 +29,7 @@ def run_collectors():
     import json
 
     # We pass in basf2 and CAF options via the config.json file
-    with open("collector_config.json", "r") as config_file:
+    with open("collector_config.json") as config_file:
         config = json.load(config_file)
 
     # Create the database chain to use the necessary central DB global tags and local DBs if they are requested
@@ -111,8 +110,8 @@ def get_entry_sequences(root_input_module):
             entry_sequences = module_param_info.values
             break
     else:
-        B2WARNING(("entrySequences ModuleParamInfo couldn't be found! "
-                   "Setting to empty list but this indicates that this script is out of date!"))
+        B2WARNING("entrySequences ModuleParamInfo couldn't be found! "
+                  "Setting to empty list but this indicates that this script is out of date!")
         entry_sequences = []
     return entry_sequences
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,7 +11,7 @@
 """Pure CsI simulation for the ECL
 
 Input:
-    No file is reguired
+    No file is required
 
 Output:
     Mdst file named 'Ecl_Pure.mdst.root'

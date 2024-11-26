@@ -8,6 +8,8 @@
 #include <map>
 #include <algorithm>
 
+#include <TMath.h>
+
 using namespace RooFit;
 
 void drawLabel(TH1F* hResz0, double gauss1Mean, double gauss1Sigma, double gauss2Mean, double gauss2Sigma);
@@ -156,8 +158,6 @@ void readFitter3D(string filename){
   TGraph* gPtResPtRelation = new TGraph();
   gPtResPtRelation->SetTitle("pt(GeV),ResPt(%)");
 
-  double Trg_PI = 3.141592653589793;
-
   // Initializing event
   Int_t eventNum = 0;
   Int_t totalInput = inTreeTrack->GetEntriesFast();
@@ -225,12 +225,12 @@ void readFitter3D(string filename){
       //pt = pt2D;
 
       // Convert to deg
-      phi0 = phi0*180/Trg_PI;
-      mcPhi0 = mcPhi0*180/Trg_PI;
-      double theta = Trg_PI/2.-atan(cot);
-      theta*=180./Trg_PI;
-      double mcTheta = Trg_PI/2.-atan(mcCot);
-      mcTheta*=180./Trg_PI;
+      phi0 = phi0*TMath::RadToDeg();
+      mcPhi0 = mcPhi0*TMath::RadToDeg();
+      double theta = M_PI_2-atan(cot);
+      theta*=TMath::RadToDeg();
+      double mcTheta = M_PI_2-atan(mcCot);
+      mcTheta*=TMath::RadToDeg();
 
       // Fill points.
       ptBins.insert(pt);

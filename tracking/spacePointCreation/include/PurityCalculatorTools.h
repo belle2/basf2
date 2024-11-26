@@ -25,7 +25,7 @@
 #include <unordered_map>
 #include <cmath> // for fabs
 
-namespace Belle2 { // make seperate sub-namespace for this?
+namespace Belle2 { // make separate sub-namespace for this?
 
   /**
    * find the given weight in the given vector of pair<int,double>

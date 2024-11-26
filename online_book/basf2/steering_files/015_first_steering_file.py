@@ -28,7 +28,7 @@ stdV0s.stdKshorts(path=main)
 
 # combine final state particles to form composite particles
 ma.reconstructDecay(
-    "J/psi:ee -> e+:uncorrected e-:uncorrected", cut="dM < 0.11", path=main
+    "J/psi:ee -> e+:uncorrected e-:uncorrected", cut="abs(dM) < 0.11", path=main
 )
 
 # combine J/psi and KS candidates to form B0 candidates [S40]

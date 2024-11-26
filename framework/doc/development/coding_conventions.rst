@@ -113,7 +113,7 @@ Names should be precise, colorful and in self-explanatory English:
 
    * template arguments begin with ``A`` followed by a capital letter
 
-   * use the prefix ``m_`` for member variables, ``s_`` for static member variables, ``h_`` or ``m_h`` 
+   * use the prefix ``m_`` for member variables, ``s_`` for static member variables, ``h_`` or ``m_h``
      for histogram member variables, and ``c_`` for constants
 
    * *Python*: use all upper case with underscores for constants; always use
@@ -277,7 +277,7 @@ Initialisation
 --------------
 
 Always initialize variables immediately in the same statement where you create them
-(see `explanation <https://confluence.desy.de/download/attachments/34036872/dangerousC.pdf?version=3&modificationDate=1467725383373&api=v2>`_).
+(see `explanation <https://xwiki.desy.de/xwiki/bin/download/BI/Belle%20II%20Internal/Software/Software%20CodeManagement/Software%20CodingConventions/WebHome/dangerousC.pdf?rev=3.1>`_).
 
 All data members of a class must be initialized at their declaration. Specific
 constructors should use the initialization list (after the colon of the constructor
@@ -376,7 +376,7 @@ All include statements must be at the top of the beginning of the file and shoul
   #include <package/dir/otherclass.h>
 
 Includes should be kept to a minimum: all necessary symbols in the header should be forward declared
-if possible (to reduce depedencies between the header files), or, if that is not possible, the
+if possible (to reduce dependencies between the header files), or, if that is not possible, the
 appropriate header needs to be included.
 
 You must add the following header to all C++ files::
@@ -416,13 +416,13 @@ In general use
 
 Example::
 
-  if (x == y) {  
-    ...   
-  } else if (x > y) {  
-    ...   
-  } else {  
-    ....   
-  }   
+  if (x == y) {
+    ...
+  } else if (x > y) {
+    ...
+  } else {
+    ....
+  }
 
 *Python*: Follow the `Style Guide for Python Code <http://www.python.org/dev/peps/pep-0008/>`_.
 
@@ -434,8 +434,8 @@ Example::
 In the definition of pointers and references the \* and \& symbols have to be attached to
 the variable type, not the variable name, e.g.::
 
-  int* pIndex;   
-  int& index = *pIndex;   
+  int* pIndex;
+  int& index = *pIndex;
 
 Be aware of the (wrong) C++ convention for definitions of multiple variables in one statement.
 E.g. ``int* a, b;`` will define a pointer a and an int variable (not a pointer) b. It is
@@ -446,7 +446,7 @@ Documentation
 -------------
 
 All code has to be documented using Software.DoxyGen style comments – you can find examples
-in the `DoxyGen <https://confluence.desy.de/display/BI/Software+DoxyGen>`_ article. Rules on
+in the `DoxyGen <https://xwiki.desy.de/xwiki/rest/p/e2e4a>`_ article. Rules on
 what should be documented, and how:
 
   * Each class needs a detailed comment describing the purpose of the class.
@@ -471,7 +471,7 @@ what should be documented, and how:
     this line as comments.
   
   * Documentation about the input and output of modules is
-    `automatically generated <https://confluence.desy.de/display/BI/Software+VisualizeDataFlow>`_
+    `automatically generated <https://xwiki.desy.de/xwiki/rest/p/ae492>`_
     if both are registered in the initialize method.
 
 

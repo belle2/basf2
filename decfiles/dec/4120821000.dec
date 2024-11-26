@@ -1,0 +1,27 @@
+#########################################################################################
+# EventType:4120821000
+# Descriptor:[e+e-->gamma chi_b0[->gamma Upsilon[->l+l-]]] are generated via ISR
+# NickName:vpho_gammachi_b0
+# Test:Yes
+# Documentation:MC15rd signal request
+# PhysicsWG:Quarkonium
+# Responsible:Weitao Xiong
+# Email:22210200014@m.fudan.edu.cn
+# Cuts:None
+# Date:2024/04/23
+##########################################################################################
+Alias  chi_b0sig  chi_b0
+
+Decay  vpho
+1.00   gamma chi_b0sig PHSP;
+Enddecay
+
+Decay  chi_b0sig
+1.00   gamma  Upsilonsig  HELAMP 1. 0. 1. 0.;
+Enddecay
+
+Decay  Upsilonsig
+0.50   e+   e-   PHOTOS  VLL; 
+0.50   mu+  mu-  PHOTOS  VLL; 
+Enddecay
+End

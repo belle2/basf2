@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -20,8 +19,7 @@ import sys  # get argv
 from heapq import nlargest
 from effCalculation import EffCalculation
 
-PI = 3.1415926
-Fac = 180.0 / PI
+RadToDeg = 180.0 / math.pi
 
 
 argvs = sys.argv
@@ -37,7 +35,7 @@ def Count_mcpart(parts):
     for part in parts:
         pdglist = [11, 13, 2212, 321, 211]
         pdg = math.fabs(part.getPDG())
-        theta = part.getMomentum().Theta() * Fac
+        theta = part.getMomentum().Theta() * RadToDeg
         if theta > dec_cdc[0] and theta < dec_cdc[1]:
             if pdg in pdglist:
                 npart[0] += 1
@@ -63,7 +61,7 @@ def Count_part_inDetector(parts):
 
 
 def Theta_MCTruth(part):
-    theta = part.getMomentum().Theta() * Fac
+    theta = part.getMomentum().Theta() * RadToDeg
     return theta
 
 
@@ -84,10 +82,10 @@ def Vec_Cluster(cluster):
     e = cluster.getEnergyDep()
     vec = ROOT.TVector3(x, y, z)
     v_mom = e * ROOT.Math.PxPyPzEVector(x / vec.Mag(), y / vec.Mag(), z / vec.Mag(), 1)
-    new_theta = v_mom.Theta() * Fac
-    new_phi = v_mom.Phi() * Fac
+    new_theta = v_mom.Theta() * RadToDeg
+    new_phi = v_mom.Phi() * RadToDeg
     if(new_phi < 0):
-        new_phi += 2 * PI
+        new_phi += 2 * math.pi
     new_e = v_mom.E()
     NVC = [new_e, new_theta, new_phi]
     return NVC
@@ -116,12 +114,12 @@ def Etot_Cluster(eclcluster):
 def Max_DeltPhi_trk(trk_2d_list):
     Delt = []
     for i, trk in enumerate(trk_2d_list):
-        phi1 = (trk.getPhi0()) * Fac
+        phi1 = (trk.getPhi0()) * RadToDeg
         for j, trk2 in enumerate(trk_2d_list):
             if j <= i:
                 continue
             else:
-                phi2 = (trk2.getPhi0()) * Fac
+                phi2 = (trk2.getPhi0()) * RadToDeg
                 Delt_phi = math.fabs(phi1 - phi2)
                 Delt.append(Delt_phi)
     return max(Delt or [-100.0])
@@ -138,10 +136,10 @@ def BhabhaVeto1(matchtrks):
         cluster1 = matchtrk1.getRelatedTo('TRGECLClusters')
         if cdctrk1 and cluster1:
             tanLam1 = cdctrk1.getTanLambda()
-            theta1 = math.acos(tanLam1 / math.sqrt(1. + tanLam1 * tanLam1)) * Fac
-            phi1 = (cdctrk1.getPhi0()) * Fac
+            theta1 = math.acos(tanLam1 / math.sqrt(1. + tanLam1 * tanLam1)) * RadToDeg
+            phi1 = (cdctrk1.getPhi0()) * RadToDeg
             if phi1 < 0.:
-                phi1 += 2 * PI
+                phi1 += 2 * math.pi
             e1 = cluster1.getEnergyDep()
             for j, matchtrk2 in enumerate(matchtrks):
                 if j <= i:
@@ -151,10 +149,10 @@ def BhabhaVeto1(matchtrks):
                     cluster2 = matchtrk2.getRelatedTo('TRGECLClusters')
                     if cdctrk2 and cluster2:
                         tanLam2 = cdctrk2.getTanLambda()
-                        theta2 = math.acos(tanLam2 / math.sqrt(1. + tanLam2 * tanLam2)) * Fac
-                        phi2 = (cdctrk2.getPhi0()) * Fac
+                        theta2 = math.acos(tanLam2 / math.sqrt(1. + tanLam2 * tanLam2)) * RadToDeg
+                        phi2 = (cdctrk2.getPhi0()) * RadToDeg
                         if phi2 < 0.:
-                            phi2 += 2 * PI
+                            phi2 += 2 * math.pi
                         e2 = cluster2.getEnergyDep()
                         Delt_theta = theta1 + theta2 - 180
                         Delt_phi = math.fabs(phi1 - phi2) - 180
@@ -195,7 +193,7 @@ def eclBhabhaVeto(eclclusters):
         theta1 = vec1.Theta()
         phi1 = vec1.Phi()
         if(phi1 < 0):
-            phi1 += 2 * PI
+            phi1 += 2 * math.pi
         for j, cluster2 in enumerate(eclclusters):
             e2 = cluster2.getEnergyDep()
             if j <= i:
@@ -207,9 +205,9 @@ def eclBhabhaVeto(eclclusters):
             theta2 = vec2.Theta()
             phi2 = vec2.Phi()
             if phi2 < 0.0:
-                phi2 += 2 * PI
-            delt_theta = math.fabs((theta1 + theta2) * Fac - 180.0)
-            delt_phi = math.fabs(phi1 - phi2) * Fac - 180.0
+                phi2 += 2 * math.pi
+            delt_theta = math.fabs((theta1 + theta2) * RadToDeg - 180.0)
+            delt_phi = math.fabs(phi1 - phi2) * RadToDeg - 180.0
             if theta1 < theta2:
                 efr = e1
                 ebr = e2
@@ -233,7 +231,7 @@ def Max_DeltPhi_cluster(eclclusters):
         vec1 = ROOT.TVector3(x1, y1, z1)
         phi1 = vec1.Phi()
         if(phi1 < 0):
-            phi1 += 2 * PI
+            phi1 += 2 * math.pi
         for j, cluster2 in enumerate(eclclusters):
             e2 = cluster2.getEnergyDep()
             if j <= i:
@@ -246,8 +244,8 @@ def Max_DeltPhi_cluster(eclclusters):
             vec2 = ROOT.TVector3(x2, y2, z2)
             phi2 = vec2.Phi()
             if phi2 < 0.0:
-                phi2 += 2 * PI
-            delt_phi = math.fabs(phi1 - phi2) * 180.0 / 3.1415926
+                phi2 += 2 * math.pi
+            delt_phi = math.fabs(phi1 - phi2) * RadToDeg
             eclphi_col.append(delt_phi)
     return max(eclphi_col or [-1.0])
 
@@ -372,21 +370,21 @@ class CreateLogics(b2.Module):
     ntrk_2dfitter_t = array('i', [-1])
     #: #3d fitter tracks
     ntrk_3dfitter_t = array('i', [-1])
-    #: #NN tracks
+    #: number of NN tracks
     ntrk_NN_t = array('i', [-1])
     #: #2d matched tracks
     ntrk_2Dmatch_t = array('i', [-1])
     #: #3d matched tracks
     ntrk_3Dmatch_t = array('i', [-1])
-    #: #max phi angle between two 2d finder tracks
+    #: max phi angle between two 2d finder tracks
     max_deltphi_2dfinder_t = array('f', [0.0])
-    #: #cluster pairs with different energy threshold
+    #: number of cluster pairs with different energy threshold
     cpair_t = array('i', 8 * [0])
-    #: #array components
+    #: number of array components
     ncomp_clu = 3
     #: the total deposited cluster energy in ecl
     etot_t = array('f', [0.0])
-    #: #ecl cluster with threshold >1.0GeV, exclude TC ID 1,2, 17
+    #: number of ecl cluster with threshold >1.0GeV, exclude TC ID 1,2, 17
     ncluster_1000b_t = array('i', [-1])
     #: # ecl cluster with threshold >2.0GeV in TC ID 1, 17
     ncluster_2000e_t = array('i', [-1])
@@ -414,15 +412,15 @@ class CreateLogics(b2.Module):
     max_deltphi_cluster_t = array('f', [0.0])
     #: the timing of clusters
     time_cluster_t = array('f', 100 * [-99999.])
-    #: #KLM track
+    #: number of KLM tracks
     ntrk_klm_t = array('i', [-1])
-    #: #KLM hits
+    #: number of KLM hits
     nhit_klm_t = array('i', [-1])
     #: # back to back track and cluster pairs
     npair_tc_t = array('i', [-1])
     #: # back to back cluster pairs
     npair_cc_t = array('i', [-1])
-    #: #array components
+    #: number of array components
     nbha_var = 5
     #: bhabha veto logic, 1: bhabha, 0: non bhabha
     bhabha_t = array('i', [0])

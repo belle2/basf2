@@ -5,6 +5,7 @@
 [INFO]  o) creating (anti-)ParticleList with name: e+:all (e-:all)
 [INFO]    -> MDST source: Tracks
 [FATAL] Tree with the name "variables" already exists in the file "ntuple.root"
+or is reserved for FileMetaData.
 
 You probably want to either set the output fileName or the treeName to something else:
 
@@ -19,6 +20,7 @@ You probably want to either set the output fileName or the treeName to something
 
 [INFO] Starting event processing, random seed is set to '1337'
 [ERROR] The required object 'e+' (durability: event) does not exist. Maybe you forgot the module that registers it?
+[INFO] EventExtraInfo is not registered. __eventType__ will be empty. The eventType is available from MC16 on.
 [FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] ParticleLoader's Summary of Actions:

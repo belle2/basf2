@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # *****************************************************************************
 
 ##########################################################################
@@ -42,16 +41,16 @@ for entry in vxd.getMap():
     ladder = vxdid.getLadderNumber()
     sensor = vxdid.getSensorNumber()
     if sensor != 0:
-        text_file.write("{0} {1} {2} {3} {4}\n".format(layer, ladder, sensor, param, value))
+        text_file.write("{} {} {} {} {}\n".format(layer, ladder, sensor, param, value))
         # print("{0} {1} {2} {3} {4}\n".format(layer, ladder, sensor, param, value))
 
 for parameter in range(1, 7):
-    text_file.write("{0} {1} {2} {3} {4}\n".format(1, 0, 1, parameter, vxd.get(int(Belle2.VxdID(1, 0, 0, 1)), parameter)))
-    text_file.write("{0} {1} {2} {3} {4}\n".format(1, 0, 2, parameter, vxd.get(int(Belle2.VxdID(1, 0, 0, 2)), parameter)))
-    text_file.write("{0} {1} {2} {3} {4}\n".format(3, 0, 1, parameter, vxd.get(int(Belle2.VxdID(3, 0, 0, 1)), parameter)))
-    text_file.write("{0} {1} {2} {3} {4}\n".format(3, 0, 2, parameter, vxd.get(int(Belle2.VxdID(3, 0, 0, 2)), parameter)))
+    text_file.write("{} {} {} {} {}\n".format(1, 0, 1, parameter, vxd.get(int(Belle2.VxdID(1, 0, 0, 1)), parameter)))
+    text_file.write("{} {} {} {} {}\n".format(1, 0, 2, parameter, vxd.get(int(Belle2.VxdID(1, 0, 0, 2)), parameter)))
+    text_file.write("{} {} {} {} {}\n".format(3, 0, 1, parameter, vxd.get(int(Belle2.VxdID(3, 0, 0, 1)), parameter)))
+    text_file.write("{} {} {} {} {}\n".format(3, 0, 2, parameter, vxd.get(int(Belle2.VxdID(3, 0, 0, 2)), parameter)))
     for layer in range(1, 7):
-        text_file.write("{0} {1} {2} {3} {4}\n".format(layer, 1, 0, parameter, vxd.get(int(Belle2.VxdID(layer, 1, 0)), parameter)))
+        text_file.write("{} {} {} {} {}\n".format(layer, 1, 0, parameter, vxd.get(int(Belle2.VxdID(layer, 1, 0)), parameter)))
 
 text_file.close()
 

@@ -1,0 +1,42 @@
+# EventType: 1140028000 
+# Descriptor: [B0 -> eta(-> gamma gamma / pi+ pi- pi0) omega]
+# NickName: Bd_etaomega
+# Documentation: B0 -> eta omega 
+# Tested: Yes
+# PhysicsWG: Bhadronic
+# Responsible: Ming-Chuan Chang
+# Email: jeri.mcchang@gmail.com
+# Cuts: None
+# Date: 20241011
+
+
+Alias      etasig     eta
+Alias      omega_sig  omega
+Alias      pi0sig     pi0
+
+Decay Upsilon(4S)
+1.0   B0 anti-B0 B0sig anti-B0sig   VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.000   omega_sig   etasig   SVS;  
+Enddecay
+CDecay anti-B0sig
+
+
+Decay etasig
+0.5  gamma  gamma        PHSP;
+0.5  pi+  pi-  pi0sig    PHSP;
+Enddecay 
+
+Decay  omega_sig
+1.0  pi+  pi-  pi0sig    OMEGA_DALITZ;
+Enddecay
+
+Decay  pi0sig
+1.0  gamma  gamma  PHSP;
+Enddecay
+
+End
+
+

@@ -6,18 +6,21 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// ECL
+/* Own header. */
 #include <ecl/utility/ECLDspUtilities.h>
-#include <ecl/utility/ECLChannelMapper.h>
-#include <ecl/dbobjects/ECLDspData.h>
+
+/* ECL headers. */
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dataobjects/ECLDigit.h>
-// Framework
-#include <framework/logging/Logger.h>
-#include <framework/database/DBObjPtr.h>
+#include <ecl/dbobjects/ECLDspData.h>
+#include <ecl/mapper/ECLChannelMapper.h>
+
+/* Basf2 headers. */
 #include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
-// ROOT
+
+/* ROOT headers. */
 #include <TFile.h>
 #include <TTree.h>
 
@@ -33,7 +36,7 @@ float ECLDspUtilities::pedfit_fg32[768] = {};
 
 /**
  * @brief Read data from file to ptr.
- * @return Number of times sucessfully read.
+ * @return Number of times successfully read.
  */
 void readEclDspCoefs(FILE* fl, void* ptr, int word_size, int word_count)
 {
@@ -131,7 +134,7 @@ ECLDspData* ECLDspUtilities::readEclDsp(const char* filename, int boardNumber)
 void ECLDspUtilities::writeEclDsp(const char* filename, ECLDspData* data)
 {
   // Default header for DSP file.
-  // Words '0xABCD' are overwitten with current parameters.
+  // Words '0xABCD' are overwritten with current parameters.
   const unsigned short DEFAULT_HEADER[256] {
     // ECLDSP FILE.....
     0x4543, 0x4c44, 0x5350, 0x2046, 0x494c, 0x4500, 0x0000, 0x0000,

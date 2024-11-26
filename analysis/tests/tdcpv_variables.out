@@ -2,9 +2,9 @@
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/tdcpv-mdst.root
-[INFO] Conditions Database: found working server
-	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] Conditions Database: found working metadata provider
+	provider = ${BELLE2_CONDB_METADATA}
+[INFO] Conditions data: configured globaltags (highest priority first) are main_2022-07-05, Legacy_CollisionAxisCMS
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: mu+:all (mu-:all)
 [INFO]    -> MDST source: Tracks
@@ -56,7 +56,7 @@
 [INFO]  ParticleLists: B0:sig (0+1) + anti-B0:sig (0+1)
 [INFO]  - 41 = 511[0]
 [INFO]      o) daughter indices = 13 38
-[INFO]      o) DeltaT = 2.43687
+[INFO]      o) DeltaT = 2.43688
 [INFO]      o) DeltaTErr = 0.378699
 [INFO]      o) DeltaTBelle = 2.28715
 [INFO]      o) TagVz = -0.0366393

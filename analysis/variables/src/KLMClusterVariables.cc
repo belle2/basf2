@@ -32,11 +32,11 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     const KlId* klid = cluster->getRelatedTo<KlId>();
     if (!klid) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return klid->getKlId();
   }
@@ -81,7 +81,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getTime();
   }
@@ -91,7 +91,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getClusterPosition().X();
   }
@@ -101,7 +101,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getClusterPosition().Y();
   }
@@ -111,7 +111,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getClusterPosition().Z();
   }
@@ -121,7 +121,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getInnermostLayer();
   }
@@ -131,7 +131,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getLayers();
   }
@@ -140,7 +140,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getEnergy();
   }
@@ -149,7 +149,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getMomentumMag();
   }
@@ -158,7 +158,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     float clusterZ = cluster->getClusterPosition().Z();
     if ((clusterZ > -180) && (clusterZ < 275)) {
@@ -171,7 +171,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     float clusterZ = cluster->getClusterPosition().Z();
     if ((clusterZ < -180) || (clusterZ > 275)) {
@@ -184,7 +184,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     float clusterZ = cluster->getClusterPosition().Z();
     if (clusterZ > 275) {
@@ -197,7 +197,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     float clusterZ = cluster->getClusterPosition().Z();
     if (clusterZ < -180) {
@@ -210,7 +210,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getClusterPosition().Theta();
   }
@@ -219,7 +219,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getClusterPosition().Phi();
   }
@@ -228,7 +228,7 @@ namespace Belle2::Variable {
   {
     // check there actually are KLM clusters in the event
     StoreArray<KLMCluster> clusters;
-    if (clusters.getEntries() == 0) return std::numeric_limits<double>::quiet_NaN();
+    if (clusters.getEntries() == 0) return Const::doubleNaN;
 
     // get the input particle's vector momentum in the CMS frame
     PCmsLabTransform T;
@@ -248,7 +248,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster)
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     size_t out = cluster->getRelationsFrom<Track>().size();
     return double(out);
   }
@@ -261,7 +261,7 @@ namespace Belle2::Variable {
     } else if (particleSource == Particle::EParticleSourceObject::c_ECLCluster) {
       return particle->getECLCluster()->getRelationsTo<KLMCluster>().size();
     } else {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
   }
 
@@ -269,7 +269,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster)
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     size_t out = cluster->getRelationsFrom<ECLCluster>().size();
     return double(out);
   }
@@ -278,10 +278,10 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster)
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     auto trackWithWeight = cluster->getRelatedFromWithWeight<Track>();
     if (!trackWithWeight.first)
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     return 1. / trackWithWeight.second;
   }
 

@@ -14,7 +14,7 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
@@ -1078,7 +1078,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     histfile->WriteTObject(tcrateNew_MINUS_tcrateOld__crateID.get(), "tcrateNew_MINUS_tcrateOld__crateID");
     histfile->WriteTObject(tcrateNew_MINUS_tcrateOld.get(), "tcrateNew_MINUS_tcrateOld");
 
-    // Save the histograms ot the crate iterations file
+    // Save the histograms to the crate iterations file
     histExtraCrateInfofile->WriteTObject(tcrateNew_MINUS_tcrateOld_allRuns.get(), "tcrateNew_MINUS_tcrateOld_allRuns");
     histExtraCrateInfofile->WriteTObject(tcrateNew_MINUS_tcrateOld_allRuns_allCrates.get(),
                                          "tcrateNew_MINUS_tcrateOld_allRuns_allCrates");

@@ -279,7 +279,7 @@ namespace VXDTFfilterTest {
     dummyFilter.accept(x1, x2);
     dummyFilter.accept(x1, x3);
 
-    // useless test as it tests if realy unobserved
+    // useless test as it tests if really unobserved
     EXPECT_EQ(0, counter< SquaredDistance3D >::N);
     EXPECT_EQ(0, counter< SquaredDistance2Dxy >::N);
     EXPECT_EQ(0, counter< SquaredDistance1Dx >::N);
@@ -312,7 +312,13 @@ namespace VXDTFfilterTest {
     EXPECT_FALSE(filter.accept(x1, x2));
     EXPECT_EQ(1, counter< SquaredDistance3D >::N);
 
+    // The clang static analyser doesn't understand that the `filter` has a pointer to
+    // `bypassControl` and thus doesn't know that the variable is in fact used after being changed to `true` here.
+    // According to https://clang-analyzer.llvm.org/faq.html#exclude_code, the only way to suppress these
+    // warnings as of May 2023 is the following
+#ifndef __clang_analyzer__
     bypassControl = true;
+#endif
     EXPECT_TRUE(filter.accept(x1, x2));
     EXPECT_EQ(2, counter< SquaredDistance3D >::N);
 

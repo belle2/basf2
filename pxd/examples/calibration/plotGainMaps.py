@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -80,8 +79,8 @@ for condition in b2.conditions:
             gain_table[sensorID.getID()].append(mean_gain)
 
             if args.maps:
-                name = "Gains_{:d}_{:d}_{:d}_run_{:d}".format(layer, ladder, sensor, condition.run)
-                title = "Relative energy calibration Sensor={:d}.{:d}.{:d} run={:d}".format(layer, ladder, sensor, condition.run)
+                name = f"Gains_{layer:d}_{ladder:d}_{sensor:d}_run_{condition.run:d}"
+                title = f"Relative energy calibration Sensor={layer:d}.{ladder:d}.{sensor:d} run={condition.run:d}"
                 gain_map = ROOT.TH2F(name, title, nBinsU, 0, nBinsU, nBinsV, 0, nBinsV)
                 gain_map.GetXaxis().SetTitle("uBin")
                 gain_map.GetYaxis().SetTitle("vBin")
@@ -112,17 +111,17 @@ for sensorID in sensor_list:
     gr = ROOT.TGraph(n, x, y)
     gr.SetLineColor(ROOT.kBlue)
     gr.SetLineWidth(4)
-    gr.SetName("graph_{}".format(sensorID.getID()))
+    gr.SetName(f"graph_{sensorID.getID()}")
     gr.SetMarkerColor(ROOT.kBlue)
     gr.SetMarkerStyle(21)
-    gr.SetTitle('Gain evolution Sensor={}'.format(sensorID))
+    gr.SetTitle(f'Gain evolution Sensor={sensorID}')
     gr.GetXaxis().SetTitle('run number')
     gr.GetYaxis().SetTitle('gain')
     gr.Draw('AP')
 
     c.Update()
     c.Modified()
-    c.Print('gains_vs_runno_{}.png'.format(sensorID.getID()))
+    c.Print(f'gains_vs_runno_{sensorID.getID()}.png')
     c.Write()
 
 

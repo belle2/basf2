@@ -41,7 +41,6 @@ namespace Belle2 {
      * Input:
      * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
-     * @param strip: NOT USED
      * @param size: cluster size
      * @param raw_error : error provided by the algorithm in the SVDClusterizer
      *

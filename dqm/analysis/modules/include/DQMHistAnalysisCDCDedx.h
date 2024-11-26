@@ -11,18 +11,20 @@
 #include <boost/format.hpp>
 #include <TROOT.h>
 
-#include "TLine.h"
-#include "TPaveText.h"
-#include "TStyle.h"
-#include "TGaxis.h"
-#include "TColor.h"
+#include <TLine.h>
+#include <TPaveText.h>
+#include <TStyle.h>
+#include <TGaxis.h>
+#include <TColor.h>
+#include <TLegend.h>
 
-#include "TF1.h"
-#include "TCanvas.h"
-#include "TH1.h"
-#include "TH2D.h"
+#include <TF1.h>
+#include <TCanvas.h>
+#include <TH1.h>
+#include <TH2D.h>
 
 #include <dqm/core/DQMHistAnalysis.h>
+#include <cdc/geometry/CDCGeometryParConstants.h>
 
 namespace Belle2 {
 
@@ -42,11 +44,6 @@ namespace Belle2 {
     * constructor
     */
     DQMHistAnalysisCDCDedxModule();
-
-    /**
-    * destructor
-    */
-    ~DQMHistAnalysisCDCDedxModule();
 
     /**
     * init function for default values
@@ -74,60 +71,102 @@ namespace Belle2 {
     void terminate() override final;
 
     /**
-    * funtion to get metadata from histogram
+    * function to get metadata from histogram
     */
     void getMetadata();
 
     /**
-    * funtion to draw dEdx+Fit
+    * function to draw dEdx+Fit
     */
     void drawDedxPR();
 
     /**
-    * funtion to draw dEdx+Fit for run variation
+    * function to draw dEdx+Fit for run variation
     */
     void drawDedxIR();
 
     /**
-    * funtion to draw ADC-based dead wire status of CDC
+    * function to draw ADC-based dead wire status of CDC
     */
     void drawWireStatus();
 
     /**
-    * funtion to draw dEdx vs costh and phi
+    * function to draw dEdx vs costh and phi
     */
     void drawDedxCosPhi();
 
     /**
-    * funtion to dedx bands P
-    */
+     * function to dedx bands P
+     */
     void drawBandPlot();
 
     /**
-    * funtion to fit gaussian dist.
+     * function to draw the dEdx vs injection time
+     */
+    void drawDedxInjTime();
+
+    /**
+    * function to draw the mean/reso of dedx vs injection time
+    */
+    void drawDedxInjTimeBin();
+
+    /**
+    * function to fit gaussian dist.
+    * @param temphist histogram to fit
+    * @param status return the status of fitting
     */
     void fitHistogram(TH1D*& temphist, std::string& status);
 
     /**
-    * funtion to add plot style
+    * function to set the mean and sigma histograms
+    * @param hist 2-D histogram
+    * @param hmean histogram to store the mean
+    * @param hsigma histogram to store the sigma
+    * @param nbin number of bins
+    */
+    void setHistPars(TH2D* hist, TH1F* hmean, TH1F* hsigma, int nbin);
+
+    /**
+    * function to draw the histograms
+    * @param hist histogram to draw
+    * @param nbin number of bins
+    * @param pars average value of histogram
+    * @param fac factor to set the range of y-axis of histogram
+    * @param var name of histogram
+    */
+    void drawHistPars(TH1F* hist, int nbin, double pars, double fac, std::string var);
+
+    /**
+    * function to add plot style
     */
     void setPlotStyle();
 
     /**
-    * funtion to add text style
+    * function to add text style
+    * @param obj pavetext variable
     */
     void setTextStyle(TPaveText*& obj);
 
     /**
-    * funtion to reset pad margins
+    * function to set the style of histogram
+    * @param obj histogram
     */
     void setHistStyle(TH1* obj);
 
     /**
-    * funtion to reset pad margins
+    * function to reset pad margins
+    * @param l left
+    * @param r right
+    * @param t top
+    * @param b bottom
     */
     void setPadStyle(double l, double r, double t, double b);
 
+    /**
+    * function to set the bhabha event info
+    * @param pt pavetext variable
+    */
+    void setBEvtInfo(TPaveText* pt);
 
   private:
 
@@ -159,4 +198,3 @@ namespace Belle2 {
 
   };
 } // end namespace Belle2
-

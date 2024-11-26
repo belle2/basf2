@@ -9,9 +9,9 @@
 #pragma once
 
 /* External headers. */
+#include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 #include <TMatrixDSym.h>
-#include <TVector3.h>
 
 /* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
@@ -70,20 +70,20 @@ namespace Belle2 {
     {return m_innermostLayer;}
 
     /**
-     * Get global position (TVector3 version).
+     * Get global position (ROOT::Math::XYZVector version).
      * @return Hit coordinates.
      */
-    inline TVector3 getClusterPosition() const
-    {return TVector3(m_globalX, m_globalY, m_globalZ);}
+    inline ROOT::Math::XYZVector getClusterPosition() const
+    {return ROOT::Math::XYZVector(m_globalX, m_globalY, m_globalZ);}
 
     /**
-     * Get global position (TVector3 version) of the origin of KLMCluster
+     * Get global position (ROOT::Math::XYZVector version) of the origin of KLMCluster
      * (always return (0,0,0) since we believe all KLMClusters to originate at or
      * near primary vertex).
      * @return KLMCluster origin coordinates.
      */
-    inline TVector3 getPosition() const
-    {return TVector3(0, 0, 0);}
+    inline ROOT::Math::XYZVector getPosition() const
+    {return ROOT::Math::XYZVector(0, 0, 0);}
 
     /**
      * Get momentum magnitude.
@@ -168,34 +168,6 @@ namespace Belle2 {
     void setMomentumMag(float momentumMag)
     {m_p = momentumMag;}
 
-    /**
-     * Set error of vertex X coordinate.
-     * @param[in] errorX Error of vertex X coordinate.
-     */
-    void setErrorX(float errorX)
-    {m_errorX = errorX;}
-
-    /**
-     * Set error of vertex Y coordinate.
-     * @param[in] errorY Error of vertex Y coordinate.
-     */
-    void setErrorY(float errorY)
-    {m_errorY = errorY;}
-
-    /**
-     * Set error of vertex Z coordinate.
-     * @param[in] errorZ Error of vertex Z coordinate.
-     */
-    void setErrorZ(float errorZ)
-    {m_errorZ = errorZ;}
-
-    /**
-     * Set error of momentum absolute value.
-     * @param[in] errorP Error of momentum absolute value.
-     */
-    void setErrorP(float errorP)
-    {m_errorP = errorP;}
-
   private:
 
     /** Decay time. */
@@ -219,20 +191,8 @@ namespace Belle2 {
     /** Absolute value of momentum, 0 means unknown. */
     float m_p;
 
-    /** Error of vertex X coordinate. */
-    float m_errorX;
-
-    /** Error of vertex Y coordinate. */
-    float m_errorY;
-
-    /** Error of vertex Z coordinate. */
-    float m_errorZ;
-
-    /** Error of momentum absolute value. */
-    float m_errorP;
-
     /** Needed to make objects storable. */
-    ClassDef(Belle2::KLMCluster, 2);
+    ClassDef(Belle2::KLMCluster, 3);
 
   };
 

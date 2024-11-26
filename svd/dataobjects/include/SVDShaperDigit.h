@@ -236,8 +236,7 @@ namespace Belle2 {
     }
 
     /**
-      *
-      * @param
+      * @param x input shaper digit
       * @return append status
       */
     bool operator < (const SVDShaperDigit&   x)const

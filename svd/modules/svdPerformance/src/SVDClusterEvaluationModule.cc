@@ -601,9 +601,9 @@ void SVDClusterEvaluationModule::endRun()
     for (int bin = 0; bin < h_effV->GetNbinsX(); bin++)
       h_effV->SetBinError(bin, 0.);
     h_effV->Write();
-  }
 
-  m_rootFilePtr->Close();
+    m_rootFilePtr->Close();
+  }
 }
 
 

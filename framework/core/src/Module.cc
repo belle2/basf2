@@ -392,7 +392,7 @@ given by e.g. ``basf2 -m RootInput``.
 
 The 'Module Development' section in the manual provides detailed information
 on how to create modules, setting parameters, or using return values/conditions:
-https://confluence.desy.de/display/BI/Software+Basf2manual#Module_Development
+https://xwiki.desy.de/xwiki/rest/p/f4fa4/#HModuleDevelopment
 
 )");
   module

@@ -20,8 +20,8 @@ void set2dconfig()
   const int N_config = 2;
 
   const int run[N_config][4] = { //itnitial exp, initial run, end exp, end run
-    0,    0,   -1,   -1, // 0
-    9, 1400,   -1,   -1  // 1
+    {0,    0,   -1,   -1}, // 0
+    {9, 1400,   -1,   -1}  // 1
   };
 
   int nTS[N_config] = {

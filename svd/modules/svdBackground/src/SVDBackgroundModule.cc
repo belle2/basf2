@@ -186,13 +186,14 @@ void SVDBackgroundModule::event()
 
   VxdID currentSensorID(0);
   double currentSensorThickness(0);
-  double currentSensorMass(0);
   double currentSensorArea(0);
 
   // Exposition and dose
   if (m_doseReportingLevel > c_reportNone) {
     B2DEBUG(100, "Expo and dose");
     currentSensorID.setID(0);
+    double currentSensorMass(0);
+
     for (const SVDSimHit& hit : storeSimHits) {
       // Update if we have a new sensor
       VxdID sensorID = hit.getSensorID();
@@ -234,7 +235,7 @@ void SVDBackgroundModule::event()
       if (sensorID != currentSensorID) {
         currentSensorID = sensorID;
         currentSensorThickness = getSensorThickness(currentSensorID);
-        currentSensorMass = getSensorMass(currentSensorID);
+        //currentSensorMass = getSensorMass(currentSensorID);
         currentSensorArea = getSensorArea(currentSensorID);
       }
       // J(TrueHit) = abs(step)/thickness * correctionFactor;
@@ -254,6 +255,10 @@ void SVDBackgroundModule::event()
             simhit = &related;
           }
         }
+      }
+      if (!simhit) {
+        B2WARNING("No related SVDSimHit found");
+        continue; //skip this true hit if the simhit is null
       }
       // FIXME: Is there a difference between positrons and electrons wrt. NIEL?
       // We fill neutronFluxBars with summary NIEL deposit for all kinds of particles by layer and component.

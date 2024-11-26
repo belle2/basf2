@@ -4,8 +4,9 @@ Import('env')
 
 env['LIBS'] = ['framework', 'dqm',
                'arich', 'cdc', 'dqm_dataobjects',
-	       'klm_dataobjects', 'klm_dbobjects', 
-	       'svd_dataobjects', 'cdc_dataobjects',
+               'ecl', 'ecl_mapper',
+               'klm_dataobjects', 'klm_dbobjects',
+               'svd_dataobjects', 'cdc_dataobjects',
                'vxd', 'vxd_dataobjects',
                'RooFit', 'RooFitCore', 'ca', 'Com']
 

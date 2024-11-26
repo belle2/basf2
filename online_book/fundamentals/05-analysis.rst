@@ -53,12 +53,13 @@ The Belle II detectors can provide three kinds of information:
 * Energy
 * PID probability.
 
-Of course not all of them are available for every particle, in fact in most cases
-only two of them are, and however only for a very limited number of particles.  Most of the particles
-in the :math:`e^+e^-` collision do not live long enough to leave any signal inside the detector, and must
-be reconstructed measuring their decay products. This introduces the very important distinction
-between measured particles, who leave a signal inside the detector and are reconstructed directly
-starting from those signals and combined particles that are reconstructed as sum of measure particles.
+Of course, not all of them are available for every particle. In fact in most cases
+only two of them are. However, for a very limited number of particles, you will have all three of them.  
+Most of the particles in the :math:`e^+e^-` collision do not live long enough to leave any signal 
+inside the detector, and must be reconstructed measuring their decay products. This introduces the 
+very important distinction between measured particles, which leave a signal inside the detector and 
+are reconstructed directly starting from those signals, and combined particles that are reconstructed 
+as sum of measured particles.
 
 .. admonition:: Question
     :class: exercise stacked
@@ -147,7 +148,7 @@ products of any decay chain we may be interested in reconstructing.
 In making an analysis, one has three building blocks:
 
 Reconstructed particle
-    Reconstructed particles are the basic building block for any analysis. The originate from two
+    Reconstructed particles are the basic building block for any analysis. They originate from two
     different reconstruction objects: charged particles are reconstructed from tracks, photons and
     :math:`K_L` from ECL or KLM clusters. Of course a charged track entering the ECL will leave a signal,
     so one can have a cluster attached to a charged tracks.

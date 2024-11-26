@@ -57,7 +57,7 @@ BKLMTrackingModule::BKLMTrackingModule() : Module(),
   addParam("fitGlobalBKLMTrack", m_globalFit,
            "[bool], do the BKLMTrack fitting in global system (multi-sectors track) or local system (sector by sector) (default is false, local sys.)",
            false);
-  addParam("StudyEffiMode", m_studyEffi, "[bool], run in efficieny study mode (default is false)", false);
+  addParam("StudyEffiMode", m_studyEffi, "[bool], run in efficiency study mode (default is false)", false);
   addParam("outputName", m_outPath, "[string],  output file name containing efficiencies plots ", std::string("bklmEffi.root"));
 }
 
@@ -135,7 +135,7 @@ void BKLMTrackingModule::event()
           if (m_storeTracks.getEntries() > 0)
             thereIsATrack = true;
           generateEffi(iSection, iSector, iLayer);
-          //clear tracks so prepare for the next layer efficieny study
+          //clear tracks so prepare for the next layer efficiency study
           m_storeTracks.clear();
         }
       }
@@ -162,7 +162,7 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
 
   if (hits2D.getEntries() < 1)
     return;
-  if (mode == 1) { //efficieny study
+  if (mode == 1) { //efficiency study
     for (int j = 0; j < hits2D.getEntries(); j++) {
       if (hits2D[j]->getSubdetector() != KLMElementNumbers::c_BKLM)
         continue;
@@ -239,11 +239,10 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
         m_track->setNumHitOnTrack(m_fitter->getNumHit());
         m_track->setIsValid(m_fitter->isValid());
         m_track->setIsGood(m_fitter->isGood());
-        std::list<KLMHit2d*>::iterator j;
         m_hits.sort(sortByLayer);
-        for (j = m_hits.begin(); j != m_hits.end(); ++j) {
-          (*j)->isOnStaTrack(true);
-          m_track->addRelationTo((*j));
+        for (KLMHit2d* hit2d : m_hits) {
+          hit2d->isOnStaTrack(true);
+          m_track->addRelationTo(hit2d);
         }
         //tracks.push_back(m_track);
         //m_track->getTrackParam().Print();
@@ -254,9 +253,9 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
           if (m_MatchToRecoTrack) {
             if (findClosestRecoTrack(m_track, closestTrack)) {
               m_track->addRelationTo(closestTrack);
-              for (j = m_hits.begin(); j != m_hits.end(); ++j) {
+              for (KLMHit2d* hit2d : m_hits) {
                 unsigned int sortingParameter = closestTrack->getNumberOfTotalHits();
-                closestTrack->addBKLMHit((*j), sortingParameter, RecoHitInformation::OriginTrackFinder::c_LocalTrackFinder);
+                closestTrack->addBKLMHit(hit2d, sortingParameter, RecoHitInformation::OriginTrackFinder::c_LocalTrackFinder);
               }
             }
           }//end match
@@ -348,41 +347,46 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
     B2INFO("BKLMTrackingModule::there is no recoTrack");
     return false;
   }
-  double oldDistance = INFINITY;
+  double oldDistanceSq = INFINITY;
   double oldAngle = INFINITY;
   closestTrack = nullptr;
-  //TVector3 poca = TVector3(0, 0, 0);
   //bklmHits are already sorted by layer
   //possible two hits in one layer?
-  ROOT::Math::XYZVector hitPosition = bklmHits[0]->getPosition();
-  TVector3 firstBKLMHitPosition(hitPosition.X(), hitPosition.Y(), hitPosition.Z());
+  //genfit requires TVector3 rather than XYZVector
+  TVector3 firstBKLMHitPosition(bklmHits[0]->getPosition().X(),
+                                bklmHits[0]->getPosition().Y(),
+                                bklmHits[0]->getPosition().Z());
+
+  // To get direction (angle) below, we have two points on the bklmTrk:
+  //     (x1, TrackParam[0]+TrackParam[1]*x1, TrackParam[2]+TrackParam[3]*x1)
+  //     (x2, TrackParam[0]+TrackParam[1]*x2, TrackParam[2]+TrackParam[3]*x2)
+  // the difference vector is
+  //     (x2-x1, TrackParam[1]*(x2-x1), TrackParam[3]*(x2-x1))
+  // which is proportional to
+  //     (1, TrackParam[1], TrackParam[3]).
+  TVector3 bklmTrkVec(1.0,  bklmTrk->getTrackParam()[1], bklmTrk->getTrackParam()[3]);
 
   TMatrixDSym cov(6);
-  TVector3 pos(0, 0, 0);
-  TVector3 mom(0, 0, 0);
+  TVector3 pos; // initializes to (0,0,0)
+  TVector3 mom; // initializes to (0,0,0)
 
   for (RecoTrack& track : recoTracks) {
     try {
       genfit::MeasuredStateOnPlane state = track.getMeasuredStateOnPlaneFromLastHit();
       //! Translates MeasuredStateOnPlane into 3D position, momentum and 6x6 covariance.
       state.getPosMomCov(pos, mom, cov);
-      if (mom.Y() * pos.Y() < 0)
-      { state = track.getMeasuredStateOnPlaneFromFirstHit(); }
-      //pos.Print(); mom.Print();
+      if (mom.Y() * pos.Y() < 0) {
+        state = track.getMeasuredStateOnPlaneFromFirstHit();
+      }
       const TVector3& distanceVec = firstBKLMHitPosition - pos;
       state.extrapolateToPoint(firstBKLMHitPosition);
-      double newDistance = distanceVec.Mag2();
-      // two points on the track, (x1,TrkParam[0]+TrkParam[1]*x1, TrkParam[2]+TrkParam[3]*x1),
-      // and (x2,TrkParam[0]+TrkParam[1]*x2, TrkParam[2]+TrkParam[3]*x2),
-      // then we got the vector (x2-x1,....), that is same with (1,TrkParam[1], TrkParam[3]).
-      TVector3 trkVec(1, bklmTrk->getTrackParam()[1], bklmTrk->getTrackParam()[3]);
-      double angle = trkVec.Angle(mom);
+      double newDistanceSq = distanceVec.Mag2();
+      double angle = bklmTrkVec.Angle(mom);
       // choose closest distance or minimum open angle ?
       // overwrite old distance
-      if (newDistance < oldDistance) {
-        oldDistance = newDistance;
+      if (newDistanceSq < oldDistanceSq) {
+        oldDistanceSq = newDistanceSq;
         closestTrack = &track;
-        //poca = pos;
         oldAngle = angle;
       }
 
@@ -398,7 +402,7 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
 
   // can not find matched RecoTrack
   // problem here is the errors of the track parameters are not considered!
-  // best way is the positon or vector direction are required within 5/10 sigma ?
+  // best way is the position or vector direction are required within 5/10 sigma ?
   if (oldAngle > m_maxAngleRequired)
     return false;
   // found matched RecoTrack
@@ -496,7 +500,7 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
           continue;
         if (hits2D[he]->isOutOfTime())
           continue;
-        //if alreday used, skip
+        //if already used, skip
         if (m_pointUsed.find(he) != m_pointUsed.end())
           continue;
 

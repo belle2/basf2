@@ -1,0 +1,30 @@
+# EventType: 1210030101
+# Descriptor: [B+ -> K+ pi- pi+) ]cc
+# NickName: B+_K+pi-pi+
+# Documentation: Decay mode for sensitivity studies
+# Responsible: Yu Nakazawa
+# Email: nakancyo@post.kek.jp
+# Tested: yes
+# PhysicsWG: Bhadronic
+# Cuts: None
+# Date: 22/08/2023
+#
+#
+#
+Decay Upsilon(4S)
+0.5   B+sig   B-      VSS;
+0.5   B+      B-sig   VSS;
+Enddecay
+### 
+### 
+### 
+Decay B+sig
+1.0   K+   pi-   pi+   PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+###
+###
+###
+###
+###
+End

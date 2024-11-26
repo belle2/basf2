@@ -90,7 +90,10 @@ namespace Belle2 {
 
     /**
      * The function returns a probability based on the Fermi motion model.
-     * @pf Fermi motion momentum for the Fermi motion model
+     * reference: Ali, Ahmed, et al. "Power corrections in the decay rate and distributions in B->Xs l+l- 2 in the standard model"
+     * see (eq.57)
+     * @param pb momentum of the b quark
+     * @param pf momentum width parameter in the Fermi motion model
      */
     double FermiMomentumProb(double pb, double pf);
 

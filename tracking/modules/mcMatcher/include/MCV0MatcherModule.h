@@ -13,8 +13,7 @@
 #include <mdst/dataobjects/V0.h>
 
 namespace Belle2 {
-  /** A module matching the V0s from the mcV0Matcher to MC particles. .
-   */
+  /** A module matching the V0s from the mcV0Matcher to MC particles. */
   class MCV0MatcherModule : public Module {
   public:
     /** Constructor, for setting module description and parameters. */

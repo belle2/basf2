@@ -103,7 +103,7 @@ The format of ``input_data`` is:
 
 .. code-block:: python
 
-  input_data = {"Your_Input_Name_A": 
+  input_data = {"Your_Input_Name_A":
                     {"/path/to/type/a/input/file_1_1.root": caf.utils.IoV(1, 1, 1, 1),
                      "/path/to/type/a/input/file_1_2.root": caf.utils.IoV(1, 2, 1, 2),
                      ...
@@ -122,7 +122,7 @@ So ``input_data`` is a dictionary that contains input files separated into *cate
           You can always filter/reduce the number of input files to a more manageable amount depending on how much
           data you expect to need per run (or in total).
 
-The ``**kwargs`` argument is used to send in the ``requested_iov`` and ``expert_config``  valuse at the moment.
+The ``**kwargs`` argument is used to send in the ``requested_iov`` and ``expert_config``  values at the moment.
 ``requested_iov`` value is the overall bucket IoV, and is the run range that your output payloads should cover.
 
 .. note:: Although ``kwargs["requested_iov"]`` has both a defined lower and upper bound e.g. IoV(2, 1, 2, 100).

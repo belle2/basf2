@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -26,7 +25,7 @@ class TestTreeFits(unittest.TestCase):
 
         main = basf2.create_path()
 
-        inputfile = b2test_utils.require_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root', py_case=self)
+        inputfile = b2test_utils.require_file('analysis/B0ToPiPiPi0.root', 'validation', py_case=self)
         ma.inputMdst(inputfile, path=main)
 
         ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
@@ -73,12 +72,12 @@ class TestTreeFits(unittest.TestCase):
         print(f"True fit survivors: {truePositives} out of {allSig} true candidates")
         print(f"False fit survivors: {falsePositives} out of {allBkg} false candidates")
 
-        self.assertTrue(falsePositives < 2156, "Background rejection too small.")
+        self.assertTrue(falsePositives < 8837, "Background rejection too small.")
 
-        self.assertTrue(truePositives > 34, "Signal rejection too high")
+        self.assertTrue(truePositives > 212, "Signal rejection too high")
         self.assertFalse(mustBeZero, f"We should have dropped all candidates with confidence level less than {conf}.")
 
-        self.assertTrue(SigMbcReasonable > 33, "Signal kinematics is wrongly reconstructed too much")
+        self.assertTrue(SigMbcReasonable > 206, "Signal kinematics is wrongly reconstructed too much")
 
         print("Test passed, cleaning up.")
 

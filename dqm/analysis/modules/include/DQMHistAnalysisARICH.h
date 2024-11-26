@@ -57,15 +57,31 @@ namespace Belle2 {
     void endRun() override final;
 
     /**
+     * begin-of-run action.
+     * read limits, etc.
+     */
+    void beginRun() override final;
+
+    /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
     void terminate() override final;
 
+    /**
+     * Returns ring number of HAPD with given moduleID
+     * @param modID HAPD module ID
+     */
+    int getRing(int modID);
+
+
   protected:
     bool m_debug;/**<debug*/
     bool m_enableAlert;/**<Enable alert by base color of canvases*/
-
+    double m_hotLimit; /**<Occupancy limit for hot channels*/
+    double m_badApdOccLimit; /**<Occupancy threshold for bad APDs, in units of average APD occupancy*/
+    double m_sigBitFracLowWarn; /**<Warning limit for overall signal/background fraction*/
+    double m_sigBitFracLowAlarm; /**<Alarm limit for overall signal/background fraction*/
     int alertColor[3] = {kWhite, kYellow, kRed};/**<Alert color of canvases*/
 
     int m_minStats = 10000;/**<The lower limit on the number of events to enable the alert*/

@@ -26,122 +26,102 @@ namespace Belle2 {
     explicit FlipRecoTrackExtractor2nd(std::vector<Named<float*>>& variableSet, const std::string& prefix = ""):
       VariableExtractor(), m_prefix(prefix)
     {
-      /// variables for 2ndMVA of tracks flipping
       addVariable(prefix + "flipped_pz_estimate", variableSet);
-      addVariable(prefix + "y_variance", variableSet);
       addVariable(prefix + "tan_lambda_estimate", variableSet);
       addVariable(prefix + "d0_variance", variableSet);
-      addVariable(prefix + "x_variance", variableSet);
       addVariable(prefix + "z_estimate", variableSet);
-      addVariable(prefix + "phi0_variance", variableSet);
       addVariable(prefix + "px_variance", variableSet);
-      addVariable(prefix + "pz_estimate", variableSet);
       addVariable(prefix + "p_value", variableSet);
       addVariable(prefix + "pt_estimate", variableSet);
       addVariable(prefix + "y_estimate", variableSet);
       addVariable(prefix + "d0_estimate", variableSet);
       addVariable(prefix + "x_estimate", variableSet);
-      addVariable(prefix + "py_variance", variableSet);
       addVariable(prefix + "pz_variance", variableSet);
-      addVariable(prefix + "omega_variance", variableSet);
-      addVariable(prefix + "tan_lambda_variance", variableSet);
-      addVariable(prefix + "z_variance", variableSet);
       addVariable(prefix + "omega_estimate", variableSet);
-      addVariable(prefix + "pt_resolution", variableSet);
       addVariable(prefix + "px_estimate", variableSet);
-      addVariable(prefix + "pt_variance", variableSet);
-      addVariable(prefix + "phi0_estimate", variableSet);
       addVariable(prefix + "flipped_z_estimate", variableSet);
       addVariable(prefix + "py_estimate", variableSet);
-      addVariable(prefix + "flipped_z_variance", variableSet);
-      addVariable(prefix + "flipped_pz_variance", variableSet);
-      addVariable(prefix + "flipped_pt_variance", variableSet);
-      addVariable(prefix + "flipped_py_estimate", variableSet);
-      addVariable(prefix + "z0_variance", variableSet);
-      addVariable(prefix + "flipped_p_value", variableSet);
-      addVariable(prefix + "flipped_px_variance", variableSet);
-      addVariable(prefix + "flipped_py_variance", variableSet);
-      addVariable(prefix + "flipped_x_estimate", variableSet);
+      addVariable(prefix + "outGoingArmTime", variableSet);
       addVariable(prefix + "quality_flip_indicator", variableSet);
+      addVariable(prefix + "inGoingArmTime", variableSet);
     }
     /// extract the actual variables and write into a variable set
-    void extractVariables(const RecoTrack& recoTrack)
+    void extractVariables(RecoTrack& recoTrack)
     {
+      // Set all values to NaN to make sure that no values from previous recoTrack are used accidentally
+      setDefaultValues();
 
-      auto genfitTrack = recoTrack.getRelated<Track>("Tracks");
-
-      if (genfitTrack) {
-        auto trackFitResult = genfitTrack->getTrackFitResultWithClosestMass(Const::pion);
-
-        RecoTrack* RecoTrack_flipped = recoTrack.getRelatedFrom<RecoTrack>("RecoTracks_flipped");
-        if (RecoTrack_flipped) {
-          Track* b2track_flipped = RecoTrack_flipped->getRelatedFrom<Track>("Tracks_flipped");
-          if (b2track_flipped) {
-            auto fitTrack_flipped = b2track_flipped->getTrackFitResultWithClosestMassByName(Const::pion, "TrackFitResults_flipped");
-            if (trackFitResult && fitTrack_flipped) {
-              auto cov6 = trackFitResult->getCovariance6();
-              auto mom = trackFitResult->getMomentum();
-              auto pos = trackFitResult->getPosition();
-
-              auto cov6_flipped = fitTrack_flipped->getCovariance6();
-              auto mom_flipped = fitTrack_flipped->getMomentum();
-              auto pos_flipped = fitTrack_flipped->getPosition();
-
-              m_variables.at(m_prefix + "flipped_pz_estimate") = mom_flipped.Z();
-              m_variables.at(m_prefix + "y_variance") = pos.Y();
-              m_variables.at(m_prefix + "tan_lambda_estimate") = trackFitResult->getCotTheta();
-              m_variables.at(m_prefix + "d0_variance") = trackFitResult->getCov()[0];
-              m_variables.at(m_prefix + "x_variance") = cov6(0, 0);
-              m_variables.at(m_prefix + "z_estimate") = pos.Z();
-              m_variables.at(m_prefix + "phi0_variance") = trackFitResult->getCov()[5];
-              m_variables.at(m_prefix + "px_variance") = cov6(3, 3);
-              m_variables.at(m_prefix + "pz_estimate") = mom.Z();
-              m_variables.at(m_prefix + "p_value") = trackFitResult->getPValue();
-              m_variables.at(m_prefix + "pt_estimate") = mom.Rho();
-              m_variables.at(m_prefix + "y_estimate") = pos.Y();
-              m_variables.at(m_prefix + "d0_estimate") = trackFitResult->getD0();
-              m_variables.at(m_prefix + "x_estimate") = pos.X();
-              m_variables.at(m_prefix + "py_variance") = cov6(4, 4);
-              m_variables.at(m_prefix + "pz_variance") = cov6(5, 5);
-              m_variables.at(m_prefix + "omega_variance") = trackFitResult->getCov()[9];
-              m_variables.at(m_prefix + "tan_lambda_variance") = trackFitResult->getCov()[14];
-              m_variables.at(m_prefix + "z_variance") = cov6(2, 2);
-              m_variables.at(m_prefix + "omega_estimate") = trackFitResult->getOmega();
-              m_variables.at(m_prefix + "quality_flip_indicator") = recoTrack.getFlipQualityIndicator();
-              float pt_estimate = mom.Rho();
-              float pt_variance = (pow(mom.X(), 2) * cov6(3, 3) + pow(mom.Y(), 2) * cov6(4, 4) - 2 * mom.X() * mom.Y() * cov6(3,
-                                   4)) / mom.Perp2();
-              float pt_resolution = pt_variance / pt_estimate;
-
-              float flipped_pt_variance = (pow(mom_flipped.X(), 2) * cov6_flipped(3, 3) + pow(mom_flipped.Y(), 2) * cov6_flipped(4,
-                                           4) - 2 * mom_flipped.X() * mom_flipped.Y() * cov6_flipped(3, 4)) / mom_flipped.Perp2();
-
-              m_variables.at(m_prefix + "pt_resolution") = pt_resolution;
-              m_variables.at(m_prefix + "px_estimate") = mom.X();
-              m_variables.at(m_prefix + "pt_variance") = pt_variance;
-
-              m_variables.at(m_prefix + "phi0_estimate") = trackFitResult->getPhi() > 0.0 ? trackFitResult->getPhi() : trackFitResult->getPhi() +
-                                                           2.0 * TMath::Pi();
-              m_variables.at(m_prefix + "flipped_z_estimate") = pos_flipped.Z();
-              m_variables.at(m_prefix + "py_estimate") = mom.Y();
-              m_variables.at(m_prefix + "flipped_z_variance") = cov6_flipped(2, 2);
-              m_variables.at(m_prefix + "flipped_pz_variance") = cov6_flipped(5, 5);
-              m_variables.at(m_prefix + "flipped_pt_variance") = flipped_pt_variance;
-              m_variables.at(m_prefix + "flipped_py_estimate") = cov6_flipped(4, 4);
-              m_variables.at(m_prefix + "z0_variance") = trackFitResult->getCov()[12];
-              m_variables.at(m_prefix + "flipped_p_value") = fitTrack_flipped->getPValue();
-              m_variables.at(m_prefix + "flipped_px_variance") = cov6_flipped(3, 3);
-              m_variables.at(m_prefix + "flipped_py_variance") = cov6_flipped(4, 4);
-              m_variables.at(m_prefix + "flipped_x_estimate") = pos_flipped.X();
-
-            }
-          }
-        }
+      const Track* track = recoTrack.getRelated<Track>("Tracks");
+      const RecoTrack* flippedRecoTrack = recoTrack.getRelatedFrom<RecoTrack>("RecoTracks_flipped");
+      if (not track or not flippedRecoTrack) {
+        // Don't have track or flippedRecoTrack -> return
+        return;
+      }
+      const Track* flippedTrack = flippedRecoTrack->getRelatedFrom<Track>("Tracks_flipped");
+      if (not flippedTrack) {
+        // Don't have flippedTrack -> return
+        return;
+      }
+      const TrackFitResult* trackFitResult = track->getTrackFitResultWithClosestMass(Const::pion);
+      const TrackFitResult* flippedTrackFitResult =
+        flippedTrack->getTrackFitResultWithClosestMassByName(Const::pion, "TrackFitResults_flipped");
+      if (not trackFitResult or not flippedTrackFitResult) {
+        // Don't have trackFitResult or flippedTrackFitResult -> return
+        return;
       }
 
+      const auto& unflippedCovariance = trackFitResult->getCovariance6();
+      const auto& unflippedMomentum = trackFitResult->getMomentum();
+      const auto& unflippedPosition = trackFitResult->getPosition();
+
+      const auto& flippedMomentum = flippedTrackFitResult->getMomentum();
+      const auto& flippedPosition = flippedTrackFitResult->getPosition();
+
+      m_variables.at(m_prefix + "flipped_pz_estimate") = static_cast<float>(flippedMomentum.Z());
+      m_variables.at(m_prefix + "tan_lambda_estimate") = static_cast<float>(trackFitResult->getCotTheta());
+      m_variables.at(m_prefix + "d0_variance") = static_cast<float>(trackFitResult->getCov()[0]);
+      m_variables.at(m_prefix + "z_estimate") = static_cast<float>(unflippedPosition.Z());
+      m_variables.at(m_prefix + "px_variance") = static_cast<float>(unflippedCovariance(3, 3));
+      m_variables.at(m_prefix + "p_value") = static_cast<float>(trackFitResult->getPValue());
+      m_variables.at(m_prefix + "pt_estimate") = static_cast<float>(unflippedMomentum.Rho());
+      m_variables.at(m_prefix + "y_estimate") = static_cast<float>(unflippedPosition.Y());
+      m_variables.at(m_prefix + "d0_estimate") = static_cast<float>(trackFitResult->getD0());
+      m_variables.at(m_prefix + "x_estimate") = static_cast<float>(unflippedPosition.X());
+      m_variables.at(m_prefix + "pz_variance") = static_cast<float>(unflippedCovariance(5, 5));
+      m_variables.at(m_prefix + "omega_estimate") = static_cast<float>(trackFitResult->getOmega());
+      m_variables.at(m_prefix + "quality_flip_indicator") = static_cast<float>(recoTrack.getFlipQualityIndicator());
+      m_variables.at(m_prefix + "px_estimate") = static_cast<float>(unflippedMomentum.X());
+      m_variables.at(m_prefix + "flipped_z_estimate") = static_cast<float>(flippedPosition.Z());
+      m_variables.at(m_prefix + "py_estimate") = static_cast<float>(unflippedMomentum.Y());
+      m_variables.at(m_prefix + "inGoingArmTime") = static_cast<float>(recoTrack.getIngoingArmTime());
+      m_variables.at(m_prefix + "outGoingArmTime") = static_cast<float>(recoTrack.getOutgoingArmTime());
     }
+
   protected:
     /// prefix for RecoTrack extracted variables
     std::string m_prefix;
+  private:
+    /// Set all variables to default error value
+    void setDefaultValues()
+    {
+      m_variables.at(m_prefix + "flipped_pz_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "tan_lambda_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "d0_variance") = Const::floatNaN;
+      m_variables.at(m_prefix + "z_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "px_variance") = Const::floatNaN;
+      m_variables.at(m_prefix + "p_value") = Const::floatNaN;
+      m_variables.at(m_prefix + "pt_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "y_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "d0_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "x_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "pz_variance") = Const::floatNaN;
+      m_variables.at(m_prefix + "omega_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "px_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "flipped_z_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "py_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "outGoingArmTime") = Const::floatNaN;
+      m_variables.at(m_prefix + "quality_flip_indicator") = Const::floatNaN;
+      m_variables.at(m_prefix + "inGoingArmTime") = Const::floatNaN;
+    }
   };
 }

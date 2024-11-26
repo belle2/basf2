@@ -1,0 +1,21 @@
+# EventType: 4720008000
+# Descriptor: [vpho_[eta-> gammagamma]h_b]
+# NickName: vpho_eta2gammah_b
+# Cuts: None
+# Documentation: eta2gamh_b process
+# PhysicsWG: Quarkonium
+# Tested: Yes
+# Responsible: Alessandro Boschetti 
+# Email: boschett@to.infn.it
+# Date: 20230401
+
+Alias myEta eta
+
+Decay vpho
+1.000 myEta h_b  PARTWAVE 1. 0. 0. 0. 0. 0.;
+Enddecay
+
+Decay myEta
+1.000 gamma gamma PHSP;
+Enddecay
+End

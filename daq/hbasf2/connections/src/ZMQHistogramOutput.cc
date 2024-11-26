@@ -10,7 +10,6 @@
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 
 #include <framework/pcore/EvtMessage.h>
-#include <daq/dqm/DqmMemFile.h>
 #include <framework/logging/Logger.h>
 
 #include <THashList.h>

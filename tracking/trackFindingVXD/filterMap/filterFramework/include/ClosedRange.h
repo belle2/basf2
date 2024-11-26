@@ -65,10 +65,9 @@ namespace Belle2 {
       t->GetListOfBranches()->Add(branch);
     }
 
-    /** sets branch addresses of the given tree to the m_min and m_msx. Note: it assumes a certain oder for
+    /** sets branch addresses of the given tree to the m_min and m_msx. Note: it assumes a certain ordering
      * @param t: the tree of the which the branch addresses need to be set
      * @param branchName: name of the branch
-     * @param variableName: specifier for the leafs
     */
     void setBranchAddress(TTree* t, const std::string& branchName,
                           const std::string& /*variableName*/)

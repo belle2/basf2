@@ -24,7 +24,7 @@ namespace {
   TEST(TrackFindingCDCTest, PyEstimator_predict_regression)
   {
     Py_Initialize();
-    // Create dummy regession object
+    // Create dummy regression object
     std::string first_var_regressor_code = R"code(
 class FirstVarRegressor(object):
     def predict(self, ys):
@@ -60,7 +60,7 @@ with open("first_var_regressor.pickle", "wb") as first_var_regressor_file:
   TEST(TrackFindingCDCTest, PyEstimator_predict_classifier)
   {
     Py_Initialize();
-    // Create dummy regession object
+    // Create dummy regression object
     std::string first_var_classifier_code = R"code(
 import numpy
 class FirstVarClassifier(object):
@@ -98,7 +98,7 @@ with open("first_var_classifier.pickle", "wb") as first_var_classifier_file:
   }
 
 
-  TEST(DISABLED_TrackFindingCDCTest, PyEstimator_predict_sklearn_regressor)
+  TEST(TrackFindingCDCTest, PyEstimator_predict_sklearn_regressor)
   {
     Py_Initialize();
     try {
@@ -110,7 +110,7 @@ with open("first_var_classifier.pickle", "wb") as first_var_classifier_file:
       return;
     }
 
-    // Create dummy regession object
+    // Create dummy regression object
     std::string bdt_regressor_code = R"code(
 
 from sklearn import ensemble
@@ -118,16 +118,17 @@ from sklearn import datasets
 from sklearn.utils import shuffle
 import numpy as np
 
-boston = datasets.load_boston()
-x, y = shuffle(boston.data, boston.target, random_state=13)
+housing = datasets.fetch_california_housing()
+x, y = shuffle(housing.data, housing.target, random_state=13)
 x = x.astype(np.float64)
 
-offset = int(x.shape[0] * 0.9)
-trainX, trainY = x[:offset], y[:offset]
-testX, testY = x[offset:], y[offset:]
+max_samples = 1000
+train_fraction = 900
+trainX, trainY = x[:train_fraction], y[:train_fraction]
+testX, testY = x[train_fraction:max_samples], y[train_fraction:max_samples]
 
-params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 1,
-          'learning_rate': 0.01, 'loss': 'ls'}
+params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 0.1,
+          'learning_rate': 0.01, 'loss': 'squared_error'}
 
 clf = ensemble.GradientBoostingRegressor(**params)
 clf.fit(trainX, trainY)
@@ -183,7 +184,7 @@ with open("bdt_regressor.pickle", "wb") as bdt_regressor_file:
       timeItResult.printSummary();
       B2INFO("This might be to slow for serious stuff");
 
-      // Compare prediciton
+      // Compare predictions
       boost::python::object testY = global["testY"];
       double squareSum = 0;
       for (size_t iRowTestX = 0; iRowTestX < nRowsTestX; ++iRowTestX) {
@@ -193,7 +194,7 @@ with open("bdt_regressor.pickle", "wb") as bdt_regressor_file:
       }
 
       double mean_square_error = squareSum / nRowsTestX;
-      EXPECT_GT(7, mean_square_error);
+      EXPECT_GT(1, mean_square_error);
 
     } catch (...) {
       PyErr_Print();

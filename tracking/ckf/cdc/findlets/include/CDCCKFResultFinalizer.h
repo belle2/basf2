@@ -61,7 +61,7 @@ namespace Belle2 {
     }
 
   private:
-    /// Filter to weigth the best path
+    /// Filter to weight the best path
     TrackFindingCDC::ChooseableFilter<CDCPathFilterFactory> m_filter;
   };
 }

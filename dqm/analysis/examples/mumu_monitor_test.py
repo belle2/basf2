@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,6 +29,7 @@ main = b2.create_path()
 inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('InputRootFile', sys.argv[1])
 main.add_module(inroot)
+# main.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
 
 # add DQM analysis module
 mirabelle = b2.register_module('DQMHistAnalysisMiraBelle')

@@ -9,11 +9,12 @@
 #pragma once
 
 /* ECL headers. */
-#include <ecl/utility/ECLChannelMapper.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <framework/core/HistoModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/datastore/StoreArray.h>
@@ -67,6 +68,12 @@ namespace Belle2 {
      */
     bool isRandomTrigger();
 
+    /**
+     * Fill entries for pi0 invariant mass distribution
+     * @return true if the current event satisfied selection criteria
+     */
+    bool fillInvMassHistogram();
+
     /** Geometry */
     ECL::ECLGeometryPar* m_geom{nullptr};
     /** StoreObjPtr EventMetaData */
@@ -94,6 +101,8 @@ namespace Belle2 {
     double m_EnergyUpperThr;
     /** Flag to select events triggered by delayed bhabha. */
     bool m_DPHYTTYP{0};
+    /** Name of the pi0 particle list */
+    std::string m_pi0PListName;
 
     /** Parameters for hit occ. histograms. */
     std::vector<double> m_HitThresholds = {};
@@ -140,6 +149,8 @@ namespace Belle2 {
     TH1F* h_adc_hits{nullptr};
     /** Histogram: Entries with crate time offsets > 100 ns (E > 1 GeV). */
     TH1F* h_time_crate_Thr1GeV_large{nullptr};
+    /** Histogram: pi0 mass. */
+    TH1F* h_pi0_mass{nullptr};
 
     /** Histogram vector: Hit map. */
     std::vector<TH1F*> h_cids = {};

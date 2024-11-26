@@ -67,7 +67,7 @@ RFRoiSender::~RFRoiSender()
 
 // Functions hooked up by NSM2
 
-int RFRoiSender::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
+int RFRoiSender::Configure(NSMmsg* nsmm, NSMcontext* /*nsmc*/)
 {
   // 0. Do you need RoI sender?
   char* roisw = m_conf->getconf("roisender", "enabled");
@@ -98,7 +98,7 @@ int RFRoiSender::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
   // 2. Run sender
   char* sender = m_conf->getconf("roisender", "sender");
   int nqueue = m_conf->getconfi("roisender", "nqueues");
-  char* qbase = m_conf->getconf("roisender", "qnamebase");
+  // char* qbase = m_conf->getconf("roisender", "qnamebase");
 
   char* arglist[20];
   arglist[0] = mergerhost;

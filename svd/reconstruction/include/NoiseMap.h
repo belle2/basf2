@@ -43,7 +43,7 @@ namespace Belle2 {
       /** Set the sensorID currently used */
       virtual void setSensorID(VxdID sensorID, bool side)
       {
-        const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+        const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
         m_sensorID = sensorID;
         if (side)
           m_noiseLevel = info.getElectronicNoiseU() / m_eInADU;
@@ -58,21 +58,20 @@ namespace Belle2 {
        */
       float getSignificance(const Sample& sample) const { return sample.getCharge() / getNoise(sample); }
       /** Return the noise level for a given strip
-       * @param (not used) number of the strip
        * @return noise level
        */
       virtual float getNoise(short) const { return m_noiseLevel; }
 
       /** Return the noise value for a given strip
-       * @param (not used) Sample at whose position we want noise level
+       * @param sample Sample at whose position we want noise level (Sample not used)
        * @return noise level for the Sample's strip
        */
-      virtual float getNoise(const Sample&) const { return m_noiseLevel; }
+      virtual float getNoise(const Sample& sample) const { return m_noiseLevel; }
 
       /** Check whether a signal exceeds a given significance
        * @param sample strip to check
        * @param significance minimum significance
-       * @true if the maximum signal of the strip exceeds the given significance.
+       * @return true if the maximum signal of the strip exceeds the given significance.
        */
       bool operator()(const Sample& sample, float significance) const
       { return getSignificance(sample) >= significance; }

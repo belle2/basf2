@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -167,7 +165,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
             if h:
                 j = j + 1
                 c2.cd(j)
-                h.GetXaxis().SetTitle("drift lenght  [cm]")
+                h.GetXaxis().SetTitle("drift length  [cm]")
                 h.GetYaxis().SetTitle("#sigma_{r}^{2} = #sigma_{u}.#sigma_{d}")
                 h.Draw("AP")
                 h.Draw()

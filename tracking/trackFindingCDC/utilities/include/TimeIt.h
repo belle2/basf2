@@ -29,7 +29,7 @@ namespace Belle2 {
         m_timeSpans(timeSpans)
       {}
 
-      /// Get the time of the individual executtions
+      /// Get the time of the individual executions
       double getSeconds(size_t iExecution) const
       {
         return m_timeSpans.at(iExecution).count();

@@ -32,8 +32,8 @@ Belle II is an international collaboration of more than 1000 members from all
 over the world.
 Since we are so spread out communication tools are really important.
 
-You are reading this page, so you have already
-`registered as a member <https://confluence.desy.de/x/ET0HAg>`_
+You are reading this page, so you have probably
+`registered as a Belle II member <https://www.belle2.org/registration/>`_
 and obtained DESY credentials.
 These allow you to access private areas of the
 `belle2.org <https://belle2.org>`_ website.
@@ -50,7 +50,7 @@ Important services for you
 Here is a curated list of the services and tools that we think are most useful
 right away (for newcomers) and that are needed in these lessons.
 
-`confluence.desy.de <https://confluence.desy.de>`_
+`xwiki.desy.de <https://xwiki.desy.de/xwiki/bin/view/BI/>`_
     Our "wiki".
     Editable, linked pages that can be easily modified and updated.
     Used for many things from run planning to tracking progress through a
@@ -86,8 +86,6 @@ right away (for newcomers) and that are needed in these lessons.
         We've got you covered.
         Try `search.belle2.org <https://search.belle2.org>`_.
 
-You should note that **confluence** is part of a
-`suite of commercial tools <https://www.atlassian.com/>`_, while
 **GitLab** and **"sphinx"** are industry-standard open-source tools.
 This means that there is non-Belle II-specific help on the internet.
 
@@ -107,12 +105,12 @@ This means that there is non-Belle II-specific help on the internet.
 .. admonition:: Question
      :class: exercise stacked
 
-     Where is the documentation for **confluence** and **gitlab**?
+     Where is the documentation for **XWiki** and **gitlab**?
 
 .. admonition:: Solution
    :class: toggle solution
 
-   At `support.atlassian.com/confluence-cloud <https://support.atlassian.com/confluence-cloud/>`_
+   At `xwiki.org/xwiki/bin/view/Documentation <https://www.xwiki.org/xwiki/bin/view/Documentation/>`_
    and `docs.gitlab.com <https://docs.gitlab.com/>`_!
 
 .. admonition:: Question
@@ -129,15 +127,15 @@ That's not all
 --------------
 
 It's not immediately relevant right now, but there are many other services.
-There is a full and complete list of all services on confluence.
+There is a full and complete list of all services on XWiki.
 
-.. centered:: `Belle II Collaborative Services and Tools <https://confluence.desy.de/x/96PwAw>`_.
+.. centered:: `Belle II Collaborative Services and Tools <https://xwiki.desy.de/xwiki/rest/p/5f1cd>`_.
 
 .. tip::
 
         You should probably bookmark the
         `Belle II Collaborative Services and Tools
-        <https://confluence.desy.de/x/96PwAw>`_
+        <https://xwiki.desy.de/xwiki/rest/p/5f1cd>`_
         page.
 
 
@@ -161,7 +159,7 @@ With all of these tools, it might be hard to work out where to go to get help.
 What if there is a problem with one of the collaborative tools themselves?
 It doesn't happen often, but sometimes the web services go down.
 Or maybe you have trouble logging in.
-Then you should check the confluence page for the responsible person and/or
+Then you should check the XWiki page for the responsible person and/or
 email to b2-helpdesk@belle2.org.
 
 ... with my analysis
@@ -207,6 +205,8 @@ Some tips
 ---------
 
 .. _onlinebook_collaborative_tools_b2chat_howto:
+
+
 
 Asking a question in #starterkit-workshop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -261,10 +261,31 @@ below (it will open a side panel with all the replies):
     Try out the "reply" feature, either by replying to one of the previous messages
     from other users or by replying to your own message.
 
-Confluence
-~~~~~~~~~~
 
-Confluence is useful for easy documentation.
+Changing your name in our chat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+It's important that you set your name in the chat to your real name (first and last name).
+Not only does this make it easier for other people to find you, it's also the only way for other
+people to tag you directly in a chat. This does not even work if people use "@yourusername" if
+your actual name isn't stored in the chat system. To add your name, perform the following steps:
+
+1. Login to `the chat <https://chat.belle2.org>`_
+2. Click on your avatar / profile picture in the top left corner
+3. Click on "My Account"
+4. Go to "Profile"
+5. Fill your name in the "Name" field, which is next to the field with your "Username"
+6. Click "Save changes" in the top right corner
+
+You follow the same steps if you want to change your name later on, but please be aware that this
+might again cause some confusion, so please use your given name (first and last name) right from
+the beginning.
+
+
+XWiki
+~~~~~
+
+XWiki is useful for easy documentation.
 We use it for glossaries, instructions, and planning.
 You will find: physics meetings discussion, the data-taking,
 data-reconstruction status, and much more on there.
@@ -283,9 +304,9 @@ It's not reliable for software documentation.
 .. admonition:: Solution
     :class: toggle solution
 
-    It's on confluence:
+    It's on XWiki:
     `Data Production Status
-    <https://confluence.desy.de/x/fGCJC>`_
+    <https://xwiki.desy.de/xwiki/rest/p/8e6ec>`_
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -295,8 +316,8 @@ It's not reliable for software documentation.
 .. admonition:: Solution
     :class: toggle solution
 
-    It's on confluence:
-    `Run Plan <https://confluence.desy.de/x/Xgp0Bw>`_
+    It's on XWiki:
+    `Run Plan <https://xwiki.desy.de/xwiki/rest/p/cad68>`_
 
 .. admonition:: Question
     :class: exercise stacked
@@ -319,10 +340,10 @@ It's not reliable for software documentation.
     :class: toggle solution
 
     Take a look at the `Main Glossary
-    <https://confluence.desy.de/x/gwgWAg>`_
-    on confluence.
+    <https://xwiki.desy.de/xwiki/rest/p/1e1f2>`_
+    on XWiki.
 
-There are some downsides to confluence.
+There are some downsides to XWiki.
 Pages may be outdated (check the "last edited" message at the top) and
 sometimes links are broken or pages re-organised.
 
@@ -331,7 +352,7 @@ original author of the page will probably get back to you.
 If you are quite sure that something is outdated: please update it!
 You can always leave a comment asking experts to check your edit.
 
-We try to **avoid** documenting software on confluence because software
+We try to **avoid** documenting software on XWiki because software
 changes between versions.
 Pages can be simultaneously outdated and not outdated depending on the version
 of the software you are using.
@@ -339,14 +360,14 @@ of the software you are using.
 .. admonition:: Exercise
     :class: exercise
 
-    There is a sandbox confluence page for you to experiment with adding
+    There is a sandbox XWiki page for you to experiment with adding
     material.
-    Go to the `Confluence Training Test Page <https://confluence.desy.de/x/61Z8Cg>`_ and add some content.
+    Go to the `XWiki Training Test Page <https://xwiki.desy.de/xwiki/rest/p/57b2b>`_ and add some content.
 
     Some inspiration:
 
     * Link to a GitLab issue.
-    * Link to another confluence page.
+    * Link to another XWiki page.
     * Tag your colleagues.
     * Add the date.
     * Add your favourite picture of a cat / piece of art.
@@ -561,7 +582,7 @@ You can make a difference!
 People are nice: don't be too afraid to bother them or break stuff (chances are
 you won't, anyway).
 Ask for help on `questions.belle2.org <https://questions.belle2.org>`_ or leave
-a comment on a confluence page or on a GitLab issue.
+a comment on a XWiki page or on a GitLab issue.
 
 Help us out with documentation: as a beginner, you know best what is missing!
 
@@ -570,7 +591,7 @@ Help us out with documentation: as a beginner, you know best what is missing!
 
     * Software documentation → `software.belle2.org <https://software.belle2.org>`_.
     * Ask questions (and answer them) at `questions.belle2.org <https://questions.belle2.org>`_.
-    * `Confluence <https://confluence.desy.de>`_ is our wiki.
+    * `XWiki <https://xwiki.desy.de/xwiki/rest/p/ce9d3>`_ is our wiki.
     * Code, bugs, feature requests → `gitlab.desy.de <https://gitlab.desy.de>`_.
 
 .. tip:: Good questions are also documentation and are also helpful!

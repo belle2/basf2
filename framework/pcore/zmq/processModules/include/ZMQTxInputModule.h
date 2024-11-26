@@ -32,6 +32,10 @@ namespace Belle2 {
     void terminate() override;
     /// Initialize the RandomSeedGenerator
     void initialize() override;
+    /// BeginRun processing
+    //    void beginRun() override;
+    /// EndRun processing
+    void endRun() override;
 
   private:
     /// The list of next worker ids.

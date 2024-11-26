@@ -9,10 +9,7 @@
 #include <simulation/physicslist/KaonPhysics.h>
 
 #include "G4ProcessManager.hh"
-#include "G4KaonPlusInelasticProcess.hh"
-#include "G4KaonMinusInelasticProcess.hh"
-#include "G4KaonZeroLInelasticProcess.hh"
-#include "G4KaonZeroSInelasticProcess.hh"
+#include "G4HadronInelasticProcess.hh"
 #include "G4HadronElasticProcess.hh"
 #include "G4HadronicAbsorptionBertini.hh"
 
@@ -98,7 +95,7 @@ void KaonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(kpProcEl);
 
   // inelastic
-  G4KaonPlusInelasticProcess* kpProcInel = new G4KaonPlusInelasticProcess;
+  G4HadronInelasticProcess* kpProcInel = new G4HadronInelasticProcess("kaon+Inelastic", G4KaonPlus::Definition());
   kpProcInel->RegisterMe(loInelModel);
   kpProcInel->RegisterMe(m_ftfp);
   kpProcInel->AddDataSet(kinelCS);
@@ -117,7 +114,7 @@ void KaonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(kmProcEl);
 
   // inelastic
-  G4KaonMinusInelasticProcess* kmProcInel = new G4KaonMinusInelasticProcess;
+  G4HadronInelasticProcess* kmProcInel = new G4HadronInelasticProcess("kaon-Inelastic", G4KaonMinus::Definition());
   kmProcInel->RegisterMe(loInelModel);
   kmProcInel->RegisterMe(m_ftfp);
   kmProcInel->AddDataSet(kinelCS);
@@ -140,7 +137,7 @@ void KaonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(k0LProcEl);
 
   // inelastic
-  G4KaonZeroLInelasticProcess* k0LProcInel = new G4KaonZeroLInelasticProcess;
+  G4HadronInelasticProcess* k0LProcInel = new G4HadronInelasticProcess("kaon0LInelastic", G4KaonZeroLong::Definition());
   k0LProcInel->RegisterMe(loInelModel);
   k0LProcInel->RegisterMe(m_ftfp);
   k0LProcInel->AddDataSet(kinelCS);
@@ -159,7 +156,7 @@ void KaonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(k0SProcEl);
 
   // inelastic
-  G4KaonZeroSInelasticProcess* k0SProcInel = new G4KaonZeroSInelasticProcess;
+  G4HadronInelasticProcess* k0SProcInel = new G4HadronInelasticProcess("kaon0SInelastic", G4KaonZeroShort::Definition());
   k0SProcInel->RegisterMe(loInelModel);
   k0SProcInel->RegisterMe(m_ftfp);
   k0SProcInel->AddDataSet(kinelCS);

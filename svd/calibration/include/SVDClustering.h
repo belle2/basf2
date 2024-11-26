@@ -44,7 +44,6 @@ namespace Belle2 {
      * Input:
      * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
-     * @param strip: NOT USED
      *
      * Output: double corresponding to the minimum SNR for the seed
      */
@@ -66,7 +65,6 @@ namespace Belle2 {
      * Input:
      * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
-     * @param strip: NOT USED
      *
      * Output: double corresponding to the minimum SNR for the adjacent
      */
@@ -89,7 +87,6 @@ namespace Belle2 {
      * Input:
      * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
-     * @param strip: NOT USED
      *
      * Output: double corresponding to the unfolding coefficient for the cluster
      */
@@ -112,7 +109,6 @@ namespace Belle2 {
      * Input:
      * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
-     * @param strip: NOT USED
      *
      * Output: double corresponding to the minimum SNR for the cluster
      */

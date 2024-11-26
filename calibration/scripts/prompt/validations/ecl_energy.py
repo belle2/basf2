@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -71,17 +69,17 @@ def run_validation(job_path, input_data_path, expert_config):
     nomLum = 2.36  # fb-1
     estUnc = 0.5 * np.sqrt(nomLum / lumi)
 
-    print("%f entries in gg EnVsCrysID lumi = %.2f fb-1 est uncerta = %.2f \n" % (ggEntries, lumi, estUnc))
+    print(f"{ggEntries:f} entries in gg EnVsCrysID lumi = {lumi:.2f} fb-1 est uncerta = {estUnc:.2f} \n")
 
     # Summarize fit status
     hStatusgg = gg.Get("hStatus")
     success = 100. * (hStatusgg.GetBinContent(22) + hStatusgg.GetBinContent(14)) / 8736.
-    print("\nSummary of Gamma Gamma fit status. %.1f good fits:\n" % (success))
-    print("16 good fit:   %.4f \n" % (hStatusgg.GetBinContent(22)))
-    print(" 8 iterations: %.4f \n" % (hStatusgg.GetBinContent(14)))
-    print(" 4 at limit:   %.4f \n" % (hStatusgg.GetBinContent(10)))
-    print(" 3 poor fit:   %.4f \n" % (hStatusgg.GetBinContent(9)))
-    print("-1 low stats:  %.4f \n" % (hStatusgg.GetBinContent(5)))
+    print(f"\nSummary of Gamma Gamma fit status. {success:.1f} good fits:\n")
+    print(f"16 good fit:   {hStatusgg.GetBinContent(22):.4f} \n")
+    print(f" 8 iterations: {hStatusgg.GetBinContent(14):.4f} \n")
+    print(f" 4 at limit:   {hStatusgg.GetBinContent(10):.4f} \n")
+    print(f" 3 poor fit:   {hStatusgg.GetBinContent(9):.4f} \n")
+    print(f"-1 low stats:  {hStatusgg.GetBinContent(5):.4f} \n")
 
     # Compare output to input (gamma gamma) calibrations
     StatusVsCrysIDgg = gg.Get("StatusVsCrysID")
@@ -103,7 +101,7 @@ def run_validation(job_path, input_data_path, expert_config):
             ggRatio.Fill(ratio)
             if(ratio < 0.95 or ratio > 1.05):
                 bigChange += 1
-                print("%.2f cellID %.4f %.3f %s\n" % (bigChange, cellID, ratio, status))
+                print(f"{bigChange:.2f} cellID {cellID:.4f} {ratio:.3f} {status}\n")
 
             # Look for large deviations in the barrel excluding first and last
             if(cellID >= 1297 and cellID <= 7632):
@@ -118,8 +116,8 @@ def run_validation(job_path, input_data_path, expert_config):
     myC.Print("plots/ggRatio.pdf")
 
     print("\nLargest changes in thetaID [14,57]\n")
-    print("ratio = %.3f in cellID %f \n" % (minBarrelRatio, minCellID))
-    print("ratio = %.3f in cellID %f \n" % (maxBarrelRatio, maxCellID))
+    print(f"ratio = {minBarrelRatio:.3f} in cellID {minCellID:f} \n")
+    print(f"ratio = {maxBarrelRatio:.3f} in cellID {maxCellID:f} \n")
 
     histMean = ggRatio.GetMean()
     ggfit = ggRatio.GetFunction("gaus")
@@ -150,9 +148,9 @@ def run_validation(job_path, input_data_path, expert_config):
             eeRatio.Fill(ratio)
             if(ratio < 0.95 or ratio > 1.05):
                 bigChange += 1
-                print(" %2d cellID %.4f %5.3f\n" % (bigChange, cellID, ratio))
+                print(f" {int(bigChange):2} cellID {cellID:.4f} {ratio:5.3f}\n")
 
-    print("Total calibrated crystals = %.4f = %.1f \n\n" % (eeCalibrated, 100. * eeCalibrated / 8736.))
+    print(f"Total calibrated crystals = {eeCalibrated:.4f} = {100.0 * eeCalibrated / 8736.0:.1f} \n\n")
     eeRatio.Fit("gaus")
     myC.Print("plots/eeRatio.pdf")
 
@@ -160,7 +158,7 @@ def run_validation(job_path, input_data_path, expert_config):
     eefit = eeRatio.GetFunction("gaus")
     fitMean = eefit.GetParameter(1)
     fitSigma = eefit.GetParameter(2)
-    print("\nBhabha mean ratio = %.4f mean of Gaussian fit = %.4f, sigma = %.4f\n" % (histMean, fitMean, fitSigma))
+    print(f"\nBhabha mean ratio = {histMean:.4f} mean of Gaussian fit = {fitMean:.4f}, sigma = {fitSigma:.4f}\n")
 
     # ------------------------------------------------------------------------
     # Bhabha/gg comparison
@@ -187,7 +185,7 @@ def run_validation(job_path, input_data_path, expert_config):
     eeggfit = eeggRatio.GetFunction("gaus")
     fitMean = eeggfit.GetParameter(1)
     fitSigma = eeggfit.GetParameter(2)
-    print("\nBhabha to gg ratio mean = %.4f mean of Gaussian fit = %.4f, sigma = %.4f\n" % (histMean, fitMean, fitSigma))
+    print(f"\nBhabha to gg ratio mean = {histMean:.4f} mean of Gaussian fit = {fitMean:.4f}, sigma = {fitSigma:.4f}\n")
 
     # Graph
     eeggRatiovsCellID = TGraph(nPo, xcellID, yratio)
@@ -213,12 +211,12 @@ def run_validation(job_path, input_data_path, expert_config):
     hStatusmumu = mumu.Get("hStatus")
     success = 100. * (hStatusmumu.GetBinContent(22) + hStatusmumu.GetBinContent(14)) / 8736.
     print(r"\nSummary of muon pair fit status. \%.1f good fits:\n", success)
-    print("16 good fit:   %.4f \n" % (hStatusmumu.GetBinContent(22)))
-    print(" 8 iterations: %.4f \n" % (hStatusmumu.GetBinContent(14)))
-    print(" 4 at limit:   %.4f \n" % (hStatusmumu.GetBinContent(10)))
-    print(" 3 poor fit:   %.4f \n" % (hStatusmumu.GetBinContent(9)))
-    print(" 2 no peak:    %.4f \n" % (hStatusmumu.GetBinContent(8)))
-    print("-1 low stats:  %.4f \n" % (hStatusmumu.GetBinContent(5)))
+    print(f"16 good fit:   {hStatusmumu.GetBinContent(22):.4f} \n")
+    print(f" 8 iterations: {hStatusmumu.GetBinContent(14):.4f} \n")
+    print(f" 4 at limit:   {hStatusmumu.GetBinContent(10):.4f} \n")
+    print(f" 3 poor fit:   {hStatusmumu.GetBinContent(9):.4f} \n")
+    print(f" 2 no peak:    {hStatusmumu.GetBinContent(8):.4f} \n")
+    print(f"-1 low stats:  {hStatusmumu.GetBinContent(5):.4f} \n")
 
     # ------------------------------------------------------------------------
     # Muon pair/gg comparison
@@ -247,7 +245,8 @@ def run_validation(job_path, input_data_path, expert_config):
     mumuggfit = mumuggRatio.GetFunction("gaus")
     fitMean = mumuggfit.GetParameter(1)
     fitSigma = mumuggfit.GetParameter(2)
-    print("\nMuon pair to gg ratio mean = %.4f mean of Gaussian fit = %.4f, sigma = %.4f\n" % (histMean, fitMean, fitSigma))
+    print(
+        f"\nMuon pair to gg ratio mean = {histMean:.4f} mean of Gaussian fit = {fitMean:.4f}, sigma = {fitSigma:.4f}\n")
 
     # Graph of ratio versus cellID
     mumuggRatiovsCellID = TGraph(nPo, xcellID, yratio)
@@ -293,7 +292,7 @@ def run_validation(job_path, input_data_path, expert_config):
     finalRatiofit = finalRatio.GetFunction("gaus")
     fitMean = finalRatiofit.GetParameter(1)
     fitSigma = finalRatiofit.GetParameter(2)
-    print("\nNew to exist ratio mean = %.4f mean of Gaussian fit = %.4f, sigma = %.4f\n" % (histMean, fitMean, fitSigma))
+    print(f"\nNew to exist ratio mean = {histMean:.4f} mean of Gaussian fit = {fitMean:.4f}, sigma = {fitSigma:.4f}\n")
 
     # Graph of / old calibration constants
     newOldRatiovsCellID = TGraph(nPo, xcellID, yratio)

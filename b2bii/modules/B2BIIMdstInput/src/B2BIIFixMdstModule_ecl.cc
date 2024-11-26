@@ -56,7 +56,7 @@
 // update for exp27 (by Miyabayashi, Sanjay, Senyo).
 //
 // Revision 1.16  2003/05/31 09:22:54  hitoshi
-// updae for exp25 (ny Miyabayashi and Senyo).
+// update for exp25 (ny Miyabayashi and Senyo).
 //
 // Revision 1.15  2003/03/19 05:02:53  hitoshi
 // minor change (by Miyabayashi).
@@ -77,7 +77,7 @@
 // New for exp. 7 from Senyo and Miyabayashi sans
 //
 // Revision 1.9  2002/06/10 17:33:48  hitoshi
-// added new corections for e11 (by Miyabayashi).
+// added new corrections for e11 (by Miyabayashi).
 //
 // Revision 1.8  2002/06/09 15:28:29  hitoshi
 // added corrections for run<460 in e19.
@@ -140,7 +140,7 @@ namespace Belle2 {
 
 //==================================
 // The function giving correction factor.
-// Correcponding Data/MC so that energy in data should be divided by this.
+// Corresponding Data/MC so that energy in data should be divided by this.
 //==================================
 //Original definition.
 //static double ecl_adhoc_corr( int Exp, int Run, double Energy, double)
@@ -630,7 +630,7 @@ namespace Belle2 {
     return return_value;
   }
 
-//===== mpi0pdg.cc ===== cerated 2001/07/17 =====
+//===== mpi0pdg.cc ===== created 2001/07/17 =====
 // Make MC mass peak to PDG's one.
 // Version0.1 2001/07/17 trial version.
 //===============================================
@@ -993,10 +993,9 @@ namespace Belle2 {
                     + (pbuf * pbuf * pbuf * error[3]) * (pbuf * pbuf * pbuf * error[3]);
     eresol = sqrt(eresol) / 1000.;
 
-    //     dout(Debugout::INFO,"B2BIIFixMdst_ecl") <<" theta="<<theta<<" p="<<pbuf
-    //     <<" para="<< para[0]<<", "<< para[1]<<", "
-    //     << para[2]<<", "<<para[3]
-    //     <<" resol="<<resol<<" er="<<eresol<<std::endl;
+    B2DEBUG(19, "B2BIIFixMdst_ecl" << LogVar("theta", theta) << LogVar("p", pbuf)
+            << LogVar("para0", para[0]) << LogVar("para1", para[1]) << LogVar("para2", para[2]) << LogVar("para3", para[3])
+            << LogVar("resol", resol) << LogVar("er", eresol));
     return resol;
   }
 // Following lines were commented out, because asymmetric line shape is
@@ -1302,7 +1301,7 @@ namespace Belle2 {
         } else { // Previous version is unsupported one.
           // Make Warning and exit.
           B2WARNING("correct_ecl :: Warning! ");
-          B2WARNING("Previously, uncorrect version was used. ");
+          B2WARNING("Previously, incorrect version was used. ");
           B2WARNING(" Exit doing nothing");
           return;
         }
@@ -1557,7 +1556,7 @@ namespace Belle2 {
 //                     low_limit and up_limit are ignored.
 //         option = 1; users can modify mass window as they
 //                    like. The boundary of window is defined
-//                    by low_limit ans up_limit (in GeV).
+//                    by low_limit and up_limit (in GeV).
 //         option = 2; users can modify mass window in the manner of
 //                    -Xsigma < Mgg - Mpi0 < +Xsigma. The value of
 //                    sigma(mass resolution) is calculated by pi0resol
@@ -1617,7 +1616,7 @@ namespace Belle2 {
         if (0.0 < low_limit || up_limit < 0.0) {
           B2ERROR("option=2 was selected. ");
           B2ERROR("Invalid mass window! " << low_limit);
-          B2ERROR(" sould be negative, or " << up_limit);
+          B2ERROR(" should be negative, and " << up_limit);
           B2ERROR(" should be positive.");
           return;
         }
@@ -1725,7 +1724,7 @@ namespace Belle2 {
 
           // Copy them to proper matrix which is given to fit.
           CLHEP::HepMatrix y(y0);
-          // Delivative.
+          // Derivative.
           CLHEP::HepMatrix Dy(6, 1, 0);
 
           int iter = 0;
@@ -1929,7 +1928,7 @@ namespace Belle2 {
 
           // Copy them to proper matrix which is given to fit.
           CLHEP::HepMatrix y(y0);
-          // Delivative.
+          // Derivative.
           CLHEP::HepMatrix Dy(6, 1, 0);
 
           int iter = 0;
@@ -2106,8 +2105,8 @@ namespace Belle2 {
         double det = err_i[2][2] * err_j[2][2] - dth_i_x_dth_j * dth_i_x_dth_j;
 
 
-        double e_i = e_i0, phi_i = phi_i0, theta_i = theta_i0, sin_th_i = sin_th_i0, cos_th_i = cos_th_i0;
-        double e_j = e_j0, phi_j = phi_j0, theta_j = theta_j0, sin_th_j = sin_th_j0, cos_th_j = cos_th_j0;
+        double e_i = e_i0, phi_i = phi_i0, sin_th_i = sin_th_i0, cos_th_i = cos_th_i0;
+        double e_j = e_j0, phi_j = phi_j0, sin_th_j = sin_th_j0, cos_th_j = cos_th_j0;
 
 
         double dphi     = phi_i - phi_j;
@@ -2180,7 +2179,6 @@ namespace Belle2 {
           //const double pull     = residual / dmass;
           if (it >= iter_max ||
               mass < low_default || mass > up_default) {
-            it = -it;
             //sdev = (dmass > 0.0) ? pull : -100;
             break;
           }
@@ -2218,8 +2216,8 @@ namespace Belle2 {
           e_j     = e_j0     + de_j;
           phi_i   = phi_i0   + dphi_i;
           phi_j   = phi_j0   + dphi_j;
-          theta_i = theta_i0 + dtheta_i;
-          theta_j = theta_j0 + dtheta_j;
+          double theta_i = theta_i0 + dtheta_i;
+          double theta_j = theta_j0 + dtheta_j;
 
           sin_th_i = std::sin(theta_i);
           cos_th_i = std::cos(theta_i);

@@ -5,10 +5,16 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
+/* Own header. */
 #include <ecl/simulation/SensitiveDetector.h>
+
+/* ECL headers. */
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <framework/gearbox/Unit.h>
+
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
+#include <framework/gearbox/Unit.h>
 #include <simulation/background/BkgNeutronWeight.h>
 
 using namespace std;
@@ -101,7 +107,7 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   const G4StepPoint& s1 = *aStep->GetPostStepPoint();
   const G4Track&  track = *aStep->GetTrack();
 
-  if (m_trackID != track.GetTrackID()) { //TrackID changed, store track informations
+  if (m_trackID != track.GetTrackID()) { //TrackID changed, store track information
     m_trackID = track.GetTrackID();
     m_momentum = s0.GetMomentum(); // Get momentum
     //Reset track parameters
@@ -218,7 +224,7 @@ bool SensitiveDiode::step(G4Step* aStep, G4TouchableHistory*)
   const G4StepPoint& s1 = *aStep->GetPostStepPoint();
   const G4Track&  track = *aStep->GetTrack();
 
-  if (m_trackID != track.GetTrackID()) { //TrackID changed, store track informations
+  if (m_trackID != track.GetTrackID()) { //TrackID changed, store track information
     m_trackID = track.GetTrackID();
     //Reset track parameters
     m_esum = 0;
@@ -282,10 +288,6 @@ void SensitiveDiode::EndOfEvent(G4HCofThisEvent*)
     }
     tsum /= esum;
 
-    double trms = 0;
-    for (const dep_t& t : v) trms += pow(t.t - tsum, 2) * t.e ;
-    trms /= esum;
-
     tsum *= 1 / CLHEP::ns;
     esum *= 1 / CLHEP::GeV;
     m_eclHits.appendNew(cellId + 1, esum, tsum);
@@ -325,7 +327,7 @@ bool BkgSensitiveDiode::step(G4Step* aStep, G4TouchableHistory*)
   const G4StepPoint& s0 = *aStep->GetPreStepPoint();
   const G4Track&  track = *aStep->GetTrack();
 
-  if (m_trackID != track.GetTrackID()) { //TrackID changed, store track informations
+  if (m_trackID != track.GetTrackID()) { //TrackID changed, store track information
     m_trackID = track.GetTrackID();
     //Get world position
     const G4ThreeVector& worldPosition = s0.GetPosition();
@@ -340,7 +342,7 @@ bool BkgSensitiveDiode::step(G4Step* aStep, G4TouchableHistory*)
     m_startEnergy = s0.GetKineticEnergy() * Unit::MeV;
     //Reset energy deposit;
     m_energyDeposit = 0;
-    //Reset track lenght;
+    //Reset track length;
     m_trackLength = 0;
   }
   //Update energy deposit

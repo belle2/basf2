@@ -156,7 +156,7 @@ CDCTrack::CDCTrack(const CDCSegment2D& segment) :
   // TODO: Maybe enhance the estimation of the z coordinate with the superlayer slopes.
 }
 
-CDCTrack CDCTrack::condense(const std::vector<const CDCTrack*>& trackPath)
+CDCTrack CDCTrack::condense(const Path<const CDCTrack>& trackPath)
 {
   if (trackPath.empty()) {
     return CDCTrack();
@@ -192,7 +192,7 @@ CDCTrack CDCTrack::condense(const std::vector<const CDCTrack*>& trackPath)
 CDCTrack CDCTrack::condense(const Path<const CDCSegmentTriple>& segmentTriplePath)
 {
   CDCTrack track;
-  // B2DEBUG(200,"Lenght of segmentTripleTrack is " << segmentTripleTrack.size() );
+  // B2DEBUG(200,"Length of segmentTripleTrack is " << segmentTripleTrack.size() );
   if (segmentTriplePath.empty()) return track;
 
   Path<const CDCSegmentTriple>::const_iterator itSegmentTriple = segmentTriplePath.begin();
@@ -215,7 +215,7 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentTriple>& segmentTriplePat
   while (itSegmentTriple != segmentTriplePath.end()) {
 
     const CDCSegmentTriple* secondSegmentTriple = *itSegmentTriple++;
-    B2ASSERT("Two segement triples do not overlap in their axial segments",
+    B2ASSERT("Two segment triples do not overlap in their axial segments",
              firstSegmentTriple->getEndSegment() == secondSegmentTriple->getStartSegment());
 
     perpSOffset = appendReconstructedAverage(firstSegmentTriple->getEndSegment(),
@@ -259,7 +259,7 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
 {
   CDCTrack track;
 
-  //B2DEBUG(200,"Lenght of segmentTripleTrack is " << segmentTripleTrack.size() );
+  //B2DEBUG(200,"Length of segmentTripleTrack is " << segmentTripleTrack.size() );
   if (segmentPairPath.empty()) return track;
 
   Path<const CDCSegmentPair>::const_iterator itSegmentPair = segmentPairPath.begin();
@@ -278,7 +278,7 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
 
     const CDCSegmentPair* secondSegmentPair = *itSegmentPair++;
 
-    B2ASSERT("Two segement pairs do not overlap in their segments",
+    B2ASSERT("Two segment pairs do not overlap in their segments",
              firstSegmentPair->getToSegment() == secondSegmentPair->getFromSegment());
 
     perpSOffset = appendReconstructedAverage(firstSegmentPair->getToSegment(),
@@ -298,11 +298,11 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
   // Keep the fit of the last segment pair to set it as the fit at the end of the track
   CDCTrajectory3D endTrajectory3D = lastSegmentPair->getTrajectory3D();
 
-  // Move the reference point of the start fit to the first observered position
+  // Move the reference point of the start fit to the first observed position
   double resetPerpSOffset = startTrajectory3D.setLocalOrigin(track.front().getRecoPos3D());
   track.setStartTrajectory3D(startTrajectory3D);
 
-  // Move the reference point of the end fit to the last observered position
+  // Move the reference point of the end fit to the last observed position
   endTrajectory3D.setLocalOrigin(track.back().getRecoPos3D());
   track.setEndTrajectory3D(endTrajectory3D);
 

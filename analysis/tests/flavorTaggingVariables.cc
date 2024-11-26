@@ -281,7 +281,7 @@ namespace {
     var = Manager::Instance().getVariable("BtagToWBosonVariables(pMissCMS)");
     ASSERT_NE(var, nullptr);
 
-    double refsBtagToWBosonPMissCMS = 0.542734;
+    double refsBtagToWBosonPMissCMS =  0.5425695;
 
     for (auto& roeChargedParticle : roeChargedParticles) {
 

@@ -35,7 +35,7 @@ namespace Belle2 {
     void clear() override;
     DBRecordList loadRecords() override;
     bool checkTable(const std::string& tablename) override;
-    virtual DBFieldTypeList getTableContents(const std::string& tablename);
+    DBFieldTypeList getTableContents(const std::string& tablename) override;
 
   private:
     PGconn* m_sq_conn;

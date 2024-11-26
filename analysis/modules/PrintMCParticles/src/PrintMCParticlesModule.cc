@@ -57,8 +57,6 @@ namespace {
   /** Helper function to convert process number from Geant4 into a string */
   std::string g4ProcessToName(int process)
   {
-    // Just copy all the values from the enums given by MCParticle.h documentation ...
-    // This was made from the externals version v01-09-01 so we might
     static std::map<int, std::string> translation{
       {1, "CoulombScattering"},
       {2, "Ionisation"},
@@ -76,11 +74,17 @@ namespace {
       {14, "GammaConversion"},
       {15, "GammaConversionToMuMu"},
       {16, "GammaGeneralProcess"},
+      {17, "PositronGeneralProcess"},
+      {18, "AnnihilationToTauTau"},
       {21, "Cerenkov"},
       {22, "Scintillation"},
       {23, "SynchrotronRadiation"},
       {24, "TransitionRadiation"},
+      {25, "SurfaceReflection"},
+      {40, "DarkBremsstrahlung"},
+      {49, "MuonPairProdByCharged"},
       {111, "HadronElastic"},
+      {116, "NeutronGeneral"},
       {121, "HadronInelastic"},
       {131, "Capture"},
       {132, "MuAtomicCapture"},
@@ -88,7 +92,7 @@ namespace {
       {151, "HadronAtRest"},
       {152, "LeptonAtRest"},
       {161, "ChargeExchange"},
-      {210, "RadioactiveDecay"},
+      // {210, "RadioactiveDecay"},
       {201, "Decay"},
       {202, "Decay_WithSpin"},
       {203, "Decay_PionMakeSpin"},
@@ -96,6 +100,7 @@ namespace {
       {211, "Decay_Unknown"},
       {221, "Decay_MuAtom "},
       {231, "Decay_External"},
+      {310, "EMDissociation"},
     };
     if (auto it = translation.find(process); it != translation.end()) {
       return it->second;

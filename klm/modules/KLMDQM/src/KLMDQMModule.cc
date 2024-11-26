@@ -42,6 +42,10 @@ KLMDQMModule::KLMDQMModule() :
   m_TriggersLERInj{nullptr},
   m_DigitsAfterHERInj{nullptr},
   m_TriggersHERInj{nullptr},
+  m_FE_BKLM_Layer_0(nullptr),
+  m_FE_BKLM_Layer_1(nullptr),
+  m_FE_EKLM_Plane_0(nullptr),
+  m_FE_EKLM_Plane_1(nullptr),
   m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
   m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
   m_ElementNumbers{&(KLMElementNumbers::Instance())},
@@ -52,6 +56,18 @@ KLMDQMModule::KLMDQMModule() :
   addParam("histogramDirectoryName", m_HistogramDirectoryName,
            "Directory for KLM DQM histograms in ROOT file.",
            std::string("KLM"));
+  addParam("RPCTimeMin", m_RPCTimeMin,
+           "Min time for RPC time histogram.", double(-1223.5));
+  addParam("RPCTimeMax", m_RPCTimeMax,
+           "Max time for RPC time histogram.", double(-199.5));
+  addParam("BKLMScintTimeMin", m_BKLMScintTimeMin,
+           "Min time for BKLM scintillator time histogram.", double(-5300));
+  addParam("BKLMScintTimeMax", m_BKLMScintTimeMax,
+           "Max time for BKLM scintillator time histogram.", double(-4300));
+  addParam("EKLMScintTimeMin", m_EKLMScintTimeMin,
+           "Min time for EKLM scintillator time histogram.", double(-5300));
+  addParam("EKLMScintTimeMax", m_EKLMScintTimeMax,
+           "Max time for EKLM scintillator time histogram.", double(-4300));
 }
 
 KLMDQMModule::~KLMDQMModule()
@@ -85,15 +101,15 @@ void KLMDQMModule::defineHisto()
   m_DAQInclusion->GetXaxis()->SetBinLabel(1, "No");
   m_DAQInclusion->GetXaxis()->SetBinLabel(2, "Yes");
   /* Time histograms. */
-  m_TimeRPC = new TH1F("time_rpc", "RPC hit time", 128, -1223.5, -199.5);
+  m_TimeRPC = new TH1F("time_rpc", "RPC hit time", 128, m_RPCTimeMin, m_RPCTimeMax);
   m_TimeRPC->GetXaxis()->SetTitle("Time, ns");
   m_TimeScintillatorBKLM =
     new TH1F("time_scintillator_bklm", "Scintillator hit time (BKLM)",
-             100, -5000, -4000);
+             100, m_BKLMScintTimeMin, m_BKLMScintTimeMax);
   m_TimeScintillatorBKLM->GetXaxis()->SetTitle("Time, ns");
   m_TimeScintillatorEKLM =
     new TH1F("time_scintillator_eklm", "Scintillator hit time (EKLM)",
-             100, -5100, -4100);
+             100, m_EKLMScintTimeMin, m_EKLMScintTimeMax);
   m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
   /* Number of hits per plane. */
   m_PlaneBKLMPhi = new TH1F("plane_bklm_phi",
@@ -244,6 +260,18 @@ void KLMDQMModule::defineHisto()
       }
     }
   }
+  // Feature extraction status histogram for BKLM
+  int bklmSectors = BKLMElementNumbers::getMaximalSectorGlobalNumber(); // 16
+  int eklmPlanes = EKLMElementNumbers::getMaximalPlaneGlobalNumber(); // 208
+
+  m_FE_BKLM_Layer_0 = new TH1F("feStatus_bklm_scintillator_layers_0",
+                               "BKLM Scintillator Standard Readout;FEE Card", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
+  m_FE_BKLM_Layer_1 = new TH1F("feStatus_bklm_scintillator_layers_1",
+                               "BKLM Scintillator Feature Extraction;FEE Card", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
+  m_FE_EKLM_Plane_0 = new TH1F("feStatus_eklm_plane_0",
+                               "EKLM Standard Readout;Plane number", eklmPlanes, 0.5, 0.5 + eklmPlanes);
+  m_FE_EKLM_Plane_1 = new TH1F("feStatus_eklm_plane_1",
+                               "EKLM Feature Extraction;Plane number", eklmPlanes, 0.5, 0.5 + eklmPlanes);
   oldDirectory->cd();
 }
 
@@ -313,6 +341,11 @@ void KLMDQMModule::beginRun()
         m_Spatial2DHitsEKLM[section - 1][j - 1]->Reset();
     }
   }
+  /* Feature extraction. */
+  m_FE_BKLM_Layer_0->Reset();
+  m_FE_BKLM_Layer_1->Reset();
+  m_FE_EKLM_Plane_0->Reset();
+  m_FE_EKLM_Plane_1->Reset();
 }
 
 void KLMDQMModule::event()
@@ -325,8 +358,10 @@ void KLMDQMModule::event()
      * Reject digits that are below the threshold (such digits may appear
      * for simulated events).
      */
+
     if (!digit.isGood())
       continue;
+    KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
     if (digit.getSubdetector() == KLMElementNumbers::c_EKLM) {
       nDigitsScintillatorEKLM++;
       int section = digit.getSection();
@@ -352,7 +387,6 @@ void KLMDQMModule::event()
       m_PlaneEKLM->Fill(planeGlobal);
       m_TimeScintillatorEKLM->Fill(digit.getTime());
       if (digit.isMultiStrip()) {
-        KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
         if (digitRaw) {
           uint16_t triggerBits = digitRaw->getTriggerBits();
           if ((triggerBits & 0x1) != 0)
@@ -365,15 +399,26 @@ void KLMDQMModule::event()
             m_TriggerBitsEKLM->Fill(c_0x8);
         }
       }
+      if (digitRaw) {
+        // Extract m_FE from m_word4
+        uint16_t feStatus = digitRaw->getFEStatus(); // Extract the most significant bit
+        if (feStatus != 0) {
+          m_FE_EKLM_Plane_1->Fill(planeGlobal);
+        } else {
+          m_FE_EKLM_Plane_0->Fill(planeGlobal);
+        }
+      }
     } else if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
       int section = digit.getSection();
       int sector = digit.getSector();
       int layer = digit.getLayer();
       int plane = digit.getPlane();
       int strip = digit.getStrip();
+
+      KLMSectorNumber klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
+      KLMSectorNumber klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
+
       if (not digit.isMultiStrip()) {
-        KLMSectorNumber klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
-        KLMSectorNumber klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
         KLMChannelNumber channel = m_ElementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
         KLMChannelNumber channelIndex = m_ChannelArrayIndex->getIndex(channel);
         for (int j = 0; j < m_ChannelHitHistogramsBKLM; j++) {
@@ -391,9 +436,16 @@ void KLMDQMModule::event()
       } else {
         nDigitsScintillatorBKLM++;
         m_TimeScintillatorBKLM->Fill(digit.getTime());
+        if (digitRaw) {
+          uint16_t feStatus = digitRaw->getFEStatus(); // Extract the most significant bit
+          if (feStatus != 0) {
+            m_FE_BKLM_Layer_1->Fill((klmSectorIndex) * 2 + layer);
+          } else {
+            m_FE_BKLM_Layer_0->Fill((klmSectorIndex) * 2 + layer);
+          }
+        }
       }
       if (digit.isMultiStrip()) {
-        KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
         if (digitRaw) {
           uint16_t triggerBits = digitRaw->getTriggerBits();
           if ((triggerBits & 0x1) != 0)

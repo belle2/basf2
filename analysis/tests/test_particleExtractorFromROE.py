@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -27,7 +26,7 @@ class TestParticleExtractorFromROE(unittest.TestCase):
 
         main = basf2.create_path()
 
-        inputfile = b2test_utils.require_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root', py_case=self)
+        inputfile = b2test_utils.require_file('analysis/B0ToPiPiPi0.root', 'validation', py_case=self)
         ma.inputMdst(inputfile, path=main)
 
         ma.fillParticleList('pi+:sig', 'pionID > 0.5', path=main)
@@ -46,14 +45,14 @@ class TestParticleExtractorFromROE(unittest.TestCase):
         deadEndPath = basf2.create_path()
         ma.signalSideParticleFilter('B0:sig', '', roe_path, deadEndPath)
 
-        plists = ['%s:in_roe' % ptype for ptype in ['pi+', 'gamma', 'K_L0', 'K+', 'p+', 'e+', 'mu+']]
+        plists = [f'{ptype}:in_roe' for ptype in ['pi+', 'gamma', 'K_L0', 'K+', 'p+', 'e+', 'mu+']]
         ma.extractParticlesFromROE(plists, maskName='all', path=roe_path)
 
-        charged_inROE = ['nParticlesInList(%s:in_roe)' % ptype for ptype in ['pi+', 'K+', 'p+', 'e+', 'mu+']]
-        neutral_inROE = ['nParticlesInList(%s:in_roe)' % ptype for ptype in ['gamma', 'K_L0']]
+        charged_inROE = [f'nParticlesInList({ptype}:in_roe)' for ptype in ['pi+', 'K+', 'p+', 'e+', 'mu+']]
+        neutral_inROE = [f'nParticlesInList({ptype}:in_roe)' for ptype in ['gamma', 'K_L0']]
 
         default = ['nParticlesInList(pi+:all)', 'nParticlesInList(gamma:all)', 'nParticlesInList(K_L0:roe_default)']
-        mostLikely = ['nParticlesInList(%s:mostlikely_roe)' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
+        mostLikely = [f'nParticlesInList({ptype}:mostlikely_roe)' for ptype in ['K+', 'p+', 'e+', 'mu+']]
 
         ma.variablesToNtuple('', charged_inROE + neutral_inROE + default + mostLikely,
                              filename=testFile.name,
@@ -89,7 +88,7 @@ class TestParticleExtractorFromROE(unittest.TestCase):
 
         main = basf2.create_path()
 
-        inputfile = b2test_utils.require_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root', py_case=self)
+        inputfile = b2test_utils.require_file('analysis/B0ToPiPiPi0.root', 'validation', py_case=self)
         ma.inputMdst(inputfile, path=main)
 
         ma.fillParticleList('pi+:sig', 'pionID > 0.5', path=main)
@@ -104,14 +103,14 @@ class TestParticleExtractorFromROE(unittest.TestCase):
 
         ma.buildRestOfEvent('B0:sig', fillWithMostLikely=True, path=main)
 
-        plists = ['%s:in_roe' % ptype for ptype in ['pi+', 'gamma', 'K_L0', 'K+', 'p+', 'e+', 'mu+']]
+        plists = [f'{ptype}:in_roe' for ptype in ['pi+', 'gamma', 'K_L0', 'K+', 'p+', 'e+', 'mu+']]
         ma.extractParticlesFromROE(plists, maskName='all', path=main, signalSideParticleList='B0:sig')
 
-        charged_inROE = ['nParticlesInList(%s:in_roe)' % ptype for ptype in ['pi+', 'K+', 'p+', 'e+', 'mu+']]
-        neutral_inROE = ['nParticlesInList(%s:in_roe)' % ptype for ptype in ['gamma', 'K_L0']]
+        charged_inROE = [f'nParticlesInList({ptype}:in_roe)' for ptype in ['pi+', 'K+', 'p+', 'e+', 'mu+']]
+        neutral_inROE = [f'nParticlesInList({ptype}:in_roe)' for ptype in ['gamma', 'K_L0']]
 
         default = ['nParticlesInList(pi+:all)', 'nParticlesInList(gamma:all)', 'nParticlesInList(K_L0:roe_default)']
-        mostLikely = ['nParticlesInList(%s:mostlikely_roe)' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
+        mostLikely = [f'nParticlesInList({ptype}:mostlikely_roe)' for ptype in ['K+', 'p+', 'e+', 'mu+']]
 
         ma.variablesToNtuple('B0:sig', charged_inROE + neutral_inROE + default + mostLikely,
                              filename=testFile.name,

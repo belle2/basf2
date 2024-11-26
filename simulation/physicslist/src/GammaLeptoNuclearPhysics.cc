@@ -9,7 +9,7 @@
 #include <simulation/physicslist/GammaLeptoNuclearPhysics.h>
 
 #include "G4ProcessManager.hh"
-#include "G4PhotoNuclearProcess.hh"
+#include "G4HadronInelasticProcess.hh"
 #include "G4ElectronNuclearProcess.hh"
 #include "G4PositronNuclearProcess.hh"
 #include "G4MuonNuclearProcess.hh"
@@ -23,16 +23,25 @@
 #include "G4QGSMFragmentation.hh"
 #include "G4GeneratorPrecompoundInterface.hh"
 
+#include "G4PhotoNuclearCrossSection.hh"
+#include "G4GammaNuclearXS.hh"
+
+#include "G4HadronicParameters.hh"
+
+#include "G4CrossSectionDataSetRegistry.hh"
+
 #include "G4SystemOfUnits.hh"
 
 using namespace Belle2;
 using namespace Simulation;
 
 
-GammaLeptoNuclearPhysics::GammaLeptoNuclearPhysics()
+GammaLeptoNuclearPhysics::GammaLeptoNuclearPhysics(const G4int verbosityLevel)
   : m_qgsp(nullptr), m_stringModel(nullptr), m_stringDecay(nullptr),
-    m_fragModel(nullptr), m_preCompoundModel(nullptr)
-{}
+    m_fragModel(nullptr), m_preCompoundModel(nullptr), m_useGammaNuclearXS(false)
+{
+  G4HadronicParameters::Instance()->SetVerboseLevel(verbosityLevel);
+}
 
 
 GammaLeptoNuclearPhysics::~GammaLeptoNuclearPhysics()
@@ -73,7 +82,17 @@ void GammaLeptoNuclearPhysics::ConstructProcess()
 
   // Gamma
   procMan = G4Gamma::Gamma()->GetProcessManager();
-  G4PhotoNuclearProcess* pnProc = new G4PhotoNuclearProcess;
+  G4HadronInelasticProcess* pnProc = new G4HadronInelasticProcess("photonNuclear", G4Gamma::Definition());
+  auto xsreg = G4CrossSectionDataSetRegistry::Instance();
+  G4VCrossSectionDataSet* xs = nullptr;
+  if (m_useGammaNuclearXS) {
+    xs = xsreg->GetCrossSectionDataSet("GammaNuclearXS");
+    if (nullptr == xs) xs = new G4GammaNuclearXS();
+  } else {
+    xs = xsreg->GetCrossSectionDataSet("PhotoNuclearXS");
+    if (nullptr == xs) xs = new G4PhotoNuclearCrossSection();
+  }
+  pnProc->AddDataSet(xs);
   pnProc->RegisterMe(theGammaReaction);
   pnProc->RegisterMe(m_qgsp);
   procMan->AddDiscreteProcess(pnProc);

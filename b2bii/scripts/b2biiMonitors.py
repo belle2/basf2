@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -21,7 +20,7 @@ from vertex import kFit
 
 def addBeamParamsConversionMonitors(outputRootFile='b2biiBeamParamsConversionMonitors.root', path=None):
     """
-    In each event saves HER, LER, CMS, x-angle to histograms for monitoring purpuses: e.g. to be compared with
+    In each event saves HER, LER, CMS, x-angle to histograms for monitoring purposes: e.g. to be compared with
     same distributions obtained within BASF.
 
     @param outputRootFile name of the output ROOT file to which the histograms are saved.
@@ -81,7 +80,7 @@ def addKshortConversionMonitors(outputRootFile='b2biiKshortConversionMonitors.ro
     """
     Creates copies of KShort particles from 'K_S0:mdst' ParticleList and fills them to a new ParticleList called
     'K_S0:b2bii_monitor'. For each KShort candidate several quantities are stored to histograms with 'VariablesToHistogram' module
-    for monitoring purpuses: e.g. to be compared with same distributions obtained within BASF.
+    for monitoring purposes: e.g. to be compared with same distributions obtained within BASF.
 
     @param outputRootFile name of the output ROOT file to which the histograms are saved.
     @param path modules are added to this path
@@ -211,7 +210,7 @@ def addKlongConversionMonitors(outputRootFile='b2biiKlongConversionMonitors.root
     """
     Creates copies of KLong particles from 'K_L0:mdst' ParticleList and fills them to a new ParticleList called
     'K_L0:b2bii_monitor'. For each Klong candidate several quantities are stored to histograms with 'VariablesToHistogram' module
-    for monitoring purpuses: e.g. to be compared with same distributions obtained within BASF.
+    for monitoring purposes: e.g. to be compared with same distributions obtained within BASF.
 
     @param outputRootFile name of the output ROOT file to which the histograms are saved.
     @param path modules are added to this path
@@ -253,7 +252,7 @@ def addLambda0ConversionMonitors(outputRootFile='b2biiLambda0ConversionMonitors.
     """
     Creates copies of Lambda0 particles from 'Lambda0:mdst' ParticleList and c.c. and fills them to a new ParticleList called
     'Lambda0:b2bii_monitor'. For each Lambda0 candidate several quantities are stored to histograms with 'VariablesToHistogram'
-    module for monitoring purpuses: e.g. to be compared with same distributions obtained within BASF.
+    module for monitoring purposes: e.g. to be compared with same distributions obtained within BASF.
 
     @param outputRootFile name of the output ROOT file to which the histograms are saved.
     @param path modules are added to this path
@@ -377,7 +376,7 @@ def addConvertedPhotonConversionMonitors(outputRootFile='b2biiConvertedPhotonCon
     """
     Creates copies of gamma particles from 'gamma:v0mdst' ParticleList and fills them to a new ParticleList called
     'gamma:v0_b2bii_monitor'. For each gamma candidate several quantities are stored to histograms with 'VariablesToHistogram'
-    module for monitoring purpuses: e.g. to be compared with same distributions obtained within BASF.
+    module for monitoring purposes: e.g. to be compared with same distributions obtained within BASF.
 
     @param outputRootFile name of the output ROOT file to which the histograms are saved.
     @param path modules are added to this path
@@ -501,7 +500,7 @@ def addTrackConversionMonitors(outputRootFile='b2biiTrackConversionMonitors.root
     """
     Creates 'pi+:b2bii_monitor' ParticleLists and fills it with all converted charged tracks as charged pions.
     For each charged pion (track) several quantities are stored to histograms with 'VariablesToHistogram' module
-    for monitoring purpuses: e.g. to be compared with same distributions obtained within BASF.
+    for monitoring purposes: e.g. to be compared with same distributions obtained within BASF.
 
     @param outputRootFile name of the output ROOT file to which the histograms are saved.
     @param path modules are added to this path
@@ -588,7 +587,7 @@ def addNeutralsConversionMonitors(gammaOutputRootFile='b2biiGammaConversionMonit
     Creates 'gamma:b2bii_monitor' and 'pi0:b2bii_monitor' from already existing 'gamma:mdst' and
     'pi0:mdst' ParticleList and fills it with all converted neutral gammas.
     For each object several quantities are stored to histograms with 'VariablesToHistogram' module
-    for monitoring purpuses: e.g. to be compared with same distributions obtained within BASF.
+    for monitoring purposes: e.g. to be compared with same distributions obtained within BASF.
 
     @param outputRootFile name of the output ROOT file to which the histograms are saved.
     @param path modules are added to this path

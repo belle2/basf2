@@ -14,7 +14,6 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 
-#include <TCanvas.h>
 #include <TF1.h>
 
 namespace Belle2 {
@@ -63,19 +62,21 @@ namespace Belle2 {
      */
     void terminate() override final;
 
-    //! Parameters accesible from basf2 scripts
-  protected:
-    /** The name of the histogram. */
-    std::string m_histoname;
-    /** The definition of the fitting function. */
-    std::string m_function;
+    //! Parameters accessible from basf2 scripts
+  private:
+    //! name of histogram directory
+    std::string m_histogramDirectoryName;
+    //! name of histogram
+    std::string m_histogramName;
+    //! prefix for EPICS PVs
+    std::string m_pvPrefix;
 
     //! Data members
   private:
     /** The fitting function. */
-    TF1* m_f = nullptr;
+    TF1* m_function = nullptr;
     /** The drawing canvas for the fitting result. */
-    TCanvas* m_c = nullptr;
+    TCanvas* m_canvas = nullptr;
 
   };
 } // end namespace Belle2

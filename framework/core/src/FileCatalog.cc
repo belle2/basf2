@@ -11,12 +11,12 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/utilities/EnvironmentVariables.h>
-#include <boost/filesystem.hpp>
-#include <fstream>
 
+#include <fstream>
+#include <filesystem>
 
 using namespace Belle2;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 
 
@@ -47,7 +47,7 @@ FileCatalog::FileCatalog() : m_fileName("")
   }
 
   // get absolute path name
-  m_fileName = fs::absolute(fileCatalog, fs::initial_path<fs::path>()).c_str();
+  m_fileName = fs::absolute(fileCatalog).c_str();
 }
 
 

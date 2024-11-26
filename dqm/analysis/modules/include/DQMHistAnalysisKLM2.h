@@ -19,6 +19,7 @@
 /* ROOT headers. */
 #include <TCanvas.h>
 #include <TH1.h>
+#include <TH2.h>
 #include <TString.h>
 #include <TText.h>
 #include <TLine.h>
@@ -39,11 +40,6 @@ namespace Belle2 {
      * Constructor.
      */
     DQMHistAnalysisKLM2Module();
-
-    /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisKLM2Module();
 
     /**
      * Initializer.
@@ -70,12 +66,36 @@ namespace Belle2 {
 
 
     /**
+     * Initialize a histogram by either finding a reference histogram or creating a new one.
+     * @param[out] hist      Pointer to the histogram to initialize.
+     * @param[in]  histName  Name of the histogram to find or create.
+     * @param[in]  title     Title for the new histogram if it needs to be created.
+     * @param[in]  maxLayer  Maximum number of layers for the histogram.
+     */
+    void initialize2DRefHistogram(TH1*& hist, const std::string& histName, const std::string& title, int maxLayer);
+
+    /**
+     * Process histogram containing the efficiencies.
+     * @param[in]  effHist  Histogram itself.
+     * @param[in]  denominator Denominator for efficiency hist.
+     * @param[in]  numerator Numerator for efficiency hist.
+     * @param[in]  canvas Canvas of interest.
+     */
+    void processEfficiencyHistogram(TH1* effHist,  TH1* denominator, TH1* numerator, TCanvas* canvas);
+
+
+    /**
      * Process histogram containing the number of hits in plane.
      * @param[in]  histName  Histogram name.
      * @param[in]  histogram Histogram itself.
      */
     void processPlaneHistogram(const std::string& histName, TH1* histogram);
 
+    /**
+     * Process 2D efficiency histograms.
+     */
+    void process2DEffHistogram(TH1* mainHist, TH1* refHist, TH2* planeHist, TH2* errHist, int layers, int sectors,
+                               bool ratioPlot, int& pvcount, double layerLimit, TCanvas* eff2dCanv);
 
     /** TLine for boundary in plane histograms. */
     TLine m_PlaneLine;
@@ -83,14 +103,11 @@ namespace Belle2 {
     /** TText for names in plane histograms. */
     TText m_PlaneText;
 
-    /** Histogram from DQMInfo with run type. */
-    TH1* m_RunType = NULL;
-
-    /** String with run type. */
-    TString m_RunTypeString;
-
     /** Run type flag for null runs. */
     bool m_IsPhysicsRun = false;
+
+    /** Run type flag for null runs. */
+    bool m_IsNullRun;
 
     /** Histogram for BKLM plane efficiency. */
     TH1* m_eff_bklm = NULL;
@@ -119,10 +136,71 @@ namespace Belle2 {
     /** Monitoring object. */
     MonitoringObject* m_monObj {};
 
-
     /** EKLM element numbers. */
     const EKLMElementNumbers* m_EklmElementNumbers;
 
+    /** efficiency ratio warning threshold **/
+    float m_warnThr = 0;
+
+    /** efficiency ratio alarm threshold **/
+    float m_alarmThr = 0;
+
+    /** efficiency ratio (run-)stop threshold **/
+    float m_stopThr = 0;
+
+    /** efficiency ratio min z scale **/
+    float m_min = 0;
+
+    /** efficiency ratio max z scale **/
+    float m_max = 2;
+
+    /** show efficiency ratio or difference **/
+    bool m_ratio = true;
+
+    /** BKLM efficiencies reference histogram **/
+    TH1* m_ref_efficiencies_bklm = NULL;
+
+    /** BKLM efficiencies 2dim histogram **/
+    TH2* m_eff2d_bklm = NULL;
+
+    /** BKLM efficiencies error histogram **/
+    TH2* m_err_bklm = NULL;
+
+    /** BKLM efficiencies ratio canvas **/
+    TCanvas* m_c_eff2d_bklm = NULL;
+
+    /** ELM efficiencies reference histogram **/
+    TH1* m_ref_efficiencies_eklm = NULL;
+
+    /** EKLM efficiencies 2dim histogram **/
+    TH2* m_eff2d_eklm = NULL;
+
+    /** EKLM efficiencies error histogram **/
+    TH2* m_err_eklm = NULL;
+
+    /** EKLM efficiencies ratio canvas **/
+    TCanvas* m_c_eff2d_eklm = NULL;
+
+    /** Name of histogram directory */
+    std::string m_histogramDirectoryName;
+
+    /** Name of histogram directory for reference file*/
+    std::string m_refHistogramDirectoryName;
+
+    /** Minimal number of entries for delta histogram and PV update. */
+    double m_minEntries;
+
+    /** Number of inefficient BKLM layers. */
+    int m_nEffBKLMLayers;
+
+    /** Number of inefficient EKLM Layers*/
+    int m_nEffEKLMLayers;
+
+    /** warn limits from inefficient BKLM layers PV */
+    double m_BKLMLayerWarn;
+
+    /** warn limits from inefficient EKLM layers PV*/
+    double m_EKLMLayerWarn;
 
   };
 

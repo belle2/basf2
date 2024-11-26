@@ -14,29 +14,28 @@
 #include <cmath>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
 
 
-void TrackFindingCDCTestWithTopology::SetUpTestCase()
+void TrackFindingCDC::TrackFindingCDCTestWithTopology::SetUpTestCase()
 {
   /// Manually open the database and prepare the cdc geometry parameters.
-  CDCGeometryLoader::loadDatabase();
+  TrackFindingCDC::CDCGeometryLoader::loadDatabase();
 
   // Prepare the wires for the cdc track finders.
-  CDCWireTopology::getInstance();
+  TrackFindingCDC::CDCWireTopology::getInstance();
 }
 
-void TrackFindingCDCTestWithTopology::TearDownTestCase()
+void TrackFindingCDC::TrackFindingCDCTestWithTopology::TearDownTestCase()
 {
-  CDCGeometryLoader::closeDatabase();
+  TrackFindingCDC::CDCGeometryLoader::closeDatabase();
 }
 
 
 
 template<>
-bool Belle2::TestHelpers::allNear<Vector3D>(const Vector3D& expected,
-                                            const Vector3D& actual,
-                                            double tolerance)
+bool Belle2::TestHelpers::allNear<TrackFindingCDC::Vector3D>(const TrackFindingCDC::Vector3D& expected,
+    const TrackFindingCDC::Vector3D& actual,
+    double tolerance)
 {
   bool xNear = std::fabs(expected.x() - actual.x()) < tolerance;
   bool yNear = std::fabs(expected.y() - actual.y()) < tolerance;

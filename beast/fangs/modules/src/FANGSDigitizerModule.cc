@@ -77,7 +77,7 @@ void FANGSDigitizerModule::event()
     const int lad = FANGSSimHit.getLadder();
     const int sen = FANGSSimHit.getSensor();
     const int detNb = (lad - 1) * 5 + sen - 1;
-    const TVector3 trackPosition =  FANGSSimHit.getLocalPosEntry();
+    const ROOT::Math::XYZVector trackPosition =  FANGSSimHit.getLocalPosEntry();
     const double z = trackPosition.Y() + m_sensor_width / 2.; //cm
     if (z < T0[detNb]) {
       T0[detNb] = z;
@@ -98,10 +98,10 @@ void FANGSDigitizerModule::event()
     const int lad = FANGSSimHit.getLadder();
     const int sen = FANGSSimHit.getSensor();
     const int detNb = (lad - 1) * 5 + sen - 1;
-    const TVector3 simHitPosition =  FANGSSimHit.getLocalPosEntry();
+    const ROOT::Math::XYZVector simHitPosition =  FANGSSimHit.getLocalPosEntry();
     const double edep = FANGSSimHit.getEnergyDep() * 1e9; //GeV to eV
 
-    const TVector3 chipPosition(//cm
+    const ROOT::Math::XYZVector chipPosition(//cm
       simHitPosition.X(),
       simHitPosition.Z(),
       simHitPosition.Y() + m_sensor_width / 2.);

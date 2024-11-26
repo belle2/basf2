@@ -112,7 +112,16 @@ void Pi0VetoEfficiencySystematicsModule::addPi0VetoEfficiencyRatios(Particle* B,
     //The selected particle is photon reconstructed from ECL cluster
     WeightInfo info = getInfo(hardPhoton);
     for (const auto& entry : info) {
-      B->addExtraInfo("Pi0VetoEfficiencySystematics_" + m_mode + m_suffix + "_" + entry.first, entry.second);
+      const std::string extraInfoName = "Pi0VetoEfficiencySystematics_" + m_mode + m_suffix + "_" + entry.first;
+      if (B->hasExtraInfo(extraInfoName)) {
+        if (B->getExtraInfo(extraInfoName) != entry.second) {
+          B2INFO("extraInfo " << extraInfoName << " has been already set and will be overwritten. Original: "
+                 << B->getExtraInfo(extraInfoName) << ", New: " << entry.second);
+          B->setExtraInfo(extraInfoName, entry.second);
+        }
+      } else {
+        B->addExtraInfo(extraInfoName, entry.second);
+      }
     }
   } else {
     B2WARNING("The given hard photon is not from ECL or not photon");

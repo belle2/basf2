@@ -11,6 +11,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/reconstruction/RawCluster.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
+#include <framework/database/DBObjPtr.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDCoGTimeCalibrations.h>
 #include <svd/calibration/SVD3SampleCoGTimeCalibrations.h>
@@ -87,7 +88,6 @@ namespace Belle2::SVD {
     SVD3SampleCoGTimeCalibrations m_CoG3TimeCal;
     /** ELS3 time calibration wrapper*/
     SVD3SampleELSTimeCalibrations m_ELS3TimeCal;
-
   };
 
 }

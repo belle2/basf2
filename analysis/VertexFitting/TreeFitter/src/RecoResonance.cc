@@ -17,7 +17,7 @@ namespace TreeFitter {
                                const ParticleBase* mother,
                                const ConstraintConfiguration& config
                               ) :
-    RecoComposite(particle, mother, config),
+    Composite(particle, mother, config),
     m_massconstraint(false)
   {
     m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
@@ -55,7 +55,7 @@ namespace TreeFitter {
     ErrCode status;
     switch (type) {
       case Constraint::resonance:
-        status |= projectRecoComposite(fitparams, p);
+        status |= projectComposite(fitparams, p);
         break;
       default:
         status |= ParticleBase::projectConstraint(type, fitparams, p);

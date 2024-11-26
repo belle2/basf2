@@ -147,10 +147,10 @@ namespace Belle2 {
       }
     }
     void GlobalParamVector::postReadFromResult(
-      std::vector< std::tuple< short unsigned int, short unsigned int, short unsigned int, double > >& result)
+      std::vector< std::tuple< short unsigned int, short unsigned int, short unsigned int, double > >& results)
     {
       for (auto interface : m_subDetectorInterfacesVector) {
-        interface->readFromResult(result, *this);
+        interface->readFromResult(results, *this);
       }
     }
 
@@ -181,7 +181,7 @@ namespace Belle2 {
               continue;
 
             rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(sensor, VxdID(0, 0, 0, 1),
-                geo.get(sensor).getTransformation(true));
+                geo.getSensorInfo(sensor).getTransformation(true));
           }
         } else if (s_hierarchyType == c_HalfShells) {
           /**

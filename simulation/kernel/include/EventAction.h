@@ -9,9 +9,14 @@
 #ifndef EVENTACTION_H_
 #define EVENTACTION_H_
 
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <G4UserEventAction.hh>
+
+#include <fstream>
+
 class G4Event;
 
 namespace Belle2 {
@@ -31,7 +36,6 @@ namespace Belle2 {
        * Constructor.
        * @param mcCollectionName The name of the MCParticle collection.
        * @param mcParticleGraph Reference to the MCParticle graph.
-       * @param createRelation If set to true the relation collection Hit -> MCParticle is created.
        */
       EventAction(const std::string& mcCollectionName, MCParticleGraph& mcParticleGraph);
 
@@ -54,11 +58,21 @@ namespace Belle2 {
        */
       void EndOfEventAction(const G4Event* event);
 
+      /**
+       * This method gets the output stream for the event-history steps
+       */
+      std::ofstream* getVREventStream() const { return m_VREventStream; }
 
     protected:
 
       std::string m_mcCollectionName;     /**< The name of the MCParticle collection to which the MCParticles should be written.*/
       MCParticleGraph& m_mcParticleGraph; /**< Reference to the MCParticle graph which is converted to a MCParticle list by this class. */
+
+    private:
+
+      bool m_writeSimSteps{false}; /**< Flag for writing out the simulation steps. */
+      std::ofstream* m_VREventStream{nullptr};  /**< Output stream for writing each step of event's history for the Virtual Reality. */
+      StoreObjPtr<EventMetaData> m_evtMetaData; /**< Event metadata. */
 
     };
 

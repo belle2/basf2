@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -11,7 +10,7 @@
 
 """
 A test of the ParticleLoader using a relatively large test file
-(mdst14.root in the validation data)
+(mdst16.root in the validation data)
 """
 
 import basf2
@@ -26,7 +25,7 @@ fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 
 ###############################################################################
 # a new ParticleLoader for each fsp
 testpath = basf2.create_path()
-inputFile = b2test_utils.require_file('mdst14.root', 'validation')
+inputFile = b2test_utils.require_file('mdst16.root', 'validation')
 testpath.add_module('RootInput', inputFileName=inputFile)
 for fsp in fsps:
     testpath.add_module('ParticleLoader', decayStrings=[fsp])

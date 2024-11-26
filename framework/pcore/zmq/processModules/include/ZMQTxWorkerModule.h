@@ -9,6 +9,9 @@
 
 #include <framework/core/Module.h>
 
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
 #include <framework/pcore/zmq/sockets/ZMQClient.h>
 #include <framework/pcore/zmq/utils/StreamHelper.h>
 
@@ -24,6 +27,8 @@ namespace Belle2 {
     ZMQTxWorkerModule();
     /// Pack the datastore and stream it.
     void event() override;
+    /// EndRun processing
+    void endRun() override;
     /// Terminate the client and tell the monitor, we are done.
     void terminate() override;
 
@@ -41,6 +46,9 @@ namespace Belle2 {
     int m_param_compressionLevel = 0;
     /// Parameter: Can we handle mergeables?
     bool m_param_handleMergeable = true;
+
+    /// The event meta data in the data store needed for confirming events
+    StoreObjPtr<EventMetaData> m_eventMetaData;
 
     /// Our ZMQ client
     ZMQClient m_zmqClient;

@@ -111,18 +111,18 @@ void MCDecayFinderModule::event()
             newParticle->appendDaughter(partDaughter, /* updateType = */ false); // particleSource remain c_MCParticle
           }
         }
-        m_outputList->addParticle(newParticle);
+        addUniqueParticleToList(newParticle);
 
       } else if (arrayIndex == -1) {
         // Particle is not created when no daughter is described in decayString
         Particle* newParticle = m_particles.appendNew(mcp);
         newParticle->addRelationTo(mcp);
 
-        m_outputList->addParticle(newParticle);
-
+        addUniqueParticleToList(newParticle);
       } else {
         // Particle is already created
-        m_outputList->addParticle(m_particles[arrayIndex]);
+        addUniqueParticleToList(m_particles[arrayIndex]);
+
       }
 
     }
@@ -201,6 +201,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
       DecayTree<MCParticle>* daughter = match(daugP, d->getDaughter(iDD), isCC, tmp);
       if (!daughter->getObj()) {
         ++itDP;
+        delete daughter;
         continue;
       }
       // Matching daughter found, remove it from list of unmatched particle daughters
@@ -266,10 +267,14 @@ void MCDecayFinderModule::appendParticles(const MCParticle* gen, vector<const MC
     // e.g. photon-conversion: gamma -> e+ e-, decay-in-flight: K+ -> mu+ nu_mu
   }
 
+  vector<const MCParticle*> tmp_children;
   const vector<MCParticle*>& genDaughters = gen->getDaughters();
   for (auto daug : genDaughters) {
+    tmp_children.push_back(daug);
     children.push_back(daug);
-    appendParticles(daug, children);
+  }
+  for (auto child : tmp_children) {
+    appendParticles(child, children);
   }
 }
 
@@ -317,7 +322,7 @@ Particle* MCDecayFinderModule::buildParticleFromDecayTree(const DecayTree<MCPart
 
   // sanity check
   if ((int)decayDaughters.size() != nDaughters) {
-    B2ERROR("MCDecayFinderModule::buildParticleFromDecayTree Inconsistency on the number daughters between DecayTree and DecayDescriptor");
+    B2ERROR("MCDecayFinderModule::buildParticleFromDecayTree Inconsistency on the number of daughters between DecayTree and DecayDescriptor");
     return nullptr;
   }
 
@@ -385,4 +390,14 @@ Particle* MCDecayFinderModule::createParticleRecursively(const MCParticle* mcp, 
   }
 
   return newParticle;
+}
+
+void MCDecayFinderModule::addUniqueParticleToList(Particle* newParticle)
+{
+  for (auto& existingParticle : *m_outputList) {
+    if (existingParticle.isCopyOf(newParticle))
+      return;
+  }
+
+  m_outputList->addParticle(newParticle);
 }

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -96,7 +95,7 @@ compress.if_false(emptypath)
 # Output: digitized hits only
 output = basf2.register_module('RootOutput')
 output.param('branchNames', ['EventLevelTriggerTimeInfo', 'PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
-                             'ARICHDigits', 'ECLWaveforms', 'KLMDigits', 'TRGECLBGTCHits'])
+                             'ARICHDigits', 'ECLWaveforms', 'KLMDigits', 'TRGECLBGTCHits', 'TRGSummary'])
 main.add_module(output)
 
 # Process events

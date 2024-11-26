@@ -75,7 +75,6 @@ void fit3D(){
   Double_t phiz[4];
   Int_t IsST = 4;
   Int_t IsAx = 5;
-  const double Trg_PI = 3.141592653589793;
 
   Double_t z0;
   Double_t mcZ0;
@@ -191,13 +190,13 @@ void fit3D(){
 
     rSFit(iezz2,arcS,zz,z0,cot);
 
-    myphi0 = myphi0*180/Trg_PI;
-    mcPhi0 = mcPhi0*180/Trg_PI;
+    myphi0 = myphi0*TMath::RadToDeg();
+    mcPhi0 = mcPhi0*TMath::RadToDeg();
 
-    ztheta=Trg_PI/2.-atan(cot);
-    ztheta*=180./Trg_PI;
-    mcTheta = Trg_PI/2.-atan(mcPar[3]);
-    mcTheta *= 180./Trg_PI;
+    ztheta=M_PI_2-atan(cot);
+    ztheta*=TMath::RadToDeg();
+    mcTheta = M_PI_2-atan(mcPar[3]);
+    mcTheta *= TMath::RadToDeg();
 
     mcZ0 = mcPar[2];
 

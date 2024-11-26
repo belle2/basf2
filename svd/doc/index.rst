@@ -31,12 +31,10 @@ In the following we describe the ``svd`` package .
 
 .. toctree:: tools
 
-.. toctree:: utilities 
+.. toctree:: utilities
 
 .. toctree:: dqm
 
 .. toctree:: datastore
 
 .. toctree:: dbstore
-
-.. toctree:: todo

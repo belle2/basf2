@@ -16,7 +16,7 @@ using namespace std;
 
 static RawRevRb2Sock* s_body = NULL;
 
-void sigint_handler(int signum)
+void sigint_handler(int /*signum*/)
 {
   printf("rawrb2sockr : aborted\n");
   delete s_body;

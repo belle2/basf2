@@ -84,9 +84,9 @@ namespace Belle2 {
   public:
     void* getValue(const std::string& name);
     const void* getValue(const std::string& name) const override;
-    virtual void setValue(const std::string& name, const void* value, int size) override;
-    virtual void addValue(const std::string& name, const void* value,
-                          DBField::Type type, int length = 0);
+    void setValue(const std::string& name, const void* value, int size) override;
+    void addValue(const std::string& name, const void* value,
+                  DBField::Type type, int length = 0) override;
     const std::string& getText(const std::string&) const override { return m_empty; }
     void addText(const std::string&, const std::string&) override {}
 

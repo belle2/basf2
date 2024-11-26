@@ -1,0 +1,41 @@
+# EventType: 1211832002
+# Descriptor: [B+- -> K+- [X(3823) -> gamma [chi_c2 -> gamma [J/psi -> l+l-]]]]
+# NickName: Bu_X3823K_gammachic2_gammaJpsi_ll
+# Documentation: B -> charmonium decays.
+# Tested: Yes
+# PhysicsWG: Quarkonium
+# Responsible: Yong Xie
+# Email: xieyong@mail.sdu.edu.cn
+# Cuts: None
+# Date: 20230829
+# Parameters of the X(3823) particle: pdg.add_particle(name='X(3823)', pdgCode=17443, mass=3.823, width=0.0, charge=0, spin=2)
+
+Alias X3823sig X(3823)
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.0 X3823sig K+ PHSP;
+Enddecay
+
+Decay B-sig
+1.0 X3823sig K- PHSP;
+Enddecay
+
+Decay X3823sig
+1.0 gamma chi_c2sig PHSP;
+Enddecay
+
+Decay chi_c2sig
+1.0 J/psisig gamma PHSP;
+Enddecay
+
+Decay J/psisig
+0.5 e+  e-     VLL;
+0.5 mu+ mu-    VLL;
+Enddecay
+
+End

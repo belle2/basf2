@@ -1,4 +1,4 @@
-.. _tracking_dbobjects: 
+.. _tracking_dbobjects:
 
 Database Objects
 ================

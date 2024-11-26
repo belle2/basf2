@@ -5,6 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 /* ---------------------------------------------------------------------- *\
    nsmlib2.c
 
@@ -45,9 +46,11 @@
    20200423 2003 mod: implement read(init)/write timeout
    20200423 2003 mod: 1 second penalty when sending non-existing req
    20200603 2006 fix: nnod in ntohs
+   20210315 2007 fix: nsmlib_parsefree fix for nsmlib_allocmem
+   20220425 2008 fix: uint16_t to int conversion fix for nnod
 \* ---------------------------------------------------------------------- */
 
-const char *nsmlib2_version   = "nsmlib2 2.0.03";
+const char *nsmlib2_version   = "nsmlib2 2.0.08";
 
 /* -- includes -- */
 #include <stdio.h>
@@ -71,10 +74,10 @@ const char *nsmlib2_version   = "nsmlib2 2.0.03";
 #include <sys/stat.h>
 #include <sys/shm.h>
 
-#include "nsm2.h"
-#include "nsmsys2.h"
-#include "nsmlib2.h"
-#include "nsmparse.h"
+#include "nsm2/nsm2.h"
+#include "nsm2/nsmsys2.h"
+#include "nsm2/nsmlib2.h"
+#include "nsm2/nsmparse.h"
 
 /* -- default constants -- */
 #define NSM2_PORT 8120 /* chosen as it corresponds to 0x2012
@@ -104,7 +107,7 @@ int  nsmlib_currecursive;
 static int *nsmlib_checkpoints;
 static int  nsmlib_nskipped;
 static NSMtcphead nsmlib_lastskipped;
-/* static int nsmlib_alloccnt = 0;  (2018.0709.0934 memory leak search) */
+/* static int nsmlib_alloccnt = 0; /* (2018.0709.0934 memory leak search) */
 
 typedef struct NSMrecvqueue_struct {
   struct NSMrecvqueue_struct *next;
@@ -291,12 +294,12 @@ nsmlib_debuglevel(int val)
 static void
 nsmlib_debug(const char *fmt, ...)
 {
+  va_list ap;
   if (! nsmlib_logfp) return;
   if (! nsmlib_debugflag) return;
 
   if (LOGSIZ > 256) {
     LOGCAT("[DBG] ");
-    va_list ap;
     VSNPRINTF(LOGEND, LOGSIZ, fmt, ap);
     LOGFWD;
     LOGCAT("\n");
@@ -306,9 +309,9 @@ nsmlib_debug(const char *fmt, ...)
 void
 nsmlib_lognl(const char *fmt, ...)
 {
+  va_list ap;
   if (! nsmlib_logfp) return;
   if (LOGSIZ > 256) {
-    va_list ap;
     VSNPRINTF(LOGEND, LOGSIZ, fmt, ap);
     LOGFWD;
     LOGCAT("\n");
@@ -318,9 +321,9 @@ nsmlib_lognl(const char *fmt, ...)
 void
 nsmlib_log(const char *fmt, ...)
 {
+  va_list ap;
   if (! nsmlib_logfp) return;
   if (LOGSIZ > 256) {
-    va_list ap;
     VSNPRINTF(LOGEND, LOGSIZ, fmt, ap);
     LOGFWD;
   }
@@ -493,7 +496,6 @@ nsmlib_addincpath(const char *path)
     if (nsmlib_incpath) nsmlib_free(nsmlib_incpath);
     nsmlib_incpath = q;
   }
-  return 0; //TODO is the return values ok?
 }
 
 /* -- nsmlib_nodename ------------------------------------------------ */
@@ -521,7 +523,9 @@ nsmlib_nodename(NSMcontext *nsmc, int nodeid)
 int
 nsmlib_nodeid(NSMcontext *nsmc, const char *nodename)
 {
+  int i;
   NSMsys *sysp;
+  const char *namep;
   int hash;
   NSMnod *nodp;
   
@@ -553,6 +557,7 @@ nsmlib_nodepid(NSMcontext *nsmc, const char *nodename)
 int
 nsmlib_nodeproc(NSMcontext *nsmc, const char *nodename)
 {
+  int i;
   NSMsys *sysp;
   if (! nsmc || ! (sysp = nsmc->sysp)) return -1;
 
@@ -750,7 +755,7 @@ nsmlib_initnet(NSMcontext *nsmc, const char *unused, int port)
       nsmc->errn = errno;
       return NSMERDUID;
     }
-    if (ret < (int) sizeof(nsmd_euid)) return NSMERDCLOSE;
+    if (ret < sizeof(nsmd_euid)) return NSMERDCLOSE;
     break;
   }
   
@@ -1114,7 +1119,7 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
 /* -- nsmlib_handler ------------------------------------------------- */
 static void
 #ifdef SIGRTMIN
-nsmlib_handler(int sig, siginfo_t * info, void *ignored)
+nsmlib_handler(int sig, siginfo_t *info, void *ignored)
 #else
 nsmlib_handler(int sig)
 #endif
@@ -1255,7 +1260,7 @@ nsmlib_usesig(NSMcontext *nsmc, int usesig)
 }
 /* -- nsmlib_delclient ----------------------------------------------- */
 void
-nsmlib_delclient(NSMmsg * msg, NSMcontext * nsmc)
+nsmlib_delclient(NSMmsg *msg, NSMcontext *nsmc)
 {
   LOG("killed by nsmd2");
   exit(1);
@@ -1340,6 +1345,7 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
   int writelen;
   int err = 0;
   int i;
+  int oldsig;
 
   DBS(nsmc,1100);
   
@@ -1433,7 +1439,7 @@ nsmlib_initcli(NSMcontext *nsmc, const char *nodename)
   int force_newclient = 0;
 
   /* check if the node is already there */
-  int nnod = ntohs(sysp->nnod);
+  int nnod = (int16_t)ntohs(sysp->nnod);
   for (inod = 0; inod <= nnod; inod++) {
     NSMnod *nodp = &sysp->nod[inod];
     if (strcmp(nodp->name, nodename) != 0) continue;
@@ -1570,6 +1576,7 @@ nsmlib_register_request(NSMcontext *nsmc, const char *name)
 {
   NSMmsg msg;
   int ret;
+  int reqid;
   memset(&msg, 0, sizeof(msg));
   msg.req   = NSMCMD_NEWREQ;
   msg.node  = -1;
@@ -1598,6 +1605,8 @@ nsmlib_readmem(NSMcontext *nsmc, void *buf,
   char fmtstr[256];
   NSMsys *sysp = nsmc->sysp;
   NSMmem *memp = nsmc->memp;
+  NSMmsg msg;
+  int ret;
   int datid;
   NSMdat *datp;
   int newrevision = -1;
@@ -1696,6 +1705,8 @@ nsmlib_openmem(NSMcontext *nsmc,
   int ret;
   int datid;
   NSMdat *datp;
+  int refid;
+  NSMref *refp;
   int newrevision = -1;
   
   if (! fmtname) fmtname = datname;
@@ -1744,7 +1755,7 @@ nsmlib_openmem(NSMcontext *nsmc,
   }
 
   /* check locally before asking nsmd2 */
-  for (int refid = 0; refid < NSMSYS_MAX_REF; refid++) {
+  for (refid = 0; refid < NSMSYS_MAX_REF; refid++) {
     NSMref *refp = sysp->ref + refid;
     if (ntohs(refp->refdat) == datid &&
         ntohs(refp->refnod) == nsmc->nodeid) {
@@ -1787,6 +1798,8 @@ nsmlib_flushmem(NSMcontext *nsmc, const void *ptr, int psiz)
   NSMmsg msg;
   NSMsys *sysp;
   size_t ppos;
+  size_t dpos = 0;
+  size_t dsiz = 0;
   int nnext;
   int n = 0; /* to check inf-loop */
   int ret;
@@ -1809,8 +1822,8 @@ nsmlib_flushmem(NSMcontext *nsmc, const void *ptr, int psiz)
   nnext = (int16_t)ntohs(sysp->nod[nsmc->nodeid].noddat);
   while (nnext >= 0 && nnext < NSMSYS_MAX_DAT) {
     NSMdat *datp = sysp->dat + nnext;
-    size_t dpos = (int32_t)ntohl(datp->dtpos);
-    size_t dsiz = (int16_t)ntohs(datp->dtsiz);
+    dpos = (int32_t)ntohl(datp->dtpos);
+    dsiz = (int16_t)ntohs(datp->dtsiz);
     DBG("flushmem: ppos=%d dpos=%d ppos+psiz=%d dpos+dsiz=%d",
         (int)ppos, (int)dpos, (int)(ppos+psiz), (int)(dpos+dsiz));
     if (ppos == dpos && psiz == 0) psiz = dsiz;
@@ -1852,6 +1865,7 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
 {
   NSMmsg msg;
   int ret;
+  int reqid;
   char fmtstr[256];
   char *p;
   NSMsys *sysp = nsmc->sysp;
@@ -1865,15 +1879,18 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
   if (! datname) { nsmc->errc = NSMEINVPAR; return 0; }
   if (revision <= 0) { nsmc->errc = NSMEINVPAR; return 0; }
   if (strlen(datname) > NSMSYS_DNAM_SIZ) { nsmc->errc = NSMEINVPAR; return 0; }
-  
-  if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr,
-                          &newrevision))) {
+
+  NSMparse *parsep = nsmlib_parsefile(fmtname, revision, nsmlib_incpath,
+                                      fmtstr, &newrevision);
+  if (! (parsep)) {
     int errcode;
     const char *errstr = nsmlib_parseerr(&errcode);
     sprintf(nsmc->errs, "cannot allocate data %s, %s", datname, errstr);
     nsmc->errc = NSMEPARSE;
     return 0;
   }
+  nsmlib_parsefree(parsep);
+
   if (revision != newrevision) {
     sprintf(nsmc->errs, "data revision mismatch for %s, %d != %d",
             datname, revision, newrevision);
@@ -1939,7 +1956,6 @@ nsmlib_shutdown(NSMcontext *nsmc, int ret, int port)
   nsmlib_free(nsmc);
   nsmc = 0;
   sleep(1); /* one second penalty */
-  return 0; // TODO is the return value OK?
 }
 /* -- nsmlib_init ------------------------------------------------------- */
 /*    node is anonymous when nodename = 0                                 */
@@ -1950,10 +1966,11 @@ nsmlib_shutdown(NSMcontext *nsmc, int ret, int port)
 /*                                                                        */
 /* ---------------------------------------------------------------------- */
 NSMcontext *
-nsmlib_init(const char *nodename, const char * unused, int port, int shmkey)
+nsmlib_init(const char *nodename, const char *unused, int port, int shmkey)
 {
   NSMcontext *nsmc;
   int ret = 0;
+  int i;
 
   if (! nsmlib_logfp) nsmlib_logfp = stdout;
 
@@ -1961,7 +1978,7 @@ nsmlib_init(const char *nodename, const char * unused, int port, int shmkey)
   if (nodename) {
     if (! *nodename) ret = -1;
     if (strlen(nodename) > NSMSYS_NAME_SIZ) ret = -1;
-    for (int i=0; ret == 0 && nodename[i]; i++) {
+    for (i=0; ret == 0 && nodename[i]; i++) {
       if (! isalnum(nodename[i]) && nodename[i] != '_') ret = -1;
     }
   }

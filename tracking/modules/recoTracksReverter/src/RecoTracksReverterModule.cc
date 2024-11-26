@@ -37,14 +37,21 @@ void RecoTracksReverterModule::initialize()
 
 void RecoTracksReverterModule::event()
 {
+  // get the cut from DB
+  if (!m_flipCutsFromDB.isValid()) {
+    B2WARNING("DBobjects : TrackFlippingCuts not found!");
+    return;
+  }
+
+  // check if the flip&refit is switched on (or off)
+  if (!(*m_flipCutsFromDB).getOnOffInfo()) return;
+
   for (const RecoTrack& recoTrack : m_inputRecoTracks) {
 
     if (not recoTrack.wasFitSuccessful()) {
       continue;
     }
 
-    // get the cut from DB
-    if (!m_flipCutsFromDB.isValid()) continue;
     double mvaFlipCut = (*m_flipCutsFromDB).getFirstCut();
 
     if (recoTrack.getFlipQualityIndicator() < mvaFlipCut) continue;

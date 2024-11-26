@@ -13,8 +13,8 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
+#include <svd/dataobjects/SVDCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -78,6 +78,7 @@ namespace Belle2 {
     StoreArray<TrackFitResult> m_tfr; /**<TrackFitResult StoreArray*/
 
     int m_ntracks = 0; /**< number of tracks*/
+    bool m_plotRecoDigits = false; /**< Produce plots for SVDRecoDigits when True */
 
     //TRACKS
     TH1F* m_nTracks = nullptr; /**< number of tracks*/

@@ -13,6 +13,8 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
+  if (argc < 2) return 1;
+
   RFConf conf(argv[1]);
 
   RFMaster* master = new RFMaster(argv[1]);

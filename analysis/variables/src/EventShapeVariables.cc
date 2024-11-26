@@ -38,11 +38,11 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
         B2INFO("The 0th-order FoxWolfram moment is zero");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getFWMoment(order) / evtShapeCont->getFWMoment(0);
     }
@@ -60,7 +60,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getFWMoment(order);
     }
@@ -90,7 +90,7 @@ namespace Belle2 {
         if (!evtShapeCont)
         {
           B2ERROR("No EventShapeContainer object has been found in the datastore");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
         if (axisName == "thrust")
           return evtShapeCont->getHarmonicMomentThrust(order);
@@ -125,7 +125,7 @@ namespace Belle2 {
         if (!evtShapeCont)
         {
           B2ERROR("No EventShapeContainer object has been found in the datastore");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
         if (axisName == "thrust")
           return evtShapeCont->getCleoConeThrust(order);
@@ -140,11 +140,11 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
         B2INFO("The 0th-order FoxWolfram moment is zero");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getFWMoment(1) / evtShapeCont->getFWMoment(0);
     }
@@ -154,11 +154,11 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
         B2INFO("The 0th-order FoxWolfram moment is zero");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getFWMoment(2) / evtShapeCont->getFWMoment(0);
     }
@@ -168,11 +168,11 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
         B2INFO("The 0th-order FoxWolfram moment is zero");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getFWMoment(3) / evtShapeCont->getFWMoment(0);
     }
@@ -182,11 +182,11 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
         B2INFO("The 0th-order FoxWolfram moment is zero");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getFWMoment(4) / evtShapeCont->getFWMoment(0);
     }
@@ -196,7 +196,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getHarmonicMomentThrust(0);
     }
@@ -206,7 +206,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getHarmonicMomentThrust(1);
     }
@@ -216,7 +216,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getHarmonicMomentThrust(2);
     }
@@ -226,7 +226,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getHarmonicMomentThrust(3);
     }
@@ -236,7 +236,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getHarmonicMomentThrust(4);
     }
@@ -246,7 +246,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getCleoConeThrust(0);
     }
@@ -256,7 +256,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getCleoConeThrust(1);
     }
@@ -266,7 +266,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getCleoConeThrust(2);
     }
@@ -276,7 +276,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getCleoConeThrust(3);
     }
@@ -286,7 +286,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getCleoConeThrust(4);
     }
@@ -296,7 +296,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getCleoConeThrust(5);
     }
@@ -306,7 +306,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getCleoConeThrust(6);
     }
@@ -316,7 +316,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getCleoConeThrust(7);
     }
@@ -326,7 +326,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getCleoConeThrust(8);
     }
@@ -336,7 +336,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       // (3/2)(lamda_2 + lambda_3)
       return 1.5 * (evtShapeCont->getSphericityEigenvalue(1) + evtShapeCont->getSphericityEigenvalue(2)) ;
@@ -347,7 +347,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       // (3/2)(lambda_3)
       return 1.5 * evtShapeCont->getSphericityEigenvalue(2);
@@ -358,7 +358,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getForwardHemisphere4Momentum().M();
     }
@@ -368,7 +368,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getForwardHemisphere4Momentum().px();
     }
@@ -378,7 +378,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getForwardHemisphere4Momentum().py();
     }
@@ -388,7 +388,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getForwardHemisphere4Momentum().pz();
     }
@@ -398,7 +398,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getForwardHemisphere4Momentum().P();
     }
@@ -408,7 +408,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getForwardHemisphere4Momentum().E();
     }
@@ -418,7 +418,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getBackwardHemisphere4Momentum().M();
     }
@@ -428,7 +428,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getBackwardHemisphere4Momentum().px();
     }
@@ -438,7 +438,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getBackwardHemisphere4Momentum().py();
     }
@@ -448,7 +448,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getBackwardHemisphere4Momentum().pz();
     }
@@ -458,7 +458,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getBackwardHemisphere4Momentum().P();
     }
@@ -468,7 +468,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getBackwardHemisphere4Momentum().E();
     }
@@ -478,7 +478,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getThrust();
     }
@@ -488,7 +488,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getThrustAxis().X();
     }
@@ -498,7 +498,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getThrustAxis().Y();
     }
@@ -508,7 +508,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return evtShapeCont->getThrustAxis().Z();
     }
@@ -518,7 +518,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return cos(evtShapeCont->getThrustAxis().Theta());
     }
@@ -535,7 +535,7 @@ namespace Belle2 {
           if (!evtShapeCont)
           {
             B2ERROR("No EventShapeContainer object has been found in the datastore");
-            return std::numeric_limits<float>::quiet_NaN();
+            return Const::doubleNaN;
           }
 
           ROOT::Math::XYZVector newZ = evtShapeCont->getThrustAxis();

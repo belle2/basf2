@@ -39,8 +39,16 @@ namespace Belle2 {
     unsigned getNumberOfWeights() const { return m_weights.size(); }
     /** calculate number of weights from number of nodes */
     unsigned nWeightsCal() const;
+    /** calculate number of weights from number of nodes */
+    unsigned nBiasCal() const;
     /** get weights vector */
     std::vector<float> getWeights() const { return m_weights; }
+    /** get bias vector */
+    std::vector<float> getBias() const { return m_bias; }
+    /** set weights vector */
+    void setWeights(std::vector<float>& weights) { m_weights = weights; }
+    /** set bias vector */
+    void setBias(std::vector<float>& bias) { m_bias = bias; }
 
     /** check if weights are default values or set by some trainer */
     void Trained(bool trained) { m_trained = trained; }
@@ -50,6 +58,8 @@ namespace Belle2 {
     std::vector<unsigned short> m_nNodes;
     /** Weights of the network. */
     std::vector<float> m_weights;
+    /** bias of the network. */
+    std::vector<float> m_bias;
     /** Indicator whether the weights are just default values or have
      *  been set by some trainer (set to true when setWeights() is first called). */
     bool m_trained;

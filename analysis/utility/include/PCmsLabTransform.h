@@ -10,10 +10,11 @@
 
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
+#include <mdst/dbobjects/CollisionAxisCMS.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/geometry/B2Vector3.h>
+#include <framework/utilities/LabToCms.h>
 
-#include <Math/Boost.h>
 #include <Math/LorentzRotation.h>
 #include <Math/Vector4D.h>
 
@@ -48,7 +49,7 @@ namespace Belle2 {
     }
 
     /**
-     * Returns LAB four-momentum of e+e-
+     * Returns LAB four-momentum of e+e-, i.e. pHER + pLER
      */
     ROOT::Math::PxPyPzEVector getBeamFourMomentum() const
     {
@@ -61,8 +62,7 @@ namespace Belle2 {
      */
     const ROOT::Math::LorentzRotation rotateLabToCms() const
     {
-      ROOT::Math::LorentzRotation rotation(ROOT::Math::Boost(-1.*getBoostVector()));
-      return rotation;
+      return LabToCms::rotateLabToCms(getBoostVector(), m_axisCmsDB->getAngleXZ(), m_axisCmsDB->getAngleYZ());
     }
 
     /**
@@ -105,6 +105,7 @@ namespace Belle2 {
   private:
     const DBObjPtr<CollisionInvariantMass> m_invariantMassDB; /**< db object for invariant mass. */
     const DBObjPtr<CollisionBoostVector> m_boostVectorDB; /**< db object for boost vector. */
+    const DBObjPtr<CollisionAxisCMS> m_axisCmsDB; /**< db object for collision axis in CM system from boost. */
   };
 
 } // Belle2 namespace

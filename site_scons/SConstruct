@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import os
 import shlex
 import config
 import subprocess
+import socket
 
 from SCons.Script import AddOption, Command, Dir, Environment, Exit, GetOption, Help, SetOption, Tool, VariantDir
 
@@ -42,7 +42,7 @@ try:
         elif os.environ['BELLE2_MAX_BUILDS'] != 'LOAD':
             num_jobs = min(num_cpus, int(os.environ['BELLE2_MAX_BUILDS']))
     SetOption('num_jobs', num_jobs)
-    print(f'Number of parallel builds: {num_jobs}')
+    print(f'Number of parallel builds: {GetOption("num_jobs")}')
 except:
     pass
 
@@ -77,6 +77,10 @@ if GetOption("check_externals"):
             print(f"externals version ({os.environ['BELLE2_EXTERNALS_VERSION']}) differs from the one defined in .externals ({ext_version})")
             print("Please run b2setup again.")
             Exit(1)
+
+# don't use /tmp on KEKCC because of limited quota
+if socket.gethostname().endswith('.cc.kek.jp'):
+    os.environ['TMPDIR'] = os.path.abspath(os.path.join('build', subdir))
 
 # create construction environment
 global_env = Environment(
@@ -189,7 +193,7 @@ elif option == 'opt':
     # linked, but causes oversubscription when linking libraries concurrently.
     # Performance and RAM usage measurements suggest that between these two
     # evils, oversubscription is the better choice.
-    global_env.Append(LINKFLAGS='-flto$(=%d$)' % GetOption('num_jobs'))
+    global_env.Append(LINKFLAGS=f"-flto$(={int(GetOption('num_jobs'))}$)")
     # LTO requires some binutils wrappers that preserve the GCC IR
     global_env['AR'] = 'gcc-ar'
     global_env['RANLIB'] = 'gcc-ranlib'
@@ -245,7 +249,7 @@ elif option == 'clang':
         # ok, here we process all lines in the g++ default include path. If they
         # have c++ in the name we take them
         if is_search_path and line.find("c++") >= 0:
-            global_env.Append(CXXFLAGS=["-isystem%s" % line.strip()])
+            global_env.Append(CXXFLAGS=[f"-isystem{line.strip()}"])
         # search path starts after this line
         if line.startswith("#include <...> search starts here:"):
             is_search_path = True
@@ -310,7 +314,7 @@ else:
     # loop over directory entries and select package directories
     exclude_dirs = {'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons'}
     if (os.path.exists('.excluded_directories')):
-        f = open('.excluded_directories', 'r')
+        f = open('.excluded_directories')
         for line in f.readlines():
             exclude_dirs.add(line.rstrip('\n'))
         f.close()
@@ -323,7 +327,7 @@ else:
 
     # retain only packages specified in the .light file if the light option is given
     if GetOption('light'):
-        light_packages = set([entry.strip('/') for entry in open('.light').read().split() if entry.endswith('/')])
+        light_packages = {entry.strip('/') for entry in open('.light').read().split() if entry.endswith('/')}
         available_packages = available_packages.intersection(light_packages)
 
     # we looped over all of them and know what's available so let's compile

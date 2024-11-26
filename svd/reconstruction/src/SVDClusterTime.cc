@@ -9,7 +9,6 @@
 #include <framework/logging/Logger.h>
 #include <svd/reconstruction/SVDClusterTime.h>
 #include <svd/reconstruction/SVDMaxSumAlgorithm.h>
-#include <svd/dataobjects/SVDEventInfo.h>
 #include <TMath.h>
 #include <numeric>
 

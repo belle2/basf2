@@ -25,8 +25,6 @@ VALIDATION_OUTPUT_FILE = 'FullTrackingValidation.root'
 N_EVENTS = 1000
 ACTIVE = True
 
-basf2.set_random_seed(1337)
-
 
 class Full(TrackingValidationRun):
     """Validate the full track-finding chain"""
@@ -45,6 +43,7 @@ class Full(TrackingValidationRun):
         'UseSVDHits': True,
         'UseCDCHits': True,
         "UseReassignedHits": True,
+        'UseOnlyBeforeTOP': True,
         'UseNLoops': 1
     }
     #: tracks will be already fitted by
@@ -52,7 +51,7 @@ class Full(TrackingValidationRun):
     fit_tracks = False
     #: But we need to tell the validation module to use the fit information
     use_fit_information = True
-    #: do not create expert-level output histograms
+    #: do not create expert-level output histograms in dedicated folder but in the main folder
     use_expert_folder = False
     #: Include pulls in the validation output
     pulls = True
@@ -63,6 +62,7 @@ class Full(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = Full()
     validation_run.configure_and_execute_from_commandline()
 
@@ -71,3 +71,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     if ACTIVE:
         main()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

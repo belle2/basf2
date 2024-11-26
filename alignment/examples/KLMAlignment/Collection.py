@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -39,7 +38,7 @@ add_reconstruction(main, pruneTracks=False, add_muid_hits=True)
 basf2.set_module_parameters(main, 'Muid', MaxDt=1e9)
 
 # DAF fitter.
-main.add_module('DAFRecoFitter', resortHits=True)
+main.add_module('DAFRecoFitter', resortHits=False)
 
 # Genfit extrapolation.
 main.add_module('SetupGenfitExtrapolation',

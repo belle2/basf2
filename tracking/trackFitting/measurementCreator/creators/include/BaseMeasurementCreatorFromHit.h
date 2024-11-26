@@ -86,9 +86,13 @@ namespace Belle2 {
   /// Standard base class for EKLM measurement creators.
   using EKLMBaseMeasurementCreator = BaseMeasurementCreatorFromHit<RecoHitInformation::UsedEKLMHit, Const::EKLM>;
 
+  // Silence Doxygen which is complaining that "no matching class member found for"
+  // But there should be a better way that I just don't know of / find
+  //! @cond Doxygen_Suppress
   /** CDC hits are a special case, as they must be WireTrackCandHits, not TrackCandHits. **/
   template<>
   genfit::AbsMeasurement*
   CDCBaseMeasurementCreator::createCoordinateMeasurement(RecoHitInformation::UsedCDCHit* cdcHit,
                                                          const RecoHitInformation& recoHitInformation) const;
+  //! @endcond
 }

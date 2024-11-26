@@ -314,29 +314,29 @@ namespace Belle2 {
         string geo_torusx_name = "geo_" + name + "x_name";
         string geo_torus_name = "geo_" + name + "_name";
 
-        G4VSolid* geo_torusxx(NULL), *geo_torus(NULL);
+        G4VSolid* geo_torus(NULL);
 
-        if (subtract != "" || intersect != "")
+        if (subtract != "" || intersect != "") {
+          G4VSolid* geo_torusxx(NULL);
           if (type == "pipe") // for pipes inner space will be created as vacuum
             geo_torusxx = new G4Torus(geo_torusxx_name, 0, torus_R, torus_RT, torus_SPHI, torus_DPHI);
           else
             geo_torusxx = new G4Torus(geo_torusxx_name, torus_r, torus_R, torus_RT, torus_SPHI, torus_DPHI);
-        else if (type == "pipe") // for pipes inner space will be created as vacuum
+          if (subtract != "" && intersect != "") {
+            G4VSolid* geo_torusx = new G4SubtractionSolid(geo_torusx_name, geo_torusxx, elements[subtract].geo,
+                                                          torus.transform.inverse()*elements[subtract].transform);
+            geo_torus = new G4IntersectionSolid(geo_torus_name, geo_torusx, elements[intersect].geo,
+                                                torus.transform.inverse()*elements[intersect].transform);
+          } else if (subtract != "")
+            geo_torus  = new G4SubtractionSolid(geo_torus_name, geo_torusxx, elements[subtract].geo,
+                                                torus.transform.inverse()*elements[subtract].transform);
+          else
+            geo_torus = new G4IntersectionSolid(geo_torus_name, geo_torusxx, elements[intersect].geo,
+                                                torus.transform.inverse()*elements[intersect].transform);
+        } else if (type == "pipe") // for pipes inner space will be created as vacuum
           geo_torus = new G4Torus(geo_torus_name, 0, torus_R, torus_RT, torus_SPHI, torus_DPHI);
         else
           geo_torus = new G4Torus(geo_torus_name, torus_r, torus_R, torus_RT, torus_SPHI, torus_DPHI);
-
-        if (subtract != "" && intersect != "") {
-          G4VSolid* geo_torusx = new G4SubtractionSolid(geo_torusx_name, geo_torusxx, elements[subtract].geo,
-                                                        torus.transform.inverse()*elements[subtract].transform);
-          geo_torus = new G4IntersectionSolid(geo_torus_name, geo_torusx, elements[intersect].geo,
-                                              torus.transform.inverse()*elements[intersect].transform);
-        } else if (subtract != "")
-          geo_torus  = new G4SubtractionSolid(geo_torus_name, geo_torusxx, elements[subtract].geo,
-                                              torus.transform.inverse()*elements[subtract].transform);
-        else if (intersect != "")
-          geo_torus = new G4IntersectionSolid(geo_torus_name, geo_torusxx, elements[intersect].geo,
-                                              torus.transform.inverse()*elements[intersect].transform);
 
         torus.geo = geo_torus;
 

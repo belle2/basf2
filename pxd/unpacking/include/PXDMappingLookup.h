@@ -19,7 +19,7 @@ namespace Belle2 {
      * Belle Note: BELLE2-NOTE-TE-2015-01  "The vertex detector numbering scheme"
      * https://docs.belle2.org/record/243/files/Belle%20II%20note%200010.pdf
      * PXD WhiteBook 3.1.3 Sensor Design and Appendix #3
-     * https://confluence.desy.de/display/BI/PXD+WebHome?preview=/34029260/56330158/PXDwb.pdf
+     * https://xwiki.desy.de/xwiki/bin/download/BI/Belle%20II%20Internal/Detector%20WebHome/PXD%20WebHome/WebHome/PXDwb.pdf?rev=2.1
      *
      */
     class PXDMappingLookup {

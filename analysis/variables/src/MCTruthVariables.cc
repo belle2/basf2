@@ -20,6 +20,8 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/Track.h>
+
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -34,13 +36,10 @@
 namespace Belle2 {
   namespace Variable {
 
-    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-
-
     double isSignal(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       return (status == MCMatching::c_Correct);
@@ -49,7 +48,7 @@ namespace Belle2 {
     double isSignalAcceptWrongFSPs(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits
@@ -67,7 +66,7 @@ namespace Belle2 {
     double isMisidentified(const Particle* part)
     {
       const MCParticle* mcp = part->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
       int st = MCMatching::getMCErrors(part, mcp);
       return ((st & MCMatching::c_MisID) != 0);
     }
@@ -75,7 +74,7 @@ namespace Belle2 {
     double isWrongCharge(const Particle* part)
     {
       const MCParticle* mcp = part->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
       return (part->getCharge() != mcp->getCharge());
     }
 
@@ -83,10 +82,10 @@ namespace Belle2 {
     {
       // neutrals and composites don't make sense
       if (!Const::chargedStableSet.contains(Const::ParticleType(abs(particle->getPDGCode()))))
-        return realNaN;
+        return Const::doubleNaN;
       // get mcparticle weight (mcmatch weight)
       const auto mcpww = particle->getRelatedToWithWeight<MCParticle>();
-      if (!mcpww.first) return realNaN;
+      if (!mcpww.first) return Const::doubleNaN;
       return (mcpww.second < 0);
     }
 
@@ -138,6 +137,24 @@ namespace Belle2 {
       return curMCParticle->getArrayIndex();
     }
 
+    double genQ2PmPd(const Particle* part, const std::vector<double>& daughter_indices)
+    {
+      const MCParticle* mcparticle = part->getMCParticle();
+      if (!mcparticle) return Const::doubleNaN;
+
+      auto daughters = mcparticle->getDaughters();
+
+      ROOT::Math::PxPyPzEVector  p4Daughters;
+      for (auto& double_daughter : daughter_indices) {
+        unsigned long daughter = std::lround(double_daughter);
+        if (daughter >= daughters.size()) return Const::doubleNaN;
+
+        p4Daughters += daughters[daughter]->get4Vector();
+      }
+      auto p4Mother = mcparticle->get4Vector();
+      return (p4Mother - p4Daughters).mag2();
+    }
+
     double genMotherPDG(const Particle* part)
     {
       return genNthMotherPDG(part, {});
@@ -146,10 +163,10 @@ namespace Belle2 {
     double genMotherP(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       const MCParticle* mcmother = mcparticle->getMother();
-      if (!mcmother) return realNaN;
+      if (!mcmother) return Const::doubleNaN;
 
       return mcmother->getMomentum().R();
     }
@@ -162,14 +179,14 @@ namespace Belle2 {
     double genParticleIndex(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return mcparticle->getArrayIndex();
     }
 
     double isSignalAcceptMissingNeutrino(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits
@@ -181,7 +198,7 @@ namespace Belle2 {
     double isSignalAcceptMissingMassive(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits
@@ -194,7 +211,7 @@ namespace Belle2 {
     double isSignalAcceptMissingGamma(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits
@@ -206,7 +223,7 @@ namespace Belle2 {
     double isSignalAcceptMissing(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits
@@ -221,7 +238,7 @@ namespace Belle2 {
     double isSignalAcceptBremsPhotons(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits
@@ -233,7 +250,7 @@ namespace Belle2 {
     double particleMCMatchPDGCode(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return mcparticle->getPDG();
     }
 
@@ -251,28 +268,28 @@ namespace Belle2 {
     double particleMCMatchWeight(const Particle* particle)
     {
       auto relWithWeight = particle->getRelatedToWithWeight<MCParticle>();
-      if (!relWithWeight.first) return realNaN;
+      if (!relWithWeight.first) return Const::doubleNaN;
       return relWithWeight.second;
     }
 
     double particleMCMatchDecayTime(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return mcparticle->getDecayTime();
     }
 
     double particleMCMatchLifeTime(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return mcparticle->getLifetime();
     }
 
     double particleMCMatchPX(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
       ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
@@ -282,7 +299,7 @@ namespace Belle2 {
     double particleMCMatchPY(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
       ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
@@ -292,7 +309,7 @@ namespace Belle2 {
     double particleMCMatchPZ(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
       ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
@@ -302,7 +319,7 @@ namespace Belle2 {
     double particleMCMatchPT(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
       ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
@@ -312,7 +329,7 @@ namespace Belle2 {
     double particleMCMatchE(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
       ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
@@ -322,7 +339,7 @@ namespace Belle2 {
     double particleMCMatchP(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
       ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
@@ -332,7 +349,7 @@ namespace Belle2 {
     double particleMCMatchTheta(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
       ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
@@ -342,7 +359,7 @@ namespace Belle2 {
     double particleMCMatchPhi(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
       ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
@@ -353,21 +370,21 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getMCParticle();
 
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return mcparticle->getNDaughters();
     }
 
     double particleMCRecoilMass(const Particle* part)
     {
       StoreArray<MCParticle> mcparticles;
-      if (mcparticles.getEntries() < 1) return realNaN;
+      if (mcparticles.getEntries() < 1) return Const::doubleNaN;
 
       ROOT::Math::PxPyPzEVector pInitial = mcparticles[0]->get4Vector();
       ROOT::Math::PxPyPzEVector pDaughters;
       const std::vector<Particle*> daughters = part->getDaughters();
       for (auto daughter : daughters) {
         const MCParticle* mcD = daughter->getMCParticle();
-        if (!mcD) return realNaN;
+        if (!mcD) return Const::doubleNaN;
 
         pDaughters += mcD->get4Vector();
       }
@@ -411,11 +428,11 @@ namespace Belle2 {
 
       // Calculate cosThetaBY with daughter neutrino momenta subtracted
       const MCParticle* mcB = part->getMCParticle();
-      if (!mcB) return realNaN;
+      if (!mcB) return Const::doubleNaN;
 
       int mcParticlePDG = abs(mcB->getPDG());
       if (mcParticlePDG != 511 and mcParticlePDG != 521)
-        return realNaN;
+        return Const::doubleNaN;
 
       ROOT::Math::PxPyPzEVector p = T.rotateLabToCms() * (mcB->get4Vector() - MCInvisibleP4(mcB));
       double e_d = p.E();
@@ -430,21 +447,21 @@ namespace Belle2 {
     double mcParticleSecondaryPhysicsProcess(const Particle* p)
     {
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
       return mcp->getSecondaryPhysicsProcess();
     }
 
     double mcParticleStatus(const Particle* p)
     {
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
       return mcp->getStatus();
     }
 
     double particleMCPrimaryParticle(const Particle* p)
     {
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
 
       unsigned int bitmask = MCParticle::c_PrimaryParticle;
       return mcp->hasStatus(bitmask);
@@ -453,7 +470,7 @@ namespace Belle2 {
     double particleMCVirtualParticle(const Particle* p)
     {
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
 
       unsigned int bitmask = MCParticle::c_IsVirtual;
       return mcp->hasStatus(bitmask);
@@ -462,7 +479,7 @@ namespace Belle2 {
     double particleMCInitialParticle(const Particle* p)
     {
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
 
       unsigned int bitmask = MCParticle::c_Initial;
       return mcp->hasStatus(bitmask);
@@ -471,7 +488,7 @@ namespace Belle2 {
     double particleMCISRParticle(const Particle* p)
     {
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
 
       unsigned int bitmask = MCParticle::c_IsISRPhoton;
       return mcp->hasStatus(bitmask);
@@ -480,7 +497,7 @@ namespace Belle2 {
     double particleMCFSRParticle(const Particle* p)
     {
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
 
       unsigned int bitmask = MCParticle::c_IsFSRPhoton;
       return mcp->hasStatus(bitmask);
@@ -489,7 +506,7 @@ namespace Belle2 {
     double particleMCPhotosParticle(const Particle* p)
     {
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
 
       unsigned int bitmask = MCParticle::c_IsPHOTOSPhoton;
       return mcp->hasStatus(bitmask);
@@ -498,7 +515,7 @@ namespace Belle2 {
     double generatorEventWeight(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
-      if (!evtMetaData) return realNaN;
+      if (!evtMetaData) return Const::doubleNaN;
       return evtMetaData->getGeneratedWeight();
     }
 
@@ -542,78 +559,116 @@ namespace Belle2 {
       return tauDecay->getTauMinusMcProng();
     }
 
+    double tauPlusEgstar(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return 0;
+      }
+      return tauDecay->getTauPlusEgstar();
+    }
+
+    double tauMinusEgstar(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return 0;
+      }
+      return tauDecay->getTauMinusEgstar();
+    }
+
     double isReconstructible(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
-        return realNaN;
+        return Const::doubleNaN;
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
 
       // If charged: make sure it was seen in the SVD.
       // If neutral: make sure it was seen in the ECL.
       return (abs(mcp->getCharge()) > 0) ? seenInSVD(p) : seenInECL(p);
     }
 
+    double isTrackFound(const Particle* p)
+    {
+      if (p->getParticleSource() != Particle::EParticleSourceObject::c_MCParticle)
+        return Const::doubleNaN;
+      const MCParticle* tmp_mcP = p->getMCParticle();
+      if (!Const::chargedStableSet.contains(Const::ParticleType(abs(tmp_mcP->getPDG()))))
+        return Const::doubleNaN;
+      Track* tmp_track = tmp_mcP->getRelated<Track>();
+      if (tmp_track) {
+        const TrackFitResult* tmp_tfr = tmp_track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(tmp_mcP->getPDG())));
+        if (tmp_tfr->getChargeSign()*tmp_mcP->getCharge() > 0)
+          return 1;
+        else
+          return -1;
+      }
+      return 0;
+    }
+
     double seenInPXD(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
-        return realNaN;
+        return Const::doubleNaN;
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
       return mcp->hasSeenInDetector(Const::PXD);
     }
 
     double seenInSVD(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
-        return realNaN;
+        return Const::doubleNaN;
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
       return mcp->hasSeenInDetector(Const::SVD);
     }
 
     double seenInCDC(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
-        return realNaN;
+        return Const::doubleNaN;
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
       return mcp->hasSeenInDetector(Const::CDC);
     }
 
     double seenInTOP(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
-        return realNaN;
+        return Const::doubleNaN;
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
       return mcp->hasSeenInDetector(Const::TOP);
     }
 
     double seenInECL(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
-        return realNaN;
+        return Const::doubleNaN;
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
       return mcp->hasSeenInDetector(Const::ECL);
     }
 
     double seenInARICH(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
-        return realNaN;
+        return Const::doubleNaN;
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
       return mcp->hasSeenInDetector(Const::ARICH);
     }
 
     double seenInKLM(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
-        return realNaN;
+        return Const::doubleNaN;
       const MCParticle* mcp = p->getMCParticle();
-      if (!mcp) return realNaN;
+      if (!mcp) return Const::doubleNaN;
       return mcp->hasSeenInDetector(Const::KLM);
     }
 
@@ -718,18 +773,18 @@ namespace Belle2 {
        * of the particle (which it inherits from the mc match of the track)
        */
       const MCParticle* matchedToParticle = particle->getMCParticle();
-      if (!matchedToParticle) return realNaN;
+      if (!matchedToParticle) return Const::doubleNaN;
       int matchedToIndex = matchedToParticle->getArrayIndex();
 
       const ECLCluster* cluster = particle->getECLCluster();
-      if (!cluster) return realNaN;
+      if (!cluster) return Const::doubleNaN;
 
       const auto mcps = cluster->getRelationsTo<MCParticle>();
       for (unsigned int i = 0; i < mcps.size(); ++i)
         if (mcps[i]->getArrayIndex() == matchedToIndex)
           return mcps.weight(i);
 
-      return realNaN;
+      return Const::doubleNaN;
     }
 
     double particleClusterBestMCMatchWeight(const Particle* particle)
@@ -745,13 +800,13 @@ namespace Belle2 {
        * mcMatchWeight
        */
       const ECLCluster* cluster = particle->getECLCluster();
-      if (!cluster) return realNaN;
+      if (!cluster) return Const::doubleNaN;
 
       /* loop over all mcparticles related to this cluster, find the largest
        * weight by std::sort-ing the doubles
        */
       auto mcps = cluster->getRelationsTo<MCParticle>();
-      if (mcps.size() == 0) return realNaN;
+      if (mcps.size() == 0) return Const::doubleNaN;
 
       std::vector<double> weights;
       for (unsigned int i = 0; i < mcps.size(); ++i)
@@ -774,10 +829,10 @@ namespace Belle2 {
        * For photons (or any ECL-based particle) this will be the same as the mcPDG
        */
       const ECLCluster* cluster = particle->getECLCluster();
-      if (!cluster) return realNaN;
+      if (!cluster) return Const::doubleNaN;
 
       auto mcps = cluster->getRelationsTo<MCParticle>();
-      if (mcps.size() == 0) return realNaN;
+      if (mcps.size() == 0) return Const::doubleNaN;
 
       std::vector<std::pair<double, int>> weightsAndIndices;
       for (unsigned int i = 0; i < mcps.size(); ++i)
@@ -793,7 +848,7 @@ namespace Belle2 {
     double particleClusterTotalMCMatchWeight(const Particle* particle)
     {
       const ECLCluster* cluster = particle->getECLCluster();
-      if (!cluster) return realNaN;
+      if (!cluster) return Const::doubleNaN;
 
       auto mcps = cluster->getRelationsTo<MCParticle>();
 
@@ -805,14 +860,80 @@ namespace Belle2 {
       return weightsum;
     }
 
+    // Helper function for particleClusterTotalMCMatchWeightForKlong
+    void getKlongWeightMap(const Particle* particle, std::map<int, double>& mapMCParticleIndxAndWeight)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+
+      for (unsigned int i = 0; i < mcps.size(); ++i) {
+        double weight = mcps.weight(i);
+        const MCParticle* mcp = mcps[i];
+
+        while (mcp) {
+          if (mcp->getPDG() == 130) {
+            int index = mcp->getArrayIndex();
+            if (mapMCParticleIndxAndWeight.find(index) != mapMCParticleIndxAndWeight.end()) {
+              mapMCParticleIndxAndWeight.at(index) = mapMCParticleIndxAndWeight.at(index) + weight;
+            } else {
+              mapMCParticleIndxAndWeight.insert({index, weight});
+            }
+            break;
+          } else {
+            mcp = mcp->getMother();
+          }
+        }
+      }
+    }
+
+    double particleClusterTotalMCMatchWeightForKlong(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return Const::doubleNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return Const::doubleNaN;
+
+      std::map<int, double> mapMCParticleIndxAndWeight;
+      getKlongWeightMap(particle, mapMCParticleIndxAndWeight);
+
+      double totalWeight = 0;
+      for (const auto& map : mapMCParticleIndxAndWeight) {
+        totalWeight += map.second;
+      }
+
+      return totalWeight;
+    }
+
+    double particleClusterTotalMCMatchWeightForBestKlong(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return Const::doubleNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return Const::doubleNaN;
+
+      std::map<int, double> mapMCParticleIndxAndWeight;
+      getKlongWeightMap(particle, mapMCParticleIndxAndWeight);
+
+      if (mapMCParticleIndxAndWeight.size() == 0)
+        return 0.0;
+
+      auto maxMap = std::max_element(mapMCParticleIndxAndWeight.begin(), mapMCParticleIndxAndWeight.end(),
+      [](const auto & x, const auto & y) { return x.second < y.second; }
+                                    );
+
+      return maxMap->second;
+    }
+
     double isBBCrossfeed(const Particle* particle)
     {
       if (particle == nullptr)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       int pdg = particle->getPDGCode();
       if (abs(pdg) != 511 && abs(pdg) != 521 && abs(pdg) != 531)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       std::vector<const Particle*> daughters = particle->getFinalStateDaughters();
       int nDaughters = daughters.size();
@@ -832,7 +953,7 @@ namespace Belle2 {
           curMCParticle = curMCMother;
         }
         if (curMCParticle == nullptr) {
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
       }
 
@@ -841,6 +962,22 @@ namespace Belle2 {
         return 0;
       else
         return 1;
+    }
+
+    int ancestorBIndex(const Particle* particle)
+    {
+      const MCParticle* mcpart = particle->getMCParticle();
+
+      while (mcpart) {
+        int pdg = std::abs(mcpart->getPDG());
+
+        if ((pdg == 521) || (pdg == 511))
+          return mcpart->getArrayIndex();
+
+        mcpart = mcpart->getMother();
+      }
+
+      return -1;
     }
 
     VARIABLE_GROUP("MC matching and MC truth");
@@ -860,6 +997,18 @@ namespace Belle2 {
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
                       "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.  :noindex:");
 
+    REGISTER_VARIABLE("genQ2PmPd(i,j,...)", genQ2PmPd, R"DOC(
+                       Returns the generated four momentum transfer squared :math:`q^2` calculated as :math:`q^2 = (p_m - p_{d_i} - p_{d_j} - ...)^2`.
+
+                       Here :math:`p_m` is the four momentum of the given (mother) particle,
+                       and :math:`p_{d_{i,j,...}}` are the daughter particles with indices given as arguments .
+                       The ordering of daughters is as defined in the DECAY.DEC file used in the generation, with the numbering starting at :math:`N=0`.
+
+                       Returns NaN if no related MCParticle could be found.
+                       Returns NaN if any of the given indices is larger than the number of daughters of the given particle.
+
+                       )DOC", ":math:`[\\text{GeV}/\\text{c}]^2`");
+
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
                       "Check the array index of a particles generated mother");
     REGISTER_VARIABLE("genMotherID(i)", genNthMotherIndex,
@@ -869,6 +1018,8 @@ namespace Belle2 {
     // variable in sphinx
     REGISTER_VARIABLE("isBBCrossfeed", isBBCrossfeed,
                       "Returns 1 for crossfeed in reconstruction of given B meson, 0 for no crossfeed and NaN for no true B meson or failed truthmatching.");
+    REGISTER_VARIABLE("ancestorBIndex", ancestorBIndex,
+                      "Returns array index of B ancestor, or -1 if no B or no MC-matching is found.");
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle\n\n", "GeV/c");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
@@ -1061,12 +1212,18 @@ List of possible values (taken from the Geant4 source of
                       "[Eventbased] Prong for the positive tau lepton in a tau pair generated event.");
     REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
                       "[Eventbased] Prong for the negative tau lepton in a tau pair generated event.");
+    REGISTER_VARIABLE("tauPlusEgstar", tauPlusEgstar,
+                      "[Eventbased] Energy of radiated gamma from positive tau lepton in a tau pair generated event.");
+    REGISTER_VARIABLE("tauMinusEgstar", tauMinusEgstar,
+                      "[Eventbased] Energy of radiated gamma from negative tau lepton in a tau pair generated event.");
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,
                       "Checks charged particles were seen in the SVD and neutrals in the ECL, returns 1.0 if so, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInPXD", seenInPXD,
                       "Returns 1.0 if the MC particle was seen in the PXD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
+    REGISTER_VARIABLE("isTrackFound", isTrackFound,
+                      "works on charged stable particle list created from MCParticles, returns NaN if not ; returns 1.0 if there is a reconstructed track related to the charged stable MCParticle with the correct charge, return -1.0 if the reconstructed track has the wrong charge, return 0.0 when no reconstructed track is found.");
     REGISTER_VARIABLE("seenInSVD", seenInSVD,
                       "Returns 1.0 if the MC particle was seen in the SVD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInCDC", seenInCDC,
@@ -1091,6 +1248,12 @@ List of possible values (taken from the Geant4 source of
                       "Returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
     REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight,
                       "Returns the sum of all weights of the ECLCluster -> MCParticles relations.");
+
+    REGISTER_VARIABLE("clusterTotalMCMatchWeightForKlong", particleClusterTotalMCMatchWeightForKlong,
+                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is a Klong or daughter of a Klong");
+    REGISTER_VARIABLE("clusterTotalMCMatchWeightForBestKlong", particleClusterTotalMCMatchWeightForBestKlong,
+                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is the same Klong or daughter of the Klong. If multiple MC Klongs are related to the ECLCluster, returns the sum of weights for the best matched Klong.");
+
 
   }
 }

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -49,7 +48,7 @@ class DQM():
         call constructor of base class, required.
         """
 
-        super(DQM, self).__init__()
+        super().__init__()
 
         #: input file name
         self.f = TFile(fname)

@@ -87,12 +87,20 @@ class Saving1stMVAData(harvesting.HarvestingModule):
         n_svd_hits = nan
         phi0_estimate = nan
         n_cdc_hits = nan
+        n_pxd_hits = nan
         svd_layer3_positionSigma = nan
         first_cdc_layer = nan
         last_cdc_layer = nan
         ndf_hits = nan
         isPrimary_misID = False
         ismatched = False
+        ismatched_CC = False
+        ismatched_WC = False
+        isclone_CC = False
+        isclone_WC = False
+        isclone = False
+        isbackground = False
+        isghost = False
         isprimary = False
         charge_truth = nan
         inGoingArmTime = nan
@@ -101,6 +109,10 @@ class Saving1stMVAData(harvesting.HarvestingModule):
         outGoingArmTimeError = nan
         InOutArmTimeDifference = nan
         InOutArmTimeDifferenceError = nan
+        pt_estimate = nan
+        track_charge = nan
+        quality_flip_indicator = nan
+        quality_2ndflip_indicator = nan
 
         if (recoTrack):
 
@@ -114,12 +126,24 @@ class Saving1stMVAData(harvesting.HarvestingModule):
             InOutArmTimeDifference = recoTrack.getInOutArmTimeDifference()
             InOutArmTimeDifferenceError = recoTrack.getInOutArmTimeDifferenceError()
 
-            ismatched = track_match_look_up.isMatchedPRRecoTrack(recoTrack)
+            ismatched = track_match_look_up.isAnyChargeMatchedPRRecoTrack(recoTrack)
+            ismatched_CC = track_match_look_up.isCorrectChargeMatchedPRRecoTrack(recoTrack)
+            ismatched_WC = track_match_look_up.isWrongChargeMatchedPRRecoTrack(recoTrack)
+
+            isclone = track_match_look_up.isAnyChargeClonePRRecoTrack(recoTrack)
+            isclone_CC = track_match_look_up.isCorrectChargeClonePRRecoTrack(recoTrack)
+            isclone_WC = track_match_look_up.isWrongChargeClonePRRecoTrack(recoTrack)
+
+            isbackground = track_match_look_up.isBackgroundPRRecoTrack(recoTrack)
+            isghost = track_match_look_up.isGhostPRRecoTrack(recoTrack)
+            quality_flip_indicator = recoTrack.getFlipQualityIndicator()
+            quality_2ndflip_indicator = recoTrack.get2ndFlipQualityIndicator()
+
             if mc_particle and fit_result:
                 isprimary = bool(mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle))
                 charge_truth = mc_particle.getCharge()
+                track_charge = fit_result.getChargeSign()
                 if isprimary:
-                    track_charge = fit_result.getChargeSign()
                     if mc_particle.getCharge() != track_charge:
                         isPrimary_misID = True
 
@@ -133,6 +157,9 @@ class Saving1stMVAData(harvesting.HarvestingModule):
                 d0_estimate = fit_result.getD0()
                 phi0_estimate = fit_result.getPhi() % (2.0 * math.pi)
                 tan_lambda_estimate = fit_result.getCotTheta()
+
+                mom = fit_result.getMomentum()
+                pt_estimate = mom.Rho()
 
                 d0_variance = fit_result.getCov()[0]
                 z0_variance = fit_result.getCov()[12]
@@ -208,20 +235,32 @@ class Saving1stMVAData(harvesting.HarvestingModule):
             n_svd_hits=n_svd_hits,
             phi0_estimate=phi0_estimate,
             n_cdc_hits=n_cdc_hits,
+            n_pxd_hits=n_pxd_hits,
             svd_layer3_positionSigma=svd_layer3_positionSigma,
             first_cdc_layer=first_cdc_layer,
             last_cdc_layer=last_cdc_layer,
             ndf_hits=ndf_hits,
             isPrimary_misID=isPrimary_misID,
             ismatched=ismatched,
+            ismatched_CC=ismatched_CC,
+            ismatched_WC=ismatched_WC,
+            isclone_CC=isclone_CC,
+            isclone_WC=isclone_WC,
+            isclone=isclone,
+            isbackground=isbackground,
+            isghost=isghost,
             isprimary=isprimary,
             charge_truth=charge_truth,
+            track_charge=track_charge,
             inGoingArmTime=inGoingArmTime,
             inGoingArmTimeError=inGoingArmTimeError,
             outGoingArmTime=outGoingArmTime,
             outGoingArmTimeError=outGoingArmTimeError,
             InOutArmTimeDifference=InOutArmTimeDifference,
             InOutArmTimeDifferenceError=InOutArmTimeDifferenceError,
+            pt_estimate=pt_estimate,
+            quality_flip_indicator=quality_flip_indicator,
+            quality_2ndflip_indicator=quality_2ndflip_indicator,
             )
         return crops
 

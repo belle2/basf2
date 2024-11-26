@@ -119,7 +119,7 @@ A good place to look for Belle II-specific jargon is the **Belle II Glossary**.
 .. admonition:: Solution
      :class: toggle solution
 
-     `Belle II Glossary <https://confluence.desy.de/display/BI/Main+Glossary>`_
+     `Belle II Glossary <https://xwiki.desy.de/xwiki/rest/p/1e1f2>`_
 
 basf2 modules
 ~~~~~~~~~~~~~
@@ -811,8 +811,8 @@ backward-compatibility that is guaranteed in the software.
 
 .. seealso::
 
-    The confluence page `Software Backward Compatibility
-    <https://confluence.desy.de/display/BI/Backward+Compatibility>`_
+    The XWiki page `Software Backward Compatibility
+    <https://xwiki.desy.de/xwiki/rest/p/0a372>`_
 
 .. admonition:: Question
      :class: exercise stacked
@@ -889,7 +889,6 @@ convenience functions that you find yourself using often.
 In pseudo-python you will see they are very often of the form:
 
 .. code-block:: python
-        :linenos:
 
         import basf2
 
@@ -961,7 +960,7 @@ Good luck.
 .. seealso::
 
     While the next sections will help you to understand the basics of steering
-    files step by step, there are also some comple examples for steering files
+    files step by step, there are also some complete examples for steering files
     `in the main software repository <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples>`_.
     You might want to take a look there after the starterkit.
 

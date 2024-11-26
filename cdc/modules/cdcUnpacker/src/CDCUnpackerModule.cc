@@ -11,6 +11,7 @@
 #include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 // framework - Database
@@ -54,7 +55,8 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("enable2ndHit", m_enable2ndHit, "Enable 2nd hit timing as a individual CDCHit object.", false);
   addParam("tdcAuxOffset", m_tdcAuxOffset, "TDC auxiliary offset (in TDC count).", 0);
   addParam("pedestalSubtraction", m_pedestalSubtraction, "Enbale ADC pedestal subtraction.", m_pedestalSubtraction);
-
+  addParam("relationRawHits", m_relationRawHits, "Enbale relation of CDCHits, CDCRawHits, and CDCRawHitWaveForms.", false);
+  addParam("recoverBoardIdError", m_recoverBoardIdError, "Recover boardID errors", true);
 }
 
 CDCUnpackerModule::~CDCUnpackerModule()
@@ -81,9 +83,25 @@ void CDCUnpackerModule::initialize()
   m_CDCRawHits.registerInDataStore(m_cdcRawHitName);
   m_CDCHits.registerInDataStore(m_cdcHitName);
 
+  if (m_relationRawHits == true) {
+    m_CDCHits.registerRelationTo(m_CDCRawHitWaveForms);
+    m_CDCHits.registerRelationTo(m_CDCRawHits);
+
+    // Set default names for the relations.
+    m_relCDCRawHitToCDCHitName = DataStore::relationName(
+                                   DataStore::arrayName<CDCRawHit>(m_cdcRawHitName),
+                                   DataStore::arrayName<CDCHit>(m_cdcHitName));
+
+    m_relCDCRawHitWFToCDCHitName = DataStore::relationName(
+                                     DataStore::arrayName<CDCRawHitWaveForm>(m_cdcRawHitWaveFormName),
+                                     DataStore::arrayName<CDCHit>(m_cdcHitName));
+  }
+
   if (m_enablePrintOut == true) {
     B2INFO("CDCUnpacker: " << LogVar("FADC threshold", m_fadcThreshold));
   }
+
+  TrackFindingCDC::CDCWireTopology::getInstance();
 }
 
 void CDCUnpackerModule::beginRun()
@@ -106,8 +124,15 @@ void CDCUnpackerModule::event()
   // TDC count for the trigger scinti.
   int tdcCountTrig = m_tdcOffset;
 
+  const TrackFindingCDC::CDCWireTopology& wireTopology = TrackFindingCDC::CDCWireTopology::getInstance();
+
   // Create Data objects.
   m_CDCHits.clear();
+
+  if (m_relationRawHits == true) {
+    RelationArray rawCDCsToCDCHits(m_CDCRawHits, m_CDCHits, m_relCDCRawHitToCDCHitName); // CDCRawHit <-> CDCHit
+    RelationArray rawCDCWFsToCDCHits(m_CDCRawHitWaveForms, m_CDCHits, m_relCDCRawHitWFToCDCHitName); // CDCRawHitWaveForm <-> CDCHit
+  }
 
   if (m_enableStoreCDCRawHit == true) {
     m_CDCRawHits.clear();
@@ -121,12 +146,14 @@ void CDCUnpackerModule::event()
   const int nEntries = m_rawCDCs.getEntries();
 
   B2DEBUG(99, "nEntries of RawCDCs : " << nEntries);
+
   for (int i = 0; i < nEntries; ++i) {
     const int subDetectorId = m_rawCDCs[i]->GetNodeID(0);
     const int iNode = (subDetectorId & 0xFFFFFF);
     const int nEntriesRawCDC = m_rawCDCs[i]->GetNumEntries();
 
     B2DEBUG(99, LogVar("nEntries of rawCDC[i]", nEntriesRawCDC));
+
     for (int j = 0; j < nEntriesRawCDC; ++j) {
       int trigType = m_rawCDCs[i]->GetTRGType(j); // Get event type of L1 trigger.
       int nWords[48];
@@ -141,6 +168,10 @@ void CDCUnpackerModule::event()
 
       for (int k = 0; k < MaxNumOfCh; ++k) {
         nWords[k] = m_rawCDCs[i]->GetDetectorNwords(j, k);
+        if (MaxNumOfCh == 48 && m_rawCDCs[i]->CheckOnlineRemovedDataBit(j, k) == true) { //for error flag in ff55 trailer
+          if (nWords[k] != 0)
+            B2FATAL("The data is not removed for the bad channel (" << j << "," << k << ") with error flag in ff55 trailer! ");
+        }
         data32tab[k] = (int*)m_rawCDCs[i]->GetDetectorBuffer(j, k);
       }
 
@@ -174,6 +205,20 @@ void CDCUnpackerModule::event()
         }
 
         setCDCPacketHeader(ibuf);
+
+        // Skip invalid boardsIDs
+        if (m_boardId > 300) {
+          B2WARNING("Invalid board " << std::hex << m_boardId << std::dec << " readout buffer block: " << i << " block channel: " << iFiness);
+          if (m_recoverBoardIdError) {
+            m_boardId = m_boardId & 0x01ff;
+            if (m_boardId > 300) {
+              B2WARNING("Unrecoverable board " << std::hex << m_boardId);
+              continue;
+            }
+          } else {
+            continue;
+          }
+        }
 
         const int dataType = getDataType();
         const int dataLength = getDataLength() / 4; // Data length in int word (4bytes).
@@ -270,17 +315,28 @@ void CDCUnpackerModule::event()
             if (tdc1 != 0x7fff) {
               // Store to the CDCHit object.
               const WireID  wireId = getWireID(board, iCh);
-
-              if (trgTime < tdc1) {
-                tdc1 = (trgTime | 0x8000) - tdc1;
+              if (wireTopology.isValidWireID(wireId)) {
+                if (trgTime < tdc1) {
+                  tdc1 = (trgTime | 0x8000) - tdc1;
+                } else {
+                  tdc1 = trgTime - tdc1;
+                }
+                CDCHit* firstHit = m_CDCHits.appendNew(tdc1, fadcSum, wireId);
+                if (m_enable2ndHit == true) {
+                  CDCHit* secondHit = m_CDCHits.appendNew(tdc2, fadcSum, wireId);
+                  secondHit->setOtherHitIndices(firstHit);
+                  secondHit->set2ndHitFlag();
+                }
+                if (m_enableStoreCDCRawHit == true) {
+                  if (m_relationRawHits == true) {
+                    for (int iSample = 0; iSample < nSamples; ++iSample) {
+                      m_CDCHits[m_CDCHits.getEntries() - 1]->addRelationTo(m_CDCRawHitWaveForms[m_CDCRawHitWaveForms.getEntries() - 1 + iSample -
+                                                                           (nSamples - 1) ]);
+                    }
+                  }
+                }
               } else {
-                tdc1 = trgTime - tdc1;
-              }
-              CDCHit* firstHit = m_CDCHits.appendNew(tdc1, fadcSum, wireId);
-              if (m_enable2ndHit == true) {
-                CDCHit* secondHit = m_CDCHits.appendNew(tdc2, fadcSum, wireId);
-                secondHit->setOtherHitIndices(firstHit);
-                secondHit->set2ndHitFlag();
+                B2WARNING("Skip invalid wire board, channel: " << board << ", " << iCh);
               }
             }
 
@@ -320,8 +376,8 @@ void CDCUnpackerModule::event()
             m_buffer.push_back(static_cast<unsigned short>(ibuf[index] & 0xffff));
           }
 
-          const int bufSize = static_cast<int>(m_buffer.size());
-          for (int it = 0; it < bufSize;) {
+          const size_t bufSize = m_buffer.size();
+          for (size_t it = 0; it < bufSize;) {
             unsigned short header = m_buffer.at(it);     // Header.
             unsigned short ch = (header & 0xff00) >> 8;  // Channel ID in FE.
             unsigned short length = (header & 0xff) / 2; // Data length in short word.
@@ -344,12 +400,12 @@ void CDCUnpackerModule::event()
                           << LogVar("board id", board)
                           << LogVar("channel", ch));
               }
-              it += length;
               break;
             }
 
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.
             unsigned short fadcSum = m_buffer.at(it + 2);  // FADC sum.
+
             if (m_pedestalSubtraction == true) {
               int diff = fadcSum - (*m_adcPedestalFromDB)->getPedestal(board, ch);
               if (diff <= m_fadcThreshold) {
@@ -372,6 +428,20 @@ void CDCUnpackerModule::event()
               B2ERROR("CDCUnpacker : Undefined data length (should be 4 or 5 short words) ");
             }
 
+            if (ch >= 48) {
+              B2WARNING("Invalid channel "
+                        << LogVar("channel", ch)
+                        << LogVar("board", board)
+                        << LogVar("buffer total size", m_buffer.size())
+                        << LogVar("length", length)
+                        << LogVar("tdc", tdc1)
+                        << LogVar("adc", fadcSum)
+                        << LogVar("tot", tot)
+                       );
+              it += length;
+              continue;
+            }
+
             if (m_enablePrintOut == true) {
               printf("%4x %4x %4x %4x %4x %4x %4x \n", ch, length, tot, fadcSum, tdc1, tdc2, tdcFlag);
             }
@@ -383,32 +453,45 @@ void CDCUnpackerModule::event()
               const WireID  wireId = getWireID(board, ch);
 
               if (isValidBoardChannel(wireId)) {
-                if (board == m_boardIDTrig && ch == m_channelTrig) {
-                  tdcCountTrig = tdc1;
-                } else {
-                  CDCHit* firstHit = m_CDCHits.appendNew(tdc1, fadcSum, wireId,
-                                                         0, tot);
-                  if (length == 5) {
-                    if (m_enable2ndHit == true) {
-                      CDCHit* secondHit = m_CDCHits.appendNew(tdc2, fadcSum, wireId,
-                                                              0, tot);
-                      secondHit->setOtherHitIndices(firstHit);
-                      secondHit->set2ndHitFlag();
+                if (wireTopology.isValidWireID(wireId)) {
+
+                  if (board == m_boardIDTrig && ch == m_channelTrig) {
+                    tdcCountTrig = tdc1;
+                  } else {
+                    CDCHit* firstHit = m_CDCHits.appendNew(tdc1, fadcSum, wireId,
+                                                           0, tot);
+                    if (length == 5) {
+                      if (m_enable2ndHit == true) {
+                        CDCHit* secondHit = m_CDCHits.appendNew(tdc2, fadcSum, wireId,
+                                                                0, tot);
+                        secondHit->setOtherHitIndices(firstHit);
+                        secondHit->set2ndHitFlag();
+                      }
                     }
                   }
-                }
 
-                if (m_enableStoreCDCRawHit == true) {
-                  // Store to the CDCRawHit object.
-                  m_CDCRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
-                                         trgTime, fadcSum, tdc1, tdc2, tot);
+                  if (m_enableStoreCDCRawHit == true) {
+                    // Store to the CDCRawHit object.
+                    if (m_relationRawHits == true) {
+                      CDCRawHit* rawHit = m_CDCRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
+                                                                 trgTime, fadcSum, tdc1, tdc2, tot);
+                      m_CDCHits[m_CDCHits.getEntries() - 1]->addRelationTo(rawHit);
+                      if (m_enable2ndHit == true) {
+                        m_CDCHits[m_CDCHits.getEntries() - 2]->addRelationTo(rawHit);
+                      }
+                    } else {
+                      m_CDCRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
+                                             trgTime, fadcSum, tdc1, tdc2, tot);
+                    }
+                  }
+                } else {
+                  B2WARNING("Skip invalid wire board, channel: " << board << ", " << ch);
                 }
-
               } else {
                 B2WARNING("Undefined board id is fired: " << LogVar("board id", board) << " " << LogVar("channel", ch));
               }
             }
-            it += static_cast<int>(length);
+            it += length;
           }
 
         } else {

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -16,7 +14,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="ARICH channel masks",
-    expert_username="luka",
+    expert_username="kspenko",
     description=__doc__,
     input_data_formats=["raw"],
     input_data_names=["bhabha_all_calib"],
@@ -79,6 +77,7 @@ def get_calibrations(input_data, **kwargs):
     # Algorithm setup
 
     from basf2 import create_path
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import ARICHChannelMaskMaker
 
     alg_arich = ARICHChannelMaskMaker()

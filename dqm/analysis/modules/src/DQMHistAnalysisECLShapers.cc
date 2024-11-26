@@ -12,6 +12,9 @@
 //ROOT
 #include <TProfile.h>
 
+//boost
+#include "boost/format.hpp"
+
 using namespace Belle2;
 
 REG_MODULE(DQMHistAnalysisECLShapers);
@@ -20,40 +23,27 @@ DQMHistAnalysisECLShapersModule::DQMHistAnalysisECLShapersModule()
   : DQMHistAnalysisModule()
 {
   B2DEBUG(20, "DQMHistAnalysisECLShapers: Constructor done.");
+  setDescription("Processes information involving ECL pedestals (widths and rms).");
 
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
+  addParam("pvPrefix", m_pvPrefix, "Prefix to use for PVs registered by this module",
+           std::string("ECL:"));
 }
 
 
-DQMHistAnalysisECLShapersModule::~DQMHistAnalysisECLShapersModule()
-{
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
-}
+DQMHistAnalysisECLShapersModule::~DQMHistAnalysisECLShapersModule() { }
 
 void DQMHistAnalysisECLShapersModule::initialize()
 {
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    for (int i = 0; i < c_collector_count; i++) {
-      std::string pv_name = "ECL:logic_check:crate" + std::to_string(i + 1);
-      SEVCHK(ca_create_channel(pv_name.c_str(), NULL, NULL, 10, &chid_logic[i]), "ca_create_channel failure");
-    }
-    SEVCHK(ca_create_channel("ECL:pedwidth:test:max_fw", NULL, NULL, 10,
-                             &chid_pedwidth[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel("ECL:pedwidth:test:max_br", NULL, NULL, 10,
-                             &chid_pedwidth[1]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel("ECL:pedwidth:test:max_bw", NULL, NULL, 10,
-                             &chid_pedwidth[2]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel("ECL:pedwidth:test:max_al", NULL, NULL, 10,
-                             &chid_pedwidth[3]), "ca_create_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  for (int i = 0; i < c_collector_count; i++) {
+    std::string pv_name = (boost::format("logic_check:crate%02d") %
+                           (i + 1)).str();
+    registerEpicsPV(m_pvPrefix + pv_name, pv_name);
   }
-#endif
+  for (auto part_id : {"fw", "br", "bw", "al"}) {
+    std::string pv_name = "pedwidth:max_";
+    pv_name += part_id;
+    registerEpicsPV(m_pvPrefix + pv_name, pv_name);
+  }
 
   m_monObj = getMonitoringObject("ecl");
 
@@ -108,24 +98,23 @@ void DQMHistAnalysisECLShapersModule::event()
 
   //== Set EPICS PVs
 
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    if (h_fail_crateid != NULL) {
-      // Set fit consistency check PVs
-      for (int i = 0; i < c_collector_count; i++) {
-        int errors_count = h_fail_crateid->GetBinContent(i + 1);
-        if (chid_logic[i]) SEVCHK(ca_put(DBR_LONG, chid_logic[i], (void*)&errors_count), "ca_set failure");
-      }
-      // Set pedestal width PVs
-      for (int i = 0; i < 4; i++) {
-        if (m_pedwidth_max[i] <= 0) continue;
-        if (!chid_pedwidth[i]) continue;
-        SEVCHK(ca_put(DBR_DOUBLE, chid_pedwidth[i], (void*)&m_pedwidth_max[i]), "ca_set failure");
-      }
+  if (h_fail_crateid != NULL) {
+    // Set fit consistency check PVs
+    for (int i = 0; i < c_collector_count; i++) {
+      std::string pv_name = (boost::format("logic_check:crate%02d") %
+                             (i + 1)).str();
+      int errors_count = h_fail_crateid->GetBinContent(i + 1);
+      setEpicsPV(pv_name, errors_count);
     }
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+    // Set pedestal width PVs
+    static const char* part_id[] = {"fw", "br", "bw", "al"};
+    for (int i = 0; i < 4; i++) {
+      if (m_pedwidth_max[i] <= 0) continue;
+      std::string pv_name = "pedwidth:max_";
+      pv_name += part_id[i];
+      setEpicsPV(pv_name, m_pedwidth_max[i]);
+    }
   }
-#endif
 }
 
 void DQMHistAnalysisECLShapersModule::endRun()
@@ -153,23 +142,6 @@ void DQMHistAnalysisECLShapersModule::endRun()
   m_monObj->setVariable("pedwidthTotal", m_pedwidth_max[3]);
 }
 
-
-void DQMHistAnalysisECLShapersModule::terminate()
-{
-  B2DEBUG(20, "terminate called");
-
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    for (int i = 0; i < c_collector_count; i++) {
-      if (chid_logic[i]) SEVCHK(ca_clear_channel(chid_logic[i]), "ca_clear_channel failure");
-    }
-    for (int i = 0; i < 4; i++) {
-      if (chid_pedwidth[i]) SEVCHK(ca_clear_channel(chid_pedwidth[i]), "ca_clear_channel failure");
-    }
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
-}
 
 double DQMHistAnalysisECLShapersModule::robust_max(std::multiset<double> values)
 {

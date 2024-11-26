@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,7 +14,7 @@ import os
 import tempfile
 
 
-class State(object):
+class State:
     """
     Tensorflow state
     """

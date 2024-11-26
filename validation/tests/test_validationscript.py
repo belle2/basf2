@@ -28,7 +28,6 @@ class ValidationScriptTest(unittest.TestCase):
         with tempfile.NamedTemporaryFile() as tf:
             tf.write(
                 b"#!/usr/bin/env python3\n"
-                b"# -*- coding: utf-8 -*-\n"
                 b'"""\n'
                 b"<header>\n"
                 b"<interval>release</interval>"

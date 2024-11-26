@@ -13,12 +13,11 @@
 void
 dump_binary(FILE* fp, const void* ptr, const size_t size)
 {
-  int i;
   const unsigned int* p = (const unsigned int*)ptr;
   const size_t _size = size / sizeof(unsigned int);
 
 
-  for (i = 0; i < _size; i++) {
+  for (unsigned int i = 0; i < _size; ++i) {
     fprintf(fp, "%08x ", p[i]);
     if (i % 8 == 7) fprintf(fp, "\n");
   }

@@ -17,7 +17,7 @@ namespace Belle2 {
      *
      *  Needed because you cannot inherit from scalar type directly in
      *  a mixin based inheritance structure.
-     *  It does not support all the basic operations, but transperently unpacks
+     *  It does not support all the basic operations, but transparently unpacks
      *  if conversion to the underlying type is requested by the using context.
      */
     template<class T>

@@ -44,8 +44,6 @@ namespace Belle2 {
     // Input
     /// Name of collection holding the RecoTracks (input).
     std::string m_recoTrackColName = "";
-    /// Name of collection holding the MCParticles (input, optional).
-    std::string m_mcParticleColName = "";
 
     // Output
     /// Name of collection holding the Tracks (output).

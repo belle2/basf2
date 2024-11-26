@@ -29,8 +29,6 @@
 //Visualization Attributes
 #include <G4VisAttributes.hh>
 
-#define PI 3.14159265358979323846
-
 using namespace std;
 using namespace boost;
 
@@ -99,7 +97,7 @@ namespace Belle2 {
           B2INFO("Crystal Number " << eclp->CsiVolNameToCellID(VolumeName) <<
                  " placed at (r[cm],[deg],z[cm]) = (" << setprecision(1) <<  fixed <<
                  volume->GetTranslation().perp() / CLHEP::cm << "," <<
-                 volume->GetTranslation().phi() * 180.0 / PI << "," <<
+                 volume->GetTranslation().phi() * 180.0 / M_PI << "," <<
                  volume->GetTranslation().z() / CLHEP::cm << ")");
         }
 

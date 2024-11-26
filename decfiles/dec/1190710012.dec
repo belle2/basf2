@@ -1,0 +1,23 @@
+# EventType: 1190710012
+# Descriptor: [B0 -> Xu0 l+ nu]cc
+# NickName: Bd_Xulnu=non-resonant-DFN
+# Documentation: Non-resonances decays of charged b->ulv (l=e,mu) for hybrid modelling. Higher excited states are included in non-resonance (F. De Fazio (INFN Bari), M. Neubert [hep-ph/9905351])
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Tommy Martinov
+# Email: tommy.martinov@desy.de
+# Cuts: None
+# Date: 20231003
+#
+
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0                   VSS_BMIX dm;
+Enddecay
+#
+Decay anti-B0sig
+0.002050   Xu+    e-    anti-nu_e    PHOTOS VUB 4.658 1.328 0.22 1 0.28 1; #[para. values from arXiv:hep-ph/0507253]
+0.002050   Xu+    mu-   anti-nu_mu   PHOTOS VUB 4.658 1.328 0.22 1 0.28 1; #[para. values from arXiv:hep-ph/0507253]
+Enddecay
+CDecay B0sig
+#
+End

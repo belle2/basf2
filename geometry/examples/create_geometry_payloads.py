@@ -18,6 +18,7 @@ Optionally one can give a list of payload names to keep only a subset of payload
 """
 
 import basf2
+import b2test_utils
 import shutil
 import sys
 import re
@@ -34,8 +35,15 @@ shutil.rmtree("localdb", ignore_errors=True)
 phase3 = basf2.Path()
 phase3.add_module("EventInfoSetter")
 phase3.add_module("Gearbox")
-phase3.add_module("Geometry", createPayloads=True, payloadIov=[0, 0, -1, -1])
-basf2.process(phase3)
+phase3.add_module("Geometry", createPayloads=True, payloadIov=[0, 0, 0, -1])
+b2test_utils.safe_process(phase3)
+
+# create post LS1 geometry: Identical to the default one
+postLS1 = basf2.Path()
+postLS1.add_module("EventInfoSetter")
+postLS1.add_module("Gearbox")
+postLS1.add_module("Geometry", createPayloads=True, payloadIov=[1004, 0, 1004, -1])
+b2test_utils.safe_process(postLS1)
 
 # create phase2 geometry. For this we need to manually add all the phase2
 # detectors and remove the phase3-only detectors.
@@ -46,7 +54,7 @@ phase2.add_module("Gearbox")
 phase2.add_module("Geometry", createPayloads=True, payloadIov=[1002, 0, 1002, -1],
                   excludedComponents=["BeamPipe", "PXD", "SVD", "VXDService", "ServiceGapsMaterial"],
                   additionalComponents=[e + "-phase2" for e in phase2_detectors])
-basf2.process(phase2)
+b2test_utils.safe_process(phase2)
 
 # create early phase3 geometry: same as phase 3 but different PXD configuration
 early3 = basf2.Path()
@@ -55,7 +63,7 @@ early3.add_module("Gearbox")
 early3.add_module("Geometry", createPayloads=True, payloadIov=[1003, 0, 1003, -1],
                   excludedComponents=['PXD', "ServiceGapsMaterial"],
                   additionalComponents=['PXD-earlyPhase3', 'ServiceGapsMaterial-earlyPhase3'])
-basf2.process(early3)
+b2test_utils.safe_process(early3)
 
 # most of the components are identical so we avoid uploading two
 # revisions so we remove most of them. We only need separate payloads for the

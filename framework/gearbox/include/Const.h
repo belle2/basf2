@@ -54,6 +54,15 @@ namespace Belle2 {
     };
 
     /**
+     * Enum for identifying run type
+     * (beam or cosmic)
+     */
+    enum ERunType {
+      c_Beam,
+      c_Cosmic
+    };
+
+    /**
     * Converts Const::EDetector object to string.
     * @param det Const::EDetector object to be converted to string
     * @return converted string
@@ -686,6 +695,9 @@ namespace Belle2 {
     static const double permSi;       /**< Permittivity of Silicon */
     static const double uTherm;       /**< Thermal Voltage at room temperature */
     static const double eMobilitySi;  /**< Electron mobility in intrinsic Silicon at room temperature */
+
+    static const double doubleNaN; /**< quiet_NaN */
+    static const float  floatNaN;  /**< quiet_NaN */
 
   private:
     /**

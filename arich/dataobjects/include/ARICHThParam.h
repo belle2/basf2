@@ -29,6 +29,7 @@ namespace Belle2 {
       /*! does nothing */
     }
 
+    //! Constructor
     ARICHThParam(int index, double dth, double th0, int nth)
     {
       m_index = index;
@@ -37,6 +38,9 @@ namespace Belle2 {
       m_nth = nth;
     }
 
+    /**
+     * Set ARICH hit information
+     */
     void set(int index, double dth, double th0, int nth)
     {
       m_index = index;
@@ -51,19 +55,42 @@ namespace Belle2 {
       /*! Does nothing */
     }
 
+    /**
+     * Get index
+     */
     int getIndex() const { return m_index; }
+
+    /**
+     * Get Dth
+     */
     double getDth() const { return m_dth; }
+
+    /**
+     * Get Th0
+     */
     double getTh0() const { return m_th0; }
+
+    /**
+     * Get Vth
+     */
     double getVth() const;
+
+    /**
+     * Get Nth
+     */
     int getNth() const { return m_nth; }
+
+    /**
+     * Get value
+     */
     int getVal() const;
 
   private:
 
-    int m_index;
-    double m_dth;
-    double m_th0;
-    int m_nth;
+    int m_index; /**< index */
+    double m_dth; /**< dth */
+    double m_th0; /**< th0 */
+    int m_nth; /**< nth */
     ClassDef(ARICHThParam, 1); /**< the class title */
 
   };

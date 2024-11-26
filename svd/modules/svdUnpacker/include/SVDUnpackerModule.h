@@ -9,11 +9,13 @@
 #pragma once
 
 #include <framework/core/Module.h>
-
-#include <svd/geometry/SensorInfo.h>
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/PayloadFile.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
+
+#include <svd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
@@ -26,7 +28,7 @@
 #include <svd/online/SVDStripNoiseMap.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <memory>
-#include <framework/database/PayloadFile.h>
+
 
 namespace Belle2::SVD {
 
@@ -82,6 +84,9 @@ namespace Belle2::SVD {
 
     /** instance of SVDModeByte for the event */
     SVDModeByte m_SVDModeByte;
+
+    /** system clock */
+    DBObjPtr<HardwareClockSettings> m_hwClock;
 
     /** additional function that prints raw data words */
     void printB2Debug(uint32_t* data32, uint32_t* data32_min, uint32_t* data32_max, int nWords);

@@ -4,7 +4,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
-#pragma link C++ class Belle2::Particle+; // checksum=0x694ee2d8, version=16
+#pragma link C++ class Belle2::Particle+; // checksum=0xb9d445e0, version=17
 #pragma link C++ class Belle2::ParticleList+; // checksum=0xa5bad8a, version=4
 #pragma link C++ class Belle2::RestOfEvent+; // checksum=0xe86f1658, version=8
 #pragma link C++ class Belle2::TagVertex+; // checksum=0xf7b6169c, version=6
@@ -14,7 +14,7 @@
 #pragma link C++ class Belle2::StringWrapper+; // checksum=0xf15ef1c4, version=1
 #pragma link C++ class Belle2::EventShapeContainer+; // checksum=0xe048bccd, version=2
 #pragma link C++ class Belle2::EventKinematics+; // checksum=0xabfc6580, version=3
-#pragma link C++ class Belle2::TauPairDecay+; // checksum=0x15ea58a, version=1
+#pragma link C++ class Belle2::TauPairDecay+; // checksum=0x3ecb631d, version=2
 #pragma link C++ class Belle2::ECLEnergyCloseToTrack+; // checksum=0xeadb37d4, version=1
 #pragma link C++ class Belle2::ECLTRGInformation+; // checksum=0x744abff9, version=3
 #pragma link C++ class Belle2::ECLTriggerCell+; // checksum=0xfcbe0110, version=2
@@ -233,6 +233,7 @@
   version="[1]"                                                                                               \
   targetClass="Belle2::EventShapeContainer"                                                                   \
   target="m_forwardHemisphere4Momentum"                                                                       \
+  include="TLorentzVector.h"                                                                                  \
   code="{m_forwardHemisphere4Momentum = ROOT::Math::PxPyPzEVector(onfile.m_forwardHemisphere4Momentum.Px(),   \
                                                                   onfile.m_forwardHemisphere4Momentum.Py(),   \
                                                                   onfile.m_forwardHemisphere4Momentum.Pz(),   \
@@ -246,6 +247,7 @@
   version="[1]"                                                                                                 \
   targetClass="Belle2::EventShapeContainer"                                                                     \
   target="m_backwardHemisphere4Momentum"                                                                        \
+  include="TLorentzVector.h"                                                                                  \
   code="{m_backwardHemisphere4Momentum = ROOT::Math::PxPyPzEVector(onfile.m_backwardHemisphere4Momentum.Px(),   \
                                                                    onfile.m_backwardHemisphere4Momentum.Py(),   \
                                                                    onfile.m_backwardHemisphere4Momentum.Pz(),   \

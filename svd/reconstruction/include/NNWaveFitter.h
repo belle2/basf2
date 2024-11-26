@@ -30,7 +30,7 @@ namespace Belle2 {
     * The class uses a neural network to find a probability distribution
     * of arrival times for a sextet of APX25 signal samples.
     * The input to the network are sample S/N ratios, i.e., we expect
-    * \sigma^2 = 1, plus width of the waveform from calibration data.
+    * sigma^2 = 1, plus width of the waveform from calibration data.
     * The network(s) is currently trained using Python's scikit-learn
     * package and results are saved in a PMML-like xml file.
     * The NNWaveFitter reads the contents of this xml and on request provides

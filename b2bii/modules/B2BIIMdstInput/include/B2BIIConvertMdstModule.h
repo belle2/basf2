@@ -37,6 +37,7 @@
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
+#include <mdst/dbobjects/CollisionAxisCMS.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
@@ -244,6 +245,11 @@ namespace Belle2 {
     void convertMdstECLObject(const Belle::Mdst_ecl& ecl, const Belle::Mdst_ecl_aux& eclAux, ECLCluster* eclCluster);
 
     /**
+     * calculate the minimal distance between a cluster and a set of tracks on the ECL surface.
+     */
+    double computeTrkMinDistanceBelle(ECLCluster* eclCluster);
+
+    /**
     * Converts Mdst_klm_cluster record to KLMCluster object.
     * No MCRelation is set, since there was no matching in Belle.
     */
@@ -408,6 +414,10 @@ namespace Belle2 {
     /** CollisionInvariantMass for Invariant Mass of Beam*/
     OptionalDBObjPtr<CollisionInvariantMass> m_collisionInvMDB;
     CollisionInvariantMass m_collisionInvM; /**< CollisionInvariantMass for the invariant mass of the beam */
+
+    /** CollisionAxisCMS */
+    OptionalDBObjPtr<CollisionAxisCMS> m_collisionAxisCMSDB;
+    CollisionAxisCMS m_collisionAxisCMS; /**< CollisionAxisCMS of the beam */
 
     /** CONVERSION OF TRACK ERROR MATRIX ELEMENTS */
     /** Belle error matrix elements are in the following order

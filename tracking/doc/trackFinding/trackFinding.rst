@@ -1,4 +1,4 @@
-.. _tracking_trackFinding: 
+.. _tracking_trackFinding:
 
 Track Finding Algorithms
 ------------------------

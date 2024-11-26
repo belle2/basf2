@@ -79,8 +79,6 @@ namespace Belle2 {
 
     /// Members.
     const TRGCDC& _cdc;
-    /// PI
-    double m_Trg_PI;
     /// 0 is Logic. 1 is LUT.
     bool m_logicLUTFlag;
 

@@ -411,6 +411,9 @@ C =======================================================================
 C switch to initialize that all modes are represented equally.
       INTEGER IFEQUALBR
       COMMON /IFEQUALBR/ IFEQUALBR
+      INTEGER IUSER,SELUSER
+      INTEGER USERACTIVE
+      COMMON /USERACTIVE/ USERACTIVE(100)
 C==========================================================================
 
 C      PARAMETER (NMODE=196,NM1=40,NM2=71,NM3=19,NM4=32,NM5=21,NM6=13)
@@ -1418,6 +1421,32 @@ C      CALL INIOFC ! dummy for now anyway
       ENDDO
       WRITE(IOUT,'(''NCHAN, KSUM, SUM = '',2I4,1X,F10.7)') NCHAN, KSUM, SUM
 
+      IF(IFEQUALBR.LT.0) THEN   ! uniform  initialization useful for some tests only
+         DO K=1,NCHAN
+            ACTIVE(K)=0
+         ENDDO
+         KSUM=0
+         DO K=1,NCHAN
+            SELUSER=0
+            DO IUSER=1,-IFEQUALBR
+               IF (K.EQ.USERACTIVE(IUSER)) THEN
+                  SELUSER = 1
+                  GOTO 100
+               ENDIF
+            ENDDO
+ 100        IF (SELUSER.EQ.1) THEN
+               KSUM=KSUM+1
+               ACTIVE(KSUM)=K
+               IF (K.LE.NLT) THEN
+                  PRINT*, '0 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,OLDNAMES(K),' GAMPRT = ',GAMPRT(K)
+               ELSE
+                  PRINT*, 'N KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT),' GAMPRT = ',GAMPRT(K)
+               ENDIF
+            ENDIF
+         ENDDO
+         WRITE(IOUT,'(''IFEQUALBR, KSUM, GAMPRT = '',2I4,1X,F10.7)') IFEQUALBR, KSUM, GAMPRT(1)
+      ENDIF
+
       IF(IFEQUALBR.EQ.1) THEN   ! uniform  initialization useful for some tests only
          DO K=1,NCHAN
             ACTIVE(K)=0
@@ -1539,11 +1568,22 @@ C      CALL INIOFC ! dummy for now anyway
       COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
       INTEGER CHCONJUGATE
       COMMON /CHCONJUGATE/ CHCONJUGATE
+      INTEGER TauToElOrMu
+      COMMON /TauToElOrMu/ TauToElOrMu
       INTEGER JAKT ! temporary place holder for JAK1
       DATA    JAKT /-1/
       SAVE    JAKT
       REAL    RRR(1)
+      REAL    RRR1(1)
       IF (KTO.EQ.1) THEN  
+         IF (TauToElOrMu.EQ.1) THEN
+            CALL KKMC_RANMAR(RRR1,1)
+            IF (RRR1(1).GT.0.5) THEN
+               JAK2 = 1
+            ELSE
+               JAK2 = 2
+            ENDIF
+         ENDIF
          IF (CHCONJUGATE.EQ.1) THEN  
             CALL KKMC_RANMAR(RRR,1)
             IF (RRR(1).GT.0.5) THEN ! swap JAK1/JAK2 for alternate events

@@ -12,14 +12,14 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/Unit.h>
+
+/* Root headers */
+#include <TH2F.h>
 
 /* C++ headers. */
 #include <vector>
-
-class TGraph2D;
-class TFile;
-class TH1F;
 
 namespace Belle2 {
   class ECLCalDigit;
@@ -27,6 +27,7 @@ namespace Belle2 {
   class ECLShower;
   class ECLLocalMaximum;
   class EventLevelClusteringInfo;
+  class ECLnOptimal;
 
   namespace ECL {
     class ECLNeighbours;
@@ -75,18 +76,13 @@ namespace Belle2 {
     double m_cutDigitTimeResidualForEnergy; /**< Maximum time residual to be included in the shower energy calculation*/
     int m_useOptimalNumberOfDigitsForEnergy; /**< Optimize the number of neighbours for energy calculations */
 
-    std::string m_fileBackgroundNormName; /**< Background normalization filename. */
-    std::string m_fileNOptimalFWDName; /**< FWD number of optimal neighbours filename. */
-    std::string m_fileNOptimalBarrelName; /**< Barrel number of optimal neighbours filename. */
-    std::string m_fileNOptimalBWDName; /**< BWD number of optimal neighbours filename. */
-    TFile* m_fileBackgroundNorm{nullptr}; /**< Background normalization file. */
-    TFile* m_fileNOptimalFWD{nullptr}; /**< FWD number of optimal neighbours. */
-    TFile* m_fileNOptimalBarrel{nullptr}; /**< Barrel number of optimal neighbours. */
-    TFile* m_fileNOptimalBWD{nullptr}; /**< BWD number of optimal neighbours. */
-    TH1F* m_th1fBackgroundNorm{nullptr}; /**< Background normalization histogram. */
-    TGraph2D* m_tg2dNOptimalFWD[13][9] {}; /**< Array of 2D graphs used for interpolation between background and energy. */
-    TGraph2D* m_tg2dNOptimalBWD[10][9] {}; /**< Array of 2D graphs used for interpolation between background and energy. */
-    TGraph2D* m_tg2dNOptimalBarrel{nullptr}; /**< Array of 2D graphs used for interpolation between background and energy. */
+    /** nOptimal payload */
+    DBObjPtr<ECLnOptimal> m_eclNOptimal;
+    TH2F m_nOptimal2D; /**< 2D hist of nOptimal for Ebin vs groupID */
+    std::vector<int> m_groupNumber; /**< group number for each crystal */
+    const int m_nLeakReg = 3; /**< 3 ECL regions: 0 = forward, 1 = barrel, 2 = backward */
+    int m_nEnergyBins = 0; /**< number of energies bins in nOptimal payload */
+    std::vector< std::vector<float> > m_eBoundaries; /**< energy boundaries each region */
 
     // Position
     std::string m_positionMethod;  /**< Position calculation: lilo or linear */
@@ -97,19 +93,6 @@ namespace Belle2 {
 
     // Background
     int m_fullBkgdCount; /**< Number of expected background digits at full background, FIXME: move to database. */
-
-    const unsigned short c_nSectorCellIdBWD[10] = {9, 9, 6, 6, 6, 6, 6, 4, 4, 4}; /**< crystals per sector for theta rings */
-    const unsigned short c_nSectorCellIdFWD[13] = {3, 3, 4, 4, 4, 6, 6, 6, 6, 6, 6, 9, 9}; /**< crystals per sector for theta rings */
-
-    // Crystals per Ring
-    const unsigned short c_crystalsPerRing[69] = {48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, //FWD (13)
-                                                  144, 144, 144, 144, 144, 144, 144,  // BARREL 20
-                                                  144, 144, 144, 144, 144, 144, 144, 144, 144, 144, //30
-                                                  144, 144, 144, 144, 144, 144, 144, 144, 144, 144, //40
-                                                  144, 144, 144, 144, 144, 144, 144, 144, 144, 144, //50
-                                                  144, 144, 144, 144, 144, 144, 144, 144, 144,//59
-                                                  144, 144, 96, 96, 96, 96, 96, 64, 64, 64
-                                                 }; /**< Number of crystals per theta ring. */
 
     /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to store array positions */
     std::vector< int > m_StoreArrPosition;
@@ -169,7 +152,7 @@ namespace Belle2 {
     int getNeighbourMap(const double energy, const double background);
 
     /** Get optimal number of digits (out of 21) based on first energy estimation and background level per event. */
-    unsigned int getOptimalNumberOfDigits(const int cellid, const double energy, const double background);
+    std::vector<int> getOptimalNumberOfDigits(const int cellid, const double energy);
 
     /** Get energy sum for weighted entries. */
     double getEnergySum(std::vector < std::pair<double, double> >& weighteddigits, const unsigned int n);

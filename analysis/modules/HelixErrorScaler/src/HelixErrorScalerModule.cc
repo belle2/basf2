@@ -9,6 +9,7 @@
 #include <analysis/modules/HelixErrorScaler/HelixErrorScalerModule.h>
 
 #include <analysis/DecayDescriptor/ParticleListName.h>
+#include <analysis/utility/ParticleCopy.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <framework/datastore/RelationArray.h>
@@ -34,13 +35,13 @@ HelixErrorScalerModule::HelixErrorScalerModule() : Module(), m_pdgCode(0), m_sca
   // Set module properties
   setDescription(R"DOC(scale the error of helix parameters
 
-    Creates a new charged particle list whose helix errors are scaled by constant factors.
-    Different sets of scale factors are defined for tracks with/without a PXD hit.
-    For tracks with a PXD hit, in order to avoid severe underestimation of d0 and z0 errors,
-    lower limits (best resolution) can be set in a momentum-dependent form.
-    The module also accepts a V0 Kshort particle list as input and applies the error correction to its daughters.
-    Note the difference in impact parameter resolution between V0 daughters and tracks from IP,
-    as V0 daughters are free from multiple scattering through the beam pipe.
+Creates a new charged particle list whose helix errors are scaled by constant factors.
+Different sets of scale factors are defined for tracks with/without a PXD hit.
+For tracks with a PXD hit, in order to avoid severe underestimation of d0 and z0 errors,
+lower limits (best resolution) can be set in a momentum-dependent form.
+The module also accepts a V0 Kshort particle list as input and applies the error correction to its daughters.
+Note the difference in impact parameter resolution between V0 daughters and tracks from IP,
+as V0 daughters are free from multiple scattering through the beam pipe.
      )DOC");
 
   // Parameter definitions
@@ -124,19 +125,20 @@ void HelixErrorScalerModule::event()
       if (particle->getNDaughters() != 2)
         B2ERROR("V0 particle should have exactly two daughters");
 
-      const Particle* dauP = particle->getDaughter(0);
-      const Particle* dauM = particle->getDaughter(1);
+      Particle* newV0 = ParticleCopy::copyParticle(particle);
+
+      const Particle* dauP = newV0->getDaughter(0);
+      const Particle* dauM = newV0->getDaughter(1);
 
       Particle* newDauP = getChargedWithScaledError(dauP);
       Particle* newDauM = getChargedWithScaledError(dauM);
 
       ROOT::Math::PxPyPzEVector v0Momentum = newDauP->get4Vector() + newDauM->get4Vector();
-      Particle new_v0(v0Momentum, m_pdgCode, particle->getFlavorType(),
-                      Particle::EParticleSourceObject::c_V0, particle->getMdstArrayIndex());
-      new_v0.appendDaughter(newDauP, false);
-      new_v0.appendDaughter(newDauM, false);
+      newV0->set4VectorDividingByMomentumScaling(v0Momentum);
 
-      Particle* newV0 = m_particles.appendNew(new_v0);
+      newV0->replaceDaughter(dauP, newDauP);
+      newV0->replaceDaughter(dauM, newDauM);
+
       m_outputparticleList->addParticle(newV0);
 
     } // loop over Kshort

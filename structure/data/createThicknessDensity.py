@@ -124,23 +124,23 @@ density_list = list(map(str, density_ARICH.tolist() + density_TOPback.tolist() +
                         density_ECLback.tolist() + density_ECLfor.tolist()))
 
 desc = {
-    'IRCDCBack': u'segmentation in R of backward',
-    'IPhiCDCBack': u'segmentation in Phi of backward',
-    'IRCDCFor': u'segmentation in R of forward',
-    'IPhiCDCFor': u'segmentation in Phi of forward',
-    'thicknesses': u'thicknesses',
-    'IZARICHFor': u'segmentation in Z of forward',
-    'IPhiARICHFor': u'segmentation in Phi of forward',
-    'IPhiTOPBack': u'segmentation in Phi of backward',
-    'IPhiTOPFor': u'segmentation in Phi of forward',
-    'IZECLCOILBar': u'segmentation in Z of barrel',
-    'IPhiECLCOILBar': u'segmentation in Phi of barrel',
-    'IRECLBack': u'segmentation in R of backward',
-    'IZECLBack': u'segmentation in Z of backward',
-    'IPhiECLBack': u'segmentation in Phi of backward',
-    'IRECLFor': u'segmentation in R of forward',
-    'IZECLFor': u'segmentation in Z of forward',
-    'IPhiECLFor': u'segmentation in Phi of forward'}
+    'IRCDCBack': 'segmentation in R of backward',
+    'IPhiCDCBack': 'segmentation in Phi of backward',
+    'IRCDCFor': 'segmentation in R of forward',
+    'IPhiCDCFor': 'segmentation in Phi of forward',
+    'thicknesses': 'thicknesses',
+    'IZARICHFor': 'segmentation in Z of forward',
+    'IPhiARICHFor': 'segmentation in Phi of forward',
+    'IPhiTOPBack': 'segmentation in Phi of backward',
+    'IPhiTOPFor': 'segmentation in Phi of forward',
+    'IZECLCOILBar': 'segmentation in Z of barrel',
+    'IPhiECLCOILBar': 'segmentation in Phi of barrel',
+    'IRECLBack': 'segmentation in R of backward',
+    'IZECLBack': 'segmentation in Z of backward',
+    'IPhiECLBack': 'segmentation in Phi of backward',
+    'IRECLFor': 'segmentation in R of forward',
+    'IZECLFor': 'segmentation in Z of forward',
+    'IPhiECLFor': 'segmentation in Phi of forward'}
 
 # The segmentation in R, Z and Phi. And thickness.
 value = {

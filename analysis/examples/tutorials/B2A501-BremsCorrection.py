@@ -116,23 +116,23 @@ var1 = ['M',
 
 ma.variablesToNtuple(decayString='e+:uncorrected',
                      variables=var0,
-                     filename='e_uncorrected.root',
+                     treename='e_uncorrected',
                      path=my_path)
 ma.variablesToNtuple(decayString='e+:corrected',
                      variables=var0,
-                     filename='e_corrected.root',
+                     treename='e_corrected',
                      path=my_path)
 ma.variablesToNtuple(decayString='J/psi:uncorrected',
                      variables=var1,
-                     filename='Jpsi_uncorrected.root',
+                     treename='Jpsi_uncorrected',
                      path=my_path)
 ma.variablesToNtuple(decayString='J/psi:corrected',
                      variables=var1,
-                     filename='Jpsi_corrected.root',
+                     treename='Jpsi_corrected',
                      path=my_path)
 ma.variablesToNtuple(decayString='J/psi:MC',
                      variables=var1,
-                     filename='Jpsi_MC.root',
+                     treename='Jpsi_MC',
                      path=my_path)
 
 # process the events

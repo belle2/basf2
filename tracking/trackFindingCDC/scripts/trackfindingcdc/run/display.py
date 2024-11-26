@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -11,13 +10,14 @@
 
 from tracking.run.tracked_event_generation import ReadOrGenerateTrackedEventsRun
 import trackfindingcdc.cdcdisplay as cdcdisplay
+import tempfile
 
 
 class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
     """Prepare and execute a basf2 job to read generated events or generate new events then display the CDC tracks"""
 
     #: Destination folder for displays
-    output_folder = '/tmp'
+    output_folder = tempfile.gettempdir()
 
     #: Switch to show the event display after each event. Run in batch mode for false
     iteractive = True
@@ -107,7 +107,7 @@ Note that some options are only relevant, if the cellular automaton finder in th
             drawoptions = cdc_display_module.drawoptions
 
         for option in sorted(drawoptions):
-            options_flag = '--%s ' % option.replace('_', '-')
+            options_flag = f"--{option.replace('_', '-')} "
 
             draw_argument_group.add_argument(
                 options_flag,

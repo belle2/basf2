@@ -5,8 +5,12 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #pragma once
+
+/* ECL headers. */
 #include <ecl/dbobjects/ECLChannelMap.h>
+
 namespace Belle2 {
   namespace ECL {
     /**

@@ -25,10 +25,14 @@
 #include <mdst/dbobjects/BeamSpot.h>
 
 #include <analysis/utility/ReferenceFrame.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeometryParConstants.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
-#include "TMath.h"
-#include "TH1D.h"
-#include "TH2D.h"
+#include <cmath>
+#include <TMath.h>
+#include <TH1D.h>
+#include <TH2D.h>
 
 namespace Belle2 {
 
@@ -46,9 +50,6 @@ namespace Belle2 {
 
     /** Default constructor */
     CDCDedxDQMModule();
-
-    /** Destructor */
-    virtual ~CDCDedxDQMModule();
 
     /** Defination of histograms */
     virtual void defineHisto() override;
@@ -69,39 +70,40 @@ namespace Belle2 {
     /** End of the event processing. */
     virtual void terminate() override;
 
-    /** get index val of cdc wire/layer/parameters */
-    double getIndexVal(int iWire, TString what);
+    /**
+     * function to plot wire status map (all, bad)
+     */
+    void plotWireMap();
 
 
   private:
 
-    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
-
     StoreObjPtr<EventMetaData> m_MetaDataPtr; /**< Store array for metadata info*/
     StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
+    StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;  /**< Store array for injection time info */
 
-    Int_t m_exp{ -1}; /**< exp number */
-    Int_t m_run{ -1}; /**< run number */
-    Int_t m_event{ -1}; /**< number of event */
+    int m_nEvt{0}; /**< accepted events */
+    int m_nBEvt{ 0}; /**< bhabha events  */
+    int m_nHEvt{0}; /**< hadron events  */
 
-    Int_t m_nEvt{0}; /**< accepted events */
-    Int_t m_nBEvt{ 0}; /**< bhabha events  */
-    Int_t m_nHEvt{0}; /**< hadron events  */
-
-    Double_t m_rungain{ -99.0}; /**< previous rungain */
-    std::vector <double> m_adc[14336]; /**< adc per wire for wire status */
+    std::array<std::vector<double>, c_nSenseWires> m_adc; /**< adc per wire for wire status */
 
     std::string mmode; /**< monitoring mode all/basic */
 
     TH1D* hMeta{nullptr}; /**< metadata */
     TH1D* hdEdx{nullptr}; /**< dedx */
+    TH2D* hinjtimeHer{nullptr}; /**< injection time in HER*/
+    TH2D* hinjtimeLer{nullptr}; /**< injection time in LER*/
     TH2D* hdEdxvsP{nullptr}; /**< dedx vs p*/
     TH2D* hdEdxvsPhi{nullptr}; /**< dedx vs phi */
     TH2D* hdEdxvsCosth{nullptr}; /**< dedx vs costh */
     TH2D* hdEdxvsEvt{nullptr}; /**< dedx vs event*/
     TH2F* hWireStatus{nullptr}; /**< dead wire status */
     TH2F* hWires{nullptr}; /**< all wire mapping  */
+
+    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
+    DBObjPtr<CDCGeometry> m_cdcGeo; /**< Geometry of CDC */
 
   };
 } // Belle2 namespace

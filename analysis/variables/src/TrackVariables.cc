@@ -20,6 +20,7 @@
 #include <framework/dataobjects/Helix.h>
 
 // dataobjects from the MDST
+#include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -35,19 +36,13 @@
 namespace Belle2 {
   namespace Variable {
 
-    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-    static const B2Vector3D vecNaN(realNaN, realNaN, realNaN);
+    static const B2Vector3D vecNaN(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
 
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
 
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the number of track hits.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
       if (det == Const::EDetector::CDC) {
         return trackFit->getHitPatternCDC().getNHits();
       } else if (det == Const::EDetector::SVD) {
@@ -55,7 +50,7 @@ namespace Belle2 {
       } else if (det == Const::EDetector::PXD) {
         return trackFit->getHitPatternVXD().getNPXDHits();
       } else {
-        return realNaN;
+        return Const::doubleNaN;
       }
     }
 
@@ -82,147 +77,157 @@ namespace Belle2 {
     double trackNDF(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getNDF();
     }
 
     double trackChi2(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getChi2();
     }
 
     double trackFirstSVDLayer(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the real pattern and get the first SVD layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getHitPatternVXD().getFirstSVDLayer();
     }
 
     double trackFirstPXDLayer(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the real pattern and get the first PXD layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
     }
 
     double trackFirstCDCLayer(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the real pattern and get the first CDC layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getHitPatternCDC().getFirstLayer();
     }
 
     double trackLastCDCLayer(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the real pattern and get the last CDC layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getHitPatternCDC().getLastLayer();
     }
 
     double trackD0(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getD0();
     }
 
     double trackPhi0(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getPhi0();
     }
 
     double trackOmega(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getOmega();
     }
 
     double trackZ0(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getZ0();
     }
 
     double trackTanLambda(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getTanLambda();
+    }
+
+    double trackD0FromIP(const Particle* part)
+    {
+      auto trackFit = part->getTrackFitResult();
+      if (!trackFit) return Const::doubleNaN;
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      auto helix = trackFit->getHelix();
+      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      return helix.getD0();
+    }
+
+    double trackZ0FromIP(const Particle* part)
+    {
+      auto trackFit = part->getTrackFitResult();
+      if (!trackFit) return Const::doubleNaN;
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      auto helix = trackFit->getHelix();
+      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      return helix.getZ0();
+    }
+
+    double trackPhi0FromIP(const Particle* part)
+    {
+      auto trackFit = part->getTrackFitResult();
+      if (!trackFit) return Const::doubleNaN;
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      auto helix = trackFit->getHelix();
+      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      return helix.getPhi0();
     }
 
     double trackD0Error(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
 
       double errorSquared = trackFit->getCovariance5()[0][0];
-      if (errorSquared <= 0) return realNaN;
+      if (errorSquared <= 0) return Const::doubleNaN;
       return sqrt(errorSquared);
     }
 
     double trackPhi0Error(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
 
       double errorSquared = trackFit->getCovariance5()[1][1];
-      if (errorSquared <= 0) return realNaN;
+      if (errorSquared <= 0) return Const::doubleNaN;
       return sqrt(errorSquared);
     }
 
     double trackOmegaError(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
 
       double errorSquared = trackFit->getCovariance5()[2][2];
-      if (errorSquared <= 0) return realNaN;
+      if (errorSquared <= 0) return Const::doubleNaN;
       return sqrt(errorSquared);
     }
 
     double trackZ0Error(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
 
       double errorSquared = trackFit->getCovariance5()[3][3];
-      if (errorSquared <= 0) return realNaN;
+      if (errorSquared <= 0) return Const::doubleNaN;
       return sqrt(errorSquared);
     }
 
     double trackTanLambdaError(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
 
       double errorSquared = trackFit->getCovariance5()[4][4];
-      if (errorSquared <= 0) return realNaN;
+      if (errorSquared <= 0) return Const::doubleNaN;
       return sqrt(errorSquared);
     }
 
@@ -235,28 +240,28 @@ namespace Belle2 {
         B2FATAL("The indices provided to the variable trackFitCovariance must be in the range 0 - 4!");
       }
       auto trackFit = particle->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getCovariance5()[indices[0]][indices[1]];
     }
 
     double trackPValue(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getPValue();
     }
 
     double trackFitHypothesisPDG(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getParticleType().getPDGCode();
     }
 
     double trackNECLClusters(const Particle* part)
     {
       const Track* track = part->getTrack();
-      if (!track) return realNaN;
+      if (!track) return Const::doubleNaN;
 
       // count the number of nPhotons hypothesis ecl clusters
       int count = 0;
@@ -319,7 +324,7 @@ namespace Belle2 {
       }
 
       B2Vector3D position = getPositionOnHelix(part, pars);
-      if (position == vecNaN) return realNaN;
+      if (position == vecNaN) return Const::doubleNaN;
       return position.Theta();
     }
 
@@ -332,7 +337,7 @@ namespace Belle2 {
       }
 
       B2Vector3D position = getPositionOnHelix(part, pars);
-      if (position == vecNaN) return realNaN;
+      if (position == vecNaN) return Const::doubleNaN;
       return position.Phi();
     }
 
@@ -360,7 +365,7 @@ namespace Belle2 {
       auto func = [parameters](const Particle * part) -> double {
 
         B2Vector3D position = getPositionOnHelix(part, parameters);
-        if (position == vecNaN) return realNaN;
+        if (position == vecNaN) return Const::doubleNaN;
         return position.Theta();
       };
       return func;
@@ -390,7 +395,7 @@ namespace Belle2 {
       auto func = [parameters](const Particle * part) -> double {
 
         B2Vector3D position = getPositionOnHelix(part, parameters);
-        if (position == vecNaN) return realNaN;
+        if (position == vecNaN) return Const::doubleNaN;
         return position.Phi();
       };
       return func;
@@ -405,7 +410,7 @@ namespace Belle2 {
     double nExtraCDCHits(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return realNaN;
+      if (!elti) return Const::doubleNaN;
       return elti->getNCDCHitsNotAssigned();
     }
 
@@ -414,7 +419,7 @@ namespace Belle2 {
     double nExtraCDCHitsPostCleaning(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return realNaN;
+      if (!elti) return Const::doubleNaN;
       return elti->getNCDCHitsNotAssignedPostCleaning();
     }
 
@@ -422,7 +427,7 @@ namespace Belle2 {
     double hasExtraCDCHitsInLayer(const Particle*, const std::vector<double>& layer)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return realNaN;
+      if (!elti) return Const::doubleNaN;
       int ilayer = std::lround(layer[0]);
       return elti->hasCDCLayer(ilayer);
     }
@@ -431,7 +436,7 @@ namespace Belle2 {
     double hasExtraCDCHitsInSuperLayer(const Particle*, const std::vector<double>& layer)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return realNaN;
+      if (!elti) return Const::doubleNaN;
       int ilayer = std::lround(layer[0]);
       return elti->hasCDCSLayer(ilayer);
     }
@@ -440,7 +445,7 @@ namespace Belle2 {
     double nExtraCDCSegments(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return realNaN;
+      if (!elti) return Const::doubleNaN;
       return elti->getNCDCSegments();
     }
 
@@ -448,7 +453,7 @@ namespace Belle2 {
     double nExtraVXDHitsInLayer(const Particle*, const std::vector<double>& layer)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return realNaN;
+      if (!elti) return Const::doubleNaN;
       int ilayer = std::lround(layer[0]);
       return elti->getNVXDClustersInLayer(ilayer);
     }
@@ -457,7 +462,7 @@ namespace Belle2 {
     double nExtraVXDHits(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return realNaN;
+      if (!elti) return Const::doubleNaN;
       double out = 0.0;
       for (uint16_t ilayer = 1; ilayer < 7; ++ilayer)
         out += elti->getNVXDClustersInLayer(ilayer);
@@ -468,7 +473,7 @@ namespace Belle2 {
     double svdFirstSampleTime(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return realNaN;
+      if (!elti) return Const::doubleNaN;
       return elti->getSVDFirstSampleTime();
     }
 
@@ -479,35 +484,57 @@ namespace Belle2 {
     double trackFindingFailureFlag(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return realNaN;
+      if (!elti) return Const::doubleNaN;
       return elti->hasAnErrorFlag();
+    }
+
+    // Build a Helix from a MCParticle's kinematics. Does NOT check for null pointer!!!
+    Belle2::Helix getMCHelix(const MCParticle* mcparticle)
+    {
+      const ROOT::Math::XYZVector mcProdVertex = mcparticle->getVertex();
+      const ROOT::Math::XYZVector mcMomentum = mcparticle->getMomentum();
+      const double BzAtProdVertex = Belle2::BFieldManager::getFieldInTesla(mcProdVertex).Z();
+      const double mcParticleCharge = mcparticle->getCharge();
+      return Belle2::Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
+    }
+
+    double getMCHelixParameterAtIndex(const Particle* particle, const int index)
+    {
+      if (!particle) return Const::doubleNaN;
+
+      const MCParticle* mcparticle = particle->getMCParticle();
+      if (!mcparticle) return Const::doubleNaN;
+
+      const Belle2::Helix mcHelix(getMCHelix(mcparticle));
+      const std::vector<double> mcHelixPars{mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(), mcHelix.getZ0(), mcHelix.getTanLambda()};
+      return mcHelixPars.at(index);
     }
 
     double getHelixParameterPullAtIndex(const Particle* particle, const int index)
     {
-      if (!particle) return realNaN;
+      if (!particle) return Const::doubleNaN;
 
       const MCParticle* mcparticle = particle->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       const Belle2::TrackFitResult* trackfit =  particle->getTrackFitResult();
-      if (!trackfit) return realNaN;
+      if (!trackfit) return Const::doubleNaN;
 
       const Belle2::UncertainHelix measHelix = trackfit->getUncertainHelix();
-      const TMatrixDSym measCovariance = measHelix.getCovariance();
-      const ROOT::Math::XYZVector mcProdVertex = mcparticle->getVertex();
-      const ROOT::Math::XYZVector mcMomentum = mcparticle->getMomentum();
-
-      const double BzAtProdVertex = Belle2::BFieldManager::getFieldInTesla(mcProdVertex).Z();
-      const double mcParticleCharge = mcparticle->getCharge();
-      const Belle2::Helix mcHelix = Belle2::Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
+      const TMatrixDSym& measCovariance = measHelix.getCovariance();
+      const Belle2::Helix mcHelix(getMCHelix(mcparticle));
 
       const std::vector<double> mcHelixPars   = {mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(), mcHelix.getZ0(), mcHelix.getTanLambda()};
       const std::vector<double> measHelixPars = {measHelix.getD0(), measHelix.getPhi0(), measHelix.getOmega(), measHelix.getZ0(), measHelix.getTanLambda()};
-      const std::vector<double> measErrSquare = {measCovariance[0][0], measCovariance[1][1], measCovariance[2][2], measCovariance[3][3], measCovariance[4][4]};
 
-      return (mcHelixPars.at(index) - measHelixPars.at(index)) / std::sqrt(measErrSquare.at(index));
+      return (mcHelixPars.at(index) - measHelixPars.at(index)) / std::sqrt(measCovariance(index, index));
     }
+
+    double getHelixMCD0(const Particle* part) { return getMCHelixParameterAtIndex(part, 0); }
+    double getHelixMCPhi0(const Particle* part) { return getMCHelixParameterAtIndex(part, 1); }
+    double getHelixMCOmega(const Particle* part) { return getMCHelixParameterAtIndex(part, 2); }
+    double getHelixMCZ0(const Particle* part) { return getMCHelixParameterAtIndex(part, 3); }
+    double getHelixMCTanLambda(const Particle* part) { return getMCHelixParameterAtIndex(part, 4); }
 
     double getHelixD0Pull(const Particle* part)
     {
@@ -528,25 +555,87 @@ namespace Belle2 {
     {
       return getHelixParameterPullAtIndex(part, 3);
     }
+
     double getHelixTanLambdaPull(const Particle* part)
     {
       return getHelixParameterPullAtIndex(part, 4);
     }
+
     double getTrackTime(const Particle* part)
     {
       const Track* track = part->getTrack();
-      if (!track) return realNaN;
+      if (!track) return Const::doubleNaN;
       return track->getTrackTime();
     }
 
     double isTrackFlippedAndRefitted(const Particle* part)
     {
       auto track = part->getTrack();
-      if (!track) return realNaN;
+      if (!track) return Const::doubleNaN;
       return track->isFlippedAndRefitted() ? 1 : 0;
     }
 
+    double getTrackLength(const Particle* part)
+    {
+      auto trackFit = part->getTrackFitResult();
+      if (!trackFit) return Const::doubleNaN;
+
+      const double lastCDCLayer = trackLastCDCLayer(part);
+      if (std::isnan(lastCDCLayer) or lastCDCLayer < 0)
+        return Const::doubleNaN;
+
+      const double r = DetectorSurface::cdcWireRadiuses.at((int)lastCDCLayer);
+
+      return trackFit->getHelix().getArcLength2DAtCylindricalR(r);
+    }
+
+
     VARIABLE_GROUP("Tracking");
+
+    REGISTER_VARIABLE("mcD0", getHelixMCD0, R"DOC(
+Returns the MC value of :math:`d_0`, the signed distance to the
+point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
+
+.. seealso:: :b2:var:`d0`
+
+Returns NaN if the particle is not related to any MCParticle.
+
+)DOC", "cm");
+    REGISTER_VARIABLE("mcPhi0", getHelixMCPhi0, R"DOC(
+Returns the MC value of :math:`\phi_0`, the angle of the transverse momentum
+in the :math:`r-\phi` plane.
+
+.. seealso:: :b2:var:`phi0`
+
+Returns NaN if the particle is not related to any MCParticle.
+
+)DOC", "rad");
+    REGISTER_VARIABLE("mcOmega", getHelixMCOmega, R"DOC(
+Returns the MC value of :math:`\omega`, the curvature of the track.
+
+.. seealso:: :b2:var:`omega`
+
+Returns NaN if the particle is not related to any MCParticle.
+
+)DOC", ":math:`\\text{cm}^{-1}`");
+    REGISTER_VARIABLE("mcZ0", getHelixMCZ0, R"DOC(
+Returns the MC value of :math:`z_0`, the z-coordinate of the
+point-of-closest-approach (POCA).
+
+.. seealso:: :b2:var:`z0`
+
+Returns NaN if the particle is not related to any MCParticle.
+
+)DOC", "cm");
+    REGISTER_VARIABLE("mcTanLambda", getHelixMCTanLambda, R"DOC(
+Returns the MC value of :math:`\tan\lambda`, the slope of the track in the
+:math:`r-z` plane.
+
+.. seealso:: :b2:var:`tanLambda`
+
+Returns NaN if the particle is not related to any MCParticle.
+)DOC");
+
     REGISTER_VARIABLE("d0Pull", getHelixD0Pull,     R"DOC(
 The pull of the tracking parameter :math:`d_0` for the reconstructed
 pattern-recognition track, with respect to the MC track. That is:
@@ -654,10 +743,10 @@ point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
 
 .. note::
 
-        Tracking parameters are with respect to the origin (0,0,0).  For the
+        Tracking parameters are with respect to the origin (0,0,0). For the
         POCA with respect to the measured beam interaction point, see
         :b2:var:`dr` (you probably want this unless you're doing a tracking
-        study or some debugging).
+        study or some debugging) and :b2:var:`d0FromIP`.
 
 Returns NaN if called for something other than a track-based particle.
 
@@ -665,6 +754,12 @@ Returns NaN if called for something other than a track-based particle.
     REGISTER_VARIABLE("phi0", trackPhi0, R"DOC(
 Returns the tracking parameter :math:`\phi_0`, the angle of the transverse
 momentum in the :math:`r-\phi` plane.
+
+.. note::
+
+        Tracking parameters are with respect to the origin (0,0,0). For the
+        POCA with respect to the measured beam interaction point, see
+        :b2:var:`phi0FromIP`.
 
 Returns NaN if called for something other than a track-based particle.
 
@@ -681,10 +776,10 @@ point-of-closest-approach (POCA).
 
 .. note::
 
-        Tracking parameters are with respect to the origin (0,0,0).  For the
+        Tracking parameters are with respect to the origin (0,0,0). For the
         POCA with respect to the measured beam interaction point, see
         :b2:var:`dz` (you probably want this unless you're doing a tracking
-        study or some debugging).
+        study or some debugging) and :b2:var:`z0FromIP`.
 
 Returns NaN if called for something other than a track-based particle.
 
@@ -694,6 +789,27 @@ Returns :math:`\tan\lambda`, the slope of the track in the :math:`r-z` plane.
 
 Returns NaN if called for something other than a track-based particle.
     )DOC");
+    REGISTER_VARIABLE("d0FromIP", trackD0FromIP, R"DOC(
+Returns the tracking parameter :math:`d_0`, the signed distance to the
+point-of-closest-approach (POCA) in the :math:`r-\phi` plane, with respect to the measured beam interaction point.
+
+Returns NaN if called for something other than a track-based particle.
+
+)DOC", "cm");
+    REGISTER_VARIABLE("z0FromIP", trackZ0FromIP, R"DOC(
+Returns the tracking parameter :math:`z_0`, the z-coordinate of the
+point-of-closest-approach (POCA), with respect to the measured beam interaction point.
+
+Returns NaN if called for something other than a track-based particle.
+
+)DOC", "cm");
+    REGISTER_VARIABLE("phi0FromIP", trackPhi0FromIP, R"DOC(
+Returns the tracking parameter :math:`\phi_0`, the angle of the transverse
+momentum in the :math:`r-\phi` plane, with respect to the measured beam interaction point.
+
+Returns NaN if called for something other than a track-based particle.
+
+)DOC", "rad");
     REGISTER_VARIABLE("d0Err", trackD0Error, R"DOC(
 Returns the uncertainty on :math:`d_0`, the signed distance to the
 point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
@@ -870,11 +986,20 @@ at the end of the reconstruction chain, in particular after the outer detector r
     )DOC");
 
     REGISTER_VARIABLE("trackTime", getTrackTime, R"DOC(
-Returns the time at which the track is produced relative to the time of the collision (given by SVD EventT0). 
+Returns the time at which the track is produced relative to the time of the collision (given by SVD EventT0).
 Both the time of the collision and the track time are computed using only SVD hits.
 Returns NaN if SVD EventT0 is NaN, or if no SVD Hits are attached to the track.
 For more details, see :ref:`Time Extraction <tracking_eventTimeExtraction>` page.
 
 )DOC", "ns");
+
+    REGISTER_VARIABLE("trackLength", getTrackLength, R"DOC(
+Returns the arc length of the helix for the TrackFitResult associated with the particle.
+The arc length is measured from the track origin to the radius of the CDC layer in which the Track has a hit.
+Returns NaN if the particle has no CDC Hits.
+
+)DOC", "cm");
+
+
   }
 }

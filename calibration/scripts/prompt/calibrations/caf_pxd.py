@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -23,7 +21,7 @@ from math import ceil
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
-                               expert_username="qyliu",
+                               expert_username="takaham",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["beamorphysics", "cosmic"],
@@ -104,7 +102,7 @@ def get_calibrations(input_data, **kwargs):
     # iov_list_physics = list(sorted(iov_set_physics))
     iov_list_all = list(sorted(iov_set_cosmics | iov_set_physics))
 
-    exp_set = set([iov.exp_low for iov in iov_list_all])
+    exp_set = {iov.exp_low for iov in iov_list_all}
     chunks_exp = []
     for exp in sorted(exp_set):
         chunks_exp += [list(g) for k, g in groupby(iov_list_all, lambda x: x.exp_low == exp) if k]
@@ -136,7 +134,7 @@ def get_calibrations(input_data, **kwargs):
         specific_iov = first_iov if iCal > 0 else output_iov
         basf2.B2INFO(f"Total number of files actually used as input = {len(input_files)} for the output {specific_iov}")
         cal = hot_pixel_mask_calibration(
-                cal_name="{}_PXDHotPixelMaskCalibration_BeamorPhysics".format(iCal + 1),
+                cal_name=f"{iCal + 1}_PXDHotPixelMaskCalibration_BeamorPhysics",
                 input_files=input_files,
                 **cal_kwargs)
         cal.algorithms[0].params = {"iov_coverage": specific_iov}
@@ -162,7 +160,7 @@ def get_calibrations(input_data, **kwargs):
             input_data, lambda x: input_data[x] in chunk) if k]))
         basf2.B2INFO(f"Total number of files actually used as input = {len(input_files)} for the output {specific_iov}")
         cal = hot_pixel_mask_calibration(
-                cal_name="{}_PXDHotPixelMaskCalibration_Cosmic".format(iCal + 1),
+                cal_name=f"{iCal + 1}_PXDHotPixelMaskCalibration_Cosmic",
                 input_files=input_files,
                 run_type='cosmic',
                 **cal_kwargs)

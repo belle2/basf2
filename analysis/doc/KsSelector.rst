@@ -11,14 +11,14 @@ Parameters for MVA training are selected not to raise bias in mass of :math:`K^0
 V0Selector
 ----------
 
-For V0Selector, mainly kinematics of :math:`K^0_S` and its daughter pions, flight length of :math:`K^0_S` and number of hits in VXD 
+For V0Selector, mainly kinematics of :math:`K^0_S` and its daughter pions, flight length of :math:`K^0_S` and number of hits in VXD
 are used for MVA training. The most dominant parameter for V0 selection is cosVertexMomentum, which represents the angle between
 vertex position and momentum of :math:`K^0_S`.
 
 LambdaVeto
 ----------
 
-For LambdaVeto, daughters' protonID, Lambda_mass which is calculated assuming proton mass hypothesis for one of daughter pions, 
+For LambdaVeto, daughters' protonID, Lambda_mass which is calculated assuming proton mass hypothesis for one of daughter pions,
 and kinematics of pions are used for MVA training. Two Lambda_mass parameters are dominant for LambdaVeto selection.
 
 Tutorials
@@ -30,13 +30,13 @@ An example tutorial for applying ksSelector to the existing :math:`K^0_S` partic
 
   analysis/examples/tutorials/B2A910-ApplyKsSelector.py
 
-An example tutorial for creating dataset for MVA training, which include true :math:`K^0_S`, :math:`\Lambda`, and mis-reconstructed :math:`K^0_S` is : 
+An example tutorial for creating dataset for MVA training, which include true :math:`K^0_S`, :math:`\Lambda`, and mis-reconstructed :math:`K^0_S` is :
 
 ::
 
   analysis/examples/tutorials/B2A911-CreateTrainData.py
 
-An example tutorial for training dataset is : 
+An example tutorial for training dataset is :
 
 ::
 

@@ -316,7 +316,7 @@ void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackClu
 
   int uBin(-1), vBin(-1);
   int binID = 0;
-  VxdID sensorID = getVxdIDFromPXDModuleID(cluster.pxdID);
+  VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
   auto layerNumber = sensorID.getLayerNumber();
   auto ladderNumber = sensorID.getLadderNumber();
   auto sensorNumber = sensorID.getSensorNumber();
@@ -360,7 +360,7 @@ void PXDPerformanceVariablesCollectorModule::collectEfficiencyVariables(const Tr
   auto z = tPoint.z;
 
   VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
-  const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+  const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
   auto localPoint = Info.pointToLocal(ROOT::Math::XYZVector(tPoint.x, tPoint.y, tPoint.z), true);
   auto uID = Info.getUCellID(localPoint.X());
   auto vID = Info.getVCellID(localPoint.Y());

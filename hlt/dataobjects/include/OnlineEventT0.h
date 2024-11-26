@@ -27,7 +27,7 @@ namespace Belle2 {
 
     /** Constructor.
      * @param eventT0 EventT0 computed on HLT
-     * @param eventT0Uncertainty uncertainity on EventT0 computed on HLT
+     * @param eventT0Uncertainty uncertainty on EventT0 computed on HLT
      * @param detector detector which provided the EventT0
      */
     OnlineEventT0(float eventT0, float eventT0Uncertainty, const Const::DetectorSet& detector)

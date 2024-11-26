@@ -188,7 +188,7 @@ namespace Belle2 {
       // for debugging: print data for crosschecks:
       printData(chain, sectorBranches, filterBranches);
 
-      // create graph containing all sector-chains occured in the training sample
+      // create graph containing all sector-chains occurred in the training sample
       SectorGraph<std::string> mainGraph = buildGraph<std::string>(chain, sectorBranches, filterBranches);
 
       // use rareness-threshold to find sector-combinations which are very rare and remove them:
@@ -276,10 +276,10 @@ namespace Belle2 {
       }
     }
 
-    /** check that the vector of FullSecIDs @param ids is meaningfull for us.
-     * if @param ids size == 2 it checks that the two sectors are not on the same
+    /** check that the vector of FullSecIDs @param ids is meaningful for us.
+     * if ids size == 2 it checks that the two sectors are not on the same
      * layer and ladder
-     * if @param ids size == 3 it checks that both segments satisfy the same requirement
+     * if ids size == 3 it checks that both segments satisfy the same requirement
      */
     bool good(const std::vector< unsigned>& ids);
   };

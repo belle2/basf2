@@ -8,31 +8,35 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+set -e
+
 # check if we are in a local repository
 if [ -z ${BELLE2_LOCAL_DIR} ]; then
   echo "You can update GenFit only if you setup a local basf2 repository" 
   exit 1
 fi
 
-# check for help argument
-echo $@ | grep -E -- "(^|\\s)(--help|-h)($|\\s)" &>/dev/null
-if [ $? -eq 0 ]; then
+show_help() {
     cat <<EOT
 This script will update GenFit locally and then push the modifications
 upstream.
 
 This script can be used as follows:
 
-    `basename $0`
+    $(basename "$0")
 
 In such a case, a default commit message will be used ("Update GenFit").
 
 It is also possible to pass a specific commit message as follows:
 
-    `basename $0` <COMMIT MESSAGE>
-
+    $(basename "$0") <COMMIT MESSAGE>
 EOT
-    exit 1;
+}
+
+# Check for the help argument
+if [[ "$#" -eq 1 && ( "$1" == "--help" || "$1" == "-h" ) ]]; then
+    show_help
+    exit 0
 fi
 
 # check if a commit message is passed
@@ -49,7 +53,7 @@ git remote add genfit2-on-github "https://github.com/GenFit/GenFit"
 git fetch genfit2-on-github
 git checkout -b feature/update-genfit-${TODAY}
 git rm -r genfit2/code2
-git read-tree --prefix=genfit2/code2/ -u genfit2-on-github/master
+git read-tree --prefix=genfit2/code2/ -u genfit2-on-github/main
 touch genfit2/code2/.imported && git add genfit2/code2/.imported
 git commit -m "${COMMIT_MESSAGE}"
 git push --set-upstream origin feature/update-genfit-${TODAY}

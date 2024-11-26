@@ -22,6 +22,7 @@
 #
 # Approach 2 and 3 can be done in parallel (by using the multiprocessing module of python, see below)
 
+from basf2 import find_file
 import basf2_mva
 import basf2_mva_util
 import multiprocessing
@@ -30,8 +31,11 @@ import copy
 
 if __name__ == "__main__":
 
-    training_data = basf2_mva.vector("train.root")
-    test_data = basf2_mva.vector("test.root")
+    train_file = find_file("mva/train_D0toKpipi.root", "examples")
+    test_file = find_file("mva/test_D0toKpipi.root", "examples")
+
+    training_data = basf2_mva.vector(train_file)
+    testing_data = basf2_mva.vector(test_file)
 
     variables = ['M', 'p', 'pt', 'pz',
                  'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)',
@@ -60,11 +64,11 @@ if __name__ == "__main__":
         options = copy.copy(general_options)
         options.m_variables = basf2_mva.vector(*variables)
         m = method.train_teacher(training_data, general_options.m_treename, general_options=options)
-        p, t = m.apply_expert(test_data, general_options.m_treename)
+        p, t = m.apply_expert(testing_data, general_options.m_treename)
         return basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
 
     method = basf2_mva_util.Method(general_options.m_identifier)
-    p, t = method.apply_expert(test_data, general_options.m_treename)
+    p, t = method.apply_expert(testing_data, general_options.m_treename)
     global_auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
 
     # Approach 1: Read out the importance calculated by the method itself

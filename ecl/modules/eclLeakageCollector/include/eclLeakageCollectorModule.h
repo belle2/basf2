@@ -8,10 +8,12 @@
 
 #pragma once
 
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-
+#include <ecl/dbobjects/ECLnOptimal.h>
+#include <TH2F.h>
 
 namespace Belle2 {
   class ECLCrystalCalib;
@@ -55,12 +57,24 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
     /** Some other useful quantities */
-    const int nLeakReg = 3; /**< 0 = forward, 1 = barrel, 2 = backward */
-    const int nCrysMax = 21; /**< max number of crystals used to calculate energy */
+    const int nLeakReg = 3; /**< 3 ECL regions: 0 = forward, 1 = barrel, 2 = backward */
     bool storeCalib = true; /**< store parameters first event */
     std::vector< std::vector<int> > i_energies;/**< Generated energies in MeV in each region */
 
     ECL::ECLLeakagePosition* leakagePosition{nullptr}; /**< location of position of cluster */
+    int m_nDump = 0; /**< Number of events with diagnostic printouts */
+
+    /** nOptimal payload */
+    DBObjPtr<ECLnOptimal> m_eclNOptimal;
+    TH2F m_nOptimal2D; /**< 2D hist of nOptimal for Ebin vs groupID */
+    TH2F m_peakFracEnergy; /**< 2D histogram of peak fractional contained energy */
+    TH2F m_bias; /**< 2D histogram of bias = sum of ECLCalDigit energy minus true (GeV) */
+    TH2F m_logPeakEnergy; /**< log of peak contained energy in GeV */
+
+    std::vector<int> m_groupNumber; /**< group number for each crystal */
+    const int m_nLeakReg = 3; /**< 3 ECL regions: 0 = forward, 1 = barrel, 2 = backward */
+    int m_nEnergyBins = 0; /**< number of energies bins in nOptimal payload */
+    std::vector< std::vector<float> > m_eBoundaries; /**< energy boundaries each region */
 
     /** For TTree */
     int t_cellID = 0; /**< cellID of photon */
@@ -68,7 +82,7 @@ namespace Belle2 {
     int t_region = 0; /**< region of photon 0=forward 1=barrel 2=backward*/
     int t_thetaBin = -1; /**< binned location in theta relative to crystal edge */
     int t_phiBin =
-      -1; /**< binned location in phi relative to crystal edge. Starts from edge with mechnical structure, or else lower edge */
+      -1; /**< binned location in phi relative to crystal edge. Starts from edge with mechanical structure, or else lower edge */
     int t_phiMech = -1; /**< 0: mechanical structure next to phi edge; 1: no mech structure */
     int t_energyBin = -1; /**< generated energy point */
     int t_nCrys = -1; /**< number of crystals used to calculate energy */

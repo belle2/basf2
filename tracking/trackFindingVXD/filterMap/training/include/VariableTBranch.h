@@ -17,13 +17,13 @@ namespace Belle2 {
   /** This class contains **/
   template <class Variable>
   class VariableTBranch {
-    /// The value to be stored in tha branch
+    /// The value to be stored in the branch
     typename Variable::variableType m_storedValue;
     /// Member for the pointer to the TBranch
     TBranch* m_branch;
   public:
     /** Add to the TTree
-     * @param tree a branch whose name and type are inferred from @param var
+     * @param tree a branch whose name and type are inferred from parameter var
      */
     explicit VariableTBranch(TTree* tree);
 

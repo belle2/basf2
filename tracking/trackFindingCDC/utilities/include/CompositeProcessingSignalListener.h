@@ -13,7 +13,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Partial implemenation for an algorithm part that wants to dispatch processing signals to subobjects.
+    /// Partial implementation for an algorithm part that wants to dispatch processing signals to subobjects.
     class CompositeProcessingSignalListener : public ProcessingSignalListener {
 
     private:

@@ -30,6 +30,8 @@ SVDB4CommissioningPlotsModule::SVDB4CommissioningPlotsModule() : Module()
   addParam("ClustersName", m_ClusterName, "Name of Cluster Store Array.", std::string("SVDClusters"));
   addParam("TrackListName", m_TrackName, "Name of Track Store Array.", std::string("Tracks"));
   addParam("TrackFitResultListName", m_TrackFitResultName, "Name of TracksFitResult Store Array.", std::string("TrackFitResults"));
+  addParam("plotRecoDigits", m_plotRecoDigits,
+           "Set true to produce the plots for RecoDigits (false by default)", m_plotRecoDigits);
 }
 
 void SVDB4CommissioningPlotsModule::initialize()
@@ -40,7 +42,6 @@ void SVDB4CommissioningPlotsModule::initialize()
   m_Tracks.isOptional(m_TrackName);
   m_recoTracks.isOptional();
   m_tfr.isOptional(m_TrackFitResultName);
-
 
   B2INFO("      RecoDigits: " << m_RecoDigitName);
   B2INFO("        Clusters: " << m_ClusterName);
@@ -220,25 +221,27 @@ void SVDB4CommissioningPlotsModule::event()
   }
 
   if (m_Tracks)
-    B2DEBUG(1, "%%%%%%%% NEW EVENT,  number of Tracks =  " << m_Tracks.getEntries());
-
+    B2DEBUG(29, "%%%%%%%% NEW EVENT,  number of Tracks =  " << m_Tracks.getEntries());
 
   //reco digits
-  if (m_svdRecos.isValid()) {
-    for (int digi = 0 ; digi < m_svdRecos.getEntries(); digi++) {
+  if (m_plotRecoDigits) {
+    if (m_svdRecos.isValid()) {
+      for (int digi = 0 ; digi < m_svdRecos.getEntries(); digi++) {
 
-      VxdID::baseType theVxdID = (VxdID::baseType)m_svdRecos[digi]->getSensorID();
-      int side = m_svdRecos[digi]->isUStrip();
-      int cellID = m_svdRecos[digi]->getCellID();
+        VxdID::baseType theVxdID = (VxdID::baseType)m_svdRecos[digi]->getSensorID();
+        int side = m_svdRecos[digi]->isUStrip();
+        int cellID = m_svdRecos[digi]->getCellID();
 
-      float thisNoise = m_NoiseCal.getNoiseInElectrons(theVxdID, side, cellID);
+        float thisNoise = m_NoiseCal.getNoiseInElectrons(theVxdID, side, cellID);
 
-      h_recoNoise->fill(theVxdID, side, thisNoise);
-      h_recoCharge->fill(theVxdID, side, m_svdRecos[digi]->getCharge() / 1000.);
-      h_recoEnergy->fill(theVxdID, side, m_svdRecos[digi]->getCharge()*c_eTOkeV);
-      h_recoTime->fill(theVxdID, side, m_svdRecos[digi]->getTime());
+        h_recoNoise->fill(theVxdID, side, thisNoise);
+        h_recoCharge->fill(theVxdID, side, m_svdRecos[digi]->getCharge() / 1000.);
+        h_recoEnergy->fill(theVxdID, side, m_svdRecos[digi]->getCharge()*c_eTOkeV);
+        h_recoTime->fill(theVxdID, side, m_svdRecos[digi]->getTime());
+      }
     }
   }
+
 
   //clusters  NOT related to tracks
   for (int cl = 0 ; cl < m_svdClusters.getEntries(); cl++) {
@@ -306,11 +309,13 @@ void SVDB4CommissioningPlotsModule::endRun()
         for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
           for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++) {
 
-            dir_reco_layer->cd();
-            (h_recoCharge->getHistogram(sensor, view))->Write();
-            (h_recoEnergy->getHistogram(sensor, view))->Write();
-            (h_recoTime->getHistogram(sensor, view))->Write();
-            (h_recoNoise->getHistogram(sensor, view))->Write();
+            if (m_plotRecoDigits) {
+              dir_reco_layer->cd();
+              (h_recoCharge->getHistogram(sensor, view))->Write();
+              (h_recoEnergy->getHistogram(sensor, view))->Write();
+              (h_recoTime->getHistogram(sensor, view))->Write();
+              (h_recoNoise->getHistogram(sensor, view))->Write();
+            }
             dir_clusterAssigned_layer->cd();
             (h_clusterTrkCharge->getHistogram(sensor, view))->Write();
             (h_clusterTrkSNR->getHistogram(sensor, view))->Write();

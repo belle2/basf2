@@ -6,7 +6,7 @@ We can also add documentation for basf2 variables with a very similar syntax to 
 .. rst:directive:: b2-variables
 
   Allows to automatically document basf2 variables from the VariableManager. It
-  has the following optional parameters. 
+  has the following optional parameters.
 
   .. note:: ``:regex-filter:`` and ``:noindex:`` can be used also for ``b2-variables`` as described in previous section.
 

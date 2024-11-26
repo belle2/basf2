@@ -46,7 +46,7 @@ using namespace Belle2;
 using namespace Simulation;
 
 
-Belle2PhysicsList::Belle2PhysicsList(const G4String& physicsListName)
+Belle2PhysicsList::Belle2PhysicsList(const G4String& physicsListName, const G4int hadronicVerbosityLevel)
   : G4VModularPhysicsList(), m_globalCutValue(0.07)
 {
   B2INFO("Using " << physicsListName << " physics list");
@@ -69,7 +69,7 @@ Belle2PhysicsList::Belle2PhysicsList(const G4String& physicsListName)
   RegisterPhysics(new HyperonPhysics());
   RegisterPhysics(new AntiBaryonPhysics());
   RegisterPhysics(new IonPhysics());
-  RegisterPhysics(new GammaLeptoNuclearPhysics());
+  RegisterPhysics(new GammaLeptoNuclearPhysics(hadronicVerbosityLevel));
   RegisterPhysics(new Geant4ePhysics());
 
   m_regionCuts = new G4ProductionCuts;

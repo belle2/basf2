@@ -8,7 +8,7 @@ PID corrections and systematic errors
 -------------------------------------
 Efficiency correction factors and systematic errors for Belle PID
 were obtained using corresponding MC and data samples.
-Those studies were done for different PID selections, and 
+Those studies were done for different PID selections, and
 possible selections differ for different hypotheses.
 
 There are three groups of lookup tables in Belle:
@@ -21,7 +21,7 @@ There are three groups of lookup tables in Belle:
 * Proton ID:
    * Possible cuts for proton: [0.6, 0.7, 0.8, 0.9]
 
-Details of these tables and how they were studies can be found at 
+Details of these tables and how they were studies can be found at
 `Belle PID Joint Homepage <https://belle.kek.jp/group/pid_joint/>`_.
 
 The weights for LID and KID are available in basf2 and can be retrieved via payloads in ``Belle_PID``;
@@ -33,7 +33,7 @@ naming schemes of each PID payloads are slightly different.
 Naming scheme for LID is ``BelleLID<e|mu>_<LID cut>``.
 Using ``eIDBelle>0.9`` as an example:
 
-.. code-block:: python3
+.. code-block:: python
 
    import variables as va
    import basf2 as b2
@@ -76,7 +76,7 @@ Here,
 To append PID correction information for pion efficiency selected as kaons with
 ``atcPIDBelle(3, 2)>0.6`` cut:
 
-.. code-block:: python3
+.. code-block:: python
 
    kid_table = "BelleKIDPiFakePlus_6"
 
@@ -110,7 +110,7 @@ To append PID correction information for pion efficiency selected as kaons with
    my_path.add_module(reweighter2)
 
 .. note::
-   ``fit_flag`` indicates if the fits failed; ``fit_flag = 0`` is for successful fit, while 
+   ``fit_flag`` indicates if the fits failed; ``fit_flag = 0`` is for successful fit, while
    any non-zero values of fit_flag are for failed fit. Please only use ``fit_flag==0``
    when evaluating PID contributions.
 
@@ -128,7 +128,7 @@ Here,
 If you'd like to add the information for proton efficiency selected
 with ``atcPIDBelle(4, 2)>0.6`` and ``atcPIDBelle(4, 3)>0.6``.
 
-.. code-block:: python3
+.. code-block:: python
 
    pid_table = "BellePIDPlus_0.6"
 
@@ -154,9 +154,10 @@ Full Event Interpretation
 
 To utilize FEI, the correct prefix of FEI payloads needs to be set:
 
-.. code-block:: python3
+.. code-block:: python
 
    import fei
+   basf2.conditions.append_globaltag("analysis_tools_light-2012-minos")
    configuration = fei.config.FeiConfiguration(prefix='FEI_B2BII_light-2012-minos', cache=0)
 
    feistate = fei.get_path(particles, configuration)
@@ -175,7 +176,7 @@ To apply flavour tagger in a b2bii analysis, one will need to append the
 correct global tag.
 FlavorTagger will call the corresponding payloads in the module.
 
-.. code-block:: python3
+.. code-block:: python
 
    import flavorTagger as ft
 
@@ -185,6 +186,40 @@ FlavorTagger will call the corresponding payloads in the module.
    ft.flavorTagger(
        particleLists=['B+:sig'],
        weightFiles=weightfiles,
+       prefix='',
        path=my_path)
 
+
+
+-------------------------------------
+BeamBackground MVA and FakePhoton MVA
+-------------------------------------
+
+The weight files for the b2bii case are stored in the ``analysis_b2bii`` global tag.
+To apply beam background MVA and fake photon MVA in a b2bii analysis, the correct
+suffix, ``Belle``, should be used for the weight file, and apply them over the
+premade ``gamma:mdst`` list:
+
+
+.. code-block:: python
+
+   import modularAnalysis as ma
+   basf2.conditions.append_globaltag(ma.getAnalysisGlobaltagB2BII())
+   # Apply fake photon MVA
+   ma.getFakePhotonProbability(
+       particleList=['gamma:mdst'],
+       weight="Belle",
+       path=mypath)
+   # Apply beamBackground MVA
+   ma.getBeamBackgroundProbability(
+       particleList=['gamma:mdst'],
+       weight="Belle",
+       path=mypath)
+
+
+.. note::
+   Details for the training done in Belle MC can be found in the appendix in 
+   `BELLE2-NOTE-PH-2023-036`_.
+
+.. _BELLE2-NOTE-PH-2023-036: https://docs.belle2.org/record/3754/
 

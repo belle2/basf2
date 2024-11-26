@@ -6,17 +6,19 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//This module
+/* Own header. */
 #include <ecl/modules/eclTrackBremFinder/BremFindingMatchCompute.h>
 
-//Framework
+/* Basf2 headers. */
+#include <framework/geometry/VectorUtil.h>
 #include <framework/utilities/Angle.h>
-
-//MDST
 #include <mdst/dataobjects/ECLCluster.h>
 
-//genfit
+/* Genfit headers. */
 #include <genfit/MeasuredStateOnPlane.h>
+
+/* ROOT headers. */
+#include <Math/Vector3D.h>
 
 using namespace std;
 using namespace Belle2;
@@ -25,10 +27,15 @@ bool BremFindingMatchCompute::isMatch()
 {
   auto fitted_state = m_measuredStateOnPlane;
 
-  auto clusterPosition = m_eclCluster.getClusterPosition();
+  ROOT::Math::XYZVector clusterPosition = m_eclCluster->getClusterPosition();
 
-  auto fitted_pos = fitted_state.getPos();
-  auto fitted_mom = fitted_state.getMom();
+  TVector3 position = fitted_state.getPos();
+  ROOT::Math::XYZVector positionDifference(
+    clusterPosition.X() - position.X(),
+    clusterPosition.Y() - position.Y(),
+    clusterPosition.Z() - position.Z());
+  TVector3 momentum = fitted_state.getMom();
+  ROOT::Math::XYZVector fitted_mom(momentum.X(), momentum.Y(), momentum.Z());
 
   auto cov = fitted_state.get6DCov();
   const double err_px = cov[3][3];
@@ -51,47 +58,38 @@ bool BremFindingMatchCompute::isMatch()
                                      ((px * pz) / (square_sum * perp)) * (perp / square_sum) * cov[3][5] +
                                      ((py * pz) / (square_sum * perp)) * (perp / square_sum) * cov[4][5]);
 
+  PhiAngle   hitPhi(fitted_mom.Phi(), err_phi);
+  ThetaAngle hitTheta(fitted_mom.Theta(), err_theta);
 
-  const auto hit_theta = fitted_mom.Theta();
-  double hit_phi       = fitted_mom.Phi();
-  if (hit_phi < 0) hit_phi += TMath::TwoPi();
-
-  PhiAngle   hitPhi(hit_phi, err_phi);
-  ThetaAngle hitTheta(hit_theta, err_theta);
-
-  PhiAngle clusterPhi(0, 0);
-
-  if ((clusterPosition - fitted_pos).Phi() >= 0) {
-    clusterPhi = PhiAngle((clusterPosition - fitted_pos).Phi(), m_eclCluster.getUncertaintyPhi());
-  } else {
-    clusterPhi = PhiAngle((clusterPosition - fitted_pos).Phi() + TMath::TwoPi(), m_eclCluster.getUncertaintyPhi());
-  }
-  ThetaAngle clusterTheta = ThetaAngle((clusterPosition - fitted_pos).Theta(), m_eclCluster.getUncertaintyTheta());
+  PhiAngle clusterPhi(positionDifference.Phi(), m_eclCluster->getUncertaintyPhi());
+  ThetaAngle clusterTheta(positionDifference.Theta(), m_eclCluster->getUncertaintyTheta());
 
   if (clusterPhi.containsIn(hitPhi, m_clusterAcceptanceFactor) &&
       clusterTheta.containsIn(hitTheta, m_clusterAcceptanceFactor)) {
 
-    TVector3 hitV;
-    hitV.SetMagThetaPhi(1.0f, hitTheta.getAngle(), hitPhi.getAngle());
-    TVector3 clusterV;
-    clusterV.SetMagThetaPhi(1.0f, clusterTheta.getAngle(), clusterPhi.getAngle());
+    ROOT::Math::XYZVector hitV;
+    VectorUtil::setMagThetaPhi(
+      hitV, 1.0, hitTheta.getAngle(), hitPhi.getAngle());
+    ROOT::Math::XYZVector clusterV;
+    VectorUtil::setMagThetaPhi(
+      clusterV, 1.0, clusterTheta.getAngle(), clusterPhi.getAngle());
 
-    auto distV = hitV - clusterV;
+    ROOT::Math::XYZVector distV = hitV - clusterV;
 
-    m_distanceHitCluster = distV.Mag();
+    m_distanceHitCluster = distV.R();
 
     // set the effective acceptance factor
     double deltaTheta = abs(hitV.Y() - clusterV.Y());
-    m_effAcceptanceFactor = deltaTheta / (err_theta + m_eclCluster.getUncertaintyTheta());
+    m_effAcceptanceFactor = deltaTheta / (err_theta + m_eclCluster->getUncertaintyTheta());
     double deltaPhi = abs(hitV.Z() - clusterV.Z());
-    double effFactor = deltaPhi / (err_phi + m_eclCluster.getUncertaintyPhi());
+    double effFactor = deltaPhi / (err_phi + m_eclCluster->getUncertaintyPhi());
     if (effFactor > m_effAcceptanceFactor) {
       m_effAcceptanceFactor = effFactor;
     }
 
     return (true);
 
-    // todo: can use weight here to signal assigment confidence
+    // todo: can use weight here to signal assignment confidence
 
   } else {
     return (false);

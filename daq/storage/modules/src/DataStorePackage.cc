@@ -19,7 +19,6 @@ using namespace Belle2;
 
 bool DataStorePackage::restore()
 {
-  static int count = 0;
   //(m_sndhdrary.appendNew())->SetBuffer(m_data.getBuffer());
   int nboard = m_data.getNBoard();
   if (m_eb2 == 0 && nboard == 1) {
@@ -29,6 +28,7 @@ bool DataStorePackage::restore()
   }
 
   if (m_data_hlt.getBuffer() == NULL || m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
+    static int count = 0; //TODO has it any meaning?
     B2FATAL("Bad tarailer magic for HLT = " << m_data_hlt.getTrailerMagic()
             << " count = " << count);
   }
@@ -43,7 +43,7 @@ bool DataStorePackage::restore()
   delete msg;
   if (nboard > 1) {
     unsigned int offset = m_data_hlt.getWordSize() + m_data.getHeaderWordSize();
-    for (unsigned int i = 0; i < nboard - 1; i++) {
+    for (int i = 0; i < nboard - 1; ++i) {
       m_data_pxd.setBuffer(m_data.getBuffer() + offset);
       offset += m_data_pxd.getWordSize();
       if (m_data_pxd.getBody()[0] != ONSENBinData::MAGIC) {

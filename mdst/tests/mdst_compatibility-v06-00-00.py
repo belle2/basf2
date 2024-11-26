@@ -11,9 +11,15 @@
 """
 Test backwards compatibility for an mdst file produced with release-06-00-00.
 
-See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
+See https://xwiki.desy.de/xwiki/rest/p/0a372 if this test fails.
 
 CHANGES since release-06-00-00:
+
+- EventLevelClusteringInfo
+  + nKLMDigitsMultiStrip
+  + nECLShowers
+  + nECLLocalMaximums
+  + nECLTriggerCells
 - Track:
   + statusBitmap and getStatusBit
   + getTrackTime added

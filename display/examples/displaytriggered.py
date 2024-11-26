@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -61,9 +60,6 @@ else:
 # create geometry
 gearbox = b2.register_module('Gearbox')
 geometry = b2.register_module('Geometry')
-# new ECL geometry contains custom objects that cannot be converted to TGeo
-# add MagneticField off B-field (also greatly speeds up startup)
-geometry.param('excludedComponents', ['ECL'])
 
 main.add_module(rootinput)
 main.add_module(gearbox)

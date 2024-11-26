@@ -12,11 +12,6 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 #include <dqm/core/DQMHistAnalysis.h>
 
 #include <TH1.h>
@@ -27,15 +22,6 @@ namespace Belle2 {
 
   class DQMHistInjectionModule final : public DQMHistAnalysisModule {
 
-#ifdef _BELLE2_EPICS
-    typedef struct MYNODE_struct {
-      chid  mychid; /**< channel ID */
-      TH1*  histo = {}; /**< initial histogram */
-      std::vector <double> data; /**< vector of data */
-    } MYNODE;
-
-#endif
-
     // Public functions
   public:
 
@@ -43,11 +29,6 @@ namespace Belle2 {
      * Constructor.
      */
     DQMHistInjectionModule();
-
-    /**
-     * Destructor.
-     */
-    ~DQMHistInjectionModule();
 
     /**
      * Initializer.
@@ -64,11 +45,6 @@ namespace Belle2 {
      */
     void event(void) override final;
 
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate(void) override final;
-
   private:
 
     // Data members
@@ -76,12 +52,6 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
-    //! whether to use EPICs
-    bool m_useEpics;
-
-    //! Clean up PVs
-    // cppcheck-suppress unusedPrivateFunction
-    void cleanPVs(void);
 
     //! PXD Hits
     TH1F* m_hInjectionLERPXD = nullptr;
@@ -156,10 +126,6 @@ namespace Belle2 {
     //! Canvas for KLM occupancy after HER injection
     TCanvas* m_cInjectionHERKLM = nullptr;
 
-#ifdef _BELLE2_EPICS
-    //! EPICS PVs
-    std::vector <MYNODE>  m_nodes;
-#endif
   };
 } // end namespace Belle2
 

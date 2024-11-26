@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -14,7 +13,6 @@ import sys
 argv = sys.argv
 
 # Set the log level to show only error and fatal messages
-b2.set_log_level(b2.LogLevel.ERROR)
 b2.set_log_level(b2.LogLevel.INFO)
 
 # Create main path
@@ -24,6 +22,7 @@ main = b2.create_path()
 input = b2.register_module('DQMHistAnalysisInput')
 input.param('HistMemoryPath', argv[1])
 main.add_module(input)
+main.add_module("DQMHistAutoCanvas")  # Plot all Histo from Input
 
 output = b2.register_module('DQMHistAnalysisOutputFile')
 output.param('SaveCanvases', True)

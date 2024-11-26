@@ -12,12 +12,11 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
 #include <ecl/digitization/EclConfiguration.h>
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -120,7 +119,7 @@ namespace Belle2 {
     /** Lookup table for ECL channels. */
     std::vector<crystallinks_t> m_tbl;
 
-    /** Fit algorihtm parameters shared by group of crystals */
+    /** Fit algorithm parameters shared by group of crystals */
     std::vector<algoparams_t> m_idn; /**< parameters that needs for waveform fit */
     std::vector<fitparams_t> m_fitparams; /**< Pairs of (waveform parameters, fit parameters) */
     std::vector<ECLNoiseData> m_noise; /**< parameters for correlated noise simulation */

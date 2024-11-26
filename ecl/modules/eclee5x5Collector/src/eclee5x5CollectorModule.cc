@@ -19,6 +19,7 @@
 #include <analysis/ClusterUtility/ClusterUtils.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
+#include <framework/geometry/VectorUtil.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
@@ -49,7 +50,7 @@ eclee5x5CollectorModule::eclee5x5CollectorModule() : CalibrationCollectorModule(
   // Set module properties
   setDescription("Calibration Collector Module for ECL single crystal energy calibration using Bhabha events");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "miniumum ecl cluster theta in lab (degrees)", 17.);
+  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "minimum ecl cluster theta in lab (degrees)", 17.);
   addParam("thetaLabMaxDeg", m_thetaLabMaxDeg, "maximum ecl cluster theta in lab (degrees)", 150.);
   addParam("minE0", m_minE0, "minimum energy of cluster 0: E*0/sqrts", 0.45);
   addParam("minE1", m_minE1, "minimum energy of cluster 1: E*1/sqrts", 0.40);
@@ -58,6 +59,7 @@ eclee5x5CollectorModule::eclee5x5CollectorModule() : CalibrationCollectorModule(
   addParam("maxTime", m_maxTime, "maximum cluster time diff abs(t1-t0)/dt99", 10.);
   addParam("useCalDigits", m_useCalDigits, "use MC events to obtain expected energies", false);
   addParam("requireL1", m_requireL1, "only use events that have a level 1 trigger", false);
+  addParam("expectedEnergyScale", m_expectedEnergyScale, "scale expected energies for non-4S calibration", 1.);
 }
 
 
@@ -131,6 +133,7 @@ void eclee5x5CollectorModule::prepare()
   B2INFO("maxTime: " << m_maxTime);
   B2INFO("useCalDigits: " << m_useCalDigits);
   B2INFO("requireL1: " << m_requireL1);
+  B2INFO("expectedEnergyScale: " << m_expectedEnergyScale);
 
   /** Resize vectors */
   EperCrys.resize(ECLElementNumbers::c_NCrystals);
@@ -295,16 +298,14 @@ void eclee5x5CollectorModule::collect()
   const ROOT::Math::XYZVector clustervertex = cUtil.GetIPPosition();
 
   double phi0 = m_eclClusterArray[icMax[0]]->getPhi();
-  TVector3 p30(0., 0., maxClustE[0]);
-  p30.SetTheta(theta0);
-  p30.SetPhi(phi0);
+  ROOT::Math::XYZVector p30;
+  VectorUtil::setMagThetaPhi(p30, maxClustE[0], theta0, phi0);
   const ROOT::Math::PxPyPzEVector p40 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[0]], clustervertex,
                                         ECLCluster::EHypothesisBit::c_nPhotons);
 
   double phi1 = m_eclClusterArray[icMax[1]]->getPhi();
-  TVector3 p31(0., 0., maxClustE[1]);
-  p31.SetTheta(theta1);
-  p31.SetPhi(phi1);
+  ROOT::Math::XYZVector p31;
+  VectorUtil::setMagThetaPhi(p31, maxClustE[1], theta1, phi1);
   const ROOT::Math::PxPyPzEVector p41 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[1]], clustervertex,
                                         ECLCluster::EHypothesisBit::c_nPhotons);
 
@@ -367,8 +368,8 @@ void eclee5x5CollectorModule::collect()
   //** Quantities needed for the 5x5 calibration */
   for (int ic = 0; ic < 2; ic++) {
     int crysMax = crysIDMax[ic];
-    float expE = abs(Expee5x5E[crysMax]);
-    float sigmaExp = Expee5x5Sigma[crysMax];
+    float expE = m_expectedEnergyScale * abs(Expee5x5E[crysMax]);
+    float sigmaExp = m_expectedEnergyScale * Expee5x5Sigma[crysMax];
     std::vector<short int> neighbours = m_eclNeighbours5x5->getNeighbours(crysMax + 1);
 
     //** Energy in 5x5, and expected energy corrected for crystals that will not be calibrated */

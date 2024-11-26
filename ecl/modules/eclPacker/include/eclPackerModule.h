@@ -5,17 +5,18 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #pragma once
 
-//Framework
+/* ECL headers. */
+#include <ecl/mapper/ECLChannelMapper.h>
+
+/* Basf2 headers. */
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-
-//ECL
-#include <ecl/utility/ECLChannelMapper.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 
@@ -47,7 +48,7 @@ namespace Belle2 {
     /// exception for errors during packing ADC data buffer
     BELLE2_DEFINE_EXCEPTION(Write_adc_samples_error,
                             "Error packing adc samples to buffer");
-    /// wrong indexes for ShaperDSP, channel or crate are apperared
+    /// wrong indexes for ShaperDSP, channel or crate are appeared
     BELLE2_DEFINE_EXCEPTION(eclPacker_internal_error,
                             "Something wrong with ECL Packer");
 
@@ -67,7 +68,7 @@ namespace Belle2 {
     /** DSP amplitude threshold */
     int m_ampThreshold;
 
-    /** eneble/disable compression of waveform data */
+    /** enable/disable compression of waveform data */
     bool m_compressMode;
 
     /** true-pack data in PCIe40 format, false-pack data in COPPER format */

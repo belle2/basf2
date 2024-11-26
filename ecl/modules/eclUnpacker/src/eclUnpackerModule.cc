@@ -204,7 +204,7 @@ void ECLUnpackerModule::terminate()
 {
 }
 
-// meathod to read collector data by 32-bit words
+// method to read collector data by 32-bit words
 unsigned int ECLUnpackerModule::readNextCollectorWord()
 {
   if (m_bufPos == m_bufLength) {
@@ -532,7 +532,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
       } // loop over shapers
 
-      // make new eclTrig oject to store trigger time for crate if there are triggered shapers in the crate
+      // make new eclTrig object to store trigger time for crate if there are triggered shapers in the crate
       if (m_storeTrigTime && shapersMask != 0) {
         int trigId = iCrate & 0x3F;
         ECLTrig* eclTrig = &m_eclTrigsBuffer[trigId - 1];

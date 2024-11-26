@@ -136,7 +136,6 @@ namespace Belle2 {
 
     /** The function to calculate the Hadronic Amplitudes of scalar (S+P) type contribution.
      *@param Dhel helicity of the daughter D(*) meson {+1,0,1} for D* and 2 for D.
-     *@param whel helicity of the virtual vector boson {+1,0,1,2}.
      *@param w   velocity transfer variable.
      *@return calculated amplitude value.
      */
@@ -144,7 +143,6 @@ namespace Belle2 {
 
     /** The function to calculate the Hadronic Amplitudes of scalar (S-P) type contribution.
      *@param Dhel helicity of the daughter D(*) meson {+1,0,1} for D* and 2 for D.
-     *@param whel helicity of the virtual vector boson {+1,0,1,2}.
      *@param w   velocity transfer variable.
      *@return calculated amplitude value.
      */

@@ -23,7 +23,7 @@ class TestGTForwarding(unittest.TestCase):
 
     def test_it(self):
         """Only one test here ..."""
-        inputfile = b2test_utils.require_file("mdst12.root", "validation", self)
+        inputfile = b2test_utils.require_file("mdst16.root", "validation", self)
         metadata = basf2.get_file_metadata(inputfile)
         inputtags = metadata.getDatabaseGlobalTag()
         self.assertNotEqual(inputtags, "")
@@ -42,7 +42,7 @@ class TestGTForwarding(unittest.TestCase):
         self.assertEqual(len(data['output_files']), 1, "Expecting exactly one output file")
         fileinfo = data['output_files'][0]
         # FIXME: Once we get rid of the legacy ip globaltag this will get nicer
-        self.assertEqual(fileinfo['metadata']['globalTag'], f"A,B,C,{inputtags},Legacy_IP_Information",
+        self.assertEqual(fileinfo['metadata']['globalTag'], f"A,B,C,{inputtags}",
                          "Globaltags not forwarded correctly")
         self.assertEqual(fileinfo['stats']['events'], 3, "Number of events is wrong")
 

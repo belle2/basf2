@@ -8,6 +8,7 @@
 
 #pragma link C++ class Belle2::BeamSpot+; // checksum=0x6f933bf2, version=2
 #pragma link C++ class Belle2::CollisionBoostVector+; // checksum=0x1721913a, version=1
+#pragma link C++ class Belle2::CollisionAxisCMS+; // checksum=0x3be09269, version=1
 #pragma link C++ class Belle2::CollisionInvariantMass+; // checksum=0xeb4ae2fa, version=1
 #pragma link C++ class Belle2::TRGGDLDBPrescales+; // checksum=0x29260a69, version=1
 #pragma link C++ class Belle2::TRGGDLDBFTDLBits+; // checksum=0x701ea2e0, version=1

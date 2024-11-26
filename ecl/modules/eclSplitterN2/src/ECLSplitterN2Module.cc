@@ -6,24 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclSplitterN2/ECLSplitterN2Module.h>
 
-// FRAMEWORK
-#include <framework/datastore/RelationArray.h>
-#include <framework/logging/Logger.h>
-
-// ECL
+/* ECL headers. */
 #include <ecl/utility/Position.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
 
-// MDST
-#include <mdst/dataobjects/ECLCluster.h>
+/* Basf2 headers. */
+#include <framework/logging/Logger.h>
 
-// OTHER
+/* C++ headers. */
 #include <string>
 
 // NAMESPACES
@@ -72,14 +68,14 @@ void ECLSplitterN2Module::initialize()
   m_liloParameters.at(2) = m_liloParameterC;
 
   // ECL dataobjects.
-  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
-  m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
-  m_eclShowers.registerInDataStore(eclShowerArrayName());
+  m_eclCalDigits.isRequired(eclCalDigitArrayName());
+  m_eclConnectedRegions.isRequired(eclConnectedRegionArrayName());
+  m_eclShowers.isRequired(eclShowerArrayName());
 
-  // Register relations (we probably dont need all, but keep them for now for debugging).
-  m_eclShowers.registerRelationTo(m_eclConnectedRegions);
-  m_eclShowers.registerRelationTo(m_eclCalDigits);
-  m_eclShowers.registerRelationTo(m_eclLocalMaximums);
+  // All the relations are already registered by ECLSplitterN1
+  m_eclShowers.requireRelationTo(m_eclConnectedRegions);
+  m_eclShowers.requireRelationTo(m_eclCalDigits);
+  m_eclShowers.requireRelationTo(m_eclLocalMaximums);
 
 }
 
@@ -143,10 +139,10 @@ void ECLSplitterN2Module::event()
 
     }
 
-    const TVector3& showerposition = Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters);
+    const ROOT::Math::XYZVector& showerposition = Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters);
     aECLShower->setTheta(showerposition.Theta());
     aECLShower->setPhi(showerposition.Phi());
-    aECLShower->setR(showerposition.Mag());
+    aECLShower->setR(showerposition.R());
 
     aECLShower->setEnergy(energySum);
     aECLShower->setEnergyRaw(energySum);

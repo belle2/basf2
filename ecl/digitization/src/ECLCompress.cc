@@ -6,8 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <ecl/digitization/BitStream.h>
 #include <ecl/digitization/ECLCompress.h>
 #include <ecl/digitization/EclConfiguration.h>
+
+#include <algorithm>
 #include <math.h>
 
 using namespace Belle2;
@@ -175,7 +178,7 @@ namespace {
  *  is distributed encoded in "w".
  * @param OUT output bit stream
  * @param x integer to compress and stream out
- * @param w progessive bit widths
+ * @param w progressive bit widths
  */
 void stream_int(BitStream& OUT, int x, const width_t& w)
 {
@@ -197,7 +200,7 @@ void stream_int(BitStream& OUT, int x, const width_t& w)
 /** Extract integer from the stream OUT with a priory knowledge how it
  *  is distributed encoded in "w".
  * @param IN input bit stream
- * @param w progessive bit widths
+ * @param w progressive bit widths
  */
 int fetch_int(BitStream& IN, const width_t& w)
 {

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # disable doxygen check for this file
 # @cond
@@ -45,7 +44,7 @@ def B2INFO_MULTILINE(lines):
         lines (list[str]): Lines to be printed in a single call to B2INFO
 
     Quick little function that creates a string for B2INFO from a list of strings.
-    But it appends a newline character + the necessary indentation to the follwing line
+    But it appends a newline character + the necessary indentation to the following line
     so that the B2INFO output is nicely aligned.
     Then it calls B2INFO on the output.
     """
@@ -141,7 +140,7 @@ class ExpRun(namedtuple('ExpRun_Factory', ['exp', 'run'])):
 
     def find_gap(self, other):
         """
-        Finds the IoV gap bewteen these two ExpRuns.
+        Finds the IoV gap between these two ExpRuns.
         """
         lower, upper = sorted((self, other))
         if lower.exp == upper.exp and lower.run != upper.run:
@@ -204,7 +203,7 @@ class AlgResult(enum.Enum):
     """
     #: OK Return code
     ok = CalibrationAlgorithm.c_OK
-    #: not enought data Return code
+    #: not enough data Return code
     not_enough_data = CalibrationAlgorithm.c_NotEnoughData
     #: iteration required Return code
     iterate = CalibrationAlgorithm.c_Iterate
@@ -220,7 +219,7 @@ class LocalDatabase():
     Simple class to hold the information about a basf2 Local database.
     Does a bit of checking that the file path entered is valid etc.
 
-    Paramters:
+    Parameters:
         filepath (str): The file path of the database.txt file of the localdb
 
     Keyword Arguments:
@@ -367,7 +366,7 @@ def find_run_lists_from_boundaries(boundaries, runs):
     """
     Takes a list of starting ExpRun boundaries and a list of available ExpRuns and finds
     the runs that are contained in the IoV of each boundary interval. We assume that this
-    is occuring in only one Experiment! We also assume that after the last boundary start
+    is occurring in only one Experiment! We also assume that after the last boundary start
     you want to include all runs that are higher than this starting ExpRun.
     Note that the output ExpRuns in their lists will be sorted. So the ordering may be
     different than the overall input order.
@@ -641,7 +640,7 @@ def merge_local_databases(list_database_dirs, output_database_dir):
                 for file_name in file_names:
                     shutil.copy(file_name, output_database_dir)
                 # Now grab all the IoV stuff from each database.txt files and merge it.
-                with open(os.path.join(directory, 'database.txt'), 'r') as f:
+                with open(os.path.join(directory, 'database.txt')) as f:
                     for line in f.readlines():
                         db_file.write(line)
 
@@ -670,7 +669,7 @@ def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None, 
     Takes a list of file path patterns (things that glob would understand) and runs b2file-metadata-show over them to
     extract the IoV.
 
-    Paramters:
+    Parameters:
         file_path_patterns (list[str]): The list of file path patterns you want to get IoVs for.
 
     Keyword Arguments:
@@ -761,7 +760,7 @@ def parse_raw_data_iov(file_path):
     file_path = Path(file_path)
 
     # We'll try and extract the exp and run from both the directory and filename
-    # That wil let us check that everything is as we expect
+    # That will let us check that everything is as we expect
 
     try:
         reduced_path = file_path.relative_to("/hsm/belle2/bdata/Data/Raw")
@@ -804,7 +803,7 @@ def find_int_dirs(dir_path):
     from iterations above your current one. This function will find directories that match an integer.
 
     Parameters:
-        dir_path(`pathlib.Path`): The dircetory to search inside.
+        dir_path(`pathlib.Path`): The directory to search inside.
 
     Returns:
         list[`pathlib.Path`]: The matching Path objects to the directories that are valid ints
@@ -834,3 +833,5 @@ def parse_file_uri(file_uri):
 
 
 UNBOUND_EXPRUN = ExpRun(-1, -1)
+
+# @endcond

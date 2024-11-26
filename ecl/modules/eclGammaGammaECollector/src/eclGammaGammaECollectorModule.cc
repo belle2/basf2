@@ -18,8 +18,8 @@
 #include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationVector.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/VectorUtil.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/Track.h>
@@ -27,6 +27,7 @@
 #include <mdst/dataobjects/TRGSummary.h>
 
 /* ROOT headers. */
+#include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 #include <TH2F.h>
 
@@ -52,13 +53,15 @@ eclGammaGammaECollectorModule::eclGammaGammaECollectorModule() : CalibrationColl
   // Set module properties
   setDescription("Calibration Collector Module for ECL single crystal energy calibration using gamma gamma events");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "miniumum photon theta in lab (degrees)", 0.);
+  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "minimum photon theta in lab (degrees)", 0.);
   addParam("thetaLabMaxDeg", m_thetaLabMaxDeg, "maximum photon theta in lab (degrees)", 180.);
   addParam("minPairMass", m_minPairMass, "minimum invariant mass of the pair of photons (GeV/c^2)", 9.);
   addParam("mindPhi", m_mindPhi, "minimum delta phi between clusters (deg)", 179.);
   addParam("maxTime", m_maxTime, "maximum (time-<t>)/dt99 of photons", 1.);
   addParam("measureTrueEnergy", m_measureTrueEnergy, "use MC events to obtain expected energies", false);
   addParam("requireL1", m_requireL1, "only use events that have a level 1 trigger", true);
+  addParam("expectedEnergyScale", m_expectedEnergyScale, "scale expected energies for non-4S calibration", 1.);
+
 }
 
 
@@ -122,6 +125,7 @@ void eclGammaGammaECollectorModule::prepare()
   B2INFO("maxTime: " << m_maxTime);
   B2INFO("measureTrueEnergy: " << m_measureTrueEnergy);
   B2INFO("requireL1: " << m_requireL1);
+  B2INFO("expectedEnergyScale: " << m_expectedEnergyScale);
 
   /** Resize vectors */
   EperCrys.resize(ECLElementNumbers::c_NCrystals);
@@ -270,15 +274,13 @@ void eclGammaGammaECollectorModule::collect()
   const ROOT::Math::XYZVector clustervertex = cUtil.GetIPPosition();
 
   double phi0 = m_eclClusterArray[icMax[0]]->getPhi();
-  TVector3 p30(0., 0., maxClustE[0]);
-  p30.SetTheta(theta0);
-  p30.SetPhi(phi0);
+  ROOT::Math::XYZVector p30;
+  VectorUtil::setMagThetaPhi(p30, maxClustE[0], theta0, phi0);
   const ROOT::Math::PxPyPzEVector p40 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[0]], clustervertex, usePhotons);
 
   double phi1 = m_eclClusterArray[icMax[1]]->getPhi();
-  TVector3 p31(0., 0., maxClustE[1]);
-  p31.SetTheta(theta1);
-  p31.SetPhi(phi1);
+  ROOT::Math::XYZVector p31;
+  VectorUtil::setMagThetaPhi(p31, maxClustE[1], theta1, phi1);
   const ROOT::Math::PxPyPzEVector p41 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[1]], clustervertex, usePhotons);
 
   double pairmass = (p40 + p41).M();
@@ -331,7 +333,8 @@ void eclGammaGammaECollectorModule::collect()
   for (int ic = 0; ic < 2; ic++) {
     if (crysIDMax[ic] >= 0) {
       /** ExpGammaGammaE is negative if the algorithm was unable to calculate a value. In this case, the nominal input value has been stored with a minus sign */
-      getObjectPtr<TH2F>("EnVsCrysID")->Fill(crysIDMax[ic] + 0.001, EperCrys[crysIDMax[ic]] / abs(ExpGammaGammaE[crysIDMax[ic]]));
+      getObjectPtr<TH2F>("EnVsCrysID")->Fill(crysIDMax[ic] + 0.001,
+                                             EperCrys[crysIDMax[ic]] / (m_expectedEnergyScale * abs(ExpGammaGammaE[crysIDMax[ic]])));
       getObjectPtr<TH1F>("ExpEvsCrys")->Fill(crysIDMax[ic] + 0.001, ExpGammaGammaE[crysIDMax[ic]]);
       getObjectPtr<TH1F>("ElecCalibvsCrys")->Fill(crysIDMax[ic] + 0.001, ElectronicsCalib[crysIDMax[ic]]);
       getObjectPtr<TH1F>("InitialCalibvsCrys")->Fill(crysIDMax[ic] + 0.001, GammaGammaECalib[crysIDMax[ic]]);

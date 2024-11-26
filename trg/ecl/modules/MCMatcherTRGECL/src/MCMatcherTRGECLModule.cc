@@ -23,9 +23,6 @@
 #include <framework/datastore/RelationArray.h>
 
 
-//root
-#include <TVector3.h>
-
 //C++ STL
 #include <cstdlib>
 #include <time.h>

@@ -9,6 +9,10 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventT0.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <TTree.h>
 #include <TFile.h>
@@ -29,8 +33,17 @@ namespace Belle2 {
     void terminate() override;
     /** Compute the variables and fill the tree*/
     void event() override;
+    /** Compute the APV clock period*/
+    void beginRun() override;
 
   private:
+
+    StoreObjPtr<EventT0> m_EventT0; /**< event T0 */
+
+    /** Hardware Clocks*/
+    DBObjPtr<HardwareClockSettings> m_hwClock;
+    /** APV clock period*/
+    double m_apvClockPeriod = std::numeric_limits<double>::quiet_NaN();
 
     std::string m_rootFileName = "";   /**< root file name */
     TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
@@ -39,10 +52,19 @@ namespace Belle2 {
 
     TTree* m_t_U = nullptr; /**< tree containing info related to the U side clusters*/
     TTree* m_t_V = nullptr;  /**< tree containing info related to the V side clusters*/
+    /* event-wise branches*/
+    float m_cdcEventT0 = std::numeric_limits<float>::quiet_NaN(); /**< CDC event T0 */
+    float m_cdcEventT0_6SRF = std::numeric_limits<float>::quiet_NaN(); /**< CDC event T0 in the 6-sample SVD ref frame*/
+    float m_cdcEventT0_3SRF = std::numeric_limits<float>::quiet_NaN(); /**< CDC event T0 in the 3-sample SVD ref frame*/
+    float m_cdcEventT0Err = std::numeric_limits<float>::quiet_NaN(); /**< CDC event T0 Error */
+    unsigned int m_svdTB = 0; /**< trigger bin */
     /* Branches of SVD u and v clusters tree */
     float m_svdClCharge = 0;      /**< cluster charge */
     float m_svdClSNR = 0;      /**< cluster SNR */
     float m_svdClTime = 0;      /**< cluster time */
+    float m_svdClTimeErr = 0;      /**< cluster time error*/
+    float m_svdClTime_6SRF = 0;      /**< cluster time in the 6-sample SVD ref frame*/
+    float m_svdClTime_3SRF = 0;      /**< cluster time in the 3-sample SVD ref frame*/
     float m_svdRes = 0;   /**< residual computed by genfit */
     float m_svdPitch = 0; /**< svd pitch */
     float m_svdWidth = 0; /**< svd sensor width */
@@ -80,7 +102,8 @@ namespace Belle2 {
     unsigned int m_svdLadder = 0; /**< ladder */
     unsigned int m_svdSensor = 0; /**< sensor */
     unsigned int m_svdSize = 0; /**< size */
-    unsigned int m_svdTB = 0; /**< trigger bin */
+    unsigned int m_svdFF = 0; /**< first frame */
+
   };
 }
 

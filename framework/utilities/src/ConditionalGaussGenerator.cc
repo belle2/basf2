@@ -9,6 +9,7 @@
 #include <framework/utilities/ConditionalGaussGenerator.h>
 #include <TRandom.h>
 
+
 using namespace Belle2;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -50,7 +51,11 @@ static std::vector<VectorXd> getOrthogonalSpace(VectorXd v0)
 
   while (int(vList.size()) < v0.rows()) {
 
-    VectorXd v = VectorXd::Random(v0.rows());
+    // Let's first create an empty vector and then fill it with gRandom
+    // We can NOT use VectorXd::Random for any reasons
+    VectorXd v(v0.rows());
+    for (int i = 0; i < v.rows(); ++i)
+      v(i) = gRandom->Uniform(-1, 1);
 
     for (const VectorXd& vi : vList)
       v -= vi.dot(v) * vi / vi.dot(vi);
@@ -60,21 +65,15 @@ static std::vector<VectorXd> getOrthogonalSpace(VectorXd v0)
     }
   }
 
-
   vList.erase(vList.begin()); // note len(vList) >= 1
-
   return vList;
-
 }
-
 
 ConditionalGaussGenerator::ConditionalGaussGenerator(const VectorXd& mu, const MatrixXd& covMat) : m_mu(mu), m_covMat(covMat)
 {
-
   Eigen::SelfAdjointEigenSolver<MatrixXd> sol(m_covMat);
   VectorXd vals = sol.eigenvalues();
   MatrixXd vecs = sol.eigenvectors();
-
 
   std::vector<VectorXd> vBase;
   //keep only vectors with positive eigenvalue
@@ -83,10 +82,8 @@ ConditionalGaussGenerator::ConditionalGaussGenerator(const VectorXd& mu, const M
       vBase.push_back(sqrt(vals[i]) * vecs.col(i));
     }
 
-
   if (vBase.size() == 0) // matrix is zero, no smearing
     return;
-
 
   m_vBaseMat = toMatrix(vBase);
 
@@ -97,7 +94,6 @@ ConditionalGaussGenerator::ConditionalGaussGenerator(const VectorXd& mu, const M
   m_cOrt = getOrthogonalSpace(v0);
 
   m_v0norm =  v0.dot(v0) > 0 ?  v0 / v0.dot(v0) : v0; //normalize, or keep it zero
-
 }
 
 VectorXd ConditionalGaussGenerator::generate(double x0) const

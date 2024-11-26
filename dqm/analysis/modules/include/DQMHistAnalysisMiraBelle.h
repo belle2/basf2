@@ -63,12 +63,13 @@ namespace Belle2 {
     void terminate() override final;
 
   protected:
-    bool m_debug;/**<debug*/
-    bool m_enableAlert;/**<Enable alert by base color of canvases*/
     double m_scale_dst; /**< Scale factor "signal region" / "sideband", assuming uniform events */
-    Belle2::DQMFileMetaData* dqm_data = nullptr; /**< DQM file meta data */
+    double m_reference_hadb; /**< Reference value for hadronb2_tight bhabha ratio */
+    double m_reference_mumu; /**< Reference value for mumu inv mass */
     Belle2::MonitoringObject* mon_mumu = nullptr; /**< MonitoringObject for mumu events */
     Belle2::MonitoringObject* mon_dst = nullptr; /**< MonitoringObject for D* events */
+    Belle2::MonitoringObject* mon_bhabha = nullptr; /**< MonitoringObject for bhabha events */
+    Belle2::MonitoringObject* mon_hadron = nullptr; /**< MonitoringObject for hadronb2 tight events */
 
     // TCanvases for mumu
     TCanvas* mumu_main = nullptr; /**< TCanvas object for main display */
@@ -78,6 +79,11 @@ namespace Belle2 {
     TCanvas* dst_mass = nullptr; /**< TCanvas object for D0 mass, delta mass, and pi0 mass */
     TCanvas* dst_pi_val = nullptr; /**< TCanvas object for PID distributions of pi */
     TCanvas* dst_k_val = nullptr; /**< TCanvas object for PID distributions of K */
+    // TCanvases for bhabha
+    TCanvas* bhabha_main = nullptr; /**< TCanvas object for main display */
+    TCanvas* bhabha_resolution = nullptr; /**< TCanvas object for resolution display */
+    // TCanvases for hadronb2 tight
+    TCanvas* hadron_main = nullptr; /**< TCanvas object for main display */
 
   };
 

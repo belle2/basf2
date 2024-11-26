@@ -57,7 +57,7 @@ Leptonic skims
     :members:
     :undoc-members:
     
-.. _skim_physics_lowmultiplicity: 
+.. _skim_physics_lowmultiplicity:
 
 Low multiplicity skims
 ~~~~~~~~~~~~~~~~~~~~~~

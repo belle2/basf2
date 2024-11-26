@@ -8,6 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+import basf2
 import basf2_mva
 import basf2_mva_util
 import multiprocessing
@@ -15,8 +16,11 @@ import itertools
 
 if __name__ == "__main__":
 
-    training_data = basf2_mva.vector("train.root")
-    test_data = basf2_mva.vector("test.root")
+    train_file = basf2.find_file("mva/train_D0toKpipi.root", "examples")
+    test_file = basf2.find_file("mva/test_D0toKpipi.root", "examples")
+
+    training_data = basf2_mva.vector(train_file)
+    test_data = basf2_mva.vector(test_file)
 
     # Train model with default parameters
     general_options = basf2_mva.GeneralOptions()

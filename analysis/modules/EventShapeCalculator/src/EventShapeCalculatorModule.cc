@@ -12,6 +12,7 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/logging/Logger.h>
 
@@ -215,12 +216,11 @@ void EventShapeCalculatorModule::event()
 
 int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNames)
 {
-  int nPart = 0; // number of particles
-
   PCmsLabTransform T;
   m_p4List.clear();
   m_p3List.clear();
 
+  unsigned int nParticlesInAllLists = 0;
   unsigned short nParticleLists = particleListNames.size();
   if (nParticleLists == 0)
     B2WARNING("No particle lists found. EventShape calculation not performed.");
@@ -237,8 +237,12 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
     StoreObjPtr<ParticleList> particleList(particleListName);
 
     // Loops over the number of particles in the list
+    nParticlesInAllLists += particleList->getListSize();
+
     for (unsigned int iPart = 0; iPart < particleList->getListSize(); iPart++) {
       const Particle* part = particleList->getParticle(iPart);
+      const MCParticle* mcParticle = part->getMCParticle();
+      if (mcParticle and mcParticle->isInitial()) continue;
 
       // Flag to check for duplicates across the lists.
       // It can be true only if m_checkForDuplicates is enabled
@@ -266,6 +270,7 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
       }
     }
   }
-  return nPart;
+
+  return nParticlesInAllLists;
 }
 

@@ -1,0 +1,23 @@
+# EventType: 1290000006
+# Descriptor: [B+ -> Xsu nu anti-nu]cc
+# NickName: Bu_Xsununubar
+# Documentation: Rare b->s nu anti-nu process. mb=4.68. ms=0.1, K*-Xs trainsition=1.2
+# Tested: Yes 
+# PhysicsWG: EWP 
+# Responsible: Junewoo Park
+# Email: junewoo@yonsei.ac.kr
+# Cuts: None
+# Date: 20230823
+
+Decay Upsilon(4S)
+0.5 B+sig B-         VSS;
+0.5 B-sig B+         VSS;
+Enddecay
+
+Decay B+sig
+1.0 Xsu anti-nu_e nu_e           BTOXSNUNU_FERMI 0.1 0.0 0.461 1.2 4.68 0.1;
+Enddecay
+
+CDecay B-sig
+
+End

@@ -9,6 +9,7 @@
 #define NEUROTRIGGER_H
 #pragma once
 #include <string>
+#include <trg/cdc/NeuroTriggerParameters.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -77,16 +78,16 @@ namespace Belle2 {
       std::vector<unsigned short> maxHitsPerSL = {1};
       /** Super layer pattern for which MLP is trained for all networks.
        *  Binary pattern of 9 * maxHitsPerSL bits (on/off for each hit).
-       *  0 in bit <i>: hits from super layer <i> are not used.
-       *  1 in bit <i>: hits from super layer <i> are used.
+       *  0 in bit \<i>: hits from super layer \<i> are not used.
+       *  1 in bit \<i>: hits from super layer \<i> are used.
        *  SLpattern = 0: use any hits present, don't check the pattern. */
       std::vector<unsigned long> SLpattern = {0};
       /** Super layer pattern mask for which MLP is trained for all networks.
        *  Binary pattern of 9 * maxHitsPerSL bits (on/off for each hit).
-       *  0 in bit <i>: super layer <i> may or may not have a hit.
-       *  1 in bit <i>: super layer <i>
-       *                - must have a hit if SLpattern bit <i> = 1
-       *                - must not have a hit if SLpattenr bit <i> = 0 */
+       *  0 in bit \<i>: super layer \<i> may or may not have a hit.
+       *  1 in bit \<i>: super layer \<i>
+       *                - must have a hit if SLpattern bit \<i> = 1
+       *                - must not have a hit if SLpattenr bit \<i> = 0 */
       std::vector<unsigned long> SLpatternMask = {0};
       /** Maximal drift time, identical for all networks. */
       unsigned tMax = 256;
@@ -102,10 +103,10 @@ namespace Belle2 {
       *                                  "fastestppriority" is used.
       *   "etf_or_zero"              :   the event time is obtained by the ETF, if
       *                                  not possible, it es set to 0
+      *   "min_etf_fastestpriority"  :   take whichever is smaller
       */
       std::string et_option = "etf_or_fastestpriority";
       /** DEPRECATED!! If true, determine event time from relevant hits if it is missing. */
-      bool T0fromHits = false;
 
     };
 
@@ -117,8 +118,10 @@ namespace Belle2 {
 
     /** Set parameters and get some network independent parameters. */
     void initialize(const Parameters& p);
+    void initialize(const NeuroTriggerParameters& p);
 
     /** Get indices for sector ranges in parameter lists. */
+    std::vector<unsigned> getRangeIndices(const NeuroTriggerParameters& p, unsigned isector);
     std::vector<unsigned> getRangeIndices(const Parameters& p, unsigned isector);
 
     /** Save MLPs to file.
@@ -126,6 +129,9 @@ namespace Belle2 {
      * @param arrayname name of the TObjArray holding the MLPs in the file
      */
     void save(const std::string& filename, const std::string& arrayname = "MLPs");
+    /** function to load idhist from file */
+    bool loadIDHist(const std::string& filename);
+
     /** Load MLPs from file.
      * @param filename name of the TFile to read from
      * @param arrayname name of the TObjArray holding the MLPs in the file
@@ -164,6 +170,15 @@ namespace Belle2 {
      * @return indices of the selected MLPs, empty if the track does not fit any sector
      */
     std::vector<int> selectMLPs(float phi0, float invpt, float theta);
+
+    /** Select all matching expert MLPs based on the given track parameters.
+     * If the sectors are overlapping, there may be more than one matching expert.
+     * During training this is intended, afterwards sectors should be redefined to be unique.
+     * For unique geometrical sectors, this function can still find several experts
+     * with different sector patterns.
+     * @return indices of the selected MLPs, empty if the track does not fit any sector
+     */
+    std::vector<int> selectMLPsTrain(float phi0, float invpt, float theta);
 
     /** Select one MLP from a list of sector indices.
      * The selected expert either matches the given sector pattern,
@@ -222,6 +237,7 @@ namespace Belle2 {
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input
      * @param track   axial hit relations are taken from given track
+     * @param neurotrackinputmode input mode
      * @return super layer pattern of hits in the current track
      */
     unsigned long getInputPattern(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode);
@@ -240,8 +256,6 @@ namespace Belle2 {
     /** Select hits for each super layer from the ones related to input track
      * @param isector              index of the MLP that will use the input
      * @param track                all hit relations are taken from given track
-     * @param returnAllRelevant    if true, return all relevant hits instead of
-     *                             selecting the best (for making relations)
      * @return list of selected hit indices */
     std::vector<unsigned> selectHitsHWSim(unsigned isector, const CDCTriggerTrack& track);
 

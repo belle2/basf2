@@ -23,8 +23,6 @@ namespace Belle2 {
   protected:
     Enum(int id, const std::string& label)
       : m_id(id), m_label(label) {}
-    Enum(const Enum& e) :
-      m_id(e.m_id), m_label(e.m_label) {}
     Enum() : m_id(UNKNOWN.m_id),
       m_label(UNKNOWN.m_label) {}
 
@@ -36,7 +34,6 @@ namespace Belle2 {
   public:
     bool operator==(const Enum& e) const;
     bool operator!=(const Enum& e) const;
-    const Enum& operator=(const Enum& e);
     bool operator==(const std::string& label) const;
     bool operator!=(const std::string& label) const;
 
@@ -54,12 +51,7 @@ namespace Belle2 {
   {
     return (m_id != e.m_id);
   }
-  inline const Enum& Enum::operator=(const Enum& e)
-  {
-    m_id = e.m_id;
-    m_label = e.m_label;
-    return *this;
-  }
+
   inline bool Enum::operator==(const std::string& label) const
   {
     return m_label == label;

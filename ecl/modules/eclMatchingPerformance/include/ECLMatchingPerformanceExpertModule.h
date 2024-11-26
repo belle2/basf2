@@ -7,8 +7,11 @@
  **************************************************************************/
 #pragma once
 
+/* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLNeighbours.h>
+
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
@@ -162,7 +165,7 @@ namespace Belle2 {
     /** theta of first crystal that is entered by track */
     double m_enteringcelltheta = 0.0;
 
-    /** number of degrees of freedom of the track (should be #CDC hits - 5 (helix parameters)) */
+    /** number of degrees of freedom of the track (should be \#CDC hits - 5 (helix parameters)) */
     int m_ndf = 0;
 
     /**

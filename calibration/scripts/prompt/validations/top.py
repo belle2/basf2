@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -72,7 +71,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     h_core = TH1F("h_core", "Core width of residuals; slot; sigma [ps]", 16, 0.5, 16.5)
     h_out = TH1F("h_out", "Outlayers (more than 3 sigma); slot; fraction [%]", 16, 0.5, 16.5)
     for slot in range(1, 17):
-        name = "slot" + '{:0=2d}'.format(slot)
+        name = "slot" + f'{slot:02d}'
         h = file_in.Get("channelT0_" + name)
         channelT0s.append(h)
         r = TH1F("residuals_" + name, "ChannelT0, " + name + "; residuals [ns]", 200, -1.0, 1.0)
@@ -139,7 +138,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
                 graphs.append(g_under)
     canvas.Print(outputFileName)
 
-    # make plots of channelT0 residual distirbutions
+    # make plots of channelT0 residual distributions
 
     canvas.Clear()
     canvas.Divide(4, 4)
@@ -201,7 +200,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     histos = []
     for slot in range(1, 17):
         canvas.cd(slot)
-        h = file_in.Get("moduleT0_slot" + '{:0=2d}'.format(slot))
+        h = file_in.Get("moduleT0_slot" + f'{slot:02d}')
         if h:
             h.Scale(1000)
             h.SetYTitle(h.GetYaxis().GetTitle().replace('[ns]', '[ps]'))
@@ -255,7 +254,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     legends = []
     for slot in range(1, 17):
         canvas.cd(slot)
-        name = "slot" + '{:0=2d}'.format(slot)
+        name = "slot" + f'{slot:02d}'
         histos = [file_in.Get("numActive_" + name), file_in.Get("numActiveCalibrated_" + name)]
         legend = TLegend(0.1, 0.1, 0.7, 0.3)
         legends.append(legend)
@@ -281,7 +280,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     legends = []
     for slot in range(1, 17):
         canvas.cd(slot)
-        name = "slot" + '{:0=2d}'.format(slot)
+        name = "slot" + f'{slot:02d}'
         histos = [file_in.Get("numTBCalibrated_" + name), file_in.Get("numT0Calibrated_" + name)]
         legend = TLegend(0.1, 0.1, 0.7, 0.3)
         legends.append(legend)
@@ -307,8 +306,8 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     legends = []
     for slot in range(1, 17):
         canvas.cd(slot)
-        name = "slot" + '{:0=2d}'.format(slot)
-        h = file_in.Get("thrEffi_slot" + '{:0=2d}'.format(slot))
+        name = "slot" + f'{slot:02d}'
+        h = file_in.Get("thrEffi_slot" + f'{slot:02d}')
         legend = TLegend(0.1, 0.1, 0.7, 0.3)
         legends.append(legend)
         if h:
@@ -419,7 +418,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     canvas.Divide(4, 4)
     for slot in range(1, 17):
         canvas.cd(slot)
-        h = file_in.Get("hits_slot" + '{:0=2d}'.format(slot))
+        h = file_in.Get("hits_slot" + f'{slot:02d}')
         if h:
             h.Draw("colz")
     canvas.SaveAs(outputFileName.replace('.pdf', 'Hits.png'))

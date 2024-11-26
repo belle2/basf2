@@ -31,14 +31,14 @@ REG_MODULE(NoKickCutsEval);
 
 NoKickCutsEvalModule::NoKickCutsEvalModule() : Module()
 {
-  setDescription("This module evaluate cuts necessary for the selction of reco tracks based on Multiple Scattering, NoKickRTSel");
+  setDescription("This module evaluate cuts necessary for the selection of reco tracks based on Multiple Scattering, NoKickRTSel");
 
   /** write validation plots */
   addParam("useValidation", c_validationON,
            "print in output file validation plot: track parameters distributions and cuts distributions", false);
 
   /** use fit method to evaluate cuts: DO NOT USE! */
-  addParam("useFitMethod", c_fitMethod, "apply the method of double-gaussian fit to evaluate the cuts", false);
+  addParam("useFitMethod", c_fitMethod, "apply the method of double-Gaussian fit to evaluate the cuts", false);
 }
 
 void NoKickCutsEvalModule::initialize()
@@ -76,7 +76,7 @@ void NoKickCutsEvalModule::initialize()
     histo_par.clear();
   }
 
-  /** iniziialize of useful store array and relations */
+  /** initialize of useful store array and relations */
   StoreArray<SVDCluster> storeClusters("");
   StoreArray<SVDTrueHit> storeTrueHits("");
   StoreArray<MCParticle> storeMCParticles("");
@@ -91,7 +91,7 @@ void NoKickCutsEvalModule::initialize()
   RelationArray relClusterMCParticles(storeClusters, storeMCParticles);
   RelationArray recoTracksToMCParticles(recoTracks, storeMCParticles);
 
-  /** inizialize output TFile with cuts-histograms */
+  /** initialize output TFile with cuts-histograms */
   m_outputFile = new TFile("NoKickCuts.root", "RECREATE");
 }
 
@@ -170,8 +170,8 @@ void NoKickCutsEvalModule::endRun()
               double moltSigma2 = 2;
               double sigma1 = (double)moltSigma1 * (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetStdDev());
               double sigma2 = (double)moltSigma2 * (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetStdDev());
-              double norm1 = sigma1 * sqrt(2 * 3.1415) * 0.9 * nbin0;
-              double norm2 = sigma2 * sqrt(2 * 3.1415) * 0.1 * nbin0;
+              double norm1 = sigma1 * sqrt(2 * M_PI) * 0.9 * nbin0;
+              double norm2 = sigma2 * sqrt(2 * M_PI) * 0.1 * nbin0;
               double mean1 = (double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetMean();
               double mean2 = (double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetMean();
               double bkg = (double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(2);
@@ -241,7 +241,7 @@ void NoKickCutsEvalModule::endRun()
 
   //------------------------------------------FIT THE CUTS --------------------------------//
 
-  /** buld 2D histogram with cuts */
+  /** build 2D histogram with cuts */
   std::vector<std::vector<std::vector<TH2F*>>> cut_M_histo;
   std::vector<std::vector<std::vector<TH2F*>>> cut_m_histo;
 
@@ -446,7 +446,7 @@ void NoKickCutsEvalModule::endRun()
 
   B2INFO("number of spacepoint with theta out of limits=" << m_tCounter);
   B2INFO("number of spacepoint with momentum out of limits=" << m_pCounter);
-  B2INFO("number of tracks cutted by global cuts=" << m_globCounter);
+  B2INFO("number of tracks cut by global cuts=" << m_globCounter);
 
 
 }

@@ -14,6 +14,10 @@
 
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 
+#include <algorithm>
+#include <initializer_list>
+#include <vector>
+
 namespace TreeFitter {
 
   void HelixUtils::vertexFromHelix(const Belle2::Helix& helix,
@@ -216,49 +220,50 @@ namespace TreeFitter {
     const double d0_1     = helix1.getD0();
     const double phi0_1   = helix1.getPhi0();
     const double omega_1  = helix1.getOmega();
-    const double z0_1     = helix1.getZ0();
-    const double tandip_1 = helix1.getTanLambda();
-    const double cosdip_1 = cos(atan(tandip_1))  ; // can do that faster
 
     const double d0_2     = helix2.getD0();
     const double phi0_2   = helix2.getPhi0();
     const double omega_2  = helix2.getOmega();
-    const double z0_2     = helix2.getZ0();
-    const double tandip_2 = helix2.getTanLambda();
-    const double cosdip_2 = cos(atan(tandip_2))  ; // can do that faster
 
+    // These radii have a sign, like omega (negative for negative charge)
     const double r_1 = 1 / omega_1 ;
     const double r_2 = 1 / omega_2 ;
 
-    const double x0_1 = - (r_1 + d0_1) * sin(phi0_1) ;
-    const double y0_1 = (r_1 + d0_1) * cos(phi0_1) ;
+    // 1) First look at the transverse plane, where the helix projection is a circle
+    // Coordinates of the centers of the circles
+    const double x0_1 = (r_1 + d0_1) * sin(phi0_1) ;
+    const double y0_1 = -(r_1 + d0_1) * cos(phi0_1) ;
 
-    const double x0_2 = - (r_2 + d0_2) * sin(phi0_2) ;
-    const double y0_2 = (r_2 + d0_2) * cos(phi0_2) ;
+    const double x0_2 = (r_2 + d0_2) * sin(phi0_2) ;
+    const double y0_2 = -(r_2 + d0_2) * cos(phi0_2) ;
 
+    // Vector that goes from center1 to center2
     const double deltax = x0_2 - x0_1 ;
     const double deltay = y0_2 - y0_1 ;
 
+    // Intersections of the circles, can be at most two
     double phi1[2] ;
     double phi2[2] ;
     int nsolutions = 1;
 
-    // the phi of the 'intersection'.
-    const double pi = TMath::Pi();
+    // The phi of the delta vector.
     const double phi    = - atan2(deltax, deltay) ;
-    const double phinot = phi > 0 ?  phi - pi : phi + pi ;
+    const double phinot = phi > 0 ?  phi - TMath::Pi() : phi + TMath::Pi() ;
     phi1[0] = r_1 < 0 ? phi : phinot ;
     phi2[0] = r_2 > 0 ? phi : phinot ;
 
+    // These radii do NOT have a sign instead
     const double R1 = fabs(r_1) ;
     const double R2 = fabs(r_2) ;
     const double Rmin = R1 < R2 ? R1 : R2 ;
     const double Rmax = R1 > R2 ? R1 : R2 ;
-    const double dX = sqrt(deltax * deltax + deltay * deltay) ;
+    const double dX = hypot(deltax, deltay) ;
 
     if (!parallel && dX + Rmin > Rmax && dX < R1 + R2) {
-      // there are two solutions
+      // Circles intersect in two points
       nsolutions = 2 ;
+
+      // This is just the law of cosines
       const double ddphi1 = acos((dX * dX - R2 * R2 + R1 * R1) / (2.*dX * R1)) ;
       phi1[1] = phidomain(phi1[0] + ddphi1) ;
       phi1[0] = phidomain(phi1[0] - ddphi1)  ;
@@ -268,54 +273,92 @@ namespace TreeFitter {
       phi2[0] = phidomain(phi2[0] + ddphi2) ;
 
     } else if (dX < Rmax) {
+      // Tangent or non-intersecting circles, one inside the other (only one POCA)
       if (R1 > R2) phi2[0] = r_2 < 0 ? phi : phinot ;
-      else          phi1[0] = r_1 < 0 ? phi : phinot ;
+      else         phi1[0] = r_1 < 0 ? phi : phinot ;
+    }
+    // else: tangent or non-intersecting circles, outside of each other (only one POCA)
+    // what we saved in phi1 and phi2 gives already the correct solution
+
+    // Intersections of the circles (cartesian)
+    double x1[2], y1[2], x2[2], y2[2];
+    for (int i = 0; i < nsolutions; i++) {
+      x1[i] =  r_1 * sin(phi1[i]) + x0_1 ;
+      y1[i] = -r_1 * cos(phi1[i]) + y0_1 ;
+      x2[i] =  r_2 * sin(phi2[i]) + x0_2 ;
+      y2[i] = -r_2 * cos(phi2[i]) + y0_2 ;
     }
 
-    // find the best solution for z by running multiples of 2_pi
-    double z1(0), z2(0) ;
-    bool first(true) ;
+    // 2) Find the best solution for z by running multiples of 2pi from the xy intersection(s)
+    double z1(0), z2(0);
+    bool first = true;
     int ibest = 0;
-    const int ncirc(2) ;
+    const int nturnsmax = 10; // Max number of turns we try backwards and forwards
+
+    // Loop on all xy-plane solutions
     for (int i = 0; i < nsolutions; ++i) {
-      const double dphi1 = phidomain(phi1[i] - phi0_1) ;
-      const double dphi2 = phidomain(phi2[i] - phi0_2) ;
+      const double l1 = helix1.getArcLength2DAtXY(x1[i], y1[i]);
+      const double l2 = helix2.getArcLength2DAtXY(x2[i], y2[i]);
 
-      for (int n1 = 1 - ncirc; n1 <= 1 + ncirc ; ++n1) {
-        const double l1 = (dphi1 + n1 * TMath::TwoPi()) / omega_1 ;
-        const double tmpz1 = (z0_1 + l1 * tandip_1) ;
-        if (n1 != 0 && fabs(tmpz1) > 100)
-          continue;
-
-        for (int n2 = 1 - ncirc ; n2 <= 1 + ncirc; ++n2) {
-          double l2 = (dphi2 + n2 * TMath::TwoPi()) / omega_2 ;
-          double tmpz2 = (z0_2 + l2 * tandip_2) ;
-          if (n2 != 0 && fabs(tmpz2) > 100)
-            continue;
-
-          if (first || fabs(tmpz1 - tmpz2) < fabs(z1 - z2)) {
-            ibest = i ;
-            first = false ;
-            z1 = tmpz1 ;
-            z2 = tmpz2 ;
-            flt1 = l1 / cosdip_1 ;
-            flt2 = l2 / cosdip_2 ;
+      // Loop on helix1 turns, save corresponding z positions
+      std::vector<double> z1s;
+      for (int n1 = 0; n1 <= nturnsmax; ++n1) {
+        bool added = false;
+        // Try forwards and backwards
+        for (int sn1 : {n1, -n1}) {
+          const double tmpz1 = helix1.getPositionAtArcLength2D(l1 + sn1 * TMath::TwoPi() / omega_1).Z();
+          if (sn1 == 0 || (-82 <= tmpz1 && tmpz1 <= 158)) {
+            // Only keep the 0th turn and those inside CDC volume
+            z1s.push_back(tmpz1);
+            added = true;
           }
+          if (sn1 == 0)
+            break; // Do not store 0th turn twice
         }
+        // If we did not add any point we are already outside CDC volume both backwards and forwards
+        if (!added)
+          break;
+      }
+
+      // Loop on helix2 turns, find closest approach to one of helix1 points
+      for (int n2 = 0; n2 <= nturnsmax; ++n2) {
+        bool tried = false;
+        // Try forwards and backwards
+        for (int sn2 : {n2, -n2}) {
+          const double tmpz2 = helix2.getPositionAtArcLength2D(l2 + sn2 * TMath::TwoPi() / omega_2).Z();
+          if (sn2 == 0 || (-82 <= tmpz2 && tmpz2 <= 158)) {
+            // Only keep the 0th turn and those inside CDC volume
+            tried = true;
+            // Find the tmpz1 closest to tmpz2
+            const auto i1best = std::min_element(
+            z1s.cbegin(), z1s.cend(), [&tmpz2](const double & z1a, const double & z1b) {
+              return fabs(z1a - tmpz2) < fabs(z1b - tmpz2);
+            });
+            const double tmpz1 = *i1best;
+            // Keep the solution where the z distance of closest approach is minimum
+            if (first || fabs(tmpz1 - tmpz2) < fabs(z1 - z2)) {
+              ibest = i;
+              first = false;
+              z1 = tmpz1;
+              z2 = tmpz2;
+              flt1 = l1;
+              flt2 = l2;
+            }
+          }
+          if (n2 == 0)
+            break; // Do not try 0th turn twice
+        }
+        // If we did not try any point we are already outside CDC volume both backwards and forwards
+        if (!tried)
+          break;
       }
     }
 
-    const double x1 =  r_1 * sin(phi1[ibest]) + x0_1 ;
-    const double y1 = -r_1 * cos(phi1[ibest]) + y0_1 ;
-
-    const double x2 =  r_2 * sin(phi2[ibest]) + x0_2 ;
-    const double y2 = -r_2 * cos(phi2[ibest]) + y0_2 ;
-
-    vertex.SetX(0.5 * (x1 + x2));
-    vertex.SetY(0.5 * (y1 + y2));
+    vertex.SetX(0.5 * (x1[ibest] + x2[ibest]));
+    vertex.SetY(0.5 * (y1[ibest] + y2[ibest]));
     vertex.SetZ(0.5 * (z1 + z2));
 
-    return sqrt(sqr(x2 - x1) + sqr(y2 - y1) + sqr(z2 - z1)) ;
+    return hypot(x2[ibest] - x1[ibest], y2[ibest] - y1[ibest], z2 - z1);
   }
 
   //POCA between a track and a point

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -22,7 +21,7 @@ class DumpDigits(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(DumpDigits, self).__init__()
+        super().__init__()
         #: Output file object.
         self.dumpfile = 'PXDDigitsDump.txt'
         #: Factors for decoding VXDId's
@@ -46,15 +45,8 @@ class DumpDigits(b2.Module):
                 # Sesnor identification
                 sensorID = digit.getSensorID().getID()
                 [layer, ladder, sensor] = self.decode(sensorID)
-                s += '{sID} {layer:3d} {ladder:3d} {sensor:3d} {u:6d} {v:6d} {c:8.1f}'.format(
-                    sID=sensorID,
-                    layer=layer,
-                    ladder=ladder,
-                    sensor=sensor,
-                    u=digit.getUCellID(),
-                    v=digit.getVCellID(),
-                    c=digit.getCharge()
-                )
+                s += f'{sensorID} {layer:3d} {ladder:3d} {sensor:3d} {digit.getUCellID():6d} ' + \
+                    f'{digit.getVCellID():6d} {digit.getCharge():8.1f}'
                 s += '\n'
             dumpfile.write(s)
 

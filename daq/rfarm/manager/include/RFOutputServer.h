@@ -52,8 +52,8 @@ namespace Belle2 {
     int m_pid_receiver[MAXNODES];
     int m_pid_basf2;
     int m_pid_sender;
-    int m_pid_hrecv;
-    int m_pid_hrelay;
+    // int m_pid_hrecv;
+    // int m_pid_hrelay;
     int m_nnodes;
 
   };

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -39,8 +38,8 @@ phokhara.set_log_level(basf2.LogLevel.INFO)
 # K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10)
 phokhara.param('FinalState', 0)
 
-# soft photon cutoff, final result is indepedent of the cut off as long as its small (<1e-3)
-# photon multiplicity (and exclusive cross sections depent on that parameter)
+# soft photon cutoff, final result is independent of the cut off as long as its small (<1e-3)
+# photon multiplicity (and exclusive cross sections depend on that parameter)
 # EXPERTS ONLY
 phokhara.param('Epsilon', 0.0001)
 
@@ -50,7 +49,7 @@ phokhara.param('SearchMax', 50000)
 # Events (unweighted) before event loop is aborted
 phokhara.param('nMaxTrials', 25000)
 
-# CMS energy [GeV] (under devlopment, currently calculated from xml file)
+# CMS energy [GeV] (under development, currently calculated from xml file)
 # phokhara.param('CMSEnergy', 10.580)
 
 # LO switch --> Born corresponds to 1 photon (0), Born corresponds to 0 photons (1), only Born: 0 photons (-1)

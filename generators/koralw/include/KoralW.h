@@ -49,7 +49,6 @@ namespace Belle2 {
     /** Initializes the generator.
      * @param dataPath The path to the default input data file for KoralW.
      * @param userDataFile The path and filename of the user input data file, which defines the user settings for the generator.
-     * @param randomSeed The random seed for the generator.
      */
     void init(const std::string& dataPath, const std::string& userDataFile);
 

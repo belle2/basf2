@@ -24,7 +24,6 @@ namespace Belle2 {
     /** Default Constructor. */
     V0ValidationVertex() :
       V0(),
-      m_fittedVertexPosition(ROOT::Math::XYZVector(0, 0, 0)),
       m_fittedMomentum(0),
       m_fittedInvariantMass(0),
       m_chi2(0)
@@ -34,11 +33,14 @@ namespace Belle2 {
      *
      * @param trackPairPositive Positive charged Belle2::Track and TrackFitResult from the V0.
      * @param trackPairNegative Negative charged Belle2::Track and TrackFitResult from the V0.
+     * @param vertexX The x coordinate of the fitted vertex position.
+     * @param vertexY The y coordinate of the fitted vertex position.
+     * @param vertexZ The z coordinate of the fitted vertex position.
      */
     V0ValidationVertex(const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairPositive,
-                       const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairNegative) :
-      V0(trackPairPositive, trackPairNegative),
-      m_fittedVertexPosition(ROOT::Math::XYZVector(0, 0, 0)),
+                       const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairNegative,
+                       double vertexX, double vertexY, double vertexZ) :
+      V0(trackPairPositive, trackPairNegative, vertexX, vertexY, vertexZ),
       m_fittedMomentum(0),
       m_fittedInvariantMass(0),
       m_chi2(0)
@@ -61,16 +63,15 @@ namespace Belle2 {
                        const double& momentum,
                        const double& invariantMass,
                        const double& chi2) :
-      V0(trackPairPositive, trackPairNegative),
-      m_fittedVertexPosition(fittedVertexPosition),
+      V0(trackPairPositive, trackPairNegative, fittedVertexPosition.X(), fittedVertexPosition.Y(), fittedVertexPosition.Z()),
       m_fittedVertexPositionCovariance(fittedVertexPositionCovariance),
       m_fittedMomentum(momentum),
       m_fittedInvariantMass(invariantMass),
       m_chi2(chi2)
     {}
 
-    /// Getter for the reconstructed vertex position.
-    ROOT::Math::XYZVector getVertexPosition() const { return m_fittedVertexPosition; }
+    /// Getter for the reconstructed vertex position. Aliases getFittedVertexPosition for backwards compatibility.
+    ROOT::Math::XYZVector getVertexPosition() const { return getFittedVertexPosition(); }
 
     /// Getter for the reconstructed vertex position covariance.
     TMatrixDSym getVertexPositionCovariance() const { return m_fittedVertexPositionCovariance; }
@@ -85,13 +86,12 @@ namespace Belle2 {
     float getVertexChi2() const { return m_chi2; }
 
   private:
-    ROOT::Math::XYZVector m_fittedVertexPosition; ///< vertex position
     TMatrixDSym m_fittedVertexPositionCovariance;  ///< vertex position covariance
     float m_fittedMomentum; ///< reconstructed momentum
     float m_fittedInvariantMass; ///< reconstructed invariant mass
     float m_chi2; ///< reconstructed chi2
 
-    ClassDef(V0ValidationVertex, 2);  ///< Dataobjects for the reconstruction level validation of V0 reconstruction.
+    ClassDef(V0ValidationVertex, 3);  ///< Dataobjects for the reconstruction level validation of V0 reconstruction.
   };
 
 }

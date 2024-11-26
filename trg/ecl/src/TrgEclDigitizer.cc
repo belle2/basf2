@@ -72,26 +72,24 @@ TrgEclDigitizer::~TrgEclDigitizer()
 //
 
 void
-TrgEclDigitizer::setup()
+TrgEclDigitizer::setup(int SourceOfTC)
 {
+
   // prepare Matrix for Noise generation
-  //
   _DataBase->  readNoiseLMatrix(MatrixParallel, MatrixSerial);
-  //
-  // 1=ECLHit, 2=ECLSimHit, 3=ECLHit+TRGECLBGTCHit
-  int TableFlag = 3;
-  // initialize parameters
-  getTCHit(TableFlag);
-  //
-  //
-  //
+
+  // Set TC data
+  // SourceOfTC => 1=ECLHit, 2=ECLSimHit, 3=ECLHit+TRGECLBGTCHit
+  // ("1:=ECLHit" is used for signal w/o bkg, and real time background monitor)
+  getTCHit(SourceOfTC);
+
   return;
 }
 //
 //
 //
 void
-TrgEclDigitizer::getTCHit(int TableFlag)
+TrgEclDigitizer::getTCHit(int SourceOfTC)
 {
 
   std::vector< std::vector<float> > E_cell(8736, std::vector<float>(80, 0.0));
@@ -104,9 +102,11 @@ TrgEclDigitizer::getTCHit(int TableFlag)
   //-------------------------------------------------------------------
   //                          read Xtal data
   //---------------------------------------------------------------------
-  if (TableFlag == 1) { // read  ECLHit table
+  if (SourceOfTC == 1) { // read  ECLHit table
+
     StoreArray<ECLHit> eclHitArray("ECLHits");
-    int nHits_hit = eclHitArray.getEntries() - 1;
+
+    int nHits_hit = eclHitArray.getEntries();
     //
     for (int iHits = 0; iHits < nHits_hit; iHits++) {
       // Get a hit
@@ -129,6 +129,7 @@ TrgEclDigitizer::getTCHit(int TableFlag)
     }
     for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
       for (int  iTime = 0; iTime < nBinTime; iTime++) {
+
         if (TCEnergy[iTCIdm][iTime] < 1e-9) {continue;}// 0.01MeV cut
         /* cppcheck-suppress variableScope */
         double maxbkgE = 0;
@@ -155,7 +156,7 @@ TrgEclDigitizer::getTCHit(int TableFlag)
   }
 
 
-  if (TableFlag == 2) { // read ECLSimHit
+  if (SourceOfTC == 2) { // read ECLSimHit
     ECL::ECLGeometryPar* eclp = ECL::ECLGeometryPar::Instance();
     //=====================
     // Loop over all hits of steps
@@ -172,10 +173,10 @@ TrgEclDigitizer::getTCHit(int TableFlag)
       float hitTOF      = aECLSimHit->getFlightTime() / Unit::ns;
 
       G4ThreeVector t = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
-      TVector3 HitInPos(t.x(), t.y(), t.z()); // = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
-      TVector3 PosCell  = eclp->GetCrystalPos(hitCellId);// [cm], Xtal position (based on from IP)
-      TVector3 VecCell  = eclp->GetCrystalVec(hitCellId);
-      float local_pos_r = (15.0 - (HitInPos - PosCell) * VecCell);
+      ROOT::Math::XYZVector HitInPos(t.x(), t.y(), t.z()); // = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
+      ROOT::Math::XYZVector PosCell  = eclp->GetCrystalPos(hitCellId);// [cm], Xtal position (based on from IP)
+      ROOT::Math::XYZVector VecCell  = eclp->GetCrystalVec(hitCellId);
+      float local_pos_r = 15.0 - (HitInPos - PosCell).Dot(VecCell);
       if (hitTOF < - TimeRange || hitTOF >  TimeRange) {continue;}
       int TimeIndex = (int)((hitTOF + TimeRange) / 100);
       E_cell[hitCellId][TimeIndex]  = E_cell[hitCellId][TimeIndex]  + hitE;
@@ -208,6 +209,7 @@ TrgEclDigitizer::getTCHit(int TableFlag)
     for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
       int iTCIdm = _TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;
       for (int  iTime = 0; iTime < nBinTime; iTime++) {
+
         if (E_cell[iXtalIdm][iTime] < 1e-9) {continue;}  // 0.01MeV cut
         TCEnergy[iTCIdm][iTime] += E_cell[iXtalIdm][iTime];
         TCTiming[iTCIdm][iTime] += E_cell[iXtalIdm][iTime] * (T_ave[iXtalIdm][iTime]);
@@ -222,6 +224,7 @@ TrgEclDigitizer::getTCHit(int TableFlag)
         double maxbkgE = 0;
         /* cppcheck-suppress variableScope */
         int maxbkgtag = 0;
+
         if (TCEnergy[iTCIdm][iTime] < 1e-9) {continue;}  // 0.01MeV cut
         TCTiming[iTCIdm][iTime] /= TCEnergy[iTCIdm][iTime];
         if (_BeambkgTag == 1) {
@@ -247,9 +250,11 @@ TrgEclDigitizer::getTCHit(int TableFlag)
   //--------------------------------------------------------
   //
   //--------------------------------------------------------
-  if (TableFlag == 3) {
+  if (SourceOfTC == 3) {
+
     StoreArray<ECLHit> eclHitArray("ECLHits");
-    int nHits_hit = eclHitArray.getEntries() - 1;
+
+    int nHits_hit = eclHitArray.getEntries();
     // signal hit
     for (int iHits = 0; iHits < nHits_hit; iHits++) {
       // Get a hit
@@ -284,7 +289,12 @@ TrgEclDigitizer::getTCHit(int TableFlag)
       double tc_e = TCEnergy[iTCIdm][TimeIndex];
       double tc_t = TCTiming[iTCIdm][TimeIndex];
       TCEnergy[iTCIdm][TimeIndex] += tcbg_e;
-      TCTiming[iTCIdm][TimeIndex] += (tcbg_e * tcbg_t + tc_e * tc_t) / TCEnergy[iTCIdm][TimeIndex];
+      TCTiming[iTCIdm][TimeIndex] += (tcbg_e * tcbg_t + tc_e * tc_t);
+    }
+    for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+      for (int  iTime = 0; iTime < nBinTime; iTime++) {
+        TCTiming[iTCIdm][iTime] /= TCEnergy[iTCIdm][iTime];
+      }
     }
   }
   //--------------------------
@@ -297,6 +307,7 @@ TrgEclDigitizer::getTCHit(int TableFlag)
     }
     TCTiming_tot[iTCIdm] /= TCEnergy_tot[iTCIdm];
   }
+
   return;
 }
 //
@@ -332,8 +343,8 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
   // (01)Signal digitization
   //==================
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
-    if (TCEnergy_tot[iTCIdm] < cut_energy_tot) {continue;} // TC energy_tot cut
     for (int iTimeBin = 0; iTimeBin < 80; iTimeBin++) {
+
       if (TCEnergy[iTCIdm][iTimeBin] < 0.0001) {continue;} // 0.1MeV cut on TC bin_energy
       for (int iSampling = 0; iSampling < NSampling; iSampling++) {
         // inputTiming is in [us] <-- Be careful, here is NOT [ns]
@@ -418,8 +429,6 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
   }
   if (1) { //use L Matrix
     for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
-
-      if (TCEnergy_tot[iTCIdm] < cut_energy_tot) { continue; }   // TC energy_tot cut
 
       for (int iSampling = 0; iSampling < NSampling; iSampling++) {
         X_pr[iSampling] = gRandom ->Gaus(0, 1);
@@ -674,7 +683,6 @@ TrgEclDigitizer::FADC(int flag_gen,
     double tt = u_max(u_max(td, t1), u_max(t2, ts)) * 2;
     int flag_once = 0;
     while (flag_once == 0) {
-      double   dt = tt / 1000;
       double tm = 0;
       for (int j = 1; j <= 1000; j++) {
         tc2 = tc - dft;
@@ -688,6 +696,7 @@ TrgEclDigitizer::FADC(int flag_gen,
           tm = tc;
           im = j;
         }
+        double   dt = tt / 1000;
         tc = tc + dt;
       }
       if (im >= 1000) {
@@ -698,7 +707,6 @@ TrgEclDigitizer::FADC(int flag_gen,
       if (ij == 0) {
         ij = 1;
         tc = 0.99 * tm;
-        dt = tm * 0.02 / 1000;
         flag_once = 0;
         continue;
       }

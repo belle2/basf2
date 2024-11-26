@@ -13,7 +13,7 @@
 
 /* ROOT headers. */
 #include <TVectorD.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TMatrixDSym.h>
 
 /* CLHEP headers. */
@@ -58,8 +58,8 @@ namespace Belle2 {
     //! Get invariance matrix of track parameters in the sector local system, where the first layer of the sector is used as reference.
     TMatrixDSym  getLocalTrackParamErr();
 
-    //! Get the positon in local coordinate system of track intercept in plane of constant x
-    TVector3 getLocalIntercept(double x);
+    //! Get the position in local coordinate system of track intercept in plane of constant x
+    ROOT::Math::XYZVector getLocalIntercept(double x);
 
     //! Get the variance matrix of (y,z) coordinates of the track intercept in plane of constant x in sector local system
     TMatrixD getLocalInterceptVariance(double x);

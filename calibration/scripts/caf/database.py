@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # disable doxygen check for this file
 # @cond
@@ -126,7 +125,7 @@ class CAFDB(SQLiteDB):
         finished = False
         while not finished:
             try:
-                self.query("UPDATE calibrations SET {}=? WHERE name=?".format(column_name), (new_value, calibration_name))
+                self.query(f"UPDATE calibrations SET {column_name}=? WHERE name=?", (new_value, calibration_name))
                 finished = True
             except sqlite3.OperationalError as e:
                 if attempt < attempts:
@@ -135,7 +134,7 @@ class CAFDB(SQLiteDB):
                     raise e
 
     def get_calibration_value(self, calibration_name, column_name):
-        return self.query("SELECT {} FROM calibrations WHERE name=?".format(column_name), (calibration_name,)).fetchone()[0]
+        return self.query(f"SELECT {column_name} FROM calibrations WHERE name=?", (calibration_name,)).fetchone()[0]
 
     def output_calibration_table(self):
         data = {"name": [], "state": [], "checkpoint": [], "iteration": []}
@@ -153,3 +152,5 @@ class CAFDB(SQLiteDB):
         border = line_len * "="
         header = "\n".join((border, title, border))
         return "\n".join((header, table_string, border))
+
+# @endcond

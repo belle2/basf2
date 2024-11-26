@@ -75,7 +75,7 @@ namespace Belle2 {
 
     /** read from stream.
      * Expected format: a row per line, elements of rows delimited by a space.
-     * returns true if operation was succesful, false elsewise
+     * returns true if operation was successful, false otherwise
      *
      * NOTE: it is only checked if enough elements are present in each row and column. However, any superfluous values are ignored.
      */
@@ -96,6 +96,9 @@ namespace Belle2 {
     calculateDecorrMatrix(calculateCovMatrix(inputData), normalise);
   }
 
+  // Silence Doxygen which is complaining that "no matching class member found for"
+  // But there should be a better way that I just don't know of / find
+  //! @cond Doxygen_Suppress
   template<size_t Ndims>
   void DecorrelationMatrix<Ndims>::calculateDecorrMatrix(const DecorrelationMatrix<Ndims>::MatrixT& covMatrix, bool normalise)
   {
@@ -112,6 +115,7 @@ namespace Belle2 {
       m_matrix = U;
     }
   }
+  //! @endcond
 
   template<size_t Ndims>
   std::vector<double> DecorrelationMatrix<Ndims>::decorrelate(const std::vector<double>& inputVec) const

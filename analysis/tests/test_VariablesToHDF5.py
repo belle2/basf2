@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,14 +14,14 @@ import pandas
 import b2test_utils
 from b2pandas_utils import VariablesToHDF5
 
-inputFile = b2test_utils.require_file('mdst14.root', 'validation')
+inputFile = b2test_utils.require_file('mdst16.root', 'validation')
 path = basf2.create_path()
 path.add_module('RootInput', inputFileName=inputFile)
 path.add_module('ParticleLoader', decayStrings=['e+'])
 
 # Write out electron id and momentum of all true electron candidates
 v2hdf5_e = VariablesToHDF5(
-    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.hdf5")
+    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.hdf5", hdf_table_name='all_electrons')
 path.add_module(v2hdf5_e)
 
 # event-wise mode is not supported at the moment. when it is add something like
@@ -38,16 +37,16 @@ with b2test_utils.clean_working_directory():
 
     # Testing
     assert os.path.isfile('particleDF.hdf5'), "particleDF.hdf5 wasn't created"
-    df1 = pandas.read_hdf('particleDF.hdf5', 'e+:all')
+    df1 = pandas.read_hdf('particleDF.hdf5', 'all_electrons')
     assert len(df1) > 0, "electron dataframe contains zero entries"
     assert 'electronID' in df1.columns, "electronID column is missing from electron dataframe"
     assert 'p' in df1.columns, "p column is missing from electron dataframe"
-    assert 'evt' in df1.columns, "event number is missing from electron dataframe"
-    assert 'run' in df1.columns, "run number is missing from electron dataframe"
-    assert 'exp' in df1.columns, "experiment number is missing from electron dataframe"
-    assert 'icand' in df1.columns, "candidate number is missing from electron dataframe"
-    assert 'ncand' in df1.columns, "candidate count is missing from electron dataframe"
+    assert '__event__' in df1.columns, "event number is missing from electron dataframe"
+    assert '__run__' in df1.columns, "run number is missing from electron dataframe"
+    assert '__experiment__' in df1.columns, "experiment number is missing from electron dataframe"
+    assert '__candidate__' in df1.columns, "candidate number is missing from electron dataframe"
+    assert '__ncandidates__' in df1.columns, "candidate count is missing from electron dataframe"
 
-    assert df1.run[0] == 0, "run number not as expected"
-    assert df1.exp[0] == 1003, "experiment number not as expected"
-    assert df1.evt[0] == 1, "event number not as expected"
+    assert df1.__run__[0] == 0, "run number not as expected"
+    assert df1.__experiment__[0] == 1003, "experiment number not as expected"
+    assert df1.__event__[0] == 1, "event number not as expected"

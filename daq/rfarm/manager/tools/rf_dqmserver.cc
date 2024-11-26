@@ -15,7 +15,7 @@ using namespace Belle2;
 
 static RFDqmServer* dqm = NULL;
 
-extern "C" void sighandler(int sig)
+extern "C" void sighandler(int /*sig*/)
 {
   printf("SIGTERM handler here\n");
   dqm->cleanup();
@@ -23,6 +23,8 @@ extern "C" void sighandler(int sig)
 
 int main(int argc, char** argv)
 {
+  if (argc < 2) return 1;
+
   RFConf conf(argv[1]);
 
   //  RFDqmServer* dqm = new RFDqmServer(argv[1]);

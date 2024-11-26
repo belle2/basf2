@@ -44,7 +44,6 @@ namespace Belle2 {
 
     // operators
   public:
-    Time& operator = (const Time&);
     bool operator == (const Time&) const;
     Time operator + (const Time&) const;
     Time operator - (const Time&) const;

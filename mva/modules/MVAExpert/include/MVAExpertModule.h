@@ -14,8 +14,10 @@
 #include <mva/interface/Weightfile.h>
 #include <mva/interface/Expert.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/VariableManager/Manager.h>
 #include <framework/dataobjects/EventExtraInfo.h>
 
@@ -62,12 +64,12 @@ namespace Belle2 {
     /**
      * Calculates expert output for given Particle pointer
      */
-    float analyse(Particle*);
+    float analyse(const Particle*);
 
     /**
      * Calculates expert output for given Particle pointer
      */
-    std::vector<float> analyseMulticlass(Particle*);
+    std::vector<float> analyseMulticlass(const Particle*);
 
     /**
      * Initialize mva expert, dataset and features
@@ -78,7 +80,7 @@ namespace Belle2 {
     /**
      * Evaluate the variables and fill the Dataset to be used by the expert.
      */
-    void fillDataset(Particle*);
+    void fillDataset(const Particle*);
 
     /**
      * Set the extra info field.
@@ -92,8 +94,16 @@ namespace Belle2 {
 
 
   private:
-
+    /**
+     * StoreArray of Particles
+     */
+    StoreArray<Particle> m_particles;
+    /**
+     * Decay descriptor of decays to look for.
+     */
+    std::unordered_map<std::string, DecayDescriptor>  m_decaydescriptors;
     std::vector<std::string> m_listNames; /**< input particle list names */
+    std::vector<std::string> m_targetListNames; /**< input particle list names after decay descriptor*/
     std::string m_identifier; /**< weight-file */
     std::string m_extraInfoName; /**< Name under which the SignalProbability is stored in the extraInfo of the Particle object. */
     double m_signal_fraction_override; /**< Signal Fraction which should be used. < 0 means use signal fraction of training sample */

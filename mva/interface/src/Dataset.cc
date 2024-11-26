@@ -14,7 +14,7 @@
 
 #include <TLeaf.h>
 
-#include <boost/filesystem/operations.hpp>
+#include <filesystem>
 
 namespace Belle2 {
   namespace MVA {
@@ -325,7 +325,7 @@ namespace Belle2 {
 
       std::vector<std::string> filenames;
       for (const auto& filename : m_general_options.m_datafiles) {
-        if (boost::filesystem::exists(filename)) {
+        if (std::filesystem::exists(filename)) {
           filenames.push_back(filename);
         } else {
           auto temp = RootIOUtilities::expandWordExpansions(m_general_options.m_datafiles);
@@ -340,7 +340,7 @@ namespace Belle2 {
       //Open TFile
       TDirectory* dir = gDirectory;
       for (const auto& filename : filenames) {
-        if (not boost::filesystem::exists(filename)) {
+        if (not std::filesystem::exists(filename)) {
           B2ERROR("Error given ROOT file does not exist " << filename);
           throw std::runtime_error("Error during open of ROOT file named " + filename);
         }
@@ -610,7 +610,7 @@ namespace Belle2 {
 
     void ROOTDataset::initialiseVarVariantForBranch(const std::string branch_name, RootDatasetVarVariant& varVariantTarget)
     {
-      auto compatible_branch_name = Belle2::MakeROOTCompatible::makeROOTCompatible(branch_name).c_str();
+      std::string compatible_branch_name = Belle2::MakeROOTCompatible::makeROOTCompatible(branch_name);
       // try the branch as is first then fall back to root safe name.
       if (checkForBranch(m_tree, branch_name.c_str())) {
         TBranch* branch = m_tree->GetBranch(branch_name.c_str());
@@ -618,8 +618,8 @@ namespace Belle2 {
         std::string type_name = leaf->GetTypeName();
         initialiseVarVariantType(type_name, varVariantTarget);
       } else if (checkForBranch(m_tree, compatible_branch_name)) {
-        TBranch* branch = m_tree->GetBranch(compatible_branch_name);
-        TLeaf* leaf = branch->GetLeaf(compatible_branch_name);
+        TBranch* branch = m_tree->GetBranch(compatible_branch_name.c_str());
+        TLeaf* leaf = branch->GetLeaf(compatible_branch_name.c_str());
         std::string type_name = leaf->GetTypeName();
         initialiseVarVariantType(type_name, varVariantTarget);
       }

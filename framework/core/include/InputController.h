@@ -90,7 +90,7 @@ namespace Belle2 {
     /** Reset InputController (e.g. after forking a thread) */
     static void resetForChildProcess();
 
-    /** Necessary to make sure the ProgressModule shows reasonable output.. */
+    /** Necessary to make sure the ProgressModule shows reasonable output. */
     static long getNumEntriesToProcess();
 
   private:

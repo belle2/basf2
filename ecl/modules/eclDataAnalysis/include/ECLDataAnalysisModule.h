@@ -7,12 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <string>
-
-// FRAMEWORK
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+
+/* C++ headers. */
+#include <string>
 
 class TFile;
 class TTree;
@@ -79,7 +80,7 @@ namespace Belle2 {
     TFile* m_rootFilePtr; /**< root file used for storing info */
     std::string m_rootFileName; /**< name of the root file */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
-    bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
+    bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at python level */
     bool m_doPureCsI; /**< if true, info on pureCsI upgrade is stored*/
     bool m_doHits; /**< if true, info on Hits and SimHits is stored*/
     bool m_doDigits; /**< if true, info on Digits and CalDigits is stored*/
@@ -235,7 +236,7 @@ namespace Belle2 {
     std::vector<int>* m_eclSimHitIdx;  /**< Index of ECLSimHit*/
     std::vector<int>* m_eclSimHitToMC; /**< Index of MCParticle related to that ECLSimHit */
     std::vector<int>* m_eclSimHitCellId; /**< ECLSimHit CellId */
-    std::vector<int>* m_eclSimHitPdg; /**< PDG code of MCParticle associted to that ECLDigit */
+    std::vector<int>* m_eclSimHitPdg; /**< PDG code of MCParticle associated to that ECLDigit */
     std::vector<double>* m_eclSimHitEnergyDep; /**< Energy deposition of ECLSimHit */
     std::vector<double>* m_eclSimHitFlightTime; /**< ECLSimhit Flight Time */
     std::vector<double>* m_eclSimHitX; /**< ECLSimHit X position */
@@ -293,7 +294,7 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterHighestE; /**< Highest energy deposit (per crystal) in ECLCluster */
     std::vector<int>* m_eclClusterCellId; /**< CellId with highest energy deposit in ECLCluster */
     std::vector<int>* m_eclClusterNofCrystals;  /**< Number of crystals in ECLCluster */
-    std::vector<int>* m_eclClusterCrystalHealth;  /**< Crystal healt flag */
+    std::vector<int>* m_eclClusterCrystalHealth;  /**< Crystal health flag */
     std::vector<bool>* m_eclClusterIsTrack; /**< Flag for charged clusters */
     std::vector<double>* m_eclClusterClosestTrackDist; /**< Flag for charged clusters */
     std::vector<double>* m_eclClusterDeltaL; /**< Reconstructed Cluster DeltaL */
@@ -403,7 +404,7 @@ namespace Belle2 {
     std::vector<int>* m_eclPureClusterCellId; /**< CellId with highest energy deposit in Cluster, PureCsI option */
     std::vector<double>* m_eclPureClusterLat; /**< Cluster shape parameter LAT, PureCsI option */
     std::vector<int>* m_eclPureClusterNofCrystals;  /**< Number of crystals in Cluster, PureCsI option */
-    std::vector<int>* m_eclPureClusterCrystalHealth;  /**< Crystal healt flag, PureCsI option */
+    std::vector<int>* m_eclPureClusterCrystalHealth;  /**< Crystal health flag, PureCsI option */
     std::vector<bool>* m_eclPureClusterIsTrack; /**< Flag for charged clusters, PureCsI option */
     std::vector<double>* m_eclPureClusterDeltaL; /**< Reconstructed Cluster DeltaL, PureCsI option */
     std::vector<double>* m_eclPureClusterClosestTrackDist;  /**< Reconstructed Distance to Closest Track, PureCsI option */
@@ -535,9 +536,9 @@ namespace Belle2 {
     std::vector<double>* m_eclpidE9E21; /**< PID track ration of 3x3 over 5x5 crystal matrices energies */
     std::vector<int>* m_eclpidNCrystals; /**< PID track number of crystals */
     std::vector<int>* m_eclpidNClusters; /**< PID track number of clusters */
-    std::vector<double>* m_eclLogLikeEl; /**< PID track electron likelyhood */
-    std::vector<double>* m_eclLogLikeMu; /**< PID track muon likelyhood */
-    std::vector<double>* m_eclLogLikePi; /**< PID track pion likelyhood */
+    std::vector<double>* m_eclLogLikeEl; /**< PID track electron likelihood */
+    std::vector<double>* m_eclLogLikeMu; /**< PID track muon likelihood */
+    std::vector<double>* m_eclLogLikePi; /**< PID track pion likelihood */
   };
 
 }

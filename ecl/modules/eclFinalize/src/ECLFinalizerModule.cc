@@ -63,13 +63,13 @@ void ECLFinalizerModule::initialize()
   m_eclShowers.isRequired(eclShowerArrayName());
   m_eclClusters.registerInDataStore(eclClusterArrayName());
   m_eclCalDigits.isRequired(eclCalDigitArrayName());
-  m_eventLevelClusteringInfo.registerInDataStore();
+  m_eventLevelClusteringInfo.isRequired();
   m_eventT0.isRequired();
 
   // Register relations.
   m_eclClusters.registerRelationTo(m_eclShowers);
   m_eclClusters.registerRelationTo(m_eclCalDigits);
-
+  m_eclShowers.requireRelationTo(m_eclCalDigits);
 }
 
 void ECLFinalizerModule::beginRun()

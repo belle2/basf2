@@ -92,7 +92,17 @@ class Script(JsonBase):
     Contains information about a script and its execution output
     """
 
-    def __init__(self, name, path, status, log_url=None, return_code=None, input=None, output=None):
+    def __init__(
+            self,
+            name,
+            path,
+            status,
+            log_url=None,
+            return_code=None,
+            input=None,
+            output=None,
+            issues=None
+    ):
         """
         Create a new Script object and fill all members
         """
@@ -117,6 +127,10 @@ class Script(JsonBase):
         #: output files produced by the script as declared in
         #  the header
         self.output = output
+        #: linked issues
+        if not issues:
+            issues = []
+        self.issues = issues
 
 
 class PlotFile(JsonBase):
@@ -148,7 +162,7 @@ class PlotFile(JsonBase):
 class Plot(JsonBase):
 
     """
-    Wrapper for one specfic plot.
+    Wrapper for one specific plot.
     """
 
     def __init__(
@@ -271,7 +285,7 @@ class ComparisonState(enum.Enum):
     #: The two distributions did not comply with the allowed
     #  differences
     FailureStastical = "statistical_failure"
-    #: The two distrubtions were equal in the envelope given by the
+    #: The two distributions were equal in the envelope given by the
     #  comparison configuration of this plot
     Equal = "equal"
 

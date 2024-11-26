@@ -14,19 +14,20 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 
+/* ROOT headers. */
+#include <TMatrixD.h>
+
 using namespace Belle2;
 
 KLMCluster::KLMCluster() : m_time(0), m_layers(0), m_innermostLayer(0),
-  m_globalX(0), m_globalY(0), m_globalZ(0), m_p(0),
-  m_errorX(0), m_errorY(0), m_errorZ(0), m_errorP(0)
+  m_globalX(0), m_globalY(0), m_globalZ(0), m_p(0)
 {
 }
 
 KLMCluster::KLMCluster(float x, float y, float z, float time, int nLayers,
                        int nInnermostLayer, float p) :
   m_time(time), m_layers(nLayers), m_innermostLayer(nInnermostLayer),
-  m_globalX(x), m_globalY(y), m_globalZ(z), m_p(p),
-  m_errorX(0), m_errorY(0), m_errorZ(0), m_errorP(0)
+  m_globalX(x), m_globalY(y), m_globalZ(z), m_p(p)
 {
 }
 
@@ -70,10 +71,6 @@ TMatrixDSym KLMCluster::getError4x4() const
   double vertexDist3;
   TMatrixDSym errorMatrix(4);
   TMatrixD jacobian(4, 4);
-  errorMatrix[0][0] = m_errorX;
-  errorMatrix[1][1] = m_errorY;
-  errorMatrix[2][2] = m_errorZ;
-  errorMatrix[3][3] = m_errorP;
   vertexDist3 = pow(m_globalX * m_globalX + m_globalY * m_globalY +
                     m_globalZ * m_globalZ, 1.5);
   jacobian(0, 0) = m_p * (m_globalY * m_globalY + m_globalZ * m_globalZ) /

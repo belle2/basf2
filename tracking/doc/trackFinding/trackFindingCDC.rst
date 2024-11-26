@@ -1,4 +1,4 @@
-.. _tracking_trackFindingCDC:  
+.. _tracking_trackFindingCDC:
 
 CDC Track Finding
 ^^^^^^^^^^^^^^^^^

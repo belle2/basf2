@@ -69,5 +69,12 @@ namespace Belle2 {
      * Map that associates to each detector its list of valid layers.
      */
     static const std::unordered_map<std::string, std::vector<int>> detToLayers;
+
+    /**
+     * CDC sense wire radiuses
+     * Values are take from cdc/data/CDC.xml
+     */
+    static const std::unordered_map<int, double> cdcWireRadiuses;
+
   };
 }

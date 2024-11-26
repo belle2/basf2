@@ -16,8 +16,9 @@
 #include <framework/logging/Logger.h>
 
 /* ROOT headers. */
+#include <Math/Vector3D.h>
+#include <Math/VectorUtil.h>
 #include <TMath.h>
-#include <TVector3.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -98,8 +99,8 @@ void ECLNeighbours::initializeR(double radius)
 
   for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
     // get the central one
-    TVector3 direction = geom->GetCrystalVec(i);
-    TVector3 position  = geom->GetCrystalPos(i);
+    ROOT::Math::XYZVector direction = geom->GetCrystalVec(i);
+    ROOT::Math::XYZVector position  = geom->GetCrystalPos(i);
 
     // get all nearby crystals
     std::vector<short int> neighbours = getNeighbours(i + 1);
@@ -107,9 +108,10 @@ void ECLNeighbours::initializeR(double radius)
 
     // ... and calculate the shortest distance between the central one and all possible neighbours (of the reduced set)
     for (auto const& id : neighbours) {
-      const TVector3& directionNeighbour = geom->GetCrystalVec(id - 1);
-      const double alpha    = direction.Angle(directionNeighbour);
-      const double R        = position.Mag();
+      const ROOT::Math::XYZVector& directionNeighbour = geom->GetCrystalVec(id - 1);
+      const double alpha = ROOT::Math::VectorUtil::Angle(
+                             direction, directionNeighbour);
+      const double R        = position.R();
       const double distance = getDistance(alpha, R);
 
       if (distance <= radius) neighboursTemp.push_back(id);

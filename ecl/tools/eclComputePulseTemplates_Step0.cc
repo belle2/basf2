@@ -25,7 +25,7 @@ using namespace Belle2;
 
 /*
 Note photon shape calibrations are needed to compute hadron and diode templates.
-Photon calibrations should be placed in file named params_gamma_shape.dat in same directiory as this script.
+Photon calibrations should be placed in file named params_gamma_shape.dat in same directory as this script.
 Format of params_gamma_shape.dat:
 
 cellID PhotonScale 0 p0 p1 p2 p3 p4 p5 p6 p7 p8 p9
@@ -53,7 +53,7 @@ recompile with "scons ecl"
 Final step will create local db object.
 */
 
-/** a struct to hold relavent Crystal information */
+/** a struct to hold relevant Crystal information */
 struct crystalInfo {
   vector<double> PhotonWaveformPars; /**< photon waveform parameters */
   vector<double> HadronWaveformPars; /**< hadron waveform parameters */
@@ -67,9 +67,9 @@ struct crystalInfo {
 int main(int argc, char* argv[])
 {
   //
-  TString OutputDirectory = "";
+  TString OutputDirectory = ".";
   if (OutputDirectory == "") {
-    std::cout << "Error set ouput directory" << std::endl;
+    std::cout << "Error set output directory" << std::endl;
     return -1;
   }
   //
@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
     }
     PhotonFile.close();
   } else {
-    std::cout << "ERROR cannont open photon param file." << endl;
+    std::cout << "ERROR cannot open photon param file." << endl;
     return -1;
   }
   if (Flag == 0) {

@@ -42,7 +42,7 @@ int Callback::add(NSMVHandler* handler, bool overwrite, bool isdump)
   return 0;
 }
 
-void Callback::remove(const std::string& node, const std::string& name)
+void Callback::remove(const std::string& node, const std::string& /*name*/)
 {
   std::string hname = node + "@" + node;
   if (m_handler.find(hname) != m_handler.end()) {

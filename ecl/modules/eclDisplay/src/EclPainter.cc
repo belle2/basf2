@@ -5,15 +5,16 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclDisplay/EclPainter.h>
 
-//Root
-#include <TString.h>
-
-//ECL
-#include <ecl/utility/ECLChannelMapper.h>
+/* ECL headers. */
+#include <ecl/mapper/ECLChannelMapper.h>
 #include <ecl/modules/eclDisplay/MultilineWidget.h>
+
+/* ROOT headers. */
+#include <TString.h>
 
 using namespace Belle2;
 using namespace ECL;

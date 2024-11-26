@@ -26,6 +26,7 @@ Untested method Track::getTrackFitResultsByName
 Untested method Track::setFlippedAndRefitted
 Untested method Track::setTrackFitResultIndex
 Untested method Track::setTrackTime
+Untested method V0::getFittedVertexPosition
 Untested method V0::getTrackFitResultIndices
 Untested method V0::getTrackIndices
 Untested method TrackFitResult::getHelix
@@ -46,10 +47,13 @@ Untested method EventLevelTrackingInfo::setSVDFirstSampleTime
 Untested method EventLevelTrackingInfo::setSVDSpacePointCreatorAbortionFlag
 Untested method EventLevelTrackingInfo::setUnspecifiedTrackFindingFailure
 Untested method EventLevelTrackingInfo::setVXDTF2AbortionFlag
+Untested method PIDLikelihood::addPreOfficialLikelihood
 Untested method PIDLikelihood::getDeltaLogL
 Untested method PIDLikelihood::getInfoHTML
+Untested method PIDLikelihood::getPreOfficialLikelihood
 Untested method PIDLikelihood::printArray
 Untested method PIDLikelihood::setLogLikelihood
+Untested method PIDLikelihood::subtractMaximum
 Untested method ECLCluster::addHypothesis
 Untested method ECLCluster::addStatus
 Untested method ECLCluster::hasStatus
@@ -89,14 +93,22 @@ Untested method ECLCluster::setdeltaL
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeBWD
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeBarrel
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeFWD
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsBWD
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsBarrel
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsFWD
+Untested method EventLevelClusteringInfo::setNECLShowersBWD
+Untested method EventLevelClusteringInfo::setNECLShowersBarrel
+Untested method EventLevelClusteringInfo::setNECLShowersFWD
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedBWD
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedBarrel
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedFWD
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsBWD
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsBarrel
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsFWD
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBWD
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBarrel
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripFWD
 Untested method KLMCluster::setClusterPosition
-Untested method KLMCluster::setErrorP
-Untested method KLMCluster::setErrorX
-Untested method KLMCluster::setErrorY
-Untested method KLMCluster::setErrorZ
 Untested method KLMCluster::setInnermostLayer
 Untested method KLMCluster::setLayers
 Untested method KLMCluster::setMomentumMag
@@ -450,6 +462,9 @@ Track#10:
   isFlippedAndRefitted(): False
   wasRefined(): False
 V0#0:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#11
@@ -459,6 +474,9 @@ V0#0:
     -> Tracks#9
   getV0Hypothesis(): <type: K_S0>
 V0#1:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#13
@@ -468,6 +486,9 @@ V0#1:
     -> Tracks#3
   getV0Hypothesis(): <type: K_S0>
 V0#2:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#15
@@ -476,9 +497,10 @@ V0#2:
     -> Tracks#8
     -> Tracks#6
   getV0Hypothesis(): <type: K_S0>
+No data for Kinks
 TrackFitResult#0:
-[INFO] Conditions Database: found working server
-	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions Database: found working metadata provider
+	provider = ${BELLE2_CONDB_METADATA}
 [INFO] Conditions data: configured globaltag is ${default_globaltag}
   get4Momentum(): (0.142389,0.0549256,0.0689178,0.217993)
   getChargeSign(): 1
@@ -1414,13 +1436,27 @@ TrackFitResult#16:
     1.29303
   getTransverseMomentum(): 0.238484
   getZ0(): 0.0187068
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -237.148
   getLogL(<type: mu->): -235.226
   getLogL(<type: pi+>): -236.735
   getLogL(<type: K+>): -270.323
   getLogL(<type: p+>): -252.232
   getLogL(<type: deuteron>): -472.416
+  getLogarithmicProbability(<type: e->): -2.1215
+  getLogarithmicProbability(<type: mu->): 1.00086
+  getLogarithmicProbability(<type: pi+>): -1.64528
+  getLogarithmicProbability(<type: K+>): -35.41
+  getLogarithmicProbability(<type: p+>): -17.3187
+  getLogarithmicProbability(<type: deuteron>): -237.503
   getMostLikely(): <type: mu->
   getProbability(<type: e->): 0.107025
   getProbability(<type: mu->): 0.731227
@@ -1428,6 +1464,7 @@ PIDLikelihood#0:
   getProbability(<type: K+>): 4.18451e-16
   getProbability(<type: p+>): 3.01019e-08
   getProbability(<type: deuteron>): 7.14084e-104
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -1435,12 +1472,25 @@ PIDLikelihood#0:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#1:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -229.125
   getLogL(<type: mu->): -206.665
   getLogL(<type: pi+>): -198.153
   getLogL(<type: K+>): -374.253
   getLogL(<type: p+>): -356.805
   getLogL(<type: deuteron>): -418.651
+  getLogarithmicProbability(<type: e->): -30.9719
+  getLogarithmicProbability(<type: mu->): -8.51237
+  getLogarithmicProbability(<type: pi+>): 8.51237
+  getLogarithmicProbability(<type: K+>): -176.1
+  getLogarithmicProbability(<type: p+>): -158.653
+  getLogarithmicProbability(<type: deuteron>): -220.498
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 3.54054e-14
   getProbability(<type: mu->): 0.000200926
@@ -1448,6 +1498,7 @@ PIDLikelihood#1:
   getProbability(<type: K+>): 3.31715e-77
   getProbability(<type: p+>): 1.25338e-69
   getProbability(<type: deuteron>): 1.73346e-96
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -1455,12 +1506,25 @@ PIDLikelihood#1:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#2:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -214.557
   getLogL(<type: mu->): -209.726
   getLogL(<type: pi+>): -206.568
   getLogL(<type: K+>): -332.154
   getLogL(<type: p+>): -238.5
   getLogL(<type: deuteron>): -286.363
+  getLogarithmicProbability(<type: e->): -8.03094
+  getLogarithmicProbability(<type: mu->): -3.15827
+  getLogarithmicProbability(<type: pi+>): 3.14998
+  getLogarithmicProbability(<type: K+>): -125.628
+  getLogarithmicProbability(<type: p+>): -31.9737
+  getLogarithmicProbability(<type: deuteron>): -79.8372
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.000325137
   getProbability(<type: mu->): 0.0407667
@@ -1468,6 +1532,7 @@ PIDLikelihood#2:
   getProbability(<type: K+>): 2.75844e-55
   getProbability(<type: p+>): 1.30016e-14
   getProbability(<type: deuteron>): 2.12395e-35
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -1475,12 +1540,25 @@ PIDLikelihood#2:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#3:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -470.973
   getLogL(<type: mu->): -451.127
   getLogL(<type: pi+>): -436.931
   getLogL(<type: K+>): -474.649
   getLogL(<type: p+>): -533.796
   getLogL(<type: deuteron>): -692.818
+  getLogarithmicProbability(<type: e->): -34.042
+  getLogarithmicProbability(<type: mu->): -14.1961
+  getLogarithmicProbability(<type: pi+>): 14.1961
+  getLogarithmicProbability(<type: K+>): -37.7179
+  getLogarithmicProbability(<type: p+>): -96.8651
+  getLogarithmicProbability(<type: deuteron>): -255.887
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 1.64338e-15
   getProbability(<type: mu->): 6.83454e-07
@@ -1488,6 +1566,7 @@ PIDLikelihood#3:
   getProbability(<type: K+>): 4.16223e-17
   getProbability(<type: p+>): 8.55124e-43
   getProbability(<type: deuteron>): 7.40646e-112
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -1495,12 +1574,25 @@ PIDLikelihood#3:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#4:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): True
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -211.732
   getLogL(<type: mu->): -183.793
   getLogL(<type: pi+>): -182.678
   getLogL(<type: K+>): -315.94
   getLogL(<type: p+>): -216.018
   getLogL(<type: deuteron>): -230.571
+  getLogarithmicProbability(<type: e->): -29.3372
+  getLogarithmicProbability(<type: mu->): -1.11432
+  getLogarithmicProbability(<type: pi+>): 1.11432
+  getLogarithmicProbability(<type: K+>): -133.545
+  getLogarithmicProbability(<type: p+>): -33.6239
+  getLogarithmicProbability(<type: deuteron>): -48.1764
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 1.81558e-13
   getProbability(<type: mu->): 0.247067
@@ -1508,6 +1600,7 @@ PIDLikelihood#4:
   getProbability(<type: K+>): 1.00472e-58
   getProbability(<type: p+>): 2.49647e-15
   getProbability(<type: deuteron>): 1.19465e-21
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -1515,12 +1608,25 @@ PIDLikelihood#4:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#5:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -724.958
   getLogL(<type: mu->): -730.074
   getLogL(<type: pi+>): -700.699
   getLogL(<type: K+>): -733.337
   getLogL(<type: p+>): -762.342
   getLogL(<type: deuteron>): -870.107
+  getLogarithmicProbability(<type: e->): -24.2588
+  getLogarithmicProbability(<type: mu->): -29.3749
+  getLogarithmicProbability(<type: pi+>): 24.2526
+  getLogarithmicProbability(<type: K+>): -32.6383
+  getLogarithmicProbability(<type: p+>): -61.6429
+  getLogarithmicProbability(<type: deuteron>): -169.408
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 2.91435e-11
   getProbability(<type: mu->): 1.74845e-13
@@ -1528,6 +1634,7 @@ PIDLikelihood#5:
   getProbability(<type: K+>): 6.68904e-15
   getProbability(<type: p+>): 1.69359e-27
   getProbability(<type: deuteron>): 2.67418e-74
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -1535,12 +1642,25 @@ PIDLikelihood#5:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#6:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): True
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -246.377
   getLogL(<type: mu->): -214.439
   getLogL(<type: pi+>): -214.079
   getLogL(<type: K+>): -324.956
   getLogL(<type: p+>): -331.117
   getLogL(<type: deuteron>): -266.245
+  getLogarithmicProbability(<type: e->): -32.827
+  getLogarithmicProbability(<type: mu->): -0.359451
+  getLogarithmicProbability(<type: pi+>): 0.359451
+  getLogarithmicProbability(<type: K+>): -111.406
+  getLogarithmicProbability(<type: p+>): -117.568
+  getLogarithmicProbability(<type: deuteron>): -52.695
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 5.53878e-15
   getProbability(<type: mu->): 0.411092
@@ -1548,6 +1668,7 @@ PIDLikelihood#6:
   getProbability(<type: K+>): 4.13908e-49
   getProbability(<type: p+>): 8.7289e-52
   getProbability(<type: deuteron>): 1.30279e-23
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -1555,12 +1676,25 @@ PIDLikelihood#6:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#7:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -128.762
   getLogL(<type: mu->): -537.3
   getLogL(<type: pi+>): -137.239
   getLogL(<type: K+>): -135.681
   getLogL(<type: p+>): -132.012
   getLogL(<type: deuteron>): -200.619
+  getLogarithmicProbability(<type: e->): 3.22025
+  getLogarithmicProbability(<type: mu->): -408.578
+  getLogarithmicProbability(<type: pi+>): -8.51664
+  getLogarithmicProbability(<type: K+>): -6.95782
+  getLogarithmicProbability(<type: p+>): -3.25185
+  getLogarithmicProbability(<type: deuteron>): -71.8964
   getMostLikely(): <type: e->
   getProbability(<type: e->): 0.961589
   getProbability(<type: mu->): 3.60458e-178
@@ -1568,6 +1702,7 @@ PIDLikelihood#7:
   getProbability(<type: K+>): 0.000950265
   getProbability(<type: p+>): 0.0372604
   getProbability(<type: deuteron>): 5.96734e-32
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -1575,12 +1710,25 @@ PIDLikelihood#7:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#8:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): True
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -155.525
   getLogL(<type: mu->): -156.684
   getLogL(<type: pi+>): -150.982
   getLogL(<type: K+>): -157.757
   getLogL(<type: p+>): -170.357
   getLogL(<type: deuteron>): -215.358
+  getLogarithmicProbability(<type: e->): -4.54806
+  getLogarithmicProbability(<type: mu->): -5.71424
+  getLogarithmicProbability(<type: pi+>): 4.19216
+  getLogarithmicProbability(<type: K+>): -6.7898
+  getLogarithmicProbability(<type: p+>): -19.3909
+  getLogarithmicProbability(<type: deuteron>): -64.391
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.0104768
   getProbability(<type: mu->): 0.00328782
@@ -1588,6 +1736,7 @@ PIDLikelihood#8:
   getProbability(<type: K+>): 0.00112393
   getProbability(<type: p+>): 3.79e-09
   getProbability(<type: deuteron>): 1.08476e-28
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -1595,12 +1744,25 @@ PIDLikelihood#8:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#9:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -11.6571
   getLogL(<type: mu->): -360.79
   getLogL(<type: pi+>): -15.0801
   getLogL(<type: K+>): -15.1686
   getLogL(<type: p+>): -28.7181
   getLogL(<type: deuteron>): -34.8708
+  getLogarithmicProbability(<type: e->): 2.77314
+  getLogarithmicProbability(<type: mu->): -349.193
+  getLogarithmicProbability(<type: pi+>): -3.45246
+  getLogarithmicProbability(<type: K+>): -3.54358
+  getLogarithmicProbability(<type: p+>): -17.1216
+  getLogarithmicProbability(<type: deuteron>): -23.2743
   getMostLikely(): <type: e->
   getProbability(<type: e->): 0.941207
   getProbability(<type: mu->): 2.22457e-152
@@ -1608,6 +1770,7 @@ PIDLikelihood#9:
   getProbability(<type: K+>): 0.0280972
   getProbability(<type: p+>): 3.66587e-08
   getProbability(<type: deuteron>): 7.80009e-11
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): False
@@ -1615,12 +1778,25 @@ PIDLikelihood#9:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#10:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): False
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -102.135
   getLogL(<type: mu->): -79.4087
   getLogL(<type: pi+>): -77.8299
   getLogL(<type: K+>): -75.4349
   getLogL(<type: p+>): -85.1737
   getLogL(<type: deuteron>): -142.366
+  getLogarithmicProbability(<type: e->): -26.8048
+  getLogarithmicProbability(<type: mu->): -4.06117
+  getLogarithmicProbability(<type: pi+>): -2.41377
+  getLogarithmicProbability(<type: K+>): 2.20706
+  getLogarithmicProbability(<type: p+>): -9.84315
+  getLogarithmicProbability(<type: deuteron>): -67.0351
   getMostLikely(): <type: K+>
   getProbability(<type: e->): 2.2846e-12
   getProbability(<type: mu->): 0.0169371
@@ -1628,6 +1804,7 @@ PIDLikelihood#10:
   getProbability(<type: K+>): 0.900881
   getProbability(<type: p+>): 5.31068e-05
   getProbability(<type: deuteron>): 7.70927e-30
+  isAvailable(): True
   isAvailable(<set: SVD>): False
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -1677,6 +1854,7 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00322266
   getUncertaintyPhi(): 0.0136719
   getUncertaintyTheta(): 0.00527344
+  getUniqueClusterId(): 1001
   getZernikeMVA(): 0.251953
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1726,6 +1904,7 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.00732422
   getUncertaintyPhi(): 0.0103516
   getUncertaintyTheta(): 0.00390625
+  getUniqueClusterId(): 2001
   getZernikeMVA(): 0.606445
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1776,6 +1955,7 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.0128906
   getUncertaintyTheta(): 0.00507813
+  getUniqueClusterId(): 4001
   getZernikeMVA(): 0.126953
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1826,6 +2006,7 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.00263672
   getUncertaintyPhi(): 0.0146484
   getUncertaintyTheta(): 0.00566406
+  getUniqueClusterId(): 4002
   getZernikeMVA(): 0.0849609
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1875,6 +2056,7 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.00117187
   getUncertaintyPhi(): 0.0154297
   getUncertaintyTheta(): 0.00644531
+  getUniqueClusterId(): 5001
   getZernikeMVA(): 0.664062
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1924,6 +2106,7 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.00800781
   getUncertaintyTheta(): 0.00644531
+  getUniqueClusterId(): 6001
   getZernikeMVA(): 0.268555
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1973,6 +2156,7 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.00527344
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00664062
+  getUniqueClusterId(): 7001
   getZernikeMVA(): 0.242188
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2022,6 +2206,7 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.00878906
   getUncertaintyPhi(): 0.00664062
   getUncertaintyTheta(): 0.00527344
+  getUniqueClusterId(): 8001
   getZernikeMVA(): 0.683594
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2071,6 +2256,7 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.00410156
   getUncertaintyPhi(): 0.00878906
   getUncertaintyTheta(): 0.00703125
+  getUniqueClusterId(): 10001
   getZernikeMVA(): 0.755859
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2123,6 +2309,7 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00996094
   getUncertaintyPhi(): 0.00625
   getUncertaintyTheta(): 0.00507813
+  getUniqueClusterId(): 11001
   getZernikeMVA(): 0.421875
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2172,6 +2359,7 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.00917969
   getUncertaintyTheta(): 0.00742187
+  getUniqueClusterId(): 12001
   getZernikeMVA(): 0.425781
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2221,6 +2409,7 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.00898437
   getUncertaintyTheta(): 0.00722656
+  getUniqueClusterId(): 13001
   getZernikeMVA(): 0.59082
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2270,6 +2459,7 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0.00322266
   getUncertaintyPhi(): 0.0128906
   getUncertaintyTheta(): 0.00878906
+  getUniqueClusterId(): 15001
   getZernikeMVA(): 0.767578
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2319,6 +2509,7 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0.0216797
   getUncertaintyPhi(): 0.00703125
   getUncertaintyTheta(): 0.00429688
+  getUniqueClusterId(): 14001
   getZernikeMVA(): 0.416016
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2371,6 +2562,7 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0.00878906
   getUncertaintyPhi(): 0.009375
   getUncertaintyTheta(): 0.00605469
+  getUniqueClusterId(): 16001
   getZernikeMVA(): 0.236328
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2423,6 +2615,7 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0.0131836
   getUncertaintyPhi(): 0.00839844
   getUncertaintyTheta(): 0.00507813
+  getUniqueClusterId(): 16002
   getZernikeMVA(): 0.298828
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2472,6 +2665,7 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0.00175781
   getUncertaintyPhi(): 0.0142578
   getUncertaintyTheta(): 0.0101563
+  getUniqueClusterId(): 18001
   getZernikeMVA(): 0.485352
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2526,6 +2720,7 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 1001
   getZernikeMVA(): 0.748047
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2575,6 +2770,7 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 2001
   getZernikeMVA(): 0.393555
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2625,6 +2821,7 @@ ECLCluster#19:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 4001
   getZernikeMVA(): 0.989258
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2674,6 +2871,7 @@ ECLCluster#20:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 5001
   getZernikeMVA(): 0.335938
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2723,6 +2921,7 @@ ECLCluster#21:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 6001
   getZernikeMVA(): 0.731445
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2772,6 +2971,7 @@ ECLCluster#22:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 7001
   getZernikeMVA(): 0.757812
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2821,6 +3021,7 @@ ECLCluster#23:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 8001
   getZernikeMVA(): 0.316406
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2870,6 +3071,7 @@ ECLCluster#24:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 10001
   getZernikeMVA(): 0.244141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2922,6 +3124,7 @@ ECLCluster#25:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 11001
   getZernikeMVA(): 0.578125
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2971,6 +3174,7 @@ ECLCluster#26:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 12001
   getZernikeMVA(): 0.574219
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3020,6 +3224,7 @@ ECLCluster#27:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 13001
   getZernikeMVA(): 0.40918
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3069,6 +3274,7 @@ ECLCluster#28:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 15001
   getZernikeMVA(): 0.232422
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3118,6 +3324,7 @@ ECLCluster#29:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 14001
   getZernikeMVA(): 0.583984
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3170,6 +3377,7 @@ ECLCluster#30:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 16001
   getZernikeMVA(): 0.929688
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3219,6 +3427,7 @@ ECLCluster#31:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 18001
   getZernikeMVA(): 0.514648
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3229,6 +3438,7 @@ ECLCluster#31:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
+No data for EventLevelClusteringInfo
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
@@ -3283,8 +3493,8 @@ KLMCluster#1:
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#22 (weight: 1)
   getTime(): 2.62976
- ... message repeated 14 times
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
+No data for KlId
+No data for TRGSummary
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(25)
     pair
@@ -3590,6 +3800,7 @@ MCParticle#4:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+ ... message repeated 14 times
 [WARNING] Daughter index out of range
 	daughter index = 0
 [WARNING] Trying to access non-existing particle.
@@ -5283,6 +5494,7 @@ MCParticle#54:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] EXP:        0        RUN:        0        EVT:        2
 EventMetaData:
   getErrorFlag(): 0
@@ -5643,6 +5855,9 @@ Track#13:
   isFlippedAndRefitted(): False
   wasRefined(): False
 V0#0:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#14
@@ -5652,6 +5867,9 @@ V0#0:
     -> Tracks#10
   getV0Hypothesis(): <type: K_S0>
 V0#1:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#16
@@ -5661,6 +5879,9 @@ V0#1:
     -> Tracks#11
   getV0Hypothesis(): <type: K_S0>
 V0#2:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#18
@@ -5670,6 +5891,9 @@ V0#2:
     -> Tracks#8
   getV0Hypothesis(): <type: K_S0>
 V0#3:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#20
@@ -5679,6 +5903,9 @@ V0#3:
     -> Tracks#10
   getV0Hypothesis(): <type: K_S0>
 V0#4:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#22
@@ -5688,6 +5915,9 @@ V0#4:
     -> Tracks#11
   getV0Hypothesis(): <type: K_S0>
 V0#5:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#24
@@ -5697,6 +5927,9 @@ V0#5:
     -> Tracks#0
   getV0Hypothesis(): <type: K_S0>
 V0#6:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#26
@@ -5706,6 +5939,9 @@ V0#6:
     -> Tracks#8
   getV0Hypothesis(): <type: K_S0>
 V0#7:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#28
@@ -5715,6 +5951,9 @@ V0#7:
     -> Tracks#0
   getV0Hypothesis(): <type: K_S0>
 V0#8:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#30
@@ -5723,6 +5962,7 @@ V0#8:
     -> Tracks#7
     -> Tracks#9
   getV0Hypothesis(): <type: K_S0>
+No data for Kinks
 TrackFitResult#0:
   get4Momentum(): (0.186523,0.190646,0.0252355,0.302082)
   getChargeSign(): -1
@@ -7483,13 +7723,27 @@ TrackFitResult#31:
     3.11522
   getTransverseMomentum(): 0.824068
   getZ0(): -0.010414
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -141.776
   getLogL(<type: mu->): -122.109
   getLogL(<type: pi+>): -123.873
   getLogL(<type: K+>): -257.745
   getLogL(<type: p+>): -165.898
   getLogL(<type: deuteron>): -160.102
+  getLogarithmicProbability(<type: e->): -19.826
+  getLogarithmicProbability(<type: mu->): 1.7642
+  getLogarithmicProbability(<type: pi+>): -1.7642
+  getLogarithmicProbability(<type: K+>): -135.795
+  getLogarithmicProbability(<type: p+>): -43.9474
+  getLogarithmicProbability(<type: deuteron>): -38.1513
   getMostLikely(): <type: mu->
   getProbability(<type: e->): 2.45295e-09
   getProbability(<type: mu->): 0.853735
@@ -7497,6 +7751,7 @@ PIDLikelihood#0:
   getProbability(<type: K+>): 1.05969e-59
   getProbability(<type: p+>): 8.2011e-20
   getProbability(<type: deuteron>): 2.69843e-17
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -7504,12 +7759,25 @@ PIDLikelihood#0:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#1:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -459.202
   getLogL(<type: mu->): -433.691
   getLogL(<type: pi+>): -415.77
   getLogL(<type: K+>): -581.691
   getLogL(<type: p+>): -505.527
   getLogL(<type: deuteron>): -487.05
+  getLogarithmicProbability(<type: e->): -43.4316
+  getLogarithmicProbability(<type: mu->): -17.9212
+  getLogarithmicProbability(<type: pi+>): 17.9212
+  getLogarithmicProbability(<type: K+>): -165.922
+  getLogarithmicProbability(<type: p+>): -89.7574
+  getLogarithmicProbability(<type: deuteron>): -71.2805
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 1.3737e-19
   getProbability(<type: mu->): 1.64791e-08
@@ -7517,6 +7785,7 @@ PIDLikelihood#1:
   getProbability(<type: K+>): 8.73355e-73
   getProbability(<type: p+>): 1.04436e-39
   getProbability(<type: deuteron>): 1.10475e-31
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -7524,12 +7793,25 @@ PIDLikelihood#1:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#2:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -360.257
   getLogL(<type: mu->): -331.192
   getLogL(<type: pi+>): -331.051
   getLogL(<type: K+>): -422.646
   getLogL(<type: p+>): -468.429
   getLogL(<type: deuteron>): -394.206
+  getLogarithmicProbability(<type: e->): -29.8306
+  getLogarithmicProbability(<type: mu->): -0.1409
+  getLogarithmicProbability(<type: pi+>): 0.1409
+  getLogarithmicProbability(<type: K+>): -92.2202
+  getLogarithmicProbability(<type: p+>): -138.002
+  getLogarithmicProbability(<type: deuteron>): -63.7795
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 1.10847e-13
   getProbability(<type: mu->): 0.464833
@@ -7537,6 +7819,7 @@ PIDLikelihood#2:
   getProbability(<type: K+>): 8.89759e-41
   getProbability(<type: p+>): 1.16501e-60
   getProbability(<type: deuteron>): 1.99952e-28
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -7544,12 +7827,25 @@ PIDLikelihood#2:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#3:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -164.955
   getLogL(<type: mu->): -166.949
   getLogL(<type: pi+>): -164.492
   getLogL(<type: K+>): -214.758
   getLogL(<type: p+>): -174.501
   getLogL(<type: deuteron>): -217.472
+  getLogarithmicProbability(<type: e->): -0.545185
+  getLogarithmicProbability(<type: mu->): -2.94557
+  getLogarithmicProbability(<type: pi+>): 0.335288
+  getLogarithmicProbability(<type: K+>): -50.8054
+  getLogarithmicProbability(<type: p+>): -10.5481
+  getLogarithmicProbability(<type: deuteron>): -53.5192
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.366982
   getProbability(<type: mu->): 0.0499461
@@ -7557,6 +7853,7 @@ PIDLikelihood#3:
   getProbability(<type: K+>): 8.62011e-23
   getProbability(<type: p+>): 2.62438e-05
   getProbability(<type: deuteron>): 5.71367e-24
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -7564,12 +7861,25 @@ PIDLikelihood#3:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#4:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -467.22
   getLogL(<type: mu->): -441.948
   getLogL(<type: pi+>): -441.35
   getLogL(<type: K+>): -593.517
   getLogL(<type: p+>): -526.006
   getLogL(<type: deuteron>): -488.1
+  getLogarithmicProbability(<type: e->): -26.3088
+  getLogarithmicProbability(<type: mu->): -0.598572
+  getLogarithmicProbability(<type: pi+>): 0.598572
+  getLogarithmicProbability(<type: K+>): -152.606
+  getLogarithmicProbability(<type: p+>): -85.0942
+  getLogarithmicProbability(<type: deuteron>): -47.1884
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 3.75158e-12
   getProbability(<type: mu->): 0.354671
@@ -7577,6 +7887,7 @@ PIDLikelihood#4:
   getProbability(<type: K+>): 5.29849e-67
   getProbability(<type: p+>): 1.10679e-37
   getProbability(<type: deuteron>): 3.20889e-21
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -7584,12 +7895,25 @@ PIDLikelihood#4:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#5:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -398.468
   getLogL(<type: mu->): -372.007
   getLogL(<type: pi+>): -366.164
   getLogL(<type: K+>): -446.775
   getLogL(<type: p+>): -589.993
   getLogL(<type: deuteron>): -458.655
+  getLogarithmicProbability(<type: e->): -32.3073
+  getLogarithmicProbability(<type: mu->): -5.8429
+  getLogarithmicProbability(<type: pi+>): 5.8429
+  getLogarithmicProbability(<type: K+>): -80.614
+  getLogarithmicProbability(<type: p+>): -223.832
+  getLogarithmicProbability(<type: deuteron>): -92.4945
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 9.31352e-15
   getProbability(<type: mu->): 0.00289204
@@ -7597,6 +7921,7 @@ PIDLikelihood#5:
   getProbability(<type: K+>): 9.76742e-36
   getProbability(<type: p+>): 6.18241e-98
   getProbability(<type: deuteron>): 6.76333e-41
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -7604,12 +7929,25 @@ PIDLikelihood#5:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#6:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -101.978
   getLogL(<type: mu->): -84.6791
   getLogL(<type: pi+>): -85.1544
   getLogL(<type: K+>): -152.955
   getLogL(<type: p+>): -144.724
   getLogL(<type: deuteron>): -119.297
+  getLogarithmicProbability(<type: e->): -17.782
+  getLogarithmicProbability(<type: mu->): 0.475342
+  getLogarithmicProbability(<type: pi+>): -0.475342
+  getLogarithmicProbability(<type: K+>): -68.7598
+  getLogarithmicProbability(<type: p+>): -60.5287
+  getLogarithmicProbability(<type: deuteron>): -35.1016
   getMostLikely(): <type: mu->
   getProbability(<type: e->): 1.89406e-08
   getProbability(<type: mu->): 0.616647
@@ -7617,6 +7955,7 @@ PIDLikelihood#6:
   getProbability(<type: K+>): 1.374e-30
   getProbability(<type: p+>): 5.16067e-27
   getProbability(<type: deuteron>): 5.69616e-16
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -7624,12 +7963,25 @@ PIDLikelihood#6:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#7:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -62.05
   getLogL(<type: mu->): -61.9305
   getLogL(<type: pi+>): -60.431
   getLogL(<type: K+>): -85.741
   getLogL(<type: p+>): -70.6524
   getLogL(<type: deuteron>): -68.5187
+  getLogarithmicProbability(<type: e->): -1.82079
+  getLogarithmicProbability(<type: mu->): -1.68052
+  getLogarithmicProbability(<type: pi+>): 0.863501
+  getLogarithmicProbability(<type: K+>): -25.6619
+  getLogarithmicProbability(<type: p+>): -10.5732
+  getLogarithmicProbability(<type: deuteron>): -8.43931
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.13934
   getProbability(<type: mu->): 0.157027
@@ -7637,6 +7989,7 @@ PIDLikelihood#7:
   getProbability(<type: K+>): 7.16471e-12
   getProbability(<type: p+>): 2.55924e-05
   getProbability(<type: deuteron>): 0.000216153
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -7644,12 +7997,25 @@ PIDLikelihood#7:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#8:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -4.67852
   getLogL(<type: mu->): -4.65956
   getLogL(<type: pi+>): -4.6714
   getLogL(<type: K+>): -15.1942
   getLogL(<type: p+>): -14.6399
   getLogL(<type: deuteron>): -8.87983
+  getLogarithmicProbability(<type: e->): -0.713608
+  getLogarithmicProbability(<type: mu->): -0.685225
+  getLogarithmicProbability(<type: pi+>): -0.702974
+  getLogarithmicProbability(<type: K+>): -11.6279
+  getLogarithmicProbability(<type: p+>): -11.0737
+  getLogarithmicProbability(<type: deuteron>): -5.30867
   getMostLikely(): <type: mu->
   getProbability(<type: e->): 0.328802
   getProbability(<type: mu->): 0.335096
@@ -7657,6 +8023,7 @@ PIDLikelihood#8:
   getProbability(<type: K+>): 8.91352e-06
   getProbability(<type: p+>): 1.55148e-05
   getProbability(<type: deuteron>): 0.00492412
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): False
@@ -7664,12 +8031,25 @@ PIDLikelihood#8:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#9:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): True
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -74.4783
   getLogL(<type: mu->): -68.5622
   getLogL(<type: pi+>): -68.9007
   getLogL(<type: K+>): -84.0889
   getLogL(<type: p+>): -90.6564
   getLogL(<type: deuteron>): -94.1841
+  getLogarithmicProbability(<type: e->): -6.45419
+  getLogarithmicProbability(<type: mu->): 0.334718
+  getLogarithmicProbability(<type: pi+>): -0.341186
+  getLogarithmicProbability(<type: K+>): -16.0664
+  getLogarithmicProbability(<type: p+>): -22.6339
+  getLogarithmicProbability(<type: deuteron>): -26.1616
   getMostLikely(): <type: mu->
   getProbability(<type: e->): 0.00157145
   getProbability(<type: mu->): 0.582907
@@ -7677,6 +8057,7 @@ PIDLikelihood#9:
   getProbability(<type: K+>): 1.05302e-07
   getProbability(<type: p+>): 1.47991e-10
   getProbability(<type: deuteron>): 4.34692e-12
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): False
@@ -7684,12 +8065,25 @@ PIDLikelihood#9:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#10:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -15.5681
   getLogL(<type: mu->): -12.2133
   getLogL(<type: pi+>): -9.6861
   getLogL(<type: K+>): -21.1138
   getLogL(<type: p+>): -16.6868
   getLogL(<type: deuteron>): -13.718
+  getLogarithmicProbability(<type: e->): -5.97597
+  getLogarithmicProbability(<type: mu->): -2.5484
+  getLogarithmicProbability(<type: pi+>): 2.28932
+  getLogarithmicProbability(<type: K+>): -11.5242
+  getLogarithmicProbability(<type: p+>): -7.09638
+  getLogarithmicProbability(<type: deuteron>): -4.11221
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.00253262
   getProbability(<type: mu->): 0.0725338
@@ -7697,6 +8091,7 @@ PIDLikelihood#10:
   getProbability(<type: K+>): 9.88804e-06
   getProbability(<type: p+>): 0.000827415
   getProbability(<type: deuteron>): 0.0161078
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): False
@@ -7704,12 +8099,25 @@ PIDLikelihood#10:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#11:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -18.9509
   getLogL(<type: mu->): -14.2997
   getLogL(<type: pi+>): -11.8802
   getLogL(<type: K+>): -19.9729
   getLogL(<type: p+>): -17.3037
   getLogL(<type: deuteron>): -15.7175
+  getLogarithmicProbability(<type: e->): -7.17976
+  getLogarithmicProbability(<type: mu->): -2.44624
+  getLogarithmicProbability(<type: pi+>): 2.15341
+  getLogarithmicProbability(<type: K+>): -8.2022
+  getLogarithmicProbability(<type: p+>): -5.52938
+  getLogarithmicProbability(<type: deuteron>): -3.92758
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.000761269
   getProbability(<type: mu->): 0.0797143
@@ -7717,6 +8125,7 @@ PIDLikelihood#11:
   getProbability(<type: K+>): 0.000273976
   getProbability(<type: p+>): 0.00395278
   getProbability(<type: deuteron>): 0.0193111
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): False
@@ -7724,12 +8133,25 @@ PIDLikelihood#11:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#12:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): False
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -127.219
   getLogL(<type: mu->): -124.088
   getLogL(<type: pi+>): -123.099
   getLogL(<type: K+>): -208.014
   getLogL(<type: p+>): -138.588
   getLogL(<type: deuteron>): -149.56
+  getLogarithmicProbability(<type: e->): -4.43626
+  getLogarithmicProbability(<type: mu->): -1.00512
+  getLogarithmicProbability(<type: pi+>): 0.946259
+  getLogarithmicProbability(<type: K+>): -85.2439
+  getLogarithmicProbability(<type: p+>): -15.8172
+  getLogarithmicProbability(<type: deuteron>): -26.7891
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.0117016
   getProbability(<type: mu->): 0.267936
@@ -7737,6 +8159,7 @@ PIDLikelihood#12:
   getProbability(<type: K+>): 9.52935e-38
   getProbability(<type: p+>): 1.35102e-07
   getProbability(<type: deuteron>): 2.32089e-12
+  isAvailable(): True
   isAvailable(<set: SVD>): False
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -7744,12 +8167,25 @@ PIDLikelihood#12:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#13:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): False
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -54.11
   getLogL(<type: mu->): -51.0057
   getLogL(<type: pi+>): -50.4948
   getLogL(<type: K+>): -103.121
   getLogL(<type: p+>): -62.075
   getLogL(<type: deuteron>): -61.5721
+  getLogarithmicProbability(<type: e->): -4.08518
+  getLogarithmicProbability(<type: mu->): -0.537471
+  getLogarithmicProbability(<type: pi+>): 0.466972
+  getLogarithmicProbability(<type: K+>): -53.1127
+  getLogarithmicProbability(<type: p+>): -12.0669
+  getLogarithmicProbability(<type: deuteron>): -11.564
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.0165419
   getProbability(<type: mu->): 0.368776
@@ -7757,6 +8193,7 @@ PIDLikelihood#13:
   getProbability(<type: K+>): 8.57953e-24
   getProbability(<type: p+>): 5.7468e-06
   getProbability(<type: deuteron>): 9.50238e-06
+  isAvailable(): True
   isAvailable(<set: SVD>): False
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -7806,6 +8243,7 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.0113281
   getUncertaintyTheta(): 0.00429688
+  getUniqueClusterId(): 1001
   getZernikeMVA(): 0.189453
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7857,6 +8295,7 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.00585938
   getUncertaintyPhi(): 0.0113281
   getUncertaintyTheta(): 0.00429688
+  getUniqueClusterId(): 2001
   getZernikeMVA(): 0.0664062
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7906,6 +8345,7 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.00673828
   getUncertaintyPhi(): 0.00742187
   getUncertaintyTheta(): 0.00585938
+  getUniqueClusterId(): 4001
   getZernikeMVA(): 0.861328
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7957,6 +8397,7 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.00820313
   getUncertaintyPhi(): 0.00683594
   getUncertaintyTheta(): 0.00546875
+  getUniqueClusterId(): 3001
   getZernikeMVA(): 0.167969
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8008,6 +8449,7 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0105469
   getUncertaintyTheta(): 0.00898437
+  getUniqueClusterId(): 3002
   getZernikeMVA(): 0.160156
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8057,6 +8499,7 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.0125977
   getUncertaintyPhi(): 0.00566406
   getUncertaintyTheta(): 0.0046875
+  getUniqueClusterId(): 5001
   getZernikeMVA(): 0.765625
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8106,6 +8549,7 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.00732422
   getUncertaintyPhi(): 0.00722656
   getUncertaintyTheta(): 0.00585938
+  getUniqueClusterId(): 6001
   getZernikeMVA(): 0.765625
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8156,6 +8600,7 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0105469
   getUncertaintyTheta(): 0.00878906
+  getUniqueClusterId(): 8001
   getZernikeMVA(): 0.791992
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8205,6 +8650,7 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.00117187
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
+  getUniqueClusterId(): 10001
   getZernikeMVA(): 0.150391
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8255,6 +8701,7 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0105469
   getUncertaintyTheta(): 0.00878906
+  getUniqueClusterId(): 9001
   getZernikeMVA(): 0.508789
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8305,6 +8752,7 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.00996094
   getUncertaintyPhi(): 0.00625
   getUncertaintyTheta(): 0.00507813
+  getUniqueClusterId(): 9002
   getZernikeMVA(): 0.410156
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8355,6 +8803,7 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.00410156
   getUncertaintyPhi(): 0.00898437
   getUncertaintyTheta(): 0.00722656
+  getUniqueClusterId(): 11001
   getZernikeMVA(): 0.0078125
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8406,6 +8855,7 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.00859375
   getUncertaintyTheta(): 0.00703125
+  getUniqueClusterId(): 11002
   getZernikeMVA(): 0.00976562
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8455,6 +8905,7 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0.000878906
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
+  getUniqueClusterId(): 12001
   getZernikeMVA(): 0.739258
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8504,6 +8955,7 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0.00234375
   getUncertaintyPhi(): 0.0103516
   getUncertaintyTheta(): 0.00859375
+  getUniqueClusterId(): 15001
   getZernikeMVA(): 0.210938
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8555,6 +9007,7 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0.00117187
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
+  getUniqueClusterId(): 14001
   getZernikeMVA(): 0.436523
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8605,6 +9058,7 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.00859375
   getUncertaintyTheta(): 0.00683594
+  getUniqueClusterId(): 17001
   getZernikeMVA(): 0.731445
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8655,6 +9109,7 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0.00791016
   getUncertaintyPhi(): 0.00703125
   getUncertaintyTheta(): 0.00566406
+  getUniqueClusterId(): 16001
   getZernikeMVA(): 0.749023
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8704,6 +9159,7 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0.00234375
   getUncertaintyPhi(): 0.0103516
   getUncertaintyTheta(): 0.00859375
+  getUniqueClusterId(): 18001
   getZernikeMVA(): 0.488281
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8754,6 +9210,7 @@ ECLCluster#19:
   getUncertaintyEnergy(): 0.00146484
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
+  getUniqueClusterId(): 19001
   getZernikeMVA(): 0.0136719
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8803,6 +9260,7 @@ ECLCluster#20:
   getUncertaintyEnergy(): 0.00849609
   getUncertaintyPhi(): 0.00683594
   getUncertaintyTheta(): 0.00546875
+  getUniqueClusterId(): 20001
   getZernikeMVA(): 0.884766
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8852,6 +9310,7 @@ ECLCluster#21:
   getUncertaintyEnergy(): 0.00615234
   getUncertaintyPhi(): 0.0105469
   getUncertaintyTheta(): 0.00683594
+  getUniqueClusterId(): 21001
   getZernikeMVA(): 0.725586
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8904,6 +9363,7 @@ ECLCluster#22:
   getUncertaintyEnergy(): 0.00234375
   getUncertaintyPhi(): 0.0136719
   getUncertaintyTheta(): 0.00957031
+  getUniqueClusterId(): 22001
   getZernikeMVA(): 0.237305
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8953,6 +9413,7 @@ ECLCluster#23:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.0130859
   getUncertaintyTheta(): 0.00898437
+  getUniqueClusterId(): 24001
   getZernikeMVA(): 0.5
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9007,6 +9468,7 @@ ECLCluster#24:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 1001
   getZernikeMVA(): 0.810547
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9058,6 +9520,7 @@ ECLCluster#25:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 2001
   getZernikeMVA(): 0.933594
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9107,6 +9570,7 @@ ECLCluster#26:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 4001
   getZernikeMVA(): 0.138672
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9158,6 +9622,7 @@ ECLCluster#27:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 3001
   getZernikeMVA(): 0.973633
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9207,6 +9672,7 @@ ECLCluster#28:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 5001
   getZernikeMVA(): 0.234375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9256,6 +9722,7 @@ ECLCluster#29:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 6001
   getZernikeMVA(): 0.234375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9306,6 +9773,7 @@ ECLCluster#30:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 8001
   getZernikeMVA(): 0.208008
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9355,6 +9823,7 @@ ECLCluster#31:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 10001
   getZernikeMVA(): 0.849609
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9405,6 +9874,7 @@ ECLCluster#32:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 9001
   getZernikeMVA(): 0.791016
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9457,6 +9927,7 @@ ECLCluster#33:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 11001
   getZernikeMVA(): 1
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9506,6 +9977,7 @@ ECLCluster#34:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 12001
   getZernikeMVA(): 0.260742
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9555,6 +10027,7 @@ ECLCluster#35:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 15001
   getZernikeMVA(): 0.789062
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9606,6 +10079,7 @@ ECLCluster#36:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 14001
   getZernikeMVA(): 0.563477
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9656,6 +10130,7 @@ ECLCluster#37:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 17001
   getZernikeMVA(): 0.268555
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9706,6 +10181,7 @@ ECLCluster#38:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 16001
   getZernikeMVA(): 0.250977
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9755,6 +10231,7 @@ ECLCluster#39:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 18001
   getZernikeMVA(): 0.511719
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9805,6 +10282,7 @@ ECLCluster#40:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 19001
   getZernikeMVA(): 0.986328
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9854,6 +10332,7 @@ ECLCluster#41:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 20001
   getZernikeMVA(): 0.115234
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9903,6 +10382,7 @@ ECLCluster#42:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 21001
   getZernikeMVA(): 0.274414
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9955,6 +10435,7 @@ ECLCluster#43:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 22001
   getZernikeMVA(): 0.762695
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -10004,6 +10485,7 @@ ECLCluster#44:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 24001
   getZernikeMVA(): 0.5
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -10014,8 +10496,9 @@ ECLCluster#44:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
- ... message repeated 20 times
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
+No data for EventLevelClusteringInfo
+No data for KlId
+No data for TRGSummary
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(25)
     pair
@@ -10517,6 +11000,7 @@ MCParticle#10:
   getNDaughters(): 2
   getName(): pi-
   getPDG(): -211
+ ... message repeated 20 times
 [WARNING] Daughter index out of range
 	daughter index = 0
 [WARNING] Trying to access non-existing particle.
@@ -13764,6 +14248,7 @@ MCParticle#106:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] EXP:        0        RUN:        0        EVT:        3
 EventMetaData:
   getErrorFlag(): 0
@@ -14101,6 +14586,9 @@ Track#12:
   isFlippedAndRefitted(): False
   wasRefined(): False
 V0#0:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#13
@@ -14109,6 +14597,7 @@ V0#0:
     -> Tracks#10
     -> Tracks#7
   getV0Hypothesis(): <type: K_S0>
+No data for Kinks
 TrackFitResult#0:
   get4Momentum(): (-0.0999914,0.219547,0.150702,0.316844)
   getChargeSign(): -1
@@ -14934,13 +15423,27 @@ TrackFitResult#14:
     1.94164
   getTransverseMomentum(): 0.395543
   getZ0(): -0.050998
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): True
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -259.555
   getLogL(<type: mu->): -239.917
   getLogL(<type: pi+>): -240.294
   getLogL(<type: K+>): -440.043
   getLogL(<type: p+>): -288.143
   getLogL(<type: deuteron>): -306.935
+  getLogarithmicProbability(<type: e->): -20.1603
+  getLogarithmicProbability(<type: mu->): 0.377655
+  getLogarithmicProbability(<type: pi+>): -0.377655
+  getLogarithmicProbability(<type: K+>): -200.648
+  getLogarithmicProbability(<type: p+>): -48.7483
+  getLogarithmicProbability(<type: deuteron>): -67.5403
   getMostLikely(): <type: mu->
   getProbability(<type: e->): 1.75592e-09
   getProbability(<type: mu->): 0.593307
@@ -14948,6 +15451,7 @@ PIDLikelihood#0:
   getProbability(<type: K+>): 7.23636e-88
   getProbability(<type: p+>): 6.74376e-22
   getProbability(<type: deuteron>): 4.65176e-30
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -14955,12 +15459,25 @@ PIDLikelihood#0:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#1:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -653.939
   getLogL(<type: mu->): -692.582
   getLogL(<type: pi+>): -680.755
   getLogL(<type: K+>): -620.839
   getLogL(<type: p+>): -696.615
   getLogL(<type: deuteron>): -651.517
+  getLogarithmicProbability(<type: e->): -33.0995
+  getLogarithmicProbability(<type: mu->): -71.7432
+  getLogarithmicProbability(<type: pi+>): -59.9162
+  getLogarithmicProbability(<type: K+>): 30.593
+  getLogarithmicProbability(<type: p+>): -75.7755
+  getLogarithmicProbability(<type: deuteron>): -30.6781
   getMostLikely(): <type: K+>
   getProbability(<type: e->): 4.2177e-15
   getProbability(<type: mu->): 6.95568e-32
@@ -14968,6 +15485,7 @@ PIDLikelihood#1:
   getProbability(<type: K+>): 1
   getProbability(<type: p+>): 1.2335e-33
   getProbability(<type: deuteron>): 4.74974e-14
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -14975,12 +15493,25 @@ PIDLikelihood#1:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#2:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -347.392
   getLogL(<type: mu->): -381.508
   getLogL(<type: pi+>): -364.223
   getLogL(<type: K+>): -350.681
   getLogL(<type: p+>): -316.674
   getLogL(<type: deuteron>): -444.705
+  getLogarithmicProbability(<type: e->): -30.7179
+  getLogarithmicProbability(<type: mu->): -64.8342
+  getLogarithmicProbability(<type: pi+>): -47.5492
+  getLogarithmicProbability(<type: K+>): -34.007
+  getLogarithmicProbability(<type: p+>): 30.6813
+  getLogarithmicProbability(<type: deuteron>): -128.031
   getMostLikely(): <type: p+>
   getProbability(<type: e->): 4.56444e-14
   getProbability(<type: mu->): 6.96411e-29
@@ -14988,6 +15519,7 @@ PIDLikelihood#2:
   getProbability(<type: K+>): 1.70187e-15
   getProbability(<type: p+>): 1
   getProbability(<type: deuteron>): 2.49383e-56
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -14995,12 +15527,25 @@ PIDLikelihood#2:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#3:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -495.584
   getLogL(<type: mu->): -483.451
   getLogL(<type: pi+>): -507.193
   getLogL(<type: K+>): -678.405
   getLogL(<type: p+>): -592.354
   getLogL(<type: deuteron>): -559.474
+  getLogarithmicProbability(<type: e->): -12.1327
+  getLogarithmicProbability(<type: mu->): 12.1327
+  getLogarithmicProbability(<type: pi+>): -23.7417
+  getLogarithmicProbability(<type: K+>): -194.953
+  getLogarithmicProbability(<type: p+>): -108.902
+  getLogarithmicProbability(<type: deuteron>): -76.0225
   getMostLikely(): <type: mu->
   getProbability(<type: e->): 5.38068e-06
   getProbability(<type: mu->): 0.999995
@@ -15008,6 +15553,7 @@ PIDLikelihood#3:
   getProbability(<type: K+>): 2.15224e-85
   getProbability(<type: p+>): 5.06326e-48
   getProbability(<type: deuteron>): 9.63494e-34
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -15015,12 +15561,25 @@ PIDLikelihood#3:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#4:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -273.805
   getLogL(<type: mu->): -257.73
   getLogL(<type: pi+>): -255.299
   getLogL(<type: K+>): -317.505
   getLogL(<type: p+>): -414.945
   getLogL(<type: deuteron>): -297.79
+  getLogarithmicProbability(<type: e->): -18.5896
+  getLogarithmicProbability(<type: mu->): -2.43094
+  getLogarithmicProbability(<type: pi+>): 2.43094
+  getLogarithmicProbability(<type: K+>): -62.2901
+  getLogarithmicProbability(<type: p+>): -159.731
+  getLogarithmicProbability(<type: deuteron>): -42.575
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 8.44544e-09
   getProbability(<type: mu->): 0.0808437
@@ -15028,6 +15587,7 @@ PIDLikelihood#4:
   getProbability(<type: K+>): 8.86671e-28
   getProbability(<type: p+>): 4.26502e-70
   getProbability(<type: deuteron>): 3.23531e-19
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -15035,12 +15595,25 @@ PIDLikelihood#4:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#5:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -517.243
   getLogL(<type: mu->): -560.694
   getLogL(<type: pi+>): -565.312
   getLogL(<type: K+>): -565.864
   getLogL(<type: p+>): -697.705
   getLogL(<type: deuteron>): -589.489
+  getLogarithmicProbability(<type: e->): 43.4351
+  getLogarithmicProbability(<type: mu->): -43.4505
+  getLogarithmicProbability(<type: pi+>): -48.0691
+  getLogarithmicProbability(<type: K+>): -48.6207
+  getLogarithmicProbability(<type: p+>): -180.462
+  getLogarithmicProbability(<type: deuteron>): -72.2461
   getMostLikely(): <type: e->
   getProbability(<type: e->): 1
   getProbability(<type: mu->): 1.34799e-19
@@ -15048,6 +15621,7 @@ PIDLikelihood#5:
   getProbability(<type: K+>): 7.66102e-22
   getProbability(<type: p+>): 4.2289e-79
   getProbability(<type: deuteron>): 4.20649e-32
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -15055,12 +15629,25 @@ PIDLikelihood#5:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#6:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): True
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -460.851
   getLogL(<type: mu->): -459.839
   getLogL(<type: pi+>): -454.283
   getLogL(<type: K+>): -445.052
   getLogL(<type: p+>): -432.092
   getLogL(<type: deuteron>): -455.091
+  getLogarithmicProbability(<type: e->): -28.7595
+  getLogarithmicProbability(<type: mu->): -27.7474
+  getLogarithmicProbability(<type: pi+>): -22.1907
+  getLogarithmicProbability(<type: K+>): -12.9599
+  getLogarithmicProbability(<type: p+>): 12.9598
+  getLogarithmicProbability(<type: deuteron>): -22.9995
   getMostLikely(): <type: p+>
   getProbability(<type: e->): 3.23537e-13
   getProbability(<type: mu->): 8.9013e-13
@@ -15068,6 +15655,7 @@ PIDLikelihood#6:
   getProbability(<type: K+>): 2.35281e-06
   getProbability(<type: p+>): 0.999998
   getProbability(<type: deuteron>): 1.02675e-10
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -15075,12 +15663,25 @@ PIDLikelihood#6:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#7:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): True
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -204.84
   getLogL(<type: mu->): -175.906
   getLogL(<type: pi+>): -169.317
   getLogL(<type: K+>): -192.049
   getLogL(<type: p+>): -233.73
   getLogL(<type: deuteron>): -289.129
+  getLogarithmicProbability(<type: e->): -35.5245
+  getLogarithmicProbability(<type: mu->): -6.58908
+  getLogarithmicProbability(<type: pi+>): 6.58908
+  getLogarithmicProbability(<type: K+>): -22.7338
+  getLogarithmicProbability(<type: p+>): -64.4144
+  getLogarithmicProbability(<type: deuteron>): -119.813
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 3.73167e-16
   getProbability(<type: mu->): 0.00137341
@@ -15088,6 +15689,7 @@ PIDLikelihood#7:
   getProbability(<type: K+>): 1.33911e-10
   getProbability(<type: p+>): 1.05973e-28
   getProbability(<type: deuteron>): 9.24174e-53
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -15095,12 +15697,25 @@ PIDLikelihood#7:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#8:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -174.586
   getLogL(<type: mu->): -185.925
   getLogL(<type: pi+>): -172.619
   getLogL(<type: K+>): -167.81
   getLogL(<type: p+>): -172.41
   getLogL(<type: deuteron>): -166.225
+  getLogarithmicProbability(<type: e->): -8.55027
+  getLogarithmicProbability(<type: mu->): -19.8894
+  getLogarithmicProbability(<type: pi+>): -6.582
+  getLogarithmicProbability(<type: K+>): -1.58912
+  getLogarithmicProbability(<type: p+>): -6.37285
+  getLogarithmicProbability(<type: deuteron>): 1.56599
   getMostLikely(): <type: deuteron>
   getProbability(<type: e->): 0.000193456
   getProbability(<type: mu->): 2.3022e-09
@@ -15108,6 +15723,7 @@ PIDLikelihood#8:
   getProbability(<type: K+>): 0.169508
   getProbability(<type: p+>): 0.00170438
   getProbability(<type: deuteron>): 0.827211
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): True
@@ -15115,12 +15731,25 @@ PIDLikelihood#8:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#9:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -46.7445
   getLogL(<type: mu->): -46.9882
   getLogL(<type: pi+>): -47.0084
   getLogL(<type: K+>): -45.1659
   getLogL(<type: p+>): -41.7695
   getLogL(<type: deuteron>): -42.9466
+  getLogarithmicProbability(<type: e->): -5.27686
+  getLogarithmicProbability(<type: mu->): -5.52167
+  getLogarithmicProbability(<type: pi+>): -5.54199
+  getLogarithmicProbability(<type: K+>): -3.67843
+  getLogarithmicProbability(<type: p+>): 1.02359
+  getLogarithmicProbability(<type: deuteron>): -1.22693
   getMostLikely(): <type: p+>
   getProbability(<type: e->): 0.00508247
   getProbability(<type: mu->): 0.00398325
@@ -15128,6 +15757,7 @@ PIDLikelihood#9:
   getProbability(<type: K+>): 0.0246401
   getProbability(<type: p+>): 0.735671
   getProbability(<type: deuteron>): 0.226719
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): True
@@ -15135,12 +15765,25 @@ PIDLikelihood#9:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): True
 PIDLikelihood#10:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -10.7895
   getLogL(<type: mu->): -9.45969
   getLogL(<type: pi+>): -10.4452
   getLogL(<type: K+>): -18.3975
   getLogL(<type: p+>): -14.7416
   getLogL(<type: deuteron>): -11.202
+  getLogarithmicProbability(<type: e->): -1.77041
+  getLogarithmicProbability(<type: mu->): 0.200809
+  getLogarithmicProbability(<type: pi+>): -1.35355
+  getLogarithmicProbability(<type: K+>): -9.5355
+  getLogarithmicProbability(<type: p+>): -5.8769
+  getLogarithmicProbability(<type: deuteron>): -2.23886
   getMostLikely(): <type: mu->
   getProbability(<type: e->): 0.145492
   getProbability(<type: mu->): 0.550034
@@ -15148,6 +15791,7 @@ PIDLikelihood#10:
   getProbability(<type: K+>): 7.22359e-05
   getProbability(<type: p+>): 0.00279562
   getProbability(<type: deuteron>): 0.096315
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): False
@@ -15155,12 +15799,25 @@ PIDLikelihood#10:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#11:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -4.23853
   getLogL(<type: mu->): -6.25089
   getLogL(<type: pi+>): -7.05551
   getLogL(<type: K+>): -5.00007
   getLogL(<type: p+>): -4.81752
   getLogL(<type: deuteron>): -4.70252
+  getLogarithmicProbability(<type: e->): -0.614995
+  getLogarithmicProbability(<type: mu->): -3.0115
+  getLogarithmicProbability(<type: pi+>): -3.84297
+  getLogarithmicProbability(<type: K+>): -1.62977
+  getLogarithmicProbability(<type: p+>): -1.40718
+  getLogarithmicProbability(<type: deuteron>): -1.26188
   getMostLikely(): <type: e->
   getProbability(<type: e->): 0.350921
   getProbability(<type: mu->): 0.0469089
@@ -15168,6 +15825,7 @@ PIDLikelihood#11:
   getProbability(<type: K+>): 0.163862
   getProbability(<type: p+>): 0.196679
   getProbability(<type: deuteron>): 0.22065
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): False
@@ -15175,12 +15833,25 @@ PIDLikelihood#11:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#12:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): False
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -406.864
   getLogL(<type: mu->): -392.965
   getLogL(<type: pi+>): -391.562
   getLogL(<type: K+>): -428.833
   getLogL(<type: p+>): -504.34
   getLogL(<type: deuteron>): -447.391
+  getLogarithmicProbability(<type: e->): -15.5212
+  getLogarithmicProbability(<type: mu->): -1.40335
+  getLogarithmicProbability(<type: pi+>): 1.40335
+  getLogarithmicProbability(<type: K+>): -37.4908
+  getLogarithmicProbability(<type: p+>): -112.998
+  getLogarithmicProbability(<type: deuteron>): -56.0489
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 1.81646e-07
   getProbability(<type: mu->): 0.197285
@@ -15188,6 +15859,7 @@ PIDLikelihood#12:
   getProbability(<type: K+>): 5.22332e-17
   getProbability(<type: p+>): 8.42582e-50
   getProbability(<type: deuteron>): 4.55265e-25
+  isAvailable(): True
   isAvailable(<set: SVD>): False
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -15237,6 +15909,7 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00615234
   getUncertaintyPhi(): 0.0109375
   getUncertaintyTheta(): 0.00429688
+  getUniqueClusterId(): 1001
   getZernikeMVA(): 0.367188
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15286,6 +15959,7 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.00410156
   getUncertaintyPhi(): 0.0126953
   getUncertaintyTheta(): 0.00488281
+  getUniqueClusterId(): 2001
   getZernikeMVA(): 0.782227
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15335,6 +16009,7 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.0121094
   getUncertaintyTheta(): 0.0046875
+  getUniqueClusterId(): 3001
   getZernikeMVA(): 0.246094
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15384,6 +16059,7 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.00527344
   getUncertaintyPhi(): 0.0115234
   getUncertaintyTheta(): 0.00449219
+  getUniqueClusterId(): 4001
   getZernikeMVA(): 0.728516
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15433,6 +16109,7 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.00878906
   getUncertaintyTheta(): 0.00703125
+  getUniqueClusterId(): 5001
   getZernikeMVA(): 0.539062
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15484,6 +16161,7 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.00878906
   getUncertaintyTheta(): 0.00703125
+  getUniqueClusterId(): 6001
   getZernikeMVA(): 0.419922
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15533,6 +16211,7 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.00175781
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.00898437
+  getUniqueClusterId(): 7001
   getZernikeMVA(): 0.560547
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15582,6 +16261,7 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.00615234
   getUncertaintyPhi(): 0.0078125
   getUncertaintyTheta(): 0.00625
+  getUniqueClusterId(): 8001
   getZernikeMVA(): 0.331055
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15631,6 +16311,7 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.00849609
   getUncertaintyPhi(): 0.00683594
   getUncertaintyTheta(): 0.00546875
+  getUniqueClusterId(): 10001
   getZernikeMVA(): 0.204102
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15681,6 +16362,7 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00527344
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00644531
+  getUniqueClusterId(): 11001
   getZernikeMVA(): 0.115234
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15731,6 +16413,7 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.00263672
   getUncertaintyPhi(): 0.00996094
   getUncertaintyTheta(): 0.00820313
+  getUniqueClusterId(): 12001
   getZernikeMVA(): 0.591797
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15780,6 +16463,7 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.0158203
   getUncertaintyPhi(): 0.00507813
   getUncertaintyTheta(): 0.00429688
+  getUniqueClusterId(): 13001
   getZernikeMVA(): 0.799805
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15829,6 +16513,7 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0.00996094
   getUncertaintyPhi(): 0.00625
   getUncertaintyTheta(): 0.00507813
+  getUniqueClusterId(): 14001
   getZernikeMVA(): 0.686523
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15880,6 +16565,7 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0.0117188
   getUncertaintyPhi(): 0.00585938
   getUncertaintyTheta(): 0.0046875
+  getUniqueClusterId(): 15001
   getZernikeMVA(): 0.874023
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15929,6 +16615,7 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.00839844
   getUncertaintyTheta(): 0.00683594
+  getUniqueClusterId(): 16001
   getZernikeMVA(): 0.619141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15978,6 +16665,7 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0.00146484
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
+  getUniqueClusterId(): 17001
   getZernikeMVA(): 0.277344
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16027,6 +16715,7 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.00898437
   getUncertaintyTheta(): 0.00742187
+  getUniqueClusterId(): 18001
   getZernikeMVA(): 0.732422
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16076,6 +16765,7 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0.00351562
   getUncertaintyPhi(): 0.00917969
   getUncertaintyTheta(): 0.00761719
+  getUniqueClusterId(): 20001
   getZernikeMVA(): 0.757812
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16126,6 +16816,7 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0.00673828
   getUncertaintyPhi(): 0.00742187
   getUncertaintyTheta(): 0.00585938
+  getUniqueClusterId(): 19001
   getZernikeMVA(): 0.750977
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16175,6 +16866,7 @@ ECLCluster#19:
   getUncertaintyEnergy(): 0.00322266
   getUncertaintyPhi(): 0.00976562
   getUncertaintyTheta(): 0.00800781
+  getUniqueClusterId(): 21001
   getZernikeMVA(): 0.0146484
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16225,6 +16917,7 @@ ECLCluster#20:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.00878906
   getUncertaintyTheta(): 0.00703125
+  getUniqueClusterId(): 21002
   getZernikeMVA(): 0.0117188
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16279,6 +16972,7 @@ ECLCluster#21:
   getUncertaintyEnergy(): 0.0105469
   getUncertaintyPhi(): 0.00605469
   getUncertaintyTheta(): 0.00488281
+  getUniqueClusterId(): 22001
   getZernikeMVA(): 0.0224609
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16332,6 +17026,7 @@ ECLCluster#22:
   getUncertaintyEnergy(): 0.00410156
   getUncertaintyPhi(): 0.00898437
   getUncertaintyTheta(): 0.00722656
+  getUniqueClusterId(): 22002
   getZernikeMVA(): 0.0605469
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16381,6 +17076,7 @@ ECLCluster#23:
   getUncertaintyEnergy(): 0.00820313
   getUncertaintyPhi(): 0.00683594
   getUncertaintyTheta(): 0.00546875
+  getUniqueClusterId(): 23001
   getZernikeMVA(): 0.180664
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16430,6 +17126,7 @@ ECLCluster#24:
   getUncertaintyEnergy(): 0.00351562
   getUncertaintyPhi(): 0.009375
   getUncertaintyTheta(): 0.00761719
+  getUniqueClusterId(): 25001
   getZernikeMVA(): 0.426758
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16479,6 +17176,7 @@ ECLCluster#25:
   getUncertaintyEnergy(): 0.00703125
   getUncertaintyPhi(): 0.0101563
   getUncertaintyTheta(): 0.00644531
+  getUniqueClusterId(): 26001
   getZernikeMVA(): 0.59375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16528,6 +17226,7 @@ ECLCluster#26:
   getUncertaintyEnergy(): 0.0120117
   getUncertaintyPhi(): 0.00859375
   getUncertaintyTheta(): 0.00527344
+  getUniqueClusterId(): 27001
   getZernikeMVA(): 0.783203
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16582,6 +17281,7 @@ ECLCluster#27:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 1001
   getZernikeMVA(): 0.632812
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16631,6 +17331,7 @@ ECLCluster#28:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 2001
   getZernikeMVA(): 0.217773
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16680,6 +17381,7 @@ ECLCluster#29:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 3001
   getZernikeMVA(): 0.753906
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16729,6 +17431,7 @@ ECLCluster#30:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 4001
   getZernikeMVA(): 0.271484
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16778,6 +17481,7 @@ ECLCluster#31:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 5001
   getZernikeMVA(): 0.460938
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16829,6 +17533,7 @@ ECLCluster#32:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 6001
   getZernikeMVA(): 0.580078
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16878,6 +17583,7 @@ ECLCluster#33:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 7001
   getZernikeMVA(): 0.439453
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16927,6 +17633,7 @@ ECLCluster#34:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 8001
   getZernikeMVA(): 0.668945
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16976,6 +17683,7 @@ ECLCluster#35:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 10001
   getZernikeMVA(): 0.795898
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17026,6 +17734,7 @@ ECLCluster#36:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 11001
   getZernikeMVA(): 0.884766
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17076,6 +17785,7 @@ ECLCluster#37:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 12001
   getZernikeMVA(): 0.408203
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17125,6 +17835,7 @@ ECLCluster#38:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 13001
   getZernikeMVA(): 0.200195
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17174,6 +17885,7 @@ ECLCluster#39:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 14001
   getZernikeMVA(): 0.313477
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17225,6 +17937,7 @@ ECLCluster#40:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 15001
   getZernikeMVA(): 0.125977
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17274,6 +17987,7 @@ ECLCluster#41:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 16001
   getZernikeMVA(): 0.380859
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17323,6 +18037,7 @@ ECLCluster#42:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 17001
   getZernikeMVA(): 0.722656
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17372,6 +18087,7 @@ ECLCluster#43:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 18001
   getZernikeMVA(): 0.267578
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17421,6 +18137,7 @@ ECLCluster#44:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 20001
   getZernikeMVA(): 0.242188
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17471,6 +18188,7 @@ ECLCluster#45:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 19001
   getZernikeMVA(): 0.249023
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17521,6 +18239,7 @@ ECLCluster#46:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 21001
   getZernikeMVA(): 1
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17575,6 +18294,7 @@ ECLCluster#47:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 22001
   getZernikeMVA(): 0.999023
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17624,6 +18344,7 @@ ECLCluster#48:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 23001
   getZernikeMVA(): 0.819336
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17673,6 +18394,7 @@ ECLCluster#49:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 25001
   getZernikeMVA(): 0.573242
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17722,6 +18444,7 @@ ECLCluster#50:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 26001
   getZernikeMVA(): 0.40625
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17771,6 +18494,7 @@ ECLCluster#51:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 27001
   getZernikeMVA(): 0.216797
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -17781,6 +18505,7 @@ ECLCluster#51:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
+No data for EventLevelClusteringInfo
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
@@ -17808,8 +18533,8 @@ KLMCluster#0:
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#70 (weight: 1)
   getTime(): 2.63636
- ... message repeated 24 times
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
+No data for KlId
+No data for TRGSummary
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(25)
     pair
@@ -18241,6 +18966,7 @@ MCParticle#8:
   getNDaughters(): 2
   getName(): pi-
   getPDG(): -211
+ ... message repeated 24 times
 [WARNING] Daughter index out of range
 	daughter index = 0
 [WARNING] Trying to access non-existing particle.
@@ -20971,6 +21697,7 @@ MCParticle#89:
   isInitial(): False
   isPrimaryParticle(): True
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 0
 [INFO] ========================================================================

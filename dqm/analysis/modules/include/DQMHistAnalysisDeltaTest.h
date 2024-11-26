@@ -12,11 +12,6 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 #include <dqm/core/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
@@ -80,13 +75,6 @@ namespace Belle2 {
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
 
-    /** flag if to export to EPICS */
-    bool m_useEpics;
-
-#ifdef _BELLE2_EPICS
-    //! vector for EPICS PVs
-    std::vector <chid> mychid;
-#endif
   };
 } // end namespace Belle2
 

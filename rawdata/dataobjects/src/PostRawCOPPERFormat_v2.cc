@@ -280,7 +280,7 @@ int PostRawCOPPERFormat_v2::CheckCRC16(int n, int finesse_num)
       //
       // Do not stop data
       //
-      char err_buf[500];
+      char err_buf[600];
       char hostname[128];
       GetNodeName(n, hostname, sizeof(hostname));
 

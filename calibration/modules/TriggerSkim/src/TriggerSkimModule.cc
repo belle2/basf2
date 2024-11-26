@@ -55,6 +55,8 @@ lines were accepted after their own prescale.
   addParam("resultOnMissing", m_resultOnMissing, "Value to return if hlt trigger result is not available or incomplete. "
            "If this is set to None a FATAL error will be raised if the results are missing. Otherwise the value "
            "given will be set as return value of the module", m_resultOnMissing);
+  addParam("skipFirstEvent", m_firstEvent, "Boolean to skip the first event or not. "
+           "If the module is used inside the hbasf2, like HLT storage, the first event need to be skipped.", m_firstEvent);
 }
 
 void TriggerSkimModule::initialize()
@@ -136,6 +138,11 @@ bool TriggerSkimModule::checkTrigger(const std::string& name, unsigned int presc
 
 void TriggerSkimModule::event()
 {
+  if(m_firstEvent) {
+    m_firstEvent = false;
+    setReturnValue(true);
+    return;
+  }
   if(!m_trigResults) {
     if(m_resultOnMissing) {
       setReturnValue(*m_resultOnMissing);

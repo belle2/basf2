@@ -48,7 +48,7 @@ namespace Belle2 {
       /**
        * Helper function to compile the full identifier from the base and the specific cut name.
        * The full name is then created as:
-       *  <package_identifier>&<base_name>&<cut_name>
+       *  \<package_identifier>&\<base_name>&\<cut_name>
        *
        * Make sure to not include & into the base or cut name.
        */
@@ -58,7 +58,7 @@ namespace Belle2 {
       /**
        * Handy function to create the name related to the total result of a specific
        * trigger stage (either filter or skim) in the stored results or the total result. It is in the form
-       *   <package_identifier>&<base_name>&total_result
+       *   \<package_identifier>&\<base_name>&total_result
        *
        * @param baseIdentifier The baseIdentifier (either filter or skim or all)
        * @return then name.
@@ -68,7 +68,7 @@ namespace Belle2 {
       /**
        * Helper function to compile the full menu identifier from the base name.
        * The full name is then created as:
-       *  <package_identifier>&<base_name>
+       *  \<package_identifier>&\<base_name>
        *
        * Make sure to not include & into the base name.
        */
@@ -76,7 +76,7 @@ namespace Belle2 {
 
       /**
        * Check if a given cut name in the form
-       *  <package_identifier>&<base_name>&<cut_name>
+       *  \<package_identifier>&\<base_name>&\<cut_name>
        * has the given base name.
        */
       static bool hasBaseIdentifier(const std::string& cutName, const std::string& baseIdentifier);

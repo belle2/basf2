@@ -114,8 +114,6 @@
 #define NW_B2L_TRAILER 3
 #endif
 
-using namespace std;
-
 #ifdef SPLIT_ECL_ECLTRG
 #define ECLTRG_NODE_ID 0x13000001
 #endif

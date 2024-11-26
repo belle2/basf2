@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,7 +11,7 @@
 """
 <header>
   <input>../TreeFitted_B0ToJPsiKs.root</input>
-  <contact>Yo Sato; yosato@post.kek.jp</contact>
+  <contact>Frank Meier; frank.meier@duke.edu</contact>
   <interval>nightly</interval>
 </header>
 """
@@ -25,9 +24,9 @@ import ROOT
 import sysconfig
 ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))  # noqa
 
-workingFiles = glob.glob(str("../TreeFitted_B0ToJPsiKs.root"))
+workingFiles = glob.glob("../TreeFitted_B0ToJPsiKs.root")
 
-chain = ROOT.TChain(str("B0TreeFit"))
+chain = ROOT.TChain("B0TreeFit")
 for iFile in workingFiles:
     chain.AddFile(iFile)
 
@@ -93,7 +92,7 @@ checkForGausian = "This should be a Gaussian on flat bkg and not changing."
 metaOptions = "pvalue-warn=0.1"
 for hist, xlabel in histsAndLabels.items():
     hist.GetXaxis().SetTitle(xlabel)
-    hist.GetListOfFunctions().Add(ROOT.TNamed("Contact", "yosato@post.kek.jp"))
+    hist.GetListOfFunctions().Add(ROOT.TNamed("Contact", "frank.meier@duke.edu"))
     hist.GetListOfFunctions().Add(ROOT.TNamed("Description", xlabel))
     hist.GetListOfFunctions().Add(ROOT.TNamed("MetaOptions", metaOptions))
     if any(string in xlabel for string in ["pull", "meas-mc"]):

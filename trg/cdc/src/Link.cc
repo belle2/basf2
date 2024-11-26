@@ -37,8 +37,8 @@ namespace Belle2 {
   unsigned* TRGCDCLink::_nHitsSL = 0;
   vector<TCLink*> TRGCDCLink::_all;
 
-  TRGCDCLink::TRGCDCLink(TCTrack* t,
-                         const Belle2::TCCHit* h,
+  TRGCDCLink::TRGCDCLink(TRGCDCTrack* t,
+                         const TRGCDCCellHit* h,
                          const HepGeom::Point3D<double>& p)
     : _track(t),
       _hit(h),
@@ -767,7 +767,7 @@ namespace Belle2 {
 //  unsigned n[11];
     static unsigned* n = new unsigned[Belle2::TRGCDC::getTRGCDC()->nSuperLayers()];
     nHitsSuperLayer(links, n);
-    string nh;
+    string nh = "";
     for (unsigned i = 0; i < _nSL; i++) {
       nh += TRGUtil::itostring(n[i]);
       if (i % 2) nh += ",";

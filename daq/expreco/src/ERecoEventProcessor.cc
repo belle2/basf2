@@ -30,7 +30,7 @@ ERecoEventProcessor::ERecoEventProcessor(string conffile)
   //  char nodename[256];
   strcpy(m_nodename, "evp_");
 
-  gethostname(&m_nodename[4], sizeof(m_nodename));
+  gethostname(&m_nodename[4], sizeof(m_nodename) - 4);
   printf("nodename = %s\n", m_nodename);
 
   // 1. Set execution directory
@@ -129,7 +129,7 @@ int ERecoEventProcessor::Configure(NSMmsg* /*nsmm*/, NSMcontext* /*nsmc*/)
   char* srchost = m_conf->getconf("distributor", "host");
   //  char* port = m_conf->getconf ( "distributor", "port" );
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
-  char* hostbase = m_conf->getconf("processor", "nodebase");
+  //  char* hostbase = m_conf->getconf("processor", "nodebase");
   int rport;
   sscanf(&m_nodename[strlen(m_nodename) - 2], "%d", &rport);
   rport += portbase;

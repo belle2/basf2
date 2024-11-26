@@ -56,9 +56,9 @@ namespace Belle2 {
        * Given the value of the electromagnetic field, this function
        * calculates the value of the derivative dydx.
        *
-       * @param y[6] 0-2 dr/ds - velocity, 3-5 dp/ds - momentum derivatives.
-       * @param Field[3] Field components.
-       * @param dydx[8] Where to store results.
+       * @param y     y[6]: 0-2 dr/ds - velocity, 3-5 dp/ds - momentum derivatives.
+       * @param Field Field[3]: Field components.
+       * @param dydx  dydx[8]: Where to store results.
        */
       virtual void EvaluateRhsGivenB(const G4double y[],
                                      const G4double Field[],

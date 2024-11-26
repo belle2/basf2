@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -16,7 +15,7 @@ This is not always guaranteed. Analysis objects may break backwards
 compatibility for older files. Some niche corner cases might be problematic for
 file produced with release older than release-05-00-00.
 
-See https://confluence.desy.de/display/BI/Backward+Compatibility for more
+See https://xwiki.desy.de/xwiki/rest/p/0a372 for more
 """
 
 import basf2
@@ -41,7 +40,7 @@ if __name__ == "__main__":
     udst.add_udst_dump(main, True)
 
     # also dump some variables just in case the DataStorePrinter hides some
-    # problems (like has happened once: PR #7525 / BII-7148).
+    # problems (like has happened once: GitLab issue #7023).
     sanity_check_variables = [
         "mcPDG",
         "daughter(0, mcPDG)",  # check the MCParticle <--> Particle relation (or array index lookup)

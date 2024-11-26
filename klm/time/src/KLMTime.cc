@@ -24,7 +24,7 @@ void KLMTime::updateConstants()
   m_CTimePeriod = 1.0 / m_HardwareClockSettings->getGlobalClockFrequency();
 }
 
-double KLMTime::getScintillatorTime(int ctime, int triggerCTime) const
+double KLMTime::getScintillatorTime(int ctime, int tdc, int triggerCTime) const
 {
   int cTimeShift = m_KLMTimeConversion->getCTimeShift();
   /* Relative time in TDC periods for scintillators. */
@@ -32,15 +32,14 @@ double KLMTime::getScintillatorTime(int ctime, int triggerCTime) const
   /*
    * All time values were shifted by 2 bits for the phase2 data.
    */
-  int correctedCTime = (ctime << cTimeShift) & 0xFFFF;
-  int correctedTriggerCTime = (triggerCTime << cTimeShift) & 0xFFFF;
+  int correctedCTime = (((ctime << cTimeShift) & 0xFFFF) << 3) + (tdc & 0x7);
+  int correctedTriggerCTime = ((triggerCTime << cTimeShift) & 0xFFFF) << 3;
   /* Scintillator: 16-bit CTIME. */
   if (correctedCTime <= correctedTriggerCTime)
     relativeTime = correctedCTime - correctedTriggerCTime;
   else
-    relativeTime = correctedCTime - correctedTriggerCTime - 0x10000;
+    relativeTime = correctedCTime - correctedTriggerCTime - (0x10000 << 3);
   /* Get time in TDC periods. */
-  relativeTime = (relativeTime << 3);
   return relativeTime * m_TDCPeriod;
 }
 

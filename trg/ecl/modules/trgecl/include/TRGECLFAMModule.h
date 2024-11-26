@@ -13,6 +13,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
+
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 #include "trg/ecl/dataobjects/TRGECLFAMAna.h"
 #include "trg/ecl/dataobjects/TRGECLDigi0.h"
@@ -67,10 +70,9 @@ namespace Belle2 {
     int _FADC;
     /** Use Condition DB*/
     int _ConditionDB;
-
-
-
-
+    /** Set source of TC data (1:=ECLHit or 2:=ECLSimHit or 3:=ECLHit+TRGECLBGTCHit) */
+    /** ("1:=ECLHit" is used for signal w/o bkg, and real time background monitor) */
+    int m_SourceOfTC;
 
     /** Config. file name. */
     std::string _configFilename;
@@ -100,6 +102,9 @@ namespace Belle2 {
     StoreArray<TRGECLHit> m_TRGECLHit; /**< output for TRGECLHit */
     StoreArray<TRGECLFAMAna> m_TRGECLFAMAna; /**< output for TRGECLFAMAna */
     DBArray<TRGECLFAMPara> m_FAMPara; /**< FAM Parameters */
+
+    /** EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
   };
 

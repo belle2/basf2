@@ -492,9 +492,9 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
       if (main_hist && main_hist->GetEntries() > 0) {
         for (auto& overlay : {overlay_hist, overlay_hist_green}) {
           for (int bin_id = 1; bin_id <= ECL::ECL_TOTAL_CHANNELS; bin_id++) {
-            if (overlay->GetBinContent(bin_id) == 0) continue;
+            // if (overlay->GetBinContent(bin_id) == 0) continue;
             // Do not adjust bin height for dead channels
-            if (main_hist->GetBinContent(bin_id) == 0) continue;
+            if (overlay->GetBinContent(bin_id) == 1) continue;
             overlay->SetBinContent(bin_id, main_hist->GetBinContent(bin_id));
           }
         }
@@ -654,13 +654,13 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
     bool not_normalized = (findCanvas("ECL/c_cid_Thr5MeV_analysis") == nullptr);
     if (total_events >= dead_alarm.required_statistics) {
       double min_occupancy;
-      if (getRunType() == "null") {
+      const std::string run_type = getRunType();
+      if (run_type == "null" || run_type == "debug" || run_type == "cosmic") {
         // For null runs, occupancy should be higher than 0.0001%
         min_occupancy = 1e-6;
-      } else {
-        // For cosmic runs, occupancy should be higher than 0.01%
+      } else if (run_type == "physics") {
+        // For physics runs, occupancy should be higher than 0.01%
         min_occupancy = 1e-4;
-        // (for physics runs, as opposed to cosmics, this can actually be set to higher value)
       }
       if (not_normalized) {
         // The histogram is not normalized, multiply the threshold by evt count

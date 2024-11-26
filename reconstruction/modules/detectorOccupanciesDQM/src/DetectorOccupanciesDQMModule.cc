@@ -242,8 +242,10 @@ void DetectorOccupanciesDQMModule::event()
 
   //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
   int index = 0; //events accepted in the passive veto window but not in the active
-  if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1;
-
+  try {
+    if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1;
+  } catch (const std::exception&) {
+  }
 
   //fill the BKLM plane occupancy plots
   for (const BKLMHit1d& hit1d : m_BklmHit1ds) {

@@ -207,10 +207,9 @@ void ParticleLoaderModule::initialize()
       // if we're not loading MCParticles, and we are loading kaon/pion/muon/charged sigmas with one daughter,
       // then this decaystring is a kink
       bool mdstSourceIsKink = false;
-      if (!m_useMCParticles &&
+      if (!m_useMCParticles && nProducts == 1 &&
           (abs(pdgCode) == abs(Const::kaon.getPDGCode()) || abs(pdgCode) == abs(Const::pion.getPDGCode())
-           || abs(pdgCode) == abs(Const::muon.getPDGCode()) || abs(pdgCode) == abs(3222) || abs(pdgCode) == abs(3112))
-          && nProducts == 1)
+           || abs(pdgCode) == abs(Const::muon.getPDGCode()) || abs(pdgCode) == abs(3222) || abs(pdgCode) == abs(3112)))
         mdstSourceIsKink = true;
 
       if (mdstSourceIsV0) {

@@ -85,7 +85,7 @@ namespace Belle2 {
       c_MCParticle    = 5,
       c_Composite     = 6,
       c_NoMDSTSource  = 7,
-      c_Kink          = 9
+      c_Kink          = 8
     };
 
     /** describes flavor type, see getFlavorType(). */

@@ -1028,7 +1028,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
 
     * Charged kinks final state particles (input ``mdst`` type = Kink)
 
-    Note:
+    .. note::
         To reconstruct charged particle kink you must specify the daughter.
 
     For example, to load Kinks as :math:`K^- \\to \\pi^-\\pi^0` decays from Kinks:

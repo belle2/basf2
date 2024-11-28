@@ -27,7 +27,10 @@ class State(object):
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
-    # Create and return a state object containing the model and other necessary functions
+    """
+    Create and return a state object containing the model and other necessary functions
+    """
+    # hyper parameters for lgbm
     param = {'num_leaves': 31,
              'objective': 'regression',
              'learning_rate': 0.1,
@@ -45,11 +48,11 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         parameters['trainFraction']))  # ,stop_round = int(parameters['stop_round']))
     return state
 
-# Optimized begin_fit function (no specific initialization)
-
 
 def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
-    # ignore origin splite, do it by your self
+    """
+    Begin fit, do nothing
+    """
     return state
 
 
@@ -61,24 +64,35 @@ def feature_importance(state):
 
 
 def partial_fit(state, X, S, y, w, epoch, batch):
-    # Internal imply the batch and epoch setting, so just keep epoch and batch as default (1, and 0 )
-    # Randomly shuffle the indices of the array
-    # np.random.seed(42)  # Set seed for reproducibility
+    """
+    Full fitting process:
+        1.randomly sperate data
+        2.build lgbm dataset
+        3.run training
+    """
+    # randomly split
     shuffled_indices = np.random.permutation(X.shape[0])
-
-    # Determine the split index
     split_index = int(X.shape[0] * state.trainFraction)
 
-    state.train_set = lgb.Dataset(X[shuffled_indices[:split_index]], label=y[shuffled_indices[:split_index]])
-    state.validation_set = state.train_set.create_valid(X[shuffled_indices[split_index:]], label=y[shuffled_indices[split_index:]])
-    # callbacks=[lgb.early_stopping(stopping_rounds=state.stop_round)])
-    state.bst = lgb.train(state.params, state.train_set, valid_sets=[state.validation_set])
+    state.train_set = lgb.Dataset(X[shuffled_indices[:split_index]],
+                                  label=y[shuffled_indices[:split_index]],
+                                  weight=w[shuffled_indices[:split_index]])
+
+    state.validation_set = state.train_set.create_valid(
+        X[shuffled_indices[split_index:]], label=y[shuffled_indices[split_index:]], weight=w[shuffled_indices[split_index:]])
+    # Do training
+    if (state.trainFraction != 1):
+        state.bst = lgb.train(state.params, state.train_set, valid_sets=[state.validation_set])
+    else:
+        state.bst = lgb.train(state.params, state.train_set)
     del shuffled_indices
     return True
 
 
 def end_fit(state):
-    # Save the best model state
+    """
+    End training process and write weights & hyperparameters into root file
+    """
     with tempfile.TemporaryDirectory() as path:
         state.bst.save_model(os.path.join(path, state.path))
         file_names = [state.path]
@@ -92,7 +106,9 @@ def end_fit(state):
 
 
 def load(obj):
-    # Load the trained model
+    """
+    load the trained model into state
+    """
     with tempfile.TemporaryDirectory() as path:
         file_names = obj[0]
         for file_index, file_name in enumerate(file_names):
@@ -107,7 +123,8 @@ def load(obj):
 
 
 def apply(state, X):
-    # Make predictions using the loaded model
-    # X=state.StandardScaler(X)
+    """
+    Apply model to data and make prediction
+    """
     outputs = state.bst.predict(X)
     return np.require(outputs, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])

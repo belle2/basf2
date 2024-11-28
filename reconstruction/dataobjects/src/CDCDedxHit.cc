@@ -11,7 +11,7 @@ namespace Belle2 {
 
   double CDCDedxHit::getSignedDOCAXY() const
   {
-    double doca = sqrt(m_dx * m_dx + m_dy * m_dy);
+    double doca = std::sqrt(m_dx * m_dx + m_dy * m_dy);
     double z = m_dx * m_y - m_dy * m_x;
     if (z < 0) doca = -doca;
 
@@ -27,7 +27,7 @@ namespace Belle2 {
     double cross = wx * py - wy * px;
     double dot = wx * px + wy * py;
 
-    return atan2(cross, dot);
+    return std::atan2(cross, dot);
   }
 
 } // end namespace Belle2

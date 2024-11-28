@@ -8,6 +8,7 @@
 
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
 #include <framework/logging/Logger.h>
+#include <cmath>
 
 namespace Belle2 {
 
@@ -19,7 +20,7 @@ namespace Belle2 {
       return D;
     }
 
-    double projection = pow(fabs(cosTheta), params[3]) + params[2];
+    double projection = std::pow(std::abs(cosTheta), params[3]) + params[2];
     if (projection == 0) {
       B2WARNING("Something wrong with dE/dx hadron constants!");
       return D;
@@ -47,7 +48,7 @@ namespace Belle2 {
       return I;
     }
 
-    double projection  = pow(fabs(cosTheta), params[3]) + params[2];
+    double projection  = std::pow(std::abs(cosTheta), params[3]) + params[2];
     if (projection == 0 or params[4] == 0) {
       B2WARNING("Something wrong with dE/dx hadron constants!");
       return I;
@@ -68,9 +69,9 @@ namespace Belle2 {
       return I;
     }
 
-    double D = (a != 0) ? (-b + sqrt(discr)) / (2.0 * a) : -c / b;
+    double D = (a != 0) ? (-b + std::sqrt(discr)) / (2.0 * a) : -c / b;
     if (D < 0) {
-      D = (a != 0) ? (-b - sqrt(discr)) / (2.0 * a) : -c / b;
+      D = (a != 0) ? (-b - std::sqrt(discr)) / (2.0 * a) : -c / b;
       if (D < 0) {
         B2WARNING("D is less than 0; return uncorrectecd value");
         return I;

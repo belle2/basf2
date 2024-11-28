@@ -101,7 +101,7 @@ namespace Belle2 {
      * Returns distance-of-closest-approach
      * @return distance-of-closest-approach
      */
-    double getDOCA() const {return sqrt(m_dx * m_dx + m_dy * m_dy + m_dz * m_dz);}
+    double getDOCA() const {return std::sqrt(m_dx * m_dx + m_dy * m_dy + m_dz * m_dz);}
 
 
     /**

@@ -421,7 +421,7 @@ def register(dataset_type, skim=None, json_dir=None, release=None, camp=None):
                 if result.returncode != 0:
                     print(f"Error executing command: {result.stderr}")
             else:
-                print(f'PATH DOESNT EXIST: {path}')
+                print(f'PATH DOESN"T EXIST: {path}')
 
     print(f'# {counter} commands executed')
 
@@ -501,7 +501,7 @@ def approve_prods():
 
 def cleanDirectory(lpn_dir):
     # no longer relevant with lpn search using collection
-    # removes empty files in lpn list directory, incase you search for lpns that don't exist
+    # removes empty files in lpn list directory, in case you search for lpns that don't exist
     # e.g. selecting "--camp allprompt and --energy all" will result in a bunch of empty files
 
     for root, dirs, files in os.walk(lpn_dir):
@@ -750,7 +750,7 @@ def main():
                     register(dataset_type='mcrd', skim=skim, json_dir=json_dir, release=release)
 
     elif args.mcri:
-        print('MC run indepentent is not supported anymore. Please use --mcrd.')
+        print('MC run independent is not supported anymore. Please use --mcrd.')
     if args.lpns:
         print('Checking for empty files to remove...')
         cleanDirectory(lpn_dir)

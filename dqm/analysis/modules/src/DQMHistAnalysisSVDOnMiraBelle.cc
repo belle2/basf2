@@ -194,7 +194,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
     std::vector<float> avgOffOccL513UV = getOccupancySensorUV(5, h_zs5countsU, h_zs5countsV, 1, 11, nE); // L5.1.3
 
-    std::vector<float> avgOffOccL514UV = getOccupancySensorUV(5, h_zs5countsU, h_zs5countsV, 3, 12, nE); // L5.1.4
+    std::vector<float> avgOffOccL514UV = getOccupancySensorUV(5, h_zs5countsU, h_zs5countsV, 1, 12, nE); // L5.1.4
 
     std::vector<float> avgOffOccL592UV = getOccupancySensorUV(5, h_zs5countsU, h_zs5countsV, 9, 10, nE); // L5.9.2
 
@@ -438,7 +438,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     std::vector<float> avgEffL513UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 1, 11,
                                                       11); // L5.1.3
 
-    std::vector<float> avgEffL514UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 3, 3, 12,
+    std::vector<float> avgEffL514UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 1, 12,
                                                       12); // L5.1.4
 
     std::vector<float> avgEffL592UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 9, 9, 10,

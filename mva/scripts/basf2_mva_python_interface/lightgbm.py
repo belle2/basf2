@@ -66,8 +66,8 @@ def feature_importance(state):
 def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Full fitting process:
-        1.randomly sperate data
-        2.build lgbm dataset
+        1.randomly shuffle data
+        2.build LGBM dataset
         3.run training
     """
     # randomly split
@@ -107,7 +107,7 @@ def end_fit(state):
 
 def load(obj):
     """
-    load the trained model into state
+    Load the trained model into state
     """
     with tempfile.TemporaryDirectory() as path:
         file_names = obj[0]

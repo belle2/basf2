@@ -9,6 +9,7 @@
 
 #include <reconstruction/dbobjects/CDCDedxMeanPars.h>
 #include <framework/logging/Logger.h>
+#include <cmath>
 
 namespace Belle2 {
 
@@ -23,7 +24,7 @@ namespace Belle2 {
         f = par[1] * std::pow(std::sqrt(x * x + 1), par[3]) / std::pow(x, par[3]) *
             (par[2] - par[5] * std::log(1 / x)) - par[4] + std::exp(par[6] + par[7] * x);
       else if (par[0] == 2)
-        f = par[1] * std::pow(x, 3) + par[2] * x * x + par[3] * x + par[4];
+        f = par[1] * x * x * x + par[2] * x * x + par[3] * x + par[4];
       else if (par[0] == 3)
         f = -1.0 * par[1] * std::log(par[4] + std::pow(1 / x, par[2])) + par[3];
     }

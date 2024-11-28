@@ -139,8 +139,8 @@ namespace Belle2 {
       // track momentum
       const auto& trackMom = fitResult->getMomentum();
       double theta = trackMom.Theta();
-      double cosTheta = cos(theta);
-      double sinTheta = sin(theta);
+      double cosTheta = std::cos(theta);
+      double sinTheta = std::sin(theta);
 
       // track dependent calibration constants
       double cosCor = isData ? m_DBCosineCor->getMean(cosTheta) : 1.0;
@@ -168,7 +168,7 @@ namespace Belle2 {
           dedxTrack->m_motherPDG = mother ? mother->getPDG() : 0;
           const auto& trueMom = mcParticle->getMomentum();
           dedxTrack->m_pTrue = trueMom.R();
-          dedxTrack->m_cosThetaTrue = cos(trueMom.Theta());
+          dedxTrack->m_cosThetaTrue = std::cos(trueMom.Theta());
         }
         dedxTrack->m_scale = scale;
         dedxTrack->m_cosCor = cosCor;
@@ -224,10 +224,10 @@ namespace Belle2 {
         double cellHalfWidth = M_PI * wireRadius / nWires;
         double cellHeight = topHeight + bottomHeight;
         double cellR = 2 * cellHalfWidth / cellHeight;
-        double tana = std::max(std::min(tan(entAng), 1e10), -1e10); // this fixes bug in CDCDedxPIDModule near +-pi/2
-        double docaRS = doca * sqrt((1 + cellR * cellR * tana * tana) / (1 + tana * tana));
+        double tana = std::max(std::min(std::tan(entAng), 1e10), -1e10); // this fixes bug in CDCDedxPIDModule near +-pi/2
+        double docaRS = doca * std::sqrt((1 + cellR * cellR * tana * tana) / (1 + tana * tana));
         double normDocaRS = docaRS / cellHalfWidth;
-        double entAngRS = atan(tana / cellR);
+        double entAngRS = std::atan(tana / cellR);
 
         // one and two dimensional corrections
         double onedcor = isData ? m_DB1DCell->getMean(currentLayer, entAngRS) : 1.0;
@@ -308,7 +308,7 @@ namespace Belle2 {
         truncatedMean = mean;
         numValues = dedxValues.size();
       }
-      double truncatedError = numValues > 1 ? sqrt(sumOfSquares / numValues - truncatedMean * truncatedMean) / (numValues - 1) : 0;
+      double truncatedError = numValues > 1 ? std::sqrt(sumOfSquares / numValues - truncatedMean * truncatedMean) / (numValues - 1) : 0;
 
       // apply the saturation correction only to data (the so called "hadron correction")
       double correctedMean = isData ? m_DBHadronCor->getCorrectedMean(truncatedMean, cosTheta) : truncatedMean;

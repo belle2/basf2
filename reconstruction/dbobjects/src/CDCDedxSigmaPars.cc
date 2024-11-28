@@ -9,6 +9,7 @@
 
 #include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
 #include <framework/logging/Logger.h>
+#include <cmath>
 
 namespace Belle2 {
 
@@ -22,29 +23,25 @@ namespace Belle2 {
       if (par[0] == 1) { // return dedx parameterization
         f = par[1] + par[2] * x;
       } else if (par[0] == 2) { // return nhit or sin(theta) parameterization
-        f = par[1] * std::pow(x, 4) + par[2] * std::pow(x, 3) +
-            par[3] * x * x + par[4] * x + par[5];
+        f = par[1] * x * x * x * x + par[2] * x * x * x + par[3] * x * x + par[4] * x + par[5];
       } else if (par[0] == 3) { // return cos(theta) parameterization
-        f = par[1] * exp(-0.5 * pow(((x - par[2]) / par[3]), 2)) +
-            par[4] * pow(x, 6) + par[5] * pow(x, 5) + par[6] * pow(x, 4) +
-            par[7] * pow(x, 3) + par[8] * x * x + par[9] * x + par[10];
+        f = par[1] * std::exp(-0.5 * std::pow(((x - par[2]) / par[3]), 2)) +
+            par[4] * std::pow(x, 6) + par[5] * std::pow(x, 5) + par[6] * std::pow(x, 4) +
+            par[7] * x * x * x + par[8] * x * x + par[9] * x + par[10];
       }
     }
 
     return f;
   }
 
-  double CDCDedxSigmaPars::getSigma(double dedx, double nhit, double cos, double timereso) const
+  double CDCDedxSigmaPars::getSigma(double dedx, double nhit, double cosTheta, double timereso) const
   {
-
-    double x;
-    double dedxpar[3];
-    double nhitpar[6];
-    double cospar[11];
-
     const auto& params = m_sigmapars;
     if (params.size() < 17) B2FATAL("CDCDedxSigmaPars: vector of parameters too short");
 
+    double dedxpar[3];
+    double nhitpar[6];
+    double cospar[11];
     dedxpar[0] = 1; nhitpar[0] = 2; cospar[0] = 3;
     for (int i = 0; i < 10; ++i) {
       if (i < 2) dedxpar[i + 1] = params[i];
@@ -53,23 +50,19 @@ namespace Belle2 {
     }
 
     // determine sigma from the parameterization
-    x = dedx;
-    double corDedx = sigmaCurve(x, dedxpar, 0);
+    double corDedx = sigmaCurve(dedx, dedxpar, 0);
 
-    x = nhit;
-    double corNHit;
-    int nhit_min = 8, nhit_max = 37;
-
+    double nhit_min = 8, nhit_max = 37;
+    double corNHit = 0;
     if (nhit <  nhit_min) {
-      x = nhit_min;
-      corNHit = sigmaCurve(x, nhitpar, 0) * sqrt(nhit_min / nhit);
+      corNHit = sigmaCurve(nhit_min, nhitpar, 0) * std::sqrt(nhit_min / nhit);
     } else if (nhit > nhit_max) {
-      x = nhit_max;
-      corNHit = sigmaCurve(x, nhitpar, 0) * sqrt(nhit_max / nhit);
-    } else corNHit = sigmaCurve(x, nhitpar, 0);
+      corNHit = sigmaCurve(nhit_max, nhitpar, 0) * std::sqrt(nhit_max / nhit);
+    } else {
+      corNHit = sigmaCurve(nhit, nhitpar, 0);
+    }
 
-    x = cos;
-    double corCos = sigmaCurve(x, cospar, 0);
+    double corCos = sigmaCurve(cosTheta, cospar, 0);
 
     return (corDedx * corCos * corNHit * timereso);
   }

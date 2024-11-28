@@ -1,5 +1,10 @@
 Changes in the analysis package in light-2411-aldebaran
 -------------------------------------------------------
+Ks selector
+++++++++++++++++
+* Changed the model from FastBDT to LightGBM, Optimized hyperparameters
+* Included three new input feature for LambdaVeto: ArmenterosDaughter1Qt, ArmenterosDaughter2Qt, ArmenterosLongitudinalMomentumAsymmetry. Removed PXD hits and daughter momemntum as inputs.
+* Retrained with MC 15rd inclusive data, uploaded new payload to conditiondb
 
 Modular Analysis
 ++++++++++++++++

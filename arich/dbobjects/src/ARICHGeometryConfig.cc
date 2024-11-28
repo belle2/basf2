@@ -260,7 +260,7 @@ void ARICHGeometryConfig::read(const GearDir& content)
                                 0, 0, 0);
   } else if (m_aerogelPlane.getFullAerogelMaterialDescriptionKey() == 1) {
     double wallHeightNew = m_aerogelPlane.getMaximumTotalTileThickness() + m_aerogelPlane.getCompensationARICHairVolumeThick_min();
-    wallHeightNew = wallHeightNew / 10.0; //convertion from mm to cm - this need to be implemented properly
+    wallHeightNew = wallHeightNew / 10.0; //conversion from mm to cm - this need to be implemented properly
     //cout<<"m_aerogelPlane.getMaximumTotalTileThickness()           = "<<m_aerogelPlane.getMaximumTotalTileThickness()<<endl
     //  <<"m_aerogelPlane.getCompensationARICHairVolumeThick_min() = "<<m_aerogelPlane.getCompensationARICHairVolumeThick_min()<<endl
     //  <<"wallHeightNew                                           = "<<wallHeightNew<<endl;

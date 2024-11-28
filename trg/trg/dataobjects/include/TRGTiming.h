@@ -46,7 +46,6 @@ namespace Belle2 {
     ~TRGTiming() {}
 
     /*! setter
-     * @param xxx explanation
      */
     void setTRGTiming() {;}
 

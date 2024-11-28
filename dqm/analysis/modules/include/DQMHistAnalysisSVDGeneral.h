@@ -83,7 +83,7 @@ namespace Belle2 {
     float m_refMeanP; /**< mean of the signal time peak from Physics reference run */
     float m_refMeanC; /**< mean of the signal time peak from Cosmic reference run */
 
-    //! Parameters accesible from basf2 scripts
+    //! Parameters accessible from basf2 scripts
     //  protected:
 
     /** Reference Histogram Root file name */
@@ -97,10 +97,10 @@ namespace Belle2 {
     SVDSummaryPlots* m_hOnlineOccupancy = nullptr;  /**< online occupancy histos */
     SVDSummaryPlots* m_hOccupancyGroupId0 = nullptr;  /**< occupancy histos for cluster time group id=0*/
     SVDSummaryPlots* m_hOccupancy3Samples = nullptr;  /**<  occupancy histos for 3 samples*/
-    SVDSummaryPlots* m_hOnlineOccupancy3Samples = nullptr;  /**< online occupancy histos for 3 sampels*/
+    SVDSummaryPlots* m_hOnlineOccupancy3Samples = nullptr;  /**< online occupancy histos for 3 samples*/
 
     TCanvas* m_cOccupancyU = nullptr; /**< occupancy U histo canvas */
-    TCanvas* m_cOccupancyU3Samples = nullptr; /**< occupancy U histo canvas for 3 sampes */
+    TCanvas* m_cOccupancyU3Samples = nullptr; /**< occupancy U histo canvas for 3 samples */
     TCanvas* m_cOccupancyUGroupId0 = nullptr; /**< occupancy U histo canvas  for cluster time group Id = 0*/
 
     TCanvas* m_cOccupancyV = nullptr; /**< occupancy V histo canvas */
@@ -113,10 +113,8 @@ namespace Belle2 {
     TH1F m_hOccupancyChartChip; /**< occupancy chart histo */
     TCanvas* m_cOccupancyChartChip = nullptr; /**< occupancy chart histo canvas */
 
-    TH2F* m_hOnlineOccupancyU = nullptr; /**< online occupancy U histo */
     TCanvas* m_cOnlineOccupancyU = nullptr; /**< online occupancy U histo canvas */
     TCanvas* m_cOnlineOccupancyU3Samples = nullptr; /**< online occupancy U histo canvas for 3 samples*/
-    TH2F* m_hOnlineOccupancyV = nullptr; /**< online Occupancy V histo */
     TCanvas* m_cOnlineOccupancyV = nullptr; /**< online Occupancy V histo canvas */
     TCanvas* m_cOnlineOccupancyV3Samples = nullptr; /**< online Occupancy V histo canvas  for 3 samples*/
 
@@ -157,16 +155,16 @@ namespace Belle2 {
     Int_t m_occUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_occVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_occU3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
-    Int_t m_occV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampels*/
+    Int_t m_occV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
 
     Int_t m_occUGroupId0 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
-    Int_t m_occVGroupId0 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampels*/
+    Int_t m_occVGroupId0 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
 
     Int_t m_onlineOccUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_onlineOccVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
 
     Int_t m_onlineOccU3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sample*/
-    Int_t m_onlineOccV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampes*/
+    Int_t m_onlineOccV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
 
     TString m_runtype = nullptr; /**< string with runtype: physics or cosmic */
 

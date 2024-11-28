@@ -68,7 +68,7 @@ void HLTEventProcessor::sendTerminatedMessage(unsigned int pid, bool waitForConf
       auto acceptMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       B2ASSERT("Should be an accept message", acceptMessage->isMessage(EMessageTypes::c_confirmMessage));
     } else {
-      B2FATAL("Did not receive a confirmation message!");
+      B2FATAL("Did not receive a confirmation message! waitForConfirmation is " << waitForConfirmation);
     }
   }
 }
@@ -168,15 +168,13 @@ void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers, bool ap
     for (const int& pid : m_processList) {
       int count = 0;
       while (true) {
+        // Do not allow internal SIGKILL to prevent data loss in case of a numbered process
         if (kill(pid, 0) != 0) {
           break;
         }
         B2DEBUG(10, g_processNumber << ": Checking process termination, count = " << count);
         std::this_thread::sleep_for(1000ms);
-        // Force to leave the loop after 20min
-        // Before this, slow control app will send SIGKILL in normal case
         if (count % 5 == 1) kill(pid, SIGINT);
-        if (count == 1200) break;
         ++count;
       }
     }
@@ -345,9 +343,14 @@ bool HLTEventProcessor::processEvent(PathIterator moduleIter, bool firstRound)
         return false;
       } else if (m_previousEventMetaData.isEndOfData() or m_previousEventMetaData.isEndOfRun()) {
         // The run has changes (or we never had one), so call beginRun() before going on
-        m_processStatisticsPtr->suspendGlobal();
-        processBeginRun();
-        m_processStatisticsPtr->resumeGlobal();
+        // The run number should not be 0
+        if (m_eventMetaDataPtr->getRun() != 0) {
+          m_processStatisticsPtr->suspendGlobal();
+          processBeginRun();
+          m_processStatisticsPtr->resumeGlobal();
+        } else {
+          return false;
+        }
       }
 
       const bool runChanged = ((m_eventMetaDataPtr->getExperiment() != m_previousEventMetaData.getExperiment()) or

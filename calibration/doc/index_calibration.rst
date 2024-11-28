@@ -14,7 +14,7 @@ The calibration package contains three main components:
 
 #. The prompt calibration scripts which define the processes that the automated calibration system will use.
 
-This document focuses on the Python CAF code and the vaious tools provided to run prompt calibrations. 
+This document focuses on the Python CAF code and the various tools provided to run prompt calibrations.
 
 .. _calibration_caf:
 

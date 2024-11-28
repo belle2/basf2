@@ -14,6 +14,8 @@
 
 #include <framework/database/DBObjPtr.h>
 
+#include <Math/Vector3D.h>
+
 
 #include <framework/core/Module.h>
 
@@ -50,7 +52,7 @@ namespace Belle2 {
     /**
      * Corrects hit position for distorsion due to non-perpendicular magnetic field component
      */
-    void magFieldCorrection(TVector3& hitpos);
+    void magFieldCorrection(ROOT::Math::XYZVector& hitpos);
 
   private:
 

@@ -66,7 +66,7 @@ namespace Belle2 {
 
   private:
     /*!
-     * Utilise ParticleWeighting moduls as holders for binning of energy resolution
+     * Utilise ParticleWeighting modules as holders for binning of energy resolution
      */
     ParticleWeightingLookUpTable m_resolutionBinningTable;
 

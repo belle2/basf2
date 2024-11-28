@@ -32,7 +32,7 @@ ACTIVE = True
 
 class CombinedSVDTrackingValidationBkg(TrackingValidationRun):
     """
-    Validation class for the DATCON tracking
+    Validation class for the combined VXDTF2 and SVDHough tracking
     """
     #: the number of events to process
     n_events = N_EVENTS

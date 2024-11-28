@@ -55,7 +55,7 @@ namespace Belle2 {
     /** holds a object of G4SafeNavigator, which is located in Geant4MaterialInterface.cc */
     std::unique_ptr<class G4SafeNavigator> nav_;
 
-    /** the volume the extraoplation is currenly located in*/
+    /** the volume the extrapolation is currently located in*/
     const class G4VPhysicalVolume* currentVolume_;
 
     /** stores whether to call SetGeometricallyLimitedStep() because the full step

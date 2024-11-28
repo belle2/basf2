@@ -16,7 +16,7 @@ from tracking.root_utils import root_cd, root_save_name
 from tracking.validation.matplotting import get_logger
 
 
-class ValidationFiguresOfMerit(collections.MutableMapping):
+class ValidationFiguresOfMerit(collections.abc.MutableMapping):
     """Create and write an TNtuple of the validation figures of merit"""
 
     def __init__(
@@ -116,7 +116,7 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
             tntuple.Write("", write_option)
 
     def __setitem__(self, figure_name, value):
-        """Braketed item assignement for figures of merit"""
+        """Braketed item assignment for figures of merit"""
 
         self.figures_by_name[figure_name] = value
 

@@ -50,5 +50,15 @@ namespace Belle2 {
     {
       return obj ? operator()(*obj) : NAN;
     }
+
+    template <class AObject>
+    std::vector<float> Filter<AObject>::operator()(const std::vector <Object*>& objs)
+    {
+      std::vector<float> out;
+      for (const auto& obj : objs) {
+        out.push_back(operator()(obj));
+      }
+      return out;
+    }
   }
 }

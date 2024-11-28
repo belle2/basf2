@@ -9,6 +9,7 @@
 #pragma once
 
 #include <framework/logging/LogConfig.h>
+#include <framework/gearbox/Const.h>
 
 #include <list>
 #include <string>
@@ -85,6 +86,17 @@ namespace Belle2 {
 
     /** Do we have generated, not real data? */
     bool isMC() const;
+
+    /** Set the run type (beam or cosmic). */
+    void setRunType(Const::ERunType runType) { m_runType = runType; }
+    /** Get the run type (beam or cosmic) */
+    Const::ERunType getRunType() const { return m_runType; }
+
+    /** Is the run for cosmics data? */
+    bool isCosmicRun() const { return (m_runType == Const::c_Cosmic); }
+
+    /** Is the run for beam data? */
+    bool isBeamRun() const { return (m_runType == Const::c_Beam); }
 
     /** Number of generated events (from EventInfoSetter). */
     unsigned int getNumberOfMCEvents() const { return m_mcEvents; }
@@ -193,6 +205,14 @@ namespace Belle2 {
     void setRealm(LogConfig::ELogRealm realm);
     /** Get the basf2 execution realm. */
     LogConfig::ELogRealm getRealm() const { return m_realm; }
+
+    /**
+     * Set the flag for writing the simulation steps into an output csv file.
+     * This is useful for simulating events for the Belle II Virtual Reality application.
+     */
+    void setWriteSimSteps(const bool writeSimSteps) { m_writeSimSteps = writeSimSteps; }
+    /** Get the flag for writing the simulation steps into an output csv file. */
+    bool getWriteSimSteps() const { return m_writeSimSteps; }
 
     /** Print information on input/output files in current steering file, used by --dry-run.
      *
@@ -386,8 +406,10 @@ namespace Belle2 {
     unsigned int m_mcEvents; /**< counter for number of generated events. */
     int m_run; /**< override run for EventInfoSetter. */
     int m_experiment; /**< override experiment for EventInfoSetter. */
+    Const::ERunType m_runType = Const::c_Beam; /**< Flag which tells if the run is beam (default: c_Beam) or cosmic (c_Cosmic). */
     unsigned int m_skipNEvents; /**< override skipNEvents for EventInfoSetter/RootInput. */
     LogConfig::ELogRealm m_realm = LogConfig::c_None; /**< The realm in which basf2 is executed. */
+    bool m_writeSimSteps; /**< bool for writing out the simulation steps into a csv file. */
 
     // ZMQ specific settings
     bool m_useZMQ = false; /**< Set to true to use ZMQ instead of RingBuffer */

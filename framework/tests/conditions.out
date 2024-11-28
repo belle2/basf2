@@ -470,13 +470,13 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber
 	url = http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0
 	error = The requested URL returned error: 503
 	try = 2
-	waiting time = 1.9732459927339243
+	waiting time = 1.6351745649391358
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
 [WARNING] Could not download url, retrying ...
 	url = http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0
 	error = The requested URL returned error: 503
 	try = 3
-	waiting time = 4.4257193624731359
+	waiting time = 6.1236823802270388
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
 [ERROR] Conditions Database: Problem parsing payload information.
 	globaltag = localtest

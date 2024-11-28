@@ -1,3 +1,74 @@
+Changes in the analysis package in light-2406-ragdoll
+-----------------------------------------------------
+
+Modules
++++++++
+* Added the `ParticleMassHypothesesUpdater` module, which updates the mass hypothesis of a given input particle list. 
+  The module takes as input a particle list and a PDG code and creates a new particle list containing copies of the original particles, 
+  with updated mass hypotheses. The only supported mass hypotheses are :math:`e, \mu, K, \pi, p` (for both input and output lists).
+  This module differs from the `ParticleMassUpdater` module, since the latter changes the value of the mass of the particles without changing their PDG code.
+
+GraFEI
+++++++
+* The tool now assigns an updated mass hypothesis to each final state particle corresponding to the model prediction. This is done by filling
+  new particles lists named ``:graFEI``.
+
+Variables
++++++++++
+* PIDVariables: in all functions replacing ``logL == 0`` with a call to ``isAvailable`` which tests the detector flags in ``PIDLikelihoods``
+* Added variables: `isPIDAvailable`, `isPIDAvailableFrom`, `pidLogarithmicProbabilityExpert`
+* in function ``addAlias(alias, variable)`` adding ``return alias`` for convenience
+* Added a new Neural-Network based KLM muon probability variable `klmMuonIDDNN` (for expert use only). 
+
+
+Changes in the analysis package in light-2405-quaxo
+---------------------------------------------------
+
+Modules
++++++++
+* Removed the cut functionality from the `KlongMomentumCalculatorExpert` module.
+* Added the :ref:`analysis_reweighting` python script that can add correction table weights to analysis ntuples.
+
+Variables
++++++++++
+* Added the variables `beamBackgroundReuseRate` and `beamBackgroundEvents` for studying the Beam Background Overlay events
+  used for producing MC samples.
+* Added the metavariables `sumValueInList` and `productValueInList`, which return the sum and product
+  of the given variable of the particles in the given particle list.
+
+
+Changes in the analysis package in light-2403-persian
+-----------------------------------------------------
+
+Modules
++++++++
+* Added a new option ``storeEventType`` in `VariablesToNtuple` and `VariablesToEventBasedTree` to store the MC event type
+  information in the branch ``__eventType__`` with the string data type, e.g. ``mixed``, ``ccbar``. This information is available
+  from MC16 on. For MC15 or older and for data, the branch will be empty. By default, the option is true.
+
+Command line tools
+++++++++++++++++++
+* New command line tool :ref:`b2help-print-mcparticles` to print MCParticles on the input mdst file. This tool is helpful for
+  quickly checking MCParticles without writing a script.
+
+Variables
++++++++++
+* Added variables for the MCMatching of ECLCluster based Klong, `clusterTotalMCMatchWeightForKlong`,
+  `clusterTotalMCMatchWeightForBestKlong`, and `varForBestMatchedMCKlong`.
+* Added variables for MC value of helix (track) parameters: `mcD0`, `mcPhi0`, `mcOmega`, `mcZ0`, `mcTanLambda`.
+  These variable work both on MC-matched track-based Particles and on Particles made from MCParticles.
+* Added the variable `genQ2PmPd`, which calculates the generated value of the four-momentum transfer squared using the
+  four-momentum difference of the mother particle and given daughter particles: :math:`(p_m - p_{d_i} -  p_{d_j} - ...)^2`.
+* Added MetaVariable `deltaPhiToMostB2BPhiInList`, which returns the abs(phi difference) to the most back-to-back in phi 
+  (closest to 180 degrees) particle in the provided particle list.  
+* Added the variable `ancestorBIndex`, which returns the array index of the B ancestor of the particle if a MC-match is found and the B exists,
+  and -1 if not.
+
+GraFEI
+++++++
+* A first version of the :ref:`GraFEI` (GraFEI) is introduced. The basic principles and instructions on 
+  how to train and apply the model are available in the dedicated page.
+
 Changes in the analysis package in light-2401-ocicat
 ----------------------------------------------------
 
@@ -10,6 +81,7 @@ Variables
   and `daughterNormDiffOf` also accept generalized daughter indices now.
 * Added the `BelleTofMass` variable (Belle only), which gives the mass of a track in :math:`GeV/c^2`, calculated using the TOF
   information, the path length and the momentum of the particle.
+
 
 Changes in the analysis package in light-2311-nebelung
 ------------------------------------------------------
@@ -26,7 +98,7 @@ Modules
 * Added a new module `TwoBodyISRPhotonCorrector` which can be accessed in the new function `modularAnalysis.twoBodyISRPhotonCorrector`.
   This module is meant to be used in two-body decays involving a high-energy ISR photon that likely experiences ECL leakage leading to an
   inaccurate energy measurement. The energy is corrected kinematically based on the beam energy, the photon's direction, and the mass of the
-  other particle in the two-body decay. The corrected kinematics are stored in copied particles in a new ParticleList. The original 
+  other particle in the two-body decay. The corrected kinematics are stored in copied particles in a new ParticleList. The original
   kinematics of the ISR photon can be accessed using the metavariable `originalParticle`.
 * Added a new module `TrackingEnergyLossCorrection` alongside its helper function `modularAnalysis.correctTrackEnergy`.
   This module modifies the track energy of each particle inside a particle list according to the given correction value
@@ -43,7 +115,7 @@ Variables
   `cosHelicityAngleMomentumPi0Dalitz` is recommended to use instead.
 * The variable `cosHelicityAngleMomentumPi0Dalitz` is extended to the case of pi0 two-body decay, where a photon is reconstructed
   from the photon conversion, :math:`\pi^0 \to \gamma (\to e^+ e^-) \gamma`.
-  
+
 
 Changes in the analysis package in light-2309-munchkin
 ------------------------------------------------------

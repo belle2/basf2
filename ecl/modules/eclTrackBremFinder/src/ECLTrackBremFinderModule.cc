@@ -6,28 +6,22 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//This module
+/* Own header. */
 #include <ecl/modules/eclTrackBremFinder/ECLTrackBremFinderModule.h>
 
-//Framework
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
-
-//MDST
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-
-//Tracking
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/BremHit.h>
-
-//ECL
+/* ECL headers. */
 #include <ecl/modules/eclTrackBremFinder/BestMatchContainer.h>
 #include <ecl/modules/eclTrackBremFinder/BremFindingMatchCompute.h>
 
+/* Basf2 headers. */
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/BremHit.h>
 
 using namespace Belle2;
 

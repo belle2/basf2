@@ -43,7 +43,6 @@
 #include <G4SubtractionSolid.hh>
 #include <G4Region.hh>
 #include <G4Material.hh>
-#include <TVector3.h>
 
 using namespace std;
 using namespace boost;
@@ -417,7 +416,7 @@ namespace Belle2 {
           rotScint.rotateX(box.rotation[0]);
           rotScint.rotateY(box.rotation[1]);
           rotScint.rotateZ(box.rotation[2]);
-          TVector3 transScintTV(box.position[0], box.position[1], box.position[2]);
+          ROOT::Math::XYZVector transScintTV(box.position[0], box.position[1], box.position[2]);
           transScintTV = m_config.getMasterVolume().pointToGlobal(transScintTV);
           B2INFO("GeoARICHCreator: Scintilator " << box.name << " placed at global: " << transScintTV.X() << " " << transScintTV.Y() << " " <<
                  transScintTV.Z());

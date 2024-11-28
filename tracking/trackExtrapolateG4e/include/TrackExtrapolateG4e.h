@@ -461,7 +461,7 @@ namespace Belle2 {
     //! Tracks
     StoreArray<Track> m_tracks;
 
-    //! Track cluster sepration
+    //! Track cluster separation
     StoreArray<TrackClusterSeparation> m_trackClusterSeparations;
 
   };

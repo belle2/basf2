@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -19,6 +18,7 @@ from reconstruction import add_cosmics_reconstruction
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 from caf.framework import Calibration, Collection
 from caf.strategies import SequentialRunByRun, SingleIOV, SequentialBoundaries
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import TOP
 
 
@@ -587,7 +587,7 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=None,
             collection.backend_args = backend_args
 
         #   add collection to calibration
-        cal.add_collection(name='slot_' + '{:0=2d}'.format(slot), collection=collection)
+        cal.add_collection(name='slot_' + f'{slot:02d}', collection=collection)
 
     #   algorithm: it just greps the last iterations of collections and prepares the payload
     algorithm = TOP.TOPAlignmentAlgorithm()

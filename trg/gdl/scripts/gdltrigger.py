@@ -9,7 +9,7 @@
 ##########################################################################
 
 import basf2 as b2
-emptypath = b2.create_path()
+import modularAnalysis as ma
 
 
 def add_gdl_trigger(path, SimulationMode=1, FilterEvents=False, simulateT0jitter=False, Belle2Phase="Phase2"):
@@ -29,6 +29,6 @@ def add_gdl_trigger(path, SimulationMode=1, FilterEvents=False, simulateT0jitter
     trggdl.param('SimulationMode', SimulationMode)
     trggdl.param('Belle2Phase', Belle2Phase)
     trggdl.param('simulateT0jitter', simulateT0jitter)
-    if FilterEvents:
-        trggdl.if_value('<1', emptypath)
     path.add_module(trggdl)
+    if FilterEvents:
+        ma.applyEventCuts('L1Trigger == 1', path)

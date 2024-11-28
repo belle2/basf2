@@ -12,7 +12,7 @@
 # ctypes.cdll.LoadLibrary('/space/ofrost/basf2/release/lib/Linux_x86_64/opt/libtracking_trackFindingCDC.so')
 
 
-from ROOT import Belle2  # make Belle2 namespace available
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import TrackFindingCDC as TFCDC
 
 import sys

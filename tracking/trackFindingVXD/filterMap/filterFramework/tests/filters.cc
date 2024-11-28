@@ -279,7 +279,7 @@ namespace VXDTFfilterTest {
     dummyFilter.accept(x1, x2);
     dummyFilter.accept(x1, x3);
 
-    // useless test as it tests if realy unobserved
+    // useless test as it tests if really unobserved
     EXPECT_EQ(0, counter< SquaredDistance3D >::N);
     EXPECT_EQ(0, counter< SquaredDistance2Dxy >::N);
     EXPECT_EQ(0, counter< SquaredDistance1Dx >::N);

@@ -6,16 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//This module`
+/* Own header. */
 #include <ecl/modules/eclAutocovarianceCalibrationC1Collector/eclAutocovarianceCalibrationC1Collector.h>
 
-//Framework
-#include <framework/dataobjects/EventMetaData.h>
-
-//ECL
-#include <ecl/dataobjects/ECLDigit.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* Basf2 headers. */
+#include <framework/dataobjects/EventMetaData.h>
 
 using namespace std;
 using namespace Belle2;
@@ -41,7 +40,7 @@ void eclAutocovarianceCalibrationC1CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  PPVsCrysID = new TH2F("PPVsCrysID", "Peak to peak amplitude for each crystal;crystal ID;Peak to peak Amplitud (ADC)",
+  PPVsCrysID = new TH2F("PPVsCrysID", "Peak to peak amplitude for each crystal;crystal ID;Peak to peak Amplitude (ADC)",
                         ECLElementNumbers::c_NCrystals, 0,
                         ECLElementNumbers::c_NCrystals, MaxPeaktoPeakValue, 0, MaxPeaktoPeakValue);
   registerObject<TH2F>("PPVsCrysID", PPVsCrysID);

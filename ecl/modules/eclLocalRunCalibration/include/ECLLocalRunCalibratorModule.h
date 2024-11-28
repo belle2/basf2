@@ -210,22 +210,22 @@ namespace Belle2 {
      */
     TTree* m_tree{nullptr};
     /**
-     * Cellid varible used
+     * Cellid variable used
      to fill tree.
      */
     int m_tree_cellid{0};
     /**
-     * Time varible used
+     * Time variable used
      to fill tree.
      */
     float m_tree_time{0};
     /**
-     * Amplitude varible used
+     * Amplitude variable used
      to fill tree.
      */
     float m_tree_ampl{0};
     /**
-     * Event varible used
+     * Event variable used
      to fill tree.
      */
     int m_tree_event{0};

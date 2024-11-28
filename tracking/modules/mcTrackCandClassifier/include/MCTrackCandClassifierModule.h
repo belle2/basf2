@@ -70,7 +70,7 @@ namespace Belle2 {
     bool m_usePXD;
     /// Whether to require that the hit is in the expected annulus.
     bool m_applyAnnulus;
-    /// Wether to require that the hit is in the expected semiplane.
+    /// Whether to require that the hit is in the expected semiplane.
     bool m_applySemiplane;
     /// Whether to require that the hit belongs to the first lap in the transverse plane.
     bool m_applyLap;
@@ -131,7 +131,7 @@ namespace Belle2 {
 
     /** Function to get semiplane.
      * @param vertex: Vertex position
-     * @param center: center positon
+     * @param center: center position
      * @param hit: hit position
      * @return difference in y-slope between hit and semiplane
      */
@@ -256,7 +256,7 @@ namespace Belle2 {
     /** Calculate thetaMS.
      *
      * @param mcParticleInfo: mcParticleInfo object
-     * @param aTrueHit: pointer to vxd ture hit
+     * @param aTrueHit: pointer to vxd true hit
      * @return thetaMS value
      */
     float compute_thetaMS(MCParticleInfo& mcParticleInfo, VXDTrueHit* aTrueHit);

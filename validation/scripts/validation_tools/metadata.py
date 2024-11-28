@@ -30,7 +30,7 @@ def file_description_set(
     rootfile: Union[ROOT.TFile, str, pathlib.PurePath], description: str
 ) -> None:
     """
-    Add file description validation metdata to a ROOT file.
+    Add file description validation metadata to a ROOT file.
 
     Args:
         rootfile (ROOT.TFile, str or pathlib.PurePath): Name of the root file
@@ -167,16 +167,26 @@ def validation_metadata_update(
             f"ROOT file {rootfile.GetName()} is not open for writing"
         )
     obj = rootfile.Get(name)
+    found_obj = False
     if not obj:
-        raise RuntimeError(
-            f"Cannot find object named {name} in {rootfile.GetName()}"
-        )
-    validation_metadata_set(obj, *args, **argk)
-    # scope guard to avoid side effects by changing the global gDirectory
-    # in modules ...
-    # noinspection PyUnusedLocal
-    directory_guard = ROOT.TDirectory.TContext(rootfile)  # noqa
-    obj.Write("", ROOT.TObject.kOverwrite)
+        subdir = rootfile.GetDirectory(args[0])
+        if subdir:
+            obj = subdir.Get(name)
+            if obj:
+                found_obj = True
+                validation_metadata_set(obj, *(args[1:]), **argk)
+                subdir.WriteObject(obj, name, "Overwrite")
+        if not found_obj:
+            raise RuntimeError(
+                f"Cannot find object named {name} in {rootfile.GetName()}"
+            )
+    else:
+        validation_metadata_set(obj, *args, **argk)
+        # scope guard to avoid side effects by changing the global gDirectory
+        # in modules ...
+        # noinspection PyUnusedLocal
+        directory_guard = ROOT.TDirectory.TContext(rootfile)  # noqa
+        obj.Write("", ROOT.TObject.kOverwrite)
     if opened:
         rootfile.Close()
 
@@ -247,6 +257,10 @@ class ValidationMetadataSetter(basf2.Module):
         if self._description:
             file_description_set(self._tfile, self._description)
         del self._tfile
+
+
+# End suppression of doxygen checks
+# @endcond
 
 
 def create_validation_histograms(
@@ -325,7 +339,3 @@ def create_validation_histograms(
         variables_2d=histograms_2d,
         fileName=rootfile,
     )
-
-
-# End suppression of doxygen checks
-# @endcond

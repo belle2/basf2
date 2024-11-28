@@ -35,15 +35,15 @@ REG_MODULE(SpacePoint2TrueHitConnector); // register the modules
 SpacePoint2TrueHitConnectorModule::SpacePoint2TrueHitConnectorModule() :
   Module()
 {
-  setDescription("Module that tries to find the appropriate TrueHit to each SpacePoint and to register a relation between them for making MC information for SpacePoints more easily accesible for Modules that need it. Module can also be used to filter out 'fishy' SpacePoints.");
+  setDescription("Module that tries to find the appropriate TrueHit to each SpacePoint and to register a relation between them for making MC information for SpacePoints more easily accessible for Modules that need it. Module can also be used to filter out 'fishy' SpacePoints.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("storeSeperate", m_PARAMstoreSeparate,
-           "Set to false if you do not want to create seperate StoreArrays for processed SpacePoints. (i.e. a relation from SpacePoint to TrueHit will be set in the passed StoreArray. NOTE: this StoreArray will contain SpacePoints with a relation to TrueHits and such without after this module). The Names of the output StoreArrays will be the names of the input StoreArrays with 'outputSuffix' (module parameter) appended to them",
+           "Set to false if you do not want to create separate StoreArrays for processed SpacePoints. (i.e. a relation from SpacePoint to TrueHit will be set in the passed StoreArray. NOTE: this StoreArray will contain SpacePoints with a relation to TrueHits and such without after this module). The Names of the output StoreArrays will be the names of the input StoreArrays with 'outputSuffix' (module parameter) appended to them",
            true);
 
   addParam("registerAll", m_PARAMregisterAll,
-           "If set to true, the module simply registers a relation for all TrueHits that are related to a SpacePoint (resp. its Clusters). In this way the module can be used to find all related TrueHits and then the user can decide what to do with these TrueHits (otherwise this module does some decision making). Setting this to true means that all checks (e.g. 'minWeight', 'maxPosSigma', ...) are ommitted! NOTE that some of the information is lost in this way (e.g. how many of the Clusters of a SpacePoint have been related to a TrueHit)!",
+           "If set to true, the module simply registers a relation for all TrueHits that are related to a SpacePoint (resp. its Clusters). In this way the module can be used to find all related TrueHits and then the user can decide what to do with these TrueHits (otherwise this module does some decision making). Setting this to true means that all checks (e.g. 'minWeight', 'maxPosSigma', ...) are omitted! NOTE that some of the information is lost in this way (e.g. how many of the Clusters of a SpacePoint have been related to a TrueHit)!",
            false);
 
   addParam("positionAnalysis", m_PARAMpositionAnalysis,
@@ -283,7 +283,7 @@ void SpacePoint2TrueHitConnectorModule::terminate()
     if (!m_PARAMregisterAll) {
       // TODO: do this containerwise
       std::stringstream furtherSummary;
-      furtherSummary << "Ommited Relations because of weight < " << m_PARAMminWeight << ": " << m_weightTooSmallCtr << "\n";
+      furtherSummary << "Omitted Relations because of weight < " << m_PARAMminWeight << ": " << m_weightTooSmallCtr << "\n";
       furtherSummary << "Rejected Relations because of non primary particle: " << m_rejectedNoPrimaryCtr;
 //       furtherSummary << "Summary for all containers:\n";
 //       furtherSummary << "possible/accepted relations for cases:\n";
@@ -456,7 +456,7 @@ void SpacePoint2TrueHitConnectorModule::registerOneRelation(Belle2::SpacePoint* 
 {
   TrueHitType* trueHit = trueHitwWeight.first;
   B2DEBUG(23, "Registering relation to TrueHit " << trueHit->getArrayIndex() << " from Array " << trueHit->getArrayName());
-  SpacePoint* newSP = spacePoint; // declaring pointer here, getting new pointer if storeSeparate ist true
+  SpacePoint* newSP = spacePoint; // declaring pointer here, getting new pointer if storeSeparate is true
 
   if (m_PARAMstoreSeparate) { // if storing in separate Array, re-register the relations to the Clusters first
     newSP = m_outputSpacePoints.at(m_iCont).appendNew(*spacePoint);
@@ -783,7 +783,7 @@ bool SpacePoint2TrueHitConnectorModule::compatibleCombination(Belle2::SpacePoint
 // ===================================================== GET LOCAL SPACEPOINT COORDINATES =========================================
 std::pair<double, double> SpacePoint2TrueHitConnectorModule::getLocalPos(Belle2::SpacePoint* spacePoint)
 {
-  // get the normalized local coordinates from SpacePoint and convert them to local coordinates (have to do so because at the slanted parts the local U-position is dependant on the local V-position)
+  // get the normalized local coordinates from SpacePoint and convert them to local coordinates (have to do so because at the slanted parts the local U-position is dependent on the local V-position)
   // NOTE: second way is to convert the global position of the SpacePoint to local position via the sensorInfoBase (yields same results)
   double normU = spacePoint->getNormalizedLocalU();
   double normV = spacePoint->getNormalizedLocalV();

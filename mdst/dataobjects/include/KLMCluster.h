@@ -168,34 +168,6 @@ namespace Belle2 {
     void setMomentumMag(float momentumMag)
     {m_p = momentumMag;}
 
-    /**
-     * Set error of vertex X coordinate.
-     * @param[in] errorX Error of vertex X coordinate.
-     */
-    void setErrorX(float errorX)
-    {m_errorX = errorX;}
-
-    /**
-     * Set error of vertex Y coordinate.
-     * @param[in] errorY Error of vertex Y coordinate.
-     */
-    void setErrorY(float errorY)
-    {m_errorY = errorY;}
-
-    /**
-     * Set error of vertex Z coordinate.
-     * @param[in] errorZ Error of vertex Z coordinate.
-     */
-    void setErrorZ(float errorZ)
-    {m_errorZ = errorZ;}
-
-    /**
-     * Set error of momentum absolute value.
-     * @param[in] errorP Error of momentum absolute value.
-     */
-    void setErrorP(float errorP)
-    {m_errorP = errorP;}
-
   private:
 
     /** Decay time. */
@@ -219,20 +191,8 @@ namespace Belle2 {
     /** Absolute value of momentum, 0 means unknown. */
     float m_p;
 
-    /** Error of vertex X coordinate. */
-    float m_errorX;
-
-    /** Error of vertex Y coordinate. */
-    float m_errorY;
-
-    /** Error of vertex Z coordinate. */
-    float m_errorZ;
-
-    /** Error of momentum absolute value. */
-    float m_errorP;
-
     /** Needed to make objects storable. */
-    ClassDef(Belle2::KLMCluster, 2);
+    ClassDef(Belle2::KLMCluster, 3);
 
   };
 

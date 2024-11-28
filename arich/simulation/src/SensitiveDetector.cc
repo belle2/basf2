@@ -20,7 +20,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <TVector2.h>
+#include <Math/Vector2D.h>
 #include <TRandom3.h>
 
 using namespace std;
@@ -132,7 +132,7 @@ namespace Belle2 {
       //                Create ARICHSimHit and save it to datastore
       //------------------------------------------------------------
 
-      TVector2 locpos(localPosition.x() / CLHEP::cm, localPosition.y() / CLHEP::cm);
+      ROOT::Math::XYVector locpos(localPosition.x() / CLHEP::cm, localPosition.y() / CLHEP::cm);
       StoreArray<ARICHSimHit> arichSimHits;
       ARICHSimHit* simHit = arichSimHits.appendNew(moduleID, locpos, globalTime, energy);
 

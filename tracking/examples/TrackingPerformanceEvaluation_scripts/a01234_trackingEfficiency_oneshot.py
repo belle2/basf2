@@ -37,7 +37,7 @@ import modularAnalysis as ma
 
 b2.set_random_seed(1509)
 
-particleGun = False
+particleGun = True
 
 release = sys.argv[1]
 

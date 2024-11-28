@@ -15,8 +15,6 @@ import basf2 as b2
 import os
 import sys
 
-from ROOT.Belle2 import TestCalibrationAlgorithm
-
 from caf.framework import Calibration, CAF
 from caf import backends
 
@@ -47,6 +45,9 @@ def main(argv):
         b2.set_log_level(b2.LogLevel.DEBUG)
         b2.B2INFO(f"Running Test Algorithm Setup For Iteration {iteration}")
         b2.B2INFO(f"Can access the {algorithm.__cppname__} class from Calibration().pre_algorithms.")
+
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
+    from ROOT.Belle2 import TestCalibrationAlgorithm
 
     # Make a bunch of test calibrations
     calibrations = []
@@ -96,7 +97,7 @@ def main(argv):
     # Add in our list of calibrations
     for cal in calibrations:
         cal_fw.add_calibration(cal)
-    # Subjobs from collector jobs being split over input files can be paralellized.
+    # Subjobs from collector jobs being split over input files can be parallelized.
     # Also Calibrations 1 and 2, can be run at the same time.
     # If you have 4 cores this backend will run them whenever one of the 4 processes becomes available
     # For larger data or more calibrations, consider using the LSF or PBS batch system backends at your site

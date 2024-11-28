@@ -38,16 +38,13 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
                         InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe"),
                         OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe"))
         # 2D finder
-        if shortTracks:
-            minHitsShort = 3
-        else:
-            minHitsShort = 4
         if lowPt:
             minPt = 0.255
         else:
             minPt = 0.3
         path.add_module('CDCTrigger2DFinder',
-                        minHits=4, minHitsShort=minHitsShort, minPt=minPt)
+                        usehitpattern=True,
+                        minHits=16, minHitsShort=16, minPt=minPt)
 
         # Old ETF
         # path.add_module('CDCTriggerETF', trueEventTime=trueEventTime)

@@ -46,7 +46,7 @@ namespace Belle2 {
       /// Constructor from a two dimensional segment filling the third dimension with 0 values.
       explicit CDCTrack(const CDCSegment2D& segment);
 
-      /// Concats several tracks from a path
+      /// concatenates several tracks from a path
       static CDCTrack condense(const Path<const CDCTrack>& trackPath);
 
       /// Reconstructs the hit content of the segment triple track to a CDCTrack averaging overlapping parts
@@ -55,7 +55,7 @@ namespace Belle2 {
       /// Reconstructs the hit content of the axial stereo segment pair path to a CDCTrack averaging overlapping parts.
       static CDCTrack condense(const Path<const CDCSegmentPair>& segmentPairPath);
 
-      /// Comparision of track - no particular order has been defined so far, all tracks are equivalent
+      /// Comparison of track - no particular order has been defined so far, all tracks are equivalent
       bool operator<(const CDCTrack& track __attribute__((unused))) const
       {
         return false;

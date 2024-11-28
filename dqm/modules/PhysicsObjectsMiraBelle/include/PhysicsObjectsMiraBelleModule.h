@@ -57,9 +57,9 @@ namespace Belle2 {
   private:
     // ======== Hitograms for run dependence
     // ----- IP position
-    /* TH1F* m_h_vx = nullptr;/\**< histogram for x coordiate of IP position *\/ */
-    /* TH1F* m_h_vy = nullptr;/\**< histogram for y coordiate of IP position *\/ */
-    /* TH1F* m_h_vz = nullptr;/\**< histogram for z coordiate of IP position *\/ */
+    /* TH1F* m_h_vx = nullptr;/\**< histogram for x coordinate of IP position *\/ */
+    /* TH1F* m_h_vy = nullptr;/\**< histogram for y coordinate of IP position *\/ */
+    /* TH1F* m_h_vz = nullptr;/\**< histogram for z coordinate of IP position *\/ */
     // ----- Detector Hits
     TH1F* m_h_npxd = nullptr;/**< histogram for number of PXD hits associated with muon track */
     TH1F* m_h_nsvd = nullptr;/**< histogram for number of SVD hits associated with muon track */

@@ -15,22 +15,25 @@
 namespace Belle2 {
 
   /**
-   * Fill ARICHHit collection from ARICHDigits
+   * Fill ARICHHit collection from ARICHDigits.
    */
   class ARICHRateCalModule : public HistoModule {
 
   public:
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHRateCalModule();
 
     /**
-     * Destructor
+     * Destructor.
      */
     virtual ~ARICHRateCalModule();
 
+    /**
+     * Definition of the histograms.
+     */
     virtual void defineHisto() override;
 
     /**
@@ -51,21 +54,28 @@ namespace Belle2 {
     virtual void event() override;
 
   protected:
+    /**
+     * Get calculated byte.
+     */
     unsigned int calbyte(const int* buf);
+
+    /**
+     * Get calculated word.
+     */
     unsigned int calword(const int* buf);
 
   protected:
-    TH2* h_rate2D[100] = {NULL};
-    int m_nrun;
-    int m_nevents;
-    double m_dth;
-    double m_th0;
-    bool m_debugmode;
-    bool m_internalmode;
-    std::string m_daqdb;
-    unsigned int m_ibyte = 0;
-    int m_run_count = 0;
-    int m_evt_count = 0;
+    TH2* h_rate2D[100] = {NULL}; /**< 2D histogram */
+    int m_nrun; /**< number of scan runs */
+    int m_nevents; /**< number of events per run */
+    double m_dth; /**< dth */
+    double m_th0; /**< th0 */
+    bool m_debugmode; /**< whether debug mode is requested */
+    bool m_internalmode; /**< whether internal thscan mode is requested */
+    std::string m_daqdb; /**< daqdb config name */
+    unsigned int m_ibyte = 0; /**< byte */
+    int m_run_count = 0; /**< run counter */
+    int m_evt_count = 0; /**< event counter */
 
   };
 

@@ -64,7 +64,7 @@ void DQMEventProcessorBase::ProcessTrack(const Track& track)
   RelationVector<CDCHit> cdcHits = DataStore::getRelationsWithObj<CDCHit>(m_recoTrack);
   int nCDCHits = (int)cdcHits.size();
 
-  // This method allways returns TrackFitResult so there's no need to check if it's not nullptr
+  // This method always returns TrackFitResult so there's no need to check if it's not nullptr
   auto trackFitResult = track.getTrackFitResultWithClosestMass(Const::pion);
 
   TString message = ConstructMessage(trackFitResult, nPXDClusters, nSVDClusters, nCDCHits);
@@ -211,7 +211,7 @@ void DQMEventProcessorBase::ProcessSVDRecoHit(RecoHitInformation* recoHitInfo)
 
 void DQMEventProcessorBase::ComputeCommonVariables()
 {
-  auto sensorInfo = &VXD::GeoCache::get(m_sensorID);
+  auto sensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(m_sensorID);
   m_globalResidual_um = sensorInfo->vectorToGlobal(m_residual_um, true);
   ROOT::Math::XYZVector globalPosition = sensorInfo->pointToGlobal(m_position, true);
 
@@ -229,12 +229,14 @@ void DQMEventProcessorBase::ComputeCommonVariables()
 void DQMEventProcessorBase::FillCommonHistograms()
 {
   if (m_isNotFirstHit && ((m_layerNumber - m_layerNumberPrev) == 1)) {
-    m_histoModule->FillTRClusterCorrelations(m_phi_deg, m_phiPrev_deg, m_theta_deg, m_thetaPrev_deg, m_correlationIndex);
+    if (m_produceTRClusters)
+      m_histoModule->FillTRClusterCorrelations(m_phi_deg, m_phiPrev_deg, m_theta_deg, m_thetaPrev_deg, m_correlationIndex);
   } else {
     m_isNotFirstHit = true;
   }
 
-  m_histoModule->FillTRClusterHitmap(m_phi_deg, m_theta_deg, m_layerIndex);
+  if (m_produceTRClusters)
+    m_histoModule->FillTRClusterHitmap(m_phi_deg, m_theta_deg, m_layerIndex);
 }
 
 void DQMEventProcessorBase::SetCommonPrevVariables()

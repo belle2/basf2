@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -57,7 +56,7 @@ class CustomArgumentParser(argparse.ArgumentParser):
 
     def __init__(self, **kwargs):
         kwargs["formatter_class"] = CustomHelpFormatter
-        super(CustomArgumentParser, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def error(self, message):
         sys.stderr.write(f"Error: {message}\n")
@@ -99,6 +98,26 @@ def get_argument_parser():
         help="List of skims to run as a combined skim.",
     )
 
+    flagged = subparsers.add_parser(
+        "flagged", help="Run several skims as a flagged steering file.",
+    )
+
+    flagged.add_argument(
+        "skims",
+        nargs="+",
+        choices=Registry.names,
+        metavar="Skim",
+        help="List of skims to run as a flagged skim.",
+    )
+
+    flagged.add_argument(
+        "--flaggedSkim",
+        default=None,
+        type=str,
+        metavar="flaggedSkim",
+        help="Name of the flagged skim",
+    )
+
     module = subparsers.add_parser("module", help="Run all skims in a module.")
 
     module.add_argument(
@@ -108,7 +127,7 @@ def get_argument_parser():
         help="Skim module to run all skims for as combined steering file.",
     )
 
-    for subparser in [single, combined, module]:
+    for subparser in [single, combined, flagged, module]:
         subparser.add_argument(
             "-n",
             "--max-input-events",
@@ -180,6 +199,20 @@ def main():
             mc=(not args.data),
             analysisGlobaltag=args.analysis_globaltag,
             pidGlobaltag=args.pid_globaltag,
+        )
+    elif args.action == "flagged":
+        skims = list({*args.skims})
+        if sorted(skims) != sorted(args.skims):
+            b2.B2FATAL("Attempting to run a skim twice!")
+        SkimObjects = [Registry.get_skim_function(skim)() for skim in skims]
+        Skim = CombinedSkim(
+            *SkimObjects,
+            mc=(not args.data),
+            analysisGlobaltag=args.analysis_globaltag,
+            pidGlobaltag=args.pid_globaltag,
+            CombinedSkimName=args.flaggedSkim,
+            udstOutput=False,
+            mdstOutput=True,
         )
     elif args.action == "module":
         SkimObjects = [

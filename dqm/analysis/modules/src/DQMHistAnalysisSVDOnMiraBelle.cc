@@ -1016,8 +1016,7 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgEfficiencyUV(TH2F* hM
     int layer, int ladder, int sensor) const
 {
   float nan = numeric_limits<float>::quiet_NaN();
-  int binXY = hMCV->GetBin(ladder, findBinY(layer, sensor) + 1);
-  //printf("%d %d %d: %d\n", layer, ladder, sensor, findBinY(layer, sensor)+1);
+  int binXY = hMCV->FindBin(ladder, findBinY(layer, sensor));
 
   std::vector<float> avgEffUV(2, 0.0);
   if (hFTU->GetBinContent(binXY) > 0) {
@@ -1033,12 +1032,6 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgEfficiencyUV(TH2F* hM
   }
 
   return avgEffUV;
-}
-
-void DQMHistAnalysisSVDOnMiraBelleModule::addVariable(string name, vector<float>& varUV)
-{
-  m_monObj->setVariable(name.c_str(), varUV[0]);
-  m_monObj->setVariable(name.c_str(), varUV[1]);
 }
 
 float DQMHistAnalysisSVDOnMiraBelleModule::xForMaxY(TH1F* h) const

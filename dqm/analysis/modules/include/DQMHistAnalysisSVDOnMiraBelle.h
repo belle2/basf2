@@ -124,17 +124,10 @@ namespace Belle2 {
     */
     float histFWHM(TH1F* h) const;
 
-    /**
-     * Add variable to object monitoring
-     * @param name name of variable
-     * @param variable vector U/V
-     */
-    void addVariable(std::string name, std::vector<float>& varUV);
-
     /** find the Y bin given the layer and sensor number */
-    // should take the method from SVDSummaryPlot (->put as static)
     Int_t findBinY(Int_t layer, Int_t sensor) const
     {
+      // should take the method from SVDSummaryPlot (->put as static)
       if (layer == 3)
         return sensor; //2
       if (layer == 4)
@@ -147,9 +140,6 @@ namespace Belle2 {
         return -1;
     }
   };
-
-#define getVariableName(variable) (#variable)
-
 } // end namespace Belle2
 
 

@@ -59,26 +59,16 @@ namespace Belle2 {
     std::vector<VxdID> m_SVDModules;
 
     /**
-     * Calculate avg offline occupancy for one specific sensor, especially with high occupancy
+     * Calculate avg offline occupancy for one specific sensor, especially
      * @param iLayer index of layer
      * @param hU, hV pointers to histograms
-     * @param binX index of binX corresponding to sensor (layer, ladder, sensor)
-     * @param binY index of binY corresponding to sensor (layer, ladder, sensor)
+     * @param layer layer index
+     * @param ladder ladder index
+     * @param sensor sensor index
      * @param nEvents number of events
      * @return vector with values for U and V sides
      */
-    std::vector<float> getOccupancySensorUV(int iLayer, TH1F* hU, TH1F* hV, int binX, int binY, int nEvents) const;
-
-
-    /**
-    * Calculate avg offline occupancy for one specific sensor, especially with high occupancy
-    * @param iLayer index of layer
-    * @param hU, hV pointers to histograms
-    * @param iBin index of bin corresponding to sensor (layer, ladder, sensor)
-    * @param nEvents number of events
-    * @return vector with values for U and V sides
-    */
-    std::vector<float> highOccupancySensor(int iLayer, TH1F* hU, TH1F* hV, int iBin, int nEvents) const;
+    std::vector<float> avgOccupancyUV(TH1F* hU, TH1F* hV,  int layer, int ladder, int sensor, int nEvents) const;
 
     /**
     * Calculate avg offline occupancy for specified sensors
@@ -112,6 +102,15 @@ namespace Belle2 {
     std::vector<float> avgEfficiencyUV(TH2F* hMCU, TH2F* hMCV, TH2F* hFTU, TH2F* hFTV, int minX, int maxX, int minY, int maxY) const;
 
     /**
+     * Calculate avg efficiency for specified sensors
+     * @param hMCU, hMCV, hFTU, hFTV pointers to histograms
+     * @param layer layer index
+     * @param ladder ladder index
+     * @param sensor sensor index     * @return vector with values for U and V sides
+     */
+    std::vector<float> avgEfficiencyUV(TH2F* hMCU, TH2F* hMCV, TH2F* hFTU, TH2F* hFTV, int layer, int ladder, int sensor) const;
+
+    /**
     * Calculate abscissa of max Y bin
     * @param h pointer to histogram
     * @return x value for max Y bin
@@ -125,6 +124,21 @@ namespace Belle2 {
     */
     float histFWHM(TH1F* h) const;
 
+    /** find the Y bin given the layer and sensor number */
+    Int_t findBinY(Int_t layer, Int_t sensor) const
+    {
+      // should take the method from SVDSummaryPlot (->put as static)
+      if (layer == 3)
+        return sensor; //2
+      if (layer == 4)
+        return 2 + 1 + sensor; //6
+      if (layer == 5)
+        return 6 + 1 + sensor; // 11
+      if (layer == 6)
+        return 11 + 1 + sensor; // 17
+      else
+        return -1;
+    }
   };
 } // end namespace Belle2
 

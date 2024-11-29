@@ -191,6 +191,7 @@ def init_info(info):
     infoDict['fei_gt'] = yaml_info['GT']['FEI']
     infoDict['ana_gt'] = yaml_info['GT']['analysis']
     infoDict['pid_gt'] = yaml_info['GT']['PID']
+    infoDict['campaign'] = yaml_info['campaign']
 
     return infoDict
 
@@ -426,7 +427,7 @@ def register(dataset_type, skim=None, json_dir=None, release=None, camp=None):
     print(f'# {counter} commands executed')
 
 
-def upload_files(json_dir, release):
+def upload_files(json_dir, release, campaignDict):
     '''
     look for all prods in "Initialized" or "Registered" state and upload the skim scripts for them
     it would be better if this could know what prods already have files uploaded
@@ -449,14 +450,15 @@ def upload_files(json_dir, release):
 
             # upload skim files
             for prod, camp in zip(prod_list, camp_list):
-                if 'bucket' in camp or 'PromptExp' in camp:
-                    camp = 'prompt'
-                elif 'proc13' in camp:
-                    camp = 'proc13'
-                elif 'MC15rd_a' in camp:
-                    camp = 'MC15rd_a'
-                elif 'MC15rd_b' in camp:
-                    camp = 'MC15rd_b'
+
+                # Find the proper campaign directory according to the dictionary in the infoYaml.
+                # The directory name is defined by b2skim-prod (args.json step) using the info encoded in the registry yaml
+                for key, campList in campaignDict.items():
+                    for campName in campList:
+                        if campName in camp:
+                            camp = key
+                            break
+
                 script_dir = f'{json_dir}skim/{camp}/{release}/SkimScripts'
                 command = ['gb2_prod_uploadFile', '-p', prod]
                 result_upload = subprocess.run(command, cwd=script_dir, capture_output=True, text=True)
@@ -684,7 +686,8 @@ def main():
 
     elif args.upload:
         release = getRelease(infoDict, args.release)
-        upload_files(json_dir, release)
+        campaignDict = infoDict['campaign']
+        upload_files(json_dir, release, campaignDict)
 
     elif args.data:
 

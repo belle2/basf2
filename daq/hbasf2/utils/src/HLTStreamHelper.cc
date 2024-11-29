@@ -227,6 +227,20 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
       int* cprbuf = new int[nwds_buf];
       memcpy(cprbuf, tempdblk.GetBuffer(cprid), nwds_buf * 4);
 
+      // Check the magic number of the Raw(ROB) header and trailer
+      if (cprbuf[ nwds_buf - (RawTrailer_latest::RAWTRAILER_NWORDS - RawTrailer_latest::POS_TERM_WORD) ]
+          != RawTrailer_latest::MAGIC_WORD_TERM_TRAILER  ||
+          (cprbuf[ RawHeader_latest::POS_VERSION_HDRNWORDS ] | RawHeader_latest::MAGIC_MASK)
+          != RawHeader_latest::MAGIC_WORD) {
+        for (int i = 0; i < nwds_buf; i++) {
+          printf(".8x ", cprbuf[ i ]);
+          if (i % 8 == 7) printf("\n");
+        }
+        printf("\n");
+        B2FATAL("Invalid magic number in Raw Trailer. Exiting...");
+        exit(1);
+      }
+
       // Check FTSW
       if (tempdblk.CheckFTSWID(cprid)) {
         RawFTSW* ftsw = m_rawFTSWs.appendNew();

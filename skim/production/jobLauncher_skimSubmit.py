@@ -133,7 +133,7 @@ if args.yaml:  # step2 - basf2 once per campaign, one command for data and one f
             subprocess.run(command_data.split(), text=True)
 
     if args.MC:
-        command_MC = command + ' --mcrd --bkg BGx1'
+        command_MC = command + ' --mcrd --bg BGx1'
         print(colored(f'>>>> Executed command: {command_MC}', 'green'))
         if not args.dry:
             subprocess.run(command_MC.split(), text=True)

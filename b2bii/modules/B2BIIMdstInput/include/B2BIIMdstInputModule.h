@@ -17,7 +17,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/dataobjects/FileMetaData.h>
 
 #define BELLE_TARGET_H "belle-x86_64-unknown-linux-gnu-g++.h"
@@ -106,9 +105,6 @@ namespace Belle2 {
 
     //! File metadata to declare if we process real data or simulated data
     StoreObjPtr<FileMetaData> m_fileMetadata{"", DataStore::c_Persistent};
-
-    /** event extra info object pointer */
-    StoreObjPtr<EventExtraInfo> m_eventExtraInfo;
   };
 
 } // end namespace Belle2

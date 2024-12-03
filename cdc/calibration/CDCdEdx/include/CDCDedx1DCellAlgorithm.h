@@ -96,7 +96,7 @@ namespace Belle2 {
     void setPtLimit(double value) {m_ptMax = value;}
 
     /**
-    * funtion to set cos #theta limit
+    * funtion to set cos \f$\theta\f$ limit
     */
     void setCosLimit(double value) {m_cosMax = value;}
 

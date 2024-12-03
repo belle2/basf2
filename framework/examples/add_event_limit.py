@@ -9,31 +9,33 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+"""
+Create the payload with an object of EventLimit class for use in EventLimiter
+module. The payload interval of validity is set equal to the specified experiment
+and run; payload file is created in localdb directory.
+"""
+
 from ROOT import Belle2
+import argparse
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('exp',   type=int, help='Experiment number')
+parser.add_argument('run',   type=int, help='Run number')
+parser.add_argument('limit', type=int, help='Event limit')
+args = parser.parse_args()
 
-"""
-Create the payload with the object of EventLimit class.
-This payload is used in EventLimiter module
-"""
-
-FIRST_EXP = 0
-FIRST_RUN = 0
-LAST_EXP = -1
-LAST_RUN = -1
 DBOBJECT_NAME = 'EventLimit'
 
-EVENT_LIMIT = 100
+FIRST_EXP = args.exp
+FIRST_RUN = args.run
+LAST_EXP = args.exp
+LAST_RUN = args.run
+
+EVENT_LIMIT = args.limit
 
 
-def main():
-    """Payload creation code
-    """
-    payload = Belle2.EventLimit(EVENT_LIMIT)
+# Payload creation code
+payload = Belle2.EventLimit(EVENT_LIMIT)
 
-    db = Belle2.Database.Instance()
-    iov = Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN)
-    db.storeData(DBOBJECT_NAME, payload, iov)
-
-
-if __name__ == '__main__':
-    main()
+db = Belle2.Database.Instance()
+iov = Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN)
+db.storeData(DBOBJECT_NAME, payload, iov)

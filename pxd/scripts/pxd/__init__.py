@@ -208,14 +208,3 @@ def add_roi_payload_assembler(path, ignore_hlt_decision):
                     ROIListName='ROIs', ROIpayloadName='ROIpayload',
                     SendAllDownscaler=0, SendROIsDownscaler=1,
                     AcceptAll=ignore_hlt_decision, NoRejectFlag=False)
-
-
-def add_roi_finder(path):
-    """
-    Add the PXDDataReduction module to preserve the tracking informaiton for ROI calculation
-    :param path: The path to which the module should be added
-    :param calcROIs: True: turn on the ROI calculation, False: turn off
-    """
-
-    path.add_module('PXDROIFinder', recoTrackListName='RecoTracks',
-                    PXDInterceptListName='PXDIntercepts', ROIListName='ROIs')

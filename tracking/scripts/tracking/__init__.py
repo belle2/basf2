@@ -693,15 +693,8 @@ def add_roiFinder(path, reco_tracks="RecoTracks", intercepts_name="PXDIntercepts
     :param reco_tracks: Which tracks to use in the extrapolation step.
     :param roiName: Name of the produced/stored ROIs.
     """
-
-    pxdDataRed = b2.register_module('PXDROIFinder')
-    param_pxdDataRed = {
-        'recoTrackListName': reco_tracks,
-        'PXDInterceptListName': intercepts_name,
-        'ROIListName': roiName,
-    }
-    pxdDataRed.param(param_pxdDataRed)
-    path.add_module(pxdDataRed)
+    path.add_module('PXDROIFinder', recoTrackListName=reco_tracks,
+                    PXDInterceptListName=intercepts_name, ROIListName=roiName)
 
 
 def add_vxd_standalone_cosmics_finder(

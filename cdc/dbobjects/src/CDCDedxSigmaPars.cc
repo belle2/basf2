@@ -1,4 +1,3 @@
-
 /**************************************************************************
  * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
@@ -7,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
+#include <cdc/dbobjects/CDCDedxSigmaPars.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
 

@@ -6,11 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <reconstruction/modules/CDCDedxPID/CDCDedxPIDCreatorModule.h>
+#include <cdc/modules/CDCDedxPID/CDCDedxPIDCreatorModule.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
-#include <reconstruction/modules/CDCDedxPID/LineHelper.h>
+#include <cdc/modules/CDCDedxPID/LineHelper.h>
 #include <framework/core/Environment.h>
 #include <TRandom.h>
 #include <cmath>

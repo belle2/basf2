@@ -75,7 +75,7 @@ namespace Belle2 {
     /** Note, we are using dense packed wire number (0-14336) defined as follows:
     const int iwire = (superlayer == 0) ?
     160*layer+wire : m_nLayerWires[superlayer-1]+(160+32*(superlayer-1))*layer+wire;
-        -see reconstruction/modules/CDCDedxPIDModule */
+        -see cdc/modules/CDCDedxPIDModule */
     std::vector<double> m_wiregains; /**< dE/dx gains for each wire */
 
 

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <reconstruction/dbobjects/CDCDedxHadronCor.h>
+#include <cdc/dbobjects/CDCDedxHadronCor.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
 

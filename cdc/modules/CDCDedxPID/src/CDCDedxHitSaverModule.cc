@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <reconstruction/modules/CDCDedxPID/CDCDedxHitSaverModule.h>
+#include <cdc/modules/CDCDedxPID/CDCDedxHitSaverModule.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <genfit/KalmanFitterInfo.h>

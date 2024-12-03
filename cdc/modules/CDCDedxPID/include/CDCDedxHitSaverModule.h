@@ -12,7 +12,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <reconstruction/dataobjects/CDCDedxHit.h>
+#include <cdc/dataobjects/CDCDedxHit.h>
 
 
 namespace Belle2 {

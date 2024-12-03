@@ -14,23 +14,23 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
-#include <reconstruction/dataobjects/CDCDedxHit.h>
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
-#include <reconstruction/dataobjects/CDCDedxLikelihood.h>
+#include <cdc/dataobjects/CDCDedxHit.h>
+#include <cdc/dataobjects/CDCDedxTrack.h>
+#include <cdc/dataobjects/CDCDedxLikelihood.h>
 
 #include <framework/database/DBObjPtr.h>
-#include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
-#include <reconstruction/dbobjects/CDCDedxWireGain.h>
-#include <reconstruction/dbobjects/CDCDedxRunGain.h>
-#include <reconstruction/dbobjects/CDCDedxCosineCor.h>
-#include <reconstruction/dbobjects/CDCDedx2DCell.h>
-#include <reconstruction/dbobjects/CDCDedx1DCell.h>
-#include <reconstruction/dbobjects/CDCDedxADCNonLinearity.h>
-#include <reconstruction/dbobjects/CDCDedxCosineEdge.h>
-#include <reconstruction/dbobjects/CDCDedxMeanPars.h>
-#include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
-#include <reconstruction/dbobjects/CDCDedxHadronCor.h>
-#include <reconstruction/dbobjects/CDCDedxInjectionTime.h>
+#include <cdc/dbobjects/CDCDedxScaleFactor.h>
+#include <cdc/dbobjects/CDCDedxWireGain.h>
+#include <cdc/dbobjects/CDCDedxRunGain.h>
+#include <cdc/dbobjects/CDCDedxCosineCor.h>
+#include <cdc/dbobjects/CDCDedx2DCell.h>
+#include <cdc/dbobjects/CDCDedx1DCell.h>
+#include <cdc/dbobjects/CDCDedxADCNonLinearity.h>
+#include <cdc/dbobjects/CDCDedxCosineEdge.h>
+#include <cdc/dbobjects/CDCDedxMeanPars.h>
+#include <cdc/dbobjects/CDCDedxSigmaPars.h>
+#include <cdc/dbobjects/CDCDedxHadronCor.h>
+#include <cdc/dbobjects/CDCDedxInjectionTime.h>
 
 #include <string.h>
 

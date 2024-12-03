@@ -13,8 +13,7 @@ import tempfile
 import basf2
 
 from softwaretrigger import constants
-from pxd import add_roi_payload_assembler
-from tracking import add_roiFinder
+from tracking import add_roiFinder, add_roi_payload_assembler
 
 from reconstruction import add_reconstruction, add_cosmics_reconstruction
 from softwaretrigger import path_utils

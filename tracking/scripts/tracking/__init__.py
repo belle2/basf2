@@ -697,6 +697,13 @@ def add_roiFinder(path, reco_tracks="RecoTracks", intercepts_name="PXDIntercepts
                     PXDInterceptListName=intercepts_name, ROIListName=roiName)
 
 
+def add_roi_payload_assembler(path, ignore_hlt_decision):
+    path.add_module('ROIPayloadAssembler',
+                    ROIListName='ROIs', ROIpayloadName='ROIpayload',
+                    SendAllDownscaler=0, SendROIsDownscaler=1,
+                    AcceptAll=ignore_hlt_decision, NoRejectFlag=False)
+
+
 def add_vxd_standalone_cosmics_finder(
         path,
         reco_tracks="RecoTracks",

@@ -218,7 +218,6 @@ namespace Belle2 {
     double m_truncMax; /**< upper threshold on truncation */
 
     int m_binSplit;/**< multiply nbins by this factor in full range */
-    int m_binMerge;/**< merge bins by this factor in (-pi/2 <-> -pi/4) and (pi/4 <-> pi/2) region*/
 
     double m_chargeType; /**< charge type for baseline adj */
     double m_adjustFac;/**< factor with that one what to adjust baseline */

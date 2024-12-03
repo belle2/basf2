@@ -92,7 +92,7 @@ if __name__ == '__main__':
         subprocess.check_call(['b2file-mix', file_name_a, file_name_b, '-o', 'test6.root', '--seed', 'def'])
 
         # Compare the content of test4, test5 and test6 and make sure it's different from test_ab.
-        # Then, test4 and test5 must be identical, while test6 must be different thant test4 and test5.
+        # Then, test4 and test5 must be identical, while test6 must be different than test4 and test5.
         # Since b2file-mix keep the relative ordering between the events in a file: For checking test6
         # is different, let's count how many times the entries differ and ask this number is large enough.
         # Because of the same reason, let's skip the first and last few events.

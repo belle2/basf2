@@ -189,7 +189,7 @@ basf2.process(main)
 
 
 def check_01_existing():
-    """Check that merging a non exsiting file fails"""
+    """Check that merging a non existing file fails"""
     create_testfile_direct("test2.root")
     return merge_files("/test1.root") != 0 and merge_files("test2.root") == 0
 
@@ -223,7 +223,7 @@ def check_05_release():
 
 
 def check_06_empty_release():
-    """Check that merging fails with empty release valuses"""
+    """Check that merging fails with empty release values"""
     create_testfile_direct("test1.root")
     create_testfile_direct("test2.root", release="")
     return merge_files("test1.root", "test2.root") != 0
@@ -308,7 +308,7 @@ def check_15_noeventbranches():
 
 
 def check_16_nonmergeable():
-    """Check that merging fails if there are mutiple mergeable persistent trees"""
+    """Check that merging fails if there are multiple mergeable persistent trees"""
     f = ROOT.TFile("test1.root", "RECREATE")
     t = ROOT.TTree("persistent", "persistent")
     meta = FileMetaData()
@@ -520,7 +520,7 @@ def check_26_ntuple_merge():
 
 
 def check_27_ntuple_trees():
-    """Check that ntuple merge failes if the tree names are different"""
+    """Check that ntuple merge fails if the tree names are different"""
     create_testfile("test1.root")
     create_testfile("test2.root")
     create_testfile_ntuple(input="test1.root", output="ntuple1.root")

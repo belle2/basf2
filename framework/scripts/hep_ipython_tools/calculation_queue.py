@@ -23,7 +23,7 @@ class CalculationQueue:
     It can be used to send and receive values from the modules while processing the calculation.
     You can use it to save - for example - filepaths of outputfiles that you create on the fly.
     The added items are all of the type CalculationQueueItem.
-    The CalculationQueue can be used as a dict. After the termination of the underlaying process
+    The CalculationQueue can be used as a dict. After the termination of the underlying process
     you can access the different entries by their names you gave them when putting them on the queue.
     """
 

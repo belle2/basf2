@@ -45,7 +45,7 @@ bool LogConnectionConsole::terminalSupportsColors(int fileDescriptor)
   const std::string termName = term ? term : "";
   const bool useColor = isTTY and
                         (termName == "xterm" or termName == "xterm-color" or termName == "xterm-256color" or
-                         termName == "sceen" or termName == "screen-256color" or termName == "tmux" or
+                         termName == "screen" or termName == "screen-256color" or termName == "tmux" or
                          termName == "tmux-256color" or termName == "rxvt-unicode" or
                          termName == "rxvt-unicode-256color" or termName == "linux" or termName == "cygwin");
   return useColor;

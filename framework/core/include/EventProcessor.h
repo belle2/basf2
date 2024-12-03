@@ -83,7 +83,7 @@ namespace Belle2 {
      *
      * @param modulePathList A list of all modules which could be executed during the data processing.
      * @param setEventInfo if true the first event call of the master module
-     * will be called immidiately to load the event info right away so that
+     * will be called immediately to load the event info right away so that
      * it's available for subsequent modules
      */
     void processInitialize(const ModulePtrList& modulePathList, bool setEventInfo = true);
@@ -152,7 +152,7 @@ namespace Belle2 {
     /** Name of the module which should be profiled, empty if no profiling is requested */
     std::string m_profileModuleName;
 
-    /** Adress of the module which we want to profile, nullptr if no profiling is requested */
+    /** Address of the module which we want to profile, nullptr if no profiling is requested */
     Module* m_profileModule = nullptr;
 
     /** EventMetaData is used by processEvent()/processCore(). */

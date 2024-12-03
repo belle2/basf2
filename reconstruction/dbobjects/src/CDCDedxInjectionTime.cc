@@ -84,8 +84,6 @@ double CDCDedxInjectionTime::getCorrection(std::string svar, unsigned int ring, 
     return 1.0;
   }
 
-  if (std::isnan(ring) || std::isnan(time))return 1.0;
-
   if (ring > 1) {
     B2ERROR("wrong ring input, choose 0 or 1");
     return 1.0;
@@ -94,20 +92,24 @@ double CDCDedxInjectionTime::getCorrection(std::string svar, unsigned int ring, 
   unsigned int iv = ring * 3 + 1 ;
   if (svar == "reso") iv = ring * 3 + 2 ;
 
-  unsigned int sizev = m_injectionvar[iv].size(); //mean or reso
-  unsigned int sizet = m_injectionvar[ring * 3].size(); //time
-  if (sizet == 0 || sizev == 0) {
-    B2ERROR("calibration vectors are empty");
+  if (iv >= m_injectionvar.size()) return 1.0;
+
+  int sizev = m_injectionvar[iv].size(); //mean or reso
+  int sizet = m_injectionvar[ring * 3].size(); //time
+  if (sizet < 2 or sizev < 2) {
+    B2ERROR("calibration vectors are empty or have only a single element");
     return 1.0;
   }
 
   std::vector<unsigned int> tedges(sizet); //time edges array
   std::copy(m_injectionvar[ring * 3].begin(), m_injectionvar[ring * 3].end(), tedges.begin());
 
-  if (time >= 5e6)time = 5e6 - 10;
+  if (time >= 5e6) time = 5e6 - 10;
 
-  unsigned int it = getTimeBin(tedges, time);
-  double center = 0.5 * (m_injectionvar[ring * 3].at(it) + m_injectionvar[ring * 3].at(it + 1));
+  int it = getTimeBin(tedges, time);
+  if (it < 0) it = 0;
+
+  double center = 0.5 * (getSafely(ring * 3, it) + getSafely(ring * 3, it + 1));
 
   //no corr before veto bin (usually one or two starting bin)
   //intrapolation for entire range except
@@ -118,12 +120,12 @@ double CDCDedxInjectionTime::getCorrection(std::string svar, unsigned int ring, 
     if (time < center) {
       thisbin = it - 1;
     } else {
-      if (it < sizet - 2)nextbin = it + 1;
+      if (it < sizet - 2) nextbin = it + 1;
       else thisbin = it - 1;
     }
 
     if (it <= 2) {
-      double diff = m_injectionvar[iv].at(2) - m_injectionvar[iv].at(1) ;
+      double diff = getSafely(iv, 2) - getSafely(iv, 1) ;
       if (diff < -0.015) { //difference above 1.0%
         thisbin = it;
         if (it == 1) nextbin = it;
@@ -137,13 +139,13 @@ double CDCDedxInjectionTime::getCorrection(std::string svar, unsigned int ring, 
     }
   }
 
-  double thisdedx = m_injectionvar[iv].at(thisbin);
-  double nextdedx = m_injectionvar[iv].at(nextbin);
+  double thisdedx = getSafely(iv, thisbin);
+  double nextdedx = getSafely(iv, nextbin);
 
-  double thistime = 0.5 * (m_injectionvar[ring * 3].at(thisbin) + m_injectionvar[ring * 3].at(thisbin + 1));
-  double nexttime = 0.5 * (m_injectionvar[ring * 3].at(nextbin) + m_injectionvar[ring * 3].at(nextbin + 1));
+  double thistime = 0.5 * (getSafely(ring * 3, thisbin) + getSafely(ring * 3, thisbin + 1));
+  double nexttime = 0.5 * (getSafely(ring * 3, nextbin) + getSafely(ring * 3, nextbin + 1));
 
-  double newdedx = m_injectionvar[iv].at(it);
+  double newdedx = getSafely(iv, it);
   if (thisbin != nextbin)
     newdedx = thisdedx + ((nextdedx - thisdedx) / (nexttime - thistime)) * (time - thistime);
 

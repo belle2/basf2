@@ -48,7 +48,7 @@ namespace Belle2 {
     unsigned int getSize(int layer, int axis) const
     {
 
-      int mylayer = 0;
+      unsigned int mylayer = 0;
       if (layer < 0 || layer > 55) {
         B2ERROR("CDCDedxADCNonLinearity:CDC layer out of range, choose between 0-55");
         return 0;
@@ -63,7 +63,8 @@ namespace Belle2 {
         mylayer = mylayer + axis;
       }
 
-      return m_nonlADC[mylayer].size();
+      if (mylayer < m_nonlADC.size()) return m_nonlADC[mylayer].size();
+      return 0;
     };
 
 
@@ -71,10 +72,10 @@ namespace Belle2 {
      * @param ADC uncorrected version
      * @param layer outer vs inner 0 to 56 indexing
      */
-    double getCorrectedADC(const double& ADC, const int layer)const
+    double getCorrectedADC(double ADC, int layer)const
     {
 
-      int mylayer = 0;
+      unsigned int mylayer = 0;
       if (layer < 0 || layer > 55) {
         B2WARNING("CDCDedxADCNonLinearity:returning uncorrected ADC as input layer is out of range: must be 0-55");
         return ADC;
@@ -82,10 +83,12 @@ namespace Belle2 {
         if (layer >= 8) mylayer = 2;
       }
 
-      std::vector<double> tempX = m_nonlADC[mylayer];//inner or outer X array
-      std::vector<double> tempY = m_nonlADC[mylayer + 1];//inner or outer Y array
+      if (mylayer + 1 >= m_nonlADC.size()) return ADC;
 
-      if (tempX.size() != tempY.size()) {
+      const std::vector<double>& tempX = m_nonlADC[mylayer];//inner or outer X array
+      const std::vector<double>& tempY = m_nonlADC[mylayer + 1];//inner or outer Y array
+
+      if (tempX.size() < 2 or tempX.size() != tempY.size()) {
         B2WARNING("CDCDedxADCNonLinearity:returning uncorrected ADC as parameters range don't match: X=Y in bins");
         return ADC;
       }
@@ -93,7 +96,7 @@ namespace Belle2 {
       //Find bin for ADC correction
       unsigned int ibin = TMath::BinarySearch(tempY.size(), tempY.data(), double(ADC));
 
-      if (ibin >= tempY.size() - 1)ibin = tempY.size() - 2; //overflow to last bin
+      if (ibin >= tempY.size() - 1) ibin = tempY.size() - 2; //overflow to last bin
       if (ibin >= tempY.size() - 1) {
         B2WARNING("CDCDedxADCNonLinearity:returning uncorrected ADC as bins are not in range");
         return ADC;
@@ -111,7 +114,7 @@ namespace Belle2 {
     double getNonLinearityPar(int layer, int axis, unsigned int par) const
     {
 
-      int mylayer = 0;
+      unsigned int mylayer = 0;
       if (layer < 0 || layer > 55) {
         B2ERROR("CDCDedxADCNonLinearity:CDC layer out of range, choose between 0-55");
         return -99.0;
@@ -124,6 +127,11 @@ namespace Belle2 {
         return -99.0;
       } else {
         mylayer = mylayer + axis;
+      }
+
+      if (mylayer >= m_nonlADC.size()) {
+        B2ERROR("CDCDedxADCNonLinearity: vector-of-vectors too short");
+        return -99.0;
       }
 
       if (par >= m_nonlADC[mylayer].size()) {
@@ -141,7 +149,7 @@ namespace Belle2 {
     void printNonLinearityPars(int layer, int axis) const
     {
 
-      int mylayer = 0;
+      unsigned int mylayer = 0;
       if (layer < 0 || layer > 55) {
         B2ERROR("CDCDedxADCNonLinearity:CDC layer out of range, choose between 0-55");
         return;
@@ -154,6 +162,11 @@ namespace Belle2 {
         return;
       } else {
         mylayer = mylayer + axis;
+      }
+
+      if (mylayer >= m_nonlADC.size()) {
+        B2ERROR("CDCDedxADCNonLinearity: vector-of-vectors too short");
+        return;
       }
 
       B2INFO("Printing parameters for layer: " << layer << ", axis: " << axis << ", nPars:" << m_nonlADC[mylayer].size());
@@ -170,7 +183,7 @@ namespace Belle2 {
      */
     void setNonLinearityPar(unsigned int layer, unsigned int axis, unsigned int par, double value)
     {
-      int mylayer = 0;
+      unsigned int mylayer = 0;
       if (layer > 55) {
         B2ERROR("CDCDedxADCNonLinearity:CDC layer out of range, choose between 0-55");
         return;
@@ -185,8 +198,13 @@ namespace Belle2 {
         mylayer = mylayer + axis;
       }
 
+      if (mylayer >= m_nonlADC.size()) {
+        B2ERROR("CDCDedxADCNonLinearity: vector-of-vectors too short");
+        return;
+      }
       if (par >= m_nonlADC[mylayer].size()) {
         B2ERROR("CDCDedxADCNonLinearity:Problem with par index: choose 0 and " << m_nonlADC[mylayer].size()); //
+        return;
       }
 
       //here set parameter to requested value

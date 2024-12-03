@@ -104,7 +104,7 @@ namespace Belle2 {
           const genfit::MeasuredStateOnPlane& mop = fitterInfo->getFittedState();
           auto pocaMom = ROOT::Math::XYZVector(mop.getMom());
           auto pocaOnTrack = ROOT::Math::XYZVector(mop.getPos());
-          auto pocaOnWire = ROOT::Math::XYZVector(mop.getPlane()->getO()); // DOUBLE CHECK THIS --\/
+          auto pocaOnWire = ROOT::Math::XYZVector(mop.getPlane()->getO());
 
           auto* hit = m_hits.appendNew(cdcRecoHit->getWireID(), cdcHit->getTDCCount(), cdcHit->getADCCount(),
                                        pocaMom, pocaOnTrack, pocaOnWire, foundByTrackFinder,

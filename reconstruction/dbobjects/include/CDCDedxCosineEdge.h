@@ -16,9 +16,9 @@
 namespace Belle2 {
 
   /**
-  *   dE/dx special large cosine calibration to fix
-  *   bending shoulder at large costh
-  */
+   *   dE/dx special large cosine calibration to fix
+   *   bending shoulder at large costh
+   */
 
   class CDCDedxCosineEdge: public TObject {
   public:
@@ -30,6 +30,7 @@ namespace Belle2 {
 
     /**
      * Constructor
+     * @param largecosth calibration constants
      */
     explicit CDCDedxCosineEdge(const std::vector<std::vector<double>>& largecosth): m_largeCos(largecosth) {};
 
@@ -41,100 +42,97 @@ namespace Belle2 {
     /**
      * Get the number of bins of requested side
      * @param side <0 for backward and >0 for forward
+     * @return number of bins
      */
     int getSize(const int side) const
     {
       if (side < 0) {
+        if (m_largeCos.empty()) return 0;
         return m_largeCos[0].size();
-      } else if (side > 0) {
-        return m_largeCos[1].size();
       } else {
-        B2ERROR("CDCDedxCosineEdge:choose >0 for forward and <0 for backward side");
-        return 0;
+        if (m_largeCos.size() < 2) return 0;
+        return m_largeCos[1].size();
       }
     };
 
 
-    /** return calibration constant for given side and bin #
+    /**
+     * Return calibration constant for given side and bin #
      * @param side <0 for backward and >0 for forward
      * @param ibin is bin number for given costh
+     * @return calibration constant
      */
     double getMean(int side, unsigned int ibin) const
     {
-
-      std::vector<double> temp;
-      if (side < 0) {
-        temp = m_largeCos[0];
-      } else if (side > 0) {
-        temp = m_largeCos[1];
-      } else {
-        B2ERROR("CDCDedxCosineEdge:choose > 0 for forward and <0 for backward side");
+      if (m_largeCos.size() < 2) {
+        B2ERROR("CDCDedxCosineEdge: vector-of-vectors too short, returning 1");
         return 1.0;
       }
 
-      if (ibin >= temp.size()) { //index starts from zero
-        B2WARNING("CDCDedxADCNonLinearity:returning (1.0) uncorrected ADC as bin: " <<  ibin << " is not in range");
-        return 1.0;
-      }
-      return temp[ibin];
+      const std::vector<double>& temp = side < 0 ?  m_largeCos[0] : m_largeCos[1];
+      if (ibin < temp.size()) return temp[ibin];
+
+      B2WARNING("CDCDedxCosineEdge: invalid bin number, returning 1");
+      return 1.0;
     };
 
-    /** return calibration constant for cosine value
-      * @param costh is a signed cosine theta value so by definition it recog it's side
-      */
+    /**
+     * Return calibration constant for cosine value
+     * @param costh is a signed cosine theta value so by definition it recog it's side
+     * @return calibration constant
+     */
     double getMean(double costh)const
     {
+      if (m_largeCos.size() < 2) {
+        B2ERROR("CDCDedxCosineEdge: vector-of-vectors too short, returning 1");
+        return 1.0;
+      }
+
+      const std::vector<double>& temp = costh < 0 ?  m_largeCos[0] : m_largeCos[1];
+      if (temp.size() < 2) {
+        B2ERROR("CDCDedxCosineEdge: vector too short, returning 1");
+        return 1.0;
+      }
 
       double coslow = 0.0, coshigh = 0.0;
-      std::vector<double> temp;
-
       if (costh < 0) {
-        temp = m_largeCos[0];
         coslow = -0.870; coshigh = -0.850; //this is hardcoded and fixed
-      } else if (costh > 0) {
-        temp = m_largeCos[1];
-        coslow = 0.950; coshigh = 0.960; //this is hardcoded and fixed
       } else {
-        B2ERROR("CDCDedxCosineEdge:choose > 0 for forward and <0 for backward side");
-        return 1.0;
+        coslow = 0.950; coshigh = 0.960; //this is hardcoded and fixed
       }
 
       //don't do anything for other cosine range
-      if (costh < coslow || costh > coshigh) {
-        B2WARNING("CDCDedxCosineEdge:outside range (" << costh << ")choose in between " << coslow << " and " << coshigh);
+      if (costh < coslow or costh > coshigh) {
         return 1.0;
       }
 
-      if (costh <= -0.866 || costh >= 0.9575) return 1.0;
+      if (costh <= -0.866 or costh >= 0.9575) return 1.0;
 
       // gains are stored at the center of the bins
       // find the bin center immediately preceding this value of costh
-      double binsize = (coshigh - coslow) / temp.size();
+      int nbins = int(temp.size());
+      double binsize = (coshigh - coslow) / nbins;
       int bin = std::floor((costh - 0.5 * binsize - coslow) / binsize);
+      if (bin < 0) bin = 0;
+      else if (bin > nbins - 2) bin = nbins - 2;
 
       // extrapolate backward for lowest half-bin and center positive half-bin
       // extrapolate forward for highest half-bin and center negative half-bin
-      int thisbin = bin, nextbin = bin + 1;
-      int nbin = int(temp.size());
-      if (bin < 0 || (temp[nextbin] - temp[thisbin] < -0.6 && bin < nbin - 1)) {
-        thisbin = bin + 1; nextbin = bin + 2;
-      } else {
-        if (bin >= nbin - 1 || (temp[nextbin] - temp[thisbin] > 0.6 && bin < nbin - 1)) {
-          thisbin = bin - 1; nextbin = bin;
-        }
-      }
+      // MS: not clear why this is needed
+      if (temp[bin + 1] - temp[bin] < -0.6) bin++;
+      else if (temp[bin + 1] - temp[bin] > 0.6) bin--;
 
-      double frac = ((costh - 0.5 * binsize - coslow) / binsize) - thisbin;
-
-      if (thisbin < 0 || (unsigned)nextbin >= temp.size()) {
+      if (bin < 0 or bin + 1 >= nbins) {
         B2WARNING("CDCDedxCosineEdge:no constants for costh: " << costh << " as it is not in range");
         return 1.0;
       }
 
-      return ((temp[nextbin] - temp[thisbin]) * frac + temp[thisbin]);
+      double frac = ((costh - 0.5 * binsize - coslow) / binsize) - bin;
+      return ((temp[bin + 1] - temp[bin]) * frac + temp[bin]);
     }
 
-    /** return specific large cosine constants on give side
+    /**
+     * Return specific large cosine constants on give side
      * @param side <0 for backward and >0 for forward
      * @param ibin is bin number for given costh
     */
@@ -144,10 +142,10 @@ namespace Belle2 {
       std::vector<double> temp;
       double coslow = 0.0, coshigh = 0.0;
       if (side < 0) {
-        temp = m_largeCos[0];
+        if (m_largeCos.size() > 0) temp = m_largeCos[0];
         coslow = -0.870; coshigh = -0.850;
       } else if (side > 0) {
-        temp = m_largeCos[1];
+        if (m_largeCos.size() > 1) temp = m_largeCos[1];
         coslow = 0.950; coshigh = 0.960;
       } else {
         B2ERROR("CDCDedxCosineEdge:choose > 0 for forward and <0 for backward side");
@@ -159,7 +157,7 @@ namespace Belle2 {
         return -99.0;
       }
 
-      if (temp.size() == 0)return -99.0;
+      if (temp.size() == 0) return -99.0;
       double bw = abs(coshigh - coslow) / temp.size();
       double bc = coslow  + (0.5 + ibin) * bw; //bin centre
       std::cout << "Par # " << ibin << ", costh bin centre = " << bc << ", const =" << temp[ibin] << std::endl;
@@ -167,7 +165,8 @@ namespace Belle2 {
     };
 
 
-    /** print large cosine constants array on requested side
+    /**
+     * Print large cosine constants array on requested side
      * @param side <0 for backward and >0 for forward constants
     */
     void printCosEdgePars(int side)
@@ -175,46 +174,42 @@ namespace Belle2 {
       std::vector<double> temp;
       double coslow = 0.0, coshigh = 0.0;
       if (side < 0) {
-        temp = m_largeCos[0];
+        if (m_largeCos.size() > 0) temp = m_largeCos[0];
         coslow = -0.870; coshigh = -0.850;
       } else if (side > 0) {
-        temp = m_largeCos[1];
+        if (m_largeCos.size() > 1) temp = m_largeCos[1];
         coslow = 0.950; coshigh = 0.960;
       } else {
         B2ERROR("CDCDedxCosineEdge:choose > 0 for forward and <0 for backward side");
         return;
       }
 
-      if (temp.size() == 0)return;
+      if (temp.size() == 0) return;
       double bw = abs(coshigh - coslow) / temp.size();
       B2INFO("Printing parameters (0=backward and 1=forward): " << side << ", nPars = " << temp.size());
       for (unsigned int ibin = 0; ibin < temp.size(); ibin++) {
         double bc = coslow  + (0.5 + ibin) * bw; //bin centre
         std::cout << "Par # " << ibin << ", costh bin centre = " << bc << ", const = " << temp[ibin] << std::endl;
       }
-      temp.clear();
     };
 
 
-    /** set specific hadron parameter
+    /**
+     * Set specific hadron parameter
      * @param side 0 for backward and 1 for forward
      * @param ibin number starts from 0
      * @param value of parameter to set
      */
     void setCosthEdgePar(int side, unsigned int ibin, double value)
     {
-      int iside = -99.0;
-      if (side < 0) {
-        iside = 0;
-      } else if (side > 0) {
-        iside = 1;
-      } else {
-        B2ERROR("CDCDedxCosineEdge:choose >0 for forward and <0 for backward side");
+      if (m_largeCos.size() < 2) {
+        B2ERROR("CDCDedxCosineEdge: vector-of-vectors too short, value not set");
         return;
       }
 
+      int iside = side < 0 ? 0 : 1;
       if (ibin >= m_largeCos[iside].size()) {
-        B2ERROR("CDCDedxCosineEdge:Problem with bin index: choose 0 and " << m_largeCos[iside].size() - 1); //
+        B2ERROR("CDCDedxCosineEdge: invalid bin number, value not set");
         return;
       }
 
@@ -224,7 +219,7 @@ namespace Belle2 {
 
 
   private:
-    std::vector<std::vector<double>> m_largeCos; /**< ADC vs corrected ADC mapping */
+    std::vector<std::vector<double>> m_largeCos; /**< large cosine calibration constants */
     ClassDef(CDCDedxCosineEdge, 1); /**< ClassDef */
   };
 } // end namespace Belle2

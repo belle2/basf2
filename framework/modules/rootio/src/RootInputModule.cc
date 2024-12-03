@@ -339,8 +339,6 @@ void RootInputModule::initialize()
   }
   // And setup global tag replay ...
   Conditions::Configuration::getInstance().setInputMetadata(fileMetaData);
-
-  m_eventExtraInfo.registerInDataStore();
 }
 
 
@@ -348,8 +346,6 @@ void RootInputModule::event()
 {
   if (!m_tree)
     return;
-
-  if (not m_eventExtraInfo.isValid()) m_eventExtraInfo.create();
 
   while (true) {
     const long nextEntry = InputController::getNextEntry(m_isSecondaryInput);

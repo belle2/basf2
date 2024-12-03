@@ -10,11 +10,9 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/Environment.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <string>
 #include <vector>
@@ -230,8 +228,5 @@ namespace Belle2 {
      * this has to be set to true
      * */
     bool m_isSecondaryInput{false};
-
-    /** event extra info object pointer */
-    StoreObjPtr<EventExtraInfo> m_eventExtraInfo;
   };
 } // end namespace Belle2

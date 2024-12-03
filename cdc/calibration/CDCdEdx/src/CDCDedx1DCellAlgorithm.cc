@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <cdc/calibration/CDCdEdx/CDCDedx1DCellAlgorithm.h>
+#include <cmath>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -90,13 +92,13 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 
     ttree->GetEvent(i);
 
-    if (abs(costh) > m_cosMax) continue;
+    if (std::abs(costh) > m_cosMax) continue;
 
     // remove wide angle bhabha tracks
     // double mom = pt/sqrt(1-costh*costh);
     // if(abs(pt)<2.4 && abs(mom)>3.6)continue;
 
-    if (abs(pt) > m_ptMax) continue;
+    if (std::abs(pt) > m_ptMax) continue;
 
     //change to random 10%
     int rand = gRandom->Integer(100);
@@ -273,7 +275,7 @@ void CDCDedx1DCellAlgorithm::CreateBinMapping()
         if (isVarBins) binwidth =  m_eaBW * steps[il][ibin];
         double binvalue = pastbin + binwidth;
         pastbin = binvalue;
-        if (abs(binvalue) < 1e-5)binvalue = 0;
+        if (std::abs(binvalue) < 1e-5)binvalue = 0;
         m_binValue[il].push_back(binvalue);
       }
       temp = ieaprime;

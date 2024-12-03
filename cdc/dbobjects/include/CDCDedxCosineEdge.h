@@ -7,11 +7,14 @@
  **************************************************************************/
 
 #pragma once
-#include <TObject.h>
-#include <vector>
-#include <cmath>
+
 #include <framework/logging/Logger.h>
-#include <iostream>
+
+#include <TObject.h>
+
+#include <cmath>
+#include <vector>
+
 
 namespace Belle2 {
 
@@ -158,7 +161,7 @@ namespace Belle2 {
       }
 
       if (temp.size() == 0) return -99.0;
-      double bw = abs(coshigh - coslow) / temp.size();
+      double bw = std::abs(coshigh - coslow) / temp.size();
       double bc = coslow  + (0.5 + ibin) * bw; //bin centre
       std::cout << "Par # " << ibin << ", costh bin centre = " << bc << ", const =" << temp[ibin] << std::endl;
       return temp[ibin];
@@ -185,7 +188,7 @@ namespace Belle2 {
       }
 
       if (temp.size() == 0) return;
-      double bw = abs(coshigh - coslow) / temp.size();
+      double bw = std::abs(coshigh - coslow) / temp.size();
       B2INFO("Printing parameters (0=backward and 1=forward): " << side << ", nPars = " << temp.size());
       for (unsigned int ibin = 0; ibin < temp.size(); ibin++) {
         double bc = coslow  + (0.5 + ibin) * bw; //bin centre
@@ -214,7 +217,7 @@ namespace Belle2 {
       }
 
       m_largeCos[iside][ibin] = value;
-      std::cout << "Par # " << ibin << ", const = " << m_largeCos[iside][ibin] << std::endl;
+      B2DEBUG(20, "Par # " << ibin << ", const = " << m_largeCos[iside][ibin]);
     };
 
 

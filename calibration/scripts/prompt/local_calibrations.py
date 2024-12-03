@@ -26,39 +26,13 @@ settings_local_calibrations = {
             "SVDLocalConfigParameters",
         ]
     },
-    "cdc": {
-        "user_dvthanh_cdc_bucket40_41": [
-            "CDCBadWires",
-            "CDCSpaceResols",
-            "CDCTimeWalks",
-            "CDCTimeZeros",
-            "CDCXtRelations",
-        ]
-    },
-    "ecl": {
-        "user_hearty_for_prompt": [
-            "ECLLeakageCorrections",
-            "ECLnOptimal",
-            "TRGECLBadRuns",
-            "TRGECLETMParas",
-            "TRGECLFAMParas",
-            "TRGECLTMMParas",
-        ]
-    },
+    "cdc": {},
+    "ecl": {},
     "top": {},
     "arich": {},
     "klm": {},
     "trigger": {},
     "tracking": {},
-    "alignment": {
-        "user_bilkat_alignment_b37_prompt_it3": [
-            "CDCAlignment",
-            "CDCAlignment_CORRECTIONS",
-            "CDCAlignment_ERRORS",
-            "VXDAlignment",
-            "VXDAlignment_CORRECTIONS",
-            "VXDAlignment_ERRORS",
-        ]
-    },
+    "alignment": {},
     "beam": {},
 }

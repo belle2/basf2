@@ -254,7 +254,7 @@ namespace Belle2 {
 
       // build and place module wall
       G4Box* tempBox = new G4Box("tempBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick,
-                                 modZsize / 2. + 0.1); // Dont't care about "+0.1", needs to be there.
+                                 modZsize / 2. + 0.1); // Don't care about "+0.1", needs to be there.
       G4SubtractionSolid* moduleWall = new G4SubtractionSolid("Box-tempBox", moduleBox, tempBox);
       G4LogicalVolume* lmoduleWall = new G4LogicalVolume(moduleWall, wallMaterial, "moduleWall");
       setColor(*lmoduleWall, "rgb(1.0,0.0,0.0,1.0)");

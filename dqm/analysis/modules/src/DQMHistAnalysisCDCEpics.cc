@@ -393,6 +393,19 @@ void DQMHistAnalysisCDCEpicsModule::event()
       } else {
         m_hist_attach_eff[ij]->SetStats(0);
         m_hist_attach_eff[ij]->Draw("COLZ");
+        int isl = 0;
+        TEllipse* el[9];
+        for (int ilay = 0; ilay < 56; ilay++) {
+          int rmdr = int(abs(ilay - 2) % 6);
+          if ((rmdr == 0 && ilay > 2) || ilay == 55) {
+            isl++;
+            el[isl] = new TEllipse(0, 0, lbinEdges[ilay], lbinEdges[ilay]);
+            el[isl]->SetLineColor(kRed);
+            el[isl]->SetLineWidth(2);
+            el[isl]->SetFillStyle(0);
+            el[isl]->Draw("same");
+          }
+        }
       }
       if (ij == 2)
         latex.DrawLatexNDC(0.12, 0.87, TString::Format("mean = %.3f%%", meanWireAttachProb * 100.0));
@@ -469,10 +482,12 @@ void DQMHistAnalysisCDCEpicsModule::fillEffiTH2(TH2F* hist, TH2F* attached, TH2F
   double firstR = cdcgeo.senseWireR(0);
   double secondR = cdcgeo.senseWireR(1);
   binEdges[0] = firstR - (secondR - firstR) / 2;
+  lbinEdges[0] = firstR;
   for (int lay = 1; lay < nSLayers; lay++) {
     double prevR = cdcgeo.senseWireR(lay - 1);
     double currentR = cdcgeo.senseWireR(lay);
     binEdges[lay] = (prevR + currentR) / 2;
+    lbinEdges[lay] = currentR;
   }
   double lastR = cdcgeo.senseWireR(nSLayers - 1);
   double secondLastR = cdcgeo.senseWireR(nSLayers - 2);

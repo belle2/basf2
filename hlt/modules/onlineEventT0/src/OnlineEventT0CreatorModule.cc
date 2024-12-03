@@ -23,7 +23,7 @@ OnlineEventT0CreatorModule::OnlineEventT0CreatorModule() : Module()
                  "By default, this module is run only on the online systems unless the user "
                  "specifically requires to execute it.");
   addParam("executeThisModule", m_executeThisModule,
-           "Execute this module: if True, this module is executed durig the reconstruction, otherwise not.", false);
+           "Execute this module: if True, this module is executed during the reconstruction, otherwise not.", false);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 

@@ -30,6 +30,7 @@ namespace Belle2 {
 
     /**
      * Constructor
+     * @param cosgains vector of calibration constants
      */
     explicit CDCDedxCosineCor(const std::vector<double>& cosgains): m_cosgains(cosgains) {};
 
@@ -55,32 +56,44 @@ namespace Belle2 {
       return *this;
     }
 
-    /** Get the number of bins for the cosine correction
+    /**
+     * Get the number of bins for the cosine correction
+     * @return number of bins
      */
     unsigned int getSize() const { return m_cosgains.size(); };
 
-    /** Get the cosine correction
+    /**
+     * Get the calibration constants
+     * @return calibration constants
      */
-    std::vector<double> getCosCor() const {return m_cosgains; };
+    const std::vector<double>& getCosCor() const {return m_cosgains; };
 
-    /** Set the cosine correction
+    /**
+     * Set the cosine correction
+     * @param bin bin number
+     * @param value value to be set
      */
-    void setCosCor(int bin, double value)
+    void setCosCor(unsigned int bin, double value)
     {
-      m_cosgains[bin] = value;
+      if (bin < m_cosgains.size()) m_cosgains[bin] = value;
+      else B2ERROR("CDCDedxCosineCor: invalid bin number, value not set");
     }
 
-    /** Return dE/dx mean value for the given bin
+    /**
+     * Return dE/dx mean value for the given bin
      * @param bin for const with cosine bin
+     * @return mean value
      */
     double getMean(unsigned int bin) const
     {
-      if (bin > m_cosgains.size()) return 1.0;
-      else return m_cosgains[bin];
+      if (bin < m_cosgains.size()) return m_cosgains[bin];
+      return 1.0;
     }
 
-    /** Return dE/dx mean value for given cos(theta)
+    /**
+     * Return dE/dx mean value for given cos(theta)
      * @param costh for const with costh theta value
+     * @return mean value
      */
     double getMean(double costh) const
     {

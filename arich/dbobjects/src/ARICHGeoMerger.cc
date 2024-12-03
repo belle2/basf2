@@ -27,7 +27,7 @@ void ARICHGeoMerger::print(const std::string& title) const
        << "Y0 merger PCB assembly envelope                         : " << getEnvelopeCenterPosition().Y() << endl
        << "Z0 merger PCB assembly envelope                         : " << getEnvelopeCenterPosition().Z() << endl;
   cout << "merger PCB material name                                : " << getMergerPCBMaterialName() << endl
-       << "merger PCB lenght                                       : " << getSizeL() << endl
+       << "merger PCB length                                       : " << getSizeL() << endl
        << "merger PCB width                                        : " << getSizeW() << endl
        << "merger PCB thickness                                    : " << getThickness() << endl;
   cout << "merger PCB screw whole radius                           : " << getMergerPCBscrewholeR() << endl
@@ -64,23 +64,23 @@ void ARICHGeoMerger::checkMergerPositionsDataConsistency() const
 {
 
   //if(m_mergerSlotID.size() != m_mergerPosR.size()){
-  //string outMessage = " Data of the merger board positions is inconsisten : m_mergerSlotID.size() != m_mergerPosR.size() ";
+  //string outMessage = " Data of the merger board positions is inconsistent : m_mergerSlotID.size() != m_mergerPosR.size() ";
   //B2ERROR( outMessage << endl );
   //B2FATAL(outMessage);
   //}
   //if(m_mergerSlotID.size() != m_mergerAngle.size()){
-  //string outMessage = " Data of the merger board positions is inconsisten : m_mergerSlotID.size() != m_mergerAngle.size() ";
+  //string outMessage = " Data of the merger board positions is inconsistent : m_mergerSlotID.size() != m_mergerAngle.size() ";
   //B2ERROR( outMessage << endl );
   //B2FATAL(outMessage);
   //}
 
-  B2ASSERT("Data of the merger board positions is inconsisten : getEnvelopeThickness() <= getThickness() ",
+  B2ASSERT("Data of the merger board positions is inconsistent : getEnvelopeThickness() <= getThickness() ",
            getEnvelopeThickness() > getThickness());
-  B2ASSERT("Data of the merger board positions is inconsisten : m_mergerSlotID.size() != m_mergerPosR.size()",
+  B2ASSERT("Data of the merger board positions is inconsistent : m_mergerSlotID.size() != m_mergerPosR.size()",
            m_mergerSlotID.size() == m_mergerPosR.size());
-  B2ASSERT("Data of the merger board positions is inconsisten : m_mergerSlotID.size() != m_mergerAngle.size()",
+  B2ASSERT("Data of the merger board positions is inconsistent : m_mergerSlotID.size() != m_mergerAngle.size()",
            m_mergerSlotID.size() == m_mergerAngle.size());
-  B2ASSERT("Data of the merger board positions is inconsisten : m_mergerSlotID.size() != m_singlemergerenvelopeDeltaZ.size()",
+  B2ASSERT("Data of the merger board positions is inconsistent : m_mergerSlotID.size() != m_singlemergerenvelopeDeltaZ.size()",
            m_mergerSlotID.size() == m_singlemergerenvelopeDeltaZ.size());
 
 }

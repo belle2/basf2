@@ -344,12 +344,12 @@ namespace Belle2 {
     void exportAerogelMap();
 
     /**
-     * Import intrarun dependant ARICH aerogel data in the database. -> Example for intrarun dependat data!
+     * Import intrarun dependent ARICH aerogel data in the database. -> Example for intrarun dependat data!
      */
     void importAerogelInfoEventDep();
 
     /**
-     * Export intrarun dependant ARICH aerogel data from the database. -> Example for intrarun dependat data!
+     * Export intrarun dependent ARICH aerogel data from the database. -> Example for intrarun dependat data!
      */
     void exportAerogelInfoEventDep();
 

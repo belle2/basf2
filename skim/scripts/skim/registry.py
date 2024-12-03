@@ -220,6 +220,7 @@ _RegisteredSkims = [
     ("18370100", "dark", "AA2uuuu"),
     ("18020600", "dark", "DimuonPlusVisibleDarkHiggs"),
     ("18020700", "dark", "DielectronPlusVisibleDarkHiggs"),
+    ("18022400", "dark", "DimuonRecoilMassSquared"),
     ("18530600", "lowMulti", "LowMassOneTrack"),
     ("18022500", "dark", "DarkShower"),
 

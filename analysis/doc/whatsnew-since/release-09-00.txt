@@ -1,6 +1,13 @@
 Changes in the analysis package in light-2411-aldebaran
 -------------------------------------------------------
 
+Modular Analysis
+++++++++++++++++
+* Add options to `modularAnalysis.writePi0EtaVeto` to:
+    * Require the soft photon being in the current RestOfEvent.
+    * Add separate selections to be applied during `modularAnalysis.reconstructDecay` for both the :math:`\pi^0` as well as
+      the :math:`\eta` reconstruction.
+
 Kinematic Fitting tools
 +++++++++++++++++++++++
 * Added option to prepend label to OrkaKinfit variables to allow multiple fits to be performed in same path.
@@ -13,6 +20,16 @@ Variables
   covariance matrix `TagVCov`.
 * Added `int` metavariable that can convert the floating point variables output to an integer value, 
   that can be saved correctly by `VariablesToNtuple` module into an integer branch of a TTree. 
+
+Modules
++++++++
+* Add support for storing ``FileMetaData`` to `VariablesToNtuple` module. Ntuples will now have a ``persistent``
+  tree with ``FileMetaData`` branch with the relevant metadata information. 
+    * Add a new option ``dataDescription`` to `VariablesToNtuple` which accepts a dictionary of key:value pairs,
+      allowing users to store additional information in the ntuple metadata.
+    * Add ntuple file support to ``b2file-merge``, which is now the recommended tool to merge ntuples over
+      ``hadd``. ``b2file-metadata-show`` and ``b2file-metadata-add`` will also work with ntuples. 
+* Added a tunable buffer to the ``VariabesToTable`` module to improve compression efficiency and feather as new output format.
 
 Changes in the analysis package in light-2409-toyger
 ----------------------------------------------------
@@ -53,3 +70,5 @@ Charm Flavor Tagger
 * Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
   function ``charmFlavorTagger``) to ``CFT_ragdoll``. This value must be used for all releases as recent as
   light-2406-ragdoll and release-09.
+
+

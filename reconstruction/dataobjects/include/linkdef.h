@@ -5,6 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class Belle2::CDCDedxHit+; // checksum=0xfb665330, version=1
 #pragma link C++ class Belle2::CDCDedxTrack+; // checksum=0x3f67dbb7, version=17
 #pragma link C++ class Belle2::CDCDedxLikelihood+; // checksum=0x6c4f61c2, version=1
 #pragma link C++ class Belle2::VXDDedxTrack+; // checksum=0xf617c631, version=2

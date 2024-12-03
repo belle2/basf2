@@ -46,7 +46,7 @@ namespace Belle2 {
     /** Return vector of sigma parameters
      * @return vector of sigma parameters
      */
-    std::vector<double> getSigmaPars() const {return m_sigmapars; };
+    const std::vector<double>& getSigmaPars() const {return m_sigmapars; };
 
     /** Return specific sigma parameters
      * @return specific sigma parameters
@@ -64,7 +64,21 @@ namespace Belle2 {
      */
     void setSigmaPar(int par, double value) {m_sigmapars[par] = value; };
 
+    /**
+     * Returns predicted dE/dx sigma
+     * @param dedx predicted mean
+     * @param nhit number of measurements
+     * @param cosTheta cosine of polar angle
+     * @param timeReso injection time resolution scaling factor
+     * @return predicted sigma
+     */
+    double getSigma(double dedx, double nhit, double cosTheta, double timeReso) const;
+
   private:
+
+    /** parameterized resolution for predictions */
+    double sigmaCurve(double x, const double* par, int version) const;
+
     short m_version{ -1}; /**< version number for sigma parameterization */
     std::vector<double> m_sigmapars; /**< dE/dx resolution parameters */
 

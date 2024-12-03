@@ -65,27 +65,28 @@ namespace Belle2 {
 
     /** Get the 2D histogram for the correction for this layer
      */
-    const TH2F* getHist(int layer) const
+    const TH2F* getHist(unsigned int layer) const
     {
       if (m_twodgains.size() == 0) {
-        B2ERROR("ERROR!");
-        return NULL;
+        B2ERROR("CDCDedx2DCell: vector too short");
+        return nullptr;
       }
 
       if (m_twodgains.size() == 2) {
         if (layer == 0) return &m_twodgains[0];
         else if (layer == 1) return &m_twodgains[1];
         else {
-          B2ERROR("ERROR! const histograms NOT found");
-          return NULL;
+          B2ERROR("CDCDedx2DCell: const histograms NOT found");
+          return nullptr;
         }
       } else if (m_twodgains.size() == 56) {
-        return &m_twodgains[layer];
+        if (layer < m_twodgains.size()) return &m_twodgains[layer];
       } else {
-        B2ERROR("ERROR! Something is wrong # of const histograms");
-        return NULL;
+        B2ERROR("CDCDedx2DCell: Something is wrong # of const histograms");
+        return nullptr;
       }
-      return NULL;
+      B2ERROR("CDCDedx2DCell: wrong layer number");
+      return nullptr;
     }
 
     /** Return dE/dx mean value for the given bin
@@ -95,11 +96,14 @@ namespace Belle2 {
      */
     double getMean(unsigned int layer, int dbin, int ebin) const
     {
-      int mylayer = 0;
+      unsigned int mylayer = 0;
       if (layer >= 8 && m_twodgains.size() == 2) mylayer = 1;
       else if (m_twodgains.size() == 56) mylayer = layer;
 
-      return m_twodgains[mylayer].GetBinContent(dbin, ebin);
+      if (mylayer < m_twodgains.size()) return m_twodgains[mylayer].GetBinContent(dbin, ebin);
+
+      B2ERROR("CDCDedx2DCell: wrong layer number, returning 1");
+      return 1.0;
     }
 
     /** Return dE/dx mean value for given DOCA and entrance angle
@@ -114,9 +118,14 @@ namespace Belle2 {
         return 0;
       }
 
-      int mylayer = 0;
+      unsigned int mylayer = 0;
       if (layer >= 8 && m_twodgains.size() == 2) mylayer = 1;
       else if (m_twodgains.size() == 56) mylayer = layer;
+
+      if (mylayer >= m_twodgains.size()) {
+        B2ERROR("CDCDedx2DCell: wrong layer number, returning 1");
+        return 1.0;
+      }
 
       // assume rotational symmetry
       if (enta < -3.1416 / 2.0) enta += 3.1416 / 2.0;

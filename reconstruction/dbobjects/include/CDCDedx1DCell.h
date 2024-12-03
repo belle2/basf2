@@ -12,7 +12,6 @@
 
 #include <TObject.h>
 #include <cmath>
-#include <TMath.h>
 
 namespace Belle2 {
 
@@ -85,7 +84,7 @@ namespace Belle2 {
           return 0;
         }
       } else if (m_onedgains.size() == 56) {
-        return m_onedgains[layer].size();
+        if (layer < m_onedgains.size()) return m_onedgains[layer].size();
       } else {
         B2ERROR("ERROR! Wrong # of constants vector array: getNBins()");
         return 0;
@@ -99,13 +98,13 @@ namespace Belle2 {
      */
     double getMean(unsigned int layer, unsigned int bin) const
     {
-      int mylayer = 0;
+      unsigned int mylayer = 0;
       if (layer >= 8 && m_onedgains.size() == 2) mylayer = 1;
       else if (m_onedgains.size() == 56) mylayer = layer;
 
-      if (bin < m_onedgains[mylayer].size())
-        return m_onedgains[mylayer][bin];
-      else return 1.0;
+      if (mylayer < m_onedgains.size() and bin < m_onedgains[mylayer].size()) return m_onedgains[mylayer][bin];
+
+      return 1.0;
     };
 
     /** Reset dE/dx mean value for the given bin
@@ -115,12 +114,11 @@ namespace Belle2 {
     */
     void setMean(unsigned int layer, unsigned int bin, double value)
     {
-      int mylayer = 0;
+      unsigned int mylayer = 0;
       if (layer >= 8 && m_onedgains.size() == 2) mylayer = 1;
       else if (m_onedgains.size() == 56) mylayer = layer;
 
-      if (bin < m_onedgains[mylayer].size()) m_onedgains[mylayer][bin] = value;
-      else m_onedgains[mylayer][bin] = 1.0;
+      if (mylayer < m_onedgains.size() and bin < m_onedgains[mylayer].size()) m_onedgains[mylayer][bin] = value;
     };
 
     /** Return dE/dx mean value for given entrance angle
@@ -134,11 +132,13 @@ namespace Belle2 {
         return 0;
       }
 
-      int mylayer = 0;
+      unsigned int mylayer = 0;
       if (layer >= 8 && m_onedgains.size() == 2) mylayer = 1;
       else if (m_onedgains.size() == 56) mylayer = layer;
 
-      double piby2 =  TMath::Pi() / 2.0;
+      if (mylayer >= m_onedgains.size()) return 1.0;
+
+      double piby2 =  M_PI / 2.0;
       // assume rotational symmetry
       if (enta < -piby2) enta += piby2;
       if (enta > piby2) enta -= piby2;

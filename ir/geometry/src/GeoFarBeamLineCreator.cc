@@ -679,7 +679,7 @@ namespace Belle2 {
         FarBeamLineElement collimator_body1;
         FarBeamLineElement collimator_body2;
 
-        // reuse head transfomation with additional shift
+        // reuse head transformation with additional shift
         if (type == "vertical") {
           collimator_body1.transform = G4Translate3D(0.0, -head_dz - body_dz, 0.0) * transform_head1;
           collimator_body2.transform = G4Translate3D(0.0, head_dz + body_dz, 0.0) * transform_head2;

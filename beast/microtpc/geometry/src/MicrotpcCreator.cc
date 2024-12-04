@@ -15,7 +15,6 @@
 #include <framework/logging/Logger.h>
 
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
@@ -118,12 +117,12 @@ namespace Belle2 {
       //values will be automatically converted
       vector<double> bar = content.getArray("bar");
       B2INFO("Contents of bar: ");
-      BOOST_FOREACH(double value, bar) {
+      for (double value : bar) {
         B2INFO("value: " << value);
       }
       int detID = 0;
       //Lets loop over all the Active nodes
-      BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+      for (const GearDir& activeParams : content.getNodes("Active")) {
 
         G4double inch = 2.54 * CLHEP::cm;
 

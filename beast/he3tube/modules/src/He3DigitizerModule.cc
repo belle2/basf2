@@ -18,7 +18,6 @@
 
 //c++
 #include <cmath>
-#include <boost/foreach.hpp>
 #include <string>
 #include <fstream>
 #include <stdlib.h>
@@ -78,18 +77,18 @@ void He3DigitizerModule::event()
   StoreArray<He3tubeSimHit> He3SimHits;
   StoreArray<He3tubeHit> He3Hits;
 
-  auto peak = new double[numOfTubes]();
-  auto lowTime = new double[numOfTubes]();  //earliest deposit in each tube
-  std::fill_n(lowTime, numOfTubes, 9999999999999);
-  auto edepDet = new double[numOfTubes]();  //total energy deposited per tube
-  auto NbEle_tot = new double[numOfTubes]();
-
   //skip events with no He3SimHits, but continue the event counter
   if (He3SimHits.getEntries() == 0) {
     B2DEBUG(250, "Skipping event #" << Event << " since there are no sim hits");
     Event++;
     return;
   }
+
+  auto peak = new double[numOfTubes]();
+  auto lowTime = new double[numOfTubes]();  //earliest deposit in each tube
+  std::fill_n(lowTime, numOfTubes, 9999999999999);
+  auto edepDet = new double[numOfTubes]();  //total energy deposited per tube
+  auto NbEle_tot = new double[numOfTubes]();
 
   auto definiteNeutron = new bool[numOfTubes]();
   //vector<int> neutronIDs;
@@ -103,10 +102,9 @@ void He3DigitizerModule::event()
     for (int i = 0; i < nMCParticles; ++i) {
       MCParticle& mcp = *mcParticles[i];
 
-      //Find all He3tubeSimHits which point from that MCParticle using a typedef and BOOST_FOREACH
-      //The typedef is needed as BOOST_FOREACH is a macro and cannot handle anything including a comma
+      // Find all He3tubeSimHits which point from that MCParticle.
       typedef RelationIndex<MCParticle, He3tubeSimHit>::Element relMCSimHit_Element;
-      BOOST_FOREACH(const relMCSimHit_Element & relation, relMCSimHit.getElementsFrom(mcp)) {
+      for (const relMCSimHit_Element& relation : relMCSimHit.getElementsFrom(mcp)) {
 
         //int processNum = mcp.getSecondaryPhysicsProcess();
 
@@ -203,7 +201,7 @@ void He3DigitizerModule::getXMLData()
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"HE3TUBE\"]/Content/");
 
   //get the location of the tubes
-  BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+  for (const GearDir& activeParams : content.getNodes("Active")) {
     B2DEBUG(250, "Tubes located at x=" << activeParams.getLength("x_he3tube"));
     numOfTubes++;
   }

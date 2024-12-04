@@ -15,7 +15,6 @@
 #include <framework/logging/Logger.h>
 
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
@@ -59,12 +58,12 @@ namespace Belle2 {
       //values will be automatically converted
       vector<double> bar_diamond = content.getArray("bar_diamond");
       B2INFO("Contents of bar_diamond: ");
-      BOOST_FOREACH(double value, bar_diamond) {
+      for (double value : bar_diamond) {
         B2INFO("value: " << value);
       }
       int diamondNb = 200;
       //Lets loop over all the Active nodes
-      BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+      for (const GearDir& activeParams : content.getNodes("Active")) {
 
         //create diamond volume
         G4Box* s_DIAMOND = new G4Box("s_DIAMOND",

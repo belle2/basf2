@@ -319,7 +319,7 @@ void BabayagaNLO::setDefaultSettings()
 void BabayagaNLO::initExtraInfo()
 {
   StoreObjPtr<EventExtraInfo> extrainfo;
-  extrainfo.registerInDataStore();
+  extrainfo.isRequired();
 }
 
 void BabayagaNLO::init()

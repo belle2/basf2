@@ -68,10 +68,10 @@ void MVAExpertModule::initialize()
 
   if (m_listNames.empty()) {
     StoreObjPtr<EventExtraInfo> extraInfo("", DataStore::c_Event);
-    extraInfo.registerInDataStore();
+    extraInfo.isRequired();
   } else {
     StoreObjPtr<ParticleExtraInfoMap> extraInfo("", DataStore::c_Event);
-    extraInfo.registerInDataStore();
+    extraInfo.isRequired();
   }
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {

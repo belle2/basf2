@@ -100,8 +100,7 @@ class NNFilterModule(b2.Module):
 
         #: StoreArray to save weights to
         self.EventExtraInfo = Belle2.PyStoreObj('EventExtraInfo')
-        if not self.EventExtraInfo.isValid():
-            self.EventExtraInfo.registerInDataStore()
+        self.EventExtraInfo.isRequired()
         #: Initialise event metadata from data store
         self.EventInfo = Belle2.PyStoreObj('EventMetaData')
         #: node features

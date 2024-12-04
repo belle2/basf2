@@ -56,7 +56,8 @@ class InitialiseSkimFlag(b2.Module):
         """
         Initialise flags to zero.
         """
-        self.EventExtraInfo.create()
+        if not self.EventExtraInfo.isValid():
+            self.EventExtraInfo.create()
         for skim in self.skims:
             self.EventExtraInfo.addExtraInfo(skim.flag, 0)
 

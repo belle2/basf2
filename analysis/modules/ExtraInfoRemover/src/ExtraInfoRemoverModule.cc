@@ -49,6 +49,9 @@ void ExtraInfoRemoverModule::event()
   }
 
   if (m_removeEventExtraInfo)  {
+    if (not m_eventExtraInfo.isValid()) {
+      m_eventExtraInfo.create();
+    }
     m_eventExtraInfo->removeExtraInfo();
   }
 

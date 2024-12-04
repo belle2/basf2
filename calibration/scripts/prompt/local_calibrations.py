@@ -13,6 +13,9 @@ b2conditionsdb iovs copy --replace -rf "(payload1|payload2)" --run-range X Y Z K
 ```
 """
 
+#: Settings of local calibrations:
+#: for each subsystem there should be a dictionary with
+#: `{global_tag_name: [list, of, payloads, names]}`
 settings_local_calibrations = {
     "pxd": {},
     "svd": {

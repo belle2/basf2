@@ -730,7 +730,8 @@ def main():
 
         elif args.jsons or args.register:
 
-            mctypes = getMCtype(args.mctype)
+            if args.jsons:
+                mctypes = getMCtype(args.mctype)
             skims = args.skims
             release = getRelease(infoDict, args.release)
             for skim in skims:

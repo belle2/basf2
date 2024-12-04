@@ -17,9 +17,9 @@ b2conditionsdb iovs copy --replace -rf "(payload1|payload2)" --run-range X Y Z K
 #: for each subsystem there should be a dictionary with
 #: `{global_tag_name: [list, of, payloads, names]}`
 settings_local_calibrations = {
-    "pxd": {},
+    "pxd": {"pxd_local_staging": []},
     "svd": {
-        "svd_loadedOnFADC": [
+        "svd_local_staging": [
             "SVDNoiseCalibrations",
             "SVDPedestalCalibrations",
             "SVDPulseShapeCalibrations",
@@ -29,13 +29,13 @@ settings_local_calibrations = {
             "SVDLocalConfigParameters",
         ]
     },
-    "cdc": {},
-    "ecl": {},
-    "top": {},
-    "arich": {},
-    "klm": {},
-    "trigger": {},
-    "tracking": {},
-    "alignment": {},
-    "beam": {},
+    "cdc": {"cdc_local_staging": []},
+    "ecl": {"ecl_local_staging": []},
+    "top": {"top_local_staging": []},
+    "arich": {"arich_local_staging": []},
+    "klm": {"klm_local_staging": []},
+    "trigger": {"trigger_local_staging": []},
+    "tracking": {"tracking_local_staging": []},
+    "alignment": {"alignment_local_staging": []},
+    "beam": {"beam_local_staging": []},
 }

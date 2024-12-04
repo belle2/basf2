@@ -28,6 +28,7 @@ ExtraInfoRemoverModule::ExtraInfoRemoverModule() : Module()
 
 void ExtraInfoRemoverModule::initialize()
 {
+  m_eventExtraInfo.isRequired();
 }
 
 void ExtraInfoRemoverModule::event()

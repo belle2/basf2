@@ -801,18 +801,19 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgOccupancyUV(TH1F* hU,
   int maxLayer = (layer != -1) ? layer : m_gTools->getLastSVDLayer();
   int sensorsN = 0;
 
+  if (ladder == 0) ladder = -1;
+
   for (int layerId = minLayer; layerId < maxLayer + 1; ++layerId) {
     int minLadder = (ladder != -1) ? ladder : 1;
     int maxLadder = (ladder != -1) ? ladder : getNumberOfLadders(layerId);
 
     int minSensor = (sensor != -1) ? sensor : 1;
-    int maxSensor = (sensor != -1) ? sensor : getNumberOfSesnors(layerId);
+    int maxSensor = (sensor != -1) ? sensor : getNumberOfSensors(layerId);
 
     for (int sensorId = minSensor; sensorId < maxSensor + 1; ++sensorId) {
 
       for (int ladderId = minLadder; ladderId < maxLadder + 1; ++ladderId) {
-        VxdID sensorID(layerId, ladderId, sensorId);
-        int bin = m_gTools->getSVDSensorIndex(sensorID) + 1;
+        int bin = m_gTools->getSVDSensorIndex(layerId, ladderId, sensorId) + 1;
 
         avgOffOccUV[0] += hU->GetBinContent(bin) / 768 * 100;
         avgOffOccUV[1] += hV->GetBinContent(bin) / nStripsV * 100;
@@ -886,16 +887,17 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgEfficiencyUV(TH2F* hM
   std::vector<float> sumMatchedClustersUV(2, 0.0);
   std::vector<float> sumFoundTracksUV(2, 0.0);
 
-
   int minLayer = (layer != -1) ? layer : m_gTools->getFirstSVDLayer();
   int maxLayer = (layer != -1) ? layer : m_gTools->getLastSVDLayer();
+
+  if (ladder == 0) ladder = -1;
 
   for (int layerId = minLayer; layerId < maxLayer + 1; ++layerId) {
     int minLadder = (ladder != -1) ? ladder : 1;
     int maxLadder = (ladder != -1) ? ladder : getNumberOfLadders(layerId);
 
     int minSensor = (sensor != -1) ? sensor : 1;
-    int maxSensor = (sensor != -1) ? sensor : getNumberOfSesnors(layerId);
+    int maxSensor = (sensor != -1) ? sensor : getNumberOfSensors(layerId);
 
     for (int sensorId = minSensor; sensorId < maxSensor + 1; ++sensorId) {
 

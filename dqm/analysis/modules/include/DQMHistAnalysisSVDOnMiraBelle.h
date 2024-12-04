@@ -145,7 +145,7 @@ namespace Belle2 {
     }
 
     /** get number of sensors per layer*/
-    Int_t getNumberOfSesnors(Int_t layer) const
+    Int_t getNumberOfSensors(Int_t layer) const
     {
       if (layer == 3)
         return 2;

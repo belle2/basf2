@@ -101,6 +101,32 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_triggerVariablesHistograms[variable]->SetXTitle(("SoftwareTriggerVariable " + variable).c_str());
   }
 
+  for (const std::string& trigger : m_param_l1Identifiers) {
+    m_l1Histograms.emplace(trigger, new TH1F(trigger.c_str(), ("Events triggered in L1 " + trigger).c_str(), 150, 0, 150));
+    m_l1Histograms[trigger]->SetXTitle("HLT line");
+    m_l1Histograms[trigger]->SetOption("hist");
+    m_l1Histograms[trigger]->SetStats(false);
+    m_l1Histograms[trigger]->SetMinimum(0);
+
+    float index = 0;
+    for (auto const& cutIdentifier : m_param_cutResultIdentifiers) {
+      const std::string& title = cutIdentifier.first;
+      const auto& mapVal = *(m_param_cutResultIdentifiers[title].begin());
+      const std::string& baseIdentifier = mapVal.first;
+      const auto& cuts = mapVal.second;
+
+      if (title == baseIdentifier) {
+        for (const std::string& cutTitle : cuts) {
+          index++;
+          m_l1Histograms[trigger]->GetXaxis()->SetBinLabel(index, cutTitle.c_str());
+        }
+      }
+    }
+    index++;
+    m_l1Histograms[trigger]->GetXaxis()->SetBinLabel(index, "hlt_result");
+    m_l1Histograms[trigger]->LabelsDeflate();
+  }
+
   for (const auto& cutIdentifier : m_param_cutResultIdentifiers) {
 
     const std::string& title = cutIdentifier.first;
@@ -154,18 +180,7 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_cutResultHistograms["total_result"]->SetOption("hist");
     m_cutResultHistograms["total_result"]->SetStats(false);
     m_cutResultHistograms["total_result"]->SetMinimum(0);
-  }
 
-  for (const std::string& trigger : m_param_l1Identifiers) {
-    m_l1Histograms.emplace(trigger, new TH1F(trigger.c_str(), ("Events triggered in L1 " + trigger).c_str(), 1, 0, 0));
-    m_l1Histograms[trigger]->SetXTitle("");
-    m_l1Histograms[trigger]->SetOption("hist");
-    m_l1Histograms[trigger]->SetStats(false);
-    m_l1Histograms[trigger]->SetMinimum(0);
-  }
-
-  // And also one for the total numbers
-  if (m_param_create_total_result_histograms) {
     m_l1Histograms.emplace("l1_total_result",
                            new TH1F("l1_total_result", "Events triggered in L1 (total results)", 1, 0, 0));
     m_l1Histograms["l1_total_result"]->SetXTitle("Total L1 Cut Result");
@@ -341,21 +356,19 @@ void SoftwareTriggerHLTDQMModule::event()
       }
     }
 
-    if (m_l1TriggerResult.isValid() and m_l1NameLookup.isValid()) {
+    if (m_l1TriggerResult.isValid()) {
       float l1Index = 0;
       for (const std::string& l1Trigger : m_param_l1Identifiers) {
         l1Index++;
-        const int triggerBit = m_l1NameLookup->getoutbitnum(l1Trigger.c_str());
-        if (triggerBit < 0) {
-          B2WARNING("Could not find"
-                    << LogVar("L1 trigger line", l1Trigger));
-          continue;
-        }
         bool triggerResult;
         try {
-          triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
+          triggerResult = m_l1TriggerResult->testPsnm(l1Trigger.c_str());
         } catch (const std::exception&) {
-          triggerResult = false;
+          try {
+            triggerResult = m_l1TriggerResult->testInput(l1Trigger.c_str());
+          } catch (const std::exception&) {
+            triggerResult = false;
+          }
         }
         if (m_param_create_total_result_histograms) {
           if (triggerResult) {
@@ -367,6 +380,7 @@ void SoftwareTriggerHLTDQMModule::event()
           continue;
         }
 
+        float index = 0;
         for (auto const& cutIdentifier : m_param_cutResultIdentifiers) {
           const std::string& title = cutIdentifier.first;
           const auto& mapVal = *(m_param_cutResultIdentifiers[title].begin());
@@ -375,6 +389,7 @@ void SoftwareTriggerHLTDQMModule::event()
 
           if (title == baseIdentifier) {
             for (const std::string& cutTitle : cuts) {
+              index++;
               const std::string& cutName = cutTitle.substr(0, cutTitle.find("\\"));
               const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
 
@@ -383,30 +398,32 @@ void SoftwareTriggerHLTDQMModule::event()
 
               if (cutEntry != results.end()) {
                 const int cutResult = cutEntry->second;
-                m_l1Histograms[l1Trigger]->Fill(cutTitle.c_str(), cutResult > 0);
+                if (cutResult > 0) {
+                  m_l1Histograms[l1Trigger]->Fill(index - 0.5);
+                }
               }
             }
           }
         }
 
+        index++;
         const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
-        m_l1Histograms[l1Trigger]->Fill("hlt_result", totalResult > 0);
-        m_l1Histograms[l1Trigger]->LabelsDeflate("X");
+        if (totalResult > 0) {
+          m_l1Histograms[l1Trigger]->Fill(index - 0.5);
+        }
       }
       if (m_param_create_total_result_histograms) {
         for (const std::string& l1Trigger : m_param_additionalL1Identifiers) {
           l1Index++;
-          const int triggerBit = m_l1NameLookup->getoutbitnum(l1Trigger.c_str());
-          if (triggerBit < 0) {
-            B2WARNING("Could not find"
-                      << LogVar("L1 trigger line", l1Trigger));
-            continue;
-          }
           bool triggerResult;
           try {
-            triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
+            triggerResult = m_l1TriggerResult->testPsnm(l1Trigger.c_str());
           } catch (const std::exception&) {
-            triggerResult = false;
+            try {
+              triggerResult = m_l1TriggerResult->testInput(l1Trigger.c_str());
+            } catch (const std::exception&) {
+              triggerResult = false;
+            }
           }
           if (triggerResult) {
             m_l1Histograms["l1_total_result"]->Fill(l1Index - 0.5);

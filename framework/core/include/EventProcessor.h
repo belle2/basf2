@@ -14,6 +14,7 @@
 #include <framework/core/ProcessStatistics.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <stdexcept>
 
@@ -160,6 +161,9 @@ namespace Belle2 {
 
     /** Stores state of EventMetaData before it was last changed. Useful since processEndRun() needs info about which run it needs to end. */
     EventMetaData m_previousEventMetaData;
+
+    /** event extra info object pointer */
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo;
 
     /** Also used in a number of places. */
     StoreObjPtr<ProcessStatistics> m_processStatisticsPtr;

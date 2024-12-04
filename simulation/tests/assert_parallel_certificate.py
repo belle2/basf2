@@ -22,4 +22,4 @@ for m in path.modules():
     if m.name() == 'BGOverlayInput':
         continue
     assert m.has_properties(
-        b2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED), '%s is missing c_ParallelProcessingCertified flag!' % (m)
+        b2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED), f'{m} is missing c_ParallelProcessingCertified flag!'

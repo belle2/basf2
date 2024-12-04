@@ -368,7 +368,8 @@ void SVDLocalCalibrationsMonitorModule::event()
         int ladder =  itSvdSensors->getLadderNumber();
         int sensor = itSvdSensors->getSensorNumber();
         Belle2::VxdID theVxdID(layer, ladder, sensor);
-        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(theVxdID));
+        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::getInstance().getSensorInfo(
+                                                     theVxdID));
         m_layer = layer;
         m_ladder = ladder;
         m_sensor = sensor;
@@ -643,6 +644,7 @@ void SVDLocalCalibrationsMonitorModule::endRun()
     m_rootFilePtr->mkdir("expert");
 
     m_rootFilePtr->cd("expert");
+    m_h2Mask->Write("h2Mask");
     m_h2Noise->Write("h2Noise");
     m_h2Occupancy->Write("h2Occupancy");
     m_h2PulseWidth->Write("h2PulseShape");

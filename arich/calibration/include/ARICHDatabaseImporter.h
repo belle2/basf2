@@ -43,7 +43,9 @@ namespace Belle2 {
                           const std::vector<std::string>& inputFilesAsicTxt, const std::vector<std::string>& inputFilesHapdQE,
                           const std::vector<std::string>& inputFilesFebTest);
 
-
+    /**
+     * Constructor from experiment and run number
+     */
     ARICHDatabaseImporter(int experiment, int run);
 
 
@@ -52,8 +54,14 @@ namespace Belle2 {
      */
     virtual ~ARICHDatabaseImporter() {};
 
+    /**
+     * Set Interval of Validity
+     */
     void SetIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
 
+    /**
+     * Set experiment and run number
+     */
     void setExperimentAndRun(int experiment, int run);
 
     // classes used in simulation/reconstruction software
@@ -205,7 +213,7 @@ namespace Belle2 {
     /**
      * Dumps aerogel tile properties (aerogel optical properties - AOP) into root file with
      * arich/utility/ARICHAerogelHist histos
-     * @param string with output name
+     * @param outRootFileName string with output name
      */
     void dumpAerogelOpticalProperties(std::string outRootFileName = "ARICH_AerogelOpticalProperties.root");
 
@@ -336,12 +344,12 @@ namespace Belle2 {
     void exportAerogelMap();
 
     /**
-     * Import intrarun dependant ARICH aerogel data in the database. -> Example for intrarun dependat data!
+     * Import intrarun dependent ARICH aerogel data in the database. -> Example for intrarun dependat data!
      */
     void importAerogelInfoEventDep();
 
     /**
-     * Export intrarun dependant ARICH aerogel data from the database. -> Example for intrarun dependat data!
+     * Export intrarun dependent ARICH aerogel data from the database. -> Example for intrarun dependat data!
      */
     void exportAerogelInfoEventDep();
 
@@ -474,7 +482,7 @@ namespace Belle2 {
 
     /**
      * Get graphs for bombardment and avalanche gain and current.
-     * @param bomb_val - bombardment or avalanche
+     * @param bomb_aval - bombardment or avalanche
      * @param g_i - gain or current
      * @param chip_label - chip label
      * @param i - number of entries
@@ -510,19 +518,19 @@ namespace Belle2 {
 
     /**
      * Export ARICH HAPD chip info data from the database and calculate bias voltages for one HAPD.
-     * @param HAPD serial number
+     * @param serialNumber HAPD serial number
      */
     void printBiasVoltagesForHapdChip(const std::string& serialNumber);
 
     /**
      * Example that shows how to use data from the database
-     * @param aerogel serial number
+     * @param aeroSerialNumber aerogel serial number
      */
     void printMyParams(const std::string& aeroSerialNumber);
 
     /**
      * Function that returns refractive index, thickness and transmission length of aerogel
-     * @param aerogel serial number
+     * @param aeroSerialNumber aerogel serial number
      */
     std::map<std::string, float> getAerogelParams(const std::string& aeroSerialNumber);
 
@@ -557,9 +565,13 @@ namespace Belle2 {
     void importSensorModuleMap();
 
     /**
-     * Export module sensor map and info classes from database
+     * Export module sensor map classes from database
      */
     void exportSensorModuleMap();
+
+    /**
+     * Export module sensor map info classes from database
+     */
     void exportSensorModuleMapInfo(int number);
 
     /**
@@ -586,7 +598,7 @@ namespace Belle2 {
     std::vector<std::string> m_inputFilesHapdQE;        /**< Input root files for HAPD quantum efficiency */
     std::vector<std::string> m_inputFilesFebTest;       /**< Input root files from FEB test (coarse/fine offset settings, test pulse) */
 
-    IntervalOfValidity m_iov;
+    IntervalOfValidity m_iov; /**< interval of validity */
 
     /**
      * @brief printContainer used for debugging purposes...

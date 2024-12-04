@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -18,7 +17,7 @@ from stdCharged import stdE, stdMu
 from variables import variables as vm
 
 __liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au>, Tommy Martinov <tommy.martinov@desy.de>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -29,13 +28,13 @@ class LeptonicUntagged(BaseSkim):
         * :math:`B^- \\to \\mu^-`
 
     Cuts applied
-        * :math:`p_{\\ell}^{*} > 2\\,\\text{GeV}` in CMS Frame
-        * :math:`\\text{electronID_noTOP} > 0.5`
+        * :math:`p_{\\ell}^{*} > 1.8\\,\\text{GeV}` in CMS Frame
+        * :math:`\\text{electronID} > 0.5`
         * :math:`\\text{muonID} > 0.5`
         * :math:`n_{\\text{tracks}} \\geq 3`
     """
 
-    __authors__ = ["Phillip Urquijo"]
+    __authors__ = ["Daniel Jacobi"]
     __contact__ = __liaison__
     __description__ = (
         "Skim for leptonic analyses, "
@@ -54,14 +53,14 @@ class LeptonicUntagged(BaseSkim):
         ma.cutAndCopyList(
             "e-:LeptonicUntagged",
             "e-:all",
-            "useCMSFrame(p) > 2.0 and electronID_noTOP > 0.5",
+            "useCMSFrame(p) > 1.8 and electronID > 0.5",
             True,
             path=path,
         )
         ma.cutAndCopyList(
             "mu-:LeptonicUntagged",
             "mu-:all",
-            "useCMSFrame(p) > 2.0 and muonID > 0.5",
+            "useCMSFrame(p) > 1.8 and muonID > 0.5",
             True,
             path=path,
         )
@@ -87,7 +86,7 @@ class LeptonicUntagged(BaseSkim):
             path=path,
         )
         vm.addAlias("d0_p", "daughter(0,p)")
-        vm.addAlias("d0_electronID_noTOP", "daughter(0,electronID_noTOP)")
+        vm.addAlias("d0_electronID", "daughter(0,electronID)")
         vm.addAlias("d0_muonID", "daughter(0,muonID)")
         vm.addAlias("MissP", "weMissP(basic,0)")
 
@@ -100,7 +99,7 @@ class LeptonicUntagged(BaseSkim):
             variables_1d=[
                 ("Mbc", 100, 4.0, 5.3, "Mbc", contact, "", ""),
                 ("d0_p", 100, 0, 5.2, "Signal-side lepton momentum", contact, "", ""),
-                ("d0_electronID_noTOP", 100, 0, 1, "electronID_noTOP of signal-side lepton",
+                ("d0_electronID", 100, 0, 1, "electronID of signal-side lepton",
                  contact, "", ""),
                 ("d0_muonID", 100, 0, 1, "muonID of signal-side lepton", contact,
                  "", ""),

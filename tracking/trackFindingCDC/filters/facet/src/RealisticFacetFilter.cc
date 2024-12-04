@@ -106,7 +106,7 @@ Weight RealisticFacetFilter::operator()(const CDCFacet& facet)
       middlePhiPull < m_param_phiPullCut and
       endPhiPull < m_param_phiPullCut) {
 
-    // Introducing a mini penalty to distiguish straighter facets as better
+    // Introducing a mini penalty to distinguish straighter facets as better
     // This is important since otherwise the ordering of the wires takes precedence and biases
     // for counterclockwise tracks.
     double miniPenalty =

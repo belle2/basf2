@@ -37,7 +37,7 @@ namespace Belle2 {
     /*!
       \param moduleID Id number of module containing hit
       \param channelID Id number of hit channel
-      \param globalTime global time of hit
+      \param bitmap global time of hit
      */
     ARICHDigit(int moduleID, int channelID, uint8_t bitmap)
     {

@@ -9,6 +9,7 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
+#include <dqm/analysis/RefHistObject.h>
 #include <TH1.h>
 #include <TCanvas.h>
 #include <TFile.h>
@@ -62,28 +63,8 @@ namespace Belle2 {
 
   private:
 
-    /**
-     * Struct for refence histogram info
-     */
-    typedef struct {
-      /** online histogram name */
-      std::string orghist_name;
-      /** reference histogram name */
-      std::string refhist_name;
-      /** related canvas name name */
-      TCanvas* canvas{nullptr};
-      /** pointer to the reference histogram */
-      TH1* ref_clone{nullptr};
-    } REFNODE;
-
-    /** Struct for reference histogram  */
-    std::vector<REFNODE*> m_pnode;
-
     /** Reference Histogram Root file name */
-    std::string m_referenceFile;
-
-    /** Is first event in run */
-    bool m_firstInRun = true;
+    std::string m_referenceFileName;
 
     /** Reads reference histograms from input root file */
     void loadReferenceHistos();

@@ -134,7 +134,7 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
                     self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
                     self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
                     self.results.addResult("software_trigger_cut&filter&L1_trigger", 1)
-                # Second event: No skim lines to replicate a HLT discared event with filter ON
+                # Second event: No skim lines to replicate a HLT discarded event with filter ON
                 elif (self.EventMetaData.obj().getEvent() == 2):
                     self.results.addResult("software_trigger_cut&all&total_result", 1)
                     self.results.addResult("software_trigger_cut&filter&L1_trigger", 1)
@@ -210,8 +210,8 @@ def test_script(script_location, input_file_name, temp_dir):
     # Move the output file with DQM histograms under the expected location:
     # for reasons we don't want to know, they are saved under the current directory
     # even if a valid and existing working directory is specified
+    final_histos_file_name = os.path.join(temp_dir, histos_file_name)
     if os.path.exists(histos_file_name):
-        final_histos_file_name = os.path.join(temp_dir, histos_file_name)
         shutil.copy(histos_file_name, os.path.join(temp_dir, final_histos_file_name))
         os.unlink(histos_file_name)
 
@@ -223,7 +223,7 @@ def test_script(script_location, input_file_name, temp_dir):
         test_path = basf2.Path()
         test_path.add_module("RootInput", inputFileName=output_file_name)
         test_path.add_module(CheckForCorrectHLTResults())
-        assert(b2test_utils.safe_process(test_path) == 0)
+        assert (b2test_utils.safe_process(test_path) == 0)
         # Check the size of DQM histograms
         cmd2 = ["hlt-check-dqm-size", final_histos_file_name]
         subprocess.check_call(cmd2)

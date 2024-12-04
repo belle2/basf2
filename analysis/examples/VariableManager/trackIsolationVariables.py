@@ -110,7 +110,7 @@ if __name__ == "__main__":
     path = b2.create_path()
 
     # Add input data and ParticleLoader modules to the path.
-    ma.inputMdst(filename=b2.find_file("mdst14.root", "validation"), path=path)
+    ma.inputMdst(filename=b2.find_file("mdst16.root", "validation"), path=path)
 
     # -------------------------------------------------------------------
 

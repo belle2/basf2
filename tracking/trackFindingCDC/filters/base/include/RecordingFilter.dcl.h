@@ -24,7 +24,7 @@ namespace Belle2 {
 
     /**
      *  Filter adapter to make a filter work on a set of variables and record
-     *  the observed instances on invokation
+     *  the observed instances on invocation
      */
     template<class AFilter>
     class Recording : public OnVarSet<AFilter> {
@@ -87,7 +87,7 @@ namespace Belle2 {
       std::unique_ptr<AFilter> m_skimFilter = nullptr;
     };
 
-    /// Convience template to create a recording filter for a set of variables.
+    /// Convenience template to create a recording filter for a set of variables.
     template<class AVarSet>
     class RecordingFilter: public Recording<Filter<typename AVarSet::Object> > {
 

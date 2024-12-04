@@ -1,0 +1,31 @@
+[
+  {
+    "name": "Track energy correction on Data",
+    "description": "Track momentum scale (global phase space)",
+    "tags": [
+      "Data",
+      "Systematics",
+      "Tracking"
+    ],
+    "snippet": "import basf2 as b2\nimport modularAnalysis as ma\nb2.conditions.prepend_globaltag('tracking_data_Moriond23_v1')\nma.scaleTrackMomenta('B0:sig', payloadName='tracking_momentumScaleFactor_global', scalingFactorName='sf_global_central', path=path)",
+    "recommendation": {
+      "GlobalTag": "tracking_data_Moriond23_v1",
+      "payloadName": "tracking_momentumScaleFactor_global",
+      "scalingFactorName": "sf_global_central",
+      "scalingFactorName to evaluate the systematic uncertainty": "sf_global_up, sf_global_down"
+    }
+  },
+  {
+    "name": "Photon energy correction on Data",
+    "description": "Correction of photon energy bias in data wrt MC15rd",
+    "tags": [
+      "Data",
+      "Systematics",
+      "Neutral",
+      "gamma"
+    ],
+    "snippet": "import modularAnalysis as ma \n#Global tag should be analysis_tools_light-2305-korat or later\n b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag()) \n# example photon list\nfillParticleList('gamma:sel','p>0.1',path=my_path)\n \n# energy bias correction applied to photon list.\n#Set TableName to corresponding dataset combination used.\n \n#For For MC15rd/preLS1:  TableName = \"PhotonEnergyBiasCorrection_MC15rd_June2023\"\nma.correctEnergyBias(inputListNames=['gamma:sel'], tableName=TableName , path=my_path)\n \n#Optional: To save correction information for each photon:\n#vm.addAlias('Weight', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_Weight)')\n#vm.addAlias('StatErr', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_StatErr)')\n#vm.addAlias('binID', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_binID)')\n#photon_extravars = ['Weight','StatErr','binID']",
+    "recommendation": {}
+  }
+
+]

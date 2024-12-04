@@ -9,7 +9,7 @@ Here we briefly describe the SVD objects that populate the Conditions Database. 
 
    * the revision can be different for official run-independent MC production of experiment 0 and 1003, please check the corresponding Global Tag.
    * for run-dependent and data reconstruction revisions should be checked inspecting the content of the corresponding Global Tags.
-   * you can also check the `SVD Payloads, Revisions and GT <https://confluence.desy.de/pages/viewpage.action?pageId=179781819>`_ Confluence Page.
+   * you can also check the `SVD Payloads, Revisions and GT <https://xwiki.desy.de/xwiki/rest/p/8f607>`_ XWiki Page.
 
 We add a string, the ``UniqueID``, to the payloads that provides information on the content of the payload. In order to read the ``UniqueID`` you can setup basf2 and then:
 

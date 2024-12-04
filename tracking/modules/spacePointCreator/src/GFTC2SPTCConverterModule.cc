@@ -49,7 +49,7 @@ GFTC2SPTCConverterModule::GFTC2SPTCConverterModule() :
   addParam("checkTrueHits", m_PARAMcheckTrueHits,
            "Set to true if you want TrueHits of Clusters forming a SpacePoint (e.g. SVD) to be checked for equality", false);
   addParam("useSingleClusterSP", m_PARAMuseSingleClusterSP,
-           "Set to true if you want to use singleCluster SVD SpacePoints if no doubleCluster SVD SpacePoint can be found. NOTE: this gets overriden if 'skipCluster' is set to true!",
+           "Set to true if you want to use singleCluster SVD SpacePoints if no doubleCluster SVD SpacePoint can be found. NOTE: this gets overridden if 'skipCluster' is set to true!",
            true);
   addParam("checkNoSingleSVDSP", m_PARAMcheckNoSingleSVDSP,
            "Set to false if you want to disable the initial check for the StoreArray of Non Single Cluster SVD SpacePoints. NOTE: The module will still search for these SpacePoints first, so you have to make sure you are not registering SpacePoints under the StoreArray with the NoSingleClusterSVDSP name! (Disable the module that registers these SpacePoints)",
@@ -505,7 +505,7 @@ int GFTC2SPTCConverterModule::getAppropriateSpacePointIndex(const std::vector<st
 
     for (unsigned int iSP = 0; iSP < existAndValidSPs.size(); ++iSP) {
       if (!existAndValidSPs.at(iSP).second) continue; // if not valid continue with next SpacePoint
-      // sign doesnot matter, comparing squared values later only!
+      // sign doesn't matter, comparing squared values later only!
       int posDiff = clusterPositions.at(iSP * 2).second - clusterPositions.at(iSP * 2 + 1).second;
 
       B2DEBUG(28, "Difference of positions of Clusters for entry " << iSP << " is " << posDiff);

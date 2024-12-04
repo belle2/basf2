@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -31,7 +30,7 @@ from variables import variables as vm
 # TODO: Add liaison name and email address
 __liaison__ = ""
 __liaison_leptonID__ = "Marcel Hohmann"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -45,7 +44,7 @@ class SystematicsDstar(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    ApplyHLTHadronCut = False
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdK("all", path=path)
@@ -148,7 +147,7 @@ class SystematicsTracking(BaseSkim):
 
     def DstarToD0PiPartList(self, path):
         """Build DstarToD0PiPartList lists for systematics skims."""
-        ma.fillParticleList("pi+:fromks", "chiProb > 0.001 and pionID > 0.1 and d0 > 0.1", path=path)
+        ma.fillParticleList("pi+:fromks", "chiProb > 0.001 and pionID > 0.1 and dr > 0.1", path=path)
 
         # D-
         DminusCuts = "1.0 < M < 1.75"
@@ -212,7 +211,7 @@ class Resonance(BaseSkim):
         DsChannel = ["phi:res pi+:loose"]
         DsList = []
         for chID, channel in enumerate(DsChannel):
-            particlename = "D_s+:Resonance%d" % (chID)
+            particlename = f"D_s+:Resonance{int(chID)}"
             ma.reconstructDecay(particlename + " -> " + channel, DsCuts, chID, path=path)
             DsList.append(particlename)
 
@@ -421,7 +420,7 @@ class SystematicsRadEE(BaseSkim):
     selection on the photon as the sample must be unbiased.
 
     As this retains a lot of bhabha events (by construction) we allow for prescaling
-    (and prefer prescaled rather than a biased sampe by requiring any selection on the
+    (and prefer prescaled rather than a biased sample by requiring any selection on the
     photon or too much of a cut on the recoil momentum).
 
     Prescales are given in standard trigger terms (reciprocal), so prescale of 100 is 1%
@@ -459,7 +458,7 @@ class SystematicsRadEE(BaseSkim):
         # require a pair of good electrons one of which must be cluster-matched
         # with 3 GeV of energy
         goodtrack = "abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits > 0"
-        goodtrackwithcluster = "%s and clusterE > 3.0" % goodtrack
+        goodtrackwithcluster = f"{goodtrack} and clusterE > 3.0"
         ma.cutAndCopyList("e+:skimtight", "e+:all", goodtrackwithcluster, path=path)
         ma.cutAndCopyList("e+:skimloose", "e+:all", goodtrack, path=path)
 
@@ -471,33 +470,31 @@ class SystematicsRadEE(BaseSkim):
         # apply event cuts (exactly two clean tracks in the event, and prescale
         # the whole event regardless of where the electron went)
         event_cuts = "[nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2]"  # cm, cm
-        event_cuts += " and [eventRandom <= %s]" % prescale_all
+        event_cuts += f" and [eventRandom <= {prescale_all}]"
 
         # now prescale the *electron* (e-) in the forward endcap (for bhabhas)
         # note this is all done with cut strings to circumnavigate BII-3607
         fwd_encap_border = "0.5480334"  # rad (31.4 deg)
         electron_is_first = "daughter(0, charge) < 0"
-        first_in_fwd_endcap = "daughter(0, theta) < %s" % fwd_encap_border
-        first_not_in_fwd_endcap = "daughter(0, theta) > %s" % fwd_encap_border
+        first_in_fwd_endcap = f"daughter(0, theta) < {fwd_encap_border}"
+        first_not_in_fwd_endcap = f"daughter(0, theta) > {fwd_encap_border}"
         electron_is_second = "daughter(1, charge) < 0"
-        second_in_fwd_endcap = "daughter(1, theta) < %s" % fwd_encap_border
-        second_not_in_fwd_endcap = "daughter(1, theta) > %s" % fwd_encap_border
-        passes_prescale = "eventRandom <= %s" % prescale_fwd_electron
+        second_in_fwd_endcap = f"daughter(1, theta) < {fwd_encap_border}"
+        second_not_in_fwd_endcap = f"daughter(1, theta) > {fwd_encap_border}"
+        passes_prescale = f"eventRandom <= {prescale_fwd_electron}"
         #
         # four possible scenarios:
         # 1) electron first in the decaystring and in fwd endcap: prescale these
-        prescale_logic = "[%s and %s and %s]" \
-            % (electron_is_first, first_in_fwd_endcap, passes_prescale)
+        prescale_logic = f"[{electron_is_first} and {first_in_fwd_endcap} and {passes_prescale}]"
         # 2) electron second in string and in fwd endcap: prescale these
-        prescale_logic += " or [%s and %s and %s]" \
-            % (electron_is_second, second_in_fwd_endcap, passes_prescale)
+        prescale_logic += f" or [{electron_is_second} and {second_in_fwd_endcap} and {passes_prescale}]"
         # 3) electron first in string and not in fwd endcap (no prescale)
-        prescale_logic += " or [%s and %s]" % (electron_is_first, first_not_in_fwd_endcap)
+        prescale_logic += f" or [{electron_is_first} and {first_not_in_fwd_endcap}]"
         # 4) electron second in string and not in fwd endcap (no prescale)
-        prescale_logic += " or [%s and %s]" % (electron_is_second, second_not_in_fwd_endcap)
+        prescale_logic += f" or [{electron_is_second} and {second_not_in_fwd_endcap}]"
 
         # final candidate building with cuts and prescales
-        prescale_logic = "[%s]" % prescale_logic
+        prescale_logic = f"[{prescale_logic}]"
         ma.applyCuts("vpho:radee", event_cuts + " and " + prescale_logic, path=path)
 
         return ["vpho:radee"]
@@ -510,7 +507,7 @@ class SystematicsLambda(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    ApplyHLTHadronCut = False
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdLambdas(path=path)
@@ -700,8 +697,6 @@ class SystematicsJpsi(BaseSkim):
     __contact__ = __liaison_leptonID__
     __category__ = "systematics, leptonID"
 
-    ApplyHLTHadronCut = False
-
     def load_standard_lists(self, path):
         stdMu("all", path=path)
         stdE("all", path=path)
@@ -733,7 +728,7 @@ class SystematicsJpsi(BaseSkim):
         ma.correctBrems('e+:brems_corrected', 'e+:all', 'gamma:brems', path=path)
         ma.reconstructDecay(
             "J/psi:systematics_ee -> e+:brems_corrected e-:brems_corrected",
-            f'{Cuts} and [daughter(0,electronID_noTOP)>0.1 or daughter(1,electronID_noTOP)>0.1]',
+            f'{Cuts} and [daughter(0,electronID)>0.1 or daughter(1,electronID)>0.1]',
             path=path)
         return "J/psi:systematics_ee"
 
@@ -823,7 +818,7 @@ class SystematicsBhabha(BaseSkim):
 
     def build_lists(self, path):
         goodtrack = "abs(dz) < 5 and abs(dr) < 2"
-        goodtrackwithPID = f"{goodtrack} and electronID_noTOP > 0.95 and clusterTheta > 0.59"\
+        goodtrackwithPID = f"{goodtrack} and electronID > 0.95 and clusterTheta > 0.59"\
             " and clusterTheta < 2.15 and useCMSFrame(clusterE) > 2"
         ma.cutAndCopyList("e+:tight", "e+:all", goodtrackwithPID, path=path)
         ma.cutAndCopyList("e+:loose", "e+:all", goodtrack, path=path)

@@ -27,5 +27,5 @@ def check_file(input_file_name):
 if __name__ == "__main__":
     b2.set_random_seed(":-)")
     b2tu.configure_logging_for_tests()
-    check_file("mdst14.root")
+    check_file("mdst16.root")
     # TODO: update this to check a data event when a suitable file is added

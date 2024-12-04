@@ -16,7 +16,6 @@
 from basf2 import B2INFO, B2FATAL, B2WARNING
 import basf2
 import basf2_mva
-import inspect
 import modularAnalysis as ma
 import variables
 from variables import utils
@@ -1338,14 +1337,5 @@ def flavorTagger(
 
 
 if __name__ == '__main__':
-
-    desc_list = []
-
-    function = globals()["flavorTagger"]
-    signature = inspect.formatargspec(*inspect.getfullargspec(function))
-    desc_list.append((function.__name__, signature + '\n' + function.__doc__))
-
-    from terminal_utils import Pager
-    from basf2.utils import pretty_print_description_list
-    with Pager('Flavor Tagger function accepts the following arguments:'):
-        pretty_print_description_list(desc_list)
+    from basf2.utils import pretty_print_module
+    pretty_print_module(__name__, "flavorTagger")

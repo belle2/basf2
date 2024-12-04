@@ -239,7 +239,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
     }
   }
 
-  /*  Fill the histgram showing that the trigger skim cut passed OR that we
+  /*  Fill the histogram showing that the trigger skim cut passed OR that we
       are skipping this selection. */
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
@@ -421,7 +421,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   B2DEBUG(22, "Cutflow: No additional loose tracks: index = " << cutIndexPassed) ;
   /* Determine if the two tracks have the opposite electric charge.
      We know this because the track indices stores the max pt track in [0] for negatively charged track
-     and [1] fo the positively charged track.  If both are filled then both a negatively charged
+     and [1] for the positively charged track.  If both are filled then both a negatively charged
      and positively charged track were found.   */
   bool oppositelyChargedTracksPassed = maxiTrk[0] != -1  &&  maxiTrk[1] != -1;
   if (!oppositelyChargedTracksPassed) {
@@ -567,8 +567,8 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   // Fill the histogram for the event level variables
   getObjectPtr<TH1F>("eventT0")->Fill(evt_t0) ;
 
-  bool isCDCt0 = (static_cast<EventT0::EventT0Component>(*m_eventT0->getEventT0Component())).detectorSet.contains(Const::CDC);
-  bool isECLt0 = (static_cast<EventT0::EventT0Component>(*m_eventT0->getEventT0Component())).detectorSet.contains(Const::ECL);
+  bool isCDCt0 = m_eventT0->isCDCEventT0();
+  bool isECLt0 = m_eventT0->isECLEventT0();
   string t0Detector = "UNKNOWN... WHY?";
   if (isCDCt0) {
     t0Detector = "CDC" ;

@@ -24,7 +24,7 @@ formatter = TolerateMissingKeyFormatter()
 
 
 class PullAnalysis:
-    """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
+    """Performs a comparison of an estimated quantity to their truths by generating standardized validation plots."""
     #: default outlier z score
     default_outlier_z_score = 5.0
     #: default plot name
@@ -59,16 +59,16 @@ class PullAnalysis:
         contact='',
         plot_name=None,
         plot_title=None,
-        plot_name_prefix='',  # depricated use plot_name instead
-        plot_name_postfix='',  # depricated use plot_name instead
-        plot_title_postfix='',  # depricated use plot_title instead
+        plot_name_prefix='',  # deprecated use plot_name instead
+        plot_name_postfix='',  # deprecated use plot_name instead
+        plot_title_postfix='',  # deprecated use plot_title instead
         referenceFileName=None  # if set binnings of plots will be read from corresponding histograms
     ):
-        """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
+        """Performs a comparison of an estimated quantity to their truths by generating standardized validation plots."""
 
         #: name of the quantity the analysis is performed on
         self.quantity_name = quantity_name
-        #: unit the quanitity is given in
+        #: unit the quantity is given in
         self.unit = unit or get_unit(quantity_name)
 
         #: the outlier score defines in terms of how many std deviations a data point is considered as an outlier
@@ -240,7 +240,7 @@ class PullAnalysis:
                                                 gaus_z_score=4,
                                                 is_expert=is_expert)
 
-            # Correct with TF1 - only works because the gaus fit is active.
+            # Correct with TF1 - only works because the Gaussian fit is active.
             hist = estimates_by_truths_profile.histograms[0]
             GetBinContent = hist.GetBinContent
             GetBinCenter = hist.GetBinCenter

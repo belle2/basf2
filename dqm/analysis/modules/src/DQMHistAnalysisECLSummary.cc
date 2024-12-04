@@ -78,7 +78,6 @@ void DQMHistAnalysisECLSummaryModule::initialize()
     std::string mask_pv_name = (boost::format("mask:%s") % alarm.name).str();
     registerEpicsPV(m_pvPrefix + mask_pv_name, mask_pv_name);
   }
-  updateEpicsPVs(5.0);
 
   m_monObj = getMonitoringObject("ecl");
 
@@ -278,7 +277,7 @@ void DQMHistAnalysisECLSummaryModule::event()
                               "if (channels_summary) channels_summary->SetDrawOption(\"col\");");
   h_channels_summary->GetListOfFunctions()->Add(m_ecl_style);
   m_default_style = new TExec("default_style",
-                              "gStyle->SetPalette(kBird);");
+                              "gStyle->SetPalette(kBird);"); // " Changing back to the default color palette
 
   //=== Draw with special style
   //    https://root.cern.ch/js/latest/examples.htm#th2_colpal77
@@ -403,7 +402,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
 
   //=== Get number of fit inconsistencies
 
-  TH1* h_fail_crateid = findHist("ECL/fail_crateid", m_onlyIfUpdated);
+  TH1* h_fail_crateid = findHist("ECL/fail_crateid", false);
 
   const int fit_alarm_index = getAlarmByName("bad_fit").first;
   for (int crate_id = 1; crate_id <= ECL::ECL_CRATES; crate_id++) {
@@ -495,7 +494,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
           for (int bin_id = 1; bin_id <= ECL::ECL_TOTAL_CHANNELS; bin_id++) {
             if (overlay->GetBinContent(bin_id) == 0) continue;
             // Do not adjust bin height for dead channels
-            if (main_hist->GetBinContent(bin_id) == 0) continue;
+            if (main_hist->GetBinContent(bin_id) < 1e-6) continue;
             overlay->SetBinContent(bin_id, main_hist->GetBinContent(bin_id));
           }
         }
@@ -549,8 +548,6 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
       }
     }
   }
-
-  if (!update_mirabelle) updateEpicsPVs(5.0);
 
   return alarm_counts;
 }
@@ -657,13 +654,13 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
     bool not_normalized = (findCanvas("ECL/c_cid_Thr5MeV_analysis") == nullptr);
     if (total_events >= dead_alarm.required_statistics) {
       double min_occupancy;
-      if (getRunType() == "null") {
+      const std::string run_type = getRunType();
+      if (run_type == "null" || run_type == "debug" || run_type == "cosmic") {
         // For null runs, occupancy should be higher than 0.0001%
         min_occupancy = 1e-6;
-      } else {
-        // For cosmic runs, occupancy should be higher than 0.01%
+      } else if (run_type == "physics") {
+        // For physics runs, occupancy should be higher than 0.01%
         min_occupancy = 1e-4;
-        // (for physics runs, as opposed to cosmics, this can actually be set to higher value)
       }
       if (not_normalized) {
         // The histogram is not normalized, multiply the threshold by evt count
@@ -736,19 +733,26 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
 
 void DQMHistAnalysisECLSummaryModule::drawGrid(TH2* hist)
 {
-  int x_min = hist->GetXaxis()->GetXmin();
-  int x_max = hist->GetXaxis()->GetXmax();
-  int y_min = hist->GetYaxis()->GetXmin();
-  int y_max = hist->GetYaxis()->GetXmax();
-  for (int x = x_min + 1; x < x_max; x++) {
-    auto l = new TLine(x, 0, x, 5);
-    l->SetLineStyle(kDashed);
-    l->Draw();
+  static std::map<std::string, std::vector<TLine*> > lines;
+  std::string name = hist->GetName();
+  if (lines[name].empty()) {
+    int x_min = hist->GetXaxis()->GetXmin();
+    int x_max = hist->GetXaxis()->GetXmax();
+    int y_min = hist->GetYaxis()->GetXmin();
+    int y_max = hist->GetYaxis()->GetXmax();
+    for (int x = x_min + 1; x < x_max; x++) {
+      auto l = new TLine(x, 0, x, 5);
+      l->SetLineStyle(kDashed);
+      lines[name].push_back(l);
+    }
+    for (int y = y_min + 1; y < y_max; y++) {
+      auto l = new TLine(1, y, ECL::ECL_CRATES + 1, y);
+      l->SetLineStyle(kDashed);
+      lines[name].push_back(l);
+    }
   }
-  for (int y = y_min + 1; y < y_max; y++) {
-    auto l = new TLine(1, y, ECL::ECL_CRATES + 1, y);
-    l->SetLineStyle(kDashed);
-    l->Draw();
+  for (auto line : lines[name]) {
+    line->Draw();
   }
 }
 

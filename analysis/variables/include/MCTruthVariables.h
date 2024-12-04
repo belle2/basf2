@@ -374,6 +374,11 @@ namespace Belle2 {
      * of a given B meson and searches for common identical B meson ancestor at generator level.
      */
     double isBBCrossfeed(const Particle*);
+
+    /**
+     * returns array index of B ancestor, or -1 if no B ancestor or no MC-matching is found.
+     */
+    int ancestorBIndex(const Particle*);
   }
 }
 

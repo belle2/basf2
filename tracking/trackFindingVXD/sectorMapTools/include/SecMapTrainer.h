@@ -42,7 +42,7 @@ namespace Belle2 {
     const std::string m_nameSetup;
 
     /** a reference to the singleton FiltersContainer used for this training. Needed as some information are
-    only accessable from the filters (in the container).  */
+    only accessible from the filters (in the container).  */
     FiltersContainer<SpacePoint>& m_filtersContainer = Belle2::FiltersContainer<SpacePoint>::getInstance();
 
     /** Contains all relevant configurations needed for training a sectorMap.
@@ -90,7 +90,7 @@ namespace Belle2 {
         ids += std::to_string(allowedLayer) + " ";
         if (allowedLayer == layerID) found = true;
       }
-      B2DEBUG(20, "SecMapTrainer::acceptHit: the TC has layerID: " << layerID << " and allowd layers: " << ids << " and was " <<
+      B2DEBUG(20, "SecMapTrainer::acceptHit: the TC has layerID: " << layerID << " and allowed layers: " << ids << " and was " <<
               (found ? "accepted" : "rejected"));
 
       return found;
@@ -228,7 +228,7 @@ namespace Belle2 {
   public:
 
     /** constructor. */
-    explicit SecMapTrainer(const std::string& setupName, const std::string& appendix = "") :
+    explicit SecMapTrainer(const std::string& setupName, const std::string& appendix = "", const std::string& outputdir = "./") :
       m_nameSetup(setupName),
       m_config(m_filtersContainer.getFilters(m_nameSetup)->getConfig()),
       m_factory(
@@ -238,7 +238,7 @@ namespace Belle2 {
         m_config.mField),
 
       m_filterMill(),
-      m_rootInterface(m_config.secMapName, appendix),
+      m_rootInterface(m_config.secMapName, appendix, outputdir),
       m_expNo(std::numeric_limits<unsigned>::max()),
       m_runNo(std::numeric_limits<unsigned>::max()),
       m_evtNo(std::numeric_limits<unsigned>::max())
@@ -349,7 +349,7 @@ namespace Belle2 {
               m_config.pTmax);
       if (m_config.pTmin > pT or m_config.pTmax < pT) return false;
 
-      // catch tracks which start too far away from orign
+      // catch tracks which start too far away from origin
       B2Vector3D distance2IP = m_config.vIP - tc.getPosSeed();
       B2DEBUG(20, "SecMapTrainer::storeTC: distance2IP/thresholdXY/-Z: " << distance2IP.Mag() << "/" << m_config.seedMaxDist2IPXY << "/"
               << m_config.seedMaxDist2IPZ);
@@ -358,7 +358,7 @@ namespace Belle2 {
       if (m_config.seedMaxDist2IPZ > 0
           and m_config.seedMaxDist2IPXY < distance2IP.Z()) return false;
 
-      // collect hits which fullfill all given tests
+      // collect hits which fulfill all given tests
       std::vector<std::pair<FullSecID, const SpacePoint*> > goodSPs;
       for (const SpacePoint* aSP : tc.getHits()) {
         if (!acceptHit(*aSP)) continue;

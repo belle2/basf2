@@ -129,15 +129,7 @@ void DQMHistAnalysisInputPVSrvModule::initialize()
         Ssiz_t f;
         f = from;
         if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-          TDirectory* e;
-          e = d->GetDirectory(tok);
-          if (e) {
-            B2DEBUG(20, "Cd Dir " << tok);
-            d = e;
-          } else {
-            B2DEBUG(20, "Create Dir " << tok);
-            d = d->mkdir(tok);
-          }
+          d = d->mkdir(tok, "", true);
           d->cd();
         } else {
           break;

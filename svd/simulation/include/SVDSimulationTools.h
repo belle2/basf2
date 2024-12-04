@@ -177,7 +177,7 @@ namespace Belle2 {
     template<typename T>
     inline void zeroSuppress(T& a, double thr)
     {
-      std::replace_if(a.begin(), a.end(), std::bind2nd(std::less<double>(), thr), 0.0);
+      std::replace_if(a.begin(), a.end(), std::bind(std::less<double>(), std::placeholders::_1, thr), 0.0);
     }
 
 // ==============================================================================

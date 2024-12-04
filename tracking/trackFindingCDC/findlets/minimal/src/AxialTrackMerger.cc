@@ -26,7 +26,7 @@ using namespace TrackFindingCDC;
 
 std::string AxialTrackMerger::getDescription()
 {
-  return "Merges axial tracks found in the legendre search";
+  return "Merges axial tracks found in the Legendre search";
 }
 
 void AxialTrackMerger::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -42,7 +42,7 @@ void AxialTrackMerger::apply(std::vector<CDCTrack>& axialTracks,
                              const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
   // Check quality of the track basing on holes on the trajectory;
-  // if holes exist then track is splitted
+  // if holes exist then track is split
   for (CDCTrack& track : axialTracks) {
     if (track.size() < 5) continue;
     AxialTrackUtil::removeHitsAfterSuperLayerBreak(track);
@@ -111,20 +111,17 @@ double AxialTrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
   const CDCTrajectory3D& trajectory3D1 = track1.getStartTrajectory3D();
   const CDCTrajectory3D& trajectory3D2 = track2.getStartTrajectory3D();
 
-  const Vector2D& phi0Vec1 = trajectory3D1.getFlightDirection3DAtSupport().xy();
-  const Vector2D& phi0Vec2 = trajectory3D2.getFlightDirection3DAtSupport().xy();
-
   int fbVote12 = 0;
   int fbVote21 = 0;
 
   for (const CDCRecoHit3D& recoHit3D : track1) {
-    EForwardBackward fbInfo = phi0Vec2.isForwardOrBackwardOf(recoHit3D.getRecoPos2D());
+    EForwardBackward fbInfo = trajectory3D2.getFlightDirection3DAtSupport().xy().isForwardOrBackwardOf(recoHit3D.getRecoPos2D());
     if (not isValid(fbInfo)) continue;
     fbVote12 += fbInfo;
   }
 
   for (const CDCRecoHit3D& recoHit3D : track2) {
-    EForwardBackward fbInfo = phi0Vec1.isForwardOrBackwardOf(recoHit3D.getRecoPos2D());
+    EForwardBackward fbInfo = trajectory3D1.getFlightDirection3DAtSupport().xy().isForwardOrBackwardOf(recoHit3D.getRecoPos2D());
     if (not isValid(fbInfo)) continue;
     fbVote21 += fbInfo;
   }

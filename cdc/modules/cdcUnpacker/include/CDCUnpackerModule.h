@@ -19,7 +19,7 @@
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 #include <rawdata/dataobjects/RawCDC.h>
-
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 namespace Belle2 {
 
   namespace CDC {
@@ -355,6 +355,11 @@ namespace Belle2 {
        * True if add relation of CDCHits, CDCRawHits, and CDCRawHitWaveForms."
        */
       bool m_relationRawHits;
+
+      /**
+       * Recover boardID error if true, skip information otherwise
+       */
+      bool m_recoverBoardIdError;
 
     };//end class declaration
 

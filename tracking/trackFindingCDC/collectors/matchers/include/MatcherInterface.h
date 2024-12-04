@@ -43,7 +43,7 @@ namespace Belle2 {
 
       /**
        * Main function: create weighted relations between collectors and collection items using
-       * the implemented functionality overriden in a derived class.
+       * the implemented functionality overridden in a derived class.
        */
       void apply(std::vector<ACollectorItem>& collectorItems, const std::vector<ACollectionItem>& collectionItems,
                  std::vector<WeightedRelationItem>& weightedRelations) override

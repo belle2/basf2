@@ -149,8 +149,8 @@ void KLMTimeCollectorModule::collect()
       return;
     if (!m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC))
       return;
-    const std::vector<EventT0::EventT0Component> evtT0C = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
-    m_Event.t0 = evtT0C.back().eventT0;
+    const auto bestCDCEvtT0C = m_eventT0->getBestCDCTemporaryEventT0();
+    m_Event.t0 = bestCDCEvtT0C->eventT0;
   }
 
   /* Read event metadata. */
@@ -167,7 +167,7 @@ void KLMTimeCollectorModule::collect()
     return;
   }
 
-  B2DEBUG(20, "debug infor for" << LogVar("run", runId) << LogVar("event", evtId) << LogVar("number of rec tracks", n_track));
+  B2DEBUG(20, "debug info for" << LogVar("run", runId) << LogVar("event", evtId) << LogVar("number of rec tracks", n_track));
 
   getObjectPtr<TH1D>("m_HevtT0_1")->Fill(m_Event.t0);
   getObjectPtr<TH1I>("m_HnTrack")->Fill(n_track);

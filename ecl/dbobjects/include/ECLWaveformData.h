@@ -51,10 +51,10 @@ namespace Belle2 {
       return m_matrixElement[ i * (i + 1) / 2 + j];
     }
 
-    /** Getter method for all matrix as one dimentional array */
+    /** Getter method for all matrix as one dimensional array */
     void getArray(float WF[136]) const  {for (int i = 0; i < 136; i++) { WF[i] = (float) m_matrixElement[i];}   }
 
-    /** Getter method for all matrix as two dimentional array (floats) */
+    /** Getter method for all matrix as two dimensional array (floats) */
     void getMatrix(float M[16][16]) const
     {
       const float* A = m_matrixElement;
@@ -64,7 +64,7 @@ namespace Belle2 {
       }
     }
 
-    /** Getter method for all matrix as two dimentional array (doubles) */
+    /** Getter method for all matrix as two dimensional array (doubles) */
     void getMatrix(double M[16][16]) const
     {
       const float* A = m_matrixElement;
@@ -109,7 +109,7 @@ namespace Belle2 {
       return m_waveformPar[i];
     }
 
-    /** Getter method for waveform shape parameters as one dimentional array of
+    /** Getter method for waveform shape parameters as one dimensional array of
      * floats */
     void getWaveformParArray(float P[10]) const
     {
@@ -117,7 +117,7 @@ namespace Belle2 {
         P[i] = (float) m_waveformPar[i];
     }
 
-    /** Getter method for waveform shape parameters as one dimentional array of
+    /** Getter method for waveform shape parameters as one dimensional array of
      * doubles */
     void getWaveformParArray(double P[10]) const
     {
@@ -182,10 +182,10 @@ namespace Belle2 {
       return m_matrixElement[i];
     }
 
-    /** Getter method for matrix as one dimentional array */
+    /** Getter method for matrix as one dimensional array */
     void getArray(float NoiseData[496]) const  {for (int i = 0; i < 496; i++) { NoiseData[i] = (float) m_matrixElement[i];}   }
 
-    /** Getter method for matrix as two dimentional array */
+    /** Getter method for matrix as two dimensional array */
     void getMatrix(float M[31][31]) const
     {
       const float* A = m_matrixElement;

@@ -62,6 +62,8 @@ VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
 
   addParam("fileNameSuffix", m_fileNameSuffix, "The suffix of the output ROOT file to be appended before ``.root``.",
            string(""));
+  addParam("ignoreCommandLineOverride", m_ignoreCommandLineOverride,
+           "Ignore override of file name via command line argument -o. Useful if you have multiple output modules in one path.", false);
 
   addParam("storeEventType", m_storeEventType,
            "If true, the branch __eventType__ is added. The eventType information is available from MC16 on.", true);
@@ -73,9 +75,11 @@ void VariablesToEventBasedTreeModule::initialize()
   StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   // override the output file name with what's been provided with the -o option
-  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
-  if (!outputFileArgument.empty())
-    m_fileName = outputFileArgument;
+  if (!m_ignoreCommandLineOverride) {
+    const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
+    if (!outputFileArgument.empty())
+      m_fileName = outputFileArgument;
+  }
 
   if (!m_fileNameSuffix.empty())
     m_fileName = m_fileName.insert(m_fileName.rfind(".root"), m_fileNameSuffix);

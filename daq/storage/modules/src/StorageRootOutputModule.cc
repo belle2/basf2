@@ -148,7 +148,10 @@ Warning:
 }
 
 
-StorageRootOutputModule::~StorageRootOutputModule() = default;
+StorageRootOutputModule::~StorageRootOutputModule()
+{
+  delete m_outputFileMetaData;
+}
 
 void StorageRootOutputModule::initialize()
 {
@@ -192,6 +195,16 @@ void StorageRootOutputModule::initialize()
                                                     config.get("database.password"),
                                                     config.getInt("database.port"));
   m_db = db;
+}
+
+// For online storage
+void StorageRootOutputModule::endRun() {
+  if (m_file) {
+    closeFile();
+    while (m_file) closeFile(); // I hope that this will not be failed
+    m_fileIndex = 0;
+  }
+  m_runno++;
 }
 
 void StorageRootOutputModule::openFile()

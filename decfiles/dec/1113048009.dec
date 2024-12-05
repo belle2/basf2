@@ -11,7 +11,7 @@
 
 Alias D20sig D_2*0
 Alias anti-D20sig anti-D_2*0
-ChargeConj D20sig D20-antisig
+ChargeConj D20sig anti-D20sig
 
 Alias etasig eta
 

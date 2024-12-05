@@ -11,7 +11,7 @@
 
 Alias Dp10sig D'_10
 Alias anti-Dp10sig anti-D'_10
-ChargeConj Dp10sig Dp10-antisig
+ChargeConj Dp10sig anti-Dp10sig
 
 Alias etasig eta
 

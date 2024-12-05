@@ -566,7 +566,7 @@ manner, it is not possible to create the database at runtime of the different ta
 ``FEIAnalysisSummaryTask``. This means, that the module ``FEIAnalysisSummaryTask`` with the **largest** stage number is creating this database to setup the instances of ``FEIAnalysisTask``. All
 other modules ``FEIAnalysisSummaryTask`` with smaller stage numbers access the already created database to save time.
 
-Technically, the :doc:`gbasf2:index` tool ``gb2_ds_query_file`` is used to created this database called ``files_database.json``, which is stored in
+Technically, the :doc:`gbasf2:index` tool `gb2_ds_query_file <BelleDIRAC.Client.gb2_scripts.gb2_ds_query_file>` is used to created this database called ``files_database.json``, which is stored in
 the same directory as the dataset list configured with the ``gbasf2_input_dslist`` setting. Currently, this is taking some amount of time, in particular for a set of many large datasets,
 therefore this is only done once.
 

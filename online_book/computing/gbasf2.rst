@@ -128,7 +128,7 @@ A proxy is a short-term credential that verifies your identity, allowing you to 
 Installing gbasf2
 -----------------
 
-The pre-installed gbasf2 on CVMFS is the recommended version (see Setup Gbasf2). However, gbasf2 local installation is available. Please be aware this is not fully tested and not fully supported. If you wish to install gbasf2 locally, follow the instructions on the `gbasf2 documentation <https://gbasf2.belle2.org/gbasf2install.html>`_.
+The pre-installed gbasf2 on CVMFS is the recommended version (see Setup Gbasf2). However, gbasf2 local installation is available. Please be aware this is not fully tested and not fully supported. If you wish to install gbasf2 locally, follow the instructions on the :doc:`gbasf2 documentation <gbasf2:gbasf2install>`.
 
 .. seealso:: https://gbasf2.belle2.org/
 
@@ -185,7 +185,7 @@ is introduced. Each dataset is subdivided by directories with name ``subXX``, wh
     * By design, each datablock contains a maximum of 1000 files.
     * If a dataset contains more than 1000 files, it will be subdivided into at least two datablocks.
 
-The command-line tool for listing the content of a directory on the grid is ``gb2_ds_list``
+The command-line tool for listing the content of a directory on the grid is `gb2_ds_list <BelleDIRAC.Client.gb2_scripts.gb2_ds_list>`
 (it is equivalent to ``ls`` on your local system). You can use it to see how many datablock(s) is/are contained
 in each dataset.
 
@@ -197,7 +197,7 @@ in each dataset.
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Use ``gb2_ds_list`` to see how many datablock(s) is/are contained in the skimmed dataset
+     Use `gb2_ds_list <BelleDIRAC.Client.gb2_scripts.gb2_ds_list>` to see how many datablock(s) is/are contained in the skimmed dataset
 
      ``/belle/Data/release-06-01-11/DB00002058/proc13/prod00029825/e0018/4S_offres/r02559/hadron/14120601/udst``
 
@@ -291,14 +291,14 @@ Also, if you want to search uDST skim samples - which are what we will be using 
     You can download a list of LFNs from the Dataset Searcher using the button "Download txt file" at the bottom.
 
 
-Another way to interact with the dataset searcher is using the command line tool ``gb2_ds_search``.
+Another way to interact with the dataset searcher is using the command line tool `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>`.
 
 .. admonition:: Exercise
      :class: exercise stacked
 
      Set your gbasf2 environment and try to get the LFNs of MC uubar samples using the same skim code from the
      decay mode above (``14120601``), and using campaign ``MC15rd_b`` along with beam energy of 4S and background
-     level BGx1 using ``gb2_ds_search``.
+     level BGx1 using `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>`.
 
 .. admonition:: Hint
      :class: toggle xhint stacked
@@ -343,12 +343,12 @@ To discover the collection you need, you should first check `Data main page <htt
 and `MC main page <https://xwiki.desy.de/xwiki/rest/p/70b0a>`_, which provide details for the official collections.
 
 If you want to explore the available collections, you can also use the dataset searcher tool. You've already 
-used the ``gb2_ds_search`` tool to search for datasets. Now use the ``collection`` key word to list the available data collections.
+used the `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>` tool to search for datasets. Now use the ``collection`` key word to list the available data collections.
 
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Set your gbasf2 environment and find the available data collections for Moriond2023 using ``gb2_ds_search``.
+     Set your gbasf2 environment and find the available data collections for Moriond2023 using `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>`.
 
 .. admonition:: Hint
      :class: toggle xhint stacked
@@ -545,7 +545,7 @@ There are two ways to monitor your jobs on the grid: command-line tools and the 
 Monitoring in the terminal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For the command-line tools, you can use ``gb2_project_summary``
+For the command-line tools, you can use `gb2_project_summary <BelleDIRAC.Client.gb2_scripts.gb2_project_summary>`
 to have an overview of your project (The flag ``-p`` will specify the project name):
 
 .. code-block:: bash
@@ -562,7 +562,7 @@ to have an overview of your project (The flag ``-p`` will specify the project na
     If no project name is specified, the tool will display information of your projects in the last month.
 
 
-The gb2 tool ``gb2_job_status`` lists all the jobs running in a project, including the status and minor status:
+The gb2 tool `gb2_job_status <BelleDIRAC.Client.gb2_scripts.gb2_job_status>` lists all the jobs running in a project, including the status and minor status:
 
 .. code-block:: bash
 
@@ -635,7 +635,7 @@ You can check the output using ``gb2_ds_list <project_name>``:
 
     To see the size of your output and its location, you can use the flags ``-l`` and ``-lg``.
 
-To actually download the files, use ``gb2_ds_get``:
+To actually download the files, use `gb2_ds_get <BelleDIRAC.Client.gb2_scripts.gb2_ds_get>`:
 
 .. code-block:: bash
 
@@ -652,7 +652,7 @@ To actually download the files, use ``gb2_ds_get``:
 
 .. tip::
 
-    You can enable download in multiple streams using the ``--new`` option of ``gb2_ds_get``, which will speed up the transfer. At some point it will become the default behavior of ``gb2_ds_get``. 
+    You can enable download in multiple streams using the ``--new`` option of `gb2_ds_get <BelleDIRAC.Client.gb2_scripts.gb2_ds_get>`, which will speed up the transfer. At some point it will become the default behavior of `gb2_ds_get <BelleDIRAC.Client.gb2_scripts.gb2_ds_get>`.
 
 .. tip::
 
@@ -729,7 +729,7 @@ related to your job.
     How to download the output sandbox from the Job Monitor.
 
 
-It is also possible to retrieve the log files directly from the command line using ``gb2_job_output``:
+It is also possible to retrieve the log files directly from the command line using `gb2_job_output <BelleDIRAC.Client.gb2_scripts.gb2_job_output>`:
 
 .. code-block:: bash
 

@@ -19,8 +19,7 @@ REG_MODULE(EventLimiter);
 //                 Implementation
 //-----------------------------------------------------------------
 
-EventLimiterModule::EventLimiterModule() : Module(),
-  m_eventLimitFromDB("", false)
+EventLimiterModule::EventLimiterModule() : Module()
 {
   // Set module properties
   setDescription("Allows you to set limits on the number of events per run passing this module. "

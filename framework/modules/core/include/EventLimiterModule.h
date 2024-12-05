@@ -43,7 +43,7 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
     /** DB object to get event limit from the conditions database */
-    DBObjPtr<EventLimit> m_eventLimitFromDB;
+    OptionalDBObjPtr<EventLimit> m_eventLimitFromDB;
 
     /** Maximum number of events to be collected at the start of each run (-1 = no maximum) */
     int m_maxEventsPerRun;

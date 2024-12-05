@@ -336,17 +336,12 @@ You can find up to date examples for training the specific or generic FEI, for t
 FEI Training on the Grid
 ########################
 
-In this section, we will consider, how to run the FEI training workflow on the grid using `gbasf2`_ and :doc:`b2luigi:index`.
+In this section, we will consider, how to run the FEI training workflow on the grid using :doc:`gbasf2:index` and :doc:`b2luigi:index`.
 
 .. seealso::
 
-<<<<<<< HEAD
-    * `gbasf2 documentation <https://gbasf2.belle2.org/>`_
-    * `b2luigi documentation <https://b2luigi.readthedocs.io/en/latest/>`_
-=======
-    * `gbasf2 documentation <https://confluence.desy.de/display/BI/Computing+GBasf2>`_
+    * :doc:`gbasf2 documentation <gbasf2:index>`
     * :doc:`b2luigi documentation <b2luigi:index>`
->>>>>>> f02cd5d27 (use link to b2luigi main page via intersphinx)
 
 The example adapted for this section is ``analysis/examples/FEI/B_generic_train.py``, but feel free to adapt
 the changes presented for that example to your own needs.
@@ -354,7 +349,7 @@ the changes presented for that example to your own needs.
 Software and Environment Setup
 ******************************
 
-The following software packages need an installation: `luigi`_, :doc:`b2luigi:index`, and `gbasf2`_.
+The following software packages need an installation: `luigi`_, :doc:`b2luigi:index`, and :doc:`gbasf2:index`.
 
 To profit from the latest developments of `luigi`_ and :doc:`b2luigi:index`, feel free to checkout the packages directly from github, as will be documented
 further below. You can also use particular releases of these packages to be installed with `pip <https://pypi.org/project/pip/>`_.
@@ -384,10 +379,10 @@ that they do not work properly because of missing ``python`` packages. In that c
     python3 -m pip install colorama tenacity --user
 
 
-The last step is to install `gbasf2`_. For that purpose, please switch to a new terminal window with fresh environment
+The last step is to install :doc:`gbasf2:index`. For that purpose, please switch to a new terminal window with fresh environment
 on your machine, and follow the steps for `gbasf2 installation <https://xwiki.desy.de/xwiki/rest/p/78b3b/#HgBasf2installationprocedure>`_.
 
-In the following, an adaption for the `gbasf2`_ package is discussed, which is required until the GitLab issue
+In the following, an adaption for the :doc:`gbasf2:index` package is discussed, which is required until the GitLab issue
 `BIIDCD-1256 <https://gitlab.desy.de/belle2/computing/distributed-computing/belledirac/-/issues/1256>`_ is resolved. It enables to upload non-basf2 data to remote SE's on the grid.
 
 Within the file ``BelleDIRAC/gbasf2/lib/ds/manager.py`` in function ``putDatasetMetadata(...)``, the lines
@@ -420,7 +415,7 @@ General Workflow Concept
 
 The :doc:`b2luigi:index` workflow of running FEI on the grid is constructed from 4 building blocks contained in `fei_grid_workflow.py`_:
 
-* ``FEIAnalysisTask`` and ``FEIAnalysisSummaryTask``: these tasks are performed to produce FEI training inputs based on ``mdst`` samples. They are used to run a `basf2` steering file for FEI on the grid using `gbasf2`_ as grid submission tool. In one instance of ``FEIAnalysisSummaryTask``, several instances of ``FEIAnalysisTask`` are created, based on the provided dataset list. This allows to run this step on an unlimited number of input files.
+* ``FEIAnalysisTask`` and ``FEIAnalysisSummaryTask``: these tasks are performed to produce FEI training inputs based on ``mdst`` samples. They are used to run a `basf2` steering file for FEI on the grid using :doc:`gbasf2:index` as grid submission tool. In one instance of ``FEIAnalysisSummaryTask``, several instances of ``FEIAnalysisTask`` are created, based on the provided dataset list. This allows to run this step on an unlimited number of input files.
 * ``MergeOutputsTask``: After all outputs produced by ``FEIAnalysisSummaryTask`` are downloaded, they need to be merged into a single file to be able to run the MVA training on it.
 * ``FEITrainingTask``: Performs the MVA training on merged outputs produced by ``MergeOutputsTask``.
 * ``PrepareInputsTask``: After a certain stage of MVA training is performed, all ingredients to produce FEI training inputs for the next stage require an upload to the grid storage elements. This is accomplished by this task, such that the ``FEIAnalysisSummaryTask`` can be run for the next stage based on these uploaded ingredients.
@@ -453,7 +448,7 @@ settings.json
 
 The :doc:`b2luigi:index` configuration of the FEI grid workflow is handled by the file `settings.json`_. Further below some explanations for the required settings:
 
-* ``gbasf2_install_directory``: Absolute path to the directory where you have installed the `gbasf2`_ tool. Please correct it to a meaningful path according to the installation you have performed previously.
+* ``gbasf2_install_directory``: Absolute path to the directory where you have installed the :doc:`gbasf2:index` tool. Please correct it to a meaningful path according to the installation you have performed previously.
 * ``gbasf2_input_dslist``: Absolute path to the dataset list of all datasets you would like to process. It is assumed by the ``FEIAnalysisSummaryTask``, that each line corresponds to a dataset sample, such that for each line in this dataset list one instance (file-based case) or multiple instances (event-based case) of ``FEIAnalysisTask`` are spawned. An example of a possible dataset list is given below:
 
     .. code-block:: bash
@@ -463,12 +458,12 @@ The :doc:`b2luigi:index` configuration of the FEI grid workflow is handled by th
         /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014088/s00/e0000/4S/r00000/charged/mdst
         /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014089/s00/e0000/4S/r00000/charged/mdst
 
-* ``gbasf2_project_name_prefix``: Prefix for the `gbasf2`_ tasks which will be created by :doc:`b2luigi:index` in the FEI grid workflow. Please try to keep it short and it is recommended to you to attach a date to it. Within the workflow, an additional string ``_Part{index}`` will be added for each enumerated instance of ``FEIAnalysisTask``, and :doc:`b2luigi:index` adds an additional hash number to the project name to keep it unique.
-* ``gbasf2_release``: The release to be used on the grid. Please make a choice here depending on what is supported by the `gbasf2`_ release you have checked out. You don't have to worry about the case, that the developments in `basf2` specific to running FEI training on the grid might not be contained in the official release. The FEI training steering file is adapted such, that it can run both with a development and an official release.
-* ``gbasf2_print_status_updates``: Convenient option to monitor the progress of running `gbasf2`_ tasks submitted by the FEI grid workflow, so it is good to set it to ``true``. As an alternative, the progress can also be monitored with the **Job Monitor** application of `Belle II DIRAC`_.
+* ``gbasf2_project_name_prefix``: Prefix for the :doc:`gbasf2:index` tasks which will be created by :doc:`b2luigi:index` in the FEI grid workflow. Please try to keep it short and it is recommended to you to attach a date to it. Within the workflow, an additional string ``_Part{index}`` will be added for each enumerated instance of ``FEIAnalysisTask``, and :doc:`b2luigi:index` adds an additional hash number to the project name to keep it unique.
+* ``gbasf2_release``: The release to be used on the grid. Please make a choice here depending on what is supported by the :doc:`gbasf2:index` release you have checked out. You don't have to worry about the case, that the developments in `basf2` specific to running FEI training on the grid might not be contained in the official release. The FEI training steering file is adapted such, that it can run both with a development and an official release.
+* ``gbasf2_print_status_updates``: Convenient option to monitor the progress of running :doc:`gbasf2:index` tasks submitted by the FEI grid workflow, so it is good to set it to ``true``. As an alternative, the progress can also be monitored with the **Job Monitor** application of `Belle II DIRAC`_.
 * ``gbasf2_noscout``: Option to disable scouting, which would slow down the progress, so it is set to ``true``. Feel free to activate it for testing purposes.
-* ``gbasf2_basf2opt``: To reduce the amount of print output of the `gbasf2`_ jobs, this option should be set to ``"-l ERROR"``, which is then passed to the `basf2` steering file. Having too many print outputs may cause problems on the grid worker nodes.
-* ``gbasf2_max_retries``: An option that handles how often a job is allowed to be resubmitted, before its `gbasf2`_ task is marked as failed in the :doc:`b2luigi:index` workflow. Since it is well possible that individual jobs fail due to connection issues or temporarily bad sites, it is good to set that option to a relatively high number, e.g. 5 or even 10. Of course, you are advised to have a look at log files of failed jobs in any case, e.g. by using `Belle II DIRAC`_ for that.
+* ``gbasf2_basf2opt``: To reduce the amount of print output of the :doc:`gbasf2:index` jobs, this option should be set to ``"-l ERROR"``, which is then passed to the `basf2` steering file. Having too many print outputs may cause problems on the grid worker nodes.
+* ``gbasf2_max_retries``: An option that handles how often a job is allowed to be resubmitted, before its :doc:`gbasf2:index` task is marked as failed in the :doc:`b2luigi:index` workflow. Since it is well possible that individual jobs fail due to connection issues or temporarily bad sites, it is good to set that option to a relatively high number, e.g. 5 or even 10. Of course, you are advised to have a look at log files of failed jobs in any case, e.g. by using `Belle II DIRAC`_ for that.
 * ``gbasf2_download_logs``: To reduce the overall time of the FEI grid workflow, this option should be disabled by setting it to ``false``. You can have a look at specific job logs by using `Belle II DIRAC`_.
 * ``remote_tmp_directory``: This option is used by the ``PrepareInputsTask`` to upload tarballs of input files required by ``FEIAnalysisTask`` running on the grid. The directory specified in this option serves as a main directory, where several subdirectories will be created by the uploads performed by ``PrepareInputsTask``. To be able to access your temporary user folders on remote storage elements, the directory name should contain ``/belle/user/<your-grid-username>``.
 * ``remote_initial_se``: Initial storage element used by the ``PrepareInputsTask`` to upload the tarballs for the first time. After that first upload, the tarballs are replicated to storage elements corresponding to the ones, where the datasets specified in ``gbasf2_input_dslist`` are located. Possible initial storage element would be e.g. ``"KIT-TMP-SE"``.
@@ -482,7 +477,7 @@ B_generic_train.py
 In contrast to the original steering file from ``analysis/examples/FEI/B_generic_train.py``, it is adapted to run both locally on your machine in the development setup of `basf2`, as well as to run on remote resources using an official `basf2` release and a pickled path created from the steering file. To achieve this, two steps are performed:
 
 * The path creation is summarized in a corresponding function ``def create_fei_path(filelist=[], cache=0, monitor=False, verbose=False):``, which returns a `basf2` path. This function is then used within the :doc:`b2luigi:index` setup to create a corresponding fixed and pickled `basf2` path.
-* The adaptions of histogram and n-tuple outputs needed for FEI training are reduced to a small set of files to avoid long lasting downloads of a large set of small files. In case these adaptions are not in an official release yet, which is supported by `gbasf2`_, these need to be done by hand. This is accomplished within the ``for``-loops ``for m in path.modules():``.
+* The adaptions of histogram and n-tuple outputs needed for FEI training are reduced to a small set of files to avoid long lasting downloads of a large set of small files. In case these adaptions are not in an official release yet, which is supported by :doc:`gbasf2:index`, these need to be done by hand. This is accomplished within the ``for``-loops ``for m in path.modules():``.
 
 .. _fei-ana:
 
@@ -502,7 +497,7 @@ Both modules have the following common settings:
 * ``monitor``: is used within the path creation of FEI steering file to enable creation of ROOT files used for monitoring the training. This is essentially only required for the evaluation of trainings done during stage 6, and therefore is only enabled for that stage.
 * ``stage``: is a task-specific setting to make a proper folder structure of the entire FEI training workflow. It is also used to set ``cache`` and ``monitor`` settings.
 * ``mode``: is another task-specific setting to make a proper folder structure of the entire FEI training workflow. In case of ``FEIAnalysisSummaryTask``, it is set to ``TrainingInput`` and extended with ``_Part{index}`` for the individual instances of ``FEIAnalysisTask``.
-* ``gbasf2_project_name_prefix``: taken from the `settings.json`_ for ``FEIAnalysisSummaryTask`` and is extended with ``_Part{index}`` for instances of ``FEIAnalysisTask``. These prefixes are then used for the names of `gbasf2`_ tasks created by the corresponding :doc:`b2luigi:index` batch process.
+* ``gbasf2_project_name_prefix``: taken from the `settings.json`_ for ``FEIAnalysisSummaryTask`` and is extended with ``_Part{index}`` for instances of ``FEIAnalysisTask``. These prefixes are then used for the names of :doc:`gbasf2:index` tasks created by the corresponding :doc:`b2luigi:index` batch process.
 * ``gbasf2_input_dslist``: taken from `settings.json`_ for ``FEIAnalysisSummaryTask`` and is extended with ``_Part{index}`` for instances of ``FEIAnalysisTask``. Corresponding individual dataset lists are created by ``FEIAnalysisSummaryTask``.
 
 The following outputs are produced by ``FEIAnalysisTask`` for different stages:
@@ -518,8 +513,8 @@ To spawn several instances of ``FEIAnalysisTask`` at a certain stage, the follow
 * Time stamp of inputs listed above, which were successfully uploaded to TMP-SE as a tarball by ``PrepareInputsTask`` of the previous stage.
 
 During the sequential execution of all required instances of ``FEIAnalysisTask``, symlinks are created for all input files (``mcParticlesCount.root`` and ``*.xml``, where applicable)
-to the current directory to correctly configure the `basf2` path. The path is then pickled by :doc:`b2luigi:index` and send out to the grid with `gbasf2`_ with an appropriate configuration of the grid
-path to the inputs tarball. The jobs are then monitored with corresponding `gbasf2`_ tools and are resubmitted, if necessary. As soon as all jobs of an instance of ``FEIAnalysisTask``
+to the current directory to correctly configure the `basf2` path. The path is then pickled by :doc:`b2luigi:index` and send out to the grid with :doc:`gbasf2:index` with an appropriate configuration of the grid
+path to the inputs tarball. The jobs are then monitored with corresponding :doc:`gbasf2:index` tools and are resubmitted, if necessary. As soon as all jobs of an instance of ``FEIAnalysisTask``
 are successfully completed, the job outputs required for further processing are downloaded.
 
 In the current state of :doc:`b2luigi:index`, the workflow is interrupted, in case not all output files could be downloaded.
@@ -530,14 +525,14 @@ The Problem of Too Long Runtimes
 
 One major drawback of the workflow presented here is that in particular the later stages of ``FEIAnalysisTask``, beginning from stage 3 to stage 6, have large runtimes due to the fact,
 that most FEI stages have to be recomputed from scratch with the corresponding trainings applied, because cache output files ``RootOutput.root`` are not produced by the
-`gbasf2`_ tasks since they occupy too much space.
+:doc:`gbasf2:index` tasks since they occupy too much space.
 
 This is a huge problem because of the fact, that individual jobs may fail for several reasons, causing potentially a large number of resubmission attempts. In consequence,
-a task submitted with `gbasf2`_ to the grid may be delayed significantly by potentially only a few restarted jobs, which have to be run again for a long time.
+a task submitted with :doc:`gbasf2:index` to the grid may be delayed significantly by potentially only a few restarted jobs, which have to be run again for a long time.
 
 A possible way out of this problem would be to split the processing per job by the number of events to be processed, and not by the number of files. This is not (yet) supported
-by `gbasf2`_, but may be accomplished by passing ``-n`` and ``--skip-events`` options to `basf2` via ``gbasf2_basf2opt``
-of :doc:`b2luigi:index`. In that case, a `gbasf2`_ task would need to be started for a single file only.
+by :doc:`gbasf2:index`, but may be accomplished by passing ``-n`` and ``--skip-events`` options to `basf2` via ``gbasf2_basf2opt``
+of :doc:`b2luigi:index`. In that case, a :doc:`gbasf2:index` task would need to be started for a single file only.
 
 To realize this within the workflow constructed in `fei_grid_workflow.py`_, the modules ``FEIAnalysisTask``
 and ``FEIAnalysisSummaryTask`` are extended:
@@ -571,7 +566,7 @@ manner, it is not possible to create the database at runtime of the different ta
 ``FEIAnalysisSummaryTask``. This means, that the module ``FEIAnalysisSummaryTask`` with the **largest** stage number is creating this database to setup the instances of ``FEIAnalysisTask``. All
 other modules ``FEIAnalysisSummaryTask`` with smaller stage numbers access the already created database to save time.
 
-Technically, the `gbasf2`_ tool ``gb2_ds_query_file`` is used to created this database called ``files_database.json``, which is stored in
+Technically, the :doc:`gbasf2:index` tool ``gb2_ds_query_file`` is used to created this database called ``files_database.json``, which is stored in
 the same directory as the dataset list configured with the ``gbasf2_input_dslist`` setting. Currently, this is taking some amount of time, in particular for a set of many large datasets,
 therefore this is only done once.
 
@@ -583,7 +578,7 @@ them to `basf2`.
 
 The options ``-n`` and ``--skip-events`` of `basf2` take care automatically of cases, when the number of remaining events to be processed from a file is smaller than configured by ``-n`` or
 the option ``--skip-events`` exceeds the maximum number of events in a file. In consequence, all files processed in an event-based manner are processed correctly.
-In summary, each instance of ``FEIAnalysisTask`` starts a `gbasf2`_ task, which is configured to process all files from the assigned
+In summary, each instance of ``FEIAnalysisTask`` starts a :doc:`gbasf2:index` task, which is configured to process all files from the assigned
 dataset, using the same fixed subset of events from the input files.
 
 With this approach, the problem of too long runtimes per job is shifted to the requirement of having a large number of worker nodes in place to perform the computations and having
@@ -593,7 +588,7 @@ Therefore, in case of central production of FEI training, a privileged access to
 
 A potential and perhaps a bit more important problem of the event-based processing approach described above is a grid related issue of the current way of processing files placed on the grid.
 Currently, the files are not streamed, but copied completely to a worker node on the grid. In contrast to the file-based processing, where a single file is needed to be copied only once for an instance
-of ``FEIAnalysisTask``, an event-based splitting may lead to multiple copy transfers of a single file, requested by multiple `gbasf2`_ tasks
+of ``FEIAnalysisTask``, an event-based splitting may lead to multiple copy transfers of a single file, requested by multiple :doc:`gbasf2:index` tasks
 at the same time. In consequence, if you specify too few events per job, a significant amount of jobs may fail at the beginning due to too many copy transfer requests for the same file.
 So please keep this in mind, when optimizing on a suitable number of events per job.
 
@@ -601,7 +596,7 @@ This problem might become less relevant, when input files are streamed and not c
 Streaming via `XRootD <https://xrootd.slac.stanford.edu/>`_ then usually takes care of transferring only the relevant information to the jobs, so only the events required by an instance of
 ``FEIAnalysisTask`` in case of event-based processing.
 
-In the current state of :doc:`b2luigi:index`, the parallel instances of `gbasf2`_ tasks
+In the current state of :doc:`b2luigi:index`, the parallel instances of :doc:`gbasf2:index` tasks
 (like ``FEIAnalysisTask`` in this workflow) are handled sequentially, and not in parallel. This means, that you should avoid creating too many tasks with the event-based splitting discussed above.
 So try to optimize in that case between the runtimes of single jobs and the total number of the tasks. However, in view of the fact, that this is done for stages 3 to 6, which anyhow run very long,
 this issue should not be a major problem.
@@ -614,7 +609,7 @@ merged into a single file. This is accomplished by ``MergeOutputsTask`` using th
 
 This task depends on the ``FEIAnalysisSummaryTask`` running directly before it to be finished successfully, and has the following settings:
 
-* ``ncpus``: number of CPUs of the local machine to be used for parallel merging, in case multiple outputs are produced by the `gbasf2`_ tasks. The value is extracted from the `settings.json`_ (``local_cpus``).
+* ``ncpus``: number of CPUs of the local machine to be used for parallel merging, in case multiple outputs are produced by the :doc:`gbasf2:index` tasks. The value is extracted from the `settings.json`_ (``local_cpus``).
 * ``monitor`` and ``stage``: see description in :ref:`fei-ana`.
 
 FEITrainingTask
@@ -669,7 +664,7 @@ To be able to upload necessary files to SE, the following inputs are required:
 * Merged ``mcParticlesCount.root`` from stage -1. This indicates also the dependence, that ``FEITrainingTask`` of stage -1 should start after ``MergeOutputsTask`` of stage -1 is successfully completed.
 * All training files ``*.xml`` from previous stages and current stage, in case BDT trainings were already performed.
 
-The files ``mcParticlesCount.root`` and ``*.xml`` are then put into a tarball, copied over by `gbasf2`_ tools to the initial TMP-SE
+The files ``mcParticlesCount.root`` and ``*.xml`` are then put into a tarball, copied over by :doc:`gbasf2:index` tools to the initial TMP-SE
 storage element configured in `settings.json`_., and then the tarball is replicated
 to the storage elements from ``dataset_sites.txt``. In case of a successful upload and replication, the timestamp used in the remote path of the tarball is written to ``successful_input_upload.txt``, which is checked by the ``FEIAnalysisSummaryTask`` directly following this ``PrepareInputsTask``.
 
@@ -710,11 +705,11 @@ especially when running on the grid.
 
     * You should make sure, that the datasets you would like to process are available on as many sites as possible. In that way you would also increase the number of potential computing nodes on the grid that you can use.
     * In case you would like to perform a central FEI training, which will then be provided centrally and used by several analysis groups, it would be good, that your jobs will get an increased priority on the grid to allow you to get the resources you need faster.
-    * If you do not trust some computing sites, or you trust only a few, you can make use of ``gbasf2_additional_params`` setting of :doc:`b2luigi:index` to ban some sites (``"--banned_site <SITE-1,SITE-2>"``) or specify sites you would like to run on (``"--site <SITE-1,SITE-2>"``). The value of the parameter ``gbasf2_additional_params`` will then be passed to `gbasf2`_.
+    * If you do not trust some computing sites, or you trust only a few, you can make use of ``gbasf2_additional_params`` setting of :doc:`b2luigi:index` to ban some sites (``"--banned_site <SITE-1,SITE-2>"``) or specify sites you would like to run on (``"--site <SITE-1,SITE-2>"``). The value of the parameter ``gbasf2_additional_params`` will then be passed to :doc:`gbasf2:index`.
 
 * Although the workflow is (more or less) automatic, you are strongly advised to have a look at its progress regularly and check, whether everything is done correctly and do not run it as a black box.
 * Please expect, that problems may arise during the process, because of (possible temporarily) bad state of sites, failing downloads due to connection problems etc. Individual jobs may need to be resubmitted several times until they are finished successfully.
-* In case you encounter problems specific to `gbasf2`_, do not hesitate to ask experts on the `comp-users-forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_ mailing list.
+* In case you encounter problems specific to :doc:`gbasf2:index`, do not hesitate to ask experts on the `comp-users-forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_ mailing list.
 
 Possible Improvements
 *********************
@@ -724,21 +719,21 @@ Some ideas of improvements of the workflow constructed to run the FEI training o
 Potential Improvements Following gbasf2 Development
 ---------------------------------------------------
 
-In the current state of the workflow and :doc:`b2luigi:index`, some print outputs from `gbasf2`_ have to be parsed to obtain desired information. Depending on the future improvements of `gbasf2`_,
-such parsing may be changed to a more convenient way, for example parsing a json file output created by `gbasf2`_ tools on request.
+In the current state of the workflow and :doc:`b2luigi:index`, some print outputs from :doc:`gbasf2:index` have to be parsed to obtain desired information. Depending on the future improvements of :doc:`gbasf2:index`,
+such parsing may be changed to a more convenient way, for example parsing a json file output created by :doc:`gbasf2:index` tools on request.
 
-According to the discussions with `gbasf2`_ developers, developments are ongoing to allow the
-`gbasf2`_ tasks to save the sandbox not on a central server, but distributed on several storage sites. This would allow to use the
-option ``--input_sandboxfiles`` of `gbasf2`_ to take care of uploading the inputs collected currently by the ``PrepareInputsTask``.
+According to the discussions with :doc:`gbasf2:index` developers, developments are ongoing to allow the
+:doc:`gbasf2:index` tasks to save the sandbox not on a central server, but distributed on several storage sites. This would allow to use the
+option ``--input_sandboxfiles`` of :doc:`gbasf2:index` to take care of uploading the inputs collected currently by the ``PrepareInputsTask``.
 The reason for doing it currently with ``PrepareInputsTask`` by hand, is that the sandbox is not allowed to exceed the size of 10 MB. As soon as the distribution of the sandbox among multiple
-storage elements is introduced to `gbasf2`_, the option ``--input_sandboxfiles`` can then be used directly and this would make the
+storage elements is introduced to :doc:`gbasf2:index`, the option ``--input_sandboxfiles`` can then be used directly and this would make the
 module ``PrepareInputsTask`` obsolete.
 
-Another possible improvement of `gbasf2`_ which is currently considered by the developers is the possibility to start merging jobs on the grid.
+Another possible improvement of :doc:`gbasf2:index` which is currently considered by the developers is the possibility to start merging jobs on the grid.
 This would allow for performing ``MergeOutputsTask`` on the grid with the potential to speed up this part of the workflow, avoiding the time spent for downloads and merging on the local machine.
 
-In general, it is good to have a look at the process of `gbasf2`_ developments and extend the workflow and/or
-:doc:`b2luigi:index` to make use of the new features and improvements of future `gbasf2`_ releases.
+In general, it is good to have a look at the process of :doc:`gbasf2:index` developments and extend the workflow and/or
+:doc:`b2luigi:index` to make use of the new features and improvements of future :doc:`gbasf2:index` releases.
 One example would be the possibility to resubmit jobs with changed settings, e.g. sites to reject, and/or the estimated runtime of the job.
 
 Troubleshooting
@@ -835,7 +830,6 @@ Resources, Publications etc.
       Thomas's PhD thesis.
 
 .. _luigi: https://luigi.readthedocs.io/en/latest/
-.. _gbasf2: https://xwiki.desy.de/xwiki/rest/p/78b3b
 .. _settings.json: https://gitlab.desy.de/belle2/performance/fei/grid-workflow/-/blob/main/settings.json
 .. _fei_grid_workflow.py: https://gitlab.desy.de/belle2/performance/fei/grid-workflow/-/blob/main/fei_grid_workflow.py
 .. _Belle II DIRAC: https://dirac.cc.kek.jp:8443/DIRAC/

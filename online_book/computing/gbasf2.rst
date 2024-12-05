@@ -68,7 +68,7 @@ and verify that you have the prerequisites. You need:
 
     It is required that you join the `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_,
     where you can ask for help and receive announcements on releases and system issues. You can also find more
-    details on the official `gbasf2 documentation page <https://gbasf2.belle2.org/>`_
+    details in the official :doc:`gbasf2 documentation <gbasf2:index>`
 
 
 Setting up gbasf2 via cvmfs
@@ -764,7 +764,7 @@ Where to go for help?
 The `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_ is the main channel of communication
 related to issues with the grid. Feel free to ask every time that you need help.
 
-The most useful place to find additional instructions and information about using gbasf2 is `gbasf2.belle2.org <https://gbasf2.belle2.org>`_.
+The most useful place to find additional instructions and information about using gbasf2 is `gbasf2.belle2.org <gbasf2:index>`.
 
 Additionally, some pages at XWiki are prepared with additional information:
 

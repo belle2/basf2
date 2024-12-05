@@ -1,0 +1,46 @@
+# EventType: 1113048001
+# Descriptor: B0 -> D_10 [-> D*- (-> anti-D0(-> K+ pi-) pi-) pi+] eta (-> gamma gamma)
+# NickName: Bd_D10eta
+# Documentation: Bd -> D_10 eta
+# Tested: yes
+# PhysicsWG: BHadronic WG
+# Responsible: Vismaya Vs
+# Email: ph20resch11010@iith.ac.in
+# Cuts: None
+# Date: 2024/12/05
+
+Alias D10sig D_10
+Alias anti-D10sig anti-D_10
+ChargeConj D10sig anti-D10sig
+
+Alias etasig eta
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0    VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0000 anti-D10sig etasig SVS;
+Enddecay
+CDecay anti-B0sig
+
+Decay anti-D10sig
+1.0000 D*-sig pi+ PHOTOS VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+Enddecay
+CDecay D10sig
+
+Decay D*-sig
+1.0000 anti-D0sig pi- PHOTOS VSS;
+Enddecay
+CDecay D*+sig
+
+Decay anti-D0sig
+1.0000 K+ pi- PHOTOS PHSP;
+Enddecay
+CDecay D0sig
+
+Decay etasig
+1.0000 gamma gamma PHSP;
+Enddecay
+
+End

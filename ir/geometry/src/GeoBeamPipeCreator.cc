@@ -1051,7 +1051,7 @@ namespace Belle2 {
           transform_AreaTubeFwdForLER);
       G4LogicalVolume* logi_Lv1SUSLERUp = new G4LogicalVolume(geo_Lv1SUSLERUp, mat_Lv1SUSLERUp, "logi_Lv1SUSLERUp_name");
 
-      //-put volumn
+      //-put volume
       setColor(*logi_Lv1SUSLERUp, "#666666");
       new G4PVPlacement(transform_Lv1TaLERUp, logi_Lv1SUSLERUp, "phys_Lv1SUSLERUp_name", &topVolume, false, 0);
 
@@ -1160,7 +1160,7 @@ namespace Belle2 {
           transform_AreaTubeFwdForHER);
       G4LogicalVolume* logi_Lv1SUSHERDwn = new G4LogicalVolume(geo_Lv1SUSHERDwn, mat_Lv1SUSHERDwn, "logi_Lv1SUSHERDwn_name");
 
-      //-put volumn
+      //-put volume
       setColor(*logi_Lv1SUSHERDwn, "#666666");
       new G4PVPlacement(transform_Lv1TaHERDwn, logi_Lv1SUSHERDwn, "phys_Lv1SUSHERDwn_name", &topVolume, false, 0);
 
@@ -1294,7 +1294,7 @@ namespace Belle2 {
           transform_AreaTubeFwdForHER);
       G4LogicalVolume* logi_Lv1SUSHERUp = new G4LogicalVolume(geo_Lv1SUSHERUp, mat_Lv1SUSHERUp, "logi_Lv1SUSHERUp_name");
 
-      //-put volumn
+      //-put volume
       setColor(*logi_Lv1SUSHERUp, "#666666");
       new G4PVPlacement(transform_Lv1TaHERUp, logi_Lv1SUSHERUp, "phys_Lv1SUSHERUp_name", &topVolume, false, 0);
 
@@ -1402,7 +1402,7 @@ namespace Belle2 {
           transform_AreaTubeFwdForHER);
       G4LogicalVolume* logi_Lv1SUSLERDwn = new G4LogicalVolume(geo_Lv1SUSLERDwn, mat_Lv1SUSLERDwn, "logi_Lv1SUSLERDwn_name");
 
-      //-put volumn
+      //-put volume
       setColor(*logi_Lv1SUSLERDwn, "#666666");
       new G4PVPlacement(transform_Lv1TaLERDwn, logi_Lv1SUSLERDwn, "phys_Lv1SUSLERDwn_name", &topVolume, false, 0);
 

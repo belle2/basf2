@@ -77,7 +77,7 @@ void PXDBgTupleProducerModule::initialize()
   //Pointer to GeoTools instance
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfPXDLayers() == 0) {
-    B2WARNING("Missing geometry for PXD, PXD-masking is skiped.");
+    B2WARNING("Missing geometry for PXD, PXD-masking is skipped.");
   }
   m_nPXDSensors = gTools->getNumberOfPXDSensors();
 
@@ -160,7 +160,7 @@ void PXDBgTupleProducerModule::event()
   //Get the event meta data
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
-  // Compute the curent one second timestamp
+  // Compute the current one second timestamp
   unsigned long long int ts = eventMetaDataPtr->getTime() / m_timePeriod;
 
   // If needed, add a new one second block to buffer

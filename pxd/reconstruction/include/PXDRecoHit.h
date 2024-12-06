@@ -119,7 +119,7 @@ namespace Belle2 {
     /** Get deposited energy error. */
     //float getEnergyDepError() const { return m_energyDepError; }
 
-    /** Get the likelyhood that cluster shape is likely to be created from track state. */
+    /** Get the likelihood that cluster shape is likely to be created from track state. */
     float getShapeLikelyhood(const genfit::StateOnPlane& state) const;
 
     /** Construct the hessian matrix */

@@ -124,7 +124,7 @@ namespace Belle2 {
     * @param hsigma histogram to store the sigma
     * @param nbin number of bins
     */
-    void setHistPars(TH2D* hist, TH1F* hmean, TH1F* hsigma, int nbin);
+    void setHistPars(TH2D*& hist, TH1F& hmean, TH1F& hsigma, int nbin);
 
     /**
     * function to draw the histograms
@@ -134,7 +134,7 @@ namespace Belle2 {
     * @param fac factor to set the range of y-axis of histogram
     * @param var name of histogram
     */
-    void drawHistPars(TH1F* hist, int nbin, double pars, double fac, std::string var);
+    void drawHistPars(TH1F& hist, int nbin, double pars, double fac, std::string var);
 
     /**
     * function to add plot style
@@ -145,7 +145,7 @@ namespace Belle2 {
     * function to add text style
     * @param obj pavetext variable
     */
-    void setTextStyle(TPaveText*& obj);
+    void setTextStyle(TPaveText& obj);
 
     /**
     * function to set the style of histogram
@@ -166,7 +166,7 @@ namespace Belle2 {
     * function to set the bhabha event info
     * @param pt pavetext variable
     */
-    void setBEvtInfo(TPaveText* pt);
+    void setBEvtInfo(TPaveText& pt);
 
   private:
 

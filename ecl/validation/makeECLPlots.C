@@ -1679,7 +1679,7 @@ void ECLCalDigitFWD(TTree* cd_treeFWD)
   cd_treeFWD->Draw("eclCalDigitAmp>>hAmp","eclCalDigitCellId<1153&&eclCalDigitToMC1==0");
   hAmp->GetListOfFunctions()->Add(new TNamed("Description", "CalDigit amplitude for 100 MeV/c single photons in FWD endcap"));
   hAmp->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hAmp->GetXaxis()->SetTitle("CalDigit amplitude");
+  hAmp->GetXaxis()->SetTitle("CalDigit amplitude (GeV)");
   hAmp->GetListOfFunctions()->Add(new TNamed("Contact","pche3675@uni.sydney.edu.au")); 
 
   TH1F* hTimeFit = new TH1F("hTimeFit","CalDigit TimeFit in FWD endcap", 50, -1100., 1100.);
@@ -1755,7 +1755,7 @@ void ECLCalDigitBarrel(TTree* cd_treeBarrel)
   cd_treeBarrel->Draw("eclCalDigitAmp>>hAmp","eclCalDigitCellId<7777&&eclCalDigitCellId>1152&&eclCalDigitToMC1==0");
   hAmp->GetListOfFunctions()->Add(new TNamed("Description", "CalDigit amplitude for 100 MeV/c single photons in Barrel"));
   hAmp->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hAmp->GetXaxis()->SetTitle("CalDigit amplitude");
+  hAmp->GetXaxis()->SetTitle("CalDigit amplitude (GeV)");
   hAmp->GetListOfFunctions()->Add(new TNamed("Contact","pche3675@uni.sydney.edu.au")); 
 
   TH1F* hTimeFit = new TH1F("hTimeFit","CalDigit TimeFit in Barrel", 50, -1100., 1100.);
@@ -1832,7 +1832,7 @@ void ECLCalDigitBWD(TTree* cd_treeBWD)
   cd_treeBWD->Draw("eclCalDigitAmp>>hAmp","eclCalDigitCellId>7776&&eclCalDigitToMC1==0");
   hAmp->GetListOfFunctions()->Add(new TNamed("Description", "CalDigit amplitude for 100 MeV/c single photons in BWD endcap"));
   hAmp->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hAmp->GetXaxis()->SetTitle("CalDigit amplitude");
+  hAmp->GetXaxis()->SetTitle("CalDigit amplitude (GeV)");
   hAmp->GetListOfFunctions()->Add(new TNamed("Contact","pche3675@uni.sydney.edu.au")); 
 
   TH1F* hTimeFit = new TH1F("hTimeFit","CalDigit TimeFit in BWD endcap", 50, -1100., 1100.);

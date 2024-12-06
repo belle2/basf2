@@ -15,7 +15,6 @@
 #include <framework/logging/Logger.h>
 
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
@@ -74,7 +73,7 @@ namespace Belle2 {
       //values will be automatically converted
       int detID = 0;
       //Lets loop over all the Active nodes
-      BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+      for (const GearDir& activeParams : content.getNodes("Active")) {
 
         //create he3tube
         G4double startAngle = 0.*CLHEP::deg;

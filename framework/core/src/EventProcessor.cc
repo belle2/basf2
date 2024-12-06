@@ -27,7 +27,7 @@
 #include <valgrind/callgrind.h>
 /** Call a module member function and optionally enable valgrind
  * instrumentation around the function call. We need this to call initialize,
- * beginRun, event, endRun and terminate and need to distuingish between using
+ * beginRun, event, endRun and terminate and need to distinguish between using
  * valgrind or not each time. The easiest way to do this is define this short
  * macro.
  */
@@ -131,7 +131,7 @@ void EventProcessor::process(const PathPtr& startPath, long maxEvent)
   //Get list of modules which could be executed during the data processing.
   ModulePtrList moduleList = startPath->buildModulePathList();
 
-  //Find the adress of the module we want to profile
+  //Find the address of the module we want to profile
   if (!m_profileModuleName.empty()) {
     for (const auto& module : moduleList) {
       if (module->getName() == m_profileModuleName) {
@@ -158,7 +158,7 @@ void EventProcessor::process(const PathPtr& startPath, long maxEvent)
     }
   }
 
-  //do we want to visualize DataStore input/ouput?
+  //do we want to visualize DataStore input/output?
   if (Environment::Instance().getVisualizeDataFlow()) {
     DataFlowVisualization v(&DataStore::Instance().getDependencyMap());
     v.visualizePath("dataflow.dot", *startPath);
@@ -185,7 +185,7 @@ void EventProcessor::process(const PathPtr& startPath, long maxEvent)
       //in case of SIGINT, we move on to processTerminate() to shut down safely
     } catch (...) {
       if (m_eventMetaDataPtr)
-        B2ERROR("Exception occured in exp/run/evt: "
+        B2ERROR("Exception occurred in exp/run/evt: "
                 << m_eventMetaDataPtr->getExperiment() << " / "
                 << m_eventMetaDataPtr->getRun() << " / "
                 << m_eventMetaDataPtr->getEvent());

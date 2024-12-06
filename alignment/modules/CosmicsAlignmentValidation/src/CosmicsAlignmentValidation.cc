@@ -14,8 +14,6 @@
 #include <root/TFile.h>
 #include <root/TTree.h>
 
-#include <boost/foreach.hpp>
-
 //avoid having to wrap everything in the namespace explicitly
 //only permissible in .cc files!
 using namespace Belle2;
@@ -206,7 +204,7 @@ const TrackFitResult* CosmicsAlignmentValidationModule::findRelatedTrackFitResul
   typedef RelationIndex<genfit::Track, TrackFitResult>::Element relElement_t;
   std::vector<const TrackFitResult*> fitResults;
 
-  BOOST_FOREACH(const relElement_t& relGfTrackToTrackFitResult, relGfTracksToTrackFitResults.getElementsFrom(gfTrack)) {
+  for (const relElement_t& relGfTrackToTrackFitResult : relGfTracksToTrackFitResults.getElementsFrom(gfTrack)) {
     B2DEBUG(99, "----> Related TrackFitResult found!!!");
     fitResults.push_back(relGfTrackToTrackFitResult.to);
   }

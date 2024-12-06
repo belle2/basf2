@@ -22,6 +22,7 @@ namespace Belle2 {
     friend class CDCDedxPIDModule;
     friend class CDCDedxScanModule;
     friend class CDCDedxCorrectionModule;
+    friend class CDCDedxPIDCreatorModule;
 
   public:
 

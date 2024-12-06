@@ -349,7 +349,7 @@ class TauGeneric(BaseSkim):
         * ``netCharge``: total net charge of good tracks
         * ``nTracksS1/nTracksS2:`` number of good tracks in each hemisphere ``S1/S2`` divided by thrust axis
         * ``invMS1/invMS2``: invariant mass of particles in each hemisphere
-        * ``maxPt``: maximum Pt amoung good tracks
+        * ``maxPt``: maximum Pt among good tracks
         * ``E_ECLtrk``: total ECL energy of good tracks
         """
 

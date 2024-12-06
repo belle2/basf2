@@ -263,7 +263,7 @@ int main(int argc, char* argv[])
         cmd.push_back(nullptr);
         //And call this thing. Execvp will not return if successful as the
         //current process will be replaced so we do not need to care about what
-        //happens if succesful
+        //happens if successful
         if (execvp(cmd[0], cmd.data()) == -1) {
           int errsv = errno;
           perror("Problem calling valgrind");

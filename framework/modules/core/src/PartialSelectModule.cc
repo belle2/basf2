@@ -27,7 +27,7 @@ PartialSelectModule::PartialSelectModule() : Module()
     This module helps you set the interval of events to process. It
     returns True inside the set window and False outside. 
 
-    The input parameters are fractions which can be interpretted as the
+    The input parameters are fractions which can be interpreted as the
     fraction of leading and (1-)fraction of trailing events that will be
     skipped. Internally, the total number of events of the input file is 
     used to determine the event selection window boundaries. 
@@ -60,7 +60,7 @@ PartialSelectModule::PartialSelectModule() : Module()
     "The product of entryStop fraction and total number of events in each file"
     " will determine the last event to end processing with. Module will return"
     " False for all trailing events after this. By default(1.0) module will "
-    "end wtih the last event.",
+    "end with the last event.",
     1.);
 }
 

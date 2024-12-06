@@ -45,7 +45,7 @@ def call_and_output(command_and_args, *args, **kwargs):
 
 def get_argument_parser(target_required=False):
     """
-    Return the argument parser. For easy automatized argmunt collection of FW tools.
+    Return the argument parser. For easy automated argmunt collection of FW tools.
     @param target_required: True if the target argument is required because no write to the default
                             folder is possible.
     """

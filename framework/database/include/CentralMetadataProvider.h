@@ -27,11 +27,11 @@ namespace Belle2::Conditions {
     /** Update the list of known payloads for the given globaltag/exp/run. This
      * basically just calls addPayload() for each payload it finds in the
      * globaltag for the given exp/run.
-     * @returns true on sucess, false on any error
+     * @returns true on success, false on any error
      */
     bool updatePayloads(const std::string& globaltag, int exp, int run) override;
   private:
-    /** Downlad a given relative url (the baseUrl will be prependend) and return the json description.
+    /** Download a given relative url (the baseUrl will be prependend) and return the json description.
      * Will raise exceptions on error */
     nlohmann::json get(const std::string& url);
     /** Reference to the downloader instance for convenience */

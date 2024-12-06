@@ -533,7 +533,7 @@ class CommandIoVsHelper:
             "--iov-pattern",
             default=None,
             help="whitespace-separated string with pattern of the iov to be considered. "
-            " Use * to mark the fields that shold be ignored. Valid patterns are 0 0 -1 -1"
+            " Use * to mark the fields that should be ignored. Valid patterns are 0 0 -1 -1"
             " (a very specific IoV),  0 * -1 -1 (any iov that starts in any run of exp 0 and ends exactly in exp -1, run -1)"
             ", * * 3 45 (any Iov ending in exp 3, run 45, regardless from where it starts).")
         self._args.add_argument("--run-range", nargs=4, default=None, type=int,

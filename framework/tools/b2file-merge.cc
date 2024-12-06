@@ -174,7 +174,7 @@ The following restrictions apply:
         // Make sure the branch is mergeable
         if(!br) continue;
         if(!br->GetTargetClass()->InheritsFrom(Mergeable::Class())){
-          B2ERROR("Branch " << std::quoted(br->GetName()) << " in persistent tree not inheriting from Mergable");
+          B2ERROR("Branch " << std::quoted(br->GetName()) << " in persistent tree not inheriting from Mergeable");
           continue;
         }
         // Ok, it's an object we now how to handle so get it from the tree

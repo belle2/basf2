@@ -1693,7 +1693,7 @@ void ECLCalDigitFWD(TTree* cd_treeFWD)
   hFitQuality->SetMinimum(0);
   cd_treeFWD->Draw("eclCalDigitFitQuality>>hFitQuality","eclCalDigitCellId<1153&&eclCalDigitToMC1==0");
   hFitQuality->GetListOfFunctions()->Add(new TNamed("Description", "CalDigit time fit quality for 100 MeV/c single photons in FWD endcap"));
-  hFitQuality->GetListOfFunctions()->Add(new TNamed("Check", "Flag values are zero")); 
+  hFitQuality->GetListOfFunctions()->Add(new TNamed("Check", "Nearly all the fit flags should be zero. Non-zero fit flags should have their amplitude investigated.")); 
   hFitQuality->GetXaxis()->SetTitle("CalDigit time fit quality");
   hFitQuality->GetListOfFunctions()->Add(new TNamed("Contact","pche3675@uni.sydney.edu.au")); 
   hFitQuality->GetListOfFunctions()->Add(new TNamed("MetaOptions", "nocompare"))
@@ -1769,7 +1769,7 @@ void ECLCalDigitBarrel(TTree* cd_treeBarrel)
   hFitQuality->SetMinimum(0);
   cd_treeBarrel->Draw("eclCalDigitFitQuality>>hFitQuality","eclCalDigitCellId<7777&&eclCalDigitCellId>1152&&eclCalDigitToMC1==0");
   hFitQuality->GetListOfFunctions()->Add(new TNamed("Description", "CalDigit fit quality for 100 MeV/c single photons in Barrel endcap"));
-  hFitQuality->GetListOfFunctions()->Add(new TNamed("Check", "Flag values are zero")); 
+  hFitQuality->GetListOfFunctions()->Add(new TNamed("Check", "Nearly all the fit flags should be zero. Non-zero fit flags should have their amplitude investigated.")); 
   hFitQuality->GetXaxis()->SetTitle("CalDigit fit quality");
   hFitQuality->GetListOfFunctions()->Add(new TNamed("Contact","pche3675@uni.sydney.edu.au")); 
   hFitQuality->GetListOfFunctions()->Add(new TNamed("MetaOptions", "nocompare"));
@@ -1846,7 +1846,7 @@ void ECLCalDigitBWD(TTree* cd_treeBWD)
   hFitQuality->SetMinimum(0);
   cd_treeBWD->Draw("eclCalDigitFitQuality>>hFitQuality","eclCalDigitCellId>7776&&eclCalDigitToMC1==0");
   hFitQuality->GetListOfFunctions()->Add(new TNamed("Description", "CalDigit fit quality for 100 MeV/c single photons in BWD endcap"));
-  hFitQuality->GetListOfFunctions()->Add(new TNamed("Check", "Flag values are zero")); 
+  hFitQuality->GetListOfFunctions()->Add(new TNamed("Check", "Nearly all the fit flags should be zero. Non-zero fit flags should have their amplitude investigated.")); 
   hFitQuality->GetXaxis()->SetTitle("CalDigit fit quality");
   hFitQuality->GetListOfFunctions()->Add(new TNamed("Contact","pche3675@uni.sydney.edu.au")); 
   hFitQuality->GetListOfFunctions()->Add(new TNamed("MetaOptions", "nocompare"))

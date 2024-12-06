@@ -37,14 +37,13 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module()
 
   //Parameter definitions
   addParam("useIndividualHits", m_useIndividualHits,
-           "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", false);
-  // no need to define highest and lowest truncated value as we always remove higest two dE/dx value from the 8 dE/dx value
-  addParam("onlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
+           "Use individual hits (true) or truncated mean (false) to determine likelihoods", false);
+  addParam("onlyPrimaryParticles", m_onlyPrimaryParticles,
+           "For MC only: if true, only save data for primary particles (as determined by MC truth)", false);
   addParam("usePXD", m_usePXD, "Use PXDClusters for dE/dx calculation", false);
   addParam("useSVD", m_useSVD, "Use SVDClusters for dE/dx calculation", true);
   addParam("trackDistanceThreshold", m_trackDistanceThreshhold,
            "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
-  addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
   m_trackID = 0;
@@ -54,64 +53,15 @@ VXDDedxPIDModule::~VXDDedxPIDModule() { }
 
 void VXDDedxPIDModule::checkPDFs()
 {
-  //load dedx:momentum PDFs
-  if (!m_SVDDedxPDFs) B2FATAL("No SVD Dedx PDFS available");
-  if (!m_PXDDedxPDFs) B2FATAL("No PXD Dedx PDFS available");
-  int nBinsXPXD, nBinsYPXD;
-  double xMinPXD, xMaxPXD, yMinPXD, yMaxPXD;
-  nBinsXPXD = nBinsYPXD = -1;
-  xMinPXD = xMaxPXD = yMinPXD = yMaxPXD = 0.0;
-
-  int nBinsXSVD, nBinsYSVD;
-  double xMinSVD, xMaxSVD, yMinSVD, yMaxSVD;
-  nBinsXSVD = nBinsYSVD = -1;
-  xMinSVD = xMaxSVD = yMinSVD = yMaxSVD = 0.0;
-
-  for (unsigned int iPart = 0; iPart < 6; iPart++) {
-    const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
-    const TH2F* svd_pdf = m_SVDDedxPDFs->getSVDPDF(iPart, !m_useIndividualHits);
-    const TH2F* pxd_pdf = m_PXDDedxPDFs->getPXDPDF(iPart, !m_useIndividualHits);
-
-    if (pxd_pdf->GetEntries() == 0 || svd_pdf->GetEntries() == 0) {
-      if (m_ignoreMissingParticles)
-        continue;
-      B2FATAL("Couldn't find PDF for PDG " << pdgCode);
-    }
-
-    //check that PXD PDFs have the same dimensions and same binning
-    const double epsFactor = 1e-5;
-    if (nBinsXPXD == -1 and nBinsYPXD == -1) {
-      nBinsXPXD = pxd_pdf->GetNbinsX();
-      nBinsYPXD = pxd_pdf->GetNbinsY();
-      xMinPXD = pxd_pdf->GetXaxis()->GetXmin();
-      xMaxPXD = pxd_pdf->GetXaxis()->GetXmax();
-      yMinPXD = pxd_pdf->GetYaxis()->GetXmin();
-      yMaxPXD = pxd_pdf->GetYaxis()->GetXmax();
-    } else if (nBinsXPXD != pxd_pdf->GetNbinsX()
-               or nBinsYPXD != pxd_pdf->GetNbinsY()
-               or fabs(xMinPXD - pxd_pdf->GetXaxis()->GetXmin()) > epsFactor * xMaxPXD
-               or fabs(xMaxPXD - pxd_pdf->GetXaxis()->GetXmax()) > epsFactor * xMaxPXD
-               or fabs(yMinPXD - pxd_pdf->GetYaxis()->GetXmin()) > epsFactor * yMaxPXD
-               or fabs(yMaxPXD - pxd_pdf->GetYaxis()->GetXmax()) > epsFactor * yMaxPXD) {
-      B2FATAL("PDF for PDG " << pdgCode << ", PXD has binning/dimensions differing from previous PDF.");
-    }
-
-    //check that SVD PDFs have the same dimensions and same binning
-    if (nBinsXSVD == -1 and nBinsYSVD == -1) {
-      nBinsXSVD = svd_pdf->GetNbinsX();
-      nBinsYSVD = svd_pdf->GetNbinsY();
-      xMinSVD = svd_pdf->GetXaxis()->GetXmin();
-      xMaxSVD = svd_pdf->GetXaxis()->GetXmax();
-      yMinSVD = svd_pdf->GetYaxis()->GetXmin();
-      yMaxSVD = svd_pdf->GetYaxis()->GetXmax();
-    } else if (nBinsXSVD != svd_pdf->GetNbinsX()
-               or nBinsYSVD != svd_pdf->GetNbinsY()
-               or fabs(xMinSVD - svd_pdf->GetXaxis()->GetXmin()) > epsFactor * xMaxSVD
-               or fabs(xMaxSVD - svd_pdf->GetXaxis()->GetXmax()) > epsFactor * xMaxSVD
-               or fabs(yMinSVD - svd_pdf->GetYaxis()->GetXmin()) > epsFactor * yMaxSVD
-               or fabs(yMaxSVD - svd_pdf->GetYaxis()->GetXmax()) > epsFactor * yMaxSVD) {
-      B2FATAL("PDF for PDG " << pdgCode << ", PXD has binning/dimensions differing from previous PDF.");
-    }
+  if (m_usePXD) {
+    if (not m_PXDDedxPDFs) B2FATAL("No PXD dE/dx PDF's available");
+    bool ok = m_PXDDedxPDFs->checkPDFs(not m_useIndividualHits);
+    if (not ok) B2FATAL("Binning or ranges of PXD dE/dx PDF's differ");
+  }
+  if (m_useSVD) {
+    if (not m_SVDDedxPDFs) B2FATAL("No SVD Dedx PDF's available");
+    bool ok = m_SVDDedxPDFs->checkPDFs(not m_useIndividualHits);
+    if (not ok) B2FATAL("Binning or ranges of SVD dE/dx PDF's differ");
   }
 }
 
@@ -158,6 +108,9 @@ void VXDDedxPIDModule::initialize()
 
 void VXDDedxPIDModule::event()
 {
+  m_dedxTracks.clear();
+  m_dedxLikelihoods.clear();
+
   // go through Tracks
   // get fitresult and gftrack and do extrapolations, save corresponding dE/dx and likelihood values
   //   get genfit::TrackCand through genfit::Track::getCand()
@@ -248,30 +201,27 @@ void VXDDedxPIDModule::event()
       continue;
     }
 
-    // calculate likelihoods for truncated mean
-    if (!m_useIndividualHits) {
-      for (int detector = 0; detector <= c_SVD; detector++) {
-        if (!detectorEnabled(static_cast<Detector>(detector)))
-          continue; //unwanted detector
-
-        if (detector == 0) savePXDLogLikelihood(dedxTrack->m_vxdLogl, dedxTrack->m_p, dedxTrack->m_dedxAvgTruncated[detector]);
-        else if (detector == 1) saveSVDLogLikelihood(dedxTrack->m_vxdLogl, dedxTrack->m_p, dedxTrack->m_dedxAvgTruncated[detector]);
-      }
-    }
-
     // add a few last things to the VXDDedxTrack
     const int numDedx = dedxTrack->dedx.size();
     dedxTrack->m_nHits = numDedx;
     // no need to define lowedgetruncated and highedgetruncated as we always remove the highest 2 dE/dx values from 8 dE/dx value
     dedxTrack->m_nHitsUsed = numDedx - 2;
 
-    // now book the information for this track
+    // calculate log likelihoods
+    dedxTrack->clearLogLikelihoods();
+    bool truncated = not m_useIndividualHits;
+    if (m_usePXD) dedxTrack->addLogLikelihoods(m_PXDDedxPDFs->getPDFs(truncated), Dedx::c_PXD, truncated);
+    if (m_useSVD) dedxTrack->addLogLikelihoods(m_SVDDedxPDFs->getPDFs(truncated), Dedx::c_SVD, truncated);
+
+    // save log likelihoods
+    if (dedxTrack->areLogLikelihoodsAvailable()) {
+      VXDDedxLikelihood* likelihoodObj = m_dedxLikelihoods.appendNew(dedxTrack->m_vxdLogl);
+      track.addRelationTo(likelihoodObj);
+    }
+
+    // save the VXDDedxTrack
     VXDDedxTrack* newVXDDedxTrack = m_dedxTracks.appendNew(*dedxTrack);
     track.addRelationTo(newVXDDedxTrack);
-
-    // save VXDDedxLikelihood
-    VXDDedxLikelihood* likelihoodObj = m_dedxLikelihoods.appendNew(dedxTrack->m_vxdLogl);
-    track.addRelationTo(likelihoodObj);
 
   } // end of loop over tracks
 }
@@ -282,8 +232,10 @@ void VXDDedxPIDModule::terminate()
   B2DEBUG(50, "VXDDedxPIDModule exiting after processing " << m_trackID <<
           " tracks in " << m_eventID + 1 << " events.");
 }
+
+
 // calculateMeans need some change as we always remove highest 2 dE/dx values
-void VXDDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr,
+void VXDDedxPIDModule::calculateMeans(double& mean, double& truncatedMean, double& truncatedMeanErr,
                                       const std::vector<double>& dedx) const
 {
   // Calculate the truncated average by skipping only highest two value
@@ -311,14 +263,13 @@ void VXDDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
     truncatedMeanTmp /= numDedx - 2;
   }
 
-  *mean = meanTmp;
-  *truncatedMean = truncatedMeanTmp;
+  mean = meanTmp;
+  truncatedMean = truncatedMeanTmp;
 
   if (numDedx - 2 > 1) {
-    *truncatedMeanErr = sqrt(sumOfSquares / double(numDedx - 2) - truncatedMeanTmp * truncatedMeanTmp) / double(
-                          (numDedx - 2) - 1);
+    truncatedMeanErr = sqrt(sumOfSquares / double(numDedx - 2) - truncatedMeanTmp * truncatedMeanTmp) / double((numDedx - 2) - 1);
   } else {
-    *truncatedMeanErr = 0;
+    truncatedMeanErr = 0;
   }
 }
 
@@ -346,11 +297,11 @@ double VXDDedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHe
 
   ROOT::Math::XYZVector a, b;
   if (hit->isUCluster()) {
-    const float u = hit->getPosition();
+    const double u = hit->getPosition();
     a = sensor.pointToGlobal(ROOT::Math::XYZVector(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
     b = sensor.pointToGlobal(ROOT::Math::XYZVector(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
   } else {
-    const float v = hit->getPosition();
+    const double v = hit->getPosition();
     a = sensor.pointToGlobal(ROOT::Math::XYZVector(-0.5 * sensor.getWidth(v), v, 0.0));
     b = sensor.pointToGlobal(ROOT::Math::XYZVector(+0.5 * sensor.getWidth(v), v, 0.0));
   }
@@ -376,7 +327,8 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
   //figure out which detector to assign hits to
   const int currentDetector = geo.get(hits.front()->getSensorID()).getType();
   assert(currentDetector == VXD::SensorInfoBase::PXD or currentDetector == VXD::SensorInfoBase::SVD);
-  assert(currentDetector <= 1); //used as array index
+  //  assert(currentDetector <= 1); //used as array index
+  assert(currentDetector == 0 or currentDetector == 1); //used as array index
 
   std::vector<double> siliconDedx; //used for averages
   siliconDedx.reserve(numHits);
@@ -395,8 +347,8 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
     //active medium traversed, in cm (can traverse one sensor at most)
     //assumption: Si detectors are close enough to the origin that helix is still accurate
     const double totalDistance = getTraversedLength(hit, &helix);
-    const float charge = hit->getCharge();
-    const float dedx = charge / totalDistance;
+    const double charge = hit->getCharge();
+    const double dedx = charge / totalDistance;
     if (dedx <= 0) {
       B2WARNING("dE/dx is " << dedx << " in layer " << layer);
     } else if (i == 0 or prevSensor != currentSensor) { //only save once per sensor (u and v hits share charge!)
@@ -405,88 +357,15 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
       siliconDedx.push_back(dedx);
       track->m_dedxAvg[currentDetector] += dedx;
       track->addDedx(layer, totalDistance, dedx);
-      if (m_useIndividualHits) {
-        if (currentDetector == 0) savePXDLogLikelihood(track->m_vxdLogl, track->m_p, dedx);
-        else if (currentDetector == 1) saveSVDLogLikelihood(track->m_vxdLogl, track->m_p, dedx);
-      }
     }
 
     track->addHit(currentSensor, layer, charge, totalDistance, dedx);
   }
 
   //save averages
-  calculateMeans(&(track->m_dedxAvg[currentDetector]),
-                 &(track->m_dedxAvgTruncated[currentDetector]),
-                 &(track->m_dedxAvgTruncatedErr[currentDetector]),
+  calculateMeans(track->m_dedxAvg[currentDetector],
+                 track->m_dedxAvgTruncated[currentDetector],
+                 track->m_dedxAvgTruncatedErr[currentDetector],
                  siliconDedx);
 }
 
-void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
-{
-  //all pdfs have the same dimensions
-  const TH2F* pdf = m_PXDDedxPDFs->getPXDPDF(0, !m_useIndividualHits);
-  const Int_t binX = pdf->GetXaxis()->FindFixBin(p);
-  const Int_t binY = pdf->GetYaxis()->FindFixBin(dedx);
-
-  for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    pdf = m_PXDDedxPDFs->getPXDPDF(iPart, !m_useIndividualHits);
-    if (pdf->GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
-      continue;
-    double probability = 0.0;
-
-    //check if this is still in the histogram, take overflow bin otherwise
-    if (binX < 1 or binX > pdf->GetNbinsX()
-        or binY < 1 or binY > pdf->GetNbinsY()) {
-      probability = pdf->GetBinContent(binX, binY);
-    } else {
-      //in normal histogram range. Of course ROOT has a bug that Interpolate()
-      //is not declared as const but it does not modify the internal state so
-      //fine, const_cast it is.
-      probability = const_cast<TH2F*>(pdf)->Interpolate(p, dedx);
-    }
-
-    if (probability != probability)
-      B2ERROR("probability NAN for a track with p=" << p << " and dedx=" << dedx);
-
-    //my pdfs aren't perfect...
-    if (probability == 0.0)
-      probability = m_useIndividualHits ? (1e-5) : (1e-3); //likelihoods for truncated mean are much higher
-
-    logl[iPart] += log(probability);
-  }
-}
-
-void VXDDedxPIDModule::saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
-{
-  //all pdfs have the same dimensions
-  const TH2F* pdf = m_SVDDedxPDFs->getSVDPDF(0, !m_useIndividualHits);
-  const Int_t binX = pdf->GetXaxis()->FindFixBin(p);
-  const Int_t binY = pdf->GetYaxis()->FindFixBin(dedx);
-
-  for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    pdf = m_SVDDedxPDFs->getSVDPDF(iPart, !m_useIndividualHits);
-    if (pdf->GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
-      continue;
-    double probability = 0.0;
-
-    //check if this is still in the histogram, take overflow bin otherwise
-    if (binX < 1 or binX > pdf->GetNbinsX()
-        or binY < 1 or binY > pdf->GetNbinsY()) {
-      probability = pdf->GetBinContent(binX, binY);
-    } else {
-      //in normal histogram range. Of course ROOT has a bug that Interpolate()
-      //is not declared as const but it does not modify the internal state so
-      //fine, const_cast it is.
-      probability = const_cast<TH2F*>(pdf)->Interpolate(p, dedx);
-    }
-
-    if (probability != probability)
-      B2ERROR("probability NAN for a track with p=" << p << " and dedx=" << dedx);
-
-    //my pdfs aren't perfect...
-    if (probability == 0.0)
-      probability = m_useIndividualHits ? (1e-5) : (1e-3); //likelihoods for truncated mean are much higher
-
-    logl[iPart] += log(probability);
-  }
-}

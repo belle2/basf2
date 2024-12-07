@@ -16,7 +16,6 @@
 
 import basf2 as b2
 # from basf2 import conditions as b2conditions
-import rawdata as raw
 import tracking as trk
 import simulation as sim
 import svd as svd
@@ -26,7 +25,7 @@ import glob
 Usage: basf2 SVDValidation.py -i <input_file>
 '''
 
-useSimulation = True
+useSimulation = False
 
 # set this string to identify the output rootfiles
 tag = "_MATEUSZ"
@@ -67,14 +66,24 @@ else:
     # b2conditions.globaltags = ["online"]
 
     # input root files
-    main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs'])
-    raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC'])
+    # main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs'])
+    # raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC'])
 
     # change ZS to 5 - if needed
     # for moda in main.modules():
     #    if moda.name() == 'SVDUnpacker':
     #        moda.param("svdShaperDigitListName", "SVDShaperDigitsZS3")
     # main.add_module("SVDZeroSuppressionEmulator",SNthreshold=5,ShaperDigits="SVDShaperDigitsZS3",ShaperDigitsIN="SVDShaperDigits")
+
+
+# set exp for sim
+expList = [0]
+numEvents = 2000
+eventinfosetter = b2.register_module('EventInfoSetter')
+eventinfosetter.param('expList', expList)
+eventinfosetter.param('runList', [0])
+eventinfosetter.param('evtNumList', [numEvents])
+main.add_module(eventinfosetter)
 
 # now do reconstruction:
 trk.add_tracking_reconstruction(
@@ -93,13 +102,17 @@ b2.set_module_parameters(main, "SVDClusterizer", returnClusterRawTime=True)
 # Histos
 # main.add_module('HistoManager', histoFileName="histos.root")
 
-# fill TTrees
 main.add_module('SVDValidation',
                 outputFileName="SVDValidation"+str(tag)+".root",
                 variables=["clusterCharge"],
                 storageType="ntuple",
                 treeName="SVDClusters")
-# main.add_module('OverlapResiduals', ExpertLevel=True)
+
+# main.add_module("RootOutput")
+
+# for moda in main.modules():
+#     if moda.name() == 'Geometry':
+#         moda.param("useDB", False)
 
 main.add_module('Progress')
 

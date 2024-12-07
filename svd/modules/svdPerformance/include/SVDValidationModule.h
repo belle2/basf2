@@ -38,12 +38,18 @@ namespace Belle2::SVD {
     std::string m_fileName;
     std::string m_treeName;
     std::string m_storageType;
+
+    // Variables -> stara koncepcja, do wywalenia
     std::vector<std::string> m_variableNames;
     Variables::ComputableVariables m_computableVariables;
     Counters m_counters;
 
-    std::string m_recoTracksStoreArrayName{"RecoTracks"};
+    // Variables -> nowa koncepcja
+    std::vector<std::string> m_variablesToNtuple;
+    std::vector<std::tuple<std::string, int, float, float>> m_variablesToHistogram;
+    Variables::Variables m_variables;
 
+    std::string m_recoTracksStoreArrayName{"RecoTracks"};
     std::unique_ptr<PersistenceManager> persistenceManager;
   };
 }

@@ -7,7 +7,7 @@
 namespace {
   namespace Variables = Belle2::SVD::Variables;
 
-  std::string variableToLeafName(const Variables::ComputableVariable& variable)
+  std::string typedVariableToLeafName(const Variables::TypedVariable& variable)
   {
     std::map<Variables::VariableDataType, std::string> suffix = {
       {Variables::VariableDataType::c_double, "/D"},
@@ -29,7 +29,7 @@ namespace Belle2::SVD {
 
   void ConcreteVariablesToNtuplePersistenceManager::initialize(const std::string& fileName,
       const std::string& treeName,
-      const Variables::ComputableVariables& variables)
+      const Variables::Variables& variables)
   {
     // TODO: Pass these in a constructor.
     m_fileName = fileName;
@@ -57,9 +57,9 @@ namespace Belle2::SVD {
     // TODO: Set counter branches
 
     // Set branches
-    for (const auto& variable : variables) {
-      registerBranch(variable);
-    }
+    // for (const auto& variable : variables) {
+    //   registerBranch(variable);
+    // }
     m_tree->get().SetBasketSize("*", m_basketSize);
   }
 
@@ -87,12 +87,18 @@ namespace Belle2::SVD {
     }
   }
 
-  void ConcreteVariablesToNtuplePersistenceManager::registerBranch(const Variables::ComputableVariable& variable)
+  void ConcreteVariablesToNtuplePersistenceManager::registerBranch(const Variables::Variable& variable)
   {
-    std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(variable.getName().c_str());
-    std::string leafName = variableToLeafName(variable);
+    const auto* typedVariable = dynamic_cast<const Variables::TypedVariable*>(&variable);
 
-    switch (variable.getDataType()) {
+    std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(typedVariable->getName().c_str());
+    std::string leafName = typedVariableToLeafName(*typedVariable);
+
+    if (not typedVariable) {
+      B2FATAL("...");
+    }
+
+    switch (typedVariable->getDataType()) {
       case Variables::VariableDataType::c_double:
         m_branchesDouble[branchName] = double{};
         m_tree->get().Branch(branchName.c_str(), &m_branchesDouble[branchName], leafName.c_str());

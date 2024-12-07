@@ -5,6 +5,7 @@
 #include <functional>
 #include <stdexcept>
 #include <map>
+#include <memory>
 
 #include <svd/variables/ClusterVariables.h>
 // #include <svd/variables/Utils.h>
@@ -24,6 +25,40 @@ namespace Belle2 {
       typedef std::variant<int, double, bool> ReturnType;
       typedef std::function<ReturnType(const InputType*)> FunctionPtr;
 
+      class Variable {
+      public:
+        Variable(std::string name) : name{name} {}
+
+        virtual const std::string& getName() const { return name; }
+
+        virtual ~Variable() = default;
+
+      private:
+        std::string name;
+      };
+
+      class TypedVariable : public Variable {
+      public:
+        TypedVariable(std::string name, VariableDataType dataType)
+          : Variable(name), dataType{dataType} {}
+
+        const VariableDataType& getDataType() const { return dataType; }
+
+      private:
+        VariableDataType dataType;
+      };
+
+      class BinnedVariable : public Variable {
+      public:
+        BinnedVariable(std::string name, VariableDataType dataType, int nBins, float lowBin, float highBin)
+          : Variable(name), nBins{nBins}, lowBin{lowBin}, highBin{highBin} {}
+      private:
+        int nBins;
+        float lowBin;
+        float highBin;
+      };
+
+      // Do wywalenia
       class ComputableVariable {
       public:
         ComputableVariable(const std::string& _name)
@@ -55,9 +90,9 @@ namespace Belle2 {
         FunctionPtr functionPtr;
       };
 
+      typedef std::vector<std::unique_ptr<Variable>> Variables;
       typedef std::vector<ComputableVariable> ComputableVariables;
       typedef std::map<std::string, ReturnType> EvaluatedVariables;
     }
   }
-
 }

@@ -15,7 +15,7 @@ namespace Belle2::SVD {
   public:
     ConcreteVariablesToNtuplePersistenceManager();
 
-    void initialize(const std::string&, const std::string&, const Variables::ComputableVariables&) override;
+    void initialize(const std::string&, const std::string&, const Variables::Variables&) override;
     void addEntry(const Variables::EvaluatedVariables&) override;
     void store() override;
 
@@ -31,7 +31,7 @@ namespace Belle2::SVD {
     std::map<std::string, int> m_branchesInt;
     std::map<std::string, bool> m_branchesBool;
 
-    void registerBranch(const Variables::ComputableVariable&);
+    void registerBranch(const Variables::Variable&);
     void updateBranch(const std::string&, const Variables::ReturnType&);
   };
 }

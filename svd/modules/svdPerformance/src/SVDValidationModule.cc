@@ -17,14 +17,27 @@ namespace Belle2::SVD {
     addParam("outputFileName", m_fileName, "", m_fileName);
     addParam("treeName", m_treeName, "", m_treeName);
     addParam("storageType", m_storageType, "Type of storage to store the variables in.", m_storageType);
+
+    // Po staremu
     addParam("variables", m_variableNames, "Variables used for the valiadation plots", m_variableNames);
+
+    // Po nowemu
+    addParam("variablesToNtuple", m_variablesToNtuple, "Variables to store in the ntuple", m_variablesToNtuple);
+    addParam("variablesToHistogram", m_variablesToHistogram, "Variables to store in the histogram", m_variablesToHistogram);
   }
 
   void SVDValidationModule::initialize()
   {
-    persistenceManager = PersistenceManagerFactory::create(m_storageType);
-    m_computableVariables = Variables::VariableFactory::create(m_variableNames);
-    persistenceManager->initialize(m_fileName, m_treeName, m_computableVariables);
+    // m_computableVariables = Variables::VariableFactory::create(m_variableNames);
+
+    // m_variablesToNtuple =
+    // m_variablesToHistogram =
+
+    // persistenceManager = PersistenceManagerFactory::create(m_storageType);
+    // persistenceManager->initialize(m_fileName, m_treeName, m_computableVariables);
+
+    // variablesToNtuple
+
   }
 
   void SVDValidationModule::event()
@@ -55,7 +68,7 @@ namespace Belle2::SVD {
         for (const auto& computableVariable : m_computableVariables) {
           evaluatedVariables[computableVariable.getName()] = computableVariable(svdCluster);
         }
-        persistenceManager->addEntry(evaluatedVariables);
+        // persistenceManager->addEntry(evaluatedVariables);
       }
 
     }

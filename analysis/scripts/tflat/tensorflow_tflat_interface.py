@@ -48,11 +48,14 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     if seed:
         tf.set_random_seed(seed)
 
+    # weight decay coefficient
+    wd = 2e-5
+
     input = Input(shape=(number_of_features,))
 
-    net = Dense(units=300, activation=tanh)(input)
+    net = Dense(units=300, activation=tanh, kernel_regularizer=tf.keras.regularizers.l2(wd))(input)
     for i in range(7):
-        net = Dense(units=300, activation=tanh)(net)
+        net = Dense(units=300, activation=tanh, kernel_regularizer=tf.keras.regularizers.l2(wd))(net)
         net = BatchNormalization()(net)
 
     output = Dense(units=1, activation=sigmoid)(net)
@@ -61,7 +64,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     state.model.compile(
         optimizer=Adam(
-            learning_rate=0.00001),
+            learning_rate=0.005),
         loss=binary_crossentropy,
         metrics=[
             'accuracy',
@@ -158,13 +161,25 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     callbacks = [tf.keras.callbacks.EarlyStopping(
         monitor='val_loss',
         min_delta=0,
-        patience=5,
+        patience=10,
         verbose=0,
         mode='auto',
         baseline=None,
         restore_best_weights=True)]
 
-    state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=128, epochs=100, callbacks=callbacks)
+    def scheduler(epoch, lr_init=0.005, decay=0.01):
+        lr = lr_init * 1/(1 + decay * epoch)
+        if lr < 10**-6:
+            lr = 10**-6
+
+        # karpathy: 3e-4 is the best learning rate for Adam, hands down.
+        lr = 3e-4
+        return lr
+
+    lr_scheduler = tf.keras.callbacks.LearningRateScheduler(scheduler)
+    callbacks.append(lr_scheduler)
+
+    state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=128, epochs=300, callbacks=callbacks)
 
     # create a model that includes preprocessing
     inputs = Input(shape=(X.shape[1],))

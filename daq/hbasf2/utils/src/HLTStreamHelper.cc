@@ -292,7 +292,8 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
           for (int i = 0; i < nwds_buf; i++) {
             oss << "0x" << std::setw(8) << std::setfill('0') << std::hex << cprbuf[i] << " ";
           }
-          B2ERROR("All words of the error event: " << oss.str());
+          B2ERROR("All words of the error event: " << oss.str() <<
+                  "[Subsystem ID = " << subsysid << " ], [N_words = " << nwds_buf << "]");
         } else {
           std::ostringstream oss_first, oss_last;
           // Print the first 8 words

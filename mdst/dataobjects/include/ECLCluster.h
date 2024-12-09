@@ -221,7 +221,7 @@ namespace Belle2 {
     /** Set Corrected Energy (GeV). */
     void setEnergy(double energy) { m_logEnergy = log(energy); }
 
-    /** Set Uncorrect Energy deposited (GeV). */
+    /** Set Incorrect Energy deposited (GeV). */
     void setEnergyRaw(double energyraw) { m_logEnergyRaw = log(energyraw); }
 
     /** Set energy of highest energetic crystal (GeV). */

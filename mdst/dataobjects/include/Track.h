@@ -127,7 +127,7 @@ namespace Belle2 {
      */
     std::vector<ChargedStableTrackFitResultPair> getTrackFitResultsByName(const std::string trackFitResultsName) const;
 
-    /** Deafult Access to all track fit results at the same time
+    /** Default Access to all track fit results at the same time
         *
         * Returns a vector of pair of all track fit results which have been set and the respective particle
         * hypothesis they have been fitted with.
@@ -182,7 +182,7 @@ namespace Belle2 {
      *  different charged particles and background contributions is estimated. This estimate
      *  includes information, that isn't used for the calculation of the p-value of the fit, e.g.
      *  energy-deposition, timing, and cluster-shape information.
-     *  We consider it unlikely, that we will make such an estimate for each hypothesis. Therfore,
+     *  We consider it unlikely, that we will make such an estimate for each hypothesis. Therefore,
      *  the Track rather than the TrackFitResult is the place to store this information.
      *  We don't want to provide a default cut, because charged-particle-vetos and
      *  recombination of different kind of resonances potentially can profit from different
@@ -218,7 +218,7 @@ namespace Belle2 {
 
   private:
 
-    /** Bitmap of the track status, contains informations on the refining stage
+    /** Bitmap of the track status, contains information on the refining stage
     */
     unsigned short int m_statusBitmap = 0;
 

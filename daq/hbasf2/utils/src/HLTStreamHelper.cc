@@ -308,7 +308,7 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
           B2ERROR("The  last 8 words of the error event: " << oss_last.str()  <<
                   "[Subsystem ID = " << subsysid << " ], [N_words = " << nwds_buf << "]");
         }
-        B2FATAL("Invalid magic number in Raw Trailer. Exiting...");
+        B2FATAL("Invalid magic number in Raw Trailer and/or Header. Exiting...");
       }
     }
 

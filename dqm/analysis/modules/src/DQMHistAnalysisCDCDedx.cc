@@ -260,7 +260,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
       setTextStyle(pinfo);
       pinfo.AddText("CDC-dE/dx Intra-run");
       setBEvtInfo(pinfo);
-      pinfo.Draw("same");
+      pinfo.DrawClone("same");
     }
 
   }
@@ -423,13 +423,11 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
     int nbin = (lbin - fbin + 1) / 2;
     if (nbin <= 0)nbin = 1;
 
-    TH1F hMeanHer("hMeanHer", "", nbin, 0.5, nbin + 0.5);
-    hMeanHer.SetTitle("CDC-dE/dx gain(#mu);Injection time (ms);dE/dx (#mu_{fit})");
-    TH1F hSigmaHer("hSigmaHer", "", nbin, 0.5, nbin + 0.5);
-    hSigmaHer.SetTitle("CDC-dE/dx reso.(#sigma);Injection time (ms);dE/dx (#sigma_{fit})");
+    TH1F hMeanHer("hMeanHer", "CDC-dE/dx gain(#mu);Injection time (ms);dE/dx (#mu_{fit})", nbin, 0.5, nbin + 0.5);
+    TH1F hSigmaHer("hSigmaHer", "CDC-dE/dx reso.(#sigma);Injection time (ms);dE/dx (#sigma_{fit})", nbin, 0.5, nbin + 0.5);
 
-    TH1F hMeanLer("hMeanLer", "", nbin, 0.5, nbin + 0.5);
-    TH1F hSigmaLer("hSigmaLer", "", nbin, 0.5, nbin + 0.5);
+    TH1F hMeanLer("hMeanLer", "CDC-dE/dx gain(#mu);Injection time (ms);dE/dx (#mu_{fit})", nbin, 0.5, nbin + 0.5);
+    TH1F hSigmaLer("hSigmaLer", "CDC-dE/dx reso.(#sigma);Injection time (ms);dE/dx (#sigma_{fit})", nbin, 0.5, nbin + 0.5);
 
     setHistPars(hdEdxITHer, hMeanHer, hSigmaHer, nbin);
     setHistPars(hdEdxITLer, hMeanLer, hSigmaLer, nbin);

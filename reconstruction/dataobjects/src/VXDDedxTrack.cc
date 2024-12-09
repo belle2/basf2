@@ -57,6 +57,8 @@ namespace Belle2 {
 
   void VXDDedxTrack::addLogLikelihoods(const std::vector<const TH2F*>& PDFs, Dedx::Detector detector, bool truncated)
   {
+    if (detector != Dedx::c_PXD and detector != Dedx::c_SVD) return;
+
     if (truncated) {
       addLogLikelihoods(PDFs, m_dedxAvgTruncated[detector], 1e-3);
     } else {

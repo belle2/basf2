@@ -3,7 +3,6 @@ stages:
   - build-gcc
   - run-tests
   - build-clang
-  - build-doc
   - release-validation
 
 variables:
@@ -12,7 +11,6 @@ variables:
   GIT_DEPTH: 0
   # GitLab specific variables
   GITLAB_BELLE2_TOOLS_B2SETUP: "/cvmfs/belle.cern.ch/tools/b2setup"
-  GITLAB_BELLE2_EXTERNALS_TOPDIR: "/belle2/externals"
   GITLAB_IS_FIRST_STAGE: "no"
   GITLAB_FORCE_RUNNING_PIPELINE: "no"
   GITLAB_RUNNER: "none"
@@ -28,26 +26,24 @@ workflow:
     # - we force the pipeline
     # Moreover, the pipelines are redirected to the runners extagent4 or extagent8
     # according to some rules defined below
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_IID =~ /[02468]$/  # merge request event and even merge request ID
-      variables:
-        GITLAB_RUNNER: "extagent4"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_IID =~ /[13579]$/  # merge request event and odd merge request ID
-      variables:
-        GITLAB_RUNNER: "extagent8"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == 'main' && $CI_COMMIT_TITLE =~ /Merge branch.*/  # merge commit in main branch
-      variables:
-        GITLAB_RUNNER: "extagent4"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == 'push' && ($CI_COMMIT_BRANCH =~ /^release/ || $CI_COMMIT_BRANCH == 'upgrade') && $CI_COMMIT_TITLE =~ /Merge branch.*/  # merge commit in release or upgrade branch
-      variables:
-        GITLAB_RUNNER: "extagent8"
-      when: always
-    - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'  # forced pipeline
-      variables:
-        GITLAB_RUNNER: "extagent4"
-      when: always
+    - &merge_request_rules
+      - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_IID =~ /[02468]$/  # merge request event and even merge request ID
+        variables:
+          GITLAB_RUNNER: "extagent4"
+      - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_IID =~ /[13579]$/  # merge request event and odd merge request ID
+        variables:
+          GITLAB_RUNNER: "extagent8"
+    - &push_rules
+      - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == 'main' && $CI_COMMIT_TITLE =~ /Merge branch.*/  # merge commit in main branch
+        variables:
+          GITLAB_RUNNER: "extagent4"
+      - if: $CI_PIPELINE_SOURCE == 'push' && ($CI_COMMIT_BRANCH =~ /^release/ || $CI_COMMIT_BRANCH == 'upgrade') && $CI_COMMIT_TITLE =~ /Merge branch.*/  # merge commit in release or upgrade branch
+        variables:
+          GITLAB_RUNNER: "extagent8"
+    - &force_rules
+      - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'  # forced pipeline
+        variables:
+          GITLAB_RUNNER: "extagent4"
 
 default:
   image: belle2/belle2-base-ubuntu2004:latest
@@ -87,8 +83,6 @@ default:
     - rm -rf .git/hooks && ln -sf $(dirname ${GITLAB_BELLE2_TOOLS_B2SETUP})/hooks .git/hooks
     - ln -fs site_scons/SConstruct
     - source ${GITLAB_BELLE2_TOOLS_B2SETUP}
-    # Use the externals installed in the docker image
-    - export BELLE2_EXTERNALS_TOPDIR=${GITLAB_BELLE2_EXTERNALS_TOPDIR}
   interruptible: true  # All the jobs can be interrupted by newer pipelines
 
 prepare-pipeline:
@@ -112,10 +106,8 @@ build-gcc:
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
     - b2code-option opt
-    - b2setup
     - scons --no-debuginfo
     - basf2 --info
-    - which root
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
 run-tests:
@@ -125,43 +117,53 @@ run-tests:
     when: always
     reports:
       junit:
-          - tests_report/tests-google.xml
-          - tests_report/tests-framework.xml
-          - tests_report/tests-non-framework.xml
+          - output_tests_reports/tests-google.xml
+          - output_tests_reports/tests-framework.xml
+          - output_tests_reports/tests-non-framework.xml
+    expose_as: 'sphinx documentation'
+    paths:
+        - build_doc/html/
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
-    - mkdir -p tests_report
+    - mkdir -p input_tests_reports output_tests_reports
+    # Download the tests reports from the main branch
+    - |
+      PACKAGE="tests-reports"
+      VERSION="main"
+      FILES=("tests-google.xml" "tests-framework.xml" "tests-non-framework.xml")
+      for FILE in "${FILES[@]}"; do
+        curl -L --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --output "input_tests_reports/${FILE}" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE}/${VERSION}/${FILE}"
+      done
+    # Run the "google" tests and the "scripts" tests
     - b2code-option opt
-    - b2setup
-    - b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/tests_report/tests-google.xml
-    - b2test-scripts -j $(nproc) --filter "^framework/tests/(?!(foreach.py))" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-framework.xml --timeout 1200
-    - b2test-scripts -j $(nproc) --filter "^(?!framework/tests/.*)" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-non-framework.xml --timeout 1200
+    - export BELLE2_SPHINX_OUTPUTDIR=${BELLE2_LOCAL_DIR}/build_doc/
+    - b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/output_tests_reports/tests-google.xml
+    - b2test-scripts -j $(nproc) --filter "^framework/tests/(?!(foreach.py))" --xml-input=${BELLE2_LOCAL_DIR}/input_tests_reports/tests-framework.xml --xml=${BELLE2_LOCAL_DIR}/output_tests_reports/tests-framework.xml --timeout 1200
+    - b2test-scripts -j $(nproc) --filter "^(?!framework/tests/.*)" --xml-input=${BELLE2_LOCAL_DIR}/input_tests_reports/tests-non-framework.xml --xml=${BELLE2_LOCAL_DIR}/output_tests_reports/tests-non-framework.xml --timeout 1200
+    # Upload the tests reports (only if this is the main branch)
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
+        for FILE in "${FILES[@]}"; do
+          curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "output_tests_reports/${FILE}" \
+          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE}/${VERSION}/${FILE}"
+        done
+      fi
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
 build-clang:
   stage: build-clang
   needs: [run-tests]
+  rules:
+    - *push_rules
+    - *force_rules
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: never
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
     - b2code-option clang
-    - b2setup
     - scons --no-debuginfo
     - basf2 --info
-    - echo "stage stop time -> $(date +%H:%M:%S)"
-
-build-doc:
-  stage: build-doc
-  needs: [run-tests]
-  artifacts:
-    when: on_success
-    expose_as: 'sphinx documentation'
-    paths:
-      - build/html/
-  script:
-    - echo "stage start time -> $(date +%H:%M:%S)"
-    - b2code-option opt
-    - b2setup
-    - scons --no-debuginfo --sphinx html
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
 release-validation:
@@ -173,8 +175,10 @@ release-validation:
       - automated_validation_*
     expire_in: 60 days
   rules:
+    - *force_rules
     - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $GITLAB_BRANCH_FOR_RELEASE_VALIDATION && $CI_COMMIT_TITLE =~ /Merge branch.*/
-    - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'
+      variables:
+        GITLAB_RUNNER: "extagent8"
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
     # Set release to branch name but replace / with -
@@ -187,7 +191,6 @@ release-validation:
         fi
       fi
     - b2code-option opt
-    - b2setup
     - basf2 --info
     - hlt/tests/release_validation/run.sh automatic automated_validation_${CI_COMMIT_BRANCH//\//-}_$(date +%Y-%m-%d_%H-%M-%S)
     - echo "stage stop time -> $(date +%H:%M:%S)"

@@ -46,7 +46,7 @@ namespace Belle2 {
       class SoftwareTriggerVariable {
       public:
         /**
-         * Function wich is called by the SoftwareTriggerCut whenever the value of this variable is needed.
+         * Function which is called by the SoftwareTriggerCut whenever the value of this variable is needed.
          * As the values are all already compiled, it just takes the corresponding number
          * from the map of values given as the SoftwareTriggerObject.
          */

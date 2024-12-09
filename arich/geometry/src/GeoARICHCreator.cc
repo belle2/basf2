@@ -20,7 +20,6 @@
 #include <arich/dbobjects/ARICHPositionElement.h>
 
 #include <cmath>
-#include <boost/foreach.hpp>
 
 // Geant4
 #include <G4LogicalVolume.hh>
@@ -763,7 +762,7 @@ namespace Belle2 {
               G4Tubs* compTileShape = new G4Tubs(compTileName.str(),                               //name
                                                  wallR[iRing - 1] + wallThick + tileGap,           //Rmin
                                                  wallR[iRing] - tileGap,                           //Rmax
-                                                 compTileUpThick / 2.0,                            //Thikness
+                                                 compTileUpThick / 2.0,                            //Thickness
                                                  (tileGap + wallThick / 2.0) / wallR[iRing],       //phi start
                                                  dphi - (2.0 * tileGap + wallThick) / wallR[iRing]); //delta phi
 
@@ -791,7 +790,7 @@ namespace Belle2 {
             G4Tubs* tileShape = new G4Tubs(tileName.str(),                                   //name
                                            wallR[iRing - 1] + wallThick + tileGap,           //Rmin
                                            wallR[iRing] - tileGap,                           //Rmax
-                                           layerThick / 2.0,                                 //Thikness
+                                           layerThick / 2.0,                                 //Thickness
                                            (tileGap + wallThick / 2.0) / wallR[iRing],       //phi start
                                            dphi - (2.0 * tileGap + wallThick) / wallR[iRing]); //delta phi
 
@@ -884,7 +883,7 @@ namespace Belle2 {
 
       // build HAPD walls
       G4Box* tempBox2 = new G4Box("tempBox2", hapdSizeX / 2. - wallThick, hapdSizeY / 2. - wallThick,
-                                  hapdSizeZ / 2. + 0.1); // Dont't care about "+0.1", needs to be there.
+                                  hapdSizeZ / 2. + 0.1); // Don't care about "+0.1", needs to be there.
       G4SubtractionSolid* moduleWall = new G4SubtractionSolid("Box-tempBox", hapdBox, tempBox2);
       G4LogicalVolume* lmoduleWall = new G4LogicalVolume(moduleWall, wallMaterial, "ARICH.HAPDWall");
       setColor(*lmoduleWall, "rgb(1.0,0.0,0.0,1.0)");
@@ -1090,7 +1089,7 @@ namespace Belle2 {
       const ARICHGeoMerger& mergerGeo = detectorGeo.getMergerGeometry();
 
       if (mergerGeo.getSingleMergerEnvelopeSizeW() < 1e-9) {
-        B2WARNING("GeoARICHCreator: Merger and merger cooling geometry will not be build as it is not availible in geometry configuration (ARICHGeometryConfig with ClasDef>4 is needed).");
+        B2WARNING("GeoARICHCreator: Merger and merger cooling geometry will not be build as it is not available in geometry configuration (ARICHGeometryConfig with ClasDef>4 is needed).");
         return NULL;
       }
 
@@ -1735,7 +1734,7 @@ namespace Belle2 {
       double posX = aerogelParam.getLength("tileXPos") / Unit::mm;
       double posY = aerogelParam.getLength("tileYPos") / Unit::mm;
       int ilayer = 0;
-      BOOST_FOREACH(const GearDir & layer, aerogelParam.getNodes("Layers/Layer")) {
+      for (const GearDir& layer : aerogelParam.getNodes("Layers/Layer")) {
         double posZ = layer.getLength("zPosition");
         double sizeZ = layer.getLength("thickness");
         string tileMat = layer.getString("material");
@@ -1774,7 +1773,7 @@ namespace Belle2 {
       G4OpticalSurface* optSurf = materials.createOpticalSurface(surface);
       new G4LogicalSkinSurface("mirrorsSurface", lmirror, optSurf);
       int iMirror = 0;
-      BOOST_FOREACH(const GearDir & mirror, mirrorsParam.getNodes("Mirror")) {
+      for (const GearDir& mirror : mirrorsParam.getNodes("Mirror")) {
         double xpos = mirror.getLength("xPos") / Unit::mm;
         double ypos = mirror.getLength("yPos") / Unit::mm;
         double zpos = mirror.getLength("zPos") / Unit::mm;

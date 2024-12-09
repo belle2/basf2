@@ -244,7 +244,7 @@ void PXDDAQDQMModule::event()
         // TODO differentiate between link-lost and truncation
         for (int i = 0; i < 4 * 2; i++) {
           auto sm = (emask >> i * 4) & 0xF;
-          if (sm >= 8) sm = 7; // clip unknow to 7, as value >6 undefined for now
+          if (sm >= 8) sm = 7; // clip unknown to 7, as value >6 undefined for now
           if (sm > 0) hDAQEndErrorDHE->Fill(dhe.getDHEID(), i * 8 + sm); // we dont want to fill noerror=0
           missingFlag |= sm == 0x1; // missing
           timeoutFlag |= sm == 0x2; // timeout

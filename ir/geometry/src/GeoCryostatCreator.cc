@@ -626,7 +626,7 @@ namespace Belle2 {
 
         int sup_cut_N = int(m_config.getParameter(prep + "N", 0));
 
-        // tranformations
+        // transformations
         G4Transform3D transform_box = G4Translate3D(box_X0, box_Y0, box_Z0);
         transform_box = transform_box * G4RotateY3D(sup_PHI / Unit::rad);
 

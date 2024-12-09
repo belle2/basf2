@@ -55,7 +55,7 @@ void PXDRawDQMModule::defineHisto()
   hrawPxdPacketSize = new TH1F("hrawPxdPacketSize", "Pxd Raw Packetsize;Words per packet", 1024, 0, 1024);
   hrawPxdHitMapAll = new TH2F("hrawPxdHitMapAll",
                               "Pxd Raw Hit Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 3700 / 50, 0, 3700, 3500 / 50, 0, 3500);
-  // ADC map not supported by DHC anymore ... deactive filling, later remove
+  // ADC map not supported by DHC anymore ... deactivate filling, later remove
   hrawPxdAdcMapAll =
     NULL;// new TH2F("hrawPxdAdcMapAll",                               "Pxd Raw Adc Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 370/*0*/, 0, 3700, 350/*0*/, 0, 3500);
 

@@ -191,7 +191,7 @@ assert len(glob.glob('Monitor_ModuleStatistics.root')) == 1
 
 assert len(glob.glob('Monitor_Final.root')) == 1
 f = ROOT.TFile.Open("Monitor_Final.root", "read")
-assert f.GetListOfKeys().GetEntries() == 7
+assert f.GetListOfKeys().GetEntries() == 8
 f.Close()
 
 prereconstruction_files = [

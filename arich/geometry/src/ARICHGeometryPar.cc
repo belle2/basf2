@@ -16,7 +16,6 @@
 #include <Math/VectorUtil.h>
 
 #include <cmath>
-#include <boost/foreach.hpp>
 
 using namespace std;
 
@@ -267,7 +266,7 @@ namespace Belle2 {
     GearDir modParams(content, "ModuleInfo");
     uint8_t defqe = uint8_t(modParams.getDouble("DefaultQE") * 100);
     m_ChannelQE.assign(m_nPads * m_fR.size(), defqe);
-    BOOST_FOREACH(const GearDir & module, modParams.getNodes("Module")) {
+    for (const GearDir& module : modParams.getNodes("Module")) {
       int modid = atoi(module.getString("@id", "").c_str());
       chstream.str(module.getString("ChannelsQE"));
       while (chstream >> ch >> qq) {
@@ -325,7 +324,7 @@ namespace Belle2 {
 
     double r = m_detInnerRadius;
 
-    BOOST_FOREACH(const GearDir & ring, detParams.getNodes("Ring")) {
+    for (const GearDir& ring : detParams.getNodes("Ring")) {
       double dR = ring.getLength("dR");
       r += dR;
       double rcenter = r + m_modXSize / 2.;
@@ -356,7 +355,7 @@ namespace Belle2 {
 
   void ARICHGeometryPar::modulesPositionSimple(const GearDir& content)
   {
-    BOOST_FOREACH(const GearDir & module, content.getNodes("Detector/Plane/Modules/Module")) {
+    for (const GearDir& module : content.getNodes("Detector/Plane/Modules/Module")) {
       ROOT::Math::XYVector position(module.getLength("xPos"), module.getLength("yPos"));
       double angle = module.getAngle("angle") / Unit::rad;
       m_fFi.push_back(position.Phi());
@@ -483,7 +482,7 @@ namespace Belle2 {
   void ARICHGeometryPar::mirrorPositionSimple(const GearDir& content)
   {
     double thick = content.getLength("Mirrors/thickness");
-    BOOST_FOREACH(const GearDir & mirror, content.getNodes("Mirrors/Mirror")) {
+    for (const GearDir& mirror : content.getNodes("Mirrors/Mirror")) {
       double angle = mirror.getAngle("angle");
       ROOT::Math::XYZVector point(mirror.getLength("xPos") - cos(angle)*thick / 2., mirror.getLength("yPos") - sin(angle)*thick / 2., 0);
       ROOT::Math::XYZVector norm(cos(angle), sin(angle), 0);
@@ -564,7 +563,7 @@ namespace Belle2 {
   {
     GearDir modParams(content, "Mirrors/Alignment");
 
-    BOOST_FOREACH(const GearDir & plate, modParams.getNodes("Plate")) {
+    for (const GearDir& plate : modParams.getNodes("Plate")) {
       int id = atoi(plate.getString("@id").c_str());
       double dr = plate.getLength("dr");
       double dphi = plate.getAngle("dphi");

@@ -85,7 +85,7 @@ namespace Belle2 {
     const std::vector<double>& getDedxList() const { return m_dEdx; }
 
     /**
-     * Clear log likelihoods (set to zero) and reset the counter m_ncalls
+     * Clear log likelihoods (set to zero) and reset the counter of added log likelihood values
      */
     void clearLogLikelihoods();
 

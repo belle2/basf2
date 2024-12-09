@@ -227,20 +227,6 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
       int* cprbuf = new int[nwds_buf];
       memcpy(cprbuf, tempdblk.GetBuffer(cprid), nwds_buf * 4);
 
-      // Check the magic number of the Raw(ROB) header and trailer
-      if (cprbuf[ nwds_buf - (RawTrailer_latest::RAWTRAILER_NWORDS - RawTrailer_latest::POS_TERM_WORD) ]
-          != RawTrailer_latest::MAGIC_WORD_TERM_TRAILER  ||
-          (cprbuf[ RawHeader_latest::POS_VERSION_HDRNWORDS ] | RawHeader_latest::MAGIC_MASK)
-          != RawHeader_latest::MAGIC_WORD) {
-        for (int i = 0; i < nwds_buf; i++) {
-          printf(".8x ", cprbuf[ i ]);
-          if (i % 8 == 7) printf("\n");
-        }
-        printf("\n");
-        B2FATAL("Invalid magic number in Raw Trailer. Exiting...");
-        exit(1);
-      }
-
       // Check FTSW
       if (tempdblk.CheckFTSWID(cprid)) {
         RawFTSW* ftsw = m_rawFTSWs.appendNew();
@@ -294,6 +280,35 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
           B2WARNING(std::hex << cprbuf[i]);
         }
         B2FATAL("Unknown COPPER ID is found. CPRID = " << std::hex << subsysid << " Please check. Exiting...");
+      }
+
+      // Check the magic number of the Raw(ROB) header and trailer
+      if ((cprbuf[nwds_buf - (RawTrailer_latest::RAWTRAILER_NWORDS - RawTrailer_latest::POS_TERM_WORD)]
+           != RawTrailer_latest::MAGIC_WORD_TERM_TRAILER) ||
+          ((cprbuf[RawHeader_latest::POS_VERSION_HDRNWORDS] & RawHeader_latest::MAGIC_MASK)
+           != RawHeader_latest::MAGIC_WORD)) {
+        if (nwds_buf < 8) {
+          std::ostringstream oss;
+          for (int i = 0; i < nwds_buf; i++) {
+            oss << "0x" << std::setw(8) << std::setfill('0') << std::hex << cprbuf[i] << " ";
+          }
+          B2ERROR("All words of the error event: " << oss.str());
+        } else {
+          std::ostringstream oss_first, oss_last;
+          // Print the first 8 words
+          for (int i = 0; i < 8; i++) {
+            oss_first << std::setw(8) << std::setfill('0') << std::hex << cprbuf[i] << " ";
+          }
+          // Print the last 8 words
+          for (int i = nwds_buf - 8; i < nwds_buf; i++) {
+            oss_last << std::setw(8) << std::setfill('0') << std::hex << cprbuf[i] << " ";
+          }
+          B2ERROR("The first 8 words of the error event: " << oss_first.str() <<
+                  "[Subsystem ID = " << subsysid << " ], [N_words = " << nwds_buf << "]");
+          B2ERROR("The  last 8 words of the error event: " << oss_last.str()  <<
+                  "[Subsystem ID = " << subsysid << " ], [N_words = " << nwds_buf << "]");
+        }
+        B2FATAL("Invalid magic number in Raw Trailer. Exiting...");
       }
     }
 

@@ -33,7 +33,7 @@ def serialize_value(module, parameter):
 
 
 def deserialize_value(module, parameter_state):
-    """Deserialize a single basf2 module paramater"""
+    """Deserialize a single basf2 module parameter"""
     if parameter_state['name'] == 'path' and module.type() == 'SubEvent':
         return deserialize_path(parameter_state['values'])
     else:

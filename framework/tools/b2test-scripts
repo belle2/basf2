@@ -17,7 +17,7 @@ directory as test cases. A return value of 0 is treaded as success, other return
 values are treated as failures. In addition if ``*.out`` or ``*.err`` files with
 the same base name are present in the tests directory they will be treated as
 expected output on stdout or stderr respectively. If the output of the script
-differes from the contents of these files the test is marked as failed as well.
+differs from the contents of these files the test is marked as failed as well.
 The first line from stdout will not be compared to allow executing the scripts
 from a different directory.
 
@@ -160,7 +160,7 @@ def format_output(name, out, err):
 
 
 def run_test(testinformation):
-    """ run either regurlar python tests (with basf2) or as jupyter notebooks """
+    """ run either regular python tests (with basf2) or as jupyter notebooks """
 
     if testinformation.extension == ".ipynb":
         return run_test_ipynb(testinformation)

@@ -132,14 +132,14 @@ void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
       // and uncompress, the amount of bytes will be returned as irep
       int irep{0};
       R__unzip(&nzip, zipptr, &nout, (unsigned char*)(m_compBuf.data() + old_size), &irep);
-      // if that is not positive an error happend, bail
+      // if that is not positive an error happened, bail
       if (irep <= 0) {
         B2FATAL("Cannot uncompress message");
       }
       // otherwise advance pointer by the amount of bytes compressed bytes in the block
       zipptr += nzip;
     }
-    // ok, decompressed succesfully, set msg pointer to the correct area
+    // ok, decompressed successfully, set msg pointer to the correct area
     msgptr = m_compBuf.data();
     end = msgptr + m_compBuf.size();
   }

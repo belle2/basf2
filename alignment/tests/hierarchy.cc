@@ -72,7 +72,7 @@ namespace {
     state[4] = 1.;
     sop->setState(state);
 
-    // The du/dU derivative should be one everywhere (when we move along X, we incerase residual in X by same amount)
+    // The du/dU derivative should be one everywhere (when we move along X, we increase residual in X by same amount)
     EXPECT_EQ(hierarchy.getGlobalDerivatives<TestLevelDBObj>(element1, sop).second(0, 0), 1.);
 
   }
@@ -89,7 +89,7 @@ namespace {
     EXPECT_EQ(constraints.size(), 6);
 
     // Here each child parameter exactly corresponds to mother parameter
-    // we have two childs, so there should be two entries in constraint coefficients
+    // we have two children, so there should be two entries in constraint coefficients
     for (auto checksum_constraint : constraints) {
       auto& constraint = checksum_constraint.second;
       EXPECT_EQ(constraint.size(), 2);

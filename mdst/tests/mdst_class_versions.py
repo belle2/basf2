@@ -11,7 +11,7 @@
 """
 Check that all the classdef versions and class checksums are consistent to prevent accidental mismatch:
 
-If one forgets to increase the ClassDef but the streamer info checksum changes this will trigger a test failure. We can distuingish
+If one forgets to increase the ClassDef but the streamer info checksum changes this will trigger a test failure. We can distinguish
 
 1. ClassDef version changed unnecessary
 2. forgot to change ClassDef

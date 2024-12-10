@@ -267,16 +267,16 @@ namespace Belle2 {
     /** Number of unassigned hits in the CDC, that survived the background filter.
      *
      *  During the pattern recognition, a cleaning of hits, that are very likely due to background
-     *  is performed. Here we save only the number of unassinged hits, that survive that cut.
+     *  is performed. Here we save only the number of unassigned hits, that survive that cut.
      */
     uint16_t m_nCDCHitsNotAssignedPostCleaning {0};
 
     /** Efficient way of storing, which layers in the CDC have at least a single hit.
       *
       *  Using indirectly the HitPatternCDC. However, as that object has internal data, that isn't
-      *  supposed to be written out, we only store an initalizer integer.
+      *  supposed to be written out, we only store an initializer integer.
       *  As we are expecting a larger number of hits, some functionality can't be used and
-      *  the corresponding information is handled with speparate members.
+      *  the corresponding information is handled with separate members.
       *  Instead we store the number of segments into the bits reserved for number of hits in the Track.
       *
       *  @sa HitPatternCDC

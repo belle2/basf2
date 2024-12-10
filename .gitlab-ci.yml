@@ -26,26 +26,24 @@ workflow:
     # - we force the pipeline
     # Moreover, the pipelines are redirected to the runners extagent4 or extagent8
     # according to some rules defined below
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_IID =~ /[02468]$/  # merge request event and even merge request ID
-      variables:
-        GITLAB_RUNNER: "extagent4"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_IID =~ /[13579]$/  # merge request event and odd merge request ID
-      variables:
-        GITLAB_RUNNER: "extagent8"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == 'main' && $CI_COMMIT_TITLE =~ /Merge branch.*/  # merge commit in main branch
-      variables:
-        GITLAB_RUNNER: "extagent4"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == 'push' && ($CI_COMMIT_BRANCH =~ /^release/ || $CI_COMMIT_BRANCH == 'upgrade') && $CI_COMMIT_TITLE =~ /Merge branch.*/  # merge commit in release or upgrade branch
-      variables:
-        GITLAB_RUNNER: "extagent8"
-      when: always
-    - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'  # forced pipeline
-      variables:
-        GITLAB_RUNNER: "extagent4"
-      when: always
+    - &merge_request_rules
+      - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_IID =~ /[02468]$/  # merge request event and even merge request ID
+        variables:
+          GITLAB_RUNNER: "extagent4"
+      - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_IID =~ /[13579]$/  # merge request event and odd merge request ID
+        variables:
+          GITLAB_RUNNER: "extagent8"
+    - &push_rules
+      - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == 'main' && $CI_COMMIT_TITLE =~ /Merge branch.*/  # merge commit in main branch
+        variables:
+          GITLAB_RUNNER: "extagent4"
+      - if: $CI_PIPELINE_SOURCE == 'push' && ($CI_COMMIT_BRANCH =~ /^release/ || $CI_COMMIT_BRANCH == 'upgrade') && $CI_COMMIT_TITLE =~ /Merge branch.*/  # merge commit in release or upgrade branch
+        variables:
+          GITLAB_RUNNER: "extagent8"
+    - &force_rules
+      - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'  # forced pipeline
+        variables:
+          GITLAB_RUNNER: "extagent4"
 
 default:
   image: belle2/belle2-base-ubuntu2004:latest
@@ -157,6 +155,8 @@ build-clang:
   stage: build-clang
   needs: [run-tests]
   rules:
+    - *push_rules
+    - *force_rules
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: never
   script:
@@ -175,8 +175,10 @@ release-validation:
       - automated_validation_*
     expire_in: 60 days
   rules:
+    - *force_rules
     - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $GITLAB_BRANCH_FOR_RELEASE_VALIDATION && $CI_COMMIT_TITLE =~ /Merge branch.*/
-    - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'
+      variables:
+        GITLAB_RUNNER: "extagent8"
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
     # Set release to branch name but replace / with -

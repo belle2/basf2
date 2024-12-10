@@ -191,7 +191,7 @@ namespace Belle2 {
      * Filter 3 and 6 of `KinkFinderModule` are saved as 2 (track pair selected with daughter Helix extrapolation);
      * Filter 7, 8, and 9 of `KinkFinderModule` are saved as 3, 4, and 5, respectively (split tracks).
      * Split-track kinks (3-5) have worse resolutions compared to track-pair kinks (1-2).
-     * The filter number (3-5) for split-track kinks might be helpful to supress false track splitting with ML.
+     * The filter number (3-5) for split-track kinks might be helpful to suppress false track splitting with ML.
      * The kinks created from track pair that has close endpoints (1) might have better resolutions than ones selected
      * with daughter Helix extrapolation (2).
      *

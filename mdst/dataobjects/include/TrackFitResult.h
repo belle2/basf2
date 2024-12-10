@@ -78,7 +78,7 @@ namespace Belle2 {
      *
      *  This constructor is needed for testing the class.
      *  @param tau           Helix parameters of the track; @sa m_tau .
-     *  @param cov5          Covariance matrix of the helix paramters of the track; @sa m_cov5
+     *  @param cov5          Covariance matrix of the helix parameters of the track; @sa m_cov5
      *  @param particleType  Particle Type used for the mass hypothesis of the fit.
      *  @param pValue        p-value of the corresponding track fit.
      *  @param hitPatternCDCInitializer  bits for initializing CDC hit pattern.

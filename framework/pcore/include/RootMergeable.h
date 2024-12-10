@@ -26,7 +26,7 @@ namespace Belle2 {
    * \code
      setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
      \endcode
-     create RootMergeable<X> in initalize (or in your constructor) of durability DataStore::c_Persistent,
+     create RootMergeable<X> in initialize (or in your constructor) of durability DataStore::c_Persistent,
      register it by calling registerInDataStore() and construct() the actual histogram. Especially for larger
      TTrees, you should also create a TFile and cd() into it before creating the histogram. To actually save
      the objects, use the following in terminate() to ensure this is done only in the output process (where
@@ -87,7 +87,7 @@ namespace Belle2 {
 
     /** Write the wrapped object into 'file', overwriting existing objects of same name.
      *
-     * This function should be prefered to calling Write() by hand.
+     * This function should be preferred to calling Write() by hand.
      *
      * \note wrapped object must already be in 'file' before filled, or not part of any file at all. This function will throw an error and might crash if this is not the case.
      */

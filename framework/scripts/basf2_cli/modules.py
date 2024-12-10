@@ -40,7 +40,7 @@ def print_module_list(modName=None):
             except pybasf2.ModuleNotCreatedError:
                 pybasf2.B2FATAL('The module could not be loaded.')
             except Exception as e:
-                pybasf2.B2FATAL(f"An exception occured when trying to create the module: {e}")
+                pybasf2.B2FATAL(f"An exception occurred when trying to create the module: {e}")
 
         elif modName == modName.lower():
             # lower case? might be a package instead

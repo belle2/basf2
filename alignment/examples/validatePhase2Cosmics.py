@@ -94,7 +94,7 @@ class CosmicAnalysis(b2.Module):
         self.HitsVsLayer = ROOT.TH2F('HitsVsLayer', '', 6, 0.5, 6.5, 6, 0.5, 6.5)
         #: Histogram with number of hits vs. sensor
         self.HitsVsSensor = ROOT.TH2F('HitsVsSensor', '', 6, 0.5, 6.5, 5, 0.5, 5.5)
-        #: Histogram with hitted layer vs. sensor
+        #: Histogram with hit layer vs. sensor
         self.LayerVsSensor = ROOT.TH2F('LayerVsSensor', '', 6, 0.5, 6.5, 5, 0.5, 5.5)
         #: Histogram with PXD cluster size
         self.PXDClusterSize = ROOT.TH1F('PXDClusterSize', '', 20, 0.5, 20.5)

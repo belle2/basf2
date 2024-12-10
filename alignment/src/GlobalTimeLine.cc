@@ -350,7 +350,7 @@ namespace Belle2 {
             if (eventNum != 0) {
               // Automatically add start of this run and start of next run as points where params can change
               //NOTE: this is the main invariant we need to keep - if something can change inside run, it is expected
-              // it did change since last run and will change for next run, too... (i.e. if there is an event depencency,
+              // it did change since last run and will change for next run, too... (i.e. if there is an event dependency,
               // the IoV of the payload has to span only single run)
               auto firstEventThisRun = std::make_tuple(expNum, runNum, 0);
               auto firstEventNextRun = std::make_tuple(expNum, runNum + 1, 0);

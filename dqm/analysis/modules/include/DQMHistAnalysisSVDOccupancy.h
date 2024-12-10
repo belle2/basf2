@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <dqm/core/DQMHistAnalysis.h>
+#include <dqm/analysis/modules/DQMHistAnalysisSVD.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDSummaryPlots.h>
 
@@ -22,10 +22,11 @@
 #include <TCanvas.h>
 #include <TH2F.h>
 
+
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisSVDOccupancyModule final : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDOccupancyModule final : public DQMHistAnalysisSVDModule {
 
     // Public functions
   public:
@@ -67,7 +68,7 @@ namespace Belle2 {
 
   private:
 
-    // parameters
+    //! Parameters accesible from basf2 scripts
     bool m_printCanvas; /**< if true print the pdf of the canvases */
     bool m_3Samples; /**< if true enable 3 samples histograms analysis */
     double m_occError; /**<error level of the occupancy */
@@ -78,32 +79,57 @@ namespace Belle2 {
     double m_onlineOccWarning; /**< warning level of the onlineOccupancy */
     double m_onlineOccEmpty; /**<empty level of the occupancy */
 
-    //! Parameters accesible from basf2 scripts
-    //  protected:
+    // plots and canvases
     SVDSummaryPlots* m_hOccupancy = nullptr;  /**< occupancy histos */
     SVDSummaryPlots* m_hOnlineOccupancy = nullptr;  /**< online occupancy histos */
     SVDSummaryPlots* m_hOccupancyGroupId0 = nullptr;  /**< occupancy histos for cluster time group id=0*/
     SVDSummaryPlots* m_hOccupancy3Samples = nullptr;  /**<  occupancy histos for 3 samples*/
     SVDSummaryPlots* m_hOnlineOccupancy3Samples = nullptr;  /**< online occupancy histos for 3 sampels*/
 
+    // histograms
     TCanvas* m_cOccupancyU = nullptr; /**< occupancy U histo canvas */
-    TCanvas* m_cOccupancyU3Samples = nullptr; /**< occupancy U histo canvas for 3 sampes */
-    TCanvas* m_cOccupancyUGroupId0 = nullptr; /**< occupancy U histo canvas  for cluster time group Id = 0*/
-
     TCanvas* m_cOccupancyV = nullptr; /**< occupancy V histo canvas */
+
+    TCanvas* m_cOnlineOccupancyU = nullptr; /**< online occupancy U histo canvas */
+    TCanvas* m_cOnlineOccupancyV = nullptr; /**< online Occupancy V histo canvas */
+
+    TCanvas* m_cOccupancyU3Samples = nullptr; /**< occupancy U histo canvas for 3 sampes */
     TCanvas* m_cOccupancyV3Samples = nullptr; /**< occupancy V histo canvas  for 3 samples*/
+
+    TCanvas* m_cOnlineOccupancyU3Samples = nullptr; /**< online occupancy U histo canvas for 3 samples*/
+    TCanvas* m_cOnlineOccupancyV3Samples = nullptr; /**< online Occupancy V histo canvas  for 3 samples*/
+
+    TCanvas* m_cOccupancyUGroupId0 = nullptr; /**< occupancy U histo canvas  for cluster time group Id = 0*/
     TCanvas* m_cOccupancyVGroupId0 = nullptr; /**< occupancy V histo canvas  for cluster time group Id = 0*/
+
+    // polyline histograms
+    TCanvas* m_cOccupancyRPhiViewU = nullptr; /**< occupancy U plot canvas */
+    TCanvas* m_cOccupancyRPhiViewV = nullptr; /**< occupancy V plot canvas */
+
+    TCanvas* m_cOnlineOccupancyRPhiViewU = nullptr; /**< online occupancy U plot canvas */
+    TCanvas* m_cOnlineOccupancyRPhiViewV = nullptr; /**< online occupancy V plot canvas */
+
+    TCanvas* m_cOccupancyRPhiViewU3Samples = nullptr; /**< occupancy U plot canvas  for 3 samples */
+    TCanvas* m_cOccupancyRPhiViewV3Samples = nullptr; /**< occupancy V plot canvas  for 3 samples */
+
+    TCanvas* m_cOnlineOccupancyRPhiViewU3Samples = nullptr; /**< occupancy U plot canvas  for 3 samples */
+    TCanvas* m_cOnlineOccupancyRPhiViewV3Samples = nullptr; /**< occupancy V plot canvas  for 3 samples */
+
+    TCanvas* m_cOccupancyRPhiViewUGroupId0 = nullptr; /**< occupancy U histo canvas  for cluster time group Id = 0*/
+    TCanvas* m_cOccupancyRPhiViewVGroupId0 = nullptr; /**< occupancy V histo canvas  for cluster time group Id = 0*/
+
 
     /** additional plots flag*/
     bool m_additionalPlots = false;
 
+    /** RPhi plots flag*/
+    bool m_RPhiView = false;
+
+    /** additional plots flag*/
+    bool m_RPhiViewId0 = false;
+
     TH1F m_hOccupancyChartChip; /**< occupancy chart histo */
     TCanvas* m_cOccupancyChartChip = nullptr; /**< occupancy chart histo canvas */
-
-    TCanvas* m_cOnlineOccupancyU = nullptr; /**< online occupancy U histo canvas */
-    TCanvas* m_cOnlineOccupancyU3Samples = nullptr; /**< online occupancy U histo canvas for 3 samples*/
-    TCanvas* m_cOnlineOccupancyV = nullptr; /**< online Occupancy V histo canvas */
-    TCanvas* m_cOnlineOccupancyV3Samples = nullptr; /**< online Occupancy V histo canvas  for 3 samples*/
 
     int m_sensors = 0; /**< number of sensors to considired*/
     TH1F m_hStripOccupancyU[172]; /**< u-side strip chart occupancy histos*/
@@ -111,37 +137,28 @@ namespace Belle2 {
     TH1F m_hStripOccupancyV[172]; /**< u-side strip chart occupancy histos*/
     TCanvas** m_cStripOccupancyV = nullptr; /**< u-side strip chart occupancy canvas*/
 
-    Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
-
-    TPaveText* m_legProblem = nullptr; /**< OfflineOccupancy plot legend, problem */
-    TPaveText* m_legWarning = nullptr; /**< OfflineOccupancy plot legend, warning */
-    TPaveText* m_legNormal = nullptr; /**< OfflineOccupancy plot legend, normal */
-    TPaveText* m_legEmpty = nullptr; /**< OfflineOccupancy plot legend, empty */
-    TPaveText* m_legError = nullptr; /**< OfflineOccupancy plot legend, error*/
-    TPaveText* m_legOnProblem = nullptr; /**< onlineOccupancy plot legend, problem */
-    TPaveText* m_legOnWarning = nullptr; /**< onlineOccupancy plot legend, warning */
-    TPaveText* m_legOnNormal = nullptr; /**< onlineOccupancy plot legend, normal */
-    TPaveText* m_legOnEmpty = nullptr; /**< onlineOccupancy plot legend, empty */
-    TPaveText* m_legOnError = nullptr; /**< onlineOccupancy plot legend, error*/
-
-    Int_t m_occUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
-    Int_t m_occVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
-    Int_t m_occU3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
-    Int_t m_occV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampels*/
-
-    Int_t m_occUGroupId0 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
-    Int_t m_occVGroupId0 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampels*/
-
-    Int_t m_onlineOccUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
-    Int_t m_onlineOccVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
-
-    Int_t m_onlineOccU3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sample*/
-    Int_t m_onlineOccV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampes*/
+    Float_t getOccupancy(float entries, int tmp_layer, int nEvents, bool sideV = false); /**< get occupancy value */
+    void setOccStatus(float occ, svdStatus& occupancyStatus, bool online = false); /**< set occupancy status */
 
     std::string m_pvPrefix; /**< string prefix for EPICS PVs */
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
+
+    svdStatus m_occUstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+    svdStatus m_occVstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+
+    svdStatus m_occU3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 samples*/
+    svdStatus m_occV3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sampels*/
+
+    svdStatus m_occUGroupId0; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 samples*/
+    svdStatus m_occVGroupId0; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sampels*/
+
+    svdStatus m_onlineOccUstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+    svdStatus m_onlineOccVstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+
+    svdStatus m_onlineOccU3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sample*/
+    svdStatus m_onlineOccV3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sampes*/
 
   };
 } // end namespace Belle2

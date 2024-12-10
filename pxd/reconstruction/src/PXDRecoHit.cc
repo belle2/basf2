@@ -137,7 +137,7 @@ float PXDRecoHit::getShapeLikelyhood(const genfit::StateOnPlane& state) const
 {
   // We need an associated cluster
   if (this->getCluster()) {
-    // Likelyhood depends on the fitted incidence angles into the sensor
+    // Likelihood depends on the fitted incidence angles into the sensor
     const TVectorD& state5 = state.getState();
     return PXD::PXDClusterPositionEstimator::getInstance().getShapeLikelyhood(*this->getCluster(), state5[1], state5[2]);
   }

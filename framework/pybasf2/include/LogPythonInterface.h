@@ -31,7 +31,7 @@ namespace Belle2 {
    * >>> print "Logging level set to", logging.log_level
    *
    * This module also allows to send log messages directly from python to ease
-   * consistent error reporting througout the framework
+   * consistent error reporting throughout the framework
    *
    * >>> B2WARNING("This is a warning message");
    *

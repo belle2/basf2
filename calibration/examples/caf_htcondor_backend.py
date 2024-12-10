@@ -61,12 +61,12 @@ def main(argv):
                                input_files=input_files_test)
 
         # Some optional configuration ####
-        # By default all input files are placed in one big job (-1), this allows you to specify a maxmimum so that
+        # By default all input files are placed in one big job (-1), this allows you to specify a maximum so that
         # subjobs for each set of input files will be created
         cal_test.max_files_per_collector_job = 1
         # Some backends can have arguments passed to them e.g. requested job memory
         cal_test.backend_args = {"request_memory": "2 GB"}
-        # The maximium iteration number you will be allowed to reach before the Calibration just completes
+        # The maximum iteration number you will be allowed to reach before the Calibration just completes
         cal_test.max_iterations = 2
         # Since we're using the LSF batch system we'll up the heartbeat from the default to query for when the jobs are all finished
         # No point spamming it

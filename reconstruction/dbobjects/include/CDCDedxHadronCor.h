@@ -46,7 +46,7 @@ namespace Belle2 {
     /** Return vector of hadron parameters
      * @return vector of hadron parameters
      */
-    std::vector<double> getHadronPars() const {return m_hadronpars; };
+    const std::vector<double>& getHadronPars() const {return m_hadronpars; };
 
     /** Return specific hadron parameter
      * @return hadron parameter
@@ -64,7 +64,22 @@ namespace Belle2 {
      */
     void setHadronPar(int par, double value) {m_hadronpars[par] = value; };
 
+    /**
+     * Returns corrected mean
+     * @param mean mean
+     * @param cosTheta cosine of polar angle
+     * @return corrected mean
+     */
+    double getCorrectedMean(double mean, double cosTheta) const {return D2I(cosTheta, I2D(cosTheta, 1.00) * mean);}
+
   private:
+
+    /** hadron saturation parameterization part 1 */
+    double I2D(double cosTheta, double I) const;
+
+    /** hadron saturation parameterization part 2 */
+    double D2I(double cosTheta, double D) const;
+
     short m_version{ -1}; /**< version number for hadron saturation parameterization */
     std::vector<double> m_hadronpars; /**< dE/dx hadron correction parameters */
 

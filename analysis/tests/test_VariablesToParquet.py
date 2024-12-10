@@ -21,7 +21,7 @@ path.add_module('ParticleLoader', decayStrings=['e+'])
 
 # Write out electron id and momentum of all true electron candidates
 v2parquet_e = VariablesToTable(
-    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.pq", "parquet")
+    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.pq")
 path.add_module(v2parquet_e)
 
 # event-wise mode is not supported at the moment. when it is add something like

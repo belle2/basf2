@@ -71,7 +71,7 @@ namespace Belle2 {
       float getCharge() const { return m_charge; }
       /** get the seed charge of the cluster */
       float getSeedCharge() const { return m_seed.getCharge(); }
-      /** get the seed pixel of the cluster, i.e. the pixel with the highes charge */
+      /** get the seed pixel of the cluster, i.e. the pixel with the highest charge */
       const Pixel& getSeed() const { return m_seed; }
       /** get the cluster size */
       size_t size() const { return m_pixels.size(); }

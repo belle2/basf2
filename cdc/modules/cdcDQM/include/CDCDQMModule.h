@@ -84,6 +84,17 @@ namespace Belle2 {
      */
     void terminate() override;
 
+    /**
+     * Compute and shift phi if it is stereo layer
+     * return [0,2pi]
+     */
+    double getShiftedPhi(const ROOT::Math::XYZVector& position, const int& lay);
+
+    /**
+     * Find bin corresponds to a specific phi in a layer
+     * phi must be in [0,2pi]
+     */
+    int findPhiBin(double phi, const int& lay);
 
   protected:
 
@@ -97,6 +108,8 @@ namespace Belle2 {
     StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
 
     int m_minHits;                   /**< Minimum hits for processing. */
+    int m_minNdf;                   /**< Minimum track NDF for cdc dqm plots. */
+    bool m_adjustWireShift = true;   /**< If true, gets the correct phi view of the boards */
     Long64_t m_nEvents = 0;          /**< Number of events processed */
     TH1F* m_hNEvents = nullptr;      /**< Histogram of num. events */
     TH1F* m_hOcc = nullptr;          /**< Histogram of occupancy */
@@ -108,6 +121,8 @@ namespace Belle2 {
     TH2F* m_hPhiIndex = nullptr;     /**< Histogram of cdc phi of different IP + skims tracks */
     TH2F* m_hPhiEff = nullptr;       /**< Histogram of cdc phi of tracking eff */
     TH2F* m_hPhiHit  = nullptr;      /**< Histogram of track associated hits in phi vs layer  */
+    TH2F* m_hPhiNCDC  = nullptr;     /**< Histogram of track associated nCDCHits vs phi */
+    TH2F* m_hTrackingWireEff = nullptr; /**< Histogram of attached and expected CDC wires in layer */
 
   };
 

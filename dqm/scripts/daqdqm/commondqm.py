@@ -42,10 +42,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     # Check components.
     check_components(components)
 
-    if dqm_mode in ["dont_care", "filtered"]:
-        # TTD trigger and bunch injection monitoring
-        path.add_module('TTDDQM')
-
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         # PXD (not useful on HLT)
         if components is None or 'PXD' in components:
@@ -121,6 +117,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module("StatisticsTimingHLTDQM",
                         createHLTUnitHistograms=create_hlt_unit_histograms,
                         )
+        # TTD trigger and bunch injection monitoring
+        path.add_module('TTDDQM')
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # HLT
@@ -338,7 +336,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             tracksStoreArrayName="TracksFromIP", histogramTitleSuffix=" - Tracks from IP") \
                 .set_name("TrackingExpressRecoDQM_FromIP")
             path.add_module('TrackingExpressRecoDQM', histogramDirectoryName="TrackingERDQM_NotFromIP",
-                            tracksStoreArrayName="TracksNotFromIP", histogramTitleSuffix=" - Tracks not from IP") \
+                            tracksStoreArrayName="TracksNotFromIP", histogramTitleSuffix=" - Tracks not from IP",
+                            produce1Dresiduals=False, produce2Dresiduals=False, produceTRClusterPlots=False) \
                 .set_name("TrackingExpressRecoDQM_NotFromIP")
 
     # ARICH

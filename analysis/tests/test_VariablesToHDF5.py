@@ -21,7 +21,7 @@ path.add_module('ParticleLoader', decayStrings=['e+'])
 
 # Write out electron id and momentum of all true electron candidates
 v2hdf5_e = VariablesToHDF5(
-    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.hdf5")
+    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.hdf5", hdf_table_name='all_electrons')
 path.add_module(v2hdf5_e)
 
 # event-wise mode is not supported at the moment. when it is add something like
@@ -37,7 +37,7 @@ with b2test_utils.clean_working_directory():
 
     # Testing
     assert os.path.isfile('particleDF.hdf5'), "particleDF.hdf5 wasn't created"
-    df1 = pandas.read_hdf('particleDF.hdf5', 'e+:all')
+    df1 = pandas.read_hdf('particleDF.hdf5', 'all_electrons')
     assert len(df1) > 0, "electron dataframe contains zero entries"
     assert 'electronID' in df1.columns, "electronID column is missing from electron dataframe"
     assert 'p' in df1.columns, "p column is missing from electron dataframe"

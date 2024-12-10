@@ -379,7 +379,7 @@ def get_calibrations(input_data, **kwargs):
             cal_ecl_merge_i = Calibration(name=mergeCalibName, collector="DummyCollector",
                                           input_files=input_files_bhabha_1perRun)
 
-            # Read in the previous crystal payload values for comparision
+            # Read in the previous crystal payload values for comparison
             cal_ecl_merge_i.algorithms = [merging_alg]
             print("merge algorithm: read previous payload for comparison purposes")
             print("merging_alg.readPrevCrysPayload = ", merging_alg.readPrevCrysPayload)

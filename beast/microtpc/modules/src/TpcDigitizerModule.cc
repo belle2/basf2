@@ -18,7 +18,6 @@
 
 //c++
 #include <cmath>
-#include <boost/foreach.hpp>
 #include <vector>
 
 using namespace Belle2;
@@ -662,7 +661,7 @@ void TpcDigitizerModule::getXMLData()
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"MICROTPC\"]/Content/");
 
   //get the location of the tubes
-  BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+  for (const GearDir& activeParams : content.getNodes("Active")) {
 
     m_TPCCenter.push_back(ROOT::Math::XYZVector(activeParams.getLength("SensVol_x"),
                                                 activeParams.getLength("SensVol_y"),

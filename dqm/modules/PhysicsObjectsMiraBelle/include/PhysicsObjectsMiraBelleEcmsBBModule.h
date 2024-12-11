@@ -65,7 +65,12 @@ namespace Belle2 {
     std::string m_BmListName = ""; ///< List name for charged B candidates
     std::string m_B0ListName = ""; ///< List name for neutral B candidates
 
-
+    static constexpr double c_mDmin = 1.830; ///< Minimal value of the D meson inv mass
+    static constexpr double c_mDmax = 1.894; ///< Maximal value of the D meson inv mass
+    static constexpr double c_dmDstarMin = 0.143; ///< Minimal value of the m(D*)-(mD)
+    static constexpr double c_dmDstarMax = 0.147; ///< Maximal value of the m(D*)-(mD)
+    static constexpr double c_mBwindow = 0.05; ///< Maximal deviation of B meson inv mass from PDG value
+    static constexpr double c_R2max = 0.3; ///< Maximal allowed R2 value (to suppress continuum)
   };
 
 } // end namespace Belle2

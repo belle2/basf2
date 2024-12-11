@@ -309,7 +309,7 @@ namespace Belle2 {
     {
 
       if (m_strips.size() == 0)
-        B2ERROR(" you are asking fo the cluster samples for a cluster candidate with no strips, it make no sense to ask for the cluster time!");
+        B2ERROR(" you are asking for the cluster samples for a cluster candidate with no strips, it make no sense to ask for the cluster time!");
 
       //steps:
       //1.loop on m_strips

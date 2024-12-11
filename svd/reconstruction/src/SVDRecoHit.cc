@@ -140,7 +140,7 @@ TVectorD SVDRecoHit::applyPlanarDeformation(TVectorD rawHit, std::vector<double>
   } else {
     v = rawHit[0];                 // V coordinate of hit
     u = state.getState()(3);       // U coordinate of hit
-    length = geometry.getLength(); // Length of sensor (V side) is fuction of V (slanted)
+    length = geometry.getLength(); // Length of sensor (V side) is function of V (slanted)
     width = geometry.getWidth(v);  // Width of sensor (U side)
 
     v = v * 2 / length;            // Legendre parametrization required V in (-1, 1)

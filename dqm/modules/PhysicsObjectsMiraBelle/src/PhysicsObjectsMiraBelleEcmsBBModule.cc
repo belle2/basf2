@@ -59,9 +59,9 @@ void PhysicsObjectsMiraBelleEcmsBBModule::defineHisto()
   oldDir->cd("PhysicsObjectsMiraBelleEcmsBB");
 
   const double cMBp = EvtGenDatabasePDG::Instance()->GetParticle("B+")->Mass();
-  //const double cMB0 = EvtGenDatabasePDG::Instance()->GetParticle("B0")->Mass();
 
   // In the original ML-based analysis there are 40 bins for visualisation
+  // Since binned fit is used here, 80 bins are used instead.
   // For simplicity, the same histogram lower bound (B+ mass) is used
   m_hB0 = new TH1D("hB0", "", 80, cMBp, 5.37);
   m_hBp = new TH1D("hBp", "", 80, cMBp, 5.37);
@@ -113,7 +113,7 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
     const Particle* Bpart = Bparts[i];
 
     const Particle* D    = nullptr;
-    double dmDstar = -99;
+    double dmDstar = std::numeric_limits<double>::quiet_NaN();
 
     static const int c_PdgD0    = abs(EvtGenDatabasePDG::Instance()->GetParticle("D0")->PdgCode());
     static const int c_PdgDplus = abs(EvtGenDatabasePDG::Instance()->GetParticle("D+")->PdgCode());
@@ -131,7 +131,7 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
     } else {
       B2INFO("No D meson found");
     }
-    double mD = D ? D->getMass() : -99;
+    double mD = D ? D->getMass() : std::numeric_limits<double>::quiet_NaN();
 
     //Convert mBC and deltaE to the Y4S reference
     double pBcms  = PCmsLabTransform::labToCms(Bpart->get4Vector()).P();
@@ -144,12 +144,11 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
 
 
     // Filling the histograms
-    if (1.830 < mD && mD < 1.894)
-      if (abs(mInv - mB) < 0.05)
-        if (R2 < 0.3)
-          if ((dmDstar < -10)  || (0.143 < dmDstar && dmDstar < 0.147)) {
-            double eBC = sqrt(pBcms * pBcms + pow(mB, 2)); // beam constrained energy
-            if (eBC > 5.37) continue;
+    if (c_mDmin < mD && mD < c_mDmax)
+      if (abs(mInv - mB) < c_mBwindow)
+        if (R2 < c_R2max)
+          if (std::isnan(dmDstar) || (c_dmDstarMin < dmDstar && dmDstar < c_dmDstarMax)) {
+            double eBC = sqrt(pBcms * pBcms + mB * mB); // beam constrained energy
             if (abs(pdg) == 511) {
               m_hB0->Fill(eBC);
             } else {

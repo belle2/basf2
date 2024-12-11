@@ -93,6 +93,6 @@ namespace Belle2 {
     float m_interceptLowerLine =
       -134.0; /**< Intercept of one of the two lines that define the signal region used in the CoG3 calibration (to remove background clusters) */
     float m_angularCoefficientLowerLine =
-      1.264; /**< Angulat coefficienct of one of the two lines that define the signal region used in the CoG3 calibration (to remove background clusters) */
+      1.264; /**< Angular coefficient of one of the two lines that define the signal region used in the CoG3 calibration (to remove background clusters) */
   };
 } // namespace Belle2

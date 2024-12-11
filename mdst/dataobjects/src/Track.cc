@@ -106,6 +106,25 @@ const TrackFitResult* Track::getTrackFitResultWithClosestMass(const Const::Charg
   return getTrackFitResultWithClosestMassByName(requestedType, "");
 }
 
+const TrackFitResult* Track::getTrackFitResultWithBestPValueByName(const std::string trackFitResultsName) const
+{
+  // make sure at least one hypothesis exists. No B2 Track should exist which does not have at least
+  // one hypothesis
+  B2ASSERT("Belle2::Track must always have at least one successfully fitted hypothesis.", getNumberOfFittedHypotheses() > 0);
+
+  // sort TrackFitResults by p value
+  auto allFitResults = getTrackFitResultsByName(trackFitResultsName);
+  auto bestPValueFit = std::max_element(allFitResults.begin(), allFitResults.end(), [](auto & a, auto & b) {
+    return a.second->getPValue() < b.second->getPValue();
+  });
+  return bestPValueFit->second;
+}
+
+const TrackFitResult* Track::getTrackFitResultWithBestPValue() const
+{
+  return getTrackFitResultWithBestPValueByName("");
+}
+
 std::string Track::getInfoHTML() const
 {
   std::stringstream out;

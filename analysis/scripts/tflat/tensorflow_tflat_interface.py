@@ -15,17 +15,66 @@ import numpy as np
 
 from basf2_mva_python_interface.tensorflow import State
 
-from keras.layers import Dense, Input, BatchNormalization, Normalization
+from keras.layers import Dense, Input, BatchNormalization, Normalization, Concatenate
 from keras.activations import sigmoid, tanh
 from keras.models import Model
 from keras.losses import binary_crossentropy
 from keras.optimizers import Adam
 import tensorflow as tf
+import keras
+
+
+class Slicing(keras.layers.Layer):
+    def __init__(self, column, **kwargs):
+        super().__init__(**kwargs)
+        self.column = column
+
+    def call(self, inputs):
+        return inputs[:, self.column:self.column+1]
+
+    def get_config(self):
+        config = super().get_config()
+        config.update({"column": self.column})
+        return config
+
+
+class NanToNum(keras.layers.Layer):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def call(self, inputs):
+        return tf.keras.ops.nan_to_num(inputs)
+
+    def get_config(self):
+        config = super().get_config()
+        return config
+
+
+def get_preprocessor_(X):
+    """
+    Configure and adapt preprocessor on data X
+    """
+
+    inputs = Input(shape=(X.shape[1],))
+
+    preprocessed_cols = []
+    for col in range(X.shape[1]):
+        Xcol = X[:, col]
+        norm_layer = Normalization(axis=None)
+        norm_layer.adapt(Xcol[~np.isnan(Xcol)])
+
+        net = Slicing(col)(inputs)
+        net = norm_layer(net)
+        net = NanToNum()(net)
+        preprocessed_cols.append(net)
+
+    outputs = Concatenate(axis=1)(preprocessed_cols)
+    return tf.keras.models.Model(inputs=inputs, outputs=outputs)
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     """
-    Specifies the and configures the tensorflow model
+    Specifies the and configures the keras model
     :param number_of_features:
     :param number_of_spectators:
     :param number_of_events:
@@ -87,10 +136,6 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-
-    # replace nan value by zero
-    X = np.nan_to_num(X)
-
     # convert array input to tensor to avoid creating a new graph for each input
     # calling the model directly is faster than using the predict method in most of our applications
     # as we do a loop over events.
@@ -116,7 +161,7 @@ def load(obj):
             with open(f'{path}/{file_name}', 'w+b') as file:
                 file.write(bytes(obj[1][file_index]))
 
-        model = tf.keras.models.load_model(f'{path}/{file_names[0]}')
+        model = tf.keras.models.load_model(f'{path}/{file_names[0]}', safe_mode=True)
 
     state = State(model=model)
     return state
@@ -146,25 +191,21 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     assert len(np.unique(y)) == 2
     assert len(np.unique(state.ytest)) == 2
 
-    # replace nan value by zero
-    X = np.nan_to_num(X)
-    state.Xtest = np.nan_to_num(state.Xtest)
+    # configure and adapt preprocessor
+    preprocessor = get_preprocessor_(X)
 
-    # standardize features
-    norm_layer = Normalization()
-    norm_layer.adapt(X)
-
-    X = norm_layer(X).numpy()
-    state.Xtest = norm_layer(state.Xtest).numpy()
+    X = preprocessor(X).numpy()
+    state.Xtest = preprocessor(state.Xtest).numpy()
 
     # perform fit() with early stopping callback
     callbacks = [tf.keras.callbacks.EarlyStopping(
         monitor='val_loss',
         min_delta=0,
-        patience=10,
-        verbose=0,
+        patience=30,
+        verbose=1,
         mode='auto',
         baseline=None,
+        start_from_epoch=200,
         restore_best_weights=True)]
 
     def scheduler(epoch, lr_init=0.005, decay=0.01):
@@ -181,9 +222,9 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 
     state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=128, epochs=300, callbacks=callbacks)
 
-    # create a model that includes preprocessing
+    # create a keras model that includes the preprocessing step
     inputs = Input(shape=(X.shape[1],))
-    outputs = norm_layer(inputs)
+    outputs = preprocessor(inputs)
     outputs = state.model(outputs)
     state.model = tf.keras.models.Model(inputs=inputs, outputs=outputs)
 

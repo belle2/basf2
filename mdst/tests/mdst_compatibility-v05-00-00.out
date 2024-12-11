@@ -19,6 +19,8 @@ Untested method Track::addStatusBits
 Untested method Track::getInfoHTML
 Untested method Track::getStatusBit
 Untested method Track::getTrackFitResultByName
+Untested method Track::getTrackFitResultWithBestPValue
+Untested method Track::getTrackFitResultWithBestPValueByName
 Untested method Track::getTrackFitResultWithClosestMassByName
 Untested method Track::getTrackFitResults
 Untested method Track::getTrackFitResultsByName

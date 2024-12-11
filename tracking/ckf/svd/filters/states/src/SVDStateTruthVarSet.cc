@@ -10,6 +10,8 @@
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <TRandom.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -37,6 +39,9 @@ bool SVDStateTruthVarSet::extract(const BaseSVDStateFilter::Object* pair)
   var<named("truth")>() = 0;
 
   if (not m_mcUtil.allStatesCorrect(allStates)) {
+    if (m_UseFractionOfBackground and gRandom->Uniform() > m_BackgroundFraction) {
+      return false;
+    }
     // Keep all variables set to false and return.
     return true;
   }

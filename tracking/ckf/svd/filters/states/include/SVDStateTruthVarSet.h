@@ -62,5 +62,11 @@ namespace Belle2 {
 
     /// MC information used in the SVD CKF
     MCUtil m_mcUtil;
+
+    /// Only use a fraction of background events for recording for MVA training
+    bool m_UseFractionOfBackground = true;
+
+    /// Fraction of background to use in case m_UseFractionOfBackground is true
+    double m_BackgroundFraction = 0.012;
   };
 }

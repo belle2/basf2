@@ -80,7 +80,7 @@ std::vector < short int> Track::getValidIndices() const
 const TrackFitResult* Track::getTrackFitResultWithClosestMassByName(const Const::ChargedStable& requestedType,
     const std::string trackFitResultsName) const
 {
-  // make sure at least one hypothesis exist. No B2 Track should exist which does not have at least
+  // make sure at least one hypothesis exists. No B2 Track should exist which does not have at least
   // one hypothesis
   B2ASSERT("Belle2::Track must always have at least one successfully fitted hypothesis.", getNumberOfFittedHypotheses() > 0);
 

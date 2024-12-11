@@ -19,6 +19,7 @@
 #include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
   namespace TrackFindingCDC {
     /**
      *  Generic class that generates some named float values from a given object.
@@ -108,6 +109,15 @@ namespace Belle2 {
           }
         }
         return nullptr;
+      }
+
+      /**
+       *  Forward prefixed parameters of this findlet to the module parameter list.
+       *
+       */
+      virtual void exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
+                                    const std::string& prefix __attribute__((unused)))
+      {
       }
     };
   }

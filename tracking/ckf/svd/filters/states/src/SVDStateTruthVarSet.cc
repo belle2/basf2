@@ -7,6 +7,9 @@
  **************************************************************************/
 #include <tracking/ckf/svd/filters/states/SVDStateTruthVarSet.h>
 
+#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -61,4 +64,16 @@ bool SVDStateTruthVarSet::extract(const BaseSVDStateFilter::Object* pair)
   var<named("truth_momentum_z")>() = cdcMCTrack->getMomentumSeed().Z();
 
   return true;
+}
+
+void SVDStateTruthVarSet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useFractionOfBackground"), m_UseFractionOfBackground,
+                                "Use only a fraction of background hits and combinations in recording to improve the signal fraction in the recording.",
+                                m_UseFractionOfBackground);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "backgroundFraction"), m_BackgroundFraction,
+                                "Fraction of background hits and combinations to be usedn in recording to improve the signal fraction in the recording if " + \
+                                TrackFindingCDC::prefixed(prefix, "useFractionOfBackground") + " is true.",
+                                m_BackgroundFraction);
 }

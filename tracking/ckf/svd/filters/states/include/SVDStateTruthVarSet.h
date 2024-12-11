@@ -56,6 +56,9 @@ namespace Belle2 {
     /// Generate and assign the variables from the object.
     virtual bool extract(const BaseSVDStateFilter::Object* result) override;
 
+    /// Expose the maximal residual
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
   private:
     /// Pointer to the object containing event number etc
     StoreObjPtr<EventMetaData> m_eventMetaData;

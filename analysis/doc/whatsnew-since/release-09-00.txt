@@ -1,3 +1,12 @@
+Changes in the analysis package in light-2501-betelgeuse
+--------------------------------------------------------
+
+Variables
++++++++++
+* The variables `prodVertexX`, `prodVertexY`, and `prodVertexZ` now return the production vertex position also for
+  TreeFit. Previously, only Rave was supported. Moreover, the covariance matrix elements of the production vertex for a
+  TreeFit are now also available via the variables `prodVertexCov` and `prodVertexXErr`, etc.
+
 Changes in the analysis package in light-2411-aldebaran
 -------------------------------------------------------
 
@@ -70,5 +79,3 @@ Charm Flavor Tagger
 * Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
   function ``charmFlavorTagger``) to ``CFT_ragdoll``. This value must be used for all releases as recent as
   light-2406-ragdoll and release-09.
-
-

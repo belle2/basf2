@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Components>
-   <!-- VTX layout with 5 layers in a windmill structure
+   <!-- VTX layout with 6 layers in a windmill structure
       -->
   <Ladder layer="1">
     <!-- shift defines the shift of the sensor center along the rphi direction
@@ -14,55 +14,93 @@
     <!-- The nominal radius of the inner layer is 14 mm, but this is the inner
          surface of the sensor and here we give the center of the sensor, so
          let's add half of the thickness of supporting balcony (0.2mm) -->
-    <radius unit="mm">14.0</radius>
+    <radius unit="mm">14.095</radius>
     <!-- The value of Sensors is the global z position -->
-    <Sensor id="1" type="layer14i" flipV="true"><z unit="mm">0.0</z><shift unit="mm">2.9</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="1" type="layer1i" unit="mm" flipV="true">-28.218</Sensor>
+    <Sensor id="2" type="layer1i" unit="mm" flipV="true">2.050000</Sensor>
+    <Sensor id="3" type="layer1i" unit="mm" flipV="true">32.318</Sensor>
+    <Sensor id="4" type="layer1i" unit="mm" flipV="true">62.586</Sensor>
   </Ladder>
 
   <Ladder layer="2">
-    <shift  unit="mm">6.0</shift>
-    <radius unit="mm">22.0</radius>
-    <Sensor id="1" type="layer14i" flipV="true"><z unit="mm">0.0</z><shift unit="mm">6.0</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <shift  unit="mm">6</shift>
+    <radius unit="mm">22.095</radius>
+    <Sensor id="1" type="layer1i" unit="mm" flipV="true">-28.218</Sensor>
+    <Sensor id="2" type="layer1i" unit="mm" flipV="true">2.050000</Sensor>
+    <Sensor id="3" type="layer1i" unit="mm" flipV="true">32.318</Sensor>
+    <Sensor id="4" type="layer1i" unit="mm" flipV="true">62.586</Sensor>
   </Ladder>
 
   <Ladder layer="3">
-    <shift  unit="mm">8.635</shift>
-    <radius unit="mm">39.0</radius>
-    <Sensor id="1" type="layer14" flipV="true"><z unit="mm">0.18599</z><shift unit="mm">8.0</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="2" type="layer14" flipV="true"><z unit="mm">120.907</z><shift unit="mm">8.0</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <shift  unit="mm">8.0</shift>
+    <radius unit="mm">69.2</radius>
+    <Sensor id="1" type="layer1o" unit="mm" flipV="true">-112.186</Sensor>
+    <Sensor id="2" type="layer1o" unit="mm" flipV="true">-81.918</Sensor>
+    <Sensor id="3" type="layer1o" unit="mm" flipV="true">-51.6500</Sensor>
+    <Sensor id="4" type="layer1o" unit="mm" flipV="true">-21.3820</Sensor>
+    <Sensor id="5" type="layer1o" unit="mm" flipV="true">8.885999</Sensor>
+    <Sensor id="6" type="layer1o" unit="mm" flipV="true">39.15399</Sensor>
+    <Sensor id="7" type="layer1o" unit="mm" flipV="true">69.422</Sensor>
+    <Sensor id="8" type="layer1o" unit="mm" flipV="true">99.69</Sensor>
+    <Sensor id="9" type="layer1o" unit="mm" flipV="true">129.958</Sensor>
+    <Sensor id="10" type="layer1o" unit="mm" flipV="true">160.2260</Sensor>
+    <Sensor id="11" type="layer1o" unit="mm" flipV="true">190.494</Sensor>
+    <Sensor id="12" type="layer1o" unit="mm" flipV="true">220.7619</Sensor>
   </Ladder>
 
   <Ladder layer="4">
-    <shift  unit="mm">12.084</shift>
-    <radius unit="mm">89.0</radius>
-    <Sensor id="1" type="layer13" flipV="true"><z unit="mm">-96.622</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="2" type="layer13" flipV="true"><z unit="mm">-6.0680</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="3" type="layer13" flipV="true"><z unit="mm">84.4859</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="4" type="layer13" flipV="true"><z unit="mm">175.039</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="5" type="layer13" flipV="true"><z unit="mm">265.593</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <shift  unit="mm">12.042</shift>
+    <radius unit="mm">89.2</radius>
+    <Sensor id="1" type="layer1o" unit="mm" flipV="true">-141.874</Sensor>
+    <Sensor id="2" type="layer1o" unit="mm" flipV="true">-111.606</Sensor>
+    <Sensor id="3" type="layer1o" unit="mm" flipV="true">-81.338</Sensor>
+    <Sensor id="4" type="layer1o" unit="mm" flipV="true">-51.0699</Sensor>
+    <Sensor id="5" type="layer1o" unit="mm" flipV="true">-20.8019</Sensor>
+    <Sensor id="6" type="layer1o" unit="mm" flipV="true">9.466000</Sensor>
+    <Sensor id="7" type="layer1o" unit="mm" flipV="true">39.73400</Sensor>
+    <Sensor id="8" type="layer1o" unit="mm" flipV="true">70.00200</Sensor>
+    <Sensor id="9" type="layer1o" unit="mm" flipV="true">100.2700</Sensor>
+    <Sensor id="10" type="layer1o" unit="mm" flipV="true">130.5380</Sensor>
+    <Sensor id="11" type="layer1o" unit="mm" flipV="true">160.806</Sensor>
+    <Sensor id="12" type="layer1o" unit="mm" flipV="true">191.0739</Sensor>
+    <Sensor id="13" type="layer1o" unit="mm" flipV="true">221.342</Sensor>
+    <Sensor id="14" type="layer1o" unit="mm" flipV="true">251.6100</Sensor>
+    <Sensor id="15" type="layer1o" unit="mm" flipV="true">281.8780</Sensor>
   </Ladder>
 
   <Ladder layer="5">
-    <shift  unit="mm">0</shift>
-    <radius unit="mm">140.0</radius>
-    <Sensor id="1" type="layer14" flipV="true"><z unit="mm">-177.52</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="2" type="layer14" flipV="true"><z unit="mm">-56.801</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="3" type="layer14" flipV="true"><z unit="mm">63.9209</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="4" type="layer14" flipV="true"><z unit="mm">184.642</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="5" type="layer14" flipV="true"><z unit="mm">305.364</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="6" type="layer14" flipV="true"><z unit="mm">426.087</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="7" type="layer14" flipV="true"><z unit="mm">-177.52</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
-    <Sensor id="8" type="layer14" flipV="true"><z unit="mm">-56.801</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
-    <Sensor id="9" type="layer14" flipV="true"><z unit="mm">63.9209</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
-    <Sensor id="10" type="layer14" flipV="true"><z unit="mm">184.642</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
-    <Sensor id="11" type="layer14" flipV="true"><z unit="mm">305.364</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
-    <Sensor id="12" type="layer14" flipV="true"><z unit="mm">426.087</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
+    <shift  unit="mm">5.818</shift>
+    <radius unit="mm">140.2</radius>
+    <Sensor id="1" type="layer1o" unit="mm" flipV="true">-237.859</Sensor>
+    <Sensor id="2" type="layer1o" unit="mm" flipV="true">-207.591</Sensor>
+    <Sensor id="3" type="layer1o" unit="mm" flipV="true">-177.323</Sensor>
+    <Sensor id="4" type="layer1o" unit="mm" flipV="true">-147.055</Sensor>
+    <Sensor id="5" type="layer1o" unit="mm" flipV="true">-116.787</Sensor>
+    <Sensor id="6" type="layer1o" unit="mm" flipV="true">-86.519</Sensor>
+    <Sensor id="7" type="layer1o" unit="mm" flipV="true">-56.2510</Sensor>
+    <Sensor id="8" type="layer1o" unit="mm" flipV="true">-25.9830</Sensor>
+    <Sensor id="9" type="layer1o" unit="mm" flipV="true">4.284999</Sensor>
+    <Sensor id="10" type="layer1o" unit="mm" flipV="true">34.55300</Sensor>
+    <Sensor id="11" type="layer1o" unit="mm" flipV="true">64.821</Sensor>
+    <Sensor id="12" type="layer1o" unit="mm" flipV="true">95.08899</Sensor>
+    <Sensor id="13" type="layer1o" unit="mm" flipV="true">125.357</Sensor>
+    <Sensor id="14" type="layer1o" unit="mm" flipV="true">155.6250</Sensor>
+    <Sensor id="15" type="layer1o" unit="mm" flipV="true">185.893</Sensor>
+    <Sensor id="16" type="layer1o" unit="mm" flipV="true">216.1609</Sensor>
+    <Sensor id="17" type="layer1o" unit="mm" flipV="true">246.429</Sensor>
+    <Sensor id="18" type="layer1o" unit="mm" flipV="true">276.697</Sensor>
+    <Sensor id="19" type="layer1o" unit="mm" flipV="true">306.9650</Sensor>
+    <Sensor id="20" type="layer1o" unit="mm" flipV="true">337.2329</Sensor>
+    <Sensor id="21" type="layer1o" unit="mm" flipV="true">367.501</Sensor>
+    <Sensor id="22" type="layer1o" unit="mm" flipV="true">397.769</Sensor>
+    <Sensor id="23" type="layer1o" unit="mm" flipV="true">428.0369</Sensor>
+    <Sensor id="24" type="layer1o" unit="mm" flipV="true">458.3049</Sensor>
   </Ladder>
 
-<Sensor type="layer14">
+<Sensor type="layer1o">
   <Material>Si</Material>
   <width unit="mm">18.812</width>
-  <length unit="mm">120.672</length>
+  <length unit="mm">30.168</length>
   <height unit="mm">0.4</height>
   <!-- definition of the active area of the module which is a part of the
        whole thing. The position is given relative to the lower left edge of
@@ -72,107 +110,11 @@
     <v unit="mm">0.3</v>
     <w>top</w>
     <width unit="mm">15.312</width>
-    <length unit="mm">118.272</length>
+    <length unit="mm">29.568</length>
     <height unit="mm">0.03</height>
     <!-- define the number of pixels in rphi direction -->
     <pixelsU>464</pixelsU>
-    <pixelsV>3584</pixelsV>
-     <!--
-           Maybe all those parameters don't make sense for Generic Pixel
-
-           Parameters describing the physical attributes of the sensor needed
-           for digitization. The voltages might be time dependent and than
-           should be placed somewhere else -->
-      <BulkDoping unit="1/um^3">10.0</BulkDoping>
-      <BackVoltage unit="V">-30</BackVoltage>
-      <TopVoltage unit="V">-5.0</TopVoltage>
-      <BorderU unit="um">6.0</BorderU>
-      <BorderV unit="um">4.0</BorderV>
-      <ChargeThreshold unit="ADU">1.25</ChargeThreshold>
-      <NoiseFraction>0.0</NoiseFraction>
-      <!-- Parameters that were in the digitizer -->
-      <!-- Apply electronic effects? -->
-      <ApplyElectronicEffects>true</ApplyElectronicEffects>
-      <!-- Noise added by the electronics, set in ENC -->
-      <ElectronicNoise unit="ENC">20.0</ElectronicNoise>
-      <!-- Apply binary readout? -->
-      <ApplyBinaryReadout>false</ApplyBinaryReadout>
-      <!-- Binary hit treshold, set in ENC -->
-      <BinaryHitThreshold unit="ENC">200</BinaryHitThreshold>
-      <!-- ENC equivalent of 1 ADU -->
-      <ElectronToADU unit="ENC">120</ElectronToADU>
-      <!-- Maximum code for analog to digital converter (clamping) -->
-      <MaxADUCode>127</MaxADUCode>
-      <!-- Apply Poisson smearing of electrons collected on pixels -->
-      <ApplyPoissonSmearing>true</ApplyPoissonSmearing>
-      <!-- Use integration window? -->
-      <ApplyIntegrationWindow>true</ApplyIntegrationWindow>
-      <!-- Maximum segment length (in mm) -->
-      <SegmentLength unit="mm">0.005</SegmentLength>
-      <!-- Split Signalpoints in smaller groups of N electrons (in e) -->
-      <ElectronGroupSize>100</ElectronGroupSize>
-      <!-- Time step for tracking electron groups in readout plane (in ns) -->
-      <ElectronStepTime unit="ns">1.0</ElectronStepTime>
-      <!-- Maximum number of steps when propagating electrons -->
-      <ElectronMaxSteps>200</ElectronMaxSteps>
-      <!-- Constant time delay between bunch crossing and switching on triggergate (in ns) -->
-      <HardwareDelay unit="ns">0.0</HardwareDelay>
-      <!-- ADC conversion factor -->
-      <ADCunit>120</ADCunit>
-      <!-- Diffusion coefficient TODO add unit? is it diffusion coeff or cloud size??-->
-      <CloudSize>8.5e-05</CloudSize>
-      <!-- ADC gain factor -->
-      <Gq>1.0</Gq>
-      <!-- Averaged sensors X0 (for perpendicular incidence) -->
-      <X0average>0.001</X0average>
-      <!-- Tangent of Lorentz angle -->
-      <TanLorentzAngle>0.24</TanLorentzAngle>
-      <!-- Spatial resolution coefficient for u axis -->
-      <ResolutionCoefficientU>0.6</ResolutionCoefficientU>
-      <!-- Spatial resolution coefficient for v axis -->
-      <ResolutionCoefficientV>0.6</ResolutionCoefficientV>
-      <!-- Integration time for Generic Pixel -->
-      <IntegrationStart unit="ns">-50</IntegrationStart>
-      <IntegrationEnd   unit="ns">50</IntegrationEnd>
-    </Active>
-    <!-- Used for thinning in the VXD sensitive area
-
-         now we place some components on the sensor by giving the name of the
-         component defined further down and the positions of all placements on
-         the sensor in local coordinates, starting at the lower left edge
-
-         possible placements for the w-coordinate are:
-          - below: place below the sensor surface
-          - bottom: place in the sensor but at the bottom
-          - center: place in the sensor center
-          - top: place in the sensor touching the top surface
-          - above place on top of the sensor surface -->
-
-     <!-- Thinning of the sensor down to the sensitive thickness by cutting out
-         a piece of the silicon -->
-    <!--Component type="ThinningLayer_iVTX_A">
-      <u unit="mm">2.0</u><v unit="mm">0.0</v>
-    </Component-->
-  </Sensor>
-
-<Sensor type="layer14i">
-  <Material>Si</Material>
-  <width unit="mm">18.812</width>
-  <length unit="mm">120.672</length>
-  <height unit="mm">0.19</height>
-  <!-- definition of the active area of the module which is a part of the
-       whole thing. The position is given relative to the lower left edge of
-       the module (the point with the most negative local coordinates). -->
-  <Active>
-    <u unit="mm">3.5</u>
-    <v unit="mm">0.3</v>
-    <w>top</w>
-    <width unit="mm">15.312</width>
-    <length unit="mm">118.272</length>
-    <height unit="mm">0.03</height>
-    <!-- define the number of pixels in rphi direction -->
-    <pixelsU>464</pixelsU>
-    <pixelsV>3584</pixelsV>
+    <pixelsV>896</pixelsV>
      <!--
            Maybe all those parameters don't make sense for Generic Pixel
 
@@ -251,11 +193,11 @@
     </Component-->
   </Sensor>
 
-<Sensor type="layer13">
+<Sensor type="layer1i">
   <Material>Si</Material>
   <width unit="mm">18.812</width>
-  <length unit="mm">90.50399999999999</length>
-  <height unit="mm">0.4</height>
+  <length unit="mm">30.168</length>
+  <height unit="mm">0.19</height>
   <!-- definition of the active area of the module which is a part of the
        whole thing. The position is given relative to the lower left edge of
        the module (the point with the most negative local coordinates). -->
@@ -264,11 +206,11 @@
     <v unit="mm">0.3</v>
     <w>top</w>
     <width unit="mm">15.312</width>
-    <length unit="mm">88.70400000000001</length>
+    <length unit="mm">29.568</length>
     <height unit="mm">0.03</height>
     <!-- define the number of pixels in rphi direction -->
     <pixelsU>464</pixelsU>
-    <pixelsV>2688</pixelsV>
+    <pixelsV>896</pixelsV>
      <!--
            Maybe all those parameters don't make sense for Generic Pixel
 
@@ -342,7 +284,7 @@
 
      <!-- Thinning of the sensor down to the sensitive thickness by cutting out
          a piece of the silicon -->
-    <!--Component type="ThinningLayer_iVTX_A">
+    <!--Component type="ThinningLayer14">
       <u unit="mm">2.0</u><v unit="mm">0.0</v>
     </Component-->
   </Sensor>
@@ -356,11 +298,20 @@
     <angle  unit="deg">0</angle>
   </Component>
 
-  <Component name="ThinningLayer13">
+  <Component name="ThinningLayer14i">
     <Material>ColdAir</Material>
     <Color>#5599BB</Color>
     <width  unit="mm">15.312</width>
-    <length unit="mm">88.70400000000001</length>
+    <length unit="mm">118.272</length>
+    <height unit="mm">0.36</height>
+    <angle  unit="deg">0</angle>
+  </Component>
+
+  <Component name="ThinningLayer12">
+    <Material>ColdAir</Material>
+    <Color>#5599BB</Color>
+    <width  unit="mm">15.312</width>
+    <length unit="mm">59.136</length>
     <height unit="mm">0.36</height>
     <angle  unit="deg">0</angle>
   </Component>

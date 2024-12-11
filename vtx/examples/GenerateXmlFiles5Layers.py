@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# create 5 layers staggered with last obelix design
-# using super modules 1x4, 1x3 sensors
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# create 6 layers staggered with last obelix design
+# using super modules 1x4, 1x2 sensors
 
 OptL3Mod = True
-Opt2Xi = False
 
 fileName = ""
 fileNameC = ""
 
 if OptL3Mod:
-    if Opt2Xi:
-        fileName = 'VTX-CMOS5-staggered-L3mod-2Xi.xml'
-        fileNameC = 'VTX-Components-CMOS5-staggered-L3mod-2Xi.xml'
-    else:
-        fileName = 'VTX-CMOS5-staggered-L3mod.xml'
-        fileNameC = 'VTX-Components-CMOS5-staggered-L3mod.xml'
+    fileName = 'VTX-CMOS5-staggered-L3mod.xml'
+    fileNameC = 'VTX-Components-CMOS5-staggered-L3mod.xml'
 else:
-    if Opt2Xi:
-        fileName = 'VTX-CMOS5-staggered-2Xi.xml'
-        fileNameC = 'VTX-Components-CMOS5-staggered-2Xi.xml'
-    else:
-        fileName = 'VTX-CMOS5-staggered.xml'
-        fileNameC = 'VTX-Components-CMOS5-staggered.xml'
+    fileName = 'VTX-CMOS5-staggered.xml'
+    fileNameC = 'VTX-Components-CMOS5-staggered.xml'
 
 f = open('../data/' + fileNameC, 'w')
 
@@ -43,7 +43,6 @@ activeH = 0.030
 
 pixelsU = 464
 pixelsV = 896
-
 
 BulkDoping = 10.0
 BackVoltage = -30
@@ -81,74 +80,68 @@ nlayer = 5
 nsensor = 0
 type = ""
 start = 0
-shift = ""
-shiftR0 = "0.0"
-shiftR1 = "1.5"
-shift1 = 0.
+shiftR0 = 0.
+shiftR1 = 1.5
+shiftZ0 = 0
 gap = 0
 shiftL = 0
 radius = 0
+radius1 = 0
+phi = 0
+phi1 = 0
 
 f.write('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n')
 f.write('<Components>\n')
-f.write('   <!-- VTX layout with 5 layers in a windmill structure\n')
+f.write('   <!-- VTX layout with 6 layers in a windmill structure\n')
 f.write('      -->\n')
 
 for layer in range(1, nlayer+1):
 
     if layer == 1:
-        type = 'layer14i'
-        nsensor = 1
-        start = 0
-        shift = str(2.9)
+        type = 'layer1i'
+        nsensor = 4
+        start = -28.218  # + sensorL/2.
         gap = 0.1
         shiftL = 2.9
-        radius = 14.0
+        radius = 14.0 + sensorHi/2.
 
     if layer == 2:
-        type = 'layer14i'
-        nsensor = 1
-        start = 0
-        shift = str(6.0)
+        type = 'layer1i'
+        nsensor = 4
+        start = -28.218  # + sensorL/2.
         gap = 0.1
-        shiftL = 6.0
-        radius = 22.0
+        shiftL = 6
+        radius = 22.0 + sensorHi/2.
 
     if layer == 3:
-        type = 'layer14'
-        if not OptL3Mod:
-            nsensor = 3
-            start = -112.186 + 2*sensorL
-            shift = str(8.0)
-            gap = 0.05
-            shiftL = 8.635
-            radius = 69.0
-        else:
-            nsensor = 2
-            start = -60.150 + 2*sensorL
-            shift = str(8.0)
-            gap = 0.05
-            shiftL = 8.635
-            radius = 39.0
+        type = 'layer1o'
+        nsensor = 12
+        start = -112.186
+        gap = 0.1
+        shiftL = 8.
+        radius = 69.0 + sensorH/2.
 
     if layer == 4:
-        type = 'layer13'
-        nsensor = 5
-        start = -141.874 + 1.5*sensorL
-        shift = str(12.042)
-        gap = 0.05
-        shiftL = 12.084
-        radius = 89.0
+        type = 'layer1o'
+        nsensor = 15
+        start = -141.874
+        gap = 0.1
+        shiftL = 12.042
+        radius = 89.0 + sensorH/2.
+        radius1 = radius + shiftR1
+        phi = 5.
+        phi1 = 15.
 
     if layer == 5:
-        type = 'layer14'
-        nsensor = 6
-        start = -237.859 + 2*sensorL
-        shift = str(5.818)
-        shift1 = str(23.518)
-        gap = 0.05
-        shiftL = 0
-        radius = 140.0
+        type = 'layer1o'
+        nsensor = 24
+        start = -237.859
+        gap = 0.1
+        shiftL = 5.818
+        radius = 140.0 + sensorH/2.
+        radius1 = radius + shiftR1
+        phi = 3.75
+        phi1 = 11.25
 
     f.write('  <Ladder layer=\"' + str(layer) + '\">\n')
     if (layer == 1):
@@ -170,331 +163,123 @@ for layer in range(1, nlayer+1):
         f.write('    <!-- The value of Sensors is the global z position -->\n')
 
     for id in range(0, nsensor):
-
-        if (layer == 4):
-            pos = start + (3*sensorL+gap)*id
-        else:
-            pos = start + (4*sensorL+gap)*id
-
-        if not OptL3Mod:
-            if layer == 3 and id == 1:
-                pos = start + (3*sensorL+gap)*id
-
+        pos = start + (sensorL+gap)*id
         posZ = str(pos)
 
-        cmd1 = '    <Sensor id=\"' + str(id+1) + '\"' + ' type=\"' + type + '\" flipV=\"true\"><z unit=\"mm\">' + \
-            posZ[0:7] + '</z><shift unit=\"mm\">' + shift[0:6] + '</shift><shiftR unit=\"mm\">' + shiftR0 + '</shiftR></Sensor>\n'
+        cmd1 = '    <Sensor id=\"' + str(id+1) + '\"' + ' type=\"' + type + \
+            '\" unit=\"mm\" flipV=\"true\">' + posZ[0:8] + '</Sensor>\n'
 
         f.write(cmd1)
-
-    if (layer == 5):
-        for id in range(0, nsensor):
-
-            pos = start + (4*sensorL+gap)*id
-            posZ = str(pos)
-
-            cmd2 = '    <Sensor id=\"' + str(id+nsensor+1) + '\"' + ' type=\"' + type + '\" flipV=\"true\"><z unit=\"mm\">' + \
-                posZ[0:7] + '</z><shift unit=\"mm\">' + shift1 + '</shift><shiftR unit=\"mm\">' + shiftR1 + '</shiftR></Sensor>\n'
-
-            f.write(cmd2)
 
     f.write('  </Ladder>\n')
 
     f.write('\n')
 
-f.write('<Sensor type=\"layer14\">\n')
-f.write('  <Material>' + Material + '</Material>\n')
-f.write('  <width unit=\"mm\">' + str(sensorW) + '</width>\n')
-f.write('  <length unit=\"mm\">' + str(sensorL*4) + '</length>\n')
-f.write('  <height unit=\"mm\">' + str(sensorH) + '</height>\n')
-f.write('  <!-- definition of the active area of the module which is a part of the\n')
-f.write('       whole thing. The position is given relative to the lower left edge of\n')
-f.write('       the module (the point with the most negative local coordinates). -->\n')
-f.write('  <Active>\n')
-f.write('    <u unit=\"mm\">' + str(offsetU) + '</u>\n')
-f.write('    <v unit=\"mm\">' + str(offsetV) + '</v>\n')
-f.write('    <w>top</w>\n')
-f.write('    <width unit=\"mm\">' + str(activeW) + '</width>\n')
-f.write('    <length unit=\"mm\">' + str(activeL*4) + '</length>\n')
-f.write('    <height unit=\"mm\">' + str(activeH)+'</height>\n')
-f.write('    <!-- define the number of pixels in rphi direction -->\n')
-f.write('    <pixelsU>' + str(pixelsU) + '</pixelsU>\n')
-f.write('    <pixelsV>' + str(pixelsV*4) + '</pixelsV>\n')
-f.write('     <!--\n')
-f.write('           Maybe all those parameters don\'t make sense for Generic Pixel\n')
-f.write('\n')
-f.write('           Parameters describing the physical attributes of the sensor needed\n')
-f.write('           for digitization. The voltages might be time dependent and than\n')
-f.write('           should be placed somewhere else -->\n')
-f.write('      <BulkDoping unit=\"1/um^3\">' + str(BulkDoping) + '</BulkDoping>\n')
-f.write('      <BackVoltage unit=\"V\">' + str(BackVoltage) + '</BackVoltage>\n')
-f.write('      <TopVoltage unit=\"V\">' + str(TopVoltage) + '</TopVoltage>\n')
-f.write('      <BorderU unit=\"um\">' + str(BorderU) + '</BorderU>\n')
-f.write('      <BorderV unit=\"um\">' + str(BorderV) + '</BorderV>\n')
-f.write('      <ChargeThreshold unit=\"ADU\">' + str(ChargeThreshold) + '</ChargeThreshold>\n')
-f.write('      <NoiseFraction>' + str(NoiseFraction) + '</NoiseFraction>\n')
-f.write('      <!-- Parameters that were in the digitizer -->\n')
-f.write('      <!-- Apply electronic effects? -->\n')
-f.write('      <ApplyElectronicEffects>' + ApplyElectronicEffects + '</ApplyElectronicEffects>\n')
-f.write('      <!-- Noise added by the electronics, set in ENC -->\n')
-f.write('      <ElectronicNoise unit=\"ENC\">' + str(ElectronicNoise) + '</ElectronicNoise>\n')
-f.write('      <!-- Apply binary readout? -->\n')
-f.write('      <ApplyBinaryReadout>' + ApplyBinaryReadout + '</ApplyBinaryReadout>\n')
-f.write('      <!-- Binary hit treshold, set in ENC -->\n')
-f.write('      <BinaryHitThreshold unit=\"ENC\">' + str(BinaryHitThreshold) + '</BinaryHitThreshold>\n')
-f.write('      <!-- ENC equivalent of 1 ADU -->\n')
-f.write('      <ElectronToADU unit=\"ENC\">' + str(ElectronToADU) + '</ElectronToADU>\n')
-f.write('      <!-- Maximum code for analog to digital converter (clamping) -->\n')
-f.write('      <MaxADUCode>' + str(MaxADUCode) + '</MaxADUCode>\n')
-f.write('      <!-- Apply Poisson smearing of electrons collected on pixels -->\n')
-f.write('      <ApplyPoissonSmearing>' + str(ApplyPoissonSmearing) + '</ApplyPoissonSmearing>\n')
-f.write('      <!-- Use integration window? -->\n')
-f.write('      <ApplyIntegrationWindow>' + str(ApplyIntegrationWindow) + '</ApplyIntegrationWindow>\n')
-f.write('      <!-- Maximum segment length (in mm) -->\n')
-f.write('      <SegmentLength unit=\"mm\">' + str(0.005) + '</SegmentLength>\n')
-f.write('      <!-- Split Signalpoints in smaller groups of N electrons (in e) -->\n')
-f.write('      <ElectronGroupSize>' + str(ElectronGroupSize) + '</ElectronGroupSize>\n')
-f.write('      <!-- Time step for tracking electron groups in readout plane (in ns) -->\n')
-f.write('      <ElectronStepTime unit=\"ns\">' + str(ElectronStepTime) + '</ElectronStepTime>\n')
-f.write('      <!-- Maximum number of steps when propagating electrons -->\n')
-f.write('      <ElectronMaxSteps>' + str(ElectronMaxSteps) + '</ElectronMaxSteps>\n')
-f.write('      <!-- Constant time delay between bunch crossing and switching on triggergate (in ns) -->\n')
-f.write('      <HardwareDelay unit=\"ns\">' + str(HardwareDelay) + '</HardwareDelay>\n')
-f.write('      <!-- ADC conversion factor -->\n')
-f.write('      <ADCunit>' + str(ADCunit) + '</ADCunit>\n')
-f.write('      <!-- Diffusion coefficient TODO add unit? is it diffusion coeff or cloud size??-->\n')
-f.write('      <CloudSize>' + str(CloudSize) + '</CloudSize>\n')
-f.write('      <!-- ADC gain factor -->\n')
-f.write('      <Gq>' + str(Gq) + '</Gq>\n')
-f.write('      <!-- Averaged sensors X0 (for perpendicular incidence) -->\n')
-f.write('      <X0average>' + str(X0average) + '</X0average>\n')
-f.write('      <!-- Tangent of Lorentz angle -->\n')
-f.write('      <TanLorentzAngle>' + str(TanLorentzAngle) + '</TanLorentzAngle>\n')
-f.write('      <!-- Spatial resolution coefficient for u axis -->\n')
-f.write('      <ResolutionCoefficientU>' + str(ResolutionCoefficientU) + '</ResolutionCoefficientU>\n')
-f.write('      <!-- Spatial resolution coefficient for v axis -->\n')
-f.write('      <ResolutionCoefficientV>' + str(ResolutionCoefficientV) + '</ResolutionCoefficientV>\n')
-f.write('      <!-- Integration time for Generic Pixel -->\n')
-f.write('      <IntegrationStart unit=\"ns\">' + str(IntegrationStart) + '</IntegrationStart>\n')
-f.write('      <IntegrationEnd   unit=\"ns\">' + str(IntegrationEnd) + '</IntegrationEnd>\n')
-f.write('    </Active>\n')
-f.write('    <!-- Used for thinning in the VXD sensitive area\n')
-f.write('\n')
-f.write('         now we place some components on the sensor by giving the name of the\n')
-f.write('         component defined further down and the positions of all placements on\n')
-f.write('         the sensor in local coordinates, starting at the lower left edge\n')
-f.write('\n')
-f.write('         possible placements for the w-coordinate are:\n')
-f.write('          - below: place below the sensor surface\n')
-f.write('          - bottom: place in the sensor but at the bottom\n')
-f.write('          - center: place in the sensor center\n')
-f.write('          - top: place in the sensor touching the top surface\n')
-f.write('          - above place on top of the sensor surface -->\n')
-f.write('\n')
-f.write('     <!-- Thinning of the sensor down to the sensitive thickness by cutting out\n')
-f.write('         a piece of the silicon -->\n')
-f.write('    <!--Component type=\"ThinningLayer_iVTX_A\">\n')
-f.write('      <u unit=\"mm\">' + str(unitThinU) + '</u><v unit=\"mm\">' + str(unitThinV) + '</v>\n')
-f.write('    </Component-->\n')
-f.write('  </Sensor>\n')
 
-f.write('\n')
+type = ("layer1o", "layer1i")
+length = (sensorL, sensorL)
+height = (sensorH, sensorHi)
+lengthA = (activeL, activeL, activeL)
+pixels = (pixelsV, pixelsV, pixelsV)
 
-f.write('<Sensor type=\"layer14i'+'\">\n')
-f.write('  <Material>' + Material + '</Material>\n')
-f.write('  <width unit=\"mm\">' + str(sensorW) + '</width>\n')
-f.write('  <length unit=\"mm\">' + str(sensorL*4) + '</length>\n')
-f.write('  <height unit=\"mm\">' + str(sensorHi) + '</height>\n')
-f.write('  <!-- definition of the active area of the module which is a part of the\n')
-f.write('       whole thing. The position is given relative to the lower left edge of\n')
-f.write('       the module (the point with the most negative local coordinates). -->\n')
-f.write('  <Active>\n')
-f.write('    <u unit=\"mm\">' + str(offsetU) + '</u>\n')
-f.write('    <v unit=\"mm\">' + str(offsetV) + '</v>\n')
-f.write('    <w>top</w>\n')
-f.write('    <width unit=\"mm\">' + str(activeW) + '</width>\n')
-f.write('    <length unit=\"mm\">' + str(activeL*4) + '</length>\n')
-f.write('    <height unit=\"mm\">' + str(activeH)+'</height>\n')
-f.write('    <!-- define the number of pixels in rphi direction -->\n')
-f.write('    <pixelsU>' + str(pixelsU) + '</pixelsU>\n')
-f.write('    <pixelsV>' + str(pixelsV*4) + '</pixelsV>\n')
-f.write('     <!--\n')
-f.write('           Maybe all those parameters don\'t make sense for Generic Pixel\n')
-f.write('\n')
-f.write('           Parameters describing the physical attributes of the sensor needed\n')
-f.write('           for digitization. The voltages might be time dependent and than\n')
-f.write('           should be placed somewhere else -->\n')
-f.write('      <BulkDoping unit=\"1/um^3\">' + str(BulkDoping) + '</BulkDoping>\n')
-f.write('      <BackVoltage unit=\"V\">' + str(BackVoltage) + '</BackVoltage>\n')
-f.write('      <TopVoltage unit=\"V\">' + str(TopVoltage) + '</TopVoltage>\n')
-f.write('      <BorderU unit=\"um\">' + str(BorderU) + '</BorderU>\n')
-f.write('      <BorderV unit=\"um\">' + str(BorderV) + '</BorderV>\n')
-f.write('      <ChargeThreshold unit=\"ADU\">' + str(ChargeThreshold) + '</ChargeThreshold>\n')
-f.write('      <NoiseFraction>' + str(NoiseFraction) + '</NoiseFraction>\n')
-f.write('      <!-- Parameters that were in the digitizer -->\n')
-f.write('      <!-- Apply electronic effects? -->\n')
-f.write('      <ApplyElectronicEffects>' + ApplyElectronicEffects + '</ApplyElectronicEffects>\n')
-f.write('      <!-- Noise added by the electronics, set in ENC -->\n')
-f.write('      <ElectronicNoise unit=\"ENC\">' + str(ElectronicNoise) + '</ElectronicNoise>\n')
-f.write('      <!-- Apply binary readout? -->\n')
-f.write('      <ApplyBinaryReadout>' + ApplyBinaryReadout + '</ApplyBinaryReadout>\n')
-f.write('      <!-- Binary hit treshold, set in ENC -->\n')
-f.write('      <BinaryHitThreshold unit=\"ENC\">' + str(BinaryHitThreshold) + '</BinaryHitThreshold>\n')
-f.write('      <!-- ENC equivalent of 1 ADU -->\n')
-f.write('      <ElectronToADU unit=\"ENC\">' + str(ElectronToADU) + '</ElectronToADU>\n')
-f.write('      <!-- Maximum code for analog to digital converter (clamping) -->\n')
-f.write('      <MaxADUCode>' + str(MaxADUCode) + '</MaxADUCode>\n')
-f.write('      <!-- Apply Poisson smearing of electrons collected on pixels -->\n')
-f.write('      <ApplyPoissonSmearing>' + str(ApplyPoissonSmearing) + '</ApplyPoissonSmearing>\n')
-f.write('      <!-- Use integration window? -->\n')
-f.write('      <ApplyIntegrationWindow>' + str(ApplyIntegrationWindow) + '</ApplyIntegrationWindow>\n')
-f.write('      <!-- Maximum segment length (in mm) -->\n')
-f.write('      <SegmentLength unit=\"mm\">' + str(0.005) + '</SegmentLength>\n')
-f.write('      <!-- Split Signalpoints in smaller groups of N electrons (in e) -->\n')
-f.write('      <ElectronGroupSize>' + str(ElectronGroupSize) + '</ElectronGroupSize>\n')
-f.write('      <!-- Time step for tracking electron groups in readout plane (in ns) -->\n')
-f.write('      <ElectronStepTime unit=\"ns\">' + str(ElectronStepTime) + '</ElectronStepTime>\n')
-f.write('      <!-- Maximum number of steps when propagating electrons -->\n')
-f.write('      <ElectronMaxSteps>' + str(ElectronMaxSteps) + '</ElectronMaxSteps>\n')
-f.write('      <!-- Constant time delay between bunch crossing and switching on triggergate (in ns) -->\n')
-f.write('      <HardwareDelay unit=\"ns\">' + str(HardwareDelay) + '</HardwareDelay>\n')
-f.write('      <!-- ADC conversion factor -->\n')
-f.write('      <ADCunit>' + str(ADCunit) + '</ADCunit>\n')
-f.write('      <!-- Diffusion coefficient TODO add unit? is it diffusion coeff or cloud size??-->\n')
-f.write('      <CloudSize>' + str(CloudSize) + '</CloudSize>\n')
-f.write('      <!-- ADC gain factor -->\n')
-f.write('      <Gq>' + str(Gq) + '</Gq>\n')
-f.write('      <!-- Averaged sensors X0 (for perpendicular incidence) -->\n')
-f.write('      <X0average>' + str(X0average) + '</X0average>\n')
-f.write('      <!-- Tangent of Lorentz angle -->\n')
-f.write('      <TanLorentzAngle>' + str(TanLorentzAngle) + '</TanLorentzAngle>\n')
-f.write('      <!-- Spatial resolution coefficient for u axis -->\n')
-f.write('      <ResolutionCoefficientU>' + str(ResolutionCoefficientU) + '</ResolutionCoefficientU>\n')
-f.write('      <!-- Spatial resolution coefficient for v axis -->\n')
-f.write('      <ResolutionCoefficientV>' + str(ResolutionCoefficientV) + '</ResolutionCoefficientV>\n')
-f.write('      <!-- Integration time for Generic Pixel -->\n')
-f.write('      <IntegrationStart unit=\"ns\">' + str(IntegrationStart) + '</IntegrationStart>\n')
-f.write('      <IntegrationEnd   unit=\"ns\">' + str(IntegrationEnd) + '</IntegrationEnd>\n')
-f.write('    </Active>\n')
-f.write('    <!-- Used for thinning in the VXD sensitive area\n')
-f.write('\n')
-f.write('         now we place some components on the sensor by giving the name of the\n')
-f.write('         component defined further down and the positions of all placements on\n')
-f.write('         the sensor in local coordinates, starting at the lower left edge\n')
-f.write('\n')
-f.write('         possible placements for the w-coordinate are:\n')
-f.write('          - below: place below the sensor surface\n')
-f.write('          - bottom: place in the sensor but at the bottom\n')
-f.write('          - center: place in the sensor center\n')
-f.write('          - top: place in the sensor touching the top surface\n')
-f.write('          - above place on top of the sensor surface -->\n')
-f.write('\n')
-f.write('     <!-- Thinning of the sensor down to the sensitive thickness by cutting out\n')
-f.write('         a piece of the silicon -->\n')
-f.write('    <!--Component type=\"ThinningLayer14\">\n')
-f.write('      <u unit=\"mm\">' + str(unitThinU) + '</u><v unit=\"mm\">' + str(unitThinV) + '</v>\n')
-f.write('    </Component-->\n')
-f.write('  </Sensor>\n')
+for i in range(0, 2):
 
-f.write('\n')
-
-f.write('<Sensor type=\"layer13\">\n')
-f.write('  <Material>' + Material + '</Material>\n')
-f.write('  <width unit=\"mm\">' + str(sensorW) + '</width>\n')
-f.write('  <length unit=\"mm\">' + str(sensorL*3) + '</length>\n')
-f.write('  <height unit=\"mm\">' + str(sensorH) + '</height>\n')
-f.write('  <!-- definition of the active area of the module which is a part of the\n')
-f.write('       whole thing. The position is given relative to the lower left edge of\n')
-f.write('       the module (the point with the most negative local coordinates). -->\n')
-f.write('  <Active>\n')
-f.write('    <u unit=\"mm\">' + str(offsetU) + '</u>\n')
-f.write('    <v unit=\"mm\">' + str(offsetV) + '</v>\n')
-f.write('    <w>top</w>\n')
-f.write('    <width unit=\"mm\">' + str(activeW) + '</width>\n')
-f.write('    <length unit=\"mm\">' + str(activeL*3) + '</length>\n')
-f.write('    <height unit=\"mm\">' + str(activeH)+'</height>\n')
-f.write('    <!-- define the number of pixels in rphi direction -->\n')
-f.write('    <pixelsU>' + str(pixelsU) + '</pixelsU>\n')
-f.write('    <pixelsV>' + str(pixelsV*3) + '</pixelsV>\n')
-f.write('     <!--\n')
-f.write('           Maybe all those parameters don\'t make sense for Generic Pixel\n')
-f.write('\n')
-f.write('           Parameters describing the physical attributes of the sensor needed\n')
-f.write('           for digitization. The voltages might be time dependent and than\n')
-f.write('           should be placed somewhere else -->\n')
-f.write('      <BulkDoping unit=\"1/um^3\">' + str(BulkDoping) + '</BulkDoping>\n')
-f.write('      <BackVoltage unit=\"V\">' + str(BackVoltage) + '</BackVoltage>\n')
-f.write('      <TopVoltage unit=\"V\">' + str(TopVoltage) + '</TopVoltage>\n')
-f.write('      <BorderU unit=\"um\">' + str(BorderU) + '</BorderU>\n')
-f.write('      <BorderV unit=\"um\">' + str(BorderV) + '</BorderV>\n')
-f.write('      <ChargeThreshold unit=\"ADU\">' + str(ChargeThreshold) + '</ChargeThreshold>\n')
-f.write('      <NoiseFraction>' + str(NoiseFraction) + '</NoiseFraction>\n')
-f.write('      <!-- Parameters that were in the digitizer -->\n')
-f.write('      <!-- Apply electronic effects? -->\n')
-f.write('      <ApplyElectronicEffects>' + ApplyElectronicEffects + '</ApplyElectronicEffects>\n')
-f.write('      <!-- Noise added by the electronics, set in ENC -->\n')
-f.write('      <ElectronicNoise unit=\"ENC\">' + str(ElectronicNoise) + '</ElectronicNoise>\n')
-f.write('      <!-- Apply binary readout? -->\n')
-f.write('      <ApplyBinaryReadout>' + ApplyBinaryReadout + '</ApplyBinaryReadout>\n')
-f.write('      <!-- Binary hit treshold, set in ENC -->\n')
-f.write('      <BinaryHitThreshold unit=\"ENC\">' + str(BinaryHitThreshold) + '</BinaryHitThreshold>\n')
-f.write('      <!-- ENC equivalent of 1 ADU -->\n')
-f.write('      <ElectronToADU unit=\"ENC\">' + str(ElectronToADU) + '</ElectronToADU>\n')
-f.write('      <!-- Maximum code for analog to digital converter (clamping) -->\n')
-f.write('      <MaxADUCode>' + str(MaxADUCode) + '</MaxADUCode>\n')
-f.write('      <!-- Apply Poisson smearing of electrons collected on pixels -->\n')
-f.write('      <ApplyPoissonSmearing>' + str(ApplyPoissonSmearing) + '</ApplyPoissonSmearing>\n')
-f.write('      <!-- Use integration window? -->\n')
-f.write('      <ApplyIntegrationWindow>' + str(ApplyIntegrationWindow) + '</ApplyIntegrationWindow>\n')
-f.write('      <!-- Maximum segment length (in mm) -->\n')
-f.write('      <SegmentLength unit=\"mm\">' + str(0.005) + '</SegmentLength>\n')
-f.write('      <!-- Split Signalpoints in smaller groups of N electrons (in e) -->\n')
-f.write('      <ElectronGroupSize>' + str(ElectronGroupSize) + '</ElectronGroupSize>\n')
-f.write('      <!-- Time step for tracking electron groups in readout plane (in ns) -->\n')
-f.write('      <ElectronStepTime unit=\"ns\">' + str(ElectronStepTime) + '</ElectronStepTime>\n')
-f.write('      <!-- Maximum number of steps when propagating electrons -->\n')
-f.write('      <ElectronMaxSteps>' + str(ElectronMaxSteps) + '</ElectronMaxSteps>\n')
-f.write('      <!-- Constant time delay between bunch crossing and switching on triggergate (in ns) -->\n')
-f.write('      <HardwareDelay unit=\"ns\">' + str(HardwareDelay) + '</HardwareDelay>\n')
-f.write('      <!-- ADC conversion factor -->\n')
-f.write('      <ADCunit>' + str(ADCunit) + '</ADCunit>\n')
-f.write('      <!-- Diffusion coefficient TODO add unit? is it diffusion coeff or cloud size??-->\n')
-f.write('      <CloudSize>' + str(CloudSize) + '</CloudSize>\n')
-f.write('      <!-- ADC gain factor -->\n')
-f.write('      <Gq>' + str(Gq) + '</Gq>\n')
-f.write('      <!-- Averaged sensors X0 (for perpendicular incidence) -->\n')
-f.write('      <X0average>' + str(X0average) + '</X0average>\n')
-f.write('      <!-- Tangent of Lorentz angle -->\n')
-f.write('      <TanLorentzAngle>' + str(TanLorentzAngle) + '</TanLorentzAngle>\n')
-f.write('      <!-- Spatial resolution coefficient for u axis -->\n')
-f.write('      <ResolutionCoefficientU>' + str(ResolutionCoefficientU) + '</ResolutionCoefficientU>\n')
-f.write('      <!-- Spatial resolution coefficient for v axis -->\n')
-f.write('      <ResolutionCoefficientV>' + str(ResolutionCoefficientV) + '</ResolutionCoefficientV>\n')
-f.write('      <!-- Integration time for Generic Pixel -->\n')
-f.write('      <IntegrationStart unit=\"ns\">' + str(IntegrationStart) + '</IntegrationStart>\n')
-f.write('      <IntegrationEnd   unit=\"ns\">' + str(IntegrationEnd) + '</IntegrationEnd>\n')
-f.write('    </Active>\n')
-f.write('    <!-- Used for thinning in the VXD sensitive area\n')
-f.write('\n')
-f.write('         now we place some components on the sensor by giving the name of the\n')
-f.write('         component defined further down and the positions of all placements on\n')
-f.write('         the sensor in local coordinates, starting at the lower left edge\n')
-f.write('\n')
-f.write('         possible placements for the w-coordinate are:\n')
-f.write('          - below: place below the sensor surface\n')
-f.write('          - bottom: place in the sensor but at the bottom\n')
-f.write('          - center: place in the sensor center\n')
-f.write('          - top: place in the sensor touching the top surface\n')
-f.write('          - above place on top of the sensor surface -->\n')
-f.write('\n')
-f.write('     <!-- Thinning of the sensor down to the sensitive thickness by cutting out\n')
-f.write('         a piece of the silicon -->\n')
-f.write('    <!--Component type=\"ThinningLayer_iVTX_A\">\n')
-f.write('      <u unit=\"mm\">' + str(unitThinU) + '</u><v unit=\"mm\">' + str(unitThinV) + '</v>\n')
-f.write('    </Component-->\n')
-f.write('  </Sensor>\n')
-
-f.write('\n')
+    f.write('<Sensor type=\"' + type[i] + '\">\n')
+    f.write('  <Material>' + Material + '</Material>\n')
+    f.write('  <width unit=\"mm\">' + str(sensorW) + '</width>\n')
+    f.write('  <length unit=\"mm\">' + str(length[i]) + '</length>\n')
+    f.write('  <height unit=\"mm\">' + str(height[i]) + '</height>\n')
+    f.write('  <!-- definition of the active area of the module which is a part of the\n')
+    f.write('       whole thing. The position is given relative to the lower left edge of\n')
+    f.write('       the module (the point with the most negative local coordinates). -->\n')
+    f.write('  <Active>\n')
+    f.write('    <u unit=\"mm\">' + str(offsetU) + '</u>\n')
+    f.write('    <v unit=\"mm\">' + str(offsetV) + '</v>\n')
+    f.write('    <w>top</w>\n')
+    f.write('    <width unit=\"mm\">' + str(activeW) + '</width>\n')
+    f.write('    <length unit=\"mm\">' + str(lengthA[i]) + '</length>\n')
+    f.write('    <height unit=\"mm\">' + str(activeH)+'</height>\n')
+    f.write('    <!-- define the number of pixels in rphi direction -->\n')
+    f.write('    <pixelsU>' + str(pixelsU) + '</pixelsU>\n')
+    f.write('    <pixelsV>' + str(pixels[i]) + '</pixelsV>\n')
+    f.write('     <!--\n')
+    f.write('           Maybe all those parameters don\'t make sense for Generic Pixel\n')
+    f.write('\n')
+    f.write('           Parameters describing the physical attributes of the sensor needed\n')
+    f.write('           for digitization. The voltages might be time dependent and than\n')
+    f.write('           should be placed somewhere else -->\n')
+    f.write('      <BulkDoping unit=\"1/um^3\">' + str(BulkDoping) + '</BulkDoping>\n')
+    f.write('      <BackVoltage unit=\"V\">' + str(BackVoltage) + '</BackVoltage>\n')
+    f.write('      <TopVoltage unit=\"V\">' + str(TopVoltage) + '</TopVoltage>\n')
+    f.write('      <BorderU unit=\"um\">' + str(BorderU) + '</BorderU>\n')
+    f.write('      <BorderV unit=\"um\">' + str(BorderV) + '</BorderV>\n')
+    f.write('      <ChargeThreshold unit=\"ADU\">' + str(ChargeThreshold) + '</ChargeThreshold>\n')
+    f.write('      <NoiseFraction>' + str(NoiseFraction) + '</NoiseFraction>\n')
+    f.write('      <!-- Parameters that were in the digitizer -->\n')
+    f.write('      <!-- Apply electronic effects? -->\n')
+    f.write('      <ApplyElectronicEffects>' + ApplyElectronicEffects + '</ApplyElectronicEffects>\n')
+    f.write('      <!-- Noise added by the electronics, set in ENC -->\n')
+    f.write('      <ElectronicNoise unit=\"ENC\">' + str(ElectronicNoise) + '</ElectronicNoise>\n')
+    f.write('      <!-- Apply binary readout? -->\n')
+    f.write('      <ApplyBinaryReadout>' + ApplyBinaryReadout + '</ApplyBinaryReadout>\n')
+    f.write('      <!-- Binary hit treshold, set in ENC -->\n')
+    f.write('      <BinaryHitThreshold unit=\"ENC\">' + str(BinaryHitThreshold) + '</BinaryHitThreshold>\n')
+    f.write('      <!-- ENC equivalent of 1 ADU -->\n')
+    f.write('      <ElectronToADU unit=\"ENC\">' + str(ElectronToADU) + '</ElectronToADU>\n')
+    f.write('      <!-- Maximum code for analog to digital converter (clamping) -->\n')
+    f.write('      <MaxADUCode>' + str(MaxADUCode) + '</MaxADUCode>\n')
+    f.write('      <!-- Apply Poisson smearing of electrons collected on pixels -->\n')
+    f.write('      <ApplyPoissonSmearing>' + str(ApplyPoissonSmearing) + '</ApplyPoissonSmearing>\n')
+    f.write('      <!-- Use integration window? -->\n')
+    f.write('      <ApplyIntegrationWindow>' + str(ApplyIntegrationWindow) + '</ApplyIntegrationWindow>\n')
+    f.write('      <!-- Maximum segment length (in mm) -->\n')
+    f.write('      <SegmentLength unit=\"mm\">' + str(0.005) + '</SegmentLength>\n')
+    f.write('      <!-- Split Signalpoints in smaller groups of N electrons (in e) -->\n')
+    f.write('      <ElectronGroupSize>' + str(ElectronGroupSize) + '</ElectronGroupSize>\n')
+    f.write('      <!-- Time step for tracking electron groups in readout plane (in ns) -->\n')
+    f.write('      <ElectronStepTime unit=\"ns\">' + str(ElectronStepTime) + '</ElectronStepTime>\n')
+    f.write('      <!-- Maximum number of steps when propagating electrons -->\n')
+    f.write('      <ElectronMaxSteps>' + str(ElectronMaxSteps) + '</ElectronMaxSteps>\n')
+    f.write('      <!-- Constant time delay between bunch crossing and switching on triggergate (in ns) -->\n')
+    f.write('      <HardwareDelay unit=\"ns\">' + str(HardwareDelay) + '</HardwareDelay>\n')
+    f.write('      <!-- ADC conversion factor -->\n')
+    f.write('      <ADCunit>' + str(ADCunit) + '</ADCunit>\n')
+    f.write('      <!-- Diffusion coefficient TODO add unit? is it diffusion coeff or cloud size??-->\n')
+    f.write('      <CloudSize>' + str(CloudSize) + '</CloudSize>\n')
+    f.write('      <!-- ADC gain factor -->\n')
+    f.write('      <Gq>' + str(Gq) + '</Gq>\n')
+    f.write('      <!-- Averaged sensors X0 (for perpendicular incidence) -->\n')
+    f.write('      <X0average>' + str(X0average) + '</X0average>\n')
+    f.write('      <!-- Tangent of Lorentz angle -->\n')
+    f.write('      <TanLorentzAngle>' + str(TanLorentzAngle) + '</TanLorentzAngle>\n')
+    f.write('      <!-- Spatial resolution coefficient for u axis -->\n')
+    f.write('      <ResolutionCoefficientU>' + str(ResolutionCoefficientU) + '</ResolutionCoefficientU>\n')
+    f.write('      <!-- Spatial resolution coefficient for v axis -->\n')
+    f.write('      <ResolutionCoefficientV>' + str(ResolutionCoefficientV) + '</ResolutionCoefficientV>\n')
+    f.write('      <!-- Integration time for Generic Pixel -->\n')
+    f.write('      <IntegrationStart unit=\"ns\">' + str(IntegrationStart) + '</IntegrationStart>\n')
+    f.write('      <IntegrationEnd   unit=\"ns\">' + str(IntegrationEnd) + '</IntegrationEnd>\n')
+    f.write('    </Active>\n')
+    f.write('    <!-- Used for thinning in the VXD sensitive area\n')
+    f.write('\n')
+    f.write('         now we place some components on the sensor by giving the name of the\n')
+    f.write('         component defined further down and the positions of all placements on\n')
+    f.write('         the sensor in local coordinates, starting at the lower left edge\n')
+    f.write('\n')
+    f.write('         possible placements for the w-coordinate are:\n')
+    f.write('          - below: place below the sensor surface\n')
+    f.write('          - bottom: place in the sensor but at the bottom\n')
+    f.write('          - center: place in the sensor center\n')
+    f.write('          - top: place in the sensor touching the top surface\n')
+    f.write('          - above place on top of the sensor surface -->\n')
+    f.write('\n')
+    f.write('     <!-- Thinning of the sensor down to the sensitive thickness by cutting out\n')
+    f.write('         a piece of the silicon -->\n')
+    f.write('    <!--Component type=\"ThinningLayer14\">\n')
+    f.write('      <u unit=\"mm\">' + str(unitThinU) + '</u><v unit=\"mm\">' + str(unitThinV) + '</v>\n')
+    f.write('    </Component-->\n')
+    f.write('  </Sensor>\n')
+    f.write('\n')
 
 Material = 'ColdAir'
 thinW = activeW
@@ -513,9 +298,21 @@ f.write('  </Component>\n')
 
 f.write('\n')
 
-thinL = activeL*3
+f.write('  <Component name=\"ThinningLayer14i'+'\">\n')
+f.write('    <Material>' + Material + '</Material>\n')
+f.write('    <Color>#5599BB</Color>\n')
+f.write('    <width  unit=\"mm\">'+str(thinW)+'</width>\n')
+f.write('    <length unit=\"mm\">'+str(thinL)+'</length>\n')
+f.write('    <height unit=\"mm\">'+str(thinH)+'</height>\n')
+f.write('    <angle  unit=\"deg\">'+str(thinAngle)+'</angle>\n')
+f.write('  </Component>\n')
 
-f.write('  <Component name=\"ThinningLayer13'+'\">\n')
+f.write('\n')
+
+thinH = 0.360
+thinL = activeL*2
+
+f.write('  <Component name=\"ThinningLayer12'+'\">\n')
 f.write('    <Material>' + Material + '</Material>\n')
 f.write('    <Color>#5599BB</Color>\n')
 f.write('    <width  unit=\"mm\">'+str(thinW)+'</width>\n')
@@ -590,6 +387,8 @@ nlayers = 5
 nLaddersYing = 0
 nLaddersYang = 0
 nLadders = 0
+shiftPhi1 = 0
+shiftPhi2 = 0
 
 # Ying
 for layer in range(1, nlayers+1):
@@ -597,33 +396,54 @@ for layer in range(1, nlayers+1):
     if layer == 1:
         nLaddersYing = 3
         nLadders = 6
+        shiftPhi = 0
 
     if layer == 2:
         nLaddersYing = 5
         nLadders = 10
+        shiftPhi = 0
 
     if layer == 3:
-        nLaddersYing = 7
-        nLadders = 15
+        nLaddersYing = 13
+        nLadders = 25
+        shiftPhi = 11
 
     if layer == 4:
         nLaddersYing = 17
         nLadders = 33
+        shiftPhi = 10
 
     if layer == 5:
-        nLaddersYing = 13
-        nLadders = 26
+        nLaddersYing = 26
+        nLadders = 52
+        shiftPhi = 7.5
 
     f.write('      <Layer id=\"' + str(layer) + '\">\n')
     dPhi = 360/nLadders
 
     for id in range(1, nLaddersYing+1):
 
-        ang = str(dPhi*(id-1))
+        ang = str(dPhi*(id-1) + shiftPhi)
 
         angt = ang[0:6]
 
-        cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + '</phi></Ladder>\n'
+        if layer <= 4:
+            cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + '</phi></Ladder>\n'
+
+        if layer == 5:
+            shiftRa = shiftR0
+            shiftRb = shiftR1
+            shiftZa = shiftZ0
+            shiftZb = shiftZ0
+
+            if id % 2 == 0:
+                cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + \
+                                                    '</phi><shiftR unit=\"mm\">' + str(shiftRa) + '</shiftR>'
+                cmd += '<shiftZ unit=\"mm\">' + str(shiftZa) + '</shiftZ></Ladder>\n'
+            else:
+                cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + \
+                                                    '</phi><shiftR unit=\"mm\">' + str(shiftRb) + '</shiftR>'
+                cmd += '<shiftZ unit=\"mm\">' + str(shiftZb) + '</shiftZ></Ladder>\n'
 
         f.write(cmd)
 
@@ -639,44 +459,65 @@ f.write('      <!-- Define the ladders in each layer with increasing phi angle. 
 f.write('           ladder ids are unique per layer and thus are continued from the\n')
 f.write('           first half shell -->\n')
 
+
 for layer in range(1, nlayers+1):
 
     if layer == 1:
         nLaddersYing = 3
         nLaddersYang = 6
         nLadders = 6
+        shiftPhi = 0
 
     if layer == 2:
         nLaddersYing = 5
         nLaddersYang = 10
         nLadders = 10
+        shiftPhi = 0
 
     if layer == 3:
-        nLaddersYing = 7
-        nLaddersYang = 15
-        nLadders = 15
+        nLaddersYing = 13
+        nLaddersYang = 25
+        nLadders = 25
+        shiftPhi = 11
 
     if layer == 4:
         nLaddersYing = 17
         nLaddersYang = 33
         nLadders = 33
+        shiftPhi = 10
 
     if layer == 5:
-        nLaddersYing = 13
-        nLaddersYang = 26
-        nLadders = 26
+        nLaddersYing = 26
+        nLaddersYang = 52
+        nLadders = 52
+        shiftPhi = 7.5
 
     f.write('      <Layer id=\"' + str(layer) + '\">\n')
     dPhi = 360/nLadders
 
     for id in range(nLaddersYing+1, nLaddersYang+1):
 
-        ang = str(dPhi*(id-1))
+        ang = str(dPhi*(id-1) + shiftPhi)
 
         angt = ang[0:6]
 
-        cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + '</phi></Ladder>\n'
+        if layer <= 4:
+            cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + '</phi></Ladder>\n'
 
+        if layer == 5:
+            shiftRa = shiftR0
+            shiftRb = shiftR1
+            shiftZa = shiftZ0
+            shiftZb = shiftZ0
+
+            if id % 2 == 0:
+                cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + \
+                                                    '</phi><shiftR unit=\"mm\">' + str(shiftRa) + '</shiftR>'
+                cmd += '<shiftZ unit=\"mm\">' + str(shiftZa) + '</shiftZ></Ladder>\n'
+            else:
+                cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + \
+                                                    '</phi><shiftR unit=\"mm\">' + str(shiftRb) + '</shiftR>'
+                cmd += '<shiftZ unit=\"mm\">' + str(shiftZb) + '</shiftZ></Ladder>\n'
         f.write(cmd)
     f.write('      </Layer>\n')
 

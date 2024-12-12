@@ -28,8 +28,9 @@ namespace Belle2 {
      * FIXME (Oct 12,2017: This test fails on buildbot, but ran successfully
      * on all machines I tried.
      */
-    TEST(NNTimeFitter, DISABLED_CompareNetworkCoefficient)
+    TEST(NNTimeFitter, CompareNetworkCoefficient)
     {
+      GTEST_SKIP();
       // Create an instance of the NN fitter
       NNWaveFitter fitter("svd/data/SVDTimeNet.xml");
       EXPECT_TRUE(fitter.checkCoefficients("svd/data/classifier.txt", 1.0e-6));
@@ -46,8 +47,9 @@ namespace Belle2 {
      * dtype='object')
      * Columns labeled by numerals contain probabilities.
      */
-    TEST(NNTimeFitter, DISABLED_CompareFits)
+    TEST(NNTimeFitter, CompareFits)
     {
+      GTEST_SKIP();
       const size_t max_lines = 100; // maximum number of lines to be read
 
       // Create an instance of the NN fitter and the fitter tool.

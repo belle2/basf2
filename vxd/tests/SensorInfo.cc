@@ -136,8 +136,9 @@ namespace Belle2 {
      * with the plane
      * Disabled temporarily, 23/08/2016, P. Kvasnicka
      */
-    TEST(SensorPlane, DISABLED_NotFound)
+    TEST(SensorPlane, NotFound)
     {
+      GTEST_SKIP();
       SensorPlane plane(VxdID(1, 1, 1));
       EXPECT_B2FATAL(plane.isInActive(0, 0));
     }

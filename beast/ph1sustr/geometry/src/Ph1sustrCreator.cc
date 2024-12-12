@@ -15,8 +15,6 @@
 #include <framework/logging/Logger.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -31,7 +29,6 @@
 #include <G4VisAttributes.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 

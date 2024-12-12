@@ -16,8 +16,6 @@
 #include <simulation/background/BkgSensitiveDetector.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -33,7 +31,6 @@
 #include <G4UserLimits.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -121,7 +118,7 @@ namespace Belle2 {
       double Lv1SUS_Z[Lv1SUS_num];
       Lv1SUS_Z[0] = 0.0;
       for (int tmpn = 0; tmpn < 8; tmpn++) {
-        Lv1SUS_Z[0] -= m_config.getParameter(prep + (format("L%1%") % (tmpn + 1)).str().c_str()) * Unit::cm / Unit::mm;
+        Lv1SUS_Z[0] -= m_config.getParameter(prep + (boost::format("L%1%") % (tmpn + 1)).str().c_str()) * Unit::cm / Unit::mm;
       }
       Lv1SUS_Z[1] = Lv1SUS_Z[0] + m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
       Lv1SUS_Z[2] = Lv1SUS_Z[1];
@@ -389,7 +386,7 @@ namespace Belle2 {
       double Lv2Paraf1_Z[Lv2Paraf1_num];
       Lv2Paraf1_Z[0] = 0.0;
       for (int tmpn = 0; tmpn < 9; tmpn++) {
-        Lv2Paraf1_Z[0] -= m_config.getParameter(prep + (format("L%1%") % (tmpn + 1)).str().c_str()) * Unit::cm / Unit::mm;
+        Lv2Paraf1_Z[0] -= m_config.getParameter(prep + (boost::format("L%1%") % (tmpn + 1)).str().c_str()) * Unit::cm / Unit::mm;
       }
       Lv2Paraf1_Z[1] = Lv2Paraf1_Z[0] + m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
       Lv2Paraf1_Z[2] = Lv2Paraf1_Z[1];
@@ -462,7 +459,7 @@ namespace Belle2 {
       double Lv2Paraf2_Z[Lv2Paraf2_num];
       Lv2Paraf2_Z[0] = 0.0;
       for (int tmpn = 10; tmpn <= 15; tmpn++) {
-        Lv2Paraf2_Z[0] += m_config.getParameter(prep + (format("L%1%") % tmpn).str().c_str()) * Unit::cm / Unit::mm;
+        Lv2Paraf2_Z[0] += m_config.getParameter(prep + (boost::format("L%1%") % tmpn).str().c_str()) * Unit::cm / Unit::mm;
       }
       Lv2Paraf2_Z[1] = Lv2Paraf2_Z[0] + m_config.getParameter(prep + "L16") * Unit::cm / Unit::mm + m_config.getParameter(
                          prep + "L17") * Unit::cm / Unit::mm;

@@ -114,7 +114,8 @@ const TrackFitResult* Track::getTrackFitResultWithBestPValueByName(const std::st
 
   // sort TrackFitResults by p value
   auto allFitResults = getTrackFitResultsByName(trackFitResultsName);
-  auto bestPValueFit = std::max_element(allFitResults.begin(), allFitResults.end(), [](auto & a, auto & b) {
+  auto bestPValueFit = std::max_element(allFitResults.begin(), allFitResults.end(), [](const auto & a, const auto & b) {
+    if (std::isnan(a.second->getPValue())) return true;
     return a.second->getPValue() < b.second->getPValue();
   });
   return bestPValueFit->second;

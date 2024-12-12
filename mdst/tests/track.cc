@@ -161,15 +161,17 @@ namespace Belle2 {
     StoreArray<TrackFitResult> myResults;
     myResults.registerInDataStore();
 
-    // add three fit results with different p values
-    const auto myMuon = addDummyTrack(myResults, Const::muon, 0.5);
+    // add four fit results with different p values
+    const auto myMuon = addDummyTrack(myResults, Const::muon, Const::floatNaN);
     const auto myPion = addDummyTrack(myResults, Const::pion, 0.75);
     const auto myKaon = addDummyTrack(myResults, Const::kaon, 0.4);
+    const auto myProton = addDummyTrack(myResults, Const::proton, Const::floatNaN);
 
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::muon, myMuon->getArrayIndex());
     mytrack.setTrackFitResultIndex(Const::pion, myPion->getArrayIndex());
     mytrack.setTrackFitResultIndex(Const::kaon, myKaon->getArrayIndex());
+    mytrack.setTrackFitResultIndex(Const::proton, myProton->getArrayIndex());
 
     // check that fit hypothesis with best p value (here pion) is returned
     const auto bestFit = mytrack.getTrackFitResultWithBestPValue();

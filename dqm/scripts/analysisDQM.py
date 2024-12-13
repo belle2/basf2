@@ -206,61 +206,61 @@ def get_hadB_path(path):
     DcutLoose = '1.7 < M < 2.1'
     Dcut = '1.830 < M < 1.894'
     # Reconstructs D0s and sets decay mode identifiers
-    ma.reconstructDecay(decayString='D0:Kpi -> K-:hadB pi+:hadB', cut=DcutLoose, dmID=1, path=path_hadB)
-    ma.reconstructDecay(decayString='D0:Kpipi0 -> K-:hadB pi+:hadB pi0:hadB',
+    ma.reconstructDecay(decayString='D0:hadB_Kpi -> K-:hadB pi+:hadB', cut=DcutLoose, dmID=1, path=path_hadB)
+    ma.reconstructDecay(decayString='D0:hadB_Kpipi0 -> K-:hadB pi+:hadB pi0:hadB',
                         cut=DcutLoose, dmID=2, path=path_hadB)
-    ma.reconstructDecay(decayString='D0:Kpipipi -> K-:hadB pi+:hadB pi-:hadB pi+:hadB',
+    ma.reconstructDecay(decayString='D0:hadB_Kpipipi -> K-:hadB pi+:hadB pi-:hadB pi+:hadB',
                         cut=DcutLoose, dmID=3, path=path_hadB)
 
     # Performs mass constrained fit for all D0 candidates
-    vertex.kFit(list_name='D0:Kpi', conf_level=0.0, fit_type='mass', path=path_hadB)
-    # vertex.kFit(list_name='D0:Kpipi0',  conf_level=0.0, fit_type='mass', path=path_hadB)
-    vertex.kFit(list_name='D0:Kpipipi', conf_level=0.0, fit_type='mass', path=path_hadB)
+    vertex.kFit(list_name='D0:hadB_Kpi', conf_level=0.0, fit_type='mass', path=path_hadB)
+    # vertex.kFit(list_name='D0:hadB_Kpipi0',  conf_level=0.0, fit_type='mass', path=path_hadB)
+    vertex.kFit(list_name='D0:hadB_Kpipipi', conf_level=0.0, fit_type='mass', path=path_hadB)
 
-    ma.applyCuts("D0:Kpi",     Dcut, path=path_hadB)
-    ma.applyCuts("D0:Kpipi0",  Dcut, path=path_hadB)
-    ma.applyCuts("D0:Kpipipi", Dcut, path=path_hadB)
+    ma.applyCuts("D0:hadB_Kpi",     Dcut, path=path_hadB)
+    ma.applyCuts("D0:hadB_Kpipi0",  Dcut, path=path_hadB)
+    ma.applyCuts("D0:hadB_Kpipipi", Dcut, path=path_hadB)
 
     DStarcutLoose = 'massDifference(0) < 0.16'
 
     # Reconstructs D*-s and sets decay mode identifiers
-    ma.reconstructDecay(decayString='D*+:D0pi_Kpi -> D0:Kpi pi+:hadB', cut=DStarcutLoose, dmID=1, path=path_hadB)
-    ma.reconstructDecay(decayString='D*+:D0pi_Kpipi0 -> D0:Kpipi0 pi+:hadB',
+    ma.reconstructDecay(decayString='D*+:hadB_D0pi_Kpi -> D0:hadB_Kpi pi+:hadB', cut=DStarcutLoose, dmID=1, path=path_hadB)
+    ma.reconstructDecay(decayString='D*+:hadB_D0pi_Kpipi0 -> D0:hadB_Kpipi0 pi+:hadB',
                         cut=DStarcutLoose, dmID=2, path=path_hadB)
-    ma.reconstructDecay(decayString='D*+:D0pi_Kpipipi -> D0:Kpipipi pi+:hadB',
+    ma.reconstructDecay(decayString='D*+:hadB_D0pi_Kpipipi -> D0:hadB_Kpipipi pi+:hadB',
                         cut=DStarcutLoose, dmID=3, path=path_hadB)
 
     BcutLoose = '[ useCMSFrame(p) < 1.6 ] and [abs(dM) < 0.25]'
     Bcut = '[ useCMSFrame(p) < 1.2 ] and [abs(dM) < 0.05]'
 
     # Reconstructs the signal B0 candidates from Dstar
-    ma.reconstructDecay(decayString='B0:Dstpi_D0pi_Kpi -> D*-:D0pi_Kpi pi+:hadB',
+    ma.reconstructDecay(decayString='B0:hadB_Dstpi_D0pi_Kpi -> D*-:hadB_D0pi_Kpi pi+:hadB',
                         cut=BcutLoose,
                         dmID=1, path=path_hadB)
-    ma.reconstructDecay(decayString='B0:Dstpi_D0pi_Kpipi0 -> D*-:D0pi_Kpipi0 pi+:hadB',
+    ma.reconstructDecay(decayString='B0:hadB_Dstpi_D0pi_Kpipi0 -> D*-:hadB_D0pi_Kpipi0 pi+:hadB',
                         cut=BcutLoose,
                         dmID=2, path=path_hadB)
-    ma.reconstructDecay(decayString='B0:Dstpi_D0pi_Kpipipi -> D*-:D0pi_Kpipipi pi+:hadB',
+    ma.reconstructDecay(decayString='B0:hadB_Dstpi_D0pi_Kpipipi -> D*-:hadB_D0pi_Kpipipi pi+:hadB',
                         cut=BcutLoose,
                         dmID=3, path=path_hadB)
 
-    vertex.treeFit('B0:Dstpi_D0pi_Kpi', updateAllDaughters=True, ipConstraint=True, path=path_hadB)
-    vertex.treeFit('B0:Dstpi_D0pi_Kpipi0', updateAllDaughters=True, ipConstraint=True, path=path_hadB)
-    vertex.treeFit('B0:Dstpi_D0pi_Kpipipi', updateAllDaughters=True, ipConstraint=True, path=path_hadB)
+    vertex.treeFit('B0:hadB_Dstpi_D0pi_Kpi', updateAllDaughters=True, ipConstraint=True, path=path_hadB)
+    vertex.treeFit('B0:hadB_Dstpi_D0pi_Kpipi0', updateAllDaughters=True, ipConstraint=True, path=path_hadB)
+    vertex.treeFit('B0:hadB_Dstpi_D0pi_Kpipipi', updateAllDaughters=True, ipConstraint=True, path=path_hadB)
 
     #####################################################
     # Reconstructs the signal B0 candidates from D-
     #####################################################
 
     # Reconstructs charged D mesons and sets decay mode identifiers
-    ma.reconstructDecay(decayString='D-:Kpipi -> K+:hadB pi-:hadB pi-:hadB',
+    ma.reconstructDecay(decayString='D-:hadB_Kpipi -> K+:hadB pi-:hadB pi-:hadB',
                         cut=DcutLoose, dmID=4, path=path_hadB)
 
-    vertex.kFit(list_name='D-:Kpipi', conf_level=0.0, fit_type='mass', path=path_hadB)
-    ma.applyCuts("D-:Kpipi",  '1.844 < M < 1.894', path=path_hadB)
+    vertex.kFit(list_name='D-:hadB_Kpipi', conf_level=0.0, fit_type='mass', path=path_hadB)
+    ma.applyCuts("D-:hadB_Kpipi",  '1.844 < M < 1.894', path=path_hadB)
 
     # Reconstructs the signal B candidates
-    ma.reconstructDecay(decayString='B0:Dpi_Kpipi -> D-:Kpipi pi+:hadB',
+    ma.reconstructDecay(decayString='B0:hadB_Dpi_Kpipi -> D-:hadB_Kpipi pi+:hadB',
                         cut=BcutLoose, dmID=4, path=path_hadB)
 
     #####################################################
@@ -268,62 +268,62 @@ def get_hadB_path(path):
     #####################################################
 
     # Reconstructs the signal B- candidates
-    ma.reconstructDecay(decayString='B-:D0pi_Kpi -> D0:Kpi pi-:hadB',
+    ma.reconstructDecay(decayString='B-:hadB_D0pi_Kpi -> D0:hadB_Kpi pi-:hadB',
                         cut=BcutLoose,
                         dmID=5, path=path_hadB)
-    ma.reconstructDecay(decayString='B-:D0pi_Kpipi0 -> D0:Kpipi0 pi-:hadB',
+    ma.reconstructDecay(decayString='B-:hadB_D0pi_Kpipi0 -> D0:hadB_Kpipi0 pi-:hadB',
                         cut=BcutLoose,
                         dmID=6, path=path_hadB)
-    ma.reconstructDecay(decayString='B-:D0pi_Kpipipi -> D0:Kpipipi pi-:hadB',
+    ma.reconstructDecay(decayString='B-:hadB_D0pi_Kpipipi -> D0:hadB_Kpipipi pi-:hadB',
                         cut=BcutLoose,
                         dmID=7, path=path_hadB)
 
-    vertex.treeFit('B-:D0pi_Kpi', updateAllDaughters=True, ipConstraint=True, path=path_hadB)
-    vertex.treeFit('B-:D0pi_Kpipi0', updateAllDaughters=True, ipConstraint=True, path=path_hadB)
-    vertex.treeFit('B-:D0pi_Kpipipi', updateAllDaughters=True, ipConstraint=True, path=path_hadB)
+    vertex.treeFit('B-:hadB_D0pi_Kpi', updateAllDaughters=True, ipConstraint=True, path=path_hadB)
+    vertex.treeFit('B-:hadB_D0pi_Kpipi0', updateAllDaughters=True, ipConstraint=True, path=path_hadB)
+    vertex.treeFit('B-:hadB_D0pi_Kpipipi', updateAllDaughters=True, ipConstraint=True, path=path_hadB)
 
     ma.copyLists(
-        outputListName='B0:combined',
+        outputListName='B0:hadB_combined',
         inputListNames=[
-            'B0:Dstpi_D0pi_Kpi',
-            'B0:Dstpi_D0pi_Kpipi0',
-            'B0:Dstpi_D0pi_Kpipipi',
-            'B0:Dpi_Kpipi'
+            'B0:hadB_Dstpi_D0pi_Kpi',
+            'B0:hadB_Dstpi_D0pi_Kpipi0',
+            'B0:hadB_Dstpi_D0pi_Kpipipi',
+            'B0:hadB_Dpi_Kpipi'
         ],
         path=path_hadB)
 
     ma.copyLists(
-        outputListName='B-:combined',
+        outputListName='B-:hadB_combined',
         inputListNames=[
-            'B-:D0pi_Kpi',
-            'B-:D0pi_Kpipi0',
-            'B-:D0pi_Kpipipi',
+            'B-:hadB_D0pi_Kpi',
+            'B-:hadB_D0pi_Kpipi0',
+            'B-:hadB_D0pi_Kpipipi',
         ],
         path=path_hadB)
 
     # Builds the rest of event object, which contains all particles not used in the reconstruction of B0 candidates.
-    ma.buildRestOfEvent(target_list_name='B0:combined', path=path_hadB)
+    ma.buildRestOfEvent(target_list_name='B0:hadB_combined', path=path_hadB)
 
     # CleanMask is identical for B0 and B+
     cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
 
     # Calculates the continuum suppression variables
-    ma.appendROEMasks(list_name='B0:combined', mask_tuples=[cleanMask], path=path_hadB)
-    ma.buildContinuumSuppression(list_name='B0:combined', roe_mask='cleanMask', path=path_hadB)
+    ma.appendROEMasks(list_name='B0:hadB_combined', mask_tuples=[cleanMask], path=path_hadB)
+    ma.buildContinuumSuppression(list_name='B0:hadB_combined', roe_mask='cleanMask', path=path_hadB)
 
     # Builds the rest of event object, which contains all particles not used in the reconstruction of B- candidates.
-    ma.buildRestOfEvent(target_list_name='B-:combined', path=path_hadB)
+    ma.buildRestOfEvent(target_list_name='B-:hadB_combined', path=path_hadB)
 
     # Calculates the continuum suppression variables
-    ma.appendROEMasks(list_name='B-:combined', mask_tuples=[cleanMask], path=path_hadB)
-    ma.buildContinuumSuppression(list_name='B-:combined', roe_mask='cleanMask', path=path_hadB)
+    ma.appendROEMasks(list_name='B-:hadB_combined', mask_tuples=[cleanMask], path=path_hadB)
+    ma.buildContinuumSuppression(list_name='B-:hadB_combined', roe_mask='cleanMask', path=path_hadB)
 
-    ma.applyCuts("B0:combined", "[R2 < 0.3] and " + Bcut, path=path_hadB)
-    ma.applyCuts("B-:combined", "[R2 < 0.3] and " + Bcut, path=path_hadB)
+    ma.applyCuts("B0:hadB_combined", "[R2 < 0.3] and " + Bcut, path=path_hadB)
+    ma.applyCuts("B-:hadB_combined", "[R2 < 0.3] and " + Bcut, path=path_hadB)
 
     MiraBelleEcmsBB = b2.register_module('PhysicsObjectsMiraBelleEcmsBB')
-    MiraBelleEcmsBB.param('B0ListName', 'B0:combined')
-    MiraBelleEcmsBB.param('BmListName', 'B-:combined')
+    MiraBelleEcmsBB.param('B0ListName', 'B0:hadB_combined')
+    MiraBelleEcmsBB.param('BmListName', 'B-:hadB_combined')
     path_hadB.add_module(MiraBelleEcmsBB)
 
     return path_hadB

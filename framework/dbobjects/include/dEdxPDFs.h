@@ -101,8 +101,10 @@ namespace Belle2 {
     /** Array of truncated dE/dx PDFs for each particle hypothesis. */
     std::array<TH2F, Const::ChargedStable::c_SetSize> m_dEdxPDFsTruncated;
 
-    /** cache for both vectors of pointers */
+    /** cache for a vector of pointers to PDFs */
     mutable std::vector<const TH2F*> m_cachePDFs;  //! do not write out
+
+    /** cache for a vector of pointers to truncated PDFs */
     mutable std::vector<const TH2F*> m_cachePDFsTruncated;  //! do not write out
 
     /** Class version for the ROOT streamer. */

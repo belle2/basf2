@@ -46,10 +46,10 @@ namespace Belle2 {
     double getDedxMean(Const::EDetector detector) const;
 
     /** Return the event ID */
-    double eventID() const { return m_eventID; }
+    int eventID() const { return m_eventID; }
 
     /** Return the track ID */
-    double trackID() const { return m_trackID; }
+    int trackID() const { return m_trackID; }
 
     /** Return cos(theta) for this yrack */
     double getCosTheta() const { return m_cosTheta; }
@@ -61,10 +61,10 @@ namespace Belle2 {
     double getTrueMomentum() const { return m_pTrue; }
 
     /** Return the number of hits for this track */
-    double size() const { return m_nHits; }
+    int size() const { return m_nHits; }
 
     /** Return the number of hits used to determine the truncated mean */
-    double getNHitsUsed() const { return m_nHitsUsed; }
+    int getNHitsUsed() const { return m_nHitsUsed; }
 
     /** Return the (global) layer number */
     int getLayer(int i) const { return m_layer[i]; }
@@ -79,7 +79,7 @@ namespace Belle2 {
     double getDx(int i) const { return m_dx[i]; }
 
     /** Return the dE/dx value for this hit */
-    double getDedx(int i) const { return m_dEdx[i]; }
+    double getDedxOfHit(int i) const { return m_dEdx[i]; }
 
     /** Return the vector of dE/dx values for this track */
     const std::vector<double>& getDedxList() const { return m_dEdx; }

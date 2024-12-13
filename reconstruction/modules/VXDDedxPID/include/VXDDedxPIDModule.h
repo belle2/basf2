@@ -41,7 +41,7 @@ namespace Belle2 {
    *
    * The reconstruction of flight paths and the used likelihood ratio method are
    * described and evaluated in
-   * <a href="http://www-ekp.physik.uni-karlsruhe.de/pub/web/thesis/iekp-ka2012-9.pdf">
+   * <a href="https://publish.etp.kit.edu/record/20770">
    * dE/dx Particle Identification and Pixel Detector Data Reduction for the Belle II Experiment</a> (Chapter 6)
    *
    */

@@ -37,7 +37,7 @@ REG_MODULE(PhysicsObjectsMiraBelleEcmsBB);
 PhysicsObjectsMiraBelleEcmsBBModule::PhysicsObjectsMiraBelleEcmsBBModule() : HistoModule()
 {
   //Set module properties
-  setDescription("Monitor Physics Objects Quality");
+  setDescription("Monitor of the CMS collision energy based on hadronic B decays");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("TriggerIdentifier", m_triggerIdentifier,

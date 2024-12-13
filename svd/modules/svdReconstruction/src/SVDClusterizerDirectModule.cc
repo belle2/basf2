@@ -370,7 +370,7 @@ void SVDClusterizerDirectModule::event()
         );
         // Some calibrations magic.
         // FIXME: Only use calibration on real data. Until simulations correspond to
-        // default calibrtion, we cannot use it.
+        // default calibration, we cannot use it.
         double peakWidth = 270;
         double timeShift = isU ? 2.5 : -2.2;
         if (m_calibratePeak) {
@@ -400,7 +400,7 @@ void SVDClusterizerDirectModule::event()
                            );
       B2DEBUG(200, "RMS cluster noise: " << clusterNoise);
 
-      // This will hold component pdfs. We may want to rememeber them to study
+      // This will hold component pdfs. We may want to remember them to study
       // homogeneity of cluster times.
       shared_ptr<nnFitterBinData> pStrip;
       // This will aggregate the components pdfs to get cluster time pdf
@@ -420,7 +420,7 @@ void SVDClusterizerDirectModule::event()
         // Apply strip time shift to pdf
         fitTool.shiftInTime(*pStrip, -timeShifts[iClusterStrip]);
         fitTool.multiply(pCluster, *pStrip);
-        os1 << "Accummulated: " << endl;
+        os1 << "Accumulated: " << endl;
         copy(pCluster.begin(), pCluster.end(), ostream_iterator<double>(os1, " "));
         B2DEBUG(200, os1.str());
       }
@@ -429,7 +429,7 @@ void SVDClusterizerDirectModule::event()
       tie(clusterTime, clusterTimeErr) = fitTool.getTimeShift(pCluster);
       B2DEBUG(200, "Time: " << clusterTime << " +/- " << clusterTimeErr);
       // Now we have the cluster time pdf, so we can calculate amplitudes.
-      // In the next cycle thrugh cluster's digits, we calculate ampltidues and their
+      // In the next cycle through cluster's digits, we calculate ampltidues and their
       // errors.
       vector<double> stripAmplitudes(stripNoises.size());
       vector<double> stripAmplitudeErrors(stripNoises.size());

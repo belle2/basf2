@@ -248,7 +248,7 @@ void SVDNNShapeReconstructorModule::event()
       float stripNoiseADU = m_noiseCal.getNoise(sensorID, isU, stripNo);
       // Some calibrations magic.
       // FIXME: Only use calibration on real data. Until simulations correspond to
-      // default calibrtion, we cannot use it.
+      // default calibration, we cannot use it.
       double stripSignalWidth = 270;
       double stripT0 = isU ? 2.5 : -2.2;
       if (m_calibratePeak) {

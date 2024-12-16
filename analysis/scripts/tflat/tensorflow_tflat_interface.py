@@ -15,61 +15,10 @@ import numpy as np
 
 from basf2_mva_python_interface.tensorflow import State
 
-from keras.layers import Dense, Input, BatchNormalization, Normalization, Concatenate
-from keras.activations import sigmoid, tanh
-from keras.models import Model
+from tflat.tensorflow_tflat_model import get_preprocessor, get_tflat_model, get_merged_model
+
 from keras.losses import binary_crossentropy
-from keras.optimizers import Adam
 import tensorflow as tf
-import keras
-
-
-class Slicing(keras.layers.Layer):
-    def __init__(self, column, **kwargs):
-        super().__init__(**kwargs)
-        self.column = column
-
-    def call(self, inputs):
-        return inputs[:, self.column:self.column+1]
-
-    def get_config(self):
-        config = super().get_config()
-        config.update({"column": self.column})
-        return config
-
-
-class NanToNum(keras.layers.Layer):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def call(self, inputs):
-        return tf.keras.ops.nan_to_num(inputs)
-
-    def get_config(self):
-        config = super().get_config()
-        return config
-
-
-def get_preprocessor_(X):
-    """
-    Configure and adapt preprocessor on data X
-    """
-
-    inputs = Input(shape=(X.shape[1],))
-
-    preprocessed_cols = []
-    for col in range(X.shape[1]):
-        Xcol = X[:, col]
-        norm_layer = Normalization(axis=None)
-        norm_layer.adapt(Xcol[~np.isnan(Xcol)])
-
-        net = Slicing(col)(inputs)
-        net = norm_layer(net)
-        net = NanToNum()(net)
-        preprocessed_cols.append(net)
-
-    outputs = Concatenate(axis=1)(preprocessed_cols)
-    return tf.keras.models.Model(inputs=inputs, outputs=outputs)
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
@@ -97,23 +46,16 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     if seed:
         tf.set_random_seed(seed)
 
-    # weight decay coefficient
-    wd = 2e-5
+    state = State(get_tflat_model(parameters, number_of_features))
 
-    input = Input(shape=(number_of_features,))
-
-    net = Dense(units=300, activation=tanh, kernel_regularizer=tf.keras.regularizers.l2(wd))(input)
-    for i in range(7):
-        net = Dense(units=300, activation=tanh, kernel_regularizer=tf.keras.regularizers.l2(wd))(net)
-        net = BatchNormalization()(net)
-
-    output = Dense(units=1, activation=sigmoid)(net)
-
-    state = State(Model(input, output))
+    learning_rate = 0.001
+    weight_decay = 0.0001
+    optimizer = tf.keras.optimizers.AdamW(
+        learning_rate=learning_rate, weight_decay=weight_decay
+    )
 
     state.model.compile(
-        optimizer=Adam(
-            learning_rate=0.005),
+        optimizer=optimizer,
         loss=binary_crossentropy,
         metrics=[
             'accuracy',
@@ -192,42 +134,26 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     assert len(np.unique(state.ytest)) == 2
 
     # configure and adapt preprocessor
-    preprocessor = get_preprocessor_(X)
+    preprocessor = get_preprocessor(X)
 
-    X = preprocessor(X).numpy()
-    state.Xtest = preprocessor(state.Xtest).numpy()
+    X = preprocessor(X)
+    state.Xtest = preprocessor(state.Xtest)
 
     # perform fit() with early stopping callback
     callbacks = [tf.keras.callbacks.EarlyStopping(
         monitor='val_loss',
         min_delta=0,
-        patience=30,
+        patience=25,
         verbose=1,
         mode='auto',
         baseline=None,
-        start_from_epoch=200,
+        # start_from_epoch=200,
         restore_best_weights=True)]
 
-    def scheduler(epoch, lr_init=0.005, decay=0.01):
-        lr = lr_init * 1/(1 + decay * epoch)
-        if lr < 10**-6:
-            lr = 10**-6
-
-        # karpathy: 3e-4 is the best learning rate for Adam, hands down.
-        lr = 3e-4
-        return lr
-
-    lr_scheduler = tf.keras.callbacks.LearningRateScheduler(scheduler)
-    callbacks.append(lr_scheduler)
-
-    state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=128, epochs=300, callbacks=callbacks)
+    state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=128, epochs=30, callbacks=callbacks)
 
     # create a keras model that includes the preprocessing step
-    inputs = Input(shape=(X.shape[1],))
-    outputs = preprocessor(inputs)
-    outputs = state.model(outputs)
-    state.model = tf.keras.models.Model(inputs=inputs, outputs=outputs)
-
+    state.model = get_merged_model(preprocessor, state.model, number_of_features=X.shape[1])
     return False
 
 

@@ -79,7 +79,7 @@ ParticleKinematicFitterModule::ParticleKinematicFitterModule() : Module(), m_tex
 
 void ParticleKinematicFitterModule::initialize()
 {
-  m_eventextrainfo.registerInDataStore();
+  m_eventextrainfo.isRequired();
 
   if (m_decayString != "") {
     m_decaydescriptor.init(m_decayString);

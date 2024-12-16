@@ -53,7 +53,7 @@ namespace Belle2 {
         }
       }
 
-      /** EmpiricalDistributionFunction(t) gives edf value at time t, linearly interpolated from cummulative
+      /** EmpiricalDistributionFunction(t) gives edf value at time t, linearly interpolated from cumulative
        * bin probabilities.
        * @param t time at which edf is to be calculated.
        */
@@ -188,8 +188,8 @@ namespace Belle2 {
     private:
       const nnFitterBins& m_bins; /**< Edges of bins */
       const nnFitterBinData& m_binCenters; /**< Centers of bins */
-      nnFitterBinData m_altBinData; /**< Bin data array for re-use. */
-      apvSamples m_altSamples; /**< Array of 6 apv samples for re-use. */
+      nnFitterBinData m_altBinData; /**< Bin data array for reuse. */
+      apvSamples m_altSamples; /**< Array of 6 apv samples for reuse. */
       WaveGenerator m_waveGenerator; /**< APV signal generator */
     }; // class NNWaveFitTool
 

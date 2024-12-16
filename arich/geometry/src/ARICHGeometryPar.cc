@@ -16,10 +16,8 @@
 #include <Math/VectorUtil.h>
 
 #include <cmath>
-#include <boost/format.hpp>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 

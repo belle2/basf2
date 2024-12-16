@@ -42,6 +42,15 @@ void EventT0CombinerModule::event()
     return;
   }
 
+  // We have an SVD based EventT0 but it currently is *NOT* set as *THE* EventT0 -> set it as *THE* EventT0
+  // This might happen e.g. during calibration if the CDCFullGridChi2 ("chi2", see below) is run after the SVD EventT0 algorithm
+  if (m_eventT0->hasTemporaryEventT0(Const::SVD)) {
+    const auto& bestSVDT0 = m_eventT0->getBestSVDTemporaryEventT0();
+    m_eventT0->setEventT0(*bestSVDT0);
+    B2DEBUG(20, "EventT0 is set to SVD EventT0.");
+    return;
+  }
+
   // If we don't have an SVD based EventT0, the second choice is the EventT0 estimate using CDC information calculabed by the
   // FullGridChi2TrackTimeExtractor method. In principle, this algorithm can create EventT0 estimates using two methods:
   // "grid" and "chi2". We are only interested in the latter one.

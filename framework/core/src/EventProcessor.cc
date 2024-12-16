@@ -254,6 +254,9 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
 
   MetadataService::Instance().addBasf2Status("initializing");
 
+  // EventExtraInfo is needed in several modules so register it here
+  m_eventExtraInfo.registerInDataStore();
+
   for (const ModulePtr& modPtr : modulePathList) {
     Module* module = modPtr.get();
 

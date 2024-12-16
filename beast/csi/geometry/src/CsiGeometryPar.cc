@@ -17,7 +17,6 @@
 
 
 using namespace std;
-using namespace boost;
 using namespace Belle2;
 using namespace csi;
 
@@ -136,13 +135,13 @@ int CsiGeometryPar::CsiVolNameToCellID(const G4String VolumeName)
   int cellID = 0;
 
   vector< string > partName;
-  split(partName, VolumeName, is_any_of("_"));
+  boost::split(partName, VolumeName, boost::is_any_of("_"));
 
   int iEnclosure = -1;
   int iCrystal   = -1;
   for (std::vector<string>::iterator it = partName.begin() ; it != partName.end(); ++it) {
-    if (equals(*it, "Enclosure")) iEnclosure = boost::lexical_cast<int>(*(it + 1)) - 1;
-    else if (equals(*it, "Crystal")) iCrystal = boost::lexical_cast<int>(*(it + 1)) - 1;
+    if (boost::equals(*it, "Enclosure")) iEnclosure = boost::lexical_cast<int>(*(it + 1)) - 1;
+    else if (boost::equals(*it, "Crystal")) iCrystal = boost::lexical_cast<int>(*(it + 1)) - 1;
   }
 
   cellID = 3 * iEnclosure + iCrystal;
@@ -162,15 +161,15 @@ G4Material* CsiGeometryPar::GetMaterial(int cid)
 
   GearDir enclosureContent(content);
   string gearPath = "Enclosures/Enclosure";
-  string enclosurePath = (format("/%1%[%2%]") % gearPath % iEnclosure).str();
+  string enclosurePath = (boost::format("/%1%[%2%]") % gearPath % iEnclosure).str();
   enclosureContent.append(enclosurePath);
 
-  string slotName = (format("CrystalInSlot[%1%]") % iSlot).str();
+  string slotName = (boost::format("CrystalInSlot[%1%]") % iSlot).str();
   int iCry = enclosureContent.getInt(slotName);
 
 
   GearDir crystalContent(content);
-  crystalContent.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
+  crystalContent.append((boost::format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
   string strMatCrystal = crystalContent.getString("Material", "Air");
 
   return geometry::Materials::get(strMatCrystal);

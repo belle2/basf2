@@ -133,4 +133,4 @@ main.add_module(dbImporterModule())
 
 b2.process(main)
 
-print("IMPORT COMPLETED, check the localDB folder and then proceeed with the upload to the central DB")
+print("IMPORT COMPLETED, check the localDB folder and then proceed with the upload to the central DB")

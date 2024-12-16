@@ -100,8 +100,7 @@ class NNFilterModule(b2.Module):
 
         #: StoreArray to save weights to
         self.EventExtraInfo = Belle2.PyStoreObj('EventExtraInfo')
-        if not self.EventExtraInfo.isValid():
-            self.EventExtraInfo.registerInDataStore()
+        self.EventExtraInfo.isRequired()
         #: Initialise event metadata from data store
         self.EventInfo = Belle2.PyStoreObj('EventMetaData')
         #: node features
@@ -114,7 +113,8 @@ class NNFilterModule(b2.Module):
         Collect information from database, build graphs, make predictions and select through sampling or threshold
         """
         # Need to create the eventExtraInfo entry for each event
-        self.EventExtraInfo.create()
+        if not self.EventExtraInfo.isValid():
+            self.EventExtraInfo.create()
         df_dict = load_particle_list(mcplist=Belle2.PyStoreArray("MCParticles"), evtNum=self.EventInfo.getEvent(), label=True)
         single_input = preprocessed(df_dict, particle_selection=self.preproc_config['cuts'])
         graph = ArrayDataset(single_input, batch_size=1)[0][0]

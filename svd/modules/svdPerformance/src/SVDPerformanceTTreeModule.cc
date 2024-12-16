@@ -321,7 +321,7 @@ void SVDPerformanceTTreeModule::event()
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
             B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize << " cluster size");
 
-          //skip clusters created beacuse of missing APV
+          //skip clusters created because of missing APV
           if (m_svdSize < 128)
             for (unsigned int d = 0; d < m_svdSize; d++) {
 
@@ -399,7 +399,7 @@ void SVDPerformanceTTreeModule::event()
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
             B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize << " cluster size");
 
-          //skip clusters created beacuse of missing APV
+          //skip clusters created because of missing APV
           if (m_svdSize < 128)
             for (unsigned int d = 0; d < m_svdSize; d++) {
               SVDShaperDigit* ShaperDigit = theRecoDigits[d]->getRelated<SVDShaperDigit>();

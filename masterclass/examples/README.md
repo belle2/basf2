@@ -10,7 +10,7 @@ Created new test **/basf2/masterclass/tests/masterclass_output.py** in order to 
 
 # 3 Updating steering file & New Dataset
 
-The main example **/basf2/masterclass/examples/masterclass.py** doesnt filter any data at all.
+The main example **/basf2/masterclass/examples/masterclass.py** doesn't filter any data at all.
 For this purposes I first increased muon efficiency in **/basf2/masterclass/modules/src/MasterClassModules.cc**.
 Next I updated the original steering file example to cut based on skims from the software trigger.
 For the dataset we decided to use:
@@ -25,7 +25,7 @@ basf2 -n100 -i "/group/belle/users/kspenko/data/masterclass/exp26/sub00/*.root" 
 
 # 4 Complications
 
-Becuase bugfix was not corrected in any release we resorted to running grid jobs with local copy of the compiled module.
+Because bugfix was not corrected in any release we resorted to running grid jobs with local copy of the compiled module.
 The command for running on grid looked like this:
 
 gbasf2 -p masterclass2 -s prerelease-08-00-00a masterclass.py -i /belle/Data/release-06-00-08/DB00000498/PromptExp26/prod00029657/e0026/4S/r00000/mdst/sub00 -f="libmasterclass_modules.so, libmasterclass_modules.b2modmap, libmasterclass_dataobjects.so" --platform EL7 --basf2opt='-n 1000'
@@ -36,7 +36,7 @@ gbasf2 -p masterclass02 -s release-06-01-12 masterclass2.py --input_dslist LPN_m
 
 gb2_ds_list /belle/Data/release-06-00-08/DB00000498/PromptExp26/prod00029657/e0026/4S/r00000/mdst/sub00
 
-# 5 Steps for preparing localy compiled module
+# 5 Steps for preparing locally compiled module
 
 If you want to precompile module to pass to grid, it is IMPORTANT to note,
 it HAS to be compiled on the same release you want it to run on the grid!

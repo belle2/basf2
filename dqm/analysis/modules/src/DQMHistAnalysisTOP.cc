@@ -302,11 +302,6 @@ void DQMHistAnalysisTOPModule::event()
 
 void DQMHistAnalysisTOPModule::endRun()
 {
-  if (m_photonYields) delete m_photonYields;
-  m_photonYields = nullptr;
-  if (m_backgroundRates) delete m_backgroundRates;
-  m_backgroundRates = nullptr;
-
   // add MiraBelle monitoring
 
   for (const auto& var : m_mirabelleVariables) {

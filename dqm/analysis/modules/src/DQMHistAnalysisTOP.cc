@@ -302,8 +302,9 @@ void DQMHistAnalysisTOPModule::event()
 
 void DQMHistAnalysisTOPModule::endRun()
 {
-  // these two histograms do not exist anymore since file is closed, therefore
+  if (m_photonYields) delete m_photonYields;
   m_photonYields = nullptr;
+  if (m_backgroundRates) delete m_backgroundRates;
   m_backgroundRates = nullptr;
 
   // add MiraBelle monitoring

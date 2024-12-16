@@ -472,7 +472,7 @@ namespace Belle2 {
     Double32_t m_NumberOfHadronDigits;  //[0, 255, 18]
 
     /** Class definition */
-    ClassDef(ECLCluster, 15);
+    ClassDef(ECLCluster, 16);
     // 15: Added m_minTrkDistanceID
     // 14: Added m_maxECellId
     // 13: Added m_hypotheses

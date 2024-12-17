@@ -1696,7 +1696,7 @@ void ECLCalDigitFWD(TTree* cd_treeFWD)
   hFitQuality->GetListOfFunctions()->Add(new TNamed("Check", "Nearly all the fit flags should be zero. Non-zero fit flags should have their amplitude investigated.")); 
   hFitQuality->GetXaxis()->SetTitle("CalDigit time fit quality");
   hFitQuality->GetListOfFunctions()->Add(new TNamed("Contact","pche3675@uni.sydney.edu.au")); 
-  hFitQuality->GetListOfFunctions()->Add(new TNamed("MetaOptions", "nocompare"))
+  hFitQuality->GetListOfFunctions()->Add(new TNamed("MetaOptions", "nocompare"));
 
   TH1F* hCellId = new TH1F("hCellId","CalDigit CellId in FWD endcap", 288, 0., 1153.);
   hCellId->SetMinimum(0);
@@ -1849,7 +1849,7 @@ void ECLCalDigitBWD(TTree* cd_treeBWD)
   hFitQuality->GetListOfFunctions()->Add(new TNamed("Check", "Nearly all the fit flags should be zero. Non-zero fit flags should have their amplitude investigated.")); 
   hFitQuality->GetXaxis()->SetTitle("CalDigit fit quality");
   hFitQuality->GetListOfFunctions()->Add(new TNamed("Contact","pche3675@uni.sydney.edu.au")); 
-  hFitQuality->GetListOfFunctions()->Add(new TNamed("MetaOptions", "nocompare"))
+  hFitQuality->GetListOfFunctions()->Add(new TNamed("MetaOptions", "nocompare"));
 
   TH1F* hCellId = new TH1F("hCellId","CalDigit CellId in BWD endcap", 240, 7777., 8737.);
   hCellId->SetMinimum(0);

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/ipMonitor/BeamSpotMonitorModule.h>
+#include <reconstruction/modules/ipMonitor/BeamSpotMonitorModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 

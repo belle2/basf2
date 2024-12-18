@@ -319,3 +319,18 @@ void DQMHistAnalysisPXDDAQModule::event()
     setEpicsPV("unused", data_unused);
   }
 }
+
+void DQMHistAnalysisPXDDAQModule::terminate()
+{
+  B2DEBUG(1, "DQMHistAnalysisPXDDAQ: terminate called.");
+  // delete dynamical variables
+  if (m_cDAQError) delete m_cDAQError;
+  if (m_cMissingDHC) delete m_cMissingDHC;
+  if (m_cMissingDHE) delete m_cMissingDHE;
+  if (m_cMissingDHP) delete m_cMissingDHP;
+  if (m_cStatistic) delete m_cStatistic;
+  if (m_cStatisticUpd) delete m_cStatisticUpd;
+
+  if (m_hMissingDHC) delete m_hMissingDHC;
+  if (m_hMissingDHE) delete m_hMissingDHE;
+}

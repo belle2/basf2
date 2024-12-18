@@ -17,7 +17,6 @@
 #include <TKey.h>
 
 #include <ctime>
-#include <filesystem>
 
 using namespace Belle2;
 
@@ -35,6 +34,7 @@ DQMHistAnalysisInput2Module::DQMHistAnalysisInput2Module()
 {
   //Parameter definition
   addParam("HistMemoryPath", m_mempath, "Path to Input Hist memory", std::string(""));
+  addParam("StatFileName", m_statname, "Filename for status export", std::string(""));
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms", 10);
   addParam("RemoveEmpty", m_remove_empty, "Remove empty histograms", false);
   addParam("EnableRunInfo", m_enable_run_info, "Enable Run Info", false);
@@ -56,12 +56,21 @@ void DQMHistAnalysisInput2Module::beginRun()
 {
   B2DEBUG(1, "DQMHistAnalysisInput2: beginRun called.");
   clearHistList();
+  clearRefList();
   resetDeltaList();
   clearCanvases();
+
+  m_last_beginrun = time(0);
+  write_state();
+  m_lasttime -= std::chrono::seconds(1); // just change
+  m_forceChanged = true;
 }
 
 void DQMHistAnalysisInput2Module::event()
 {
+  m_last_event = time(0);
+  write_state();
+
   TH1::AddDirectory(false);
   initHistListBeforeEvent();
 
@@ -73,16 +82,16 @@ void DQMHistAnalysisInput2Module::event()
   m_eventMetaDataPtr->setRun(m_runno);
   m_eventMetaDataPtr->setEvent(m_count);
 
-  static std::filesystem::file_time_type lasttime;
   const std::filesystem::file_time_type ftime = std::filesystem::last_write_time(m_mempath);
 
-  if (lasttime == ftime) {
+  if (m_lasttime == ftime) {
     B2INFO("File not updated! -> Sleep");
     sleep(m_interval);
     setReturnValue(false);
     return;
   }
-  lasttime = ftime;
+  m_last_file_update = time(0);
+  m_lasttime = ftime;
 
   char mbstr[100];
   time_t now = time(0);
@@ -203,14 +212,19 @@ void DQMHistAnalysisInput2Module::event()
   ExtractEvent(hs);
 
   // this code must be run after "event processed" has been extracted
-  bool anyupdate = false; // flag if any histogram updated at all
+  bool anyupdate = m_forceChanged; // flag if any histogram updated at all
+  m_forceChanged = false;
   for (auto& h : hs) {
     anyupdate |= addHist("", h->GetName(), h);
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
   }
 
-  // if there is no update, sleep a moment
-  if (!anyupdate) sleep(m_interval);
+  if (anyupdate) {
+    m_last_content_update = time(0);
+  } else {
+    // if there is no update, sleep a moment
+    sleep(m_interval);
+  }
 
   // if no histogram was updated, we could stop processing
   setReturnValue(anyupdate);
@@ -225,5 +239,27 @@ void DQMHistAnalysisInput2Module::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisInput2: terminate called");
   if (m_c_info) delete m_c_info;
+  clearlist(); // necessary in the Input Module! Otherwise ROOT may clean before we do
 }
 
+void DQMHistAnalysisInput2Module::write_state(void)
+{
+  if (m_statname == "") return;
+  FILE* fh = fopen(m_statname.c_str(), "wt+");
+  if (fh) {
+    char mbstr[100];
+    time_t now = time(0);
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+    fprintf(fh, "%s,%s,%s,", m_statname.c_str(), m_mempath.c_str(), mbstr);
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_event));
+    fprintf(fh, "%s,", mbstr);
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_beginrun));
+    fprintf(fh, "%s,", mbstr);
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_file_update));
+    fprintf(fh, "%s,", mbstr);
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_content_update));
+    fprintf(fh, "%s\n", mbstr);
+
+    fclose(fh);
+  }
+}

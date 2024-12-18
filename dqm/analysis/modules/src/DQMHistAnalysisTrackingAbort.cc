@@ -132,7 +132,7 @@ void DQMHistAnalysisTrackingAbortModule::event()
   int nEventsIN = 0;
   int nEventsOUT = 0;
 
-  if (hAbortIn != nullptr && hAbortOut) {
+  if (hAbortIn != nullptr && hAbortOut != nullptr) {
 
     nEventsIN = hAbortIn->GetEntries();
     m_monObj->setVariable("nEvents_inActiveVeto", nEventsIN);
@@ -143,8 +143,8 @@ void DQMHistAnalysisTrackingAbortModule::event()
     m_hAbort->SetBinContent(1, hAbortIn->GetBinContent(1) + hAbortOut->GetBinContent(1));
     m_hAbort->SetBinContent(2, hAbortIn->GetBinContent(2) + hAbortOut->GetBinContent(2));
 
-    const double abortRate = m_hAbort->GetMean();
-    m_hAbort->SetTitle(Form("Fraction of Events in which Tracking Aborts = %.4f %%", abortRate * 100));
+    const double abortRate = (double)m_hAbort->GetBinContent(2) / (m_hAbort->GetBinContent(1) + m_hAbort->GetBinContent(2));
+    m_hAbort->SetTitle(Form("[After Filter] Fraction of Events in which Tracking Aborts = %.2f %%", abortRate * 100));
 
     if (nEvents >= m_statThreshold) {
       m_monObj->setVariable("abortRate", abortRate);
@@ -191,18 +191,19 @@ void DQMHistAnalysisTrackingAbortModule::event()
   int nEventsINbf = 0;
   int nEventsOUTbf = 0;
 
-  if (hAbortIn_BF != nullptr && hAbortOut_BF) {
+  if (hAbortIn_BF != nullptr && hAbortOut_BF != nullptr) {
 
     nEventsINbf = hAbortIn_BF->GetEntries();
     m_monObj->setVariable("nEventsBeforeFilter_inActiveVeto", nEventsINbf);
     nEventsOUTbf = hAbortOut_BF->GetEntries();
-    m_monObj->setVariable("nEventsBeforeFilter_outActiveVeto", nEventsOUT);
+    m_monObj->setVariable("nEventsBeforeFilter_outActiveVeto", nEventsOUTbf);
     const int nEvents_BF = nEventsINbf + nEventsOUTbf;
 
     m_hAbort_BF->SetBinContent(1, hAbortIn_BF->GetBinContent(1) + hAbortOut_BF->GetBinContent(1));
     m_hAbort_BF->SetBinContent(2, hAbortIn_BF->GetBinContent(2) + hAbortOut_BF->GetBinContent(2));
-    const double abortRate_BF = m_hAbort_BF->GetMean();
-    m_hAbort_BF->SetTitle(Form("[Before Filter] Fraction of Events in which Tracking Aborts = %.4f %%", abortRate_BF * 100));
+
+    const double abortRate_BF = (double)m_hAbort_BF->GetBinContent(2) / (m_hAbort_BF->GetBinContent(1) + m_hAbort_BF->GetBinContent(2));
+    m_hAbort_BF->SetTitle(Form("[Before Filter] Fraction of Events in which Tracking Aborts = %.2f %%", abortRate_BF * 100));
 
     if (nEvents_BF >= m_statThreshold) {
       m_monObj->setVariable("abortRateBeforeFilter", abortRate_BF);
@@ -251,15 +252,15 @@ void DQMHistAnalysisTrackingAbortModule::event()
   TH1F* hAverage_out_BF = (TH1F*)findHist("TrackingAbort_before_filter/averages_OUT");
   if (hAverage_out_BF != nullptr) scaleAndSendToMirabelle(hAverage_out_BF, nEventsOUTbf, "BeforeFilter_outActiveVeto");
 
-  // average SVD L3V Occupancy to Mirabelle
-  TH1* hL3VOccIn = findHist("TrackingAbort/SVDL3UOcc_IN");
-  if (hL3VOccIn != nullptr) m_monObj->setVariable("svdL3VOcc_inActiveVeto", hL3VOccIn->GetMean());
-  TH1* hL3VOccOut = findHist("TrackingAbort/SVDL3UOcc_OUT");
-  if (hL3VOccOut != nullptr) m_monObj->setVariable("svdL3VOcc_outActiveVeto", hL3VOccOut->GetMean());
-  TH1* hL3VOccIn_BF = findHist("TrackingAbort_before_filter/SVDL3UOcc_IN");
-  if (hL3VOccIn_BF != nullptr) m_monObj->setVariable("svdL3VOccBeforeFilter_inActiveVeto", hL3VOccIn_BF->GetMean());
-  TH1* hL3VOccOut_BF = findHist("TrackingAbort_before_filter/SVDL3UOcc_OUT");
-  if (hL3VOccOut_BF != nullptr) m_monObj->setVariable("svdL3VOccBeforeFilter_outActiveVeto", hL3VOccOut_BF->GetMean());
+  // average SVD L3U Occupancy to Mirabelle
+  TH1* hL3UOccIn = findHist("TrackingAbort/SVDL3UOcc_IN");
+  if (hL3UOccIn != nullptr) m_monObj->setVariable("svdL3UOcc_inActiveVeto", hL3UOccIn->GetMean());
+  TH1* hL3UOccOut = findHist("TrackingAbort/SVDL3UOcc_OUT");
+  if (hL3UOccOut != nullptr) m_monObj->setVariable("svdL3UOcc_outActiveVeto", hL3UOccOut->GetMean());
+  TH1* hL3UOccIn_BF = findHist("TrackingAbort_before_filter/SVDL3UOcc_IN");
+  if (hL3UOccIn_BF != nullptr) m_monObj->setVariable("svdL3UOccBeforeFilter_inActiveVeto", hL3UOccIn_BF->GetMean());
+  TH1* hL3UOccOut_BF = findHist("TrackingAbort_before_filter/SVDL3UOcc_OUT");
+  if (hL3UOccOut_BF != nullptr) m_monObj->setVariable("svdL3UOccBeforeFilter_outActiveVeto", hL3UOccOut_BF->GetMean());
 
 
   // average n CDC extra hits to Mirabelle

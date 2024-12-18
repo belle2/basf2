@@ -28,7 +28,7 @@ bool ARICHGeoAerogelPlane::isConsistent() const
          << "getLayerThickness(2) = " << getLayerThickness(2) << endl;
     cout << "getWallHeight() - getLayerThickness(1) - getLayerThickness(2) = "
          << getWallHeight() - getLayerThickness(1) - getLayerThickness(2) << endl;
-    B2ERROR("Data of the ARICHGeoAerogelPlane is inconsisten : --> abs (getWallHeight() - getLayerThickness(1) - getLayerThickness(2)) > 1.0e-10");
+    B2ERROR("Data of the ARICHGeoAerogelPlane is inconsistent : --> abs (getWallHeight() - getLayerThickness(1) - getLayerThickness(2)) > 1.0e-10");
   }
 
   if (getFullAerogelMaterialDescriptionKey() == 1) {
@@ -44,7 +44,7 @@ bool ARICHGeoAerogelPlane::isConsistent() const
     for (unsigned i = 0; i < getNAeroSlotsIndividualRing().size(); i++) {
       //cout<<"getNAeroSlotsIndividualRing().at(i) = "<<getNAeroSlotsIndividualRing().at(i)<<endl
       //  <<"nAeroSlotsPerRing[i]                = "<<nAeroSlotsPerRing[i]<<endl;
-      B2ASSERT("Data of the ARICHGeoAerogelPlane is inconsisten : --> getNAeroSlotsIndividualRing().at(i) != nAeroSlotsPerRing[i]",
+      B2ASSERT("Data of the ARICHGeoAerogelPlane is inconsistent : --> getNAeroSlotsIndividualRing().at(i) != nAeroSlotsPerRing[i]",
                getNAeroSlotsIndividualRing().at(i) == nAeroSlotsPerRing[i]);
     }
   }
@@ -67,7 +67,7 @@ void ARICHGeoAerogelPlane::print(const std::string& title) const
          << setw(15) << getNAeroSlotsIndividualRing().at(i) << endl;
   }
 
-  cout << "Imaginary tube thikness just after aerogel layers : " << getImgTubeThickness() << endl;
+  cout << "Imaginary tube thickness just after aerogel layers : " << getImgTubeThickness() << endl;
   cout << "Minimum thickness of the compensation volume with ARICH air : " << getCompensationARICHairVolumeThick_min() << endl;
 
   cout << "Aerogel layers " << endl;

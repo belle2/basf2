@@ -137,7 +137,7 @@ void TreeFitterModule::beginRun()
 
   m_beamCovariance = Eigen::Matrix4d::Zero();
   const double covE = 3.19575e-05; // TODO Avoid using the hard coded value.
-  // It is taked from the BeamParameter which was used previously. The uncertainty from the CollisionInvariantMass is a possibility.
+  // It is taken from the BeamParameter which was used previously. The uncertainty from the CollisionInvariantMass is a possibility.
 
   for (size_t i = 0; i < 4; ++i) {
     m_beamCovariance(i, i) = covE;

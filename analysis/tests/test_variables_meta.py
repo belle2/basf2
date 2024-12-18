@@ -231,9 +231,9 @@ class MetavariableDataTypeTest(unittest.TestCase):
         for filepath in files:
             num_metavariables += self.process_file(filepath)
 
-        # We should get at least 235 registering statements
+        # We should get at least 238 registering statements
         print(f"Number of meta-variables is {num_metavariables}")
-        self.assertGreaterEqual(num_metavariables, 235)
+        self.assertGreaterEqual(num_metavariables, 238)
 
 
 if __name__ == "__main__":

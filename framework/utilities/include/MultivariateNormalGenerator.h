@@ -12,8 +12,9 @@
 #include <Math/Vector3D.h>
 #include <TRandom.h>
 #include <TVectorT.h>
-#include <TVector3.h>
 #include <TMatrixTBase.h>
+
+#include <array>
 
 namespace Belle2 {
   /** Class to generate normal distributed, correlated random numbers given the
@@ -100,22 +101,22 @@ namespace Belle2 {
     }
 
     /** Generate a set of correlated random numbers with the previously set
-     * mean and covariance and return a TVector3. Optimally, the set mean and
+     * mean and covariance and return a ROOT::Math::XYZVector. Optimally, the set mean and
      * covariance matrix should be of dimension three, otherwise just the first
-     * size() elements of the TVector3 are set and the remaining elements are
+     * size() elements of the ROOT::Math::XYZVector are set and the remaining elements are
      * zero. If size() is bigger than 3 the remaining values will be discarded.
      */
-    TVector3 generateVec3() const
+    ROOT::Math::XYZVector generateVec3() const
     {
       Eigen::VectorXd x = generate();
-      TVector3 output(0, 0, 0);
+      std::array<double, 3> tmp = {0.};
       for (unsigned int i = 0; i < std::min(3u, (unsigned int)size()); ++i) {
-        output[i] = x(i);
+        tmp[i] = x(i);
       }
-      return output;
+      return ROOT::Math::XYZVector(tmp[0], tmp[1], tmp[2]);
     }
 
-    /** Generate a set of correlated random numbers with the previouly set
+    /** Generate a set of correlated random numbers with the previously set
      * mean and covariance and return a TVectorT<double>
      */
     TVectorD generateVecT() const
@@ -133,14 +134,14 @@ namespace Belle2 {
      * @param n dimensionality
      * @param mean pointer to the n mean values of the distribution
      * @param cov pointer to the n*n covariance values in row major layout
-     * @return true if covariance could be decomposited, false otherwise
+     * @return true if covariance could be decomposed, false otherwise
      */
     bool setMeanCov(int n, const double* mean, const double* cov);
 
     /** set the mean and covariance for the distribution.
      * @param mean Vector of mean values
      * @param cov Matrix containing the covariance values
-     * @return true if covariance could be decomposited, false otherwise
+     * @return true if covariance could be decomposed, false otherwise
      */
     bool setMeanCov(const Eigen::VectorXd& mean, const Eigen::MatrixXd& cov);
 
@@ -148,7 +149,7 @@ namespace Belle2 {
      * TMatrixD, TMatrixF, TMatrixDSym and so forth
      * @param mean Vector of mean values
      * @param cov Matrix containing the covariance values
-     * @return true if covariance could be decomposited, false otherwise
+     * @return true if covariance could be decomposed, false otherwise
      */
     template<class value_type> bool setMeanCov(const TVectorT<value_type>& mean,
                                                const TMatrixTBase<value_type>& cov);
@@ -156,7 +157,7 @@ namespace Belle2 {
     /** set the mean and covariance for the distribution.
      * @param mean Vector of mean values
      * @param cov Matrix containing the covariance values
-     * @return true if covariance could be decomposited, false otherwise
+     * @return true if covariance could be decomposed, false otherwise
      */
     template<class value_type> bool setMeanCov(const ROOT::Math::XYZVector& mean,
                                                const TMatrixTBase<value_type>& cov);

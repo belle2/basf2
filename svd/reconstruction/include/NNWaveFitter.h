@@ -99,7 +99,7 @@ namespace Belle2 {
        */
       const nnFitterBinData& getBinCenters() const { return m_binCenters; }
 
-      /** Get bins of netwrok output
+      /** Get bins of network output
        * @return array of bin edges (length of timebase + 1)
        */
       const nnFitterBins& getBins() const { return m_bins; }

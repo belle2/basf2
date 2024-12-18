@@ -14,7 +14,6 @@ Script to Import Calibrations into a local DB
 """
 
 import basf2 as b2
-from ROOT.Belle2 import SVDLocalCalibrationsImporter
 import sys
 import argparse
 from termcolor import colored
@@ -31,7 +30,7 @@ parser.add_argument('--nomask', dest='mask', action='store_const', default=False
 
 print('')
 
-if(str(sys.argv[1]) == "help"):
+if (str(sys.argv[1]) == "help"):
     parser.print_help()
     exit(1)
 
@@ -100,6 +99,10 @@ class dbImporterModule(b2.Module):
         """
         Function to call the dbImporter methods to upload the different local payloads
         """
+        # avoid top level ROOT imports
+        from ROOT import Belle2  # noqa: make Belle2 namespace available
+        from ROOT.Belle2 import SVDLocalCalibrationsImporter
+
         # call the importer class
         dbImporter = SVDLocalCalibrationsImporter(experiment, run, experiment, -1)
         if args.calib is not None:
@@ -130,4 +133,4 @@ main.add_module(dbImporterModule())
 
 b2.process(main)
 
-print("IMPORT COMPLETED, check the localDB folder and then proceeed with the upload to the central DB")
+print("IMPORT COMPLETED, check the localDB folder and then proceed with the upload to the central DB")

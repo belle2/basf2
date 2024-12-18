@@ -58,7 +58,7 @@ namespace Belle2 {
       std::string m_relDigitTrueHitName;
       /** Copy of the Digits needed for sorting */
       std::vector<PXDDigit> m_digitcopy;
-      /** Mode: if true, merge duplicate pixels, otherwise delete all but the first occurence */
+      /** Mode: if true, merge duplicate pixels, otherwise delete all but the first occurrence */
       bool m_mergeDuplicates;
       /** if true, check digit data and discard malformed digits.*/
       bool m_trimDigits;

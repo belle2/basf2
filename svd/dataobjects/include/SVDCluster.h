@@ -29,7 +29,7 @@ namespace Belle2 {
      * @param sensorID Sensor compact ID.
      * @param isU true if u strips, otherwise false.
      * @param position Hit position estimate.
-     * @param positionSigma Error of hit postion estimate.
+     * @param positionSigma Error of hit position estimate.
      * @param clsTime Hit time stimate.
      * @param clsTimeSigma Error of hit time estimate.
      * @param clsCharge The cluster charge in ADC units.
@@ -76,7 +76,7 @@ namespace Belle2 {
      * @param sensorID Sensor compact ID.
      * @param isU true if u strips, otherwise false.
      * @param position Hit position estimate.
-     * @param positionSigma Error of hit postion estimate.
+     * @param positionSigma Error of hit position estimate.
      * @param clsTime Hit time stimate.
      * @param clsTimeSigma Error of hit time estimate.
      * @param clsCharge The cluster charge in ADC units.
@@ -258,7 +258,7 @@ namespace Belle2 {
     std::vector<std::tuple<float, float, float>> m_timeGroupInfo; /**< TimeGroup Gaussian Parameters,
                    (integral, center, sigma) */
     double m_qualityIndicator = {0.};  /**< Probability of signal cluster */
-    double m_qualityIndicatorError = {0.};  /**< Error associated with probability calcualtion */
+    double m_qualityIndicatorError = {0.};  /**< Error associated with probability calculation */
 
     ClassDef(SVDCluster, 8)
 

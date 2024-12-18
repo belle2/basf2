@@ -47,7 +47,7 @@ extern "C" {
 };
 
 
-//anonymous namespace for data objects used by both ECLWaveformFitModule class and fcnPhotonHadron funciton for MINUIT minimization.
+//anonymous namespace for data objects used by both ECLWaveformFitModule class and fcnPhotonHadron function for MINUIT minimization.
 namespace {
 
   // Number of fit points.
@@ -157,7 +157,7 @@ namespace {
     grad[5] = 2 * gT2;
   }
 
-  // regularize autocovariance function by multipling it by the step
+  // regularize autocovariance function by multiplying it by the step
   // function so elements above u0 become 0 and below are untouched.
   void regularize(double* dst, const double* src, const int n, const double u0 = 13.0, const double u1 = 0.8)
   {
@@ -295,8 +295,11 @@ void ECLWaveformFitModule::beginRun()
 void ECLWaveformFitModule::initialize()
 {
   // ECL dataobjects
-  m_eclDSPs.registerInDataStore();
-  m_eclDigits.registerInDataStore();
+  m_eclDSPs.isRequired();
+  m_eclDigits.isRequired();
+  // While we set a relation from ECLDsps to ECLDigits here, the relation
+  // is already register in previous modules: let's require it here
+  m_eclDSPs.registerRelationTo(m_eclDigits);
 
   //initializing fit minimizer
   m_MinuitPhotonHadron = new TMinuit(4);
@@ -470,7 +473,7 @@ void ECLWaveformFitModule::fitPhotonHadron(
   double arglist[10] = {0};
   int ierflg = 0;
 
-  /* Setting inital fit parameters. */
+  /* Setting initial fit parameters. */
   double dt = 0.5;
   double amax = 0;
   int jmax = 6;
@@ -495,7 +498,7 @@ void ECLWaveformFitModule::fitPhotonHadron(
   double T0 = dt * (4.5 - jmax);
   double A0 = amax;
 
-  //initalize minimizer
+  //initialize minimizer
   m_MinuitPhotonHadron->mnparm(0, "B", B0, 10, B0 / 1.5, B0 * 1.5, ierflg);
   m_MinuitPhotonHadron->mnparm(1, "Ag", A0, A0 / 20, 0, 2 * A0, ierflg);
   m_MinuitPhotonHadron->mnparm(2, "T", T0, 0.5, T0 - 2.5, T0 + 2.5, ierflg);

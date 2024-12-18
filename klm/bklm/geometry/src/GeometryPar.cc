@@ -808,7 +808,7 @@ HepGeom::Transform3D GeometryPar::getTransformFromRigidBodyParams(double dU, dou
   CLHEP::HepRotation dx = CLHEP::HepRotationX(-dGamma);
   CLHEP::Hep3Vector shift(dW, dU, dV);
 
-  //we do dx-->dz-->dy ( local w-->v-->u), because angles are definded as intrinsic rotations u-->v'-->w''
+  //we do dx-->dz-->dy ( local w-->v-->u), because angles are defined as intrinsic rotations u-->v'-->w''
   //the equivalent one is extrinsic rotation with the order w (gamma)--> v(beta) --> u (alpha)
   //and then we map it to global rotation x -> z -> y axis
   return HepGeom::Transform3D(dy * dz * dx, shift);

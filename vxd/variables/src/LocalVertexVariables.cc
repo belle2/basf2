@@ -37,7 +37,7 @@ namespace Belle2 {
       for (const auto& layer : geo.getLayers()) {
         for (const auto& ladder : geo.getLadders(layer)) {
           for (const auto& sensor : geo.getSensors(ladder)) {
-            const auto& sInfo = VXD::GeoCache::get(sensor);
+            const auto& sInfo = geo.getSensorInfo(sensor);
             const auto& mclocal = sInfo.pointToLocal(mcglobal, true);
             if (sInfo.inside(mclocal))
               return std::make_tuple(mclocal, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
@@ -88,7 +88,7 @@ namespace Belle2 {
         for (const auto& ladder : geo.getLadders(layer)) {
           for (const auto& sensor : geo.getSensors(ladder)) {
 
-            const auto& sInfo = VXD::GeoCache::get(sensor);
+            const auto& sInfo = geo.getSensorInfo(sensor);
             const auto& local = sInfo.pointToLocal(global, true);
             if (sInfo.inside(local.X(), local.Y(), 0.1, 0.1)) {
               if (abs(local.Z()) < 0.1) {

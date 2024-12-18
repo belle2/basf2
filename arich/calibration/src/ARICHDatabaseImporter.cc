@@ -66,6 +66,7 @@
 #include <TGraph2D.h>
 #include <TFile.h>
 #include <TKey.h>
+#include <TCanvas.h>
 #include <TString.h>
 #include <string>
 #include <vector>
@@ -708,28 +709,52 @@ int ARICHDatabaseImporter::getAeroTileColumn(int slot)
 }
 
 
-void ARICHDatabaseImporter::printAeroTileInfo()
+void ARICHDatabaseImporter::printAeroTileInfo(bool dump)
 {
   DBObjPtr<ARICHAeroTilesInfo> tilesInfo;
   tilesInfo->print();
+
+  if (dump) {
+    DBImportObjPtr<ARICHAeroTilesInfo> importObj;
+    importObj.construct(*tilesInfo);
+    importObj.import(tilesInfo.getIoV());
+  }
 }
 
-void ARICHDatabaseImporter::printGlobalAlignment()
+void ARICHDatabaseImporter::printGlobalAlignment(bool dump)
 {
   DBObjPtr<ARICHGlobalAlignment> align;
   align->print();
+
+  if (dump) {
+    DBImportObjPtr<ARICHGlobalAlignment> importObj;
+    importObj.construct(*align);
+    importObj.import(align.getIoV());
+  }
 }
 
-void ARICHDatabaseImporter::printMirrorAlignment()
+void ARICHDatabaseImporter::printMirrorAlignment(bool dump)
 {
   DBObjPtr<ARICHMirrorAlignment> align;
   align->print();
+
+  if (dump) {
+    DBImportObjPtr<ARICHMirrorAlignment> importObj;
+    importObj.construct(*align);
+    importObj.import(align.getIoV());
+  }
 }
 
-void ARICHDatabaseImporter::printAeroTilesAlignment()
+void ARICHDatabaseImporter::printAeroTilesAlignment(bool dump)
 {
   DBObjPtr<ARICHAeroTilesAlignment> align;
   align->print();
+
+  if (dump) {
+    DBImportObjPtr<ARICHAeroTilesAlignment> importObj;
+    importObj.construct(*align);
+    importObj.import(align.getIoV());
+  }
 }
 
 // classes for DAQ
@@ -881,7 +906,7 @@ void ARICHDatabaseImporter::importNominalBiasVoltages()
 }
 
 
-void ARICHDatabaseImporter::printBiasMappings()
+void ARICHDatabaseImporter::printBiasMappings(bool dump)
 {
   DBObjPtr<ARICHBiasCablesMapping> biasMap;
   biasMap->print();
@@ -889,14 +914,38 @@ void ARICHDatabaseImporter::printBiasMappings()
   channelsMap->print();
   DBObjPtr<ARICHBiasCrateCableMapping> crateMap;
   crateMap->print();
+
+  if (dump) {
+    DBImportObjPtr<ARICHBiasCablesMapping> importObjBias;
+    importObjBias.construct(*biasMap);
+    importObjBias.import(biasMap.getIoV());
+
+    DBImportObjPtr<ARICHBiasChannelsMapping> importObjBiasCH;
+    importObjBiasCH.construct(*channelsMap);
+    importObjBiasCH.import(channelsMap.getIoV());
+
+    DBImportObjPtr<ARICHBiasCrateCableMapping> importObjBiasCrate;
+    importObjBiasCrate.construct(*crateMap);
+    importObjBiasCrate.import(crateMap.getIoV());
+  }
 }
 
-void ARICHDatabaseImporter::printHvMappings()
+void ARICHDatabaseImporter::printHvMappings(bool dump)
 {
   DBObjPtr<ARICHHvCablesMapping> hvMap;
   hvMap->print();
   DBObjPtr<ARICHHvCrateCableMapping> crateMap;
   crateMap->print();
+
+  if (dump) {
+    DBImportObjPtr<ARICHHvCablesMapping> importObjHv;
+    importObjHv.construct(*hvMap);
+    importObjHv.import(hvMap.getIoV());
+
+    DBImportObjPtr<ARICHHvCrateCableMapping> importObjHvCrate;
+    importObjHvCrate.construct(*crateMap);
+    importObjHvCrate.import(crateMap.getIoV());
+  }
 }
 
 void ARICHDatabaseImporter::dumpHvMappings()
@@ -912,10 +961,16 @@ void ARICHDatabaseImporter::dumpHvMappings()
   hist->SaveAs("HVMapping.root");
 }
 
-void ARICHDatabaseImporter::printNominalBiasVoltages()
+void ARICHDatabaseImporter::printNominalBiasVoltages(bool dump)
 {
   DBObjPtr<ARICHBiasVoltages> biasVolt;
   biasVolt->print();
+
+  if (dump) {
+    DBImportObjPtr<ARICHBiasVoltages> importObjBiasVolt;
+    importObjBiasVolt.construct(*biasVolt);
+    importObjBiasVolt.import(biasVolt.getIoV());
+  }
 }
 
 void ARICHDatabaseImporter::printNominalBiasVoltageForChannel(std::vector<int> channel)
@@ -1006,51 +1061,92 @@ int ARICHDatabaseImporter::getFebDaqSlot(unsigned febSlot)
   return febDaqSlot;
 }
 
-void ARICHDatabaseImporter::printSimulationPar()
+void ARICHDatabaseImporter::printSimulationPar(bool dump)
 {
   DBObjPtr<ARICHSimulationPar> simPar;
   simPar->print();
+
+  if (dump) {
+    DBImportObjPtr<ARICHSimulationPar> importObjSim;
+    importObjSim.construct(*simPar);
+    importObjSim.import(simPar.getIoV());
+  }
 }
 
-void ARICHDatabaseImporter::printGeometryConfig()
+void ARICHDatabaseImporter::printGeometryConfig(bool dump)
 {
   DBObjPtr<ARICHGeometryConfig> geoConfig;
   geoConfig->print();
 
+  if (dump) {
+    DBImportObjPtr<ARICHGeometryConfig> importObjGeo;
+    importObjGeo.construct(*geoConfig);
+    importObjGeo.import(geoConfig.getIoV());
+  }
 }
 
-void ARICHDatabaseImporter::printChannelMapping()
+void ARICHDatabaseImporter::printChannelMapping(bool dump)
 {
   DBObjPtr<ARICHChannelMapping> chMap;
   chMap->print();
+
+  if (dump) {
+    DBImportObjPtr<ARICHChannelMapping> importObjMap;
+    importObjMap.construct(*chMap);
+    importObjMap.import(chMap.getIoV());
+  }
 }
 
-void ARICHDatabaseImporter::printMergerMapping()
+void ARICHDatabaseImporter::printMergerMapping(bool dump)
 {
   DBObjPtr<ARICHMergerMapping> mrgMap;
   mrgMap->print();
+
+  if (dump) {
+    DBImportObjPtr<ARICHMergerMapping> importObjMerger;
+    importObjMerger.construct(*mrgMap);
+    importObjMerger.import(mrgMap.getIoV());
+  }
 }
 
-void ARICHDatabaseImporter::printCopperMapping()
+void ARICHDatabaseImporter::printCopperMapping(bool dump)
 {
   DBObjPtr<ARICHCopperMapping> copMap;
   copMap->print();
+
+  if (dump) {
+    DBImportObjPtr<ARICHCopperMapping> importObjCopper;
+    importObjCopper.construct(*copMap);
+    importObjCopper.import(copMap.getIoV());
+  }
 }
 
-void ARICHDatabaseImporter::printModulesInfo()
+void ARICHDatabaseImporter::printModulesInfo(bool dump)
 {
   DBObjPtr<ARICHModulesInfo> modinfo;
   modinfo->print();
+
+  if (dump) {
+    DBImportObjPtr<ARICHModulesInfo> importObjMod;
+    importObjMod.construct(*modinfo);
+    importObjMod.import(modinfo.getIoV());
+  }
 }
 
-void ARICHDatabaseImporter::printReconstructionPar()
+void ARICHDatabaseImporter::printReconstructionPar(bool dump)
 {
   DBObjPtr<ARICHReconstructionPar> recPar;
   recPar->print();
+
+  if (dump) {
+    DBImportObjPtr<ARICHReconstructionPar> importObjRec;
+    importObjRec.construct(*recPar);
+    importObjRec.import(recPar.getIoV());
+  }
 }
 
 
-void ARICHDatabaseImporter::printChannelMask(bool makeHist)
+void ARICHDatabaseImporter::printChannelMask(bool makeHist, bool dump)
 {
 
   DBObjPtr<ARICHChannelMask> chMask;
@@ -1064,6 +1160,12 @@ void ARICHDatabaseImporter::printChannelMask(bool makeHist)
       }
     }
     hist->SaveAs("channelMask.root");
+  }
+
+  if (dump) {
+    DBImportObjPtr<ARICHChannelMask> importObj;
+    importObj.construct(*chMask);
+    importObj.import(chMask.getIoV());
   }
 }
 

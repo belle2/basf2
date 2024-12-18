@@ -160,7 +160,7 @@ def send_mail(
             except smtplib.SMTPAuthenticationError as e:
                 print(
                     "!!!!!!!!!!!!!!!!!!!!!\n"
-                    "AN ERROR OCCURED DURING SENDING OF MAILS:",
+                    "AN ERROR OCCURRED DURING SENDING OF MAILS:",
                     file=sys.stderr,
                 )
                 print(e, file=sys.stderr)

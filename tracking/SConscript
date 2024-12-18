@@ -16,7 +16,7 @@ env['LIBS'] = [
     'EG',
     '$ROOT_LIBS',
     'FastBDT_shared',
-    'analysis', 'analysis_dataobjects'
+    'analysis', 'analysis_dataobjects', 'analysis_VertexFitting'
     ]
 
 Return('env')

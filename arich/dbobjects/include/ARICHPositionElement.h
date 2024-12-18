@@ -89,14 +89,14 @@ namespace Belle2 {
 
     /**
      * Sets rotation around y
-     * @param alpha rotation angle around y
+     * @param beta rotation angle around y
      */
     void setBeta(double beta) {m_beta = beta;}
 
 
     /**
      * Sets rotation around z
-     * @param alpha rotation angle around z
+     * @param gamma rotation angle around z
      */
     void setGamma(double gamma) {m_gamma = gamma;}
 
@@ -185,7 +185,7 @@ namespace Belle2 {
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Parmeters of position element") const override
+    void print(const std::string& title = "Parameters of position element") const override
     {
       std::cout << title << std::endl;
       std::cout << "translations (x,y,z): " << m_x << " " << m_y << " " << m_z << std::endl;

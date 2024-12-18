@@ -46,7 +46,7 @@ namespace Belle2 {
     /** Return vector of mean parameters
      * @return vector of mean parameters
      */
-    std::vector<double> getMeanPars() const {return m_meanpars; };
+    const std::vector<double>& getMeanPars() const {return m_meanpars; };
 
     /** Return specific mean parameter
      * @return mean parameter
@@ -64,7 +64,18 @@ namespace Belle2 {
      */
     void setMeanPar(int par, double value) {m_meanpars[par] = value; };
 
+    /**
+     * Returns the predicted dE/dx mean at given beta-gamma
+     * @param bg beta-gamma
+     * @return predicted dE/dx mean
+     */
+    double getMean(double bg) const;
+
   private:
+
+    /** parameterized beta-gamma curve for predicted means */
+    double meanCurve(double x, const double* par, int version) const;
+
     short m_version{ -1}; /**< version number for mean parameterization */
     std::vector<double> m_meanpars; /**< dE/dx mean parameters */
 

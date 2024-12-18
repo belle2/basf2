@@ -22,7 +22,7 @@ from skim.utils.misc import _sphinxify_decay
 from variables import variables as vm
 
 __liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au>, Tommy Martinov <tommy.martinov@desy.de>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 def _merge_boolean_dicts(*dicts):
@@ -132,7 +132,7 @@ class BaseFEISkim(BaseSkim):
         * Cleaned tracks (``pi+:FEI_cleaned``): :math:`d_0 < 0.5~{\\rm cm}`,
           :math:`|z_0| < 2~{\\rm cm}`, and :math:`p_T > 0.1~{\\rm GeV}`
         * Cleaned ECL clusters (``gamma:FEI_cleaned``):
-          :math:`0.296706 < \\theta < 2.61799`, and
+          :math:`\\theta` in CDC acceptance, and
           :math:`E>0.1~{\\rm GeV}`
         """
 
@@ -224,7 +224,7 @@ class BaseFEISkim(BaseSkim):
 
     def additional_setup(self, path):
         """Apply pre-FEI event-level cuts and apply the FEI. This setup function is run
-        by all FEI skims, so they all have the save event-level pre-cuts.
+        by all FEI skims, so they all have the same event-level pre-cuts.
 
         This function passes `FEIChannelArgs` to the cached function `run_fei_for_skims`
         to avoid applying the FEI twice.
@@ -321,10 +321,7 @@ class feiHadronicB0(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B0:generic", "Mbc>5.2", path=path)
-        ma.applyCuts("B0:generic", "abs(deltaE)<0.300", path=path)
-        ma.applyCuts("B0:generic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)
-
+        ma.applyCuts("B0:generic", "Mbc > 5.2 and abs(deltaE) < 0.3 and [sigProb > 0.001 or extraInfo(dmID)==23]", path=path)
         return ["B0:generic"]
 
     def validation_histograms(self, path):
@@ -366,7 +363,7 @@ class feiHadronicB0(BaseFEISkim):
                           ('decayModeID', 26, 0, 26, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -401,10 +398,7 @@ class feiHadronicBplus(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B+:generic", "Mbc>5.2", path=path)
-        ma.applyCuts("B+:generic", "abs(deltaE)<0.300", path=path)
-        ma.applyCuts("B+:generic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
-
+        ma.applyCuts("B+:generic", "Mbc > 5.2 and abs(deltaE) < 0.3 and [sigProb > 0.001 or extraInfo(dmID)==25]", path=path)
         return ["B+:generic"]
 
     def validation_histograms(self, path):
@@ -446,7 +440,7 @@ class feiHadronicBplus(BaseFEISkim):
                           ('decayModeID', 29, 0, 29, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -483,11 +477,8 @@ class feiSLB0(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B0:semileptonic", "dmID<8", path=path)
-        ma.applyCuts("B0:semileptonic", "log10(sigProb)>-2.4", path=path)
-        ma.applyCuts("B0:semileptonic", "-4.0<cosThetaBY<3.0", path=path)
-        ma.applyCuts("B0:semileptonic", "p_lepton_CMSframe>1.0", path=path)
-
+        Bcuts = " and ".join(["dmID < 8", "log10(sigProb) > -2.4", "-4 < cosThetaBY < 3", "p_lepton_CMSframe > 1"])
+        ma.applyCuts("B0:semileptonic", Bcuts, path=path)
         return ["B0:semileptonic"]
 
     def validation_histograms(self, path):
@@ -524,7 +515,7 @@ class feiSLB0(BaseFEISkim):
             variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -565,55 +556,29 @@ class feiSLB0_RDstar(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        CleanedTrackCuts = "abs(z0) < 2.0 and abs(d0) < 0.5 and pt > 0.1"
-        CleanedClusterCuts = "E > 0.1 and thetaInCDCAcceptance"
-
-        ma.fillParticleList(decayString="pi+:FEI_cleaned",
-                            cut=CleanedTrackCuts, path=path)
-        ma.fillParticleList(decayString="gamma:FEI_cleaned",
-                            cut=CleanedClusterCuts, path=path)
-
-        ma.buildEventKinematics(inputListNames=["pi+:FEI_cleaned",
-                                                "gamma:FEI_cleaned"],
-                                path=path)
-
         ma.buildEventShape(inputListNames=['pi+:FEI_cleaned', 'gamma:FEI_cleaned'],
-                           allMoments=True,
                            foxWolfram=True,
-                           harmonicMoments=True,
-                           cleoCones=True,
-                           thrust=True,
-                           collisionAxis=True,
-                           jets=True,
-                           sphericity=True,
+                           harmonicMoments=False,
+                           cleoCones=False,
+                           thrust=False,
+                           collisionAxis=False,
+                           jets=False,
+                           sphericity=False,
                            checkForDuplicates=True,
                            path=path)
 
-        # additional cut on Fox WR R2
+        # tightened cuts on sigprob and cosThetaBY as well as additional cut on Fox WR R2
         vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
-
-        EventCuts = " and ".join(
+        TighterCuts = " and ".join(
             [
-                f"nCleanedTracks({CleanedTrackCuts})>=3",
-                f"nCleanedECLClusters({CleanedClusterCuts})>=3",
-                "visibleEnergyOfEventCMS>4",
-                "foxWolframR2_maskedNaN<0.40",
+                "foxWolframR2_maskedNaN<0.4",
+                "dmID < 8",
+                "log10(sigProb) > -2.0",
+                "-1.75 < cosThetaBY < 1.1",
+                "p_lepton_CMSframe > 1.0"
             ]
         )
-        eselect = b2.register_module('VariableToReturnValue')
-        eselect.param('variable', 'passesEventCut(' + EventCuts + ')')
-        path.add_module(eselect)
-        empty_path = b2.create_path()
-        eselect.if_value('<1', empty_path)
-
-        ma.copyList("B0:SLRDstar", "B0:semileptonic", path=path)
-
-        ma.applyCuts("B0:SLRDstar", "dmID<8", path=path)
-        # tightened cut on sigprob
-        ma.applyCuts("B0:SLRDstar", "log10(sigProb)>-2.0", path=path)
-        # tightened cut on cosThetaBY
-        ma.applyCuts("B0:SLRDstar", "-1.75<cosThetaBY<1.1", path=path)
-        ma.applyCuts("B0:SLRDstar", "p_lepton_CMSframe>1.0", path=path)
+        ma.cutAndCopyList("B0:SLRDstar", "B0:semileptonic", TighterCuts, path=path)
 
         # best candidate selection on signal probability
         ma.rankByHighest("B0:SLRDstar", "sigProb", numBest=1,
@@ -656,7 +621,7 @@ class feiSLB0_RDstar(BaseFEISkim):
             variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -693,11 +658,8 @@ class feiSLBplus(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B+:semileptonic", "dmID<8", path=path)
-        ma.applyCuts("B+:semileptonic", "log10_sigProb>-2.4", path=path)
-        ma.applyCuts("B+:semileptonic", "-4.0<cosThetaBY<3.0", path=path)
-        ma.applyCuts("B+:semileptonic", "p_lepton_CMSframe>1.0", path=path)
-
+        Bcuts = " and ".join(["dmID < 8", "log10_sigProb > -2.4", "-4 < cosThetaBY < 3", "p_lepton_CMSframe > 1"])
+        ma.applyCuts("B+:semileptonic", Bcuts, path=path)
         return ["B+:semileptonic"]
 
     def validation_histograms(self, path):
@@ -734,7 +696,7 @@ class feiSLBplus(BaseFEISkim):
             variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -773,18 +735,11 @@ class feiHadronic(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.copyList("B0:feiHadronic", "B0:generic", path=path)
-        ma.copyList("B+:feiHadronic", "B+:generic", path=path)
-        HadronicBLists = ["B0:feiHadronic", "B+:feiHadronic"]
-
-        for BList in HadronicBLists:
-            ma.applyCuts(BList, "Mbc>5.2", path=path)
-            ma.applyCuts(BList, "abs(deltaE)<0.300", path=path)
-
-        ma.applyCuts("B+:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
-        ma.applyCuts("B0:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)
-
-        return HadronicBLists
+        ma.cutAndCopyList("B0:feiHadronic", "B0:generic",
+                          "Mbc > 5.2 and abs(deltaE) < 0.3 and [sigProb > 0.001 or extraInfo(dmID)==23]", path=path)
+        ma.cutAndCopyList("B+:feiHadronic", "B+:generic",
+                          "Mbc > 5.2 and abs(deltaE) < 0.3 and [sigProb > 0.001 or extraInfo(dmID)==25]", path=path)
+        return ["B0:feiHadronic", "B+:feiHadronic"]
 
 
 @_FEI_skim_header(["B0", "B+"])
@@ -826,26 +781,18 @@ class feiHadronic_DstEllNu(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.copyList("B0:feiHadronicDstEllNu", "B0:generic", path=path)
-        ma.copyList("B+:feiHadronicDstEllNu", "B+:generic", path=path)
+        ma.cutAndCopyList("B0:feiHadronicDstEllNu", "B0:generic", "sigProb > 0.001 or extraInfo(dmID)==23", path=path)
+        ma.cutAndCopyList("B+:feiHadronicDstEllNu", "B+:generic", "sigProb > 0.001 or extraInfo(dmID)==25", path=path)
         HadronicBLists = ["B0:feiHadronicDstEllNu", "B+:feiHadronicDstEllNu"]
 
-        ma.applyCuts(
-            "B+:feiHadronicDstEllNu", "sigProb>0.001 or extraInfo(dmID)==25", path=path
-        )
-        ma.applyCuts(
-            "B0:feiHadronicDstEllNu", "sigProb>0.001 or extraInfo(dmID)==23", path=path
-        )
-
         for BList in HadronicBLists:
-            ma.applyCuts(BList, "Mbc>5.27", path=path)
-            ma.applyCuts(BList, "-0.150 <= deltaE <= 0.100", path=path)
+            ma.applyCuts(BList, "Mbc > 5.27 and -0.15 <= deltaE <= 0.10", path=path)
             # Need to build Btag_ROE to build continuum suppression variables i.e. cosTBTO
             self._build_continuum_suppression(particle_list=BList, path=path)
             ma.applyCuts(BList, "cosTBTO < 0.9", path=path)
             # Keep only the best 2 candidates that survive based on the Signal probability.
             # The second candidate is kept just in case an analyst wishes to
-            # perform some tag sipyde studies
+            # perform some tag side studies
             ma.rankByHighest(
                 particleList=BList,
                 variable="extraInfo(SignalProbability)",
@@ -907,7 +854,7 @@ class feiHadronic_DstEllNu(BaseFEISkim):
             "clusters": [
                 "clusterNHits > 1.5",
                 "[[clusterReg==1 and E > 0.080] or [clusterReg==2 and E > 0.030] or [clusterReg==3 and E > 0.060]]",
-                "[[clusterTheta > 0.2967] and [clusterTheta < 2.6180]]",
+                "thetaInCDCAcceptance",
                 "abs(clusterTiming) < 200",
             ],
         }
@@ -949,14 +896,7 @@ class feiSL(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.copyList("B0:feiSL", "B0:semileptonic", path=path)
-        ma.copyList("B+:feiSL", "B+:semileptonic", path=path)
-        SLBLists = ["B0:feiSL", "B+:feiSL"]
-
-        Bcuts = ["log10_sigProb>-2.4", "-4.0<cosThetaBY<3.0", "p_lepton_CMSframe>1.0"]
-
-        for BList in SLBLists:
-            for cut in Bcuts:
-                ma.applyCuts(BList, cut, path=path)
-
-        return SLBLists
+        Bcuts = " and ".join(["log10_sigProb > -2.4", "-4 < cosThetaBY < 3", "p_lepton_CMSframe > 1"])
+        ma.cutAndCopyList("B0:feiSL", "B0:semileptonic", Bcuts, path=path)
+        ma.cutAndCopyList("B+:feiSL", "B+:semileptonic", Bcuts, path=path)
+        return ["B0:feiSL", "B+:feiSL"]

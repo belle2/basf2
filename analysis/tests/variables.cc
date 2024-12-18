@@ -391,6 +391,8 @@ namespace {
     EXPECT_FLOAT_EQ(0.5, trackPValue(part));
     EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
     EXPECT_FLOAT_EQ(position.Rho(), trackD0(part));
+    EXPECT_FLOAT_EQ(particleDRho(part), std::fabs(trackD0FromIP(part)));
+    EXPECT_FLOAT_EQ(particleDZ(part), trackZ0FromIP(part));
     EXPECT_FLOAT_EQ(3, trackNCDCHits(part));
     EXPECT_FLOAT_EQ(24, trackNSVDHits(part));
     EXPECT_FLOAT_EQ(12, trackNPXDHits(part));
@@ -986,6 +988,48 @@ namespace {
     EXPECT_NEAR(std::get<double>(var->function(p0)), p1->getMass(), 1e-6);
   }
 
+  TEST_F(MetaVariableTest, useMCancestorBRestFrame)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<Particle> particles;
+    StoreArray<MCParticle> mcparticles;
+    particles.registerInDataStore();
+    mcparticles.registerInDataStore();
+    particles.registerRelationTo(mcparticles);
+    MCParticleGraph mcGraph;
+    // MC mother of the MC particle
+    MCParticleGraph::GraphParticle& mcMother = mcGraph.addParticle();
+    // MC particle of the reconstructed one
+    MCParticleGraph::GraphParticle& mcParticle = mcGraph.addParticle();
+    mcParticle.comesFrom(mcMother);
+    mcGraph.generateList();
+    // Reconstructed particle
+    Particle particle({ 0.1, -0.4, 0.8, 1.0 }, 411);
+    auto* p = particles.appendNew(particle);
+    p->setVertex(XYZVector(1.0, 2.0, 2.0));
+    p->addRelationTo(mcparticles[1]);
+
+    mcparticles[1]->setPDG(411);
+
+    // MC mother of the MC particle
+    mcparticles[0]->setMomentum(XYZVector(0.0, 0.0, 0.1));
+    mcparticles[0]->setStatus(MCParticle::c_PrimaryParticle);
+    mcparticles[0]->setPDG(511);
+    mcparticles[0]->setMassFromPDG();
+    DataStore::Instance().setInitializeActive(false);
+
+    const Manager::Var* var = Manager::Instance().getVariable("useMCancestorBRestFrame(p)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0.88333338);
+
+    var = Manager::Instance().getVariable("useMCancestorBRestFrame(E)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0.98502684);
+
+    var = Manager::Instance().getVariable("useMCancestorBRestFrame(distance)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 3.0007174);
+  }
 
   TEST_F(MetaVariableTest, extraInfo)
   {

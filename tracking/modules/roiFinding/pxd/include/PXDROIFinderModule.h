@@ -84,5 +84,7 @@ namespace Belle2 {
 
     bool m_overrideDBROICalculation = false; /**< Override DB parameters for ROI calculation for debugging and testing. */
 
+    bool m_ROIFindingForDQM = false; /**< ROI finding for DQM or for data reduction */
+
   };
 }

@@ -454,7 +454,7 @@ namespace Belle2 {
     }
 
     unsigned seu = len[2];
-    // This line (16 bits) is actaully not used for data length.
+    // This line (16 bits) is actually not used for data length.
     len[2] = 0;
     len[3] = 0;
     uint32_t* tmp = (uint32_t*)len;
@@ -504,7 +504,7 @@ namespace Belle2 {
     unsigned vth_info = len[3] * 256 + len[2];
     if (vth_info >= 32768) { head.thscan_mode = true; vth_info -= 32768; }
     head.vth = vth_info;
-    // This line (16 bits) is actaully not used for data length.
+    // This line (16 bits) is actually not used for data length.
     len[2] = 0;
     len[3] = 0;
     uint32_t* tmp = (uint32_t*)len;

@@ -18,7 +18,7 @@ namespace Belle2 {
   namespace SVD {
 
     /**
-     * structure containing the relevant informations
+     * structure containing the relevant information
      * of eachstrip of the cluster
      */
     struct stripInCluster {

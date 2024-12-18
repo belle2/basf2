@@ -9,7 +9,7 @@
 
 #include <tracking/trackFitting/measurementCreator/adder/MeasurementAdder.h>
 #include <framework/gearbox/Const.h>
-
+#include <framework/core/Environment.h>
 #include <tracking/dbobjects/DAFparameters.h>
 
 #include <TError.h>
@@ -133,7 +133,13 @@ namespace Belle2 {
       m_measurementAdder(storeArrayNameOfPXDHits, storeArrayNameOfSVDHits, storeArrayNameOfCDCHits,
                          storeArrayNameOfBKLMHits, storeArrayNameOfEKLMHits, initializeCDCTranslators)
     {
-      resetFitterToDefaultSettings();
+      if (Environment::Instance().isCosmicRun()) {
+        // Resetting with parameters for cosmics data
+        resetFitterToCosmicsSettings();
+      } else {
+        // Resetting with parameters for beam data
+        resetFitterToDBSettings();
+      }
     }
 
     /// Helper function to multiply the PDG code of a charged stable with the charge of the reco track (if needed)
@@ -148,10 +154,25 @@ namespace Belle2 {
     void resetFitter(const std::shared_ptr<genfit::AbsFitter>& fitter);
 
     /**
-     * Use the default settings of the fitter to fit the reco tracks.
-     * This method is called on construction automatically.
+     * Use the DB settings of the fitter to fit the reco tracks.
+     * This method is called on construction automatically
+     * for non cosmics data (checked by using Environment object).
      */
-    void resetFitterToDefaultSettings();
+    void resetFitterToDBSettings();
+
+    /**
+    * Use the user settings of the fitter to fit the reco tracks.
+    * The parameters are passed as DAFparameters object.
+    */
+    void resetFitterToUserSettings(DAFparameters* DAFparams);
+
+    /**
+     * Use the settings of the fitter to fit the reco tracks for cosmics data.
+     * This method is called on construction automatically
+     * for cosmics data (checked by using Environment object).
+     * The cosmics parameters are the initial ones of the DAFparameters constructor.
+     */
+    void resetFitterToCosmicsSettings();
 
     /**
      * Fit a reco track with a given non-default track representation.

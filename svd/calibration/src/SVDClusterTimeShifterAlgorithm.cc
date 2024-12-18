@@ -49,7 +49,7 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
 
   auto payload = new Belle2::SVDClusterTimeShifter(Form("SVDClusterTimeShifter_%s_rev_%d", m_id.data(), cal_rev));
 
-  // single gaus fit function
+  // single gauss fit function
   TF1* fn_singleGaus = new TF1("fn_singleGaus", singleGaus, -50., 50., 4);
   fn_singleGaus->SetLineColor(kGreen + 2);
   fn_singleGaus->SetParName(0, "N");
@@ -57,7 +57,7 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
   fn_singleGaus->SetParName(2, "#sigma");
   fn_singleGaus->SetParName(3, "C");
 
-  // double gaus fit function
+  // double gauss fit function
   TF1* fn_doubleGaus = new TF1("fn_doubleGaus", doubleGaus, -50., 50., 7);
   fn_doubleGaus->SetLineColor(kRed + 2);
   fn_doubleGaus->SetParName(0, "N");
@@ -203,7 +203,7 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
         ptstats->SetOptStat(11);
         ptstats->SetParent(hist);
         ptstats->Draw();
-        ptstats->AddText("Single Gaus");
+        ptstats->AddText("Single Gauss");
         for (int npar = 0; npar < (fn_singleGaus->GetNpar()); npar++)
           ptstats->AddText(TString::Format("%s = %.3f #pm %.4f",
                                            fn_singleGaus->GetParName(npar),
@@ -219,7 +219,7 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
         ptstats->SetOptStat(11);
         ptstats->SetParent(hist);
         ptstats->Draw();
-        ptstats->AddText("Double Gaus");
+        ptstats->AddText("Double Gauss");
         for (int npar = 0; npar < (fn_doubleGaus->GetNpar()); npar++)
           ptstats->AddText(TString::Format("%s = %.3f #pm %.4f",
                                            fn_doubleGaus->GetParName(npar),
@@ -243,12 +243,12 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
         if (isDoubleGausFitValid) {
           fillShiftVal = (fn_doubleGaus->GetParameter(1) > 0.5 ?
                           fn_doubleGaus->GetParameter(2) : fn_doubleGaus->GetParameter(4));
-          ptstats->AddText(TString::Format("#splitline{Shift Value from Double Gaus}{%.3f}", fillShiftVal));
+          ptstats->AddText(TString::Format("#splitline{Shift Value from Double Gauss}{%.3f}", fillShiftVal));
         } else if (isSingleGausFitValid) {
           fillShiftVal = fn_singleGaus->GetParameter(1);
           B2WARNING("Fit failed for " << hist->GetName() <<
-                    "; using mean from single gaus fit. ");
-          ptstats->AddText(TString::Format("#splitline{Shift Value from Single Gaus}{%.3f}", fillShiftVal));
+                    "; using mean from single gauss fit. ");
+          ptstats->AddText(TString::Format("#splitline{Shift Value from Single Gauss}{%.3f}", fillShiftVal));
         }
 
         if (std::fabs(fillShiftVal) > m_maximumAllowedShift) {

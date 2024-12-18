@@ -156,7 +156,7 @@ void PXDDigitSorterModule::event()
   storeDigits.getPtr()->ExpandCreate(index);
 
   // Finally we just need to reorder the RelationArrays and delete elements
-  // referencing pixels which were ignored because that adress was set more
+  // referencing pixels which were ignored because that address was set more
   // than once
   RelationArray::ReplaceVec<> from(relationIndices);
   RelationArray::Identity to;

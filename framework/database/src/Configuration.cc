@@ -22,7 +22,7 @@
 #include <TPython.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "main_2023-09-18"
+#define CURRENT_DEFAULT_TAG "main_2024-07-19"
 
 namespace py = boost::python;
 
@@ -601,7 +601,7 @@ Parameters:
   backoff_factor (int): backoff factor for retries in seconds. Retries are
       performed using something similar to binary backoff: For retry :math:`n`
       and a ``backoff_factor`` :math:`f` we wait for a random time chosen
-      uniformely from the interval :math:`[1, (2^{n} - 1) \times f]` in
+      uniformly from the interval :math:`[1, (2^{n} - 1) \times f]` in
       seconds.
 )DOC")
     .def("set_globaltag_callback", &Configuration::setGlobaltagCallbackPy, R"DOC(set_globaltag_callback(function)

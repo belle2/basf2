@@ -31,6 +31,7 @@ DQMHistAnalysisModule::HistList DQMHistAnalysisModule::s_histList;
 DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::s_monObjList;
 DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::s_deltaList;
 DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::s_canvasUpdatedList;
+DQMHistAnalysisModule::RefList DQMHistAnalysisModule::s_refList;
 #ifdef _BELLE2_EPICS
 std::vector <chid>  DQMHistAnalysisModule::m_epicsChID;
 #endif
@@ -44,6 +45,15 @@ DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
 {
   //Set module properties
   setDescription("Histogram Analysis module base class");
+}
+
+void DQMHistAnalysisModule::clearlist()
+{
+  s_histList.clear();
+  s_refList.clear();
+// s_monObjList;
+  s_deltaList.clear();
+  s_canvasUpdatedList.clear();
 }
 
 bool DQMHistAnalysisModule::addHist(const std::string& dirname, const std::string& histname, TH1* h)
@@ -60,13 +70,28 @@ bool DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
     auto it = s_deltaList.find(fullname);
     if (it != s_deltaList.end()) {
       B2DEBUG(20, "Found Delta" << fullname);
-      it->second->update(h); // update
+      it->second.update(h); // update
     }
     return true; // histogram changed
   }
 
-  return false; // histogram didnt change
+  return false; // histogram didn't change
 }
+
+// void DQMHistAnalysisModule::addRef(const std::string& dirname, const std::string& histname, TH1* ref)
+// {
+//   std::string fullname;
+//   if (dirname.size() > 0) {
+//     fullname = dirname + "/" + histname;
+//   } else {
+//     fullname = histname;
+//   }
+//   auto it = s_refList.find(fullname);
+//   if (it == s_refList.end()) {
+//     B2DEBUG(1, "Did not find histogram " << fullname << "in s_refList, so inserting now.");
+//     s_refList.insert({fullname, ref});
+//   }
+// }
 
 void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::EDeltaType t, int p,
                                         unsigned int a)
@@ -77,7 +102,7 @@ void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::s
   } else {
     fullname = histname;
   }
-  s_deltaList[fullname] = new HistDelta(t, p, a);
+  s_deltaList[fullname].set(t, p, a);
 }
 
 bool DQMHistAnalysisModule::hasDeltaPar(const std::string& dirname, const std::string& histname)
@@ -106,7 +131,7 @@ TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n, bool on
 {
   auto it = s_deltaList.find(fullname);
   if (it != s_deltaList.end()) {
-    return it->second->getDelta(n, onlyIfUpdated);
+    return it->second.getDelta(n, onlyIfUpdated);
   }
   B2WARNING("Delta hist " << fullname << " not found");
   return nullptr;
@@ -114,17 +139,8 @@ TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n, bool on
 
 MonitoringObject* DQMHistAnalysisModule::getMonitoringObject(const std::string& objName)
 {
-  if (s_monObjList.find(objName) != s_monObjList.end()) {
-    if (s_monObjList[objName]) {
-      return s_monObjList[objName];
-    } else {
-      B2WARNING("MonitoringObject " << objName << " listed as being in memfile but points to nowhere. New Object will be made.");
-      s_monObjList.erase(objName);
-    }
-  }
-
-  MonitoringObject* obj = new MonitoringObject(objName);
-  s_monObjList.insert(MonObjList::value_type(objName, obj));
+  auto obj = &s_monObjList[objName];
+  obj->SetName(objName.c_str());
   return obj;
 }
 
@@ -164,9 +180,54 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   return findHist(histname, updated);
 }
 
+TH1* DQMHistAnalysisModule::scaleReference(ERefScaling scaling, const TH1* hist, TH1* ref)
+{
+  // if hist/ref is nullptr, nothing to do
+  if (!hist || !ref)
+    return ref;
+
+  switch (scaling) {
+    // default: do nothing
+    case ERefScaling::c_RefScaleNone: //do nothing
+      break;
+    case ERefScaling::c_RefScaleEntries: // Integral
+      // only if we have entries in reference
+      if (hist->Integral() != 0 and ref->Integral() != 0) {
+        ref->Scale(hist->Integral() / ref->Integral());
+      }
+      break;
+    case ERefScaling::c_RefScaleMax: // Maximum
+      // only if we have entries in reference
+      if (hist->GetMaximum() != 0 and ref->GetMaximum() != 0) {
+        ref->Scale(hist->GetMaximum() / ref->GetMaximum());
+      }
+      break;
+  }
+  return ref;
+}
+
+TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, ERefScaling scaling, const TH1* hist)
+{
+  if (s_refList.find(histname) != s_refList.end()) {
+    // get a copy of the reference which we can modify
+    // (it is still owned and managed by the framework)
+    // then do the scaling
+    return scaleReference(scaling, hist, s_refList[histname].getReference());
+  }
+  return nullptr;
+}
+
+TH1* DQMHistAnalysisModule::findRefHist(const std::string& dirname, const std::string& histname, ERefScaling scaling,
+                                        const TH1* hist)
+{
+  if (dirname.size() > 0) {
+    return findRefHist(dirname + "/" + histname, scaling, hist);
+  }
+  return findRefHist(histname, scaling, hist);
+}
+
 TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCanvas** cobj)
 {
-
   TCanvas* cnv = nullptr;
   // try to get canvas from outside
   if (cobj) cnv = *cobj;
@@ -224,15 +285,10 @@ TH1* DQMHistAnalysisModule::findHistInFile(TFile* file, const std::string& histn
 MonitoringObject* DQMHistAnalysisModule::findMonitoringObject(const std::string& objName)
 {
   if (s_monObjList.find(objName) != s_monObjList.end()) {
-    if (s_monObjList[objName]) {
-      //Want to search elsewhere if null-pointer saved in map
-      return s_monObjList[objName];
-    } else {
-      B2ERROR("MonitoringObject " << objName << " listed as being in memfile but points to nowhere.");
-    }
+    return &s_monObjList[objName];
   }
   B2INFO("MonitoringObject " << objName << " not in memfile.");
-  return NULL;
+  return nullptr;
 }
 
 double DQMHistAnalysisModule::getSigma68(TH1* h) const
@@ -267,12 +323,13 @@ void DQMHistAnalysisModule::clearCanvases(void)
 
 void DQMHistAnalysisModule::initHistListBeforeEvent(void)
 {
-  for (auto& h : s_histList) {
-    // attention, we need the reference, otherwise we work on a copy
-    h.second.resetBeforeEvent();
+  for (auto& it : s_histList) {
+    // attention, we must use reference, otherwise we work on a copy
+    it.second.resetBeforeEvent();
   }
-  for (auto d : s_deltaList) {
-    d.second->setNotUpdated();
+  for (auto& it : s_deltaList) {
+    // attention, we must use reference, otherwise we work on a copy
+    it.second.setNotUpdated();
   }
 
   s_canvasUpdatedList.clear();
@@ -283,10 +340,15 @@ void DQMHistAnalysisModule::clearHistList(void)
   s_histList.clear();
 }
 
+void DQMHistAnalysisModule::clearRefList(void)
+{
+  s_refList.clear();
+}
+
 void DQMHistAnalysisModule::resetDeltaList(void)
 {
-  for (auto d : s_deltaList) {
-    d.second->reset();
+  for (auto& d : s_deltaList) {
+    d.second.reset();
   }
 }
 
@@ -451,7 +513,7 @@ double DQMHistAnalysisModule::getEpicsPV(std::string keyname)
     B2ERROR("Epics PV " << keyname << " not registered!");
     return value;
   }
-  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value can't be assumed to be stable
   // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
   // outstanding get requests are not automatically reissued following reconnect.
   auto r = ca_get(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value);
@@ -474,7 +536,7 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
     B2ERROR("Epics PV with " << index << " not registered!");
     return value;
   }
-  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value can't be assumed to be stable
   // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
   // outstanding get requests are not automatically reissued following reconnect.
   auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], (void*)&value);
@@ -498,7 +560,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname, bool& s
     B2ERROR("Epics PV " << keyname << " not registered!");
     return std::string(value);
   }
-  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value can't be assumed to be stable
   // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
   // outstanding get requests are not automatically reissued following reconnect.
   auto r = ca_get(DBR_STRING, m_epicsNameToChID[keyname], value);
@@ -523,7 +585,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(int index, bool& status)
     B2ERROR("Epics PV with " << index << " not registered!");
     return std::string(value);
   }
-  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value can't be assumed to be stable
   // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
   // outstanding get requests are not automatically reissued following reconnect.
   auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], value);
@@ -610,11 +672,11 @@ bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(chid pv, double& lowerAlar
 {
   // get warn and error limit only if pv exists
   // overwrite only if limit is defined (not NaN)
-  // user should initilize with NaN before calling, unless
+  // user should initialize with NaN before calling, unless
   // some "default" values should be set otherwise
   if (pv != nullptr) {
     struct dbr_ctrl_double tPvData;
-    // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+    // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value can't be assumed to be stable
     // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
     // outstanding get requests are not automatically reissued following reconnect.
     auto r = ca_get(DBR_CTRL_DOUBLE, pv, &tPvData);

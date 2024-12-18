@@ -111,7 +111,7 @@ class PXDPositionEstimation(b2.Module):
 
         for truehit in truehits:
             if isinstance(truehit, Belle2.PXDTrueHit):
-                sensor_info = Belle2.VXD.GeoCache.get(truehit.getSensorID())
+                sensor_info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(truehit.getSensorID())
                 clusters = truehit.getRelationsFrom("PXDClusters")
 
                 # now check if we find a cluster
@@ -178,10 +178,10 @@ class PXDPositionEstimation(b2.Module):
 
                         offset = PositionEstimator.getClusterOffset(cls, tu, tv)
                         if offset:
-                            # Now, we can safely querry the correction
+                            # Now, we can safely query the correction
                             self.nfound_offset += 1
 
-                            # We need to explicitely add a shift to the offsets
+                            # We need to explicitly add a shift to the offsets
                             # This is not needed when working with PXDRecoHits
                             shiftU = sensor_info.getUCellPosition(cls.getUStart())
                             shiftV = sensor_info.getVCellPosition(cls.getVStart())

@@ -14,7 +14,6 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
 #include <Math/Vector4D.h>
@@ -122,7 +121,7 @@ int HepevtReader::readEventHeader(int& eventID, double& eventWeight)
   tokenizer tokens(line, sep);
   int index(0);
 
-  BOOST_FOREACH(const string & tok, tokens) {
+  for (const string& tok : tokens) {
     ++index;
     try {
       fields.push_back(boost::lexical_cast<double>(tok));
@@ -161,7 +160,7 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle)
   tokenizer tokens(line, sep);
   int index(0);
 
-  BOOST_FOREACH(const string & tok, tokens) {
+  for (const string& tok : tokens) {
     ++index;
     try {
       fields.push_back(boost::lexical_cast<double>(tok));

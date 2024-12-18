@@ -18,22 +18,38 @@ from tabulate import tabulate
 
 _RegisteredSkims = [
     # --- Flagged skims ---
-    ("21000100", "flagged", "f_SLME_p1"),
-    ("21000200", "flagged", "f_SLME_p2"),
-    ("22000100", "flagged", "f_EWP_p1"),
-    ("22000200", "flagged", "f_EWP_p2"),
-    ("23000100", "flagged", "f_TDCPV_p1"),
-    ("23000200", "flagged", "f_TDCPV_p2"),
-    ("24000100", "flagged", "f_bhadronic_p1"),  # btocharmless is included here
-    ("24000200", "flagged", "f_bhadronic_p2"),  # btocharmless is included here
-    ("25000100", "flagged", "f_quarkonium_p1"),
-    ("25000200", "flagged", "f_quarkonium_p2"),
-    ("27000100", "flagged", "f_charm_p1"),
-    ("27000200", "flagged", "f_charm_p2"),
-    ("28000100", "flagged", "f_dark_p1"),
-    ("28000200", "flagged", "f_dark_p2"),
-    ("29000100", "flagged", "f_tau_p1"),
-    ("29000200", "flagged", "f_tau_p2"),
+    ("71000100", "flagged", "f_SLME_p1"),
+    ("71000200", "flagged", "f_SLME_p2"),
+    ("71000300", "flagged", "f_SLME_p3"),
+    ("71000400", "flagged", "f_SLME_p4"),
+    ("72000100", "flagged", "f_EWP_p1"),
+    ("72000200", "flagged", "f_EWP_p2"),
+    ("72000300", "flagged", "f_EWP_p3"),
+    ("72000400", "flagged", "f_EWP_p4"),
+    ("73000100", "flagged", "f_TDCPV_p1"),
+    ("73000200", "flagged", "f_TDCPV_p2"),
+    ("73000300", "flagged", "f_TDCPV_p3"),
+    ("73000400", "flagged", "f_TDCPV_p4"),
+    ("74000100", "flagged", "f_bhadronic_p1"),  # btocharmless is included here
+    ("74000200", "flagged", "f_bhadronic_p2"),  # btocharmless is included here
+    ("74000300", "flagged", "f_bhadronic_p3"),  # btocharmless is included here
+    ("74000400", "flagged", "f_bhadronic_p4"),  # btocharmless is included here
+    ("75000100", "flagged", "f_quarkonium_p1"),
+    ("75000200", "flagged", "f_quarkonium_p2"),
+    ("75000300", "flagged", "f_quarkonium_p3"),
+    ("75000400", "flagged", "f_quarkonium_p4"),
+    ("77000100", "flagged", "f_charm_p1"),
+    ("77000200", "flagged", "f_charm_p2"),
+    ("77000300", "flagged", "f_charm_p3"),
+    ("77000400", "flagged", "f_charm_p4"),
+    ("78000100", "flagged", "f_dark_p1"),
+    ("78000200", "flagged", "f_dark_p2"),
+    ("78000300", "flagged", "f_dark_p3"),
+    ("78000400", "flagged", "f_dark_p4"),
+    ("79000100", "flagged", "f_tau_p1"),
+    ("79000200", "flagged", "f_tau_p2"),
+    ("79000300", "flagged", "f_tau_p3"),
+    ("79000400", "flagged", "f_tau_p4"),
 
     # --- WG0: Systematics ---
     ("10000000", "systematics", "Random"),
@@ -74,12 +90,17 @@ _RegisteredSkims = [
     ("12160100", "ewp", "BtoXgamma"),
     ("12160200", "ewp", "BtoXll"),
     ("12160300", "ewp", "BtoXll_LFV"),
+    ("12120400", "ewp", "B0TwoBody"),
+    ("12120500", "ewp", "FourLepton"),
+    ("12120600", "ewp", "RadiativeDilepton"),
     # ("12160400", "ewp", "inclusiveBplusToKplusNuNu"), # deprecated skim
 
     # --- WG3: Time-dependent CP violation ---
     ("13160200", "tdcpv", "TDCPV_ccs"),
     ("13160300", "tdcpv", "TDCPV_qqs"),
+    ("13160400", "tdcpv", "TDCPV_klong"),
     ("13130300", "tdcpv", "TDCPV_dilepton"),
+    ("13110100", "tdcpv", "TDCPV_inclusiveJpsi"),
 
 
     # --- WG4: Charmed B decays ---
@@ -115,6 +136,14 @@ _RegisteredSkims = [
     ("14121300", "btocharm", "B0toD0Kpipi0_pi0"),
     ("14160200", "btocharm", "B0toDs1D"),
     ("14160201", "btocharm", "B0toDDs0star"),
+    ("14141701", "btocharm", "B0toDomegapi_Kpipi_pipipi0"),
+    ("14141702", "btocharm", "B0toDomegapi_Kspi_pipipi0"),
+    ("14141703", "btocharm", "BtoD0pi_Kpiomega_pipipi0"),
+    ("14121401", "btocharm", "BtoDstpipi_D0pi_Kpi"),
+    ("14121402", "btocharm", "BtoDpipi_Kpipi"),
+    ("14121403", "btocharm", "BtoDsDsst_Kpi_KK"),
+    ("14123300", "btocharm", "antiB0toDpipi0_Kpipi"),
+    ("14163400", "btocharm", "antiB0toDsDsst_Kpi0"),
 
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),
@@ -137,8 +166,9 @@ _RegisteredSkims = [
     # Charmed baryons
     ("17230900", "charm", "LambdacToSHpJm"),  # Lambda_c+ -> Sigma+ h+ j-
     ("17231000", "charm", "XicpTopHpJm"),  # Xi_c+ -> proton h+ j-
-    ("17231100", "charm", "XictoXimpippim"),  # Xi_c+ -> Sigma+/Xi h+ j- (k+)
+    ("17231100", "charm", "XicToXimPipPim"),  # Xi_c+ -> Sigma+/Xi h+ j- (k+)
     ("17231200", "charm", "Xic0ToLHpJm"),  # Xi_c0 -> Lambda0 h+ j-
+    ("17231300", "charm", "XicpToLKsHp"),  # Xi_c+ -> Lambda Ks h+, Xi- pi+ h+
     # D* -> D0
     ("17240100", "charm", "DstToD0Pi_D0ToHpJm"),  # D* -> D0 -> K pi/pi pi/K K
     # D* -> D0 -> K/pi- pi/pi+ pi0 (RS+WS)
@@ -155,14 +185,16 @@ _RegisteredSkims = [
     ("17240900", "charm", "EarlyData_DstToD0Pi_D0ToHpHmPi0"),  # D* -> D0 -> h h pi0
     ("17241000", "charm", "DstToDpPi0_DpToHpPi0"),  # D*+ -> D+ pi0, D+ -> h+ pi0
     ("17232000", "charm", "DpToHpPi0"),  # D+ -> h+ pi0
-    ("17222100", "charm", "DpToKsHp"),  # D+ -> Ks pi+
     ("17241100", "charm", "DstToD0Pi_D0ToHpHmHpJm"),  # D* -> D0 -> h h h j
     ("17241200", "charm", "DstToD0Pi_D0ToVGamma"),  # D* -> D0 -> vgamma
-    ("17220100", "charm", "DpToPipepem"),  # D+ -> pi+ e+ e-
-    ("17220200", "charm", "DpToPipmupmum"),  # D+ -> pi+ mu+ mu-
+    ("17220100", "charm", "DpToPipEpEm"),  # D+ -> pi+ e+ e-
+    ("17220200", "charm", "DpToPipMupMum"),  # D+ -> pi+ mu+ mu-
     ("17220300", "charm", "DpToPipKpKm"),  # D+ -> pi+ K+ K-
     ("17260100", "charm", "DpToHpOmega"),  # D+ -> K/pi+ omega / omega -> pi+ pi- pi0
     ("17260200", "charm", "DspToHpOmega"),  # D_s+ -> K/pi+ omega / omega -> pi+ pi- pi0
+    ("17241300", "charm", "DpToEtaHp"),  # D+ -> eta h+
+    ("17241400", "charm", "LambdacToGeneric"),  # Lambda_c+ -> X
+
 
 
     # --- WG8: Dark matter searches and tau physics ---
@@ -188,10 +220,13 @@ _RegisteredSkims = [
     ("18370100", "dark", "AA2uuuu"),
     ("18020600", "dark", "DimuonPlusVisibleDarkHiggs"),
     ("18020700", "dark", "DielectronPlusVisibleDarkHiggs"),
+    ("18022400", "dark", "DimuonRecoilMassSquared"),
     ("18530600", "lowMulti", "LowMassOneTrack"),
+    ("18022500", "dark", "DarkShower"),
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),
+    ("19130600", "btocharmless", "BtoPi0Eta"),
     ("19130201", "btocharmless", "BtoHadTracks"),
     ("19130300", "btocharmless", "BtoHad1Pi0"),
     ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),

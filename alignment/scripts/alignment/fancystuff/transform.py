@@ -259,7 +259,7 @@ class ToFlat(Transform):
         """
         Fit function calculates the cumulative distribution with numpy percentile.
 
-        :param x:   Inout distribution
+        :param x:   Input distribution
         :param y:   Will not be used in this transformation
         """
         self.io.debug("Fitting Flat")

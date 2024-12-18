@@ -52,7 +52,7 @@ if __name__ == "__main__":
     store_mc_truth = True
 
     path = b2.create_path()
-    ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False), path=path)
+    ma.inputMdst(filename=b2.find_file('mdst16.root', 'validation', False), path=path)
 
     b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
     if args.globaltag:
@@ -180,10 +180,6 @@ if __name__ == "__main__":
 
     # -----------------------------------------Tag side reconstruction----------------------------------------
 
-    if store_mc_truth:
-        # Fill particle list of true B0 from ground-truth information
-        ma.fillParticleListFromMC("B0:MC", "", path=path)
-
     graFEI_roe_mask = (
         "graFEIROE",
         cut_charged_graFEI,
@@ -202,13 +198,10 @@ if __name__ == "__main__":
         path=path,
     )
 
-    if store_mc_truth:
-        # Associate parent B to each FSP
-        ma.matchMCTruth("B0:tag", path=path)
-
     # Run graFEI
-    graFEI(
+    graFEI_vars = graFEI(
         "B0:tag",
+        store_mc_truth=store_mc_truth,
         cfg_path=args.config,
         param_file=args.weight,
         payload_config_name="graFEIConfigFile_Breco_example",  # If you default payload name just remove this argument
@@ -216,7 +209,7 @@ if __name__ == "__main__":
         path=path,
     )
 
-    # Reconstructin Upsilon(4S)
+    # Reconstructing Upsilon(4S)
     ma.reconstructDecay("Upsilon(4S):graFEI -> B0:tag B0:sig", "", path=path)
 
     # ---------------- Write information to file ---------------------------
@@ -248,53 +241,6 @@ if __name__ == "__main__":
             ]
         )
 
-    # graFEI variables
-    graFEI_vars = [
-        "graFEI_probEdgeProd",
-        "graFEI_probEdgeMean",
-        "graFEI_probEdgeGeom",
-        "graFEI_validTree",
-        "graFEI_goodEvent",
-        "graFEI_nFSP",
-        "graFEI_nCharged_preFit",
-        "graFEI_nElectrons_preFit",
-        "graFEI_nMuons_preFit",
-        "graFEI_nPions_preFit",
-        "graFEI_nKaons_preFit",
-        "graFEI_nProtons_preFit",
-        "graFEI_nLeptons_preFit",
-        "graFEI_nPhotons_preFit",
-        "graFEI_nOthers_preFit",
-        "graFEI_nCharged_postFit",
-        "graFEI_nElectrons_postFit",
-        "graFEI_nMuons_postFit",
-        "graFEI_nPions_postFit",
-        "graFEI_nKaons_postFit",
-        "graFEI_nProtons_postFit",
-        "graFEI_nLeptons_postFit",
-        "graFEI_nPhotons_postFit",
-        "graFEI_nOthers_postFit",
-        "graFEI_nPredictedUnmatched",
-        "graFEI_nPredictedUnmatched_noPhotons",
-    ]
-    if store_mc_truth:
-        graFEI_vars.extend(
-            [
-                "graFEI_truth_perfectLCA",
-                "graFEI_truth_perfectMasses",
-                "graFEI_truth_perfectEvent",
-                "graFEI_truth_isSemileptonic",
-                "graFEI_truth_nFSP",
-                "graFEI_truth_nPhotons",
-                "graFEI_truth_nElectrons",
-                "graFEI_truth_nMuons",
-                "graFEI_truth_nPions",
-                "graFEI_truth_nKaons",
-                "graFEI_truth_nProtons",
-                "graFEI_truth_nOthers",
-            ]
-        )
-
     # Aliases
     vm.addAlias("Bsig_Rank", "daughter(1, extraInfo(Rank))")
 
@@ -302,7 +248,7 @@ if __name__ == "__main__":
         vm.addAlias(f"Btag_{var}", f"daughter(0, {var})")
         vm.addAlias(f"Bsig_{var}", f"daughter(1, {var})")
     for var in graFEI_vars:
-        vm.addAlias(f"Btag_{var}", f"daughter(0, extraInfo({var}))")
+        vm.addAlias(f"Btag_{var}", f"eventExtraInfo({var})")
 
     graFEI_vars = [f"Btag_{var}" for var in graFEI_vars + default_vars] + \
         ["Btag_Mbc", "Bsig_Rank"] + [f"Bsig_{var}" for var in default_vars]

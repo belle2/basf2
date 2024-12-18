@@ -27,10 +27,10 @@ from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
 from variables import variables as vm
-from ROOT import Belle2
+# from ROOT import Belle2
 
 __liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au>, Tommy Martinov <tommy.martinov@desy.de>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -49,7 +49,7 @@ class PRsemileptonicUntagged(BaseSkim):
 
     Cuts on electrons:
 
-    * :math:`\\text{electronID_noTOP} > 0.5`
+    * :math:`\\text{electronID} > 0.5`
     * :math:`p > 1.5\\,\\text{GeV}` in CMS frame
 
     Cuts on muons:
@@ -103,14 +103,14 @@ class PRsemileptonicUntagged(BaseSkim):
         path = self.skim_event_cuts("foxWolframR2<0.5 and nTracks>4", path=path)
 
         ma.cutAndCopyList("e+:PRSemileptonic_1", "e+:all",
-                          "useCMSFrame(p) > 1.50 and electronID_noTOP > 0.5", path=path)
+                          "useCMSFrame(p) > 1.50 and electronID > 0.5", path=path)
         ma.cutAndCopyList("mu+:PRSemileptonic_1", "mu+:all",
                           "useCMSFrame(p) > 1.50 and muonID > 0.5", path=path)
         ma.cutAndCopyList("pi-:PRSemileptonic_1", "pi-:all",
                           "pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.220", path=path)
 
         ma.cutAndCopyList("e+:PRSemileptonic_2", "e+:all",
-                          "0.600 < useCMSFrame(p) <= 1.50 and electronID_noTOP > 0.5", path=path)
+                          "0.600 < useCMSFrame(p) <= 1.50 and electronID > 0.5", path=path)
         ma.cutAndCopyList("mu+:PRSemileptonic_2", "mu+:all",
                           "0.350 < useCMSFrame(p) <= 1.50 and muonID > 0.5", path=path)
         ma.cutAndCopyList("pi-:PRSemileptonic_2", "pi-:all",
@@ -211,6 +211,7 @@ class SLUntagged(BaseSkim):
         loadStdDstarPlus(path=path)
 
     def build_lists(self, path):
+        path = self.skim_event_cuts("nTracks > 4", path=path)
         ma.cutAndCopyList("e+:SLUntagged", "e+:all", "p>0.35", True, path=path)
         ma.cutAndCopyList("mu+:SLUntagged", "mu+:all", "p>0.35", True, path=path)
         Bcuts = "5.24 < Mbc < 5.29 and abs(deltaE) < 0.5"
@@ -230,13 +231,11 @@ class SLUntagged(BaseSkim):
         bplusList = []
         for chID, channel in enumerate(BplusChannels):
             ma.reconstructDecay(f"B+:SLUntagged_{chID} -> {channel}", Bcuts, chID, path=path)
-            ma.applyCuts(f"B+:SLUntagged_{chID}", "nTracks>4", path=path)
             bplusList.append(f"B+:SLUntagged_{chID}")
 
         b0List = []
         for chID, channel in enumerate(B0Channels):
             ma.reconstructDecay(f"B0:SLUntagged_{chID} -> {channel}", Bcuts, chID, path=path)
-            ma.applyCuts(f"B0:SLUntagged_{chID}", "nTracks>4", path=path)
             b0List.append(f"B0:SLUntagged_{chID}")
 
         return b0List + bplusList
@@ -337,7 +336,7 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
         ma.cutAndCopyList(
             'e+:sig',
             'e+:all',
-            'abs(dr) < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and electronID_noTOP >= 0.95 and 1.1 < useCMSFrame(p) < 2.5 ',
+            'abs(dr) < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and electronID >= 0.95 and 1.1 < useCMSFrame(p) < 2.5 ',
             path=path)
         ma.cutAndCopyList(
             'mu+:sig',
@@ -384,14 +383,14 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     Cuts on electrons:
 
-    * :math:`\\text{pidChargedBDTScore(11,all)} > 0.9`
+    * :math:`\\text{electronID} > 0.3`
     * :math:`p_t > 0.3\\,\\text{GeV}` in lab frame,  :math:`p > 0.5\\,\\text{GeV}` in lab frame
     * :math:`dr < 0.5`,  :math:`|dz| < 2`
     * :math:`\\text{thetaInCDCAcceptance}`
 
     Cuts on muons:
 
-    * :math:`\\text{muonID_noSVD} > 0.9`
+    * :math:`\\text{muonID} > 0.9`
     * :math:`p_t > 0.4\\,\\text{GeV}` in lab frame,  :math:`p > 0.7\\,\\text{GeV}` in lab frame
     * :math:`dr < 0.5`,  :math:`|dz| < 2`
 
@@ -402,7 +401,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     ECL cluster mask for ROE:
 
-    * :math:`\\text{clusterNHits}>1.5`,  :math:`0.2967<\\theta<2.6180`
+    * :math:`\\text{clusterNHits}>1.5`,  :math:`\\theta` in CDC acceptance
     * :math:`E>0.080,\\text{GeV}`
     """
 
@@ -422,19 +421,15 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     def build_lists(self, path):
 
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
-        eIDCut = "pidChargedBDTScore(11,all) > 0.9"
-        muIDCut = "muonID_noSVD > 0.9"
+        eIDCut = "electronID > 0.3"
+        muIDCut = "muonID > 0.9"
         ePCut = "p > 0.5"
         ePtCut = "pt > 0.3"
         muPCut = "p > 0.7"
         muPtCut = "pt > 0.4"
         lepTrkCuts = "dr < 0.5 and abs(dz) < 2"
         hadTrkCuts = "dr < 2.0 and abs(dz) < 4"
-        gammaCuts = "[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]"
+        gammaCuts = "[clusterNHits>1.5] and thetaInCDCAcceptance"
         gammaECuts = "[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.025] or [clusterReg==3 and E>0.040]]"
         cleanMask = ('cleanMask', 'pt>0.05 and dr < 5 and abs(dz) < 10',
                      f'{gammaCuts} and E>0.080 and minC2TDist>20.0 and abs(clusterTiming)<200')
@@ -448,10 +443,6 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         vm.addAlias('cosBY', 'cosThetaBetweenParticleAndNominalB')
         # electrons and muons
         ma.fillParticleList("e-:sig", f"{lepTrkCuts} and thetaInCDCAcceptance and {ePtCut} and {ePCut}", path=path)
-        ma.applyChargedPidMVA(
-            particleLists=['e-:sig'],
-            path=path,
-            trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass)
         ma.applyCuts('e-:sig', eIDCut, path=path)
 
         ma.fillParticleList("mu-:sig", f"{muIDCut} and {lepTrkCuts} and {muPtCut} and {muPCut}", path=path)
@@ -496,13 +487,13 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         ma.rankByLowest("D+:KKpi", variable="abs(dM)", numBest=15, path=path)
         ma.copyLists("D+:sig", ['D+:Kpipi_BtoDl', 'D+:Kspi_BtoDl', 'D+:KKpi'], path=path)
 
-# No explicit reconstruction of D*0 to D0 pi0/gamma or D*+ to D0 pi+ (included in feeddown)
+        # No explicit reconstruction of D*0 to D0 pi0/gamma or D*+ to D0 pi+ (included in feeddown)
 
         ma.reconstructDecay("D*+:D0        -> pi+:slow D0:sig", cut="abs(dQ) < 0.0035", dmID=11, path=path)
         ma.rankByLowest("D*+:D0", variable="abs(dQ)", numBest=15, path=path)
         ma.copyLists("D*+:sig", ['D*+:D0'], path=path)
 
-# B reconstruction.  Use wide cut on cosThetaBY.
+        # B reconstruction.  Use wide cut on cosThetaBY.
 
         ma.reconstructDecay('anti-B0:Dpe  ->  e-:sig D+:sig ?nu ', BSLRecoCut, dmID=200, path=path)
         ma.reconstructDecay('anti-B0:Dpmu -> mu-:sig D+:sig ?nu ', BSLRecoCut, dmID=201, path=path)
@@ -519,17 +510,17 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         ma.copyLists('B-:D0l', ['B-:D0e', 'B-:D0mu'], path=path)
         ma.rankByHighest('B-:D0l', variable='InvM', numBest=9, path=path)
 
-# master SL B lists
+        # main SL B lists
         ma.copyLists('B-:SL', ['B-:D0l'], path=path)
         ma.copyLists('anti-B0:SL', ['anti-B0:Dspl', 'anti-B0:Dpl'], path=path)
 
-# Build ROE and look for e-, mu-, charged multiplicity and E_ECL
+        # Build ROE and look for e-, mu-, charged multiplicity and E_ECL
 
         for Btype in ['B-:SL', 'anti-B0:SL']:
 
             roe_path = b2.create_path()
             deadEndPath = b2.create_path()
-# Execute the filter module:
+            # Execute the filter module:
             ma.buildRestOfEvent(Btype, fillWithMostLikely=True, path=path)
             ma.appendROEMasks(Btype, [cleanMask], path=path)
             ma.signalSideParticleFilter(Btype, '', roe_path, deadEndPath)
@@ -558,7 +549,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         vm.addAlias('nROE_Ch', 'nROE_Charged(cleanMask)')
         vm.addAlias('E_extra_ROE', 'useCMSFrame(roeEextra(cleanMask))')
 
-#  Only keep events whose ROE has an extra e or mu, or Ntrk<3, or E_ECL<2.0 GeV
+        # Only keep events whose ROE has an extra e or mu, or Ntrk<3, or E_ECL<2.0 GeV
 
         ma.applyCuts('B-:SL', f'passesCut({BSLSkimCut})', path=path)
         ma.applyCuts('anti-B0:SL', f'passesCut({BSLSkimCut})', path=path)

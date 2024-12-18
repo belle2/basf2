@@ -88,8 +88,8 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
     try {
       extrapolatedMSoP.extrapolateToLine(m_beamSpot, m_beamAxis);
     } catch (...) {
-      B2WARNING("Could not extrapolate the fit result for pdg " << particleType.getPDGCode() <<
-                " to the perigee point. Why, I don't know.");
+      B2DEBUG(29, "Could not extrapolate the fit result for pdg " << particleType.getPDGCode() <<
+              " to the perigee point.");
       continue;
     }
 

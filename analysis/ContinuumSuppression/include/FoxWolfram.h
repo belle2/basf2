@@ -79,7 +79,7 @@ namespace Belle2 {
     double getH(int i) const { return (i < 0 || i > 8) ? NAN : m_moment[i]; }
 
     /**
-     * Returns the i-th moment normalized to the 0th-order moment. These are the quantites
+     * Returns the i-th moment normalized to the 0th-order moment. These are the quantities
      * normally used for the event shape characterization and the continuum suppression.
      */
     double getR(int i) const { return (i < 0 || i > 8 || m_moment[0] == 0) ? NAN : m_moment[i] / m_moment[0]; }

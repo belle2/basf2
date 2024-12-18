@@ -42,7 +42,6 @@ def fitVertex(
         fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC/recoilmass)
         constraint (str):       add additional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
-            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         recoilMass (float):     invariant mass of recoil in GeV (valid only for recoilmass)
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
@@ -91,12 +90,13 @@ def _fitVertex(
         fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC/recoilmass)
         constraint (str):       add additional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
-            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         recoilMass (float):     invariant mass of recoil in GeV (valid only for recoilmass)
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
     """
+
+    from pdg import from_names
 
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + list_name)
@@ -110,10 +110,7 @@ def _fitVertex(
     pvfit.param('recoilMass', recoilMass)
     pvfit.param('smearing', smearing)
     if massConstraint:
-        if isinstance(massConstraint[0], str):
-            pvfit.param('massConstraintListParticlename', massConstraint)
-        else:
-            pvfit.param('massConstraintList', massConstraint)
+        pvfit.param('massConstraintList', from_names(massConstraint))
     path.add_module(pvfit)
 
 
@@ -147,7 +144,6 @@ def kFit(list_name,
 
         constraint (str):       add an additional constraint to the fit (valid options are ipprofile or iptube)
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
-            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         recoilMass (float):     invariant mass of recoil in GeV (valid only for recoilmass)
         daughtersUpdate (bool): make copy of the daughters and update them after the KFit
         decay_string (str):     select particles used for the KFit

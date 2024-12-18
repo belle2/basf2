@@ -73,8 +73,9 @@ namespace Belle2 {
     {
       const ECLCluster* cluster = part->getECLCluster();
       if (cluster) {
-        const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
-        return std::sqrt(EPhiThetaCov[0][0]);
+        ClusterUtils clutls;
+        const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+        return sqrt(fabs(EPhiThetaCov[0][0]));
       }
       return Const::doubleNaN;
     }

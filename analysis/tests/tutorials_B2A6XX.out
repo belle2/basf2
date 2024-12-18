@@ -7,6 +7,7 @@ TBranch: __event__, 7
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: distance, 0.02705
 TBranch: significanceOfDistance, 1.774
@@ -22,9 +23,9 @@ TBranch: z_uncertainty, 0.001815
 TBranch: dr, 0.01448
 TBranch: dphi, -0.5763
 TBranch: dcosTheta, 0.8445
-TBranch: prodVertexX, nan
-TBranch: prodVertexY, nan
-TBranch: prodVertexZ, nan
+TBranch: prodVertexX, 0.0001797
+TBranch: prodVertexY, 0.0007036
+TBranch: prodVertexZ, 0.01254
 TBranch: prodVertexXErr, nan
 TBranch: prodVertexYErr, nan
 TBranch: prodVertexZErr, nan

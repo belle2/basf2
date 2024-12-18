@@ -193,7 +193,7 @@ namespace Belle2 {
 
       //Lorentz shift correction - PATCHED
       //NOTE: layer 3 is upside down with respect to L4,5,6 in the real data (real SVD), but _not_ in the simulation. We need to change the sign of the Lorentz correction on L3 only if reconstructing data, i.e. if Environment::Instance().isMC() is FALSE.
-      const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(m_vxdID));
+      const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_vxdID));
 
       bool isMC = Environment::Instance().isMC();
 
@@ -309,7 +309,7 @@ namespace Belle2 {
     {
 
       if (m_strips.size() == 0)
-        B2ERROR(" you are asking fo the cluster samples for a cluster candidate with no strips, it make no sense to ask for the cluster time!");
+        B2ERROR(" you are asking for the cluster samples for a cluster candidate with no strips, it make no sense to ask for the cluster time!");
 
       //steps:
       //1.loop on m_strips

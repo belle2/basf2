@@ -15,7 +15,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <genfit/MeasuredStateOnPlane.h>
-#include <TVector3.h>
 //#include <limits>
 #include <vector>
 #include <math.h>
@@ -97,7 +96,7 @@ namespace Belle2 {
 
       bool usedInTrack;        /**< True if the cluster is used in tracking */
       float dU;                /**< Residual (meas - prediction) in U. */
-      float dV;                /**< Residual (meas - prediciton) in V. */
+      float dV;                /**< Residual (meas - prediction) in V. */
       Cluster_t cluster;         /**< Cluster associated to the track. */
       TrackPoint_t intersection; /**< The track-module intersection. */
     }; // end struct TrackCluster_t

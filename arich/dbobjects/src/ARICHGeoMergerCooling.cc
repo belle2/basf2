@@ -15,9 +15,6 @@
 #include <iostream>
 #include <iomanip>
 
-//root
-#include <TVector3.h>
-
 using namespace std;
 using namespace Belle2;
 
@@ -47,7 +44,7 @@ void ARICHGeoMergerCooling::print(const std::string& title) const
 void ARICHGeoMergerCooling::checkMergerCoolingSystemDataConsistency() const
 {
 
-  B2ASSERT("Data of the cooling system V2 is inconsisten : getMergerCoolingPositionID().size() != 72",
+  B2ASSERT("Data of the cooling system V2 is inconsistent : getMergerCoolingPositionID().size() != 72",
            getMergerCoolingPositionID().size() == 72);
   for (unsigned i = 0; i < m_mergerCoolingBodiesInfo.size(); i++) {
     tessellatedSolidStr mergerCoolingBodiesStr = getMergerCoolingBodiesInfo(i + 1);

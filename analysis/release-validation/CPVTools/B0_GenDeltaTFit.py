@@ -621,9 +621,9 @@ class fitDeltaT(b2.Module):
         lMC.Draw()
 
         textFitRes = "#it{A}_{#it{CP}} = " + \
-            '{: 1.2f}'.format(self.A.getValV() if abs(self.A.getValV()) > 0.005 else abs(self.A.getValV())) + \
+            f'{self.A.getValV() if abs(self.A.getValV()) > 0.005 else abs(self.A.getValV()): 1.2f}' + \
             ", " + "#it{S}_{#it{CP}} = " + \
-            '{: 1.2f}'.format(self.S.getValV() if abs(self.S.getValV()) > 0.005 else abs(self.S.getValV()))
+            f'{self.S.getValV() if abs(self.S.getValV()) > 0.005 else abs(self.S.getValV()): 1.2f}'
 
         lFitRes = ROOT.TLegend(0.215, 0.905, 0.7, 0.98)
         lFitRes.AddEntry("", textFitRes, " ")
@@ -642,20 +642,16 @@ class fitDeltaT(b2.Module):
             0.1,
             1,
             "#it{A}_{#it{CP}} = " +
-            '{:1.2f}'.format(
-                self.A.getValV()) +
+            f'{self.A.getValV():1.2f}' +
             " #pm " +
-            '{:1.2f}'.format(
-                self.A.getError()))
+            f'{self.A.getError():1.2f}')
         ROOT.TText(
             0.1,
             0.5,
             "#it{A}_{#it{CP}} = " +
-            '{:1.2f}'.format(
-                self.S.getValV()) +
+            f'{self.S.getValV():1.2f}' +
             " #pm " +
-            '{:1.2f}'.format(
-                self.S.getError()))
+            f'{self.S.getError():1.2f}')
 
         fitRes.Print("v")
         c1.SaveAs("./" + 'B0_JPsiKs_DeltaTFittedOnGenMC.pdf')
@@ -1939,14 +1935,11 @@ class fitDeltaT(b2.Module):
         print("B0 Tag Flavor: ")
         print(
             "B0s = ",
-            " %0.4f" %
-            B0tagPercentage,
+            f" {B0tagPercentage:0.4f}",
             "% B0bars = ",
-            " %0.4f" %
-            B0tagbarsPercentage,
+            f" {B0tagbarsPercentage:0.4f}",
             "% Diff = ",
-            " %0.2f" %
-            Diff,
+            f" {Diff:0.2f}",
             "%")
         B0signalPercentage = self.B0sInSignalSide / (self.B0barsInSignalSide + self.B0sInSignalSide) * 100
         B0signalbarsPercentage = self.B0barsInSignalSide / (self.B0barsInSignalSide + self.B0sInSignalSide) * 100
@@ -1954,14 +1947,11 @@ class fitDeltaT(b2.Module):
         print("B0 Signal Flavor: ")
         print(
             "B0s = ",
-            " %0.4f" %
-            B0signalPercentage,
+            f" {B0signalPercentage:0.4f}",
             "% B0bars = ",
-            " %0.4f" %
-            B0signalbarsPercentage,
+            f" {B0signalbarsPercentage:0.4f}",
             "% Diff = ",
-            " %0.2f" %
-            Diff,
+            f" {Diff:0.2f}",
             "%")
         print("Total amount of events = ", self.nentries)
 

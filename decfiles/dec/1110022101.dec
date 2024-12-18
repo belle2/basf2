@@ -1,0 +1,39 @@
+# EventType: 1110022101
+# Descriptor: [B0 -> KS0 pi0 pi0) ]cc
+# NickName: Bd_KS0pi0pi0
+# Documentation: Decay mode for sensitivity studies
+# Responsible: Yu Nakazawa
+# Email: nakancyo@post.kek.jp
+# Tested: yes
+# PhysicsWG: Bhadronic
+# Cuts: None
+# Date: 22/08/2023
+#
+#
+#
+Alias      K_S0sig  K_S0
+ChargeConj K_S0sig  K_S0sig
+#
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0			VSS_BMIX dm;
+Enddecay
+### 
+### 
+### 
+Decay B0sig
+1.0   K_S0sig   pi0   pi0   PHSP;
+Enddecay
+CDecay anti-B0sig
+### 
+### 
+### 
+Decay K_S0sig
+1     pi+       pi-         PHOTOS PHSP;
+Enddecay
+###
+###
+###
+###
+###
+End

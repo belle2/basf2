@@ -22,7 +22,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(StorageSerializer)
+REG_MODULE(StorageSerializer);
 
 //-----------------------------------------------------------------
 //                 Implementation

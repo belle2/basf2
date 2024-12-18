@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,10 +23,15 @@ from skim.standardlists.charmless import (
     loadStdVeryLooseKstarPlus,
     loadStdVeryLooseKstarPlusPi0,
     loadStdVeryLooseRhoPlus)
-
+from skim.standardlists.lightmesons import (
+    loadStdSkimHighEffTracks,
+    loadStdSkimHighEffEtaPrime,
+    loadStdSkimHighEffEta)
+from stdPi0s import stdPi0s
+from stdPhotons import stdPhotons
 
 __liaison__ = "Benedikt Wach <benedikt.wach@desy.de>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -63,13 +67,53 @@ class BtoPi0Pi0(BaseSkim):
 
 
 @fancy_skim_header
+class BtoPi0Eta(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to \\pi^0 \\eta`
+    * :math:`B^{0}\\to \\pi^0 \\eta^{'}`
+
+    Cuts applied:
+
+    * ``5.20 < Mbc < 5.29``
+    * ``abs(deltaE) < 0.5``
+
+    """
+    __authors__ = ["Longke Li", "Yinghui Guan"]
+    __description__ = "Skim list definitions for neutral B to pi0 eta and B to pi0 eta'."
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charmless"
+
+    ApplyHLTHadronCut = False
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
+    def load_standard_lists(self, path):
+        loadStdPi0ForBToCharmless(path=path)
+        stdPhotons('tight', path=path)
+        stdPi0s("eff40_May2020", path=path)
+        loadStdSkimHighEffTracks('pi', path=path)
+        loadStdSkimHighEffEta(path=path)
+        loadStdSkimHighEffEtaPrime(path=path)
+
+    def build_lists(self, path):
+        Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        BsigList = []
+        ma.reconstructDecay('B0:Pi0Eta -> pi0:charmlessFit eta:SkimHighEff', Bcuts, path=path)
+        ma.reconstructDecay('B0:Pi0Etap -> pi0:charmlessFit eta\':SkimHighEff', Bcuts, path=path)
+        BsigList.append('B0:Pi0Eta')
+        BsigList.append('B0:Pi0Etap')
+        return BsigList
+
+
+@fancy_skim_header
 class BtoHadTracks(BaseSkim):
     """
     Reconstructed decay modes:
 
     * :math:`B^{0}\\to \\pi^+ \\pi^-`
-    * :math:`B^{0}\\to \\K^+ \\pi^-`
-    * :math:`B^{0}\\to \\K^+ K^-`
+    * :math:`B^{0}\\to K^+ \\pi^-`
+    * :math:`B^{0}\\to K^+ K^-`
     * :math:`B^{+}\\to \\pi^+ \\pi^+ \\pi^-`
     * :math:`B^{+}\\to K_{\\rm S}^0 \\pi^+`
     * :math:`B^{+}\\to K_{\\rm S}^0 K^+`
@@ -78,22 +122,22 @@ class BtoHadTracks(BaseSkim):
     * :math:`B^{+}\\to K^+ K^- \\pi^+`
     * :math:`B^{+}\\to K^+ K^+ K^-`
     * :math:`B^{0}\\to \\pi^+ \\pi^- \\pi^+ \\pi^-`
-    * :math:`B^{0}\\to -> K^+ \\pi^- \\pi^+ \\pi^-`
-    * :math:`B^{0}\\to -> K^+ K^- \\pi^+ \\pi^-`
-    * :math:`B^{0}\\to -> K^+ \\pi^- K^+ \\pi^-`
-    * :math:`B^{0}\\to -> K^+ K^- K^+ \\pi^-`
-    * :math:`B^{0}\\to -> K^+ K^- K^+ K^-`
-    * :math:`B^{0}\\to -> K_{\\rm S}^0 \\pi^+ \\pi^-`
-    * :math:`B^{0}\\to -> K_{\\rm S}^0 K^+ \\pi^-`
-    * :math:`B^{0}\\to -> K_{\\rm S}^0 K^+ K^-`
-    * :math:`B^{0}\\to -> K_{\\rm S}^0 K_{\\rm S}^0`
-    * :math:`B^{0}\\to -> K^{*0} K^- K^+`
-    * :math:`B^{0}\\to -> K^{*0} \\pi^- \\pi^+`
-    * :math:`B^{0}\\to -> K^{*0} K^+ \\pi^-`
-    * :math:`B^{0}\\to -> \\rho^0 \\rho^0`
-    * :math:`B^{+}\\to -> K^{*+} K^- K^+`
-    * :math:`B^{+}\\to -> K^{*+} \\pi^- \\pi^+`
-    * :math:`B^{+}\\to -> K^{*+} K^+ \\pi^-`
+    * :math:`B^{0}\\to K^+ \\pi^- \\pi^+ \\pi^-`
+    * :math:`B^{0}\\to K^+ K^- \\pi^+ \\pi^-`
+    * :math:`B^{0}\\to K^+ \\pi^- K^+ \\pi^-`
+    * :math:`B^{0}\\to K^+ K^- K^+ \\pi^-`
+    * :math:`B^{0}\\to K^+ K^- K^+ K^-`
+    * :math:`B^{0}\\to K_{\\rm S}^0 \\pi^+ \\pi^-`
+    * :math:`B^{0}\\to K_{\\rm S}^0 K^+ \\pi^-`
+    * :math:`B^{0}\\to K_{\\rm S}^0 K^+ K^-`
+    * :math:`B^{0}\\to K_{\\rm S}^0 K_{\\rm S}^0`
+    * :math:`B^{0}\\to K^{*0} K^- K^+`
+    * :math:`B^{0}\\to K^{*0} \\pi^- \\pi^+`
+    * :math:`B^{0}\\to K^{*0} K^+ \\pi^-`
+    * :math:`B^{0}\\to \\rho^0 \\rho^0`
+    * :math:`B^{+}\\to K^{*+} K^- K^+`
+    * :math:`B^{+}\\to K^{*+} \\pi^- \\pi^+`
+    * :math:`B^{+}\\to K^{*+} K^+ \\pi^-`
 
     Cuts applied:
 
@@ -299,4 +343,53 @@ class BtoRhopRhom(BaseSkim):
         ma.reconstructDecay('B0:Charmless_b2rr -> rho+:veryLoose rho-:veryLoose', Bcuts, path=path)
         BsigList.append('B0:Charmless_b2rr')
         path = self.skim_event_cuts("nTracks >= 2", path=path)
+        return BsigList
+
+
+@fancy_skim_header
+class BtoEtapKstp(BaseSkim):
+    """
+    Reconstructed decay mode:
+
+    * :math:`B^{+}\\to \\eta^{'} K^{*+}`
+
+    Cuts applied:
+
+    * ``5.20 < Mbc < 5.29``
+    * ``abs(deltaE) < 0.5``
+    * ``0.4 < M_{eta} < 0.6``
+    * ``0.8 < M_{eta'} < 1.1``
+    * ``0.7 < M_{K*} < 1.6``
+
+    Note:
+        This skim uses `skim.standardlists.lightmesons.loadStdSkimHighEffEtaPrime`
+        and `skim.standardlists.charmless.loadStdVeryLooseKstarPlus` where
+        :math:`\\eta^{'}` and :math:`K^{*+}` are defined, respectively.
+        :math:`\\eta` channel is defined in `skim.standardlists.lightmesons.loadStdSkimHighEffEta`.
+
+    """
+
+    __authors__ = ["Chia-Ling Hsu"]
+    __description__ = "Skim list for B+ to eta' K*+."
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charmless"
+
+    ApplyHLTHadronCut = True
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
+    def load_standard_lists(self, path):
+        stdKshorts(path=path)
+        stdPhotons('tight', path=path)
+        stdPi0s("eff40_May2020", path=path)
+        loadStdVeryLooseTracks('pi', path=path)
+        loadStdSkimHighEffTracks('pi', path=path)
+        loadStdSkimHighEffEta(path=path)
+        loadStdSkimHighEffEtaPrime(path=path)
+        loadStdVeryLooseKstarPlus(path=path)
+
+    def build_lists(self, path):
+        Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        BsigList = []
+        ma.reconstructDecay("B+:Charmless_b2etapkst -> eta':SkimHighEff K*+:veryLoose", Bcuts, path=path)
+        BsigList.append('B+:Charmless_b2etapkst')
         return BsigList

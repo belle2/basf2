@@ -1,0 +1,30 @@
+##############################################################
+# EventType: 2421840002
+# Descriptor: [e+ e- -> Jpsi [ -> e+ e- / mu+ mu- ] p+ anti-p-] are generated via ISR
+# NickName: ISR_ppbarJ/psi
+# Test : Yes
+# Documentation: MC15rd signal request
+# PhysicsWG: Quarkonium
+# Responsible: Yipu Liao
+# Email: liaoyp@ihep.ac.cn
+# Cuts: None
+# Date: 2023/12/25
+#
+# Decay table to generate
+# vpho -> J/psi p+ anti-p- gamma
+#           |
+#           -> e+ e- gamma
+#           -> mu+ mu- gamma
+#                     
+###############################################################
+
+Decay vpho
+1.0 p+ anti-p- J/psisig  PHOTOS PHSP;
+Enddecay
+
+Decay J/psisig
+0.5 e+ e- PHOTOS VLL;
+0.5 mu+ mu- PHOTOS VLL;
+Enddecay
+
+End

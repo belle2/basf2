@@ -11,6 +11,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/EventProcessor.h>
 
+#include <framework/pcore/ProcHandler.h>
+
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include <cstdio>
@@ -203,6 +205,8 @@ bool GlobalProcHandler::startProc(ProcType procType, int id)
     else
       s_processID = id;
 
+    ProcHandler::setProcessID(s_processID);    // Interface to existing ProcHandler
+
     // Reset some python state: signals, threads, gil in the child
     PyOS_AfterFork_Child();
     // InputController becomes useless in child process
@@ -241,7 +245,7 @@ void GlobalProcHandler::killAllProcesses()
   for (int& pid : s_pidVector) {
     if (pid != 0) {
       if (kill(pid, SIGKILL) >= 0) {
-        B2ERROR("hard killed process " << pid);
+        B2DEBUG(100, "hard killed process " << pid);
       } else {
         B2DEBUG(100, "no process " << pid << " found, already gone?");
       }

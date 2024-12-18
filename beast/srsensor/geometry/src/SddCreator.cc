@@ -15,9 +15,6 @@
 #include <framework/logging/Logger.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -27,7 +24,6 @@
 #include "G4Tubs.hh"
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -60,12 +56,12 @@ namespace Belle2 {
       //values will be automatically converted
       vector<double> bar_sdd = content.getArray("bar_sdd");
       B2INFO("Contents of bar_sdd: ");
-      BOOST_FOREACH(double value, bar_sdd) {
+      for (double value : bar_sdd) {
         B2INFO("value: " << value);
       }
       int sddNb = 0;
       //Lets loop over all the Active nodes
-      BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+      for (const GearDir& activeParams : content.getNodes("Active")) {
 
         //create sdd volume
         G4double startAngle = 0.*CLHEP::deg;

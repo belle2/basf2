@@ -85,15 +85,15 @@ namespace Belle2 {
   }
 
   TRGSignalBundle::TRGSignalBundle(const string& name,
-                                   const TRGClock& c,
+                                   const TRGClock& clock,
                                    const TRGSignalBundle& input,
                                    const unsigned outputBitSize,
                                    const unsigned registerBitSize,
-                                   TRGState(* packer)(const TRGState&,
-                                                      TRGState&,
-                                                      bool&))
+                                   TRGState(* packer)(const TRGState& in,
+                                                      TRGState& registers,
+                                                      bool& logicStillActive))
     : _name(name),
-      _clock(& c)
+      _clock(& clock)
   {
 
     const string sn = "TRGSignalBundle constructor(4)";
@@ -111,7 +111,7 @@ namespace Belle2 {
 
     //...Input is stably inactive...
     if (nStates == 0) {
-      TRGSignalVector* sb = new TRGSignalVector(_name, c, outputBitSize);
+      TRGSignalVector* sb = new TRGSignalVector(_name, clock, outputBitSize);
       push_back(sb);
       TRGDebug::leaveStage(sn);
       return;
@@ -162,7 +162,7 @@ namespace Belle2 {
     //     outputSize = outputStates.back()->size();
 
     //...Creat a SignalVector...
-    TRGSignalVector* sb = new TRGSignalVector(_name, c, outputBitSize);
+    TRGSignalVector* sb = new TRGSignalVector(_name, clock, outputBitSize);
 
     //...Make a SignalVector...
     // const TRGState &os0 = * outputStates[0];

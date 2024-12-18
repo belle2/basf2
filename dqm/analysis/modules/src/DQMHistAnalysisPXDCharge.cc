@@ -32,22 +32,18 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("DQM Analysis for PXD Cluster Charge");
 
-  //Parameter definition
+  // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDER"));
   addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 30.);
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 85.);
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Charge:"));
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: Constructor done.");
 }
 
 DQMHistAnalysisPXDChargeModule::~DQMHistAnalysisPXDChargeModule()
 {
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
 }
 
 void DQMHistAnalysisPXDChargeModule::initialize()
@@ -112,16 +108,9 @@ void DQMHistAnalysisPXDChargeModule::initialize()
   m_fMean->SetNpx(m_PXDModules.size());
   m_fMean->SetNumberFitPoints(m_PXDModules.size());
 
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    mychid.resize(3);
-    SEVCHK(ca_create_channel((m_pvPrefix + "Mean").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Diff").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  registerEpicsPV("PXD:Charge:Mean", "Mean");
+  registerEpicsPV("PXD:Charge:Diff", "Diff");
+  registerEpicsPV("PXD:Charge:Status", "Status");
 }
 
 
@@ -186,18 +175,14 @@ void DQMHistAnalysisPXDChargeModule::event()
 //     m_line2->Draw();
 //     m_line3->Draw();
     m_hCharge->Fit(m_fMean, "R");
-    data = m_fMean->GetParameter(0); // we are more interessted in the maximum deviation from mean
+    data = m_fMean->GetParameter(0); // we are more interested in the maximum deviation from mean
     m_hCharge->GetMinimumAndMaximum(currentMin, currentMax);
     diff = fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
     if (0) B2INFO("Mean: " << data << " Max Diff: " << diff);
   }
 
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
-    SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
-  }
-#endif
+  setEpicsPV("Mean", data);
+  setEpicsPV("Diff", diff);
 
   int status = 0;
 
@@ -206,7 +191,7 @@ void DQMHistAnalysisPXDChargeModule::event()
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
     status = 0; // default
   } else {
-    /// FIXME: what is the accpetable limit?
+    /// FIXME: what is the acceptable limit?
     if (fabs(data - 50.) > 20. || diff > 30) {
       m_cCharge->Pad()->SetFillColor(kRed);// Red
       status = 4;
@@ -222,20 +207,24 @@ void DQMHistAnalysisPXDChargeModule::event()
     m_cCharge->Pad()->SetFillColor(kGreen);// Green
   }
 
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    SEVCHK(ca_put(DBR_INT, mychid[2], (void*)&status), "ca_set failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  setEpicsPV("Status", status);
 
-  auto tt = new TLatex(5.5, 0, "1.3.2 Module is excluded, please ignore");
-  tt->SetTextAngle(90);// Rotated
-  tt->SetTextAlign(12);// Centered
-  tt->Draw();
+  for (auto& it : m_excluded) {
+    static std::map <int, TLatex*> ltmap;
+    auto tt = ltmap[it];
+    if (!tt) {
+      tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+      tt->SetTextSize(0.035);
+      tt->SetTextAngle(90);// Rotated
+      tt->SetTextAlign(12);// Centered
+      ltmap[it] = tt;
+    }
+    tt->Draw();
+  }
 
   m_cCharge->Modified();
   m_cCharge->Update();
+  UpdateCanvas(m_cCharge);
 }
 
 void DQMHistAnalysisPXDChargeModule::endRun()
@@ -246,13 +235,11 @@ void DQMHistAnalysisPXDChargeModule::endRun()
 
 void DQMHistAnalysisPXDChargeModule::terminate()
 {
-  // should delete canvas here, maybe hist, too? Who owns it?
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: terminate called");
+
+  if (m_cCharge) delete m_cCharge;
+  if (m_hCharge) delete m_hCharge;
+  if (m_fLandau) delete m_fLandau;
+  if (m_fMean) delete m_fMean;
 }
 

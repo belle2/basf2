@@ -70,7 +70,7 @@ namespace Belle2 {
 
     /** Return pdf for the PXD dE/dx for the given particle
      * @param part particle number (as in Const::ChargedStable::c_SetSize)
-     * @param truncated is trucated or not
+     * @param truncated is truncated or not
      */
     const TH2F* getPXDPDF(int part, bool truncated) const
     {
@@ -79,7 +79,7 @@ namespace Belle2 {
 
     /** Return pdf for the PXD dE/dx for the given particle
      * @param part particle number (as in Const::ChargedStable::c_SetSize)
-     * @param truncated is trucated or not
+     * @param truncated is truncated or not
      */
     const TH2F* getSVDPDF(int part, bool truncated) const
     {
@@ -88,7 +88,7 @@ namespace Belle2 {
 
     /** Return pdf for the PXD dE/dx for the given particle
      * @param part particle number (as in Const::ChargedStable::c_SetSize)
-     * @param truncated is trucated or not
+     * @param truncated is truncated or not
      */
     const TH2F* getCDCPDF(int part, bool truncated) const
     {

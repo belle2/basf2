@@ -22,8 +22,6 @@
 
 
 //root stuff
-#include "TVector3.h"
-
 #include "TFile.h"
 #include "TNtuple.h"
 
@@ -70,7 +68,7 @@ namespace Belle2 {
     /* returns the space point in local coordinates where the track hits the sensor:
       sensorInfo: info of the sensor under investigation
       aTrack: the track to be tested
-      isgood: flag which is false if some error occured (do not use the point if false)
+      isgood: flag which is false if some error occurred (do not use the point if false)
       du and dv are the uncertainties in u and v on the sensor plane of the fit (local coordinates)
      */
     ROOT::Math::XYZVector getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du,

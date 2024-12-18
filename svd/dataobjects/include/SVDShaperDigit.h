@@ -224,7 +224,7 @@ namespace Belle2 {
     }
 
     /**
-     * Modify already appended BG digit if aquisition mode is 3 sample
+     * Modify already appended BG digit if acquisition mode is 3 sample
      */
     void adjustAppendedBGDigit() override
     {

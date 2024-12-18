@@ -42,6 +42,7 @@ PXDDQMTrackRawNtupleModule::PXDDQMTrackRawNtupleModule() : Module(), m_vxdGeomet
   addParam("pCut", m_pcut, "Set a cut on the track fit p-value (0=no cut)", double(1e-20));
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 5u);
   addParam("momCut", m_momCut, "Set a cut on the track momentum in GeV/c, 0 disables", double(0.3));
+  addParam("pTCut", m_pTCut, "Set a cut on the track transverse momentum (<=0 disable)", double(0.3));
   addParam("uDist", m_uDist, "distance in ucell to intercept to accept hit", int(10));
   addParam("vDist", m_vDist, "distance in vcell to intercept to accept hit", int(10));
 }

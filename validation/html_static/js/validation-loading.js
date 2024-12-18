@@ -149,7 +149,7 @@ function loadSelectedRevisions(button=false) {
         else {
             console.warn("Selected reference not in revisions.")
         }
-        // add reference to fron of revisions
+        // add reference to the list of revisions
         revList.unshift(reference);
     }
     else {
@@ -278,7 +278,7 @@ function onReferenceSelectionChanged(){
 
     console.log(`referenceSelectionChanged: Will compare '${newestRevision}' (newest selected revision) with '${selectedReference}' (reference).`);
 
-    // Upddate boldness
+    // Update boldness
 
     $(`.revision-label`).each(
         (i, obj) => {
@@ -305,7 +305,7 @@ function onReferenceSelectionChanged(){
 
 /**
  * Sets the state of the revision checkboxes
- * @parm mode: "all" (all revisions), "r" (last revision only), "n" (last
+ * @param mode: "all" (all revisions), "r" (last revision only), "n" (last
  *  nightly only), "nnn" (all nightlies), "rbn"
  *  (default, nightly and revision).
  */
@@ -395,6 +395,27 @@ function loadCustomSelectionRequired(required){
     }
 }
 
+/**
+ * Display the scriptfiles accordion of the selected revision,
+ * hiding the rest. Also highlight the selected reference button. 
+ */
+function showScriptFiles(revision) {
+    var i;
+    var revisions = document.getElementsByClassName("script_logs");
+    for (i = 0; i < revisions.length; i++) {
+      revisions[i].style.display = "none";
+    }
+    document.getElementById(revision).style.display = "block";
+
+    var buttons = document.getElementsByClassName("button");
+    for (i = 0; i < buttons.length; i++) {
+      buttons[i].style.backgroundColor = '';
+    }
+    document.getElementById('bt_'+revision).style.backgroundColor = '#a09ec2';
+    
+}
+
+
 // ============================================================================
 // Loading
 // ============================================================================
@@ -411,6 +432,7 @@ function updateComparisonData(_comparisonData) {
     // to get information about failed scripts and the
     // log files
     let newestRev = getObjectWithKey(revisionsData["revisions"], "label", getNewestRevision());
+    let revs = getSelectedRevsList();
 
     console.debug(`Newest revision is '${newestRev["label"]}'`);
 
@@ -430,6 +452,7 @@ function updateComparisonData(_comparisonData) {
         for (let index in comparisonData["packages"]) {
             let name = comparisonData["packages"][index]["name"];
             comparisonDataPkg2Index[name] = index;
+            comparisonData["packages"][index]['scriptfiles_dict'] = {};
         }
 
         for (let irev in newestRev["packages"]) {
@@ -447,6 +470,17 @@ function updateComparisonData(_comparisonData) {
 
                 comparisonData["packages"][ipkg]["fail_count"] = failCount;
                 comparisonData["packages"][ipkg]["scriptfiles"] = scriptfiles;
+                // Store all the selected revs' scriptfiles as well,
+                // along with the newestRev's
+                for (let rev of revs) {
+                    if (rev == 'reference') {
+                        continue;
+                    }
+                    let selectedRev = getObjectWithKey(revisionsData["revisions"], "label", rev);
+                    comparisonData["packages"][ipkg]["scriptfiles_dict"][rev] = selectedRev["packages"][irev]["scriptfiles"];
+                }
+                
+
                 // Also store the label of the newest revision as this
                 // is needed to stich together the loading path of
                 // log files
@@ -476,7 +510,7 @@ function updateComparisonData(_comparisonData) {
                     pkgDict["scriptfiles"] = scriptfiles;
                     pkgDict["newest_revision"] = label;
                     // Also add keys that usually come from the
-                    // comparison file and are nescessary for things to work
+                    // comparison file and are necessary for things to work
                     pkgDict["visible"] = true;
                     pkgDict["comparison_error"] = 0; // else problems in package template
                     comparisonData["packages"].push(pkgDict);
@@ -653,27 +687,13 @@ function loadValidationPlots(packageLoadName="") {
             ractive.observe('show_expert_plots', function () {
                 ractiveValuePreserveSession(ractive, "show_expert_plots");
             });
-
-            // check if an "empty" entry needs to be added to the script accordion
-            if ( $('.failed_script').length > 0) {
-                $("#no_failed_scripts").hide();
-            }
-
-            if ( $('.finished_script').length > 0) {
-                $("#no_finished_scripts").hide();
-            }
-
-            if ( $('.skipped_script').length > 0) {
-                $("#no_skipped_scripts").hide();
-            }
-
         },
         // on teardown
         function (ractive) {
         },
         // on render
         function () {
-            $("#accordion_script_files").accordion({
+            $(".accordion_script_files").accordion({
                 heightStyle: "content"
             });
         },

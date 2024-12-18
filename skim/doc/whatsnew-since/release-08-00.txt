@@ -1,0 +1,63 @@
+Changes in the skim package in light-2401-ocicat
+------------------------------------------------
+
+New skims
++++++++++
+* SL&ME: 
+
+  * `11170100 <skim.WGs.semileptonic.BtoDl_and_ROE_e_or_mu_or_lowmult>`:  :math:`B \to D^{(*)} l`
+
+* TDCPV: 
+
+  * `13130300 <skim.WGs.tdcpv.TDCPV_dilepton>`:  :math:`B\bar{B} \to ll`
+
+* Tau: 
+
+  * `18570800 <skim.WGs.taupair.TauKshort>`:  :math:`e^+ e^- \to \tau^+ \tau^-, \tau \to K_s \pi X`
+
+* Bhadronic: 
+
+  * `19140500 <skim.WGs.btocharmless.BtoEtapKstp>`:  :math:`B^{+} \to \eta^{'} K^{*+}`
+  * `14160200 <skim.WGs.btocharm.B0toDs1D>`:  :math:`B^{0} \to D_{s1}^{+} D^-`
+  * `14160201 <skim.WGs.btocharm.B0toDDs0star>`:  :math:`B^{0} \to D_{s0}^{*+} D^{-} (\to K^+ \pi^- \pi^-)`
+  * `14121400 <skim.WGs.btocharm.B0toDstarpipi0_D0pi_Kpi>`:  :math:`B^{0} \to \overline{D}^{*-} (\to \bar{D}^{0} (\to K^+ \pi^-) \pi^-) \pi^+ \pi^0`
+  * `14161400 <skim.WGs.btocharm.BtoDstarpipipi0_D0pi_Kpi>`:  :math:`B^{+} \to D^{*-} (\to \overline{D}^{0} (\to K^+ \pi^-) \pi^-) \pi^+ \pi^+ \pi^0`
+  * `14121500 <skim.WGs.btocharm.B0toDstaretapi_D0pi_Kpi>`:  :math:`B^{0} \to \overline{D}^{*-} (\to \bar{D}^{0} (\to K^+ \pi^-) \pi^-) \eta (\to \gamma \gamma) \pi^+`
+  * `14121600 <skim.WGs.btocharm.BptoD0etapi_Kpi>`:  :math:`B^{+} \to \bar{D}^{0} (\to K^+ \pi^-) \eta (\to \gamma \gamma) \pi^+`
+  * `14121601 <skim.WGs.btocharm.BptoD0pipi0_Kpi>`:  :math:`B^{+} \to \bar{D}^{0} (\to K^+ \pi^-) \pi^+ \pi^0`
+
+* Dark & low multi: 
+
+  * `18530600 <skim.WGs.lowMulti.LowMassOneTrack>`: :math:`e^{+} e^{-} \to \gamma \pi^{+} \pi^{-}`,  :math:`e^{+} e^{-} \to \gamma \mu^{+} \mu^{-}`
+  * `18020600 <skim.WGs.dark.DimuonPlusVisibleDarkHiggs>`: :math:`e^+ e^- \to A' (\to \mu^+ \mu^-) h'`
+  * `18020700 <skim.WGs.dark.DielectronPlusVisibleDarkHiggs>`: :math:`e^+ e^- \to A' (\to e^+ e^-) h'`
+
+* Charm: 
+
+  * `17230700 <skim.WGs.charm.DstToD0Pi_D0ToGeneric>`:  :math:`D^{*} \to D^{0} \pi`
+  * `17260100 <skim.WGs.charm.DpToHpOmega>`:  :math:`D^{+} \to K^{+} \omega (\to \pi^+ \pi^- \pi^0)`,  :math:`D^{+} \to \pi^{+} \omega (\to \pi^+ \pi^- \pi^0)`  (and CC)
+  * `17260200 <skim.WGs.charm.DspToHpOmega>`:  :math:`D_{s}^{+} \to K^{+} \omega (\to \pi^+ \pi^- \pi^0)`,  :math:`D_{s}^{+} \to \pi^{+} \omega (\to \pi^+ \pi^- \pi^0)`  (and CC)
+  * `17220100 <skim.WGs.charm.DpToPipEpEm>`:  :math:`D^+ \to \pi^+ e^- e^+`
+  * `17220200 <skim.WGs.charm.DpToPipMupMum>`:  :math:`D^+ \to \pi^+ \mu^- \mu^+`
+  * `17220300 <skim.WGs.charm.DpToPipKpKm>`:  :math:`D^+ \to \pi^+ K^- K^+`
+  * `17230900 <skim.WGs.charm.LambdacToSHpJm>`:  :math:`\Lambda_c^+ \to \Sigma^+ h^+ j^-`
+  * `17231000 <skim.WGs.charm.XicpTopHpJm>`:  :math:`\Xi_c^+ \to p \pi^+ K^-`
+  * `17231100 <skim.WGs.charm.XicToXimPipPim>`:  :math:`\Xi_c^+ \to \Sigma^+ h^+ j^-`,  :math:`\Xi_c^+ \to \Xi^- h^+ j^-`
+  * `17231200 <skim.WGs.charm.Xic0ToLHpJm>`:  :math:`\Xi_c^0 \to \Lambda^0 h^+ j^-`
+  * `17232000 <skim.WGs.charm.DpToHpPi0>`:  :math:`D^{+} \to \pi^+ \pi^0`
+
+* Quarkonium: 
+
+  * `15460400 <skim.WGs.quarkonium.InclusiveUpsilon>`:  :math:`\Upsilon(1S,2S,3S) \to l^+ l^- (l = e, \mu)`
+  * `16460200 <skim.WGs.quarkonium.CharmoniumPsi>`:  :math:`J/\psi \to l^+ l^- (l = e, \mu)`, :math:`\psi(2S) \to l^+ l^- (l = e, \mu)`
+
+
+Modified skims
+++++++++++++++
+* TDCPV: `13160200 <skim.WGs.tdcpv.TDCPV_ccs>`, `13160300 <skim.WGs.tdcpv.TDCPV_qqs>`
+* Tau: `18360100 <skim.WGs.taupair.TauLFV>`
+* Bhadronic: `14140200 <skim.WGs.btocharm.BtoD0h_Kshh>`
+* Dark & low multi: `18520400 <skim.WGs.dark.LFVZpVisible>`, `18520500 <skim.WGs.lowMulti.LowMassTwoTrack>`, `18020500 <skim.WGs.dark.InelasticDarkMatterWithDarkHiggs>`, `18520300 <skim.WGs.dark.DielectronPlusMissingEnergy>`
+* Charm: `17230100 <skim.WGs.charm.XToD0_D0ToHpJm>`, `17230200 <skim.WGs.charm.XToD0_D0ToNeutrals>`, `17240200 <skim.WGs.charm.DstToD0Pi_D0ToHpJmPi0>`, `17230300 <skim.WGs.charm.DstToD0Pi_D0ToRare>`, `17230500 <skim.WGs.charm.XToDp_DpToHpHmJp>`, `17240500 <skim.WGs.charm.DstToD0Pi_D0ToHpJmEta>`, `17241200 <skim.WGs.charm.DstToD0Pi_D0ToVGamma>`, `17230600 <skim.WGs.charm.LambdacTopHpJm>`
+* Quarkonium: `15410300 <skim.WGs.quarkonium.InclusiveLambda>`
+* EWP: `12160100 <skim.WGs.ewp.BtoXgamma>`, `12160200 <skim.WGs.ewp.BtoXll>`, `12160300 <skim.WGs.ewp.BtoXll_LFV>`

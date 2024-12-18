@@ -32,8 +32,9 @@ void EclConfigurationPure::signalsamplepure_t::InitSample(const TH1F* sampledfun
   ECLSampledShaper dsp(sampledfun, round(r1 / r2));
   dsp.fillarray(N, m_ft);
   double maxval = * max_element(m_ft, m_ft + N);
-
-  for_each(m_ft1, m_ft1 + N, [maxval](double & a) { a /= maxval; });
+  double scale = 1.0 / maxval;
+  for (int i = 0; i < N; ++i)
+    m_ft1[i] = m_ft1[i] * scale;
   double maxval2 = * max_element(m_ft, m_ft + N);
   assert(maxval2 - 1.0 < 0.001);
   double sum = 0;
@@ -42,7 +43,9 @@ void EclConfigurationPure::signalsamplepure_t::InitSample(const TH1F* sampledfun
   //  for (int i = 0; i < N; ++i) m_ft1[i] = sampledfunDerivative->GetBinContent(i + 1);
   ECLSampledShaper dsp1(sampledfunDerivative, round(r1 / r2));
   dsp1.fillarray(N, m_ft1);
-  for_each(m_ft1, m_ft1 + N, [r1, r2, maxval](double & a) { a *= (r1 / r2) / maxval; });
+  scale = (r1 / r2) / maxval;
+  for (int i = 0; i < N; ++i)
+    m_ft1[i] = m_ft1[i] * scale;
 }
 
 void EclConfigurationPure::adccountspure_t::AddHit(const double a, const double t0,

@@ -1,0 +1,45 @@
+# EventType: 1213038002
+# Descriptor: [B+ -> anti-D2*0(-> anti-D0 eta) pi+]
+# NickName: Bu_D2st0pi
+# Documentation: B to charm
+# Tested: yes
+# Physics WG: B2Hadronic WG
+# Responsible: Vismaya Vs
+# Email: ph20resch11010@iith.ac.in
+# Cuts: None
+# Date: 20241001
+
+Alias etasig eta
+Alias D2*0sig D_2*0
+Alias anti-D2*0sig anti-D_2*0
+ChargeConj D2*0sig anti-D2*0sig
+
+
+Decay Upsilon(4S)
+0.5 B-sig   B+ VSS;
+0.5 B+sig   B- VSS;
+Enddecay
+
+
+Decay B+sig
+1.0000 anti-D2*0sig pi+ PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+
+Decay anti-D2*0sig
+1.0000 anti-D0sig etasig TSS;
+Enddecay
+CDecay D2*0sig
+
+
+Decay anti-D0sig
+1.0000 K+ pi- PHOTOS PHSP;
+Enddecay
+CDecay D0sig
+
+Decay etasig
+1.0000 gamma gamma PHSP;
+Enddecay
+
+End

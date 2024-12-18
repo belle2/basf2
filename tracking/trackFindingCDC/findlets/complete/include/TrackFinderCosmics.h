@@ -20,7 +20,7 @@ namespace Belle2 {
       using Super = TrackFinderAutomaton;
 
     public:
-      /// Constructor adjusting some of the parameters to suiteable values for cosmics tracking.
+      /// Constructor adjusting some of the parameters to suitable values for cosmics tracking.
       TrackFinderCosmics();
 
       /// Short description of the findlet

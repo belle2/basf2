@@ -48,8 +48,8 @@ namespace Belle2 {
       _famana(0),
       _threshold(100.0),
       _FADC(1),
-      _ConditionDB(0)
-
+      _ConditionDB(0),
+      m_SourceOfTC(3)
   {
 
     string desc = "TRGECLFAMModule(" + version() + ")";
@@ -70,12 +70,16 @@ namespace Belle2 {
              _threshold);
     addParam("ShapingFunction", _FADC, "Set function of shaper ",  _FADC);
     addParam("ConditionDB", _ConditionDB, "Use conditionDB ",  _ConditionDB);
+    addParam("SourceOfTC", m_SourceOfTC,
+             "Select source of TC data(1:=ECLHit or 2:=ECLSimHit or 3:=ECLHit+TRGECLBGTCHit)",
+             m_SourceOfTC);
 
     if (_ConditionDB == 1) { //Use global tag
       m_FAMPara.addCallback(this, &TRGECLFAMModule::beginRun);
     }
     B2DEBUG(100, "TRGECLFAMModule ... created");
     Threshold.clear();
+
   }
 //
 //
@@ -84,7 +88,6 @@ namespace Belle2 {
   {
 
     B2DEBUG(100, "TRGECLFAMModule ... destructed ");
-
 
   }
 //
@@ -95,8 +98,13 @@ namespace Belle2 {
   {
 
     B2DEBUG(100, "TRGECLFAMModule::initialize ... options");
-    B2DEBUG(100, "TRGECLFAMModule::initialize> FAM Fit Method = "
-            << _famMethod << "  ; Bin of Time Interval = " << _binTimeInterval << " ;output TC waveforml = " << _waveform);
+    B2DEBUG(100, "TRGECLFAMModule::initialize> FAM Fit Method = " << _famMethod
+            << "  ; Bin of Time Interval = " << _binTimeInterval
+            << " ;output TC waveforml = " << _waveform);
+    if (m_SourceOfTC <= 0 ||
+        m_SourceOfTC >= 4) {
+      B2FATAL("TRGECLFAMModule::initialize> SourceOfTC must be 1 or 2 or 3");
+    }
 
     m_nRun   = 0;
     m_nEvent = 1;
@@ -105,6 +113,9 @@ namespace Belle2 {
     m_TRGECLWaveform.registerInDataStore();
     m_TRGECLHit.registerInDataStore();
     m_TRGECLFAMAna.registerInDataStore();
+    // This object is registered by few packages. Let's be agnostic about the
+    // execution order of the modules: the first package run registers the module
+    m_eventLevelClusteringInfo.isOptional() ? m_eventLevelClusteringInfo.isRequired() :
     m_eventLevelClusteringInfo.registerInDataStore();
 
     //    m_FAMPara = new DBObjPtr<TRGECLFAMPara>;
@@ -149,11 +160,16 @@ namespace Belle2 {
     //
     // FAM Digitizer
     TrgEclDigitizer* obj_trgeclDigi = new TrgEclDigitizer();
-    obj_trgeclDigi-> setWaveform(_waveform);
-    obj_trgeclDigi-> setFADC(_FADC);
-    obj_trgeclDigi-> setup();
-    if (_famMethod == 2 || _famMethod == 1) {obj_trgeclDigi->  digitization01(TCDigiE, TCDigiT); } // no-fit method = backup method 1
-    else if (_famMethod == 3) { obj_trgeclDigi-> digitization02(TCDigiE, TCDigiT); } // orignal method = backup method 2
+    obj_trgeclDigi->setWaveform(_waveform);
+    obj_trgeclDigi->setFADC(_FADC);
+    obj_trgeclDigi->setup(m_SourceOfTC);
+    if (_famMethod == 1 || _famMethod == 2) {
+      // no-fit method = backup method 1
+      obj_trgeclDigi->digitization01(TCDigiE, TCDigiT);
+    } else if (_famMethod == 3) {
+      // orignal method = backup method 2
+      obj_trgeclDigi->digitization02(TCDigiE, TCDigiT);
+    }
     obj_trgeclDigi-> save(m_nEvent);
 
 

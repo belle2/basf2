@@ -43,7 +43,7 @@ class TestModule(basf2.Module):
         for hit in simhits:
             relations = hit.getRelationsFrom("PXDTrueHits")
             for truehit in relations:
-                print('truehit %d => hit %d' % (truehit.getArrayIndex(), hit.getArrayIndex()))
+                print(f'truehit {truehit.getArrayIndex()} => hit {hit.getArrayIndex()}')
 
         self.iEvent += 1
 
@@ -56,7 +56,7 @@ inputfiles = [
 basf2.conditions.disable_globaltag_replay()
 main = basf2.Path()
 
-# not used for anything, just checking wether the master module
+# not used for anything, just checking whether the master module
 # can be found if it's not the first module in the path.
 main.add_module(NoopModule())
 

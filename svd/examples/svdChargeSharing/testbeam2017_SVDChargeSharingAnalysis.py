@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -49,7 +48,7 @@ def add_geometry(
         excluded_components += ['MagneticField']
         additonal_components += ['MagneticFieldConstant']
 
-    # Add gearbox, additonally override field value if set
+    # Add gearbox, additionally override field value if set
     if field_override is not None:
         path.add_module('Gearbox',
                         fileName=geometry_xml,

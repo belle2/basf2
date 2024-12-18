@@ -9,9 +9,9 @@ Here we briefly describe the SVD objects that populate the Conditions Database. 
 
    * the revision can be different for official run-independent MC production of experiment 0 and 1003, please check the corresponding Global Tag.
    * for run-dependent and data reconstruction revisions should be checked inspecting the content of the corresponding Global Tags.
-   * you can also check the `SVD Payloads, Revisions and GT <https://confluence.desy.de/pages/viewpage.action?pageId=179781819>`_ Confluence Page.
+   * you can also check the `SVD Payloads, Revisions and GT <https://xwiki.desy.de/xwiki/rest/p/8f607>`_ XWiki Page.
 
-We add a string, the ``UniqueID``, to the payloads that provides informations on the content of the payload. In order to read the ``UniqueID`` you can setup basf2 and then:
+We add a string, the ``UniqueID``, to the payloads that provides information on the content of the payload. In order to read the ``UniqueID`` you can setup basf2 and then:
 
 .. code::
 
@@ -26,6 +26,7 @@ Wrappers have one of the following granularity:
 #. strip granularity: one value/payload per strip
 #. sensor-side granularity: one value/payload per sensor side
 #. detector granularity: one value/payload for all sensors
+#. sensor-on-ladder granularity: one value/payload per sensor side integrated over all ladders
 
 
 .. warning:
@@ -118,6 +119,15 @@ Check `LocalConfig@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDLocalConfig
 Reconstruction Calibrations
 ---------------------------
 
+
+.. _svdrecoconfiguration:
+
+.. cpp:class:: SVDRecoConfiguration
+
+	       Stores SVDRecoConfiguration (time, position, charge, etc), with detector granularity_
+
+   Check `SVDRecoConfiguration@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDRecoConfiguration&perpage=25&>`_ all revisions available in the Conditions Database. Revision **10** is used for experiment 0 (with grouping module turned ON), revision **11** is used for experiment 1002/3/4.
+
 .. _svdcogonlyerr:
 
 .. cpp:class:: SVDCoGOnlyPositionError
@@ -169,6 +179,14 @@ Check `HitTimeSelection@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHitTim
 
 	       wrapper with the hot strips as determined by ``SVDHotStripFinder``, strip granularity_
 
+.. _svdtimegroupingconfiguration:
+
+.. cpp:class:: SVDTimeGroupingConfiguration
+
+	       Stores parameters used in SVDTimeGrouping module, with detector granularity_
+
+   Check `SVDTimeGroupingConfiguration@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDTimeGroupingConfiguration&perpage=25&>`_ all revisions available in the Conditions Database. Revision **3** is used for experiment 0 and 1003/4, revision **4** is calculated from *Exp24-Run1726* and should be used for data.
+
 
 Time Calibrations
 -----------------
@@ -197,3 +215,11 @@ Check `CoG3Time@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVD3SampleCoGTime
 	       ELS3 Time calibration wrapper, with sensor-side granularity_
 
 Check `ELS3Time@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVD3SampleELSTimeCalibrations&perpage=25&>`_ all revisions available in the Conditions Database. Revision **2** is used for experiment 0 and 1003, revision **1** correspond to no calibration.
+
+.. _svdclustertimeshifter:
+
+.. cpp:class:: SVDClusterTimeShifter
+
+	       Time shift adjustment depending on cluster-size, with sensor-on-ladder granularity_
+
+   Check `SVDClusterTimeShifter@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDClusterTimeShifter&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** is used for experiment 0 and 1002/3/4 which corresponds to no shift, revision **3** is calculated from *Exp24,Run1726* and should only be used for data.

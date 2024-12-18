@@ -57,7 +57,7 @@ BKLMTrackingModule::BKLMTrackingModule() : Module(),
   addParam("fitGlobalBKLMTrack", m_globalFit,
            "[bool], do the BKLMTrack fitting in global system (multi-sectors track) or local system (sector by sector) (default is false, local sys.)",
            false);
-  addParam("StudyEffiMode", m_studyEffi, "[bool], run in efficieny study mode (default is false)", false);
+  addParam("StudyEffiMode", m_studyEffi, "[bool], run in efficiency study mode (default is false)", false);
   addParam("outputName", m_outPath, "[string],  output file name containing efficiencies plots ", std::string("bklmEffi.root"));
 }
 
@@ -135,7 +135,7 @@ void BKLMTrackingModule::event()
           if (m_storeTracks.getEntries() > 0)
             thereIsATrack = true;
           generateEffi(iSection, iSector, iLayer);
-          //clear tracks so prepare for the next layer efficieny study
+          //clear tracks so prepare for the next layer efficiency study
           m_storeTracks.clear();
         }
       }
@@ -162,7 +162,7 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
 
   if (hits2D.getEntries() < 1)
     return;
-  if (mode == 1) { //efficieny study
+  if (mode == 1) { //efficiency study
     for (int j = 0; j < hits2D.getEntries(); j++) {
       if (hits2D[j]->getSubdetector() != KLMElementNumbers::c_BKLM)
         continue;
@@ -239,11 +239,10 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
         m_track->setNumHitOnTrack(m_fitter->getNumHit());
         m_track->setIsValid(m_fitter->isValid());
         m_track->setIsGood(m_fitter->isGood());
-        std::list<KLMHit2d*>::iterator j;
         m_hits.sort(sortByLayer);
-        for (j = m_hits.begin(); j != m_hits.end(); ++j) {
-          (*j)->isOnStaTrack(true);
-          m_track->addRelationTo((*j));
+        for (KLMHit2d* hit2d : m_hits) {
+          hit2d->isOnStaTrack(true);
+          m_track->addRelationTo(hit2d);
         }
         //tracks.push_back(m_track);
         //m_track->getTrackParam().Print();
@@ -254,9 +253,9 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
           if (m_MatchToRecoTrack) {
             if (findClosestRecoTrack(m_track, closestTrack)) {
               m_track->addRelationTo(closestTrack);
-              for (j = m_hits.begin(); j != m_hits.end(); ++j) {
+              for (KLMHit2d* hit2d : m_hits) {
                 unsigned int sortingParameter = closestTrack->getNumberOfTotalHits();
-                closestTrack->addBKLMHit((*j), sortingParameter, RecoHitInformation::OriginTrackFinder::c_LocalTrackFinder);
+                closestTrack->addBKLMHit(hit2d, sortingParameter, RecoHitInformation::OriginTrackFinder::c_LocalTrackFinder);
               }
             }
           }//end match
@@ -403,7 +402,7 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
 
   // can not find matched RecoTrack
   // problem here is the errors of the track parameters are not considered!
-  // best way is the positon or vector direction are required within 5/10 sigma ?
+  // best way is the position or vector direction are required within 5/10 sigma ?
   if (oldAngle > m_maxAngleRequired)
     return false;
   // found matched RecoTrack
@@ -514,7 +513,7 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
           continue;
         if (hits2D[he]->isOutOfTime())
           continue;
-        //if alreday used, skip
+        //if already used, skip
         if (m_pointUsed.find(he) != m_pointUsed.end())
           continue;
 

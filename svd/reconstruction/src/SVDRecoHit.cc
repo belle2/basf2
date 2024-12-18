@@ -14,7 +14,6 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <genfit/DetPlane.h>
-#include <TVector3.h>
 #include <TRandom.h>
 #include <cmath>
 
@@ -42,7 +41,7 @@ SVDRecoHit::SVDRecoHit(const SVDTrueHit* hit, bool uDirection, float sigma):
 
   //If no error is given, estimate the error to pitch/sqrt(12)
   if (sigma < 0) {
-    const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+    const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
     sigma = (m_isU) ? geometry.getUPitch(hit->getV()) / sqrt(12) : geometry.getVPitch() / sqrt(12);
   }
 
@@ -67,7 +66,7 @@ SVDRecoHit::SVDRecoHit(const SVDCluster* hit, const genfit::TrackCandHit*):
   setStripV(!m_isU);
 
   // Determine if we have a wedge sensor.
-  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
 
   bool isWedgeU = m_isU && (geometry.getBackwardWidth() > geometry.getForwardWidth());
 
@@ -90,7 +89,7 @@ SVDRecoHit::SVDRecoHit(const SVDCluster* hit, const genfit::TrackCandHit*):
 void SVDRecoHit::setDetectorPlane()
 {
   // Construct a finite detector plane and set it.
-  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
   bool isWedgeU = m_isU && (geometry.getBackwardWidth() > geometry.getForwardWidth());
 
   // Construct vectors o, u, v
@@ -122,7 +121,7 @@ TVectorD SVDRecoHit::applyPlanarDeformation(TVectorD rawHit, std::vector<double>
   auto L3 = [](double x) {return (5 * x * x * x - 3 * x) / 2;};
   auto L4 = [](double x) {return (35 * x * x * x * x - 30 * x * x + 3) / 8;};
 
-  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
 
   double u = 0;
   double v = 0;
@@ -141,7 +140,7 @@ TVectorD SVDRecoHit::applyPlanarDeformation(TVectorD rawHit, std::vector<double>
   } else {
     v = rawHit[0];                 // V coordinate of hit
     u = state.getState()(3);       // U coordinate of hit
-    length = geometry.getLength(); // Length of sensor (V side) is fuction of V (slanted)
+    length = geometry.getLength(); // Length of sensor (V side) is function of V (slanted)
     width = geometry.getWidth(v);  // Width of sensor (U side)
 
     v = v * 2 / length;            // Legendre parametrization required V in (-1, 1)
@@ -182,7 +181,8 @@ std::vector<genfit::MeasurementOnPlane*> SVDRecoHit::constructMeasurementsOnPlan
   if (!m_isU || m_rotationPhi == 0.0) {
 
     // Apply planar deformation to rectangular sensor or V coordinate of slanted sensor
-    TVectorD pos = applyPlanarDeformation(rawHitCoords_, VXD::GeoCache::get(m_sensorID).getSurfaceParameters(), state);
+    TVectorD pos = applyPlanarDeformation(rawHitCoords_, VXD::GeoCache::getInstance().getSensorInfo(m_sensorID).getSurfaceParameters(),
+                                          state);
 
     return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(pos, rawHitCov_, state.getPlane(),
                                                     state.getRep(), this->constructHMatrix(state.getRep())));
@@ -199,7 +199,7 @@ std::vector<genfit::MeasurementOnPlane*> SVDRecoHit::constructMeasurementsOnPlan
   coords(0) = uPrime;
 
   // Apply planar deformation to U coordinate of slanted sensor
-  TVectorD pos = applyPlanarDeformation(coords, VXD::GeoCache::get(m_sensorID).getSurfaceParameters(), state);
+  TVectorD pos = applyPlanarDeformation(coords, VXD::GeoCache::getInstance().getSensorInfo(m_sensorID).getSurfaceParameters(), state);
 
   TMatrixDSym cov(scale * scale * rawHitCov_);
 

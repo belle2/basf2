@@ -8,6 +8,7 @@
 
 #include <reconstruction/modules/CDCDedxElectronCollector/CDCDedxElectronCollectorModule.h>
 
+
 #include <TTree.h>
 #include <TH1D.h>
 #include <TH1I.h>
@@ -28,11 +29,13 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
   setDescription("A collector module for CDC dE/dx electron calibrations");
 
   // Parameter definitions
+
   addParam("cleanupCuts", m_cuts, "boolean to apply cleanup cuts", true);
   addParam("maxHits", m_maxHits, "maximum number of hits per track ", int(100));
   addParam("setEoP", m_setEoP, "Set E over p Cut values. ", double(0.25));
   addParam("isCosth", m_isCosth, "true for adding costh tree branch. ", false);
   addParam("isMom", m_isMom, "true for adding momentum tree branch. ", false);
+  addParam("isPt", m_isPt, "true for adding transverse momentum tree branch. ", false);
   addParam("isCharge", m_isCharge, "true for charge dedx tree branch. ", false);
   addParam("isRun", m_isRun, "true for adding run number tree branch. ", false);
   addParam("isWire", m_isWire, "true for adding wires tree branch. ", false);
@@ -86,11 +89,15 @@ void CDCDedxElectronCollectorModule::prepare()
   if (m_isInjTime) {
     ttree->Branch<double>("injtime", &m_injTime);
     ttree->Branch<double>("injring", &m_injRing);
+    ttree->Branch<double>("costh", &m_costh);
+    ttree->Branch<int>("nhits", &m_nhits);
+    ttree->Branch<double>("p", &m_p);
   }
 
   ttree->Branch<double>("dedx", &m_dedx);
   if (m_isCosth)ttree->Branch<double>("costh", &m_costh);
   if (m_isMom)ttree->Branch<double>("p", &m_p);
+  if (m_isPt)ttree->Branch<double>("pt", &m_pt);
   if (m_isCharge)ttree->Branch<int>("charge", &m_charge);
   if (m_isRun)ttree->Branch<int>("run", &m_run);
 
@@ -201,8 +208,11 @@ void CDCDedxElectronCollectorModule::collect()
     m_p = dedxTrack->getMomentum();
     m_costh = dedxTrack->getCosTheta();
     m_charge = fitResult->getChargeSign();
+    m_pt = fitResult->getTransverseMomentum();
     m_injTime = dedxTrack->getInjectionTime();
     m_injRing = dedxTrack->getInjectionRing();
+    m_nhits = dedxTrack->size();
+
     htstats->Fill(0);
 
     if (m_cuts) {
@@ -216,7 +226,6 @@ void CDCDedxElectronCollectorModule::collect()
       if (m_costh > TMath::Cos(17.0 * TMath::DegToRad())) continue; //0.95
       htstats->Fill(2);
 
-      m_nhits = dedxTrack->size();
       if (m_nhits > m_maxHits) continue;
 
       //making some cuts based on acceptance

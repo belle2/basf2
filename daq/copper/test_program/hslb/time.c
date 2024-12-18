@@ -12,6 +12,11 @@ void   main()
     time_t   lt;   /*define   a   longint   time   varible*/ 
     lt=time(NULL);/*system   time   and   date*/ 
     printf(ctime(&lt));   /*english   format   output*/ 
-    printf(asctime(localtime(&lt)));/*tranfer   to   tm*/ 
-    printf(asctime(gmtime(&lt)));   /*tranfer   to   Greenwich   time*/ 
+
+    char timeLoc[100], timeGMT[100];
+    std::strftime(timeLoc, sizeof(timeLoc), "%Y-%m-%d %H:%M:%S\n", localtime(&lt));
+    std::strftime(timeGMT, sizeof(timeGMT), "%Y-%m-%d %H:%M:%S\n", gmtime(&lt));
+
+    printf(timeLoc);/*tranfer   to   tm*/ 
+    printf(timeGMT);   /*tranfer   to   Greenwich   time*/ 
 }

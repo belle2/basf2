@@ -36,7 +36,7 @@ namespace Belle2 {
   {
   }
 
-  TRGCDCTrack::TRGCDCTrack(const TCCircle& c)
+  TRGCDCTrack::TRGCDCTrack(const TRGCDCCircle& c)
     : TCTBase((const TCTBase&) c),
       _helix(ORIGIN, CLHEP::HepVector(5, 0), CLHEP::HepSymMatrix(5, 0)), m_2DFitChi2(9999), m_3DFitChi2(9999), m_debugValue(0)
   {

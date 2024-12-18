@@ -33,6 +33,6 @@ PXDRawAdc::PXDRawAdc(VxdID sensorID, void* data, int len):
   } else {
     m_adcs.resize(len);// resize vector
     std::memcpy(&m_adcs[0], d, len);// lowlevel hardcore, TODO maybe better use std::copy ?
-    // seems endianess swapping is not needed
+    // seems endianness swapping is not needed
   }
 };

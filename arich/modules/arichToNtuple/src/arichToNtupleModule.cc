@@ -89,14 +89,14 @@ void arichToNtupleModule::initialize()
 
   // Initializing the output root file
   if (m_fileName.empty()) {
-    B2FATAL("Output root file name is not set. Please set a vaild root output file name (\"fileName\" module parameter).");
+    B2FATAL("Output root file name is not set. Please set a valid root output file name (\"fileName\" module parameter).");
   }
   // See if there is already a file in which case add a new tree to it ...
   // otherwise create a new file (all handled by framework)
   m_file =  RootFileCreationManager::getInstance().getFile(m_fileName);
   if (!m_file) {
     B2ERROR("Could not create file \"" << m_fileName <<
-            "\". Please set a vaild root output file name (\"fileName\" module parameter).");
+            "\". Please set a valid root output file name (\"fileName\" module parameter).");
     return;
   }
 
@@ -264,7 +264,7 @@ void arichToNtupleModule::terminate()
     const bool writeError = m_file->TestBit(TFile::kWriteError);
     m_file.reset();
     if (writeError) {
-      B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
+      B2FATAL("A write error occurred while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
   }
 }
@@ -297,20 +297,19 @@ void arichToNtupleModule::fillARICHTree(const Particle* particle)
       if (!atrk) continue;
 
       if (atrk->hitsWindow()) {
-        TVector2 winHit = atrk->windowHitPosition();
-        m_arich[iTree]->winHit[0] = winHit.X();
-        m_arich[iTree]->winHit[1] = winHit.Y();
+        m_arich[iTree]->winHit[0] = atrk->windowHitPosition().X();
+        m_arich[iTree]->winHit[1] = atrk->windowHitPosition().Y();
       }
 
       m_arich[iTree]->photons = atrk->getPhotons();
 
-      TVector3 recPos = atrk->getPosition();
+      ROOT::Math::XYZVector recPos = atrk->getPosition();
       m_arich[iTree]->recHit.x = recPos.X();
       m_arich[iTree]->recHit.y = recPos.Y();
       m_arich[iTree]->recHit.z = recPos.Z();
 
-      TVector3 recMom = atrk->getDirection() * atrk->getMomentum();
-      m_arich[iTree]->recHit.p = recMom.Mag();
+      ROOT::Math::XYZVector recMom = atrk->getDirection() * atrk->getMomentum();
+      m_arich[iTree]->recHit.p = recMom.R();
       m_arich[iTree]->recHit.theta = recMom.Theta();
       m_arich[iTree]->recHit.phi = recMom.Phi();
 
@@ -336,13 +335,13 @@ void arichToNtupleModule::fillARICHTree(const Particle* particle)
 
       const ARICHAeroHit* aeroHit = atrk->getRelated<ARICHAeroHit>();
       if (aeroHit) {
-        TVector3 truePos = aeroHit->getPosition();
+        ROOT::Math::XYZVector truePos = aeroHit->getPosition();
         m_arich[iTree]->mcHit.x = truePos.X();
         m_arich[iTree]->mcHit.y = truePos.Y();
         m_arich[iTree]->mcHit.z = truePos.Z();
 
-        TVector3 trueMom = aeroHit->getMomentum();
-        m_arich[iTree]->mcHit.p = trueMom.Mag();
+        ROOT::Math::XYZVector trueMom = aeroHit->getMomentum();
+        m_arich[iTree]->mcHit.p = trueMom.R();
         m_arich[iTree]->mcHit.theta = trueMom.Theta();
         m_arich[iTree]->mcHit.phi = trueMom.Phi();
         m_arich[iTree]->mcHit.PDG = aeroHit->getPDG();

@@ -164,9 +164,9 @@ namespace Belle2 {
 
       RelationArray simHitRel(mcParticles, simHits);
 
-      // convert Hep3Vectors to TVector3
-      TVector3 momentum(mom.getX(), mom.getY(), mom.getZ());
-      TVector3 position(pos.getX(), pos.getY(), pos.getZ());
+      // convert Hep3Vectors to ROOT::Math::XYZVector
+      ROOT::Math::XYZVector momentum(mom.getX(), mom.getY(), mom.getZ());
+      ROOT::Math::XYZVector position(pos.getX(), pos.getY(), pos.getZ());
 
       //Append
       simHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV,

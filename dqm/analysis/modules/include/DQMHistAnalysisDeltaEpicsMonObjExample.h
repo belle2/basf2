@@ -14,7 +14,7 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 
-#include <TCanvas.h>
+#include <TLine.h>
 
 namespace Belle2 {
   /*! DQM Delta Histogram Test code and example */
@@ -81,6 +81,29 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
+
+    /** alarm limits from PV */
+    double m_meanLowerAlarm{NAN};
+    /** alarm limits from PV */
+    double m_meanLowerWarn{NAN};
+    /** alarm limits from PV */
+    double m_meanUpperWarn{NAN};
+    /** alarm limits from PV */
+    double m_meanUpperAlarm{NAN};
+    /** alarm limits from PV */
+    double m_widthUpperWarn{NAN};
+    /** alarm limits from PV */
+    double m_widthUpperAlarm{NAN};
+
+    /** TLine for alarm limits */
+    TLine* m_meanLowerAlarmLine{nullptr};
+    /** TLine for alarm limits */
+    TLine* m_meanLowerWarnLine{nullptr};
+    /** TLine for alarm limits */
+    TLine* m_meanUpperWarnLine{nullptr};
+    /** TLine for alarm limits */
+    TLine* m_meanUpperAlarmLine{nullptr};
+
   };
 } // end namespace Belle2
 

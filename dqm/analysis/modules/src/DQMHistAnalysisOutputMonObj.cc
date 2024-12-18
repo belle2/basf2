@@ -32,6 +32,8 @@ REG_MODULE(DQMHistAnalysisOutputMonObj);
 DQMHistAnalysisOutputMonObjModule::DQMHistAnalysisOutputMonObjModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("Module to process run information.");
+
   //Parameter definition
   addParam("Filename", m_filename, "Output root filename (if not set mon_e{exp}r{run}.root is used", std::string(""));
   addParam("TreeFile", m_treeFile, "If set, entry to run summary TTree from TreeFile is made", std::string(""));
@@ -90,30 +92,35 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   if (hnevt) m_metaData->setNEvents(hnevt->GetEntries());
   else m_metaData->setNEvents(m_nevt);
 
-  TFile f(fname, "NEW");
-
-  if (f.IsZombie()) {
+  TFile* f = new TFile(fname, "NEW");
+  int exist = 0;
+  if (f->IsZombie()) {
     B2WARNING("File " << LogVar("MonitoringObject file",
-                                fname) << " already exists and it will not be rewritten. If desired please delete file and re-run.");
-    return;
+                                fname) << " already exists additional data will be appended! previous metadata is kept.");
+    f = new TFile(fname, "UPDATE");
+    exist = 1;
   }
 
-  // set meta data info
-  //  m_metaData->setNEvents(lastEvtMeta->getEvent());
-  m_metaData->setExperimentRun(exp, run);
-  time_t ts = lastEvtMeta->getTime() / 1e9;
-  struct tm* timeinfo;
-  timeinfo = localtime(&ts);
-  // cppcheck-suppress asctimeCalled
-  m_metaData->setRunDate(asctime(timeinfo));
+  // set and write meta data info if first input
+  if (!exist) {
+    m_metaData->setExperimentRun(exp, run);
+    time_t ts = lastEvtMeta->getTime() / 1e9;
+    struct tm* timeinfo;
+    timeinfo = localtime(&ts);
+    char buf[50];
+    m_metaData->setRunDate(asctime_r(timeinfo, buf));
+    m_metaData->Write();
+  }
 
-  m_metaData->Write();
   // get list of existing monitoring objects
   const MonObjList& objts =  getMonObjList();
   // write them to the output file
-  for (const auto& obj : objts)(obj.second)->Write();
-
-  f.Close();
+  for (const auto& obj : objts) {
+    // of object already exists rewrite it
+    if (exist) f->Delete(obj.second.GetName() + TString(";*"));
+    obj.second.Write();
+  }
+  f->Close();
 
   if (m_treeFile.length() > 0) addTreeEntry();
 
@@ -134,7 +141,7 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
   //int expee = 0;
   char* rel = const_cast<char*>(m_metaData->getRelease().c_str());
   char* db = const_cast<char*>(m_metaData->getDatabaseGlobalTag().c_str());
-  char* datee = const_cast<char*>(m_metaData->getRunDate().c_str());
+  char* date = const_cast<char*>(m_metaData->getRunDate().c_str());
   char* rtype = const_cast<char*>(m_metaData->getRunType().c_str());
   char* procID = const_cast<char*>(m_metaData->getProcessingID().c_str());
 
@@ -171,22 +178,21 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
   else b_release->SetAddress(rel);
   if (!b_gt) tree->Branch("gt", db, "gt/C");
   else b_gt->SetAddress(db);
-  if (!b_datetime) tree->Branch("datetime", datee, "datetime/C");
-  else b_datetime->SetAddress(datee);
+  if (!b_datetime) tree->Branch("datetime", date, "datetime/C");
+  else b_datetime->SetAddress(date);
   if (!b_rtype) tree->Branch("rtype", rtype, "rtype/C");
   else b_rtype->SetAddress(rtype);
   if (!b_procID) tree->Branch("procID", procID, "procID/C");
   else b_procID->SetAddress(procID);
 
 
-  const MonObjList& objts =  getMonObjList();
+  auto& objts =  getMonObjList();
   // write them to the output file
-  for (const auto& obj : objts) {
-    std::map<std::string, float>& vars = const_cast<std::map<std::string, float>&>((obj.second)->getVariables());
-    std::map<std::string, float>& upErr = const_cast<std::map<std::string, float>&>((obj.second)->getUpError());
-    std::map<std::string, float>& lowErr = const_cast<std::map<std::string, float>&>((obj.second)->getLowError());
-
-    const std::vector<std::pair<std::string, std::string>>& strVars = (obj.second)->getStringVariables();
+  for (auto& obj : objts) {
+    auto& vars = const_cast<std::map<std::string, float>&>(obj.second.getVariables());
+    auto& upErr = const_cast<std::map<std::string, float>&>(obj.second.getUpError());
+    auto& lowErr = const_cast<std::map<std::string, float>&>(obj.second.getLowError());
+    auto& strVars = obj.second.getStringVariables();
 
     for (auto& var : vars) {
       std::string brname = obj.first + "_" + var.first;

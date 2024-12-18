@@ -872,7 +872,6 @@ namespace Belle2 {
       trackList2DFitted.push_back(& aTrack);
 
       CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
-      double phi02D;
       vector<double> nWires(9);
       vector<double> rr(9);
       vector<double> rr2D;
@@ -962,12 +961,7 @@ namespace Belle2 {
         else if (fLRLUT) LR[iSL] = lutLR[iSL];
         else LR[iSL] = 3;
       }//End superlayer loop
-      // 2D fit values from IW 2D fitter
-      phi02D = aTrack.helix().phi0();
-      if (aTrack.charge() < 0) {
-        phi02D = phi02D - M_PI;
-        if (phi02D < 0) phi02D = phi02D + 2 * M_PI;
-      }
+
       // Get 2D fit values from JB 2D fitter
       // Set phi2DError for 2D fit
       vector<double>phi2DError(5);
@@ -999,7 +993,6 @@ namespace Belle2 {
       double rho, phi0, pt, chi2;
       rho = 0;
       phi0 = 0;
-      pt = 0;
       chi2 = 0;
       vector<double>phi2DInvError(5);
       for (unsigned iAx = 0; iAx < 5; iAx++) {

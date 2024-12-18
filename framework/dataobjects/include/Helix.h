@@ -44,7 +44,7 @@ namespace Belle2 {
    *
    *  in that exact order.
    *
-   *  Each point on the helix can be adressed by the two dimensional arc length s, which has to be traversed to get to it from the perigee.
+   *  Each point on the helix can be addressed by the two dimensional arc length s, which has to be traversed to get to it from the perigee.
    *  More precisely the two dimensional arc length means the transverse part of the particles travel distance,
    *  hence the arc length of the circle in the xy projection.
    *
@@ -180,7 +180,7 @@ namespace Belle2 {
      *
      *  This calculates the dimensional arc length to the closest approach in xy projection.
      *  Hence, it only optimizes the distance in x and y.
-     *  This is sufficent to extrapolate to an axial wire.
+     *  This is sufficient to extrapolate to an axial wire.
      *  For stereo wires this is not optimal, since the distance in the z direction also plays a role.
      *
      *  @param x        X coordinate of the point to which to extrapolate
@@ -262,7 +262,7 @@ namespace Belle2 {
      *  @param expandBelowChi  Control parameter below, which absolute value of chi an expansion of divergent terms shall be used.
      *                         This parameter exists for testing the consistency of the expansion with the closed form.
      *                         In other applications the parameter should remain at its default value.
-     *  @return                The jacobian matrix containing the derivatives of the five helix parameters after the move relative the orignal parameters.
+     *  @return                The jacobian matrix containing the derivatives of the five helix parameters after the move relative the original parameters.
      */
     TMatrixD calcPassiveMoveByJacobian(const ROOT::Math::XYZVector& by, const double expandBelowChi = M_PI / 8) const;
 
@@ -281,7 +281,7 @@ namespace Belle2 {
      *  @param byX           X displacement by which the origin of the coordinate system should be moved.
      *  @param byY           Y displacement by which the origin of the coordinate system should be moved.
      *  @param[out] jacobian The jacobian matrix containing the derivatives of the five helix parameters
-     *                       after the move relative the orignal parameters.
+     *                       after the move relative the original parameters.
      *  @param expandBelowChi Control parameter below, which absolute value of chi an expansion of
      *                        divergent terms shall be used. This parameter exists for testing the
      *                        consistency of the expansion with the closed form.
@@ -388,7 +388,7 @@ namespace Belle2 {
     /** Getter for tan lambda, which is the z over two dimensional arc length slope of the track. */
     double getTanLambda() const { return m_tanLambda; }
 
-    /** Getter for cot theta, which is the z over two dimensional arc length slope of the track. Synomym to tan lambda. */
+    /** Getter for cot theta, which is the z over two dimensional arc length slope of the track. Synonym to tan lambda. */
     double getCotTheta() const { return m_tanLambda; }
     /// @}
 
@@ -396,7 +396,7 @@ namespace Belle2 {
   private:
     //---------------------------------------------------------------------------------------------------------------------------
     //--- Functions for internal conversions between cartesian and perigee helix parameters
-    //--- This can be placed in a seperate header which handles all the conversion stuff
+    //--- This can be placed in a separate header which handles all the conversion stuff
     //---------------------------------------------------------------------------------------------------------------------------
 
     /** Cartesian to Perigee conversion.

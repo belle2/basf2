@@ -461,7 +461,7 @@ int ECLGeometryPar::TouchableToCellID(const G4VTouchable* touch)
 
     G4ThreeVector dr = m_current_crystal.pos - ro, dn = m_current_crystal.dir - rn;
     if (dr.mag() > 1e-10 || dn.mag() > 1e-10) {
-      cout << "Missmatch " << h->GetVolume(hd - 1)->GetName() << " " << cellID << " " << ThetaId << " " << PhiId << " " << NCryst << " "
+      cout << "Mismatch " << h->GetVolume(hd - 1)->GetName() << " " << cellID << " " << ThetaId << " " << PhiId << " " << NCryst << " "
            << hd << " " << i2 << " " << i1 << " " << m_current_crystal.pos << " " << ro << " " << rn << " " << dr << " " << dn << endl;
 
       for (int i = 0; i < 144; i++) {

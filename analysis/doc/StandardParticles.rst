@@ -19,7 +19,7 @@ Standard Particles
         * `stdV0s.stdLambdas`
 
         However, please check
-        `this Neutrals Performance confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+        `this Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
         for the latest updates.
 
 .. tip::
@@ -40,7 +40,7 @@ Standard Particles
 	* 'UniformEff95'
 
         However, please check
-        `the Lepton ID Performance confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+        `the Charged PID performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/fab3e>`_
         for the latest updates.
 
 
@@ -81,7 +81,7 @@ Other functions available
 
 .. warning::
         These other functions are not recommended for normal use without some study of the selection, or if you are working on skimming.
-        If you use and improve these lists, please report in a performance meeting and make a pull request.
+        If you use and improve these lists, please report in a performance meeting and make a merge request.
 
 .. automodule:: stdCharged
    :members:

@@ -208,6 +208,7 @@ namespace TreeFitter {
     }
 
     if (m_updateDaugthers || isTreeHead) {
+      TMatrixFSym cov7b2(7);
       if (posindex >= 0) {
         const ROOT::Math::XYZVector pos(m_fitparams->getStateVector()(posindex),
                                         m_fitparams->getStateVector()(posindex + 1),
@@ -227,6 +228,21 @@ namespace TreeFitter {
             cand.writeExtraInfo("prodVertexY", m_fitparams->getStateVector()(motherPosIndex + 1));
             if (pb.mother()->dim() > 2)
               cand.writeExtraInfo("prodVertexZ", m_fitparams->getStateVector()(motherPosIndex + 2));
+            if (not isTreeHead) {
+              getCovFromPB(pb.mother(), cov7b2);
+              cand.writeExtraInfo("prodVertSxx", cov7b2[4][4]);
+              cand.writeExtraInfo("prodVertSxy", cov7b2[4][5]);
+              cand.writeExtraInfo("prodVertSyx", cov7b2[5][4]);
+              cand.writeExtraInfo("prodVertSyy", cov7b2[5][5]);
+              if (pb.mother()->dim() > 2) {
+                cand.writeExtraInfo("prodVertexZ", m_fitparams->getStateVector()(motherPosIndex + 2));
+                cand.writeExtraInfo("prodVertSxz", cov7b2[4][6]);
+                cand.writeExtraInfo("prodVertSyz", cov7b2[5][6]);
+                cand.writeExtraInfo("prodVertSzx", cov7b2[6][4]);
+                cand.writeExtraInfo("prodVertSzy", cov7b2[6][5]);
+                cand.writeExtraInfo("prodVertSzz", cov7b2[6][6]);
+              }
+            }
           }
         }
       }
@@ -244,7 +260,6 @@ namespace TreeFitter {
         p.SetE(std::sqrt(p.P2() + mass * mass));
         cand.set4VectorDividingByMomentumScaling(p);
       }
-      TMatrixFSym cov7b2(7);
       getCovFromPB(&pb, cov7b2);
       cand.setMomentumVertexErrorMatrix(cov7b2);
     }

@@ -21,7 +21,7 @@ namespace Belle2 {
    *  You can use setNextEntry() to request loading of any event in 0..numEntries()-1,
    *  which will be done the next time the input module's event() function is called.
    *
-   *  Use canControlInput() to check wether control is actually possible.
+   *  Use canControlInput() to check whether control is actually possible.
    */
   class InputController {
   public:
@@ -90,7 +90,7 @@ namespace Belle2 {
     /** Reset InputController (e.g. after forking a thread) */
     static void resetForChildProcess();
 
-    /** Necessary to make sure the ProgressModule shows reasonable output.. */
+    /** Necessary to make sure the ProgressModule shows reasonable output. */
     static long getNumEntriesToProcess();
 
   private:

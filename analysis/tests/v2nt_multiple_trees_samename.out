@@ -5,6 +5,7 @@
 [INFO]  o) creating (anti-)ParticleList with name: e+:all (e-:all)
 [INFO]    -> MDST source: Tracks
 [FATAL] Tree with the name "variables" already exists in the file "ntuple.root"
+or is reserved for FileMetaData.
 
 You probably want to either set the output fileName or the treeName to something else:
 

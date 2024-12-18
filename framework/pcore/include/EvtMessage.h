@@ -142,6 +142,6 @@ namespace Belle2 {
     void setMsg(const char* msg, int size, ERecordType type);
 
     char* m_data;         ///< Pointer to the internal EvtMessage buffer
-    bool m_ownsBuffer; ///< Wether to clean up m_data in destructor
+    bool m_ownsBuffer; ///< Whether to clean up m_data in destructor
   };
 }

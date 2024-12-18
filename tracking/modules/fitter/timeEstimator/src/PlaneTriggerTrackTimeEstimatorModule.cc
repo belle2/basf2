@@ -120,7 +120,7 @@ double PlaneTriggerTrackTimeEstimatorModule::estimateFlightLengthUsingSeedInform
       const double x2_rotated = h.getCosPhi0() * x2_unrotated + h.getSinPhi0() * y2_unrotated;
       const double y2_rotated = -h.getSinPhi0() * x2_unrotated + h.getCosPhi0() * y2_unrotated;
 
-      // Finaly, we can calculate the arc length
+      // Finally, we can calculate the arc length
       const double arcLengthOfTrigger1 = h.getArcLength2DAtXY(x1_rotated, y1_rotated);
       const double arcLengthOfTrigger2 = h.getArcLength2DAtXY(x2_rotated, y2_rotated);
 

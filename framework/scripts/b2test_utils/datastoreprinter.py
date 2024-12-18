@@ -19,6 +19,8 @@ def get_public_members(classname):
     Return a list of public, non-static member functions for a given classname.
     The class must exist in the Belle2 namespace and have a ROOT dictionary
     """
+    if not hasattr(Belle2, classname):
+        return []
     tclass = getattr(Belle2, classname).Class()
     members = {e.GetName() for e in tclass.GetListOfMethods()
                if (e.Property() & kIsPublic) and not (e.Property() & kIsStatic)}
@@ -41,7 +43,7 @@ class DataStorePrinter:
     """
     Class to print contents of a StoreObjPtr or StoreArray.
 
-    This class is inteded to print the contents of dataobjects to the standard
+    This class is intended to print the contents of dataobjects to the standard
     output to monitor changes to the contents among versions.
 
     For example:
@@ -50,7 +52,7 @@ class DataStorePrinter:
     >>> printer.print()
 
     will loop over all MCParticle instances in the MCParticles StoreArray and
-    print someting like ::
+    print something like ::
 
         MCParticle#0
           getVertex(): (0,0,0)
@@ -111,7 +113,7 @@ class DataStorePrinter:
                 the object as first argument and the member name to be tested as
                 second argument. The function is supposed to return the list of
                 arguments to pass to the member when calling. Possible return
-                valus for the callable are:
+                values for the callable are:
 
                 * a `list` of arguments to be passed to the member. An empty
                   `list` means to call the member with no arguments.
@@ -137,12 +139,18 @@ class DataStorePrinter:
         """Print all the objects currently existing"""
         if self.array:
             data = Belle2.PyStoreArray(self.name + "s")
-            for i, obj in enumerate(data):
-                self._printObj(obj, i)
+            if not data.isValid():
+                print(f"No data for {self.name}")
+            else:
+                for i, obj in enumerate(data):
+                    self._printObj(obj, i)
         else:
             obj = Belle2.PyStoreObj(self.name)
-            if obj:
-                self._printObj(obj.obj())
+            if not obj.isValid():
+                print(f"No data for {self.name}")
+            else:
+                if obj:
+                    self._printObj(obj.obj())
 
     def print_untested(self):
         """Print all the public member functions we will not test"""
@@ -161,7 +169,7 @@ class DataStorePrinter:
         """
         # print array index? If yes then add it to the output
         if index is not None:
-            index = "#%d" % index
+            index = f"#{int(index)}"
         else:
             index = ""
 
@@ -174,7 +182,7 @@ class DataStorePrinter:
             # the arguments
             if callable(arguments):
                 all_args = arguments(obj, name)
-                # None means we don't calle the member this time
+                # None means we don't called the member this time
                 if all_args is None:
                     continue
                 # list is one set of arguments, tuple(list) is n set of
@@ -195,7 +203,7 @@ class DataStorePrinter:
                     print("  " + display + ": ", end="")
                 else:
                     # otherwise just print name and arguments
-                    print("  {}({}): ".format(name, ",".join(map(str, args))), end="")
+                    print(f"  {name}({','.join(map(str, args))}): ", end="")
                 # if a callback is set the callback is used to print the result
                 if callback is not None:
                     print("", end="", flush=True)
@@ -222,43 +230,43 @@ class DataStorePrinter:
             print("  " * (depth + 1), end="")
 
         if weight is not None:
-            weight = " (weight: %.6g)" % weight
+            weight = f" (weight: {weight:.6g})"
         else:
             weight = ""
 
         # is it another RelationsObject? print array name and index
         if hasattr(result, "getArrayName") and hasattr(result, "getArrayIndex"):
             if not result:
-                print("-> NULL%s" % weight)
+                print(f"-> NULL{weight}")
             else:
-                print("-> %s#%d%s" % (result.getArrayName(), result.getArrayIndex(), weight))
+                print(f"-> {result.getArrayName()}#{int(result.getArrayIndex())}{weight}")
         # special case for TMatrix like types to make them more space efficient
         elif hasattr(result, "GetNrows") and hasattr(result, "GetNcols"):
             print(weight, end="")
             for row in range(result.GetNrows()):
                 print("\n" + "  " * (depth + 2), end="")
                 for col in range(result.GetNcols()):
-                    print("%13.6e " % result(row, col), end="")
+                    print(f"{result(row, col):13.6e} ", end="")
 
             print()
         # or is it a TVector3 or TLorentzVector?
         elif isinstance(result, TVector3):
-            print("(" + ",".join("%.6g" % result[i] for i in range(3)) + ")")
+            print("(" + ",".join(f"{result[i]:.6g}" for i in range(3)) + ")")
         elif isinstance(result, XYZVector):
-            print("(" + ",".join("%.6g" % Belle2.B2Vector3D(result)[i] for i in range(3)) + ")")
+            print("(" + ",".join(f"{Belle2.B2Vector3D(result)[i]:.6g}" for i in range(3)) + ")")
             # print("(" + ",".join("%.6g" % x for x in [result.X(), result.Y(), result.Z()]) + ")")
         elif isinstance(result, TLorentzVector):
-            print("(" + ",".join("%.6g" % result[i] for i in range(4)) + ")")
+            print("(" + ",".join(f"{result[i]:.6g}" for i in range(4)) + ")")
         # or, does it look like a std::pair?
         elif hasattr(result, "first") and hasattr(result, "second"):
-            print("pair%s" % weight)
+            print(f"pair{weight}")
             self._printResult(result.first, depth + 1)
             self._printResult(result.second, depth + 1)
         # or, could it be a std::vector like container? But ROOT might wrap a std::string so if it has npos assume it's a string
         elif (hasattr(result, "size") and hasattr(result, "begin")
               and hasattr(result, "end")) and not hasattr(result, "npos") \
                 and not isinstance(result, Const.DetectorSet):
-            print("size(%d)%s" % (result.size(), weight))
+            print(f"size({int(result.size())}){weight}")
             # if it is a RelationVector we also want to print the weights. So
             # check whether we have weights and pass them to the _printResult
             weight_getter = getattr(result, "weight", None)

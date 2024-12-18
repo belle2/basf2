@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -5,15 +7,19 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 import numpy as np
 from scipy.fftpack import fft, ifft
 import ROOT
 from ROOT import TFile
 import sys
 from array import array
-#
+import argparse
+
+# '''
+# Third step in waveform template calibrations.  Computes hadron pulse shape using photon template input.
 # See eclComputePulseTemplates_Step0.cc for README instructions.
-#
+# '''
 
 
 def EvalGamComp(tin, ttrg):
@@ -44,7 +50,7 @@ def EvalAnyComp(tin, ttrg, TauIn):
 
 
 def CalcShaperOutput(muonShaper, muonInitial, inputPreShaper, ITER):
-    impulse = ((ifft((fft(muonShaper) / fft(muonInitial)))))
+    impulse = (ifft(fft(muonShaper) / fft(muonInitial)))
     outputShaper = np.real(ifft(fft(impulse) * fft(inputPreShaper)))
     base = outputShaper[ITER]
     i = 0
@@ -61,15 +67,15 @@ def GetShaperOutput(ratio, flg, shaperMuonFunc):
     Ns = 100000
     TLen = 100000.
     to_ns = TLen/Ns
-    #
+
     PMT_trigger_time = 1000. * to_ns
-    #
+
     Time = []
     TimeShp = []
     ShaperDSP_output_muon_array = []
     PMT_output_muon_array = []
     PMT_output_array = []
-    #
+
     for i in range(0, Ns):
         t = i * to_ns
         Time.append(t)
@@ -81,16 +87,16 @@ def GetShaperOutput(ratio, flg, shaperMuonFunc):
         else:
             PMT_output_array.append((2 - ratio) * EvalGamComp(t, PMT_trigger_time) +
                                     (ratio - 1) * (EvalAnyComp(t, PMT_trigger_time, 10)))
-    #
-    if(flg == 0):
+
+    if (flg == 0):
         return Time, PMT_output_array
-    if(flg == 1):
+    if (flg == 1):
         return Time, PMT_output_muon_array
-    if(flg == 2):
+    if (flg == 2):
         return Time, ShaperDSP_output_muon_array
-    if(flg == 3):
+    if (flg == 3):
         ShaperDSP_output_array = []
-        if(ratio <= 1.):
+        if (ratio <= 1.):
             ShaperDSP_output_array = CalcShaperOutput(ShaperDSP_output_muon_array, PMT_output_muon_array, PMT_output_array, 0)
         else:
             ShaperDSP_output_array = CalcShaperOutput(ShaperDSP_output_muon_array, PMT_output_muon_array, PMT_output_array, 30)
@@ -102,22 +108,33 @@ def GetShaperOutput(ratio, flg, shaperMuonFunc):
         return Time_us, ShaperDSP_output_array
 
 
-OutputDirectory = ""
-if(OutputDirectory == ""):
-    print("Error set ouput directory")
+OutputDirectory = "./"
+if (OutputDirectory == ""):
+    print("Error set output directory")
     sys.exit()
-#
-Low = int(sys.argv[1])
-High = int(sys.argv[2])
-#
+
+
+def argument_parser():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('Low', type=int, help='First CellID to be processed')
+    parser.add_argument('High', type=int, help='Last CellID to be processed')
+    return parser
+
+
+args = argument_parser().parse_args()
+Low = args.Low
+High = args.High
+
+print(Low, High)
+
 f1 = ROOT.TFile(OutputDirectory + "PhotonShapes_Low" + str(Low) + "_High" + str(High) + ".root", "update")
 f1.cd()
 mt = f1.Get("mtree")
 entries = mt.GetEntries()
 print(entries)
-#
+
 TFactor = 30
-#
+
 outFile = TFile(OutputDirectory + "HadronShapes_Low" + str(Low) + "_High" + str(High) + ".root", "RECREATE")
 outTree = ROOT.TTree("HadronTree", "")
 TimeAll_A = array('d', 1000 * [0.])
@@ -128,11 +145,11 @@ outTree.Branch("TimeAll_A", TimeAll_A, 'TimeAll_A[1000]/D')
 outTree.Branch("ValuePhoton_A", ValuePhoton_A, 'ValuePhoton_A[1000]/D')
 outTree.Branch("ValueHadron_A", ValueHadron_A, 'ValueHadron_A[1000]/D')
 outTree.Branch("ValueDiode_A", ValueDiode_A, 'ValueDiode_A[1000]/D')
-#
+
 i = 0
 for i in range(entries):
     mt.GetEntry(i)
-    if(mt.PhotonArray[1] < -100):
+    if (mt.PhotonArray[1] < -100):
         for j in range(1000):
             ValuePhoton_A[j] = -999
             TimeAll_A[j] = -999
@@ -143,10 +160,10 @@ for i in range(entries):
         Time3, ValuesHadron_A = GetShaperOutput(1, flag, mt.PhotonArray)
         Time4, ValuesDiode_A = GetShaperOutput(2, flag, mt.PhotonArray)
         Time6, ValuesPhoton_A = GetShaperOutput(0, flag, mt.PhotonArray)
-        #
+
         factor = TFactor
         for j in range(1000):
-            if(flag == 3):
+            if (flag == 3):
                 ValuePhoton_A[j] = mt.PhotonArray[j * factor]
             else:
                 ValuePhoton_A[j] = ValuesPhoton_A[j * factor]

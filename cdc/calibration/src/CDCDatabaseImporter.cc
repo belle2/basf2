@@ -44,6 +44,7 @@
 #include <TFile.h>
 #include <TTreeReader.h>
 #include <TH1F.h>
+#include <Math/Vector3D.h>
 #include <iostream>
 #include <fstream>
 
@@ -743,8 +744,8 @@ void Belle2::CDCDatabaseImporter::importDisplacement(std::string fileName)
 
     ++nRead;
     WireID wire(iL, iC);
-    TVector3 fwd(fwrd[0], fwrd[1], fwrd[2]);
-    TVector3 bwd(back[0], back[1], back[2]);
+    ROOT::Math::XYZVector fwd(fwrd[0], fwrd[1], fwrd[2]);
+    ROOT::Math::XYZVector bwd(back[0], back[1], back[2]);
     disp.appendNew(wire, fwd, bwd, tension);
   }
 

@@ -42,7 +42,7 @@ def make_3D_bin(bin_x, bin_y, bin_z):
     return bin_3d
 
 # To make these one needs tables generated with the photon efficiency code
-# REPOSITORY: https://stash.desy.de/projects/DBX/repos/photoneff/browse
+# REPOSITORY: https://gitlab.desy.de/belle2/performance/neutrals/photon-detection-efficiency
 # They provide you with 2D theta phi tables, for different photon energy bins.
 # The energy bins are defined in the file names, but the theta, phi bins are not, so they are given in separate files.
 # The naming scheme has to be exact for this to work, but luckily the code in the repository takes care of all that.

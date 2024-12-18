@@ -213,7 +213,7 @@ namespace Belle2 {
     m_Hough3DFinder->destruct();
   }
 
-  void TRGCDCHough3DFinder::doit(vector<TCTrack*> const& trackList2D, vector<TCTrack*>& trackList3D)
+  void TRGCDCHough3DFinder::doit(vector<TRGCDCTrack*> const& trackList2D, vector<TRGCDCTrack*>& trackList3D)
   {
     // Loop over trackList2D and copy to make a new trackList3D. Will delete it at TRGCDC.cc.
     for (unsigned int iTrack = 0; iTrack < trackList2D.size(); iTrack++) {
@@ -223,7 +223,7 @@ namespace Belle2 {
     doit(trackList3D);
   }
 
-  void TRGCDCHough3DFinder::doit(vector<TCTrack*>& trackList)
+  void TRGCDCHough3DFinder::doit(vector<TRGCDCTrack*>& trackList)
   {
 
     // Assign track ID's.

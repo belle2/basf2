@@ -14,7 +14,7 @@
 #                                                                        #
 # This tutorial demonstrates how to include the charm flavor             #
 # tagging user interface into your analysis.                             #
-# The following decay is recontructed:                                   #
+# The following decay is reconstructed:                                  #
 #                                                                        #
 # D0 -> K- pi+                                                           #
 #                                                                        #
@@ -34,7 +34,7 @@ import variables.utils as vu
 cft_path = b2.Path()
 
 # append analysis global tag where the CFT payload is stored
-b2.conditions.append_globaltag('analysis_tools_light-2302-genetta')
+b2.conditions.append_globaltag(ma.getAnalysisGlobaltag())
 
 # load input ROOT file
 ma.inputMdst(filename=b2.find_file('Dst2D0pi.root', 'examples', False),
@@ -68,7 +68,7 @@ cft.charmFlavorTagger(
     path=cft_path)
 
 # Select variables that will be stored to ntuple
-d_vars = vc.kinematics+vc.mc_truth+["CFT_qr","CFT_prob"]
+d_vars = vc.kinematics+vc.mc_truth+["CFT_qr", "CFT_prob"]
 d_vars += vu.create_aliases_for_selected(
     list_of_variables=vc.kinematics
     + vc.mc_truth,
@@ -88,4 +88,3 @@ b2.process(cft_path)
 
 # print out the summary
 print(b2.statistics)
-

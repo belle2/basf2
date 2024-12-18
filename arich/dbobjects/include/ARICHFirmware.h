@@ -10,59 +10,68 @@
 #include <TObject.h>
 
 namespace Belle2 {
+
   /**
-  *  ARICH firmware
-  */
+   * ARICH firmware.
+   */
   class ARICHFirmware: public TObject {
+
   public:
+
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHFirmware(): m_comment(""), m_version(0), m_firmware("") {};
 
     /**
-     * Constructor
+     * Constructor.
      */
     explicit ARICHFirmware(int version): m_comment(""), m_version(version), m_firmware("") {};
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHFirmware(const std::string& comment, int version, const std::string& firmware): m_comment(comment), m_version(version),
       m_firmware(firmware) {};
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ARICHFirmware() {};
 
-    /** Return comment
-     * @return comment
+    /**
+     * Get comment.
+     * @return Comment.
      */
     std::string getFirmwareComment() const {return m_comment; }
 
-    /** Set comment
-     * @param comment
+    /**
+     * Set comment.
+     * @param[in] comment Comment.
      */
     void setFirmwareComment(const std::string& comment) {m_comment = comment; }
 
-    /** Return Version Number
-     * @return Version Number
+    /**
+     * Get version number.
+     * @return Version number.
      */
     unsigned int getFirmwareVersion() const {return m_version; }
 
-    /** Set Version Number
-     * @param Version Number
+    /**
+     * Set version number.
+     * @param[in] version Version number.
      */
     void setFirmwareVersion(unsigned int version) {m_version = version; }
 
-    /** Return FPGA bitfile
-     * @return FPGA bitfile
+    /**
+     * Get FPGA bitfile.
+     * @return FPGA bitfile.
      */
     std::string getFPGA() const {return m_firmware; }
 
-    /** Set FPGA bitfile
-     * @param FPGA bitfile
+    /**
+     * Set FPGA bitfile.
+     * @param[in] firmware FPGA bitfile.
      */
     void setFPGA(const std::string& firmware) {m_firmware = firmware; }
 

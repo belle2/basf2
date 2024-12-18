@@ -15,6 +15,7 @@
 #include "TDirectory.h"
 #include <boost/format.hpp>
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
 using boost::format;
@@ -62,11 +63,11 @@ namespace Belle2 {
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_numModules = geo->getNumModules();
-    double bunchTimeSep = geo->getNominalTDC().getSyncTimeBase() / 24;
+    m_bunchTimeSep = geo->getNominalTDC().getSyncTimeBase() / 24;
 
     // Histograms
 
-    m_BoolEvtMonitor = new TH1D("BoolEvtMonitor", "Event desynchronization monitoring", 2, -0.5, 1.5);
+    m_BoolEvtMonitor = new TH1D("BoolEvtMonitor", "Event synchronization", 2, -0.5, 1.5);
     m_BoolEvtMonitor->GetYaxis()->SetTitle("number of digits");
     m_BoolEvtMonitor->GetXaxis()->SetBinLabel(1, "synchronized");
     m_BoolEvtMonitor->GetXaxis()->SetBinLabel(2, "de-synchronized");
@@ -74,7 +75,7 @@ namespace Belle2 {
     m_BoolEvtMonitor->GetXaxis()->SetAlphanumeric();
     m_BoolEvtMonitor->SetMinimum(0);
 
-    m_window_vs_slot = new TH2F("window_vs_slot", "Distribution of hits: raw timing", 16, 0.5, 16.5, 512, 0, 512);
+    m_window_vs_slot = new TH2F("window_vs_slot", "Asic windows", 16, 0.5, 16.5, 512, 0, 512);
     m_window_vs_slot->SetXTitle("slot number");
     m_window_vs_slot->SetYTitle("window number w.r.t reference window");
     m_window_vs_slot->SetStats(kFALSE);
@@ -82,10 +83,10 @@ namespace Belle2 {
     m_window_vs_slot->GetXaxis()->SetNdivisions(16);
 
     int nbinsT0 = 75;
-    double rangeT0 = nbinsT0 * bunchTimeSep;
-    m_eventT0 = new TH1F("eventT0", "reconstructed event T0; event T0 [ns]; events per bin", nbinsT0, -rangeT0 / 2, rangeT0 / 2);
+    double rangeT0 = nbinsT0 * m_bunchTimeSep;
+    m_eventT0 = new TH1F("eventT0", "Event T0; event T0 [ns]; events per bin", nbinsT0, -rangeT0 / 2, rangeT0 / 2);
 
-    m_bunchOffset = new TH1F("bunchOffset", "Reconstructed bunch: current offset", 100, -bunchTimeSep / 2, bunchTimeSep / 2);
+    m_bunchOffset = new TH1F("bunchOffset", "Bunch offset", 100, -m_bunchTimeSep / 2, m_bunchTimeSep / 2);
     m_bunchOffset->SetXTitle("offset [ns]");
     m_bunchOffset->SetYTitle("events per bin");
     m_bunchOffset->SetMinimum(0);
@@ -93,7 +94,10 @@ namespace Belle2 {
     m_time = new TH1F("goodHitTimes", "Time distribution of good hits", 1000, -20, 80);
     m_time->SetXTitle("time [ns]");
     m_time->SetYTitle("hits per bin");
-    m_time->SetMinimum(0);
+
+    m_timeBG = new TH1F("goodHitTimesBG", "Time distribution of good hits (background)", 1000, -20, 80);
+    m_timeBG->SetXTitle("time [ns]");
+    m_timeBG->SetYTitle("hits per bin");
 
     m_signalHits = new TProfile("signalHits", "Number of good hits per track in [0, 50] ns", 16, 0.5, 16.5, 0, 1000);
     m_signalHits->SetXTitle("slot number");
@@ -107,13 +111,17 @@ namespace Belle2 {
     m_backgroundHits->SetMinimum(0);
     m_backgroundHits->GetXaxis()->SetNdivisions(16);
 
+    m_trackHits = new TH2F("trackHits", "Number of events w/ and w/o track in the slot", 16, 0.5, 16.5, 2, 0, 2);
+    m_trackHits->SetXTitle("slot number");
+    m_trackHits->SetYTitle("numTracks > 0");
+
     int nbinsHits = 1000;
     double xmaxHits = 10000;
     m_goodHitsPerEventAll = new TH1F("goodHitsPerEventAll", "Number of good hits per event", nbinsHits, 0, xmaxHits);
     m_goodHitsPerEventAll->GetXaxis()->SetTitle("hits per event");
     m_goodHitsPerEventAll->GetYaxis()->SetTitle("entries per bin");
 
-    m_badHitsPerEventAll = new TH1F("badHitsPerEventAll", "Number of bad hits per event", nbinsHits, 0, xmaxHits);
+    m_badHitsPerEventAll = new TH1F("badHitsPerEventAll", "Number of junk hits per event", nbinsHits, 0, xmaxHits);
     m_badHitsPerEventAll->GetXaxis()->SetTitle("hits per event");
     m_badHitsPerEventAll->GetYaxis()->SetTitle("entries per bin");
 
@@ -124,7 +132,7 @@ namespace Belle2 {
     m_goodTDCAll->SetXTitle("raw time [samples]");
     m_goodTDCAll->SetYTitle("hits per sample");
 
-    m_badTDCAll = new TH1F("badTDCAll", "Raw time distribution of bad hits", nbinsTDC, xminTDC, xmaxTDC);
+    m_badTDCAll = new TH1F("badTDCAll", "Raw time distribution of junk hits", nbinsTDC, xminTDC, xmaxTDC);
     m_badTDCAll->SetXTitle("raw time [samples]");
     m_badTDCAll->SetYTitle("hits per sample");
 
@@ -133,6 +141,39 @@ namespace Belle2 {
     m_TOPEOccAfterInjLER  = new TH1F("TOPEOccInjLER", "TOPEOccInjLER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
     m_TOPEOccAfterInjHER  = new TH1F("TOPEOccInjHER", "TOPEOccInjHER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
 
+    m_nhitInjLER = new TProfile2D("nhitInjLER",
+                                  "LER: average Nhits; "
+                                  "time since injection [msec]; time within beam cycle [syst. clk]; Nhits average",
+                                  160, 0, 80, 256, 0, 1280, 0, 100000);
+    m_nhitInjHER = new TProfile2D("nhitInjHER",
+                                  "HER: average Nhits; "
+                                  "time since injection [msec]; time within beam cycle [syst. clk]; Nhits average",
+                                  160, 0, 80, 256, 0, 1280, 0, 100000);
+    m_nhitInjLERcut = new TProfile2D("nhitInjLERcut",
+                                     "LER: average Nhits (Nhits>1000); "
+                                     "time since injection [msec]; time within beam cycle [syst. clk]; Nhits average",
+                                     160, 0, 80, 256, 0, 1280, 0, 100000);
+    m_nhitInjHERcut = new TProfile2D("nhitInjHERcut",
+                                     "HER: average Nhits (Nhits>1000); "
+                                     "time since injection [msec]; time within beam cycle [syst. clk]; Nhits average",
+                                     160, 0, 80, 256, 0, 1280, 0, 100000);
+    m_eventInjLER = new TH2F("eventInjLER",
+                             "LER: event distribution; "
+                             "time since injection [msec]; time within beam cycle [syst. clk]; events per bin",
+                             160, 0, 80, 256, 0, 1280);
+    m_eventInjHER = new TH2F("eventInjHER",
+                             "HER: event distribution; "
+                             "time since injection [msec]; time within beam cycle [syst. clk]; events per bin",
+                             160, 0, 80, 256, 0, 1280);
+    m_eventInjLERcut = new TH2F("eventInjLERcut",
+                                "LER: event distribution (Nhits>1000); "
+                                "time since injection [msec]; time within beam cycle [syst. clk]; events per bin",
+                                160, 0, 80, 256, 0, 1280);
+    m_eventInjHERcut = new TH2F("eventInjHERcut",
+                                "HER: event distribution (Nhits>1000); "
+                                "time since injection [msec]; time within beam cycle [syst. clk]; events per bin",
+                                160, 0, 80, 256, 0, 1280);
+
     for (int i = 0; i < m_numModules; i++) {
       int module = i + 1;
       string name, title;
@@ -140,7 +181,7 @@ namespace Belle2 {
       TH2F* h2 = 0;
 
       name = str(format("window_vs_asic_%1%") % (module));
-      title = str(format("Distribution of hits: raw timing for slot #%1%") % (module));
+      title = str(format("Asic windows for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 512, 0, 512);
       h2->SetStats(kFALSE);
       h2->SetXTitle("ASIC number");
@@ -158,7 +199,7 @@ namespace Belle2 {
       m_goodHitsXY.push_back(h2);
 
       name = str(format("bad_hits_xy_%1%") % (module));
-      title = str(format("Distribution of bad hits for slot #%1%") % (module));
+      title = str(format("Distribution of junk hits for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
       h2->SetStats(kFALSE);
       h2->GetXaxis()->SetTitle("pixel column");
@@ -176,7 +217,7 @@ namespace Belle2 {
       m_goodHitsAsics.push_back(h2);
 
       name = str(format("bad_hits_asics_%1%") % (module));
-      title = str(format("Distribution of bad hits for slot #%1%") % (module));
+      title = str(format("Distribution of junk hits for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 8, 0, 8);
       h2->SetStats(kFALSE);
       h2->GetXaxis()->SetTitle("ASIC number");
@@ -192,19 +233,25 @@ namespace Belle2 {
       m_goodTDC.push_back(h1);
 
       name = str(format("bad_TDC_%1%") % (module));
-      title = str(format("Raw time distribution of bad hits for slot #%1%") % (module));
+      title = str(format("Raw time distribution of junk hits for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), nbinsTDC, xminTDC, xmaxTDC);
       h1->GetXaxis()->SetTitle("raw time [samples]");
       h1->GetYaxis()->SetTitle("hits per sample");
       m_badTDC.push_back(h1);
 
       name = str(format("good_timing_%1%") % (module));
-      title = str(format("Timing distribution of good hits for slot #%1%") % (module));
+      title = str(format("Time distribution of good hits for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), 200, -20, 80);
       h1->GetXaxis()->SetTitle("time [ns]");
       h1->GetYaxis()->SetTitle("hits per time bin");
-      h1->SetMinimum(0);
       m_goodTiming.push_back(h1);
+
+      name = str(format("good_timing_%1%BG") % (module));
+      title = str(format("Time distribution of good hits (background) for slot #%1%") % (module));
+      h1 = new TH1F(name.c_str(), title.c_str(), 200, -20, 80);
+      h1->GetXaxis()->SetTitle("time [ns]");
+      h1->GetYaxis()->SetTitle("hits per time bin");
+      m_goodTimingBG.push_back(h1);
 
       name = str(format("good_channel_hits_%1%") % (module));
       title = str(format("Distribution of good hits for slot #%1%") % (module));
@@ -216,13 +263,21 @@ namespace Belle2 {
       m_goodChannelHits.push_back(h1);
 
       name = str(format("bad_channel_hits_%1%") % (module));
-      title = str(format("Distribution of bad hits for slot #%1%") % (module));
+      title = str(format("Distribution of junk hits for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0, numPixels);
       h1->GetXaxis()->SetTitle("channel number");
       h1->GetYaxis()->SetTitle("hits per channel");
       h1->SetMinimum(0);
       m_badChannelHits.push_back(h1);
 
+      name = str(format("pulseHeights_%1%") % (module));
+      title = str(format("Average pulse heights for slot #%1%") % (module));
+      auto* prof = new TProfile(name.c_str(), title.c_str(), 32, 0.5, 32.5, 0, 2000);
+      prof->GetXaxis()->SetTitle("PMT number");
+      prof->GetYaxis()->SetTitle("pulse height [ADC counts]");
+      prof->SetMarkerStyle(20);
+      prof->SetMinimum(0);
+      m_pulseHeights.push_back(prof);
     }
 
     // cd back to root directory
@@ -237,7 +292,7 @@ namespace Belle2 {
 
     // register dataobjects
 
-    m_rawFTSW.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
+    m_rawFTSWs.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
     m_digits.isRequired();
     m_recBunch.isOptional();
     m_timeZeros.isOptional();
@@ -252,8 +307,10 @@ namespace Belle2 {
     m_eventT0->Reset();
     m_bunchOffset->Reset();
     m_time->Reset();
+    m_timeBG->Reset();
     m_signalHits->Reset();
     m_backgroundHits->Reset();
+    m_trackHits->Reset();
     m_goodTDCAll->Reset();
     m_badTDCAll->Reset();
     m_goodHitsPerEventAll->Reset();
@@ -262,6 +319,14 @@ namespace Belle2 {
     m_TOPOccAfterInjHER->Reset();
     m_TOPEOccAfterInjLER->Reset();
     m_TOPEOccAfterInjHER->Reset();
+    m_nhitInjLER->Reset();
+    m_nhitInjHER->Reset();
+    m_nhitInjLERcut->Reset();
+    m_nhitInjHERcut->Reset();
+    m_eventInjLER->Reset();
+    m_eventInjHER->Reset();
+    m_eventInjLERcut->Reset();
+    m_eventInjHERcut->Reset();
 
     for (int i = 0; i < m_numModules; i++) {
       m_window_vs_asic[i]->Reset();
@@ -272,8 +337,10 @@ namespace Belle2 {
       m_goodTDC[i]->Reset();
       m_badTDC[i]->Reset();
       m_goodTiming[i]->Reset();
+      m_goodTimingBG[i]->Reset();
       m_goodChannelHits[i]->Reset();
       m_badChannelHits[i]->Reset();
+      m_pulseHeights[i]->Reset();
     }
   }
 
@@ -295,7 +362,9 @@ namespace Belle2 {
 
     if (recBunchValid) {
       double t0 = m_commonT0->isRoughlyCalibrated() ? m_commonT0->getT0() : 0;
-      m_bunchOffset->Fill(m_recBunch->getCurrentOffset() - t0);
+      double offset = m_recBunch->getCurrentOffset() - t0;
+      offset -= m_bunchTimeSep * lround(offset / m_bunchTimeSep); // wrap around
+      m_bunchOffset->Fill(offset);
       m_eventT0->Fill(m_recBunch->getTime());
     }
 
@@ -319,6 +388,15 @@ namespace Belle2 {
       if (slot == 0) continue;
       numTracks[slot - 1]++;
       trackMomenta[slot - 1] = std::max(trackMomenta[slot - 1], fitResult->getMomentum().R());
+    }
+
+    // count events w/ and w/o track in the slot
+
+    if (recBunchValid or cosmics) {
+      for (size_t i = 0; i < numTracks.size(); i++) {
+        bool hit = numTracks[i] > 0;
+        m_trackHits->Fill(i + 1, hit);
+      }
     }
 
     // select modules for counting hits in signal and background time windows
@@ -355,6 +433,7 @@ namespace Belle2 {
         m_goodTDC[slot - 1]->Fill(digit.getRawTime());
         m_goodTDCAll->Fill(digit.getRawTime());
         m_goodChannelHits[slot - 1]->Fill(digit.getChannel());
+        m_pulseHeights[slot - 1]->Fill(digit.getPMTNumber(), digit.getPulseHeight());
         nHits_good++;
         if (digit.hasStatus(TOPDigit::c_EventT0Subtracted)) {
           double time = digit.getTime();
@@ -362,6 +441,9 @@ namespace Belle2 {
           if (numTracks[slot - 1] > 0) {
             m_goodTiming[slot - 1]->Fill(time);
             m_time->Fill(time);
+          } else {
+            m_goodTimingBG[slot - 1]->Fill(time);
+            m_timeBG->Fill(time);
           }
           if (selectedSlots[slot - 1] and abs(time) < 50) {
             if (time > 0) numSignalHits[slot - 1]++;
@@ -391,20 +473,34 @@ namespace Belle2 {
 
     // fill injection histograms
 
-    for (auto& it : m_rawFTSW) {
+    for (auto& it : m_rawFTSWs) {
       B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
               (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
               it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
-      auto difference = it.GetTimeSinceLastInjection(0);
-      if (difference != 0x7FFFFFFF) {
+      auto time_clk = it.GetTimeSinceLastInjection(0);  // expressed in system clock
+      if (time_clk != 0x7FFFFFFF) {
         unsigned int nentries = m_digits.getEntries();
-        float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+        double time_us = time_clk / 127.0; //  127MHz clock ticks to us, inexact rounding
+        double time_ms = time_us / 1000;
+        double time_1280 = time_clk % 1280; // within beam cycle, experssed in system clock
         if (it.GetIsHER(0)) {
-          m_TOPOccAfterInjHER->Fill(diff2, nentries);
-          m_TOPEOccAfterInjHER->Fill(diff2);
+          m_TOPOccAfterInjHER->Fill(time_us, nentries);
+          m_TOPEOccAfterInjHER->Fill(time_us);
+          m_nhitInjHER->Fill(time_ms, time_1280, nHits_good);
+          m_eventInjHER->Fill(time_ms, time_1280);
+          if (nHits_good > 1000) {
+            m_nhitInjHERcut->Fill(time_ms, time_1280, nHits_good);
+            m_eventInjHERcut->Fill(time_ms, time_1280);
+          }
         } else {
-          m_TOPOccAfterInjLER->Fill(diff2, nentries);
-          m_TOPEOccAfterInjLER->Fill(diff2);
+          m_TOPOccAfterInjLER->Fill(time_us, nentries);
+          m_TOPEOccAfterInjLER->Fill(time_us);
+          m_nhitInjLER->Fill(time_ms, time_1280, nHits_good);
+          m_eventInjLER->Fill(time_ms, time_1280);
+          if (nHits_good > 1000) {
+            m_nhitInjLERcut->Fill(time_ms, time_1280, nHits_good);
+            m_eventInjLERcut->Fill(time_ms, time_1280);
+          }
         }
       }
     }

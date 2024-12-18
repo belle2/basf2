@@ -161,7 +161,7 @@ namespace Belle2 {
 
 
     /**
-     * Function performing the actual line fit via a principal component analysis methode yielding a direction vector
+     * Function performing the actual line fit via a principal component analysis method yielding a direction vector
      * based on the eigen vector corresponding to the largest eigenvalue and a seed position calculated as the mean of
      * all given SpacePoints.
      * The function sets the member m_reducedChi2 which is calculated based on the distance of all given points to the

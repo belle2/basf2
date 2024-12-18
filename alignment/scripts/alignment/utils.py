@@ -33,27 +33,27 @@ class AlignmentGeneratorConfig:
         self.alignment.append(str(vxdid + ',' + str(param_id) + ',' + distribution + ',' + str(value)))
 
     def gen_u_gaus(self, vxdid, value):
-        """ generate u coordinate shift for VxdID mask with gausian distribution of given width """
+        """ generate u coordinate shift for VxdID mask with Gaussian distribution of given width """
         self.align_sensors(vxdid, 1, 'gaus', value)
 
     def gen_v_gaus(self, vxdid, value):
-        """ generate v coordinate shift for VxdID mask with gausian distribution of given width """
+        """ generate v coordinate shift for VxdID mask with Gaussian distribution of given width """
         self.align_sensors(vxdid, 2, 'gaus', value)
 
     def gen_w_gaus(self, vxdid, value):
-        """ generate w coordinate shift for VxdID mask with gausian distribution of given width """
+        """ generate w coordinate shift for VxdID mask with Gaussian distribution of given width """
         self.align_sensors(vxdid, 3, 'gaus', value)
 
     def gen_alpha_gaus(self, vxdid, value):
-        """ generate alpha rotation for VxdID mask with gausian distribution of given width """
+        """ generate alpha rotation for VxdID mask with Gaussian distribution of given width """
         self.align_sensors(vxdid, 4, 'gaus', value)
 
     def gen_beta_gaus(self, vxdid, value):
-        """ generate beta rotation for VxdID mask with gausian distribution of given width """
+        """ generate beta rotation for VxdID mask with Gaussian distribution of given width """
         self.align_sensors(vxdid, 5, 'gaus', value)
 
     def gen_gamma_gaus(self, vxdid, value):
-        """ generate gamma rotation coordinate shift for VxdID mask with gausian distribution of given width """
+        """ generate gamma rotation coordinate shift for VxdID mask with Gaussian distribution of given width """
         self.align_sensors(vxdid, 6, 'gaus', value)
 
     def gen_u_uniform(self, vxdid, value):

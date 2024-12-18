@@ -12,9 +12,6 @@
 #include <simulation/dataobjects/SimHitBase.h>
 //#include <framework/datastore/RelationsObject.h>
 
-// ROOT
-#include <TVector3.h>
-
 namespace Belle2 {
   /**
   * ClassMicrotpcDataHit - digitization simulated datahit for the Microtpc detector.

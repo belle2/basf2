@@ -146,7 +146,7 @@ with the `passesCut` function.
     You can use the ``passesCut`` function to turn a cut into a variable and
     assign an alias for it.
 
-    .. code-block:: python3
+    .. code-block:: python
 
         from variables import variables as vm
         vm.addAlias("myCut", "passesCut(E > 1 and p > 1")
@@ -171,7 +171,7 @@ with the `passesCut` function.
 
    The cuts will look like this:
 
-   .. code-block:: python3
+   .. code-block:: python
 
        vm.addAlias(
            "goodXXXGamma", "passesCut(clusterReg == XXX and clusterE > XXX)"
@@ -254,7 +254,7 @@ one Bremsstrahlung photon was added to this particle.
 .. admonition:: Solution
    :class: toggle solution
 
-   .. code-block:: python3
+   .. code-block:: python
 
       ma.correctBremsBelle('e+:corrected', 'e+:uncorrected', 'gamma:brems', path=main)
 

@@ -45,17 +45,21 @@
 using namespace std;
 using namespace Belle2;
 
-/** shortcut for NaN of double type */
-static const double    realNaN = std::numeric_limits<double>::quiet_NaN();
-/** vector with NaN entries */
+/** Shortcut for NaN of double type. */
+static const double realNaN = std::numeric_limits<double>::quiet_NaN();
+
+/** Vector with NaN entries. */
 static const ROOT::Math::XYZVector vecNaN(realNaN, realNaN, realNaN);
-/** 3x3 matrix with NaN entries */
-static const TMatrixDSym matNaN(3, (double [])
-{
+
+/** Array with NaN entries. */
+static const double arrayNaN[] = {
   realNaN, realNaN, realNaN,
-           realNaN, realNaN, realNaN,
-           realNaN, realNaN, realNaN
-});
+  realNaN, realNaN, realNaN,
+  realNaN, realNaN, realNaN,
+};
+
+/** 3x3 matrix with NaN entries */
+static const TMatrixDSym matNaN(3, arrayNaN);
 
 // import tools from RotationTools.h
 using RotationTools::rotateTensor;

@@ -12,7 +12,7 @@
 <header>
   <input>../GenericB_GENSIMRECtoDST.dst.root</input>
   <output>Pi0_Validation.root</output>
-  <contact>Mario Merola (mario.merola@na.infn.it), Andrea Selce (selce@infn.it)</contact>
+  <contact>Mario Merola (mario.merola@na.infn.it)</contact>
   <description>
   Check the calibration of the ECL in the MC by determining the measured pi0 invariant mass.
   </description>
@@ -22,6 +22,7 @@
 import basf2
 import ROOT
 from modularAnalysis import cutAndCopyList, inputMdst
+from stdPi0s import stdPi0s
 from validation_tools.metadata import create_validation_histograms
 from validation_tools.metadata import validation_metadata_update
 from variables import variables as vm
@@ -32,6 +33,7 @@ OUTPUT_FILENAME = "Pi0_Validation.root"
 main = basf2.Path()
 inputMdst(INPUT_FILENAME, path=main)
 
+stdPi0s('all', path=main)
 cutAndCopyList('pi0:rec', 'pi0:all', 'daughter(0, E)>0.05 and daughter(1, E)>0.05', path=main)
 cutAndCopyList('pi0:mc', 'pi0:all', 'mcErrors<1', path=main)
 
@@ -44,7 +46,7 @@ create_validation_histograms(
         (
             "Mreco", 40, 0.08, 0.18,
             "#pi^{0} reconstructed candidates, invariant mass",
-            "Andrea Selce <selce@infn.it>",
+            "Eldar Ganiev <eldar.ganiev@desy.de>",
             r"The $\pi^0$ invariant mass distribution with $E_{\gamma}>0.05\, \text{GeV}$",
             r"Distribution should be peaking at the nominal $\pi^0$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
@@ -62,7 +64,7 @@ create_validation_histograms(
         (
             "Mmc", 40, 0.08, 0.18,
             "#pi^{0} MC candidates, invariant mass",
-            "Andrea Selce <selce@infn.it>",
+            "Eldar Ganiev <eldar.ganiev@desy.de>",
             r"The $\pi^0$ invariant mass distribution for truth matched candidates",
             r"Distribution should be peaking at the nominal $\pi^0$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
@@ -183,7 +185,7 @@ validation_metadata_update(
     output,
     "pi0_mass",
     title="Pi0 mass fit results",
-    contact="selce@infn.it",
+    contact="eldar.ganiev@desy.de",
     description="Fit to the invariant mass of the reconstructed and truth matched pi0s",
     check="Consistent numerical fit results. Stable mean and width.",
     metaoptions="shifter")

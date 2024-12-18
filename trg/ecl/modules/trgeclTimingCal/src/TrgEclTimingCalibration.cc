@@ -219,7 +219,7 @@ int TRGECLTimingCalModule::FillMatrix()
       }
 
       else if (fCalType == 1) { //cosmic ray data
-        double TOF_TC2TC = (TCPosition[m_TCID1] - TCPosition[m_TCID2]).Mag() / 29.9792458;
+        double TOF_TC2TC = (TCPosition[m_TCID1] - TCPosition[m_TCID2]).R() / 29.9792458;
         if (TCPosition[m_TCID1].y() > TCPosition[m_TCID2].y()) {
           Vector_component = (TCTiming[itc1] - (TCTiming[itc2] - TOF_TC2TC));
         } else Vector_component = ((TCTiming[itc1] - TOF_TC2TC) - TCTiming[itc2]);

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -18,9 +17,9 @@ def CheckEnvVar(conf, var, text=None):
     """check for the existance of an environment variable"""
 
     if text:
-        conf.Message('Checking for %s...' % text)
+        conf.Message(f'Checking for {text}...')
     else:
-        conf.Message('Checking for environment variable %s...' % var)
+        conf.Message(f'Checking for environment variable {var}...')
     result = var in conf.env['ENV']
     conf.Result(result)
     return result
@@ -29,8 +28,8 @@ def CheckEnvVar(conf, var, text=None):
 def CheckConfigTool(conf, tool):
     """check for the existance of a tool"""
 
-    conf.Message('Checking for %s...' % tool)
-    (result, version) = conf.TryAction('%s --version' % tool)
+    conf.Message(f'Checking for {tool}...')
+    (result, version) = conf.TryAction(f'{tool} --version')
     conf.Result(result)
     return result
 
@@ -40,8 +39,8 @@ def CheckPackage(conf, package, text=None):
 
     if not text:
         text = package
-    conf.Message('Checking for %s...' % text)
-    (result, output) = conf.TryAction('pkg-config --exists %s' % package)
+    conf.Message(f'Checking for {text}...')
+    (result, output) = conf.TryAction(f'pkg-config --exists {package}')
     conf.Result(result)
     return result
 
@@ -50,9 +49,9 @@ def CheckFile(conf, dir, text=None):
     """check for the existance a file"""
 
     if text:
-        conf.Message('Checking for %s...' % text)
+        conf.Message(f'Checking for {text}...')
     else:
-        conf.Message('Checking for directory %s...' % dir)
+        conf.Message(f'Checking for directory {dir}...')
     if conf.env.FindFile(dir, '.') is None:
         result = 0
     else:

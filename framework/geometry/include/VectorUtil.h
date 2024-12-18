@@ -72,6 +72,24 @@ namespace Belle2 {
       setMagThetaPhi(vector, vector.R(), vector.Theta(), phi);
     }
 
+    /**
+     * Set vector by polar coordinates.
+     * @param[out] vector Vector.
+     * @param[in]  pt     Magnitude in xy-plane.
+     * @param[in]  theta  Polar angle.
+     * @param[in]  phi    Azimuthal angle.
+     */
+    inline void setPtThetaPhi(ROOT::Math::XYZVector& vector,
+                              double pt, double theta, double phi)
+    {
+      const double aPt = std::abs(pt);
+      const double x = aPt * std::cos(phi);
+      const double y = aPt * std::sin(phi);
+      const double tanTheta = std::tan(theta);
+      const double z = tanTheta ? aPt / tanTheta : 0;
+      vector.SetXYZ(x, y, z);
+    }
+
   }
 
 }

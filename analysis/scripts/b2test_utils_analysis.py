@@ -57,18 +57,31 @@ def scanTTree(filename):
     ttrees = [key.GetName() for key in tfile.GetListOfKeys() if key.GetClassName() == "TTree"]
 
     for ttree_name in ttrees:
+        if ttree_name == "persistent":
+            continue
         print(f"TTree: {ttree_name}")
 
         # get TTree object
         ttree = tfile.Get(ttree_name)
-        ttree.GetEntry(0)
-        # print name and value of all TBranch in the TTree
-        for branch in ttree.GetListOfBranches():
-            branch_name = branch.GetName()
-            branch_value = getattr(ttree, branch.GetName())
-            if isinstance(branch_value, float):
-                print(f"TBranch: {branch_name}, {branch_value:.4g}")
-            else:
-                print(f"TBranch: {branch_name}, {branch_value}")
+        num_entries = ttree.GetEntries()
+
+        if num_entries == 0:
+            print("No entry found")
+            # print name all TBranches in the TTree
+            for branch in ttree.GetListOfBranches():
+                branch_name = branch.GetName()
+                print(f"TBranch: {branch_name}")
+
+        else:
+            ttree.GetEntry(0)
+            # print name and value of all TBranches in the TTree
+            for branch in ttree.GetListOfBranches():
+                branch_name = branch.GetName()
+                branch_value = getattr(ttree, branch_name)
+
+                if isinstance(branch_value, float):
+                    print(f"TBranch: {branch_name}, {branch_value:.4g}")
+                else:
+                    print(f"TBranch: {branch_name}, {branch_value}")
 
     tfile.Close()

@@ -111,7 +111,7 @@ CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(PyObject* runs, int 
   return execute(vecRuns, iteration, iov);
 }
 
-CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(vector<ExpRun> runs, int iteration, IntervalOfValidity iov)
+CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(vector<Calibration::ExpRun> runs, int iteration, IntervalOfValidity iov)
 {
   // Check if we are calling this function directly and need to reset, or through Python where it was already done.
   if (m_data.getResult() != c_Undefined) {
@@ -407,7 +407,7 @@ void CalibrationAlgorithm::updateDBObjPtrs(const unsigned int event = 1, const i
   EventMetaData emd(event, run, experiment);
   // Explicitly update while avoiding registering a Datastore object
   DBStore::Instance().update(emd);
-  // Also update the intra-run objects to the event at the same time (maybe unnessary...)
+  // Also update the intra-run objects to the event at the same time (maybe unnecessary...)
   DBStore::Instance().updateEvent(event);
 }
 

@@ -14,8 +14,8 @@
 #include <beast/microtpc/dataobjects/MicrotpcHit.h>
 
 #include <TF1.h>
-#include <TVector3.h>
-#include <TVector2.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
 
 #include <vector>
 #include <map>
@@ -86,10 +86,10 @@ namespace Belle2 {
       virtual void Drift(double, double, double, double&, double&, double&, double&, double, double, double);
 
       /** GEMazition of GEM1 */
-      TVector2 GEMGeo1(double x1, double y1);
+      ROOT::Math::XYVector GEMGeo1(double x1, double y1);
 
       /** GEMazition of GEM2 */
-      TVector2 GEMGeo2(double x1, double y1);
+      ROOT::Math::XYVector GEMGeo2(double x1, double y1);
 
       /** Phase */
       Int_t m_phase;
@@ -189,7 +189,7 @@ namespace Belle2 {
       /** number of detectors. Read from MICROTPC.xml*/
       int m_nTPC = 0;
       /** TPC coordinate */
-      std::vector<TVector3> m_TPCCenter;
+      std::vector<ROOT::Math::XYZVector> m_TPCCenter;
       /** TPC angle X */
       std::vector<float> m_TPCAngleX;
       /** TPC angle Z */

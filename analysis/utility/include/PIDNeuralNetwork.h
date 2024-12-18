@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
 #include <analysis/dbobjects/PIDNeuralNetworkParameters.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
@@ -36,6 +37,7 @@ namespace Belle2 {
       m_model(nullptr)
     {
       loadParametersFromDB();
+      check();
     };
 
 
@@ -48,6 +50,7 @@ namespace Belle2 {
       m_model(nullptr)
     {
       loadParametersFromDB();
+      check();
     }
 
     /**
@@ -56,7 +59,9 @@ namespace Belle2 {
     PIDNeuralNetwork(PIDNeuralNetwork&& other):
       m_pidNeuralNetworkParametersName(std::move(other.m_pidNeuralNetworkParametersName)),
       m_pidNeuralNetworkParametersDB(std::move(other.m_pidNeuralNetworkParametersDB)),
-      m_model(std::move(other.m_model))
+      m_model(std::move(other.m_model)),
+      m_inputBasf2Names(std::move(other.m_inputBasf2Names)),
+      m_extraInfoNames(std::move(other.m_extraInfoNames))
     {
     }
 
@@ -75,16 +80,10 @@ namespace Belle2 {
     size_t getInputSize() const { return (*m_pidNeuralNetworkParametersDB)->getInputSize(); }
 
     /**
-     * Get input names
-     * @return const std::vector<std::string>& input names
+     * Get names of input variables in the basf2 naming scheme, which may be different from the one in the payload
+     * @return const std::vector<const std::string>& input variables
      */
-    size_t getInputIndex(const std::string& name) const { return (*m_pidNeuralNetworkParametersDB)->getInputIndex(name); }
-
-    /**
-     * Get input names
-     * @return const std::vector<std::string>& input names
-     */
-    const std::vector<std::string>& getInputNames() const { return (*m_pidNeuralNetworkParametersDB)->getInputNames(); }
+    const std::vector<std::string>& getInputBasf2Names() const { return m_inputBasf2Names; }
 
     /**
      * Get the list of pdg codes of species hypotheses, for which the network predicts
@@ -107,23 +106,40 @@ namespace Belle2 {
      */
     bool hasPdgCode(const int pdg, const bool throwException = false) const {return (*m_pidNeuralNetworkParametersDB)->hasPdgCode(pdg, throwException);}
 
+    /**
+     * @param pdg pdg code of hypothesis
+     * @return name of the extra info that stores the probability of the given pdg code
+     */
+    const std::string& getExtraInfoName(const int pdg) const {return m_extraInfoNames.at(pdg);}
+
+
   private:
 
     /**
      * Load neural-network parameters with name `m_pidNeuralNetworkParametersName` from the conditions data base.
      */
     void loadParametersFromDB();
+    /**
+     * Check that Neural Network can be evaluated, e.g. that all required inputs exist
+     */
+    void check();
 
     std::string m_pidNeuralNetworkParametersName = "PIDNeuralNetworkParameters"; /**< name of the parameter set */
-    std::unique_ptr<DBObjPtr<PIDNeuralNetworkParameters>>
-                                                       m_pidNeuralNetworkParametersDB; /**< db object for the parameter set */
-
+    std::unique_ptr<DBObjPtr<PIDNeuralNetworkParameters>> m_pidNeuralNetworkParametersDB; /**< db object for the parameter set */
     std::unique_ptr<const fdeep::model> m_model; /**< frugally-deep neural network */
+    std::vector<std::string> m_inputBasf2Names; /**< list of input names of input variables in the basf2 naming scheme*/
+    std::map<int, std::string> m_extraInfoNames; /**< map from PDG code to extraInfo name that stores the output of this network */
 
   };
 
 } // Belle2 namespace
 
 
+inline void Belle2::PIDNeuralNetwork::check()
+{
+  for (const auto& name : getInputBasf2Names()) {
+    if (!Variable::Manager::Instance().getVariable(name))
+      B2FATAL("PID neural network needs input '" + name + "', but this input is not available!");
+  }
 
-
+}

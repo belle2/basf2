@@ -19,7 +19,7 @@ using namespace std;
 namespace Belle2 {
 
   string
-  TRGUtil::dateString(void)
+  TRGUtilities::dateString(void)
   {
     time_t t;
     time(& t);
@@ -31,7 +31,7 @@ namespace Belle2 {
   }
 
   string
-  TRGUtil::dateStringF(void)
+  TRGUtilities::dateStringF(void)
   {
     time_t t;
     time(& t);
@@ -43,7 +43,7 @@ namespace Belle2 {
   }
 
   std::string
-  TRGUtil::itostring(int i)
+  TRGUtilities::itostring(int i)
   {
     // std::ostringstream s;
     // s << i;
@@ -53,7 +53,7 @@ namespace Belle2 {
   }
 
   std::string
-  TRGUtil::dtostring(double d, unsigned int precision)
+  TRGUtilities::dtostring(double d, unsigned int precision)
   {
     std::ostringstream s;
     s << std::setprecision(precision) << d;
@@ -61,7 +61,7 @@ namespace Belle2 {
   }
 
   std::string
-  TRGUtil::carstring(const std::string& s)
+  TRGUtilities::carstring(const std::string& s)
   {
     std::string ret;
 //    const char * p = str;
@@ -81,7 +81,7 @@ namespace Belle2 {
   }
 
   std::string
-  TRGUtil::cdrstring(const std::string& s)
+  TRGUtilities::cdrstring(const std::string& s)
   {
 //    const char * p = str;
 //    while ( *p && isspace(*p) ) p++;
@@ -102,13 +102,13 @@ namespace Belle2 {
   }
 
   void
-  TRGUtil::bitDisplay(unsigned val)
+  TRGUtilities::bitDisplay(unsigned val)
   {
     bitDisplay(val, 31, 0);
   }
 
   void
-  TRGUtil::bitDisplay(unsigned val, unsigned f, unsigned l)
+  TRGUtilities::bitDisplay(unsigned val, unsigned f, unsigned l)
   {
     unsigned i;
     for (i = 0; i < f - l; i++) {
@@ -118,7 +118,7 @@ namespace Belle2 {
   }
 
   string
-  TRGUtil::streamDisplay(unsigned val, unsigned f, unsigned l)
+  TRGUtilities::streamDisplay(unsigned val, unsigned f, unsigned l)
   {
     string s;
     for (unsigned i = f; i < l + 1; i++) {
@@ -129,7 +129,7 @@ namespace Belle2 {
   }
 
   string
-  TRGUtil::streamDisplay(unsigned val)
+  TRGUtilities::streamDisplay(unsigned val)
   {
     return streamDisplay(val, 0, 63);
   }

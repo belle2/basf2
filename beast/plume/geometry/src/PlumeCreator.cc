@@ -14,9 +14,6 @@
 #include <framework/gearbox/GearDir.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4AssemblyVolume.hh>
@@ -34,7 +31,6 @@
 #include<G4ExtrudedSolid.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -196,7 +192,6 @@ namespace Belle2 {
       G4double a, zz;
       G4double density;
       G4int ncomponents;
-      G4double fractionmass;
       a = 1.01 * CLHEP::g / CLHEP::mole;
       G4Element* elH  = new G4Element(name = "Hydrogen", symbol = "H", zz = 1., a);
       a = 12.01 * CLHEP::g / CLHEP::mole;
@@ -205,12 +200,12 @@ namespace Belle2 {
       G4Element* elO  = new G4Element(name = "Oxygen", symbol = "O", zz = 8., a);
       density = 1.31 * CLHEP::g / CLHEP::cm3;
       G4Material* peekMat = new G4Material(name = "plumePeek", density, ncomponents = 3);
-      peekMat->AddElement(elC, fractionmass = 0.76);
-      peekMat->AddElement(elH, fractionmass = 0.08);
-      peekMat->AddElement(elO, fractionmass = 0.16);
+      peekMat->AddElementByMassFraction(elC, 0.76);
+      peekMat->AddElementByMassFraction(elH, 0.08);
+      peekMat->AddElementByMassFraction(elO, 0.16);
       density = 1.5 * CLHEP::g / CLHEP::cm3;
       G4Material* carbMat = new G4Material(name = "plumeCarb", density, ncomponents = 1);
-      carbMat->AddElement(elC, fractionmass = 1.0);
+      carbMat->AddElementByMassFraction(elC, 1.0);
 
       G4Box* s_sensor = new G4Box("s_sensor", SensorLengthX / 2., SensorLengthY / 2., dz_sensor);
       G4LogicalVolume* l_sensor = new G4LogicalVolume(s_sensor, geometry::Materials::get("G4_AIR"), "PLUME.l_sensor");

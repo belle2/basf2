@@ -44,7 +44,7 @@ namespace Belle2 {
     /**
      * Set channel quantum efficiency
      * @param modId module ID number
-     * @param chNo channel number (ASIC number)
+     * @param chId channel number (ASIC number)
      * @param qe channel quantum efficiency (0.35 for example)
      */
     void setChannelQE(unsigned modId, unsigned chId, double qe);

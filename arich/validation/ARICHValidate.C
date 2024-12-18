@@ -20,7 +20,7 @@
 
 void ARICHValidate(){
 
-  // intput tree
+  // input tree
   TChain* ch = new TChain("arich");
   ch->Add("../ARICHEvents.root");
 
@@ -43,14 +43,14 @@ void ARICHValidate(){
   hall->GetListOfFunctions()->Add(new TNamed("Description", "Difference of ARICHLikelihood value for K and #pi hypothesis, for K and #pi tracks with 3.0 - 3.5 GeV (particle gun from the IP). TrackFinderMCTruth is used for track matching."));
   hall->GetListOfFunctions()->Add(new TNamed("Contact","luka.santelj@ijs.si"));
   hall->GetListOfFunctions()->Add(new TNamed("Check", "Well separated K and #pi peaks."));
-
+  hall->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
   hall->Write();
 
   TH1F* heff = new TH1F("heff","K id. efficiency vs. #pi missid. probability;fake;efficiency",100,0.005,0.05);
 
   heff->GetListOfFunctions()->Add(new TNamed("Description", "K identification efficiency vs. #pi missidentification probability, for K and #pi tracks with 3.0 - 3.5 GeV. TrackFinderMCTruth is used for track matching."));
   heff->GetListOfFunctions()->Add(new TNamed("Contact","luka.santelj@ijs.si"));
-  heff->GetListOfFunctions()->Add(new TNamed("Check", "Continuous, >0.98 eff. for > 0.02 fake. NOTE: as this is not a usual histogram p-value calculation is not proper so it will often apear RED. If other two plots are OK please don't mind."));
+  heff->GetListOfFunctions()->Add(new TNamed("Check", "Continuous, >0.98 eff. for > 0.02 fake. NOTE: as this is not a usual histogram p-value calculation is not proper so it will often appear RED. If other two plots are OK please don't mind."));
 
   int startbin = hpi->FindFirstBinAbove(0.);
   int nentrpi = 0;
@@ -81,7 +81,8 @@ void ARICHValidate(){
 
   hnphot->GetListOfFunctions()->Add(new TNamed("Description", "Number of detected photons in a 3#sigma band around the expected Cherenkov angle, for #pi with momenta 3.0-3.5 GeV."));
   hnphot->GetListOfFunctions()->Add(new TNamed("Contact","luka.santelj@ijs.si"));
-  hnphot->GetListOfFunctions()->Add(new TNamed("Check", "Poissonian peak with average at ~11.5."));
+  hnphot->GetListOfFunctions()->Add(new TNamed("Check", "Poissonian peak with average at ~14.5."));
+  hnphot->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
   hnphot->Write();
 

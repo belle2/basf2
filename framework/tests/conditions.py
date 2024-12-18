@@ -122,8 +122,7 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
             gtname = url.path.split("/")[-1]
             if gtname in self.globaltags:
                 return self.reply(
-                    '{{ "name": "{}", "globalTagStatus": {{ "name": "{}" }} }}'.format(
-                        gtname, self.globaltags[gtname]))
+                    f'{{ "name": "{gtname}", "globalTagStatus": {{ "name": "{self.globaltags[gtname]}" }} }}')
             else:
                 return self.send_error(404)
 
@@ -233,6 +232,8 @@ def set_serverlist(serverlist):
     basf2.conditions.metadata_providers = serverlist + [e for e in basf2.conditions.metadata_providers if not e.startswith("http")]
 
 
+os.environ.pop('BELLE2_CONDB_METADATA', None)
+
 # keep timeouts short for testing
 basf2.conditions.expert_settings(backoff_factor=1, connection_timeout=5,
                                  stalled_timeout=5, max_retries=3)
@@ -246,7 +247,7 @@ conn = multiprocessing.Pipe(False)
 mock_conditionsdb = multiprocessing.Process(target=run_mockdb, args=(conn[1],))
 mock_conditionsdb.daemon = True
 mock_conditionsdb.start()
-# mock db has started when we recieve the port number from the child, so wait for that
+# mock db has started when we receive the port number from the child, so wait for that
 mock_port = conn[0].recv()
 # if the port we got is None the server didn't start ... so bail
 if mock_port is None:
@@ -270,7 +271,7 @@ main = basf2.Path()
 evtinfo = main.add_module("EventInfoSetter")
 main.add_module("PrintBeamParameters")
 
-# run trough a set of experiments, each time we want to process two runs to make
+# run through a set of experiments, each time we want to process two runs to make
 # sure that it works correctly for more than one run
 for exp in range(len(SimpleConditionsDB.payloads) + 1):
     try:

@@ -34,64 +34,55 @@ DQMHistAnalysisTrackingHLTModule::DQMHistAnalysisTrackingHLTModule()
 
   setDescription("DQM Analysis Module of the Tracking HLT Plots.");
 
-  addParam("failureRateThreshold", m_failureRateThreshold,
-           "Maximum Fraction of Events in which Tracking Aborts before turning Canvas to Red", double(m_failureRateThreshold));
-  addParam("minNoEvents", m_statThreshold, "Minimum Number of Events before scaring CR shifters", int(m_statThreshold));
+  addParam("minNoEvents", m_statThreshold,
+           "Minimum Number of Events before scaring CR shifters. Will be taken from Epics by default, \
+    this value is only taken if Epics is not available!", int(m_statThreshold));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(m_printCanvas));
 
 }
+
+
+
+void DQMHistAnalysisTrackingHLTModule::beginRun()
+{
+  // get the abort rate and statThreshold from epics
+  double buffMinEvents(NAN);
+  double dummyLowerAlarm, dummyUpperWarn, dummyUpperAlarm;
+
+  // read thresholds from EPICS
+  requestLimitsFromEpicsPVs("minNoEvents", dummyLowerAlarm, buffMinEvents, dummyUpperWarn, dummyUpperAlarm);
+
+  if (!std::isnan(buffMinEvents)) {
+    B2INFO(getName() << ": Setting min number of events threshold from EPICS. New minNoEvents " << buffMinEvents);
+    m_statThreshold = buffMinEvents;
+  }
+
+}
+
 
 void DQMHistAnalysisTrackingHLTModule::initialize()
 {
 
   gROOT->cd();
-  m_cAbortRate = new TCanvas("TrackingAnalysis/c_AbortRate");
   m_cAbortRateHER = new TCanvas("TrackingAnalysis/c_AbortRateHER");
   m_cAbortRateLER = new TCanvas("TrackingAnalysis/c_AbortRateLER");
 
   // add MonitoringObject
   m_monObj = getMonitoringObject("trackingHLT");
 
+  // register the PVs for setting thresholds
+  registerEpicsPV("TRACKING:minNoEvents", "minNoEvents");
+
+  // variables to be monitored via EPICS
+  registerEpicsPV("trackingHLT:nTracksPerEvent", "nTracksPerEvent");
+  registerEpicsPV("trackingHLT:nVXDTracksPerEvent", "nVXDTracksPerEvent");
+  registerEpicsPV("trackingHLT:nCDCTracksPerEvent", "nCDCTracksPerEvent");
+  registerEpicsPV("trackingHLT:nVXDCDCTracksPerEvent", "nVXDCDCTracksPerEvent");
+
 }
 
 void DQMHistAnalysisTrackingHLTModule::event()
 {
-
-  //check Tracking Abort Rate
-
-  TH1* hAbort = findHist("TrackingHLTDQM/NumberTrackingErrorFlags");
-  if (hAbort != nullptr) {
-
-    bool hasError = false;
-    int nEvents = hAbort->GetEntries();
-    double abortRate = hAbort->GetMean();
-    hAbort->SetTitle(Form("Fraction of Events in which Tracking aborts = %.4f %%", abortRate * 100));
-
-    m_monObj->setVariable("abortRate", abortRate);
-    //check if number of errors is above the allowed limit
-    if (abortRate > m_failureRateThreshold)
-      hasError = true;
-
-    if (nEvents < m_statThreshold) m_cAbortRate->SetFillColor(kGray);
-    else if (hasError) m_cAbortRate->SetFillColor(kRed);
-    else m_cAbortRate->SetFillColor(kGreen);
-    m_cAbortRate->SetFrameFillColor(10);
-
-    m_cAbortRate->cd();
-    hAbort->Draw();
-
-  } else { // histogram not found
-    B2WARNING("Histogram TrackingHLTDQM/NumberTrackingErrorFlags from Tracking DQM not found!");
-    m_cAbortRate->SetFillColor(kGray);
-  }
-
-  m_cAbortRate->Modified();
-  m_cAbortRate->Update();
-
-
-  if (m_printCanvas)
-    m_cAbortRate->Print("c_AbortRate.pdf");
-
 
   // check tracking abort rate VS time after last HER injection and time within a beam cycle HER
   TH2F* hAbortHER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/TrkAbortVsTimeHER"));
@@ -110,13 +101,15 @@ void DQMHistAnalysisTrackingHLTModule::event()
       }
 
     m_cAbortRateHER->cd();
+    colorizeCanvas(m_cAbortRateHER, EStatus::c_StatusDefault);
+    hAbortRateHER->SetTitle("Fraction of Events with Tracking Aborts vs HER injection");
+    hAbortRateHER->GetZaxis()->SetTitle("Fraction of events / bin");
     hAbortRateHER->Draw("colz");
 
 
-  } else { // histogram not found
-    B2WARNING("Histograms TrackingHLTDQM/TrkAbortVsTimeHER or allEvtsVsTimeHER from Tracking DQM not found!");
-    m_cAbortRateHER->SetFillColor(kGray);
-  }
+  } else
+    colorizeCanvas(m_cAbortRateHER, EStatus::c_StatusTooFew);
+
   if (m_printCanvas)
     m_cAbortRateHER->Print("c_AbortRateHER.pdf");
 
@@ -124,6 +117,7 @@ void DQMHistAnalysisTrackingHLTModule::event()
   // check tracking abort rate VS time after last LER injection and time within a beam cycle LER
   TH2F* hAbortLER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/TrkAbortVsTimeLER"));
   TH2F* hAllLER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/allEvtsVsTimeLER"));
+
   if (hAbortLER != nullptr && hAllLER != nullptr) {
 
     TH2F* hAbortRateLER = new TH2F(*hAbortLER);
@@ -138,38 +132,44 @@ void DQMHistAnalysisTrackingHLTModule::event()
       }
 
     m_cAbortRateLER->cd();
+    colorizeCanvas(m_cAbortRateLER, EStatus::c_StatusDefault);
+    hAbortRateLER->SetTitle("Fraction of Events with Tracking Aborts vs LER injection");
+    hAbortRateLER->GetZaxis()->SetTitle("Fraction of events / bin");
     hAbortRateLER->Draw("colz");
 
-  } else { // histogram not found
-    B2WARNING("Histograms TrackingHLTDQM/TrkAbortVsTimeLER or allEvtsVsTimeLER from Tracking DQM not found!");
-    m_cAbortRateLER->SetFillColor(kGray);
-  }
+  } else
+    colorizeCanvas(m_cAbortRateLER, EStatus::c_StatusTooFew);
+
   if (m_printCanvas)
     m_cAbortRateLER->Print("c_AbortRateLER.pdf");
 
   // add average number of tracks per event to Mirabelle
   TH1* hnTracks = findHist("TrackingHLTDQM/NoOfTracks");
-  if (hnTracks != nullptr) {
+  if (hnTracks != nullptr && hnTracks->GetEntries() >= m_statThreshold) {
     double averageNTracks = hnTracks->GetMean();
     m_monObj->setVariable("nTracksPerEvent", averageNTracks);
+    setEpicsPV("nTracksPerEvent", averageNTracks);
   }
 
   TH1* hnVXDTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDOnly");
-  if (hnVXDTracks != nullptr) {
+  if (hnVXDTracks != nullptr && hnVXDTracks->GetEntries() >= m_statThreshold) {
     double averageNVXDTracks = hnVXDTracks->GetMean();
     m_monObj->setVariable("nVXDTracksPerEvent", averageNVXDTracks);
+    setEpicsPV("nVXDTracksPerEvent", averageNVXDTracks);
   }
 
   TH1* hnCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInCDCOnly");
-  if (hnCDCTracks != nullptr) {
+  if (hnCDCTracks != nullptr && hnCDCTracks->GetEntries() >= m_statThreshold) {
     double averageNCDCTracks = hnCDCTracks->GetMean();
     m_monObj->setVariable("nCDCTracksPerEvent", averageNCDCTracks);
+    setEpicsPV("nCDCTracksPerEvent", averageNCDCTracks);
   }
 
   TH1* hnVXDCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDCDC");
-  if (hnVXDCDCTracks != nullptr) {
+  if (hnVXDCDCTracks != nullptr && hnVXDCDCTracks->GetEntries() >= m_statThreshold) {
     double averageNVXDCDCTracks = hnVXDCDCTracks->GetMean();
     m_monObj->setVariable("nVXDCDCTracksPerEvent", averageNVXDCDCTracks);
+    setEpicsPV("nVXDCDCTracksPerEvent", averageNVXDCDCTracks);
   }
 
 }

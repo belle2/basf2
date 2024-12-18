@@ -88,11 +88,12 @@ namespace Belle2 {
      */
     void setEndcapRegion(double minR, double minZ) { m_endcapRMin = minR; m_endcapZMin = minZ;}
 
-    /** Set the layer parameters
-     * @bgapl0 barrel gap height for layer 0
-     * @bironth barrel iron thickness
-     * @egap endcap gap height
-     * @dl distance between two layers
+    /**
+     * Set the layer parameters.
+     * @param bgapl0  Barrel gap height for layer 0.
+     * @param bironth Barrel iron thickness.
+     * @param egap    Endcap gap height.
+     * @param dl      Distance between two layers.
      */
     void setLayerParam(double bgapl0, double bironth, double egap, double dl)
     {

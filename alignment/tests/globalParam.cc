@@ -150,14 +150,14 @@ namespace {
     // Full vector contains all objects
     EXPECT_EQ(!!gpv.getDBObj<VXDAlignment>(), true);
     EXPECT_EQ(!!gpv.getDBObj<BeamSpot>(), true);
-    // BeamSpot global vector should only containt BeamSpot
+    // BeamSpot global vector should only contain BeamSpot
     EXPECT_EQ(!!gpvComp.getDBObj<VXDAlignment>(), false);
     EXPECT_EQ(!!gpvComp.getDBObj<BeamSpot>(), true);
 
     // Full vector contains all objects
     EXPECT_EQ(gpv.getGlobalParamSet<VXDAlignment>().isConstructed(), true);
     EXPECT_EQ(gpv.getGlobalParamSet<BeamSpot>().isConstructed(), true);
-    // BeamSpot global vector should only containt BeamSpot
+    // BeamSpot global vector should only contain BeamSpot
     EXPECT_EQ(gpvComp.getGlobalParamSet<VXDAlignment>().isConstructed(), false);
     EXPECT_EQ(gpvComp.getGlobalParamSet<BeamSpot>().isConstructed(), true);
 

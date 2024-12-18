@@ -53,7 +53,7 @@ namespace Belle2 {
       c_Initial           = 1 << 5,
       /** bit 6: Particle is from initial state radiation */
       c_IsISRPhoton       = 1 << 6,
-      /** bit 7: Particle is from finial state radiation */
+      /** bit 7: Particle is from final state radiation */
       c_IsFSRPhoton       = 1 << 7,
       /** bit 8: Particle is an radiative photon from PHOTOS */
       c_IsPHOTOSPhoton    = 1 << 8,
@@ -368,7 +368,7 @@ namespace Belle2 {
     void setEnergy(float energy) { m_energy = energy; }
 
     /**
-     * Set indication wether vertex and time information is valid or just default.
+     * Set indication whether vertex and time information is valid or just default.
      * @param valid Set to true if the vertex is valid.
      */
     void setValidVertex(bool valid) { m_validVertex = valid; }
@@ -491,12 +491,12 @@ namespace Belle2 {
     void fixParticleList() const;
 
     /**
-     * Set particle to virtual. (A bit more convinient)
+     * Set particle to virtual. (A bit more convenient)
      */
     void setVirtual() {  addStatus(c_IsVirtual); }
 
     /**
-     * Set particle to initial. (A bit more convinient)
+     * Set particle to initial. (A bit more convenient)
      */
     void setInitial() {  addStatus(c_Initial); }
 
@@ -541,7 +541,7 @@ namespace Belle2 {
     float m_momentum_y;         /**< momentum of particle, y component */
     float m_momentum_z;         /**< momentum of particle, z component */
 
-    bool m_validVertex;         /**< indication wether vertex and time information is useful or just default */
+    bool m_validVertex;         /**< indication whether vertex and time information is useful or just default */
 
     float m_productionTime;     /**< production time */
     float m_productionVertex_x; /**< production vertex of particle, x component */

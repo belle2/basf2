@@ -17,6 +17,7 @@
 #include <TObject.h>
 #include <TCanvas.h>
 #include <ctime>
+#include <filesystem>
 
 using namespace std;
 using namespace Belle2;
@@ -33,6 +34,7 @@ REG_MODULE(DQMHistAnalysisOutputImages);
 DQMHistAnalysisOutputImagesModule::DQMHistAnalysisOutputImagesModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("Module to produce output images during 'events' for dqm steering scripts.");
   //Parameter definition
   addParam("CanvasSaveDefault", m_canvasSaveDefault, "Save untagged canvases", false);
   addParam("OutputPath", m_outputPath, "Set output path", std::string(""));
@@ -41,19 +43,30 @@ DQMHistAnalysisOutputImagesModule::DQMHistAnalysisOutputImagesModule()
   addParam("asPDF", m_asPDF, "Save as PDF files", false);
   addParam("asJSON", m_asJSON, "Save as JSON files", false);
   addParam("asROOT", m_asROOT, "Save as ROOT files", false);
+  addParam("useExpRun", m_useExpRun, "crate exp/run subdirs", false);
   B2DEBUG(20, "DQMHistAnalysisOutputImages: Constructor done.");
+}
+
+void DQMHistAnalysisOutputImagesModule::initialize()
+{
+  m_evtMetaDataPtr.isRequired();
 }
 
 void DQMHistAnalysisOutputImagesModule::event()
 {
   B2DEBUG(20, "DQMHistAnalysisOutputImages: event called.");
+  if (!m_evtMetaDataPtr.isValid()) {
+    B2ERROR("No valid EventMetaData.");
+    return;
+  }
 
   TSeqCollection* seq = gROOT->GetListOfCanvases();
   TIter nextkey(seq);
   TObject* obj = 0;
 
-  std::string outpath;
-  if (m_outputPath != "") outpath = m_outputPath + "/"; // make sure slash is added, but only if path not empty
+  std::filesystem::path outpath = m_outputPath;
+  if (m_useExpRun) outpath = outpath / std::to_string(m_evtMetaDataPtr->getExperiment()) / std::to_string(
+                                 m_evtMetaDataPtr->getRun()); // add exp/run
 
   auto& clist = getCanvasUpdatedList();
   int saved_canvases = 0;
@@ -70,11 +83,13 @@ void DQMHistAnalysisOutputImagesModule::event()
       if (!process_canvas) continue;
       saved_canvases++;
 
-      if (m_asPNG) c->Print((outpath + c->GetName() + ".png").c_str());
-      if (m_asJPEG) c->Print((outpath + c->GetName() + ".jpg").c_str());
-      if (m_asPDF) c->Print((outpath + c->GetName() + ".pdf").c_str());
-      if (m_asROOT) c->Print((outpath + c->GetName() + ".root").c_str());
-      if (m_asJSON) c->Print((outpath + c->GetName() + ".json").c_str());
+      std::string cname = c->GetName();
+      create_directories((outpath / cname).parent_path()); // create recursive path, even if it exist
+      if (m_asPNG) c->Print((outpath / (cname + ".png")).c_str());
+      if (m_asJPEG) c->Print((outpath / (cname + ".jpg")).c_str());
+      if (m_asPDF) c->Print((outpath / (cname + ".pdf")).c_str());
+      if (m_asROOT) c->Print((outpath / (cname + ".root")).c_str());
+      if (m_asJSON) c->Print((outpath / (cname + ".json")).c_str());
     }
   }
   B2INFO("Saved " << saved_canvases << " of " << seq->GetEntries() << " objects.");

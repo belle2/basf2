@@ -201,6 +201,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
       DecayTree<MCParticle>* daughter = match(daugP, d->getDaughter(iDD), isCC, tmp);
       if (!daughter->getObj()) {
         ++itDP;
+        delete daughter;
         continue;
       }
       // Matching daughter found, remove it from list of unmatched particle daughters
@@ -266,10 +267,14 @@ void MCDecayFinderModule::appendParticles(const MCParticle* gen, vector<const MC
     // e.g. photon-conversion: gamma -> e+ e-, decay-in-flight: K+ -> mu+ nu_mu
   }
 
+  vector<const MCParticle*> tmp_children;
   const vector<MCParticle*>& genDaughters = gen->getDaughters();
   for (auto daug : genDaughters) {
+    tmp_children.push_back(daug);
     children.push_back(daug);
-    appendParticles(daug, children);
+  }
+  for (auto child : tmp_children) {
+    appendParticles(child, children);
   }
 }
 
@@ -317,7 +322,7 @@ Particle* MCDecayFinderModule::buildParticleFromDecayTree(const DecayTree<MCPart
 
   // sanity check
   if ((int)decayDaughters.size() != nDaughters) {
-    B2ERROR("MCDecayFinderModule::buildParticleFromDecayTree Inconsistency on the number daughters between DecayTree and DecayDescriptor");
+    B2ERROR("MCDecayFinderModule::buildParticleFromDecayTree Inconsistency on the number of daughters between DecayTree and DecayDescriptor");
     return nullptr;
   }
 
@@ -389,8 +394,7 @@ Particle* MCDecayFinderModule::createParticleRecursively(const MCParticle* mcp, 
 
 void MCDecayFinderModule::addUniqueParticleToList(Particle* newParticle)
 {
-
-  for (auto existingParticle : *m_outputList) {
+  for (auto& existingParticle : *m_outputList) {
     if (existingParticle.isCopyOf(newParticle))
       return;
   }

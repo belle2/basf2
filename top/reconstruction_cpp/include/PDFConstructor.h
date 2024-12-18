@@ -55,6 +55,7 @@ namespace Belle2 {
         double logL = 0; /**< extended log likelihood */
         double expPhotons = 0; /**< expected number of photons */
         unsigned numPhotons = 0; /**< detected number of photons */
+        double effectiveSignalYield = 0; /**< effective number of signal photons in data */
 
         /**
          * Constructor
@@ -622,6 +623,16 @@ namespace Belle2 {
       PrismSolution prismSolution(const ROOT::Math::XYZPoint& rD, double L);
 
       /**
+       * Returns the value of signal PDF normalized to the number of expected photons.
+       * @param pixelID pixel ID
+       * @param time photon hit time
+       * @param timeErr uncertainty of hit time
+       * @param sigt additional time smearing
+       * @return PDF value
+       */
+      double pdfValueSignal(int pixelID, double time, double timeErr, double sigt = 0) const;
+
+      /**
        * Returns the value of signal + deltaRay PDF normalized to the number of expected photons.
        * @param pixelID pixel ID
        * @param time photon hit time
@@ -694,20 +705,26 @@ namespace Belle2 {
       mutable std::set<int> m_zeroPixels; /**< collection of pixelID's with zero pdfValue */
 
       std::vector<const PDFConstructor*> m_pdfOtherTracks; /**< most probable PDF's of other tracks in the module */
+      mutable double m_f0 = 0; /**< temporary value of signal PDF */
 
     };
 
     //--- inline functions ------------------------------------------------------------
 
-    inline double PDFConstructor::pdfValueSignalDelta(int pixelID, double time, double timeErr, double sigt) const
+    inline double PDFConstructor::pdfValueSignal(int pixelID, double time, double timeErr, double sigt) const
     {
       unsigned k = pixelID - 1;
       if (k < m_signalPDFs.size() and m_valid) {
-        double f = m_signalPhotons * m_signalPDFs[k].getPDFValue(time, timeErr, sigt);
-        if (m_deltaPDFOn) f += m_deltaPhotons * m_deltaRayPDF.getPDFValue(pixelID, time);
-        return f;
+        return  m_signalPhotons * m_signalPDFs[k].getPDFValue(time, timeErr, sigt);
       }
       return 0;
+    }
+
+    inline double PDFConstructor::pdfValueSignalDelta(int pixelID, double time, double timeErr, double sigt) const
+    {
+      double f = pdfValueSignal(pixelID, time, timeErr, sigt);
+      if (m_deltaPDFOn) f += m_deltaPhotons * m_deltaRayPDF.getPDFValue(pixelID, time);
+      return f;
     }
 
     inline double PDFConstructor::pdfValue(int pixelID, double time, double timeErr, double sigt) const
@@ -715,7 +732,9 @@ namespace Belle2 {
 
       if (not m_valid) return 0;
 
-      double f = pdfValueSignalDelta(pixelID, time, timeErr, sigt); // signal
+      double f = pdfValueSignal(pixelID, time, timeErr, sigt); // signal
+      m_f0 = f;
+      if (m_deltaPDFOn) f += m_deltaPhotons * m_deltaRayPDF.getPDFValue(pixelID, time); // delta electrons
       f += m_bkgPhotons * m_backgroundPDF->getPDFValue(pixelID); // uniform background
       for (const auto* other : m_pdfOtherTracks) f += other->pdfValueSignalDelta(pixelID, time, timeErr, sigt); // other tracks
 

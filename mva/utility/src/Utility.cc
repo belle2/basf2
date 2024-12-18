@@ -20,6 +20,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
+#include <cstdlib>
 #include <iostream>
 #include <chrono>
 #include <string>
@@ -86,7 +87,7 @@ void Utility::extract(const std::string& filename, const std::string& directory)
   auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
   auto weightfile = Weightfile::load(filename);
   weightfile.setRemoveTemporaryDirectories(false);
-  weightfile.setTemporaryDirectory(directory);
+  setenv("TMPDIR", directory.c_str(), 1);
   GeneralOptions general_options;
   weightfile.getOptions(general_options);
   auto expertLocal = supported_interfaces[general_options.m_method]->getExpert();

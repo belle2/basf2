@@ -35,7 +35,7 @@ SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
   addParam("StripPeakTimeCorrection", m_corrPeakTime,
            "Correct for the different peaking times of the strips, obtained from local run calibration", true);
   addParam("CalibrationWithEventT0", m_calEventT0,
-           "Use the timing informations of the EventT0 in order to calibrate the CoG.",
+           "Use the timing information of the EventT0 in order to calibrate the CoG.",
            true);
 
 }
@@ -51,7 +51,7 @@ void SVDCoGTimeEstimatorModule::initialize()
   m_storeTrueHits.isOptional();
   m_storeMCParticles.isOptional();
 
-  //Inizialization of needed store array
+  //Initialization of needed store array
   m_storeShaper.isRequired(m_storeShaperDigitsName);
 
   if (!m_storeSVDEvtInfo.isOptional(m_svdEventInfoName)) m_svdEventInfoName = "SVDEventInfoSim";

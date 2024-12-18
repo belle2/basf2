@@ -30,5 +30,8 @@ namespace Belle2 {
 
     /// DAF parameters Database OjbPtr
     DBObjPtr<DAFparameters> m_DAFparameters;
+
+    /// Boolean to only show the warning about changed DAF parameters on first occurrence but not each time a DAF instance is created
+    mutable bool m_changedParametersMessageWasShown = false;
   };
 }

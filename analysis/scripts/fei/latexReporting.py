@@ -146,8 +146,7 @@ if __name__ == '__main__':
                       timePerCandidate=timePerCandidate,
                       timePercent=time / tt_particle * 100 if p.total_time > 0 else 0)
 
-        o += table.finish(tail='Total & & {tt_channel} / {tt_particle} & & {fraction:.2f}'.format(
-            tt_channel=format.duration(tt_channel), tt_particle=format.duration(tt_particle), fraction=fraction))
+        o += table.finish(tail=f'Total & & {format.duration(tt_channel)} / {format.duration(tt_particle)} & & {fraction:.2f}')
 
     for p in monitoringParticle:
         print(p.particle.identifier)

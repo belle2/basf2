@@ -21,7 +21,7 @@ namespace Belle2 {
      *
      *  $ test_tracking --gtest_filter="TrackFindingCDCTest*"
      *
-     *  which runs only for track finding in the CDC (positiv match).
+     *  which runs only for track finding in the CDC (positive match).
      *
      *  Run
      *
@@ -34,7 +34,7 @@ namespace Belle2 {
      *
      *  $ test_tracking_trackFindingCDC
      *
-     *  as a seperate executable.
+     *  as a separate executable.
      */
     class TrackFindingCDCTestWithTopology : public TestHelpers::TestWithGearbox {
 

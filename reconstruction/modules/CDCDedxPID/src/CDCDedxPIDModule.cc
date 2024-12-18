@@ -369,7 +369,6 @@ void CDCDedxPIDModule::event()
         const CDCRecoHit* nextcdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtrNext);
         // if next hit fails, assume this is the last hit in the layer
         if (!nextcdcRecoHit || !(cdcRecoHit->getCDCHit()) || !((*(tp + 1))->getFitterInfo())) {
-          lastHitInCurrentLayer = true;
           break;
         }
         const CDCHit* nextcdcHit = nextcdcRecoHit->getCDCHit();

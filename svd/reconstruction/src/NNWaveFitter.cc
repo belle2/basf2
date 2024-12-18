@@ -48,7 +48,7 @@ int NNWaveFitter::readNetworkData(const string& xmlData)
   } catch (const ptree_error& e) {
     B2ERROR("Failed to parse xml data: " << e.what());
   } catch (std::exception const& ex) {
-    B2ERROR("STD excpetion " << ex.what() << " in parsing.");
+    B2ERROR("STD exception " << ex.what() << " in parsing.");
     return -1;
   }
   // 1. Check that we have a classifier with relu activation.
@@ -71,7 +71,7 @@ int NNWaveFitter::readNetworkData(const string& xmlData)
     string waveFormType = propertyTree.get<string>("PMML.MiningBuildTask.Training.Waveform");
     B2DEBUG(400, "Waveform set to " << waveFormType);
   } catch (const ptree_error& e) {
-    B2ERROR("PropertyTree excpetion : " << e.what() << " in network check.");
+    B2ERROR("PropertyTree exception : " << e.what() << " in network check.");
     return -1;
   }
 
@@ -102,7 +102,7 @@ int NNWaveFitter::readNetworkData(const string& xmlData)
       m_layerStates.push_back(VectorXd(m_layerSizes[iLayer]));
     B2DEBUG(400, "Network topology read.");
   } catch (const ptree_error& e) {
-    B2ERROR("PropertyTree excpetion : " << e.what() << " when reading network topology.");
+    B2ERROR("PropertyTree exception : " << e.what() << " when reading network topology.");
     return -1;
   }
 
@@ -132,7 +132,7 @@ int NNWaveFitter::readNetworkData(const string& xmlData)
                          m_waveWidthBounds.first, m_waveWidthBounds.second);
     B2DEBUG(400, "Read parameter bounds.");
   } catch (const ptree_error& e) {
-    B2ERROR("PropertyTree excpetion: " << e.what() << " when reading parameter bounds.");
+    B2ERROR("PropertyTree exception: " << e.what() << " when reading parameter bounds.");
     return -1;
   }
 
@@ -153,7 +153,7 @@ int NNWaveFitter::readNetworkData(const string& xmlData)
     m_fitTool = std::shared_ptr<NNWaveFitTool>(new NNWaveFitTool(m_bins, m_binCenters, WaveGenerator(m_wave)));
     B2DEBUG(400, "Outputs done.");
   } catch (const ptree_error& e) {
-    B2ERROR("PropertyTree excpetion: " << e.what() << " when reading bin data.");
+    B2ERROR("PropertyTree exception: " << e.what() << " when reading bin data.");
     return -1;
   }
 
@@ -183,7 +183,7 @@ int NNWaveFitter::readNetworkData(const string& xmlData)
     }
     B2DEBUG(400, "Neurons done.");
   } catch (const ptree_error& e) {
-    B2ERROR("PropertyTree excpetion: " << e.what() << " when reading neurons.");
+    B2ERROR("PropertyTree exception: " << e.what() << " when reading neurons.");
     return -1;
   }
   return 0;

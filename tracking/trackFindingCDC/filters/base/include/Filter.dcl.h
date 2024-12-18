@@ -15,6 +15,8 @@
 
 #include <string>
 
+#include <vector>
+
 namespace Belle2 {
   class ModuleParamList;
 
@@ -70,6 +72,14 @@ namespace Belle2 {
        *             NAN if the object is rejected. Nullptr is always rejected.
        */
       Weight operator()(const Object* obj);
+
+      /**
+       * Function to evaluate a vector of objects
+       * Base implementation applies the function to each object. Can be optimized for MVA filters
+       * @param objs A vector of pointers to objects
+       * @return A vector of float or NAN values. See above
+       */
+      virtual std::vector<float> operator()(const std::vector <Object*>& objs);
     };
   }
 }

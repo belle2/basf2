@@ -37,7 +37,6 @@ namespace Belle2 {
     RFConf* m_conf{};
     RFProcessManager* m_proc{};
     RFLogManager* m_log{};
-    char* m_nodename{};
     RFSharedMem* m_shm{};
     std::atomic_int m_pid_merger{};
     pthread_t m_logthread{};

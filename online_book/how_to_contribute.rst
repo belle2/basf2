@@ -34,7 +34,7 @@ See :doc:`/framework/doc/atend-doctools` to learn more about these tools.
    has the URL ``.../online_book/how_to_contribute.html``, so your source
    file is in ``${BELLE2_LOCAL_DIR}/online_book/how_to_contribute.rst``.
 
-Submitting a PR
+Submitting a MR
 ---------------
 
 You need to
@@ -47,10 +47,10 @@ You need to
 3. Make your changes
 4. Optionally: Preview them locally as described in :doc:`/framework/doc/atend-doctools`
 5. Push your branch
-6. Create a PR following the guidelines outlined at :ref:`pr_best_practices`
+6. Create a MR following the guidelines outlined at :ref:`pr_best_practices`
 
 .. seealso::
 
-    You already opened a PR for a test repository in :ref:`onlinebook_git`, remember?
+    You already opened a MR for a test repository in :ref:`onlinebook_git`, remember?
     Basically this is exactly the same procedure.
 

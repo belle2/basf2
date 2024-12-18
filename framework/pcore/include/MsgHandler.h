@@ -128,7 +128,7 @@ namespace Belle2 {
     std::unique_ptr<TMessage> m_msg; /**< Used for serialising objects into m_buf. */
     InMessage m_inMsg; /**< Used for deserializing in decode_msg() */
     int m_complevel; /**< compression algorithm * 100 + compression level.
-                      level can be 0 for no compression to 9 for highes
+                      level can be 0 for no compression to 9 for highest
                       compression, algorithm can be one of default (0), zlib
                       (1) or lzma (2) */
   };

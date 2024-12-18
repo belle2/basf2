@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,7 +11,7 @@
 """
 <header>
   <output>CosmicsSimNoBkg.root</output>
-  <contact>Software team b2soft@mail.desy.de</contact>
+  <contact>arul.prakash@physik.uni-muenchen.de</contact>
   <cacheable/>
   <description>
     This steering file produces 10000 cosmic ray events without background, for the early_phase3 geometry.
@@ -54,14 +53,14 @@ print(statistics)
 
 statistics_plots(
     "CosmicsSimNoBkg_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation job with Cosmics events",
     prefix="CosmicsSimNoBkg",
 )
 event_timing_plot(
     "../CosmicsSimNoBkg.root",
     "CosmicsSimNoBkg_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation job with Cosmics events",
     prefix="CosmicsSimNoBkg",
 )

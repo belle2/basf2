@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "TObject.h"
-#include "TClonesArray.h"
+#include <TObject.h>
+#include <TClonesArray.h>
 
 #include "BParticle.h"
 
@@ -59,6 +59,25 @@ public:
                 float charge, SIMPLEPID pid);
 
   /**
+     * Add the track to the event.
+     * @param px - x component of the particle momentum
+     * @param py - y component of the particle momentum
+     * @param pz - z component of the particle momentum
+     * @param e  - energy of the particle
+     * @param charge  - unit charge of the particle
+     * @param pid - particle identity - hypothesis with the highest maximum likelihood
+      * @param logL_e - log likelihood for electron hypothesis
+      * @param logL_mu - log likelihood for muon hypothesis
+      * @param logL_pi - log likelihood for pion hypothesis
+      * @param logL_k - log likelihood for kaon hypothesis
+      * @param logL_p - log likelihood for proton hypothesis
+      * @param logL_d - log likelihood for deuteron hypothesis
+     */
+  void AddTrack(float px, float py, float pz, float e,
+                float charge, SIMPLEPID pid,
+                float logL_e, float logL_mu, float logL_pi, float logL_k, float logL_p, float logL_d);
+
+  /**
    * Get the number of particles in the event.
    * @return number of particles in the event
    */
@@ -71,7 +90,7 @@ public:
    */
   TClonesArray* GetParticleList();
 
-  ClassDef(BEvent, 1)
+  ClassDef(BEvent, 2)
 };
 
 

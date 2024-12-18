@@ -40,10 +40,10 @@ namespace Belle2 {
     void increment(const std::string& key);
     /// Decrement the value with the given key (only numerical values). If not present, set to -1.
     void decrement(const std::string& key);
-    /// Instead of storeing the double value directly under the given key, store the average of the last MAX_SIZE values.
+    /// Instead of storing the double value directly under the given key, store the average of the last MAX_SIZE values.
     template<size_t MAX_SIZE = 100>
     void average(const std::string& key, double value);
-    /// Measure the rate of calls with the same key every AVERAGE_SIZE calls (and also display the last time AVERAGE_SIZE was reached under <key>_last_measurement)
+    /// Measure the rate of calls with the same key every AVERAGE_SIZE calls (and also display the last time AVERAGE_SIZE was reached under \<key\>_last_measurement)
     template<size_t AVERAGE_SIZE = 2000>
     void timeit(const std::string& key);
     /// Store the current time as a string under the given key

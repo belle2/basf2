@@ -55,7 +55,7 @@ namespace Belle2 {
      * */
     static unsigned int poll(const std::vector<zmq::socket_t*>& socketList, int timeout);
 
-    /// Create a unique ZMQ identity in the form <hostname>_<pid> (if pid is 0, use the current processes PID).
+    /// Create a unique ZMQ identity in the form \<hostname\>_<pid> (if pid is 0, use the current processes PID).
     static std::string createIdentity(unsigned int pid = 0);
 
     /// Terminate the parent manually (before calling its destructor). You probably do not need to do this.

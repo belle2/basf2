@@ -60,27 +60,30 @@ namespace Belle2 {
     /** Return time vector
      * @param ring is injection ring number (0/1 for LER/HER)
      */
-    std::vector<double> getTimeVector(const unsigned int ring) const
+    const std::vector<double>& getTimeVector(unsigned int ring) const
     {
-      if (ring > 2) B2ERROR("wrong index for injection ring ");
+      if (ring > 1) B2ERROR("wrong index for injection ring ");
+      if (ring * 3 >= m_injectionvar.size()) B2FATAL("CDCDedxInjectionTime: vector-of-vectors too short");
       return m_injectionvar[ring * 3];
     };
 
     /** Return dedx mean vector
      * @param ring is injection ring number (0/1 for LER/HER)
      */
-    std::vector<double> getMeanVector(const int ring) const
+    const std::vector<double>& getMeanVector(unsigned int ring) const
     {
-      if (ring <= 0 || ring > 2) B2ERROR("wrong index for injection ring ");
+      if (ring > 1) B2ERROR("wrong index for injection ring ");
+      if (ring * 3 + 1 >= m_injectionvar.size()) B2FATAL("CDCDedxInjectionTime: vector-of-vectors too short");
       return m_injectionvar[ring * 3 + 1];
     };
 
     /** Return dedx reso vector
      * @param ring is injection ring number (0/1 for LER/HER)
      */
-    std::vector<double> getResoVector(const unsigned int ring) const
+    const std::vector<double>& getResoVector(unsigned int ring) const
     {
-      if (ring > 2) B2ERROR("wrong index for injection ring ");
+      if (ring > 1) B2ERROR("wrong index for injection ring ");
+      if (ring * 3 + 2 >= m_injectionvar.size()) B2FATAL("CDCDedxInjectionTime: vector-of-vectors too short");
       return m_injectionvar[ring * 3 + 2];
     };
 
@@ -88,7 +91,7 @@ namespace Belle2 {
     * @param array of time
     * @param value of input time
     */
-    unsigned int getTimeBin(const std::vector<unsigned int>& array, unsigned int value) const
+    int getTimeBin(const std::vector<unsigned int>& array, unsigned int value) const
     {
       int nabove, nbelow, middle;
       nabove = array.size() + 1;
@@ -111,6 +114,22 @@ namespace Belle2 {
 
 
   private:
+
+    /**
+     * Helper: safe access to a vector element
+     * @param iv valid index of a vector
+     * @param k index of an element
+     * @return element value
+     */
+    double getSafely(unsigned int iv, int k) const
+    {
+      const auto& vector = m_injectionvar[iv]; // assuming iv is valid index and vector not empty
+      int last = vector.size() - 1;
+      if (k < 0) k = 0;
+      else if (k > last) k = last;
+      return vector[k];
+    }
+
 
     /** CDC dE/dx injection time payloads for dEdx mean and reso.
      * different for LER and HER

@@ -238,7 +238,7 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
   distLeft[1][0] = rMax - rHitMinLeft;
   distLeft[1][1] = rMax - rHitMaxLeft;
 
-  // Compare distance signes from sinograms to the node
+  // Compare distance signs from sinograms to the node
   // Check right
   if (not sameSign(distRight[0][0], distRight[0][1], distRight[1][0], distRight[1][1])) {
     return true;

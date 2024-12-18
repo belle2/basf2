@@ -134,6 +134,21 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   m_treeCHECK->SetBranchAddress("pulseWidth", &m_pulseWidthCHECK, &b_pulseWidthCHECK);
 
 
+  ///MASKS
+  m_h2MaskREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2Mask");
+  m_h2MaskCHECK = (SVDHistograms<TH2F>*)m_rootFilePtrCHECK->Get("expert/h2Mask");
+
+  TH1F template_mask("maskDIFF_L@layerL@ladderS@sensor@view@apv",
+                     "Mask Deviation Distribution in @layer.@ladder.@sensor @view/@side",
+                     //                      200, -1, 1);
+                     200, -5, 5);
+  //  template_mask.GetXaxis()->SetTitle("( ref - check ) / ref");
+  template_mask.GetXaxis()->SetTitle("ref - check");
+  m_hMaskDIFF = new SVDAPVHistograms<TH1F>(template_mask);
+  setAPVHistoStyles(m_hMaskDIFF);
+  m_hMaskSummary = new SVDSummaryPlots("maskSummary@view", "REF - CHECK Number of Masked strips @view/@side Side");
+  m_hMaskSummaryCHECK = new SVDSummaryPlots("maskCHECKSummary@view", "CHECK Number Masked Strips @view/@side Side");
+
   ///NOISES
   m_h2NoiseREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2Noise");
   m_h2NoiseCHECK = (SVDHistograms<TH2F>*)m_rootFilePtrCHECK->Get("expert/h2Noise");
@@ -165,7 +180,7 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   m_hCalpeakTimeSummary = new SVDSummaryPlots("calPeakTimeSummary@view",
                                               "Number of problematic APV chips due to CalPeakTime for @view/@side Side for @view/@side Side");
 
-  ///CALPEAKTIMES
+  ///CALPEAKADC
   m_h2CalpeakADCREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2CalPeakADC");
   m_h2CalpeakADCCHECK = (SVDHistograms<TH2F>*)m_rootFilePtrCHECK->Get("expert/h2CalPeakADC");
 
@@ -189,7 +204,7 @@ void SVDLocalCalibrationsCheckModule::beginRun()
                          //                         100, -0.5, 0.5);
                          100, -15, 15);
   //  template_pedestal.GetXaxis()->SetTitle("( ref - check ) / ref");
-  template_pedestal.GetXaxis()->SetTitle("( ref - check)  (ADC)");
+  template_pedestal.GetXaxis()->SetTitle("(ref - check)  (ADC)");
   m_hPedestalDIFF = new SVDAPVHistograms<TH1F>(template_pedestal);
   setAPVHistoStyles(m_hPedestalDIFF);
   m_hPedestalSummary = new SVDSummaryPlots("pedestalSummary@view",
@@ -210,6 +225,17 @@ void SVDLocalCalibrationsCheckModule::event()
     VxdID theVxdID(m_layerREF, m_ladderREF, m_sensorREF);
     float diff = 0;
 
+
+    diff = (m_maskREF - m_maskCHECK);// / m_maskREF;
+    m_hMaskDIFF->fill(theVxdID, (int)m_sideREF, (int)m_stripREF / 128, diff);
+    if (m_sideREF == 1) {
+      m_nMaskedUREF += m_maskREF;
+      m_nMaskedUCHECK += m_maskCHECK;
+    } else {
+      m_nMaskedVREF += m_maskREF;
+      m_nMaskedVCHECK += m_maskCHECK;
+    }
+    m_hMaskSummaryCHECK->fill(theVxdID, (int)m_sideREF, (float)m_maskCHECK);
 
     diff = (m_noiseREF - m_noiseCHECK);// / m_noiseREF;
     m_hNoiseDIFF->fill(theVxdID, (int)m_sideREF, (int)m_stripREF / 128, diff);
@@ -255,7 +281,8 @@ void SVDLocalCalibrationsCheckModule::event()
         int ladder =  itSvdSensors->getLadderNumber();
         int sensor = itSvdSensors->getSensorNumber();
         Belle2::VxdID theVxdID(layer, ladder, sensor);
-        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(theVxdID));
+        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::getInstance().getSensorInfo(
+                                                     theVxdID));
 
         TList* listEmpty = new TList;
 
@@ -294,6 +321,10 @@ void SVDLocalCalibrationsCheckModule::event()
           for (int m_APV = 0; m_APV < Napv; m_APV++) {
 
             int problem = 0;
+
+            //mask analysis
+            TH1F* hMask = m_hMaskDIFF->getHistogram(theVxdID, side, m_APV);
+            m_hMaskSummary->fill(theVxdID, side, hMask->GetMean() * 128);
 
             //noise analysis
             TH1F* hNoise = m_hNoiseDIFF->getHistogram(theVxdID, side, m_APV);
@@ -379,7 +410,8 @@ void SVDLocalCalibrationsCheckModule::event()
     ++itSvdLayers;
   }
 
-  printSummaryPages();
+  printAPVSummaryPages();
+  printMaskedSummaryPages();
   printLastPage();
 
 }
@@ -585,6 +617,8 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
     leftLine = -m_cutPedestal_out;
     rightLine = m_cutPedestal_out;
     topLine = 25;
+  } else {
+    B2FATAL("The printPage function is not implemented for" << LogVar("variable", variable));
   }
   refU->GetYaxis()->SetRangeUser(minY, maxY);
   refV->GetYaxis()->SetRangeUser(minY, maxY);
@@ -772,7 +806,8 @@ void SVDLocalCalibrationsCheckModule::setAPVHistoStyles(SVDAPVHistograms<TH1F>* 
         int ladder =  itSvdSensors->getLadderNumber();
         int sensor = itSvdSensors->getSensorNumber();
         Belle2::VxdID theVxdID(layer, ladder, sensor);
-        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(theVxdID));
+        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::getInstance().getSensorInfo(
+                                                     theVxdID));
 
         for (int side = 0; side < 2; side++) {
 
@@ -803,13 +838,13 @@ void SVDLocalCalibrationsCheckModule::setAPVHistoStyles(SVDAPVHistograms<TH1F>* 
 }
 
 
-void SVDLocalCalibrationsCheckModule::printSummaryPages()
+void SVDLocalCalibrationsCheckModule::printAPVSummaryPages()
 {
 
   TPaveText* pt_cuts_title = new TPaveText(.05, .6, .95, .65);
   TPaveText* pt_cuts = new TPaveText(.15, .5, .85, .55);
   char cuts[512];
-  sprintf(cuts, "%s", "SUMMARY");
+  sprintf(cuts, "%s", "APV SUMMARY");
   pt_cuts_title->SetShadowColor(0);
   pt_cuts_title->SetBorderSize(0);
   pt_cuts_title->SetTextSize(0.03);
@@ -855,6 +890,58 @@ void SVDLocalCalibrationsCheckModule::printSummaryPages()
   pedestal->cd(3);
   m_hPedestalSummary->getHistogram(0)->Draw("colztext");
   pedestal->Print(m_outputPdfName.c_str());
+
+
+}
+
+void SVDLocalCalibrationsCheckModule::printMaskedSummaryPages()
+{
+
+  TPaveText* pt_cuts_title = new TPaveText(.05, .6, .95, .65);
+  TPaveText* pt_cuts = new TPaveText(.15, .4, .85, .55);
+  char cuts[512];
+  sprintf(cuts, "%s", "Masked Strips SUMMARY");
+  pt_cuts_title->SetShadowColor(0);
+  pt_cuts_title->SetBorderSize(0);
+  pt_cuts_title->SetTextSize(0.03);
+  pt_cuts_title->AddText(cuts);
+  float nU = 768 * (2 * 7 + 3 * 10 + 4 * 12 + 5 * 16);
+  float nV = 512 * (2 * 7) + 768 * (3 * 10 + 4 * 12 + 5 * 16);
+  sprintf(cuts, "Number of MASKED strips on the u/P side in the REF   calibration = %d (%.3f)%%", m_nMaskedUREF,
+          m_nMaskedUREF * 100. / nU);
+  pt_cuts->AddText(cuts);
+  sprintf(cuts, "Number of MASKED strips on the u/P side in the CHECK calibration = %d (%.3f)%%", m_nMaskedUCHECK,
+          m_nMaskedUCHECK * 100. / nU);
+  pt_cuts->AddText(cuts);
+  sprintf(cuts, "Number of MASKED strips on the v/N side in the REF   calibration = %d (%.3f)%%", m_nMaskedVREF,
+          m_nMaskedVREF * 100. / nV);
+  pt_cuts->AddText(cuts);
+  sprintf(cuts, "Number of MASKED strips on the v/N side in the CHECK calibration = %d (%.3f)%%", m_nMaskedVCHECK,
+          m_nMaskedVCHECK * 100. / nV);
+  pt_cuts->AddText(cuts);
+  pt_cuts->SetTextSize(0.02);
+  pt_cuts->SetShadowColor(0);
+  pt_cuts->SetBorderSize(0);
+  pt_cuts->SetFillColor(10);
+  pt_cuts->SetTextAlign(12);
+
+  TCanvas* explain = new TCanvas();
+  pt_cuts_title->Draw();
+  pt_cuts->Draw();
+  explain->Print(m_outputPdfName.c_str());
+
+  TCanvas* mask = new TCanvas();
+  mask->SetGridx();
+  mask->Divide(2, 2);
+  mask->cd(1);
+  m_hMaskSummary->getHistogram(1)->Draw("colztext");
+  mask->cd(2);
+  m_hMaskSummaryCHECK->getHistogram(1)->Draw("colztext");
+  mask->cd(3);
+  m_hMaskSummary->getHistogram(0)->Draw("colztext");
+  mask->cd(4);
+  m_hMaskSummaryCHECK->getHistogram(0)->Draw("colztext");
+  mask->Print(m_outputPdfName.c_str());
 
 
 }

@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #include <analysis/modules/NeutralHadronMatcher/NeutralHadronMatcherModule.h>
-#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/core/Environment.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

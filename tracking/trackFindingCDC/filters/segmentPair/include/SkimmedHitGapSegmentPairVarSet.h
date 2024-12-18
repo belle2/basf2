@@ -17,8 +17,8 @@ namespace Belle2 {
      *  Class to compute floating point variables from an axial stereo segment pair
      *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      *
-     *  Is the same as the HitGapSegmentPairVarSet, but skimmed for non sensical combinations
-     *  with a hard coded cut. To be used as a precut before proceding to a more expensive fit
+     *  Is the same as the HitGapSegmentPairVarSet, but skimmed for nonsensical combinations
+     *  with a hard coded cut. To be used as a precut before proceeding to a more expensive fit
      *  of the axial stereo segment pair.
      */
     class  SkimmedHitGapSegmentPairVarSet : public HitGapSegmentPairVarSet {

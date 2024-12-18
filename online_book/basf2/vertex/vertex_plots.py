@@ -30,7 +30,7 @@ ax.hist(
     linestyle="--",
     bins=m_bins,
     range=m_range,
-    label=r"$J/\psi$ vertex(MC)",
+    label=r"$J/\psi$ vertex (MC)",
 )
 ax.set_xlabel("dz[cm]")
 ax.set_ylabel("Events")

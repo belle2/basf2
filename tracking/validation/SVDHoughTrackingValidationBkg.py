@@ -29,12 +29,10 @@ VALIDATION_OUTPUT_FILE = 'SVDHoughTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
-basf2.set_random_seed(1337)
-
 
 class SVDHoughTrackingValidationBkg(TrackingValidationRun):
     """
-    Validation class for the DATCON tracking
+    Validation class for the SVDHoughTracking
     """
     #: the number of events to process
     n_events = N_EVENTS
@@ -75,6 +73,7 @@ def main():
     """
     create SVD validation class and execute
     """
+    basf2.set_random_seed(1337)
     validation_run = SVDHoughTrackingValidationBkg()
     validation_run.configure_and_execute_from_commandline()
 
@@ -83,3 +82,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     if ACTIVE:
         main()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

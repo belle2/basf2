@@ -16,7 +16,6 @@
 from basf2 import B2INFO, B2FATAL, B2WARNING
 import basf2
 import basf2_mva
-import inspect
 import modularAnalysis as ma
 import variables
 from variables import utils
@@ -1101,7 +1100,7 @@ def flavorTagger(
       @param downloadFromDatabaseIfNotFound    [Expert] Weight files are downloaded from
                                                the conditions database if not available in workingDirectory.
       @param uploadToDatabaseAfterTraining     [Expert] For librarians only: uploads weight files to localdb after training.
-      @param samplerFileId                     Identifier to paralellize
+      @param samplerFileId                     Identifier to parallelize
                                                sampling. Only used in ``Sampler`` mode.  If you are training by yourself and
                                                want to parallelize the sampling, you can run several sampling scripts in
                                                parallel. By changing this parameter you will not overwrite an older sample.
@@ -1228,7 +1227,7 @@ def flavorTagger(
             B2FATAL('Flavor Tagger: ' + category + ' has been already given')
 
     for code in sorted(categoriesCombination):
-        categoriesCombinationCode = categoriesCombinationCode + '%02d' % code
+        categoriesCombinationCode = categoriesCombinationCode + f'{int(code):02}'
 
     # Create default ROE-mask
     if maskName == 'FTDefaultMask':
@@ -1338,14 +1337,5 @@ def flavorTagger(
 
 
 if __name__ == '__main__':
-
-    desc_list = []
-
-    function = globals()["flavorTagger"]
-    signature = inspect.formatargspec(*inspect.getfullargspec(function))
-    desc_list.append((function.__name__, signature + '\n' + function.__doc__))
-
-    from terminal_utils import Pager
-    from basf2.utils import pretty_print_description_list
-    with Pager('Flavor Tagger function accepts the following arguments:'):
-        pretty_print_description_list(desc_list)
+    from basf2.utils import pretty_print_module
+    pretty_print_module(__name__, "flavorTagger")

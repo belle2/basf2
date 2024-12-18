@@ -10,6 +10,7 @@
 
 /* Geant4 headers. */
 #include <G4ThreeVector.hh>
+#include <G4VTouchable.hh>
 
 /* ROOT headers. */
 #include <Math/Vector3D.h>
@@ -23,7 +24,6 @@ typedef double EclGeV;
 typedef double EclCM;
 typedef double EclRad;
 
-class G4VTouchable;
 namespace HepGeom {
   class Transform3D;
 }
@@ -34,7 +34,7 @@ namespace Belle2 {
 
 
     //! The Class for ECL Geometry Parameters
-    /*! This class provides ECL gemetry parameters for simulation, reconstruction and so on.
+    /*! This class provides ECL geometry parameters for simulation, reconstruction and so on.
         These parameters are got from geometry description
     */
     class ECLGeometryPar {
@@ -135,7 +135,7 @@ namespace Belle2 {
       int mPar_thetaID;
       /** The Phi ID information*/
       int mPar_phiID;
-      /** . */
+      /** initial crystal ID */
       int m_ini_cid;
       /** Pointer that saves the instance of this class. */
       static ECLGeometryPar* m_B4ECLGeometryParDB;
@@ -144,7 +144,7 @@ namespace Belle2 {
 
     /** EclNbr class  */
     class EclNbr {
-      // friend classses and functions
+      // friend classes and functions
 
     public:
       /** constants, enums and typedefs */

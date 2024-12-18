@@ -12,7 +12,7 @@
 #include <simulation/dataobjects/SimHitBase.h>
 #include <stdint.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <algorithm>
 
 namespace Belle2 {
@@ -67,11 +67,11 @@ namespace Belle2 {
     /** Return the non-ionization energy in electrons */
     float getEnergyVisible() const { return m_energyVisible; }
     /** Return the entry track position */
-    TVector3 getPosEntry() const { return TVector3(m_posEntry[0], m_posEntry[1], m_posEntry[2]); }
+    ROOT::Math::XYZVector getPosEntry() const { return ROOT::Math::XYZVector(m_posEntry[0], m_posEntry[1], m_posEntry[2]); }
     /** Return the exit track position */
-    TVector3 getPosExit() const { return TVector3(m_posExit[0], m_posExit[1], m_posExit[2]); }
+    ROOT::Math::XYZVector getPosExit() const { return ROOT::Math::XYZVector(m_posExit[0], m_posExit[1], m_posExit[2]); }
     /** Return the track momentum */
-    TVector3 getMomEntry() const { return TVector3(m_momEntry[0], m_momEntry[1], m_momEntry[2]); }
+    ROOT::Math::XYZVector getMomEntry() const { return ROOT::Math::XYZVector(m_momEntry[0], m_momEntry[1], m_momEntry[2]); }
     /** Return track position as float array */
     const float* getPosEntryArray() const { return m_posEntry; }
     /** Return track position as float array */

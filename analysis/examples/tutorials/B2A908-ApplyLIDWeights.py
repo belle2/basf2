@@ -8,14 +8,13 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Doxygen should skip this script
-# @cond
-
 """
 Example to create lepton particle list and apply LeptonID corrections to a MC sample
 by retrieving lookup tables from the conditions DB.
 """
 
+# Doxygen should skip this script
+# @cond
 
 import argparse
 
@@ -75,8 +74,8 @@ def main():
     # ----------
 
     ma.inputMdst(environmentType="default",
-                 filename=b2.find_file("mdst14.root", "validation"),
-                 entrySequence="0:10000",
+                 filename=b2.find_file("mdst16.root", "validation"),
+                 entrySequence="6500:16500",
                  path=path)
 
     # ----------------------------------------------
@@ -235,3 +234,5 @@ def main():
 if __name__ == "__main__":
 
     main()
+
+# @endcond

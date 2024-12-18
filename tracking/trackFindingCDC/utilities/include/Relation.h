@@ -39,13 +39,13 @@ namespace Belle2 {
                  (getTo() < rhs.getTo())));
       }
 
-      /// Operator to compare key type item to the relations for assoziative lookups.
+      /// Operator to compare key type item to the relations for associative lookups.
       friend bool operator<(const From* ptrFrom, const Relation<From, To>& relation)
       {
         return ptrFrom < relation.getFrom();
       }
 
-      /// Operator to compare key type item to the relations for assoziative lookups.
+      /// Operator to compare key type item to the relations for associative lookups.
       friend bool operator<(const Relation<From, To>& relation, const From* ptrFrom)
       {
         return relation.getFrom() < ptrFrom;
@@ -63,7 +63,7 @@ namespace Belle2 {
         return this->second;
       }
 
-      /// Make a relation in the opposite direciton with the same weight
+      /// Make a relation in the opposite direction with the same weight
       Relation<To, From> reversed() const
       {
         return Relation<To, From>(getTo(), getFrom());

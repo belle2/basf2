@@ -22,7 +22,6 @@
 
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TVector3.h"
 
 
 namespace Belle2 {
@@ -74,7 +73,7 @@ namespace Belle2 {
     /* returns the space point in local coordinates where the track hits the sensor:
       sensorInfo: info of the sensor under investigation
       aTrack: the track to be tested
-      isgood: flag which is false if some error occured (do not use the point if false)
+      isgood: flag which is false if some error occurred (do not use the point if false)
       du and dv are the uncertainties in u and v on the sensor plane of the fit (local coordinates)
      */
     ROOT::Math::XYZVector getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du,
@@ -122,9 +121,9 @@ namespace Belle2 {
     double m_momCut; ///< Cut on fitted track momentum
     double m_pTCut; ///< Cut on fitted track pT
     unsigned int m_minSVDHits; ///< Required hits in SVD strips for tracks
-    double m_z0minCut;/**< cut z0 minimum in cm (large negativ value eg -9999 disables)*/
-    double m_z0maxCut;/**< cut z0 maximum in cm (large positiv value eg 9999 disables)*/
-    double m_d0Cut;/**< cut abs(d0) in cm (large positiv value eg 9999 disables)*/
+    double m_z0minCut;/**< cut z0 minimum in cm (large negative value eg -9999 disables)*/
+    double m_z0maxCut;/**< cut z0 maximum in cm (large positive value eg 9999 disables)*/
+    double m_d0Cut;/**< cut abs(d0) in cm (large positive value eg 9999 disables)*/
     int m_maskedDistance; ///< Distance inside which no dead pixel or module border is allowed
 
     //Histograms to later determine efficiency

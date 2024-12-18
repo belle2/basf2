@@ -64,7 +64,7 @@ namespace Belle2 {
     /** Construct SVDRecoHit directly from vxdid and coordinates without using a hit object from the storearray
      * in the constructor
      *
-     * @param vxdid  the vxd id so the reco hit knows on which sensor the measurment took place
+     * @param vxdid  the vxd id so the reco hit knows on which sensor the measurement took place
      * @param u coordinate of the Hit along u
      * @param v coordinate of the Hit along v
      * @param sigmaU Error of the Hit along u

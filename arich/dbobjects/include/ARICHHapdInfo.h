@@ -94,7 +94,7 @@ namespace Belle2 {
 
     /**
      * Set operational Guard Bias
-     * @param guard bias
+     * @param gb guard bias
      */
     void setGuardBias(int gb) {m_guardBias = gb;}
 
@@ -132,7 +132,7 @@ namespace Belle2 {
 
     /**
      * Set Quantum Efficiency as a function of wavelength
-     * @param quantum efficiency
+     * @param qe quantum efficiency
      */
     void setQuantumEfficiency(TGraph* qe) {m_quantumEfficiency = qe;}
 

@@ -10,7 +10,6 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 
-#include <TFile.h>
 #include <TCanvas.h>
 #include <TH1.h>
 #include <TH2.h>

@@ -601,6 +601,10 @@ namespace Belle2 {
       Track* tmp_track = tmp_mcP->getRelated<Track>();
       if (tmp_track) {
         const TrackFitResult* tmp_tfr = tmp_track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(tmp_mcP->getPDG())));
+        if (!tmp_tfr) {
+          // p value of TrackFitResult is NaN so cannot check charge
+          return 0;
+        }
         if (tmp_tfr->getChargeSign()*tmp_mcP->getCharge() > 0)
           return 1;
         else

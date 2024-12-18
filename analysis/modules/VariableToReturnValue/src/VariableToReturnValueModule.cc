@@ -8,7 +8,6 @@
 
 #include <analysis/modules/VariableToReturnValue/VariableToReturnValueModule.h>
 
-#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 

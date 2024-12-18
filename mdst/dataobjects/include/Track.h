@@ -77,10 +77,10 @@ namespace Belle2 {
     const TrackFitResult* getTrackFitResult(const Const::ChargedStable& chargedStable) const;
 
 
-    /** Return the track fit (from TrackFitResult with specified name) for a fit hypothesis with the closest mass
+    /** Return the track fit (from TrackFitResult with specified name) for the fit hypothesis with the closest mass
      *
-     * Multiple particle hypothesis are used for fitting during the reconstruction and stored with
-     * this Track class. Not all hypothesis are available for all tracks because either a specific hypothesis
+     * Multiple particle hypotheses are used for fitting during the reconstruction and stored with
+     * this Track class. Not all hypotheses are available for all tracks because either a specific hypothesis
      * was not fitted or because the fit failed.
      * This method returns the track fit result of a successful fit with the hypothesis of a mass closest
      * to the requested particle type. If the requested type's hypothesis is available it will be returned
@@ -99,10 +99,10 @@ namespace Belle2 {
     const TrackFitResult* getTrackFitResultWithClosestMassByName(const Const::ChargedStable& requestedType,
         const std::string trackFitResultsName) const;
 
-    /** Return the track fit for a fit hypothesis with the closest mass
+    /** Return the track fit for the fit hypothesis with the closest mass
      *
-     * Multiple particle hypothesis are used for fitting during the reconstruction and stored with
-     * this Track class. Not all hypothesis are available for all tracks because either a specific hypothesis
+     * Multiple particle hypotheses are used for fitting during the reconstruction and stored with
+     * this Track class. Not all hypotheses are available for all tracks because either a specific hypothesis
      * was not fitted or because the fit failed.
      * This method returns the track fit result of a successful fit with the hypothesis of a mass closest
      * to the requested particle type. If the requested type's hypothesis is available it will be returned
@@ -118,6 +118,20 @@ namespace Belle2 {
      *         to check which fitting hypothesis was actually used for this result.
      */
     const TrackFitResult* getTrackFitResultWithClosestMass(const Const::ChargedStable& requestedType) const;
+
+    /** Return the track fit (from TrackFitResult with specified name) for the fit hypothesis with the best p value of the fit
+     *
+     * Multiple particle hypotheses are used for fitting during the reconstruction and stored with
+     * this Track class. Not all hypotheses are available for all tracks because either a specific hypothesis
+     * was not fitted or because the fit failed.
+     * This method returns the track fit result of the fit for the hypothesis with the best fit quality
+     * (highest p value).
+     *
+     * @param trackFitResultsName The name of the storeArray to get the TrackFitResults from
+     * @return a pointer to the TrackFitResult object. Use TrackFitResult::getParticleType()
+     *         to check which fitting hypothesis was used for this result.
+     */
+    const TrackFitResult* getTrackFitResultWithBestPValue(const std::string& trackFitResultsName = "") const;
 
     /** Access to all track fit results at the same time (from TrackFitResult with specified name)
      *
@@ -172,7 +186,7 @@ namespace Belle2 {
       m_trackFitIndices[chargedStable.getIndex()] = index;
     }
 
-    /** Returns the number of fitted hypothesis which are stored in this track. */
+    /** Returns the number of fitted hypotheses which are stored in this track. */
     unsigned int getNumberOfFittedHypotheses() const;
 
     /** Getter for quality indicator for classification of fake vs. MC-matched Tracks.

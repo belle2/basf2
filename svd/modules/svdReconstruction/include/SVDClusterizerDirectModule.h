@@ -100,7 +100,7 @@ namespace Belle2 {
       /** Name of the time fitter (db label) */
       std::string m_timeFitterName;
       /** Use peak widths and peak time calibrations?
-       * Unitl this is also simulated, set to true only for testbeam data. */
+       * Until this is also simulated, set to true only for testbeam data. */
       bool m_calibratePeak = false;
 
 

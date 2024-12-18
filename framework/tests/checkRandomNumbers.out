@@ -27,6 +27,7 @@
 [INFO] Starting event processing, random seed is set to 'this is the seed'
 [DEBUG:31] DataStore::reset(): Removing all elements from DataStore
 [DEBUG:100] Successfully registered object 'ProcessStatistics' (durability: persistent)
+[DEBUG:100] Successfully registered object 'EventExtraInfo' (durability: event)
 [DEBUG:100] Successfully registered object 'EventMetaData' (durability: event)
 [DEBUG:100] EventInfoSetter: will process 12 events in total.
 [DEBUG:100] Found module providing EventMetaData: EventInfoSetter

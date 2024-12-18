@@ -14,7 +14,7 @@
 
 namespace Belle2::SVD {
   /**
-   * structure containing the relevant informations
+   * structure containing the relevant information
    * of each strip of the raw cluster
    */
   struct StripInRawCluster {

@@ -93,8 +93,8 @@ namespace Belle2 {
     TH1F* m_l3v_mumu_L1_CDCTRG{nullptr};   /**< svd time histogram for mu mu events wrt the CDC trigger time*/
     TH1F* m_l3vEvtT0_mumu_L1_CDCTRG{nullptr};   /**< svd time histogram for mu mu events wrt the CDC trigger time*/
 
-    TH1F* m_SVDEventT03Sample{nullptr};    /**<  SVD event T0  for 3 sampels */
-    TH1F* m_SVDEventT06Sample{nullptr};    /**<  SVD event T0  for 6 sampels */
+    TH1F* m_SVDEventT03Sample{nullptr};    /**<  SVD event T0  for 3 samples */
+    TH1F* m_SVDEventT06Sample{nullptr};    /**<  SVD event T0  for 6 samples */
 
     TH1F* m_SVDEventT03Sample_bhabha_L1_ECLTRG{nullptr}; /**< svd eventT0 histogram for bhabha events wrt the ECL trigger time for 3 samples*/
     TH1F* m_SVDEventT03Sample_hadron_L1_ECLTRG{nullptr}; /**< svd eventT0 histogram for hadronic events wrt the ECL trigger time for 3 samples */

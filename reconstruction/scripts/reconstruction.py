@@ -914,7 +914,9 @@ def add_dedx_modules(path, components=None, for_cdst_analysis=False, enableDebug
     # VXD dE/dx PID
     # only run this if the SVD is enabled - PXD is disabled by default
     if components is None or 'SVD' in components:
-        if not for_cdst_analysis:
+        if for_cdst_analysis:
+            path.add_module('VXDDedxPIDRemaker')
+        else:
             path.add_module('VXDDedxPID')
 
 

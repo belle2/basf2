@@ -42,6 +42,7 @@ FlavorTaggerInfoFillerModule::FlavorTaggerInfoFillerModule() : Module()
 
 void FlavorTaggerInfoFillerModule::initialize()
 {
+  if (m_FANNmlp or m_TMVAfbdt) m_eventExtraInfo.isRequired();
 }
 
 void FlavorTaggerInfoFillerModule::event()

@@ -27,7 +27,7 @@
 namespace Belle2 {
   /**
    * Module that produces a localdb with position error scale factors
-   * for different position algoritms
+   * for different position algorithms
    */
   class SVDPositionErrorScaleFactorImporterModule : public Module {
 

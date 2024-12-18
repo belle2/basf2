@@ -19,7 +19,7 @@
 #include <cstdlib>
 
 namespace Belle2 {
-  /**This module generates a StoreObjPtr that contains random trigger quality chosen between FINE and CORSE
+  /**This module generates a StoreObjPtr that contains random trigger quality chosen between FINE and COARSE
    */
   class SVDTriggerQualityGeneratorModule : public Module {
 

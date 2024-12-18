@@ -39,7 +39,6 @@ class TestTreeFits(unittest.TestCase):
                         particleList='K_S0:pipi',
                         confidenceLevel=conf,
                         massConstraintList=[],
-                        massConstraintListParticlename=[],
                         expertUseReferencing=True,
                         ipConstraint=False,
                         updateAllDaughters=False)

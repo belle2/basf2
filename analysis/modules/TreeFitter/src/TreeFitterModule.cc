@@ -13,7 +13,6 @@
 #include <analysis/VertexFitting/TreeFitter/FitManager.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/particledb/EvtGenDatabasePDG.h>
 #include <framework/database/DBObjPtr.h>
 
 #include <analysis/utility/ParticleCopy.h>
@@ -40,9 +39,6 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            0.01);
   addParam("massConstraintList", m_massConstraintList,
            "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).", {});
-  addParam("massConstraintListParticlename", m_massConstraintListParticlename,
-           "Type::[string]. List of particles to mass constrain with string = particle name.", {});
-
 
   addParam("geoConstraintList", m_geoConstraintListPDG,
            "Type::[int], if 'autoSetGeoConstraintAndMergeVertices==False' you can manually set the particles that will be geometrically constrained here.", {});
@@ -101,13 +97,6 @@ void TreeFitterModule::initialize()
   m_particles.isRequired();
   m_nCandidatesBeforeFit = 0;
   m_nCandidatesAfter = 0;
-
-  if ((m_massConstraintList.size()) == 0 && (m_massConstraintListParticlename.size()) > 0) {
-    for (auto& containedParticle : m_massConstraintListParticlename) {
-      TParticlePDG* particletemp = TDatabasePDG::Instance()->GetParticle((containedParticle).c_str());
-      m_massConstraintList.push_back(particletemp->PdgCode());
-    }
-  }
 
   if (!m_treatAsInvisible.empty()) {
     bool valid = m_pDDescriptorInvisibles.init(m_treatAsInvisible);

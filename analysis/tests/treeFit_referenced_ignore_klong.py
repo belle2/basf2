@@ -43,7 +43,6 @@ class TestTreeFits(unittest.TestCase):
                         particleList='B0:sig',
                         confidenceLevel=conf,
                         massConstraintList=[],
-                        massConstraintListParticlename=[],
                         expertUseReferencing=True,
                         ipConstraint=True,
                         updateAllDaughters=True,

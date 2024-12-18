@@ -41,8 +41,7 @@ class TestTreeFits(unittest.TestCase):
         main.add_module('TreeFitter',
                         particleList='B0:sig',
                         confidenceLevel=conf,
-                        massConstraintList=[],
-                        massConstraintListParticlename=['B0'],
+                        massConstraintList=[511],
                         expertUseReferencing=True,
                         ipConstraint=True,
                         updateAllDaughters=True)

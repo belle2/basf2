@@ -80,8 +80,6 @@ namespace Belle2 {
      * which is the vertex of the mother */
     std::vector<int> m_fixedToMotherVertexListPDG;
 
-    /** vector carrying the names of the particles to be mass constraint */
-    std::vector<std::string> m_massConstraintListParticlename;
     /** type of the mass constraint false: use normal one. true: use parameters of daughters experimental!
      *  WARNING not even guaranteed that it works
      * */

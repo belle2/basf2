@@ -259,7 +259,6 @@ def treeFit(
             Setting this parameter to -1 selects all particle candidates.
             The value of 0 rejects the particle candidates with failed fit.
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
-            Please do not mix PDG id and particle names in massConstraint list.
         ipConstraint (bool): constrain head production vertex to IP (x-y-z) constraint
         customOriginConstraint (bool): use a custom origin vertex as the production vertex of your particle.
             This is useful when fitting D*/D without wanting to fit a B but constraining the process to be B-decay-like.
@@ -278,13 +277,13 @@ def treeFit(
         ignoreFromVertexFit (str): Decay string to select particles that will be ignored to determine the vertex position.
         path (basf2.Path): modules are added to this path
     """
+
+    from pdg import from_names
+
     treeFitter = register_module("TreeFitter")
     treeFitter.set_name('TreeFitter_' + list_name)
     if massConstraint:
-        if isinstance(massConstraint[0], str):
-            treeFitter.param('massConstraintListParticlename', massConstraint)
-        else:
-            treeFitter.param('massConstraintList', massConstraint)
+        treeFitter.param('massConstraintList', from_names(massConstraint))
     treeFitter.param('particleList', list_name)
     treeFitter.param('confidenceLevel', conf_level)
     treeFitter.param('ipConstraint', ipConstraint)

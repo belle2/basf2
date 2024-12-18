@@ -123,6 +123,8 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     Pass received data to keras model and fit it
     """
 
+    number_of_features = X.shape[1]
+
     # transform labels
     if y.min() != 0:
         y[y == y.min()] = 0
@@ -143,17 +145,17 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     callbacks = [tf.keras.callbacks.EarlyStopping(
         monitor='val_loss',
         min_delta=0,
-        patience=25,
+        patience=5,
         verbose=1,
         mode='auto',
         baseline=None,
         # start_from_epoch=200,
         restore_best_weights=True)]
 
-    state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=128, epochs=30, callbacks=callbacks)
+    state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=128, epochs=15, callbacks=callbacks)
 
     # create a keras model that includes the preprocessing step
-    state.model = get_merged_model(preprocessor, state.model, number_of_features=X.shape[1])
+    state.model = get_merged_model(preprocessor, state.model, number_of_features=number_of_features)
     return False
 
 

@@ -56,6 +56,11 @@ def get_preprocessor(X):
         disc_layer = Discretization(num_bins=num_bins, epsilon=0.0001,)
         disc_layer.adapt(Xcol[~np.isnan(Xcol)])
 
+        # Note: After calling adapt(), both `num_bins` and `bin_boundaries`
+        # attributes are not None. This causes a ValueError when deserializing
+        # the Discretization layer later. So we manually force `num_bins` to None.
+        disc_layer.num_bins = None
+
         net = Slicing(col)(inputs)
         net = disc_layer(net)
         outputs["{}".format(col)] = net
@@ -67,7 +72,7 @@ def create_model_inputs(number_of_features):
     inputs = {}
     for col in range(number_of_features):
         feature_name = "{}".format(col)
-        inputs[feature_name] = keras.layers.Input(name=feature_name, shape=(), dtype="int64")
+        inputs[feature_name] = keras.layers.Input(name=feature_name, shape=(1,), dtype="int64")
 
     return inputs
 

@@ -10,26 +10,72 @@
 
 using namespace Belle2;
 
-double CDCDedxSigmaPred::sigmaCurve(double* x, const double* par, int version) const
+void CDCDedxSigmaPred::setParameters()
 {
-  // calculate the predicted mean value as a function of beta-gamma (bg)
-  // this is done with a different function depending dE/dx, nhit, and cos(theta)
-  double f = 0;
 
-  if (version == 0) {
-    if (par[0] == 1) { // return dedx parameterization
-      f = par[1] + par[2] * x[0];
-    } else if (par[0] == 2) { // return nhit or sin(theta) parameterization
-      f = par[1] * std::pow(x[0], 4) + par[2] * std::pow(x[0], 3) +
-          par[3] * x[0] * x[0] + par[4] * x[0] + par[5];
-    } else if (par[0] == 3) { // return cos(theta) parameterization
-      f = par[1] * exp(-0.5 * pow(((x[0] - par[2]) / par[3]), 2)) +
-          par[4] * pow(x[0], 6) + par[5] * pow(x[0], 5) + par[6] * pow(x[0], 4) +
-          par[7] * pow(x[0], 3) + par[8] * x[0] * x[0] + par[9] * x[0] + par[10];
-    }
+  // make sure the resolution parameters are reasonable
+  if (!m_DBSigmaPars || m_DBSigmaPars->getSize() == 0)
+    B2FATAL("No dE/dx sigma parameters!");
+
+  std::vector<double> sigmapar;
+  sigmapar = m_DBSigmaPars->getSigmaPars();
+  for (int i = 0; i < 2; ++i)  m_dedxpars[i] = sigmapar[i];
+  for (int i = 0; i < 5; ++i) m_nhitpars[i] = sigmapar[i + 2];
+  for (int i = 0; i < 10; ++i) m_cospars[i] = sigmapar[i + 7];
+}
+
+void CDCDedxSigmaPred::setParameters(std::string infile)
+{
+
+  B2INFO("\n\tWidgetParameterization: Using parameters from file --> " << infile);
+
+  std::ifstream fin;
+  fin.open(infile.c_str());
+
+  if (!fin.good()) B2FATAL("\tWARNING: CANNOT FIND " << infile);
+
+  int par;
+
+  B2INFO("\t --> dedx parameters");
+  for (int i = 0; i < 2; ++i) {
+    fin >> par >> m_dedxpars[i];
+    B2INFO("\t\t (" << i << ")" << m_dedxpars[i]);
   }
 
-  return f;
+  B2INFO("\t --> nhit parameters");
+  for (int i = 0; i <= 4; ++i) {
+    fin >> par >> m_nhitpars[i];
+    B2INFO("\t\t (" << i << ")" << m_nhitpars[i]);
+  }
+
+  B2INFO("\t --> cos parameters");
+  for (int i = 0; i < 10; ++i) {   //4
+    fin >> par >> m_cospars[i];
+    B2INFO("\t\t (" << i << ")" << m_cospars[i]);
+  }
+
+  fin.close();
+}
+
+void CDCDedxSigmaPred::printParameters(std::string outfile)
+{
+
+  B2INFO("\n\tCDCDedxSigmaPred: Printing parameters to file --> " << outfile.c_str());
+
+  // write out the parameters to file
+  std::ofstream fout(outfile.c_str());
+
+  for (int i = 1; i < 3; ++i) fout << i << "\t" << m_dedxpars[i - 1] << std::endl;
+
+  fout << std::endl;
+  for (int i = 3; i < 8; ++i) fout << i << "\t" << m_nhitpars[i - 3] << std::endl;
+
+  fout << std::endl;
+  for (int i = 8; i < 18; ++i) fout << i << "\t" << m_cospars[i - 8] << std::endl;
+
+  fout << std::endl;
+
+  fout.close();
 }
 
 double CDCDedxSigmaPred::getSigma(double dedx, double nhit, double cos, double timereso)
@@ -42,16 +88,14 @@ double CDCDedxSigmaPred::getSigma(double dedx, double nhit, double cos, double t
 double CDCDedxSigmaPred::nhitPrediction(double nhit)
 {
 
-  m_sigmapars = getSigmaVector();
   double x[1];
   double nhitpar[6];
 
   nhitpar[0] = 2;
-  for (int i = 0; i < 5; ++i) {
-    nhitpar[i + 1] = m_sigmapars[i + 2];
-  }
+  for (int i = 0; i < 5; ++i) nhitpar[i + 1] = m_nhitpars[i];
 
   // determine sigma from the nhit parameterization
+  CDCDedxWidgetSigma gs;
   x[0] = nhit;
 
   double corNHit;
@@ -59,12 +103,11 @@ double CDCDedxSigmaPred::nhitPrediction(double nhit)
 
   if (nhit <  nhit_min) {
     x[0] = nhit_min;
-    corNHit = sigmaCurve(x, nhitpar, 0) * sqrt(nhit_min / nhit);
+    corNHit = gs.sigmaCurve(x, nhitpar) * sqrt(nhit_min / nhit);
   } else if (nhit > nhit_max) {
     x[0] = nhit_max;
-    corNHit = sigmaCurve(x, nhitpar, 0) * sqrt(nhit_max / nhit);
-  } else corNHit = sigmaCurve(x, nhitpar, 0);
-
+    corNHit = gs.sigmaCurve(x, nhitpar) * sqrt(nhit_max / nhit);
+  } else corNHit = gs.sigmaCurve(x, nhitpar);
 
   return corNHit;
 }
@@ -72,19 +115,17 @@ double CDCDedxSigmaPred::nhitPrediction(double nhit)
 double CDCDedxSigmaPred::ionzPrediction(double dedx)
 {
 
-  m_sigmapars = getSigmaVector();
   double x[1];
   double dedxpar[3];
 
   dedxpar[0] = 1;
 
-  for (int i = 0; i < 2; ++i) {
-    dedxpar[i + 1] = m_sigmapars[i];
+  for (int i = 0; i < 2; ++i) dedxpar[i + 1] = m_dedxpars[i];
 
-  }
   // determine sigma from the parameterization
+  CDCDedxWidgetSigma gs;
   x[0] = dedx;
-  double corDedx = sigmaCurve(x, dedxpar, 0);
+  double corDedx = gs.sigmaCurve(x, dedxpar);
 
   return corDedx;
 }
@@ -92,34 +133,18 @@ double CDCDedxSigmaPred::ionzPrediction(double dedx)
 double CDCDedxSigmaPred::cosPrediction(double cos)
 {
 
-  m_sigmapars = getSigmaVector();
   double x[1];
   double corCos;
+  CDCDedxWidgetSigma gs;
 
-  if (m_sigmapars.size() == 17) {
-    double cospar[11];
-    cospar[0] = 3;
-    for (int i = 0; i < 10; ++i) {
-      cospar[i + 1] = m_sigmapars[i + 7];
-    }
-    x[0] = cos;
-    corCos = sigmaCurve(x, cospar, 0);
-  }
+  double cospar[11];
+  cospar[0] = 3;
 
-  else {
-    double sinpar[6];
+  for (int i = 0; i < 10; ++i)  cospar[i + 1] = m_cospars[i];
 
-    sinpar[0] = 2;
-    for (int i = 0; i < 5; ++i) {
-      sinpar[i + 1] = m_sigmapars[i + 7];
-    }
-
-    double sin = sqrt(1 - cos * cos);
-    if (sin > 0.99) sin = 0.99;
-    x[0] = sin;
-
-    corCos = sigmaCurve(x, sinpar, 0);
-  }
+  x[0] = cos;
+  corCos = gs.sigmaCurve(x, cospar);
 
   return corCos;
+
 }

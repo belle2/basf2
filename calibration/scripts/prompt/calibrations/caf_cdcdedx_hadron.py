@@ -6,18 +6,19 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+
 """
 Airflow script to perform Hadron calibration.
 """
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
-from ROOT.Belle2 import CDCDedxHadSatAlgorithm
+from caf.framework import Calibration, Collection
+from caf.strategies import SingleIOV
+from ROOT.Belle2 import CDCDedxHadSatAlgorithm, CDCDedxHadBGAlgorithm
 from basf2 import create_path, register_module
 from clean_samples import make_pion_kaon_collection, make_proton_collection, make_muon_collection, make_electron_collection
 
-# from ROOT import Belle2
-from caf.framework import Calibration, Collection
-from caf.strategies import SingleIOV
+from prompt.calibrations.caf_cdcdedx import settings as cdc_dedx_electron
 
 quality_flags = [INPUT_DATA_FILTERS["Run Type"]["physics"],
                  INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
@@ -27,6 +28,7 @@ quality_flags = [INPUT_DATA_FILTERS["Run Type"]["physics"],
                  INPUT_DATA_FILTERS['Beam Energy']['Scan']]
 
 collection = ["pion_kaon", "electron", "muon", "proton"]
+
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="CDC dedx Hadron Calibrations",
@@ -39,8 +41,15 @@ settings = CalibrationSettings(
       "bhabha_all_calib": [INPUT_DATA_FILTERS['Data Tag']['bhabha_all_calib']] + quality_flags,
       "radmumu_calib": [INPUT_DATA_FILTERS['Data Tag']['radmumu_calib']] + quality_flags
       },
-    expert_config={"payload_boundaries": []},
-    depends_on=[])
+    expert_config={"payload_boundaries": [],
+                   "proton_minCut": 0.5,
+                   "proton_maxCut": 1.2,
+                   "maxevt": 1.5e6,
+                   "sat_bgpar": {"muon": [8, 2.83, 28.83], "proton": [6, 0.44, 0.85]},
+                   "bgpar": {"muon": [12, 2.85, 28.85], "proton": [20, 0.33, 0.85]},
+                   "cosbins": {"muon": 24, "proton": 20},
+                   },
+    depends_on=[cdc_dedx_electron])
 
 ##############################
 
@@ -66,23 +75,27 @@ def get_calibrations(input_data, **kwargs):
 
     # Set up config options
     # In this script we want to use one sources of input data.
-    # Get the input files  from the input_data variable
+    # Get the input files from the input_data variable
     file_to_iov_muon = input_data["radmumu_calib"]
     file_to_iov_electron = input_data["bhabha_all_calib"]
     file_to_iov_hadron = input_data["hadron_calib"]
 
-    # We might have requested an enormous amount of data across a run range.
-    # There's a LOT more files than runs!
-    # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 1000000
+    expert_config = kwargs.get("expert_config")
+    maxevt = expert_config["maxevt"]
 
-    # We filter out any more than 100 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
-    # already. This procedure respects that ordering
-    from prompt.utils import filter_by_max_files_per_run
+    # max_files_per_run = 1000000
+    # from prompt.utils import filter_by_max_files_per_run
+    from prompt.utils import filter_by_select_max_events_from_files
 
-    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_muon, max_files_per_run)
-    input_files_muon = list(reduced_file_to_iov_physics.keys())
-    input_files_electron = list(file_to_iov_electron.keys())
+    # reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_muon, max_files_per_run)
+    input_files_muon = filter_by_select_max_events_from_files(list(file_to_iov_muon.keys()), maxevt)
+    if not input_files_muon:
+        raise ValueError(f"Muon: all requested ({maxevt}) events not found")
+
+    input_files_electron = filter_by_select_max_events_from_files(list(file_to_iov_electron.keys()), maxevt)
+    if not input_files_electron:
+        raise ValueError(f"Electron: all requested ({maxevt}) events not found")
+
     input_files_hadron = list(file_to_iov_hadron.keys())
 
     basf2.B2INFO(f"Total number of files actually used as input for muon = {len(input_files_muon)}")
@@ -97,6 +110,14 @@ def get_calibrations(input_data, **kwargs):
     # The actual value our output IoV payload should have. Notice that we've set it open ended.
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
+    # extracting parameters
+    # expert_config = kwargs.get("expert_config")
+    proton_minCut = expert_config["proton_minCut"]
+    proton_maxCut = expert_config["proton_maxCut"]
+    bgpar = expert_config["bgpar"]
+    sat_bgpar = expert_config["sat_bgpar"]
+    cosbins = expert_config["cosbins"]
+
     ###################################################
     # Calibration setup
 
@@ -105,14 +126,13 @@ def get_calibrations(input_data, **kwargs):
     #
     # pion kaon collection
     #
-
     rec_path_pion_kaon = create_path()
     rec_path_pion_kaon.add_module(root_input)
 
     pion_kaon_list = []
     pion_kaon_list = make_pion_kaon_collection(rec_path_pion_kaon)
 
-    collector_pion_kaon = register_module('CDCDedxHadronCollector')  # ,
+    collector_pion_kaon = register_module('CDCDedxHadronCollector')
     collector_pion_kaon.param("particleLists", pion_kaon_list)
 
     collection_pion_kaon = Collection(collector=collector_pion_kaon,
@@ -122,12 +142,13 @@ def get_calibrations(input_data, **kwargs):
     #
     # proton collection
     #
-
     rec_path_proton = create_path()
     rec_path_proton.add_module(root_input)
     proton_list = make_proton_collection(rec_path_proton)
 
     collector_proton = register_module('CDCDedxHadronCollector', particleLists=proton_list)
+    collector_proton.param("maxcut", proton_maxCut)
+    collector_proton.param("mincut", proton_minCut)
 
     collection_proton = Collection(collector=collector_proton,
                                    input_files=input_files_hadron,
@@ -138,7 +159,6 @@ def get_calibrations(input_data, **kwargs):
     #
     # muon collection
     #
-
     rec_path_muon = create_path()
     rec_path_muon.add_module(root_input)
     muon_list = make_muon_collection(rec_path_muon)
@@ -164,7 +184,19 @@ def get_calibrations(input_data, **kwargs):
                                      )
 
     # set algorithim
-    algorithm_bv = CDCDedxHadSatAlgorithm()
+    algorithm_sat = CDCDedxHadSatAlgorithm()
+    algorithm_sat.setProtonCut(proton_minCut)
+    for key, value in sat_bgpar.items():
+        algorithm_sat.setBGPars(key, value[0], value[1], value[2])
+
+    algorithm_bg = CDCDedxHadBGAlgorithm()
+    algorithm_bg.setProtonCut(proton_minCut)
+
+    for key, value in bgpar.items():
+        algorithm_bg.setBGPars(key, value[0], value[1], value[2])
+
+    for key, value in cosbins.items():
+        algorithm_bg.setCosBin(key, value)
 
     # set calibration
     cal = Calibration("Hadron_saturation")
@@ -173,7 +205,7 @@ def get_calibrations(input_data, **kwargs):
     cal.add_collection(name="muon", collection=collection_muon)
     cal.add_collection(name="electron", collection=collection_electron)
 
-    cal.algorithms = [algorithm_bv]
+    cal.algorithms = [algorithm_sat, algorithm_bg]
 
     cal.strategies = SingleIOV
 
@@ -181,9 +213,6 @@ def get_calibrations(input_data, **kwargs):
     # It may be different if you are using another strategy like SequentialRunByRun
     for algorithm in cal.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
-
-    # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
-    # So we don't bother setting them.
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     return [cal]

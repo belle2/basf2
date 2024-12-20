@@ -11,7 +11,12 @@
 #include <framework/database/DBObjPtr.h>
 #include <reconstruction/dbobjects/CDCDedxMeanPars.h>
 
+#include <reconstruction/utility/CDCDedxWidgetCurve.h>
+
 #include <vector>
+#include <string>
+#include <iostream>
+#include <fstream>
 
 namespace Belle2 {
 
@@ -24,19 +29,19 @@ namespace Belle2 {
   public:
 
     /**
-     * Return the mean vector from payload
-     */
-    std::vector<double> getMeanVector() const
-    {
-      if (!m_DBMeanPars || m_DBMeanPars->getSize() == 0) {
-        B2WARNING("No dE/dx mean parameters!");
-        std::vector<double> meanpar;
-        for (int i = 0; i < 15; ++i)
-          meanpar.push_back(1.0);
-        return meanpar;
-      } else
-        return m_DBMeanPars->getMeanPars();
-    }
+    * set the parameters from file
+    */
+    void setParameters(std::string infile);
+
+    /**
+    * set the parameters
+    */
+    void setParameters();
+
+    /**
+    * write the parameters in file
+    */
+    void printParameters(std::string infile);
 
     /**
     * Return the predicted mean value as a function of beta-gamma (bg)
@@ -44,14 +49,18 @@ namespace Belle2 {
     double getMean(double bg);
 
     /**
-      * beta-gamma (bg) curve function
-      */
-    double meanCurve(double* x, double* par, int version) const;
+    * get the curve parameters
+    */
+    double getCurvePars(int i) { return m_meanpars[i]; };
 
+    /**
+    * set the curve parameters
+    */
+    void setCurvePars(int i, double val) { m_meanpars[i] = val; };
 
   private:
 
-    std::vector<double> m_meanpars; /**< dE/dx mean parameters */
+    double m_meanpars[15]; /**< parameters for beta-gamma curve */
 
     const DBObjPtr<CDCDedxMeanPars> m_DBMeanPars; /**< db object for dE/dx mean parameters */
 

@@ -13,15 +13,15 @@
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
 
 #include <vector>
-
 #include <memory>
 #include <cmath>
 #include <iostream>
+#include <fstream>
 
 namespace Belle2 {
 
   /**
-  * Class to hold the prediction of resolution depending dE/dx, nhit, and cos(theta)
+  * Class to hold the hadron saturation functions
   */
 
   class CDCDedxHadSat {
@@ -29,32 +29,44 @@ namespace Belle2 {
   public:
 
     /**
-    * Return the resolution vector from payload
+    * set the parameters
     */
-    void getHadronVector()
-    {
-
-      // get the hadron correction parameters
-      if (!m_DBHadronCor || m_DBHadronCor->getSize() == 0) {
-        B2WARNING("No hadron correction parameters!");
-        for (int i = 0; i < 4; ++i)
-          m_hadronpars.push_back(0.0);
-        m_hadronpars.push_back(1.0);
-      } else m_hadronpars = m_DBHadronCor->getHadronPars();
-
-    }
+    void setParameters();
 
     /**
-      * resolution functions depending on dE/dx, nhit, and cos(theta)
-      */
-    double D2I(double cosTheta,  double D) ;
-    double I2D(double cosTheta,  double I) ;
+    * set the parameters from file
+    */
+    void setParameters(std::string infile);
+
+    /**
+    * hadron saturation parameterization part 1
+    */
+    double D2I(double cosTheta,  double D) const;
+
+    /**
+    * hadron saturation parameterization part 2
+    */
+    double I2D(double cosTheta,  double I) const;
+
+    /**
+    * hadron saturation parameterization part 1
+    */
+    double D2I(double cosTheta, double D, double alpha, double gamma, double delta, double power, double ratio) const;
+
+    /**
+    * hadron saturation parameterization part 2
+    */
+    double I2D(double cosTheta, double I, double alpha, double gamma, double delta, double power, double ratio) const;
 
   private:
 
-    std::vector<double> m_hadronpars; /**< dE/dx resolution parameters */
+    double m_alpha; /*< the alpha parameter for the hadron saturation correction */
+    double m_gamma; /*< the gamma parameter for the hadron saturation correction */
+    double m_delta; /*< the delta parameter for the hadron saturation correction */
+    double m_power; /*< the power parameter for the hadron saturation correction */
+    double m_ratio; /*< the ratio parameter for the hadron saturation correction */
 
-    DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< db object for dE/dx resolution parameters */
+    DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< db object for dE/dx hadron saturation parameters */
 
   };
 } // Belle2 namespace

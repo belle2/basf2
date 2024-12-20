@@ -12,11 +12,16 @@
 
 #include <reconstruction/dbobjects/CDCDedxMeanPars.h>
 #include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
+#include <reconstruction/utility/CDCDedxWidgetSigma.h>
 
 #include <vector>
 
 #include <memory>
 #include <cmath>
+
+#include <string>
+#include <iostream>
+#include <fstream>
 
 namespace Belle2 {
 
@@ -29,34 +34,28 @@ namespace Belle2 {
   public:
 
     /**
-    * Return the resolution vector from payload
+    * set the parameters from file
     */
-    std::vector<double> getSigmaVector() const
-    {
-
-      // make sure the resolution parameters are reasonable
-      if (!m_DBSigmaPars || m_DBSigmaPars->getSize() == 0) {
-        B2WARNING("No dE/dx sigma parameters!");
-        std::vector<double> sigmapar;
-        for (int i = 0; i < 12; ++i)
-          sigmapar.push_back(1.0);
-        return sigmapar;
-      } else return m_DBSigmaPars->getSigmaPars();
-    }
+    void setParameters(std::string infile);
 
     /**
-      * resolution functions depending on dE/dx, nhit, and cos(theta)
-      */
-    double sigmaCurve(double* x, const double* par, int version) const;
+    * set the parameters
+    */
+    void setParameters();
 
     /**
-      * Return the predicted resolution depending on dE/dx, nhit, and cos(theta)
-      */
+    * write the parameters in file
+    */
+    void printParameters(std::string infile);
+
+    /**
+    * Return the predicted resolution depending on dE/dx, nhit, and cos(theta)
+    */
     double getSigma(double dedx, double nhit, double cos, double timereso);
 
     /**
-      * Return sigma from the nhit parameterization
-      */
+    * Return sigma from the nhit parameterization
+    */
     double nhitPrediction(double nhit);
 
     /**
@@ -69,9 +68,41 @@ namespace Belle2 {
     */
     double cosPrediction(double cos);
 
+    /**
+    * get the dedx parameters
+    */
+    double getDedxPars(int i) { return m_dedxpars[i]; };
+
+    /**
+    * set the dedx parameters
+    */
+    void setDedxPars(int i, double val) { m_dedxpars[i] = val; };
+
+    /**
+    * get the nhit parameters
+    */
+    double getNHitPars(int i) { return m_nhitpars[i]; };
+
+    /**
+    * set the nhit parameters
+    */
+    void setNHitPars(int i, double val) { m_nhitpars[i] = val; };
+
+    /**
+    * get the cos(theta) parameters
+    */
+    double getCosPars(int i) { return m_cospars[i]; };
+
+    /**
+    * set the cos(theta) parameters
+    */
+    void setCosPars(int i, double val) { m_cospars[i] = val; };
+
   private:
 
-    std::vector<double> m_sigmapars; /**< dE/dx resolution parameters */
+    double m_dedxpars[2]; // parameters for sigma vs. dE/dx curve
+    double m_cospars[10]; // parameters for sigma vs. cos(theta) curve
+    double m_nhitpars[5]; // parameters for sigma vs. nhit curve
 
     const DBObjPtr<CDCDedxSigmaPars> m_DBSigmaPars; /**< db object for dE/dx resolution parameters */
 

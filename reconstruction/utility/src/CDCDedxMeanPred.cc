@@ -10,37 +10,63 @@
 
 using namespace Belle2;
 
-double CDCDedxMeanPred::meanCurve(double* x, double* par, int version) const
+void CDCDedxMeanPred::setParameters()
 {
-  // calculate the predicted mean value as a function of beta-gamma (bg)
-  // this is done with a different function depending on the value of bg
-  double f = 0;
 
-  if (version == 0) {
-    if (par[0] == 1)
-      f = par[1] * std::pow(std::sqrt(x[0] * x[0] + 1), par[3]) / std::pow(x[0], par[3]) *
-          (par[2] - par[5] * std::log(1 / x[0])) - par[4] + std::exp(par[6] + par[7] * x[0]);
-    else if (par[0] == 2)
-      f = par[1] * std::pow(x[0], 3) + par[2] * x[0] * x[0] + par[3] * x[0] + par[4];
-    else if (par[0] == 3)
-      f = -1.0 * par[1] * std::log(par[4] + std::pow(1 / x[0], par[2])) + par[3];
+  // make sure the resolution parameters are reasonable
+  if (!m_DBMeanPars || m_DBMeanPars->getSize() == 0)
+    B2FATAL("No dE/dx mean parameters!");
+
+  std::vector<double> meanpar;
+  meanpar = m_DBMeanPars->getMeanPars();
+
+  for (int i = 0; i < 15; ++i)
+    m_meanpars[i] = meanpar[i];
+}
+
+
+void CDCDedxMeanPred::setParameters(std::string infile)
+{
+
+  B2INFO("\n\tWidgetParameterization: Using parameters from file --> " << infile);
+
+  std::ifstream fin;
+  fin.open(infile.c_str());
+
+  if (!fin.good()) B2FATAL("\tWARNING: CANNOT FIND" << infile);
+
+  int par;
+
+  B2INFO("\t --> Curve parameters");
+  for (int i = 0; i < 15; ++i) {
+    fin >> par >> m_meanpars[i];
+    B2INFO("\t\t (" << i << ")" << m_meanpars[i]);
   }
 
-  return f;
+  fin.close();
+}
+
+void CDCDedxMeanPred::printParameters(std::string outfile)
+{
+
+  B2INFO("\tCDCDedxMeanPred: Printing parameters to file --> " << outfile.c_str());
+
+  // write out the parameters to file
+  std::ofstream fout(outfile.c_str());
+
+  for (int i = 1; i < 16; ++i) fout << i << "\t" << m_meanpars[i - 1] << std::endl;
+  fout.close();
 }
 
 double CDCDedxMeanPred::getMean(double bg)
 {
-  m_meanpars = getMeanVector();
 
   // define the section of the mean to use
   double A = 0, B = 0, C = 0;
-  if (bg < 4.5)
-    A = 1;
-  else if (bg < 10)
-    B = 1;
-  else
-    C = 1;
+
+  if (bg < 4.5) A = 1;
+  else if (bg < 10) B = 1;
+  else C = 1;
 
   double x[1]; x[0] = bg;
   double parsA[9];
@@ -55,9 +81,10 @@ double CDCDedxMeanPred::getMean(double bg)
   }
 
   // calculate dE/dx from the Bethe-Bloch mean
-  double partA = meanCurve(x, parsA, 0);
-  double partB = meanCurve(x, parsB, 0);
-  double partC = meanCurve(x, parsC, 0);
+  CDCDedxWidgetCurve gc;
+  double partA = gc.meanCurve(x, parsA);
+  double partB = gc.meanCurve(x, parsB);
+  double partC = gc.meanCurve(x, parsC);
 
   return (A * partA + B * partB + C * partC);
 }

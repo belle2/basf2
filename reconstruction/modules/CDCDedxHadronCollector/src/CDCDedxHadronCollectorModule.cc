@@ -25,6 +25,8 @@ CDCDedxHadronCollectorModule::CDCDedxHadronCollectorModule() : CalibrationCollec
 
   // Parameter definitions
   addParam("particleLists", m_strParticleList, "Vector of ParticleLists to save", std::vector<std::string>());
+  addParam("maxcut", m_maxCut, "high cut on dedx curve for proton sample ", double(1.2));
+  addParam("mincut", m_minCut, "low cut on dedx curve for proton sample ", double(0.35));
 }
 
 //-----------------------------------------------------------------
@@ -34,10 +36,10 @@ CDCDedxHadronCollectorModule::CDCDedxHadronCollectorModule() : CalibrationCollec
 void CDCDedxHadronCollectorModule::prepare()
 {
 
-  m_trgResult.isOptional();
-  m_dedxTracks.isRequired();
-  m_tracks.isRequired();
-  m_trackFitResults.isRequired();
+  // m_trgResult.isOptional();
+  // m_dedxTracks.isRequired();
+  // m_tracks.isRequired();
+  // m_trackFitResults.isRequired();
 
   // Data object creation
   std::vector<TTree* > ttree;
@@ -49,7 +51,6 @@ void CDCDedxHadronCollectorModule::prepare()
 
     // strip the name of the particle lists to make this work
     std::string pdg = x.second;
-    // std::string pdg = m_pdgMap[m_strParticleList[i].substr(0, m_strParticleList[i].find(":"))];
 
     ttree.push_back(new TTree(Form("%s", pdg.data()), Form("%s dE/dx information", pdg.data())));
     int tt = ttree.size() - 1;
@@ -61,6 +62,8 @@ void CDCDedxHadronCollectorModule::prepare()
     ttree[tt]->Branch<int>("charge", &m_charge);
     ttree[tt]->Branch<int>("nhits", &m_nhits);
     ttree[tt]->Branch<double>("timereso", &m_timeReso);
+    ttree[tt]->Branch<double>("injtime", &m_injTime);
+    ttree[tt]->Branch<double>("injring", &m_injRing);
 
     // Collector object registration
     registerObject<TTree>(Form("%s", pdg.data()), ttree[tt]);
@@ -84,10 +87,7 @@ void CDCDedxHadronCollectorModule::collect()
     // make sure the list exists and is not empty
     StoreObjPtr<ParticleList> particlelist(m_strParticleList[iList]);
 
-    if (!particlelist or particlelist->getListSize() == 0) {
-      // B2WARNING("ParticleList " << m_strParticleList[iList] << " not found or empty, skipping");
-      continue;
-    }
+    if (!particlelist or particlelist->getListSize() == 0) continue;
 
     // loop over the particles in the list and follow the links to the
     // dE/dx information (Particle -> PIDLikelihood -> Track -> CDCDedxTrack)
@@ -108,6 +108,7 @@ void CDCDedxHadronCollectorModule::collect()
         B2WARNING("No related track...");
         continue;
       }
+
       CDCDedxTrack* dedxTrack = track->getRelatedTo<CDCDedxTrack>();
       if (!dedxTrack) {
         B2WARNING("No related CDCDedxTrack...");
@@ -147,19 +148,19 @@ void CDCDedxHadronCollectorModule::collect()
       { if (m_p < 0.05) continue;}
 
       if (ptype == "p+") {
-        if (((m_dedx - 0.45)*m_p * m_p > 1.20) || ((m_dedx - 0.45)*m_p * m_p < 0.35)) continue;
+        if (((m_dedx - 0.45) * abs(m_p) * abs(m_p) > m_maxCut) || ((m_dedx - 0.45)*abs(m_p) * abs(m_p) < m_minCut)) continue;
         if (m_dedx < 1.00) continue;
-        if (m_p > 1.0) continue;
+        if (abs(m_p) > 1.0) continue;
       }
 
       if (ptype == "pi+") {
         if (m_dedx > 20) continue;
       }
 
-      double injring = dedxTrack->getInjectionRing();
-      double injtime = dedxTrack->getInjectionTime();
+      m_injRing = dedxTrack->getInjectionRing();
+      m_injTime = dedxTrack->getInjectionTime();
 
-      m_timeReso = m_DBInjectTime->getCorrection("reso", injring, injtime);
+      m_timeReso = m_DBInjectTime->getCorrection("reso", m_injRing, m_injTime);
       m_nhits = dedxTrack->getNLayerHitsUsed();
 
       // fill the TTree

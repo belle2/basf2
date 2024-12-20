@@ -38,6 +38,7 @@
 #include <vector>
 
 namespace Belle2 {
+
   /**
    * A collector module for CDC dE/dx hadron calibrations
    *
@@ -64,32 +65,36 @@ namespace Belle2 {
 
   private:
     /**
-    * Electron collector variables
+    * Hadron collector variables
     */
     bool m_cuts; /**< Boolean to apply cuts during collection */
 
     std::vector<std::string> m_strParticleList; /**< Vector of ParticleLists to write out */
 
-    /// required input
-    StoreObjPtr<SoftwareTriggerResult> m_trgResult; /**< Store array for Trigger selection */
-    StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array for CDCDedxTracks */
-    StoreArray<Track> m_tracks; /**< Required array for Tracks */
-    StoreArray<TrackFitResult> m_trackFitResults; /**< Required array for TrackFitResults */
+    // /// required input
+    // StoreObjPtr<SoftwareTriggerResult> m_trgResult; /**< Store array for Trigger selection */
+    // StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array for CDCDedxTracks */
+    // StoreArray<Track> m_tracks; /**< Required array for Tracks */
+    // StoreArray<TrackFitResult> m_trackFitResults; /**< Required array for TrackFitResults */
 
-    std::map<std::string, std::string> m_pdgMap;
+    std::map<std::string, std::string> m_pdgMap;   /**< map to relate input strings to the right particle type */
 
     /// module params
-    int m_maxHits; /**< maximum number of hits allowed */
-    double m_setEoP; /**< Cut of E over P value */
+    double m_minCut; /**< low cut dedx curve for proton sample */
+    double m_maxCut; /**< high cut dedx curve for proton sample */
 
     /// track level information
     double m_dedx{ -1}; /**< dE/dx truncated mean */
-    double m_dedxnosat{ -1}; /**< dE/dx truncated mean */
+    double m_dedxnosat{ -1}; /**< dE/dx truncated mean no-saturation */
     double m_costh{ -1}; /**< track cos(theta) */
     double m_p{ -1}; /**< track momentum */
-    int m_charge{0}; /**< track momentum */
+    int m_charge{0}; /**< track charge */
     int m_nhits{ -1}; /**< number of dE/dx hits on the track */
-    double m_timeReso{ -1};
+
+    /// event level information
+    double m_injRing{ -1}; /**< her or ler  */
+    double m_injTime{ -1}; /**< time since last injection */
+    double m_timeReso{ -1}; /**< injection time resolution */
 
     DBObjPtr<CDCDedxInjectionTime> m_DBInjectTime; /**< Injection time DB object */
 

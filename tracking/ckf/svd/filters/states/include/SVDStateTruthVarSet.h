@@ -56,7 +56,7 @@ namespace Belle2 {
     /// Generate and assign the variables from the object.
     virtual bool extract(const BaseSVDStateFilter::Object* result) override;
 
-    /// Expose the maximal residual
+    /// Expose the parameters to the outside world
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
   private:

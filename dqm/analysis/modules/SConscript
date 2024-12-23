@@ -7,7 +7,7 @@ env['LIBS'] = ['framework', 'dqm',
                'ecl', 'ecl_mapper',
                'klm_dataobjects', 'klm_dbobjects',
                'svd_dataobjects', 'cdc_dataobjects',
-               'vxd', 'vxd_dataobjects',
+               'vxd', 'vxd_dataobjects', 'cdc_dbobjects',
                'RooFit', 'RooFitCore', 'ca', 'Com']
 
 # this check is not completely save if new options are added with clang

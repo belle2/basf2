@@ -16,11 +16,11 @@ namespace Belle2::SVD::Variables {
 
   double clusterSNR(const SVDCluster* svdCluster)
   {
-    svdCluster->getSNR();
+    return svdCluster->getSNR();
   }
 
   double clusterSize(const SVDCluster* svdCluster)
   {
-    svdCluster->getSize();
+    return svdCluster->getSize();
   }
 }

@@ -21,15 +21,11 @@ namespace Belle2 {
         c_bool = 2
       };
 
-      typedef SVDCluster InputType;
-      typedef std::variant<int, double, bool> ReturnType;
-      typedef std::function<ReturnType(const InputType*)> FunctionPtr;
-
       class Variable {
       public:
-        Variable(std::string name) : name{name} {}
+        Variable(const std::string& variableName) : name{variableName} {}
 
-        virtual const std::string& getName() const { return name; }
+        virtual std::string getName() const { return name; }
 
         virtual ~Variable() = default;
 
@@ -39,10 +35,10 @@ namespace Belle2 {
 
       class TypedVariable : public Variable {
       public:
-        TypedVariable(std::string name, VariableDataType dataType)
-          : Variable(name), dataType{dataType} {}
+        TypedVariable(const std::string& variableName, const VariableDataType& variableDataType)
+          : Variable(variableName), dataType{variableDataType} {}
 
-        const VariableDataType& getDataType() const { return dataType; }
+        VariableDataType getDataType() const { return dataType; }
 
       private:
         VariableDataType dataType;
@@ -50,8 +46,15 @@ namespace Belle2 {
 
       class BinnedVariable : public Variable {
       public:
-        BinnedVariable(std::string name, VariableDataType dataType, int nBins, float lowBin, float highBin)
-          : Variable(name), nBins{nBins}, lowBin{lowBin}, highBin{highBin} {}
+        BinnedVariable(const std::string& variableName, int _nBins, float _lowBin, float _highBin)
+          : Variable(variableName), nBins{_nBins}, lowBin{_lowBin}, highBin{_highBin} {}
+
+        int getNbins() const { return nBins; }
+
+        float getLowBin() const { return lowBin; }
+
+        float getHighBin() const { return highBin; }
+
       private:
         int nBins;
         float lowBin;
@@ -59,6 +62,10 @@ namespace Belle2 {
       };
 
       // Do wywalenia
+      typedef SVDCluster InputType;
+      typedef std::variant<int, double, bool> ReturnType;
+      typedef std::function<ReturnType(const InputType*)> FunctionPtr;
+
       class ComputableVariable {
       public:
         ComputableVariable(const std::string& _name)
@@ -66,7 +73,17 @@ namespace Belle2 {
             // TODO: Pass actual arguments
           , description{""}
           , dataType{VariableDataType::c_double}
-          , functionPtr{clusterCharge} {}
+        {
+          if (name == "clusterCharge") {
+            functionPtr = clusterCharge;
+          } else if (name == "clusterChargeNormalized") {
+            functionPtr = clusterChargeNormalized;
+          } else if (name == "clusterSNR") {
+            functionPtr = clusterSNR;
+          } else if (name == "clusterSize") {
+            functionPtr = clusterSize;
+          }
+        }
 
         const std::string& getName() const { return name; }
 
@@ -90,7 +107,7 @@ namespace Belle2 {
         FunctionPtr functionPtr;
       };
 
-      typedef std::vector<std::unique_ptr<Variable>> Variables;
+      typedef std::vector<std::variant<TypedVariable, BinnedVariable>> Variables;
       typedef std::vector<ComputableVariable> ComputableVariables;
       typedef std::map<std::string, ReturnType> EvaluatedVariables;
     }

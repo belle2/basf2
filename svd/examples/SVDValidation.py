@@ -25,10 +25,9 @@ import glob
 Usage: basf2 SVDValidation.py -i <input_file>
 '''
 
-useSimulation = False
+useSimulation = True
 
-# set this string to identify the output rootfiles
-tag = "_MATEUSZ"
+b2.set_log_level(b2.LogLevel.ERROR)
 
 main = b2.create_path()
 
@@ -77,13 +76,14 @@ else:
 
 
 # set exp for sim
-expList = [0]
-numEvents = 2000
-eventinfosetter = b2.register_module('EventInfoSetter')
-eventinfosetter.param('expList', expList)
-eventinfosetter.param('runList', [0])
-eventinfosetter.param('evtNumList', [numEvents])
-main.add_module(eventinfosetter)
+# expList = [0]
+
+# numEvents = 2000
+# eventinfosetter = b2.register_module('EventInfoSetter')
+# eventinfosetter.param('expList', expList)
+# eventinfosetter.param('runList', [0])
+# eventinfosetter.param('evtNumList', [numEvents])
+# main.add_module(eventinfosetter)
 
 # now do reconstruction:
 trk.add_tracking_reconstruction(
@@ -102,11 +102,16 @@ b2.set_module_parameters(main, "SVDClusterizer", returnClusterRawTime=True)
 # Histos
 # main.add_module('HistoManager', histoFileName="histos.root")
 
+tag = "histogram"
+
 main.add_module('SVDValidation',
-                outputFileName="SVDValidation"+str(tag)+".root",
-                variables=["clusterCharge"],
-                storageType="ntuple",
-                treeName="SVDClusters")
+                outputFileName="SVDValidation_"+str(tag)+".root",
+                containerName="SVDClusters",
+                variables=["clusterCharge", "clusterSize"],
+                # variablesToHistogram=[("clusterCharge", 100, 0, 100e3),
+                #                       ("clusterSize", 10, 0, 10)]
+                variablesToNtuple=["clusterCharge", "clusterSize"]
+                ).set_log_level(b2.LogLevel.INFO)
 
 # main.add_module("RootOutput")
 

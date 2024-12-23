@@ -15,13 +15,15 @@ namespace Belle2::SVD {
   public:
     ConcreteVariablesToNtuplePersistenceManager();
 
-    void initialize(const std::string&, const std::string&, const Variables::Variables&) override;
+    void initialize(const std::string&, const std::string&, Variables::Variables&) override;
     void addEntry(const Variables::EvaluatedVariables&) override;
     void store() override;
 
   private:
     std::string m_fileName;
     std::string m_treeName;
+    Variables::Variables m_variables;
+
     int m_basketSize{1600};
 
     std::shared_ptr<TFile> m_file{nullptr};
@@ -31,7 +33,8 @@ namespace Belle2::SVD {
     std::map<std::string, int> m_branchesInt;
     std::map<std::string, bool> m_branchesBool;
 
-    void registerBranch(const Variables::Variable&);
+    void openFileWithGuards();
+    void registerBranches();
     void updateBranch(const std::string&, const Variables::ReturnType&);
   };
 }

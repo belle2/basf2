@@ -12,18 +12,23 @@ namespace Belle2::SVD {
   ConcreteVariablesToHistogramPersistenceManager::ConcreteVariablesToHistogramPersistenceManager() {}
 
   void ConcreteVariablesToHistogramPersistenceManager::initialize(const std::string& fileName,
-      // treename should be optional
-      const std::string& treeName,
-      const Variables::Variables& variables)
+      const std::string& directoryName,
+      Variables::Variables& variables)
   {
-    createFileWithGuards();
+    m_fileName = fileName;
+    m_directory = directoryName;
+    m_variables = variables;
+
+    openFileWithGuards();
     registerHistograms();
   }
 
   void ConcreteVariablesToHistogramPersistenceManager::addEntry(const Variables::EvaluatedVariables& evaluatedVariables)
   {
     for (const auto& [variableName, value] : evaluatedVariables) {
-      (*m_histograms[variableName])->get().Fill(std::get<double>(value));
+      std::visit([&](auto&& val) {
+        (*m_histograms[variableName])->get().Fill(val);
+      }, value);
     }
   }
 
@@ -46,7 +51,7 @@ namespace Belle2::SVD {
     }
   }
 
-  void ConcreteVariablesToHistogramPersistenceManager::createFileWithGuards()
+  void ConcreteVariablesToHistogramPersistenceManager::openFileWithGuards()
   {
     m_file = RootFileCreationManager::getInstance().getFile(m_fileName);
 
@@ -62,18 +67,26 @@ namespace Belle2::SVD {
 
   void ConcreteVariablesToHistogramPersistenceManager::registerHistograms()
   {
-    for (const auto& varTuple : m_variables) {
-      std::string varStr;
-      int varNbins = 0;
-      float low = 0;
-      float high = 0;
-      std::tie(varStr, varNbins, low, high) = varTuple;
-      std::string compatibleName = MakeROOTCompatible::makeROOTCompatible(varStr);
+    for (const auto& variable : m_variables) {
+      std::visit([&](const auto & typedVariable) {
+        using T = std::decay_t<decltype(typedVariable)>;
+        if constexpr(std::is_same_v<T, Variables::BinnedVariable>) {
+          std::string varStr = typedVariable.getName();
+          int varNbins = typedVariable.getNbins();
+          float low = typedVariable.getLowBin();
+          float high = typedVariable.getHighBin();
 
-      auto ptr = std::make_unique<StoreObjPtr<RootMergeable<TH1D>>>("", DataStore::c_Persistent);
-      ptr->registerInDataStore(m_fileName + m_directory + varStr, DataStore::c_DontWriteOut);
-      ptr->construct(compatibleName.c_str(), compatibleName.c_str(), varNbins, low, high);
-      m_histograms[compatibleName] = std::move(ptr);
+          std::string compatibleName = MakeROOTCompatible::makeROOTCompatible(varStr);
+
+          auto ptr = std::make_unique<StoreObjPtr<RootMergeable<TH1D>>>("", DataStore::c_Persistent);
+          ptr->registerInDataStore(m_fileName + m_directory + varStr, DataStore::c_DontWriteOut);
+          ptr->construct(compatibleName.c_str(), compatibleName.c_str(), varNbins, low, high);
+
+          m_histograms[compatibleName] = std::move(ptr);
+        } else {
+          B2WARNING("Incompatible variable type. Skipping histogram registration.");
+        }
+      }, variable);
     }
   }
 }

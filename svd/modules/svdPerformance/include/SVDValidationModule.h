@@ -36,15 +36,14 @@ namespace Belle2::SVD {
 
   private:
     std::string m_fileName;
-    std::string m_treeName;
-    std::string m_storageType;
+    std::string m_containerName;
 
     // Variables -> stara koncepcja, do wywalenia
     std::vector<std::string> m_variableNames;
     Variables::ComputableVariables m_computableVariables;
     Counters m_counters;
 
-    // Variables -> nowa koncepcja
+    // Variables -> nowa koncepcja -> wykorzystujemy variables do dedukcji storage type
     std::vector<std::string> m_variablesToNtuple;
     std::vector<std::tuple<std::string, int, float, float>> m_variablesToHistogram;
     Variables::Variables m_variables;

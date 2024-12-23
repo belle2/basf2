@@ -3,10 +3,34 @@
 #include <svd/variables/VariableFactory.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
+
+namespace {
+  namespace Variables = Belle2::SVD::Variables;
+
+  Variables::Variables createVariables(std::vector<std::string> variablesToNtuple)
+  {
+    Variables::Variables variables;
+    for (const auto& variableName : variablesToNtuple) {
+      variables.push_back(Variables::TypedVariable(variableName, Variables::VariableDataType::c_double));
+    }
+    return variables;
+  }
+
+  Variables::Variables createVariables(std::vector<std::tuple<std::string, int, float, float>> variablesToHistogram)
+  {
+    Variables::Variables variables;
+    for (const auto& [varName, nbins, minVal, maxVal] : variablesToHistogram) {
+      B2INFO("I'm here");
+      variables.push_back(Variables::BinnedVariable(varName, nbins, minVal, maxVal));
+    }
+    return variables;
+  }
+}
 
 namespace Belle2::SVD {
 
@@ -15,8 +39,7 @@ namespace Belle2::SVD {
   SVDValidationModule::SVDValidationModule() : Module()
   {
     addParam("outputFileName", m_fileName, "", m_fileName);
-    addParam("treeName", m_treeName, "", m_treeName);
-    addParam("storageType", m_storageType, "Type of storage to store the variables in.", m_storageType);
+    addParam("containerName", m_containerName, "", m_containerName);
 
     // Po staremu
     addParam("variables", m_variableNames, "Variables used for the valiadation plots", m_variableNames);
@@ -28,16 +51,20 @@ namespace Belle2::SVD {
 
   void SVDValidationModule::initialize()
   {
-    // m_computableVariables = Variables::VariableFactory::create(m_variableNames);
+    // To bedzie do wywalenia ale na razie potrzebne
+    m_computableVariables = Variables::VariableFactory::create(m_variableNames);
 
-    // m_variablesToNtuple =
-    // m_variablesToHistogram =
-
-    // persistenceManager = PersistenceManagerFactory::create(m_storageType);
-    // persistenceManager->initialize(m_fileName, m_treeName, m_computableVariables);
-
-    // variablesToNtuple
-
+    if (not m_variablesToNtuple.empty() and not m_variablesToHistogram.empty()) {
+      B2FATAL("Cannot have both variablesToNtuple and variablesToHistogram set");
+    } else if (not m_variablesToNtuple.empty()) {
+      m_variables = createVariables(m_variablesToNtuple);
+      persistenceManager = PersistenceManagerFactory::create("ntuple");
+    } else if (not m_variablesToHistogram.empty()) {
+      B2INFO("I'm here");
+      m_variables = createVariables(m_variablesToHistogram);
+      persistenceManager = PersistenceManagerFactory::create("histogram");
+    }
+    persistenceManager->initialize(m_fileName, m_containerName, m_variables);
   }
 
   void SVDValidationModule::event()
@@ -68,7 +95,7 @@ namespace Belle2::SVD {
         for (const auto& computableVariable : m_computableVariables) {
           evaluatedVariables[computableVariable.getName()] = computableVariable(svdCluster);
         }
-        // persistenceManager->addEntry(evaluatedVariables);
+        persistenceManager->addEntry(evaluatedVariables);
       }
 
     }

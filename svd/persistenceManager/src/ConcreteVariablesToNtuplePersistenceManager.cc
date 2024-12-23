@@ -29,12 +29,42 @@ namespace Belle2::SVD {
 
   void ConcreteVariablesToNtuplePersistenceManager::initialize(const std::string& fileName,
       const std::string& treeName,
-      const Variables::Variables& variables)
+      Variables::Variables& variables)
   {
-    // TODO: Pass these in a constructor.
     m_fileName = fileName;
     m_treeName = treeName;
+    m_variables = variables;
 
+    openFileWithGuards();
+    registerBranches();
+  }
+
+  void ConcreteVariablesToNtuplePersistenceManager::addEntry(const Variables::EvaluatedVariables& evaluatedVariables)
+  {
+    for (const auto& [variableName, value] : evaluatedVariables) {
+      std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(variableName.c_str());
+      updateBranch(branchName, value);
+    }
+    m_tree->get().Fill();
+  }
+
+  void ConcreteVariablesToNtuplePersistenceManager::store()
+  {
+    if (not ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
+      B2INFO("Writing Ntuple: " << m_treeName);
+      TDirectory::TContext directoryGuard{m_file.get()};
+      m_tree->write(m_file.get());
+
+      const bool writeError = m_file->TestBit(TFile::kWriteError);
+      m_file.reset();
+      if (writeError) {
+        B2FATAL("A write error occurred while saving '" << m_fileName << "', please check if enough disk space is available.");
+      }
+    }
+  }
+
+  void ConcreteVariablesToNtuplePersistenceManager::openFileWithGuards()
+  {
     if (m_fileName.empty()) {
       B2FATAL("Output root file name is not set.");
     }
@@ -53,67 +83,39 @@ namespace Belle2::SVD {
     m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
     m_tree.construct(m_treeName.c_str(), "");
     m_tree->get().SetCacheSize(100000);
+  }
 
-    // TODO: Set counter branches
+  void ConcreteVariablesToNtuplePersistenceManager::registerBranches()
+  {
+    for (const auto& variable : m_variables) {
+      std::visit([&](const auto & typedVariable) {
+        using T = std::decay_t<decltype(typedVariable)>;
+        if constexpr(std::is_same_v<T, Variables::TypedVariable>) {
+          std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(typedVariable.getName().c_str());
+          std::string leafName = typedVariableToLeafName(typedVariable);
 
-    // Set branches
-    // for (const auto& variable : variables) {
-    //   registerBranch(variable);
-    // }
+          switch (typedVariable.getDataType()) {
+            case Variables::VariableDataType::c_double:
+              m_branchesDouble[branchName] = double{};
+              m_tree->get().Branch(branchName.c_str(), &m_branchesDouble[branchName], leafName.c_str());
+              break;
+            case Variables::VariableDataType::c_int:
+              m_branchesInt[branchName] = int{};
+              m_tree->get().Branch(branchName.c_str(), &m_branchesInt[branchName], leafName.c_str());
+              break;
+            case Variables::VariableDataType::c_bool:
+              m_branchesBool[branchName] = bool{};
+              m_tree->get().Branch(branchName.c_str(), &m_branchesBool[branchName], leafName.c_str());
+              break;
+            default:
+              break;
+          }
+        } else {
+          B2WARNING("Incompatible variable type. Skipping branch registration.");
+        }
+      }, variable);
+    }
     m_tree->get().SetBasketSize("*", m_basketSize);
-  }
-
-  void ConcreteVariablesToNtuplePersistenceManager::addEntry(const Variables::EvaluatedVariables& evaluatedVariables)
-  {
-    for (const auto& [variableName, value] : evaluatedVariables) {
-      std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(variableName.c_str());
-      updateBranch(branchName, value);
-      m_tree->get().Fill();
-    }
-  }
-
-  void ConcreteVariablesToNtuplePersistenceManager::store()
-  {
-    if (not ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
-      B2INFO("Writing Ntuple" << m_treeName);
-      TDirectory::TContext directoryGuard{m_file.get()};
-      m_tree->write(m_file.get());
-
-      const bool writeError = m_file->TestBit(TFile::kWriteError);
-      m_file.reset();
-      if (writeError) {
-        B2FATAL("A write error occurred while saving '" << m_fileName << "', please check if enough disk space is available.");
-      }
-    }
-  }
-
-  void ConcreteVariablesToNtuplePersistenceManager::registerBranch(const Variables::Variable& variable)
-  {
-    const auto* typedVariable = dynamic_cast<const Variables::TypedVariable*>(&variable);
-
-    std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(typedVariable->getName().c_str());
-    std::string leafName = typedVariableToLeafName(*typedVariable);
-
-    if (not typedVariable) {
-      B2FATAL("...");
-    }
-
-    switch (typedVariable->getDataType()) {
-      case Variables::VariableDataType::c_double:
-        m_branchesDouble[branchName] = double{};
-        m_tree->get().Branch(branchName.c_str(), &m_branchesDouble[branchName], leafName.c_str());
-        break;
-      case Variables::VariableDataType::c_int:
-        m_branchesInt[branchName] = int{};
-        m_tree->get().Branch(branchName.c_str(), &m_branchesInt[branchName], leafName.c_str());
-        break;
-      case Variables::VariableDataType::c_bool:
-        m_branchesBool[branchName] = bool{};
-        m_tree->get().Branch(branchName.c_str(), &m_branchesBool[branchName], leafName.c_str());
-        break;
-      default:
-        break;
-    }
   }
 
   void ConcreteVariablesToNtuplePersistenceManager::updateBranch(const std::string& branchName,

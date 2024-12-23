@@ -20,9 +20,6 @@
 #include <arich/dbobjects/ARICHPositionElement.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 
 // Geant4
 #include <G4LogicalVolume.hh>
@@ -45,7 +42,6 @@
 #include <G4Material.hh>
 
 using namespace std;
-using namespace boost;
 using namespace CLHEP;
 
 namespace Belle2 {
@@ -1738,7 +1734,7 @@ namespace Belle2 {
       double posX = aerogelParam.getLength("tileXPos") / Unit::mm;
       double posY = aerogelParam.getLength("tileYPos") / Unit::mm;
       int ilayer = 0;
-      BOOST_FOREACH(const GearDir & layer, aerogelParam.getNodes("Layers/Layer")) {
+      for (const GearDir& layer : aerogelParam.getNodes("Layers/Layer")) {
         double posZ = layer.getLength("zPosition");
         double sizeZ = layer.getLength("thickness");
         string tileMat = layer.getString("material");
@@ -1777,7 +1773,7 @@ namespace Belle2 {
       G4OpticalSurface* optSurf = materials.createOpticalSurface(surface);
       new G4LogicalSkinSurface("mirrorsSurface", lmirror, optSurf);
       int iMirror = 0;
-      BOOST_FOREACH(const GearDir & mirror, mirrorsParam.getNodes("Mirror")) {
+      for (const GearDir& mirror : mirrorsParam.getNodes("Mirror")) {
         double xpos = mirror.getLength("xPos") / Unit::mm;
         double ypos = mirror.getLength("yPos") / Unit::mm;
         double zpos = mirror.getLength("zPos") / Unit::mm;

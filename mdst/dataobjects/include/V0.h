@@ -37,7 +37,7 @@ namespace Belle2 {
        const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairNegative,
        double vertexX, double vertexY, double vertexZ);
 
-    /** Get pair of  yhe Tracks, that are part of the V0 particle.*/
+    /** Get pair of  the Tracks, that are part of the V0 particle.*/
     std::pair<Track*, Track*> getTracks() const
     {
       StoreArray<Track> tracks;

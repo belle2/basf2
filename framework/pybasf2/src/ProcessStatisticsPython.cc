@@ -213,7 +213,7 @@ Time spent or memory used in any module function. This is the sum of all of the 
   .def("__str__", &ProcessStatisticsPython::getStatisticsString,
        "Return the event statistics as a string in a human readable form")
   .def("_repr_html_", &ProcessStatisticsPython::getStatisticsStringHTML,
-       "Return an html represenation of the statistics (used by ipython/jupyter)")
+       "Return an html representation of the statistics (used by ipython/jupyter)")
   .def("__call__", &ProcessStatisticsPython::getModuleStatistics, (bp::arg("counter") = ModuleStatistics::EStatisticCounters::c_Event, bp::arg("modules") = boost::python::list()),
        R"DOCSTRING(__call__(counter=StatisticCounters.EVENT, modules=None)
 

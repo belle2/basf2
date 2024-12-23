@@ -11,7 +11,7 @@
 """
 Check that all the classdef versions and class checksums are consistent to prevent accidental mismatch:
 
-If one forgets to increase the ClassDef but the streamer info checksum changes this will trigger a test failure. We can distuingish
+If one forgets to increase the ClassDef but the streamer info checksum changes this will trigger a test failure. We can distinguish
 
 1. ClassDef version changed unnecessary
 2. forgot to change ClassDef
@@ -24,7 +24,7 @@ from b2test_utils import get_object_with_name, get_streamer_checksums
 #: A mapping name -> version, checksum of the expected objects
 EXPECTED_CHECKSUMS = {
     'Belle2::Const::DetectorSet': (1, 1222446098),
-    'Belle2::ECLCluster': (15, 835771092),
+    'Belle2::ECLCluster': (16, 2788194468),
     'Belle2::EventLevelClusteringInfo': (4, 1906636092),
     'Belle2::EventLevelTrackingInfo': (2, 1667284927),
     'Belle2::EventMetaData': (4, 2999207747),

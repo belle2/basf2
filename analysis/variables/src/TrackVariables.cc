@@ -308,10 +308,12 @@ namespace Belle2 {
 
         auto highestProbMass = part->getMostLikelyTrackFitResult().first;
         const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(highestProbMass);
-        return getPositionOnHelix(trackFit, pars);
+        if (!trackFit) return vecNaN;
+        else return getPositionOnHelix(trackFit, pars);
       } else {
         const TrackFitResult* trackFit = part->getTrackFitResult();
-        return getPositionOnHelix(trackFit, pars);
+        if (!trackFit) return vecNaN;
+        else return getPositionOnHelix(trackFit, pars);
       }
     }
 

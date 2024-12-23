@@ -71,7 +71,7 @@ if __name__ == "__main__":
     persistent.CloneTree()
     # disable ALL branches in the file
     events.SetBranchStatus('*', 0)
-    # and reenable all branches not excluded
+    # and re-enable all branches not excluded
     for branch in events.GetListOfBranches():
         branch = branch.GetName()
         if branch not in disabled_branches:

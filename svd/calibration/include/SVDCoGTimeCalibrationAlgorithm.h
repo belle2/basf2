@@ -59,7 +59,7 @@ namespace Belle2 {
     std::optional<float> m_previousRawTimeMeanL3V; /**< CoG time mean of the previous run for V side of layer 3*/
 
     float m_allowedTimeShift = 2.; /**< Allowed EventT0 shift*/
-    float m_minEntries = 10000; /**< Set the minimun number of entries required in the histograms of layer 3*/
+    float m_minEntries = 10000; /**< Set the minimum number of entries required in the histograms of layer 3*/
   };
 } // namespace Belle2
 

@@ -16,21 +16,14 @@
 #include <cdc/simulation/CDCSimControlPar.h>
 #include <cdc/utilities/OpenFile.h>
 
-//#include <float.h>
-
 #include <cmath>
-#include <boost/format.hpp>
-//#include <iostream>
 #include <iomanip>
 
 #include <boost/iostreams/filtering_stream.hpp>
-//#include <boost/iostreams/device/file.hpp>
-//#include <boost/iostreams/filter/gzip.hpp>
 
 #include <Math/ChebyshevPol.h>
 
 using namespace std;
-using namespace boost;
 using namespace Belle2;
 using namespace CDC;
 

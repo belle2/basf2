@@ -1,5 +1,5 @@
 [INFO] Steering file: framework/tests/merge_files.py
-running check_01_existing: Check that merging a non exsiting file fails
+running check_01_existing: Check that merging a non existing file fails
 [ERROR] input file "/test1.root": Could not open file
 [WARNING] File "test2.root" is empty.
 [WARNING] All Files were empty
@@ -22,7 +22,7 @@ running check_05_release: Check that it fails if the releases are different
 [ERROR] Release in "test2.root" differs from previous files: other_release != test_release
 [WARNING] File "test2.root" is empty.
 check_05_release passed
-running check_06_empty_release: Check that merging fails with empty release valuses
+running check_06_empty_release: Check that merging fails with empty release values
 [WARNING] File "test1.root" is empty.
 [ERROR] Cannot determine release used to create "test2.root"
 check_06_empty_release passed
@@ -70,8 +70,8 @@ check_14_noeventtree passed
 running check_15_noeventbranches: Check that merging fails without event tree
 [ERROR] input file "test1.root": Could not find any branches in tree
 check_15_noeventbranches passed
-running check_16_nonmergeable: Check that merging fails if there are mutiple mergeable persistent trees
-[ERROR] Branch "AnotherMetaData" in persistent tree not inheriting from Mergable
+running check_16_nonmergeable: Check that merging fails if there are multiple mergeable persistent trees
+[ERROR] Branch "AnotherMetaData" in persistent tree not inheriting from Mergeable
 [WARNING] File "test1.root" is empty.
 check_16_nonmergeable passed
 running check_17_checkparentLFN: Check that parent LFN get merged correctly
@@ -130,7 +130,7 @@ running check_26_ntuple_merge: Check that we can merge two ntuple output files
 [INFO] Steering file: steering-ntuple.py
 [INFO] Steering file: steering-ntuple.py
 check_26_ntuple_merge passed
-running check_27_ntuple_trees: Check that ntuple merge failes if the tree names are different
+running check_27_ntuple_trees: Check that ntuple merge fails if the tree names are different
 [INFO] Steering file: steering-test1.root.py
 [INFO] Steering file: steering-test2.root.py
 [INFO] Steering file: steering-ntuple.py

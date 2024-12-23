@@ -292,8 +292,11 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
     :param v0_finding: If false, the V0 module will not be executed
-    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter (only if PXD is present)
+    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter (only if PXD is part of
+        the ``components``). This flag is automatically set to false on HLT and ExpressReco.
     :param mcTrackFinding: Use the MC track finders instead of the realistic ones.
+    :param kink_finding: if true, add the ``KinkFinder`` module to the path. This flag is automatically set to false
+        on HLT and ExpressReco.
     """
 
     # do not add any new modules if no tracking detectors are in the components
@@ -693,15 +696,15 @@ def add_roiFinder(path, reco_tracks="RecoTracks", intercepts_name="PXDIntercepts
     :param reco_tracks: Which tracks to use in the extrapolation step.
     :param roiName: Name of the produced/stored ROIs.
     """
+    path.add_module('PXDROIFinder', recoTrackListName=reco_tracks,
+                    PXDInterceptListName=intercepts_name, ROIListName=roiName)
 
-    pxdDataRed = b2.register_module('PXDROIFinder')
-    param_pxdDataRed = {
-        'recoTrackListName': reco_tracks,
-        'PXDInterceptListName': intercepts_name,
-        'ROIListName': roiName,
-    }
-    pxdDataRed.param(param_pxdDataRed)
-    path.add_module(pxdDataRed)
+
+def add_roi_payload_assembler(path, ignore_hlt_decision):
+    path.add_module('ROIPayloadAssembler',
+                    ROIListName='ROIs', ROIpayloadName='ROIpayload',
+                    SendAllDownscaler=0, SendROIsDownscaler=1,
+                    AcceptAll=ignore_hlt_decision, NoRejectFlag=False)
 
 
 def add_vxd_standalone_cosmics_finder(

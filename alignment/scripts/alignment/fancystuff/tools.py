@@ -39,7 +39,7 @@ def set_axis_label_range(ax, new_start, new_end, n_labels=5, axis=1, to_flat=Non
     # print start, end
     label_position = np.append(np.arange(start, end, (end - start) / float(n_labels - 1)), end)
 
-    # Wrong linear interploation
+    # Wrong linear interpolation
     new_labels = np.append(np.arange(new_start, new_end, (new_end - new_start) / float(n_labels - 1)), new_end)
 
     # None linear 'correct' case using the CDF as reference
@@ -251,8 +251,8 @@ def draw_fancy_correlation_matrix(df, pdf=None, tight=False, col_numbers=False, 
 
     :param df:          DataFrame of the input data
     :param pdf:         optional, file to save
-    :param tight:       tight layout, be carefult
-    :param col_numbers: swith bwtween numbers or names for the clumns
+    :param tight:       tight layout, be careful
+    :param col_numbers: switch between numbers or names for the columns
     :param labels:      optional, list of latex labels
     :param fontsize:    size of the labels
     """

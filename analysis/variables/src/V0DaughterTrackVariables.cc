@@ -407,7 +407,9 @@ namespace Belle2 {
     {
       //Get helix parameters
       //Electron/track 1
-      Helix e1Helix = gamma->getDaughter(daughterIndex1)->getTrackFitResult()->getHelix();
+      const TrackFitResult* e1TrackFit = gamma->getDaughter(daughterIndex1)->getTrackFitResult();
+      if (!e1TrackFit) return -1;
+      Helix e1Helix = e1TrackFit->getHelix();
 
       Phi01 = e1Helix.getPhi0();
       D01  = e1Helix.getD0() ;
@@ -416,7 +418,9 @@ namespace Belle2 {
       TanLambda1 = e1Helix.getTanLambda();
 
       //Electron/track 2
-      Helix e2Helix = gamma->getDaughter(daughterIndex2)->getTrackFitResult()->getHelix();
+      const TrackFitResult* e2TrackFit = gamma->getDaughter(daughterIndex2)->getTrackFitResult();
+      if (!e2TrackFit) return -2;
+      Helix e2Helix = e2TrackFit->getHelix();
 
       Phi02 = e2Helix.getPhi0();
       D02  = e2Helix.getD0() ;
@@ -441,9 +445,9 @@ namespace Belle2 {
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
       int daughterIndex1 = int(daughterIndices[0]);
       int daughterIndex2 = int(daughterIndices[1]);
-      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
-                                     Omega2, Z02, TanLambda2);
-
+      errFlag = convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                               Omega2, Z02, TanLambda2);
+      if (errFlag != 0) return Const::doubleNaN;
 
       //Calculating invariant mass
       //Sine and cosine Lambda
@@ -477,10 +481,9 @@ namespace Belle2 {
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
       int daughterIndex1 = int(daughterIndices[0]);
       int daughterIndex2 = int(daughterIndices[1]);
-      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
-                                     Omega2, Z02, TanLambda2);
-
-
+      errFlag = convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                               Omega2, Z02, TanLambda2);
+      if (errFlag != 0) return Const::doubleNaN;
 
       //Delta-TanLambda
       return (TanLambda2 - TanLambda1);

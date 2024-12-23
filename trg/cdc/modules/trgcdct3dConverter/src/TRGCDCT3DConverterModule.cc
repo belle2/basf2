@@ -27,7 +27,6 @@
 #include "trg/cdc/JSignalData.h"
 #include "boost/multi_array.hpp"
 
-using namespace boost;
 using namespace std;
 using namespace Belle2;
 using namespace TRGCDCT3DCONVERTERSPACE;
@@ -118,11 +117,11 @@ void TRGCDCT3DConverterModule::event()
   if (m_addTSToDatastore) {
     // Process firmware stereo TS
     // stTsfFirmwareInfo[stSL][tsIndex][iClk][id, rt, lr, pr, foundTime]
-    multi_array<double, 4> stTsfFirmwareInfo{extents[4][15][48][5]};
+    boost::multi_array<double, 4> stTsfFirmwareInfo{boost::extents[4][15][48][5]};
     storeTSFirmwareData(stTsfFirmwareInfo);
 
     // stTsfInfo[stSL][iTS][id, rt, lr, pr, foundTime]
-    multi_array<double, 3> stTsfInfo{extents[4][0][5]};
+    boost::multi_array<double, 3> stTsfInfo{boost::extents[4][0][5]};
 
     filterTSData(stTsfFirmwareInfo, stTsfInfo);
     // Add to TS datastore
@@ -133,15 +132,15 @@ void TRGCDCT3DConverterModule::event()
     // Process firmware 2D
 
     // t2DFirmwareInfo[tIndex][iClk][valid, isOld, charge, rho, phi0]
-    multi_array<double, 3> t2DFirmwareInfo{extents[4][48][5]};
+    boost::multi_array<double, 3> t2DFirmwareInfo{boost::extents[4][48][5]};
     // t2DTsfFirmwareInfo[tIndex][iClk][axSL][id, rt, lr, pr]
-    multi_array<double, 4> t2DTsfFirmwareInfo{extents[4][48][5][4]};
+    boost::multi_array<double, 4> t2DTsfFirmwareInfo{boost::extents[4][48][5][4]};
     store2DFirmwareData(t2DFirmwareInfo, t2DTsfFirmwareInfo);
 
     // t2DInfo[tIndex][charge, rho, phi0]
-    multi_array<double, 2> t2DInfo{extents[0][3]};
+    boost::multi_array<double, 2> t2DInfo{boost::extents[0][3]};
     // t2DTsfInfo[tIndex][axSL][id, rt, lr, pr, -9999]
-    multi_array<double, 3> t2DTsfInfo{extents[0][5][5]};
+    boost::multi_array<double, 3> t2DTsfInfo{boost::extents[0][5][5]};
 
     filter2DData(t2DFirmwareInfo, t2DTsfFirmwareInfo, t2DInfo, t2DTsfInfo);
     add2DDatastore(t2DInfo, t2DTsfInfo);
@@ -170,7 +169,7 @@ void TRGCDCT3DConverterModule::event()
 
   if (m_add3DToDatastore) {
     // t3DFirmwareInfo[tIndex][iClk][2DValid, 2DisOld, TSFValid, EventTimeValid, eventTime, charge, rho, phi0, z0, cot, zchi]
-    multi_array<double, 3> t3DFirmwareInfo{extents[4][48][11]};
+    boost::multi_array<double, 3> t3DFirmwareInfo{boost::extents[4][48][11]};
 
     // m_fit3DWithTSIM 0:firmware 1:fastSim 2:firmSim
     // Use Firmware results
@@ -181,7 +180,7 @@ void TRGCDCT3DConverterModule::event()
     if (m_fit3DWithTSIM == 2) store3DFirmSimData(t3DFirmwareInfo);
 
     // t3DInfo[eventTime, charge, rho, phi0, z0, cot, zchi]
-    multi_array<double, 2> t3DInfo{extents[0][7]};
+    boost::multi_array<double, 2> t3DInfo{boost::extents[0][7]};
 
 
     filter3DData(t3DFirmwareInfo, t3DInfo);
@@ -299,8 +298,8 @@ int TRGCDCT3DConverterModule::t2DPhiTot3DPhi(int phi, int rho)
   return phiInt;
 }
 
-void TRGCDCT3DConverterModule::filterTSData(multi_array<double, 4>& tsfFirmwareInfo,
-                                            multi_array<double, 3>& tsfInfo)
+void TRGCDCT3DConverterModule::filterTSData(boost::multi_array<double, 4>& tsfFirmwareInfo,
+                                            boost::multi_array<double, 3>& tsfInfo)
 {
   // iSl is stereo SL index
   for (unsigned iSL = 0; iSL < tsfFirmwareInfo.shape()[0]; iSL++) {
@@ -315,8 +314,8 @@ void TRGCDCT3DConverterModule::filterTSData(multi_array<double, 4>& tsfFirmwareI
 
         if (pr != 0) {
           double ts_ref[5] = {id, rt, lr, pr, ft};
-          multi_array_ref<double, 1> ts((double*)ts_ref, extents[5]);
-          tsfInfo.resize(extents[4][tsfInfo.shape()[1] + 1][5]);
+          boost::multi_array_ref<double, 1> ts((double*)ts_ref, boost::extents[5]);
+          tsfInfo.resize(boost::extents[4][tsfInfo.shape()[1] + 1][5]);
           tsfInfo[iSL][iTS_filter++] = ts;
         }
 
@@ -355,9 +354,9 @@ void TRGCDCT3DConverterModule::filterTSData(multi_array<double, 4>& tsfFirmwareI
 // t2DTsfFirmwareInfo[tIndex][iClk][axSL][id, rt, lr, pr]
 // t2DInfo[tIndex][charge, rho, phi0]
 // t2DTsfInfo[tIndex][axSL][id, rt, lr, pr, -9999]
-void TRGCDCT3DConverterModule::filter2DData(multi_array<double, 3>& t2DFirmwareInfo,
-                                            multi_array<double, 4>& t2DTsfFirmwareInfo, multi_array<double, 2>& t2DInfo,
-                                            multi_array<double, 3>& t2DTsfInfo)
+void TRGCDCT3DConverterModule::filter2DData(boost::multi_array<double, 3>& t2DFirmwareInfo,
+                                            boost::multi_array<double, 4>& t2DTsfFirmwareInfo, boost::multi_array<double, 2>& t2DInfo,
+                                            boost::multi_array<double, 3>& t2DTsfInfo)
 {
 
   for (unsigned iTrack = 0; iTrack < t2DFirmwareInfo.shape()[0]; iTrack++) {
@@ -369,12 +368,12 @@ void TRGCDCT3DConverterModule::filter2DData(multi_array<double, 3>& t2DFirmwareI
       //if (t2DInfo.shape()[0] != 0 && t2DFirmwareInfo[iTrack][iClk][1] == 1) continue;
 
       double track_ref[3] = {t2DFirmwareInfo[iTrack][iClk][2], t2DFirmwareInfo[iTrack][iClk][3], t2DFirmwareInfo[iTrack][iClk][4]};
-      multi_array_ref<double, 1> track((double*)track_ref, extents[3]);
-      t2DInfo.resize(extents[t2DInfo.shape()[0] + 1][3]);
+      boost::multi_array_ref<double, 1> track((double*)track_ref, boost::extents[3]);
+      t2DInfo.resize(boost::extents[t2DInfo.shape()[0] + 1][3]);
       t2DInfo[t2DInfo.shape()[0] - 1] = track;
 
 
-      multi_array<double, 2>  axTSInfo{extents[5][5]};
+      boost::multi_array<double, 2>  axTSInfo{boost::extents[5][5]};
       for (unsigned iAx = 0; iAx < t2DTsfFirmwareInfo.shape()[2]; iAx++) {
         double id = t2DTsfFirmwareInfo[iTrack][iClk][iAx][0];
         double rt = t2DTsfFirmwareInfo[iTrack][iClk][iAx][1];
@@ -387,7 +386,7 @@ void TRGCDCT3DConverterModule::filter2DData(multi_array<double, 3>& t2DFirmwareI
         axTSInfo[iAx][3] = pr;
         axTSInfo[iAx][4] = -9999;
       }
-      t2DTsfInfo.resize(extents[t2DTsfInfo.shape()[0] + 1][5][5]);
+      t2DTsfInfo.resize(boost::extents[t2DTsfInfo.shape()[0] + 1][5][5]);
       t2DTsfInfo[t2DTsfInfo.shape()[0] - 1] = axTSInfo;
     }
   }
@@ -450,8 +449,8 @@ void TRGCDCT3DConverterModule::filter2DData(multi_array<double, 3>& t2DFirmwareI
 //// t2DInfo[tIndex][charge, rho, phi0]
 //// t2DTsfInfo[tIndex][axSL][id, rt, lr, pr, -9999]
 // t3DInfo[eventTime, charge, rho, phi0, z0, cot, zchi]
-void TRGCDCT3DConverterModule::add2DDatastore(multi_array<double, 2>& t2DInfo,
-                                              multi_array<double, 3>& t2DTsfInfo)
+void TRGCDCT3DConverterModule::add2DDatastore(boost::multi_array<double, 2>& t2DInfo,
+                                              boost::multi_array<double, 3>& t2DTsfInfo)
 {
   // Add 2D track
   for (unsigned iTrack = 0; iTrack < t2DInfo.shape()[0]; ++iTrack) {
@@ -518,7 +517,7 @@ void TRGCDCT3DConverterModule::add2DDatastore(multi_array<double, 2>& t2DInfo,
   }
 }
 
-void TRGCDCT3DConverterModule::addTSDatastore(multi_array<double, 3>& tsfInfo, int isSt)
+void TRGCDCT3DConverterModule::addTSDatastore(boost::multi_array<double, 3>& tsfInfo, int isSt)
 {
   for (unsigned iSL = 0; iSL < tsfInfo.shape()[0]; iSL++) {
     for (unsigned iTS = 0; iTS < tsfInfo.shape()[1]; iTS++) {
@@ -537,7 +536,7 @@ void TRGCDCT3DConverterModule::addTSDatastore(multi_array<double, 3>& tsfInfo, i
   }
 }
 
-void TRGCDCT3DConverterModule::storeTSFirmwareData(multi_array<double, 4>& tsfInfo)
+void TRGCDCT3DConverterModule::storeTSFirmwareData(boost::multi_array<double, 4>& tsfInfo)
 {
   for (int iClk = 0; iClk < m_firmwareResults.getEntries(); iClk++) {
     TRGCDCT3DUnpackerStore* result = m_firmwareResults[iClk];
@@ -851,8 +850,8 @@ void TRGCDCT3DConverterModule::storeTSFirmwareData(multi_array<double, 4>& tsfIn
 
 // t2DFirmwareInfo[tIndex][iClk][valid, isOld charge, rho, phi0]
 // t2DTsfFirmwareInfo[tIndex][iClk][axSL][id, rt, lr, pr]
-void TRGCDCT3DConverterModule::store2DFirmwareData(multi_array<double, 3>& t2DFirmwareInfo,
-                                                   multi_array<double, 4>& t2DTsfFirmwareInfo)
+void TRGCDCT3DConverterModule::store2DFirmwareData(boost::multi_array<double, 3>& t2DFirmwareInfo,
+                                                   boost::multi_array<double, 4>& t2DTsfFirmwareInfo)
 {
 
   for (int iClk = 0; iClk < m_firmwareResults.getEntries(); iClk++) {
@@ -974,7 +973,7 @@ void TRGCDCT3DConverterModule::store2DFirmwareData(multi_array<double, 3>& t2DFi
 
 
 // t3DFirmwareInfo[tIndex][iClk][2DValid, 2DisOld, TSFValid, EventTimeValid, eventTime, charge, rho, phi0, z0, cot, zchi]
-void TRGCDCT3DConverterModule::store3DFirmwareData(multi_array<double, 3>& t3DFirmwareInfo)
+void TRGCDCT3DConverterModule::store3DFirmwareData(boost::multi_array<double, 3>& t3DFirmwareInfo)
 {
 
   for (int iClk = 0; iClk < m_firmwareResults.getEntries() - 17 - 1; iClk++) {
@@ -1042,7 +1041,7 @@ void TRGCDCT3DConverterModule::store3DFirmwareData(multi_array<double, 3>& t3DFi
 }
 
 // t3DFirmwareInfo[tIndex][iClk][2DValid, 2DisOld, TSFValid, EventTimeValid, eventTime, charge, rho, phi0, z0, cot, zchi]
-void TRGCDCT3DConverterModule::store3DFastSimData(multi_array<double, 3>& t3DFirmwareInfo)
+void TRGCDCT3DConverterModule::store3DFastSimData(boost::multi_array<double, 3>& t3DFirmwareInfo)
 {
 
   for (int iClk = 0; iClk < m_firmwareResults.getEntries() - 17 - 1; iClk++) {
@@ -1106,7 +1105,7 @@ void TRGCDCT3DConverterModule::store3DFastSimData(multi_array<double, 3>& t3DFir
 }
 
 // t3DFirmwareInfo[tIndex][iClk][2DValid, 2DisOld, TSFValid, EventTimeValid, eventTime, charge, rho, phi0, z0, cot, zchi]
-void TRGCDCT3DConverterModule::store3DFirmSimData(multi_array<double, 3>& t3DFirmwareInfo)
+void TRGCDCT3DConverterModule::store3DFirmSimData(boost::multi_array<double, 3>& t3DFirmwareInfo)
 {
   for (int iClk = 0; iClk < m_firmwareResults.getEntries() - 17 - 1; iClk++) {
 
@@ -1545,8 +1544,8 @@ void TRGCDCT3DConverterModule::debug3DFirmware()
 
 // t3DFirmwareInfo[tIndex][iClk][2DValid, 2DisOld, TSFValid, EventTimeValid, eventTime, charge, rho, phi0, z0, cot, zchi]
 // t3DInfo[eventTime, charge, rho, phi0, z0, cot, zchi]
-void TRGCDCT3DConverterModule::filter3DData(multi_array<double, 3>& t3DFirmwareInfo,
-                                            multi_array<double, 2>& t3DInfo)
+void TRGCDCT3DConverterModule::filter3DData(boost::multi_array<double, 3>& t3DFirmwareInfo,
+                                            boost::multi_array<double, 2>& t3DInfo)
 {
   for (unsigned iTrack = 0; iTrack < t3DFirmwareInfo.shape()[0]; iTrack++) {
     for (unsigned iClk = 0; iClk < t3DFirmwareInfo.shape()[1]; iClk++) {
@@ -1566,9 +1565,9 @@ void TRGCDCT3DConverterModule::filter3DData(multi_array<double, 3>& t3DFirmwareI
       //if (t3DFirmwareInfo[iTrack][iClk][1] == 1) continue;
       double track3D_ref[7] = {t3DFirmwareInfo[iTrack][iClk][4], t3DFirmwareInfo[iTrack][iClk][5], t3DFirmwareInfo[iTrack][iClk][6], t3DFirmwareInfo[iTrack][iClk][7], t3DFirmwareInfo[iTrack][iClk][8], t3DFirmwareInfo[iTrack][iClk][9], t3DFirmwareInfo[iTrack][iClk][10]};
 
-      multi_array_ref<double, 1> track3D((double*)track3D_ref, extents[7]);
+      boost::multi_array_ref<double, 1> track3D((double*)track3D_ref, boost::extents[7]);
 
-      t3DInfo.resize(extents[t3DInfo.shape()[0] + 1][7]);
+      t3DInfo.resize(boost::extents[t3DInfo.shape()[0] + 1][7]);
       t3DInfo[t3DInfo.shape()[0] - 1] = track3D;
 
     }
@@ -1576,7 +1575,7 @@ void TRGCDCT3DConverterModule::filter3DData(multi_array<double, 3>& t3DFirmwareI
 }
 
 // t3DInfo[eventTime, charge, rho, phi0, z0, cot, zchi]
-void TRGCDCT3DConverterModule::add3DDatastore(multi_array<double, 2>& t3DInfo, bool doConvert)
+void TRGCDCT3DConverterModule::add3DDatastore(boost::multi_array<double, 2>& t3DInfo, bool doConvert)
 {
   for (unsigned iTrack = 0; iTrack < t3DInfo.shape()[0]; ++iTrack) {
     double charge = 0, phi0_i = 0, omega = 0, chi2D = 0, z0 = 0, cot = 0, zchi2 = 0;

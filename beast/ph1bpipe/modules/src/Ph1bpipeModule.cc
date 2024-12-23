@@ -13,7 +13,6 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -102,10 +101,9 @@ void Ph1bpipeModule::event()
   int nMCParticles = mcParticles.getEntries();
   for (int i = 0; i < nMCParticles; ++i) {
     MCParticle& mcp = *mcParticles[i];
-    //Find all Ph1bpipeSimHits which point from that MCParticle using a typedef and BOOST_FOREACH
-    //The typedef is needed as BOOST_FOREACH is a macro and cannot handle anything including a comma
+    // Find all Ph1bpipeSimHits which point from that MCParticle.
     typedef RelationIndex<MCParticle, Ph1bpipeSimHit>::Element relMCSimHit_Element;
-    BOOST_FOREACH(const relMCSimHit_Element & relation, relMCSimHit.getElementsFrom(mcp)) {
+    for (const relMCSimHit_Element& relation : relMCSimHit.getElementsFrom(mcp)) {
       B2INFO("MCParticle #" << i << " created the AwesomSimHit #" << relation.indexTo
              << " which has an energy deposition of " << relation.to->getEnergyDep());
     }

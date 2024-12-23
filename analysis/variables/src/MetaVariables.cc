@@ -370,6 +370,7 @@ namespace Belle2 {
           for (const auto& track : tracks)
           {
             const TrackFitResult* trackFit = track.getTrackFitResultWithClosestMass(Const::pion);
+            if (!trackFit) continue;
             if (trackFit->getChargeSign() == 0) {
               // Ignore track
             } else {
@@ -3362,10 +3363,9 @@ namespace Belle2 {
 
         int nTrackFitResults = 0;
 
-        for (int i = 0; i < tracks.getEntries(); i++)
+        for (const auto& track : tracks)
         {
-          const Track* track = tracks[i];
-          const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(type);
+          const TrackFitResult* trackFit = track.getTrackFitResultWithClosestMass(type);
 
           if (!trackFit) continue;
           if (trackFit->getChargeSign() == 0) continue;

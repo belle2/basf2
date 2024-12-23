@@ -22,9 +22,9 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
-#include <reconstruction/dbobjects/CDCDedxRunGain.h>
-#include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
-#include <reconstruction/dbobjects/CDCDedxWireGain.h>
+#include <cdc/dbobjects/CDCDedxRunGain.h>
+#include <cdc/dbobjects/CDCDedxScaleFactor.h>
+#include <cdc/dbobjects/CDCDedxWireGain.h>
 //#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 #include <cdc/dbobjects/CDCCrossTalkLibrary.h>
 #include <cdc/dbobjects/CDCCorrToThresholds.h>

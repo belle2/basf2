@@ -1,4 +1,0 @@
-Import('env')
-env['LIBS'] = ['$ROOT_LIBS', 'calibration', 'framework', 'reconstruction', 'reconstruction_dataobjects', 'reconstruction_dbobjects', 'mdst_dataobjects', 'analysis_dataobjects', 'analysis_utility', 'analysis']
-Return('env')
-

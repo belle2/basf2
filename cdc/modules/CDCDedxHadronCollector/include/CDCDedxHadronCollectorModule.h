@@ -21,14 +21,14 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
-#include <reconstruction/dbobjects/CDCDedxWireGain.h>
+#include <cdc/dataobjects/CDCDedxTrack.h>
+#include <cdc/dbobjects/CDCDedxWireGain.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/ReferenceFrame.h>
 
-#include <reconstruction/dbobjects/CDCDedxInjectionTime.h>
+#include <cdc/dbobjects/CDCDedxInjectionTime.h>
 
 #include <TTree.h>
 #include <TString.h>

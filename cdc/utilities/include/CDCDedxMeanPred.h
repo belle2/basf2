@@ -11,7 +11,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <cdc/dbobjects/CDCDedxMeanPars.h>
 
-#include <reconstruction/utility/CDCDedxWidgetCurve.h>
+#include <cdc/utilities/CDCDedxWidgetCurve.h>
 
 #include <vector>
 #include <string>

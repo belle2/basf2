@@ -32,29 +32,29 @@ namespace Belle2 {
     ExtHit();
 
     //! Constructor with initial values
+    //! @param tof Time of flight from start of event to this hit (ns)
     //! @param pdgCode PDG hypothesis used for this extrapolation
     //! @param detector Detector containing this hit
-    //! @param element Detector element containing this hit
+    //! @param copyID Detector element containing this hit
     //! @param status State of extrapolation at this hit
     //! @param backwardPropagation Direction of the track propagation.
-    //! @param t Time of flight from start of event to this hit (ns)
     //! @param r Global position of this hit (cm)
     //! @param p Momentum of extrapolated track at this hit (GeV/c)
     //! @param e Covariance matrix of extrapolation at this hit (GeV/c and cm)
-    ExtHit(int pdgCode, Const::EDetector detector, int element, ExtHitStatus status, bool backwardPropagation, double t,
+    ExtHit(double tof, int pdgCode, Const::EDetector detector, int copyID, ExtHitStatus status, bool backwardPropagation,
            const ROOT::Math::XYZPoint& r, const ROOT::Math::XYZVector& p, const TMatrixDSym& e);
 
     //! Constructor with initial values
+    //! @param tof Time of flight from IP to this hit (ns)
     //! @param pdgCode PDG hypothesis used for this extrapolation
     //! @param detector Detector containing this hit
-    //! @param element Detector element containing this hit
+    //! @param copyID Detector element containing this hit
     //! @param status State of extrapolation at this hit
     //! @param backwardPropagation Direction of the track propagation.
-    //! @param t Time of flight from IP to this hit (ns)
     //! @param r Global position of this hit (cm)
     //! @param p Momentum of extrapolated track at this hit (GeV/c)
     //! @param e Covariance matrix of extrapolation at this hit (GeV/c and cm)
-    ExtHit(int pdgCode, Const::EDetector detector, int element, ExtHitStatus status, bool backwardPropagation, double t,
+    ExtHit(double tof, int pdgCode, Const::EDetector detector, int copyID, ExtHitStatus status, bool backwardPropagation,
            const G4ThreeVector& r, const G4ThreeVector& p, const G4ErrorSymMatrix& e);
 
     //! Copy constructor
@@ -170,8 +170,17 @@ namespace Belle2 {
 
   private:
 
-    //! Get diagonal elemment of the 3x3 position-covariance matrix in polar coordinates (r, theta, phi)
-    double getPolarCovariance(int i) const;
+    //! phase-space covariance (symmetric 6x6 linearized to 6*(6+1)/2: position & momentum in cm & GeV/c)
+    float m_Covariance[21];
+
+    //! position (cm)
+    float m_Position[3];
+
+    //! momentum (GeV/c)
+    float m_Momentum[3];
+
+    //! time of flight (ns)
+    float m_TOF;
 
     //! PDG code
     int m_PdgCode;
@@ -188,17 +197,8 @@ namespace Belle2 {
     //! Direction of track propagation.
     bool m_BackwardPropagation;
 
-    //! time of flight (ns)
-    float m_TOF;
-
-    //! position (cm)
-    float m_Position[3];
-
-    //! momentum (GeV/c)
-    float m_Momentum[3];
-
-    //! phase-space covariance (symmetric 6x6 linearized to 6*(6+1)/2: position & momentum in cm & GeV/c)
-    float m_Covariance[21];
+    //! Get diagonal elemment of the 3x3 position-covariance matrix in polar coordinates (r, theta, phi)
+    double getPolarCovariance(int i) const;
 
     //! Needed to make the ROOT object storable
     ClassDef(ExtHit, 8);

@@ -40,22 +40,22 @@ namespace Belle2 {
     ROOT::Math::XYZVector m_momentumLocalMid; /**< momentum of hit at midpoint of layer, local coordinate */
     ROOT::Math::XYZVector m_momentumLocalEntry; /**< momentum of hit at entrypoint of layer, local coordinate */
     ROOT::Math::XYZVector m_momentumLocalExit; /**< momentum of hit at exitpoint of layer, local coordinate */
-    int m_PDGID = 0; /**< PDGID */
-    ROOT::Math::XYZVector m_position0; /**< position at IP */
     ROOT::Math::XYZVector m_momentum0; /**< momentum at IP */
+    ROOT::Math::XYZVector m_position0; /**< position at IP */
     double m_time = 0; /**< time of the hit */
-    int m_sensorSensor = 0; /**< sensor of the hit */
-    int m_sensorLayer = 0; /**< layer of the hit */
-    int m_sensorLadder = 0; /**< ladder of the hit */
     double m_info_d0 = 0; /**< d0 from MCParticle info evaluation. DO NOT USE, use the get */
     double m_info_z0 = 0; /**< z0 from MCParticle info evaluation. DO NOT USE, use the get */
     double m_info_phi0 = 0; /**< phi0 from MCParticle info evaluation. DO NOT USE, use the get */
     double m_info_tanlambda = 0; /**< tanlambda from MCParticle info evaluation. DO NOT USE, use the get */
     double m_info_omega = 0; /**< omega from MCParticle info evaluation. DO NOT USE, use the get */
+    double m_charge = 0; /**< charge of the track */
+    int m_PDGID = 0; /**< PDGID */
+    int m_sensorSensor = 0; /**< sensor of the hit */
+    int m_sensorLayer = 0; /**< layer of the hit */
+    int m_sensorLadder = 0; /**< ladder of the hit */
     int m_clusterU = 0; /**< flag for u cluster */
     int m_clusterV = 0; /**< flag for v cluster */
     bool m_reconstructed = 0; /**< flag for reconstructed track */
-    double m_charge = 0; /**< charge of the track */
 
     /** empty constructor of the class */
     hitXP() {}

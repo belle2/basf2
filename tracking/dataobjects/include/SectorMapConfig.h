@@ -26,15 +26,8 @@ namespace Belle2 {
     SectorMapConfig() {}
 
 
-
-    /** stores pTCuts for min pT allowed for this . */
-    double pTmin = 0.02;
-    /** stores pTCuts for min (.first) and max (.second) ptCut. */
-    double pTmax = 3.5;
-
-    /** allows smearing of the cuts. Values greater 0 stretch the cuts,
-    values smaller 0 narrow them down. */
-    double pTSmear = 0.;
+    /** Sets the human readable proto-name of the sectorMap. */
+    std::string secMapName = "testMap";
 
     /** stores allowed layers to be used (including virtual IP with layer 0). */
     std::vector<int> allowedLayers = {0, 3, 4, 5, 6};
@@ -51,6 +44,22 @@ namespace Belle2 {
     If empty all types are allowed. */
     std::vector<int> pdgCodesAllowed;
 
+    /** Stores the position of the assumed position of the interaction point -
+    The virtual IP. */
+    B2Vector3D vIP = B2Vector3D(0, 0, 0);
+
+    /** the quantiles to be chosen in the end for determining the cuts first is quantile, second is 1-quantile. */
+    std::pair<double, double> quantiles = {0.005, 1. - 0.005};
+
+    /** stores pTCuts for min pT allowed for this . */
+    double pTmin = 0.02;
+    /** stores pTCuts for min (.first) and max (.second) ptCut. */
+    double pTmax = 3.5;
+
+    /** allows smearing of the cuts. Values greater 0 stretch the cuts,
+    values smaller 0 narrow them down. */
+    double pTSmear = 0.;
+
     /** Stores a cut for maximum distance of the seed in xy of the given virtual IP.
     WARNING only working if MC-TCs are used,
     VXDTF-TCs use innermost hit as seed != mctc-seed! */
@@ -61,25 +70,15 @@ namespace Belle2 {
     VXDTF-TCs use innermost hit as seed != mctc-seed!  */
     double seedMaxDist2IPZ = 23.5;
 
-    /** Stores the minimal number of hits a TC must have to be accepted as TC
-    (vIP-Hits are ignored). */
-    unsigned nHitsMin = 3;
-
-    /** Stores the position of the assumed position of the interaction point -
-    The virtual IP. */
-    B2Vector3D vIP = B2Vector3D(0, 0, 0);
-
-    /** Sets the human readable proto-name of the sectorMap. */
-    std::string secMapName = "testMap";
-
     /** Magnetic field value to be set for the filters. */
     double mField = 1.5;
 
     /** defined 1 == 100%, if relative frequency of sec-combi to the outer-sector is less than threshold, sector-combi will be deleted. */
     double rarenessThreshold = 0.001;
 
-    /** the quantiles to be chosen in the end for determining the cuts first is quantile, second is 1-quantile. */
-    std::pair<double, double> quantiles = {0.005, 1. - 0.005};
+    /** Stores the minimal number of hits a TC must have to be accepted as TC
+    (vIP-Hits are ignored). */
+    unsigned nHitsMin = 3;
 
     //! needed for the root library
     ClassDef(SectorMapConfig, 2);

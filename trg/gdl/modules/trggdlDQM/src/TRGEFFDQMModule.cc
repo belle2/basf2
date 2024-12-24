@@ -52,6 +52,10 @@ void TRGEFFDQMModule::defineHisto()
   m_hPt_psnecl                   = new TH1F("hPt_psnecl", "", 50, 0, 5);
   m_hPt_psnecl_ftdf              = new TH1F("hPt_psnecl_ftdf", "", 50, 0, 5);
 
+  m_nobha_f_phi                  = new TH1F("nobha_f_phi", "", 36, -180., 180.);
+  m_nobha_f_phi_psnecl           = new TH1F("nobha_f_phi_psnecl", "", 36, -180., 180.);
+  m_nobha_f_phi_psnecl_ftdf      = new TH1F("nobha_f_phi_psnecl_ftdf", "", 36, -180., 180.);
+
   m_nobha_hPt                    = new TH1F("nobha_hPt", "", 50, 0, 5);
   m_nobha_hPt_psnecl             = new TH1F("nobha_hPt_psnecl", "", 50, 0, 5);
   m_nobha_hPt_psnecl_ftdf        = new TH1F("nobha_hPt_psnecl_ftdf", "", 50, 0, 5);
@@ -71,6 +75,14 @@ void TRGEFFDQMModule::defineHisto()
   m_nobha_hP3_z                  = new TH1F("nobha_hP3_z", "", 50, 0, 5);
   m_nobha_hP3_z_psnecl           = new TH1F("nobha_hP3_z_psnecl", "", 50, 0, 5);
   m_nobha_hP3_z_psnecl_ftdf      = new TH1F("nobha_hP3_z_psnecl_ftdf", "", 50, 0, 5);
+
+  m_nobha_phi_y                  = new TH1F("nobha_phi_y", "", 36, -180., 180.);
+  m_nobha_phi_y_psnecl           = new TH1F("nobha_phi_y_psnecl", "", 36, -180., 180.);
+  m_nobha_phi_y_psnecl_ftdf      = new TH1F("nobha_phi_y_psnecl_ftdf", "", 36, -180., 180.);
+
+  m_nobha_phi_z                  = new TH1F("nobha_phi_z", "", 36, -180., 180.);
+  m_nobha_phi_z_psnecl           = new TH1F("nobha_phi_z_psnecl", "", 36, -180., 180.);
+  m_nobha_phi_z_psnecl_ftdf      = new TH1F("nobha_phi_z_psnecl_ftdf", "", 36, -180., 180.);
 
   m_fyo_dphi                     = new TH1F("fyo_dphi", "", 18, 0., 180.);
   m_fyo_dphi_psnecl              = new TH1F("fyo_dphi_psnecl", "", 18, 0., 180.);
@@ -178,13 +190,10 @@ void TRGEFFDQMModule::beginRun()
     return;
   }
 
-  m_hPhi->Reset();
 }
 
 void TRGEFFDQMModule::event()
 {
-  // bool debug = 1;   // if(debug)cout<<"line "<<__LINE__<<endl;
-
   if (!m_trgSummary.isValid()) {
     B2WARNING("TRGSummary object not available but require to estimate trg efficiency");
     return;
@@ -201,9 +210,6 @@ void TRGEFFDQMModule::event()
     B2WARNING("TRGEFFDQMModule: Can't find required bhabha or mumu or hadron trigger identifier");
     return;
   }
-
-  const bool IsBhabha = (m_TrgResult->getResult("software_trigger_cut&skim&accept_bhabha") == SoftwareTriggerCutResult::c_accept);
-  const bool IsHadron = (m_TrgResult->getResult("software_trigger_cut&skim&accept_hadron") == SoftwareTriggerCutResult::c_accept);
 
 
   /*///////////////////////////////////////////////////////////////////
@@ -332,18 +338,32 @@ void TRGEFFDQMModule::event()
     m_eklmhit_theta->Fill(theta);
 
     if (trg_KLMecl) {
-      m_klmhit_phi_psnecl->Fill(phiDegree);
+      // m_klmhit_phi_psnecl->Fill(phiDegree);
       m_klmhit_theta_psnecl->Fill(theta);
-      m_eklmhit_phi_psnecl->Fill(phiDegree);
+      // m_eklmhit_phi_psnecl->Fill(phiDegree);
       m_eklmhit_theta_psnecl->Fill(theta);
     }
     if (trg_KLMecl && trg_klmhit) {
-      m_klmhit_phi_psnecl_ftdf->Fill(phiDegree);
+      // m_klmhit_phi_psnecl_ftdf->Fill(phiDegree);
       m_klmhit_theta_psnecl_ftdf->Fill(theta);
     }
     if (trg_KLMecl && trg_eklmhit) {
-      m_eklmhit_phi_psnecl_ftdf->Fill(phiDegree);
+      // m_eklmhit_phi_psnecl_ftdf->Fill(phiDegree);
       m_eklmhit_theta_psnecl_ftdf->Fill(theta);
+    }
+
+    // add theta cut for phi distribution, since the efficiency at some theta range is very low.
+    if (trg_KLMecl && theta > 50 && theta < 120) {
+      m_klmhit_phi_psnecl->Fill(phiDegree);
+    }
+    if (trg_KLMecl && ((theta > 20 && theta < 40) || (theta > 120 && theta < 160))) {
+      m_eklmhit_phi_psnecl->Fill(phiDegree);
+    }
+    if (trg_KLMecl && trg_klmhit && theta > 50 && theta < 120) {
+      m_klmhit_phi_psnecl_ftdf->Fill(phiDegree);
+    }
+    if (trg_KLMecl && trg_eklmhit && ((theta > 20 && theta < 40) || (theta > 120 && theta < 160))) {
+      m_eklmhit_phi_psnecl_ftdf->Fill(phiDegree);
     }
   }
 
@@ -352,7 +372,7 @@ void TRGEFFDQMModule::event()
   /*///////////////////////////////////////////////////////////////////
   ///////////- - - - CDC TRG - - - - -////////////////////////////////
   ///////////////////////////////////////////////////////////////////*/
-  // int N_tracks = m_Tracks.getEntries();   // number of tracks
+
 
   vector<double> p_stt_P3_psnecl_ftdf, p_stt_P3_psnecl, p_stt_P3, phi_fyo_dphi, phi_fyo_dphi_psnecl, phi_fyo_dphi_psnecl_ftdf ;
   p_stt_P3_psnecl_ftdf.clear();
@@ -447,12 +467,16 @@ void TRGEFFDQMModule::event()
 
       m_hPt->Fill(pt);
       m_nobha_hPt->Fill(pt);
+      m_nobha_f_phi->Fill(phiDegree);
 
       m_hP3_z->Fill(p3);
       m_hP3_y->Fill(p3);
 
       m_nobha_hP3_z->Fill(p3);
       m_nobha_hP3_y->Fill(p3);
+
+      m_nobha_phi_z->Fill(phiDegree);
+      m_nobha_phi_y->Fill(phiDegree);
 
       m_stt_theta->Fill(theta);
       m_stt_phi->Fill(phiDegree);
@@ -466,12 +490,16 @@ void TRGEFFDQMModule::event()
       if (trg_psnecl) {
         m_hPt_psnecl->Fill(pt);
         m_nobha_hPt_psnecl->Fill(pt);
+        m_nobha_f_phi_psnecl->Fill(phiDegree);
 
         m_hP3_z_psnecl->Fill(p3);           // for z bit
         m_hP3_y_psnecl->Fill(p3);           // for y bit
 
         m_nobha_hP3_z_psnecl->Fill(p3);     // remove bhabha veto for z bit
         m_nobha_hP3_y_psnecl->Fill(p3);     // remove bhabha veto for y bit
+
+        m_nobha_phi_z_psnecl->Fill(phiDegree);
+        m_nobha_phi_y_psnecl->Fill(phiDegree);
 
         m_stt_phi_psnecl->Fill(phiDegree);
         p_stt_P3_psnecl.push_back(p3);
@@ -487,6 +515,7 @@ void TRGEFFDQMModule::event()
       }
       if (trg_psnecl && trg_itdt2) {
         m_nobha_hPt_psnecl_ftdf->Fill(pt);
+        m_nobha_f_phi_psnecl_ftdf->Fill(phiDegree);
       }
 
       if (trg_psnecl && trg_ftdz) {
@@ -497,9 +526,11 @@ void TRGEFFDQMModule::event()
       }
       if (trg_psnecl && trg_itdt3) {
         m_nobha_hP3_z_psnecl_ftdf->Fill(p3);
+        m_nobha_phi_z_psnecl_ftdf->Fill(phiDegree);
       }
       if (trg_psnecl && trg_itdt4) {
         m_nobha_hP3_y_psnecl_ftdf->Fill(p3);
+        m_nobha_phi_y_psnecl_ftdf->Fill(phiDegree);
       }
 
       if (trg_psnecl && trg_stt) {

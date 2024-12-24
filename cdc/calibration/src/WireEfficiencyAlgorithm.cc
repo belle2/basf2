@@ -142,7 +142,7 @@ void WireEfficiencyAlgorithm::detectBadWires()
     int nonZeroWires = 0;
     for (int i = 0; i <= passedProjectedY->GetNbinsX(); ++i) {
       float efficiencyAtBin = efficiencyProjectedY->GetEfficiency(i);
-      if (efficiencyAtBin > 0.4) {
+      if (efficiencyAtBin > 0.2) {
         totalAverage += efficiencyAtBin;
         nonZeroWires++;
       }
@@ -165,6 +165,12 @@ void WireEfficiencyAlgorithm::detectBadWires()
       // if not a single hit within the central area of wire then mark it as bad
       if (!singleWirePassed->Integral(minFitBin, maxFitBin)) {
         double wireID = passed->GetYaxis()->GetBinCenter(i);
+        unsigned short maxWires = CDCGeometryPar::Instance().nWiresInLayer(layerNo);
+        if (wireID < 0 || wireID >= maxWires) {
+          B2ERROR("Invalid wireID: " << wireID << " for LayerID: " << layerNo
+                  << ". Max wires: " << maxWires);
+          continue; // remove invalid wireID
+        }
         m_badWireList->setWire(layerNo, round(wireID), 0);
         continue;
       }
@@ -180,7 +186,7 @@ void WireEfficiencyAlgorithm::detectBadWires()
       // applies a chi test on the wire
       float p_value = chiTest(graphSingleWireEfficiency, graphEfficiencyProjected, minFitRange, maxFitRange);
       // check three conditions and decide if wire should be marked as bad
-      bool averageCondition = (0.95 * totalAverage) > (singleWireEfficiencyFromFit + 5 * singleWireUpErrorFromFit);
+      bool averageCondition = (0.95 * totalAverage) > (singleWireEfficiencyFromFit + 3 * singleWireUpErrorFromFit);
       bool pvalueCondition = p_value < 0.01;
       bool generalCondition = singleWireEfficiencyFromFit < 0.4;
       if (generalCondition || (averageCondition && pvalueCondition)) {

@@ -13,7 +13,7 @@ Airflow script to perform Hadron calibration.
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from caf.framework import Calibration, Collection
-from caf.strategies import SingleIOV
+from caf.strategies import SequentialBoundaries
 from ROOT.Belle2 import CDCDedxHadSatAlgorithm, CDCDedxHadBGAlgorithm
 from basf2 import create_path, register_module
 from clean_samples import make_pion_kaon_collection, make_proton_collection, make_muon_collection, make_electron_collection
@@ -83,14 +83,9 @@ def get_calibrations(input_data, **kwargs):
     expert_config = kwargs.get("expert_config")
     maxevt = expert_config["maxevt"]
 
-    # max_files_per_run = 1000000
-    # from prompt.utils import filter_by_max_files_per_run
     from prompt.utils import filter_by_select_max_events_from_files
 
-    # reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_muon, max_files_per_run)
-    input_files_muon = filter_by_select_max_events_from_files(list(file_to_iov_muon.keys()), maxevt)
-    if not input_files_muon:
-        raise ValueError(f"Muon: all requested ({maxevt}) events not found")
+    input_files_muon = list(file_to_iov_muon.keys())
 
     input_files_electron = filter_by_select_max_events_from_files(list(file_to_iov_electron.keys()), maxevt)
     if not input_files_electron:
@@ -106,12 +101,15 @@ def get_calibrations(input_data, **kwargs):
     # IoV should be open ended. We could also use this as part of the input data selection in some way.
     requested_iov = kwargs.get("requested_iov", None)
 
-    from caf.utils import IoV
+    from caf.utils import ExpRun, IoV
     # The actual value our output IoV payload should have. Notice that we've set it open ended.
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
+    payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
+    payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
+    basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")
+
     # extracting parameters
-    # expert_config = kwargs.get("expert_config")
     proton_minCut = expert_config["proton_minCut"]
     proton_maxCut = expert_config["proton_maxCut"]
     bgpar = expert_config["bgpar"]
@@ -137,7 +135,7 @@ def get_calibrations(input_data, **kwargs):
 
     collection_pion_kaon = Collection(collector=collector_pion_kaon,
                                       input_files=input_files_hadron,
-                                      pre_collector_path=rec_path_pion_kaon, max_collector_jobs=600)
+                                      pre_collector_path=rec_path_pion_kaon, max_collector_jobs=400)
 
     #
     # proton collection
@@ -153,7 +151,7 @@ def get_calibrations(input_data, **kwargs):
     collection_proton = Collection(collector=collector_proton,
                                    input_files=input_files_hadron,
                                    pre_collector_path=rec_path_proton,
-                                   max_collector_jobs=600
+                                   max_collector_jobs=400
                                    )
 
     #
@@ -207,12 +205,14 @@ def get_calibrations(input_data, **kwargs):
 
     cal.algorithms = [algorithm_sat, algorithm_bg]
 
-    cal.strategies = SingleIOV
-
-    # Do this for the default AlgorithmStrategy to force the output payload IoV
-    # It may be different if you are using another strategy like SequentialRunByRun
-    for algorithm in cal.algorithms:
-        algorithm.params = {"iov_coverage": output_iov}
+    if payload_boundaries:
+        basf2.B2INFO("Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
+        cal.strategies = SequentialBoundaries
+        for algorithm in cal.algorithms:
+            algorithm.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
+    else:
+        for algorithm in cal.algorithms:
+            algorithm.params = {"iov_coverage": output_iov}
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     return [cal]

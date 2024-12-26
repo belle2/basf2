@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'cdc_dataobjects', 'cdc_dbobjects'
+env['LIBS'] = ['framework', 'cdc_dataobjects', 'cdc_dbobjects',
                'genfit2', '$ROOT_LIBS', 'EG', 'svd', 'pxd',
                'alignment_dataobjects', 'calibration', 'calibration_dataobjects',
                'klm_dataobjects', 'klm_dbobjects', 'klm', 'cdc', 'alignment_dbobjects',

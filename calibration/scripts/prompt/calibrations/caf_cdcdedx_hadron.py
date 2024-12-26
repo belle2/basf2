@@ -8,7 +8,8 @@
 
 
 """
-Airflow script to perform Hadron calibration.
+Airflow script for automatic CDC dEdx calibration. It is the hadron based
+calibration, where Hadron saturation and beta gamma curve and resolution calibration implemented.
 """
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
@@ -18,7 +19,7 @@ from ROOT.Belle2 import CDCDedxHadSatAlgorithm, CDCDedxHadBGAlgorithm
 from basf2 import create_path, register_module
 from clean_samples import make_pion_kaon_collection, make_proton_collection, make_muon_collection, make_electron_collection
 
-from prompt.calibrations.caf_cdcdedx import settings as cdc_dedx_electron
+from prompt.calibrations.caf_cdcdedx_electron import settings as cdc_dedx_electron
 
 quality_flags = [INPUT_DATA_FILTERS["Run Type"]["physics"],
                  INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
@@ -44,7 +45,7 @@ settings = CalibrationSettings(
     expert_config={"payload_boundaries": [],
                    "proton_minCut": 0.5,
                    "proton_maxCut": 1.2,
-                   "maxevt": 1.5e6,
+                   "maxevt": 2e6,
                    "sat_bgpar": {"muon": [8, 2.83, 28.83], "proton": [6, 0.44, 0.85]},
                    "bgpar": {"muon": [12, 2.85, 28.85], "proton": [20, 0.33, 0.85]},
                    "cosbins": {"muon": 24, "proton": 20},

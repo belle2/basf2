@@ -28,8 +28,8 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDCluster():
-      m_sensorID(0), m_uPosition(0), m_vPosition(0), m_uPositionSigma(1),
-      m_vPositionSigma(1), m_uvRho(0),  m_clsCharge(0), m_seedCharge(0),
+      m_uPosition(0), m_vPosition(0), m_uPositionSigma(1),
+      m_vPositionSigma(1), m_uvRho(0), m_sensorID(0), m_clsCharge(0), m_seedCharge(0),
       m_clsSize(0), m_uSize(0), m_vSize(0), m_uStart(0), m_vStart(0),
       m_clsKind(0) {}
 
@@ -52,9 +52,9 @@ namespace Belle2 {
                float vError, float uvRho, unsigned short clsCharge, unsigned short seedCharge,
                unsigned short clsSize, unsigned short uSize, unsigned short vSize,
                unsigned short uStart, unsigned short vStart):
-      m_sensorID(sensorID), m_uPosition(uPosition), m_vPosition(vPosition),
+      m_uPosition(uPosition), m_vPosition(vPosition),
       m_uPositionSigma(uError), m_vPositionSigma(vError),
-      m_uvRho(uvRho), m_clsCharge(clsCharge),
+      m_uvRho(uvRho), m_sensorID(sensorID), m_clsCharge(clsCharge),
       m_seedCharge(seedCharge),  m_clsSize(clsSize), m_uSize(uSize),
       m_vSize(vSize), m_uStart(uStart), m_vStart(vStart), m_clsKind(0)
     {}
@@ -79,9 +79,9 @@ namespace Belle2 {
                float vError, float uvRho, unsigned short clsCharge, unsigned short seedCharge,
                unsigned short clsSize, unsigned short uSize, unsigned short vSize,
                unsigned short uStart, unsigned short vStart, int clsKind):
-      m_sensorID(sensorID), m_uPosition(uPosition), m_vPosition(vPosition),
+      m_uPosition(uPosition), m_vPosition(vPosition),
       m_uPositionSigma(uError), m_vPositionSigma(vError),
-      m_uvRho(uvRho), m_clsCharge(clsCharge),
+      m_uvRho(uvRho), m_sensorID(sensorID), m_clsCharge(clsCharge),
       m_seedCharge(seedCharge),  m_clsSize(clsSize), m_uSize(uSize),
       m_vSize(vSize), m_uStart(uStart), m_vStart(vStart), m_clsKind(clsKind)
     {}
@@ -109,11 +109,12 @@ namespace Belle2 {
                unsigned short clsSize, unsigned short uSize, unsigned short vSize,
                unsigned short uStart, unsigned short vStart, int clsKind, const std::vector<float>& etaValues,
                const std::vector<int>& shapeIndices):
-      m_sensorID(sensorID), m_uPosition(uPosition), m_vPosition(vPosition),
+      m_etaValues(etaValues), m_shapeIndices(shapeIndices),
+      m_uPosition(uPosition), m_vPosition(vPosition),
       m_uPositionSigma(uError), m_vPositionSigma(vError),
-      m_uvRho(uvRho), m_clsCharge(clsCharge),
+      m_uvRho(uvRho), m_sensorID(sensorID), m_clsCharge(clsCharge),
       m_seedCharge(seedCharge),  m_clsSize(clsSize), m_uSize(uSize),
-      m_vSize(vSize), m_uStart(uStart), m_vStart(vStart), m_clsKind(clsKind), m_etaValues(etaValues), m_shapeIndices(shapeIndices)
+      m_vSize(vSize), m_uStart(uStart), m_vStart(vStart), m_clsKind(clsKind)
     {}
 
     /** Get the sensor ID.
@@ -233,12 +234,14 @@ namespace Belle2 {
     std::vector<float>& getSectorEtaValues() { return m_etaValues; }
 
   protected:
-    unsigned short m_sensorID;    /**< Compressed sensor identifier.*/
+    std::vector<float> m_etaValues;    /**< Vector of eta values for four angle sectors */
+    std::vector<int> m_shapeIndices;   /**< Vector of shape indices for four angle sectors */
     float m_uPosition;            /**< Absolute cell position in r-phi. */
     float m_vPosition;            /**< Absolute cell position in z. */
     float m_uPositionSigma;       /**< Error in u position. */
     float m_vPositionSigma;       /**< Error in v position. */
     float m_uvRho;                /**< Cluster shape correlation. */
+    unsigned short m_sensorID;    /**< Compressed sensor identifier.*/
     unsigned short m_clsCharge;   /**< Deposited charge in ADC units. */
     unsigned short m_seedCharge;  /**< Cluster seed charge in ADC units. */
     unsigned short m_clsSize;     /**< Cluster size in pixels */
@@ -247,8 +250,6 @@ namespace Belle2 {
     unsigned short m_uStart;      /**< Start column of the cluster */
     unsigned short m_vStart;      /**< Start row of the cluster */
     int m_clsKind;                /**< Cluster kind */
-    std::vector<float> m_etaValues;    /**< Vector of eta values for four angle sectors */
-    std::vector<int> m_shapeIndices;   /**< Vector of shape indices for four angle sectors */
 
 
     ClassDef(PXDCluster, 5)

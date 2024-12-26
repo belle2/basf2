@@ -5,10 +5,10 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::PXDSimHit+; // checksum=0x1a29d35c, version=3
+#pragma link C++ class Belle2::PXDSimHit+; // checksum=0xdf1258d6, version=3
 #pragma link C++ class Belle2::PXDDigit+; // checksum=0x2ea122d3, version=5
-#pragma link C++ class Belle2::PXDTrueHit+; // checksum=0xa2812fe1, version=6
-#pragma link C++ class Belle2::PXDCluster+; // checksum=0xbc8fec5d, version=5
+#pragma link C++ class Belle2::PXDTrueHit+; // checksum=0x4510f859, version=6
+#pragma link C++ class Belle2::PXDCluster+; // checksum=0xb7d21c21, version=5
 #pragma link C++ class Belle2::PXDRawHit+; // checksum=0xf3f25bd, version=6
 #pragma link C++ class Belle2::PXDRawROIs+; // checksum=0x769611e7, version=3
 #pragma link C++ class Belle2::PXDRawAdc+; // checksum=0x5127f0f4, version=3

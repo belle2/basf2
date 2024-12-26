@@ -56,7 +56,7 @@ namespace Belle2 {
     SVDShaperDigit(VxdID sensorID, bool isU, short cellID,
                    T samples[c_nAPVSamples], int8_t FADCTime = 0
                   ):
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_FADCTime(FADCTime)
+      m_sensorID(sensorID), m_cellID(cellID), m_FADCTime(FADCTime), m_isU(isU)
     {
       std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
                      [](T x)->APVRawSampleType { return trimToSampleRange(x); }
@@ -74,7 +74,7 @@ namespace Belle2 {
     template<typename T>
     SVDShaperDigit(VxdID sensorID, bool isU, short cellID, T samples,
                    int8_t FADCTime = 0):
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_FADCTime(FADCTime)
+      m_sensorID(sensorID), m_cellID(cellID), m_FADCTime(FADCTime), m_isU(isU)
     {
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
                      [](typename T::value_type x)->APVRawSampleType
@@ -283,11 +283,11 @@ namespace Belle2 {
 
   private:
 
-    VxdID::baseType m_sensorID = 0; /**< Compressed sensor identifier.*/
-    bool m_isU = false; /**< True if U, false if V. */
-    short m_cellID = 0; /**< Strip coordinate in pitch units. */
     APVRawSamples m_samples; /**< 6 APV signals from the strip. */
+    VxdID::baseType m_sensorID = 0; /**< Compressed sensor identifier.*/
+    short m_cellID = 0; /**< Strip coordinate in pitch units. */
     int8_t m_FADCTime = 0; /**< digit time estimate from the FADC, in ns */
+    bool m_isU = false; /**< True if U, false if V. */
 
     static size_t s_APVSampleMode; /**< APV acquisition mode (3 or 6) */
     static size_t s_APVSampleBegin; /**< first sample number for 3 sample acquisition mode (0 - 3) */

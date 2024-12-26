@@ -42,11 +42,11 @@ namespace Belle2 {
     SVDCluster(VxdID sensorID, bool isU, float position, float positionSigma,
                double clsTime, double clsTimeSigma, float clsCharge, float seedCharge,
                unsigned short clsSize, float clsSN, float clsChi2, int firstFrame = 0):
-      m_sensorID(sensorID), m_isU(isU),
+      m_clsTime(clsTime), m_clsTimeSigma(clsTimeSigma),
       m_position(position), m_positionSigma(positionSigma),
-      m_clsTime(clsTime), m_clsTimeSigma(clsTimeSigma), m_clsCharge(clsCharge),
-      m_seedCharge(seedCharge), m_clsSize(clsSize), m_clsSN(clsSN),
-      m_clsChi2(clsChi2), m_firstFrame(firstFrame)
+      m_clsCharge(clsCharge),  m_seedCharge(seedCharge), m_clsSN(clsSN),
+      m_clsChi2(clsChi2), m_firstFrame(firstFrame),
+      m_sensorID(sensorID), m_clsSize(clsSize), m_isU(isU)
     {}
 
     /** Default constructor for the ROOT IO. */
@@ -242,23 +242,23 @@ namespace Belle2 {
     }
 
   protected:
-    unsigned short m_sensorID; /**< Compressed sensor identifier.*/
-    bool m_isU;                /**< True if clusters of u-strips, otherwise false. */
-    float m_position;          /**< Reconstructed hit position in r-phi or z. */
-    float m_positionSigma;     /**< Standard deviation of hit position in r-phi or z.*/
-    double m_clsTime;          /**< Average waveform maximum time. */
-    double m_clsTimeSigma;     /**< Standard deviation of waveform maximum times.*/
-    float m_clsCharge;         /**< Deposited charge in electrons. */
-    float m_seedCharge;        /**< Cluster seed charge in electrons. */
-    unsigned short m_clsSize;  /**< Cluster size in pixels */
-    float m_clsSN;             /**< Cluster S/N ratio */
-    float m_clsChi2;           /**< Chi2 for time/amplitude fit */
-    int m_firstFrame;           /**< firstFrame computed with the MaxSum algorithm */
     std::vector<int> m_timeGroupId;    /**< Grouping of clusters in time */
     std::vector<std::tuple<float, float, float>> m_timeGroupInfo; /**< TimeGroup Gaussian Parameters,
                    (integral, center, sigma) */
     double m_qualityIndicator = {0.};  /**< Probability of signal cluster */
     double m_qualityIndicatorError = {0.};  /**< Error associated with probability calculation */
+    double m_clsTime;          /**< Average waveform maximum time. */
+    double m_clsTimeSigma;     /**< Standard deviation of waveform maximum times.*/
+    float m_position;          /**< Reconstructed hit position in r-phi or z. */
+    float m_positionSigma;     /**< Standard deviation of hit position in r-phi or z.*/
+    float m_clsCharge;         /**< Deposited charge in electrons. */
+    float m_seedCharge;        /**< Cluster seed charge in electrons. */
+    float m_clsSN;             /**< Cluster S/N ratio */
+    float m_clsChi2;           /**< Chi2 for time/amplitude fit */
+    int m_firstFrame;           /**< firstFrame computed with the MaxSum algorithm */
+    unsigned short m_sensorID; /**< Compressed sensor identifier.*/
+    unsigned short m_clsSize;  /**< Cluster size in pixels */
+    bool m_isU;                /**< True if clusters of u-strips, otherwise false. */
 
     ClassDef(SVDCluster, 8)
 

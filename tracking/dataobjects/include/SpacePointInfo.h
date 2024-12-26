@@ -148,6 +148,6 @@ namespace Belle2 {
     bool m_isAssigned = false;
 
     //! needed by root
-    ClassDef(SpacePointInfo, 2);
+    ClassDef(SpacePointInfo, 3);
   };
 }

@@ -127,7 +127,7 @@ namespace Belle2 {
     int m_mainMCParticleID;
 
     //! Needed to make the ROOT object storable
-    ClassDef(ObserverInfo, 1);
+    ClassDef(ObserverInfo, 2);
   };
 
 }// end namespace Belle2

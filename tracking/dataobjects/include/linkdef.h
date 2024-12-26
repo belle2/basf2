@@ -5,7 +5,7 @@
 #pragma link C++ nestedclasses;
 // #pragma link C++ all namespaces;
 
-#pragma link C++ class Belle2::ExtHit+; // checksum=0x4cc0291c, version=8
+#pragma link C++ class Belle2::ExtHit+; // checksum=0x4cc0291c, version=9
 #pragma link C++ class Belle2::TrackClusterSeparation+; // checksum=0x8d25ce5e, version=3
 #pragma link C++ class Belle2::V0ValidationVertex+; // checksum=0x1b03f08a, version=3
 #pragma link C++ class Belle2::FullSecID+; // checksum=0xa4543536, version=-1
@@ -30,17 +30,17 @@
 #pragma link C++ class Belle2::RecoTrack+; // checksum=0x20e47f35, version=14
 #pragma link C++ class Belle2::RecoHitInformation+; // checksum=0xcf616f27, version=6
 #pragma link C++ class Belle2::BremHit+; // checksum=0xc51e119f, version=2
-#pragma link C++ class Belle2::SectorMapConfig+; // checksum=0xcbb85c2e, version=2
-#pragma link C++ class Belle2::hitXP+; // checksum=0xd7d2c2b4, version=2
-#pragma link C++ class Belle2::hitXPDerivate+; // checksum=0xf4639dfc, version=2
+#pragma link C++ class Belle2::SectorMapConfig+; // checksum=0xcbb85c2e, version=3
+#pragma link C++ class Belle2::hitXP+; // checksum=0xd7d2c2b4, version=3
+#pragma link C++ class Belle2::hitXPDerivate+; // checksum=0xf4639dfc, version=3
 #pragma link C++ class std::vector<Belle2::hitXP>+; // checksum=0x26380ecc, version=6
 #pragma link C++ class std::vector<Belle2::hitXPDerivate>+; // checksum=0x82b91048, version=6
 
-#pragma link C++ class Belle2::SpacePointInfo+; // checksum=0x77ac40ce, version=2
+#pragma link C++ class Belle2::SpacePointInfo+; // checksum=0x77ac40ce, version=3
 #pragma link C++ class Belle2::FilterInfo+; // checksum=0xc33c4990, version=1
 #pragma link C++ class std::vector<Belle2::FilterInfo>+; // checksum=0x4718205b, version=6
 #pragma link C++ class std::vector<Belle2::SpacePointInfo>+; // checksum=0x8273c275, version=6
-#pragma link C++ class Belle2::ObserverInfo+; // checksum=0xe8b1a249, version=1
+#pragma link C++ class Belle2::ObserverInfo+; // checksum=0xe8b1a249, version=2
 
 // ----------------------------------------------------------------------------
 

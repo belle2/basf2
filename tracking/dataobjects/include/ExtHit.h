@@ -201,7 +201,7 @@ namespace Belle2 {
     double getPolarCovariance(int i) const;
 
     //! Needed to make the ROOT object storable
-    ClassDef(ExtHit, 8);
+    ClassDef(ExtHit, 9);
 
   };
 }

@@ -81,7 +81,7 @@ namespace Belle2 {
     unsigned nHitsMin = 3;
 
     //! needed for the root library
-    ClassDef(SectorMapConfig, 2);
+    ClassDef(SectorMapConfig, 3);
 
   };
 }

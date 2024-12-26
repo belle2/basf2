@@ -386,6 +386,6 @@ namespace Belle2 {
     };
 
     //! needed by root
-    ClassDef(hitXP, 2);
+    ClassDef(hitXP, 3);
   };
 } /** end namespace Belle2 */

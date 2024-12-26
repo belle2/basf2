@@ -29,9 +29,9 @@ namespace Belle2 {
     /** Default constructor for the ROOT IO. */
     PXDCluster():
       m_uPosition(0), m_vPosition(0), m_uPositionSigma(1),
-      m_vPositionSigma(1), m_uvRho(0), m_sensorID(0), m_clsCharge(0), m_seedCharge(0),
-      m_clsSize(0), m_uSize(0), m_vSize(0), m_uStart(0), m_vStart(0),
-      m_clsKind(0) {}
+      m_vPositionSigma(1), m_uvRho(0), m_clsKind(0), m_sensorID(0), m_clsCharge(0), m_seedCharge(0),
+      m_clsSize(0), m_uSize(0), m_vSize(0), m_uStart(0), m_vStart(0)
+    {}
 
     /** Constructor.
      * @param sensorID Sensor compact ID.
@@ -54,9 +54,9 @@ namespace Belle2 {
                unsigned short uStart, unsigned short vStart):
       m_uPosition(uPosition), m_vPosition(vPosition),
       m_uPositionSigma(uError), m_vPositionSigma(vError),
-      m_uvRho(uvRho), m_sensorID(sensorID), m_clsCharge(clsCharge),
+      m_uvRho(uvRho), m_clsKind(0), m_sensorID(sensorID), m_clsCharge(clsCharge),
       m_seedCharge(seedCharge),  m_clsSize(clsSize), m_uSize(uSize),
-      m_vSize(vSize), m_uStart(uStart), m_vStart(vStart), m_clsKind(0)
+      m_vSize(vSize), m_uStart(uStart), m_vStart(vStart)
     {}
 
     /** Constructor for who want to add also cluster kind in one step.
@@ -81,9 +81,9 @@ namespace Belle2 {
                unsigned short uStart, unsigned short vStart, int clsKind):
       m_uPosition(uPosition), m_vPosition(vPosition),
       m_uPositionSigma(uError), m_vPositionSigma(vError),
-      m_uvRho(uvRho), m_sensorID(sensorID), m_clsCharge(clsCharge),
-      m_seedCharge(seedCharge),  m_clsSize(clsSize), m_uSize(uSize),
-      m_vSize(vSize), m_uStart(uStart), m_vStart(vStart), m_clsKind(clsKind)
+      m_uvRho(uvRho), m_clsKind(clsKind), m_sensorID(sensorID), m_clsCharge(clsCharge),
+      m_seedCharge(seedCharge), m_clsSize(clsSize), m_uSize(uSize),
+      m_vSize(vSize), m_uStart(uStart), m_vStart(vStart)
     {}
 
     /** Constructor for who want to add also cluster kind, shape indices and eta values in one step.
@@ -112,9 +112,9 @@ namespace Belle2 {
       m_etaValues(etaValues), m_shapeIndices(shapeIndices),
       m_uPosition(uPosition), m_vPosition(vPosition),
       m_uPositionSigma(uError), m_vPositionSigma(vError),
-      m_uvRho(uvRho), m_sensorID(sensorID), m_clsCharge(clsCharge),
+      m_uvRho(uvRho), m_clsKind(clsKind), m_sensorID(sensorID), m_clsCharge(clsCharge),
       m_seedCharge(seedCharge),  m_clsSize(clsSize), m_uSize(uSize),
-      m_vSize(vSize), m_uStart(uStart), m_vStart(vStart), m_clsKind(clsKind)
+      m_vSize(vSize), m_uStart(uStart), m_vStart(vStart)
     {}
 
     /** Get the sensor ID.
@@ -241,6 +241,7 @@ namespace Belle2 {
     float m_uPositionSigma;       /**< Error in u position. */
     float m_vPositionSigma;       /**< Error in v position. */
     float m_uvRho;                /**< Cluster shape correlation. */
+    int m_clsKind;                /**< Cluster kind */
     unsigned short m_sensorID;    /**< Compressed sensor identifier.*/
     unsigned short m_clsCharge;   /**< Deposited charge in ADC units. */
     unsigned short m_seedCharge;  /**< Cluster seed charge in ADC units. */
@@ -249,10 +250,9 @@ namespace Belle2 {
     unsigned short m_vSize;       /**< Cluster size in pixel rows  */
     unsigned short m_uStart;      /**< Start column of the cluster */
     unsigned short m_vStart;      /**< Start row of the cluster */
-    int m_clsKind;                /**< Cluster kind */
 
 
-    ClassDef(PXDCluster, 5)
+    ClassDef(PXDCluster, 6)
   };
 
 

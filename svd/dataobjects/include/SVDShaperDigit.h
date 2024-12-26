@@ -292,7 +292,7 @@ namespace Belle2 {
     static size_t s_APVSampleMode; /**< APV acquisition mode (3 or 6) */
     static size_t s_APVSampleBegin; /**< first sample number for 3 sample acquisition mode (0 - 3) */
 
-    ClassDefOverride(SVDShaperDigit, 5)
+    ClassDefOverride(SVDShaperDigit, 6)
 
   }; // class SVDShaperDigit
 

@@ -260,7 +260,7 @@ namespace Belle2 {
     unsigned short m_clsSize;  /**< Cluster size in pixels */
     bool m_isU;                /**< True if clusters of u-strips, otherwise false. */
 
-    ClassDef(SVDCluster, 8)
+    ClassDef(SVDCluster, 9)
 
   };
 

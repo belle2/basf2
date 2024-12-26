@@ -120,7 +120,7 @@ namespace Belle2 {
     /** ID of the sensor */
     int m_sensorID;
 
-    ClassDef(VXDTrueHit, 6)
+    ClassDef(VXDTrueHit, 7)
   };
 
 } // end namespace Belle2

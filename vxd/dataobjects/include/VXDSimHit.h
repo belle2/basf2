@@ -130,7 +130,7 @@ namespace Belle2 {
     /** ID of the sensor the electron was deposited in */
     unsigned short m_sensorID;
 
-    ClassDefOverride(VXDSimHit, 1)
+    ClassDefOverride(VXDSimHit, 2)
   };
 } // end namespace Belle2
 

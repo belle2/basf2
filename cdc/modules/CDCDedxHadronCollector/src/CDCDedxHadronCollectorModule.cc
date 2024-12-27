@@ -36,12 +36,6 @@ CDCDedxHadronCollectorModule::CDCDedxHadronCollectorModule() : CalibrationCollec
 void CDCDedxHadronCollectorModule::prepare()
 {
 
-  // m_trgResult.isOptional();
-  // m_dedxTracks.isRequired();
-  // m_tracks.isRequired();
-  // m_trackFitResults.isRequired();
-
-  // Data object creation
   std::vector<TTree* > ttree;
 
   // build a map to relate input strings to the right particle type
@@ -90,7 +84,6 @@ void CDCDedxHadronCollectorModule::collect()
     if (!particlelist or particlelist->getListSize() == 0) continue;
 
     // loop over the particles in the list and follow the links to the
-    // dE/dx information (Particle -> PIDLikelihood -> Track -> CDCDedxTrack)
     for (unsigned int iPart = 0; iPart < particlelist->getListSize(true); iPart++) {
 
       Particle* part = particlelist->getParticle(iPart, true);

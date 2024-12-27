@@ -71,12 +71,6 @@ namespace Belle2 {
 
     std::vector<std::string> m_strParticleList; /**< Vector of ParticleLists to write out */
 
-    // /// required input
-    // StoreObjPtr<SoftwareTriggerResult> m_trgResult; /**< Store array for Trigger selection */
-    // StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array for CDCDedxTracks */
-    // StoreArray<Track> m_tracks; /**< Required array for Tracks */
-    // StoreArray<TrackFitResult> m_trackFitResults; /**< Required array for TrackFitResults */
-
     std::map<std::string, std::string> m_pdgMap;   /**< map to relate input strings to the right particle type */
 
     /// module params

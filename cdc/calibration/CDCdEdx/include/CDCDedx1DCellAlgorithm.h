@@ -206,6 +206,7 @@ namespace Belle2 {
     double m_eaMax; /**< upper edge of enta angle */
     double m_eaBW; /**< binwdith of enta angle bin */
     int m_eaBin; /**< # of bins for enta angle */
+    int m_eaB; /**< # of bins for etna angle */
 
     double m_dedxMin;  /**< lower edge of dedxhit */
     double m_dedxMax;  /**< upper edge of dedxhit */

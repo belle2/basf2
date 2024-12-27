@@ -3,21 +3,13 @@
 
 import basf2
 from reconstruction import prepare_cdst_analysis
-# from modularAnalysis import *
 import modularAnalysis as mA
-
-# from ROOT import Belle2
-# from ROOT import gSystem
-
-# radiative electron selection
 
 
 def make_electron_collection(path_electron):
     prepare_cdst_analysis(path=path_electron)
     trg_bhabhaskim = path_electron.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_radee"])
     trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
-    # ps_bhabhaskim = path_electron.add_module("Prescale", prescale=0.30)
-    # ps_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
     path_electron.add_module(
         'CDCDedxCorrection',
@@ -83,8 +75,6 @@ def make_muon_collection(path_muon):
     event_cutscopy = '[nCleanedTracks('+goodTrack+') == 2] and nTracks < 3'
     mA.applyCuts('mu+:cal', event_cutscopy, path=filter_path)
 
-    # ps_bhabhaskim = filter_path.add_module("Prescale", prescale=0.50)
-    # ps_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
     return ['mu+:cal']
 
 

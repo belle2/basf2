@@ -75,6 +75,6 @@ namespace Belle2 {
 
   private:
 
-    ClassDefOverride(AlignablePXDRecoHit, 3); /**< PXD RecoHit extended for alignment/calibration */
+    ClassDefOverride(AlignablePXDRecoHit, 4); /**< PXD RecoHit extended for alignment/calibration */
   };
 }

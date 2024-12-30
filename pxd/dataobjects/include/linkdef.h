@@ -11,8 +11,8 @@
 #pragma link C++ class Belle2::PXDCluster+; // checksum=0x98128d1, version=6
 #pragma link C++ class Belle2::PXDRawHit+; // checksum=0xf3f25bd, version=6
 #pragma link C++ class Belle2::PXDRawROIs+; // checksum=0x769611e7, version=3
-#pragma link C++ class Belle2::PXDRawAdc+; // checksum=0x5127f0f4, version=3
-#pragma link C++ class Belle2::PXDInjectionBGTiming+; // checksum=0x3a01879a, version=1
+#pragma link C++ class Belle2::PXDRawAdc+; // checksum=0x39c4ff76, version=4
+#pragma link C++ class Belle2::PXDInjectionBGTiming+; // checksum=0xf6635216, version=2
 
 #pragma link C++ class Belle2::PXDDAQDHPStatus+; // checksum=0xe9b4cd4c, version=2
 #pragma link C++ class Belle2::PXDDAQDHEStatus+; // checksum=0x53489061, version=8
@@ -22,9 +22,9 @@
 
 #pragma link C++ class Belle2::PXDGatedModeInfo+; // checksum=0x8846af1d, version=1
 
-#pragma link C++ class Belle2::PXDEnergyDepositionEvent+; // checksum=0xb98aafb8, version=2
+#pragma link C++ class Belle2::PXDEnergyDepositionEvent+; // checksum=0x7c8edd10, version=3
 #pragma link C++ class Belle2::PXDNeutronFluxEvent+; // checksum=0x28070b7b, version=1
-#pragma link C++ class Belle2::PXDOccupancyEvent+; // checksum=0x6d2b3a39, version=2
+#pragma link C++ class Belle2::PXDOccupancyEvent+; // checksum=0x6eea5025, version=3
 
 
 #endif

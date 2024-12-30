@@ -119,9 +119,6 @@ namespace Belle2 {
      */
     void addLogLikelihoods(const std::vector<const TH2F*>& PDFs, double dedxValue, double minPDFValue);
 
-    int m_eventID = 0; /**< event in which this Track was found */
-    int m_trackID = 0; /**< ID number of the Track */
-
     // hit level information
     std::vector<int> m_layer;    /**< VXD layer number */
     std::vector<int> m_sensorID; /**< unique sensor ID */
@@ -134,26 +131,31 @@ namespace Belle2 {
     std::vector<double> dist;      /**< distance flown through active medium in current segment */
     std::vector<double> dedxLayer; /**< layer id corresponding to dE/dx measurement */
 
-    // track level information
-    double m_p = 0;        /**< momentum at the IP */
-    double m_cosTheta = 0; /**< cos(theta) for the track */
-    short m_charge = 0;    /**< particle charge from tracking (+1 or -1) */
+    double m_vxdLogl[Const::ChargedStable::c_SetSize] = {0}; /**< log likelihood for each particle */
 
-    double m_length = 0;   /**< total distance travelled by the track */
-    short m_nHits = 0;     /**< number of hits on this track */
-    short m_nHitsUsed = 0; /**< number of hits on this track used in the truncated mean */
-
-    double m_pdg = 0;       /**< MC PID */
-    double m_motherPDG = 0; /**< MC PID of mother particle */
-    double m_pTrue = 0;     /**< MC true momentum */
-
+    // dEdx information
     double m_dedxAvg[2] = {0};            /**< dE/dx mean value per track */
     double m_dedxAvgTruncated[2] = {0};   /**< dE/dx truncated mean per track */
     double m_dedxAvgTruncatedErr[2] = {0}; /**< standard deviation of m_dedxAvgTruncated */
 
-    double m_vxdLogl[Const::ChargedStable::c_SetSize] = {0}; /**< log likelihood for each particle */
-    int m_numAdded = 0; /**< counter of added log likelihood values */
+    // track level information
+    double m_p = 0;        /**< momentum at the IP */
+    double m_cosTheta = 0; /**< cos(theta) for the track */
+    double m_length = 0;   /**< total distance travelled by the track */
+    short m_charge = 0;    /**< particle charge from tracking (+1 or -1) */
 
-    ClassDef(VXDDedxTrack, 3); /**< class version for ROOT streamer */
+    // MC information
+    double m_pdg = 0;       /**< MC PID */
+    double m_motherPDG = 0; /**< MC PID of mother particle */
+    double m_pTrue = 0;     /**< MC true momentum */
+
+    int m_numAdded = 0; /**< counter of added log likelihood values */
+    int m_eventID = 0; /**< event in which this Track was found */
+    int m_trackID = 0; /**< ID number of the Track */
+    short m_nHits = 0;     /**< number of hits on this track */
+    short m_nHitsUsed = 0; /**< number of hits on this track used in the truncated mean */
+
+
+    ClassDef(VXDDedxTrack, 4); /**< class version for ROOT streamer */
   };
 }

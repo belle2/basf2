@@ -8,14 +8,14 @@
 #pragma link C++ class Belle2::SVDCluster+; // checksum=0x4a4a8b7e, version=9
 #pragma link C++ class Belle2::SVDModeByte+; // checksum=0x5ede40e5, version=-1
 #pragma link C++ class Belle2::SVDDAQDiagnostic+; // checksum=0x10c3ffc4, version=5
-#pragma link C++ class Belle2::SVDRecoDigit+; // checksum=0x359100bf, version=3
+#pragma link C++ class Belle2::SVDRecoDigit+; // checksum=0x9066f67, version=4
 #pragma link C++ class Belle2::SVDRecoTimeBase+; // checksum=0xf6a86f3e, version=2
 #pragma link C++ class Belle2::SVDShaperDigit+; // checksum=0x608071d7, version=6
 #pragma link C++ class Belle2::SVDTransparentDigit+; // checksum=0x476654f7, version=3
 #pragma link C++ class Belle2::SVDSimHit+; // checksum=0xcb6d834b, version=4
 #pragma link C++ class Belle2::SVDTrueHit+; // checksum=0x94457676, version=7
-#pragma link C++ class Belle2::SVDEnergyDepositionEvent+; // checksum=0x78e3259d, version=2
-#pragma link C++ class Belle2::SVDNeutronFluxEvent+; // checksum=0x4fa137ca, version=1
+#pragma link C++ class Belle2::SVDEnergyDepositionEvent+; // checksum=0x3be752f5, version=3
+#pragma link C++ class Belle2::SVDNeutronFluxEvent+; // checksum=0xeb3a317a, version=2
 #pragma link C++ class Belle2::SVDOccupancyEvent+; // checksum=0x4e908461, version=2
 #pragma link C++ class Belle2::SVDEventInfo+; // checksum=0x32f53307, version=3
 

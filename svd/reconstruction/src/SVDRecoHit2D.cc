@@ -21,13 +21,13 @@ using namespace std;
 using namespace Belle2;
 
 SVDRecoHit2D::SVDRecoHit2D():
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_uCluster(0), m_vCluster(0),
-  m_energyDep(0)//, m_energyDepError(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(0), m_uCluster(0), m_vCluster(0),
+  m_energyDep(0), m_sensorID(0)//, m_energyDepError(0)
 {}
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit*, float sigmaU, float sigmaV):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit), m_uCluster(0), m_vCluster(0),
-  m_energyDep(0)//, m_energyDepError(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(hit), m_uCluster(0), m_vCluster(0),
+  m_energyDep(0), m_sensorID(0)//, m_energyDepError(0)
 {
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
 
@@ -56,8 +56,8 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit*, f
 }
 
 SVDRecoHit2D::SVDRecoHit2D(VxdID::baseType vxdid, const double u, const double v, double sigmaU, double sigmaV):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(vxdid), m_trueHit(nullptr), m_uCluster(0), m_vCluster(0),
-  m_energyDep(0)//, m_energyDepError(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(nullptr), m_uCluster(0), m_vCluster(0),
+  m_energyDep(0), m_sensorID(vxdid)//, m_energyDepError(0)
 {
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
   if (sigmaU < 0 || sigmaV < 0) {

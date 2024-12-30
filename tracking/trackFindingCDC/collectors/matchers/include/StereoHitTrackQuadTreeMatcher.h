@@ -47,14 +47,14 @@ namespace Belle2 {
       void writeDebugInformation();
 
       /// Parameters
-      /// Set to false to skip the B2B check (good for curlers).
-      bool m_param_checkForB2BTracks = true;
       /// Set to false to skip the in-wire-bound check (good for second stage).
       double m_param_checkForInWireBoundsFactor = 1.0;
       /// Maximum level of the quad tree search.
       unsigned int m_param_quadTreeLevel = 7;
       /// Minimal number of hits a quad tree node must have to be called a found bin
       unsigned int m_param_minimumNumberOfHits = 5;
+      /// Set to false to skip the B2B check (good for curlers).
+      bool m_param_checkForB2BTracks = true;
       /// Set to true to output debug information.
       bool m_param_writeDebugInformation = false;
 

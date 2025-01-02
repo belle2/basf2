@@ -315,6 +315,9 @@ namespace Belle2 {
       /// Memory for the CDCWire pointer - Trailing comment indicates to not stream this member
       mutable CDCWire const* m_wire = nullptr; //!
 
+      /// Memory for the CDCHit pointer.
+      const CDCHit* m_hit = nullptr;
+
       /// Memory for the automaton cell.
       mutable AutomatonCell m_automatonCell{1};
 
@@ -327,14 +330,11 @@ namespace Belle2 {
       /// Memory for the charge induced by the energy deposit in the drift cell.
       double m_refChargeDeposit = 0.0;
 
-      /// Memory for the super cluster id
-      int m_iSuperCluster = -1;
-
       /// Measured drift time of the CDC hit
       double m_refDriftTime = 0.0f;
 
-      /// Memory for the CDCHit pointer.
-      const CDCHit* m_hit = nullptr;
+      /// Memory for the super cluster id
+      int m_iSuperCluster = -1;
     };
 
     /// Generic functor to get the wire hit from an object.

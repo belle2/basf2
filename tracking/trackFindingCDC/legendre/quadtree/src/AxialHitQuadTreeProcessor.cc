@@ -98,9 +98,9 @@ AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(int lastLevel,
                                                      const XYSpans& ranges,
                                                      PrecisionUtil::PrecisionFunction precisionFunction)
   : QuadTreeProcessor(lastLevel, seedLevel, ranges)
-  , m_cosSinLookupTable(&getCosSinLookupTable())
-  , m_localOrigin(0.0, 0.0)
   , m_precisionFunction(precisionFunction)
+  , m_localOrigin(0.0, 0.0)
+  , m_cosSinLookupTable(&getCosSinLookupTable())
 {
   m_twoSidedPhaseSpace = m_quadTree->getYMin() * m_quadTree->getYMax() < 0;
 }
@@ -109,8 +109,8 @@ AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(const Vector2D& localOrigin
                                                      const YSpan& curvSpan,
                                                      const LookupTable<Vector2D>* cosSinLookupTable)
   : QuadTreeProcessor(0, 0, { {0, cosSinLookupTable->getNPoints() - 1}, curvSpan})
-, m_cosSinLookupTable(cosSinLookupTable)
 , m_localOrigin(localOrigin)
+, m_cosSinLookupTable(cosSinLookupTable)
 {
   // Never use two sided mode in off origin extension
   m_twoSidedPhaseSpace = false;

@@ -268,14 +268,14 @@ namespace Belle2 {
       /// Memory for the reference to the assiziated wire hit.
       const CDCWireHit* m_wireHit = nullptr;
 
-      /// Memory for the right left passage information of the oriented wire hit.
-      ERightLeft m_rlInfo = ERightLeft::c_Unknown;
-
       /// Memory for the reestimated drift length
       double m_refDriftLength = 0.0;
 
       /// Memory for the reestimated drift length variance
       double m_refDriftLengthVariance = 0.0;
+
+      /// Memory for the right left passage information of the oriented wire hit.
+      ERightLeft m_rlInfo = ERightLeft::c_Unknown;
     };
 
     /// Output operator. Help debugging.

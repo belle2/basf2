@@ -57,7 +57,7 @@ kinematic constraints of the initial state.
   addParam("decayString", m_decayString,
            "Input DecayDescriptor string.");
   addParam("maximumNumberOfCandidates", m_maximumNumberOfCandidates,
-           "Don't reconstruct channel if more candidates than given are produced.", -1);
+           "Don't reconstruct channel if more candidates than given are produced.", 10000);
   addParam("writeOut", m_writeOut,
            "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
   addParam("recoList", m_recoList,

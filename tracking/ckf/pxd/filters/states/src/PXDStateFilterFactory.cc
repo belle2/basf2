@@ -122,10 +122,14 @@ PXDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<SloppyMCPXDStateFilter>();
   } else if (filterName == "recording") {
     return std::make_unique<RecordingPXDStateFilter>("PXDStateFilter.root");
-  } else if (filterName == "recording_and_truth") {
-    return std::make_unique<AndPXDStateFilter>(
-             std::make_unique<RecordingPXDStateFilter>("PXDStateFilter.root"),
-             std::make_unique<MCPXDStateFilter>());
+    // This filter causes trouble with the parameters added to the PXDStateTruthVarSet, as both the RecordingPXDStateFilter
+    // AND the MCPXDStateFilter internally use the PXDStateTruthVarSet, so the parameters are added twice for the same filter
+    // causing an error. Currently this filter isn't actively used, but to keep it in the code in some way, even if it would
+    // not work currently, it's commented.
+    // } else if (filterName == "recording_and_truth") {
+    //   return std::make_unique<AndPXDStateFilter>(
+    //            std::make_unique<RecordingPXDStateFilter>("PXDStateFilter.root"),
+    //            std::make_unique<MCPXDStateFilter>());
   } else if (filterName == "recording_with_direction_check") {
     return std::make_unique<AndPXDStateFilter>(
              std::make_unique<NonIPCrossingPXDStateFilter>(),

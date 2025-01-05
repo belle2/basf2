@@ -56,11 +56,20 @@ namespace Belle2 {
     /// Generate and assign the variables from the object.
     virtual bool extract(const BasePXDStateFilter::Object* result) override;
 
+    /// Expose the parameters to the outside world
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
   private:
     /// Pointer to the object containing event number etc
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
     /// MC information used in the PXD CKF
     MCUtil m_mcUtil;
+
+    /// Only use a fraction of background events for recording for MVA training
+    bool m_UseFractionOfBackground = true;
+
+    /// Fraction of background to use in case m_UseFractionOfBackground is true
+    double m_BackgroundFraction = 0.001;
   };
 }

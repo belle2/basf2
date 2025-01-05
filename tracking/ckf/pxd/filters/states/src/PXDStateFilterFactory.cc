@@ -93,7 +93,7 @@ std::map<std::string, std::string> PXDStateFilterFactory::getValidFilterNamesAnd
     {"sloppy_truth", "sloppy monte carlo truth"},
     {"simple", "simple filter to be used in pxd"},
     {"recording", "record variables to a TTree"},
-    {"recording_and_truth", "record variables to a TTree and store truth information"},
+    // {"recording_and_truth", "record variables to a TTree and store truth information"},
     {"recording_with_direction_check", "record variables to a TTree with direction check"},
     {"mva_with_direction_check", "MVA filter with direction check"},
     {"mva", "MVA filter"},

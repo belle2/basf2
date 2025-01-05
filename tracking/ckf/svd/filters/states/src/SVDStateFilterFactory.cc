@@ -129,6 +129,10 @@ SVDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<SloppyMCSVDStateFilter>();
   } else if (filterName == "recording") {
     return std::make_unique<RecordingSVDStateFilter>("SVDStateFilter.root");
+    // This filter causes trouble with the parameters added to the SVDStateTruthVarSet, as both the RecordingSVDStateFilter
+    // AND the MCSVDStateFilter internally use the SVDStateTruthVarSet, so the parameters are added twice for the same filter
+    // causing an error. Currently this filter isn't actively used, but to keep it in the code in some way, even if it would
+    // not work currently, it's commented.
     // } else if (filterName == "recording_and_truth") {
     //   return std::make_unique<AndSVDStateFilter>(
     //            std::make_unique<RecordingSVDStateFilter>("SVDStateFilter.root"),

@@ -49,11 +49,6 @@ bool PXDStateTruthVarSet::extract(const BasePXDStateFilter::Object* pair)
     return true;
   }
 
-  if (not m_mcUtil.allStatesCorrect(allStates)) {
-    // Keep all variables set to false and return.
-    return true;
-  }
-
   const std::string& seedTrackStoreArrayName = seedTrack->getArrayName();
 
   TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", seedTrackStoreArrayName);

@@ -17,29 +17,26 @@ namespace Belle2 {
   class PXDDigit;
 
   /**
-   * The MCSlowPionPXDROICreatorModule module
-   * Create artificial ROI just for PXDDigits from slow pions from D* decays on MC information.
+   * The MCPXDROICreatorModule module
+   * Create artificial ROI just for PXDDigits from either all charged primary MCParticles or slow pions from D* decays on MC information.
    */
-  class MCSlowPionPXDROICreatorModule : public Module {
+  class MCPXDROICreatorModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    MCSlowPionPXDROICreatorModule();
+    MCPXDROICreatorModule();
 
     /** Empty destructor */
-    virtual ~MCSlowPionPXDROICreatorModule() {};
+    virtual ~MCPXDROICreatorModule() {};
 
     /** init the module */
     virtual void initialize() override;
 
     /** processes the event */
     virtual void event() override;
-
-    /** end the run */
-    virtual void endRun() override;
 
   private:
     std::string m_pxdDigitsName = "";   /**< PXDDigits StoreArray name*/
@@ -50,9 +47,8 @@ namespace Belle2 {
     StoreArray<MCParticle> m_MCParticles; /**< StoreArray for the MCParticles */
     StoreArray<ROIid> m_ROIs;             /**< StoreArray for the ROIs */
 
-    short m_ROISize = 20; /**< ROI size */
-
-    uint m_slowPiCounter = 0; /**< Count the slow pions in MC for debugging*/
-    uint m_ROICounter = 0;    /**< Count the ROI that are created for debugging */
+    short m_ROISize = 40; /**< ROI size */
+    bool m_createROIForAll = false; /** Create ROI for all chargedstable MCParticles */
+    bool m_createROIForSlowPionsOnly = true; /** Create ROI only for slow pions */
   };
 }

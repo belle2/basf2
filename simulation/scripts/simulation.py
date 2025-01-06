@@ -44,8 +44,15 @@ def check_simulation(path):
         b2.B2ERROR(f"Simulation modules in wrong order. Should be '{', '.join(required)}' but is '{', '.join(found)}'")
 
 
-def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered_digits',
-                         doCleanup=True, overrideDB=False, usePXDDataReduction=True, save_slow_pions_in_mc=False):
+def add_PXDDataReduction(
+        path,
+        components,
+        pxd_unfiltered_digits='pxd_unfiltered_digits',
+        doCleanup=True,
+        overrideDB=False,
+        usePXDDataReduction=True,
+        save_slow_pions_in_mc=False,
+        save_all_charged_particles_in_mc=False):
     """
     This function adds the standard simulation modules to a path.
     @param pxd_unfiltered_digits: the name of the StoreArray containing the input PXDDigits
@@ -67,8 +74,12 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
 
     add_roiFinder(path, svd_reco_tracks)
 
-    if save_slow_pions_in_mc:
-        path.add_module('MCSlowPionPXDROICreator', PXDDigitsName=pxd_unfiltered_digits, ROIsName='ROIs')
+    if save_slow_pions_in_mc or save_all_charged_particles_in_mc:
+        path.add_module('MCPXDROICreator',
+                        PXDDigitsName=pxd_unfiltered_digits,
+                        ROIsName='ROIs',
+                        createROIForSlowPionsOnly=save_slow_pions_in_mc,
+                        createROIForAll=save_all_charged_particles_in_mc)
 
     # Filtering of PXDDigits
     pxd_digifilter = b2.register_module('PXDdigiFilter')

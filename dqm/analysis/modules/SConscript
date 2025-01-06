@@ -4,10 +4,11 @@ Import('env')
 
 env['LIBS'] = ['framework', 'dqm',
                'arich', 'cdc', 'dqm_dataobjects',
+               'cdc_dataobjects', 'cdc_dbobjects',
                'ecl', 'ecl_mapper',
                'klm_dataobjects', 'klm_dbobjects',
-               'svd_dataobjects', 'cdc_dataobjects',
-               'vxd', 'vxd_dataobjects', 'cdc_dbobjects',
+               'svd_dataobjects',
+               'vxd', 'vxd_dataobjects',
                'RooFit', 'RooFitCore', 'ca', 'Com']
 
 # this check is not completely save if new options are added with clang

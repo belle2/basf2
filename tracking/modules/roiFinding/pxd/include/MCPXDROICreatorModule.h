@@ -48,7 +48,7 @@ namespace Belle2 {
     StoreArray<ROIid> m_ROIs;             /**< StoreArray for the ROIs */
 
     short m_ROISize = 40; /**< ROI size */
-    bool m_createROIForAll = false; /** Create ROI for all chargedstable MCParticles */
-    bool m_createROIForSlowPionsOnly = true; /** Create ROI only for slow pions */
+    bool m_createROIForAll = false; /**< Create ROI for all chargedstable MCParticles */
+    bool m_createROIForSlowPionsOnly = true; /**< Create ROI only for slow pions */
   };
 }

@@ -2311,7 +2311,7 @@ namespace {
 
   TEST_F(MetaVariableTest, sin)
   {
-    Particle p({ 3.14159265359 / 2.0, -0.4, 0.8, 1.0}, 11);
+    Particle p({ M_PI / 2.0, -0.4, 0.8, 1.0}, 11);
     Particle p2({ 0.0, -0.4, 0.8, 1.0 }, -11);
 
     const Manager::Var* var = Manager::Instance().getVariable("sin(px)");
@@ -2323,7 +2323,7 @@ namespace {
 
   TEST_F(MetaVariableTest, cos)
   {
-    Particle p({ 3.14159265359 / 2.0, -0.4, 0.8, 1.0}, 11);
+    Particle p({ M_PI / 2.0, -0.4, 0.8, 1.0}, 11);
     Particle p2({ 0.0, -0.4, 0.8, 1.0 }, -11);
 
     const Manager::Var* var = Manager::Instance().getVariable("cos(px)");

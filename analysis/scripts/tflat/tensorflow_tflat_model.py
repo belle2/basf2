@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from keras.layers import Input, Discretization
+from keras.layers import Input, Discretization, Reshape
 import keras
 import numpy as np
 
@@ -119,7 +119,7 @@ def get_tflat_model(parameters, number_of_features):
     embedding_dims = 16
     mlp_hidden_units_factors = [2, 1,]
     dropout_rate = 0.2
-    use_column_embedding = False
+    use_column_embedding = True
 
     # Create model inputs
     inputs = create_model_inputs(number_of_features)
@@ -130,16 +130,19 @@ def get_tflat_model(parameters, number_of_features):
     # Stack feature embeddings for the Tansformer.
     encoded_features = keras.ops.stack(encoded_feature_list, axis=1)
 
-    # Add column embedding to categorical feature embeddings.
+    # Number of encoded features
+    num_columns = encoded_features.shape[1]
+
+    # Reshape the encoded features
+    encoded_features = Reshape((num_columns, embedding_dims))(encoded_features)
+
+    # Add column embedding to feature embeddings.
     if use_column_embedding:
-        num_columns = encoded_features.shape[1]
         column_embedding = keras.layers.Embedding(
             input_dim=num_columns, output_dim=embedding_dims
         )
         column_indices = keras.ops.arange(start=0, stop=num_columns, step=1)
-        encoded_features = encoded_features + column_embedding(
-            column_indices
-        )
+        encoded_features = encoded_features + column_embedding(column_indices)
 
     # Create multiple layers of the Transformer block.
     for block_idx in range(num_transformer_blocks):

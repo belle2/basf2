@@ -622,7 +622,6 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
   TCanvas cchi(Form("cchi_%s", suffix.data()), "cchi", 700, 600);
   cchi.Divide(2, 2);
   cchi.cd(1);
-  bghigh = m_bgBins;
   FormatGraph(grchicos, 0, Form("all (%s) bg bins, p =(%0.02f, %0.02f)", pdg.data(), m_bgMin * mass, m_bgMax * mass));
   FormatGraph(grchicosn, 1);
   grchicos.Draw("AP");
@@ -651,7 +650,6 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
 
   cchi.cd(4);
   bglow = int(2 * m_bgBins / 3);
-  bghigh = m_bgBins;
   FormatGraph(grchicos2, 0, Form("third 1/3 bg bins, p =(%0.02f, %0.02f)", bglow * bgstep * mass, m_bgMax * mass));
   FormatGraph(grchicos2n, 1);
   grchicos2.Draw("AP");
@@ -669,6 +667,7 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
   lchi.Draw("same");
 
   cchi.cd(2);
+  bghigh = int(m_bgBins / 3);
   FormatGraph(grsigmacos_1b3bg, 2, Form("first 1/3 bg bins, p =(%0.02f, %0.02f)", m_bgMin * mass, bghigh * bgstep * mass));
   FormatGraph(grsigmacos_1b3bgn, 1);
   grsigmacos_1b3bg.Draw("AP");
@@ -677,6 +676,8 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
   lchi.Draw("same");
 
   cchi.cd(3);
+  bglow = int(m_bgBins / 3);
+  bghigh = int(2 * m_bgBins / 3);
   FormatGraph(grsigmacos_2b3bg, 2, Form("second 1/3 bg bins, p =(%0.02f, %0.02f)", bglow * bgstep * mass, bghigh * bgstep * mass));
   FormatGraph(grsigmacos_2b3bgn, 1);
   grsigmacos_2b3bg.Draw("AP");
@@ -685,6 +686,7 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
   lchi.Draw("same");
 
   cchi.cd(4);
+  bglow = int(2 * m_bgBins / 3);
   FormatGraph(grsigmacos2, 2, Form("third 1/3 bg bins, p =(%0.02f, %0.02f)", bglow * bgstep * mass, m_bgMax * mass));
   FormatGraph(grsigmacos2n, 1);
   grsigmacos2.Draw("AP");

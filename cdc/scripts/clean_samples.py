@@ -43,7 +43,7 @@ def make_muon_collection(path_muon):
         oneDCell=True)
     # Creating a particle list with basic cuts
 
-    goodTrack = 'abs(dr) < 0.5 and abs(dz) < 0.5 and nCDCHits > 0'  # and pCDC > 0.050'
+    goodTrack = 'abs(dr) < 0.5 and abs(dz) < 0.5 and nCDCHits > 0'
     goodTrack += ' and clusterE < 0.40 and clusterEoP < 0.40 and inCDCAcceptance==1'
     goodTrack += ' and [[pidMissingProbabilityExpert(KLM) == 1 and clusterE < 0.25] or pidMissingProbabilityExpert(KLM) == 0]'
 

@@ -29,6 +29,10 @@
 #include <cdc/calibration/CDCdEdx/HadronBgPrep.h>
 
 namespace Belle2 {
+
+  /**
+  * Class to prepare sample for hadron saturation calibration
+  */
   class HadronPrep {
 
   public:
@@ -86,10 +90,15 @@ namespace Belle2 {
 
   private:
 
-    std::map<int, std::vector<double>> m_sumcos, m_sumbg, m_means, m_errors;  /**< variables for mean and error  */
+    std::map<int, std::vector<double>> m_sumcos;  /**< variables to add cos values */
+    std::map<int, std::vector<double>> m_sumbg; /**< variables to add bg values */
+    std::map<int, std::vector<double>> m_means; /**< mean variable */
+    std::map<int, std::vector<double>> m_errors;  /**< error variable  */
+
     std::map<int, std::vector<int>> m_sumsize; /**< variables for size  */
 
-    double m_dedxmax = 0.0, m_dedxmin = 99999999.0; /**< variables to set minimum and maximum dedx mean  */
+    double m_dedxmax = 0.0; /**< variables to set maximum dedx mean  */
+    double m_dedxmin = 99999999.0; /**< variables to set minimum dedx mean  */
 
     int m_bgBins; /**< bins for dedx histogram */
     double m_bgMin; /**< min range of dedx */

@@ -36,6 +36,9 @@
 
 namespace Belle2 {
 
+  /**
+  * Class to perform the fitting in beta gamma bins
+  */
   class HadronCalibration {
 
   public:

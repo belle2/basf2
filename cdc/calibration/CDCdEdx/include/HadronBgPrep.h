@@ -32,6 +32,10 @@
 enum gstatus {OK, Failed};
 
 namespace Belle2 {
+
+  /**
+  * Class to prepare sample for fitting in beta gamma bins
+  */
   class HadronBgPrep {
 
   public:
@@ -162,8 +166,15 @@ namespace Belle2 {
 
   private:
 
-    std::vector<double> m_sumcos, m_sumbg, m_sumres_square, m_suminj, m_means, m_errors; /**< variables for bg  */
-    std::vector<int> m_sumsize, m_injsize; /**< variables for injection time  */
+    std::vector<double> m_sumcos; /**< variables to add cos values */
+    std::vector<double> m_sumbg;  /**< variables to add bg values */
+    std::vector<double> m_sumres_square;  /**< variables to add square of resolution */
+    std::vector<double> m_suminj; /**< variables to add injection time */
+    std::vector<double> m_means;  /**< mean variable */
+    std::vector<double> m_errors; /**< error variable  */
+
+    std::vector<int> m_sumsize; /**< size of the bg bins  */
+    std::vector<int> m_injsize; /**< size of the injection bins  */
 
     int m_bgBins; /**< bins for bg  */
     double m_bgMin; /**< min range of bg */

@@ -107,7 +107,7 @@ double HadronSaturation::myFunction(double alpha, double gamma, double delta, do
   // changes as a function of beta gamma...
   CDCDedxHadSat hadsat;
 
-  double dedxcor = 0;
+  double dedxcor;
   for (unsigned int i = 0; i < nevt; i++) {
 
     dedxcor = hadsat.D2I(m_costheta[i], hadsat.I2D(m_costheta[i], 1.0, alpha, gamma, delta, power, ratio) * m_dedx[i], alpha, gamma,
@@ -160,12 +160,11 @@ HadronSaturation::fitSaturation()
   minimizer->SetParameter(3, "power", m_power, gRandom->Rndm() * 0.01, 0.05, 2.5);
   minimizer->SetParameter(4, "ratio", m_ratio, gRandom->Rndm() * 0.01, 0.5, 2);
   minimizer->FixParameter(2);
-  // minimizer->FixParameter(3);
   minimizer->FixParameter(4);
 
   // Set minuit fitting strategy
   double arg[10];
-  arg[0] = 2;
+
   double strategy(2.);
   minimizer->ExecuteCommand("SET STRAT", &strategy, 1);
 
@@ -179,9 +178,6 @@ HadronSaturation::fitSaturation()
   double eps_machine(std::numeric_limits<double>::epsilon());
   minimizer->ExecuteCommand("SET EPS", &eps_machine, 1);
 
-  // Minimize with MIGRAD
-  arg[0] = 10000;
-
   double fitpar[5], fiterr[5];
 
   for (int i = 0; i < 30; ++i) {
@@ -192,18 +188,15 @@ HadronSaturation::fitSaturation()
     minimizer->SetParameter(3, "power", m_power, gRandom->Rndm() * 0.01, 0.05, 2.5);
     minimizer->SetParameter(4, "ratio", m_ratio, gRandom->Rndm() * 0.01, 0.5, 2);
     minimizer->FixParameter(2);
-    // minimizer->FixParameter(3);
     minimizer->FixParameter(4);
 
     double maxcalls(5000.), tolerance(0.1);
     double arglist[] = {maxcalls, tolerance};
     unsigned int nargs(2);
-    int status = minimizer->ExecuteCommand("MIGRAD", arglist, nargs);
-    status = minimizer->ExecuteCommand("MIGRAD", arglist, nargs);
-    status = minimizer->ExecuteCommand("HESSE", arglist, nargs);
+    minimizer->ExecuteCommand("MIGRAD", arglist, nargs);
+    minimizer->ExecuteCommand("MIGRAD", arglist, nargs);
+    int status = minimizer->ExecuteCommand("HESSE", arglist, nargs);
 
-    // int status = minimizer->ExecuteCommand("MIGRAD", arg, 1);
-    // status = minimizer->ExecuteCommand("MIGRAD", arg, 1);
     minimizer->PrintResults(1, 0);
     B2INFO("\t iter = " << i << ": Fit status: " << status);
 
@@ -218,7 +211,7 @@ HadronSaturation::fitSaturation()
       // minimizer->FixParameter(3);
       minimizer->FixParameter(4);
       counter++;
-      status = minimizer->ExecuteCommand("MIGRAD", arglist, nargs);
+      minimizer->ExecuteCommand("MIGRAD", arglist, nargs);
       status = minimizer->ExecuteCommand("HESSE", arglist, nargs);
       B2INFO("\t re-Fit iter: " << counter  << ", status code: " << status);
     }
@@ -227,7 +220,6 @@ HadronSaturation::fitSaturation()
       B2INFO("\t HadronSaturation::ERROR - BAD FIT!");
       return;
     }
-    if (status == 0) break;
   }
 
   for (int par = 0; par < 5; ++par) {

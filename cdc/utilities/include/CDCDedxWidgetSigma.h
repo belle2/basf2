@@ -11,17 +11,31 @@
 #include <math.h>
 
 namespace Belle2 {
+
+  /**
+  * Class to hold the beta-gamma (bg) resolution function
+  */
   class CDCDedxWidgetSigma {
 
   public:
 
+    /**
+    * Constructor
+    */
     CDCDedxWidgetSigma() {};
+
+    /**
+    * Destructor
+    */
     virtual ~CDCDedxWidgetSigma() {};
 
+    /**
+    * calculate the predicted sigma value as a function of beta-gamma (bg)
+    * this is done with a different function depending dE/dx, nhit, and cos(theta)
+    */
     double sigmaCurve(double* x, const double* par) const
     {
-      // calculate the predicted mean value as a function of beta-gamma (bg)
-      // this is done with a different function depending dE/dx, nhit, and cos(theta)
+
       double f = 0;
 
       if (par[0] == 1) { // return dedx parameterization
@@ -42,10 +56,13 @@ namespace Belle2 {
       return f;
     }
 
+    /**
+    *  Opertaor to call mean function
+    */
     double operator()(double* x, double* par)
     {
       return sigmaCurve(x, par);
     }
 
   };
-}
+}  // Belle2 namespace

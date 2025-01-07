@@ -210,7 +210,6 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, std:
     // --------------------------------------------------
     double dedxnosat;    // dE/dx without hadron saturation correction
     double p;       // track momentum
-    double bg;      // track beta-gamma
     double costh;   // cosine of track polar angle
     double timereso;
     int nhits;       // number of hits on this track
@@ -263,7 +262,7 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, std:
     for (unsigned int index = 0; index < hadron->GetEntries(); ++index) {
 
       hadron->GetEvent(index);
-
+      double bg;      // track beta-gamma
       bg = fabs(p) / mass;
 
       if (fabs(p) > 8.0)continue;   //unphysical tracks
@@ -279,8 +278,7 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, std:
 
       if (particle == "electron" || particle == "muon") {if (fabs(p) > 2.0) continue;}
 
-      double dedx_new = dedxnosat;
-      dedx_new = had.D2I(costh, had.I2D(costh, 1.0) * dedxnosat);
+      double dedx_new = had.D2I(costh, had.I2D(costh, 1.0) * dedxnosat);
 
       double dedx_cur = mgpar.getMean(bg);
 

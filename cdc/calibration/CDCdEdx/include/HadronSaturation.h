@@ -24,6 +24,9 @@
 
 namespace Belle2 {
 
+  /**
+  * Class to perform the hadron saturation calibration
+  */
   class HadronSaturation {
 
   public:
@@ -80,18 +83,18 @@ namespace Belle2 {
 
   private:
 
-    int m_cosbins;  /*< the number of cosine bins */
+    int m_cosbins;  /**< the number of cosine bins */
 
-    double m_alpha; /*< the alpha parameter for the hadron saturation correction */
-    double m_gamma; /*< the gamma parameter for the hadron saturation correction */
-    double m_delta; /*< the delta parameter for the hadron saturation correction */
-    double m_power; /*< the power parameter for the hadron saturation correction */
-    double m_ratio; /*< the ratio parameter for the hadron saturation correction */
+    double m_alpha; /**< the alpha parameter for the hadron saturation correction */
+    double m_gamma; /**< the gamma parameter for the hadron saturation correction */
+    double m_delta; /**< the delta parameter for the hadron saturation correction */
+    double m_power; /**< the power parameter for the hadron saturation correction */
+    double m_ratio; /**< the ratio parameter for the hadron saturation correction */
 
-    std::vector< double > m_dedx;      /*< a vector to hold dE/dx measurements */
-    std::vector< double > m_dedxerror; /*< a vector to hold dE/dx errors */
-    std::vector< double > m_betagamma; /*< a vector to hold beta-gamma values */
-    std::vector< double > m_costheta;  /*< a vector to hold cos(theta) values */
+    std::vector< double > m_dedx;      /**< a vector to hold dE/dx measurements */
+    std::vector< double > m_dedxerror; /**< a vector to hold dE/dx errors */
+    std::vector< double > m_betagamma; /**< a vector to hold beta-gamma values */
+    std::vector< double > m_costheta;  /**< a vector to hold cos(theta) values */
 
   };
 }

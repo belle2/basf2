@@ -100,9 +100,9 @@ namespace Belle2 {
 
   private:
 
-    double m_dedxpars[2]; // parameters for sigma vs. dE/dx curve
-    double m_cospars[10]; // parameters for sigma vs. cos(theta) curve
-    double m_nhitpars[5]; // parameters for sigma vs. nhit curve
+    double m_dedxpars[2]; /**< parameters for sigma vs. dE/dx curve */
+    double m_cospars[10]; /**< parameters for sigma vs. cos(theta) curve */
+    double m_nhitpars[5]; /**< parameters for sigma vs. nhit curve */
 
     const DBObjPtr<CDCDedxSigmaPars> m_DBSigmaPars; /**< db object for dE/dx resolution parameters */
 

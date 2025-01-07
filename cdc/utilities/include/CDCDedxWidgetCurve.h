@@ -11,17 +11,32 @@
 #include <math.h>
 
 namespace Belle2 {
+
+  /**
+  * Class to hold the beta-gamma (bg) mean function
+  */
+
   class CDCDedxWidgetCurve {
 
   public:
 
+    /**
+    * Constructor
+    */
     CDCDedxWidgetCurve() {};
+
+    /**
+    * Destructor
+    */
     virtual ~CDCDedxWidgetCurve() {};
 
+
+    /**
+    * calculate the predicted mean value as a function of beta-gamma (bg)
+    * this is done with a different function depending on the value of bg
+    */
     double meanCurve(double* x, double* par) const
     {
-      // calculate the predicted mean value as a function of beta-gamma (bg)
-      // this is done with a different function depending on the value of bg
       double f = 0;
 
       if (par[0] == 1)
@@ -35,10 +50,13 @@ namespace Belle2 {
       return f;
     }
 
+    /**
+    *  Opertaor to call mean function
+    */
     double operator()(double* x, double* par)
     {
       return meanCurve(x, par);
     }
 
   };
-}
+} // Belle2 namespace

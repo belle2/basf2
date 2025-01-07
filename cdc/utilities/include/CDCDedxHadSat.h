@@ -60,11 +60,11 @@ namespace Belle2 {
 
   private:
 
-    double m_alpha; /*< the alpha parameter for the hadron saturation correction */
-    double m_gamma; /*< the gamma parameter for the hadron saturation correction */
-    double m_delta; /*< the delta parameter for the hadron saturation correction */
-    double m_power; /*< the power parameter for the hadron saturation correction */
-    double m_ratio; /*< the ratio parameter for the hadron saturation correction */
+    double m_alpha; /**< the alpha parameter for the hadron saturation correction */
+    double m_gamma; /**< the gamma parameter for the hadron saturation correction */
+    double m_delta; /**< the delta parameter for the hadron saturation correction */
+    double m_power; /**< the power parameter for the hadron saturation correction */
+    double m_ratio; /**< the ratio parameter for the hadron saturation correction */
 
     DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< db object for dE/dx hadron saturation parameters */
 

@@ -155,7 +155,8 @@ namespace Belle2 {
 
     bool m_ismakePlots; /**< produce plots for monitoring */
 
-    std::string  m_bgsigma, m_bgcurve;  /**< string for parameter file names */
+    std::string m_bgsigma;  /**< string for sigma parameter file names */
+    std::string m_bgcurve;  /**< string for mean parameter file names */
     std::string m_suffix; /**< string suffix for object names */
 
     int m_iter = 5;  /**< set number of iteration */

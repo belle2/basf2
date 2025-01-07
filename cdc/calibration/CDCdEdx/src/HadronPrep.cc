@@ -68,7 +68,6 @@ void HadronPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, s
 
   double dedxnosat;    // dE/dx w/o HS correction (use to get new parameters)
   double p;       // track momentum
-  double bg;      // track beta-gamma
   double costh;   // cosine of track polar angle
   double timereso;
   int nhit;       // number of hits on this track
@@ -102,7 +101,9 @@ void HadronPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, s
 
     hadron->GetEvent(index);
 
+    double bg;      // track beta-gamma
     bg = fabs(p) / mass;
+
     double uncosth = costh;
     costh = fabs(costh);
 
@@ -194,15 +195,10 @@ void HadronPrep::plotDist(std::map<int, std::vector<TH1F*>>& hist, std::string s
       hist[i][j]->Draw();
 
       if (m_cosBins <= 4) {
-        if (j + 1 == m_cosBins)ctmp.Print(psname.str().c_str());
-      } else {
-        if ((j + 1) % 4 == 0) {
-          ctmp.Print(psname.str().c_str());
-          ctmp.Clear("D");
-        } else if (((j + 1) % 4 != 0) && (j + 1 == m_cosBins)) {
-          ctmp.Print(psname.str().c_str());
-          ctmp.Clear("D");
-        }
+        if (j + 1 == m_cosBins) ctmp.Print(psname.str().c_str());
+      } else if ((j + 1) % 4 == 0 || (j + 1 == m_cosBins)) {
+        ctmp.Print(psname.str().c_str());
+        ctmp.Clear("D");
       }
     }
   }

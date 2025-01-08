@@ -32,6 +32,7 @@ REG_MODULE(Pi0VetoEfficiencySystematics);
 Pi0VetoEfficiencySystematicsModule::Pi0VetoEfficiencySystematicsModule() : Module()
 {
   setDescription("Includes data/MC weights for pi0 veto efficiency as extraInfo for a given particle list. One must call writeP0EtaVeto function in advance. Weights and their errors will be provided for given mode and threshold.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   std::vector<std::string> emptylist;
   addParam("particleLists", m_ParticleLists, "input particle lists", emptylist);

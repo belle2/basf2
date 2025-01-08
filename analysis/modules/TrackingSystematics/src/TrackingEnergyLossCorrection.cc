@@ -34,6 +34,7 @@ TrackingEnergyLossCorrectionModule::TrackingEnergyLossCorrectionModule() : Modul
 The module modifies the input particleLists by subtracting the correction value to the track energy and rescaling the momenta
 		     
 		     )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("correction", m_correction, "correction value to be subtracted from the particle energy",

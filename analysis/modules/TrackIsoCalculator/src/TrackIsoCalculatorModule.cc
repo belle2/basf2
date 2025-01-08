@@ -24,6 +24,7 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
   // Set module properties
   setDescription(
     R"DOC(Calculate track isolation variables on the charged stable particles, or selected charged daughters, of the input ParticleList.)DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("decayString",

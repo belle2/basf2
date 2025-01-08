@@ -34,6 +34,7 @@ TrackingEfficiencyModule::TrackingEfficiencyModule() : Module()
 The module modifies the input particleLists by randomly removing tracks with the probability frac.
 		     
 		     )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("frac", m_frac, "probability to remove the particle", 0.0);

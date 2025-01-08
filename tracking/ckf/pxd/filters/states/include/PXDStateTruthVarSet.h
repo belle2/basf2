@@ -67,9 +67,12 @@ namespace Belle2 {
     MCUtil m_mcUtil;
 
     /// Only use a fraction of background events for recording for MVA training
-    bool m_UseFractionOfBackground = true;
+    bool m_UseFractionOfBackground = false;
 
     /// Fraction of background to use in case m_UseFractionOfBackground is true
+    ///   The default value of 0.001 was chosen as it creates a roughly balanced training
+    ///   data set in case NO PXD data reduction is performed. With PXD data reduction the
+    ///   value must be larger to obtain a balanced data set.
     double m_BackgroundFraction = 0.001;
   };
 }

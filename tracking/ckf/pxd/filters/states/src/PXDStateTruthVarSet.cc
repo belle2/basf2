@@ -73,7 +73,7 @@ void PXDStateTruthVarSet::exposeParameters(ModuleParamList* moduleParamList, con
                                 m_UseFractionOfBackground);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "backgroundFraction"), m_BackgroundFraction,
-                                "Fraction of background hits and combinations to be usedn in recording to improve the signal fraction in the recording if " + \
+                                "Fraction of background hits and combinations to be used in recording to improve the signal fraction in the recording if " + \
                                 TrackFindingCDC::prefixed(prefix, "useFractionOfBackground") + " is true.",
                                 m_BackgroundFraction);
 }

@@ -77,8 +77,7 @@ def get_calibrations(input_data, **kwargs):
     if payload_boundaries:
         basf2.B2INFO('Found payload_boundaries: set collector granularity to run')
     # call collector module
-    col = basf2.register_module("CDCBadwirecollector",
-                                effStudy=True)
+    col = basf2.register_module("CDCBadwirecollector")
     # call algorighm
     algo = Belle2.CDC.WireEfficiencyAlgorithm()
     algo.setInputFileNames("histo_badwire.root")

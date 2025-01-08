@@ -76,6 +76,6 @@ namespace Belle2 {
   private:
 
     /** ROOT Macro.*/
-    ClassDefOverride(AlignableSVDRecoHit, 2);
+    ClassDefOverride(AlignableSVDRecoHit, 3);
   };
 }

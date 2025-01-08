@@ -55,7 +55,7 @@ K_L0 and kinematic constraints of the initial state.
            "Input DecayDescriptor string.");
   addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
   addParam("maximumNumberOfCandidates", m_maximumNumberOfCandidates,
-           "Don't reconstruct channel if more candidates than given are produced.", -1);
+           "Don't reconstruct channel if more candidates than given are produced.", 10000);
   addParam("decayMode", m_decayModeID, "User-specified decay mode identifier (saved in 'decayModeID' extra-info for each Particle)",
            0);
   addParam("writeOut", m_writeOut,

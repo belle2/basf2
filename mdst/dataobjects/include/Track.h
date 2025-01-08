@@ -232,10 +232,6 @@ namespace Belle2 {
 
   private:
 
-    /** Bitmap of the track status, contains information on the refining stage
-    */
-    unsigned short int m_statusBitmap = 0;
-
     /** Index list of the TrackFitResults associated with this Track. */
     short int m_trackFitIndices[Const::ChargedStable::c_SetSize];
 
@@ -255,7 +251,12 @@ namespace Belle2 {
     /** Track time, computed as the difference between outgoing/ingoing arm time and the SVDEvent T0 */
     float m_trackTime = std::numeric_limits<float>::quiet_NaN();
 
-    ClassDefOverride(Track, 6); /**< Class that bundles various TrackFitResults. */
+    /** Bitmap of the track status, contains information on the refining stage
+    */
+    unsigned short int m_statusBitmap = 0;
+
+    ClassDefOverride(Track, 7); /**< Class that bundles various TrackFitResults. */
+    // version 7: reorder class members to improve memory layout
 
     friend class FixMergedObjectsModule;
     friend class PostMergeUpdaterModule;

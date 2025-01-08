@@ -255,6 +255,9 @@ def test_folder(location, run_type, exp_number, phase, passthrough=False,
                      EventsOfDoomBuster module by inflating the number of CDC hits
     """
 
+    # The beam tests always fail on buildbot with a permission error
+    if run_type == constants.RunTypes.beam and not b2test_utils.is_ci():
+        b2test_utils.skip_test("Test not runnable on build bot because of permission issue.")
     # The test is already run in a clean, temporary directory
     temp_dir = os.getcwd()
     prepare_path = os.environ["BELLE2_PREPARE_PATH"]

@@ -39,7 +39,7 @@ from prompt.calibrations.caf_klm_channel_status import settings as caf_klm_chann
 # Test with experiment 12 physics data:
 # ~350000 events correspond to ~1300000 Millepede entries.
 settings = CalibrationSettings(name="KLM alignmnent",
-                               expert_username="oskin",
+                               expert_username="nbrenny",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["raw_physics", "raw_cosmic"],

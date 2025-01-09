@@ -43,6 +43,51 @@ class NanToNum(keras.layers.Layer):
         return config
 
 
+class ColumnEmbedding(keras.layers.Layer):
+    def __init__(
+        self,
+        sequence_length,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.sequence_length = int(sequence_length)
+        self.initializer = keras.initializers.get("glorot_uniform")
+
+    def get_config(self):
+        config = super().get_config()
+        config.update(
+            {
+                "sequence_length": self.sequence_length,
+                "initializer": keras.initializers.serialize(self.initializer),
+            }
+        )
+        return config
+
+    def build(self, inputs_shape):
+        feature_size = inputs_shape[-1]
+        self.position_embeddings = self.add_weight(
+            name="embeddings",
+            shape=[self.sequence_length, feature_size],
+            initializer=self.initializer,
+            trainable=True,
+        )
+        self.built = True
+
+    def call(self, inputs, start_index=0):
+        shape = keras.ops.shape(inputs)
+        feature_length = shape[-1]
+        sequence_length = shape[-2]
+        # trim to match the length of the input sequence, which might be less
+        # than the sequence_length of the layer.
+        position_embeddings = keras.ops.convert_to_tensor(self.position_embeddings)
+        position_embeddings = keras.ops.slice(
+            position_embeddings,
+            (start_index, 0),
+            (sequence_length, feature_length),
+        )
+        return keras.ops.broadcast_to(position_embeddings, shape)
+
+
 def get_preprocessor(X):
     """
     Configure and adapt preprocessor on data X
@@ -116,7 +161,7 @@ def get_tflat_model(parameters, number_of_features):
     """
     num_transformer_blocks = 3
     num_heads = 4
-    embedding_dims = 16
+    embedding_dims = 8
     mlp_hidden_units_factors = [2, 1,]
     dropout_rate = 0.2
     use_column_embedding = True
@@ -138,11 +183,8 @@ def get_tflat_model(parameters, number_of_features):
 
     # Add column embedding to feature embeddings.
     if use_column_embedding:
-        column_embedding = keras.layers.Embedding(
-            input_dim=num_columns, output_dim=embedding_dims
-        )
-        column_indices = keras.ops.arange(start=0, stop=num_columns, step=1)
-        encoded_features = encoded_features + column_embedding(column_indices)
+        column_embeddings = ColumnEmbedding(sequence_length=num_columns)(encoded_features)
+        encoded_features = encoded_features + column_embeddings
 
     # Create multiple layers of the Transformer block.
     for block_idx in range(num_transformer_blocks):

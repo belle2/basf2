@@ -43,6 +43,7 @@ EnergyBiasCorrectionModule::EnergyBiasCorrectionModule() : Module()
 The module modifies the input particleLists by scaling energy as given by the scale in the LookUpTable
 		     
 		     )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("tableName", m_tableName, "ID of table used for reweighing");

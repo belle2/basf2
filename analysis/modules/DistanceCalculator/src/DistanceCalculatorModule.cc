@@ -30,6 +30,7 @@ DistanceCalculatorModule::DistanceCalculatorModule() : Module(),
 {
   // Set module properties
   setDescription("Calculates distance between two vertices, distance of closest approach between a vertex and a track, distance of closest approach between two tracks, distance of closest approach between a vertex/track and Btube");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("listName", m_listName, "", std::string(""));

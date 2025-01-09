@@ -23,6 +23,7 @@ REG_MODULE(NeutralHadronMatcher);
 NeutralHadronMatcherModule::NeutralHadronMatcherModule() : Module()
 {
   setDescription("Perform geometrical match between MC neutral hadron (given by mcPDG) and ECL clusters from the particleLists");
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("particleLists", m_ParticleLists, "Input particle list");
   addParam("efficiencyCorrection", m_effcorr, "data/mc efficiency ratio", 0.83);
   addParam("distanceCut", m_distance, "Matching distance", 15.0);

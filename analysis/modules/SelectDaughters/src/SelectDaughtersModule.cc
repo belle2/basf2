@@ -32,6 +32,7 @@ SelectDaughtersModule::SelectDaughtersModule() : Module()
 {
   // Set module properties
   setDescription("SelectDaughters");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   //Parameter definitions
   addParam("listName", m_listName, "name of particle list", string(""));

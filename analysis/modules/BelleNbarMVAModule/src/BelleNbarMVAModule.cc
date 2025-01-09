@@ -31,6 +31,7 @@ BelleNbarMVAModule::BelleNbarMVAModule() : Module(), m_model()
 {
   setDescription(
     R"DOC(Apply nbarMVA for Belle I, a DNN trained with ECLCluster variables for discrimination of anti-neutrons against photons. Anti-neutron-like particles have scores closer to 1; photon-like particles have scores closer to 0.)DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("identifier", m_identifier, "Identifier of the MVA", std::string(""));
   addParam("particleList", m_particleList, "ParticleList to apply the MVA", std::string(""));
 }

@@ -47,11 +47,12 @@ class ColumnEmbedding(keras.layers.Layer):
     def __init__(
         self,
         sequence_length,
+        initializer="glorot_uniform",
         **kwargs,
     ):
         super().__init__(**kwargs)
         self.sequence_length = int(sequence_length)
-        self.initializer = keras.initializers.get("glorot_uniform")
+        self.initializer = keras.initializers.get(initializer)
 
     def get_config(self):
         config = super().get_config()

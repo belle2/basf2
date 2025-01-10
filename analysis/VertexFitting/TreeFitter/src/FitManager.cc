@@ -24,8 +24,7 @@ namespace TreeFitter {
   FitManager::FitManager(Belle2::Particle* particle,
                          const ConstraintConfiguration& config,
                          double prec,
-                         bool updateDaughters,
-                         const bool useReferencing
+                         bool updateDaughters
                         ) :
     m_particle(particle),
     m_decaychain(nullptr),
@@ -35,7 +34,6 @@ namespace TreeFitter {
     m_updateDaugthers(updateDaughters),
     m_ndf(0),
     m_fitparams(nullptr),
-    m_useReferencing(useReferencing),
     m_config(config)
   {
     m_decaychain = new DecayChain(particle, config, false);
@@ -70,7 +68,7 @@ namespace TreeFitter {
       for (niter = 0; niter < nitermax && !finished; ++niter) {
         if (niter == 0) {
           m_errCode = m_decaychain->filter(*m_fitparams);
-        } else if (m_useReferencing) {
+        } else {
           auto* tempState = new FitParams(*m_fitparams);
           m_errCode = m_decaychain->filterWithReference(*m_fitparams, *tempState);
           delete tempState;

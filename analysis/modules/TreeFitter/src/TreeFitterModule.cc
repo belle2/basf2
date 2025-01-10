@@ -78,9 +78,6 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            0);
   addParam("expertRemoveConstraintList", m_removeConstraintList,
            "Type::[string]. List of constraints that you do not want to be used in the fit. WARNING don't use if you don't know exactly what it does.", {});
-  addParam("expertUseReferencing", m_useReferencing,
-           "Type::[bool]. Use the Extended Kalman Filter. This implementation linearises around the previous state vector which gives smoother convergence.",
-           true);
   addParam("inflationFactorCovZ", m_inflationFactorCovZ,
            "Inflate the covariance of the beamspot by this number so that the 3d beam constraint becomes weaker in Z.And: thisnumber->infinity : dim(beamspot constr) 3d->2d.",
            1);
@@ -241,8 +238,7 @@ bool TreeFitterModule::fitTree(Particle* head)
       head,
       constrConfig,
       m_precision,
-      m_updateDaughters,
-      m_useReferencing
+      m_updateDaughters
     )
   );
   bool rc = TreeFitter->fit();

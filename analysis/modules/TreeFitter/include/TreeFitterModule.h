@@ -112,9 +112,6 @@ namespace Belle2 {
      * */
     bool m_customOrigin;
 
-    /** linearise around a previous state of the Kalman Filter */
-    bool m_useReferencing;
-
     /** vertex coordinates of the custom origin  */
     std::vector<double> m_customOriginVertex;
 

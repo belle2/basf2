@@ -144,16 +144,38 @@ void CKFToPXDFindlet::apply()
 
   for (const uint layer : {2, 1}) {
     B2DEBUG(29, "layer" << layer);
-    std::vector<CKFToPXDState> statesOnLayer;
+    std::vector<CKFToPXDState> usedStates;
     std::vector<const SpacePoint*> usedSpacePoints = m_spacePointVector;
 
+    // Remove all hits that are not on the layer we are interested in
     const auto notOnLayer = [layer](const SpacePoint * spacePoint) {
       return spacePoint->getVxdID().getLayerNumber() != layer;
     };
     TrackFindingCDC::erase_remove_if(usedSpacePoints, notOnLayer);
 
-    m_stateCreatorFromHits.apply(usedSpacePoints, statesOnLayer);
-    m_relationCreator.apply(m_seedStates, statesOnLayer, m_relations);
+    // Only use subset of hit SpacePoints for inter hit state relation creation if they were used in the previous iteration
+    if (layer == 1 and m_relations.size() > 0) {
+      std::vector<const SpacePoint*> toSpacePoints;
+      toSpacePoints.reserve(m_spacePointVector.size());
+
+      for (const auto& relation : m_relations) {
+        // hit state pointers are the "To"s in the relation, only take those
+        const auto it = std::find(toSpacePoints.begin(), toSpacePoints.end(), relation.getTo()->getHit());
+        if (it == toSpacePoints.end()) {
+          toSpacePoints.push_back(relation.getTo()->getHit());
+        }
+      }
+      // add SpacePoints used in previous iteration to the set of SpacePoints to be used in next step
+      usedSpacePoints.reserve(usedSpacePoints.size() + toSpacePoints.size());
+      for (const auto sp : toSpacePoints) {
+        usedSpacePoints.push_back(sp);
+      }
+    }
+
+    m_stateCreatorFromHits.apply(usedSpacePoints, usedStates);
+    // Clear relation vector as we don't want to build up on the previous relations but start fresh
+    checkResizeClear<TrackFindingCDC::WeightedRelation<CKFToPXDState>>(m_relations, 2000);
+    m_relationCreator.apply(m_seedStates, usedStates, m_relations);
 
     B2DEBUG(29, "Created " << m_relations.size() << " relations.");
 

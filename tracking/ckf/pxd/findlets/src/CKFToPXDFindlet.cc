@@ -145,15 +145,14 @@ void CKFToPXDFindlet::apply()
   for (const uint layer : {2, 1}) {
     B2DEBUG(29, "layer" << layer);
     std::vector<CKFToPXDState> statesOnLayer;
-    std::vector<const SpacePoint*> spacePointsOnLayer;
-    spacePointsOnLayer.reserve(m_spacePointVector.size());
+    std::vector<const SpacePoint*> usedSpacePoints = m_spacePointVector;
 
     const auto notOnLayer = [layer](const SpacePoint * spacePoint) {
       return spacePoint->getVxdID().getLayerNumber() != layer;
     };
-    TrackFindingCDC::erase_remove_if(spacePointsOnLayer, notOnLayer);
+    TrackFindingCDC::erase_remove_if(usedSpacePoints, notOnLayer);
 
-    m_stateCreatorFromHits.apply(spacePointsOnLayer, statesOnLayer);
+    m_stateCreatorFromHits.apply(usedSpacePoints, statesOnLayer);
     m_relationCreator.apply(m_seedStates, statesOnLayer, m_relations);
 
     B2DEBUG(29, "Created " << m_relations.size() << " relations.");

@@ -179,7 +179,7 @@ void CKFToPXDFindlet::apply()
 
     B2DEBUG(29, "Created " << m_relations.size() << " relations.");
 
-    m_treeSearchFindlet.apply(m_seedStates, statesOnLayer, m_relations, m_results);
+    m_treeSearchFindlet.apply(m_seedStates, usedStates, m_relations, m_results);
   }
 
   B2DEBUG(29, "Having found " << m_results.size() << " results before overlap check");

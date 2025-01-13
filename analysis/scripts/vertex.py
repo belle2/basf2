@@ -225,6 +225,7 @@ def treeFit(
     massConstraint=[],
     ipConstraint=False,
     updateAllDaughters=False,
+    massConstraintDecayString='',
     customOriginConstraint=False,
     customOriginVertex=[0.001, 0, 0.0116],
     customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
@@ -260,6 +261,11 @@ def treeFit(
             The value of 0 rejects the particle candidates with failed fit.
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
         ipConstraint (bool): constrain head production vertex to IP (x-y-z) constraint
+        updateAllDaughters (bool): if true the entire tree will be updated with the fitted values
+            for momenta and vertex position. Otherwise only the momenta of the head of the tree will be updated,
+            however for all daughters we also update the vertex position with the fit results as this would
+            otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
+        massConstraintDecayString (str): Decay string to select which particles' mass should be constrained
         customOriginConstraint (bool): use a custom origin vertex as the production vertex of your particle.
             This is useful when fitting D*/D without wanting to fit a B but constraining the process to be B-decay-like.
             (think of semileptonic modes and stuff with a neutrino in the B decay).
@@ -267,10 +273,6 @@ def treeFit(
             Default numbers are taken for B-mesons
         customOriginCovariance (list(float)): 3x3 covariance matrix for the custom vertex (type: vector).
             Default numbers extracted from generator distribution width of B-mesons.
-        updateAllDaughters (bool): if true the entire tree will be updated with the fitted values
-            for momenta and vertex position. Otherwise only the momenta of the head of the tree will be updated,
-            however for all daughters we also update the vertex position with the fit results as this would
-            otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
         originDimension (int): If the origin or IP constraint (``customOriginVertex`` or ``ipConstraint``) are used,
             this specifies the dimension of the constraint (3D or 2D).
         treatAsInvisible (str): Decay string to select one particle that will be treated as invisible in the fit.
@@ -294,6 +296,7 @@ def treeFit(
     treeFitter.param('originDimension', originDimension)
     treeFitter.param('treatAsInvisible', treatAsInvisible)
     treeFitter.param('ignoreFromVertexFit', ignoreFromVertexFit)
+    treeFitter.param('massConstraintDecayString', massConstraintDecayString)
     path.add_module(treeFitter)
 
 

@@ -39,6 +39,8 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            0.01);
   addParam("massConstraintList", m_massConstraintList,
            "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).", {});
+  addParam("massConstraintDecayString", m_massConstraintDecayString,
+           "Type::[string]. Decay string to select which particles' mass should be constrained to their nominal value. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).", {});
 
   addParam("geoConstraintList", m_geoConstraintListPDG,
            "Type::[int], if 'autoSetGeoConstraintAndMergeVertices==False' you can manually set the particles that will be geometrically constrained here.", {});
@@ -94,6 +96,14 @@ void TreeFitterModule::initialize()
   m_particles.isRequired();
   m_nCandidatesBeforeFit = 0;
   m_nCandidatesAfter = 0;
+
+  if (!m_massConstraintDecayString.empty()) {
+    if (!m_massConstraintList.empty())
+      B2ERROR("TreeFitterModule::initialize Either provide a decay string or a list of particles to determine which particles' mass should be constrained not both!");
+    bool valid = m_pDDescriptorMassConstraint.init(m_massConstraintDecayString);
+    if (!valid)
+      B2ERROR("TreeFitterModule::initialize Invalid decay descriptor: " << m_massConstraintDecayString);
+  }
 
   if (!m_treatAsInvisible.empty()) {
     bool valid = m_pDDescriptorInvisible.init(m_treatAsInvisible);
@@ -156,6 +166,20 @@ void TreeFitterModule::event()
 
     if (m_updateDaughters == true) {
       ParticleCopy::copyDaughters(particle);
+    }
+
+    if (!m_massConstraintDecayString.empty()) {
+      std::vector<const Particle*> selParticlesMassConstraint = m_pDDescriptorMassConstraint.getSelectionParticles(particle);
+      size_t nSelParticlesMassConstraint = selParticlesMassConstraint.size();
+      for (size_t i = 0; i < nSelParticlesMassConstraint; ++i) {
+        Particle* selParticle = m_particles[selParticlesMassConstraint[i]->getArrayIndex()];
+        Particle* selParticleCopy = ParticleCopy::copyParticle(selParticle);
+        selParticleCopy->writeExtraInfo("treeFitterMassConstraint", 1);
+
+        bool isReplaced = particle->replaceDaughterRecursively(selParticle, selParticleCopy);
+        if (!isReplaced)
+          B2ERROR("TreeFitterModule::event Cannot find particle selected in " << m_massConstraintDecayString);
+      }
     }
 
     if (!m_treatAsInvisible.empty()) {

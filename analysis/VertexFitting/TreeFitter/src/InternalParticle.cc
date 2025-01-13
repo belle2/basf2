@@ -59,7 +59,8 @@ namespace TreeFitter {
     }
 
     m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
-                                 std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end();
+                                 std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end()
+                       or m_particle->hasExtraInfo("treeFitterMassConstraint");
 
     m_beamconstraint = (std::abs(m_particle->getPDGCode()) == config.m_beamConstraintPDG);
 

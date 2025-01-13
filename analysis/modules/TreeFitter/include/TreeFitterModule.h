@@ -146,11 +146,17 @@ namespace Belle2 {
     /** beam covariance matrix */
     Eigen::Matrix<double, 4, 4> m_beamCovariance;
 
-    /** decay string to select one particle that will be treated as invisible */
-    std::string  m_treatAsInvisible;
+    /** decay string to select particles that will be mass-constrained */
+    std::string m_massConstraintDecayString;
 
-    /** decay string to select one particle that will be ignored to determine the vertex position */
-    std::string  m_ignoreFromVertexFit;
+    /** decay string to select one particle that will be treated as invisible */
+    std::string m_treatAsInvisible;
+
+    /** decay string to select particles that will be ignored to determine the vertex position */
+    std::string m_ignoreFromVertexFit;
+
+    /** Decay descriptor of the mass constrained particles */
+    DecayDescriptor m_pDDescriptorMassConstraint;
 
     /** Decay descriptor of the invisible particle */
     DecayDescriptor m_pDDescriptorInvisible;

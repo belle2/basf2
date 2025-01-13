@@ -26,13 +26,16 @@ class TestTreeFits(unittest.TestCase):
         main = basf2.create_path()
 
         inputfile = b2test_utils.require_file(
-            'analysis/1000_B_DstD0Kpi_skimmed.root', 'validation', py_case=self)
+            'analysis/1000_B_DstD0Kpipi0_skimmed.root', 'validation', py_case=self)
         ma.inputMdst(inputfile, path=main)
 
         ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
         ma.fillParticleList('K+:a', 'kaonID > 0.5', path=main)
 
-        ma.reconstructDecay('D0:rec -> K-:a pi+:a', '', 0, path=main)
+        ma.fillParticleList('gamma:a', 'E > 0.08', path=main)
+        ma.reconstructDecay('pi0:a -> gamma:a gamma:a', '0.125 < InvM < 0.145', 0, path=main)
+
+        ma.reconstructDecay('D0:rec -> K-:a pi+:a pi0:a', '', 0, path=main)
         ma.reconstructDecay('D*+:rec -> D0:rec pi+:a', '', 0, path=main)
         ma.reconstructDecay('B0:rec -> D*+:rec pi-:a', ' InvM > 5', 0, path=main)
         ma.matchMCTruth('B0:rec', path=main)
@@ -41,10 +44,8 @@ class TestTreeFits(unittest.TestCase):
         main.add_module('TreeFitter',
                         particleList='B0:rec',
                         confidenceLevel=conf,
-                        massConstraintList=[],
-                        expertUseReferencing=True,
-                        ipConstraint=True,
-                        originDimension=2,
+                        massConstraintList=[111],
+                        ipConstraint=False,
                         updateAllDaughters=False)
 
         ntupler = basf2.register_module('VariablesToNtuple')
@@ -73,9 +74,9 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(falsePositives <= 1595, f"Background rejection {falsePositives} out of {allBkg}")
+        self.assertTrue(falsePositives < 3038, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
 
-        self.assertTrue(truePositives == 156, f"Signal rejection too high {truePositives} out of {allSig}")
+        self.assertTrue(truePositives > 63, "Signal rejection too high")
         self.assertFalse(mustBeZero, f"We should have dropped all candidates with confidence level less than {conf}.")
 
         print("Test passed, cleaning up.")

@@ -44,10 +44,14 @@ class TestTreeFits(unittest.TestCase):
         main.add_module('TreeFitter',
                         particleList='B0:rec',
                         confidenceLevel=conf,
-                        massConstraintList=[111],
-                        expertUseReferencing=True,
+                        massConstraintList=[],
                         ipConstraint=False,
-                        updateAllDaughters=False)
+                        updateAllDaughters=False,
+                        customOriginConstraint=True,
+                        # just to test this doesn't crash
+                        customOriginVertex=[0, 0, 0],
+                        customOriginCovariance=[1, 0, 0, 0, 1, 0, 0, 0, 1]
+                        )
 
         ntupler = basf2.register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)
@@ -75,9 +79,9 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(falsePositives < 3038, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
+        self.assertTrue(falsePositives < 3032, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
 
-        self.assertTrue(truePositives > 63, "Signal rejection too high")
+        self.assertTrue(truePositives > 64, "Signal rejection too high")
         self.assertFalse(mustBeZero, f"We should have dropped all candidates with confidence level less than {conf}.")
 
         print("Test passed, cleaning up.")

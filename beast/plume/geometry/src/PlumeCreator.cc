@@ -189,9 +189,8 @@ namespace Belle2 {
 
 
       G4String symbol, name;
-      G4double a, zz;
+      G4double a;
       G4double density;
-      G4int ncomponents;
       a = 1.01 * CLHEP::g / CLHEP::mole;
       G4Element* elH  = new G4Element("Hydrogen", "H", 1., a);
       a = 12.01 * CLHEP::g / CLHEP::mole;

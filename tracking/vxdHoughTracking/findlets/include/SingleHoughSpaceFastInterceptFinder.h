@@ -76,7 +76,7 @@ namespace Belle2 {
       uint m_maxRecursionLevel = 9;
 
       /// number of sectors of the Hough Space on the horizontal axis
-      uint m_nAngleSectors = 256;
+      uint m_nAngleSectors = 512;
 
       /// number of sectors of the Hough Space on the vertical axis
       uint m_nVerticalSectors = 512;
@@ -92,11 +92,11 @@ namespace Belle2 {
       /// minimum cluster size of sectors belonging to intercepts in the Hough Space
       uint m_MinimumHSClusterSize = 1;
       /// maximum cluster size of sectors belonging to intercepts in the Hough Space
-      uint m_MaximumHSClusterSize = 10;
+      uint m_MaximumHSClusterSize = 12;
       /// maximum cluster size in x of sectors belonging to intercepts in the Hough Space
       uint m_MaximumHSClusterSizeX = 2;
       /// maximum cluster size in y of sectors belonging to intercepts in the Hough Space
-      uint m_MaximumHSClusterSizeY = 10;
+      uint m_MaximumHSClusterSizeY = 12;
 
       // class variables
       /// HS unit size in x

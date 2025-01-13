@@ -89,9 +89,9 @@ The calibration uses only ``RawSVD``, which is unpacked and converted to :ref:`S
 
 For the calibration we build 1D occupancy distributions per sensor-side. Per each sensor-side we loop over the strips and classify them as hot based on their occupancy. The criteria to classify the strips as the following are based on three parameters:
 
-#. the absolute occupancy threshold. The default is 0.2. A strip is tag as hot if its occupancy is higher than 0.2 (i.e. 20%).;
-#. the relative occupancy threshold. It is relative to the average occupancy per sensor-side or chip. The default is 5. A strip is tag as hot if its occupancy is higher than 5 times the average occupancy, by default;
-#. a parameter used to select the strips to compute the average occupancy. By default it is `False` and the average occupancy per sensor-side is computed. Set `True` to compute the average occupancy per chip (considering 128 strips).
+#. the absolute occupancy threshold. The default is **0.2**. A strip is tagged as hot if its occupancy is higher than 0.2 (i.e. 20%).;
+#. the relative occupancy threshold. It is relative to the average occupancy per sensor-side or chip. The default is **5**. A strip is tagged as hot if its occupancy is higher than 5 times the average occupancy, by default;
+#. a parameter used to select the strips to compute the average occupancy. By default it is `False` and the average occupancy per sensor-side is computed. Set `True` to compute the average occupancy per chip (128 strips/chip are considered in this case).
 
 The calibration steps are the following:
 

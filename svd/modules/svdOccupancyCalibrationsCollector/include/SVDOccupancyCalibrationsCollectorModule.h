@@ -15,8 +15,8 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <string>
-#include "TH1F.h"
-#include "TTree.h"
+#include <TH1F.h>
+#include <TTree.h>
 
 namespace Belle2 {
   /**

@@ -375,7 +375,9 @@ namespace TreeFitter {
   ErrCode ParticleBase::projectMassConstraintParticle(const FitParams& fitparams,
                                                       Projection& p) const
   {
-    const double mass = particle()->getPDGMass();
+    double mass = 0;
+    if (particle()->hasExtraInfo("treeFitterMassConstraintValue")) mass = particle()->getExtraInfo("treeFitterMassConstraintValue");
+    else mass = particle()->getPDGMass();
     const double mass2 = mass * mass;
     const int momindex = momIndex();
     const double px = fitparams.getStateVector()(momindex);

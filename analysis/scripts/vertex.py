@@ -226,6 +226,7 @@ def treeFit(
     ipConstraint=False,
     updateAllDaughters=False,
     massConstraintDecayString='',
+    massConstraintMassValues=[],
     customOriginConstraint=False,
     customOriginVertex=[0.001, 0, 0.0116],
     customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
@@ -266,6 +267,10 @@ def treeFit(
             however for all daughters we also update the vertex position with the fit results as this would
             otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
         massConstraintDecayString (str): Decay string to select which particles' mass should be constrained
+        massConstraintMassValues (list(float, int, str)): list of invariant masses to be used for the mass constraints
+            of the particles selected via the decay string massConstraintDecayString. A floating point value is taken directly
+            while an integer or string is interpreted as defining the PDG id or name of a particle
+            and the corresponding PDG value is taken
         customOriginConstraint (bool): use a custom origin vertex as the production vertex of your particle.
             This is useful when fitting D*/D without wanting to fit a B but constraining the process to be B-decay-like.
             (think of semileptonic modes and stuff with a neutrino in the B decay).
@@ -280,12 +285,12 @@ def treeFit(
         path (basf2.Path): modules are added to this path
     """
 
-    from pdg import from_names
+    import pdg
 
     treeFitter = register_module("TreeFitter")
     treeFitter.set_name('TreeFitter_' + list_name)
     if massConstraint:
-        treeFitter.param('massConstraintList', from_names(massConstraint))
+        treeFitter.param('massConstraintList', pdg.from_names(massConstraint))
     treeFitter.param('particleList', list_name)
     treeFitter.param('confidenceLevel', conf_level)
     treeFitter.param('ipConstraint', ipConstraint)
@@ -297,6 +302,9 @@ def treeFit(
     treeFitter.param('treatAsInvisible', treatAsInvisible)
     treeFitter.param('ignoreFromVertexFit', ignoreFromVertexFit)
     treeFitter.param('massConstraintDecayString', massConstraintDecayString)
+    if massConstraintMassValues:
+        treeFitter.param('massConstraintMassValues', [
+                pdg.get(item).Mass() if isinstance(item, (int, str)) else item for item in massConstraintMassValues])
     path.add_module(treeFitter)
 
 

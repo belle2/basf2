@@ -146,6 +146,12 @@ namespace Belle2 {
     /** beam covariance matrix */
     Eigen::Matrix<double, 4, 4> m_beamCovariance;
 
+    /** use PDG values for mass constraints */
+    bool m_usePDGMassForMassConstraint;
+
+    /** list of values for mass constraints */
+    std::vector<double> m_massConstraintMassValues;
+
     /** decay string to select particles that will be mass-constrained */
     std::string m_massConstraintDecayString;
 

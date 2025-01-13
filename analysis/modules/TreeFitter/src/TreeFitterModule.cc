@@ -96,10 +96,10 @@ void TreeFitterModule::initialize()
   m_nCandidatesAfter = 0;
 
   if (!m_treatAsInvisible.empty()) {
-    bool valid = m_pDDescriptorInvisibles.init(m_treatAsInvisible);
+    bool valid = m_pDDescriptorInvisible.init(m_treatAsInvisible);
     if (!valid)
       B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_treatAsInvisible);
-    else if (m_pDDescriptorInvisibles.getSelectionPDGCodes().size() != 1)
+    else if (m_pDDescriptorInvisible.getSelectionPDGCodes().size() != 1)
       B2ERROR("TreeFitterModule::initialize Please select exactly one particle to ignore: " << m_treatAsInvisible);
   }
 
@@ -108,7 +108,6 @@ void TreeFitterModule::initialize()
     if (!valid)
       B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_ignoreFromVertexFit);
   }
-
 }
 
 void TreeFitterModule::beginRun()
@@ -160,7 +159,7 @@ void TreeFitterModule::event()
     }
 
     if (!m_treatAsInvisible.empty()) {
-      std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisibles.getSelectionParticles(particle);
+      std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisible.getSelectionParticles(particle);
       Particle* targetD = m_particles[selParticlesTarget[0]->getArrayIndex()];
       Particle* daughterCopy = ParticleCopy::copyParticle(targetD);
       daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);

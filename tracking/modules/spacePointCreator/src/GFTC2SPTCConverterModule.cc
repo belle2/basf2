@@ -15,6 +15,8 @@
 
 #include <algorithm> // count, sort, etc...
 
+#include <boost/tuple/tuple_comparison.hpp>
+
 using namespace Belle2;
 
 REG_MODULE(GFTC2SPTCConverter);

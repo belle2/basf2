@@ -38,7 +38,6 @@
 #include <framework/datastore/RelationVector.h>
 
 #include <framework/logging/Logger.h>
-#include <boost/algorithm/string.hpp>
 
 #include <iostream>
 

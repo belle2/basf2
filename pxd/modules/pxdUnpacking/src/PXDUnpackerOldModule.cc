@@ -14,8 +14,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <boost/endian/arithmetic.hpp>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;

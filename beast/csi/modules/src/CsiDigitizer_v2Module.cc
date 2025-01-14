@@ -11,13 +11,12 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/core/RandomNumbers.h>
 
 #include <TMath.h>
+#include <TRandom.h>
 
 //c++
 #include <string>
-#include <fstream>
 #include <vector>
 
 using namespace std;

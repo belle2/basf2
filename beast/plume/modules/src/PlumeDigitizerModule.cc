@@ -13,11 +13,9 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/GearDir.h>
 
 //c++
 #include <string>
-#include <fstream>
 
 using namespace std;
 using namespace Belle2;

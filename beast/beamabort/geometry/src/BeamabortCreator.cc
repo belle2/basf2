@@ -11,7 +11,6 @@
 
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
 #include <cmath>

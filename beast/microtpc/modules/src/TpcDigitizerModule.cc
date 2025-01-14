@@ -13,8 +13,9 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Const.h>
-#include <framework/core/RandomNumbers.h>
 #include <framework/geometry/B2Vector3.h>
+
+#include <TRandom.h>
 
 //c++
 #include <cmath>

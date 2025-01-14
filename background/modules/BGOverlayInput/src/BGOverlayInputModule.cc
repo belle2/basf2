@@ -19,7 +19,6 @@
 
 /* ROOT headers. */
 #include <TClonesArray.h>
-#include <TFile.h>
 #include <TRandom.h>
 
 /* C++ headers. */

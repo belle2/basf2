@@ -11,6 +11,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
+#include <TF1.h>
 #include <TH2D.h>
 
 using namespace Belle2;

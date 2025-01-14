@@ -8,10 +8,7 @@
 
 #include <cdc/modules/CDCDedxPID/CDCDedxPIDModule.h>
 
-#include <reconstruction/dataobjects/DedxConstants.h>
 #include <cdc/modules/CDCDedxPID/LineHelper.h>
-
-#include <framework/gearbox/Const.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
@@ -20,6 +17,10 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
+
+#include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+#include <reconstruction/dataobjects/DedxConstants.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 
 #include <genfit/AbsTrackRep.h>

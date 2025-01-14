@@ -8,7 +8,15 @@
 
 #include <cdc/modules/CDCDedxDQM/CDCDedxDQM.h>
 
+#include <cdc/geometry/CDCGeometryPar.h>
+
+#include <analysis/utility/ReferenceFrame.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dbobjects/BeamSpot.h>
+
 #include <TDirectory.h>
+#include <TMath.h>
 
 using namespace Belle2;
 

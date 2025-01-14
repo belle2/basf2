@@ -9,10 +9,7 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/database/DBArray.h>
-#include <framework/database/DBObjPtr.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
@@ -20,9 +17,6 @@
 #include <mdst/dataobjects/TRGSummary.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/HitPatternVXD.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <rawdata/dataobjects/RawCDC.h>

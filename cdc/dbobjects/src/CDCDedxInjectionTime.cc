@@ -8,6 +8,9 @@
 
 #include <cdc/dbobjects/CDCDedxInjectionTime.h>
 
+#include <TCanvas.h>
+#include <TH1F.h>
+
 using namespace Belle2;
 
 void CDCDedxInjectionTime::printCorrection(std::string svar, std::string sfx) const

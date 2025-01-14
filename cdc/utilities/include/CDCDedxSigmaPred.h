@@ -10,13 +10,9 @@
 
 #include <framework/database/DBObjPtr.h>
 
-#include <cdc/dbobjects/CDCDedxMeanPars.h>
 #include <cdc/dbobjects/CDCDedxSigmaPars.h>
 
 #include <vector>
-
-#include <memory>
-#include <cmath>
 
 namespace Belle2 {
 

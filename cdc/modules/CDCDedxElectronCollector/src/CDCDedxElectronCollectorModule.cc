@@ -8,6 +8,7 @@
 
 #include <cdc/modules/CDCDedxElectronCollector/CDCDedxElectronCollectorModule.h>
 
+#include <mdst/dataobjects/ECLCluster.h>
 
 #include <TTree.h>
 #include <TH1D.h>

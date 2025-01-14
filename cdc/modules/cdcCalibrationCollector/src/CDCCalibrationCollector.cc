@@ -10,7 +10,6 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <genfit/TrackPoint.h>

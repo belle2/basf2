@@ -8,18 +8,14 @@
 
 #include "cdc/modules/cdcCalibrationCollector/CDCFudgeFactorCalibrationCollector.h"
 #include "analysis/utility/PCmsLabTransform.h"
-#include <framework/dataobjects/Helix.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/variables/PIDVariables.h>
-#include <Math/ProbFuncMathCore.h>
 
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;

@@ -8,6 +8,15 @@
 
 #include <cdc/calibration/CDCdEdx/CDCDedxInjectTimeAlgorithm.h>
 
+#include <cdc/utilities/CDCDedxMeanPred.h>
+#include <cdc/utilities/CDCDedxSigmaPred.h>
+
+#include <framework/gearbox/Const.h>
+
+#include <TCanvas.h>
+#include <TF1.h>
+#include <TLegend.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------

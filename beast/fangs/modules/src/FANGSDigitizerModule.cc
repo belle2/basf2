@@ -9,10 +9,10 @@
 #include <beast/fangs/modules/FANGSDigitizerModule.h>
 #include <beast/fangs/dataobjects/FANGSSimHit.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/core/RandomNumbers.h>
+
+#include <TRandom.h>
 
 //c++
 #include <cmath>

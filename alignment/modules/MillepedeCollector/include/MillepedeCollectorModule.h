@@ -10,7 +10,6 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <calibration/CalibrationCollectorModule.h>
-#include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/geometry/B2Vector3.h>

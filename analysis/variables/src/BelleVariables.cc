@@ -16,23 +16,15 @@
 #include <analysis/variables/Variables.h>
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/ECLVariables.h>
-#include <analysis/variables/TrackVariables.h>
 #include <analysis/variables/V0DaughterTrackVariables.h>
 #include <mdst/dataobjects/Track.h>
-#include <analysis/variables/VertexVariables.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
-#include <framework/database/DBObjPtr.h>
-#include <mdst/dbobjects/BeamSpot.h>
-
-#include <framework/datastore/StoreArray.h>
 #include <b2bii/dataobjects/BelleTrkExtra.h>
 
 #include <TVectorF.h>
-
-#include <limits>
 
 namespace Belle2 {
   namespace Variable {

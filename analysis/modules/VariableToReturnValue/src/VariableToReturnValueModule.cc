@@ -8,10 +8,7 @@
 
 #include <analysis/modules/VariableToReturnValue/VariableToReturnValueModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
-
-#include <cmath>
 
 using namespace Belle2;
 

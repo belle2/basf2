@@ -13,13 +13,11 @@
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/Conversion.h>
 
 #include <TMatrixFSym.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
 

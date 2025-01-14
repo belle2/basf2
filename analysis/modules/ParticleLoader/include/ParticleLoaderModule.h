@@ -26,13 +26,11 @@
 
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 #include <vector>
 #include <tuple>
 #include <string>
-#include <memory>
 
 namespace Belle2 {
 

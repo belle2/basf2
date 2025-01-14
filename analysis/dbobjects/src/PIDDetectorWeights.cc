@@ -6,7 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <framework/gearbox/Unit.h>
 #include <analysis/dbobjects/PIDDetectorWeights.h>
 
 using namespace Belle2;

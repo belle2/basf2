@@ -11,9 +11,6 @@
 // Root
 #include <TObject.h>
 
-/* C++ headers. */
-#include <map>
-
 // basf2
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
 

@@ -6,8 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <iostream>
-
 #include <analysis/modules/TwoBodyISRPhotonCorrector/TwoBodyISRPhotonCorrectorModule.h>
 
 #include <analysis/dataobjects/Particle.h>
@@ -21,8 +19,6 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
 #include <TDatabasePDG.h>
-
-#include <algorithm>
 
 using namespace Belle2;
 

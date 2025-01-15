@@ -9809,8 +9809,6 @@ Decay K_S0
 0.000344328   pi-  e+  nu_e                                PHSP;
 Enddecay
 
-# K_L0 is decayed in GEANT
-
 # K0
 Decay K0
 0.500000000   K_L0                                         PHSP;

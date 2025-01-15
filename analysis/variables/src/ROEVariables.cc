@@ -1711,7 +1711,8 @@ namespace Belle2 {
       std::string mode;
       mode = arguments[0];
 
-      if (mode != "standard" and mode != "tight" and mode != "cluster" and mode != "both")
+      if (mode != "standard" and mode != "tight" and mode != "cluster" and mode != "both" and mode != "standardMC15rd"
+          and mode != "tightMC15rd")
         B2ERROR("the given argument is not supported in pi0Prob!");
 
       auto func = [mode](const Particle * particle) -> double {
@@ -1751,6 +1752,24 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return Const::doubleNaN;
           }
+        } else if (mode == "standardMC15rd")
+        {
+          if (particle->hasExtraInfo("Pi0ProbOriginMC15rd")) {
+            return particle->getExtraInfo("Pi0ProbOriginMC15rd");
+          } else {
+            B2WARNING("Pi0ProbOriginMC15rd is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return Const::doubleNaN;
+          }
+        } else if (mode == "tightMC15rd")
+        {
+          if (particle->hasExtraInfo("Pi0ProbTightEnergyThresholdMC15rd")) {
+            return particle->getExtraInfo("Pi0ProbTightEnergyThresholdMC15rd");
+          } else {
+            B2WARNING("Pi0ProbTightEnergyThresholdMC15rd is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return Const::doubleNaN;
+          }
         } else
         {
           return Const::doubleNaN;
@@ -1767,7 +1786,8 @@ namespace Belle2 {
       std::string mode;
       mode = arguments[0];
 
-      if (mode != "standard" and mode != "tight" and mode != "cluster" and mode != "both")
+      if (mode != "standard" and mode != "tight" and mode != "cluster" and mode != "both" and mode != "standardMC15rd"
+          and mode != "tightMC15rd")
         B2ERROR("the given argument is not supported in etaProb!");
 
       auto func = [mode](const Particle * particle) -> double {
@@ -1804,6 +1824,24 @@ namespace Belle2 {
             return particle->getExtraInfo("EtaProbTightEnergyThresholdAndLargeClusterSize");
           } else {
             B2WARNING("EtaProbTightEnergyThresholdAndLargeClusterSize is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return Const::doubleNaN;
+          }
+        } else if (mode == "standardMC15rd")
+        {
+          if (particle->hasExtraInfo("EtaProbOriginMC15rd")) {
+            return particle->getExtraInfo("EtaProbOriginMC15rd");
+          } else {
+            B2WARNING("EtaProbOriginMC15rd is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return Const::doubleNaN;
+          }
+        } else if (mode == "tightMC15rd")
+        {
+          if (particle->hasExtraInfo("EtaProbTightEnergyThresholdMC15rd")) {
+            return particle->getExtraInfo("EtaProbTightEnergyThresholdMC15rd");
+          } else {
+            B2WARNING("EtaProbTightEnergyThresholdMC15rd is not registerted in extraInfo! \n"
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return Const::doubleNaN;
           }

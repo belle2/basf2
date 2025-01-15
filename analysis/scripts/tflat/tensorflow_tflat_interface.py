@@ -92,11 +92,6 @@ def load(obj):
     Load Tensorflow model into state
     """
 
-    gpus = tf.config.list_physical_devices('GPU')
-    if gpus:
-        for gpu in gpus:
-            tf.config.experimental.set_memory_growth(gpu, True)
-
     with tempfile.TemporaryDirectory() as path:
         file_names = obj[0]
         for file_index, file_name in enumerate(file_names):

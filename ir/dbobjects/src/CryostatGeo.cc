@@ -20,7 +20,7 @@ void CryostatGeo::initialize(const GearDir& content)
 
   addParameter("LimitStepLength", content.getInt("LimitStepLength"));
 
-  std::vector<std::string> names = {"CrossingAngle", "TubeR", "TubeR2", "TubeL", "A1spc1", "A1spc2", "B1spc1", "B1spc2", "D1spc1", "E1spc1", "C1wal1", "F1wal1", "APSR9", "APSR10", "APSR11", "APSR12", "APSL9", "APSL10", "APSL11", "APSL12"};
+  std::vector<std::string> names = {"CrossingAngle", "TubeR", "TubeR2", "TubeL", "A1spc1", "A1spc2", "B1spc1", "B1spc2", "D1spc1", "E1spc1", "C1wal1", "F1wal1", "BellowsShield"};
 
   for (auto name : names) {
     GearDir sect(content, name + "/");

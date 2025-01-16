@@ -3787,7 +3787,6 @@
       </Shield>
 
       <ACSL>
-         <Enable>0</Enable>
          <sec name="X0" unit="m">0.0</sec>
          <sec name="Y0" unit="m">1.070</sec>
          <sec name="Z0" unit="m">-3.460</sec>
@@ -3826,7 +3825,6 @@
       </ACSL>
  
       <ACSR1>
-         <Enable>0</Enable>
          <sec name="X0" unit="m">0.515</sec>
          <sec name="Y0" unit="m">0.866</sec>
          <sec name="Z0" unit="m">4.519</sec>
@@ -3847,7 +3845,6 @@
       </ACSR1>
 
       <ACSR2>
-         <Enable>0</Enable>
          <sec name="X0" unit="m">-0.510</sec>
          <sec name="Y0" unit="m">0.866</sec>
          <sec name="Z0" unit="m">4.511</sec>
@@ -3867,7 +3864,6 @@
       </ACSR2>
 
       <APSL1>
-         <Enable>0</Enable>
          <sec name="W" unit="m">2.52</sec>
          <sec name="H" unit="m">1.23</sec>
          <sec name="L" unit="m">0.08</sec>
@@ -3885,7 +3881,6 @@
       </APSL1>
 
       <APSL2>
-         <Enable>0</Enable>
          <sec name="W" unit="m">2.52</sec>
          <sec name="H" unit="m">1.32</sec>
          <sec name="L" unit="m">0.08</sec>
@@ -3903,7 +3898,6 @@
       </APSL2>
 
       <APSR1>
-         <Enable>0</Enable>
          <sec name="W" unit="m">2.52</sec>
          <sec name="H" unit="m">1.23</sec>
          <sec name="L" unit="m">0.08</sec>
@@ -3921,7 +3915,6 @@
       </APSR1>
 
       <APSR2>
-         <Enable>0</Enable>
          <sec name="W" unit="m">2.52</sec>
          <sec name="H" unit="m">1.32</sec>
          <sec name="L" unit="m">0.08</sec>
@@ -3937,250 +3930,6 @@
          <Material>G4_POLYETHYLENE</Material>
          <Desc>Additional polyethylene shield right, part 2</Desc>
       </APSR2>
-
-      <APSR3>
-         <Enable>0</Enable>
-         <N desc="Number of planes">6</N>
-         <sec name="Z0" unit="cm">130</sec>
-         <sec name="Z1" unit="cm">163.5</sec>
-         <sec name="Z2" unit="cm">163.5</sec>
-         <sec name="Z3" unit="cm">206.5</sec>
-         <sec name="Z4" unit="cm">206.5</sec>
-         <sec name="Z5" unit="cm">230</sec>
-         <sec name="r0" unit="cm">27</sec>
-         <sec name="r1" unit="cm">27</sec>
-         <sec name="r2" unit="cm">27</sec>
-         <sec name="r3" unit="cm">27</sec>
-         <sec name="r4" unit="cm">27</sec>
-         <sec name="r5" unit="cm">27</sec>
-         <sec name="R0" unit="cm">33</sec>
-         <sec name="R1" unit="cm">33</sec>
-         <sec name="R2" unit="cm">29.5</sec>
-         <sec name="R3" unit="cm">29.5</sec>
-         <sec name="R4" unit="cm">33</sec>
-         <sec name="R5" unit="cm">33</sec>
-         <Material>G4_POLYETHYLENE</Material>
-         <Desc>Additional polyethylene shield between QCS and ARICH right (inner layer)</Desc>
-      </APSR3>
-
-      <APSL3>
-         <Enable>0</Enable>
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">-86</sec>
-         <sec name="Z1" unit="cm">-132</sec>
-         <sec name="r0" unit="cm">21</sec>
-         <sec name="r1" unit="cm">25.7</sec>
-         <sec name="R0" unit="cm">24</sec>
-         <sec name="R1" unit="cm">28.7</sec>
-         <Material>G4_POLYETHYLENE</Material>
-         <Desc>Additional polyethylene shield between QCS and CDC left (inner layer)</Desc>
-      </APSL3>
-
-      <APSR4>
-         <Enable>0</Enable>
-         <N desc="Number of planes">10</N>
-         <sec name="Z0" unit="cm">130</sec>
-         <sec name="Z1" unit="cm">162.71</sec>
-         <sec name="Z2" unit="cm">162.71</sec>
-         <sec name="Z3" unit="cm">163.50</sec>
-         <sec name="Z4" unit="cm">163.50</sec>
-         <sec name="Z5" unit="cm">206.50</sec>
-         <sec name="Z6" unit="cm">206.50</sec>
-         <sec name="Z7" unit="cm">207.29</sec>
-         <sec name="Z8" unit="cm">207.29</sec>
-         <sec name="Z9" unit="cm">230</sec>
-         <sec name="r0" unit="cm">27</sec>
-         <sec name="r1" unit="cm">27</sec>
-         <sec name="r2" unit="cm">27</sec>
-         <sec name="r3" unit="cm">27</sec>
-         <sec name="r4" unit="cm">27</sec>
-         <sec name="r5" unit="cm">27</sec>
-         <sec name="r6" unit="cm">27</sec>
-         <sec name="r7" unit="cm">27</sec>
-         <sec name="r8" unit="cm">27</sec>
-         <sec name="r9" unit="cm">27</sec>
-         <sec name="R0" unit="cm">33</sec>
-         <sec name="R1" unit="cm">33</sec>
-         <sec name="R2" unit="cm">33</sec>
-         <sec name="R3" unit="cm">33</sec>
-         <sec name="R4" unit="cm">29.5</sec>
-         <sec name="R5" unit="cm">29.5</sec>
-         <sec name="R6" unit="cm">33</sec>
-         <sec name="R7" unit="cm">33</sec>
-         <sec name="R8" unit="cm">33</sec>
-         <sec name="R9" unit="cm">33</sec>
-         <Material>G4_POLYETHYLENE</Material>
-         <Desc>Additional polyethylene shield between QCS and ARICH right (outer layer)</Desc>
-      </APSR4>
-
-      <APSL4>
-         <Enable>0</Enable>
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">-86</sec>
-         <sec name="Z1" unit="cm">-132</sec>
-         <sec name="r0" unit="cm">21</sec>
-         <sec name="r1" unit="cm">25.7</sec>
-         <sec name="R0" unit="cm">24</sec>
-         <sec name="R1" unit="cm">28.7</sec>
-         <Material>G4_POLYETHYLENE</Material>
-         <Desc>Additional polyethylene shield between QCS and CDC left (outer layer)</Desc>
-      </APSL4>
-
-      <APSR5>
-         <Enable>0</Enable>
-         <N desc="Number of planes">13</N>
-         <sec name="Z0"  unit="cm">63.35</sec>
-         <sec name="Z1"  unit="cm">95.24</sec>
-         <sec name="Z2"  unit="cm">100.51</sec>
-         <sec name="Z3"  unit="cm">100.51</sec>
-         <sec name="Z4"  unit="cm">101.30</sec>
-         <sec name="Z5"  unit="cm">101.30</sec>
-         <sec name="Z6"  unit="cm">103.01</sec>
-         <sec name="Z7"  unit="cm">103.01</sec>
-         <sec name="Z8"  unit="cm">103.80</sec>
-         <sec name="Z9"  unit="cm">103.80</sec>
-         <sec name="Z10" unit="cm">120.51</sec>
-         <sec name="Z11" unit="cm">127.05</sec>
-         <sec name="Z12" unit="cm">230.00</sec>
-         <sec name="r0"  unit="cm">12.75</sec>
-         <sec name="r1"  unit="cm">22.50</sec>
-         <sec name="r2"  unit="cm">22.50</sec>
-         <sec name="r3"  unit="cm">22.50</sec>
-         <sec name="r4"  unit="cm">22.50</sec>
-         <sec name="r5"  unit="cm">24.50</sec>
-         <sec name="r6"  unit="cm">24.50</sec>
-         <sec name="r7"  unit="cm">24.50</sec>
-         <sec name="r8"  unit="cm">24.50</sec>
-         <sec name="r9"  unit="cm">25.00</sec>
-         <sec name="r10" unit="cm">25.00</sec>
-         <sec name="r11" unit="cm">27.00</sec>
-         <sec name="r12" unit="cm">27.00</sec>
-         <sec name="R0"  unit="cm">13.54</sec>
-         <sec name="R1"  unit="cm">23.29</sec>
-         <sec name="R2"  unit="cm">23.29</sec>
-         <sec name="R3"  unit="cm">25.29</sec>
-         <sec name="R4"  unit="cm">25.29</sec>
-         <sec name="R5"  unit="cm">25.29</sec>
-         <sec name="R6"  unit="cm">25.29</sec>
-         <sec name="R7"  unit="cm">25.79</sec>
-         <sec name="R8"  unit="cm">25.79</sec>
-         <sec name="R9"  unit="cm">25.79</sec>
-         <sec name="R10" unit="cm">25.79</sec>
-         <sec name="R11" unit="cm">27.79</sec>
-         <sec name="R12" unit="cm">27.79</sec>
-         <Material>G4_POLYETHYLENE</Material>
-         <Desc>Additional polyethylene shield between QCS and ARICH right (inner layer, extended)</Desc>
-      </APSR5>
-
-      <APSL5>
-         <Enable>0</Enable>
-         <N desc="Number of planes">8</N>
-         <sec name="Z0" unit="cm">-62.73</sec>
-         <sec name="Z1" unit="cm">-73.05</sec>
-         <sec name="Z2" unit="cm">-73.05</sec>
-         <sec name="Z3" unit="cm">-73.84</sec>
-         <sec name="Z4" unit="cm">-73.84</sec>
-         <sec name="Z5" unit="cm">-84.876</sec>
-         <sec name="Z6" unit="cm">-131.836</sec>
-         <sec name="Z7" unit="cm">-147.75</sec>
-         <sec name="r0" unit="cm">13.305</sec>
-         <sec name="r1" unit="cm">17.050</sec>
-         <sec name="r2" unit="cm">17.050</sec>
-         <sec name="r3" unit="cm">17.518</sec>
-         <sec name="r4" unit="cm">20.750</sec>
-         <sec name="r5" unit="cm">20.750</sec>
-         <sec name="r6" unit="cm">25.500</sec>
-         <sec name="r7" unit="cm">25.500</sec>
-         <sec name="R0" unit="cm">14.095</sec>
-         <sec name="R1" unit="cm">17.840</sec>
-         <sec name="R2" unit="cm">21.540</sec>
-         <sec name="R3" unit="cm">21.540</sec>
-         <sec name="R4" unit="cm">21.540</sec>
-         <sec name="R5" unit="cm">21.540</sec>
-         <sec name="R6" unit="cm">26.290</sec>
-         <sec name="R7" unit="cm">26.290</sec>
-
-         <Material>G4_POLYETHYLENE</Material>
-         <Desc>Additional polyethylene shield between QCS and CDC left (inner layer, extended)</Desc>
-      </APSL5>
-
-      <APSR6>
-         <Enable>0</Enable>
-         <N desc="Number of planes">13</N>
-         <sec name="Z0"  unit="cm">63.35</sec>
-         <sec name="Z1"  unit="cm">95.24</sec>
-         <sec name="Z2"  unit="cm">100.19</sec>
-         <sec name="Z3"  unit="cm">100.19</sec>
-         <sec name="Z4"  unit="cm">100.51</sec>
-         <sec name="Z5"  unit="cm">100.51</sec>
-         <sec name="Z6"  unit="cm">102.69</sec>
-         <sec name="Z7"  unit="cm">102.69</sec>
-         <sec name="Z8"  unit="cm">103.01</sec>
-         <sec name="Z9"  unit="cm">103.01</sec>
-         <sec name="Z10" unit="cm">120.51</sec>
-         <sec name="Z11" unit="cm">127.05</sec>
-         <sec name="Z12" unit="cm">230.00</sec>
-         <sec name="r0"  unit="cm">13.54</sec>
-         <sec name="r1"  unit="cm">23.29</sec>
-         <sec name="r2"  unit="cm">23.29</sec>
-         <sec name="r3"  unit="cm">23.29</sec>
-         <sec name="r4"  unit="cm">23.29</sec>
-         <sec name="r5"  unit="cm">25.29</sec>
-         <sec name="r6"  unit="cm">25.29</sec>
-         <sec name="r7"  unit="cm">25.29</sec>
-         <sec name="r8"  unit="cm">25.29</sec>
-         <sec name="r9"  unit="cm">25.79</sec>
-         <sec name="r10" unit="cm">25.79</sec>
-         <sec name="r11" unit="cm">27.79</sec>
-         <sec name="r12" unit="cm">27.79</sec>
-         <sec name="R0"  unit="cm">13.86</sec>
-         <sec name="R1"  unit="cm">23.61</sec>
-         <sec name="R2"  unit="cm">23.61</sec>
-         <sec name="R3"  unit="cm">25.61</sec>
-         <sec name="R4"  unit="cm">25.61</sec>
-         <sec name="R5"  unit="cm">25.61</sec>
-         <sec name="R6"  unit="cm">25.61</sec>
-         <sec name="R7"  unit="cm">26.11</sec>
-         <sec name="R8"  unit="cm">26.11</sec>
-         <sec name="R9"  unit="cm">26.11</sec>
-         <sec name="R10" unit="cm">26.11</sec>
-         <sec name="R11" unit="cm">28.11</sec>
-         <sec name="R12" unit="cm">28.11</sec>
-         <Material>G4_POLYETHYLENE</Material>
-         <Desc>Additional polyethylene shield between QCS and ARICH right (outer layer, extended)</Desc>
-      </APSR6>
-
-      <APSL6>
-         <Enable>0</Enable>
-         <N desc="Number of planes">8</N>
-         <sec name="Z0" unit="cm">-62.73</sec>
-         <sec name="Z1" unit="cm">-72.73</sec>
-         <sec name="Z2" unit="cm">-72.73</sec>
-         <sec name="Z3" unit="cm">-73.05</sec>
-         <sec name="Z4" unit="cm">-73.05</sec>
-         <sec name="Z5" unit="cm">-84.876</sec>
-         <sec name="Z6" unit="cm">-131.836</sec>
-         <sec name="Z7" unit="cm">-147.75</sec>
-         <sec name="r0" unit="cm">14.095</sec>
-         <sec name="r1" unit="cm">17.724</sec>
-         <sec name="r2" unit="cm">17.724</sec>
-         <sec name="r3" unit="cm">17.840</sec>
-         <sec name="r4" unit="cm">21.540</sec>
-         <sec name="r5" unit="cm">21.540</sec>
-         <sec name="r6" unit="cm">26.290</sec>
-         <sec name="r7" unit="cm">26.290</sec>
-         <sec name="R0" unit="cm">14.415</sec>
-         <sec name="R1" unit="cm">18.044</sec>
-         <sec name="R2" unit="cm">21.860</sec>
-         <sec name="R3" unit="cm">21.860</sec>
-         <sec name="R4" unit="cm">21.860</sec>
-         <sec name="R5" unit="cm">21.860</sec>
-         <sec name="R6" unit="cm">26.610</sec>
-         <sec name="R7" unit="cm">26.610</sec>
-
-         <Material>G4_POLYETHYLENE</Material>
-         <Desc>Additional polyethylene shield between QCS and CDC left (outer layer, extended)</Desc>
-      </APSL6>
 
    </Content>
 </DetectorComponent>

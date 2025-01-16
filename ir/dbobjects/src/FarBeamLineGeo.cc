@@ -20,7 +20,7 @@ void FarBeamLineGeo::initialize(const GearDir& content)
 
   addParameter("LimitStepLength", content.getInt("LimitStepLength"));
 
-  std::vector<std::string> names = {"TubeR", "TubeL", "ACSL", "ACSR1", "ACSR2", "APSL1", "APSL2", "APSR1", "APSR2", "APSR3", "APSL3", "APSR4", "APSL4", "APSR5", "APSL5", "APSR6", "APSL6"};
+  std::vector<std::string> names = {"TubeR", "TubeL", "ACSL", "ACSR1", "ACSR2", "APSL1", "APSL2", "APSR1", "APSR2"};
 
   for (auto name : names) {
     GearDir sect(content, name + "/");

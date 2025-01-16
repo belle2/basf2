@@ -923,7 +923,7 @@
          <sec name="r7" unit="cm">21.00</sec-->
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C1wal1</MotherVolume>
-         <Material>W</Material>
+         <Material>SUS316L</Material>
          <Desc>Tungsten shield forward</Desc>
       </Straight>
       <Straight name="C2spc1">
@@ -2658,7 +2658,7 @@
          <sec name="R1" unit="cm">12.71</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F1wal1</MotherVolume>
-         <Material>W</Material>
+         <Material>SUS316L</Material>
          <Desc>Tungsten shield backward</Desc>
       </Straight>
       <Straight name="F2spc1">
@@ -3495,58 +3495,9 @@
          <Desc>Right support mount</Desc>
       </Shield>
 
-      <APSR9>
-         <Enable>0</Enable>
-         <Material>G4_POLYETHYLENE</Material>
-         <Desc>Additional polyethylene shield around FWD QCS (outer layer, part 1)</Desc>
-      </APSR9>
-
-      <APSR10>
-         <Enable>0</Enable>
-         <Material>G4_POLYETHYLENE</Material>
-         <Desc>Additional polyethylene shield around FWD QCS (outer layer, part 2)</Desc>
-      </APSR10>
-
-      <APSL9>
-         <Enable>0</Enable>
-         <Material>G4_POLYETHYLENE</Material>
-         <Desc>Additional polyethylene shield around BWD QCS (outer layer, part 1)</Desc>
-      </APSL9>
-
-      <APSL10>
-         <Enable>0</Enable>
-         <Material>G4_POLYETHYLENE</Material>
-         <Desc>Additional polyethylene shield around BWD QCS (outer layer, part 2)</Desc>
-      </APSL10>
-
-      <APSR11>
-         <Enable>0</Enable>
-         <Material>SWX-238</Material>
-         <Desc>Additional polyethylene shield around FWD QCS (inner layer, part 1)</Desc>
-      </APSR11>
-
-      <APSR12>
-         <Enable>0</Enable>
-         <Material>SWX-238</Material>
-         <Desc>Additional polyethylene shield around FWD QCS (inner layer, part 2)</Desc>
-      </APSR12>
-
-      <APSL11>
-         <Enable>0</Enable>
-         <Material>SWX-238</Material>
-         <Desc>Additional polyethylene shield around BWD QCS (inner layer, part 1)</Desc>
-      </APSL11>
-
-      <APSL12>
-         <Enable>0</Enable>
-         <Material>SWX-238</Material>
-         <Desc>Additional polyethylene shield around BWD QCS (inner layer, part 2)</Desc>
-      </APSL12>
-
       <!--   2023 QCS shielding -->
 
       <PolyBlock name="R-L1">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">450</sec>
          <sec name="R" unit="mm">283.80</sec>
          <sec name="r0" unit="mm">265.00</sec>
@@ -3571,7 +3522,6 @@
       </PolyBlock>
 
       <PolyBlock name="R-L2">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">450</sec>
          <sec name="R" unit="mm">283.80</sec>
          <sec name="r0" unit="mm">265.00</sec>
@@ -3598,7 +3548,6 @@
       </PolyBlock>
 
       <PolyBlock name="R-L2s">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">230</sec>
          <sec name="R" unit="mm">283.80</sec>
          <sec name="r0" unit="mm">265.00</sec>
@@ -3614,7 +3563,6 @@
       </PolyBlock>
 
       <PolyBlock name="R-S1">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">230</sec>
          <sec name="R" unit="mm">283.80</sec>
          <sec name="r0" unit="mm">265.00</sec>
@@ -3639,7 +3587,6 @@
       </PolyBlock>
 
       <PolyBlock name="L-T">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">75</sec>
          <sec name="R" unit="mm">182.20</sec>
          <sec name="r" unit="mm">153.50</sec>
@@ -3692,7 +3639,6 @@
       </PolyBlock>
 
       <PolyBlock name="L-M1">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">245.0</sec>
          <sec name="R" unit="mm">255.9</sec>
          <sec name="r0" unit="mm">202.5</sec>
@@ -3723,7 +3669,6 @@
       </PolyBlock>
 
       <PolyBlock name="L-M2">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">180.0</sec>
          <sec name="R0" unit="mm">256.6</sec>
          <sec name="R" unit="mm">256.3</sec>
@@ -3749,7 +3694,6 @@
       </PolyBlock>
 
       <PolyBlock name="L-M3">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">245.0</sec>
          <sec name="R" unit="mm">256.0</sec>
          <sec name="r0" unit="mm">202.5</sec>
@@ -3781,7 +3725,6 @@
       </PolyBlock>
 
       <PolyBlock name="L-0">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">268.62</sec>
          <sec name="R" unit="mm">226.76</sec>
          <sec name="r" unit="mm">218.78</sec>
@@ -3824,7 +3767,6 @@
       </PolyBlock>
 
       <PolyBlock name="L-S">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">169.13</sec>
          <sec name="R" unit="mm">236.86</sec>
          <sec name="r" unit="mm">226.86</sec>
@@ -3867,7 +3809,6 @@
       </PolyBlock>
 
       <SWXLayer name="R-SWX-238-1">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">490.0</sec>
          <sec name="r1" unit="mm">284.3</sec>
          <sec name="r2" unit="mm">284.3</sec>
@@ -3955,7 +3896,6 @@
       </SWXLayer>
 
       <SWXLayer name="R-SWX-238-2">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">640.0</sec>
          <sec name="r10" unit="mm">300.3</sec>
          <sec name="r20" unit="mm">300.3</sec>
@@ -3968,7 +3908,6 @@
       </SWXLayer>
 
       <SWXLayer name="L-SWX-238-1">
-         <Enable>0</Enable>
          <sec name="L0" unit="mm">267.0</sec>
          <sec name="L" unit="mm">265.5</sec>
          <sec name="r1" unit="mm">256.3</sec>
@@ -4058,7 +3997,6 @@
       </SWXLayer>
 
       <SWXLayer name="L-SWX-238-2">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">101.4</sec>
          <sec name="r1" unit="mm">256.0</sec>
          <sec name="r2" unit="mm">174.9</sec>
@@ -4118,7 +4056,6 @@
       </SWXLayer>
 
       <SWXLayer name="L-SWX-238-3">
-         <Enable>0</Enable>
          <sec name="L" unit="mm">400.0</sec>
          <sec name="r1" unit="mm">254.0</sec>
          <sec name="r2" unit="mm">254.0</sec>
@@ -4127,6 +4064,67 @@
          <Material>SWX-238</Material>
          <Desc>Left SWX layer 3</Desc>
       </SWXLayer>
+
+      <BellowsShield>
+        <!-- Parameters for Base10/11 (FWD) -->
+        <sec name="fwdZ0" unit="mm">480</sec>
+        <sec name="fwdZ1" unit="mm">496</sec>
+        <sec name="fwdP0_R" unit="mm">73</sec>
+        <sec name="fwdP0_Yout" unit="mm">62</sec>
+        <sec name="fwdP0_Yin" unit="mm">47</sec>
+        <sec name="fwdP0_Xin" unit="mm">16</sec>
+        <sec name="fwdP0_Yedge" unit="mm">40</sec>
+        <sec name="fwdP0_Xedge" unit="mm">57</sec>
+        <sec name="fwdP0_Yside" unit="mm">23</sec>
+        <sec name="fwdP0_Xside" unit="mm">57</sec>
+        <!-- Parameters for Base20/21 (BWD) -->
+        <sec name="bwdZ0" unit="mm">-410</sec>
+        <sec name="bwdZ1" unit="mm">-420</sec>
+        <sec name="bwdP0_R0" unit="mm">72</sec>
+        <sec name="bwdP0_R1" unit="mm">56</sec>
+        <sec name="bwdP0_Yin" unit="mm">41</sec>
+        <sec name="bwdP0_Xin" unit="mm">16</sec>
+        <!-- Parameters for Base5/6 -->
+        <sec name="fwdZ2" unit="mm">504</sec> <!-- fwdZ0 + 24mm -->
+        <sec name="bwdZ2" unit="mm">-504</sec> <!-- bwdZ0 - 94mm -->
+        <sec name="P1_Yout" unit="mm">47</sec>
+        <sec name="P1_Yin" unit="mm">32</sec>
+        <sec name="P1_Rout" unit="mm">56.5</sec>
+        <sec name="P1_Rin" unit="mm">41.5</sec>
+        <sec name="P1_Aout" unit="rad">0.982</sec>
+        <sec name="P1_Ain" unit="rad">0.881</sec>
+        <sec name="P1_RX" unit="mm">8.5</sec>
+        <sec name="fwdZhole" unit="mm">528</sec> <!-- fwdZ2 + 24mm -->
+        <sec name="bwdZhole" unit="mm">-528</sec> <!-- bwdZ2 - 24mm -->
+        <sec name="P1_Rhole" unit="mm">7.75</sec>
+        <sec name="P1_Rbump" unit="mm">14.5</sec>
+        <sec name="P1_Yhole" unit="mm">40</sec>
+        <sec name="P1_MillD1" unit="mm">19</sec> <!-- -X -->
+        <sec name="P1_MillD2" unit="mm">34</sec> <!-- +X -->
+        <sec name="P1_MillX" unit="mm">22</sec>
+        <sec name="P1_MillW" unit="mm">7</sec>
+        <sec name="fwdZcut" unit="mm">545</sec> <!-- fwdZ2 + 41mm -->
+        <sec name="bwdZcut" unit="mm">-545</sec> <!-- bwdZ2 - 41mm -->
+        <sec name="P1_XcutTL" unit="mm">-40</sec> <!-- Top Left -->
+        <sec name="P1_XcutTR" unit="mm">35</sec> <!-- Top Right -->
+        <sec name="P1_XcutBL" unit="mm">-7</sec> <!-- Bottom Left -->
+        <sec name="P1_XcutBR" unit="mm">35</sec> <!-- Bottom Right -->
+        <!-- Parameters for Base7/8 (FWD) Base23/24 (BWD) -->
+        <sec name="fwdZ3" unit="mm">558</sec> <!-- fwdZ2 + 54mm -->
+        <sec name="bwdZ3" unit="mm">-560</sec> <!-- bwdZ2 - 56mm -->
+        <sec name="P2_Rout" unit="mm">57.5</sec>
+        <sec name="P2_Rin" unit="mm">25.5</sec>
+        <sec name="P2_Xin" unit="mm">25</sec>
+        <sec name="P2_Rhole" unit="mm">10.5</sec>
+        <sec name="P2_Yhole" unit="mm">40</sec>
+        <sec name="P2_XcutTL" unit="mm">-40</sec> <!-- Top Left -->
+        <sec name="P2_XcutTR" unit="mm">10.5</sec> <!-- Top Right -->
+        <sec name="P2_XcutBL" unit="mm">-5.5</sec> <!-- Bottom Left -->
+        <sec name="P2_XcutBR" unit="mm">36.5</sec> <!-- Bottom Right -->
+        <sec name="fwdZ4" unit="mm">567.5</sec> <!-- fwdZ3 + 9.5mm -->
+        <sec name="bwdZ4" unit="mm">-597</sec> <!-- (Not Used) bwdZ3 - 39mm  -->
+        <Material>W</Material>
+      </BellowsShield>
 
    </Content>
 </DetectorComponent>

@@ -756,8 +756,6 @@ namespace Belle2 {
       std::string name = "ACSL";
       prep = name + ".";
 
-      int acsl_En = int(m_config.getParameter(prep + "Enable"));
-
       double acsl_X0 = m_config.getParameter(prep + "X0") * unitFactor;
       double acsl_Y0 = m_config.getParameter(prep + "Y0") * unitFactor;
       double acsl_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
@@ -852,8 +850,7 @@ namespace Belle2 {
 
       //put volume
       string phys_acsl_name = "phys_" + name + "_name";
-      if (acsl_En == 1)
-        new G4PVPlacement(ACSL.transform, ACSL.logi, phys_acsl_name, &topVolume, false, 0);
+      new G4PVPlacement(ACSL.transform, ACSL.logi, phys_acsl_name, &topVolume, false, 0);
 
       elements[name] = ACSL;
 
@@ -870,8 +867,6 @@ namespace Belle2 {
       //get parameters from .xml file
       name = "ACSR1";
       prep = name + ".";
-
-      int acsr1_En = int(m_config.getParameter(prep + "Enable"));
 
       double acsr1_X0 = m_config.getParameter(prep + "X0") * unitFactor;
       double acsr1_Y0 = m_config.getParameter(prep + "Y0") * unitFactor;
@@ -924,8 +919,7 @@ namespace Belle2 {
 
       //put volume
       string phys_acsr1_name = "phys_" + name + "_name";
-      if (acsr1_En == 1)
-        new G4PVPlacement(ACSR1.transform, ACSR1.logi, phys_acsr1_name, &topVolume, false, 0);
+      new G4PVPlacement(ACSR1.transform, ACSR1.logi, phys_acsr1_name, &topVolume, false, 0);
 
       elements[name] = ACSR1;
 
@@ -937,8 +931,6 @@ namespace Belle2 {
       //get parameters from .xml file
       name = "ACSR2";
       prep = name + ".";
-
-      int acsr2_En = int(m_config.getParameter(prep + "Enable"));
 
       double acsr2_X0 = m_config.getParameter(prep + "X0") * unitFactor;
       double acsr2_Y0 = m_config.getParameter(prep + "Y0") * unitFactor;
@@ -991,8 +983,7 @@ namespace Belle2 {
 
       //put volume
       string phys_acsr2_name = "phys_" + name + "_name";
-      if (acsr2_En == 1)
-        new G4PVPlacement(ACSR2.transform, ACSR2.logi, phys_acsr2_name, &topVolume, false, 0);
+      new G4PVPlacement(ACSR2.transform, ACSR2.logi, phys_acsr2_name, &topVolume, false, 0);
 
       elements[name] = ACSR2;
 
@@ -1009,8 +1000,6 @@ namespace Belle2 {
       //get parameters from .xml file
       name = "APSL1";
       prep = name + ".";
-
-      int apsl1_En = int(m_config.getParameter(prep + "Enable"));
 
       double apsl1_W = m_config.getParameter(prep + "W") * unitFactor;
       double apsl1_H = m_config.getParameter(prep + "H") * unitFactor;
@@ -1054,8 +1043,7 @@ namespace Belle2 {
 
       //put volume
       string phys_apsl1_name = "phys_" + name + "_name";
-      if (apsl1_En == 1)
-        new G4PVPlacement(APSL1.transform, APSL1.logi, phys_apsl1_name, &topVolume, false, 0);
+      new G4PVPlacement(APSL1.transform, APSL1.logi, phys_apsl1_name, &topVolume, false, 0);
 
       elements[name] = APSL1;
 
@@ -1067,8 +1055,6 @@ namespace Belle2 {
       //get parameters from .xml file
       name = "APSL2";
       prep = name + ".";
-
-      int apsl2_En = int(m_config.getParameter(prep + "Enable"));
 
       double apsl2_W = m_config.getParameter(prep + "W") * unitFactor;
       double apsl2_H = m_config.getParameter(prep + "H") * unitFactor;
@@ -1112,8 +1098,7 @@ namespace Belle2 {
 
       //put volume
       string phys_apsl2_name = "phys_" + name + "_name";
-      if (apsl2_En == 1)
-        new G4PVPlacement(APSL2.transform, APSL2.logi, phys_apsl2_name, &topVolume, false, 0);
+      new G4PVPlacement(APSL2.transform, APSL2.logi, phys_apsl2_name, &topVolume, false, 0);
 
       elements[name] = APSL2;
 
@@ -1130,8 +1115,6 @@ namespace Belle2 {
       //get parameters from .xml file
       name = "APSR1";
       prep = name + ".";
-
-      int apsr1_En = int(m_config.getParameter(prep + "Enable"));
 
       double apsr1_W = m_config.getParameter(prep + "W") * unitFactor;
       double apsr1_H = m_config.getParameter(prep + "H") * unitFactor;
@@ -1175,8 +1158,7 @@ namespace Belle2 {
 
       //put volume
       string phys_apsr1_name = "phys_" + name + "_name";
-      if (apsr1_En == 1)
-        new G4PVPlacement(APSR1.transform, APSR1.logi, phys_apsr1_name, &topVolume, false, 0);
+      new G4PVPlacement(APSR1.transform, APSR1.logi, phys_apsr1_name, &topVolume, false, 0);
 
       elements[name] = APSR1;
 
@@ -1188,8 +1170,6 @@ namespace Belle2 {
       //get parameters from .xml file
       name = "APSR2";
       prep = name + ".";
-
-      int apsr2_En = int(m_config.getParameter(prep + "Enable"));
 
       double apsr2_W = m_config.getParameter(prep + "W") * unitFactor;
       double apsr2_H = m_config.getParameter(prep + "H") * unitFactor;
@@ -1233,524 +1213,21 @@ namespace Belle2 {
 
       //put volume
       string phys_apsr2_name = "phys_" + name + "_name";
-      if (apsr2_En == 1)
-        new G4PVPlacement(APSR2.transform, APSR2.logi, phys_apsr2_name, &topVolume, false, 0);
+      new G4PVPlacement(APSR2.transform, APSR2.logi, phys_apsr2_name, &topVolume, false, 0);
 
       elements[name] = APSR2;
-
-
-      //--------------
-      //-   Additional polyethilene shield right (forward)
-      //-   Fills gap between QCS and ARICH (inner layer)
-
-      FarBeamLineElement APSR3;
-
-      //get parameters from .xml file
-      name = "APSR3";
-      prep = name + ".";
-
-      int apsr3_En = int(m_config.getParameter(prep + "Enable"));
-      int apsr3_N = int(m_config.getParameter(prep + "N"));
-
-      std::vector<double> apsr3_Z(apsr3_N);
-      std::vector<double> apsr3_R(apsr3_N);
-      std::vector<double> apsr3_r(apsr3_N);
-
-      for (int i = 0; i < apsr3_N; ++i) {
-        ostringstream ossZID;
-        ossZID << "Z" << i;
-
-        ostringstream ossRID;
-        ossRID << "R" << i;
-
-        ostringstream ossrID;
-        ossrID << "r" << i;
-
-        apsr3_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
-        apsr3_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
-        apsr3_r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
-      }
-
-      // transformations
-      APSR3.transform = G4Translate3D(0.0, 0.0, 0.0);
-
-      //define geometry
-      string geo_apsr3_name = "geo_" + name + "_name";
-
-      G4Polycone* geo_apsr3 = new G4Polycone(geo_apsr3_name, 0.0, 2.0 * M_PI, apsr3_N, &(apsr3_Z[0]), &(apsr3_r[0]), &(apsr3_R[0]));
-
-      APSR3.geo = geo_apsr3;
-
-      // define logical volume
-      string strMat_apsr3 = m_config.getParameterStr(prep + "Material");
-      G4Material* mat_apsr3 = Materials::get(strMat_apsr3);
-      string logi_apsr3_name = "logi_" + name + "_name";
-      G4LogicalVolume* logi_apsr3 = new G4LogicalVolume(geo_apsr3, mat_apsr3, logi_apsr3_name);
-      setColor(*logi_apsr3, "#00CC00");
-      setVisibility(*logi_apsr3, false);
-
-      APSR3.logi = logi_apsr3;
-
-      if (apsr3_En == 1)G4cout << "_____________" << G4endl << logi_apsr3->GetName() << " (APSR3) : mass = " << logi_apsr3->GetMass() /
-                                 CLHEP::kg << " | materials : " << logi_apsr3->GetMaterial() << G4endl << "_____________" << G4endl;
-      //put volume
-      string phys_apsr3_name = "phys_" + name + "_name";
-      if (apsr3_En == 1)
-        new G4PVPlacement(APSR3.transform, APSR3.logi, phys_apsr3_name, &topVolume, false, 0);
-
-      elements[name] = APSR3;
-
-
-
-      //--------------
-      //-   Additional polyethilene shield left (backward)
-      //-   Fills gap between QCS and CDC (inner layer)
-
-      FarBeamLineElement APSL3;
-
-      //get parameters from .xml file
-      name = "APSL3";
-      prep = name + ".";
-
-      int apsl3_En = int(m_config.getParameter(prep + "Enable"));
-      int apsl3_N = int(m_config.getParameter(prep + "N"));
-
-      std::vector<double> apsl3_Z(apsl3_N);
-      std::vector<double> apsl3_R(apsl3_N);
-      std::vector<double> apsl3_r(apsl3_N);
-
-      for (int i = 0; i < apsl3_N; ++i) {
-        ostringstream ossZID;
-        ossZID << "Z" << i;
-
-        ostringstream ossRID;
-        ossRID << "R" << i;
-
-        ostringstream ossrID;
-        ossrID << "r" << i;
-
-        apsl3_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
-        apsl3_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
-        apsl3_r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
-      }
-
-      // transformations
-      APSL3.transform = G4Translate3D(0.0, 0.0, 0.0);
-
-      //define geometry
-      string geo_apsl3_name = "geo_" + name + "_name";
-
-      G4Polycone* geo_apsl3 = new G4Polycone(geo_apsl3_name, 0.0, 2.0 * M_PI, apsl3_N, &(apsl3_Z[0]), &(apsl3_r[0]), &(apsl3_R[0]));
-
-      APSL3.geo = geo_apsl3;
-
-      // define logical volume
-      string strMat_apsl3 = m_config.getParameterStr(prep + "Material");
-      G4Material* mat_apsl3 = Materials::get(strMat_apsl3);
-      string logi_apsl3_name = "logi_" + name + "_name";
-      G4LogicalVolume* logi_apsl3 = new G4LogicalVolume(geo_apsl3, mat_apsl3, logi_apsl3_name);
-      setColor(*logi_apsl3, "#00CC00");
-      setVisibility(*logi_apsl3, false);
-
-      APSL3.logi = logi_apsl3;
-
-      if (apsl3_En == 1)G4cout << "_____________" << G4endl << logi_apsl3->GetName() << " (APSL3) : mass = " << logi_apsl3->GetMass() /
-                                 CLHEP::kg << " | materials : " << logi_apsl3->GetMaterial() << G4endl << "_____________" << G4endl;
-      //put volume
-      string phys_apsl3_name = "phys_" + name + "_name";
-      if (apsl3_En == 1)
-        new G4PVPlacement(APSL3.transform, APSL3.logi, phys_apsl3_name, &topVolume, false, 0);
-
-      elements[name] = APSL3;
-
-      //--------------
-      //-   Additional polyethilene shield right (forward)
-      //-   Fills gap between QCS and ARICH (outer layer)
-
-      FarBeamLineElement APSR4;
-
-      //get parameters from .xml file
-      name = "APSR4";
-      prep = name + ".";
-
-      int apsr4_En = int(m_config.getParameter(prep + "Enable"));
-      int apsr4_N = int(m_config.getParameter(prep + "N"));
-
-      std::vector<double> apsr4_Z(apsr4_N);
-      std::vector<double> apsr4_R(apsr4_N);
-      std::vector<double> apsr4_r(apsr4_N);
-
-      for (int i = 0; i < apsr4_N; ++i) {
-        ostringstream ossZID;
-        ossZID << "Z" << i;
-
-        ostringstream ossRID;
-        ossRID << "R" << i;
-
-        ostringstream ossrID;
-        ossrID << "r" << i;
-
-        apsr4_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
-        apsr4_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
-        apsr4_r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
-      }
-
-      // transformations
-      APSR4.transform = G4Translate3D(0.0, 0.0, 0.0);
-
-      //define geometry
-      string geo_apsr4_name = "geo_" + name + "_name";
-
-      G4Polycone* geo_apsr4 = new G4Polycone(geo_apsr4_name, 0.0, 2.0 * M_PI, apsr4_N, &(apsr4_Z[0]), &(apsr4_r[0]), &(apsr4_R[0]));
-
-      APSR4.geo = geo_apsr4;
-
-      // define logical volume
-      string strMat_apsr4 = m_config.getParameterStr(prep + "Material");
-      G4Material* mat_apsr4 = Materials::get(strMat_apsr4);
-      string logi_apsr4_name = "logi_" + name + "_name";
-      G4LogicalVolume* logi_apsr4 = new G4LogicalVolume(geo_apsr4, mat_apsr4, logi_apsr4_name);
-      setColor(*logi_apsr4, "#00CC00");
-      setVisibility(*logi_apsr4, false);
-
-      APSR4.logi = logi_apsr4;
-
-      if (apsr4_En == 1)G4cout << "_____________" << G4endl << logi_apsr4->GetName() << " (APSR4) : mass = " << logi_apsr4->GetMass() /
-                                 CLHEP::kg << " | materials : " << logi_apsr4->GetMaterial() << G4endl << "_____________" << G4endl;
-      //put volume
-      string phys_apsr4_name = "phys_" + name + "_name";
-      if (apsr4_En == 1)
-        new G4PVPlacement(APSR4.transform, APSR4.logi, phys_apsr4_name, &topVolume, false, 0);
-
-      elements[name] = APSR4;
-
-
-
-      //--------------
-      //-   Additional polyethilene shield left (backward)
-      //-   Fills gap between QCS and CDC (outer layer)
-
-      FarBeamLineElement APSL4;
-
-      //get parameters from .xml file
-      name = "APSL4";
-      prep = name + ".";
-
-      int apsl4_En = int(m_config.getParameter(prep + "Enable"));
-      int apsl4_N = int(m_config.getParameter(prep + "N"));
-
-      std::vector<double> apsl4_Z(apsl4_N);
-      std::vector<double> apsl4_R(apsl4_N);
-      std::vector<double> apsl4_r(apsl4_N);
-
-      for (int i = 0; i < apsl4_N; ++i) {
-        ostringstream ossZID;
-        ossZID << "Z" << i;
-
-        ostringstream ossRID;
-        ossRID << "R" << i;
-
-        ostringstream ossrID;
-        ossrID << "r" << i;
-
-        apsl4_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
-        apsl4_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
-        apsl4_r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
-      }
-
-      // transformations
-      APSL4.transform = G4Translate3D(0.0, 0.0, 0.0);
-
-      //define geometry
-      string geo_apsl4_name = "geo_" + name + "_name";
-
-      G4Polycone* geo_apsl4 = new G4Polycone(geo_apsl4_name, 0.0, 2.0 * M_PI, apsl4_N, &(apsl4_Z[0]), &(apsl4_r[0]), &(apsl4_R[0]));
-
-      APSL4.geo = geo_apsl4;
-
-      // define logical volume
-      string strMat_apsl4 = m_config.getParameterStr(prep + "Material");
-      G4Material* mat_apsl4 = Materials::get(strMat_apsl4);
-      string logi_apsl4_name = "logi_" + name + "_name";
-      G4LogicalVolume* logi_apsl4 = new G4LogicalVolume(geo_apsl4, mat_apsl4, logi_apsl4_name);
-      setColor(*logi_apsl4, "#00CC00");
-      setVisibility(*logi_apsl4, false);
-
-      APSL4.logi = logi_apsl4;
-
-      if (apsl4_En == 1)G4cout << "_____________" << G4endl << logi_apsl4->GetName() << " (APSL4) : mass = " << logi_apsl4->GetMass() /
-                                 CLHEP::kg << " | materials : " << logi_apsl4->GetMaterial() << G4endl << "_____________" << G4endl;
-      //put volume
-      string phys_apsl4_name = "phys_" + name + "_name";
-      if (apsl4_En == 1)
-        new G4PVPlacement(APSL4.transform, APSL4.logi, phys_apsl4_name, &topVolume, false, 0);
-
-      elements[name] = APSL4;
-
-
-      //--------------
-      //-   Additional polyethilene shield right (forward)
-      //-   Fills gap between QCS and ARICH (inner layer, extended)
-
-      FarBeamLineElement APSR5;
-
-      //get parameters from .xml file
-      name = "APSR5";
-      prep = name + ".";
-
-      int apsr5_En = int(m_config.getParameter(prep + "Enable"));
-      int apsr5_N = int(m_config.getParameter(prep + "N"));
-
-      std::vector<double> apsr5_Z(apsr5_N);
-      std::vector<double> apsr5_R(apsr5_N);
-      std::vector<double> apsr5_r(apsr5_N);
-
-      for (int i = 0; i < apsr5_N; ++i) {
-        ostringstream ossZID;
-        ossZID << "Z" << i;
-
-        ostringstream ossRID;
-        ossRID << "R" << i;
-
-        ostringstream ossrID;
-        ossrID << "r" << i;
-
-        apsr5_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
-        apsr5_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
-        apsr5_r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
-      }
-
-      // transformations
-      APSR5.transform = G4Translate3D(0.0, 0.0, 0.0);
-
-      //define geometry
-      string geo_apsr5_name = "geo_" + name + "_name";
-
-      G4Polycone* geo_apsr5 = new G4Polycone(geo_apsr5_name, 0.0, 2.0 * M_PI, apsr5_N, &(apsr5_Z[0]), &(apsr5_r[0]), &(apsr5_R[0]));
-
-      APSR5.geo = geo_apsr5;
-
-      // define logical volume
-      string strMat_apsr5 = m_config.getParameterStr(prep + "Material");
-      G4Material* mat_apsr5 = Materials::get(strMat_apsr5);
-      string logi_apsr5_name = "logi_" + name + "_name";
-      G4LogicalVolume* logi_apsr5 = new G4LogicalVolume(geo_apsr5, mat_apsr5, logi_apsr5_name);
-      setColor(*logi_apsr5, "#00CC00");
-      setVisibility(*logi_apsr5, false);
-
-      APSR5.logi = logi_apsr5;
-
-      if (apsr5_En == 1)G4cout << "_____________" << G4endl << logi_apsr5->GetName() << " (APSR5) : mass = " << logi_apsr5->GetMass() /
-                                 CLHEP::kg << " | materials : " << logi_apsr5->GetMaterial() << G4endl << "_____________" << G4endl;
-      //put volume
-      string phys_apsr5_name = "phys_" + name + "_name";
-      if (apsr5_En == 1)
-        new G4PVPlacement(APSR5.transform, APSR5.logi, phys_apsr5_name, &topVolume, false, 0);
-
-      elements[name] = APSR5;
-
-      //--------------
-      //-   Additional polyethilene shield left (backward)
-      //-   Fills gap between QCS and CDC (inner layer, extended)
-
-      FarBeamLineElement APSL5;
-
-      //get parameters from .xml file
-      name = "APSL5";
-      prep = name + ".";
-
-      int apsl5_En = int(m_config.getParameter(prep + "Enable"));
-      int apsl5_N = int(m_config.getParameter(prep + "N"));
-
-      std::vector<double> apsl5_Z(apsl5_N);
-      std::vector<double> apsl5_R(apsl5_N);
-      std::vector<double> apsl5_r(apsl5_N);
-
-      for (int i = 0; i < apsl5_N; ++i) {
-        ostringstream ossZID;
-        ossZID << "Z" << i;
-
-        ostringstream ossRID;
-        ossRID << "R" << i;
-
-        ostringstream ossrID;
-        ossrID << "r" << i;
-
-        apsl5_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
-        apsl5_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
-        apsl5_r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
-      }
-
-      // transformations
-      APSL5.transform = G4Translate3D(0.0, 0.0, 0.0);
-
-      //define geometry
-      string geo_apsl5_name = "geo_" + name + "_name";
-
-      G4Polycone* geo_apsl5 = new G4Polycone(geo_apsl5_name, 0.0, 2.0 * M_PI, apsl5_N, &(apsl5_Z[0]), &(apsl5_r[0]), &(apsl5_R[0]));
-
-      APSL5.geo = geo_apsl5;
-
-      // define logical volume
-      string strMat_apsl5 = m_config.getParameterStr(prep + "Material");
-      G4Material* mat_apsl5 = Materials::get(strMat_apsl5);
-      string logi_apsl5_name = "logi_" + name + "_name";
-      G4LogicalVolume* logi_apsl5 = new G4LogicalVolume(geo_apsl5, mat_apsl5, logi_apsl5_name);
-      setColor(*logi_apsl5, "#00CC00");
-      setVisibility(*logi_apsl5, false);
-
-      APSL5.logi = logi_apsl5;
-
-      if (apsl5_En == 1)G4cout << "_____________" << G4endl << logi_apsl5->GetName() << " (APSL5) : mass = " << logi_apsl5->GetMass() /
-                                 CLHEP::kg << " | materials : " << logi_apsl5->GetMaterial() << G4endl << "_____________" << G4endl;
-      //put volume
-      string phys_apsl5_name = "phys_" + name + "_name";
-      if (apsl5_En == 1)
-        new G4PVPlacement(APSL5.transform, APSL5.logi, phys_apsl5_name, &topVolume, false, 0);
-
-      elements[name] = APSL5;
-
-      //--------------
-      //-   Additional polyethilene shield right (forward)
-      //-   Fills gap between QCS and ARICH (inner layer, extended)
-
-      FarBeamLineElement APSR6;
-
-      //get parameters from .xml file
-      name = "APSR6";
-      prep = name + ".";
-
-      int apsr6_En = int(m_config.getParameter(prep + "Enable"));
-      int apsr6_N = int(m_config.getParameter(prep + "N"));
-
-      std::vector<double> apsr6_Z(apsr6_N);
-      std::vector<double> apsr6_R(apsr6_N);
-      std::vector<double> apsr6_r(apsr6_N);
-
-      for (int i = 0; i < apsr6_N; ++i) {
-        ostringstream ossZID;
-        ossZID << "Z" << i;
-
-        ostringstream ossRID;
-        ossRID << "R" << i;
-
-        ostringstream ossrID;
-        ossrID << "r" << i;
-
-        apsr6_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
-        apsr6_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
-        apsr6_r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
-      }
-
-      // transformations
-      APSR6.transform = G4Translate3D(0.0, 0.0, 0.0);
-
-      //define geometry
-      string geo_apsr6_name = "geo_" + name + "_name";
-
-      G4Polycone* geo_apsr6 = new G4Polycone(geo_apsr6_name, 0.0, 2.0 * M_PI, apsr6_N, &(apsr6_Z[0]), &(apsr6_r[0]), &(apsr6_R[0]));
-
-      APSR6.geo = geo_apsr6;
-
-      // define logical volume
-      string strMat_apsr6 = m_config.getParameterStr(prep + "Material");
-      G4Material* mat_apsr6 = Materials::get(strMat_apsr6);
-      string logi_apsr6_name = "logi_" + name + "_name";
-      G4LogicalVolume* logi_apsr6 = new G4LogicalVolume(geo_apsr6, mat_apsr6, logi_apsr6_name);
-      setColor(*logi_apsr6, "#00CC00");
-      setVisibility(*logi_apsr6, false);
-
-      APSR6.logi = logi_apsr6;
-
-      if (apsr6_En == 1)G4cout << "_____________" << G4endl << logi_apsr6->GetName() << " (APSR6) : mass = " << logi_apsr6->GetMass() /
-                                 CLHEP::kg << " | materials : " << logi_apsr6->GetMaterial() << G4endl << "_____________" << G4endl;
-      //put volume
-      string phys_apsr6_name = "phys_" + name + "_name";
-      if (apsr6_En == 1)
-        new G4PVPlacement(APSR6.transform, APSR6.logi, phys_apsr6_name, &topVolume, false, 0);
-
-      elements[name] = APSR6;
-
-      //--------------
-      //-   Additional polyethilene shield left (backward)
-      //-   Fills gap between QCS and CDC (outer layer, extended)
-
-      FarBeamLineElement APSL6;
-
-      //get parameters from .xml file
-      name = "APSL6";
-      prep = name + ".";
-
-      int apsl6_En = int(m_config.getParameter(prep + "Enable"));
-      int apsl6_N = int(m_config.getParameter(prep + "N"));
-
-      std::vector<double> apsl6_Z(apsl6_N);
-      std::vector<double> apsl6_R(apsl6_N);
-      std::vector<double> apsl6_r(apsl6_N);
-
-      for (int i = 0; i < apsl6_N; ++i) {
-        ostringstream ossZID;
-        ossZID << "Z" << i;
-
-        ostringstream ossRID;
-        ossRID << "R" << i;
-
-        ostringstream ossrID;
-        ossrID << "r" << i;
-
-        apsl6_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
-        apsl6_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
-        apsl6_r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
-      }
-
-      // transformations
-      APSL6.transform = G4Translate3D(0.0, 0.0, 0.0);
-
-      //define geometry
-      string geo_apsl6_name = "geo_" + name + "_name";
-
-      G4Polycone* geo_apsl6 = new G4Polycone(geo_apsl6_name, 0.0, 2.0 * M_PI, apsl6_N, &(apsl6_Z[0]), &(apsl6_r[0]), &(apsl6_R[0]));
-
-      APSL6.geo = geo_apsl6;
-
-      // define logical volume
-      string strMat_apsl6 = m_config.getParameterStr(prep + "Material");
-      G4Material* mat_apsl6 = Materials::get(strMat_apsl6);
-      string logi_apsl6_name = "logi_" + name + "_name";
-      G4LogicalVolume* logi_apsl6 = new G4LogicalVolume(geo_apsl6, mat_apsl6, logi_apsl6_name);
-      setColor(*logi_apsl6, "#00CC00");
-      setVisibility(*logi_apsl6, false);
-
-      APSL6.logi = logi_apsl6;
-
-      if (apsl6_En == 1)G4cout << "_____________" << G4endl << logi_apsl6->GetName() << " (APSL6) : mass = " << logi_apsl6->GetMass() /
-                                 CLHEP::kg << " | materials : " << logi_apsl6->GetMaterial() << G4endl << "_____________" << G4endl;
-      //put volume
-      string phys_apsl6_name = "phys_" + name + "_name";
-      if (apsl6_En == 1)
-        new G4PVPlacement(APSL6.transform, APSL6.logi, phys_apsl6_name, &topVolume, false, 0);
-
-      elements[name] = APSL6;
 
 
       //---------------------------
       // dose calculation
       //---------------------------
-      //if (elements.count("ACSL") && acsl_En == 1) elements["ACSL"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2001));
-      //if (elements.count("ACSR1") && acsr1_En == 1) elements["ACSR1"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2002));
-      //if (elements.count("ACSR2") && acsr2_En == 1) elements["ACSR2"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2003));
-      //if (elements.count("APSL1") && apsl1_En == 1) elements["APSL1"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2004));
-      //if (elements.count("APSL2") && apsl2_En == 1) elements["APSL2"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2005));
-      //if (elements.count("APSR1") && apsr1_En == 1) elements["APSR1"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2006));
-      //if (elements.count("APSR2") && apsr2_En == 1) elements["APSR2"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2007));
-      if (elements.count("APSR3") && apsr3_En == 1) elements["APSR3"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2008));
-      if (elements.count("APSL3") && apsl3_En == 1) elements["APSL3"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2009));
-      if (elements.count("APSR4") && apsr4_En == 1) elements["APSR4"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2010));
-      if (elements.count("APSL4") && apsl4_En == 1) elements["APSL4"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2011));
-      if (elements.count("APSR5") && apsr5_En == 1) elements["APSR5"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2012));
-      if (elements.count("APSL5") && apsl5_En == 1) elements["APSL5"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2013));
-      if (elements.count("APSR6") && apsr6_En == 1) elements["APSR6"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2014));
-      if (elements.count("APSL6") && apsl6_En == 1) elements["APSL6"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2015));
+      //if (elements.count("ACSL")) elements["ACSL"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2001));
+      //if (elements.count("ACSR1")) elements["ACSR1"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2002));
+      //if (elements.count("ACSR2")) elements["ACSR2"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2003));
+      //if (elements.count("APSL1")) elements["APSL1"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2004));
+      //if (elements.count("APSL2")) elements["APSL2"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2005));
+      //if (elements.count("APSR1")) elements["APSR1"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2006));
+      //if (elements.count("APSR2")) elements["APSR2"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2007));
     }
   }
 }

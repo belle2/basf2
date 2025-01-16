@@ -12,8 +12,9 @@
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <top/dataobjects/TOPSimHit.h>
 #include <ecl/dataobjects/ECLSimHit.h>
-#include <klm/dataobjects/eklm/EKLMSimHit.h>
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
+// #include <klm/dataobjects/eklm/EKLMSimHit.h>
+// #include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/KLMSimHit.h>
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 
 // framework - DataStore
@@ -121,8 +122,9 @@ namespace Belle2 {
     StoreArray<ARICHSimHit> ARICHSimHits;
     StoreArray<TOPSimHit>   TOPSimHits;
     StoreArray<ECLSimHit>   ECLSimHits;
-    StoreArray<EKLMSimHit>  EKLMSimHits;
-    StoreArray<BKLMSimHit>  BKLMSimHits;
+//    StoreArray<EKLMSimHit>  EKLMSimHits;
+//    StoreArray<BKLMSimHit>  BKLMSimHits;
+    StoreArray<KLMSimHit>   KLMSimHits;
 
     for (Int_t i = 0; i < 13; i++) {
       nSimHits[i] = 0;
@@ -136,13 +138,15 @@ namespace Belle2 {
     nSimHits[4] = ARICHSimHits.getEntries();
     nSimHits[5] = TOPSimHits.getEntries();
     nSimHits[6] = ECLSimHits.getEntries();
-    nSimHits[7] = EKLMSimHits.getEntries();
-    nSimHits[8] = BKLMSimHits.getEntries();
+//    nSimHits[7] = EKLMSimHits.getEntries();
+//    nSimHits[8] = BKLMSimHits.getEntries();
+    nSimHits[7] = KLMSimHits.getEntries();
 
-    // loop over EKLM simHits
+    // loop over KLM simHits
     for (Int_t hit = 0; hit < nSimHits[7]; hit++) {
-      // get EKLMSimHit
-      EKLMSimHit* simHit = EKLMSimHits[hit];
+      // get KLMSimHit
+//      EKLMSimHit* simHit = EKLMSimHits[hit];
+      KLMSimHit* simHit = KLMSimHits[hit];
       Float_t posZ = simHit->getPositionZ();
       if (280.0 < posZ && posZ <  288.0) nSimHits[9]++;   // FWD EKLM innermost layer
       else if (400.0 < posZ && posZ <  406.0) nSimHits[10]++;  // FWD EKLM outermost layer
@@ -156,8 +160,9 @@ namespace Belle2 {
     RelationIndex<MCParticle, ARICHSimHit> relARICHSimHitToMCParticle(McParticles, ARICHSimHits);
     RelationIndex<MCParticle, TOPSimHit> relTOPSimHitToMCParticle(McParticles, TOPSimHits);
     RelationIndex<MCParticle, ECLSimHit> relECLSimHitToMCParticle(McParticles, ECLSimHits);
-    RelationIndex<MCParticle, EKLMSimHit> relEKLMSimHitToMCParticle(McParticles, EKLMSimHits);
-    RelationIndex<MCParticle, BKLMSimHit> relBKLMSimHitToMCParticle(McParticles, BKLMSimHits);
+//    RelationIndex<MCParticle, EKLMSimHit> relEKLMSimHitToMCParticle(McParticles, EKLMSimHits);
+//    RelationIndex<MCParticle, BKLMSimHit> relBKLMSimHitToMCParticle(McParticles, BKLMSimHits);
+    RelationIndex<MCParticle, KLMSimHit> relKLMSimHitToMCParticle(McParticles, KLMSimHits);
 
     Int_t detID;
 
@@ -256,31 +261,47 @@ namespace Belle2 {
         }
       }
     }
+    /*
+        //--- EKLM
+        detID = 7;
+        // loop over simhits
+        for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
+          EKLMSimHit* simHit = EKLMSimHits[iHit];
+          // get related MCparticle
+          if (relEKLMSimHitToMCParticle.getFirstElementTo(simHit)) {
+            const MCParticle* currParticle = relEKLMSimHitToMCParticle.getFirstElementTo(simHit)->from;
+            hitPDG[detID] = currParticle->getPDG();
+            if (!currParticle->isPrimaryParticle()) {
+              const MCParticle* momParticle = currParticle->getMother();
+              momPDG[detID] = momParticle->getPDG();
+            }
+          }
+        }
 
-    //--- EKLM
+        //--- BKLM
+        detID = 8;
+        // loop over simhits
+        for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
+          BKLMSimHit* simHit = BKLMSimHits[iHit];
+          // get related MCparticle
+          if (relBKLMSimHitToMCParticle.getFirstElementTo(simHit)) {
+            const MCParticle* currParticle = relBKLMSimHitToMCParticle.getFirstElementTo(simHit)->from;
+            hitPDG[detID] = currParticle->getPDG();
+            if (!currParticle->isPrimaryParticle()) {
+              const MCParticle* momParticle = currParticle->getMother();
+              momPDG[detID] = momParticle->getPDG();
+            }
+          }
+        }
+    */
+    //--- KLM
     detID = 7;
     // loop over simhits
     for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
-      EKLMSimHit* simHit = EKLMSimHits[iHit];
+      KLMSimHit* simHit = KLMSimHits[iHit];
       // get related MCparticle
-      if (relEKLMSimHitToMCParticle.getFirstElementTo(simHit)) {
-        const MCParticle* currParticle = relEKLMSimHitToMCParticle.getFirstElementTo(simHit)->from;
-        hitPDG[detID] = currParticle->getPDG();
-        if (!currParticle->isPrimaryParticle()) {
-          const MCParticle* momParticle = currParticle->getMother();
-          momPDG[detID] = momParticle->getPDG();
-        }
-      }
-    }
-
-    //--- BKLM
-    detID = 8;
-    // loop over simhits
-    for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
-      BKLMSimHit* simHit = BKLMSimHits[iHit];
-      // get related MCparticle
-      if (relBKLMSimHitToMCParticle.getFirstElementTo(simHit)) {
-        const MCParticle* currParticle = relBKLMSimHitToMCParticle.getFirstElementTo(simHit)->from;
+      if (relKLMSimHitToMCParticle.getFirstElementTo(simHit)) {
+        const MCParticle* currParticle = relKLMSimHitToMCParticle.getFirstElementTo(simHit)->from;
         hitPDG[detID] = currParticle->getPDG();
         if (!currParticle->isPrimaryParticle()) {
           const MCParticle* momParticle = currParticle->getMother();

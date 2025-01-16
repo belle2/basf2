@@ -14,8 +14,6 @@ import numpy as np
 
 from functools import partial
 
-num_bins = 64
-
 
 class Slicing(keras.layers.Layer):
     def __init__(self, column, **kwargs):
@@ -89,7 +87,7 @@ class ColumnEmbedding(keras.layers.Layer):
         return keras.ops.broadcast_to(position_embeddings, shape)
 
 
-def get_preprocessor(X):
+def get_preprocessor(X, num_bins):
     """
     Configure and adapt preprocessor on data X
     """
@@ -123,7 +121,7 @@ def create_model_inputs(number_of_features):
     return inputs
 
 
-def encode_inputs(inputs, embedding_dims):
+def encode_inputs(inputs, embedding_dims, num_bins):
     encoded_feature_list = []
 
     for feature_name in inputs:
@@ -160,18 +158,19 @@ def get_tflat_model(parameters, number_of_features):
     https://keras.io/examples/structured_data/tabtransformer/
 
     """
-    num_transformer_blocks = 3
-    num_heads = 4
-    embedding_dims = 64
-    mlp_hidden_units_factors = [2, 1,]
-    dropout_rate = 0.2
-    use_column_embedding = True
+    num_transformer_blocks = parameters.get("num_transformer_blocks")
+    num_heads = parameters.get("num_heads")
+    embedding_dims = parameters.get("embedding_dims")
+    mlp_hidden_units_factors = parameters.get("mlp_hidden_units_factors")
+    dropout_rate = parameters.get("dropout_rate")
+    use_column_embedding = parameters.get("use_column_embedding")
+    num_bins = parameters.get("num_bins")
 
     # Create model inputs
     inputs = create_model_inputs(number_of_features)
 
     # Encode features
-    encoded_feature_list = encode_inputs(inputs, embedding_dims)
+    encoded_feature_list = encode_inputs(inputs, embedding_dims, num_bins)
 
     # Stack feature embeddings for the Tansformer.
     encoded_features = keras.ops.stack(encoded_feature_list, axis=1)

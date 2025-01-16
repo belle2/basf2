@@ -46,6 +46,14 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     if seed:
         tf.set_random_seed(seed)
 
+    parameters["num_transformer_blocks"] = 3
+    parameters["num_heads"] = 4
+    parameters["embedding_dims"] = 64
+    parameters["mlp_hidden_units_factors"] = [2, 1,]
+    parameters["dropout_rate"] = 0.2
+    parameters["use_column_embedding"] = True
+    parameters["num_bins"] = 64
+
     state = State(get_tflat_model(parameters, number_of_features))
 
     learning_rate = 0.001
@@ -71,6 +79,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     saved_parameters['number_of_features'] = number_of_features
     state.parameters = json.dumps(saved_parameters)
     state.seed = seed
+    state.num_bins = parameters["num_bins"]
     return state
 
 
@@ -119,6 +128,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     """
 
     number_of_features = X.shape[1]
+    num_bins = state.num_bins
 
     # transform labels
     if y.min() != 0:
@@ -131,7 +141,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     assert len(np.unique(state.ytest)) == 2
 
     # configure and adapt preprocessor
-    preprocessor = get_preprocessor(X)
+    preprocessor = get_preprocessor(X, num_bins)
 
     X = preprocessor(X)
     state.Xtest = preprocessor(state.Xtest)

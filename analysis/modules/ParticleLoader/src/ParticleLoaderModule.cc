@@ -14,6 +14,7 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 
 // utilities
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ValueIndexPairSorting.h>

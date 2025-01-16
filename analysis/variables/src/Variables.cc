@@ -30,7 +30,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/V0.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 
@@ -45,7 +44,6 @@
 #include <TRandom.h>
 #include <TVectorF.h>
 
-#include <iostream>
 #include <cmath>
 #include <boost/algorithm/string.hpp>
 

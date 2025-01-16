@@ -8,15 +8,12 @@
 
 #include <analysis/modules/TrackFitResultEstimator/TrackFitResultEstimator.h>
 
-#include <framework/datastore/RelationArray.h>
 #include <framework/geometry/BFieldManager.h>
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <analysis/ClusterUtility/ClusterUtils.h>
 
 #include <TDatabasePDG.h>
 #include <Math/Vector3D.h>
-#include <vector>
 
 using namespace Belle2;
 using namespace ROOT::Math;

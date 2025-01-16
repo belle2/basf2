@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #include <analysis/modules/UdstListFilter/UdstListFilterModule.h>
-// framework aux
-#include <framework/logging/Logger.h>
 #include <unordered_set>
 
 using namespace Belle2;

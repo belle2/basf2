@@ -8,6 +8,8 @@
 
 #include <analysis/dataobjects/TagVertex.h>
 
+#include <mdst/dataobjects/TrackFitResult.h>
+
 using namespace Belle2;
 
 static const double realNaN = std::numeric_limits<double>::quiet_NaN();

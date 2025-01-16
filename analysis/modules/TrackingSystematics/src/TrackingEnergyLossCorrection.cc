@@ -14,9 +14,9 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-#include <map>
-#include <TRandom.h>
 #include <Math/Vector4D.h>
+
+#include <map>
 
 using namespace Belle2;
 

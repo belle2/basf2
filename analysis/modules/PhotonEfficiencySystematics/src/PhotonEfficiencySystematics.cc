@@ -8,12 +8,12 @@
 
 // Own header.
 #include <analysis/modules/PhotonEfficiencySystematics/PhotonEfficiencySystematics.h>
-#include <iostream>
+
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/core/Environment.h>
-#include <analysis/VariableManager/Manager.h>
 
 #include <map>
 

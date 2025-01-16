@@ -14,7 +14,6 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/TagVertex.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 //utilities
 #include <analysis/utility/DistanceTools.h>
@@ -25,6 +24,8 @@
 // framework aux
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/B2Vector3.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <TMatrixD.h>
 #include <TVectorD.h>

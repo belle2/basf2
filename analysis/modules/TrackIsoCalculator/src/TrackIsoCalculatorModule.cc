@@ -8,10 +8,10 @@
 
 #include <analysis/modules/TrackIsoCalculator/TrackIsoCalculatorModule.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
+#include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/DetectorSurface.h>
 
 #include <cmath>
-#include <iomanip>
 #include <boost/algorithm/string.hpp>
 
 

@@ -238,23 +238,23 @@ namespace Belle2 {
       }
 
     private:
+      /// Array of the number of divisions at each level
+      const std::array<size_t, sizeof ...(divisions)> m_divisions = {{divisions ...}};
+
+      /// Dynamic hough tree structure traversed in the leaf search.
+      std::unique_ptr<HoughTree> m_houghTree = nullptr;
+
       /// Number of the maximum tree level.
       int m_maxLevel;
 
       /// Number of levels to skip in first level to form a finer sectored hough space.
       int m_sectorLevelSkip;
 
-      /// Array of the number of divisions at each level
-      const std::array<size_t, sizeof ...(divisions)> m_divisions = {{divisions ...}};
-
       /// An tuple of division overlaps in each coordinate.
       typename HoughBox::Delta m_overlaps;
 
       /// A tuple of value arrays providing the memory for the discrete bin bounds.
       Arrays m_arrays;
-
-      /// Dynamic hough tree structure traversed in the leaf search.
-      std::unique_ptr<HoughTree> m_houghTree = nullptr;
     };
   }
 }

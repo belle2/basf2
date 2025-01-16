@@ -3,4 +3,4 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::TrackFindingCDC::AutomatonCell+; // checksum=0x9f120b48, version=-1
+#pragma link C++ class Belle2::TrackFindingCDC::AutomatonCell+; // checksum=0x8a581ad6, version=-1

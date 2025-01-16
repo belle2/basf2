@@ -8,9 +8,6 @@
 
 #pragma once
 
-
-#include <vector>
-#include <string>
 #include <framework/geometry/B2Vector3.h>
 #include "TMatrixDSym.h"
 

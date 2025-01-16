@@ -3260,11 +3260,7 @@ def writePi0EtaVeto(
     if pi0PayloadNameOverride is not None:
         Pi0PayloadName = pi0PayloadNameOverride
     if pi0SoftPhotonCutOverride is None:
-        Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + NHitsCut
-        import b2bii
-        if not b2bii.isB2BII():
-            # timing cut is only valid for Belle II but not for B2BII
-            Pi0SoftPhotonCut += ' and ' + TimingCut
+        Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + NHitsCut + ' and ' + TimingCut
     else:
         Pi0SoftPhotonCut = pi0SoftPhotonCutOverride
 
@@ -3291,11 +3287,7 @@ def writePi0EtaVeto(
     if etaPayloadNameOverride is not None:
         EtaPayloadName = etaPayloadNameOverride
     if etaSoftPhotonCutOverride is None:
-        EtaSoftPhotonCut = EtaEnergyCut + ' and ' + NHitsCut
-        import b2bii
-        if not b2bii.isB2BII():
-            # timing cut is only valid for Belle II but not for B2BII
-            EtaSoftPhotonCut += ' and ' + TimingCut
+        EtaSoftPhotonCut = EtaEnergyCut + ' and ' + NHitsCut + ' and ' + TimingCut
     else:
         EtaSoftPhotonCut = etaSoftPhotonCutOverride
 

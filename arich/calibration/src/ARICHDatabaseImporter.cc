@@ -66,7 +66,6 @@
 #include <TGraph2D.h>
 #include <TFile.h>
 #include <TKey.h>
-#include <TCanvas.h>
 #include <TString.h>
 #include <string>
 #include <vector>

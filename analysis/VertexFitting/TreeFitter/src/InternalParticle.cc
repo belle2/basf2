@@ -13,7 +13,6 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/logging/Logger.h>
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/V0.h>
 
 using std::vector;

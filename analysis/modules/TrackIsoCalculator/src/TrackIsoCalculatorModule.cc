@@ -8,10 +8,10 @@
 
 #include <analysis/modules/TrackIsoCalculator/TrackIsoCalculatorModule.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
+#include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/DetectorSurface.h>
 
 #include <cmath>
-#include <iomanip>
 #include <boost/algorithm/string.hpp>
 
 
@@ -24,6 +24,7 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
   // Set module properties
   setDescription(
     R"DOC(Calculate track isolation variables on the charged stable particles, or selected charged daughters, of the input ParticleList.)DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("decayString",

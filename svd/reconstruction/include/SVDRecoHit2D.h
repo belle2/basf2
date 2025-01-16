@@ -128,13 +128,13 @@ namespace Belle2 {
 
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };
 
-    unsigned short m_sensorID; /**< Unique sensor identifier.*/
     const SVDTrueHit* m_trueHit; /**< Pointer to the Truehit used to generate this hit */
     const SVDCluster* m_uCluster; /**< Pointer to mother uCluster. */
     const SVDCluster* m_vCluster; /**< Pointer to mother vCluster. */
 
     float m_energyDep; /**< deposited energy.*/
     //float m_energyDepError; /**< error in dep. energy.*/
+    unsigned short m_sensorID; /**< Unique sensor identifier.*/
 
     /** Set up Detector plane information */
     void setDetectorPlane();
@@ -142,7 +142,7 @@ namespace Belle2 {
     /** Apply planar deformation of sensors */
     TVectorD applyPlanarDeformation(TVectorD rawHit, std::vector<double> planarParameters, const genfit::StateOnPlane& state) const;
 
-    ClassDefOverride(SVDRecoHit2D, 7)
+    ClassDefOverride(SVDRecoHit2D, 8)
   };
 
 } // namespace Belle2

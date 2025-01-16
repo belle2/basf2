@@ -12,8 +12,7 @@
 #include <analysis/modules/TreeFitter/TreeFitterModule.h>
 #include <analysis/VertexFitting/TreeFitter/FitManager.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/database/DBObjPtr.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
 
 #include <analysis/utility/ParticleCopy.h>
 #include <analysis/utility/PCmsLabTransform.h>

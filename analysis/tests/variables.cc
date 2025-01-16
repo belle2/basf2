@@ -13,19 +13,16 @@
 #include <analysis/variables/TrackVariables.h>
 
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/dataobjects/EventExtraInfo.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/TestHelpers.h>
-#include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/Const.h>
 
@@ -35,7 +32,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/V0.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
 
 #include <gtest/gtest.h>
 
@@ -44,7 +40,6 @@
 #include <Math/Cartesian2D.h>
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
-#include <TMath.h>
 #include <utility>
 
 using namespace std;
@@ -2311,7 +2306,7 @@ namespace {
 
   TEST_F(MetaVariableTest, sin)
   {
-    Particle p({ 3.14159265359 / 2.0, -0.4, 0.8, 1.0}, 11);
+    Particle p({ M_PI / 2.0, -0.4, 0.8, 1.0}, 11);
     Particle p2({ 0.0, -0.4, 0.8, 1.0 }, -11);
 
     const Manager::Var* var = Manager::Instance().getVariable("sin(px)");
@@ -2323,7 +2318,7 @@ namespace {
 
   TEST_F(MetaVariableTest, cos)
   {
-    Particle p({ 3.14159265359 / 2.0, -0.4, 0.8, 1.0}, 11);
+    Particle p({ M_PI / 2.0, -0.4, 0.8, 1.0}, 11);
     Particle p2({ 0.0, -0.4, 0.8, 1.0 }, -11);
 
     const Manager::Var* var = Manager::Instance().getVariable("cos(px)");

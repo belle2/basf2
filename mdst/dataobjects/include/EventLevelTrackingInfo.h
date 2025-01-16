@@ -256,6 +256,33 @@ namespace Belle2 {
       c_svdSpacePointAbortion   = 4, /**< Indicating abortion of the SVD Space Point Creator due to very busy event. */
     };
 
+    /** Efficient way of storing, which layers in the CDC have at least a single hit.
+      *
+      *  Using indirectly the HitPatternCDC. However, as that object has internal data, that isn't
+      *  supposed to be written out, we only store an initializer integer.
+      *  As we are expecting a larger number of hits, some functionality can't be used and
+      *  the corresponding information is handled with separate members.
+      *  Instead we store the number of segments into the bits reserved for number of hits in the Track.
+      *
+      *  @sa HitPatternCDC
+      */
+    uint64_t m_hitPatternCDCInitializer {0};
+
+    /** Storage for number of clusters in the SVD
+     *
+     *  We can store up to 255 clusters per layer and direction.
+     *  Typically events are much below that, if not, the event is a noisy one.
+     *  The first 4 numbers refer to u-direction strips, the second 4 to the v-direction.
+     */
+    uint8_t m_nSVDClusters[8] {0, 0, 0, 0, 0, 0, 0, 0};
+
+    /** Storage for number of clusters in the PXD.
+     *
+     *  We can store up to 65'535 cluster per layer here. This is slightly above the hardware readout limit,
+     *  and therefore sufficient.
+     */
+    uint16_t m_nPXDClusters[2] {0, 0};
+
     /** Number of hits in the CDC, that were not assigned to any Track.
      *
      *  HitPatternCDC saves only up to 255 hits, as its primary use-case is the Track, but
@@ -271,39 +298,12 @@ namespace Belle2 {
      */
     uint16_t m_nCDCHitsNotAssignedPostCleaning {0};
 
-    /** Efficient way of storing, which layers in the CDC have at least a single hit.
-      *
-      *  Using indirectly the HitPatternCDC. However, as that object has internal data, that isn't
-      *  supposed to be written out, we only store an initializer integer.
-      *  As we are expecting a larger number of hits, some functionality can't be used and
-      *  the corresponding information is handled with separate members.
-      *  Instead we store the number of segments into the bits reserved for number of hits in the Track.
-      *
-      *  @sa HitPatternCDC
-      */
-    uint64_t m_hitPatternCDCInitializer {0};
-
-    /** Storage for number of clusters in the PXD.
-     *
-     *  We can store up to 65'535 cluster per layer here. This is slightly above the hardware readout limit,
-     *  and therefore sufficient.
-     */
-    uint16_t m_nPXDClusters[2] {0, 0};
-
-    /** Storage for number of clusters in the SVD
-     *
-     *  We can store up to 255 clusters per layer and direction.
-     *  Typically events are much below that, if not, the event is a noisy one.
-     *  The first 4 numbers refer to u-direction strips, the second 4 to the v-direction.
-     */
-    uint8_t m_nSVDClusters[8] {0, 0, 0, 0, 0, 0, 0, 0};
-
     /** storage for time of first SVD sample.*/
     int8_t m_sampleTime {0};
 
     /** Set of further flags useful in the context of tracking reconstruction. */
     std::bitset<16> m_flagBlock;
 
-    ClassDef(EventLevelTrackingInfo, 2); /**< ROOTification. */
+    ClassDef(EventLevelTrackingInfo, 3); /**< ROOTification. */
   };
 }

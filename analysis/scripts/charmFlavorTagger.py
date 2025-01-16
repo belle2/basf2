@@ -11,6 +11,7 @@
 import basf2
 import variables as va
 import modularAnalysis as ma
+import math
 
 
 def charmFlavorTagger(particle_list, uniqueIdentifier='CFT_ragdoll',
@@ -43,14 +44,14 @@ def charmFlavorTagger(particle_list, uniqueIdentifier='CFT_ragdoll',
 
     # compute ranking variable and additional CFT input variables, PID_diff=pionID-kaonID, deltaR=sqrt(deltaPhi**2+deltaEta**2)
     rank_variable = 'opang_shift'
-    va.variables.addAlias(rank_variable, f"abs(formula(angleToClosestInList({particle_list}) - 3.14159265359/2))")
+    va.variables.addAlias(rank_variable, f"abs(formula(angleToClosestInList({particle_list}) - {math.pi}/2))")
     va.variables.addAlias("eta", "formula(-1*log(tan(formula(theta/2))))")
     va.variables.addAlias("phi_sig", "particleRelatedToCurrentROE(phi)")
     va.variables.addAlias("eta_sig", "particleRelatedToCurrentROE(eta)")
     va.variables.addAlias("deltaPhi_temp", "abs(formula(phi-phi_sig))")
     va.variables.addAlias(
         "deltaPhi",
-        "conditionalVariableSelector(deltaPhi_temp>3.14159265359,formula(deltaPhi_temp-2*3.14159265359),deltaPhi_temp)")
+        f"conditionalVariableSelector(deltaPhi_temp>{math.pi},formula(deltaPhi_temp-2*{math.pi}),deltaPhi_temp)")
     va.variables.addAlias("deltaR", "formula(((deltaPhi)**2+(eta-eta_sig)**2)**0.5)")
     va.variables.addAlias("PID_diff", "formula(pionID-kaonID)")
 

@@ -9,8 +9,6 @@
 // Own header.
 #include <analysis/variables/HelicityVariables.h>
 
-#include <analysis/VariableManager/Utility.h>
-
 #include <analysis/variables/EventVariables.h>
 
 #include <analysis/dataobjects/Particle.h>
@@ -18,10 +16,7 @@
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/VariableManager/Manager.h>
 
-#include <framework/utilities/Conversion.h>
 #include <framework/gearbox/Const.h>
-
-#include <boost/algorithm/string.hpp>
 
 #include <Math/Boost.h>
 #include <Math/Vector4D.h>

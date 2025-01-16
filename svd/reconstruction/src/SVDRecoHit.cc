@@ -21,15 +21,15 @@ using namespace std;
 using namespace Belle2;
 
 SVDRecoHit::SVDRecoHit():
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
-  m_cluster(0), m_isU(0), m_energyDep(0), m_rotationPhi(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(0),
+  m_cluster(0), m_energyDep(0), m_rotationPhi(0), m_sensorID(0), m_isU(0)
 {
   setStripV(!m_isU);
 }
 
 SVDRecoHit::SVDRecoHit(const SVDTrueHit* hit, bool uDirection, float sigma):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
-  m_cluster(0), m_isU(uDirection), m_energyDep(0), m_rotationPhi(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(hit),
+  m_cluster(0), m_energyDep(0), m_rotationPhi(0), m_sensorID(0), m_isU(uDirection)
 {
   setStripV(!m_isU);
 
@@ -56,8 +56,8 @@ SVDRecoHit::SVDRecoHit(const SVDTrueHit* hit, bool uDirection, float sigma):
 }
 
 SVDRecoHit::SVDRecoHit(const SVDCluster* hit, const genfit::TrackCandHit*):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
-  m_cluster(hit), m_energyDep(0), m_rotationPhi(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(0),
+  m_cluster(hit), m_energyDep(0), m_rotationPhi(0), m_sensorID(0)
 {
   // Set the sensor UID
   m_sensorID = hit->getSensorID();

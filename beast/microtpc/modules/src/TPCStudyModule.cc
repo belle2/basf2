@@ -18,8 +18,6 @@
 
 // ROOT
 #include <Math/Vector3D.h>
-#include <TH1.h>
-#include <TH2.h>
 
 int ctr = 0;
 int co_ctr[4] = {0, 0, 0, 0};

@@ -12,8 +12,6 @@
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
 #include <analysis/VariableManager/Manager.h>
 
-#include <iostream>
-
 using namespace std;
 using namespace Belle2;
 

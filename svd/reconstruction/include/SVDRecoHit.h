@@ -110,15 +110,15 @@ namespace Belle2 {
 
     enum { HIT_DIMENSIONS = 1 /**< sensitive Dimensions of the Hit */ };
 
-    unsigned short m_sensorID; /**< Unique sensor identifier.*/
     /** Pointer to the Truehit used to generate this hit */
     const SVDTrueHit* m_trueHit; //! transient member (not written out during streaming)
     /** Pointer to the Cluster used to generate this hit */
     const SVDCluster* m_cluster; //! transient member (not written out during streaming)
-    bool m_isU; /**< True if the hit has u-coordinate, false if v. */
     float m_energyDep; /**< deposited energy.*/
     //float m_energyDepError; /**< error in dep. energy.*/
     float m_rotationPhi; /**< angle of the plane rotation, for u in wedge sensors.*/
+    unsigned short m_sensorID; /**< Unique sensor identifier.*/
+    bool m_isU; /**< True if the hit has u-coordinate, false if v. */
 
     /** Set up Detector plane information */
     void setDetectorPlane();
@@ -126,7 +126,7 @@ namespace Belle2 {
     /** Apply planar deformation of sensors */
     TVectorD applyPlanarDeformation(TVectorD rawHit, std::vector<double> planarParameters, const genfit::StateOnPlane& state) const;
 
-    ClassDefOverride(SVDRecoHit, 7)
+    ClassDefOverride(SVDRecoHit, 8)
   };
 
 } // namespace Belle2

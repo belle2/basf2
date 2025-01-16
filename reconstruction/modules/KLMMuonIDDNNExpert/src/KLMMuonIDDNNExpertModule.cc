@@ -28,8 +28,6 @@
 
 #include <mva/interface/Interface.h>
 
-#include <boost/algorithm/string/predicate.hpp>
-
 using namespace Belle2;
 
 REG_MODULE(KLMMuonIDDNNExpert);

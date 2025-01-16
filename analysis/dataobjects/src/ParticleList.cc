@@ -16,7 +16,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/HTML.h>
 
-#include <iostream>
 #include <algorithm>
 
 using namespace std;

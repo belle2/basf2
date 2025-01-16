@@ -18,14 +18,10 @@
 #include <framework/gearbox/Const.h>
 #include <cmath>
 
-#include <fstream>
 #include <string>
 
 // ROOT
 #include <TRandom.h>
-#include <TH1.h>
-#include <TH2.h>
-#include <TH3.h>
 #include <TMath.h>
 
 int eventNum = 0;

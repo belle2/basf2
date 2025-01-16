@@ -11,13 +11,11 @@
 #include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHGeometryConfig.h>
-#include <arich/dbobjects/tessellatedSolidStr.h>
 
 #include <geometry/Materials.h>
 #include <arich/dbobjects/ARICHGeoHAPD.h>
 
 #include <cmath>
-#include <fstream>
 
 using namespace std;
 using namespace Belle2;

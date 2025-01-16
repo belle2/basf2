@@ -413,8 +413,9 @@ class TauGeneric(BaseSkim):
         # NOTE: the validation package is not part of the light releases, so this import
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
+        from ROOT import Belle2
 
-        vm.addAlias('Theta_miss', 'formula(missingMomentumOfEvent_theta*180/3.14159)')
+        vm.addAlias('Theta_miss', f'formula(missingMomentumOfEvent_theta/{Belle2.Unit.deg})')
 
         # add contact information to histogram
         contact = "kenji@hepl.phys.nagoya-u.ac.jp"

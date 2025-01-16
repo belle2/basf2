@@ -162,7 +162,7 @@ def get_tflat_model(parameters, number_of_features):
     """
     num_transformer_blocks = 3
     num_heads = 4
-    embedding_dims = 8
+    embedding_dims = 64
     mlp_hidden_units_factors = [2, 1,]
     dropout_rate = 0.2
     use_column_embedding = True
@@ -220,7 +220,10 @@ def get_tflat_model(parameters, number_of_features):
         )(x)
 
     # Flatten the "contextualized" embeddings of the features.
-    features = keras.layers.Flatten()(encoded_features)
+    # features = keras.layers.Flatten()(encoded_features)
+
+    # Pool the "contextualized" embeddings of the features.
+    features = keras.layers.GlobalAveragePooling1D()(encoded_features)
 
     # Compute MLP hidden_units.
     mlp_hidden_units = [

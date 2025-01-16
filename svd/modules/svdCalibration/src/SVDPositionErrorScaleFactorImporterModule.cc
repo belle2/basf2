@@ -302,6 +302,8 @@ void SVDPositionErrorScaleFactorImporterModule::endRun()
             payload_oldDefault->set(theVxdID.getLayerNumber(), theVxdID.getLadderNumber(), theVxdID.getSensorNumber(), m_side, 1, *scfs);
         }
 
+  delete scfs;
+
   if (TString(m_posAlgorithm).Contains("CoGOnly")) {
     Database::Instance().storeData(SVDCoGOnlyErrorScaleFactors::name, payload_cogOnly, iov);
 

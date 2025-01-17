@@ -325,11 +325,11 @@ def run_validation(job_path, job_path_prev, arg3, arg4, arg5):
     # Sort IoV from earliest to latest
     sorted_exp_run_list = sorted(exp_run_list + exp_run_list_prev)
     # Calculate the residuals for each adjacent pair of IoVs and saves the results of the comparison in a .pdf file
-    for i in range(0, len(sorted_exp_run_list)-1):
-        exp_prev = sorted_exp_run_list[i][0]
-        run_prev = sorted_exp_run_list[i][1]
-        exp = sorted_exp_run_list[i+1][0]
-        run = sorted_exp_run_list[i+1][1]
+    for i in range(0, len(sorted_exp_run_list)//2):
+        exp_prev = sorted_exp_run_list[2*i][0]
+        run_prev = sorted_exp_run_list[2*i][1]
+        exp = sorted_exp_run_list[2*i+1][0]
+        run = sorted_exp_run_list[2*i+1][1]
         data_path = tmp_work_dir+f'/alignment_{exp_prev}_{run_prev}.root'
         data_path_prev = tmp_work_dir+f'/alignment_{exp}_{run}.root'
         EKLM_values, EKLM_errors, EKLM_chi2, BKLM_values, BKLM_errors, BKLM_chi2 = get_residuals(data_path, data_path_prev)

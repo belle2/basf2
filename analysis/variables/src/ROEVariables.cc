@@ -2295,7 +2295,9 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "- ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
                       "- ``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
                       "- ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
-                      "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n\n"
+                      "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
+                      "- ``standardMC15rd``: loose energy cut is applied to soft photon and the weight files are trained using MC15rd \n"
+                      "- ``tightMC15rd``: tight energy cut is applied to soft photon and the weight files are trained using MC15rd \n\n"
                       "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("etaProb(mode)", etaProb,
@@ -2304,7 +2306,9 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "- ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
                       "- ``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
                       "- ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
-                      "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n\n"
+                      "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
+                      "- ``standardMC15rd``: loose energy cut is applied to soft photon and the weight files are trained using MC15rd \n"
+                      "- ``tightMC15rd``: tight energy cut is applied to soft photon and the weight files are trained using MC15rd \n\n"
                       "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.", Manager::VariableDataType::c_double);
 
   }

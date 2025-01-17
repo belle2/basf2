@@ -3121,27 +3121,28 @@ def writePi0EtaVeto(
     Give pi0/eta probability for hard photon.
 
     In the default weight files a value of 1.4 GeV is set as the lower limit for the hard photon energy in the CMS frame.
-    For MC15rd weight files, the BtoXGamma skim is applied durning the MVA training.
+    For MC15rd weight files, the BtoXGamma skim is applied during the MVA training.
 
     The current default weight files are optimised using MC15rd. The weight files for MC12 (last version) are still available.
 
     The input variables of the mva training for pi0 veto using MC15rd are:
 
-    * M: pi0/eta candidates Invariant mass
-    * cosHelicityAngleMomentum: pi0/eta candidates cosHelicityAngleMomentum
+    * M: Invariant mass of pi0 candidates
+    * cosHelicityAngleMomentum: Cosine of angle between momentum difference of the photons in the pi0 rest frame
+    and momentum of pi0 in lab frame
     * daughter(1,E): soft photon energy in lab frame
     * daughter(1,clusterTheta): soft photon ECL cluster's polar angle
     * daughter(1,clusterLAT): soft photon lateral energy distribution
 
     The input variables of the mva training for eta veto using MC15rd are:
 
-    * M: pi0/eta candidates Invariant mass
+    * M: Invariant mass of eta candidates
     * cosHelicityAngleMomentum: pi0/eta candidates cosHelicityAngleMomentum
     * daughter(1,E): soft photon energy in lab frame
     * daughter(1,clusterTheta): soft photon ECL cluster's polar angle
     * daughter(1,clusterLAT): soft photon lateral energy distribution
     * daughter(1,clusterNHits): soft photon total crystal weights sum(w_i) with w_i<=1
-    * daughter(1,clusterE1E9): soft photon ratio of energies in inner 1x1 crystals and 3x3 crystals
+    * daughter(1,clusterE1E9): soft photon ratio between energies of central crystal and inner 3x3 crystals
     * daughter(1,clusterE9E21): soft photon ratio of energies in inner 3x3 crystals and 5x5 crystals without corners
     * daughter(1,clusterSecondMoment): soft photon second moment
     * daughter(1,clusterAbsZernikeMoment40): soft photon Zernike moment 40
@@ -3164,14 +3165,14 @@ def writePi0EtaVeto(
     * tight: tight energy cut and no clusterNHits cut are applied to soft photon
     * cluster: loose energy cut and clusterNHits cut are applied to soft photon
     * both: tight energy cut and clusterNHits cut are applied to soft photon
-    * standardMC15rd: loose energy cut are applied to soft photon and the weight files is trained using MC15rd
-    * tightMC15rd: tight energy cut are applied to soft photon and the weight files is trained using MC15rd
+    * standardMC15rd: loose energy cut is applied to soft photon and the weight files are trained using MC15rd
+    * tightMC15rd: tight energy cut is applied to soft photon and the weight files are trained using MC15rd
 
     The final probability of the pi0/eta veto is stored as an extraInfo. If no suffix is set it can be obtained from the variables
     `pi0Prob`/`etaProb`. Otherwise, it is available as '{Pi0, Eta}ProbOrigin', '{Pi0, Eta}ProbTightEnergyThreshold', '{Pi0,
     Eta}ProbLargeClusterSize', '{Pi0, Eta}ProbTightEnergyThresholdAndLargeClusterSize', '{Pi0, Eta}ProbOriginMC15rd', or
     '{Pi0, Eta}ProbTightEnergyThresholdMC15rd' for the six modes described above, with the chosen suffix appended. If one would
-    like call this veto twice in one script, add suffix in the second time!!!
+    like to call this veto twice in one script, add suffix in the second time!
     The second highest probability of the pi0/eta veto also is stored as an extraInfo, with a prefix of 'second' to the previous
     ones, e.g. secondPi0ProbOrigin{suffix}. This can be used to do validation/systematics study.
 
@@ -3199,8 +3200,8 @@ def writePi0EtaVeto(
                                     (default is None)
     @param requireSoftPhotonIsInROE specify if the soft photons used to build pi0 and eta candidates have to be in the current ROE
                                     or not. Default is False, i.e. all soft photons in the event are used.
-    @param pi0Selection     Selection for the pi0 reconstruction. Default is '(M > 0.03 and M < 0.23)'.
-    @param etaSelection     Selection for the eta reconstruction. Default is '(M > 0.25 and M < 0.75)'.
+    @param pi0Selection     Selection for the pi0 reconstruction. Default is '(0.03 < M < 0.23)'.
+    @param etaSelection     Selection for the eta reconstruction. Default is '(0.25 < M < 0.75)'.
     """
 
     import b2bii
@@ -3210,10 +3211,16 @@ def writePi0EtaVeto(
     if (requireSoftPhotonIsInROE):
         B2WARNING("Requiring the soft photon to being in the ROE was not done for the MVA training. "
                   "Please check the results carefully.")
-    if (pi0Selection != '[0.03 < M < 0.23]' or etaSelection != '[0.25 < M < 0.75]'):
-        B2WARNING(
-            "Personal selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
-            "Please check the results carefully.")
+    if (mode == 'standardMC15rd' or mode == 'tightMC15rd'):
+        if (pi0Selection != '[0.03 < M < 0.23]' or etaSelection != '[0.25 < M < 0.75]'):
+            B2WARNING(
+                "Personal selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
+                "Please check the results carefully.")
+    else:
+        if (pi0Selection != '' or etaSelection != ''):
+            B2WARNING(
+                "Personal selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
+                "Please check the results carefully.")
 
     renameSuffix = False
 
@@ -3324,7 +3331,7 @@ def writePi0EtaVeto(
     # MVA training is conducted.
     roe_path.add_module('MVAExpert', listNames=['pi0:Pi0Veto' + ListName + suffix],
                         extraInfoName=Pi0ExtraInfoName, identifier=Pi0PayloadName)
-    # Pick up one pi0/eta candidate with the highest pi0/eta probability.
+    # Pick up the pi0/eta candidate with the highest pi0/eta probability.
     rankByHighest(
         'pi0:Pi0Veto' + ListName + suffix,
         'extraInfo(' + Pi0ExtraInfoName + ')',
@@ -3337,7 +3344,7 @@ def writePi0EtaVeto(
                    path=roe_path)
     variableToSignalSideExtraInfo('pi0:Pi0VetoFirst' + ListName + suffix,
                                   {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoName + suffix}, path=roe_path)
-    # Pick up one pi0/eta candidate with the second highest pi0/eta probability.
+    # Pick up the pi0/eta candidate with the second highest pi0/eta probability.
     cutAndCopyList(outputListName='pi0:Pi0VetoSecond' + ListName + suffix,
                    inputListName='pi0:Pi0Veto' + ListName + suffix,
                    cut='extraInfo(Pi0VetoRank)==2',
@@ -3353,7 +3360,7 @@ def writePi0EtaVeto(
         EtaSoftPhotonCut = EtaEnergyCut + ' and ' + NHitsTimingCut
     else:
         EtaSoftPhotonCut = etaSoftPhotonCutOverride
-        B2WARNING("You're appling personal cuts on the softphoton candidates, be careful. ")
+        B2WARNING("You're applying personal cuts on the soft photon candidates, be careful. ")
 
     if requireSoftPhotonIsInROE:
         EtaSoftPhotonCut += ' and isInRestOfEvent==1'

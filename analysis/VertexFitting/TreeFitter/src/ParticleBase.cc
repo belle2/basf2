@@ -446,7 +446,7 @@ namespace TreeFitter {
       const Eigen::Matrix < double, 1, -1, 1, 1, 3 > vertex_dist =
         fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
       const Eigen::Matrix < double, 1, -1, 1, 1, 3 >
-      mom = fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
+      mom = fitparams.getStateVector().segment(posindex, dim);
 
       // if an intermediate vertex is not well defined by a track or so it will be initialised with 0
       // same for the momentum of for example B0, it might be initialised with 0

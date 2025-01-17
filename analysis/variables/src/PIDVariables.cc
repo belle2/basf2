@@ -1005,6 +1005,22 @@ namespace Belle2 {
     };
 
 
+    double electronIDNN(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("pidNeuralNetworkValueExpert(11)"))
+        return particle->getExtraInfo("pidNeuralNetworkValueExpert(11)");
+      static auto func = pidNeuralNetworkValueExpert({"11"});
+      return std::get<double>(func(particle));
+    }
+
+    double muonIDNN(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("pidNeuralNetworkValueExpert(13)"))
+        return particle->getExtraInfo("pidNeuralNetworkValueExpert(13)");
+      static auto func = pidNeuralNetworkValueExpert({"13"});
+      return std::get<double>(func(particle));
+    }
+
     double pionIDNN(const Particle* particle)
     {
       if (particle->hasExtraInfo("pidNeuralNetworkValueExpert(211)"))
@@ -1020,6 +1036,23 @@ namespace Belle2 {
       static auto func = pidNeuralNetworkValueExpert({"321"});
       return std::get<double>(func(particle));
     }
+
+    double protonIDNN(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("pidNeuralNetworkValueExpert(2212)"))
+        return particle->getExtraInfo("pidNeuralNetworkValueExpert(2212)");
+      static auto func = pidNeuralNetworkValueExpert({"2212"});
+      return std::get<double>(func(particle));
+    }
+
+    double deuteronIDNN(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("pidNeuralNetworkValueExpert(1000010020)"))
+        return particle->getExtraInfo("pidNeuralNetworkValueExpert(1000010020)");
+      static auto func = pidNeuralNetworkValueExpert({"1000010020"});
+      return std::get<double>(func(particle));
+    }
+
 
     double klmMuonIDDNN(const Particle* part)
     {
@@ -1238,13 +1271,35 @@ One can provide the name of the weight matrix as the argument.
                           Manager::VariableDataType::c_double);
 
 
+    REGISTER_VARIABLE("electronIDNN", electronIDNN,
+			  R"DOC(
+electron identification probability as calculated from the PID neural network.
+Requires global tag `pid_nn_<release>` with the correct data <release>.
+)DOC");
+    REGISTER_VARIABLE("muonIDNN", muonIDNN,
+			  R"DOC(
+muon identification probability as calculated from the PID neural network.
+Requires global tag `pid_nn_<release>` with the correct data <release>.
+)DOC");
     REGISTER_VARIABLE("pionIDNN", pionIDNN,
 			  R"DOC(
 pion identification probability as calculated from the PID neural network.
+Requires global tag `pid_nn_<release>` with the correct data <release>.
 )DOC");
     REGISTER_VARIABLE("kaonIDNN", kaonIDNN,
 			  R"DOC(
 kaon identification probability as calculated from the PID neural network.
+Requires global tag `pid_nn_<release>` with the correct data <release>.
+)DOC");
+    REGISTER_VARIABLE("protonIDNN", protonIDNN,
+			  R"DOC(
+proton identification probability as calculated from the PID neural network.
+Requires global tag `pid_nn_<release>` with the correct data <release>.
+)DOC");
+    REGISTER_VARIABLE("deuteronIDNN", deuteronIDNN,
+			  R"DOC(
+deuteron identification probability as calculated from the PID neural network.
+Requires global tag `pid_nn_<release>` with the correct data <release>.
 )DOC");
 
 

@@ -158,7 +158,10 @@ namespace TreeFitter {
         }
       }
 
-      double mass = pb->particle()->getPDGMass();
+      double mass = 0;
+      if (pb->particle()->hasExtraInfo("treeFitterMassConstraintValue")) {
+        mass = pb->particle()->getExtraInfo("treeFitterMassConstraintValue");
+      } else mass = pb->particle()->getPDGMass();
       Eigen::Matrix<double, 3, 1> momVec =
         m_fitparams->getStateVector().segment(momindex, 3);
 
@@ -254,7 +257,10 @@ namespace TreeFitter {
         p.SetE(m_fitparams->getStateVector()(momindex + 3));
         cand.set4VectorDividingByMomentumScaling(p);
       } else {
-        const double mass = cand.getPDGMass();
+        double mass = 0;
+        if (cand.hasExtraInfo("treeFitterMassConstraintValue")) {
+          mass = cand.getExtraInfo("treeFitterMassConstraintValue");
+        } else mass = cand.getPDGMass();
         p.SetE(std::sqrt(p.P2() + mass * mass));
         cand.set4VectorDividingByMomentumScaling(p);
       }
@@ -308,7 +314,10 @@ namespace TreeFitter {
 
       comb_cov.block<3, 3>(1, 1) = mom_cov;
 
-      const double mass = pb->particle()->getPDGMass();
+      double mass = 0;
+      if (pb->particle()->hasExtraInfo("treeFitterMassConstraintValue")) {
+        mass = pb->particle()->getExtraInfo("treeFitterMassConstraintValue");
+      } else mass = pb->particle()->getPDGMass();
       const double mBYc = mass / Belle2::Const::speedOfLight;
       const double mom = mom_vec.norm();
       const double mom3 = mom * mom * mom;

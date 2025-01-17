@@ -216,7 +216,10 @@ namespace TreeFitter {
       fitparams.getStateVector().segment(momindex, maxrow) += fitparams.getStateVector().segment(daumomindex, maxrow);
 
       if (maxrow == 3) {
-        double mass = daughter->particle()->getPDGMass();
+        double mass = 0;
+        if (daughter->particle()->hasExtraInfo("treeFitterMassConstraintValue")) {
+          mass = daughter->particle()->getExtraInfo("treeFitterMassConstraintValue");
+        } else mass = daughter->particle()->getPDGMass();
         fitparams.getStateVector()(momindex + 3) += std::sqrt(e2 + mass * mass);
       }
     }
@@ -261,7 +264,10 @@ namespace TreeFitter {
         // m^2 + p^2 = E^2
         // so
         // E = sqrt(m^2 + p^2)
-        const double mass = daughter->particle()->getPDGMass();
+        double mass = 0;
+        if (daughter->particle()->hasExtraInfo("treeFitterMassConstraintValue")) {
+          mass = daughter->particle()->getExtraInfo("treeFitterMassConstraintValue");
+        } else mass = daughter->particle()->getPDGMass();
         const double p2 = p3_vec.squaredNorm();
         const double energy = std::sqrt(mass * mass + p2);
         p.getResiduals()(3) -= energy;

@@ -3129,7 +3129,7 @@ def writePi0EtaVeto(
 
     * M: Invariant mass of pi0 candidates
     * cosHelicityAngleMomentum: Cosine of angle between momentum difference of the photons in the pi0 rest frame
-    and momentum of pi0 in lab frame
+      and momentum of pi0 in lab frame
     * daughter(1,E): soft photon energy in lab frame
     * daughter(1,clusterTheta): soft photon ECL cluster's polar angle
     * daughter(1,clusterLAT): soft photon lateral energy distribution

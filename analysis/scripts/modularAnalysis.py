@@ -3316,7 +3316,7 @@ def writePi0EtaVeto(
         Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + NHitsTimingCut
     else:
         Pi0SoftPhotonCut = pi0SoftPhotonCutOverride
-        B2WARNING("You're appling personal cuts on the softphoton candidates, be careful. ")
+        B2WARNING("You're applying personal cuts on the soft photon candidates, be careful. ")
 
     if requireSoftPhotonIsInROE:
         Pi0SoftPhotonCut += ' and isInRestOfEvent==1'

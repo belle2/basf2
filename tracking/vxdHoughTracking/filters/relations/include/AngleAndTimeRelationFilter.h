@@ -29,9 +29,9 @@ namespace Belle2 {
       /// Filter relations in theta between hit states where the layer difference is +-2
       double m_ThetaCutDeltaL2 = 0.15;
       /// Cut on difference in u-side cluster time of the two hits
-      double m_DeltaTU = 15; // ns
+      double m_DeltaTU = 17.5; // ns
       /// Cut on difference in v-side cluster time of the two hits
-      double m_DeltaTV = 14; // ns
+      double m_DeltaTV = 17.5; // ns
       /// Use the delta t cuts between hits?
       bool m_useDeltaTCuts = true;
     };

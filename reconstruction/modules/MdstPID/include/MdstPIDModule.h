@@ -18,7 +18,7 @@
 
 #include <top/dataobjects/TOPLikelihood.h>
 #include <arich/dataobjects/ARICHLikelihood.h>
-#include <reconstruction/dataobjects/CDCDedxLikelihood.h>
+#include <cdc/dataobjects/CDCDedxLikelihood.h>
 #include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>

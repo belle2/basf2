@@ -1,23 +1,20 @@
-Changes in the analysis package in light-25xx-xxx
+Changes in the analysis package in light-2501-betelgeuse
+--------------------------------------------------------
+
 Modular Analysis
 ++++++++++++++++
 * In `modularAnalysis.writePi0EtaVeto`:
-  * Add option to use the weight files trained using MC15rd files: standardMC15rd and tightMC15rd.
-  * The second highest score is also stored in to extra information, e.g. secondPi0ProbOrigin.
 
-Variables
-+++++++++
-* The variables 'pi0Prob(mode)' and 'etaProb(mode)' are extended to MC15 version: standardMC15rd and tightMC15rd.
-
-
-Changes in the analysis package in light-2501-betelgeuse
---------------------------------------------------------
+  * Add option to use the weight files trained using MC15rd files: ``standardMC15rd`` and ``tightMC15rd``.
+  * The second highest score is also stored in to extra information, e.g., ``secondPi0ProbOrigin``.
 
 Variables
 +++++++++
 * The variables `prodVertexX`, `prodVertexY`, and `prodVertexZ` now return the production vertex position also for
   TreeFit. Previously, only Rave was supported. Moreover, the covariance matrix elements of the production vertex for a
   TreeFit are now also available via the variables `prodVertexCov` and `prodVertexXErr`, etc.
+* The variables `pi0Prob(mode) <pi0Prob>` and `etaProb(mode) <etaProb>` are extended to MC15 version
+  and accept the modes ``standardMC15rd`` and ``tightMC15rd``.
 
 Changes in the analysis package in light-2411-aldebaran
 -------------------------------------------------------

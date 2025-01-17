@@ -54,7 +54,6 @@ namespace Belle2 {
 
       size_t nHits = 0;
       std::pair<ITrackType, size_t> highestHitCountMCTrackId(0, 0);
-      // cppcheck-suppress ignoredReturnValue
       static_cast<void>(std::max_element(hitCountByMCTrackId.begin(), hitCountByMCTrackId.end(), LessOf<Second>()));
 
       for (const auto& hitCountForMCTrackId : hitCountByMCTrackId) {

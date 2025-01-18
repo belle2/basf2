@@ -3137,7 +3137,8 @@ def writePi0EtaVeto(
     The input variables of the mva training for eta veto using MC15rd are:
 
     * M: Invariant mass of eta candidates
-    * cosHelicityAngleMomentum: pi0/eta candidates cosHelicityAngleMomentum
+    * cosHelicityAngleMomentum: Cosine of angle between momentum difference of the photons in the eta rest frame
+      and momentum of eta in lab frame
     * daughter(1,E): soft photon energy in lab frame
     * daughter(1,clusterTheta): soft photon ECL cluster's polar angle
     * daughter(1,clusterLAT): soft photon lateral energy distribution
@@ -3150,14 +3151,15 @@ def writePi0EtaVeto(
 
     The input variables of the mva training using MC12 are:
 
-    * M: pi0/eta candidates Invariant mass
+    * M: Invariant mass of pi0/eta candidates
     * daughter(1,E): soft photon energy in lab frame
     * daughter(1,clusterTheta): soft photon ECL cluster's polar angle
     * daughter(1,minC2TDist): soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
     * daughter(1,clusterZernikeMVA): soft photon output of MVA using Zernike moments of the cluster
     * daughter(1,clusterNHits): soft photon total crystal weights sum(w_i) with w_i<=1
     * daughter(1,clusterE9E21): soft photon ratio of energies in inner 3x3 crystals and 5x5 crystals without corners
-    * cosHelicityAngleMomentum: pi0/eta candidates cosHelicityAngleMomentum
+    * cosHelicityAngleMomentum: Cosine of angle between momentum difference of the photons in the pi0/eta rest frame
+      and momentum of pi0/eta in lab frame
 
     The following strings are available for mode:
 
@@ -3253,7 +3255,7 @@ def writePi0EtaVeto(
         'tight': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
         'cluster': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
         'both': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
-        'standardMC15rd': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+        'standardMC15rd': '[[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
         'tightMC15rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
 
     dictEtaEnergyCut = {
@@ -3261,7 +3263,7 @@ def writePi0EtaVeto(
         'tight': '[[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]]',
         'cluster': '[[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]]',
         'both': '[[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]]',
-        'standardMC15rd': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+        'standardMC15rd': '[[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
         'tightMC15rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
 
     dictNHitsTimingCut = {'standard': 'clusterNHits >= 0 and abs(clusterTiming)<clusterErrorTiming',

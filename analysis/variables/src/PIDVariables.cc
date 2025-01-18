@@ -1274,32 +1274,32 @@ One can provide the name of the weight matrix as the argument.
     REGISTER_VARIABLE("electronIDNN", electronIDNN,
 			  R"DOC(
 electron identification probability as calculated from the PID neural network.
-Requires global tag `pid_nn_<release>` with the correct data <release>.
+Requires global tag 'pid_nn_<release>' with the correct data <release>.
 )DOC");
     REGISTER_VARIABLE("muonIDNN", muonIDNN,
 			  R"DOC(
 muon identification probability as calculated from the PID neural network.
-Requires global tag `pid_nn_<release>` with the correct data <release>.
+Requires global tag 'pid_nn_<release>' with the correct data <release>.
 )DOC");
     REGISTER_VARIABLE("pionIDNN", pionIDNN,
 			  R"DOC(
 pion identification probability as calculated from the PID neural network.
-Requires global tag `pid_nn_<release>` with the correct data <release>.
+Requires global tag 'pid_nn_<release>' with the correct data <release>.
 )DOC");
     REGISTER_VARIABLE("kaonIDNN", kaonIDNN,
 			  R"DOC(
 kaon identification probability as calculated from the PID neural network.
-Requires global tag `pid_nn_<release>` with the correct data <release>.
+Requires global tag 'pid_nn_<release>' with the correct data <release>.
 )DOC");
     REGISTER_VARIABLE("protonIDNN", protonIDNN,
 			  R"DOC(
 proton identification probability as calculated from the PID neural network.
-Requires global tag `pid_nn_<release>` with the correct data <release>.
+Requires global tag 'pid_nn_<release>' with the correct data <release>.
 )DOC");
     REGISTER_VARIABLE("deuteronIDNN", deuteronIDNN,
 			  R"DOC(
 deuteron identification probability as calculated from the PID neural network.
-Requires global tag `pid_nn_<release>` with the correct data <release>.
+Requires global tag 'pid_nn_<release>' with the correct data <release>.
 )DOC");
 
 

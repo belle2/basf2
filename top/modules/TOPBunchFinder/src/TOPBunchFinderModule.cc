@@ -23,7 +23,7 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
-#include <reconstruction/dataobjects/CDCDedxLikelihood.h>
+#include <cdc/dataobjects/CDCDedxLikelihood.h>
 #include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 

@@ -12,7 +12,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -20,14 +19,11 @@
 #include <framework/gearbox/Const.h>
 
 // database
-//#include <framework/database/DBObjPtr.h>
-#include <analysis/dbobjects/PIDCalibrationWeight.h>
 #include <analysis/utility/PIDCalibrationWeightUtil.h>
 #include <analysis/utility/PIDNeuralNetwork.h>
 
 #include <boost/algorithm/string.hpp>
 
-#include <iostream>
 #include <cmath>
 
 using namespace std;

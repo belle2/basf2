@@ -15,13 +15,10 @@
 #include <framework/gearbox/Const.h>
 #include <cmath>
 
-#include <fstream>
 #include <string>
 
 // ROOT
 #include <Math/Vector3D.h>
-#include <TH1.h>
-#include <TH2.h>
 
 int eventNum = 0;
 

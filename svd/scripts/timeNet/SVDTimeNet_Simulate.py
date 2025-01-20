@@ -40,7 +40,7 @@ from svd.SVDSimBase import dt, SampleGenerator
 # off. This is to robustify against imprecise knowledge of waveform width
 # or shape.
 
-parser = argparse.ArgumentParser(description="Simulation of toy data for training of SVD hit time esitmator")
+parser = argparse.ArgumentParser(description="Simulation of toy data for training of SVD hit time estimator")
 
 parser.add_argument(
     '--nsamples',

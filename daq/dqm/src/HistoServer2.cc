@@ -9,6 +9,7 @@
 
 #include <framework/pcore/MsgHandler.h>
 #include <ctime>
+#include <unistd.h>
 #include <arpa/inet.h>
 
 using namespace Belle2;
@@ -71,7 +72,7 @@ int HistoServer2::server()
           if (ptr) {
             nr = atoi(ptr + 1);
           }
-          m_unit_last_conn_time[nr] = now;
+          m_unit_last_conn_time[address] = now;
 
           int is = sio.get(fd, buffer, c_maxBufSize);
           if (is <= 0) {
@@ -94,9 +95,9 @@ int HistoServer2::server()
           string subdir = "";
           now = time(0);
           strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-          m_unit_last_packet_time[nr] = now;
+          m_unit_last_packet_time[address] = now;
           printf("[%s] HistoServer2 : received nobjs = %d from %s\n", mbstr, nobjs, address);
-          if (nobjs > 0) m_unit_last_content_time[nr] = now;
+          if (nobjs > 0) m_unit_last_content_time[address] = now;
           for (int i = 0; i < nobjs; i++) {
             //      printf ( "Object : %s received, class = %s\n", (strlist.at(i)).c_str(),
             //                     (objlist.at(i))->ClassName() );
@@ -170,9 +171,9 @@ void HistoServer2::write_state(void)
     for (auto& it : m_units_connected) {
       int nr = it.second.first;
       int con = it.second.second;
-      strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_unit_last_conn_time[nr]));
-      strftime(mbstr2, sizeof(mbstr2), "%F %T", localtime(&m_unit_last_packet_time[nr]));
-      strftime(mbstr3, sizeof(mbstr3), "%F %T", localtime(&m_unit_last_content_time[nr]));
+      strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_unit_last_conn_time[it.first]));
+      strftime(mbstr2, sizeof(mbstr2), "%F %T", localtime(&m_unit_last_packet_time[it.first]));
+      strftime(mbstr3, sizeof(mbstr3), "%F %T", localtime(&m_unit_last_content_time[it.first]));
       if (it.first == "127.0.0.1") {
         fprintf(fh, "RUNCONTROL,");
       } else {

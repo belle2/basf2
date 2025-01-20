@@ -196,7 +196,8 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   n = histogram->GetXaxis()->GetNbins();
 
   /* call reference histograms from base class*/
-  TH1* ref_histogram = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleNone);
+  TH1* ref_histogram = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+  if (ref_histogram) {ref_histogram->Draw("hist,same");}
   float ref_average = 0;
 
   if (ref_histogram != nullptr) {
@@ -420,6 +421,9 @@ void DQMHistAnalysisKLMModule::processTimeHistogram(
       B2INFO("DQMHistAnalysisKLM: Time Delta Entries is " << delta->GetEntries());
       deltaDrawer(delta, histogram, canvas);
     }
+    //reference check
+    TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+    if (ref) {ref->Draw("hist,same");}
   }
 }
 
@@ -484,6 +488,9 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
     canvas->cd();
     histogram->SetStats(false);
     histogram->Draw();
+    //reference check
+    TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+    if (ref) {ref->Draw("hist,same");}
 
     int message_counter = 0;
     if (histName.find("bklm") != std::string::npos) {

@@ -280,7 +280,12 @@ def add_prune_tracks(path, components=None, reco_tracks="RecoTracks"):
     path.add_module("PruneGenfitTracks")
 
 
-def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", trackFitHypotheses=None):
+def add_flipping_of_recoTracks(
+        path,
+        fit_tracks=True,
+        reco_tracks="RecoTracks",
+        trackFitHypotheses=None,
+        reco_tracks_flipped="RecoTracks_flipped"):
     """
     This function adds the mva based selections and the flipping of the recoTracks
 
@@ -288,13 +293,13 @@ def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", 
     :param fit_tracks: fit the flipped recotracks or not
     :param reco_tracks: Name of the StoreArray where the reco tracks should be flipped
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param reco_tracks_flipped: Name of the temporary StoreArray for the flipped RecoTracks
     """
 
     path.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
                     identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
                     indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
 
-    reco_tracks_flipped = "RecoTracks_flipped"
     path.add_module("RecoTracksReverter", inputStoreArrayName=reco_tracks,
                     outputStoreArrayName=reco_tracks_flipped)
     if fit_tracks:
@@ -1153,7 +1158,7 @@ def add_svd_hough_tracking(path,
                     RecoTracksStoreArrayName=reco_tracks + suffix,
                     SVDSpacePointTrackCandsStoreArrayName=svd_space_point_track_candidates + suffix,
                     relationFilter='angleAndTime',
-                    twoHitUseNBestHits=4,
+                    twoHitUseNBestHits=2,
                     threeHitUseNBestHits=3,
                     fourHitUseNBestHits=3,
                     fiveHitUseNBestHits=2,

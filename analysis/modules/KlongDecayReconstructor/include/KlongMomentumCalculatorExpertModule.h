@@ -16,7 +16,6 @@
 #include <string>
 
 namespace Belle2 {
-  class Particle;
 
   /**
    * reco missing module

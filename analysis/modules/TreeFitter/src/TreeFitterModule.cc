@@ -14,7 +14,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
-#include <framework/database/DBObjPtr.h>
 
 #include <analysis/utility/ParticleCopy.h>
 #include <analysis/utility/PCmsLabTransform.h>

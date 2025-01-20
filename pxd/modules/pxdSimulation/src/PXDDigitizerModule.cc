@@ -482,7 +482,7 @@ double PXDDigitizerModule::addNoise(double charge)
         charge = gRandom->Gaus(charge, sqrt(charge));
       else
         // Otherwise Poisson distr.
-        charge = gRandom->Poisson(charge);
+        charge = gRandom->PoissonD(charge);
     }
     if (m_applyNoise) {
       charge += gRandom->Gaus(0., m_elNoise);

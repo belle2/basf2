@@ -35,7 +35,7 @@ REG_MODULE(DQMHistAnalysisSVDUnpacker);
 //-----------------------------------------------------------------
 
 DQMHistAnalysisSVDUnpackerModule::DQMHistAnalysisSVDUnpackerModule()
-  : DQMHistAnalysisModule()
+  : DQMHistAnalysisSVDModule()
 {
   //Parameter definition
   B2DEBUG(10, "DQMHistAnalysisSVDUnpacker: Constructor done.");
@@ -54,11 +54,8 @@ void DQMHistAnalysisSVDUnpackerModule::initialize()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDUnpacker: initialized.");
 
-  m_legError = new TPaveText(-1, 54, 3, 57.5, "br");
-  m_legError->AddText("ERROR!!");
-  m_legError->SetFillColor(c_ColorError);
-  m_legError->SetTextColor(c_ColorDefault);
-
+  m_legProblem->Clear();
+  m_legProblem->AddText("ERROR!!");
 
   gROOT->cd();
   m_cUnpacker = new TCanvas("SVDAnalysis/c_SVDDataFormat");
@@ -118,17 +115,17 @@ void DQMHistAnalysisSVDUnpackerModule::event()
     for (int un = 0; un < h->GetNcells(); un++)
       if (h->GetBinContent(un) / nEvents > m_unpackError)
         hasError = true;
-    if (! hasError) {
+
+    if (!hasError) {
       m_cUnpacker->cd();
       h->Draw("colztext");
       h->SetStats(0);
-      colorizeCanvas(m_cUnpacker, c_StatusGood);
+      setStatusOfCanvas(good, m_cUnpacker, false);
     } else {
       m_cUnpacker->cd();
       h->Draw("colztext");
       h->SetStats(0);
-      m_legError->Draw();
-      colorizeCanvas(m_cUnpacker, c_StatusError);
+      setStatusOfCanvas(error, m_cUnpacker, true);
     }
     if (nEvents > 0)
       setEpicsPV("UnpackError", h->GetEntries() / nEvents);
@@ -136,10 +133,8 @@ void DQMHistAnalysisSVDUnpackerModule::event()
     B2INFO("Histogram SVDUnpacker/DQMUnpackerHisto from SVDUnpackerDQM not found!");
     m_cUnpacker->cd();
     colorizeCanvas(m_cUnpacker, c_StatusDefault);
+    setStatusOfCanvas(noStat, m_cUnpacker);
   }
-
-  m_cUnpacker->Modified();
-  m_cUnpacker->Update();
 
   if (m_printCanvas)
     m_cUnpacker->Print("c_SVDDataFormat.pdf");
@@ -157,7 +152,4 @@ void DQMHistAnalysisSVDUnpackerModule::terminate()
   B2DEBUG(10, "DQMHistAnalysisSVDUnpacker: terminate called");
 
   delete m_cUnpacker;
-
-  delete m_legError;
-
 }

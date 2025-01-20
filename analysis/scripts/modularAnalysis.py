@@ -3149,7 +3149,10 @@ def writePi0EtaVeto(
     pi0PayloadNameOverride=None,
     pi0SoftPhotonCutOverride=None,
     etaPayloadNameOverride=None,
-    etaSoftPhotonCutOverride=None
+    etaSoftPhotonCutOverride=None,
+    requireSoftPhotonIsInROE=False,
+    pi0Selection='',
+    etaSelection=''
 ):
     """
     Give pi0/eta probability for hard photon.
@@ -3203,11 +3206,23 @@ def writePi0EtaVeto(
     @param etaPayloadNameOverride  specify the payload name of eta veto only if one wants to use non-default one. (default is None)
     @param etaSoftPhotonCutOverride specify the soft photon selection criteria of eta veto only if one wants to use non-default one.
                                     (default is None)
+    @param requireSoftPhotonIsInROE specify if the soft photons used to build pi0 and eta candidates have to be in the current ROE
+                                    or not. Default is False, i.e. all soft photons in the event are used.
+    @param pi0Selection     Selection for the pi0 reconstruction. Default is ''.
+    @param etaSelection     Selection for the eta reconstruction. Default is ''.
     """
 
     import b2bii
     if b2bii.isB2BII():
         B2ERROR("The pi0 / eta veto is not suitable for Belle analyses.")
+
+    if (requireSoftPhotonIsInROE):
+        B2WARNING("Requiring the soft photon to being in the ROE was not done for the MVA training. "
+                  "Please check the results carefully.")
+    if (pi0Selection != '' or etaSelection != ''):
+        B2WARNING(
+            "Additional selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
+            "Please check the results carefully.")
 
     renameSuffix = False
 
@@ -3282,20 +3297,19 @@ def writePi0EtaVeto(
     if pi0PayloadNameOverride is not None:
         Pi0PayloadName = pi0PayloadNameOverride
     if pi0SoftPhotonCutOverride is None:
-        Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + NHitsCut
-        import b2bii
-        if not b2bii.isB2BII():
-            # timing cut is only valid for Belle II but not for B2BII
-            Pi0SoftPhotonCut += ' and ' + TimingCut
+        Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + NHitsCut + ' and ' + TimingCut
     else:
         Pi0SoftPhotonCut = pi0SoftPhotonCutOverride
+
+    if requireSoftPhotonIsInROE:
+        Pi0SoftPhotonCut += ' and isInRestOfEvent==1'
 
     # define the particleList name for soft photon
     pi0soft = f'gamma:Pi0Soft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     # fill the particleList for soft photon with energy, timing and clusterNHits cuts
     fillParticleList(pi0soft, Pi0SoftPhotonCut, path=roe_path)
     # reconstruct pi0
-    reconstructDecay('pi0:Pi0Veto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + pi0soft, '',
+    reconstructDecay('pi0:Pi0Veto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + pi0soft, pi0Selection,
                      allowChargeViolation=True, path=roe_path)
     # MVA training is conducted.
     roe_path.add_module('MVAExpert', listNames=['pi0:Pi0Veto' + ListName],
@@ -3310,17 +3324,16 @@ def writePi0EtaVeto(
     if etaPayloadNameOverride is not None:
         EtaPayloadName = etaPayloadNameOverride
     if etaSoftPhotonCutOverride is None:
-        EtaSoftPhotonCut = EtaEnergyCut + ' and ' + NHitsCut
-        import b2bii
-        if not b2bii.isB2BII():
-            # timing cut is only valid for Belle II but not for B2BII
-            EtaSoftPhotonCut += ' and ' + TimingCut
+        EtaSoftPhotonCut = EtaEnergyCut + ' and ' + NHitsCut + ' and ' + TimingCut
     else:
         EtaSoftPhotonCut = etaSoftPhotonCutOverride
 
+    if requireSoftPhotonIsInROE:
+        EtaSoftPhotonCut += ' and isInRestOfEvent==1'
+
     etasoft = f'gamma:EtaSoft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     fillParticleList(etasoft, EtaSoftPhotonCut, path=roe_path)
-    reconstructDecay('eta:EtaVeto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + etasoft, '',
+    reconstructDecay('eta:EtaVeto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + etasoft, etaSelection,
                      allowChargeViolation=True, path=roe_path)
     roe_path.add_module('MVAExpert', listNames=['eta:EtaVeto' + ListName],
                         extraInfoName=EtaExtraInfoName, identifier=EtaPayloadName)

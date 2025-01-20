@@ -42,7 +42,7 @@ class DumpDigits(b2.Module):
         with open(self.dumpfile, 'a') as dumpfile:
             s = ''
             for digit in digits:
-                # Sesnor identification
+                # Sensor identification
                 sensorID = digit.getSensorID().getID()
                 [layer, ladder, sensor] = self.decode(sensorID)
                 s += f'{sensorID} {layer:3d} {ladder:3d} {sensor:3d} {digit.getUCellID():6d} ' + \

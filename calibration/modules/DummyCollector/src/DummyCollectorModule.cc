@@ -8,7 +8,6 @@
 
 #include <calibration/modules/DummyCollector/DummyCollectorModule.h>
 
-#include <TTree.h>
 #include <TH1I.h>
 
 using namespace Belle2;

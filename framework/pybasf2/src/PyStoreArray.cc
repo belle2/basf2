@@ -41,7 +41,7 @@ PyStoreArray::PyStoreArray(const std::string& name,
                            DataStore::EDurability durability):
   PyStoreArray(replaceNullPtr(DataStore::getTClassFromDefaultArrayName(name),
                               TObject::Class()),
-               /* Default to TObject for unknown class for backwards compatability */
+               /* Default to TObject for unknown class for backwards compatibility */
                name,
                durability)
 {

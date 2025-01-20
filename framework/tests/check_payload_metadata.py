@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
     with b2tu.clean_working_directory():
 
-        #: Path to the dabase with the testing payloads.
+        #: Path to the database with the testing payloads.
         testing_database_path = 'testingdb/testingdb.txt'
 
         # Create the testing payloads.

@@ -77,7 +77,7 @@ namespace Belle2 {
     /// Did we already receive the statistics?
     bool m_receivedStatistics = false;
 
-    /// Cound the number of processes with a certain type
+    /// Count the number of processes with a certain type
     unsigned int processesWithType(const ProcType& procType) const;
 
     /// Process a message from the multicast

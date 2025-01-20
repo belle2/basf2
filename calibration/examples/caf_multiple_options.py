@@ -97,7 +97,7 @@ def main(argv):
     # Add in our list of calibrations
     for cal in calibrations:
         cal_fw.add_calibration(cal)
-    # Subjobs from collector jobs being split over input files can be paralellized.
+    # Subjobs from collector jobs being split over input files can be parallelized.
     # Also Calibrations 1 and 2, can be run at the same time.
     # If you have 4 cores this backend will run them whenever one of the 4 processes becomes available
     # For larger data or more calibrations, consider using the LSF or PBS batch system backends at your site

@@ -65,7 +65,7 @@ class TestSkimRegistry(unittest.TestCase):
             self.assertFalse(
                 name.startswith("Base"),
                 (
-                    f"Invalid skim name in registry: {name}. Registed skim names cannot"
+                    f"Invalid skim name in registry: {name}. Registered skim names cannot"
                     " begin with 'Base'; this word is reserved for subclassing purposes."
                 ),
             )

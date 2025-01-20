@@ -17,16 +17,11 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Const.h>
 #include <cmath>
-#include <boost/foreach.hpp>
 
-#include <fstream>
 #include <string>
 
 // ROOT
 #include <TRandom.h>
-#include <TH1.h>
-#include <TH2.h>
-#include <TH3.h>
 #include <TMath.h>
 
 int eventNum = 0;
@@ -654,7 +649,7 @@ void MicrotpcStudyModule::getXMLData()
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"MICROTPC\"]/Content/");
 
   //get the location of the tubes
-  BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+  for (const GearDir& activeParams : content.getNodes("Active")) {
 
     TPCCenter.push_back(ROOT::Math::XYZVector(activeParams.getLength("TPCpos_x"),
                                               activeParams.getLength("TPCpos_y"),

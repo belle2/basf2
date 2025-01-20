@@ -9,13 +9,10 @@
 // Own header.
 #include <background/modules/BeamBkgMixer/BeamBkgMixerModule.h>
 
-
-
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/core/ModuleParam.templateDetails.h>
@@ -32,7 +29,6 @@
 #include <simulation/dataobjects/BeamBackHit.h>
 
 // MetaData
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/BackgroundInfo.h>
 
 // Root

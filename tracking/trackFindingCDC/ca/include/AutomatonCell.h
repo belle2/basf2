@@ -67,24 +67,24 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility. Cell weight defaults to 0
       AutomatonCell()
         : m_weight(0)
-        , m_flags(ECellFlag(0))
         , m_state(0)
+        , m_flags(ECellFlag(0))
       {
       }
 
       /// Constructor with a certain cell weight
       explicit AutomatonCell(const Weight& cellWeight)
         : m_weight(cellWeight)
-        , m_flags(ECellFlag(0))
         , m_state(0)
+        , m_flags(ECellFlag(0))
       {
       }
 
       /// Constructor with a certain cell weight and initial flags to be set.
       AutomatonCell(const Weight& cellWeight, const ECellFlags& initialFlags)
         : m_weight(cellWeight)
-        , m_flags(initialFlags)
         , m_state(0)
+        , m_flags(initialFlags)
       {
       }
 
@@ -364,11 +364,11 @@ namespace Belle2 {
       /// Storage for the cell weight
       Weight m_weight = 1;
 
-      /// Storage for the cell status flags
-      ECellFlags m_flags = ECellFlag(0);
-
       /// Storage for the cell state set by the cellular automata
       Weight m_state = 0;
+
+      /// Storage for the cell status flags
+      ECellFlags m_flags = ECellFlag(0);
     };
   }
 }

@@ -767,7 +767,7 @@ namespace Belle2 {
 //  unsigned n[11];
     static unsigned* n = new unsigned[Belle2::TRGCDC::getTRGCDC()->nSuperLayers()];
     nHitsSuperLayer(links, n);
-    string nh;
+    string nh = "";
     for (unsigned i = 0; i < _nSL; i++) {
       nh += TRGUtil::itostring(n[i]);
       if (i % 2) nh += ",";

@@ -16,15 +16,15 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
-#include <framework/core/RandomNumbers.h>
 
 // DataStore classes
 #include <framework/io/RootIOUtilities.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <TMath.h>
-#include <TH1F.h>
-#include <TH2F.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TRandom.h>
 #include <TString.h>
 
 using namespace std;

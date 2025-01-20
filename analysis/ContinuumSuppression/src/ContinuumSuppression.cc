@@ -15,7 +15,6 @@
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
 
 #include <vector>
 #include <Math/Vector3D.h>

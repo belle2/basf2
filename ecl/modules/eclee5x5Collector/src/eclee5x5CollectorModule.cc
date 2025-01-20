@@ -59,6 +59,7 @@ eclee5x5CollectorModule::eclee5x5CollectorModule() : CalibrationCollectorModule(
   addParam("maxTime", m_maxTime, "maximum cluster time diff abs(t1-t0)/dt99", 10.);
   addParam("useCalDigits", m_useCalDigits, "use MC events to obtain expected energies", false);
   addParam("requireL1", m_requireL1, "only use events that have a level 1 trigger", false);
+  addParam("expectedEnergyScale", m_expectedEnergyScale, "scale expected energies for non-4S calibration", 1.);
 }
 
 
@@ -132,6 +133,7 @@ void eclee5x5CollectorModule::prepare()
   B2INFO("maxTime: " << m_maxTime);
   B2INFO("useCalDigits: " << m_useCalDigits);
   B2INFO("requireL1: " << m_requireL1);
+  B2INFO("expectedEnergyScale: " << m_expectedEnergyScale);
 
   /** Resize vectors */
   EperCrys.resize(ECLElementNumbers::c_NCrystals);
@@ -366,8 +368,8 @@ void eclee5x5CollectorModule::collect()
   //** Quantities needed for the 5x5 calibration */
   for (int ic = 0; ic < 2; ic++) {
     int crysMax = crysIDMax[ic];
-    float expE = abs(Expee5x5E[crysMax]);
-    float sigmaExp = Expee5x5Sigma[crysMax];
+    float expE = m_expectedEnergyScale * abs(Expee5x5E[crysMax]);
+    float sigmaExp = m_expectedEnergyScale * Expee5x5Sigma[crysMax];
     std::vector<short int> neighbours = m_eclNeighbours5x5->getNeighbours(crysMax + 1);
 
     //** Energy in 5x5, and expected energy corrected for crystals that will not be calibrated */

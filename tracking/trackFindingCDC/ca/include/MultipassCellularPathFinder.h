@@ -162,17 +162,17 @@ namespace Belle2 {
        */
       std::string m_param_caMode{"normal"};
 
-      /// The minimal accumulated state of the paths to follow
-      Weight m_param_minState = -INFINITY;
-
-      /// The minimal path length to write to output
-      int m_param_minPathLength = 0;
-
       /// The cellular automaton to be used.
       CellularAutomaton<ACellHolder> m_cellularAutomaton;
 
       /// The path follower used to extract the path from the graph processed by the cellular automaton.
       CellularPathFollower<ACellHolder> m_cellularPathFollower;
+
+      /// The minimal accumulated state of the paths to follow
+      Weight m_param_minState = -INFINITY;
+
+      /// The minimal path length to write to output
+      int m_param_minPathLength = 0;
     };
   }
 }

@@ -1,5 +1,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/Track.h>
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 
 namespace {

@@ -1,6 +1,5 @@
 #include <svd/modules/svdPerformance/SVDValidationModule.h>
 #include <svd/persistenceManager/PersistenceManagerFactory.h>
-#include <svd/variables/VariableFactory.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/ModuleParam.templateDetails.h>
@@ -13,23 +12,39 @@
 namespace {
   namespace Variables = Belle2::SVD::Variables;
 
-  Variables::Variables createVariables(std::vector<std::string> variablesToNtuple)
+  Variables::Variables createTypedVariables(const std::vector<std::string>& variablesToNtuple)
   {
     Variables::Variables variables;
     for (const auto& variableName : variablesToNtuple) {
-      variables.push_back(Variables::TypedVariable(variableName, Variables::VariableDataType::c_double));
+      const auto variableDataType = static_cast<Variables::VariableDataType>(Belle2::Variable::Manager::Instance().getVariable(
+                                      variableName)->variabletype);
+      variables.push_back(Variables::TypedVariable(variableName, variableDataType));
     }
     return variables;
   }
 
-  Variables::Variables createVariables(std::vector<std::tuple<std::string, int, float, float>> variablesToHistogram)
+  Variables::Variables createBinnedVariables(const std::vector<std::tuple<std::string, int, float, float>>& variablesToHistogram)
   {
     Variables::Variables variables;
     for (const auto& [varName, nbins, minVal, maxVal] : variablesToHistogram) {
-      B2INFO("I'm here");
       variables.push_back(Variables::BinnedVariable(varName, nbins, minVal, maxVal));
     }
     return variables;
+  }
+
+  std::vector<std::string> extractVariableNames(const std::vector<std::tuple<std::string, int, float, float>>& variablesToHistogram)
+  {
+    std::vector<std::string> variableNames;
+    std::transform(variablesToHistogram.begin(), variablesToHistogram.end(), std::back_inserter(variableNames),
+    [](const auto & variable) {
+      return std::get<0>(variable);
+    });
+    return variableNames;
+  }
+
+  std::string getIndexedVariableName(const std::string& variableName, unsigned int iCluster)
+  {
+    return variableName + "(" + std::to_string(iCluster) + ")";
   }
 }
 
@@ -41,30 +56,32 @@ namespace Belle2::SVD {
   {
     addParam("outputFileName", m_fileName, "", m_fileName);
     addParam("containerName", m_containerName, "", m_containerName);
-    addParam("variablesToNtuple", m_variablesToNtuple, "Variables to store in the ntuple", m_variablesToNtuple);
-    addParam("variablesToHistogram", m_variablesToHistogram, "Variables to store in the histogram", m_variablesToHistogram);
+    addParam("particleListName", m_particleListName, "", m_particleListName);
+    addParam("variablesToNtuple", m_variablesToNtuple, "Variables to store in the ntuple.", m_variablesToNtuple);
+    addParam("variablesToHistogram", m_variablesToHistogram, "Variables to store in the histogram.", m_variablesToHistogram);
   }
 
   void SVDValidationModule::initialize()
   {
-    Variables::Variables variables;
+    Variables::Variables variablesToStore;
     if (not m_variablesToNtuple.empty() and not m_variablesToHistogram.empty()) {
       B2FATAL("Cannot have both variablesToNtuple and variablesToHistogram set.");
     } else if (not m_variablesToNtuple.empty()) {
-      variables = createVariables(m_variablesToNtuple);
+      m_variableNames = m_variablesToNtuple;
+      variablesToStore = createTypedVariables(m_variablesToNtuple);
       persistenceManager = PersistenceManagerFactory::create("ntuple");
     } else if (not m_variablesToHistogram.empty()) {
-      variables = createVariables(m_variablesToHistogram);
+      m_variableNames = extractVariableNames(m_variablesToHistogram);
+      variablesToStore = createBinnedVariables(m_variablesToHistogram);
       persistenceManager = PersistenceManagerFactory::create("histogram");
     }
-    persistenceManager->initialize(m_fileName, m_containerName, variables);
+    persistenceManager->initialize(m_fileName, m_containerName, variablesToStore);
   }
 
   void SVDValidationModule::event()
   {
-    StoreObjPtr<ParticleList> particlelist("pi+:all");
+    StoreObjPtr<ParticleList> particlelist(m_particleListName);
     const auto ncandidates = particlelist->getListSize();
-    B2INFO("listSize: " << ncandidates);
     for (unsigned int iPart = 0; iPart < ncandidates; iPart++) {
       const Particle* particle = particlelist->getParticle(iPart);
 
@@ -75,22 +92,19 @@ namespace Belle2::SVD {
       }
 
       const auto nSVDClusters = trackFitResult->getHitPatternVXD().getNSVDHits();
-      B2INFO("clusters: " << nSVDClusters);
 
       for (unsigned int iCluster = 0; iCluster < nSVDClusters; iCluster++) {
 
-        std::string varName = "SVDClusterCharge(" + std::to_string(iCluster) + ")";
-
-        const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varName);
-        Belle2::SVD::Variables::ReturnType charge = var->function(particle);
-
         Variables::EvaluatedVariables evaluatedVariables{};
-        evaluatedVariables["clusterCharge"] = charge;
+        for (const auto& variableName : m_variableNames) {
+          const std::string indexedVariableName = getIndexedVariableName(variableName, iCluster);
+          const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(indexedVariableName);
+          const auto value = var->function(particle);
+          evaluatedVariables[variableName] = value;
+        }
         persistenceManager->addEntry(evaluatedVariables);
       }
-
     }
-
   }
 
   void SVDValidationModule::terminate()

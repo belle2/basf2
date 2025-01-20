@@ -35,6 +35,6 @@ namespace Belle2::SVD {
 
     void openFileWithGuards();
     void registerBranches();
-    void updateBranch(const std::string&, const Variables::ReturnType&);
+    void updateBranch(const std::string&, const Variables::VariableType&);
   };
 }

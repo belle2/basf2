@@ -119,7 +119,7 @@ namespace Belle2::SVD {
   }
 
   void ConcreteVariablesToNtuplePersistenceManager::updateBranch(const std::string& branchName,
-      const Variables::ReturnType& evaluatedValue)
+      const Variables::VariableType& evaluatedValue)
   {
     std::visit([&](auto&& value) {
       using T = std::decay_t<decltype(value)>;

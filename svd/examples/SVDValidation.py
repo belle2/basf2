@@ -21,113 +21,94 @@ import simulation as sim
 import svd as svd
 import glob
 import modularAnalysis as ma
+import rawdata as raw
+from basf2 import conditions as b2conditions
 
-'''
-Usage: basf2 SVDValidation.py -i <input_file>
-'''
 
-useSimulation = True
+def addSVDValidationModule(path, storageType):
 
-b2.set_log_level(b2.LogLevel.ERROR)
+    if (storageType == "ntuple"):
+        path.add_module('SVDValidation',
+                        outputFileName="SVDValidation_ntuple.root",
+                        containerName="SVDClusters",
+                        particleListName="pi+:all",
+                        variablesToNtuple=["SVDClusterCharge", "SVDClusterSNR", "SVDClusterSize"]
+                        ).set_log_level(b2.LogLevel.INFO)
+    elif (storageType == "histogram"):
+        path.add_module('SVDValidation',
+                        outputFileName="SVDValidation_histogram.root",
+                        containerName="SVDClusters",
+                        particleListName="pi+:all",
+                        variablesToHistogram=[("SVDClusterCharge", 100, 0, 100e3),
+                                              ("SVDClusterSNR", 50, 0, 50),
+                                              ("SVDClusterSize", 10, 0, 10),
+                                              ]
+                        ).set_log_level(b2.LogLevel.INFO)
 
-main = b2.create_path()
 
-b2.set_random_seed(1)
+if __name__ == '__main__':
 
-if useSimulation:
-    # options for simulation:
-    expList = [1003]
-    numEvents = 2000
-    bkgFiles = glob.glob('/sw/belle2/bkg/*.root')  # Phase3 background
-    bkgFiles = None  # uncomment to remove  background
-    simulateJitter = False
-    ROIfinding = False
-    MCTracking = False
-    eventinfosetter = b2.register_module('EventInfoSetter')
-    eventinfosetter.param('expList', expList)
-    eventinfosetter.param('runList', [0])
-    eventinfosetter.param('evtNumList', [numEvents])
-    main.add_module(eventinfosetter)
-    # main.add_module('EventInfoPrinter')
-    main.add_module('EvtGenInput')
+    useSimulation = True
 
-    sim.add_simulation(
+    b2.set_log_level(b2.LogLevel.ERROR)
+    main = b2.create_path()
+    b2.set_random_seed(1)
+
+    if useSimulation:
+        # options for simulation:
+        expList = [1003]
+        numEvents = 2000
+        bkgFiles = glob.glob('/sw/belle2/bkg/*.root')  # Phase3 background
+        bkgFiles = None  # uncomment to remove  background
+        simulateJitter = False
+        ROIfinding = False
+        MCTracking = False
+        eventinfosetter = b2.register_module('EventInfoSetter')
+        eventinfosetter.param('expList', expList)
+        eventinfosetter.param('runList', [0])
+        eventinfosetter.param('evtNumList', [numEvents])
+        main.add_module(eventinfosetter)
+        # main.add_module('EventInfoPrinter')
+        main.add_module('EvtGenInput')
+
+        sim.add_simulation(
+            main,
+            bkgfiles=bkgFiles,
+            forceSetPXDDataReduction=True,
+            usePXDDataReduction=ROIfinding,
+            simulateT0jitter=simulateJitter)
+    else:
+        MCTracking = False
+
+        # setup database - if needed
+        b2conditions.reset()
+        b2conditions.override_globaltags()
+        b2conditions.globaltags = ["online"]
+
+        # input root files
+        main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs'])
+        raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC'])
+
+    # now do reconstruction:
+    trk.add_tracking_reconstruction(
         main,
-        bkgfiles=bkgFiles,
-        forceSetPXDDataReduction=True,
-        usePXDDataReduction=ROIfinding,
-        simulateT0jitter=simulateJitter)
-else:
-    MCTracking = False
+        mcTrackFinding=MCTracking,
+        trackFitHypotheses=[211],
+        append_full_grid_cdc_eventt0=True,
+        skip_full_grid_cdc_eventt0_if_svd_time_present=False)
 
-    # setup database - if needed
-    # b2conditions.reset()
-    # b2conditions.override_globaltags()
-    # b2conditions.globaltags = ["online"]
+    # Reconstruct strips
+    svd.add_svd_create_recodigits(main)
 
-    # input root files
-    # main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs'])
-    # raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC'])
+    # Fill particle lists
+    ma.fillParticleLists(decayStringsWithCuts=[("pi+:all", "")], path=main)
 
-    # change ZS to 5 - if needed
-    # for moda in main.modules():
-    #    if moda.name() == 'SVDUnpacker':
-    #        moda.param("svdShaperDigitListName", "SVDShaperDigitsZS3")
-    # main.add_module("SVDZeroSuppressionEmulator",SNthreshold=5,ShaperDigits="SVDShaperDigitsZS3",ShaperDigitsIN="SVDShaperDigits")
+    # Add SVDValidationModule
+    addSVDValidationModule(main, "ntuple")
+    addSVDValidationModule(main, "histogram")
 
-
-# set exp for sim
-# expList = [0]
-
-# numEvents = 2000
-# eventinfosetter = b2.register_module('EventInfoSetter')
-# eventinfosetter.param('expList', expList)
-# eventinfosetter.param('runList', [0])
-# eventinfosetter.param('evtNumList', [numEvents])
-# main.add_module(eventinfosetter)
-
-# now do reconstruction:
-trk.add_tracking_reconstruction(
-    main,
-    mcTrackFinding=MCTracking,
-    trackFitHypotheses=[211],
-    append_full_grid_cdc_eventt0=True,
-    skip_full_grid_cdc_eventt0_if_svd_time_present=False)
-
-# reconstruct strips
-svd.add_svd_create_recodigits(main)
-
-# look at raw time - uncomment if needed
-b2.set_module_parameters(main, "SVDClusterizer", returnClusterRawTime=True)
-
-# Histos
-# main.add_module('HistoManager', histoFileName="histos.root")
-
-tag = "ntuple"
-
-pions = ("pi+:all", "")
-
-ma.fillParticleLists(decayStringsWithCuts=[pions], path=main)
-
-main.add_module('SVDValidation',
-                outputFileName="SVDValidation_"+str(tag)+".root",
-                containerName="SVDClusters",
-                variables=["clusterCharge"],
-                # variablesToHistogram=[("clusterCharge", 100, 0, 100e3),
-                #                       ("clusterSize", 10, 0, 10)]
-                variablesToNtuple=["clusterCharge"]
-                ).set_log_level(b2.LogLevel.INFO)
-
-# main.add_module("RootOutput")
-
-# for moda in main.modules():
-#     if moda.name() == 'Geometry':
-#         moda.param("useDB", False)
-
-main.add_module('Progress')
-
-b2.print_path(main)
-
-b2.process(main)
-
-print(b2.statistics)
+    # Summary
+    main.add_module('Progress')
+    b2.print_path(main)
+    b2.process(main)
+    print(b2.statistics)

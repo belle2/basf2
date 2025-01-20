@@ -37,11 +37,12 @@ namespace Belle2::SVD {
   private:
     std::string m_fileName;
     std::string m_containerName;
+    std::string m_particleListName;
 
     std::vector<std::string> m_variablesToNtuple;
     std::vector<std::tuple<std::string, int, float, float>> m_variablesToHistogram;
+    std::vector<std::string> m_variableNames;
 
-    std::string m_recoTracksStoreArrayName{"RecoTracks"};
     std::unique_ptr<PersistenceManager> persistenceManager;
   };
 }

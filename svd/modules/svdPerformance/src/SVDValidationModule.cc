@@ -12,18 +12,23 @@
 namespace {
   namespace Variables = Belle2::SVD::Variables;
 
-  Variables::Variables createTypedVariables(const std::vector<std::string>& variablesToNtuple)
+  std::string getIndexedVariableName(const std::string& variableName, unsigned int iCluster)
+  {
+    return variableName + "(" + std::to_string(iCluster) + ")";
+  }
+
+  Variables::Variables createVariablesToStore(const std::vector<std::string>& variablesToNtuple)
   {
     Variables::Variables variables;
     for (const auto& variableName : variablesToNtuple) {
       const auto variableDataType = static_cast<Variables::VariableDataType>(Belle2::Variable::Manager::Instance().getVariable(
-                                      variableName)->variabletype);
+                                      getIndexedVariableName(variableName, 0))->variabletype);
       variables.push_back(Variables::TypedVariable(variableName, variableDataType));
     }
     return variables;
   }
 
-  Variables::Variables createBinnedVariables(const std::vector<std::tuple<std::string, int, float, float>>& variablesToHistogram)
+  Variables::Variables createVariablesToStore(const std::vector<std::tuple<std::string, int, float, float>>& variablesToHistogram)
   {
     Variables::Variables variables;
     for (const auto& [varName, nbins, minVal, maxVal] : variablesToHistogram) {
@@ -40,11 +45,6 @@ namespace {
       return std::get<0>(variable);
     });
     return variableNames;
-  }
-
-  std::string getIndexedVariableName(const std::string& variableName, unsigned int iCluster)
-  {
-    return variableName + "(" + std::to_string(iCluster) + ")";
   }
 }
 
@@ -68,11 +68,11 @@ namespace Belle2::SVD {
       B2FATAL("Cannot have both variablesToNtuple and variablesToHistogram set.");
     } else if (not m_variablesToNtuple.empty()) {
       m_variableNames = m_variablesToNtuple;
-      variablesToStore = createTypedVariables(m_variablesToNtuple);
+      variablesToStore = createVariablesToStore(m_variablesToNtuple);
       persistenceManager = PersistenceManagerFactory::create("ntuple");
     } else if (not m_variablesToHistogram.empty()) {
       m_variableNames = extractVariableNames(m_variablesToHistogram);
-      variablesToStore = createBinnedVariables(m_variablesToHistogram);
+      variablesToStore = createVariablesToStore(m_variablesToHistogram);
       persistenceManager = PersistenceManagerFactory::create("histogram");
     }
     persistenceManager->initialize(m_fileName, m_containerName, variablesToStore);

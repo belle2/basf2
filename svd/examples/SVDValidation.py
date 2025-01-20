@@ -41,8 +41,7 @@ def addSVDValidationModule(path, storageType):
                         particleListName="pi+:all",
                         variablesToHistogram=[("SVDClusterCharge", 100, 0, 100e3),
                                               ("SVDClusterSNR", 50, 0, 50),
-                                              ("SVDClusterSize", 10, 0, 10),
-                                              ]
+                                              ("SVDClusterSize", 10, 0, 10)]
                         ).set_log_level(b2.LogLevel.INFO)
 
 
@@ -111,4 +110,3 @@ if __name__ == '__main__':
     main.add_module('Progress')
     b2.print_path(main)
     b2.process(main)
-    print(b2.statistics)

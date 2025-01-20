@@ -50,6 +50,7 @@ namespace {
 
 namespace Belle2::SVD {
 
+  /** Register the module. */
   REG_MODULE(SVDValidation);
 
   SVDValidationModule::SVDValidationModule() : Module()

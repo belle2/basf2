@@ -32,7 +32,7 @@ namespace Belle2::Variable {
   Manager::FunctionPtr SVDClusterCharge(const std::vector<std::string>& arguments)
   {
     if (arguments.size() != 1) {
-      B2FATAL("Exactly one parameter (cluster index) is required for SVDClusterCharge.");
+      B2FATAL("Exactly one parameter (cluster index) is required.");
     }
     const auto clusterIndex = std::stoi(arguments[0]);
 
@@ -45,7 +45,7 @@ namespace Belle2::Variable {
   Manager::FunctionPtr SVDClusterSNR(const std::vector<std::string>& arguments)
   {
     if (arguments.size() != 1) {
-      B2FATAL("Exactly one parameter (cluster index) is required for SVDClusterCharge.");
+      B2FATAL("Exactly one parameter (cluster index) is required.");
     }
     const auto clusterIndex = std::stoi(arguments[0]);
 
@@ -58,7 +58,7 @@ namespace Belle2::Variable {
   Manager::FunctionPtr SVDClusterSize(const std::vector<std::string>& arguments)
   {
     if (arguments.size() != 1) {
-      B2FATAL("Exactly one parameter (cluster index) is required for SVDClusterCharge.");
+      B2FATAL("Exactly one parameter (cluster index) is required.");
     }
     const auto clusterIndex = std::stoi(arguments[0]);
 

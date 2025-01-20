@@ -7,8 +7,9 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-
-
+#include <analysis/dataobjects/ParticleList.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
+#include <analysis/VariableManager/Manager.h>
 namespace {
   namespace Variables = Belle2::SVD::Variables;
 
@@ -40,65 +41,56 @@ namespace Belle2::SVD {
   {
     addParam("outputFileName", m_fileName, "", m_fileName);
     addParam("containerName", m_containerName, "", m_containerName);
-
-    // Po staremu
-    addParam("variables", m_variableNames, "Variables used for the valiadation plots", m_variableNames);
-
-    // Po nowemu
     addParam("variablesToNtuple", m_variablesToNtuple, "Variables to store in the ntuple", m_variablesToNtuple);
     addParam("variablesToHistogram", m_variablesToHistogram, "Variables to store in the histogram", m_variablesToHistogram);
   }
 
   void SVDValidationModule::initialize()
   {
-    // To bedzie do wywalenia ale na razie potrzebne
-    m_computableVariables = Variables::VariableFactory::create(m_variableNames);
-
+    Variables::Variables variables;
     if (not m_variablesToNtuple.empty() and not m_variablesToHistogram.empty()) {
-      B2FATAL("Cannot have both variablesToNtuple and variablesToHistogram set");
+      B2FATAL("Cannot have both variablesToNtuple and variablesToHistogram set.");
     } else if (not m_variablesToNtuple.empty()) {
-      m_variables = createVariables(m_variablesToNtuple);
+      variables = createVariables(m_variablesToNtuple);
       persistenceManager = PersistenceManagerFactory::create("ntuple");
     } else if (not m_variablesToHistogram.empty()) {
-      B2INFO("I'm here");
-      m_variables = createVariables(m_variablesToHistogram);
+      variables = createVariables(m_variablesToHistogram);
       persistenceManager = PersistenceManagerFactory::create("histogram");
     }
-    persistenceManager->initialize(m_fileName, m_containerName, m_variables);
+    persistenceManager->initialize(m_fileName, m_containerName, variables);
   }
 
   void SVDValidationModule::event()
   {
-    // Can be moved as a class field
-    StoreArray<RecoTrack> recoTracks{m_recoTracksStoreArrayName};
+    StoreObjPtr<ParticleList> particlelist("pi+:all");
+    const auto ncandidates = particlelist->getListSize();
+    B2INFO("listSize: " << ncandidates);
+    for (unsigned int iPart = 0; iPart < ncandidates; iPart++) {
+      const Particle* particle = particlelist->getParticle(iPart);
 
-    for (const auto& recoTrack : recoTracks) {
-      if (not recoTrack.wasFitSuccessful()) {
+      const auto trackFitResult = particle->getTrackFitResult();
+
+      if (!trackFitResult) {
         continue;
       }
-      // Do we need a vector? consider getRelationWith...
-      RelationVector<Track> track = DataStore::getRelationsWithObj<Track>(&recoTrack);
-      if (0 == track.size()) {
-        continue;
-      }
-      const TrackFitResult* trackFitResult = track[0]->getTrackFitResultWithClosestMass(Const::pion);
 
-      if (trackFitResult) {
-        // Calculate track related stuff
-      }
+      const auto nSVDClusters = trackFitResult->getHitPatternVXD().getNSVDHits();
+      B2INFO("clusters: " << nSVDClusters);
 
-      const std::vector<Belle2::SVDCluster*> svdClusters = recoTrack.getSVDHitList();
+      for (unsigned int iCluster = 0; iCluster < nSVDClusters; iCluster++) {
 
-      for (const auto& svdCluster : svdClusters) {
+        std::string varName = "SVDClusterCharge(" + std::to_string(iCluster) + ")";
+
+        const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varName);
+        Belle2::SVD::Variables::ReturnType charge = var->function(particle);
+
         Variables::EvaluatedVariables evaluatedVariables{};
-
-        for (const auto& computableVariable : m_computableVariables) {
-          evaluatedVariables[computableVariable.getName()] = computableVariable(svdCluster);
-        }
+        evaluatedVariables["clusterCharge"] = charge;
         persistenceManager->addEntry(evaluatedVariables);
       }
 
     }
+
   }
 
   void SVDValidationModule::terminate()

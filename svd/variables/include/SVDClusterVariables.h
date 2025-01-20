@@ -5,5 +5,6 @@ namespace Belle2 {
 
   namespace Variable {
     double SVDClusterCharge(const Particle*);
+    // int SVDClusterSize(const Particle*);
   }
 }

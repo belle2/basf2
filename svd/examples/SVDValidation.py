@@ -20,6 +20,7 @@ import tracking as trk
 import simulation as sim
 import svd as svd
 import glob
+import modularAnalysis as ma
 
 '''
 Usage: basf2 SVDValidation.py -i <input_file>
@@ -102,15 +103,19 @@ b2.set_module_parameters(main, "SVDClusterizer", returnClusterRawTime=True)
 # Histos
 # main.add_module('HistoManager', histoFileName="histos.root")
 
-tag = "histogram"
+tag = "ntuple"
+
+pions = ("pi+:all", "")
+
+ma.fillParticleLists(decayStringsWithCuts=[pions], path=main)
 
 main.add_module('SVDValidation',
                 outputFileName="SVDValidation_"+str(tag)+".root",
                 containerName="SVDClusters",
-                variables=["clusterCharge", "clusterSize"],
+                variables=["clusterCharge"],
                 # variablesToHistogram=[("clusterCharge", 100, 0, 100e3),
                 #                       ("clusterSize", 10, 0, 10)]
-                variablesToNtuple=["clusterCharge", "clusterSize"]
+                variablesToNtuple=["clusterCharge"]
                 ).set_log_level(b2.LogLevel.INFO)
 
 # main.add_module("RootOutput")

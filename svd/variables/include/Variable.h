@@ -63,7 +63,7 @@ namespace Belle2 {
 
       // Do wywalenia
       typedef SVDCluster InputType;
-      typedef std::variant<int, double, bool> ReturnType;
+      typedef std::variant<double, int, bool> ReturnType;
       typedef std::function<ReturnType(const InputType*)> FunctionPtr;
 
       class ComputableVariable {

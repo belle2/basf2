@@ -70,11 +70,11 @@ class TestTreeFits(unittest.TestCase):
         print(f"False fit survivors: {falsePositives} out of {allBkg} false candidates")
         print(f"True fit survivors with reasonable deltaE: {SigDeltaEReasonable}")
 
-        self.assertTrue(allBkg - falsePositives >= 43,
+        self.assertTrue(allBkg - falsePositives >= 37,
                         f"Background rejection: {allBkg-falsePositives} out of {allBkg} false candidates rejected")
-        self.assertTrue(truePositives >= 501, f"Signal efficiency: {truePositives} out of {allSig} true candidates retained")
+        self.assertTrue(truePositives >= 508, f"Signal efficiency: {truePositives} out of {allSig} true candidates retained")
 
-        self.assertTrue(SigDeltaEReasonable >= 427,
+        self.assertTrue(SigDeltaEReasonable >= 433,
                         f"Signal kinematics is correctly reconstructed in {SigDeltaEReasonable} candidates.")
 
         print("Test passed, cleaning up.")

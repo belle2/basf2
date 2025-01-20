@@ -475,8 +475,8 @@ void ECLWaveformFitModule::event()
     aECLDsp.setTwoComponentBaseline(pedestal);
     aECLDsp.setTwoComponentFitType(fitType);
     if (fitType == ECLDsp::photonHadronBackgroundPhoton) {
-      aECLDsp.setBackgroundPhotonEnergy(amplitudeBackgroundPhoton);
-      aECLDsp.setBackgroundPhotonTime(timeBackgroundPhoton);
+      aECLDsp.setbackgroundPhotonEnergy(amplitudeBackgroundPhoton);
+      aECLDsp.setbackgroundPhotonTime(timeBackgroundPhoton);
     }
   }
 }

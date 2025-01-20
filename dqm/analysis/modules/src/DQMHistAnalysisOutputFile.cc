@@ -37,7 +37,7 @@ DQMHistAnalysisOutputFileModule::DQMHistAnalysisOutputFileModule()
 
   addParam("OutputFolder", m_folder, "Output file path", std::string(""));
   addParam("FilePrefix", m_prefix,
-           "prefix of the output filename {prefix}dqm_e####r######.root is generated (unless Filename is set)", std::string(""));
+           "prefix of the output filename {prefix}dqm_canvas_e####r######.root is generated (unless Filename is set)", std::string(""));
   addParam("Filename", m_filename, "name of the output file (default is {prefix}dqm_canvas_e####r######.root)", std::string(""));
   addParam("SaveHistos", m_saveHistos, "Save Histos (not default)", false);
   addParam("SaveCanvases", m_saveCanvases, "Save Canvases (default)", true);

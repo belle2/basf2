@@ -3104,7 +3104,7 @@ def oldwritePi0EtaVeto(
 def writePi0EtaVeto(
     particleList,
     decayString,
-    mode='standard',
+    mode='standardMC15rd',
     selection='',
     path=None,
     suffix='',
@@ -3114,26 +3114,52 @@ def writePi0EtaVeto(
     etaPayloadNameOverride=None,
     etaSoftPhotonCutOverride=None,
     requireSoftPhotonIsInROE=False,
-    pi0Selection='',
-    etaSelection=''
+    pi0Selection='[0.03 < M < 0.23]',
+    etaSelection='[0.25 < M < 0.75]'
 ):
     """
     Give pi0/eta probability for hard photon.
 
     In the default weight files a value of 1.4 GeV is set as the lower limit for the hard photon energy in the CMS frame.
+    For MC15rd weight files, the BtoXGamma skim is applied during the MVA training.
 
-    The current default weight files are optimised using MC12.
+    The current default weight files are optimised using MC15rd. The weight files for MC12 (last version) are still available.
 
-    The input variables of the mva training are:
+    The input variables of the mva training for pi0 veto using MC15rd are:
 
-    * M: pi0/eta candidates Invariant mass
+    * M: Invariant mass of pi0 candidates
+    * cosHelicityAngleMomentum: Cosine of angle between momentum difference of the photons in the pi0 rest frame
+      and momentum of pi0 in lab frame
+    * daughter(1,E): soft photon energy in lab frame
+    * daughter(1,clusterTheta): soft photon ECL cluster's polar angle
+    * daughter(1,clusterLAT): soft photon lateral energy distribution
+
+    The input variables of the mva training for eta veto using MC15rd are:
+
+    * M: Invariant mass of eta candidates
+    * cosHelicityAngleMomentum: Cosine of angle between momentum difference of the photons in the eta rest frame
+      and momentum of eta in lab frame
+    * daughter(1,E): soft photon energy in lab frame
+    * daughter(1,clusterTheta): soft photon ECL cluster's polar angle
+    * daughter(1,clusterLAT): soft photon lateral energy distribution
+    * daughter(1,clusterNHits): soft photon total crystal weights sum(w_i) with w_i<=1
+    * daughter(1,clusterE1E9): soft photon ratio between energies of central crystal and inner 3x3 crystals
+    * daughter(1,clusterE9E21): soft photon ratio of energies in inner 3x3 crystals and 5x5 crystals without corners
+    * daughter(1,clusterSecondMoment): soft photon second moment
+    * daughter(1,clusterAbsZernikeMoment40): soft photon Zernike moment 40
+    * daughter(1,clusterAbsZernikeMoment51): soft photon Zernike moment 51
+
+    The input variables of the mva training using MC12 are:
+
+    * M: Invariant mass of pi0/eta candidates
     * daughter(1,E): soft photon energy in lab frame
     * daughter(1,clusterTheta): soft photon ECL cluster's polar angle
     * daughter(1,minC2TDist): soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
     * daughter(1,clusterZernikeMVA): soft photon output of MVA using Zernike moments of the cluster
     * daughter(1,clusterNHits): soft photon total crystal weights sum(w_i) with w_i<=1
     * daughter(1,clusterE9E21): soft photon ratio of energies in inner 3x3 crystals and 5x5 crystals without corners
-    * cosHelicityAngleMomentum: pi0/eta candidates cosHelicityAngleMomentum
+    * cosHelicityAngleMomentum: Cosine of angle between momentum difference of the photons in the pi0/eta rest frame
+      and momentum of pi0/eta in lab frame
 
     The following strings are available for mode:
 
@@ -3141,11 +3167,16 @@ def writePi0EtaVeto(
     * tight: tight energy cut and no clusterNHits cut are applied to soft photon
     * cluster: loose energy cut and clusterNHits cut are applied to soft photon
     * both: tight energy cut and clusterNHits cut are applied to soft photon
+    * standardMC15rd: loose energy cut is applied to soft photon and the weight files are trained using MC15rd
+    * tightMC15rd: tight energy cut is applied to soft photon and the weight files are trained using MC15rd
 
     The final probability of the pi0/eta veto is stored as an extraInfo. If no suffix is set it can be obtained from the variables
     `pi0Prob`/`etaProb`. Otherwise, it is available as '{Pi0, Eta}ProbOrigin', '{Pi0, Eta}ProbTightEnergyThreshold', '{Pi0,
-    Eta}ProbLargeClusterSize', or '{Pi0, Eta}ProbTightEnergyThresholdAndLargeClusterSize'} for the four modes described above, with
-    the chosen suffix appended.
+    Eta}ProbLargeClusterSize', '{Pi0, Eta}ProbTightEnergyThresholdAndLargeClusterSize', '{Pi0, Eta}ProbOriginMC15rd', or
+    '{Pi0, Eta}ProbTightEnergyThresholdMC15rd' for the six modes described above, with the chosen suffix appended. If one would
+    like to call this veto twice in one script, add suffix in the second time!
+    The second highest probability of the pi0/eta veto also is stored as an extraInfo, with a prefix of 'second' to the previous
+    ones, e.g. secondPi0ProbOrigin{suffix}. This can be used to do validation/systematics study.
 
     NOTE:
       Please don't use following ParticleList names elsewhere:
@@ -3158,7 +3189,7 @@ def writePi0EtaVeto(
 
     @param particleList     the input ParticleList
     @param decayString 		specify Particle to be added to the ParticleList
-    @param mode				choose one mode out of 'standard', 'tight', 'cluster' and 'both'
+    @param mode				choose one mode out of 'standardMC15rd', 'tightMC15rd', 'standard', 'tight', 'cluster' and 'both'
     @param selection 		selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       		modules are added to this path
     @param suffix           optional suffix to be appended to the usual extraInfo name
@@ -3171,8 +3202,8 @@ def writePi0EtaVeto(
                                     (default is None)
     @param requireSoftPhotonIsInROE specify if the soft photons used to build pi0 and eta candidates have to be in the current ROE
                                     or not. Default is False, i.e. all soft photons in the event are used.
-    @param pi0Selection     Selection for the pi0 reconstruction. Default is ''.
-    @param etaSelection     Selection for the eta reconstruction. Default is ''.
+    @param pi0Selection     Selection for the pi0 reconstruction. Default is '(0.03 < M < 0.23)'.
+    @param etaSelection     Selection for the eta reconstruction. Default is '(0.25 < M < 0.75)'.
     """
 
     import b2bii
@@ -3182,10 +3213,16 @@ def writePi0EtaVeto(
     if (requireSoftPhotonIsInROE):
         B2WARNING("Requiring the soft photon to being in the ROE was not done for the MVA training. "
                   "Please check the results carefully.")
-    if (pi0Selection != '' or etaSelection != ''):
-        B2WARNING(
-            "Additional selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
-            "Please check the results carefully.")
+    if (mode == 'standardMC15rd' or mode == 'tightMC15rd'):
+        if (pi0Selection != '[0.03 < M < 0.23]' or etaSelection != '[0.25 < M < 0.75]'):
+            B2WARNING(
+                "Personal selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
+                "Please check the results carefully.")
+    else:
+        if (pi0Selection != '' or etaSelection != ''):
+            B2WARNING(
+                "Personal selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
+                "Please check the results carefully.")
 
     renameSuffix = False
 
@@ -3209,48 +3246,65 @@ def writePi0EtaVeto(
     dictListName = {'standard': 'Origin',
                     'tight': 'TightEnergyThreshold',
                     'cluster': 'LargeClusterSize',
-                    'both': 'TightEnrgyThresholdAndLargeClusterSize'}
+                    'both': 'TightEnrgyThresholdAndLargeClusterSize',
+                    'standardMC15rd': 'OriginMC15rd',
+                    'tightMC15rd': 'TightEnergyThresholdMC15rd'}
 
-    dictPi0EnergyCut = {'standard': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
-                        'tight': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
-                        'cluster': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
-                        'both': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
+    dictPi0EnergyCut = {
+        'standard': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+        'tight': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
+        'cluster': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+        'both': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
+        'standardMC15rd': '[[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+        'tightMC15rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
 
-    dictEtaEnergyCut = {'standard': '[[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]]',
-                        'tight': '[[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]]',
-                        'cluster': '[[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]]',
-                        'both': '[[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]]'}
+    dictEtaEnergyCut = {
+        'standard': '[[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]]',
+        'tight': '[[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]]',
+        'cluster': '[[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]]',
+        'both': '[[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]]',
+        'standardMC15rd': '[[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+        'tightMC15rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
 
-    dictNHitsCut = {'standard': 'clusterNHits >= 0',
-                    'tight': 'clusterNHits >= 0',
-                    'cluster': 'clusterNHits >= 2',
-                    'both': 'clusterNHits >= 2'}
+    dictNHitsTimingCut = {'standard': 'clusterNHits >= 0 and abs(clusterTiming)<clusterErrorTiming',
+                          'tight': 'clusterNHits >= 0 and abs(clusterTiming)<clusterErrorTiming',
+                          'cluster': 'clusterNHits >= 2 and abs(clusterTiming)<clusterErrorTiming',
+                          'both': 'clusterNHits >= 2 and abs(clusterTiming)<clusterErrorTiming',
+                          'standardMC15rd': 'clusterNHits > 1.5 and abs(clusterTiming) < 200',
+                          'tightMC15rd': 'clusterNHits > 1.5 and abs(clusterTiming) < 200'}
 
     dictPi0PayloadName = {'standard': 'Pi0VetoIdentifierStandard',
                           'tight': 'Pi0VetoIdentifierWithHigherEnergyThreshold',
                           'cluster': 'Pi0VetoIdentifierWithLargerClusterSize',
-                          'both': 'Pi0VetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize'}
+                          'both': 'Pi0VetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize',
+                          'standardMC15rd': 'Pi0VetoIdentifierStandardMC15rd',
+                          'tightMC15rd': 'Pi0VetoIdentifierWithHigherEnergyThresholdMC15rd'}
 
     dictEtaPayloadName = {'standard': 'EtaVetoIdentifierStandard',
                           'tight': 'EtaVetoIdentifierWithHigherEnergyThreshold',
                           'cluster': 'EtaVetoIdentifierWithLargerClusterSize',
-                          'both': 'EtaVetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize'}
+                          'both': 'EtaVetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize',
+                          'standardMC15rd': 'EtaVetoIdentifierStandardMC15rd',
+                          'tightMC15rd': 'EtaVetoIdentifierWithHigherEnergyThresholdMC15rd'}
 
     dictPi0ExtraInfoName = {'standard': 'Pi0ProbOrigin',
                             'tight': 'Pi0ProbTightEnergyThreshold',
                             'cluster': 'Pi0ProbLargeClusterSize',
-                            'both': 'Pi0ProbTightEnergyThresholdAndLargeClusterSize'}
+                            'both': 'Pi0ProbTightEnergyThresholdAndLargeClusterSize',
+                            'standardMC15rd': 'Pi0ProbOriginMC15rd',
+                            'tightMC15rd': 'Pi0ProbTightEnergyThresholdMC15rd'}
 
     dictEtaExtraInfoName = {'standard': 'EtaProbOrigin',
                             'tight': 'EtaProbTightEnergyThreshold',
                             'cluster': 'EtaProbLargeClusterSize',
-                            'both': 'EtaProbTightEnergyThresholdAndLargeClusterSize'}
+                            'both': 'EtaProbTightEnergyThresholdAndLargeClusterSize',
+                            'standardMC15rd': 'EtaProbOriginMC15rd',
+                            'tightMC15rd': 'EtaProbTightEnergyThresholdMC15rd'}
 
     ListName = dictListName[mode]
     Pi0EnergyCut = dictPi0EnergyCut[mode]
     EtaEnergyCut = dictEtaEnergyCut[mode]
-    TimingCut = 'abs(clusterTiming)<clusterErrorTiming'
-    NHitsCut = dictNHitsCut[mode]
+    NHitsTimingCut = dictNHitsTimingCut[mode]
     Pi0PayloadName = dictPi0PayloadName[mode]
     EtaPayloadName = dictEtaPayloadName[mode]
     Pi0ExtraInfoName = dictPi0ExtraInfoName[mode]
@@ -3259,10 +3313,12 @@ def writePi0EtaVeto(
     # pi0 veto
     if pi0PayloadNameOverride is not None:
         Pi0PayloadName = pi0PayloadNameOverride
+        B2WARNING("You're using personal weight files, be careful. ")
     if pi0SoftPhotonCutOverride is None:
-        Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + NHitsCut + ' and ' + TimingCut
+        Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + NHitsTimingCut
     else:
         Pi0SoftPhotonCut = pi0SoftPhotonCutOverride
+        B2WARNING("You're applying personal cuts on the soft photon candidates, be careful. ")
 
     if requireSoftPhotonIsInROE:
         Pi0SoftPhotonCut += ' and isInRestOfEvent==1'
@@ -3272,37 +3328,69 @@ def writePi0EtaVeto(
     # fill the particleList for soft photon with energy, timing and clusterNHits cuts
     fillParticleList(pi0soft, Pi0SoftPhotonCut, path=roe_path)
     # reconstruct pi0
-    reconstructDecay('pi0:Pi0Veto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + pi0soft, pi0Selection,
+    reconstructDecay('pi0:Pi0Veto' + ListName + suffix + f' -> {hardParticle}:HardPhoton{suffix} ' + pi0soft, pi0Selection,
                      allowChargeViolation=True, path=roe_path)
     # MVA training is conducted.
-    roe_path.add_module('MVAExpert', listNames=['pi0:Pi0Veto' + ListName],
+    roe_path.add_module('MVAExpert', listNames=['pi0:Pi0Veto' + ListName + suffix],
                         extraInfoName=Pi0ExtraInfoName, identifier=Pi0PayloadName)
-    # Pick up only one pi0/eta candidate with the highest pi0/eta probability.
-    rankByHighest('pi0:Pi0Veto' + ListName, 'extraInfo(' + Pi0ExtraInfoName + ')', numBest=1, path=roe_path)
-    # 'extraInfo(Pi0Veto)' is labeled 'Pi0_Prob'
-    variableToSignalSideExtraInfo('pi0:Pi0Veto' + ListName,
+    # Pick up the pi0/eta candidate with the highest pi0/eta probability.
+    rankByHighest(
+        'pi0:Pi0Veto' + ListName + suffix,
+        'extraInfo(' + Pi0ExtraInfoName + ')',
+        numBest=2,
+        outputVariable="Pi0VetoRank",
+        path=roe_path)
+    cutAndCopyList(outputListName='pi0:Pi0VetoFirst' + ListName + suffix,
+                   inputListName='pi0:Pi0Veto' + ListName + suffix,
+                   cut='extraInfo(Pi0VetoRank)==1',
+                   path=roe_path)
+    variableToSignalSideExtraInfo('pi0:Pi0VetoFirst' + ListName + suffix,
                                   {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoName + suffix}, path=roe_path)
+    # Pick up the pi0/eta candidate with the second highest pi0/eta probability.
+    cutAndCopyList(outputListName='pi0:Pi0VetoSecond' + ListName + suffix,
+                   inputListName='pi0:Pi0Veto' + ListName + suffix,
+                   cut='extraInfo(Pi0VetoRank)==2',
+                   path=roe_path)
+    variableToSignalSideExtraInfo('pi0:Pi0VetoSecond' + ListName + suffix,
+                                  {'extraInfo(' + Pi0ExtraInfoName + ')': 'second' + Pi0ExtraInfoName + suffix}, path=roe_path)
 
     # eta veto
     if etaPayloadNameOverride is not None:
         EtaPayloadName = etaPayloadNameOverride
+        B2WARNING("You're using personal weight files, be careful. ")
     if etaSoftPhotonCutOverride is None:
-        EtaSoftPhotonCut = EtaEnergyCut + ' and ' + NHitsCut + ' and ' + TimingCut
+        EtaSoftPhotonCut = EtaEnergyCut + ' and ' + NHitsTimingCut
     else:
         EtaSoftPhotonCut = etaSoftPhotonCutOverride
+        B2WARNING("You're applying personal cuts on the soft photon candidates, be careful. ")
 
     if requireSoftPhotonIsInROE:
         EtaSoftPhotonCut += ' and isInRestOfEvent==1'
 
     etasoft = f'gamma:EtaSoft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     fillParticleList(etasoft, EtaSoftPhotonCut, path=roe_path)
-    reconstructDecay('eta:EtaVeto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + etasoft, etaSelection,
+    reconstructDecay('eta:EtaVeto' + ListName + suffix + f' -> {hardParticle}:HardPhoton{suffix} ' + etasoft, etaSelection,
                      allowChargeViolation=True, path=roe_path)
-    roe_path.add_module('MVAExpert', listNames=['eta:EtaVeto' + ListName],
+    roe_path.add_module('MVAExpert', listNames=['eta:EtaVeto' + ListName + suffix],
                         extraInfoName=EtaExtraInfoName, identifier=EtaPayloadName)
-    rankByHighest('eta:EtaVeto' + ListName, 'extraInfo(' + EtaExtraInfoName + ')', numBest=1, path=roe_path)
-    variableToSignalSideExtraInfo('eta:EtaVeto' + ListName,
+    rankByHighest(
+        'eta:EtaVeto' + ListName + suffix,
+        'extraInfo(' + EtaExtraInfoName + ')',
+        numBest=2,
+        outputVariable="EtaVetoRank",
+        path=roe_path)
+    cutAndCopyList(outputListName='eta:EtaVetoFirst' + ListName + suffix,
+                   inputListName='eta:EtaVeto' + ListName + suffix,
+                   cut='extraInfo(EtaVetoRank)==1',
+                   path=roe_path)
+    variableToSignalSideExtraInfo('eta:EtaVetoFirst' + ListName + suffix,
                                   {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoName + suffix}, path=roe_path)
+    cutAndCopyList(outputListName='eta:EtaVetoSecond' + ListName + suffix,
+                   inputListName='eta:EtaVeto' + ListName + suffix,
+                   cut='extraInfo(EtaVetoRank)==2',
+                   path=roe_path)
+    variableToSignalSideExtraInfo('eta:EtaVetoSecond' + ListName + suffix,
+                                  {'extraInfo(' + EtaExtraInfoName + ')': 'second' + EtaExtraInfoName + suffix}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

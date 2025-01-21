@@ -7,6 +7,13 @@ Modular Analysis
 
   * Add option to use the weight files trained using MC15rd files: ``standardMC15rd`` and ``tightMC15rd``.
   * The second highest score is also stored in to extra information, e.g., ``secondPi0ProbOrigin``.
+* Added the option to mix PDG ids and particle names when defining which particles should be mass-constrained via the
+  argument ``massConstraint`` of `vertex.treeFit` and `vertex.kFit`.
+* Added the two new arguments ``massConstraintDecayString`` and ``massConstraintMassValues`` to the function
+  `vertex.treeFit`. Via the former a decay string can be used to indicate which particle's masses should be
+  mass-constrained. You can use the latter to set invariant mass values that differ from the nominal PDG values. The
+  number of values must be identical to the number of selected particles in the decay string. Besides floating point
+  values, PDG ids (as integers) or particle names (as strings) can be provided to use the corresponding PDG mass.
 
 Variables
 +++++++++
@@ -15,6 +22,11 @@ Variables
   TreeFit are now also available via the variables `prodVertexCov` and `prodVertexXErr`, etc.
 * The variables `pi0Prob(mode) <pi0Prob>` and `etaProb(mode) <etaProb>` are extended to MC15 version
   and accept the modes ``standardMC15rd`` and ``tightMC15rd``.
+
+Modules
++++++++
+* Fixed a bug in the initialization of the decay length of TreeFit.
+* Removed the option ``expertUseReferencing`` from :b2:mod:`TreeFitter`.
 
 Changes in the analysis package in light-2411-aldebaran
 -------------------------------------------------------

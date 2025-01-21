@@ -41,14 +41,13 @@ class TestTreeFits(unittest.TestCase):
                         particleList='B0:rec',
                         confidenceLevel=conf,
                         massConstraintList=[],
-                        massConstraintListParticlename=[],
-                        expertUseReferencing=True,
-                        ipConstraint=False,
-                        updateAllDaughters=True)
+                        ipConstraint=True,
+                        updateAllDaughters=True,
+                        ignoreFromVertexFit='B0 -> ^pi- pi+ pi0')
 
         ntupler = basf2.register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)
-        ntupler.param('variables', ['chiProb', 'M', 'isSignal'])
+        ntupler.param('variables', ['chiProb', 'M', 'isSignal', 'Mbc'])
         ntupler.param('particleList', 'B0:rec')
         main.add_module(ntupler)
 
@@ -61,6 +60,7 @@ class TestTreeFits(unittest.TestCase):
 
         allBkg = ntuple.GetEntries("isSignal == 0")
         allSig = ntuple.GetEntries("isSignal > 0")
+        SigMbcReasonable = ntuple.GetEntries("isSignal > 0 && Mbc > 5.27")
 
         truePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal > 0)")
         falsePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal == 0)")
@@ -70,12 +70,12 @@ class TestTreeFits(unittest.TestCase):
         print(f"True fit survivors: {truePositives} out of {allSig} true candidates")
         print(f"False fit survivors: {falsePositives} out of {allBkg} false candidates")
 
-        self.assertFalse(truePositives == 0, "No signal survived the fit.")
-
-        self.assertTrue(falsePositives < 8299, "Background rejection too small.")
+        self.assertTrue(falsePositives < 8837, "Background rejection too small.")
 
         self.assertTrue(truePositives > 212, "Signal rejection too high")
         self.assertFalse(mustBeZero, f"We should have dropped all candidates with confidence level less than {conf}.")
+
+        self.assertTrue(SigMbcReasonable > 206, "Signal kinematics is wrongly reconstructed too much")
 
         print("Test passed, cleaning up.")
 

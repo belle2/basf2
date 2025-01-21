@@ -42,9 +42,8 @@ class TestTreeFits(unittest.TestCase):
                         particleList='B0:rec',
                         confidenceLevel=conf,
                         massConstraintList=[],
-                        massConstraintListParticlename=[],
-                        expertUseReferencing=True,
-                        ipConstraint=False,
+                        ipConstraint=True,
+                        originDimension=2,
                         updateAllDaughters=False)
 
         ntupler = basf2.register_module('VariablesToNtuple')
@@ -73,7 +72,7 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(falsePositives <= 1600, f"Background rejection {falsePositives} out of {allBkg}")
+        self.assertTrue(falsePositives <= 1595, f"Background rejection {falsePositives} out of {allBkg}")
 
         self.assertTrue(truePositives == 156, f"Signal rejection too high {truePositives} out of {allSig}")
         self.assertFalse(mustBeZero, f"We should have dropped all candidates with confidence level less than {conf}.")

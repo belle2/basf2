@@ -41,9 +41,9 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
 
   ///** vectors to store information for output root file */
   std::vector<double> cryIDs;
-  std::vector<double> invertStatusVector;
   std::vector<double> noiseMatrix00Vector;
   std::vector<double> totalCountsVector;
+  std::vector<double> invertAttempts;
 
   ///**-----------------------------------------------------------------------------------------------*/
   ///** Histogram containing the data collected by eclAutocovarianceCalibrationC3Collector*/
@@ -53,8 +53,8 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
 
   for (int ID = 0; ID < ECLElementNumbers::c_NCrystals; ID++) {
 
-    float totalCounts = CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(ID + 1,
-                        m_numberofADCPoints + 1));
+    double totalCounts = CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(ID + 1,
+                         m_numberofADCPoints + 1));
 
     if (totalCounts < m_TotalCountsThreshold) {
       B2INFO("eclAutocovarianceCalibrationC3Algorithm: warning total entries for cell ID " << ID + 1 << " is only: " << totalCounts <<
@@ -68,31 +68,59 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
     for (int i = 0; i < m_numberofADCPoints; i++) {
       for (int j = 0; j < m_numberofADCPoints; j++) {
         int index = abs(i - j);
-        NoiseMatrix(i, j) = float(CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(ID + 1,
-                                  index + 1))) / (totalCounts - 1) / (float(m_numberofADCPoints - index));
+        NoiseMatrix(i, j) = double(CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(ID + 1,
+                                   index + 1))) / (totalCounts - 1) / (double(m_numberofADCPoints - index));
       }
     }
 
-    double tempAutoCov[m_numberofADCPoints];
-    for (int i = 0; i < m_numberofADCPoints; i++) tempAutoCov[i] = NoiseMatrix(0, i);
-
-    TDecompChol dc(NoiseMatrix);
-    bool InvertStatus = dc.Invert(NoiseMatrix);
-    if (InvertStatus == false && ID > 0) {
-      B2INFO("eclAutocovarianceCalibrationC3Algorithm iD InvertStatus [0][0] totalCounts: " << ID << " " << InvertStatus << " " <<
-             NoiseMatrix(0, 0) << " " << totalCounts);
-      B2INFO("eclAutocovarianceCalibrationC3Algorithm Setting ID " << ID << " Autocovariance to Autocovariance from ID " << ID - 1);
-      B2INFO("eclAutocovarianceCalibrationC3Algorithm B: " << tempAutoCov[0]);
-      Autocovariances->getAutoCovariance(ID + 1 - 1, tempAutoCov);
-      B2INFO("eclAutocovarianceCalibrationC3Algorithm A: " << tempAutoCov[0]);
+    TMatrixDSym NoiseMatrixReduced(m_numberofADCPoints);
+    for (int i = 0; i < m_numberofADCPoints; i++) {
+      for (int j = 0; j < m_numberofADCPoints; j++) {
+        NoiseMatrixReduced(i, j) = (NoiseMatrix(0, abs(i - j)));
+      }
     }
 
-    Autocovariances->setAutoCovariance(ID + 1, tempAutoCov);
+    bool invert_successful = 0;
+    int invert_attempt = 0;
+    double tempAutoCov[m_numberofADCPoints];
+    for (int i = 0; i < m_numberofADCPoints; i++) tempAutoCov[i] = NoiseMatrixReduced(0, i);
+    std::vector<double> buf(m_numberofADCPoints);
+    while (invert_successful == 0) {
+
+      Autocovariances->setAutoCovariance(ID + 1, tempAutoCov);
+      Autocovariances->getAutoCovariance(ID + 1, buf.data());
+
+      TMatrixDSym NoiseMatrix_check(m_numberofADCPoints);
+      for (int i = 0; i < m_numberofADCPoints; i++) {
+        for (int j = 0; j < m_numberofADCPoints; j++) {
+          NoiseMatrix_check(i, j) = buf[abs(i - j)];
+        }
+      }
+
+      TDecompChol dc(NoiseMatrix_check);
+      invert_successful = dc.Invert(NoiseMatrix_check);
+      if (invert_successful == 0) {
+
+        if (invert_attempt > 4) {
+          B2INFO("eclAutocovarianceCalibrationC3Algorithm iD " << ID << " invert_attempt limit reached " << invert_attempt);
+          B2INFO("eclAutocovarianceCalibrationC3Algorithm setting m_u2 to zero");
+          m_u2 = 0.0;
+        }
+
+        B2INFO("eclAutocovarianceCalibrationC3Algorithm iD " << ID << " invert_attempt " << invert_attempt);
+
+        for (int i = 0; i < m_numberofADCPoints; i++) B2INFO("old[" << i << "] = " <<  tempAutoCov[i]);
+        for (int i = 1; i < m_numberofADCPoints; i++) tempAutoCov[i] *= (m_u2 / (1. + exp((i - m_u0) / m_u1)));
+        for (int i = 0; i < m_numberofADCPoints; i++) B2INFO("new[" << i << "] = " <<  tempAutoCov[i]);
+
+      }
+      invert_attempt++;
+    }
 
     cryIDs.push_back(ID + 1);
-    invertStatusVector.push_back(InvertStatus);
-    noiseMatrix00Vector.push_back(NoiseMatrix(0, 0));
+    noiseMatrix00Vector.push_back(tempAutoCov[0]);
     totalCountsVector.push_back(totalCounts);
+    invertAttempts.push_back(invert_attempt);
 
   }
 
@@ -100,26 +128,27 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
   saveCalibration(Autocovariances, "ECLAutoCovariance");
 
   /** Preparing TGraphs for output file */
-  auto ginvertStatusVector = new TGraph(cryIDs.size(), cryIDs.data(), invertStatusVector.data());
-  ginvertStatusVector->SetName("ginvertStatusVector");
-  ginvertStatusVector->SetMarkerStyle(20);
   auto gnoiseMatrix00Vector = new TGraph(cryIDs.size(), cryIDs.data(), noiseMatrix00Vector.data());
   gnoiseMatrix00Vector->SetName("gnoiseMatrix00Vector");
   gnoiseMatrix00Vector->SetMarkerStyle(20);
   auto gtotalCountsVector = new TGraph(cryIDs.size(), cryIDs.data(), totalCountsVector.data());
   gtotalCountsVector->SetName("gtotalCountsVector");
   gtotalCountsVector->SetMarkerStyle(20);
+  auto ginvertAttempts = new TGraph(cryIDs.size(), cryIDs.data(), invertAttempts.data());
+  ginvertAttempts->SetName("ginvertAttempts");
+  ginvertAttempts->SetMarkerStyle(20);
 
   /** Write out the basic histograms in all cases */
   TString fName = m_outputName;
   TDirectory::TContext context;
   TFile* histfile = new TFile(fName, "recreate");
   histfile->cd();
-  ginvertStatusVector->Write();
   gnoiseMatrix00Vector->Write();
   gtotalCountsVector->Write();
+  ginvertAttempts->Write();
   histfile->Close();
   delete histfile;
 
   return c_OK;
 }
+

@@ -49,7 +49,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 create_intercepts_for_pxd_ckf=False,
                                 append_full_grid_cdc_eventt0=True,
                                 v0_finding=True, flip_recoTrack=True,
-                                skip_full_grid_cdc_eventt0_if_svd_time_present=True):
+                                skip_full_grid_cdc_eventt0_if_svd_time_present=True,
+                                inverted_tracking=False):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
@@ -129,6 +130,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
         append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
         SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
+    :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF
+        (if `use_svd_to_cdc_ckf` is True), follwed by the CDC standalone tracking.
     """
 
     add_prefilter_tracking_reconstruction(
@@ -151,7 +154,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         pxd_filtering_offline=pxd_filtering_offline,
         create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
-        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
+        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
+        inverted_tracking=inverted_tracking)
 
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
@@ -174,7 +178,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           pxd_filtering_offline=False,
                                           create_intercepts_for_pxd_ckf=False,
                                           append_full_grid_cdc_eventt0=True,
-                                          skip_full_grid_cdc_eventt0_if_svd_time_present=True):
+                                          skip_full_grid_cdc_eventt0_if_svd_time_present=True,
+                                          inverted_tracking=False):
     """
     This function adds the tracking reconstruction modules required to calculate HLT filter decision
     to a path.
@@ -219,6 +224,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
         append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
         SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
+    :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF
+        (if `use_svd_to_cdc_ckf` is True), follwed by the CDC standalone tracking.
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):
@@ -263,7 +270,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                           add_cdcTrack_QI=add_cdcTrack_QI,
                           add_vxdTrack_QI=add_vxdTrack_QI,
                           pxd_filtering_offline=pxd_filtering_offline,
-                          create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf)
+                          create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
+                          inverted_tracking=inverted_tracking)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -443,7 +451,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                       add_cdcTrack_QI=True, add_vxdTrack_QI=False,
                       pxd_filtering_offline=False, use_HLT_ROIs=False,
-                      create_intercepts_for_pxd_ckf=False):
+                      create_intercepts_for_pxd_ckf=False,
+                      inverted_tracking=False):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
@@ -473,6 +482,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
         for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
         steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
+    :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF
+        (if `use_svd_to_cdc_ckf` is True), follwed by the CDC standalone tracking.
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return
@@ -513,23 +524,70 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         elif (not use_ecl_to_cdc_ckf) and (not is_svd_used(components)) and is_cdc_used(components):
             cdc_reco_tracks = reco_tracks
 
-    if is_cdc_used(components):
-        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
-                              add_mva_quality_indicator=add_cdcTrack_QI)
-        temporary_reco_track_list.append(cdc_reco_tracks)
-        latest_reco_tracks = cdc_reco_tracks
+    # Default tracking with CDC first, followed by SVD tracking
+    if not inverted_tracking:
+        if is_cdc_used(components):
+            add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
+                                  add_mva_quality_indicator=add_cdcTrack_QI)
+            temporary_reco_track_list.append(cdc_reco_tracks)
+            latest_reco_tracks = cdc_reco_tracks
 
-    if is_svd_used(components):
-        add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                              output_reco_tracks=svd_cdc_reco_tracks, use_mc_truth=use_mc_truth,
-                              temporary_reco_tracks=svd_reco_tracks,
-                              svd_ckf_mode=svd_ckf_mode, add_both_directions=add_both_directions,
-                              use_svd_to_cdc_ckf=use_svd_to_cdc_ckf, prune_temporary_tracks=prune_temporary_tracks,
-                              add_mva_quality_indicator=add_vxdTrack_QI,
-                              svd_standalone_mode=svd_standalone_mode)
-        temporary_reco_track_list.append(svd_reco_tracks)
-        temporary_reco_track_list.append(svd_cdc_reco_tracks)
-        latest_reco_tracks = svd_cdc_reco_tracks
+        if is_svd_used(components):
+            add_svd_track_finding(path,
+                                  components=components,
+                                  input_reco_tracks=latest_reco_tracks,
+                                  output_reco_tracks=svd_cdc_reco_tracks,
+                                  use_mc_truth=use_mc_truth,
+                                  temporary_reco_tracks=svd_reco_tracks,
+                                  svd_ckf_mode=svd_ckf_mode,
+                                  add_both_directions=add_both_directions,
+                                  use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
+                                  prune_temporary_tracks=prune_temporary_tracks,
+                                  add_mva_quality_indicator=add_vxdTrack_QI,
+                                  svd_standalone_mode=svd_standalone_mode)
+            temporary_reco_track_list.append(svd_reco_tracks)
+            temporary_reco_track_list.append(svd_cdc_reco_tracks)
+            latest_reco_tracks = svd_cdc_reco_tracks
+    else:
+        if is_svd_used(components):
+            add_svd_track_finding(path,
+                                  components=components,
+                                  input_reco_tracks=None,
+                                  output_reco_tracks=svd_reco_tracks,
+                                  add_mva_quality_indicator=add_vxdTrack_QI,
+                                  svd_standalone_mode=svd_standalone_mode)
+            temporary_reco_track_list.append(svd_reco_tracks)
+            latest_reco_tracks = svd_reco_tracks
+
+        if is_cdc_used(components):
+            if use_svd_to_cdc_ckf:
+                cdcckf_reco_tracks = "CKFCDCRecoTracks"
+                path.add_module("ToCDCCKF",
+                                inputWireHits="CDCWireHitVector",
+                                inputRecoTrackStoreArrayName=svd_reco_tracks,
+                                relatedRecoTrackStoreArrayName=cdcckf_reco_tracks,
+                                relationCheckForDirection="backward",
+                                ignoreTracksWithCDChits=True,
+                                outputRecoTrackStoreArrayName=cdcckf_reco_tracks,
+                                outputRelationRecoTrackStoreArrayName=svd_reco_tracks,
+                                writeOutDirection="backward",
+                                stateBasicFilterParameters={"maximalHitDistance": 0.15},
+                                pathFilter="arc_length",
+                                maximalLayerJump=4)
+
+                path.add_module("CDCCKFTracksCombiner",
+                                CDCRecoTracksStoreArrayName=cdcckf_reco_tracks,
+                                VXDRecoTracksStoreArrayName=svd_reco_tracks,
+                                recoTracksStoreArrayName=svd_cdc_reco_tracks)
+
+                temporary_reco_track_list.append(cdcckf_reco_tracks)
+                temporary_reco_track_list.append(svd_cdc_reco_tracks)
+                latest_reco_tracks = svd_cdc_reco_tracks
+
+            add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
+                                  add_mva_quality_indicator=add_cdcTrack_QI)
+            temporary_reco_track_list.append(cdc_reco_tracks)
+            latest_reco_tracks = cdc_reco_tracks
 
     if use_ecl_to_cdc_ckf and is_cdc_used(components):
         add_eclcdc_track_finding(path, components=components, output_reco_tracks=ecl_reco_tracks,

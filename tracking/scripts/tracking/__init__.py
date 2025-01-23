@@ -131,7 +131,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
         SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF
-        (if `use_svd_to_cdc_ckf` is True), follwed by the CDC standalone tracking.
+        (if "use_svd_to_cdc_ckf" is True), follwed by the CDC standalone tracking.
     """
 
     add_prefilter_tracking_reconstruction(
@@ -225,7 +225,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
         SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF
-        (if `use_svd_to_cdc_ckf` is True), follwed by the CDC standalone tracking.
+        (if "use_svd_to_cdc_ckf" is True), follwed by the CDC standalone tracking.
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):

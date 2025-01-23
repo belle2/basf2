@@ -9,42 +9,58 @@
 # Cuts: None
 # Date: 20250113
 
+Alias D_1-sig         D_1-
+Alias D_1+sig         D_1+
+ChargeConj D_1+sig    D_1-sig
+
+Alias D_0*-sig         D_0*-
+Alias D_0*+sig         D_0*+
+ChargeConj D_0*-sig    D_0*+sig
+
+Alias D'_1-sig         D'_1-
+Alias D'_1+sig         D'_1+
+ChargeConj D'_1-sig    D'_1+sig
+
+Alias D_2*-sig         D_2*-
+Alias D_2*+sig         D_2*+
+ChargeConj D_2*-sig    D_2*+sig
 
 Decay Upsilon(4S)
-1.0 B0 anti-B0 VSS_BMIX dm;
+1.0 B0 anti-B0 B0sig anti-B0sig VSS_BMIX dm;
 Enddecay
 
-Decay B0
-0.007040000   D_1-  e+  nu_e                               LLSW 0.71 -1.6 -0.5 2.9;
-0.003620000   D_0*-  e+  nu_e                              LLSW 0.68 -0.2 0.3;
-0.004010000   D'_1-  e+  nu_e                              LLSW 0.68 -0.2 0.3;
-0.003470000   D_2*-  e+  nu_e                              LLSW 0.71 -1.6 -0.5 2.9;
+Decay B0sig
+0.007040000   D_1-sig  e+  nu_e                               LLSW 0.71 -1.6 -0.5 2.9;
+0.003620000   D_0*-sig  e+  nu_e                              LLSW 0.68 -0.2 0.3;
+0.004010000   D'_1-sig  e+  nu_e                              LLSW 0.68 -0.2 0.3;
+0.003470000   D_2*-sig  e+  nu_e                              LLSW 0.71 -1.6 -0.5 2.9;
 
-0.007040000   D_1-  mu+  nu_mu                             LLSW 0.71 -1.6 -0.5 2.9;
-0.003620000   D_0*-  mu+  nu_mu                            LLSW 0.68 -0.2 0.3;
-0.004010000   D'_1-  mu+  nu_mu                            LLSW 0.68 -0.2 0.3;
-0.003470000   D_2*-  mu+  nu_mu                            LLSW 0.71 -1.6 -0.5 2.9;
+0.007040000   D_1-sig  mu+  nu_mu                             LLSW 0.71 -1.6 -0.5 2.9;
+0.003620000   D_0*-sig  mu+  nu_mu                            LLSW 0.68 -0.2 0.3;
+0.004010000   D'_1-sig  mu+  nu_mu                            LLSW 0.68 -0.2 0.3;
+0.003470000   D_2*-sig  mu+  nu_mu                            LLSW 0.71 -1.6 -0.5 2.9;
 Enddecay
+CDecay anti-B0sig 
 
-Decay D_1+
+Decay D_1+sig
 0.399400000   D*0  pi+                                     VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
 Enddecay
-CDecay D_1-
+CDecay D_1-sig
 
-Decay D_0*+
+Decay D_0*+sig
 0.666700000   D0  pi+                                      PHSP;
 Enddecay
-CDecay D_0*-
+CDecay D_0*-sig
 
-Decay D'_1+
+Decay D'_1+sig
 0.666700000   D*0  pi+                                     VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
-CDecay D'_1-
+CDecay D'_1-sig
 
-Decay D_2*+
+Decay D_2*+sig
 0.266900000   D*0  pi+                                     TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
 0.399800000   D0  pi+                                      TSS;
 Enddecay
-CDecay D_2*-
+CDecay D_2*-sig
 
 End

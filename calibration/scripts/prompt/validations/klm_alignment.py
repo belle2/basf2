@@ -363,7 +363,7 @@ if __name__ == "__main__":
 
     parser.add_argument('-o', '--output_dir',
                         help='The directory where all the output will be saved',
-                        default='SVDTimeValidation_output')
+                        default='KLMAlignmentValidation_output')
     args = parser.parse_args()
 
     run_validation(args.calibration_results_dir[0])

@@ -421,8 +421,8 @@ def add_svd_track_finding(
     if not is_svd_used(components):
         return
 
-    if not input_reco_tracks:
-        # We do not have an input track store array. So lets just add vxdtf track finding
+    if not input_reco_tracks or input_reco_tracks == "":
+        # We do not have an input track store array. So lets just add SVD standalone track finding
         add_svd_standalone_tracking(path, components=["SVD"],
                                     svd_standalone_mode=svd_standalone_mode,
                                     reco_tracks=output_reco_tracks,

@@ -219,10 +219,10 @@ def get_tflat_model(parameters, number_of_features):
         )(x)
 
     # Flatten the "contextualized" embeddings of the features.
-    # features = keras.layers.Flatten()(encoded_features)
+    features = keras.layers.Flatten()(encoded_features)
 
     # Pool the "contextualized" embeddings of the features.
-    features = keras.layers.GlobalAveragePooling1D()(encoded_features)
+    # features = keras.layers.GlobalAveragePooling1D()(encoded_features)
 
     # Compute MLP hidden_units.
     mlp_hidden_units = [

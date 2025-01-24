@@ -39,16 +39,15 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         if not isinstance(parameters, dict):
             raise TypeError('parameters must be a dictionary')
 
-    batch_size = parameters.get('batch_size', 100)
     seed = parameters.get('seed', None)
 
     # set random state
     if seed:
         tf.random.set_seed(seed)
 
-    parameters["num_transformer_blocks"] = 3
+    parameters["num_transformer_blocks"] = 6
     parameters["num_heads"] = 4
-    parameters["embedding_dims"] = 64
+    parameters["embedding_dims"] = 8
     parameters["mlp_hidden_units_factors"] = [2, 1,]
     parameters["dropout_rate"] = 0.2
     parameters["use_column_embedding"] = True
@@ -56,10 +55,19 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     state = State(get_tflat_model(parameters, number_of_features))
 
-    learning_rate = 0.001
-    weight_decay = 0.0001
+    weight_decay = 1e-05
+    initial_learning_rate = 1e-4
+    decay_steps = 200000
+    alpha = 1e-2
+
+    cosine_decay_scheduler = tf.keras.optimizers.schedules.CosineDecay(
+        initial_learning_rate=initial_learning_rate,
+        decay_steps=decay_steps,
+        alpha=alpha
+    )
+
     optimizer = tf.keras.optimizers.AdamW(
-        learning_rate=learning_rate, weight_decay=weight_decay
+        learning_rate=cosine_decay_scheduler, weight_decay=weight_decay
     )
 
     state.model.compile(
@@ -70,9 +78,6 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             tf.keras.metrics.AUC()])
 
     state.model.summary()
-
-    # training object is required in partial fit
-    state.batch_size = batch_size
 
     # save parameters
     saved_parameters = parameters.copy()
@@ -150,14 +155,13 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     callbacks = [tf.keras.callbacks.EarlyStopping(
         monitor='val_loss',
         min_delta=0,
-        patience=5,
+        patience=7,
         verbose=1,
         mode='auto',
         baseline=None,
-        # start_from_epoch=200,
         restore_best_weights=True)]
 
-    state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=128, epochs=15, callbacks=callbacks)
+    state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=128, epochs=100, callbacks=callbacks, verbose=1)
 
     # create a keras model that includes the preprocessing step
     state.model = get_merged_model(preprocessor, state.model, number_of_features=number_of_features)

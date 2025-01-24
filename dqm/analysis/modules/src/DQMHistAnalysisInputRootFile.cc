@@ -173,8 +173,6 @@ void DQMHistAnalysisInputRootFileModule::event()
       TH1* h = (TH1*)dkey->ReadObj();
       if (h->InheritsFrom("TH2")) h->SetOption("col");
       else h->SetOption("hist");
-      Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
-      h->Scale(scale);
       std::string hname = h->GetName();
 
       bool hpass = false;
@@ -191,6 +189,9 @@ void DQMHistAnalysisInputRootFileModule::event()
       if (!hpass) continue;
 
       if (hname.find("/") == std::string::npos) h->SetName((dirname + "/" + hname).c_str());
+      Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
+      h->Scale(scale);
+      h->SetEntries(h->GetEntries()*scale); // empty hists are not marked for update!
       hs.push_back(h);
     }
     m_file->cd();
@@ -220,9 +221,10 @@ void DQMHistAnalysisInputRootFileModule::event()
       }
       if (!hpass) continue;
 
-      hs.push_back(h);
       Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
       h->Scale(scale);
+      h->SetEntries(h->GetEntries()*scale); // empty hists are not marked for update!
+      hs.push_back(h);
     }
   }
 

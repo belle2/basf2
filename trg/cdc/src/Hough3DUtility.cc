@@ -440,11 +440,9 @@ void Hough3DFinder::runFinderVersion1(const vector<double>& trackVariables, cons
       } else {
         tempHoughZ0 = houghZ0;
       }
-      //Change to actual value
-      actualCot = houghCot * m_cotStepSize + m_cotStart;
-      actualZ0 = tempHoughZ0 * m_z0StepSize;
-      // To remove warning of actualCot and actualZ0.
-      if (false) cout << actualCot << actualZ0 << endl;
+      //Change to actual value, currently unused so commented out
+      // actualCot = houghCot * m_cotStepSize + m_cotStart;
+      // actualZ0 = tempHoughZ0 * m_z0StepSize;
 
       for (int layer = 0; layer < 4; layer++) {
         m_houghMesh[houghCot][houghZ0] += m_houghMeshLayer[houghCot][houghZ0][layer];

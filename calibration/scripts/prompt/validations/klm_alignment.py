@@ -9,13 +9,13 @@
 # KLM alignment validation
 
 from prompt import ValidationSettings
-import sys
 import os
 import basf2
 import uproot
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+import glob
 
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='KLM alignment',
@@ -307,7 +307,7 @@ def draw_BKLM_pics(BKLM_values, BKLM_errors, BKLM_chi2, pdfPages):
     plt.close('all')
 
 
-def run_validation(job_path, job_path_prev, arg3, arg4, arg5):
+def run_validation(calibration_results_dir, input_data_path=None, **kwargs):
     '''
     Run the validation.
     The script compares the most recent alignment result with the previous results by calculating the residuals.
@@ -318,6 +318,15 @@ def run_validation(job_path, job_path_prev, arg3, arg4, arg5):
         os.makedirs(tmp_work_dir)
     if not os.path.exists(tmp_plot_dir):
         os.makedirs(tmp_plot_dir)
+
+    # Find the latest iterations' directories
+    iterations = [d for d in glob.glob(f'{calibration_results_dir}/KLMAlignment/?')]
+    iterations = sorted(iterations, key=lambda x: int(x.split('/')[-1]), reverse=True)[:2]
+    if len(iterations) < 2:
+        raise ValueError("Not enough KLMAlignment iterations found.")
+
+    job_path = f'{iterations[0]}/algorithm_output'
+    job_path_prev = f'{iterations[1]}/algorithm_output'
 
     # Create alignment results tree the recent and previous calibration and get IoVs
     exp_run_list = get_result(job_path, tmp_work_dir)
@@ -340,4 +349,21 @@ def run_validation(job_path, job_path_prev, arg3, arg4, arg5):
 
 
 if __name__ == "__main__":
-    run_validation(*sys.argv[1:])
+
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawTextHelpFormatter)
+
+    # b2val-prompt-run wants to pass to the script also input_data_path
+    # and requested_iov. As they are not required by this validation I just accept
+    # them together with calibration_results_dir and then ignore them
+    parser.add_argument('calibration_results_dir',
+                        help='The directory that contains the collector outputs',
+                        nargs='+')
+
+    parser.add_argument('-o', '--output_dir',
+                        help='The directory where all the output will be saved',
+                        default='KLMAlignmentValidation_output')
+    args = parser.parse_args()
+
+    run_validation(args.calibration_results_dir[0])

@@ -15,7 +15,6 @@ from tracking.path_utils import (  # noqa
     add_default_cdc_svd_tracking_chain,
     add_inverted_svd_cdc_tracking_chain,
     add_cdc_cr_track_finding,
-    add_cdc_track_finding,
     add_cr_track_fit_and_track_creator,
     add_eclcdc_track_finding,
     add_geometry_modules,
@@ -26,15 +25,12 @@ from tracking.path_utils import (  # noqa
     add_pxd_cr_track_finding,
     add_pxd_track_finding,
     add_svd_track_finding,
-    add_track_fit_and_track_creator,
     add_prefilter_track_fit_and_track_creator,
-    add_vxd_track_finding_vxdtf2,
     add_svd_standalone_tracking,
     is_cdc_used,
     is_ecl_used,
     is_pxd_used,
     is_svd_used,
-    use_local_sectormap,
 )
 
 from pxd import add_pxd_reconstruction

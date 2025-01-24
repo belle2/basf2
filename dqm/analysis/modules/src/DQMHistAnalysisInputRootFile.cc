@@ -239,11 +239,11 @@ void DQMHistAnalysisInputRootFileModule::event()
 
   if (m_add_runcontrol_hist) {
     m_h_expno->SetTitle(std::to_string(m_expno).c_str());
-    hs.push_back(m_h_expno);
+    hs.push_back((TH1*)(m_h_expno->Clone()));
     m_h_runno->SetTitle(std::to_string(runno).c_str());
-    hs.push_back(m_h_runno);
+    hs.push_back((TH1*)(m_h_runno->Clone()));
     m_h_rtype->SetTitle(m_runType.c_str());
-    hs.push_back(m_h_rtype);
+    hs.push_back((TH1*)(m_h_rtype->Clone()));
   }
   //setExpNr(m_expno); // redundant access from MetaData
   //setRunNr(m_runno); // redundant access from MetaData

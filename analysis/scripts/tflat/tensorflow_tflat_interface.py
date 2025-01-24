@@ -44,7 +44,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     # set random state
     if seed:
-        tf.set_random_seed(seed)
+        tf.random.set_seed(seed)
 
     parameters["num_transformer_blocks"] = 3
     parameters["num_heads"] = 4

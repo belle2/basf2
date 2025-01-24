@@ -14,7 +14,7 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B0sig
-1.000 rho0 nu_e anti-nu_e PHSP;
+1.000 rho0 nu_e anti-nu_e KSTARNUNU_REV;
 Enddecay
 CDecay anti-B0sig
 

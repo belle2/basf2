@@ -1306,6 +1306,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
     if is_svd_used(components):
         add_svd_track_finding(path,
                               components=components,
+                              input_reco_tracks="",
                               output_reco_tracks=svd_reco_tracks,
                               add_mva_quality_indicator=add_vxdTrack_QI,
                               svd_standalone_mode=svd_standalone_mode)

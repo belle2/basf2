@@ -1314,6 +1314,13 @@ def add_inverted_svd_cdc_tracking_chain(path,
         latest_reco_tracks = svd_reco_tracks
 
     if is_cdc_used(components):
+        path.add_module("TFCDC_WireHitPreparer",
+                        wirePosition="aligned",
+                        useSecondHits=use_second_cdc_hits,
+                        flightTimeEstimation="outwards",
+                        filter="mva",
+                        filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
+
         path.add_module("ToCDCCKF",
                         inputWireHits="CDCWireHitVector",
                         inputRecoTrackStoreArrayName=svd_reco_tracks,

@@ -434,12 +434,12 @@ void Hough3DFinder::runFinderVersion1(const vector<double>& trackVariables, cons
   // Filling HoughMesh. Combines the seperate HoughMeshLayers.
   for (int houghCot = 0; houghCot < m_nCotSteps; houghCot++) {
     for (int houghZ0 = 0; houghZ0 < m_nZ0Steps; houghZ0++) {
-      //Change back tempHoughZ0 if minus
-      if (houghZ0 > (m_nZ0Steps - 1) / 2) {
-        tempHoughZ0 = (m_nZ0Steps - 1) / 2 - houghZ0;
-      } else {
-        tempHoughZ0 = houghZ0;
-      }
+      //Change back tempHoughZ0 if minus, currently unused so commented out
+      // if (houghZ0 > (m_nZ0Steps - 1) / 2) {
+      //   tempHoughZ0 = (m_nZ0Steps - 1) / 2 - houghZ0;
+      // } else {
+      //   tempHoughZ0 = houghZ0;
+      // }
       //Change to actual value, currently unused so commented out
       // actualCot = houghCot * m_cotStepSize + m_cotStart;
       // actualZ0 = tempHoughZ0 * m_z0StepSize;

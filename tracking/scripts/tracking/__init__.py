@@ -12,6 +12,8 @@ import basf2 as b2
 
 # Many scripts import these functions from `tracking`, so leave these imports here
 from tracking.path_utils import (  # noqa
+    add_default_cdc_svd_tracking_chain,
+    add_inverted_svd_cdc_tracking_chain,
     add_cdc_cr_track_finding,
     add_cdc_track_finding,
     add_cr_track_fit_and_track_creator,
@@ -526,68 +528,42 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
 
     # Default tracking with CDC first, followed by SVD tracking
     if not inverted_tracking:
-        if is_cdc_used(components):
-            add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
-                                  add_mva_quality_indicator=add_cdcTrack_QI)
-            temporary_reco_track_list.append(cdc_reco_tracks)
-            latest_reco_tracks = cdc_reco_tracks
+        latest_reco_tracks, tmp_reco_track_list = \
+            add_default_cdc_svd_tracking_chain(path,
+                                               components=components,
+                                               svd_reco_tracks=svd_reco_tracks,
+                                               cdc_reco_tracks=cdc_reco_tracks,
+                                               svd_cdc_reco_tracks=svd_cdc_reco_tracks,
+                                               use_second_cdc_hits=use_second_cdc_hits,
+                                               add_cdcTrack_QI=add_cdcTrack_QI,
+                                               use_mc_truth=use_mc_truth,
+                                               svd_ckf_mode=svd_ckf_mode,
+                                               add_both_directions=add_both_directions,
+                                               use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
+                                               svd_standalone_mode=svd_standalone_mode,
+                                               add_vxdTrack_QI=add_vxdTrack_QI,
+                                               prune_temporary_tracks=prune_temporary_tracks)
 
-        if is_svd_used(components):
-            add_svd_track_finding(path,
-                                  components=components,
-                                  input_reco_tracks=latest_reco_tracks,
-                                  output_reco_tracks=svd_cdc_reco_tracks,
-                                  use_mc_truth=use_mc_truth,
-                                  temporary_reco_tracks=svd_reco_tracks,
-                                  svd_ckf_mode=svd_ckf_mode,
-                                  add_both_directions=add_both_directions,
-                                  use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
-                                  prune_temporary_tracks=prune_temporary_tracks,
-                                  add_mva_quality_indicator=add_vxdTrack_QI,
-                                  svd_standalone_mode=svd_standalone_mode)
-            temporary_reco_track_list.append(svd_reco_tracks)
-            temporary_reco_track_list.append(svd_cdc_reco_tracks)
-            latest_reco_tracks = svd_cdc_reco_tracks
+        temporary_reco_track_list.extend(tmp_reco_track_list)
     else:
-        if is_svd_used(components):
-            add_svd_track_finding(path,
-                                  components=components,
-                                  input_reco_tracks=None,
-                                  output_reco_tracks=svd_reco_tracks,
-                                  add_mva_quality_indicator=add_vxdTrack_QI,
-                                  svd_standalone_mode=svd_standalone_mode)
-            temporary_reco_track_list.append(svd_reco_tracks)
-            latest_reco_tracks = svd_reco_tracks
+        # add the inverted tracking chain with SVD standalone tracking executed first
+        latest_reco_tracks, tmp_reco_track_list = \
+            add_inverted_svd_cdc_tracking_chain(path,
+                                                components=components,
+                                                svd_reco_tracks=svd_reco_tracks,
+                                                cdc_reco_tracks=cdc_reco_tracks,
+                                                svd_cdc_reco_tracks=svd_cdc_reco_tracks,
+                                                use_second_cdc_hits=use_second_cdc_hits,
+                                                add_cdcTrack_QI=add_cdcTrack_QI,
+                                                use_mc_truth=use_mc_truth,
+                                                svd_ckf_mode=svd_ckf_mode,
+                                                add_both_directions=add_both_directions,
+                                                use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
+                                                svd_standalone_mode=svd_standalone_mode,
+                                                add_vxdTrack_QI=add_vxdTrack_QI,
+                                                prune_temporary_tracks=prune_temporary_tracks)
 
-        if is_cdc_used(components):
-            if use_svd_to_cdc_ckf:
-                cdcckf_reco_tracks = "CKFCDCRecoTracks"
-                path.add_module("ToCDCCKF",
-                                inputWireHits="CDCWireHitVector",
-                                inputRecoTrackStoreArrayName=svd_reco_tracks,
-                                relatedRecoTrackStoreArrayName=cdcckf_reco_tracks,
-                                relationCheckForDirection="backward",
-                                ignoreTracksWithCDChits=True,
-                                outputRecoTrackStoreArrayName=cdcckf_reco_tracks,
-                                outputRelationRecoTrackStoreArrayName=svd_reco_tracks,
-                                writeOutDirection="backward",
-                                stateBasicFilterParameters={"maximalHitDistance": 0.15},
-                                pathFilter="arc_length",
-                                maximalLayerJump=4)
-
-                path.add_module("CDCCKFTracksCombiner",
-                                CDCRecoTracksStoreArrayName=cdcckf_reco_tracks,
-                                VXDRecoTracksStoreArrayName=svd_reco_tracks,
-                                recoTracksStoreArrayName=svd_cdc_reco_tracks)
-
-                temporary_reco_track_list.append(cdcckf_reco_tracks)
-                temporary_reco_track_list.append(svd_cdc_reco_tracks)
-                latest_reco_tracks = svd_cdc_reco_tracks
-
-            add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
-                                  add_mva_quality_indicator=add_cdcTrack_QI)
-            temporary_reco_track_list.append(cdc_reco_tracks)
-            latest_reco_tracks = cdc_reco_tracks
+        temporary_reco_track_list.extend(tmp_reco_track_list)
 
     if use_ecl_to_cdc_ckf and is_cdc_used(components):
         add_eclcdc_track_finding(path, components=components, output_reco_tracks=ecl_reco_tracks,

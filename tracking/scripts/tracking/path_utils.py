@@ -632,7 +632,7 @@ def add_svd_standalone_tracking(path,
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                           use_second_hits=False, add_mva_quality_indicator=True,
-                          reattach_hits=False):
+                          reattach_hits=False, skip_WireHitPreparer=False):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -654,12 +654,13 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
         path.add_module('RegisterEventLevelTrackingInfo')
 
     # Init the geometry for cdc tracking and the hits and cut low ADC hits
-    path.add_module("TFCDC_WireHitPreparer",
-                    wirePosition="aligned",
-                    useSecondHits=use_second_hits,
-                    flightTimeEstimation="outwards",
-                    filter="mva",
-                    filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
+    if not skip_WireHitPreparer:
+        path.add_module("TFCDC_WireHitPreparer",
+                        wirePosition="aligned",
+                        useSecondHits=use_second_hits,
+                        flightTimeEstimation="outwards",
+                        filter="mva",
+                        filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
 
     # Constructs clusters
     path.add_module("TFCDC_ClusterPreparer",
@@ -1337,7 +1338,8 @@ def add_inverted_svd_cdc_tracking_chain(path,
         add_cdc_track_finding(path,
                               use_second_hits=use_second_cdc_hits,
                               output_reco_tracks=cdc_reco_tracks,
-                              add_mva_quality_indicator=add_cdcTrack_QI)
+                              add_mva_quality_indicator=add_cdcTrack_QI,
+                              skip_WireHitPreparer=True)
         temporary_reco_track_list.append(cdc_reco_tracks)
         latest_reco_tracks = cdc_reco_tracks
 

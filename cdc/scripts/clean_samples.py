@@ -45,7 +45,7 @@ def make_muon_collection(path_muon):
 
     goodTrack = 'abs(dr) < 0.5 and abs(dz) < 0.5 and nCDCHits > 0'
     goodTrack += ' and clusterE < 0.40 and clusterEoP < 0.40 and inCDCAcceptance==1'
-    goodTrack += ' and [[pidMissingProbabilityExpert(KLM) == 1 and clusterE < 0.25] or pidMissingProbabilityExpert(KLM) == 0]'
+    goodTrack += ' and [[isPIDAvailableFrom(KLM) == 0 and clusterE < 0.25] or isPIDAvailableFrom(KLM) == 1]'
 
     mA.fillParticleList('mu+:calib', goodTrack, path=path_muon)
 
@@ -54,7 +54,7 @@ def make_muon_collection(path_muon):
     track_cuts += ' and [daughter(0,clusterE) <= 0.25 or daughter(1,clusterE) <= 0.25]'
 
     # one of them is valid in KLM
-    track_cuts += ' and [daughter(0,pidMissingProbabilityExpert(KLM)) == 0 or daughter(1,pidMissingProbabilityExpert(KLM))  == 0]'
+    track_cuts += ' and [daughter(0,isPIDAvailableFrom(KLM)) == 1 or daughter(1,isPIDAvailableFrom(KLM))  == 1]'
 
     mA.reconstructDecay('vpho:mumu -> mu+:calib mu-:calib', track_cuts, path=path_muon)
     event_cuts = '[nCleanedTracks('+goodTrack+') == 2] and nTracks < 3'

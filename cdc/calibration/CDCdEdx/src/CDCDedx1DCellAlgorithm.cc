@@ -67,7 +67,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   ttree->SetBranchAddress("costh", &costh);
 
   //repair nbins if they are not divisible accordingly
-  m_eaBin = m_eaB * m_binSplit;;
+  m_eaBin = m_eaB * m_binSplit;
   m_eaBW = (m_eaMax - m_eaMin) / m_eaBin;
 
   //Settings of variables bins

@@ -20,6 +20,8 @@ from basf2 import create_path, register_module
 from clean_samples import make_pion_kaon_collection, make_proton_collection, make_muon_collection, make_electron_collection
 
 from prompt.calibrations.caf_cdcdedx_electron import settings as cdc_dedx_electron
+from prompt.calibrations.caf_top import settings as top
+
 
 quality_flags = [INPUT_DATA_FILTERS["Run Type"]["physics"],
                  INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
@@ -50,7 +52,7 @@ settings = CalibrationSettings(
                    "bgpar": {"muon": [12, 2.85, 28.85], "proton": [20, 0.33, 0.85]},
                    "cosbins": {"muon": 24, "proton": 20},
                    },
-    depends_on=[cdc_dedx_electron])
+    depends_on=[cdc_dedx_electron, top])
 
 ##############################
 

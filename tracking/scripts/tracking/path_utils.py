@@ -396,7 +396,7 @@ def add_svd_track_finding(
            stored.
     :param svd_ckf_mode: String designating the mode of the CDC-to-SVD CKF, that is how it is combined with the SVD
             standalone track finding. One of "SVD_after", "SVD_before", "SVD_before_with_second_ckf",
-            "only_ckf", "SVD_alone", "cosmics".
+            "only_ckf", "ckf_merger_plus_spacepoint_ckf", "SVD_alone", "cosmics".
     :param use_mc_truth: Add mc matching and use the MC information in the CKF (but not in the VXDTF2)
     :param add_both_directions: Whether to add the CKF with both forward and backward extrapolation directions instead
            of just one.
@@ -464,6 +464,19 @@ def add_svd_track_finding(
                         use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
     elif svd_ckf_mode == "only_ckf":
+        add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
+                    use_mc_truth=use_mc_truth, direction="backward", **kwargs)
+        if add_both_directions:
+            add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
+                        use_mc_truth=use_mc_truth, direction="forward", **kwargs)
+
+    # option for inside-out tracking when we start with SVD tracking
+    elif svd_ckf_mode == "ckf_merger_plus_spacepoint_ckf":
+        add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
+                             use_mc_truth=use_mc_truth, direction="backward", **kwargs)
+        if add_both_directions:
+            add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
+                                 use_mc_truth=use_mc_truth, direction="forward", **kwargs)
         add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                     use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:

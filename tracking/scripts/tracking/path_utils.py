@@ -1313,6 +1313,8 @@ def add_inverted_svd_cdc_tracking_chain(path,
         temporary_reco_track_list.append(svd_reco_tracks)
         latest_reco_tracks = svd_reco_tracks
 
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks)
+
     if is_cdc_used(components):
         path.add_module("TFCDC_WireHitPreparer",
                         wirePosition="aligned",

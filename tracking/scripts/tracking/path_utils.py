@@ -1194,7 +1194,9 @@ def add_default_cdc_svd_tracking_chain(path,
                                        prune_temporary_tracks=True,
                                        ):
     """
-    Add the CKF to the path with all the track finding related to and needed for it.
+    Add the default CDC based tracking chain to the path, i.e. CDC standalone followed by the ToSVDSpacePointCKF, the SVD standalone
+    track finding, a CKF based merger for standalone tracks, and finally the SVDToCDCCKF (if setup as such).
+
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param svd_reco_tracks: name of the SVD standalone RecoTracks StoreArray
@@ -1267,7 +1269,9 @@ def add_inverted_svd_cdc_tracking_chain(path,
                                         prune_temporary_tracks=True,
                                         **kwargs,):
     """
-    Add the CKF to the path with all the track finding related to and needed for it.
+    Add an inverted SVD based tracking chain to the path, i.e. SVD standalone followed by the ToCDCCKF, the CDC standalone
+    track finding, a CKF based merger for standalone tracks, and finally the CDCToSVDSpacePointCKF.
+
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param svd_reco_tracks: name of the SVD standalone RecoTracks StoreArray

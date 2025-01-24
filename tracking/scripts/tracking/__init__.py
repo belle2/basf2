@@ -128,8 +128,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
         append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
         SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
-    :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF
-        (if "use_svd_to_cdc_ckf" is True), follwed by the CDC standalone tracking.
+    :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF,
+        the CDC standalone tracking, a CKF-based merger to merge the standalone RecoTracks, and finally the
+        CDCToSVDSpacePointCKF to add SVD hits to all CDC tracks that don't have SVD hits attached to them.
     """
 
     add_prefilter_tracking_reconstruction(
@@ -222,8 +223,9 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
         append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
         SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
-    :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF
-        (if "use_svd_to_cdc_ckf" is True), follwed by the CDC standalone tracking.
+    :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF,
+        the CDC standalone tracking, a CKF-based merger to merge the standalone RecoTracks, and finally the
+        CDCToSVDSpacePointCKF to add SVD hits to all CDC tracks that don't have SVD hits attached to them.
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):
@@ -452,7 +454,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       create_intercepts_for_pxd_ckf=False,
                       inverted_tracking=False):
     """
-    Add the CKF to the path with all the track finding related to and needed for it.
+    Add the track finding chain to the path. Depending on the parameters, different tracking chains can be defined and attached.
     :param path: The path to add the tracking reconstruction modules to
     :param reco_tracks: The store array name where to output all tracks
     :param use_mc_truth: Use the truth information in the CKF modules
@@ -480,8 +482,9 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
         for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
         steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
-    :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF
-        (if `use_svd_to_cdc_ckf` is True), follwed by the CDC standalone tracking.
+    :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF,
+        the CDC standalone tracking, a CKF-based merger to merge the standalone RecoTracks, and finally the
+        CDCToSVDSpacePointCKF to add SVD hits to all CDC tracks that don't have SVD hits attached to them.
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return

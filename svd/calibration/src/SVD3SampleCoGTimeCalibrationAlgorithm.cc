@@ -20,7 +20,6 @@
 #include <TString.h>
 #include <TFitResult.h>
 
-using namespace std;
 using namespace Belle2;
 
 SVD3SampleCoGTimeCalibrationAlgorithm::SVD3SampleCoGTimeCalibrationAlgorithm(const std::string& str) :
@@ -78,7 +77,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
     B2INFO("--------- Applyingselection, 2D-region selection parameters: ");
     B2INFO("Upper Line (q, m): " << m_interceptUpperLine << ", " << m_angularCoefficientUpperLine);
     B2INFO("Lower Line (q, m): " << m_interceptLowerLine << ", " << m_angularCoefficientLowerLine);
-  } //B2INFO("Selecton applied : " << m_applyLinearCutsToRemoveBkg);
+  } //B2INFO("Selection applied : " << m_applyLinearCutsToRemoveBkg);
 
   auto __hEventT0vsCoG__ = getObjectPtr<TH3F>("__hEventT0vsCoG__");
   auto __hEventT0__ = getObjectPtr<TH2F>("__hEventT0__");
@@ -149,7 +148,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
               if (m_applyLinearCutsToRemoveBkg && (hEventT0vsCoG->GetBinContent(i, j) > 0 && (bcy > f1->Eval(bcx) || bcy < f2->Eval(bcx)))) {
                 hEventT0vsCoG->SetBinContent(i, j, 0);
               } else if (hEventT0vsCoG->GetBinContent(i, j) > 0
-                         && (hEventT0vsCoG->GetBinContent(i, j) < max(2, int(nEntriesForFilter * 0.001)))) {
+                         && (hEventT0vsCoG->GetBinContent(i, j) < std::max(2, int(nEntriesForFilter * 0.001)))) {
                 hEventT0vsCoG->SetBinContent(i, j, 0);
               }
             }

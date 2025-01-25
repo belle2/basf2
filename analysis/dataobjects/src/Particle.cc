@@ -32,7 +32,6 @@
 #include <TMatrixFSym.h>
 #include <Math/Boost.h>
 
-#include <iostream>
 #include <iomanip>
 #include <stdexcept>
 #include <queue>

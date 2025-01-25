@@ -28,6 +28,8 @@ DQMHistAnalysisMiraBelleModule::DQMHistAnalysisMiraBelleModule()
   setDescription("Modify and analyze the data quality histograms of MiraBelle");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("scale_dst", m_scale_dst, "Scale factor signal/sideband", 0.09375);
+  addParam("m_reference_hadb", m_reference_hadb, "reference for hadronb2_tight bhabha ratio", 0.193);
+  addParam("m_reference_mumu", m_reference_mumu, "reference for mumu inv mass", 10.568);
 }
 
 DQMHistAnalysisMiraBelleModule::~DQMHistAnalysisMiraBelleModule()
@@ -309,14 +311,17 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   }
   //Calculate M(mumu)
   double peak_mumu = hist_inv_p->GetXaxis()->GetBinCenter(hist_inv_p->GetMaximumBin());
-  TF1* f_mumuInvM = new TF1("f_mumuInvM", "gaus", peak_mumu - 0.04, peak_mumu + 0.04);
+  TF1* f_mumuInvM = new TF1("f_mumuInvM", "gaus", peak_mumu - 0.05, peak_mumu + 0.05);
   f_mumuInvM->SetParameters(hist_inv_p->GetMaximum(), peak_mumu, 0.045);
-  f_mumuInvM->SetParLimits(1, peak_mumu - 0.04, peak_mumu + 0.04);
-  f_mumuInvM->SetParLimits(2, 0.01, 0.06);
+  f_mumuInvM->SetParLimits(1, peak_mumu - 0.05, peak_mumu + 0.05);
+  f_mumuInvM->SetParLimits(2, 0.01, 0.08);
   hist_inv_p->Fit(f_mumuInvM, "R");
   double fit_mumumass = f_mumuInvM->GetParameter(1);
   if (fit_mumumass < 9.) fit_mumumass = 9.;
   if (fit_mumumass > 12.) fit_mumumass = 12.;
+  double fit_mumumass_error = f_mumuInvM->GetParError(1);
+  double pull_mumumass = (fit_mumumass - m_reference_mumu) / fit_mumumass_error;
+  double fit_sigma_mumu = f_mumuInvM->GetParameter(2);
 
   // set values
   mon_mumu->setVariable("mean_npxd", mean_npxd);
@@ -354,6 +359,9 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_mumu->setVariable("notop_frac", notop_frac);
   mon_mumu->setVariable("noarich_frac", noarich_frac);
   mon_mumu->setVariable("fit_mumumass", fit_mumumass);
+  mon_mumu->setVariable("fit_mumumass_error", fit_mumumass_error);
+  mon_mumu->setVariable("pull_mumumass", pull_mumumass);
+  mon_mumu->setVariable("sigma_mumumass", fit_sigma_mumu);
 
   // ========== D*
   // get existing histograms produced by DQM modules
@@ -1061,13 +1069,11 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   //pull
   double ratio_pull_hadBhabha = -10.;
   double error_ratio = -10.;
-
   if (bh_ntot != 0) {
     ratio_hadron_bhabha = had_ntot / bh_neve_bhabha;
     //pull
-    double ratio_reference = 0.206;
     error_ratio = ratio_hadron_bhabha * sqrt((1 / had_ntot) + (1 / bh_neve_bhabha));
-    ratio_pull_hadBhabha = (ratio_hadron_bhabha - ratio_reference) / error_ratio;
+    ratio_pull_hadBhabha = (ratio_hadron_bhabha - m_reference_hadb) / error_ratio;
   }
   // set values
   mon_bhabha->setVariable("had_ntot", had_ntot);

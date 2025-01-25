@@ -16,7 +16,7 @@ namespace Belle2 {
   class PlaneTriggerTrackTimeEstimatorModule : public BaseTrackTimeEstimatorModule {
 
   public:
-    /** Initilialize the module parameters. */
+    /** Initialize the module parameters. */
     PlaneTriggerTrackTimeEstimatorModule();
 
   private:

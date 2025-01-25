@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 '''
 This script will get all the "Done" skim productions for a given campaign, check which ones already have
 metadata retrieved for, and retrieve the metadata for the remaining productions. Then, upload those

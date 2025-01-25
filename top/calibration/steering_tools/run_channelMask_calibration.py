@@ -24,12 +24,12 @@ from top_calibration import channel_mask_calibration
 
 # ----- those parameters need to be adjusted before running -----------------------
 #
-globalTags = ['data_reprocessing_proc11']  # highest priority first
+globalTags = ['online']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
 data_dir = '/group/belle2/dataprod/Data/OfficialReco/proc11/'
 skim_dir = 'skim/hlt_hadron/cdst/sub00'
 main_output_dir = 'top_calibration'
-new_cdst_format = False  # set to True for input in new cdst format
+unpack = True  # True if data unpacking is required (i.e. for raw data or for new cdst format)
 #
 # ---------------------------------------------------------------------------------------
 
@@ -61,7 +61,7 @@ run_range = 'r' + f'{run_first:05d}' + '-' + f'{run_last:05d}'
 output_dir = f"{main_output_dir}/channelMask-{expNo}-{run_range}"
 
 # Define calibration
-cal = channel_mask_calibration(inputFiles, globalTags, localDBs, new_cdst_format)
+cal = channel_mask_calibration(inputFiles, globalTags, localDBs, unpack)
 cal.backend_args = {"queue": "s"}
 
 # Add calibration to CAF

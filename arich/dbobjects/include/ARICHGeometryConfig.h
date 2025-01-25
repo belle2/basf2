@@ -30,7 +30,7 @@
 namespace Belle2 {
 
   //! The Class for ARICH Geometry Parameters
-  /*! This class provides ARICH gemetry paramters for simulation, reconstruction and so on.
+  /*! This class provides ARICH geometry parameters for simulation, reconstruction and so on.
     These parameters are gotten from gearbox.
   */
 
@@ -41,7 +41,7 @@ namespace Belle2 {
     //! Default constructor
     ARICHGeometryConfig() {};
 
-    //! Contructor
+    //! Constructor
     explicit ARICHGeometryConfig(const GearDir&);
 
     //! Clears
@@ -216,21 +216,35 @@ namespace Belle2 {
       m_mirrorDispl = displ;
     }
 
+    /**
+     * Set whether global displacement should be used
+     * @param use switch on/off global displacement
+     */
     void setUseGlobalDisplacement(bool use)
     {
       m_displaceGlobal = use;
     }
 
+    /**
+     * Set whether mirror displacement should be used
+     * @param use switch on/off mirror displacement
+     */
     void setUseMirrorDisplacement(bool use)
     {
       m_displaceMirrors = use;
     }
 
+    /**
+     * Get whether global displacement is used
+     */
     bool useGlobalDisplacement() const
     {
       return m_displaceGlobal;
     }
 
+    /**
+     * Get whether mirror displacement is used
+     */
     bool useMirrorDisplacement() const
     {
       return m_displaceMirrors;

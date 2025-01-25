@@ -9,13 +9,11 @@
 #include <beast/qcsmonitor/modules/QcsmonitorDigitizerModule.h>
 #include <beast/qcsmonitor/dataobjects/QcsmonitorSimHit.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 
 //c++
 #include <string>
-#include <fstream>
 
 using namespace std;
 using namespace Belle2;

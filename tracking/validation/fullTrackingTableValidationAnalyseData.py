@@ -100,8 +100,8 @@ def write_value_cell(key, value):
 
 
 def make_html_row(x):
-    keys = [key for key, _ in x.iteritems()]
-    titles = [key[2] for key, _ in x.iteritems()]
+    keys = [key for key, _ in x.items()]
+    titles = [key[2] for key, _ in x.items()]
 
     chunked_titles = make_chunks(titles, 2)
     common_prefixes = list(map(os.path.commonprefix, chunked_titles))
@@ -113,7 +113,7 @@ def make_html_row(x):
     row_content = "".join([write_value_cell(key, value) for key, value in zip(keys, shorter_titles)])
     html = "<tr>" + row_content + "</tr>"
 
-    row_content = "".join([write_value_cell(key, value) for key, value in x.sort_index().iteritems()])
+    row_content = "".join([write_value_cell(key, value) for key, value in x.sort_index().items()])
     html += "<tr>" + row_content + "</tr>"
 
     return html

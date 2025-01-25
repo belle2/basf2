@@ -14,19 +14,32 @@
 
 
 namespace Belle2 {
-  /// Testing module for collection of calibration data
+
+  /**
+   * ARICH channel-mask calibration: data collector.
+   */
   class ARICHChannelMaskModule : public CalibrationCollectorModule {
 
   public:
 
-    /// Constructor: Sets the description, the properties and the parameters of the module.
+    /**
+     * Constructor.
+     */
     ARICHChannelMaskModule();
 
+    /**
+     * Preparation of data collection.
+     */
     virtual void prepare() override;
+
+    /**
+     * Collection (called for each event).
+     */
     virtual void collect() override;
 
   private:
 
+    /** Digits. */
     StoreArray<ARICHDigit> m_ARICHDigits;
 
   };

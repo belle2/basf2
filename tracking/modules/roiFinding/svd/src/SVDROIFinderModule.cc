@@ -51,7 +51,9 @@ SVDROIFinderModule::SVDROIFinderModule() : Module()
 
   addParam("SVDInterceptListName", m_SVDInterceptListName, "name of the list of interceptions", std::string(""));
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
-
+  addParam("ROIFindingForDQM", m_ROIFindingForDQM,
+           "Is this ROI finding for DQM? If false, create SVDIntercepts by extrapolating tracks in both directions. If true, only extrapolate backwards.",
+           m_ROIFindingForDQM);
 }
 
 SVDROIFinderModule::~SVDROIFinderModule()
@@ -102,7 +104,8 @@ void SVDROIFinderModule::beginRun()
 
   m_theSVDInterceptor = new VXDInterceptor<SVDIntercept>(m_toleranceZ, m_tolerancePhi,
                                                          std::vector<float> {3.9, 8.0, 10.4, 13.5},
-                                                         VXD::SensorInfoBase::SVD);
+                                                         VXD::SensorInfoBase::SVD,
+                                                         m_ROIFindingForDQM);
 
   m_theStripTranslator = new ROIToUnitTranslator<SVDIntercept>(&m_ROIinfo);
 

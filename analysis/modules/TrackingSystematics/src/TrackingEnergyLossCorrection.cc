@@ -14,9 +14,9 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-#include <map>
-#include <TRandom.h>
 #include <Math/Vector4D.h>
+
+#include <map>
 
 using namespace Belle2;
 
@@ -27,13 +27,14 @@ TrackingEnergyLossCorrectionModule::TrackingEnergyLossCorrectionModule() : Modul
   setDescription(
     R"DOC(Module to modify Energy of tracks from the lists. Include in your code as
 
-    .. code:: python
+.. code:: python
 
-        mypath.add_module("TrackingEnergyLossCorrection", particleLists=['pi+:cut'], correction=0.001)
+    mypath.add_module("TrackingEnergyLossCorrection", particleLists=['pi+:cut'], correction=0.001)
 
-    The module modifies the input particleLists by subtracting the correction value to the track energy and rescaling the momenta 
+The module modifies the input particleLists by subtracting the correction value to the track energy and rescaling the momenta
 		     
 		     )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("correction", m_correction, "correction value to be subtracted from the particle energy",

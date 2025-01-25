@@ -289,7 +289,7 @@ namespace Belle2 {
 
 
     trackCand.clearRefereeStatus(); // enforce empty refereeStatus
-    // add several statusses one by one and test if the overall status is as expected (once with 'overall status' and once with status one by one)
+    // add several statuses one by one and test if the overall status is as expected (once with 'overall status' and once with status one by one)
     trackCand.addRefereeStatus(SpacePointTrackCand::c_checkedClean);
     EXPECT_TRUE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_checkedClean));
     trackCand.addRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor);
@@ -302,7 +302,7 @@ namespace Belle2 {
     EXPECT_EQ(trackCand.getRefereeStatus(), expectedStatus);
 
 
-    // remove one status and test if it actuall gets removed
+    // remove one status and test if it actually gets removed
     trackCand.removeRefereeStatus(SpacePointTrackCand::c_checkedClean);
     expectedStatus -= SpacePointTrackCand::c_checkedClean;
     EXPECT_EQ(trackCand.getRefereeStatus(), expectedStatus);
@@ -386,7 +386,7 @@ namespace Belle2 {
     fullTrackCand.addSpacePoint(&SVDSpacePoint2, 3.45);
     fullTrackCand.addSpacePoint(&SVDSpacePoint3, 4.56);
 
-    // set up a second TC, but ommit one SpacePoint
+    // set up a second TC, but omit one SpacePoint
     SpacePointTrackCand expectedTC;
     expectedTC.addSpacePoint(&aPXDSpacePoint, 1.23);
     expectedTC.addSpacePoint(&SVDSpacePoint2, 3.45);
@@ -470,7 +470,7 @@ namespace Belle2 {
     EXPECT_TRUE(nothingChanged == sortedConstructed);
 
 
-    std::vector<double> sortParams1 = { 1.0, 2.0, 3.0 , 4.0, 5.0, 7.0, 6.0};
+    std::vector<double> sortParams1 = { 1.0, 2.0, 3.0, 4.0, 5.0, 7.0, 6.0};
     sortedConstructed.setSortingParameters(sortParams1);
 
     // verify that sorting changed according to new sortParams

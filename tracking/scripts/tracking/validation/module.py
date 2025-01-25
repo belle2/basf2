@@ -38,7 +38,7 @@ ROOT.gSystem.Load("libtracking")
 
 class FilterProperties:
     """
-    contains all informations necessary for track filters to decide whether
+    contains all information necessary for track filters to decide whether
     track will be included into the processed list of tracks
     This class is used for both providing information on pattern reco and
     MC tracks
@@ -180,7 +180,7 @@ class TrackingValidationModule(basf2.Module):
         #: Track-match object that examines relation information from MCMatcherTracksModule
         self.trackMatchLookUp = Belle2.TrackMatchLookUp(self.mcTrackCandidatesColumnName, self.trackCandidatesColumnName)
 
-        #: Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
+        #: Use dequeues in favour of lists to prevent repeated memory allocation of cost O(n)
 
         #: list of PR-track clones and matches
         self.pr_clones_and_matches = collections.deque()
@@ -813,7 +813,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             if parameter_name in parameter_names \
                     or root_save_name(parameter_name) in parameter_names:
 
-                is_expert = not(parameter_name in self.non_expert_parameters)
+                is_expert = not (parameter_name in self.non_expert_parameters)
 
                 parameter_root_name = root_save_name(parameter_name)
 

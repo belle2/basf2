@@ -12,7 +12,6 @@
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <map>
 #include <optional>
 #include <string>
 

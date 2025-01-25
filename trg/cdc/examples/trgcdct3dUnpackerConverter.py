@@ -17,6 +17,7 @@
 # -----------------------------------------------------------------------------------
 
 import basf2
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 import ROOT.Belle2
 
 

@@ -149,7 +149,7 @@ void DQMHistAnalysisDeltaTestModule::event()
   m_cTest->cd(7);
   auto it = getDeltaList().find(m_histogramName);
   if (it != getDeltaList().end()) {
-    auto h = it->second->m_lastHist;
+    auto h = it->second.m_lastHist.get();
     if (h) {
       auto a = (TH1*)h->DrawClone("hist");
       a->SetTitle("last update histogram");

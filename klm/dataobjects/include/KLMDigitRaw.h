@@ -130,7 +130,7 @@ namespace Belle2 {
      */
     uint16_t getFlag() const
     {
-      return m_word1 >> 13;
+      return KLM::RawData::unpackType(m_word1);
     }
 
     /**
@@ -163,6 +163,14 @@ namespace Belle2 {
     uint16_t getCharge()
     {
       return KLM::RawData::unpackCharge(m_word4);
+    }
+
+    /**
+     * Get FE
+     */
+    uint16_t getFEStatus()
+    {
+      return KLM::RawData::unpackFE(m_word4);
     }
 
     /**

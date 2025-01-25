@@ -138,7 +138,7 @@ void OverlapResidualsModule::defineHisto()
                                    "Layer 6: histrogram of residual difference #Delta res_{v} for overlapping SVD hits", 100, -1000, 1000);
   h_V_DeltaRes_SVD_Lyr6->GetXaxis()->SetTitle("#Delta res_{v} (#mum)");
   h_V_DeltaRes_SVD_Lyr6->GetYaxis()->SetTitle("counts");
-  h_SVDstrips_Mult = new TH1F("h_SVDstrips_Mult", "SVD strips multipicity for SVD clusters in overlapping sensors", 15, 0.5, 15.5);
+  h_SVDstrips_Mult = new TH1F("h_SVDstrips_Mult", "SVD strips multiplicity for SVD clusters in overlapping sensors", 15, 0.5, 15.5);
   h_SVDstrips_Mult->GetXaxis()->SetTitle("N. of SVD strips contributing to the cluster");
   h_SVDstrips_Mult->GetYaxis()->SetTitle("counts");
   //Define 2D histograms: difference of u-residuals vs phi of VXD overlaps for each layer (1 to 6)
@@ -522,8 +522,8 @@ void OverlapResidualsModule::event()
           const float over_V_PXD = res_V_2 - res_V_1;
           const ROOT::Math::XYZVector pxdLocal_1(pxd_1->getU(), pxd_1->getV(), 0.);
           const ROOT::Math::XYZVector pxdLocal_2(pxd_2->getU(), pxd_2->getV(), 0.);
-          const VXD::SensorInfoBase& pxdSensor_1 = geo.get(pxd_id_1);
-          const VXD::SensorInfoBase& pxdSensor_2 = geo.get(pxd_id_2);
+          const VXD::SensorInfoBase& pxdSensor_1 = geo.getSensorInfo(pxd_id_1);
+          const VXD::SensorInfoBase& pxdSensor_2 = geo.getSensorInfo(pxd_id_2);
           const ROOT::Math::XYZVector& pxdGlobal_1 = pxdSensor_1.pointToGlobal(pxdLocal_1);
           const ROOT::Math::XYZVector& pxdGlobal_2 = pxdSensor_2.pointToGlobal(pxdLocal_2);
           double pxdPhi_1 = atan2(pxdGlobal_1.Y(), pxdGlobal_1.X());  // maybe use pxdGlobal_1.Phi() instead
@@ -681,8 +681,8 @@ void OverlapResidualsModule::event()
             const float over_U_SVD = res_U_2 - res_U_1;
             const ROOT::Math::XYZVector svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
             const ROOT::Math::XYZVector svdLocal_2(svd_2->getPosition(), svd_predIntersect_2[4], 0.);
-            const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
-            const VXD::SensorInfoBase& svdSensor_2 = geo.get(svd_id_2);
+            const VXD::SensorInfoBase& svdSensor_1 = geo.getSensorInfo(svd_id_1);
+            const VXD::SensorInfoBase& svdSensor_2 = geo.getSensorInfo(svd_id_2);
             const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
             const ROOT::Math::XYZVector& svdGlobal_2 = svdSensor_2.pointToGlobal(svdLocal_2);
             double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X());  // maybe use svdGlobal_1.Phi() instead
@@ -741,7 +741,7 @@ void OverlapResidualsModule::event()
                 B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits_1.size() << " != " << svdSize_U_int <<
                         " cluster size");
 
-              //skip clusters created beacuse of missing APV
+              //skip clusters created because of missing APV
               if (svdSize_U_int < 128)
                 for (unsigned int d = 0; d < svdSize_U_int; d++) {
                   svdStripCharge_U_int.push_back(theRecoDigits_1[d]->getCharge());
@@ -795,7 +795,7 @@ void OverlapResidualsModule::event()
               if ((theRecoDigits_2.size() != svdSize_U_ext) && (svdSize_U_ext != 128)) //virtual cluster
                 B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits_2.size() << " != " << svdSize_U_ext <<
                         " cluster size");
-              //skip clusters created beacuse of missing APV
+              //skip clusters created because of missing APV
               if (svdSize_U_ext < 128)
                 for (unsigned int d = 0; d < svdSize_U_ext; d++) {
                   svdStripCharge_U_ext.push_back(theRecoDigits_2[d]->getCharge());
@@ -872,8 +872,8 @@ void OverlapResidualsModule::event()
             const float over_V_SVD = res_V_2 - res_V_1;
             const ROOT::Math::XYZVector svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
             const ROOT::Math::XYZVector svdLocal_2(svd_predIntersect_2[3], svd_2->getPosition(), 0.);
-            const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
-            const VXD::SensorInfoBase& svdSensor_2 = geo.get(svd_id_2);
+            const VXD::SensorInfoBase& svdSensor_1 = geo.getSensorInfo(svd_id_1);
+            const VXD::SensorInfoBase& svdSensor_2 = geo.getSensorInfo(svd_id_2);
             const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
             const ROOT::Math::XYZVector& svdGlobal_2 = svdSensor_2.pointToGlobal(svdLocal_2);
             double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X());  // maybe use svdGlobal_1.Phi() instead
@@ -930,7 +930,7 @@ void OverlapResidualsModule::event()
               if ((theRecoDigits_1.size() != svdSize_V_int) && (svdSize_V_int != 128)) //virtual cluster
                 B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits_1.size() << " != " << svdSize_V_int <<
                         " cluster size");
-              //skip clusters created beacuse of missing APV
+              //skip clusters created because of missing APV
               if (svdSize_V_int < 128)
                 for (unsigned int d = 0; d < svdSize_V_int; d++) {
                   svdStripCharge_V_int.push_back(theRecoDigits_1[d]->getCharge());
@@ -984,7 +984,7 @@ void OverlapResidualsModule::event()
               if ((theRecoDigits_2.size() != svdSize_V_ext) && (svdSize_V_ext != 128)) //virtual cluster
                 B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits_2.size() << " != " << svdSize_V_ext <<
                         " cluster size");
-              //skip clusters created beacuse of missing APV
+              //skip clusters created because of missing APV
               if (svdSize_V_ext < 128)
                 for (unsigned int d = 0; d < svdSize_V_ext; d++) {
                   svdStripCharge_V_ext.push_back(theRecoDigits_2[d]->getCharge());

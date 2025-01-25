@@ -78,7 +78,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         self.track_match_look_up = Belle2.TrackMatchLookUp(self.mc_reco_tracks_name, self.reco_tracks_name)
 
     def prepare(self):
-        """Collect some statistics about the pattern recognition tracks used for comparision to the MC tracks
+        """Collect some statistics about the pattern recognition tracks used for comparison to the MC tracks
 
         Executed once at the start of each event.
         """

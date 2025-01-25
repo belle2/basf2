@@ -35,7 +35,7 @@ def coroutine(generator_func):
     """Famous coroutine decorator.
 
     Starts a receiving generator function to the first yield,
-    such that it can receive a send call immediatly.
+    such that it can receive a sent call immediately.
     """
 
     @functools.wraps(generator_func)
@@ -113,7 +113,7 @@ class HarvestingModule(basf2.Module):
         Method called with each object in the StoreArray.
         Extractes the parts relevant for analysis and
         returns them as MutableMapping (e.g. a dict) of part_name and values.
-        Currently only float values or values convertable to floats are supported.
+        Currently only float values or values convertible to floats are supported.
         If requested that can change in the future.
 
     On termination all the collected values are recasted to numpy arrays and
@@ -180,7 +180,7 @@ class HarvestingModule(basf2.Module):
             Name of the harvest that is used in the title of ROOT plots and trees.
             Defaults to the name.
         contact : string, optional
-            Contact email adress to be used in the validation plots contact. Defaults to None.
+            Contact email address to be used in the validation plots contact. Defaults to None.
         expert_level : int, optional
             Expert level that can be used to switch on more plots.
             Generally the higher the more detailed to analysis.
@@ -210,7 +210,7 @@ class HarvestingModule(basf2.Module):
         #: Contact email address to be displayed on the validation page
         self.contact = contact
 
-        #: Integer expert level that controlls to detail of plots to be generated
+        #: Integer expert level that controls to detail of plots to be generated
         self.expert_level = self.default_expert_level if expert_level is None else expert_level
 
         #: A list of additional refiner instances to be executed
@@ -242,7 +242,7 @@ class HarvestingModule(basf2.Module):
         * Does invoke the prepare method before the iteration starts.
         * In each event fetch the StoreArray / iterable StoreObjPtr,
         * Iterate through all instances
-        * Feed each instance to the pick method to deside it the instance is relevant
+        * Feed each instance to the pick method to decide it the instance is relevant
         * Forward it to the peel method that should generated a dictionary of values
         * Store each dictionary of values
         """
@@ -300,7 +300,7 @@ class HarvestingModule(basf2.Module):
             except GeneratorExit:
                 crops = np.array(raw_crops)
 
-        elif isinstance(crop, collections.MutableMapping):
+        elif isinstance(crop, collections.abc.MutableMapping):
             for part_name in crop:
                 raw_crops[part_name] = self.create_crop_part_collection()
 
@@ -391,7 +391,7 @@ class HarvestingModule(basf2.Module):
 
         Returns
         -------
-        bool : Indicator if the instance is valueable in the current harverst.
+        bool : Indicator if the instance is valuable in the current harvest.
         """
         return True
 
@@ -443,7 +443,7 @@ class HarvestingModule(basf2.Module):
     def iter_store_obj(store_obj):
         """Obtain a iterator from a StoreObj
 
-        Repeatly calls iter(store_obj) or store_obj.__iter__()
+        Repeatedly calls iter(store_obj) or store_obj.__iter__()
         until the final iterator returns itself
 
         Returns

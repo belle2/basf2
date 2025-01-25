@@ -298,7 +298,7 @@ PXDDQMEfficiencyNtupleSelftrackModule::findClosestCluster(const VxdID& avxdid, R
     double v = m_pxdclusters[iclus]->getV();
     ROOT::Math::XYZVector current(u, v, 0);
 
-    //2D dist sqared
+    //2D dist squared
     double dist = (intersection - current).R();
     if (dist < mindist) {
       closest = iclus;

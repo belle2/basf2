@@ -39,7 +39,6 @@ namespace Belle2 {
 
     //! Useful Constructor
     /*!
-      \param trackId geant4 track id
       \param particleId particle PDG id number
       \param position vector of track position on aerogel plane
       \param momentum vector of track momentum on aerogel plane

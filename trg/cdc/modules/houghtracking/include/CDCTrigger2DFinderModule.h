@@ -225,6 +225,12 @@ namespace Belle2 {
     /** switch to send only the first found track and suppress the subsequent clones */
     bool m_suppressClone;
 
+    /** switch to use hit pattern inside TSF */
+    bool m_usehitpattern;
+
+    /** switch to use hit pattern inside TSF with ADC cut*/
+    bool m_useadc;
+
     /** switch to save the Hough plane in DataStore
      *  (0: don't save, 1: save only peaks, 2: save full plane) */
     unsigned m_storePlane;
@@ -257,7 +263,7 @@ namespace Belle2 {
     std::vector<CDCTriggerHoughCand> houghCand;
 
     /** Radius of the CDC layers with priority wires (2 per super layer). Initialized at 0 by the SW shifter*/
-    double radius[9][2] = {{0.}};
+    double radius[9][5] = {{0.}};
     /** Number of track segments up to super layer. Initialized at 0 by the SW shifter */
     unsigned TSoffset[10] = {0};
 

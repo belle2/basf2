@@ -17,14 +17,14 @@
 namespace Belle2 {
 
   /**  This class is the derivate of HitXP, and complete it with a constructor that use
-  * all other complex types (classes) of basf2. It is necessary to buld a hitXP object.
+  * all other complex types (classes) of basf2. It is necessary to build a hitXP object.
   */
 
   class hitXPDerivate: public hitXP {
 
   public:
 
-    /** empy constructor */
+    /** empty constructor */
     hitXPDerivate() {}
 
     /** constructor for SVD hit
@@ -38,6 +38,6 @@ namespace Belle2 {
     hitXPDerivate(const PXDTrueHit& hit, const MCParticle& particle, const VXD::SensorInfoBase& sensor);
 
     //! needed by root
-    ClassDef(hitXPDerivate, 2);
+    ClassDef(hitXPDerivate, 3);
   };
 } /** end namespace Belle2 */

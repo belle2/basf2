@@ -10,106 +10,85 @@
 #pragma once
 
 
-#include "trg/klm/modules/klmtrigger/group_helper.h"
+#include "trg/klm/modules/klmtrigger/ntuples_full.h"
+#include <cstdint>
+
 
 
 namespace Belle2 {
-  namespace group_helper {
-
-    namespace KLM_Generic {
-      AXIS_NAME(event_nr, int);
-    }
-
-    namespace KLM_Coordinates_n {
-      AXIS_NAME(sector, int32_t);
-      AXIS_NAME(section, int32_t);
-      AXIS_NAME(Subdetector, int32_t);
-      AXIS_NAME(strip, int32_t);
-      AXIS_NAME(layer, int32_t);
-      AXIS_NAME(plane, int32_t);
-      AXIS_NAME(isectors_t, int);
-    }
+  namespace KLM_TRG_definitions {
+    nt_new_axis_t(event_nr, int32_t{});
+    nt_new_axis_t(sector, int32_t{});
+    nt_new_axis_t(section, int32_t{});
+    nt_new_axis_t(subdetector, int32_t{});
+    nt_new_axis_t(strip, int32_t{});
+    nt_new_axis_t(layer, int32_t{});
+    nt_new_axis_t(plane, int32_t{});
+    nt_new_axis_t(digit_id, int32_t{});
 
 
-    namespace geofit {
-      AXIS_NAME(slopeY, double);
-      AXIS_NAME(offsetY, double);
-      AXIS_NAME(slopeX, double);
-      AXIS_NAME(offsetX, double);
-    }
+
+    using KLM_Digit_compact_t = nt::ntuple <
+                                event_nr,
+                                digit_id,
+                                subdetector,
+                                section,
+                                sector,
+                                plane,
+                                layer,
+                                strip
+                                >;
+
+    using KLM_Digit_compact_ts = std::vector < KLM_Digit_compact_t>;
+
+    nt_new_axis_t(x_pos, int32_t{});
+    nt_new_axis_t(y_pos, int32_t{});
+
+
+
+    nt_new_axis_t(slopeX, double{});
+    nt_new_axis_t(offsetX, double{});
+    nt_new_axis_t(slopeY, double{});
+    nt_new_axis_t(offsetY, double{});
+
+    nt_new_axis_t(slopeXY, double{});
+    nt_new_axis_t(interceptXY, double{});
+    nt_new_axis_t(ipXY, double{});
+    nt_new_axis_t(chisqXY, double{});
+    nt_new_axis_t(Nhits, double{});
+
+    nt_new_axis_t(track_id, int{});
+    nt_new_axis_t(geo_id, int{});
 
     using KLM_geo_fit_t =
-      std::tuple<KLM_Coordinates_n::Subdetector, KLM_Coordinates_n::section, KLM_Coordinates_n::sector, KLM_Coordinates_n::layer, KLM_Coordinates_n::plane, geofit::slopeX, geofit::offsetX,  geofit::slopeY, geofit::offsetY>;
+      nt::ntuple<geo_id, subdetector, section, sector, layer, plane, slopeX, offsetX,  slopeY, offsetY>;
+    using KLM_geo_fit_t_old =
+      nt::ntuple< subdetector, section, sector, layer, plane, slopeX, offsetX, slopeY, offsetY>;
+    using KLM_geo_fit_ts = std::vector< KLM_geo_fit_t>;
 
-
-
-    using KLM_Digit_compact = std::tuple <
-                              KLM_Generic::event_nr,
-                              KLM_Coordinates_n::Subdetector,
-                              KLM_Coordinates_n::section,
-                              KLM_Coordinates_n::isectors_t,
-                              KLM_Coordinates_n::sector,
-                              KLM_Coordinates_n::plane,
-                              KLM_Coordinates_n::layer,
-                              KLM_Coordinates_n::strip
-                              >;
-
-
-
-
-    AXIS_NAME(slopeXY_t, double);
-    AXIS_NAME(interceptXY_t, double);
-    AXIS_NAME(ipXY_t, double);
-    AXIS_NAME(chisqXY_t, double);
-    AXIS_NAME(Nhits_t, int);
-
-
-    using KLM_trig_linear_fit = std::tuple <
-                                KLM_Generic::event_nr,
-                                KLM_Coordinates_n::Subdetector,
-                                KLM_Coordinates_n::section,
-                                KLM_Coordinates_n::sector,
-                                KLM_Coordinates_n::plane,
-                                slopeXY_t,
-                                interceptXY_t,
-                                ipXY_t,
-                                chisqXY_t,
-                                Nhits_t
+    using KLM_trig_linear_fit = nt::ntuple <
+                                subdetector,
+                                section,
+                                sector,
+                                plane,
+                                track_id,
+                                slopeXY,
+                                interceptXY,
+                                ipXY,
+                                chisqXY,
+                                Nhits
                                 >;
 
 
-
-    AXIS_NAME(BKLM_n_trg_sectors, int);
-    AXIS_NAME(EKLM_n_trg_sectors, int);
-    AXIS_NAME(Sector_mask_Backward_Barrel, int);
-    AXIS_NAME(Sector_mask_Forward_Barrel, int);
-    AXIS_NAME(Sector_mask_Backward_Endcap, int);
-    AXIS_NAME(Sector_mask_Forward_Endcap, int);
-    AXIS_NAME(Sector_mask_OR_Backward_Barrel, int);
-    AXIS_NAME(Sector_mask_OR_Forward_Barrel, int);
-    AXIS_NAME(Sector_mask_OR_Backward_Endcap, int);
-    AXIS_NAME(Sector_mask_OR_Forward_Endcap, int);
-    AXIS_NAME(BKLM_back_to_back_flag, int);
-    AXIS_NAME(EKLM_back_to_back_flag, int);
-
-    using KLM_trg_summery = std::tuple <
-                            KLM_Generic::event_nr,
-                            BKLM_n_trg_sectors,
-                            EKLM_n_trg_sectors,
-                            Sector_mask_Backward_Barrel,
-                            Sector_mask_Forward_Barrel,
-                            Sector_mask_Backward_Endcap,
-                            Sector_mask_Forward_Endcap,
-                            Sector_mask_OR_Backward_Barrel,
-                            Sector_mask_OR_Forward_Barrel,
-                            Sector_mask_OR_Backward_Endcap,
-                            Sector_mask_OR_Forward_Endcap,
-                            BKLM_back_to_back_flag,
-                            EKLM_back_to_back_flag
-
-                            >;
+    using KLM_trig_linear_fits = std::vector< KLM_trig_linear_fit>;
 
 
-  }
+
+    nt_new_axis_t(n_sections_trig, int32_t{});
+    nt_new_axis_t(sector_mask, int32_t{});
+    nt_new_axis_t(sector_mask_or, int32_t{});
+    nt_new_axis_t(back2back, int32_t{});
+  };
+
 
 }

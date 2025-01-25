@@ -71,32 +71,32 @@ namespace Belle2 {
     void terminate() override final;
 
     /**
-    * funtion to get metadata from histogram
+    * function to get metadata from histogram
     */
     void getMetadata();
 
     /**
-    * funtion to draw dEdx+Fit
+    * function to draw dEdx+Fit
     */
     void drawDedxPR();
 
     /**
-    * funtion to draw dEdx+Fit for run variation
+    * function to draw dEdx+Fit for run variation
     */
     void drawDedxIR();
 
     /**
-    * funtion to draw ADC-based dead wire status of CDC
+    * function to draw ADC-based dead wire status of CDC
     */
     void drawWireStatus();
 
     /**
-    * funtion to draw dEdx vs costh and phi
+    * function to draw dEdx vs costh and phi
     */
     void drawDedxCosPhi();
 
     /**
-     * funtion to dedx bands P
+     * function to dedx bands P
      */
     void drawBandPlot();
 
@@ -106,19 +106,19 @@ namespace Belle2 {
     void drawDedxInjTime();
 
     /**
-    * funtion to draw the mean/reso of dedx vs injection time
+    * function to draw the mean/reso of dedx vs injection time
     */
     void drawDedxInjTimeBin();
 
     /**
-    * funtion to fit gaussian dist.
+    * function to fit gaussian dist.
     * @param temphist histogram to fit
     * @param status return the status of fitting
     */
     void fitHistogram(TH1D*& temphist, std::string& status);
 
     /**
-    * funtion to set the mean and sigma histograms
+    * function to set the mean and sigma histograms
     * @param hist 2-D histogram
     * @param hmean histogram to store the mean
     * @param hsigma histogram to store the sigma
@@ -127,7 +127,7 @@ namespace Belle2 {
     void setHistPars(TH2D* hist, TH1F* hmean, TH1F* hsigma, int nbin);
 
     /**
-    * funtion to draw the histograms
+    * function to draw the histograms
     * @param hist histogram to draw
     * @param nbin number of bins
     * @param pars average value of histogram
@@ -137,24 +137,24 @@ namespace Belle2 {
     void drawHistPars(TH1F* hist, int nbin, double pars, double fac, std::string var);
 
     /**
-    * funtion to add plot style
+    * function to add plot style
     */
     void setPlotStyle();
 
     /**
-    * funtion to add text style
+    * function to add text style
     * @param obj pavetext variable
     */
     void setTextStyle(TPaveText*& obj);
 
     /**
-    * funtion to set the style of histogram
+    * function to set the style of histogram
     * @param obj histogram
     */
     void setHistStyle(TH1* obj);
 
     /**
-    * funtion to reset pad margins
+    * function to reset pad margins
     * @param l left
     * @param r right
     * @param t top
@@ -163,7 +163,7 @@ namespace Belle2 {
     void setPadStyle(double l, double r, double t, double b);
 
     /**
-    * funtion to set the bhabha event info
+    * function to set the bhabha event info
     * @param pt pavetext variable
     */
     void setBEvtInfo(TPaveText* pt);

@@ -118,15 +118,14 @@ namespace Belle2 {
     }
 
   private:
-
-    /** Pointer to the Quality Estimator used to evaluate the SPTCs to find the best. */
-    std::unique_ptr<QualityEstimatorBase> m_estimator;
-
     /** Vector containing one vector of the best SPTCs per family. */
     std::vector<std::multiset<SpacePointTrackCand> > m_bestPaths;
 
     /** Map of family number to respective index for m_bestPaths */
     std::vector<short> m_familyToIndex;
+
+    /** Pointer to the Quality Estimator used to evaluate the SPTCs to find the best. */
+    std::unique_ptr<QualityEstimatorBase> m_estimator;
 
     /** Counter for current index used for m_familyToIndex. The counter is increased each time a family is seen for
      *  the first time and thus a new entry for this family is added to m_familyToIndex. */

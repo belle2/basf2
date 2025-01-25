@@ -21,8 +21,8 @@ While the read access to the conditions database is always allowed (e.g.
 for downloading globaltags and payloads), users need a valid JSON Web Token
 (JWT) to authenticate to the conditions database when using this tool for
 creating/manpipulating globaltags or uploading payloads. For practical purposes,
-it is only necessary to know that a JWT is a string containing crypted
-information, and that string is stored in a file. More informations about what
+it is only necessary to know that a JWT is a string containing encrypted
+information, and that string is stored in a file. More information about what
 a JWT is can be found on
 `Wikipedia <https://en.wikipedia.org/wiki/JSON_Web_Token>`_.
 
@@ -285,7 +285,7 @@ def command_tag_create(args, db=None):
     Create a new globaltag
 
     This command creates a new globaltag in the database with the given name
-    and description. The name can only contain alpha-numeric characters and the
+    and description. The name can only contain alphanumeric characters and the
     characters ``+-_:``.
 
     .. warning::
@@ -701,7 +701,7 @@ def command_iov(args, db):
     if not iovfilter.check_arguments():
         return 1
 
-    # Check if the globaltag exists otherwise I get the same result for an emply global tag or for a non-existing one
+    # Check if the globaltag exists otherwise I get the same result for an empty global tag or for a non-existing one
     if db.get_globalTagInfo(args.tag) is None:
         B2ERROR(f"Globaltag '{args.tag}' doesn't exist.")
         return False
@@ -1033,7 +1033,7 @@ def get_argument_parser():
         # the command is top level, e.g. foo, we just use parsers. Otherwise we
         # go look into the dict of subparsers for command chains.
         parent = parsers
-        if(len(parts) > 1):
+        if (len(parts) > 1):
             parent_parser, parent = subparsers[tuple(parts[:-1])]
             # if we are the first subcommand to a given command we have to add
             # the subparsers. do that and add it back to the dict

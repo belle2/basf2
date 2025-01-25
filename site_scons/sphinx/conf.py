@@ -16,7 +16,6 @@ import sys
 import os
 import re
 import subprocess
-import jupytext
 
 sys.path.insert(0, os.path.abspath("extensions"))
 
@@ -55,13 +54,6 @@ codeautolink_warn_on_missing_inventory = False
 codeautolink_warn_on_failed_resolve = False
 
 nbsphinx_allow_errors = True
-# Anything that ends with .jupy.py will be understood as a jupyter
-# notebook converted to a plain python file with jupytext. During the sphinx
-# build, jupytext will converted it back to a .ipynb file and nbsphinx will
-# build the HTML
-nbsphinx_custom_formats = {
-    '.doc.jupy.py': lambda s: jupytext.reads(s, '.py'),
-}
 
 # autosummary_generate = True
 
@@ -121,7 +113,7 @@ for entry in ['int', 'bool', 'list', 'str', 'object', 'None', 'LogConfig', 'Modu
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -365,11 +357,13 @@ texinfo_documents = [
 # texinfo_no_detailmenu = False
 
 # allow to have links to python documentation
-intersphinx_mapping = {'python': ('https://docs.python.org/3.8/', None),
+intersphinx_mapping = {'python': ('https://docs.python.org/3.11/', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'scipy': ('https://docs.scipy.org/doc/scipy/', None),
                        'pandas': ('https://pandas.pydata.org/docs/', None),
                        'matplotlib': ('https://matplotlib.org/stable/', None),
+                       'b2luigi': ('https://b2luigi.belle2.org/', None),
+                       'gbasf2': ('https://gbasf2.belle2.org/', None),
                        'uproot': ('https://uproot.readthedocs.io/en/stable/', None)}
 
 
@@ -482,24 +476,3 @@ def setup(app):
     app.connect('autodoc-process-docstring', process_docstring)
     app.connect('autodoc-skip-member', skipmember)
     app.add_css_file('css/custom.css')
-
-
-# Work around https://github.com/sphinx-doc/sphinx/issues/9189 by monkey patching the member function in question
-# FIXME: Not needed with sphinx>=4.0.1
-
-from sphinx.ext import autodoc  # noqa
-# remember the old function
-old_directive_header = autodoc.PropertyDocumenter.add_directive_header
-
-
-# make a new one that ignores the value error
-def _fixed_directive_header(*args, **argk):
-    """Catch the ValueError and ignore it as done in https://github.com/sphinx-doc/sphinx/pull/9190"""
-    try:
-        old_directive_header(*args, **argk)
-    except ValueError:
-        return None
-
-
-# and override the existing function with our new and improved version.
-autodoc.PropertyDocumenter.add_directive_header = _fixed_directive_header

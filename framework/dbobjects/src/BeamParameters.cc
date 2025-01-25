@@ -17,7 +17,7 @@ namespace {
   /** Access element in triangular matrix including diagonal elements.
    * This function returns the storage index of an element (i,j) in a
    * symmetric matrix including diagonal elements if the elements are
-   * stored in a continous array of size n(n+1)/2
+   * stored in a continuous array of size n(n+1)/2
    */
   constexpr int getIndex(unsigned int i, unsigned int j)
   {
@@ -92,7 +92,7 @@ void BeamParameters::setCovMatrix(Double32_t* matrix, const std::vector<double>&
       [[fallthrough]];
     case 3: // diagonal form.
       // we can do both at once by using cov[i % cov.size()] which will either
-      // loop trough 0, 1, 2 if size is 3 or will always be 0
+      // loop through 0, 1, 2 if size is 3 or will always be 0
       for (int i = 0; i < 3; ++i) {
         matrix[getIndex(i, i)] = cov[i % cov.size()];
       }

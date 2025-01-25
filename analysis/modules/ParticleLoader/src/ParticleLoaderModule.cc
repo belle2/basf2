@@ -14,6 +14,7 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 
 // utilities
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ValueIndexPairSorting.h>
@@ -119,7 +120,6 @@ void ParticleLoaderModule::initialize()
 
   m_particles.registerInDataStore();
   m_particleExtraInfoMap.registerInDataStore();
-  m_eventExtraInfo.registerInDataStore();
   //register relations if these things exists
   if (m_mcparticles.isOptional()) {
     m_particles.registerRelationTo(m_mcparticles);

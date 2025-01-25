@@ -66,7 +66,7 @@ void DQMHistAnalysisExampleFlagsModule::event()
 
   // search for hist is missing in this example look at Fitter code
 
-  // doesnt change
+  // doesn't change
   const Int_t colNum = 5;
   Int_t palette[colNum] {13 /* (dark) grey*/, 0 /* White*/, 3 /* Green */, 5 /* Yellow */, 2 /* Red */};
 

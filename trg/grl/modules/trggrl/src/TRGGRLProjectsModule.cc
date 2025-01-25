@@ -652,6 +652,7 @@ void TRGGRLProjectsModule::event()
   bool ehigh1 = (ECLtoGDL[2] & (1 << (90 - 32 * 2))) != 0;
   bool ehigh2 = (ECLtoGDL[2] & (1 << (91 - 32 * 2))) != 0;
   bool ehigh3 = (ECLtoGDL[2] & (1 << (92 - 32 * 2))) != 0;
+  bool ehigh4 = (ECLtoGDL[2] & (1u << (95 - 32 * 2))) != 0;
 
   //---------------------------------------------------------------------
   //..Other input bits
@@ -877,6 +878,7 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ehigh1") {bit = ehigh1;}
     else if (bitname == "ehigh2") {bit = ehigh2;}
     else if (bitname == "ehigh3") {bit = ehigh3;}
+    else if (bitname == "ehigh4") {bit = ehigh4;}
 
     else if (bitname == "klm_hit") {bit = klm_hit;}
     else if (bitname == "klm_0") {bit = klm_0;}

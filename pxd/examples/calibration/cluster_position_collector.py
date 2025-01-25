@@ -16,7 +16,7 @@
 # The collector will create source files for training of clusterkind 0 by simulating
 # 10 million clusters.
 #
-# Full set of training sources for PXD requires starting the script 4x wiht clusterkinds
+# Full set of training sources for PXD requires starting the script 4x with clusterkinds
 # 0-3.
 
 import basf2 as b2

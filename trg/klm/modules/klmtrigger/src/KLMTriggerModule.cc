@@ -7,14 +7,14 @@
  **************************************************************************/
 
 #include <trg/klm/modules/klmtrigger/KLMTriggerModule.h>
-#include "trg/klm/modules/klmtrigger/group_helper.h"
-
 
 
 #include "trg/klm/modules/klmtrigger/KLMAxis.h"
 
 #include "trg/klm/modules/klmtrigger/KLM_Trig.h"
 #include <trg/klm/modules/klmtrigger/klm_trig_linear_fit.h>
+
+#include <trg/klm/modules/klmtrigger/IO_csv.h>
 
 
 #include <klm/bklm/geometry/GeometryPar.h>
@@ -49,12 +49,12 @@
 #include <tuple>
 #include <iostream>
 
-
+//#include <trg/klm/modules/klmtrigger/geometry.h>
 
 
 using namespace std;
 using namespace Belle2;
-using namespace Belle2::group_helper;
+
 
 
 
@@ -64,9 +64,8 @@ using namespace Belle2::group_helper;
 
 
 using namespace Belle2;
-using namespace Belle2::group_helper::KLM_Coordinates_n;
-using namespace Belle2::group_helper::KLM_Generic;
-using namespace Belle2::group_helper;
+using namespace Belle2::KLM_TRG_definitions;
+
 
 
 // part of unused old Trigger collection
@@ -76,9 +75,7 @@ const std::string m_klmhitCollectionName = "TRGKLMHits";
 
 
 
-struct KLMTriggerModule::geometry_data {
-  std::vector<Belle2::group_helper::KLM_geo_fit_t> m_data;
-};
+
 
 
 //-----------------------------------------------------------------
@@ -145,10 +142,9 @@ KLMTriggerModule::KLMTriggerModule() : Module()
   setDescription("KLM trigger simulation");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("nLayerTrigger", m_nLayerTrigger, "", 8);
-
-//  addParam("LayerUsed", m_dummy_used_layers, "List of layers used for the simulation", string("0:16"));
-
+  addParam("y_cutoff", y_cutoff, "", 500);
+  addParam("intercept_cutoff", m_intercept_cutoff, "", 500);
+  addParam("CSV_Dump_Path", m_dump_Path, "", m_dump_Path);
 
 }
 
@@ -195,8 +191,10 @@ void KLMTriggerModule::initialize()
   klmTriggerTracks.registerRelationTo(klmTriggerHits);
 // end unused
 
-
-
+  if (!m_dump_Path.empty()) {
+    get_IO_csv_handle().dump_path  = m_dump_Path;
+    get_IO_csv_handle().do_dump    = true;
+  }
 
 }
 
@@ -207,7 +205,7 @@ void KLMTriggerModule::beginRun()
   B2DEBUG(100, "KLMTrigger: Experiment " << evtMetaData->getExperiment() << ", run " << evtMetaData->getRun());
   if (not KLMTriggerParameters.isValid())
     B2FATAL("KLM trigger parameters are not available.");
-  m_nLayerTrigger = KLMTriggerParameters->getNLayers();
+
   try {
     m_layerUsed = layer_string_list_to_integer(KLMTriggerParameters->getWhichLayers());
     B2DEBUG(20, "KLMTrigger: m_layerUsed " << KLMTriggerParameters->getWhichLayers());
@@ -220,21 +218,38 @@ void KLMTriggerModule::beginRun()
             << LogVar("exception", e.what()));
   }
   try {
-    m_geometry = std::make_shared<KLMTriggerModule::geometry_data>();
+    m_klmtrg_layer_counter = std::make_shared< Belle2::klmtrg_layer_counter_t>();
+    m_klm_trig_linear_fit = std::make_shared< Belle2::klm_trig_linear_fit_t>();
+    m_klm_trig_linear_fit->set_y_cutoff(y_cutoff);
+    m_klm_trig_linear_fit->set_intercept_cutoff(m_intercept_cutoff);
 
-    for (size_t i = 0; i < KLMTriggerParameters->getGeometryDataSize()  ; ++i) {
-      m_geometry->m_data.emplace_back(
-        Subdetector(KLMTriggerParameters->getSubdetector(i)),
-        section(KLMTriggerParameters->getSection(i)),
-        sector(KLMTriggerParameters->getSector(i)),
-        layer(KLMTriggerParameters->getLayer(i)),
-        plane(KLMTriggerParameters->getPlane(i)),
-        geofit::slopeX(KLMTriggerParameters->getSlopeX(i)),
-        geofit::offsetX(KLMTriggerParameters->getOffsetX(i)),
-        geofit::slopeY(KLMTriggerParameters->getSlopeY(i)),
-        geofit::offsetY(KLMTriggerParameters->getOffsetY(i))
-      );
+
+    m_klmtrg_layer_counter->set_NLayerTrigger(KLMTriggerParameters->getNLayers());
+
+    for (auto e : m_layerUsed) {
+      m_klmtrg_layer_counter->add_layersUsed(e);
     }
+
+
+    Belle2::KLM_TRG_definitions::KLM_geo_fit_t e{};
+
+
+    for (size_t i = 0 ; i < KLMTriggerParameters->getGeometryDataSize() ; ++i) {
+      e.subdetector  = KLMTriggerParameters->getSubdetector(i);
+      e.section      = KLMTriggerParameters->getSection(i);
+      e.sector       = KLMTriggerParameters->getSector(i);
+      e.layer        = KLMTriggerParameters->getLayer(i);
+      e.plane        = KLMTriggerParameters->getPlane(i);
+      e.slopeX       = KLMTriggerParameters->getSlopeX(i);
+      e.offsetX      = KLMTriggerParameters->getOffsetX(i);
+      e.slopeY       = KLMTriggerParameters->getSlopeY(i);
+      e.offsetY      = KLMTriggerParameters->getOffsetY(i);
+      m_klm_trig_linear_fit->add_geometry(e);
+
+    }
+
+
+
   } catch (const std::exception& er) {
     B2FATAL(er.what());
   }
@@ -249,102 +264,142 @@ void KLMTriggerModule::endRun()
 }
 
 
-isectors_t to_i_sector(int KLM_type_, int section_)
-{
-  if (KLM_type_ == KLMElementNumbers::c_BKLM && section_ == BKLMElementNumbers::c_BackwardSection) {
-    return isectors_t(Belle2::KLM_TRG_definitions::c_backward_bklm);
-  } else if (KLM_type_ == KLMElementNumbers::c_BKLM && section_ == BKLMElementNumbers::c_ForwardSection) {
-    return isectors_t(Belle2::KLM_TRG_definitions::c_forward_bklm);
-  } else if (KLM_type_ == KLMElementNumbers::c_EKLM && section_ == EKLMElementNumbers::c_BackwardSection) {
-    return isectors_t(Belle2::KLM_TRG_definitions::c_backward_eklm);
-  } else if (KLM_type_ == KLMElementNumbers::c_EKLM && section_ == EKLMElementNumbers::c_ForwardSection) {
-    return isectors_t(Belle2::KLM_TRG_definitions::c_forward_eklm);
-  }
 
-  return isectors_t(0);
-}
+
+
+
 
 
 
 template <typename T1, typename T2>
-void fill_KLMTrgSummary(T1& KLMTrgSummary, const T2& summary)
-{
-  KLMTrgSummary.create();
-  KLMTrgSummary->setBKLM_n_trg_sectors(BKLM_n_trg_sectors(summary));
-  KLMTrgSummary->setEKLM_n_trg_sectors(EKLM_n_trg_sectors(summary));
-
-  KLMTrgSummary->setSector_mask_Backward_Barrel(Sector_mask_Backward_Barrel(summary));
-  KLMTrgSummary->setSector_mask_Forward_Barrel(Sector_mask_Forward_Barrel(summary));
-  KLMTrgSummary->setSector_mask_Backward_Endcap(Sector_mask_Backward_Endcap(summary));
-  KLMTrgSummary->setSector_mask_Forward_Endcap(Sector_mask_Forward_Endcap(summary));
-
-  KLMTrgSummary->setSector_mask_OR_Backward_Barrel(Sector_mask_OR_Backward_Barrel(summary));
-  KLMTrgSummary->setSector_mask_OR_Forward_Barrel(Sector_mask_OR_Forward_Barrel(summary));
-  KLMTrgSummary->setSector_mask_OR_Backward_Endcap(Sector_mask_OR_Backward_Endcap(summary));
-  KLMTrgSummary->setSector_mask_OR_Forward_Endcap(Sector_mask_OR_Forward_Endcap(summary));
-
-  KLMTrgSummary->setBKLM_back_to_back_flag(BKLM_back_to_back_flag(summary));
-  KLMTrgSummary->setEKLM_back_to_back_flag(EKLM_back_to_back_flag(summary));
-}
-
-
-template <typename T1, typename T2>
-auto push_linear_fit_to_KLMTrgFittedTrack(const T1& linear_fited,  T2& KLMTrgFittedTrack_)
+auto push_linear_fit_to_KLMTrgFittedTrack(T1&& linear_fited,  T2& KLMTrgFittedTrack_)
 {
   for (const auto& e : linear_fited) {
-    if (slopeXY_t(e) >= 1e100) {     continue;    }
+    //if (e.slopeXY >= 1e100) {     continue;    }
     auto FittedTrack =  KLMTrgFittedTrack_.appendNew();
-    FittedTrack->setSlopeXY(slopeXY_t(e)) ;
-    FittedTrack->setInterceptXY(interceptXY_t(e));
-    FittedTrack->setIpXY(ipXY_t(e)) ;
-    FittedTrack->setPlane(plane(e));
-    FittedTrack->setChisqXY(chisqXY_t(e));
-    FittedTrack->setSubdetector(Subdetector(e));
-    FittedTrack->setSection(section(e));
-    FittedTrack->setSector(sector(e));
-    FittedTrack->setNhits(Nhits_t(e));
+    FittedTrack->setSlopeXY(e.slopeXY) ;
+    FittedTrack->setInterceptXY(e.interceptXY);
+    FittedTrack->setIpXY(e.ipXY) ;
+    FittedTrack->setPlane(e.plane);
+    FittedTrack->setChisqXY(e.chisqXY);
+    FittedTrack->setSubdetector(e.subdetector);
+    FittedTrack->setSection(e.section);
+    FittedTrack->setSector(e.sector);
+    FittedTrack->setNhits(e.Nhits);
+    FittedTrack->setTrack_id(e.track_id);
 
   }
 
 }
+
+
+
+
+
+
 
 void KLMTriggerModule::event()
 {
 
   try {
+    ++m_event_nr;
     StoreArray<KLMDigit> klmDigits;
     StoreArray<KLMTrgFittedTrack> KLMTrgFittedTrack_("KLMTrgFittedTrack");
     StoreObjPtr<KLMTrgSummary> KLMTrgSummary;
+    KLMTrgSummary.create();
 
-    auto hits = fill_vector(klmDigits.getEntries(),
+
+    get_IO_csv_handle().event_nr = m_event_nr;
+    Belle2::KLM_TRG_definitions::KLM_Digit_compact_t dummy {};
+    auto hits = nt::algorithms::fill_vector(klmDigits.getEntries(),
     [&](auto Index) {
-      letref digit = klmDigits[Index];
-      return std::tuple(
-               event_nr(m_event_nr),
-               Subdetector(digit->getSubdetector()),
-               section(digit->getSection()),
-               to_i_sector(digit->getSubdetector(), digit->getSection()),
-               sector(digit->getSector() - 1),
-               plane(digit->getPlane()  - (digit->getSubdetector() == 2)),
-               layer(digit->getLayer()  - 1),
-               strip(digit->getStrip())
-             );
+      const auto& digit = klmDigits[Index];
+
+
+      dummy.event_nr    = m_event_nr;
+      dummy.subdetector = digit->getSubdetector();
+      dummy.section     = digit->getSection();
+      dummy.sector      = digit->getSector();
+      dummy.plane       = digit->getPlane();
+      dummy.layer       = digit->getLayer();
+      dummy.strip       = digit->getStrip();
+      return dummy;
+
     });
 
-
-    sort(hits);
-    drop_duplicates(hits);
-    erase_remove_if(hits, [layerUsed = this->m_layerUsed ](const auto & ele)  {  return !contains(layerUsed, layer(ele));  });
-
-    auto summary =  make_trg(hits,  m_event_nr, m_nLayerTrigger);
-    fill_KLMTrgSummary(KLMTrgSummary, summary);
+    m_klmtrg_layer_counter->run(hits);
+    m_klm_trig_linear_fit->run(hits);
 
 
-    auto linear_fit =  klm_trig_linear_fit(hits, m_geometry->m_data);
-    push_linear_fit_to_KLMTrgFittedTrack(linear_fit, KLMTrgFittedTrack_);
+    push_linear_fit_to_KLMTrgFittedTrack(m_klm_trig_linear_fit->get_result(), KLMTrgFittedTrack_);
+
+    KLMTrgSummary->setBKLM_back_to_back_flag(
+      m_klmtrg_layer_counter->get_BKLM_back_to_back_flag(KLMElementNumbers::c_BKLM)
+    );
+
+    KLMTrgSummary->setEKLM_back_to_back_flag(
+      m_klmtrg_layer_counter->get_BKLM_back_to_back_flag(KLMElementNumbers::c_EKLM)
+    );
+
+    KLMTrgSummary->setBKLM_n_trg_sectors(
+      m_klmtrg_layer_counter->get_n_sections_trig(KLMElementNumbers::c_BKLM)
+    );
+    KLMTrgSummary->setEKLM_n_trg_sectors(
+      m_klmtrg_layer_counter->get_n_sections_trig(KLMElementNumbers::c_EKLM)
+    );
+    KLMTrgSummary->setSector_mask_Backward_Barrel(
+      m_klmtrg_layer_counter->get_triggermask(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_BackwardSection)
+    );
+
+    KLMTrgSummary->setSector_mask_Forward_Barrel(
+      m_klmtrg_layer_counter->get_triggermask(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_ForwardSection)
+    );
+    KLMTrgSummary->setSector_mask_Backward_Endcap(
+      m_klmtrg_layer_counter->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_BackwardSection)
+    );
+
+    KLMTrgSummary->setSector_mask_Forward_Endcap(
+      m_klmtrg_layer_counter->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_ForwardSection)
+    );
 
 
-    ++m_event_nr;
+
+
+
+
+
+    KLMTrgSummary->setSector_mask_SLF_Backward_Barrel(
+      m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_BackwardSection)
+    );
+
+    KLMTrgSummary->setSector_mask_SLF_Forward_Barrel(
+      m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_ForwardSection)
+    );
+    KLMTrgSummary->setSector_mask_SLF_Backward_Endcap(
+      m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_BackwardSection)
+    );
+
+    KLMTrgSummary->setSector_mask_SLF_Forward_Endcap(
+      m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_ForwardSection)
+    );
+
+
+    KLMTrgSummary->setSector_mask_SLF_OR_Backward_Barrel(
+      m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_BackwardSection)
+    );
+
+    KLMTrgSummary->setSector_mask_SLF_OR_Forward_Barrel(
+      m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_ForwardSection)
+    );
+    KLMTrgSummary->setSector_mask_SLF_OR_Backward_Endcap(
+      m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_BackwardSection)
+    );
+
+    KLMTrgSummary->setSector_mask_SLF_OR_Forward_Endcap(
+      m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_ForwardSection)
+    );
+
+
   } catch (const std::exception& er) {
     B2FATAL(er.what());
   }

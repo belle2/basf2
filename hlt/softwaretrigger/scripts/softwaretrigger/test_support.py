@@ -134,7 +134,7 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
                     self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
                     self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
                     self.results.addResult("software_trigger_cut&filter&L1_trigger", 1)
-                # Second event: No skim lines to replicate a HLT discared event with filter ON
+                # Second event: No skim lines to replicate a HLT discarded event with filter ON
                 elif (self.EventMetaData.obj().getEvent() == 2):
                     self.results.addResult("software_trigger_cut&all&total_result", 1)
                     self.results.addResult("software_trigger_cut&filter&L1_trigger", 1)
@@ -190,7 +190,6 @@ def test_script(script_location, input_file_name, temp_dir):
 
     histos_file_name = f"{random_seed}_histos.root"
     output_file_name = os.path.join(temp_dir, f"{random_seed}_output.root")
-    # TODO: should we use the default global tag here?
     globaltags = list(basf2.conditions.default_globaltags)
     num_processes = 1
 
@@ -210,20 +209,23 @@ def test_script(script_location, input_file_name, temp_dir):
     # Move the output file with DQM histograms under the expected location:
     # for reasons we don't want to know, they are saved under the current directory
     # even if a valid and existing working directory is specified
+    final_histos_file_name = os.path.join(temp_dir, histos_file_name)
     if os.path.exists(histos_file_name):
-        final_histos_file_name = os.path.join(temp_dir, histos_file_name)
         shutil.copy(histos_file_name, os.path.join(temp_dir, final_histos_file_name))
         os.unlink(histos_file_name)
 
     # Go back to the original directory for safety
     os.chdir(cwd)
 
-    if "expressreco" not in script_location and "beam_reco" in script_location:
-        # Check the integrity of HLT result
-        test_path = basf2.Path()
-        test_path.add_module("RootInput", inputFileName=output_file_name)
-        test_path.add_module(CheckForCorrectHLTResults())
-        assert(b2test_utils.safe_process(test_path) == 0)
+    if "beam_reco" in script_location:
+
+        if "expressreco" not in script_location:
+            # Check the integrity of HLT result
+            test_path = basf2.Path()
+            test_path.add_module("RootInput", inputFileName=output_file_name)
+            test_path.add_module(CheckForCorrectHLTResults())
+            assert (b2test_utils.safe_process(test_path) == 0)
+
         # Check the size of DQM histograms
         cmd2 = ["hlt-check-dqm-size", final_histos_file_name]
         subprocess.check_call(cmd2)
@@ -253,15 +255,14 @@ def test_folder(location, run_type, exp_number, phase, passthrough=False,
                      EventsOfDoomBuster module by inflating the number of CDC hits
     """
 
+    # The beam tests always fail on buildbot with a permission error
+    if run_type == constants.RunTypes.beam and not b2test_utils.is_ci():
+        b2test_utils.skip_test("Test not runnable on build bot because of permission issue.")
     # The test is already run in a clean, temporary directory
     temp_dir = os.getcwd()
     prepare_path = os.environ["BELLE2_PREPARE_PATH"]
     input_file_name = get_file_name(
         prepare_path, run_type, location, passthrough, simulate_events_of_doom_buster)
-    # generate_input_file(run_type=run_type, location=location,
-    #                    output_file_name=output_file_name, exp_number=exp_number,
-    #                    passthrough=passthrough,
-    #                    simulate_events_of_doom_buster=simulate_events_of_doom_buster)
 
     script_dir = basf2.find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
     run_at_least_one = False

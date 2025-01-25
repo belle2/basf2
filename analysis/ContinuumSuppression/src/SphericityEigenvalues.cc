@@ -12,8 +12,6 @@
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
 
-#include <string>
-
 using namespace Belle2;
 
 void SphericityEigenvalues::calculateEigenvalues()

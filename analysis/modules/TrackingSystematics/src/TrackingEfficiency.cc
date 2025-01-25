@@ -11,7 +11,6 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <map>
@@ -27,13 +26,14 @@ TrackingEfficiencyModule::TrackingEfficiencyModule() : Module()
   setDescription(
     R"DOC(Module to remove tracks from the lists at random. Include in your code as
 
-    .. code:: python
+.. code:: python
 
-        mypath.add_module("TrackingEfficiency", particleLists=['pi+:cut'], frac=0.01)
+    mypath.add_module("TrackingEfficiency", particleLists=['pi+:cut'], frac=0.01)
 
 The module modifies the input particleLists by randomly removing tracks with the probability frac.
 		     
 		     )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("frac", m_frac, "probability to remove the particle", 0.0);

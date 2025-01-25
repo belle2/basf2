@@ -13,12 +13,12 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Const.h>
-#include <framework/core/RandomNumbers.h>
 #include <framework/geometry/B2Vector3.h>
+
+#include <TRandom.h>
 
 //c++
 #include <cmath>
-#include <boost/foreach.hpp>
 #include <vector>
 
 using namespace Belle2;
@@ -662,7 +662,7 @@ void TpcDigitizerModule::getXMLData()
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"MICROTPC\"]/Content/");
 
   //get the location of the tubes
-  BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+  for (const GearDir& activeParams : content.getNodes("Active")) {
 
     m_TPCCenter.push_back(ROOT::Math::XYZVector(activeParams.getLength("SensVol_x"),
                                                 activeParams.getLength("SensVol_y"),

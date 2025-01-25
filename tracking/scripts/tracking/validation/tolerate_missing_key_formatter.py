@@ -81,7 +81,7 @@ class TolerateMissingKeyFormatter(string.Formatter):
     """
 
     def get_value(self, key, args, kwds):
-        """Retrieves the value that corresponds to the key from either the postional or
+        """Retrieves the value that corresponds to the key from either the positional or
         the keyword arguments given to format
 
         Overrides the standard lookup such that missing keys in the keyword arguments or

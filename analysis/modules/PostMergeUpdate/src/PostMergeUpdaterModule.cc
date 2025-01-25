@@ -9,7 +9,6 @@
 #include <analysis/modules/PostMergeUpdate/PostMergeUpdaterModule.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <framework/logging/Logger.h>
-#include <analysis/utility/RotationTools.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <TDatabasePDG.h>
 #include <Math/Vector3D.h>
@@ -25,6 +24,7 @@ REG_MODULE(PostMergeUpdater);
 PostMergeUpdaterModule::PostMergeUpdaterModule() : Module()
 {
   setDescription("Synchronize parts of the events post merge/embedding. Used in the signal embedding pipeline. Uses kinematic information for the tag / simulated decay stored in eventExtraInfo.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("Mixing", m_mixing, "Mixing (true) or embedding (false) corrections", false);
   addParam("isCharged", m_isCharged, "Charged (true) or neutral (false) B mesons", true);
 }
@@ -82,11 +82,11 @@ TRotation PostMergeUpdaterModule::tag_vertex_rotation()
     }
 
 
-    B2Vector3D cros = tag3v.Unit().Cross(sec3v.Unit());
+    B2Vector3D cross = tag3v.Unit().Cross(sec3v.Unit());
     double  dot = tag3v.Unit().Dot(sec3v.Unit());
 
     // Rotation to make secondary B point as tag B
-    rot.Rotate(-acos(dot), cros);
+    rot.Rotate(-acos(dot), cross);
 
     // Closure test that rotation does what expected:
     B2Vector3D test = rot * sec3v;

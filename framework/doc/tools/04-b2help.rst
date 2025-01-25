@@ -27,19 +27,6 @@ Tools which will provide you help
     :nogroupsections:
 
 
-.. _b2help-decay:
-
-``b2help-decay``: Tool to find decays in decay files
-----------------------------------------------------
-
-.. argparse::
-    :filename: decfiles/tools/b2help-decay
-    :func: get_argparse
-    :prog: b2help-decay
-    :nodefault:
-    :nogroupsections:
-
-
 .. _b2help-recommendation:
 
 ``b2help-recommendation``: Tool to print analysis recommendations
@@ -61,6 +48,19 @@ Tools which will provide you help
     :filename: analysis/tools/b2help-variables
     :func: get_argument_parser
     :prog: b2help-variables
+    :nodefault:
+    :nogroupsections:
+
+
+.. _b2help-print-fei-mode-names:
+
+``b2help-print-fei-mode-names``: List available FEI modes for a given particle
+------------------------------------------------------------------------------
+
+.. argparse::
+    :filename: analysis/tools/b2help-print-fei-mode-names
+    :func: get_argument_parser
+    :prog: b2help-print-fei-mode-names
     :nodefault:
     :nogroupsections:
 

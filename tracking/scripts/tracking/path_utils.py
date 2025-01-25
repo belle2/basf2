@@ -1208,6 +1208,7 @@ def add_default_cdc_svd_tracking_chain(path,
     :param output_reco_tracks: name of the combined CDC+SVD RecoTracks StoreArray that is the final result of this tracking path
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found CDC standalone tracks
     :param use_mc_truth: Use the truth information in the CKF modules
     :param svd_ckf_mode: how to apply the CKF (with or without SVD standalone tracking). Defaults to "SVD_after".
     :param add_both_directions: Curlers may be found in the wrong orientation by the CDC track finder, so try to
@@ -1222,7 +1223,6 @@ def add_default_cdc_svd_tracking_chain(path,
         -> setting this option to 'True' will have some influence on the final track collection)
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
-        to the path that sets the quality indicator property of the found CDC standalone tracks
     """
 
     # collections that will be pruned
@@ -1292,12 +1292,12 @@ def add_inverted_svd_cdc_tracking_chain(path,
            Defaults to "VXDTF2"
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found CDC standalone tracks
     :param use_mc_truth: Use the truth information in the CKF modules
     :param add_both_directions: Curlers may be found in the wrong orientation by the CDC track finder, so try to
            extrapolate also in the other direction.
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
-        to the path that sets the quality indicator property of the found CDC standalone tracks
     """
 
     B2WARNING("The inverted tracking chain starting from SVD is an experimental feature. "

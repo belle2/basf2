@@ -648,6 +648,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     :param cdc_quality_estimator_weightfile: Weightfile identifier for the TFCDC_TrackQualityEstimator
     :param reattach_hits: if true, use the ReattachCDCWireHitsToRecoTracks module at the end of the CDC track finding
                           to read hits with bad ADC or TOT rejected by the TFCDC_WireHitPreparer module.
+    :param skip_WireHitPreparer: if True, the TFCDC_WireHitPreparer will be skipped. This is necessary if for instance
+        the SVD tracking and the ToCDCCKF are run before the full CDC tracking, as the ToCDCCKF already reqires the WireHits
+        to be present. Defaults to False, as for the default tracking chain it is required.
     """
     # add EventLevelTrackinginfo for logging errors
     if 'RegisterEventLevelTrackingInfo' not in path:

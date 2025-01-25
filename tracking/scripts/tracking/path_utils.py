@@ -1297,6 +1297,10 @@ def add_inverted_svd_cdc_tracking_chain(path,
         to the path that sets the quality indicator property of the found CDC standalone tracks
     """
 
+    B2WARNING("The inverted tracking chain starting from SVD is an experimental feature. "
+              "It is neither well optimised nor tested for the time being. "
+              "Please be careful when interpreting the results!")
+
     # collections that will be pruned
     temporary_reco_track_list = []
 

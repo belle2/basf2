@@ -64,7 +64,7 @@ namespace Belle2::Variable {
 
     return [clusterIndex](const Particle * particle) -> int {
       SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
-      return svdCluster ? svdCluster->getSize() : Const::intNaN;
+      return svdCluster ? svdCluster->getSize() : -1;
     };
   }
 

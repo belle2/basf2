@@ -698,7 +698,6 @@ namespace Belle2 {
 
     static const double doubleNaN; /**< quiet_NaN */
     static const float  floatNaN;  /**< quiet_NaN */
-    static const int  intNaN;  /**< quiet_NaN */
 
   private:
     /**

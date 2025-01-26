@@ -438,4 +438,3 @@ const double Const::eMobilitySi    = 1415 * Unit::cm2 / Unit::V / Unit::s;
 
 const double Const::doubleNaN = std::numeric_limits<double>::quiet_NaN();
 const float Const::floatNaN = std::numeric_limits<float>::quiet_NaN();
-const int Const::intNaN = std::numeric_limits<int>::quiet_NaN();

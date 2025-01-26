@@ -173,8 +173,6 @@ void DQMHistAnalysisInputRootFileModule::event()
       TH1* h = (TH1*)dkey->ReadObj();
       if (h->InheritsFrom("TH2")) h->SetOption("col");
       else h->SetOption("hist");
-      Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
-      h->Scale(scale);
       std::string hname = h->GetName();
 
       bool hpass = false;
@@ -191,6 +189,9 @@ void DQMHistAnalysisInputRootFileModule::event()
       if (!hpass) continue;
 
       if (hname.find("/") == std::string::npos) h->SetName((dirname + "/" + hname).c_str());
+      Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
+      h->Scale(scale);
+      h->SetEntries(h->GetEntries()*scale); // empty hists are not marked for update!
       hs.push_back(h);
     }
     m_file->cd();
@@ -220,9 +221,10 @@ void DQMHistAnalysisInputRootFileModule::event()
       }
       if (!hpass) continue;
 
-      hs.push_back(h);
       Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
       h->Scale(scale);
+      h->SetEntries(h->GetEntries()*scale); // empty hists are not marked for update!
+      hs.push_back(h);
     }
   }
 
@@ -239,11 +241,11 @@ void DQMHistAnalysisInputRootFileModule::event()
 
   if (m_add_runcontrol_hist) {
     m_h_expno->SetTitle(std::to_string(m_expno).c_str());
-    hs.push_back(m_h_expno);
+    hs.push_back((TH1*)(m_h_expno->Clone()));
     m_h_runno->SetTitle(std::to_string(runno).c_str());
-    hs.push_back(m_h_runno);
+    hs.push_back((TH1*)(m_h_runno->Clone()));
     m_h_rtype->SetTitle(m_runType.c_str());
-    hs.push_back(m_h_rtype);
+    hs.push_back((TH1*)(m_h_rtype->Clone()));
   }
   //setExpNr(m_expno); // redundant access from MetaData
   //setRunNr(m_runno); // redundant access from MetaData

@@ -203,7 +203,7 @@ void DQMHistAnalysisInput2Module::event()
   //setRunNr(m_runno); // redundant access from MetaData
   // ExtractRunType();// Run Type is processed above already, just take it
   setRunType(rtype);
-  ExtractEvent(hs);
+  ExtractNEvent(hs);
 
   // this code must be run after "event processed" has been extracted
   bool anyupdate = m_forceChanged; // flag if any histogram updated at all

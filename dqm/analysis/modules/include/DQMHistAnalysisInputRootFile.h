@@ -84,7 +84,7 @@ namespace Belle2 {
     std::string m_runType;
 
     /** Filled event number. */
-    int m_fillEvent = 0;
+    int m_fillNEvent = 0;
 
     /** List of total number of events for each run.
      * This is the number of issued update events for testing,

@@ -43,7 +43,7 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   addParam("RunList", m_runList, "Run Number List", std::vector<unsigned int> {1u});
   addParam("EventsList", m_eventsList, "Number of events for each run", std::vector<unsigned int> {10u});
   addParam("RunType", m_runType, "Run Type override", std::string(""));
-  addParam("EventFilled", m_fillEvent, "Event override", 0);
+  addParam("FillNEvent", m_fillNEvent, "NEvent override", 0);
   addParam("EventInterval", m_interval, "Time between events (seconds)", 20u);
   addParam("NullHistogramMode", m_nullHistoMode, "Test mode for null histograms", false);
   addParam("EnableRunInfo", m_enable_run_info, "Enable Run Info", false);
@@ -72,7 +72,11 @@ void DQMHistAnalysisInputRootFileModule::initialize()
     m_h_runno = new TH1F("DQMInfo/runno", "", 1, 0, 1);
     m_h_rtype = new TH1F("DQMInfo/rtype", "", 1, 0, 1);
   }
-
+  if (m_fillNEvent > 0) {
+    m_h_fillNEvent = new TH1F("DAQ/Nevent", "", 1, 0, 1);
+    m_h_fillNEvent->Fill(0., m_fillNEvent);
+    m_h_fillNEvent->SetEntries(m_fillNEvent);
+  }
   B2INFO("DQMHistAnalysisInputRootFile: initialized.");
 }
 
@@ -143,8 +147,8 @@ void DQMHistAnalysisInputRootFileModule::event()
     //setRunNr(m_runno); // redundant access from MetaData
     setRunType(m_runType);
     //ExtractRunType();
-    setEventProcessed(m_fillEvent);
-    //ExtractEvent();
+    setEventProcessed(m_fillNEvent);
+    //ExtractNEvent();
 
     B2INFO("DQMHistAnalysisInputRootFile: event finished. count: " << m_count);
     m_count++;
@@ -249,8 +253,8 @@ void DQMHistAnalysisInputRootFileModule::event()
   }
   //setExpNr(m_expno); // redundant access from MetaData
   //setRunNr(m_runno); // redundant access from MetaData
-  if (m_runType == "") ExtractRunType(hs);
-  if (m_fillEvent <= 0) ExtractEvent(hs);
+  ExtractRunType(hs);
+  ExtractNEvent(hs);
 
   // this code must be run after "event processed" has been extracted
   for (size_t i = 0; i < hs.size(); i++) {

@@ -1,6 +1,6 @@
-# EventType: 2213032000
-# Descriptor: [ccbar Dp2EtaPip]
-# NickName: Dp2EtaPip, MC16rd
+# EventType: 2113032001
+# Descriptor: [ccbar Dp2EtaKp]
+# NickName: Dp2EtaKp, MC16rd
 # Tested: Yes
 # PhysicsWG: Charm
 # Responsible: Jaeyoung Kim
@@ -54,7 +54,7 @@ Decay vpho
 Enddecay
 
 Decay D+sig
-1.000 Myeta  pi+              PHSP;
+1.000 Myeta  K+              PHSP;
 Enddecay
 CDecay D-sig
 

@@ -19,7 +19,6 @@
 
 import tracking.path_utils
 from tracking.validation.run import TrackingValidationRun
-import tracking
 import logging
 import basf2
 import svd

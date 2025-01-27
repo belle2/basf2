@@ -9,7 +9,6 @@
 ##########################################################################
 
 import basf2
-import tracking
 
 from tracking.metamodules import IfMCParticlesPresentModule
 import tracking.path_utils

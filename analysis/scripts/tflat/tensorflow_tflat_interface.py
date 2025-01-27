@@ -55,10 +55,10 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     state = State(get_tflat_model(parameters, number_of_features))
 
-    weight_decay = 1e-05
+    weight_decay = 0.0001
     initial_learning_rate = 1e-4
-    decay_steps = 200000
-    alpha = 1e-2
+    decay_steps = 2000000
+    alpha = 1e-1
 
     cosine_decay_scheduler = tf.keras.optimizers.schedules.CosineDecay(
         initial_learning_rate=initial_learning_rate,

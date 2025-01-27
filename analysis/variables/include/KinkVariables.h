@@ -8,8 +8,9 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/B2Vector3.h>
+#include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 
 namespace Belle2 {
@@ -205,124 +206,14 @@ namespace Belle2 {
     // Kink Daughter Measured Track Parameters
 
     /**
-     * returns the number of CDC hits of kink daughter track associated to this particle
+     * returns variables calculated for the kink daughter track
      */
-    double kinkDaughterTrackNCDCHits(const Particle* part);
+    Manager::FunctionPtr kinkDaughterTrack(const std::vector<std::string>& arguments);
 
     /**
-     * returns the number of SVD hits of kink daughter track associated to this particle
+     * returns variables calculated for the initial kink daughter track
      */
-    double kinkDaughterTrackNSVDHits(const Particle* part);
-
-    /**
-     * returns the number of PXD hits of kink daughter track associated to this particle
-     */
-    double kinkDaughterTrackNPXDHits(const Particle* part);
-
-    /**
-     * returns the number of VXD hits of kink daughter track associated to this particle
-     */
-    double kinkDaughterTrackNVXDHits(const Particle* part);
-
-    /**
-     * returns the first activated SVD layer of kink daughter track associated to this particle
-     */
-    double kinkDaughterTrackFirstSVDLayer(const Particle* part);
-
-    /**
-     * returns the first activated PXD layer of kink daughter track associated to this particle
-     */
-    double kinkDaughterTrackFirstPXDLayer(const Particle* part);
-
-    /**
-     * returns the first activated CDC layer of kink daughter track associated to this particle
-     */
-    double kinkDaughterTrackFirstCDCLayer(const Particle* part);
-
-    /**
-     * returns the last CDC layer of kink daughter track associated to this particle
-     */
-    double kinkDaughterTrackLastCDCLayer(const Particle* part);
-
-    /**
-     * returns the fit P-value of kink daughter track associated to this particle
-     */
-    double kinkDaughterTrackPValue(const Particle* part);
-
-    /**
-     * returns the fit NDF of kink daughter track associated to this particle
-     */
-    double kinkDaughterTrackNDF(const Particle* part);
-
-    /**
-     * returns the fit Chi2 of kink daughter track associated to this particle
-     */
-    double kinkDaughterTrackChi2(const Particle* part);
-
-    /**
-     * returns the initial fit P-value of kink daughter track associated to this particle
-     */
-    double kinkDaughterInitTrackPValue(const Particle* part);
-
-    /**
-     * returns the initial fit NDF of kink daughter track associated to this particle
-     */
-    double kinkDaughterInitTrackNDF(const Particle* part);
-
-    /**
-     * returns the initial fit Chi2 of kink daughter track associated to this particle
-     */
-    double kinkDaughterInitTrackChi2(const Particle* part);
-
-    /**
-     * returns the D0 impact parameter of kink daughter track associated to this particle at IP
-     */
-    double kinkDaughterTrackD0(const Particle* part);
-
-    /**
-     * returns the transverse momentum angle of kink daughter track associated to this particle at IP
-     */
-    double kinkDaughterTrackPhi0(const Particle* part);
-
-    /**
-     * returns the curvature of kink daughter track associated to this particle at IP
-     */
-    double kinkDaughterTrackOmega(const Particle* part);
-
-    /**
-     * returns the Z0 impact parameter of kink daughter track associated to this particle at IP
-     */
-    double kinkDaughterTrackZ0(const Particle* part);
-
-    /**
-     * returns the slope of kink daughter track associated to this particle at IP
-     */
-    double kinkDaughterTrackTanLambda(const Particle* part);
-
-    /**
-     * returns the DO error of kink daughter track associated to this particle at IP
-     */
-    double kinkDaughterTrackD0Error(const Particle* part);
-
-    /**
-     * returns the phi0 error of kink daughter track associated to this particle at IP
-     */
-    double kinkDaughterTrackPhi0Error(const Particle* part);
-
-    /**
-     * returns the omega error of kink daughter track associated to this particle at IP
-     */
-    double kinkDaughterTrackOmegaError(const Particle* part);
-
-    /**
-     * returns the Z0 error of kink daughter track associated to this particle at IP
-     */
-    double kinkDaughterTrackZ0Error(const Particle* part);
-
-    /**
-     * returns the tan(lambda) error of kink daughter track associated to this particle at IP
-     */
-    double kinkDaughterTrackTanLambdaError(const Particle* part);
+    Manager::FunctionPtr kinkDaughterInitTrack(const std::vector<std::string>& arguments);
 
     /**
      * return the D0 impact parameter of kink daughter track associated to this particle at kink vertex
@@ -352,19 +243,9 @@ namespace Belle2 {
     // Kink Mother Measured Track Parameters
 
     /**
-     * returns the initial fit P-value of kink mother track associated to this particle
+     * returns variables calculated for the initial kink mother track
      */
-    double kinkMotherInitTrackPValue(const Particle* part);
-
-    /**
-     * returns the initial fit NDF of kink mother track associated to this particle
-     */
-    double kinkMotherInitTrackNDF(const Particle* part);
-
-    /**
-     * returns the initial fit Chi2 of kink mother track associated to this particle
-     */
-    double kinkMotherInitTrackChi2(const Particle* part);
+    Manager::FunctionPtr kinkMotherInitTrack(const std::vector<std::string>& arguments);
 
     /**
      * return the D0 impact parameter of kink mother track associated to this particle at kink vertex
@@ -410,7 +291,7 @@ namespace Belle2 {
     double particleIsDaughterInKink(const Particle* part);
 
     /**
-     * return 1 if the particle is used as a split track to creat a Kink object and 0 otherwise
+     * return 1 if the particle is used as a split track to create a Kink object and 0 otherwise
      */
     double particleIsSplitKink(const Particle* part);
 
@@ -462,71 +343,9 @@ namespace Belle2 {
     // Kink from track pair daughter MC variables
 
     /**
-     * Helper function that return MCParticle of the kink daughter for kinks created from two separate tracks.
-     * It returns nullptr if MCParticle does not exist or the particle is not one of the required types
+     * returns variables for the MCParticle of the kink daughter for kinks created from two separate tracks.
      */
-    const MCParticle* kinkPairDaughterMCParticle(const Particle* part);
-
-    /**
-     * return PDG code of the kink daughter for kinks created from two separate tracks
-     */
-    double kinkPairDaughterMCPDG(const Particle* part);
-
-    /**
-     * return PDG code of the kink daughter's mother for kinks created from two separate tracks
-     * (might be different from the mother track MCParticle)
-     */
-    double kinkPairDaughterMCMotherPDG(const Particle* part);
-
-    /**
-     * return Secondary Physics Process code of the kink daughter for kinks created from two separate tracks
-     */
-    double kinkPairDaughterMCSecProc(const Particle* part);
-
-    /**
-     * return production vertex X coordinate of the kink daughter for kinks created from two separate tracks
-     */
-    double kinkPairDaughterMCVertexX(const Particle* part);
-
-    /**
-     * return production vertex Y coordinate of the kink daughter for kinks created from two separate tracks
-     */
-    double kinkPairDaughterMCVertexY(const Particle* part);
-
-    /**
-     * return production vertex Z coordinate of the kink daughter for kinks created from two separate tracks
-     */
-    double kinkPairDaughterMCVertexZ(const Particle* part);
-
-    /**
-     * return generated PX of the kink daughter for kinks created from two separate tracks
-     */
-    double kinkPairDaughterMCPX(const Particle* part);
-
-    /**
-     * return generated PY of the kink daughter for kinks created from two separate tracks
-     */
-    double kinkPairDaughterMCPY(const Particle* part);
-
-    /**
-     * return generated PZ of the kink daughter for kinks created from two separate tracks
-     */
-    double kinkPairDaughterMCPZ(const Particle* part);
-
-    /**
-     * return generated PT of the kink daughter for kinks created from two separate tracks
-     */
-    double kinkPairDaughterMCPT(const Particle* part);
-
-    /**
-     * return generated P of the kink daughter for kinks created from two separate tracks
-     */
-    double kinkPairDaughterMCP(const Particle* part);
-
-    /**
-     * return generated E of the kink daughter for kinks created from two separate tracks
-     */
-    double kinkPairDaughterMCE(const Particle* part);
+    Manager::FunctionPtr kinkPairDaughterMC(const std::vector<std::string>& arguments);
 
     // Kink from track pair mother MC variables
 
@@ -535,6 +354,11 @@ namespace Belle2 {
      * It returns nullptr if MCParticle does not exist or the particle is not one of the required types
      */
     const MCParticle* kinkPairMotherMCParticle(const Particle* part);
+
+    /**
+     * returns variables for the MCParticle of the kink mother for kinks created from two separate tracks.
+     */
+    Manager::FunctionPtr kinkPairMotherMC(const std::vector<std::string>& arguments);
 
     /**
      * return generated PX of the kink mother at the decay vertex for kinks created from two separate tracks

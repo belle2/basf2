@@ -9,9 +9,6 @@
 // Own header.
 #include <analysis/variables/KinkVariables.h>
 
-// variables
-#include <analysis/VariableManager/Manager.h>
-
 // dataobjects from the analysis
 #include <analysis/dataobjects/Particle.h>
 
@@ -31,7 +28,6 @@
 
 // extra
 #include <algorithm>
-#include <TVector2.h>
 #include <cmath>
 #include <Math/Boost.h>
 
@@ -97,7 +93,7 @@ namespace Belle2 {
                                                               signDiff * daughterMomentumAtKinkVertex.Z(),
                                                               daughterEnergy);
 
-      B2Vector3D motherBoostAtKinkVertex = mother4MomentumAtKinkVertex.BoostToCM();
+      ROOT::Math::XYZVector motherBoostAtKinkVertex = mother4MomentumAtKinkVertex.BoostToCM();
       daughter4MomentumAtKinkVertex = ROOT::Math::Boost(motherBoostAtKinkVertex) * daughter4MomentumAtKinkVertex;
 
       if (returnCosTheta)
@@ -137,7 +133,7 @@ namespace Belle2 {
       ROOT::Math::PxPyPzEVector mother4MomentumAtDecayVertex = kinkMotherMCP4AtDecayVertex(motherMCParticle);
       ROOT::Math::PxPyPzEVector daughter4MomentumAtProductionVertex = daughterMCParticle->get4Vector();
 
-      B2Vector3D motherBoostAtDecayVertex = mother4MomentumAtDecayVertex.BoostToCM();
+      ROOT::Math::XYZVector motherBoostAtDecayVertex = mother4MomentumAtDecayVertex.BoostToCM();
       ROOT::Math::PxPyPzEVector daughter4MomentumAtDecayVertex = ROOT::Math::Boost(motherBoostAtDecayVertex) *
                                                                  daughter4MomentumAtProductionVertex;
 
@@ -313,194 +309,66 @@ namespace Belle2 {
 
     // Kink Daughter Measured Track Parameters
 
-    double kinkDaughterTrackNCDCHits(const Particle* part)
+    Manager::FunctionPtr kinkDaughterTrack(const std::vector<std::string>& arguments)
     {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getHitPatternCDC().getNHits();
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          if (particle->getParticleSource() != Particle::EParticleSourceObject::c_Kink) return Const::doubleNaN;
+          const Kink* kink = particle->getKink();
+          if (!kink) return Const::doubleNaN;
+          if (not particle->hasExtraInfo("kinkDaughterPDGCode")) return Const::doubleNaN;
+          Particle tmpParticle(kink->getDaughterTrack()->getArrayIndex(), kink->getDaughterTrackFitResult(), Const::ChargedStable(abs(particle->getExtraInfo("kinkDaughterPDGCode"))));
+          auto var_result = var->function(&tmpParticle);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else
+          {
+            return Const::doubleNaN;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function kinkDaughterTrack");
+      }
     }
 
-    double kinkDaughterTrackNSVDHits(const Particle* part)
+    Manager::FunctionPtr kinkDaughterInitTrack(const std::vector<std::string>& arguments)
     {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getHitPatternVXD().getNSVDHits();
-    }
-
-    double kinkDaughterTrackNPXDHits(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getHitPatternVXD().getNPXDHits();
-    }
-
-    double kinkDaughterTrackNVXDHits(const Particle* part)
-    {
-      return kinkDaughterTrackNSVDHits(part) + kinkDaughterTrackNPXDHits(part);
-    }
-
-    double kinkDaughterTrackFirstSVDLayer(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getHitPatternVXD().getFirstSVDLayer();
-    }
-
-    double kinkDaughterTrackFirstPXDLayer(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
-    }
-
-    double kinkDaughterTrackFirstCDCLayer(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getHitPatternCDC().getFirstLayer();
-    }
-
-    double kinkDaughterTrackLastCDCLayer(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getHitPatternCDC().getLastLayer();
-    }
-
-    double kinkDaughterTrackPValue(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getPValue();
-    }
-
-    double kinkDaughterTrackNDF(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getNDF();
-    }
-
-    double kinkDaughterTrackChi2(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getChi2();
-    }
-
-    double kinkDaughterInitTrackPValue(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      const Track* daughterTrack = kink->getDaughterTrack();
-      const TrackFitResult* daughterTrackFitResult = daughterTrack->getTrackFitResultWithClosestMass(Const::pion);
-      if (!daughterTrackFitResult) return Const::doubleNaN;
-      return daughterTrackFitResult->getPValue();
-    }
-
-    double kinkDaughterInitTrackNDF(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      const Track* daughterTrack = kink->getDaughterTrack();
-      const TrackFitResult* daughterTrackFitResult = daughterTrack->getTrackFitResultWithClosestMass(Const::pion);
-      if (!daughterTrackFitResult) return Const::doubleNaN;
-      return daughterTrackFitResult->getNDF();
-    }
-
-    double kinkDaughterInitTrackChi2(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      const Track* daughterTrack = kink->getDaughterTrack();
-      const TrackFitResult* daughterTrackFitResult = daughterTrack->getTrackFitResultWithClosestMass(Const::pion);
-      if (!daughterTrackFitResult) return Const::doubleNaN;
-      return daughterTrackFitResult->getChi2();
-    }
-
-    double kinkDaughterTrackD0(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getD0();
-    }
-
-    double kinkDaughterTrackPhi0(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getPhi0();
-    }
-
-    double kinkDaughterTrackOmega(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getOmega();
-    }
-
-    double kinkDaughterTrackZ0(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getZ0();
-    }
-
-    double kinkDaughterTrackTanLambda(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-      return kink->getDaughterTrackFitResult()->getTanLambda();
-    }
-
-    double kinkDaughterTrackD0Error(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-
-      double errorSquared = kink->getDaughterTrackFitResult()->getCovariance5()[0][0];
-      if (errorSquared <= 0) return Const::doubleNaN;
-      return sqrt(errorSquared);
-    }
-
-    double kinkDaughterTrackPhi0Error(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-
-      double errorSquared = kink->getDaughterTrackFitResult()->getCovariance5()[1][1];
-      if (errorSquared <= 0) return Const::doubleNaN;
-      return sqrt(errorSquared);
-    }
-
-    double kinkDaughterTrackOmegaError(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-
-      double errorSquared = kink->getDaughterTrackFitResult()->getCovariance5()[2][2];
-      if (errorSquared <= 0) return Const::doubleNaN;
-      return sqrt(errorSquared);
-    }
-
-    double kinkDaughterTrackZ0Error(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-
-      double errorSquared = kink->getDaughterTrackFitResult()->getCovariance5()[3][3];
-      if (errorSquared <= 0) return Const::doubleNaN;
-      return sqrt(errorSquared);
-    }
-
-    double kinkDaughterTrackTanLambdaError(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-
-      double errorSquared = kink->getDaughterTrackFitResult()->getCovariance5()[4][4];
-      if (errorSquared <= 0) return Const::doubleNaN;
-      return sqrt(errorSquared);
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          if (particle->getParticleSource() != Particle::EParticleSourceObject::c_Kink) return Const::doubleNaN;
+          const Kink* kink = particle->getKink();
+          if (!kink) return Const::doubleNaN;
+          if (not particle->hasExtraInfo("kinkDaughterPDGCode")) return Const::doubleNaN;
+          Particle tmpParticle(kink->getDaughterTrack()->getArrayIndex(), kink->getDaughterTrack()->getTrackFitResultWithClosestMass(Const::pion), Const::ChargedStable(abs(particle->getExtraInfo("kinkDaughterPDGCode"))));
+          auto var_result = var->function(&tmpParticle);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else
+          {
+            return Const::doubleNaN;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function kinkDaughterInitTrack");
+      }
     }
 
     double kinkDaughterTrackD0AtKinkVertex(const Particle* part)
@@ -550,40 +418,34 @@ namespace Belle2 {
 
     // Kink Mother Measured Track Parameters
 
-    double kinkMotherInitTrackPValue(const Particle* part)
+    Manager::FunctionPtr kinkMotherInitTrack(const std::vector<std::string>& arguments)
     {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-
-      const Track* motherTrack = kink->getMotherTrack();
-      const TrackFitResult* motherTrackFitResult = motherTrack->getTrackFitResultWithClosestMass(Const::pion);
-      if (!motherTrackFitResult) return Const::doubleNaN;
-
-      return motherTrackFitResult->getPValue();
-    }
-
-    double kinkMotherInitTrackNDF(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-
-      const Track* motherTrack = kink->getMotherTrack();
-      const TrackFitResult* motherTrackFitResult = motherTrack->getTrackFitResultWithClosestMass(Const::pion);
-      if (!motherTrackFitResult) return Const::doubleNaN;
-
-      return motherTrackFitResult->getNDF();
-    }
-
-    double kinkMotherInitTrackChi2(const Particle* part)
-    {
-      const Kink* kink = part->getKink();
-      if (!kink) return Const::doubleNaN;
-
-      const Track* motherTrack = kink->getMotherTrack();
-      const TrackFitResult* motherTrackFitResult = motherTrack->getTrackFitResultWithClosestMass(Const::pion);
-      if (!motherTrackFitResult) return Const::doubleNaN;
-
-      return motherTrackFitResult->getChi2();
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          if (particle->getParticleSource() != Particle::EParticleSourceObject::c_Kink) return Const::doubleNaN;
+          const Kink* kink = particle->getKink();
+          if (!kink) return Const::doubleNaN;
+          Particle tmpParticle(kink->getMotherTrack()->getArrayIndex(), kink->getMotherTrack()->getTrackFitResultWithClosestMass(Const::pion), Const::pion);
+          auto var_result = var->function(&tmpParticle);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else
+          {
+            return Const::doubleNaN;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function kinkMotherInitTrack");
+      }
     }
 
     double kinkMotherTrackD0AtKinkVertex(const Particle* part)
@@ -819,106 +681,71 @@ namespace Belle2 {
 
     // Kink from track pair daughter MC variables
 
-    const MCParticle* kinkPairDaughterMCParticle(const Particle* part)
+    Manager::FunctionPtr kinkPairDaughterMC(const std::vector<std::string>& arguments)
     {
-      const Kink* kink = part->getKink();
-      if (!kink) return nullptr;
-
-      const Track* motherTrack = kink->getMotherTrack();
-      const Track* daughterTrack = kink->getDaughterTrack();
-
-      if (motherTrack == daughterTrack) return nullptr;
-      return daughterTrack->getRelated<MCParticle>();
-    }
-
-    double kinkPairDaughterMCPDG(const Particle* part)
-    {
-      const MCParticle* daughterMCParticle = kinkPairDaughterMCParticle(part);
-      if (!daughterMCParticle) return Const::doubleNaN;
-      return daughterMCParticle->getPDG();
-    }
-
-    double kinkPairDaughterMCMotherPDG(const Particle* part)
-    {
-      const MCParticle* daughterMCParticle = kinkPairDaughterMCParticle(part);
-      if (!daughterMCParticle) return Const::doubleNaN;
-      if (daughterMCParticle->getMother())
-        return daughterMCParticle->getMother()->getPDG();
-      else
-        return Const::doubleNaN;
-    }
-
-    double kinkPairDaughterMCSecProc(const Particle* part)
-    {
-      const MCParticle* daughterMCParticle = kinkPairDaughterMCParticle(part);
-      if (!daughterMCParticle) return Const::doubleNaN;
-      return daughterMCParticle->getSecondaryPhysicsProcess();
-    }
-
-    double kinkPairDaughterMCVertexX(const Particle* part)
-    {
-      const MCParticle* daughterMCParticle = kinkPairDaughterMCParticle(part);
-      if (!daughterMCParticle) return Const::doubleNaN;
-      return daughterMCParticle->getVertex().X();
-    }
-
-    double kinkPairDaughterMCVertexY(const Particle* part)
-    {
-      const MCParticle* daughterMCParticle = kinkPairDaughterMCParticle(part);
-      if (!daughterMCParticle) return Const::doubleNaN;
-      return daughterMCParticle->getVertex().Y();
-    }
-
-    double kinkPairDaughterMCVertexZ(const Particle* part)
-    {
-      const MCParticle* daughterMCParticle = kinkPairDaughterMCParticle(part);
-      if (!daughterMCParticle) return Const::doubleNaN;
-      return daughterMCParticle->getVertex().Z();
-    }
-
-    double kinkPairDaughterMCPX(const Particle* part)
-    {
-      const MCParticle* daughterMCParticle = kinkPairDaughterMCParticle(part);
-      if (!daughterMCParticle) return Const::doubleNaN;
-      return daughterMCParticle->get4Vector().X();
-    }
-
-    double kinkPairDaughterMCPY(const Particle* part)
-    {
-      const MCParticle* daughterMCParticle = kinkPairDaughterMCParticle(part);
-      if (!daughterMCParticle) return Const::doubleNaN;
-      return daughterMCParticle->get4Vector().Y();
-    }
-
-    double kinkPairDaughterMCPZ(const Particle* part)
-    {
-      const MCParticle* daughterMCParticle = kinkPairDaughterMCParticle(part);
-      if (!daughterMCParticle) return Const::doubleNaN;
-      return daughterMCParticle->get4Vector().Z();
-    }
-
-    double kinkPairDaughterMCPT(const Particle* part)
-    {
-      const MCParticle* daughterMCParticle = kinkPairDaughterMCParticle(part);
-      if (!daughterMCParticle) return Const::doubleNaN;
-      return sqrt(daughterMCParticle->get4Vector().Vect().Perp2());
-    }
-
-    double kinkPairDaughterMCP(const Particle* part)
-    {
-      const MCParticle* daughterMCParticle = kinkPairDaughterMCParticle(part);
-      if (!daughterMCParticle) return Const::doubleNaN;
-      return sqrt(daughterMCParticle->get4Vector().Vect().Mag2());
-    }
-
-    double kinkPairDaughterMCE(const Particle* part)
-    {
-      const MCParticle* daughterMCParticle = kinkPairDaughterMCParticle(part);
-      if (!daughterMCParticle) return Const::doubleNaN;
-      return daughterMCParticle->get4Vector().E();
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          if (particle->getParticleSource() != Particle::EParticleSourceObject::c_Kink) return Const::doubleNaN;
+          const Kink* kink = particle->getKink();
+          if (!kink) return Const::doubleNaN;
+          const Track* daughterTrack = kink->getDaughterTrack();
+          if (daughterTrack == kink->getMotherTrack()) return Const::doubleNaN;
+          Particle tmpParticle(daughterTrack->getRelated<MCParticle>());
+          auto var_result = var->function(&tmpParticle);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else
+          {
+            return Const::doubleNaN;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function kinkPairDaughterMC");
+      }
     }
 
     // Kink from track pair mother MC variables
+
+    Manager::FunctionPtr kinkMotherMC(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          if (particle->getParticleSource() != Particle::EParticleSourceObject::c_Kink) return Const::doubleNaN;
+          const Kink* kink = particle->getKink();
+          if (!kink) return Const::doubleNaN;
+          const Track* motherTrack = kink->getMotherTrack();
+          if (motherTrack == kink->getDaughterTrack()) return Const::doubleNaN;
+          Particle tmpParticle(motherTrack->getRelated<MCParticle>());
+          auto var_result = var->function(&tmpParticle);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else
+          {
+            return Const::doubleNaN;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function kinkMotherMC");
+      }
+    }
 
     const MCParticle* kinkPairMotherMCParticle(const Particle* part)
     {
@@ -1032,54 +859,10 @@ namespace Belle2 {
                       " with electron and muon mass hypotheses");
 
     // Kink Daughter Measured Track Parameters
-    REGISTER_VARIABLE("kinkDaughterTrackNCDCHits", kinkDaughterTrackNCDCHits,
-                      "Number of CDC hits of kink daughter track");
-    REGISTER_VARIABLE("kinkDaughterTrackNSVDHits", kinkDaughterTrackNSVDHits,
-                      "Number of SVD hits of kink daughter track");
-    REGISTER_VARIABLE("kinkDaughterTrackNPXDHits", kinkDaughterTrackNPXDHits,
-                      "Number of PXD hits of kink daughter track");
-    REGISTER_VARIABLE("kinkDaughterTrackNVXDHits", kinkDaughterTrackNVXDHits,
-                      "Number of VXD hits of kink daughter track");
-    REGISTER_VARIABLE("kinkDaughterTrackFirstSVDLayer", kinkDaughterTrackFirstSVDLayer,
-                      "First activated SVD layer of kink daughter track");
-    REGISTER_VARIABLE("kinkDaughterTrackFirstPXDLayer", kinkDaughterTrackFirstPXDLayer,
-                      "First activated PXD layer of kink daughter track");
-    REGISTER_VARIABLE("kinkDaughterTrackFirstCDCLayer", kinkDaughterTrackFirstCDCLayer,
-                      "First activated CDC layer of kink daughter track");
-    REGISTER_VARIABLE("kinkDaughterTrackLastCDCLayer", kinkDaughterTrackLastCDCLayer,
-                      "Last activated CDC layer of kink daughter track");
-    REGISTER_VARIABLE("kinkDaughterTrackPValue", kinkDaughterTrackPValue,
-                      "P-value of kink daughter track fit");
-    REGISTER_VARIABLE("kinkDaughterTrackNDF", kinkDaughterTrackNDF,
-                      "NDF of kink daughter track fit");
-    REGISTER_VARIABLE("kinkDaughterTrackChi2", kinkDaughterTrackChi2,
-                      "Chi2 of kink daughter track fit");
-    REGISTER_VARIABLE("kinkDaughterInitTrackPValue", kinkDaughterInitTrackPValue,
-                      "P-value of initial kink daughter track fit");
-    REGISTER_VARIABLE("kinkDaughterInitTrackNDF", kinkDaughterInitTrackNDF,
-                      "NDF of initial kink daughter track fit");
-    REGISTER_VARIABLE("kinkDaughterInitTrackChi2", kinkDaughterInitTrackChi2,
-                      "Chi2 of initial kink daughter track fit");
-    REGISTER_VARIABLE("kinkDaughterTrackD0", kinkDaughterTrackD0,
-                      "D0 impact parameter of kink daughter track at IP");
-    REGISTER_VARIABLE("kinkDaughterTrackPhi0", kinkDaughterTrackPhi0,
-                      "Transverse momentum angle of kink daughter track at IP");
-    REGISTER_VARIABLE("kinkDaughterTrackOmega", kinkDaughterTrackOmega,
-                      "Curvature of kink daughter track at IP");
-    REGISTER_VARIABLE("kinkDaughterTrackZ0", kinkDaughterTrackZ0,
-                      "Z0 impact parameter of kink daughter track at IP");
-    REGISTER_VARIABLE("kinkDaughterTrackTanLambda", kinkDaughterTrackTanLambda,
-                      "Slope of kink daughter track at IP");
-    REGISTER_VARIABLE("kinkDaughterTrackD0Error", kinkDaughterTrackD0Error,
-                      "DO error of kink daughter track at IP");
-    REGISTER_VARIABLE("kinkDaughterTrackPhi0Error", kinkDaughterTrackPhi0Error,
-                      "Phi0 error of kink daughter track at IP");
-    REGISTER_VARIABLE("kinkDaughterTrackOmegaError", kinkDaughterTrackOmegaError,
-                      "Omega error of kink daughter track at IP");
-    REGISTER_VARIABLE("kinkDaughterTrackZ0Error", kinkDaughterTrackZ0Error,
-                      "Z0 error of kink daughter track at IP");
-    REGISTER_VARIABLE("kinkDaughterTrackTanLambdaError", kinkDaughterTrackTanLambdaError,
-                      "Tan(lambda) error of kink daughter track at IP");
+    REGISTER_METAVARIABLE("kinkDaughterTrack(variable)", kinkDaughterTrack,
+                          "Returns variable for the kink daughter track", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("kinkDaughterInitTrack(variable)", kinkDaughterInitTrack,
+                          "Returns variable for the initial kink daughter track", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("kinkDaughterTrackD0AtKinkVertex", kinkDaughterTrackD0AtKinkVertex,
                       "D0 impact parameter of kink daughter track at kink vertex");
     REGISTER_VARIABLE("kinkDaughterTrackZ0AtKinkVertex", kinkDaughterTrackZ0AtKinkVertex,
@@ -1092,12 +875,8 @@ namespace Belle2 {
                       "P of kink daughter track at kink vertex");
 
     // Kink Mother Measured Track Parameters
-    REGISTER_VARIABLE("kinkMotherInitTrackPValue", kinkMotherInitTrackPValue,
-                      "P-value of initial kink mother track fit");
-    REGISTER_VARIABLE("kinkMotherInitTrackNDF", kinkMotherInitTrackNDF,
-                      "NDF of initial kink mother track fit");
-    REGISTER_VARIABLE("kinkMotherInitTrackChi2", kinkMotherInitTrackChi2,
-                      "Chi2 of initial kink mother track fit");
+    REGISTER_METAVARIABLE("kinkMotherInitTrack(variable)", kinkMotherInitTrack,
+                          "Returns variable for the initial kink mother track fit", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("kinkMotherTrackD0AtKinkVertex", kinkMotherTrackD0AtKinkVertex,
                       "D0 impact parameter of kink mother track at kink vertex");
     REGISTER_VARIABLE("kinkMotherTrackZ0AtKinkVertex", kinkMotherTrackZ0AtKinkVertex,
@@ -1145,33 +924,12 @@ namespace Belle2 {
                       "Makes sense only for real decays-in-flight; however, it is not checked here");
 
     // Kink from track pair daughter MC variables
-    REGISTER_VARIABLE("kinkDaughterMCPDG", kinkPairDaughterMCPDG,
-                      "PDG code of the kink daughter for kinks created from two separate tracks");
-    REGISTER_VARIABLE("kinkDaughterMCMotherPDG", kinkPairDaughterMCMotherPDG,
-                      "PDG code of the kink daughter's mother for kinks created from two separate tracks"
-                      " (might be different from the mother track MCParticle)");
-    REGISTER_VARIABLE("kinkDaughterMCSecProc", kinkPairDaughterMCSecProc,
-                      "Secondary Physics Process code of the kink daughter for kinks created from two separate tracks");
-    REGISTER_VARIABLE("kinkDaughterMCVertexX", kinkPairDaughterMCVertexX,
-                      "Production vertex X coordinate of the kink daughter for kinks created from two separate tracks");
-    REGISTER_VARIABLE("kinkDaughterMCVertexY", kinkPairDaughterMCVertexY,
-                      "Production vertex Y coordinate of the kink daughter for kinks created from two separate tracks");
-    REGISTER_VARIABLE("kinkDaughterMCVertexZ", kinkPairDaughterMCVertexZ,
-                      "Production vertex Z coordinate of the kink daughter for kinks created from two separate tracks");
-    REGISTER_VARIABLE("kinkDaughterMCPX", kinkPairDaughterMCPX,
-                      "Generated PX of the kink daughter for kinks created from two separate tracks");
-    REGISTER_VARIABLE("kinkDaughterMCPY", kinkPairDaughterMCPY,
-                      "Generated PY of the kink daughter for kinks created from two separate tracks");
-    REGISTER_VARIABLE("kinkDaughterMCPZ", kinkPairDaughterMCPZ,
-                      "Generated PZ of the kink daughter for kinks created from two separate tracks");
-    REGISTER_VARIABLE("kinkDaughterMCPT", kinkPairDaughterMCPT,
-                      "Generated PT of the kink daughter for kinks created from two separate tracks");
-    REGISTER_VARIABLE("kinkDaughterMCP", kinkPairDaughterMCP,
-                      "Generated P of the kink daughter for kinks created from two separate tracks");
-    REGISTER_VARIABLE("kinkDaughterMCE", kinkPairDaughterMCE,
-                      "Generated E of the kink daughter for kinks created from two separate tracks");
+    REGISTER_METAVARIABLE("kinkPairDaughterMC(variable)", kinkPairDaughterMC,
+                          "Returns MC variable for the kink daughter for kinks created from two separate tracks", Manager::VariableDataType::c_double);
 
     // Kink from track pair mother MC variables
+    REGISTER_METAVARIABLE("kinkMotherMC(variable)", kinkMotherMC,
+                          "Returns MC variable for the kink mother for kinks created from two separate tracks", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("kinkMotherMCPXAtDV", kinkPairMotherMCPXAtDecayVertex,
                       "Generated PX of the kink mother at the decay vertex for kinks created from two separate tracks");
     REGISTER_VARIABLE("kinkMotherMCPYAtDV", kinkPairMotherMCPYAtDecayVertex,

@@ -39,9 +39,9 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   addParam("FileList", m_fileList, "List of input files", std::vector<std::string> {"input_histo.root"});
   addParam("SelectHistograms", m_histograms, "List of histogram name patterns, empty for all. Support wildcard matching (* and ?).",
            std::vector<std::string>());
-  addParam("Experiment", m_expno, "Experiment Nr", 7u);
-  addParam("RunList", m_runList, "Run Number List", std::vector<unsigned int> {1u});
-  addParam("EventsList", m_eventsList, "Number of events for each run", std::vector<unsigned int> {10u});
+  addParam("EventsList", m_eventsList, "Number of events for each run", std::vector<unsigned int>());
+  addParam("Experiment", m_expno, "Experiment Nr override", 0u);
+  addParam("RunList", m_runList, "Run Number List", std::vector<unsigned int>());
   addParam("RunType", m_runType, "Run Type override", std::string(""));
   addParam("FillNEvent", m_fillNEvent, "NEvent override", 0);
   addParam("EventInterval", m_interval, "Time between events (seconds)", 20u);
@@ -53,12 +53,12 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
 
 void DQMHistAnalysisInputRootFileModule::initialize()
 {
-  if (m_file != nullptr) delete m_file;
-  if (m_fileList.size() == 0) B2ERROR("File list is empty.");
-  if (m_runList.size() == 0) B2ERROR("Run list is empty.");
-  if (m_eventsList.size() == 0) B2ERROR("Events list is empty.");
-  if (m_runList.size() != m_eventsList.size()) B2ERROR("Run list does not have the same size as events list.");
-  if (m_runList.size() != m_fileList.size()) B2ERROR("Run list does not have the same size as file list.");
+  if (m_fileList.size() == 0) B2FATAL("File list is empty.");
+  if (m_eventsList.size() == 0) {
+    m_eventsList.resize(m_fileList.size(), 3); // default three events per file
+  }
+  if (m_fileList.size() != m_eventsList.size()) B2ERROR("File list does not have the same size as events list.");
+  if (m_runList.size() != 0 and m_runList.size() != m_fileList.size()) B2ERROR("Run list does not have the same size as file list.");
   m_run_idx = 0;
   m_file = new TFile(m_fileList[m_run_idx].c_str());
   m_eventMetaDataPtr.registerInDataStore();
@@ -106,7 +106,7 @@ bool DQMHistAnalysisInputRootFileModule::hnamePatternMatch(std::string pattern, 
 
 void DQMHistAnalysisInputRootFileModule::beginRun()
 {
-  B2INFO("DQMHistAnalysisInputRootFile: beginRun called. Run: " << m_runList[m_run_idx]);
+  B2INFO("DQMHistAnalysisInputRootFile: beginRun called.");
   clearHistList();
   clearRefList();
 }
@@ -118,14 +118,16 @@ void DQMHistAnalysisInputRootFileModule::event()
 
   sleep(m_interval);
 
+  // Check for run change
   if (m_count > m_eventsList[m_run_idx]) {
     m_run_idx++;
-    if (m_run_idx == m_runList.size()) {
+    if (m_run_idx == m_fileList.size()) {
       m_eventMetaDataPtr.create();
       m_eventMetaDataPtr->setEndOfData();
       return;
     }
     m_count = 0;
+    // open next file
     if (m_file != nullptr) {
       m_file->Close();
       delete m_file;
@@ -232,25 +234,63 @@ void DQMHistAnalysisInputRootFileModule::event()
     }
   }
 
-  auto runno = m_runList[m_run_idx];
-  if (m_c_info != NULL) m_c_info->SetTitle(("OFFLINE: Exp " + std::to_string(m_expno) + ", Run " + std::to_string(
-                                                runno) + ", RunType " + m_runType + ", Last Changed NEVER, Last Updated NEVER, Last DQM event NEVER").c_str());
-
-  m_count++;
-  m_eventMetaDataPtr.create();
-  m_eventMetaDataPtr->setExperiment(m_expno);
-  m_eventMetaDataPtr->setRun(m_runList[m_run_idx]);
-  m_eventMetaDataPtr->setEvent(m_count);
-  m_eventMetaDataPtr->setTime(ts * 1e9);
+  auto expno = m_expno;
+  auto runno = m_runList.size() ? m_runList[m_run_idx] : 0;
+  auto rtype = m_runType;
 
   if (m_add_runcontrol_hist) {
-    m_h_expno->SetTitle(std::to_string(m_expno).c_str());
+    m_h_expno->SetTitle(std::to_string(expno).c_str());
     hs.push_back((TH1*)(m_h_expno->Clone()));
     m_h_runno->SetTitle(std::to_string(runno).c_str());
     hs.push_back((TH1*)(m_h_runno->Clone()));
-    m_h_rtype->SetTitle(m_runType.c_str());
+    m_h_rtype->SetTitle(rtype.c_str());
     hs.push_back((TH1*)(m_h_rtype->Clone()));
   }
+  if (m_fillNEvent > 0) {
+    hs.push_back((TH1*)(m_h_fillNEvent->Clone()));
+  }
+  // check for no-override
+  for (size_t i = 0; i < hs.size(); i++) {
+    TH1* h = hs[i];
+    B2INFO(h->GetName());
+    if (std::string(h->GetName()) == std::string("DQMInfo/expno")) {
+      if (expno == 0) {
+        expno = atoi(h->GetTitle());
+      } else {
+        h->SetTitle(std::to_string(expno).c_str());
+      }
+    }
+    if (std::string(h->GetName()) == std::string("DQMInfo/runno")) {
+      if (runno == 0) {
+        runno = atoi(h->GetTitle());
+      } else {
+        h->SetTitle(std::to_string(runno).c_str());
+      }
+    }
+    if (std::string(h->GetName()) == std::string("DQMInfo/rtype")) {
+      if (rtype == "") {
+        rtype = h->GetTitle();
+      } else {
+        h->SetTitle(rtype.c_str());
+      }
+    }
+    if (std::string(h->GetName()) == std::string("DAQ/Nevent")) {
+      if (m_fillNEvent > 0) {
+        h->SetEntries(m_fillNEvent);
+      }
+    }
+  }
+
+  if (m_c_info != nullptr) m_c_info->SetTitle(("OFFLINE: Exp " + std::to_string(expno) + ", Run " + std::to_string(
+                                                   runno) + ", RunType " + rtype + ", Last Changed NEVER, Last Updated NEVER, Last DQM event NEVER").c_str());
+
+  m_count++;
+  m_eventMetaDataPtr.create();
+  m_eventMetaDataPtr->setExperiment(expno);
+  m_eventMetaDataPtr->setRun(runno);
+  m_eventMetaDataPtr->setEvent(m_count);
+  m_eventMetaDataPtr->setTime(ts * 1e9);
+
   //setExpNr(m_expno); // redundant access from MetaData
   //setRunNr(m_runno); // redundant access from MetaData
   ExtractRunType(hs);

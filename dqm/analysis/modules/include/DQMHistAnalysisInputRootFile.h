@@ -112,6 +112,8 @@ namespace Belle2 {
     TH1F* m_h_runno{nullptr};
     /** emulated histogram from runcontrol, runtype */
     TH1F* m_h_rtype{nullptr};
+    /** emulated histogram from daq, nevent */
+    TH1F* m_h_fillNEvent{nullptr};
   };
 } // end namespace Belle2
 

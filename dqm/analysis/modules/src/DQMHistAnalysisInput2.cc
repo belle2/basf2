@@ -33,10 +33,9 @@ DQMHistAnalysisInput2Module::DQMHistAnalysisInput2Module()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("HistMemoryPath", m_mempath, "Path to Input Hist memory", std::string(""));
+  addParam("HistMemoryPath", m_mempath, "Path to Input Hist memory");
   addParam("StatFileName", m_statname, "Filename for status export", std::string(""));
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms", 10);
-  addParam("RemoveEmpty", m_remove_empty, "Remove empty histograms", false);
   addParam("EnableRunInfo", m_enable_run_info, "Enable Run Info", false);
   B2DEBUG(1, "DQMHistAnalysisInput2: Constructor done.");
 }
@@ -50,7 +49,6 @@ void DQMHistAnalysisInput2Module::initialize()
   m_eventMetaDataPtr.registerInDataStore();
   B2DEBUG(1, "DQMHistAnalysisInput2: initialized.");
 }
-
 
 void DQMHistAnalysisInput2Module::beginRun()
 {
@@ -140,10 +138,6 @@ void DQMHistAnalysisInput2Module::event()
     }
     TH1* h = (TH1*)obj; // we are sure its a TH1
 
-    if (m_remove_empty && h->GetEntries() == 0) {
-      delete obj;
-      continue;
-    }
     // Remove ":" from folder name, workaround!
     TString a = h->GetName();
     a.ReplaceAll(":", "");

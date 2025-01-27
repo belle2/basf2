@@ -71,8 +71,6 @@ namespace Belle2 {
     /** The name of the memory file (HLT or ExpressReco). */
     /** The refresh interval. */
     int m_interval;
-    /** Whether to remove empty histograms. */
-    bool m_remove_empty;
     /** Whether to enable the run info to be displayed. */
     bool m_enable_run_info;
     /** The canvas hold the basic DQM info. */

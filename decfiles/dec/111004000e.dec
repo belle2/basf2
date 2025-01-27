@@ -9,7 +9,7 @@
 # Cuts: None
 # Date: 2025/01/27
 #
-Alias f2sig f_2
+Alias f_2sig f_2
 Alias rho0sig rho0
 #
 Decay Upsilon(4S)

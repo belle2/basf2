@@ -39,6 +39,7 @@ namespace Belle2 {
      */
     DQMHistAnalysisInput2Module();
 
+  private:
     /**
      * Initialize the module.
      */
@@ -64,8 +65,12 @@ namespace Belle2 {
      */
     void terminate() override final;
 
+    /**
+     * Read histogram from key and add to list vector
+     */
+    void addToHistList(std::vector<TH1*>& hs, std::string dirname, TKey* key);
+
     // Data members
-  private:
     /** The name of the shared memory for the histograms. */
     std::string m_mempath;
     /** The name of the memory file (HLT or ExpressReco). */

@@ -111,6 +111,58 @@ void DQMHistAnalysisInputRootFileModule::beginRun()
   clearRefList();
 }
 
+void DQMHistAnalysisInputRootFileModule::addToHistList(std::vector<TH1*>& hs, std::string dirname, TKey* key)
+{
+  TH1* h = (TH1*)key->ReadObj();
+  if (h == nullptr) return; // would be strange, but better check
+  std::string hname = h->GetName();
+
+  if (hname.find("/") == std::string::npos) {
+    if (dirname != "") {
+      hname = dirname + "/" + hname;
+      h->SetName(hname.c_str());
+    } else {
+      // histo in root dir without prefix -> do not keep!
+      delete h;
+      return;
+    }
+  }
+
+  bool hpass = false;
+  if (m_histograms.size() == 0) {
+    hpass = true;
+  } else {
+    for (auto& hpattern : m_histograms) {
+      if (hnamePatternMatch(hpattern, h->GetName())) {
+        hpass = true;
+        break;
+      }
+    }
+  }
+  if (!hpass) {
+    delete h;
+    return;
+  }
+
+  // Remove ":" from folder name, workaround!
+  // Is this really needed?
+  if (hname.find(":") != std::string::npos) {
+    B2ERROR("histogram or folder name with : is problematic");
+  }
+  TString a = h->GetName();
+  a.ReplaceAll(":", "");
+  h->SetName(a);
+  B2DEBUG(1, "DQMHistAnalysisInput2: get histo " << a.Data());
+
+
+  Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
+  h->Scale(scale);
+  h->SetEntries(h->GetEntries()*scale); // empty hists are not marked for update!
+
+  // Histograms in the hs list will be taken care of later (delete)
+  hs.push_back(h);
+}
+
 void DQMHistAnalysisInputRootFileModule::event()
 {
   B2INFO("DQMHistAnalysisInputRootFile: event called.");
@@ -165,72 +217,22 @@ void DQMHistAnalysisInputRootFileModule::event()
   while ((key = (TKey*)next())) {
     TClass* cl = gROOT->GetClass(key->GetClassName());
     if (ts == 0) ts = key->GetDatime().Convert();
-    if (!cl->InheritsFrom("TDirectory")) continue;
-    TDirectory* d = (TDirectory*)key->ReadObj();
-    std::string dirname = d->GetName();
+    if (cl->InheritsFrom("TDirectory")) {
+      TDirectory* d = (TDirectory*)key->ReadObj();
+      std::string dirname = d->GetName();
 
-    d->cd();
-    TIter nextd(d->GetListOfKeys());
+      d->cd();
+      TIter nextd(d->GetListOfKeys());
 
-    TKey* dkey;
-    while ((dkey = (TKey*)nextd())) {
-      TClass* dcl = gROOT->GetClass(dkey->GetClassName());
-      if (!dcl->InheritsFrom("TH1")) continue;
-      TH1* h = (TH1*)dkey->ReadObj();
-      if (h->InheritsFrom("TH2")) h->SetOption("col");
-      else h->SetOption("hist");
-      std::string hname = h->GetName();
-
-      bool hpass = false;
-      if (m_histograms.size() == 0) {
-        hpass = true;
-      } else {
-        for (auto& hpattern : m_histograms) {
-          if (hnamePatternMatch(hpattern, dirname + "/" + hname)) {
-            hpass = true;
-            break;
-          }
-        }
+      TKey* dkey;
+      while ((dkey = (TKey*)nextd())) {
+        TClass* dcl = gROOT->GetClass(dkey->GetClassName());
+        if (!dcl->InheritsFrom("TH1")) continue;
+        addToHistList(hs, dirname, dkey);
       }
-      if (!hpass) continue;
-
-      if (hname.find("/") == std::string::npos) h->SetName((dirname + "/" + hname).c_str());
-      Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
-      h->Scale(scale);
-      h->SetEntries(h->GetEntries()*scale); // empty hists are not marked for update!
-      hs.push_back(h);
-    }
-    m_file->cd();
-  }
-
-  // if no histograms are found in the sub-directories
-  // search the top folder
-  if (hs.size() == 0) {
-    TIter nexth(m_file->GetListOfKeys());
-    TKey* keyh = NULL;
-    while ((keyh = (TKey*)nexth())) {
-      TClass* cl = gROOT->GetClass(keyh->GetClassName());
-      TH1* h;
-      if (!cl->InheritsFrom("TH1")) continue;
-      h = (TH1*)keyh->ReadObj();
-
-      bool hpass = false;
-      if (m_histograms.size() == 0) {
-        hpass = true;
-      } else {
-        for (auto& hpattern : m_histograms) {
-          if (hnamePatternMatch(hpattern, h->GetName())) {
-            hpass = true;
-            break;
-          }
-        }
-      }
-      if (!hpass) continue;
-
-      Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
-      h->Scale(scale);
-      h->SetEntries(h->GetEntries()*scale); // empty hists are not marked for update!
-      hs.push_back(h);
+      m_file->cd();
+    } else if (cl->InheritsFrom("TH1")) {
+      addToHistList(hs, "", key);
     }
   }
 
@@ -250,9 +252,7 @@ void DQMHistAnalysisInputRootFileModule::event()
     hs.push_back((TH1*)(m_h_fillNEvent->Clone()));
   }
   // check for no-override
-  for (size_t i = 0; i < hs.size(); i++) {
-    TH1* h = hs[i];
-    B2INFO(h->GetName());
+  for (auto& h : hs) {
     if (std::string(h->GetName()) == std::string("DQMInfo/expno")) {
       if (expno == 0) {
         expno = atoi(h->GetTitle());

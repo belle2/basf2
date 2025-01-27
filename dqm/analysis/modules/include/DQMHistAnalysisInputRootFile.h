@@ -34,6 +34,7 @@ namespace Belle2 {
      */
     DQMHistAnalysisInputRootFileModule();
 
+  private:
     /**
      * Initialize the module.
      */
@@ -49,7 +50,11 @@ namespace Belle2 {
      */
     void event() override final;
 
-  private:
+    /**
+     * Read histogram from key and add to list vector
+     */
+    void addToHistList(std::vector<TH1*>& hs, std::string dirname, TKey* key);
+
     /**
      * Pattern match for histogram name
      * @param pattern Used for matchng the histogram name. Wildcards (* and ?) are supported
@@ -58,6 +63,7 @@ namespace Belle2 {
      */
     bool hnamePatternMatch(std::string pattern, std::string text);
 
+    // Data members
     /** The list of names of the input root file. */
     std::vector<std::string> m_fileList;
 

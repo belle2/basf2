@@ -66,7 +66,6 @@ void DQMHistAnalysisInput2Module::beginRun()
 
 void DQMHistAnalysisInput2Module::addToHistList(std::vector<TH1*>& hs, std::string dirname, TKey* key)
 {
-  // helper function
   TH1* h = (TH1*)key->ReadObj();
   if (h == nullptr) return; // would be strange, but better check
   std::string hname = h->GetName();

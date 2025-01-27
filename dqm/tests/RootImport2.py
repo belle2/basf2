@@ -10,6 +10,7 @@
 '''
 DQM Import test
 '''
+import os
 import basf2 as b2
 from ROOT import TFile, TH1F
 
@@ -52,3 +53,6 @@ main.add_module(dqmoutput)
 
 # Process all events
 b2.process(main)
+
+os.remove(filein)
+os.remove(fileout)

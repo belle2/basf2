@@ -40,13 +40,6 @@ namespace Belle2 {
       /// Make destructor of interface class virtual
       virtual ~Filter();
 
-      /**
-       *  Expose the set of parameters of the filter to the module parameter list.
-       *
-       *  Note that not all filters have yet exposed their parameters in this way.
-       */
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
-
       /// Indicates if the filter requires Monte Carlo information.
       virtual bool needsTruthInformation();
 

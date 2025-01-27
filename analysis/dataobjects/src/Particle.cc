@@ -32,6 +32,7 @@
 #include <TMatrixFSym.h>
 #include <Math/Boost.h>
 
+#include <cmath>
 #include <iomanip>
 #include <stdexcept>
 #include <queue>
@@ -854,7 +855,7 @@ const TrackFitResult* Particle::getTrackFitResult() const
 {
   // if the particle is related to a TrackFitResult then return this
   auto* selfrelated = this->getRelatedTo<TrackFitResult>();
-  if (selfrelated && !isnan(selfrelated->getPValue()))
+  if (selfrelated && !std::isnan(selfrelated->getPValue()))
     return selfrelated;
 
   // if not get the TFR with closest mass to this particle

@@ -44,8 +44,6 @@ namespace Belle2 {
        *  Expose the set of parameters of the filter to the module parameter list.
        *
        *  Note that not all filters have yet exposed their parameters in this way.
-       *
-       *  This method is deprecated as the exposeParams below uses a less compile heavy equivalent.
        */
       virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 

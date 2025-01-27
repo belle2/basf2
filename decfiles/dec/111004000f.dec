@@ -7,11 +7,12 @@
 # Tested: Yes
 # PhysicsWG: BHadronic
 # Cuts: None
-# Date: 2025/01/19
+# Date: 2025/01/27
 #
 Alias a1+sig a_1+
 Alias a1-sig a_1-
 ChargeConj  a1+sig a1-sig
+Alias rho0sig rho0
 #
 Decay Upsilon(4S)
 1.0     B0sig anti-B0sig B0 anti-B0       VSS_BMIX dm;
@@ -24,9 +25,13 @@ Enddecay
 CDecay anti-B0sig
 #
 Decay a+sig
-1.0     rho0 pi+                  VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0; # S-wave only
+1.0     rho0sig pi+         VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0; # S-wave only
 Enddecay
 CDecay a1-sig
+#
+Decay rho0sig
+1.0    pi+ pi-   VSS;
+Enddecay
 #
 End
 

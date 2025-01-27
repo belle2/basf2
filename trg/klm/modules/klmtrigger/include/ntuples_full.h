@@ -26,11 +26,6 @@ namespace nt {
 
 }
 
-
-
-
-
-
 namespace nt {
 
   template <class _Ty>
@@ -39,8 +34,6 @@ namespace nt {
   template <int N, typename... Ts>
   using NthTypeOf =
     typename std::tuple_element<N, std::tuple<Ts...>>::type;
-
-
 
   template <typename T1>
   struct type_container {
@@ -127,18 +120,15 @@ namespace nt {
       return lhs.v > rhs.v;
     }
 
-
-
-
     friend constexpr bool operator<(const ax_type& lhs, const T1& rhs)
     {
       return lhs.v < rhs;
     }
+
     friend constexpr bool operator<(const T1 lhs, const ax_type&  rhs)
     {
       return lhs < rhs.v;
     }
-
 
     friend constexpr bool operator<=(const ax_type& lhs, const T1& rhs)
     {
@@ -150,7 +140,6 @@ namespace nt {
       return lhs <= rhs.v;
     }
 
-
     friend constexpr bool operator==(const ax_type& lhs, const T1& rhs)
     {
       return lhs.v == rhs;
@@ -160,7 +149,6 @@ namespace nt {
     {
       return lhs == rhs.v;
     }
-
 
     friend constexpr bool operator!=(const ax_type& lhs, const T1& rhs)
     {
@@ -172,7 +160,6 @@ namespace nt {
       return lhs != rhs.v;
     }
 
-
     friend constexpr bool operator>=(const ax_type& lhs, const T1& rhs)
     {
       return lhs.v >= rhs;
@@ -183,7 +170,6 @@ namespace nt {
       return lhs >= rhs.v;
     }
 
-
     friend constexpr bool operator>(const ax_type& lhs, const T1& rhs)
     {
       return lhs.v > rhs;
@@ -193,7 +179,6 @@ namespace nt {
     {
       return lhs > rhs.v;
     }
-
 
     friend std::ostream& operator<<(std::ostream& out, const ax_type& self)
     {
@@ -208,7 +193,6 @@ namespace nt {
   namespace comparators {
     template <typename T1, typename... T_rest>
     struct _nt_compare {
-
       template <typename VECA_T, typename VECB_T>
       static auto __isLessthen(const VECA_T& vecA, const VECB_T& vecB)
       {
@@ -218,7 +202,7 @@ namespace nt {
           } else if (T1::get(vecA) > T1::get(vecB)) {
             return false;
           }
-          return _nt_compare<T_rest...>::template __isLessthen(vecA, vecB);
+          return _nt_compare<T_rest...>::__isLessthen(vecA, vecB);
         } else {
           return T1::get(vecA) < T1::get(vecB);
         }
@@ -231,7 +215,7 @@ namespace nt {
           if (nt::_Remove_cvref_t<T1>::get(vecA) != nt::_Remove_cvref_t<T1>::get(vecB)) {
             return false;
           }
-          return _nt_compare<T_rest...>::template __isEequal(vecA, vecB);
+          return _nt_compare<T_rest...>::__isEequal(vecA, vecB);
         } else {
           return nt::_Remove_cvref_t<T1>::get(vecA) == nt::_Remove_cvref_t<T1>::get(vecB);
         }

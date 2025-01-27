@@ -12,7 +12,9 @@ DQM Import test
 '''
 import os
 import basf2 as b2
-from ROOT import TFile, TH1F
+from ROOT import TFile, TH1F, gROOT
+
+gROOT.SetBatch(True)
 
 filein = "histin4.root"
 fileout = 'histout4.root'
@@ -28,11 +30,17 @@ f.Close()
 main = b2.create_path()
 
 dqminput = b2.register_module('DQMHistAnalysisInputRootFile')
-dqminput.param('SelectHistograms', [])  # leave blank to include all folders
 dqminput.param('FileList', [filein])
+dqminput.param('Experiment', 1)
+dqminput.param('RunType', 'null')
+dqminput.param('RunList', [1])
+dqminput.param('FillNEvent', 11)
 dqminput.param('EventInterval', 0)
 dqminput.param("AddRunControlHist", True)
+dqminput.param("EnableRunInfo", True)
 main.add_module(dqminput)
+
+main.add_module("DQMHistAutoCanvas")
 
 dqmoutput = b2.register_module('DQMHistAnalysisOutputFile')
 dqmoutput.param('OutputFolder', './')
@@ -41,6 +49,21 @@ main.add_module(dqmoutput)
 
 # Process all events
 b2.process(main)
+
+expected = ["DQMInfo/c_info", "DAQ/c_Nevent", "DQMInfo/c_expno", "DQMInfo/c_runno", "DQMInfo/c_rtype", "TEST/c_test"]
+print("== resulting file content ==")
+f = TFile(fileout, "READ")
+for k in f.GetListOfKeys():
+    o = k.ReadObj()
+    print(o.ClassName(), k)
+    if o.GetName() == "DQMInfo/c_info":
+        if "Exp 1, Run 1, RunType null" not in o.GetTitle():
+            b2.B2ERROR(f"Run Info not found in {o.GetName()}: {o.GetTitle()}")
+    if o.GetName() in expected:
+        expected.remove(o.GetName())
+print("============================")
+if len(expected) > 0:
+    b2.B2ERROR("missing items in outfile: ", expected)
 
 os.remove(filein)
 os.remove(fileout)

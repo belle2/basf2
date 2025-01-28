@@ -10,8 +10,8 @@
 import unittest
 import tempfile
 import basf2
-import b2test_utils
 import modularAnalysis as ma
+import b2test_utils
 from ROOT import TFile
 
 
@@ -25,32 +25,30 @@ class TestTreeFits(unittest.TestCase):
 
         main = basf2.create_path()
 
-        inputfile = b2test_utils.require_file('analysis/B0ToPiPiPi0.root', 'validation', py_case=self)
+        inputfile = b2test_utils.require_file(
+            'analysis/1000_B_Jpsi_ks_pipi.root', 'validation', py_case=self)
         ma.inputMdst(inputfile, path=main)
 
         ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
 
-        ma.fillParticleList('gamma:a', '', path=main)
-        ma.reconstructDecay('pi0:a -> gamma:a gamma:a', '0.125 < InvM < 0.145', 0, path=main)
-
-        ma.reconstructDecay('B0:rec -> pi-:a pi+:a pi0:a', '', 0, path=main)
-        ma.matchMCTruth('B0:rec', path=main)
+        ma.reconstructDecay('K_S0:pipi -> pi+:a pi-:a', '', 0, path=main)
+        ma.matchMCTruth('K_S0:pipi', path=main)
 
         conf = 0
         main.add_module('TreeFitter',
-                        particleList='B0:rec',
+                        particleList='K_S0:pipi',
                         confidenceLevel=conf,
                         massConstraintList=[],
-                        massConstraintListParticlename=[],
-                        expertUseReferencing=True,
-                        ipConstraint=True,
-                        updateAllDaughters=True,
-                        ignoreFromVertexFit='B0 -> ^pi- pi+ pi0')
+                        ipConstraint=False,
+                        updateAllDaughters=False)
+
+        ma.printMCParticles(path=main, suppressPrint=True, showStatus=True, showMomenta=True)
 
         ntupler = basf2.register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)
-        ntupler.param('variables', ['chiProb', 'M', 'isSignal', 'Mbc'])
-        ntupler.param('particleList', 'B0:rec')
+        ntupler.param('variables', ['chiProb', 'M', 'isSignal', 'mcErrors', 'genParticleID',
+                                    'daughter(0,genParticleID)', 'daughter(1,genParticleID)'])
+        ntupler.param('particleList', 'K_S0:pipi')
         main.add_module(ntupler)
 
         basf2.process(main)
@@ -62,7 +60,6 @@ class TestTreeFits(unittest.TestCase):
 
         allBkg = ntuple.GetEntries("isSignal == 0")
         allSig = ntuple.GetEntries("isSignal > 0")
-        SigMbcReasonable = ntuple.GetEntries("isSignal > 0 && Mbc > 5.27")
 
         truePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal > 0)")
         falsePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal == 0)")
@@ -72,12 +69,12 @@ class TestTreeFits(unittest.TestCase):
         print(f"True fit survivors: {truePositives} out of {allSig} true candidates")
         print(f"False fit survivors: {falsePositives} out of {allBkg} false candidates")
 
-        self.assertTrue(falsePositives < 8837, "Background rejection too small.")
+        self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(truePositives > 212, "Signal rejection too high")
+        self.assertTrue(falsePositives == 3449, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
+
+        self.assertTrue(truePositives == 555, "Signal rejection too high")
         self.assertFalse(mustBeZero, f"We should have dropped all candidates with confidence level less than {conf}.")
-
-        self.assertTrue(SigMbcReasonable > 206, "Signal kinematics is wrongly reconstructed too much")
 
         print("Test passed, cleaning up.")
 

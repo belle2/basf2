@@ -39,8 +39,6 @@ class TestTreeFits(unittest.TestCase):
                         particleList='J/psi:all',
                         confidenceLevel=conf,
                         massConstraintList=[],
-                        massConstraintListParticlename=[],
-                        expertUseReferencing=True,
                         ipConstraint=False,
                         updateAllDaughters=False)
 

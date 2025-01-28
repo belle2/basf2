@@ -6,6 +6,7 @@ Variables
 * The variables `prodVertexX`, `prodVertexY`, and `prodVertexZ` now return the production vertex position also for
   TreeFit. Previously, only Rave was supported. Moreover, the covariance matrix elements of the production vertex for a
   TreeFit are now also available via the variables `prodVertexCov` and `prodVertexXErr`, etc.
+* Added kink variables. You can find them in the new variable group `kinkvariables`.
 
 Changes in the analysis package in light-2411-aldebaran
 -------------------------------------------------------

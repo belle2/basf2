@@ -34,9 +34,13 @@ def stdKKinks(path=None, writeOut=False, daughter='pi+'):
     ma.applyCuts('K+:kinks',
                  clonesCut,
                  path=path)
-    ma.applyCuts('K+:kinks',
-                 'pPimu > 0.05 and pMue > 0.07 and pKpi < 0.3 and kinkFilterID < 3',
-                 path=path)
+    ma.applyCuts(
+        'K+:kinks',
+        'kinkDaughterMomentumInMotherRestFramePiMuHypothesis > 0.05 and \
+         kinkDaughterMomentumInMotherRestFrameMuEHypothesis > 0.07 and \
+         kinkDaughterMomentumInMotherRestFrameKPiHypothesis < 0.3 and \
+         kinkFilterID < 3',
+        path=path)
 
 
 def stdPiKinks(path=None, writeOut=False, daughter='mu+'):
@@ -59,7 +63,7 @@ def stdPiKinks(path=None, writeOut=False, daughter='mu+'):
     ma.applyCuts('pi+:kinks',
                  clonesCut,
                  path=path)
-    ma.applyCuts('pi+:kinks', 'pPimu < 0.1 and kinkFilterID < 3', path=path)
+    ma.applyCuts('pi+:kinks', 'kinkDaughterMomentumInMotherRestFramePiMuHypothesis < 0.1 and kinkFilterID < 3', path=path)
 
 
 def stdMuKinks(path=None, writeOut=False, daughter='e+'):
@@ -83,4 +87,8 @@ def stdMuKinks(path=None, writeOut=False, daughter='e+'):
     ma.applyCuts('mu+:kinks',
                  clonesCut,
                  path=path)
-    ma.applyCuts('mu+:kinks', 'pPimu > 0.05 and pMue < 0.1 and kinkFilterID < 3', path=path)
+    ma.applyCuts(
+        'mu+:kinks',
+        'kinkDaughterMomentumInMotherRestFramePiMuHypothesis > 0.05 and \
+         kinkDaughterMomentumInMotherRestFrameMuEHypothesis < 0.1 and kinkFilterID < 3',
+        path=path)

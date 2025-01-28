@@ -831,30 +831,30 @@ namespace Belle2 {
                       "Check if charges of mother and daughter tracks are the same");
 
     // Kink Decay Kinematics
-    REGISTER_VARIABLE("pMD", kinkDaughterMomentumInMotherRF,
+    REGISTER_VARIABLE("kinkDaughterMomentumInMotherRestFrame", kinkDaughterMomentumInMotherRF,
                       "Kink daughter momentum in mother rest frame with default pair of mass hypotheses,"
                       " set by a user in the decay string");
-    REGISTER_VARIABLE("cosMD", kinkDaughterCosThetaInMotherRF,
+    REGISTER_VARIABLE("kinkDaughterCosAngleInMotherRestFrame", kinkDaughterCosThetaInMotherRF,
                       "Kink daughter direction in mother rest frame with respect to mother momentum direction in the lab frame"
                       " with default pair of mass hypotheses, set by a user in the decay string");
-    REGISTER_VARIABLE("pKpi", kinkDaughterMomentumInMotherRFKPi,
+    REGISTER_VARIABLE("kinkDaughterMomentumInMotherRestFrameKPiHypothesis", kinkDaughterMomentumInMotherRFKPi,
                       "Kink daughter momentum in mother rest frame with pion and kaon mass hypotheses");
-    REGISTER_VARIABLE("cosKpi", kinkDaughterCosThetaInMotherRFKPi,
+    REGISTER_VARIABLE("kinkDaughterCosAngleInMotherRestFrameKPiHypothesis", kinkDaughterCosThetaInMotherRFKPi,
                       "Kink daughter direction in mother rest frame with respect to mother momentum direction in the lab frame"
                       " with pion and kaon mass hypotheses");
-    REGISTER_VARIABLE("pKmu", kinkDaughterMomentumInMotherRFKMu,
+    REGISTER_VARIABLE("kinkDaughterMomentumInMotherRestFrameKMuHypothesis", kinkDaughterMomentumInMotherRFKMu,
                       "Kink daughter momentum in mother rest frame with muon and kaon mass hypotheses");
-    REGISTER_VARIABLE("cosKmu", kinkDaughterCosThetaInMotherRFKMu,
+    REGISTER_VARIABLE("kinkDaughterCosAngleInMotherRestFrameKMuHypothesis", kinkDaughterCosThetaInMotherRFKMu,
                       "Kink daughter direction in mother rest frame with respect to mother momentum direction in the lab frame"
                       " with muon and kaon mass hypotheses");
-    REGISTER_VARIABLE("pPimu", kinkDaughterMomentumInMotherRFPiMu,
+    REGISTER_VARIABLE("kinkDaughterMomentumInMotherRestFramePiMuHypothesis", kinkDaughterMomentumInMotherRFPiMu,
                       "Kink daughter momentum in mother rest frame with muon and pion mass hypotheses");
-    REGISTER_VARIABLE("cosPimu", kinkDaughterCosThetaInMotherRFPiMu,
+    REGISTER_VARIABLE("kinkDaughterCosAngleInMotherRestFramePiMuHypothesis", kinkDaughterCosThetaInMotherRFPiMu,
                       "Kink daughter direction in mother rest frame with respect to mother momentum direction in the lab frame"
                       " with muon and pion mass hypotheses");
-    REGISTER_VARIABLE("pMue", kinkDaughterMomentumInMotherRFMuE,
+    REGISTER_VARIABLE("kinkDaughterMomentumInMotherRestFrameMuEHypothesis", kinkDaughterMomentumInMotherRFMuE,
                       "Kink daughter momentum in mother rest frame with electron and muon mass hypotheses");
-    REGISTER_VARIABLE("cosMue", kinkDaughterCosThetaInMotherRFMuE,
+    REGISTER_VARIABLE("kinkDaughterCosAngleInMotherRestFrameMuEHypothesis", kinkDaughterCosThetaInMotherRFMuE,
                       "Kink daughter direction in mother rest frame with respect to mother momentum direction in the lab frame"
                       " with electron and muon mass hypotheses");
 
@@ -915,11 +915,11 @@ namespace Belle2 {
                       "Kink is a hadron scattering");
 
     // Kink from track pair MC kinematics
-    REGISTER_VARIABLE("mcPMd", kinkDaughterMomentumInMotherRFMC,
+    REGISTER_VARIABLE("kinkDaughterMCMomentumInMotherRestFrame", kinkDaughterMomentumInMotherRFMC,
                       "Kink daughter momentum in mother rest frame MC (works only for kink created from a track pair)\n"
                       "Makes sense only for real decays-in-flight; however, it is not checked here");
-    REGISTER_VARIABLE("mcCosMd", kinkDaughterCosThetaInMotherRFMC,
-                      "ink daughter direction in mother rest frame with respect to mother momentum direction in the lab frame"
+    REGISTER_VARIABLE("kinkDaughterMCCosAngleInMotherRestFrame", kinkDaughterCosThetaInMotherRFMC,
+                      "Kink daughter direction in mother rest frame with respect to mother momentum direction in the lab frame"
                       " MC (works only for kink created from a track pair)\n"
                       "Makes sense only for real decays-in-flight; however, it is not checked here");
 

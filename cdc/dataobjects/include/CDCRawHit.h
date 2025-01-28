@@ -122,13 +122,13 @@ namespace Belle2 {
 
   private:
     /**
-     * Status of data block.
-     */
-    unsigned short m_status;
-    /**
      * Trigger number.
      */
     int m_triggerNumber;
+    /**
+     * Status of data block.
+     */
+    unsigned short m_status;
     /**
      * Copper node ID.
      */
@@ -169,6 +169,6 @@ namespace Belle2 {
     unsigned short m_tot;
 
     /// To derive from TObject
-    ClassDef(CDCRawHit, 2);
+    ClassDef(CDCRawHit, 3);
   };
 }

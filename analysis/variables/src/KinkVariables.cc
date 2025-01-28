@@ -818,11 +818,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("kinkCombinedFitResultFlagB1", kinkCombinedFitResultFlagBit1,
                       "The first bit of the flag of the combined kink fit result");
     REGISTER_VARIABLE("kinkCombinedFitResultFlagB2", kinkCombinedFitResultFlagBit2,
-                      "The first bit of the flag of the combined kink fit result");
+                      "The second bit of the flag of the combined kink fit result");
     REGISTER_VARIABLE("kinkCombinedFitResultFlagB3", kinkCombinedFitResultFlagBit3,
-                      "The first bit of the flag of the combined kink fit result");
+                      "The third bit of the flag of the combined kink fit result");
     REGISTER_VARIABLE("kinkCombinedFitResultFlagB4", kinkCombinedFitResultFlagBit4,
-                      "The first bit of the flag of the combined kink fit result");
+                      "The fourth bit of the flag of the combined kink fit result");
     REGISTER_VARIABLE("kinkSplitTrackDistanceAtVertexFlag", kinkSplitTrackDistanceAtVertexFlag,
                       "Flag showing if the split kink failed the distance criteria at the kink vertex");
     REGISTER_VARIABLE("kinkNumberOfReassignedHits", kinkNumberOfReassignedHits,
@@ -942,6 +942,5 @@ namespace Belle2 {
                       "Generated P of the kink mother at the decay vertex for kinks created from two separate tracks");
     REGISTER_VARIABLE("kinkMotherMCEAtDV", kinkPairMotherMCEAtDecayVertex,
                       "Generated E of the kink mother at the decay vertex for kinks created from two separate tracks");
-
   }
 }

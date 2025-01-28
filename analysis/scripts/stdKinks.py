@@ -13,11 +13,11 @@ import modularAnalysis as ma
 
 def stdKKinks(path=None, writeOut=False, daughter='pi+'):
     """
-    Load a list of the Kaon kinks from Kink objects using only kinks created from track pairs (Filter 1 and 2).
-    Kaon to muon and kaon to pion decays hard to distinguish, so they are both saved by default.
+    Load a list of kaon kinks from Kink objects using only kinks created from track pairs (Filter 1 and 2).
+    Kaon to muon and kaon to pion decays are hard to distinguish, so they are both saved by default.
 
     The ParticleList is named ``K+:kinks``. A simple clone suppression is applied based on the
-    combined fit result flag. Loose kinemtic cuts to suppress pion decays :math:`pPimu > 0.05~GeV` and
+    combined fit result flag. Loose kinematic cuts to suppress pion decays :math:`pPimu > 0.05~GeV` and
     muon decays :math:`pPemu > 0.07~GeV` are applied. In addition, events with wrong kinematics are discarded
     :math:`pKpi < 0.3~GeV`.
 
@@ -41,10 +41,10 @@ def stdKKinks(path=None, writeOut=False, daughter='pi+'):
 
 def stdPiKinks(path=None, writeOut=False, daughter='mu+'):
     """
-    Load a list of the Pion kinks from Kink objects using only kinks created from track pairs (Filter 1 and 2).
+    Load a list of pion kinks from Kink objects using only kinks created from track pairs (Filter 1 and 2).
 
     The ParticleList is named ``pi+:kinks``. A simple clone suppression is applied based on the
-    combined fit result flag. Loose kinemtic cut to suppress other decays is applied :math:`pPimu < 0.1~GeV`.
+    combined fit result flag. Loose kinematic cut to suppress other decays is applied :math:`pPimu < 0.1~GeV`.
 
     Parameters:
         path (basf2.Path): the path to load the modules
@@ -64,11 +64,11 @@ def stdPiKinks(path=None, writeOut=False, daughter='mu+'):
 
 def stdMuKinks(path=None, writeOut=False, daughter='e+'):
     """
-    Load a list of the Muon kinks from Kink objects using only kinks created from track pairs (Filter 1 and 2).
+    Load a list of muon kinks from Kink objects using only kinks created from track pairs (Filter 1 and 2).
 
     The ParticleList is named ``mu+:kinks``. A simple clone suppression is applied based on the
-    combined fit result flag. Loose kinemtic cuts to suppress pion decays :math:`pPimu > 0.05~GeV` and
-    kaon decays :math:`pMue < 0.1~GeV` are applied/
+    combined fit result flag. Loose kinematic cuts to suppress pion decays :math:`pPimu > 0.05~GeV` and
+    kaon decays :math:`pMue < 0.1~GeV` are applied.
 
     Parameters:
         path (basf2.Path): the path to load the modules

@@ -113,6 +113,8 @@ class VariablesToTable(basf2.Module):
                 variables.std_vector(*self._variables)
             )
         ]
+        #: std::vector of variable names
+        self._std_varnames = variables.std_vector(*self._varnames)
         #: variable objects for each variable
         self._var_objects = [variables.variables.getVariable(n) for n in self._varnames]
 
@@ -221,11 +223,9 @@ class VariablesToTable(basf2.Module):
         buf["__candidate__"] = np.arange(len(buf))
 
         for row, p in zip(buf, self._plist):
-            for name, v in zip(self._varnames, self._var_objects):
-                # pyroot proxy not working with callables, we should fix this.
-                # For now we need to go back by name and call it.
-                # should be `row[v.name] = v.func(p)`
-                row[name] = variables.variables.evaluate(v.name, p)
+            values = variables.variables.evaluateVariables(self._std_varnames, p)
+            for name, value in zip(self._varnames, values):
+                row[name] = value
         return buf
 
     def fill_buffer(self):

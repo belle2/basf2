@@ -43,7 +43,6 @@ CalibrationAlgorithm::EResult CDCDedxHadBGAlgorithm::calibrate()
     std::string p = particles[i];
     auto tree = getObjectPtr<TTree>(Form("%s", p.data()));
     if (!tree) return c_NotEnoughData;
-    std::cout << "Entries:   " << p.data() << "   " << tree->GetEntries() << std::endl;
   }
 
   gSystem->Exec("mkdir -p plots/HadronPrep");
@@ -285,7 +284,7 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, std:
       if (svar == "nhit") {
         double res_cor = sgpar.cosPrediction(costh) * sgpar.ionzPrediction(dedx_cur) * timereso;
         int nhitBin = (int)((fabs(nhits) - lower) / nstep);
-        hdedx_var[nhitBin]->Fill((dedx_new - dedx_cur) / res_cor);
+        if (res_cor != 0) hdedx_var[nhitBin]->Fill((dedx_new - dedx_cur) / res_cor);
         sumvar[nhitBin] += nhits;
         sumsize[nhitBin] += 1;
       } else if (svar == "costh") {
@@ -293,7 +292,7 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, std:
         double res_cor = sgpar.nhitPrediction(nhits) * sgpar.ionzPrediction(dedx_cur) * timereso;
         int cosBin = (int)((costh - lower) / (upper - lower) * nbins);
 
-        hdedx_var[cosBin]->Fill((dedx_new - dedx_cur) / res_cor);
+        if (res_cor != 0) hdedx_var[cosBin]->Fill((dedx_new - dedx_cur) / res_cor);
 
         sumvar[cosBin] += costh;
         sumsize[cosBin] += 1;

@@ -313,7 +313,7 @@ void HadronPrep::plotGraph(std::string sname, std::string pdg)
   }
 
   // Plot the dE/dx means vs. cos(theta) for validation
-  TCanvas ctmp6("tmp6", "tmp6", 500, 500);
+  TCanvas ctmp6(Form("cdcdedx_costh_%s_%s", sname.data(), pdg.data()), "", 500, 500);
   ctmp6.SetGridy(1);
 
   TH1F base("base", "bla-bla", 25, 0, 1.0);

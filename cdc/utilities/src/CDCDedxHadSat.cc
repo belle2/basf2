@@ -52,7 +52,7 @@ double CDCDedxHadSat::D2I(double cosTheta, double D = 1) const
   double projection    = pow(absCosTheta, m_power) + m_delta;
 
   if (projection == 0) {
-    B2WARNING("Something wrong with dE/dx hadron ants!");
+    B2WARNING("Something wrong with dE/dx hadron constants!");
     return D;
   }
 
@@ -60,7 +60,7 @@ double CDCDedxHadSat::D2I(double cosTheta, double D = 1) const
   double numerator     = 1 + m_alpha * chargeDensity;
   double denominator   = 1 + m_gamma * chargeDensity;
   if (denominator == 0) {
-    B2WARNING("Something wrong with dE/dx hadron ants!");
+    B2WARNING("Something wrong with dE/dx hadron constants!");
     return D;
   }
   double I = D * m_ratio * numerator / denominator;
@@ -75,7 +75,7 @@ double CDCDedxHadSat::I2D(double cosTheta, double I = 1) const
   double projection  = pow(absCosTheta, m_power) + m_delta;
 
   if (projection == 0 || m_ratio == 0) {
-    B2WARNING("Something wrong with dE/dx hadron ants!");
+    B2WARNING("Something wrong with dE/dx hadron constants!");
     return I;
   }
   double a =  m_alpha / projection;
@@ -83,13 +83,13 @@ double CDCDedxHadSat::I2D(double cosTheta, double I = 1) const
   double c = -1.0 * I / m_ratio;
 
   if (b == 0 && a == 0) {
-    B2WARNING("both a and b coefficiants for hadron correction are 0");
+    B2WARNING("both a and b coefficients for hadron correction are 0");
     return I;
   }
 
   double discr = b * b - 4.0 * a * c;
   if (discr < 0) {
-    B2WARNING("negative discriminant; return uncorrectecd value");
+    B2WARNING("negative discriminant; return uncorrected value");
     return I;
   }
 
@@ -98,7 +98,7 @@ double CDCDedxHadSat::I2D(double cosTheta, double I = 1) const
     B2WARNING("D is less 0! will try another solution");
     D = (a != 0) ? (-b - sqrt(discr)) / (2.0 * a) : -c / b;
     if (D < 0) {
-      B2WARNING("D is still less 0! just return uncorrectecd value");
+      B2WARNING("D is still less 0! just return uncorrected value");
       return I;
     }
   }
@@ -146,13 +146,13 @@ CDCDedxHadSat::I2D(double cosTheta, double I, double alpha, double gamma, double
   double c = -1.0 * I / ratio;
 
   if (b == 0 && a == 0) {
-    B2INFO("\t HadronSaturation: both a and b coefficiants for hadron correction are 0");
+    B2INFO("\t HadronSaturation: both a and b coefficients for hadron correction are 0");
     return I;
   }
 
   double discr = b * b - 4.0 * a * c;
   if (discr < 0) {
-    B2INFO("negative discriminant; return uncorrectecd value");
+    B2INFO("negative discriminant; return uncorrected value");
     return I;
   }
 
@@ -162,7 +162,7 @@ CDCDedxHadSat::I2D(double cosTheta, double I, double alpha, double gamma, double
     B2INFO("D is less 0! will try another solution");
     D = (a != 0) ? (-b - sqrt(discr)) / (2.0 * a) : -c / b;
     if (D < 0) {
-      B2INFO("D is still less 0! just return uncorrectecd value");
+      B2INFO("D is still less 0! just return uncorrected value");
       return I;
     }
   }

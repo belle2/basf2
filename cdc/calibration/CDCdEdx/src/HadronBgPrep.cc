@@ -163,7 +163,7 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
 
     double ionz_res = sbg.cosPrediction(costh) * sbg.nhitPrediction(nhit) * timereso;
 
-    hionzsigma_bg[bgBin]->Fill((dedx_new - dedx_cur) / ionz_res);
+    if (ionz_res != 0) hionzsigma_bg[bgBin]->Fill((dedx_new - dedx_cur) / ionz_res);
 
     m_sumcos[bgBin] += costh;
     m_sumbg[bgBin] += bg;

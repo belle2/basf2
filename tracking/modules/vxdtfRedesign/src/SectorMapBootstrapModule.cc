@@ -206,8 +206,10 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1point2.pTmax = 6.0; // minimal relevant version // Feb18-onePass-Test
   config1point2.pTSmear = 0.;
   config1point2.allowedLayers = {0, 1, 2, 3, 4, 5, 6, 7};
-  config1point2.uSectorDivider = { .3, .7, 1.}; // standard relevant version
-  config1point2.vSectorDivider = { .3, .7, 1.}; // standard relevant version
+  // config1point2.uSectorDivider = { .3, .7, 1.}; // standard relevant version
+  // config1point2.vSectorDivider = { .3, .7, 1.}; // standard relevant version
+  config1point2.uSectorDivider = { 1.}; // standard relevant version
+  config1point2.vSectorDivider = { 1.}; // standard relevant version
   config1point2.pdgCodesAllowed = {};
   config1point2.seedMaxDist2IPXY = 23.5;
   config1point2.seedMaxDist2IPZ = 23.5;

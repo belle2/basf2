@@ -11,6 +11,8 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
+#include <analysis/variables/KinkVariables.h>
+
 #include <mdst/dataobjects/Kink.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -96,7 +98,7 @@ namespace {
       myKinkMuon->writeExtraInfo("kinkDaughterPDGCode", Const::electron.getPDGCode());
 
       myKinks.appendNew(std::make_pair(muonTrack, std::make_pair(myMotherTrackFitResult, myMotherTrackFitResult)),
-                        std::make_pair(electronTrack, myDaughterTrackFitResult), 1, 1, 2, 11500);
+                        std::make_pair(electronTrack, myDaughterTrackFitResult), 1, 1, 2, 11100);
 
       auto* true_muon = myMCParticles.appendNew(MCParticle());
       true_muon->setPDG(Const::muon.getPDGCode());
@@ -114,6 +116,34 @@ namespace {
       DataStore::Instance().reset();
     }
   };
+
+  /*
+   * Test kink vertex variables
+   */
+  TEST_F(KinkVariablesTest, KinkVertex)
+  {
+    StoreArray<Particle> myParticles{};
+    auto part = myParticles[1];
+
+    EXPECT_FLOAT_EQ(kinkVertexX(part), 1);
+    EXPECT_FLOAT_EQ(kinkVertexY(part), 1);
+    EXPECT_FLOAT_EQ(kinkVertexZ(part), 2);
+  }
+
+  /*
+   * Test kink flag variables
+   */
+  TEST_F(KinkVariablesTest, KinkFlag)
+  {
+    StoreArray<Particle> myParticles{};
+    auto part = myParticles[1];
+
+    EXPECT_FLOAT_EQ(kinkCombinedFitResultFlag(part), 10);
+    EXPECT_FLOAT_EQ(kinkCombinedFitResultFlagBit1(part), 0);
+    EXPECT_FLOAT_EQ(kinkCombinedFitResultFlagBit2(part), 2);
+    EXPECT_FLOAT_EQ(kinkCombinedFitResultFlagBit3(part), 0);
+    EXPECT_FLOAT_EQ(kinkCombinedFitResultFlagBit4(part), 8);
+  }
 
   /*
    * Test KinkDaughterTrack variables

@@ -715,7 +715,7 @@ namespace Belle2 {
 
     // Kink from track pair mother MC variables
 
-    Manager::FunctionPtr kinkMotherMC(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr kinkPairMotherMC(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
@@ -743,7 +743,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function kinkMotherMC");
+        B2FATAL("Wrong number of arguments for meta function kinkPairMotherMC");
       }
     }
 
@@ -928,7 +928,7 @@ namespace Belle2 {
                           "Returns MC variable for the kink daughter for kinks created from two separate tracks", Manager::VariableDataType::c_double);
 
     // Kink from track pair mother MC variables
-    REGISTER_METAVARIABLE("kinkMotherMC(variable)", kinkMotherMC,
+    REGISTER_METAVARIABLE("kinkPairMotherMC(variable)", kinkPairMotherMC,
                           "Returns MC variable for the kink mother for kinks created from two separate tracks", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("kinkMotherMCPXAtDV", kinkPairMotherMCPXAtDecayVertex,
                       "Generated PX of the kink mother at the decay vertex for kinks created from two separate tracks");

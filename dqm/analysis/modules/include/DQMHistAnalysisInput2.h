@@ -111,8 +111,11 @@ namespace Belle2 {
     time_t m_last_content_update{};
     /** Last time input file changes */
     std::filesystem::file_time_type m_lasttime;
-    /** enforce a content change on next event */
-    bool m_forceChanged{false};
+
+    /** last run */
+    int m_lastRun{-1};
+    /** last exp */
+    int m_lastExp{-1};
   };
 } // end namespace Belle2
 

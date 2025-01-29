@@ -231,9 +231,17 @@ void DQMHistAnalysisInput2Module::event()
   setRunType(rtype);
   ExtractNEvent(inputHistList);
 
+  if (m_lastRun != m_runno or m_lastExp != m_expno) {
+    // Run change detected
+    m_lastRun = m_runno;
+    m_lastExp = m_expno;
+    // we cannot do that in beginRun(), otherwise all histos are cleare before first event
+    clearHistList();
+    resetDeltaList();
+  }
+
   // this code must be run after "event processed" has been extracted
-  bool anyupdate = m_forceChanged; // flag if any histogram updated at all
-  m_forceChanged = false;
+  bool anyupdate = false; // flag if any histogram updated at all
   for (auto& h : inputHistList) {
     anyupdate |= addHist("", h->GetName(), h);
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());

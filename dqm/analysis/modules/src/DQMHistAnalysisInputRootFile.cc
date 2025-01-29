@@ -300,10 +300,10 @@ void DQMHistAnalysisInputRootFileModule::event()
   m_eventMetaDataPtr->setEvent(m_count);
   m_eventMetaDataPtr->setTime(ts * 1e9);
 
-  //setExpNr(m_expno); // redundant access from MetaData
-  //setRunNr(m_runno); // redundant access from MetaData
-  ExtractRunType(inputHistList);
-  ExtractNEvent(inputHistList);
+  if (m_runType == "") ExtractRunType(inputHistList);
+  else setRunType(m_runType);
+  if (m_fillNEvent <= 0) ExtractNEvent(inputHistList);
+  else setEventProcessed(m_fillNEvent);
 
   if (m_lastRun != runno or m_lastExp != expno) {
     // Run change detected

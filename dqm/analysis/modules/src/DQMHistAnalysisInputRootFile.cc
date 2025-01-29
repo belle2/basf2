@@ -39,9 +39,9 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   addParam("FileList", m_fileList, "List of input files", std::vector<std::string> {"input_histo.root"});
   addParam("SelectHistograms", m_histograms, "List of histogram name patterns, empty for all. Support wildcard matching (* and ?).",
            std::vector<std::string>());
-  addParam("EventsList", m_eventsList, "Number of events for each run", std::vector<unsigned int>());
-  addParam("Experiment", m_expno, "Experiment Nr override", 0u);
-  addParam("RunList", m_runList, "Run Number List", std::vector<unsigned int>());
+  addParam("EventsList", m_eventsList, "Number of events for each run", std::vector<int>());
+  addParam("Experiment", m_expno, "Experiment Nr override", 0);
+  addParam("RunList", m_runList, "Run Number List", std::vector<int>());
   addParam("RunType", m_runType, "Run Type override", std::string(""));
   addParam("FillNEvent", m_fillNEvent, "NEvent override", 0);
   addParam("EventInterval", m_interval, "Time between events (seconds)", 20u);
@@ -55,7 +55,7 @@ void DQMHistAnalysisInputRootFileModule::initialize()
 {
   if (m_fileList.size() == 0) B2FATAL("File list is empty.");
   if (m_eventsList.size() == 0) {
-    m_eventsList.resize(m_fileList.size(), 3); // default three events per file
+    m_eventsList.resize(m_fileList.size(), 1); // default one events per file
   }
   if (m_fileList.size() != m_eventsList.size()) B2ERROR("File list does not have the same size as events list.");
   if (m_runList.size() != 0 and m_runList.size() != m_fileList.size()) B2ERROR("Run list does not have the same size as file list.");
@@ -129,7 +129,7 @@ void DQMHistAnalysisInputRootFileModule::addToHistList(std::vector<TH1*>& hs, st
   }
 
   bool hpass = false;
-  if (m_histograms.size() == 0) {
+  if (m_histograms.size() == 0) {// workaround for run info???
     hpass = true;
   } else {
     for (auto& hpattern : m_histograms) {
@@ -168,7 +168,13 @@ void DQMHistAnalysisInputRootFileModule::event()
   B2INFO("DQMHistAnalysisInputRootFile: event called.");
   TH1::AddDirectory(false);
 
-  sleep(m_interval);
+  if (m_count == 0) {
+    // special handling for 1 event to get proper max scaling
+    if (m_eventsList[m_run_idx] == 1) m_count++;
+    else m_eventsList[m_run_idx]--;
+  } else {
+    sleep(m_interval);
+  }
 
   // Check for run change
   if (m_count > m_eventsList[m_run_idx]) {

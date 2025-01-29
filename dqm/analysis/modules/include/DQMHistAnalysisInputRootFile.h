@@ -82,9 +82,9 @@ namespace Belle2 {
     std::vector<std::string> m_histograms;
 
     /** Exp number */
-    unsigned int m_expno = 0;
+    int m_expno = 0;
     /** Event number */
-    unsigned int m_count = 0;
+    int m_count = 0;
 
     /** Run Type Override*/
     std::string m_runType;
@@ -96,10 +96,10 @@ namespace Belle2 {
      * This is the number of issued update events for testing,
      * not the number of events from which histograms were filled
      */
-    std::vector<unsigned int> m_eventsList;
+    std::vector<int> m_eventsList;
 
     /** List of runs. */
-    std::vector<unsigned int> m_runList;
+    std::vector<int> m_runList;
 
     /** Time between two events in second. */
     unsigned int m_interval = 0;
@@ -120,6 +120,11 @@ namespace Belle2 {
     TH1F* m_h_rtype{nullptr};
     /** emulated histogram from daq, nevent */
     TH1F* m_h_fillNEvent{nullptr};
+
+    /** last run */
+    int m_lastRun{-1};
+    /** last exp */
+    int m_lastExp{-1};
   };
 } // end namespace Belle2
 

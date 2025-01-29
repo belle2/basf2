@@ -283,7 +283,9 @@ void DQMHistAnalysisInputRootFileModule::event()
     }
     if (std::string(h->GetName()) == std::string("DAQ/Nevent")) {
       if (m_fillNEvent > 0) {
-        h->SetEntries(m_fillNEvent);
+        Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
+        h->Scale(scale);
+        h->SetEntries(h->GetEntries()*scale); // empty hists are not marked for update!
       }
     }
   }

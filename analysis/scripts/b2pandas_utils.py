@@ -113,14 +113,14 @@ class VariablesToTable(basf2.Module):
                 variables.std_vector(*self._variables)
             )
         ]
+
         #: std::vector of variable names
         self._std_varnames = variables.std_vector(*self._varnames)
-        #: variable objects for each variable
-        self._var_objects = [variables.variables.getVariable(n) for n in self._varnames]
 
         #: Event metadata
         self._evtmeta = ROOT.Belle2.PyStoreObj("EventMetaData")
         self._evtmeta.isRequired()
+
         #: Pointer to the particle list
         self._plist = ROOT.Belle2.PyStoreObj(self._listname)
         self._plist.isRequired()

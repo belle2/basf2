@@ -44,15 +44,17 @@ f.cd("..")
 f.Write()
 f.Close()
 
-Belle2.Environment.Instance().setNumberEventsOverride(3)
+Belle2.Environment.Instance().setNumberEventsOverride(1)
 
 main = b2.create_path()
+emptypath = b2.create_path()
 
 dqminput = b2.register_module('DQMHistAnalysisInput2')
 dqminput.param('HistMemoryPath', filein)
 dqminput.param('RefreshInterval', 0)
 dqminput.param('StatFileName', statfile)
 dqminput.param("EnableRunInfo", True)
+dqminput.if_false(emptypath)
 main.add_module(dqminput)
 
 main.add_module("DQMHistAutoCanvas")

@@ -107,11 +107,10 @@ bool DQMHistAnalysisInputRootFileModule::hnamePatternMatch(std::string pattern, 
 void DQMHistAnalysisInputRootFileModule::beginRun()
 {
   B2INFO("DQMHistAnalysisInputRootFile: beginRun called.");
-  clearHistList();
   clearRefList();
 }
 
-void DQMHistAnalysisInputRootFileModule::addToHistList(std::vector<TH1*>& hs, std::string dirname, TKey* key)
+void DQMHistAnalysisInputRootFileModule::addToHistList(std::vector<TH1*>& inputHistList, std::string dirname, TKey* key)
 {
   TH1* h = (TH1*)key->ReadObj();
   if (h == nullptr) return; // would be strange, but better check
@@ -159,8 +158,8 @@ void DQMHistAnalysisInputRootFileModule::addToHistList(std::vector<TH1*>& hs, st
   h->Scale(scale);
   h->SetEntries(h->GetEntries()*scale); // empty hists are not marked for update!
 
-  // Histograms in the hs list will be taken care of later (delete)
-  hs.push_back(h);
+  // Histograms in the inputHistList list will be taken care of later (delete)
+  inputHistList.push_back(h);
 }
 
 void DQMHistAnalysisInputRootFileModule::event()
@@ -215,7 +214,9 @@ void DQMHistAnalysisInputRootFileModule::event()
     return;
   }
 
-  std::vector<TH1*> hs;
+  /** Input vector for histograms */
+  std::vector<TH1*> inputHistList;
+
   unsigned long long int ts = 0;
   m_file->cd();
   TIter next(m_file->GetListOfKeys());
@@ -234,11 +235,11 @@ void DQMHistAnalysisInputRootFileModule::event()
       while ((dkey = (TKey*)nextd())) {
         TClass* dcl = gROOT->GetClass(dkey->GetClassName());
         if (!dcl->InheritsFrom("TH1")) continue;
-        addToHistList(hs, dirname, dkey);
+        addToHistList(inputHistList, dirname, dkey);
       }
       m_file->cd();
     } else if (cl->InheritsFrom("TH1")) {
-      addToHistList(hs, "", key);
+      addToHistList(inputHistList, "", key);
     }
   }
 
@@ -248,17 +249,17 @@ void DQMHistAnalysisInputRootFileModule::event()
 
   if (m_add_runcontrol_hist) {
     m_h_expno->SetTitle(std::to_string(expno).c_str());
-    hs.push_back((TH1*)(m_h_expno->Clone()));
+    inputHistList.push_back((TH1*)(m_h_expno->Clone()));
     m_h_runno->SetTitle(std::to_string(runno).c_str());
-    hs.push_back((TH1*)(m_h_runno->Clone()));
+    inputHistList.push_back((TH1*)(m_h_runno->Clone()));
     m_h_rtype->SetTitle(rtype.c_str());
-    hs.push_back((TH1*)(m_h_rtype->Clone()));
+    inputHistList.push_back((TH1*)(m_h_rtype->Clone()));
   }
   if (m_fillNEvent > 0) {
-    hs.push_back((TH1*)(m_h_fillNEvent->Clone()));
+    inputHistList.push_back((TH1*)(m_h_fillNEvent->Clone()));
   }
   // check for no-override
-  for (auto& h : hs) {
+  for (auto& h : inputHistList) {
     if (std::string(h->GetName()) == std::string("DQMInfo/expno")) {
       if (expno == 0) {
         expno = atoi(h->GetTitle());
@@ -299,12 +300,20 @@ void DQMHistAnalysisInputRootFileModule::event()
 
   //setExpNr(m_expno); // redundant access from MetaData
   //setRunNr(m_runno); // redundant access from MetaData
-  ExtractRunType(hs);
-  ExtractNEvent(hs);
+  ExtractRunType(inputHistList);
+  ExtractNEvent(inputHistList);
+
+  if (m_lastRun != runno or m_lastExp != expno) {
+    // Run change detected
+    m_lastRun = runno;
+    m_lastExp = expno;
+    // we cannot do that in beginRun(), otherwise all histos are cleare before first event
+    clearHistList();
+  }
 
   // this code must be run after "event processed" has been extracted
-  for (size_t i = 0; i < hs.size(); i++) {
-    TH1* h = hs[i];
+  for (size_t i = 0; i < inputHistList.size(); i++) {
+    TH1* h = inputHistList[i];
     addHist("", h->GetName(), h);
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
   }

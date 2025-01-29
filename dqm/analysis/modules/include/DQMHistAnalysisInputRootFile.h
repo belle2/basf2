@@ -53,7 +53,7 @@ namespace Belle2 {
     /**
      * Read histogram from key and add to list vector
      */
-    void addToHistList(std::vector<TH1*>& hs, std::string dirname, TKey* key);
+    void addToHistList(std::vector<TH1*>& inputHistList, std::string dirname, TKey* key);
 
     /**
      * Pattern match for histogram name

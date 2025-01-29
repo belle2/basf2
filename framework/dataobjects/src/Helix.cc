@@ -610,7 +610,7 @@ void Helix::setCartesian(const ROOT::Math::XYZVector& position,
   const double omega = charge * ptinv / alpha;
   const double tanLambda = ptinv * pz;
   const double phi0 = atan2(py, px);
-  const double z0 = 0;
+  const double z0 = z;
   const double d0 = 0;
 
   m_omega = omega;
@@ -619,7 +619,7 @@ void Helix::setCartesian(const ROOT::Math::XYZVector& position,
   m_tanLambda = tanLambda;
   m_z0 = z0;
 
-  passiveMoveBy(-x, -y, -z);
+  passiveMoveBy(-x, -y, 0);
 }
 
 namespace Belle2 {

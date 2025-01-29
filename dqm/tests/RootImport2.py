@@ -26,15 +26,11 @@ f.cd("DQMInfo")
 h_expno = TH1F("expno", "1", 1, 0, 1)
 h_runno = TH1F("runno", "1", 1, 0, 1)
 h_rtype = TH1F("rtype", "null", 1, 0, 1)
-h_expno.Write()
-h_runno.Write()
-h_rtype.Write()
 f.cd("..")
 
 f.mkdir("TEST")
 f.cd("TEST")
 h_test = TH1F("test", "", 1, 0, 1)
-h_test.Write()
 f.cd("..")
 
 f.mkdir("DAQ")
@@ -42,7 +38,6 @@ f.cd("DAQ")
 h_nevent = TH1F("Nevent", "", 1, 0, 1)
 for n in range(0, 10):
     h_nevent.Fill(n)
-h_nevent.Write()
 f.cd("..")
 
 f.Write()

@@ -28,11 +28,6 @@ h_test = TH1F("TEST/test", "", 1, 0, 1)
 h_nevent = TH1F("DAQ/Nevent", "", 1, 0, 1)
 for n in range(0, 10):
     h_nevent.Fill(n)
-h_expno.Write()
-h_runno.Write()
-h_rtype.Write()
-h_test.Write()
-h_nevent.Write()
 
 f.Write()
 f.Close()

@@ -24,7 +24,6 @@ f = TFile(filein, "RECREATE")
 f.mkdir("TEST")
 f.cd("TEST")
 h_test = TH1F("test", "", 1, 0, 1)
-h_test.Write()
 
 f.Write()
 f.Close()

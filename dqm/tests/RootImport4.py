@@ -22,7 +22,6 @@ fileout = 'histout4.root'
 f = TFile(filein, "RECREATE")
 
 h_test = TH1F("TEST/test", "", 1, 0, 1)
-h_test.Write()
 
 f.Write()
 f.Close()

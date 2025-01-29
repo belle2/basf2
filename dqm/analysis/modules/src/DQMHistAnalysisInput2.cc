@@ -53,22 +53,20 @@ void DQMHistAnalysisInput2Module::initialize()
 void DQMHistAnalysisInput2Module::beginRun()
 {
   B2DEBUG(1, "DQMHistAnalysisInput2: beginRun called.");
-  clearHistList();
   clearRefList();
-  resetDeltaList();
   clearCanvases();
 
   m_last_beginrun = time(0);
   write_state();
   m_lasttime -= std::chrono::seconds(1); // just change
-  m_forceChanged = true;
 }
 
-void DQMHistAnalysisInput2Module::addToHistList(std::vector<TH1*>& hs, std::string dirname, TKey* key)
+void DQMHistAnalysisInput2Module::addToHistList(std::vector<TH1*>& inputHistList, std::string dirname, TKey* key)
 {
   TH1* h = (TH1*)key->ReadObj();
   if (h == nullptr) return; // would be strange, but better check
   std::string hname = h->GetName();
+
   if (hname.find("/") == std::string::npos) {
     if (dirname != "") {
       hname = dirname + "/" + hname;
@@ -90,8 +88,8 @@ void DQMHistAnalysisInput2Module::addToHistList(std::vector<TH1*>& hs, std::stri
   h->SetName(a);
   B2DEBUG(1, "DQMHistAnalysisInput2: get histo " << a.Data());
 
-  // Histograms in the hs list will be taken care of later (delete)
-  hs.push_back(h);
+  // Histograms in the inputHistList list will be taken care of later (delete)
+  inputHistList.push_back(h);
 }
 
 void DQMHistAnalysisInput2Module::event()
@@ -153,7 +151,8 @@ void DQMHistAnalysisInput2Module::event()
   // update number of processed events
   m_nevent = getEventProcessed();
 
-  std::vector<TH1*> hs; // temporary histograms storage vector
+  /** Input vector for histograms */
+  std::vector<TH1*> inputHistList;
 
   // first check sub-directories
   pFile->cd();
@@ -172,15 +171,15 @@ void DQMHistAnalysisInput2Module::event()
       while ((dkey = (TKey*)nextd())) {
         TClass* dcl = gROOT->GetClass(dkey->GetClassName());
         if (!dcl->InheritsFrom("TH1")) continue;
-        addToHistList(hs, dirname, dkey);
+        addToHistList(inputHistList, dirname, dkey);
       }
       pFile->cd();
     } else if (cl->InheritsFrom("TH1")) {
-      addToHistList(hs, "", key);
+      addToHistList(inputHistList, "", key);
     }
   }
 
-  for (auto& h : hs) {
+  for (auto& h : inputHistList) {
     if (std::string(h->GetName()) == std::string("DQMInfo/expno")) expno = h->GetTitle();
     if (std::string(h->GetName()) == std::string("DQMInfo/runno")) runno = h->GetTitle();
     if (std::string(h->GetName()) == std::string("DQMInfo/rtype")) rtype = h->GetTitle();
@@ -206,7 +205,7 @@ void DQMHistAnalysisInput2Module::event()
     B2WARNING("DQMHistAnalysisInput2: " << m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
               mmt.AsString());
     setReturnValue(false);
-    for (auto& h : hs)  delete h;
+    for (auto& h : inputHistList)  delete h;
     return;
   } else {
     if (m_c_info != NULL) m_c_info->SetTitle((m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Changed "
@@ -230,12 +229,12 @@ void DQMHistAnalysisInput2Module::event()
   //setRunNr(m_runno); // redundant access from MetaData
   // ExtractRunType();// Run Type is processed above already, just take it
   setRunType(rtype);
-  ExtractNEvent(hs);
+  ExtractNEvent(inputHistList);
 
   // this code must be run after "event processed" has been extracted
   bool anyupdate = m_forceChanged; // flag if any histogram updated at all
   m_forceChanged = false;
-  for (auto& h : hs) {
+  for (auto& h : inputHistList) {
     anyupdate |= addHist("", h->GetName(), h);
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
   }

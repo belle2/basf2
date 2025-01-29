@@ -137,6 +137,24 @@ namespace Belle2 {
       return curMCParticle->getArrayIndex();
     }
 
+    double genQ2PmPd(const Particle* part, const std::vector<double>& daughter_indices)
+    {
+      const MCParticle* mcparticle = part->getMCParticle();
+      if (!mcparticle) return Const::doubleNaN;
+
+      auto daughters = mcparticle->getDaughters();
+
+      ROOT::Math::PxPyPzEVector  p4Daughters;
+      for (auto& double_daughter : daughter_indices) {
+        unsigned long daughter = std::lround(double_daughter);
+        if (daughter >= daughters.size()) return Const::doubleNaN;
+
+        p4Daughters += daughters[daughter]->get4Vector();
+      }
+      auto p4Mother = mcparticle->get4Vector();
+      return (p4Mother - p4Daughters).mag2();
+    }
+
     double genMotherPDG(const Particle* part)
     {
       return genNthMotherPDG(part, {});
@@ -541,6 +559,26 @@ namespace Belle2 {
       return tauDecay->getTauMinusMcProng();
     }
 
+    double tauPlusEgstar(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return 0;
+      }
+      return tauDecay->getTauPlusEgstar();
+    }
+
+    double tauMinusEgstar(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return 0;
+      }
+      return tauDecay->getTauMinusEgstar();
+    }
+
     double isReconstructible(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
@@ -563,6 +601,10 @@ namespace Belle2 {
       Track* tmp_track = tmp_mcP->getRelated<Track>();
       if (tmp_track) {
         const TrackFitResult* tmp_tfr = tmp_track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(tmp_mcP->getPDG())));
+        if (!tmp_tfr) {
+          // p value of TrackFitResult is NaN so cannot check charge
+          return 0;
+        }
         if (tmp_tfr->getChargeSign()*tmp_mcP->getCharge() > 0)
           return 1;
         else
@@ -822,6 +864,72 @@ namespace Belle2 {
       return weightsum;
     }
 
+    // Helper function for particleClusterTotalMCMatchWeightForKlong
+    void getKlongWeightMap(const Particle* particle, std::map<int, double>& mapMCParticleIndxAndWeight)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+
+      for (unsigned int i = 0; i < mcps.size(); ++i) {
+        double weight = mcps.weight(i);
+        const MCParticle* mcp = mcps[i];
+
+        while (mcp) {
+          if (mcp->getPDG() == 130) {
+            int index = mcp->getArrayIndex();
+            if (mapMCParticleIndxAndWeight.find(index) != mapMCParticleIndxAndWeight.end()) {
+              mapMCParticleIndxAndWeight.at(index) = mapMCParticleIndxAndWeight.at(index) + weight;
+            } else {
+              mapMCParticleIndxAndWeight.insert({index, weight});
+            }
+            break;
+          } else {
+            mcp = mcp->getMother();
+          }
+        }
+      }
+    }
+
+    double particleClusterTotalMCMatchWeightForKlong(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return Const::doubleNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return Const::doubleNaN;
+
+      std::map<int, double> mapMCParticleIndxAndWeight;
+      getKlongWeightMap(particle, mapMCParticleIndxAndWeight);
+
+      double totalWeight = 0;
+      for (const auto& map : mapMCParticleIndxAndWeight) {
+        totalWeight += map.second;
+      }
+
+      return totalWeight;
+    }
+
+    double particleClusterTotalMCMatchWeightForBestKlong(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return Const::doubleNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return Const::doubleNaN;
+
+      std::map<int, double> mapMCParticleIndxAndWeight;
+      getKlongWeightMap(particle, mapMCParticleIndxAndWeight);
+
+      if (mapMCParticleIndxAndWeight.size() == 0)
+        return 0.0;
+
+      auto maxMap = std::max_element(mapMCParticleIndxAndWeight.begin(), mapMCParticleIndxAndWeight.end(),
+      [](const auto & x, const auto & y) { return x.second < y.second; }
+                                    );
+
+      return maxMap->second;
+    }
+
     double isBBCrossfeed(const Particle* particle)
     {
       if (particle == nullptr)
@@ -860,6 +968,22 @@ namespace Belle2 {
         return 1;
     }
 
+    int ancestorBIndex(const Particle* particle)
+    {
+      const MCParticle* mcpart = particle->getMCParticle();
+
+      while (mcpart) {
+        int pdg = std::abs(mcpart->getPDG());
+
+        if ((pdg == 521) || (pdg == 511))
+          return mcpart->getArrayIndex();
+
+        mcpart = mcpart->getMother();
+      }
+
+      return -1;
+    }
+
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found. \n"
@@ -877,6 +1001,18 @@ namespace Belle2 {
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
                       "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.  :noindex:");
 
+    REGISTER_VARIABLE("genQ2PmPd(i,j,...)", genQ2PmPd, R"DOC(
+                       Returns the generated four momentum transfer squared :math:`q^2` calculated as :math:`q^2 = (p_m - p_{d_i} - p_{d_j} - ...)^2`.
+
+                       Here :math:`p_m` is the four momentum of the given (mother) particle,
+                       and :math:`p_{d_{i,j,...}}` are the daughter particles with indices given as arguments .
+                       The ordering of daughters is as defined in the DECAY.DEC file used in the generation, with the numbering starting at :math:`N=0`.
+
+                       Returns NaN if no related MCParticle could be found.
+                       Returns NaN if any of the given indices is larger than the number of daughters of the given particle.
+
+                       )DOC", ":math:`[\\text{GeV}/\\text{c}]^2`");
+
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
                       "Check the array index of a particles generated mother");
     REGISTER_VARIABLE("genMotherID(i)", genNthMotherIndex,
@@ -886,6 +1022,8 @@ namespace Belle2 {
     // variable in sphinx
     REGISTER_VARIABLE("isBBCrossfeed", isBBCrossfeed,
                       "Returns 1 for crossfeed in reconstruction of given B meson, 0 for no crossfeed and NaN for no true B meson or failed truthmatching.");
+    REGISTER_VARIABLE("ancestorBIndex", ancestorBIndex,
+                      "Returns array index of B ancestor, or -1 if no B or no MC-matching is found.");
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle\n\n", "GeV/c");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
@@ -1078,6 +1216,10 @@ List of possible values (taken from the Geant4 source of
                       "[Eventbased] Prong for the positive tau lepton in a tau pair generated event.");
     REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
                       "[Eventbased] Prong for the negative tau lepton in a tau pair generated event.");
+    REGISTER_VARIABLE("tauPlusEgstar", tauPlusEgstar,
+                      "[Eventbased] Energy of radiated gamma from positive tau lepton in a tau pair generated event.");
+    REGISTER_VARIABLE("tauMinusEgstar", tauMinusEgstar,
+                      "[Eventbased] Energy of radiated gamma from negative tau lepton in a tau pair generated event.");
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,
@@ -1085,7 +1227,7 @@ List of possible values (taken from the Geant4 source of
     REGISTER_VARIABLE("seenInPXD", seenInPXD,
                       "Returns 1.0 if the MC particle was seen in the PXD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("isTrackFound", isTrackFound,
-                      "works on charged stable particle list created from MCParticles, returns NaN if not ; returns 1.0 if there is a reconstructed track related to the charged stable MCParticle with the correct charge, return -1.0 if the reconstucted track has the wrong charge, return 0.0 when no reconstructed track is found.");
+                      "works on charged stable particle list created from MCParticles, returns NaN if not ; returns 1.0 if there is a reconstructed track related to the charged stable MCParticle with the correct charge, return -1.0 if the reconstructed track has the wrong charge, return 0.0 when no reconstructed track is found.");
     REGISTER_VARIABLE("seenInSVD", seenInSVD,
                       "Returns 1.0 if the MC particle was seen in the SVD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInCDC", seenInCDC,
@@ -1110,6 +1252,12 @@ List of possible values (taken from the Geant4 source of
                       "Returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
     REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight,
                       "Returns the sum of all weights of the ECLCluster -> MCParticles relations.");
+
+    REGISTER_VARIABLE("clusterTotalMCMatchWeightForKlong", particleClusterTotalMCMatchWeightForKlong,
+                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is a Klong or daughter of a Klong");
+    REGISTER_VARIABLE("clusterTotalMCMatchWeightForBestKlong", particleClusterTotalMCMatchWeightForBestKlong,
+                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is the same Klong or daughter of the Klong. If multiple MC Klongs are related to the ECLCluster, returns the sum of weights for the best matched Klong.");
+
 
   }
 }

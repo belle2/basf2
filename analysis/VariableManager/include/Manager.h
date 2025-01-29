@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <framework/logging/Logger.h>
 
 #include <string>
@@ -17,7 +16,6 @@
 #include <functional>
 #include <memory>
 #include <variant>
-#include <type_traits>
 
 namespace Belle2 {
   class Particle;

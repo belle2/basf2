@@ -50,14 +50,17 @@ def add_geometry_modules(path, components=None):
                         energyLossBrems=False, noiseBrems=False)
 
 
-def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=False):
+def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=False, create_intercepts_for_pxd_ckf=False):
     """
-    Helper fucntion to prepare the hit information to be used by tracking.
+    Helper function to prepare the hit information to be used by tracking.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param pxd_filtering_offline: PXD data reduction is performed after CDC and SVD tracking,
             so PXD reconstruction has to wait until the ROIs are calculated.
+    :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
+        for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
+        steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     """
 
     # Preparation of the SVD clusters
@@ -65,7 +68,7 @@ def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=Fal
         add_svd_reconstruction(path)
 
     # Preparation of the PXD clusters
-    if is_pxd_used(components) and not pxd_filtering_offline:
+    if is_pxd_used(components) and not pxd_filtering_offline and not create_intercepts_for_pxd_ckf:
         add_pxd_reconstruction(path)
 
 
@@ -213,7 +216,7 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
     """
     Match the tracks to the MC truth. The matching works based on
     the output of the TrackFinderMCTruthRecoTracks.
-    Alternativly one can use the Chi2MCTrackMatcher based on chi2 values
+    Alternatively one can use the Chi2MCTrackMatcher based on chi2 values
     calculated from the helixparameters of Tracks and MCParticles.
 
     :param path: The path to add the tracking reconstruction modules to
@@ -222,7 +225,7 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param split_after_delta_t: If positive, split MCRecoTrack into multiple MCRecoTracks if the time
-                                distance between two adjecent SimHits is more than the given value
+                                distance between two adjacent SimHits is more than the given value
     :param matching_method:     hit: uses the hit-matching
                                 chi2: uses the chi2-matching
     :param chi2_cutoffs:        If chi2 matching method is used, this list defines the individual cut-off values
@@ -277,7 +280,12 @@ def add_prune_tracks(path, components=None, reco_tracks="RecoTracks"):
     path.add_module("PruneGenfitTracks")
 
 
-def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", trackFitHypotheses=None):
+def add_flipping_of_recoTracks(
+        path,
+        fit_tracks=True,
+        reco_tracks="RecoTracks",
+        trackFitHypotheses=None,
+        reco_tracks_flipped="RecoTracks_flipped"):
     """
     This function adds the mva based selections and the flipping of the recoTracks
 
@@ -285,13 +293,13 @@ def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", 
     :param fit_tracks: fit the flipped recotracks or not
     :param reco_tracks: Name of the StoreArray where the reco tracks should be flipped
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param reco_tracks_flipped: Name of the temporary StoreArray for the flipped RecoTracks
     """
 
     path.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
                     identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
                     indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
 
-    reco_tracks_flipped = "RecoTracks_flipped"
     path.add_module("RecoTracksReverter", inputStoreArrayName=reco_tracks,
                     outputStoreArrayName=reco_tracks_flipped)
     if fit_tracks:
@@ -626,7 +634,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
            indicator property of the CDC ``output_reco_tracks``
     :param cdc_quality_estimator_weightfile: Weightfile identifier for the TFCDC_TrackQualityEstimator
     :param reattach_hits: if true, use the ReattachCDCWireHitsToRecoTracks module at the end of the CDC track finding
-                          to readd hits with bad ADC or TOT rejected by the TFCDC_WireHitPreparer module.
+                          to read hits with bad ADC or TOT rejected by the TFCDC_WireHitPreparer module.
     """
     # add EventLevelTrackinginfo for logging errors
     if 'RegisterEventLevelTrackingInfo' not in path:
@@ -637,7 +645,8 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                     wirePosition="aligned",
                     useSecondHits=use_second_hits,
                     flightTimeEstimation="outwards",
-                    filter="cuts_from_DB")
+                    filter="mva",
+                    filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
 
     # Constructs clusters
     path.add_module("TFCDC_ClusterPreparer",
@@ -729,7 +738,8 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     path.add_module("CDCHitBasedT0Extraction")
 
     # prepare mdst event level info
-    path.add_module("CDCTrackingEventLevelMdstInfoFiller")
+    path.add_module("CDCTrackingEventLevelMdstInfoFillerFromHits")
+    path.add_module("CDCTrackingEventLevelMdstInfoFillerFromSegments")
 
 
 def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", prune_temporary_tracks=True):
@@ -1148,7 +1158,7 @@ def add_svd_hough_tracking(path,
                     RecoTracksStoreArrayName=reco_tracks + suffix,
                     SVDSpacePointTrackCandsStoreArrayName=svd_space_point_track_candidates + suffix,
                     relationFilter='angleAndTime',
-                    twoHitUseNBestHits=4,
+                    twoHitUseNBestHits=2,
                     threeHitUseNBestHits=3,
                     fourHitUseNBestHits=3,
                     fiveHitUseNBestHits=2,

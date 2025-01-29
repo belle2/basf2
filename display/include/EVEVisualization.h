@@ -32,7 +32,6 @@
 
 #include <Math/Vector3D.h>
 #include <TEveStraightLineSet.h>
-#include <TVector3.h>
 #include <TEveTrack.h>
 
 #include <string>
@@ -288,7 +287,7 @@ namespace Belle2 {
       static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
       const ROOT::Math::XYZVector local_pos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
-      const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
+      const VXD::SensorInfoBase& sensor = geo.getSensorInfo(hit->getSensorID());
       const ROOT::Math::XYZVector global_pos = sensor.pointToGlobal(local_pos);
       lines->AddMarker(global_pos.X(), global_pos.Y(), global_pos.Z());
 

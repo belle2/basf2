@@ -38,7 +38,7 @@ namespace Belle2 {
      * * 0: if neither one of the accept cuts is true nor one of the reject cuts false ( = don't know) or
      * *    if one of the reject cuts is false ( = rejected)
      *
-     * In short: event accepted <=> (#true accept cuts > 0) && (#false reject cuts == 0)
+     * In short: event accepted <=> (\#true accept cuts > 0) && (\#false reject cuts == 0)
      *
      * Please note that the reject cuts override the accept cuts decision in this case!
      *
@@ -49,7 +49,7 @@ namespace Belle2 {
      *
      * Please note that the accept cuts override the reject cuts decision in this case!
      *
-     * In short: event accepted <=> (#true accept cuts > 0) || (#false reject cuts == 0)
+     * In short: event accepted <=> (\#true accept cuts > 0) || (\#false reject cuts == 0)
      *
      */
     class SoftwareTriggerModule : public Module {
@@ -110,7 +110,7 @@ namespace Belle2 {
       /// requiring all store arrays.
       void initializeCalculation();
 
-      /// Helper function to initliaze debug output creation by creating a TTree
+      /// Helper function to initialize debug output creation by creating a TTree
       /// and an object in the data store if needed.
       void initializeDebugOutput();
 

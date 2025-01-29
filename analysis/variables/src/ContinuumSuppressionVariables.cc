@@ -14,17 +14,10 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/ReferenceFrame.h>
-#include <analysis/ClusterUtility/ClusterUtils.h>
-#include <analysis/ContinuumSuppression/FoxWolfram.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/Conversion.h>
-
-#include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
 
 #include <cmath>
 

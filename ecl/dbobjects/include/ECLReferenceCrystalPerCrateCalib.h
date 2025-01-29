@@ -12,8 +12,8 @@
  * General database object to keep track of the reference crystals,       *
  * one for each crate.  This was Originally designed for                  *
  * determining which crystal to define as having a crystal time           *
- * calibration consant fixed to a specific value to ensure there are      *
- * no extra degrees of freedom with the combiation of crystal and crate   *
+ * calibration constant fixed to a specific value to ensure there are      *
+ * no extra degrees of freedom with the combination of crystal and crate   *
  * time calibration constants.                                            *
  *                                                                        *
  * 1 <= cell id <= 8736                                                   *

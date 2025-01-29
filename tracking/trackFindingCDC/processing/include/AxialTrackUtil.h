@@ -82,7 +82,7 @@ namespace Belle2 {
 
       /**
        *  Calculate the sum of right and left votes for the hits relative to the center.
-       *  Positive indicates a majority of right by that amout. Negative indicates a left majority.
+       *  Positive indicates a majority of right by that amount. Negative indicates a left majority.
        */
       static int getArmSignVote(const CDCTrack& track, const Vector2D& center);
 

@@ -13,19 +13,17 @@
 #include <beast/csi/geometry/CsiGeometryPar.h>
 
 // Basf2 headers
-#include <framework/core/RandomNumbers.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // ROOT headers
 #include <TGraph.h>
-#include <TH1F.h>
+#include <TH1.h>
 #include <TH1I.h>
-#include <TMath.h>
+#include <TRandom.h>
 #include <Math/Vector3D.h>
 
 // C++ headers
-#include <math.h>
 #include <vector>
 
 using namespace std;
@@ -415,7 +413,6 @@ double CsIDigitizerModule::genTimeSignal(Signal* _output, Signal _energies, Sign
 
   Signal Vanode   = firstOrderResponse(1.602e-10 * m_Zl * invdt * m_PmtGain[_iChannel], Qcathode, 0, _dt, m_tRisePMT, m_tTransitPMT);
 
-  i = 0;
   B2DEBUG(150, "Adding noise. Container length is " << Vanode.size());
   addNoise(&Vanode, m_noiseLevels[_iChannel], 5e-3 * gRandom->Rndm() + 1e-2);
 

@@ -25,8 +25,8 @@ int main(int argc, char* argv[])
   std::string ringBufferName;
   std::string shmName;
   unsigned int shmID;
-  bool raw;
-  bool repeat;
+  bool raw = false;
+  bool repeat = false;
   std::string file_name;
 
   po::options_description desc("b2hlt_file2rb FILE-NAME RING-BUFFER-NAME SHM-NAME SHM-ID");

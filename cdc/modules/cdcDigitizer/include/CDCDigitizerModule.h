@@ -22,9 +22,9 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
-#include <reconstruction/dbobjects/CDCDedxRunGain.h>
-#include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
-#include <reconstruction/dbobjects/CDCDedxWireGain.h>
+#include <cdc/dbobjects/CDCDedxRunGain.h>
+#include <cdc/dbobjects/CDCDedxScaleFactor.h>
+#include <cdc/dbobjects/CDCDedxWireGain.h>
 //#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 #include <cdc/dbobjects/CDCCrossTalkLibrary.h>
 #include <cdc/dbobjects/CDCCorrToThresholds.h>
@@ -110,16 +110,14 @@ namespace Belle2 {
     double getDriftTime(double driftLength, bool addTof, bool addDelay);
 
 
-    /** Function to make signals after shapers
+    /** Function to write ADC-count and conversion factor for threshold
      *
      *  @param wid wire id.
      *  @param edep energy deposit (GeV).
      *  @param dx step length (cm).
      *  @param costh cos(theta) of particle.
      *  @param adcCount ADC-count.
-     *  @param convFactorForThreshold conversin factor needed for threshold setting.
-     *
-     *  @return ADC-count and conversion factor for threshold.
+     *  @param convFactorForThreshold conversion factor needed for threshold setting.
      *
      */
     void makeSignalsAfterShapers(const WireID& wid, double edep, double dx, double costh, unsigned short& adcCount,
@@ -131,9 +129,9 @@ namespace Belle2 {
     /** Set FEE parameters (from DB) */
     void setFEElectronics();
 
-    /** Generate randum number according to Polya distribution
+    /** Generate random number according to Polya distribution
      *  @param xmax max of no. generated
-     *  @return randum no.
+     *  @return random no.
      */
     double Polya(double xmax = 10);
 
@@ -183,12 +181,12 @@ namespace Belle2 {
     std::string m_OptionalAllMCParticlesToHitsName;      /**< Relation name for optional matching of all MCParticles. */
 
     bool m_useSimpleDigitization;            /**< Use float Gaussian Smearing instead of proper digitization. */
-    //--- Paramters for simple digitization -------------------------------------------------------------------------------------
+    //--- Parameters for simple digitization -------------------------------------------------------------------------------------
     double m_fraction;          /**< Fraction of the first Gaussian used to smear drift length */
-    double m_mean1;             /**< Mean value of the first Gassian used to smear drift length */
-    double m_resolution1;       /**< Resolution of the first Gassian used to smear drift length */
-    double m_mean2;             /**< Mean value of the second Gassian used to smear drift length */
-    double m_resolution2;       /**< Resolution of the second Gassian used to smear drift length */
+    double m_mean1;             /**< Mean value of the first Gaussian used to smear drift length */
+    double m_resolution1;       /**< Resolution of the first Gaussian used to smear drift length */
+    double m_mean2;             /**< Mean value of the second Gaussian used to smear drift length */
+    double m_resolution2;       /**< Resolution of the second Gaussian used to smear drift length */
     double m_tdcThreshold4Outer; /**< TDC threshold for outer layers in unit of eV */
     double m_tdcThreshold4Inner; /**< TDC threshold for inner layers in unit of eV */
     int    m_eDepInGasMode;     /**< Mode for extracting dE(gas) from dE(gas+wire) */
@@ -227,10 +225,10 @@ namespace Belle2 {
     double m_addFudgeFactorForSigma; /**< additional fudge factor for space resol. */
     double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
 
-    bool m_gasGainSmearing = true;  /**< Swtich for gas gain smearing */
+    bool m_gasGainSmearing = true;  /**< Switch for gas gain smearing */
     double m_effWForGasGainSmearing = 0.0266;  /**< Effective energy (keV) for one electron prod. for gas gain smearing */
     double m_thetaOfPolya = 0.5;     /**< theta of Polya function for gas gain smearing */
-    bool m_extraADCSmearing = false; /**< Swtich for extra ADC smearing */
+    bool m_extraADCSmearing = false; /**< Switch for extra ADC smearing */
     //    double m_sigmaForExtraADCSmearing = 0.3;  /**< Gaussian sigma for extra ADC smearing */
     double m_runGain = 1.;  /**< run gain. */
     float m_semiTotalGain[c_maxNSenseLayers][c_maxNDriftCells] = {{}}; /**< total gain per wire */
@@ -249,7 +247,7 @@ namespace Belle2 {
     bool m_correctForWireSag;    /**< A switch to control wire sag */
     bool m_treatNegT0WiresAsGood;    /**< A switch for negative-t0 wires */
     bool m_matchFirstMCParticles;    /**< A switch to match first three MCParticles, not just the one with smallest drift time */
-    bool m_matchAllMCParticles;    /**< A switch to match all particles to a hit, regardless wether they produced a hit or not */
+    bool m_matchAllMCParticles;    /**< A switch to match all particles to a hit, regardless whether they produced a hit or not */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
 
     bool m_useDB4FEE;             /**< Fetch FEE params from DB */
@@ -280,7 +278,7 @@ namespace Belle2 {
 
     StoreObjPtr<SimClockState> m_simClockState; /**< generated hardware clock state */
     bool m_synchronization = true; /**< Flag to switch on/off timing synchronization */
-    bool m_randomization = true; /**< Flag to switch on/off timing randmization */
+    bool m_randomization = true; /**< Flag to switch on/off timing randomization */
     int m_tSimMode = 0; /**< Timing simulation mode */
     int m_offsetForTriggerBin = 1; /**< Input to getCDCTriggerBin(offset) */
     int m_trgTimingOffsetInCount   = 4; /**< Trigger timing offset in unit of count */

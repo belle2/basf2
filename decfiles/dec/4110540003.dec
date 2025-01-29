@@ -1,0 +1,20 @@
+# EventType: 4110540003
+# Descriptor: [vpho->K+K-[Y1S->e+e-]]
+# NickName: vpho_KKY1S_ee
+# Cuts: None
+# Documentation: Decay for non-Y(4S) physics
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Roman Mizuk
+# Email: roman.miziuk@gmail.com
+# Date: 20231103
+
+Decay  vpho
+1.000   K+  K-  Upsilonsig  PHSP;
+Enddecay
+
+Decay  Upsilonsig
+1.000   e+  e-  VLL;
+Enddecay
+
+End

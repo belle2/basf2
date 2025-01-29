@@ -9,15 +9,16 @@
 #include <analysis/modules/ChargedParticleIdentificator/ChargedPidMVAModule.h>
 
 //ANALYSIS
-#include <mva/interface/Interface.h>
-#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/VariableManager/Utility.h>
+#include <analysis/variables/ECLVariables.h>
 
 // FRAMEWORK
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
-
+#include <mva/interface/Interface.h>
 
 using namespace Belle2;
 
@@ -179,8 +180,7 @@ void ChargedPidMVAModule::event()
       int idx_theta, idx_p, idx_charge;
       auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(theta, p, charge, idx_theta, idx_p, idx_charge);
 
-      auto* matchVar = Variable::Manager::Instance().getVariable("clusterTrackMatch");
-      auto hasMatch = std::isnormal(std::get<double>(matchVar->function(particle)));
+      auto hasMatch = std::isnormal(Variable::eclClusterTrackMatched(particle));
 
       debugStr[11] += "\n";
       debugStr[11] += ("Particle [" + std::to_string(ipart) + "]\n");

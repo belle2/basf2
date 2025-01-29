@@ -146,6 +146,9 @@ namespace Belle2 {
     /** output file name */
     std::string m_outputName = "K_long_full_validation_sample.root";
 
+    /** contact email address */
+    std::string m_contact = "";
+
     /** root tree etc. */
     TFile* m_f = nullptr;
 

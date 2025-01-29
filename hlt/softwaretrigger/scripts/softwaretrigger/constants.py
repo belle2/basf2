@@ -67,8 +67,7 @@ PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',
                      'SVDClusters', 'PXDClusters',
                      'CDCHits', 'TOPDigits',
                      'ARICHHits', 'ECLClusters',
-                     'BKLMHit1ds', 'BKLMHit2ds',
-                     'EKLMHit2ds', 'SoftwareTriggerResult']
+                     'KLMHit2ds', 'SoftwareTriggerResult']
 
 #: List of DataStore names that are present when data enters the HLT.
 HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData", "RawFTSWs"]

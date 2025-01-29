@@ -53,7 +53,7 @@ CurlingTrackCandSplitterModule::CurlingTrackCandSplitterModule()
            "Collection name under which all but the first outgoing parts of a curling TrackCand will be stored in the StoreArray",
            std::string(""));
   addParam("completeCurlerName", m_PARAMcompleteCurlerName,
-           "Collection name under which all parts of a curling TrackCand will be stored in the StoreArray together. NOTE: only if this parameter is set to a non-empty string a complete (but splitted) curling TrackCand will be stored!",
+           "Collection name under which all parts of a curling TrackCand will be stored in the StoreArray together. NOTE: only if this parameter is set to a non-empty string a complete (but split) curling TrackCand will be stored!",
            std::string(""));
 
   // WARNING TODO: find out the units that are used internally!!!
@@ -358,7 +358,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
             " in StoreArray " << spacePoint->getArrayName());
 
     // get global position and momentum for every spacePoint in the SpacePointTrackCand
-    std::pair<B2Vector3<double>, B2Vector3<double> > hitGlobalPosMom;
+    std::pair<B2Vector3D, B2Vector3D > hitGlobalPosMom;
 
     if (detType == VXD::SensorInfoBase::PXD) {
       // first get PXDCluster, from that get TrueHit
@@ -443,8 +443,8 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
 
             // Only do these calculations if output to root is is enabled
             if (m_PARAMpositionAnalysis) {
-              std::vector<B2Vector3<double> > globalPositions;
-              std::vector<B2Vector3<double> > globalMomenta;
+              std::vector<B2Vector3D > globalPositions;
+              std::vector<B2Vector3D > globalMomenta;
               // collect all values
               for (unsigned int i = 0; i < svdTrueHits.size(); ++i) {
                 auto posMom = getGlobalPositionAndMomentum(svdTrueHits[i]);
@@ -464,7 +464,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
                 rootVariables.MisMatchPosU.at(layer).push_back((svdTrueHits[i]->getU() - svdTrueHits[i - 1]->getU()));
                 rootVariables.MisMatchPosV.at(layer).push_back((svdTrueHits[i]->getV() - svdTrueHits[i - 1]->getV()));
 
-                B2Vector3<double> momDiff = globalMomenta[i] - globalMomenta[i - 1];
+                B2Vector3D momDiff = globalMomenta[i] - globalMomenta[i - 1];
                 rootVariables.MisMatchMomX.at(layer).push_back(momDiff.X());
                 rootVariables.MisMatchMomY.at(layer).push_back(momDiff.Y());
                 rootVariables.MisMatchMomZ.at(layer).push_back(momDiff.Z());
@@ -515,7 +515,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
 
 /// Helper class to retrieve the global position and momentum of a TrueHit
 template<class TrueHit>
-std::pair<const Belle2::B2Vector3<double>, const Belle2::B2Vector3<double> >
+std::pair<const Belle2::B2Vector3D, const Belle2::B2Vector3D >
 CurlingTrackCandSplitterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)
 {
   // get sensor stuff (needed for pointToGlobal)
@@ -528,14 +528,14 @@ CurlingTrackCandSplitterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)
   const VXD::SensorInfoBase& sensorInfoBase = geometry.getSensorInfo(aVxdId);
 
   // get position
-  B2Vector3<double> hitLocal = B2Vector3<double>(aTrueHit->getU(), aTrueHit->getV(), 0);
-  B2Vector3<double> hitGlobal = sensorInfoBase.pointToGlobal(
-                                  hitLocal, true); // should work like this, since local coordinates are only 2D
+  B2Vector3D hitLocal = B2Vector3D(aTrueHit->getU(), aTrueHit->getV(), 0);
+  B2Vector3D hitGlobal = sensorInfoBase.pointToGlobal(
+                           hitLocal, true); // should work like this, since local coordinates are only 2D
   B2DEBUG(21, "Local position of hit is (" << hitLocal.X() << "," << hitLocal.Y() << "," << hitLocal.Z() <<
           "), Global position of hit is (" << hitGlobal.X() << "," << hitGlobal.Y() << "," << hitGlobal.Z() << ")");
 
   // get momentum
-  B2Vector3<double> pGlobal = sensorInfoBase.vectorToGlobal(aTrueHit->getMomentum(), true);
+  B2Vector3D pGlobal = sensorInfoBase.vectorToGlobal(aTrueHit->getMomentum(), true);
   B2DEBUG(21, "Global momentum of hit is (" << pGlobal.X() << "," << pGlobal.Y() << "," << pGlobal.Z() << ")");
 
   return std::make_pair(hitGlobal, pGlobal);
@@ -543,11 +543,11 @@ CurlingTrackCandSplitterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)
 
 // ======================================= GET DIRECTION OF FLIGHT ======================================================================
 bool CurlingTrackCandSplitterModule::getDirectionOfFlight(const
-                                                          std::pair<const B2Vector3<double>, const B2Vector3<double>>& hitPosAndMom,
-                                                          const B2Vector3<double>& origin)
+                                                          std::pair<const B2Vector3D, const B2Vector3D>& hitPosAndMom,
+                                                          const B2Vector3D& origin)
 {
-  B2Vector3<double> originToHit = hitPosAndMom.first - origin;
-  B2Vector3<double> momentumAtHit = hitPosAndMom.second + originToHit;
+  B2Vector3D originToHit = hitPosAndMom.first - origin;
+  B2Vector3D momentumAtHit = hitPosAndMom.second + originToHit;
 
 
   B2DEBUG(21, "Position of hit relative to origin is (" << originToHit.X() << "," << originToHit.Y() << "," << originToHit.Z() <<
@@ -650,21 +650,21 @@ void CurlingTrackCandSplitterModule::getValuesForRoot(const Belle2::SpacePoint* 
   VxdID trueHitVxdId = trueHit->getSensorID();
 
   // get positions from SpacePoint
-  const B2Vector3<double>& spacePointGlobal =
-    spacePoint->getPosition(); // COULDDO: uneccesary, spacePoint->X(), etc. returns the same information!
+  const B2Vector3D& spacePointGlobal =
+    spacePoint->getPosition(); // COULDDO: unnecessary, spacePoint->X(), etc. returns the same information!
 //   std::pair<double, double> spacePointUV = getUV(spacePoint);
   TaggedUVPos spacePointUV = getUV(spacePoint);
-  const B2Vector3<double> spacePointLocal = B2Vector3<double>(spacePointUV.m_U, spacePointUV.m_V, 0);
+  const B2Vector3D spacePointLocal = B2Vector3D(spacePointUV.m_U, spacePointUV.m_V, 0);
 
   // get local position from TrueHit
-  const B2Vector3<double> trueHitLocal = B2Vector3<double>(trueHit->getU(), trueHit->getV(), 0);
+  const B2Vector3D trueHitLocal = B2Vector3D(trueHit->getU(), trueHit->getV(), 0);
 
   // get sensor Info for global position of TrueHit
   const VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
   const VXD::SensorInfoBase& sensorInfoBase = geometry.getSensorInfo(trueHitVxdId);
 
   // get global position from TrueHit
-  const B2Vector3<double> trueHitGlobal = sensorInfoBase.pointToGlobal(trueHitLocal, true);
+  const B2Vector3D trueHitGlobal = sensorInfoBase.pointToGlobal(trueHitLocal, true);
 
   // Layer numbering starts at 1 not at 0 so deduce layer by one to access array
   int spLayer = spacePointVxdId.getLayerNumber() - 1;
@@ -762,7 +762,7 @@ CurlingTrackCandSplitterModule::TaggedUVPos CurlingTrackCandSplitterModule::getU
 {
   TaggedUVPos returnVals; // initialized to: both bools false, both doubles to 0.
 
-  // get the normalized local coordinates from SpacePoint and convert them to local coordinates (have to do so because at the slanted parts the local U-position is dependant on the local V-position)
+  // get the normalized local coordinates from SpacePoint and convert them to local coordinates (have to do so because at the slanted parts the local U-position is dependent on the local V-position)
   double normU = spacePoint->getNormalizedLocalU();
   double normV = spacePoint->getNormalizedLocalV();
 

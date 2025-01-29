@@ -30,7 +30,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/V0.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 
@@ -45,7 +44,6 @@
 #include <TRandom.h>
 #include <TVectorF.h>
 
-#include <iostream>
 #include <cmath>
 #include <boost/algorithm/string.hpp>
 
@@ -954,24 +952,6 @@ namespace Belle2 {
       return event_tracks - par_tracks;
     }
 
-    double trackMatchType(const Particle* particle)
-    {
-      // Particle does not contain a ECL Cluster
-      double result = Const::doubleNaN;
-
-      const ECLCluster* cluster = particle->getECLCluster();
-      if (cluster) {
-        // No associated track is default
-        result = 0;
-        if (cluster->isTrack()) {
-          // There is a track match
-          result = 1.0;
-        }
-      }
-      return result;
-    }
-
-
     bool False(const Particle*)
     {
       return 0;
@@ -1321,16 +1301,6 @@ value possible with the information provided.
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
-    REGISTER_VARIABLE("trackMatchType", trackMatchType, R"DOC(
-
-* -1 particle has no ECL cluster
-*  0 particle has no associated track
-*  1 there is a matched track called connected - region(CR) track match
-
-                      )DOC");
-    MAKE_DEPRECATED("trackMatchType", true, "light-2012-minos", R"DOC(
-                     Use better variables like `trackNECLClusters`, `clusterTrackMatch`, and `nECLClusterTrackMatches`.)DOC");
-
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,
                       "type of the particle decay(no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2,"
                       "lower level leptonic = 3.");

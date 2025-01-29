@@ -334,18 +334,18 @@ namespace {
     std::filesystem::remove_all(std::filesystem::path(filename).parent_path());
     EXPECT_FALSE(std::filesystem::exists(std::filesystem::path(filename).parent_path()));
 
-    char* directory_template = strdup("/tmp/Basf2Sub.XXXXXX");
+    char* directory_template = strdup((std::filesystem::temp_directory_path() / "Basf2Sub.XXXXXX").c_str());
     auto tempdir = std::string(mkdtemp(directory_template));
+    setenv("TMPDIR", tempdir.c_str(), 1);
     {
       MVA::Weightfile weightfile2;
-      weightfile2.setTemporaryDirectory(tempdir);
       filename = weightfile2.generateFileName(".xml");
       EXPECT_EQ(filename.substr(0, tempdir.size()), tempdir);
     }
     free(directory_template);
     std::filesystem::remove_all(tempdir);
     EXPECT_FALSE(std::filesystem::exists(tempdir));
-
+    setenv("TMPDIR", "/tmp", 1);
   }
 
 }

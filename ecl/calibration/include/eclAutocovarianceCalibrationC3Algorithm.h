@@ -8,9 +8,6 @@
 
 #pragma once
 
-/* ECL headers. */
-#include <ecl/calibration/eclAutocovarianceCalibrationC3Algorithm.h>
-
 /* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
@@ -30,6 +27,14 @@ namespace Belle2 {
       /** Setter for m_outputName */
       void setOutputName(const std::string& outputName) {m_outputName = outputName;}
 
+      /** Setter for RegularizationParams*/
+      void setRegularizationParams(double u0, double u1, double u2)
+      {
+        m_u0 = u0;
+        m_u1 = u1;
+        m_u2 = u2;
+      }
+
       /** Getter for m_outputName */
       std::string getOutputName() {return m_outputName;}
 
@@ -45,6 +50,10 @@ namespace Belle2 {
       std::string m_outputName = "eclAutocovarianceCalibrationC3Algorithm.root"; /**< file name for histogram output */
 
       int m_TotalCountsThreshold = 10000; /**< min number of counts needed to compute calibration */
+
+      double m_u0 = 13.0;   /**< Regularization Function Parameter 0 */
+      double m_u1 = 4.0;   /**< Regularization Function Parameter 1 */
+      double m_u2 = 1.0;   /**< Regularization Function Parameter 2 */
 
     };
   }

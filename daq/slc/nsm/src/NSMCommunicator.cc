@@ -106,8 +106,8 @@ NSMCommunicator& NSMCommunicator::connected(const std::string& node)
 bool NSMCommunicator::send(const NSMMessage& msg)
 {
   bool sent = false;
-  bool alive = false;
 #if NSM_PACKAGE_VERSION >= 1914
+  bool alive = false;
   LockGuard lockGuard(g_mutex);
   std::string emsg;
   for (NSMCommunicatorList::iterator it = g_comm.begin();

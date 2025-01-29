@@ -87,7 +87,7 @@ namespace Belle2 {
                                                      const TRGClock& dataClock,
                                                      const TRGClock& userClockInput,
                                                      const TRGClock& userClockOutput,
-                                                     const std::vector<TCSegment*>& tsSL)
+                                                     const std::vector<TRGCDCSegment*>& tsSL)
     : TRGBoard(name, systemClock, dataClock, userClockInput, userClockOutput),
       _cdc(TRGCDC),
       m_logicLUTFlag(),
@@ -192,7 +192,7 @@ namespace Belle2 {
 
 
   vector <TRGSignalVector*>
-  TSFinder::findTSHit(TRGSignalVector* eachInput, int tsid)
+  TRGCDCTrackSegmentFinder::findTSHit(TRGSignalVector* eachInput, int tsid)
   {
 
     //variables for common
@@ -313,9 +313,9 @@ namespace Belle2 {
   }
 
   TRGSignalVector*
-  TSFinder::packerOuterTracker(vector<TRGSignalVector*>& hitList,
-                               vector<int>& cList,
-                               const unsigned maxHit)
+  TRGCDCTrackSegmentFinder::packerOuterTracker(vector<TRGSignalVector*>& hitList,
+                                               vector<int>& cList,
+                                               const unsigned maxHit)
   {
     TRGSignalVector* result =
       new TRGSignalVector("", (* hitList[0]).clock(), 21 * maxHit);
@@ -348,8 +348,8 @@ namespace Belle2 {
   }
 
   TRGSignalVector*
-  TSFinder::packerOuterEvt(vector<TRGSignalVector*> hitList, vector<int> cList,
-                           int maxHit)
+  TRGCDCTrackSegmentFinder::packerOuterEvt(vector<TRGSignalVector*> hitList, vector<int> cList,
+                                           int maxHit)
   {
 
     //TRGSignalVector * result = new TRGSignalVector("",(*hitList[0]).clock() ,N+9*maxHit);
@@ -374,7 +374,7 @@ namespace Belle2 {
   }
 
   double
-  TSFinder::mkint(TRGState bitInput)
+  TRGCDCTrackSegmentFinder::mkint(TRGState bitInput)
   {
     double r = 0;
     bool* binput = new bool[bitInput.size()];
@@ -388,7 +388,7 @@ namespace Belle2 {
   }
 
   vector<bool>
-  TSFinder::mkbool(int N, int bitSize)
+  TRGCDCTrackSegmentFinder::mkbool(int N, int bitSize)
   {
     vector<bool> boutput;
     boutput.resize(bitSize);
@@ -1041,7 +1041,7 @@ namespace Belle2 {
   }
 
   vector <TRGSignalVector*>
-  TSFinder::simulateOuter(TRGSignalVector* in, unsigned tsid)
+  TRGCDCTrackSegmentFinder::simulateOuter(TRGSignalVector* in, unsigned tsid)
   {
 
     //variables for common
@@ -2378,9 +2378,9 @@ namespace Belle2 {
   }
 
   TRGSignalVector*
-  TSFinder::packerForTracker(vector<TRGSignalVector*>& hitList,
-                             vector<int>& cList,
-                             const unsigned maxHit)
+  TRGCDCTrackSegmentFinder::packerForTracker(vector<TRGSignalVector*>& hitList,
+                                             vector<int>& cList,
+                                             const unsigned maxHit)
   {
 
     TRGSignalVector* result =
@@ -2414,7 +2414,7 @@ namespace Belle2 {
   }
 
   vector <TRGSignalVector*>
-  TSFinder::simulateTSFOld(TRGSignalVector* in, unsigned tsid)
+  TRGCDCTrackSegmentFinder::simulateTSFOld(TRGSignalVector* in, unsigned tsid)
   {
 
     //variables for common
@@ -2580,7 +2580,7 @@ namespace Belle2 {
   }
 
   vector <TRGSignalVector*>
-  TSFinder::simulateTSF(TRGSignalVector* in, unsigned tsid)
+  TRGCDCTrackSegmentFinder::simulateTSF(TRGSignalVector* in, unsigned tsid)
   {
 
     //variables for common
@@ -2804,7 +2804,7 @@ namespace Belle2 {
     return result;
   }
   vector <TRGSignalVector*>
-  TSFinder::simulateTSF2(TRGSignalVector* in, unsigned tsid)
+  TRGCDCTrackSegmentFinder::simulateTSF2(TRGSignalVector* in, unsigned tsid)
   {
 
     //variables for common

@@ -217,7 +217,7 @@ def stdLep(pdgId,
 
                               .. tip::
                                   Please refer to the
-                                  `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                                  `Charged PID XWiki page <https://xwiki.desy.de/xwiki/rest/p/fab3e>`_
                                   for info about the recommended global tags.
 
         release (Optional[int]): the major release number of the data and MC campaigns considered.
@@ -225,7 +225,7 @@ def stdLep(pdgId,
 
                                  .. tip::
                                      Please refer to the
-                                     `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                                     `Charged PID XWiki page <https://xwiki.desy.de/xwiki/rest/p/fab3e>`_
                                      for info about lepton identification variables and campaigns.
 
         channel_eff (Optional[str]): the channel used to derive the :math:`\\ell` ID efficiency corrections.
@@ -234,7 +234,7 @@ def stdLep(pdgId,
 
                                      .. tip::
                                          Please refer to the
-                                         `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                                         `Charged PID XWiki page <https://xwiki.desy.de/xwiki/rest/p/fab3e>`_
                                          for other possible choices (if any).
 
         channel_misid_pi (Optional[str]): the channel used to derive the :math:`\\pi` fake rate corrections.
@@ -409,7 +409,6 @@ def stdLep(pdgId,
     # The names of the payloads w/ efficiency and mis-id corrections.
     payload_eff = f"ParticleReweighting:{pid_alias}_eff_{channel_eff}_{working_point}"
     payload_misid_pi = f"ParticleReweighting:{pid_alias}_misid_pi_{channel_misid_pi}_{working_point}"
-    payload_misid_K = f"ParticleReweighting:{pid_alias}_misid_K_{channel_misid_K}_{working_point}"
 
     # Configure weighting module(s).
     path.add_module("ParticleWeighting",
@@ -417,11 +416,15 @@ def stdLep(pdgId,
                     tableName=payload_eff).set_name(f"ParticleWeighting_eff_{outputListName}")
     path.add_module("ParticleWeighting",
                     particleList=outputListName,
-                    tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{outputListName}")
+                    tableName=payload_misid_pi,
+                    allowToSkip=True).set_name(f"ParticleWeighting_misid_pi_{outputListName}")
+
     if classification == "global":
+        payload_misid_K = f"ParticleReweighting:{pid_alias}_misid_K_{channel_misid_K}_{working_point}"
         path.add_module("ParticleWeighting",
                         particleList=outputListName,
-                        tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{outputListName}")
+                        tableName=payload_misid_K,
+                        allowToSkip=True).set_name(f"ParticleWeighting_misid_K_{outputListName}")
 
     # Apply the PID selection cut, which is read from the efficiency payload.
     # The '>=' handles extreme cases in which the variable and the threshold value are at a boundary of the PID variable range.

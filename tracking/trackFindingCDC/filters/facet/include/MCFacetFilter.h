@@ -16,16 +16,20 @@ namespace Belle2 {
     class CDCFacet;
     class CDCRLWireHitTriple;
 
-    /// Filter for the constuction of good facets based on monte carlo information
+    /// Filter for the construction of good facets based on Monte Carlo information
     class MCFacetFilter : public MCSymmetric<BaseFacetFilter> {
     private:
       /// Type of the super class
       using Super = MCSymmetric<BaseFacetFilter>;
 
     public:
+      /// Making expicit the Filter operator() to avoid [-Woverloaded-virtual=]
+      using Super::operator();
+
+    public:
       /**
        *  Constructor also setting the switch,
-       *  if the reversed version of a facet (in comparision to MC truth) shall be accepted.
+       *  if the reversed version of a facet (in comparison to MC truth) shall be accepted.
        */
       explicit MCFacetFilter(bool allowReverse = true);
 

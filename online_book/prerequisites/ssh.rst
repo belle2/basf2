@@ -452,7 +452,7 @@ usually safer and more convenient than using the password directly.
     Key based login doesn't work to all servers. Most notable exception for us
     is DESY as they have a different security system called kerberos which is
     incompatible with key based login. However for DESY one can obtain a
-    `kerberos token <https://confluence.desy.de/x/173UBw>`_ instead
+    `kerberos token <https://xwiki.desy.de/xwiki/rest/p/41a5f>`_ instead
     which will have almost the same effect.
 
 
@@ -705,7 +705,7 @@ nice python interface via web browser.
 .. note::
 
     DESY offers a direct `weblogin
-    <https://confluence.desy.de/x/rJetC>`_ to jupyter
+    <https://xwiki.desy.de/xwiki/rest/p/9fd53>`_ to jupyter
     notebooks so the following is not necessary for DESY
 
 Now you can tell jupyter notebooks which port to use but this time we run it on
@@ -818,7 +818,7 @@ local files. For example
   more information but this works similar in other desktop environments.
 * In addition many editors or development environments have their own support to
   work on a remote machine via ssh. There is a
-  `guide on confluence <https://confluence.desy.de/x/XGJ8Cg>`_
+  `guide on XWiki <https://xwiki.desy.de/xwiki/rest/p/da9b4>`_
   explaining the setup for some of them.
 
 .. rubric:: SSH multiplexing

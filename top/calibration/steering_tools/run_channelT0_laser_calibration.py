@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -10,7 +9,7 @@
 ##########################################################################
 
 # ---------------------------------------------------------------------------------------
-# CAF calibration script: channel T0 with laser (including pre-calibration of BS13d)
+# CAF calibration script: channel T0 with laser
 # data type: local runs with laser
 #
 # usage: basf2 run_channelT0_laser_calibration.py expNo run_1 run_2 ... run_n
@@ -23,20 +22,23 @@ import glob
 from caf import backends
 from caf.framework import Calibration, CAF
 from caf.strategies import SingleIOV
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import TOP
 from basf2 import B2ERROR
-from top_calibration import BS13d_calibration_local
 
 # ----- those parameters need to be adjusted before running -----------------------
 #
-globalTags = ['data_reprocessing_proc11']  # highest priority first
+globalTags = ['online']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
 data_dir = '/ghi/fs01/belle2/bdata/group/detector/TOP/2019-*/data_sroot_global/'
 main_output_dir = 'top_calibration'
-look_back = 28  # look-back window setting (set to 0 if look-back setting available in DB)
+look_back = 30  # look-back window setting (set to 0 if look-back setting available in DB)
+calpulse_min_time = 50.0  # calibration pulse selection in time: minimal time [ns]
+calpulse_max_time = 120.0  # calibration pulse selection in time: maximal time [ns]
 tts_file = '/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrizations.root'
 laser_mc_fit = '/group/belle2/group/detector/TOP/calibration/MCreferences/laserMCFit.root'
 fit_mode = 'calibration'  # can be either monitoring, MC or calibration
+sroot_format = False  # on True data in sroot format, on False data in root format
 #
 # ---------------------------------------------------------------------------------------
 
@@ -52,14 +54,17 @@ run_last = run_numbers[-1]
 
 # Make list of files
 inputFiles = []
-expNo = 'e' + '{:0=4d}'.format(experiment)
+expNo = 'e' + f'{experiment:04d}'
 for run in run_numbers:
-    expRun = '{:0=4d}'.format(experiment) + '.' + '{:0=5d}'.format(run)
-    filename = f"{data_dir}/top.{expRun}.*.sroot"
+    expRun = f'{experiment:04d}' + '.' + f'{run:05d}'
+    if sroot_format:
+        filename = f"{data_dir}/top.{expRun}.*.sroot"
+    else:
+        filename = f"{data_dir}/top.{expRun}.*.root"
     inputFiles += glob.glob(filename)
 if len(inputFiles) == 0:
     runs = "".join([str(r) + "," for r in run_numbers])[:-1]
-    B2ERROR(f'No sroot files found in {data_dir} for exp={str(experiment)} runs={runs}')
+    B2ERROR(f'No root files found in {data_dir} for exp={str(experiment)} runs={runs}')
     sys.exit()
 
 # Check the existence of additional input files
@@ -71,21 +76,27 @@ if not os.path.isfile(laser_mc_fit):
     sys.exit()
 
 # Output folder name
-run_range = 'r' + '{:0=5d}'.format(run_first) + '-' + '{:0=5d}'.format(run_last)
+run_range = 'r' + f'{run_first:05d}' + '-' + f'{run_last:05d}'
 output_dir = f"{main_output_dir}/channelT0-local-{expNo}-{run_range}"
 
 # Suppress messages during processing
 # basf2.set_log_level(basf2.LogLevel.WARNING)
 
 
-def channelT0_calibration():
-    ''' calibration of channel T0 with laser data '''
+def channelT0_calibration(sroot=False):
+    '''
+    calibration of channel T0 with laser data
+    :param sroot: True if input files are in sroot format, False if in root format
+    '''
 
     #   create path
     main = basf2.create_path()
 
     #   basic modules
-    main.add_module('SeqRootInput')
+    if sroot:
+        main.add_module('SeqRootInput')
+    else:
+        main.add_module('RootInput')
     main.add_module('TOPGeometryParInitializer')
     main.add_module('TOPUnpacker')
     main.add_module('TOPRawDigitConverter',
@@ -94,10 +105,12 @@ def channelT0_calibration():
                     useChannelT0Calibration=False,
                     useModuleT0Calibration=False,
                     useCommonT0Calibration=False,
-                    calpulseHeightMin=320,
+                    calpulseHeightMin=200,
                     calpulseHeightMax=680,
                     calpulseWidthMin=1.5,
                     calpulseWidthMax=2.2,
+                    calpulseTimeMin=calpulse_min_time,
+                    calpulseTimeMax=calpulse_max_time,
                     calibrationChannel=0,
                     lookBackWindows=look_back)
 
@@ -129,16 +142,12 @@ def channelT0_calibration():
 
 
 # Define calibrations
-cal1 = BS13d_calibration_local(inputFiles, look_back, globalTags, localDBs)
-cal2 = channelT0_calibration()
-cal1.backend_args = {"queue": "l"}
-cal2.backend_args = {"queue": "l"}
-cal2.depends_on(cal1)
+cal = channelT0_calibration(sroot_format)
+cal.backend_args = {"queue": "l"}
 
 # Add calibrations to CAF
 cal_fw = CAF()
-cal_fw.add_calibration(cal1)
-cal_fw.add_calibration(cal2)
+cal_fw.add_calibration(cal)
 cal_fw.output_dir = output_dir
 cal_fw.backend = backends.LSF()
 

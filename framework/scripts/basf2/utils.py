@@ -309,12 +309,12 @@ def print_params(module, print_values=True, shared_lib_path=None):
 
     print('')
     print('=' * (len(module.name()) + 4))
-    print('  %s' % module.name())
+    print(f'  {module.name()}')
     print('=' * (len(module.name()) + 4))
-    print('Description: %s' % module.description())
+    print(f'Description: {module.description()}')
     if shared_lib_path is not None:
-        print('Found in:    %s' % shared_lib_path)
-    print('Package:     %s' % module.package())
+        print(f'Found in:    {shared_lib_path}')
+    print(f'Package:     {module.package()}')
 
     # gather output data in table
     output = []
@@ -385,7 +385,7 @@ def print_path(path, defaults=False, description=False, indentation=0, title=Tru
     for module in path.modules():
         out = indentation_string + ' % 2d. % s' % (index, module.name())
         if description:
-            out += '  #%s' % module.description()
+            out += f'  #{module.description()}'
         print(out)
         index += 1
         for param in module.available_params():
@@ -393,7 +393,7 @@ def print_path(path, defaults=False, description=False, indentation=0, title=Tru
                 continue
             out = indentation_string + f'      {param.name}={param.values}'
             if description:
-                out += '  #%s' % param.description
+                out += f'  #{param.description}'
             print(out)
 
         for condition in module.get_all_conditions():
@@ -440,10 +440,13 @@ def pretty_print_module(module, module_name, replacements=None):
 
     for function_name in sorted(list_functions(module), key=lambda x: x.lower()):
         function = getattr(module, function_name)
-        signature = _inspect.formatargspec(*_inspect.getfullargspec(function))
+        signature = str(_inspect.signature(function))
         for key, value in replacements.items():
             signature = signature.replace(key, value)
-        desc_list.append((function.__name__, signature + '\n' + function.__doc__))
+        function_doc = function.__doc__
+        if not function_doc:
+            function_doc = '(no documentation)'
+        desc_list.append((function.__name__, signature + '\n' + function_doc))
 
     with Pager('List of available functions in ' + module_name, True):
         pretty_print_description_list(desc_list)

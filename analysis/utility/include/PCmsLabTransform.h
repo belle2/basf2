@@ -13,9 +13,8 @@
 #include <mdst/dbobjects/CollisionAxisCMS.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/geometry/B2Vector3.h>
+#include <framework/utilities/LabToCms.h>
 
-#include <Math/Boost.h>
-#include <Math/AxisAngle.h>
 #include <Math/LorentzRotation.h>
 #include <Math/Vector4D.h>
 
@@ -60,30 +59,10 @@ namespace Belle2 {
     /**
      * Returns Lorentz transformation from Lab to CMS
      * @return const reference to Lorentz rotation matrix
-     * Similar transformation done in MCInitialParticles::calculateBoost()
      */
     const ROOT::Math::LorentzRotation rotateLabToCms() const
     {
-      //boost to CM frame
-      ROOT::Math::LorentzRotation boost(ROOT::Math::Boost(-1.*getBoostVector()));
-
-
-      //rotation such that the collision axis is aligned with z-axis
-      ROOT::Math::XYZVector zaxis(0., 0., 1.); //target collision axis
-
-      double tanAngleXZ = tan(m_axisCmsDB->getAngleXZ());
-      double tanAngleYZ = tan(m_axisCmsDB->getAngleYZ());
-      double Norm   = 1 / sqrt(1 + pow(tanAngleXZ, 2) + pow(tanAngleYZ, 2));
-      ROOT::Math::XYZVector electronCMS(Norm * tanAngleXZ, Norm * tanAngleYZ, Norm); //current collision axis
-
-      ROOT::Math::XYZVector rotAxis = zaxis.Cross(electronCMS);
-      double rotangle = asin(rotAxis.R());
-
-      ROOT::Math::LorentzRotation rotation(ROOT::Math::AxisAngle(rotAxis, -rotangle));
-
-
-      ROOT::Math::LorentzRotation trans = rotation * boost;
-      return trans;
+      return LabToCms::rotateLabToCms(getBoostVector(), m_axisCmsDB->getAngleXZ(), m_axisCmsDB->getAngleYZ());
     }
 
     /**

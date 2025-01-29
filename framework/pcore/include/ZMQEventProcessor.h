@@ -58,7 +58,25 @@ namespace Belle2 {
     /// Basic function run in every process: process the event loop of the given path
     void processPath(const PathPtr& localPath, const ModulePtrList& terminateGlobally, long maxEvent);
 
+    /// Process modules in the path
+    void processCore(const PathPtr& startPath, const ModulePtrList& modulePathList, long maxEvent = 0, bool isInputProcess = true,
+                     bool isWorkerProcess = false, bool isOutputProcess = false);
+
+    /// Calls Event function
+    bool processEvent(PathIterator moduleIter, bool skipMasterModule, bool Worker = false, bool output = false);
+
+    /// Calls BeginRun function
+    void processBeginRun(bool skipDB = false);
+
+    /// Calls EndRun function
+    void processEndRun();
+
     /// Instance of the process monitor
     ProcessMonitor m_processMonitor;
+
+    /// Stores previous eventMetaData
+    EventMetaData m_previousEventMetaData;
+
   };
+
 }

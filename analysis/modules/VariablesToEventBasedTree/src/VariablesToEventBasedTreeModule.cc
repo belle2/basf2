@@ -62,6 +62,11 @@ VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
 
   addParam("fileNameSuffix", m_fileNameSuffix, "The suffix of the output ROOT file to be appended before ``.root``.",
            string(""));
+  addParam("ignoreCommandLineOverride", m_ignoreCommandLineOverride,
+           "Ignore override of file name via command line argument -o. Useful if you have multiple output modules in one path.", false);
+
+  addParam("storeEventType", m_storeEventType,
+           "If true, the branch __eventType__ is added. The eventType information is available from MC16 on.", true);
 }
 
 void VariablesToEventBasedTreeModule::initialize()
@@ -70,9 +75,11 @@ void VariablesToEventBasedTreeModule::initialize()
   StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   // override the output file name with what's been provided with the -o option
-  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
-  if (!outputFileArgument.empty())
-    m_fileName = outputFileArgument;
+  if (!m_ignoreCommandLineOverride) {
+    const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
+    if (!outputFileArgument.empty())
+      m_fileName = outputFileArgument;
+  }
 
   if (!m_fileNameSuffix.empty())
     m_fileName = m_fileName.insert(m_fileName.rfind(".root"), m_fileNameSuffix);
@@ -132,6 +139,13 @@ void VariablesToEventBasedTreeModule::initialize()
 
   if (m_stringWrapper.isOptional("MCDecayString"))
     m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
+
+  if (m_storeEventType) {
+    m_tree->get().Branch("__eventType__", &m_eventType);
+    if (not m_eventExtraInfo.isOptional())
+      B2INFO("EventExtraInfo is not registered. __eventType__ will be empty. The eventType is available from MC16 on.");
+  }
+
 
   for (unsigned int i = 0; i < m_event_variables.size(); ++i) {
     auto varStr = m_event_variables[i];
@@ -243,6 +257,11 @@ void VariablesToEventBasedTreeModule::event()
   else
     m_MCDecayString = "";
 
+  if (m_storeEventType and m_eventExtraInfo.isValid())
+    m_eventType = m_eventExtraInfo->getEventType();
+  else
+    m_eventType = "";
+
   StoreObjPtr<ParticleList> particlelist(m_particleList);
   m_ncandidates = particlelist->getListSize();
   m_weight = getInverseSamplingRateWeight();
@@ -287,6 +306,7 @@ void VariablesToEventBasedTreeModule::terminate()
     m_tree->write(m_file.get());
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);
+    m_file.reset();
     if (writeError) {
       B2FATAL("A write error occurred while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }

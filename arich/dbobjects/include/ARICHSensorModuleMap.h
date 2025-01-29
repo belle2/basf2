@@ -14,14 +14,16 @@
 #include <arich/dbobjects/ARICHCableInfo.h>
 
 namespace Belle2 {
-  /**
-   *   Mapping of the Sensor Board Connections to the detector
-   */
 
+  /**
+   *Mapping of the sensor-board connections to the detector.
+   */
   class ARICHSensorModuleMap: public TObject {
+
   public:
+
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHSensorModuleMap(): m_sextant(0), m_ring(0), m_column(0), m_sensorID(0), m_sensor(NULL), m_merger(NULL), m_port(0),
       m_cableHv(NULL), m_cableGuard(NULL), m_timeStamp()
@@ -31,7 +33,7 @@ namespace Belle2 {
 
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHSensorModuleMap(int sextant, int ring, int column, int sensorID, ARICHSensorModuleInfo* sensor, ARICHMergerInfo* merger,
                          int port,
@@ -44,117 +46,129 @@ namespace Belle2 {
     }
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ARICHSensorModuleMap() {};
 
     /**
-      * Return SensorModule Sextant Identifier
-      * @return SensorModule Sextant
-      */
+     * Get sensor-module sextant identifier.
+     * @return Sensor-module sextant.
+     */
     int getSensorModuleSextantID() const {return m_sextant;}
 
     /**
-     * Set SensorModule Sextant Identifier
-     * @param Sextant Identifier
+     * Set sensor-module sextant identifier.
+     * @param[in] sextant Sextant identifier.
      */
     void setSensorModuleSextantID(int sextant) {m_sextant = sextant;}
 
     /**
-      * Return SensorModule Ring Identifier
-      * @return SensorModule Ring
-      */
+     * Get sensor-module ring identifier.
+     * @return Sensor-module ring.
+     */
     int getSensorModuleRingID() const {return m_ring;}
 
     /**
-     * Set SensorModule Ring Identifier
-     * @param Ring Identifier
+     * Set sensor-module ring identifier.
+     * @param[in] ring Ring Identifier.
      */
     void setSensorModuleRingID(int ring) {m_ring = ring;}
 
     /**
-     * Return Sensor Module Column Identifier
-     * @return Sensor Module Column
-     */
-    int getSensorModuleColumnID() const {return m_column;}
-
-    /**
-     * Set Sensor Global Identifier
-     * @param Global Identifier
-     */
-    void setSensorGlobalID(int sensorID) {m_sensorID = sensorID;}
-
-    /**
-     * Return Sensor Global Identifier
-     * @return Global Identifier
+     * Get sensor global identifier.
+     * @return Global identifier.
      */
     int getSensorGlobalID() const {return m_sensorID;}
 
     /**
-     * Set Sensor Module Column Identifier
-     * @param Column Identifier
+     * Set sensor global identifier.
+     * @param[in] sensorID Global identifier
+     */
+    void setSensorGlobalID(int sensorID) {m_sensorID = sensorID;}
+
+    /**
+     * Get sensor-module column identifier.
+     * @return Sensor-module column.
+     */
+    int getSensorModuleColumnID() const {return m_column;}
+
+    /**
+     * Set sensor-module column identifier.
+     * @param[in] column Column identifier
      */
     void setSensorModuleColumnID(int column) {m_column = column;}
 
-    /** Get Sensor Module Identifier
-     * @return Sensor Module Identifier
+    /**
+     * Get sensor-module identifier.
+     * @return Sensor-module identifier.
      */
     ARICHSensorModuleInfo* getSensorModuleId() const {return m_sensor; }
 
-    /** Set Sensor Module Identifier
-     * @param Sensor Module Identifier
+    /**
+     * Set sensor-module identifier.
+     * @param[in] sensor Sensor-module identifier.
      */
     void setSensorModuleId(ARICHSensorModuleInfo* sensor) {m_sensor = sensor; }
 
-    /** Get Merger Identifier
-     * @return Merger Identifier
+    /**
+     * Get merger identifier.
+     * @return Merger identifier.
      */
     ARICHMergerInfo* getMergerId() const {return m_merger; }
 
-    /** Set Merger Identifier
-     * @param Merger Identifier
+    /**
+     * Set merger identifier.
+     * @param[in] merger Merger identifier.
      */
     void setMergerId(ARICHMergerInfo* merger) {m_merger = merger; }
 
-    /** Get Cable High Voltage Identifier
-     * @return Cable High Voltage Identifier
+    /**
+     * Get high-voltage cable identifier.
+     * @return High-voltage cable identifier.
      */
     ARICHCableInfo* getCableHighVoltageId() const {return m_cableHv; }
 
-    /** Set Cable High Voltage Identifier
-     * @param Cable High Voltage Identifier
+    /**
+     * Set high-voltage cable identifier.
+     * @param[in] cableHv High-voltage cable identifier.
      */
     void setCableHighVoltageId(ARICHCableInfo* cableHv) {m_cableHv = cableHv; }
 
-    /** Get Cable Bias Voltage Identifier
-     * @param i index of the chip
-     * @return Cable Bias Voltage Identifier
+    /**
+     * Get bias-voltage cable identifier.
+     * @param i Index of the chip.
+     * @return Bias-voltage cable identifier.
      */
     ARICHCableInfo* getCableBiasVoltageId(unsigned int i) {if (i < 4) return m_cableBias[i]; else return NULL; }
 
-    /** Set Cable Bias Voltage Identifier
-     * @param i index of the chip
-     * @param Cable Bias Voltage Identifier
+    /**
+     * Set bias-voltage cable identifier.
+     * @param i Index of the chip.
+     * @param[in] cableBias Bias-voltage cable identifier.
      */
     void setCableBiasVoltageId(unsigned int i, ARICHCableInfo** cableBias) {if (i < 4) m_cableBias[i] = cableBias[i]; }
 
-    /** Get Cable Guard Identifier
-     * @return Cable Identifier
+    /**
+     * Get guard-cable identifier.
+     * @return Guard-cable identifier.
      */
     ARICHCableInfo* getCableGuard() const {return m_cableGuard; }
 
-    /** Set Cable Guard Identifier
-     * @param Cable Guard Identifier
+    /**
+     * Set guard-cable identifier.
+     * @param[in] cableGuard Guard-cable Identifier.
      */
     void setCableGuard(ARICHCableInfo* cableGuard) {m_cableGuard = cableGuard; }
 
-    /** Get Installation date
-     * @return Installation date
+    /**
+     * Get installation date.
+     * @return Installation date.
      */
     TTimeStamp getTimeStamp() const {return m_timeStamp; }
 
-    /** Set Installation date
-     * @param Installation date
+    /**
+     * Set installation date.
+     * @param[in] timeStamp Installation date.
      */
     void setTimeStamp(TTimeStamp timeStamp) {m_timeStamp = timeStamp; }
 

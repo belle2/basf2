@@ -1,3 +1,11 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 //For GFTrack visualisation:
 /* Copyright 2011, Technische Universitaet Muenchen,
    Author: Karl Bicker
@@ -76,7 +84,6 @@
 #include <TMatrixD.h>
 #include <TMatrixDSymEigen.h>
 
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/algorithm/string/find.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -679,7 +686,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
                 continue;
               }
 
-              const VXD::SensorInfoBase& sensor = geo.get(recoHit->getSensorID());
+              const VXD::SensorInfoBase& sensor = geo.getSensorInfo(recoHit->getSensorID());
               double du, dv;
               ROOT::Math::XYZVector a = o; //defines position of sensor plane
               double hit_res_u = hit_cov(0, 0);
@@ -1070,13 +1077,13 @@ void EVEVisualization::addSimHit(const CDCSimHit* hit, const MCParticle* particl
 void EVEVisualization::addSimHit(const PXDSimHit* hit, const MCParticle* particle)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
+  const ROOT::Math::XYZVector& global_pos = geo.getSensorInfo(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const SVDSimHit* hit, const MCParticle* particle)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
+  const ROOT::Math::XYZVector& global_pos = geo.getSensorInfo(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const KLMSimHit* hit, const MCParticle* particle)
@@ -1127,7 +1134,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     mctrack = tparticle;
     mctrack.fTDecay = particle->getDecayTime();
     mctrack.fVDecay.Set(B2Vector3D(particle->getDecayVertex()));
-    mctrack.fDecayed = !boost::math::isinf(mctrack.fTDecay);
+    mctrack.fDecayed = !std::isinf(mctrack.fTDecay);
     mctrack.fIndex = particle->getIndex();
     m_mcparticleTracks[particle].track = new TEveTrack(&mctrack, m_trackpropagator);
 
@@ -1575,7 +1582,7 @@ void EVEVisualization::addROI(const ROIid* roi)
 void EVEVisualization::addRecoHit(const SVDCluster* hit, TEveStraightLineSet* lines)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
+  const VXD::SensorInfoBase& sensor = geo.getSensorInfo(hit->getSensorID());
 
   ROOT::Math::XYZVector a, b;
   if (hit->isUCluster()) {
@@ -1769,14 +1776,17 @@ void EVEVisualization::addARICHHit(const ARICHHit* hit)
   int hitModule = hit->getModule();
   float fi = arichGeo->getDetectorPlane().getSlotPhi(hitModule);
 
-  B2Vector3D centerPos3D =  hit->getPosition();
+  ROOT::Math::XYZVector  centerPos3D =  hit->getPosition();
 
-  B2Vector3D channelX(1, 0, 0);    channelX.RotateZ(fi);
-  B2Vector3D channelY(0, 1, 0);    channelY.RotateZ(fi);
+  ROOT::Math::RotationZ rotZ(fi);
+  ROOT::Math::XYZVector channelX(1, 0, 0);
+  ROOT::Math::XYZVector channelY(0, 1, 0);
+  channelX = rotZ * channelX;
+  channelY = rotZ * channelY;
 
   auto* arichbox = boxCreator(centerPos3D,
-                              ROOT::Math::XYZVector(arichGeo->getMasterVolume().momentumToGlobal(channelX)),
-                              ROOT::Math::XYZVector(arichGeo->getMasterVolume().momentumToGlobal(channelY)),
+                              arichGeo->getMasterVolume().momentumToGlobal(channelX),
+                              arichGeo->getMasterVolume().momentumToGlobal(channelY),
                               0.49, 0.49, 0.05);
   arichbox->SetMainColor(kOrange + 10);
   arichbox->SetName((std::to_string(hitModule)).c_str());

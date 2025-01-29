@@ -16,8 +16,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <iostream>
-
 #include <analysis/ContinuumSuppression/Thrust.h>
 #include <analysis/ContinuumSuppression/HarmonicMoments.h>
 #include <analysis/ContinuumSuppression/CleoCones.h>

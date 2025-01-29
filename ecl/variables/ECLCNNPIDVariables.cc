@@ -42,7 +42,7 @@ namespace Belle2 {
     VARIABLE_GROUP("CNN PID ECL variable (cDST)");
 
     REGISTER_VARIABLE("cnn_pid_ecl_muon", CNNPIDECLMuon,
-                      R"DOC(CNN runs over extrapolated tracks and output probabilities of pion or muon like. The variable here is muon-like probablity.
+                      R"DOC(CNN runs over extrapolated tracks and output probabilities of pion or muon like. The variable here is muon-like probability.
 Returns NaN if CNN was not run or if the ``cnn_pid_ecl_muon`` parameter was not set.)DOC");
 
   }

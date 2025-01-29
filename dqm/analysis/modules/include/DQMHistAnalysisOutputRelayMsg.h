@@ -67,7 +67,7 @@ namespace Belle2 {
     int m_port;
     /** The hostname of the canvas server. */
     std::string m_hostname;
-    /** Send untagged canvase by default */
+    /** Send untagged canvas by default */
     bool m_canvasSendDefault{true};
   };
 } // end namespace Belle2

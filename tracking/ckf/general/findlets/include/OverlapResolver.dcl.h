@@ -16,7 +16,7 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  /// Simple findlet for searching the best candidate for a given seed aplying the given filter.
+  /// Simple findlet for searching the best candidate for a given seed applying the given filter.
   template<class AFilter>
   class OverlapResolver : public TrackFindingCDC::Findlet<typename AFilter::Object, typename AFilter::Object> {
   public:

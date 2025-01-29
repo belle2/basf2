@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -28,7 +27,7 @@ class SetVXDSensitiveThreshold(b2.Module):
     def __init__(self, threshold):
         """Initialize the module"""
 
-        super(SetVXDSensitiveThreshold, self).__init__()
+        super().__init__()
         #: The threshold value to be set.
         self.threshold = threshold
         #: The current pxd threshold value.
@@ -51,7 +50,7 @@ class SetVXDSensitiveThreshold(b2.Module):
                 self.old_pxd_threshold = float(node.text)
             else:
                 self.old_svd_threshold = float(node.text)
-            node.text = '{val}'.format(val=value)
+            node.text = f'{value}'
 
         file = open(filename, 'w')
         tree.write(file, encoding='UTF-8', xml_declaration=True)

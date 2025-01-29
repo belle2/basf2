@@ -26,14 +26,11 @@
 
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <vector>
 #include <tuple>
 #include <string>
-#include <memory>
 
 namespace Belle2 {
 
@@ -180,7 +177,6 @@ namespace Belle2 {
     StoreArray<PIDLikelihood> m_pidlikelihoods; /**< StoreArray of PIDLikelihoods */
     StoreArray<Track> m_tracks; /**< StoreArray of Tracks */
     StoreArray<TrackFitResult> m_trackfitresults; /**< StoreArray of TrackFitResults */
-    StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< object pointer to event extra info */
     StoreObjPtr<ParticleExtraInfoMap> m_particleExtraInfoMap; /**< object pointer to extra info map */
     StoreArray<RestOfEvent> m_roes; /**< StoreArray of ROEs */
     StoreArray<V0> m_v0s; /**< StoreArray of V0s */

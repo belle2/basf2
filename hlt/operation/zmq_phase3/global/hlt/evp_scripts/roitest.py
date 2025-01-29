@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,7 +11,7 @@ import basf2
 import hbasf2
 from softwaretrigger import constants
 from softwaretrigger.processing import finalize_zmq_path, setup_basf2_and_db, start_zmq_path
-from pxd import add_roi_payload_assembler
+from tracking import add_roi_payload_assembler
 
 
 args = setup_basf2_and_db(zmq=True)

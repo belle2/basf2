@@ -1108,7 +1108,7 @@ If there are no extrapolated hits found in the ECL for the event, NaN will be re
 
 )DOC","cm");
     REGISTER_VARIABLE("minC2TDistID", eclClusterIsolationID, R"DOC(
-Returns the track array index of the nearest track to the ECL cluster. The nearest track is calculcated 
+Returns the track array index of the nearest track to the ECL cluster. The nearest track is calculated
 using the `minC2TDist` variable. 
 )DOC");
     REGISTER_METAVARIABLE("minC2TDistVar(variable,particleList=pi-:all)", eclClusterIsolationVar, R"DOC(
@@ -1416,11 +1416,11 @@ More details about Zernike polynomials can be found in `Wikipedia <https://en.wi
 Returns second moment :math:`S`. It is defined as:
 
 .. math::
-    S = \frac{\sum_{i=0}^{n} w_{i} E_{i} r^2_{i}}{\sum_{i=0}^{n} w_{i} E_{i}}
+    S = \frac{1}{S_{0}(\theta)}\frac{\sum_{i=0}^{n} w_{i} E_{i} r^2_{i}}{\sum_{i=0}^{n} w_{i} E_{i}}
 
 where :math:`E_{i} = (E_0, E_1, ...)` are the single crystal energies sorted by energy, :math:`w_{i}` is
 the crystal weight, and :math:`r_{i}` is the distance of the :math:`i`-th digit to the shower center projected
-to a plane perpendicular to the shower axis.
+to a plane perpendicular to the shower axis. :math:`S_{0}(\theta)` normalizes :math:`S` to 1 for isolated photons.
 
 .. note::
     | Please read `this <importantNoteECL>` first.
@@ -1429,7 +1429,7 @@ to a plane perpendicular to the shower axis.
     | Precision: :math:`10` bit
 ..
 
-)DOC",":math:`\\text{cm}^2`");
+)DOC","dimensionless");
     REGISTER_VARIABLE("clusterLAT", eclClusterLAT, R"DOC(
 Returns lateral energy distribution (shower variable). It is defined as following:
 
@@ -1499,7 +1499,7 @@ The MVA has been trained using MC and the features used are:
 - `clusterZernikeMVA`
 
 Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
-the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
 )DOC");
     REGISTER_VARIABLE("fakePhotonSuppression", fakePhotonSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from fake photon clusters (e.g. split-offs,
@@ -1517,7 +1517,7 @@ The MVA has been trained using MC and the features are:
 This MVA is the same as the one used for `hadronicSplitOffSuppression` but that variable should not be used as it is deprecated and does not use the new weights. 
 
 Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
-the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
 )DOC");
     REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.

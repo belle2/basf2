@@ -197,3 +197,10 @@ void HistoManager::clear()
   m_memfile->ClearSharedMem();
 }
 
+
+void HistoManager::filedump(std::string outfile)
+{
+  printf("dump to dqm file = %s\n", outfile.c_str());
+  merge(); // Smart move to first merge, but necessary?
+  m_memfile->SaveToFile(outfile);
+}

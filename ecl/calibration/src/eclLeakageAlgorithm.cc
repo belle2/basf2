@@ -5,20 +5,27 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
+/* Own header. */
 #include <ecl/calibration/eclLeakageAlgorithm.h>
+
+/* ECL headers. */
 #include <ecl/calibration/tools.h>
 #include <ecl/dbobjects/ECLLeakageCorrections.h>
-#include <framework/datastore/StoreObjPtr.h>
+
+/* Basf2 headers. */
+#include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
 
+/* ROOT headers. */
+#include <TF1.h>
+#include <TFile.h>
+#include <TH1D.h>
+#include <TTree.h>
 
-#include "TH1D.h"
-#include "TF1.h"
-#include "TTree.h"
-#include "TFile.h"
-#include "TDirectory.h"
-#include "TProfile.h"
+/* C++ headers. */
 #include <iostream>
 
 using namespace std;

@@ -23,7 +23,7 @@ REG_MODULE(SVDLatencyCalibration);
 SVDLatencyCalibrationModule::SVDLatencyCalibrationModule() : Module()
 {
   // Set module properties
-  setDescription("this module perfoms an analysis to find the APV25 latency");
+  setDescription("this module performs an analysis to find the APV25 latency");
 
   // Parameter definitions
   addParam("ShaperDigitsName", m_shapersListName, "SVDShaperDigits list name", std::string(""));
@@ -91,9 +91,9 @@ void SVDLatencyCalibrationModule::endRun()
         for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
           for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++)
             (m_histo_maxAmplitude->getHistogram(sensor, view))->Write();
-  }
 
-  m_rootFilePtr->Close();
+    m_rootFilePtr->Close();
+  }
 
   //  m_histo_maxAmplitude->clean();
 

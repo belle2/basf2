@@ -328,12 +328,12 @@ void TSF::initializeMerger()
   }
 }
 
-bool TSF::notHit(MergerOut field, unsigned iTS, TSF::registeredStructElement& reg)
+bool TSF::notHit(CDCTrigger::MergerOut field, unsigned iTS, TSF::registeredStructElement& reg)
 {
   return ! reg[field][iTS];
 }
 
-void TSF::registerHit(MergerOut field, unsigned iTS, TSF::registeredStructElement& reg)
+void TSF::registerHit(CDCTrigger::MergerOut field, unsigned iTS, TSF::registeredStructElement& reg)
 {
   reg[field].set(iTS);
 }

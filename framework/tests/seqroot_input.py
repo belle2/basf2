@@ -41,7 +41,7 @@ class TestModule(basf2.Module):
         truehits = Belle2.PyStoreArray('PXDTrueHits')
         for truehit in truehits:
             relations = truehit.getRelationsTo("PXDSimHits")
-            print("truehit %d => hits " % truehit.getArrayIndex(), end="")
+            print(f"truehit {truehit.getArrayIndex()} => hits ", end="")
             for hit in relations:
                 print(hit.getArrayIndex(), end=", ")
             print()

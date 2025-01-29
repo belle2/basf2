@@ -26,21 +26,25 @@ namespace Belle2 {
      * normalization as the number of events for this specific histogram may differ)
     */
     enum EDeltaType { c_Disabled = 0, c_Entries = 1, c_Underflow = 2, c_Events = 3};
-    EDeltaType m_type{}; /**< type of delta algo */
-    int m_parameter{}; /**< parameter depending on algo, e.g. nr of entries or events */
+    EDeltaType m_type{c_Disabled}; /**< type of delta algo */
+    int m_parameter{0}; /**< parameter depending on algo, e.g. nr of entries or events */
     unsigned int m_amountDeltas{}; /**< amount of past histograms, at least 1*/
-    TH1* m_lastHist{};/**< Pointer to last histogram state for check */
-    int m_lastValue{}; /**< last value for comparison, depending on type */
-    std::vector<TH1*> m_deltaHists;/**< vector of histograms (max m_amountDeltas) */
-    bool m_updated{};/**< if any delta was updated in this event */
+    std::unique_ptr<TH1> m_lastHist{nullptr};/**< Pointer to last histogram state for check */
+    int m_lastValue{0}; /**< last value for comparison, depending on type */
+    std::vector<std::unique_ptr<TH1>> m_deltaHists;/**< vector of histograms (max m_amountDeltas) */
+    bool m_updated{false};/**< if any delta was updated in this event */
   public:
 
-    /** Construktor
+    /** Constructor
      * @param t type
      * @param p parameter for type
      * @param a amount of deletas in the past
      */
     HistDelta(EDeltaType t = c_Disabled, int p = 0, unsigned int a = 0);
+
+    /** Destructor
+     */
+    ~HistDelta();
 
     /** Parameter setter
      * @param t type
@@ -56,7 +60,7 @@ namespace Belle2 {
     /** Check if update of delta histogram is necessary
      * @param hist pointer to histogram
      */
-    void update(TH1* hist);
+    void update(const TH1* hist);
 
     /** Reset histogram and deltas, not the parameters
      */
@@ -67,6 +71,6 @@ namespace Belle2 {
      * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
      * @return Found histogram or nullptr
      */
-    TH1* getDelta(unsigned int n = 0, bool onlyIfUpdated = true);
+    TH1* getDelta(unsigned int n = 0, bool onlyIfUpdated = true) const;
   };
 }

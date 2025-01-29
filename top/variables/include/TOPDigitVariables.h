@@ -380,6 +380,33 @@ namespace Belle2 {
       double getFlag(const Particle* particle);
 
       /**
+       * Returns slot ID stored in TOPLikelihoods (available from release-9 on).
+       * Requires TOPLikelihoods.
+       * Variable name: topLogLSlotID
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return slot ID (NaN if N/A)
+       */
+      double getModuleID(const Particle* particle);
+
+      /**
+       * Returns assumed photon emission coordinate stored in TOPLikelihoods (available from release-9 on).
+       * Requires TOPLikelihoods.
+       * Variable name: topLogLEmiX
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return coordinate x in local frame (NaN if N/A)
+       */
+      double getEmissionX(const Particle* particle);
+
+      /**
+       * Returns assumed photon emission coordinate stored in TOPLikelihoods (available from release-9 on).
+       * Requires TOPLikelihoods.
+       * Variable name: topLogLEmiZ
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return coordinate z in local frame (NaN if N/A)
+       */
+      double getEmissionZ(const Particle* particle);
+
+      /**
        * Returns the number of photons used for the particle likelihood.
        * Requires TOPLikelihoods.
        * Variable name: topLogLPhotonCount
@@ -416,6 +443,35 @@ namespace Belle2 {
        */
       double getExpectedPhotonCountExpert(const Particle* particle,
                                           const std::vector<double>& vars);
+
+      /**
+       * Returns the effective number of signal photons for a given hypothesis.
+       * Requires TOPLikelihoods.
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @param pdg PDG code of charged stable particle
+       * @return effective number of signal photons (NaN if N/A)
+       */
+      double effectiveSignalYield(const Particle* particle, int pdg);
+
+      /**
+       * Returns the effective number of signal photons for this particle.
+       * Requires TOPLikelihoods.
+       * Variable name: topLogLSignalYield
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return effective number of signal photons (NaN if N/A)
+       */
+      double getEffectiveSignalYield(const Particle* particle);
+
+      /**
+       * Returns the effective number of signal photons for a given hypothesis.
+       * Requires TOPLikelihoods.
+       * Variable name: topLogLSignalYieldExpert(pdg)
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @param vars vector of size = 1 containing PDG code of charged stable particle
+       * @return effective number of signal photons (NaN if N/A)
+       */
+      double getEffectiveSignalYieldExpert(const Particle* particle,
+                                           const std::vector<double>& vars);
 
       /**
        * Returns the expected background count.

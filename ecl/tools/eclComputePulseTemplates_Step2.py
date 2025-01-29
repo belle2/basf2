@@ -50,7 +50,7 @@ def EvalAnyComp(tin, ttrg, TauIn):
 
 
 def CalcShaperOutput(muonShaper, muonInitial, inputPreShaper, ITER):
-    impulse = ((ifft((fft(muonShaper) / fft(muonInitial)))))
+    impulse = (ifft(fft(muonShaper) / fft(muonInitial)))
     outputShaper = np.real(ifft(fft(impulse) * fft(inputPreShaper)))
     base = outputShaper[ITER]
     i = 0
@@ -88,15 +88,15 @@ def GetShaperOutput(ratio, flg, shaperMuonFunc):
             PMT_output_array.append((2 - ratio) * EvalGamComp(t, PMT_trigger_time) +
                                     (ratio - 1) * (EvalAnyComp(t, PMT_trigger_time, 10)))
 
-    if(flg == 0):
+    if (flg == 0):
         return Time, PMT_output_array
-    if(flg == 1):
+    if (flg == 1):
         return Time, PMT_output_muon_array
-    if(flg == 2):
+    if (flg == 2):
         return Time, ShaperDSP_output_muon_array
-    if(flg == 3):
+    if (flg == 3):
         ShaperDSP_output_array = []
-        if(ratio <= 1.):
+        if (ratio <= 1.):
             ShaperDSP_output_array = CalcShaperOutput(ShaperDSP_output_muon_array, PMT_output_muon_array, PMT_output_array, 0)
         else:
             ShaperDSP_output_array = CalcShaperOutput(ShaperDSP_output_muon_array, PMT_output_muon_array, PMT_output_array, 30)
@@ -109,8 +109,8 @@ def GetShaperOutput(ratio, flg, shaperMuonFunc):
 
 
 OutputDirectory = "./"
-if(OutputDirectory == ""):
-    print("Error set ouput directory")
+if (OutputDirectory == ""):
+    print("Error set output directory")
     sys.exit()
 
 
@@ -149,7 +149,7 @@ outTree.Branch("ValueDiode_A", ValueDiode_A, 'ValueDiode_A[1000]/D')
 i = 0
 for i in range(entries):
     mt.GetEntry(i)
-    if(mt.PhotonArray[1] < -100):
+    if (mt.PhotonArray[1] < -100):
         for j in range(1000):
             ValuePhoton_A[j] = -999
             TimeAll_A[j] = -999
@@ -163,7 +163,7 @@ for i in range(entries):
 
         factor = TFactor
         for j in range(1000):
-            if(flag == 3):
+            if (flag == 3):
                 ValuePhoton_A[j] = mt.PhotonArray[j * factor]
             else:
                 ValuePhoton_A[j] = ValuesPhoton_A[j * factor]

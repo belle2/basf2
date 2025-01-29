@@ -11,41 +11,37 @@
 #include <arich/dbobjects/ARICHGeoBase.h>
 #include <arich/dbobjects/ARICHPositionElement.h>
 #include <string>
-#include <TVector3.h>
-#include <TRotation.h>
+#include <Math/Vector3D.h>
+#include <Math/Rotation3D.h>
 
 namespace Belle2 {
 
-
   /**
-   * Geometry parameters of ARICH Master volume (envelope)
+   * Geometry parameters of ARICH Master volume (envelope).
    */
-
-
   class ARICHGlobalAlignment: public ARICHGeoBase {
 
   public:
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHGlobalAlignment()
     {}
 
     /**
-     * Copy constructor
+     * Copy constructor.
      */
     ARICHGlobalAlignment(const ARICHGlobalAlignment& align): ARICHGeoBase()
     {
       *this = align;
-      m_rotation = 0;
-      m_rotationInverse = 0;
-      m_translation = 0;
+      m_rotation = nullptr;
+      m_rotationInverse = nullptr;
+      m_translation = nullptr;
     }
 
-
     /**
-     * Assignment operator
+     * Assignment operator.
      */
     ARICHGlobalAlignment& operator=(const ARICHGlobalAlignment& align)
     {
@@ -55,15 +51,15 @@ namespace Belle2 {
         if (m_rotation) delete m_rotation;
         if (m_rotationInverse) delete m_rotationInverse;
         if (m_translation) delete m_translation;
-        m_rotation = 0;
-        m_rotationInverse = 0;
-        m_translation = 0;
+        m_rotation = nullptr;
+        m_rotationInverse = nullptr;
+        m_translation = nullptr;
       }
       return *this;
     }
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ARICHGlobalAlignment()
     {
@@ -73,8 +69,8 @@ namespace Belle2 {
     }
 
     /**
-     * Sets alignment parameters (element)
-     * @param align alignment element
+     * Sets alignment parameters (element).
+     * @param[in] align Alignment element.
      */
     void setAlignmentElement(const ARICHPositionElement& align)
     {
@@ -82,8 +78,8 @@ namespace Belle2 {
     }
 
     /**
-     * Returns alignment parameters (element)
-     * @return alignment element
+     * Returns alignment parameters (element).
+     * @return Alignment element
      */
     const ARICHPositionElement& getAlignmentElement() const
     {
@@ -92,44 +88,72 @@ namespace Belle2 {
 
 
     /**
-     * Print the content of the class
-     * @param title title to be printed
+     * Print the content of the class.
+     * @param[in] title Title to be printed.
      */
     void print(const std::string& title = "ARICH global alignment parameters") const;
 
 
     /**
-     * Get position of ARICH master volume center point in global Belle II coordinates
-     * @return center point of ARICH volume
+     * Get position of ARICH master volume center point in global
+     * Belle II coordinates.
+     * @return Center point of ARICH volume.
      */
-    const TVector3& getTranslation() const {if (!m_translation) setTransformation(); return *m_translation;}
+    const ROOT::Math::XYZVector& getTranslation() const {if (!m_translation) setTransformation(); return *m_translation;}
 
     /**
-     * Get rotation matrix of ARICH master volume in global Belle II coordinates
-     * @return rotation matrix of ARICH master volume
+     * Get rotation matrix of ARICH master volume in global
+     * Belle II coordinates.
+     * @return Rotation matrix of ARICH master volume.
      */
-    const TRotation& getRotation() const
+    const ROOT::Math::Rotation3D& getRotation() const
     {
       if (!m_rotation) setTransformation();
       return *m_rotation;
     }
 
-    TVector3 pointToGlobal(const TVector3& point) const;
-    TVector3 momentumToGlobal(const TVector3& momentum) const;
-    TVector3 pointToLocal(const TVector3& point) const;
-    TVector3 momentumToLocal(const TVector3& momentum) const;
+    /**
+     * Transform local point into global Belle II coordinate system via rotation and translation
+     * @param point point to be transformed
+     * @return transformed point
+     */
+    ROOT::Math::XYZVector pointToGlobal(const ROOT::Math::XYZVector& point) const;
+
+    /**
+     * Rotate local momentum into global Belle II coordinate system
+     * @param momentum momentum vector to be rotated
+     * @return rotated momentum vector
+     */
+    ROOT::Math::XYZVector momentumToGlobal(const ROOT::Math::XYZVector& momentum) const;
+
+    /**
+     * Transform global point into ARICH reference system via inverse rotation and translation
+     * @param point point to be transformed
+     * @return transformed point
+     */
+    ROOT::Math::XYZVector pointToLocal(const ROOT::Math::XYZVector& point) const;
+
+    /**
+     * Rotate global point into ARICH reference system via inverse rotation
+     * @param momentum momentum vector to be rotated
+     * @return rotated momentum vector
+     */
+    ROOT::Math::XYZVector momentumToLocal(const ROOT::Math::XYZVector& momentum) const;
 
   private:
 
+    /**
+     * Set rotation matrix and center point of ARICH master volume based on alignment parameters
+     */
     void setTransformation() const;
 
-    ARICHPositionElement m_alignPars;
+    ARICHPositionElement m_alignPars; /**< alignment parameters */
 
-    mutable TRotation* m_rotation = 0 ;
-    mutable TRotation* m_rotationInverse = 0;
-    mutable TVector3*  m_translation = 0;
+    mutable ROOT::Math::Rotation3D* m_rotation = nullptr; /**< rotation matrix of ARICH master volume */
+    mutable ROOT::Math::Rotation3D* m_rotationInverse = nullptr; /**< inverse rotation matrix of ARICH master volume */
+    mutable ROOT::Math::XYZVector*  m_translation = nullptr; /**< position of ARICH master volume center point */
 
-    ClassDef(ARICHGlobalAlignment, 1); /**< ClassDef */
+    ClassDef(ARICHGlobalAlignment, 2); /**< ClassDef */
 
   };
 

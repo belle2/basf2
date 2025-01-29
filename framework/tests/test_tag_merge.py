@@ -33,3 +33,5 @@ if __name__ == '__main__':
             print(f'  {payload.name} r{payload.revision} {payload.iov}')
 
     subprocess.check_call(['b2conditionsdb-tag-merge', '-o', final_tag, '--dry-run'] + tags)
+
+    subprocess.check_call(['b2conditionsdb-tag-merge', '-o', final_tag, '--dry-run', '--run-range', '5', '0', '5', '300'] + tags)

@@ -122,6 +122,11 @@ void DQMHistAnalysisTrackingERModule::event()
         m_monObj->setVariable("abortRateSVDCKF", hAbortReasons->GetBinContent(4) / nEvents);
         m_monObj->setVariable("abortRatePXDCKF", hAbortReasons->GetBinContent(5) / nEvents);
         m_monObj->setVariable("abortRateSpacePoint", hAbortReasons->GetBinContent(6) / nEvents);
+
+        // Scale the bin contents to contain relative instead of absolute values.
+        for (int i = 1; i <= 6; i++) {
+          hAbortReasons->SetBinContent(i, hAbortReasons->GetBinContent(i) / nEvents);
+        }
       }
     }
   }

@@ -14,7 +14,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Filter for the constuction of segment triples based on simple criterions
+    /// Filter for the construction of segment triples based on simple criteria
     class SimpleSegmentTripleFilter : public Filter<CDCSegmentTriple> {
 
     private:
@@ -24,7 +24,7 @@ namespace Belle2 {
     public:
       /**
        *  Checks if a triple of axial, stereo and axial segments is a good combination to be stored.
-       *  Checks the proper alignement and the quality of connection between all three segments.
+       *  Checks the proper alignment and the quality of connection between all three segments.
        *  Returns NAN if the connection shall not be made or
        *  a finit value be used as the cell weight of the cell to constructed.
        */

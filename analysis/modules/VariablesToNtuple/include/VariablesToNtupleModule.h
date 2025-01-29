@@ -14,6 +14,8 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/FileMetaData.h>
 #include <framework/pcore/RootMergeable.h>
 
 #include <TTree.h>
@@ -51,6 +53,9 @@ namespace Belle2 {
      */
     float getInverseSamplingRateWeight(const Particle* particle);
 
+    /** Create and fill FileMetaData object. */
+    void fillFileMetaData();
+
     /** Name of particle list with reconstructed particles. */
     std::string m_particleList;
     /** List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
@@ -61,6 +66,8 @@ namespace Belle2 {
     std::string m_treeName;
     /** Suffix to be appended to the output file name. */
     std::string m_fileNameSuffix;
+    /** Use float type for floating-point numbers. */
+    bool m_useFloat;
     /** Size of TBaskets in the output ROOT file in bytes. */
     int m_basketsize;
 
@@ -75,8 +82,20 @@ namespace Belle2 {
     int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     int m_candidate{ -1};            /**< candidate counter */
     unsigned int m_ncandidates{0};   /**< total n candidates */
-    /** Branch addresses of variables of type double */
+    unsigned int m_eventCount{0};    /**< event counter */
+    int m_experimentLow{1};          /**< lowest experiment number */
+    int m_experimentHigh{0};         /**< highest experiment number */
+    int m_runLow{0};                 /**< lowest run number */
+    int m_runHigh{0};                /**< highest run number */
+    int m_eventLow{0};               /**< lowest event number */
+    int m_eventHigh{0};              /**< highest event number */
+
+    /** Branch addresses of variables of type float. */
+    std::vector<float> m_branchAddressesFloat;
+
+    /** Branch addresses of variables of type double. */
     std::vector<double> m_branchAddressesDouble;
+
     /** Branch addresses of variables of type int (or bool) */
     std::vector<int> m_branchAddressesInt;
     /** List of pairs of function pointers and respective data type corresponding to given variables. */
@@ -100,5 +119,20 @@ namespace Belle2 {
     int m_signalSideCandidate{-1};             /**< signal-side candidate counter */
     unsigned int m_nSignalSideCandidates{0};   /**< total n signal-side candidates */
     StoreObjPtr<RestOfEvent> m_roe;            /**< ROE object */
+
+    bool m_storeEventType;  /**< If true, the branch __eventType__ is added */
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< pointer to EventExtraInfo  */
+    std::string m_eventType; /**< EventType to be filled */
+
+    std::map<std::string, std::string> m_dataDescription; /**< Additional metadata description */
+
+    std::vector<std::string> m_parentLfns; /**< Vector of parent file LFNs. */
+
+    StoreObjPtr<FileMetaData> m_inputFileMetaData{"", DataStore::c_Persistent}; /**< Pointer to the input file meta data */
+
+    StoreObjPtr<FileMetaData> m_outputFileMetaData; /**< File meta data to be stored in the output ntuple file */
+
+    bool m_ignoreCommandLineOverride; /**< if true, ignore override of filename */
+
   };
 } // end namespace Belle2

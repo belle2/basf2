@@ -28,11 +28,12 @@ df_signal_only = df.query("Jpsi_isSignal == 1")
 
 fig, ax = plt.subplots()
 
-ax.hist(df_signal_only["Jpsi_M_uncorrected"], label="w/o brems corr", alpha=0.5)
-ax.hist(df_signal_only["Jpsi_M"], label="with brems corr", alpha=0.5)
+ax.hist(df_signal_only["Jpsi_M_uncorrected"], label="w/o brems corr", alpha=0.5, range=(1.7, 3.2))
+ax.hist(df_signal_only["Jpsi_M"], label="with brems corr", alpha=0.5, range=(1.7, 3.2))
 
 ax.set_yscale("log")  # set a logarithmic scale in the y-axis
-ax.set_xlabel("Invariant mass of the J/Psi")
+ax.set_xlabel("Invariant mass of the J/Psi [GeV]")
+ax.set_xlim(1.5, 3.5)
 ax.set_ylabel("Events")
 ax.legend()  # show legend
 

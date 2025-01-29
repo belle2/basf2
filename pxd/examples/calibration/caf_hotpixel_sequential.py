@@ -32,6 +32,7 @@ from caf.strategies import SequentialRunByRun
 from caf.utils import ExpRun, IoV
 from caf import backends
 from caf.framework import Calibration, CAF
+from ROOT import Belle2  # noqa: make Belle2 namespace accessible
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm
 import pickle
 import basf2 as b2

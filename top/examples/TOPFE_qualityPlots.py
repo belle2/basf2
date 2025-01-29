@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -291,7 +290,8 @@ b2.conditions.append_globaltag('online')
 
 # Create path
 main = b2.create_path()
-reader = b2.register_module('SeqRootInput')
+# reader = b2.register_module('SeqRootInput')  # sroot file
+reader = b2.register_module('RootInput')  # root file
 # file to read
 reader.param('inputFileName', args.filename)
 main.add_module(reader)

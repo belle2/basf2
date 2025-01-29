@@ -26,6 +26,8 @@ namespace Belle2 {
       float fraction = 0; /**< area normalization */
       float position = 0; /**< peak position [ns] */
       float sigma = 0;    /**< peak width [ns] */
+
+      ClassDef(Gauss, 1); /**< ClassDef */
     };
 
     /**

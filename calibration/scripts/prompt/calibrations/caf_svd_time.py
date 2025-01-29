@@ -15,12 +15,6 @@ import sys
 import datetime
 import random
 
-from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
-from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
-from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
-from ROOT.Belle2 import SVDClusterTimeShifterAlgorithm
-from ROOT.Belle2 import SVDTimeValidationAlgorithm
-
 import basf2 as b2
 
 import rawdata as raw
@@ -32,6 +26,8 @@ from caf import strategies
 from caf.utils import IoV
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.utils import filter_by_max_events_per_run
+
+from prompt.calibrations.caf_cdc import settings as cdc_tracking_calibration
 
 b2.set_log_level(b2.LogLevel.INFO)
 
@@ -49,12 +45,12 @@ settings = CalibrationSettings(name="caf_svd_time",
                                                                     INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
                                                                     INPUT_DATA_FILTERS["Run Type"]["physics"],
                                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
-                               depends_on=[],
+                               depends_on=[cdc_tracking_calibration],  # SVD time depends on CDC tracking calibration
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
                                    "listOfMutedCalibrations": [],  # "rawTimeCalibration", "timeShiftCalibration", "timeValidation"
-                                   "max_events_per_run":  60000,
-                                   "max_events_per_file": 30000,
+                                   "max_events_per_run":  10000,
+                                   "max_events_per_file": 5000,
                                    "isMC": False,
                                    "linearCutsOnCoG3": False,
                                    "upperLineParameters": [-94.0, 1.264],
@@ -149,6 +145,10 @@ def create_algorithm(
     Returns:
         ROOT.Belle2.SVDCoGTimeCalibrationAlgorithm
     """
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
+    from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
+    from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
+    from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
     if "CoG6" in prefix:
         algorithm = SVDCoGTimeCalibrationAlgorithm(unique_id)
     if "CoG3" in prefix:
@@ -175,6 +175,8 @@ def create_validation_algorithm(prefix="", min_entries=10000):
     Returns:
         ROOT.Belle2.SVDCoGTimeValidationAlgorithm
     """
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
+    from ROOT.Belle2 import SVDTimeValidationAlgorithm
     algorithm = SVDTimeValidationAlgorithm()
     if prefix:
         algorithm.setPrefix(prefix)
@@ -221,7 +223,7 @@ def create_pre_collector_path(
         is_validation=False):
     """
     Create a basf2 path that runs a common reconstruction path and also runs several SVDSimpleClusterizer
-    modules with different configurations. This way they re-use the same reconstructed objects.
+    modules with different configurations. This way they reuse the same reconstructed objects.
 
     Parameters:
         clusterizers (list[pybasf2.Module]): All the differently configured
@@ -256,7 +258,7 @@ def create_pre_collector_path(
 
     if not isMC:
         # run tracking reconstruction
-        add_tracking_reconstruction(path, append_full_grid_cdc_eventt0=True)
+        add_tracking_reconstruction(path, append_full_grid_cdc_eventt0=True, skip_full_grid_cdc_eventt0_if_svd_time_present=False)
         path = remove_module(path, "V0Finder")
         if not is_validation:
             # if we would like using the grouping (True by default), we should use the calibrated cluster time
@@ -303,6 +305,9 @@ def create_pre_collector_path(
 
 
 def get_calibrations(input_data, **kwargs):
+
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
+    from ROOT.Belle2 import SVDClusterTimeShifterAlgorithm
 
     file_to_iov_physics = input_data["hadron_calib"]
     expert_config = kwargs.get("expert_config")
@@ -547,7 +552,7 @@ def get_calibrations(input_data, **kwargs):
     shift_calibration.strategies = strategies.SingleIOV
 
     for algorithm in shift_calibration.algorithms:
-        algorithm.params = {"iov_coverage": output_iov}
+        algorithm.params = {"apply_iov": output_iov}
 
     if "timeShiftCalibration" not in listOfMutedCalibrations:
         list_of_calibrations.append(shift_calibration)

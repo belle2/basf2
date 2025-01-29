@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -11,7 +10,7 @@
 
 # ---------------------------------------------------------------------------------------
 # Checks the unpacking of raw data
-# Usage: basf2 checkUnpacking.py -i <file_name.sroot> [<debug_level>]
+# Usage: basf2 checkUnpacking.py -i <file_name.root> [<debug_level>]
 #   debug_level 21: to print additional information on errors
 #   debug_level 22: to print buffer sizes and additional information on errors
 # ---------------------------------------------------------------------------------------
@@ -32,8 +31,8 @@ b2.conditions.append_globaltag('online')
 main = b2.create_path()
 
 # input
-roinput = b2.register_module('SeqRootInput')
-# roinput = b2.register_module('RootInput')
+# roinput = b2.register_module('SeqRootInput')  # sroot files
+roinput = b2.register_module('RootInput')  # root files
 main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawDetector objects (needed if PocketDAQ)

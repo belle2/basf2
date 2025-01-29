@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -40,7 +39,7 @@ def main():
     print("Will now write your notebook config.")
 
     jupyter_template_file = find_file("framework/examples/ipython_tools/jupyter_notebook_config.py.j2")
-    with open(jupyter_template_file, 'r') as f:
+    with open(jupyter_template_file) as f:
         template = Template(f.read())
 
         try:
@@ -54,7 +53,7 @@ def main():
                 check_output(['jupyter', 'notebook', '--generate-config'])
             except BaseException:
                 print("Could not start jupyter notebook. There are many possible reasons for this.\n"
-                      "Please see https://confluence.desy.de/display/BI/Software+Jupyter+Notebooks for possible fixes \n"
+                      "Please see https://xwiki.desy.de/xwiki/rest/p/83b56 for possible fixes \n"
                       "and feel free to contact software@belle2.org for questions.")
 
         config_file = template.render(port=port)

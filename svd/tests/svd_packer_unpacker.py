@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -22,7 +21,7 @@ b2.set_random_seed(42)
 class SvdPackerUnpackerTestModule(b2.Module):
 
     """
-    module which ckecks if two collection of SVDShaperDigits are equal
+    module which checks if two collection of SVDShaperDigits are equal
     """
 
     def sortDigits(self, unsortedPyStoreArray):
@@ -33,7 +32,7 @@ class SvdPackerUnpackerTestModule(b2.Module):
         # first convert to a python-list to be abple to sort
         py_list = [x for x in unsortedPyStoreArray]
 
-        # sort via a hierachy of sort keys
+        # sort via a hierarchy of sort keys
         return sorted(
             py_list,
             key=lambda x: (

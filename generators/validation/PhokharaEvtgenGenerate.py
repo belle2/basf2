@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 <header>
@@ -19,6 +18,8 @@ basf2.set_log_level(basf2.LogLevel.INFO)
 # Random seed.
 basf2.set_random_seed(12345)
 
+#: \cond Doxygen_suppress
+
 # Create the main path.
 main = basf2.create_path()
 
@@ -35,6 +36,8 @@ generators.add_phokhara_evtgen_combination(
 output = basf2.register_module('RootOutput')
 output.param('outputFileName', 'PhokharaEvtgenData.root')
 main.add_module(output)
+
+#: \endcond
 
 # Progress.
 main.add_module('Progress')

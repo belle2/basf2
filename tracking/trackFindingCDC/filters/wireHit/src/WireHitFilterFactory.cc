@@ -9,12 +9,19 @@
 
 #include <tracking/trackFindingCDC/filters/wireHit/BaseWireHitFilter.h>
 #include <tracking/trackFindingCDC/filters/wireHit/AllWireHitFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHit/CDCWireHitVarSet.h>
 #include <tracking/trackFindingCDC/filters/wireHit/CutsFromDBWireHitFilter.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+  /// MVA filter for CDC states
+  using MVACDCWireHitFilter = MVAFilter<CDCWireHitVarSet>;
+}
 
 template class TrackFindingCDC::FilterFactory<BaseWireHitFilter>;
 
@@ -39,7 +46,8 @@ std::map<std::string, std::string> WireHitFilterFactory::getValidFilterNamesAndD
 {
   return {
     {"all", "all wireHits are valid."},
-    {"cuts_from_DB", "wireHits filtered by cuts from DB."}
+    {"cuts_from_DB", "wireHits filtered by cuts from DB."},
+    {"mva", "MVA filter using TOT, ADC, TDC to tag background hits."}
   };
 }
 
@@ -51,6 +59,9 @@ WireHitFilterFactory::create(const std::string& filterName) const
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "cuts_from_DB") {
     return std::make_unique<CutsFromDBWireHitFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
+  } else if (filterName == "mva") {
+    return std::make_unique<MVACDCWireHitFilter>();
   } else {
     return Super::create(filterName);
   }

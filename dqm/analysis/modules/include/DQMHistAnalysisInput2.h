@@ -91,9 +91,9 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
     /** Exp number */
-    unsigned int m_expno = 0;
+    int m_expno = 0;
     /** Run number */
-    unsigned int m_runno = 0;
+    int m_runno = 0;
     /** Event number */
     unsigned int m_count = 0;
 

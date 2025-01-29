@@ -90,6 +90,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   // Collect other plots just for reference - combines all the runs for these plots.
   auto cutflow = getObjectPtr<TH1F>("cutflow");
+  auto svdEventT0 = getObjectPtr<TH1D>("svdEventT0");
 
 
   // Define new plots to make
@@ -416,6 +417,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   TimevsCrateNoCrateCalibPrevCrystCalib  ->Write();
 
   cutflow->Write();
+  svdEventT0->Write();
 
 
   if (debugOutput) {

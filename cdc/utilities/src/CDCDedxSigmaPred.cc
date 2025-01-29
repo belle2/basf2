@@ -88,63 +88,72 @@ double CDCDedxSigmaPred::getSigma(double dedx, double nhit, double cos, double t
 double CDCDedxSigmaPred::nhitPrediction(double nhit)
 {
 
-  double x[1];
-  double nhitpar[6];
+// Define minimum and maximum nhit values
+  int nhit_min = 8, nhit_max = 37;
 
+  // Define the parameter array and initialize it
+  double nhitpar[6];
   nhitpar[0] = 2;
   for (int i = 0; i < 5; ++i) nhitpar[i + 1] = m_nhitpars[i];
 
-  // determine sigma from the nhit parameterization
+  // Create an instance of the CDCDedxWidgetSigma class
   CDCDedxWidgetSigma gs;
+
+  // Initialize x array to pass to sigmaCurve
+  double x[1];
+
   x[0] = nhit;
 
   double corNHit;
-  int nhit_min = 8, nhit_max = 37;
 
-  if (nhit <  nhit_min) {
+  if (nhit < nhit_min) {
     x[0] = nhit_min;
-    corNHit = gs.sigmaCurve(x, nhitpar) * sqrt(nhit_min / nhit);
+    corNHit = gs.sigmaCurve(x, std::vector<double>(nhitpar, nhitpar + 6)) * std::sqrt(nhit_min / nhit);
   } else if (nhit > nhit_max) {
     x[0] = nhit_max;
-    corNHit = gs.sigmaCurve(x, nhitpar) * sqrt(nhit_max / nhit);
-  } else corNHit = gs.sigmaCurve(x, nhitpar);
+    corNHit = gs.sigmaCurve(x, std::vector<double>(nhitpar, nhitpar + 6)) * std::sqrt(nhit_max / nhit);
+  } else {
+    corNHit = gs.sigmaCurve(x, std::vector<double>(nhitpar, nhitpar + 6));
+  }
 
   return corNHit;
 }
 
 double CDCDedxSigmaPred::ionzPrediction(double dedx)
 {
-
-  double x[1];
+  // Define the parameter array and initialize it
   double dedxpar[3];
-
   dedxpar[0] = 1;
-
   for (int i = 0; i < 2; ++i) dedxpar[i + 1] = m_dedxpars[i];
 
-  // determine sigma from the parameterization
+  // Create an instance of the CDCDedxWidgetSigma class
   CDCDedxWidgetSigma gs;
+
+// Initialize x array to pass to sigmaCurve
+  double x[1];
   x[0] = dedx;
-  double corDedx = gs.sigmaCurve(x, dedxpar);
+
+  double corDedx = gs.sigmaCurve(x, std::vector<double>(dedxpar, dedxpar + 3));
 
   return corDedx;
 }
 
 double CDCDedxSigmaPred::cosPrediction(double cos)
 {
-
-  double x[1];
-  double corCos;
+  // Create an instance of the CDCDedxWidgetSigma class
   CDCDedxWidgetSigma gs;
 
+  // Define the parameter array and initialize it
   double cospar[11];
   cospar[0] = 3;
-
   for (int i = 0; i < 10; ++i)  cospar[i + 1] = m_cospars[i];
 
+  // Initialize x array to pass to sigmaCurve
+  double x[1];
   x[0] = cos;
-  corCos = gs.sigmaCurve(x, cospar);
+
+  double corCos;
+  corCos = gs.sigmaCurve(x, std::vector<double>(cospar, cospar + 11));
 
   return corCos;
-
 }

@@ -121,7 +121,7 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
   had.setParameters("sat-pars.fit.txt");
 
   unsigned int entries = hadron->GetEntries();
-  // if (pdg == "electron") entries /= 10.;
+
   for (unsigned int index = 0; index < entries; ++index) {
 
     hadron->GetEvent(index);
@@ -163,7 +163,12 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
 
     double ionz_res = sbg.cosPrediction(costh) * sbg.nhitPrediction(nhit) * timereso;
 
-    if (ionz_res != 0) hionzsigma_bg[bgBin]->Fill((dedx_new - dedx_cur) / ionz_res);
+    if (ionz_res == 0) {
+      B2INFO("RESOLUTION costh * nhit * timereso IS ZERO!!!");
+      continue;
+    }
+
+    hionzsigma_bg[bgBin]->Fill((dedx_new - dedx_cur) / ionz_res);
 
     m_sumcos[bgBin] += costh;
     m_sumbg[bgBin] += bg;
@@ -512,17 +517,25 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
                                   std::map<int, std::vector<TH1F*>>& hchicos_3by3bg, std::string pdg, std::string suffix)
 {
 
-  double chicos[2][m_cosBins], sigmacos[2][m_cosBins];
-  double chicoserr[2][m_cosBins], sigmacoserr[2][m_cosBins];
+  std::vector<std::vector<double>> chicos(2, std::vector<double>(m_cosBins));
+  std::vector<std::vector<double>> sigmacos(2, std::vector<double>(m_cosBins));
+  std::vector<std::vector<double>> chicoserr(2, std::vector<double>(m_cosBins));
+  std::vector<std::vector<double>> sigmacoserr(2, std::vector<double>(m_cosBins));
 
-  double chicos_1b3bg[2][m_cosBins], sigmacos_1b3bg[2][m_cosBins];
-  double chicos_1b3bgerr[2][m_cosBins], sigmacos_1b3bgerr[2][m_cosBins];
+  std::vector<std::vector<double>> chicos_1b3bg(2, std::vector<double>(m_cosBins));
+  std::vector<std::vector<double>> sigmacos_1b3bg(2, std::vector<double>(m_cosBins));
+  std::vector<std::vector<double>> chicos_1b3bgerr(2, std::vector<double>(m_cosBins));
+  std::vector<std::vector<double>> sigmacos_1b3bgerr(2, std::vector<double>(m_cosBins));
 
-  double chicos_2b3bg[2][m_cosBins], sigmacos_2b3bg[2][m_cosBins];
-  double chicos_2b3bgerr[2][m_cosBins], sigmacos_2b3bgerr[2][m_cosBins];
+  std::vector<std::vector<double>> chicos_2b3bg(2, std::vector<double>(m_cosBins));
+  std::vector<std::vector<double>> sigmacos_2b3bg(2, std::vector<double>(m_cosBins));
+  std::vector<std::vector<double>> chicos_2b3bgerr(2, std::vector<double>(m_cosBins));
+  std::vector<std::vector<double>> sigmacos_2b3bgerr(2, std::vector<double>(m_cosBins));
 
-  double chicos2[2][m_cosBins], sigmacos2[2][m_cosBins];
-  double chicos2err[2][m_cosBins], sigmacos2err[2][m_cosBins];
+  std::vector<std::vector<double>> chicos2(2, std::vector<double>(m_cosBins));
+  std::vector<std::vector<double>> sigmacos2(2, std::vector<double>(m_cosBins));
+  std::vector<std::vector<double>> chicos2err(2, std::vector<double>(m_cosBins));
+  std::vector<std::vector<double>> sigmacos2err(2, std::vector<double>(m_cosBins));
 
   for (int c = 0; c < 2; ++c) {
     for (int i = 0; i < m_cosBins; ++i) {
@@ -560,38 +573,41 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
     }
   }
 
-
   plotDist(hchicos_allbg,  Form("fits_chi_vscos_allbg_%s_%s", pdg.data(), suffix.data()), m_cosBins);
   plotDist(hchicos_1by3bg, Form("fits_chi_vscos_1by3bg_%s_%s", pdg.data(), suffix.data()), m_cosBins);
   plotDist(hchicos_2by3bg,  Form("fits_chi_vscos_2by3bg_%s_%s", pdg.data(), suffix.data()), m_cosBins);
   plotDist(hchicos_3by3bg, Form("fits_chi_vscos_3by3bg_%s_%s", pdg.data(), suffix.data()), m_cosBins);
 
   const double cosstep = 2.0 / m_cosBins;
-  double cosArray[m_cosBins], cosArrayErr[m_cosBins];
+  std::vector<double> cosArray(m_cosBins), cosArrayErr(m_cosBins);
   for (int i = 0; i < m_cosBins; ++i) {
     cosArray[i] = -1.0 + (i * cosstep + cosstep / 2.0); //finding bin centre
     cosArrayErr[i] = 0.0;
   }
 
-  TGraphErrors grchicos(m_cosBins, cosArray, chicos[0], cosArrayErr, chicoserr[0]);
-  TGraphErrors grchicos_1b3bg(m_cosBins, cosArray, chicos_1b3bg[0], cosArrayErr, chicos_1b3bgerr[0]);
-  TGraphErrors grchicos_2b3bg(m_cosBins, cosArray, chicos_2b3bg[0], cosArrayErr, chicos_2b3bgerr[0]);
-  TGraphErrors grchicos2(m_cosBins, cosArray, chicos2[0], cosArrayErr, chicos2err[0]);
+  TGraphErrors grchicos(m_cosBins, cosArray.data(), chicos[0].data(), cosArrayErr.data(), chicoserr[0].data());
+  TGraphErrors grchicos_1b3bg(m_cosBins, cosArray.data(), chicos_1b3bg[0].data(), cosArrayErr.data(), chicos_1b3bgerr[0].data());
+  TGraphErrors grchicos_2b3bg(m_cosBins, cosArray.data(), chicos_2b3bg[0].data(), cosArrayErr.data(), chicos_2b3bgerr[0].data());
+  TGraphErrors grchicos2(m_cosBins, cosArray.data(), chicos2[0].data(), cosArrayErr.data(), chicos2err[0].data());
 
-  TGraphErrors grchicosn(m_cosBins, cosArray, chicos[1], cosArrayErr, chicoserr[1]);
-  TGraphErrors grchicos_1b3bgn(m_cosBins, cosArray, chicos_1b3bg[1], cosArrayErr, chicos_1b3bgerr[1]);
-  TGraphErrors grchicos_2b3bgn(m_cosBins, cosArray, chicos_2b3bg[1], cosArrayErr, chicos_2b3bgerr[1]);
-  TGraphErrors grchicos2n(m_cosBins, cosArray, chicos2[1], cosArrayErr, chicos2err[1]);
+  TGraphErrors grchicosn(m_cosBins, cosArray.data(), chicos[1].data(), cosArrayErr.data(), chicoserr[1].data());
+  TGraphErrors grchicos_1b3bgn(m_cosBins, cosArray.data(), chicos_1b3bg[1].data(), cosArrayErr.data(), chicos_1b3bgerr[1].data());
+  TGraphErrors grchicos_2b3bgn(m_cosBins, cosArray.data(), chicos_2b3bg[1].data(), cosArrayErr.data(), chicos_2b3bgerr[1].data());
+  TGraphErrors grchicos2n(m_cosBins, cosArray.data(), chicos2[1].data(), cosArrayErr.data(), chicos2err[1].data());
 
-  TGraphErrors grsigmacos(m_cosBins, cosArray, sigmacos[0], cosArrayErr, sigmacoserr[0]);
-  TGraphErrors grsigmacos_1b3bg(m_cosBins, cosArray, sigmacos_1b3bg[0], cosArrayErr, sigmacos_1b3bgerr[0]);
-  TGraphErrors grsigmacos_2b3bg(m_cosBins, cosArray, sigmacos_2b3bg[0], cosArrayErr, sigmacos_2b3bgerr[0]);
-  TGraphErrors grsigmacos2(m_cosBins, cosArray, sigmacos2[0], cosArrayErr, sigmacos2err[0]);
+  TGraphErrors grsigmacos(m_cosBins, cosArray.data(), sigmacos[0].data(), cosArrayErr.data(), sigmacoserr[0].data());
+  TGraphErrors grsigmacos_1b3bg(m_cosBins, cosArray.data(), sigmacos_1b3bg[0].data(), cosArrayErr.data(),
+                                sigmacos_1b3bgerr[0].data());
+  TGraphErrors grsigmacos_2b3bg(m_cosBins, cosArray.data(), sigmacos_2b3bg[0].data(), cosArrayErr.data(),
+                                sigmacos_2b3bgerr[0].data());
+  TGraphErrors grsigmacos2(m_cosBins, cosArray.data(), sigmacos2[0].data(), cosArrayErr.data(), sigmacos2err[0].data());
 
-  TGraphErrors grsigmacosn(m_cosBins, cosArray, sigmacos[1], cosArrayErr, sigmacoserr[1]);
-  TGraphErrors grsigmacos_1b3bgn(m_cosBins, cosArray, sigmacos_1b3bg[1], cosArrayErr, sigmacos_1b3bgerr[1]);
-  TGraphErrors grsigmacos_2b3bgn(m_cosBins, cosArray, sigmacos_2b3bg[1], cosArrayErr, sigmacos_2b3bgerr[1]);
-  TGraphErrors grsigmacos2n(m_cosBins, cosArray, sigmacos2[1], cosArrayErr, sigmacos2err[1]);
+  TGraphErrors grsigmacosn(m_cosBins, cosArray.data(), sigmacos[1].data(), cosArrayErr.data(), sigmacoserr[1].data());
+  TGraphErrors grsigmacos_1b3bgn(m_cosBins, cosArray.data(), sigmacos_1b3bg[1].data(), cosArrayErr.data(),
+                                 sigmacos_1b3bgerr[1].data());
+  TGraphErrors grsigmacos_2b3bgn(m_cosBins, cosArray.data(), sigmacos_2b3bg[1].data(), cosArrayErr.data(),
+                                 sigmacos_2b3bgerr[1].data());
+  TGraphErrors grsigmacos2n(m_cosBins, cosArray.data(), sigmacos2[1].data(), cosArrayErr.data(), sigmacos2err[1].data());
 
   TLine line0(-1, 0, 1, 0);
   line0.SetLineStyle(kDashed);

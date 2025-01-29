@@ -237,8 +237,8 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, std:
     prep.defineHisto(hdedx_var, "chi", svar, particle.data());
 
     // Create some containers to calculate averages
-    double sumvar[nbins];
-    int sumsize[nbins];
+    std::vector<double> sumvar(nbins);
+    std::vector<int> sumsize(nbins);
     for (int i = 0; i < nbins; ++i) {
       sumvar[i] = 0;
       sumsize[i] = 0;
@@ -316,7 +316,7 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, std:
     tTree->Branch("chisigma_err", &sigma_err, "chisigma_err/D");
 
     double avg_sigma = 0.0;
-    double var[nbins], varres[nbins], varreserr[nbins];
+    std::vector<double> var(nbins), varres(nbins), varreserr(nbins);
 
     int count_bins = 0;
     for (int i = 0; i < nbins; ++i) {

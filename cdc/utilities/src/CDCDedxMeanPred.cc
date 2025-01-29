@@ -69,7 +69,7 @@ double CDCDedxMeanPred::getMean(double bg)
   else C = 1;
 
   double x[1]; x[0] = bg;
-  double parsA[9];
+  double parsA[8];
   double parsB[5];
   double parsC[5];
 
@@ -82,9 +82,9 @@ double CDCDedxMeanPred::getMean(double bg)
 
   // calculate dE/dx from the Bethe-Bloch mean
   CDCDedxWidgetCurve gc;
-  double partA = gc.meanCurve(x, parsA);
-  double partB = gc.meanCurve(x, parsB);
-  double partC = gc.meanCurve(x, parsC);
+  double partA = gc.meanCurve(x, std::vector<double>(parsA, parsA + 8));
+  double partB = gc.meanCurve(x, std::vector<double>(parsB, parsB + 5));
+  double partC = gc.meanCurve(x, std::vector<double>(parsC, parsC + 5));
 
   return (A * partA + B * partB + C * partC);
 }

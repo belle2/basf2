@@ -35,27 +35,22 @@ namespace Belle2 {
     * calculate the predicted mean value as a function of beta-gamma (bg)
     * this is done with a different function depending on the value of bg
     */
-    double meanCurve(double* x, double* par) const
+    double meanCurve(double* x, const std::vector<double>& par) const
     {
       double f = 0;
 
-      if (par[0] == 1)
-        f = par[1] * std::pow(std::sqrt(x[0] * x[0] + 1), par[3]) / std::pow(x[0], par[3]) *
-            (par[2] - par[5] * std::log(1 / x[0])) - par[4] + std::exp(par[6] + par[7] * x[0]);
-      else if (par[0] == 2)
-        f = par[1] * std::pow(x[0], 3) + par[2] * x[0] * x[0] + par[3] * x[0] + par[4];
-      else if (par[0] == 3)
-        f = -1.0 * par[1] * std::log(par[4] + std::pow(1 / x[0], par[2])) + par[3];
-
+      if (par[0] == 1) {
+        if (par.size() == 8)
+          f = par[1] * std::pow(std::sqrt(x[0] * x[0] + 1), par[3]) / std::pow(x[0], par[3]) *
+              (par[2] - par[5] * std::log(1 / x[0])) - par[4] + std::exp(par[6] + par[7] * x[0]);
+      } else if (par[0] == 2) {
+        if (par.size() == 5)
+          f = par[1] * std::pow(x[0], 3) + par[2] * x[0] * x[0] + par[3] * x[0] + par[4];
+      } else if (par[0] == 3) {
+        if (par.size() == 5)
+          f = -1.0 * par[1] * std::log(par[4] + std::pow(1 / x[0], par[2])) + par[3];
+      }
       return f;
-    }
-
-    /**
-    *  Opertaor to call mean function
-    */
-    double operator()(double* x, double* par)
-    {
-      return meanCurve(x, par);
     }
 
   };

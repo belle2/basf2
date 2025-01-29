@@ -67,8 +67,6 @@ namespace Belle2 {
     /**
     * Hadron collector variables
     */
-    bool m_cuts; /**< Boolean to apply cuts during collection */
-
     std::vector<std::string> m_strParticleList; /**< Vector of ParticleLists to write out */
 
     std::map<std::string, std::string> m_pdgMap;   /**< map to relate input strings to the right particle type */

@@ -303,7 +303,7 @@ void HadronPrep::setPars(TFile*& outfile, std::map<int, std::vector<TH1F*>>& hde
 //------------------------------------
 void HadronPrep::plotGraph(std::string sname, std::string pdg)
 {
-  double cbcenters[m_cosBins], cberrors[m_cosBins];
+  std::vector<double> cbcenters(m_cosBins), cberrors(m_cosBins);
   double cosstep = (m_cosMax - m_cosMin) / m_cosBins;
   double bgstep = (m_bgMax - m_bgMin) / m_bgBins;
 
@@ -330,17 +330,21 @@ void HadronPrep::plotGraph(std::string sname, std::string pdg)
 
   TLegend legend(0.75, 0.75, 0.95, 0.9);
 
-  TGraphErrors* gdedx_costh[m_bgBins];
+  std::vector<TGraphErrors*> gdedx_costh(m_bgBins);
+
   legend.SetBorderSize(0);
 
   for (int i = 0; i < m_bgBins; ++i) {
-    double mean_d [m_cosBins];
-    double error_d[m_cosBins];
+    std::vector<double> mean_d(m_cosBins);
+    std::vector<double> error_d(m_cosBins);
+    // double mean_d [m_cosBins];
+    // double error_d[m_cosBins];
     for (int j = 0; j < m_cosBins; ++j) {
       mean_d [j] = m_means[i][j];
       error_d[j] = m_errors[i][j];
     }
-    gdedx_costh[i] = new TGraphErrors(m_cosBins, cbcenters, mean_d, cberrors, error_d);
+    gdedx_costh[i] = new TGraphErrors(m_cosBins, cbcenters.data(), mean_d.data(), cberrors.data(), error_d.data());
+
     gdedx_costh[i]->SetMarkerSize(0.9);
     gdedx_costh[i]->SetMarkerColor(50 + i * 3);
     gdedx_costh[i]->SetLineColor(i + 1);

@@ -91,8 +91,16 @@ void HadronCalibration::fitBGCurve(std::vector< std::string > particles, std::st
   TMultiGraph* grcopy1 = (TMultiGraph*)gr_dedxvsbg->Clone(Form("datapoints_%s", suffix.data()));
 
   //Region 1
-  TF1* fdedx1 = new TF1("fdedx1", gc, bgmin1, bgmax1, 8, "WidgetCurve");
-  TF1* fdedx1Copy = new TF1("fdedx1Copy", gc, bgmin1, bgmax1, 8, "WidgetCurve");
+  TF1* fdedx1 = new TF1("fdedx1", [gc](double * x, double * par) {
+    std::vector<double> parVec(par, par + 8);  // Create a vector from the parameters
+    return gc->meanCurve(x, parVec);  // Call the member function
+  }, bgmin1, bgmax1, 8, "WidgetCurve");
+
+  TF1* fdedx1Copy = new TF1("fdedx1Copy", [gc](double * x, double * par) {
+    std::vector<double> parVec(par, par + 8);  // Create a vector from the parameters
+    return gc->meanCurve(x, parVec);  // Call the member function
+  }, bgmin1, bgmax1, 8, "WidgetCurve");
+
   fdedx1->SetParameter(0, 1);
   fdedx1Copy->SetParameter(0, 1);
   for (int i = 1; i < 8; ++i) {
@@ -101,8 +109,16 @@ void HadronCalibration::fitBGCurve(std::vector< std::string > particles, std::st
   }
 
   //Region 2
-  TF1* fdedx2 = new TF1("fdedx2", gc, bgmin2, bgmax2, 5, "WidgetCurve");
-  TF1* fdedx2Copy = new TF1("fdedx2Copy", gc, bgmin2, bgmax2, 5, "WidgetCurve");
+  TF1* fdedx2 = new TF1("fdedx2", [gc](double * x, double * par) {
+    std::vector<double> parVec(par, par + 5);  // Create a vector from the parameters
+    return gc->meanCurve(x, parVec);  // Call the member function
+  }, bgmin2, bgmax2, 5, "WidgetCurve");
+
+  TF1* fdedx2Copy = new TF1("fdedx2Copy", [gc](double * x, double * par) {
+    std::vector<double> parVec(par, par + 5);  // Create a vector from the parameters
+    return gc->meanCurve(x, parVec);  // Call the member function
+  }, bgmin2, bgmax2, 5, "WidgetCurve");
+
   fdedx2->SetParameter(0, 2);
   fdedx2Copy->SetParameter(0, 2);
   for (int i = 1; i < 5; ++i) {
@@ -111,8 +127,16 @@ void HadronCalibration::fitBGCurve(std::vector< std::string > particles, std::st
   }
 
   //Region 3
-  TF1* fdedx3 = new TF1("fdedx3", gc, bgmin3, bgmax3, 5, "WidgetCurve");
-  TF1* fdedx3Copy = new TF1("fdedx3Copy", gc, bgmin3, bgmax3, 5, "WidgetCurve");
+  TF1* fdedx3 = new TF1("fdedx3", [gc](double * x, double * par) {
+    std::vector<double> parVec(par, par + 5);  // Create a vector from the parameters
+    return gc->meanCurve(x, parVec);  // Call the member function
+  }, bgmin3, bgmax3, 5, "WidgetCurve");
+
+  TF1* fdedx3Copy = new TF1("fdedx3Copy", [gc](double * x, double * par) {
+    std::vector<double> parVec(par, par + 5);  // Create a vector from the parameters
+    return gc->meanCurve(x, parVec);  // Call the member function
+  }, bgmin3, bgmax3, 5, "WidgetCurve");
+
   fdedx3->SetParameter(0, 3);
   fdedx3Copy->SetParameter(0, 3);
   for (int i = 1; i < 5; ++i) {
@@ -438,7 +462,9 @@ void HadronCalibration::plotMonitoring(std::vector< std::string > particles, std
   TFile* infile = new TFile(filename.data());
 
   // multigraphs to hold the curve and residual results
-  TGraphErrors grchim[npart];
+  // TGraphErrors grchim[npart];
+  std::vector<TGraphErrors> grchim(npart);
+
   TMultiGraph* gr_var = new TMultiGraph(Form("%s", sname.data()), "");
 
   TLegend tlegPart(0.75, 0.65, 0.90, 0.90);
@@ -519,8 +545,8 @@ void HadronCalibration::fitSigmavsIonz(std::vector< std::string > particles, std
   gpar.setParameters(paramfile.data());
 
   TFile* infile = new TFile(filename.data());
+  std::vector<TGraphErrors> part_resovsdedx(npart);
 
-  TGraphErrors part_resovsdedx[npart];
   TMultiGraph* gr_resovsdedx = new TMultiGraph("gr_resovsdedx", ";dedx;#sigma(ionz)");
 
   TLegend tlegPart(0.72, 0.15, 0.88, 0.40);
@@ -622,7 +648,11 @@ void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, std
 
   CDCDedxWidgetSigma* gs = new CDCDedxWidgetSigma();
 
-  TF1* fsigma = new TF1("fsigma", gs, lowernhit, uppernhit, 6, "CDCDedxWidgetSigma");
+  TF1* fsigma = new TF1("fsigma", [gs](double * x, double * par) {
+    std::vector<double> parVec(par, par + 6);  // Create a vector from the parameters
+    return gs->sigmaCurve(x, parVec);  // Call the member function
+  }, lowernhit, uppernhit, 6, "CDCDedxWidgetSigma");
+
   fsigma->SetParameter(0, 2);
   for (int i = 1; i < 6; ++i) fsigma->SetParameter(i, sgpar.getNHitPars(i - 1));
 
@@ -720,7 +750,11 @@ void HadronCalibration::fitSigmaVsCos(std::vector< std::string > particles, std:
 
   CDCDedxWidgetSigma* gs = new CDCDedxWidgetSigma();
 
-  TF1* total = new TF1("total", gs, lowercos, uppercos, 11, "CDCDedxWidgetSigma");
+  TF1* total = new TF1("total", [gs](double * x, double * par) {
+    std::vector<double> parVec(par, par + 11);  // Create a vector from the parameters
+    return gs->sigmaCurve(x, parVec);  // Call the member function
+  }, lowercos, uppercos, 11, "CDCDedxWidgetSigma"); // 6 parameters for this example
+
   for (int i = 0; i < 10; ++i) total->SetParameter(i + 1, gpar.getCosPars(i));
   total->FixParameter(0, 3);
   total->FixParameter(2, 0.0);

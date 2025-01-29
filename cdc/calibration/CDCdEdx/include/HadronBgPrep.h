@@ -155,7 +155,7 @@ namespace Belle2 {
     */
     double getParticleMass(std::string particle)
     {
-      double mass;
+      double mass = 0.0;
       if (particle == "pion") mass = Const::pion.getMass();
       else if (particle == "kaon") mass = Const::kaon.getMass();
       else if (particle == "proton") mass = Const::proton.getMass();

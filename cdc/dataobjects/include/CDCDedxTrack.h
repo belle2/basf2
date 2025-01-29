@@ -29,8 +29,8 @@ namespace Belle2 {
     /** Default constructor */
     CDCDedxTrack() :
       RelationsObject(),
-      m_track(0), m_charge(0), m_cosTheta(0), m_p(0), m_pCDC(0), m_length(0.0), m_injring(-1),
-      m_injtime(-1), m_pdg(-999), m_mcmass(0), m_motherPDG(0), m_pTrue(0), m_cosThetaTrue(0),
+      m_cosTheta(0), m_p(0), m_pCDC(0), m_length(0.0), m_injring(-1), m_injtime(-1),
+      m_track(0), m_charge(0), m_pdg(-999), m_mcmass(0), m_motherPDG(0), m_pTrue(0), m_cosThetaTrue(0),
       m_scale(0), m_cosCor(0), m_cosEdgeCor(0), m_runGain(0), m_timeGain(0), m_timeReso(0),
       m_lNHitsUsed(0)
     {

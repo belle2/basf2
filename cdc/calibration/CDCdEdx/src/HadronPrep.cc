@@ -337,8 +337,7 @@ void HadronPrep::plotGraph(std::string sname, std::string pdg)
   for (int i = 0; i < m_bgBins; ++i) {
     std::vector<double> mean_d(m_cosBins);
     std::vector<double> error_d(m_cosBins);
-    // double mean_d [m_cosBins];
-    // double error_d[m_cosBins];
+
     for (int j = 0; j < m_cosBins; ++j) {
       mean_d [j] = m_means[i][j];
       error_d[j] = m_errors[i][j];

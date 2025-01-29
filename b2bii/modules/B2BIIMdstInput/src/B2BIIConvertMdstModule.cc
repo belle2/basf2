@@ -637,6 +637,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       } else {
         Belle::Mdst_trk_fit& trk_fit = charged_mag[trackID[0] - 1].trk().mhyp(belleHypP);
         double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
+        if (std::isnan(pValue)) continue;
 
         std::vector<float> helixParam(5);
         std::vector<float> helixError(15);
@@ -692,6 +693,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       } else {
         Belle::Mdst_trk_fit& trk_fit = charged_mag[trackID[1] - 1].trk().mhyp(belleHypM);
         double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
+        if (std::isnan(pValue)) continue;
 
         std::vector<float> helixParam(5);
         std::vector<float> helixError(15);

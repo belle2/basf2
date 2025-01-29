@@ -19,7 +19,7 @@
 #include <TLine.h>
 #include <TLegend.h>
 #include <TGraphErrors.h>
-#include "TTree.h"
+#include <TTree.h>
 
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>

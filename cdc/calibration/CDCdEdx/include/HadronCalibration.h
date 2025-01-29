@@ -16,17 +16,17 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "TFile.h"
-#include "TTree.h"
-#include "TGraphErrors.h"
-#include "TLine.h"
-#include "TMultiGraph.h"
-#include "TCanvas.h"
-#include "TLegend.h"
-#include "TF1.h"
+#include <TFile.h>
+#include <TTree.h>
+#include <TGraphErrors.h>
+#include <TLine.h>
+#include <TMultiGraph.h>
+#include <TCanvas.h>
+#include <TLegend.h>
+#include <TF1.h>
 
-#include "TStyle.h"
-#include "TPaveText.h"
+#include <TStyle.h>
+#include <TPaveText.h>
 #include <framework/gearbox/Const.h>
 #include <cdc/utilities/CDCDedxMeanPred.h>
 #include <cdc/utilities/CDCDedxWidgetCurve.h>

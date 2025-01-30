@@ -19,6 +19,8 @@
 
 #include <mdst/dataobjects/ECLCluster.h>
 
+#include <TDatabasePDG.h>
+
 // framework utilities
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
@@ -74,6 +76,10 @@ ParticleKinematicFitterModule::ParticleKinematicFitterModule() : Module(), m_tex
   addParam("recoilMass", m_recoilMass, "Recoil mass in GeV. RecoilMass constraint only.", 0.0);
   addParam("invMass", m_invMass, "Invariant mass in GeV. Mass constraint only.", 0.0);
   addParam("variablePrefix", m_prefix, "Prefix attached to extra info variables.", string(""));
+  addParam("listDirectionOnlyParticles", m_listDirectionOnlyParticles,
+           "boolean list indicating index of particles where only direction is used in the fit");
+  addParam("listAlternateMassHypo", m_listAlternateMassHypo,
+           "integer list of pdg values for particles where different mass hypo. is used in the fit");
 
 }
 
@@ -200,9 +206,22 @@ bool ParticleKinematicFitterModule::doOrcaKinFitFit(Particle* mother)
   // set constraints (not connected to a fitter or particles at this point!)
   setConstraints();
 
+  if (m_listDirectionOnlyParticles.size() == 0) {
+    m_listDirectionOnlyParticles.resize(particleChildren.size());
+  } else if (m_listDirectionOnlyParticles.size() != particleChildren.size()) {
+    B2FATAL("ParticleKinematicFitterModule: m_listDirectionOnlyParticles size must match particleChildren size");
+  }
+
+  if (m_listAlternateMassHypo.size() == 0) {
+    m_listAlternateMassHypo.resize(particleChildren.size());
+  } else if (m_listAlternateMassHypo.size() != particleChildren.size()) {
+    B2FATAL("ParticleKinematicFitterModule: m_listAlternateMassHypo size must match particleChildren size");
+  }
+
   // add fit particles from particle list to the fitter and to all constraints
   for (unsigned iChild = 0; iChild < particleChildren.size(); iChild++) {
-    addParticleToOrcaKinFit(fitter, particleChildren[iChild], iChild);
+    addParticleToOrcaKinFit(fitter, particleChildren[iChild], iChild, m_listDirectionOnlyParticles[iChild],
+                            m_listAlternateMassHypo[iChild]);
   }
 
   // add unmeasured photon to the fitter and to all constraints
@@ -317,7 +336,8 @@ bool ParticleKinematicFitterModule::AddFour(Particle* mother)
   return true;
 }
 
-void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, Particle* particle, const int index)
+void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, Particle* particle, const int index,
+                                                            bool useOnlyDirection, int massHypoPDG)
 {
   B2DEBUG(17, "ParticleKinematicFitterModule: adding a particle to the fitter!");
 
@@ -350,6 +370,46 @@ void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, 
     pfitobject->setParam(2, startingPhi, true, false);
 
     std::string fitObjectName = "Unmeasured3C";
+    pfitobject->setName(fitObjectName.c_str());
+    ParticleFitObject& fitobject = *pfitobject;
+
+    // add this fit object (=particle) to the constraints
+    addFitObjectToConstraints(fitobject);
+
+    // add fit particle to the fitter
+    fitter.addFitObject(fitobject);
+
+  } else if (useOnlyDirection || massHypoPDG) {
+
+    ParticleFitObject* pfitobject;
+
+    const ECLCluster* cluster = particle->getECLCluster();
+
+    double mass = particle->getMass();
+    if (massHypoPDG != 0) {
+      if (TDatabasePDG::Instance()->GetParticle(massHypoPDG) == nullptr) {
+        B2FATAL("ParticleKinematicFitterModule:  " << massHypoPDG << " is an unknown PDG code!");
+      }
+      mass = TDatabasePDG::Instance()->GetParticle(massHypoPDG)->Mass();
+    }
+    double clusterE = cluster->getEnergy(particle->getECLClusterEHypothesisBit());
+    double startingE = sqrt(clusterE * clusterE + mass * mass);
+    double startingPhi = cluster->getPhi();
+    double startingTheta = cluster->getTheta();
+
+    ClusterUtils clutls;
+    const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+    double startingeE = sqrt(fabs(EPhiThetaCov[0][0]));
+    double startingePhi = sqrt(fabs(EPhiThetaCov[1][1]));
+    double startingeTheta = sqrt(fabs(EPhiThetaCov[2][2]));
+
+    // memory allocated: it will be deallocated via "delete fo" in doOrcaKinFitFit
+    pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, startingeE, startingeTheta, startingePhi, mass);
+    if (useOnlyDirection)  pfitobject->setParam(0, startingE, false, false);
+    pfitobject->setParam(1, startingTheta, true, false);
+    pfitobject->setParam(2, startingPhi, true, false);
+
+    std::string fitObjectName = "particle_" + SSTR(index);
     pfitobject->setName(fitObjectName.c_str());
     ParticleFitObject& fitobject = *pfitobject;
 

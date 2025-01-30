@@ -91,6 +91,8 @@ namespace Belle2 {
       bool m_updateDaughters;            /**< update daughter kinematics*/
       double m_recoilMass;               /**< Recoil mass for RecoilMass constraint */
       double m_invMass;                  /**< Invariant mass for Mass constraint */
+      std::vector<int> m_listAlternateMassHypo;  /**< index of particles where only direction is used */
+      std::vector<bool> m_listDirectionOnlyParticles;  /**< pdg values for particles where different mass hypo. is used */
 
       // internal variables
       TextTracer* m_textTracer;                           /**< internal text output variable */
@@ -144,7 +146,7 @@ namespace Belle2 {
        * @param particle pointer to particle
        * @param index used to name particles: particle_%index
        */
-      void addParticleToOrcaKinFit(BaseFitter& fitter, Particle* particle, const int index);
+      void addParticleToOrcaKinFit(BaseFitter& fitter, Particle* particle, const int index, bool useOnlyDirection, int massHypoPDG);
 
       /**
        * Adds Orca fit object to the constraints.

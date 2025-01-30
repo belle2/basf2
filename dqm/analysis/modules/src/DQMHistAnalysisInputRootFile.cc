@@ -180,6 +180,9 @@ void DQMHistAnalysisInputRootFileModule::event()
       return;
     }
     m_count = 0;
+    // special handling for 1 event to get proper max scaling
+    if (m_eventsList[m_run_idx] == 1) m_count = 1;
+    else m_eventsList[m_run_idx]--;
     // open next file
     if (m_file != nullptr) {
       m_file->Close();

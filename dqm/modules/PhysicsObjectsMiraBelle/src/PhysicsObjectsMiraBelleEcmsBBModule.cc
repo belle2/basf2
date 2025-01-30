@@ -7,19 +7,15 @@
  **************************************************************************/
 #include <dqm/modules/PhysicsObjectsMiraBelle/PhysicsObjectsMiraBelleEcmsBBModule.h>
 
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/variables/ContinuumSuppressionVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-#include <TTree.h>
+#include <TDirectory.h>
 #include <TH1D.h>
-
 
 using namespace Belle2;
 

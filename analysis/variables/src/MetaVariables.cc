@@ -584,9 +584,8 @@ namespace Belle2 {
         for (unsigned i = 0; i < list->getListSize(); ++i)
         {
           Particle* iparticle = list->getParticle(i);
-          if (particlesource == iparticle->getParticleSource())
-            if (particle->getMdstArrayIndex() == iparticle->getMdstArrayIndex())
-              return 1;
+          if (particle->getMdstSource() == iparticle->getMdstSource())
+            return 1;
         }
         return 0;
 

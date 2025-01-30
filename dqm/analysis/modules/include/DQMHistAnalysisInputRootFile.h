@@ -107,8 +107,6 @@ namespace Belle2 {
     /** Index in the list of runs, events and files */
     unsigned int m_run_idx = 0;
 
-    /** Whether to add the run control histograms. */
-    bool m_add_runcontrol_hist;
     /** emulated histogram from runcontrol, expno */
     TH1F* m_h_expno{nullptr};
     /** emulated histogram from runcontrol, runno */

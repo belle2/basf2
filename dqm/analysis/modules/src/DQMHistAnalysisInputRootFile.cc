@@ -46,7 +46,6 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   addParam("FillNEvent", m_fillNEvent, "NEvent override", 0);
   addParam("EventInterval", m_interval, "Time between events (seconds)", 20u);
   addParam("EnableRunInfo", m_enable_run_info, "Enable Run Info", false);
-  addParam("AddRunControlHist", m_add_runcontrol_hist, "Add Hists from Run Control", false);
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }
 
@@ -66,11 +65,9 @@ void DQMHistAnalysisInputRootFileModule::initialize()
     m_c_info = new TCanvas("DQMInfo/c_info", "");
     m_c_info->SetTitle("");
   }
-  if (m_add_runcontrol_hist) {
-    m_h_expno = new TH1F("DQMInfo/expno", "", 1, 0, 1);
-    m_h_runno = new TH1F("DQMInfo/runno", "", 1, 0, 1);
-    m_h_rtype = new TH1F("DQMInfo/rtype", "", 1, 0, 1);
-  }
+  if (m_expno > 0)  m_h_expno = new TH1F("DQMInfo/expno", "", 1, 0, 1);
+  if (m_runList.size() != 0)  m_h_runno = new TH1F("DQMInfo/runno", "", 1, 0, 1);
+  if (m_runType != "")  m_h_rtype = new TH1F("DQMInfo/rtype", m_runType.c_str(), 1, 0, 1);
   if (m_fillNEvent > 0) {
     m_h_fillNEvent = new TH1F("DAQ/Nevent", "", 1, 0, 1);
     m_h_fillNEvent->Fill(0., m_fillNEvent);
@@ -228,11 +225,15 @@ void DQMHistAnalysisInputRootFileModule::event()
   auto runno = m_runList.size() ? m_runList[m_run_idx] : 0;
   auto rtype = m_runType;
 
-  if (m_add_runcontrol_hist) {
+  if (m_h_expno) {
     m_h_expno->SetTitle(std::to_string(expno).c_str());
     inputHistList.push_back((TH1*)(m_h_expno->Clone()));
+  }
+  if (m_h_runno) {
     m_h_runno->SetTitle(std::to_string(runno).c_str());
     inputHistList.push_back((TH1*)(m_h_runno->Clone()));
+  }
+  if (m_h_rtype) {
     m_h_rtype->SetTitle(rtype.c_str());
     inputHistList.push_back((TH1*)(m_h_rtype->Clone()));
   }
@@ -281,10 +282,8 @@ void DQMHistAnalysisInputRootFileModule::event()
   m_eventMetaDataPtr->setEvent(m_count);
   m_eventMetaDataPtr->setTime(ts * 1e9);
 
-  if (m_runType == "") ExtractRunType(inputHistList);
-  else setRunType(m_runType);
-  if (m_fillNEvent <= 0) ExtractNEvent(inputHistList);
-  else setEventProcessed(m_fillNEvent);
+  ExtractRunType(inputHistList);
+  ExtractNEvent(inputHistList);
 
   if (m_lastRun != runno or m_lastExp != expno) {
     // Run change detected

@@ -56,7 +56,9 @@ namespace Belle2 {
       void finish() override;
 
     private:
-
+      /**
+       * Build efficiency
+       */
       void buildEfficiencies(std::vector<unsigned short> wireHits, const Helix helixFit);
       /**
        * extrapolates the helix fit to a given layer and finds the wire which it would be hitting

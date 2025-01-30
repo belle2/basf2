@@ -45,7 +45,6 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   addParam("RunType", m_runType, "Run Type override", std::string(""));
   addParam("FillNEvent", m_fillNEvent, "NEvent override", 0);
   addParam("EventInterval", m_interval, "Time between events (seconds)", 20u);
-  addParam("NullHistogramMode", m_nullHistoMode, "Test mode for null histograms", false);
   addParam("EnableRunInfo", m_enable_run_info, "Enable Run Info", false);
   addParam("AddRunControlHist", m_add_runcontrol_hist, "Add Hists from Run Control", false);
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
@@ -195,24 +194,6 @@ void DQMHistAnalysisInputRootFileModule::event()
   // Clear only after EndOfRun check, otherwise we won't have any histograms for MiraBelle
   // which expects analysis run in endRun function
   initHistListBeforeEvent();
-
-  if (m_nullHistoMode) {
-    m_eventMetaDataPtr.create();
-    m_eventMetaDataPtr->setExperiment(m_expno);
-    m_eventMetaDataPtr->setRun(m_runList[m_run_idx]);
-    m_eventMetaDataPtr->setEvent(m_count);
-    m_eventMetaDataPtr->setTime(0);
-    //setExpNr(m_expno); // redundant access from MetaData
-    //setRunNr(m_runno); // redundant access from MetaData
-    setRunType(m_runType);
-    //ExtractRunType();
-    setEventProcessed(m_fillNEvent);
-    //ExtractNEvent();
-
-    B2INFO("DQMHistAnalysisInputRootFile: event finished. count: " << m_count);
-    m_count++;
-    return;
-  }
 
   /** Input vector for histograms */
   std::vector<TH1*> inputHistList;

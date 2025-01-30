@@ -8,7 +8,10 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 '''
-DQM Import test
+DQM RootImport test
+Test import for Offline root file
+with histograms in subdirs
+With overiding of Exp/Run/Type
 '''
 import os
 import basf2 as b2
@@ -37,7 +40,6 @@ dqminput.param('RunType', 'null')
 dqminput.param('RunList', [1])
 dqminput.param('FillNEvent', 11)
 dqminput.param('EventInterval', 0)
-dqminput.param("AddRunControlHist", True)
 dqminput.param("EnableRunInfo", True)
 main.add_module(dqminput)
 

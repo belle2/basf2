@@ -11,6 +11,7 @@
 DQM RootImport test
 Test import for Offline root file
 with histogram name include subdir prefix
+Test exp/run/type overide of existing histograms
 '''
 import os
 import basf2 as b2
@@ -18,8 +19,8 @@ from ROOT import TFile, TH1F, gROOT
 
 gROOT.SetBatch(True)
 
-filein = "histin1.root"
-fileout = 'histout1.root'
+filein = "histin5.root"
+fileout = 'histout5.root'
 
 f = TFile(filein, "RECREATE")
 
@@ -37,8 +38,11 @@ f.Close()
 main = b2.create_path()
 
 dqminput = b2.register_module('DQMHistAnalysisInputRootFile')
-dqminput.param('SelectHistograms', [])  # leave blank to include all folders
 dqminput.param('FileList', [filein])
+dqminput.param('Experiment', 2)
+dqminput.param('RunType', 'beam')
+dqminput.param('RunList', [2])
+dqminput.param('FillNEvent', 11)
 dqminput.param('EventInterval', 0)
 dqminput.param("EnableRunInfo", True)
 main.add_module(dqminput)
@@ -60,7 +64,7 @@ for k in f.GetListOfKeys():
     o = k.ReadObj()
     print(o.ClassName(), k)
     if o.GetName() == "DQMInfo/c_info":
-        if "Exp 1, Run 1, RunType null" not in o.GetTitle():
+        if "Exp 2, Run 2, RunType beam" not in o.GetTitle():
             b2.B2ERROR(f"Run Info not found in {o.GetName()}: {o.GetTitle()}")
     if o.GetName() in expected:
         expected.remove(o.GetName())

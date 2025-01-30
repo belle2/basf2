@@ -8,7 +8,9 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 '''
-DQM Import test
+DQM RootImport test
+Test import for Offline root file
+with histograms in subdirs
 '''
 import os
 import basf2 as b2
@@ -49,7 +51,6 @@ dqminput = b2.register_module('DQMHistAnalysisInputRootFile')
 dqminput.param('SelectHistograms', [])  # leave blank to include all folders
 dqminput.param('FileList', [filein])
 dqminput.param('EventInterval', 0)
-dqminput.param("AddRunControlHist", False)
 dqminput.param("EnableRunInfo", True)
 main.add_module(dqminput)
 

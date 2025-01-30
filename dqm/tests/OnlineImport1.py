@@ -8,7 +8,9 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 '''
-DQM Import test
+DQM RootImport test
+Test import for Online system root file
+with histogram name include subdir prefix
 '''
 import os
 import basf2 as b2

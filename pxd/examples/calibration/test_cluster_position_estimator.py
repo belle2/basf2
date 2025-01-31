@@ -122,6 +122,7 @@ class PXDPositionEstimation(b2.Module):
                         continue
 
                     mom = truehit.getMomentum()
+                    abs_momentum = mom.R()
                     tu = mom.X() / mom.Z()
                     tv = mom.Y() / mom.Z()
                     thetaU = math.atan(tu) * 180 / math.pi
@@ -134,18 +135,18 @@ class PXDPositionEstimation(b2.Module):
                     # Clusterkinds 0,1,2,3 refer to all cases which can currently
                     # be corrected. Cases where a cluster pixel touches a sensor
                     # edge or contains pixel with varying vPitch are excluded here.
-                    if clusterkind <= 3 and math.sqrt(mom.Mag2()) > 0.02:
+                    if clusterkind <= 3 and abs_momentum > 0.02:
 
                         self.nclusters += 1
 
                         # Fill momentum and angles for clusterkind
-                        self.hist_map_momentum[clusterkind].Fill(math.sqrt(mom.Mag2()))
+                        self.hist_map_momentum[clusterkind].Fill(abs_momentum)
                         self.hist_map_theta_u[clusterkind].Fill(thetaU)
                         self.hist_map_theta_v[clusterkind].Fill(thetaV)
                         self.hist_map_clustercharge[clusterkind].Fill(cls.getCharge())
 
                         # Fill clusterkind=4 for all PXD sensors
-                        self.hist_map_momentum[4].Fill(math.sqrt(mom.Mag2()))
+                        self.hist_map_momentum[4].Fill(abs_momentum)
                         self.hist_map_theta_u[4].Fill(thetaU)
                         self.hist_map_theta_v[4].Fill(thetaV)
                         self.hist_map_clustercharge[4].Fill(cls.getCharge())

@@ -62,7 +62,6 @@ def main():
     geometry = b2.register_module('Geometry')
 
     rootinput = b2.register_module('RootInput')
-    # param("inputFileNames", "/home/belle2/vberta/storage/release1_validation/training_sample/simulated*.root")
 
     progressbar = b2.register_module('ProgressBar')
 

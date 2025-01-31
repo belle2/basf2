@@ -35,7 +35,7 @@ def execute_train_op(state):
             state.model.optimizer.apply_gradients(zip(grads, state.model.trainable_variables))
 
             if (epoch % 100 == 0):
-                print('Step %d: Train cost = %.4f' % (epoch, avg_cost))
+                print(f'Step {epoch:d}: Train cost = {avg_cost:.4f}')
             epoch += 1
 
     except tf.errors.OutOfRangeError:
@@ -128,7 +128,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     Put data in the queue.
     """
     state.queue.enqueue_many([X, w, y])
-    print("Queue Epoch: %d, Queue Batch: %d, Queue Size: %d" % (epoch, batch, state.queue.size()))
+    print(f"Queue Epoch: {epoch:d}, Queue Batch: {batch:d}, Queue Size: {state.queue.size():d}")
     return True
 
 

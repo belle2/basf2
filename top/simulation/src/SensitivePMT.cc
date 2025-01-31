@@ -77,8 +77,10 @@ namespace Belle2 {
           photon.SetTrackStatus(fStopAndKill);
           return false;
         }
-        info->setStatus(3);
-        info->setFraction(qeffi);
+        if (info) {
+          info->setStatus(3);
+          info->setFraction(qeffi);
+        }
       }
 
       // photon at detection

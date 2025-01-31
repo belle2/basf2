@@ -16,7 +16,6 @@
 #include <svd/calibration/SVDCoGTimeCalibrations.h>
 #include <svd/calibration/SVD3SampleCoGTimeCalibrations.h>
 #include <svd/calibration/SVD3SampleELSTimeCalibrations.h>
-#include <svd/dbobjects/SVDClusterTimeShifter.h>
 #include <vector>
 
 namespace Belle2::SVD {
@@ -68,18 +67,6 @@ namespace Belle2::SVD {
 
   protected:
 
-    /** to be used for time calibration  */
-    bool m_returnRawClusterTime = false;
-
-    /** trigger bin */
-    int m_triggerBin = std::numeric_limits<int>::quiet_NaN();
-
-    /** Hardware Clocks*/
-    DBObjPtr<HardwareClockSettings> m_hwClock;
-
-    /** APV clock period*/
-    double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
-
     /**SVDPulseShaper calibration wrapper*/
     SVDPulseShapeCalibrations m_PulseShapeCal;
 
@@ -90,8 +77,17 @@ namespace Belle2::SVD {
     /** ELS3 time calibration wrapper*/
     SVD3SampleELSTimeCalibrations m_ELS3TimeCal;
 
-    /** SVDCluster time shift*/
-    DBObjPtr<Belle2::SVDClusterTimeShifter> m_svdClusterTimeShifter;
+    /** Hardware Clocks*/
+    DBObjPtr<HardwareClockSettings> m_hwClock;
+
+    /** APV clock period*/
+    double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
+
+    /** trigger bin */
+    int m_triggerBin = std::numeric_limits<int>::quiet_NaN();
+
+    /** to be used for time calibration  */
+    bool m_returnRawClusterTime = false;
   };
 
 }

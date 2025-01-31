@@ -38,7 +38,7 @@ namespace Belle2 {
       short vPeak = 0;    /**< ADC value at samplePeak */
       short vFall0 = 0;   /**< ADC value at sampleFall */
       short vFall1 = 0;   /**< ADC value at sampleFall + 1 */
-      int integral = 0;   /**< integral of a pulse (e.g. \propto charge) */
+      int integral = 0;   /**< integral of a pulse (proportional to charge) */
     };
 
 

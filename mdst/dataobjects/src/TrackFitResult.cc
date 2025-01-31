@@ -20,9 +20,9 @@
 using namespace Belle2;
 
 TrackFitResult::TrackFitResult() :
-  m_pdg(0), m_pValue(0),
   m_hitPatternCDCInitializer(0),
   m_hitPatternVXDInitializer(0),
+  m_pdg(0), m_pValue(0),
   m_NDF100(c_NDFFlag)
 {
   memset(m_tau, 0, sizeof(m_tau));
@@ -36,9 +36,9 @@ TrackFitResult::TrackFitResult(const ROOT::Math::XYZVector& position, const ROOT
                                const uint64_t hitPatternCDCInitializer,
                                const uint32_t hitPatternVXDInitializer,
                                const float NDF) :
-  m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
   m_hitPatternCDCInitializer(hitPatternCDCInitializer),
   m_hitPatternVXDInitializer(hitPatternVXDInitializer),
+  m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
   m_NDF100(int(NDF * 100.))
 {
   UncertainHelix h(position, momentum, charge, bField, covariance, pValue);
@@ -64,10 +64,10 @@ TrackFitResult::TrackFitResult(const std::vector<float>& tau, const std::vector<
                                const Const::ParticleType& particleType, const float pValue,
                                const uint64_t hitPatternCDCInitializer,
                                const uint32_t hitPatternVXDInitializer,
-                               const float_t NDF) :
-  m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
+                               const float NDF) :
   m_hitPatternCDCInitializer(hitPatternCDCInitializer),
   m_hitPatternVXDInitializer(hitPatternVXDInitializer),
+  m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
   m_NDF100(int(NDF * 100.))
 {
   if (tau.size() != c_NPars

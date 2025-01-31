@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <framework/modules/profile/ProfileModule.h>
+#include <framework/core/MetadataService.h>
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/Utils.h>
@@ -165,9 +166,14 @@ void ProfileModule::terminate()
     B2INFO("Execution time per event [ms]           : " << 1000 * (m_endInfo.time - m_startInfo.time) / (m_nEvents - k_burnIn));
   }
 
-  // store the plots of ther memory consumption for virtual and rss memory
+  // store the plots of their memory consumption for virtual and rss memory
   storeMemoryGraph("VirtualMemoryProfile", "Virtual Memory usage", "Virtual Memory Usage [MB]",
                    m_outputFileName, m_extractVirtualMem);
   storeMemoryGraph("RssMemoryProfile", "Rss Memory usage", "Rss Memory Usage [MB]",
                    m_rssOutputFileName, m_extractRssMem);
+
+  // add them to the metadata service
+  MetadataService::Instance().addNtuple(m_outputFileName);
+  MetadataService::Instance().addNtuple(m_rssOutputFileName);
+
 }

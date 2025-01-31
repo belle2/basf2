@@ -21,9 +21,7 @@
 
 #include <TFile.h>
 
-#include <boost/filesystem.hpp>
-
-#include <iostream>
+#include <filesystem>
 #include <string>
 
 using namespace std;
@@ -201,7 +199,7 @@ namespace {
       GlobalLabel::clearTimeDependentParamaters();
       GlobalLabel::setCurrentTimeInterval(0);
 
-      boost::filesystem::remove_all("testPayloads");
+      std::filesystem::remove_all("testPayloads");
       Database::reset();
       DataStore::Instance().reset();
     }
@@ -229,7 +227,7 @@ namespace {
 
   }
 
-  /// Test finalization of the timetable and its adressing
+  /// Test finalization of the timetable and its addressing
   TEST_F(TimeLineTest, TimeTable)
   {
     finalizeTimeTable(initTimeTable);

@@ -9,7 +9,6 @@
 #include <tracking/modules/flipQualityModule/FlipQualityModule.h>
 #include <mva/interface/Interface.h>
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <memory>
 
 namespace Belle2 {

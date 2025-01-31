@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -16,7 +15,7 @@
 
 import basf2 as b2
 
-# output filename, can be overriden with -o
+# output filename, can be overridden with -o
 output_filename = "RootOutput_PXDOnly.root"
 
 # create path

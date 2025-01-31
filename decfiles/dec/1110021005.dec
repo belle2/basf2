@@ -1,0 +1,31 @@
+# EventType: 1110021005 
+# Descriptor: [B0 -> [K_2*0 -> K+ pi-] gamma] cc
+# NickName: Bd_K2*gamma_charged
+# Documentation: Rare b->s gamma process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Sayan Mitra
+# Email: sayan97@iastate.edu
+# Cuts: None
+# Date: 20230817
+#
+#
+Alias      K_2*0sig          K_2*0
+Alias      anti-K_2*0sig     anti-K_2*0
+ChargeConj K_2*0sig          anti-K_2*0sig
+#
+Decay Upsilon(4S)
+1.0 B0sig  anti-B0sig B0 anti-B0  VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.0 K_2*0sig  gamma  HELAMP 1.0 0.0 1.0 0.0;
+Enddecay
+CDecay anti-B0sig
+#
+Decay K_2*0sig
+1.0   K+  pi-   TSS;
+Enddecay
+CDecay anti-K_2*0sig
+
+End

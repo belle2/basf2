@@ -126,7 +126,7 @@ NeuroTrigger::initialize(const NeuroTriggerParameters& p)
   int nTarget = (int) p.targetZ + (int) p.targetTheta;
   if (p.outputScale.size() == p.nMLP || p.outputScale.size() == 1) {
     for (unsigned iScale = 0; iScale < p.outputScale.size(); ++iScale) {
-      if (p.outputScale[iScale].size() != 2 * nTarget) {
+      if (p.outputScale[iScale].size() != 2 * static_cast<unsigned int>(nTarget)) {
         B2ERROR("outputScale should be exactly " << 2 * nTarget << " values");
         okay = false;
       }
@@ -738,13 +738,6 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track, co
     unsigned short iSL = axialHits[ihit]->getISuperLayer();
     // // skip stereo hits (should not be related to track, but check anyway)
     if ((!neurotrackinputmode) && (iSL % 2 == 1)) continue;
-    // get priority time
-    int t = (m_hasT0) ? axialHits[ihit]->priorityTime() - m_T0 : 0;
-    if (t < 0) {
-      t = 0;
-    } else if (t > expert.getTMax()) {
-      t = expert.getTMax();
-    }
     double relId = getRelId(*axialHits[ihit]);
 
     if (expert.isRelevant(relId, iSL)) {
@@ -763,13 +756,6 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track, co
       unsigned short iSL = m_segmentHits[ihit]->getISuperLayer();
       // skip axial hits
       if (iSL % 2 == 0) continue;
-      // get priority time
-      int t = (m_hasT0) ? m_segmentHits[ihit]->priorityTime() - m_T0 : 0;
-      if (t < 0) {
-        t = 0;
-      } else if (t > expert.getTMax()) {
-        t = expert.getTMax();
-      }
       double relId = getRelId(*m_segmentHits[ihit]);
       if (expert.isRelevant(relId, iSL)) {
         if (nHits[iSL] < expert.getMaxHitsPerSL()) {
@@ -1150,7 +1136,7 @@ bool NeuroTrigger::loadIDHist(const std::string& filename)
   if (gzipfile.is_open()) {
     while (arrayStream >> hline) {
       for (unsigned i = 0; i < 18; ++i) {
-        m_MLPs[hline.exPert].m_relevantID[i] = hline.relID[i];
+        m_MLPs[hline.exPert].relevantID[i] = hline.relID[i];
       }
     }
   } else { return false;}

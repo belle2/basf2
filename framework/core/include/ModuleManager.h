@@ -15,12 +15,7 @@
 #include <string>
 #include <map>
 #include <list>
-
-namespace boost {
-  namespace filesystem {
-    class directory_entry;
-  }
-}
+#include <filesystem>
 
 namespace Belle2 {
 
@@ -153,7 +148,7 @@ namespace Belle2 {
     /** List of all checked and validated filepaths that are searched for map files. */
     std::list<std::string> m_moduleSearchPathList;
 
-    /** Maps the module name to the filename of the shared library which containes the module. */
+    /** Maps the module name to the filename of the shared library which contains the module. */
     std::map<std::string, std::string> m_moduleNameLibMap;
 
     std::map<std::string, ModuleProxyBase*> m_registeredProxyMap; /**< Maps the module name to a pointer of its proxy. */
@@ -168,7 +163,7 @@ namespace Belle2 {
      * @param mapPath The filename (path+name) of the map file which should be parsed for module names.
      */
     static void fillModuleNameLibMap(std::map<std::string, std::string>& moduleNameLibMap,
-                                     const boost::filesystem::directory_entry& mapPath);
+                                     const std::filesystem::directory_entry& mapPath);
 
     /**
      * The constructor is hidden to avoid that someone creates an instance of this class.

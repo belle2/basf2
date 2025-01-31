@@ -205,11 +205,11 @@ GRLNeuroTrainerModule::initialize()
   for (int tc = 1; tc <= 576; tc++) {
 
     //..Four vector of a 1 GeV lab photon at this TC
-    TVector3 CellPosition = trgecl_obj->getTCPosition(tc);
+    ROOT::Math::XYZVector CellPosition = trgecl_obj->getTCPosition(tc);
     ROOT::Math::PxPyPzEVector CellLab;
-    CellLab.SetPx(CellPosition.Unit().Px());
-    CellLab.SetPy(CellPosition.Unit().Py());
-    CellLab.SetPz(CellPosition.Unit().Pz());
+    CellLab.SetPx(CellPosition.Unit().X());
+    CellLab.SetPy(CellPosition.Unit().Y());
+    CellLab.SetPz(CellPosition.Unit().Z());
     CellLab.SetE(1.);
 
     //..cotan Theta and phi in lab

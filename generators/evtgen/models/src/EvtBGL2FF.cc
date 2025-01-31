@@ -11,7 +11,6 @@
 #include "EvtGenBase/EvtPDL.hh"
 #include <math.h>
 #include <stdlib.h>
-#include <boost/math/constants/constants.hpp>
 #include <cmath>
 #include <iostream>
 #include <vector>
@@ -49,8 +48,6 @@ EvtBGL2FF::EvtBGL2FF(double bglap_0, double bglap_1, double bglap_2, double bgla
 void EvtBGL2FF::getscalarff(EvtId parent, EvtId,
                             double t, double mass, double* fp, double* f0)
 {
-
-  static constexpr double pi = boost::math::constants::pi<double>();
   double mb = EvtPDL::getMeanMass(parent);
   double r = mass / mb; // mass = mass of the D meson
   double w = ((mb * mb) + (mass * mass) - t) / (2.0 * mb * mass);
@@ -78,8 +75,8 @@ void EvtBGL2FF::getscalarff(EvtId parent, EvtId,
   }
 
   double ni = 2.6;
-  double kp = (8 * pow(r, 2) / mb) * sqrt(8 * ni / (3 * pi * chiT));
-  double k0 = r * (1 - pow(r, 2)) * sqrt(8 * ni / (pi * chiL));
+  double kp = (8 * pow(r, 2) / mb) * sqrt(8 * ni / (3 * M_PI * chiT));
+  double k0 = r * (1 - pow(r, 2)) * sqrt(8 * ni / (M_PI * chiL));
 
   double phi_sub = (1 + r) * (1 - z) + 2.0 * sqrt(r) * (1 + z);
 
@@ -97,8 +94,7 @@ void EvtBGL2FF::getscalarff(EvtId parent, EvtId,
 
 // NOTE : This class should not be used for vector mesons (D*). Use the EvtBGL class instead.
 
-void EvtBGL2FF::getvectorff(EvtId parent, EvtId, double t, double mass, double* a1f,
-                            double* a2f, double* vf, double* a0f)
+void EvtBGL2FF::getvectorff(EvtId, EvtId, double, double, double*, double*, double*, double*)
 
 {
 

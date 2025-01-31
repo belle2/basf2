@@ -58,14 +58,15 @@ namespace Belle2 {
      * G = ( du/da du/db du/dc ... )
      *     (   0     0     0   ... )    for U-strip,
      *
-     * Measurements with more dimesions (slopes, curvature) should provide
+     * Measurements with more dimensions (slopes, curvature) should provide
      * full 4-5Dx(n params) matrix (state as (q/p, u', v', u, v) or (u', v', u, v))
      *
      *
      * @param sop Predicted state of the track as linearization point around
      * which derivatives of alignment/calibration parameters shall be computed
-     * @return pair<vector<int>, TMatrixD> With matrix with #rows = dimension of residual, #columns = number of parameters.
-     * #columns must match vector<int>.size().
+     * @return pair<vector<int>, TMatrixD> With matrix with
+    * number of rows = dimension of residual, number of columns = number of parameters.
+    * number of columns must match vector<int>.size().
      */
     virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop) override;
 
@@ -73,12 +74,12 @@ namespace Belle2 {
      * @brief Derivatives for (local) fit parameters
      *
      * @param sop State on virtual plane to calculate derivatives
-     * @return TMatrixD of local derivatives, #columns=#params, #row=2 (or measurement dimension if > 2)
+     * @return TMatrixD of local derivatives, number of columns = number of params, number of rows = 2 (or measurement dimension if > 2)
      */
     virtual TMatrixD localDerivatives(const genfit::StateOnPlane* sop) override;
 
   private:
     /** ROOT Macro.*/
-    ClassDefOverride(AlignableCDCRecoHit, 1);
+    ClassDefOverride(AlignableCDCRecoHit, 2);
   };
 }

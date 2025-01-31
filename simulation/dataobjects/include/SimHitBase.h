@@ -45,7 +45,9 @@ namespace Belle2 {
      * The method to shift the SimHit in time.
      * Re-implement for your subdetector's SimHit class if time-aware background
      * is needed.
-     * @param delta The desired time shift.
+     * Tha parameter delta the function would take is the desired time shift.
+     * However, it's unused in many cases and thus not explicitely given here, but only as
+     * an example as a comment.
      */
     virtual void shiftInTime(float /*delta*/) {}
 

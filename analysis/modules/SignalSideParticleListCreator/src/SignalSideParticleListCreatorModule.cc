@@ -38,6 +38,7 @@ SignalSideParticleListCreatorModule::SignalSideParticleListCreatorModule() : Mod
 {
   // Set module properties
   setDescription("The module creates a ParticleList and fills it with one of the daughter Particles.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("particleListName", m_particleListName,

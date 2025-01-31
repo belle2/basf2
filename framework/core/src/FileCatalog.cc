@@ -11,12 +11,12 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/utilities/EnvironmentVariables.h>
-#include <boost/filesystem.hpp>
-#include <fstream>
 
+#include <fstream>
+#include <filesystem>
 
 using namespace Belle2;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 
 
@@ -47,7 +47,7 @@ FileCatalog::FileCatalog() : m_fileName("")
   }
 
   // get absolute path name
-  m_fileName = fs::absolute(fileCatalog, fs::initial_path<fs::path>()).c_str();
+  m_fileName = fs::absolute(fileCatalog).c_str();
 }
 
 
@@ -65,7 +65,7 @@ bool FileCatalog::readCatalog(FileCatalog::FileMap& fileMap)
       if (entry.read(file, physicalFileName)) fileMap[entry.getLfn()] = std::make_pair(physicalFileName, entry);
     }
   } catch (std::exception& e) {
-    B2ERROR("Errors occured while reading " << m_fileName <<
+    B2ERROR("Errors occurred while reading " << m_fileName <<
             ", maybe it is corrupted? Note that your .root files should be unaffected. (Error details: " << e.what() << ")");
     return false;
   }

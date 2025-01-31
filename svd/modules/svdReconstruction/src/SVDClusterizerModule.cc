@@ -67,6 +67,8 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
   addParam("returnClusterRawTime", m_returnRawClusterTime,
            "if True, returns the raw cluster time (to be used for time calibration).",
            m_returnRawClusterTime);
+  addParam("shiftSVDClusterTime", m_shiftSVDClusterTime,
+           "if True, applies SVDCluster time shift based on cluster-size.", m_shiftSVDClusterTime);
   addParam("SeedSN", m_cutSeed,
            "minimum SNR for strips to be considered as cluster seed. Overwritten by the dbobject, unless you set useDB = False.", m_cutSeed);
   addParam("ClusterSN", m_cutCluster,
@@ -117,6 +119,8 @@ void SVDClusterizerModule::beginRun()
       B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
 
     m_timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith6Samples();
+    //m_timeRecoWith6SamplesAlgorithm = "ELS3";
+    //m_timeRecoWith3SamplesAlgorithm = "ELS3";
     m_timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
     m_chargeRecoWith6SamplesAlgorithm = m_recoConfig->getChargeRecoWith6Samples();
     m_chargeRecoWith3SamplesAlgorithm = m_recoConfig->getChargeRecoWith3Samples();
@@ -337,7 +341,7 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   bool isU = rawCluster.isUSide();
   int size = rawCluster.getSize();
 
-  //first take Event Informations:
+  //first take Event Information:
   StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);
   if (!temp_eventinfo.isValid())
     m_svdEventInfoName = "SVDEventInfoSim";
@@ -409,6 +413,12 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
     if (isMC) {
       alterClusterPosition();
       alterClusterTime();
+    } else {
+      if (m_svdClusterTimeShifter.isValid() &&
+          !m_returnRawClusterTime &&
+          m_shiftSVDClusterTime) {
+        shiftSVDClusterTime();
+      }
     }
   }
 }
@@ -479,7 +489,7 @@ double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID 
   //Lorentz shift correction - PATCHED
   //NOTE: layer 3 is upside down with respect to L4,5,6 in the real data (real SVD), but _not_ in the simulation. We need to change the sign of the Lorentz correction on L3 only if reconstructing data, i.e. if Environment::Instance().isMC() is FALSE.
 
-  const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(vxdID));
+  const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(vxdID));
 
   bool isMC = Environment::Instance().isMC();
 
@@ -545,6 +555,26 @@ void SVDClusterizerModule::alterClusterTime()
 
   B2DEBUG(20, "Layer number: " << sensorID.getLayerNumber() << ", is U side: " << isU << ", sigma: " << sigma <<
           ", cluster time: " << clsTime << ", fudge factor: " << fudgeFactor);
+}
+
+void SVDClusterizerModule::shiftSVDClusterTime()
+{
+  // alter the time of the last cluster in the array
+  int clsIndex = m_storeClusters.getEntries() - 1;
+
+  // get the necessary information on the cluster
+  float clsTime = m_storeClusters[clsIndex]->getClsTime();
+
+  TString algo = m_timeRecoWith6SamplesAlgorithm;
+  if (m_numberOfAcquiredSamples == 3) algo = m_timeRecoWith3SamplesAlgorithm;
+
+  clsTime -= m_svdClusterTimeShifter->getClusterTimeShift(algo,
+                                                          m_storeClusters[clsIndex]->getSensorID().getLayerNumber(),
+                                                          m_storeClusters[clsIndex]->getSensorID().getSensorNumber(),
+                                                          m_storeClusters[clsIndex]->isUCluster(),
+                                                          m_storeClusters[clsIndex]->getSize());
+
+  m_storeClusters[clsIndex]->setClsTime(clsTime);
 }
 
 void SVDClusterizerModule::endRun()

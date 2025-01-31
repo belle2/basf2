@@ -10,14 +10,10 @@
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 
 #include <framework/pcore/EvtMessage.h>
-#include <daq/dqm/DqmMemFile.h>
 #include <framework/logging/Logger.h>
 
 #include <THashList.h>
 #include <TBufferJSON.h>
-
-#include <boost/format.hpp>
-#include <boost/algorithm/string/replace.hpp>
 
 #include <lz4.h>
 #include <zmq.hpp>

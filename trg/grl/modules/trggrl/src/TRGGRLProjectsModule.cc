@@ -147,11 +147,11 @@ void TRGGRLProjectsModule::initialize()
   for (int tc = 1; tc <= 576; tc++) {
 
     //..Four vector of a 1 GeV lab photon at this TC
-    TVector3 CellPosition = eclMapping->getTCPosition(tc);
+    ROOT::Math::XYZVector CellPosition = eclMapping->getTCPosition(tc);
     ROOT::Math::PxPyPzEVector CellLab;
-    CellLab.SetPx(CellPosition.Px() / CellPosition.Mag());
-    CellLab.SetPy(CellPosition.Py() / CellPosition.Mag());
-    CellLab.SetPz(CellPosition.Pz() / CellPosition.Mag());
+    CellLab.SetPx(CellPosition.X() / CellPosition.R());
+    CellLab.SetPy(CellPosition.Y() / CellPosition.R());
+    CellLab.SetPz(CellPosition.Z() / CellPosition.R());
     CellLab.SetE(1.);
 
     //..cotan Theta and phi in lab
@@ -176,6 +176,7 @@ void
 TRGGRLProjectsModule::beginRun()
 {
   B2DEBUG(20, "TRGGDLModule ... beginRun called ");
+  m_falsebits.clear();
   //...GDL config. name...
 }
 //-----------------------------------------------------------------------------------------
@@ -651,6 +652,7 @@ void TRGGRLProjectsModule::event()
   bool ehigh1 = (ECLtoGDL[2] & (1 << (90 - 32 * 2))) != 0;
   bool ehigh2 = (ECLtoGDL[2] & (1 << (91 - 32 * 2))) != 0;
   bool ehigh3 = (ECLtoGDL[2] & (1 << (92 - 32 * 2))) != 0;
+  bool ehigh4 = (ECLtoGDL[2] & (1u << (95 - 32 * 2))) != 0;
 
   //---------------------------------------------------------------------
   //..Other input bits
@@ -876,6 +878,7 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ehigh1") {bit = ehigh1;}
     else if (bitname == "ehigh2") {bit = ehigh2;}
     else if (bitname == "ehigh3") {bit = ehigh3;}
+    else if (bitname == "ehigh4") {bit = ehigh4;}
 
     else if (bitname == "klm_hit") {bit = klm_hit;}
     else if (bitname == "klm_0") {bit = klm_0;}
@@ -977,7 +980,12 @@ void TRGGRLProjectsModule::event()
 
     //DITTO: please don't change the WARNING message below.
     //If you change it, please update the test trg_tsim_check_warnings.py accordingly.
-    else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
+    //else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
+    else {
+      bit = false;
+      bool notcontain = std::find(m_falsebits.begin(), m_falsebits.end(), bitname) == m_falsebits.end();
+      if (notcontain) m_falsebits.push_back(bitname);
+    }
 
     trgInfo->setInputBits(i, bit);
   }
@@ -988,6 +996,11 @@ void
 TRGGRLProjectsModule::endRun()
 {
   B2DEBUG(20, "TRGGRLProjectsModule ... endRun called ");
+  if (m_falsebits.size() > 0) {
+    for (const std::string& bitname : m_falsebits) {
+      B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
+    }
+  }
 }
 
 

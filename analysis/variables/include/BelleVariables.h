@@ -53,6 +53,8 @@ namespace Belle2 {
     double BelleTofSigma(const Particle* particle);
     /** Returns the track's path length from mdst_tof */
     double BellePathLength(const Particle* particle);
+    /** Returns the tof mass calculated from BelleTof and BellePathLength*/
+    double BelleTofMass(const Particle* particle);
 
     /** Returns the dEdx from mdst_trk */
     double BelledEdx(const Particle* particle);

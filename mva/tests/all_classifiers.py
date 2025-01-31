@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -42,6 +41,7 @@ if __name__ == "__main__":
         ('Python_sklearn.xml', basf2_mva.PythonOptions(), 'sklearn'),
         ('Python_xgb.xml', basf2_mva.PythonOptions(), 'xgboost'),
         ('Python_tensorflow.xml', basf2_mva.PythonOptions(), 'tensorflow'),
+        ('Python_torch.xml', basf2_mva.PythonOptions(), 'torch'),
     ]
 
     # we create payloads so let's switch to an empty, temporary directory

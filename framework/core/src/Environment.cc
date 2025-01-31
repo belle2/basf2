@@ -15,15 +15,14 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/FileMetaData.h>
 
-#include <boost/filesystem.hpp>
 #include <memory>
-
 #include <iostream>
 #include <cstdlib>
+#include <filesystem>
 
 using namespace Belle2;
 using namespace std;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 
 Environment& Environment::Instance()
@@ -99,7 +98,9 @@ Environment::Environment() :
   m_mcEvents(0),
   m_run(-1),
   m_experiment(-1),
-  m_skipNEvents(0)
+  m_runType(Const::c_Beam),
+  m_skipNEvents(0),
+  m_writeSimSteps(false)
 {
   // Check for environment variables set by setuprel
   const char* envarReleaseDir = getenv("BELLE2_RELEASE_DIR");
@@ -121,7 +122,7 @@ Environment::Environment() :
   }
 
   // add module directories for current build options, starting with the working directory on program startup
-  std::string added_dirs = fs::initial_path().string();
+  std::string added_dirs = fs::current_path().string();
   ModuleManager::Instance().addModuleSearchPath(added_dirs);
 
   if (envarAnalysisDir) {
@@ -152,10 +153,6 @@ Environment::Environment() :
 
 Environment::~Environment() = default;
 
-
-// we know getFileNames is deprecated but we need it as long as --dry-run is available
-// so let's remove the warning for now ...
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 void Environment::setJobInformation(const std::shared_ptr<Path>& path)
 {

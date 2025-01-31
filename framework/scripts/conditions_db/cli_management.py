@@ -7,13 +7,16 @@
 ##########################################################################
 import functools
 import time
+from fnmatch import fnmatch
 from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 from basf2 import B2INFO, B2ERROR, B2WARNING, LogPythonInterface  # noqa
 from basf2.utils import pretty_print_table
 from terminal_utils import Pager
+from conditions_db import set_cdb_authentication_token
 from conditions_db.iov import IoVSet, IntervalOfValidity
 from conditions_db.runningupdate import RunningTagUpdater, RunningTagUpdaterError, RunningTagUpdateMode
+from conditions_db.cli_utils import ItemFilter
 
 
 def get_all_iovsets(existing_payloads, run_range=None):
@@ -77,12 +80,11 @@ def command_tag_merge(args, db=None):
     The result is equivalent to having multiple globaltags setup in the conditions
     access for basf2 (highest priority goes first).
 
-    Warning:
+    .. warning::
+
       The order of the globaltags is highest priority first, so payloads from
       globaltags earlier on the command line will be taken with before globaltags
       from later tags.
-
-      This command requires that all globaltags are overlap free.
 
     For each globaltag in the list we copy all payloads to the output globaltag
     if there is no payload of that name valid for the given interval of validity
@@ -94,18 +96,18 @@ def command_tag_merge(args, db=None):
 
     For example:
 
-    globaltag A contains ::
+    Globaltag ``A`` contains ::
 
         payload1, rev 2, valid from 1,0 to 1,10
         payload1, rev 3, valid from 1,20 to 1,22
         payload2, rev 1, valid from 1,0 to 1,-1
 
-    globaltag B contains ::
+    Globaltag ``B`` contains ::
 
         payload1, rev 1, valid from 1,1 to 1,30
         payload2, rev 2, valid from 0,1 to 1,20
 
-    Then running ``b2conditionsdb tag merge -o output A B``, the output globaltag
+    Then running ``b2conditionsdb tag merge -o C A B``, the output globaltag ``C``
     after the merge will contain::
 
         payload1, rev 2, valid from 1,0 to 1,10
@@ -146,6 +148,9 @@ def command_tag_merge(args, db=None):
                           help="Number of concurrent threads to use for "
                           "creating payloads into the output globaltag.")
         return
+
+    if not args.dry_run:
+        set_cdb_authentication_token(db, args.auth_token)
 
     # prepare some colors for easy distinction of source tag
     support_color = LogPythonInterface.terminal_supports_colors()
@@ -281,54 +286,61 @@ def command_tag_runningupdate(args, db=None):
        first run for the update to be valid or later
     3. Optionally, make sure all payloads in the staging tag end in an open iov.
 
-    Example:
+    .. rubric:: Examples
 
-        running tag contains ::
+    Running tag contains ::
 
-            payload1, rev 1, valid from 0,1 to 1,0
-            payload1, rev 2, valid from 1,1 to -1,-1
-            payload2, rev 1, valid from 0,1 to -1,-1
-            payload3, rev 1, valid from 0,1 to 1,0
-            payload4, rev 1, valid from 0,1 to -1,-1
-            payload5, rev 1, valid from 0,1 to -1,-1
+        payload1, rev 1, valid from 0,1 to 1,0
+        payload1, rev 2, valid from 1,1 to -1,-1
+        payload2, rev 1, valid from 0,1 to -1,-1
+        payload3, rev 1, valid from 0,1 to 1,0
+        payload4, rev 1, valid from 0,1 to -1,-1
+        payload5, rev 1, valid from 0,1 to -1,-1
 
-        staging tag contains ::
+    Staging tag contains ::
 
-            payload1, rev 3, valid from 0,0 to 1,8
-            payload1, rev 4, valid from 1,9 to 1,20
-            payload2, rev 2, valid from 1,5 to 1,20
-            payload3, rev 2, valid from 0,0 to -1,-1
-            payload4, rev 1, valid from 0,0 to 1,20
+        payload1, rev 3, valid from 0,0 to 1,8
+        payload1, rev 4, valid from 1,9 to 1,20
+        payload2, rev 2, valid from 1,5 to 1,20
+        payload3, rev 2, valid from 0,0 to -1,-1
+        payload4, rev 1, valid from 0,0 to 1,20
 
-        Then running ``b2conditionsdb tag runningupdate running staging --run 1 2 --allow-closed``,
-        the running globaltag after the update will contain ::
+    Then running ``b2conditionsdb tag runningupdate running staging --run 1 2 --allow-closed``,
+    the running globaltag after the update will contain ::
 
-            payload1, rev 1, valid from 0,1 to 1,0
-            payload1, rev 2, valid from 1,1 to 1,1
-            payload1, rev 3, valid from 1,2 to 1,8
-            payload1, rev 4, valid from 1,9 to 1,20
-            payload2, rev 1, valid from 0,1 to 1,4
-            payload2, rev 2, valid from 1,5 to 1,20
-            payload3, rev 1, valid from 0,1 to 1,0
-            payload3, rev 2, valid from 1,2 to -1,-1
-            payload4, rev 1, valid from 0,1 to 1,20
-            payload5, rev 1, valid from 0,1 to -1,-1
+        payload1, rev 1, valid from 0,1 to 1,0
+        payload1, rev 2, valid from 1,1 to 1,1
+        payload1, rev 3, valid from 1,2 to 1,8
+        payload1, rev 4, valid from 1,9 to 1,20
+        payload2, rev 1, valid from 0,1 to 1,4
+        payload2, rev 2, valid from 1,5 to 1,20
+        payload3, rev 1, valid from 0,1 to 1,0
+        payload3, rev 2, valid from 1,2 to -1,-1
+        payload4, rev 1, valid from 0,1 to 1,20
+        payload5, rev 1, valid from 0,1 to -1,-1
 
-        Note that
+    Note that
 
         - the start of payload1 and payload3 in staging has been adjusted
+
         - payload2 in the running tag as been closed at 1,4, just before the
           validity from the staging tag
+
         - payload3 was already closed in the running tag so no change is
           performed. This might result in gaps but is intentional
+
         - payload4 was not closed at rim 1,2 because the staging tag had the same
           revision of the payload so the these were merged to one long validity.
+
         - payload5 was not closed as there was no update to it in the staging tag.
           If we would have run with ``--full-replacement`` it would have been closed.
+
         - if we would have chosen ``--run 1 1`` the update would have failed because
           payload1, rev2 in running starts at 1,1 so we would have a conflict
+
         - if we would have chosen ``--run 1 6`` the update would have failed because
           payload2 in the staging tag starts before this run
+
         - if we would have chosen to open the final iovs in staging by using
           ``--fix-closed``, payload1, rev 4; payload2, rev 2 and payload4 rev 1
           would be valid until -1,-1 after the running tag. In fact, payload 4
@@ -367,6 +379,9 @@ def command_tag_runningupdate(args, db=None):
         args.add_argument("--dry-run", default=False, action="store_true",
                           help="Only show the changes, don't try to apply them")
         return
+
+    if not args.dry_run:
+        set_cdb_authentication_token(db, args.auth_token)
 
     try:
         updater = RunningTagUpdater(db, args.running, args.staging, args.run, args.mode, args.dry_run)
@@ -455,3 +470,371 @@ def command_tag_runningupdate(args, db=None):
     except RunningTagUpdaterError as e:
         B2ERROR(e, **e.extra_vars)
         return 1
+
+
+def command_iovs(args, db=None):
+    """
+    Modify, delete or copy iovs from a globaltags.
+
+    This command allows to modify, delete or copy iovs of a globaltag. If no other command is given do nothing.
+    """
+
+    # no arguments to define, just a group command
+    pass
+
+# Helper class to unify common parts of commands_iovs_*
+
+
+class CommandIoVsHelper:
+    """
+    Class to unify common parts of b2conditionsdb iovs commands
+
+    This class defines common argparse arguments,
+    common filter of iovs and common multithreading
+    """
+
+    def __init__(self, whichcommand, args, db):
+        """initialization, just remember the arguments or parser and the database instance
+
+        Args:
+            whichcommand (str): from whichcommand it is called (copy, delete or modify)
+            args (argparse.ArgumentParser): where to append new arguments
+            db (conditions_db.ConditionsDB): database instance to be used
+        """
+
+        #: from whichcommand it is called (copy, delete or modify)
+        self.whichcommand = whichcommand
+        #: argparse.ArgumentParser instance
+        self._args = args
+        #: conditions_db.ConditionsDB instance
+        self.db = db
+        #: ItemFilter
+        self.iovfilter = ItemFilter(args)
+        #: number of iovs before payload and revision selection
+        self.num_all_iovs = None
+        #: Dictionary with past participles
+        self.past_dict = {"delete": "deleted", "modify": "modified", "copy": "copied", "create": "created"}
+
+    def add_arguments(self):
+        """Add arguments to the parser"""
+
+        self._args.add_argument("tag", metavar="INPUT_TAGNAME",
+                                help=f"globaltag for which the the IoVs should be {self.past_dict[self.whichcommand]}")
+        if self.whichcommand == "copy":
+            self._args.add_argument("output", metavar="OUTPUT_TAGNAME", help="globaltag to which the the IoVs should be copied")
+        if self.whichcommand == "modify":
+            self._args.add_argument("new_iov", metavar="NEW_IOV", help="New iov to be set to all considered iovs."
+                                    " It should be a string with 4 numbers separated by spaces."
+                                    " Use * to mark the fields that should not be modified. For example"
+                                    " if 7 0 * * is given the iov (7, 1, 9, 42) will become (7 0 9 42).")
+        self._args.add_argument("--iov-id", default=None, type=int,
+                                help="IoVid of the iov to be considered")
+        self._args.add_argument(
+            "--iov-pattern",
+            default=None,
+            help="whitespace-separated string with pattern of the iov to be considered. "
+            " Use * to mark the fields that should be ignored. Valid patterns are 0 0 -1 -1"
+            " (a very specific IoV),  0 * -1 -1 (any iov that starts in any run of exp 0 and ends exactly in exp -1, run -1)"
+            ", * * 3 45 (any Iov ending in exp 3, run 45, regardless from where it starts).")
+        self._args.add_argument("--run-range", nargs=4, default=None, type=int,
+                                metavar=("FIRST_EXP", "FIRST_RUN", "FINAL_EXP", "FINAL_RUN"),
+                                help="Can be four numbers to limit the run range to be considered"
+                                " Only iovs overlapping, even partially, with this range will be considered.")
+        self._args.add_argument("--fully-contained", action="store_true",
+                                help="If given together with ``--run_range`` limit the list of payloads "
+                                "to the ones fully contained in the given run range")
+        if self.whichcommand == "copy":
+            self._args.add_argument("--set-run-range", action="store_true",
+                                    help="If given together with ``--run_range`` modify the interval of validity"
+                                    " of partially overlapping iovs to be fully contained in the given run range")
+        self.iovfilter.add_arguments("payloads")
+        self._args.add_argument("--revision", metavar='revision', type=int,
+                                help="Specify the revision of the payload to be removed")
+        self._args.add_argument("--dry-run", help="Don't do anything, just print what would be done",
+                                action="store_true", default=False)
+        if self.whichcommand == "copy":
+            self._args.add_argument("--replace", help="Modify the iovs in the output tag to avoid overlaps",
+                                    action="store_true", default=False)
+        self._args.add_argument("-j", type=int, default=10, dest="nprocess",
+                                help="Number of concurrent threads to use.")
+
+    def get_iovs(self):
+        """Get the iovs already filtered"""
+        if not self.iovfilter.check_arguments():
+            B2ERROR("Issue with arguments")
+
+        all_iovs = self.db.get_all_iovs(
+            self._args.tag,
+            run_range=self._args.run_range,
+            fully_contained=self._args.fully_contained,
+            message=str(self.iovfilter))
+        self.num_all_iovs = len(all_iovs)
+        iovs_to_return = []
+        for iov in all_iovs:
+            if self._args.iov_id and iov.iov_id != self._args.iov_id:
+                continue
+            if not self.iovfilter.check(iov.name):
+                continue
+            if self._args.iov_pattern and not fnmatch("{} {} {} {}".format(*iov.iov),
+                                                      "{} {} {} {}".format(*self._args.iov_pattern.split())):
+                continue
+            if self._args.revision and iov.revision != self._args.revision:
+                continue
+            iovs_to_return.append(iov)
+        return iovs_to_return
+
+    def modify_db(self, func, func_args, whichcommand=None):
+        """Modify the database using multithreading"""
+        if whichcommand is None:
+            whichcommand = self.whichcommand
+        try:
+            with ThreadPoolExecutor(max_workers=self._args.nprocess) as pool:
+                start = time.monotonic()
+                for iov_num, _ in enumerate(pool.map(func, func_args), 1):
+                    eta = (time.monotonic() - start) / iov_num * (len(func_args) - iov_num)
+                    B2INFO(f"{iov_num}/{len(func_args)} iovs {self.past_dict[whichcommand]}, ETA: {eta:.1f} seconds")
+        except RuntimeError:
+            B2ERROR(f"Not all iovs could be {self.past_dict[whichcommand]}. This could be a server/network problem "
+                    "or the destination globaltag was not writeable.")
+            raise
+
+
+def command_iovs_delete(args, db=None):
+    """
+    Delete iovs from a globaltag
+
+    This command allows to delete the iovs from a globaltags, optionally limiting the iovs to be deleted to those
+    of a specific payload, revision, IoVid or run range.
+    """
+    command_iovs_helper = CommandIoVsHelper("delete", args, db)
+    if db is None:
+        command_iovs_helper.add_arguments()
+        return
+
+    iovs_to_delete = command_iovs_helper.get_iovs()
+
+    table = [[i.iov_id, i.name, i.revision] + list(i.iov) for i in iovs_to_delete]
+    table.insert(0, ["IovId", "Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run"])
+    columns = [9, "+", 6, 6, 6, 6, 6]
+
+    if command_iovs_helper.num_all_iovs == len(iovs_to_delete) and args.run_range is None:
+        B2WARNING(f"All the iovs in the globaltag {args.tag} will be deleted!")
+        gt_check = input('Please enter the global tag name again to confirm this action: ')
+        if gt_check != args.tag:
+            B2ERROR('global tag names do not match.')
+            return 1
+
+    B2INFO("Deleting the following iovs")
+    pretty_print_table(table, columns)
+
+    if not args.dry_run:
+        set_cdb_authentication_token(db, args.auth_token)
+        try:
+            command_iovs_helper.modify_db(db.delete_iov, [i.iov_id for i in iovs_to_delete])
+        except RuntimeError:
+            return 1
+
+    return 0
+
+
+def command_iovs_copy(args, db=None):
+    """
+    Copy iovs from a globaltag to another one
+
+    This command allows to copy the iovs from a globaltags to another one, optionally limiting
+    the iovs to be copied to those of a specific payload, revision, IoV id or run range.
+    """
+    command_iovs_helper = CommandIoVsHelper("copy", args, db)
+    if db is None:
+        command_iovs_helper.add_arguments()
+        return
+
+    iovs_to_copy = command_iovs_helper.get_iovs()
+
+    # make sure that there are no overlaps in the iovs to copy and set run range if needed
+    by_name = defaultdict(lambda: IoVSet(allow_overlaps=False))
+    for iov in iovs_to_copy:
+        if args.run_range and args.set_run_range:
+            iov.iov = (IntervalOfValidity(*iov.iov) & IntervalOfValidity(*args.run_range)).tuple
+        try:
+            by_name[iov.name].add(iov.iov)
+        except ValueError as e:
+            B2ERROR(f"Overlap for payload {iov.name} r{iov.revision}: {e}")
+            return 1
+    del by_name
+
+    # make sure output tag exists
+    output_id = db.get_globalTagInfo(args.output)
+    if output_id is None:
+        B2ERROR("Output globaltag doesn't exist. Please create it first with a proper description")
+        return False
+    output_id = output_id["globalTagId"]
+
+    # get iovs already present in output global tag
+    iovs_output = db.get_all_iovs(args.output)
+    iovs_output.sort(key=lambda i: i.iov[:2])
+    payloads_output = defaultdict(list)
+    for iov in iovs_output:
+        iov.newiov = IoVSet([IntervalOfValidity(*iov.iov)])
+        payloads_output[iov.name].append(iov)
+
+    # remove from iovs to copy those that are already present in the output global tag
+    iovs_in_output = [(i.checksum, i.iov) for i in iovs_output]
+    iovs_to_copy = [i for i in iovs_to_copy if (i.checksum, i.iov) not in iovs_in_output]
+    del iovs_in_output
+
+    iovs_not_to_copy = []
+
+    # readjust the iovs already present if they overlap
+    # with the ones to be copied
+    for iov_to_copy in iovs_to_copy:
+        iov_ = IntervalOfValidity(*iov_to_copy.iov)
+        still_to_copy = True
+        for iov_present in payloads_output[iov_to_copy.name]:
+            if iov_present.newiov & iov_:
+                if still_to_copy and iov_to_copy.checksum == iov_present.checksum:
+                    iov_present.newiov.add(iov_, allow_overlaps=True)
+                    iovs_not_to_copy.append(iov_to_copy)
+                    still_to_copy = False
+                else:
+                    iov_present.newiov -= iov_
+
+    iovs_to_delete = []
+    iovs_to_modify = []
+    iovs_to_create = []
+
+    # Fill lists of iovs to be deleted, modified or added
+    for iov_present in sum(payloads_output.values(), []):
+        # iov_present was replaced by copied iovs so it should be deleted
+        if len(iov_present.newiov) == 0:
+            iovs_to_delete.append(iov_present)
+        # iov_present was partially overlapping by copied iovs so it should be modified
+        elif len(iov_present.newiov) == 1:
+            if not list(iov_present.newiov)[0].tuple == iov_present.iov:
+                iovs_to_modify.append((iov_present, list(iov_present.newiov)[0].tuple))
+        # iov_present was split by copied iovs so its first iov should be modified and new iovs should be created
+        else:
+            newiovs = list(iov_present.newiov)
+            iovs_to_modify.append((iov_present, newiovs[0].tuple))
+            for newiov in newiovs[1:]:
+                iovs_to_create.append((iov_present, newiov.tuple))
+
+    # If I fix the overlaps do not copy iovs that can be obtained extending iovs already present
+    if args.replace:
+        iovs_to_copy = [i for i in iovs_to_copy if i not in iovs_not_to_copy]
+
+    # Print nice table
+    table = [[i.iov_id, i.name, i.revision] + list(i.iov) for i in iovs_to_copy]
+    table.insert(0, ["IovId", "Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run"])
+    columns = [9, "+", 6, 6, 6, 6, 6]
+    B2INFO(f"Copying the following iovs to {args.output}")
+    pretty_print_table(table, columns)
+
+    if (iovs_to_delete or iovs_to_modify or iovs_to_create) and not args.replace:
+        B2WARNING("Inserting the iovs will create overlaps,"
+                  f" to avoid them the changes below should be implemented on {args.tag}")
+
+    if iovs_to_delete:
+        B2WARNING("iovs to be deleted")
+        # Sort by payload name and iov for nicer logs
+        iovs_to_delete.sort(key=lambda x: x.iov[:2])
+        iovs_to_delete.sort(key=lambda x: x.name)
+        # Print nice table
+        table = [[i.iov_id, i.name, i.revision] + list(i.iov) for i in iovs_to_delete]
+        table.insert(0, ["IovId", "Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run"])
+        columns = [9, "+", 6, 6, 6, 6, 6]
+        pretty_print_table(table, columns)
+    if iovs_to_modify:
+        B2WARNING("iovs to be modified")
+        # Sort by payload name and iov for nicer logs
+        iovs_to_modify.sort(key=lambda x: x[0].iov[:2])
+        iovs_to_modify.sort(key=lambda x: x[0].name)
+        # Print nice table
+        table = [[i[0].iov_id, i[0].name, i[0].revision] + list(i[0].iov) + list(i[1]) for i in iovs_to_modify]
+        table.insert(0, ["IovId", "Name", "Rev", "Old First Exp", "Old First Run", "Old Final Exp", "Old Final Run",
+                     "New First Exp", "New First Run", "New Final Exp", "New Final Run"])
+        columns = [9, "+", 6, 6, 6, 6, 6, 6, 6, 6, 6]
+        pretty_print_table(table, columns)
+    if iovs_to_create:
+        B2WARNING("iovs to be created")
+        # Sort by payload name and iov for nicer logs
+        iovs_to_create.sort(key=lambda x: x[1][:2])
+        iovs_to_create.sort(key=lambda x: x[0].name)
+        # Print nice table
+        table = [[i[0].name, i[0].revision] + list(i[1]) for i in iovs_to_create]
+        table.insert(0, ["Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run"])
+        columns = ["+", 6, 6, 6, 6, 6]
+        pretty_print_table(table, columns)
+
+    if (iovs_to_delete or iovs_to_modify or iovs_to_create) and not args.replace:
+        B2WARNING("To apply them use the option --replace")
+        B2WARNING("If instead you want these overlaps to be present enter"
+                  " the output global tag name again to confirm this action: ")
+        gt_check = input()
+        if gt_check != args.output:
+            B2ERROR("global tag names do not match.")
+            return 1
+
+    if not args.dry_run:
+        set_cdb_authentication_token(db, args.auth_token)
+        try:
+            command_iovs_helper.modify_db(lambda args: db.create_iov(output_id, *args),
+                                          [(i.payload_id, *i.iov) for i in iovs_to_copy])
+            if args.replace:
+                command_iovs_helper.modify_db(db.delete_iov, [i.iov_id for i in iovs_to_delete], "delete")
+                command_iovs_helper.modify_db(lambda args: db.modify_iov(*args),
+                                              [(i[0].iov_id, *i[1]) for i in iovs_to_modify], "modify")
+                command_iovs_helper.modify_db(lambda args: db.create_iov(output_id, *args),
+                                              [(i[0].payload_id, *i[1]) for i in iovs_to_create], "create")
+        except RuntimeError:
+            return 1
+
+    return 0
+
+
+def command_iovs_modify(args, db=None):
+    """
+    Modify iovs from a globaltag
+
+    This command allows to modify the iovs from a globaltags, optionally limiting the iovs to be modified to those
+    of a specific payload, revision, IoV id or run range.
+    """
+    command_iovs_helper = CommandIoVsHelper("modify", args, db)
+    if db is None:
+        command_iovs_helper.add_arguments()
+        return
+
+    new_iov = args.new_iov.split()
+    # Transform integer values of iov in int and keep '*' as strings. Raise error if something different is given.
+    for i in range(len(new_iov)):
+        try:
+            new_iov[i] = int(new_iov[i])
+        except ValueError:
+            if new_iov[i] != '*':
+                raise ValueError(f"Invalid IOV value: {new_iov[i]} should be an integer or '*'")
+
+    iovs_to_modify = []
+    for iov in command_iovs_helper.get_iovs():
+        new_iow_ = new_iov.copy()
+        for i in range(len(new_iow_)):
+            if new_iow_[i] == '*':
+                new_iow_[i] = iov.iov[i]
+        iovs_to_modify.append((iov, new_iow_))
+
+    table = [[i[0].iov_id, i[0].name, i[0].revision] + list(i[0].iov) + list(i[1]) for i in iovs_to_modify]
+    table.insert(0, ["IovId", "Name", "Rev", "Old First Exp", "Old First Run", "Old Final Exp", "Old Final Run",
+                     "New First Exp", "New First Run", "New Final Exp", "New Final Run"])
+    columns = [9, "+", 6, 6, 6, 6, 6, 6, 6, 6, 6]
+
+    B2INFO("Changing the following iovs")
+    pretty_print_table(table, columns)
+
+    if not args.dry_run:
+        set_cdb_authentication_token(db, args.auth_token)
+        try:
+            command_iovs_helper.modify_db(lambda args: db.modify_iov(*args),
+                                          [(i[0].iov_id, *i[1]) for i in iovs_to_modify])
+        except RuntimeError:
+            return 1
+
+    return 0

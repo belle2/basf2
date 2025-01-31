@@ -9,21 +9,22 @@
 #include <analysis/modules/ChargedParticleIdentificator/ChargedPidMVAModule.h>
 
 //ANALYSIS
-#include <mva/interface/Interface.h>
-#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/VariableManager/Utility.h>
+#include <analysis/variables/ECLVariables.h>
 
 // FRAMEWORK
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
-
+#include <mva/interface/Interface.h>
 
 using namespace Belle2;
 
 REG_MODULE(ChargedPidMVA);
 
-ChargedPidMVAModule::ChargedPidMVAModule() : Module()
+Belle2::ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 {
   setDescription("This module evaluates the response of an MVA trained for binary charged particle identification between two hypotheses, S and B. For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists, calculates the MVA score using the appropriate xml weight file, and adds it as ExtraInfo to the Particle objects.");
 
@@ -56,10 +57,10 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 }
 
 
-ChargedPidMVAModule::~ChargedPidMVAModule() = default;
+Belle2::ChargedPidMVAModule::~ChargedPidMVAModule() = default;
 
 
-void ChargedPidMVAModule::initialize()
+void Belle2::ChargedPidMVAModule::initialize()
 {
   m_event_metadata.isRequired();
 
@@ -90,12 +91,12 @@ void ChargedPidMVAModule::initialize()
 }
 
 
-void ChargedPidMVAModule::beginRun()
+void Belle2::ChargedPidMVAModule::beginRun()
 {
 }
 
 
-void ChargedPidMVAModule::event()
+void Belle2::ChargedPidMVAModule::event()
 {
 
   // Debug strings per log level.
@@ -158,9 +159,7 @@ void ChargedPidMVAModule::event()
         // LEGACY TRAININGS: always require a track-cluster match.
         const ECLCluster* eclCluster = particle->getECLCluster();
         if (!eclCluster) {
-          if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 11)) {
-            B2WARNING("\nParticle [" << ipart << "] has invalid Track-ECLCluster relation, skip MVA application...");
-          }
+          B2DEBUG(11, "\nParticle [" << ipart << "] has invalid Track-ECLCluster relation, skip MVA application...");
           continue;
         }
       }
@@ -172,11 +171,16 @@ void ChargedPidMVAModule::event()
       auto p = particle->getP();
       // Set a dummy charge of zero to pick charge-independent payloads, if requested.
       auto charge = (!m_charge_independent) ? particle->getCharge() : 0.0;
+      if (std::isnan(theta) or std::isnan(p) or std::isnan(charge)) {
+        B2DEBUG(11, "\nParticle [" << ipart << "] has invalid input variable, skip MVA application..." <<
+                " polar angle: " << theta << ", p: " << p << ", charge: " << charge);
+        continue;
+      }
+
       int idx_theta, idx_p, idx_charge;
       auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(theta, p, charge, idx_theta, idx_p, idx_charge);
 
-      auto* matchVar = Variable::Manager::Instance().getVariable("clusterTrackMatch");
-      auto hasMatch = std::isnormal(std::get<double>(matchVar->function(particle)));
+      auto hasMatch = std::isnormal(Variable::eclClusterTrackMatched(particle));
 
       debugStr[11] += "\n";
       debugStr[11] += ("Particle [" + std::to_string(ipart) + "]\n");
@@ -199,14 +203,10 @@ void ChargedPidMVAModule::event()
 
       // Don't even bother if particle does not fulfil the category selection.
       if (m_cuts.at(index)) {
-
         if (!m_cuts.at(index)->check(particle)) {
-          if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 11)) {
-            B2WARNING("\nParticle [" << ipart << "] didn't pass MVA category cut, skip MVA application...");
-          }
+          B2DEBUG(11, "\nParticle [" << ipart << "] didn't pass MVA category cut, skip MVA application...");
           continue;
         }
-
       }
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
@@ -308,7 +308,7 @@ void ChargedPidMVAModule::event()
 }
 
 
-void ChargedPidMVAModule::registerAliasesLegacy()
+void Belle2::ChargedPidMVAModule::registerAliasesLegacy()
 {
 
   std::map<std::string, std::string> aliasesLegacy;
@@ -354,7 +354,7 @@ void ChargedPidMVAModule::registerAliasesLegacy()
 }
 
 
-void ChargedPidMVAModule::registerAliases()
+void Belle2::ChargedPidMVAModule::registerAliases()
 {
 
   auto aliases = (*m_weightfiles_representation.get())->getAliases();
@@ -384,7 +384,7 @@ void ChargedPidMVAModule::registerAliases()
 }
 
 
-void ChargedPidMVAModule::initializeMVA()
+void Belle2::ChargedPidMVAModule::initializeMVA()
 {
 
   B2INFO("Run: " << m_event_metadata->getRun() << ". Load supported MVA interfaces for binary charged particle identification...");

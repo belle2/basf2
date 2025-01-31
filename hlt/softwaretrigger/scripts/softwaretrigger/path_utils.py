@@ -12,7 +12,6 @@ import modularAnalysis
 import stdV0s
 import vertex
 from geometry import check_components
-import reconstruction
 from softwaretrigger.reconstruction_utils import bToCharmHLTSkim
 
 
@@ -180,7 +179,7 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
 
 
-def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
+def add_pre_filter_reconstruction(path, run_type, components, switch_off_slow_modules_for_online, **kwargs):
     """
     Add everything needed to calculation a filter decision and if possible,
     also do the HLT filtering. This is only possible for beam runs (in the moment).
@@ -188,6 +187,8 @@ def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
     Please note that this function adds the HLT decision, but does not branch
     according to it.
     """
+    import reconstruction  # noqa
+
     check_components(components)
 
     if run_type == constants.RunTypes.beam:
@@ -196,6 +197,7 @@ def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
             skipGeometryAdding=True,
             components=components,
             event_abort=hlt_event_abort,
+            switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
             **kwargs)
 
     elif run_type == constants.RunTypes.cosmic:
@@ -214,17 +216,24 @@ def add_filter_module(path):
     return path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"])
 
 
-def add_post_filter_reconstruction(path, run_type, components):
+def add_post_filter_reconstruction(path, run_type, components, switch_off_slow_modules_for_online):
     """
     Add all modules which should run after the HLT decision is taken
     and only on the accepted events.
     This includes reconstruction modules not essential
     to calculate filter decision and then the skim calculation.
     """
+    import reconstruction  # noqa
+
     check_components(components)
 
     if run_type == constants.RunTypes.beam:
-        reconstruction.add_postfilter_reconstruction(path, components=components, pruneTracks=False)
+        reconstruction.add_postfilter_reconstruction(
+            path,
+            components=components,
+            pruneTracks=False,
+            switch_off_slow_modules_for_online=switch_off_slow_modules_for_online
+        )
 
         add_skim_software_trigger(path, store_array_debug_prescale=1)
     elif run_type == constants.RunTypes.cosmic:

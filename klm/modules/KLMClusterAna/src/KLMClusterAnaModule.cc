@@ -17,7 +17,6 @@
 #include <TMatrixT.h>
 #include <TMatrixDSymEigen.h>
 #include <TVectorT.h>
-#include <TVector3.h>
 
 /* C++ headers. */
 #include <algorithm>
@@ -203,7 +202,6 @@ void KLMClusterAnaModule::event()
     std::vector<double> zHits(nHits);
 
     std::vector<KLMHit2d*> klmHit2ds;
-    std::vector<KLMHit2d*>::iterator it;
 
     for (int i = 0; i < nHits; i++) {
       klmHit2ds.push_back(hit2ds[i]);
@@ -228,8 +226,8 @@ void KLMClusterAnaModule::event()
 
     klmcluster.addRelationTo(clusterShape);
 
-    for (it = klmHit2ds.begin(); it != klmHit2ds.end(); ++it) {
-      clusterShape->addRelationTo(*it);
+    for (const KLMHit2d* hit2d : klmHit2ds) {
+      clusterShape->addRelationTo(hit2d);
     }
 
   }

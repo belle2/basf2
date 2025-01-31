@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -10,7 +9,7 @@
 ##########################################################################
 
 """\
-This tool is an extention of b2conditionsdb-extract for PXD calibration validation.
+This tool is an extension of b2conditionsdb-extract for PXD calibration validation.
 It reads the given conditions objects from the database and writes them
 to a TTree or histograms. Intra run dependencies are not supported.
 
@@ -20,7 +19,7 @@ For example the command ::
 
 will create a root file with validation histograms or a Tree containing the masked
 pixels of the runs 1, 2, 3, and 12 of experiment 5. The branch PXDMaskedPixelPar_valid
-contains 1 if the calibration costants are available for the given run and 0 if not.
+contains 1 if the calibration constants are available for the given run and 0 if not.
 
 """
 
@@ -134,7 +133,7 @@ class ConditionsTreeModule(basf2.Module):
             if not self.maps:
                 self.conditionCheckers[aCondition].rundir = ""
         # Get Calibration Checkers
-        dbObjTypeSet = set(aCondition.objType for aCondition in self.conditionCheckers.keys())
+        dbObjTypeSet = {aCondition.objType for aCondition in self.conditionCheckers.keys()}
         for aCalChecker_name, aObjType_set in calChecker.__cal_checker_dict__.items():
             # basf2.B2INFO(f"dbObjTypeSet:  {dbObjTypeSet}")
             # basf2.B2INFO(f"aObjType_set:  {aObjType_set}")
@@ -244,7 +243,7 @@ if __name__ == "__main__":
         else:
             runs.append(int(runentry))
     if selected_runs:
-        runs = list(sorted(set(runs) & set(i for _, i in selected_runs)))
+        runs = list(sorted(set(runs) & {i for _, i in selected_runs}))
     else:
         runs = list(sorted(set(runs)))
 

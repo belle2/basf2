@@ -9,8 +9,6 @@
 // Own header.
 #include <analysis/variables/HelicityVariables.h>
 
-#include <analysis/VariableManager/Utility.h>
-
 #include <analysis/variables/EventVariables.h>
 
 #include <analysis/dataobjects/Particle.h>
@@ -18,10 +16,7 @@
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/VariableManager/Manager.h>
 
-#include <framework/utilities/Conversion.h>
 #include <framework/gearbox/Const.h>
-
-#include <boost/algorithm/string.hpp>
 
 #include <Math/Boost.h>
 #include <Math/Vector4D.h>
@@ -41,22 +36,32 @@ namespace Belle2 {
 
       if (daughters.size() == 2) {
 
+        // Only for pi0 -> gamma gamma, gamma -> e+ e-
         bool isOneConversion = false;
-
-        for (auto& idaughter : daughters) {
-          if (idaughter -> getNDaughters() == 2) {
-            if (std::abs(idaughter -> getDaughters()[0]-> getPDGCode()) == Const::electron.getPDGCode()
-                && std::abs(idaughter -> getDaughters()[1]-> getPDGCode()) == Const::electron.getPDGCode()) {
-              isOneConversion = true;
+        if (part->getPDGCode() == Const::pi0.getPDGCode()) {
+          for (auto& idaughter : daughters) {
+            // both daughter must be gamma
+            if (idaughter -> getPDGCode() != Const::photon.getPDGCode()) {
+              isOneConversion = false;
+              break;
+            }
+            // check if one of gammas has two daughters
+            if (idaughter -> getNDaughters() == 2) {
+              if (std::abs(idaughter -> getDaughters()[0]-> getPDGCode()) == Const::electron.getPDGCode()
+                  && std::abs(idaughter -> getDaughters()[1]-> getPDGCode()) == Const::electron.getPDGCode()) { // e+ e-
+                isOneConversion = true;
+              }
             }
           }
         }
 
         if (isOneConversion) {
+          B2WARNING("cosHelicityAngleMomentum: Special treatment for pi0->gamma gamma, gamma -> e+ e-, is called. "
+                    "This treatment is going to be deprecated and we recommend using ``cosHelicityAngleMomentumPi0Dalitz`` "
+                    "If you find this message in another case, it must be a bug. Please report it to the software mailing list.");
+
           //only for pi0 decay where one gamma converts
-
           PxPyPzEVector pGamma;
-
           for (auto& idaughter : daughters) {
             if (idaughter -> getNDaughters() == 2) continue;
             else pGamma = frame.getMomentum(idaughter);
@@ -113,14 +118,47 @@ namespace Belle2 {
         PxPyPzEVector pGamma;
 
         for (auto& idaughter : daughters) {
-          if (std::abs(idaughter -> getPDGCode()) == Const::photon.getPDGCode()) pGamma = frame.getMomentum(idaughter);
+          if (std::abs(idaughter -> getPDGCode()) == Const::photon.getPDGCode()) {
+            pGamma = frame.getMomentum(idaughter);
+            break;
+          }
+        }
+        pGamma = Boost(motherBoost) * pGamma;
+
+        return std::cos(motherMomentum.Angle(pGamma.Vect()));
+
+      } else if (daughters.size() == 2) { // only for pi0 -> gamma gamma, gamma -> e+ e-
+
+        PxPyPzEVector pGamma;
+
+        // both daughters must be gamma
+        if (daughters[0] -> getPDGCode() != Const::photon.getPDGCode() or
+            daughters[1] -> getPDGCode() != Const::photon.getPDGCode())
+          return Const::doubleNaN;
+
+        if (daughters[0] -> getNDaughters() == 2 and daughters[1] -> getNDaughters() == 0) {
+          if (std::abs(daughters[0] -> getDaughters()[0]-> getPDGCode()) == Const::electron.getPDGCode()
+              && std::abs(daughters[0] -> getDaughters()[1]-> getPDGCode()) == Const::electron.getPDGCode()) { // e+ e-
+            pGamma = frame.getMomentum(daughters[1]);
+          } else {
+            return Const::doubleNaN;
+          }
+        } else if (daughters[0] -> getNDaughters() == 0 and daughters[1] -> getNDaughters() == 2) {
+          if (std::abs(daughters[1] -> getDaughters()[0]-> getPDGCode()) == Const::electron.getPDGCode()
+              && std::abs(daughters[1] -> getDaughters()[1]-> getPDGCode()) == Const::electron.getPDGCode()) { // e+ e-
+            pGamma = frame.getMomentum(daughters[0]);
+          } else {
+            return Const::doubleNaN;
+          }
+        } else {
+          return Const::doubleNaN;
         }
 
         pGamma = Boost(motherBoost) * pGamma;
 
         return std::cos(motherMomentum.Angle(pGamma.Vect()));
 
-      }  else return Const::doubleNaN;
+      } else return Const::doubleNaN;
 
     }
 
@@ -345,6 +383,8 @@ namespace Belle2 {
                       To be used for the decay :math:`\pi^0 \to e^+ e^- \gamma`: 
                       cosine of the angle between the momentum of the gamma in the frame of the given particle (mother)
                       and the momentum of the given particle in the lab frame.
+
+                      One can call the variable for the decay :math:`\pi^0 \to \gamma \gamma, \gamma \to e^+ e^-` as well.
 
                       Otherwise, it returns 0.)DOC");
 

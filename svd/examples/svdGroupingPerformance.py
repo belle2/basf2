@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -48,7 +47,7 @@ parser.add_argument("--doSVDGrouping", action="store_true",
                     help="Perform grouping of SVD Clusters")
 parser.add_argument("--signalLifetime", type=float, default=30,
                     help="Lifetime of Signal when computing exponential-weigth for sorting signal groups")
-parser.add_argument("--numberOfSignalGroups", type=int, default=20,
+parser.add_argument("--numberOfSignalGroups", type=int, default=1,
                     help="Select only few signal groups")
 parser.add_argument("--formSingleSignalGroup", action="store_true",
                     help="Assign groupId 0 to every signal groups")
@@ -61,7 +60,7 @@ parser.add_argument("--CoG3TimeCalibration_bucket32", action="store_true",
 parser.add_argument("--is3sample", action="store_true",
                     help="Emulate SVD 3 samples")
 parser.add_argument("--executionTime", action="store_true",
-                    help="Store exection time tree")
+                    help="Store execution time tree")
 parser.add_argument("--test", action="store_true",
                     help="Test with small numbers of events")
 args = parser.parse_args()
@@ -119,7 +118,7 @@ class SVDGroupingPerformance(b2.Module):
 
         timeBin = int(maxTime - minTime)
 
-        #: \cond
+        #: \cond Doxygen_suppress
         self.TH1F_Index = {}
         self.TH1F_Store = []
         TH1F_Store_Count = 0
@@ -505,7 +504,7 @@ class SVDGroupingPerformance(b2.Module):
                         - par1 * TMath.Sin(TMath.PiOver4()) + cdcEventT0 * TMath.Cos(TMath.PiOver4()))
                 fillOnce += 1
 
-            if par1 > sigMin and par1 < sigMax:
+            if minId == 0:
                 self.TH1F_Store[self.TH1F_Index["th1f_sigClsTime_PreTracking"]].Fill(clsTime)
             else:
                 self.TH1F_Store[self.TH1F_Index["th1f_bkgClsTime_PreTracking"]].Fill(clsTime)
@@ -648,6 +647,7 @@ else:
     b2conditions.globaltags = ["online"]
     b2conditions.prepend_globaltag("data_reprocessing_prompt")
     b2conditions.prepend_globaltag("patch_main_release-07")
+    b2conditions.prepend_globaltag("patch_main_release-08")
     if args.CoG3TimeCalibration_bucket36:
         b2conditions.prepend_globaltag("svd_CoG3TimeCalibration_bucket36_withGrouping_pol3")
     if args.CoG3TimeCalibration_bucket32:
@@ -693,7 +693,8 @@ else:
 trk.add_tracking_reconstruction(
     main,
     mcTrackFinding=MCTracking,
-    append_full_grid_cdc_eventt0=True)
+    append_full_grid_cdc_eventt0=True,
+    skip_full_grid_cdc_eventt0_if_svd_time_present=False)
 
 main.add_module(SVDGroupingPerformance())
 
@@ -702,22 +703,24 @@ for moda in main.modules():
         moda.param("returnClusterRawTime", args.isRawTime)
     if moda.name() == 'SVDTimeGrouping':
         if args.doSVDGrouping:
-            moda.param("useDB", False)
+            moda.param("forceGroupingFromDB", False)
+            moda.param("isEnabledIn6Samples", True)
+            moda.param("isEnabledIn3Samples", True)
+            moda.param("useParamFromDB", False)
             moda.param('tRangeLow',  minTime)
             moda.param('tRangeHigh', maxTime)
             moda.param("expectedSignalTimeCenter",    sigLoc)
             moda.param('expectedSignalTimeMin',  sigMin)
             moda.param('expectedSignalTimeMax', sigMax)
-            moda.param("isEnabledIn6Samples", True)
-            moda.param("isEnabledIn3Samples", True)
-            moda.param("numberOfSignalGroups", args.numberOfSignalGroups)
-            moda.param("formSingleSignalGroup", args.formSingleSignalGroup)
             moda.param("signalLifetime", args.signalLifetime)
     if moda.name() == 'SVDSpacePointCreator':
         if args.useSVDGroupInfo:
-            moda.param("useDB", False)
+            moda.param("forceGroupingFromDB", False)
             moda.param("useSVDGroupInfoIn6Sample", True)
             moda.param("useSVDGroupInfoIn3Sample", True)
+            moda.param("useParamFromDB", False)
+            moda.param("numberOfSignalGroups", args.numberOfSignalGroups)
+            moda.param("formSingleSignalGroup", args.formSingleSignalGroup)
 
 
 if args.executionTime:

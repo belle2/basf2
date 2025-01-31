@@ -39,7 +39,6 @@ namespace Belle2 {
      * @param momEntry momentum of the start of the track in local coordinates
      * @param momMidPoint momentum of the mid point of the track in local coordinates
      * @param momExit momentum of the end of the track in local coordinates
-     * @param momentum momentum of the particle in local coordinates
      * @param energyDep energy deposited by the track inside the sensor
      * @param globalTime timestamp of the hit
      */
@@ -51,7 +50,7 @@ namespace Belle2 {
 
 
 
-    ClassDef(SVDTrueHit, 6)
+    ClassDef(SVDTrueHit, 7)
   };
 
 } // end namespace Belle2

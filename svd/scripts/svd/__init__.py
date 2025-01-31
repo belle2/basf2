@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -43,7 +42,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         path.add_module(registerEventlevelTrackingInfo)
 
-    if(isROIsimulation):
+    if (isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
         timeGroupComposerName = '__ROISVDTimeGrouping'
         recocreatorName = '__ROISVDRecoDigitCreator'
@@ -63,8 +62,8 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         missingAPVsClusterCreatorName = 'SVDMissingAPVsClusterCreator'
 
         # mask HotStrips from SVDHotStripsCalibration payloads
-    if(applyMasking):
-        if(isROIsimulation):
+    if (applyMasking):
+        if (isROIsimulation):
             shaperDigitsName = '__ROISVDShaperDigitsUnmasked'
             maskingName = '__ROISVDStripMasking'
         else:
@@ -140,7 +139,7 @@ def add_svd_create_recodigits(path, recocreatorName="SVDRecoDigitCreator", shape
 
 def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False):
     """
-    Adds the old (up to release-05) SVD recontruction to the path.
+    Adds the old (up to release-05) SVD reconstruction to the path.
 
     Reconstruction starts with :ref:`SVDShaperDigits<svdshapers>` and
     :ref:`SVDEventInfo<svdeventinfo>` and provides :ref:`SVDClusters<svdclusters>`
@@ -168,7 +167,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         path.add_module(registerEventlevelTrackingInfo)
 
-    if(isROIsimulation):
+    if (isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
         clusterizerName = '__ROISVDSimpleClusterizer'
         timeGroupComposerName = '__ROISVDTimeGrouping'
@@ -188,8 +187,8 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         missingAPVsClusterCreatorName = 'SVDMissingAPVsClusterCreator'
 
         # add strip masking if needed
-    if(applyMasking):
-        if(isROIsimulation):
+    if (applyMasking):
+        if (isROIsimulation):
             shaperDigitsName = '__ROISVDShaperDigitsUnmasked'
             maskingName = '__ROISVDStripMasking'
         else:
@@ -374,7 +373,7 @@ def add_svd_SPcreation(path, isROIsimulation=False):
         registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         path.add_module(registerEventlevelTrackingInfo)
 
-    if(isROIsimulation):
+    if (isROIsimulation):
         svdSPCreatorName = '__ROISVDSpacePointCreator'
         svd_clusters = '__ROIsvdClusters'
         nameSPs = 'SVDSpacePoints__ROI'

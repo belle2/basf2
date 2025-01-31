@@ -132,7 +132,7 @@ namespace Belle2::Conditions {
     }
   protected:
     /** Check the status of a global tag with the given name.
-     * Returns "" if the tag doesn't exist or any other error occured */
+     * Returns "" if the tag doesn't exist or any other error occurred */
     virtual std::string getGlobaltagStatus(const std::string& name) = 0;
     /** Update the list of existing payloads from a given globaltag, exp and run
      * combination.
@@ -160,6 +160,11 @@ namespace Belle2::Conditions {
      *    messages to indicate the correct metadata provider
      */
     void addPayload(PayloadMetadata&& payload, const std::string& messagePrefix = "");
+    /** Print an INFO message about the used metadata provider.
+     *
+     * @param provider the actual metadata provider used for the job
+     */
+    void printInfoMessage(const std::string& provider);
 
     /** List of globaltags to consider */
     std::vector<std::string> m_tags;

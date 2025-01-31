@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -18,6 +17,7 @@
 # -----------------------------------------------------------------------------------
 
 import basf2
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 import ROOT.Belle2
 
 

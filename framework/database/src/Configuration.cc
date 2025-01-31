@@ -22,7 +22,7 @@
 #include <TPython.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "main_2023-06-27"
+#define CURRENT_DEFAULT_TAG "main_2024-12-20"
 
 namespace py = boost::python;
 
@@ -103,7 +103,7 @@ namespace Belle2::Conditions {
       fillFromEnv(m_globalTags, "BELLE2_CONDB_GLOBALTAG", "");
       overrideGlobalTags();
     }
-    std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", "http://belle2db.sdcc.bnl.gov/b2s/rest/");
+    std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", m_defaultMetadataProviderUrl);
     fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", serverList + " /cvmfs/belle.cern.ch/conditions/database.sqlite");
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", "/cvmfs/belle.cern.ch/conditions");
   }
@@ -512,6 +512,10 @@ want to be able to use the software without internet connection after they
 downloaded a snapshot of the necessary globaltags with ``b2conditionsdb download``
 to point to this location.
 )DOC")
+    .add_property("default_metadata_provider_url", &Configuration::getDefaultMetadataProviderUrl, R"DOC(
+URL of the default central metadata provider to look for payloads in the
+conditions database.
+)DOC")
     .add_property("payload_locations", &Configuration::getPayloadLocationsPy, &Configuration::setPayloadLocationsPy, R"DOC(
 List of payload locations to search for payloads which have been found by any of
 the configured `metadata_providers`. This can be a local directory or a
@@ -597,7 +601,7 @@ Parameters:
   backoff_factor (int): backoff factor for retries in seconds. Retries are
       performed using something similar to binary backoff: For retry :math:`n`
       and a ``backoff_factor`` :math:`f` we wait for a random time chosen
-      uniformely from the interval :math:`[1, (2^{n} - 1) \times f]` in
+      uniformly from the interval :math:`[1, (2^{n} - 1) \times f]` in
       seconds.
 )DOC")
     .def("set_globaltag_callback", &Configuration::setGlobaltagCallbackPy, R"DOC(set_globaltag_callback(function)

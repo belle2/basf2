@@ -67,7 +67,6 @@ class TestTreeFits(unittest.TestCase):
                         particleList='Z0:rec',
                         confidenceLevel=conf,
                         massConstraintList=[],
-                        massConstraintListParticlename=[],
                         expertBeamConstraintPDG=23,
                         treatAsInvisible='Z0:rec -> ^D+:sig D-:tag pi-:a pi+:a',
                         ipConstraint=True,

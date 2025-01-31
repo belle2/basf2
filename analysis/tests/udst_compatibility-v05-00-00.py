@@ -15,7 +15,7 @@ This is the *start* of analysis objects guarantee of backwards compatibility.
 Pragmatically, we are backwards compatible with release-04 **in** release-05
 but we cannot guarantee this in general.
 
-See https://confluence.desy.de/display/BI/Backward+Compatibility for more
+See https://xwiki.desy.de/xwiki/rest/p/0a372 for more
 specific statements about guarantees, and in case you observe a test failure.
 
 We keep a coarse log of the changes here for reference. Please reference a
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     udst.add_udst_dump(main, True)
 
     # also dump some variables just in case the DataStorePrinter hides some
-    # problems (like has happened once: PR #7525 / BII-7148).
+    # problems (like has happened once: GitLab issue #7023).
     sanity_check_variables = [
         "mcPDG",
         "daughter(0, mcPDG)",  # check the MCParticle <--> Particle relation (or array index lookup)

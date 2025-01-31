@@ -67,18 +67,19 @@ namespace Belle2 {
      *
      * We denote with P_i the 4-vector of the i-th ParticleFitObject,
      * then
-     * $$ \frac{\partial ^2 g}{\partial a_k \partial a_l}
+     * \f[
+     *   \frac{\partial ^2 g}{\partial a_k \partial a_l}
      *   = \sum_i \sum_j \frac{\partial ^2 g}{\partial P_i \partial P_j} \cdot
      *     \frac{\partial P_i}{\partial a_k} \cdot \frac{\partial P_j}{\partial a_l}
      *     + \sum_i \frac{\partial g}{\partial P_i} \cdot
      *        \frac{\partial^2 P_i}{\partial a_k \partial a_l}
-     * $$
-     * Here, $\frac{\partial P_i}{\partial a_k}$ is a $4 \times n_i$ Matrix, where
-     * $n_i$ is the number of parameters of FitObject i;
-     * Correspondingly, $\frac{\partial^2 P_i}{\partial a_k \partial a_l}$ is a
-     * $4 \times n_i \times n_i$ matrix.
-     * Also, $\frac{\partial ^2 g}{\partial P_i \partial P_j}$ is a $4\times 4$ matrix
-     * for a given i and j, and $\frac{\partial g}{\partial P_i}$ is a 4-vector
+     * \f]
+     * Here, \f$\frac{\partial P_i}{\partial a_k}\f$ is a \f$4 \times n_i\f$ Matrix, where
+     * \f$n_i\f$ is the number of parameters of FitObject i;
+     * Correspondingly, \f$\frac{\partial^2 P_i}{\partial a_k \partial a_l}\f$ is a
+     * \f$4 \times n_i \times n_i\f$ matrix.
+     * Also, \f$\frac{\partial ^2 g}{\partial P_i \partial P_j}\f$ is a \f$4\times 4\f$ matrix
+     * for a given i and j, and \f$\frac{\partial g}{\partial P_i}\f$ is a 4-vector
      * (though not a Lorentz-vector!).
      *
      */
@@ -88,20 +89,20 @@ namespace Belle2 {
     {
 
       /** First, treat the part
-       * $$
+       * \f[
        *    \frac{\partial ^2 g}{\partial P_i \partial P_j}  \cdot
        *     \frac{\partial P_i}{\partial a_k} \cdot \frac{\partial P_j}{\partial a_l}
-       * $$
+       * \f]
        */
       double s = getSigma();
       double fact = 2 * getValue() / (s * s);
 
-      // Derivatives $\frac{\partial ^2 g}{\partial P_i \partial P_j}$ at fixed i, j
+      // Derivatives \f$\frac{\partial ^2 g}{\partial P_i \partial P_j}\f$ at fixed i, j
       // d2GdPidPj[4*ii+jj] is derivative w.r.t. P_i,ii and P_j,jj, where ii=0,1,2,3 for E,px,py,pz
       double d2GdPidPj[16];
-      // Derivatives $\frac {\partial P_i}{\partial a_k}$ for all i;
+      // Derivatives \f$\frac {\partial P_i}{\partial a_k}\f$ for all i;
       // k is local parameter number
-      // dPidAk[KMAX*4*i + 4*k + ii] is $\frac {\partial P_{i,ii}}{\partial a_k}$,
+      // dPidAk[KMAX*4*i + 4*k + ii] is \f$\frac {\partial P_{i,ii}}{\partial a_k}\f$,
       // with ii=0, 1, 2, 3 for E, px, py, pz
       const int KMAX = 4;
       const int n = fitobjects.size();
@@ -110,10 +111,10 @@ namespace Belle2 {
 
       for (int i = 0; i < n; ++i) dPidAkval[i] = false;
 
-      // Derivatives $\frac{\partial ^2 g}{\partial P_i \partial a_l}$ at fixed i
-      // d2GdPdAl[4*l + ii] is $\frac{\partial ^2 g}{\partial P_{i,ii} \partial a_l}$
+      // Derivatives \f$\frac{\partial ^2 g}{\partial P_i \partial a_l}\f$ at fixed i
+      // d2GdPdAl[4*l + ii] is \f$\frac{\partial ^2 g}{\partial P_{i,ii} \partial a_l}\f$
       double d2GdPdAl[4 * KMAX];
-      // Derivatives $\frac{\partial ^2 g}{\partial a_k \partial a_l}$
+      // Derivatives \f$\frac{\partial ^2 g}{\partial a_k \partial a_l}\f$
       double d2GdAkdAl[KMAX * KMAX] = {0};
 
       // Global parameter numbers: parglobal[KMAX*i+klocal]
@@ -145,9 +146,11 @@ namespace Belle2 {
               dPidAkval[j] = true;
             }
             // Now sum over E/px/Py/Pz for object j:
-            // $$\frac{\partial ^2 g}{\partial P_{i,ii} \partial a_l}
+            // \f[
+            //   \frac{\partial ^2 g}{\partial P_{i,ii} \partial a_l}
             //   = (sum_{j}) sum_{jj} frac{\partial ^2 g}{\partial P_{i,ii} \partial P_{j,jj}}
             //     \cdot \frac{\partial P_{j,jj}}{\partial a_l}
+            // \f]
             // We're summing over jj here
             for (int llocal = 0; llocal < foj->getNPar(); ++llocal) {
               for (int ii = 0; ii < 4; ++ii) {
@@ -161,11 +164,11 @@ namespace Belle2 {
               }
             }
             // Now sum over E/px/Py/Pz for object i, i.e. sum over ii:
-            // $$
+            // \f[
             // \frac{\partial ^2 g}{\partial a_k \partial a_l}
             //      = \sum_{ii} \frac{\partial ^2 g}{\partial P_{i,ii} \partial a_l} \cdot
             //        \frac{\partial P_{i,ii}}{\partial a_k}
-            // $$
+            // \f]
             for (int klocal = 0; klocal < foi->getNPar(); ++klocal) {
               for (int llocal = 0; llocal < foj->getNPar(); ++llocal) {
                 int ind1 = 4 * llocal;
@@ -189,20 +192,20 @@ namespace Belle2 {
         }
       }
       /** Second, treat the parts
-       * $$
+       * \f[
        * \sum_i \frac{\partial g}{\partial P_i} \cdot
        *        \frac{\partial^2 P_i}{\partial a_k \partial a_l}
-       * $$
+       * \f]
        * and
-       * $$
+       * \f[
        * \frac{\partial^2 h}{\partial g^2}
        * \sum_i \frac{\partial g}{\partial P_i} \cdot
        *        \frac{\partial P_i}{\partial a_k}
        * \sum_j \frac{\partial g}{\partial P_j} \cdot
        *        \frac{\partial P_j}{\partial a_l}
-       * $$
+       * \f]
        *
-       * Here, $\frac{\partial g}{\partial P_i}$ is a 4-vector, which we pass on to
+       * Here, \f$\frac{\partial g}{\partial P_i}\f$ is a 4-vector, which we pass on to
        * the FitObject
        */
 

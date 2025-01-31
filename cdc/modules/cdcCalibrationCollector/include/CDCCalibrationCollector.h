@@ -22,7 +22,7 @@
 #include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <string>
 
 namespace Belle2 {
@@ -76,7 +76,7 @@ namespace Belle2 {
       /**
        * extrapolates the helix fit to a given layer and finds the wire which it would be hitting
        */
-      const TrackFindingCDC::CDCWire& getIntersectingWire(const TVector3& xyz, const TrackFindingCDC::CDCWireLayer& layer,
+      const TrackFindingCDC::CDCWire& getIntersectingWire(const ROOT::Math::XYZVector& xyz, const TrackFindingCDC::CDCWireLayer& layer,
                                                           const Helix& helixFit) const;
 
       StoreObjPtr<EventT0> m_eventTimeStoreObject;  /**< Event t0 object */

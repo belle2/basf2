@@ -9,9 +9,6 @@
 #pragma once
 
 #include <calibration/CalibrationAlgorithm.h>
-#include <vxd/geometry/GeoCache.h>
-#include "TH1F.h"
-#include <svd/dataobjects/SVDHistograms.h>
 
 #include <optional>
 
@@ -52,6 +49,6 @@ namespace Belle2 {
     std::optional<float> m_previousRawTimeMeanL3V; /**< CoG time mean of the previous run for V side of layer 3*/
 
     float m_allowedDeviationMean = 0.5; /**< Allowed deviation of clsOnTracks histo wrt EventT0 histo in  number of EventT0 RMS */
-    float m_minEntries = 10000; /**< Set the minimun number of entries required in the histograms of layer 3*/
+    float m_minEntries = 10000; /**< Set the minimum number of entries required in the histograms of layer 3*/
   };
 } // namespace Belle2

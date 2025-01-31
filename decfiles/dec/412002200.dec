@@ -1,0 +1,31 @@
+# EventType 412002200
+# Descriptor: vpho -> eta_b omega
+#                     eta_b -> g   g
+#                     omega -> pi+ pi- pi0
+#                                      pi0 -> gamma gamma
+# NickName: vpho_etab_omega_pi+pi-pi0
+# Documentation: signal MC for e+e- -> eta_b omega analysis with omega -> pi+pi-pi0 inclusive reconstruction
+# Tested: Yes
+# PhysicsWG: Quarkonium
+# Reponsible: Pavel Oskin
+# Email: oskin.pavel.v@gmail.com
+# Cuts: None
+# Date: 21-11-2022
+
+Decay vpho
+1.0  omega  eta_b  PHSP;
+Enddecay
+
+Decay eta_b
+1.0  g  g  PHOTOS PYTHIA 91;
+Enddecay
+
+Decay omega
+1.0  pi+  pi- pi0 OMEGA_DALITZ;
+Enddecay
+
+Decay pi0
+1.0  gamma gamma  PHSP;
+Enddecay
+
+End

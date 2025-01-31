@@ -12,10 +12,9 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/logging/Logger.h>
-
-#include <iostream>
 
 #include <analysis/ContinuumSuppression/Thrust.h>
 #include <analysis/ContinuumSuppression/HarmonicMoments.h>
@@ -240,6 +239,8 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
 
     for (unsigned int iPart = 0; iPart < particleList->getListSize(); iPart++) {
       const Particle* part = particleList->getParticle(iPart);
+      const MCParticle* mcParticle = part->getMCParticle();
+      if (mcParticle and mcParticle->isInitial()) continue;
 
       // Flag to check for duplicates across the lists.
       // It can be true only if m_checkForDuplicates is enabled

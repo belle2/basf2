@@ -20,6 +20,9 @@
 #include <TFile.h>
 #include <TTree.h>
 
+/* C++ headers. */
+#include <algorithm>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -397,9 +400,9 @@ void ECLMatchingPerformanceExpertModule::findECLCalDigitMatchInNeighbouringCell(
 {
   const auto& vec_of_neighbouring_cells = eclneighbours->getNeighbours(cell);
   for (const auto& neighbouringcell : vec_of_neighbouring_cells) {
-    const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
+    const auto idigit = std::find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
     [&](const ECLCalDigit & d) { return (d.getCellId() == neighbouringcell && d.getEnergy() > m_minCalDigitEnergy); }
-                               );
+                                    );
     //Found ECLCalDigit close to ExtHit
     if (idigit != m_eclCalDigits.end()) {
       matchedToNeighbours = 1;
@@ -410,9 +413,9 @@ void ECLMatchingPerformanceExpertModule::findECLCalDigitMatchInNeighbouringCell(
 
 void ECLMatchingPerformanceExpertModule::findECLCalDigitMatch(const int& cell, int& matched)
 {
-  const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
+  const auto idigit = std::find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
   [&](const ECLCalDigit & d) { return (d.getCellId() == cell && d.getEnergy() > m_minCalDigitEnergy); }
-                             );
+                                  );
   //Found ECLCalDigit close to ExtHit
   if (idigit != m_eclCalDigits.end()) {
     matched = 1;

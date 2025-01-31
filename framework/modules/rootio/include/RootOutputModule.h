@@ -160,6 +160,9 @@ namespace Belle2 {
     /** Keep track of the file index: if we split files than we add '.f{fileIndex:05d}' in front of the ROOT extension */
     int m_fileIndex{0};
 
+    /** Number of full events (aka number of events without an error flag) */
+    unsigned int m_nFullEvents{0};
+
     /** TFile for output. */
     TFile* m_file;
 
@@ -210,9 +213,9 @@ namespace Belle2 {
 
     /** Pointer to the event meta data */
     StoreObjPtr<EventMetaData> m_eventMetaData;
-    /** Pointer to the file meta data */
+    /** Pointer to the input file meta data */
     StoreObjPtr<FileMetaData> m_fileMetaData{"", DataStore::c_Persistent};
-    /** File meta data finally stored in the output file */
-    FileMetaData m_outputFileMetaData;
+    /** File meta data stored in the output file */
+    FileMetaData* m_outputFileMetaData;
   };
 } // end namespace Belle2

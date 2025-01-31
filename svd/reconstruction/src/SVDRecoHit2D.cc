@@ -14,7 +14,6 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <genfit/DetPlane.h>
-#include <TVector3.h>
 #include <TRandom.h>
 #include <cmath>
 
@@ -22,13 +21,13 @@ using namespace std;
 using namespace Belle2;
 
 SVDRecoHit2D::SVDRecoHit2D():
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_uCluster(0), m_vCluster(0),
-  m_energyDep(0)//, m_energyDepError(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(0), m_uCluster(0), m_vCluster(0),
+  m_energyDep(0), m_sensorID(0)//, m_energyDepError(0)
 {}
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit*, float sigmaU, float sigmaV):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit), m_uCluster(0), m_vCluster(0),
-  m_energyDep(0)//, m_energyDepError(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(hit), m_uCluster(0), m_vCluster(0),
+  m_energyDep(0), m_sensorID(0)//, m_energyDepError(0)
 {
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
 
@@ -37,7 +36,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit*, f
 
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
   if (sigmaU < 0 || sigmaV < 0) {
-    const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+    const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
     sigmaU = geometry.getUPitch(hit->getV()) / sqrt(12);
     sigmaV = geometry.getVPitch(hit->getV()) / sqrt(12);
   }
@@ -57,12 +56,12 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit*, f
 }
 
 SVDRecoHit2D::SVDRecoHit2D(VxdID::baseType vxdid, const double u, const double v, double sigmaU, double sigmaV):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(vxdid), m_trueHit(nullptr), m_uCluster(0), m_vCluster(0),
-  m_energyDep(0)//, m_energyDepError(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(nullptr), m_uCluster(0), m_vCluster(0),
+  m_energyDep(0), m_sensorID(vxdid)//, m_energyDepError(0)
 {
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
   if (sigmaU < 0 || sigmaV < 0) {
-    const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+    const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
     sigmaU = geometry.getUPitch(v) / sqrt(12);
     sigmaV = geometry.getVPitch(v) / sqrt(12);
   }
@@ -89,7 +88,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit):
 
   // Now that we have a v coordinate, we can rescale u.
   const SVD::SensorInfo& info =
-    dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+    dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
 
   double DeltaU =
     (info.getForwardWidth() - info.getBackwardWidth()) / info.getLength() / info.getWidth(0);
@@ -129,7 +128,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHi
 
   // Now that we have a v coordinate, we can rescale u.
   const SVD::SensorInfo& info =
-    dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+    dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
 
   double DeltaU =
     (info.getForwardWidth() - info.getBackwardWidth()) / info.getLength() / info.getWidth(0);
@@ -158,7 +157,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHi
 void SVDRecoHit2D::setDetectorPlane()
 {
   // Construct a finite detector plane and set it.
-  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
 
   // Construct vectors o, u, v
   ROOT::Math::XYZVector origin  = geometry.pointToGlobal(ROOT::Math::XYZVector(0, 0, 0), true);
@@ -180,7 +179,7 @@ TVectorD SVDRecoHit2D::applyPlanarDeformation(TVectorD rawHit, std::vector<doubl
   auto L3 = [](double x) {return (5 * x * x * x - 3 * x) / 2;};
   auto L4 = [](double x) {return (35 * x * x * x * x - 30 * x * x + 3) / 8;};
 
-  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
 
   double u = rawHit[0];                 // U coordinate of hit
   double v = rawHit[1];                 // V coordinate of hit
@@ -217,7 +216,8 @@ TVectorD SVDRecoHit2D::applyPlanarDeformation(TVectorD rawHit, std::vector<doubl
 std::vector<genfit::MeasurementOnPlane*> SVDRecoHit2D::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
   // Apply planar deformation
-  TVectorD pos = applyPlanarDeformation(rawHitCoords_, VXD::GeoCache::get(m_sensorID).getSurfaceParameters(), state);
+  TVectorD pos = applyPlanarDeformation(rawHitCoords_, VXD::GeoCache::getInstance().getSensorInfo(m_sensorID).getSurfaceParameters(),
+                                        state);
 
   return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(pos, rawHitCov_, state.getPlane(),
                                                   state.getRep(), this->constructHMatrix(state.getRep())));

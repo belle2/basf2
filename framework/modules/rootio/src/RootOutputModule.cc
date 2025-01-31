@@ -19,8 +19,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/utilities/EnvironmentVariables.h>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -30,7 +28,7 @@
 
 #include <memory>
 #include <regex>
-
+#include <filesystem>
 
 using namespace std;
 using namespace Belle2;
@@ -49,7 +47,7 @@ RootOutputModule::RootOutputModule() : Module(), m_file(nullptr), m_tree{0}, m_e
   m_eventLow(0), m_experimentHigh(0), m_runHigh(0), m_eventHigh(0)
 {
   //Set module properties
-  setDescription("Writes DataStore objects into a .root file. Data is stored in a TTree 'tree' for event-dependent and in 'persistent' for peristent data. You can use RootInput to read the files back into basf2.");
+  setDescription("Writes DataStore objects into a .root file. Data is stored in a TTree 'tree' for event-dependent and in 'persistent' for persistent data. You can use RootInput to read the files back into basf2.");
   setPropertyFlags(c_Output);
 
   //Parameter definition
@@ -128,10 +126,15 @@ Warning:
 
 .. versionadded:: release-03-00-00
 )DOC", m_outputSplitSize);
+
+  m_outputFileMetaData = new FileMetaData;
 }
 
 
-RootOutputModule::~RootOutputModule() = default;
+RootOutputModule::~RootOutputModule()
+{
+  delete m_outputFileMetaData;
+}
 
 void RootOutputModule::initialize()
 {
@@ -139,9 +142,7 @@ void RootOutputModule::initialize()
   //Let's set this to 100PB, that should last a bit longer.
   TTree::SetMaxTreeSize(1000 * 1000 * 100000000000LL);
 
-  //create a file level metadata object in the data store
-  m_fileMetaData.registerInDataStore();
-  //and make sure we have event meta data
+  //make sure we have event meta data
   m_eventMetaData.isRequired();
 
   //check outputSplitSize
@@ -171,8 +172,11 @@ void RootOutputModule::initialize()
 
 void RootOutputModule::openFile()
 {
+  // Since we open a new file, we also have to reset the number of full events
+  m_nFullEvents = 0;
+  // Continue with opening the file
   TDirectory* dir = gDirectory;
-  boost::filesystem::path out{m_outputFileName};
+  std::filesystem::path out{m_outputFileName};
   if (m_outputSplitSize) {
     // Mangle the filename to add the fNNNNN part. However we need to be
     // careful since the file name could be non-local and have some options or
@@ -180,7 +184,7 @@ void RootOutputModule::openFile()
     // http://mydomain.org/filename.root?foo=bar#baz). So use "TUrl" *sigh* to
     // do the parsing and only replace the extension of the file part.
     TUrl fileUrl(m_outputFileName.c_str(), m_regularFile);
-    boost::filesystem::path file{fileUrl.GetFile()};
+    std::filesystem::path file{fileUrl.GetFile()};
     file.replace_extension((boost::format("f%05d.root") % m_fileIndex).str());
     fileUrl.SetFile(file.c_str());
     // In case of regular files we don't want the protocol or anything, just the file
@@ -191,7 +195,7 @@ void RootOutputModule::openFile()
     //try creating necessary directories since this is a local file
     auto dirpath = out.parent_path();
 
-    if (boost::filesystem::create_directories(dirpath)) {
+    if (std::filesystem::create_directories(dirpath)) {
       B2INFO("Created missing directory " << dirpath << ".");
       //try again
       m_file = TFile::Open(out.c_str(), "RECREATE", "basf2 Event File");
@@ -282,6 +286,14 @@ void RootOutputModule::openFile()
     }
   }
 
+  // set the address of the FileMetaData branch for the output to a separate one from the input
+  TBranch* fileMetaDataBranch = m_tree[DataStore::c_Persistent]->GetBranch("FileMetaData");
+  if (fileMetaDataBranch) {
+    fileMetaDataBranch->SetAddress(&m_outputFileMetaData);
+  } else {
+    m_tree[DataStore::c_Persistent]->Branch("FileMetaData", &m_outputFileMetaData, m_basketsize, m_splitLevel);
+  }
+
   dir->cd();
   if (m_outputSplitSize) {
     B2INFO(getName() << ": Opened " << (m_fileIndex > 0 ? "new " : "") << "file for writing" << LogVar("filename", out));
@@ -292,7 +304,8 @@ void RootOutputModule::openFile()
 void RootOutputModule::event()
 {
   // if we closed after last event ... make a new one
-  if (!m_file) openFile();
+  if (!m_file)
+    openFile();
 
   if (!m_keepParents) {
     if (m_fileMetaData) {
@@ -342,6 +355,10 @@ void RootOutputModule::event()
     }
   }
 
+  // check if the event is a full event or not: if yes, increase the counter
+  if (m_eventMetaData->getErrorFlag() == 0) // no error flag -> this is a full event
+    m_nFullEvents++;
+
   // check if we need to split the file
   if (m_outputSplitSize and (uint64_t)m_file->GetEND() > *m_outputSplitSize) {
     // close file and open new one
@@ -353,13 +370,14 @@ void RootOutputModule::event()
 void RootOutputModule::fillFileMetaData()
 {
   bool isMC = (m_fileMetaData) ? m_fileMetaData->isMC() : true;
-  m_fileMetaData.create(true);
-  if (!isMC) m_fileMetaData->declareRealData();
+  new(m_outputFileMetaData) FileMetaData;
+  if (!isMC) m_outputFileMetaData->declareRealData();
 
   if (m_tree[DataStore::c_Event]) {
     //create an index for the event tree
     TTree* tree = m_tree[DataStore::c_Event];
     unsigned long numEntries = tree->GetEntries();
+    m_outputFileMetaData->setNFullEvents(m_nFullEvents);
     if (m_buildIndex && numEntries > 0) {
       if (numEntries > 10000000) {
         //10M events correspond to about 240MB for the TTreeIndex object. for more than ~45M entries this causes crashes, broken files :(
@@ -370,49 +388,48 @@ void RootOutputModule::fillFileMetaData()
       }
     }
 
-    m_fileMetaData->setNEvents(numEntries);
+    m_outputFileMetaData->setNEvents(numEntries);
     if (m_experimentLow > m_experimentHigh) {
       //starting condition so apparently no events at all
-      m_fileMetaData->setLow(-1, -1, 0);
-      m_fileMetaData->setHigh(-1, -1, 0);
+      m_outputFileMetaData->setLow(-1, -1, 0);
+      m_outputFileMetaData->setHigh(-1, -1, 0);
     } else {
-      m_fileMetaData->setLow(m_experimentLow, m_runLow, m_eventLow);
-      m_fileMetaData->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
+      m_outputFileMetaData->setLow(m_experimentLow, m_runLow, m_eventLow);
+      m_outputFileMetaData->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
     }
   }
 
   //fill more file level metadata
-  m_fileMetaData->setParents(m_parentLfns);
-  RootIOUtilities::setCreationData(*m_fileMetaData);
-  m_fileMetaData->setRandomSeed(RandomNumbers::getSeed());
-  m_fileMetaData->setSteering(Environment::Instance().getSteering());
+  m_outputFileMetaData->setParents(m_parentLfns);
+  RootIOUtilities::setCreationData(*m_outputFileMetaData);
+  m_outputFileMetaData->setRandomSeed(RandomNumbers::getSeed());
+  m_outputFileMetaData->setSteering(Environment::Instance().getSteering());
   auto mcEvents = Environment::Instance().getNumberOfMCEvents();
   if(m_outputSplitSize and mcEvents > 0) {
     if(m_fileIndex == 0) B2WARNING("Number of MC Events cannot be saved when splitting output files by size, setting to 0");
     mcEvents = 0;
   }
-  m_fileMetaData->setMcEvents(mcEvents);
-  m_fileMetaData->setDatabaseGlobalTag(Database::Instance().getGlobalTags());
+  m_outputFileMetaData->setMcEvents(mcEvents);
+  m_outputFileMetaData->setDatabaseGlobalTag(Database::Instance().getGlobalTags());
   for (const auto& item : m_additionalDataDescription) {
-    m_fileMetaData->setDataDescription(item.first, item.second);
+    m_outputFileMetaData->setDataDescription(item.first, item.second);
   }
   // Set the LFN to the filename: if it's a URL to directly, otherwise make sure it's absolute
   std::string lfn = m_file->GetName();
   if(m_regularFile) {
-    lfn = boost::filesystem::absolute(lfn, boost::filesystem::initial_path()).string();
+    lfn = std::filesystem::absolute(lfn).string();
   }
   // Format LFN if BELLE2_LFN_FORMATSTRING is set
   std::string format = EnvironmentVariables::get("BELLE2_LFN_FORMATSTRING", "");
   if (!format.empty()) {
     auto format_filename = boost::python::import("B2Tools.format").attr("format_filename");
-    lfn = boost::python::extract<std::string>(format_filename(format, m_outputFileName, m_fileMetaData->getJsonStr()));
+    lfn = boost::python::extract<std::string>(format_filename(format, m_outputFileName, m_outputFileMetaData->getJsonStr()));
   }
-  m_fileMetaData->setLfn(lfn);
+  m_outputFileMetaData->setLfn(lfn);
   //register the file in the catalog
   if (m_updateFileCatalog) {
-    FileCatalog::Instance().registerFile(m_file->GetName(), *m_fileMetaData);
+    FileCatalog::Instance().registerFile(m_file->GetName(), *m_outputFileMetaData);
   }
-  m_outputFileMetaData = *m_fileMetaData;
 }
 
 
@@ -424,18 +441,11 @@ void RootOutputModule::terminate()
 void RootOutputModule::closeFile()
 {
   if(!m_file) return;
-  //get pointer to file level metadata
-  std::unique_ptr<FileMetaData> old;
-  if (m_fileMetaData) old = std::make_unique<FileMetaData>(*m_fileMetaData);
 
   fillFileMetaData();
 
   //fill Persistent data
   fillTree(DataStore::c_Persistent);
-
-  // restore old file meta data if it existed
-  if (old) *m_fileMetaData = *old;
-  old.reset();
 
   //write the trees
   TDirectory* dir = gDirectory;
@@ -458,7 +468,7 @@ void RootOutputModule::closeFile()
   m_file = nullptr;
 
   // and now add it to the metadata service as it's fully written
-  MetadataService::Instance().addRootOutputFile(filename, &m_outputFileMetaData);
+  MetadataService::Instance().addRootOutputFile(filename, m_outputFileMetaData);
 
   // reset some variables
   for (auto & entry : m_entries) {
@@ -488,7 +498,11 @@ void RootOutputModule::fillTree(DataStore::EDurability durability)
       entry->object->SetBit(kInvalidObject);
     }
     //FIXME: Do we need this? in theory no but it crashes in parallel processing otherwise ¯\_(ツ)_/¯
-    tree.SetBranchAddress(entry->name.c_str(), &entry->object);
+    if (entry->name == "FileMetaData") {
+      tree.SetBranchAddress(entry->name.c_str(), &m_outputFileMetaData);
+    } else {
+      tree.SetBranchAddress(entry->name.c_str(), &entry->object);
+    }
   }
   tree.Fill();
   for (auto* entry: m_entries[durability]) {
@@ -500,6 +514,6 @@ void RootOutputModule::fillTree(DataStore::EDurability durability)
     //m_file deleted first so we have a chance of closing it (though that will probably fail)
     const std::string filename = m_file->GetName();
     delete m_file;
-    B2FATAL("A write error occured while saving '" << filename << "', please check if enough disk space is available.");
+    B2FATAL("A write error occurred while saving '" << filename << "', please check if enough disk space is available.");
   }
 }

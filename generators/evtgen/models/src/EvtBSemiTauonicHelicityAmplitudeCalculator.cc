@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <cassert>
 #include <cmath>
 #include <string>
 #include "framework/logging/Logger.h"

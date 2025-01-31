@@ -19,7 +19,7 @@
 
 namespace Belle2::Conditions {
   /** Wrapper class for a list of strings to either be held in a std::vector or
-   * in a python list. It's basically a std::variant with some convenince
+   * in a python list. It's basically a std::variant with some convenience
    * members to convert between the two representations.
    *
    * This is necessary as python lists can only exist after Py_Initialize() and
@@ -76,7 +76,7 @@ namespace Belle2::Conditions {
 
     /** Append a globaltag */
     void appendGlobalTag(const std::string& globalTag) { ensureEditable(); m_globalTags.append(globalTag); }
-    /** preprend a globaltag */
+    /** prepend a globaltag */
     void prependGlobalTag(const std::string& globalTag) { ensureEditable(); m_globalTags.prepend(globalTag); }
     /** Set the list of globaltags */
     void setGlobalTags(const std::vector<std::string>& list) { ensureEditable(); m_globalTags.ensureCpp() = list; }
@@ -126,7 +126,7 @@ namespace Belle2::Conditions {
      *
      * - If no input file is present, the result of getBaseTags() is identical
      *   to the list returned by getDefaultGlobalTags()
-     * - If one ore more input files are present, the input module is
+     * - If one or more input files are present, the input module is
      *   responsible to call setInputGlobalTags(). If setInputGlobalTags() has
      *   been called then getBaseTags() returns the list of globaltags by
      *   splitting the value passed from the input modules at the commas.
@@ -230,6 +230,8 @@ namespace Belle2::Conditions {
     std::vector<std::string> getMetadataProviders() { return m_metadataProviders.ensureCpp(); }
     /** Get the list of metadata providers in python */
     boost::python::list getMetadataProvidersPy() { return m_metadataProviders.ensurePy(); }
+    /** Get the default URL where to look for the metadata provider */
+    std::string getDefaultMetadataProviderUrl() { return m_defaultMetadataProviderUrl; }
     ///@}
 
     /** @name Payload Location Configuration
@@ -279,9 +281,9 @@ namespace Belle2::Conditions {
      * shorthand to put them in a folder `basf2-conditions` in the temp dir */
     std::string getDownloadCacheDirectory() const { return m_downloadCacheDirectory; }
 
-    /** Set the timout we try to lock a file in the download cache directory for downloading */
+    /** Set the timeout we try to lock a file in the download cache directory for downloading */
     void setDownloadLockTimeout(size_t timeout) { ensureEditable(); m_downloadLockTimeout = timeout; }
-    /** Get the timout we try to lock a file in the download cache directory for downloading */
+    /** Get the timeout we try to lock a file in the download cache directory for downloading */
     size_t getDownloadLockTimeout() const { return m_downloadLockTimeout; }
 
     /** Set the set of usable globaltag states to be allowed for processing.
@@ -329,6 +331,8 @@ namespace Belle2::Conditions {
     CppOrPyList m_metadataProviders;
     /** the list with all the payload locations */
     CppOrPyList m_payloadLocations;
+    /** default URL where to look for the metadata provider */
+    std::string m_defaultMetadataProviderUrl{"http://belle2db.sdcc.bnl.gov/b2s/rest/"};
     /** the file to put the newly created payload information */
     std::string m_newPayloadFile{"localdb/database.txt"};
     /** the directory to put newly downloaded payloads */

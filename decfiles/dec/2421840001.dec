@@ -1,0 +1,30 @@
+##############################################################
+# EventType: 2421840001
+# Descriptor: [e+ e- -> Jpsi [ -> e+ e- / mu+ mu- ] K+ K-] are generated via ISR
+# NickName: ISR_K+K-J/psi
+# Test : Yes
+# Documentation: MC15rd signal request
+# PhysicsWG: Quarkonium
+# Responsible: Yipu Liao
+# Email: liaoyp@ihep.ac.cn
+# Cuts: None
+# Date: 2023/12/25
+#
+# Decay table to generate
+# vpho -> J/psi K+ K- gamma
+#           |
+#           -> e+ e- gamma
+#           -> mu+ mu- gamma
+#                     
+###############################################################
+
+Decay vpho
+1.0 K+ K- J/psisig PHOTOS PHSP;
+Enddecay
+
+Decay J/psisig
+0.5 e+ e- PHOTOS VLL;
+0.5 mu+ mu- PHOTOS VLL;
+Enddecay
+
+End

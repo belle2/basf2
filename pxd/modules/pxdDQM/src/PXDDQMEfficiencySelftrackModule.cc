@@ -56,9 +56,9 @@ PXDDQMEfficiencySelftrackModule::PXDDQMEfficiencySelftrackModule() : HistoModule
   addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked pixel or sensor border is allowed", int(10));
   addParam("trackUFactorDistCut", m_uFactor, "Set a cut on u error of track (factor*err<dist), 0 disables", double(2.0));
   addParam("trackVFactorDistCut", m_vFactor, "Set a cut on v error of track (factor*err<dist), 0 disables", double(2.0));
-  addParam("z0minCut", m_z0minCut, "Set a cut z0 minimum in cm (large negativ value eg -9999 disables)", double(-1));
-  addParam("z0maxCut", m_z0maxCut, "Set a cut z0 maximum in cm (large positiv value eg 9999 disables)", double(1));
-  addParam("d0Cut", m_d0Cut, "Set a cut abs(d0) in cm (large positiv value eg 9999 disables)", double(0.5));
+  addParam("z0minCut", m_z0minCut, "Set a cut z0 minimum in cm (large negative value eg -9999 disables)", double(-1));
+  addParam("z0maxCut", m_z0maxCut, "Set a cut z0 maximum in cm (large positive value eg 9999 disables)", double(1));
+  addParam("d0Cut", m_d0Cut, "Set a cut abs(d0) in cm (large positive value eg 9999 disables)", double(0.5));
   addParam("verboseHistos", m_verboseHistos, "Add more verbose histograms for cuts (not for ereoc)", bool(false));
 }
 
@@ -208,8 +208,8 @@ void PXDDQMEfficiencySelftrackModule::event()
           double v_clus = m_pxdclusters[bestcluster]->getV();
 
           //is the closest cluster close enough to the track to count as measured?
-          TVector3 dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
-          if (dist_clus.Mag() <= m_distcut)  {
+          ROOT::Math::XYZVector dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
+          if (dist_clus.R() <= m_distcut)  {
             m_h_matched_cluster[aVxdID]->Fill(ucell_fit, vcell_fit);
             if (m_verboseHistos) {
               if (m_h_p2[aVxdID]) m_h_p2[aVxdID]->Fill(trackstate.getMom().Mag());
@@ -354,7 +354,7 @@ PXDDQMEfficiencySelftrackModule::findClosestCluster(const VxdID& avxdid, ROOT::M
     double v = m_pxdclusters[iclus]->getV();
     ROOT::Math::XYZVector current(u, v, 0);
 
-    //2D dist sqared
+    //2D dist squared
     double dist = (intersection - current).R();
     if (dist < mindist) {
       closest = iclus;

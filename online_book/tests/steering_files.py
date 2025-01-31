@@ -123,7 +123,7 @@ class SteeringFileTest(unittest.TestCase):
             additional_arguments (list(str)): (optional) additional arguments
                 for basf2 to be passed when testing the scripts
             expensive_tests (list(str)): (optional) names of scripts that take
-                longer and should e.g. not run on bamboo
+                longer and should e.g. not run in GitLab pipeline
             skip_in_light (list(str)): (optional) names of scripts that have to
                 be excluded in light builds
             skip (list(str)): (optional) names of scripts to always skip

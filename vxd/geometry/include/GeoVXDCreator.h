@@ -99,25 +99,21 @@ namespace Belle2 {
        * Place a list of subcomponents into an component.
        *
        * If the volume of the given component is NULL, a new container will be
-       * created to fit all subcomponents. It will have air as medium.  If
-       * createContainer is true, then the placements above and below are
-       * valid. If at least one subcomponent with this placement is found the
+       * created to fit all subcomponents. It will have air as medium.
+       * If at least one subcomponent with this placement is found the
        * whole component is wrapped in a container volume with Air medium which
        * extends above and below to fit the subcomponents
        *
        * @param name Name for the potential new volume or as prefix for the
        *        container to extend the component
-       * @param component Component to fit the subcomponents into @param
-       *        placements Placement information for all subcomponents
-       * @param createContainer if true, subcomponents are allowed to be placed
-       *        on top or below the component and the whole component will be
-       *        wrapped in an Air volume fitting all components
+       * @param component Component to fit the subcomponents into
+       * @param placements Placement information for all subcomponents
        * @param originCenter bool
        * @param allowOutside bool
        * @return offset in w which was applied to the component when extending it
        */
-      GeoVXDAssembly createSubComponents(const std::string& name, VXDGeoComponent&
-                                         component, std::vector<VXDGeoPlacement> placements,
+      GeoVXDAssembly createSubComponents(const std::string& name, VXDGeoComponent& component,
+                                         std::vector<VXDGeoPlacement> placements,
                                          bool originCenter = true, bool allowOutside = false);
 
       /** Create a trapezoidal solid.

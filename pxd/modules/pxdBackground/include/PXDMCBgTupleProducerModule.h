@@ -119,7 +119,7 @@ namespace Belle2 {
 
     inline const PXD::SensorInfo& PXDMCBgTupleProducerModule::getInfo(VxdID sensorID) const
     {
-      return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     }
 
     inline  double PXDMCBgTupleProducerModule::getSensorArea(VxdID sensorID) const

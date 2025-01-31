@@ -16,12 +16,7 @@
 #include <framework/logging/Logger.h>
 #include <cmath>
 
-#include <fstream>
 #include <string>
-
-// ROOT
-#include <TH1.h>
-#include <TH2.h>
 
 int eventNum = 0;
 

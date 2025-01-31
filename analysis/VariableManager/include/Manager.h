@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <framework/logging/Logger.h>
 
 #include <string>
@@ -17,7 +16,6 @@
 #include <functional>
 #include <memory>
 #include <variant>
-#include <type_traits>
 
 namespace Belle2 {
   class Particle;
@@ -248,13 +246,19 @@ namespace Belle2 {
        */
       void checkDeprecatedVariable(const std::string& name);
 
-      /** evaluate variable 'varName' on given Particle.
+      /** Evaluate variable 'varName' on given Particle.
        *
        * Mainly provided for the Python interface. For performance critical code, it is recommended to use getVariable() once and keep the Var* pointer around.
        *
        * Throws exception if variable isn't found. Assumes 'p' is != NULL.
        */
       double evaluate(const std::string& varName, const Particle* p);
+
+      /** Evaluate each variable in the vector 'varNames' on given Particle.
+       *
+       * Throws exception if one of the variables isn't found. Assumes 'p' is != NULL.
+       */
+      std::vector<double> evaluateVariables(const std::vector<std::string>& varNames, const Particle* p);
 
       /** Return list of all variable names (in order registered). */
       std::vector<std::string> getNames() const;

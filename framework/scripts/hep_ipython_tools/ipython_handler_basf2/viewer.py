@@ -244,8 +244,7 @@ class DependencyViewer(viewer.IPythonWidget):
         </style>"""
 
         #: Template for inserting the node JSON
-        self.nodes_template = """<script>var test_nodes = JSON.parse('{nodes_json}');</script>""".format(
-            nodes_json=self.store_arrays_with_dependencies_JSON)
+        self.nodes_template = f"""<script>var test_nodes = JSON.parse('{self.store_arrays_with_dependencies_JSON}');</script>"""
 
         #: Template for the full HTML
         self.viewer_template = self.d3_include_string + self.nodes_template + self.d3_element_string + self.style_template + """

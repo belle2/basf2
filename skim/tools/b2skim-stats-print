@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -144,7 +143,7 @@ def getArgumentParser():
         metavar="OutputFilename",
         help=(
             "Save a markdown table in a format that can be copied into "
-            "pull request comments."
+            "merge request comments."
         ),
     )
     OutputGroup.add_argument(
@@ -173,6 +172,13 @@ def getArgumentParser():
             "Print out extra warning messages when the script cannot "
             "calculate a value, but moves on anyway."
         ),
+    )
+
+    parser.add_argument(
+        "-flagged",
+        "--flagged",
+        action="store_true",
+        help="run on flagged skim",
     )
 
     return parser
@@ -223,7 +229,7 @@ def getLogFile(skim, sample, TestingCombined):
 
 
 @lru_cache()
-def getJsonFile(skim, sample, TestingCombined):
+def getJsonFile(skim, sample, TestingCombined, flagged):
     """Read in the JSON output from ``--job-information`` of a test job as a dict.
 
     The order of the ``output_files`` section has no relation to the order of skims. So
@@ -234,6 +240,8 @@ def getJsonFile(skim, sample, TestingCombined):
         skim (str): The name of the skim being tested.
         sample (skim.testfiles.Sample): Sample being tested.
         TestingCombined (bool): True if this tool is being run on combined skims.
+        flagged (bool): True if the tool is being run on flagged skims.
+
 
     Returns:
         jsonFileContents (dict): A dict read from the ``--jobinformation`` JSON
@@ -268,7 +276,8 @@ def getJsonFile(skim, sample, TestingCombined):
         )
 
     # Reorder `output_files` section to match order of skim definition.
-    if TestingCombined:
+    # flagged=True
+    if TestingCombined and not flagged:
         definitions = get_metadata(TestingCombined=True)["CombinedSkims"]
 
         # Creates a mapping of {skim code -> `output_file` block} and uses this mapping
@@ -304,7 +313,7 @@ def getStatFromLog(statisticName, logFileContents):
     return float(statFromLog)
 
 
-def nInputEvents(skim, sample, TestingCombined):
+def nInputEvents(skim, sample, TestingCombined, flagged):
     """Read the number of input MDST events from the JSON output file from
     ``--job-information``.
 
@@ -312,12 +321,13 @@ def nInputEvents(skim, sample, TestingCombined):
         skim (str): The name of the skim being tested.
         sample (skim.testfiles.Sample): The sample being tested.
         TestingCombined (bool): True if this tool is being run on combined skims.
+        flagged (bool): True if the tool is being run on flagged skims.
 
     Returns:
         nInputEvents (int): Total number of events that the test skim job was
             run on.
     """
-    jsonFileContents = getJsonFile(skim, sample, TestingCombined)
+    jsonFileContents = getJsonFile(skim, sample, TestingCombined, flagged)
 
     return jsonFileContents["basf2_status"]["total_events"]
 
@@ -338,7 +348,7 @@ def nTotalInputEvents(skim, sample, TestingCombined):
     return get_eventN(sample.location)
 
 
-def nSkimmedEvents(skim, sample, TestingCombined):
+def nSkimmedEvents(skim, sample, TestingCombined, flagged):
     """Read the number of output uDST events from the JSON output file from
     ``--job-information``. If more than one output file is present, take the
     maximum across output files.
@@ -347,11 +357,12 @@ def nSkimmedEvents(skim, sample, TestingCombined):
         skim (str): The name of the skim being tested.
         sample (skim.testfiles.Sample): The sample being tested.
         TestingCombined (bool): True if this tool is being run on combined skims.
+        flagged (bool): True if the tool is being run on flagged skims.
 
     Returns:
         nSkimmedEvents (int): The average number of events in the output uDST files.
     """
-    jsonFileContents = getJsonFile(skim, sample, TestingCombined)
+    jsonFileContents = getJsonFile(skim, sample, TestingCombined, flagged)
 
     outputFileInfoList = jsonFileContents["output_files"]
     eventNumberList = [
@@ -363,7 +374,7 @@ def nSkimmedEvents(skim, sample, TestingCombined):
     return np.array(eventNumberList)
 
 
-def udstSize(skim, sample, TestingCombined):
+def udstSize(skim, sample, TestingCombined, flagged):
     """Read the size of the of output uDST file from the JSON output file from
     ``--job-information``. If more than one output file is present, take the
     maximum across output files.
@@ -372,11 +383,12 @@ def udstSize(skim, sample, TestingCombined):
         skim (str): The name of the skim being tested.
         sample (skim.testfiles.Sample): The sample being tested.
         TestingCombined (bool): True if this tool is being run on combined skims.
+        flagged (bool): True if the tool is being run on flagged skims.
 
     Returns:
         udstSize (float): The average file size of the output uDST files.
     """
-    jsonFileContents = getJsonFile(skim, sample, TestingCombined)
+    jsonFileContents = getJsonFile(skim, sample, TestingCombined, flagged)
 
     outputFileInfoList = jsonFileContents["output_files"]
     udstSizeList = [
@@ -388,7 +400,7 @@ def udstSize(skim, sample, TestingCombined):
     return np.array(udstSizeList)
 
 
-def inputFileSize(skim, sample, TestingCombined):
+def inputFileSize(skim, sample, TestingCombined, flagged):
     """
     Calculate the size of the input file multiplied by the fraction of events used. If
     the ``-n`` flag was passed, this may be less than the full file size.
@@ -405,7 +417,7 @@ def inputFileSize(skim, sample, TestingCombined):
     filename = sample.location
     TotalFileSize = os.path.getsize(filename) / 1024
     FractionOfEventsUsed = nInputEvents(
-        skim, sample, TestingCombined
+        skim, sample, TestingCombined, flagged
     ) / nTotalInputEvents(skim, sample, TestingCombined)
 
     return TotalFileSize * FractionOfEventsUsed
@@ -685,9 +697,9 @@ def getStatSpecifier():
             "FloatFormat": ".2f",
             "PrintToScreen": True,
             "PrintToConfluence": True,
-            "Calculate": lambda skim, sample, combined: 100
-            * nSkimmedEvents(skim, sample, combined)
-            / nInputEvents(skim, sample, combined),
+            "Calculate": lambda skim, sample, combined, flagged: 100
+            * nSkimmedEvents(skim, sample, combined, flagged)
+            / nInputEvents(skim, sample, combined, flagged),
             "CalculationDescription": "Number of skimmed events divided by number of input events.",
             "CombineMC": lambda statDict, mcCampaign, beamBackground: (
                 mcWeightedAverage(statDict, mcCampaign, beamBackground)
@@ -698,10 +710,10 @@ def getStatSpecifier():
             "FloatFormat": ".2f",
             "PrintToScreen": True,
             "PrintToConfluence": True,
-            "Calculate": lambda skim, sample, combined: (
+            "Calculate": lambda skim, sample, combined, flagged: (
                 100
-                * udstSize(skim, sample, TestingCombined)
-                / inputFileSize(skim, sample, TestingCombined)
+                * udstSize(skim, sample, TestingCombined, flagged)
+                / inputFileSize(skim, sample, TestingCombined, flagged)
             ),
             "CalculationDescription": (
                 "Output file size divided by "
@@ -716,8 +728,8 @@ def getStatSpecifier():
             "FloatFormat": ".0f",
             "PrintToScreen": False,
             "PrintToConfluence": True,
-            "Calculate": lambda skim, sample, combined: nInputEvents(
-                skim, sample, combined
+            "Calculate": lambda skim, sample, combined, flagged: nInputEvents(
+                skim, sample, combined, flagged
             ),
             "CalculationDescription": "Number of events in the input MDST file.",
             "CombineMC": None,
@@ -727,8 +739,8 @@ def getStatSpecifier():
             "FloatFormat": ".0f",
             "PrintToScreen": False,
             "PrintToConfluence": True,
-            "Calculate": lambda skim, sample, combined: nSkimmedEvents(
-                skim, sample, combined
+            "Calculate": lambda skim, sample, combined, flagged: nSkimmedEvents(
+                skim, sample, combined, flagged
             ),
             "CalculationDescription": "Number of events in the output uDST file.",
             "CombineMC": None,
@@ -749,8 +761,8 @@ def getStatSpecifier():
             "FloatFormat": ".3f",
             "PrintToScreen": False,
             "PrintToConfluence": False,
-            "Calculate": lambda skim, sample, combined: (
-                cpuTime(skim, sample, combined) / nInputEvents(skim, sample, combined)
+            "Calculate": lambda skim, sample, combined, flagged: (
+                cpuTime(skim, sample, combined) / nInputEvents(skim, sample, combined, flagged)
             ),
             "CalculationDescription": (
                 "CPU time of test job divided by number of input events."
@@ -764,9 +776,9 @@ def getStatSpecifier():
             "FloatFormat": ".3f",
             "PrintToScreen": True,
             "PrintToConfluence": True,
-            "Calculate": lambda skim, sample, combined: (
+            "Calculate": lambda skim, sample, combined, flagged: (
                 cpuTime(skim, sample, combined)
-                / nInputEvents(skim, sample, combined)
+                / nInputEvents(skim, sample, combined, flagged)
                 * HEPSpecPerCore
             ),
             "CalculationDescription": (
@@ -781,8 +793,8 @@ def getStatSpecifier():
             "FloatFormat": ".2f",
             "PrintToScreen": False,
             "PrintToConfluence": True,
-            "Calculate": lambda skim, sample, combined: (
-                udstSize(skim, sample, combined) / 1024
+            "Calculate": lambda skim, sample, combined, flagged: (
+                udstSize(skim, sample, combined, flagged) / 1024
             ),
             "CalculationDescription": "File size of output uDST.",
             "CombineMC": None,
@@ -792,9 +804,9 @@ def getStatSpecifier():
             "FloatFormat": ".3f",
             "PrintToScreen": True,
             "PrintToConfluence": True,
-            "Calculate": lambda skim, sample, combined: (
-                udstSize(skim, sample, combined)
-                / nSkimmedEvents(skim, sample, combined)
+            "Calculate": lambda skim, sample, combined, flagged: (
+                udstSize(skim, sample, combined, flagged)
+                / nSkimmedEvents(skim, sample, combined, flagged)
             ),
             "CalculationDescription": (
                 "File size of output uDST divided by number of skimmed events."
@@ -808,8 +820,8 @@ def getStatSpecifier():
             "FloatFormat": ".3f",
             "PrintToScreen": False,
             "PrintToConfluence": True,
-            "Calculate": lambda skim, sample, combined: (
-                udstSize(skim, sample, combined) / nInputEvents(skim, sample, combined)
+            "Calculate": lambda skim, sample, combined, flagged: (
+                udstSize(skim, sample, combined, flagged) / nInputEvents(skim, sample, combined, flagged)
             ),
             "CalculationDescription": (
                 "File size of output uDST divided by number of input events."
@@ -823,7 +835,7 @@ def getStatSpecifier():
             "FloatFormat": ".1f",
             "PrintToScreen": True,
             "PrintToConfluence": True,
-            "Calculate": lambda skim, sample, combined: logSize(skim, sample, combined),
+            "Calculate": lambda skim, sample, combined, flagged: logSize(skim, sample, combined),
             "CalculationDescription": "File size of the output logs.",
             "CombineMC": None,
         },
@@ -832,9 +844,9 @@ def getStatSpecifier():
             "FloatFormat": ".2f",
             "PrintToScreen": False,
             "PrintToConfluence": True,
-            "Calculate": lambda skim, sample, combined: (
+            "Calculate": lambda skim, sample, combined, flagged: (
                 logSize(skim, sample, combined)
-                / nInputEvents(skim, sample, combined)
+                / nInputEvents(skim, sample, combined, flagged)
                 * 1024
             ),
             "CalculationDescription": (
@@ -892,7 +904,7 @@ def getStatSpecifier():
 
 
 def fillSkimStatsDict(
-    skims, samples, statSpecifier, *, TestingCombined=False, verbose=False
+    skims, samples, statSpecifier, *, TestingCombined=False, verbose=False, flagged=False
 ):
     """Fill a nested dict with skim performance statistics, using the skim and
     sample names provided. The dict ``statSpecifier`` determines how each
@@ -924,7 +936,7 @@ def fillSkimStatsDict(
 
                 try:
                     allSkimStats[skim][statName][sample.encodeable_name] = statFunction(
-                        skim, sample, TestingCombined
+                        skim, sample, TestingCombined, flagged
                     )
 
                 except (TypeError, ZeroDivisionError, KeyError):
@@ -1059,8 +1071,8 @@ def addWeightedMC(allSkimStats, statSpecifier, samples, verbose=False):
             dict, with an extra entry for combined MC samples.
     """
 
-    beamBackgrounds = list(set(s.beam_background for s in samples.mc_samples))
-    mcCampaigns = list(set(s.campaign for s in samples.mc_samples))
+    beamBackgrounds = list({s.beam_background for s in samples.mc_samples})
+    mcCampaigns = list({s.campaign for s in samples.mc_samples})
 
     for (skim, skimStats), (stat, statSpec), beamBackground, mcCampaign in product(
         allSkimStats.items(), statSpecifier.items(), beamBackgrounds, mcCampaigns
@@ -1169,9 +1181,9 @@ def printToScreen(allSkimStats, samples):
         print(table)
 
     print(
-        "\nNote: If you are producing these stats for a skim pull request, please\n"
+        "\nNote: If you are producing these stats for a skim merge request, please\n"
         "    consider using the `--markdown` option to produce a Markdown table\n"
-        "    which BitBucket will display nicely."
+        "    which GitLab will display nicely."
     )
 
 
@@ -1247,7 +1259,7 @@ def printToConfluence(allSkimStats, samples, *, OutputFilename=None):
 
 def printToMarkdown(allSkimStats, samples, *, OutputFilename=None):
     """Format the skim performance statistics as a markdown table, which will be
-    formatted nicely if pasted into a pull request on BitBucket.
+    formatted nicely if pasted into a merge request on GitLab.
 
     Args:
         allSkimStats (dict): A nested dict of statistics, as returned by
@@ -1291,7 +1303,7 @@ def printToMarkdown(allSkimStats, samples, *, OutputFilename=None):
 
     print(
         f"Wrote tables to {OutputFilename}. This format is suitable for including "
-        "in pull request comments."
+        "in merge request comments."
     )
 
 
@@ -1318,6 +1330,7 @@ if __name__ == "__main__":
         statSpecifier,
         TestingCombined=TestingCombined,
         verbose=args.VERBOSE,
+        flagged=args.flagged
     )
 
     # NOTE: can't calculate weighted MC averages for combined skims, since certain stats are lists

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -26,12 +25,12 @@ b2.conditions.append_globaltag('online')
 main = b2.create_path()
 
 # input: raw data
-roinput = b2.register_module('RootInput')
-# roinput = register_module('SeqRootInput')
+roinput = b2.register_module('RootInput')  # root files
+# roinput = b2.register_module('SeqRootInput')  # sroot files
 main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawTOP (uncomment for pocketDAQ!)
-# converter = register_module('Convert2RawDet')
+# converter = b2.register_module('Convert2RawDet')
 # main.add_module(converter)
 
 # Initialize TOP geometry parameters (creation of Geant geometry is not needed)

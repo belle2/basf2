@@ -128,7 +128,6 @@ namespace Belle2 {
        * Creates side rail
        * @param geo geometry description
        * @param type side rail type
-       * @param translate translation to return
        * @return logical volume
        */
       G4LogicalVolume* createSideRail(const TOPGeoQBB& geo, ESideRailType type);

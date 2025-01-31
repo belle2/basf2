@@ -7,10 +7,12 @@
  **************************************************************************/
 
 #include "masterclass/dataobjects/BParticle.h"
-
+#include <iostream>
+#include <cmath>
 
 BParticle::BParticle(float px, float py, float pz, float e,
-                     float charge, SIMPLEPID pid)
+                     float charge, SIMPLEPID pid,
+                     float logL_e, float logL_mu, float logL_pi, float logL_k, float logL_p, float logL_d)
 {
   m_px = px;
   m_py = py;
@@ -18,6 +20,12 @@ BParticle::BParticle(float px, float py, float pz, float e,
   m_e = e;
   m_charge = charge;
   m_pid = pid;
+  m_logL_e = logL_e;
+  m_logL_mu = logL_mu;
+  m_logL_pi = logL_pi;
+  m_logL_k = logL_k;
+  m_logL_p = logL_p;
+  m_logL_d = logL_d;
 }
 
 BParticle& BParticle::operator+=(const BParticle& a)
@@ -28,6 +36,7 @@ BParticle& BParticle::operator+=(const BParticle& a)
   m_e += a.e();
   m_charge += a.charge();
   m_pid = PHOTON; // wrong
+  m_logL_e = m_logL_mu = m_logL_pi = m_logL_k = m_logL_p = m_logL_d = 0;
   return *this;
 }
 
@@ -36,12 +45,40 @@ BParticle operator+(BParticle a, const BParticle& b)
   return a += b;
 }
 
+float BParticle::GetLogL(SIMPLEPID pid)
+{
+  switch (pid) {
+    case ELECTRON: return m_logL_e;
+    case PION:     return m_logL_pi;
+    case MUON:     return m_logL_mu;
+    case KAON:     return m_logL_k;
+    case PROTON:   return m_logL_p;
+    case DEUTERON: return m_logL_d;
+    default: return 0;
+  }
+}
+
+float BParticle::GetPID(SIMPLEPID pid)
+{
+  float sum = 0;
+  for (int i = 0; i < 6; i++) {
+    sum += exp(GetLogL(SIMPLEPID(i)));
+  }
+  sum -= exp(GetLogL(pid));
+  return exp(GetLogL(pid)) / sum;
+}
+
+float BParticle::GetBinPID(SIMPLEPID pid1, SIMPLEPID pid2)
+{
+  return exp(GetLogL(pid1)) / (exp(GetLogL(pid1)) + exp(GetLogL(pid2)));
+}
+
 float BParticle::GetMass(SIMPLEPID pid)
 {
 
   switch (pid) {
     case PHOTON:   return 0;
-    case ELECTRON: return 0.51;
+    case ELECTRON: return 0.00051;
     case PION:     return 0.139;
     case MUON:     return 0.105;
     case KAON:     return 0.497;
@@ -52,6 +89,7 @@ float BParticle::GetMass(SIMPLEPID pid)
     case B:        return 5.27;
     case PHI:      return 1.02;
     case LAMBDA0:  return 1.115683;
+    case DEUTERON: return 1.8756;
     case ALL:      return -1;
     default: return 0;
   }

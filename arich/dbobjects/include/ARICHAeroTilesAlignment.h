@@ -20,15 +20,15 @@ namespace Belle2 {
   public:
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHAeroTilesAlignment()
     {}
 
     /**
-     * Sets Alignment parameters (element) for aerogel tile
-     * @param id slot id
-     * @param element alignment element
+     * Sets alignment parameters (element) for aerogel tile.
+     * @param id Slot id.
+     * @param pars Alignment element.
      */
     void setAlignmentElement(int id, const ARICHPositionElement& pars)
     {
@@ -36,8 +36,8 @@ namespace Belle2 {
     }
 
     /**
-     * Returns alignment parameters for given aerogel tile
-     * @return position element
+     * Returns alignment parameters for given aerogel tile.
+     * @return Position element.
      */
     const ARICHPositionElement& getAlignmentElement(int mirrorID) const
     {
@@ -45,7 +45,7 @@ namespace Belle2 {
     }
 
     /**
-     * Prints parameters of aerogel tiles alignment
+     * Prints parameters of aerogel tiles alignment.
      */
     void print(const std::string& title = "Aerogel tilesAlignment Parameters") const
     {

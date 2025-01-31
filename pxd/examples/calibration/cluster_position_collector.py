@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -17,7 +16,7 @@
 # The collector will create source files for training of clusterkind 0 by simulating
 # 10 million clusters.
 #
-# Full set of training sources for PXD requires starting the script 4x wiht clusterkinds
+# Full set of training sources for PXD requires starting the script 4x with clusterkinds
 # 0-3.
 
 import basf2 as b2
@@ -66,8 +65,7 @@ if __name__ == "__main__":
     eventinfosetter = main.add_module("EventInfoSetter")
     histoman = main.add_module(
         'HistoManager',
-        histoFileName='PXDClusterPositionCollectorOutput_kind_{:d}.root'.format(
-            args.clusterkind))
+        histoFileName=f'PXDClusterPositionCollectorOutput_kind_{args.clusterkind:d}.root')
     gearbox = main.add_module("Gearbox")
     geometry = main.add_module("Geometry")
     geometry.param({"components": ['MagneticField', 'PXD']})

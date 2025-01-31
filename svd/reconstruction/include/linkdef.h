@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::SVDRecoHit2D+; // checksum=0x43468eac, version=7
-#pragma link C++ class Belle2::SVDRecoHit+; // checksum=0x5c66b41, version=7
+#pragma link C++ class Belle2::SVDRecoHit2D+; // checksum=0x13a592ec, version=8
+#pragma link C++ class Belle2::SVDRecoHit+; // checksum=0xe84555f5, version=8
 
 #endif

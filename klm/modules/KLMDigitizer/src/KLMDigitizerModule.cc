@@ -25,6 +25,25 @@ using namespace Belle2;
 
 REG_MODULE(KLMDigitizer);
 
+/**
+ * Comparison of MCParticles by index.
+ */
+class CompareMCParticlesByIndex {
+
+public:
+
+  /**
+   * Compare MCParticles by index.
+   *
+   * @param[in] particle1 MC particle 1.
+   * @param[in] particle2 MC particle 2.
+   */
+  bool operator()(const MCParticle* particle1, const MCParticle* particle2) const
+  {
+    return particle1->getIndex() < particle2->getIndex();
+  }
+};
+
 KLMDigitizerModule::KLMDigitizerModule() :
   Module(),
   m_Time(&(KLMTime::Instance())),
@@ -49,7 +68,7 @@ KLMDigitizerModule::KLMDigitizerModule() :
            "Efficiency determination mode (\"Strip\" or \"Plane\").",
            std::string("Plane"));
   addParam("CreateMultiStripDigits", m_CreateMultiStripDigits,
-           "Whether to create multi-strip digits.", false);
+           "Whether to create multi-strip digits in Run 1 data (not used for Run 2+).", true);
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
            false);
@@ -118,10 +137,20 @@ void KLMDigitizerModule::beginRun()
     B2FATAL("KLM channel status data are not available.");
   if (!m_StripEfficiency.isValid())
     B2FATAL("KLM strip efficiency data are not available.");
+  if (!m_ScintillatorFirmware.isValid())
+    B2FATAL("KLM scintillator firmware version is not available.");
   if (m_ChannelSpecificSimulation)
     checkScintillatorFEEParameters();
   m_Time->updateConstants();
   m_Fitter = new KLM::ScintillatorFirmware(m_DigPar->getNDigitizations());
+  KLMScintillatorFirmware::FirmwareVersion fwVersion = m_ScintillatorFirmware->getFirmwareVersion();
+  m_CreateMultiStripDigitsByRun = false; // do not make multi-strip KLMDigits for Run 2+ events
+  if ((fwVersion == KLMScintillatorFirmware::FirmwareVersion::c_Invalid) || // this should never happen!
+      (fwVersion == KLMScintillatorFirmware::FirmwareVersion::c_Phase2) ||  // for very early data (deprecated)
+      (fwVersion == KLMScintillatorFirmware::FirmwareVersion::c_Run1)) {  // for data up to and including 2022b
+    m_CreateMultiStripDigitsByRun = m_CreateMultiStripDigits;
+  }
+  B2INFO("KLM multi-strip digits are " << (m_CreateMultiStripDigitsByRun ? "" : "NOT") << " simulated");
 }
 
 /*
@@ -140,9 +169,9 @@ bool KLMDigitizerModule::checkActive(KLMChannelNumber channel)
 
 bool KLMDigitizerModule::efficiencyCorrection(float efficiency)
 {
-  if (isnan(efficiency))
+  if (std::isnan(efficiency))
     B2FATAL("Incomplete KLM efficiency data.");
-  double selection = gRandom->Rndm();
+  double selection = gRandom->Uniform();
   return (selection < efficiency);
 }
 
@@ -271,7 +300,7 @@ void KLMDigitizerModule::digitizeAsic()
         std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
     }
     digitizeScintillator();
-    if (m_CreateMultiStripDigits) {
+    if (m_CreateMultiStripDigitsByRun) {
       int nDigits = 0;
       for (int i = 0; i < KLM::c_NChannelsAsic; ++i) {
         if (m_AsicDigits[i] != nullptr)
@@ -285,20 +314,11 @@ void KLMDigitizerModule::digitizeAsic()
           ++i;
           continue;
         }
-        int minGroupChannel, maxGroupChannel;
-        if (i < 4) {
-          minGroupChannel = 1;
-          maxGroupChannel = 4;
-        } else if (i < 8) {
-          minGroupChannel = 5;
-          maxGroupChannel = 8;
-        } else if (i < 12) {
-          minGroupChannel = 9;
-          maxGroupChannel = 12;
-        } else {
-          minGroupChannel = 13;
-          maxGroupChannel = KLM::c_NChannelsAsic;
-        }
+        // Firmware bug (used OR of struck channel numbers in range 1..15) defeated the
+        // expected by-4 grouping so we assume the worst case: all 15 channels are struck.
+        // This will be reduced for BKLM scintillators if there are missing detectorChannels.
+        int minGroupChannel = 1;
+        int maxGroupChannel = KLM::c_NChannelsAsic;
         KLMDigit* arrayDigit = m_Digits.appendNew(*digit);
         KLMElectronicsChannel electronicsChannel(it->first);
         int asic = electronicsChannel.getChannel();
@@ -413,7 +433,13 @@ void KLMDigitizerModule::event()
       }
     }
     std::multimap<KLMPlaneNumber, const KLMSimHit*>::iterator it, it2;
-    std::multimap<const MCParticle*, const KLMSimHit*> particleHitMap;
+    /**
+     * Compare MCParticles by index to avoid memory layout dependence.
+     * For the default pointer comparison, it is introduced because of
+     * the different order of efficiencyCorrection() calls below.
+     */
+    std::multimap<const MCParticle*, const KLMSimHit*,
+        CompareMCParticlesByIndex> particleHitMap;
     std::multimap<const MCParticle*, const KLMSimHit*>::iterator
     itParticle, it2Particle;
     it = m_MapPlaneSimHit.begin();

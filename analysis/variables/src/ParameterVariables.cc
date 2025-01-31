@@ -21,9 +21,6 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-
 #include <Math/Boost.h>
 #include <Math/Vector4D.h>
 #include <TVectorF.h>
@@ -425,7 +422,7 @@ Useful to identify intermediate resonances in a decay, which weren't reconstruct
 Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= number of daughters).
 
 )DOC", "GeV/:math:`\\text{c}^2`");
-    MAKE_DEPRECATED("daughterInvariantMass", false, "light-2203-zeus", R"DOC(
+    MAKE_DEPRECATED("daughterInvariantMass", true, "light-2203-zeus", R"DOC(
                      The variable `daughterInvM` provides exactly the same functionality.)DOC");
     REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass, R"DOC(
 Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.

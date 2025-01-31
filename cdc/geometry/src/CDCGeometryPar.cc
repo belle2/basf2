@@ -16,21 +16,14 @@
 #include <cdc/simulation/CDCSimControlPar.h>
 #include <cdc/utilities/OpenFile.h>
 
-//#include <float.h>
-
 #include <cmath>
-#include <boost/format.hpp>
-//#include <iostream>
 #include <iomanip>
 
 #include <boost/iostreams/filtering_stream.hpp>
-//#include <boost/iostreams/device/file.hpp>
-//#include <boost/iostreams/filter/gzip.hpp>
 
 #include <Math/ChebyshevPol.h>
 
 using namespace std;
-using namespace boost;
 using namespace Belle2;
 using namespace CDC;
 
@@ -2123,7 +2116,7 @@ void CDCGeometryPar::outputDesignWirParam(const unsigned layerID, const unsigned
 double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                  const double theta) const
 {
-  if (iCLayer < m_firstLayerOffset) {
+  if (iCLayer < m_firstLayerOffset || iCLayer >= c_maxNSenseLayers) {
     return 0.;
   }
 
@@ -2211,7 +2204,7 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
 double CDCGeometryPar::getDriftLength0(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                        const double theta) const
 {
-  if (iCLayer < m_firstLayerOffset) {
+  if (iCLayer < m_firstLayerOffset || iCLayer >= c_maxNSenseLayers) {
     return 0.;
   }
 
@@ -2295,7 +2288,7 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
                                       const bool calculateMinTime,
                                       const double inputMinTime) const
 {
-  if (iCLayer < m_firstLayerOffset) {
+  if (iCLayer < m_firstLayerOffset || iCLayer >= c_maxNSenseLayers) {
     return 0.;
   }
 
@@ -2396,7 +2389,7 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
 double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                        const double theta) const
 {
-  if (iCLayer < m_firstLayerOffset) {
+  if (iCLayer < m_firstLayerOffset || iCLayer >= c_maxNSenseLayers) {
     return 0.;
   }
 
@@ -2590,7 +2583,7 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
 double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                     const double theta) const
 {
-  if (iCLayer < m_firstLayerOffset) {
+  if (iCLayer < m_firstLayerOffset || iCLayer >= c_maxNSenseLayers) {
     return 0.;
   }
 
@@ -2646,7 +2639,7 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
 double CDCGeometryPar::getSigma(const double DriftL0, const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                 const double theta) const
 {
-  if (iCLayer < m_firstLayerOffset) {
+  if (iCLayer < m_firstLayerOffset || iCLayer >= c_maxNSenseLayers) {
     return 0.;
   }
 
@@ -2867,16 +2860,12 @@ void CDCGeometryPar::getClosestAlphaPoints(const double alpha, double& weight, u
       weight = (alphao - m_alphaPoints[points[0]]) / (m_alphaPoints[points[1]] + M_PI - m_alphaPoints[points[0]]);
     }
   } else {
-    for (unsigned short i = 0; i <= m_nAlphaPoints - 2; ++i) {
-      if (m_alphaPoints[i] <= alphao && alphao < m_alphaPoints[i + 1]) {
-        points[0] = i;
-        points[1] = i + 1;
-        weight = (alphao - m_alphaPoints[points[0]]) / (m_alphaPoints[points[1]] - m_alphaPoints[points[0]]);
-        break;
-      }
-    }
+    const float* upper = std::upper_bound(m_alphaPoints,
+                                          m_alphaPoints + m_nAlphaPoints, alphao);
+    points[1] = upper - m_alphaPoints;
+    points[0] = points[1] - 1;
+    weight = (alphao - m_alphaPoints[points[0]]) / (m_alphaPoints[points[1]] - m_alphaPoints[points[0]]);
   }
-  //  weight = (alphao - m_alphaPoints[points[0]]) / (m_alphaPoints[points[1]] - m_alphaPoints[points[0]]);
 }
 
 
@@ -2901,14 +2890,11 @@ void CDCGeometryPar::getClosestAlphaPoints4Sgm(const double alpha, double& weigh
       weight = (alphao - m_alphaPoints4Sgm[points[0]]) / (m_alphaPoints4Sgm[points[1]] + M_PI - m_alphaPoints4Sgm[points[0]]);
     }
   } else {
-    for (unsigned short i = 0; i <= m_nAlphaPoints4Sgm - 2; ++i) {
-      if (m_alphaPoints4Sgm[i] <= alphao && alphao < m_alphaPoints4Sgm[i + 1]) {
-        points[0] = i;
-        points[1] = i + 1;
-        weight = (alphao - m_alphaPoints4Sgm[points[0]]) / (m_alphaPoints4Sgm[points[1]] - m_alphaPoints4Sgm[points[0]]);
-        break;
-      }
-    }
+    const float* upper = std::upper_bound(m_alphaPoints4Sgm,
+                                          m_alphaPoints4Sgm + m_nAlphaPoints4Sgm, alphao);
+    points[1] = upper - m_alphaPoints4Sgm;
+    points[0] = points[1] - 1;
+    weight = (alphao - m_alphaPoints4Sgm[points[0]]) / (m_alphaPoints4Sgm[points[1]] - m_alphaPoints4Sgm[points[0]]);
   }
 }
 
@@ -2930,16 +2916,12 @@ void CDCGeometryPar::getClosestThetaPoints(const double alpha, const double thet
     points[1] = m_nThetaPoints - 1;
     weight = 1.;
   } else {
-    for (unsigned short i = 0; i <= m_nThetaPoints - 2; ++i) {
-      if (m_thetaPoints[i] <= thetao && thetao < m_thetaPoints[i + 1]) {
-        points[0] = i;
-        points[1] = i + 1;
-        weight = (thetao - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
-        break;
-      }
-    }
+    const float* upper = std::upper_bound(m_thetaPoints,
+                                          m_thetaPoints + m_nThetaPoints, thetao);
+    points[1] = upper - m_thetaPoints;
+    points[0] = points[1] - 1;
+    weight = (thetao - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
   }
-  //  weight = (thetao - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
 }
 
 
@@ -2957,14 +2939,11 @@ void CDCGeometryPar::getClosestThetaPoints4Sgm(const double alpha, const double 
     points[1] = m_nThetaPoints4Sgm - 1;
     weight = 1.;
   } else {
-    for (unsigned short i = 0; i <= m_nThetaPoints4Sgm - 2; ++i) {
-      if (m_thetaPoints4Sgm[i] <= thetao && thetao < m_thetaPoints4Sgm[i + 1]) {
-        points[0] = i;
-        points[1] = i + 1;
-        weight = (thetao - m_thetaPoints4Sgm[points[0]]) / (m_thetaPoints4Sgm[points[1]] - m_thetaPoints4Sgm[points[0]]);
-        break;
-      }
-    }
+    const float* upper = std::upper_bound(m_thetaPoints4Sgm,
+                                          m_thetaPoints4Sgm + m_nThetaPoints4Sgm, thetao);
+    points[1] = upper - m_thetaPoints4Sgm;
+    points[0] = points[1] - 1;
+    weight = (thetao - m_thetaPoints4Sgm[points[0]]) / (m_thetaPoints4Sgm[points[1]] - m_thetaPoints4Sgm[points[0]]);
   }
 }
 

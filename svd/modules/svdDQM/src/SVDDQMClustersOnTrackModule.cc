@@ -51,8 +51,16 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
   addParam("Clusters", m_svdClustersName, "SVDCluster StoreArray name.", std::string(""));
   addParam("RecoDigits", m_svdRecoDigitsName, "SVDRecoDigits StoreArray name.", std::string(""));
   addParam("ShaperDigits", m_svdShaperDigitsName, "SVDShaperDigits StoreArray name.", std::string(""));
+  addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
 
   m_histoList = new TList();
+
+  m_ladderMap =  {
+    {{3, 1}, 0}, {{3, 2}, 1},
+    {{4, 1}, 2}, {{4, 2}, 3}, {{4, 3}, 4},
+    {{5, 1}, 5}, {{5, 2}, 6}, {{5, 3}, 7}, {{5, 4}, 8},
+    {{6, 1}, 9}, {{6, 2}, 10}, {{6, 3}, 11}, {{6, 4}, 12}, {{6, 5}, 13}
+  };
 }
 
 
@@ -128,6 +136,54 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   m_clsTrkChargeV456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkChargeV456);
 
+  m_clsTrkChargeL3 = new TH1F*[4];
+  m_clsTrkSNRL3    = new TH1F*[4];
+
+  int ind = 0;
+  for (int ladder = 1; ladder <= 2; ++ladder) {
+    for (int sensor = 1; sensor <= 2; ++sensor) {
+
+      name = Form("SVDTRK_ClusterCharge_L3.%d.%d", ladder, sensor);
+      title = Form("SVD Cluster-on-Track Charge for L3.%d.%d", ladder, sensor);
+      m_clsTrkChargeL3[ind] = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
+      m_clsTrkChargeL3[ind]->GetXaxis()->SetTitle("cluster charge [ke-]");
+      m_clsTrkChargeL3[ind]->GetYaxis()->SetTitle("count");
+      m_histoList->Add(m_clsTrkChargeL3[ind]);
+
+      name = Form("SVDTRK_ClusterSNR_L3.%d.%d", ladder, sensor);
+      title = Form("SVD Cluster-on-Track SNR for L3.%d.%d", ladder, sensor);
+      m_clsTrkSNRL3[ind] = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
+      m_clsTrkSNRL3[ind]->GetXaxis()->SetTitle("cluster SNR");
+      m_clsTrkSNRL3[ind]->GetYaxis()->SetTitle("count");
+      m_histoList->Add(m_clsTrkSNRL3[ind]);
+      ind++;
+    }
+  }
+
+  m_clsTrkCharge = new TH1F*[m_ladderMap.size()];
+  m_clsTrkSNR    = new TH1F*[m_ladderMap.size()];
+
+  for (const auto& it : m_ladderMap) {
+    std::pair<int, int> p = it.first;
+    int layer = p.first;
+    int sensor = p.second;
+    int idx = it.second;
+    name = Form("SVDTRK_ClusterCharge_L%d.x.%d", layer, sensor);
+    title = Form("SVD Cluster-on-Track Charge for L%d.x.%d", layer, sensor);
+    m_clsTrkCharge[idx] = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
+    m_clsTrkCharge[idx]->GetXaxis()->SetTitle("cluster charge [ke-]");
+    m_clsTrkCharge[idx]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_clsTrkCharge[idx]);
+
+    //printf("name %s layer %d sensor %d index %d\n", name.Data(), layer, sensor, idx);
+    name = Form("SVDTRK_ClusterSNR_L%d.x.%d", layer, sensor);
+    title = Form("SVD Cluster-on-Track SNR for L%d.x.%d", layer, sensor);
+    m_clsTrkSNR[idx] = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
+    m_clsTrkSNR[idx]->GetXaxis()->SetTitle("cluster SNR");
+    m_clsTrkSNR[idx]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_clsTrkSNR[idx]);
+  }
+
   //----------------------------------------------------------------
   // SNR of clusters for L3/L456 sensors
   //----------------------------------------------------------------
@@ -173,6 +229,34 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   m_clsTrkTimeV3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkTimeV3);
 
+  if (m_3Samples) {
+    name = "SVDTRK_Cluster3SampleTimeU3";
+    title = Form("SVD U-Cluster-on-Track Time %s for layer 3 sensors for 3 samples", refFrame.Data());
+    m_cls3SampleTrkTimeU3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls3SampleTrkTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls3SampleTrkTimeU3->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls3SampleTrkTimeU3);
+    name = "SVDTRK_Cluster3SampleTimeV3";
+    title = Form("SVD V-Cluster-on-Track Time %s for layer 3 sensors for 3 samples", refFrame.Data());
+    m_cls3SampleTrkTimeV3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls3SampleTrkTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls3SampleTrkTimeV3->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls3SampleTrkTimeV3);
+
+    name = "SVDTRK_Cluster6SampleTimeU3";
+    title = Form("SVD U-Cluster-on-Track Time %s for layer 3 sensors for 6 samples", refFrame.Data());
+    m_cls6SampleTrkTimeU3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls6SampleTrkTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls6SampleTrkTimeU3->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls6SampleTrkTimeU3);
+    name = "SVDTRK_Cluster6SampleTimeV3";
+    title = Form("SVD V-Cluster-on-Track Time %s for layer 3 sensors for 6 samples", refFrame.Data());
+    m_cls6SampleTrkTimeV3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls6SampleTrkTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls6SampleTrkTimeV3->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls6SampleTrkTimeV3);
+  }
+
   name = "SVDTRK_ClusterTimeU456";
   title = Form("SVD U-Cluster-on-Track Time %s for layers 4,5,6 sensors", refFrame.Data());
   m_clsTrkTimeU456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
@@ -185,6 +269,34 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   m_clsTrkTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
   m_clsTrkTimeV456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkTimeV456);
+
+  if (m_3Samples) {
+    name = "SVDTRK_Cluster3SampleTimeU456";
+    title = Form("SVD U-Cluster-on-Track Time %s for layers 4,5,6 sensors for 3 samples", refFrame.Data());
+    m_cls3SampleTrkTimeU456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls3SampleTrkTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls3SampleTrkTimeU456->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls3SampleTrkTimeU456);
+    name = "SVDTRK_Cluster3SampleTimeV456";
+    title = Form("SVD V-Cluster-on-Track Time %s for layers 4,5,6 sensors for 3 samples", refFrame.Data());
+    m_cls3SampleTrkTimeV456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls3SampleTrkTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls3SampleTrkTimeV456->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls3SampleTrkTimeV456);
+
+    name = "SVDTRK_Cluster6SampleTimeU456";
+    title = Form("SVD U-Cluster-on-Track Time %s for layers 4,5,6 sensors for 6 samples", refFrame.Data());
+    m_cls6SampleTrkTimeU456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls6SampleTrkTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls6SampleTrkTimeU456->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls6SampleTrkTimeU456);
+    name = "SVDTRK_Cluster6SampleTimeV456";
+    title = Form("SVD V-Cluster-on-Track Time %s for layers 4,5,6 sensors for 6 samples", refFrame.Data());
+    m_cls6SampleTrkTimeV456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls6SampleTrkTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls6SampleTrkTimeV456->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls6SampleTrkTimeV456);
+  }
 
   //----------------------------------------------------------------
   // EventT0 vs Time of clusters for U and V sides
@@ -244,12 +356,25 @@ void SVDDQMClustersOnTrackModule::beginRun()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
+  // Add experiment and run number to the title of selected histograms (CR shifter plots)
+  StoreObjPtr<EventMetaData> evtMetaData;
+  m_expNumber = evtMetaData->getExperiment();
+  m_runNumber = evtMetaData->getRun();
+  TString runID = TString::Format(" ~ Exp%d Run%d", m_expNumber, m_runNumber);
+
   //reset histograms
   TObject* obj;
   TIter nextH(m_histoList);
   while ((obj = nextH()))
     if (obj->InheritsFrom("TH1")) {
       ((TH1F*)obj)->Reset();
+
+      TString tmp = (TString)obj->GetTitle();
+      Int_t pos = tmp.Last('~');
+      if (pos == -1) pos = tmp.Length() + 2;
+
+      TString title = tmp(0, pos - 2);
+      ((TH1F*)obj)->SetTitle(title + runID);
     }
 }
 
@@ -269,9 +394,11 @@ void SVDDQMClustersOnTrackModule::event()
         return;
   }
 
-  StoreObjPtr<EventMetaData> evtMetaData;
-  m_expNumber = evtMetaData->getExperiment();
-  m_runNumber = evtMetaData->getRun();
+  int nSamples = 0;
+  if (m_svdEventInfo.isValid())
+    nSamples = m_svdEventInfo->getNSamples();
+  else
+    return;
 
   // get EventT0 if present and valid
   double eventT0 = -1000;
@@ -294,16 +421,6 @@ void SVDDQMClustersOnTrackModule::event()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
-  // Add experiment and run number to the title of selected histograms (CR shifter plots)
-  TString runID = TString::Format(" ~ Exp%d Run%d", m_expNumber, m_runNumber);
-  TObject* obj;
-  TIter nextH(m_histoList);
-  while ((obj = nextH()))
-    if (obj->InheritsFrom("TH1")) {
-      if (((TString)obj->GetTitle()).Contains(runID) == false) {
-        ((TH1F*)obj)->SetTitle(obj->GetTitle() + runID);
-      }
-    }
 
   for (const Track& track : m_tracks) {
 
@@ -316,6 +433,33 @@ void SVDDQMClustersOnTrackModule::event()
     for (const SVDCluster& svdCluster : recoTrack->getRelationsWith<SVDCluster>(m_svdClustersName)) {
 
       int iLayer = svdCluster.getSensorID().getLayerNumber();
+      int iLadder = svdCluster.getSensorID().getLadderNumber();
+      int iSensor = svdCluster.getSensorID().getSensorNumber();
+
+      if (iLayer == 3) {
+        int ind = -1;
+        if (iLadder == 1 && iSensor == 1) {
+          ind = 0;
+        } else if (iLadder == 1 && iSensor == 2) {
+          ind = 1;
+        } else if (iLadder == 2 && iSensor == 1) {
+          ind = 2;
+        } else if (iLadder == 2 && iSensor == 2) {
+          ind = 3;
+        }
+
+        if (ind != -1) {
+          if (m_clsTrkChargeL3[ind] != nullptr) m_clsTrkChargeL3[ind]->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
+          if (m_clsTrkSNRL3[ind] != nullptr) m_clsTrkSNRL3[ind]->Fill(svdCluster.getSNR());
+        }
+
+      }
+
+      std::pair<int, int> p(iLayer, iSensor);
+      int idx = m_ladderMap[p];
+
+      if (m_clsTrkCharge[idx] != nullptr) m_clsTrkCharge[idx]->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
+      if (m_clsTrkSNR[idx] != nullptr) m_clsTrkSNR[idx]->Fill(svdCluster.getSNR());
 
       float time = svdCluster.getClsTime();
       if (m_desynchSVDTime && m_svdEventInfo.isValid())
@@ -329,10 +473,26 @@ void SVDDQMClustersOnTrackModule::event()
           if (m_clsTrkChargeU3 != nullptr) m_clsTrkChargeU3->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
           if (m_clsTrkSNRU3 != nullptr) m_clsTrkSNRU3->Fill(svdCluster.getSNR());
           if (m_clsTrkTimeU3 != nullptr) m_clsTrkTimeU3->Fill(time);
+
+          if (m_3Samples) {
+            if (nSamples == 3) {
+              if (m_cls3SampleTrkTimeU3 != nullptr) m_cls3SampleTrkTimeU3->Fill(time);
+            } else {
+              if (m_cls6SampleTrkTimeU3 != nullptr) m_cls6SampleTrkTimeU3->Fill(time);
+            }
+          }
         } else {
           if (m_clsTrkChargeU456 != nullptr) m_clsTrkChargeU456->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
           if (m_clsTrkSNRU456 != nullptr) m_clsTrkSNRU456->Fill(svdCluster.getSNR());
           if (m_clsTrkTimeU456 != nullptr) m_clsTrkTimeU456->Fill(time);
+
+          if (m_3Samples) {
+            if (nSamples == 3) {
+              if (m_cls3SampleTrkTimeU456 != nullptr) m_cls3SampleTrkTimeU456->Fill(time);
+            } else {
+              if (m_cls6SampleTrkTimeU456 != nullptr) m_cls6SampleTrkTimeU456->Fill(time);
+            }
+          }
         }
 
         for (const SVDRecoDigit& recoDigit : svdCluster.getRelationsTo<SVDRecoDigit>(m_svdRecoDigitsName)) {
@@ -350,10 +510,24 @@ void SVDDQMClustersOnTrackModule::event()
           if (m_clsTrkChargeV3 != nullptr) m_clsTrkChargeV3->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
           if (m_clsTrkSNRV3 != nullptr) m_clsTrkSNRV3->Fill(svdCluster.getSNR());
           if (m_clsTrkTimeV3 != nullptr) m_clsTrkTimeV3->Fill(time);
+          if (m_3Samples) {
+            if (nSamples == 3) {
+              if (m_cls3SampleTrkTimeV3 != nullptr) m_cls3SampleTrkTimeV3->Fill(time);
+            } else {
+              if (m_cls6SampleTrkTimeV3 != nullptr) m_cls6SampleTrkTimeV3->Fill(time);
+            }
+          }
         } else {
           if (m_clsTrkChargeV456 != nullptr) m_clsTrkChargeV456->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
           if (m_clsTrkSNRV456 != nullptr) m_clsTrkSNRV456->Fill(svdCluster.getSNR());
           if (m_clsTrkTimeV456 != nullptr) m_clsTrkTimeV456->Fill(time);
+          if (m_3Samples) {
+            if (nSamples == 3) {
+              if (m_cls3SampleTrkTimeV456 != nullptr) m_cls3SampleTrkTimeV456->Fill(time);
+            } else {
+              if (m_cls6SampleTrkTimeV456 != nullptr) m_cls6SampleTrkTimeV456->Fill(time);
+            }
+          }
         }
 
         for (const SVDRecoDigit& recoDigit : svdCluster.getRelationsTo<SVDRecoDigit>(m_svdRecoDigitsName)) {

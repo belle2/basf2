@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,6 +14,7 @@ Author: qingyuan.liu@desy.de
 """
 
 from basf2 import register_module, create_path
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm, PXDAnalyticGainCalibrationAlgorithm
 from ROOT.Belle2 import PXDValidationAlgorithm
 from caf.framework import Calibration
@@ -42,7 +42,7 @@ def hot_pixel_mask_calibration(
 
       local_dbs   (list): A list of local databases
 
-      **kwargs: Additional configuration to support extentions without changing scripts in calibration folder.
+      **kwargs: Additional configuration to support extensions without changing scripts in calibration folder.
         Supported options are listed below:
 
         "activate_masking" is a boolean to activate existing masking in the payload.
@@ -67,7 +67,7 @@ def hot_pixel_mask_calibration(
     if run_type is None:
         run_type = 'all'
     if not isinstance(run_type, str) or run_type.lower() not in run_types:
-        raise ValueError("run_type not found in run_types : {}".format(run_type))
+        raise ValueError(f"run_type not found in run_types : {run_type}")
     activate_masking = kwargs.get("activate_masking", False)
     if not isinstance(activate_masking, bool):
         raise ValueError("activate_masking is not a boolean!")
@@ -173,14 +173,14 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
 
       validation (bool): Adding validation algorithm if True (default)
 
-      **kwargs: Additional configuration to support extentions without changing scripts in calibration folder.
+      **kwargs: Additional configuration to support extensions without changing scripts in calibration folder.
         Supported options are listed below:
 
         "collector_prefix": a string indicating which collector to be used for gain calibration. The supported
           collectors are:
             PXDPerformanceVariablesCollector (default),
             PXDPerformanceCollector(using RAVE package for vertexing, obsolete)
-        "useClusterPosition": Flag to use cluster postion rather than track point to group pixels for calibration.
+        "useClusterPosition": Flag to use cluster position rather than track point to group pixels for calibration.
         "particle_type": Particle type assigned to tracks. "e" by default.
         "track_cuts_4gain": Track cuts used for gain calibration.
         "track_cuts_4eff": Track cuts used for efficiency study.
@@ -197,11 +197,11 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
     if gain_method is None:
         gain_method = 'analytic'
     if not isinstance(gain_method, str) or gain_method.lower() not in gain_methods:
-        raise ValueError("gain_method not found in gain_methods : {}".format(gain_method))
+        raise ValueError(f"gain_method not found in gain_methods : {gain_method}")
     collector_prefix = kwargs.get("collector_prefix", "PXDPerformanceVariablesCollector")
     supported_collectors = ["PXDPerformanceVariablesCollector", "PXDPerformanceCollector"]
     if not isinstance(collector_prefix, str) or collector_prefix not in supported_collectors:
-        raise ValueError("collector_prefix not found in {}".format(supported_collectors))
+        raise ValueError(f"collector_prefix not found in {supported_collectors}")
     useClusterPosition = kwargs.get("useClusterPosition", False)
     if not isinstance(useClusterPosition, bool):
         raise ValueError("useClusterPosition has to be a boolean!")
@@ -245,7 +245,7 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         # vertex.kFit('vpho:eff', conf_level=0.01, fit_type="fourC", daughtersUpdate=False, path=main)
 
         # Particle list for studying impact parameter resolution
-        # Alias dosn't work with airflow implementation
+        # Alias doesn't work with airflow implementation
         # from variables import variables as vm
         # vm.addAlias("pBetaSinTheta3o2", "formula(pt * (1./(1. + tanLambda**2)**0.5)**0.5)")
         # vm.addAlias("absLambda", "abs(atan(tanLambda))")

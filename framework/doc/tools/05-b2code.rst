@@ -103,6 +103,27 @@ cppcheck in parallel::
 However in this case a directory to check has to be provided
 
 
+``b2code-option``: Set up the environment for selected compiler options
+-----------------------------------------------------------------------
+
+This tool sets up compiler options coding environment. 
+
+To run this tool:: 
+
+    b2code-option [-h] OPTION
+
+Possible inputs for OPTION: 
+
+* debug : use gcc compiler, include debug symbols, no optimization
+* opt   : use gcc compiler, no debug symbols, turn on -O3 optimization
+* intel : use intel compiler, no debug symbols
+* clang : use clang compiler (LLVM), no debug symbols, turn on -O3 optimization
+
+.. rubric:: Optional Arguments
+
+-h, --help      Show this help message and exit
+
+
 ``b2code-parallel_processing-benchmark``: Measure multi-core performance
 ------------------------------------------------------------------------
 
@@ -137,4 +158,10 @@ All other options will be forwarded to ``sphinx-build``
 ---------------------------------------------------------------------------------
 
 This script will create the sphinx documentation and check whether there are any warnings.
+
+.. rubric:: Options
+
+-o, --output DIR       Specify the output directory.
+-h, --help             Display this help message.
+
 All extra arguments are forwarded to ``b2code-sphinx-build``.

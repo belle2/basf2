@@ -17,11 +17,9 @@ path = b2.create_path()
 # Add only the simulation
 add_simulation(path, bkgfiles="some_file", simulateT0jitter=True)
 
-# Assert that all modules have a parallel processing certified flag, except for BGOverlayInput at the beginning of the path.
-modules = path.modules()
-if modules[0].name() == 'BGOverlayInput':
-    modules = modules[1:]
-
-for m in modules:
+# Assert that all modules have a parallel processing certified flag, except for BGOverlayInput.
+for m in path.modules():
+    if m.name() == 'BGOverlayInput':
+        continue
     assert m.has_properties(
-        b2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED), '%s is missing c_ParallelProcessingCertified flag!' % (m)
+        b2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED), f'{m} is missing c_ParallelProcessingCertified flag!'

@@ -17,12 +17,12 @@ import time
 import numpy as np
 
 
-from tensorflow.keras.layers import Input, Dense, Dropout, BatchNormalization
-from tensorflow.keras.models import Model
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.losses import binary_crossentropy
-from tensorflow.keras.activations import sigmoid, tanh
-from tensorflow.keras.callbacks import Callback
+from keras.layers import Input, Dense, Dropout, BatchNormalization
+from keras.models import Model
+from keras.optimizers import Adam
+from keras.losses import binary_crossentropy
+from keras.activations import sigmoid, tanh
+from keras.callbacks import Callback
 
 from basf2_mva_python_interface.keras import State
 from basf2_mva_extensions.preprocessing import fast_equal_frequency_binning
@@ -50,7 +50,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     # The interface is designed to automatically save every kwarg, which is passed in the initializer in end_fit.
     state = State(Model(input, output), preprocessor_state=None)
 
-    state.model.compile(optimizer=Adam(lr=0.01), loss=binary_crossentropy, metrics=['accuracy'])
+    state.model.compile(optimizer=Adam(learning_rate=0.01), loss=binary_crossentropy, metrics=['accuracy'])
 
     state.model.summary()
 
@@ -85,8 +85,8 @@ def partial_fit(state, X, S, y, w, epoch, batch):
         def on_epoch_end(self, epoch, logs=None):
             loss, acc = state.model.evaluate(state.Xtest, state.ytest, verbose=0, batch_size=1000)
             loss2, acc2 = state.model.evaluate(X[:10000], y[:10000], verbose=0, batch_size=1000)
-            print('\nTesting loss: {}, acc: {}'.format(loss, acc))
-            print('Training loss: {}, acc: {}'.format(loss2, acc2))
+            print(f'\nTesting loss: {loss}, acc: {acc}')
+            print(f'Training loss: {loss2}, acc: {acc2}')
 
     state.model.fit(X, y, batch_size=500, epochs=10, callbacks=[TestCallback()])
     return False

@@ -30,8 +30,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/GFRaveVertex.h>
 
+#include <Math/Vector3D.h>
 #include <TEveStraightLineSet.h>
-#include <TVector3.h>
 #include <TEveTrack.h>
 
 #include <string>
@@ -152,12 +152,7 @@ namespace Belle2 {
     void addSimHit(const KLMSimHit* hit, const MCParticle* particle);
 
     /** Add simhit as a simple point. */
-    void addSimHit(const TVector3& v, const MCParticle* particle);
-    /** Add simhit as a simple point. */
-    inline void addSimHit(const ROOT::Math::XYZVector& v, const MCParticle* particle)
-    {
-      addSimHit(TVector3(v.X(), v.Y(), v.Z()), particle);
-    }
+    void addSimHit(const ROOT::Math::XYZVector& v, const MCParticle* particle);
 
     /** Return MCTrack for given particle, add it if it doesn't exist yet.
      *
@@ -278,7 +273,8 @@ namespace Belle2 {
     /** @brief Create a box around o, oriented along u and v with widths ud, vd and depth and
      *  return a pointer to the box object.
      */
-    TEveBox* boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth);
+    TEveBox* boxCreator(const ROOT::Math::XYZVector& o, ROOT::Math::XYZVector u, ROOT::Math::XYZVector v, float ud, float vd,
+                        float depth);
 
     /** Create hit visualisation for the given options, and add them to 'eveTrack'. */
     void makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state,
@@ -291,7 +287,7 @@ namespace Belle2 {
       static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
       const ROOT::Math::XYZVector local_pos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
-      const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
+      const VXD::SensorInfoBase& sensor = geo.getSensorInfo(hit->getSensorID());
       const ROOT::Math::XYZVector global_pos = sensor.pointToGlobal(local_pos);
       lines->AddMarker(global_pos.X(), global_pos.Y(), global_pos.Z());
 

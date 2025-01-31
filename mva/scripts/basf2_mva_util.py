@@ -126,7 +126,7 @@ def calculate_flatness(f, p, w=None):
     return np.sqrt(diff.sum() / (100 * 99))
 
 
-class Method(object):
+class Method:
     """
     Wrapper class providing an interface to the method stored under the given identifier.
     It loads the Options, can apply the expert and train new ones using the current as a prototype.

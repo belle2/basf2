@@ -9,14 +9,15 @@
 #include <analysis/modules/ChargedParticleIdentificator/ChargedPidMVAMulticlassModule.h>
 
 //ANALYSIS
-#include <mva/interface/Interface.h>
-#include <mva/methods/TMVA.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/variables/ECLVariables.h>
 
 // FRAMEWORK
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
-
+#include <mva/interface/Interface.h>
+#include <mva/methods/TMVA.h>
 
 using namespace Belle2;
 
@@ -130,9 +131,7 @@ void ChargedPidMVAMulticlassModule::event()
         // LEGACY TRAININGS: always require a track-cluster match.
         const ECLCluster* eclCluster = particle->getECLCluster();
         if (!eclCluster) {
-          if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 11)) {
-            B2WARNING("\nParticle [" << ipart << "] has invalid Track-ECLCluster relation, skip MVA application...");
-          }
+          B2DEBUG(11, "\nParticle [" << ipart << "] has invalid Track-ECLCluster relation, skip MVA application...");
           continue;
         }
       }
@@ -144,11 +143,16 @@ void ChargedPidMVAMulticlassModule::event()
       auto p = particle->getP();
       // Set a dummy charge of zero to pick charge-independent payloads, if requested.
       auto charge = (!m_charge_independent) ? particle->getCharge() : 0.0;
+      if (std::isnan(theta) or std::isnan(p) or std::isnan(charge)) {
+        B2DEBUG(11, "\nParticle [" << ipart << "] has invalid input variable, skip MVA application..." <<
+                " polar angle: " << theta << ", p: " << p << ", charge: " << charge);
+        continue;
+      }
+
       int idx_theta, idx_p, idx_charge;
       auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(theta, p, charge, idx_theta, idx_p, idx_charge);
 
-      auto* matchVar = Variable::Manager::Instance().getVariable("clusterTrackMatch");
-      auto hasMatch = std::isnormal(std::get<double>(matchVar->function(particle)));
+      auto hasMatch = std::isnormal(Variable::eclClusterTrackMatched(particle));
 
       debugStr[11] += "\n";
       debugStr[11] += ("Particle [" + std::to_string(ipart) + "]\n");
@@ -171,14 +175,10 @@ void ChargedPidMVAMulticlassModule::event()
 
       // Don't even bother if particle does not fulfil the category selection.
       if (m_cuts.at(index)) {
-
         if (!m_cuts.at(index)->check(particle)) {
-          if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 11)) {
-            B2WARNING("\nParticle [" << ipart << "] didn't pass MVA category cut, skip MVA application...");
-          }
+          B2DEBUG(11, "\nParticle [" << ipart << "] didn't pass MVA category cut, skip MVA application...");
           continue;
         }
-
       }
 
       // Fill the MVA::SingleDataset w/ variables and spectators.

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -55,7 +54,7 @@ class PxdPackerUnpackerTestModule(b2.Module):
         # first convert to a python-list to be abple to sort
         py_list = [x for x in unsortedPyStoreArray]
 
-        # sort via a hierachy of sort keys
+        # sort via a hierarchy of sort keys
         return sorted(
             py_list,
             key=lambda x: (
@@ -71,7 +70,7 @@ class PxdPackerUnpackerTestModule(b2.Module):
         # first convert to a python-list to be able to sort
         py_list = [x for x in unsortedPyStoreArray]
 
-        # sort via a hierachy of sort keys
+        # sort via a hierarchy of sort keys
         return sorted(
             py_list,
             key=lambda x: (
@@ -97,7 +96,7 @@ class PxdPackerUnpackerTestModule(b2.Module):
         if not len(pxdDigits) == len(pxdRawHitsPackedUnpacked):
             b2.B2FATAL("PXDDigits and PXDRawHits count not equal after packing and unpacking")
 
-        print("Comparing %i pxd digits " % len(pxdDigits))
+        print(f"Comparing {len(pxdDigits)} pxd digits ")
 
         # check all quantities between the direct and the packed/unpacked pxd digits
         for i in range(len(pxdDigits)):
@@ -105,13 +104,13 @@ class PxdPackerUnpackerTestModule(b2.Module):
             rawHitPackedUnpacked = pxdRawHitsPackedUnpacked[i]
 
             # compare all available quantities
-            # cannot compare frame number, because it is not availabl on PXDDigits
+            # cannot compare frame number, because it is not available on PXDDigits
             assert rawHitPackedUnpacked.getSensorID().getID() == digit.getSensorID().getID()
             assert rawHitPackedUnpacked.getRow() == digit.getVCellID()
             assert rawHitPackedUnpacked.getColumn() == digit.getUCellID()
             # There are some rare cases (~ every 10th event), where the PXD Digits have a charge
             # larger than 255 which will be clipped by the packer to 8bit (at most 255)
-            # therefor, limit the maximal charge of the digit here in the comparison
+            # therefore, limit the maximal charge of the digit here in the comparison
             assert numpy.isclose(min(255.0, digit.getCharge()), rawHitPackedUnpacked.getCharge())
 
 

@@ -160,16 +160,6 @@ namespace Belle2 {
     std::unique_ptr< Belle2::ECL::ECLTimingUtilities > ECLTimeUtil =
       std::make_unique<Belle2::ECL::ECLTimingUtilities>(); /**< ECL timing tools */
 
-    // For the energy dependence correction to the time
-    // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
-    // Only change the time walk function paramters if they change away from the below dummy values
-    double m_energyDependenceTimeOffsetFitParam_p1 = -999;     /**< p1 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p2 = -999;     /**< p2 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p3 = -999;     /**< p3 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p4 = -999;     /**< p4 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p5 = -999;     /**< p5 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p6 = -999;     /**< p6 in "energy dependence equation" */
-
   };
 
   /** Class derived from ECLDigitCalibratorModule, only difference are the names */

@@ -1,0 +1,111 @@
+Changes in the analysis package in light-2501-betelgeuse
+--------------------------------------------------------
+
+Modular Analysis
+++++++++++++++++
+* In `modularAnalysis.writePi0EtaVeto`:
+
+  * Add option to use the weight files trained using MC15rd files: ``standardMC15rd`` and ``tightMC15rd``.
+  * The second highest score is also stored in to extra information, e.g., ``secondPi0ProbOrigin``.
+* Added the option to mix PDG ids and particle names when defining which particles should be mass-constrained via the
+  argument ``massConstraint`` of `vertex.treeFit` and `vertex.kFit`.
+* Added the two new arguments ``massConstraintDecayString`` and ``massConstraintMassValues`` to the function
+  `vertex.treeFit`. Via the former a decay string can be used to indicate which particle's masses should be
+  mass-constrained. You can use the latter to set invariant mass values that differ from the nominal PDG values. The
+  number of values must be identical to the number of selected particles in the decay string. Besides floating point
+  values, PDG ids (as integers) or particle names (as strings) can be provided to use the corresponding PDG mass.
+
+Variables
++++++++++
+* The variables `prodVertexX`, `prodVertexY`, and `prodVertexZ` now return the production vertex position also for
+  TreeFit. Previously, only Rave was supported. Moreover, the covariance matrix elements of the production vertex for a
+  TreeFit are now also available via the variables `prodVertexCov` and `prodVertexXErr`, etc.
+* The variables `pi0Prob(mode) <pi0Prob>` and `etaProb(mode) <etaProb>` are extended to MC15 version
+  and accept the modes ``standardMC15rd`` and ``tightMC15rd``.
+
+Modules
++++++++
+* Fixed a bug in the initialization of the decay length of TreeFit.
+* Removed the option ``expertUseReferencing`` from :b2:mod:`TreeFitter`.
+
+Changes in the analysis package in light-2411-aldebaran
+-------------------------------------------------------
+
+K_S0 selector module
+++++++++++++++++++++
+* Changed the model from FastBDT to LightGBM, reoptimized hyperparameters
+* Included three new input feature for LambdaVeto: ArmenterosDaughter1Qt, ArmenterosDaughter2Qt, ArmenterosLongitudinalMomentumAsymmetry. Removed PXD hits and daughter momentum as inputs.
+* Retrained with MC 15rd inclusive data, uploaded new payload to conditiondb
+
+Modular Analysis
+++++++++++++++++
+* Add options to `modularAnalysis.writePi0EtaVeto` to:
+
+  * Require the soft photon being in the current RestOfEvent.
+  * Add separate selections to be applied during `modularAnalysis.reconstructDecay` for both the :math:`\pi^0` as well as
+    the :math:`\eta` reconstruction.
+
+Kinematic Fitting tools
++++++++++++++++++++++++
+* Added option to prepend label to OrkaKinfit variables to allow multiple fits to be performed in same path.
+
+Variables
++++++++++
+* Added variables `tSigB`, `tTagB` which represent reconstructed proper decay times of individual B mesons.
+* Added `DeltaT3D` = `tSigB` - `tTagB` as an alternative to the `DeltaT` variable.
+* Added the reconstructed coordinates of the Y4S vertex `Y4SvtxX`, `Y4SvtxY`, `Y4SvtxZ` and the Tag vertex
+  covariance matrix `TagVCov`.
+* Added `int` metavariable that can convert the floating point variables output to an integer value, 
+  that can be saved correctly by `VariablesToNtuple` module into an integer branch of a TTree. 
+
+Modules
++++++++
+* Add support for storing ``FileMetaData`` to `VariablesToNtuple` module. Ntuples will now have a ``persistent``
+  tree with ``FileMetaData`` branch with the relevant metadata information. 
+
+  * Add a new option ``dataDescription`` to `VariablesToNtuple` which accepts a dictionary of key:value pairs,
+    allowing users to store additional information in the ntuple metadata.
+  * Add ntuple file support to ``b2file-merge``, which is now the recommended tool to merge ntuples over
+    ``hadd``. ``b2file-metadata-show`` and ``b2file-metadata-add`` will also work with ntuples. 
+
+* Added a tunable buffer to the ``VariabesToTable`` module to improve compression efficiency and feather as new output format.
+
+Changes in the analysis package in light-2409-toyger
+----------------------------------------------------
+
+Modules
++++++++
+* Added a module ``VariabesToTable`` that writes Ntuples to hdf5, csv or parquet.
+* Added support for the FEI table format of the corrections repository to the analysis reweighting script
+
+Graph Neural Network based Flavor Tagger
+++++++++++++++++++++++++++++++++++++++++
+* Fixed a memory leak that affected light-2406-ragdoll and light-2408-savannah by upgrading the tensorflow version
+
+Changes in the analysis package in light-2408-savannah
+------------------------------------------------------
+
+Modules
++++++++
+* Fixed a bug in `MCDecayFinder`, which previously didn't find all true candidates when using the default arrow.
+* Fixed a bug in :ref:`analysis_reweighting` where the weights were not correctly assigned 
+  if a selection cut was applied on the input DataFrame.
+
+Variables
++++++++++
+* Added track variables `d0FromIP`, `z0FromIP` and `phi0FromIP`; which return the tracking parameters of the
+  point-of-closest-approach (POCA), with respect to the measured beam interaction point.
+* Added energy [in tau rest frame] of radiated photon from tau+/- decays: 'tauPlusEgstar'/'tauMinusEgstar'
+* Added a meta variable `useMCancestorBRestFrame` which returns the given variable in the rest frame of the
+  ancestor B MC particle.
+
+Command line tools
+++++++++++++++++++
+* Improved output and content of the :ref:`b2help-recommendation`.
+* Added new tool to list available FEI modes :ref:`b2help-print-fei-mode-names` and corresponding function `get_mode_names`.
+
+Charm Flavor Tagger
++++++++++++++++++++
+* Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
+  function ``charmFlavorTagger``) to ``CFT_ragdoll``. This value must be used for all releases as recent as
+  light-2406-ragdoll and release-09.

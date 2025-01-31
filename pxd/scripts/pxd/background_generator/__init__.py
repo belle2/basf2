@@ -19,6 +19,7 @@ from itertools import product
 from typing import Callable, Union
 
 import basf2
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import DataStore, PyStoreArray, PyStoreObj
 from ROOT.Belle2 import DBAccessorBase, DBStoreEntry
 from ROOT.Belle2 import VxdID, PXDDigit
@@ -269,7 +270,7 @@ class PXDBackgroundGenerator(basf2.Module):
         torch.manual_seed(seed)
 
         # instantiate objects for specifying distinct PXD modules
-        self._vxdids = tuple(VxdID(arg) for arg in VXDID_ARGS)
+        self._vxdids = tuple(VxdID(*arg) for arg in VXDID_ARGS)
 
         # get the name of the extension used by BGOverlayInput for background collections
         bkginfo = PyStoreObj("BackgroundInfo", DataStore.c_Persistent)

@@ -7,11 +7,9 @@
  **************************************************************************/
 
 #include <analysis/modules/Pi0VetoEfficiencySystematics/Pi0VetoEfficiencySystematics.h>
-#include <iostream>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/core/Environment.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/ParticleList.h>
 
@@ -32,6 +30,7 @@ REG_MODULE(Pi0VetoEfficiencySystematics);
 Pi0VetoEfficiencySystematicsModule::Pi0VetoEfficiencySystematicsModule() : Module()
 {
   setDescription("Includes data/MC weights for pi0 veto efficiency as extraInfo for a given particle list. One must call writeP0EtaVeto function in advance. Weights and their errors will be provided for given mode and threshold.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   std::vector<std::string> emptylist;
   addParam("particleLists", m_ParticleLists, "input particle lists", emptylist);
@@ -112,7 +111,16 @@ void Pi0VetoEfficiencySystematicsModule::addPi0VetoEfficiencyRatios(Particle* B,
     //The selected particle is photon reconstructed from ECL cluster
     WeightInfo info = getInfo(hardPhoton);
     for (const auto& entry : info) {
-      B->addExtraInfo("Pi0VetoEfficiencySystematics_" + m_mode + m_suffix + "_" + entry.first, entry.second);
+      const std::string extraInfoName = "Pi0VetoEfficiencySystematics_" + m_mode + m_suffix + "_" + entry.first;
+      if (B->hasExtraInfo(extraInfoName)) {
+        if (B->getExtraInfo(extraInfoName) != entry.second) {
+          B2INFO("extraInfo " << extraInfoName << " has been already set and will be overwritten. Original: "
+                 << B->getExtraInfo(extraInfoName) << ", New: " << entry.second);
+          B->setExtraInfo(extraInfoName, entry.second);
+        }
+      } else {
+        B->addExtraInfo(extraInfoName, entry.second);
+      }
     }
   } else {
     B2WARNING("The given hard photon is not from ECL or not photon");

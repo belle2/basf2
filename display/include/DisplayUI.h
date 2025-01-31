@@ -211,7 +211,7 @@ namespace Belle2 {
     /** show event/run/exp number for current event. */
     TGLabel* m_eventLabel{nullptr};
 
-    /** File name prefix (prefix + #event + "_" + projection + ".png"). */
+    /** File name prefix (prefix + event number + "_" + projection + ".png"). */
     TGTextEntry* m_autoFileNamePrefix{nullptr};
 
     /** width of saved PNGs. */

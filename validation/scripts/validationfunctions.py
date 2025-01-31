@@ -24,6 +24,8 @@ import time
 from typing import Dict, Optional, List, Union
 import logging
 from pathlib import Path
+import json
+import shutil
 
 # 3rd party
 import ROOT
@@ -111,6 +113,132 @@ def available_revisions(work_folder: str) -> List[str]:
         p.name for p in sorted(subfolders, key=lambda p: p.stat().st_mtime)
     ]
     return revisions
+
+
+def get_latest_nightly(work_folder: str) -> str:
+    """
+    Loops over the results folder and looks for nightly builds. It then returns
+    the most recent nightly tag sorted by date in the name. If no
+    nightly results are available then it returns the default 'current' tag.
+    :return: the most recent nightly build or current
+    """
+    available = available_revisions(work_folder)
+    available_nightlies = [
+        revision for revision in available
+        if revision.startswith("nightly")
+    ]
+    if available_nightlies:
+        return sorted(available_nightlies, reverse=True)[0]
+    else:
+        return 'current'
+
+
+def get_popular_revision_combinations(work_folder: str) -> List[str]:
+    """
+    Returns several combinations of available revisions that we might
+    want to pre-build on the server.
+
+    Returns:
+        List[List of revisions (str)]
+    """
+    available = sorted(
+        available_revisions(work_folder),
+        reverse=True
+    )
+    available_releases = [
+        revision for revision in available
+        if revision.startswith("release") or revision.startswith("prerelease")
+    ]
+    available_nightlies = [
+        revision for revision in available
+        if revision.startswith("nightly")
+    ]
+
+    def atindex_or_none(lst, index):
+        """ Returns item at index from lst or None"""
+        try:
+            return lst[index]
+        except IndexError:
+            return None
+
+    def remove_duplicates_lstlst(lstlst):
+        """ Removes duplicate lists in a list of lists """
+        # If we didn't care about the order:
+        # return list(map(list, set(map(tuple, lstlst))))
+        # would do the job. But we do care, or at least it is very
+        # relevant which revision is first (because it gets taken
+        # as reference)
+        ret = []
+        for lst in lstlst:
+            if lst not in ret:
+                ret.append(lst)
+        return ret
+
+    # Return value
+    ret = [
+        # All revisions
+        ["reference"] + sorted(available),
+
+        # Latest X + reference
+        ["reference", atindex_or_none(available_releases, 0)],
+        ["reference", atindex_or_none(available_nightlies, 0)],
+
+        # All latest + reference
+        ["reference"] + sorted(list(filter(
+            None,
+            [
+                atindex_or_none(available_releases, 0),
+                atindex_or_none(available_nightlies, 0)
+            ]
+        ))),
+
+        # All nightlies + reference
+        ["reference"] + sorted(available_nightlies)
+    ]
+
+    # Remove all Nones from the sublists
+    ret = [
+        list(filter(None, comb)) for comb in ret
+    ]
+    # Remove all empty lists
+    ret = list(filter(None, ret))
+
+    # Remove duplicates
+    ret = remove_duplicates_lstlst(ret)
+
+    if not ret:
+        sys.exit("No revisions seem to be available. Exit.")
+
+    return ret
+
+
+def clear_plots(work_folder: str, keep_revisions: List[str]):
+    """
+    This function will clear the plots folder to get rid of all but the
+    skipped revisions' associated plot files.
+    """
+
+    rainbow_file = os.path.join(work_folder, 'rainbow.json')
+    cleaned_rainbow = {}
+
+    keep_revisions = [sorted(revs) for revs in keep_revisions]
+
+    with open(rainbow_file) as rainbow:
+        entries = json.loads(rainbow.read())
+        for hash, revisions in entries.items():
+
+            if sorted(revisions) in keep_revisions:
+                print(f'Retaining {hash}')
+                cleaned_rainbow[hash] = revisions
+                continue
+
+            print(f'Removing {hash}:{revisions}')
+            work_folder_path = Path(os.path.join(work_folder, hash))
+            if work_folder_path.exists() and work_folder_path.is_dir():
+                shutil.rmtree(work_folder_path)
+
+    with open(rainbow_file, 'w') as rainbow:
+        rainbow.write(json.dumps(cleaned_rainbow, indent=4))
 
 
 def get_start_time() -> float:
@@ -207,7 +335,7 @@ def get_argument_parser(
     parser.add_argument(
         "-i",
         "--intervals",
-        help="Comma seperated list of intervals for which to execute the "
+        help="Comma separated list of intervals for which to execute the "
         "validation scripts. Default is 'nightly'",
         type=str,
         default="nightly",
@@ -500,7 +628,7 @@ def congratulator(
         success: Number of successes
         failure: Number of failures
         total: success + failures (out of success, failure and total, exactly
-            2 have to be spefified. If you want to use your own figure of
+            2 have to be specified. If you want to use your own figure of
             merit, just set total = 1. and set success to a number between 0.0
             (infernal) to 1.0 (stellar))
         just_comment: Do not add calculated percentage to return string.
@@ -565,7 +693,7 @@ def congratulator(
     if just_comment:
         return comment
     else:
-        return "{} {}%. {}".format(rate_name, int(success_rate), comment)
+        return f"{rate_name} {int(success_rate)}%. {comment}"
 
 
 def terminal_title_line(title="", subtitle="", level=0) -> str:
@@ -618,10 +746,16 @@ def get_file_metadata(filename: str) -> str:
     if not Path(filename).exists():
         raise FileNotFoundError(f"Could not find file {filename}")
 
-    proc = subprocess.run(
-        ["b2file-metadata-show", "-a", str(filename)],
-        stdout=subprocess.PIPE,
-        check=True,
-    )
-    metadata = proc.stdout.decode("utf-8")
+    metadata = None
+
+    try:
+        proc = subprocess.run(
+            ["b2file-metadata-show", "-a", str(filename)],
+            stdout=subprocess.PIPE,
+            check=True,
+        )
+        metadata = proc.stdout.decode("utf-8")
+    except subprocess.CalledProcessError as e:
+        print(e.stderr)
+
     return metadata

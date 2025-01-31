@@ -32,13 +32,13 @@ REG_MODULE(DQMHistAnalysisPXDER);
 
 DQMHistAnalysisPXDERModule::DQMHistAnalysisPXDERModule() : DQMHistAnalysisModule()
 {
-  //Set module properties
+  // This module CAN NOT be run in parallel!
   setDescription("PXD DQM analysis module for Express Reco ");
+
+  // Set module properties
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDER"));
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
-
-  // NO parallel processing
 }
 
 
@@ -85,7 +85,7 @@ void DQMHistAnalysisPXDERModule::initialize()
     int iSensor = 0;
     getIDsFromIndex(i, iLayer, iLadder, iSensor);
     VxdID sensorID(iLayer, iLadder, iSensor);
-    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     //----------------------------------------------------------------
     // Number of fired pixels per frame
@@ -259,8 +259,8 @@ void DQMHistAnalysisPXDERModule::event()
   // Compare histograms with reference histograms and create flags:
   for (int i = 0; i < c_nPXDSensors; i++) {
     double pars[2];
-    pars[0] = 0.01;// Probabilty value error?
-    pars[1] = 0.05;// Probabilty value warning?
+    pars[0] = 0.01;// Probability value error?
+    pars[1] = 0.05;// Probability value warning?
 
     double m_NoOfEvents = 1., m_NoOfEventsRef = 1.; // workaround
 
@@ -343,7 +343,7 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, d
     flagInt += temp->GetBinContent(j + 1);
     flagrInt += refhist->GetBinContent(j + 1);
   }
-  if (NEvents < 100) {  // not enough information for comparition
+  if (NEvents < 100) {  // not enough information for comparison
     iret = -1;
     flaghist->SetBinContent(bin + 1, -1);
     return iret;
@@ -462,3 +462,18 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, d
 //   delete refhistF;
 //   return ret;
 // }
+
+void DQMHistAnalysisPXDERModule::terminate()
+{
+  if (m_refFile) delete m_refFile;
+  if (m_fFiredFlag) delete m_fFiredFlag;
+  if (m_fClustersFlag) delete m_fClustersFlag;
+  if (m_fStartRowFlag) delete m_fStartRowFlag;
+  if (m_fChargStartRowFlag) delete m_fChargStartRowFlag;
+  if (m_fStartRowCountFlag) delete m_fStartRowCountFlag;
+  if (m_fClusterChargeFlag) delete m_fClusterChargeFlag;
+  if (m_fPixelSignalFlag) delete m_fPixelSignalFlag;
+  if (m_fClusterSizeUFlag) delete m_fClusterSizeUFlag;
+  if (m_fClusterSizeVFlag) delete m_fClusterSizeVFlag;
+  if (m_fClusterSizeUVFlag) delete m_fClusterSizeUVFlag;
+}

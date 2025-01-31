@@ -33,7 +33,7 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
            std::string("mu+:all"));
   addParam("AllowedDistance1D", m_AllowedDistance1D,
            "Maximal distance in the units of strip number from ExtHit to "
-           "matching KLMDigit.", double(8));
+           "matching KLMDigit (not for multi-strip hits).", double(8));
   addParam("MinimalMatchingDigits", m_MinimalMatchingDigits,
            "Minimal number of matching digits.", 0);
   addParam("MinimalMatchingDigitsOuterLayers",
@@ -195,19 +195,21 @@ void KLMStripEfficiencyCollectorModule::findMatchingDigit(
   struct HitData* hitData)
 {
   for (const KLMDigit& digit : m_Digits) {
-    /*
-     * TODO: multi-strip digits are ugnored for now.
-     * It is necessary to take them into account.
-     */
-    if (digit.isMultiStrip())
-      continue;
     if (!(digit.getSubdetector() == hitData->subdetector &&
           digit.getSection() == hitData->section &&
           digit.getLayer() == hitData->layer &&
           digit.getSector() == hitData->sector &&
           digit.getPlane() == hitData->plane))
       continue;
-    if (fabs(digit.getStrip() - hitData->strip) < m_AllowedDistance1D) {
+
+    double stripPosition = digit.getStrip();
+    double allowedDistance1D = m_AllowedDistance1D;
+
+    if (digit.isMultiStrip()) {
+      stripPosition = 0.5 * (digit.getLastStrip() + digit.getStrip());
+      allowedDistance1D *= (digit.getLastStrip() - digit.getStrip() + 1);
+    }
+    if (fabs(stripPosition - hitData->strip) < allowedDistance1D) {
       hitData->digit = &digit;
       return;
     }
@@ -231,7 +233,11 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(
   int layer;
   int extHitLayer[nExtrapolationLayers] = {0};
   int digitLayer[nExtrapolationLayers] = {0};
+  // initialize hitDataPrevious components
   hitDataPrevious.subdetector = -1;
+  hitDataPrevious.section = -1;
+  hitDataPrevious.sector = -1;
+  hitDataPrevious.layer = -1;
   for (const ExtHit& hit : extHits) {
     /*
      * Choose hits that exit the sensitive volume.
@@ -321,10 +327,10 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(
          * not available in ExtHit. For now, 2 entries are created (one for
          * each plane) for the first hit, and the second one is removed.
          */
-        if (hitData.subdetector == hitDataPrevious.subdetector &&
-            hitData.section == hitDataPrevious.section &&
-            hitData.sector == hitDataPrevious.sector &&
-            hitData.layer == hitDataPrevious.layer)
+        if ((hitData.subdetector == hitDataPrevious.subdetector) &&
+            (hitData.section == hitDataPrevious.section) &&
+            (hitData.sector == hitDataPrevious.sector) &&
+            (hitData.layer == hitDataPrevious.layer))
           continue;
         std::memcpy(&hitDataPrevious, &hitData, sizeof(struct HitData));
         /* The returned strip may be out of the valid range. */

@@ -232,7 +232,7 @@ void ParticleListManipulatorModule::fillUniqueIdentifier(const Particle* p, std:
   else idSequence.push_back(p->getPDGCode());
 
   if (p->getNDaughters() == 0) {
-    idSequence.push_back(p->getMdstArrayIndex());
+    idSequence.push_back(p->getMdstSource());
   } else {
     idSequence.push_back(p->getNDaughters());
     auto daughters = p->getDaughters();

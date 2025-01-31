@@ -25,6 +25,7 @@
 
 /* ROOT headers. */
 #include <TH2F.h>
+#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -51,7 +52,7 @@ eclMuMuECollectorModule::eclMuMuECollectorModule() : CalibrationCollectorModule(
   addParam("minPairMass", m_minPairMass, "minimum invariant mass of the muon pair (GeV/c^2)", 9.0);
   addParam("minTrackLength", m_minTrackLength, "minimum extrapolated track length in the crystal (cm)", 30.);
   addParam("MaxNeighbourE", m_MaxNeighbourE, "maximum energy allowed in a neighbouring crystal (GeV)", 0.010);
-  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "miniumum muon theta in lab (degrees)", 17.);
+  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "minimum muon theta in lab (degrees)", 17.);
   addParam("thetaLabMaxDeg", m_thetaLabMaxDeg, "maximum muon theta in lab (degrees)", 150.);
   addParam("measureTrueEnergy", m_measureTrueEnergy, "use MC events to obtain expected energies", false);
   addParam("requireL1", m_requireL1, "only use events that have a level 1 trigger", true);
@@ -133,7 +134,7 @@ void eclMuMuECollectorModule::prepare()
   } else if (m_thetaLabMinDeg > 179.) {
     cotThetaLabMax = -9999.;
   } else {
-    double thetaLabMin = m_thetaLabMinDeg * TMath::Pi() / 180.;
+    double thetaLabMin = m_thetaLabMinDeg * TMath::DegToRad();
     cotThetaLabMax = 1. / tan(thetaLabMin);
   }
   if (m_thetaLabMaxDeg < 1.) {
@@ -141,7 +142,7 @@ void eclMuMuECollectorModule::prepare()
   } else if (m_thetaLabMaxDeg > 179.) {
     cotThetaLabMin = -9999.;
   } else {
-    double thetaLabMax = m_thetaLabMaxDeg * TMath::Pi() / 180.;
+    double thetaLabMax = m_thetaLabMaxDeg * TMath::DegToRad();
     cotThetaLabMin = 1. / tan(thetaLabMax);
   }
   B2INFO("cotThetaLabMin: " << cotThetaLabMin);

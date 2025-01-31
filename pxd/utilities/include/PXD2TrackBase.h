@@ -18,7 +18,6 @@
 #include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
 
 #include <Math/Vector3D.h>
-#include <TVector3.h>
 #include <vector>
 
 
@@ -52,7 +51,7 @@ namespace Belle2 {
      * @param track_p The track with positive charge
      * @param track_m The track with negative charge
      */
-    PXD2TrackBase(const TVector3& vertex, const T& track_p, const T& track_m):
+    PXD2TrackBase(const ROOT::Math::XYZVector& vertex, const T& track_p, const T& track_m):
       m_vx(vertex.X()), m_vy(vertex.Y()), m_vz(vertex.Z()),
       m_track_p(track_p), m_track_m(track_m)
     {
@@ -61,7 +60,7 @@ namespace Belle2 {
     /** Get the vertex.
      * @return Vertex of the 2 tracks.
      */
-    TVector3 getVertex() const { return TVector3(m_vx, m_vy, m_vz); }
+    ROOT::Math::XYZVector getVertex() const { return ROOT::Math::XYZVector(m_vx, m_vy, m_vz); }
 
     /** Get the track with positive charge.
      * @return track struct with positive charge.

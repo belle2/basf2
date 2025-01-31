@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -102,6 +101,11 @@ class BaseSkim(ABC):
     Analysis globaltag.
     """
 
+    pidGlobaltag = None
+    """
+    PID globaltag.
+    """
+
     @property
     @abstractmethod
     def __description__(self):
@@ -136,6 +140,7 @@ class BaseSkim(ABC):
         validation=False,
         mc=True,
         analysisGlobaltag=None,
+        pidGlobaltag=None,
     ):
         """Initialise the BaseSkim class.
 
@@ -148,6 +153,7 @@ class BaseSkim(ABC):
                 instead of writing uDSTs.
             mc (bool): If True, include MC quantities in output.
             analysisGlobaltag (str): Analysis globaltag.
+            pidGlobaltag (str): PID globaltag.
         """
         self.name = self.__class__.__name__
         self.OutputFileName = OutputFileName
@@ -156,6 +162,7 @@ class BaseSkim(ABC):
         self._validation = validation
         self.mc = mc
         self.analysisGlobaltag = analysisGlobaltag
+        self.pidGlobaltag = pidGlobaltag
 
         if self.NoisyModules is None:
             self.NoisyModules = []
@@ -484,7 +491,7 @@ class CombinedSkim(BaseSkim):
 
     The heavy-lifting functions `BaseSkim.additional_setup`, `BaseSkim.build_lists` and
     `BaseSkim.output_udst` are modified to loop over the corresponding functions of each
-    invididual skim. The `load_standard_lists` method is also modified to load all
+    individual skim. The `load_standard_lists` method is also modified to load all
     required lists, without accidentally loading a list twice.
 
     Calling an instance of the `CombinedSkim` class will load all the required particle
@@ -509,6 +516,7 @@ class CombinedSkim(BaseSkim):
             OutputFileName=None,
             mc=None,
             analysisGlobaltag=None,
+            pidGlobaltag=None,
     ):
         """Initialise the CombinedSkim class.
 
@@ -526,6 +534,7 @@ class CombinedSkim(BaseSkim):
                 If mdstOutput=False, this option does nothing.
             mc (bool): If True, include MC quantities in output.
             analysisGlobaltag (str): Analysis globaltag.
+            pidGlobaltag (str): PID globaltag.
         """
 
         if NoisyModules is None:
@@ -562,6 +571,11 @@ class CombinedSkim(BaseSkim):
         if analysisGlobaltag is not None:
             for skim in self:
                 skim.analysisGlobaltag = analysisGlobaltag
+
+        self.pidGlobaltag = pidGlobaltag
+        if pidGlobaltag is not None:
+            for skim in self:
+                skim.pidGlobaltag = pidGlobaltag
 
         self._mdstOutput = mdstOutput
         self.mdst_kwargs = mdst_kwargs or {}

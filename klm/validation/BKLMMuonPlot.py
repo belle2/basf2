@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -65,10 +64,10 @@ def main():
     try:
         number_entries = file_chain.GetEntries()
     except AttributeError:
-        print('Could not load input file(s) %s.' % args.input_file)
+        print(f'Could not load input file(s) {args.input_file}.')
 
     if number_entries == 0:
-        print('Data tree is empty or does not exist in file(s) %s. Exit.' % args.input_file)
+        print(f'Data tree is empty or does not exist in file(s) {args.input_file}. Exit.')
         sys.exit(0)
 
     # open the output root file
@@ -196,7 +195,7 @@ def draw_bklmhists(file_chain):
 
     nPE = TH1F('nGenPE', 'Generated PE in BKLM', 200, 0.0, 200)
     file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE',
-                    subdetector_selection + ' && KLMDigits.getLayer() < 3')
+                    'KLMDigits.m_Subdetector==1 && KLMDigits.getLayer() < 3')
     nPE.GetXaxis().SetTitle('# generated PE')
     nPE.GetListOfFunctions().Add(TNamed('Description', 'Number of generated photoelectrons in BKLM'))
     nPE.GetListOfFunctions().Add(TNamed('Check', 'Peak around 50.'))

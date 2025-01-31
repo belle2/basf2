@@ -78,16 +78,16 @@ namespace Belle2 {
       std::vector<unsigned short> maxHitsPerSL = {1};
       /** Super layer pattern for which MLP is trained for all networks.
        *  Binary pattern of 9 * maxHitsPerSL bits (on/off for each hit).
-       *  0 in bit <i>: hits from super layer <i> are not used.
-       *  1 in bit <i>: hits from super layer <i> are used.
+       *  0 in bit \<i>: hits from super layer \<i> are not used.
+       *  1 in bit \<i>: hits from super layer \<i> are used.
        *  SLpattern = 0: use any hits present, don't check the pattern. */
       std::vector<unsigned long> SLpattern = {0};
       /** Super layer pattern mask for which MLP is trained for all networks.
        *  Binary pattern of 9 * maxHitsPerSL bits (on/off for each hit).
-       *  0 in bit <i>: super layer <i> may or may not have a hit.
-       *  1 in bit <i>: super layer <i>
-       *                - must have a hit if SLpattern bit <i> = 1
-       *                - must not have a hit if SLpattenr bit <i> = 0 */
+       *  0 in bit \<i>: super layer \<i> may or may not have a hit.
+       *  1 in bit \<i>: super layer \<i>
+       *                - must have a hit if SLpattern bit \<i> = 1
+       *                - must not have a hit if SLpattenr bit \<i> = 0 */
       std::vector<unsigned long> SLpatternMask = {0};
       /** Maximal drift time, identical for all networks. */
       unsigned tMax = 256;
@@ -237,6 +237,7 @@ namespace Belle2 {
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input
      * @param track   axial hit relations are taken from given track
+     * @param neurotrackinputmode input mode
      * @return super layer pattern of hits in the current track
      */
     unsigned long getInputPattern(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode);
@@ -255,8 +256,6 @@ namespace Belle2 {
     /** Select hits for each super layer from the ones related to input track
      * @param isector              index of the MLP that will use the input
      * @param track                all hit relations are taken from given track
-     * @param returnAllRelevant    if true, return all relevant hits instead of
-     *                             selecting the best (for making relations)
      * @return list of selected hit indices */
     std::vector<unsigned> selectHitsHWSim(unsigned isector, const CDCTriggerTrack& track);
 

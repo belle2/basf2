@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -10,12 +9,15 @@
 ##########################################################################
 
 import numpy as np
-import sys
 import os
 import tempfile
 
+import tensorflow as tf
+tf.config.threading.set_intra_op_parallelism_threads(1)
+tf.config.threading.set_inter_op_parallelism_threads(1)
 
-class State(object):
+
+class State:
     """
     Tensorflow state
     """
@@ -38,12 +40,6 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     """
     Return default tensorflow model
     """
-    try:
-        import tensorflow as tf
-    except ImportError:
-        print("Please install tensorflow: pip3 install tensorflow")
-        sys.exit(1)
-
     gpus = tf.config.list_physical_devices('GPU')
     if gpus:
         for gpu in gpus:
@@ -81,12 +77,6 @@ def load(obj):
     """
     Load Tensorflow estimator into state
     """
-    try:
-        import tensorflow as tf
-    except ImportError:
-        print("Please install tensorflow: pip3 install tensorflow")
-        sys.exit(1)
-
     gpus = tf.config.list_physical_devices('GPU')
     if gpus:
         for gpu in gpus:
@@ -113,12 +103,6 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    try:
-        import tensorflow as tf
-    except ImportError:
-        print("Please install tensorflow: pip3 install tensorflow")
-        sys.exit(1)
-
     r = state.model(tf.convert_to_tensor(np.atleast_2d(X), dtype=tf.float32)).numpy()
     if r.shape[1] == 1:
         r = r[:, 0]  # cannot use squeeze because we might have output of shape [1,X classes]
@@ -137,12 +121,6 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Pass batches of received data to tensorflow
     """
-    try:
-        import tensorflow as tf
-    except ImportError:
-        print("Please install tensorflow: pip3 install tensorflow")
-        sys.exit(1)
-
     with tf.GradientTape() as tape:
         avg_cost = state.model.loss(state.model(X), y, w)
         grads = tape.gradient(avg_cost, state.model.trainable_variables)
@@ -167,11 +145,6 @@ def end_fit(state):
     """
     Store tensorflow model in a graph
     """
-    try:
-        import tensorflow as tf
-    except ImportError:
-        print("Please install tensorflow: pip3 install tensorflow")
-        sys.exit(1)
     with tempfile.TemporaryDirectory() as path:
 
         tf.saved_model.save(state.model, path)

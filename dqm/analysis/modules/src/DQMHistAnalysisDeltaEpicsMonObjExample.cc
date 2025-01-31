@@ -30,6 +30,7 @@ DQMHistAnalysisDeltaEpicsMonObjExampleModule::DQMHistAnalysisDeltaEpicsMonObjExa
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("Example module for using delta histogramming and sending values to EPICS");
 
   // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("test"));
@@ -63,13 +64,54 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::initialize()
   registerEpicsPV(m_pvPrefix + "mean", "mean");
   registerEpicsPV(m_pvPrefix + "width", "width");
   registerEpicsPV(m_pvPrefix + "alarm", "alarm");
-  updateEpicsPVs(
-    5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
+
+  m_meanLowerAlarmLine = new TLine();
+  m_meanLowerAlarmLine->SetLineColor(kRed + 3);
+  m_meanLowerAlarmLine->SetLineWidth(3);
+  m_meanLowerAlarmLine->SetVertical(true);
+  m_meanLowerWarnLine = new TLine();
+  m_meanLowerWarnLine->SetLineColor(kOrange - 3);
+  m_meanLowerWarnLine->SetLineWidth(3);
+  m_meanLowerWarnLine->SetVertical(true);
+  m_meanUpperWarnLine = new TLine();
+  m_meanUpperWarnLine->SetLineColor(kOrange - 3);
+  m_meanUpperWarnLine->SetLineWidth(3);
+  m_meanUpperWarnLine->SetVertical(true);
+  m_meanUpperAlarmLine = new TLine();
+  m_meanUpperAlarmLine->SetLineColor(kRed + 3);
+  m_meanUpperAlarmLine->SetLineWidth(3);
+  m_meanUpperAlarmLine->SetVertical(true);
 }
 
 void DQMHistAnalysisDeltaEpicsMonObjExampleModule::beginRun()
 {
   B2DEBUG(1, "DQMHistAnalysisDeltaEpicsMonObjExample: beginRun called.");
+
+  double unused = NAN;
+  m_meanLowerAlarm = -1.0; // this is some way to set default values, which are used
+  m_meanLowerWarn = -0.9; // when none are set in epics PV directly.
+  m_meanUpperWarn = 0.9;
+  m_meanUpperAlarm = 1.0;
+  requestLimitsFromEpicsPVs("mean", m_meanLowerAlarm, m_meanLowerWarn, m_meanUpperWarn, m_meanUpperAlarm);
+
+  if (!std::isnan(m_meanLowerAlarm)) {
+    m_meanLowerAlarmLine->SetX1(m_meanLowerAlarm);
+    m_meanLowerAlarmLine->SetX2(m_meanLowerAlarm);
+  }
+  if (!std::isnan(m_meanLowerWarn)) {
+    m_meanLowerWarnLine->SetX1(m_meanLowerWarn);
+    m_meanLowerWarnLine->SetX2(m_meanLowerWarn);
+  }
+  if (!std::isnan(m_meanUpperWarn)) {
+    m_meanUpperWarnLine->SetX1(m_meanUpperWarn);
+    m_meanUpperWarnLine->SetX2(m_meanUpperWarn);
+  }
+  if (!std::isnan(m_meanUpperAlarm)) {
+    m_meanUpperAlarmLine->SetX1(m_meanUpperAlarm);
+    m_meanUpperAlarmLine->SetX2(m_meanUpperAlarm);
+  }
+
+  requestLimitsFromEpicsPVs("width", unused, unused, m_widthUpperWarn, m_widthUpperAlarm);
 }
 
 void DQMHistAnalysisDeltaEpicsMonObjExampleModule::endRun()
@@ -90,7 +132,7 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
 {
   double data_mean = 0.0;
   double data_width = 0.0;
-  int data_alarm = 0;
+  EStatus status = c_StatusDefault;
 
   m_canvas->Clear();
   m_canvas->cd(0);
@@ -106,7 +148,7 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
   // get basic histogram (run integrated up) but only if updated since last call
   // auto hist = findHist(m_histogramDirectoryName, m_histogramName, true);// only if updated
 
-  // the following cases do not make sense, unless you want to archieve something special.
+  // the following cases do not make sense, unless you want to achieve something special.
   // get most recent delta even if not updated
   // auto hist =  getDelta(m_histogramDirectoryName, m_histogramName, 0, false);// even if no update
   // get basic histogram (run integrated up) even if not updated
@@ -116,31 +158,35 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
     data_mean = hist->GetMean();
     data_width = hist->GetRMS();
 
-    // whatever condition
-    data_alarm = 2; // good, green
-    if (data_mean > 0.5 || data_mean < -0.5 || data_width > 0.5) data_alarm = 3; // warning, yellow
-    if (data_mean > 0.7 || data_mean < -0.7 || data_width > 0.7) data_alarm = 4; // error, red
+    // your conditions for warn and alarm
+    // here we would have to check against NaN, too ... just too lazy to write the code in this example
     // maybe other condition, e.g. too low to judge -> 0
+    status = makeStatus(true,
+                        data_mean > m_meanUpperWarn || data_mean < m_meanLowerWarn || data_width > m_widthUpperWarn,
+                        data_mean > m_meanUpperAlarm || data_mean < m_meanLowerAlarm || data_width > m_widthUpperAlarm);
 
     hist->Draw("hist");
 
-    // the following will be replaced by a base class function
-    auto color = kWhite;
-    switch (data_alarm) {
-      case 2:
-        color = kGreen;
-        break;
-      case 3:
-        color = kYellow;
-        break;
-      case 4:
-        color = kRed;
-        break;
-      default:
-        color = kGray;
-        break;
-    }
-    m_canvas->Pad()->SetFillColor(color);
+    // line position need to be adjusted to histogram content
+    double y1 = hist->GetMaximum();
+    double y2 = hist->GetMinimum();
+    auto ym = y1 + (y1 - y2) * 0.05;
+    m_meanLowerAlarmLine->SetY1(ym);
+    m_meanLowerWarnLine->SetY1(ym);
+    m_meanUpperWarnLine->SetY1(ym);
+    m_meanUpperAlarmLine->SetY1(ym);
+    auto yn = y2 + (y1 - y2) * 0.05;
+    m_meanLowerAlarmLine->SetY2(yn);
+    m_meanLowerWarnLine->SetY2(yn);
+    m_meanUpperWarnLine->SetY2(yn);
+    m_meanUpperAlarmLine->SetY2(yn);
+
+    if (!std::isnan(m_meanLowerAlarm)) m_meanLowerAlarmLine->Draw();
+    if (!std::isnan(m_meanLowerWarn)) m_meanLowerWarnLine->Draw();
+    if (!std::isnan(m_meanUpperWarn)) m_meanUpperWarnLine->Draw();
+    if (!std::isnan(m_meanUpperAlarm)) m_meanUpperAlarmLine->Draw();
+
+    colorizeCanvas(m_canvas, status);
   }
 
   // Tag canvas as updated ONLY if things have changed.
@@ -163,10 +209,9 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
       // we do not want to fill epics again at end of run, as this would be identical to the last event called before.
       setEpicsPV("mean", data_mean);
       setEpicsPV("width", data_width);
-      setEpicsPV("alarm", data_alarm);
-      // until now, chnages are buffered only locally, not written out to network for performance reason
-      updateEpicsPVs(
-        5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
+      setEpicsPV("alarm", int(status));
+      // until now, changes are buffered only locally, not waiting for them being written out to performance reason
+      // framework will take care after all analysis modules are done
     }
   }
 }

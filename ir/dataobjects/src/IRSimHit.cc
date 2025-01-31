@@ -16,19 +16,19 @@ IRSimHit::~IRSimHit()
 }
 
 /** The method to set.*/
-void IRSimHit::setposIn(TVector3 posIn)
+void IRSimHit::setposIn(ROOT::Math::XYZVector posIn)
 {
   m_posIn = posIn;
 }
-void IRSimHit::setmomIn(TVector3 momIn)
+void IRSimHit::setmomIn(ROOT::Math::XYZVector momIn)
 {
   m_momIn = momIn;
 }
-void IRSimHit::setposOut(TVector3 posOut)
+void IRSimHit::setposOut(ROOT::Math::XYZVector posOut)
 {
   m_posOut = posOut;
 }
-void IRSimHit::setmomOut(TVector3 momOut)
+void IRSimHit::setmomOut(ROOT::Math::XYZVector momOut)
 {
   m_momOut = momOut;
 }
@@ -46,10 +46,10 @@ void IRSimHit::setVolname(const std::string& Volname)
 }
 
 /** The method to get.*/
-TVector3 IRSimHit::getposIn() { return m_posIn; }
-TVector3 IRSimHit::getmomIn() { return m_momIn; }
-TVector3 IRSimHit::getposOut() { return m_posOut; }
-TVector3 IRSimHit::getmomOut() { return m_momOut; }
+ROOT::Math::XYZVector IRSimHit::getposIn() { return m_posIn; }
+ROOT::Math::XYZVector IRSimHit::getmomIn() { return m_momIn; }
+ROOT::Math::XYZVector IRSimHit::getposOut() { return m_posOut; }
+ROOT::Math::XYZVector IRSimHit::getmomOut() { return m_momOut; }
 int IRSimHit::getPDGcode() { return m_PDGcode; }
 float IRSimHit::getdepEnergy() { return m_depEnergy; }
 std::string IRSimHit::getVolname() { return m_Volname; }

@@ -10,17 +10,17 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <filesystem>
 #include <sys/stat.h>
 
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 namespace Belle2::Conditions {
   PayloadProvider::PayloadProvider(const std::vector<std::string>& locations, const std::string& cacheDir, int timeout): m_timeout{timeout}
   {
-    // check whether we have a chache directory ... otherwise use default
+    // check whether we have a cache directory ... otherwise use default
     if (!cacheDir.empty()) {
       m_cacheDir = {fs::absolute(cacheDir).string(), false};
     } else {
@@ -92,7 +92,7 @@ namespace Belle2::Conditions {
 
   bool PayloadProvider::getRemoteFile(const PayloadLocation& loc, PayloadMetadata& metadata)
   {
-    // we want to download payloads in a hashed directory structure to keep amount of payloads per directory to a managable level
+    // we want to download payloads in a hashed directory structure to keep amount of payloads per directory to a manageable level
     const auto local = fs::path(m_cacheDir.base) / getFilename(EDirectoryLayout::c_hashed, metadata);
     // empty location: use the central server supplied baseUrl from payload metadata
     const bool fallback = loc.base.empty();
@@ -130,8 +130,8 @@ namespace Belle2::Conditions {
         throw std::runtime_error("cannot open file for writing????");
       }
       // and make sure it's readable for all
-      boost::filesystem::permissions(local, boost::filesystem::all_all &
-                                     ~(boost::filesystem::owner_exe | boost::filesystem::group_exe | boost::filesystem::others_exe));
+      fs::permissions(local, fs::perms::all &
+                      ~(fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec));
       // File is open. Someone might have downloaded the file
       // while we waited, check md5sum again.
       B2DEBUG(37, "Ok, check digest in case another process downloaded already...");

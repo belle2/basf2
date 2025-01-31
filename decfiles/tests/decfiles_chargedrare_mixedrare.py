@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -72,7 +71,7 @@ diff_found = False
 differ = difflib.Differ()
 for particle in decay_belle2.keys():
     for group in (d for d in difflib.SequenceMatcher(None, [line for _, line in decay_belle2[particle]],
-                                                           [line for _, line in special_files[particle]])
+                                                     [line for _, line in special_files[particle]])
                   .get_grouped_opcodes(0)):
         for change in group:
             if change[0] == 'equal':

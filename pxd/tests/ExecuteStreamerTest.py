@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -23,4 +22,4 @@ with tempfile.TemporaryDirectory() as tempdir:
     # might not be the most elegant way but cannot directly redirect ROOT Error
     os.system("basf2 " + testScript + " > output.log 2>&1")
     # and check if an Error related to TStreamer was thrown
-    assert(0 == open('output.log', 'r').read().count('Error in <TStreamerInfo::Build>'))
+    assert(0 == open('output.log').read().count('Error in <TStreamerInfo::Build>'))

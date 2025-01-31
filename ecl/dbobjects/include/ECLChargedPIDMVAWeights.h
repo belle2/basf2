@@ -64,7 +64,7 @@ namespace Belle2 {
      */
     int getLinearisedBinIndex(const std::vector<float> values)
     {
-      int globalBin;
+      int globalBin(-1);
       std::vector<int> binIndices = getBinIndices(values);
       for (unsigned int i = 0; i < binIndices.size(); i++) {
         if (binIndices[i] < 0) return -1;
@@ -157,7 +157,6 @@ namespace Belle2 {
     * Useful constructor.
     * @param weightfilePath path to the MVA weightfile for this phasespace category.
     * @param mvaResponeTransformMode mva response transform mode booked for this phasespace.
-    * @param pdfs vector of unordered_map mapping hypothesis to pdfs for each mva response.
     * @param mvaIndexForHypothesis unordered_map mapping hypothesis to index of mva response. Useful if we exclude a class from the MVA training
     *        but want to use the likelihood of a different particle. For example using the proton pdf for a deuteron.
     */
@@ -176,7 +175,7 @@ namespace Belle2 {
       } else  if (boost::ends_with(weightfilePath, ".xml")) {
         weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(weightfilePath);
       } else {
-        B2WARNING("Unkown file extension for file: " << weightfilePath << ", fallback to xml...");
+        B2WARNING("Unknown file extension for file: " << weightfilePath << ", fallback to xml...");
         weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(weightfilePath);
       }
       std::stringstream ss;
@@ -206,7 +205,7 @@ namespace Belle2 {
     /**
      * Getter for pdfs.
      * @param iMVAResponse index of MVA response.
-     * @param hypoPDG, hypothesis pdg.
+     * @param hypoPDG hypothesis pdg.
      */
     const TF1* getPDF(const unsigned int iMVAResponse, const unsigned int hypoPDG) const
     {
@@ -216,7 +215,7 @@ namespace Belle2 {
     /**
      * Gets the cdf for the hypothesis pdg for a given response value.
      * @param iMVAResponse index of MVA response.
-     * @param hypoPDG, hypothesis pdg.
+     * @param hypoPDG hypothesis pdg.
      */
     const TH1F* getCDF(const unsigned int iMVAResponse, const int hypoPDG) const
     {
@@ -225,7 +224,7 @@ namespace Belle2 {
 
     /**
      * Gets the decorrelation matrix for a given particle hypothesis.
-     * @param hypoPDG, hypothesis pdg.
+     * @param hypoPDG hypothesis pdg.
      */
     const std::vector<float>* getDecorrelationMatrix(const int hypoPDG) const
     {
@@ -332,7 +331,7 @@ namespace Belle2 {
 
     /**
      * A vector of unodered maps. The vector corresponds to the return values of the MVA, one for each class correspondonding to charged stable particles considered by the MVA. In general this is the full six charged stable particles {e, mu, pi, K, p, d}.
-     * The unordered map maps the hypothesis pdg values to their matching TF1 pdfs from which the liklihood will be taken.
+     * The unordered map maps the hypothesis pdg values to their matching TF1 pdfs from which the likelihood will be taken.
      */
     std::vector<std::unordered_map<unsigned int, TF1>> m_pdfs;
 
@@ -350,7 +349,7 @@ namespace Belle2 {
     std::vector<std::unordered_map<unsigned int, TH1F>> m_cdfs;
 
     /**
-     * Decorrelation matrices. To be used (optionally) afer gaussianisation.
+     * Decorrelation matrices. To be used (optionally) after gaussianisation.
      * The unordered map maps the hypothesis pdg values to their matching linearised decorrelation matrix.
      */
     std::unordered_map<unsigned int, std::vector<float>> m_decorrelationMatrices;
@@ -396,7 +395,7 @@ namespace Belle2 {
 
     /**
      * Returns the ith ECLChargedPIDPhasespaceCategory.
-     * @param idx, index of ECLChargedPIDPhasespaceCategory.
+     * @param idx index of ECLChargedPIDPhasespaceCategory.
      */
     const ECLChargedPIDPhasespaceCategory* getPhasespaceCategory(const unsigned int idx)  const {return &m_phasespaceCategories.at(idx);}
 

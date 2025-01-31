@@ -67,9 +67,9 @@ namespace Belle2 {
     SVDRecoDigit(VxdID sensorID, bool isU, short cellID, float fittedAmplitude,
                  float fittedAmplitudeError, float fittedTime, float fittedTimeError,
                  const T& probabilities, float chi2):
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID),
       m_fittedAmplitude(fittedAmplitude), m_fittedAmplitudeError(fittedAmplitudeError),
-      m_fittedTime(fittedTime), m_fittedTimeError(fittedTimeError), m_fitChi2Ndf(chi2)
+      m_fittedTime(fittedTime), m_fittedTimeError(fittedTimeError), m_fitChi2Ndf(chi2),
+      m_cellID(cellID), m_sensorID(sensorID), m_isU(isU)
     {
       // Expecting input array normalized to 1, but don't rely on it.
       double inputNorm = std::accumulate(probabilities.begin(), probabilities.end(), 0.0);
@@ -125,7 +125,7 @@ namespace Belle2 {
     float getAmplitudeError() const { return m_fittedAmplitudeError; }
 
     /** Get time estimate
-     * @returm fitted signal arrival time
+     * @return fitted signal arrival time
      */
     float getTime() const { return m_fittedTime; }
 
@@ -177,18 +177,18 @@ namespace Belle2 {
 
   private:
 
-    VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
-    bool m_isU; /**< True if U, false if V. */
-    short m_cellID; /**< Strip coordinate in pitch units. */
+    StoredProbArray m_probabilities; /**< pdf of the time estimate. */
     //    float m_stripNoise; /**< Noise of the strip, from calibration. */
     float m_fittedAmplitude; /**< Fitted amplitude of the signal ("charge") */
     float m_fittedAmplitudeError; /**< Error estimate of amplitude fit. */
     float m_fittedTime; /**< Fitted arrival time of the signal. */
     float m_fittedTimeError; /**< Error estimate of time fit. */
-    StoredProbArray m_probabilities; /**< pdf of the time estimate. */
     float m_fitChi2Ndf; /**< Standardized chi2 of the fit. */
+    short m_cellID; /**< Strip coordinate in pitch units. */
+    VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
+    bool m_isU; /**< True if U, false if V. */
 
-    ClassDef(SVDRecoDigit, 3)
+    ClassDef(SVDRecoDigit, 4)
 
   }; // class SVDRecoDigit
 

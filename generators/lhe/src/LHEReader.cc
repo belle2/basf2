@@ -15,7 +15,6 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
 #include <TF1.h>
@@ -174,7 +173,7 @@ int LHEReader::readEventHeader(double& eventWeight)
   tokenizer tokens(line, sep);
   int index(0);
 
-  BOOST_FOREACH(const string & tok, tokens) {
+  for (const string& tok : tokens) {
     ++index;
     try {
       fields.push_back(boost::lexical_cast<double>(tok));
@@ -204,7 +203,7 @@ int LHEReader::readParticle(MCParticleGraph::GraphParticle& particle)
   tokenizer tokens(line, sep);
   int index(0);
 
-  BOOST_FOREACH(const string & tok, tokens) {
+  for (const string& tok : tokens) {
     ++index;
     try {
       fields.push_back(boost::lexical_cast<double>(tok));

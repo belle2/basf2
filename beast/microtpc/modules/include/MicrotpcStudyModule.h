@@ -12,7 +12,7 @@
 #include <framework/core/HistoModule.h>
 #include <vector>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <TH3.h>
@@ -91,7 +91,7 @@ namespace Belle2 {
       /** number of detectors. Read from MICROTPC.xml*/
       int nTPC = 0;
       /** TPC coordinate */
-      std::vector<TVector3> TPCCenter;
+      std::vector<ROOT::Math::XYZVector> TPCCenter;
       /** Event counter */
       //int Event = 0;
       /** rate */

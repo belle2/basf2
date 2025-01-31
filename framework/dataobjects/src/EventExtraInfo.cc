@@ -60,3 +60,52 @@ std::vector<std::string> EventExtraInfo::getNames() const
     out.push_back(pair.first);
   return out;
 }
+
+
+
+std::string EventExtraInfo::getExtraStringInfo(const std::string& name) const
+{
+  if (hasExtraStringInfo(name)) return eventExtraStringInfo.at(name);
+  else throw std::runtime_error("EventExtraInfo::getExtraStringInfo: You try to access the EventExtraInfo '" + name +
+                                  "', but it doesn't exist.");
+}
+
+bool EventExtraInfo::hasExtraStringInfo(const std::string& name) const
+{
+  return not(eventExtraStringInfo.find(name) == eventExtraStringInfo.end());
+}
+
+
+void EventExtraInfo::removeExtraStringInfo()
+{
+  eventExtraStringInfo.clear();
+}
+
+void EventExtraInfo::addExtraStringInfo(const std::string& name, const std::string& value)
+{
+  if (hasExtraStringInfo(name)) {
+    throw std::out_of_range(std::string("Key with name ") + name + " already exists in EventExtraInfo.");
+  }
+  eventExtraStringInfo[name] = value;
+}
+
+void EventExtraInfo::setExtraStringInfo(const std::string& name, const std::string& value)
+{
+  eventExtraStringInfo[name] = value;
+}
+
+std::vector<std::string> EventExtraInfo::getStringInfoNames() const
+{
+  std::vector<std::string> out;
+  for (const auto& pair : eventExtraStringInfo)
+    out.push_back(pair.first);
+  return out;
+}
+
+std::string EventExtraInfo::getEventType() const
+{
+  if (hasExtraStringInfo(std::string("eventType")))
+    return getExtraStringInfo(std::string("eventType"));
+  else
+    return std::string("");
+}

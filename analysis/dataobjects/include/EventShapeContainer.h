@@ -13,7 +13,6 @@
 
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
-#include <TLorentzVector.h>  // needed for schema evolution
 #include <vector>
 
 namespace Belle2 {

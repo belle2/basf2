@@ -1,8 +1,11 @@
-[INFO] Steering file: framework/tests/filemetadata.py
+[INFO] Steering file: filemetadata.py
 [INFO] The random number seed is set to "something important"
 [INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Added file b2filemetadata.root
 === FileMetaData ===
 LFN:        /logical/file/name
 nEvents:    10
+nFullEvents: 10
 range:      7/1/1 - 7/15/1
 parents:    []

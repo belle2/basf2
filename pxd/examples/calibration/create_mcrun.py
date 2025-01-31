@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -79,10 +78,7 @@ main.add_module(bkgmixer)
 output = main.add_module('RootOutput')
 output.param(
     'outputFileName',
-    'beam.{:0>4}.{:0>5}.HLT2.f{:0>5}.root'.format(
-        args.expNo,
-        args.runNo,
-        args.setNo))
+    f'beam.{args.expNo:0>4}.{args.runNo:0>5}.HLT2.f{args.setNo:0>5}.root')
 output.param('branchNames', ['PXDSimHits', 'EventMetaData'])
 main.add_module("Progress")
 

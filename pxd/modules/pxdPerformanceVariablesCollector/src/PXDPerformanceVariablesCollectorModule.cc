@@ -316,14 +316,14 @@ void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackClu
 
   int uBin(-1), vBin(-1);
   int binID = 0;
-  VxdID sensorID = getVxdIDFromPXDModuleID(cluster.pxdID);
+  VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
   auto layerNumber = sensorID.getLayerNumber();
   auto ladderNumber = sensorID.getLadderNumber();
   auto sensorNumber = sensorID.getSensorNumber();
   try {
     binID = getBinID(trackCluster, uBin, vBin, m_useClusterPosition);
   } catch (...) {
-    // It happends very rarely (2 track clusters out of all in s-proc3 HLT bhabha skim.)
+    // It happens very rarely (2 track clusters out of all in s-proc3 HLT bhabha skim.)
     // One could check hit reconstruction bias and the calculation of uBin/vBin in PXDGainCalibrator
     B2ERROR("On module " << sensorID
             << ": Failed to get bin ID for the track cluster at (u,v) = (" << cluster.posU << "," << cluster.posV
@@ -334,7 +334,7 @@ void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackClu
 // Increment the counter
   getObjectPtr<TH1I>("PXDClusterCounter")->Fill(binID);
 
-  // Fill variabels into tree
+  // Fill variables into tree
   if (m_fillChargeTree) {
     string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
     getObjectPtr<TTree>(treename)->Fill();
@@ -360,7 +360,7 @@ void PXDPerformanceVariablesCollectorModule::collectEfficiencyVariables(const Tr
   auto z = tPoint.z;
 
   VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
-  const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+  const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
   auto localPoint = Info.pointToLocal(ROOT::Math::XYZVector(tPoint.x, tPoint.y, tPoint.z), true);
   auto uID = Info.getUCellID(localPoint.X());
   auto vID = Info.getVCellID(localPoint.Y());

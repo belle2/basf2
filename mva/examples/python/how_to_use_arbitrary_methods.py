@@ -18,7 +18,7 @@ import basf2_mva
 import basf2_mva_util
 
 
-class MyFancyClassifier(object):
+class MyFancyClassifier:
     """ Let's assume we have written our own classifier (or installed something from github) """
 
     def __init__(self, *my_fancy_parameters):

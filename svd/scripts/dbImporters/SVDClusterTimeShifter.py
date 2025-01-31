@@ -15,9 +15,11 @@
 
 
 from ROOT import Belle2
+import basf2 as b2
 import datetime
 import json
 import argparse
+import math
 
 now = datetime.datetime.now()
 
@@ -61,7 +63,12 @@ if __name__ == "__main__":
 
     for alg in param["shiftValues"]:
         for sType in param["shiftValues"][alg]:
-            payload.setClusterTimeShift(alg, sType, param["shiftValues"][alg][sType])
+            shiftVals = param["shiftValues"][alg][sType]
+            for strip in range(len(shiftVals)):
+                val = shiftVals[strip]
+                if math.fabs(val) > 10:
+                    b2.B2WARNING(f"cluster time shift ({val}) is very large for ({alg} : {sType} : size {strip + 1})")
+            payload.setClusterTimeShift(alg, sType, shiftVals)
 
     # write out the payload to localdb directory
     Belle2.Database.Instance().storeData(Belle2.SVDClusterTimeShifter.name, payload, iov)

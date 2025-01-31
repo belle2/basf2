@@ -115,7 +115,7 @@ namespace Belle2 {
     /** point on helix corresponding to a flown path length s (from poca) */
     ROOT::Math::XYZVector position(double s) const
     {
-      //aproximation (but it does work for straight tracks)
+      //approximation (but it does work for straight tracks)
       return m_poca + ROOT::Math::XYZVector(
                s * s * m_omega / 2 * sin(m_phi) + s * cos(m_phi),
                -s * s * m_omega / 2 * cos(m_phi) + s * sin(m_phi),

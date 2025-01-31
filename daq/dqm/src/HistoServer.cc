@@ -9,6 +9,7 @@
 
 #include <framework/pcore/MsgHandler.h>
 #include <ctime>
+#include <unistd.h>
 
 using namespace Belle2;
 using namespace std;
@@ -33,7 +34,7 @@ int HistoServer:: init()
   m_sock = new EvtSocketRecv(m_port, false);
   m_man = new EvtSocketManager(m_sock);
   //  m_mapfile = TMapFile::Create(m_filename.c_str(), "RECREATE", MAPFILESIZE);
-  m_memfile = new DqmMemFile(m_filename, "write", MEMFILESIZE);
+  m_memfile = new DqmMemFile(m_filename, "write", DqmMemFile::c_memFileSize);
   m_hman = new HistoManager(m_memfile);
 
   // Semaphore to ensure exclusive access to shm
@@ -50,7 +51,7 @@ int HistoServer::server()
   MsgHandler msghdl(0);
   char mbstr[100];
   time_t now;
-  char* buffer = new char[MAXBUFSIZE];
+  char* buffer = new char[c_maxBufSize];
   //  vector<int> recvsock;
   int loop_counter = 0;
   bool updated = false;
@@ -65,7 +66,7 @@ int HistoServer::server()
            it != recvsock.end(); ++it) {
         int fd = *it;
         if (m_man->connected(fd)) {
-          int is = sio.get(fd, buffer, MAXBUFSIZE);
+          int is = sio.get(fd, buffer, c_maxBufSize);
           if (is <= 0) {
             now = time(0);
             strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
@@ -107,7 +108,13 @@ int HistoServer::server()
               updated = false;
               continue;
             }
-            auto lpos = objname.find("SUBDIR:");
+            auto lpos = objname.find("DQMRC:SAVE:");
+            if (lpos != string::npos) {
+              auto filename = objname.substr(11);
+              m_hman->filedump(filename);
+              continue;
+            }
+            lpos = objname.find("SUBDIR:");
             if (lpos != string::npos) {
               subdir = objname.substr(7);
               if (subdir == "EXIT") subdir = "";
@@ -121,7 +128,7 @@ int HistoServer::server()
     }
     usleep(1000);
     loop_counter++;
-    if (loop_counter % MERGE_INTERVAL == 0 && updated) {
+    if (loop_counter % c_mergeIntervall == 0 && updated) {
       now = time(0);
       strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
       printf("[%s] HistoServer: merging histograms\n", mbstr);

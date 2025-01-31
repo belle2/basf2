@@ -5,6 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 /* ---------------------------------------------------------------------- *\
    nsmlib2.h
 
@@ -18,13 +19,10 @@
 #include <stdio.h>       /* for FILE * */
 #include <netinet/in.h>  /* for struct sockaddr_in */
 
-#include "nsm2.h"
+#include "nsm2/nsm2.h"
 
 #if defined(__cplusplus)
 extern "C" {
-#endif
-#if defined(__dummy_close_bracket_to_cheat_emacs_auto_indent)
-}
 #endif
 
 /* -- DATA TYPES ----------------------------------------------------- */
@@ -158,9 +156,6 @@ void nsmlib_call(NSMcontext* nsmc, struct NSMtcphead_struct* hp);
 NSMparse* nsmlib_parsefile(const char* datname, int revision,
                            const char* incpath, char* fmtstr, int* revisionp);
 
-#if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
-__dummy_open_bracket_to_cheat_emacs_auto_indent {
-#endif
 #if defined(__cplusplus)
 }
 #endif

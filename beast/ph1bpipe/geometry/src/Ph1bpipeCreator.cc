@@ -14,9 +14,6 @@
 #include <framework/gearbox/GearDir.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -33,7 +30,6 @@
 #include "G4Trd.hh"
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -123,7 +119,7 @@ namespace Belle2 {
       //bool flag_limitStep = false;
 //      bool flag_limitStep = true;
 
-///      double stepSize = content.getLength("stepSize", 5*CLHEP::um);
+//      double stepSize = content.getLength("stepSize", 5*CLHEP::um);
       double SafetyLength = 0.1 * CLHEP ::cm;
 
       double xpipe_hz1 = content.getLength("xpipe_hz1") * CLHEP::cm;

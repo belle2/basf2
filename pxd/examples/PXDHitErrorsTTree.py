@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -59,7 +58,7 @@ class PXDHitErrorsTTree(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(PXDHitErrorsTTree, self).__init__()
+        super().__init__()
         #: Output ROOT file.
         self.file = ROOT.TFile('PXDHitErrorOutput.root', 'recreate')
         #: TTree for output data
@@ -99,7 +98,7 @@ class PXDHitErrorsTTree(b2.Module):
 
             for truehit in cluster_truehits:
                 # Now let's store some data
-                # Sesnor identification
+                # Sensor identification
                 vxd_id = truehit.getSensorID()
                 self.data.vxd_id = vxd_id.getID()
                 self.data.layer = vxd_id.getLayerNumber()
@@ -109,7 +108,7 @@ class PXDHitErrorsTTree(b2.Module):
                 self.data.cluster_index = cluster.getArrayIndex()
 
                 # Get sensor geometry information
-                sensor_info = Belle2.VXD.GeoCache.get(vxd_id)
+                sensor_info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(vxd_id)
                 thickness = sensor_info.getThickness()
 
                 # TrueHit information

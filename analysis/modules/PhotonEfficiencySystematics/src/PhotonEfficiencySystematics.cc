@@ -8,12 +8,12 @@
 
 // Own header.
 #include <analysis/modules/PhotonEfficiencySystematics/PhotonEfficiencySystematics.h>
-#include <iostream>
+
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/core/Environment.h>
-#include <analysis/VariableManager/Manager.h>
 
 #include <map>
 
@@ -34,11 +34,12 @@ PhotonEfficiencySystematicsModule::PhotonEfficiencySystematicsModule() : Module(
   setDescription(
     R"DOC(Module to include data/MC weights for photon detection efficiency. Include in your code as
 
-    .. code:: python
+.. code:: python
 
-        mypath.add_module("PhotonEfficiencySystematics", particleLists=['gamma:cut'], tableName=tableName_Weight)
+    mypath.add_module("PhotonEfficiencySystematics", particleLists=['gamma:cut'], tableName=tableName_Weight)
 
 		     )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("tableName", m_tableName, "ID of table used for reweighing");
@@ -94,7 +95,16 @@ void PhotonEfficiencySystematicsModule::addPhotonDetectionEfficiencyRatios(Parti
     //particle is photon reconstructed from ECL cluster
     WeightInfo info = getInfo(particle);
     for (const auto& entry : info) {
-      particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
+      const std::string extraInfoName = m_tableName + "_" + entry.first;
+      if (particle->hasExtraInfo(extraInfoName)) {
+        if (particle->getExtraInfo(extraInfoName) != entry.second) {
+          B2INFO("extraInfo " << extraInfoName << " has been already set and will be overwritten. Original: "
+                 << particle->getExtraInfo(extraInfoName) << ", New: " << entry.second);
+          particle->setExtraInfo(extraInfoName, entry.second);
+        }
+      } else {
+        particle->addExtraInfo(extraInfoName, entry.second);
+      }
     }
   }
 }

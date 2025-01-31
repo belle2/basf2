@@ -14,13 +14,14 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <regex>
-#include <boost/filesystem.hpp>
+#include <filesystem>
+
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
 using namespace std;
 namespace io = boost::iostreams;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 namespace Belle2::gearbox {
 

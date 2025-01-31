@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -52,7 +51,7 @@ main.add_module(input)
 
 # output
 output = b2.register_module('RootOutput')
-output.param("outputFileName", "trgsum/trgsum.%s.root" % basename)
+output.param("outputFileName", f"trgsum/trgsum.{basename}.root")
 if not os.path.isdir('trgsum'):
     os.mkdir('trgsum')
 

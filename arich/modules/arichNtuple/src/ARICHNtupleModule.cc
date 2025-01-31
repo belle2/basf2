@@ -32,7 +32,7 @@
 #include <framework/logging/Logger.h>
 
 // ROOT
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <vector>
 
 namespace Belle2 {
@@ -52,7 +52,7 @@ namespace Belle2 {
     m_tree(0)
   {
     // set module description (e.g. insert text)
-    setDescription("The module saves variables needed for performance analysis, such as postion and momentum of the hit, likelihoods for hypotheses and number of photons.");
+    setDescription("The module saves variables needed for performance analysis, such as position and momentum of the hit, likelihoods for hypotheses and number of photons.");
 
     // Add parameters
     addParam("outputFile", m_outputFile, "ROOT output file name", std::string("ARICHNtuple.root"));
@@ -179,9 +179,8 @@ namespace Belle2 {
 
       // set hapd window hit if available
       if (arichTrack.hitsWindow()) {
-        TVector2 winHit = arichTrack.windowHitPosition();
-        m_arich.winHit[0] = winHit.X();
-        m_arich.winHit[1] = winHit.Y();
+        m_arich.winHit[0] = arichTrack.windowHitPosition().X();
+        m_arich.winHit[1] = arichTrack.windowHitPosition().Y();
       }
 
       if (lkh->getFlag() == 1) m_arich.inAcc = 1;
@@ -277,24 +276,24 @@ namespace Belle2 {
         m_arich.photons.push_back(iph);
       }
 
-      TVector3 recPos = arichTrack.getPosition();
+      ROOT::Math::XYZVector recPos = arichTrack.getPosition();
       m_arich.recHit.x = recPos.X();
       m_arich.recHit.y = recPos.Y();
       m_arich.recHit.z = recPos.Z();
 
-      TVector3 recMom = arichTrack.getDirection() * arichTrack.getMomentum();
-      m_arich.recHit.p = recMom.Mag();
+      ROOT::Math::XYZVector recMom = arichTrack.getDirection() * arichTrack.getMomentum();
+      m_arich.recHit.p = recMom.R();
       m_arich.recHit.theta = recMom.Theta();
       m_arich.recHit.phi = recMom.Phi();
 
       if (aeroHit) {
-        TVector3 truePos = aeroHit->getPosition();
+        ROOT::Math::XYZVector truePos = aeroHit->getPosition();
         m_arich.mcHit.x = truePos.X();
         m_arich.mcHit.y = truePos.Y();
         m_arich.mcHit.z = truePos.Z();
 
-        TVector3 trueMom = aeroHit->getMomentum();
-        m_arich.mcHit.p = trueMom.Mag();
+        ROOT::Math::XYZVector trueMom = aeroHit->getMomentum();
+        m_arich.mcHit.p = trueMom.R();
         m_arich.mcHit.theta = trueMom.Theta();
         m_arich.mcHit.phi = trueMom.Phi();
 

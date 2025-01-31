@@ -5,8 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef HISTOSERVER_H
-#define HISTOSERVER_H
+#pragma once
 
 #include <string>
 
@@ -17,16 +16,15 @@
 
 #include <daq/dqm/HistoManager.h>
 
-#define MAXBUFSIZE 160000000
-
-#define MAPFILESIZE 512000000
-
-// interval to invoke histogram merge (in msec*2)
-#define MERGE_INTERVAL 5000
 
 namespace Belle2 {
 
   class HistoServer {
+  public:
+    enum {c_maxBufSize = 160000000 };
+// interval to invoke histogram merge (in msec*2)
+    enum { c_mergeIntervall = 5000 };
+
   public:
     HistoServer(int port, const std::string& mapfile);
     ~HistoServer();
@@ -47,5 +45,4 @@ namespace Belle2 {
     HistoManager* m_hman;
   };
 }
-#endif
 

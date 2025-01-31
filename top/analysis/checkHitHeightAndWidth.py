@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -17,7 +16,7 @@ from ROOT import TH2F, TFile, gDirectory
 # ------------------------------------------------------------------------
 # Simple module to study the width and amplitude of TOPDigits
 #
-# usage: basf2 checkHitHeightAndWidth.py -i <raw_data.sroot>
+# usage: basf2 checkHitHeightAndWidth.py -i <raw_data.root>
 # ------------------------------------------------------------------------
 
 
@@ -30,7 +29,7 @@ class Histogrammer(b2.Module):
 
         #: output file
         self.tfile = TFile.Open('hitHeightAndWidth.root', 'recreate')
-        dirs = [gDirectory.mkdir('slot_' + '{:0=2d}'.format(slot)) for slot in range(1, 17)]
+        dirs = [gDirectory.mkdir('slot_' + f'{slot:02d}') for slot in range(1, 17)]
 
         #: Width VS amplitude plot in each slot
         self.hist = []
@@ -42,7 +41,7 @@ class Histogrammer(b2.Module):
             h = TH2F('WidthVSAmplitude', 'Slot ' + str(slot) +
                      ';amplitude [ADC counts]; width [ns]', 2000, 0, 2000, 200, 0, 10)
             self.hist.append(h)
-            hh = [TH2F('WidthVSample_ch' + '{:0=3d}'.format(ch), 'Slot ' + str(slot) + ', channel ' + str(ch) +
+            hh = [TH2F('WidthVSample_ch' + f'{ch:03d}', 'Slot ' + str(slot) + ', channel ' + str(ch) +
                        ';sample; width [ns]', 256, 0, 256, 200, 0, 10) for ch in range(512)]
             self.histSampling.append(hh)
 
@@ -76,8 +75,8 @@ b2.conditions.append_globaltag('online')
 main = b2.create_path()
 
 # input
-roinput = b2.register_module('SeqRootInput')
-# roinput = b2.register_module('RootInput')
+# roinput = b2.register_module('SeqRootInput')  # sroot files
+roinput = b2.register_module('RootInput')  # root files
 main.add_module(roinput)
 
 # Initialize TOP geometry parameters (creation of Geant geometry is not needed)

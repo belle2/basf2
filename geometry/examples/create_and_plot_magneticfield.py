@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -33,7 +32,7 @@ scan_type = "zx"
 stepsU = (1800, -400., 500.)
 stepsV = (1600, -400., 400.)
 fieldtype = "MagneticField"
-filename = "fieldmap-%s.pdf" % scan_type
+filename = f"fieldmap-{scan_type}.pdf"
 # if true, the magnetic field will be shown using a blue-white-red gradient,
 # white being no field.
 show_color = True
@@ -152,7 +151,7 @@ cmap_material = mpl.cm.get_cmap('binary')
 # create pdf file and fill with plots
 pdf = PdfPages(filename)
 for component in ["Bx", "By", "Bz", "B"]:
-    print("Create %s fieldmap plot" % component)
+    print(f"Create {component} fieldmap plot")
     h = rfieldmap_file.Get(component)
     data, extent = get_hist_data(h)
     # we need the scale to be symmetric so find out what is the maximal

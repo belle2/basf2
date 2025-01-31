@@ -12,7 +12,6 @@
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <map>
 #include <optional>
 #include <string>
 
@@ -50,5 +49,7 @@ namespace Belle2 {
     std::vector<uint32_t> m_prescaleCounters;
     /** EventMetaData is used to report warning/error messages. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+    /** Check event is the first event for hbasf2 usage, especiaaly for HLT storage. */
+    bool m_firstEvent{false};
   };
 }

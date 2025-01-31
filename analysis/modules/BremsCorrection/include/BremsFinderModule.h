@@ -22,7 +22,6 @@
 #include <string>
 
 namespace Belle2 {
-  class Particle;
 
   /**
    * Bremsstrahlung finder correction module

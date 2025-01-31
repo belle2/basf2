@@ -8,22 +8,8 @@
 
 #include <dqm/modules/PhysicsObjectsMiraBelle/PhysicsObjectsMiraBelleDst2Module.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/variables/ContinuumSuppressionVariables.h>
-#include <analysis/variables/TrackVariables.h>
-#include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/variables/Variables.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dataobjects/HitPatternVXD.h>
-#include <mdst/dataobjects/EventLevelTrackingInfo.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
-#include <top/variables/TOPDigitVariables.h>
-#include <arich/modules/arichDQM/ARICHDQMModule.h>
-#include <arich/dataobjects/ARICHLikelihood.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <TDirectory.h>
 #include <map>
@@ -45,7 +31,9 @@ PhysicsObjectsMiraBelleDst2Module::PhysicsObjectsMiraBelleDst2Module() : HistoMo
 void PhysicsObjectsMiraBelleDst2Module::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("PhysicsObjectsMiraBelleDst2")->cd();
+  oldDir->mkdir("PhysicsObjectsMiraBelleDst2");
+  oldDir->cd("PhysicsObjectsMiraBelleDst2");
+
   // Mass distributions
   m_h_D0_pi0_InvM = new TH1F("hist_D0_pi0_InvM", "#pi^{0} mass of D^{*}#rightarrowK#pi#pi^{0};D0_pi0_InvM;", 50, 0.09, 0.17);
 

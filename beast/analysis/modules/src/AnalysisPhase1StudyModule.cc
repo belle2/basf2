@@ -14,13 +14,10 @@
 #include <framework/gearbox/Const.h>
 #include <cmath>
 
-#include <fstream>
 #include <string>
 
 // ROOT
-#include <TVector3.h>
-#include <TH1.h>
-#include <TH2.h>
+#include <TMath.h>
 
 using namespace std;
 

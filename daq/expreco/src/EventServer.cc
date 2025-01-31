@@ -9,6 +9,8 @@
 #include "daq/expreco/EventServer.h"
 #include <framework/pcore/MsgHandler.h>
 
+#include <unistd.h>
+
 using namespace Belle2;
 using namespace std;
 
@@ -38,7 +40,7 @@ int EventServer::server()
   char* evtbuffer = new char[MAXEVTSIZE];
 
   //  vector<int> recvsock;
-  int loop_counter = 0;
+  int loop_counter [[maybe_unused]] = 0;
   while (m_force_exit == 0) {
     // Pick up a event from RingBuffer (non blocking)
     int size = m_rbuf->remq((int*)evtbuffer);

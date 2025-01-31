@@ -32,7 +32,7 @@ SVDHotStripFinderModule::SVDHotStripFinderModule() : Module()
   addParam("searchBase", m_base,
            "number of strips used to compute the average occupancy, possible choices = 32, 64, 128. Default = -1, use all sensor strips.",
            int(-1));
-  //additional paramters to import on the DB:
+  //additional parameters to import on the DB:
   addParam("zeroSuppression", m_zs, "ZeroSuppression cut of the input SVDShaperDigits", float(5));
   addParam("firstExp", m_firstExp, "experiment number", int(-1));
   addParam("firstRun", m_firstRun, "run number", int(-1));
@@ -140,7 +140,7 @@ void SVDHotStripFinderModule::beginRun()
   m_hHotStripsSummary = new SVDSummaryPlots("hotStripsSummary@view", "Number of HotStrips on @view/@side Side");
 
 
-  // DQM style historgram  number of hs vs sensor plane
+  // DQM style histogram  number of hs vs sensor plane
   h_tot_dqm =  createHistogram1D("htodqm", "HS per sensor", 28, 0, 28.0, "HS per sensor", m_histoList_occu);
   h_tot_dqm1 =  createHistogram1D("htodqm1", "HS per sensor1", 350, 0, 350.0, "HS per sensor ", m_histoList_occu);
 
@@ -332,9 +332,9 @@ void SVDHotStripFinderModule::endRun()
       oldDir->cd();
       m_hHotStripsSummary->getHistogram(0)->Write();
       m_hHotStripsSummary->getHistogram(1)->Write();
+      m_rootFilePtr->Close();
     }
 
-    m_rootFilePtr->Close();
     //import the filled dbobjects to the ConditionDB
     if (m_firstExp == -1)
       m_firstExp = exp;
@@ -444,7 +444,7 @@ void SVDHotStripFinderModule::terminate()
               if (tmp_occ > 0.0) {
                 hm_dist->fill(*itSvdSensors, k, tmp_occ); // ..
                 h_tot_dist->Fill(tmp_occ);
-                hm_dist1->fill(*itSvdSensors, k, tmp_occ1); //occupancy as probablity to fire the strip
+                hm_dist1->fill(*itSvdSensors, k, tmp_occ1); //occupancy as probability to fire the strip
                 h_tot_dist1->Fill(tmp_occ1);
                 hm_dist12->fill(*itSvdSensors, k, tmp_occ, tmp_occ1); // 2D distribution
                 h_tot_dist12->Fill(tmp_occ, tmp_occ1);
@@ -468,7 +468,7 @@ void SVDHotStripFinderModule::terminate()
               if (ibase == 64) threshold_corrections = 12.0;
               if (ibase == 128) threshold_corrections = 6.0;
 
-              if (position1[l] > 0.01 * m_thr * threshold_corrections) { // if probablity is larger then threshold mark as Hot strip
+              if (position1[l] > 0.01 * m_thr * threshold_corrections) { // if probability is larger then threshold mark as Hot strip
                 hsflag[l] = 1; // HS vector
                 flag[l] = 0; // mark strip as bad for second pass
                 iths++;
@@ -502,7 +502,7 @@ void SVDHotStripFinderModule::terminate()
               }
             }
             // for Laura .. HS flags, place interface for DB
-            // outputs : hsflag[l]  1- HS 0- non HS, flag[l]    0- bad strip, 1 working strip, h_tot_dist1   occupancy as probablity of firing the strip
+            // outputs : hsflag[l]  1- HS 0- non HS, flag[l]    0- bad strip, 1 working strip, h_tot_dist1   occupancy as probability of firing the strip
 
 
             for (int l = 0; l < 768; l++) {

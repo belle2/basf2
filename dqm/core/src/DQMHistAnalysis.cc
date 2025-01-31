@@ -374,7 +374,7 @@ void DQMHistAnalysisModule::ExtractRunType(std::vector <TH1*>& hs)
   B2ERROR("ExtractRunType: Histogram \"DQMInfo/rtype\" missing");
 }
 
-void DQMHistAnalysisModule::ExtractEvent(std::vector <TH1*>& hs)
+void DQMHistAnalysisModule::ExtractNEvent(std::vector <TH1*>& hs)
 {
   s_eventProcessed = 0;
   for (size_t i = 0; i < hs.size(); i++) {

@@ -17,28 +17,6 @@ namespace Belle2 {
   class CDCSimHit : public SimHitBase {
 
   private:
-
-    //! The WireID of the hit.
-    WireID m_wireID;
-
-    //! The track id of this hit.
-    unsigned short m_trackId;
-
-    //! Particle PDG (can be one of secondaries).
-    int m_pdg;
-
-    //! Drift length of this hit.
-    float m_driftLength;
-
-    //!  Flight time from IP.
-    float m_flightTime;
-
-    //! Deposited energy of this hit.
-    float m_edep;
-
-    //! Step length of this hit.
-    float m_stepLength;
-
     //! The momentum at closest point.
     float m_momentum[3];
 
@@ -54,6 +32,30 @@ namespace Belle2 {
     //! Position on the track.
     float m_posTrack[3];
 
+    //! The WireID of the hit.
+    WireID m_wireID;
+
+    /** Time of energy deposition */
+    float m_globalTime;
+
+    //! Drift length of this hit.
+    float m_driftLength;
+
+    //!  Flight time from IP.
+    float m_flightTime;
+
+    //! Deposited energy of this hit.
+    float m_edep;
+
+    //! Step length of this hit.
+    float m_stepLength;
+
+    //! Particle PDG (can be one of secondaries).
+    int m_pdg;
+
+    //! The track id of this hit.
+    unsigned short m_trackId;
+
     /**
      * The flag to denote this hit is in the left or right side.
      * bit0: old L/R flag;
@@ -61,9 +63,6 @@ namespace Belle2 {
      * bit2: new L/R flag for tracking.
      */
     unsigned char m_leftRight;
-
-    /** Time of energy deposition */
-    float m_globalTime;
 
 
   public:
@@ -248,11 +247,12 @@ namespace Belle2 {
     */
 
     CDCSimHit(): SimHitBase(),
-      m_trackId(0), m_pdg(0), m_driftLength(0.0),
-      m_flightTime(0.0), m_edep(0.0), m_stepLength(1.0),
       m_momentum(), m_posWire(),
       m_posIn(), m_posOut(), m_posTrack(),
-      m_leftRight(0), m_globalTime(0.0)
+      m_globalTime(0.0), m_driftLength(0.0), m_flightTime(0.0),
+      m_edep(0.0), m_stepLength(1.0),
+      m_pdg(0), m_trackId(0),
+      m_leftRight(0)
     {}
 
     //! Useful Constructor
@@ -309,6 +309,6 @@ namespace Belle2 {
 
 
     /** ROOT Macro. */
-    ClassDefOverride(CDCSimHit, 6);
+    ClassDefOverride(CDCSimHit, 7);
   };
 } // end namespace Belle2

@@ -338,7 +338,11 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
 
     if prune_temporary_tracks:
         for temporary_reco_tracks in temporary_reco_track_list:
-            path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_tracks)
+            path.add_module(
+                'PruneRecoTracks',
+                storeArrayName=temporary_reco_tracks).set_name(
+                "PruneRecoTracks " +
+                temporary_reco_tracks)
 
 
 def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=None,
@@ -587,7 +591,11 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     if prune_temporary_tracks:
         for temporary_reco_track_name in temporary_reco_track_list:
             if temporary_reco_track_name != reco_tracks:
-                path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_track_name)
+                path.add_module(
+                    'PruneRecoTracks',
+                    storeArrayName=temporary_reco_track_name).set_name(
+                    "PruneRecoTracks " +
+                    temporary_reco_track_name)
 
 
 def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,

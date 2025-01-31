@@ -1930,7 +1930,7 @@ namespace Belle2 {
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
         if (!ListOfParticles.isValid()) return 0;
 
-        const auto mdstIndex = particle->getMdstArrayIndex();
+        const auto mdstSource = particle->getMdstSource();
 
         Particle* target = nullptr; //Particle selected as target
         for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
@@ -1939,7 +1939,7 @@ namespace Belle2 {
           if (!particlei)
             continue;
 
-          if (particlei->getMdstArrayIndex() == mdstIndex) {
+          if (particlei->getMdstSource() == mdstSource) {
             target = particlei;
             break;
           }

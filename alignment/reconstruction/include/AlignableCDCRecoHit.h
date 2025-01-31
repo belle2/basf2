@@ -80,6 +80,6 @@ namespace Belle2 {
 
   private:
     /** ROOT Macro.*/
-    ClassDefOverride(AlignableCDCRecoHit, 1);
+    ClassDefOverride(AlignableCDCRecoHit, 2);
   };
 }

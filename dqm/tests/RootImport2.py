@@ -18,8 +18,8 @@ from ROOT import TFile, TH1F, gROOT
 
 gROOT.SetBatch(True)
 
-filein = "histin3.root"
-fileout = 'histout3.root'
+filein = "histin2.root"
+fileout = 'histout2.root'
 
 f = TFile(filein, "RECREATE")
 

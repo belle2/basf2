@@ -23,6 +23,8 @@ database.txt
 dbstore_PXDClusterShapeIndexPar_rev_4e623c.root
 dbstore_PXDClusterPositionEstimatorPar_rev_be220e.root
 
+The revision numbers will obviously be different with different trainings.
+
 $ basf2 plotPXDPositionEstimator.py -- --resultdir=results --dbfile=./localdb/database.txt
 
 Visualizes the cluster shape payloads from localdb. Creates a folder results containing plots. 
@@ -30,7 +32,7 @@ Visualizes the cluster shape payloads from localdb. Creates a folder results con
 
 $ basf2 test_cluster_position_estimator.py -- --dbfile=./localdb/database.txt
 
-Produces a root file (VTXPositionEstimation.root) with all sorts of histograms about residuals and pulls.
+Produces a root file (PXDPositionEstimation.root) with all sorts of histograms about residuals and pulls.
 
 
 $ b2conditionsdb tag create DEV   GT_NAME_HERE “Development cluster Shape payloads”

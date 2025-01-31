@@ -55,7 +55,7 @@ main(int argc, const char* argv[])
   const string outname = "TRGCDCConfig_" + version + "_" + ts0 + ".dat";
 
   //...Get path to data...
-  const string path = getenv(ENV_PATH);
+  const string path = (getenv(ENV_PATH) != nullptr ? getenv(ENV_PATH) : "");
   const string inname = path + "/data/trg/" + argv[1];
   cout << tab << "CDC Wire Config    : " << inname << endl;
   cout << tab << "CDC Trigger Config : " << outname << endl;

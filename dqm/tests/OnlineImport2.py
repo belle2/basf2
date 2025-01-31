@@ -18,9 +18,9 @@ from ROOT import Belle2, TFile, TH1F, gROOT
 
 gROOT.SetBatch(True)
 
-filein = "histin6.root"
-fileout = 'histout6.root'
-statfile = "stats6.txt"
+filein = "histino2.root"
+fileout = 'histouto2.root'
+statfile = "statso2.txt"
 
 f = TFile(filein, "RECREATE")
 

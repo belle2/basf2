@@ -76,9 +76,9 @@ ParticleKinematicFitterModule::ParticleKinematicFitterModule() : Module(), m_tex
   addParam("recoilMass", m_recoilMass, "Recoil mass in GeV. RecoilMass constraint only.", 0.0);
   addParam("invMass", m_invMass, "Invariant mass in GeV. Mass constraint only.", 0.0);
   addParam("variablePrefix", m_prefix, "Prefix attached to extra info variables.", string(""));
-  addParam("listDirectionOnlyParticles", m_listDirectionOnlyParticles,
+  addParam("directionOnlyParticles", m_listDirectionOnlyParticles,
            "boolean list indicating index of particles where only direction is used in the fit");
-  addParam("listAlternateMassHypo", m_listAlternateMassHypo,
+  addParam("alternateMassHypos", m_listAlternateMassHypo,
            "integer list of pdg values for particles where different mass hypo. is used in the fit");
 
 }

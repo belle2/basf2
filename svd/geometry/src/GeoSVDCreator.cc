@@ -782,6 +782,7 @@ namespace Belle2 {
             supportAssembly.add(bendVolume, placement);
           }
         }
+        delete bendVolume;
       }
 
       return supportAssembly;

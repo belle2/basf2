@@ -401,7 +401,7 @@ void TRGECLDQMModule::event()
   const int NofTCHit = TCId.size();
 
   int nTCHitPerClk_total[8] = {0};
-  int nTCHitPerClk_part[3][8] = {0};
+  int nTCHitPerClk_part[3][8] = {{0}};
   double totalEnergy = 0;
   TrgEclMapping* a = new TrgEclMapping();
   double max = 0;

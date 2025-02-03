@@ -87,6 +87,7 @@ TagVertexModule::TagVertexModule() : Module(),
 {
   // Set module properties
   setDescription("Tag side Vertex Fitter for modular analysis");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("listName", m_listName, "name of particle list", string(""));

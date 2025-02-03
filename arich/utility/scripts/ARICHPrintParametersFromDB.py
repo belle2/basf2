@@ -15,6 +15,7 @@ from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import ARICHDatabaseImporter
 from optparse import OptionParser
 
+# basf2 ARICHPrintParametersFromDB.py -- -t data_prompt_rel08 -e 31 -r 13 -o ARICHGlobalAlignment
 parser = OptionParser()
 parser.add_option('-t', '--tag', dest='tag', default='',
                   help='database tag from which to import/export data')
@@ -24,6 +25,7 @@ parser.add_option('-r', '--run', dest='run',
                   default=-1, help='run')
 parser.add_option('-o', '--object', dest='object',
                   default="", help='object to be printed')
+parser.add_option('-d', '--dump', dest='dump', action='store_true', default=False, help='dump payload to localdb')
 
 
 (options, args) = parser.parse_args()
@@ -61,28 +63,29 @@ if exp > 0 and run > 0:
     dbImporter.setExperimentAndRun(exp, run)
 
 if options.object == 'ARICHModulesInfo':
-    dbImporter.printModulesInfo()
+    dbImporter.printModulesInfo(dump=options.dump)
 elif options.object == 'ARICHSimulationPar':
-    dbImporter.printSimulationPar()
+    dbImporter.printSimulationPar(dump=options.dump)
 elif options.object == 'ARICHChannelMask':
-    dbImporter.printChannelMask()  # use dbImporter.printChannelMask(True) to make 2d map of active channels
+    dbImporter.printChannelMask(dump=options.dump)
+    # use dbImporter.printChannelMask(True, dump=options.dump)) to make 2d map of active channels
 elif options.object == 'ARICHChannelMapping':
-    dbImporter.printChannelMapping()
+    dbImporter.printChannelMapping(dump=options.dump)
 elif options.object == 'ARICHMergerMapping':
-    dbImporter.printMergerMapping()
+    dbImporter.printMergerMapping(dump=options.dump)
 elif options.object == 'ARICHCopperMapping':
-    dbImporter.printCopperMapping()
+    dbImporter.printCopperMapping(dump=options.dump)
 elif options.object == 'ARICHReconstructionPar':
-    dbImporter.printReconstructionPar()
+    dbImporter.printReconstructionPar(dump=options.dump)
 elif options.object == 'ARICHGlobalAlignment':
-    dbImporter.printGlobalAlignment()
+    dbImporter.printGlobalAlignment(dump=options.dump)
 elif options.object == 'ARICHMirrorAlignment':
-    dbImporter.printMirrorAlignment()
+    dbImporter.printMirrorAlignment(dump=options.dump)
 elif options.object == 'ARICHAeroTilesAlignment':
-    dbImporter.printAeroTilesAlignment()
+    dbImporter.printAeroTilesAlignment(dump=options.dump)
 elif options.object == 'ARICHGeometryConfig':
     # print geometry parameters of ARICH detector from the database
-    dbImporter.printGeometryConfig()
+    dbImporter.printGeometryConfig(dump=options.dump)
 elif options.object == 'moduleNumbering':
     # creates file with numbering of HAPD module slots (position on detector plane -> module number)
     dbImporter.dumpModuleNumbering()
@@ -95,6 +98,6 @@ elif options.object == 'MergerMap':
     dbImporter.dumpMergerMapping()
 elif options.object == 'FEMappings':
     # prints FE mappings (module to merger to copper) in json suitable format
-    dbImporter.printFEMappings()
+    dbImporter.printFEMappings(dump=options.dump)
 else:
     print('Non-valid arich DB object!')

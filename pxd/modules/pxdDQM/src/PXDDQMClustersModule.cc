@@ -47,7 +47,7 @@ PXDDQMClustersModule::PXDDQMClustersModule() : HistoModule()
 {
   //Set module properties
   setDescription("PXD DQM clusters module "
-                 "Recommended Number of events for monitorin is 40 kEvents or more to fill all histograms "
+                 "Recommended Number of events for monitoring is 40 kEvents or more to fill all histograms "
                 );
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing

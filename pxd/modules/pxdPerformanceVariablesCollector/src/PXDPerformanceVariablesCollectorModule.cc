@@ -323,7 +323,7 @@ void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackClu
   try {
     binID = getBinID(trackCluster, uBin, vBin, m_useClusterPosition);
   } catch (...) {
-    // It happends very rarely (2 track clusters out of all in s-proc3 HLT bhabha skim.)
+    // It happens very rarely (2 track clusters out of all in s-proc3 HLT bhabha skim.)
     // One could check hit reconstruction bias and the calculation of uBin/vBin in PXDGainCalibrator
     B2ERROR("On module " << sensorID
             << ": Failed to get bin ID for the track cluster at (u,v) = (" << cluster.posU << "," << cluster.posV
@@ -334,7 +334,7 @@ void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackClu
 // Increment the counter
   getObjectPtr<TH1I>("PXDClusterCounter")->Fill(binID);
 
-  // Fill variabels into tree
+  // Fill variables into tree
   if (m_fillChargeTree) {
     string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
     getObjectPtr<TTree>(treename)->Fill();

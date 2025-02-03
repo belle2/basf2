@@ -18,8 +18,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <TRotation.h>
 
-#include <string>
-
 namespace Belle2 {
 
   /**

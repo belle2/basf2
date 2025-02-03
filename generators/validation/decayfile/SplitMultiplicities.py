@@ -83,7 +83,8 @@ class SplitMultiplicities(basf2.Module):
         extraInfoName_B0 = f'nGen_{self.pdgcode}_B0'
         extraInfoName_antiB0 = f'nGen_{self.pdgcode}_antiB0'
 
-        self.eventExtraInfo.create()
+        if not self.eventExtraInfo.isValid():
+            self.eventExtraInfo.create()
         self.eventExtraInfo.setExtraInfo(extraInfoName, gen_counter)
         self.eventExtraInfo.setExtraInfo(extraInfoName_Bp, Bp_counter)
         self.eventExtraInfo.setExtraInfo(extraInfoName_Bm, Bm_counter)

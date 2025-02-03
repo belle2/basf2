@@ -15,9 +15,6 @@
 
 #include <gtest/gtest.h>
 
-#include <iostream>
-#include <string>
-
 using namespace std;
 using namespace Belle2;
 using namespace alignment;
@@ -30,7 +27,7 @@ namespace Belle2 {
     short vxdSensor;
     /// Testing cdc id
     short cdcWire;
-    /// Testng parameter id
+    /// Testing parameter id
     int paramid;
 
     /** init */

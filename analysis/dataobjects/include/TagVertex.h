@@ -15,7 +15,6 @@
 #include <string>
 
 // DataObjects
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
 

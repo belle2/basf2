@@ -52,7 +52,7 @@ void PXDGatedDHCDQMModule::initialize()
 
 void PXDGatedDHCDQMModule::beginRun()
 {
-  // Assume that everthing is non-zero ;-)
+  // Assume that everything is non-zero ;-)
   hGateAfterInjLER->Reset();
   hGateAfterInjHER->Reset();
 }

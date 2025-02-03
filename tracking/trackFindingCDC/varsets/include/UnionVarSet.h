@@ -107,6 +107,17 @@ namespace Belle2 {
         return m_varSets.size();
       }
 
+      /**
+       *  Forward prefixed parameters of this findlet to the module parameter list.
+       */
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      {
+        Super::exposeParameters(moduleParamList, prefix);
+        for (const std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
+          varSet->exposeParameters(moduleParamList, prefix);
+        }
+      }
+
     private:
       /// Collection of contained variables sets.
       std::vector<std::unique_ptr<ContainedVarSet>> m_varSets;

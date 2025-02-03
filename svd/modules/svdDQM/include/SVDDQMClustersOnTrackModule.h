@@ -131,12 +131,12 @@ namespace Belle2 {
 
     /** u Time of clusters related to tracks for layer 3 sensors for 3 samples*/
     TH1F* m_cls3SampleTrkTimeU3 = nullptr;
-    /** v Time of clusters related to tracks for layer 3  sensors for 3 sampes*/
+    /** v Time of clusters related to tracks for layer 3  sensors for 3 samples*/
     TH1F* m_cls3SampleTrkTimeV3 = nullptr;
 
     /** u Time of clusters related to tracks for layer 3 sensors for 3 samples*/
     TH1F* m_cls6SampleTrkTimeU3 = nullptr;
-    /** v Time of clusters related to tracks for layer 3  sensors for 3 sampes*/
+    /** v Time of clusters related to tracks for layer 3  sensors for 3 samples*/
     TH1F* m_cls6SampleTrkTimeV3 = nullptr;
 
     /** u Time of clusters related to tracks for layer 4,5,6 sensors */

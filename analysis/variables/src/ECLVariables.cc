@@ -1009,14 +1009,14 @@ namespace Belle2 {
         }
 
         double connectedRegionID = eclClusterConnectedRegionID(particle);
-        unsigned mdstArrayIndex = particle->getMdstArrayIndex();
+        int mdstSource = particle->getMdstSource();
 
         for (unsigned int i = 0; i < photonlist->getListSize(); i++)
         {
           const Particle* part = photonlist->getParticle(i);
 
           // skip the particle itself
-          if (part->getMdstArrayIndex() == mdstArrayIndex) {
+          if (part->getMdstSource() == mdstSource) {
             continue;
           }
 

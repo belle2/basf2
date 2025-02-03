@@ -488,3 +488,11 @@ double Variable::Manager::evaluate(const std::string& varName, const Particle* p
     return (double)std::get<bool>(var->function(p));
   else return std::numeric_limits<double>::quiet_NaN();
 }
+
+std::vector<double> Variable::Manager::evaluateVariables(const std::vector<std::string>& varNames, const Particle* p)
+{
+  std::vector<double> values(varNames.size());
+  for (size_t i = 0; i < varNames.size(); ++i)
+    values[i] = evaluate(varNames[i], p);
+  return values;
+}

@@ -21,7 +21,7 @@ path.add_module('ParticleLoader', decayStrings=['e+'])
 
 # Write out electron id and momentum of all true electron candidates
 v2csv_e = VariablesToTable(
-    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.csv", "csv")
+    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.csv")
 path.add_module(v2csv_e)
 
 # event-wise mode is not supported at the moment. when it is add something like

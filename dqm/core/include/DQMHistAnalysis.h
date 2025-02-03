@@ -423,7 +423,7 @@ namespace Belle2 {
     /**
      * Extract event processed from daq histogram, called from input module
      */
-    void ExtractEvent(std::vector <TH1*>& hs);
+    void ExtractNEvent(std::vector <TH1*>& hs);
 
     /// EPICS related Functions
 

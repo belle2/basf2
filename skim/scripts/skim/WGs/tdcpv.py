@@ -150,8 +150,8 @@ class TDCPV_qqs(BaseSkim):
         btotcpvcuts = '5.2 < Mbc and abs(deltaE) < 0.5'
 
         bd_qqs_Channels = [
-            'phi:SkimHighEff_TDCPV_qqs K_S0:merged',
-            'phi:SkimHighEff_TDCPV_qqs K*0:SkimHighEff',
+            'phi:SkimHighEff K_S0:merged',
+            'phi:SkimHighEff K*0:SkimHighEff',
             'eta\':SkimHighEff K_S0:merged',
             'eta:SkimHighEff K_S0:merged',
             'eta\':SkimHighEff K*0:SkimHighEff',
@@ -524,8 +524,8 @@ class TDCPV_ccs(BaseSkim):
                            'J/psi:mumu K*0:neutral_TDCPV_ccs',
                            'J/psi:ee eta:SkimHighEff',
                            'J/psi:mumu eta:SkimHighEff',
-                           'J/psi:ee pi0:eff60_May2020_TDCPV_ccs',
-                           'J/psi:mumu pi0:eff60_May2020_TDCPV_ccs',
+                           'J/psi:ee pi0:eff60_May2020',
+                           'J/psi:mumu pi0:eff60_May2020',
                            'J/psi:ee K+:SkimHighEff pi-:SkimHighEff',
                            'J/psi:mumu K+:SkimHighEff pi-:SkimHighEff']
 

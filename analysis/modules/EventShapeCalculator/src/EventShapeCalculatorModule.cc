@@ -62,6 +62,14 @@ EventShapeCalculatorModule::EventShapeCalculatorModule() : Module()
 void EventShapeCalculatorModule::initialize()
 {
   m_eventShapeContainer.registerInDataStore();
+  if (m_enableJets and not m_enableThrust) {
+    B2WARNING("The jet-related quantities can only be calculated if the thrust calculation is activated as well.");
+    m_enableThrust = true;
+  }
+  if (m_enableCleoCones and not(m_enableThrust or m_enableCollisionAxis))
+    B2WARNING("The CLEO cones can only be calculated if either the thrust or the collision axis calculation are activated as well.");
+  if (m_enableHarmonicMoments and not(m_enableThrust or m_enableCollisionAxis))
+    B2WARNING("The harmonic moments can only be calculated if either the thrust or the collision axis calculation are activated as well.");
 }
 
 

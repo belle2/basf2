@@ -6,23 +6,18 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "cdc/modules/cdcCalibrationCollector/CDCBadwirecollector.h"
+#include <cdc/modules/cdcCalibrationCollector/CDCBadWireCollector.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <framework/datastore/RelationArray.h>
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-
 #include <genfit/TrackPoint.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/MeasurementOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
-
 #include <Math/ProbFuncMathCore.h>
-
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-
 #include <TH1F.h>
 
 //using namespace std;
@@ -32,10 +27,10 @@ using namespace genfit;
 using namespace TrackFindingCDC;
 
 
-REG_MODULE(CDCBadwirecollector);
+REG_MODULE(CDCBadWireCollector);
 
 
-CDCBadwirecollectorModule::CDCBadwirecollectorModule() : CalibrationCollectorModule()
+CDCBadWireCollectorModule::CDCBadWireCollectorModule() : CalibrationCollectorModule()
 {
   setDescription("Collector module for cdc calibration");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
@@ -48,11 +43,11 @@ CDCBadwirecollectorModule::CDCBadwirecollectorModule() : CalibrationCollectorMod
   addParam("effStudy", m_effStudy, "When true module collects info only  necessary for wire eff study", true);
 }
 
-CDCBadwirecollectorModule::~CDCBadwirecollectorModule()
+CDCBadWireCollectorModule::~CDCBadWireCollectorModule()
 {
 }
 
-void CDCBadwirecollectorModule::prepare()
+void CDCBadWireCollectorModule::prepare()
 {
   m_Tracks.isRequired(m_trackArrayName);
   m_RecoTracks.isRequired(m_recoTrackArrayName);
@@ -84,7 +79,7 @@ void CDCBadwirecollectorModule::prepare()
   registerObject<TH1F>("hOccupancy", m_hOccupancy);
 }
 
-void CDCBadwirecollectorModule::collect()
+void CDCBadWireCollectorModule::collect()
 {
   const RelationArray relTrackTrack(m_RecoTracks, m_Tracks, m_relRecoTrackTrackName);
 
@@ -151,10 +146,10 @@ void CDCBadwirecollectorModule::collect()
 
 }
 
-void CDCBadwirecollectorModule::finish()
+void CDCBadWireCollectorModule::finish()
 {
 }
-const CDCWire& CDCBadwirecollectorModule::getIntersectingWire(const TVector3& xyz, const CDCWireLayer& layer,
+const CDCWire& CDCBadWireCollectorModule::getIntersectingWire(const TVector3& xyz, const CDCWireLayer& layer,
     const Helix& helixFit) const
 {
   Vector3D crosspoint;
@@ -173,7 +168,7 @@ const CDCWire& CDCBadwirecollectorModule::getIntersectingWire(const TVector3& xy
   return wire;
 }
 
-void CDCBadwirecollectorModule::buildEfficiencies(std::vector<unsigned short> wireHits, const Helix helixFit)
+void CDCBadWireCollectorModule::buildEfficiencies(std::vector<unsigned short> wireHits, const Helix helixFit)
 {
   static const TrackFindingCDC::CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {

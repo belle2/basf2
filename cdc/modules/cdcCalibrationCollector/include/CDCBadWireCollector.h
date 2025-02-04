@@ -17,7 +17,6 @@
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <framework/datastore/StoreArray.h>
-
 #include <Math/Vector3D.h>
 #include <string>
 
@@ -27,18 +26,18 @@ namespace Belle2 {
     /**
      * Collect hit information for cdc calibration with CAF
      */
-    class CDCBadwirecollectorModule : public CalibrationCollectorModule {
+    class CDCBadWireCollectorModule : public CalibrationCollectorModule {
 
     public:
       /**
        * Constructor.
        */
-      CDCBadwirecollectorModule();
+      CDCBadWireCollectorModule();
 
       /**
        * Destructor.
        */
-      virtual ~CDCBadwirecollectorModule();
+      virtual ~CDCBadWireCollectorModule();
 
       /**
        * Initializes the Module.

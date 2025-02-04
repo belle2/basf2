@@ -386,12 +386,11 @@ void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, 
     const ECLCluster* cluster = particle->getECLCluster();
 
     if (particle->getCharge() != 0 or !cluster) {
-      B2FATAL("ParticleKinematicFitterModule:  Direction only and alternate mass options only implemented for neutral particles with ECL cluster")
-        :
-      }
+      B2FATAL("ParticleKinematicFitterModule:  Direction only and alternate mass options only implemented for neutral particles with ECL cluster");
+    }
 
 
-      double mass = particle->getMass();
+    double mass = particle->getMass();
     if (massHypoPDG != 0) {
       if (TDatabasePDG::Instance()->GetParticle(massHypoPDG) == nullptr) {
         B2FATAL("ParticleKinematicFitterModule:  " << massHypoPDG << " is an unknown PDG code!");

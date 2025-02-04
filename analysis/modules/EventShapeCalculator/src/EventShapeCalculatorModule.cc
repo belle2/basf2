@@ -45,7 +45,7 @@ EventShapeCalculatorModule::EventShapeCalculatorModule() : Module()
   // Parameter definitions
   addParam("particleListNames", m_particleListNames, "List of the ParticleLists to be used for the calculation of the EventShapes.",
            vector<string>());
-  addParam("enableThrust", m_enableThrust, "Enables the calculation of thust-related quantities.", true);
+  addParam("enableThrust", m_enableThrust, "Enables the calculation of thrust-related quantities.", true);
   addParam("enableCollisionAxis", m_enableCollisionAxis, "Enables the calculation of the  quantities related to the collision axis.",
            true);
   addParam("enableFoxWolfram", m_enableFW, "Enables the calculation of the Fox-Wolfram moments.", true);
@@ -80,7 +80,7 @@ void EventShapeCalculatorModule::event()
   // Calculates the FW moments
   // --------------------
   if (m_enableFW) {
-    FoxWolfram fw(m_p3List);
+    FoxWolfram fw(m_p4List);
     if (m_enableAllMoments) {
       fw.calculateAllMoments();
       for (short i = 0; i < 9; i++) {
@@ -98,7 +98,7 @@ void EventShapeCalculatorModule::event()
   // Calculates the sphericity quantities
   // --------------------
   if (m_enableSphericity) {
-    SphericityEigenvalues Sph(m_p3List);
+    SphericityEigenvalues Sph(m_p4List);
     Sph.calculateEigenvalues();
     if (Sph.getEigenvalue(0) < Sph.getEigenvalue(1) || Sph.getEigenvalue(0) < Sph.getEigenvalue(2)
         || Sph.getEigenvalue(1) < Sph.getEigenvalue(2))
@@ -115,7 +115,7 @@ void EventShapeCalculatorModule::event()
   // Calculates thrust and thrust-related quantities
   // --------------------
   if (m_enableThrust) {
-    ROOT::Math::XYZVector thrust = Thrust::calculateThrust(m_p3List);
+    ROOT::Math::XYZVector thrust = Thrust::calculateThrust(m_p4List);
     float thrustVal = thrust.R();
     thrust = thrust.Unit();
     m_eventShapeContainer->setThrustAxis(thrust);
@@ -123,7 +123,7 @@ void EventShapeCalculatorModule::event()
 
     // --- If required, calculates the HarmonicMoments ---
     if (m_enableHarmonicMoments) {
-      HarmonicMoments MM(m_p3List, thrust);
+      HarmonicMoments MM(m_p4List, thrust);
       if (m_enableAllMoments) {
         MM.calculateAllMoments();
         for (short i = 0; i < 9; i++) {
@@ -144,10 +144,10 @@ void EventShapeCalculatorModule::event()
       // Cleo cone class constructor. Unfortunately this class is designed
       // to use the ROE, so the constructor takes two std::vector of momenta ("all" and "ROE"),
       // then a vector to be used as axis, and finally two flags that determine if the cleo cones
-      // are calculated using the ROE, all the particles or both. Here we use the m_p3List as dummy
+      // are calculated using the ROE, all the particles or both. Here we use the m_p4List as dummy
       // list of the ROE momenta, that is however not used at all since the calculate only the
       // cones with all the particles. This whole class would need some heavy restructuring...
-      CleoCones cleoCones(m_p3List, m_p3List, thrust, true, false);
+      CleoCones cleoCones(m_p4List, m_p4List, thrust, true, false);
       std::vector<float> cones;
       cones = cleoCones.cleo_cone_with_all();
       for (short i = 0; i < 10; i++) {
@@ -182,7 +182,7 @@ void EventShapeCalculatorModule::event()
 
     // --- If required, calculates the cleo cones w/ respect to the collision axis ---
     if (m_enableCleoCones) {
-      CleoCones cleoCones(m_p3List, m_p3List, collisionAxis, true, false);
+      CleoCones cleoCones(m_p4List, m_p4List, collisionAxis, true, false);
       std::vector<float> cones;
       cones = cleoCones.cleo_cone_with_all();
       for (short i = 0; i < 10; i++) {
@@ -192,7 +192,7 @@ void EventShapeCalculatorModule::event()
 
     // --- If required, calculates the HarmonicMoments ---
     if (m_enableHarmonicMoments) {
-      HarmonicMoments MM(m_p3List, collisionAxis);
+      HarmonicMoments MM(m_p4List, collisionAxis);
       if (m_enableAllMoments) {
         MM.calculateAllMoments();
         for (short i = 0; i < 9; i++) {
@@ -216,14 +216,13 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
 {
   PCmsLabTransform T;
   m_p4List.clear();
-  m_p3List.clear();
 
   unsigned int nParticlesInAllLists = 0;
   unsigned short nParticleLists = particleListNames.size();
   if (nParticleLists == 0)
     B2WARNING("No particle lists found. EventShape calculation not performed.");
 
-  // This vector temporary stores the mdstSource of particle objects
+  // This vector temporarily stores the mdstSource of particle objects
   // that have been processed so far (not only the momenta)
   // in order to check for duplicates before pushing the 3- and 4- vectors
   // in the corresponding lists
@@ -261,10 +260,7 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
 
       if (!isDuplicate) {
         ROOT::Math::PxPyPzEVector p4CMS = T.rotateLabToCms() * part->get4Vector();
-        // it need to fill an std::vector of XYZVector to use the current FW routines.
-        // It will hopefully change in release 3
         m_p4List.push_back(p4CMS);
-        m_p3List.push_back(p4CMS.Vect());
       }
     }
   }

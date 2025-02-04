@@ -7,7 +7,6 @@
 ##########################################################################
 """CDC badwire calibration."""
 import basf2
-# import tracking.harvest.peelers as peelers
 from ROOT import gInterpreter
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_cdc import settings as cdc_tracking_calibration
@@ -16,15 +15,9 @@ from prompt.utils import ExpRun
 from ROOT import Belle2
 from caf.framework import Calibration
 from caf import strategies
-# from modularAnalysis import fillParticleList, cutAndCopyList, reconstructDecay, applyCuts
-# from softwaretrigger.constants import HLT_INPUT_OBJECTS
-# from ROOT.Belle2 import CDCDatabaseImporter
-# from tracking.harvesting_validation import recorded_data_module
 from tracking import add_hit_preparation_modules, add_track_finding, add_track_fit_and_track_creator
 from rawdata import add_unpackers
 gInterpreter.ProcessLine("#include <tracking/trackFindingCDC/rootification/StoreWrapper.h>")
-# from reconstruction import add_reconstruction
-#: Tells the automated system some details of this script
 settings = CalibrationSettings(name="CDC badwire",
                                expert_username="manhtt",
                                description=__doc__,
@@ -46,7 +39,6 @@ settings = CalibrationSettings(name="CDC badwire",
 
 
 # Main function to get calibrations
-
 def get_calibrations(input_data, **kwargs):
     expert_config = kwargs.get("expert_config")
     min_events_per_file = expert_config["min_events_per_file"]
@@ -56,28 +48,24 @@ def get_calibrations(input_data, **kwargs):
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
     file_to_iov_mumu = input_data["mumu_tight_or_highm_calib"]
-
     from prompt.utils import filter_by_max_files_per_run
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, 100, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
     basf2.B2INFO("Complete input data selection.")
     basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_mumu)}")
-
     payload_boundaries = []
     payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
     basf2.B2INFO(f"Payload boundaries from expert_config: {payload_boundaries}")
-
     from caf.utils import IoV
     # The actual value our output IoV payload should have. Notice that we've set it open ended.
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
     # for SingleIOV stratrgy, it's better to set the granularity to 'all' so that the collector jobs will run faster
-    # collector_granularity = 'all'
     if payload_boundaries:
         basf2.B2INFO('Found payload_boundaries: set collector granularity to run')
     # call collector module
-    col = basf2.register_module("CDCBadwirecollector")
+    col = basf2.register_module("CDCBadWireCollector")
     # call algorighm
     algo = Belle2.CDC.WireEfficiencyAlgorithm()
     algo.setInputFileNames("histo_badwire.root")
@@ -89,8 +77,6 @@ def get_calibrations(input_data, **kwargs):
                                 pre_collector_path=pre_collector(max_events_per_file,
                                                                  components=components,
                                                                  fileFormat=fileFormat))
-    #                              backend_args=expert_config["backend_args"])
-    #                           collector_granularity=collector_granularity)
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun
     if payload_boundaries:
@@ -111,7 +97,6 @@ def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"], fileFormat=
     path = basf2.create_path()
     branches = ['EventMetaData', 'RawCDCs', 'RawFTSWs']
     unpackers = ['CDC']
-
     path.add_module("RootInput", branchNames=branches)
     path.add_module("Gearbox")
     path.add_module("Geometry", useDB=True)

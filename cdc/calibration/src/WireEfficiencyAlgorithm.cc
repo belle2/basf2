@@ -7,18 +7,13 @@
  **************************************************************************/
 
 #include <cdc/calibration/WireEfficiencyAlgorithm.h>
-
 #include <calibration/CalibrationAlgorithm.h>
-
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
-
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dbobjects/CDCBadWires.h>
-
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
-
 #include <TH2F.h>
 #include <TFitResult.h>
 #include <TH1F.h>
@@ -30,7 +25,7 @@
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
-WireEfficiencyAlgorithm::WireEfficiencyAlgorithm(): CalibrationAlgorithm("CDCBadwirecollector")
+WireEfficiencyAlgorithm::WireEfficiencyAlgorithm(): CalibrationAlgorithm("CDCBadWireCollector")
 {
 
   setDescription(

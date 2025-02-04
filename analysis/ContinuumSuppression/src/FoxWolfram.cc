@@ -29,7 +29,7 @@ void FoxWolfram::calculateBasicMoments()
     for (auto iter2 = iter1; iter2 != end; iter2++) {
       const PxPyPzEVector pVec2 = (*iter2);
       double magProd = pMag1 * pVec2.R();  // product of the vector's magnitudes
-      double cTheta = pVec1.Dot(pVec2) / magProd; // costheta_ij
+      double cTheta = pVec1.Vect().Dot(pVec2.Vect()) / magProd; // costheta_ij
 
       // Since the FW moment definition requires to double count all the
       // pairs of different particles,  but the smart loop implemented here doesn't,
@@ -73,7 +73,7 @@ void FoxWolfram::calculateAllMoments()
     for (auto iter2 = iter1; iter2 != end; iter2++) {
       const PxPyPzEVector pVec2 = (*iter2);
       double magProd = pMag1 * pVec2.R();  // product of the vector's magnitudes
-      double cTheta = pVec1.Dot(pVec2) / magProd; // costheta_ij
+      double cTheta = pVec1.Vect().Dot(pVec2.Vect()) / magProd; // costheta_ij
 
       // Since the FW moment definition requires to double count all the
       // pairs of different particles,  but the smart loop implemented here doesn't,

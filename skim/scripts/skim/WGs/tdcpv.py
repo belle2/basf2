@@ -130,13 +130,13 @@ class TDCPV_qqs(BaseSkim):
         loadStdSkimHighEffF_0(path=path)
 
         # Additional non-standard lists
-        ma.reconstructDecay('phi:SkimHighEff2 -> pi0:skim pi-:SkimHighEff pi+:SkimHighEff', '0.97 < M < 1.1', path=path)
-        ma.reconstructDecay('K_S0:pi0pi0 -> pi0:skim pi0:skim', '0.4 < M < 0.6', path=path)
+        ma.reconstructDecay('phi:SkimHighEff2_TDCPV_qqs -> pi0:skim pi-:SkimHighEff pi+:SkimHighEff', '0.97 < M < 1.1', path=path)
+        ma.reconstructDecay('K_S0:pi0pi0_TDCPV_qqs -> pi0:skim pi0:skim', '0.4 < M < 0.6', path=path)
 
-        ma.cutAndCopyList('pi0:SkimHighEffCut', 'pi0:SkimHighEff', 'M > 0.105 and M < 0.150', path=path)
+        ma.cutAndCopyList('pi0:SkimHighEffCut_TDCPV_qqs', 'pi0:SkimHighEff', 'M > 0.105 and M < 0.150', path=path)
 
-        ma.reconstructDecay('K*+:kshort_pip -> K_S0:merged pi+:SkimHighEff', '0.74 < M < 1.04', path=path)
-        ma.reconstructDecay('K*+:kp_piz -> K+:SkimHighEff pi0:SkimHighEffCut', '0.74 < M < 1.04', path=path)
+        ma.reconstructDecay('K*+:kshort_pip_TDCPV_qqs -> K_S0:merged pi+:SkimHighEff', '0.74 < M < 1.04', path=path)
+        ma.reconstructDecay('K*+:kp_piz_TDCPV_qqs -> K+:SkimHighEff pi0:SkimHighEffCut_TDCPV_qqs', '0.74 < M < 1.04', path=path)
 
     def additional_setup(self, path):
         ma.cutAndCopyList('gamma:E15', 'gamma:all', '1.4<E<4', path=path)
@@ -150,14 +150,14 @@ class TDCPV_qqs(BaseSkim):
         btotcpvcuts = '5.2 < Mbc and abs(deltaE) < 0.5'
 
         bd_qqs_Channels = [
-            'phi:SkimHighEff K_S0:merged',
-            'phi:SkimHighEff K*0:SkimHighEff',
+            'phi:SkimHighEff_TDCPV_qqs K_S0:merged',
+            'phi:SkimHighEff_TDCPV_qqs K*0:SkimHighEff',
             'eta\':SkimHighEff K_S0:merged',
             'eta:SkimHighEff K_S0:merged',
             'eta\':SkimHighEff K*0:SkimHighEff',
             'eta:SkimHighEff K*0:SkimHighEff',
             'K_S0:merged K_S0:merged K_S0:merged',
-            'pi0:SkimHighEffCut K_S0:merged',
+            'pi0:SkimHighEffCut_TDCPV_qqs K_S0:merged',
             'rho0:SkimHighEff K_S0:merged',
             'omega:SkimHighEff K_S0:merged',
             'f_0:SkimHighEff K_S0:merged',
@@ -167,9 +167,9 @@ class TDCPV_qqs(BaseSkim):
             'pi+:SkimHighEff pi-:SkimHighEff K_S0:merged gamma:E15',
             'pi0:skim K_S0:merged gamma:E15',
             'pi0:SkimHighEff K_S0:merged gamma:ECMS16',
-            'phi:SkimHighEff2 K_S0:merged',
-            'phi:SkimHighEff K_S0:pi0pi0',
-            'eta\':SkimHighEff K_S0:pi0pi0',
+            'phi:SkimHighEff2_TDCPV_qqs K_S0:merged',
+            'phi:SkimHighEff K_S0:pi0pi0_TDCPV_qqs',
+            'eta\':SkimHighEff K_S0:pi0pi0_TDCPV_qqs',
             'phi:SkimHighEff K_S0:merged gamma:E15',
             'eta:SkimHighEff K_S0:merged gamma:E15',
             'rho0:SkimHighEff gamma:E15',
@@ -180,8 +180,8 @@ class TDCPV_qqs(BaseSkim):
         bu_qqs_Channels = [
             'eta\':SkimHighEff K+:SkimHighEff',
             'phi:SkimHighEff K+:SkimHighEff',
-            'phi:SkimHighEff K*+:kshort_pip',
-            'phi:SkimHighEff K*+:kp_piz',
+            'phi:SkimHighEff K*+:kshort_pip_TDCPV_qqs',
+            'phi:SkimHighEff K*+:kp_piz_TDCPV_qqs',
             'omega:SkimHighEff K+:SkimHighEff',
             'rho0:SkimHighEff K+:SkimHighEff',
             'K_S0:merged K_S0:merged K+:SkimHighEff',
@@ -311,14 +311,17 @@ class TDCPV_klong(BaseSkim):
         loadStdSkimHighEffOmega(path=path)
 
         # Additional non-standard lists
-        ma.reconstructDecay('phi:SkimHighEff2 -> pi0:skim pi-:SkimHighEff pi+:SkimHighEff', '0.97 < M < 1.1', path=path)
+        ma.reconstructDecay('phi:SkimHighEff2_TDCPV_klong -> pi0:skim pi-:SkimHighEff pi+:SkimHighEff', '0.97 < M < 1.1', path=path)
 
-        ma.cutAndCopyList('eta:SkimKlong2', 'eta:SkimHighEff2', '0.5 < M < 0.6', path=path)
+        ma.cutAndCopyList('eta:SkimKlong2_TDCPV_klong', 'eta:SkimHighEff2', '0.5 < M < 0.6', path=path)
 
-        ma.reconstructDecay('eta\':klong_ggpp -> eta:SkimHighEff1 pi+:SkimHighEff pi-:SkimHighEff',
+        ma.reconstructDecay('eta\':klong_ggpp_TDCPV_klong -> eta:SkimHighEff1 pi+:SkimHighEff pi-:SkimHighEff',
                             '0.8 < M < 1.1', path=path)
-        ma.reconstructDecay('eta\':klong_pipipi -> eta:SkimKlong2 pi+:SkimHighEff pi-:SkimHighEff', '0.9 < M < 1', path=path)
-        ma.reconstructDecay('eta\':klong_rhogam -> rho0:SkimHighEff gamma:tight', '0.9 < M < 1', path=path)
+        ma.reconstructDecay(
+            'eta\':klong_pipipi_TDCPV_klong -> eta:SkimKlong2_TDCPV_klong pi+:SkimHighEff pi-:SkimHighEff',
+            '0.9 < M < 1',
+            path=path)
+        ma.reconstructDecay('eta\':klong_rhogam_TDCPV_klong -> rho0:SkimHighEff gamma:tight', '0.9 < M < 1', path=path)
 
         stdKlongs(listtype='allklm', path=path)
         stdKlongs(listtype='allecl', path=path)
@@ -361,18 +364,18 @@ class TDCPV_klong(BaseSkim):
         ma.copyLists('K_L0:eclklm_qqs_7', ['K_L0:ecl_tight', 'K_L0:klm_tight'], path=path)  # pi0KL
 
     def build_lists(self, path):
-        vm.addAlias('E_ECL_pi_TDCPV_qqs', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_qqs_eventshape)')
-        vm.addAlias('E_ECL_gamma_TDCPV_qqs', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_qqs_eventshape)')
-        vm.addAlias('E_ECL_TDCPV_qqs', 'formula(E_ECL_pi_TDCPV_qqs+E_ECL_gamma_TDCPV_qqs)')
+        vm.addAlias('E_ECL_pi_TDCPV_klong', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_klong_eventshape)')
+        vm.addAlias('E_ECL_gamma_TDCPV_klong', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_klong_eventshape)')
+        vm.addAlias('E_ECL_TDCPV_klong', 'formula(TDCPV_klong_eventshape+TDCPV_klong_eventshape)')
 
         btotcpvcuts_KL = 'abs(deltaE) < 0.10'
 
         bd_klong_Channels = [
             'phi:SkimHighEff K_L0:eclklm_qqs_0',
-            'phi:SkimHighEff2 K_L0:eclklm_qqs_1',
-            'eta\':klong_ggpp K_L0:eclklm_qqs_2',
-            'eta\':klong_pipipi K_L0:eclklm_qqs_3',
-            'eta\':klong_rhogam K_L0:eclklm_qqs_4',
+            'phi:SkimHighEff2_TDCPV_klong K_L0:eclklm_qqs_1',
+            'eta\':klong_ggpp_TDCPV_klong K_L0:eclklm_qqs_2',
+            'eta\':klong_pipipi_TDCPV_klong K_L0:eclklm_qqs_3',
+            'eta\':klong_rhogam_TDCPV_klong K_L0:eclklm_qqs_4',
             'omega:SkimHighEff K_L0:eclklm_qqs_5',
             'rho0:SkimHighEff K_L0:eclklm_qqs_6',
             'pi0:skim K_L0:eclklm_qqs_7'
@@ -384,12 +387,12 @@ class TDCPV_klong(BaseSkim):
             ma.reconstructMissingKlongDecayExpert('B0:TDCPV_klong' + str(chID) + ' -> ' + channel, btotcpvcuts_KL, chID, path=path)
             bd_klong_List.append('B0:TDCPV_klong' + str(chID))
 
-        ma.fillParticleList(decayString='pi+:TDCPV_qqs_eventshape',
+        ma.fillParticleList(decayString='pi+:TDCPV_klong_eventshape',
                             cut='pt > 0.1 and abs(dr)<0.5 and abs(dz)<2 and nCDCHits>20', path=path)
-        ma.fillParticleList(decayString='gamma:TDCPV_qqs_eventshape',
+        ma.fillParticleList(decayString='gamma:TDCPV_klong_eventshape',
                             cut='E > 0.1 and thetaInCDCAcceptance', path=path)
 
-        ma.buildEventShape(inputListNames=['pi+:TDCPV_qqs_eventshape', 'gamma:TDCPV_qqs_eventshape'],
+        ma.buildEventShape(inputListNames=['pi+:TDCPV_klong_eventshape', 'gamma:TDCPV_klong_eventshape'],
                            allMoments=False,
                            foxWolfram=True,
                            harmonicMoments=False,
@@ -401,11 +404,11 @@ class TDCPV_klong(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        ma.buildEventKinematics(inputListNames=['pi+:TDCPV_qqs_eventshape', 'gamma:TDCPV_qqs_eventshape'], path=path)
+        ma.buildEventKinematics(inputListNames=['pi+:TDCPV_klong_eventshape', 'gamma:TDCPV_klong_eventshape'], path=path)
 
         EventCuts = [
             "nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1",
-            "E_ECL_TDCPV_qqs<9",
+            "E_ECL_TDCPV_klong<9",
             "foxWolframR2<0.6"
         ]
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
@@ -490,11 +493,11 @@ class TDCPV_ccs(BaseSkim):
         stdKlongs(listtype='allklm', path=path)
         stdKlongs(listtype='allecl', path=path)
 
-        ma.reconstructDecay('K*0:neutral -> K_S0:merged pi0:eff40_May2020', '0.74 < M < 1.04', path=path)
-        ma.reconstructDecay('K*+:kshort_pip -> K_S0:merged pi+:SkimHighEff', '0.74 < M < 1.04', path=path)
-        ma.reconstructDecay('K*+:kp_piz -> K+:SkimHighEff pi0:eff40_May2020', '0.74 < M < 1.04', path=path)
+        ma.reconstructDecay('K*0:neutral_TDCPV_ccs -> K_S0:merged pi0:eff40_May2020', '0.74 < M < 1.04', path=path)
+        ma.reconstructDecay('K*+:kshort_pip_TDCPV_ccs -> K_S0:merged pi+:SkimHighEff', '0.74 < M < 1.04', path=path)
+        ma.reconstructDecay('K*+:kp_piz_TDCPV_ccs -> K+:SkimHighEff pi0:eff40_May2020', '0.74 < M < 1.04', path=path)
 
-        ma.applyCuts('pi0:eff60_May2020', 'InvM < 0.2', path=path)
+        ma.applyCuts('pi0:eff60_May2020_TDCPV_ccs', 'InvM < 0.2', path=path)
 
     def additional_setup(self, path):
         ma.cutAndCopyList('K_L0:alleclEcut_ccs', 'K_L0:allecl', 'clusterE>0.15 and clusterE1E9<0.85', path=path)
@@ -519,12 +522,12 @@ class TDCPV_ccs(BaseSkim):
                            'psi(2S):ll K_S0:merged',
                            'J/psi:ee K*0:SkimHighEff',
                            'J/psi:mumu K*0:SkimHighEff',
-                           'J/psi:ee K*0:neutral',
-                           'J/psi:mumu K*0:neutral',
+                           'J/psi:ee K*0:neutral_TDCPV_ccs',
+                           'J/psi:mumu K*0:neutral_TDCPV_ccs',
                            'J/psi:ee eta:SkimHighEff',
                            'J/psi:mumu eta:SkimHighEff',
-                           'J/psi:ee pi0:eff60_May2020',
-                           'J/psi:mumu pi0:eff60_May2020',
+                           'J/psi:ee pi0:eff60_May2020_TDCPV_ccs',
+                           'J/psi:mumu pi0:eff60_May2020_TDCPV_ccs',
                            'J/psi:ee K+:SkimHighEff pi-:SkimHighEff',
                            'J/psi:mumu K+:SkimHighEff pi-:SkimHighEff']
 

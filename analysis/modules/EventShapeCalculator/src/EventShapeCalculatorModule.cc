@@ -249,24 +249,25 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
       const MCParticle* mcParticle = part->getMCParticle();
       if (mcParticle and mcParticle->isInitial()) continue;
 
-      // Flag to check for duplicates across the lists.
-      // It can be true only if m_checkForDuplicates is enabled
-      bool isDuplicate = false;
-
       if (m_checkForDuplicates) {
-        int mdstSource = part->getMdstSource();
 
-        auto result = std::find(usedMdstSources.begin(), usedMdstSources.end(), mdstSource);
-        if (result == usedMdstSources.end()) {
-          usedMdstSources.push_back(mdstSource);
-        } else {
-          B2WARNING("Duplicate particle found. The new one won't be used for the calculation of the event shape variables. "
+        std::vector<const Belle2::Particle*> finalStateDaughters = part->getFinalStateDaughters();
+
+        for (const auto fsp : finalStateDaughters) {
+          int mdstSource = fsp->getMdstSource();
+          auto result = std::find(usedMdstSources.begin(), usedMdstSources.end(), mdstSource);
+          if (result == usedMdstSources.end()) {
+            usedMdstSources.push_back(mdstSource);
+            ROOT::Math::PxPyPzEVector p4CMS = T.rotateLabToCms() * fsp->get4Vector();
+            m_p4List.push_back(p4CMS);
+            B2DEBUG(19, "non-duplicate has pdgCode " << fsp->getPDGCode() << " and mdstSource " << mdstSource);
+          } else {
+            B2DEBUG(19, "duplicate has pdgCode " << fsp->getPDGCode() << " and mdstSource " << mdstSource);
+            B2DEBUG(19, "Duplicate particle found. The new one won't be used for the calculation of the event shape variables. "
                     "Please, double check your input lists and try to make them mutually exclusive.");
-          isDuplicate = true;
+          }
         }
-      }
-
-      if (!isDuplicate) {
+      } else {
         ROOT::Math::PxPyPzEVector p4CMS = T.rotateLabToCms() * part->get4Vector();
         m_p4List.push_back(p4CMS);
       }

@@ -1279,6 +1279,10 @@ def add_inverted_svd_cdc_tracking_chain(path,
     Add an inverted SVD based tracking chain to the path, i.e. SVD standalone followed by the ToCDCCKF, the CDC standalone
     track finding, a CKF based merger for standalone tracks, and finally the CDCToSVDSpacePointCKF.
 
+    ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
+    One known issue is a reduced hit efficiency when using the full chain.
+    Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
+
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param svd_reco_tracks: name of the SVD standalone RecoTracks StoreArray

@@ -132,7 +132,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         the CDC standalone tracking, a CKF-based merger to merge the standalone RecoTracks, and finally the
         CDCToSVDSpacePointCKF to add SVD hits to all CDC tracks that don't have SVD hits attached to them.
         ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
-        One know issue is a reduced hit efficiency when using the full chain.
+        One known issue is a reduced hit efficiency when using the full chain.
         Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
     """
 
@@ -230,7 +230,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         the CDC standalone tracking, a CKF-based merger to merge the standalone RecoTracks, and finally the
         CDCToSVDSpacePointCKF to add SVD hits to all CDC tracks that don't have SVD hits attached to them.
         ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
-        One know issue is a reduced hit efficiency when using the full chain.
+        One known issue is a reduced hit efficiency when using the full chain.
         Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
     """
 
@@ -496,7 +496,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         the CDC standalone tracking, a CKF-based merger to merge the standalone RecoTracks, and finally the
         CDCToSVDSpacePointCKF to add SVD hits to all CDC tracks that don't have SVD hits attached to them.
         ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
-        One know issue is a reduced hit efficiency when using the full chain.
+        One known issue is a reduced hit efficiency when using the full chain.
         Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
     """
     if not is_svd_used(components) and not is_cdc_used(components):
@@ -560,7 +560,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     else:
         # add the inverted tracking chain with SVD standalone tracking executed first
         # ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
-        # One know issue is a reduced hit efficiency when using the full chain.
+        # One known issue is a reduced hit efficiency when using the full chain.
         # Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
         latest_reco_tracks, tmp_reco_track_list = \
             add_inverted_svd_cdc_tracking_chain(path,

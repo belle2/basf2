@@ -10,6 +10,8 @@
 
 from basf2 import register_module
 
+import pdg
+
 
 def fitKinematic4C(
     list_name,
@@ -45,7 +47,7 @@ def fitKinematic4C(
     orca.param('addUnmeasuredPhoton', addUnmeasuredPhoton)
     orca.param('variablePrefix', variablePrefix)
     orca.param('directionOnlyParticles', directionOnlyParticles)
-    orca.param('alternateMassHypos', alternateMassHypos)
+    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
 
@@ -81,7 +83,7 @@ def UnmeasuredfitKinematic1C(
     orca.param('addUnmeasuredPhoton', True)
     orca.param('variablePrefix', variablePrefix)
     orca.param('directionOnlyParticles', directionOnlyParticles)
-    orca.param('alternateMassHypos', alternateMassHypos)
+    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
 
@@ -123,7 +125,7 @@ def fitKinematic3C(
     orca.param('add3CPhoton', add3CPhoton)
     orca.param('variablePrefix', variablePrefix)
     orca.param('directionOnlyParticles', directionOnlyParticles)
-    orca.param('alternateMassHypos', alternateMassHypos)
+    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
 
@@ -176,7 +178,7 @@ def fitKinematic2C(
             orca.param('fixUnmeasuredToLER', True)
     orca.param('variablePrefix', variablePrefix)
     orca.param('directionOnlyParticles', directionOnlyParticles)
-    orca.param('alternateMassHypos', alternateMassHypos)
+    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
 
@@ -215,7 +217,7 @@ def MassfitKinematic1CRecoil(
     orca.param('addUnmeasuredPhoton', False)
     orca.param('variablePrefix', variablePrefix)
     orca.param('directionOnlyParticles', directionOnlyParticles)
-    orca.param('alternateMassHypos', alternateMassHypos)
+    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
 
@@ -254,7 +256,7 @@ def MassfitKinematic1C(
     orca.param('addUnmeasuredPhoton', False)
     orca.param('variablePrefix', variablePrefix)
     orca.param('directionOnlyParticles', directionOnlyParticles)
-    orca.param('alternateMassHypos', alternateMassHypos)
+    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
 

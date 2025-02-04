@@ -366,7 +366,7 @@ class TDCPV_klong(BaseSkim):
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV_klong', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_klong_eventshape)')
         vm.addAlias('E_ECL_gamma_TDCPV_klong', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_klong_eventshape)')
-        vm.addAlias('E_ECL_TDCPV_klong', 'formula(TDCPV_klong_eventshape+TDCPV_klong_eventshape)')
+        vm.addAlias('E_ECL_TDCPV_klong', 'formula(E_ECL_pi_TDCPV_klong+E_ECL_gamma_TDCPV_klong)')
 
         btotcpvcuts_KL = 'abs(deltaE) < 0.10'
 
@@ -496,8 +496,6 @@ class TDCPV_ccs(BaseSkim):
         ma.reconstructDecay('K*0:neutral_TDCPV_ccs -> K_S0:merged pi0:eff40_May2020', '0.74 < M < 1.04', path=path)
         ma.reconstructDecay('K*+:kshort_pip_TDCPV_ccs -> K_S0:merged pi+:SkimHighEff', '0.74 < M < 1.04', path=path)
         ma.reconstructDecay('K*+:kp_piz_TDCPV_ccs -> K+:SkimHighEff pi0:eff40_May2020', '0.74 < M < 1.04', path=path)
-
-        ma.applyCuts('pi0:eff60_May2020_TDCPV_ccs', 'InvM < 0.2', path=path)
 
     def additional_setup(self, path):
         ma.cutAndCopyList('K_L0:alleclEcut_ccs', 'K_L0:allecl', 'clusterE>0.15 and clusterE1E9<0.85', path=path)

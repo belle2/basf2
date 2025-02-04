@@ -1,3 +1,13 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+'''Test for checking if the continuum generation and fragmentation works.'''
+
 import basf2 as b2
 import b2test_utils as b2tu
 from generators import add_continuum_generator, get_default_decayfile

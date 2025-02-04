@@ -353,15 +353,15 @@ void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, 
 
     ClusterUtils clutls;
     const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
-    double startingeE = sqrt(fabs(EPhiThetaCov[0][0]));
-    double startingePhi = sqrt(fabs(EPhiThetaCov[1][1]));
-    double startingeTheta = sqrt(fabs(EPhiThetaCov[2][2]));
+    double startingEError = sqrt(fabs(EPhiThetaCov[0][0]));
+    double startingPhiError = sqrt(fabs(EPhiThetaCov[1][1]));
+    double startingThetaError = sqrt(fabs(EPhiThetaCov[2][2]));
 
-    B2DEBUG(17, startingPhi << " " << startingTheta << " " <<  startingePhi << " " << startingeTheta);
+    B2DEBUG(17, startingPhi << " " << startingTheta << " " <<  startingPhiError << " " << startingThetaError);
     // create a fit object
     ParticleFitObject* pfitobject;
     // memory allocated: it will be deallocated via "delete fo" in doOrcaKinFitFit
-    pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, startingeE, startingeTheta, startingePhi, 0.);
+    pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, startingEError, startingThetaError, startingPhiError, 0.);
     pfitobject->setParam(0, startingE, false, false);
     if (m_liftPhotonTheta)
       pfitobject->setParam(1, startingTheta, false, false);
@@ -404,12 +404,12 @@ void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, 
 
     ClusterUtils clutls;
     const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
-    double startingeE = sqrt(fabs(EPhiThetaCov[0][0]));
-    double startingePhi = sqrt(fabs(EPhiThetaCov[1][1]));
-    double startingeTheta = sqrt(fabs(EPhiThetaCov[2][2]));
+    double startingEError = sqrt(fabs(EPhiThetaCov[0][0]));
+    double startingPhiError = sqrt(fabs(EPhiThetaCov[1][1]));
+    double startingThetaError = sqrt(fabs(EPhiThetaCov[2][2]));
 
     // memory allocated: it will be deallocated via "delete fo" in doOrcaKinFitFit
-    pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, startingeE, startingeTheta, startingePhi, mass);
+    pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, startingEError, startingThetaError, startingPhiError, mass);
     if (useOnlyDirection)  pfitobject->setParam(0, startingE, false, false);
     pfitobject->setParam(1, startingTheta, true, false);
     pfitobject->setParam(2, startingPhi, true, false);

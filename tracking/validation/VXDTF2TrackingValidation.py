@@ -32,7 +32,7 @@ ACTIVE = False
 
 def setupFinderModule(path):
     tracking.add_hit_preparation_modules(path, components=["SVD"])
-    tracking.add_vxd_track_finding_vxdtf2(path, components=["SVD"])
+    tracking.path_utils.add_vxd_track_finding_vxdtf2(path, components=["SVD"])
 
 
 class VXDTF2TrackingValidation(TrackingValidationRun):

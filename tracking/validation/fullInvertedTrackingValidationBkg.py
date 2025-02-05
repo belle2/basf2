@@ -18,7 +18,7 @@
 """
 
 from tracking.validation.run import TrackingValidationRun
-import tracking
+from tracking import add_tracking_reconstruction
 import logging
 import basf2
 VALIDATION_OUTPUT_FILE = 'FullInvertedTrackingValidationBkg.root'
@@ -35,7 +35,7 @@ class InvertedFullBkg(TrackingValidationRun):
 
     def finder_module(self, path):
         """Add the inverted track finding to the basf2 path"""
-        tracking.add_tracking_reconstruction(path, inverted_tracking=True)
+        add_tracking_reconstruction(path, inverted_tracking=True)
 
     #: Define the user parameters for the track-finding module
     tracking_coverage = {

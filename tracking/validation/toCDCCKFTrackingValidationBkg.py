@@ -17,7 +17,7 @@
 </header>
 """
 
-import tracking.path_utils
+from tracking.path_utils import add_vxd_track_finding_vxdtf2
 from tracking.validation.run import TrackingValidationRun
 import logging
 import basf2
@@ -45,7 +45,7 @@ class toCDCCKFValidationBkg(TrackingValidationRun):
                         energyLossBrems=False, noiseBrems=False)
 
         svd.add_svd_reconstruction(path)
-        tracking.path_utils.add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracksSVD", components=["SVD"])
+        add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracksSVD", components=["SVD"])
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracksSVD")
 
         path.add_module("TFCDC_WireHitPreparer",

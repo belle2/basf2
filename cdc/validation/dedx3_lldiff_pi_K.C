@@ -8,6 +8,7 @@
 /*
   <header>
   <input>ParticleGunSimRec_dedx.root</input>
+  <output>dedx_LLdiff_pi_K.root</output>
   <contact>renu2@andrew.cmu.edu</contact>
   <description>check log-likelihood difference pi vs. K</description>
   </header>

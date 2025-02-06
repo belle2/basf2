@@ -61,6 +61,11 @@ namespace Belle2 {
      */
     double getRelativeEnergyResolution(double energy, double theta, double phi) const;
 
+    void addThetaPhiResolution(std::vector<double> thetaResolution, std::vector<double> phiResolution, Binning binning);
+
+    double getThetaPhiResolution(double energy, double theta, double phi, bool thetaOrPhi) const;
+
+
   private:
     /*!
      * Utilise ParticleWeighting modules as holders for binning of energy resolution

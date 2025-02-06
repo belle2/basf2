@@ -389,7 +389,6 @@ void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, 
       B2FATAL("ParticleKinematicFitterModule:  Direction only and alternate mass options only implemented for neutral particles with ECL cluster");
     }
 
-
     double mass = particle->getMass();
     if (massHypoPDG != 0) {
       if (TDatabasePDG::Instance()->GetParticle(massHypoPDG) == nullptr) {
@@ -403,7 +402,7 @@ void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, 
     double startingTheta = cluster->getTheta();
 
     ClusterUtils clutls;
-    const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+    const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster, massHypoPDG);
     double startingEError = sqrt(fabs(EPhiThetaCov[0][0]));
     double startingPhiError = sqrt(fabs(EPhiThetaCov[1][1]));
     double startingThetaError = sqrt(fabs(EPhiThetaCov[2][2]));

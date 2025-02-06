@@ -72,7 +72,7 @@ namespace Belle2 {
      * Returns 3x3 covariance matrix (E, theta, phi)
      * @return const TMatrixDSym
      */
-    const TMatrixDSym GetCovarianceMatrix3x3FromCluster(const ECLCluster* cluster);
+    const TMatrixDSym GetCovarianceMatrix3x3FromCluster(const ECLCluster* cluster, int particleHypo = 22);
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)
@@ -124,6 +124,14 @@ namespace Belle2 {
      * Photon energy resolution database object
      */
     OptionalDBObjPtr<ECLPhotonEnergyResolution> m_photonEnergyResolutionDB;
+
+    /**
+     * Hadron position resolution database objects
+     */
+    OptionalDBObjPtr<ECLPhotonEnergyResolution> m_neutronPositionResolutionDB{"neutronPositionResolutionDB"};
+    OptionalDBObjPtr<ECLPhotonEnergyResolution> m_antiNeutronPositionResolutionDB{"antiNeutronPositionResolutionDB"};
+    OptionalDBObjPtr<ECLPhotonEnergyResolution> m_kaonPositionResolutionDB{"kaonPositionResolutionDB"};
+
   };
 
 } // Belle2 namespace

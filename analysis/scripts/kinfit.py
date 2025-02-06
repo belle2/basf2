@@ -47,7 +47,7 @@ def fitKinematic4C(
     orca.param('addUnmeasuredPhoton', addUnmeasuredPhoton)
     orca.param('variablePrefix', variablePrefix)
     orca.param('directionOnlyParticles', directionOnlyParticles)
-    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
+    orca.param('alternateMassHypos', alternateMassHypos)
     path.add_module(orca)
 
 

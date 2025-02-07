@@ -27,6 +27,8 @@ Modules
 +++++++
 * Fixed a bug in the initialization of the decay length of TreeFit.
 * Removed the option ``expertUseReferencing`` from :b2:mod:`TreeFitter`.
+* Improved the duplicate detection in the EventShapeCalculator module so that particle lists of composite particles can
+  be provided safely
 
 Changes in the analysis package in light-2411-aldebaran
 -------------------------------------------------------

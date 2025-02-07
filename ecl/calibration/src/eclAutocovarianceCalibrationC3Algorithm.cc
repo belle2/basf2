@@ -42,6 +42,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
   ///** vectors to store information for output root file */
   std::vector<double> cryIDs;
   std::vector<double> noiseMatrix00Vector;
+  std::vector<double> autoCov00Vector;
   std::vector<double> totalCountsVector;
   std::vector<double> invertAttempts;
 
@@ -52,6 +53,8 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
   ECLAutoCovariance* Autocovariances = new ECLAutoCovariance();
 
   for (int ID = 0; ID < ECLElementNumbers::c_NCrystals; ID++) {
+
+    m_u2 = 1.0; //Reseting
 
     double totalCounts = CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(ID + 1,
                          m_numberofADCPoints + 1));
@@ -106,6 +109,10 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
           B2INFO("eclAutocovarianceCalibrationC3Algorithm setting m_u2 to zero");
           m_u2 = 0.0;
         }
+        if (invert_attempt > 100) {
+          B2INFO("eclAutocovarianceCalibrationC3Algorithm unable to invert!");
+          return c_NotEnoughData;
+        }
 
         B2INFO("eclAutocovarianceCalibrationC3Algorithm iD " << ID << " invert_attempt " << invert_attempt);
 
@@ -113,12 +120,14 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
         for (int i = 1; i < m_numberofADCPoints; i++) tempAutoCov[i] *= (m_u2 / (1. + exp((i - m_u0) / m_u1)));
         for (int i = 0; i < m_numberofADCPoints; i++) B2INFO("new[" << i << "] = " <<  tempAutoCov[i]);
 
+      } else {
+        noiseMatrix00Vector.push_back(NoiseMatrix_check(0, 0));
       }
       invert_attempt++;
     }
 
     cryIDs.push_back(ID + 1);
-    noiseMatrix00Vector.push_back(tempAutoCov[0]);
+    autoCov00Vector.push_back(tempAutoCov[0]);
     totalCountsVector.push_back(totalCounts);
     invertAttempts.push_back(invert_attempt);
 
@@ -128,6 +137,9 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
   saveCalibration(Autocovariances, "ECLAutoCovariance");
 
   /** Preparing TGraphs for output file */
+  auto gautoCov00Vector = new TGraph(cryIDs.size(), cryIDs.data(), autoCov00Vector.data());
+  gautoCov00Vector->SetName("gautoCov00Vector");
+  gautoCov00Vector->SetMarkerStyle(20);
   auto gnoiseMatrix00Vector = new TGraph(cryIDs.size(), cryIDs.data(), noiseMatrix00Vector.data());
   gnoiseMatrix00Vector->SetName("gnoiseMatrix00Vector");
   gnoiseMatrix00Vector->SetMarkerStyle(20);
@@ -143,6 +155,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
   TDirectory::TContext context;
   TFile* histfile = new TFile(fName, "recreate");
   histfile->cd();
+  gautoCov00Vector->Write();
   gnoiseMatrix00Vector->Write();
   gtotalCountsVector->Write();
   ginvertAttempts->Write();

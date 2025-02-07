@@ -50,6 +50,11 @@ void DQMHistAnalysisCDCDedxModule::initialize()
   l_line->SetLineStyle(1);
   l_line->SetLineWidth(2);
 
+  m_pave = new TPaveText();
+  m_pave->SetBorderSize(0);
+
+  m_lego = new TLegend(0.45, 0.77, 0.60, 0.89);
+
   //Monitoring object for run dependency at mirabelle
   m_monObj = getMonitoringObject("cdcdedx");
   m_monObj->addCanvas(c_ir_dedx);
@@ -134,7 +139,15 @@ void DQMHistAnalysisCDCDedxModule::terminate()
 
   delete c_pr_dedx;
   delete c_ir_dedx;
-
+  delete l_line;
+  delete m_pave;
+  delete h_dEdxIRMean;
+  delete h_dEdxIRSigma;
+  delete h_SigmaHer;
+  delete h_MeanHer;
+  delete h_MeanLer;
+  delete h_SigmaLer;
+  delete m_lego;
 }
 
 //-------------------------------------------
@@ -176,8 +189,8 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
   m_mean = 0.0;
   m_sigma = 0.0;
 
-  TH1* h_dEdx = findHist("CDCDedx/hdEdx");
-  if (h_dEdx != nullptr) {
+  TH1* h_dEdxClone = findHist("CDCDedx/hdEdx");
+  if (h_dEdxClone != nullptr) {
 
     double m_meanerr = 0.0;
     double m_sigmaerr = 0.0;
@@ -187,7 +200,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
 
     m_status = "LowStats";
 
-    TH1D* h_dEdxClone = (TH1D*)h_dEdx->Clone("hdEdx_clone");
+    // TH1D* h_dEdxClone = (TH1D*)h_dEdx->Clone("hdEdx_clone");
     if (h_dEdxClone != nullptr) {
       if (h_dEdxClone->Integral() > 250) {
         fitHistogram(h_dEdxClone, m_status);
@@ -210,29 +223,35 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
     m_monObj->setVariable("CDCDedxMeanErr", m_meanerr);
     m_monObj->setVariable("CDCDedxResoErr", m_sigmaerr);
 
-    TF1* f_gausC = (TF1*)f_gaus->Clone("f_gausC");
-    f_gausC->SetLineColor(kRed);
-    f_gausC->DrawClone("same");
+    // TF1* f_gausC = (TF1*)f_gaus->Clone("f_gausC");
+    f_gaus->SetLineColor(kRed);
+    f_gaus->DrawClone("same");
 
-    TPaveText pinfo0(0.12, 0.72, 0.37, 0.89, "NBNDC");
-    setTextStyle(pinfo0);
-    pinfo0.AddText(Form("Fit Status: %s", m_status.data()));
-    pinfo0.AddText(Form("Fit #mu^{dE/dx}: %0.3f ", m_mean));
-    pinfo0.AddText(Form("Fit #sigma^{dE/dx}: %0.3f ", m_sigma));
-    pinfo0.SetTextColor(kRed);
-    pinfo0.DrawClone("same");
+    m_pave->Clear();
 
-    TPaveText pinfo1(0.60, 0.69, 0.85, 0.89, "NBNDC");
-    setTextStyle(pinfo1);
-    pinfo1.AddText(Form("-- Expert info"));
-    pinfo1.AddText(Form("-------------"));
-    setBEvtInfo(pinfo1);
-    pinfo1.AddText(Form("Prev Gain: %0.03f", m_dbrg));
-    pinfo1.DrawClone("same");
+    // TPaveText* pinfo0= new TPaveText(0.12, 0.72, 0.37, 0.89, "NBNDC");
+    m_pave->SetX1NDC(0.12); m_pave->SetX2NDC(0.37); m_pave->SetY1NDC(0.72); m_pave->SetY2NDC(0.89);
+    setTextStyle(m_pave);
+    m_pave->AddText(Form("Fit Status: %s", m_status.data()));
+    m_pave->AddText(Form("Fit #mu^{dE/dx}: %0.3f ", m_mean));
+    m_pave->AddText(Form("Fit #sigma^{dE/dx}: %0.3f ", m_sigma));
+    m_pave->SetTextColor(kRed);
+    m_pave->DrawClone("same");
+
+    m_pave->Clear();
+    m_pave->SetX1NDC(0.60); m_pave->SetX2NDC(0.85); m_pave->SetY1NDC(0.69); m_pave->SetY2NDC(0.89);
+
+    // TPaveText* pinfo1 = new TPaveText(0.60, 0.69, 0.85, 0.89, "NBNDC");
+    setTextStyle(m_pave);
+    m_pave->AddText(Form("-- Expert info"));
+    m_pave->AddText(Form("-------------"));
+    setBEvtInfo(m_pave);
+    m_pave->AddText(Form("Prev Gain: %0.03f", m_dbrg));
+    m_pave->DrawClone("same");
 
     m_status.clear();
-    delete h_dEdxClone;
-    delete f_gausC;
+    // delete h_dEdxClone;
+    // delete f_gausC;
   }
 }
 
@@ -256,11 +275,15 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
 
       setHistStyle(hdEdxIRScat);
       hdEdxIRScat->Draw("");
-      TPaveText pinfo(0.609, 0.710, 0.942, 0.911, "NBNDC");
-      setTextStyle(pinfo);
-      pinfo.AddText("CDC-dE/dx Intra-run");
-      setBEvtInfo(pinfo);
-      pinfo.DrawClone("same");
+
+      m_pave->Clear();
+      m_pave->SetX1NDC(0.609); m_pave->SetX2NDC(0.942); m_pave->SetY1NDC(0.710); m_pave->SetY2NDC(0.911);
+
+      // TPaveText* pinfo = new TPaveText(0.609, 0.710, 0.942, 0.911, "NBNDC");
+      setTextStyle(m_pave);
+      m_pave->AddText("CDC-dE/dx Intra-run");
+      setBEvtInfo(m_pave);
+      m_pave->DrawClone("same");
     }
 
   }
@@ -279,23 +302,23 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
 
     if (nbin <= 0) nbin = 1;
 
-    TH1F hdEdxIRMean("hdEdxIRMean", "", nbin, 0.5, nbin + 0.5);
-    hdEdxIRMean.SetTitle("CDC-dE/dx gain(#mu): intra-run variation;Events(M);dE/dx (#mu_{fit})");
+    h_dEdxIRMean = new TH1F("h_dEdxIRMean", "", nbin, 0.5, nbin + 0.5);
+    h_dEdxIRMean->SetTitle("CDC-dE/dx gain(#mu): intra-run variation;Events(M);dE/dx (#mu_{fit})");
 
-    TH1F hdEdxIRSigma("hdEdxIRSigma", "", nbin, 0.5, nbin + 0.5);
-    hdEdxIRSigma.SetTitle("CDC-dE/dx reso.(#sigma): intra-run variation;Events(M);dE/dx (#sigma_{fit})");
+    h_dEdxIRSigma = new TH1F("h_dEdxIRSigma", "", nbin, 0.5, nbin + 0.5);
+    h_dEdxIRSigma->SetTitle("CDC-dE/dx reso.(#sigma): intra-run variation;Events(M);dE/dx (#sigma_{fit})");
 
-    setHistPars(hdEdxIRScatC, hdEdxIRMean, hdEdxIRSigma, nbin);
+    setHistPars(hdEdxIRScatC, h_dEdxIRMean, h_dEdxIRSigma, nbin);
 
     //2 intra-gain trend
 
-    drawHistPars(hdEdxIRMean, nbin, m_mean, 0.10, "#mu_{fit}");
+    drawHistPars(h_dEdxIRMean, nbin, m_mean, 0.10, "#mu_{fit}");
 
     //3 intra-resolution trend
     c_ir_dedx->cd(2);
     gPad->SetGridy(1);
 
-    drawHistPars(hdEdxIRSigma, nbin, m_sigma, 0.04, "#sigma_{fit}");
+    drawHistPars(h_dEdxIRSigma, nbin, m_sigma, 0.04, "#sigma_{fit}");
   }
 
 }
@@ -317,17 +340,20 @@ void DQMHistAnalysisCDCDedxModule::drawBandPlot()
     hdEdxVsP->SetMinimum(0.10);
     hdEdxVsP->Draw("col");
 
-    TPaveText pinfo0(0.60, 0.77, 0.85, 0.89, "NBNDC");
-    setTextStyle(pinfo0);
-    pinfo0.AddText(Form("IP tracks (hadron)"));
-    pinfo0.AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
+    m_pave->Clear();
+    m_pave->SetX1NDC(0.60); m_pave->SetX2NDC(0.85); m_pave->SetY1NDC(0.77); m_pave->SetY2NDC(0.89);
+
+    // TPaveText* pinfo0 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
+    setTextStyle(m_pave);
+    m_pave->AddText(Form("IP tracks (hadron)"));
+    m_pave->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
     if (m_nhadevt > 1e5)
-      pinfo0.AddText(Form("Events: %0.02fM", double(m_nhadevt / 1e6)));
+      m_pave->AddText(Form("Events: %0.02fM", double(m_nhadevt / 1e6)));
     if (m_nhadevt > 1e3)
-      pinfo0.AddText(Form("Events: %0.02fK", double(m_nhadevt / 1e3)));
+      m_pave->AddText(Form("Events: %0.02fK", double(m_nhadevt / 1e3)));
     else
-      pinfo0.AddText(Form("Events: %d", m_nhadevt));
-    pinfo0.DrawClone("same");
+      m_pave->AddText(Form("Events: %d", m_nhadevt));
+    m_pave->DrawClone("same");
   }
 }
 
@@ -347,10 +373,13 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
 
     l_line->DrawLine(-3.20, m_mean, 3.20, m_mean);
 
-    TPaveText pinfo0(0.60, 0.77, 0.85, 0.89, "NBNDC");
-    setTextStyle(pinfo0);
-    setBEvtInfo(pinfo0);
-    pinfo0.DrawClone("same");
+    m_pave->Clear();
+    m_pave->SetX1NDC(0.60); m_pave->SetX2NDC(0.85); m_pave->SetY1NDC(0.77); m_pave->SetY2NDC(0.89);
+
+    // TPaveText* pinfo0 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
+    setTextStyle(m_pave);
+    setBEvtInfo(m_pave);
+    m_pave->DrawClone("same");
   }
 
   //plot # 2
@@ -365,10 +394,13 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
 
     l_line->DrawLine(-1.0, m_mean, 1.0, m_mean);
 
-    TPaveText pinfo1(0.60, 0.77, 0.85, 0.89, "NBNDC");
-    setTextStyle(pinfo1);
-    setBEvtInfo(pinfo1);
-    pinfo1.DrawClone("same");
+    m_pave->Clear();
+    m_pave->SetX1NDC(0.60); m_pave->SetX2NDC(0.85); m_pave->SetY1NDC(0.77); m_pave->SetY2NDC(0.89);
+
+    // TPaveText* pinfo1 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
+    setTextStyle(m_pave);
+    setBEvtInfo(m_pave);
+    m_pave->DrawClone("same");
   }
 }
 
@@ -386,23 +418,28 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTime()
     setPlotStyle();
     setHistStyle(hinjtimeHer);
     hinjtimeHer->SetTitle("Time since last injection (HER)");
-    hinjtimeHer->Draw("box");
+    hinjtimeHer->DrawClone("box");
 
     setHistStyle(hinjtimeLer);
     hinjtimeLer->SetFillColor(kRed);
-    hinjtimeLer->Draw("same box");
+    hinjtimeLer->DrawClone("same box");
 
     l_line->DrawLine(0, m_mean, 80e3, m_mean);
 
-    TLegend lego(0.50, 0.77, 0.60, 0.89);
-    lego.AddEntry(hinjtimeHer, "HER", "f");
-    lego.AddEntry(hinjtimeLer, "LER", "f");
-    lego.DrawClone("same");
+    m_lego->Clear();
+    // m_lego->SetX1(0.5); m_lego->SetY1(0.77); m_lego->SetX2(0.6); m_lego->SetY2(0.89);
+    // TLegend m_lego(0.50, 0.77, 0.60, 0.89);
+    m_lego->AddEntry(hinjtimeHer, "HER", "f");
+    m_lego->AddEntry(hinjtimeLer, "LER", "f");
+    m_lego->DrawClone("same");
 
-    TPaveText pinfo0(0.60, 0.77, 0.85, 0.89, "NBNDC");
-    setTextStyle(pinfo0);
-    setBEvtInfo(pinfo0);
-    pinfo0.DrawClone("same");
+    m_pave->Clear();
+    m_pave->SetX1NDC(0.60); m_pave->SetX2NDC(0.85); m_pave->SetY1NDC(0.77); m_pave->SetY2NDC(0.89);
+
+    // TPaveText* pinfo0 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
+    setTextStyle(m_pave);
+    setBEvtInfo(m_pave);
+    m_pave->DrawClone("same");
   }
 }
 
@@ -423,42 +460,46 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
     int nbin = (lbin - fbin + 1) / 2;
     if (nbin <= 0)nbin = 1;
 
-    TH1F hMeanHer("hMeanHer", "CDC-dE/dx gain(#mu);Injection time (ms);dE/dx (#mu_{fit})", nbin, 0.5, nbin + 0.5);
-    TH1F hSigmaHer("hSigmaHer", "CDC-dE/dx reso.(#sigma);Injection time (ms);dE/dx (#sigma_{fit})", nbin, 0.5, nbin + 0.5);
+    h_MeanHer = new TH1F("h_MeanHer", "CDC-dE/dx gain(#mu);Injection time (ms);dE/dx (#mu_{fit})", nbin, 0.5, nbin + 0.5);
+    h_SigmaHer = new TH1F("h_SigmaHer", "CDC-dE/dx reso.(#sigma);Injection time (ms);dE/dx (#sigma_{fit})", nbin, 0.5, nbin + 0.5);
 
-    TH1F hMeanLer("hMeanLer", "CDC-dE/dx gain(#mu);Injection time (ms);dE/dx (#mu_{fit})", nbin, 0.5, nbin + 0.5);
-    TH1F hSigmaLer("hSigmaLer", "CDC-dE/dx reso.(#sigma);Injection time (ms);dE/dx (#sigma_{fit})", nbin, 0.5, nbin + 0.5);
+    h_MeanLer = new TH1F("h_MeanLer", "CDC-dE/dx gain(#mu);Injection time (ms);dE/dx (#mu_{fit})", nbin, 0.5, nbin + 0.5);
+    h_SigmaLer = new TH1F("h_SigmaLer", "CDC-dE/dx reso.(#sigma);Injection time (ms);dE/dx (#sigma_{fit})", nbin, 0.5, nbin + 0.5);
 
-    setHistPars(hdEdxITHer, hMeanHer, hSigmaHer, nbin);
-    setHistPars(hdEdxITLer, hMeanLer, hSigmaLer, nbin);
+    setHistPars(hdEdxITHer, h_MeanHer, h_SigmaHer, nbin);
+    setHistPars(hdEdxITLer, h_MeanLer, h_SigmaLer, nbin);
 
     gPad->SetGridy(1);
-    drawHistPars(hMeanHer, nbin, m_mean, 0.40, "#mu_{fit}");
+    drawHistPars(h_MeanHer, nbin, m_mean, 0.40, "#mu_{fit}");
 
-    hMeanLer.SetMarkerColor(kRed);
-    hMeanLer.SetMarkerStyle(20);
-    hMeanLer.SetMarkerSize(1.10);
-    hMeanLer.DrawClone("same");
+    h_MeanLer->SetMarkerColor(kRed);
+    h_MeanLer->SetMarkerStyle(20);
+    h_MeanLer->SetMarkerSize(1.10);
+    h_MeanLer->DrawClone("same");
 
-    TLegend lego(0.45, 0.77, 0.60, 0.89);
-    lego.AddEntry(&hMeanHer, "HER", "p");
-    lego.AddEntry(&hMeanLer, "LER", "p");
-    lego.DrawClone("same");
+
+    // TLegend m_lego(0.45, 0.77, 0.60, 0.89);
+    m_lego->Clear();
+
+    m_lego->AddEntry(h_MeanHer, "HER", "p");
+    m_lego->AddEntry(h_MeanLer, "LER", "p");
+    m_lego->DrawClone("same");
 
     c_pr_dedx->cd(6);
     gPad->SetGridy(1);
 
-    drawHistPars(hSigmaHer, nbin, m_sigma, 0.15, "#sigma_{fit}");
+    drawHistPars(h_SigmaHer, nbin, m_sigma, 0.15, "#sigma_{fit}");
 
-    hSigmaLer.SetMarkerColor(kRed);
-    hSigmaLer.SetMarkerStyle(20);
-    hSigmaLer.SetMarkerSize(1.10);
-    hSigmaLer.DrawClone("same");
+    h_SigmaLer->SetMarkerColor(kRed);
+    h_SigmaLer->SetMarkerStyle(20);
+    h_SigmaLer->SetMarkerSize(1.10);
+    h_SigmaLer->DrawClone("same");
 
-    TLegend lego1(0.45, 0.77, 0.60, 0.89);
-    lego1.AddEntry(&hSigmaHer, "HER", "p");
-    lego1.AddEntry(&hSigmaLer, "LER", "p");
-    lego1.DrawClone("same");
+    m_lego->Clear();
+    // TLegend m_lego1(0.45, 0.77, 0.60, 0.89);
+    m_lego->AddEntry(h_SigmaHer, "HER", "p");
+    m_lego->AddEntry(h_SigmaLer, "LER", "p");
+    m_lego->DrawClone("same");
   }
 }
 
@@ -485,30 +526,33 @@ void DQMHistAnalysisCDCDedxModule::drawWireStatus()
     hWireStatus->SetMarkerStyle(7);
     hWireStatus->Draw("same");
 
-    TPaveText pinfo0(0.117, 0.832, 0.148, 0.976, "NBNDC");
-    setTextStyle(pinfo0);
-    pinfo0.AddText(Form("CDC Wire Status"));
-    pinfo0.AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
-    pinfo0.AddText(Form("Dead: %d (%0.02f%%)", m_ndead, (100.0 * m_ndead / c_nSenseWires)));
+    m_pave->Clear();
+    m_pave->SetX1NDC(0.117); m_pave->SetX2NDC(0.148); m_pave->SetY1NDC(0.832); m_pave->SetY2NDC(0.976);
+
+    // TPaveText* pinfo0 = new TPaveText(0.117, 0.832, 0.148, 0.976, "NBNDC");
+    setTextStyle(m_pave);
+    m_pave->AddText(Form("CDC Wire Status"));
+    m_pave->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
+    m_pave->AddText(Form("Dead: %d (%0.02f%%)", m_ndead, (100.0 * m_ndead / c_nSenseWires)));
     if (m_nallevt > 1e5)
-      pinfo0.AddText(Form("Events: %0.02fM", double(m_nallevt / 1e6)));
+      m_pave->AddText(Form("Events: %0.02fM", double(m_nallevt / 1e6)));
     if (m_nallevt > 1e3)
-      pinfo0.AddText(Form("Events: %0.02fK", double(m_nallevt / 1e3)));
+      m_pave->AddText(Form("Events: %0.02fK", double(m_nallevt / 1e3)));
     else
-      pinfo0.AddText(Form("Events: %d", m_nallevt));
-    pinfo0.DrawClone("same");
+      m_pave->AddText(Form("Events: %d", m_nallevt));
+    m_pave->DrawClone("same");
   }
 }
 
 //-----------------------------------------------
-void DQMHistAnalysisCDCDedxModule::setHistPars(TH2D*& hdEdx, TH1F& hmean, TH1F& hsigma, int nbin)
+void DQMHistAnalysisCDCDedxModule::setHistPars(TH2D*& hdEdx, TH1F*& hmean, TH1F*& hsigma, int nbin)
 {
 
   int fbin = hdEdx->FindFirstBinAbove(0, 1);
 
   for (int ibin = 0; ibin < nbin; ibin++) {
     int localbin = ibin + fbin;
-    TH1D* hdEdxIRInd = (TH1D*)hdEdx->ProjectionY(Form("htemp_%d", localbin), localbin, localbin);
+    TH1* hdEdxIRInd = (TH1*)hdEdx->ProjectionY(Form("htemp_%d", localbin), localbin, localbin);
 
     double mean = 0.0, meanerr = 0.0;
     double sigma = 0.0, sigmaerr = 0.0;
@@ -522,51 +566,54 @@ void DQMHistAnalysisCDCDedxModule::setHistPars(TH2D*& hdEdx, TH1F& hmean, TH1F& 
       sigmaerr = hdEdxIRInd->GetFunction("f_gaus")->GetParError(2);
     }
 
-    hmean.SetBinContent(ibin + 1, mean);
-    hmean.SetBinError(ibin + 1, meanerr);
-    hsigma.SetBinContent(ibin + 1, sigma);
-    hsigma.SetBinError(ibin + 1, sigmaerr);
+    hmean->SetBinContent(ibin + 1, mean);
+    hmean->SetBinError(ibin + 1, meanerr);
+    hsigma->SetBinContent(ibin + 1, sigma);
+    hsigma->SetBinError(ibin + 1, sigmaerr);
   }
 
 }
 
 //-----------------------------------------------
-void DQMHistAnalysisCDCDedxModule::drawHistPars(TH1F& hist, int nbin, double pars, double fac, std::string var)
+void DQMHistAnalysisCDCDedxModule::drawHistPars(TH1F*& hist, int nbin, double pars, double fac, std::string var)
 {
-  std::string hname = hist.GetName();
+  std::string hname = hist->GetName();
   setPadStyle(0.143, 0.045, 0.077, 0.0);
-  hist.SetMarkerColor(kBlue);
-  hist.SetMarkerStyle(20);
-  hist.SetMarkerSize(1.10);
-  hist.GetYaxis()->SetRangeUser(pars - fac, pars + fac); //m_mean - 0.10, m_mean + 0.10);
-  hist.DrawClone("");
+  hist->SetMarkerColor(kBlue);
+  hist->SetMarkerStyle(20);
+  hist->SetMarkerSize(1.10);
+  hist->GetYaxis()->SetRangeUser(pars - fac, pars + fac); //m_mean - 0.10, m_mean + 0.10);
+  hist->DrawClone("");
 
-  l_line->DrawLine(0.5, pars, hist.GetXaxis()->GetBinUpEdge(nbin), pars);
+  l_line->DrawLine(0.5, pars, hist->GetXaxis()->GetBinUpEdge(nbin), pars);
 
-  TPaveText pinfo0(0.609, 0.680, 0.942, 0.911, "NBNDC");
-  setTextStyle(pinfo0);
-  if (hname == "hdEdxIRMean" || hname == "hdEdxIRSigma")  pinfo0.AddText("Intra-run variation");
-  setBEvtInfo(pinfo0);
-  pinfo0.AddText(Form("Avg %s: %0.3f", var.data(), pars));
-  pinfo0.DrawClone("same");
+  m_pave->Clear();
+  m_pave->SetX1NDC(0.609); m_pave->SetX2NDC(0.942); m_pave->SetY1NDC(0.680); m_pave->SetY2NDC(0.911);
+
+  // TPaveText* pinfo0 = new TPaveText(0.609, 0.680, 0.942, 0.911, "NBNDC");
+  setTextStyle(m_pave);
+  if (hname == "h_dEdxIRMean" || hname == "h_dEdxIRSigma")  m_pave->AddText("Intra-run variation");
+  setBEvtInfo(m_pave);
+  m_pave->AddText(Form("Avg %s: %0.3f", var.data(), pars));
+  m_pave->DrawClone("same");
 }
 
 //-----------------------------------------------
-void DQMHistAnalysisCDCDedxModule::setBEvtInfo(TPaveText& pt)
+void DQMHistAnalysisCDCDedxModule::setBEvtInfo(TPaveText*& pt)
 {
 
-  pt.AddText("CDC dE/dx (e^{+}e^{-})");
-  pt.AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
+  pt->AddText("CDC dE/dx (e^{+}e^{-})");
+  pt->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
   if (m_nbhabhaevt > 1e5)
-    pt.AddText(Form("Events: %0.02fM", double(m_nbhabhaevt / 1e6)));
+    pt->AddText(Form("Events: %0.02fM", double(m_nbhabhaevt / 1e6)));
   if (m_nbhabhaevt > 1e3)
-    pt.AddText(Form("Events: %0.02fK", double(m_nbhabhaevt / 1e3)));
+    pt->AddText(Form("Events: %0.02fK", double(m_nbhabhaevt / 1e3)));
   else
-    pt.AddText(Form("Events: %d", m_nbhabhaevt));
+    pt->AddText(Form("Events: %d", m_nbhabhaevt));
 }
 
 //----------------------------------------------------------------------------------------
-void DQMHistAnalysisCDCDedxModule::fitHistogram(TH1D*& temphist, std::string& status)
+void DQMHistAnalysisCDCDedxModule::fitHistogram(TH1*& temphist, std::string& status)
 {
 
   if (temphist != nullptr) {
@@ -606,20 +653,20 @@ void DQMHistAnalysisCDCDedxModule::setPlotStyle()
 
 
 //------------------------------------------------------------------
-void DQMHistAnalysisCDCDedxModule::setTextStyle(TPaveText& obj)
+void DQMHistAnalysisCDCDedxModule::setTextStyle(TPaveText*& obj)
 {
 
-  obj.SetFillColor(0);
-  obj.SetFillStyle(0);
+  obj->SetFillColor(0);
+  obj->SetFillStyle(0);
 
-  obj.SetLineColor(TColor::GetColor("#000000"));
-  obj.SetLineWidth(0);
-  obj.SetTextAlign(12);
+  obj->SetLineColor(TColor::GetColor("#000000"));
+  obj->SetLineWidth(0);
+  obj->SetTextAlign(12);
 
-  obj.SetTextColor(kGray + 3);
-  obj.SetTextFont(82);
-  obj.SetTextSize(0.03157895);
-  obj.SetTextAlign(12);
+  obj->SetTextColor(kGray + 3);
+  obj->SetTextFont(82);
+  obj->SetTextSize(0.03157895);
+  obj->SetTextAlign(12);
 
 }
 

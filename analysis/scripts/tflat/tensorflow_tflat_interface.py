@@ -51,7 +51,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     parameters["mlp_hidden_units_factors"] = [2, 1,]
     parameters["dropout_rate"] = 0.2
     parameters["use_column_embedding"] = True
-    parameters["num_bins"] = 64
+    parameters["num_bins"] = 16  # 64
 
     state = State(get_tflat_model(parameters, number_of_features))
 

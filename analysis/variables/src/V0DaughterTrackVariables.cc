@@ -29,7 +29,6 @@
 #include <framework/logging/Logger.h>
 
 #include <algorithm>
-#include <TVector2.h>
 #include <cmath>
 
 using namespace std;
@@ -514,11 +513,11 @@ namespace Belle2 {
       double radius1 = 1 / Omega1;
       double radius2 = 1 / Omega2;
 
-      TVector2 center1((radius1 + D01) * sin(Phi01), -1 * (radius1 + D01) * cos(Phi01));
-      TVector2 center2((radius2 + D02) * sin(Phi02), -1 * (radius2 + D02) * cos(Phi02));
-      TVector2 cenDiff = center1 - center2;
+      ROOT::Math::XYVector center1((radius1 + D01) * sin(Phi01), -1 * (radius1 + D01) * cos(Phi01));
+      ROOT::Math::XYVector center2((radius2 + D02) * sin(Phi02), -1 * (radius2 + D02) * cos(Phi02));
+      ROOT::Math::XYVector cenDiff = center1 - center2;
 
-      double delR = fabs(radius1) + fabs(radius2) - cenDiff.Mod();
+      double delR = fabs(radius1) + fabs(radius2) - cenDiff.R();
       return delR;
     }
 
@@ -548,11 +547,11 @@ namespace Belle2 {
       double radius1 = 1 / Omega1;
       double radius2 = 1 / Omega2;
 
-      TVector2 center1((radius1 + D01) * sin(Phi01), -1 * (radius1 + D01) * cos(Phi01));
-      TVector2 center2((radius2 + D02) * sin(Phi02), -1 * (radius2 + D02) * cos(Phi02));
+      ROOT::Math::XYVector center1((radius1 + D01) * sin(Phi01), -1 * (radius1 + D01) * cos(Phi01));
+      ROOT::Math::XYVector center2((radius2 + D02) * sin(Phi02), -1 * (radius2 + D02) * cos(Phi02));
 
-      TVector2 n1 =  center1 - center2; n1 = n1.Unit();
-      TVector2 n2 = -1 * n1;
+      ROOT::Math::XYVector n1 =  center1 - center2; n1 = n1.Unit();
+      ROOT::Math::XYVector n2 = -1 * n1;
       n1 = copysign(1.0, Omega1) * n1;
       n2 = copysign(1.0, Omega2) * n2;
 
@@ -582,11 +581,11 @@ namespace Belle2 {
       return (z1 + z2) * 0.5;
     }
 
-    TVector2 convertedPhotonXY(const Particle* gamma, const std::vector<double>& daughterIndices)
+    ROOT::Math::XYVector convertedPhotonXY(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
       //Do basic checks
       int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
-      if (errFlag == -1) {return TVector2(Const::doubleNaN, Const::doubleNaN);}
+      if (errFlag == -1) {return ROOT::Math::XYVector(Const::doubleNaN, Const::doubleNaN);}
 
       //Load helix parameters
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
@@ -596,25 +595,25 @@ namespace Belle2 {
                                                Omega2, Z02, TanLambda2);
       if (errFlag == -1) {
         B2ERROR("First track provided has curvature zero. Calculation of convertedPhotonXY failed.");
-        return  TVector2(Const::doubleNaN, Const::doubleNaN);
+        return  ROOT::Math::XYVector(Const::doubleNaN, Const::doubleNaN);
       }
       if (errFlag == -2) {
         B2ERROR("Second track provided has curvature zero. Calculation of convertedPhotonXY failed.");
-        return  TVector2(Const::doubleNaN, Const::doubleNaN);
+        return  ROOT::Math::XYVector(Const::doubleNaN, Const::doubleNaN);
       }
 
       //Radial unit vectors
       double radius1 = 1 / Omega1;
       double radius2 = 1 / Omega2;
 
-      TVector2 center1((radius1 + D01) * sin(Phi01), -1 * (radius1 + D01) * cos(Phi01));
-      TVector2 center2((radius2 + D02) * sin(Phi02), -1 * (radius2 + D02) * cos(Phi02));
-      TVector2 cenDiff = center2 - center1;
-      double delR = fabs(radius1) + fabs(radius2) - cenDiff.Mod();
+      ROOT::Math::XYVector center1((radius1 + D01) * sin(Phi01), -1 * (radius1 + D01) * cos(Phi01));
+      ROOT::Math::XYVector center2((radius2 + D02) * sin(Phi02), -1 * (radius2 + D02) * cos(Phi02));
+      ROOT::Math::XYVector cenDiff = center2 - center1;
+      double delR = fabs(radius1) + fabs(radius2) - cenDiff.R();
 
       //Calculate transverse vertex
-      TVector2 n1 = cenDiff.Unit();
-      TVector2 vtxXY = center1 + ((fabs(radius1) - (delR / 2)) * n1);
+      ROOT::Math::XYVector n1 = cenDiff.Unit();
+      ROOT::Math::XYVector vtxXY = center1 + ((fabs(radius1) - (delR / 2)) * n1);
       return vtxXY;
     }
 
@@ -633,14 +632,14 @@ namespace Belle2 {
     double convertedPhotonRho(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
       auto vtxXY = convertedPhotonXY(gamma, daughterIndices);
-      return vtxXY.Mod();
+      return vtxXY.R();
     }
 
-    B2Vector3D convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices)
+    ROOT::Math::XYZVector convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
       //Do basic checks
       int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
-      if (errFlag == -1) {return B2Vector3D(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);}
+      if (errFlag == -1) {return ROOT::Math::XYZVector(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);}
 
       //Load helix parameters
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
@@ -651,11 +650,11 @@ namespace Belle2 {
                                                TanLambda2);
       if (errFlag == -1) {
         B2ERROR("First track provided has curvature zero. Calculation of convertedPhoton3Momentum failed.");
-        return  B2Vector3D(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
+        return  ROOT::Math::XYZVector(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
       }
       if (errFlag == -2) {
         B2ERROR("Second track provided has curvature zero. Calculation of convertedPhoton3Momentum failed.");
-        return  B2Vector3D(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
+        return  ROOT::Math::XYZVector(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
       }
 
       //Delta-Z
@@ -663,10 +662,10 @@ namespace Belle2 {
       double radius1 = 1 / Omega1;
       double radius2 = 1 / Omega2;
 
-      TVector2 center1((radius1 + D01) * sin(Phi01), -1 * (radius1 + D01) * cos(Phi01));
-      TVector2 center2((radius2 + D02) * sin(Phi02), -1 * (radius2 + D02) * cos(Phi02));
-      TVector2 n1 =  center1 - center2; n1 = n1.Unit();
-      TVector2 n2 = -1 * n1;
+      ROOT::Math::XYVector center1((radius1 + D01) * sin(Phi01), -1 * (radius1 + D01) * cos(Phi01));
+      ROOT::Math::XYVector center2((radius2 + D02) * sin(Phi02), -1 * (radius2 + D02) * cos(Phi02));
+      ROOT::Math::XYVector n1 =  center1 - center2; n1 = n1.Unit();
+      ROOT::Math::XYVector n2 = -1 * n1;
       n1 = copysign(1.0, Omega1) * n1;
       n2 = copysign(1.0, Omega2) * n2;
 
@@ -682,10 +681,10 @@ namespace Belle2 {
 
       //Photon 3-momentum
       double p1  = gamma->getDaughter(daughterIndex1)->getMomentumMagnitude();
-      B2Vector3D e1Momentum(coslam1 * cos(phiN1), coslam1 * sin(phiN1), sinlam1);
+      ROOT::Math::XYZVector e1Momentum(coslam1 * cos(phiN1), coslam1 * sin(phiN1), sinlam1);
       double p2  = gamma->getDaughter(daughterIndex2)->getMomentumMagnitude();
-      B2Vector3D e2Momentum(coslam2 * cos(phiN2), coslam2 * sin(phiN2), sinlam2);
-      B2Vector3D gammaMomentum = (e1Momentum * p1) + (e2Momentum * p2);
+      ROOT::Math::XYZVector e2Momentum(coslam2 * cos(phiN2), coslam2 * sin(phiN2), sinlam2);
+      ROOT::Math::XYZVector gammaMomentum = (e1Momentum * p1) + (e2Momentum * p2);
 
       return gammaMomentum;
     }
@@ -693,19 +692,19 @@ namespace Belle2 {
     double convertedPhotonPx(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
       auto gammaMomentum = convertedPhoton3Momentum(gamma, daughterIndices);
-      return gammaMomentum.Px();
+      return gammaMomentum.X();
     }
 
     double convertedPhotonPy(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
       auto gammaMomentum = convertedPhoton3Momentum(gamma, daughterIndices);
-      return gammaMomentum.Py();
+      return gammaMomentum.Y();
     }
 
     double convertedPhotonPz(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
       auto gammaMomentum = convertedPhoton3Momentum(gamma, daughterIndices);
-      return gammaMomentum.Pz();
+      return gammaMomentum.Z();
     }
 
     int v0DaughtersShareInnermostHit(const Particle* part)

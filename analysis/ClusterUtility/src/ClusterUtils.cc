@@ -219,7 +219,7 @@ const XYZVector ClusterUtils::GetIPPosition()
     B2WARNING("Beamspot not available, using (0, 0, 0) as IP position instead.");
     return XYZVector(0.0, 0.0, 0.0);
   } else
-    return XYZVector(m_beamSpotDB->getIPPosition().X(), m_beamSpotDB->getIPPosition().Y(), m_beamSpotDB->getIPPosition().Z());
+    return m_beamSpotDB->getIPPosition();
 }
 
 // -----------------------------------------------------------------------------

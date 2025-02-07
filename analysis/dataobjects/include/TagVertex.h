@@ -10,7 +10,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 
-#include <framework/geometry/B2Vector3.h>
+#include <Math/Vector3D.h>
 #include <TMatrixDSym.h>
 #include <string>
 
@@ -36,13 +36,13 @@ namespace Belle2 {
       */
     TagVertex()
     {
-      m_tagVertex(0) = 0; m_tagVertex(1) = 0; m_tagVertex(2) = 0;
+      m_tagVertex = ROOT::Math::XYZVector(0, 0, 0);
       m_tagVertexPval = 0;
       m_deltaT = 0;
       m_deltaTErr = 0;
       m_mcDeltaTau = 0;
       m_mcDeltaT = 0;
-      m_mcTagV(0) = 0; m_mcTagV(1) = 0; m_mcTagV(2) = 0;
+      m_mcTagV = ROOT::Math::XYZVector(0, 0, 0);
       m_mcPDG = 0;
       resetTagVertexErrorMatrix();
       resetConstraintCov();
@@ -59,7 +59,7 @@ namespace Belle2 {
       m_tagVChi2IP = 0;
       m_NFitTracks = 0;
       m_constraintType = "";
-      m_constraintCenter(0) = 0; m_constraintCenter(1) = 0, m_constraintCenter(2) = 0;
+      m_constraintCenter = ROOT::Math::XYZVector(0, 0, 0);
       m_fitTruthStatus = 0;
       m_rollbackStatus = 0;
     }
@@ -69,7 +69,7 @@ namespace Belle2 {
     /**
      * Returns BTag Vertex
      */
-    B2Vector3D getTagVertex() const;
+    ROOT::Math::XYZVector getTagVertex() const;
 
     /**
      * Returns BTag Vertex (3x3) error matrix
@@ -104,7 +104,7 @@ namespace Belle2 {
     /**
      * Returns generated BTag Vertex
      */
-    B2Vector3D getMCTagVertex() const;
+    ROOT::Math::XYZVector getMCTagVertex() const;
 
     /**
      * Returns generated Btag PDG code
@@ -192,7 +192,7 @@ namespace Belle2 {
      *  Returns the position of the constraint, ie centre of the constraint ellipse
      */
 
-    B2Vector3D getConstraintCenter() const;
+    ROOT::Math::XYZVector getConstraintCenter() const;
 
     /**
      * Get the covariance matrix of the constraint for the tag fit
@@ -239,7 +239,7 @@ namespace Belle2 {
     /**
      * Set BTag Vertex
      */
-    void setTagVertex(const B2Vector3D& TagVertex);
+    void setTagVertex(const ROOT::Math::XYZVector& TagVertex);
 
     /**
      *  Set BTag Vertex (3x3) error matrix
@@ -264,7 +264,7 @@ namespace Belle2 {
     /**
      * Set generated BTag Vertex
      */
-    void setMCTagVertex(const B2Vector3D& mcTagVertex);
+    void setMCTagVertex(const ROOT::Math::XYZVector& mcTagVertex);
 
     /**
      * Set generated Btag PDG code
@@ -355,7 +355,7 @@ namespace Belle2 {
      * Set the centre of the constraint for the tag fit
      */
 
-    void setConstraintCenter(const B2Vector3D& constraintCenter);
+    void setConstraintCenter(const ROOT::Math::XYZVector& constraintCenter);
 
     /**
      * Set the covariance matrix of the constraint for the tag fit
@@ -380,12 +380,12 @@ namespace Belle2 {
     void setRollBackStatus(int backStatus);
 
   private:
-    B2Vector3D m_tagVertex;             /**< Btag vertex */
+    ROOT::Math::XYZVector m_tagVertex;  /**< Btag vertex */
     TMatrixDSym m_tagVertexErrMatrix;   /**< Btag vertex (3x3) error matrix */
     float m_tagVertexPval;              /**< Btag vertex P value */
     float m_deltaT;                     /**< Delta t */
     float m_deltaTErr;                  /**< Delta t error */
-    B2Vector3D m_mcTagV;                /**< generated Btag vertex */
+    ROOT::Math::XYZVector m_mcTagV;     /**< generated Btag vertex */
     int m_mcPDG;                        /**< generated tag side B flavor (PDG code) */
     float m_mcDeltaTau;                 /**< generated Delta t: difference between signal and tag flight times */
     float m_mcDeltaT;                   /**< generated Delta t approximated: true Delta L divided by Upsilon(4S)'s boost */
@@ -405,7 +405,7 @@ namespace Belle2 {
     int m_NFitTracks;                   /**< Number of tracks used by Rave to fit the vertex */
     std::vector<double> m_raveWeights;  /**< weights of each track in the Rave tag vtx fit */
     std::string m_constraintType;       /**< Type of the constraint used for the tag vertex fit (noConstraint, IP, Boost, Tube) */
-    B2Vector3D m_constraintCenter;      /**< centre of the constraint */
+    ROOT::Math::XYZVector m_constraintCenter;      /**< centre of the constraint */
     TMatrixDSym m_constraintCov;        /**< covariance matrix associated to the constraint, ie size of the constraint */
     int m_fitTruthStatus;               /**< status of the fit when fitted with the truth info of the tracks */
     int m_rollbackStatus;               /**< status of the fit when fitted with rolled back tracks */
@@ -423,7 +423,8 @@ namespace Belle2 {
      */
     void resetConstraintCov();
 
-    ClassDef(TagVertex, 6) /**<
+    ClassDef(TagVertex, 7) /**<
+           7. Replaced B2Vector3D with XYZVector
            6. Replaced TVector3 with B2Vector3D
            5. Renamed variables related to DeltaZ and DeltaT
            4. Add info related to fit tracks, rave weights

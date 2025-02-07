@@ -632,14 +632,14 @@ class TDCPV_dilepton(BaseSkim):
 
     def build_lists(self, path):
         ma.cutAndCopyList(
-            "e+:pid",
+            "e+:pid_TDCPV_dilepton",
             "e+:all",
             "abs(dr) < 1 and abs(dz) < 4 and p > 1.2 and electronID > 0.5",
             True,
             path=path,
         )
         ma.cutAndCopyList(
-            "mu+:pid",
+            "mu+:pid_TDCPV_dilepton",
             "mu+:all",
             "abs(dr) < 1 and abs(dz) < 4 and p > 1.2 and muonID > 0.5",
             True,
@@ -662,23 +662,27 @@ class TDCPV_dilepton(BaseSkim):
 
         path = self.skim_event_cuts('sphericity > 0.18 and nTracks > 4', path=path)
 
-        ma.reconstructDecay('Upsilon(4S):ee   -> e+:pid e-:pid', 'M < 15', path=path)
-        ma.reconstructDecay('Upsilon(4S):emu  -> e+:pid mu-:pid', 'M < 15', path=path)
-        ma.reconstructDecay('Upsilon(4S):mumu -> mu+:pid mu-:pid', 'M < 15', path=path)
+        ma.reconstructDecay('Upsilon(4S):ee_TDCPV_dilepton   -> e+:pid_TDCPV_dilepton e-:pid_TDCPV_dilepton', 'M < 15', path=path)
+        ma.reconstructDecay('Upsilon(4S):emu_TDCPV_dilepton  -> e+:pid_TDCPV_dilepton mu-:pid_TDCPV_dilepton', 'M < 15', path=path)
+        ma.reconstructDecay('Upsilon(4S):mumu_TDCPV_dilepton -> mu+:pid_TDCPV_dilepton mu-:pid_TDCPV_dilepton', 'M < 15', path=path)
 
-        ma.reconstructDecay('Delta++:ee   -> e+:pid e+:pid', 'M < 15', path=path)
-        ma.reconstructDecay('Delta++:emu  -> e+:pid mu+:pid', 'M < 15', path=path)
-        ma.reconstructDecay('Delta++:mumu -> mu+:pid mu+:pid', 'M < 15', path=path)
+        ma.reconstructDecay('Delta++:ee_TDCPV_dilepton   -> e+:pid_TDCPV_dilepton e+:pid_TDCPV_dilepton', 'M < 15', path=path)
+        ma.reconstructDecay('Delta++:emu_TDCPV_dilepton  -> e+:pid_TDCPV_dilepton mu+:pid_TDCPV_dilepton', 'M < 15', path=path)
+        ma.reconstructDecay('Delta++:mumu_TDCPV_dilepton -> mu+:pid_TDCPV_dilepton mu+:pid_TDCPV_dilepton', 'M < 15', path=path)
 
-        ma.copyLists(outputListName='Upsilon(4S):ll',
-                     inputListNames=['Upsilon(4S):ee', 'Upsilon(4S):emu', 'Upsilon(4S):mumu'],
+        ma.copyLists(
+            outputListName='Upsilon(4S):ll_TDCPV_dilepton',
+            inputListNames=[
+                'Upsilon(4S):ee_TDCPV_dilepton',
+                'Upsilon(4S):emu_TDCPV_dilepton',
+                'Upsilon(4S):mumu_TDCPV_dilepton'],
+            path=path)
+
+        ma.copyLists(outputListName='Delta++:ll_TDCPV_dilepton',
+                     inputListNames=['Delta++:ee_TDCPV_dilepton', 'Delta++:emu_TDCPV_dilepton', 'Delta++:mumu_TDCPV_dilepton'],
                      path=path)
 
-        ma.copyLists(outputListName='Delta++:ll',
-                     inputListNames=['Delta++:ee', 'Delta++:emu', 'Delta++:mumu'],
-                     path=path)
-
-        return ["Upsilon(4S):ll", "Delta++:ll"]
+        return ["Upsilon(4S):ll_TDCPV_dilepton", "Delta++:ll_TDCPV_dilepton"]
 
 
 @fancy_skim_header

@@ -201,16 +201,16 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
     m_status = "LowStats";
 
     // TH1D* h_dEdxClone = (TH1D*)h_dEdx->Clone("hdEdx_clone");
-    if (h_dEdxClone != nullptr) {
-      if (h_dEdxClone->Integral() > 250) {
-        fitHistogram(h_dEdxClone, m_status);
-        if (m_status == "OK") {
-          m_mean = h_dEdxClone->GetFunction("f_gaus")->GetParameter(1);
-          m_sigma = h_dEdxClone->GetFunction("f_gaus")->GetParameter(2);
-          m_meanerr = h_dEdxClone->GetFunction("f_gaus")->GetParError(1);
-          m_sigmaerr = h_dEdxClone->GetFunction("f_gaus")->GetParError(2);
-        }
+    // if (h_dEdxClone != nullptr) {
+    if (h_dEdxClone->Integral() > 250) {
+      fitHistogram(h_dEdxClone, m_status);
+      if (m_status == "OK") {
+        m_mean = h_dEdxClone->GetFunction("f_gaus")->GetParameter(1);
+        m_sigma = h_dEdxClone->GetFunction("f_gaus")->GetParameter(2);
+        m_meanerr = h_dEdxClone->GetFunction("f_gaus")->GetParError(1);
+        m_sigmaerr = h_dEdxClone->GetFunction("f_gaus")->GetParError(2);
       }
+      // }
       setHistStyle(h_dEdxClone);
       h_dEdxClone->SetTitle("CDC-dEdx");
       h_dEdxClone->DrawCopy("");

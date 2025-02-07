@@ -497,10 +497,7 @@ bool ParticleVertexFitterModule::doKVertexFit(Particle* mother, bool ipProfileCo
   kv.setMagneticField(m_Bfield);
 
   if (mother->getV0()) {
-    HepPoint3D V0vertex_heppoint(mother->getV0()->getFittedVertexX(),
-                                 mother->getV0()->getFittedVertexY(),
-                                 mother->getV0()->getFittedVertexZ());
-    kv.setInitialVertex(V0vertex_heppoint);
+    kv.setInitialVertex(mother->getV0()->getFittedVertexPosition());
   }
 
   for (auto& child : fitChildren)
@@ -1340,7 +1337,7 @@ bool ParticleVertexFitterModule::doRaveFit(Particle* mother)
 
 
       if (mothSel && nTrk > 1) {
-        analysis::RaveSetup::getInstance()->setBeamSpot(B2Vector3D(pos.x(), pos.y(), pos.z()), RerrMatrix);
+        analysis::RaveSetup::getInstance()->setBeamSpot(pos, RerrMatrix);
         rf.addMother(mother);
         int nKfit = rf.fit();
         rf.updateMother();

@@ -139,6 +139,9 @@ class VariablesToTable(basf2.Module):
         #: The data type
         self._dtypes = dtypes
 
+        #: event variables buffer
+        self._buf = np.empty(100, dtype=self._dtypes)
+
         if self._format == "hdf5":
             self.initialize_hdf5_writer()
         elif self._format == "parquet":
@@ -211,8 +214,12 @@ class VariablesToTable(basf2.Module):
         collect all variables for the particle in a numpy array
         """
 
-        # create a numpy array with the data
-        buf = np.empty(self._plist.getListSize(), dtype=self._dtypes)
+        # grow the buffer if necessary
+        plist_size = self._plist.getListSize()
+        if plist_size > len(self._buf):
+            self._buf = np.empty(plist_size, dtype=self._dtypes)
+        buf = self._buf[:plist_size]
+
         # add some extra columns for bookkeeping
         buf["__experiment__"] = self._evtmeta.getExperiment()
         buf["__run__"] = self._evtmeta.getRun()
@@ -221,11 +228,13 @@ class VariablesToTable(basf2.Module):
         buf["__ncandidates__"] = len(buf)
         buf["__candidate__"] = np.arange(len(buf))
 
+        # fill variables into buffer
         vectors = [variables.variables.evaluateVariables(self._std_varnames, p) for p in self._plist]
         values = np.stack([np.array(v.data()) for v in vectors])
         for name, col in zip(self._varnames, values.T):
             buf[name] = col
-        return buf
+
+        return np.array(buf)  # copy
 
     def fill_buffer(self):
         """

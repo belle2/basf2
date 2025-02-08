@@ -76,10 +76,15 @@ ParticleKinematicFitterModule::ParticleKinematicFitterModule() : Module(), m_tex
   addParam("recoilMass", m_recoilMass, "Recoil mass in GeV. RecoilMass constraint only.", 0.0);
   addParam("invMass", m_invMass, "Invariant mass in GeV. Mass constraint only.", 0.0);
   addParam("variablePrefix", m_prefix, "Prefix attached to extra info variables.", string(""));
-  addParam("directionOnlyParticles", m_listDirectionOnlyParticles,
-           "boolean list indicating index of particles where only direction is used in the fit");
+  addParam("decayStringForDirectionOnlyParticles", m_decayStringForDirectionOnlyParticles,
+           "DecayString specifying the particles to use only direction information in the fit", std::string(""));
+  addParam("decayStringForAlternateMassParticles", m_decayStringForAlternateMassParticles,
+           "DecayString specifying the particles where an alternate mass hypothesis is used", std::string(""));
+  addParam("decayStringForNeutronVsAntiNeutron", m_decayStringForNeutronVsAntiNeutron,
+           "DecayString specifying the charged particle used to tag whether n or nbar. If tag particle has negative change, PDG sign of n/nbar is flipped from default given in alternateMassHypos",
+           std::string(""));
   addParam("alternateMassHypos", m_listAlternateMassHypo,
-           "integer list of pdg values for particles where different mass hypo. is used in the fit");
+           "integer list of pdg values for particles where different mass hypothesis is used in the fit");
 
 }
 
@@ -90,6 +95,22 @@ void ParticleKinematicFitterModule::initialize()
   if (m_decayString != "") {
     m_decaydescriptor.init(m_decayString);
     B2INFO("ParticleKinematicFitter: Using specified decay string: " << m_decayString);
+  }
+
+  if (m_decayStringForDirectionOnlyParticles != "") {
+    m_decaydescriptorForDirectionOnlyParticles.init(m_decayStringForDirectionOnlyParticles);
+  }
+
+  if (m_decayStringForAlternateMassParticles != "") {
+    m_decaydescriptorForAlternateMassParticles.init(m_decayStringForAlternateMassParticles);
+    if (m_listAlternateMassHypo.size() == 0)
+      B2FATAL("decayStringForAlternateMassParticles specified but alternateMassHypos not provided.");
+  } else if (m_listAlternateMassHypo.size() > 0) {
+    B2FATAL("alternateMassHypos specified but decayStringForAlternateMassParticles not provided.");
+  }
+
+  if (m_decayStringForNeutronVsAntiNeutron != "") {
+    m_decaydescriptorForNeutronVsAntiNeutron.init(m_decayStringForNeutronVsAntiNeutron);
   }
 
   m_plist.isRequired(m_listName);
@@ -167,6 +188,40 @@ bool ParticleKinematicFitterModule::doOrcaKinFitFit(Particle* mother)
     return false;
   }
 
+  //use getMdstSource as unique identifier
+  std::vector<int> directionOnlyParticlesIdentifiers;
+  if (m_decayStringForDirectionOnlyParticles != "") {
+    std::vector<const Particle*> selparticles = m_decaydescriptorForDirectionOnlyParticles.getSelectionParticles(mother);
+    for (unsigned int i = 0; i < selparticles.size(); i++) {
+      directionOnlyParticlesIdentifiers.push_back(selparticles[i]->getMdstSource());
+    }
+  }
+
+  //use getMdstSource as unique identifier
+  std::vector<int> alternateMassHypoIdentifiers;
+  if (m_decayStringForAlternateMassParticles != "") {
+    std::vector<const Particle*> selparticles = m_decaydescriptorForAlternateMassParticles.getSelectionParticles(mother);
+    for (unsigned int i = 0; i < selparticles.size(); i++) {
+      alternateMassHypoIdentifiers.push_back(selparticles[i]->getMdstSource());
+    }
+    if (alternateMassHypoIdentifiers.size() != m_listAlternateMassHypo.size()) {
+      B2FATAL("alternateMassHypoIdentifiers size must match listAlternateMassHypo");
+    }
+  }
+
+  //Determine if n or nbar based on charge of tag particle indicated
+  //If tag particle has negative change, sign of n and nbar are flipped.
+  //Required to use optimal position resolution
+  bool flipNeutronPDGsign = 0;
+  if (m_decayStringForNeutronVsAntiNeutron != "") {
+    std::vector<const Particle*> selparticles = m_decaydescriptorForNeutronVsAntiNeutron.getSelectionParticles(mother);
+    if (selparticles.size() != 1) {
+      B2FATAL("Select only one particle to tag neutron vs. antineutron");
+    }
+    if (selparticles[0]->getCharge() < 0) flipNeutronPDGsign = 1;
+  }
+
+
   // fill particles
   std::vector<Particle*> particleChildren;
   bool validChildren = fillFitParticles(mother, particleChildren);
@@ -206,22 +261,31 @@ bool ParticleKinematicFitterModule::doOrcaKinFitFit(Particle* mother)
   // set constraints (not connected to a fitter or particles at this point!)
   setConstraints();
 
-  if (m_listDirectionOnlyParticles.size() == 0) {
-    m_listDirectionOnlyParticles.resize(particleChildren.size());
-  } else if (m_listDirectionOnlyParticles.size() != particleChildren.size()) {
-    B2FATAL("ParticleKinematicFitterModule: m_listDirectionOnlyParticles size must match particleChildren size");
-  }
-
-  if (m_listAlternateMassHypo.size() == 0) {
-    m_listAlternateMassHypo.resize(particleChildren.size());
-  } else if (m_listAlternateMassHypo.size() != particleChildren.size()) {
-    B2FATAL("ParticleKinematicFitterModule: m_listAlternateMassHypo size must match particleChildren size");
-  }
 
   // add fit particles from particle list to the fitter and to all constraints
   for (unsigned iChild = 0; iChild < particleChildren.size(); iChild++) {
-    addParticleToOrcaKinFit(fitter, particleChildren[iChild], iChild, m_listDirectionOnlyParticles[iChild],
-                            m_listAlternateMassHypo[iChild]);
+
+    bool useDirectionOnly = false;
+    if (directionOnlyParticlesIdentifiers.size() > 0) {
+      if (std::find(directionOnlyParticlesIdentifiers.begin(), directionOnlyParticlesIdentifiers.end(),
+                    particleChildren[iChild]->getMdstSource()) != directionOnlyParticlesIdentifiers.end()) useDirectionOnly = true;
+    }
+
+    int massHypo = 0;
+    if (alternateMassHypoIdentifiers.size() > 0) {
+      for (unsigned int i = 0; i < alternateMassHypoIdentifiers.size(); i++) {
+        if (alternateMassHypoIdentifiers[i] == particleChildren[iChild]->getMdstSource()) {
+          massHypo = m_listAlternateMassHypo[i];
+          break;
+        }
+      }
+      //Always use direction only for neutrons
+      if (abs(massHypo) == Const::neutron.getPDGCode()) {
+        useDirectionOnly = true;
+        if (flipNeutronPDGsign)  massHypo = -massHypo;
+      }
+    }
+    addParticleToOrcaKinFit(fitter, particleChildren[iChild], iChild, useDirectionOnly, massHypo);
   }
 
   // add unmeasured photon to the fitter and to all constraints
@@ -409,6 +473,7 @@ void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, 
 
     // memory allocated: it will be deallocated via "delete fo" in doOrcaKinFitFit
     pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, startingEError, startingThetaError, startingPhiError, mass);
+    pfitobject->setParam(0, startingE, true, false);
     if (useOnlyDirection)  pfitobject->setParam(0, startingE, false, false);
     pfitobject->setParam(1, startingTheta, true, false);
     pfitobject->setParam(2, startingPhi, true, false);

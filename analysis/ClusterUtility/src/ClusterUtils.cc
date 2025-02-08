@@ -140,7 +140,7 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix3x3FromCluster(const ECLClust
    * Replace fixed energy resolution value by derived value from the DB if present
    */
   if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
-    if (m_photonEnergyResolutionDB.isValid() and particleHypo == 22) {
+    if (m_photonEnergyResolutionDB.isValid() and particleHypo == Const::photon.getPDGCode()) {
       double pEnergy = cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
       double pTheta = cluster->getTheta();
       double pPhi = cluster->getPhi();
@@ -149,25 +149,24 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix3x3FromCluster(const ECLClust
       if (energyCovarianceElement != -1) {
         covmatecl(0, 0) = energyCovarianceElement * pEnergy * energyCovarianceElement * pEnergy;
       }
-    } else if (particleHypo != 22) {
+    } else if (particleHypo != Const::photon.getPDGCode()) {
 
       // Using hadron mass hypothesis but photon cluster reconstruction hypothesis, load correct position resolution from DB
       // for hadrons, parameterized as function of cluster uncorrected energy
       double pClusterUncorrEnergy = cluster->getEnergyRaw();
       double pTheta = cluster->getTheta();
       double pPhi = cluster->getPhi();
-      if (particleHypo == 2112 and m_neutronPositionResolutionDB.isValid()) {
-        B2INFO(pClusterUncorrEnergy << " " << pTheta << " " << pPhi);
+      if (particleHypo == Const::neutron.getPDGCode() and m_neutronPositionResolutionDB.isValid()) {
         double phiResolution = m_neutronPositionResolutionDB->getThetaPhiResolution(pClusterUncorrEnergy, pTheta, pPhi, 0);
         double thetaResolution = m_neutronPositionResolutionDB->getThetaPhiResolution(pClusterUncorrEnergy, pTheta, pPhi, 1);
         covmatecl(1, 1) = phiResolution * phiResolution;
         covmatecl(2, 2) = thetaResolution * thetaResolution;
-      } else if (particleHypo == -2112 and m_antiNeutronPositionResolutionDB.isValid()) {
+      } else if (particleHypo == Const::antiNeutron.getPDGCode() and m_antiNeutronPositionResolutionDB.isValid()) {
         double phiResolution = m_antiNeutronPositionResolutionDB->getThetaPhiResolution(pClusterUncorrEnergy, pTheta, pPhi, 0);
         double thetaResolution = m_antiNeutronPositionResolutionDB->getThetaPhiResolution(pClusterUncorrEnergy, pTheta, pPhi, 1);
         covmatecl(1, 1) = phiResolution * phiResolution;
         covmatecl(2, 2) = thetaResolution * thetaResolution;
-      } else if (particleHypo == 130 and m_kaonPositionResolutionDB.isValid()) {
+      } else if (particleHypo == Const::Klong.getPDGCode() and m_kaonPositionResolutionDB.isValid()) {
         double phiResolution = m_kaonPositionResolutionDB->getThetaPhiResolution(pClusterUncorrEnergy, pTheta, pPhi, 0);
         double thetaResolution = m_kaonPositionResolutionDB->getThetaPhiResolution(pClusterUncorrEnergy, pTheta, pPhi, 1);
         covmatecl(1, 1) = phiResolution * phiResolution;

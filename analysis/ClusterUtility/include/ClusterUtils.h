@@ -21,6 +21,8 @@
 #include <Math/Vector4D.h>
 #include <TMatrixD.h>
 
+#include <framework/gearbox/Const.h>
+
 namespace Belle2 {
 
   /**
@@ -72,7 +74,7 @@ namespace Belle2 {
      * Returns 3x3 covariance matrix (E, theta, phi)
      * @return const TMatrixDSym
      */
-    const TMatrixDSym GetCovarianceMatrix3x3FromCluster(const ECLCluster* cluster, int particleHypo = 22);
+    const TMatrixDSym GetCovarianceMatrix3x3FromCluster(const ECLCluster* cluster, int particleHypo = Const::photon.getPDGCode());
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)

@@ -168,6 +168,9 @@ class VariablesToTable(basf2.Module):
         return self._buffer[self._buffer_index - self._plist.getListSize(): self._buffer_index]
 
     def clear_buffer(self):
+        """
+        Reset the buffer event counter and index
+        """
         self._event_buffer_counter = 0
         self._buffer_index = 0
 
@@ -269,6 +272,9 @@ class VariablesToTable(basf2.Module):
 
     @property
     def buffer_full(self):
+        """
+        check if the buffer is full
+        """
         return self._event_buffer_counter == self._event_buffer_size
 
     def write_buffer(self):

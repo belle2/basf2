@@ -17,6 +17,7 @@ from pyarrow.csv import CSVWriter
 from pyarrow import ipc
 import pyarrow as pa
 
+
 """
 Python utilities to help create or manage ntuples and work with them in pandas
 """
@@ -97,34 +98,6 @@ class VariablesToTable(basf2.Module):
         #: writer kwargs
         self._writer_kwargs = writer_kwargs
 
-    @property
-    def buffer(self):
-        """
-        The buffer slice across multiple entries
-        """
-        return np.array(self._buffer[:self._buffer_index])  # TODO: copy needed?
-
-    def get_next_buffer_slice(self):
-        """
-        The buffer slice to fill next in the current event
-
-        This also replaces the buffer by a larger one if necessary updates the index
-        """
-        plist_size = self._plist.getListSize()
-        if (plist_size + self._buffer_index) > len(self._buffer):
-            new_buffer = np.empty(
-                max(int(len(self._buffer) * 1.5), self._buffer_index + plist_size),
-                dtype=self._dtypes,
-            )
-            new_buffer[:self._buffer_index] = self.buffer
-            self._buffer = new_buffer
-        buf = self._buffer[self._buffer_index: self._buffer_index + plist_size]
-        self._buffer_index += plist_size
-        return buf
-
-    def reset_buffer(self):
-        self._buffer_index = 0
-
     def initialize(self):
         """Create the hdf5 file and list of variable objects to be used during
         event processing."""
@@ -180,6 +153,42 @@ class VariablesToTable(basf2.Module):
         elif self._format == "feather":
             self.initialize_feather_writer()
 
+    @property
+    def buffer(self):
+        """
+        The buffer slice across multiple entries
+        """
+        return self._buffer[:self._buffer_index]
+
+    @property
+    def event_buffer(self):
+        """
+        The buffer slice for the current event
+        """
+        return self._buffer[self._buffer_index - self._plist.getListSize(): self._buffer_index]
+
+    def clear_buffer(self):
+        self._event_buffer_counter = 0
+        self._buffer_index = 0
+
+    def append_buffer(self):
+        """
+        "Append" a new event to the buffer
+
+        Automatically replaces the buffer by a larger one if necessary
+        """
+        plist_size = self._plist.getListSize()
+        if (plist_size + self._buffer_index) > len(self._buffer):
+            new_buffer = np.empty(
+                # factor 1.5 larger or at least as large as necessary
+                max(int(len(self._buffer) * 1.5), self._buffer_index + plist_size),
+                dtype=self._dtypes,
+            )
+            new_buffer[:self._buffer_index] = self.buffer
+            self._buffer = new_buffer
+        self._buffer_index += plist_size
+        self._event_buffer_counter += 1
+
     def initialize_feather_writer(self):
         """
         Initialize the feather writer using pyarrow
@@ -192,7 +201,7 @@ class VariablesToTable(basf2.Module):
         self._feather_writer = ipc.RecordBatchFileWriter(
             sink=self._filename,
             schema=pa.schema(self._schema),
-            **self._writer_kwargs
+            **self._writer_kwargs,
         )
 
     def initialize_parquet_writer(self):
@@ -242,7 +251,7 @@ class VariablesToTable(basf2.Module):
         """
         collect all variables for the particle in a numpy array
         """
-        buf = self.get_next_buffer_slice()
+        buf = self.event_buffer
 
         # add some extra columns for bookkeeping
         buf["__experiment__"] = self._evtmeta.getExperiment()
@@ -258,28 +267,19 @@ class VariablesToTable(basf2.Module):
         for name, col in zip(self._varnames, values.T):
             buf[name] = col
 
-    def fill_buffer(self):
-        """
-        fill a buffer over multiple events and return it, when self.
-        """
-        self.fill_event_buffer()
-        self._event_buffer_counter += 1
-        if self._event_buffer_counter == self._event_buffer_size:
-            self._event_buffer_counter = 0
-            buf = self.buffer
-            self.reset_buffer()
-            return buf
-        return None
+    @property
+    def buffer_full(self):
+        return self._event_buffer_counter == self._event_buffer_size
 
-    def write_buffer(self, buf):
+    def write_buffer(self):
         """
         write the buffer to the output file
         """
         if self._format == "hdf5":
             """Create a new row in the hdf5 file with for each particle in the list"""
-            self._table.append(buf)
+            self._table.append(self.buffer)
         else:
-            table = {name: buf[name] for name, _ in self._dtypes}
+            table = {name: self.buffer[name] for name, _ in self._dtypes}
             pa_table = pa.table(table, schema=pa.schema(self._schema))
             if self._format == "parquet":
                 self._parquet_writer.write_table(pa_table)
@@ -291,18 +291,21 @@ class VariablesToTable(basf2.Module):
     def event(self):
         """
         Event processing function
+
         executes the fill_buffer function and writes the data to the output file
+        in chunks of event_buffer_size
         """
-        buf = self.fill_buffer()
-        if buf is None:
-            return
-        self.write_buffer(buf)
+        self.append_buffer()
+        self.fill_event_buffer()
+        if self.buffer_full:
+            self.write_buffer()
+            self.clear_buffer()
 
     def terminate(self):
         """save and close the output"""
         import ROOT  # noqa
-        if self._event_buffer_counter > 0:
-            self.write_buffer(self.buffer)
+        if len(self.buffer) > 0:
+            self.write_buffer()
 
         if self._format == "hdf5":
             self._table.flush()

@@ -233,10 +233,9 @@ class VariablesToTable(basf2.Module):
         fill a buffer over multiple events and return it, when self.
         """
         if self._event_buffer_counter == 0:
-            self._buffer = self.fill_event_buffer()
-        else:
-            self._buffer = np.concatenate((self._buffer, self.fill_event_buffer()))
-
+            self._buffer = []
+            self._buffer = [self.fill_event_buffer()]
+        self._buffer.append(self.fill_event_buffer())
         self._event_buffer_counter += 1
         if self._event_buffer_counter == self._event_buffer_size:
             self._event_buffer_counter = 0
@@ -247,7 +246,7 @@ class VariablesToTable(basf2.Module):
         """
         write the buffer to the output file
         """
-
+        buf = np.concatenate(buf)
         if self._format == "hdf5":
             """Create a new row in the hdf5 file with for each particle in the list"""
             self._table.append(buf)

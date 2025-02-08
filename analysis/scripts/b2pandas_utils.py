@@ -229,8 +229,8 @@ class VariablesToTable(basf2.Module):
         buf["__candidate__"] = np.arange(len(buf))
 
         # fill variables into buffer
-        vectors = [variables.variables.evaluateVariables(self._std_varnames, p) for p in self._plist]
-        values = np.stack([np.array(v.data()) for v in vectors])
+        vector = variables.variables.evaluateVariables(self._std_varnames, self._plist)
+        values = np.array(vector.data()).reshape(-1, len(self._varnames))
         for name, col in zip(self._varnames, values.T):
             buf[name] = col
 

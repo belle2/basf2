@@ -19,6 +19,7 @@
 
 namespace Belle2 {
   class Particle;
+  class ParticleList;
 
   namespace Variable {
     /** Global list of available variables.
@@ -254,11 +255,11 @@ namespace Belle2 {
        */
       double evaluate(const std::string& varName, const Particle* p);
 
-      /** Evaluate each variable in the vector 'varNames' on given Particle.
+      /** Evaluate each variable in the vector 'varNames' on given ParticleList and return a flattened vector of values.
        *
-       * Throws exception if one of the variables isn't found. Assumes 'p' is != NULL.
+       * Throws exception if one of the variables isn't found. Assumes 'plist' is != NULL.
        */
-      std::vector<double> evaluateVariables(const std::vector<std::string>& varNames, const Particle* p);
+      std::vector<double> evaluateVariables(const std::vector<std::string>& varNames, const ParticleList* plist);
 
       /** Return list of all variable names (in order registered). */
       std::vector<std::string> getNames() const;

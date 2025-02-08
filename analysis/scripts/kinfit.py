@@ -20,8 +20,10 @@ def fitKinematic4C(
     daughtersUpdate=True,
     addUnmeasuredPhoton=False,
     variablePrefix="",
-    directionOnlyParticles=[],
+    decayStringForDirectionOnlyParticles="",
+    decayStringForAlternateMassParticles="",
     alternateMassHypos=[],
+    decayStringForNeutronVsAntiNeutron="",
     path=None,
 ):
     """
@@ -46,8 +48,10 @@ def fitKinematic4C(
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', addUnmeasuredPhoton)
     orca.param('variablePrefix', variablePrefix)
-    orca.param('directionOnlyParticles', directionOnlyParticles)
-    orca.param('alternateMassHypos', alternateMassHypos)
+    orca.param('decayStringForDirectionOnlyParticles', decayStringForDirectionOnlyParticles)
+    orca.param('decayStringForAlternateMassParticles', decayStringForAlternateMassParticles)
+    orca.param('decayStringForNeutronVsAntiNeutron', decayStringForNeutronVsAntiNeutron)
+    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
 
@@ -57,8 +61,10 @@ def UnmeasuredfitKinematic1C(
     constraint='HardBeam',
     daughtersUpdate=True,
     variablePrefix="",
-    directionOnlyParticles=[],
+    decayStringForDirectionOnlyParticles="",
+    decayStringForAlternateMassParticles="",
     alternateMassHypos=[],
+    decayStringForNeutronVsAntiNeutron="",
     path=None,
 ):
     """
@@ -82,7 +88,9 @@ def UnmeasuredfitKinematic1C(
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', True)
     orca.param('variablePrefix', variablePrefix)
-    orca.param('directionOnlyParticles', directionOnlyParticles)
+    orca.param('decayStringForDirectionOnlyParticles', decayStringForDirectionOnlyParticles)
+    orca.param('decayStringForAlternateMassParticles', decayStringForAlternateMassParticles)
+    orca.param('decayStringForNeutronVsAntiNeutron', decayStringForNeutronVsAntiNeutron)
     orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
@@ -95,8 +103,10 @@ def fitKinematic3C(
         addUnmeasuredPhoton=False,
         add3CPhoton=True,
         variablePrefix="",
-        directionOnlyParticles=[],
+        decayStringForDirectionOnlyParticles="",
+        decayStringForAlternateMassParticles="",
         alternateMassHypos=[],
+        decayStringForNeutronVsAntiNeutron="",
         path=None,
 ):
     """
@@ -124,7 +134,9 @@ def fitKinematic3C(
     orca.param('addUnmeasuredPhoton', addUnmeasuredPhoton)
     orca.param('add3CPhoton', add3CPhoton)
     orca.param('variablePrefix', variablePrefix)
-    orca.param('directionOnlyParticles', directionOnlyParticles)
+    orca.param('decayStringForDirectionOnlyParticles', decayStringForDirectionOnlyParticles)
+    orca.param('decayStringForAlternateMassParticles', decayStringForAlternateMassParticles)
+    orca.param('decayStringForNeutronVsAntiNeutron', decayStringForNeutronVsAntiNeutron)
     orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
@@ -136,8 +148,10 @@ def fitKinematic2C(
         daughtersUpdate=True,
         addUnmeasuredPhotonAlongBeam="",
         variablePrefix="",
-        directionOnlyParticles=[],
+        decayStringForDirectionOnlyParticles="",
+        decayStringForAlternateMassParticles="",
         alternateMassHypos=[],
+        decayStringForNeutronVsAntiNeutron="",
         path=None,
 ):
     """
@@ -177,7 +191,9 @@ def fitKinematic2C(
         else:  # should be LER
             orca.param('fixUnmeasuredToLER', True)
     orca.param('variablePrefix', variablePrefix)
-    orca.param('directionOnlyParticles', directionOnlyParticles)
+    orca.param('decayStringForDirectionOnlyParticles', decayStringForDirectionOnlyParticles)
+    orca.param('decayStringForAlternateMassParticles', decayStringForAlternateMassParticles)
+    orca.param('decayStringForNeutronVsAntiNeutron', decayStringForNeutronVsAntiNeutron)
     orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
@@ -189,8 +205,10 @@ def MassfitKinematic1CRecoil(
     constraint='RecoilMass',
     daughtersUpdate=True,
     variablePrefix="",
-    directionOnlyParticles=[],
+    decayStringForDirectionOnlyParticles="",
+    decayStringForAlternateMassParticles="",
     alternateMassHypos=[],
+    decayStringForNeutronVsAntiNeutron="",
     path=None,
 ):
     """
@@ -216,7 +234,9 @@ def MassfitKinematic1CRecoil(
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', False)
     orca.param('variablePrefix', variablePrefix)
-    orca.param('directionOnlyParticles', directionOnlyParticles)
+    orca.param('decayStringForDirectionOnlyParticles', decayStringForDirectionOnlyParticles)
+    orca.param('decayStringForAlternateMassParticles', decayStringForAlternateMassParticles)
+    orca.param('decayStringForNeutronVsAntiNeutron', decayStringForNeutronVsAntiNeutron)
     orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
@@ -228,8 +248,10 @@ def MassfitKinematic1C(
     constraint='Mass',
     daughtersUpdate=True,
     variablePrefix="",
-    directionOnlyParticles=[],
+    decayStringForDirectionOnlyParticles="",
+    decayStringForAlternateMassParticles="",
     alternateMassHypos=[],
+    decayStringForNeutronVsAntiNeutron="",
     path=None,
 ):
     """
@@ -255,7 +277,9 @@ def MassfitKinematic1C(
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', False)
     orca.param('variablePrefix', variablePrefix)
-    orca.param('directionOnlyParticles', directionOnlyParticles)
+    orca.param('decayStringForDirectionOnlyParticles', decayStringForDirectionOnlyParticles)
+    orca.param('decayStringForAlternateMassParticles', decayStringForAlternateMassParticles)
+    orca.param('decayStringForNeutronVsAntiNeutron', decayStringForNeutronVsAntiNeutron)
     orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 

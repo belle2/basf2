@@ -17,7 +17,6 @@ from pyarrow.csv import CSVWriter
 from pyarrow import ipc
 import pyarrow as pa
 
-
 """
 Python utilities to help create or manage ntuples and work with them in pandas
 """
@@ -222,10 +221,10 @@ class VariablesToTable(basf2.Module):
         buf["__ncandidates__"] = len(buf)
         buf["__candidate__"] = np.arange(len(buf))
 
-        for row, p in zip(buf, self._plist):
-            values = variables.variables.evaluateVariables(self._std_varnames, p)
-            for name, value in zip(self._varnames, values):
-                row[name] = value
+        vectors = [variables.variables.evaluateVariables(self._std_varnames, p) for p in self._plist]
+        values = np.stack([np.array(v.data()) for v in vectors])
+        for name, col in zip(self._varnames, values.T):
+            buf[name] = col
         return buf
 
     def fill_buffer(self):
@@ -234,7 +233,6 @@ class VariablesToTable(basf2.Module):
         """
         if self._event_buffer_counter == 0:
             self._buffer = []
-            self._buffer = [self.fill_event_buffer()]
         self._buffer.append(self.fill_event_buffer())
         self._event_buffer_counter += 1
         if self._event_buffer_counter == self._event_buffer_size:

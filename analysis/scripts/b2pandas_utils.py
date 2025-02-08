@@ -92,12 +92,38 @@ class VariablesToTable(basf2.Module):
         )
         #: Event buffer size
         self._event_buffer_size = event_buffer_size
-        #: Event buffer
-        self._buffer = None
         #: Event buffer counter
         self._event_buffer_counter = 0
         #: writer kwargs
         self._writer_kwargs = writer_kwargs
+
+    @property
+    def buffer(self):
+        """
+        The buffer slice across multiple entries
+        """
+        return np.array(self._buffer[:self._buffer_index])  # TODO: copy needed?
+
+    def get_next_buffer_slice(self):
+        """
+        The buffer slice to fill next in the current event
+
+        This also replaces the buffer by a larger one if necessary updates the index
+        """
+        plist_size = self._plist.getListSize()
+        if (plist_size + self._buffer_index) > len(self._buffer):
+            new_buffer = np.empty(
+                max(int(len(self._buffer) * 1.5), self._buffer_index + plist_size),
+                dtype=self._dtypes,
+            )
+            new_buffer[:self._buffer_index] = self.buffer
+            self._buffer = new_buffer
+        buf = self._buffer[self._buffer_index: self._buffer_index + plist_size]
+        self._buffer_index += plist_size
+        return buf
+
+    def reset_buffer(self):
+        self._buffer_index = 0
 
     def initialize(self):
         """Create the hdf5 file and list of variable objects to be used during
@@ -139,8 +165,11 @@ class VariablesToTable(basf2.Module):
         #: The data type
         self._dtypes = dtypes
 
-        #: event variables buffer
-        self._buf = np.empty(100, dtype=self._dtypes)
+        #: event variables buffer (will be automatically grown if necessary)
+        self._buffer = np.empty(self._event_buffer_size * 10, dtype=self._dtypes)
+
+        #: current start index in the event variables buffer
+        self._buffer_index = 0
 
         if self._format == "hdf5":
             self.initialize_hdf5_writer()
@@ -213,12 +242,7 @@ class VariablesToTable(basf2.Module):
         """
         collect all variables for the particle in a numpy array
         """
-
-        # grow the buffer if necessary
-        plist_size = self._plist.getListSize()
-        if plist_size > len(self._buf):
-            self._buf = np.empty(plist_size, dtype=self._dtypes)
-        buf = self._buf[:plist_size]
+        buf = self.get_next_buffer_slice()
 
         # add some extra columns for bookkeeping
         buf["__experiment__"] = self._evtmeta.getExperiment()
@@ -234,26 +258,23 @@ class VariablesToTable(basf2.Module):
         for name, col in zip(self._varnames, values.T):
             buf[name] = col
 
-        return np.array(buf)  # copy
-
     def fill_buffer(self):
         """
         fill a buffer over multiple events and return it, when self.
         """
-        if self._event_buffer_counter == 0:
-            self._buffer = []
-        self._buffer.append(self.fill_event_buffer())
+        self.fill_event_buffer()
         self._event_buffer_counter += 1
         if self._event_buffer_counter == self._event_buffer_size:
             self._event_buffer_counter = 0
-            return self._buffer
+            buf = self.buffer
+            self.reset_buffer()
+            return buf
         return None
 
     def write_buffer(self, buf):
         """
         write the buffer to the output file
         """
-        buf = np.concatenate(buf)
         if self._format == "hdf5":
             """Create a new row in the hdf5 file with for each particle in the list"""
             self._table.append(buf)
@@ -281,7 +302,7 @@ class VariablesToTable(basf2.Module):
         """save and close the output"""
         import ROOT  # noqa
         if self._event_buffer_counter > 0:
-            self.write_buffer(self._buffer)
+            self.write_buffer(self.buffer)
 
         if self._format == "hdf5":
             self._table.flush()

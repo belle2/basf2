@@ -128,10 +128,18 @@ namespace Belle2 {
     OptionalDBObjPtr<ECLPhotonEnergyResolution> m_photonEnergyResolutionDB;
 
     /**
-     * Hadron position resolution database objects
+     * Neutron position resolution database objects
      */
     OptionalDBObjPtr<ECLPhotonEnergyResolution> m_neutronPositionResolutionDB{"neutronPositionResolutionDB"};
+
+    /**
+     * Antineutron position resolution database objects
+     */
     OptionalDBObjPtr<ECLPhotonEnergyResolution> m_antiNeutronPositionResolutionDB{"antiNeutronPositionResolutionDB"};
+
+    /**
+     * Neutral kaon position resolution database objects
+     */
     OptionalDBObjPtr<ECLPhotonEnergyResolution> m_kaonPositionResolutionDB{"kaonPositionResolutionDB"};
 
   };

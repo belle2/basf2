@@ -99,8 +99,9 @@ class VariablesToTable(basf2.Module):
         self._writer_kwargs = writer_kwargs
 
     def initialize(self):
-        """Create the hdf5 file and list of variable objects to be used during
-        event processing."""
+        """
+        Setup variable lists, pointers, buffers and file writers
+        """
         # Always avoid the top-level 'import ROOT'.
         import ROOT  # noqa
 
@@ -176,7 +177,7 @@ class VariablesToTable(basf2.Module):
 
     def append_buffer(self):
         """
-        "Append" a new event to the buffer
+        "Append" a new event to the buffer by moving the buffer index forward by particle list size
 
         Automatically replaces the buffer by a larger one if necessary
         """
@@ -252,7 +253,7 @@ class VariablesToTable(basf2.Module):
 
     def fill_event_buffer(self):
         """
-        collect all variables for the particle in a numpy array
+        Assign values for all variables for all particles in the particle list to the current event buffer
         """
         buf = self.event_buffer
 

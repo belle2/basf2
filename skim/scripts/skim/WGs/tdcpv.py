@@ -139,8 +139,8 @@ class TDCPV_qqs(BaseSkim):
         ma.reconstructDecay('K*+:kp_piz_TDCPV_qqs -> K+:SkimHighEff pi0:SkimHighEffCut_TDCPV_qqs', '0.74 < M < 1.04', path=path)
 
     def additional_setup(self, path):
-        ma.cutAndCopyList('gamma:E15', 'gamma:all', '1.4<E<4', path=path)
-        ma.cutAndCopyList('gamma:ECMS16', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
+        ma.cutAndCopyList('gamma:E15_TDCPV_qqs', 'gamma:all', '1.4<E<4', path=path)
+        ma.cutAndCopyList('gamma:ECMS16_TDCPV_qqs', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
 
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV_qqs', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_qqs_eventshape)')
@@ -164,17 +164,17 @@ class TDCPV_qqs(BaseSkim):
             'pi0:skim pi0:skim K_S0:merged',
             'phi:SkimHighEff K_S0:merged pi0:skim',
             'pi+:SkimHighEff pi-:SkimHighEff K_S0:merged',
-            'pi+:SkimHighEff pi-:SkimHighEff K_S0:merged gamma:E15',
-            'pi0:skim K_S0:merged gamma:E15',
-            'pi0:SkimHighEff K_S0:merged gamma:ECMS16',
+            'pi+:SkimHighEff pi-:SkimHighEff K_S0:merged gamma:E15_TDCPV_qqs',
+            'pi0:skim K_S0:merged gamma:E15_TDCPV_qqs',
+            'pi0:SkimHighEff K_S0:merged gamma:ECMS16_TDCPV_qqs',
             'phi:SkimHighEff2_TDCPV_qqs K_S0:merged',
             'phi:SkimHighEff K_S0:pi0pi0_TDCPV_qqs',
             'eta\':SkimHighEff K_S0:pi0pi0_TDCPV_qqs',
-            'phi:SkimHighEff K_S0:merged gamma:E15',
-            'eta:SkimHighEff K_S0:merged gamma:E15',
-            'rho0:SkimHighEff gamma:E15',
-            'omega:SkimHighEff gamma:E15',
-            'phi:SkimHighEff gamma:E15'
+            'phi:SkimHighEff K_S0:merged gamma:E15_TDCPV_qqs',
+            'eta:SkimHighEff K_S0:merged gamma:E15_TDCPV_qqs',
+            'rho0:SkimHighEff gamma:E15_TDCPV_qqs',
+            'omega:SkimHighEff gamma:E15_TDCPV_qqs',
+            'phi:SkimHighEff gamma:E15_TDCPV_qqs'
         ]
 
         bu_qqs_Channels = [
@@ -185,7 +185,7 @@ class TDCPV_qqs(BaseSkim):
             'omega:SkimHighEff K+:SkimHighEff',
             'rho0:SkimHighEff K+:SkimHighEff',
             'K_S0:merged K_S0:merged K+:SkimHighEff',
-            'pi+:SkimHighEff pi-:SkimHighEff K+:SkimHighEff gamma:E15'
+            'pi+:SkimHighEff pi-:SkimHighEff K+:SkimHighEff gamma:E15_TDCPV_qqs'
         ]
 
         bd_qqs_List = []
@@ -230,10 +230,10 @@ class TDCPV_qqs(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import ValidationMetadataSetter
 
-        ma.reconstructDecay("B0:etap -> eta':SkimHighEff K_S0:merged", '5.2 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
+        ma.reconstructDecay("B0:etap_TDCPV_qqs -> eta':SkimHighEff K_S0:merged", '5.2 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
 
-        ma.reconstructDecay("K_10:all -> K_S0:merged pi+:all pi-:all ", "", path=path)
-        ma.reconstructDecay("B0:Kspipig -> K_10:all gamma:E15",
+        ma.reconstructDecay("K_10:all_TDCPV_qqs -> K_S0:merged pi+:all pi-:all ", "", path=path)
+        ma.reconstructDecay("B0:Kspipig_TDCPV_qqs -> K_10:all_TDCPV_qqs gamma:E15_TDCPV_qqs",
                             "Mbc > 5.2 and abs(deltaE) < 0.5", path=path)
 
         variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
@@ -245,8 +245,8 @@ class TDCPV_qqs(BaseSkim):
             metadata.append(['Mbc', directory, 'Mbc', __liaison__,
                             f'Beam-constrained mass for {directory} mode', '', 'M_{bc} [GeV]', 'Candidates'])
         path.add_module(ValidationMetadataSetter(metadata, filename))
-        ma.variablesToHistogram('B0:etap', variableshisto, filename=filename, path=path, directory="etap")
-        ma.variablesToHistogram('B0:Kspipig', variableshisto, filename=filename, path=path, directory="Kspipig")
+        ma.variablesToHistogram('B0:etap_TDCPV_qqs', variableshisto, filename=filename, path=path, directory="etap")
+        ma.variablesToHistogram('B0:Kspipig_TDCPV_qqs', variableshisto, filename=filename, path=path, directory="Kspipig")
         variableshisto = [('deltaE', 135, -0.020, 0.250)]
 
 
@@ -327,41 +327,50 @@ class TDCPV_klong(BaseSkim):
         stdKlongs(listtype='allecl', path=path)
 
     def additional_setup(self, path):
-        ma.cutAndCopyList('gamma:E15', 'gamma:all', '1.4<E<4', path=path)
-        ma.cutAndCopyList('gamma:ECMS16', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
+        ma.cutAndCopyList('gamma:E15_TDCPV_klong', 'gamma:all', '1.4<E<4', path=path)
+        ma.cutAndCopyList('gamma:ECMS16_TDCPV_klong', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
 
         # loose KL
         ma.cutAndCopyList(
-            'K_L0:ecl_loose',
+            'K_L0:ecl_loose_TDCPV_klong',
             'K_L0:allecl',
             'clusterE>0.150',
             path=path)
         ma.cutAndCopyList(
-            'K_L0:klm_loose',
+            'K_L0:klm_loose_TDCPV_klong',
             'K_L0:allklm',
             '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]',
             path=path)
 
         # tight KL
         ma.cutAndCopyList(
-            'K_L0:ecl_tight',
+            'K_L0:ecl_tight_TDCPV_klong',
             'K_L0:allecl',
             '[clusterPulseShapeDiscriminationMVA<0.15] and [clusterE>0.25]',
             path=path)
         ma.cutAndCopyList(
-            'K_L0:klm_tight',
+            'K_L0:klm_tight_TDCPV_klong',
             'K_L0:allklm',
             '[klmClusterKlId>0.1] and [klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]',
             path=path)
 
-        ma.copyLists('K_L0:eclklm_qqs_0', ['K_L0:ecl_loose', 'K_L0:klm_loose'], path=path)  # phi(KK)KL
-        ma.copyLists('K_L0:eclklm_qqs_1', ['K_L0:ecl_tight', 'K_L0:klm_tight'], path=path)  # phi(3pi)KL
-        ma.copyLists('K_L0:eclklm_qqs_2', ['K_L0:ecl_loose', 'K_L0:klm_loose'], path=path)  # eta'(eta(gg)pipi)KL
-        ma.copyLists('K_L0:eclklm_qqs_3', ['K_L0:ecl_tight', 'K_L0:klm_tight'], path=path)  # eta'(eta(3pi)pipi)KL
-        ma.copyLists('K_L0:eclklm_qqs_4', ['K_L0:ecl_tight', 'K_L0:klm_tight'], path=path)  # eta'(rho(pipi)gam)KL
-        ma.copyLists('K_L0:eclklm_qqs_5', ['K_L0:ecl_tight', 'K_L0:klm_tight'], path=path)  # omegaKL
-        ma.copyLists('K_L0:eclklm_qqs_6', ['K_L0:ecl_tight', 'K_L0:klm_tight'], path=path)  # rho0KL
-        ma.copyLists('K_L0:eclklm_qqs_7', ['K_L0:ecl_tight', 'K_L0:klm_tight'], path=path)  # pi0KL
+        ma.copyLists('K_L0:eclklm_qqs_0', ['K_L0:ecl_loose_TDCPV_klong', 'K_L0:klm_loose_TDCPV_klong'], path=path)  # phi(KK)KL
+        ma.copyLists('K_L0:eclklm_qqs_1', ['K_L0:ecl_tight_TDCPV_klong', 'K_L0:klm_tight_TDCPV_klong'], path=path)  # phi(3pi)KL
+        ma.copyLists('K_L0:eclklm_qqs_2',
+                     ['K_L0:ecl_loose_TDCPV_klong',
+                      'K_L0:klm_loose_TDCPV_klong'],
+                     path=path)  # eta'(eta(gg)pipi)KL
+        ma.copyLists('K_L0:eclklm_qqs_3',
+                     ['K_L0:ecl_tight_TDCPV_klong',
+                      'K_L0:klm_tight_TDCPV_klong'],
+                     path=path)  # eta'(eta(3pi)pipi)KL
+        ma.copyLists('K_L0:eclklm_qqs_4',
+                     ['K_L0:ecl_tight_TDCPV_klong',
+                      'K_L0:klm_tight_TDCPV_klong'],
+                     path=path)  # eta'(rho(pipi)gam)KL
+        ma.copyLists('K_L0:eclklm_qqs_5', ['K_L0:ecl_tight_TDCPV_klong', 'K_L0:klm_tight_TDCPV_klong'], path=path)  # omegaKL
+        ma.copyLists('K_L0:eclklm_qqs_6', ['K_L0:ecl_tight_TDCPV_klong', 'K_L0:klm_tight_TDCPV_klong'], path=path)  # rho0KL
+        ma.copyLists('K_L0:eclklm_qqs_7', ['K_L0:ecl_tight_TDCPV_klong', 'K_L0:klm_tight_TDCPV_klong'], path=path)  # pi0KL
 
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV_klong', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_klong_eventshape)')
@@ -587,8 +596,8 @@ class TDCPV_ccs(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import ValidationMetadataSetter
 
-        ma.reconstructDecay('B0:jpsiee -> J/psi:ee K_S0:merged', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
-        ma.reconstructDecay('B0:jpsimumu -> J/psi:mumu K_S0:merged', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
+        ma.reconstructDecay('B0:jpsiee_TDCPV_ccs -> J/psi:ee K_S0:merged', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
+        ma.reconstructDecay('B0:jpsimumu_TDCPV_ccs -> J/psi:mumu K_S0:merged', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         filename = f'{self}_Validation.root'
         variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
@@ -600,8 +609,8 @@ class TDCPV_ccs(BaseSkim):
             metadata.append(['Mbc', directory, 'Mbc', __liaison__,
                             f'Beam-constrained mass for {directory} mode', '', 'M_{bc} [GeV]', 'Candidates'])
         path.add_module(ValidationMetadataSetter(metadata, filename))
-        ma.variablesToHistogram('B0:jpsiee', variableshisto, filename=filename, path=path, directory="jpsiee")
-        ma.variablesToHistogram('B0:jpsimumu', variableshisto, filename=filename, path=path, directory="jpsimumu")
+        ma.variablesToHistogram('B0:jpsiee_TDCPV_ccs', variableshisto, filename=filename, path=path, directory="jpsiee")
+        ma.variablesToHistogram('B0:jpsimumu_TDCPV_ccs', variableshisto, filename=filename, path=path, directory="jpsimumu")
 
         variableshisto = [('deltaE', 100, -0.020, 0.180)]
         ma.variablesToHistogram('B0:TDCPV_JPsiKL0', variableshisto, filename=filename, path=path, directory="KLjpsimumu")
@@ -728,22 +737,29 @@ class TDCPV_inclusiveJpsi(BaseSkim):
         goodChargedTrackCut = 'abs(dr) < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance'
 
         # Fill reduced particle lists for muons, electrons, and photons
-        ma.cutAndCopyList('mu+:withPID', 'mu+:all', f'{goodChargedTrackCut} and muonID_noSVD > 0.01', path=path)
-        ma.cutAndCopyList('e+:uncorrected_withPID', 'e+:all', f'{goodChargedTrackCut} and electronID > 0.01', path=path)
-        ma.cutAndCopyList('gamma:bremsinput', 'gamma:loose', 'E < 1', path=path)
+        ma.cutAndCopyList('mu+:withPID_TDCPV_inclusiveJpsi', 'mu+:all', f'{goodChargedTrackCut} and muonID_noSVD > 0.01', path=path)
+        ma.cutAndCopyList('e+:uncorrected_withPID_TDCPV_inclusiveJpsi', 'e+:all',
+                          f'{goodChargedTrackCut} and electronID > 0.01', path=path)
+        ma.cutAndCopyList('gamma:bremsinput_TDCPV_inclusiveJpsi', 'gamma:loose', 'E < 1', path=path)
 
         # Perform bremsstrahlung correction for electrons and fill new list with corrected electrons
-        ma.correctBremsBelle('e+:corrected_withPID', 'e+:uncorrected_withPID', 'gamma:bremsinput', path=path)
-        ma.correctBremsBelle('e+:corrected', 'e+:all', 'gamma:bremsinput', path=path)
+        ma.correctBremsBelle(
+            'e+:corrected_withPID_TDCPV_inclusiveJpsi',
+            'e+:uncorrected_withPID_TDCPV_inclusiveJpsi',
+            'gamma:bremsinput_TDCPV_inclusiveJpsi',
+            path=path)
+        ma.correctBremsBelle('e+:corrected_TDCPV_inclusiveJpsi', 'e+:all', 'gamma:bremsinput_TDCPV_inclusiveJpsi', path=path)
 
         # Reconstruct J/psi decays
-        ma.reconstructDecay('J/psi:inclusive_ee -> e+:corrected_withPID e-:corrected',
-                            '2.7 < M < 4.1 and useCMSFrame(p) < 3.1', path=path)
-        ma.reconstructDecay('J/psi:inclusive_mumu -> mu+:withPID mu-:all',
+        ma.reconstructDecay(
+            'J/psi:inclusive_ee_TDCPV_inclusiveJpsi -> e+:corrected_withPID_TDCPV_inclusiveJpsi e-:corrected_TDCPV_inclusiveJpsi',
+            '2.7 < M < 4.1 and useCMSFrame(p) < 3.1',
+            path=path)
+        ma.reconstructDecay('J/psi:inclusive_mumu_TDCPV_inclusiveJpsi -> mu+:withPID_TDCPV_inclusiveJpsi mu-:all',
                             '2.7 < M < 4.1 and useCMSFrame(p) < 3.1', path=path)
 
         # Return the particle lists that will be used in the skim
-        return ['J/psi:inclusive_ee', 'J/psi:inclusive_mumu']
+        return ['J/psi:inclusive_ee_TDCPV_inclusiveJpsi', 'J/psi:inclusive_mumu_TDCPV_inclusiveJpsi']
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -768,5 +784,15 @@ class TDCPV_inclusiveJpsi(BaseSkim):
         path.add_module(ValidationMetadataSetter(metadata, filename))
 
         # Produce the validation histograms
-        ma.variablesToHistogram('J/psi:inclusive_ee', variableshisto, filename=filename, path=path, directory="ee")
-        ma.variablesToHistogram('J/psi:inclusive_mumu', variableshisto, filename=filename, path=path, directory="mumu")
+        ma.variablesToHistogram(
+            'J/psi:inclusive_ee_TDCPV_inclusiveJpsi',
+            variableshisto,
+            filename=filename,
+            path=path,
+            directory="ee")
+        ma.variablesToHistogram(
+            'J/psi:inclusive_mumu_TDCPV_inclusiveJpsi',
+            variableshisto,
+            filename=filename,
+            path=path,
+            directory="mumu")

@@ -11,4 +11,6 @@ add  p Particle  Xb                           1111553           1.0             
 add  p Particle  LLP                          100               1.0             1.0     100e-3        0      2              0          0
 add  p Meson     X(3823)                      17443             3.823           0.0     0.0           0      4              0      17443
 add  p Particle  X_2(4013)                    9910440           4.0143          0.004   20e-3         0      4              0    9910440
+add  p Particle  X_0(3915)                    9910441           3.9221          0.020   100e-3        0      0              0    9910441 
+add  p Particle  X_2(4010)                    9900442           4.0130          0.00115 10e-3         0      4              0    9900442
 * No 'end' needed here as the default pdl is concatenated with this file.

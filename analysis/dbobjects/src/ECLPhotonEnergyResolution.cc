@@ -80,9 +80,9 @@ void ECLPhotonEnergyResolution::addThetaPhiResolution(std::vector<double> thetaR
     {"ThetaResolution", thetaResolution.at(0)},
     {"ThetaResolutionUncertUp", thetaResolution.at(1)},
     {"ThetaResolutionUncertDown", thetaResolution.at(2)},
-    {"PhiResolution", thetaResolution.at(0)},
-    {"PhiResolutionUncertUp", thetaResolution.at(1)},
-    {"PhiResolutionUncertDown", thetaResolution.at(2)}
+    {"PhiResolution", phiResolution.at(0)},
+    {"PhiResolutionUncertUp", phiResolution.at(1)},
+    {"PhiResolutionUncertDown", phiResolution.at(2)}
   };
 
   /**

@@ -81,7 +81,7 @@ ParticleKinematicFitterModule::ParticleKinematicFitterModule() : Module(), m_tex
   addParam("decayStringForAlternateMassParticles", m_decayStringForAlternateMassParticles,
            "DecayString specifying the particles where an alternate mass hypothesis is used", std::string(""));
   addParam("decayStringForNeutronVsAntiNeutron", m_decayStringForNeutronVsAntiNeutron,
-           "DecayString specifying the charged particle used to tag whether n or nbar. If tag particle has negative change, PDG sign of n/nbar is flipped from default given in alternateMassHypos",
+           "DecayString specifying the charged particle used to tag whether n or nbar. If tag particle has negative charge, PDG sign of n/nbar is flipped from default given in alternateMassHypos",
            std::string(""));
   addParam("alternateMassHypos", m_listAlternateMassHypo,
            "integer list of pdg values for particles where different mass hypothesis is used in the fit");
@@ -282,6 +282,7 @@ bool ParticleKinematicFitterModule::doOrcaKinFitFit(Particle* mother)
       //Always use direction only for neutrons
       if (abs(massHypo) == Const::neutron.getPDGCode()) {
         useDirectionOnly = true;
+        B2WARNING("Neutron mass hypothesis assigned to fit particle but directionOnly flag not specified for same particle.  Setting candidtate to useDirectionOnly.");
         if (flipNeutronPDGsign)  massHypo = -massHypo;
       }
     }

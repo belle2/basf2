@@ -63,7 +63,7 @@ namespace Belle2 {
 
     /*!
      * For neutral hadrons
-     * Add clusterUncEnergy,theta,phi bin [vector of three pairs] and theta resolution [vector of three values] and phi resolution [vector of three values]
+     * Add theta resolution [vector of three values] and phi resolution [vector of three values] in bins of (clusterUncEnergy, theta, phi) [vector of three pairs]
      * thetaResolution structure: [value, uncertainty up, uncertainty down]
      * phiResolution structure: [value, uncertainty up, uncertainty down]
      * bin structure for bin limit pairs: [energy limits, theta limits, phi limits]

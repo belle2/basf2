@@ -58,15 +58,6 @@ namespace Belle2 {
         return "(no description)";
       }
 
-      /**
-       *  Forward prefixed parameters of this findlet to the module parameter list.
-       *
-       */
-      virtual void exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
-                                    const std::string& prefix __attribute__((unused)))
-      {
-      }
-
       /// Main function executing the algorithm
       virtual void apply(ToVector<AIOTypes>& ... ioVectors) = 0;
     };

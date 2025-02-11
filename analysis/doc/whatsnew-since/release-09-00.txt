@@ -27,6 +27,9 @@ Modules
 +++++++
 * Fixed a bug in the initialization of the decay length of TreeFit.
 * Removed the option ``expertUseReferencing`` from :b2:mod:`TreeFitter`.
+* Improved the duplicate detection in the EventShapeCalculator module so that particle lists of composite particles can
+  be provided safely
+* ``VariablesToTable`` is now a lot faster than before, almost on par with ``VariablesToNtuple``.
 
 Changes in the analysis package in light-2411-aldebaran
 -------------------------------------------------------
@@ -68,14 +71,14 @@ Modules
   * Add ntuple file support to ``b2file-merge``, which is now the recommended tool to merge ntuples over
     ``hadd``. ``b2file-metadata-show`` and ``b2file-metadata-add`` will also work with ntuples. 
 
-* Added a tunable buffer to the ``VariabesToTable`` module to improve compression efficiency and feather as new output format.
+* Added a tunable buffer to the ``VariablesToTable`` module to improve compression efficiency and feather as new output format.
 
 Changes in the analysis package in light-2409-toyger
 ----------------------------------------------------
 
 Modules
 +++++++
-* Added a module ``VariabesToTable`` that writes Ntuples to hdf5, csv or parquet.
+* Added a module ``VariablesToTable`` that writes Ntuples to hdf5, csv or parquet.
 * Added support for the FEI table format of the corrections repository to the analysis reweighting script
 
 Graph Neural Network based Flavor Tagger

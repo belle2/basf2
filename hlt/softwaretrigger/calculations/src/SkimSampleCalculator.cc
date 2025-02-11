@@ -640,12 +640,12 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   double hadronb = 0;
   double hadronb1 = 0;
   double hadronb2 = 0;
-  std::vector<ROOT::Math::XYZVector> m_pionHadv3;
+  std::vector<ROOT::Math::PxPyPzEVector> m_pionHad;
 
   for (int nPiHad = 0; nPiHad < nHadTracks; nPiHad++) {
     Particle* parPiHad = m_pionHadParticles->getParticle(nPiHad);
     ROOT::Math::PxPyPzEVector V4PiHad = PCmsLabTransform::labToCms(parPiHad->get4Vector());
-    m_pionHadv3.push_back(parPiHad->getMomentum());
+    m_pionHad.push_back(V4PiHad);
     EsumPiHad += V4PiHad.E();
     PzPiHad += V4PiHad.Pz();
   }
@@ -659,7 +659,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   if (hadronb_tag) {
     hadronb = 1;
-    FoxWolfram fw(m_pionHadv3);
+    FoxWolfram fw(m_pionHad);
     fw.calculateBasicMoments();
     double R2 = fw.getR(2);
     if (R2 < 0.4) hadronb1 = 1;

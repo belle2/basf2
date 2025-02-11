@@ -3645,15 +3645,14 @@ def buildEventShape(inputListNames=None,
     time. By default the calculation of the high-order moments (5-8) is turned off.
     Switching off an option will make the corresponding variables not available.
 
-    Warning:
-       The user can provide as many particle lists
-       as needed, using also combined particles, but the function will always assume that
-       the lists are independent.
-       If the lists provided by the user contain several times the same track (either with
-       different mass hypothesis, or once as an independent particle and once as daughter of a
-       combined particle) the results won't be reliable.
-       A basic check for duplicates is available setting the checkForDuplicate flags.
-
+    Info:
+       The user can provide as many particle lists as needed, using also composite particles.
+       In these cases, it is recommended to activate the checkForDuplicates flag since it
+       will eliminate duplicates, e.g., if the same track is provided multiple times
+       (either with different mass hypothesis or once as an independent particle and once
+       as daughter of a composite particle). The first occurrence will be used in the
+       calculations so the order in which the particle lists are given as well as within
+       the particle lists matters.
 
     @param inputListNames     List of ParticleLists used to calculate the
                               event shape variables. If the list is empty the default
@@ -3679,7 +3678,8 @@ def buildEventShape(inputListNames=None,
                               Requires thrust = True.
     @param sphericity         Enables the calculation of the sphericity-related quantities.
     @param checkForDuplicates Perform a check for duplicate particles before adding them. Regardless of the value of this option,
-                              it is recommended to consider sanitizing the lists you are passing to the function.
+                              it is recommended to consider sanitizing the lists you are passing to the function since this will
+                              speed up the processing.
 
     """
 

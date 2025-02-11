@@ -102,8 +102,13 @@ void save_internal(std::string source_file, int lineno,  std::string variable_na
   save(file, content);
 }
 
-
+#ifdef __DO_CSV_PRINTOUT__
 #define __CSV__WRITE_W_lINE__(x)  save_internal(__FILE__, __LINE__, #x, x)
 #define __CSV__WRITE__(x) save_internal(__FILE__, 0, #x, x)
+#else
 
+// do nothing
+#define __CSV__WRITE_W_lINE__(x)  do {} while (false)
+#define __CSV__WRITE__(x) do {} while (false)
 
+#endif

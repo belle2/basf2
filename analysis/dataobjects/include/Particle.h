@@ -488,6 +488,15 @@ namespace Belle2 {
     }
 
     /**
+     * Returns 0-based index of the TrackFitResult that should be associated with the Particle
+     * @return index of TrackFitResult
+     */
+    unsigned getTrackFitResultIndex(void) const
+    {
+      return m_trackFitResultIndex;
+    }
+
+    /**
      * Returns particle property as a bit pattern
      * The values are defined in the PropertyFlags enum and described in detail there.
      *

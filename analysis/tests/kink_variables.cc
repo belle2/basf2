@@ -46,7 +46,6 @@ namespace {
       myTracks.registerInDataStore();
       myParticles.registerInDataStore();
       myMCParticles.registerInDataStore();
-      myParticles.registerRelationTo(myTFRs);
       myParticles.registerRelationTo(myMCParticles);
       myTracks.registerRelationTo(myMCParticles);
       DataStore::Instance().setInitializeActive(false);
@@ -91,14 +90,12 @@ namespace {
       myDaughterTrack.setTrackFitResultIndex(Const::electron, 1);
       Track* electronTrack = myTracks.appendNew(myDaughterTrack);
 
-      Particle* myMuon = myParticles.appendNew(muonTrack, Const::muon);
-      Particle* myKinkMuon = myParticles.appendNew(myMuon->get4Vector(), Const::muon.getPDGCode(), Particle::c_Flavored,
-                                                   Particle::EParticleSourceObject::c_Kink, 0);
-      myKinkMuon->addRelationTo(myMotherTrackFitResult);
-      myKinkMuon->writeExtraInfo("kinkDaughterPDGCode", Const::electron.getPDGCode());
+      Kink* myKink = myKinks.appendNew(std::make_pair(muonTrack, std::make_pair(myMotherTrackFitResult, myMotherTrackFitResult)),
+                                       std::make_pair(electronTrack, myDaughterTrackFitResult), 1, 1, 2, 11100);
 
-      myKinks.appendNew(std::make_pair(muonTrack, std::make_pair(myMotherTrackFitResult, myMotherTrackFitResult)),
-                        std::make_pair(electronTrack, myDaughterTrackFitResult), 1, 1, 2, 11100);
+      myParticles.appendNew(muonTrack, Const::muon);
+      Particle* myKinkMuon = myParticles.appendNew(myKink, Const::muon, 0);
+      myKinkMuon->writeExtraInfo("kinkDaughterPDGCode", Const::electron.getPDGCode());
 
       auto* true_muon = myMCParticles.appendNew(MCParticle());
       true_muon->setPDG(Const::muon.getPDGCode());

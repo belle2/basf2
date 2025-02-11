@@ -663,7 +663,6 @@ void ParticleLoaderModule::kinksToParticles()
       const Kink* kink = m_kinks[i];
 
       Const::ChargedStable motherType(abs(pdgCode));
-      Particle::EFlavorType kinkFlavorType = Particle::c_Flavored;
       const Track* motherTrack = kink->getMotherTrack();
       const TrackFitResult* motherTrackFit = kink->getMotherTrackFitResultStart();
 
@@ -676,13 +675,8 @@ void ParticleLoaderModule::kinksToParticles()
       const auto& motherMCParticleWithWeight = motherTrack->getRelatedToWithWeight<MCParticle>();
       const PIDLikelihood* motherPID = motherTrack->getRelated<PIDLikelihood>();
 
-      Particle motherP(motherTrack->getArrayIndex(), motherTrackFit, motherType);
-
       // a particle object creation from kink mother with the correct option
-      ROOT::Math::PxPyPzEVector kinkMomentum = motherP.get4Vector();
-
-      Particle kinkP(kinkMomentum, motherType.getPDGCode(), kinkFlavorType,
-                     Particle::EParticleSourceObject::c_Kink, kink->getArrayIndex());
+      Particle kinkP(kink, motherType, kink->getTrackFitResultIndexMotherStart());
 
 
       // append the particle to the Particle StoreArray and add the new particle to the ParticleList
@@ -692,7 +686,6 @@ void ParticleLoaderModule::kinksToParticles()
         newPart->addRelationTo(motherPID);
       if (motherMCParticleWithWeight.first)
         newPart->addRelationTo(motherMCParticleWithWeight.first, motherMCParticleWithWeight.second);
-      newPart->addRelationTo(motherTrackFit);
       newPart->writeExtraInfo("kinkDaughterPDGCode", m_decaydescriptor.getDaughter(0)->getMother()->getPDGCode());
     }
 

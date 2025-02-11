@@ -44,7 +44,8 @@ using namespace ROOT::Math;
 
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(nan("")), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0),
+  m_pValue(nan("")), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0),
+  m_properties(0),
   m_arrayPointer(nullptr)
 {
   resetErrorMatrix();
@@ -53,7 +54,8 @@ Particle::Particle() :
 
 Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum, const int pdgCode) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0), m_properties(0),
+  m_arrayPointer(nullptr)
 {
   setFlavorType();
   set4Vector(momentum);
@@ -71,7 +73,7 @@ Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum,
                    const EParticleSourceObject source,
                    const unsigned mdstIndex) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(flavorType), m_particleSource(source), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(-1), m_flavorType(flavorType), m_particleSource(source), m_trackFitResultIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
   if (flavorType == c_Unflavored and pdgCode < 0)
     m_pdgCode = -pdgCode;
@@ -94,7 +96,7 @@ Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum,
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1),
   m_daughterIndices(daughterIndices),
-  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0),
+  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0),
   m_properties(0), m_arrayPointer(arrayPointer)
 {
   m_pdgCode = pdgCode;
@@ -128,7 +130,7 @@ Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum,
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1),
   m_daughterIndices(daughterIndices),
-  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0),
+  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0),
   m_arrayPointer(arrayPointer)
 {
   m_pdgCode = pdgCode;
@@ -165,7 +167,7 @@ Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum,
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1),
   m_daughterIndices(daughterIndices),
-  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0),
+  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0),
   m_daughterProperties(daughterProperties),
   m_arrayPointer(arrayPointer)
 {
@@ -201,7 +203,8 @@ Particle::Particle(const int trackArrayIndex,
                    const TrackFitResult* trackFit,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0), m_properties(0),
+  m_arrayPointer(nullptr)
 {
   if (!trackFit) return;
 

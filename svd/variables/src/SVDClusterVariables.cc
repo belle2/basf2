@@ -69,6 +69,101 @@ namespace Belle2::Variable {
     };
   }
 
+  Manager::FunctionPtr SVDClusterTime(const std::vector<std::string>& arguments)
+  {
+    if (arguments.size() != 1) {
+      B2FATAL("Exactly one parameter (cluster index) is required.");
+    }
+    const auto clusterIndex = std::stoi(arguments[0]);
+
+    return [clusterIndex](const Particle * particle) -> double {
+      SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+      return svdCluster ? svdCluster->getClsTime() : Const::doubleNaN;
+    };
+  }
+
+  Manager::FunctionPtr SVDTrackPrime(const std::vector<std::string>& arguments)
+  {
+    if (arguments.size() != 1) {
+      B2FATAL("Exactly one parameter (cluster index) is required.");
+    }
+    const auto clusterIndex = std::stoi(arguments[0]);
+
+    return [clusterIndex](const Particle * particle) -> double {
+      const RecoTrack* recoTrack = getRecoTrack(particle);
+      if (!recoTrack)
+      {
+        return Const::doubleNaN;
+      }
+      const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+      if (!svdCluster)
+      {
+        return Const::doubleNaN;
+      }
+      const RecoHitInformation* recoHitInformation = recoTrack->getRecoHitInformation(svdCluster);
+      if (!recoHitInformation)
+      {
+        return Const::doubleNaN;
+      }
+      try
+      {
+        genfit::MeasuredStateOnPlane measuredState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(recoHitInformation);
+        return svdCluster->isUCluster()
+        ? measuredState.getState()[1] * Unit::convertValueToUnit(1.0, "um")
+        : measuredState.getState()[2] * Unit::convertValueToUnit(1.0, "um");
+      } catch (const NoTrackFitResult&)
+      {
+        B2WARNING("No track fit result available for this hit!");
+        return Const::doubleNaN;
+      }
+    };
+  }
+
+  Manager::FunctionPtr SVDResidual(const std::vector<std::string>& arguments)
+  {
+    if (arguments.size() != 1) {
+      B2FATAL("Exactly one parameter (cluster index) is required.");
+    }
+    const auto clusterIndex = std::stoi(arguments[0]);
+
+    return [clusterIndex](const Particle * particle) -> double {
+      const RecoTrack* recoTrack = getRecoTrack(particle);
+      if (!recoTrack)
+      {
+        return Const::doubleNaN;
+      }
+      const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+      if (!svdCluster)
+      {
+        return Const::doubleNaN;
+      }
+      const RecoHitInformation* recoHitInformation = recoTrack->getRecoHitInformation(svdCluster);
+      if (!recoHitInformation)
+      {
+        return Const::doubleNaN;
+      }
+      const genfit::TrackPoint* trackPoint = recoTrack->getCreatedTrackPoint(recoHitInformation);
+      if (!trackPoint)
+      {
+        return Const::doubleNaN;
+      }
+      const genfit::AbsFitterInfo* fitterInfo = trackPoint->getFitterInfo();
+      if (!fitterInfo)
+      {
+        return Const::doubleNaN;
+      }
+      try
+      {
+        const TVectorD residualMeasurement =  fitterInfo->getResidual(0, false).getState();
+        return residualMeasurement.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
+      } catch (...)
+      {
+        B2WARNING("Could not get track residual.");
+        return Const::doubleNaN;
+      }
+    };
+  }
+
   Manager::FunctionPtr SVDLayer(const std::vector<std::string>& arguments)
   {
     if (arguments.size() != 1) {
@@ -138,6 +233,27 @@ namespace Belle2::Variable {
                         "Returns the size of the i-th SVD cluster related to the Particle.",
                         Manager::VariableDataType::c_int);
 
+  REGISTER_METAVARIABLE("SVDLayer(i)", SVDLayer,
+                        "Returns the layer number of the i-th SVD cluster related to the Particle.",
+                        Manager::VariableDataType::c_int);
+  REGISTER_METAVARIABLE("SVDLadder(i)", SVDLadder,
+                        "Returns the ladder number of the i-th SVD cluster related to the Particle.",
+                        Manager::VariableDataType::c_int);
+  REGISTER_METAVARIABLE("SVDSensor(i)", SVDSensor,
+                        "Returns the sensor number of the i-th SVD cluster related to the Particle.",
+                        Manager::VariableDataType::c_int);
+  REGISTER_METAVARIABLE("SVDSide(i)", SVDSide,
+                        "Returns true if the i-th SVD cluster related to the Particle is a U cluster.",
+                        Manager::VariableDataType::c_bool);
+  REGISTER_METAVARIABLE("SVDClusterTime(i)", SVDClusterTime,
+                        "Returns the time of the i-th SVD cluster related to the Particle.",
+                        Manager::VariableDataType::c_double);
+  REGISTER_METAVARIABLE("SVDTrackPrime(i)", SVDTrackPrime,
+                        "Returns the tan of the incident angle projected on U/V of the i-th SVD cluster related to the Particle.",
+                        Manager::VariableDataType::c_double);
+  REGISTER_METAVARIABLE("SVDResidual(i)", SVDResidual,
+                        "Returns the track residual of the i-th SVD cluster related to the Particle.",
+                        Manager::VariableDataType::c_double);
   REGISTER_METAVARIABLE("SVDLayer(i)", SVDLayer,
                         "Returns the layer number of the i-th SVD cluster related to the Particle.",
                         Manager::VariableDataType::c_int);

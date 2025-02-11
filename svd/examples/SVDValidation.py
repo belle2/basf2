@@ -32,7 +32,8 @@ def addSVDValidationModule(path, storageType):
                         outputFileName="SVDValidation_ntuple.root",
                         containerName="SVDClusters",
                         particleListName="pi+:all",
-                        variablesToNtuple=["SVDClusterCharge", "SVDClusterSNR", "SVDClusterSize"]
+                        variablesToNtuple=["SVDClusterCharge", "SVDClusterSNR", "SVDClusterSize", "SVDClusterTime",
+                                           "SVDTrackPrime", "SVDResidual", "SVDLayer", "SVDLadder", "SVDSensor", "SVDSide"]
                         ).set_log_level(b2.LogLevel.INFO)
     elif (storageType == "histogram"):
         path.add_module('SVDValidation',
@@ -41,7 +42,14 @@ def addSVDValidationModule(path, storageType):
                         particleListName="pi+:all",
                         variablesToHistogram=[("SVDClusterCharge", 100, 0, 100e3),
                                               ("SVDClusterSNR", 50, 0, 50),
-                                              ("SVDClusterSize", 10, 0, 10)]
+                                              ("SVDClusterSize", 10, 0, 10),
+                                              ("SVDClusterTime", 100, -100, 100),
+                                              ("SVDTrackPrime", 25, -1, 1),
+                                              ("SVDResidual", 100, -1e5, 1e5),
+                                              ("SVDLayer", 4, 3, 7),
+                                              ("SVDLadder", 16, 1, 17),
+                                              ("SVDSensor", 5, 1, 6),
+                                              ("SVDSide", 2, 0, 2)]
                         ).set_log_level(b2.LogLevel.INFO)
 
 

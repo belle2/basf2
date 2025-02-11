@@ -27,6 +27,9 @@ Modular Analysis
 Kinematic Fitting tools
 +++++++++++++++++++++++
 * Added option to prepend label to OrkaKinfit variables to allow multiple fits to be performed in same path.
+* Added functionality to ParticleKinematicFitter module to change mass hypothesis for photons (eg to n0 or n0bar) used in the fit.
+* Added functionality to ParticleKinematicFitter module to specify if only ECL cluster direction informatio is used in the fit (intended for fits involving neutral hadrons). 
+* Added to ECLPhotonEnergyResolution dbobject ability to store position resolution information for neutral hadrons
 
 Variables
 +++++++++

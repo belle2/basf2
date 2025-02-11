@@ -225,6 +225,30 @@ Particle::Particle(const int trackArrayIndex,
   setMomentumPositionErrorMatrix(trackFit);
 }
 
+Particle::Particle(const Kink* kink, const Const::ChargedStable& chargedStable, const unsigned trackFitResultIndex) :
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0), m_properties(0),
+  m_arrayPointer(nullptr)
+{
+  if (!kink) return;
+
+  m_flavorType = c_Flavored;
+  m_particleSource = c_Kink;
+
+  setMdstArrayIndex(kink->getArrayIndex());
+  m_trackFitResultIndex = trackFitResultIndex;
+
+  m_pdgCode = generatePDGCodeFromCharge(kink->getMotherTrackFitResultStart()->getChargeSign(), chargedStable);
+
+  // set mass
+  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
+    B2FATAL("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
+  m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
+
+  // set momentum, position and error matrix
+  setMomentumPositionErrorMatrix(kink->getMotherTrackFitResultStart());
+}
+
 Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type) :
   m_pdgCode(type.getPDGCode()), m_mass(type.getMass()), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)

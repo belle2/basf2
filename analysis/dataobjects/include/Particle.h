@@ -224,6 +224,15 @@ namespace Belle2 {
              const Const::ChargedStable& chargedStable);
 
     /**
+     * Constructor from a kink object
+     * @param kink pointer to Kink object
+     * @param chargedStable Type of charged particle
+     * @param trackFitResultIndex index of TrackFitResult to be associated with Particle
+     */
+    Particle(const Kink* kink, const Const::ChargedStable& chargedStable,
+             const unsigned trackFitResultIndex);
+
+    /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
      * @param eclCluster pointer to ECLCluster object
      * @param type the kind of ParticleType we want (photon by default)

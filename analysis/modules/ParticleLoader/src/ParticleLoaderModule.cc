@@ -678,15 +678,17 @@ void ParticleLoaderModule::kinksToParticles()
       // a particle object creation from kink mother with the correct option
       Particle kinkP(kink, motherType, kink->getTrackFitResultIndexMotherStart());
 
-
-      // append the particle to the Particle StoreArray and add the new particle to the ParticleList
+      // append the particle to the Particle StoreArray
       Particle* newPart = m_particles.appendNew(kinkP);
-      plist->addParticle(newPart);
+
       if (motherPID)
         newPart->addRelationTo(motherPID);
       if (motherMCParticleWithWeight.first)
         newPart->addRelationTo(motherMCParticleWithWeight.first, motherMCParticleWithWeight.second);
       newPart->writeExtraInfo("kinkDaughterPDGCode", m_decaydescriptor.getDaughter(0)->getMother()->getPDGCode());
+
+      // add the new particle to the ParticleList
+      plist->addParticle(newPart);
     }
 
     plist->setEditable(false); // set the :kink list as not editable.

@@ -30,6 +30,11 @@ Modules
 * Improved the duplicate detection in the EventShapeCalculator module so that particle lists of composite particles can
   be provided safely
 * ``VariablesToTable`` is now a lot faster than before, almost on par with ``VariablesToNtuple``.
+* The PID Neural Network (PIDNN) variables `pionIDNN` and `kaonIDNN` require now the payload from a special global tag. The payload
+  is no longer shipped with the analysis global tag. For processing release06 data, the payload for the K/pi separation PIDNN
+  is included in the global tag `pid_nn_release06_Kpi`, which is the same PIDNN as proveded by previous analysis global tags.
+* Added the PIDNN variables `electronIDNN`, `muonIDNN`, `protonIDNN`, and `deuteronIDNN`; which can be used with the new PIDNN for
+  6 hypotheses trained on release08 data. They require the payload from the corresponding global tag (see recommendations).
 
 Changes in the analysis package in light-2411-aldebaran
 -------------------------------------------------------

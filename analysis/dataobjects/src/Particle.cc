@@ -925,6 +925,11 @@ const TrackFitResult* Particle::getTrackFitResult() const
   if (selfrelated && !isnan(selfrelated->getPValue()))
     return selfrelated;
 
+  if (m_particleSource == c_Kink) {
+    StoreArray<TrackFitResult> trackFitResults{};
+    return trackFitResults[m_trackFitResultIndex];
+  }
+
   // if not get the TFR with closest mass to this particle
   auto* selftrack = this->getTrack();
   if (selftrack)

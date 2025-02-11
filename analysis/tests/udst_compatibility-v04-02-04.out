@@ -13,6 +13,7 @@ Untested method Particle::getKink
 Untested method Particle::getMomentumLossCorrectionFactor
 Untested method Particle::getMostLikelyTrackFitResult
 Untested method Particle::getPDGLifetime
+Untested method Particle::getTrackFitResultIndex
 Untested method Particle::isCopyOf
 Untested method Particle::isMostLikely
 Untested method Particle::isMostLikelyTrackFitResult

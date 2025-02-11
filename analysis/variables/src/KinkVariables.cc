@@ -318,7 +318,7 @@ namespace Belle2 {
           const Kink* kink = particle->getKink();
           if (!kink) return Const::doubleNaN;
           if (not particle->hasExtraInfo("kinkDaughterPDGCode")) return Const::doubleNaN;
-          Particle tmpParticle(kink->getDaughterTrack()->getArrayIndex(), kink->getDaughterTrackFitResult(), Const::ChargedStable(abs(particle->getExtraInfo("kinkDaughterPDGCode"))));
+          Particle tmpParticle(kink, Const::ChargedStable(abs(particle->getExtraInfo("kinkDaughterPDGCode"))), kink->getTrackFitResultIndexDaughter());
           auto var_result = var->function(&tmpParticle);
           if (std::holds_alternative<double>(var_result))
           {

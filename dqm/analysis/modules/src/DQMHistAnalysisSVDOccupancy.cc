@@ -101,8 +101,8 @@ void DQMHistAnalysisSVDOccupancyModule::initialize()
   m_cOnlineOccupancyU = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyU");
   m_cOnlineOccupancyV = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyV");
 
-  m_cOccupancyUGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyGroupId0U");
-  m_cOccupancyVGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyGroupId0V");
+  m_cOccupancyUGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyUGroupId0");
+  m_cOccupancyVGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyVGroupId0");
 
   if (m_RPhiView) {
     m_cOccupancyRPhiViewU = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewU", "", 800, 800);
@@ -126,7 +126,7 @@ void DQMHistAnalysisSVDOccupancyModule::initialize()
   m_hOnlineOccupancy->setStats(0);
 
   // change name by hand cos side index not at the end
-  hName = getHistoNameFromCanvas(m_cOccupancyUGroupId0->GetName(), "@view");
+  hName = getHistoNameFromCanvas("SVDAnalysis/c_SVDOccupancyGroupId0U", "@view");
   m_hOccupancyGroupId0 = new SVDSummaryPlots(hName.Data(),
                                              "Average OFFLINE Sensor Occupancy (%), @view/@side Side for cluster time group Id = 0");
   m_hOccupancyGroupId0->setStats(0);

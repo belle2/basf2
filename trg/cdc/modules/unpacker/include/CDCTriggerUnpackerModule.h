@@ -306,6 +306,9 @@ namespace Belle2 {
 
     /** bitstream of Neuro input and output (including intermediate results) */
     StoreArray<CDCTriggerUnpacker::NNBitStream> m_bitsNN;
+    /** bitstream of DNN input and output (including intermediate results) */
+
+    StoreArray<CDCTriggerUnpacker::DNNBitStream> m_bitsDNN;
 
     /** store object for unpacked etf event time from neuro b2link */
     StoreObjPtr<BinnedEventT0> m_ETFTime;
@@ -372,6 +375,8 @@ namespace Belle2 {
     bool m_sim13dt;
     /** PCIe40 data or copper data */
     bool m_pciedata;
+    /** flag for unpacking DNN or not */
+    bool m_isDNN;
   };
 
 

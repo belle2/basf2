@@ -32,7 +32,8 @@
 #pragma link C++ class Belle2::Bitstream<array<array<char, T2D_TO_3D_WIDTH>, NUM_2D> >+; // checksum=0x265dd3d5, version=4
 #pragma link C++ class Belle2::Bitstream<array<array<char, NN_IN_WIDTH>, NUM_2D> >+; // checksum=0xdeda710f, version=4
 #pragma link C++ class Belle2::Bitstream<array<array<char, NN_OUT_WIDTH>, NUM_2D> >+; // checksum=0x689d6f35, version=4
-#pragma link C++ class Belle2::Bitstream<array<array<char, NN_WIDTH>, NUM_2D> >+; // checksum=0x7e4d46c1, version=4
+#pragma link C++ class Belle2::Bitstream<array<array<char, NN_WIDTH>, NUM_2D> >+; // checksum=0x9e8c810d, version=4
+#pragma link C++ class Belle2::Bitstream<array<array<char, DNN_WIDTH>, NUM_2D> >+; // checksum=0x7e4d46c1, version=4
 
 #pragma read                                                                \
   sourceClass="Belle2::CDCTriggerHoughCluster"                              \

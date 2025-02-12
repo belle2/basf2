@@ -71,7 +71,7 @@ void eclAutocovarianceCalibrationC1CollectorModule::collect()
       float PeakToPeak = (float) aECLDsp.computePeaktoPeakAmp();
 
       // I avoid using getObjectPtr<TH2>("PPVsCrysID")->Fill(id, PeakToPeak); to improve on run time as getObjectPtr is  very slow
-      PPVsCrysID->Fill(id, PeakToPeak);
+      if (aECLDsp.getDspA()[0] > 1)  PPVsCrysID->Fill(id, PeakToPeak);
 
     }
   }

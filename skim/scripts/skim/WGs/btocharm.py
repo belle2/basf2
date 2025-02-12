@@ -1394,7 +1394,7 @@ class B0toDs1D(BaseSkim):
                             cut="[2.062 < M < 2.131] and [0.072 < massDifference(0) < 0.179]", path=path)
         ma.reconstructDecay(decayString="D_s1+:Ds1D_B0toDs1D -> D_s*+:Ds1D_B0toDs1D pi0:bth_skim",
                             cut="[2.288 < M < 2.507] and [0.247 < massDifference(0) < 0.378]", path=path)
-        ma.reconstructDecay(decayString="B0:B0toDs1D -> D_s1+:Ds1D D-:Kpipi",
+        ma.reconstructDecay(decayString="B0:B0toDs1D -> D_s1+:Ds1D_B0toDs1D D-:Kpipi",
                             cut="[5.2 < Mbc < 5.3] and [-0.5 < deltaE < 0.5]", path=path)
 
         return ["B0:B0toDs1D"]
@@ -1759,7 +1759,7 @@ class antiB0toDsDsst_Kpi0(BaseSkim):
         ma.reconstructDecay("D_s+:KKpi_antiB0toDsDsst_Kpi0 -> K+:GoodTrack K-:GoodTrack pi+:GoodTrack ",
                             cut="[1.93 < M < 1.99]", path=path)
 
-        ma.reconstructDecay("D_s+:KstK_antiB0toDsDsst_Kpi0 -> anti-K*0:Kpi K+:GoodTrack",
+        ma.reconstructDecay("D_s+:KstK_antiB0toDsDsst_Kpi0 -> anti-K*0:Kpi_antiB0toDsDsst_Kpi0 K+:GoodTrack",
                             cut="[1.93 < M < 1.99]", path=path)
 
         ma.reconstructDecay("D_s+:KszK_antiB0toDsDsst_Kpi0 -> K_S0:merged K+:GoodTrack ",

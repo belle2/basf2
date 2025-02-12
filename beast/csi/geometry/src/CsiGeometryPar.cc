@@ -200,8 +200,8 @@ void CsiGeometryPar::Print(int cid, int debuglevel)
 
   B2DEBUG(debuglevel, "   Material : " << GetMaterial(cid)->GetName());
 
-  B2DEBUG(debuglevel, "   Slow time constatnt : " << GetMaterialProperty(cid, "SLOWTIMECONSTANT"));
-  B2DEBUG(debuglevel, "   Fast time constatnt : " << GetMaterialProperty(cid, "FASTTIMECONSTANT"));
+  B2DEBUG(debuglevel, "   Slow time constant : " << GetMaterialProperty(cid, "SLOWTIMECONSTANT"));
+  B2DEBUG(debuglevel, "   Fast time constant : " << GetMaterialProperty(cid, "FASTTIMECONSTANT"));
   B2DEBUG(debuglevel, "   Light yield : "         << GetMaterialProperty(cid, "SCINTILLATIONYIELD"));
 
   //GetMaterial(cid)->GetMaterialPropertiesTable()->DumpTable();

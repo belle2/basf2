@@ -8,6 +8,7 @@
 /*
   <header>
   <input>ParticleGunSimRec_dedx.root</input>
+  <output>dedx_internals.root</output>
   <contact>renu2@andrew.cmu.edu</contact>
   <description>Check some internals of the module</description>
   </header>

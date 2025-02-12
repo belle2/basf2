@@ -208,16 +208,8 @@ void CDCUnpackerModule::event()
 
         // Skip invalid boardsIDs
         if (m_boardId > 300) {
-          B2WARNING("Invalid board " << std::hex << m_boardId << std::dec << " readout buffer block: " << i << " block channel: " << iFiness);
-          if (m_recoverBoardIdError) {
-            m_boardId = m_boardId & 0x01ff;
-            if (m_boardId > 300) {
-              B2WARNING("Unrecoverable board " << std::hex << m_boardId);
-              continue;
-            }
-          } else {
-            continue;
-          }
+          B2WARNING("Unrecoverable board " << std::hex << m_boardId);
+          continue;
         }
 
         const int dataType = getDataType();

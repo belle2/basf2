@@ -1049,7 +1049,7 @@ namespace Belle2 {
         }
 
         const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
-        auto refPart = refPartList->getParticleWithMdstIdx(part->getExtraInfo(extraInfo));
+        auto refPart = refPartList->getParticleWithMdstSource(part->getExtraInfo(extraInfo));
 
         return std::get<double>(var->function(refPart));
       };

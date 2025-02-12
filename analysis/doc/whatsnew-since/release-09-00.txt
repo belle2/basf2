@@ -22,6 +22,8 @@ Variables
   TreeFit are now also available via the variables `prodVertexCov` and `prodVertexXErr`, etc.
 * The variables `pi0Prob(mode) <pi0Prob>` and `etaProb(mode) <etaProb>` are extended to MC15 version
   and accept the modes ``standardMC15rd`` and ``tightMC15rd``.
+* The `beamBackgroundSuppression` and `fakePhotonSuppression` MVA tools have the variable `clusterZernikeMVA` 
+  removed from training for the MC16 weight files. Both MC16ri and MC16rd weight files are now available for use. 
 
 Modules
 +++++++

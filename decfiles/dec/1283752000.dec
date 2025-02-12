@@ -1,29 +1,13 @@
 # EventType: 1283752000
 # Descriptor: [B- -> [D** -> D(*) pi] l nu]
 # NickName: Bu_D**lnu_cocktail
-# Documentation: B- decay to the four D** particles, a light lepton and a neutrino. The D** is forced to decay into one of exclusive decay channels (only channels with two charged final states).
+# Documentation: B- decay to the four D** particles, a light lepton and a neutrino.
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Eyluel Uenlue
 # Email: eyluel.uenlue@campus.lmu.de
 # Cuts: None
 # Date: 20250113
-
-Alias D_10sig         D_10
-Alias anti-D_10sig    anti-D_10
-ChargeConj D_10sig    anti-D_10sig
-
-Alias D_0*0sig        D_0*0
-Alias anti-D_0*0sig   anti-D_0*0
-ChargeConj D_0*0sig   anti-D_0*0sig
-
-Alias D'_10sig        D'_10
-Alias anti-D'_10sig   anti-D'_10
-ChargeConj D'_10sig   anti-D'_10sig
-
-Alias D_2*0sig        D_2*0
-Alias anti-D_2*0sig   anti-D_2*0
-ChargeConj D_2*0sig   anti-D_2*0sig
 
 Decay Upsilon(4S) 
 0.5  B+ B-sig VSS;
@@ -43,25 +27,5 @@ Decay B-sig
 Enddecay
 CDecay B+sig
 
-Decay D_10sig
-0.399400000   D*+  pi-                                     VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-Enddecay
-CDecay anti-D_10sig
-
-Decay D_0*0sig
-0.666700000   D+  pi-                                      PHSP;
-Enddecay
-CDecay anti-D_0*0sig
-
-Decay D'_10sig
-0.666700000   D*+  pi-                                     VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
-Enddecay
-CDecay anti-D'_10sig
-
-Decay D_2*0sig
-0.266900000   D*+  pi-                                     TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.399800000   D+  pi-                                      TSS;
-Enddecay
-CDecay anti-D_2*0sig
 
 End

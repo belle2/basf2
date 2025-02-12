@@ -29,8 +29,8 @@ namespace Belle2 {
     /** Default constructor */
     CDCDedxTrack() :
       RelationsObject(),
-      m_track(0), m_charge(0), m_cosTheta(0), m_p(0), m_pCDC(0), m_length(0.0), m_injring(-1),
-      m_injtime(-1), m_pdg(-999), m_mcmass(0), m_motherPDG(0), m_pTrue(0), m_cosThetaTrue(0),
+      m_cosTheta(0), m_p(0), m_pCDC(0), m_length(0.0), m_injring(-1), m_injtime(-1),
+      m_track(0), m_charge(0), m_pdg(-999), m_mcmass(0), m_motherPDG(0), m_pTrue(0), m_cosThetaTrue(0),
       m_scale(0), m_cosCor(0), m_cosEdgeCor(0), m_runGain(0), m_timeGain(0), m_timeReso(0),
       m_lNHitsUsed(0)
     {
@@ -286,55 +286,6 @@ namespace Belle2 {
 
   private:
 
-    // track level information
-    int m_track; /**< ID number of the Track */
-    int m_charge;    /**< particle charge from tracking (+1 or -1) */
-    double m_cosTheta; /**< cos(theta) for the track */
-    double m_p;        /**< momentum at the IP */
-    double m_pCDC;    /**< momentum at the inner layer of the CDC */
-    double m_length;   /**< total distance travelled by the track */
-    double m_injring; /**< injection ring type of track's event*/
-    double m_injtime;  /**< time since last injection of track's event*/
-
-    // dE/dx simulation
-    double m_pdg;        /**< MC PID */
-    double m_mcmass;     /**< MC PID mass */
-    double m_motherPDG; /**< MC PID of mother particle */
-    double m_pTrue;     /**< MC true momentum */
-    double m_cosThetaTrue;     /**< MC true cos(theta) */
-    double m_simDedx;    /**< track level MC dE/dx truncated mean */
-
-    // calibration constants
-    double m_scale; /**< scale factor to make electrons ~1 */
-    double m_cosCor;  /**< calibration cosine correction */
-    double m_cosEdgeCor;  /**< calibration cosine edge correction */
-    double m_runGain; /**< calibration run gain */
-    double m_timeGain; /**< calibration injection time gain */
-    double m_timeReso; /**< calibration injection time gain */
-
-    std::vector<double> m_hWireGain; /**< calibration hit gain (indexed on number of hits) */
-    std::vector<double> m_hTwodCor;  /**< calibration 2-D correction (indexed on number of hits) */
-    std::vector<double> m_hOnedCor;  /**< calibration 1-D correction (indexed on number of hits) */
-    double m_predmean[Const::ChargedStable::c_SetSize]; /**< predicted dE/dx truncated mean */
-    double m_predres[Const::ChargedStable::c_SetSize];  /**< predicted dE/dx resolution */
-
-    // track level dE/dx measurements
-    double m_dedxAvg;             /**< dE/dx mean value per track */
-    double m_dedxAvgTruncated;    /**< dE/dx truncated mean per track */
-    double m_dedxAvgTruncatedNoSat;    /**< dE/dx truncated mean per track without the saturation correction */
-    double m_dedxAvgTruncatedErr; /**< standard deviation of m_dedxAvgTruncated */
-    double m_cdcChi[Const::ChargedStable::c_SetSize];  /**< chi values for each particle type */
-    double m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
-
-
-    // layer level information (just don't mix with the hit arrays)
-    int m_lNHitsUsed; /**< number of hits on this track used for truncated mean */
-    std::vector<int> m_lNHitsCombined; /**< number of hits combined in the layer */
-    std::vector<int> m_lWireLongestHit; /**< wire id for the longest hit in the layer */
-    std::vector<int> m_lLayer; /**< layer id corresponding to dedx */
-    std::vector<double> m_lPath;   /**< distance flown through active medium in current segment */
-    std::vector<double> m_lDedx;   /**< extracted dE/dx (arb. units, detector dependent) */
-
     // hit level information
     std::vector<int> m_hLWire;     /**< wire ID within the layer */
     std::vector<int> m_hWire;     /**< continuous wire ID in the CDC */
@@ -359,6 +310,55 @@ namespace Belle2 {
     std::vector<double> m_hCellHeight;    /**< height of the CDC cell */
     std::vector<double> m_hCellHalfWidth; /**< half-width of the CDC cell */
 
-    ClassDef(CDCDedxTrack, 17); /**< Debug output for CDCDedxPID module. */
+    // track level information
+    double m_cosTheta; /**< cos(theta) for the track */
+    double m_p;        /**< momentum at the IP */
+    double m_pCDC;    /**< momentum at the inner layer of the CDC */
+    double m_length;   /**< total distance travelled by the track */
+    double m_injring; /**< injection ring type of track's event*/
+    double m_injtime;  /**< time since last injection of track's event*/
+    int m_track; /**< ID number of the Track */
+    int m_charge;    /**< particle charge from tracking (+1 or -1) */
+
+    // dE/dx simulation
+    double m_pdg;        /**< MC PID */
+    double m_mcmass;     /**< MC PID mass */
+    double m_motherPDG; /**< MC PID of mother particle */
+    double m_pTrue;     /**< MC true momentum */
+    double m_cosThetaTrue;     /**< MC true cos(theta) */
+    double m_simDedx;    /**< track level MC dE/dx truncated mean */
+
+    // calibration constants
+    double m_predmean[Const::ChargedStable::c_SetSize]; /**< predicted dE/dx truncated mean */
+    double m_predres[Const::ChargedStable::c_SetSize];  /**< predicted dE/dx resolution */
+    std::vector<double> m_hWireGain; /**< calibration hit gain (indexed on number of hits) */
+    std::vector<double> m_hTwodCor;  /**< calibration 2-D correction (indexed on number of hits) */
+    std::vector<double> m_hOnedCor;  /**< calibration 1-D correction (indexed on number of hits) */
+
+    double m_scale; /**< scale factor to make electrons ~1 */
+    double m_cosCor;  /**< calibration cosine correction */
+    double m_cosEdgeCor;  /**< calibration cosine edge correction */
+    double m_runGain; /**< calibration run gain */
+    double m_timeGain; /**< calibration injection time gain */
+    double m_timeReso; /**< calibration injection time gain */
+
+    // track level dE/dx measurements
+    double m_cdcChi[Const::ChargedStable::c_SetSize];  /**< chi values for each particle type */
+    double m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
+    double m_dedxAvg;             /**< dE/dx mean value per track */
+    double m_dedxAvgTruncated;    /**< dE/dx truncated mean per track */
+    double m_dedxAvgTruncatedNoSat;    /**< dE/dx truncated mean per track without the saturation correction */
+    double m_dedxAvgTruncatedErr; /**< standard deviation of m_dedxAvgTruncated */
+
+
+    // layer level information (just don't mix with the hit arrays)
+    std::vector<int> m_lNHitsCombined; /**< number of hits combined in the layer */
+    std::vector<int> m_lWireLongestHit; /**< wire id for the longest hit in the layer */
+    std::vector<int> m_lLayer; /**< layer id corresponding to dedx */
+    std::vector<double> m_lPath;   /**< distance flown through active medium in current segment */
+    std::vector<double> m_lDedx;   /**< extracted dE/dx (arb. units, detector dependent) */
+    int m_lNHitsUsed; /**< number of hits on this track used for truncated mean */
+
+    ClassDef(CDCDedxTrack, 18); /**< Debug output for CDCDedxPID module. */
   };
 }

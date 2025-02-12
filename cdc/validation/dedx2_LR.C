@@ -8,6 +8,7 @@
 /*
   <header>
   <input>ParticleGunSimRec_dedx.root</input>
+  <output>dedx_LRplots.root</output>
   <contact>renu2@andrew.cmu.edu</contact>
   <description>check PID performance of each particle vs. all others</description>
   </header>

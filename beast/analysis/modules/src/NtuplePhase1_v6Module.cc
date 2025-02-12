@@ -155,7 +155,7 @@ void NtuplePhase1_v6Module::initialize()
     m_tree->AddFile(fileName.c_str());
   }
   m_numEvents = m_tree->GetEntries();
-  if (m_numEvents == 0) B2ERROR(c_treeNames[DataStore::c_Event] << " has no entires");
+  if (m_numEvents == 0) B2ERROR(c_treeNames[DataStore::c_Event] << " has no entries");
   m_eventCount = 0;
 
   m_tree->SetBranchAddress("ts", &(m_beast.ts));

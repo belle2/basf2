@@ -13,7 +13,8 @@
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include "TH1D.h"
+
+#include <TH1D.h>
 
 namespace Belle2 {
 

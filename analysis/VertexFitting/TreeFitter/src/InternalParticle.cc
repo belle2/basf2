@@ -58,12 +58,13 @@ namespace TreeFitter {
     }
 
     m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
-                                 std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end();
+                                 std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end()
+                       or m_particle->hasExtraInfo("treeFitterMassConstraint");
 
     m_beamconstraint = (std::abs(m_particle->getPDGCode()) == config.m_beamConstraintPDG);
 
     if (!m_automatic_vertex_constraining) {
-      // if this is a hadronically decaying resonance it is useful to constraint the decay vertex to its mothers decay vertex.
+      // if this is a hadronically decaying resonance it is useful to constrain the decay vertex to its mother's decay vertex.
       //
       m_shares_vertex_with_mother  = std::find(config.m_fixedToMotherVertexListPDG.begin(),
                                                config.m_fixedToMotherVertexListPDG.end(),
@@ -124,9 +125,9 @@ namespace TreeFitter {
           auto part_dau2 = particle()->getDaughter(1);
 
           auto recotrack_dau1 = std::find_if(trkdaughters.begin(), trkdaughters.end(),
-          [&part_dau1](RecoTrack * rt) { return rt->particle()->getMdstArrayIndex() == part_dau1->getMdstArrayIndex(); });
+          [&part_dau1](RecoTrack * rt) { return rt->particle()->getMdstSource() == part_dau1->getMdstSource(); });
           auto recotrack_dau2 = std::find_if(trkdaughters.begin(), trkdaughters.end(),
-          [&part_dau2](RecoTrack * rt) { return rt->particle()->getMdstArrayIndex() == part_dau2->getMdstArrayIndex(); });
+          [&part_dau2](RecoTrack * rt) { return rt->particle()->getMdstSource() == part_dau2->getMdstSource(); });
 
           if (recotrack_dau1 == trkdaughters.end() || recotrack_dau2 == trkdaughters.end()) {
             B2WARNING("V0 daughter particles do not match with RecoTracks.");
@@ -215,7 +216,10 @@ namespace TreeFitter {
       fitparams.getStateVector().segment(momindex, maxrow) += fitparams.getStateVector().segment(daumomindex, maxrow);
 
       if (maxrow == 3) {
-        double mass = daughter->particle()->getPDGMass();
+        double mass = 0;
+        if (daughter->particle()->hasExtraInfo("treeFitterMassConstraintValue")) {
+          mass = daughter->particle()->getExtraInfo("treeFitterMassConstraintValue");
+        } else mass = daughter->particle()->getPDGMass();
         fitparams.getStateVector()(momindex + 3) += std::sqrt(e2 + mass * mass);
       }
     }
@@ -260,7 +264,10 @@ namespace TreeFitter {
         // m^2 + p^2 = E^2
         // so
         // E = sqrt(m^2 + p^2)
-        const double mass = daughter->particle()->getPDGMass();
+        double mass = 0;
+        if (daughter->particle()->hasExtraInfo("treeFitterMassConstraintValue")) {
+          mass = daughter->particle()->getExtraInfo("treeFitterMassConstraintValue");
+        } else mass = daughter->particle()->getPDGMass();
         const double p2 = p3_vec.squaredNorm();
         const double energy = std::sqrt(mass * mass + p2);
         p.getResiduals()(3) -= energy;

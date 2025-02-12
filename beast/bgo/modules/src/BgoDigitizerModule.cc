@@ -118,7 +118,7 @@ void BgoDigitizerModule::getXMLData()
     iRange++;
   }
 
-  B2INFO("BgoDigitizer: Aquired bgo locations and gas parameters");
+  B2INFO("BgoDigitizer: Acquired bgo locations and gas parameters");
   B2INFO("              from BGO.xml. There are " << nBGO << " BGOs implemented");
 
 }

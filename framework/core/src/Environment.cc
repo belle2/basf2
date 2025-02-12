@@ -154,10 +154,6 @@ Environment::Environment() :
 Environment::~Environment() = default;
 
 
-// we know getFileNames is deprecated but we need it as long as --dry-run is available
-// so let's remove the warning for now ...
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
 void Environment::setJobInformation(const std::shared_ptr<Path>& path)
 {
   const std::list<ModulePtr>& modules = path->buildModulePathList(true);

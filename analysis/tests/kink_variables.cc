@@ -137,9 +137,9 @@ namespace {
 
     EXPECT_FLOAT_EQ(kinkCombinedFitResultFlag(part), 10);
     EXPECT_FLOAT_EQ(kinkCombinedFitResultFlagBit1(part), 0);
-    EXPECT_FLOAT_EQ(kinkCombinedFitResultFlagBit2(part), 2);
+    EXPECT_FLOAT_EQ(kinkCombinedFitResultFlagBit2(part), 1);
     EXPECT_FLOAT_EQ(kinkCombinedFitResultFlagBit3(part), 0);
-    EXPECT_FLOAT_EQ(kinkCombinedFitResultFlagBit4(part), 8);
+    EXPECT_FLOAT_EQ(kinkCombinedFitResultFlagBit4(part), 1);
   }
 
   /*

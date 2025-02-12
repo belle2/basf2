@@ -198,7 +198,7 @@ namespace Belle2 {
     {
       double flag = kinkCombinedFitResultFlag(part);
       if (flag < 16)
-        return  static_cast<int>(flag) & 0b0010;
+        return  static_cast<bool>(static_cast<int>(flag) & 0b0010);
       else
         return Const::doubleNaN;
     }
@@ -207,7 +207,7 @@ namespace Belle2 {
     {
       double flag = kinkCombinedFitResultFlag(part);
       if (flag < 16)
-        return  static_cast<int>(flag) & 0b0100;
+        return  static_cast<bool>(static_cast<int>(flag) & 0b0100);
       else
         return Const::doubleNaN;
     }
@@ -216,7 +216,7 @@ namespace Belle2 {
     {
       double flag = kinkCombinedFitResultFlag(part);
       if (flag < 16)
-        return  static_cast<int>(flag) & 0b1000;
+        return  static_cast<bool>(static_cast<int>(flag) & 0b1000);
       else
         return Const::doubleNaN;
     }

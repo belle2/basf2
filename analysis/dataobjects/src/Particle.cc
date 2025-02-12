@@ -238,7 +238,10 @@ Particle::Particle(const Kink* kink, const Const::ChargedStable& chargedStable, 
   setMdstArrayIndex(kink->getArrayIndex());
   m_trackFitResultIndex = trackFitResultIndex;
 
-  m_pdgCode = generatePDGCodeFromCharge(kink->getMotherTrackFitResultStart()->getChargeSign(), chargedStable);
+  StoreArray<TrackFitResult> trackFitResults{};
+  const TrackFitResult* particleTrackFitResult = trackFitResults[m_trackFitResultIndex];
+
+  m_pdgCode = generatePDGCodeFromCharge(particleTrackFitResult->getChargeSign(), chargedStable);
 
   // set mass
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
@@ -246,7 +249,7 @@ Particle::Particle(const Kink* kink, const Const::ChargedStable& chargedStable, 
   m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
 
   // set momentum, position and error matrix
-  setMomentumPositionErrorMatrix(kink->getMotherTrackFitResultStart());
+  setMomentumPositionErrorMatrix(particleTrackFitResult);
 }
 
 Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type) :

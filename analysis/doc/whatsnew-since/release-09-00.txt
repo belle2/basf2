@@ -20,6 +20,7 @@ Variables
 * The variables `prodVertexX`, `prodVertexY`, and `prodVertexZ` now return the production vertex position also for
   TreeFit. Previously, only Rave was supported. Moreover, the covariance matrix elements of the production vertex for a
   TreeFit are now also available via the variables `prodVertexCov` and `prodVertexXErr`, etc.
+* Added kink variables. You can find them in the new variable group `kinkvariables`.
 * The variables `pi0Prob(mode) <pi0Prob>` and `etaProb(mode) <etaProb>` are extended to MC15 version
   and accept the modes ``standardMC15rd`` and ``tightMC15rd``.
 * The PID Neural Network (PIDNN) variables `pionIDNN` and `kaonIDNN` require now the payload from a special global tag. The payload

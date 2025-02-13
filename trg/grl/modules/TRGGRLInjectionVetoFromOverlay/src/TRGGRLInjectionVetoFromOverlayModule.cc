@@ -6,13 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <trg/gdl/modules/TRGGDLInjectionVetoFromOverlay/TRGGDLInjectionVetoFromOverlayModule.h>
+#include <trg/grl/modules/TRGGRLInjectionVetoFromOverlay/TRGGRLInjectionVetoFromOverlayModule.h>
 
 using namespace Belle2;
 
-REG_MODULE(TRGGDLInjectionVetoFromOverlay);
+REG_MODULE(TRGGRLInjectionVetoFromOverlay);
 
-TRGGDLInjectionVetoFromOverlayModule::TRGGDLInjectionVetoFromOverlayModule() : Module()
+TRGGRLInjectionVetoFromOverlayModule::TRGGRLInjectionVetoFromOverlayModule() : Module()
 {
   setDescription("Module for adding to MC samples the information about the TRG active veto from "
                  "beam background overlay files.");
@@ -21,19 +21,19 @@ TRGGDLInjectionVetoFromOverlayModule::TRGGDLInjectionVetoFromOverlayModule() : M
            "Name added to default branch names", std::string("_beamBG"));
 }
 
-void TRGGDLInjectionVetoFromOverlayModule::initialize()
+void TRGGRLInjectionVetoFromOverlayModule::initialize()
 {
   m_TRGGRLInfoFromSimulation.isRequired("TRGGRLObjects");
   m_TRGSummaryFromOverlay.isOptional(std::string("TRGSummary") + m_extensionName);
 }
 
-void TRGGDLInjectionVetoFromOverlayModule::beginRun()
+void TRGGRLInjectionVetoFromOverlayModule::beginRun()
 {
   if (not m_TRGInputBits.isValid())
     B2FATAL("TRGGDLInputBits database object is not available");
 }
 
-void TRGGDLInjectionVetoFromOverlayModule::event()
+void TRGGRLInjectionVetoFromOverlayModule::event()
 {
   if (!m_TRGGRLInfoFromSimulation.isValid() or !m_TRGSummaryFromOverlay.isValid())
     return;

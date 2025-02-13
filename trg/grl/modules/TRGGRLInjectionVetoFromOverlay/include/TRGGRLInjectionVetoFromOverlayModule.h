@@ -22,14 +22,14 @@ namespace Belle2 {
   /**
    * Module for adding to MC samples the information about the TRG active veto from beam background overlay files.
    */
-  class TRGGDLInjectionVetoFromOverlayModule : public Module {
+  class TRGGRLInjectionVetoFromOverlayModule : public Module {
 
   public:
 
   public:
 
     /** Constructor. */
-    TRGGDLInjectionVetoFromOverlayModule();
+    TRGGRLInjectionVetoFromOverlayModule();
 
     /** Initialize. */
     void initialize() override;

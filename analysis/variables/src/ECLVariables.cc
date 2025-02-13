@@ -1515,13 +1515,13 @@ The MVA has been trained using MC and the features are:
 - `clusterTiming`
 - `clusterTheta`
 
-This MVA is the same as the one used for `hadronicSplitOffSuppression` but that variable should not be used as it is deprecated and does not use the new weights. 
-
 The variable `clusterZernikeMVA` is also used but only for the MC15 training. 
 Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
 the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
 
 Please cite `this <https://inspirehep.net/literature/2785196>`_ if using this tool. 
+
+(This MVA is the same as the one used for `hadronicSplitOffSuppression` but that variable should not be used as it is deprecated and does not use the new weights). 
 )DOC");
     REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.

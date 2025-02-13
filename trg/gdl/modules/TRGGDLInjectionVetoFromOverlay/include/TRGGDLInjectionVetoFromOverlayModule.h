@@ -9,8 +9,11 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
+#include <mdst/dbobjects/TRGGDLDBInputBits.h>
+#include <trg/grl/dataobjects/TRGGRLInfo.h>
 
 #include <string>
 
@@ -28,16 +31,22 @@ namespace Belle2 {
     /** Constructor. */
     TRGGDLInjectionVetoFromOverlayModule();
 
-    /** Initialize the module. */
+    /** Initialize. */
     void initialize() override;
 
-    /** Event processor. */
+    /** Begin run. */
+    void beginRun() override;
+
+    /** Event. */
     void event() override;
 
   private:
 
-    /** TRGSummary object from MC simulation */
-    StoreObjPtr<TRGSummary> m_TRGSummaryFromSimulation;
+    /** TRGGDLInputBits database object */
+    DBObjPtr<TRGGDLDBInputBits> m_TRGInputBits;
+
+    /** TRGGRLInfo object from MC simulation */
+    StoreObjPtr<TRGGRLInfo> m_TRGGRLInfoFromSimulation;
 
     /** TRGSummary object from beam background overlay */
     StoreObjPtr<TRGSummary> m_TRGSummaryFromOverlay;

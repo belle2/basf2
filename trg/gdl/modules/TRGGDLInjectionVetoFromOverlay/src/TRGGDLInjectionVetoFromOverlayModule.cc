@@ -23,23 +23,33 @@ TRGGDLInjectionVetoFromOverlayModule::TRGGDLInjectionVetoFromOverlayModule() : M
 
 void TRGGDLInjectionVetoFromOverlayModule::initialize()
 {
-  m_TRGSummaryFromSimulation.isRequired();
+  m_TRGGRLInfoFromSimulation.isRequired("TRGGRLObjects");
   m_TRGSummaryFromOverlay.isOptional(std::string("TRGSummary") + m_extensionName);
+}
+
+void TRGGDLInjectionVetoFromOverlayModule::beginRun()
+{
+  if (not m_TRGInputBits.isValid())
+    B2FATAL("TRGGDLInputBits database object is not available");
 }
 
 void TRGGDLInjectionVetoFromOverlayModule::event()
 {
-  if (!m_TRGSummaryFromSimulation.isValid() or !m_TRGSummaryFromOverlay.isValid())
+  if (!m_TRGGRLInfoFromSimulation.isValid() or !m_TRGSummaryFromOverlay.isValid())
     return;
-  // Check if the corresponing BGO event falls into the TRG veto:
-  // if yes, let's set the current MC event as falling into the TRG veto as well
   try {
+    // Check if the corresponing BGO event falls into the TRG veto:
+    // if yes, let's set the current MC event as falling into the TRG veto as well
     if (m_TRGSummaryFromOverlay->testInput("passive_veto")) {
-      const unsigned int passive_veto = m_TRGSummaryFromSimulation->getInputBitNumber("passive_veto");
-      m_TRGSummaryFromSimulation->setInputBits(passive_veto, 1);
+      const unsigned int passive_vetoBit = m_TRGInputBits->getinbitnum("passive_veto");
+      m_TRGGRLInfoFromSimulation->setInputBits(passive_vetoBit, 1);
       // Set also the cdcecl_veto input line according to what written in the BGO event
-      const unsigned int cdcecl_veto = m_TRGSummaryFromSimulation->getInputBitNumber("cdcecl_veto");
-      m_TRGSummaryFromSimulation->setInputBits(cdcecl_veto, m_TRGSummaryFromOverlay->testInput("cdcecl_veto"));
+      const unsigned int cdcecl_vetoBit = m_TRGInputBits->getinbitnum("cdcecl_veto");
+      const bool cdcecl_vetoAnswer = m_TRGSummaryFromOverlay->testInput("cdcecl_veto");
+      m_TRGGRLInfoFromSimulation->setInputBits(cdcecl_vetoBit, cdcecl_vetoAnswer);
+    } else {
+      const unsigned int passive_vetoBit = m_TRGInputBits->getinbitnum("passive_veto");
+      m_TRGGRLInfoFromSimulation->setInputBits(passive_vetoBit, 0);
     }
   } catch (const std::exception&) {
     // TRGSummary methods can throw out_of_range, runtime_error and invalid_argument exceptions

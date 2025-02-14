@@ -33,13 +33,15 @@ def add_grl_trigger(path, SimulationMode=1):
     grl.param('biasFiles', [b2.find_file("data/trg/grl/bias.dat")])
     path.add_module(grl)
 
+    _TRGGRLInfo = 'TRGGRLObjects'
+
     path.add_module(
         'TRGGRLProjects',
         SimulationMode=SimulationMode,
-        TrgGrlInformation='TRGGRLObjects'
+        TrgGrlInformation=_TRGGRLInfo
     )
 
     path.add_module(
         'TRGGRLInjectionVetoFromOverlay',
-        TRGGRLInfoName='TRGGRLObjects'
+        TRGGRLInfoName=_TRGGRLInfo
     )

@@ -8,132 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from keras.layers import Input, Discretization, Reshape
 import keras
-import numpy as np
-
-from functools import partial
-
-
-class Slicing(keras.layers.Layer):
-    def __init__(self, column, **kwargs):
-        super().__init__(**kwargs)
-        self.column = column
-
-    def call(self, inputs):
-        return inputs[:, self.column:self.column+1]
-
-    def get_config(self):
-        config = super().get_config()
-        config.update({"column": self.column})
-        return config
-
-
-class NanToNum(keras.layers.Layer):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def call(self, inputs):
-        return keras.ops.nan_to_num(inputs)
-
-    def get_config(self):
-        config = super().get_config()
-        return config
-
-
-class ColumnEmbedding(keras.layers.Layer):
-    def __init__(
-        self,
-        sequence_length,
-        initializer="glorot_uniform",
-        **kwargs,
-    ):
-        super().__init__(**kwargs)
-        self.sequence_length = int(sequence_length)
-        self.initializer = keras.initializers.get(initializer)
-
-    def get_config(self):
-        config = super().get_config()
-        config.update(
-            {
-                "sequence_length": self.sequence_length,
-                "initializer": keras.initializers.serialize(self.initializer),
-            }
-        )
-        return config
-
-    def build(self, inputs_shape):
-        feature_size = inputs_shape[-1]
-        self.position_embeddings = self.add_weight(
-            name="embeddings",
-            shape=[self.sequence_length, feature_size],
-            initializer=self.initializer,
-            trainable=True,
-        )
-        self.built = True
-
-    def call(self, inputs, start_index=0):
-        shape = keras.ops.shape(inputs)
-        feature_length = shape[-1]
-        sequence_length = shape[-2]
-        # trim to match the length of the input sequence, which might be less
-        # than the sequence_length of the layer.
-        position_embeddings = keras.ops.convert_to_tensor(self.position_embeddings)
-        position_embeddings = keras.ops.slice(
-            position_embeddings,
-            (start_index, 0),
-            (sequence_length, feature_length),
-        )
-        return keras.ops.broadcast_to(position_embeddings, shape)
-
-
-def get_preprocessor(X, num_bins):
-    """
-    Configure and adapt preprocessor on data X
-    """
-    number_of_features = X.shape[1]
-    inputs = Input(shape=(number_of_features,))
-
-    outputs = {}
-    for col in range(number_of_features):
-        Xcol = X[:, col]
-        disc_layer = Discretization(num_bins=num_bins, epsilon=0.0001,)
-        disc_layer.adapt(Xcol[~np.isnan(Xcol)])
-
-        # Note: After calling adapt(), both `num_bins` and `bin_boundaries`
-        # attributes are not None. This causes a ValueError when deserializing
-        # the Discretization layer later. So we manually force `num_bins` to None.
-        disc_layer.num_bins = None
-
-        net = Slicing(col)(inputs)
-        net = disc_layer(net)
-        outputs["{}".format(col)] = net
-
-    return keras.models.Model(inputs=inputs, outputs=outputs)
-
-
-def create_model_inputs(number_of_features):
-    inputs = {}
-    for col in range(number_of_features):
-        feature_name = "{}".format(col)
-        inputs[feature_name] = keras.layers.Input(name=feature_name, shape=(1,), dtype="int64")
-
-    return inputs
-
-
-def encode_inputs(inputs, embedding_dims, num_bins):
-    encoded_feature_list = []
-
-    for feature_name in inputs:
-        # Create an embedding layer with the specified dimensions.
-        embedding = keras.layers.Embedding(
-            input_dim=num_bins, output_dim=embedding_dims
-        )
-        # Convert the index values to embedding representations.
-        encoded_feature = embedding(inputs[feature_name])
-        encoded_feature_list.append(encoded_feature)
-
-    return encoded_feature_list
 
 
 def create_mlp(hidden_units, dropout_rate, activation, normalization_layer, name=None):
@@ -149,42 +24,42 @@ def create_mlp(hidden_units, dropout_rate, activation, normalization_layer, name
 def get_tflat_model(parameters, number_of_features):
     """
     Configure tflat model from parameters
-
-    The model is based on the paper
-    "TabTransformer: Tabular Data Modeling Using Contextual Embeddings"
-    https://arxiv.org/abs/2012.06678
-
-    The implementation of the model is inspired from
-    https://keras.io/examples/structured_data/tabtransformer/
-
     """
+    num_tracks = parameters.get("num_tracks")
+    num_features = parameters.get("num_features")
     num_transformer_blocks = parameters.get("num_transformer_blocks")
     num_heads = parameters.get("num_heads")
     embedding_dims = parameters.get("embedding_dims")
     mlp_hidden_units_factors = parameters.get("mlp_hidden_units_factors")
     dropout_rate = parameters.get("dropout_rate")
-    use_column_embedding = parameters.get("use_column_embedding")
-    num_bins = parameters.get("num_bins")
 
     # Create model inputs
-    inputs = create_model_inputs(number_of_features)
+    inputs = keras.layers.Input((number_of_features,))
 
-    # Encode features
-    encoded_feature_list = encode_inputs(inputs, embedding_dims, num_bins)
+    # Replace NaN's by a special number
+    raw_features = keras.ops.nan_to_num(inputs, nan=0)
 
-    # Stack feature embeddings for the Tansformer.
-    encoded_features = keras.ops.stack(encoded_feature_list, axis=1)
+    # 3D tensor with axes for samples, tracks and features
+    reshaped_features = keras.layers.Reshape((num_tracks, num_features))(raw_features)
 
-    # Number of encoded features
-    num_columns = encoded_features.shape[1]
+    # Create a keras mask for padded tracks
+    masked_features = keras.layers.Masking(0)(reshaped_features)
 
-    # Reshape the encoded features
-    encoded_features = Reshape((num_columns, embedding_dims))(encoded_features)
+    # Normalize the input features
+    normed_features = keras.layers.BatchNormalization()(masked_features)
 
-    # Add column embedding to feature embeddings.
-    if use_column_embedding:
-        column_embeddings = ColumnEmbedding(sequence_length=num_columns)(encoded_features)
-        encoded_features = encoded_features + column_embeddings
+    # Embed features in latent space with embedding_dims
+    encoded_features = keras.layers.Dense(
+        units=embedding_dims,
+        activation=keras.activations.selu,
+        name="Embedding_dense_1")(normed_features)
+    encoded_features = keras.layers.Dropout(dropout_rate, name="Embedding_dropout_1")(encoded_features)
+    encoded_features = keras.layers.BatchNormalization(name="Embedding_batchnorm")(encoded_features)
+    encoded_features = keras.layers.Dense(
+        units=embedding_dims,
+        activation=keras.activations.selu,
+        name="Embedding_dense_2")(encoded_features)
+    encoded_features = keras.layers.Dropout(dropout_rate, name="Embedding_dropout_2")(encoded_features)
 
     # Create multiple layers of the Transformer block.
     for block_idx in range(num_transformer_blocks):
@@ -202,15 +77,10 @@ def get_tflat_model(parameters, number_of_features):
         # Layer normalization 1.
         x = keras.layers.LayerNormalization(name=f"layer_norm1_{block_idx}", epsilon=1e-6)(x)
         # Feedforward.
-        feedforward_output = create_mlp(
-            hidden_units=[embedding_dims],
-            dropout_rate=dropout_rate,
-            activation=keras.activations.gelu,
-            normalization_layer=partial(
-                keras.layers.LayerNormalization, epsilon=1e-6
-            ),  # using partial to provide keyword arguments before initialization
-            name=f"feedforward_{block_idx}",
-        )(x)
+        feedforward_output = keras.layers.Dense(units=3*embedding_dims, activation='relu',
+                                                name=f"feedforward_{block_idx}_dense_1")(x)
+        feedforward_output = keras.layers.Dense(units=embedding_dims, name=f"feedforward_{block_idx}_dense_2")(feedforward_output)
+        feedforward_output = keras.layers.Dropout(dropout_rate, name=f"feedforward_{block_idx}_dropout")(feedforward_output)
         # Skip connection 2.
         x = keras.layers.Add(name=f"skip_connection2_{block_idx}")([feedforward_output, x])
         # Layer normalization 2.
@@ -218,11 +88,8 @@ def get_tflat_model(parameters, number_of_features):
             name=f"layer_norm2_{block_idx}", epsilon=1e-6
         )(x)
 
-    # Flatten the "contextualized" embeddings of the features.
-    features = keras.layers.Flatten()(encoded_features)
-
     # Pool the "contextualized" embeddings of the features.
-    # features = keras.layers.GlobalAveragePooling1D()(encoded_features)
+    features = keras.layers.GlobalAveragePooling1D()(encoded_features)
 
     # Compute MLP hidden_units.
     mlp_hidden_units = [
@@ -234,20 +101,10 @@ def get_tflat_model(parameters, number_of_features):
         dropout_rate=dropout_rate,
         activation=keras.activations.selu,
         normalization_layer=keras.layers.BatchNormalization,
-        name="MLP",
+        name="ClassifierMLP",
     )(features)
 
     # Add a sigmoid as a binary classifer.
     outputs = keras.layers.Dense(units=1, activation="sigmoid", name="sigmoid")(features)
     model = keras.Model(inputs=inputs, outputs=outputs)
     return model
-
-
-def get_merged_model(preprocessor, tflat_model, number_of_features):
-    """
-    Create a keras model that includes the preprocessing step
-    """
-    inputs = Input(shape=(number_of_features,))
-    outputs = preprocessor(inputs)
-    outputs = tflat_model(outputs)
-    return keras.models.Model(inputs=inputs, outputs=outputs)

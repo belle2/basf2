@@ -15,7 +15,7 @@ import numpy as np
 
 from basf2_mva_python_interface.tensorflow import State
 
-from tflat.tensorflow_tflat_model import get_preprocessor, get_tflat_model, get_merged_model
+from tflat.tensorflow_tflat_model import get_tflat_model
 
 from keras.losses import binary_crossentropy
 import tensorflow as tf
@@ -45,13 +45,13 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     if seed:
         tf.random.set_seed(seed)
 
+    parameters['num_tracks'] = 10
+    parameters['num_features'] = 14
     parameters["num_transformer_blocks"] = 6
     parameters["num_heads"] = 4
-    parameters["embedding_dims"] = 8
+    parameters["embedding_dims"] = 128
     parameters["mlp_hidden_units_factors"] = [2, 1,]
-    parameters["dropout_rate"] = 0.2
-    parameters["use_column_embedding"] = True
-    parameters["num_bins"] = 16  # 64
+    parameters["dropout_rate"] = 0.1
 
     state = State(get_tflat_model(parameters, number_of_features))
 
@@ -83,8 +83,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     saved_parameters = parameters.copy()
     saved_parameters['number_of_features'] = number_of_features
     state.parameters = json.dumps(saved_parameters)
-    state.seed = seed
-    state.num_bins = parameters["num_bins"]
+
     return state
 
 
@@ -132,24 +131,15 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     Pass received data to keras model and fit it
     """
 
-    number_of_features = X.shape[1]
-    num_bins = state.num_bins
-
     # transform labels
     if y.min() != 0:
         y[y == y.min()] = 0
     if state.ytest.min() != 0:
         state.ytest[state.ytest == state.ytest.min()] = 0
 
-    # not binary
+    # assert binary labels
     assert len(np.unique(y)) == 2
     assert len(np.unique(state.ytest)) == 2
-
-    # configure and adapt preprocessor
-    preprocessor = get_preprocessor(X, num_bins)
-
-    X = preprocessor(X)
-    state.Xtest = preprocessor(state.Xtest)
 
     # perform fit() with early stopping callback
     callbacks = [tf.keras.callbacks.EarlyStopping(
@@ -161,10 +151,8 @@ def partial_fit(state, X, S, y, w, epoch, batch):
         baseline=None,
         restore_best_weights=True)]
 
-    state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=128, epochs=100, callbacks=callbacks, verbose=1)
+    state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=256, epochs=100, callbacks=callbacks, verbose=1)
 
-    # create a keras model that includes the preprocessing step
-    state.model = get_merged_model(preprocessor, state.model, number_of_features=number_of_features)
     return False
 
 

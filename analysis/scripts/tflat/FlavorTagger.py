@@ -26,8 +26,8 @@ def get_variables(particle_list, ranked_variable, variables=None, particleNumber
     :return:
     """
     var_list = []
-    for var in variables:
-        for i_num in range(1, particleNumber + 1):
+    for i_num in range(1, particleNumber + 1):
+        for var in variables:
             var_list.append('getVariableByRank(' + particle_list + ', ' + ranked_variable + ', ' + var + ', ' +
                             str(i_num) + ')')
     return var_list
@@ -70,6 +70,7 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
 
     if mode in ['sampler', 'teacher']:
         variable_list = [
+            'charge',
             'useCMSFrame(p)',
             'useCMSFrame(cosTheta)',
             'useCMSFrame(phi)',
@@ -108,13 +109,11 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
     # create final state particle lists
     ma.fillParticleList(roe_particle_list, roe_particle_list_cut, path=roe_path)
 
-    tflat_particle_lists = ['pi+:pos_charged', 'pi+:neg_charged']
+    tflat_particle_lists = ['pi+:pos_charged',]
 
-    pos_cut = 'charge > 0 and isInRestOfEvent == 1 and passesROEMask(' + maskName + ') > 0.5 and p < infinity'
-    neg_cut = 'charge < 0 and isInRestOfEvent == 1 and passesROEMask(' + maskName + ') > 0.5 and p < infinity'
+    pos_cut = 'isInRestOfEvent == 1 and passesROEMask(' + maskName + ') > 0.5 and p < infinity'
 
     ma.cutAndCopyList(tflat_particle_lists[0], roe_particle_list, pos_cut, writeOut=True, path=roe_path)
-    ma.cutAndCopyList(tflat_particle_lists[1], roe_particle_list, neg_cut, writeOut=True, path=roe_path)
 
     # sort pattern for tagging specific variables
     rank_variable = 'p'
@@ -122,8 +121,7 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
 
     # create tagging specific variables
     if mode != 'expert':
-        features = get_variables(tflat_particle_lists[0], rank_variable, variable_list, particleNumber=5)
-        features += get_variables(tflat_particle_lists[1], rank_variable, variable_list, particleNumber=5)
+        features = get_variables(tflat_particle_lists[0], rank_variable, variable_list, particleNumber=10)
 
     for particles in tflat_particle_lists:
         ma.rankByHighest(particles, rank_variable, path=roe_path)

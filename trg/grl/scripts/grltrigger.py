@@ -37,4 +37,4 @@ def add_grl_trigger(path, SimulationMode=1):
     objects.param('SimulationMode', SimulationMode)
     path.add_module(objects)
 
-    path.add_module('TRGGDLInjectionVetoFromOverlay')
+    path.add_module('TRGGRLInjectionVetoFromOverlay')

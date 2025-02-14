@@ -315,10 +315,14 @@ There are different sub-directories:
 - ``mva/examples/orthogonal_discriminators`` – create orthongonal discriminators with ugBoost or adversary networks
 - ``mva/examples/<backend>`` – backend specific examples e.g. for tmva and tensorflow
 
+For an example on how to apply these multivariate methods within a physics analysis context, the 
+`Continuum Suppression using Boosted Decision Trees <https://software.belle2.org/development/sphinx/online_book/basf2/cs.html#continuum-suppression-using-boosted-decision-trees>`_ 
+walkthrough is a particularly helpful resource. 
+
 Contributions
 -------------
 
-The `MVA/ML subgroup <https://confluence.desy.de/pages/viewpage.action?pageId=104035532>`_ is the place to go for getting involved in MVA-related projects.
+The `MVA/ML subgroup <https://xwiki.desy.de/xwiki/rest/p/ab2a9>`_ is the place to go for getting involved in MVA-related projects.
 If you want to contribute your are welcome to do so by creating a merge request or initiating your own project.
 
 You can add examples if you have interesting applications of MVA, or you can add plots to the ``basf2_mva_evaluation.py`` script.

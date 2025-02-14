@@ -504,8 +504,8 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   std::vector<ExtHit> eclHit1, eclHit2, eclHit3;
   if (eclClusterInfo != nullptr) {
     eclClusterDistance.resize(eclClusterInfo->size(), 1.0E10); // "positive infinity"
-    ExtHit tempExtHit(extState.pdgCode, Const::EDetector::ECL, 0, EXT_FIRST,
-                      extState.isCosmic, 0.0,
+    ExtHit tempExtHit(.0, extState.pdgCode, Const::EDetector::ECL, 0, EXT_FIRST,
+                      extState.isCosmic,
                       G4ThreeVector(), G4ThreeVector(), G4ErrorSymMatrix(6));
     eclHit1.resize(eclClusterInfo->size(), tempExtHit);
     eclHit2.resize(eclClusterInfo->size(), tempExtHit);
@@ -1192,8 +1192,8 @@ void TrackExtrapolateG4e::createExtHit(ExtHitStatus status, const ExtState& extS
     mom = -mom;
   G4ErrorSymMatrix covariance(6, 0);
   fromG4eToPhasespace(g4eState, covariance);
-  ExtHit* extHit = m_extHits.appendNew(extState.pdgCode, detID, copyID, status,
-                                       extState.isCosmic, extState.tof,
+  ExtHit* extHit = m_extHits.appendNew(extState.tof, extState.pdgCode, detID, copyID, status,
+                                       extState.isCosmic,
                                        pos, mom, covariance);
   // If called standalone, there will be no associated track
   if (extState.track != nullptr)
@@ -1728,7 +1728,7 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
   correction.invert(fail);
   if (fail != 0)
     return;
-  // Matrix inversion succeeeded and is reasonable.
+  // Matrix inversion succeeded and is reasonable.
   // Evaluate chi-squared increment assuming that the Kalman filter
   // won't be able to adjust the extrapolated track's position (fall-back).
   intersection.chi2 = (correction.similarityT(residual))[0][0];

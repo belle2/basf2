@@ -10,6 +10,8 @@
 
 #include <analysis/VariableManager/Manager.h>
 
+#include <framework/gearbox/Const.h>
+
 #include <vector>
 #include <string>
 

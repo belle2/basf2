@@ -198,6 +198,45 @@ class DimuonPlusMissingEnergy(BaseSkim):
 
 
 @fancy_skim_header
+class DimuonRecoilMassSquared(BaseSkim):
+    """
+    **Physics channel**: :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-} \\gamma`.
+    """
+    __authors__ = ["Robin Leboucher"]
+    __description__ = (
+        "Dimuon skim, needed for :math:`e^{+}e^{-} \\to A^{\\prime} \\to \\mu^{+}\\mu^{-} (\\gamma)` "
+        "and other searches."
+    )
+    __contact__ = __liaison__
+    __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
+
+    def build_lists(self, path):
+        dimuon_list = []
+        skim_label = "forDimuonRecoilMassSquared"
+        dimuon_name = "vpho:" + skim_label
+
+        # Define some cuts
+        fromIP_cut = "[abs(dz) < 5.0] and [abs(dr) < 2.0]"
+        muonID_cut = "[muonID > 0.3]"
+        # We want exactly 2 tracks from IP
+        dimuon_cut = "[nCleanedTracks(" + fromIP_cut + ") < 4]"
+        # And the recoil mass squared must be below 20 GeV^2/c^4
+        dimuon_cut += " and [m2Recoil < 20]"
+
+        # Reconstruct the dimuon candidate
+        ma.cutAndCopyList("mu+:" + skim_label, "mu+:all", fromIP_cut + " and " + muonID_cut, path=path)
+        ma.reconstructDecay(dimuon_name + " -> mu+:" + skim_label + " mu-:" + skim_label, dimuon_cut, path=path)
+
+        # And return the dimuon list
+        dimuon_list.append(dimuon_name)
+        return dimuon_list
+
+
+@fancy_skim_header
 class ElectronMuonPlusMissingEnergy(BaseSkim):
     __authors__ = ["Giacomo De Pietro"]
     __description__ = (
@@ -511,7 +550,7 @@ class RadBhabhaV0Control(BaseSkim):
 
     def build_lists(self, path):
 
-        # require Bhabha tracks are high p and E/p is consitent with e+/e-
+        # require Bhabha tracks are high p and E/p is consistent with e+/e-
         BhabhaTrackCuts = ('abs(dr)<0.5 and abs(dz)<2 and pt>0.2 and 0.8<clusterEoP<1.2 and p>1.0 '
                            'and clusterReg==2 and nCDCHits>4')
         BhabhaSystemCuts = '4<M<10 and 0.5<pRecoilTheta<2.25'
@@ -899,3 +938,77 @@ class DielectronPlusVisibleDarkHiggs(BaseSkim):
              path=path)
 
         return [f'vpho:{skim_str}']
+
+
+@fancy_skim_header
+class DarkShower(BaseSkim):
+    """
+    Skim list contains events with only one displaced vertex and a maximum of one other good track.
+    """
+
+    __authors__ = ["Miho Wakai"]
+    __contact__ = __liaison__
+    __description__ = (
+        "Skim for the dark shower analysis. "
+        "We are reconstructing the displaced vertex as a :math:`e^+e^- \\to K_s(\\to \\pi^+ \\pi^-)`"
+        )
+    __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+
+    def build_lists(self, path):
+        skim_str = "DarkShower"
+        n_track_event_cut = "[nCleanedTracks([thetaInCDCAcceptance] and [p > 0.15] and [abs(dz) < 10] ) <= 3]"
+
+        track_requirements = "[pt > 0.1] and [nCDCHits >= 5]"
+
+        ma.cutAndCopyList(
+            f"pi+:{skim_str}",
+            "pi+:all",
+            f"[{track_requirements} and {n_track_event_cut}]",
+            path=path)
+
+        ma.reconstructDecay(
+            decayString=f"K_S0:{skim_str} -> pi+:{skim_str} pi-:{skim_str}",
+            cut="",
+            path=path
+        )
+
+        vertex.treeFit(
+            list_name=f"K_S0:{skim_str}",
+            conf_level=0,
+            updateAllDaughters=True,
+            path=path
+        )
+        ma.applyCuts(
+            list_name=f"K_S0:{skim_str}",
+            cut="[dr > 0.2] and [significanceOfDistance > 10] and [cosAngleBetweenMomentumAndVertexVector > 0.950212931632136]",
+            path=path
+        )
+        path = self.skim_event_cuts(f"[nParticlesInList(K_S0:{skim_str}) == 1]", path=path)
+
+        ma.buildRestOfEvent(
+            target_list_name=f"K_S0:{skim_str}",
+            fillWithMostLikely=True,
+            path=path
+        )
+        ma.appendROEMasks(
+            list_name=f"K_S0:{skim_str}",
+            mask_tuples=[
+                ("ds_roe",
+                 '',  # no track cuts
+                 "formula(clusterTiming/clusterErrorTiming) < 2 and minC2TDist > 50" +
+                 " and thetaInCDCAcceptance" +
+                 " and [[clusterReg==1 and E>0.1] or [clusterReg==2 and E>0.060] or [clusterReg==3 and E>0.150]]")],
+            path=path
+         )
+
+        ma.applyCuts(
+            list_name=f"K_S0:{skim_str}",
+            cut="roeNeextra(ds_roe) < 1.5",
+            path=path
+        )
+
+        return [f"K_S0:{skim_str}"]

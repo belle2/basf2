@@ -341,47 +341,47 @@ namespace Belle2 {
   private:
 
     /// Keeps all TRGCDCLinks created by new().
-    static std::vector<TRGCDCLink*> _all;
+    static std::vector<TRGCDCLink*> m_all;
 
     /// Track object.
-    TRGCDCTrack* _track;
+    TRGCDCTrack* m_track;
 
     /// Cell hit object.
-    const TRGCDCCellHit* _hit;
+    const TRGCDCCellHit* m_hit;
 
     /// position on track
-    HepGeom::Point3D<double> _onTrack;
+    HepGeom::Point3D<double> m_onTrack;
     /// position on wire
-    HepGeom::Point3D<double> _onWire;
+    HepGeom::Point3D<double> m_onWire;
     /// position
-    HepGeom::Point3D<double> _position;
+    HepGeom::Point3D<double> m_position;
     /// dPhi
-    double _dPhi;
+    double m_dPhi;
     /// left right
-    unsigned _leftRight;
+    unsigned m_leftRight;
     /// drift distance
-    float _drift[2];
+    float m_drift[2];
     /// drift distance error
-    float _dDrift[2];
+    float m_dDrift[2];
 
     /// z status of stereo
-    int _zStatus;
+    int m_zStatus;
     /// not useds?
-    int _zPair;
+    int m_zPair;
     /// pull
-    double _pull;
+    double m_pull;
     /// neighbor TRGCDCLink
-    TRGCDCLink* _neighbor[7];
+    TRGCDCLink* m_neighbor[7];
     /// TRGCDCLink
-    TRGCDCLink* _link;
+    TRGCDCLink* m_link;
 
     /// ...tmp...
-    HepGeom::Point3D<double> _conf;
+    HepGeom::Point3D<double> m_conf;
 
     /// arcZ
-    HepGeom::Point3D<double> _arcZ[4];
+    HepGeom::Point3D<double> m_arcZ[4];
     ///  2D fitted or not
-    unsigned _fit2D;
+    unsigned m_fit2D;
     //
     // for quick dicision
     //
@@ -391,13 +391,13 @@ namespace Belle2 {
     static bool ms_superb;
 
     /// ...Buffers...
-    static unsigned _nL;
+    static unsigned m_nL;
     /// ...Buffers...
-    static unsigned _nSL;
+    static unsigned m_nSL;
     /// ...Buffers...
-    static unsigned _nSLA;
+    static unsigned m_nSLA;
     /// ...Buffers...
-    static unsigned* _nHitsSL;
+    static unsigned* m_nHitsSL;
 
 #ifdef TRASAN_DEBUG
   public:
@@ -415,28 +415,28 @@ namespace Belle2 {
   const TRGCDCCellHit*
   TRGCDCLink::hit(void) const
   {
-    return _hit;
+    return m_hit;
   }
 
   inline
   TRGCDCTrack*
   TRGCDCLink::track(void) const
   {
-    return _track;
+    return m_track;
   }
 
   inline
   const TRGCDCCellHit*
   TRGCDCLink::hit(const TRGCDCCellHit* a)
   {
-    return _hit = a;
+    return m_hit = a;
   }
 
   inline
   TRGCDCTrack*
   TRGCDCLink::track(TRGCDCTrack* a)
   {
-    return _track = a;
+    return m_track = a;
   }
 
   inline
@@ -446,127 +446,127 @@ namespace Belle2 {
                      unsigned leftRight,
                      double pull)
   {
-    _onTrack = onTrack;
-    _onWire = onWire;
-    _leftRight = leftRight;
-    _pull = pull;
+    m_onTrack = onTrack;
+    m_onWire = onWire;
+    m_leftRight = leftRight;
+    m_pull = pull;
   }
 
   inline
   double
   TRGCDCLink::pull(void) const
   {
-    return _pull;
+    return m_pull;
   }
 
   inline
   double
   TRGCDCLink::pull(double a)
   {
-    return _pull = a;
+    return m_pull = a;
   }
 
   inline
   const HepGeom::Point3D<double>&
   TRGCDCLink::positionOnWire(void) const
   {
-    return _onWire;
+    return m_onWire;
   }
 
   inline
   const HepGeom::Point3D<double>&
   TRGCDCLink::positionOnTrack(void) const
   {
-    return _onTrack;
+    return m_onTrack;
   }
 
   inline
   const HepGeom::Point3D<double>&
   TRGCDCLink::positionOnWire(const HepGeom::Point3D<double>& a)
   {
-    return _onWire = a;
+    return m_onWire = a;
   }
 
   inline
   const HepGeom::Point3D<double>&
   TRGCDCLink::positionOnWire(double p[3])
   {
-    _onWire.setX(p[0]);
-    _onWire.setY(p[1]);
-    _onWire.setZ(p[2]);
-    return _onWire;
+    m_onWire.setX(p[0]);
+    m_onWire.setY(p[1]);
+    m_onWire.setZ(p[2]);
+    return m_onWire;
   }
 
   inline
   const HepGeom::Point3D<double>&
   TRGCDCLink::positionOnTrack(const HepGeom::Point3D<double>& a)
   {
-    return _onTrack = a;
+    return m_onTrack = a;
   }
 
   inline
   const HepGeom::Point3D<double>&
   TRGCDCLink::positionOnTrack(double p[3])
   {
-    _onTrack.setX(p[0]);
-    _onTrack.setY(p[1]);
-    _onTrack.setZ(p[2]);
-    return _onTrack;
+    m_onTrack.setX(p[0]);
+    m_onTrack.setY(p[1]);
+    m_onTrack.setZ(p[2]);
+    return m_onTrack;
   }
 
   inline
   unsigned
   TRGCDCLink::leftRight(void) const
   {
-    return _leftRight;
+    return m_leftRight;
   }
 
   inline
   unsigned
   TRGCDCLink::leftRight(unsigned a)
   {
-    return _leftRight = a;
+    return m_leftRight = a;
   }
 
   inline
   double
   TRGCDCLink::dPhi(void) const
   {
-    return _dPhi;
+    return m_dPhi;
   }
 
   inline
   double
   TRGCDCLink::dPhi(double a)
   {
-    return _dPhi = a;
+    return m_dPhi = a;
   }
 
   inline
   const HepGeom::Point3D<double>&
   TRGCDCLink::position(void) const
   {
-    return _position;
+    return m_position;
   }
 
   inline
   const HepGeom::Point3D<double>&
   TRGCDCLink::position(const HepGeom::Point3D<double>& a)
   {
-    return _position = a;
+    return m_position = a;
   }
 
 // inline
 // const HepGeom::Point3D<double> &
 // TRGCDCLink::conf(void) const {
-//     return _conf;
+//     return m_conf;
 // }
 
   inline
   const HepGeom::Point3D<double>&
   TRGCDCLink::conf(const HepGeom::Point3D<double>& a)
   {
-    return _conf = a;
+    return m_conf = a;
   }
 
   inline
@@ -574,7 +574,7 @@ namespace Belle2 {
   TRGCDCLink::neighbor(unsigned n, TRGCDCLink* neighbor)
   {
     if (n < 7)
-      _neighbor[n] = neighbor;
+      m_neighbor[n] = neighbor;
   }
 
   inline
@@ -582,7 +582,7 @@ namespace Belle2 {
   TRGCDCLink::neighbor(unsigned n) const
   {
     if (n < 7)
-      return _neighbor[n];
+      return m_neighbor[n];
     return NULL;
   }
 
@@ -590,97 +590,97 @@ namespace Belle2 {
   TRGCDCLink*
   TRGCDCLink::link(void) const
   {
-    return _link;
+    return m_link;
   }
 
   inline
   TRGCDCLink*
   TRGCDCLink::link(TRGCDCLink* a)
   {
-    return _link = a;
+    return m_link = a;
   }
 
   inline
   double
   TRGCDCLink::distance(void) const
   {
-    return (_onTrack - _onWire).mag();
+    return (m_onTrack - m_onWire).mag();
   }
 
   inline
   const HepGeom::Point3D<double>&
   TRGCDCLink::xyPosition(void) const
   {
-    return _hit->cell().xyPosition();
+    return m_hit->cell().xyPosition();
   }
 
 // inline
 // const unsigned
 // TRGCDCLink::fit2D(const unsigned &f) {
-//   return _fit2D = f;
+//   return m_fit2D = f;
 // }
 
 // inline
 // unsigned
 // TRGCDCLink::fit2D(void) {
-//   return _fit2D;
+//   return m_fit2D;
 // }
 
   inline
   float
   TRGCDCLink::drift(unsigned a) const
   {
-    return _drift[a];
+    return m_drift[a];
   }
 
   inline
   float
   TRGCDCLink::drift(float b, unsigned a)
   {
-    return _drift[a] = b;
+    return m_drift[a] = b;
   }
 
   inline
   float
   TRGCDCLink::dDrift(unsigned a) const
   {
-    return _dDrift[a];
+    return m_dDrift[a];
   }
 
   inline
   float
   TRGCDCLink::dDrift(float b, unsigned a)
   {
-    return _dDrift[a] = b;
+    return m_dDrift[a] = b;
   }
 
   inline
   float
   TRGCDCLink::drift(void) const
   {
-    return (_drift[0] + _drift[1]) / 2.;
+    return (m_drift[0] + m_drift[1]) / 2.;
   }
 
   inline
   float
   TRGCDCLink::dDrift(void) const
   {
-    return (_dDrift[0] + _dDrift[1]) / 2.;
+    return (m_dDrift[0] + m_dDrift[1]) / 2.;
   }
 
   inline
   void
   TRGCDCLink::clearBufferSL(void)
   {
-    bzero(_nHitsSL, sizeof(unsigned) * _nSL);
+    bzero(m_nHitsSL, sizeof(unsigned) * m_nSL);
   }
 
   inline
   const TRGCDCCell*
   TRGCDCLink::cell(void) const
   {
-    if (_hit)
-      return & _hit->cell();
+    if (m_hit)
+      return & m_hit->cell();
     return 0;
   }
 

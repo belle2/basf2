@@ -68,7 +68,8 @@ namespace Belle2 {
     }
 
     template <class AFilter>
-    auto OnVarSet<AFilter>::releaseVarSet()&& -> std::unique_ptr<AVarSet> {
+    auto OnVarSet<AFilter>::releaseVarSet()&& -> std::unique_ptr<AVarSet>
+    {
       return std::move(m_varSet);
     }
 
@@ -82,6 +83,13 @@ namespace Belle2 {
     void OnVarSet<AFilter>::setVarSet(std::unique_ptr<AVarSet> varSet)
     {
       m_varSet = std::move(varSet);
+    }
+
+    template <class AFilter>
+    void OnVarSet<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+    {
+      Super::exposeParameters(moduleParamList, prefix);
+      m_varSet->exposeParameters(moduleParamList, prefix);
     }
 
     template <class AVarSet>

@@ -43,6 +43,7 @@ The module also accepts a V0 Kshort particle list as input and applies the error
 Note the difference in impact parameter resolution between V0 daughters and tracks from IP,
 as V0 daughters are free from multiple scattering through the beam pipe.
      )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("inputListName", m_inputListName, "The name of input particle list (charged stable or V0 Kshort)", std::string(""));

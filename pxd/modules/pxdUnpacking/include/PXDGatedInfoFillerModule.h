@@ -17,7 +17,7 @@
 namespace Belle2 {
 
   namespace PXD {
-    /** PXD Gates Mode infromation on readout gate basis
+    /** PXD Gates Mode information on readout gate basis
      *
      */
     class PXDGatedInfoFillerModule : public Module {

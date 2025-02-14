@@ -65,7 +65,7 @@ bool FileCatalog::readCatalog(FileCatalog::FileMap& fileMap)
       if (entry.read(file, physicalFileName)) fileMap[entry.getLfn()] = std::make_pair(physicalFileName, entry);
     }
   } catch (std::exception& e) {
-    B2ERROR("Errors occured while reading " << m_fileName <<
+    B2ERROR("Errors occurred while reading " << m_fileName <<
             ", maybe it is corrupted? Note that your .root files should be unaffected. (Error details: " << e.what() << ")");
     return false;
   }

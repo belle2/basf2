@@ -264,7 +264,7 @@ RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrac
   } else {
 
     // In case of hit reassignment, we do not want to have VXD hits in the beginning of daughter track
-    // even if they exist (absense of VXD hits at the end of the track was checked in KinkFinderModule)
+    // even if they exist (absence of VXD hits at the end of the track was checked in KinkFinderModule)
 
     if (deltaMother)
       sortingParameterOffset = motherRecoTrack->getRecoHitInformation(motherCDCHit[motherCDCHit.size() +
@@ -1008,7 +1008,7 @@ bool KinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
       unsigned short countBadReassignTries = 0;
 
       // find threshold hit position in the track
-      // hit bellow the threshold are to be reassigned
+      // hit below the threshold are to be reassigned
       // positive for daughter hits reassignment to mother, negative vice-versa
       int hitPositionForReassignment = 0;
       if (reassignHitStatus & 0x1) {

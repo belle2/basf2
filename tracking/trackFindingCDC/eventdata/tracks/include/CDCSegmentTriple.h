@@ -24,11 +24,11 @@ namespace Belle2 {
     class CDCTrajectorySZ;
     class CDCTrajectory2D;
 
-    /// Class representing a triple of reconstructed segements in adjacent superlayer
+    /// Class representing a triple of reconstructed segments in adjacent superlayer
     class CDCSegmentTriple {
     public:
 
-      /// Default constructor for ROOT compatability
+      /// Default constructor for ROOT compatibility
       CDCSegmentTriple();
 
       /// Constructor taking two axial segments leaving the middle stereo segment set to null pointer.
@@ -49,7 +49,7 @@ namespace Belle2 {
                        const CDCAxialSegment2D* endSegment,
                        const CDCTrajectory3D& trajectory3D);
 
-      /// Equality comparision based on the pointers to the stored segments
+      /// Equality comparison based on the pointers to the stored segments
       bool operator==(CDCSegmentTriple const& rhs) const
       {
         return
@@ -57,7 +57,7 @@ namespace Belle2 {
           std::tie(rhs.m_startSegment, rhs.m_middleSegment, rhs.m_endSegment);
       }
 
-      /// Total ordering sheme based on the two axial segments first and the stereo segments second
+      /// Total ordering scheme based on the two axial segments first and the stereo segments second
       bool operator<(CDCSegmentTriple const& rhs) const
       {
         return
@@ -178,10 +178,10 @@ namespace Belle2 {
       /// Reference to the axial segment in the start of the triple.
       const CDCAxialSegment2D* m_endSegment;
 
-      /// Memory of the linear trajectory in the sz direction assoziated with the triple.
+      /// Memory of the linear trajectory in the sz direction associated with the triple.
       mutable CDCTrajectory3D m_trajectory3D;
 
-      /// Automaton cell assoziated with the pair of segments
+      /// Automaton cell associated with the pair of segments
       mutable AutomatonCell m_automatonCell;
     };
   }

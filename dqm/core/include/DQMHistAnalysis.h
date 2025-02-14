@@ -59,6 +59,15 @@ namespace Belle2 {
     };
 
     /**
+     * Reference plot scaling type
+    */
+    enum ERefScaling {
+      c_RefScaleNone = 0, /**< no scaling */
+      c_RefScaleEntries = 1, /**< to number of entries (integral) */
+      c_RefScaleMax = 2 /**< to maximum (bin entry) */
+    };
+
+    /**
      * The type of list of histograms.
      */
     typedef std::map<std::string, HistObject> HistList;
@@ -250,7 +259,7 @@ namespace Belle2 {
      * @param hist histogram to scale to
      * @return The found histogram, or nullptr if not found.
      */
-    static TH1* findRefHist(const std::string& histname, int scaling = 0, const TH1* hist = nullptr);
+    static TH1* findRefHist(const std::string& histname, ERefScaling scaling = ERefScaling::c_RefScaleNone, const TH1* hist = nullptr);
 
     /**
      * Find reference histogram.
@@ -261,7 +270,7 @@ namespace Belle2 {
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findRefHist(const std::string& dirname,
-                            const std::string& histname, int scaling = 0, const TH1* hist = nullptr);
+                            const std::string& histname, ERefScaling scaling = ERefScaling::c_RefScaleNone, const TH1* hist = nullptr);
 
     /** Using the original and reference, create scaled version
      * @param scaling scaling algorithm
@@ -269,7 +278,7 @@ namespace Belle2 {
      * @param ref pointer to reference
      * @return scaled reference
      */
-    static TH1* scaleReference(int scaling, const TH1* hist, TH1* ref);
+    static TH1* scaleReference(ERefScaling scaling, const TH1* hist, TH1* ref);
 
     /**
      * Find histogram in specific TFile (e.g. ref file).
@@ -414,7 +423,7 @@ namespace Belle2 {
     /**
      * Extract event processed from daq histogram, called from input module
      */
-    void ExtractEvent(std::vector <TH1*>& hs);
+    void ExtractNEvent(std::vector <TH1*>& hs);
 
     /// EPICS related Functions
 

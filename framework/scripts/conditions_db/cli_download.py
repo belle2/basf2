@@ -38,7 +38,7 @@ def check_payload(destination, payloadinfo, run_range=None):
 
     Args:
         destination (str): local folder where to download the payload
-        payloadinfo (dict): pyload informations as returned by the REST API
+        payloadinfo (dict): pyload information as returned by the REST API
         run_range (b2conditions_db.iov.IntervalOfValidity, optional): Interval of validity . Defaults to None.
 
     Returns:
@@ -334,7 +334,7 @@ def command_download(args, db=None):
                 return None
             return tag_info['globalTagId'], tag_info['name'], tag_info['globalTagStatus']['name']
 
-        # so lets get info on all our tags and check if soem are missing ...
+        # so lets get info on all our tags and check if some are missing ...
         with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
             tags = list(pool.map(get_taginfo, args.tag))
 

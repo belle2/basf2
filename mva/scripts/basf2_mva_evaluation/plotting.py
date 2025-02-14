@@ -35,7 +35,6 @@ import matplotlib
 # Do not use standard backend TkAgg, because it is NOT thread-safe
 # You will get an RuntimeError: main thread is not in main loop otherwise!
 matplotlib.use("svg")
-matplotlib.rcParams.update({'font.size': 36})
 
 # Use the Belle II style while producing the plots
 plt.style.use("belle2")
@@ -84,8 +83,8 @@ class Plotter:
         b2.B2INFO("Create new figure for class " + str(type(self)))
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
-            self.figure.set_tight_layout(False)
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
+            self.figure.set_tight_layout(True)
         else:
             self.figure = figure
 
@@ -501,7 +500,7 @@ class Multiplot(Plotter):
         """
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
             self.figure.set_tight_layout(True)
         else:
             self.figure = figure
@@ -706,7 +705,7 @@ class Box(Plotter):
     #: @var x_axis_label
     #: Label on x axis
 
-    def __init__(self, figure=None, axis=None):
+    def __init__(self, figure=None, axis=None, x_axis_label=None):
         """
         Creates a new figure and axis if None is given, sets the default plot parameters
         @param figure default draw figure which is used
@@ -715,7 +714,7 @@ class Box(Plotter):
         super().__init__(figure=figure, axis=axis)
 
         #: Label on x axis
-        self.x_axis_label = ""
+        self.x_axis_label = x_axis_label
 
     def add(self, data, column, mask=None, weight_column=None):
         """
@@ -744,7 +743,8 @@ class Box(Plotter):
                               )
         self.plots.append(p)
         self.labels.append(column)
-        self.x_axis_label = column
+        if not self.x_axis_label:
+            self.x_axis_label = column
         r"""
         self.axis.text(0.1, 0.9, (r'$     \mu = {:.2f}$' + '\n' + r'$median = {:.2f}$').format(x.mean(), x.median()),
                        fontsize=28, verticalalignment='top', horizontalalignment='left', transform=self.axis.transAxes)
@@ -851,7 +851,7 @@ class Difference(Plotter):
         self.axis.set_title("Difference Plot")
         self.axis.get_yaxis().set_major_locator(matplotlib.ticker.MaxNLocator(5))
         self.axis.get_xaxis().set_label_text(self.x_axis_label)
-        self.axis.get_yaxis().set_label_text('Difference')
+        self.axis.get_yaxis().set_label_text('Diff.')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
 
@@ -877,7 +877,7 @@ class Overtraining(Plotter):
         """
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
             self.figure.set_tight_layout(True)
         else:
             self.figure = figure
@@ -956,14 +956,14 @@ class Overtraining(Plotter):
             else:
                 ks = scipy.stats.ks_2samp(data[column][train_mask & signal_mask], data[column][test_mask & signal_mask])
                 props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
-                self.axis_d1.text(0.1, 0.9, r'signal (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36, bbox=props,
+                self.axis_d1.text(0.1, 0.9, r'signal (train - test) difference $p={:.2f}$'.format(ks[1]),  bbox=props,
                                   verticalalignment='top', horizontalalignment='left', transform=self.axis_d1.transAxes)
             if len(data[column][train_mask & bckgrd_mask]) == 0 or len(data[column][test_mask & bckgrd_mask]) == 0:
                 b2.B2WARNING("Cannot calculate kolmogorov smirnov test for background due to missing data")
             else:
                 ks = scipy.stats.ks_2samp(data[column][train_mask & bckgrd_mask], data[column][test_mask & bckgrd_mask])
                 props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
-                self.axis_d2.text(0.1, 0.9, r'background (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36,
+                self.axis_d2.text(0.1, 0.9, r'background (train - test) difference $p={:.2f}$'.format(ks[1]),
                                   bbox=props,
                                   verticalalignment='top', horizontalalignment='left', transform=self.axis_d2.transAxes)
         except ImportError:
@@ -994,7 +994,7 @@ class VerboseDistribution(Plotter):
     #: Axes for the boxplots
     box_axes = None
 
-    def __init__(self, figure=None, axis=None, normed=False, range_in_std=None):
+    def __init__(self, figure=None, axis=None, normed=False, range_in_std=None, x_axis_label=None):
         """
         Creates a new figure and axis if None is given, sets the default plot parameters
         @param figure default draw figure which is used
@@ -1011,6 +1011,8 @@ class VerboseDistribution(Plotter):
         self.box_axes = []
         #: The distribution plot
         self.distribution = Distribution(self.figure, self.axis, normed_to_all_entries=self.normed, range_in_std=self.range_in_std)
+        #: x axis label
+        self.x_axis_label = x_axis_label
 
     def add(self, data, column, mask=None, weight_column=None, label=None):
         """
@@ -1035,7 +1037,7 @@ class VerboseDistribution(Plotter):
             mean, std = histogram.weighted_mean_and_std(data[column], None if weight_column is None else data[weight_column])
             # Everything outside mean +- range_in_std * std is considered not inside the mask
             mask = mask & (data[column] > (mean - self.range_in_std * std)) & (data[column] < (mean + self.range_in_std * std))
-        box = Box(self.figure, box_axis)
+        box = Box(self.figure, box_axis, x_axis_label=self.x_axis_label)
         box.add(data, column, mask, weight_column)
         if len(box.plots) > 0:
             box.plots[0]['boxes'][0].set_facecolor(self.distribution.plots[-1][0][0].get_color())
@@ -1082,7 +1084,7 @@ class Correlation(Plotter):
         """
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
             self.figure.set_tight_layout(True)
         else:
             self.figure = figure
@@ -1258,7 +1260,7 @@ class CorrelationMatrix(Plotter):
         """
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
             self.figure.set_tight_layout(True)
         else:
             self.figure = figure

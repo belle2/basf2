@@ -17,7 +17,6 @@
 
 namespace Belle2 {
   class MCParticle;
-  class Particle;
 
   /** The DecayDescriptor stores information about
   a decay tree or parts of a decay tree. It contains

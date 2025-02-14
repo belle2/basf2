@@ -16,15 +16,10 @@
 #include <framework/gearbox/Const.h>
 #include <cmath>
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <string>
 
 // ROOT
 #include <Math/Vector3D.h>
-#include <TH1.h>
-#include <TH2.h>
 #include <TMath.h>
 
 int eventNum = 0;

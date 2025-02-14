@@ -32,7 +32,6 @@
 
 #include <Math/Vector3D.h>
 #include <TEveStraightLineSet.h>
-#include <TVector3.h>
 #include <TEveTrack.h>
 
 #include <string>

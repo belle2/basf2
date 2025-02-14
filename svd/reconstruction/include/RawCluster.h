@@ -14,7 +14,7 @@
 
 namespace Belle2::SVD {
   /**
-   * structure containing the relevant informations
+   * structure containing the relevant information
    * of each strip of the raw cluster
    */
   struct StripInRawCluster {
@@ -134,11 +134,11 @@ namespace Belle2::SVD {
 
   protected:
 
-    /** VxdID of the cluster */
-    VxdID m_vxdID;
+    /** Name of the collection to use for the SVDShaperDigits */
+    std::string m_storeShaperDigitsName;
 
-    /** side of the cluster */
-    bool m_isUside;
+    /** vector containing the strips in the cluster */
+    std::vector<StripInRawCluster> m_strips;
 
     /** SNR above which the strip can be considered as seed*/
     double m_cutSeed = 5;
@@ -146,11 +146,11 @@ namespace Belle2::SVD {
     /** SNR above which the strip can be considered for clustering*/
     double m_cutAdjacent = 3;
 
-    /** ADC MaxSample of the seed strip */
-    int m_seedMaxSample = -1;
-
     /** SNR (using MaxSample) of the seed strip */
     float m_seedSNR = -1;
+
+    /** ADC MaxSample of the seed strip */
+    int m_seedMaxSample = -1;
 
     /** SVDShaperDigit index of the seed strip of the cluster */
     int m_seedIndex = -1;
@@ -158,11 +158,11 @@ namespace Belle2::SVD {
     /** stripsInRawCluster index of the seed strip of the cluster */
     int m_seedInternalIndex = -1;
 
-    /** vector containing the strips in the cluster */
-    std::vector<StripInRawCluster> m_strips;
+    /** VxdID of the cluster */
+    VxdID m_vxdID;
 
-    /** Name of the collection to use for the SVDShaperDigits */
-    std::string m_storeShaperDigitsName;
+    /** side of the cluster */
+    bool m_isUside;
 
   };
 

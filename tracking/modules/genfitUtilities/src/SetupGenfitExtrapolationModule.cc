@@ -52,7 +52,7 @@ namespace {
   genfitSink<100> errorSink;
 //! Buffer for error output.
   boost::iostreams::stream_buffer<genfitSink<100> > errorStreamBuf(errorSink);
-//! Sink for output from ...::Print() callls.
+//! Sink for output from ...::Print() calls.
   genfitSink<150> printSink;
 //! Buffer for output from ...::Print() calls.
   boost::iostreams::stream_buffer<genfitSink<150> > printStreamBuf(printSink);

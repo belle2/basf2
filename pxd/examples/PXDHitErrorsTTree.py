@@ -98,7 +98,7 @@ class PXDHitErrorsTTree(b2.Module):
 
             for truehit in cluster_truehits:
                 # Now let's store some data
-                # Sesnor identification
+                # Sensor identification
                 vxd_id = truehit.getSensorID()
                 self.data.vxd_id = vxd_id.getID()
                 self.data.layer = vxd_id.getLayerNumber()

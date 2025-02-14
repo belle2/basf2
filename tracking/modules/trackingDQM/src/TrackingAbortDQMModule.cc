@@ -205,7 +205,7 @@ void TrackingAbortDQMModule::beginRun()
 void TrackingAbortDQMModule::event()
 {
 
-  //skip events in which we do not have EvenTMetaData or TRGSummary
+  //skip events in which we do not have EventMetaData or TRGSummary
   if (!m_eventMetaData.isValid()) return;
   if (!m_trgSummary.isValid()) return;
 
@@ -224,8 +224,10 @@ void TrackingAbortDQMModule::event()
 
   //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
   int index = 0; //events accepted in the passive veto window but not in the active
-  if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1;
-
+  try {
+    if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1;
+  } catch (const std::exception&) {
+  }
 
   //fill the tracking abort reason histogram & nEvents with Abort
   if (m_eventLevelTrackingInfo.isValid()) {

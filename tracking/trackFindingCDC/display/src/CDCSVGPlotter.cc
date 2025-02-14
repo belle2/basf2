@@ -73,7 +73,7 @@ namespace {
   /// used by drawCDCSimHitsConnectByToF as comparison tool
   class FlightTimeOrder {
   public:
-    /// Comparision function that sorts CDCSimHits for their flight time.
+    /// Comparison function that sorts CDCSimHits for their flight time.
     bool operator()(const CDCSimHit* x, const CDCSimHit* y) const
     {
       return (x->getFlightTime() < y->getFlightTime());

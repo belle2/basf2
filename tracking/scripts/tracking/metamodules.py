@@ -76,7 +76,7 @@ class WrapperModule(basf2.Module):
 
     @property
     def available_params(self):
-        """Forwards the avaiilable parameters"""
+        """Forwards the available parameters"""
         return self.module.available_params
 
     def compose_wrapped_module_name(self, module):
@@ -117,7 +117,7 @@ class PyProfilingModule(WrapperModule):
     Attributes:
       module (basf2.Module): The wrapped module that should be profiled.
         Should be a module written in Python, since the profile interacts
-        with the interpretor for the measurements, but cannot look into c++ implementations.
+        with the interpreter for the measurements, but cannot look into c++ implementations.
 
       output_file_name (str, optional): Path to the file where the profiling information
         shall be stored. Defaults to profile.txt.
@@ -167,7 +167,7 @@ class IfModule(WrapperModule):
     """Wrapper module to conditionally execute module and continue with the normal path afterwards.
 
     There are two ways to specify the condition.
-    One way is to override the condtion(self) method in a subclass.
+    One way is to override the condition(self) method in a subclass.
     The second way is to give a function as the second argument to the module constructor,
     which is called each event.
 
@@ -265,7 +265,7 @@ class IfStoreArrayPresentModule(IfModule):
         self.storearray_is_present = None
 
     def initialize(self):
-        """Initialize the contianed module (only of the condition is true)."""
+        """Initialize the contained module (only if the condition is true)."""
         if self.condition():
             super().initialize()
 

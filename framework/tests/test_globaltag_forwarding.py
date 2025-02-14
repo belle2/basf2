@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Test that globaltags are forwarded correclty to the output file even if the
+# Test that globaltags are forwarded correctly to the output file even if the
 # database isn't used (BII-5790)
 
 import basf2

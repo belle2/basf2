@@ -1,0 +1,24 @@
+# EventType: 1110020002
+# Descriptor: [B0 -> proton anti-proton gamma] cc
+# NickName: B0_p_anti_p_gamma
+# Documentation: Rare b->d gamma process
+# Tested: OK
+# PhysicsWG: EWP
+# Responsible: Jyotirmoi Borah 
+# Email: borah@ijs.si
+# Cuts: None
+# Date: 20250113 (YMD)
+#
+# Decay
+#
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.0 p+ anti-p- gamma PHSP;
+Enddecay
+CDecay anti-B0sig
+#
+#
+End

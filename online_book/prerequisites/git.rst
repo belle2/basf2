@@ -105,7 +105,7 @@ address you got with your account.
     If you want to commit to the main Belle II software repository the email is
     actually validated to be one of the two options above.
 
-We also have a `confluence page <https://confluence.desy.de/x/2o4iAg>`_ with
+We also have a `XWiki page <https://xwiki.desy.de/xwiki/rest/p/dba4c>`_ with
 more information and help in case of problems.
 
 Exercises
@@ -308,7 +308,7 @@ to continue your training even after the StarterKit. It will not be time wasted!
 
 .. seealso::
 
-  We have started to compile a reading list for git `on confluence <https://confluence.desy.de/x/qhG3Cg>`_.
+  We have started to compile a reading list for git `on XWiki <https://xwiki.desy.de/xwiki/rest/p/fbda7>`_.
   Please take a look (and help us extend it if you can recommend other tutorials)!
 
 .. hint::

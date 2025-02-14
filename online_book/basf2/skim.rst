@@ -245,13 +245,11 @@ announced when ready and made available to the analyst.
 Each skim campaign on data or MC samples has a given name. For example, skims of MC13a
 run-independent MC are listed under the campaign name ``SkimM13ax1``. Skims of data are usually
 made available for official processing, like ``Proc11``, or for individual buckets like ``bucket9``,
-``bucket10``, etc..The corresponding skim campaign names are ``SkimP11x1`` and ``SkimB9x1-SkimB13x1``.
+``bucket10``, etc. The corresponding skim campaign names are ``SkimP11x1`` and ``SkimB9x1-SkimB13x1``.
 The production status of available MC and data samples is continuously updated on the
-`Data Production Status <https://confluence.desy.de/display/BI/Data+Production+Status>`_ page.
-Status updates on the readiness of a skim campaign are also posted on the `Skim Confluence page
-<https://confluence.desy.de/pages/viewpage.action?pageId=167963852>`_.
-For example, you can browse `here <https://confluence.desy.de/pages/viewpage.action?pageId=167963852>`_
-for the latest updates on 2020a,b data skims.
+`Data Production Status <https://xwiki.desy.de/xwiki/rest/p/8e6ec>`_ page.
+Status updates on the readiness of a skim campaign are also posted on the `Skim Production Status XWiki page
+<https://xwiki.desy.de/xwiki/rest/p/c29ca>`_.
 
 To find the list of skim campaign campaigns available on the, simply browse through the app,
 select Data type: MC or Data and look in the drop-down menu under Campaigns. All skim campaigns
@@ -272,8 +270,8 @@ in the documentation of `skim.registry.SkimRegistryClass`.
 .. note::
 
     The details of the numbering scheme are explained on `the skimming
-    Confluence page
-    <https://confluence.desy.de/x/qw36Ag#SkimmingHomepage-Skimcodeconventionandskimregistry>`_.
+    Expert XWiki page
+    <https://xwiki.desy.de/xwiki/rest/p/9199f/#HSkimcodeconventionandskimregistry>`_.
 
 
 .. admonition:: Exercise
@@ -326,7 +324,7 @@ a given skim, as inherited from data production.
     This is a known bug and will be improved in future developments of the dataset searcher.
 
 For now, a workaround in order is described on the
-`Skim Confluence page <https://confluence.desy.de/pages/viewpage.action?pageId=167963852>`_
+`Skim XWiki page <https://xwiki.desy.de/xwiki/rest/p/99030/#HHowtofindyourskimwithoutusingcollections28notrecommended29>`_
 to run your analysis script on the full set
 of skimmed data samples available for a given campaign.
 
@@ -335,8 +333,8 @@ of skimmed data samples available for a given campaign.
 Getting involved
 ----------------
 
-Each working group has an assigned skim liaison (all `listed on Confluence
-<https://confluence.desy.de/x/qw36Ag#SkimmingHomepage-Skimmingpersonnel>`_),
+Each working group has an assigned data production liaison (all `listed on XWiki
+<https://xwiki.desy.de/xwiki/rest/p/df1b0>`_),
 whose job it is to survey the needs of the group and develop skims. If there is
 an existing skim that might be useful for your analysis and is not currently
 being produced, talk to your local skim liaison.
@@ -350,8 +348,8 @@ documentation helpful.
     :class: key-points
 
     * The two sources of documentation on skims are the :ref:`Sphinx
-      documentation <skim>` and the `skimming Confluence page
-      <https://confluence.desy.de/x/qw36Ag>`_. The best way to find out how a
+      documentation <skim>` and the `skimming XWiki page
+      <https://xwiki.desy.de/xwiki/rest/p/7e4fa>`_. The best way to find out how a
       particular skim is currently defined is to read the source code (either on
       Sphinx, or in the directory ``skim/scripts/skim/`` in the software repo).
 

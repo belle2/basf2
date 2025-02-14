@@ -12,9 +12,9 @@ Gbasf2
 
     **Prerequisites**:
 
-    * See `Computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_.
+    * See `Computing getting started <https://xwiki.desy.de/xwiki/rest/p/c804c>`_.
     * Access to KEKCC or NAF (recommended), or to a system with CentOS 7 or EL9 and CVMFS mounted.
-    * A valid `grid certificate <https://confluence.desy.de/display/BI/Computing+Belle-II-Grid-Certificate>`_ installed in ``~/.globus`` and in a web browser.
+    * A valid `grid certificate <https://xwiki.desy.de/xwiki/rest/p/d9328>`_ installed in ``~/.globus`` and in a web browser.
     * A working basf2 steering script (see the :ref:`onlinebook_first_steering_file` lesson)
 
     **Questions**:
@@ -55,20 +55,20 @@ The same basf2 steering files are used when running on the grid. The usual workf
     * Remember, always test your jobs locally before submitting to the grid!
 
 
-Go to `computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_
+Go to `computing getting started <https://xwiki.desy.de/xwiki/rest/p/c804c>`_
 and verify that you have the prerequisites. You need:
 
 * Access to KEKCC or NAF (recommended), or to a system with CentOS 7 and CVMFS mounted.
-* A valid grid certificate issued within a year and `installed <https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=Computing+GettingStarted#ComputingGettingStarted-2.Installyourcertificate>`_ in ``~/.globus`` in ``.pem`` format.
+* A valid grid certificate issued within a year and `installed <https://xwiki.desy.de/xwiki/rest/p/c804c/#H2.Installyourcertificate>`_ in ``~/.globus`` in ``.pem`` format.
 * Belle Virtual Organization (VO) membership registered or renewed within a year. You can check your status at
   `VOMS server <https://voms.cc.kek.jp:8443/voms/belle/>`_.
-* Registration in `DIRAC <https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=Computing+GettingStarted#ComputingGettingStarted-7.RegisterwithDIRAC>`_.
+* Registration in `DIRAC <https://xwiki.desy.de/xwiki/rest/p/c804c/#H7.RegisterwithDIRAC>`_.
 
 .. note::
 
     It is required that you join the `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_,
     where you can ask for help and receive announcements on releases and system issues. You can also find more
-    details on the official `gbasf2 documentation page <https://gbasf2.belle2.org/>`_
+    details in the official :doc:`gbasf2 documentation <gbasf2:index>`
 
 
 Setting up gbasf2 via cvmfs
@@ -128,7 +128,7 @@ A proxy is a short-term credential that verifies your identity, allowing you to 
 Installing gbasf2
 -----------------
 
-The pre-installed gbasf2 on CVMFS is the recommended version (see Setup Gbasf2). However, gbasf2 local installation is available. Please be aware this is not fully tested and not fully supported. If you wish to install gbasf2 locally, follow the instructions on the `gbasf2 documentation <https://gbasf2.belle2.org/gbasf2install.html>`_.
+The pre-installed gbasf2 on CVMFS is the recommended version (see Setup Gbasf2). However, gbasf2 local installation is available. Please be aware this is not fully tested and not fully supported. If you wish to install gbasf2 locally, follow the instructions on the :doc:`gbasf2 documentation <gbasf2:gbasf2install>`.
 
 .. seealso:: https://gbasf2.belle2.org/
 
@@ -185,7 +185,7 @@ is introduced. Each dataset is subdivided by directories with name ``subXX``, wh
     * By design, each datablock contains a maximum of 1000 files.
     * If a dataset contains more than 1000 files, it will be subdivided into at least two datablocks.
 
-The command-line tool for listing the content of a directory on the grid is ``gb2_ds_list``
+The command-line tool for listing the content of a directory on the grid is `gb2_ds_list <BelleDIRAC.Client.gb2_scripts.gb2_ds_list>`
 (it is equivalent to ``ls`` on your local system). You can use it to see how many datablock(s) is/are contained
 in each dataset.
 
@@ -197,7 +197,7 @@ in each dataset.
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Use ``gb2_ds_list`` to see how many datablock(s) is/are contained in the skimmed dataset
+     Use `gb2_ds_list <BelleDIRAC.Client.gb2_scripts.gb2_ds_list>` to see how many datablock(s) is/are contained in the skimmed dataset
 
      ``/belle/Data/release-06-01-11/DB00002058/proc13/prod00029825/e0018/4S_offres/r02559/hadron/14120601/udst``
 
@@ -214,7 +214,7 @@ in each dataset.
 
 .. note::
 
-    Sometimes, in the documentation (such as in the Confluence pages) we refer to the **logical path name** (LPN)
+    Sometimes, in the documentation (such as in the XWiki pages) we refer to the **logical path name** (LPN)
     of datasets and datablocks, while for files we use LFN. In practice, LFN and LPN are the same thing.
 
 The Dataset Searcher
@@ -238,12 +238,12 @@ available options and get familiar with them.
 .. note::
 
     Accessing the DIRAC web portal requires that your user certificate is installed in your web browser. See
-    `computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_ for details.
+    `computing getting started <https://xwiki.desy.de/xwiki/rest/p/c804c>`_ for details.
 
 
 The ``MC Event types`` box show, by default, the generic samples available (charged, mixed, uubar, etc.).
 If you want to search
-signal samples, you need to specify the `signal event type <https://confluence.desy.de/display/BI/Signal+EventType>`_.
+signal samples, you need to specify the `signal event type <https://xwiki.desy.de/xwiki/rest/p/3a506>`_.
 Also, if you want to search uDST skim samples - which are what we will be using in the examples - you can find them at
 :ref:`skim/doc/04-experts:Skim Registry` section in the basf2 software documentation.
 
@@ -291,14 +291,14 @@ Also, if you want to search uDST skim samples - which are what we will be using 
     You can download a list of LFNs from the Dataset Searcher using the button "Download txt file" at the bottom.
 
 
-Another way to interact with the dataset searcher is using the command line tool ``gb2_ds_search``.
+Another way to interact with the dataset searcher is using the command line tool `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>`.
 
 .. admonition:: Exercise
      :class: exercise stacked
 
      Set your gbasf2 environment and try to get the LFNs of MC uubar samples using the same skim code from the
      decay mode above (``14120601``), and using campaign ``MC15rd_b`` along with beam energy of 4S and background
-     level BGx1 using ``gb2_ds_search``.
+     level BGx1 using `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>`.
 
 .. admonition:: Hint
      :class: toggle xhint stacked
@@ -339,16 +339,16 @@ the data production team prepares ``collections`` of LFNs. This provides a commo
 which can help to avoid errors related to missing or using incorrect samples for an analysis. You can discover 
 collections in the same way as for LFNs.
 
-To discover the collection you need, you should first check `Data main page <https://confluence.desy.de/display/BI/Data+main+page>`_ 
-and `MC main page <https://confluence.desy.de/display/BI/MC+main+page>`_, which provide details for the official collections.
+To discover the collection you need, you should first check `Data main page <https://xwiki.desy.de/xwiki/rest/p/ed439>`_ 
+and `MC main page <https://xwiki.desy.de/xwiki/rest/p/70b0a>`_, which provide details for the official collections.
 
 If you want to explore the available collections, you can also use the dataset searcher tool. You've already 
-used the ``gb2_ds_search`` tool to search for datasets. Now use the ``collection`` key word to list the available data collections.
+used the `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>` tool to search for datasets. Now use the ``collection`` key word to list the available data collections.
 
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Set your gbasf2 environment and find the available data collections for Moriond2023 using ``gb2_ds_search``.
+     Set your gbasf2 environment and find the available data collections for Moriond2023 using `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>`.
 
 .. admonition:: Hint
      :class: toggle xhint stacked
@@ -545,7 +545,7 @@ There are two ways to monitor your jobs on the grid: command-line tools and the 
 Monitoring in the terminal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For the command-line tools, you can use ``gb2_project_summary``
+For the command-line tools, you can use `gb2_project_summary <BelleDIRAC.Client.gb2_scripts.gb2_project_summary>`
 to have an overview of your project (The flag ``-p`` will specify the project name):
 
 .. code-block:: bash
@@ -562,7 +562,7 @@ to have an overview of your project (The flag ``-p`` will specify the project na
     If no project name is specified, the tool will display information of your projects in the last month.
 
 
-The gb2 tool ``gb2_job_status`` lists all the jobs running in a project, including the status and minor status:
+The gb2 tool `gb2_job_status <BelleDIRAC.Client.gb2_scripts.gb2_job_status>` lists all the jobs running in a project, including the status and minor status:
 
 .. code-block:: bash
 
@@ -635,7 +635,7 @@ You can check the output using ``gb2_ds_list <project_name>``:
 
     To see the size of your output and its location, you can use the flags ``-l`` and ``-lg``.
 
-To actually download the files, use ``gb2_ds_get``:
+To actually download the files, use `gb2_ds_get <BelleDIRAC.Client.gb2_scripts.gb2_ds_get>`:
 
 .. code-block:: bash
 
@@ -652,7 +652,7 @@ To actually download the files, use ``gb2_ds_get``:
 
 .. tip::
 
-    You can enable download in multiple streams using the ``--new`` option of ``gb2_ds_get``, which will speed up the transfer. At some point it will become the default behavior of ``gb2_ds_get``. 
+    You can enable download in multiple streams using the ``--new`` option of `gb2_ds_get <BelleDIRAC.Client.gb2_scripts.gb2_ds_get>`, which will speed up the transfer. At some point it will become the default behavior of `gb2_ds_get <BelleDIRAC.Client.gb2_scripts.gb2_ds_get>`.
 
 .. tip::
 
@@ -729,7 +729,7 @@ related to your job.
     How to download the output sandbox from the Job Monitor.
 
 
-It is also possible to retrieve the log files directly from the command line using ``gb2_job_output``:
+It is also possible to retrieve the log files directly from the command line using `gb2_job_output <BelleDIRAC.Client.gb2_scripts.gb2_job_output>`:
 
 .. code-block:: bash
 
@@ -764,15 +764,15 @@ Where to go for help?
 The `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_ is the main channel of communication
 related to issues with the grid. Feel free to ask every time that you need help.
 
-The most useful place to find additional instructions and information about using gbasf2 is `gbasf2.belle2.org <https://gbasf2.belle2.org>`_.
+The most useful place to find additional instructions and information about using gbasf2 is `gbasf2.belle2.org <gbasf2:index>`.
 
-Additionally, some pages at Confluence are prepared with additional information:
+Additionally, some pages at XWiki are prepared with additional information:
 
-* `Gbasf2 mainpage <https://confluence.desy.de/display/BI/Computing+GBasf2>`_
-* `Gbasf2 FAQ <https://confluence.desy.de/display/BI/GBasf2+FAQ>`_ and `troubleshooting <https://confluence.desy.de/display/BI/gbasf2+trouble+shooting>`_
-* `Computing glossary <https://confluence.desy.de/display/BI/Computing+Glossary>`_
+* `Gbasf2 mainpage <https://xwiki.desy.de/xwiki/rest/p/78b3b>`_
+* `Gbasf2 FAQ <https://xwiki.desy.de/xwiki/rest/p/f1a37>`_ and `troubleshooting <https://xwiki.desy.de/xwiki/rest/p/35008>`_
+* `Computing glossary <https://xwiki.desy.de/xwiki/rest/p/d6530>`_
 
-Take a look to the `gbasf2 tutorials <https://confluence.desy.de/display/BI/GBasf2+Tutorials>`_ (they contain some advanced topics not covered here).
+Take a look at the `gbasf2 tutorials <https://xwiki.desy.de/xwiki/rest/p/a21dd>`_ (they contain some advanced topics not covered here).
 
 You can also ask in `questions.belle2.org <https://questions.belle2.org/questions>`_.
 

@@ -554,7 +554,7 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "flag to decode input TS to 2D", false);
   addParam("decodeNeuro", m_decodeNeuro,
            "flag to decode neurotrigger data", false);
-  //  https://confluence.desy.de/display/BI/DAQ+and+Operation for CPR/HSLB
+  //  https://xwiki.desy.de/xwiki/rest/p/776d2 for CPR/HSLB
   NodeList defaultMergerNodeID = {    // These should be very temporary ones since no merger to B2L yet.
     {0x11000001, 0},
     {0x11000003, 0},

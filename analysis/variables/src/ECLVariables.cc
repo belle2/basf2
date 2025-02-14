@@ -1009,14 +1009,14 @@ namespace Belle2 {
         }
 
         double connectedRegionID = eclClusterConnectedRegionID(particle);
-        unsigned mdstArrayIndex = particle->getMdstArrayIndex();
+        int mdstSource = particle->getMdstSource();
 
         for (unsigned int i = 0; i < photonlist->getListSize(); i++)
         {
           const Particle* part = photonlist->getParticle(i);
 
           // skip the particle itself
-          if (part->getMdstArrayIndex() == mdstArrayIndex) {
+          if (part->getMdstSource() == mdstSource) {
             continue;
           }
 
@@ -1499,7 +1499,7 @@ The MVA has been trained using MC and the features used are:
 - `clusterZernikeMVA`
 
 Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
-the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
 )DOC");
     REGISTER_VARIABLE("fakePhotonSuppression", fakePhotonSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from fake photon clusters (e.g. split-offs,
@@ -1517,7 +1517,7 @@ The MVA has been trained using MC and the features are:
 This MVA is the same as the one used for `hadronicSplitOffSuppression` but that variable should not be used as it is deprecated and does not use the new weights. 
 
 Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
-the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
 )DOC");
     REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.

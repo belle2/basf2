@@ -209,7 +209,7 @@ if __name__ == "__main__":
         path=path,
     )
 
-    # Reconstructin Upsilon(4S)
+    # Reconstructing Upsilon(4S)
     ma.reconstructDecay("Upsilon(4S):graFEI -> B0:tag B0:sig", "", path=path)
 
     # ---------------- Write information to file ---------------------------

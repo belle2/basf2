@@ -22,7 +22,7 @@
 /** @param: filename : the name of the file 
     @param: delete_tree: if true the old tree will be deleted, else a new entry will be added to the tree
     @param: tree_name: name of the tree
-    @return: return true if everything works as aspected, false else
+    @return: return true if everything works as expected, false else
 */
 
 const TString branchname = "entry";

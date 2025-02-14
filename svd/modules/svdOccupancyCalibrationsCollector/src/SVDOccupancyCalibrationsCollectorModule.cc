@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <svd/modules/svdOccupancyCalibrationsCollector/SVDOccupancyCalibrationsCollectorModule.h>
+#include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 
 #include <TH2F.h>
 
@@ -29,8 +30,8 @@ SVDOccupancyCalibrationsCollectorModule::SVDOccupancyCalibrationsCollectorModule
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("SVDShaperDigitsName", m_svdShaperDigitName, "Name of the SVDClusters list", std::string("SVDShaperDigits"));
-
   addParam("HistogramTree", m_tree, "Name of the tree in which the histograms are saved", std::string("tree"));
+  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If True, skip events rejected by HLT.", bool(false));
 }
 
 void SVDOccupancyCalibrationsCollectorModule::prepare()
@@ -58,10 +59,11 @@ void SVDOccupancyCalibrationsCollectorModule::prepare()
   m_histogramTree->Branch("sensor", &m_sensor, "sensor/I");
   m_histogramTree->Branch("view", &m_side, "view/I");
 
-  m_hnevents = new TH1F("hnevents", "Number of events", 1, 0, 1);
+  m_hnevents = new TH1F("hnevents", "Number of events", 3, 0, 2);
 
   //register objects needed to collect input to fill payloads
   registerObject<TTree>("HTreeOccupancyCalib", m_histogramTree);
+  registerObject<TH1F>("HNEvents", m_hnevents);
 
 }
 
@@ -74,16 +76,13 @@ void SVDOccupancyCalibrationsCollectorModule::startRun()
     for (auto ladder : geoCache.getLadders(layer)) {
       for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
         for (int view = SVDHistograms<TH2F>::VIndex ; view < SVDHistograms<TH2F>::UIndex + 1; view++) {
-          // std::string s = std::string(sensor);
-          // std::string v = std::to_string(view);
-          // std::string name = string("eventT0vsCog_")+s+string("_")+v;
-          // registerObject<TH2F>(name.c_str(),hm_occupancy->getHistogram(sensor, view));
           (hm_occupancy->getHistogram(sensor, view))->Reset();
         }
       }
     }
   }
-  m_hnevents->Reset();
+  // m_hnevents->Reset();
+  getObjectPtr<TH1F>("HNEvents")->Reset();
 
 }
 
@@ -91,8 +90,13 @@ void SVDOccupancyCalibrationsCollectorModule::startRun()
 void SVDOccupancyCalibrationsCollectorModule::collect()
 {
 
+  if (m_skipRejectedEvents && (m_resultStoreObjectPointer.isValid())) {
+    const bool eventAccepted = SoftwareTrigger::FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
+    if (!eventAccepted) return;
+  }
+
   int nDigits = m_storeDigits.getEntries();
-  m_hnevents->Fill(0.0); // check if HLT did not filter out the event (no rawSVD)
+  getObjectPtr<TH1F>("HNEvents")->Fill(1);
 
   if (nDigits == 0)
     return;
@@ -119,15 +123,13 @@ void SVDOccupancyCalibrationsCollectorModule::finish()
 void SVDOccupancyCalibrationsCollectorModule::closeRun()
 {
 
-  int nevents = m_hnevents->GetEntries(); //number of events processed in events
-  //getObjectPtr<TH1F>("HNevents")->GetEntries(); //number of events processed in events
+  int nevents = getObjectPtr<TH1F>("HNEvents")->GetEntries(); //number of events processed in events
 
   B2RESULT("number of events " << nevents);
 
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
   std::set<Belle2::VxdID> svdLayers = aGeometry.getLayers(VXD::SensorInfoBase::SVD);
   std::set<Belle2::VxdID>::iterator itSvdLayers = svdLayers.begin();
-  //int itsensor = 0; //sensor numbering
   while ((itSvdLayers != svdLayers.end())
          && (itSvdLayers->getLayerNumber() != 7)) { //loop on Layers
 
@@ -143,8 +145,6 @@ void SVDOccupancyCalibrationsCollectorModule::closeRun()
 
         for (int k = 0; k < m_nSides; k ++) { //loop on Sides , k = isU(), k=0 is v-side, k=1 is u-side
 
-          (hm_occupancy->getHistogram(*itSvdSensors, k))->Scale(1. / nevents);
-          B2INFO("occupancy histo scaled by the number of events");
           m_hist = hm_occupancy->getHistogram(*itSvdSensors, k);
           m_layer = itSvdSensors->getLayerNumber();
           m_ladder = itSvdSensors->getLadderNumber();

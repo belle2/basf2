@@ -77,8 +77,6 @@ ParticleVertexFitterModule::ParticleVertexFitterModule() : Module(),
   addParam("recoilMass", m_recoilMass, "recoil invariant mass (GeV)", 0.);
   addParam("massConstraintList", m_massConstraintList,
            "Type::[int]. List of daughter particles to mass constrain with int = pdg code. (only for MassFourCKFit)", {});
-  addParam("massConstraintListParticlename", m_massConstraintListParticlename,
-           "Type::[string]. List of daughter particles to mass constrain with string = particle name. (only for MassFourCKFit)", {});
 }
 
 void ParticleVertexFitterModule::initialize()
@@ -98,13 +96,6 @@ void ParticleVertexFitterModule::initialize()
 
   if (m_decayString != "")
     m_decaydescriptor.init(m_decayString);
-
-  if ((m_massConstraintList.size()) == 0 && (m_massConstraintListParticlename.size()) > 0) {
-    for (auto& containedParticle : m_massConstraintListParticlename) {
-      TParticlePDG* particletemp = TDatabasePDG::Instance()->GetParticle((containedParticle).c_str());
-      m_massConstraintList.push_back(particletemp->PdgCode());
-    }
-  }
 
   B2INFO("ParticleVertexFitter: Performing " << m_fitType << " fit on " << m_listName << " using " << m_vertexFitter);
   if (m_decayString != "")
@@ -1219,7 +1210,7 @@ bool ParticleVertexFitterModule::makeKRecoilMassMother(analysis::RecoilMassKFit&
 void ParticleVertexFitterModule::updateMapOfTrackAndDaughter(unsigned& l,  std::vector<std::vector<unsigned>>& pars,
     std::vector<unsigned>& parm, std::vector<Particle*>&  allparticles, const Particle* daughter)
 {
-  std::vector <Belle2::Particle*> childs = daughter->getDaughters();
+  std::vector <Belle2::Particle*> daughters = daughter->getDaughters();
   for (unsigned ichild = 0; ichild < daughter->getNDaughters(); ichild++) {
     const Particle* child = daughter->getDaughter(ichild);
     std::vector<unsigned> pard;
@@ -1227,12 +1218,12 @@ void ParticleVertexFitterModule::updateMapOfTrackAndDaughter(unsigned& l,  std::
       updateMapOfTrackAndDaughter(l, pars, pard, allparticles, child);
       parm.insert(parm.end(), pard.begin(), pard.end());
       pars.push_back(pard);
-      allparticles.push_back(childs[ichild]);
+      allparticles.push_back(daughters[ichild]);
     } else  {
       pard.push_back(l);
       parm.push_back(l);
       pars.push_back(pard);
-      allparticles.push_back(childs[ichild]);
+      allparticles.push_back(daughters[ichild]);
       l++;
     }
   }

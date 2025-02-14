@@ -51,7 +51,7 @@ namespace Belle2 {
 
 
     public:
-      /// Forward the Attributre map from the primitive plotter.
+      /// Forward the Attribute map from the primitive plotter.
       using AttributeMap = PrimitivePlotter::AttributeMap;
 
     public:
@@ -59,7 +59,7 @@ namespace Belle2 {
       explicit EventDataPlotter(bool animate = false, bool forwardFade = false);
 
       /**
-       *  Constructor taking the specifc PrimitivePlotter instance as backend.
+       *  Constructor taking the specific PrimitivePlotter instance as backend.
        *
        *  Note that the EventDataPlotter takes ownership of the PrimitivePlotter and destroys it on its on own deconstruction.
        */
@@ -74,23 +74,23 @@ namespace Belle2 {
       /**
        *  Saves the current plot stead to a file.
        *
-       *  Deriving instances may should implement the approriate thing here and
+       *  Deriving instances may should implement the appropriate thing here and
        *  may return a modified string indicating the file name to which the plot as been written.
-       *  It is allowed to append or change the file extension if the concret implementation PrimitivePlotter decides to do so.
+       *  It is allowed to append or change the file extension if the concrete implementation PrimitivePlotter decides to do so.
        *
        *  @param fileName       fileName where the plot shall be saved
-       *  @return               Potentially modifed file name where the file has actually been written to.
+       *  @return               Potentially modified file name where the file has actually been written to.
        */
       const std::string save(const std::string& fileName);
 
-      /// Clears all drawed elements from the plotter.
+      /// Clears all drawn elements from the plotter.
       void clear();
 
     public:
       /// Getter for the current bounding box
       BoundingBox getBoundingBox() const;
 
-      /// Setter for the bounding box of all drawed objects.
+      /// Setter for the bounding box of all drawn objects.
       void setBoundingBox(const BoundingBox& boundingBox);
 
       /// Getter for the canvas width in pixels.
@@ -102,7 +102,7 @@ namespace Belle2 {
       /**
        *  Setter for the canvas width in pixels.
        *  The canvas height denotes the size of the image being produced.
-       *  The coordinates space that is visible in the picture is a seperate concept
+       *  The coordinates space that is visible in the picture is a separate concept
        *  which is stored in the bounding box (getBoundingBox()).
        */
       void setCanvasWidth(float width);
@@ -110,7 +110,7 @@ namespace Belle2 {
       /**
        *  Setter for the canvas height in pixels
        *  The canvas height denotes the size of the image being produced.
-       *  The coordinates space that is visible in the picture is a seperate concept
+       *  The coordinates space that is visible in the picture is a separate concept
        *  which is stored in the bounding box (getBoundingBox()).
        */
       void setCanvasHeight(float height);
@@ -126,7 +126,7 @@ namespace Belle2 {
       void endGroup();
 
     public:
-      /// Converts a time given in nanoseconds to a time sting of the from "%fs".
+      /// Converts a time given in nanoseconds to a time string of the from "%fs".
       std::string getAnimationTimeFromNanoSeconds(float nanoseconds)
       {
         return std::to_string(nanoseconds) + "s";
@@ -160,7 +160,7 @@ namespace Belle2 {
                     const AttributeMap& attributeMap = AttributeMap());
 
     public:
-      // Drawing methods for the variuous event data objects.
+      // Drawing methods for the various event data objects.
 
       /// Draws a filled circle.
       void draw(const Belle2::TrackFindingCDC::Circle2D& circle,
@@ -300,7 +300,7 @@ namespace Belle2 {
       /// Memory for the flag if the event data should be animated. If animation is supported is backend dependent.
       bool m_animate = false;
 
-      /// Memory for the flag whether the orientation of tracks segments etc should be shown as diming opacity
+      /// Memory for the flag whether the orientation of tracks segments etc should be shown as dimming opacity
       bool m_forwardFade = false;
 
     };

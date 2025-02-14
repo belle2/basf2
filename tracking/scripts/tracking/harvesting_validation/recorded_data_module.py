@@ -175,7 +175,7 @@ class HitInfoHarvester(harvesting.HarvestingModule):
 
     def __init__(self, output_file_name, reco_tracks_name="RecoTracks"):
         """Expecting a name for the output file and the name of the RecoTracks StoreArray
-           to operate on. The latter dafaults to 'RecoTracks'"""
+           to operate on. The latter defaults to 'RecoTracks'"""
         super().__init__(foreach=reco_tracks_name,
                          output_file_name=output_file_name)
 

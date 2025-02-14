@@ -18,22 +18,38 @@ from tabulate import tabulate
 
 _RegisteredSkims = [
     # --- Flagged skims ---
-    ("21000100", "flagged", "f_SLME_p1"),
-    ("21000200", "flagged", "f_SLME_p2"),
-    ("22000100", "flagged", "f_EWP_p1"),
-    ("22000200", "flagged", "f_EWP_p2"),
-    ("23000100", "flagged", "f_TDCPV_p1"),
-    ("23000200", "flagged", "f_TDCPV_p2"),
-    ("24000100", "flagged", "f_bhadronic_p1"),  # btocharmless is included here
-    ("24000200", "flagged", "f_bhadronic_p2"),  # btocharmless is included here
-    ("25000100", "flagged", "f_quarkonium_p1"),
-    ("25000200", "flagged", "f_quarkonium_p2"),
-    ("27000100", "flagged", "f_charm_p1"),
-    ("27000200", "flagged", "f_charm_p2"),
-    ("28000100", "flagged", "f_dark_p1"),
-    ("28000200", "flagged", "f_dark_p2"),
-    ("29000100", "flagged", "f_tau_p1"),
-    ("29000200", "flagged", "f_tau_p2"),
+    ("71000100", "flagged", "f_SLME_p1"),
+    ("71000200", "flagged", "f_SLME_p2"),
+    ("71000300", "flagged", "f_SLME_p3"),
+    ("71000400", "flagged", "f_SLME_p4"),
+    ("72000100", "flagged", "f_EWP_p1"),
+    ("72000200", "flagged", "f_EWP_p2"),
+    ("72000300", "flagged", "f_EWP_p3"),
+    ("72000400", "flagged", "f_EWP_p4"),
+    ("73000100", "flagged", "f_TDCPV_p1"),
+    ("73000200", "flagged", "f_TDCPV_p2"),
+    ("73000300", "flagged", "f_TDCPV_p3"),
+    ("73000400", "flagged", "f_TDCPV_p4"),
+    ("74000100", "flagged", "f_bhadronic_p1"),  # btocharmless is included here
+    ("74000200", "flagged", "f_bhadronic_p2"),  # btocharmless is included here
+    ("74000300", "flagged", "f_bhadronic_p3"),  # btocharmless is included here
+    ("74000400", "flagged", "f_bhadronic_p4"),  # btocharmless is included here
+    ("75000100", "flagged", "f_quarkonium_p1"),
+    ("75000200", "flagged", "f_quarkonium_p2"),
+    ("75000300", "flagged", "f_quarkonium_p3"),
+    ("75000400", "flagged", "f_quarkonium_p4"),
+    ("77000100", "flagged", "f_charm_p1"),
+    ("77000200", "flagged", "f_charm_p2"),
+    ("77000300", "flagged", "f_charm_p3"),
+    ("77000400", "flagged", "f_charm_p4"),
+    ("78000100", "flagged", "f_dark_p1"),
+    ("78000200", "flagged", "f_dark_p2"),
+    ("78000300", "flagged", "f_dark_p3"),
+    ("78000400", "flagged", "f_dark_p4"),
+    ("79000100", "flagged", "f_tau_p1"),
+    ("79000200", "flagged", "f_tau_p2"),
+    ("79000300", "flagged", "f_tau_p3"),
+    ("79000400", "flagged", "f_tau_p4"),
 
     # --- WG0: Systematics ---
     ("10000000", "systematics", "Random"),
@@ -51,7 +67,8 @@ _RegisteredSkims = [
     ("10611100", "systematics", "SystematicsKshort"),
     ("10601200", "systematics", "SystematicsBhabha"),
     ("10601300", "systematics", "SystematicsCombinedHadronic"),
-    ("10601400", "systematics", "SystematicsCombinedLowMulti"),
+    ("10601401", "systematics", "SystematicsCombinedLowMulti"),  # Added the SystematicsPhiGamma skim
+    #    ("10601400", "systematics", "SystematicsCombinedLowMulti"),
     ("10601500", "systematics", "SystematicsDstar"),
 
     # --- WG1: SL + missing energy ---
@@ -82,7 +99,9 @@ _RegisteredSkims = [
     # --- WG3: Time-dependent CP violation ---
     ("13160200", "tdcpv", "TDCPV_ccs"),
     ("13160300", "tdcpv", "TDCPV_qqs"),
+    ("13160400", "tdcpv", "TDCPV_klong"),
     ("13130300", "tdcpv", "TDCPV_dilepton"),
+    ("13110100", "tdcpv", "TDCPV_inclusiveJpsi"),
 
 
     # --- WG4: Charmed B decays ---
@@ -121,6 +140,11 @@ _RegisteredSkims = [
     ("14141701", "btocharm", "B0toDomegapi_Kpipi_pipipi0"),
     ("14141702", "btocharm", "B0toDomegapi_Kspi_pipipi0"),
     ("14141703", "btocharm", "BtoD0pi_Kpiomega_pipipi0"),
+    ("14121401", "btocharm", "BtoDstpipi_D0pi_Kpi"),
+    ("14121402", "btocharm", "BtoDpipi_Kpipi"),
+    ("14121403", "btocharm", "BtoDsDsst_Kpi_KK"),
+    ("14123300", "btocharm", "antiB0toDpipi0_Kpipi"),
+    ("14163400", "btocharm", "antiB0toDsDsst_Kpi0"),
 
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),
@@ -170,6 +194,8 @@ _RegisteredSkims = [
     ("17260100", "charm", "DpToHpOmega"),  # D+ -> K/pi+ omega / omega -> pi+ pi- pi0
     ("17260200", "charm", "DspToHpOmega"),  # D_s+ -> K/pi+ omega / omega -> pi+ pi- pi0
     ("17241300", "charm", "DpToEtaHp"),  # D+ -> eta h+
+    ("17241400", "charm", "LambdacToGeneric"),  # Lambda_c+ -> X
+
 
 
     # --- WG8: Dark matter searches and tau physics ---
@@ -195,7 +221,9 @@ _RegisteredSkims = [
     ("18370100", "dark", "AA2uuuu"),
     ("18020600", "dark", "DimuonPlusVisibleDarkHiggs"),
     ("18020700", "dark", "DielectronPlusVisibleDarkHiggs"),
+    ("18022400", "dark", "DimuonRecoilMassSquared"),
     ("18530600", "lowMulti", "LowMassOneTrack"),
+    ("18022500", "dark", "DarkShower"),
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),

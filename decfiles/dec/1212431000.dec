@@ -1,0 +1,35 @@
+# EventType: 1212431000
+# Descriptor: [B+ -> X_1(3872) [-> pi0 chi_c1 [-> gamma  J/psi [->mu+ mu-]] ]  K+]
+# NickName: Bu_X3872K__X3872_pi0chic1__chic1_gJpsi__Jpsimm
+# Documentation: X->pi0 chicJ studies.
+# Tested:
+# PhysicsWG:  Quarkonium
+# Responsible: Junxi Cui
+# Email: jxcui@seu.edu.cn
+# Cuts: None
+# Date: 20250123
+
+yesPhotos
+
+Decay Upsilon(4S)
+0.50  B+sig B-    VSS;
+0.50  B+    B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.00  X_1(3872)sig K+  SVS;
+Enddecay
+CDecay B-sig
+
+Decay X_1(3872)sig
+1.00  pi0 chi_c1sig PHSP;
+Enddecay
+
+Decay chi_c1sig
+1.00  J/psisig   gamma   VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+
+Decay J/psisig
+1.00  mu+ mu- VLL;
+Enddecay
+End

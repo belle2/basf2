@@ -37,7 +37,7 @@ namespace Belle2 {
     BELLE2_DEFINE_EXCEPTION(Center_Is_Origin, "The Calculated Circle Center is the origin, not supported by this fitter.");
 
     /** this exception catches TCs which are too small to be able to be detected by the TC, therefore are likely to be ghost TCs. such TCs can be neglected */
-    BELLE2_DEFINE_EXCEPTION(Circle_too_small, "The radius of the circle is too small for usefull pT-estimation.");
+    BELLE2_DEFINE_EXCEPTION(Circle_too_small, "The radius of the circle is too small for useful pT-estimation.");
 
   };
 

@@ -909,6 +909,18 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
         klongs = ('K_L0', 'isFromKLM > 0')
         fillParticleLists([kaons, pions, klongs], path=mypath)
 
+    * Charged kinks final state particles (input ``mdst`` type = Kink)
+
+    Note:
+        To reconstruct charged particle kink you must specify the daughter.
+
+    For example, to load Kinks as :math:`K^- \\to \\pi^-\\pi^0` decays from Kinks:
+
+    .. code-block:: python
+
+        kinkKaons = ('K- -> pi-', yourCut)
+        fillParticleLists([kaons, pions, v0lambdas, kinkKaons], path=mypath)
+
 
     Parameters:
         decayStringsWithCuts (list): A list of python ntuples of (decayString, cut).
@@ -917,7 +929,9 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      If the input MDST type is V0 the whole
                                      decay chain needs to be specified, so that
                                      the user decides and controls the daughters
-                                     ' order (e.g. ``K_S0 -> pi+ pi-``)
+                                     ' order (e.g. ``K_S0 -> pi+ pi-``).
+                                     If the input MDST type is Kink the decay chain needs to be specified
+                                     with only one daughter (e.g. ``K- -> pi-``).
                                      The cut is the selection criteria
                                      to be added to the ParticleList. It can be an empty string.
         writeOut (bool):             whether RootOutput module should save the created ParticleList
@@ -944,14 +958,18 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
             raise ValueError("Invalid decay string")
         # need to check some logic to unpack possible scenarios
         if decayDescriptor.getNDaughters() > 0:
-            # ... then we have an actual decay in the decay string which must be a V0
-            # the particle loader automatically calls this "V0" so we have to copy over
+            # ... then we have an actual decay in the decay string which must be a V0 (if more than 1 daughter)
+            # or a kink (if 1 daughter)
+            # the particle loader automatically calls this "V0" or "kink", respectively, so we have to copy over
             # the list to name/format that user wants
-            if decayDescriptor.getMother().getLabel() != 'V0':
+            if (decayDescriptor.getNDaughters() == 1) & (decayDescriptor.getMother().getLabel() != 'kink'):
+                copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':kink',
+                         writeOut, path)
+            if (decayDescriptor.getNDaughters() > 1) & (decayDescriptor.getMother().getLabel() != 'V0'):
                 copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
         elif decayDescriptor.getMother().getLabel() != 'all':
-            # then we have a non-V0 particle which the particle loader automatically calls "all"
-            # as with the special V0 case we have to copy over the list to the name/format requested
+            # then we have a non-V0/kink particle which the particle loader automatically calls "all"
+            # as with the special V0 and kink cases we have to copy over the list to the name/format requested
             copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
 
         # optionally apply a cut
@@ -1008,10 +1026,24 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
 
         fillParticleList('K_L0', 'isFromKLM > 0', path=mypath)
 
+    * Charged kinks final state particles (input ``mdst`` type = Kink)
+
+    .. note::
+        To reconstruct charged particle kink you must specify the daughter.
+
+    For example, to load Kinks as :math:`K^- \\to \\pi^-\\pi^0` decays from Kinks:
+
+    .. code-block:: python
+
+        fillParticleList('K- -> pi-', yourCut, path=mypath)
+
+
     Parameters:
         decayString (str):           Type of Particle and determines the name of the ParticleList.
                                      If the input MDST type is V0 the whole decay chain needs to be specified, so that
-                                     the user decides and controls the daughters' order (e.g. ``K_S0 -> pi+ pi-``)
+                                     the user decides and controls the daughters' order (e.g. ``K_S0 -> pi+ pi-``).
+                                     If the input MDST type is Kink the decay chain needs to be specified
+                                     with only one daughter (e.g. ``K- -> pi-``).
         cut (str):                   Particles need to pass these selection criteria to be added to the ParticleList
         writeOut (bool):             whether RootOutput module should save the created ParticleList
         path (basf2.Path):           modules are added to this path
@@ -1036,14 +1068,19 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     if not decayDescriptor.init(decayString):
         raise ValueError("Invalid decay string")
     if decayDescriptor.getNDaughters() > 0:
-        # ... then we have an actual decay in the decay string which must be a V0
-        # the particle loader automatically calls this "V0" so we have to copy over
+        # ... then we have an actual decay in the decay string which must be a V0 (if more than 1 daughter)
+        # or a kink (if 1 daughter)
+        # the particle loader automatically calls this "V0" or "kink", respectively, so we have to copy over
         # the list to name/format that user wants
-        if decayDescriptor.getMother().getLabel() != 'V0':
-            copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
+        if (decayDescriptor.getNDaughters() == 1) & (decayDescriptor.getMother().getLabel() != 'kink'):
+            copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':kink',
+                     writeOut, path)
+        if (decayDescriptor.getNDaughters() > 1) & (decayDescriptor.getMother().getLabel() != 'V0'):
+            copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut,
+                     path)
     elif decayDescriptor.getMother().getLabel() != 'all':
-        # then we have a non-V0 particle which the particle loader automatically calls "all"
-        # as with the special V0 case we have to copy over the list to the name/format requested
+        # then we have a non-V0/kink particle which the particle loader automatically calls "all"
+        # as with the special V0 and kink cases we have to copy over the list to the name/format requested
         copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
 
     # optionally apply a cut
@@ -3645,15 +3682,14 @@ def buildEventShape(inputListNames=None,
     time. By default the calculation of the high-order moments (5-8) is turned off.
     Switching off an option will make the corresponding variables not available.
 
-    Warning:
-       The user can provide as many particle lists
-       as needed, using also combined particles, but the function will always assume that
-       the lists are independent.
-       If the lists provided by the user contain several times the same track (either with
-       different mass hypothesis, or once as an independent particle and once as daughter of a
-       combined particle) the results won't be reliable.
-       A basic check for duplicates is available setting the checkForDuplicate flags.
-
+    Info:
+       The user can provide as many particle lists as needed, using also composite particles.
+       In these cases, it is recommended to activate the checkForDuplicates flag since it
+       will eliminate duplicates, e.g., if the same track is provided multiple times
+       (either with different mass hypothesis or once as an independent particle and once
+       as daughter of a composite particle). The first occurrence will be used in the
+       calculations so the order in which the particle lists are given as well as within
+       the particle lists matters.
 
     @param inputListNames     List of ParticleLists used to calculate the
                               event shape variables. If the list is empty the default
@@ -3679,7 +3715,8 @@ def buildEventShape(inputListNames=None,
                               Requires thrust = True.
     @param sphericity         Enables the calculation of the sphericity-related quantities.
     @param checkForDuplicates Perform a check for duplicate particles before adding them. Regardless of the value of this option,
-                              it is recommended to consider sanitizing the lists you are passing to the function.
+                              it is recommended to consider sanitizing the lists you are passing to the function since this will
+                              speed up the processing.
 
     """
 

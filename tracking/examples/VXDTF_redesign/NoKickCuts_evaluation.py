@@ -27,59 +27,64 @@
 import basf2 as b2
 
 import argparse
-parser = argparse.ArgumentParser(description="NoKickCuts evaluation module")
-parser.add_argument(
-    '--useValidation',
-    dest='use_validation',
-    action='store_const',
-    const=True,
-    default=False,
-    help='print validation plots')
-parser.add_argument(
-    '--useFitMethod',
-    dest='use_fitMethod',
-    action='store_const',
-    const=True,
-    default=False,
-    help='definition of the cuts with the double-gaussian fit')
-
-args = parser.parse_args()
-use_Validation = args.use_validation
-use_fit = args.use_fitMethod
 
 
-main_path = b2.create_path()
+def main():
+    """Only execute the code if the script is run but not when it's imported."""
+    parser = argparse.ArgumentParser(description="NoKickCuts evaluation module")
+    parser.add_argument(
+        '--useValidation',
+        dest='use_validation',
+        action='store_const',
+        const=True,
+        default=False,
+        help='print validation plots')
+    parser.add_argument(
+        '--useFitMethod',
+        dest='use_fitMethod',
+        action='store_const',
+        const=True,
+        default=False,
+        help='definition of the cuts with the double-gaussian fit')
 
-mctrackfinder = b2.register_module('TrackFinderMCTruthRecoTracks')
-mctrackfinder.param('WhichParticles', ['SVD'])
-mctrackfinder.param('EnergyCut', 0)
+    args = parser.parse_args()
+    use_Validation = args.use_validation
+    use_fit = args.use_fitMethod
 
-gearbox = b2.register_module('Gearbox')
+    main_path = b2.create_path()
 
-geometry = b2.register_module('Geometry')
+    mctrackfinder = b2.register_module('TrackFinderMCTruthRecoTracks')
+    mctrackfinder.param('WhichParticles', ['SVD'])
+    mctrackfinder.param('EnergyCut', 0)
 
-rootinput = b2.register_module('RootInput')
-# param("inputFileNames", "/home/belle2/vberta/storage/release1_validation/training_sample/simulated*.root")
+    gearbox = b2.register_module('Gearbox')
 
-progressbar = b2.register_module('ProgressBar')
+    geometry = b2.register_module('Geometry')
 
-mctrackmatcher = b2.register_module('MCRecoTracksMatcher')
-mctrackmatcher.param('UseCDCHits', False)
-mctrackmatcher.param('UseSVDHits', True)
-mctrackmatcher.param('UsePXDHits', True)
-mctrackmatcher.param('mcRecoTracksStoreArrayName', 'MCRecoTracks')
+    rootinput = b2.register_module('RootInput')
 
-NoKickCuts = b2.register_module('NoKickCutsEval')
-NoKickCuts.param('useValidation', use_Validation)
-NoKickCuts.param('useFitMethod', use_fit)
+    progressbar = b2.register_module('ProgressBar')
+
+    mctrackmatcher = b2.register_module('MCRecoTracksMatcher')
+    mctrackmatcher.param('UseCDCHits', False)
+    mctrackmatcher.param('UseSVDHits', True)
+    mctrackmatcher.param('UsePXDHits', True)
+    mctrackmatcher.param('mcRecoTracksStoreArrayName', 'MCRecoTracks')
+
+    NoKickCuts = b2.register_module('NoKickCutsEval')
+    NoKickCuts.param('useValidation', use_Validation)
+    NoKickCuts.param('useFitMethod', use_fit)
+
+    main_path.add_module(rootinput)
+    main_path.add_module(gearbox)
+    main_path.add_module(geometry)
+    main_path.add_module(mctrackfinder)
+    main_path.add_module(NoKickCuts)
+    main_path.add_module(progressbar)
+
+    b2.process(main_path)
+    print(b2.statistics)
 
 
-main_path.add_module(rootinput)
-main_path.add_module(gearbox)
-main_path.add_module(geometry)
-main_path.add_module(mctrackfinder)
-main_path.add_module(NoKickCuts)
-main_path.add_module(progressbar)
-
-b2.process(main_path)
-print(b2.statistics)
+if __name__ == "__main__":
+    main()

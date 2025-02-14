@@ -83,7 +83,7 @@ void DosiDigitizerModule::getXMLData()
 {
   //GearDir content = GearDir("/Detector/DetectorComponent[@name=\"DOSI\"]/Content/");
 
-  B2INFO("DosiDigitizer: Aquired dosi locations and gas parameters");
+  B2INFO("DosiDigitizer: Acquired dosi locations and gas parameters");
   B2INFO("              from DOSI.xml. There are " << nDOSI << " DOSIs implemented");
 
 }

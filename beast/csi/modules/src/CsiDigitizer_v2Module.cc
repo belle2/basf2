@@ -114,7 +114,7 @@ void CsiDigitizer_v2Module::getXMLData()
     iRange++;
   }
 
-  B2INFO("CsiDigitizer_V2: Aquired csi locations and gas parameters");
+  B2INFO("CsiDigitizer_V2: Acquired csi locations and gas parameters");
   B2INFO("              from CSI.xml. There are " << nCSI << " CSIs implemented");
 
 }

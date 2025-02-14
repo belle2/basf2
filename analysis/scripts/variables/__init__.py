@@ -106,12 +106,12 @@ class PythonVariableManager:
         instance = PythonVariableManager._instance()
         return instance.evaluate(variable, particle)
 
-    def evaluateVariables(self, variables, particle):
+    def evaluateVariables(self, variables, plist):
         '''
-        Wrapper around Manager::evaluateVariables(const std::vector<std::string>& varNames, const Particle* p).
+        Wrapper around Manager::evaluateVariables(const std::vector<std::string>& varNames, const ParticleList* plist).
         '''
         instance = PythonVariableManager._instance()
-        return instance.evaluateVariables(variables, particle)
+        return instance.evaluateVariables(variables, plist.obj())
 
     def getNames(self):
         '''

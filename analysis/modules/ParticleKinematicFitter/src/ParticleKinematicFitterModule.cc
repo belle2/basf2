@@ -210,7 +210,7 @@ bool ParticleKinematicFitterModule::doOrcaKinFitFit(Particle* mother)
   }
 
   //Determine if n or nbar based on charge of tag particle indicated
-  //If tag particle has negative change, sign of n and nbar are flipped.
+  //If tag particle has negative charge, sign of n and nbar are flipped.
   //Required to use optimal position resolution
   bool flipNeutronPDGsign = 0;
   if (m_decayStringForNeutronVsAntiNeutron != "") {
@@ -282,7 +282,7 @@ bool ParticleKinematicFitterModule::doOrcaKinFitFit(Particle* mother)
       //Always use direction only for neutrons
       if (abs(massHypo) == Const::neutron.getPDGCode()) {
         useDirectionOnly = true;
-        B2WARNING("Neutron mass hypothesis assigned to fit particle but directionOnly flag not specified for same particle.  Setting candidtate to useDirectionOnly.");
+        B2WARNING("Neutron mass hypothesis assigned to fit particle but directionOnly flag not specified for same particle.  Setting candidate to useDirectionOnly.");
         if (flipNeutronPDGsign)  massHypo = -massHypo;
       }
     }

@@ -51,6 +51,9 @@ namespace Belle2 {
     /** TRGSummary object from beam background overlay */
     StoreObjPtr<TRGSummary> m_TRGSummaryFromOverlay;
 
+    /** Name of TRGGRLInfo object */
+    std::string m_TRGGRLInfoName;
+
     /** Extension name for branches from beam background overlay */
     std::string m_extensionName;
 

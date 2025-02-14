@@ -9,8 +9,9 @@
 # Cuts: None
 # Date: 
 # This decay model is intended for pentaquark studies
-# Pccs particle to be generated with parameters:
-# pdg.add_particle('Pccs', 999 , 4.3382, 0.007,0, 0.5)
+# Pentaquark particle to be generated with parameters:
+# pdg.add_particle('P_Lambda_psis0', 9432142 , 4.3382, 0.007,0, 0.5)
+# pdg.add_particle('anti-P_Lambda_psis0', -9432142 , 4.3382, 0.007,0, 0.5)
 
 Decay Upsilon(4S)
 0.5 B+sig B- VSS;
@@ -18,16 +19,16 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B-sig
-1.0 Pccs anti-p- PHSP;
+1.0 P_Lambda_psis0 anti-p- PHSP;
 Enddecay
 
-Decay Pccs
+Decay P_Lambda_psis0
 1.0 J/psi Lambda0 PHSP;
 Enddecay
-CDecay anti-Pccs
+CDecay anti-P_Lambda_psis0
 
 Decay B+sig
-1.0 anti-Pccs p+ PHSP;
+1.0 anti-P_Lambda_psis0 p+ PHSP;
 Enddecay
 
 End

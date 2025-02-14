@@ -17,13 +17,14 @@ TRGGRLInjectionVetoFromOverlayModule::TRGGRLInjectionVetoFromOverlayModule() : M
   setDescription("Module for adding to MC samples the information about the TRG injection veto from "
                  "beam background overlay files.");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("TRGGRLInfoName", m_TRGGRLInfoName, "Name of the TRGGRLInfo object", std::string("TRGGRLObjects"));
   addParam("extensionName", m_extensionName,
            "Name added to default branch names", std::string("_beamBG"));
 }
 
 void TRGGRLInjectionVetoFromOverlayModule::initialize()
 {
-  m_TRGGRLInfoFromSimulation.isRequired("TRGGRLObjects");
+  m_TRGGRLInfoFromSimulation.isRequired(m_TRGGRLInfoName);
   m_TRGSummaryFromOverlay.isOptional(std::string("TRGSummary") + m_extensionName);
 }
 

@@ -34,7 +34,17 @@ def fitKinematic4C(
     @param constraint       HardBeam or RecoilMass
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (uses up three constraints)
-    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
+    @param variablePrefix prepended to fit variables stored in extra info. Required if
+    ParticleKinematicFitter is run multiple times
+    @param decayStringForDirectionOnlyParticles DecayString specifying the particles
+    to use only direction information in the fit
+    @param decayStringForAlternateMassParticles DecayString specifying the particles
+    where an alternate mass hypothesis is used
+    @param alternateMassHypos list of pdg values (or particle names) for particles where
+    different mass hypothesis is used in the fit
+    @param decayStringForNeutronVsAntiNeutron DecayString specifying the charged particle
+    used to tag whether n or nbar. When tag particle has negative charge, PDG sign of n/nbar
+    is flipped from default given in alternateMassHypos
     @param path         modules are added to this path
     """
 
@@ -75,6 +85,15 @@ def UnmeasuredfitKinematic1C(
     @param constraint       HardBeam or RecoilMass
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
+    @param decayStringForDirectionOnlyParticles DecayString specifying the particles
+    to use only direction information in the fit
+    @param decayStringForAlternateMassParticles DecayString specifying the particles
+    where an alternate mass hypothesis is used
+    @param alternateMassHypos list of pdg values (or particle names) for particles where
+    different mass hypothesis is used in the fit
+    @param decayStringForNeutronVsAntiNeutron DecayString specifying the charged particle
+    used to tag whether n or nbar. When tag particle has negative charge, PDG sign of n/nbar
+    is flipped from default given in alternateMassHypos
     @param path         modules are added to this path
     """
 
@@ -120,6 +139,15 @@ def fitKinematic3C(
     @param addUnmeasuredPhoton add one unmeasured photon (uses up three constraints)
     @param add3CPhoton add one photon with unmeasured energy (uses up a constraint)
     @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
+    @param decayStringForDirectionOnlyParticles DecayString specifying the particles
+    to use only direction information in the fit
+    @param decayStringForAlternateMassParticles DecayString specifying the particles
+    where an alternate mass hypothesis is used
+    @param alternateMassHypos list of pdg values (or particle names) for particles where
+    different mass hypothesis is used in the fit
+    @param decayStringForNeutronVsAntiNeutron DecayString specifying the charged particle
+    used to tag whether n or nbar. When tag particle has negative charge, PDG sign of n/nbar
+    is flipped from default given in alternateMassHypos
     @param path         modules are added to this path
     """
 
@@ -167,6 +195,15 @@ def fitKinematic2C(
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhotonAlongBeam add an unmeasured photon along beam if 'HER' or 'LER' is set
     @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
+    @param decayStringForDirectionOnlyParticles DecayString specifying the particles
+    to use only direction information in the fit
+    @param decayStringForAlternateMassParticles DecayString specifying the particles
+    where an alternate mass hypothesis is used
+    @param alternateMassHypos list of pdg values (or particle names) for particles where
+    different mass hypothesis is used in the fit
+    @param decayStringForNeutronVsAntiNeutron DecayString specifying the charged particle
+    used to tag whether n or nbar. When tag particle has negative charge, PDG sign of n/nbar
+    is flipped from default given in alternateMassHypos
     @param path         modules are added to this path
     """
 
@@ -220,6 +257,15 @@ def MassfitKinematic1CRecoil(
     @param recoilMass       RecoilMass (GeV)
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
+    @param decayStringForDirectionOnlyParticles DecayString specifying the particles
+    to use only direction information in the fit
+    @param decayStringForAlternateMassParticles DecayString specifying the particles
+    where an alternate mass hypothesis is used
+    @param alternateMassHypos list of pdg values (or particle names) for particles where
+    different mass hypothesis is used in the fit
+    @param decayStringForNeutronVsAntiNeutron DecayString specifying the charged particle
+    used to tag whether n or nbar. When tag particle has negative charge, PDG sign of n/nbar
+    is flipped from default given in alternateMassHypos
     @param path         modules are added to this path
     """
 
@@ -263,6 +309,15 @@ def MassfitKinematic1C(
     @param invMass       Invariant Mass (GeV)
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
+    @param decayStringForDirectionOnlyParticles DecayString specifying the particles
+    to use only direction information in the fit
+    @param decayStringForAlternateMassParticles DecayString specifying the particles
+    where an alternate mass hypothesis is used
+    @param alternateMassHypos list of pdg values (or particle names) for particles where
+    different mass hypothesis is used in the fit
+    @param decayStringForNeutronVsAntiNeutron DecayString specifying the charged particle
+    used to tag whether n or nbar. When tag particle has negative charge, PDG sign of n/nbar
+    is flipped from default given in alternateMassHypos
     @param path         modules are added to this path
     """
 

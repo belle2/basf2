@@ -45,6 +45,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     if seed:
         tf.random.set_seed(seed)
 
+    parameters['mask_value'] = 0
     parameters['num_tracks'] = 10
     parameters['num_features'] = 14
     parameters["num_transformer_blocks"] = 6

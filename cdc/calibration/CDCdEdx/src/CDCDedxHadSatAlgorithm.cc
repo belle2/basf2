@@ -119,7 +119,8 @@ void CDCDedxHadSatAlgorithm::createPayload()
 
 }
 
-void CDCDedxHadSatAlgorithm::prepareSample(std::vector< std::string >& particles, std::string filename, std::string sfx,
+void CDCDedxHadSatAlgorithm::prepareSample(std::vector< std::string >& particles, const std::string& filename,
+                                           const std::string& sfx,
                                            bool correct)
 {
   TFile* outfile = new TFile(Form("%s", filename.data()), "RECREATE");

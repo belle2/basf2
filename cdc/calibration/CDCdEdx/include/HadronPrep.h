@@ -55,33 +55,33 @@ namespace Belle2 {
     /**
     * function to prepare sample for monitoring plots, bg curve fitting and sigma vs ionz fitting
     */
-    void prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, std::string suffix,
-                       std::string pdg, bool ismakePlots, bool correct);
+    void prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, const std::string& suffix,
+                       const std::string& pdg, bool ismakePlots, bool correct);
 
     /**
     * function to define histograms
     */
-    void defineHisto(std::vector<TH1F*>& htemp, std::string title, std::string pdg);
+    void defineHisto(std::vector<TH1F*>& htemp, const std::string& title, const std::string& pdg);
 
     /**
     * function to plot the map of histograms
     */
-    void plotDist(std::map<int, std::vector<TH1F*>>& hist, std::string sname, std::string pdg);
+    void plotDist(std::map<int, std::vector<TH1F*>>& hist, const std::string& sname, const std::string& pdg);
 
     /**
     * function to plot the 2-D histograms
     */
-    void plotDist(std::vector<TH2F*>& hist, std::string sname, std::string pdg);
+    void plotDist(std::vector<TH2F*>& hist, const std::string& sname, const std::string& pdg);
 
     /**
     * function to fill the parameters like mean and reso in the tree
     */
-    void setPars(TFile*& outfile, std::map<int, std::vector<TH1F*>>& hdedx_bgcosth, std::string pdg);
+    void setPars(TFile*& outfile, std::map<int, std::vector<TH1F*>>& hdedx_bgcosth, const std::string& pdg);
 
     /**
     * function to make graph dedx vs cos in different bg bins
     */
-    void plotGraph(std::string sname, std::string pdg);
+    void plotGraph(const std::string& sname, const std::string& pdg);
 
     /**
     * function to clear the variables

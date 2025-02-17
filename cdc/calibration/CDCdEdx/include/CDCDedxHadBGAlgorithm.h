@@ -64,27 +64,27 @@ namespace Belle2 {
     /**
     * function to set beta gamma parameters for particle
     */
-    void setBGPars(std::string particle, double nbin, double min, double max)
+    void setBGPars(const std::string& particle, double nbin, double min, double max)
     {
-      m_bgpar[particle.data()][0] = nbin;
-      m_bgpar[particle.data()][1] = min;
-      m_bgpar[particle.data()][2] = max;
+      m_bgpar[particle][0] = nbin;
+      m_bgpar[particle][1] = min;
+      m_bgpar[particle][2] = max;
     }
 
     /**
     * function to set inection time parameters for particle
     */
-    void setInjectionPars(std::string particle, double nbin, double min, double max)
+    void setInjectionPars(const std::string& particle, double nbin, double min, double max)
     {
-      m_injpar[particle.data()][0] = nbin;
-      m_injpar[particle.data()][1] = min;
-      m_injpar[particle.data()][2] = max;
+      m_injpar[particle][0] = nbin;
+      m_injpar[particle][1] = min;
+      m_injpar[particle][2] = max;
     }
 
     /**
     * function to set cosine bins for particle
     */
-    void setCosBin(std::string particle, double nbin) { m_cospar[particle.data()] = nbin; }
+    void setCosBin(const std::string& particle, double nbin) { m_cospar[particle] = nbin; }
 
     /**
     * function to set cos parameters for particle
@@ -104,12 +104,12 @@ namespace Belle2 {
     /**
     * function to do the sigma vs nhit or cos fits and store parameters
     */
-    void SigmaFits(std::vector< std::string > particles, std::string sfx, std::string svar);
+    void SigmaFits(std::vector< std::string > particles, const std::string& sfx, const std::string& svar);
 
     /**
     * function to prepare sample for bgcurve fitting, sigma vs ionzation fitting and monitoring plots
     */
-    void prepareSample(std::vector< std::string > particles, std::string filename, std::string sfx);
+    void prepareSample(std::vector< std::string > particles, const std::string& filename, const std::string& sfx);
 
   protected:
 

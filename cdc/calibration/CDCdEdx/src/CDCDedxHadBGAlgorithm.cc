@@ -164,7 +164,7 @@ void CDCDedxHadBGAlgorithm::createPayload()
   saveCalibration(sgains, "CDCDedxSigmaPars");
 }
 
-void CDCDedxHadBGAlgorithm::prepareSample(std::vector< std::string > particles, std::string filename, std::string sfx)
+void CDCDedxHadBGAlgorithm::prepareSample(std::vector< std::string > particles, const std::string& filename, const std::string& sfx)
 {
 
   TFile* outfile = new TFile(filename.data(), "RECREATE");
@@ -183,7 +183,7 @@ void CDCDedxHadBGAlgorithm::prepareSample(std::vector< std::string > particles, 
 
 }
 
-void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, std::string sfx, std::string svar)
+void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, const std::string& sfx, const std::string& svar)
 {
   // only the muon samples are used for the sigma fits
   HadronCalibration hadcal;
@@ -352,7 +352,7 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, std:
 
     prep.plotDist(hdedx_var, Form("fits_chi_%s_%s_%s", svar.data(), sfx.data(), particle.data()), nbins);
 
-    prep.deleteHistos(hdedx_var, nbins);
+    prep.deleteHistos(hdedx_var);
   }
   outfile->Close();
 

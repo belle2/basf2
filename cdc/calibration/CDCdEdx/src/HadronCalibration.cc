@@ -14,8 +14,8 @@ using namespace Belle2;
 HadronCalibration::HadronCalibration() {}
 
 
-void HadronCalibration::fitBGCurve(std::vector< std::string > particles, std::string filename, std::string paramfile,
-                                   std::string suffix)
+void HadronCalibration::fitBGCurve(std::vector< std::string > particles, const std::string& filename, const std::string& paramfile,
+                                   const std::string& suffix)
 {
 
   // read in a file that contains fit results for bg bins
@@ -42,7 +42,7 @@ void HadronCalibration::fitBGCurve(std::vector< std::string > particles, std::st
   TLegend tleg(0.4, 0.50, 0.65, 0.85);
   tleg.SetBorderSize(0);
 
-  TLegend tlegPart(0.80, 0.80, 0.98, 0.98);
+  TLegend tlegPart(0.60, 0.60, 0.90, 0.90);
   tlegPart.SetBorderSize(0);
 
   for (int i = 0; i < int(particles.size()); ++i) {
@@ -413,7 +413,8 @@ void HadronCalibration::fitBGCurve(std::vector< std::string > particles, std::st
   infile->Close();
 }
 
-void HadronCalibration::plotBGMonitoring(std::vector< std::string > particles, std::string filename, std::string suffix)
+void HadronCalibration::plotBGMonitoring(std::vector< std::string > particles, const std::string& filename,
+                                         const std::string& suffix)
 {
   //1. chi-mean vs bg
   std::string title = "chi-fit-means of different particles;#beta#gamma;#chi(#mu)";
@@ -451,9 +452,9 @@ void HadronCalibration::plotBGMonitoring(std::vector< std::string > particles, s
   }
 }
 
-void HadronCalibration::plotMonitoring(std::vector< std::string > particles, std::string filename, std::string sname,
-                                       std::string title,
-                                       std::string sxvar, std::string syvar)
+void HadronCalibration::plotMonitoring(std::vector< std::string > particles, const std::string& filename, const std::string& sname,
+                                       const std::string& title,
+                                       const std::string& sxvar, const std::string& syvar)
 {
 
   const int npart = int(particles.size());
@@ -501,7 +502,7 @@ void HadronCalibration::plotMonitoring(std::vector< std::string > particles, std
       else xvar = avg;
 
       grchim[i].SetPoint(j, xvar, var);
-      grchim[i].SetPointError(j, 0, varerr);
+      // grchim[i].SetPointError(j, 0, varerr);
     }
 
     tlegPart.AddEntry(&grchim[i], particles[i].data(), "p");
@@ -534,8 +535,9 @@ void HadronCalibration::plotMonitoring(std::vector< std::string > particles, std
   delete gr_var;
 }
 
-void HadronCalibration::fitSigmavsIonz(std::vector< std::string > particles, std::string filename, std::string paramfile,
-                                       std::string suffix)
+void HadronCalibration::fitSigmavsIonz(std::vector< std::string > particles, const std::string& filename,
+                                       const std::string& paramfile,
+                                       const std::string& suffix)
 {
 
   // read in a file that contains fit results for bg bins
@@ -637,8 +639,9 @@ void HadronCalibration::fitSigmavsIonz(std::vector< std::string > particles, std
   delete sigvsdedx;
 }
 
-void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, std::string filename, std::string paramsigma,
-                                       std::string suffix)
+void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, const std::string& filename,
+                                       const std::string& paramsigma,
+                                       const std::string& suffix)
 {
 
   const double lowernhit = 7, uppernhit = 39;
@@ -689,7 +692,7 @@ void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, std
     TCanvas sigvsnhitcan(Form("sigvsnhitcan_%s", suffix.data()), "#sigma vs. nHit", 600, 600);
 
     gr_dedxvsbg.SetMarkerStyle(8);
-    gr_dedxvsbg.SetMarkerSize(0.3);
+    gr_dedxvsbg.SetMarkerSize(0.5);
     gr_dedxvsbg.SetMaximum(2.2);
     gr_dedxvsbg.SetMinimum(0.0);
     gr_dedxvsbg.SetTitle(Form("width of (dedx-pred)/(#sigma_{Cos * Ion * InjReso}) vs lNHitsUsed, %s ;lNHitsUsed; #sigma",
@@ -740,8 +743,9 @@ void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, std
   }
 }
 
-void HadronCalibration::fitSigmaVsCos(std::vector< std::string > particles, std::string filename, std::string paramsigma,
-                                      std::string suffix)
+void HadronCalibration::fitSigmaVsCos(std::vector< std::string > particles, const std::string& filename,
+                                      const std::string& paramsigma,
+                                      const std::string& suffix)
 {
   double lowercos = -0.84, uppercos = 0.96;
 

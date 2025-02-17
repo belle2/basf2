@@ -31,8 +31,8 @@ HadronPrep::HadronPrep(int bgbins, double lowerbg, double upperbg, int cosbins, 
   m_cut = cut;
 }
 
-void HadronPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, std::string suffix,
-                               std::string pdg, bool ismakePlots, bool correct)
+void HadronPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, const std::string& suffix,
+                               const std::string& pdg, bool ismakePlots, bool correct)
 {
 
   std::map<int, std::vector<TH1F*>>  hdedx_bgcosth;
@@ -154,15 +154,15 @@ void HadronPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, s
 }
 
 //------------------------------------
-void HadronPrep::defineHisto(std::vector<TH1F*>& htemp, std::string svar, std::string pdg)
+void HadronPrep::defineHisto(std::vector<TH1F*>& htemp, const std::string& svar, const std::string& pdg)
 {
   for (int j = 0; j < m_cosBins; ++j) {
     // initialize the histograms
     std::string title = Form("%s_%s_%d", pdg.data(), svar.data(), j);
     double dedxMax = 4.0;
-    int cosbins = int(40 * dedxMax);
+    int cosbins = int(50 * dedxMax);
     if (pdg == "pion")  {
-      dedxMax = 2.0; cosbins = int(50 * dedxMax);
+      dedxMax = 2.0; cosbins = int(100 * dedxMax);
     }
     if (pdg == "proton")  dedxMax = 20.0;
     if (svar.substr(0, svar.find("_")) == "dedx")
@@ -174,7 +174,7 @@ void HadronPrep::defineHisto(std::vector<TH1F*>& htemp, std::string svar, std::s
 }
 
 //------------------------------------
-void HadronPrep::plotDist(std::map<int, std::vector<TH1F*>>& hist, std::string sname, std::string pdg)
+void HadronPrep::plotDist(std::map<int, std::vector<TH1F*>>& hist, const std::string& sname, const std::string& pdg)
 {
 
   TCanvas ctmp(Form("cdcdedx_%s_%s", sname.data(), pdg.data()), "", 1200, 1200);
@@ -208,7 +208,7 @@ void HadronPrep::plotDist(std::map<int, std::vector<TH1F*>>& hist, std::string s
 }
 
 //------------------------------------
-void HadronPrep::plotDist(std::vector<TH2F*>& hist, std::string sname, std::string pdg)
+void HadronPrep::plotDist(std::vector<TH2F*>& hist, const std::string& sname, const std::string& pdg)
 {
 
   TCanvas ctmp(Form("cdcdedx_%s_%s", sname.data(), pdg.data()), "", 1200, 1200);
@@ -244,7 +244,7 @@ void HadronPrep::plotDist(std::vector<TH2F*>& hist, std::string sname, std::stri
 }
 
 //----------------------------------------
-void HadronPrep::setPars(TFile*& outfile, std::map<int, std::vector<TH1F*>>& hdedx_bgcosth, std::string pdg)
+void HadronPrep::setPars(TFile*& outfile, std::map<int, std::vector<TH1F*>>& hdedx_bgcosth, const std::string& pdg)
 {
   outfile->cd();
   TTree* satTree = new TTree(Form("%s", pdg.data()), "dE/dx means and errors");
@@ -301,7 +301,7 @@ void HadronPrep::setPars(TFile*& outfile, std::map<int, std::vector<TH1F*>>& hde
 }
 
 //------------------------------------
-void HadronPrep::plotGraph(std::string sname, std::string pdg)
+void HadronPrep::plotGraph(const std::string& sname, const std::string& pdg)
 {
   std::vector<double> cbcenters(m_cosBins), cberrors(m_cosBins);
   double cosstep = (m_cosMax - m_cosMin) / m_cosBins;

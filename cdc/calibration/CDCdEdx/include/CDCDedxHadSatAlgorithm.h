@@ -53,11 +53,11 @@ namespace Belle2 {
     /**
     * function to set beta gamma parameters for particle
     */
-    void setBGPars(std::string particle, double nbin, double min, double max)
+    void setBGPars(const std::string& particle, double nbin, double min, double max)
     {
-      m_bgpar[particle.data()][0] = nbin;
-      m_bgpar[particle.data()][1] = min;
-      m_bgpar[particle.data()][2] = max;
+      m_bgpar[particle][0] = nbin;
+      m_bgpar[particle][1] = min;
+      m_bgpar[particle][2] = max;
     }
 
     /**
@@ -78,7 +78,7 @@ namespace Belle2 {
     /**
     * function to prepare sample for bgcurve hadron saturation and monitoring plots
     */
-    void prepareSample(std::vector< std::string >& particles, std::string filename, std::string sfx, bool correct);
+    void prepareSample(std::vector< std::string >& particles, const std::string& filename, const std::string& sfx, bool correct);
 
   protected:
 

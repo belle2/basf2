@@ -59,28 +59,28 @@ namespace Belle2 {
     /**
     * function to prepare sample for monitoring plots, bg curve fitting and sigma vs ionz fitting
     */
-    void prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, std::string suffix, std::string bgcurvefile,
-                       std::string bgsigmafile, std::string pdg, bool ismakePlots);
+    void prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, const std::string& suffix, const std::string& bgcurvefile,
+                       const std::string& bgsigmafile, const std::string& pdg, bool ismakePlots);
 
     /**
     * function to define histograms
     */
-    void defineHisto(std::vector<TH1F*>& htemp, std::string svar, std::string stype, std::string pdg);
+    void defineHisto(std::vector<TH1F*>& htemp, const std::string& svar, const std::string& stype, const std::string& pdg);
 
     /**
     * function to plot the map of histograms
     */
-    void plotDist(std::map<int, std::vector<TH1F*>>& hist, std::string suffix, int bins);
+    void plotDist(std::map<int, std::vector<TH1F*>>& hist, const std::string& suffix, int bins);
 
     /**
     * function to plot the histograms
     */
-    void plotDist(std::vector<TH1F*>& hist, std::string suffix, int nbins);
+    void plotDist(std::vector<TH1F*>& hist, const std::string& suffix, int nbins);
 
     /**
     * function to fill the parameters like mean and reso in the tree
     */
-    void setPars(TFile*& outfile, std::string& pdg, std::vector<TH1F*>& hdedx_bg, std::vector<TH1F*>& hchi_bg,
+    void setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>& hdedx_bg, std::vector<TH1F*>& hchi_bg,
                  std::vector<TH1F*>& hionzsigma_bg, std::map<int, std::vector<TH1F*>>& hchi_inj);
 
     /**
@@ -91,19 +91,19 @@ namespace Belle2 {
     /**
     * function to fit the histograms
     */
-    void fit(TH1F*& hist, std::string pdg);
+    void fit(TH1F*& hist, const std::string& pdg);
 
     /**
     * function to draw the dedx vs costh histograms
     */
     void printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_allbg, std::map<int, std::vector<TH1F*>>& hchicos_1by3bg,
-                        std::map<int, std::vector<TH1F*>>& hchicos_2by3bg, std::map<int, std::vector<TH1F*>>& hchicos_3by3bg, std::string particle,
-                        std::string suffix);
+                        std::map<int, std::vector<TH1F*>>& hchicos_2by3bg, std::map<int, std::vector<TH1F*>>& hchicos_3by3bg, const std::string& particle,
+                        const std::string& suffix);
 
     /**
     * function to set graph cosmetics
     */
-    void FormatGraph(TGraphErrors& gr, int flag, std::string name = "")
+    void FormatGraph(TGraphErrors& gr, int flag, const std::string& name = "")
     {
       if (flag == 0) {
         gr.SetTitle(Form("%s;cos(#theta);#chi_{mean}", name.data()));
@@ -145,22 +145,23 @@ namespace Belle2 {
     /**
     * function to delete the histograms
     */
-    void deleteHistos(std::vector<TH1F*>& htemp, int bins)
+    void deleteHistos(std::vector<TH1F*>& htemp)
     {
-      for (int j = 0; j < bins; ++j) delete htemp[j];
+      for (auto& hist : htemp) hist->Delete();
     }
 
     /**
     * function to get the particle mass
     */
-    double getParticleMass(std::string particle)
+    double getParticleMass(const std::string& particle)
     {
-      double mass = 0.0;
+      double mass;
       if (particle == "pion") mass = Const::pion.getMass();
       else if (particle == "kaon") mass = Const::kaon.getMass();
       else if (particle == "proton") mass = Const::proton.getMass();
       else if (particle == "muon") mass = Const::muon.getMass();
       else if (particle == "electron") mass = Const::electron.getMass();
+      else mass = 0.0;
       return mass;
     }
 

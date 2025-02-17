@@ -56,33 +56,38 @@ namespace Belle2 {
     /**
     * fit the beta-gamma curve
     */
-    void fitBGCurve(std::vector< std::string > particles, std::string filename, std::string paramfile, std::string suffx);
+    void fitBGCurve(std::vector< std::string > particles, const std::string& filename, const std::string& paramfile,
+                    const std::string& suffx);
 
     /**
     * fit sigma vs. ionzation
     */
-    void fitSigmavsIonz(std::vector< std::string > particles, std::string filename, std::string paramfile, std::string suffix);
+    void fitSigmavsIonz(std::vector< std::string > particles, const std::string& filename, const std::string& paramfile,
+                        const std::string& suffix);
 
     /**
     * fit sigma vs. nhit
     */
-    void fitSigmaVsNHit(std::vector< std::string > particles, std::string filename, std::string paramsigma, std::string suffx);
+    void fitSigmaVsNHit(std::vector< std::string > particles, const std::string& filename, const std::string& paramsigma,
+                        const std::string& suffx);
 
     /**
     * fit sigma vs. cos(theta)
     */
-    void fitSigmaVsCos(std::vector< std::string > particles, std::string filename, std::string paramfile, std::string suffx);
+    void fitSigmaVsCos(std::vector< std::string > particles, const std::string& filename, const std::string& paramfile,
+                       const std::string& suffx);
 
     /**
     * plots mean and width after fitting
     */
-    void plotBGMonitoring(std::vector< std::string > particles, std::string filename, std::string suffix);
+    void plotBGMonitoring(std::vector< std::string > particles, const std::string& filename, const std::string& suffix);
 
     /**
     * plots chi and width after fitting - main function
     */
-    void plotMonitoring(std::vector< std::string > particles, std::string filename, std::string sname, std::string title,
-                        std::string sx, std::string sy);
+    void plotMonitoring(std::vector< std::string > particles, const std::string& filename, const std::string& sname,
+                        const std::string& title,
+                        const std::string& sx, const std::string& sy);
 
     /**
     * function to set grpah cosmetics

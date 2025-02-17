@@ -43,8 +43,9 @@ HadronBgPrep::HadronBgPrep(int bgbins, double lowerbg, double upperbg, int cosbi
   m_cut = cut;
 }
 
-void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, std::string suffix, std::string bgcurvefile,
-                                 std::string bgsigmafile, std::string pdg, bool ismakePlots)
+void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, const std::string& suffix,
+                                 const std::string& bgcurvefile,
+                                 const std::string& bgsigmafile, const std::string& pdg, bool ismakePlots)
 {
 
   std::vector<TH1F*>  hdedx_bg, hchi_bg, hionzsigma_bg;
@@ -214,21 +215,21 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
 
   // delete histograms
   clearVars();
-  deleteHistos(hdedx_bg, m_bgBins);
-  deleteHistos(hchi_bg, m_bgBins);
-  deleteHistos(hionzsigma_bg, m_bgBins);
+  deleteHistos(hdedx_bg);
+  deleteHistos(hchi_bg);
+  deleteHistos(hionzsigma_bg);
   for (int i = 0; i < 2; ++i) {
-    deleteHistos(hchi_inj[i], m_injBins);
-    deleteHistos(hchicos_allbg[i], m_cosBins);
-    deleteHistos(hchicos_1by3bg[i], m_cosBins);
-    deleteHistos(hchicos_2by3bg[i], m_cosBins);
-    deleteHistos(hchicos_3by3bg[i], m_cosBins);
+    deleteHistos(hchi_inj[i]);
+    deleteHistos(hchicos_allbg[i]);
+    deleteHistos(hchicos_1by3bg[i]);
+    deleteHistos(hchicos_2by3bg[i]);
+    deleteHistos(hchicos_3by3bg[i]);
   }
 
 }
 
 //------------------------------------
-void HadronBgPrep::defineHisto(std::vector<TH1F*>& htemp, std::string svar, std::string stype, std::string pdg)
+void HadronBgPrep::defineHisto(std::vector<TH1F*>& htemp, const std::string& svar, const std::string& stype, const std::string& pdg)
 {
   int nbdEdx = 200, nbchi = 200;
   double dedxMax = 20.0;
@@ -280,7 +281,7 @@ void HadronBgPrep::defineHisto(std::vector<TH1F*>& htemp, std::string svar, std:
 }
 
 //------------------------------------
-void HadronBgPrep::plotDist(std::map<int, std::vector<TH1F*>>& hist, std::string sname, int bins)
+void HadronBgPrep::plotDist(std::map<int, std::vector<TH1F*>>& hist, const std::string& sname, int bins)
 {
 
   TCanvas ctmp(Form("cdcdedx_%s", sname.data()), "", 1200, 600);
@@ -307,7 +308,7 @@ void HadronBgPrep::plotDist(std::map<int, std::vector<TH1F*>>& hist, std::string
 }
 
 //------------------------------------
-void HadronBgPrep::plotDist(std::vector<TH1F*>& hist, std::string sname, int nbins)
+void HadronBgPrep::plotDist(std::vector<TH1F*>& hist, const std::string& sname, int nbins)
 {
 
   TCanvas ctmp(Form("cdcdedx_%s", sname.data()), "", 1200, 1200);
@@ -336,7 +337,7 @@ void HadronBgPrep::plotDist(std::vector<TH1F*>& hist, std::string sname, int nbi
 }
 
 //----------------------------------------
-void HadronBgPrep::setPars(TFile*& outfile, std::string& pdg, std::vector<TH1F*>& hdedx_bg, std::vector<TH1F*>& hchi_bg,
+void HadronBgPrep::setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>& hdedx_bg, std::vector<TH1F*>& hchi_bg,
                            std::vector<TH1F*>& hionzsigma_bg, std::map<int, std::vector<TH1F*>>& hchi_inj)
 {
   outfile->cd();
@@ -460,7 +461,7 @@ void HadronBgPrep::setPars(TFile*& outfile, std::string& pdg, std::vector<TH1F*>
 }
 
 //----------------------------------------
-void HadronBgPrep::fit(TH1F*& hist, std::string pdg)
+void HadronBgPrep::fit(TH1F*& hist, const std::string& pdg)
 {
   gstatus status;
   if (pdg == "pion") fitGaussianWRange(hist, status, 1.0);
@@ -514,7 +515,7 @@ void HadronBgPrep::fitGaussianWRange(TH1F*& temphist, gstatus& status, double si
 // --------------------------------------------------
 void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_allbg,
                                   std::map<int, std::vector<TH1F*>>& hchicos_1by3bg, std::map<int, std::vector<TH1F*>>& hchicos_2by3bg,
-                                  std::map<int, std::vector<TH1F*>>& hchicos_3by3bg, std::string pdg, std::string suffix)
+                                  std::map<int, std::vector<TH1F*>>& hchicos_3by3bg, const std::string& pdg, const std::string& suffix)
 {
 
   std::vector<std::vector<double>> chicos(2, std::vector<double>(m_cosBins));

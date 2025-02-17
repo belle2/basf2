@@ -96,7 +96,7 @@ ft.flavorTagger(
     useGNN=True,
     path=main)
 
-# You can apply cuts using the flavor Tagger: isNAN(qrOutput(FBDT)) < 1 rejects all events which do not
+# You can apply cuts using the flavor Tagger: isNAN(qrGNN) < 1 rejects all events which do not
 # provide flavor information using the tag side
 ma.applyCuts(list_name='B0:sig',
              cut='isNAN(qrGNN) < 1',

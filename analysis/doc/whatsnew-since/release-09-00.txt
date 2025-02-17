@@ -1,3 +1,12 @@
+Changes in the analysis package in light-2503-ceres
+---------------------------------------------------
+
+Kinematic Fitting tools
++++++++++++++++++++++++
+* Added functionality to ParticleKinematicFitter module to change mass hypothesis for photons (eg to n0 or n0bar) used in the fit.
+* Added functionality to ParticleKinematicFitter module to specify whether only ECL cluster direction information is to be used in the fit (intended for fits involving neutral hadrons).
+* Added to ECLPhotonEnergyResolution dbobject ability to store position resolution information for neutral hadrons
+
 Changes in the analysis package in light-2501-betelgeuse
 --------------------------------------------------------
 

@@ -25,6 +25,7 @@ def get_tflat_model(parameters, number_of_features):
     """
     Configure tflat model from parameters
     """
+    clip_value = parameters.get("clip_value")
     mask_value = parameters.get("mask_value")
     num_tracks = parameters.get("num_tracks")
     num_features = parameters.get("num_features")
@@ -39,6 +40,9 @@ def get_tflat_model(parameters, number_of_features):
 
     # Replace NaN's by a special number
     raw_features = keras.ops.nan_to_num(inputs, nan=mask_value)
+
+    # Clip features to mitigate outliers
+    raw_features = keras.ops.clip(raw_features, x_min=-clip_value, x_max=clip_value)
 
     # 3D tensor with axes for samples, tracks and features
     reshaped_features = keras.layers.Reshape((num_tracks, num_features))(raw_features)

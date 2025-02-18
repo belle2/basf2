@@ -58,7 +58,7 @@ def add_collision_dqm(path, components=None, dqm_environment="expressreco", dqm_
         # KLM2 (requires mu+ particle list from add_analysis_dqm)
         if (components is None or 'KLM' in components):
             path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM2',
-                            MinimalMatchingDigits=12,
+                            MinimalMatchingDigits=14,
                             MinimalMatchingDigitsOuterLayers=0,
                             MinimalMomentumNoOuterLayers=4.0)
 

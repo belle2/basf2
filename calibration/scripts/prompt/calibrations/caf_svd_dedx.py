@@ -15,7 +15,7 @@ import basf2 as b2
 
 import modularAnalysis as ma
 import vertex as vx
-import reconstruction as re
+from reconstruction import prepare_user_cdst_analysis
 
 settings = CalibrationSettings(
     name="caf_svd_dedx",
@@ -59,32 +59,15 @@ def create_path(rerun_reco, isMC, expert_config):
     max_events_per_file = expert_config["MaxEvtsPerFile"]
 
     if rerun_reco:
-        rec_path.add_module(
-            'RootInput',
-            branchNames=[
-                'RawARICHs',
-                'RawCDCs',
-                'RawECLs',
-                'RawFTSWs',
-                'RawKLMs',
-                'RawPXDs',
-                'RawSVDs',
-                'RawTOPs',
-                'RawTRGs',
-                'RawDataBlock',
-                'RawCOPPER'],
-            entrySequences=[f'0:{max_events_per_file - 1}'],
-            logLevel=b2.LogLevel.ERROR)
-        if not isMC:
-            re.add_unpackers(path=rec_path)
-        else:
+        rec_path.add_module('RootInput')
+        if isMC:
             rec_path.add_module("Gearbox")
             rec_path.add_module("Geometry")
 
-        re.add_reconstruction(path=rec_path, pruneTracks=False)
-        rec_path.add_module('VXDDedxPID')
+        prepare_user_cdst_analysis(rec_path)
     else:
-        rec_path.add_module('RootInput')
+        rec_path.add_module('RootInput', entrySequences=[f'0:{max_events_per_file - 1}']
+                            )
 
     # Fill particle lists
     ma.fillParticleList("pi+:all", "", path=rec_path)

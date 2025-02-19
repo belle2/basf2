@@ -59,15 +59,15 @@ def create_path(rerun_reco, isMC, expert_config):
     max_events_per_file = expert_config["MaxEvtsPerFile"]
 
     if rerun_reco:
-        rec_path.add_module('RootInput')
+        rec_path.add_module('RootInput', entrySequences=[f'0:{max_events_per_file - 1}']
+                            )
         if isMC:
             rec_path.add_module("Gearbox")
             rec_path.add_module("Geometry")
 
         prepare_user_cdst_analysis(rec_path)
     else:
-        rec_path.add_module('RootInput', entrySequences=[f'0:{max_events_per_file - 1}']
-                            )
+        rec_path.add_module('RootInput')
 
     # Fill particle lists
     ma.fillParticleList("pi+:all", "", path=rec_path)

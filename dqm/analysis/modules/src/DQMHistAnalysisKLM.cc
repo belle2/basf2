@@ -523,7 +523,6 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   // Define variables for text and alarm positioning
   double xAlarm = 0.15, yAlarm = 0.8;
   int message_counter = 0;
-  std::string name, alarm;
 
   // Determine if histogram is BKLM or EKLM and process accordingly
   bool isBKLM = histName.find("bklm") != std::string::npos;

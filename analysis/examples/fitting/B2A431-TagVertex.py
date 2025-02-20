@@ -44,7 +44,7 @@ from modularAnalysis import variablesToNtuple
 # Add signal MC files for release 9.
 # 150000 events!
 # Consider using -n flag in command line to limit number of events, e.g.:
-# > basf2 B2A410-TagVertex.py -n 1000
+# > basf2 B2A431-TagVertex.py -n 1000
 
 # create path
 my_path = b2.create_path()
@@ -96,7 +96,7 @@ bvars = vc.inv_mass + vc.deltae_mbc + \
 
 
 # Saving variables to ntuple
-output_file = 'B2A410-TagVertex.root'
+output_file = 'B2A431-TagVertex.root'
 variablesToNtuple('B0:jpsiks', bvars,
                   filename=output_file, treename='B0tree', path=my_path)
 

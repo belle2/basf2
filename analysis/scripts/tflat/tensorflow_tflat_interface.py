@@ -147,13 +147,13 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     callbacks = [tf.keras.callbacks.EarlyStopping(
         monitor='val_loss',
         min_delta=0,
-        patience=7,
+        patience=10,
         verbose=1,
         mode='auto',
         baseline=None,
         restore_best_weights=True)]
 
-    state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=256, epochs=100, callbacks=callbacks, verbose=1)
+    state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=256, epochs=200, callbacks=callbacks, verbose=1)
 
     return False
 

@@ -21,6 +21,8 @@ os.environ['PGUSER'] = 'g0db'
 # Add the necessary global tag
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
+b2.set_random_seed("B_converted_apply")
+
 # Create path
 path = b2.create_path()
 

@@ -77,13 +77,13 @@ raveFit('D0:du', 0.0, daughtersUpdate=True, path=my_path)
 
 # reconstruct 3 times the D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
-# and D* CMS momentum > 2.5 GeV
+# and D* CMS momentum > 2 GeV
 reconstructDecay('D*+:1 -> D0:kpi pi+:all',
-                 '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
+                 '0.0 <= Q < 0.02 and 2 < useCMSFrame(p) < 5.5', path=my_path)
 reconstructDecay('D*+:2 -> D0:kpi pi+:all',
-                 '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
+                 '0.0 <= Q < 0.02 and 2 < useCMSFrame(p) < 5.5', path=my_path)
 reconstructDecay('D*+:3 -> D0:kpi pi+:all',
-                 '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
+                 '0.0 <= Q < 0.02 and 2 < useCMSFrame(p) < 5.5', path=my_path)
 
 # perform MC matching (MC truth association)
 matchMCTruth('D*+:1', path=my_path)

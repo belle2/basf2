@@ -18,7 +18,7 @@ CDCDedx1DCellAlgorithm::CDCDedx1DCellAlgorithm() :
   CalibrationAlgorithm("CDCDedxElectronCollector"),
   m_eaMin(-TMath::Pi() / 2),
   m_eaMax(+TMath::Pi() / 2),
-  m_eaBin(316),
+  m_eaB(316),
   m_dedxMin(0.0),
   m_dedxMax(5.0),
   m_dedxBin(250),
@@ -67,7 +67,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   ttree->SetBranchAddress("costh", &costh);
 
   //repair nbins if they are not divisible accordingly
-  m_eaBin = m_eaBin * m_binSplit;
+  m_eaBin = m_eaB * m_binSplit;
   m_eaBW = (m_eaMax - m_eaMin) / m_eaBin;
 
   //Settings of variables bins
@@ -210,6 +210,11 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   }
 
   delete hptcosth;
+  m_eaBinLocal.clear();
+  for (int il = 0; il < 2; il++) {
+    m_binValue[il].clear();
+    m_binIndex[il].clear();
+  }
   return c_OK;
 }
 

@@ -35,8 +35,6 @@ import pdg
 # create path
 mypath = b2.create_path()
 
-b2.set_log_level(b2.LogLevel.WARNING)
-
 # Input file(s).
 inputMdst(filename=b2.find_file('darkphotonmumu_mdst.root', 'examples', False),
           path=mypath)

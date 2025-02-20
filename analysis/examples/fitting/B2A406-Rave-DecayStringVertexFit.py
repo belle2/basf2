@@ -45,7 +45,6 @@ my_path = b2.create_path()
 inputMdst(filename=b2.find_file('B02pi0D0_D2kpi_B2Dstarpi_Dstar2Dpi_D2kpi.root', 'examples', False),
           path=my_path)
 
-
 # use standard final state particle lists
 #
 # creates "pi+:all" ParticleList (and c.c.)

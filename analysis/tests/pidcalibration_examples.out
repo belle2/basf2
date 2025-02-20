@@ -1,0 +1,15 @@
+[INFO] Steering file: analysis/tests/pidcalibration_examples.py
+TFile: 03_ApplyWeight.root
+TTree: variables
+TBranch: __experiment__, 0
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 4
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: pionID, 2.944e-19
+TBranch: kaonID, 1.452e-41
+TBranch: weightedPionID__boPIDCalibrationWeight_Example__bc, 1.777e-12
+TBranch: weightedKaonID__boPIDCalibrationWeight_Example__bc, 3.183e-34

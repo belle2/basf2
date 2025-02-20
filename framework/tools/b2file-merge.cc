@@ -327,7 +327,7 @@ The following restrictions apply:
   // OK we have a valid FileMetaData and merged all persistent objects, now do
   // the conversion of the event trees and create the output file.
   auto output = std::unique_ptr<TFile>{TFile::Open(outputfilename.c_str(), "RECREATE")};
-  if (output->IsZombie()) {
+  if (output == nullptr or output->IsZombie()) {
     B2ERROR("Could not create output file " << std::quoted(outputfilename));
     return 1;
   }
@@ -337,6 +337,8 @@ The following restrictions apply:
     for (const auto& input : inputfilenames) {
       B2INFO("processing events from " << std::quoted(input + ":" + treeName));
       auto tfile = std::unique_ptr<TFile>{TFile::Open(input.c_str(), "READ")};
+      // At this point, we already checked that the input files are valid and exist
+      // so it's safe to access tfile directly
       auto* tree = dynamic_cast<TTree*>(tfile->Get(treeName.c_str()));
       if (!outputEventTree){
         output->cd();

@@ -78,20 +78,19 @@ bool DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
   return false; // histogram didn't change
 }
 
-// void DQMHistAnalysisModule::addRef(const std::string& dirname, const std::string& histname, TH1* ref)
-// {
-//   std::string fullname;
-//   if (dirname.size() > 0) {
-//     fullname = dirname + "/" + histname;
-//   } else {
-//     fullname = histname;
-//   }
-//   auto it = s_refList.find(fullname);
-//   if (it == s_refList.end()) {
-//     B2DEBUG(1, "Did not find histogram " << fullname << "in s_refList, so inserting now.");
-//     s_refList.insert({fullname, ref});
-//   }
-// }
+void DQMHistAnalysisModule::addRefHist(const std::string& dirname, TH1* hist)
+{
+  string histname = hist->GetName();
+  std::string name = dirname + "/" + histname;
+  auto& n = s_refList[name];
+  n.m_orghist_name = name;
+  n.m_refhist_name = "ref/" + name;
+  hist->SetName((n.m_refhist_name).c_str());
+  hist->SetDirectory(0);
+  n.setRefHist(hist); // transfer ownership!
+  n.setRefCopy(nullptr);
+  n.setCanvas(nullptr);
+}
 
 void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::EDeltaType t, int p,
                                         unsigned int a)

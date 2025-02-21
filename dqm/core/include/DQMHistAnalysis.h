@@ -322,14 +322,12 @@ namespace Belle2 {
     static bool addHist(const std::string& dirname,
                         const std::string& histname, TH1* h);
 
-    // /**
-    //  * Add reference.
-    //  * @param dirname The name of the directory.
-    //  * @param histname The name of the histogram.
-    //  * @param ref The TH1 pointer for the reference.
-    //  */
-    // void addRef(const std::string& dirname,
-    //             const std::string& histname, TH1* ref);
+    /**
+     * Add reference histogram.
+     * @param dirname The name of the directory.
+     * @param hist The TH1 pointer for the reference.
+    */
+    void addRefHist(const std::string& dirname, TH1* hist);
 
 
     /**

@@ -201,7 +201,8 @@ namespace Belle2 {
      * Get the list of the reference histograms.
      * @return The list of the reference  histograms.
      */
-    static /*const*/ RefList& getRefList() { return s_refList;};
+    // Unused:
+    //static const RefList& getRefList() { return s_refList;};
 
     /**
      * Get the Run Type.

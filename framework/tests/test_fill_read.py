@@ -1,5 +1,7 @@
+import basf2  # noqa: needed to load pythonizations
 import ROOT
 from ROOT.Belle2 import VxdID, PXDDigit
+
 
 import unittest
 import numpy as np

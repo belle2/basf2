@@ -101,27 +101,29 @@ def _PyDBArray__iter__(self):
         yield self[i]
 
 
-def _wrap_fill_array(func):
-    type_table = {"short": "short",
-                  "unsigned short": "ushort",
-                  "int": "intc",
-                  "unsigned int": "uintc",
-                  "long": "long",
-                  "unsigned long": "ulong",
-                  "float": "single",
-                  "double": "double",
-                  "long double": "longdouble",
-                  "Belle2::VxdID": "ushort"}
+conv_type_table = {"int16": "short *",
+                   "uint16": "unsigned short *",
+                   "int32": "int *",
+                   "uint32": "unsigned int *",
+                   "int64": "long *",
+                   "uint64": "unsigned long *",
+                   "float32": "float *",
+                   "float64": "double *",
+                   "float96": "long double *"}
 
-    conv_type_table = {"int16": "short *",
-                       "uint16": "unsigned short *",
-                       "int32": "int *",
-                       "uint32": "unsigned int *",
-                       "int64": "long *",
-                       "uint64": "unsigned long *",
-                       "float32": "float *",
-                       "float64": "double *",
-                       "float96": "long double *"}
+type_table = {"short": "short",
+              "unsigned short": "ushort",
+              "int": "intc",
+              "unsigned int": "uintc",
+              "long": "long",
+              "unsigned long": "ulong",
+              "float": "single",
+              "double": "double",
+              "long double": "longdouble",
+              "Belle2::VxdID": "ushort"}
+
+
+def _wrap_fill_array(func):
 
     def fill_array(pyStoreArray, **kwargs):
         import numpy as np

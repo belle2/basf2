@@ -123,25 +123,26 @@ type_table = {"short": "short",
               "Belle2::VxdID": "ushort"}
 
 
+class ConstructorNotFoundError(Exception):
+    def __init__(self, members, list_constructors, obj_name):
+        self.message = "No corresponding constructor found. Looking for signature: \n"
+        self.d = members
+        self.list_constructors = list_constructors
+        self.name = obj_name
+        self.message = self.message + self.name + "("
+        self.message = (self.message +
+                        ", ".join([" ".join(i) for i in list(zip(self.d.values(), self.d.keys()))]) +
+                        ")\n Available constructors:\n")
+        for lis in list_constructors:
+            self.message = (self.message +
+                            self.name + "(" + ", ".join([" ".join(i) for i in list(zip(lis.values(), lis.keys()))]) + ")\n")
+        super().__init__(self.message)
+
+
 def _wrap_fill_array(func):
 
     def fill_array(pyStoreArray, **kwargs):
         import numpy as np
-
-        class ConstructorNotFoundError(Exception):
-            def __init__(self, members, list_constructors, obj_name):
-                self.message = "No corresponding constructor found. Looking for signature: \n"
-                self.d = members
-                self.list_constructors = list_constructors
-                self.name = obj_name
-                self.message = self.message + self.name + "("
-                self.message = (self.message +
-                                ", ".join([" ".join(i) for i in list(zip(self.d.values(), self.d.keys()))]) +
-                                ")\n Available constructors:\n")
-                for lis in list_constructors:
-                    self.message = (self.message +
-                                    self.name + "(" + ", ".join([" ".join(i) for i in list(zip(lis.values(), lis.keys()))]) + ")\n")
-                super().__init__(self.message)
 
         list_constructors = []
 

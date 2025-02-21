@@ -11,5 +11,5 @@ TBranch: __eventType__,
 TBranch: __weight__, 1
 TBranch: pionID, 2.944e-19
 TBranch: kaonID, 1.452e-41
-TBranch: weightedPionID__boPIDCalibrationWeight_Example__bc, 1.777e-12
-TBranch: weightedKaonID__boPIDCalibrationWeight_Example__bc, 3.183e-34
+TBranch: weightedPionID__boPIDCalibrationWeight_Example__bc, 1.999e-12
+TBranch: weightedKaonID__boPIDCalibrationWeight_Example__bc, 3.759e-34

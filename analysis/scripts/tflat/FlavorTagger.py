@@ -33,7 +33,7 @@ def get_variables(particle_list, ranked_variable, variables=None, particleNumber
     return var_list
 
 
-def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier='standard',
+def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier='standard_tflat',
                  target='qrCombined', overwrite=False,
                  classifier_args=None,
                  train_valid_fraction=.92, mva_steering_file='analysis/scripts/tflat/tensorflow_tflat_interface.py',
@@ -52,11 +52,7 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
     :param target: string, target variable
     :param overwrite: bool, overwrite already (locally!) existing training
     :param classifier_args: dictionary, customized arguments for tflat
-     possible attributes of the dictionary are:
-     lr_dec_rate: learning rate decay rate
-     lr_init: learning rate initial value
-    :param train_valid_fraction: float, train-valid fraction (.92). If transform to probability is
-     enabled, train valid fraction will be split into a test set (.5)
+    :param train_valid_fraction: float, train-valid fraction (.92).
     :param maskName: get ROE particles from a specified ROE mask
     :param path: basf2 path obj
     :return: None

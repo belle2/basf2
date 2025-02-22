@@ -173,15 +173,15 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
         expert_module = basf2.register_module('MVAExpert')
         expert_module.param('listNames', particle_lists)
         expert_module.param('identifier', uniqueIdentifier)
-        expert_module.param('extraInfoName', 'dnn_output')
+        expert_module.param('extraInfoName', 'tflat_output')
 
         roe_path.add_module(expert_module)
 
         flavorTaggerInfoFiller = basf2.register_module('FlavorTaggerInfoFiller')
-        flavorTaggerInfoFiller.param('DNNmlp', True)
+        flavorTaggerInfoFiller.param('TFLATnn', True)
         roe_path.add_module(flavorTaggerInfoFiller)
 
         # Create standard alias for the output of the flavor tagger
-        vm.addAlias('DNN_qrCombined', 'qrOutput(DNN)')
+        vm.addAlias('TFLAT_qrCombined', 'qrOutput(TFLAT)')
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

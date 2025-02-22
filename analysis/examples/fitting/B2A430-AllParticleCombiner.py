@@ -122,7 +122,7 @@ DepthOfDecayChain = 5
 for i in range(0, DepthOfDecayChain):
     PVParticlesCuts += '[genMotherPDG('
     PVParticlesCuts += str(i)
-    PVParticlesCuts += ') == 10022'
+    PVParticlesCuts += ') == 23'
     for j in range(0, i):
         for WeaklyDecayingParticle in WeaklyDecayingParticles:
             PVParticlesCuts += ' and abs(genMotherPDG('
@@ -169,7 +169,7 @@ d0_vars = vu.create_aliases_for_selected(
     'D*+ -> ^D0 pi+', 'D0')
 
 # Saving variables to ntuple
-output_file = 'B2A408-AllParticleCombiner.root'
+output_file = 'B2A430-AllParticleCombiner.root'
 variablesToNtuple('D*+:all', dstar_vars + d0_vars + fs_hadron_vars,
                   filename=output_file, treename='dsttree', path=my_path)
 

@@ -21,7 +21,7 @@ class ExamplesTest(b2tua.ExamplesTest):
         Test supported fitting examples.
         """
 
-        self._test_examples_dir('analysis/examples/fitting/', filepattern="B2A43", nevents=100)
+        self._test_examples_dir('analysis/examples/fitting/', filepattern="*-Rave-")
 
 
 if __name__ == '__main__':

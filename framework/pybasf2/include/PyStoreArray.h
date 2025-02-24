@@ -241,6 +241,7 @@ namespace Belle2 {
     TClonesArray* getPtr();
 
     /** Templated function to fill the PyStoreArray with objects of a certain class (PXDDigits, CDCHits, ...)
+     * This function will append the values to the array if it's not empty.
      * @param len Length of the PyStoreArray.
      * @param args Arrays of length len, one for each of the memebers of the class under consideration.
      *

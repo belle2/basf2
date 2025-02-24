@@ -101,26 +101,26 @@ def _PyDBArray__iter__(self):
         yield self[i]
 
 
-conv_type_table = {"int16": "short *",
-                   "uint16": "unsigned short *",
-                   "int32": "int *",
-                   "uint32": "unsigned int *",
-                   "int64": "long *",
-                   "uint64": "unsigned long *",
-                   "float32": "float *",
-                   "float64": "double *",
-                   "float96": "long double *"}
+numpy_to_cpp = {"int16": "short *",
+                "uint16": "unsigned short *",
+                "int32": "int *",
+                "uint32": "unsigned int *",
+                "int64": "long *",
+                "uint64": "unsigned long *",
+                "float32": "float *",
+                "float64": "double *",
+                "float96": "long double *"}
 
-type_table = {"short": "short",
-              "unsigned short": "ushort",
-              "int": "intc",
-              "unsigned int": "uintc",
-              "long": "long",
-              "unsigned long": "ulong",
-              "float": "single",
-              "double": "double",
-              "long double": "longdouble",
-              "Belle2::VxdID": "ushort"}
+cpp_to_numpy = {"short": "short",
+                "unsigned short": "ushort",
+                "int": "intc",
+                "unsigned int": "uintc",
+                "long": "long",
+                "unsigned long": "ulong",
+                "float": "single",
+                "double": "double",
+                "long double": "longdouble",
+                "Belle2::VxdID": "ushort"}
 
 
 class ConstructorNotFoundError(Exception):
@@ -162,19 +162,19 @@ def _wrap_fill_array(func):
                     break
 
         else:
-            m_d = {list(kwargs.keys())[i]: conv_type_table[type(list(kwargs.values())[i]
-                                                                [0]).__name__].split("*")[0] for i in range(len(kwargs.keys()))}
+            m_d = {list(kwargs.keys())[i]: numpy_to_cpp[type(list(kwargs.values())[i]
+                                                             [0]).__name__].split("*")[0] for i in range(len(kwargs.keys()))}
             raise ConstructorNotFoundError(m_d, list_constructors, obj_classname)
 
         arr_types = []
         for k in kwargs.keys():
-            if kwargs[k][0].dtype != np.dtype(type_table[d[k]]):
+            if kwargs[k][0].dtype != np.dtype(cpp_to_numpy[d[k]]):
                 try:
-                    kwargs[k] = kwargs[k].astype(type_table[d[k]])
+                    kwargs[k] = kwargs[k].astype(cpp_to_numpy[d[k]])
                 except ValueError:
                     raise ValueError((f"Impossible to convert type of input arrays ({type(kwargs[k][0]).__name__})" +
-                                      f" into the type of the corresponding class member '{k}' ({np.dtype(type_table[d[k]])})"))
-            arr_types.append(conv_type_table[type(kwargs[k][0]).__name__])
+                                      f" into the type of the corresponding class member '{k}' ({np.dtype(cpp_to_numpy[d[k]])})"))
+            arr_types.append(numpy_to_cpp[type(kwargs[k][0]).__name__])
 
         l_arr = list(kwargs.values())
         if not all(len(l_arr[0]) == len(arr) for arr in l_arr[1:]):
@@ -188,26 +188,6 @@ def _wrap_fill_array(func):
 
 
 def _wrap_read_array(func):
-    type_table = {"short": "short",
-                  "unsigned short": "ushort",
-                  "int": "intc",
-                  "unsigned int": "uintc",
-                  "long": "long",
-                  "unsigned long": "ulong",
-                  "float": "single",
-                  "double": "double",
-                  "long double": "longdouble",
-                  "Belle2::VxdID": "ushort"}
-
-    conv_type_table = {"int16": "short *",
-                       "uint16": "unsigned short *",
-                       "int32": "int *",
-                       "uint32": "unsigned int *",
-                       "int64": "long *",
-                       "uint64": "unsigned long *",
-                       "float32": "float *",
-                       "float64": "double *",
-                       "float96": "long double *"}
 
     def read_array(pyStoreArray):
         import numpy as np
@@ -217,9 +197,9 @@ def _wrap_read_array(func):
         obj_classname = obj_class.GetName()
 
         for ar in obj_class.GetMethodAny("fillValues").GetListOfMethodArgs():
-            kwargs.setdefault(ar.GetName(), np.zeros(len(pyStoreArray), dtype=type_table[ar.GetFullTypeName().split("*")[0]]))
+            kwargs.setdefault(ar.GetName(), np.zeros(len(pyStoreArray), dtype=cpp_to_numpy[ar.GetFullTypeName().split("*")[0]]))
 
-        l_types = [conv_type_table[type(kwargs[v][0]).__name__] for v in kwargs.keys()]
+        l_types = [numpy_to_cpp[type(kwargs[v][0]).__name__] for v in kwargs.keys()]
 
         func[(obj_classname, *l_types)](pyStoreArray, *kwargs.values())
 

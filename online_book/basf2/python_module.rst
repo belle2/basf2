@@ -108,6 +108,9 @@ More advanced examples
 - :file:`reconstruction/examples/plot_LL_diff.py` - Gets PID log-likelihoods,
   uses relations to get corresponding MC truth and fills ROOT histograms
   accordingly
+- :file:`framework/examples/fill_array_example.py` - Shows example usage of
+  Python interface to fill a PyStoreArray with digits without having to
+  explicitly instantiate the object, thus making the operation faster 
 
 .. include:: ../lesson_footer.rstinclude
 

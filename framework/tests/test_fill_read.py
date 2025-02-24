@@ -8,6 +8,9 @@ import numpy as np
 
 
 class TestFillReadArray(unittest.TestCase):
+    '''
+    Class that tests the function readArray and fillArray
+    '''
 
     def test_readArray(self):
         l_pxd = []

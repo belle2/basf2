@@ -124,6 +124,22 @@ cpp_to_numpy = {"short": "short",
 
 
 class ConstructorNotFoundError(Exception):
+    '''
+    Class that throws an exception when a specific constructor is not found.
+    The error message will contain the signature of the wanted constructor,
+    as well as the signature of the available constructors.
+    Parameters:
+    -----------
+    members: dictionary
+        Contains the name of the parameters of the wanted constructor and their types
+
+    list_constructors: list of dictionaries
+        Contains all the available constructors, with the names of their parameters
+        and their types
+
+    obj_name: string
+        Name of the class of which the constructor is wanted
+    '''
     def __init__(self, members, list_constructors, obj_name):
         self.message = "No corresponding constructor found. Looking for signature: \n"
         self.d = members

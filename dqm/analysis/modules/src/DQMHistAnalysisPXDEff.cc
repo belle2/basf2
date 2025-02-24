@@ -10,7 +10,6 @@
 // Description : DQM module, which gives histograms showing the efficiency of PXD sensors
 //-
 
-
 #include <dqm/analysis/modules/DQMHistAnalysisPXDEff.h>
 #include <TROOT.h>
 #include <TLatex.h>
@@ -294,7 +293,7 @@ void DQMHistAnalysisPXDEffModule::event()
   {
     // First create some 2d overview of efficiency for all modules
     // This is not taken into account for efficiency calculation as
-    // there may be update glitches dues to seperate histograms
+    // there may be update glitches dues to separate histograms
     // The histograms
     bool updateinner = false, updateouter = false;
     for (auto aPXDModule : m_PXDModules) {
@@ -433,7 +432,7 @@ void DQMHistAnalysisPXDEffModule::event()
       // workaround for excluded module
       if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
 
-      // get the errors and check for limits for each bin seperately ...
+      // get the errors and check for limits for each bin separately ...
 
       if (nhit >= m_minEntries) {
         error_flag |= check_error_level(bin, aModule);
@@ -500,6 +499,7 @@ void DQMHistAnalysisPXDEffModule::event()
             tt->SetTextSize(0.035);
             tt->SetTextAngle(90);// Rotated
             tt->SetTextAlign(12);// Centered
+            ltmap[it] = tt;
           } else {
             tt->SetY(scale_min);
           }
@@ -618,5 +618,27 @@ void DQMHistAnalysisPXDEffModule::event()
 void DQMHistAnalysisPXDEffModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
+
+  for (VxdID& aPXDModule : m_PXDModules) {
+    if (m_cEffModules[aPXDModule]) delete m_cEffModules[aPXDModule];
+    if (m_eEffModules[aPXDModule]) delete m_eEffModules[aPXDModule];
+  }
+
+  if (m_hEffAllLastTotal) delete m_hEffAllLastTotal;
+  if (m_hEffAllLastPassed) delete m_hEffAllLastPassed;
+
+  if (m_cInnerMap) delete m_cInnerMap;
+  if (m_cOuterMap) delete m_cOuterMap;
+  if (m_hInnerMap) delete m_hInnerMap;
+  if (m_hOuterMap) delete m_hOuterMap;
+
+  if (m_hErrorLine) delete m_hErrorLine;
+  if (m_hWarnLine) delete m_hWarnLine;
+
+  if (m_cEffAll) delete m_cEffAll;
+  if (m_eEffAll) delete m_eEffAll;
+
+  if (m_cEffAllUpdate) delete m_cEffAllUpdate;
+  if (m_eEffAllUpdate) delete m_eEffAllUpdate;
 }
 

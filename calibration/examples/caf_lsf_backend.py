@@ -17,7 +17,6 @@ import basf2 as b2
 import os
 import sys
 
-from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
 
@@ -48,6 +47,8 @@ def main(argv):
         col_test.param('spread', 15)  # Proportional to the probability of algorithm requesting iteration
         col_test.param('granularity', 'run')  # Allows us to execute algorithm over all data, in one big IoV
 
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
+        from ROOT.Belle2 import TestCalibrationAlgorithm
         alg_test = TestCalibrationAlgorithm()
         # Since we're using several instances of the same test algorithm here, we still want the database entries to have
         # different names. TestCalibrationAlgorithm outputs to the database using the prefix name so we change it
@@ -60,12 +61,12 @@ def main(argv):
                                input_files=input_files_test)
 
         # Some optional configuration ####
-        # By default all input files are placed in one big job (-1), this allows you to specify a maxmimum so that
+        # By default all input files are placed in one big job (-1), this allows you to specify a maximum so that
         # subjobs for each set of input files will be created
         cal_test.max_files_per_collector_job = 1
         # Some backends can have arguments passed to them e.g. queue type
         cal_test.backend_args = {"queue": "s"}
-        # The maximium iteration number you will be allowed to reach before the Calibration just completes
+        # The maximum iteration number you will be allowed to reach before the Calibration just completes
         cal_test.max_iterations = 2
         # Since we're using the LSF batch system we'll up the heartbeat from the default to query for when the jobs are all finished
         # No point spamming it

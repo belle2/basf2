@@ -11,15 +11,15 @@
 #pragma link C++ class Belle2::ECLConnectedRegion+; // checksum=0xa7247f52, version=2
 #pragma link C++ class Belle2::ECLPureCsIInfo+; // checksum=0x2710b222, version=2
 #pragma link C++ class Belle2::ECLDigit+; // checksum=0x93164e6c, version=2
-#pragma link C++ class Belle2::ECLCalDigit+; // checksum=0x85c12d90, version=6
-#pragma link C++ class Belle2::ECLDsp+; // checksum=0x71bcc594, version=6
-#pragma link C++ class Belle2::ECLDspWithExtraMCInfo+; // checksum=0x13725e34, version=1
-#pragma link C++ class Belle2::ECLTrig+; // checksum=0x3de50c09, version=3
-#pragma link C++ class Belle2::ECLSimHit+; // checksum=0x67f0e0ff, version=6
+#pragma link C++ class Belle2::ECLCalDigit+; // checksum=0x2beba43a, version=8
+#pragma link C++ class Belle2::ECLDsp+; // checksum=0x2a74d1c2, version=7
+#pragma link C++ class Belle2::ECLDspWithExtraMCInfo+; // checksum=0xaf5bfaae, version=2
+#pragma link C++ class Belle2::ECLTrig+; // checksum=0x79e09991, version=4
+#pragma link C++ class Belle2::ECLSimHit+; // checksum=0x68e9e265, version=7
 #pragma link C++ class Belle2::ECLHit+; // checksum=0xc5a4962f, version=4
 #pragma link C++ class Belle2::ECLDebugHit+; // checksum=0xbe219607, version=1
 #pragma link C++ class Belle2::ECLHitAssignment+; // checksum=0x2bf88ae8, version=1
-#pragma link C++ class Belle2::ECLShower+; // checksum=0x16a46f92, version=17
+#pragma link C++ class Belle2::ECLShower+; // checksum=0xcbb98e2e, version=18
 #pragma link C++ class Belle2::ECLPidLikelihood+; // checksum=0x25e90278, version=3
 
 //----------------------------------------------------------

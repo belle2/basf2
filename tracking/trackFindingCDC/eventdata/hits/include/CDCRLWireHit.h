@@ -51,8 +51,8 @@ namespace Belle2 {
        *  Constructs an oriented wire hit.
        *  @param wireHit      The wire hit the oriented hit is associated with.
        *  @param rlInfo       The right left passage information of the _wire_ relative to the track
-       *  @param driftLength  The reestimated drift length
-       *  @param driftLengthVariance  The reestimated drift length variance
+       *  @param driftLength  The re-estimated drift length
+       *  @param driftLengthVariance  The re-estimated drift length variance
        */
       CDCRLWireHit(const CDCWireHit* wireHit,
                    ERightLeft rlInfo,
@@ -60,13 +60,13 @@ namespace Belle2 {
                    double driftLengthVariance);
 
       /**
-       *  Constructs the average of two wire hits with right left passage informations.
+       *  Constructs the average of two wire hits with right left passage information.
        *  Takes the average of the estimated drift lengths.
        */
       static CDCRLWireHit average(const CDCRLWireHit& rlWireHit1, const CDCRLWireHit& rlWireHit2);
 
       /**
-       *  Constructs the average of three wire hits with right left passage informations.
+       *  Constructs the average of three wire hits with right left passage information.
        *  Takes the average of the estimated drift lengths.
        */
       static CDCRLWireHit average(const CDCRLWireHit& rlWireHit1,
@@ -90,7 +90,7 @@ namespace Belle2 {
                             m_refDriftLengthVariance);
       }
 
-      /// Swiches the right left passage to its opposite inplace.
+      /// Switches the right left passage to its opposite in place.
       void reverse()
       {
         m_rlInfo = NRightLeft::reversed(m_rlInfo);
@@ -268,14 +268,14 @@ namespace Belle2 {
       /// Memory for the reference to the assiziated wire hit.
       const CDCWireHit* m_wireHit = nullptr;
 
-      /// Memory for the right left passage information of the oriented wire hit.
-      ERightLeft m_rlInfo = ERightLeft::c_Unknown;
-
       /// Memory for the reestimated drift length
       double m_refDriftLength = 0.0;
 
       /// Memory for the reestimated drift length variance
       double m_refDriftLengthVariance = 0.0;
+
+      /// Memory for the right left passage information of the oriented wire hit.
+      ERightLeft m_rlInfo = ERightLeft::c_Unknown;
     };
 
     /// Output operator. Help debugging.

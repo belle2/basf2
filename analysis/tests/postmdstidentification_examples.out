@@ -1,0 +1,110 @@
+[INFO] Steering file: analysis/tests/postmdstidentification_examples.py
+TFile: ChargedPidMVAModule.root
+TTree: my_deuteron
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 10
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02525
+TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.0007314
+TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.1366
+TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.8374
+TBranch: pidChargedBDTScore__bo2212__cm__spALL__bc, nan
+TBranch: pidChargedBDTScore__bo1000010020__cm__spALL__bc, nan
+TTree: my_p
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 10
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02525
+TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.0007314
+TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.1366
+TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.8374
+TBranch: pidChargedBDTScore__bo2212__cm__spALL__bc, nan
+TBranch: pidChargedBDTScore__bo1000010020__cm__spALL__bc, nan
+TTree: my_K
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 10
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02525
+TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.0007314
+TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.1366
+TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.8374
+TBranch: pidChargedBDTScore__bo2212__cm__spALL__bc, nan
+TBranch: pidChargedBDTScore__bo1000010020__cm__spALL__bc, nan
+TTree: my_pi
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 10
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02525
+TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.0007314
+TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.1366
+TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.8374
+TBranch: pidChargedBDTScore__bo2212__cm__spALL__bc, nan
+TBranch: pidChargedBDTScore__bo1000010020__cm__spALL__bc, nan
+TTree: my_mu
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 10
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.01819
+TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.002985
+TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.7828
+TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.1961
+TBranch: pidChargedBDTScore__bo2212__cm__spALL__bc, nan
+TBranch: pidChargedBDTScore__bo1000010020__cm__spALL__bc, nan
+TTree: my_e
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 10
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.01819
+TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.002985
+TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.7828
+TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.1961
+TBranch: pidChargedBDTScore__bo2212__cm__spALL__bc, nan
+TBranch: pidChargedBDTScore__bo1000010020__cm__spALL__bc, nan
+TFile: LowEnergyPi0Identification.root
+TTree: t1
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 38
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: px, 0.04916
+TBranch: py, 0.2831
+TBranch: pz, -0.1112
+TBranch: pt, 0.2873
+TBranch: p, 0.3081
+TBranch: E, 0.3335
+TBranch: InvM, 0.1277
+TBranch: identification, 0.1694

@@ -8,14 +8,11 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
-#include <framework/gearbox/Unit.h>
 
 #include <analysis/dbobjects/ChargedPidMVAWeights.h>
 
 #include <gtest/gtest.h>
 #include <random>
-
-#include <TH2F.h>
 
 namespace Belle2 {
 

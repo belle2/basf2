@@ -30,7 +30,7 @@ from variables import variables as vm
 # TODO: Add liaison name and email address
 __liaison__ = ""
 __liaison_leptonID__ = "Marcel Hohmann"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -44,7 +44,7 @@ class SystematicsDstar(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    ApplyHLTHadronCut = False
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdK("all", path=path)
@@ -147,7 +147,7 @@ class SystematicsTracking(BaseSkim):
 
     def DstarToD0PiPartList(self, path):
         """Build DstarToD0PiPartList lists for systematics skims."""
-        ma.fillParticleList("pi+:fromks", "chiProb > 0.001 and pionID > 0.1 and d0 > 0.1", path=path)
+        ma.fillParticleList("pi+:fromks", "chiProb > 0.001 and pionID > 0.1 and dr > 0.1", path=path)
 
         # D-
         DminusCuts = "1.0 < M < 1.75"
@@ -420,7 +420,7 @@ class SystematicsRadEE(BaseSkim):
     selection on the photon as the sample must be unbiased.
 
     As this retains a lot of bhabha events (by construction) we allow for prescaling
-    (and prefer prescaled rather than a biased sampe by requiring any selection on the
+    (and prefer prescaled rather than a biased sample by requiring any selection on the
     photon or too much of a cut on the recoil momentum).
 
     Prescales are given in standard trigger terms (reciprocal), so prescale of 100 is 1%
@@ -507,7 +507,7 @@ class SystematicsLambda(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    ApplyHLTHadronCut = False
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdLambdas(path=path)
@@ -697,8 +697,6 @@ class SystematicsJpsi(BaseSkim):
     __contact__ = __liaison_leptonID__
     __category__ = "systematics, leptonID"
 
-    ApplyHLTHadronCut = False
-
     def load_standard_lists(self, path):
         stdMu("all", path=path)
         stdE("all", path=path)
@@ -730,7 +728,7 @@ class SystematicsJpsi(BaseSkim):
         ma.correctBrems('e+:brems_corrected', 'e+:all', 'gamma:brems', path=path)
         ma.reconstructDecay(
             "J/psi:systematics_ee -> e+:brems_corrected e-:brems_corrected",
-            f'{Cuts} and [daughter(0,electronID_noTOP)>0.1 or daughter(1,electronID_noTOP)>0.1]',
+            f'{Cuts} and [daughter(0,electronID)>0.1 or daughter(1,electronID)>0.1]',
             path=path)
         return "J/psi:systematics_ee"
 
@@ -820,7 +818,7 @@ class SystematicsBhabha(BaseSkim):
 
     def build_lists(self, path):
         goodtrack = "abs(dz) < 5 and abs(dr) < 2"
-        goodtrackwithPID = f"{goodtrack} and electronID_noTOP > 0.95 and clusterTheta > 0.59"\
+        goodtrackwithPID = f"{goodtrack} and electronID > 0.95 and clusterTheta > 0.59"\
             " and clusterTheta < 2.15 and useCMSFrame(clusterE) > 2"
         ma.cutAndCopyList("e+:tight", "e+:all", goodtrackwithPID, path=path)
         ma.cutAndCopyList("e+:loose", "e+:all", goodtrack, path=path)
@@ -878,13 +876,15 @@ class SystematicsCombinedLowMulti(CombinedSkim):
           SystematicsFourLeptonFromHLTFlag,
           SystematicsRadmumuFromHLTFlag,
           SystematicsBhabha,
+          SystematicsPhiGamma,
+          SystematicsRadMuMu,
           TauThrust.
 
       This is required for  technical (data production) reasons, as it keeps the number of files low.
       See the definitions of the individual skims for the details.
     """
     __authors__ = ["Marcel Hohmann"]
-    __description__ = "Combined Skim of the systematic low multi skims: FourLepton, Radmumu, Bhabha, TauThrust."
+    __description__ = "Combined Skim of the systematic low multi skims: FourLepton, Radmumu, Bhabha, PhiGamma, RadMuMu, TauThrust."
     __contact__ = __liaison_leptonID__
     __category__ = "performance, leptonID"
     __name__ = "SystematicsCombinedLowMulti"
@@ -902,5 +902,11 @@ class SystematicsCombinedLowMulti(CombinedSkim):
         kwargs.setdefault('udstOutput', False)
 
         from skim.WGs.taupair import TauThrust
-        skims_list = [SystematicsFourLeptonFromHLTFlag(), SystematicsRadMuMuFromHLTFlag(), SystematicsBhabha(), TauThrust()]
+        skims_list = [
+            SystematicsFourLeptonFromHLTFlag(),
+            SystematicsRadMuMuFromHLTFlag(),
+            SystematicsBhabha(),
+            SystematicsPhiGamma(),
+            SystematicsRadMuMu(),
+            TauThrust()]
         super().__init__(*skims_list, **kwargs)

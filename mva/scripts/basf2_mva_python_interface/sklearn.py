@@ -37,9 +37,9 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     Create SKLearn classifier and store it in a State object
     """
     from sklearn.ensemble import GradientBoostingClassifier
-    if isinstance(parameters, collections.Mapping):
+    if isinstance(parameters, collections.abc.Mapping):
         clf = GradientBoostingClassifier(**parameters)
-    elif isinstance(parameters, collections.Sequence):
+    elif isinstance(parameters, collections.abc.Sequence):
         clf = GradientBoostingClassifier(*parameters)
     else:
         clf = GradientBoostingClassifier()

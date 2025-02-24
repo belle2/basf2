@@ -31,7 +31,7 @@ output.param('SaveHistos', False)
 output.param('SaveCanvases', True)
 main.add_module(output)
 
-# Process mian path.
+# Process main path.
 b2.process(main)
 
 # Statistics.

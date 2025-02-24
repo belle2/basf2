@@ -39,7 +39,7 @@ namespace Belle2 {
     int getMirrorID() const {return m_id; }
 
     /** Set Mirror Identifier
-     * @param Mirror Identifier
+     * @param id Mirror Identifier
      */
     void setMirrorID(int id) {m_id = id; }
 
@@ -51,7 +51,7 @@ namespace Belle2 {
 
     /**
      * Set Reflectivity of the mirror
-     * @param Reflectivity of the mirror
+     * @param reflectivity Reflectivity of the mirror
      */
     void setMirrorReflectivity(TGraph* reflectivity) {m_reflectivity = reflectivity;}
 

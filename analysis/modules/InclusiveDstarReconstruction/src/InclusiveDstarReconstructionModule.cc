@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #include <analysis/modules/InclusiveDstarReconstruction/InclusiveDstarReconstructionModule.h>
-#include <analysis/utility/PCmsLabTransform.h>
 
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
@@ -29,6 +28,7 @@ InclusiveDstarReconstructionModule::InclusiveDstarReconstructionModule() : Modul
 {
   // Set module properties
   setDescription("Inclusive Dstar reconstruction by estimating the four vector using slow pions");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("decayString", m_decayString, "Input DecayDescriptor string", std::string(""));

@@ -107,7 +107,8 @@ CDCSimpleSimulation::constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> 
       if (&(simpleSimHit.m_wireHit.getWire()) == lastWire)
       {
         ++nSameWire;
-      } else {
+      } else
+      {
         nSameWire = 1;
         lastWire = &(simpleSimHit.m_wireHit.getWire());
       }
@@ -152,7 +153,7 @@ CDCSimpleSimulation::constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> 
     mcTrack.push_back(recoHit3D);
   }
 
-  /// Sort the hits by the order of their occurance
+  /// Sort the hits by the order of their occurrence
   for (CDCTrack& mcTrack : mcTracks) {
     mcTrack.sortByArcLength2D();
   }

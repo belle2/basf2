@@ -8,6 +8,9 @@
 #ifndef TRCGDLSummaryModule_h
 #define TRCGDLSummaryModule_h
 
+#include <vector>
+#include <string>
+
 #include <trg/gdl/dataobjects/TRGGDLUnpackerStore.h>
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 #include <framework/core/Module.h>
@@ -54,6 +57,13 @@ namespace Belle2 {
     int ee_psn[10] = {0};
     int ee_ftd[10] = {0};
     int ee_itd[10] = {0};
+
+    std::vector<std::string> e_inBitsWithPSNMTiming;
+    std::vector<std::string> e_outBitsWithPSNMTiming;
+
+    bool maskInitialized;
+    unsigned int e_inBitWPTMasks[TRGSummary::c_ntrgWords];
+    unsigned int e_outBitWPTMasks[TRGSummary::c_ntrgWords];
 
     /** Debug Level **/
     int _debugLevel;

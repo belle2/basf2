@@ -103,7 +103,8 @@ def loadStdD0_Kpi(path=None):
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D0:Kpi -> K-:GoodTrack pi+:GoodTrack', cut='1.7 < M < 2.0', dmID=1, path=path)
+    ma.reconstructDecay(decayString='D0:Kpi -> K-:GoodTrack pi+:GoodTrack', cut='1.7 < M < 2.0',
+                        dmID=1, path=path)
     return ['D0:Kpi']
 
 
@@ -251,19 +252,8 @@ def loadD0_Kspi0_loose(path):
 
     @param path     modules are added to this path
     """
-
-    Dcuts = '1.5 < M < 2.2'
-
-    D0_Channels = [
-        'K_S0:merged pi0:bth_skim'
-    ]
-
-    D0List = []
-    for chID, channel in enumerate(D0_Channels):
-        ma.reconstructDecay(decayString='D0:Kspi0' + str(chID) + ' -> ' + channel, cut=Dcuts, dmID=chID, path=path)
-        D0List.append('D0:Kspi0' + str(chID))
-        ma.copyLists(outputListName='D0:Kspi0', inputListNames=D0List, path=path)
-    return D0List
+    ma.reconstructDecay('D0:Kspi0 -> K_S0:merged pi0:bth_skim', cut='1.5 < M < 2.2', path=path)
+    return ['D0:Kspi0']
 
 
 def loadD0_Kspipipi0(path):
@@ -273,18 +263,8 @@ def loadD0_Kspipipi0(path):
 
     @param path     modules are added to this path
     """
-
-    Dcuts = '1.8 < M < 1.9'
-
-    D0_Channels = [
-        'K_S0:merged pi+:GoodTrack pi-:GoodTrack pi0:bth_skim'
-    ]
-    D0List = []
-    for chID, channel in enumerate(D0_Channels):
-        ma.reconstructDecay(decayString='D0:Kspipipi0' + str(chID) + ' -> ' + channel, cut=Dcuts, dmID=chID, path=path)
-        D0List.append('D0:Kspipipi0' + str(chID))
-        ma.copyLists(outputListName='D0:Kspipipi0', inputListNames=D0List, path=path)
-    return D0List
+    ma.reconstructDecay('D0:Kspipipi0 -> K_S0:merged pi+:GoodTrack pi-:GoodTrack pi0:bth_skim', '1.8 < M < 1.9', path=path)
+    return ['D0:Kspipipi0']
 
 
 def loadStdDplus(path):
@@ -323,7 +303,8 @@ def loadStdDplus_Kpipi(path=None):
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D+:Kpipi -> K-:GoodTrack pi+:GoodTrack pi+:GoodTrack', cut='1.8 < M < 1.9', dmID=1, path=path)
+    ma.reconstructDecay(decayString='D+:Kpipi -> K-:GoodTrack pi+:GoodTrack pi+:GoodTrack',
+                        cut='1.8 < M < 1.9', dmID=1, path=path)
     return ['D+:Kpipi']
 
 
@@ -336,7 +317,8 @@ def loadStdDplus_Kspi(path=None):
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D+:Kspi -> K_S0:merged pi+:GoodTrack', cut='1.8 < M < 1.9', dmID=2, path=path)
+    ma.reconstructDecay(decayString='D+:Kspi -> K_S0:merged pi+:GoodTrack', cut='1.8 < M < 1.9',
+                        dmID=2, path=path)
     return ['D+:Kspi']
 
 
@@ -396,16 +378,8 @@ def loadStdDstar0_D0pi0_all(path=None):
 
     @param path     modules are added to this path
     """
-    Dstar0Cuts = 'massDifference(0) < 0.16'
-    Dstar0_Channels = ['D0:all pi0:bth_skim',
-                       ]
-
-    Dstar0List = []
-    for chID, channel in enumerate(Dstar0_Channels):
-        ma.reconstructDecay(decayString='D*0:all' + str(chID) + ' -> ' + channel, cut=Dstar0Cuts, dmID=chID, path=path)
-        Dstar0List.append('D*0:all' + str(chID))
-    ma.copyLists(outputListName='D*0:all', inputListNames=Dstar0List, path=path)
-    return Dstar0List
+    ma.reconstructDecay('D*0:all -> D0:all pi0:bth_skim', 'massDifference(0) < 0.16', path=path)
+    return ['D*0:all']
 
 
 def loadStdDstar0_D0pi0_Kpi(path=None):
@@ -479,16 +453,8 @@ def loadStdDstarPlus_D0pi_all(path=None):
 
     @param path     modules are added to this path
     """
-    DstarPlusCuts = 'massDifference(0) < 0.16'
-    DstarPlus_Channels = ['D0:all pi+:GoodTrack',
-                          ]
-
-    DstarPlusList = []
-    for chID, channel in enumerate(DstarPlus_Channels):
-        ma.reconstructDecay(decayString='D*+:std' + str(chID) + ' -> ' + channel, cut=DstarPlusCuts, dmID=chID, path=path)
-        DstarPlusList.append('D*+:std' + str(chID))
-    ma.copyLists(outputListName='D*+:all', inputListNames=DstarPlusList, path=path)
-    return DstarPlusList
+    ma.reconstructDecay('D*+:all -> D0:all pi+:GoodTrack', 'massDifference(0) < 0.16', path=path)
+    return ['D*+:all']
 
 
 def loadStdDstarPlus_D0pi_Kpi(path=None):

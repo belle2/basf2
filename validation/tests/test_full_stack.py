@@ -18,6 +18,7 @@ import requests
 import traceback
 
 # ours
+import b2test_utils
 import validationserver
 import validationpath
 from validationtestutil import check_execute
@@ -151,7 +152,7 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
             rr = [web_r for web_r in found_revs if web_r.value == r]
             if len(rr) == 0:
                 print(
-                    f"Revsion {r} was not found on validation website. It should be there."
+                    f"Revision {r} was not found on validation website. It should be there."
                 )
                 return False
 
@@ -184,9 +185,8 @@ def main():
     Runs two test validations, starts the web server and queries data
     """
 
-    # fixme: See if we can reenable this test or at least run it locally
-    print("TEST SKIPPED: Not properly runnable on build bot", file=sys.stderr)
-    sys.exit(1)
+    # fixme: See if we can re-enable this test or at least run it locally
+    b2test_utils.skip_test("Not properly runnable yet")
     # noinspection PyUnreachableCode
 
     # only run the test on dev machines with splinter installed. Also for the

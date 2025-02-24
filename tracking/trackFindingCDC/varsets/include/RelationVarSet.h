@@ -58,7 +58,7 @@ namespace Belle2 {
 
       /**
        *  Getter for the named references to the individual variables
-       *  Base implementaton returns empty vector
+       *  Base implementation returns empty vector
        */
       std::vector<Named<Float_t*>> getNamedVariables(const std::string& prefix) override
       {

@@ -229,7 +229,7 @@
 			<!-- total outer width, inner part will be placed centered around this -->
 			<width unit="mm">3.280</width>
 		</outer>
-		<!-- parametres for the support of the ribs -->
+		<!-- parameters for the support of the ribs -->
 		<endmount>
 			<Material>Fe</Material>
 		</endmount>

@@ -34,12 +34,11 @@
 #include <fstream>
 #include <sstream>
 
-using namespace std;
 using namespace Belle2;
 using boost::property_tree::ptree;
 
 
-void SVDDetectorConfigurationImporter::importSVDGlobalXMLFile(const std::string& fileName)
+void Belle2::SVDDetectorConfigurationImporter::importSVDGlobalXMLFile(const std::string& fileName)
 {
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun, m_lastExperiment, m_lastRun);
@@ -53,7 +52,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalXMLFile(const std::string&
     B2INFO("Failure :( ua uaa uaa uaa uaaaa)");
 }
 
-void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(const std::string& xmlFileName)
+void Belle2::SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(const std::string& xmlFileName)
 {
   // This is the property tree
   ptree pt;
@@ -139,7 +138,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
 
 }
 
-void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(const std::string& xmlFileName)
+void Belle2::SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(const std::string& xmlFileName)
 {
 
   // This is the property tree

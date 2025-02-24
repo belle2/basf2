@@ -39,7 +39,7 @@ def run():
         """ Class for creation of cosmics extrapolation plot module. """
 
         def set_options_coordinate(self, histogram, description, shifter):
-            """ Set optiions for coordinate plot. """
+            """ Set options for coordinate plot. """
             histogram.SetXTitle('cm')
             histogram.SetYTitle('Events')
             function_list = histogram.GetListOfFunctions()

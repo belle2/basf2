@@ -78,6 +78,7 @@ def add_generator_preselection(
                                             MinPhotonEnergy=MinPhotonEnergy,
                                             MinPhotonTheta=MinPhotonTheta,
                                             MaxPhotonTheta=MaxPhotonTheta,
+                                            applyInCMS=applyInCMS,
                                             stableParticles=stableParticles
                                             )
 
@@ -516,19 +517,21 @@ def add_babayaganlo_generator(
         eventType (str) : event type information
     '''
 
-    babayaganlo = path.add_module('BabayagaNLOInput')
-    babayaganlo.param('eventType', eventType)
+    if finalstate != 'ee' and finalstate != 'gg' and finalstate != 'mm':
+        b2.B2FATAL(f'add_babayaganlo_generator final state not supported: {finalstate}')
+
     if not (fmax == -1.0):
         b2.B2WARNING(f'The BabayagaNLOInput parameter "FMax" will be set to {fmax} instead to the default value (-1.0). '
                      'Please do not do this, unless you are extremely sure about this choice.')
 
-    if finalstate != 'ee' and finalstate != 'gg' and finalstate != 'mm':
-        b2.B2FATAL(f'add_babayaganlo_generator final state not supported: {finalstate}')
-
-    babayaganlo.param('FinalState', finalstate)
-    babayaganlo.param('ScatteringAngleRange', [minangle, 180.0 - minangle])
-    babayaganlo.param('MinEnergy', minenergy)
-    babayaganlo.param('FMax', fmax)
+    path.add_module(
+        'BabayagaNLOInput',
+        eventType=eventType,
+        FinalState=finalstate,
+        ScatteringAngleRange=[minangle, 180.0 - minangle],
+        MinEnergy=minenergy,
+        FMax=fmax
+    )
 
     if generateInECLAcceptance:
         b2.B2INFO(f'The final state {finalstate} is preselected requiring both primary particles within the ECL acceptance.')
@@ -537,11 +540,19 @@ def add_babayaganlo_generator(
                                    emptypath=emptypath,
                                    applyInCMS=False)
 
-        b2.set_module_parameters(path=path,
-                                 name='GeneratorPreselection',
-                                 nChargedMin=2,
-                                 MinChargedTheta=12.4,
-                                 MaxChargedTheta=155.1)
+        if finalstate == 'ee' or finalstate == 'mm':
+            b2.set_module_parameters(path=path,
+                                     name='GeneratorPreselection',
+                                     nChargedMin=2,
+                                     MinChargedTheta=12.4,
+                                     MaxChargedTheta=155.1,)
+
+        elif finalstate == 'gg':
+            b2.set_module_parameters(path=path,
+                                     name='GeneratorPreselection',
+                                     nPhotonMin=2,
+                                     MinPhotonTheta=12.4,
+                                     MaxPhotonTheta=155.1)
 
 
 def add_phokhara_generator(path, finalstate='', eventType=''):

@@ -51,6 +51,9 @@ FragmentationModule::FragmentationModule() : Module()
            FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true));
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string(""));
   addParam("CoherentMixing", m_coherentMixing, "Decay the B0-B0bar coherently (should always be true)", true);
+  addParam("QuarkPairMotherParticle", m_quarkPairMotherParticle,
+           "PDG Code of the mother particle of the quark pair (default Z0 boson)", 23);
+  addParam("AdditionalPDGCodes", m_additionalPDGCodes, "Additional particles used by Pythia", {});
 
   //initialize member variables
   evtgen  = 0;
@@ -350,7 +353,7 @@ int FragmentationModule::addParticleToPYTHIA(const MCParticle& mcParticle)
   bool isVPho  = false;
   bool isQuark = false;
   if (abs(id) >= 1 && abs(id) <= 5) isQuark = true;
-  if (id == 23) isVPho = true;
+  if (id == m_quarkPairMotherParticle) isVPho = true;
 
   if (!(isVPho || isQuark)) return 0;
 
@@ -366,8 +369,8 @@ int FragmentationModule::addParticleToPYTHIA(const MCParticle& mcParticle)
   const double energy = sqrt(mass * mass + p.Mag2());
 
   //add this (anti)quark to the m_PythiaEvent
-  if (id == 23) {
-    m_PythiaEvent->append(23, -22, 0, 0, 2, 3, 0, 0, p.X(), p.Y(), p.Z(), energy, mass);
+  if (id == m_quarkPairMotherParticle) {
+    m_PythiaEvent->append(m_quarkPairMotherParticle, -22, 0, 0, 2, 3, 0, 0, p.X(), p.Y(), p.Z(), energy, mass);
     nVpho++;
   } else if (id > 0) {
     m_PythiaEvent->append(id, 23, 1, 0, 0, 0, 101, 0, p.X(), p.Y(), p.Z(), energy, mass, 20.0);
@@ -410,6 +413,20 @@ void FragmentationModule::loadEvtGenParticleData(Pythia8::Pythia* pythia)
                            EvtPDL::getMinMass(evtgenParticle),
                            EvtPDL::getMaxMass(evtgenParticle),
                            EvtPDL::getctau(evtgenParticle));
+    } else if (std::find(m_additionalPDGCodes.begin(), m_additionalPDGCodes.end(), pdg) != m_additionalPDGCodes.end()) {
+      particleData->addParticle(
+        pdg,
+        EvtPDL::name(evtgenParticle),
+        EvtPDL::name(evtgenAntiParticle),
+        EvtPDL::getSpinType(evtgenParticle),
+        EvtPDL::chg3(evtgenParticle),
+        // colType == 0 for uncolored particles.
+        0,
+        EvtPDL::getMeanMass(evtgenParticle),
+        EvtPDL::getWidth(evtgenParticle),
+        EvtPDL::getMinMass(evtgenParticle),
+        EvtPDL::getMaxMass(evtgenParticle),
+        EvtPDL::getctau(evtgenParticle));
     }
   }
 }

@@ -8,6 +8,7 @@
 
 // own include
 #include <generators/modules/GeneratorPreselectionModule.h>
+#include <analysis/utility/PCmsLabTransform.h>
 #include <framework/gearbox/Unit.h>
 #include <numeric>
 
@@ -109,7 +110,7 @@ void GeneratorPreselectionModule::checkParticle(const MCParticle& mc)
   double theta      = p.Theta();
 
   if (m_applyInCMS) {
-    const ROOT::Math::PxPyPzEVector p_cms = m_initial->getLabToCMS() * mc.get4Vector();
+    const ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(mc.get4Vector());
     energy = p_cms.E();
     mom = p_cms.P();
     theta = p_cms.Theta();

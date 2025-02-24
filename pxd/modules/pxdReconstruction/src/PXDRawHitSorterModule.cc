@@ -42,7 +42,7 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
   addParam("mergeDuplicates", m_mergeDuplicates,
            "If true, take maximum charge of multiple instances of the same fired pixel. Otherwise only keep the first.", true);
   addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a digit to carry", 0);
-  addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits whith out-of-range coordinates", true);
+  addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits with out-of-range coordinates", true);
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
   addParam("digits", m_storeDigitsName, "PXDDigit collection name", string(""));
 }

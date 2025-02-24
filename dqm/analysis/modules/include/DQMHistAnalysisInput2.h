@@ -23,27 +23,25 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <filesystem>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /**
+   * Class to read histograms from a root file for online analysis modules.
+   */
 
   class DQMHistAnalysisInput2Module : public DQMHistAnalysisModule {
 
-    // Public functions
   public:
 
     /**
-     * Constructor.
+     * Constructor
      */
     DQMHistAnalysisInput2Module();
 
+  private:
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisInput2Module();
-
-    /**
-     * Initializer.
+     * Initialize the module.
      */
     void initialize() override final;
 
@@ -67,25 +65,24 @@ namespace Belle2 {
      */
     void terminate() override final;
 
+    /**
+     * Read histogram from key and add to list vector
+     */
+    void addToHistList(std::vector<TH1*>& inputHistList, std::string dirname, TKey* key);
+
     // Data members
-  private:
     /** The name of the shared memory for the histograms. */
     std::string m_mempath;
     /** The name of the memory file (HLT or ExpressReco). */
     /** The refresh interval. */
     int m_interval;
-    /** Whether to remove empty histograms. */
-    bool m_remove_empty;
     /** Whether to enable the run info to be displayed. */
     bool m_enable_run_info;
     /** The canvas hold the basic DQM info. */
-    TCanvas* m_c_info = nullptr;
+    TCanvas* m_c_info{nullptr};
 
     /** DAQ number of processed events */
     int m_nevent = 0;
-
-    /** The opened file */
-    TFile* m_file{nullptr};
 
     /** last change date/time of shm input file */
     std::string m_lastChange;
@@ -94,11 +91,31 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
     /** Exp number */
-    unsigned int m_expno = 0;
+    int m_expno = 0;
     /** Run number */
-    unsigned int m_runno = 0;
+    int m_runno = 0;
     /** Event number */
     unsigned int m_count = 0;
+
+    /** The file name of the analysis for stats */
+    std::string m_statname;
+    /** Write stats of analysis */
+    void write_state(void);
+    /** last time event loop entered */
+    time_t m_last_event{};
+    /** last time begin run entered */
+    time_t m_last_beginrun{};
+    /** last time input file update detected */
+    time_t m_last_file_update{};
+    /** last time input file content has changed */
+    time_t m_last_content_update{};
+    /** Last time input file changes */
+    std::filesystem::file_time_type m_lasttime;
+
+    /** last run */
+    int m_lastRun{-1};
+    /** last exp */
+    int m_lastExp{-1};
   };
 } // end namespace Belle2
 

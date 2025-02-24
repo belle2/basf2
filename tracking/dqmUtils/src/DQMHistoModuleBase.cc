@@ -391,7 +391,7 @@ void DQMHistoModuleBase::DefineTRClusters()
 
     int layerIndex = gTools->getLayerIndex(layerNumber);
 
-    /** Track related clusters - neighbor corelations in Phi */
+    /** Track related clusters - neighbor correlations in Phi */
     std::string name = str(format("CorrelationsPhiLayers_%1%_%2%") % layerNumber % (layerNumber + 1));
     std::string title = str(format("Correlations in Phi for Layers %1% %2%") % layerNumber % (layerNumber + 1));
     std::string xTitle = str(format("angle layer %1% [deg]") % layerNumber);
@@ -399,7 +399,7 @@ void DQMHistoModuleBase::DefineTRClusters()
     m_TRClusterCorrelationsPhi[layerIndex] = Create(name, title, nbins, -range, range, nbins, -range, range,
                                                     xTitle, yTitle, "counts");
 
-    /** Track related clusters - neighbor corelations in Theta */
+    /** Track related clusters - neighbor correlations in Theta */
     name = str(format("CorrelationsThetaLayers_%1%_%2%") % layerNumber % (layerNumber + 1));
     title = str(format("Correlations in Theta for Layers %1% %2%") % layerNumber % (layerNumber + 1));
     m_TRClusterCorrelationsTheta[layerIndex] = Create(name, title, nbins / 2, .0, range, nbins / 2, .0, range,

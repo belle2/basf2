@@ -353,6 +353,19 @@ namespace Belle2 {
       }
       return res;
     }
+    bool decodebool(const std::string& boolstring)
+    {
+      bool res;
+      if (boolstring == "1") {
+        res = true;
+      } else if (boolstring == "0") {
+        res = false;
+      } else {
+        B2WARNING("Invalid input in NNBitstream, appending 'false'!");
+        res = false;
+      }
+      return res;
+    }
     /**
      *  Calculate the local TS ID (continuous ID in a super layer)
      *
@@ -558,7 +571,7 @@ namespace Belle2 {
 
       int phi = std::stoi(p_phi, 0, 2);
       trackout.hwPhi0 = phi;
-      // c.f. https://confluence.desy.de/download/attachments/34033650/output-def.pdf
+      // c.f. https://xwiki.desy.de/xwiki/bin/download/BI/Belle%20II%20Internal/Detector%20WebHome/Trigger%20WebHome/Sub-Trigger%20Systems/CDC%20Trigger/WebHome/output-def.pdf?rev=1.1
       double globalPhi0 = pi() / 4 + pi() / 2 / 80 * (phi + 1) + pi() / 2 * iTracker; // see document above
 
 
@@ -598,7 +611,7 @@ namespace Belle2 {
       const double BField = 1.5e-4;
       // omega in 1/cm
       // omega = 1/R = c * B / pt
-      // c.f. https://confluence.desy.de/download/attachments/34033650/output-def.pdf
+      // c.f. https://xwiki.desy.de/xwiki/bin/download/BI/Belle%20II%20Internal/Detector%20WebHome/Trigger%20WebHome/Sub-Trigger%20Systems/CDC%20Trigger/WebHome/output-def.pdf?rev=1.1
       trackOut.omega = Const::speedOfLight * BField / 0.3 / 34 * omegaFirm;
       int phi0 = std::bitset<trackLens[2]>(trackIn.substr(trackPos[2], trackLens[2])).to_ulong();
       trackOut.hwPhi0 = phi0;
@@ -1294,6 +1307,18 @@ namespace Belle2 {
                     iclock);
             continue;
           }
+          B2LDataField  p_nntgdl(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("nntgdl"));
+          if ((p_nntgdl.name != "None") && (p_nntgdl.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_nntgdl.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
+          B2LDataField  p_sttgdl(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("sttgdl"));
+          if ((p_sttgdl.name != "None") && (p_sttgdl.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_sttgdl.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
 
           // B2LDataField  (bitsNN, iclock, iTracker, neurodb->getB2FormatLine(""));
 
@@ -1510,6 +1535,17 @@ namespace Belle2 {
                   }
                 }
               }
+              if (p_nntgdl.name != "None") {
+                bool dbool = decodebool(p_nntgdl.data);
+                trackNN->setNNTToGDL(dbool);
+                B2DEBUG(20, "NNT to GDL Bit decision for this track is: " << dbool);
+              }
+              if (p_sttgdl.name != "None") {
+                bool dbool = decodebool(p_sttgdl.data);
+                trackNN->setSTTToGDL(dbool);
+                B2DEBUG(20, "STT to GDL Bit decision for this track is: " << dbool);
+              }
+
             }
 
 

@@ -140,7 +140,7 @@ void DQMHistAnalysisPXDCMModule::beginRun()
   m_cCommonModeDelta->Clear();
   m_cCommonModeDelta->SetLogz();
 
-  // this is needed at least for the "Old" and "Delta" one or update doesnt work
+  // this is needed at least for the "Old" and "Delta" one or update doesn't work
   m_hCommonModeDelta->Reset();
 }
 
@@ -165,6 +165,7 @@ void DQMHistAnalysisPXDCMModule::event()
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     auto modname = (std::string)m_PXDModules[i];
     std::string name = "PXDDAQCM_" + modname;
+    bool excluded = find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end();
 
     auto hh1 = getDelta(m_histogramDirectoryName, name); // default, only updated
     if (hh1) {
@@ -189,16 +190,18 @@ void DQMHistAnalysisPXDCMModule::event()
                  hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 3, bin));
           }
         }
-        // integration intervalls depend on CM default value, this seems to be agreed =10
+        // integration intervals depend on CM default value, this seems to be agreed =10
         // FIXME currently we have to much noise below the line ... thus excluding this to avoid false alarms
         // outside_full += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
         // attention, n bins!
         // we integrate up including value 62 (cm overflow), but not 63 (fifo full)
-        if (bin == 63 + 1) { // CM63
-          all_cm += v;
-        } else { // excluding CM63
-          all += v;
-          if (bin > m_upperLine + 1) all_outside += v;
+        if (!excluded) {
+          if (bin == 63 + 1) { // CM63
+            all_cm += v;
+          } else { // excluding CM63
+            all += v;
+            if (bin > m_upperLine + 1) all_outside += v;
+          }
         }
         m_hCommonModeDelta->SetBinContent(i + 1, bin, v * scale); // attention, mixing bin nr and index
       }
@@ -222,28 +225,30 @@ void DQMHistAnalysisPXDCMModule::event()
           entries += v;
           outside += v;
         }
-        if (entries > 0 && scale < 1e-3) { // ignore modules with minimum events
+        if (entries > 0 and scale < 1e-3) {  // ignore modules with minimum events
           // scale <1e-3 == >1000 events
           mean /= entries; // calculate mean
           auto warn_tmp_m = fabs(10.0 - mean) > m_warnMean;
           auto err_tmp_m = fabs(10.0 - mean) > m_errorMean;
           auto warn_tmp_os = outside / entries > m_warnOutside;
           auto err_tmp_os = outside / entries > m_errorOutside;
-          warn_flag |= warn_tmp_m || warn_tmp_os;
-          error_flag |= err_tmp_m || err_tmp_os;
+          if (not excluded) {
+            warn_flag |= warn_tmp_m or warn_tmp_os;
+            error_flag |= err_tmp_m or err_tmp_os;
 
-          if (warn_tmp_m || err_tmp_m) {
-            TString tmp;
-            tmp.Form("%s: Mean %f", modname.c_str(), mean);
-            leg->AddText(tmp);
-            B2INFO(name << " Mean " <<  mean << " " << warn_tmp_m << err_tmp_m);
-          }
-          if (warn_tmp_os || err_tmp_os) {
-            TString tmp;
-            tmp.Form("%s: Outside %f %%", modname.c_str(), 100. * outside / entries);
-            leg->AddText(tmp);
-            B2INFO(name << " Outside " << outside / entries << " (" << outside << "/" << entries << ") " << warn_tmp_os
-                   << err_tmp_os);
+            if (warn_tmp_m or err_tmp_m) {
+              TString tmp;
+              tmp.Form("%s: Mean %f", modname.c_str(), mean);
+              leg->AddText(tmp);
+              B2INFO(name << " Mean " <<  mean << " " << warn_tmp_m << err_tmp_m);
+            }
+            if (warn_tmp_os or err_tmp_os) {
+              TString tmp;
+              tmp.Form("%s: Outside %f %%", modname.c_str(), 100. * outside / entries);
+              leg->AddText(tmp);
+              B2INFO(name << " Outside " << outside / entries << " (" << outside << "/" << entries << ") " << warn_tmp_os
+                     << err_tmp_os);
+            }
           }
           m_monObj->setVariable(("cm_" + modname).c_str(), mean);
 
@@ -278,6 +283,7 @@ void DQMHistAnalysisPXDCMModule::event()
         tt->SetTextSize(0.035);
         tt->SetTextAngle(90);// Rotated
         tt->SetTextAlign(12);// Centered
+        ltmap[it] = tt;
       }
       tt->Draw();
     }
@@ -291,5 +297,10 @@ void DQMHistAnalysisPXDCMModule::event()
 void DQMHistAnalysisPXDCMModule::terminate()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDCM: terminate called");
+
+  if (m_cCommonModeDelta) delete m_cCommonModeDelta;
+  if (m_hCommonModeDelta) delete m_hCommonModeDelta;
+  if (m_line10) delete m_line10;
+  if (m_lineOutside) delete m_lineOutside;
 }
 

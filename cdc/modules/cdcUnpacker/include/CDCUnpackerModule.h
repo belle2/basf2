@@ -84,7 +84,7 @@ namespace Belle2 {
         }
 
         m_version = ((buf[0] & 0xff0000) >> 16); // Always zero.
-        m_boardId = (buf[0] & 0xffff);
+        m_boardId = (buf[0] & 0x01ff);
         m_triggerTime = ((buf[1] & 0xffff0000) >> 16);
         m_dataLength = (buf[1] & 0xffff);
         m_triggerNumber = buf[2];
@@ -355,6 +355,11 @@ namespace Belle2 {
        * True if add relation of CDCHits, CDCRawHits, and CDCRawHitWaveForms."
        */
       bool m_relationRawHits;
+
+      /**
+       * Recover boardID error if true, skip information otherwise
+       */
+      bool m_recoverBoardIdError;
 
     };//end class declaration
 

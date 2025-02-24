@@ -21,7 +21,7 @@ namespace Belle2 {
 
   /** This module takes the MCParticles, the genfit Tracks, the genfit TrackCand,
    *  and the MCTrackCands input and produce a root file containing various histograms
-   *  showing the performance of the tracking package: fitter, pattern recongnition algorithms.
+   *  showing the performance of the tracking package: fitter, pattern recognition algorithms.
    */
   class PerformanceEvaluationBaseClass  {
 

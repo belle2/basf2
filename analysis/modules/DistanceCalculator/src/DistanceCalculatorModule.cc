@@ -9,7 +9,6 @@
 #include <analysis/modules/DistanceCalculator/DistanceCalculatorModule.h>
 
 #include <Eigen/Dense>
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;

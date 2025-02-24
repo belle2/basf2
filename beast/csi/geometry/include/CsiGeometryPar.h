@@ -38,7 +38,7 @@ namespace Belle2 {
   namespace csi {
 
 //! The Class for CSI Geometry Parameters
-    /*! This class provides CSI gemetry paramters for simulation, reconstruction and so on.
+    /*! This class provides CSI geometry parameters for simulation, reconstruction and so on.
         These parameters are gotten from gearbox.
     */
     class CsiGeometryPar {

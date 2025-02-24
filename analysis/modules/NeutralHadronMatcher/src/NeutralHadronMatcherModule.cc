@@ -7,11 +7,16 @@
  **************************************************************************/
 
 #include <analysis/modules/NeutralHadronMatcher/NeutralHadronMatcherModule.h>
-#include <framework/core/Environment.h>
+
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/variables/MCTruthVariables.h>
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/MCParticle.h>
+
 #include <TRandom.h>
-#include <analysis/variables/MCTruthVariables.h>
 
 using namespace Belle2;
 

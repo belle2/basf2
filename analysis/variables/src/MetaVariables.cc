@@ -13,7 +13,6 @@
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
@@ -585,9 +584,8 @@ namespace Belle2 {
         for (unsigned i = 0; i < list->getListSize(); ++i)
         {
           Particle* iparticle = list->getParticle(i);
-          if (particlesource == iparticle->getParticleSource())
-            if (particle->getMdstArrayIndex() == iparticle->getMdstArrayIndex())
-              return 1;
+          if (particle->getMdstSource() == iparticle->getMdstSource())
+            return 1;
         }
         return 0;
 

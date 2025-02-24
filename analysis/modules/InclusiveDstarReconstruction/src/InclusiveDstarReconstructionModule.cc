@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #include <analysis/modules/InclusiveDstarReconstruction/InclusiveDstarReconstructionModule.h>
-#include <analysis/utility/PCmsLabTransform.h>
 
 #include <analysis/DecayDescriptor/ParticleListName.h>
 

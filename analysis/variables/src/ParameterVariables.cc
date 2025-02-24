@@ -21,9 +21,6 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-
 #include <Math/Boost.h>
 #include <Math/Vector4D.h>
 #include <TVectorF.h>

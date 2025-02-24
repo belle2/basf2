@@ -26,11 +26,8 @@
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/RootFileCreationManager.h>
 #include <framework/io/RootIOUtilities.h>
-#include <framework/io/RootFileInfo.h>
-
 
 #include <cmath>
-#include <filesystem>
 
 using namespace std;
 using namespace Belle2;

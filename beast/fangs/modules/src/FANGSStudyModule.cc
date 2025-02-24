@@ -154,7 +154,7 @@ void FANGSStudyModule::initialize()
 
   //convert sample time into rate in Hz
   //rateCorrection = m_sampletime / 1e6;
-  //get FANGS paramters
+  //get FANGS parameters
   getXMLData();
 
   fctQ_Calib1 = new TF1("fctQ_Calib1", "[0]*([1]*x-[2])/([3]-x)", 0., 15.);

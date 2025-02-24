@@ -37,7 +37,9 @@ def create_digits():
 
 class InjectPXDDigits(basf2.Module):
     """
-    Simple basf2 module to fill a PyStoreArray with PXD digits
+    Simple basf2 module to fill a PyStoreArray with PXD digits.
+    Takes as arguments the digits to fill the PyStoreArray with,
+    and then for each event it calls the fillArray function.
     """
 
     def __init__(self, digits_arrays):
@@ -57,6 +59,7 @@ class InjectPXDDigits(basf2.Module):
             digits[key].astype(np.ushort) for key in keys]
 
         # call the function fillArray to fill the PyStoreArray
+        # Note: this function appends the new digits to the array if it is non empty
         self.pxddigits.fillArray(uCellID=uCellID, vCellID=vCellID, sensorID=sensorID, charge=charge)
 
 

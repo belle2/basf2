@@ -109,8 +109,11 @@ More advanced examples
   uses relations to get corresponding MC truth and fills ROOT histograms
   accordingly
 - :file:`framework/examples/fill_array_example.py` - Shows example usage of
-  Python interface to fill a PyStoreArray with digits without having to
-  explicitly instantiate the object, thus making the operation faster 
+  Python array-oriented interface to fill a PyStoreArray with digits without
+  having to explicitly instantiate the object, thus making the operation faster
+- :file:`framework/examples/read_array_example.py` - Simple example of how to
+  use the Python array-oriented interface mentioned above to read elements from
+  a PyStoreArray 
 
 .. include:: ../lesson_footer.rstinclude
 

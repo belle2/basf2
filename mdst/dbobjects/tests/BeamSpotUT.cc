@@ -46,7 +46,7 @@ namespace Belle2 {
     bs.setSizeCovMatrix(size);
     bs.setIP(position, positionError);
 
-    TVector3 testPosition = bs.getIPPosition();
+    ROOT::Math::XYZVector testPosition = bs.getIPPosition();
     EXPECT_EQ(testPosition.X(), 1.);
     EXPECT_EQ(testPosition.Y(), 2.);
     EXPECT_EQ(testPosition.Z(), 3.);

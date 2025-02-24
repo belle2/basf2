@@ -184,7 +184,7 @@ namespace Belle2 {
                 << LogVar("provider", m_currentProvider) << LogVar("error", e.what()));
       return nextMetadataProvider();
     }
-    // and check the tags are useable
+    // and check the tags are usable
     if (!m_metadataProvider->setTags(m_globalTags)) {
       B2FATAL("Conditions data: Problems with globaltag configuration, cannot continue");
     }
@@ -232,7 +232,7 @@ namespace Belle2 {
       }
       // we will actually use the globaltags so print them now
       if (!m_globalTags.empty()) {
-        // Globaltags are useable so print out the final list we're gonna use
+        // Globaltags are usable so print out the final list we're gonna use
         if (m_globalTags.size() == 1) {
           B2INFO("Conditions data: configured globaltag is " << m_globalTags[0]);
         } else {

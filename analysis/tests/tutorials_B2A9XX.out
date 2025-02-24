@@ -74,113 +74,228 @@ TBranch: SystErrUp, 0.004612
 TBranch: SystErrDown, 0.01075
 TFile: B2A908-ApplyLIDWeights.root
 TTree: jpsimumu
-No entry found
-TBranch: __experiment__
-TBranch: __run__
-TBranch: __event__
-TBranch: __production__
-TBranch: __candidate__
-TBranch: __ncandidates__
-TBranch: __eventType__
-TBranch: __weight__
-TBranch: jpsi_px
-TBranch: jpsi_py
-TBranch: jpsi_pz
-TBranch: jpsi_pt
-TBranch: jpsi_p
-TBranch: jpsi_E
-TBranch: jpsi_M
-TBranch: jpsi_ErrM
-TBranch: jpsi_SigM
-TBranch: jpsi_InvM
-TBranch: mu_0_px
-TBranch: mu_0_py
-TBranch: mu_0_pz
-TBranch: mu_0_pt
-TBranch: mu_0_p
-TBranch: mu_0_E
-TBranch: mu_0_theta
-TBranch: mu_0_charge
-TBranch: mu_0_minET2ETIsoScore
-TBranch: mu_0_CMS_px
-TBranch: mu_0_CMS_py
-TBranch: mu_0_CMS_pz
-TBranch: mu_0_CMS_pt
-TBranch: mu_0_CMS_p
-TBranch: mu_0_CMS_E
-TBranch: mu_0_pidChargedBDTScore_mu
-TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90
-TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_stat_up
-TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_stat_dn
-TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_sys_up
-TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_sys_dn
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_stat_up
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_stat_dn
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_sys_up
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_sys_dn
-TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_stat_up
-TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_stat_dn
-TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_sys_up
-TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_sys_dn
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_stat_up
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_stat_dn
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_sys_up
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_sys_dn
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_stat_up
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_stat_dn
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_sys_up
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_sys_dn
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_stat_up
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_stat_dn
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_sys_up
-TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_sys_dn
-TBranch: mu_1_px
-TBranch: mu_1_py
-TBranch: mu_1_pz
-TBranch: mu_1_pt
-TBranch: mu_1_p
-TBranch: mu_1_E
-TBranch: mu_1_theta
-TBranch: mu_1_charge
-TBranch: mu_1_minET2ETIsoScore
-TBranch: mu_1_CMS_px
-TBranch: mu_1_CMS_py
-TBranch: mu_1_CMS_pz
-TBranch: mu_1_CMS_pt
-TBranch: mu_1_CMS_p
-TBranch: mu_1_CMS_E
-TBranch: mu_1_pidChargedBDTScore_mu
-TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90
-TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_stat_up
-TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_stat_dn
-TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_sys_up
-TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_sys_dn
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_stat_up
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_stat_dn
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_sys_up
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_sys_dn
-TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_stat_up
-TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_stat_dn
-TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_sys_up
-TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_sys_dn
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_stat_up
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_stat_dn
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_sys_up
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_sys_dn
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_stat_up
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_stat_dn
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_sys_up
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_sys_dn
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_stat_up
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_stat_dn
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_sys_up
-TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_sys_dn
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 6536
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: jpsi_px, -0.2633
+TBranch: jpsi_py, -0.1883
+TBranch: jpsi_pz, 0.7435
+TBranch: jpsi_pt, 0.3237
+TBranch: jpsi_p, 0.8109
+TBranch: jpsi_E, 3.196
+TBranch: jpsi_M, 3.091
+TBranch: jpsi_ErrM, 0
+TBranch: jpsi_SigM, -inf
+TBranch: jpsi_InvM, 3.091
+TBranch: mu_0_px, -0.2394
+TBranch: mu_0_py, -1.185
+TBranch: mu_0_pz, -0.7282
+TBranch: mu_0_pt, 1.209
+TBranch: mu_0_p, 1.411
+TBranch: mu_0_E, 1.415
+TBranch: mu_0_theta, 2.113
+TBranch: mu_0_charge, 1
+TBranch: mu_0_minET2ETIsoScore, 1
+TBranch: mu_0_CMS_px, -0.2984
+TBranch: mu_0_CMS_py, -1.185
+TBranch: mu_0_CMS_pz, -1.161
+TBranch: mu_0_CMS_pt, 1.222
+TBranch: mu_0_CMS_p, 1.686
+TBranch: mu_0_CMS_E, 1.689
+TBranch: mu_0_pidChargedBDTScore_mu, 0.9734
+TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90, 0.9509
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90, 0.9472
+TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_stat_up, 0.0033
+TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_stat_dn, 0.0033
+TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_sys_up, 0
+TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_sys_dn, 0
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_stat_up, 0.0142
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_stat_dn, 0.0144
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_sys_up, 0.0117
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_sys_dn, 0.0106
+TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_stat_up, 1.003
+TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_stat_dn, 0.9965
+TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_sys_up, 1
+TBranch: mu_0_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_sys_dn, 1
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_stat_up, 1.015
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_stat_dn, 0.9848
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_sys_up, 1.012
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_sys_dn, 0.9888
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90, 0.9603
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_stat_up, 0.1356
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_stat_dn, 0.1356
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_sys_up, 0.0008
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_sys_dn, 0.0003
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_stat_up, 1.141
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_stat_dn, 0.8588
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_sys_up, 1.001
+TBranch: mu_0_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_sys_dn, 0.9997
+TBranch: mu_1_px, -0.0239
+TBranch: mu_1_py, 0.9964
+TBranch: mu_1_pz, 1.472
+TBranch: mu_1_pt, 0.9967
+TBranch: mu_1_p, 1.777
+TBranch: mu_1_E, 1.781
+TBranch: mu_1_theta, 0.5953
+TBranch: mu_1_charge, -1
+TBranch: mu_1_minET2ETIsoScore, 1
+TBranch: mu_1_CMS_px, -0.09786
+TBranch: mu_1_CMS_py, 0.9964
+TBranch: mu_1_CMS_pz, 1.024
+TBranch: mu_1_CMS_pt, 1.001
+TBranch: mu_1_CMS_p, 1.432
+TBranch: mu_1_CMS_E, 1.436
+TBranch: mu_1_pidChargedBDTScore_mu, 0.9158
+TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90, 0.9323
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90, 0.795
+TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_stat_up, 0.0055
+TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_stat_dn, 0.0056
+TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_sys_up, 0
+TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_sys_dn, 0
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_stat_up, 0.0232
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_stat_dn, 0.0241
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_sys_up, 0.0009
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_sys_dn, 0.0022
+TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_stat_up, 1.006
+TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_stat_dn, 0.994
+TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_sys_up, 1
+TBranch: mu_1_weight_pidChargedBDTScore_mu_eff_UniformEff90_rel_sys_dn, 1
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_stat_up, 1.029
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_stat_dn, 0.9697
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_sys_up, 1.001
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_pi_UniformEff90_rel_sys_dn, 0.9972
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90, 1.163
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_stat_up, 0.3614
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_stat_dn, 0.3614
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_sys_up, 0.0012
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_sys_dn, 0.0235
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_stat_up, 1.311
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_stat_dn, 0.6893
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_sys_up, 1.001
+TBranch: mu_1_weight_pidChargedBDTScore_mu_misid_K_UniformEff90_rel_sys_dn, 0.9798
 TTree: jpsiee
 TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 6565
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: jpsi_px, -0.2307
+TBranch: jpsi_py, 0.7583
+TBranch: jpsi_pz, 0.1892
+TBranch: jpsi_pt, 0.7926
+TBranch: jpsi_p, 0.8148
+TBranch: jpsi_E, 3.239
+TBranch: jpsi_M, 3.135
+TBranch: jpsi_ErrM, 0
+TBranch: jpsi_SigM, inf
+TBranch: jpsi_InvM, 3.135
+TBranch: e_0_px, -0.7472
+TBranch: e_0_py, 1.351
+TBranch: e_0_pz, -0.9806
+TBranch: e_0_pt, 1.544
+TBranch: e_0_p, 1.829
+TBranch: e_0_E, 1.829
+TBranch: e_0_theta, 2.137
+TBranch: e_0_charge, 1
+TBranch: e_0_minET2ETIsoScore, 1
+TBranch: e_0_CMS_px, -0.8239
+TBranch: e_0_CMS_py, 1.351
+TBranch: e_0_CMS_pz, -1.547
+TBranch: e_0_CMS_pt, 1.583
+TBranch: e_0_CMS_p, 2.213
+TBranch: e_0_CMS_E, 2.213
+TBranch: e_0_binaryElectronID_noSVD_noTOP_pi, 1
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09, 0.9947
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09, 1.928
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_stat_up, 0.0002
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_stat_dn, 0.0002
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_sys_up, 0.0072
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_sys_dn, 0.0068
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_stat_up, 0.0788
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_stat_dn, 0.0787
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_sys_up, 0.2203
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_sys_dn, 0.5497
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_stat_up, 1
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_stat_dn, 0.9998
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_sys_up, 1.007
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_sys_dn, 0.9932
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_stat_up, 1.041
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_stat_dn, 0.9592
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_up, 1.114
+TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_dn, 0.7149
+TBranch: e_1_px, 0.5166
+TBranch: e_1_py, -0.5932
+TBranch: e_1_pz, 1.17
+TBranch: e_1_pt, 0.7866
+TBranch: e_1_p, 1.41
+TBranch: e_1_E, 1.41
+TBranch: e_1_theta, 0.592
+TBranch: e_1_charge, -1
+TBranch: e_1_minET2ETIsoScore, 1
+TBranch: e_1_CMS_px, 0.4585
+TBranch: e_1_CMS_py, -0.5932
+TBranch: e_1_CMS_pz, 0.822
+TBranch: e_1_CMS_pt, 0.7497
+TBranch: e_1_CMS_p, 1.113
+TBranch: e_1_CMS_E, 1.113
+TBranch: e_1_binaryElectronID_noSVD_noTOP_pi, 1
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09, 0.9991
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09, 3.689
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_stat_up, 0.0002
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_stat_dn, 0.0002
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_sys_up, 0.0073
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_sys_dn, 0.0073
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_stat_up, 0.0687
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_stat_dn, 0.124
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_sys_up, 0.0407
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_sys_dn, 0.0217
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_stat_up, 1
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_stat_dn, 0.9998
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_sys_up, 1.007
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_sys_dn, 0.9927
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_stat_up, 1.019
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_stat_dn, 0.9664
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_up, 1.011
+TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_dn, 0.9941
+TFile: B2A910-ApplyKsSelector.root
+TTree: tree
+TBranch: __experiment__, 0
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: px, -1.547
+TBranch: py, -0.6457
+TBranch: pz, 0.9127
+TBranch: pt, 1.676
+TBranch: p, 1.909
+TBranch: E, 1.973
+TBranch: mcE, 1.968
+TBranch: mcP, 1.904
+TBranch: mcPT, 1.674
+TBranch: mcPX, -1.544
+TBranch: mcPY, -0.6454
+TBranch: mcPZ, 0.9073
+TBranch: mcPhi, -2.746
+TBranch: isSignal, 1
+TBranch: mcErrors, 0
+TBranch: mcPDG, 310
+TBranch: extraInfo__boV0_mva__bc, 0.9998
+TBranch: extraInfo__boLam_mva__bc, 0.9825
+TFile: B2A913-CharmFlavorTagger.root
+TTree: D0tree
+TBranch: __experiment__, 0
 TBranch: __run__, 0
 TBranch: __event__, 9
 TBranch: __production__, 0
@@ -188,81 +303,32 @@ TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
 TBranch: __eventType__, 
 TBranch: __weight__, 1
-TBranch: jpsi_px, -0.5051
-TBranch: jpsi_py, -0.2845
-TBranch: jpsi_pz, 0.9965
-TBranch: jpsi_pt, 0.5797
-TBranch: jpsi_p, 1.153
-TBranch: jpsi_E, 3.296
-TBranch: jpsi_M, 3.088
-TBranch: jpsi_ErrM, 0
-TBranch: jpsi_SigM, -inf
-TBranch: jpsi_InvM, 3.088
-TBranch: e_0_px, -1.658
-TBranch: e_0_py, 0.3816
-TBranch: e_0_pz, 0.9819
-TBranch: e_0_pt, 1.701
-TBranch: e_0_p, 1.964
-TBranch: e_0_E, 1.964
-TBranch: e_0_theta, 1.047
-TBranch: e_0_charge, 1
-TBranch: e_0_minET2ETIsoScore, 1
-TBranch: e_0_CMS_px, -1.741
-TBranch: e_0_CMS_py, 0.3816
-TBranch: e_0_CMS_pz, 0.4437
-TBranch: e_0_CMS_pt, 1.782
-TBranch: e_0_CMS_p, 1.837
-TBranch: e_0_CMS_E, 1.837
-TBranch: e_0_binaryElectronID_noSVD_noTOP_pi, 1
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09, 1.002
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09, 3.104
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_stat_up, 0.0004
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_stat_dn, 0.0004
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_sys_up, 0.003
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_sys_dn, 0.003
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_stat_up, 0.0602
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_stat_dn, 0.1946
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_sys_up, 0.9607
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_sys_dn, 1.023
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_stat_up, 1
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_stat_dn, 0.9996
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_sys_up, 1.003
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_sys_dn, 0.997
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_stat_up, 1.019
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_stat_dn, 0.9373
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_up, 1.309
-TBranch: e_0_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_dn, 0.6706
-TBranch: e_1_px, 1.153
-TBranch: e_1_py, -0.6662
-TBranch: e_1_pz, 0.01466
-TBranch: e_1_pt, 1.332
-TBranch: e_1_p, 1.332
-TBranch: e_1_E, 1.332
-TBranch: e_1_theta, 1.56
-TBranch: e_1_charge, -1
-TBranch: e_1_minET2ETIsoScore, 1
-TBranch: e_1_CMS_px, 1.099
-TBranch: e_1_CMS_py, -0.6662
-TBranch: e_1_CMS_pz, -0.349
-TBranch: e_1_CMS_pt, 1.285
-TBranch: e_1_CMS_p, 1.331
-TBranch: e_1_CMS_E, 1.331
-TBranch: e_1_binaryElectronID_noSVD_noTOP_pi, 0.9996
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09, 0.9984
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09, 2.976
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_stat_up, 0.0004
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_stat_dn, 0.0004
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_sys_up, 0.0025
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_sys_dn, 0.0025
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_stat_up, 0.0784
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_stat_dn, 0.0768
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_sys_up, 0.2767
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_sys_dn, 1.189
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_stat_up, 1
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_stat_dn, 0.9996
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_sys_up, 1.003
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_eff_FixedThresh09_rel_sys_dn, 0.9975
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_stat_up, 1.026
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_stat_dn, 0.9742
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_up, 1.093
-TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_dn, 0.6004
+TBranch: px, -1.565
+TBranch: py, 1.745
+TBranch: pz, 1.209
+TBranch: pt, 2.344
+TBranch: p, 2.637
+TBranch: E, 3.23
+TBranch: isSignal, 1
+TBranch: mcErrors, 0
+TBranch: mcPDG, 421
+TBranch: CFT_qr, 0.5695
+TBranch: CFT_prob, 0.7848
+TBranch: K_px, -0.9924
+TBranch: K_py, 2.049
+TBranch: K_pz, 0.8923
+TBranch: K_pt, 2.277
+TBranch: K_p, 2.446
+TBranch: K_E, 2.495
+TBranch: K_isSignal, 1
+TBranch: K_mcErrors, 0
+TBranch: K_mcPDG, -321
+TBranch: pi_px, -0.5723
+TBranch: pi_py, -0.304
+TBranch: pi_pz, 0.3165
+TBranch: pi_pt, 0.648
+TBranch: pi_p, 0.7212
+TBranch: pi_E, 0.7346
+TBranch: pi_isSignal, 1
+TBranch: pi_mcErrors, 0
+TBranch: pi_mcPDG, 211

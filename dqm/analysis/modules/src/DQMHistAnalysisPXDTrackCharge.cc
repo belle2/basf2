@@ -19,6 +19,7 @@
 #include <RooDataHist.h>
 #include <RooAbsPdf.h>
 #include <RooPlot.h>
+#include <RooFitResult.h>
 
 
 using namespace std;
@@ -417,7 +418,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     m_line_mean->SetY2(mean);
     m_line_low->SetY1(mini);
     m_line_low->SetY2(mini);
-    data = mean; // m_fMean->GetParameter(0); // we are more interessted in the maximum deviation from mean
+    data = mean; // m_fMean->GetParameter(0); // we are more interested in the maximum deviation from mean
     // m_gCharge->GetMinimumAndMaximum(currentMin, currentMax);
     diff = m_gCharge->GetRMS(2);// RMS of Y
     // better, max deviation as fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
@@ -438,7 +439,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
     status = 0; // default
   } else {
-    /// FIXME: what is the accpetable limit?
+    /// FIXME: what is the acceptable limit?
     if (fabs(data - 30.) > 20. || diff > 12) {
       m_cCharge->Pad()->SetFillColor(kRed);// Red
       status = 4;

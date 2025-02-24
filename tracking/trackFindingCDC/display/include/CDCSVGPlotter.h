@@ -201,21 +201,21 @@ namespace Belle2 {
       /* *** Section with some more complex operations *** */
 
       /**
-       * Draw the CDCRLWireHits in the CDCSegments colored by the match of the right left passage informations.
-       * It respects segments reconstructed backwards to have the opposite rl informations
+       * Draw the CDCRLWireHits in the CDCSegments colored by the match of the right left passage information.
+       * It respects segments reconstructed backwards to have the opposite rl information
        */
       void drawWrongRLHitsInSegments(const std::string& segmentsStoreObjName);
 
       /**
-       * Draw the CDCRLWireHits in the CDCTracks colored by the match of the right left passage informations.
-       * It respects tracks reconstructed backwards to have the opposite rl informations
+       * Draw the CDCRLWireHits in the CDCTracks colored by the match of the right left passage information.
+       * It respects tracks reconstructed backwards to have the opposite rl information
        */
       void drawWrongRLHitsInTracks(const std::string& tracksStoreObjName);
 
     private:
       /**
-       * Draw the CDCRLWireHits in the ACDCHitCollection colored by the match of the right left passage informations.
-       * It respects hit collections reconstructed backwards to have the opposite rl informations.
+       * Draw the CDCRLWireHits in the ACDCHitCollection colored by the match of the right left passage information.
+       * It respects hit collections reconstructed backwards to have the opposite rl information.
        */
       template<class ACDCHitCollection>
       void drawWrongRLHits(const std::string& storeObjName);

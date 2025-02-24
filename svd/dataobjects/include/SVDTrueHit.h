@@ -50,7 +50,7 @@ namespace Belle2 {
 
 
 
-    ClassDef(SVDTrueHit, 6)
+    ClassDef(SVDTrueHit, 7)
   };
 
 } // end namespace Belle2

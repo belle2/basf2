@@ -8,12 +8,12 @@
 
 // Own header.
 #include <analysis/modules/BiasCorrection/BiasCorrection.h>
-#include <iostream>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/core/Environment.h>
-#include <analysis/VariableManager/Manager.h>
 
 #include <Math/Vector4D.h>
 
@@ -43,6 +43,7 @@ EnergyBiasCorrectionModule::EnergyBiasCorrectionModule() : Module()
 The module modifies the input particleLists by scaling energy as given by the scale in the LookUpTable
 		     
 		     )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("tableName", m_tableName, "ID of table used for reweighing");
@@ -58,8 +59,9 @@ WeightInfo EnergyBiasCorrectionModule::getInfo(const Particle* particle)
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
     if (!var) {
       B2ERROR("Variable '" << i_variable << "' is not available in Variable::Manager!");
+    } else {
+      values.insert(std::make_pair(i_variable, std::get<double>(var->function(particle))));
     }
-    values.insert(std::make_pair(i_variable, std::get<double>(var->function(particle))));
   }
 
   return (*m_ParticleWeightingLookUpTable.get())->getInfo(values);

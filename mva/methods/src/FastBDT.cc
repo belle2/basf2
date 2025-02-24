@@ -88,7 +88,7 @@ namespace Belle2 {
       description.add_options()
       ("nTrees", po::value<unsigned int>(&m_nTrees), "Number of trees in the forest. Reasonable values are between 10 and 1000")
       ("nLevels", po::value<unsigned int>(&m_nLevels)->notifier(check_bounds<unsigned int>(0, 20, "nLevels")),
-       "Depth d of trees. The last layer of the tree will contain 2^d bins. Maximum is 20. Reasonable values are 2 and 6.")
+       "Depth d of trees. The last layer of the tree will contain 2^d bins. Maximum is 20. Reasonable values are between 2 and 6.")
       ("shrinkage", po::value<double>(&m_shrinkage)->notifier(check_bounds<double>(0.0, 1.0, "shrinkage")),
        "Shrinkage of the boosting algorithm. Reasonable values are between 0.01 and 1.0.")
       ("nCutLevels", po::value<unsigned int>(&m_nCuts)->notifier(check_bounds<unsigned int>(0, 20, "nCutLevels")),
@@ -116,6 +116,9 @@ namespace Belle2 {
 
     Weightfile FastBDTTeacher::train(Dataset& training_data) const
     {
+      if (training_data.getNumberOfEvents() > 5e+6) {
+        B2WARNING("Number of events for training exceeds 5 million. FastBDT performance starts getting worse when the number reaches O(10^7).");
+      }
 
       unsigned int numberOfFeatures = training_data.getNumberOfFeatures();
       unsigned int numberOfSpectators = training_data.getNumberOfSpectators();

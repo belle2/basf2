@@ -30,7 +30,7 @@ from variables import variables as vm
 # TODO: Add liaison name and email address
 __liaison__ = ""
 __liaison_leptonID__ = "Marcel Hohmann"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -420,7 +420,7 @@ class SystematicsRadEE(BaseSkim):
     selection on the photon as the sample must be unbiased.
 
     As this retains a lot of bhabha events (by construction) we allow for prescaling
-    (and prefer prescaled rather than a biased sampe by requiring any selection on the
+    (and prefer prescaled rather than a biased sample by requiring any selection on the
     photon or too much of a cut on the recoil momentum).
 
     Prescales are given in standard trigger terms (reciprocal), so prescale of 100 is 1%
@@ -876,13 +876,15 @@ class SystematicsCombinedLowMulti(CombinedSkim):
           SystematicsFourLeptonFromHLTFlag,
           SystematicsRadmumuFromHLTFlag,
           SystematicsBhabha,
+          SystematicsPhiGamma,
+          SystematicsRadMuMu,
           TauThrust.
 
       This is required for  technical (data production) reasons, as it keeps the number of files low.
       See the definitions of the individual skims for the details.
     """
     __authors__ = ["Marcel Hohmann"]
-    __description__ = "Combined Skim of the systematic low multi skims: FourLepton, Radmumu, Bhabha, TauThrust."
+    __description__ = "Combined Skim of the systematic low multi skims: FourLepton, Radmumu, Bhabha, PhiGamma, RadMuMu, TauThrust."
     __contact__ = __liaison_leptonID__
     __category__ = "performance, leptonID"
     __name__ = "SystematicsCombinedLowMulti"
@@ -900,5 +902,11 @@ class SystematicsCombinedLowMulti(CombinedSkim):
         kwargs.setdefault('udstOutput', False)
 
         from skim.WGs.taupair import TauThrust
-        skims_list = [SystematicsFourLeptonFromHLTFlag(), SystematicsRadMuMuFromHLTFlag(), SystematicsBhabha(), TauThrust()]
+        skims_list = [
+            SystematicsFourLeptonFromHLTFlag(),
+            SystematicsRadMuMuFromHLTFlag(),
+            SystematicsBhabha(),
+            SystematicsPhiGamma(),
+            SystematicsRadMuMu(),
+            TauThrust()]
         super().__init__(*skims_list, **kwargs)

@@ -160,7 +160,7 @@ class MillepedeCalibration():
 
         # If you call this, you are going to use calibration framework most likely.
         # This NOW does not anymore move/copy files from collector to algorithm, so
-        # we have to remeber where they are located at the time of creation
+        # we have to remember where they are located at the time of creation
         if not self.get_param('useGblTree'):
             self.set_param(True, 'absFilePaths')
 

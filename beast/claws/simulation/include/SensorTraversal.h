@@ -62,7 +62,7 @@ namespace Belle2 {
       /** return whether the track belongs to a primary particle */
       bool isPrimary() const { return m_primary; }
 
-      /** indicate that the track originated outisde the current volume */
+      /** indicate that the track originated outside the current volume */
       void hasEntered() { m_contained = false; }
       /** indicate that the track left the current volume */
       void hasLeft() { m_contained = false; }
@@ -127,7 +127,7 @@ namespace Belle2 {
       double m_length {0};
       /** time the track entered the volume */
       double m_entryTime {0};
-      /** Indication wether the track is completely contained inside the volume */
+      /** Indication whether the track is completely contained inside the volume */
       bool m_contained {true};
       /** Indication whether track is from a primary particle */
       bool m_primary {false};

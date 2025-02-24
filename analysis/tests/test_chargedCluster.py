@@ -27,7 +27,7 @@ class TestChargedCluster(unittest.TestCase):
 
         main = create_path()
 
-        inputfile = b2test_utils.require_file('mdst14.root', 'validation', py_case=self)
+        inputfile = b2test_utils.require_file('mdst16.root', 'validation', py_case=self)
         ma.inputMdst(inputfile, path=main)
 
         ma.fillParticleList('pi+:ecl', 'clusterE>0', path=main)

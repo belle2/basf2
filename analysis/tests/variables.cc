@@ -13,19 +13,16 @@
 #include <analysis/variables/TrackVariables.h>
 
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/dataobjects/EventExtraInfo.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/TestHelpers.h>
-#include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/Const.h>
 
@@ -35,7 +32,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/V0.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
 
 #include <gtest/gtest.h>
 
@@ -44,7 +40,6 @@
 #include <Math/Cartesian2D.h>
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
-#include <TMath.h>
 #include <utility>
 
 using namespace std;
@@ -988,6 +983,48 @@ namespace {
     EXPECT_NEAR(std::get<double>(var->function(p0)), p1->getMass(), 1e-6);
   }
 
+  TEST_F(MetaVariableTest, useMCancestorBRestFrame)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<Particle> particles;
+    StoreArray<MCParticle> mcparticles;
+    particles.registerInDataStore();
+    mcparticles.registerInDataStore();
+    particles.registerRelationTo(mcparticles);
+    MCParticleGraph mcGraph;
+    // MC mother of the MC particle
+    MCParticleGraph::GraphParticle& mcMother = mcGraph.addParticle();
+    // MC particle of the reconstructed one
+    MCParticleGraph::GraphParticle& mcParticle = mcGraph.addParticle();
+    mcParticle.comesFrom(mcMother);
+    mcGraph.generateList();
+    // Reconstructed particle
+    Particle particle({ 0.1, -0.4, 0.8, 1.0 }, 411);
+    auto* p = particles.appendNew(particle);
+    p->setVertex(XYZVector(1.0, 2.0, 2.0));
+    p->addRelationTo(mcparticles[1]);
+
+    mcparticles[1]->setPDG(411);
+
+    // MC mother of the MC particle
+    mcparticles[0]->setMomentum(XYZVector(0.0, 0.0, 0.1));
+    mcparticles[0]->setStatus(MCParticle::c_PrimaryParticle);
+    mcparticles[0]->setPDG(511);
+    mcparticles[0]->setMassFromPDG();
+    DataStore::Instance().setInitializeActive(false);
+
+    const Manager::Var* var = Manager::Instance().getVariable("useMCancestorBRestFrame(p)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0.88333338);
+
+    var = Manager::Instance().getVariable("useMCancestorBRestFrame(E)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0.98502684);
+
+    var = Manager::Instance().getVariable("useMCancestorBRestFrame(distance)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 3.0007174);
+  }
 
   TEST_F(MetaVariableTest, extraInfo)
   {
@@ -2269,7 +2306,7 @@ namespace {
 
   TEST_F(MetaVariableTest, sin)
   {
-    Particle p({ 3.14159265359 / 2.0, -0.4, 0.8, 1.0}, 11);
+    Particle p({ M_PI / 2.0, -0.4, 0.8, 1.0}, 11);
     Particle p2({ 0.0, -0.4, 0.8, 1.0 }, -11);
 
     const Manager::Var* var = Manager::Instance().getVariable("sin(px)");
@@ -2281,7 +2318,7 @@ namespace {
 
   TEST_F(MetaVariableTest, cos)
   {
-    Particle p({ 3.14159265359 / 2.0, -0.4, 0.8, 1.0}, 11);
+    Particle p({ M_PI / 2.0, -0.4, 0.8, 1.0}, 11);
     Particle p2({ 0.0, -0.4, 0.8, 1.0 }, -11);
 
     const Manager::Var* var = Manager::Instance().getVariable("cos(px)");

@@ -42,7 +42,7 @@ namespace Belle2 {
       virtual Weight operator()(const AObject& from, const AObject& to);
 
       /**
-       * Filter over a vector of relations. We need to override it since derrived relation classes do not implement a call with a pointer to a relation.
+       * Filter over a vector of relations. We need to override it since derived relation classes do not implement a call with a pointer to a relation.
        */
       virtual std::vector<float> operator()(const std::vector <Relation<AObject>*>& objs) override
       {

@@ -68,14 +68,14 @@ void ECLSplitterN2Module::initialize()
   m_liloParameters.at(2) = m_liloParameterC;
 
   // ECL dataobjects.
-  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
-  m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
-  m_eclShowers.registerInDataStore(eclShowerArrayName());
+  m_eclCalDigits.isRequired(eclCalDigitArrayName());
+  m_eclConnectedRegions.isRequired(eclConnectedRegionArrayName());
+  m_eclShowers.isRequired(eclShowerArrayName());
 
-  // Register relations (we probably dont need all, but keep them for now for debugging).
-  m_eclShowers.registerRelationTo(m_eclConnectedRegions);
-  m_eclShowers.registerRelationTo(m_eclCalDigits);
-  m_eclShowers.registerRelationTo(m_eclLocalMaximums);
+  // All the relations are already registered by ECLSplitterN1
+  m_eclShowers.requireRelationTo(m_eclConnectedRegions);
+  m_eclShowers.requireRelationTo(m_eclCalDigits);
+  m_eclShowers.requireRelationTo(m_eclLocalMaximums);
 
 }
 

@@ -35,11 +35,7 @@
   code="{m_nEvents = onfile.m_events;}"
 
 #pragma link C++ class Belle2::DisplayData+; // checksum=0x8b755e12, version=5
-#pragma link C++ class std::vector<TVector3>+; // checksum=0x907dc885, version=6
-#pragma link C++ class std::map<string, vector<TVector3>>+; // checksum=0xd74970c5, version=6
 #pragma link C++ class std::map<string, vector<ROOT::Math::XYZVector>>+; // checksum=0x91d6f4ec, version=6
-#pragma link C++ class std::pair<string, TVector3>+; // checksum=0x4d496280, version=-1
-#pragma link C++ class std::vector<std::pair<std::string, TVector3>>+; // checksum=0x1998b952, version=6
 #pragma link C++ class std::vector<std::pair<std::string, ROOT::Math::XYZVector>>+; // checksum=0xa2b6087d, version=6
 #pragma link C++ class std::vector<TH1*>+; // checksum=0x1c8a598, version=6
 #pragma link C++ class Belle2::DisplayData::Arrow+; // checksum=0xaf5e21d6, version=-1

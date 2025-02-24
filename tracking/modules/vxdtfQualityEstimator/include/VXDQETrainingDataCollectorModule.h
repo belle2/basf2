@@ -92,7 +92,7 @@ namespace Belle2 {
     /** QualityEstimatorMC as target for training */
     std::unique_ptr<QualityEstimatorBase> m_estimatorMC;
 
-    /** pointer to object that extracts the results from the estimation mehtod
+    /** pointer to object that extracts the results from the estimation method
     * (including QI, chi2, p_t and p_mag) */
     std::unique_ptr<QEResultsExtractor> m_qeResultsExtractor;
 
@@ -106,11 +106,11 @@ namespace Belle2 {
     std::vector<Named<float*>> m_variableSet;
 
     /** number of SpacePoints in SPTC as additional info to be collected,
-     * type is float to be consistend with m_variableSet (and TTree + MVA implementation) */
+     * type is float to be consistent with m_variableSet (and TTree + MVA implementation) */
     float m_nSpacePoints = NAN;
 
     /** truth information collected with m_estimatorMC
-     * type is float to be consistend with m_variableSet (and TTree + MVA implementation) */
+     * type is float to be consistent with m_variableSet (and TTree + MVA implementation) */
     float m_truth = NAN;
 
   };

@@ -514,7 +514,7 @@ to the log message. All keyword arguments are added to the function as
   def("B2FATAL", logFatal);
   setattr(logFatal, "__doc__", "B2FATAL(message, *args, **kwargs)\n\n"
           "Print a `FATAL <basf2.LogLevel.FATAL>` message. " + common_doc +
-          "\n\n.. note:: This also exits the programm with an error and is "
+          "\n\n.. note:: This also exits the program with an error and is "
           "guaranteed to not return.");
 }
 

@@ -13,7 +13,6 @@
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
@@ -212,6 +211,25 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr useMCancestorBRestFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          int index = ancestorBIndex(particle);
+          if (index < 0) return Const::doubleNaN;
+          StoreArray<MCParticle> mcparticles;
+          Particle temp(mcparticles[index]);
+          UseReferenceFrame<RestFrame> frame(&temp);
+          double result = std::get<double>(var->function(particle));
+          return result;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function useMCancestorBRestFrame.");
+      }
+    }
+
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -351,6 +369,7 @@ namespace Belle2 {
           for (const auto& track : tracks)
           {
             const TrackFitResult* trackFit = track.getTrackFitResultWithClosestMass(Const::pion);
+            if (!trackFit) continue;
             if (trackFit->getChargeSign() == 0) {
               // Ignore track
             } else {
@@ -565,9 +584,8 @@ namespace Belle2 {
         for (unsigned i = 0; i < list->getListSize(); ++i)
         {
           Particle* iparticle = list->getParticle(i);
-          if (particlesource == iparticle->getParticleSource())
-            if (particle->getMdstArrayIndex() == iparticle->getMdstArrayIndex())
-              return 1;
+          if (particle->getMdstSource() == iparticle->getMdstSource())
+            return 1;
         }
         return 0;
 
@@ -3343,10 +3361,9 @@ namespace Belle2 {
 
         int nTrackFitResults = 0;
 
-        for (int i = 0; i < tracks.getEntries(); i++)
+        for (const auto& track : tracks)
         {
-          const Track* track = tracks[i];
-          const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(type);
+          const TrackFitResult* trackFit = track.getTrackFitResultWithClosestMass(type);
 
           if (!trackFit) continue;
           if (trackFit->getChargeSign() == 0) continue;
@@ -3358,6 +3375,36 @@ namespace Belle2 {
 
       };
       return func;
+    }
+
+
+    Manager::FunctionPtr convertToInt(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        int default_val = Belle2::convertString<int>(arguments[1]);
+        auto func = [var, default_val](const Particle * particle) -> int {
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+          {
+            double value = std::get<double>(var_result);
+            if (value > std::numeric_limits<int>::max())
+              value = std::numeric_limits<int>::max();
+            if (value < std::numeric_limits<int>::min())
+              value = std::numeric_limits<int>::min();
+            if (std::isnan(value))
+              value = default_val;
+            return static_cast<int>(value);
+          } else if (std::holds_alternative<int>(var_result))
+            return std::get<int>(var_result);
+          else if (std::holds_alternative<bool>(var_result))
+            return static_cast<int>(std::get<bool>(var_result));
+          else return default_val;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function int, please provide variable name and replacement value for NaN!");
+      }
     }
 
     VARIABLE_GROUP("MetaFunctions");
@@ -3419,6 +3466,9 @@ Specifying the lab frame is useful in some corner-cases. For example:
 		      "of the first daughter (0). If the daughter index is invalid, it returns NaN.\n"
 		      "If two or more indices are given, the rest frame of the sum of the daughters is used.",
 		      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useMCancestorBRestFrame(variable)", useMCancestorBRestFrame,
+                      "Returns the value of the variable in the rest frame of the ancestor B MC particle.\n"
+                      "If no B or no MC-matching is found, it returns NaN.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.", Manager::VariableDataType::c_bool);
@@ -3582,48 +3632,48 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns the difference in :math:`\\phi` between the two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("daughterDiffOfPhi", false, "release-06-00-00", R"DOC(
+    MAKE_DEPRECATED("daughterDiffOfPhi", true, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("mcDaughterDiffOfPhi(i, j)", mcDaughterDiffOfPhi,
                       "MC matched version of the `daughterDiffOfPhi` function. The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("mcDaughterDiffOfPhi", false, "release-06-00-00", R"DOC(
+    MAKE_DEPRECATED("mcDaughterDiffOfPhi", true, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
                       "Returns the difference in :math:`\\phi` between the first daughters of the two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("grandDaughterDiffOfPhi", false, "release-06-00-00", R"DOC(
+    MAKE_DEPRECATED("grandDaughterDiffOfPhi", true, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
                       "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("daughterDiffOfClusterPhi", false, "release-06-00-00", R"DOC(
+    MAKE_DEPRECATED("daughterDiffOfClusterPhi", true, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("grandDaughterDiffOfClusterPhi(i, j)", grandDaughterDiffOfClusterPhi,
                       "Returns the difference in :math:`\\phi` between the ECLClusters of the daughters of the two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("grandDaughterDiffOfClusterPhi", false, "release-06-00-00", R"DOC(
+    MAKE_DEPRECATED("grandDaughterDiffOfClusterPhi", true, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
                       "Returns the difference in :math:`\\phi` between the two given daughters in the CMS frame. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("daughterDiffOfPhiCMS", false, "release-06-00-00", R"DOC(
+    MAKE_DEPRECATED("daughterDiffOfPhiCMS", true, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("mcDaughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
                       "MC matched version of the `daughterDiffOfPhiCMS` function. The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("mcDaughterDiffOfPhiCMS", false, "release-06-00-00", R"DOC(
+    MAKE_DEPRECATED("mcDaughterDiffOfPhiCMS", true, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
                       "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i``.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("daughterDiffOfClusterPhiCMS", false, "release-06-00-00", R"DOC(
+    MAKE_DEPRECATED("daughterDiffOfClusterPhiCMS", true, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
@@ -3713,6 +3763,13 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("int(variable, nan_replacement)", convertToInt, R"DOC(
+                      Casts the output of the variable to an integer value. 
+
+                      .. note::
+                        Overflow and underflow are clipped at maximum and minimum values, respectively. NaN values are replaced with the value of the 2nd argument.
+
+                      )DOC",  Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
                       "Useful for debugging.", Manager::VariableDataType::c_bool);

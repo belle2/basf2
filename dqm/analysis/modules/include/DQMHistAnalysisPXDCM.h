@@ -57,7 +57,7 @@ namespace Belle2 {
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
-    /** Update entry intervall */
+    /** Update entry interval */
     int m_minEntries = 10000;
 
     /** warn level for mean */

@@ -128,7 +128,7 @@ namespace {
     EXPECT_EQ(query[0].revision, 1);
     EXPECT_EQ(query[1].revision, 0);
     // try for exp 1, there should be something for both payloads and A should be in revision 3.
-    // Howewer metadata provider only fills missing info so we need new query structure
+    // However metadata provider only fills missing info so we need new query structure
     query = {PayloadMetadata{"A"}, PayloadMetadata{"B"}};
     EXPECT_TRUE(provider.getPayloads(1, 0, query));
     EXPECT_EQ(query[0].revision, 3);

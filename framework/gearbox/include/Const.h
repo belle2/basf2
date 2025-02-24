@@ -179,7 +179,7 @@ namespace Belle2 {
       DetectorSet& operator=(const DetectorSet&) = default;
 
       /**
-       * Constructor for a set containig one detector ID.
+       * Constructor for a set containing one detector ID.
        * @param det  The ID of the detector.
        */
       // cppcheck-suppress noExplicitConstructor
@@ -310,7 +310,7 @@ namespace Belle2 {
       RestrictedDetectorSet(const DetectorSet& set): DetectorSet(set) {checkSet();}
 
       /**
-       * Constructor for a set containg one detector ID.
+       * Constructor for a set containing one detector ID.
        * @param det  The detector ID.
        */
       // cppcheck-suppress noExplicitConstructor
@@ -512,7 +512,7 @@ namespace Belle2 {
      */
     class ParticleSet {
     public:
-      /** Emtpy constructor. */
+      /** Empty constructor. */
       ParticleSet() = default;
 
       /** Copy constructor to make sure particles belong to correct set. */

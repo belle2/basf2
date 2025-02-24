@@ -56,9 +56,7 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationCrystalElect
   m_calibrationCrateTimeOffset("ECLCrateTimeOffset"),
   m_calibrationCrystalFlightTime("ECLCrystalFlightTime"),
   m_eclDigits(eclDigitArrayName()),
-  m_eclCalDigits(eclCalDigitArrayName()),
-  m_eclDsps(eclDspArrayName()),
-  m_eclPureCsIInfo(eclPureCsIInfoArrayName())
+  m_eclCalDigits(eclCalDigitArrayName())
 {
   // Set module properties
   setDescription("Applies digit energy, time and time-resolution calibration to each ECL digit. Counts number of out-of-time background digits to determine the event-by-event background level.");
@@ -67,20 +65,6 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationCrystalElect
   addParam("fileBackgroundName", m_fileBackgroundName, "Background filename.",
            FileSystem::findFile("/data/ecl/background_norm.root"));
   addParam("simulatePure", m_simulatePure, "Flag to simulate pure CsI option", false);
-
-  // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
-  addParam("energyDependenceTimeOffsetFitParam_p1", m_energyDependenceTimeOffsetFitParam_p1,
-           "Fit parameter (p1) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
-  addParam("energyDependenceTimeOffsetFitParam_p2", m_energyDependenceTimeOffsetFitParam_p2,
-           "Fit parameter (p2) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
-  addParam("energyDependenceTimeOffsetFitParam_p3", m_energyDependenceTimeOffsetFitParam_p3,
-           "Fit parameter (p3) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
-  addParam("energyDependenceTimeOffsetFitParam_p4", m_energyDependenceTimeOffsetFitParam_p4,
-           "Fit parameter (p4) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
-  addParam("energyDependenceTimeOffsetFitParam_p5", m_energyDependenceTimeOffsetFitParam_p5,
-           "Fit parameter (p5) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
-  addParam("energyDependenceTimeOffsetFitParam_p6", m_energyDependenceTimeOffsetFitParam_p6,
-           "Fit parameter (p6) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
 
   // Parallel processing certification
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -126,20 +110,16 @@ void ECLDigitCalibratorModule::callbackCalibration(DBObjPtr<ECLCrystalCalib>& ca
 void ECLDigitCalibratorModule::initialize()
 {
   // mdst dataobjects
-  //  This object is registered by both ECL and KLM packages. Let's be agnostic about the
-  //  execution order of ecl and klm modules: the first package run registers the module
+  // This object is registered by few packages. Let's be agnostic about the
+  // execution order of the modules: the first package run registers the module
   m_eventLevelClusteringInfo.isOptional(eventLevelClusteringInfoName()) ? m_eventLevelClusteringInfo.isRequired(
     eventLevelClusteringInfoName())
   : m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 
   // Register Digits, CalDigits and their relation in datastore
-  m_eclDigits.registerInDataStore(eclDigitArrayName());
-  m_eclDsps.registerInDataStore(eclDspArrayName());
+  m_eclDigits.isRequired(eclDigitArrayName());
   m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   m_eclCalDigits.registerRelationTo(m_eclDigits);
-
-  // Special information for pure CsI simulation
-  m_eclPureCsIInfo.registerInDataStore(eclPureCsIInfoArrayName());
 
   // initialize calibration
   initializeCalibration();
@@ -161,27 +141,6 @@ void ECLDigitCalibratorModule::initialize()
     m_pol2Max = -c_pol2Var2 / (2 * c_pol2Var3);
   } else {
     m_pol2Max = 0.;
-  }
-
-  if ((m_energyDependenceTimeOffsetFitParam_p1 != -999) &&
-      (m_energyDependenceTimeOffsetFitParam_p2 != -999) &&
-      (m_energyDependenceTimeOffsetFitParam_p3 != -999) &&
-      (m_energyDependenceTimeOffsetFitParam_p4 != -999) &&
-      (m_energyDependenceTimeOffsetFitParam_p5 != -999) &&
-      (m_energyDependenceTimeOffsetFitParam_p6 != -999)) {
-    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p1 = " << m_energyDependenceTimeOffsetFitParam_p1);
-    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p2 = " << m_energyDependenceTimeOffsetFitParam_p2);
-    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p3 = " << m_energyDependenceTimeOffsetFitParam_p3);
-    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p4 = " << m_energyDependenceTimeOffsetFitParam_p4);
-    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p5 = " << m_energyDependenceTimeOffsetFitParam_p5);
-    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p6 = " << m_energyDependenceTimeOffsetFitParam_p6);
-
-    ECLTimeUtil->setTimeWalkFuncParams(m_energyDependenceTimeOffsetFitParam_p1,
-                                       m_energyDependenceTimeOffsetFitParam_p2,
-                                       m_energyDependenceTimeOffsetFitParam_p3,
-                                       m_energyDependenceTimeOffsetFitParam_p4,
-                                       m_energyDependenceTimeOffsetFitParam_p5,
-                                       m_energyDependenceTimeOffsetFitParam_p6);
   }
 }
 

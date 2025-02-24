@@ -281,7 +281,8 @@ void SVDLocalCalibrationsCheckModule::event()
         int ladder =  itSvdSensors->getLadderNumber();
         int sensor = itSvdSensors->getSensorNumber();
         Belle2::VxdID theVxdID(layer, ladder, sensor);
-        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(theVxdID));
+        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::getInstance().getSensorInfo(
+                                                     theVxdID));
 
         TList* listEmpty = new TList;
 
@@ -805,7 +806,8 @@ void SVDLocalCalibrationsCheckModule::setAPVHistoStyles(SVDAPVHistograms<TH1F>* 
         int ladder =  itSvdSensors->getLadderNumber();
         int sensor = itSvdSensors->getSensorNumber();
         Belle2::VxdID theVxdID(layer, ladder, sensor);
-        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(theVxdID));
+        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::getInstance().getSensorInfo(
+                                                     theVxdID));
 
         for (int side = 0; side < 2; side++) {
 

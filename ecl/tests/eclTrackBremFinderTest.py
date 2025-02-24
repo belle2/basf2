@@ -48,10 +48,10 @@ class CheckRelationBremClusterTestModule(b2.Module):
         if (eventMetaData.getEvent() in bad_events):
             # the check fails on some events. Instead of finding new settings,
             # check if the bremCluster is None only for the bad_events
-            assert(not bremCluster)
+            assert (not bremCluster)
         else:
             # for all the other events, there must be a bremCluster
-            assert(bremCluster)
+            assert (bremCluster)
 
 
 class SearchForHits(b2.Module):
@@ -103,9 +103,9 @@ main.add_module('ParticleGun',
                 momentumGeneration='fixed',
                 momentumParams=0.1,
                 thetaGeneration='fixed',
-                thetaParams=1.6614126908216453 * 180 / 3.1415,
+                thetaParams=1.6614126908216453 / Belle2.Unit.deg,
                 phiGeneration='fixed',
-                phiParams=0.6210485691762964 * 180 / 3.1415,
+                phiParams=0.6210485691762964 / Belle2.Unit.deg,
                 xVertexParams=[9.27695426703659],
                 yVertexParams=[5.949838410158973],
                 zVertexParams=[-0.9875516764256207],

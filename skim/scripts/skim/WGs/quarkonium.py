@@ -20,7 +20,7 @@ from stdV0s import stdLambdas
 from variables import variables as v
 
 __liaison__ = "Sen Jia <jiasen@seu.edu.cn>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -151,7 +151,7 @@ class BottomoniumUpsilon(BaseSkim):
             ma.reconstructDecay("junction:all" + str(chID) + " -> " + channel, Ycuts, chID, path=path, allowChargeViolation=True)
             UpsilonList.append("junction:all" + str(chID))
 
-        # reture the list
+        # return the list
         return UpsilonList
 
     #       *two* sets of validation scripts defined.
@@ -223,7 +223,7 @@ class CharmoniumPsi(BaseSkim):
         # Electrons with bremsstrahlung correction.
         # Use both correction algorithms as well as uncorrected electrons
         # to allow for algorithm comparison in analysis.
-        # The recommeneded list for further reconstruction is J/psi:eebrems.
+        # The recommended list for further reconstruction is J/psi:eebrems.
         # The estimated ratio of efficiencies in B decays in release 5.1.5 is
         # 1.00 (J/psi:eebrems) : 0.95 (J/psi:eebrems2) : 0.82 (J/psi:ee).
         ma.correctBremsBelle('e+:brems', 'e+:merged', 'gamma:all',
@@ -389,5 +389,5 @@ class InclusiveUpsilon(BaseSkim):
                 allowChargeViolation=True)
             InclusiveUpsilon.append("junction:InclusiveUpsilon" + str(chID))
 
-        # reture the list
+        # return the list
         return InclusiveUpsilon

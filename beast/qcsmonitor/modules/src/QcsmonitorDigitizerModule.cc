@@ -9,13 +9,11 @@
 #include <beast/qcsmonitor/modules/QcsmonitorDigitizerModule.h>
 #include <beast/qcsmonitor/dataobjects/QcsmonitorSimHit.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 
 //c++
 #include <string>
-#include <fstream>
 
 using namespace std;
 using namespace Belle2;
@@ -55,7 +53,7 @@ void QcsmonitorDigitizerModule::initialize()
   B2INFO("QcsmonitorDigitizer: Initializing");
   m_qcsmonitorHit.registerInDataStore();
 
-  //get the garfield drift data, gas, and QCSMONITOR paramters
+  //get the garfield drift data, gas, and QCSMONITOR parameters
   getXMLData();
 
 }
@@ -135,7 +133,7 @@ void QcsmonitorDigitizerModule::getXMLData()
   m_C_keV_to_MIP = content.getDouble("C_keV_to_MIP");
   m_C_MIP_to_PE = content.getDouble("C_MIP_to_PE");
 
-  B2INFO("QcsmonitorDigitizer: Aquired qcsmonitor locations and gas parameters");
+  B2INFO("QcsmonitorDigitizer: Acquired qcsmonitor locations and gas parameters");
 
 }
 

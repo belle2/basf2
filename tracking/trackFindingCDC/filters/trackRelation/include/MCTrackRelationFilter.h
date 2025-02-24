@@ -14,7 +14,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Filter for the constuction of track relations based on MC information.
+    /// Filter for the construction of track relations based on MC information.
     class MCTrackRelationFilter : public MCSymmetric<BaseTrackRelationFilter > {
 
     private:
@@ -24,7 +24,7 @@ namespace Belle2 {
     public:
       /**
        *  Constructor also setting the switch ,
-       *  if the reversed version of a track relation (in comparision to MC truth) shall be accepted.
+       *  if the reversed version of a track relation (in comparison to MC truth) shall be accepted.
        */
       explicit MCTrackRelationFilter(bool allowReverse = false);
 

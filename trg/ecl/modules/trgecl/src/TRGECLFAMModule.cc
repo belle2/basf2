@@ -113,6 +113,9 @@ namespace Belle2 {
     m_TRGECLWaveform.registerInDataStore();
     m_TRGECLHit.registerInDataStore();
     m_TRGECLFAMAna.registerInDataStore();
+    // This object is registered by few packages. Let's be agnostic about the
+    // execution order of the modules: the first package run registers the module
+    m_eventLevelClusteringInfo.isOptional() ? m_eventLevelClusteringInfo.isRequired() :
     m_eventLevelClusteringInfo.registerInDataStore();
 
     //    m_FAMPara = new DBObjPtr<TRGECLFAMPara>;

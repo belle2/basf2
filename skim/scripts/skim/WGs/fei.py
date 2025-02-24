@@ -22,7 +22,7 @@ from skim.utils.misc import _sphinxify_decay
 from variables import variables as vm
 
 __liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au>, Tommy Martinov <tommy.martinov@desy.de>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 def _merge_boolean_dicts(*dicts):
@@ -132,7 +132,7 @@ class BaseFEISkim(BaseSkim):
         * Cleaned tracks (``pi+:FEI_cleaned``): :math:`d_0 < 0.5~{\\rm cm}`,
           :math:`|z_0| < 2~{\\rm cm}`, and :math:`p_T > 0.1~{\\rm GeV}`
         * Cleaned ECL clusters (``gamma:FEI_cleaned``):
-          :math:`0.296706 < \\theta < 2.61799`, and
+          :math:`\\theta` in CDC acceptance, and
           :math:`E>0.1~{\\rm GeV}`
         """
 
@@ -854,7 +854,7 @@ class feiHadronic_DstEllNu(BaseFEISkim):
             "clusters": [
                 "clusterNHits > 1.5",
                 "[[clusterReg==1 and E > 0.080] or [clusterReg==2 and E > 0.030] or [clusterReg==3 and E > 0.060]]",
-                "[[clusterTheta > 0.2967] and [clusterTheta < 2.6180]]",
+                "thetaInCDCAcceptance",
                 "abs(clusterTiming) < 200",
             ],
         }

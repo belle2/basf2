@@ -58,7 +58,7 @@ namespace Belle2 {
     /// Constructor, for setting module description and parameters.
     CKFToPXDFindlet();
 
-    /// Default desctructor
+    /// Default destructor
     ~CKFToPXDFindlet();
 
     /// Expose the parameters of the sub findlets.

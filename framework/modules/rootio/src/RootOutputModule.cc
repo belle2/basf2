@@ -47,7 +47,7 @@ RootOutputModule::RootOutputModule() : Module(), m_file(nullptr), m_tree{0}, m_e
   m_eventLow(0), m_experimentHigh(0), m_runHigh(0), m_eventHigh(0)
 {
   //Set module properties
-  setDescription("Writes DataStore objects into a .root file. Data is stored in a TTree 'tree' for event-dependent and in 'persistent' for peristent data. You can use RootInput to read the files back into basf2.");
+  setDescription("Writes DataStore objects into a .root file. Data is stored in a TTree 'tree' for event-dependent and in 'persistent' for persistent data. You can use RootInput to read the files back into basf2.");
   setPropertyFlags(c_Output);
 
   //Parameter definition
@@ -514,6 +514,6 @@ void RootOutputModule::fillTree(DataStore::EDurability durability)
     //m_file deleted first so we have a chance of closing it (though that will probably fail)
     const std::string filename = m_file->GetName();
     delete m_file;
-    B2FATAL("A write error occured while saving '" << filename << "', please check if enough disk space is available.");
+    B2FATAL("A write error occurred while saving '" << filename << "', please check if enough disk space is available.");
   }
 }

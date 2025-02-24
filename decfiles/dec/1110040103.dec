@@ -1,0 +1,31 @@
+# EventType: 1110040103
+# Descriptor: [B0 -> (K_S0 -> pi+ pi-)(K_S0 -> pi+ pi-)]cc
+# NickName: Bd_KSKS
+# Documentation: Study of TDCPV in B0->KSKS mode analysis with CPV parameters of (S_CP,C_CP)=(-1.0,0.0)
+# Tested: Yes
+# PhysicsWG: TDCPV
+# Responsible: Aimi Kusudo
+# Email: waa_kusudo@cc.nara-wu.ac.jp
+# Cuts: None
+# Date: 20250211
+#
+#
+Alias      K_S0sig K_S0
+ChargeConj K_S0sig K_S0sig
+#
+#
+Decay Upsilon(4S)
+1.000 B0 anti-B0 B0sig anti-B0sig VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.000 K_S0sig K_S0sig             SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.395 1.0 -0.395;
+Enddecay
+#
+CDecay anti-B0sig
+#
+Decay K_S0sig
+1.000 pi+ pi-                     PHSP;
+Enddecay
+#
+End

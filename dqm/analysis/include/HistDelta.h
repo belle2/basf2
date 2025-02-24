@@ -35,14 +35,14 @@ namespace Belle2 {
     bool m_updated{false};/**< if any delta was updated in this event */
   public:
 
-    /** Construktor
+    /** Constructor
      * @param t type
      * @param p parameter for type
      * @param a amount of deletas in the past
      */
     HistDelta(EDeltaType t = c_Disabled, int p = 0, unsigned int a = 0);
 
-    /** Destruktor
+    /** Destructor
      */
     ~HistDelta();
 

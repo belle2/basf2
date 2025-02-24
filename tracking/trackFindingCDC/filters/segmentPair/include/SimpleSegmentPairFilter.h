@@ -18,7 +18,7 @@ namespace Belle2 {
     class CDCTrajectory3D;
     class CDCTrajectory2D;
 
-    /// Filter for the constuction of axial to axial segment pairs based on simple criterions
+    /// Filter for the construction of axial to axial segment pairs based on simple criterions
     class SimpleSegmentPairFilter : public BaseSegmentPairFilter {
 
     public:

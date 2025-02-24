@@ -22,7 +22,6 @@
 
 #include <RooDataSet.h>
 #include <RooRealVar.h>
-#include <RooFormulaVar.h>
 #include <RooAddPdf.h>
 #include <RooGaussian.h>
 #include <RooChebychev.h>
@@ -68,8 +67,8 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
   TH2F hGammaE = GammaHistogram(ttreeGamma);
   std::vector<double> pbins = CreatePBinningScheme();
   TH2F hEmpty("hEmpty", "A histogram returned if we cannot calibrate", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
-  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+  for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       hEmpty.SetBinContent(pbin, dedxbin, 0.01);
     };
   }
@@ -187,14 +186,21 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
   RooRealVar GaussSigma("GaussSigma", "#sigma_{1}", 3.e-3, 3.e-5, 10.e-3);
   RooGaussian LambdaGauss("LambdaGauss", "LambdaGauss", InvM, GaussMean, GaussSigma);
 
-  RooRealVar resolutionParamL("resolutionParamL", "resolutionParamL", 0.4, 5.e-4, 1.0);
-  RooRealVar resolutionParamR("resolutionParamR", "resolutionParamR", 0.4, 5.e-4, 1.0);
-  RooFormulaVar sigmaBifurGaussL1("sigmaBifurGaussL1", "resolutionParamL*GaussSigma", RooArgSet(resolutionParamL, GaussSigma));
-  RooFormulaVar sigmaBifurGaussR1("sigmaBifurGaussR1", "resolutionParamR*GaussSigma", RooArgSet(resolutionParamR, GaussSigma));
+  /* temporary RooRealVar sigmaBifurGaussL1 and sigmaBifurGaussR1 to replace
+   * RooRealVar resolutionParamL("resolutionParamL", "resolutionParamL", 0.4, 5.e-4, 1.0);
+   * RooRealVar resolutionParamR("resolutionParamR", "resolutionParamR", 0.4, 5.e-4, 1.0);
+   * RooFormulaVar sigmaBifurGaussL1("sigmaBifurGaussL1", "resolutionParamL*GaussSigma", RooArgSet(resolutionParamL, GaussSigma));
+   * RooFormulaVar sigmaBifurGaussR1("sigmaBifurGaussR1", "resolutionParamR*GaussSigma", RooArgSet(resolutionParamR, GaussSigma));
+   */
+  RooRealVar sigmaBifurGaussL1("sigmaBifurGaussL1", "sigma left", 0.4 * 3.e-3, 3.e-5, 10.e-3);
+  RooRealVar sigmaBifurGaussR1("sigmaBifurGaussR1", "sigma right", 0.4 * 3.e-3, 3.e-5, 10.e-3);
   RooBifurGauss LambdaBifurGauss("LambdaBifurGauss", "LambdaBifurGauss", InvM, GaussMean, sigmaBifurGaussL1, sigmaBifurGaussR1);
 
-  RooRealVar resolutionParam2("resolutionParam2", "resolutionParam2", 0.2, 5.e-4, 1.0);
-  RooFormulaVar sigmaBifurGaussL2("sigmaBifurGaussL2", "resolutionParam2*GaussSigma", RooArgSet(resolutionParam2, GaussSigma));
+  /* temporary RooRealVar sigmaBifurGaussL2 to replace
+   * RooRealVar resolutionParam2("resolutionParam2", "resolutionParam2", 0.2, 5.e-4, 1.0);
+   * sigmaBifurGaussL2("sigmaBifurGaussL2", "resolutionParam2*GaussSigma", RooArgSet(resolutionParam2, GaussSigma));
+   */
+  RooRealVar sigmaBifurGaussL2("sigmaBifurGaussL2", "sigmaBifurGaussL2", 0.2 * 3.e-3, 3.e-5, 10.e-3);
   RooGaussian LambdaBifurGauss2("LambdaBifurGauss2", "LambdaBifurGauss2", InvM, GaussMean, sigmaBifurGaussL2);
 
   RooRealVar fracBifurGaussYield("fracBifurGaussYield", "fracBifurGaussYield", 0.3, 5.e-4, 1.0);
@@ -278,9 +284,8 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
   RooDataSet* LambdaDatasetSWeighted = new RooDataSet(LambdaDataset->GetName(), LambdaDataset->GetTitle(), LambdaDataset,
                                                       *LambdaDataset->get());
 
-  RooDataSet::setDefaultStorageType(RooAbsData::Tree);
-  ((RooTreeDataStore*)(LambdaDatasetSWeighted->store())->tree())->SetName("treeLambda_sw");
   TTree* treeLambda_sw = LambdaDatasetSWeighted->GetClonedTree();
+  treeLambda_sw->SetName("treeLambda_sw");
 
   B2INFO("Lambda: sPlot done. Proceed to histogramming");
 
@@ -310,8 +315,8 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
   // for each momentum bin, normalize the pdf
 
   // hLambdaP normalisation
-  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+  for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       // get rid of the bins with negative weights
       if (hLambdaP->GetBinContent(pbin, dedxbin) <= 1) {
         hLambdaP->SetBinContent(pbin, dedxbin, 0);
@@ -324,7 +329,7 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       hLambdaP->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
@@ -456,9 +461,8 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   RooDataSet* DstarDatasetSWeighted = new RooDataSet(DstarDataset->GetName(), DstarDataset->GetTitle(), DstarDataset,
                                                      *DstarDataset->get());
 
-  RooDataSet::setDefaultStorageType(RooAbsData::Tree);
-  ((RooTreeDataStore*)(DstarDatasetSWeighted->store())->tree())->SetName("treeDstar_sw");
   TTree* treeDstar_sw = DstarDatasetSWeighted->GetClonedTree();
+  treeDstar_sw->SetName("treeDstar_sw");
 
   B2INFO("Dstar: sPlot done. Proceed to histogramming");
 
@@ -515,8 +519,8 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   // hDstarK normalisation
   // for each momentum bin, normalize the pdf
 
-  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+  for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       // get rid of the bins with negative weights
       if (hDstarK->GetBinContent(pbin, dedxbin) <= 1) {
         hDstarK->SetBinContent(pbin, dedxbin, 0);
@@ -529,14 +533,14 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       hDstarK->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
 
   // hDstarPi normalisation
-  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+  for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       // get rid of the bins with negative weights
       if (hDstarPi->GetBinContent(pbin, dedxbin) <= 1) {
         hDstarPi->SetBinContent(pbin, dedxbin, 0);
@@ -549,14 +553,14 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       hDstarPi->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
 
   // hDstarMu normalisation
-  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+  for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       // get rid of the bins with negative weights
       if (hDstarMu->GetBinContent(pbin, dedxbin) <= 1) {
         hDstarMu->SetBinContent(pbin, dedxbin, 0);
@@ -569,7 +573,7 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       hDstarMu->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
@@ -624,8 +628,8 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
 
   // for each momentum bin, normalize the pdf
   // hGammaE normalisation
-  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+  for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       // get rid of the bins with negative weights
       if (hGammaE->GetBinContent(pbin, dedxbin) <= 1) {
         hGammaE->SetBinContent(pbin, dedxbin, 0);
@@ -639,7 +643,7 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       hGammaE->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }

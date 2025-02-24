@@ -559,6 +559,26 @@ namespace Belle2 {
       return tauDecay->getTauMinusMcProng();
     }
 
+    double tauPlusEgstar(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return 0;
+      }
+      return tauDecay->getTauPlusEgstar();
+    }
+
+    double tauMinusEgstar(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return 0;
+      }
+      return tauDecay->getTauMinusEgstar();
+    }
+
     double isReconstructible(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
@@ -581,6 +601,10 @@ namespace Belle2 {
       Track* tmp_track = tmp_mcP->getRelated<Track>();
       if (tmp_track) {
         const TrackFitResult* tmp_tfr = tmp_track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(tmp_mcP->getPDG())));
+        if (!tmp_tfr) {
+          // p value of TrackFitResult is NaN so cannot check charge
+          return 0;
+        }
         if (tmp_tfr->getChargeSign()*tmp_mcP->getCharge() > 0)
           return 1;
         else
@@ -1192,6 +1216,10 @@ List of possible values (taken from the Geant4 source of
                       "[Eventbased] Prong for the positive tau lepton in a tau pair generated event.");
     REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
                       "[Eventbased] Prong for the negative tau lepton in a tau pair generated event.");
+    REGISTER_VARIABLE("tauPlusEgstar", tauPlusEgstar,
+                      "[Eventbased] Energy of radiated gamma from positive tau lepton in a tau pair generated event.");
+    REGISTER_VARIABLE("tauMinusEgstar", tauMinusEgstar,
+                      "[Eventbased] Energy of radiated gamma from negative tau lepton in a tau pair generated event.");
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,

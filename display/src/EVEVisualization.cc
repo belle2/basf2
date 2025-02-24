@@ -84,7 +84,6 @@
 #include <TMatrixD.h>
 #include <TMatrixDSymEigen.h>
 
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/algorithm/string/find.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -687,7 +686,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
                 continue;
               }
 
-              const VXD::SensorInfoBase& sensor = geo.get(recoHit->getSensorID());
+              const VXD::SensorInfoBase& sensor = geo.getSensorInfo(recoHit->getSensorID());
               double du, dv;
               ROOT::Math::XYZVector a = o; //defines position of sensor plane
               double hit_res_u = hit_cov(0, 0);
@@ -1078,13 +1077,13 @@ void EVEVisualization::addSimHit(const CDCSimHit* hit, const MCParticle* particl
 void EVEVisualization::addSimHit(const PXDSimHit* hit, const MCParticle* particle)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
+  const ROOT::Math::XYZVector& global_pos = geo.getSensorInfo(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const SVDSimHit* hit, const MCParticle* particle)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
+  const ROOT::Math::XYZVector& global_pos = geo.getSensorInfo(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const KLMSimHit* hit, const MCParticle* particle)
@@ -1135,7 +1134,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     mctrack = tparticle;
     mctrack.fTDecay = particle->getDecayTime();
     mctrack.fVDecay.Set(B2Vector3D(particle->getDecayVertex()));
-    mctrack.fDecayed = !boost::math::isinf(mctrack.fTDecay);
+    mctrack.fDecayed = !std::isinf(mctrack.fTDecay);
     mctrack.fIndex = particle->getIndex();
     m_mcparticleTracks[particle].track = new TEveTrack(&mctrack, m_trackpropagator);
 
@@ -1583,7 +1582,7 @@ void EVEVisualization::addROI(const ROIid* roi)
 void EVEVisualization::addRecoHit(const SVDCluster* hit, TEveStraightLineSet* lines)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
+  const VXD::SensorInfoBase& sensor = geo.getSensorInfo(hit->getSensorID());
 
   ROOT::Math::XYZVector a, b;
   if (hit->isUCluster()) {

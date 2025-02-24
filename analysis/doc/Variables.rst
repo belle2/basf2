@@ -156,6 +156,16 @@ Here is a list of track variables for V0 daughters:
 .. b2-variables::
    :group: V0Daughter
 
+.. _kinkvariables:
+
+Kink
+~~~~
+
+Here is a list of variables for kinks, which are reconstructed since release-09:
+
+.. b2-variables::
+   :group: Kink
+
 PID
 ~~~
 
@@ -521,7 +531,7 @@ events used for producing MC samples (both run-independent and run-dependent).
 
 .. b2-variables::
    :group: BeamBackgroundOverlay
-	     
+
 Calibration
 ~~~~~~~~~~~
 
@@ -537,7 +547,7 @@ They have a **[Calibration]** pretag.
    :group: ECL calibration
 .. b2-variables::
    :group: ECL trigger calibration
-	   
+
 Collections and Lists
 ---------------------
 

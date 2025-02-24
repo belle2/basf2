@@ -4,7 +4,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
-#pragma link C++ class Belle2::Particle+; // checksum=0xb9d445e0, version=17
+#pragma link C++ class Belle2::Particle+; // checksum=0x3fd26c63, version=18
 #pragma link C++ class Belle2::ParticleList+; // checksum=0xa5bad8a, version=4
 #pragma link C++ class Belle2::RestOfEvent+; // checksum=0xe86f1658, version=8
 #pragma link C++ class Belle2::TagVertex+; // checksum=0x329aa3d0, version=7

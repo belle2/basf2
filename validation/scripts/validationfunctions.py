@@ -370,7 +370,8 @@ def get_argument_parser(
         "--select",
         help="The file name(s) of one or more space separated validation "
         "scripts that should be executed exclusively. All dependent "
-        "scripts will also be executed. E.g. -s ECL2D.C",
+        "scripts will also be executed. E.g. -s ECL2D.C "
+        "(use -si instead to execute script(s) ignoring dependencies)",
         type=str,
         nargs="+",
     )

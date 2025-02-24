@@ -713,7 +713,7 @@ void TpcDigitizerModule::getXMLData()
   m_Fanofac = content.getDouble("Fanofac");
   m_GasAbs = content.getDouble("GasAbs");
 
-  B2INFO("TpcDigitizer: Aquired tpc locations and gas parameters");
+  B2INFO("TpcDigitizer: Acquired tpc locations and gas parameters");
   B2INFO("              from MICROTPC.xml. There are " << m_nTPC << " TPCs implemented");
 
 }

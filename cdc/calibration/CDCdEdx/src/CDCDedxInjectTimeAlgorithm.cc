@@ -157,8 +157,11 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
   //................................................
   // Do the calibration for resolution
   //................................................
-  CDCDedxMeanPred m;
-  CDCDedxSigmaPred s;
+  CDCDedxMeanPred mbg;
+  CDCDedxSigmaPred sbg;
+  mbg.setParameters();
+  sbg.setParameters();
+
   //fill histograms for the resolution
   for (int i = 0; i < ttree->GetEntries(); ++i) {
 
@@ -181,8 +184,8 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
     if (tb > m_tbins)tb = m_tbins; //overflow
     tb = tb - 1;
 
-    double predmean = m.getMean(mom / Const::electron.getMass());
-    double predsigma = s.nhitPrediction(nhits) * s.ionzPrediction(dedx) * s.cosPrediction(costh);
+    double predmean = mbg.getMean(mom / Const::electron.getMass());
+    double predsigma = sbg.nhitPrediction(nhits) * sbg.ionzPrediction(dedx) * sbg.cosPrediction(costh);
 
     double chi = (dedx - predmean) / predsigma;
     hdedx_corr[wr][tb]->Fill(dedx);

@@ -11,8 +11,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
-#include <iostream>
-
 using namespace std;
 using namespace Belle2;
 

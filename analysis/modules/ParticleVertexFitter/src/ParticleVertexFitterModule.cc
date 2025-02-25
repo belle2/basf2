@@ -77,8 +77,6 @@ ParticleVertexFitterModule::ParticleVertexFitterModule() : Module(),
   addParam("recoilMass", m_recoilMass, "recoil invariant mass (GeV)", 0.);
   addParam("massConstraintList", m_massConstraintList,
            "Type::[int]. List of daughter particles to mass constrain with int = pdg code. (only for MassFourCKFit)", {});
-  addParam("massConstraintListParticlename", m_massConstraintListParticlename,
-           "Type::[string]. List of daughter particles to mass constrain with string = particle name. (only for MassFourCKFit)", {});
 }
 
 void ParticleVertexFitterModule::initialize()
@@ -98,13 +96,6 @@ void ParticleVertexFitterModule::initialize()
 
   if (m_decayString != "")
     m_decaydescriptor.init(m_decayString);
-
-  if ((m_massConstraintList.size()) == 0 && (m_massConstraintListParticlename.size()) > 0) {
-    for (auto& containedParticle : m_massConstraintListParticlename) {
-      TParticlePDG* particletemp = TDatabasePDG::Instance()->GetParticle((containedParticle).c_str());
-      m_massConstraintList.push_back(particletemp->PdgCode());
-    }
-  }
 
   B2INFO("ParticleVertexFitter: Performing " << m_fitType << " fit on " << m_listName << " using " << m_vertexFitter);
   if (m_decayString != "")

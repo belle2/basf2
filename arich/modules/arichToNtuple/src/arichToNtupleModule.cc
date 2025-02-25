@@ -12,7 +12,6 @@
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <arich/dataobjects/ARICHTrack.h>
 #include <arich/dataobjects/ARICHPhoton.h>
-#include <arich/dataobjects/ARICHHit.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 

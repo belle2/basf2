@@ -126,7 +126,6 @@ namespace Belle2 {
      * Environment as they get consumed when obtained so the finalized list of
      * output files should be stored for subsequent calls.
      */
-    [[deprecated("will be removed in release-05.")]]
     virtual std::vector<std::string> getFileNames(__attribute__((unused)) bool outputFiles)
     {
       return std::vector<std::string>();

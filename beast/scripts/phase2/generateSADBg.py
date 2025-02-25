@@ -95,7 +95,7 @@ realTime = float(equivTime) * 1000
 fname = bgType + '_' + sampleType + '-phase' + str(phase) + '-' + num
 outputFile = outdir + '/' + fname + '.root'
 
-# check for the existance of a SAD file
+# check for the existence of a SAD file
 
 if not os.path.exists(sadFile):
     b2.B2ERROR('SAD file ' + sadFile + ' not found')
@@ -159,7 +159,7 @@ main.add_module(geometry)
 fullsim = b2.register_module('FullSim')
 if sampleType == 'study':
     fullsim.param('PhysicsList', 'FTFP_BERT_HP')
-    fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
+    fullsim.param('UICommandsAtIdle', ['/process/deactivate nKiller'])
     fullsim.param('StoreAllSecondaries', True)
     fullsim.param('SecondariesEnergyCut', 0.000001)  # [MeV] need for CDC EB neutron flux
 main.add_module(fullsim)

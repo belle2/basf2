@@ -8,10 +8,10 @@
 
 #include <analysis/modules/TrackIsoCalculator/TrackIsoCalculatorModule.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
+#include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/DetectorSurface.h>
 
 #include <cmath>
-#include <iomanip>
 #include <boost/algorithm/string.hpp>
 
 
@@ -144,7 +144,7 @@ void TrackIsoCalculatorModule::event()
   // for which the distance to nearest neighbour is to be calculated.
   // If the input ParticleList is that of standard charged particles, just copy
   // the whole list over, otherwise loop over the selected charged daughters.
-  std::unordered_map<unsigned int, const Particle*> targetParticles;
+  std::unordered_map<int, const Particle*> targetParticles;
   targetParticles.reserve(nMotherParticles);
 
   for (unsigned int iPart(0); iPart < nMotherParticles; ++iPart) {
@@ -166,13 +166,13 @@ void TrackIsoCalculatorModule::event()
             if (iDaughter->hasExtraInfo(m_detLayerToDistVariable[iDetLayer])) {
               continue;
             }
-            targetParticles.insert({iDaughter->getMdstArrayIndex(), iDaughter});
+            targetParticles.insert({iDaughter->getMdstSource(), iDaughter});
           }
         } else {
           if (iParticle->hasExtraInfo(m_detLayerToDistVariable[iDetLayer])) {
             continue;
           }
-          targetParticles.insert({iParticle->getMdstArrayIndex(), iParticle});
+          targetParticles.insert({iParticle->getMdstSource(), iParticle});
         }
 
       }
@@ -200,24 +200,24 @@ void TrackIsoCalculatorModule::event()
 
       // Store the pair-wise distances in a map,
       // where the keys are pairs of mdst indexes.
-      std::map<std::pair<unsigned int, unsigned int>, double> particleMdstIdxPairsToDist;
+      std::map<std::pair<int, int>, double> particleMdstSourcePairsToDist;
 
       // Loop over input particle list
       for (const auto& targetParticle : targetParticles) {
 
-        auto iMdstIdx = targetParticle.first;
+        auto iMdstSource = targetParticle.first;
         auto iParticle = targetParticle.second;
 
         for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
 
           auto jParticle = m_pListReference->getParticle(jPart);
-          auto jMdstIdx = jParticle->getMdstArrayIndex();
+          auto jMdstSource = jParticle->getMdstSource();
 
-          auto partMdstIdxPair = std::make_pair(iMdstIdx, jMdstIdx);
+          auto partMdstSourcePair = std::make_pair(iMdstSource, jMdstSource);
 
           // Set dummy distance if same particle.
-          if (iMdstIdx == jMdstIdx) {
-            particleMdstIdxPairsToDist[partMdstIdxPair] = dummyDist;
+          if (iMdstSource == jMdstSource) {
+            particleMdstSourcePairsToDist[partMdstSourcePair] = dummyDist;
             continue;
           }
           // If:
@@ -227,13 +227,13 @@ void TrackIsoCalculatorModule::event()
           //
           // avoid re-doing the calculation if a pair with the flipped mdst indexes in the map already exists.
           if (m_useHighestProbMassForExt || (iParticle->getPDGCodeUsedForFit() == jParticle->getPDGCodeUsedForFit())) {
-            if (particleMdstIdxPairsToDist.count({jMdstIdx, iMdstIdx})) {
-              particleMdstIdxPairsToDist[partMdstIdxPair] = particleMdstIdxPairsToDist[ {jMdstIdx, iMdstIdx}];
+            if (particleMdstSourcePairsToDist.count({jMdstSource, iMdstSource})) {
+              particleMdstSourcePairsToDist[partMdstSourcePair] = particleMdstSourcePairsToDist[ {jMdstSource, iMdstSource}];
               continue;
             }
           }
           // Calculate the pair-wise distance.
-          particleMdstIdxPairsToDist[partMdstIdxPair] = this->getDistAtDetSurface(iParticle, jParticle, iDetLayer);
+          particleMdstSourcePairsToDist[partMdstSourcePair] = this->getDistAtDetSurface(iParticle, jParticle, iDetLayer);
         }
 
       }
@@ -241,32 +241,32 @@ void TrackIsoCalculatorModule::event()
       // For each particle in the input list, find the minimum among all distances to the reference particles.
       for (const auto& targetParticle : targetParticles) {
 
-        auto iMdstIdx = targetParticle.first;
+        auto iMdstSource = targetParticle.first;
         auto iParticle = targetParticle.second;
 
         // Save the distances and the mdst indexes of the reference particles.
-        std::vector<std::pair<double, unsigned int>> iDistancesAndRefMdstIdxs;
-        for (const auto& [mdstIdxs, dist] : particleMdstIdxPairsToDist) {
-          if (mdstIdxs.first == iMdstIdx) {
+        std::vector<std::pair<double, int>> iDistancesAndRefMdstSources;
+        for (const auto& [mdstIdxs, dist] : particleMdstSourcePairsToDist) {
+          if (mdstIdxs.first == iMdstSource) {
             if (!std::isnan(dist) && dist >= 0) {
-              iDistancesAndRefMdstIdxs.push_back(std::make_pair(dist, mdstIdxs.second));
+              iDistancesAndRefMdstSources.push_back(std::make_pair(dist, mdstIdxs.second));
             }
           }
         }
 
-        if (!iDistancesAndRefMdstIdxs.size()) {
+        if (!iDistancesAndRefMdstSources.size()) {
           B2DEBUG(12, "The container of distances is empty. Perhaps the target and reference lists contain the same exact particles?");
           continue;
         }
 
-        const auto minDist = *std::min_element(std::begin(iDistancesAndRefMdstIdxs), std::end(iDistancesAndRefMdstIdxs),
+        const auto minDist = *std::min_element(std::begin(iDistancesAndRefMdstSources), std::end(iDistancesAndRefMdstSources),
         [](const auto & l, const auto & r) {return l.first < r.first;});
 
-        auto jParticle = m_pListReference->getParticleWithMdstIdx(minDist.second);
+        auto jParticle = m_pListReference->getParticleWithMdstSource(minDist.second);
 
         B2DEBUG(11, "\n"
-                << "Particle w/ mdstIndex[" << iMdstIdx << "] (PDG = "
-                << iParticle->getPDGCode() << "). Closest charged particle w/ mdstIndex["
+                << "Particle w/ mdstSource[" << iMdstSource << "] (PDG = "
+                << iParticle->getPDGCode() << "). Closest charged particle w/ mdstSource["
                 << minDist.second
                 << "] (PDG = " << jParticle->getPDGCode()
                 << ") at " << iDetLayer
@@ -291,7 +291,7 @@ void TrackIsoCalculatorModule::event()
   // Now calculate the isolation score for each target particle.
   for (const auto& targetParticle : targetParticles) {
 
-    auto iMdstIdx = targetParticle.first;
+    auto iMdstSource = targetParticle.first;
     auto iParticle = targetParticle.second;
 
     // Initialise isolation score.
@@ -299,7 +299,7 @@ void TrackIsoCalculatorModule::event()
     double isoScoreAsWeightedAvg(0.0);
     double sumWeights(0.0);
 
-    B2DEBUG(11, "Particle w/ mdstIndex[" << iMdstIdx << "] (PDG = " << iParticle->getPDGCode() << ").");
+    B2DEBUG(11, "Particle w/ mdstSource[" << iMdstSource << "] (PDG = " << iParticle->getPDGCode() << ").");
 
     for (const auto& detName : m_detNames) {
 

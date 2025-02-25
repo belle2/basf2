@@ -8,6 +8,7 @@
 #pragma once
 
 #include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 #include <vector>
 
 namespace Belle2 {
@@ -21,9 +22,9 @@ namespace Belle2 {
   public:
 
     /**
-     * Constructor with an array of 3-momenta.
+     * Constructor with an array of 4-momenta.
      */
-    explicit SphericityEigenvalues(const std::vector<ROOT::Math::XYZVector>& momenta)
+    explicit SphericityEigenvalues(const std::vector<ROOT::Math::PxPyPzEVector>& momenta)
     {
       m_momenta.clear();
       m_momenta = momenta;
@@ -39,7 +40,7 @@ namespace Belle2 {
      * Sets the list of momenta to be used in the calculation
      * overwriting the previous values
      */
-    void setMomenta(const std::vector<ROOT::Math::XYZVector>& momenta)
+    void setMomenta(const std::vector<ROOT::Math::PxPyPzEVector>& momenta)
     {
       m_momenta.clear();
       m_momenta = momenta;
@@ -73,7 +74,7 @@ namespace Belle2 {
 
     double m_lambda[3] = {0.}; /**<  The eigenvalues */
     ROOT::Math::XYZVector m_eVector[3]; /**<  The eigenvectors */
-    std::vector<ROOT::Math::XYZVector> m_momenta; /**< The particles' momenta */
+    std::vector<ROOT::Math::PxPyPzEVector> m_momenta; /**< The particles' momenta */
   };
 
 } // Belle2 namespace

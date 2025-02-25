@@ -62,8 +62,8 @@ namespace Belle2 {
      *
      *  The given position and momentum are extrapolated to the perigee assuming a homogeneous magnetic field in the z direction.
      *
-     *  @param position      Position of the track at the perigee.
-     *  @param momentum      Momentum of the track at the perigee.
+     *  @param position      Any position on the track.
+     *  @param momentum      Momentum of the track at the given position.
      *  @param charge        Charge of the particle.
      *  @param bZ            Magnetic field to be used for the calculation of the curvature.
      *                       It is assumed, that the B-field is homogeneous parallel to the z axis.

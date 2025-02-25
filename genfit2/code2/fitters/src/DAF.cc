@@ -151,7 +151,7 @@ namespace genfit {
       try {
         converged = calcWeights(tr, rep, betas_.at(iBeta));
         if (!converged && iBeta >= minIterForPval_ - 1 &&
-            status->getBackwardPVal() > 1e-10 && lastPval > 1e-10 && fabs(lastPval - status->getBackwardPVal()) < this->deltaPval_) {
+            status->getBackwardPVal() != 0 && fabs(lastPval - status->getBackwardPVal()) < this->deltaPval_) {
           if (debugLvl_ > 0) {
             debugOut << "converged by Pval = " << status->getBackwardPVal() << " even though weights changed at iBeta = " << iBeta << std::endl;
           }

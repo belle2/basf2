@@ -9,11 +9,9 @@
 #include "utilities/TestParticleFactory.h"
 
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/variables/SpecificKinematicVariables.h>
-#include <analysis/variables/Variables.h>
-#include <analysis/variables/ROEVariables.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
 #include <mdst/dataobjects/Track.h>
@@ -21,9 +19,6 @@
 #include <mdst/dataobjects/KLMCluster.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/utilities/TestHelpers.h>
 
 using namespace std;
 using namespace Belle2;

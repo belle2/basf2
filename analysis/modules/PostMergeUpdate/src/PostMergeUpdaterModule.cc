@@ -9,7 +9,6 @@
 #include <analysis/modules/PostMergeUpdate/PostMergeUpdaterModule.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <framework/logging/Logger.h>
-#include <analysis/utility/RotationTools.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <TDatabasePDG.h>
 #include <Math/Vector3D.h>
@@ -25,6 +24,7 @@ REG_MODULE(PostMergeUpdater);
 PostMergeUpdaterModule::PostMergeUpdaterModule() : Module()
 {
   setDescription("Synchronize parts of the events post merge/embedding. Used in the signal embedding pipeline. Uses kinematic information for the tag / simulated decay stored in eventExtraInfo.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("Mixing", m_mixing, "Mixing (true) or embedding (false) corrections", false);
   addParam("isCharged", m_isCharged, "Charged (true) or neutral (false) B mesons", true);
 }

@@ -194,7 +194,7 @@ namespace Belle2 {
      *  using the channel mapping
      */
     void prepareListOfMissingAPVs();
-    /** struct to hold missing APVs informations */
+    /** struct to hold missing APVs information */
     struct missingAPV {
       VxdID m_sensorID;           /**< Sensor ID */
       bool m_isUSide;               /**< True if u-side of the sensor */

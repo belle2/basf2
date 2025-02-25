@@ -6,8 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <iostream>
-
 #include <analysis/modules/TwoBodyISRPhotonCorrector/TwoBodyISRPhotonCorrectorModule.h>
 
 #include <analysis/dataobjects/Particle.h>
@@ -22,8 +20,6 @@
 #include <analysis/utility/ParticleCopy.h>
 #include <TDatabasePDG.h>
 
-#include <algorithm>
-
 using namespace Belle2;
 
 // Register module in the framework
@@ -33,6 +29,7 @@ TwoBodyISRPhotonCorrectorModule::TwoBodyISRPhotonCorrectorModule() : Module()
 {
   //Set module properties
   setDescription("This module corrects the energy and momentum of high energy ISR photons in single ISR events based on the beam energy, photon direction, and mass of the recoil particle. The corrected photons are stored in a new list, the original photon kinematics can be accessed via the originalParticle() metavariable.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("inputGammaList", m_inputGammaListName, "Name of photon list containing the ISR gammas to be corrected");
   addParam("outputGammaList", m_outputGammaListName, "Name of photon list containing the corrected ISR gammas");

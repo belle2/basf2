@@ -13,8 +13,9 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Const.h>
-#include <framework/core/RandomNumbers.h>
 #include <framework/geometry/B2Vector3.h>
+
+#include <TRandom.h>
 
 //c++
 #include <cmath>
@@ -712,7 +713,7 @@ void TpcDigitizerModule::getXMLData()
   m_Fanofac = content.getDouble("Fanofac");
   m_GasAbs = content.getDouble("GasAbs");
 
-  B2INFO("TpcDigitizer: Aquired tpc locations and gas parameters");
+  B2INFO("TpcDigitizer: Acquired tpc locations and gas parameters");
   B2INFO("              from MICROTPC.xml. There are " << m_nTPC << " TPCs implemented");
 
 }

@@ -28,7 +28,7 @@ namespace Belle2 {
   class Kink : public RelationsObject {
   public:
     /** Constructor without arguments; needed for I/O. Should not be used to create Kinks! */
-    Kink();
+    Kink() {};
 
     /**
      * Constructor taking two pairs of tracks and trackFitResults, the fitted vertex coordinates, and filter flag.
@@ -160,6 +160,15 @@ namespace Belle2 {
     }
 
   private:
+    /** The X coordinate of the fitted kink vertex. */
+    Double32_t m_fittedVertexX = 0.0;
+
+    /** The Y coordinate of the fitted kink vertex. */
+    Double32_t m_fittedVertexY = 0.0;
+
+    /** The Z coordinate of the fitted kink vertex. */
+    Double32_t m_fittedVertexZ = 0.0;
+
     /** Indicates which mother `Track` was used for this `Kink`. */
     short m_trackIndexMother = -1;
 
@@ -174,16 +183,6 @@ namespace Belle2 {
 
     /** Points to the new `TrackFitResult` of the daughter `Track` at Start. */
     short m_trackFitResultIndexDaughter = -1;
-
-    /** The X coordinate of the fitted kink vertex. */
-    Double32_t m_fittedVertexX = 0.0;
-
-    /** The Y coordinate of the fitted kink vertex. */
-    Double32_t m_fittedVertexY = 0.0;
-
-    /** The Z coordinate of the fitted kink vertex. */
-    Double32_t m_fittedVertexZ = 0.0;
-
     /** The filter flag of the kink.
      *
      * 1st digit represents the filter in `KinkFinderModule` used to preselect the kink candidate (from 1 to 5):
@@ -222,7 +221,7 @@ namespace Belle2 {
     short m_filterFlag = 0;
 
     /** Macro for ROOTification. */
-    ClassDef(Kink, 1);
+    ClassDef(Kink, 2);
 
     friend class FixMergedObjectsModule;
   };

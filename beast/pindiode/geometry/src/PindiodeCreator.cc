@@ -17,8 +17,6 @@
 #include <TMath.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -34,7 +32,6 @@
 #include <G4VisAttributes.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -320,7 +317,7 @@ namespace Belle2 {
                                                   i).Data(), l_airbox, false, 0);
               }
         */
-        //Create PIN plastic subtrate
+        //Create PIN plastic substrate
         /*
         h_hole = 0.6 / 2.*CLHEP::cm;
         sA_hole = 0.*deg;

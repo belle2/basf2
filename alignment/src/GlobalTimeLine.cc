@@ -8,7 +8,6 @@
 
 #include <alignment/GlobalTimeLine.h>
 
-#include <alignment/Manager.h>
 #include <framework/core/PyObjConvUtils.h>
 #include <framework/database/EventDependency.h>
 

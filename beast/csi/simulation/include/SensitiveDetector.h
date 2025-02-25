@@ -67,7 +67,7 @@ namespace Belle2 {
       int m_trackID;                    /** track id */
       G4ThreeVector m_startPos;         /**  Position of prestep */
       G4ThreeVector m_endPos;           /**  Position of poststep*/
-      G4ThreeVector m_WightedPos;            /**  Wighted step Position*/
+      G4ThreeVector m_WightedPos;            /**  Weighted step Position*/
       G4ThreeVector m_momentum;         /**  momentum of track */
       double m_startTime;               /** global time */
       double m_endTime;                 /** global time */

@@ -82,34 +82,37 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_cEfficiencyErrRPhiViewU = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrRPhiViewU", "", 800, 800);
   m_cEfficiencyErrRPhiViewV = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrRPhiViewV", "", 800, 800);
 
-  m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%), @view/@side Side");
+  TString hName = getHistoNameFromCanvas(m_cEfficiencyU->GetName(), "@view");
+  m_hEfficiency = new SVDSummaryPlots(hName.Data(), "Summary of SVD efficiencies (%), @view/@side Side");
   m_hEfficiency->setStats(0);
   if (m_setColzRange) {
     m_hEfficiency->setMaximum(m_colzMaximum);
     m_hEfficiency->setMinimum(m_colzMinimum);
   }
-  m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
+  hName = getHistoNameFromCanvas(m_cEfficiencyErrU->GetName(), "@view");
+  m_hEfficiencyErr = new SVDSummaryPlots(hName.Data(), "Summary of SVD efficiencies errors (%), @view/@side Side");
   m_hEfficiencyErr->setStats(0);
 
   if (m_3Samples) {
-    m_cEfficiencyU3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyU3Samples");
-    m_cEfficiencyV3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyV3Samples");
-    m_cEfficiencyErrU3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrU3Samples");
-    m_cEfficiencyErrV3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrV3Samples");
+    m_cEfficiencyU3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiency3SamplesU");
+    m_cEfficiencyV3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiency3SamplesV");
+    m_cEfficiencyErrU3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyErr3SamplesU");
+    m_cEfficiencyErrV3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyErr3SamplesV");
 
-    m_cEfficiencyRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyRPhiViewU3Samples", "", 800, 800);
-    m_cEfficiencyRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyRPhiViewV3Samples", "", 800, 800);
-    m_cEfficiencyErrRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrRPhiViewU3Samples", "", 800, 800);
-    m_cEfficiencyErrRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrRPhiViewV3Samples", "", 800, 800);
+    m_cEfficiencyRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyRPhiView3SamplesU", "", 800, 800);
+    m_cEfficiencyRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyRPhiView3SamplesV", "", 800, 800);
+    m_cEfficiencyErrRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrRPhiView3SamplesU", "", 800, 800);
+    m_cEfficiencyErrRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrRPhiView3SamplesV", "", 800, 800);
 
-    m_hEfficiency3Samples = new SVDSummaryPlots("SVD3Efficiency@view",
-                                                "Summary of SVD efficiencies (%), @view/@side Side for 3 samples");
+    hName = getHistoNameFromCanvas(m_cEfficiencyU3Samples->GetName(), "@view");
+    m_hEfficiency3Samples = new SVDSummaryPlots(hName.Data(), "Summary of SVD efficiencies (%), @view/@side Side for 3 samples");
     m_hEfficiency3Samples->setStats(0);
     if (m_setColzRange) {
       m_hEfficiency3Samples->setMaximum(m_colzMaximum);
       m_hEfficiency3Samples->setMinimum(m_colzMinimum);
     }
-    m_hEfficiencyErr3Samples = new SVDSummaryPlots("SVD3EfficiencyErr@view",
+    hName = getHistoNameFromCanvas(m_cEfficiencyErrU3Samples->GetName(), "@view");
+    m_hEfficiencyErr3Samples = new SVDSummaryPlots(hName.Data(),
                                                    "Summary of SVD efficiencies errors (%), @view/@side Side for 3 samples");
     m_hEfficiencyErr3Samples->setStats(0);
   }

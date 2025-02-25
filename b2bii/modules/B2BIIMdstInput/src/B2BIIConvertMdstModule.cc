@@ -225,7 +225,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
 
-  if (m_convertEvtcls || m_convertRecTrg) m_evtInfo.registerInDataStore();
+  if (m_convertEvtcls || m_convertRecTrg) m_evtInfo.isRequired();
 
   if (m_convertTrkExtra) m_belleTrkExtra.registerInDataStore();
 

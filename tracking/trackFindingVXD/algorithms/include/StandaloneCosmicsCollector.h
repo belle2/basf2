@@ -328,22 +328,14 @@ namespace Belle2 {
       return parA < parB;
     }
 
+    /// Start point obtained by the last performed line fit.
+    std::vector<double> m_start {0., 0., 0.};
+
+    /// Direction of the line obtained by the last performed line fit.
+    std::vector<double> m_direction {0., 0., 0.};
 
     /// Member vector of SpacePoints holding the SpacePoints considered for the track candidate.
     std::vector<const SpacePoint*> m_spacePoints;
-
-    /** Storing identifier for sorting algorithm to be used for the function addSpacePoint.
-     *  1: by radius (default)
-     *  2: by x-value
-     *  3: by y-value
-     */
-    unsigned short m_sortingMode = 1;
-
-    /** Member variable containing the reduced chi squared value of the current line fit.
-     *  The value is obtained by dividing the actual chi2 value by the number of SPs in the track candidate.
-     *  Is reset to 10 in addSpacePoints.
-     */
-    double m_reducedChi2 = 10;
 
     /**
      * Pair containing the index of the vector m_spacePoints for the SpacePoint with the largest contribution to the
@@ -353,11 +345,19 @@ namespace Belle2 {
      */
     std::pair<double, int> m_largestChi2 = std::pair<double, int>(0., 0);
 
-    /// Start point obtained by the last performed line fit.
-    std::vector<double> m_start {0., 0., 0.};
+    /** Member variable containing the reduced chi squared value of the current line fit.
+     *  The value is obtained by dividing the actual chi2 value by the number of SPs in the track candidate.
+     *  Is reset to 10 in addSpacePoints.
+     */
+    double m_reducedChi2 = 10;
 
-    /// Direction of the line obtained by the last performed line fit.
-    std::vector<double> m_direction {0., 0., 0.};
+    /** Storing identifier for sorting algorithm to be used for the function addSpacePoint.
+     *  1: by radius (default)
+     *  2: by x-value
+     *  3: by y-value
+     */
+    unsigned short m_sortingMode = 1;
+
   };
 }
 

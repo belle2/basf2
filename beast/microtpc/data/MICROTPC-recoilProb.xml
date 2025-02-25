@@ -2,7 +2,7 @@
 
 <RecoilProbability>
   <Recoil name="helium">
-    <Fraction desc="Max. fraction of transfered neutron energy">0.64</Fraction>
+    <Fraction desc="Max. fraction of transferred neutron energy">0.64</Fraction>
     <Probability desc="this is (E[MeV] interaction probability / cm)">
       0.1 1.33423391298e-05
       0.15 1.36181497578e-05
@@ -91,7 +91,7 @@
   </Recoil>
 
   <Recoil name="oxygen">
-    <Fraction desc="Max. fraction of transfered neutron energy">0.284</Fraction>
+    <Fraction desc="Max. fraction of transferred neutron energy">0.284</Fraction>
     <Probability desc="this is (E[MeV] interaction probability / cm)">
       0.1 5.37830724613e-05
       0.15 5.24532712191e-05
@@ -180,7 +180,7 @@
   </Recoil>
   
   <Recoil name="carbon">
-    <Fraction desc="Max. fraction of transfered neutron energy">0.221</Fraction>
+    <Fraction desc="Max. fraction of transferred neutron energy">0.221</Fraction>
     <Probability desc="this is (E[MeV] interaction probability / cm)">
       0.1 3.25801304333e-05
       0.15 3.20629855058e-05

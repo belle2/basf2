@@ -24,13 +24,13 @@ using namespace std;
 using namespace Belle2;
 
 PXDRecoHit::PXDRecoHit():
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(0),
-  m_energyDep(0)//, m_energyDepError(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(0), m_cluster(0),
+  m_energyDep(0), m_sensorID(0)//, m_energyDepError(0)
 {}
 
 PXDRecoHit::PXDRecoHit(const PXDTrueHit* hit, const genfit::TrackCandHit*, float sigmaU, float sigmaV):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit), m_cluster(0),
-  m_energyDep(0)//, m_energyDepError(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(hit), m_cluster(0),
+  m_energyDep(0), m_sensorID(0)//, m_energyDepError(0)
 {
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
 
@@ -59,8 +59,8 @@ PXDRecoHit::PXDRecoHit(const PXDTrueHit* hit, const genfit::TrackCandHit*, float
 }
 
 PXDRecoHit::PXDRecoHit(const PXDCluster* hit, float sigmaU, float sigmaV, float covUV):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(hit),
-  m_energyDep(0)//, m_energyDepError(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(0), m_cluster(hit),
+  m_energyDep(0), m_sensorID(0)//, m_energyDepError(0)
 {
   // Set the sensor UID
   m_sensorID = hit->getSensorID();
@@ -84,8 +84,8 @@ PXDRecoHit::PXDRecoHit(const PXDCluster* hit, float sigmaU, float sigmaV, float 
 
 
 PXDRecoHit::PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit*):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(hit),
-  m_energyDep(0)//, m_energyDepError(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(0), m_cluster(hit),
+  m_energyDep(0), m_sensorID(0)//, m_energyDepError(0)
 {
   // Set the sensor UID
   m_sensorID = hit->getSensorID();

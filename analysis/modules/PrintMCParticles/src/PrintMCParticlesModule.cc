@@ -113,6 +113,7 @@ PrintMCParticlesModule::PrintMCParticlesModule() : Module()
 {
   //Set module properties
   setDescription("Print an MCParticle List");
+  setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   //Parameter definition
   addParam("storeName", m_particleList, "Name of the StoreArray to print", m_particleList);

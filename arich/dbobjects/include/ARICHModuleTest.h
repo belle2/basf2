@@ -11,7 +11,7 @@
 #include <TObject.h>
 #include <string>
 #include <vector>
-#include <TH1D.h>
+#include <TH1F.h>
 #include <TH2D.h>
 #include <TGraph.h>
 

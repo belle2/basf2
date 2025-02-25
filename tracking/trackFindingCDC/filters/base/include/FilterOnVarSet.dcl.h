@@ -62,6 +62,9 @@ namespace Belle2 {
       /// Setter for the set of variables
       void setVarSet(std::unique_ptr<AVarSet> varSet);
 
+      /// Forward prefixed parameters of this findlet to the module parameter list.
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
     private:
       /// Instance of the variable set to be used in the filter.
       std::unique_ptr<AVarSet> m_varSet;

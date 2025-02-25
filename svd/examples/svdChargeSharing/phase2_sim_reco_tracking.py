@@ -45,7 +45,7 @@ main.add_module(geometry)
 main.add_module('SVDCoGTimeEstimator')
 main.add_module('SVDSimpleClusterizer', Clusters="SVDClusters")
 
-# add tracking recontruction
+# add tracking reconstruction
 add_tracking_reconstruction(main, components=['SVD'])
 # remove cut on CoG in SpacePointCreator
 for module in main.modules():

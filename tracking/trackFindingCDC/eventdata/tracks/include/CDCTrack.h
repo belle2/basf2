@@ -202,12 +202,12 @@ namespace Belle2 {
       /// Memory for the three dimensional trajectory at the end of the track
       CDCTrajectory3D m_endTrajectory3D;
 
-      /// Flag which indicates that the track had a matching segment (can be used for filter decisions)
-      bool m_hasMatchingSegment = false;
-
       /// Multivariate classifier output in [0, 1] correlated with probability that track is good
       /// match. Used to reject fakes and clones. Implemented here to be forwarded to RecoTrack.
       float m_qualityIndicator = NAN;
+
+      /// Flag which indicates that the track had a matching segment (can be used for filter decisions)
+      bool m_hasMatchingSegment = false;
     };
   }
 }

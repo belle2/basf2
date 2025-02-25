@@ -21,7 +21,6 @@
 #include <framework/logging/LogSystem.h>
 
 #include <framework/database/DBStore.h>
-#include <framework/database/Database.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/MetadataService.h>
 #include <framework/gearbox/Unit.h>
@@ -32,7 +31,6 @@
 #include <sys/stat.h>
 
 #include <csignal>
-#include <fstream>
 
 using namespace std;
 using namespace Belle2;

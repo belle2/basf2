@@ -74,12 +74,17 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
             'electronID',
             'muonID',
             'protonID',
-            'nCDCHits',
-            'nPXDHits',
-            'nSVDHits',
+            'nCDCHits/56',
+            'nPXDHits/2',
+            'nSVDHits/8',
             'dz',
             'dr',
-            'chiProb']
+            'chiProb',
+            'BtagToWBosonVariables(EW90)',
+            'BtagToWBosonVariables(recoilMassSqrd)/15',
+            'BtagToWBosonVariables(pMissCMS)',
+            'BtagToWBosonVariables(cosThetaMissCMS)',
+            'cosTPTO']
 
     if classifier_args is None:
         classifier_args = {}

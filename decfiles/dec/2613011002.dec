@@ -1,11 +1,9 @@
 # EventType: 2613011002
 # Descriptor: [ccbar Dstarp2D0Pip D02RhoGamma]
 # NickName: DstpToD0Pip_D02RhoGamma
-# Tested: Yes
 # PhysicsWG: Charm
 # Responsible: Michel Bertemes
-# Email: mbertemes@bnl.gov
-# Date: 20220310 (YYYYMMDD)
+# Date: 20250220 (YYYYMMDD)
 
 # June 2021 Automated: Converted PYTHIA ids
 #   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
@@ -52,12 +50,24 @@ Decay vpho
 1.000 c         anti-c          PYTHIA 91;
 Enddecay
 
-Decay D*+
-1.000 D0sig     pi+             VSS;
-Enddecay
+Alias MyD0 D0
+Alias anti-MyD0 anti-D0
+ChargeConj MyD0 anti-MyD0
 
-Decay D0sig
-1.000 rho0      gamma           SVP_HELAMP 1.0 0.0 1.0 0.0;
+Alias Myrho0 rho0
+
+Decay D*+sig
+1.000 MyD0     pi+             VSS;
+Enddecay
+CDecay D*-sig
+
+Decay MyD0
+1.000 Myrho0      gamma           SVP_HELAMP 1.0 0.0 1.0 0.0;
+Enddecay
+CDecay anti-MyD0
+
+Decay Myrho0
+1.000 pi+ pi- VSS;
 Enddecay
 
 End

@@ -24,7 +24,7 @@ Enddecay
 CDecay B+sig
 
 Decay anti-P_Lambda_psi-
-1.0 J/psi p- PHSP;
+1.0 J/psi anti-p- PHSP;
 Enddecay
 CDecay P_Lambda_psi+
 

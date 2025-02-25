@@ -92,7 +92,7 @@ namespace Belle2 {
     std::string  m_waveformFilename ; /**< Path where to save the waveforms (root file) */
 
 
-    //Othe rmembers
+    //Other rmembers
     TFile* fWF; /**< ROOT file to save waveforms */
 
     // Histograms
@@ -113,7 +113,7 @@ namespace Belle2 {
 
     // Constants
     const double GeVtoJ = 1.6e-10; /**< Conversion between GeV to Joule */
-    const double Sampletime = 1000.0; /**< Sample time in us.. to fix: not truely a constant! */
+    const double Sampletime = 1000.0; /**< Sample time in us.. to fix: not truly a constant! */
     const double usInYr = 1.0e13; /**< Conversion between us to nominal year */
   };
 }

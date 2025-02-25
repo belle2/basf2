@@ -19,6 +19,7 @@
 #include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
   namespace TrackFindingCDC {
     /**
      *  Generic class that generates some named float values from a given object.

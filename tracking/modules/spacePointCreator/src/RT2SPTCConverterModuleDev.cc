@@ -90,7 +90,7 @@ void RT2SPTCConverterModule::initialize()
 
   // check if all required StoreArrays are here
   m_SVDClusters.isRequired(m_SVDClusterName);
-  if (m_pxdSpacePointsStoreArrayName) {
+  if (not m_ignorePXDHits and m_pxdSpacePointsStoreArrayName) {
     m_PXDSpacePoints.isRequired(*m_pxdSpacePointsStoreArrayName);
   }
   if (m_svdSpacePointsStoreArrayName) {
@@ -185,8 +185,13 @@ void RT2SPTCConverterModule::event()
     SpacePointTrackCand spacePointTC;
     if (m_mcParticlesPresent) {
       MCParticle* mcParticle = recoTrack.getRelatedTo<MCParticle>();
-      spacePointTC = SpacePointTrackCand(spacePointStatePair.first, mcParticle->getPDG(), mcParticle->getCharge(),
-                                         recoTrack.getArrayIndex());
+      if (mcParticle) {
+        spacePointTC = SpacePointTrackCand(spacePointStatePair.first, mcParticle->getPDG(), mcParticle->getCharge(),
+                                           recoTrack.getArrayIndex());
+      } else {
+        spacePointTC = SpacePointTrackCand(spacePointStatePair.first, 0, 0, recoTrack.getArrayIndex());
+      }
+
     } else {
       spacePointTC = SpacePointTrackCand(spacePointStatePair.first, 0, 0, recoTrack.getArrayIndex());
     }

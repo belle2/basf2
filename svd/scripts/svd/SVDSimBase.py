@@ -146,7 +146,7 @@ def gen_signal(ampl, t0, tau, sigma=1, w=betaprime_wave, tau_sigma=0.0):
             res = (res0 + sigma * np.random.randn(6) + 0.5).astype(int)
         res[res < threshold_cut * sigma] = 0
     else:  # low-amp mode
-        # calculate probabilities of saamples above threhold
+        # calculate probabilities of samples above threshold
         p_over = 1.0 - norm.cdf((gen_thr - res0) / sigma)
         # calculate probabilities of over-threhold configurations
         pconfs = np.array([np.prod(p_over[conf]) for conf in residual_configs])

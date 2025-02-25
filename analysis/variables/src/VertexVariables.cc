@@ -13,13 +13,11 @@
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/Conversion.h>
 
 #include <TMatrixFSym.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
 
@@ -271,20 +269,23 @@ namespace Belle2 {
 
     double particleProductionX(const Particle* part)
     {
-      if (!part->hasExtraInfo("prodVertX")) return Const::doubleNaN;
-      return part->getExtraInfo("prodVertX");
+      if (part->hasExtraInfo("prodVertX")) return part->getExtraInfo("prodVertX");
+      else if (part->hasExtraInfo("prodVertexX")) return part->getExtraInfo("prodVertexX");
+      else return Const::doubleNaN;
     }
 
     double particleProductionY(const Particle* part)
     {
-      if (!part->hasExtraInfo("prodVertY")) return Const::doubleNaN;
-      return part->getExtraInfo("prodVertY");
+      if (part->hasExtraInfo("prodVertY")) return part->getExtraInfo("prodVertY");
+      else if (part->hasExtraInfo("prodVertexY")) return part->getExtraInfo("prodVertexY");
+      else return Const::doubleNaN;
     }
 
     double particleProductionZ(const Particle* part)
     {
-      if (!part->hasExtraInfo("prodVertZ")) return Const::doubleNaN;
-      return part->getExtraInfo("prodVertZ");
+      if (part->hasExtraInfo("prodVertZ")) return part->getExtraInfo("prodVertZ");
+      else if (part->hasExtraInfo("prodVertexZ")) return part->getExtraInfo("prodVertexZ");
+      else return Const::doubleNaN;
     }
 
     // Production vertex covariance matrix

@@ -94,7 +94,7 @@ if __name__ == "__main__":
                     RunList=[run_number],
                     EventsList=[1],
                     RunType='physics',
-                    EventFilled=1,
+                    FillNEvent=1,
                     FileList=[output_file],
                     SelectHistograms=['KLM/*'],
                     EventInterval=1)

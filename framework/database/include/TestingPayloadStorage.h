@@ -79,7 +79,7 @@ namespace Belle2 {
        * @param name payload name
        * @param iov iov for the payload
        * @param source source filename to use. If this is empty there is no file yet and it has to be created first
-       * @param writer callback function to create a file. Will be called with a destination filename if the source parameter was emty
+       * @param writer callback function to create a file. Will be called with a destination filename if the source parameter was empty
        */
       bool store(const std::string& name, const IntervalOfValidity& iov, const std::string& source,
                  const std::function<bool(const std::string&)>& writer);

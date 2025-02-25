@@ -18,16 +18,12 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 
-// framework aux
-#include <framework/logging/Logger.h>
-
 #include <TRandom.h>
 #include <TMath.h>
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
-using namespace ROOT::Math;
 
-#include <iostream>
+using namespace ROOT::Math;
 using namespace std;
 
 namespace Belle2 {

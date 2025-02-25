@@ -34,7 +34,7 @@ create_validation_histograms(
     [
         ('q2', 50, -0.5, 12.5, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
          r'B2Vlnu $q^2$ of the $e^+\nu_{e}$ system in $B^+ \to \bar{D^{*0}} e^+ \nu_e$ (truth values)',
-         'should follow the reference', '#q^2'),
+         'should follow the reference', '#q^2', '', 'shifter'),
     ],
     description='B2Vlnu Validation to check generator level distributions',
 )

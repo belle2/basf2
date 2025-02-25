@@ -156,6 +156,16 @@ Here is a list of track variables for V0 daughters:
 .. b2-variables::
    :group: V0Daughter
 
+.. _kinkvariables:
+
+Kink
+~~~~
+
+Here is a list of variables for kinks, which are reconstructed since release-09:
+
+.. b2-variables::
+   :group: Kink
+
 PID
 ~~~
 
@@ -521,7 +531,7 @@ events used for producing MC samples (both run-independent and run-dependent).
 
 .. b2-variables::
    :group: BeamBackgroundOverlay
-	     
+
 Calibration
 ~~~~~~~~~~~
 
@@ -537,7 +547,7 @@ They have a **[Calibration]** pretag.
    :group: ECL calibration
 .. b2-variables::
    :group: ECL trigger calibration
-	   
+
 Collections and Lists
 ---------------------
 
@@ -811,4 +821,4 @@ with the -f option of ``gbasf2``:
 >>> gbasf2 ./steering.py -p project -i dataset -f myanalysis.so myanalysis.b2modmap
 
 .. warning:: This line implies that you already have working ``gbasf2`` installation and ``gbasf2`` syntax didn't
-  change since the moment of writing. Please refer gbasf2 `documentation <https://xwiki.desy.de/xwiki/rest/p/78b3b>`_ for more details.
+  change since the moment of writing. Please refer to the :doc:`gbasf2 documentation <gbasf2:index>` for more details.

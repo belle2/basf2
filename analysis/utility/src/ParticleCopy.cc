@@ -10,7 +10,6 @@
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <iostream>
 
 using namespace Belle2;
 using namespace std;

@@ -258,8 +258,8 @@ class B2Lexer(Lexer):
 
         Possible notations covered by this regular expression:
             Normal decimal notation e.g 0.1
-            Hanging decimal seperator notation e.g 1.
-            Preceding decimal seperator notation e.g .1
+            Hanging decimal separator notation e.g 1.
+            Preceding decimal separator notation e.g .1
             Scientific notation with (signed) exponents e.g 1.0E4, 1.e-4, .1E+3
             Exponents are case insensitive e.g 1.e4, 1.E4
             Integer with exponent e.g 1E4
@@ -301,7 +301,7 @@ class B2Lexer(Lexer):
     @_(r"[a-zA-Z_][a-zA-Z_0-9]*")  # noqa: F821
     def IDENTIFIER(self, t):
         """
-        Scaning function for identifiers
+        Scanning function for identifiers
 
         If a matched sequence equals reserved keywords of other tokens
         the token type and value is remapped via the reserved dictionary.

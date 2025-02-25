@@ -10,9 +10,9 @@
 
 #include <framework/core/HistoModule.h>
 
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TH3F.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TH3.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>

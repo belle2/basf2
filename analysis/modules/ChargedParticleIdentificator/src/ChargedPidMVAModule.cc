@@ -9,22 +9,22 @@
 #include <analysis/modules/ChargedParticleIdentificator/ChargedPidMVAModule.h>
 
 //ANALYSIS
-#include <mva/interface/Interface.h>
-#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/VariableManager/Utility.h>
 #include <analysis/variables/ECLVariables.h>
 
 // FRAMEWORK
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
-
+#include <mva/interface/Interface.h>
 
 using namespace Belle2;
 
 REG_MODULE(ChargedPidMVA);
 
-ChargedPidMVAModule::ChargedPidMVAModule() : Module()
+Belle2::ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 {
   setDescription("This module evaluates the response of an MVA trained for binary charged particle identification between two hypotheses, S and B. For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists, calculates the MVA score using the appropriate xml weight file, and adds it as ExtraInfo to the Particle objects.");
 
@@ -57,10 +57,10 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 }
 
 
-ChargedPidMVAModule::~ChargedPidMVAModule() = default;
+Belle2::ChargedPidMVAModule::~ChargedPidMVAModule() = default;
 
 
-void ChargedPidMVAModule::initialize()
+void Belle2::ChargedPidMVAModule::initialize()
 {
   m_event_metadata.isRequired();
 
@@ -91,12 +91,12 @@ void ChargedPidMVAModule::initialize()
 }
 
 
-void ChargedPidMVAModule::beginRun()
+void Belle2::ChargedPidMVAModule::beginRun()
 {
 }
 
 
-void ChargedPidMVAModule::event()
+void Belle2::ChargedPidMVAModule::event()
 {
 
   // Debug strings per log level.
@@ -308,7 +308,7 @@ void ChargedPidMVAModule::event()
 }
 
 
-void ChargedPidMVAModule::registerAliasesLegacy()
+void Belle2::ChargedPidMVAModule::registerAliasesLegacy()
 {
 
   std::map<std::string, std::string> aliasesLegacy;
@@ -354,7 +354,7 @@ void ChargedPidMVAModule::registerAliasesLegacy()
 }
 
 
-void ChargedPidMVAModule::registerAliases()
+void Belle2::ChargedPidMVAModule::registerAliases()
 {
 
   auto aliases = (*m_weightfiles_representation.get())->getAliases();
@@ -384,7 +384,7 @@ void ChargedPidMVAModule::registerAliases()
 }
 
 
-void ChargedPidMVAModule::initializeMVA()
+void Belle2::ChargedPidMVAModule::initializeMVA()
 {
 
   B2INFO("Run: " << m_event_metadata->getRun() << ". Load supported MVA interfaces for binary charged particle identification...");

@@ -21,7 +21,7 @@ namespace Belle2 {
    * The PXD DAQ Status class
    *
    * This is a small class that records information about PXD DAQ status
-   * It will record if the data of PXD is useable.
+   * It will record if the data of PXD is usable.
    * In a tree structure, additional information per packet, DHC and DHE is
    * stored. This preserves information which would normally get lost
    * during unpacking
@@ -48,7 +48,7 @@ namespace Belle2 {
     const PXDDAQDHEStatus* findDHE(const VxdID& id) const;
 
     /** Return Usability of data
-     * @return conclusion if data is useable
+     * @return conclusion if data is usable
      */
     bool isUsable() const { return m_usable; }
 
@@ -146,11 +146,11 @@ namespace Belle2 {
     PXDErrorFlags m_errorMask; /**< errors found in any packet/DHC/DHE */
     PXDErrorFlags m_critErrorMask; /**< critical error mask */
 
-    bool m_usable; /**< Data is useable.*/
+    bool m_usable; /**< Data is usable.*/
     bool m_gated; /**< Sensor was in gated mode */
     bool m_unfiltered; /**< Data was not ROI filtered */
 
-    /** Vector of packet informations beloning to this event */
+    /** Vector of packet information belonging to this event */
     std::vector <PXDDAQPacketStatus> m_pxdPacket;
 
     ClassDef(PXDDAQStatus, 3)

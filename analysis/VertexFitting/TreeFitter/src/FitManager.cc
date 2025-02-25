@@ -24,8 +24,7 @@ namespace TreeFitter {
   FitManager::FitManager(Belle2::Particle* particle,
                          const ConstraintConfiguration& config,
                          double prec,
-                         bool updateDaughters,
-                         const bool useReferencing
+                         bool updateDaughters
                         ) :
     m_particle(particle),
     m_decaychain(nullptr),
@@ -35,7 +34,6 @@ namespace TreeFitter {
     m_updateDaugthers(updateDaughters),
     m_ndf(0),
     m_fitparams(nullptr),
-    m_useReferencing(useReferencing),
     m_config(config)
   {
     m_decaychain = new DecayChain(particle, config, false);
@@ -70,7 +68,7 @@ namespace TreeFitter {
       for (niter = 0; niter < nitermax && !finished; ++niter) {
         if (niter == 0) {
           m_errCode = m_decaychain->filter(*m_fitparams);
-        } else if (m_useReferencing) {
+        } else {
           auto* tempState = new FitParams(*m_fitparams);
           m_errCode = m_decaychain->filterWithReference(*m_fitparams, *tempState);
           delete tempState;
@@ -160,7 +158,10 @@ namespace TreeFitter {
         }
       }
 
-      double mass = pb->particle()->getPDGMass();
+      double mass = 0;
+      if (pb->particle()->hasExtraInfo("treeFitterMassConstraintValue")) {
+        mass = pb->particle()->getExtraInfo("treeFitterMassConstraintValue");
+      } else mass = pb->particle()->getPDGMass();
       Eigen::Matrix<double, 3, 1> momVec =
         m_fitparams->getStateVector().segment(momindex, 3);
 
@@ -208,6 +209,7 @@ namespace TreeFitter {
     }
 
     if (m_updateDaugthers || isTreeHead) {
+      TMatrixFSym cov7b2(7);
       if (posindex >= 0) {
         const ROOT::Math::XYZVector pos(m_fitparams->getStateVector()(posindex),
                                         m_fitparams->getStateVector()(posindex + 1),
@@ -227,6 +229,21 @@ namespace TreeFitter {
             cand.writeExtraInfo("prodVertexY", m_fitparams->getStateVector()(motherPosIndex + 1));
             if (pb.mother()->dim() > 2)
               cand.writeExtraInfo("prodVertexZ", m_fitparams->getStateVector()(motherPosIndex + 2));
+            if (not isTreeHead) {
+              getCovFromPB(pb.mother(), cov7b2);
+              cand.writeExtraInfo("prodVertSxx", cov7b2[4][4]);
+              cand.writeExtraInfo("prodVertSxy", cov7b2[4][5]);
+              cand.writeExtraInfo("prodVertSyx", cov7b2[5][4]);
+              cand.writeExtraInfo("prodVertSyy", cov7b2[5][5]);
+              if (pb.mother()->dim() > 2) {
+                cand.writeExtraInfo("prodVertexZ", m_fitparams->getStateVector()(motherPosIndex + 2));
+                cand.writeExtraInfo("prodVertSxz", cov7b2[4][6]);
+                cand.writeExtraInfo("prodVertSyz", cov7b2[5][6]);
+                cand.writeExtraInfo("prodVertSzx", cov7b2[6][4]);
+                cand.writeExtraInfo("prodVertSzy", cov7b2[6][5]);
+                cand.writeExtraInfo("prodVertSzz", cov7b2[6][6]);
+              }
+            }
           }
         }
       }
@@ -240,11 +257,13 @@ namespace TreeFitter {
         p.SetE(m_fitparams->getStateVector()(momindex + 3));
         cand.set4VectorDividingByMomentumScaling(p);
       } else {
-        const double mass = cand.getPDGMass();
+        double mass = 0;
+        if (cand.hasExtraInfo("treeFitterMassConstraintValue")) {
+          mass = cand.getExtraInfo("treeFitterMassConstraintValue");
+        } else mass = cand.getPDGMass();
         p.SetE(std::sqrt(p.P2() + mass * mass));
         cand.set4VectorDividingByMomentumScaling(p);
       }
-      TMatrixFSym cov7b2(7);
       getCovFromPB(&pb, cov7b2);
       cand.setMomentumVertexErrorMatrix(cov7b2);
     }
@@ -295,7 +314,10 @@ namespace TreeFitter {
 
       comb_cov.block<3, 3>(1, 1) = mom_cov;
 
-      const double mass = pb->particle()->getPDGMass();
+      double mass = 0;
+      if (pb->particle()->hasExtraInfo("treeFitterMassConstraintValue")) {
+        mass = pb->particle()->getExtraInfo("treeFitterMassConstraintValue");
+      } else mass = pb->particle()->getPDGMass();
       const double mBYc = mass / Belle2::Const::speedOfLight;
       const double mom = mom_vec.norm();
       const double mom3 = mom * mom * mom;

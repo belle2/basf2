@@ -363,6 +363,7 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.11/', None),
                        'pandas': ('https://pandas.pydata.org/docs/', None),
                        'matplotlib': ('https://matplotlib.org/stable/', None),
                        'b2luigi': ('https://b2luigi.belle2.org/', None),
+                       'gbasf2': ('https://gbasf2.belle2.org/', None),
                        'uproot': ('https://uproot.readthedocs.io/en/stable/', None)}
 
 

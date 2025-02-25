@@ -303,8 +303,6 @@ namespace Belle2 {
       void setBFieldZ(const double bfieldZ = 1.5) { m_BFieldZ = bfieldZ; }
 
     private:
-      /// BField along z to estimate pT
-      double m_BFieldZ = 1.5;
       /// outermost hit position
       B2Vector3D m_oHit;
       /// center hit position
@@ -316,6 +314,8 @@ namespace Belle2 {
       B2Vector3D m_outerDifferenceVector;
       /// vector containing the difference m_cHit - m_iHit
       B2Vector3D m_innerDifferenceVector;
+      /// BField along z to estimate pT
+      double m_BFieldZ = 1.5;
 
     };
   }

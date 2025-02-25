@@ -306,8 +306,8 @@ void Phokhara::applySettings()
   m_npar[33]  = m_IFSNLO;
   m_npar[34]  = m_alpha;
   m_npar[35]  = m_pionff;
-  m_npar[36]  = m_pionstructure;
-  m_npar[37]  = m_kaonff;
+  m_npar[36]  = m_kaonff;
+  m_npar[37]  = m_pionstructure;
   m_npar[38]  = m_narres;
   m_npar[39]  = m_protonff;
   m_npar[40]  = m_fullNLO;

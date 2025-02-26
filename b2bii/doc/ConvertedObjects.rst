@@ -21,9 +21,7 @@ in the case of conversion of ``V0``'s daughter tracks.
    There is nothing special to note regarding the usage of converted charged
    tracks in BASF2. Use the usual ``fillParticleList(...)`` or
    ``fillParticleLists(...)`` analysis functions to create and fill charged
-   kaon, pion, electron, muon and proton `ParticleList`_ s.
-
-.. _ParticleList: https://software.belle2.org/|release|/classBelle2_1_1ParticleList.html
+   kaon, pion, electron, muon and proton :doxygen:`ParticleList <classBelle2_1_1ParticleList>` s.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Particle Identification

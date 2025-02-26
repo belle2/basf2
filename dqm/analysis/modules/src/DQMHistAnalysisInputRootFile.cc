@@ -285,8 +285,8 @@ void DQMHistAnalysisInputRootFileModule::event()
   m_eventMetaDataPtr->setEvent(m_count);
   m_eventMetaDataPtr->setTime(ts * 1e9);
 
-//  ExtractRunType(inputHistList);
-//  ExtractNEvent(inputHistList);
+  ExtractRunType(inputHistList);
+  ExtractNEvent(inputHistList);
 
   if (m_lastRun != runno or m_lastExp != expno) {
     // Run change detected

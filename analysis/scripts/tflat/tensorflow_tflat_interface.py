@@ -23,7 +23,7 @@ import tensorflow as tf
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     """
-    Specifies the and configures the keras model
+    Specifies and configures the keras model
     :param number_of_features:
     :param number_of_spectators:
     :param number_of_events:

@@ -26,7 +26,6 @@ import basf2
 import subprocess
 import re
 from b2test_utils import logfilter
-from basf2.version import get_version
 
 
 def skip_test(reason, py_case=None):
@@ -150,7 +149,7 @@ def configure_logging_for_tests(user_replacements=None):
     # the BELLE2_LOCAL_DIR is identical to the current working directory
     replacements = OrderedDict()
     try:
-        replacements[get_version()] = "${release_version}"
+        replacements[basf2.version.get_version()] = "${release_version}"
     except Exception:
         pass
     replacements[", ".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"

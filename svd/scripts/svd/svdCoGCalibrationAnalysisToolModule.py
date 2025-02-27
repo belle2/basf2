@@ -152,7 +152,7 @@ class svdCoGCalibrationAnalysisTool(b2.Module):
 
     def event(self):
         """
-        Function that allows to cicle on the events
+        Function that allows to cycle on the events
         """
         svd_cls = Belle2.PyStoreArray(svd_Clusters)
         svd_clsFromTrks = Belle2.PyStoreArray(svd_ClustersFromTracks)
@@ -206,7 +206,7 @@ class svdCoGCalibrationAnalysisTool(b2.Module):
 
     def terminate(self):
         """
-        Terminates te class and produces the output rootfile
+        Terminates the class and produces the output rootfile
         """
         #: creation of TFile
         self.tFile = TFile(self.outputFileName, 'recreate')

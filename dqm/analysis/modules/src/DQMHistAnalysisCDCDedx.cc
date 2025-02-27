@@ -441,7 +441,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
 
     drawHistPars(hinjectmean[0], nbin, m_mean, 0.40, "#mu_{fit}");
 
-    hinjectmean[1]->SetMarkerColor(kBlue);
+    hinjectmean[1]->SetMarkerColor(kRed);
     hinjectmean[1]->SetMarkerStyle(20);
     hinjectmean[1]->SetMarkerSize(1.10);
     hinjectmean[1]->Draw("same");
@@ -456,7 +456,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
     gPad->SetGridy(1);
     drawHistPars(hinjectsigma[0], nbin, m_sigma, 0.15, "#sigma_{fit}");
 
-    hinjectsigma[1]->SetMarkerColor(kBlue);
+    hinjectsigma[1]->SetMarkerColor(kRed);
     hinjectsigma[1]->SetMarkerStyle(20);
     hinjectsigma[1]->SetMarkerSize(1.10);
     hinjectsigma[1]->Draw("same");
@@ -541,7 +541,7 @@ void DQMHistAnalysisCDCDedxModule::drawHistPars(TH1F* hist, int nbin, double par
 {
   std::string hname = hist->GetName();
   setPadStyle(0.143, 0.045, 0.077, 0.0);
-  hist->SetMarkerColor(kRed);
+  hist->SetMarkerColor(kBlue);
   hist->SetMarkerStyle(20);
   hist->SetMarkerSize(1.10);
   hist->GetYaxis()->SetRangeUser(pars - fac, pars + fac); //m_mean - 0.10, m_mean + 0.10);

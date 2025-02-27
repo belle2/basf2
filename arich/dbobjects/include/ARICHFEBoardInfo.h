@@ -109,7 +109,7 @@ namespace Belle2 {
     void setFEBoardLocation(const std::string& currentLocation) {m_currentLocation = currentLocation; }
 
   private:
-    int m_serial;                    /**< FrontEndBoard Identfier */
+    int m_serial;                    /**< FrontEndBoard Identifier */
     ARICHAsicInfo* m_asicInfo[4];    /**< id of the i-th chip in the FEB */
     std::string m_asicsFEB[4];       /**< serial numbers of ASICs on FEB board */
     TTimeStamp m_timeStamp;          /**< Delivery Date */

@@ -10,6 +10,8 @@
 
 from basf2 import register_module
 
+import pdg
+
 
 def fitKinematic4C(
     list_name,
@@ -18,6 +20,10 @@ def fitKinematic4C(
     daughtersUpdate=True,
     addUnmeasuredPhoton=False,
     variablePrefix="",
+    decayStringForDirectionOnlyParticles="",
+    decayStringForAlternateMassParticles="",
+    alternateMassHypos=[],
+    decayStringForNeutronVsAntiNeutron="",
     path=None,
 ):
     """
@@ -28,7 +34,17 @@ def fitKinematic4C(
     @param constraint       HardBeam or RecoilMass
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (uses up three constraints)
-    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
+    @param variablePrefix prepended to fit variables stored in extra info. Required if
+        ParticleKinematicFitter is run multiple times
+    @param decayStringForDirectionOnlyParticles DecayString specifying the particles
+        to use only direction information in the fit
+    @param decayStringForAlternateMassParticles DecayString specifying the particles
+        where an alternate mass hypothesis is used
+    @param alternateMassHypos list of pdg values (or particle names) for particles where
+        different mass hypothesis is used in the fit
+    @param decayStringForNeutronVsAntiNeutron DecayString specifying the charged particle
+        used to tag whether n or nbar. When tag particle has negative charge, PDG sign of n/nbar
+        is flipped from default given in alternateMassHypos
     @param path         modules are added to this path
     """
 
@@ -42,6 +58,10 @@ def fitKinematic4C(
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', addUnmeasuredPhoton)
     orca.param('variablePrefix', variablePrefix)
+    orca.param('decayStringForDirectionOnlyParticles', decayStringForDirectionOnlyParticles)
+    orca.param('decayStringForAlternateMassParticles', decayStringForAlternateMassParticles)
+    orca.param('decayStringForNeutronVsAntiNeutron', decayStringForNeutronVsAntiNeutron)
+    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
 
@@ -51,6 +71,10 @@ def UnmeasuredfitKinematic1C(
     constraint='HardBeam',
     daughtersUpdate=True,
     variablePrefix="",
+    decayStringForDirectionOnlyParticles="",
+    decayStringForAlternateMassParticles="",
+    alternateMassHypos=[],
+    decayStringForNeutronVsAntiNeutron="",
     path=None,
 ):
     """
@@ -61,6 +85,15 @@ def UnmeasuredfitKinematic1C(
     @param constraint       HardBeam or RecoilMass
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
+    @param decayStringForDirectionOnlyParticles DecayString specifying the particles
+        to use only direction information in the fit
+    @param decayStringForAlternateMassParticles DecayString specifying the particles
+        where an alternate mass hypothesis is used
+    @param alternateMassHypos list of pdg values (or particle names) for particles where
+        different mass hypothesis is used in the fit
+    @param decayStringForNeutronVsAntiNeutron DecayString specifying the charged particle
+        used to tag whether n or nbar. When tag particle has negative charge, PDG sign of n/nbar
+        is flipped from default given in alternateMassHypos
     @param path         modules are added to this path
     """
 
@@ -74,6 +107,10 @@ def UnmeasuredfitKinematic1C(
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', True)
     orca.param('variablePrefix', variablePrefix)
+    orca.param('decayStringForDirectionOnlyParticles', decayStringForDirectionOnlyParticles)
+    orca.param('decayStringForAlternateMassParticles', decayStringForAlternateMassParticles)
+    orca.param('decayStringForNeutronVsAntiNeutron', decayStringForNeutronVsAntiNeutron)
+    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
 
@@ -85,6 +122,10 @@ def fitKinematic3C(
         addUnmeasuredPhoton=False,
         add3CPhoton=True,
         variablePrefix="",
+        decayStringForDirectionOnlyParticles="",
+        decayStringForAlternateMassParticles="",
+        alternateMassHypos=[],
+        decayStringForNeutronVsAntiNeutron="",
         path=None,
 ):
     """
@@ -98,6 +139,15 @@ def fitKinematic3C(
     @param addUnmeasuredPhoton add one unmeasured photon (uses up three constraints)
     @param add3CPhoton add one photon with unmeasured energy (uses up a constraint)
     @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
+    @param decayStringForDirectionOnlyParticles DecayString specifying the particles
+        to use only direction information in the fit
+    @param decayStringForAlternateMassParticles DecayString specifying the particles
+        where an alternate mass hypothesis is used
+    @param alternateMassHypos list of pdg values (or particle names) for particles where
+        different mass hypothesis is used in the fit
+    @param decayStringForNeutronVsAntiNeutron DecayString specifying the charged particle
+        used to tag whether n or nbar. When tag particle has negative charge, PDG sign of n/nbar
+        is flipped from default given in alternateMassHypos
     @param path         modules are added to this path
     """
 
@@ -112,6 +162,10 @@ def fitKinematic3C(
     orca.param('addUnmeasuredPhoton', addUnmeasuredPhoton)
     orca.param('add3CPhoton', add3CPhoton)
     orca.param('variablePrefix', variablePrefix)
+    orca.param('decayStringForDirectionOnlyParticles', decayStringForDirectionOnlyParticles)
+    orca.param('decayStringForAlternateMassParticles', decayStringForAlternateMassParticles)
+    orca.param('decayStringForNeutronVsAntiNeutron', decayStringForNeutronVsAntiNeutron)
+    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
 
@@ -122,6 +176,10 @@ def fitKinematic2C(
         daughtersUpdate=True,
         addUnmeasuredPhotonAlongBeam="",
         variablePrefix="",
+        decayStringForDirectionOnlyParticles="",
+        decayStringForAlternateMassParticles="",
+        alternateMassHypos=[],
+        decayStringForNeutronVsAntiNeutron="",
         path=None,
 ):
     """
@@ -137,6 +195,15 @@ def fitKinematic2C(
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhotonAlongBeam add an unmeasured photon along beam if 'HER' or 'LER' is set
     @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
+    @param decayStringForDirectionOnlyParticles DecayString specifying the particles
+        to use only direction information in the fit
+    @param decayStringForAlternateMassParticles DecayString specifying the particles
+        where an alternate mass hypothesis is used
+    @param alternateMassHypos list of pdg values (or particle names) for particles where
+        different mass hypothesis is used in the fit
+    @param decayStringForNeutronVsAntiNeutron DecayString specifying the charged particle
+        used to tag whether n or nbar. When tag particle has negative charge, PDG sign of n/nbar
+        is flipped from default given in alternateMassHypos
     @param path         modules are added to this path
     """
 
@@ -161,6 +228,10 @@ def fitKinematic2C(
         else:  # should be LER
             orca.param('fixUnmeasuredToLER', True)
     orca.param('variablePrefix', variablePrefix)
+    orca.param('decayStringForDirectionOnlyParticles', decayStringForDirectionOnlyParticles)
+    orca.param('decayStringForAlternateMassParticles', decayStringForAlternateMassParticles)
+    orca.param('decayStringForNeutronVsAntiNeutron', decayStringForNeutronVsAntiNeutron)
+    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
 
@@ -171,6 +242,10 @@ def MassfitKinematic1CRecoil(
     constraint='RecoilMass',
     daughtersUpdate=True,
     variablePrefix="",
+    decayStringForDirectionOnlyParticles="",
+    decayStringForAlternateMassParticles="",
+    alternateMassHypos=[],
+    decayStringForNeutronVsAntiNeutron="",
     path=None,
 ):
     """
@@ -182,6 +257,15 @@ def MassfitKinematic1CRecoil(
     @param recoilMass       RecoilMass (GeV)
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
+    @param decayStringForDirectionOnlyParticles DecayString specifying the particles
+        to use only direction information in the fit
+    @param decayStringForAlternateMassParticles DecayString specifying the particles
+        where an alternate mass hypothesis is used
+    @param alternateMassHypos list of pdg values (or particle names) for particles where
+        different mass hypothesis is used in the fit
+    @param decayStringForNeutronVsAntiNeutron DecayString specifying the charged particle
+        used to tag whether n or nbar. When tag particle has negative charge, PDG sign of n/nbar
+        is flipped from default given in alternateMassHypos
     @param path         modules are added to this path
     """
 
@@ -196,6 +280,10 @@ def MassfitKinematic1CRecoil(
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', False)
     orca.param('variablePrefix', variablePrefix)
+    orca.param('decayStringForDirectionOnlyParticles', decayStringForDirectionOnlyParticles)
+    orca.param('decayStringForAlternateMassParticles', decayStringForAlternateMassParticles)
+    orca.param('decayStringForNeutronVsAntiNeutron', decayStringForNeutronVsAntiNeutron)
+    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
 
@@ -206,6 +294,10 @@ def MassfitKinematic1C(
     constraint='Mass',
     daughtersUpdate=True,
     variablePrefix="",
+    decayStringForDirectionOnlyParticles="",
+    decayStringForAlternateMassParticles="",
+    alternateMassHypos=[],
+    decayStringForNeutronVsAntiNeutron="",
     path=None,
 ):
     """
@@ -217,6 +309,15 @@ def MassfitKinematic1C(
     @param invMass       Invariant Mass (GeV)
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
+    @param decayStringForDirectionOnlyParticles DecayString specifying the particles
+        to use only direction information in the fit
+    @param decayStringForAlternateMassParticles DecayString specifying the particles
+        where an alternate mass hypothesis is used
+    @param alternateMassHypos list of pdg values (or particle names) for particles where
+        different mass hypothesis is used in the fit
+    @param decayStringForNeutronVsAntiNeutron DecayString specifying the charged particle
+        used to tag whether n or nbar. When tag particle has negative charge, PDG sign of n/nbar
+        is flipped from default given in alternateMassHypos
     @param path         modules are added to this path
     """
 
@@ -231,6 +332,10 @@ def MassfitKinematic1C(
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', False)
     orca.param('variablePrefix', variablePrefix)
+    orca.param('decayStringForDirectionOnlyParticles', decayStringForDirectionOnlyParticles)
+    orca.param('decayStringForAlternateMassParticles', decayStringForAlternateMassParticles)
+    orca.param('decayStringForNeutronVsAntiNeutron', decayStringForNeutronVsAntiNeutron)
+    orca.param('alternateMassHypos', pdg.from_names(alternateMassHypos))
     path.add_module(orca)
 
 

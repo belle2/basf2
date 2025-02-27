@@ -12,7 +12,7 @@ import basf2 as b2
 from svd import add_svd_create_recodigits
 from svd.dqm_utils import add_svd_dqm_dose
 from geometry import check_components
-from analysisDQM import add_analysis_dqm, add_mirabelle_dqm
+from analysisDQM import add_analysis_dqm, add_mirabelle_dqm, get_hadB_path
 import neurotrigger
 
 
@@ -41,10 +41,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
     # Check components.
     check_components(components)
-
-    if dqm_mode in ["dont_care", "filtered"]:
-        # TTD trigger and bunch injection monitoring
-        path.add_module('TTDDQM')
 
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         # PXD (not useful on HLT)
@@ -121,8 +117,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module("StatisticsTimingHLTDQM",
                         createHLTUnitHistograms=create_hlt_unit_histograms,
                         )
+        # TTD trigger and bunch injection monitoring
+        path.add_module('TTDDQM')
 
-    if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
+    if dqm_mode in ["dont_care", "filtered"]:
         # HLT
         hlt_trigger_lines_in_plot = []
         hlt_skim_lines_in_plot = []
@@ -351,6 +349,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         add_analysis_dqm(path)
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         add_mirabelle_dqm(path)
+        get_hadB_path(path)
 
     # KLM2 (requires mu+ particle list from add_analysis_dqm)
     if (components is None or ('KLM' in components and 'CDC' in components)) and (dqm_mode in ["dont_care", "filtered"]):

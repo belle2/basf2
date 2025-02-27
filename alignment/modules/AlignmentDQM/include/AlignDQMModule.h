@@ -38,7 +38,7 @@ namespace Belle2 {
 
     /** Function to create TH1F and add it to the vector of histograms (m_histograms).
      * All histograms in the module should be created via this function (or following Create- functions).
-     * This function calls base function but wirh "Alig_" prefix to the name parameter */
+     * This function calls base function but with "Alig_" prefix to the name parameter */
     virtual TH1F* Create(std::string name, std::string title, int nbinsx, double xlow, double xup, std::string xTitle,
                          std::string yTitle) override;
     /** Same as above but for TH2F. */
@@ -118,7 +118,7 @@ namespace Belle2 {
     /** ResidaulMeanV vs Theta for Layer*/
     TH1F** m_ResMeanVThetaLayer = nullptr;
 
-    /** helix parameters and their corellations */
+    /** helix parameters and their correlations */
     /** Phi - the angle of the transverse momentum in the r-phi plane vs. z0 of the perigee (to see primary vertex shifts along R or z) */
     TH2F* m_PhiZ0 = nullptr;
     /** Phi - the angle of the transverse momentum in the r-phi plane vs. Track momentum Pt */

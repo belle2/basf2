@@ -84,7 +84,6 @@
 #include <TMatrixD.h>
 #include <TMatrixDSymEigen.h>
 
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/algorithm/string/find.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -1135,7 +1134,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     mctrack = tparticle;
     mctrack.fTDecay = particle->getDecayTime();
     mctrack.fVDecay.Set(B2Vector3D(particle->getDecayVertex()));
-    mctrack.fDecayed = !boost::math::isinf(mctrack.fTDecay);
+    mctrack.fDecayed = !std::isinf(mctrack.fTDecay);
     mctrack.fIndex = particle->getIndex();
     m_mcparticleTracks[particle].track = new TEveTrack(&mctrack, m_trackpropagator);
 

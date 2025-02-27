@@ -18,7 +18,7 @@
 """
 
 from tracking.validation.run import TrackingValidationRun
-import tracking
+from tracking import add_tracking_reconstruction
 import logging
 import basf2
 VALIDATION_OUTPUT_FILE = 'FullTrackingValidation.root'
@@ -35,7 +35,7 @@ class Full(TrackingValidationRun):
     #: no background overlay
     root_input_file = '../EvtGenSimNoBkg.root'
     #: use the complete track-reconstruction chain
-    finder_module = staticmethod(tracking.add_tracking_reconstruction)
+    finder_module = staticmethod(add_tracking_reconstruction)
     #: Define the user parameters for the track-finding module
     tracking_coverage = {
         'WhichParticles': [],  # Include all particles, also secondaries

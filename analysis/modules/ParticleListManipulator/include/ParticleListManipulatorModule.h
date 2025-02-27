@@ -25,9 +25,6 @@
 
 namespace Belle2 {
 
-  // forward declaration
-  class Particle;
-
   /**
    * Module for copying Particles (actually their indices) from
    * two or more ParticleLists(s) to another ParticleList. In the

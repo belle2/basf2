@@ -18,6 +18,7 @@ import requests
 import traceback
 
 # ours
+import b2test_utils
 import validationserver
 import validationpath
 from validationtestutil import check_execute
@@ -185,8 +186,7 @@ def main():
     """
 
     # fixme: See if we can re-enable this test or at least run it locally
-    print("TEST SKIPPED: Not properly runnable on build bot", file=sys.stderr)
-    sys.exit(1)
+    b2test_utils.skip_test("Not properly runnable yet")
     # noinspection PyUnreachableCode
 
     # only run the test on dev machines with splinter installed. Also for the

@@ -9,11 +9,9 @@
 #include <analysis/modules/RestOfEventUpdater/RestOfEventUpdaterModule.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h> //
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
-
-#include <iostream>
 
 using namespace std;
 

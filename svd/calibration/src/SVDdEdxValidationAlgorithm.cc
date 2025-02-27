@@ -584,7 +584,7 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
         SelectedSignalIntegral = DataFrameSignalAll.Filter(SelectedSignalCut.GetTitle()).Sum(SignalWeightName).GetValue();
       }
 
-      // special treatement for pions: add also the slow pions from Dstar to gain low-momentum coverage
+      // special treatment for pions: add also the slow pions from Dstar to gain low-momentum coverage
       if (strncmp(SignalVarName.Data(), "PionD", 5) == 0) {
         TString SignalVarNameSlow = "SlowPion";
         TCut SelectedSignalCutSlow = Form("(%s%s%s > %s)", SignalVarNameSlow.Data(), PIDVarName.Data(), PIDDetectors[i].Data(),
@@ -623,7 +623,7 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
 
   std::unique_ptr<ROOT::RDF::RNode> DataFrameSlowFakeAll;
 
-  // special treatement for pions: add also the slow pions from Dstar to gain low-momentum coverage
+  // special treatment for pions: add also the slow pions from Dstar to gain low-momentum coverage
   if (strncmp(FakeVarName.Data(), "PionD", 5) == 0) {
 
     TString FakeVarNameSlow = "SlowPion";

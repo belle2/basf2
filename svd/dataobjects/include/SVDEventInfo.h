@@ -142,7 +142,7 @@ namespace Belle2 {
     /** sets the APV clock period. This operation can be done only in an event().
     * return false if the HardwareClockSettings DBObject is not valid,
     * in this case the APV clock period is set to be 16000. / 509.;
-    * returns true when the operation is successfull.
+    * returns true when the operation is successful.
     */
     bool setAPVClock(DBObjPtr<HardwareClockSettings> hwClock)
     {

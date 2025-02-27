@@ -92,3 +92,7 @@ def create_fbdt_option_string(fast_bdt_option):
     """
     return f"_nTrees{fast_bdt_option[0]}_nCuts{fast_bdt_option[1]}"\
            f"_nLevels{fast_bdt_option[2]}_shrin{int(round(100*fast_bdt_option[3], 0))}"
+
+
+if __name__ == "__main__":
+    pass

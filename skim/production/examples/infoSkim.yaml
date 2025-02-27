@@ -54,3 +54,9 @@ GT :
   PID : 'chargedpidmva_rel6_v5'
 
 release : 'build-light-2405q'
+
+campaign :
+  'proc13' : ['proc13']
+  'prompt' : ['bucket','PromptExp']
+  'MC15rd_a' : ['MC15rd_a']
+  'MC15rd_b' : ['MC15rd_b']

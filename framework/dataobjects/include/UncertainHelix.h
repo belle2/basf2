@@ -31,7 +31,7 @@ namespace Belle2 {
    */
   class UncertainHelix : public Helix {
   public:
-    /** Default constuctor initialising all members to zero.*/
+    /** Default constructor initialising all members to zero.*/
     UncertainHelix();
 
     /** Constructor initializing class with fit result.
@@ -79,7 +79,7 @@ namespace Belle2 {
      *  from a 5x5 perigee parameter covariance matrix there is necessarily a missing
      *  rank in the resulting matrix. The rank has to be filled by a convention
      *  essentially expressing, which points around the perigee are considered to be at s = 0.
-     *  For backwards compatability with the original Belle experiment we apply
+     *  For backwards compatibility with the original Belle experiment we apply
      *  the convention used there. See the Belle II note for more details.
      *
      *  @param bZ_tesla      Magnetic field to be used for the calculation from the curvature;

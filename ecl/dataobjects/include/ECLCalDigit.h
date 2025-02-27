@@ -219,10 +219,10 @@ namespace Belle2 {
     bool isOnlineFitQuality0() const;
 
   private:
-    int m_CellId;                                      /**< Cell ID */
     double m_Time;                                     /**< Calibrated Time */
     double m_TimeResolution;                           /**< Calibrated Time resolution*/
     double m_Energy;                                   /**< Calibrated Energy */
+    int m_CellId;                                      /**< Cell ID */
     unsigned short int m_Status;                       /**< Calibration and Fit Status */
     double m_TwoComponentTotalEnergy;                  /**< Calibrated Two Component Total Energy */
     double m_TwoComponentHadronEnergy;                 /**< Calibrated Hadron Component Energy */
@@ -238,7 +238,8 @@ namespace Belle2 {
     // 5: added diode and pile-up photon offline fit hypothesis (SL)
     // 6: added m_TwoComponentSavedChi2[3] to save chi2 for each fit tried (SL)
     // 7: propagated status flags for the online fit from the ECLDigit object (JE)
-    ClassDef(ECLCalDigit, 7); /**< ClassDef */
+    // 8: Slightly reorder data members to improve memory layout (CW)
+    ClassDef(ECLCalDigit, 8); /**< ClassDef */
   };
 
   // inline isCalibrated

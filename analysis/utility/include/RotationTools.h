@@ -44,9 +44,27 @@ namespace Belle2 {
       ROOT::Math::XYZVector zAxis(0, 0, 1);
       double angle = ROOT::Math::VectorUtil::Angle(zAxis, zPrime);
 
-      ROOT::Math::RotationZ rotZ(angle);
-      ROOT::Math::Rotation3D r(rotZ);
-      return toMatrix(r);
+      ROOT::Math::XYZVector rotAxis = zAxis.Cross(zPrime).Unit();
+      double x = rotAxis.x();
+      double y = rotAxis.y();
+
+      double cosA = std::cos(angle);
+      double sinA = std::sin(angle);
+      double oneMinusCosA = 1 - cosA;
+
+      double xx = cosA + x * x * oneMinusCosA;
+      double xy = x * y * oneMinusCosA;
+      double xz = y * sinA;
+
+      double yx = y * x * oneMinusCosA;
+      double yy = cosA + y * y * oneMinusCosA;
+      double yz = - x * sinA;
+
+      double zx = - y * sinA;
+      double zy = x * sinA;
+      double zz = cosA;
+
+      return toMatrix(ROOT::Math::Rotation3D(xx, xy, xz, yx, yy, yz, zx, zy, zz));
     }
 
 

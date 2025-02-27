@@ -131,8 +131,8 @@ namespace Belle2 {
       /** Clustering: minimum peak cell weight */
       unsigned short minPeakWeight = 32;
 
-      /** Clustering: number of iterations for the cluster search in each Hough space */
-      unsigned char iterations = 5;
+      /** Clustering: number of iterations for the cluster search in each Hough space quadrant */
+      unsigned char iterations = 2;
 
       /** Clustering: number of deleted cells in each omega direction from the maximum */
       unsigned char omegaTrim = 5;
@@ -146,7 +146,7 @@ namespace Belle2 {
       /** CDC symmetry: repeat wire pattern 32 times in phi */
       unsigned short phigeo = 32;
 
-      ///** CDC symmetry: phi range covered by hit data [0 .. phigeo] */
+      /** CDC symmetry: phi range covered by hit data [0 .. phigeo] */
       unsigned short parcels = 7;
 
       /** CDC symmetry: phi range covered by expanded hit data [0 .. phigeo] */
@@ -185,7 +185,7 @@ namespace Belle2 {
      * @param dbscanning when true: dbscan, when false: fixed three dim volume
      * @param minTotalWeight minimum total weight of all cells in the 3d volume
      * @param minPeakWeight minimum peak cell weight
-     * @param iterations number of cluster searches in each Hough space
+     * @param iterations number of cluster searches in each Hough space quadrant
      * @param omegaTrim number deleted cells in each omega direction from the maximum
      * @param phiTrim number deleted cells in each phi direction from the maximum
      * @param thetaTrim number deleted cells in each theta direction from the maximum

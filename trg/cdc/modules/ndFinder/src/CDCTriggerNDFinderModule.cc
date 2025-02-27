@@ -65,8 +65,8 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            "Clustering: minimum peak cell weight of a cluster.",
            32);
   addParam("iterations", m_iterations,
-           "Clustering: Number of iterations for the cluster finding in one Hough space.",
-           5);
+           "Clustering: Number of iterations for the cluster finding in one Hough space quadrant.",
+           2);
   addParam("omegaTrim", m_omegaTrim,
            "Clustering: Number of deleted cells in each omega direction of the maximum.",
            5);

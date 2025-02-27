@@ -23,8 +23,8 @@ namespace Belle2 {
     unsigned short minTotalWeight  =    450;
     /** Cut on the peak cell weight */
     unsigned short minPeakWeight   =    32;
-    /** Number of iterations of the cluster searching for each Hough space */
-    unsigned char iterations      =    5;
+    /** Number of iterations of the cluster searching for each Hough space quadrant */
+    unsigned char iterations      =    2;
     /** Number of deleted cells in omega in each direction of the maximum */
     unsigned char omegaTrim                =    5;
     /** Number of deleted cells in phi in each direction of the maximum */
@@ -174,7 +174,7 @@ namespace Belle2 {
 
     std::vector<cell_index> getCandidates();
 
-    std::pair<cell_index, unsigned long> getGlobalMax();
+    std::pair<cell_index, unsigned long> getGlobalMax(unsigned char quadrant);
 
     void deleteMax(cell_index maxIndex);
 

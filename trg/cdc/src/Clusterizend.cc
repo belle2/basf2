@@ -163,16 +163,17 @@ Clusterizend::getCandidates()
   return candidates;
 }
 
-std::pair<cell_index, unsigned long> Clusterizend::getGlobalMax()
+std::pair<cell_index, unsigned long> Clusterizend::getGlobalMax(unsigned char quadrant)
 {
   unsigned long maxValue = 0;
   cell_index maxIndex = {0, 0, 0};
   for (c3index iom = 0; iom < 40; iom++) {
-    for (c3index iph = 0; iph < 384; iph++) {
+    for (c3index iph = 48 + quadrant * 96; iph < 48 + (quadrant + 1) * 96; iph++) {
+      c3index phiMod = iph % 384;
       for (c3index ith = 0; ith < 9; ith++) {
-        if ((*m_houghVals)[iom][iph][ith] > maxValue) {
-          maxValue = (*m_houghVals)[iom][iph][ith];
-          maxIndex = {iom, iph, ith};
+        if ((*m_houghVals)[iom][phiMod][ith] > maxValue) {
+          maxValue = (*m_houghVals)[iom][phiMod][ith];
+          maxIndex = {iom, phiMod, ith};
         }
       }
     }
@@ -214,16 +215,21 @@ void Clusterizend::deleteMax(cell_index maxIndex)
 std::vector<SimpleCluster> Clusterizend::makeClusters()
 {
   std::vector<SimpleCluster> candidates;
-  for (unsigned long iter = 0; iter < m_params.iterations; iter++) {
-    auto [globalMax, peakWeight] = getGlobalMax();
-    if (peakWeight < m_params.minPeakWeight || peakWeight == 0) {
-      break;
+  c3array houghValsBackup = *m_houghVals;
+  for (unsigned char quadrant = 0; quadrant < 4; quadrant++) {
+    for (unsigned char iter = 0; iter < m_params.iterations; iter++) {
+      auto [globalMax, peakWeight] = getGlobalMax(quadrant);
+      if (peakWeight < m_params.minPeakWeight || peakWeight == 0) {
+        *m_houghVals = houghValsBackup;
+        break;
+      }
+      auto [newCluster, totalWeight] = createCluster(globalMax);
+      if (totalWeight >= m_params.minTotalWeight) {
+        candidates.push_back(newCluster);
+      }
+      deleteMax(globalMax);
     }
-    auto [newCluster, totalWeight] = createCluster(globalMax);
-    if (totalWeight >= m_params.minTotalWeight) {
-      candidates.push_back(newCluster);
-    }
-    deleteMax(globalMax);
+    *m_houghVals = houghValsBackup;
   }
   return candidates;
 }

@@ -81,7 +81,7 @@ namespace Belle2 {
     int m_minTotalWeight;
     /** Clustering with 3d volume: Cut on the peak cell weight */
     int m_minPeakWeight;
-    /** Clustering with 3d volume: Number of global maximum searches per Hough space */
+    /** Clustering with 3d volume: Number of global maximum searches per Hough space quadrant */
     int m_iterations;
     /** Clustering with 3d volume: Max deletion in omega (number of cells in each direction from max */
     int m_omegaTrim;

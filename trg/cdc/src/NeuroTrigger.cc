@@ -1112,10 +1112,10 @@ NeuroTrigger::getInputVector_extrahit(unsigned isector, const vector<unsigned>& 
       double deltaPhi = 0;
       //Based on the sysmetry shape, build a table for alpha and id delta phi
       //Following same method as previous, use delta phi instead of true id for other priority
-      int outerpriorList[11] = {4, 4, 4, 2, 2, 0, 1, 1, 3, 3, 3};
-      int innerpriorList[15] = {0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4};
-      double outerdeltaPhiList[11] = {-1, 0, 1, -0.5, 0.5, 0, -0.5, 0.5, -1, 0, 1};
-      double innerdeltaPhiList[15] = {-0.5, 0.5, -1, 0, 1, -1.5, -0.5, 0.5, 1.5, -2, -1, 0, 1, 2};
+      const int outerpriorList[11] = {4, 4, 4, 2, 2, 0, 1, 1, 3, 3, 3};
+      const int innerpriorList[15] = {0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4};
+      const double outerdeltaPhiList[11] = {-1, 0, 1, -0.5, 0.5, 0, -0.5, 0.5, -1, 0, 1};
+      const double innerdeltaPhiList[15] = {-0.5, 0.5, -1, 0, 1, -1.5, -0.5, 0.5, 1.5, -2, -1, 0, 1, 2};
       if (iSL != 0) {
         prior = outerpriorList[BestID[i]];
         deltaPhi = outerdeltaPhiList[BestID[i]];

@@ -196,20 +196,20 @@ namespace Belle2 {
       } else {
         MCParticle* mcTrack =
           m_tracks[itrack]->getRelatedTo<MCParticle>(m_targetCollectionName);
-        if (not mcTrack) {
+        if (!mcTrack) {
           if (m_SaveFakeTrack)
             isFakeTrack = true;
           else {
             B2DEBUG(150, "Skipping CDCTriggerTrack without relation to MCParticle.");
             continue;
           }
+        } else {
+          //phi0Target = mcTrack->getMomentum().Phi();
+          //invptTarget = mcTrack->getCharge() / mcTrack->getMomentum().rho();
+          thetaTarget = mcTrack->getMomentum().Theta();
+          zTarget = mcTrack->getProductionVertex().Z();
+          PtTarget = mcTrack->getMomentum().rho();
         }
-        //phi0Target = mcTrack->getMomentum().Phi();
-        //invptTarget = mcTrack->getCharge() / mcTrack->getMomentum().rho();
-        thetaTarget = mcTrack->getMomentum().Theta();
-        zTarget = mcTrack->getProductionVertex().Z();
-        PtTarget = mcTrack->getMomentum().rho();
-
       }
       m_NeuroTrigger.updateTrack(*m_tracks[itrack]);
 

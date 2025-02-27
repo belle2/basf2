@@ -608,12 +608,27 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "This affects the output scaling of the Neurotrigger as well as the"
            "bit configuration of its unpacker. If false, an old unpacker version with fixed scalings and old bit adresses is used.",
            true);
+  addParam("NNTrackName", m_neuro_track_name,
+           "Name for unpacked Neurotrack",
+           (std::string)"CDCTriggerNeuroTracks");
+  addParam("NNInStereoTS", m_neuro_in_sTS_name,
+           "Name for unpacked Neurotrigger input all stereo TSs",
+           (std::string)"CDCTriggerNNInputAllStereoSegmentHits");
+  addParam("NNInSelectTS", m_neuro_select_TS_name,
+           "Name for unpacked Neurotrigger selected TSs",
+           (std::string)"CDCTriggerNNInputSegmentHits");
+  addParam("NNIn2DTrack", m_neuro_in_2dtrack_name,
+           "Name for unpacked Neurotrigger input 2d tracks",
+           (std::string)"CDCTriggerNNInput2DFinderTracks");
+  addParam("NNInETFT0", m_neuro_in_etf_name,
+           "Name for unpacked Neurotrigger input ETF T0",
+           (std::string)"CDCTriggerNeuroETFT0");
+  addParam("NNScaledInput", m_neuro_scaled_input_name,
+           "Name for unpacked Neurotrigger scaled input",
+           (std::string)"CDCTriggerNeuroTracksInput");
   addParam("sim13dt", m_sim13dt,
            "Simulate 13 bit drift time by using 2d clock counter value.",
            false);
-  addParam("NNTrackName", m_neurotrack_name,
-           "Name for unpacked Neurotrack",
-           (std::string)"CDCTriggerNeuroTracks");
   addParam("isDNN", m_isDNN,
            "flag to unpack DNN trigger data", false);
 }
@@ -644,12 +659,12 @@ void CDCTriggerUnpackerModule::initialize()
     m_2DFinderClones.registerRelationTo(m_2DFinderTracks);
   }
   if (m_decodeNeuro) {
-    m_NNInputTSHitsAll.registerInDataStore("CDCTriggerNNInputAllStereoSegmentHits");
-    m_NNInputTSHits.registerInDataStore("CDCTriggerNNInputSegmentHits");
-    m_NNInput2DFinderTracks.registerInDataStore("CDCTriggerNNInput2DFinderTracks");
-    m_NeuroTracks.registerInDataStore(m_neurotrack_name.c_str());
-    m_NeuroInputs.registerInDataStore("CDCTriggerNeuroTracksInput");
-    m_ETFTime.registerInDataStore("CDCTriggerNeuroETFT0");
+    m_NNInputTSHitsAll.registerInDataStore(m_neuro_in_sTS_name.c_str());
+    m_NNInputTSHits.registerInDataStore(m_neuro_select_TS_name.c_str());
+    m_NNInput2DFinderTracks.registerInDataStore(m_neuro_in_2dtrack_name.c_str());
+    m_NeuroTracks.registerInDataStore(m_neuro_track_name.c_str());
+    m_NeuroInputs.registerInDataStore(m_neuro_scaled_input_name.c_str());
+    m_ETFTime.registerInDataStore(m_neuro_in_etf_name.c_str());
     m_NeuroTracks.registerRelationTo(m_NNInputTSHits);
     m_NNInput2DFinderTracks.registerRelationTo(m_NNInputTSHits);
     m_NNInput2DFinderTracks.registerRelationTo(m_NNInputTSHitsAll);

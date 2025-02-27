@@ -500,10 +500,8 @@ CDCTriggerTSFModule::event()
         const CDCHit* priorityHit = m_cdcHits[s.priority().hit()->iCDCHit()];
 
         /* generate ADC Pattern for NN*/
-        unsigned int adcpattern = -1;
         std::vector<float> fullADC = {};
         if (m_saveadc) {
-          unsigned int PatternAfterCut = s.lutPattern();
           int nwires = (isl == 0) ? 15 : 11;
           for (int iwire = 0; iwire < nwires; iwire++) {
             if (!s[iwire] || !(s[iwire]->hit())) { //Make sure the wire do exist
@@ -512,11 +510,7 @@ CDCTriggerTSFModule::event()
             }
             const CDCHit* cdchit0 = m_cdcHits[s[iwire]->hit()->iCDCHit()];
             fullADC.push_back(cdchit0->getADCCount());
-            if (cdchit0 && (cdchit0->getADCCount() < m_adccut)) {
-              PatternAfterCut &= ~(1UL << (iwire + 1));
-            }
           }
-          adcpattern =  PatternAfterCut;
         }
         const CDCTriggerSegmentHit* tsHit =
           m_segmentHits.appendNew(*priorityHit,

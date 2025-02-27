@@ -49,7 +49,7 @@ DETECTOR_ACCEPTANCE_CUTS = [
     "inKLMAcceptance"  # KLM
 ]
 
-PID_EXPERT = "kenta.uno@kek.jp and alessandro.gaz@pd.infn.it"
+PID_EXPERT = "Alessandro Gaz. alessandro.gaz@pd.infn.it"
 
 THRESHOLDS = [0.2, 0.8]
 KIN_VAR_NAMES = ['p', 'cosTheta']

@@ -19,7 +19,7 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
-#include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
+#include <tracking/dataobjects/PXDIntercept.h>
 
 #include "TH1F.h"
 #include "TH1D.h"
@@ -115,9 +115,9 @@ namespace Belle2 {
     double m_momCut; ///< Cut on fitted track momentum
     double m_pTCut; ///< Cut on fitted track pT
     unsigned int m_minSVDHits; ///< Required hits in SVD strips for tracks
-    double m_z0minCut;/**< cut z0 minimum in cm (large negativ value eg -9999 disables)*/
-    double m_z0maxCut;/**< cut z0 maximum in cm (large positiv value eg 9999 disables)*/
-    double m_d0Cut;/**< cut abs(d0) in cm (large positiv value eg 9999 disables)*/
+    double m_z0minCut;/**< cut z0 minimum in cm (large negative value eg -9999 disables)*/
+    double m_z0maxCut;/**< cut z0 maximum in cm (large positive value eg 9999 disables)*/
+    double m_d0Cut;/**< cut abs(d0) in cm (large positive value eg 9999 disables)*/
     int m_maskedDistance; ///< Distance inside which no dead pixel or module border is allowed
 
     std::map<VxdID, int> revLUT; ///< reverse lookup sensor id -> index in histogram

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -23,7 +22,7 @@ from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKe
 formatter = TolerateMissingKeyFormatter()
 
 
-class ResolutionAnalysis(object):
+class ResolutionAnalysis:
     """Perform resolution analysis"""
 
     #: default Z-score (for outlier detection)
@@ -54,9 +53,9 @@ class ResolutionAnalysis(object):
         plot_name=None,
         plot_title=None,
         min_required_entries=None,  # minimum number of entries in a bin for the resolution fit
-        plot_name_prefix='',  # depricated use plot_name instead
-        plot_name_postfix='',  # depricated use plot_name instead
-        plot_title_postfix='',  # depricated use plot_title instead
+        plot_name_prefix='',  # deprecated use plot_name instead
+        plot_name_postfix='',  # deprecated use plot_name instead
+        plot_title_postfix='',  # deprecated use plot_title instead
         referenceFileName=None,  # if set binnings of histograms will be read from corresponding histogram in this file
     ):
         """Performs a comparison of an estimated quantity to their truths by generating standardized validation plots."""
@@ -116,7 +115,7 @@ class ResolutionAnalysis(object):
         Parameters
         ----------
         bin_values : array_like(float
-            The parametr used for binning
+            The parameter used for binning
         truths : array_like(float)
             Sample of the true values
         estimates : array_like(float)
@@ -179,7 +178,7 @@ class ResolutionAnalysis(object):
                         sel_residuals.append(residuals[i])
 
                 residuals_hist_name = formatter.format(plot_name, subplot_name="residuals") + \
-                    "{}_to_{}".format(lower_bin, upper_bin)
+                    f"{lower_bin}_to_{upper_bin}"
                 vplot = ValidationPlot(residuals_hist_name, self.referenceFileName)
                 vplot.hist(sel_residuals,
                            outlier_z_score=outlier_z_score,
@@ -212,7 +211,7 @@ class ResolutionAnalysis(object):
             resolution_graph_name = formatter.format(plot_name, subplot_name="resolution")
             resolution_graph = ValidationPlot(resolution_graph_name, self.referenceFileName)
 
-            # compile all requried data going into the final TGraphErrors
+            # compile all required data going into the final TGraphErrors
             xs = []
             xs_err = []
             ys = []

@@ -36,7 +36,7 @@ namespace Belle2 {
     double hasAncestor(const Particle* part, const std::vector<double>& args);
 
     /**
-     * return angle between the CMS momentum vector and the direction of the i-th daughter, both calculcated in the mother's rest frame
+     * return angle between the CMS momentum vector and the direction of the i-th daughter, both calculated in the mother's rest frame
      */
     double particleDecayAngle(const Particle* particle, const std::vector<double>& daughters);
 

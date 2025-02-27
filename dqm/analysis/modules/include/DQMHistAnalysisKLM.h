@@ -80,10 +80,10 @@ namespace Belle2 {
 
     /**
      * Analyse channel hit histogram.
-     * @param[in]  subdetector  Subdetector.
-     * @param[in]  section      Section.
+     * @param[in]  subdetector  Subdetector (E or B-KLM).
+     * @param[in]  section      Section (Forward or Backward).
      * @param[in]  sector       Sector.
-     * @param[in]  index        Histogram Index.
+     * @param[in]  index        Histogram Index (The j'th histogram of a given sector).
      * @param[in]  histogram    Histogram.
      * @param[in]  delta        Delta Histogram.
      * @param[in]  canvas       Canvas.
@@ -145,6 +145,9 @@ namespace Belle2 {
     /** Minimal number of hits for flagging. */
     int m_MinHitsForFlagging;
 
+    /** Message Threshold for expert pots */
+    int m_MessageThreshold;
+
     /** Input parameter for minimal number of processed events for error messages. */
     double m_MinProcessedEventsForMessagesInput;
 
@@ -156,12 +159,6 @@ namespace Belle2 {
 
     /** Name of histogram directory */
     std::string m_histogramDirectoryName;
-
-    /** Reference Histogram Root file name */
-    std::string m_refFileName;
-
-    /** The pointer to the reference file */
-    TFile* m_refFile = nullptr;
 
     /** Vector of dead barrel modules. */
     std::vector<uint16_t> m_DeadBarrelModules;

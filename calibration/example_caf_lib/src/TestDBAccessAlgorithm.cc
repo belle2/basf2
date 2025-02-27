@@ -19,7 +19,7 @@ using namespace Belle2;
 TestDBAccessAlgorithm::TestDBAccessAlgorithm(): CalibrationAlgorithm("CaTest")
 {
   setDescription(
-    " -------------------------- Test Calibration Algoritm -------------------------\n"
+    " -------------------------- Test Calibration Algorithm -------------------------\n"
     "                                                                               \n"
     "  Testing algorithm which accesses DBObjPtr to show how it could be done.      \n"
     " ------------------------------------------------------------------------------\n"

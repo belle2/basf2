@@ -140,7 +140,7 @@ restrictions apply:
 .. hint:: If you want to merge the output of `VariablesToNtuple`, please use
     ``hadd``.
 
-.. seealso:: For a comparision between ``hadd``, ``b2file-merge`` and friends,
+.. seealso:: For a comparison between ``hadd``, ``b2file-merge`` and friends,
     take a look at
     `this questions.belle2 thread <https://questions.belle2.org/question/3945/>`_.
 

@@ -206,7 +206,7 @@ namespace Belle2 {
               for (unsigned iAxialTSF = 0; iAxialTSF < nAxialTSF; ++iAxialTSF) {
                 inputClock->m_signal[iAxialTSF][j].fill(zero_val);
               }
-              outputClock->m_signal[j].fill(zero_val);
+              outputClock->m_signal.at(j).fill(zero_val);
             }
           }
           B2DEBUG(20, name << ": " << nClocks << " clocks");
@@ -304,7 +304,7 @@ namespace Belle2 {
         auto inputClock = (*inputArrayPtr)[iclock];
         auto outputClock = (*outputArrayPtr)[iclock];
         // clear output bitstream
-        outputClock->m_signal[iTracker].fill(zero_val);
+        outputClock->m_signal.at(iTracker).fill(zero_val);
         B2DEBUG(90, "unpacker clock " << iclock);
         if (debugLevel >= 300) {
           printBuffer(data32tab[iFinesse_i] + headerSize + eventWidth * iclock,
@@ -407,7 +407,7 @@ namespace Belle2 {
             const int j = (offsetBitWidth + pos + outputOffset) / wordWidth;
             const int k = (offsetBitWidth + pos + outputOffset) % wordWidth;
             dataWord word(data32tab[iFinesse_i][i + j]);
-            outputClock->m_signal[iTracker][clockCounterWidth + oldtrackWidth + pos]
+            outputClock->m_signal.at(iTracker).at(clockCounterWidth + oldtrackWidth + pos)
               = std_logic(word[wordWidth - 1 - k]);
           }
         } else {
@@ -422,12 +422,20 @@ namespace Belle2 {
             const int j = (pos + outputOffset) / wordWidth;
             const int k = (pos + outputOffset) % wordWidth;
             dataWord word(data32tab[iFinesse_i][i + j]);
-            outputClock->m_signal[iTracker][clockCounterWidth + pos]
-              = std_logic(word[wordWidth - 1 - k]);
+            try {
+              outputClock->m_signal.at(iTracker).at(clockCounterWidth + pos)
+                = std_logic(word[wordWidth - 1 - k]);
+            } catch (const std::out_of_range& e) {
+              B2DEBUG(20, "Out-of-range access ot outputClock->m_signal.at(iTracker).at(clockCounterWidth + pos)"
+                      << LogVar("iTracker", iTracker)
+                      << LogVar("clockCounterWidth", clockCounterWidth)
+                      << LogVar("post", pos));
+              break;
+            }
           }
         }
         if (debugLevel >= 100) {
-          display_hex(outputClock->m_signal[iTracker]);
+          display_hex(outputClock->m_signal.at(iTracker));
         }
       }
     }
@@ -547,7 +555,7 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "flag to decode input TS to 2D", false);
   addParam("decodeNeuro", m_decodeNeuro,
            "flag to decode neurotrigger data", false);
-  //  https://confluence.desy.de/display/BI/DAQ+and+Operation for CPR/HSLB
+  //  https://xwiki.desy.de/xwiki/rest/p/776d2 for CPR/HSLB
   NodeList defaultMergerNodeID = {    // These should be very temporary ones since no merger to B2L yet.
     {0x11000001, 0},
     {0x11000003, 0},

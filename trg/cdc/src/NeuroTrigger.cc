@@ -743,13 +743,6 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track, co
     unsigned short iSL = axialHits[ihit]->getISuperLayer();
     // // skip stereo hits (should not be related to track, but check anyway)
     if ((!neurotrackinputmode) && (iSL % 2 == 1)) continue;
-    // get priority time
-    int t = (m_hasT0) ? axialHits[ihit]->priorityTime() - m_T0 : 0;
-    if (t < 0) {
-      t = 0;
-    } else if (t > expert.getTMax()) {
-      t = expert.getTMax();
-    }
     double relId = getRelId(*axialHits[ihit]);
 
     if (expert.isRelevant(relId, iSL)) {
@@ -768,13 +761,6 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track, co
       unsigned short iSL = m_segmentHits[ihit]->getISuperLayer();
       // skip axial hits
       if (iSL % 2 == 0) continue;
-      // get priority time
-      int t = (m_hasT0) ? m_segmentHits[ihit]->priorityTime() - m_T0 : 0;
-      if (t < 0) {
-        t = 0;
-      } else if (t > expert.getTMax()) {
-        t = expert.getTMax();
-      }
       double relId = getRelId(*m_segmentHits[ihit]);
       if (expert.isRelevant(relId, iSL)) {
         if (nHits[iSL] < expert.getMaxHitsPerSL()) {

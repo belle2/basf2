@@ -34,14 +34,14 @@ namespace Belle2 {
      *  * T0, TOF and signal delay in the wire are not taken into account
      *    (but can eventually implemented to study them)
      *
-     *  Nevertheless drift length a smeared by one gaussian distribution of fixed width to have a
+     *  Nevertheless drift length a smeared by one Gaussian distribution of fixed width to have a
      *  realistic check for the accuracy of fast fitting procedures in terms of their chi2 distributions.
      */
     class CDCSimpleSimulation  {
 
     private:
 
-      /// Structure to accomdate information about the individual hits during the simluation
+      /// Structure to accommodate information about the individual hits during the simulation
       struct SimpleSimHit {
 
         /**

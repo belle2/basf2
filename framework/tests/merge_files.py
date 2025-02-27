@@ -21,7 +21,7 @@ import basf2
 from b2test_utils import clean_working_directory, skip_test_if_light
 
 
-def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=None, **argk):
+def create_testfile(name, exp=0, run=0, events=100, branchNames=None, **argk):
     """Create a test file from a steering string"""
     if branchNames is None:
         branchNames = []
@@ -33,12 +33,34 @@ def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=No
     with open(steering_file, "w") as f:
         f.write(testfile_steering)
 
-    subprocess.call(["basf2", "-o", name, "--experiment", str(exp), "--run", str(run),
-                     "-n", str(events), steering_file] + branchNames, env=env)
+    subprocess.call(
+        [
+            "basf2",
+            "-o",
+            name,
+            "--experiment",
+            str(exp),
+            "--run",
+            str(run),
+            "-n",
+            str(events),
+            steering_file,
+        ]
+        + branchNames,
+        env=env,
+    )
 
 
-def create_testfile_direct(name, metadata=None, release="test_release", user="test_user", seed=None,
-                           site="test_site", global_tag="test_globaltag", steering="test_steering"):
+def create_testfile_direct(
+    name,
+    metadata=None,
+    release="test_release",
+    user="test_user",
+    seed=None,
+    site="test_site",
+    global_tag="test_globaltag",
+    steering="test_steering",
+):
     """similar to create_testfile but does it manually without running basf2 for
     full control over the FileMetaData"""
     if metadata is None:
@@ -49,7 +71,9 @@ def create_testfile_direct(name, metadata=None, release="test_release", user="te
     if seed is not None:
         metadata.setRandomSeed(seed)
     metadata.setLfn(name)
-    metadata.setCreationData("the most auspicious of days for testing", site, user, release)
+    metadata.setCreationData(
+        "the most auspicious of days for testing", site, user, release
+    )
     metadata.setDatabaseGlobalTag(global_tag)
     metadata.setSteering(steering)
     f = ROOT.TFile(name, "RECREATE")
@@ -60,6 +84,33 @@ def create_testfile_direct(name, metadata=None, release="test_release", user="te
     t = ROOT.TTree("tree", "tree")
     event_meta = ROOT.Belle2.EventMetaData()
     t.Branch("EventMetaData", event_meta)
+    t.Fill()
+    t.Write()
+    f.Close()
+
+
+def create_testfile_ntuple(input, output, treeNames=["tree", "anotherTree"], **argk):
+    """Create a test ntuple file from a steering string"""
+    global testfile_ntuple_steering
+    env = dict(os.environ)
+    env.update(argk)
+
+    steering_file = "steering-ntuple.py"
+    with open(steering_file, "w") as f:
+        f.write(testfile_ntuple_steering)
+
+    subprocess.call(
+        ["basf2", "-i", input, "-o", output, steering_file] + treeNames, env=env
+    )
+
+    # update release in metadata to avoid 'modified-xxx' warnings
+    metadata = get_metadata(output)
+    metadata.setCreationData(
+        metadata.getDate(), metadata.getSite(), metadata.getUser(), "test-release"
+    )
+    f = ROOT.TFile(output, "UPDATE")
+    t = ROOT.TTree("persistent", "persistent")
+    t.Branch("FileMetaData", metadata)
     t.Fill()
     t.Write()
     f.Close()
@@ -77,16 +128,23 @@ def merge_files(*args, output="output.root", filter_modified=False):
     """run the merging tool on all passed files
 
     Parameters:
-      output: name of the output file
-      filter_modified: if True omit warnings that the release is modified and
-          consistency cannot be checked
+        output: name of the output file
+        filter_modified: if True omit warnings that the release is modified and
+            consistency cannot be checked
     """
-    process = subprocess.run(["b2file-merge", "-q", output] + list(args), stdout=subprocess.PIPE)
+    process = subprocess.run(
+        ["b2file-merge", "-q", output] + list(args), stdout=subprocess.PIPE
+    )
     # do we want to filter the modified release warning?
     if filter_modified:
         # if so replace them using regular expression
-        process.stdout = re.sub(rb"^\[WARNING\] File \"(.*?)\" created with modified software ([a-zA-Z0-9\-+]*?): "
-                                rb"cannot verify that files are compatible\n", b"", process.stdout, flags=re.MULTILINE)
+        process.stdout = re.sub(
+            rb"^\[WARNING\] File \"(.*?)\" created with modified software ([a-zA-Z0-9\-+]*?): "
+            rb"cannot verify that files are compatible\n",
+            b"",
+            process.stdout,
+            flags=re.MULTILINE,
+        )
 
     # in any case print output
     sys.stdout.buffer.write(process.stdout)
@@ -113,8 +171,25 @@ basf2.process(main)
 """
 
 
+#: Minimal steering file to create output ntuples we can merge
+testfile_ntuple_steering = """
+import sys
+import basf2
+basf2.set_log_level(basf2.LogLevel.ERROR)
+main = basf2.create_path()
+main.add_module('RootInput')
+main.add_module('VariablesToNtuple',
+                treeName=sys.argv[1]
+                )
+main.add_module('VariablesToNtuple',
+                treeName=sys.argv[2]
+                )
+basf2.process(main)
+"""
+
+
 def check_01_existing():
-    """Check that merging a non exsiting file fails"""
+    """Check that merging a non existing file fails"""
     create_testfile_direct("test2.root")
     return merge_files("/test1.root") != 0 and merge_files("test2.root") == 0
 
@@ -148,7 +223,7 @@ def check_05_release():
 
 
 def check_06_empty_release():
-    """Check that merging fails with empty release valuses"""
+    """Check that merging fails with empty release values"""
     create_testfile_direct("test1.root")
     create_testfile_direct("test2.root", release="")
     return merge_files("test1.root", "test2.root") != 0
@@ -170,7 +245,7 @@ def check_08_duplicate_seed():
 
 def check_09_different_steering():
     """Check that merging fails if the steering file is different"""
-    create_testfile_direct("test1.root",)
+    create_testfile_direct("test1.root")
     create_testfile_direct("test2.root", steering="my other steering")
     return merge_files("test1.root", "test2.root") != 0
 
@@ -233,7 +308,7 @@ def check_15_noeventbranches():
 
 
 def check_16_nonmergeable():
-    """Check that merging fails it there a ron mergeable persistent trees"""
+    """Check that merging fails if there are multiple mergeable persistent trees"""
     f = ROOT.TFile("test1.root", "RECREATE")
     t = ROOT.TTree("persistent", "persistent")
     meta = FileMetaData()
@@ -277,7 +352,7 @@ def check_17_checkparentLFN():
 def check_18_checkEventNr():
     """Check that event and mc numbers are summed correctly"""
     evtNr = [10, 1243, 232, 1272, 25]
-    evtNrFullEvents = [i-1 for i in evtNr]
+    evtNrFullEvents = [i - 1 for i in evtNr]
     mcNr = [120, 821, 23, 923, 1]
     files = []
     for i, (e, f, m) in enumerate(zip(evtNr, evtNrFullEvents, mcNr)):
@@ -286,11 +361,15 @@ def check_18_checkEventNr():
         meta.setNFullEvents(f)
         meta.setMcEvents(m)
         meta.setRandomSeed(str(i))
-        files.append("test%d.root" % i)
+        files.append(f"test{i}.root")
         create_testfile_direct(files[-1], meta)
     merge_files(*files)
     meta = get_metadata()
-    return sum(evtNr) == meta.getNEvents() and sum(evtNrFullEvents) == meta.getNFullEvents() and sum(mcNr) == meta.getMcEvents()
+    return (
+        sum(evtNr) == meta.getNEvents()
+        and sum(evtNrFullEvents) == meta.getNFullEvents()
+        and sum(mcNr) == meta.getMcEvents()
+    )
 
 
 def check_19_lowhigh():
@@ -311,7 +390,7 @@ def check_19_lowhigh():
         meta.setRandomSeed(str(i))
         meta.setLow(e[0], e[1], e[2])
         meta.setHigh(e[0], e[1], e[2])
-        files.append("test%d.root" % i)
+        files.append(f"test{i}.root")
         create_testfile_direct(files[-1], meta)
 
     # test all possible combinations taking 2 elements from the list plus the
@@ -324,11 +403,19 @@ def check_19_lowhigh():
         if merge_files("-f", "--no-catalog", *(files[i] for i in indices)) != 0:
             return False
         meta = get_metadata()
-        if meta.getExperimentLow() != low[0] or meta.getRunLow() != low[1] or meta.getEventLow() != low[2]:
+        if (
+            meta.getExperimentLow() != low[0]
+            or meta.getRunLow() != low[1]
+            or meta.getEventLow() != low[2]
+        ):
             print("low event should be", low)
             meta.Print()
             return False
-        if meta.getExperimentHigh() != high[0] or meta.getRunHigh() != high[1] or meta.getEventHigh() != high[2]:
+        if (
+            meta.getExperimentHigh() != high[0]
+            or meta.getRunHigh() != high[1]
+            or meta.getEventHigh() != high[2]
+        ):
             print("high event should be", high)
             meta.Print()
             return False
@@ -340,14 +427,31 @@ def check_20_test_file():
     create_testfile("test1.root", events=1111)
     create_testfile("test2.root", events=123)
     merge_files("test1.root", "test2.root", filter_modified=True)
-    return subprocess.call(["b2file-check", "-n", "1234", "--mcevents", "1234",
-                            "output.root", "EventMetaData", "MCParticles"]) == 0
+    return (
+        subprocess.call(
+            [
+                "b2file-check",
+                "-n",
+                "1234",
+                "--mcevents",
+                "1234",
+                "output.root",
+                "EventMetaData",
+                "MCParticles",
+            ]
+        )
+        == 0
+    )
 
 
 def check_21_eventmetadata():
     """Check that merged files has all the correct even infos"""
-    create_testfile("test1.root", run=0, events=100, BELLE2_SEED="test1", BELLE2_USER="user1")
-    create_testfile("test2.root", run=1, events=100, BELLE2_SEED="test2", BELLE2_USER="user2")
+    create_testfile(
+        "test1.root", run=0, events=100, BELLE2_SEED="test1", BELLE2_USER="user1"
+    )
+    create_testfile(
+        "test2.root", run=1, events=100, BELLE2_SEED="test2", BELLE2_USER="user2"
+    )
     merge_files("test1.root", "test2.root", "test1.root", filter_modified=True)
     out = ROOT.TFile("output.root")
     events = out.Get("tree")
@@ -375,7 +479,9 @@ def check_22_real_mc():
 def check_23_legacy_ip():
     """Check that we can merge if the Legacy_IP_Information is inconsistent"""
     create_testfile_direct("test1.root", global_tag="test_globaltag")
-    create_testfile_direct("test2.root", global_tag="test_globaltag,Legacy_IP_Information")
+    create_testfile_direct(
+        "test2.root", global_tag="test_globaltag,Legacy_IP_Information"
+    )
     if merge_files("test1.root", "test2.root") != 0:
         return False
     meta = get_metadata()
@@ -385,7 +491,9 @@ def check_23_legacy_ip():
 def check_24_legacy_ip_middle():
     """Check that we can merge if the Legacy_IP_Information is inconsistent"""
     create_testfile_direct("test1.root", global_tag="test_globaltag,other")
-    create_testfile_direct("test2.root", global_tag="test_globaltag,Legacy_IP_Information,other")
+    create_testfile_direct(
+        "test2.root", global_tag="test_globaltag,Legacy_IP_Information,other"
+    )
     if merge_files("test1.root", "test2.root") != 0:
         return False
     meta = get_metadata()
@@ -400,6 +508,26 @@ def check_25_legacy_ip_only():
         return False
     meta = get_metadata()
     return meta.getDatabaseGlobalTag() == ""
+
+
+def check_26_ntuple_merge():
+    """Check that we can merge two ntuple output files"""
+    create_testfile("test1.root", exp=1, run=2, events=111)
+    create_testfile("test2.root", exp=1, run=2, events=123)
+    create_testfile_ntuple(input="test1.root", output="ntuple1.root")
+    create_testfile_ntuple(input="test2.root", output="ntuple2.root")
+    return merge_files("ntuple1.root", "ntuple2.root") == 0
+
+
+def check_27_ntuple_trees():
+    """Check that ntuple merge fails if the tree names are different"""
+    create_testfile("test1.root")
+    create_testfile("test2.root")
+    create_testfile_ntuple(input="test1.root", output="ntuple1.root")
+    create_testfile_ntuple(
+        input="test2.root", output="ntuple2.root", treeNames=["differentTree", "tree"]
+    )
+    return merge_files("ntuple1.root", "ntuple2.root") != 0
 
 
 def check_XX_filemetaversion():

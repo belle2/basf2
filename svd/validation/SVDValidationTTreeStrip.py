@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -25,7 +24,7 @@ import basf2 as b2
 
 # Some ROOT tools
 import ROOT
-from ROOT import Belle2  # make Belle2 namespace available
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT import gROOT, addressof
 
 # Define a ROOT struct to hold output data in the TTree
@@ -49,7 +48,7 @@ class SVDValidationTTreeStrip(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(SVDValidationTTreeStrip, self).__init__()
+        super().__init__()
         #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeStrip.root', 'recreate')
         #: output ttree
@@ -115,7 +114,7 @@ class SVDValidationTTreeStrip(b2.Module):
 
                     # print("this digit's charge: " + str(digit.getCharge()))
 
-                    if(digit.getCharge() > strip_charge):
+                    if (digit.getCharge() > strip_charge):
                         strip_charge = digit.getCharge()
 
                 # Sensor identification

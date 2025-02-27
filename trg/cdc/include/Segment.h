@@ -67,6 +67,9 @@ namespace Belle2 {
     /// returns trigger output. Null will returned if no signal.
     const TRGSignal& signal(void) const override;
 
+    /// returns trigger output. Null will returned if no signal.
+    const TRGSignal& signal_adc(void) const override;
+
     /// returns a pointer to a TRGCDCSegmentHit.
     const TRGCDCSegmentHit* hit(void) const;
 
@@ -75,6 +78,8 @@ namespace Belle2 {
 
     /// returns hit pattern.
     unsigned hitPattern(void) const;
+    /// returns hit pattern with adc cut.
+    unsigned hitPattern_adc(void) const;
     /// returns hit pattern for hits in given time window.
     unsigned hitPattern(int clk0, int clk1) const;
     /// returns hit pattern with hit time
@@ -168,6 +173,9 @@ namespace Belle2 {
     /// Trigger signal.
     TRGSignal _signal;
 
+    /// Trigger signal.
+    TRGSignal _signal_adc;
+
     /// Wire hits.
     std::vector<const TRGCDCWireHit*> _hits;
 
@@ -204,6 +212,13 @@ namespace Belle2 {
   TRGCDCSegment::signal(void) const
   {
     return _signal;
+  }
+
+  inline
+  const TRGSignal&
+  TRGCDCSegment::signal_adc(void) const
+  {
+    return _signal_adc;
   }
 
   inline

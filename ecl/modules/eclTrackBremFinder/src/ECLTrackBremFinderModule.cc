@@ -6,28 +6,22 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//This module
+/* Own header. */
 #include <ecl/modules/eclTrackBremFinder/ECLTrackBremFinderModule.h>
 
-//Framework
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
-
-//MDST
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-
-//Tracking
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/BremHit.h>
-
-//ECL
+/* ECL headers. */
 #include <ecl/modules/eclTrackBremFinder/BestMatchContainer.h>
 #include <ecl/modules/eclTrackBremFinder/BremFindingMatchCompute.h>
 
+/* Basf2 headers. */
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/BremHit.h>
 
 using namespace Belle2;
 
@@ -79,6 +73,20 @@ void ECLTrackBremFinderModule::initialize()
 
 void ECLTrackBremFinderModule::event()
 {
+  std::vector<ECLCluster*> eclClusters;
+  for (ECLCluster& cluster : m_eclClusters) {
+    /* Check if the cluster belongs to a photon or electron. */
+    if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+      continue;
+    /*
+     * Check if the cluster is already related to a track.
+     * If true, it can't be a bremsstrahlung cluster.
+     */
+    const Track* relatedTrack = cluster.getRelatedFrom<Track>();
+    if (relatedTrack != nullptr)
+      continue;
+    eclClusters.push_back(&cluster);
+  }
 
 
   // either use the Clusters matched to tracks (non-neutral) or use the smarter decision
@@ -124,6 +132,8 @@ void ECLTrackBremFinderModule::event()
       continue;
     }
 
+    std::vector<RecoHitInformation*> recoHitInformations =
+      recoTrack->getRecoHitInformations(true);
 
     // set the params for the virtual hits
     std::vector<std::pair<float, RecoHitInformation*>> extrapolationParams = {};
@@ -131,7 +141,7 @@ void ECLTrackBremFinderModule::event()
     try {
       for (auto virtualHitRadius : m_virtualHitRadii) {
         BestMatchContainer<RecoHitInformation*, float> nearestHitContainer;
-        for (auto hit : recoTrack->getRecoHitInformations(true)) {
+        for (RecoHitInformation* hit : recoHitInformations) {
           if (hit->useInFit() && recoTrack->hasTrackFitStatus()) {
             try {
               auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
@@ -167,24 +177,11 @@ void ECLTrackBremFinderModule::event()
 
     // possible improvement: use fast lookup using kd-tree, this is nasty
     // iterate over full cluster list to find possible compatible clusters
-    for (ECLCluster& cluster : m_eclClusters) {
-      //check if the cluster belongs to a photon or electron
-      if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
-        B2DEBUG(20, "Cluster has wrong hypothesis!");
-        continue;
-      }
-
-
-      //check if cluster is already related to a track -> if true, can't be bremsstrahlung cluster
-      auto relatedTrack = cluster.getRelatedFrom<Track>();
-      if (relatedTrack) {
-        B2DEBUG(20, "Cluster already related to track, bailing out");
-        continue;
-      }
+    for (ECLCluster* cluster : eclClusters) {
 
       //check if the cluster is already related to a BremHit
       //procedure: first come, first served
-      auto relatedBremHit = cluster.getRelated<BremHit>();
+      auto relatedBremHit = cluster->getRelated<BremHit>();
       if (relatedBremHit) {
         B2DEBUG(20, "Cluster already assumed to be bremsstrahlung cluster!");
         continue;
@@ -196,7 +193,7 @@ void ECLTrackBremFinderModule::event()
       // iterate over all track points and see whether this cluster matches
       // the track points direction
       // only VXD hits shall be used
-      for (auto hit : recoTrack->getRecoHitInformations(true)) {
+      for (RecoHitInformation* hit : recoHitInformations) {
         if (hit->getTrackingDetector() == RecoHitInformation::c_PXD || hit->getTrackingDetector() == RecoHitInformation::c_SVD) {
           try {
             if (!recoTrack->hasTrackFitStatus()) {
@@ -205,7 +202,7 @@ void ECLTrackBremFinderModule::event()
             auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
             auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, measState);
             if (bremFinder.isMatch()) {
-              ClusterMSoPPair match_pair = std::make_tuple(&cluster, measState, bremFinder.getDistanceHitCluster(),
+              ClusterMSoPPair match_pair = std::make_tuple(cluster, measState, bremFinder.getDistanceHitCluster(),
                                                            bremFinder.getEffAcceptanceFactor());
               matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
             }
@@ -221,7 +218,7 @@ void ECLTrackBremFinderModule::event()
       for (auto fitted_state : extrapolatedStates) {
         auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
         if (bremFinder.isMatch()) {
-          ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, bremFinder.getDistanceHitCluster(),
+          ClusterMSoPPair match_pair = std::make_tuple(cluster, fitted_state, bremFinder.getDistanceHitCluster(),
                                                        bremFinder.getEffAcceptanceFactor());
           matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
         }

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -109,7 +108,7 @@ class Ntuple(b2.Module):
         evtMetaData = Belle2.PyStoreObj('EventMetaData')
         expNo = evtMetaData.obj().getExperiment()
         runNo = evtMetaData.obj().getRun()
-        exp_run = '-e' + '{:0=4d}'.format(expNo) + '-r' + '{:0=5d}'.format(runNo)
+        exp_run = '-e' + f'{expNo:04d}' + '-r' + f'{runNo:05d}'
         outName = 'timeResoNtuple' + exp_run + '.root'
 
         #: track selector - selection of muons from ee->mumu events

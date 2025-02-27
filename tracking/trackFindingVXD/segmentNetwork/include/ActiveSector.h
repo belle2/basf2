@@ -26,11 +26,11 @@ namespace Belle2 {
   protected:
     /** ************************* DATA MEMBERS ************************* */
 
-    /** Pointer to real sector after design of SectorMap */
-    const StaticSectorType* m_staticSector;
-
     /** stores indices of all associated Hits */
     std::vector<HitType*> m_hits;
+
+    /** Pointer to real sector after design of SectorMap */
+    const StaticSectorType* m_staticSector;
 
     /** unique identifier */
     const std::int32_t m_identifier;

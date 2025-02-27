@@ -50,7 +50,7 @@ namespace Belle2 {
   private:
 
     std::string m_inputArrayName;  /**< StoreArray with the input clusters */
-    std::string m_outputINArrayName;  /**< StoreArray with the selectd output clusters */
+    std::string m_outputINArrayName;  /**< StoreArray with the selected output clusters */
     std::string m_outputOUTArrayName;  /**< StoreArray with the NOT selected output clusters */
     int m_layerNum;  /**< the layer number from which the clusters should be excluded  m_sensorID*/
     int m_xShell;  /**< X shell identificator: +1(+X), -1 (-X), 0(both)*/

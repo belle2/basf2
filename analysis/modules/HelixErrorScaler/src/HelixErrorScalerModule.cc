@@ -35,14 +35,15 @@ HelixErrorScalerModule::HelixErrorScalerModule() : Module(), m_pdgCode(0), m_sca
   // Set module properties
   setDescription(R"DOC(scale the error of helix parameters
 
-    Creates a new charged particle list whose helix errors are scaled by constant factors.
-    Different sets of scale factors are defined for tracks with/without a PXD hit.
-    For tracks with a PXD hit, in order to avoid severe underestimation of d0 and z0 errors,
-    lower limits (best resolution) can be set in a momentum-dependent form.
-    The module also accepts a V0 Kshort particle list as input and applies the error correction to its daughters.
-    Note the difference in impact parameter resolution between V0 daughters and tracks from IP,
-    as V0 daughters are free from multiple scattering through the beam pipe.
+Creates a new charged particle list whose helix errors are scaled by constant factors.
+Different sets of scale factors are defined for tracks with/without a PXD hit.
+For tracks with a PXD hit, in order to avoid severe underestimation of d0 and z0 errors,
+lower limits (best resolution) can be set in a momentum-dependent form.
+The module also accepts a V0 Kshort particle list as input and applies the error correction to its daughters.
+Note the difference in impact parameter resolution between V0 daughters and tracks from IP,
+as V0 daughters are free from multiple scattering through the beam pipe.
      )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("inputListName", m_inputListName, "The name of input particle list (charged stable or V0 Kshort)", std::string(""));

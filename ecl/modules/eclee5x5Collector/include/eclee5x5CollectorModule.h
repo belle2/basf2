@@ -42,7 +42,7 @@ namespace Belle2 {
 
   private:
     /** Parameters to control the job */
-    double m_thetaLabMinDeg; /**< miniumum ecl cluster theta in lab (17 degrees) */
+    double m_thetaLabMinDeg; /**< minimum ecl cluster theta in lab (17 degrees) */
     double m_thetaLabMaxDeg; /**< maximum ecl cluster theta in lab (150 degrees) */
     double m_minE0; /**< minimum energy of cluster 0: E*0/sqrts (0.45) */
     double m_minE1; /**< minimum energy of cluster 1: E*1/sqrts (0.40) */
@@ -51,6 +51,7 @@ namespace Belle2 {
     double m_maxTime; /**< maximum cluster time diff abs(t1-t0)/dt99 (10) */
     bool m_useCalDigits; /**< use eclCalDigit to determine MC deposited energy (false) */
     bool m_requireL1; /**< require events to satisfy a level 1 trigger (false) */
+    double m_expectedEnergyScale; /**< scale expected energies for non-4S calibration (1.) */
 
     /** Required arrays */
     StoreArray<ECLCluster> m_eclClusterArray; /**< Required input array of ECLClusters */

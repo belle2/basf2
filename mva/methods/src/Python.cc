@@ -8,7 +8,6 @@
 
 #include <mva/methods/Python.h>
 
-#include <boost/filesystem/convenience.hpp>
 #include <numpy/npy_common.h>
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
@@ -61,8 +60,8 @@ namespace Belle2 {
       po::options_description description("Python options");
       description.add_options()
       ("framework", po::value<std::string>(&m_framework),
-       "Framework which should be used. Currently supported are sklearn, tensorflow and theano")
-      ("steering_file", po::value<std::string>(&m_steering_file), "Steering file which describes")
+       "Framework which should be used. Currently supported are sklearn, xgboost, tensorflow, keras, torch,  and theano")
+      ("steering_file", po::value<std::string>(&m_steering_file), "Steering file which describes the model")
       ("mini_batch_size", po::value<unsigned int>(&m_mini_batch_size), "Size of the mini batch given to partial_fit function")
       ("nIterations", po::value<unsigned int>(&m_nIterations), "Number of iterations")
       ("normalize", po::value<bool>(&m_normalize), "Normalize input data (shift mean to 0 and std to 1)")
@@ -97,9 +96,6 @@ namespace Belle2 {
       {
         if (not Py_IsInitialized()) {
           Py_Initialize();
-          // wchar_t* bla[] = {L""};
-          wchar_t** bla = nullptr;
-          PySys_SetArgvEx(0, bla, 0);
           m_initialized_python = true;
         }
 
@@ -164,8 +160,14 @@ namespace Belle2 {
       uint64_t numberOfSpectators = training_data.getNumberOfSpectators();
       uint64_t numberOfEvents = training_data.getNumberOfEvents();
 
-      auto numberOfValidationEvents = static_cast<uint64_t>(numberOfEvents * (1 - m_specific_options.m_training_fraction));
-      auto numberOfTrainingEvents = static_cast<uint64_t>(numberOfEvents * m_specific_options.m_training_fraction);
+      if (m_specific_options.m_training_fraction <= 0.0 or m_specific_options.m_training_fraction > 1.0) {
+        B2ERROR("Please provide a positive training fraction");
+        throw std::runtime_error("Please provide a training fraction between (0.0,1.0]");
+      }
+
+      auto numberOfTrainingEvents = static_cast<uint64_t>(numberOfEvents * 100 * m_specific_options.m_training_fraction);
+      numberOfTrainingEvents = numberOfTrainingEvents / 100 + (numberOfTrainingEvents % 100 != 0);
+      auto numberOfValidationEvents = numberOfEvents - numberOfTrainingEvents;
 
       uint64_t batch_size = m_specific_options.m_mini_batch_size;
       if (batch_size == 0) {
@@ -177,11 +179,6 @@ namespace Belle2 {
                   " The batch size has been set equal to the number of training events.");
         batch_size = numberOfTrainingEvents;
       };
-
-      if (m_specific_options.m_training_fraction <= 0.0 or m_specific_options.m_training_fraction > 1.0) {
-        B2ERROR("Please provide a positive training fraction");
-        throw std::runtime_error("Please provide a training fraction between (0.0,1.0]");
-      }
 
       auto X = std::unique_ptr<float[]>(new float[batch_size * numberOfFeatures]);
       auto S = std::unique_ptr<float[]>(new float[batch_size * numberOfSpectators]);

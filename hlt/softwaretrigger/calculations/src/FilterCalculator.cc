@@ -200,9 +200,16 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     } catch (const std::exception&) {
       lml1 = false;
     }
+    bool l1_bit_f;
+    try {
+      l1_bit_f = m_l1Trigger->testPsnm("fpre");
+    } catch (const std::exception&) {
+      l1_bit_f = false;
+    }
     calculationResult["bha3d"] = bha3d;
     calculationResult["bhapur"] = bhapurPsnm;
     calculationResult["bhapur_lml1"] = lml1 and bhapurFtdl;
+    calculationResult["l1_bit_f"] = l1_bit_f;
   } else {
     calculationResult["l1_trigger_random"] = 1; // save every event if no L1 trigger info
     calculationResult["l1_trigger_delayed_bhabha"] = 0;
@@ -210,6 +217,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     calculationResult["bha3d"] = 0;
     calculationResult["bhapur"] = 0;
     calculationResult["bhapur_lml1"] = 0;
+    calculationResult["l1_bit_f"] = 0;
   }
 
   // Every 256th event has CDC NN trigger information
@@ -315,9 +323,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       if (std::abs(z0) < 1.) {calculationResult["nTrkTightB"] += 1;}
       if (std::abs(z0) < 5.) {
         calculationResult["nTrkLooseB"] += 1;
+        calculationResult["netChargeLooseB"] += charge;
         if (std::isnan(calculationResult["maximumPCMSB"]) or pCMS > calculationResult["maximumPCMSB"]) {
           calculationResult["maximumPCMSB"] = pCMS;
-          calculationResult["netChargeLooseB"] += charge;
 
         }
       }
@@ -922,7 +930,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     const double vertexXY = vertexLocation.perp();
     const double vertexTheta = vertexLocation.theta() * TMath::RadToDeg();
 
-    //..Angular differance of two tracks to reject cosmics
+    //..Angular differaence of two tracks to reject cosmics
     //  Tolerance could be reduced from 10 deg to 2 deg if needed for physics reasons,
     //  for a 5% increase in the rate of selected displaced vertex triggers.
     //  See https://gitlab.desy.de/belle2/software/basf2/-/merge_requests/1867

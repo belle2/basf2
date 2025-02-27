@@ -81,7 +81,7 @@ namespace Belle2 {
 
     /** Positon offset in r-phi */
     float m_uOffset;
-    /** Positon offset in z */
+    /** Position offset in z */
     float m_vOffset;
     /** Sigma squared for offset in r-phi */
     float m_uOffsetSigma2;

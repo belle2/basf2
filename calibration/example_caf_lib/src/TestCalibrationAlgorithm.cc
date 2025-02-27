@@ -25,7 +25,7 @@ using namespace Calibration;
 TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTest")
 {
   setDescription(
-    " -------------------------- Test Calibration Algoritm -------------------------\n"
+    " -------------------------- Test Calibration Algorithm -------------------------\n"
     "                                                                               \n"
     "  Testing algorithm which just gets mean of a test histogram collected by      \n"
     "  CaTest module and provides a DB object with another histogram with one       \n"
@@ -117,7 +117,7 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
   float val = 0.0;
   for (int i = 0; i < 2; i++) {
     val += 1.0;
-    new((*exampleDBArrayConstants)[i]) TestCalibObject(val);
+    new ((*exampleDBArrayConstants)[i]) TestCalibObject(val);
   }
   saveCalibration(exampleDBArrayConstants, "TestCalibObjects");
   // Iterate until we find answer to the most fundamental question...

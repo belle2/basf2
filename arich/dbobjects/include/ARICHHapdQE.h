@@ -54,7 +54,7 @@ namespace Belle2 {
 
     /**
      * Set 2D quantum efficiency
-     * @param quantum efficiency 2D
+     * @param qe quantum efficiency 2D
      */
     void setQuantumEfficiency2D(TH2F* qe) { m_quantumEfficiency2D = qe;}
 

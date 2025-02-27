@@ -10,14 +10,12 @@
 #include <ecl/modules/eclLeakageCollector/eclLeakageCollectorModule.h>
 
 /* ECL headers. */
-#include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLLeakagePosition.h>
 #include <ecl/dataobjects/ECLElementNumbers.h>
 
 /* Basf2 headers. */
-#include <framework/gearbox/Const.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/geometry/VectorUtil.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -25,7 +23,6 @@
 /* Root headers. */
 #include <Math/Vector3D.h>
 #include <Math/VectorUtil.h>
-#include <TMath.h>
 #include <TTree.h>
 
 /* C++ headers. */

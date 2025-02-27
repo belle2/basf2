@@ -48,7 +48,7 @@ limZTag = 0.03
 
 treeName = str(sys.argv[2])
 
-# No PXD hit equired: PXD0. At least one PXD (SVD) hit for one of the muon tracks: PXD1 (SVD1).
+# No PXD hit required: PXD0. At least one PXD (SVD) hit for one of the muon tracks: PXD1 (SVD1).
 # Hit required for both muon tracks: PXD2 (SVD2)"
 VXDReqs = []
 if str(sys.argv[3]) == "PXD":
@@ -313,7 +313,7 @@ for VXDReq in VXDReqs:
     if resolutionErr < 0.01:
         resolutionErr = 0.01
 
-    Numbr = f'{int((f1 + f2) * fitDataDT.numEntries()):d}'
+    Number = f'{int((f1 + f2) * fitDataDT.numEntries()):d}'
 
     c1 = ROOT.TCanvas("c1", "c1", 1400, 1100)
     c1.cd()
@@ -324,7 +324,7 @@ for VXDReq in VXDReqs:
     Pad.cd()
     resFrame.Draw()
     legend = ROOT.TLegend(0.59, 0.6, 0.9, 0.9)
-    # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Numbr))
+    # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Number))
     legend.AddEntry(
         0,
         '#splitline{#mu_{#Delta t} =' +
@@ -363,7 +363,7 @@ for VXDReq in VXDReqs:
     Pad.cd()
     resFrameDtErr.Draw()
     legend = ROOT.TLegend(0.59, 0.6, 0.9, 0.9)
-    # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Numbr))
+    # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Number))
     legend.AddEntry(0, '#splitline{#mu_{#Delta t} =' + f'{meanCBS.getVal(): 4.2f}' + '}{    #pm ' +
                     f'{meanCBS.getError():4.2f}' + ' ps}')  # '{:>6}'.format(Shift)
     legend.AddEntry(0, '#splitline{#sigma_{#Delta t} =' + f'{sigmaCBS.getVal(): 4.2f}' +

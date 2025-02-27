@@ -48,7 +48,7 @@ namespace Belle2 {
     /// exception for errors during packing ADC data buffer
     BELLE2_DEFINE_EXCEPTION(Write_adc_samples_error,
                             "Error packing adc samples to buffer");
-    /// wrong indexes for ShaperDSP, channel or crate are apperared
+    /// wrong indexes for ShaperDSP, channel or crate are appeared
     BELLE2_DEFINE_EXCEPTION(eclPacker_internal_error,
                             "Something wrong with ECL Packer");
 
@@ -68,7 +68,7 @@ namespace Belle2 {
     /** DSP amplitude threshold */
     int m_ampThreshold;
 
-    /** eneble/disable compression of waveform data */
+    /** enable/disable compression of waveform data */
     bool m_compressMode;
 
     /** true-pack data in PCIe40 format, false-pack data in COPPER format */

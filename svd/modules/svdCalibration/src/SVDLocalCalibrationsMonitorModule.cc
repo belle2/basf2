@@ -103,9 +103,9 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
     B2WARNING("No valid SVDPulseShapeCalibrations for the requested IoV");
   /*  if (!m_OccupancyCal.isValid())
     B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
+  */
   if (!m_HotStripsCal.isValid())
     B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");
-  */
 
   ///OCCUPANCY
   TH1F hOccupancy("occupancy_L@layerL@ladderS@sensor@view",
@@ -368,7 +368,8 @@ void SVDLocalCalibrationsMonitorModule::event()
         int ladder =  itSvdSensors->getLadderNumber();
         int sensor = itSvdSensors->getSensorNumber();
         Belle2::VxdID theVxdID(layer, ladder, sensor);
-        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(theVxdID));
+        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::getInstance().getSensorInfo(
+                                                     theVxdID));
         m_layer = layer;
         m_ladder = ladder;
         m_sensor = sensor;
@@ -389,8 +390,8 @@ void SVDLocalCalibrationsMonitorModule::event()
 
 
             m_hotstrips = -1;
-            /*            if (m_HotStripsCal.isValid())
-              m_hotstrips = m_HotStripsCal.isHot(theVxdID, m_side, m_strip);*/
+            if (m_HotStripsCal.isValid())
+              m_hotstrips = m_HotStripsCal.isHot(theVxdID, m_side, m_strip);
 
             //aux histo for hotStripSummary table
             hm_hot_strips->getHistogram(*itSvdSensors, m_side)->SetBinContent(m_strip + 1, m_hotstrips);
@@ -494,8 +495,8 @@ void SVDLocalCalibrationsMonitorModule::event()
           m_pulseWidthRMS = (m_hPulseWidth->getHistogram(theVxdID, m_side))->GetRMS();
 
 
-          //            for (int s = 0; s < hm_hot_strips->getHistogram(*itSvdSensors, m_side)->GetEntries(); s++)
-          //  m_hHotStripsSummary->fill(*itSvdSensors, m_side, 1);
+          for (int s = 0; s < hm_hot_strips->getHistogram(*itSvdSensors, m_side)->GetEntries(); s++)
+            m_hHotStripsSummary->fill(*itSvdSensors, m_side, 1);
 
           m_tree->Fill();
 
@@ -520,11 +521,11 @@ void SVDLocalCalibrationsMonitorModule::endRun()
     B2RESULT("   - SVDOccupancyCalibrations:" << m_OccupancyCal.getUniqueID());
   else
     B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
-
+  */
   if (m_HotStripsCal.isValid())
     B2RESULT("   - SVDHotStripsCalibrations:" << m_HotStripsCal.getUniqueID());
   else
-  B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");*/
+    B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");
 
 
   if (m_MaskedStr.isValid())
@@ -643,6 +644,7 @@ void SVDLocalCalibrationsMonitorModule::endRun()
     m_rootFilePtr->mkdir("expert");
 
     m_rootFilePtr->cd("expert");
+    m_h2Mask->Write("h2Mask");
     m_h2Noise->Write("h2Noise");
     m_h2Occupancy->Write("h2Occupancy");
     m_h2PulseWidth->Write("h2PulseShape");

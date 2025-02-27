@@ -4,10 +4,10 @@
 # Documentation: Rare b->d gamma process
 # Tested: Yes
 # PhysicsWG: EWP
-# Responsible: Jyotirmoi Borah and Soumen Halder
-# Email: borah176121103@iitg.ac.in
+# Responsible: Arkodip Biswas and Jyotirmoi Borah
+# Email: arkodip@iitg.ac.in
 # Cuts: None
-# Date: 20201103 (YMD)
+# Date: 20241106 (YMD)
 
 #
 #  Decay table to generate
@@ -32,7 +32,7 @@ Enddecay
 CDecay anti-B0sig
 #
 Decay omegasig
-1.0 pi+ pi- pi0sig   PHOTOS PHSP;
+1.0 pi+ pi- pi0sig   PHOTOS OMEGA_DALITZ;
 Enddecay
 #
 Decay pi0sig
@@ -40,3 +40,4 @@ Decay pi0sig
 Enddecay
 #
 End
+

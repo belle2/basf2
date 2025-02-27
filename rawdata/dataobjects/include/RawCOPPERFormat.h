@@ -342,6 +342,8 @@ namespace Belle2 {
     //! Get hostname of a node from an argument
     virtual void GetNodeName(char* node_name, unsigned int node_id, int bufsize);
 
+    //! Check if COPPER Magic words are correct
+    virtual bool CheckOnlineRemovedDataBit(int n, int finesse_num);
 
   protected :
 

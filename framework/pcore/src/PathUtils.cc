@@ -95,17 +95,16 @@ std::tuple<PathPtr, PathPtr, PathPtr> PathUtils::splitPath(const PathPtr& path)
   return {inputPath, mainPath, outputPath};
 }
 
-ModulePtr PathUtils::getHistogramManager(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath)
+ModulePtr PathUtils::getHistogramManager(PathPtr& inputPath)
 {
   ModulePtr histoManagerModule;
+
+
   for (const ModulePtr& module : inputPath->getModules()) {
     if (module->hasProperties(Module::c_HistogramManager)) {
       // Initialize histogram manager if found in the path
       histoManagerModule = module;
 
-      //add histoman to other paths
-      //      mainPath->addModule(histoManagerModule);
-      //      outputPath->addModule(histoManagerModule);
     }
   }
 

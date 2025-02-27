@@ -31,7 +31,7 @@ void SegmentTrackAdderWithNormalization::exposeParameters(ModuleParamList* modul
   m_singleHitSelector.exposeParameters(moduleParamList, prefixed(prefix, "hitSelector"));
   moduleParamList->addParameter(prefixed(prefix, "removeUnmatchedSegments"),
                                 m_param_removeUnmatchedSegments,
-                                "Swtich to remove hits in segments that have no matching track from all tracks",
+                                "Switch to remove hits in segments that have no matching track from all tracks",
                                 m_param_removeUnmatchedSegments);
 
 }

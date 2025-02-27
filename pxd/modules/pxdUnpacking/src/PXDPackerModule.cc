@@ -58,7 +58,7 @@ PXDPackerModule::PXDPackerModule() :
   addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of generated RawPXDs", std::string(""));
   addParam("InjectionBGTimingName", m_InjectionBGTimingName, "The name of the StoreObj for Injection Timing", std::string(""));
   addParam("dhe_to_dhc", m_dhe_to_dhc,  "DHE to DHC mapping (DHC_ID, DHE1, DHE2, ..., DHE5) ; -1 disable port");
-  addParam("InvertMapping",  m_InvertMapping, "Use invers mapping to DHP row/col instead of \"remapped\" coordinates", false);
+  addParam("InvertMapping",  m_InvertMapping, "Use inverse mapping to DHP row/col instead of \"remapped\" coordinates", false);
   addParam("Clusterize",  m_Clusterize, "Use clusterizer (FCE format)", false);
   addParam("overrideFirmwareVersion", m_overrideFirmwareVersion, "Overwrite Firmware Version from DB with this value", 0);
 
@@ -311,7 +311,7 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
 
   uint32_t mm = (unsigned int)std::round((m_meta_time % 1000000000ull) * 0.127216); // in 127MHz Ticks
   uint32_t ss = (unsigned int)(m_meta_time / 1000000000ull) ; // in seconds
-  append_int16(((mm << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
+  append_int16(((mm << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something useful TODO
   append_int16(((mm >> 12) & 0x7FFF) | ((ss & 1) ? 0x8000 : 0x0)); // TT 27-12 ... not clear if completely filled by DHC
   append_int16((ss >> 1) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
   append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
@@ -351,7 +351,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
 
   if (m_InvertMapping) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
-    // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
+    // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up table etc!)
     // this code has never been completed as pxd cluster format will anyway need mapping in firmware
     B2FATAL("Inverse Mapping not implemented in Packer");
   }
@@ -385,7 +385,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
     bzero(halfladder_pixmap, sizeof(halfladder_pixmap));
 
     VxdID currentVxdId = 0;
-    /// refering to BelleII Note Nr 0010, the numbers run from ... to
+    /// referring to BelleII Note Nr 0010, the numbers run from ... to
     ///   unsigned int layer, ladder, sensor;
     ///   layer= vxdid.getLayerNumber();/// 1 ... 2
     ///   ladder= vxdid.getLadderNumber();/// 1 ... 8 and 1 ... 12
@@ -433,7 +433,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
         if (dhp_active & 0x1) {
           pack_dhp(i, dhe_id, dhe_has_remapped ? 1 : 0);
           /// The following lines "simulate" a full frame readout frame ... not for production yet!
-          /// pedestals taking frames are normally not transfered to Belle2 DAQ (unless decided otherwise)
+          /// pedestals taking frames are normally not transferred to Belle2 DAQ (unless decided otherwise)
 //         if (m_trigger_nr == 0x11) {
 //           pack_dhp_raw(i, dhe_id, false);
 //           pack_dhp_raw(i, dhe_id, true);
@@ -467,7 +467,7 @@ void PXDPackerModule::do_the_reverse_mapping(unsigned int& /*row*/, unsigned int
 
 void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id)
 {
-  B2FATAL("This code needs to be checked agains new firmware");
+  B2FATAL("This code needs to be checked against new firmware");
   B2DEBUG(27, "PXD Packer --> pack_dhp Raw Chip " << chip_id << " of DHE id: " << dhe_id);
   start_frame();
   /// DHP data Frame
@@ -504,7 +504,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
 
   if (dhe_has_remapped == 0) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
-    // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
+    // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up table etc!)
     B2FATAL("dhe_has_remapped == 0");
   }
 
@@ -521,7 +521,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
   if (c2 >= PACKER_NUM_COLS) c2 = PACKER_NUM_COLS;
   for (int rr = startrow; rr < startrow + PACKER_NUM_ROWS; rr++) {
     int row = (rr % PACKER_NUM_ROWS); // warp around
-    /// we do not create a second frame (thats what the old firmware would have been doing)
+    /// we do not create a second frame (that's what the old firmware would have been doing)
     /// thus the behaviour is like in the new firmware, but old unpacker can handle that
     /// we do not support some "extra" readout gates before trigger and/or at the end of the full frame
     bool rowstart = true;
@@ -552,7 +552,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
     /// Ghost frames are ALWAYS an indication for a data flow/daq problem
     /// need to be consistent for simulation!
     if (m_firmware < 10) {
-      // behaviour of old firmware is not upward comaptible, but for simulation (=Packing) the new behaviour
+      // behaviour of old firmware is not upward compatible, but for simulation (=Packing) the new behaviour
       // would work even for the old unpacking, even so not according to firmware documentation
       // -> maybe we remove this code?
       // we DROP the frame, thus we have to correct DHE and DHC counters

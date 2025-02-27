@@ -7,6 +7,7 @@ TBranch: __event__, 2
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 2
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, 1.21
 TBranch: py, 2.932
@@ -148,6 +149,7 @@ TBranch: __event__, 2
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 2
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: isSignal, 1
 TBranch: mcErrors, 0
@@ -265,6 +267,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 5
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, -2.456
 TBranch: py, 2.383
@@ -305,6 +308,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 5
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, -2.456
 TBranch: py, 2.383
@@ -343,6 +347,7 @@ TBranch: __event__, 2
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 6
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, -0.107
 TBranch: py, 0.1756
@@ -400,6 +405,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 4
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: nTracks, 4
 TBranch: px, -1.964
@@ -448,6 +454,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 4
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: nTracks, 4
 TBranch: px, -1.964
@@ -496,6 +503,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 4
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: nTracks, 4
 TBranch: px, -1.963
@@ -544,6 +552,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 4
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: nTracks, 4
 TBranch: px, -1.964
@@ -593,6 +602,7 @@ TBranch: __event__, 2
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, 1.209
 TBranch: py, 2.932
@@ -699,6 +709,7 @@ TBranch: __event__, 2
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 2
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, 1.21
 TBranch: py, 2.932
@@ -806,6 +817,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 6
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: combinationID, 3
 TBranch: deltaPhi, -2.264

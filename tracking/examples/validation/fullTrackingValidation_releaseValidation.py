@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 """
     This script runs the tracking validation on cdst samples like done for the release validation.
@@ -50,6 +57,7 @@ class Full(TrackingValidationRun):
     output_file_name = './FullTrackingValidation_validationSample.root'
 
 
+#: \cond Doxygen_suppress
 def main():
     validation_run = Full()
     validation_run.configure_and_execute_from_commandline()
@@ -58,3 +66,4 @@ def main():
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     main()
+#: \endcond

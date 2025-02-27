@@ -19,22 +19,19 @@
 </header>
 """
 
-import tracking
 from tracking.validation.run import TrackingValidationRun
+from tracking.path_utils import add_hit_preparation_modules, add_svd_standalone_tracking
 import logging
 import basf2
-from tracking.path_utils import add_svd_standalone_tracking
 
 VALIDATION_OUTPUT_FILE = 'CombinedSVDTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
-basf2.set_random_seed(1337)
-
 
 class CombinedSVDTrackingValidationBkg(TrackingValidationRun):
     """
-    Validation class for the DATCON tracking
+    Validation class for the combined VXDTF2 and SVDHough tracking
     """
     #: the number of events to process
     n_events = N_EVENTS
@@ -48,7 +45,7 @@ class CombinedSVDTrackingValidationBkg(TrackingValidationRun):
     @staticmethod
     def finder_module(path):
         """Add the combined SVD standalone track finders and related modules to the basf2 path"""
-        tracking.add_hit_preparation_modules(path, components=["SVD"])
+        add_hit_preparation_modules(path, components=["SVD"])
         add_svd_standalone_tracking(path, reco_tracks="RecoTracks", svd_standalone_mode="VXDTF2_and_SVDHough")
 
     #: use only the svd hits when computing efficiencies
@@ -73,6 +70,7 @@ def main():
     """
     create SVD validation class and execute
     """
+    basf2.set_random_seed(1337)
     validation_run = CombinedSVDTrackingValidationBkg()
     validation_run.configure_and_execute_from_commandline()
 
@@ -81,3 +79,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     if ACTIVE:
         main()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

@@ -50,14 +50,17 @@ def add_geometry_modules(path, components=None):
                         energyLossBrems=False, noiseBrems=False)
 
 
-def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=False):
+def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=False, create_intercepts_for_pxd_ckf=False):
     """
-    Helper fucntion to prepare the hit information to be used by tracking.
+    Helper function to prepare the hit information to be used by tracking.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param pxd_filtering_offline: PXD data reduction is performed after CDC and SVD tracking,
             so PXD reconstruction has to wait until the ROIs are calculated.
+    :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
+        for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
+        steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     """
 
     # Preparation of the SVD clusters
@@ -65,7 +68,7 @@ def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=Fal
         add_svd_reconstruction(path)
 
     # Preparation of the PXD clusters
-    if is_pxd_used(components) and not pxd_filtering_offline:
+    if is_pxd_used(components) and not pxd_filtering_offline and not create_intercepts_for_pxd_ckf:
         add_pxd_reconstruction(path)
 
 
@@ -201,8 +204,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
 
     # Prune genfit tracks
     if prune_tracks:
-        add_prune_tracks(path=path, components=components,
-                         reco_tracks=reco_tracks)
+        add_prune_tracks(path=path, components=components, reco_tracks=reco_tracks)
 
 
 def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
@@ -213,7 +215,7 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
     """
     Match the tracks to the MC truth. The matching works based on
     the output of the TrackFinderMCTruthRecoTracks.
-    Alternativly one can use the Chi2MCTrackMatcher based on chi2 values
+    Alternatively one can use the Chi2MCTrackMatcher based on chi2 values
     calculated from the helixparameters of Tracks and MCParticles.
 
     :param path: The path to add the tracking reconstruction modules to
@@ -222,7 +224,7 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param split_after_delta_t: If positive, split MCRecoTrack into multiple MCRecoTracks if the time
-                                distance between two adjecent SimHits is more than the given value
+                                distance between two adjacent SimHits is more than the given value
     :param matching_method:     hit: uses the hit-matching
                                 chi2: uses the chi2-matching
     :param chi2_cutoffs:        If chi2 matching method is used, this list defines the individual cut-off values
@@ -273,11 +275,16 @@ def add_prune_tracks(path, components=None, reco_tracks="RecoTracks"):
     if components and not ('SVD' in components or 'CDC' in components):
         return
 
-    path.add_module('PruneRecoTracks', storeArrayName=reco_tracks)
+    path.add_module('PruneRecoTracks', storeArrayName=reco_tracks).set_name("PruneRecoTracks " + reco_tracks)
     path.add_module("PruneGenfitTracks")
 
 
-def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", trackFitHypotheses=None):
+def add_flipping_of_recoTracks(
+        path,
+        fit_tracks=True,
+        reco_tracks="RecoTracks",
+        trackFitHypotheses=None,
+        reco_tracks_flipped="RecoTracks_flipped"):
     """
     This function adds the mva based selections and the flipping of the recoTracks
 
@@ -285,13 +292,13 @@ def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", 
     :param fit_tracks: fit the flipped recotracks or not
     :param reco_tracks: Name of the StoreArray where the reco tracks should be flipped
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param reco_tracks_flipped: Name of the temporary StoreArray for the flipped RecoTracks
     """
 
     path.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
                     identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
                     indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
 
-    reco_tracks_flipped = "RecoTracks_flipped"
     path.add_module("RecoTracksReverter", inputStoreArrayName=reco_tracks,
                     outputStoreArrayName=reco_tracks_flipped)
     if fit_tracks:
@@ -388,7 +395,7 @@ def add_svd_track_finding(
            stored.
     :param svd_ckf_mode: String designating the mode of the CDC-to-SVD CKF, that is how it is combined with the SVD
             standalone track finding. One of "SVD_after", "SVD_before", "SVD_before_with_second_ckf",
-            "only_ckf", "SVD_alone", "cosmics".
+            "only_ckf", "ckf_merger_plus_spacepoint_ckf", "SVD_alone", "cosmics".
     :param use_mc_truth: Add mc matching and use the MC information in the CKF (but not in the VXDTF2)
     :param add_both_directions: Whether to add the CKF with both forward and backward extrapolation directions instead
            of just one.
@@ -413,8 +420,8 @@ def add_svd_track_finding(
     if not is_svd_used(components):
         return
 
-    if not input_reco_tracks:
-        # We do not have an input track store array. So lets just add vxdtf track finding
+    if not input_reco_tracks or input_reco_tracks == "":
+        # We do not have an input track store array. So lets just add SVD standalone track finding
         add_svd_standalone_tracking(path, components=["SVD"],
                                     svd_standalone_mode=svd_standalone_mode,
                                     reco_tracks=output_reco_tracks,
@@ -456,6 +463,19 @@ def add_svd_track_finding(
                         use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
     elif svd_ckf_mode == "only_ckf":
+        add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
+                    use_mc_truth=use_mc_truth, direction="backward", **kwargs)
+        if add_both_directions:
+            add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
+                        use_mc_truth=use_mc_truth, direction="forward", **kwargs)
+
+    # option for inside-out tracking when we start with SVD tracking
+    elif svd_ckf_mode == "ckf_merger_plus_spacepoint_ckf":
+        add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
+                             use_mc_truth=use_mc_truth, direction="backward", **kwargs)
+        if add_both_directions:
+            add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
+                                 use_mc_truth=use_mc_truth, direction="forward", **kwargs)
         add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                     use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
@@ -529,7 +549,7 @@ def add_svd_track_finding(
 
         if prune_temporary_tracks:
             for temp_reco_track in [combined_svd_cdc_standalone_tracks, "CKFCDCRecoTracks"]:
-                path.add_module('PruneRecoTracks', storeArrayName=temp_reco_track)
+                path.add_module('PruneRecoTracks', storeArrayName=temp_reco_track).set_name("PruneRecoTracks " + temp_reco_track)
 
 
 def add_svd_standalone_tracking(path,
@@ -582,8 +602,8 @@ def add_svd_standalone_tracking(path,
                         Temp1RecoTracksStoreArrayName=reco_tracks+"VXDTF2",
                         Temp2RecoTracksStoreArrayName=reco_tracks+"Hough",
                         recoTracksStoreArrayName=reco_tracks)
-        path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"VXDTF2")
-        path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"Hough")
+        path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"VXDTF2").set_name("PruneRecoTracks " + reco_tracks+"VXDTF2")
+        path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"Hough").set_name("PruneRecoTracks " + reco_tracks+"Hough")
 
     elif svd_standalone_mode == "SVDHough_and_VXDTF2":
         add_svd_hough_tracking(path,
@@ -602,8 +622,8 @@ def add_svd_standalone_tracking(path,
                         Temp1RecoTracksStoreArrayName=reco_tracks+"Hough",
                         Temp2RecoTracksStoreArrayName=reco_tracks+"VXDTF2",
                         recoTracksStoreArrayName=reco_tracks)
-        path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"Hough")
-        path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"VXDTF2")
+        path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"Hough").set_name("PruneRecoTracks " + reco_tracks+"Hough")
+        path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"VXDTF2").set_name("PruneRecoTracks " + reco_tracks+"VXDTF2")
 
     else:
         raise ValueError(f"Do not understand the svd_standalone_mode {svd_standalone_mode}")
@@ -611,7 +631,7 @@ def add_svd_standalone_tracking(path,
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                           use_second_hits=False, add_mva_quality_indicator=True,
-                          reattach_hits=False):
+                          reattach_hits=False, skip_WireHitPreparer=False):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -626,18 +646,23 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
            indicator property of the CDC ``output_reco_tracks``
     :param cdc_quality_estimator_weightfile: Weightfile identifier for the TFCDC_TrackQualityEstimator
     :param reattach_hits: if true, use the ReattachCDCWireHitsToRecoTracks module at the end of the CDC track finding
-                          to readd hits with bad ADC or TOT rejected by the TFCDC_WireHitPreparer module.
+                          to read hits with bad ADC or TOT rejected by the TFCDC_WireHitPreparer module.
+    :param skip_WireHitPreparer: if True, the TFCDC_WireHitPreparer will be skipped. This is necessary if for instance
+        the SVD tracking and the ToCDCCKF are run before the full CDC tracking, as the ToCDCCKF already reqires the WireHits
+        to be present. Defaults to False, as for the default tracking chain it is required.
     """
     # add EventLevelTrackinginfo for logging errors
     if 'RegisterEventLevelTrackingInfo' not in path:
         path.add_module('RegisterEventLevelTrackingInfo')
 
     # Init the geometry for cdc tracking and the hits and cut low ADC hits
-    path.add_module("TFCDC_WireHitPreparer",
-                    wirePosition="aligned",
-                    useSecondHits=use_second_hits,
-                    flightTimeEstimation="outwards",
-                    filter="cuts_from_DB")
+    if not skip_WireHitPreparer:
+        path.add_module("TFCDC_WireHitPreparer",
+                        wirePosition="aligned",
+                        useSecondHits=use_second_hits,
+                        flightTimeEstimation="outwards",
+                        filter="mva",
+                        filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
 
     # Constructs clusters
     path.add_module("TFCDC_ClusterPreparer",
@@ -729,7 +754,8 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     path.add_module("CDCHitBasedT0Extraction")
 
     # prepare mdst event level info
-    path.add_module("CDCTrackingEventLevelMdstInfoFiller")
+    path.add_module("CDCTrackingEventLevelMdstInfoFillerFromHits")
+    path.add_module("CDCTrackingEventLevelMdstInfoFillerFromSegments")
 
 
 def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", prune_temporary_tracks=True):
@@ -815,7 +841,11 @@ def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", 
     if prune_temporary_tracks:
         for temporary_reco_track_name in temporary_reco_track_list:
             if temporary_reco_track_name != output_reco_tracks:
-                path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_track_name)
+                path.add_module(
+                    'PruneRecoTracks',
+                    storeArrayName=temporary_reco_track_name).set_name(
+                    "PruneRecoTracks " +
+                    temporary_reco_track_name)
 
 
 def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_point=(0, 0, 0), merge_tracks=True,
@@ -1148,11 +1178,210 @@ def add_svd_hough_tracking(path,
                     RecoTracksStoreArrayName=reco_tracks + suffix,
                     SVDSpacePointTrackCandsStoreArrayName=svd_space_point_track_candidates + suffix,
                     relationFilter='angleAndTime',
-                    twoHitUseNBestHits=4,
+                    twoHitUseNBestHits=2,
                     threeHitUseNBestHits=3,
                     fourHitUseNBestHits=3,
                     fiveHitUseNBestHits=2,
                     )
+
+
+def add_default_cdc_svd_tracking_chain(path,
+                                       components,
+                                       svd_reco_tracks,
+                                       cdc_reco_tracks,
+                                       output_reco_tracks,
+                                       use_second_cdc_hits=False,
+                                       add_cdcTrack_QI=True,
+                                       use_mc_truth=False,
+                                       svd_ckf_mode="SVD_after",
+                                       add_both_directions=True,
+                                       use_svd_to_cdc_ckf=True,
+                                       svd_standalone_mode="VXDTF2",
+                                       add_vxdTrack_QI=False,
+                                       prune_temporary_tracks=True,
+                                       ):
+    """
+    Add the default CDC based tracking chain to the path, i.e. CDC standalone followed by the ToSVDSpacePointCKF, the SVD standalone
+    track finding, a CKF based merger for standalone tracks, and finally the SVDToCDCCKF (if setup as such).
+
+    :param path: The path to add the tracking reconstruction modules to
+    :param components: the list of geometry components in use or None for all components.
+    :param svd_reco_tracks: name of the SVD standalone RecoTracks StoreArray
+    :param cdc_reco_tracks: name of the CDC standalone RecoTracks StoreArray
+    :param output_reco_tracks: name of the combined CDC+SVD RecoTracks StoreArray that is the final result of this tracking path
+    :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
+    :param add_cdcTrack_QI: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found CDC standalone tracks
+    :param use_mc_truth: Use the truth information in the CKF modules
+    :param svd_ckf_mode: how to apply the CKF (with or without SVD standalone tracking). Defaults to "SVD_after".
+    :param add_both_directions: Curlers may be found in the wrong orientation by the CDC track finder, so try to
+           extrapolate also in the other direction.
+    :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
+    :param svd_standalone_mode: Which SVD standalone tracking is used.
+           Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
+           Defaults to "VXDTF2"
+    :param add_vxdTrack_QI: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found VXDTF2 tracks
+        (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
+        -> setting this option to 'True' will have some influence on the final track collection)
+    :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
+        If true, prune them.
+    """
+
+    # collections that will be pruned
+    temporary_reco_track_list = []
+
+    # the name of the most recent track collection
+    latest_reco_tracks = None
+
+    if is_cdc_used(components):
+        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
+                              add_mva_quality_indicator=add_cdcTrack_QI)
+        temporary_reco_track_list.append(cdc_reco_tracks)
+        latest_reco_tracks = cdc_reco_tracks
+
+    if is_svd_used(components):
+        add_svd_track_finding(path,
+                              components=components,
+                              input_reco_tracks=latest_reco_tracks,
+                              output_reco_tracks=output_reco_tracks,
+                              use_mc_truth=use_mc_truth,
+                              temporary_reco_tracks=svd_reco_tracks,
+                              svd_ckf_mode=svd_ckf_mode,
+                              add_both_directions=add_both_directions,
+                              use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
+                              prune_temporary_tracks=prune_temporary_tracks,
+                              add_mva_quality_indicator=add_vxdTrack_QI,
+                              svd_standalone_mode=svd_standalone_mode)
+        temporary_reco_track_list.append(svd_reco_tracks)
+        temporary_reco_track_list.append(output_reco_tracks)
+        latest_reco_tracks = output_reco_tracks
+
+    return (latest_reco_tracks, temporary_reco_track_list)
+
+
+def add_inverted_svd_cdc_tracking_chain(path,
+                                        components,
+                                        svd_reco_tracks,
+                                        cdc_reco_tracks,
+                                        svd_cdc_reco_tracks,
+                                        cdcckf_reco_tracks="CKFCDCRecoTracks",
+                                        output_reco_tracks="CombinedSVDCDCRecoTracks",
+                                        add_vxdTrack_QI=True,
+                                        svd_standalone_mode="VXDTF2",
+                                        use_second_cdc_hits=False,
+                                        add_cdcTrack_QI=True,
+                                        use_mc_truth=False,
+                                        add_both_directions=True,
+                                        prune_temporary_tracks=True,
+                                        **kwargs,):
+    """
+    Add an inverted SVD based tracking chain to the path, i.e. SVD standalone followed by the ToCDCCKF, the CDC standalone
+    track finding, a CKF based merger for standalone tracks, and finally the CDCToSVDSpacePointCKF.
+
+    ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
+    One known issue is a reduced hit efficiency when using the full chain.
+    Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
+
+    :param path: The path to add the tracking reconstruction modules to
+    :param components: the list of geometry components in use or None for all components.
+    :param svd_reco_tracks: name of the SVD standalone RecoTracks StoreArray
+    :param cdc_reco_tracks: name of the CDC standalone RecoTracks StoreArray
+    :param svd_cdc_reco_tracks: name of the intermediate combined CDC+SVD RecoTracks StoreArray
+    :param cdcckf_reco_tracks: name of the intermediate RecoTracks StoreArray from the SVDToCDCCKF
+    :param output_reco_tracks: name of the combined CDC+SVD RecoTracks StoreArray that is the final result of this tracking path
+    :param add_vxdTrack_QI: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found VXDTF2 tracks
+        (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
+        -> setting this option to 'True' will have some influence on the final track collection)
+    :param svd_standalone_mode: Which SVD standalone tracking is used.
+           Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
+           Defaults to "VXDTF2"
+    :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
+    :param add_cdcTrack_QI: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found CDC standalone tracks
+    :param use_mc_truth: Use the truth information in the CKF modules
+    :param add_both_directions: Curlers may be found in the wrong orientation by the CDC track finder, so try to
+           extrapolate also in the other direction.
+    :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
+        If true, prune them.
+    """
+
+    B2WARNING("The inverted tracking chain starting from SVD is an experimental feature. "
+              "It is neither well optimised nor tested for the time being. "
+              "Please be careful when interpreting the results!")
+
+    # collections that will be pruned
+    temporary_reco_track_list = []
+
+    # the name of the most recent track collection
+    latest_reco_tracks = None
+
+    if is_svd_used(components):
+        add_svd_track_finding(path,
+                              components=components,
+                              input_reco_tracks="",
+                              output_reco_tracks=svd_reco_tracks,
+                              add_mva_quality_indicator=add_vxdTrack_QI,
+                              svd_standalone_mode=svd_standalone_mode)
+        temporary_reco_track_list.append(svd_reco_tracks)
+        latest_reco_tracks = svd_reco_tracks
+
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks)
+
+    if is_cdc_used(components):
+        path.add_module("TFCDC_WireHitPreparer",
+                        wirePosition="aligned",
+                        useSecondHits=use_second_cdc_hits,
+                        flightTimeEstimation="outwards",
+                        filter="mva",
+                        filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
+
+        path.add_module("ToCDCCKF",
+                        inputWireHits="CDCWireHitVector",
+                        inputRecoTrackStoreArrayName=svd_reco_tracks,
+                        relatedRecoTrackStoreArrayName=cdcckf_reco_tracks,
+                        relationCheckForDirection="backward",
+                        ignoreTracksWithCDChits=True,
+                        outputRecoTrackStoreArrayName=cdcckf_reco_tracks,
+                        outputRelationRecoTrackStoreArrayName=svd_reco_tracks,
+                        writeOutDirection="backward",
+                        stateBasicFilterParameters={"maximalHitDistance": 0.15},
+                        pathFilter="arc_length",
+                        maximalLayerJump=4)
+
+        path.add_module("CDCCKFTracksCombiner",
+                        CDCRecoTracksStoreArrayName=cdcckf_reco_tracks,
+                        VXDRecoTracksStoreArrayName=svd_reco_tracks,
+                        recoTracksStoreArrayName=svd_cdc_reco_tracks)
+
+        temporary_reco_track_list.append(cdcckf_reco_tracks)
+        temporary_reco_track_list.append(svd_cdc_reco_tracks)
+        latest_reco_tracks = svd_cdc_reco_tracks
+
+        add_cdc_track_finding(path,
+                              use_second_hits=use_second_cdc_hits,
+                              output_reco_tracks=cdc_reco_tracks,
+                              add_mva_quality_indicator=add_cdcTrack_QI,
+                              skip_WireHitPreparer=True)
+        temporary_reco_track_list.append(cdc_reco_tracks)
+        latest_reco_tracks = cdc_reco_tracks
+
+    if is_svd_used(components):
+        add_svd_track_finding(path,
+                              components=components,
+                              input_reco_tracks=latest_reco_tracks,
+                              output_reco_tracks=output_reco_tracks,
+                              temporary_reco_tracks=svd_reco_tracks,
+                              use_mc_truth=use_mc_truth,
+                              svd_ckf_mode="ckf_merger_plus_spacepoint_ckf",
+                              add_both_directions=add_both_directions,
+                              use_svd_to_cdc_ckf=False,
+                              prune_temporary_tracks=prune_temporary_tracks)
+        temporary_reco_track_list.append(output_reco_tracks)
+        latest_reco_tracks = output_reco_tracks
+
+    return (latest_reco_tracks, temporary_reco_track_list)
 
 
 def is_svd_used(components):

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -10,7 +9,7 @@
 ##########################################################################
 
 # ---------------------------------------------------------------------------------------
-# CAF calibration script: channel T0 with laser (including pre-calibration of BS13d)
+# CAF calibration script: channel T0 with laser
 # data type: local runs with laser
 #
 # usage: basf2 run_channelT0_laser_calibration.py expNo run_1 run_2 ... run_n
@@ -23,9 +22,9 @@ import glob
 from caf import backends
 from caf.framework import Calibration, CAF
 from caf.strategies import SingleIOV
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import TOP
 from basf2 import B2ERROR
-from top_calibration import BS13d_calibration_local
 
 # ----- those parameters need to be adjusted before running -----------------------
 #
@@ -33,11 +32,13 @@ globalTags = ['online']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
 data_dir = '/ghi/fs01/belle2/bdata/group/detector/TOP/2019-*/data_sroot_global/'
 main_output_dir = 'top_calibration'
-look_back = 28  # look-back window setting (set to 0 if look-back setting available in DB)
+look_back = 30  # look-back window setting (set to 0 if look-back setting available in DB)
+calpulse_min_time = 50.0  # calibration pulse selection in time: minimal time [ns]
+calpulse_max_time = 120.0  # calibration pulse selection in time: maximal time [ns]
 tts_file = '/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrizations.root'
 laser_mc_fit = '/group/belle2/group/detector/TOP/calibration/MCreferences/laserMCFit.root'
 fit_mode = 'calibration'  # can be either monitoring, MC or calibration
-sroot_format = True  # on True data in sroot format, on False data in root format
+sroot_format = False  # on True data in sroot format, on False data in root format
 #
 # ---------------------------------------------------------------------------------------
 
@@ -53,9 +54,9 @@ run_last = run_numbers[-1]
 
 # Make list of files
 inputFiles = []
-expNo = 'e' + '{:0=4d}'.format(experiment)
+expNo = 'e' + f'{experiment:04d}'
 for run in run_numbers:
-    expRun = '{:0=4d}'.format(experiment) + '.' + '{:0=5d}'.format(run)
+    expRun = f'{experiment:04d}' + '.' + f'{run:05d}'
     if sroot_format:
         filename = f"{data_dir}/top.{expRun}.*.sroot"
     else:
@@ -75,7 +76,7 @@ if not os.path.isfile(laser_mc_fit):
     sys.exit()
 
 # Output folder name
-run_range = 'r' + '{:0=5d}'.format(run_first) + '-' + '{:0=5d}'.format(run_last)
+run_range = 'r' + f'{run_first:05d}' + '-' + f'{run_last:05d}'
 output_dir = f"{main_output_dir}/channelT0-local-{expNo}-{run_range}"
 
 # Suppress messages during processing
@@ -104,10 +105,12 @@ def channelT0_calibration(sroot=False):
                     useChannelT0Calibration=False,
                     useModuleT0Calibration=False,
                     useCommonT0Calibration=False,
-                    calpulseHeightMin=320,
+                    calpulseHeightMin=200,
                     calpulseHeightMax=680,
                     calpulseWidthMin=1.5,
                     calpulseWidthMax=2.2,
+                    calpulseTimeMin=calpulse_min_time,
+                    calpulseTimeMax=calpulse_max_time,
                     calibrationChannel=0,
                     lookBackWindows=look_back)
 
@@ -139,16 +142,12 @@ def channelT0_calibration(sroot=False):
 
 
 # Define calibrations
-cal1 = BS13d_calibration_local(inputFiles, look_back, globalTags, localDBs, sroot_format)
-cal2 = channelT0_calibration(sroot_format)
-cal1.backend_args = {"queue": "l"}
-cal2.backend_args = {"queue": "l"}
-cal2.depends_on(cal1)
+cal = channelT0_calibration(sroot_format)
+cal.backend_args = {"queue": "l"}
 
 # Add calibrations to CAF
 cal_fw = CAF()
-cal_fw.add_calibration(cal1)
-cal_fw.add_calibration(cal2)
+cal_fw.add_calibration(cal)
 cal_fw.output_dir = output_dir
 cal_fw.backend = backends.LSF()
 

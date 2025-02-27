@@ -27,7 +27,7 @@ from svd import add_svd_simulation
 #
 # NB: I sort both digit samples before saving. Normally, the digits
 # require sorting only after background overlay, but SVDDigitizer happens
-# to sort digits differently than ShaperDigitSorter. Both sortings are
+# to sort digits differently than ShaperDigitSorter. Both sorting are
 # correct, but the sorting to eventually correct is that in the
 # digitizer.
 # NB: Switching off electronic effects in SVDDigitizer prevents it from
@@ -180,4 +180,4 @@ if __name__ == "__main__":
                 else:
                     n_good += 1
 
-        basf2.B2INFO('Processed {0} matching digits.'.format(n_good))
+        basf2.B2INFO(f'Processed {n_good} matching digits.')

@@ -50,7 +50,7 @@ namespace Belle2 {
       float warning;
       /** The error level for the histogram difference. */
       float error;
-      /** The mininum entries for histogram comparison. */
+      /** The minimum entries for histogram comparison. */
       int min_entries;
     } CMPNODE;
 

@@ -76,6 +76,8 @@
 
 #pragma link C++ class Belle2::SVDSpacePointSNRFractionSelector +; // checksum=0x217f15e4, version=1
 
+#pragma link C++ class Belle2::SVDdEdxPDFs+; // checksum=0x6d7012eb, version=1
+
 #endif
 
 
@@ -134,7 +136,7 @@
 
 
 // SVDRecoConfiguration
-// New member object, m_useSVDSpacePointSNRFractionSelectorFor6Samples is added in verion 3.
+// New member object, m_useSVDSpacePointSNRFractionSelectorFor6Samples is added in version 3.
 #pragma read \
   sourceClass="Belle2::SVDRecoConfiguration"\
   source=""\
@@ -144,7 +146,7 @@
   code="{ m_useSVDSpacePointSNRFractionFor6Samples = false;}" \
 
 // SVDRecoConfiguration
-// New member object, m_useSVDSpacePointSNRFractionSelectorFor3Samples is added in verion 3.
+// New member object, m_useSVDSpacePointSNRFractionSelectorFor3Samples is added in version 3.
 #pragma read \
   sourceClass="Belle2::SVDRecoConfiguration"\
   source=""\

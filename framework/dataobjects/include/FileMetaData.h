@@ -295,6 +295,7 @@ namespace Belle2 {
     friend class B2BIIMdstInputModule;
     friend class BeamBkgHitRateMonitorModule;
     friend class StorageRootOutputModule;
+    friend class VariablesToNtupleModule;
 
     ClassDefOverride(FileMetaData, 11); /**< Metadata information about a file. */
 

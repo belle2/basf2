@@ -10,7 +10,7 @@
 #pragma link C++ class Belle2::TOPSimCalPulse+; // checksum=0xa0d37252, version=1
 #pragma link C++ class Belle2::TOPDigit+; // checksum=0x43b82094, version=15
 #pragma link C++ class Belle2::TOPBarHit+; // checksum=0x88bd7661, version=3
-#pragma link C++ class Belle2::TOPLikelihood+; // checksum=0xd7c618b7, version=2
+#pragma link C++ class Belle2::TOPLikelihood+; // checksum=0xa9894130, version=3
 #pragma link C++ class Belle2::TOPRecBunch+; // checksum=0x28cd770d, version=7
 #pragma link C++ class Belle2::TOPRawWaveform+; // checksum=0x581d60d9, version=9
 #pragma link C++ class Belle2::TOPProductionEventDebug+; // checksum=0xfbeb4b5d, version=1

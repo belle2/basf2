@@ -140,7 +140,7 @@ and filter it like this:
    df = df.Filter("B0_mbc>5.2", "B0_mbc cut")\
           .Filter("B0_deltae>-1", "B_deltae cut")
 
-Because of RDataFrame's lazyness, these operations return almost
+Because of RDataFrame's laziness, these operations return almost
 instantly. The computations are only “booked”.
 
 .. admonition:: Exercise

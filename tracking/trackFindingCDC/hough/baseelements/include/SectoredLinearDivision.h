@@ -27,13 +27,13 @@ namespace Belle2 {
      *  down the usual division level as level 1.
      *
      *  In this way some repeated computations in the first levels are abolished and
-     *  a better overview which part of the hough space is more densly populared is aquired.
+     *  a better overview which part of the hough space is more densely populated is acquired.
      *  The latter means that a better search space prioritisation can be expected compared
      *  to deciding the priority from coarse first level nodes.
      *
      *  Note since the tree using this division strategy is generally unaware of the fast forward
      *  the division granularity and the level number have a different relation.
-     *  Essentially the sectorLevelSkip parameter setted here has to be added to the level number
+     *  Essentially the sectorLevelSkip parameter set here has to be added to the level number
      *  to know at which granularity one currently is in the tree.
      *  Alternatively the search depth can be reduced by sectorLevelSkip, which is what we do in
      *  the application.
@@ -114,7 +114,7 @@ namespace Belle2 {
       int m_sectorLevelSkip;
     };
 
-    // Extra mention of the constexpr such that it aquires external linkage.
+    // Extra mention of the constexpr such that it acquires external linkage.
     template<class ABox, std::size_t... divisions>
     constexpr std::size_t SectoredLinearDivision<ABox, divisions...>::s_divisions[sizeof...(divisions)];
   }

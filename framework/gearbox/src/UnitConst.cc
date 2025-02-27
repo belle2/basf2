@@ -14,7 +14,6 @@
 #include <TMath.h>
 
 #include <algorithm>
-#include <fstream>
 
 using namespace Belle2;
 using namespace std;
@@ -440,3 +439,4 @@ const double Const::uTherm         = 0.026 * Unit::V;
 const double Const::eMobilitySi    = 1415 * Unit::cm2 / Unit::V / Unit::s;
 
 const double Const::doubleNaN = std::numeric_limits<double>::quiet_NaN();
+const float  Const::floatNaN = std::numeric_limits<float>::quiet_NaN();

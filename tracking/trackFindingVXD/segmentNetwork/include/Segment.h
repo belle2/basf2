@@ -23,10 +23,13 @@ namespace Belle2 {
     /** ************************* DATA MEMBERS ************************* */
 
     /** pointer to hit forming the outer end of the Segment. */
-    HitType* m_outerHit;
+    HitType* m_outerHit = nullptr;
 
     /** pointer to hit forming the inner end of the Segment. */
-    HitType* m_innerHit;
+    HitType* m_innerHit = nullptr;
+
+    /** unique identifier */
+    const std::int64_t m_identifier = -1;
 
     /** iD of sector carrying outer hit */
     FullSecID::BaseType m_outerSector;
@@ -34,19 +37,13 @@ namespace Belle2 {
     /** iD of sector carrying inner hit */
     FullSecID::BaseType m_innerSector;
 
-    /** unique identifier */
-    const std::int64_t m_identifier;
-
   public:
     /** ************************* CONSTRUCTORS ************************* */
 
     /** Default constructor for the ROOT IO. */
     Segment():
-      m_outerHit(nullptr),
-      m_innerHit(nullptr),
       m_outerSector(FullSecID()),
-      m_innerSector(FullSecID()),
-      m_identifier(-1)
+      m_innerSector(FullSecID())
     {}
 
 
@@ -59,10 +56,10 @@ namespace Belle2 {
     Segment(FullSecID::BaseType outerSector, FullSecID::BaseType innerSector, HitType* outerNode, HitType* innerNode):
       m_outerHit(outerNode),
       m_innerHit(innerNode),
-      m_outerSector(outerSector),
-      m_innerSector(innerSector),
       m_identifier(static_cast<std::int64_t>(outerNode->getID()) << 32 | static_cast<std::int64_t>
-                   (innerNode->getID())) // Use int TrackNode IDs to construct int Segment ID
+                   (innerNode->getID())), // Use int TrackNode IDs to construct int Segment ID
+      m_outerSector(outerSector),
+      m_innerSector(innerSector)
     {}
 
     /** ************************* OPERATORS ************************* */

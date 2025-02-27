@@ -28,7 +28,7 @@ global tags.
 If you use an older release than ``release-05-02`` or ``light-2103-oceanos``, the
 following two lines **must** be added in the beginning of your b2bii analysis script:
 
-.. code-block:: python3
+.. code-block:: python
 
    basf2.conditions.metadata_providers = ["/sw/belle/b2bii/database/conditions/b2bii.sqlite"]
    basf2.conditions.payload_locations = ["/sw/belle/b2bii/database/conditions/"]
@@ -50,7 +50,7 @@ This function has input parameters to specify the input MDST files to be convert
 flag to specify whether or not the fix_mdst should be applied or not (it should!)
 and path.
 
-.. code-block:: python3
+.. code-block:: python
 
    from b2biiConversion import convertBelleMdstToBelleIIMdst
    convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, path=my_path)

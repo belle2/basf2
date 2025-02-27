@@ -14,7 +14,7 @@ import b2test_utils
 # This test does the following:
 # 1. Simulate a few hundred ParticleGun events to produce a sample of
 #    SVD simhits.
-# 2. Use SVDDigitizer with varius zero-suppression cut settings and check
+# 2. Use SVDDigitizer with various zero-suppression cut settings and check
 #    that the settings work.
 # ====================================================================
 
@@ -45,7 +45,7 @@ class CheckZS(basf2.Module):
                 if s > threshold_in_adu:
                     break
             else:
-                basf2.B2FATAL("Found digit under threshold: {0}".format(digit.to_string()))
+                basf2.B2FATAL(f"Found digit under threshold: {digit.to_string()}")
 
 
 if __name__ == "__main__":

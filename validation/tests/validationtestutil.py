@@ -23,7 +23,7 @@ def check_execute(cmd, terminate_on_error=True):
     if not res == 0:
         print("FATAL: Exit code is not 0")
         if terminate_on_error:
-            sys.exit(res)
+            sys.exit(1)
         return False
 
     return True
@@ -40,7 +40,7 @@ def check_path_exists(paths, terminate_on_error=True):
     """
 
     for p in paths:
-        print(f"Checking for existance of file {p}")
+        print(f"Checking for existence of file {p}")
         if not os.path.exists(p):
             print(f"Path {p} does not exist")
             if terminate_on_error:

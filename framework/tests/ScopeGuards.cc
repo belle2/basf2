@@ -151,10 +151,11 @@ namespace {
   TEST(ScopeGuards, WorkingDirectory)
   {
     std::string start{std::filesystem::current_path().c_str()};
-    std::string tmpdir("/tmp");
+    std::string tmpdir(std::filesystem::temp_directory_path().c_str());
     std::string root("/");
     {
-      auto guard1 = Belle2::ScopeGuard::guardWorkingDirectory("/tmp"); // cppcheck-suppress unreadVariable
+      auto guard1 = Belle2::ScopeGuard::guardWorkingDirectory( // cppcheck-suppress unreadVariable
+                      std::filesystem::temp_directory_path().c_str());
       ASSERT_EQ(tmpdir, std::filesystem::current_path().c_str());
       {
         auto guard2 = Belle2::ScopeGuard::guardWorkingDirectory("/");

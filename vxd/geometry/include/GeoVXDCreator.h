@@ -121,7 +121,7 @@ namespace Belle2 {
        * @param width full forward width of the shape in mm
        * @param width2 full backward width of the shape in mm
        * @param length length of the shape in mm
-       * @param[inout] height of the shape in mm. If angle is not 0 this value
+       * @param[input] height of the shape in mm. If angle is not 0 this value
        *        might be changed if the actual height will be smaller due to
        *        the slanted edges
        * @param angle angle of the sides along w with respect to to the uv
@@ -214,7 +214,7 @@ namespace Belle2 {
       std::vector<G4UserLimits*> m_UserLimits;
       /// Current half-shell being processed (need to know ladder parent for hierarchy)
       std::string m_currentHalfShell {""};
-      /// Used for translation of half-shell name into a VxdID to consitently handle it in hierarchy
+      /// Used for translation of half-shell name into a VxdID to consistently handle it in hierarchy
       std::map<std::string, Belle2::VxdID> m_halfShellVxdIDs {
         {{"PXD.Ying"}, {Belle2::VxdID(1, 0, 0, 1)}},
         {{"PXD.Yang"}, {Belle2::VxdID(1, 0, 0, 2)}},

@@ -1,0 +1,43 @@
+# EventType: 1213041100
+# Descriptor: [B- -> rho- [D*0 -> [D0 -> [K_S0 -> pi+ pi-] pi+ pi-] gamma] ]cc
+# NickName: Bu_Dstrho-_DsttoDgamma_DtoKSpi+pi-
+# Documentation: backgroud study for phi3 BPGGSZ using B->D*h
+# Tested:yes
+# PhysicsWG: BHadronic WG
+# Responsible: Ansu Johnson
+# Email: ansujohnson@physics.iitm.ac.in
+# Cuts: None
+# Date: 01/11/2024
+#
+
+Alias K_S0sig K_S0
+
+# Upsilon(4S) decay
+Decay Upsilon(4S)
+0.500 B-sig B+   PHOTOS VSS;
+0.500 B- B+sig   PHOTOS VSS;
+Enddecay
+
+
+Decay B-sig
+1.000 D*0sig  rho-   SVV_HELAMP 0.228 0.95 0.932 0.0 0.283 1.13;  
+Enddecay
+CDecay B+sig
+
+
+Decay D*0sig
+1.000 D0sig gamma  VSP_PWAVE; 
+Enddecay
+CDecay anti-D*0sig
+
+
+Decay D0sig
+1.000 K_S0sig pi+ pi- PHOTOS PHSP;
+Enddecay
+CDecay anti-D0sig
+
+Decay K_S0sig
+1.0 pi+ pi- PHSP;
+Enddecay
+
+End

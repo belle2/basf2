@@ -16,23 +16,15 @@
 #include <analysis/variables/Variables.h>
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/ECLVariables.h>
-#include <analysis/variables/TrackVariables.h>
 #include <analysis/variables/V0DaughterTrackVariables.h>
 #include <mdst/dataobjects/Track.h>
-#include <analysis/variables/VertexVariables.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
-#include <framework/database/DBObjPtr.h>
-#include <mdst/dbobjects/BeamSpot.h>
-
-#include <framework/datastore/StoreArray.h>
 #include <b2bii/dataobjects/BelleTrkExtra.h>
 
 #include <TVectorF.h>
-
-#include <limits>
 
 namespace Belle2 {
   namespace Variable {
@@ -278,6 +270,22 @@ namespace Belle2 {
       return belleTrkExtra->getPathLength();
     }
 
+    double BelleTofMass(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return Const::doubleNaN;
+      }
+      double time = belleTrkExtra->getTof();
+      double length = belleTrkExtra->getPathLength();
+      double p = particle->getP(); //3-momentum
+      double tofbeta = length / time / Belle2::Const::speedOfLight;
+      double tofmass = p * sqrt(1. / (tofbeta * tofbeta) - 1.); //(GeV)
+
+      return tofmass;
+    }
+
     double BelledEdx(const Particle* particle)
     {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
@@ -427,6 +435,10 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
 [Legacy] Returns the track path length. This is defined from the closest point to the z-axis up to TOF counter. (Belle only).
 
 )DOC", "cm");
+
+    REGISTER_VARIABLE("BelleTofMass", BelleTofMass, R"DOC(
+[Legacy] Returns the TOF mass calculated from the time of flight and path length. (Belle only).
+)DOC", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("BelledEdx", BelledEdx, R"DOC(
 [Legacy] Returns the dE/dx measured in the CDC. (Belle only).

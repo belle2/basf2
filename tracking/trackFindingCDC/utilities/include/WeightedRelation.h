@@ -37,7 +37,7 @@ namespace Belle2 {
 
       /// Creating a relation with one object on the from side, one on the to side and a weight.
       WeightedRelation(From* from, Weight weight, To* to)
-        : Super( {from, weight}, to)
+        : Super({from, weight}, to)
       {}
 
       /// Operator for ordering of relations.
@@ -51,7 +51,7 @@ namespace Belle2 {
                    (getTo() < rhs.getTo())))));
       }
 
-      /// Operator to compare key type weighted item to the relations for assoziative lookups.
+      /// Operator to compare key type weighted item to the relations for associative lookups.
       friend bool operator<(const std::pair<From*, Weight>& weightedPtr,
                             const WeightedRelation<From, To>& weightedRelation)
       {
@@ -61,7 +61,7 @@ namespace Belle2 {
                  (weightedPtr.second > weightedRelation.getWeight())));
       }
 
-      /// Operator to compare key type weighted item to the relations for assoziative lookups.
+      /// Operator to compare key type weighted item to the relations for associative lookups.
       friend bool operator<(const WeightedRelation<From, To>& weightedRelation,
                             const std::pair<From*, Weight>& weightedPtr)
       {
@@ -71,13 +71,13 @@ namespace Belle2 {
                  (weightedRelation.getWeight() > weightedPtr.second)));
       }
 
-      /// Operator to compare key type item to the relations for assoziative lookups.
+      /// Operator to compare key type item to the relations for associative lookups.
       friend bool operator<(const From* ptrFrom, const WeightedRelation<From, To>& weightedRelation)
       {
         return ptrFrom < weightedRelation.getFrom();
       }
 
-      /// Operator to compare key type item to the relations for assoziative lookups.
+      /// Operator to compare key type item to the relations for associative lookups.
       friend bool operator<(const WeightedRelation<From, To>& weightedRelation, const From* ptrFrom)
       {
         return weightedRelation.getFrom() < ptrFrom;
@@ -113,7 +113,7 @@ namespace Belle2 {
         return this->second;
       }
 
-      /// Make a relation in the opposite direciton with the same weight
+      /// Make a relation in the opposite direction with the same weight
       WeightedRelation<To, From> reversed() const
       {
         //return WeightedRelation<To, From>(getTo(), getWeight(), getFrom());
@@ -137,8 +137,8 @@ namespace Belle2 {
         auto reversedRelationExists =
         [&weightedRelations](const WeightedRelation<AFrom, ATo>& weightedRelation) -> bool {
           auto reversedRelations = std::equal_range(std::begin(weightedRelations),
-          std::end(weightedRelations),
-          weightedRelation.reversed());
+                                                    std::end(weightedRelations),
+                                                    weightedRelation.reversed());
           return reversedRelations.first != reversedRelations.second;
         };
         return std::all_of(std::begin(weightedRelations),

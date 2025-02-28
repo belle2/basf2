@@ -6,24 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclCRFinder/ECLCRFinderModule.h>
 
-// FRAMEWORK
-#include <framework/core/Environment.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/LogConfig.h>
-#include <framework/logging/Logger.h>
-
-//ECL
-#include <ecl/geometry/ECLNeighbours.h>
+/* ECL headeers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/geometry/ECLNeighbours.h>
 
-// MDST
+/* Basf2 headers. */
+#include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
-// C++
+/* C++ headers. */
 #include <algorithm>
 #include <iostream>
 
@@ -81,7 +77,7 @@ void ECLCRFinderModule::initialize()
   B2DEBUG(200, "ECLCRFinderModule::initialize()");
 
   // Register dataobjects.
-  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
+  m_eclCalDigits.isRequired(eclCalDigitArrayName());
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
   m_eventLevelClusteringInfo.isRequired(eventLevelClusteringInfoName());
 
@@ -155,38 +151,42 @@ void ECLCRFinderModule::event()
       timeresidual = time / timeresolution;
     }
 
-    // Negative timecut is interpreted as cut on time residual, positive cut as cut on the timeresolution!
+    // Negative timecut is interpreted as cut on time residual, positive cut as cut on the time!
     // Start filling all crystals to a map. Growth and seed crystals are strict subsets.
     if (std::isgreaterequal(energy, m_energyCut[2])) {
       if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
       if (!fitfailed
           and energy < m_timeCut_maxEnergy[2]) { //check timing cuts only if we have a good fit and if the energy is below threshold
-        if (m_timeCut[2] > 1e-9 and fabs(timeresolution) > m_timeCut[2]) continue;
+        if (m_timeCut[2] > 1e-9 and fabs(time) > m_timeCut[2]) continue;
         if (m_timeCut[2] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[2])) continue;
       }
       m_cellIdToDigitVec[cellid] = 1;
-      B2DEBUG(250, "ECLCRFinderModule::event(), adding 'all digit' with cellid = " << cellid);
+      B2DEBUG(250, "ECLCRFinderModule::event(), adding 'all digit' cellid = " << cellid << " " << energy << " " << time << " " <<
+              timeresidual);
 
       // check growth only if they already passed the digit check
       if (std::isgreaterequal(energy, m_energyCut[1])) {
         if (!fitfailed
             and energy < m_timeCut_maxEnergy[1]) { //check timing cuts only if we have a good fit and if the energy is below threshold
-          if (m_timeCut[1] > 1e-9 and fabs(timeresolution) > m_timeCut[1]) continue;
+          if (m_timeCut[1] > 1e-9 and fabs(time) > m_timeCut[1]) continue;
           if (m_timeCut[1] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[1])) continue;
         }
         m_cellIdToGrowthVec[cellid] = 1;
-        B2DEBUG(250, "ECLCRFinderModule::event(), adding 'growth digit' with cellid = " << cellid);
+        B2DEBUG(250, "ECLCRFinderModule::event(), adding 'growth digit' cellid = " << cellid << " " << energy << " " << time << " " <<
+                timeresidual);
+
 
         // check seed only if they already passed the growth check
         if (std::isgreaterequal(energy, m_energyCut[0])) {
           if (!fitfailed
               and energy < m_timeCut_maxEnergy[0]) { //check timing cuts only if we have a good fit and if the energy is below threshold
-            if (m_timeCut[0] > 1e-9 and fabs(timeresolution) > m_timeCut[0]) continue;
+            if (m_timeCut[0] > 1e-9 and fabs(time) > m_timeCut[0]) continue;
             if (m_timeCut[0] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[0])) continue;
           }
-        }
-        m_cellIdToSeedVec[cellid] = 1;
-        B2DEBUG(250, "ECLCRFinderModule::event(), adding 'seed digit' with cellid = " << cellid);
+          m_cellIdToSeedVec[cellid] = 1;
+          B2DEBUG(250, "ECLCRFinderModule::event(), adding 'seed digit' cellid = " << cellid << " " << energy << " " << time << " " <<
+                  timeresidual);
+        } // end seed
       } //end growth
     }// end digit
   }//end filling maps

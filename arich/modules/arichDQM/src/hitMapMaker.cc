@@ -12,22 +12,16 @@
 // ARICH
 #include <arich/dbobjects/ARICHChannelMapping.h>
 #include <arich/dbobjects/ARICHMergerMapping.h>
-#include <arich/dataobjects/ARICHHit.h>
-
-#include <mdst/dataobjects/Track.h>
 
 // Dataobject classes
 #include <framework/database/DBObjPtr.h>
 
-#include <TH1F.h>
-#include <TH2F.h>
 #include <TCanvas.h>
 #include <TStyle.h>
 #include <TColor.h>
 #include <TExec.h>
 
 #include <vector>
-#include <fstream>
 
 namespace Belle2 {
 
@@ -204,6 +198,9 @@ namespace Belle2 {
     return m_sectorDeadMap;
   }
 
+  /**
+   * Set palette for sector dead-chip map.
+   */
   void deadPalette()
   {
     static Int_t colors[50];

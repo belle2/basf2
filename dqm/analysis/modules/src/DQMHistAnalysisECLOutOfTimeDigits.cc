@@ -38,7 +38,6 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::initialize()
       registerEpicsPV(m_pvPrefix + pv_name, pv_name);
     }
   }
-  updateEpicsPVs(5.0);
 
   m_monObj = getMonitoringObject("ecl");
 
@@ -69,7 +68,6 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::event()
       setEpicsPV(pv_name, selected_value);
     }
   }
-  updateEpicsPVs(5.0);
 }
 
 void DQMHistAnalysisECLOutOfTimeDigitsModule::endRun()

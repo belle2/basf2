@@ -19,7 +19,7 @@ show_event(unsigned long * head, int len)
 {
     int i;
     for (i=0; i<(len/4); i+= 8) {
-        printf("%08ld %08lx %08lx %08lx %08lx %08lx %08lx %08lx %08lx\n", i,
+        printf("%08d %08lx %08lx %08lx %08lx %08lx %08lx %08lx %08lx\n", i,
             buffer[i], buffer[i+1], buffer[i+2], buffer[i+3],
             buffer[i+4], buffer[i+5], buffer[i+6], buffer[i+7]);
     }

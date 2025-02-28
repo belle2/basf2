@@ -14,7 +14,6 @@
 
 /* ROOT headers */
 #include <TH1F.h>
-#include <TProfile.h>
 
 namespace Belle2 {
 

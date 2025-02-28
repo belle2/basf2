@@ -8,7 +8,6 @@
 
 #include <framework/dbobjects/RunInfo.h>
 #include <framework/gearbox/Const.h>
-#include <framework/gearbox/Unit.h>
 
 #include <iostream>
 

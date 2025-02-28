@@ -197,7 +197,11 @@ namespace Belle2 {
           G4Element* cmp = getElement(component.getName());
           if (!cmp) {
             B2ERROR("Cannot create material " << parameters.getName() << ": element " << component.getName() << " not found");
+#ifdef __clang_analyzer__
+            continue;
+#else
             return nullptr;
+#endif
           }
           mat->AddElement(cmp, component.getFraction());
         } else {

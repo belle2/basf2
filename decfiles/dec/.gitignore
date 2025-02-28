@@ -1,0 +1,2 @@
+# Override global gitignore on XML files to allow using EvtGen's GENERIC_DALITZ
+!*.xml

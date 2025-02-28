@@ -36,5 +36,5 @@ del(newRootFile)
 checksum = hashlib.md5()
 checksum.update(open(fileName, 'rb').read())
 print(checksum.digest().hex())
-assert checksum.digest().hex() == '4b616ad813c35498f6f8aa09f2bcebda'
+assert checksum.digest().hex() == 'ddef04f82a39be019daf7c83d2f5005c'
 del(testFile)

@@ -74,12 +74,22 @@ namespace Belle2 {
     template<class THit, class TSimHit>
     bool isWithinNLoops(double Bz, const THit* aHit, double nLoops);
 
+    /** helper function which returns true if the current hit has a creation time after
+     * the MCParticle left the CDC and entered TOP. These tracks that re-enter the tracking
+     * volume are more difficult to reconstruct due to the energy loss in the CDC outer all and in TOP.
+     * The template gives the hit type and the according sim hit type (e.g. CDCHit and CDCSimHit)
+     * @param aHit: pointer to the hit under investiation
+     * @return : returns true if the the track left CDC and entered TOP before this hit was registered
+     */
+    template<class THit, class TSimHit>
+    bool didParticleExitCDC(const THit* aHit);
+
     bool m_usePXDHits;                                          /**< Boolean to select if PXDHits should be used*/
     bool m_useSVDHits;                                          /**< Boolean to select if SVDHits should be used*/
     bool m_useCDCHits;                                          /**< Boolean to select if CDCHits should be used*/
     bool m_useOnlyAxialCDCHits;                                 /**< Boolean to select if only axial CDCHits should be used*/
-    bool m_useOnlyBeforeTOP;                                    /**< Boolean to select if CDC hits after TOP detector are discarded*/
-    float m_useNLoops;                                          /**< Number of loops to include in the MC tracks - effects only CDC.*/
+    bool m_useOnlyBeforeTOP;                                    /**< Boolean to select if hits after TOP detector are discarded. */
+    float m_useNLoops;                                          /**< Number of loops to include in the MC tracks. */
     bool m_useReassignedHits;                                   /**< Boolean to select the inclusion of hits form discarded secondary daughters*/
     bool m_useSecondCDCHits;                  /**< Also includes the CDC 2nd hit information in the mc tracks.*/
 
@@ -123,7 +133,7 @@ namespace Belle2 {
 
     bool m_mcParticlesPresent =
       false; /**< This flag is set to false if there are no MC Particles in the data store (probably data run?) and we can not create MC Reco tracks. */
-    double m_splitAfterDeltaT; /**< Minimal time delay between two sim hits (in ns) after which MC reco track will be split into seperate tracks. If < 0, don't do splitting.*/
+    double m_splitAfterDeltaT; /**< Minimal time delay between two sim hits (in ns) after which MC reco track will be split into separate tracks. If < 0, don't do splitting.*/
 
     bool m_discardAuxiliaryHits = false; /**< if true hits marked as auxiliary will not be included in the RecoTrack */
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -198,7 +197,7 @@ class printSVDLadders(b2.Module):
                 ladderNumber = ladder.getLadderNumber()
                 for sensor in geoCache.getSensors(ladder):
                     sensorNumber = sensor.getSensorNumber()
-                    if not(sensorNumber == layerNumber - 1):
+                    if not (sensorNumber == layerNumber - 1):
                         continue
                     # sensor ID string
                     sensorID = str(layerNumber) + "." + str(ladderNumber)
@@ -208,16 +207,16 @@ class printSVDLadders(b2.Module):
 
                     angleRad = m.atan2(glob.Y(), glob.X())
                     print(angleRad)
-                    if(angleRad < 0):
+                    if (angleRad < 0):
                         angleRad = 2 * m.pi + angleRad
                         print("second = " + str(angleRad))
 
                     angleDeg = m.degrees(angleRad)
 
-                    xStr = "{0:.2f}".format(round(glob.X(), 2))
-                    yStr = "{0:.2f}".format(round(glob.Y(), 2))
-                    radStr = "{0:.2f}".format(round(angleRad, 4))
-                    degStr = "{0:.2f}".format(round(angleDeg, 2))
+                    xStr = f"{round(glob.X(), 2):.2f}"
+                    yStr = f"{round(glob.Y(), 2):.2f}"
+                    radStr = f"{round(angleRad, 4):.2f}"
+                    degStr = f"{round(angleDeg, 2):.2f}"
                     print(sensorID + '     ' + xStr + '     ' + yStr + '     ' + radStr + '     ' + degStr)
 
 

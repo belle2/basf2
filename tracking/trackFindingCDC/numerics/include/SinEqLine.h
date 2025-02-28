@@ -21,10 +21,10 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /** Helper class to calculate roots for the function f(x) = sin x - slope * x - intercept.
-     *  Solves the equation sin x = slope * x + intercept by netwons method on the function f(x) = sin x - slope * x - intercept.
-     *  There can be zero, infinitly many solutions and anything inbetween depending on the value of slope and intercept.
-     *  To find solutions we expliot that the local exterma of the function f(x) can be found easily and that maximally one solutions can be found between consecutive extrema.
-     *  There is exactly one local extermum in each half period of sin(x) and local extrema are therefore addressed by there half period index.
+     *  Solves the equation sin x = slope * x + intercept by Newton's method on the function f(x) = sin x - slope * x - intercept.
+     *  There can be zero, infinitely many solutions and anything in-between depending on the value of slope and intercept.
+     *  To find solutions we exploit that the local extrema of the function f(x) can be found easily and that maximally one solutions can be found between consecutive extrema.
+     *  There is exactly one local extremum in each half period of sin(x) and local extrema are therefore addressed by there half period index.
      *  Each possible solution of the equation is than addressed by the index of the closest *smaller* local extrema.
      *  However only a range of indices corresponds to realized solutions. For non existent solutions NAN is returned.
      *  Note that for fabs(slope) >= 1 there are no more local maxima. In this case only a single solution exists, which is always returned for any index.
@@ -65,7 +65,7 @@ namespace Belle2 {
       { return floor(x / M_PI); }
 
       /* Computes the positive solution that has the smallest value of x.
-      The additional parameter serves as a criterion to abbort the search if the solutions is further away than the specified half period.
+      The additional parameter serves as a criterion to abort the search if the solutions is further away than the specified half period.
       */
       double computeSmallestPositiveRoot(int maxIHalfPeriod = 5) const;
 
@@ -76,7 +76,7 @@ namespace Belle2 {
       /// Compute single solution in the case that fabs(slope) >= 1.
       double computeRootForLargeSlope() const;
 
-      /// Computes the solution in between the given x values. The x values are generally choosen consecutive local extermas.
+      /// Computes the solution in between the given x values. The x values are generally chosen consecutive local extremes.
       double computeRootInInterval(double lowerX, double upperX) const;
 
     private:
@@ -86,23 +86,23 @@ namespace Belle2 {
       /// Fall back shrinking method to the secant algorithm
       static double secantX(const Vector2D& lower, const Vector2D& upper);
 
-      /// Simple fall back shrinking method using trivial devision of the intervall.
+      /// Simple fall back shrinking method using trivial division of the interval.
       static double middleX(const Vector2D& lower, const Vector2D& upper);
 
-      /// Replaces the lower or upper bound inplace if the next candidate position is valid and within the intervall. Returns true on success.
+      /// Replaces the lower or upper bound inplace if the next candidate position is valid and within the interval. Returns true on success.
       static bool updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& next);
 
-      /// Check is next position is within the intervall given by lower and upper.
+      /// Check is next position is within the interval given by lower and upper.
       static bool isBetween(const Vector2D& lower, const Vector2D& next, const Vector2D& upper)
       { return lower.x() < next.x() and next.x() < upper.x(); }
 
-      /// Check if the intervall has shrunk close enough to the solution.
+      /// Check if the interval has shrunk close enough to the solution.
       static bool isConverged(const Vector2D& lower, const Vector2D& upper)
       {
         return fabs(lower.y()) < 10e-7 or fabs(upper.y()) < 10e-7;
       }
 
-      /// Returns the better solution x from the bounds of the intervall.
+      /// Returns the better solution x from the bounds of the interval.
       static double getConvergedBound(const Vector2D& lower, const Vector2D& upper)
       {
         if (not std::isfinite(lower.y()) or not std::isfinite(upper.y())) {
@@ -121,11 +121,11 @@ namespace Belle2 {
       }
 
     public:
-      /// Checks if the function changes sign in the intervall
+      /// Checks if the function changes sign in the interval
       static bool changesSign(const Vector2D& lower, const Vector2D& upper)
       { return (lower.y() > 0 and upper.y() < 0) or (lower.y() < 0 and upper.y() > 0); }
 
-      /// Determines if the function is increasing or decreasing in the intervall.
+      /// Determines if the function is increasing or decreasing in the interval.
       static EIncDec getEIncDec(const Vector2D& lower, const Vector2D& upper)
       {
         if (lower.y() < upper.y()) {
@@ -140,7 +140,7 @@ namespace Belle2 {
       }
 
     public:
-      /// Get the local extermum that is located in the half period indicated by the given index.
+      /// Get the local extremum that is located in the half period indicated by the given index.
       double computeExtremumXInHalfPeriod(int iHalfPeriod) const;
 
       /// Helper function to translate the index of the half period to index of the containing period.
@@ -148,7 +148,7 @@ namespace Belle2 {
       { return isEven(iHalfPeriod) ? iHalfPeriod / 2 : (iHalfPeriod - 1) / 2; }
 
     public:
-      /// Indicates that the slope is so large such that the function has no local exterma.
+      /// Indicates that the slope is so large such that the function has no local extrema.
       bool hasLargeSlope() const
       { return fabs(getSlope()) >= 1; }
 

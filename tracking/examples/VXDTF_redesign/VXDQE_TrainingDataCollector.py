@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -19,45 +18,53 @@
 import basf2 as b2
 from tracking import add_vxd_track_finding_vxdtf2, add_mc_matcher, add_hit_preparation_modules
 
-estimationMethod = 'tripletFit'
-clusterInfo = 'Average'
 
-eval_file_train = "Upsilon4S_ForMVA_10000Events_w16th_overlay_Bkg.root"  # Change to correct training file
-sector_map = None  # Default SectorMap
+def main():
+    """Only execute the code if the script is run but not when it's imported."""
 
-# ---------------------------------------------------------------------------------------
-name = 'VXDEQE_CollectedTrainingData_Default'
+    estimationMethod = 'tripletFit'
+    clusterInfo = 'Average'
 
-# Logging and Debug Level
-b2.set_log_level(b2.LogLevel.INFO)
+    eval_file_train = "Upsilon4S_ForMVA_10000Events_w16th_overlay_Bkg.root"  # Change to correct training file
+    sector_map = None  # Default SectorMap
 
-path = b2.create_path()
+    # ---------------------------------------------------------------------------------------
+    name = 'VXDEQE_CollectedTrainingData_Default'
 
-rootInput = b2.register_module('RootInput')
-rootInput.param('inputFileName', eval_file_train)
-path.add_module(rootInput)
+    # Logging and Debug Level
+    b2.set_log_level(b2.LogLevel.INFO)
 
-# Event Info Module
-eventinfoprinter = b2.register_module('EventInfoPrinter')
-path.add_module(eventinfoprinter)
+    path = b2.create_path()
 
-path.add_module("Gearbox")
-path.add_module("Geometry")
+    rootInput = b2.register_module('RootInput')
+    rootInput.param('inputFileName', eval_file_train)
+    path.add_module(rootInput)
 
-add_hit_preparation_modules(path, components=['SVD'])
+    # Event Info Module
+    eventinfoprinter = b2.register_module('EventInfoPrinter')
+    path.add_module(eventinfoprinter)
 
-add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=['SVD'], suffix="", sectormap_file=sector_map)
+    path.add_module("Gearbox")
+    path.add_module("Geometry")
 
-add_mc_matcher(path, components=['SVD'])
+    add_hit_preparation_modules(path, components=['SVD'])
 
-data = b2.register_module('VXDQETrainingDataCollector')
-data.param('EstimationMethod', estimationMethod)
-data.param('ClusterInformation', clusterInfo)
-data.param('TrainingDataOutputName', name + '.root')
-data.param('SpacePointTrackCandsStoreArrayName', 'SPTrackCands')
-data.param('MCRecoTracksStoreArrayName', 'MCRecoTracks')
-path.add_module(data)
+    add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=['SVD'], suffix="", sectormap_file=sector_map)
 
-b2.print_path(path)
-b2.process(path)
-print(b2.statistics)
+    add_mc_matcher(path, components=['SVD'])
+
+    data = b2.register_module('VXDQETrainingDataCollector')
+    data.param('EstimationMethod', estimationMethod)
+    data.param('ClusterInformation', clusterInfo)
+    data.param('TrainingDataOutputName', name + '.root')
+    data.param('SpacePointTrackCandsStoreArrayName', 'SPTrackCands')
+    data.param('MCRecoTracksStoreArrayName', 'MCRecoTracks')
+    path.add_module(data)
+
+    b2.print_path(path)
+    b2.process(path)
+    print(b2.statistics)
+
+
+if __name__ == "__main__":
+    main()

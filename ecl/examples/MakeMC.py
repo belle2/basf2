@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -119,8 +118,7 @@ add_reconstruction(mainPath)
 # Register and add 'RootOutput' module
 outputFile = b2.register_module('RootOutput')
 outputFile.param('outputFileName',
-                 'pdg{}_BGx1_{}.mdst.root'.format(args.pdgCode,
-                                                  args.fileNumber))
+                 f'pdg{args.pdgCode}_BGx1_{args.fileNumber}.mdst.root')
 mainPath.add_module(outputFile)
 
 # Process the events and print call statistics

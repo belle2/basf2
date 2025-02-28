@@ -115,6 +115,24 @@ def available_revisions(work_folder: str) -> List[str]:
     return revisions
 
 
+def get_latest_nightly(work_folder: str) -> str:
+    """
+    Loops over the results folder and looks for nightly builds. It then returns
+    the most recent nightly tag sorted by date in the name. If no
+    nightly results are available then it returns the default 'current' tag.
+    :return: the most recent nightly build or current
+    """
+    available = available_revisions(work_folder)
+    available_nightlies = [
+        revision for revision in available
+        if revision.startswith("nightly")
+    ]
+    if available_nightlies:
+        return sorted(available_nightlies, reverse=True)[0]
+    else:
+        return 'current'
+
+
 def get_popular_revision_combinations(work_folder: str) -> List[str]:
     """
     Returns several combinations of available revisions that we might
@@ -317,7 +335,7 @@ def get_argument_parser(
     parser.add_argument(
         "-i",
         "--intervals",
-        help="Comma seperated list of intervals for which to execute the "
+        help="Comma separated list of intervals for which to execute the "
         "validation scripts. Default is 'nightly'",
         type=str,
         default="nightly",
@@ -352,7 +370,8 @@ def get_argument_parser(
         "--select",
         help="The file name(s) of one or more space separated validation "
         "scripts that should be executed exclusively. All dependent "
-        "scripts will also be executed. E.g. -s ECL2D.C",
+        "scripts will also be executed. E.g. -s ECL2D.C "
+        "(use -si instead to execute script(s) ignoring dependencies)",
         type=str,
         nargs="+",
     )
@@ -610,7 +629,7 @@ def congratulator(
         success: Number of successes
         failure: Number of failures
         total: success + failures (out of success, failure and total, exactly
-            2 have to be spefified. If you want to use your own figure of
+            2 have to be specified. If you want to use your own figure of
             merit, just set total = 1. and set success to a number between 0.0
             (infernal) to 1.0 (stellar))
         just_comment: Do not add calculated percentage to return string.
@@ -675,7 +694,7 @@ def congratulator(
     if just_comment:
         return comment
     else:
-        return "{} {}%. {}".format(rate_name, int(success_rate), comment)
+        return f"{rate_name} {int(success_rate)}%. {comment}"
 
 
 def terminal_title_line(title="", subtitle="", level=0) -> str:

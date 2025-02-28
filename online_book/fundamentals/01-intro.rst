@@ -94,13 +94,13 @@ However this is not the most probable result in an :math:`e^+e^-` collision.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    You should be able to find this information on confluence.
+    You should be able to find this information on XWiki.
 
 .. admonition:: Another hint
     :class: toggle xhint stacked
 
     Probably you are looking for `this page
-    <https://confluence.desy.de/x/AQkWAg>`_.
+    <https://xwiki.desy.de/xwiki/rest/p/8f198>`_.
 
 .. admonition:: Solution
     :class: toggle solution

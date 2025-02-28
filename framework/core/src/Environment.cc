@@ -98,7 +98,9 @@ Environment::Environment() :
   m_mcEvents(0),
   m_run(-1),
   m_experiment(-1),
-  m_skipNEvents(0)
+  m_runType(Const::c_Beam),
+  m_skipNEvents(0),
+  m_writeSimSteps(false)
 {
   // Check for environment variables set by setuprel
   const char* envarReleaseDir = getenv("BELLE2_RELEASE_DIR");
@@ -151,10 +153,6 @@ Environment::Environment() :
 
 Environment::~Environment() = default;
 
-
-// we know getFileNames is deprecated but we need it as long as --dry-run is available
-// so let's remove the warning for now ...
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 void Environment::setJobInformation(const std::shared_ptr<Path>& path)
 {

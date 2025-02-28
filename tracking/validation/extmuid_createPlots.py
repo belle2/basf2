@@ -40,6 +40,8 @@ from optparse import OptionParser
 CONTACT_PERSON = {'Name': 'Leo Piilonen',
                   'Email': 'piilonen@vt.edu'}
 
+ACTIVE = True
+
 
 def main():
     """Create validation plots for Ext and Muid"""
@@ -65,10 +67,10 @@ def main():
     try:
         number_entries = file_chain.GetEntries()
     except AttributeError:
-        print('Could not load input file(s) %s.' % options.input_file)
+        print(f'Could not load input file(s) {options.input_file}.')
 
     if number_entries == 0:
-        print('Data tree is empty or does not exist in file(s) %s. Exit.' % options.input_file)
+        print(f'Data tree is empty or does not exist in file(s) {options.input_file}. Exit.')
         sys.exit(0)
 
     # open the output root file
@@ -530,4 +532,9 @@ def draw_likelihoods(file_chain):
 # Entry point of this script: call the main() function             #
 ####################################################################
 if __name__ == '__main__':
-    main()
+    if ACTIVE:
+        main()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

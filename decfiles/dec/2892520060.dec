@@ -1,11 +1,11 @@
 # EventType: 2892420060
 # Descriptor: [e+ e- -> J/psi [-> e+ e-] eta_c]
-# NickName: ee_Jpsietac_ee
+# NickName: ee_Jpsietac_mumu
 # Documentation: Double charmonium production.
 # Tested: Yes
-# PhysicsWG: Charmonium
+# PhysicsWG: Quarkonium
 # Responsible: Kirill Chilikin
-# Email: chilikin@lebedev.ru
+# Email: K.A.Chilikin@inp.nsk.su
 # Cuts: None
 # Date: 20220113
 #

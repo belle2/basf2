@@ -1,0 +1,23 @@
+# EventType: 1120002100
+# Descriptor: B0 -> KS0 pi0
+# NickName: Bd_KS0_pi0
+# Documentation: Signal MC for TDCPV analysis of B0 -> KS0 pi0
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: G. Vikas Raj
+# Email: vikas.raj@physics.iitm.ac.in
+# Cuts: None
+# Date: 20240718
+
+
+Decay Upsilon(4S)
+1.000 B0 anti-B0 B0sig anti-B0sig VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0    K_S0    pi0    SSS_CP beta dm -1 1 0 1 0; 
+Enddecay
+
+CDecay anti-B0sig
+
+End

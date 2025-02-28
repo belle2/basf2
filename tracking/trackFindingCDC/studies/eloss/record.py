@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -9,11 +8,8 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Fix TLS bug
-# ctypes.cdll.LoadLibrary('/space/ofrost/basf2/release/lib/Linux_x86_64/opt/libtracking_trackFindingCDC.so')
 
-
-from ROOT import Belle2  # make Belle2 namespace available
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import TrackFindingCDC as TFCDC
 
 import sys
@@ -32,9 +28,6 @@ import logging
 
 def get_logger():
     return logging.getLogger(__name__)
-
-
-CONTACT = "oliver.frost@desy.de"
 
 
 def getNaiveBetheEnergyLoss(p, pdg_code, s):

@@ -22,6 +22,7 @@ import svd.validation_utils as vu
 
 import ROOT as r
 r.PyConfig.IgnoreCommandLineOptions = True
+r.gROOT.SetBatch()
 
 matplotlib.use('Agg')
 plt.style.use("belle2")

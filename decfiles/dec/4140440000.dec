@@ -1,0 +1,22 @@
+# EventType: 4140440000
+# Descriptor: [Y4S->pi0pi0/pippim/eta/eta'[Y1S->mu+mu-]]
+# NickName: Y4S_pi0pi0/pippim/eta/eta'Y1S_mumu
+# Cuts: None
+# Documentation: Upsilon(4S) decay process
+# PhysicsWG: Quarkonium
+# Tested: Yes
+# Responsible: Yang Li
+# Email: y_li21@m.fudan.edu.cn
+# Date: 20240220
+
+Decay  Upsilon(4S)
+0.25   Upsilonsig  pi0  pi0  VVPIPI;
+0.25   Upsilonsig  pi+  pi-  VVPIPI;
+0.25   Upsilonsig  eta    PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
+0.25   Upsilonsig  eta'   PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
+Enddecay
+
+Decay  Upsilonsig
+1.0    mu+  mu-  VLL;
+Enddecay
+End

@@ -137,7 +137,7 @@ void DesSerCOPPER::DataAcquisition()
           m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_prev_ftsweve32, m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           m_prev_exprunsubrun_no = m_exprunsubrun_no;
           //    fillNewRawCOPPERHeader( &temp_rawcopper );
-        } catch (string err_str) {
+        } catch (const string& err_str) {
           print_err.PrintError(m_shmflag, &m_status, err_str);
           exit(1);
         }
@@ -151,7 +151,7 @@ void DesSerCOPPER::DataAcquisition()
         //  temp_rawdatablk->SetBuffer(temp_buf, m_size_word, delete_flag, num_events, num_nodes);
         raw_datablk[ j ].SetBuffer(temp_buf, m_size_word, delete_flag, num_events, num_nodes);
 
-      } catch (string err_str) {
+      } catch (const string& err_str) {
         printf("Error was detected\n"); fflush(stdout);
         break;
       }
@@ -181,7 +181,7 @@ void DesSerCOPPER::DataAcquisition()
       }
       try {
         m_sent_totbytes += sendByWriteV(&(raw_datablk[ j ]));
-      } catch (string err_str) {
+      } catch (const string& err_str) {
 #ifdef NONSTOP
         break;
 #endif
@@ -561,14 +561,14 @@ int DesSerCOPPER::readFD(int fd, char* buf, int data_size_byte, int /*delete_fla
         string err_str;
         try {
           callCheckRunPause(err_str);
-        } catch (string err_str) {
+        } catch (const string& err_string) {
           if (delete_flag) {
             // Delete allocated buffer
             //            B2WARNING("Delete buffer before going to Run-pause state");
             printf("[WARNING] Delete buffer before going to Run-pause state\n"); fflush(stdout);
             delete buf;
           }
-          throw (err_str);
+          throw (err_string);
         }
 #endif
         continue;

@@ -25,7 +25,7 @@ namespace Belle2 {
     virtual ~svdDumpModule() {};
 
     //! module functions
-    virtual void initialize() override; /**< requires RawSVDs adn create output file*/
+    virtual void initialize() override; /**< requires RawSVDs and create output file*/
     virtual void beginRun() override; /**< print begin run*/
     virtual void endRun() override; /**< print end run*/
     virtual void event() override; /**< dump RawSVDs*/

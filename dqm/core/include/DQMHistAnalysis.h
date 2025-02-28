@@ -15,6 +15,7 @@
 #include <framework/core/Module.h>
 #include <dqm/core/MonitoringObject.h>
 #include <dqm/analysis/HistObject.h>
+#include <dqm/analysis/RefHistObject.h>
 #include <dqm/analysis/HistDelta.h>
 #include <TFile.h>
 #include <TH1.h>
@@ -36,23 +37,65 @@ namespace Belle2 {
 
   public:
     /**
+     * Status flag of histogram/canvas
+    */
+    enum EStatus {
+      c_StatusTooFew = 0, /**< Not enough entries/event to judge */
+      c_StatusDefault = 1, /**< default for non-coloring */
+      c_StatusGood = 2, /**< Analysis result: Good */
+      c_StatusWarning = 3, /**< Analysis result: Warning, there may be minor issues */
+      c_StatusError = 4 /**< Analysis result: Severe issue found */
+    };
+
+    /**
+     * Status colors of histogram/canvas (corresponding to status)
+    */
+    enum EStatusColor {
+      c_ColorTooFew = kGray, /**< Not enough entries/event to judge */
+      c_ColorDefault = kWhite, /**< default for non-coloring */
+      c_ColorGood = kGreen, /**< Analysis result: Good */
+      c_ColorWarning = kYellow, /**< Analysis result: Warning, there may be minor issues */
+      c_ColorError = kRed /**< Analysis result: Severe issue found */
+    };
+
+    /**
+     * Reference plot scaling type
+    */
+    enum ERefScaling {
+      c_RefScaleNone = 0, /**< no scaling */
+      c_RefScaleEntries = 1, /**< to number of entries (integral) */
+      c_RefScaleMax = 2 /**< to maximum (bin entry) */
+    };
+
+    /**
      * The type of list of histograms.
      */
     typedef std::map<std::string, HistObject> HistList;
     /**
      * The type of list of MonitoringObjects.
      */
-    typedef std::map<std::string, MonitoringObject*> MonObjList;
+    typedef std::map<std::string, MonitoringObject> MonObjList;
 
     /**
      * The type of list of delta settings and histograms.
      */
-    typedef std::map<std::string, HistDelta*> DeltaList;
+    typedef std::map<std::string, HistDelta> DeltaList;
 
     /**
      * The type of list of canvas updated status.
      */
     typedef std::map<std::string, bool> CanvasUpdatedList;
+
+    /**
+     * The type of list of references.
+     */
+    typedef std::map<std::string, RefHistObject> RefList;
+
+    /**
+    * Clear all static global lists
+    */
+    void clearlist(void);
+
 
   private:
     /**
@@ -64,15 +107,22 @@ namespace Belle2 {
      */
     static MonObjList s_monObjList;
 
+  public:
     /**
      * The list of Delta Histograms and settings.
      */
     static DeltaList s_deltaList;
+  private:
 
     /**
      * The list of canvas updated status.
      */
     static CanvasUpdatedList s_canvasUpdatedList;
+
+    /**
+     * The list of references.
+     */
+    static RefList s_refList;
 
     /**
      * Number of Events processed to fill histograms.
@@ -107,11 +157,20 @@ namespace Belle2 {
 
 
 #ifdef _BELLE2_EPICS
-    //! Vector of EPICS PVs
-    std::vector <chid>  m_epicsChID;
-    //! Map of (key)names to EPICS PVs
+    //! Vector of EPICS PVs, static as it contains all
+    static std::vector <chid>  m_epicsChID;
+    //! Map of (key)names to EPICS PVs, non static, as per module
     std::map <std::string, chid> m_epicsNameToChID;
 #endif
+
+    /**
+     * Register a PV with its name and a key name
+     * @param prefix prefix to PV name
+     * @param pvname full PV name without prefix
+     * @param keyname key name for easier access
+     * @return an index which can be used to access the PV instead of key name, -1 if failure
+     */
+    int registerEpicsPVwithPrefix(std::string prefix, std::string pvname, std::string keyname = "");
 
   public:
     /**
@@ -124,7 +183,7 @@ namespace Belle2 {
      * Get the list of MonitoringObjects.
      * @return The list of the MonitoringObjects.
      */
-    static const MonObjList& getMonObjList() { return s_monObjList;};
+    static /*const*/ MonObjList& getMonObjList() { return s_monObjList;};
 
     /**
      * Get the list of the delta histograms.
@@ -137,6 +196,13 @@ namespace Belle2 {
      * @return The list of the canvases.
      */
     static const CanvasUpdatedList& getCanvasUpdatedList() { return s_canvasUpdatedList;};
+
+    /**
+     * Get the list of the reference histograms.
+     * @return The list of the reference  histograms.
+     */
+    // Unused:
+    //static const RefList& getRefList() { return s_refList;};
 
     /**
      * Get the Run Type.
@@ -188,6 +254,34 @@ namespace Belle2 {
                          const std::string& histname, bool onlyIfUpdated = false);
 
     /**
+     * Get referencehistogram from list (no other search).
+     * @param histname The name of the histogram (incl dir).
+     * @param scaling enum what scaling to use
+     * @param hist histogram to scale to
+     * @return The found histogram, or nullptr if not found.
+     */
+    static TH1* findRefHist(const std::string& histname, ERefScaling scaling = ERefScaling::c_RefScaleNone, const TH1* hist = nullptr);
+
+    /**
+     * Find reference histogram.
+     * @param dirname  The name of the directory.
+     * @param histname The name of the histogram.
+     * @param scaling enum what scaling to use
+     * @param hist histogram to scale to
+     * @return The found histogram, or nullptr if not found.
+     */
+    static TH1* findRefHist(const std::string& dirname,
+                            const std::string& histname, ERefScaling scaling = ERefScaling::c_RefScaleNone, const TH1* hist = nullptr);
+
+    /** Using the original and reference, create scaled version
+     * @param scaling scaling algorithm
+     * @param hist pointer to histogram
+     * @param ref pointer to reference
+     * @return scaled reference
+     */
+    static TH1* scaleReference(ERefScaling scaling, const TH1* hist, TH1* ref);
+
+    /**
      * Find histogram in specific TFile (e.g. ref file).
      * @param file  The TFile to search.
      * @param histname The name of the histogram, can incl directory
@@ -198,9 +292,10 @@ namespace Belle2 {
     /**
      * Find histogram in corresponding canvas.
      * @param hname Name of the histogram (dir+name)
+     * @param canvas ptr to specific canvas ptr or nullptr
      * @return The pointer to the histogram, or nullptr if not found.
      */
-    TH1* findHistInCanvas(const std::string& hname);
+    TH1* findHistInCanvas(const std::string& hname, TCanvas** canvas = nullptr);
 
     /**
      * Find MonitoringObject.
@@ -229,11 +324,24 @@ namespace Belle2 {
                         const std::string& histname, TH1* h);
 
     /**
+     * Add reference histogram.
+     * @param dirname The name of the directory.
+     * @param hist The TH1 pointer for the reference.
+    */
+    void addRefHist(const std::string& dirname, TH1* hist);
+
+
+    /**
      * Get MonitoringObject with given name (new object is created if non-existing)
-     * @param histname name of MonitoringObject to get
+     * @param name name of MonitoringObject to get
      * @return The MonitoringObject
      */
-    static MonitoringObject* getMonitoringObject(const std::string& histname);
+    static MonitoringObject* getMonitoringObject(const std::string& name);
+
+    /**
+     * Clear content of all Canvases
+     */
+    void clearCanvases(void);
 
     /**
      * Reset the list of histograms.
@@ -244,6 +352,16 @@ namespace Belle2 {
      * Clears the list of histograms.
      */
     static void clearHistList(void);
+
+    /**
+     * Clears the list of ref histograms.
+     */
+    static void clearRefList(void);
+
+    /**
+     * Reset Delta
+     */
+    void resetDeltaList(void);
 
     /**
      * Get Delta histogram.
@@ -269,7 +387,7 @@ namespace Belle2 {
      * @param dirname directory
      * @param histname name of histogram
      * @param t type of delta histogramming
-     * @param p numerical parameter depnding on type, e.g. number of entries
+     * @param p numerical parameter depending on type, e.g. number of entries
      * @param a amount of histograms in the past
      */
     void addDeltaPar(const std::string& dirname, const std::string& histname,  HistDelta::EDeltaType t, int p, unsigned int a = 1);
@@ -304,22 +422,25 @@ namespace Belle2 {
     /**
      * Extract event processed from daq histogram, called from input module
      */
-    void ExtractEvent(std::vector <TH1*>& hs);
+    void ExtractNEvent(std::vector <TH1*>& hs);
 
     /// EPICS related Functions
 
     /**
      * Register a PV with its name and a key name
-     *
-     * If you register large number of PVs at once, consider setting
-     * update_pvs = false and explicitly running updateEpicsPVs()
-     *
      * @param pvname full PV name
      * @param keyname key name for easier access
-     * @param update_pvs if true, update all PVs (flush network) after new PV is registered
      * @return an index which can be used to access the PV instead of key name, -1 if failure
      */
-    int registerEpicsPV(std::string pvname, std::string keyname = "", bool update_pvs = true);
+    int registerEpicsPV(std::string pvname, std::string keyname = "");
+
+    /**
+     * Register a PV with its name and a key name
+     * @param pvname full PV name
+     * @param keyname key name for easier access
+     * @return an index which can be used to access the PV instead of key name, -1 if failure
+     */
+    int registerExternalEpicsPV(std::string pvname, std::string keyname = "");
 
     /**
      * Write value to a EPICS PV
@@ -396,8 +517,9 @@ namespace Belle2 {
     /**
      * Update all EPICS PV (flush to network)
      * @param timeout maximum time until timeout in s
+     * @return status of ca_pend_io
      * */
-    void updateEpicsPVs(float timeout);
+    int updateEpicsPVs(float timeout);
 
     /**
      * Get EPICS PV Channel Id
@@ -486,6 +608,58 @@ namespace Belle2 {
      * @param prefix Prefix to set
      */
     void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
+
+    /**
+     * Helper function to judge the status for coloring and EPICS
+     * @param enough enough events for judging
+     * @param warn_flag outside of expected range
+     * @param error_flag outside of warning range
+     * @return the status
+     */
+    EStatus makeStatus(bool enough, bool warn_flag, bool error_flag);
+
+    /**
+     * Helper function for Canvas colorization
+     * @param canvas Canvas to change
+     * @param status status to color
+     */
+    void colorizeCanvas(TCanvas* canvas, EStatus status);
+
+    /**
+     * Return color for canvas state
+     * @param status canvas status
+     * @return alarm color
+     */
+    EStatusColor getStatusColor(EStatus status);
+
+    /**
+     * Check the status of all PVs and report if disconnected or not found
+     */
+    void checkPVStatus(void);
+
+    /**
+     * check the status of a PVs and report if disconnected or not found
+     * @param pv the chid of the PV to check
+     * @param onlyError print only if in error condition (default)
+     */
+    void printPVStatus(chid pv, bool onlyError = true);
+
+    /**
+     * check the return status and check PV in case of error
+     * @param state return state of epics function
+     * @param message message to print out
+     * @param name the (key)name of the affected PV
+     */
+    void CheckEpicsError(int state, const std::string& message, const std::string& name);
+
+    /**
+     * check the return status and check PV in case of error
+     * @param state return state of epics function
+     * @param message message to print out
+     * @param id the chid of the affected PV
+     */
+    void CheckEpicsError(int state, const std::string& message, chid id);
+
 
     // Public functions
   public:

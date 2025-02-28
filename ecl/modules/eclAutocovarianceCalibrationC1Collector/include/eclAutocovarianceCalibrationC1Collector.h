@@ -8,14 +8,11 @@
 
 #pragma once
 
-//Calibration
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
-
-//Framework
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-//Root
+/* ROOT headers. */
 #include <TH2F.h>
 
 namespace Belle2 {

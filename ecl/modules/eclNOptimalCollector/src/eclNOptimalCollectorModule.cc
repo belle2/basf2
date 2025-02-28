@@ -88,7 +88,6 @@ void eclNOptimalCollectorModule::prepare()
 
   //..Record the thetaID of each cellID
   neighbours = new ECLNeighbours("N", 1);
-  std::vector<int> thetaIDofCrysID;
   std::vector<int> nCrysPerRing;
   for (int thID = 0; thID < 69; thID++) {
     const int nCrys = neighbours->getCrystalsPerRing(thID);
@@ -160,6 +159,18 @@ void eclNOptimalCollectorModule::prepare()
   auto groupNumberOfEachCellID = new TH1F("groupNumberOfEachCellID", "group number of each cellID;cellID",
                                           ECLElementNumbers::c_NCrystals, 1, 8737);
   registerObject<TH1F>("groupNumberOfEachCellID", groupNumberOfEachCellID);
+
+  //-----------------------------------------------------------------
+  //..Histograms to check MC sample properties
+  auto entriesPerThetaIdEnergy = new TH2F("entriesPerThetaIdEnergy", "Entries per thetaID/energy point;thetaID;energy point", 69, 0,
+                                          69, m_numberEnergies, 0, m_numberEnergies);
+  registerObject<TH2F>("entriesPerThetaIdEnergy", entriesPerThetaIdEnergy);
+
+  auto mcEnergyDiff = new TH2F("mcEnergyDiff", "mc E minus nominal (MeV) per thetaID/energy point;thetaID;energy point", 69, 0, 69,
+                               m_numberEnergies, 0, m_numberEnergies);
+  mcEnergyDiff->Sumw2();
+  registerObject<TH2F>("mcEnergyDiff", mcEnergyDiff);
+
 
   //-----------------------------------------------------------------
   //..Histograms to store the sum of n crystals. One per group / energy.
@@ -280,13 +291,20 @@ void eclNOptimalCollectorModule::collect()
   const int nMC = m_mcParticleArray.getEntries();
   if (nMC != 1) {return;}
 
-  //..Energy. Convert to integer MeV to get corresponding bin
+  //..Energy. Convert to MeV to get corresponding bin
   const double eTrue = m_mcParticleArray[0]->getEnergy();
-  const int iETrueMev = (int)(1000.*eTrue + 0.5);
+  const float genEnergyMeV = 1000.*eTrue;
+  const float tolerance = std::max(0.002 * genEnergyMeV, 1.0);
 
+  //..Look for generated energy to be close enough to the expected one
   int iEnergy = -1;
+  double minDiff = 9999.;
   for (int ie = 0; ie < m_numberEnergies; ie++) {
-    if (iETrueMev == iEnergies[iRegion][ie]) {
+    double diff = std::abs(genEnergyMeV - iEnergies[iRegion][ie]);
+    if (diff < std::abs(minDiff)) {
+      minDiff = genEnergyMeV - iEnergies[iRegion][ie];
+    }
+    if (diff < tolerance) {
       iEnergy = ie;
       break;
     }
@@ -295,6 +313,10 @@ void eclNOptimalCollectorModule::collect()
   //..Quit if the true energy is not equal to a generated one.
   //  This happens if the cluster is reconstructed in the wrong region.
   if (iEnergy == -1) {return;}
+
+  //..Some statistics for validation
+  getObjectPtr<TH2F>("entriesPerThetaIdEnergy")->Fill(thetaIDofCrysID[iCellId - 1] + 0.001, iEnergy + 0.001);
+  getObjectPtr<TH2F>("mcEnergyDiff")->Fill(thetaIDofCrysID[iCellId - 1] + 0.001, iEnergy + 0.001, minDiff);
 
   //--------------------------------------------------------
   //..Get the ECLCalDigits and weights associated with the cluster,

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -16,6 +15,7 @@ import sys
 import subprocess
 import basf2
 from time import time
+from b2test_utils import skip_test_if_central
 
 """
 Check that no light-release-breaking dependencies have been added.
@@ -68,7 +68,7 @@ def get_dependencies(sconscript_filename):
     ]
     # now just trim only the packagename's from the library names
     # and make a python set of them
-    package_dependencies = set([lb.split("_")[0] for lb in dependencies])
+    package_dependencies = {lb.split("_")[0] for lb in dependencies}
 
     return package_dependencies
 
@@ -106,6 +106,10 @@ def check_dependencies(forbidden, sconscript_files, error=""):
 
 
 if __name__ == "__main__":
+
+    # skip this for central releases because we have no git repository there
+    # (and it's too late to fix anyhow)
+    skip_test_if_central()
 
     # grab all of the light release packages
     # (defined by the .light file for the sparse checkout)

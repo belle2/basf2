@@ -31,7 +31,7 @@ The post-reconstruction dataobjects are C++ classes found in the mdst dataobject
 
         ls $BELLE2_RELASE_DIR/mdst/dataobjects/include
 
-Or in the C++ doxygen documentation `here <https://software.belle2.org/|release|/group__mdst__dataobjects.html>`__.
+Or in the C++ doxygen documentation :doxygen:`here <group__mdst__dataobjects>`.
 
 ROOT and compatibility guarantee
 ================================
@@ -50,7 +50,7 @@ I.e. use of the basf2 framework and the :ref:`analysis` package is mandatory.
 
 However! Backward-compatibility is guaranteed for two major basf2 releases and the supported light releases.
 
-.. seealso:: `Backward compatibility <https://confluence.desy.de/display/BI/Backward+Compatibility>`__ on confluence.
+.. seealso:: `Backward compatibility <https://xwiki.desy.de/xwiki/rest/p/0a372>`__ on XWiki.
 
 Related packages
 ================

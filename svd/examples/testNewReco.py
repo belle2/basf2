@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -34,7 +33,7 @@ class SVDClustersQuickCheck(b2.Module):
     def initialize(self):
         '''define histograms'''
 
-        #: \cond
+        #: \cond Doxygen_suppress
         self.test = []
         self.testNew = []
         self.size = TH1F("cl_size", "Cluster Size", 20, 0, 20)
@@ -103,7 +102,7 @@ class SVDClustersQuickCheck(b2.Module):
         for d in clusterList:
             trueList = d.getRelationsTo('SVDTrueHits')  # SVDClustersToSVDTrueHits
             isU = 0
-            if(d.isUCluster()):
+            if (d.isUCluster()):
                 isU = 0.5
                 truePos = trueList[0].getU()
             else:
@@ -137,7 +136,7 @@ class SVDClustersQuickCheck(b2.Module):
 
             isU = 0
             trueListNew = d.getRelationsTo('SVDTrueHits')  # SVDClustersToSVDTrueHits
-            if(d.isUCluster()):
+            if (d.isUCluster()):
                 isU = 0.5
                 truePos = trueListNew[0].getU()
             else:
@@ -271,7 +270,7 @@ class SVDRecoDigitsQuickCheck(b2.Module):
     def initialize(self):
         '''define histograms'''
 
-        #: \cond
+        #: \cond Doxygen_suppress
         self.test = []
         self.testNew = []
         self.time = TH1F("rd_time", "RecoDigit Time", 300, -100, 200)
@@ -313,7 +312,7 @@ class SVDRecoDigitsQuickCheck(b2.Module):
             self.time.Fill(d.getTime())
             self.charge.Fill(d.getCharge())
             isU = 0
-            if(d.isUStrip()):
+            if (d.isUStrip()):
                 isU = 0.5
             self.test[d.getSensorID().getLayerNumber() - 3].Fill(d.getSensorID().getLadderNumber(),
                                                                  d.getSensorID().getSensorNumber() + isU)
@@ -322,7 +321,7 @@ class SVDRecoDigitsQuickCheck(b2.Module):
             self.timeNew.Fill(d.getTime())
             self.chargeNew.Fill(d.getCharge())
             isU = 0
-            if(d.isUStrip()):
+            if (d.isUStrip()):
                 isU = 0.5
             self.testNew[d.getSensorID().getLayerNumber() - 3].Fill(d.getSensorID().getLadderNumber(),
                                                                     d.getSensorID().getSensorNumber() + isU)
@@ -373,7 +372,7 @@ add_simulation(
 
 add_svd_reconstruction(main)
 for mod in main.modules():
-    if(mod.name() == "SVDSimpleClusterizer"):
+    if (mod.name() == "SVDSimpleClusterizer"):
         mod.param("timeAlgorithm", 0)
         mod.param("HeadTailSize", 3)
 

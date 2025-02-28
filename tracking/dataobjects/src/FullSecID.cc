@@ -152,7 +152,7 @@ std::string FullSecID::getFullSecString() const
 //
 //
 // FullSecID::FullSecID(VxdID vxdID, bool subLayerID, unsigned int sectorNumber):
-//   m_fullSecID(0)   // setting to 0 to be shure that value is 0 when using it within the brackets
+//   m_fullSecID(0)   // setting to 0 to be sure that value is 0 when using it within the brackets
 // {
 //   unsigned int LayerID = vxdID.getLayerNumber();
 //   unsigned int SubLayerID = subLayerID; // converting to int

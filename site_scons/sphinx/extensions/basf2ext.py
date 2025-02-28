@@ -106,6 +106,8 @@ class ModuleListDirective(Directive):
 
     def show_module(self, module, library):
         description = module.description().splitlines()
+        for i, line in enumerate(description):
+            description[i] = line.replace('|release|', self.state.document.settings.env.app.config.release)
         # pretend to be the autodoc extension to let other events process
         # the doc string. Enables Google/Numpy docstrings as well as a bit
         # of doxygen docstring conversion we have
@@ -130,9 +132,9 @@ class ModuleListDirective(Directive):
                 dest += [f"    * **{p.name}** *({p.type}{default})*"]
                 dest += param_desc
 
-            if(required_params):
+            if (required_params):
                 description += [":Required Parameters:", "    "] + required_params
-            if(optional_params):
+            if (optional_params):
                 description += [":Parameters:", "    "] + optional_params
 
         if "io-plots" in self.options:
@@ -282,6 +284,46 @@ def gitlab_issue_role(role, rawtext, text, lineno, inliner, options=None, conten
     return [nodes.reference(rawtext, text=text, refuri=url)], []
 
 
+def doxygen_role(role, rawtext, text, lineno, inliner, options=None, content=None):
+    if content is None:
+        content = []
+    if options is None:
+        options = {}
+    release_version = inliner.document.settings.env.app.config.release
+    match = re.match(r'(.+?)<(.+?)>', text)
+    if match:
+        display_text, url_text = match.groups()
+    else:
+        display_text = text
+        url_text = text
+    if "html#" in url_text:
+        url = f"https://software.belle2.org/{release_version}/doxygen/{url_text}"
+    else:
+        url = f"https://software.belle2.org/{release_version}/doxygen/{url_text}.html"
+
+    return [nodes.reference(rawsource=rawtext, text=display_text, refuri=url)], []
+
+
+def sphinx_role(role, rawtext, text, lineno, inliner, options=None, content=None):
+    if content is None:
+        content = []
+    if options is None:
+        options = {}
+    release_version = inliner.document.settings.env.app.config.release
+    match = re.match(r'(.+?)<(.+?)>', text)
+    if match:
+        display_text, url_text = match.groups()
+    else:
+        display_text = text
+        url_text = text
+    if "html#" in url_text:
+        url = f"https://software.belle2.org/{release_version}/sphinx/{url_text}"
+    else:
+        url = f"https://software.belle2.org/{release_version}/sphinx/{url_text}.html"
+
+    return [nodes.reference(rawsource=rawtext, text=display_text, refuri=url)], []
+
+
 def setup(app):
     import basf2
     basf2.logging.log_level = basf2.LogLevel.WARNING
@@ -294,6 +336,8 @@ def setup(app):
     app.add_directive("b2-variables", VariableListDirective)
     app.add_directive("docstring", RenderDocstring)
     app.add_role("issue", gitlab_issue_role)
+    app.add_role("doxygen", doxygen_role)
+    app.add_role("sphinx", sphinx_role)
     app.connect('html-page-context', html_page_context)
 
     # Sadly sphinx does not seem to add labels to custom indices ... :/

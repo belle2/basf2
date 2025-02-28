@@ -6,10 +6,8 @@ Cut strings and selections
 Cut strings in ``basf2`` analysis scripts work quite intuitively, particularly if you're comfortable with python logic.
 There are some minor differences with respect to  `ROOT <https://root.cern.ch>`_ cut strings.
 
-Cut strings are used to manipulate candidates (i.e. `ParticleList`_ s) with `modularAnalysis.applyCuts`, and `modularAnalysis.cutAndCopyList`.
+Cut strings are used to manipulate candidates (i.e. :doxygen:`ParticleList <classBelle2_1_1ParticleList>` s) with `modularAnalysis.applyCuts`, and `modularAnalysis.cutAndCopyList`.
 Events selections are applied with `modularAnalysis.applyEventCuts`.
-
-.. _ParticleList: https://software.belle2.org/development/classBelle2_1_1ParticleList.html
 
 Allowed comparisons are ``<``, ``<=``, ``>``, ``>=``, ``==`` and ``!=``.
 Two-sided inequalities like ``1.2 < M < 1.5`` also work as expected.
@@ -40,10 +38,8 @@ Boolean literals can be written in both python ``True/False`` and c++ ``true/fal
 
 .. hint::
 
-   For a more in-depth documentation of cut strings for developers, you can refer to the `doxygen documentation`_
+   For a more in-depth documentation of cut strings for developers, you can refer to the :doxygen:`doxygen documentation <classBelle2_1_1GeneralCut>`
    for the ``GeneralCut`` class.
-
-.. _doxygen documentation: https://software.belle2.org/|release|/classBelle2_1_1GeneralCut.html
 
 .. hint:: In previous versions the `formula` MetaVariable was needed to support formulas in cuts. This is still supported but not necessary anymore.
 

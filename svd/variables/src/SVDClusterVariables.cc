@@ -224,27 +224,12 @@ namespace Belle2::Variable {
   REGISTER_METAVARIABLE("SVDClusterCharge(i)", SVDClusterCharge,
                         "Returns the charge of the i-th SVD cluster related to the Particle.",
                         Manager::VariableDataType::c_double);
-
   REGISTER_METAVARIABLE("SVDClusterSNR(i)", SVDClusterSNR,
                         "Returns the SNR of the i-th SVD cluster related to the Particle.",
                         Manager::VariableDataType::c_double);
-
   REGISTER_METAVARIABLE("SVDClusterSize(i)", SVDClusterSize,
                         "Returns the size of the i-th SVD cluster related to the Particle.",
                         Manager::VariableDataType::c_int);
-
-  REGISTER_METAVARIABLE("SVDLayer(i)", SVDLayer,
-                        "Returns the layer number of the i-th SVD cluster related to the Particle.",
-                        Manager::VariableDataType::c_int);
-  REGISTER_METAVARIABLE("SVDLadder(i)", SVDLadder,
-                        "Returns the ladder number of the i-th SVD cluster related to the Particle.",
-                        Manager::VariableDataType::c_int);
-  REGISTER_METAVARIABLE("SVDSensor(i)", SVDSensor,
-                        "Returns the sensor number of the i-th SVD cluster related to the Particle.",
-                        Manager::VariableDataType::c_int);
-  REGISTER_METAVARIABLE("SVDSide(i)", SVDSide,
-                        "Returns true if the i-th SVD cluster related to the Particle is a U cluster.",
-                        Manager::VariableDataType::c_bool);
   REGISTER_METAVARIABLE("SVDClusterTime(i)", SVDClusterTime,
                         "Returns the time of the i-th SVD cluster related to the Particle.",
                         Manager::VariableDataType::c_double);

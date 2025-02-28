@@ -13,10 +13,18 @@ class PXDReader(basf2.Module):
     '''
 
     def initialize(self):
+        '''
+        Initialize the PyStoreArray and regiter it into the DataStore
+        '''
+        #: PyStoreArray
         self.pxddigits = PyStoreArray("PXDDigits", DataStore.c_Event)
         self.pxddigits.registerInDataStore("PXDDigits")
 
     def event(self):
+        '''
+        Loop over the number of events and read the content of the
+        PyStoreArray into a dictionary
+        '''
         digits = self.pxddigits.readArray()
         print(digits)
 

@@ -13,6 +13,9 @@ class TestFillReadArray(unittest.TestCase):
     '''
 
     def test_readArray(self):
+        '''
+        Test for the readArray function
+        '''
         l_pxd = []
         sids = np.array([1, 2, 3, 4, 5], dtype=np.ushort)
         ucells = np.array([10, 20, 30, 40, 50], dtype=np.ushort)
@@ -40,6 +43,9 @@ class TestFillReadArray(unittest.TestCase):
         arr_ptr.Clear()
 
     def test_fillArray(self):
+        '''
+        Test for the fillArray function
+        '''
         sids = np.array([1, 2, 3, 4, 5])
         ucells = np.array([10, 20, 30, 40, 50])
         vcells = np.array([15, 25, 35, 45, 55])

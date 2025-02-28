@@ -128,28 +128,34 @@ class ConstructorNotFoundError(Exception):
     Class that throws an exception when a specific constructor is not found.
     The error message will contain the signature of the wanted constructor,
     as well as the signature of the available constructors.
-    Parameters:
-    -----------
-    members: dictionary
-        Contains the name of the parameters of the wanted constructor and their types
-
-    list_constructors: list of dictionaries
-        Contains all the available constructors, with the names of their parameters
-        and their types
-
-    obj_name: string
-        Name of the class of which the constructor is wanted
     '''
     def __init__(self, members, list_constructors, obj_name):
+        '''
+        Parameters:
+        -----------
+        members: dictionary
+            Contains the name of the parameters of the wanted constructor and their types
+
+        list_constructors: list of dictionaries
+            Contains all the available constructors, with the names of their parameters
+            and their types
+
+        obj_name: string
+            Name of the class of which the constructor is wanted
+        '''
+        #: Member contatining the final message of the exception
         self.message = "No corresponding constructor found. Looking for signature: \n"
-        self.d = members
+        #: Dictionary
+        self.members = members
+        #: List of constructors
         self.list_constructors = list_constructors
+        #: Name of the class
         self.name = obj_name
         self.message = self.message + self.name + "("
         self.message = (self.message +
-                        ", ".join([" ".join(i) for i in list(zip(self.d.values(), self.d.keys()))]) +
+                        ", ".join([" ".join(i) for i in list(zip(self.members.values(), self.members.keys()))]) +
                         ")\n Available constructors:\n")
-        for lis in list_constructors:
+        for lis in self.list_constructors:
             self.message = (self.message +
                             self.name + "(" + ", ".join([" ".join(i) for i in list(zip(lis.values(), lis.keys()))]) + ")\n")
         super().__init__(self.message)

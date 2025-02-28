@@ -43,15 +43,30 @@ class InjectPXDDigits(basf2.Module):
     """
 
     def __init__(self, digits_arrays):
+        '''
+        Initialization
+        --------------
+        digits_array: array of digits with lenght equal to the number of events
+        '''
+        #: Array of digits
         self.digits_arrays = digits_arrays
         super().__init__()
 
     def initialize(self):
+        '''
+        Initialization of the PyStoreArray and registration in the DataStore
+        '''
+        #: PyStoreArray
         self.pxddigits = PyStoreArray("PXDDigits", DataStore.c_Event)
         self.pxddigits.registerInDataStore("PXDDigits")
+        #: Iterator of the digits array
         self.it_digits = iter(self.digits_arrays)
 
     def event(self):
+        '''
+        For each event take the corresponding entry of digits_array and write it
+        into the PyStoreArray
+        '''
         digits = next(self.it_digits)
         keys = ["sensorID", "uCellID", "vCellID", "charge"]
         sensorID, uCellID, vCellID, charge = [

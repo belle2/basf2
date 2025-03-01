@@ -15,6 +15,7 @@
 #include <mdst/dbobjects/TRGGDLDBInputBits.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 
+#include <array>
 #include <string>
 
 namespace Belle2 {
@@ -56,6 +57,9 @@ namespace Belle2 {
 
     /** Extension name for branches from beam background overlay */
     std::string m_extensionName;
+
+    /** Array of L1 input bit names to overlay */
+    const std::array<std::string, 4> m_inputBitNames{{"cdc_veto", "ecl_veto", "cdcecl_veto", "passive_veto"}};
 
   };
 

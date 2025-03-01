@@ -39,13 +39,12 @@ void TRGGRLInjectionVetoFromOverlayModule::event()
   if (!m_TRGGRLInfoFromSimulation.isValid() or !m_TRGSummaryFromOverlay.isValid())
     return;
   try {
-    // Set the passive_veto and cdcecl_veto input lines according to what is written in the BGO event
-    const unsigned int passive_vetoBit = m_TRGInputBits->getinbitnum("passive_veto");
-    const bool passive_vetoAnswer = m_TRGSummaryFromOverlay->testInput("passive_veto");
-    m_TRGGRLInfoFromSimulation->setInputBits(passive_vetoBit, passive_vetoAnswer);
-    const unsigned int cdcecl_vetoBit = m_TRGInputBits->getinbitnum("cdcecl_veto");
-    const bool cdcecl_vetoAnswer = m_TRGSummaryFromOverlay->testInput("cdcecl_veto");
-    m_TRGGRLInfoFromSimulation->setInputBits(cdcecl_vetoBit, cdcecl_vetoAnswer);
+    for (const std::string& inputBitName : m_inputBitNames) {
+      // Set the relevant input lines according to what is written in the BGO event
+      const unsigned int inputBitNumber = m_TRGInputBits->getinbitnum(inputBitName.c_str());
+      const bool inputBitAnswer = m_TRGSummaryFromOverlay->testInput(inputBitName.c_str());
+      m_TRGGRLInfoFromSimulation->setInputBits(inputBitNumber, inputBitAnswer);
+    }
   } catch (const std::exception&) {
     // TRGSummary methods can throw out_of_range, runtime_error and invalid_argument exceptions
     // Also: the methods already print a warning or an error before throwing the exception,

@@ -9,7 +9,6 @@
 #pragma once
 
 #include <TMatrixDSym.h>
-#include <TVector3.h>
 #include <Math/Vector3D.h>
 
 namespace Belle2 {
@@ -53,9 +52,9 @@ namespace Belle2 {
      * @param ipPosition position in basf2 units: cm
      * @param covariance covariance matrix of the vertex position.
      */
-    void setIP(const TVector3& ipPosition, const TMatrixDSym& covariance)
+    void setIP(const ROOT::Math::XYZVector& ipPosition, const TMatrixDSym& covariance)
     {
-      m_IPPosition = ROOT::Math::XYZVector(ipPosition.X(), ipPosition.Y(), ipPosition.Z());
+      m_IPPosition = ipPosition;
       m_IPPositionCovMatrix = covariance;
     }
 

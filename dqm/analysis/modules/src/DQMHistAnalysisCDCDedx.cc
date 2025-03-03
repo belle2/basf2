@@ -200,8 +200,6 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
 
     m_status = "LowStats";
 
-    // TH1D* h_dEdxClone = (TH1D*)h_dEdx->Clone("hdEdx_clone");
-    // if (h_dEdxClone != nullptr) {
     if (h_dEdxClone->Integral() > 250) {
       fitHistogram(h_dEdxClone, m_status);
       if (m_status == "OK") {
@@ -223,7 +221,6 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
     m_monObj->setVariable("CDCDedxMeanErr", m_meanerr);
     m_monObj->setVariable("CDCDedxResoErr", m_sigmaerr);
 
-    // TF1* f_gausC = (TF1*)f_gaus->Clone("f_gausC");
     f_gaus->SetLineColor(kRed);
     f_gaus->DrawClone("same");
 
@@ -241,7 +238,6 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
     m_pave->Clear();
     m_pave->SetX1NDC(0.60); m_pave->SetX2NDC(0.85); m_pave->SetY1NDC(0.69); m_pave->SetY2NDC(0.89);
 
-    // TPaveText* pinfo1 = new TPaveText(0.60, 0.69, 0.85, 0.89, "NBNDC");
     setTextStyle(m_pave);
     m_pave->AddText(Form("-- Expert info"));
     m_pave->AddText(Form("-------------"));
@@ -250,8 +246,6 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
     m_pave->DrawClone("same");
 
     m_status.clear();
-    // delete h_dEdxClone;
-    // delete f_gausC;
   }
 }
 
@@ -279,7 +273,6 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
       m_pave->Clear();
       m_pave->SetX1NDC(0.609); m_pave->SetX2NDC(0.942); m_pave->SetY1NDC(0.710); m_pave->SetY2NDC(0.911);
 
-      // TPaveText* pinfo = new TPaveText(0.609, 0.710, 0.942, 0.911, "NBNDC");
       setTextStyle(m_pave);
       m_pave->AddText("CDC-dE/dx Intra-run");
       setBEvtInfo(m_pave);
@@ -302,9 +295,11 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
 
     if (nbin <= 0) nbin = 1;
 
+    delete h_dEdxIRMean;
     h_dEdxIRMean = new TH1F("h_dEdxIRMean", "", nbin, 0.5, nbin + 0.5);
     h_dEdxIRMean->SetTitle("CDC-dE/dx gain(#mu): intra-run variation;Events(M);dE/dx (#mu_{fit})");
 
+    delete h_dEdxIRSigma;
     h_dEdxIRSigma = new TH1F("h_dEdxIRSigma", "", nbin, 0.5, nbin + 0.5);
     h_dEdxIRSigma->SetTitle("CDC-dE/dx reso.(#sigma): intra-run variation;Events(M);dE/dx (#sigma_{fit})");
 
@@ -343,7 +338,6 @@ void DQMHistAnalysisCDCDedxModule::drawBandPlot()
     m_pave->Clear();
     m_pave->SetX1NDC(0.60); m_pave->SetX2NDC(0.85); m_pave->SetY1NDC(0.77); m_pave->SetY2NDC(0.89);
 
-    // TPaveText* pinfo0 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
     setTextStyle(m_pave);
     m_pave->AddText(Form("IP tracks (hadron)"));
     m_pave->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
@@ -376,7 +370,6 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
     m_pave->Clear();
     m_pave->SetX1NDC(0.60); m_pave->SetX2NDC(0.85); m_pave->SetY1NDC(0.77); m_pave->SetY2NDC(0.89);
 
-    // TPaveText* pinfo0 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
     setTextStyle(m_pave);
     setBEvtInfo(m_pave);
     m_pave->DrawClone("same");
@@ -397,7 +390,6 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
     m_pave->Clear();
     m_pave->SetX1NDC(0.60); m_pave->SetX2NDC(0.85); m_pave->SetY1NDC(0.77); m_pave->SetY2NDC(0.89);
 
-    // TPaveText* pinfo1 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
     setTextStyle(m_pave);
     setBEvtInfo(m_pave);
     m_pave->DrawClone("same");
@@ -427,8 +419,6 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTime()
     l_line->DrawLine(0, m_mean, 80e3, m_mean);
 
     m_lego->Clear();
-    // m_lego->SetX1(0.5); m_lego->SetY1(0.77); m_lego->SetX2(0.6); m_lego->SetY2(0.89);
-    // TLegend m_lego(0.50, 0.77, 0.60, 0.89);
     m_lego->AddEntry(hinjtimeHer, "HER", "f");
     m_lego->AddEntry(hinjtimeLer, "LER", "f");
     m_lego->DrawClone("same");
@@ -436,7 +426,6 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTime()
     m_pave->Clear();
     m_pave->SetX1NDC(0.60); m_pave->SetX2NDC(0.85); m_pave->SetY1NDC(0.77); m_pave->SetY2NDC(0.89);
 
-    // TPaveText* pinfo0 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
     setTextStyle(m_pave);
     setBEvtInfo(m_pave);
     m_pave->DrawClone("same");
@@ -460,6 +449,10 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
     int nbin = (lbin - fbin + 1) / 2;
     if (nbin <= 0)nbin = 1;
 
+    delete h_SigmaHer;
+    delete h_MeanHer;
+    delete h_MeanLer;
+    delete h_SigmaLer;
     h_MeanHer = new TH1F("h_MeanHer", "CDC-dE/dx gain(#mu);Injection time (ms);dE/dx (#mu_{fit})", nbin, 0.5, nbin + 0.5);
     h_SigmaHer = new TH1F("h_SigmaHer", "CDC-dE/dx reso.(#sigma);Injection time (ms);dE/dx (#sigma_{fit})", nbin, 0.5, nbin + 0.5);
 
@@ -478,7 +471,6 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
     h_MeanLer->DrawClone("same");
 
 
-    // TLegend m_lego(0.45, 0.77, 0.60, 0.89);
     m_lego->Clear();
 
     m_lego->AddEntry(h_MeanHer, "HER", "p");
@@ -496,7 +488,6 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
     h_SigmaLer->DrawClone("same");
 
     m_lego->Clear();
-    // TLegend m_lego1(0.45, 0.77, 0.60, 0.89);
     m_lego->AddEntry(h_SigmaHer, "HER", "p");
     m_lego->AddEntry(h_SigmaLer, "LER", "p");
     m_lego->DrawClone("same");
@@ -529,7 +520,6 @@ void DQMHistAnalysisCDCDedxModule::drawWireStatus()
     m_pave->Clear();
     m_pave->SetX1NDC(0.117); m_pave->SetX2NDC(0.148); m_pave->SetY1NDC(0.832); m_pave->SetY2NDC(0.976);
 
-    // TPaveText* pinfo0 = new TPaveText(0.117, 0.832, 0.148, 0.976, "NBNDC");
     setTextStyle(m_pave);
     m_pave->AddText(Form("CDC Wire Status"));
     m_pave->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
@@ -590,7 +580,6 @@ void DQMHistAnalysisCDCDedxModule::drawHistPars(TH1F*& hist, int nbin, double pa
   m_pave->Clear();
   m_pave->SetX1NDC(0.609); m_pave->SetX2NDC(0.942); m_pave->SetY1NDC(0.680); m_pave->SetY2NDC(0.911);
 
-  // TPaveText* pinfo0 = new TPaveText(0.609, 0.680, 0.942, 0.911, "NBNDC");
   setTextStyle(m_pave);
   if (hname == "h_dEdxIRMean" || hname == "h_dEdxIRSigma")  m_pave->AddText("Intra-run variation");
   setBEvtInfo(m_pave);

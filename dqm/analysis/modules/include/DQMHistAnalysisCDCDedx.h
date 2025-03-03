@@ -193,13 +193,14 @@ namespace Belle2 {
 
     TPaveText* m_pave = nullptr; /**< text to add information */
 
-    TH1F* h_dEdxIRMean = nullptr;
-    TH1F* h_dEdxIRSigma = nullptr;
-    TH1F* h_MeanHer = nullptr;
-    TH1F* h_SigmaHer = nullptr;
-    TH1F* h_MeanLer = nullptr;
-    TH1F* h_SigmaLer = nullptr;
-    TLegend* m_lego = nullptr;
+    TH1F* h_dEdxIRMean = nullptr; /**< histogram for dE/dx mean vs events per run */
+    TH1F* h_dEdxIRSigma = nullptr; /**< histogram for dE/dx sigma vs events per run */
+    TH1F* h_MeanHer = nullptr; /**< histogram for dE/dx mean vs injection time (HER) */
+    TH1F* h_SigmaHer = nullptr; /**< histogram for dE/dx sigma vs injection time (HER) */
+    TH1F* h_MeanLer = nullptr; /**< histogram for dE/dx mean vs injection time (LER) */
+    TH1F* h_SigmaLer = nullptr; /**< histogram for dE/dx sigma vs injection time (LER) */
+    TLegend* m_lego = nullptr; /**< legends for LER/HER */
+
     unsigned first{0};/**< substring start value*/
     unsigned last{0};/**< substring last value*/
 

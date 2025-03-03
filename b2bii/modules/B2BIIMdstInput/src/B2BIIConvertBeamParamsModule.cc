@@ -36,10 +36,10 @@ namespace Belle {
 }
 
 namespace {
-  /** Convert CLHEP point to ROOT TVector3 */
-  TVector3 CLHEPtoROOT(const HepPoint3D& point)
+  /** Convert CLHEP point to ROOT XYZVector */
+  ROOT::Math::XYZVector CLHEPtoROOT(const HepPoint3D& point)
   {
-    return TVector3(point.x(), point.y(), point.z());
+    return ROOT::Math::XYZVector(point.x(), point.y(), point.z());
   }
   /** Convert CLHP SymMatrix to ROOT TMatrixDSym */
   TMatrixDSym CLHEPtoROOT(const HepSymMatrix& matrix)
@@ -230,7 +230,7 @@ namespace Belle2 {
       HepPoint3D ip = Belle::IpProfile::e_position();
       HepSymMatrix ipErr = Belle::IpProfile::e_position_err();
 
-      beamParams.setVertex(ROOT::Math::XYZVector(ip.x(), ip.y(), ip.z()));
+      beamParams.setVertex(CLHEPtoROOT(ip));
       beamParams.setCovVertex(CLHEPtoROOT(ipErr));
       beamparamsList.emplace_back(beamParams);
 

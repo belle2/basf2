@@ -13,6 +13,7 @@
 
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+#include <TMatrix.h>
 
 // DataStore
 #include <framework/database/DBObjPtr.h>

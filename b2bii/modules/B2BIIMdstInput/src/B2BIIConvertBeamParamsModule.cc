@@ -191,10 +191,10 @@ namespace Belle2 {
 
       BeamSpot beamSpot;
       beamSpot.setIP(
-        TVector3(std::numeric_limits<double>::quiet_NaN(),
-                 std::numeric_limits<double>::quiet_NaN(),
-                 std::numeric_limits<double>::quiet_NaN()
-                ), TMatrixTSym<double>(3)
+        ROOT::Math::XYZVector(std::numeric_limits<double>::quiet_NaN(),
+                              std::numeric_limits<double>::quiet_NaN(),
+                              std::numeric_limits<double>::quiet_NaN()
+                             ), TMatrixTSym<double>(3)
       );
       if (m_storeBeamSpot) {
         Database::Instance().storeData("BeamSpot", &beamSpot, iov);

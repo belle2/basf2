@@ -428,10 +428,10 @@ void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
     if (beginRun) {
       // no IPProfile, set vertex to NaN without errors for the full run
       m_beamSpot.setIP(
-        TVector3(std::numeric_limits<double>::quiet_NaN(),
-                 std::numeric_limits<double>::quiet_NaN(),
-                 std::numeric_limits<double>::quiet_NaN()
-                ), TMatrixTSym<double>()
+        ROOT::Math::XYZVector(std::numeric_limits<double>::quiet_NaN(),
+                              std::numeric_limits<double>::quiet_NaN(),
+                              std::numeric_limits<double>::quiet_NaN()
+                             ), TMatrixTSym<double>()
       );
     }
     return;
@@ -460,7 +460,7 @@ void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
       cov(i, j) = ipErr(i + 1, j + 1);
     }
   }
-  m_beamSpot.setIP(TVector3(ip.x(), ip.y(), ip.z()), cov);
+  m_beamSpot.setIP(ROOT::Math::XYZVector(ip.x(), ip.y(), ip.z()), cov);
 }
 
 void B2BIIConvertMdstModule::convertMdstChargedTable()

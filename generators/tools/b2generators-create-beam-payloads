@@ -236,7 +236,7 @@ if __name__ == "__main__":
             pos_cov[i][j] = 1e-6 * vtx_cov[i][j]
 
     vertex = beamparams.getVertex()
-    beamspot.setIP(ROOT.TVector3(vertex.X(), vertex.Y(), vertex.Z()), pos_cov)
+    beamspot.setIP(vertex, pos_cov)
     beamspot.setSizeCovMatrix(vtx_cov)
 
     #: Collision invariant mass.

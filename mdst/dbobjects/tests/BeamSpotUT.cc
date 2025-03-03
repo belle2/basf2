@@ -40,7 +40,7 @@ namespace Belle2 {
         positionError(i, j) = positionError(j, i) = errorElement(i, j);
       }
 
-    TVector3 position;
+    ROOT::Math::XYZVector position;
     position.SetXYZ(1., 2., 3.);
 
     bs.setSizeCovMatrix(size);

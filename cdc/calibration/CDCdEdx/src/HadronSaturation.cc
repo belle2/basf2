@@ -139,7 +139,7 @@ double HadronSaturation::myFunction(double alpha, double gamma, double delta, do
 }
 
 void
-HadronSaturation::minuitFunction(int& nDim, double* gout, double& result, double* par, int flag)
+HadronSaturation::minuitFunction(int&, double*, double& result, double* par, int)
 {
   result = HC_obj->myFunction(par[0], par[1], par[2], par[3], par[4]);
 }

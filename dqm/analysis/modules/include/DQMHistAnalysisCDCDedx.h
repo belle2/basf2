@@ -199,6 +199,8 @@ namespace Belle2 {
     TH1F* h_SigmaHer = nullptr; /**< histogram for dE/dx sigma vs injection time (HER) */
     TH1F* h_MeanLer = nullptr; /**< histogram for dE/dx mean vs injection time (LER) */
     TH1F* h_SigmaLer = nullptr; /**< histogram for dE/dx sigma vs injection time (LER) */
+    TH1* h_dEdxIRInd = nullptr; /**< histogram to calculate dE/dx mean and sigma in bins */
+
     TLegend* m_lego = nullptr; /**< legends for LER/HER */
 
     unsigned first{0};/**< substring start value*/

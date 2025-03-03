@@ -147,6 +147,7 @@ void DQMHistAnalysisCDCDedxModule::terminate()
   delete h_MeanHer;
   delete h_MeanLer;
   delete h_SigmaLer;
+  delete h_dEdxIRInd;
   delete m_lego;
 }
 
@@ -542,18 +543,19 @@ void DQMHistAnalysisCDCDedxModule::setHistPars(TH2D*& hdEdx, TH1F*& hmean, TH1F*
 
   for (int ibin = 0; ibin < nbin; ibin++) {
     int localbin = ibin + fbin;
-    TH1* hdEdxIRInd = (TH1*)hdEdx->ProjectionY(Form("htemp_%d", localbin), localbin, localbin);
+    delete h_dEdxIRInd;
+    h_dEdxIRInd = (TH1*)hdEdx->ProjectionY(Form("htemp_%d", localbin), localbin, localbin);
 
     double mean = 0.0, meanerr = 0.0;
     double sigma = 0.0, sigmaerr = 0.0;
 
-    fitHistogram(hdEdxIRInd, m_status);
+    fitHistogram(h_dEdxIRInd, m_status);
 
     if (m_status == "OK") {
-      mean = hdEdxIRInd->GetFunction("f_gaus")->GetParameter(1);
-      meanerr = hdEdxIRInd->GetFunction("f_gaus")->GetParError(1);
-      sigma = hdEdxIRInd->GetFunction("f_gaus")->GetParameter(2);
-      sigmaerr = hdEdxIRInd->GetFunction("f_gaus")->GetParError(2);
+      mean = h_dEdxIRInd->GetFunction("f_gaus")->GetParameter(1);
+      meanerr = h_dEdxIRInd->GetFunction("f_gaus")->GetParError(1);
+      sigma = h_dEdxIRInd->GetFunction("f_gaus")->GetParameter(2);
+      sigmaerr = h_dEdxIRInd->GetFunction("f_gaus")->GetParError(2);
     }
 
     hmean->SetBinContent(ibin + 1, mean);

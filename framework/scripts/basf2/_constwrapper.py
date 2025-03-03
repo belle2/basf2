@@ -218,10 +218,14 @@ def _wrap_read_array(func):
         obj_class = pyStoreArray.getClass()
         obj_classname = obj_class.GetName()
 
-        for ar in obj_class.GetMethodAny("fillValues").GetListOfMethodArgs():
+        fillValuesMethod = obj_class.GetMethodAny("fillValues")
+        if not fillValuesMethod:
+            raise ReferenceError(f"The method fillValues is not implemented for the class {obj_classname}")
+
+        for ar in fillValuesMethod.GetListOfMethodArgs():
             kwargs.setdefault(ar.GetName(), np.zeros(len(pyStoreArray), dtype=cpp_to_numpy[ar.GetFullTypeName().split("*")[0]]))
 
-        l_types = [numpy_to_cpp[type(kwargs[v][0]).__name__] for v in kwargs.keys()]
+        l_types = [numpy_to_cpp[kwargs[v].dtype.name] for v in kwargs.keys()]
 
         func[(obj_classname, *l_types)](pyStoreArray, *kwargs.values())
 

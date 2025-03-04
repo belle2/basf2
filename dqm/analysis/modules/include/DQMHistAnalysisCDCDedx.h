@@ -208,5 +208,10 @@ namespace Belle2 {
 
     MonitoringObject* m_monObj = NULL; /**< MonitoringObject for mirabelle*/
 
+    static const Int_t NRGBs = 6;
+    static const Int_t NCont = 255;
+
+    Int_t m_pal = 0;
+    Int_t m_palarr[NCont];
   };
 } // end namespace Belle2

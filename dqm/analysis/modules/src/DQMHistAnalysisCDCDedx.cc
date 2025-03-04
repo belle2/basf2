@@ -476,7 +476,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
     h_MeanLer->SetMarkerColor(kRed);
     h_MeanLer->SetMarkerStyle(20);
     h_MeanLer->SetMarkerSize(1.10);
-    h_MeanLer->DrawClone("same");
+    h_MeanLer->Draw("same");
 
 
     m_lego->Clear();
@@ -493,7 +493,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
     h_SigmaLer->SetMarkerColor(kRed);
     h_SigmaLer->SetMarkerStyle(20);
     h_SigmaLer->SetMarkerSize(1.10);
-    h_SigmaLer->DrawClone("same");
+    h_SigmaLer->Draw("same");
 
     m_lego->Clear();
     m_lego->AddEntry(h_SigmaHer, "HER", "p");
@@ -582,7 +582,7 @@ void DQMHistAnalysisCDCDedxModule::drawHistPars(TH1F*& hist, int nbin, double pa
   hist->SetMarkerStyle(20);
   hist->SetMarkerSize(1.10);
   hist->GetYaxis()->SetRangeUser(pars - fac, pars + fac); //m_mean - 0.10, m_mean + 0.10);
-  hist->DrawClone("");
+  hist->Draw("");
 
   l_line->DrawLine(0.5, pars, hist->GetXaxis()->GetBinUpEdge(nbin), pars);
 

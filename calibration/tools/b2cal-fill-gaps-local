@@ -1,0 +1,233 @@
+#!/usr/bin/env python3
+"""
+Fill the gaps in a local database, if the database contains
+event-dependent payloads it extends them properly: if the
+event-dependent payload contains only one condition per run only its iov
+is extended, otherwise a new payload containing only the last condition
+is created and its iov is set to fill the gap.
+
+`BeamSpot` and `CollisionBoostVector` have the start and end time
+encoded in the payload via a hack (adding informations to floats). If a
+new payload of these kinds is created,(because a payload containing
+multiple conditions per run must be extended) we do not simply copy the
+last condition, as the times would be inconsistent, but we encode in
+the payload new start and end time. The start time is shortly after the
+end of the previous payload and the end time shortly before the
+beginning of the following one.
+"""
+
+from collections import defaultdict
+import argparse
+import math
+import basf2 as b2
+from conditions_db.testing_payloads import parse_testing_payloads_file
+
+
+def previous_exp_run(exp, run):
+    if run == 0:
+        return exp - 1, -1
+    else:
+        return exp, run - 1
+
+
+def next_exp_run(exp, run):
+    if run == -1:
+        return exp + 1, 0
+    else:
+        return exp, run + 1
+
+
+def encode_number(val, num):
+    """encode integer 32bit num into 64bit float val. The value is changed only by very small amount."""
+    assert isinstance(num, int)
+    assert isinstance(val, float)
+
+    factor = math.pow(2, 53)  # Base factor
+    fEnc = math.pow(2, 32)  # 32 binary digits for encoded number
+
+    mantisa, e = math.frexp(val)  # mantisa and exponent
+    mantisaI = int(mantisa * factor)  # mantissa as integer
+
+    if val != 0:
+        mantisaI = (
+            mantisaI // fEnc
+        ) * fEnc + num  # adding encoded number to last digits of mantissa
+    else:
+        mantisaI = int(factor / 2) + num
+        e = -100  # if the val is zero, ensure very small number by the exponent
+
+    newVal = math.ldexp(mantisaI / factor, e)
+
+    return newVal
+
+
+def get_args():
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawTextHelpFormatter
+    )
+    parser.add_argument(
+        "database",
+        help="path of the database.txt file. The payloads should be in the same directory",
+    )
+    parser.add_argument(
+        "--dry-run", help="Do not fix anything but just print", action="store_true"
+    )
+    parser.add_argument(
+        "--open-last",
+        help="Set the end of last iov for each payload to -1 -1",
+        action="store_true",
+    )
+
+    return parser.parse_args()
+
+
+def get_local_payloads(database):
+    db = sorted(parse_testing_payloads_file(database), key=lambda x: x.iov_tuple[:2])
+
+    payloads = defaultdict(list)
+    for iov in db:
+        payloads[iov.module].append(iov)
+
+    return payloads
+
+
+def get_start_end_time(obj, module):
+    if module == "BeamSpot":
+        cov = obj.getIPPositionCovMatrix()
+    elif iov1.module == "CollisionBoostVector":
+        cov = obj.getBoostCovariance()
+    # hack to get start/end times from payloads
+    tStart = int(math.frexp(cov(0, 1))[0] * 2**53) % 2**32 / 3600.0
+    tEnd = int(math.frexp(cov(0, 2))[0] * 2**53) % 2**32 / 3600.0
+    return (tStart, tEnd)
+
+
+if __name__ == "__main__":
+
+    import ROOT as r
+    from ROOT import Belle2
+
+    args = get_args()
+
+    payloads = get_local_payloads(args.database)
+    iovs_to_modify = {}
+
+    # Fill the gaps that require making a new payload (gaps preceeded by a event dependent payload with multiple conditions)
+    for iovs_ in payloads.values():
+        for iov1, iov2 in zip(iovs_[:-1], iovs_[1:]):
+            if iov1.iov_tuple[2:] != previous_exp_run(*iov2.iov_tuple[:2]):
+                payload_file = r.TFile.Open(iov1.filename)
+                all_objects = payload_file.Get(iov1.module)
+                if all_objects.ClassName() == "Belle2::EventDependency":
+                    num_conditions = all_objects.getEventNumbers().size() + 1
+                    if num_conditions != 1:
+                        b2.conditions.expert_settings(save_payloads=args.database)
+                        last_object = all_objects.getObjectByIndex(num_conditions - 1)
+                        if iov1.module in ["BeamSpot", "CollisionBoostVector"]:
+                            t1 = get_start_end_time(last_object, iov1.module)[-1] + 1e-3
+                            payload_file2 = r.TFile.Open(iov2.filename)
+                            all_objects2 = payload_file2.Get(iov2.module)
+                            first_object2 = all_objects2.getObjectByIndex(0)
+                            t2 = (
+                                get_start_end_time(first_object2, iov2.module)[0] - 1e-3
+                            )
+                            if iov1.module == "BeamSpot":
+                                val = last_object.getIPPosition()
+                                cov = last_object.getIPPositionCovMatrix()
+                                spread = last_object.getSizeCovMatrix()
+
+                            elif iov1.module == "CollisionBoostVector":
+                                val = last_object.getBoost()
+                                cov = last_object.getBoostCovariance()
+
+                            valStart = encode_number(cov(0, 1), round(t1 * 3600))
+                            valEnd = encode_number(cov(0, 2), round(t2 * 3600))
+                            cov = r.TMatrixDSym(cov)
+                            cov[0][1] = valStart
+                            cov[1][0] = valStart
+                            cov[0][2] = valEnd
+                            cov[2][0] = valEnd
+
+                            if iov1.module == "BeamSpot":
+                                new_object = Belle2.BeamSpot()
+                                new_object.setIP(val, cov)
+                                new_object.setSizeCovMatrix(spread)
+                            elif iov1.module == "CollisionBoostVector":
+                                new_object = Belle2.CollisionBoostVector()
+                                new_object.setBoost(val, cov)
+                            event_object = r.Belle2.EventDependency(new_object)
+                        else:
+                            event_object = r.Belle2.EventDependency(last_object)
+                        database = r.Belle2.Database.Instance()
+                        iov = r.Belle2.IntervalOfValidity(
+                            *next_exp_run(*iov1.iov_tuple[2:]),
+                            *previous_exp_run(*iov2.iov_tuple[:2]),
+                        )
+
+                        print(
+                            "New",
+                            iov1.module,
+                            "(",
+                            *next_exp_run(*iov1.iov_tuple[2:]),
+                            *previous_exp_run(*iov2.iov_tuple[:2]),
+                            ")",
+                        )
+                        if not args.dry_run:
+                            created = database.storeData(iov1.module, event_object, iov)
+                            if not created:
+                                b2.B2FATAL(
+                                    "Something went wrong during the addition of a new payload"
+                                )
+                    else:
+                        print(
+                            "expand",
+                            iov1.iov_tuple,
+                            "to",
+                            previous_exp_run(*iov2.iov_tuple[:2]),
+                        )
+                        iovs_to_modify[iov1] = [
+                            *iov1.iov_tuple[:2],
+                            *previous_exp_run(*iov2.iov_tuple[:2]),
+                        ]
+                else:
+                    print(
+                        "expand",
+                        iov1.iov_tuple,
+                        "to",
+                        previous_exp_run(*iov2.iov_tuple[:2]),
+                    )
+                    iovs_to_modify[iov1] = [
+                        *iov1.iov_tuple[:2],
+                        *previous_exp_run(*iov2.iov_tuple[:2]),
+                    ]
+                payload_file.Close()
+
+    if args.open_last:
+        for iovs_ in payloads.values():
+            last_iov = iovs_[-1]
+            if last_iov.iov_tuple[2:] != (-1, -1):
+                print(
+                    f"Modify {last_iov.module} rev {last_iov.revision} from {last_iov.iov_tuple} ",
+                    f"to {list(last_iov.iov_tuple[:2])+[-1, -1]}"
+                )
+                iovs_to_modify[last_iov] = [*last_iov.iov_tuple[:2], -1, -1]
+
+    if not args.dry_run:
+        payloads = get_local_payloads(args.database)
+
+        with open(args.database, "w") as f:
+            for iovs_ in payloads.values():
+                for i in iovs_:
+                    if i in iovs_to_modify:
+                        iov_ = iovs_to_modify[i]
+                        f.write(
+                            f"dbstore/{i.module} {i.revision} "
+                            + ",".join([str(j) for j in iov_])
+                            + "\n"
+                        )
+                    else:
+                        f.write(
+                            f"dbstore/{i.module} {i.revision} "
+                            + ",".join([str(j) for j in i.iov_tuple])
+                            + "\n"
+                        )

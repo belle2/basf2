@@ -672,8 +672,9 @@ def make_data_description_block(skims, sampleInfo, skimName, flagged=False):
                 "": skimName,
                 "SkimDecayMode": Registry.encode_skim_name(skimName),
                 "DataLevel": 'mdst',
-                "GeneralSkimName": GeneralSkim
             }
+        if GeneralSkim is not None:
+            DescriptionDict["GeneralSkimName"] = GeneralSkim
         DataDescription.append(DescriptionDict)
     else:
         for skim in skims:

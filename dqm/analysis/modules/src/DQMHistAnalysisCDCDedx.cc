@@ -197,8 +197,8 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
   m_mean = 0.0;
   m_sigma = 0.0;
 
-  TH1* h_dEdxClone = findHist("CDCDedx/hdEdx");
-  if (h_dEdxClone != nullptr) {
+  TH1* h_dEdx = findHist("CDCDedx/hdEdx");
+  if (h_dEdx != nullptr) {
 
     double m_meanerr = 0.0;
     double m_sigmaerr = 0.0;
@@ -208,20 +208,20 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
 
     m_status = "LowStats";
 
-    if (h_dEdxClone->Integral() > 250) {
-      fitHistogram(h_dEdxClone, m_status);
+    if (h_dEdx->Integral() > 250) {
+      fitHistogram(h_dEdx, m_status);
       if (m_status == "OK") {
-        m_mean = h_dEdxClone->GetFunction("f_gaus")->GetParameter(1);
-        m_sigma = h_dEdxClone->GetFunction("f_gaus")->GetParameter(2);
-        m_meanerr = h_dEdxClone->GetFunction("f_gaus")->GetParError(1);
-        m_sigmaerr = h_dEdxClone->GetFunction("f_gaus")->GetParError(2);
+        m_mean = h_dEdx->GetFunction("f_gaus")->GetParameter(1);
+        m_sigma = h_dEdx->GetFunction("f_gaus")->GetParameter(2);
+        m_meanerr = h_dEdx->GetFunction("f_gaus")->GetParError(1);
+        m_sigmaerr = h_dEdx->GetFunction("f_gaus")->GetParError(2);
       }
       // }
-      setHistStyle(h_dEdxClone);
-      h_dEdxClone->SetTitle("CDC-dEdx");
-      h_dEdxClone->DrawCopy("");
+      setHistStyle(h_dEdx);
+      h_dEdx->SetTitle("CDC-dEdx");
+      h_dEdx->Draw("");
       //Draw line for dE/dx mean
-      l_line->DrawLine(m_mean, 0, m_mean, h_dEdxClone->GetMaximum());
+      l_line->DrawLine(m_mean, 0, m_mean, h_dEdx->GetMaximum());
     }
 
     m_monObj->setVariable("CDCDedxMean", m_mean);

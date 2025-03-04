@@ -230,7 +230,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
     m_monObj->setVariable("CDCDedxResoErr", m_sigmaerr);
 
     f_gaus->SetLineColor(kRed);
-    f_gaus->DrawClone("same");
+    f_gaus->Draw("same");
 
     m_pave->Clear();
 
@@ -241,7 +241,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
     m_pave->AddText(Form("Fit #mu^{dE/dx}: %0.3f ", m_mean));
     m_pave->AddText(Form("Fit #sigma^{dE/dx}: %0.3f ", m_sigma));
     m_pave->SetTextColor(kRed);
-    m_pave->DrawClone("same");
+    m_pave->Draw("same");
 
     m_pave->Clear();
     m_pave->SetX1NDC(0.60); m_pave->SetX2NDC(0.85); m_pave->SetY1NDC(0.69); m_pave->SetY2NDC(0.89);
@@ -251,7 +251,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
     m_pave->AddText(Form("-------------"));
     setBEvtInfo(m_pave);
     m_pave->AddText(Form("Prev Gain: %0.03f", m_dbrg));
-    m_pave->DrawClone("same");
+    m_pave->Draw("same");
 
     m_status.clear();
   }
@@ -284,7 +284,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
       setTextStyle(m_pave);
       m_pave->AddText("CDC-dE/dx Intra-run");
       setBEvtInfo(m_pave);
-      m_pave->DrawClone("same");
+      m_pave->Draw("same");
     }
 
   }
@@ -355,7 +355,7 @@ void DQMHistAnalysisCDCDedxModule::drawBandPlot()
       m_pave->AddText(Form("Events: %0.02fK", double(m_nhadevt / 1e3)));
     else
       m_pave->AddText(Form("Events: %d", m_nhadevt));
-    m_pave->DrawClone("same");
+    m_pave->Draw("same");
   }
 }
 
@@ -380,7 +380,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
 
     setTextStyle(m_pave);
     setBEvtInfo(m_pave);
-    m_pave->DrawClone("same");
+    m_pave->Draw("same");
   }
 
   //plot # 2
@@ -400,7 +400,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
 
     setTextStyle(m_pave);
     setBEvtInfo(m_pave);
-    m_pave->DrawClone("same");
+    m_pave->Draw("same");
   }
 }
 
@@ -418,25 +418,25 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTime()
     setPlotStyle();
     setHistStyle(hinjtimeHer);
     hinjtimeHer->SetTitle("Time since last injection (HER)");
-    hinjtimeHer->DrawClone("box");
+    hinjtimeHer->Draw("box");
 
     setHistStyle(hinjtimeLer);
     hinjtimeLer->SetFillColor(kRed);
-    hinjtimeLer->DrawClone("same box");
+    hinjtimeLer->Draw("same box");
 
     l_line->DrawLine(0, m_mean, 80e3, m_mean);
 
     m_lego->Clear();
     m_lego->AddEntry(hinjtimeHer, "HER", "f");
     m_lego->AddEntry(hinjtimeLer, "LER", "f");
-    m_lego->DrawClone("same");
+    m_lego->Draw("same");
 
     m_pave->Clear();
     m_pave->SetX1NDC(0.60); m_pave->SetX2NDC(0.85); m_pave->SetY1NDC(0.77); m_pave->SetY2NDC(0.89);
 
     setTextStyle(m_pave);
     setBEvtInfo(m_pave);
-    m_pave->DrawClone("same");
+    m_pave->Draw("same");
   }
 }
 
@@ -483,7 +483,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
 
     m_lego->AddEntry(h_MeanHer, "HER", "p");
     m_lego->AddEntry(h_MeanLer, "LER", "p");
-    m_lego->DrawClone("same");
+    m_lego->Draw("same");
 
     c_pr_dedx->cd(6);
     gPad->SetGridy(1);
@@ -498,7 +498,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
     m_lego->Clear();
     m_lego->AddEntry(h_SigmaHer, "HER", "p");
     m_lego->AddEntry(h_SigmaLer, "LER", "p");
-    m_lego->DrawClone("same");
+    m_lego->Draw("same");
   }
 }
 
@@ -538,7 +538,7 @@ void DQMHistAnalysisCDCDedxModule::drawWireStatus()
       m_pave->AddText(Form("Events: %0.02fK", double(m_nallevt / 1e3)));
     else
       m_pave->AddText(Form("Events: %d", m_nallevt));
-    m_pave->DrawClone("same");
+    m_pave->Draw("same");
   }
 }
 
@@ -593,7 +593,7 @@ void DQMHistAnalysisCDCDedxModule::drawHistPars(TH1F*& hist, int nbin, double pa
   if (hname == "h_dEdxIRMean" || hname == "h_dEdxIRSigma")  m_pave->AddText("Intra-run variation");
   setBEvtInfo(m_pave);
   m_pave->AddText(Form("Avg %s: %0.3f", var.data(), pars));
-  m_pave->DrawClone("same");
+  m_pave->Draw("same");
 }
 
 //-----------------------------------------------

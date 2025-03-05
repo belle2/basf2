@@ -211,7 +211,7 @@ namespace Belle2 {
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (not roe.isValid())
-        return 0;
+        return -1;
       int n_roe_tracks = roe->getNTracks(maskName);
       int n_par_tracks = 0;
       const auto& daughters = particle->getFinalStateDaughters();
@@ -659,7 +659,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return 0;
+          return -1;
         }
 
         int nPart = 0;

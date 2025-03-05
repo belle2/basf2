@@ -180,11 +180,11 @@ namespace {
 
     var = Manager::Instance().getVariable("nROE_NeutralHadrons()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 1);
 
     var = Manager::Instance().getVariable("nROE_NeutralHadrons(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 0);
 
   }
   /*

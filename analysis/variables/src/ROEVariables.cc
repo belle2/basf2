@@ -1646,11 +1646,13 @@ namespace Belle2 {
 
       auto func = [maskName](const Particle * particle) -> bool {
 
-        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-        if (not roe.isValid())
+        StoreObjPtr<RestOfEvent> roeObjPtr("RestOfEvent");
+        if (not roeObjPtr.isValid())
           return 0;
 
-        return roe->hasParticle(particle, maskName);
+        const RestOfEvent* roe = &(*roeObjPtr);
+
+        return isInThisRestOfEvent(particle, roe, maskName);
       };
       return func;
     }

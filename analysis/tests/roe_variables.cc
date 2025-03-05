@@ -437,19 +437,19 @@ namespace {
 
     var = Manager::Instance().getVariable("passesROEMask(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROE1)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<bool>(var->function(partROE1)), 1);
 
     var = Manager::Instance().getVariable("passesROEMask(all)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROE1)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<bool>(var->function(partROE1)), 1);
 
     var = Manager::Instance().getVariable("passesROEMask(all)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(partNotROE)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<bool>(var->function(partNotROE)), 0);
 
     var = Manager::Instance().getVariable("passesROEMask(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROEnotFromMask)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<bool>(var->function(partROEnotFromMask)), 0);
 
     var = Manager::Instance().getVariable("nROE_ParticlesInList(pi0:vartest)");
     ASSERT_NE(var, nullptr);

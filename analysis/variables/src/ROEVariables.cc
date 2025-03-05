@@ -582,13 +582,13 @@ namespace Belle2 {
         try {
           pdgCode = Belle2::convertString<int>(arguments[1]);
         } catch (std::invalid_argument&) {
-          B2ERROR("First argument of nROE_ChargedParticles must be a PDG code");
+          B2ERROR("First argument of nROE_Charged must be a PDG code");
           return nullptr;
         }
       } else if (arguments.size() > 2)  {
-        B2FATAL("Wrong number of arguments (2 optional) for meta function nROE_ChargedParticles");
+        B2FATAL("Wrong number of arguments (2 optional) for meta function nROE_Charged");
       }
-      auto func = [maskName, pdgCode](const Particle * particle) -> double {
+      auto func = [maskName, pdgCode](const Particle * particle) -> int {
 
         // Get related ROE object
         const RestOfEvent* roe = getRelatedROEObject(particle);
@@ -596,7 +596,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return Const::doubleNaN;
+          return -1;
         }
 
         return roe->getChargedParticles(maskName, abs(pdgCode)).size();
@@ -2075,7 +2075,7 @@ namespace Belle2 {
                           "Returns number of all charged particles in the related RestOfEvent object. First optional argument is ROE mask name. "
                           "Second argument is a PDG code to count only one charged particle species, independently of charge. "
                           "For example: ``nROE_Charged(cleanMask, 321)`` will output number of kaons in Rest Of Event with ``cleanMask``. "
-                          "PDG code 0 is used to count all charged particles", Manager::VariableDataType::c_double);
+                          "PDG code 0 is used to count all charged particles", Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("nROE_Photons(maskName)", nROE_Photons,
                           "Returns number of all photons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ",

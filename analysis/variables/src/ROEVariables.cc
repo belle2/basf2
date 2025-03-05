@@ -106,7 +106,7 @@ namespace Belle2 {
 
       std::string listName = arguments[0];
 
-      auto func = [listName](const Particle*) -> double {
+      auto func = [listName](const Particle*) -> bool {
 
         StoreObjPtr<ParticleList> particleList(listName);
         if (!(particleList.isValid()))
@@ -122,7 +122,7 @@ namespace Belle2 {
         if (particle == nullptr)
         {
           B2ERROR("Relation between particle and ROE doesn't exist! currentROEIsInList() variable has to be called from ROE loop");
-          return Const::doubleNaN;
+          return 0;
         }
         return particleList->contains(particle) ? 1 : 0;
 
@@ -2059,7 +2059,7 @@ namespace Belle2 {
 
     REGISTER_METAVARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
                           "[Eventbased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."
-                          "Useful to restrict the for_each loop over ROEs to ROEs of a certain ParticleList.", Manager::VariableDataType::c_double);
+                          "Useful to restrict the for_each loop over ROEs to ROEs of a certain ParticleList.", Manager::VariableDataType::c_bool);
 
     REGISTER_VARIABLE("nROE_RemainingTracks", nROE_RemainingTracks,
                       "Returns number of tracks in ROE - number of tracks of given particle"

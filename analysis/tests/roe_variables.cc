@@ -457,11 +457,11 @@ namespace {
 
     var = Manager::Instance().getVariable("currentROEIsInList(B0:vartest)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROE1)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<bool>(var->function(partROE1)), 1);
 
     var = Manager::Instance().getVariable("currentROEIsInList(pi0:vartest)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROE1)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<bool>(var->function(partROE1)), 0);
 
     var = Manager::Instance().getVariable("particleRelatedToCurrentROE(PDG)");
     ASSERT_NE(var, nullptr);

@@ -453,9 +453,10 @@ what should be documented, and how:
   
   * Each method needs a comment describing at least the input and output quantities.
   
-  * Comments on data members are encouraged, unless their meaning is obvious. *Python*: Data
-    members must be preceded by a comment (either starting with ``#:`` or ``##``) as seen in the
-    Python example `here <https://xwiki.desy.de/xwiki/short/e2e4a>`_.
+  * Comments on data members are encouraged, unless their meaning is obvious.
+    *Python*: Each data member needs to be preceded by a comment as seen in the Python example
+    `here <https://xwiki.desy.de/xwiki/short/e2e4a>`_. Note that the syntax is different - 
+    they need to start with either ``#:`` or ``##``. 
   
   * Comments on design decisions and implementation details may be added if appropriate.
     External documentation may be more useful to describe the overall design.

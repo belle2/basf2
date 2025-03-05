@@ -651,7 +651,7 @@ namespace Belle2 {
       } else
         B2FATAL("Wrong number of arguments (1 or 2 required) for meta function nROE_ParticlesInList");
 
-      auto func = [pListName, maskName](const Particle * particle) -> double {
+      auto func = [pListName, maskName](const Particle * particle) -> int {
 
         // Get related ROE object
         const RestOfEvent* roe = getRelatedROEObject(particle);
@@ -659,7 +659,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return Const::doubleNaN;
+          return 0;
         }
 
         int nPart = 0;
@@ -2144,7 +2144,7 @@ namespace Belle2 {
 
     REGISTER_METAVARIABLE("nROE_ParticlesInList(pListName[, maskName])", nROE_ParticlesInList,
                           "Returns the number of particles in ROE from the given particle list. If a mask name is provided the selection criteria are applied.\n"
-                          "Use of variable aliases is advised.", Manager::VariableDataType::c_double);
+                          "Use of variable aliases is advised.", Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("roeCharge(maskName)", ROE_Charge,
                           "Returns total charge of the related RestOfEvent object. The unit of the charge is ``e`` ", Manager::VariableDataType::c_double);

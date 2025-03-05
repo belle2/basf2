@@ -75,7 +75,7 @@ def make_muon_collection(path_muon):
     # Reconstruct the decay 'vpho -> mu+ mu-'
     mA.reconstructDecay('vpho:mumu -> mu+:calib mu-:calib', track_cuts, path=path_muon)
 
-    # Apply event-level cuts to ensure there are exactly two cleaned tracks, and less than three total tracks
+    # Apply event-level cuts to ensure there are exactly two cleaned tracks
     event_cuts = '[nCleanedTracks('+goodTrack+') == 2]'
     mA.applyEventCuts(event_cuts, path=path_muon)
     radmumulist = ['vpho:mumu']
@@ -179,14 +179,12 @@ def make_pion_kaon_collection(path_hadrons):
     clean_Dz1 = 'abs(dM) < 0.020'    # Mass difference of D0
     clean_Dz1 += ' and [daughter(0,nCDCHits) > 30 or daughter(1, nCDCHits) > 30] '
 
-    # clean_Dz1 += ' and daughterHighest(nCDCHits) > 30 '
     mA.reconstructDecay('D0:cal1 -> K-:calib pi+:calib', clean_Dz1, path=path_hadrons)
 
     # Reconstruction for the D0 -> K- pi+ pi+ pi- decay
     clean_Dz2 = 'abs(dM) < 0.020'   # Mass difference of D0
     clean_Dz2 += ' and [daughter(0,nCDCHits) > 25 or daughter(1, nCDCHits) > 25 or daughter(2, nCDCHits) > 25 '
     clean_Dz2 += ' or daughter(3, nCDCHits) > 25] '
-    # clean_Dz2 += ' and daughterHighest(nCDCHits) > 25 '
     mA.reconstructDecay('D0:cal2 -> K-:calib pi+:calib pi+:calib pi-:calib', clean_Dz2, path=path_hadrons)
 
     # ------------------------------------------------------------
@@ -237,7 +235,7 @@ def make_pion_kaon_collection(path_hadrons):
 
     # Define the cut conditions for first D*+ mass difference, momentum, and decay parameters
     cutonD1var = "abs(extraInfo(l_Ds1dM)) < 0.02"  # D* mass difference
-    cutonD1var += "and extraInfo(l_Ds1p) > 1.5 "  # D* momentum
+    cutonD1var += " and extraInfo(l_Ds1p) > 1.5 "  # D* momentum
     cutonD1var += " and abs(formula(extraInfo(l_Ds1mDiff) - 0.14542)) < 0.0010"  # \DeltaM
     cutonD1var += " and abs(extraInfo(l_Ds1_DzdM)) < 0.02"  # D0 mass difference
     cutonD1var += " and [extraInfo(l_Ds1_Dz_Khits) > 30 or extraInfo(l_Ds1_Dz_Pihits) > 30]"
@@ -280,7 +278,7 @@ def make_pion_kaon_collection(path_hadrons):
 
     # Define the cut conditions for second D*+ mass difference, momentum, and decay parameters
     cutonD2var = "abs(extraInfo(l_Ds2dM)) < 0.02"     # D* mass difference
-    cutonD2var += "and extraInfo(l_Ds2p) > 2.0"    # D* momentum
+    cutonD2var += " and extraInfo(l_Ds2p) > 2.0"    # D* momentum
     cutonD2var += " and abs(formula(extraInfo(l_Ds2mDiff) - 0.14542)) < 0.0010"  # \DeltaM
     cutonD2var += " and abs(extraInfo(l_Ds2_DzdM)) < 0.02"  # D0 mass difference
     cutonD2var += " and [extraInfo(l_Ds2_Dz_Khits) > 25 or extraInfo(l_Ds2_Dz_Pi1hits) > 25 "

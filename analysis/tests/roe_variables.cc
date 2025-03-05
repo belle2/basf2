@@ -197,15 +197,15 @@ namespace {
 
     auto* var = Manager::Instance().getVariable("nROE_Tracks()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 2);
 
     var = Manager::Instance().getVariable("nROE_Tracks(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 1);
 
     var = Manager::Instance().getVariable("nROE_Tracks(all)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 2);
 
     var = Manager::Instance().getVariable("nROE_ECLClusters()");
     ASSERT_NE(var, nullptr);

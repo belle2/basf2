@@ -447,7 +447,7 @@ namespace Belle2 {
       else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function nROE_Tracks");
 
-      auto func = [maskName](const Particle * particle) -> double {
+      auto func = [maskName](const Particle * particle) -> int {
 
         // Get related ROE object
         const RestOfEvent* roe = getRelatedROEObject(particle);
@@ -455,7 +455,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return Const::doubleNaN;
+          return -1;
         }
 
         return roe->getNTracks(maskName);
@@ -2123,7 +2123,7 @@ namespace Belle2 {
 
     REGISTER_METAVARIABLE("nROE_Tracks(maskName)",  nROE_Tracks,
                           "Returns number of tracks in the related RestOfEvent object that pass the selection criteria.",
-                          Manager::VariableDataType::c_double);
+                          Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("nROE_ECLClusters(maskName)", nROE_ECLClusters,
                           "Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria.",

@@ -127,16 +127,6 @@ namespace Belle2 {
     void setHistPars(TH2D*& hist, TH1F*& hmean, TH1F*& hsigma, int nbin);
 
     /**
-    * function to draw the histograms
-    * @param hist histogram to draw
-    * @param nbin number of bins
-    * @param pars average value of histogram
-    * @param fac factor to set the range of y-axis of histogram
-    * @param var name of histogram
-    */
-    void drawHistPars(TH1F*& hist, int nbin, double pars, double fac, std::string var);
-
-    /**
     * function to add plot style
     */
     void setPlotStyle();
@@ -145,7 +135,7 @@ namespace Belle2 {
     * function to add text style
     * @param obj pavetext variable
     */
-    void setTextStyle(TPaveText*& obj);
+    void setTextStyle(TPaveText* obj);
 
     /**
     * function to set the style of histogram
@@ -166,7 +156,7 @@ namespace Belle2 {
     * function to set the bhabha event info
     * @param pt pavetext variable
     */
-    void setBEvtInfo(TPaveText*& pt);
+    void setBEvtInfo(TPaveText* pt);
 
   private:
 
@@ -191,17 +181,26 @@ namespace Belle2 {
     TF1* f_gaus = nullptr; /**< fit function */
     TLine* l_line = nullptr; /**< line for dedx mean */
 
-    TPaveText* m_pave = nullptr; /**< text to add information */
+    TPaveText* m_text_dedx_fit = nullptr; /**< add dE/dx fit information */
+    TPaveText* m_text_dedx = nullptr; /**< add dE/dx bhabha event information */
+    TPaveText* m_text_dedx_ir = nullptr; /**< add dE/dx intra run information */
 
-    TH1F* h_dEdxIRMean = nullptr; /**< histogram for dE/dx mean vs events per run */
-    TH1F* h_dEdxIRSigma = nullptr; /**< histogram for dE/dx sigma vs events per run */
-    TH1F* h_MeanHer = nullptr; /**< histogram for dE/dx mean vs injection time (HER) */
-    TH1F* h_SigmaHer = nullptr; /**< histogram for dE/dx sigma vs injection time (HER) */
-    TH1F* h_MeanLer = nullptr; /**< histogram for dE/dx mean vs injection time (LER) */
-    TH1F* h_SigmaLer = nullptr; /**< histogram for dE/dx sigma vs injection time (LER) */
-    TH1* h_dEdxIRInd = nullptr; /**< histogram to calculate dE/dx mean and sigma in bins */
+    TPaveText* m_text_bandplot = nullptr; /**< add hadron event information */
+    TPaveText* m_text_dedxWire = nullptr; /**< add Wire information */
+
+    TPaveText* m_text_mean = nullptr; /**< add dE/dx mean information */
+    TPaveText* m_text_sigma = nullptr; /**< add dE/dx sigma information */
+
+    TH1F* m_hdEdxIRMean = nullptr; /**< histogram for dE/dx mean vs events per run */
+    TH1F* m_hdEdxIRSigma = nullptr; /**< histogram for dE/dx sigma vs events per run */
+    TH1F* m_hMeanHer = nullptr; /**< histogram for dE/dx mean vs injection time (HER) */
+    TH1F* m_hSigmaHer = nullptr; /**< histogram for dE/dx sigma vs injection time (HER) */
+    TH1F* m_hMeanLer = nullptr; /**< histogram for dE/dx mean vs injection time (LER) */
+    TH1F* m_hSigmaLer = nullptr; /**< histogram for dE/dx sigma vs injection time (LER) */
+    TH1* m_hdEdxIRInd = nullptr; /**< histogram to calculate dE/dx mean and sigma in bins */
 
     TLegend* m_lego = nullptr; /**< legends for LER/HER */
+    TLegend* m_legoI = nullptr; /**< legends for LER/HER */
 
     unsigned first{0};/**< substring start value*/
     unsigned last{0};/**< substring last value*/

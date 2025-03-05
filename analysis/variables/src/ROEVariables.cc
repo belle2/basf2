@@ -522,7 +522,7 @@ namespace Belle2 {
       } else if (arguments.size() > 1) {
         B2FATAL("At most 1 argument (name of mask) accepted for meta function nROE_Photons");
       }
-      auto func = [maskName](const Particle * particle) -> double {
+      auto func = [maskName](const Particle * particle) -> int {
 
         // Get related ROE object
         const RestOfEvent* roe = getRelatedROEObject(particle);
@@ -530,7 +530,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return Const::doubleNaN;
+          return -1;
         }
 
         // Get unused ECLClusters in ROE
@@ -2079,7 +2079,7 @@ namespace Belle2 {
 
     REGISTER_METAVARIABLE("nROE_Photons(maskName)", nROE_Photons,
                           "Returns number of all photons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ",
-                          Manager::VariableDataType::c_double);
+                          Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("nROE_NeutralHadrons(maskName)", nROE_NeutralHadrons,
                           "Returns number of all neutral hadrons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ",

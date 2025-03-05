@@ -50,7 +50,7 @@ default_config = {
     "hadron.max_processed_events_per_file": 1000,
     "mumu.max_processed_events_per_file": 5000,
     "offip.max_processed_events_per_file": 2000,
-    "beamspot.minPXDhits": 0,
+    "beamspot.min_pxd_hits": 0,
     "stage1.method": "decomposition"
 }
 
@@ -305,7 +305,7 @@ def create_beamspot(files, cfg):
 
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
-    muSelection += f' and nPXDHits >= {cfg["beamspot.minPXDhits"]} nSVDHits >= 8 and nCDCHits >= 20'
+    muSelection += f' and nPXDHits >= {cfg["beamspot.min_pxd_hits"]} and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BS', muSelection, path=path)
     ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=path)
 

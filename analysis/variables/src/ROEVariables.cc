@@ -613,7 +613,7 @@ namespace Belle2 {
       } else if (arguments.size() > 1) {
         B2FATAL("At most 1 argument (name of mask) accepted for meta function nROE_Composites");
       }
-      auto func = [maskName](const Particle * particle) -> double {
+      auto func = [maskName](const Particle * particle) -> int {
 
         // Get related ROE object
         const RestOfEvent* roe = getRelatedROEObject(particle);
@@ -621,7 +621,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return Const::doubleNaN;
+          return -1;
         }
         int result = 0;
         auto particles = roe->getParticles(maskName, false);
@@ -2135,7 +2135,7 @@ namespace Belle2 {
 
     REGISTER_METAVARIABLE("nROE_Composites(maskName)", nROE_Composites,
                           "Returns number of composite particles or V0s in the related RestOfEvent object that pass the selection criteria.",
-                          Manager::VariableDataType::c_double);
+                          Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("nROE_ParticlesInList(pListName[, maskName])", nROE_ParticlesInList,
                           "Returns the number of particles in ROE from the given particle list. If a mask name is provided the selection criteria are applied.\n"

@@ -28,7 +28,7 @@ namespace Belle2 {
      * Returns 1 if a track, ecl or klmCluster associated to particle is in the related RestOfEvent object, 0 otherwise.
      * Also works for composite particles, where all mdst objects of related FSP particles must be in ROE.
      */
-    double isInRestOfEvent(const Particle* particle);
+    bool isInRestOfEvent(const Particle* particle);
     /**
      * Returns 1 if a particle is a clone of signal side final state particles, 0 otherwise.
      */
@@ -378,8 +378,8 @@ namespace Belle2 {
      * Also works for composite particles, where all mdst objects of related FSP particles must be in ROE.
      * This helper function accepts a specific roe object as an argument
      */
-    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe,
-                               const std::string& maskName = RestOfEvent::c_defaultMaskName);
+    bool isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe,
+                             const std::string& maskName = RestOfEvent::c_defaultMaskName);
 
 
     /**

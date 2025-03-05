@@ -41,7 +41,7 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    double isInRestOfEvent(const Particle* particle)
+    bool isInRestOfEvent(const Particle* particle)
     {
 
       StoreObjPtr<RestOfEvent> roeobjptr;
@@ -2011,7 +2011,7 @@ namespace Belle2 {
       }
     }
 
-    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, const std::string& maskName)
+    bool isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, const std::string& maskName)
     {
       if (particle->getParticleSource() == Particle::c_Composite or
           particle->getParticleSource() == Particle::c_V0) {

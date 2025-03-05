@@ -417,23 +417,23 @@ namespace {
 
     auto* var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_EQ(std::get<double>(var->function(partROE1)), 1);
+    EXPECT_EQ(std::get<bool>(var->function(partROE1)), 1);
 
     var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_EQ(std::get<double>(var->function(partROE2)), 1);
+    EXPECT_EQ(std::get<bool>(var->function(partROE2)), 1);
 
     var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_EQ(std::get<double>(var->function(partROE3)), 1);
+    EXPECT_EQ(std::get<bool>(var->function(partROE3)), 1);
 
     var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_EQ(std::get<double>(var->function(partNotROE)), 0);
+    EXPECT_EQ(std::get<bool>(var->function(partNotROE)), 0);
 
     var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_EQ(std::get<double>(var->function(partNotROE)), 0);
+    EXPECT_EQ(std::get<bool>(var->function(partNotROE)), 0);
 
     var = Manager::Instance().getVariable("passesROEMask(my_mask)");
     ASSERT_NE(var, nullptr);

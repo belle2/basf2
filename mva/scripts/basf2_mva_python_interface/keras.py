@@ -10,11 +10,14 @@ import pathlib
 import tempfile
 import numpy as np
 
+from basf2 import B2WARNING
+
 from keras.layers import Dense, Input
 from keras.models import Model, load_model
 from keras.losses import binary_crossentropy
 import tensorflow as tf
-from basf2 import B2WARNING
+tf.config.threading.set_intra_op_parallelism_threads(1)
+tf.config.threading.set_inter_op_parallelism_threads(1)
 
 
 class State:

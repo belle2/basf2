@@ -243,14 +243,14 @@ namespace Belle2 {
       return nRemainingTracksInROE(particle);
     }
 
-    double nROE_KLMClusters(const Particle* particle)
+    int nROE_KLMClusters(const Particle* particle)
     {
       // Get related ROE object
       const RestOfEvent* roe = getRelatedROEObject(particle);
 
       if (!roe) {
         B2ERROR("Relation between particle and ROE doesn't exist!");
-        return Const::doubleNaN;
+        return -1;
       }
 
       return roe->getNKLMClusters();

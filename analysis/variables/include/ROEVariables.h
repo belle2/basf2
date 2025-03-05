@@ -75,7 +75,7 @@ namespace Belle2 {
     /**
      * Returns number of remaining KLM clusters in the related RestOfEvent object
      */
-    double nROE_KLMClusters(const Particle* particle);
+    int nROE_KLMClusters(const Particle* particle);
 
     /**
      * Returns true energy of unused tracks and clusters in ROE.

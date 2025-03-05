@@ -225,7 +225,7 @@ namespace {
 
     var = Manager::Instance().getVariable("nROE_KLMClusters");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 1);
   }
   /*
    * Test ROE recoil frame variable

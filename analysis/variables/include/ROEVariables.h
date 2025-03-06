@@ -37,7 +37,7 @@ namespace Belle2 {
     /**
      * Returns 1 if a particle has ancestor signal side final state particles, 0 otherwise.
      */
-    double hasAncestorFromSignalSide(const Particle* particle);
+    bool hasAncestorFromSignalSide(const Particle* particle);
 
     /**
      * Prints the indices of all particles in the ROE and the properties of all masks appended to the ROE.

@@ -76,27 +76,27 @@ namespace Belle2 {
       return 0;
     }
 
-    double hasAncestorFromSignalSide(const Particle* particle)
+    bool hasAncestorFromSignalSide(const Particle* particle)
     {
       StoreObjPtr<RestOfEvent> roe;
       if (!roe.isValid()) {
-        B2WARNING("Please use hasAncestorFromSignalSide variable in for_each ROE loop!");
-        return Const::doubleNaN;
+        B2ERROR("Please use hasAncestorFromSignalSide variable in for_each ROE loop!");
+        return 0;
       }
       auto* particleMC = particle->getMCParticle();
       if (!particleMC) {
-        return 0.0;
+        return 0;
       }
       auto* signalReco = roe->getRelatedFrom<Particle>();
       auto* signalMC = signalReco->getMCParticle();
       MCParticle* ancestorMC = particleMC->getMother();
       while (ancestorMC) {
         if (ancestorMC == signalMC) {
-          return 1.0;
+          return 1;
         }
         ancestorMC = ancestorMC->getMother();
       }
-      return 0.0;
+      return 0;
     }
 
     Manager::FunctionPtr currentROEIsInList(const std::vector<std::string>& arguments)

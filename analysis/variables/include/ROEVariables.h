@@ -32,7 +32,7 @@ namespace Belle2 {
     /**
      * Returns 1 if a particle is a clone of signal side final state particles, 0 otherwise.
      */
-    double isCloneOfSignalSide(const Particle* particle);
+    bool isCloneOfSignalSide(const Particle* particle);
 
     /**
      * Returns 1 if a particle has ancestor signal side final state particles, 0 otherwise.

@@ -53,27 +53,27 @@ namespace Belle2 {
       return isInThisRestOfEvent(particle, roe);
     }
 
-    double isCloneOfSignalSide(const Particle* particle)
+    bool isCloneOfSignalSide(const Particle* particle)
     {
 
       StoreObjPtr<RestOfEvent> roe;
       if (not roe.isValid()) {
-        B2WARNING("Please use isCloneOfSignalSide variable in for_each ROE loop!");
-        return Const::doubleNaN;
+        B2ERROR("Please use isCloneOfSignalSide variable in for_each ROE loop!");
+        return 0;
       }
       auto* particleMC = particle->getMCParticle();
       if (!particleMC) {
-        return 0.0;
+        return 0;
       }
       auto* signal = roe->getRelatedFrom<Particle>();
       auto signalFSPs = signal->getFinalStateDaughters();
       for (auto* daughter : signalFSPs) {
         auto* daughterMC = daughter->getMCParticle();
         if (daughterMC == particleMC) {
-          return 1.0;
+          return 1;
         }
       }
-      return 0.0;
+      return 0;
     }
 
     double hasAncestorFromSignalSide(const Particle* particle)

@@ -47,10 +47,9 @@ namespace Belle2 {
 
     /**
      * Returns 1 if there is correct combination of daughter particles between the particle that is the basis of the ROE and the particle loaded from the ROE.
-     * Returns 0 if there is not correct combination.
-     * If there is no daughter particle loaded from the ROE, returns quiet NaN.
+     * Returns 0 if there is not correct combination or if there is no daughter particle loaded from the ROE.
      */
-    double hasCorrectROECombination(const Particle* particle);
+    bool hasCorrectROECombination(const Particle* particle);
 
     /**
      * Helper function for nRemainingTracksInRestOfEventWithMask and nRemainingTracksInRestOfEvent

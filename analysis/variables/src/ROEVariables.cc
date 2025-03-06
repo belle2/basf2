@@ -1667,12 +1667,12 @@ namespace Belle2 {
       return 0;
     }
 
-    double hasCorrectROECombination(const Particle* particle)
+    bool hasCorrectROECombination(const Particle* particle)
     {
       unsigned nDaughters = particle->getNDaughters();
       if (nDaughters < 2) {
         B2ERROR("The particle must have at least two daughters.");
-        return Const::doubleNaN;
+        return 0;
       }
 
       for (unsigned i = 0; i < particle->getNDaughters(); i++) {
@@ -1689,13 +1689,13 @@ namespace Belle2 {
           const auto anotherDaughter = particle->getDaughter(j);
 
           if (anotherDaughter == sourceParticle)
-            return 1.0;
+            return 1;
         }
-        return 0.0;
+        return 0;
       }
 
       B2ERROR("There is no daughter particle loaded from the ROE object.");
-      return Const::doubleNaN;
+      return 0;
     }
 
     Manager::FunctionPtr pi0Prob(const std::vector<std::string>& arguments)
@@ -2281,8 +2281,7 @@ The neutrino momentum is calculated from ROE taking into account the specified m
 
     REGISTER_VARIABLE("hasCorrectROECombination", hasCorrectROECombination,
 		      "Returns 1 if there is correct combination of daughter particles between the particle that is the basis of the ROE and the particle loaded from the ROE. "
-		      "Returns 0 if there is not correct combination. "
-		      "If there is no daughter particle loaded from the ROE, returns quiet NaN.");
+		      "Returns 0 if there is not correct combination or if there is no daughter particle loaded from the ROE.");
 
     REGISTER_METAVARIABLE("pi0Prob(mode)", pi0Prob,
                       "Returns pi0 probability, where mode is used to specify the selection criteria for soft photon. \n"

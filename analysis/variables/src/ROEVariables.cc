@@ -201,7 +201,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function useROERecoilFrame");
+        B2FATAL("Wrong number of arguments for meta function useROERecoilFrame");
         return nullptr;
       }
     }

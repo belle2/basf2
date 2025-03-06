@@ -673,7 +673,7 @@ namespace Belle2 {
     for( int i=0;i<olhitmgr.count();i++ ){
     Belle::Datcdc_olhit&  h = olhitmgr[i];
     }
-    dout(Debugout::B2INFO,"SensitiveDetector")
+    doubt(Debugout::B2INFO,"SensitiveDetector")
     << "AddbgOne " << olhitmgr.size()
     << std::endl;
     }
@@ -969,7 +969,7 @@ L10:
     //Calculates a rotation matrix in advance at a local position in lab.
     //The rotation is done about the coord. origin; lab.-frame to B-field
     //frame in which only Bz-comp. is non-zero.
-    //~dead copy of gsim_cdc_for_rotat.F in gsim-cdc for Belle (for tentaive use)
+    //~dead copy of gsim_cdc_for_rotat.F in gsim-cdc for Belle (for tentative use)
 
     if (m_nonUniformField == 0) return;
 
@@ -1000,12 +1000,12 @@ L10:
   }
 
   void
-  CDCSensitiveDetector::Rotat(G4double& x, G4double& y, G4double& z,
-                              const int mode)
+  CDCSensitiveDetector::Rotate(G4double& x, G4double& y, G4double& z,
+                               const int mode)
   {
     //Translates (x,y,z) in lab. to (x,y,z) in B-field frame (mode=1), or reverse
     // translation (mode=-1).
-    //~dead copy (for tentaive use) of gsim_cdc_rotat/irotat.F in gsim-cdc
+    //~dead copy (for tentative use) of gsim_cdc_rotat/irotat.F in gsim-cdc
     //for Belle
 
     if (m_nonUniformField == 0) return;
@@ -1021,7 +1021,7 @@ L10:
       y = m_brot[1][0] * x0 + m_brot[1][1] * y0 + m_brot[1][2] * z0;
       z = m_brot[2][0] * x0 + m_brot[2][1] * y0 + m_brot[2][2] * z0;
     } else {
-      //B2ERROR("SensitiveDetector " <<"invalid mode " << mode << "specifed");
+      //B2ERROR("SensitiveDetector " <<"invalid mode " << mode << "specified");
     }
     return;
 
@@ -1032,7 +1032,7 @@ L10:
   {
     //Translates (x,y,z) in lab. to (x,y,z) in B-field frame (mode=1), or reverse
     // translation (mode=-1).
-    //~dead copy (for tentaive use) of gsim_cdc_rotat/irotat.F in gsim-cdc
+    //~dead copy (for tentative use) of gsim_cdc_rotat/irotat.F in gsim-cdc
     //for Belle
 
     if (m_nonUniformField == 0) return;
@@ -1048,7 +1048,7 @@ L10:
       x[1] = m_brot[1][0] * x0 + m_brot[1][1] * y0 + m_brot[1][2] * z0;
       x[2] = m_brot[2][0] * x0 + m_brot[2][1] * y0 + m_brot[2][2] * z0;
     } else {
-      //B2ERROR("SensitiveDetector " <<"invalid mode " << mode << "specifed");
+      //B2ERROR("SensitiveDetector " <<"invalid mode " << mode << "specified");
     }
     return;
 
@@ -1070,7 +1070,7 @@ L10:
                                G4double q3[3],
                                G4int& ntry)
   {
-    //~dead copy of gsim_cdc_hit.F in gsim-cdc for Belle (for tentaive use)
+    //~dead copy of gsim_cdc_hit.F in gsim-cdc for Belle (for tentative use)
     // ---------------------------------------------------------------------
     //     Purpose : Calculate closest points between helix and wire.
     //
@@ -1146,7 +1146,7 @@ L10:
     vv = sqrt(vx * vx + vy * vy + vz * vz);
     vx /= vv;  vy /= vv;  vz /= vv;
 
-    //flag for distingushing between stereo and axial wire
+    //flag for distinguishing between stereo and axial wire
     iflg = 0;
     if (vx == 0. &&  vy == 0.) iflg = 1;
     //  std::cout << "iflg= " << iflg << std::endl;
@@ -1225,7 +1225,7 @@ line1:
     //on a point along the helix.
     dxx[0] =   r * sinfi0fi;  dxx[1] = - r * cosfi0fi;  dxx[2] = - r * tanl;
 
-    //   In order to derive the closest pont between straight line and helix,
+    //   In order to derive the closest point between straight line and helix,
     //   we can put following two conditions:
     //     (i)  A point H(xh,yh,zh) on the helix given should be on
     //          the plane which is perpendicular to the straight line.

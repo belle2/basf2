@@ -60,7 +60,7 @@ namespace Belle2 {
 
     GeoCDCCreator::GeoCDCCreator()
     {
-      // Set job control params. before sensitivedetector and gometry construction
+      // Set job control params. before sensitivedetector and geometry construction
       CDCSimControlPar::getInstance();
       CDCGeoControlPar::getInstance();
 
@@ -794,7 +794,7 @@ namespace Belle2 {
 
         //G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,
         //                                                logicalName, 0, 0, 0);
-        // ID depndent material definition, Aluminum is default
+        // ID dependent material definition, Aluminum is default
         G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum, logicalName, 0, 0, 0);
         if (id > 39 && id < 78) // Cu
           logicalV = new G4LogicalVolume(boxShape, medCopper, logicalName, 0, 0, 0);

@@ -203,7 +203,7 @@ namespace Belle2 {
 
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_cdcHitArrayName ;         /**< Belle2::CDCHit StoreArray name. */
-      std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray nam.e */
+      std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray name.e */
       std::string m_trackFitResultArrayName;  /**< Belle2::TrackFitResult StoreArray name. */
       std::string m_relRecoTrackTrackName;    /**< Relation between RecoTrack and Belle2:Track. */
       std::string m_histogramDirectoryName;   /**< subdir where to place the histograms. */
@@ -233,7 +233,7 @@ namespace Belle2 {
       TH1* m_hNormalizedResidualU[56];        /**< Residual distribution normalized with tracking error.  */
       TH2* m_hNDFNormalizedResidualU[56];     /**< Normalized residual vs. ndf. */
       TH2* m_hDxDt[56];                       /**< Unbiased x_fit vs. drift time. */
-      TProfile* m_hHitEff_soft[56];           /**< Hit efficience of each layer, software */
+      TProfile* m_hHitEff_soft[56];           /**< Hit efficiency of each layer, software */
       TH2* m_h2DHitDistInCDCHit;              /**< 2D Hit Dist.(ICLay vs IWire) from CDCHit. */
       TH2* m_h2DHitDistInTrCand;              /**< 2D Hit Dist.(ICLay vs IWire) of Track candidates. */
       TH2* m_h2DHitDistInTrack;               /**< 2D Hit Dist..(ICLay vs IWire) have weight>0.5 after fit with DAF */

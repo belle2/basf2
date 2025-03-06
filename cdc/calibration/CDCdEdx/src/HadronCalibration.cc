@@ -19,7 +19,7 @@ void HadronCalibration::fitBGCurve(std::vector< std::string > particles, const s
 {
 
   // read in a file that contains fit results for bg bins
-  double bgmin1 = 0.25, bgmax1 = 5.1; //using untill 0 --> 4.5
+  double bgmin1 = 0.25, bgmax1 = 5.1; //using until 0 --> 4.5
   double bgmin2 = 3.9, bgmax2 = 15.0; //using till 4.5 --> 10
   double bgmin3 = 7.5, bgmax3 = 5000; //using above 10 --> 6000 *use this range only
 
@@ -716,7 +716,7 @@ void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, con
       }
 
       if (status == 0) {
-        B2INFO("\tHadronCalibration::fitSigmaVsNHit --> FIT OK..upadting parameters");
+        B2INFO("\tHadronCalibration::fitSigmaVsNHit --> FIT OK..updating parameters");
         for (int j = 1; j < 6; ++j) {
           B2INFO("\t" << j << ") Old = " << sgpar.getNHitPars(j - 1) << " --> New = " << fsigma->GetParameter(j));
           sgpar.setNHitPars(j - 1, fsigma->GetParameter(j));
@@ -817,7 +817,7 @@ void HadronCalibration::fitSigmaVsCos(std::vector< std::string > particles, cons
         status = gr_dedx.Fit("total", "FR", "", lowercos, uppercos);
       }
       if (status == 0) {
-        B2INFO("\tHadronCalibration::fitSigmaVsCos --> FIT OK..upadting parameters");
+        B2INFO("\tHadronCalibration::fitSigmaVsCos --> FIT OK..updating parameters");
         for (int j = 1; j < 11; ++j) {
           B2INFO("\t" << j - 1 << ") Old = " << gpar.getCosPars(j - 1) << " --> New = " << total->GetParameter(j));
           gpar.setCosPars(j - 1, total->GetParameter(j));

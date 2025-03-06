@@ -132,14 +132,14 @@ namespace Belle2 {
        * or reverse translation (mode=-1).
        */
 
-      void Rotat(G4double& x, G4double& y,
-                 G4double& z,
-                 const int mode);
+      void Rotate(G4double& x, G4double& y,
+                  G4double& z,
+                  const int mode);
 
       /**
        * Overloaded translation method.
        */
-      void Rotat(G4double x[3], const int mode);
+      void Rotate(G4double x[3], const int mode);
 
       //! Calculate closest points between helix and wire.
       /*!

@@ -2274,7 +2274,7 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "Returns missing mass squared over missing energy. The unit of the missing mass squared is :math:`\\text{GeV/c}^4`.", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("passesROEMask(maskName)", passesROEMask,
-                      "Returns boolean value if a particle passes a certain mask or not. Only to be used in for_each path, otherwise returns quiet NaN.", Manager::VariableDataType::c_bool);
+                      "Returns boolean value if a particle passes a certain mask or not. Only to be used in for_each path.", Manager::VariableDataType::c_bool);
 
     REGISTER_VARIABLE("printROE", printROE,
                       "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");

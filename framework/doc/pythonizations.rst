@@ -13,7 +13,7 @@ Other then filling the PyStoreArray we can also read from it, and the idea is th
 Usage example
 +++++++++++++
 The usage is pretty straightforward. Assume we want to fill a PyStoreArray with PXDDigits,
-then we just instantiate the PyStoreArray and call the `fillArray` function passing all the 
+then we just instantiate the PyStoreArray and call the ``fillArray`` function passing all the 
 members of the PXDDigit class, as in the following example:
 
 .. code-block:: python
@@ -22,7 +22,7 @@ members of the PXDDigit class, as in the following example:
     store.registerInDataStore()
     store.fillArray(sensorID=sids, uCellID=ucells, vCellID=vcells, charge=charge)
 
-The `readArray` function usage is very similar. It will return a dictionary with all the 
+The ``readArray`` function usage is very similar. It will return a dictionary with all the 
 members of the class:
 
 .. code-block:: python

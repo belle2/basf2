@@ -34,13 +34,11 @@ settings = CalibrationSettings(name="CDC badwire",
                                })
 
 
-# Main function to get calibrations
 def get_calibrations(input_data, **kwargs):
     expert_config = kwargs.get("expert_config")
     min_events_per_file = expert_config["min_events_per_file"]
     max_events_per_file = expert_config["max_events_per_file"]
     components = expert_config["components"]
-    # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
     file_to_iov_mumu = input_data["mumu_tight_or_highm_calib"]
     from prompt.utils import filter_by_max_files_per_run
@@ -55,7 +53,6 @@ def get_calibrations(input_data, **kwargs):
     # The actual value our output IoV payload should have. Notice that we've set it open ended.
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
-
     # for SingleIOV stratrgy, it's better to set the granularity to 'all' so that the collector jobs will run faster
     if payload_boundaries:
         basf2.B2INFO('Found payload_boundaries: set collector granularity to run')
@@ -85,7 +82,6 @@ def get_calibrations(input_data, **kwargs):
 
 
 def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"]):
-
     # Create an execution path
     path = basf2.create_path()
     branches = ['EventMetaData', 'RawCDCs', 'RawFTSWs']
@@ -97,14 +93,11 @@ def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"]):
                     energyLossBrems=False, noiseBrems=False)
     add_unpackers(path, components=unpackers)
     add_hit_preparation_modules(path, components=unpackers)
-
     # Print some progress messages
     path.add_module("Progress")
-
     # Execute CDC track finding
     add_track_finding(path, components=unpackers)
     add_track_fit_and_track_creator(path, trackFitHypotheses=[211])  # pion or muon hypothesis
-
     # Making sure CDC Raw Hits are stored
     for module in path.modules():
         if module.name() == 'CDCUnpacker':

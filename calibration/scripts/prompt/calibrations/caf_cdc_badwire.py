@@ -97,14 +97,11 @@ def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"]):
                     energyLossBrems=False, noiseBrems=False)
     add_unpackers(path, components=unpackers)
     add_hit_preparation_modules(path, components=unpackers)
-
     # Print some progress messages
     path.add_module("Progress")
-
     # Execute CDC track finding
     add_track_finding(path, components=unpackers)
     add_track_fit_and_track_creator(path, trackFitHypotheses=[211])  # pion or muon hypothesis
-
     # Making sure CDC Raw Hits are stored
     for module in path.modules():
         if module.name() == 'CDCUnpacker':
@@ -113,7 +110,6 @@ def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"]):
         if module.name() == 'TFCDC_WireHitPreparer':
             print('Enabling bad wires')
             module.param({'useBadWires': True})
-
     # Print a textual representation of what was just put together
     basf2.print_path(path)
     return path

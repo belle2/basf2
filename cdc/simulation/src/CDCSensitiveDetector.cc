@@ -1000,8 +1000,8 @@ L10:
   }
 
   void
-  CDCSensitiveDetector::Rotate(G4double& x, G4double& y, G4double& z,
-                               const int mode)
+  CDCSensitiveDetector::Rotat(G4double& x, G4double& y, G4double& z,
+                              const int mode)
   {
     //Translates (x,y,z) in lab. to (x,y,z) in B-field frame (mode=1), or reverse
     // translation (mode=-1).

@@ -12,24 +12,25 @@
     <!-- ########## IP pipe ########## -->
     
     <Lv1SUS>     
-      <sec name="L1" unit="cm">0.55</sec>
-      <sec name="L2" unit="cm">0.75</sec>
-      <sec name="L3" unit="cm">0.35</sec>
-      <sec name="L4" unit="cm">0.5</sec>
+      <sec name="L1" unit="cm">0.45</sec>
+      <sec name="L2" unit="cm">0.9</sec>
+      <sec name="L3" unit="cm">0.25</sec>
+      <sec name="L4" unit="cm">0.65</sec>
       <sec name="L5" unit="cm">0.35</sec>
-      <sec name="L6" unit="cm">4.07</sec>
-      <sec name="L7" unit="cm">0.03</sec>
+      <sec name="L6" unit="cm">4.03</sec>
+      <sec name="L7" unit="cm">0.07</sec>
       <sec name="L8" unit="cm">2.45</sec>
       <sec name="L9" unit="cm">4.65</sec>
-      <sec name="L10" unit="cm">0.03</sec>
-      <sec name="L11" unit="cm">5.12</sec>
-      <sec name="L12" unit="cm">1.7</sec>
-      <sec name="L13" unit="cm">0.25</sec>
-      <sec name="L14" unit="cm">0.9</sec>
+      <sec name="L10" unit="cm">0.07</sec>
+      <sec name="L11" unit="cm">5.78</sec>
+      <sec name="L12" unit="cm">0.35</sec>
+      <sec name="L13" unit="cm">0.65</sec>
+      <sec name="L14" unit="cm">0.25</sec>
       <sec name="L15" unit="cm">0.9</sec>
+      <sec name="L16" unit="cm">0.9</sec>
       <sec name="R1" unit="cm">1.16</sec>
       <sec name="R2" unit="cm">2.5</sec>
-      <sec name="R3" unit="cm">2.05</sec>
+      <sec name="R3" unit="cm">2.25</sec>
       <sec name="R4" unit="cm">1.6</sec>
       <sec name="R5" unit="cm">1.25</sec>
       <sec name="R6" unit="cm">1.2002</sec>
@@ -68,24 +69,26 @@
     <Lv2Paraf>      
       <sec name="L1" unit="cm">0.35</sec>
       <sec name="L2" unit="cm">0.1</sec>
-      <sec name="L3" unit="cm">0.425</sec>
+      <sec name="L3" unit="cm">0.625</sec>
       <sec name="L4" unit="cm">0.3</sec>
-      <sec name="L5" unit="cm">3.385</sec>
-      <sec name="L6" unit="cm">0.04</sec>
+      <sec name="L5" unit="cm">3.35</sec>
+      <sec name="L6" unit="cm">0.075</sec>
       <sec name="L7" unit="cm">0.125</sec>
       <sec name="L8" unit="cm">0.075</sec>
       <sec name="L9" unit="cm">3.00</sec>
       <sec name="L10" unit="cm">5.20</sec>
       <sec name="L11" unit="cm">0.025</sec>
       <sec name="L12" unit="cm">0.175</sec>
-      <sec name="L13" unit="cm">0.07</sec>
-      <sec name="L14" unit="cm">4.41</sec>
-      <sec name="L15" unit="cm">0.17</sec>
-      <sec name="L16" unit="cm">0.82</sec>
-      <sec name="L17" unit="cm">0.73</sec>
-      <sec name="L18" unit="cm">0.35</sec>
+      <sec name="L13" unit="cm">0.075</sec>
+      <sec name="L14" unit="cm">5.1</sec>
+      <sec name="L15" unit="cm">0.285</sec>
+      <sec name="L16" unit="cm">0.065</sec>
+      <sec name="L17" unit="cm">0.115</sec>
+      <sec name="L18" unit="cm">0.46</sec>
+      <sec name="L19" unit="cm">0.1</sec>
+      <sec name="L20" unit="cm">0.35</sec>
       <sec name="R1" unit="cm">1.12</sec>
-      <sec name="R2" unit="cm">2.05</sec>
+      <sec name="R2" unit="cm">2.25</sec>
       <sec name="R3" unit="cm">1.6</sec>
       <sec name="R4" unit="cm">1.5</sec>
       <sec name="R5" unit="cm">1.18</sec>
@@ -93,47 +96,29 @@
       <sec name="R7" unit="cm">1.16</sec>
       <sec name="R8" unit="cm">1.18</sec>
       <sec name="R9" unit="cm">1.12</sec>
-      <sec name="R10" unit="cm">1.31</sec>
-      <sec name="R11" unit="cm">1.6</sec>
-      <sec name="R12" unit="cm">2.25</sec>
+      <sec name="R10" unit="cm">1.5</sec>
+      <sec name="R11" unit="cm">1.31</sec>
+      <sec name="R12" unit="cm">1.6</sec>
+      <sec name="R13" unit="cm">2.25</sec>
       <Material>Paraffin</Material>      
     </Lv2Paraf>
 
     <Lv2Vacuum>
-      <sec name="L1" unit="cm">9.05</sec>
-      <sec name="L2" unit="cm">10.0</sec>
+      <sec name="L1" unit="cm">9.25</sec>
+      <sec name="L2" unit="cm">11.0</sec>
       <sec name="L3" unit="cm">5.0</sec>
       <sec name="L4" unit="cm">15.0</sec>
-      <sec name="D1" unit="cm">0.0</sec>
-      <sec name="D2" unit="cm">0.1</sec>
-      <sec name="D3" unit="cm">0.5</sec>
-      <sec name="D4" unit="cm">0.5</sec>
-      <sec name="D5" unit="cm">6.75</sec>
-      <sec name="D6" unit="cm">7.5</sec>
-      <sec name="S1" unit="cm">0.5</sec>
       <sec name="R1" unit="cm">1.0</sec>
       <sec name="R2" unit="cm">1.0</sec>
       <sec name="R3" unit="cm">0.5</sec>
-      <sec name="P1" unit="cm">6.75</sec>
       <sec name="A1" unit="rad">0.0415</sec>
       <sec name="A2" unit="rad">0.07</sec>
-      <sec name="A3" unit="rad">1.563389</sec>
       <Material>Vacuum</Material>
     </Lv2Vacuum>
     
-    <Lv2AuCoat>
-      <sec name="L1" unit="cm">3.20</sec>
-      <sec name="L2" unit="cm">2.05</sec>
-      <sec name="L3" unit="cm">3.72</sec>
-      <sec name="L4" unit="cm">5.40</sec>
-      <sec name="R1" unit="cm">1.060</sec>
-      <sec name="R2" unit="cm">1.061</sec>
-      <Material>Au</Material>
-    </Lv2AuCoat>
-
     <Lv3AuCoat>
       <sec name="L1" unit="cm">6.55</sec>
-      <sec name="L2" unit="cm">9.8</sec>
+      <sec name="L2" unit="cm">10.5</sec>
       <sec name="R1" unit="cm">0.999</sec>
       <sec name="R2" unit="cm">1.000</sec>
       <Material>Au</Material>

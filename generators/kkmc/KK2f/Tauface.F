@@ -117,6 +117,9 @@ C     IFCURR4PI = 3  CLEO initialization
       REAL    GMALFA            ! width
       DATA    GMALFA /0.0/
       COMMON /AMALFA/ AMALFA,ISALFA,VCALFA,ACALFA,DMALFA,GMALFA
+      DOUBLE PRECISION  CTALFA  ! lifetime (mm)
+      DATA              CTALFA/0.0D0/
+      COMMON /CTALFA/   CTALFA
 C
 C     DarkPhoton parameters: epsilon (kinematic mixing), mass and width
 C     
@@ -189,10 +192,11 @@ C     Print functional flags
       ACALFA    = XPAR(ITAUXPAR+914)
       DMALFA    = XPAR(ITAUXPAR+920) ! 915 to 919 are already in use
       GMALFA    = XPAR(ITAUXPAR+921) ! width
+      CTALFA    = XPAR(ITAUXPAR+922) ! lifetime
 C     Print flags for exotic particle
       IF (VCALFA.NE.0.0.OR.ACALFA.NE.0.0)
-     $   WRITE(iout,*) 'AMALFA, ISALFA, VCALFA, ACALFA, DMALFA, GMALFA = ',
-     $                  AMALFA, ISALFA, VCALFA, ACALFA, DMALFA, GMALFA
+     $   WRITE(iout,*) 'AMALFA, ISALFA, VCALFA, ACALFA, DMALFA, GMALFA, CTALFA = ',
+     $                  AMALFA, ISALFA, VCALFA, ACALFA, DMALFA, GMALFA, CTALFA
       
 C     Print optional flags 
       WRITE(iout,*) 'IFEQUALBR, LAMDEC = ',

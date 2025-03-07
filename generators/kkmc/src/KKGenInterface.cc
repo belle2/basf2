@@ -132,13 +132,10 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph, const ConditionalGauss
     //hepevt_.phep[i][4] = p4lab.M();
   }
 
-  // Shift vertex point of alpha in tau- -> lepton- + alpha due to its life time
-  int idalpha = 94144;
-  kk_shifttaudecayvtx_(&idalpha);
 
   // Shift vertex point due to tau life time
-  int idtau = 15;
-  kk_shifttaudecayvtx_(&idtau);
+  kk_shifttaudecayvtx_();
+
 
   // before storing event to MCParticle, check /hepevt/ common block
   B2DEBUG(100, "HepEVT table:");

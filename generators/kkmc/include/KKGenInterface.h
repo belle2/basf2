@@ -51,7 +51,7 @@ extern "C" {
   void kk_init_seed_();
   void kk_term_(double*, double*);
   void kk_event_(int*);
-  void kk_shifttaudecayvtx_(int*);
+  void kk_shifttaudecayvtx_();
   int pycomp_(int&);
 
 }

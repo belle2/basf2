@@ -190,8 +190,9 @@ C   Switch on internal JETSET? (this is the default of Belle)
 
       end
 
+
 CCCCCC
-      subroutine KK_ShiftTauDecayVtx(id)
+      subroutine KK_ShiftTauDecayVtx
       implicit none
 
       integer imax
@@ -212,15 +213,15 @@ CCCCCC
 c  HepEvt
       INCLUDE 'KK2f/HepEvt.fi'
 
-      if (abs(id).eq.15) ctaulife = ctau
-      if (abs(id).eq.94144) ctaulife = ctalfa
       
       do itau=1,2
          do i=1,nhep
-            if(idhep(i).eq.(id)) then
+            if((idhep(i).eq.(itau*30-45)).or.(abs(idhep(i)).eq.94144)) then
                p = dsqrt(phep(4,i)*phep(4,i)-phep(5,i)*phep(5,i))
                betagamma = p/phep(5,i)
                call KK_RandExp(rvec,1)
+               if (abs(idhep(i)).eq.15) ctaulife = ctau
+               if (abs(idhep(i)).eq.94144) ctaulife = ctalfa
                flen = betagamma*ctaulife*rvec(1)
                do j=1,4
                   vtx0(j) = VHEP(j,jdahep(1,i))-VHEP(j,i)

@@ -121,7 +121,7 @@ namespace Belle2 {
        * @param width full forward width of the shape in mm
        * @param width2 full backward width of the shape in mm
        * @param length length of the shape in mm
-       * @param[input] height of the shape in mm. If angle is not 0 this value
+       * @param[height] height of the shape in mm. If angle is not 0 this value
        *        might be changed if the actual height will be smaller due to
        *        the slanted edges
        * @param angle angle of the sides along w with respect to to the uv

@@ -4,11 +4,37 @@ In many important tasks one is required to fill a PyStoreArray with instances of
 One example could be when someone wants to create background overlay files starting from PXD digits.
 In order to do that, one should first create the object instance in Python and then fill the PyStoreArray with it.
 This procedure, however, can be optimized to make it much faster.
-The solution is to create an array-oriented interface capable of passing the objects to the PyStoreArray
-without having to first create the object instance in Python.
-The idea is to write a C++ function which does the filling of the PyStoreArray accessing directly the underlying
-ROOT TClonesArray, and then create a python wrapper which allows a cleaner way for the user to call the function.
-Other then filling the PyStoreArray we can also read from it, and the idea is the same in both cases.
+The solution is to create an array-oriented interface capable of filling the PyStoreArray in compiled mode,
+accessing the underlying TClonesArray, thus without having to first create the object instance in Python.
+In order to use this function one has to call it as a member function of the PyStoreArray, as shown in the usage example below,
+and pass one by one the members of the class in question specifying their names.
+
+Instead of just filling a PyStoreArray we can also read from it using the same logic.
+In order to read the content of a PyStoreArray, one has just to call the ``readArray`` as shown in the example below,
+and it will return a dictionary where each key is one member of the class into consideration.
+In order to read the content of a PyStoreArray we have to first pass to the functions some empty arrays and then fill them with the class members.
+The filling of the empty arrays is done by the ``fillValues`` function, which has to be implemented in the header file of every class of objects which we want
+to be able to read.
+This function is already implemented for the ``PXDDigits`` and for the ``CDCHits``.
+
+``fillValues`` implementation
++++++++++++++++++++++++++++++
+The implementation of the ``fillValues`` function is pretty straightforward.
+We just have to fill the empty arrays passed to the function with the class members.
+Since every class has a different number and type of members, this has to be implemented
+specifically for each class we want to be able to read from a PyStoreArray.
+The implementation for the case of ``PXDDigits`` looks like this:
+
+.. code-block:: C++
+
+    void fillValues(unsigned short* charge, unsigned short* uCellID, unsigned short* vCellID, unsigned short* sensorID)
+    {
+      *charge = m_charge;
+      *uCellID = m_uCellID;
+      *vCellID = m_vCellID;
+      *sensorID = m_sensorID;
+    }
+
 
 Usage example
 +++++++++++++

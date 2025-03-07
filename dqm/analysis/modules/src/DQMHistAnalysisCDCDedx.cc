@@ -23,14 +23,14 @@ DQMHistAnalysisCDCDedxModule::DQMHistAnalysisCDCDedxModule()
   setDescription("Module to draw and compute values related to dEdx for CDC. ");
 
   //Parameter definition here
-  addParam("mmode", mmode, "default monitoring mode is basic", std::string("basic"));
+  addParam("mmode", m_mode, "default monitoring mode is basic", std::string("basic"));
 
-  Double_t stops[NRGBs] = { 0.00, 0.00, 0.34, 0.61, 0.84, 1.00 };
-  Double_t red[NRGBs]   = { 0.00, 0.00, 0.00, 0.87, 1.00, 0.51 };
-  Double_t green[NRGBs] = { 0.00, 0.00, 0.81, 1.00, 0.20, 0.00 };
-  Double_t blue[NRGBs]  = { 0.00, 0.51, 1.00, 0.12, 0.00, 0.00 };
-  m_pal = TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont, false);
-  for (auto i = 0; i < NCont; i++) m_palarr[i] = m_pal + i;
+  Double_t stops[m_NRGBs] = { 0.00, 0.00, 0.34, 0.61, 0.84, 1.00 };
+  Double_t red[m_NRGBs]   = { 0.00, 0.00, 0.00, 0.87, 1.00, 0.51 };
+  Double_t green[m_NRGBs] = { 0.00, 0.00, 0.81, 1.00, 0.20, 0.00 };
+  Double_t blue[m_NRGBs]  = { 0.00, 0.51, 1.00, 0.12, 0.00, 0.00 };
+  m_pal = TColor::CreateGradientColorTable(m_NRGBs, stops, red, green, blue, m_NCont, false);
+  for (auto i = 0; i < m_NCont; i++) m_palarr[i] = m_pal + i;
 }
 
 
@@ -44,10 +44,10 @@ void DQMHistAnalysisCDCDedxModule::initialize()
   B2DEBUG(20, "DQMHistAnalysisCDCDedx: initialized.");
 
   //intra-run cavnas 1D
-  c_ir_dedx = new TCanvas("CDCDedx/c_ir_dedx", "", 1400, 500);
+  m_c_ir_dedx = new TCanvas("CDCDedx/m_c_ir_dedx", "", 1400, 500);
 
   //per run canvas
-  c_pr_dedx = new TCanvas("CDCDedx/c_CDCdedxMean", "", 800, 800);
+  m_c_pr_dedx = new TCanvas("CDCDedx/c_CDCdedxMean", "", 800, 800);
 
   f_gaus = new TF1("f_gaus", "gaus", 0.0, 2.5);
   f_gaus->SetLineColor(kRed);
@@ -57,7 +57,7 @@ void DQMHistAnalysisCDCDedxModule::initialize()
   l_line->SetLineStyle(1);
   l_line->SetLineWidth(2);
 
-  m_text_dedx = new TPaveText(0.60, 0.68, 0.85, 0.89, "NBNDC");
+  m_text_dedx = new TPaveText(0.60, 0.60, 0.85, 0.89, "NBNDC");
   m_text_dedx->SetBorderSize(0);
 
   m_text_dedx_fit = new TPaveText(0.12, 0.72, 0.37, 0.89, "NBNDC");
@@ -83,14 +83,15 @@ void DQMHistAnalysisCDCDedxModule::initialize()
 
   //Monitoring object for run dependency at mirabelle
   m_monObj = getMonitoringObject("cdcdedx");
-  m_monObj->addCanvas(c_ir_dedx);
-  m_monObj->addCanvas(c_pr_dedx);
+  m_monObj->addCanvas(m_c_ir_dedx);
+  m_monObj->addCanvas(m_c_pr_dedx);
 }
 
 
 //-------------------------------------------
 void DQMHistAnalysisCDCDedxModule::beginRun()
 {
+
   B2DEBUG(20, "DQMHistAnalysisCDCDedx: beginRun called.");
 
 }
@@ -105,13 +106,13 @@ void DQMHistAnalysisCDCDedxModule::event()
   //Plot 0 getmeta those are useful for cosmetics
   getMetadata();
 
-  c_pr_dedx->Clear();
-  if (mmode != "basic") {
-    c_pr_dedx->SetWindowSize(1400, 800);
-    c_pr_dedx->Divide(3, 3);
+  m_c_pr_dedx->Clear();
+  if (m_mode != "basic") {
+    m_c_pr_dedx->SetWindowSize(1400, 800);
+    m_c_pr_dedx->Divide(3, 3);
   } else {
-    c_pr_dedx->SetWindowSize(1000, 800);
-    c_pr_dedx->Divide(3, 2);
+    m_c_pr_dedx->SetWindowSize(1000, 800);
+    m_c_pr_dedx->Divide(3, 2);
   }
 
   //Plot 1 dE/dx per run gain/reso
@@ -126,26 +127,26 @@ void DQMHistAnalysisCDCDedxModule::event()
   // Plot 5/6 dE/dx mean/reso vs inject time
   drawDedxInjTimeBin();
 
-  c_pr_dedx->Modified();
-  c_pr_dedx->Update();
+  m_c_pr_dedx->Modified();
+  m_c_pr_dedx->Update();
 
-  c_ir_dedx->Clear();
-  if (mmode != "basic") {
-    c_ir_dedx->SetWindowSize(900, 400);
-    c_ir_dedx->Divide(3, 1);
+  m_c_ir_dedx->Clear();
+  if (m_mode != "basic") {
+    m_c_ir_dedx->SetWindowSize(900, 400);
+    m_c_ir_dedx->Divide(3, 1);
   } else {
-    c_ir_dedx->SetWindowSize(900, 400);
-    c_ir_dedx->Divide(2, 1);
+    m_c_ir_dedx->SetWindowSize(900, 400);
+    m_c_ir_dedx->Divide(2, 1);
   }
 
   //Plot 1 dE/dx intra-run gain/reso
   drawDedxIR();
 
-  c_ir_dedx->Modified();
-  c_ir_dedx->Update();
+  m_c_ir_dedx->Modified();
+  m_c_ir_dedx->Update();
 
   //Plot 7/8 wire status/ injection time
-  if (mmode != "basic") {
+  if (m_mode != "basic") {
     drawDedxInjTime();
     drawWireStatus();
   }
@@ -163,8 +164,8 @@ void DQMHistAnalysisCDCDedxModule::terminate()
 
   B2DEBUG(20, "DQMHistAnalysisCDCDedx : terminate called");
 
-  delete c_pr_dedx;
-  delete c_ir_dedx;
+  delete m_c_pr_dedx;
+  delete m_c_ir_dedx;
   delete l_line;
   delete m_hdEdxIRMean;
   delete m_hdEdxIRSigma;
@@ -196,19 +197,19 @@ void DQMHistAnalysisCDCDedxModule::getMetadata()
     m_nbhabhaevt = int(h_Meta->GetBinContent(2));
     m_nhadevt = int(h_Meta->GetBinContent(3));
 
-    std::string m_title = h_Meta->GetTitle();
+    std::string title = h_Meta->GetTitle();
 
-    first = m_title.find("Exp:");
-    last = m_title.find(", Run:");
-    std::string expN = m_title.substr(first + 4, last - first - 4);
+    m_first = title.find("Exp:");
+    m_last = title.find(", Run:");
+    std::string expN = title.substr(m_first + 4, m_last - m_first - 4);
 
-    first = m_title.find(", Run:");
-    last = m_title.find(", RG:");
-    std::string runN = m_title.substr(first + 6, last - first - 6);
+    m_first = title.find(", Run:");
+    m_last = title.find(", RG:");
+    std::string runN = title.substr(m_first + 6, m_last - m_first - 6);
 
-    first = m_title.find(", RG:");
-    last = m_title.find(")");
-    std::string runGain = m_title.substr(first + 5, last - first - 5);
+    m_first = title.find(", RG:");
+    m_last = title.find(")");
+    std::string runGain = title.substr(m_first + 5, m_last - m_first - 5);
 
     m_exp = std::stoi(expN.c_str());
     m_run = std::stoi(runN.c_str());
@@ -230,7 +231,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
     double meanerr = 0.0;
     double sigmaerr = 0.0;
 
-    c_pr_dedx->cd(1);
+    m_c_pr_dedx->cd(1);
     l_line->Clear();
 
     m_status = "LowStats";
@@ -244,6 +245,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
         sigmaerr = h_dEdx->GetFunction("f_gaus")->GetParError(2);
       }
       setHistStyle(h_dEdx);
+      h_dEdx->SetFillColor(kYellow);
       h_dEdx->SetTitle("CDC-dEdx");
       h_dEdx->Draw();
 
@@ -273,9 +275,9 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
     m_text_dedx->AddText(Form("Prev Gain: %0.03f", m_dbrg));
     m_text_dedx->Draw();
 
-    c_pr_dedx->Draw();
-    c_pr_dedx->Modified();
-    c_pr_dedx->Update();
+    m_c_pr_dedx->Draw();
+    m_c_pr_dedx->Modified();
+    m_c_pr_dedx->Update();
 
     m_status.clear();
 
@@ -295,9 +297,9 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
 {
 
   //1. Draw Scattered plot
-  if (mmode != "basic") {
+  if (m_mode != "basic") {
 
-    c_ir_dedx->cd(3);
+    m_c_ir_dedx->cd(3);
 
     TH2D* hdEdxIRScat = (TH2D*)findHist("CDCDedx/hdEdxvsEvt");
     if (hdEdxIRScat != nullptr) {
@@ -309,6 +311,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
       }
 
       setHistStyle(hdEdxIRScat);
+      hdEdxIRScat->SetTitle("CDC-dE/dx Intra-run variation");
       hdEdxIRScat->Draw("");
 
       m_text_dedx_ir->Clear();
@@ -326,7 +329,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
 
   if (hdEdxIRScatC != nullptr) {
 
-    c_ir_dedx->cd(1);
+    m_c_ir_dedx->cd(1);
     gPad->SetGridy(1);
 
     int fbin = hdEdxIRScatC->FindFirstBinAbove(0, 1);
@@ -357,7 +360,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
 
 
     //3 intra-resolution trend
-    c_ir_dedx->cd(2);
+    m_c_ir_dedx->cd(2);
     gPad->SetGridy(1);
 
     setPadStyle(0.143, 0.045, 0.077, 0.0);
@@ -379,7 +382,7 @@ void DQMHistAnalysisCDCDedxModule::drawBandPlot()
   TH2D* hdEdxVsP = (TH2D*)findHist("CDCDedx/hdEdxVsP");
   if (hdEdxVsP != nullptr) {
 
-    c_pr_dedx->cd(2);
+    m_c_pr_dedx->cd(2);
     gPad->SetLogx();
     gPad->SetLogy();
 
@@ -412,7 +415,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
   TH2D* hdEdxvsPhi = (TH2D*)findHist("CDCDedx/hdEdxvsPhi");
   if (hdEdxvsPhi != nullptr) {
 
-    c_pr_dedx->cd(3);
+    m_c_pr_dedx->cd(3);
 
     setHistStyle(hdEdxvsPhi);
     hdEdxvsPhi->SetTitle("CDC-dEdx vs Phi");
@@ -426,7 +429,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
   TH2D* hdEdxvsCosth = (TH2D*)findHist("CDCDedx/hdEdxvsCosth");
   if (hdEdxvsCosth != nullptr) {
 
-    c_pr_dedx->cd(4);
+    m_c_pr_dedx->cd(4);
 
     setHistStyle(hdEdxvsCosth);
     hdEdxvsCosth->SetTitle("CDC-dEdx vs Costh");
@@ -445,11 +448,12 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTime()
 
   if (hinjtimeHer != nullptr && hinjtimeLer != nullptr) {
 
-    c_pr_dedx->cd(7);
+    m_c_pr_dedx->cd(7);
 
     setPlotStyle();
     setHistStyle(hinjtimeHer);
-    hinjtimeHer->SetTitle("Time since last injection (HER)");
+    hinjtimeHer->SetFillColor(kBlue);
+    hinjtimeHer->SetTitle("Time since m_last injection (HER)");
     hinjtimeHer->Draw("box");
 
     setHistStyle(hinjtimeLer);
@@ -476,7 +480,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
 
   if (hdEdxITHer != nullptr && hdEdxITLer != nullptr) {
 
-    c_pr_dedx->cd(5);
+    m_c_pr_dedx->cd(5);
 
     int fbin = hdEdxITHer->FindFirstBinAbove(0, 1);
     int lbin = hdEdxITHer->FindLastBinAbove(0, 1);
@@ -517,7 +521,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
 
     // dE/dx sigma vs injection time
 
-    c_pr_dedx->cd(6);
+    m_c_pr_dedx->cd(6);
     gPad->SetGridy(1);
 
     setPadStyle(0.143, 0.045, 0.077, 0.0);
@@ -545,7 +549,7 @@ void DQMHistAnalysisCDCDedxModule::drawWireStatus()
   TH2D* hWireStatus = (TH2D*)findHist("CDCDedx/hWireStatus");
   if (hWires != nullptr && hWireStatus != nullptr) {
 
-    c_pr_dedx->cd(8);
+    m_c_pr_dedx->cd(8);
     setHistStyle(hWires);
     hWires->SetMarkerColor(kGray);
     hWires->Draw("");
@@ -650,7 +654,7 @@ void DQMHistAnalysisCDCDedxModule::fitHistogram(TH1*& temphist, std::string& sta
 //------------------------------------------------
 void DQMHistAnalysisCDCDedxModule::setPlotStyle()
 {
-  gStyle->SetNumberContours(NCont);
+  gStyle->SetNumberContours(m_NCont);
   TColor::SetPalette(m_pal, m_palarr);
 }
 
@@ -676,7 +680,6 @@ void DQMHistAnalysisCDCDedxModule::setHistStyle(TH1* obj)
 
   obj->SetStats(0);
   obj->SetTitle("");
-  obj->SetFillColor(kYellow);
 
   obj->SetTitleOffset(1.15, "x");
   obj->SetTitleSize(.040, "x");

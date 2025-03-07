@@ -172,11 +172,11 @@ namespace Belle2 {
     int m_nbhabhaevt{0}; /**< bhabha events */
     int m_nhadevt{0}; /**< hadron events */
 
-    std::string mmode; /**< monitoring mode all/basic */
+    std::string m_mode; /**< monitoring mode all/basic */
 
     //DQM analysis and Mirabelle
-    TCanvas* c_pr_dedx = nullptr; /**< dedx dist+fit */
-    TCanvas* c_ir_dedx = nullptr; /**< intra-run dedx status */
+    TCanvas* m_c_pr_dedx = nullptr; /**< dedx dist+fit */
+    TCanvas* m_c_ir_dedx = nullptr; /**< intra-run dedx status */
 
     TF1* f_gaus = nullptr; /**< fit function */
     TLine* l_line = nullptr; /**< line for dedx mean */
@@ -200,17 +200,17 @@ namespace Belle2 {
     TH1* m_hdEdxIRInd = nullptr; /**< histogram to calculate dE/dx mean and sigma in bins */
 
     TLegend* m_lego = nullptr; /**< legends for LER/HER */
-    TLegend* m_legoI = nullptr; /**< legends for LER/HER */
+    TLegend* m_legoI = nullptr; /**< legends for LER/HER for mean and sigma*/
 
-    unsigned first{0};/**< substring start value*/
-    unsigned last{0};/**< substring last value*/
+    unsigned m_first{0};  /**< substring start value*/
+    unsigned m_last{0}; /**< substring last value*/
 
     MonitoringObject* m_monObj = NULL; /**< MonitoringObject for mirabelle*/
 
-    static const Int_t NRGBs = 6;
-    static const Int_t NCont = 255;
+    static const Int_t m_NRGBs = 6; /**<  Number of end point colors that will form the gradients*/
+    static const Int_t m_NCont = 255; /**< Total number of colors in the table */
 
-    Int_t m_pal = 0;
-    Int_t m_palarr[NCont];
+    Int_t m_pal = 0;  /**< number of colors*/
+    Int_t m_palarr[m_NCont];  /**< array of colors*/
   };
 } // end namespace Belle2

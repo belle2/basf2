@@ -25,7 +25,7 @@ Since every class has a different number and type of members, this has to be imp
 specifically for each class we want to be able to read from a PyStoreArray.
 The implementation for the case of ``PXDDigits`` looks like this:
 
-.. code-block:: C++
+.. code-block:: c
 
     void fillValues(unsigned short* charge, unsigned short* uCellID, unsigned short* vCellID, unsigned short* sensorID)
     {

@@ -21,7 +21,7 @@ namespace Belle2 {
    *  You can use setNextEntry() to request loading of any event in 0..numEntries()-1,
    *  which will be done the next time the input module's event() function is called.
    *
-   *  Use canControlInput() to check wether control is actually possible.
+   *  Use canControlInput() to check whether control is actually possible.
    */
   class InputController {
   public:

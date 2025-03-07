@@ -16,8 +16,6 @@
 #include <simulation/background/BkgSensitiveDetector.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -33,7 +31,6 @@
 #include <G4UserLimits.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -121,7 +118,7 @@ namespace Belle2 {
       double Lv1SUS_Z[Lv1SUS_num];
       Lv1SUS_Z[0] = 0.0;
       for (int tmpn = 0; tmpn < 8; tmpn++) {
-        Lv1SUS_Z[0] -= m_config.getParameter(prep + (format("L%1%") % (tmpn + 1)).str().c_str()) * Unit::cm / Unit::mm;
+        Lv1SUS_Z[0] -= m_config.getParameter(prep + (boost::format("L%1%") % (tmpn + 1)).str().c_str()) * Unit::cm / Unit::mm;
       }
       Lv1SUS_Z[1] = Lv1SUS_Z[0] + m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
       Lv1SUS_Z[2] = Lv1SUS_Z[1];
@@ -389,7 +386,7 @@ namespace Belle2 {
       double Lv2Paraf1_Z[Lv2Paraf1_num];
       Lv2Paraf1_Z[0] = 0.0;
       for (int tmpn = 0; tmpn < 9; tmpn++) {
-        Lv2Paraf1_Z[0] -= m_config.getParameter(prep + (format("L%1%") % (tmpn + 1)).str().c_str()) * Unit::cm / Unit::mm;
+        Lv2Paraf1_Z[0] -= m_config.getParameter(prep + (boost::format("L%1%") % (tmpn + 1)).str().c_str()) * Unit::cm / Unit::mm;
       }
       Lv2Paraf1_Z[1] = Lv2Paraf1_Z[0] + m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
       Lv2Paraf1_Z[2] = Lv2Paraf1_Z[1];
@@ -462,7 +459,7 @@ namespace Belle2 {
       double Lv2Paraf2_Z[Lv2Paraf2_num];
       Lv2Paraf2_Z[0] = 0.0;
       for (int tmpn = 10; tmpn <= 15; tmpn++) {
-        Lv2Paraf2_Z[0] += m_config.getParameter(prep + (format("L%1%") % tmpn).str().c_str()) * Unit::cm / Unit::mm;
+        Lv2Paraf2_Z[0] += m_config.getParameter(prep + (boost::format("L%1%") % tmpn).str().c_str()) * Unit::cm / Unit::mm;
       }
       Lv2Paraf2_Z[1] = Lv2Paraf2_Z[0] + m_config.getParameter(prep + "L16") * Unit::cm / Unit::mm + m_config.getParameter(
                          prep + "L17") * Unit::cm / Unit::mm;
@@ -1051,7 +1048,7 @@ namespace Belle2 {
           transform_AreaTubeFwdForLER);
       G4LogicalVolume* logi_Lv1SUSLERUp = new G4LogicalVolume(geo_Lv1SUSLERUp, mat_Lv1SUSLERUp, "logi_Lv1SUSLERUp_name");
 
-      //-put volumn
+      //-put volume
       setColor(*logi_Lv1SUSLERUp, "#666666");
       new G4PVPlacement(transform_Lv1TaLERUp, logi_Lv1SUSLERUp, "phys_Lv1SUSLERUp_name", &topVolume, false, 0);
 
@@ -1160,7 +1157,7 @@ namespace Belle2 {
           transform_AreaTubeFwdForHER);
       G4LogicalVolume* logi_Lv1SUSHERDwn = new G4LogicalVolume(geo_Lv1SUSHERDwn, mat_Lv1SUSHERDwn, "logi_Lv1SUSHERDwn_name");
 
-      //-put volumn
+      //-put volume
       setColor(*logi_Lv1SUSHERDwn, "#666666");
       new G4PVPlacement(transform_Lv1TaHERDwn, logi_Lv1SUSHERDwn, "phys_Lv1SUSHERDwn_name", &topVolume, false, 0);
 
@@ -1294,7 +1291,7 @@ namespace Belle2 {
           transform_AreaTubeFwdForHER);
       G4LogicalVolume* logi_Lv1SUSHERUp = new G4LogicalVolume(geo_Lv1SUSHERUp, mat_Lv1SUSHERUp, "logi_Lv1SUSHERUp_name");
 
-      //-put volumn
+      //-put volume
       setColor(*logi_Lv1SUSHERUp, "#666666");
       new G4PVPlacement(transform_Lv1TaHERUp, logi_Lv1SUSHERUp, "phys_Lv1SUSHERUp_name", &topVolume, false, 0);
 
@@ -1402,7 +1399,7 @@ namespace Belle2 {
           transform_AreaTubeFwdForHER);
       G4LogicalVolume* logi_Lv1SUSLERDwn = new G4LogicalVolume(geo_Lv1SUSLERDwn, mat_Lv1SUSLERDwn, "logi_Lv1SUSLERDwn_name");
 
-      //-put volumn
+      //-put volume
       setColor(*logi_Lv1SUSLERDwn, "#666666");
       new G4PVPlacement(transform_Lv1TaLERDwn, logi_Lv1SUSLERDwn, "phys_Lv1SUSLERDwn_name", &topVolume, false, 0);
 

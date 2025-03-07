@@ -42,7 +42,7 @@ def hot_pixel_mask_calibration(
 
       local_dbs   (list): A list of local databases
 
-      **kwargs: Additional configuration to support extentions without changing scripts in calibration folder.
+      **kwargs: Additional configuration to support extensions without changing scripts in calibration folder.
         Supported options are listed below:
 
         "activate_masking" is a boolean to activate existing masking in the payload.
@@ -173,14 +173,14 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
 
       validation (bool): Adding validation algorithm if True (default)
 
-      **kwargs: Additional configuration to support extentions without changing scripts in calibration folder.
+      **kwargs: Additional configuration to support extensions without changing scripts in calibration folder.
         Supported options are listed below:
 
         "collector_prefix": a string indicating which collector to be used for gain calibration. The supported
           collectors are:
             PXDPerformanceVariablesCollector (default),
             PXDPerformanceCollector(using RAVE package for vertexing, obsolete)
-        "useClusterPosition": Flag to use cluster postion rather than track point to group pixels for calibration.
+        "useClusterPosition": Flag to use cluster position rather than track point to group pixels for calibration.
         "particle_type": Particle type assigned to tracks. "e" by default.
         "track_cuts_4gain": Track cuts used for gain calibration.
         "track_cuts_4eff": Track cuts used for efficiency study.
@@ -245,7 +245,7 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         # vertex.kFit('vpho:eff', conf_level=0.01, fit_type="fourC", daughtersUpdate=False, path=main)
 
         # Particle list for studying impact parameter resolution
-        # Alias dosn't work with airflow implementation
+        # Alias doesn't work with airflow implementation
         # from variables import variables as vm
         # vm.addAlias("pBetaSinTheta3o2", "formula(pt * (1./(1. + tanLambda**2)**0.5)**0.5)")
         # vm.addAlias("absLambda", "abs(atan(tanLambda))")

@@ -113,14 +113,15 @@ namespace Belle2 {
     static ECLTrig* getByCellID(int cid);
 
   private:
-    int m_TrigId;      /**< Trig ID */
     double m_TimeTrig; /**< Trig Time */
+    int m_TrigId;      /**< Trig ID */
     int m_TrigTag;     /**< Trig tag */
 
 
     /** 2 CellId -> TrigIdvariable lengthx */
     /** 3 TrgTag added */
-    ClassDef(ECLTrig, 3);
+    /** 4: Slightly reorder data members to improve memory layout (CW) */
+    ClassDef(ECLTrig, 4);
 
   };
 } // end namespace Belle2

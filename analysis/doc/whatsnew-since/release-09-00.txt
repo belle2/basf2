@@ -1,3 +1,60 @@
+Changes in the analysis package in light-2503-ceres
+---------------------------------------------------
+
+Kinematic Fitting tools
++++++++++++++++++++++++
+* Added functionality to ParticleKinematicFitter module to change mass hypothesis for photons (eg to n0 or n0bar) used in the fit.
+* Added functionality to ParticleKinematicFitter module to specify whether only ECL cluster direction information is to be used in the fit (intended for fits involving neutral hadrons).
+* Added to ECLPhotonEnergyResolution dbobject ability to store position resolution information for neutral hadrons
+
+Variables
++++++++++
+* Changed return type of the variables `isInRestOfEvent`, `isCloneOfSignalSide`, `hasAncestorFromSignalSide`,
+  `currentROEIsInList`, `passesROEMask`, and `hasCorrectROECombination` from double to bool.
+* Changed return type of the variables `nROE_KLMClusters`, `nROE_Tracks`, `nROE_ECLClusters`,
+  `nROE_NeutralECLClusters`, `nROE_Photons`, `nROE_NeutralHadrons`, `nROE_Charged`, `nROE_Composites`, and
+  `nROE_ParticlesInList` from double to int.
+* Extended functionality of the variable `passesROEMask` to handle composite particles as well.
+
+Changes in the analysis package in light-2501-betelgeuse
+--------------------------------------------------------
+
+Modular Analysis
+++++++++++++++++
+* In `modularAnalysis.writePi0EtaVeto`:
+
+  * Add option to use the weight files trained using MC15rd files: ``standardMC15rd`` and ``tightMC15rd``.
+  * The second highest score is also stored in to extra information, e.g., ``secondPi0ProbOrigin``.
+* Added the option to mix PDG ids and particle names when defining which particles should be mass-constrained via the
+  argument ``massConstraint`` of `vertex.treeFit` and `vertex.kFit`.
+* Added the two new arguments ``massConstraintDecayString`` and ``massConstraintMassValues`` to the function
+  `vertex.treeFit`. Via the former a decay string can be used to indicate which particle's masses should be
+  mass-constrained. You can use the latter to set invariant mass values that differ from the nominal PDG values. The
+  number of values must be identical to the number of selected particles in the decay string. Besides floating point
+  values, PDG ids (as integers) or particle names (as strings) can be provided to use the corresponding PDG mass.
+
+Variables
++++++++++
+* The variables `prodVertexX`, `prodVertexY`, and `prodVertexZ` now return the production vertex position also for
+  TreeFit. Previously, only Rave was supported. Moreover, the covariance matrix elements of the production vertex for a
+  TreeFit are now also available via the variables `prodVertexCov` and `prodVertexXErr`, etc.
+* Added kink variables. You can find them in the new variable group `kinkvariables`.
+* The variables `pi0Prob(mode) <pi0Prob>` and `etaProb(mode) <etaProb>` are extended to MC15 version
+  and accept the modes ``standardMC15rd`` and ``tightMC15rd``.
+* The PID Neural Network (PIDNN) variables `pionIDNN` and `kaonIDNN` require now the payload from a special global tag. The payload
+  is no longer shipped with the analysis global tag. For processing release06 data, the payload for the K/pi separation PIDNN
+  is included in the global tag ``pid_nn_release06_Kpi``, which is the same PIDNN as provided by previous analysis global tags.
+* Added the PIDNN variables `electronIDNN`, `muonIDNN`, `protonIDNN`, and `deuteronIDNN`; which can be used with the new PIDNN for
+  6 hypotheses trained on release08 data. They require the payload from the corresponding global tag (see recommendations).
+
+Modules
++++++++
+* Fixed a bug in the initialization of the decay length of TreeFit.
+* Removed the option ``expertUseReferencing`` from :b2:mod:`TreeFitter`.
+* Improved the duplicate detection in the EventShapeCalculator module so that particle lists of composite particles can
+  be provided safely
+* ``VariablesToTable`` is now a lot faster than before, almost on par with ``VariablesToNtuple``.
+
 Changes in the analysis package in light-2411-aldebaran
 -------------------------------------------------------
 
@@ -10,9 +67,10 @@ K_S0 selector module
 Modular Analysis
 ++++++++++++++++
 * Add options to `modularAnalysis.writePi0EtaVeto` to:
-    * Require the soft photon being in the current RestOfEvent.
-    * Add separate selections to be applied during `modularAnalysis.reconstructDecay` for both the :math:`\pi^0` as well as
-      the :math:`\eta` reconstruction.
+
+  * Require the soft photon being in the current RestOfEvent.
+  * Add separate selections to be applied during `modularAnalysis.reconstructDecay` for both the :math:`\pi^0` as well as
+    the :math:`\eta` reconstruction.
 
 Kinematic Fitting tools
 +++++++++++++++++++++++
@@ -31,18 +89,20 @@ Modules
 +++++++
 * Add support for storing ``FileMetaData`` to `VariablesToNtuple` module. Ntuples will now have a ``persistent``
   tree with ``FileMetaData`` branch with the relevant metadata information. 
-    * Add a new option ``dataDescription`` to `VariablesToNtuple` which accepts a dictionary of key:value pairs,
-      allowing users to store additional information in the ntuple metadata.
-    * Add ntuple file support to ``b2file-merge``, which is now the recommended tool to merge ntuples over
-      ``hadd``. ``b2file-metadata-show`` and ``b2file-metadata-add`` will also work with ntuples. 
-* Added a tunable buffer to the ``VariabesToTable`` module to improve compression efficiency and feather as new output format.
+
+  * Add a new option ``dataDescription`` to `VariablesToNtuple` which accepts a dictionary of key:value pairs,
+    allowing users to store additional information in the ntuple metadata.
+  * Add ntuple file support to ``b2file-merge``, which is now the recommended tool to merge ntuples over
+    ``hadd``. ``b2file-metadata-show`` and ``b2file-metadata-add`` will also work with ntuples. 
+
+* Added a tunable buffer to the ``VariablesToTable`` module to improve compression efficiency and feather as new output format.
 
 Changes in the analysis package in light-2409-toyger
 ----------------------------------------------------
 
 Modules
 +++++++
-* Added a module ``VariabesToTable`` that writes Ntuples to hdf5, csv or parquet.
+* Added a module ``VariablesToTable`` that writes Ntuples to hdf5, csv or parquet.
 * Added support for the FEI table format of the corrections repository to the analysis reweighting script
 
 Graph Neural Network based Flavor Tagger
@@ -76,5 +136,3 @@ Charm Flavor Tagger
 * Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
   function ``charmFlavorTagger``) to ``CFT_ragdoll``. This value must be used for all releases as recent as
   light-2406-ragdoll and release-09.
-
-

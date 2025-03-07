@@ -8,21 +8,12 @@
 
 #include <arich/modules/arichBtest/arichBtestModule.h>
 
-//include <boost/format.hpp>
-//include <boost/foreach.hpp>
-
-
 // Framework - DataStore
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-
-
-#include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
-
 
 // Hit classes
 #include <arich/dataobjects/ARICHDigit.h>

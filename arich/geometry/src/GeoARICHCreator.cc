@@ -20,8 +20,6 @@
 #include <arich/dbobjects/ARICHPositionElement.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
 
 // Geant4
 #include <G4LogicalVolume.hh>
@@ -44,7 +42,6 @@
 #include <G4Material.hh>
 
 using namespace std;
-using namespace boost;
 using namespace CLHEP;
 
 namespace Belle2 {

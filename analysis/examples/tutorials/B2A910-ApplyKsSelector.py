@@ -33,8 +33,7 @@ ma.inputMdst(filename=b2.find_file('B02JpsiKs_Jpsi2mumu_Ks2pipi.root', 'examples
 # load V0s and copy it
 stdV0s.stdKshorts(path=my_path)
 
-# ultimately, this line can be replaced with b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
-b2.conditions.prepend_globaltag('analysis_tools_light-2411-aldebaran')
+b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # apply ksSelector to the K_S0 particle list
 # list type can be 'all', 'standard', 'tight', or 'loose'

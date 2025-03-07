@@ -46,16 +46,16 @@ namespace Belle2 {
 
 
 
-    nt_new_axis_t(slopeX, double{});
-    nt_new_axis_t(offsetX, double{});
-    nt_new_axis_t(slopeY, double{});
-    nt_new_axis_t(offsetY, double{});
+    nt_new_axis_t(slopeX, int32_t{});
+    nt_new_axis_t(offsetX, int32_t{});
+    nt_new_axis_t(slopeY, int32_t{});
+    nt_new_axis_t(offsetY, int32_t{});
 
-    nt_new_axis_t(slopeXY, double{});
-    nt_new_axis_t(interceptXY, double{});
-    nt_new_axis_t(ipXY, double{});
-    nt_new_axis_t(chisqXY, double{});
-    nt_new_axis_t(Nhits, double{});
+    nt_new_axis_t(slopeXY, int32_t{});
+    nt_new_axis_t(interceptXY, int32_t{});
+    nt_new_axis_t(ipXY, int32_t{});
+    nt_new_axis_t(chisqXY, int32_t{});
+    nt_new_axis_t(Nhits, int32_t{});
 
     nt_new_axis_t(track_id, int{});
     nt_new_axis_t(geo_id, int{});

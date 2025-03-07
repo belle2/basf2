@@ -34,6 +34,7 @@ TrackingMomentumScaleFactorsModule::TrackingMomentumScaleFactorsModule() : Modul
 The module modifies the input particleLists by scaling track momenta as given by the parameter scale
 		     
 		     )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("scale", m_scale, "scale factor to be applied to 3-momentum", nan(""));

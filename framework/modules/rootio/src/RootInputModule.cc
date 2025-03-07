@@ -78,7 +78,7 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
            0);
 
   addParam("collectStatistics", m_collectStatistics,
-           "Collect statistics on amount of data read and print statistics (seperate for input & parent files) after processing. Data is collected from TFile using GetBytesRead(), GetBytesReadExtra(), GetReadCalls()",
+           "Collect statistics on amount of data read and print statistics (separate for input & parent files) after processing. Data is collected from TFile using GetBytesRead(), GetBytesReadExtra(), GetReadCalls()",
            false);
   addParam("cacheSize", m_cacheSize,
            "file cache size in Mbytes. If negative, use root default", 0);

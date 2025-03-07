@@ -55,8 +55,8 @@ namespace Belle2 {
       /// the very same DHE and DHC can show up in different packets (for different events)!
       /// but we will fill only one histogram
       TH1D* hDAQErrorEvent{};          /**< per event errors */
-      TH1D* hDAQUseableModule{};          /**< Count Useable/unuseable decision */
-      TH1D* hDAQNotUseableModule{};          /**< Count Useable/unuseable decision */
+      TH1D* hDAQUseableModule{};          /**< Count Usable/unusable decision */
+      TH1D* hDAQNotUseableModule{};          /**< Count Usable/unusable decision */
       TH1D* hDAQDHPDataMissing{};          /**< Count Missing DHP data */
       // TH1F* hDAQErrorPacket{};         /**< per packet (event builder input) errors  */
       TH2D* hDAQErrorDHC{};          /**< individual DHC errors  */

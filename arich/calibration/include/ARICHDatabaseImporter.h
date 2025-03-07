@@ -79,8 +79,9 @@ namespace Belle2 {
 
     /**
      * Print simulation parameters from the database (QE curve, etc.)
+     * @param dump if true, dumps payload to localdb
      */
-    void printSimulationPar();
+    void printSimulationPar(bool dump = false);
 
     /**
      * Import HAPD modules info from the xml file and database (2D QE maps)
@@ -92,8 +93,9 @@ namespace Belle2 {
 
     /**
      * Print HAPD modules info from the database (lightweight class for sim/rec=)
+     * @param dump if true, dumps payload to localdb
      */
-    void printModulesInfo();
+    void printModulesInfo(bool dump = false);
 
     /**
      *  Example function for importing HAPD QE to database class (ARICHModulesInfo)
@@ -143,8 +145,10 @@ namespace Belle2 {
 
     /**
      * Print channel mask of all HAPD modules from the database (lightweight class for sim/rec)
+     * @param makeHist if true, creates histogram with dead channels
+     * @param dump if true, dumps payload to localdb
      */
-    void printChannelMask(bool makeHist = false);
+    void printChannelMask(bool makeHist = false, bool dump = false);
 
     /**
      * Imports HAPD (asic) channel mappings from the xml file
@@ -153,8 +157,9 @@ namespace Belle2 {
 
     /**
      * Prints HAPD (asic) channel mapping from the database
+     * @param dump if true, dumps payload to localdb
      */
-    void printChannelMapping();
+    void printChannelMapping(bool dump = false);
 
     /**
      * Imports mappings of FE electronics from the xml file (ARICH-FrontEndMapping.xml) to the database
@@ -164,23 +169,27 @@ namespace Belle2 {
 
     /**
      * Prints merger to FEB mappings from the database
+     * @param dump if true, dumps payload to localdb
      */
-    void printMergerMapping();
+    void printMergerMapping(bool dump = false);
 
     /**
      * Prints Copper to merger mappings from the database
+     * @param dump if true, dumps payload to localdb
      */
-    void printCopperMapping();
+    void printCopperMapping(bool dump = false);
 
     /**
      * Prints reconstruction parameters
+     * @param dump if true, dumps payload to localdb
      */
-    void printReconstructionPar();
+    void printReconstructionPar(bool dump = false);
 
     /**
      * Prints geometry configuration parameters from the database
+     * @param dump if true, dumps payload to localdb
      */
-    void printGeometryConfig();
+    void printGeometryConfig(bool dump = false);
 
     /**
      * Dumps 2D QE map of full detector surface from the database into root file (from ARICHModulesInfo)
@@ -249,23 +258,27 @@ namespace Belle2 {
 
     /**
      * Prints mapping of aerogel tiles and their optical properties
+     * @param dump if true, dumps payload to localdb
      */
-    void printAeroTileInfo();
+    void printAeroTileInfo(bool dump = false);
 
     /**
      * Prints global alignment constants
+     * @param dump if true, dumps payload to localdb
      */
-    void printGlobalAlignment();
+    void printGlobalAlignment(bool dump = false);
 
     /**
      * Prints mirror alignment constants
+     * @param dump if true, dumps payload to localdb
      */
-    void printMirrorAlignment();
+    void printMirrorAlignment(bool dump = false);
 
     /**
      * Prints aerogel tiles alignment constants
+     * @param dump if true, dumps payload to localdb
      */
-    void printAeroTilesAlignment();
+    void printAeroTilesAlignment(bool dump = false);
 
     // DAQ classes
 
@@ -286,18 +299,21 @@ namespace Belle2 {
 
     /**
      * Prints mappings of power supply to bias cables and cables to HAPDs and nominal values of bias voltages from the database
+     * @param dump if true, dumps payload to localdb
      */
-    void printBiasMappings();
+    void printBiasMappings(bool dump = false);
 
     /**
      * Prints mappings of power supply to HV cables and cables to HAPDs from the database
+     * @param dump if true, dumps payload to localdb
      */
-    void printHvMappings();
+    void printHvMappings(bool dump = false);
 
     /**
      * Prints mappings of nominal values of bias voltages from the database
+     * @param dump if true, dumps payload to localdb
      */
-    void printNominalBiasVoltages();
+    void printNominalBiasVoltages(bool dump = false);
 
     /**
      * Prints nominal bias voltage for channel on power supply from the database
@@ -344,12 +360,12 @@ namespace Belle2 {
     void exportAerogelMap();
 
     /**
-     * Import intrarun dependent ARICH aerogel data in the database. -> Example for intrarun dependat data!
+     * Import intrarun dependant ARICH aerogel data in the database. -> Example for intrarun dependat data!
      */
     void importAerogelInfoEventDep();
 
     /**
-     * Export intrarun dependent ARICH aerogel data from the database. -> Example for intrarun dependat data!
+     * Export intrarun dependant ARICH aerogel data from the database. -> Example for intrarun dependat data!
      */
     void exportAerogelInfoEventDep();
 

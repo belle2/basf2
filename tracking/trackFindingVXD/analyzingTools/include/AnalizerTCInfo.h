@@ -26,26 +26,26 @@ namespace Belle2 {
 
 
     /** carries the global coordinates of the position of the seed hit (typically the innermost hit) */
-    ROOT::Math::XYZVector posSeed;
+    ROOT::Math::XYZVector m_posSeed;
 
     /** carries the momentum vector at the position of the seed hit (typically the innermost hit) */
-    ROOT::Math::XYZVector momSeed;
+    ROOT::Math::XYZVector m_momSeed;
 
     /** a link to the TC itself */
-    const SpacePointTrackCand* tC;
+    const SpacePointTrackCand* m_tC = nullptr;
 
     /** for reference TC: best test TC found, for test TC, compatible reference TC found */
-    AnalizerTCInfo* assignedTC;
+    AnalizerTCInfo* m_assignedTC = nullptr;
 
     /** stores the iD of the particle and knows the purity for it */
-    MCVXDPurityInfo assignedID;
+    MCVXDPurityInfo m_assignedID;
 
     /** classifies attached TC */
-    TCType::Type tcType;
+    TCType::Type m_tcType;
 
 
     /** constructor, makes sure that pointers are on nullptr until set */
-    AnalizerTCInfo() : tC(nullptr), assignedTC(nullptr), tcType(TCType::Unclassified) {}
+    AnalizerTCInfo() : m_tcType(TCType::Unclassified) {}
 
 
     /** static function for correctly creating TrackCandidates */
@@ -53,11 +53,11 @@ namespace Belle2 {
     {
       AnalizerTCInfo newTC;
 
-      newTC.posSeed = aTC.getPosSeed();
-      newTC.momSeed = aTC.getMomSeed();
-      newTC.tC = &aTC;
-      newTC.assignedID = iD;
-      newTC.tcType = isReference ? TCType::Reference : TCType::Unclassified;
+      newTC.m_posSeed = aTC.getPosSeed();
+      newTC.m_momSeed = aTC.getMomSeed();
+      newTC.m_tC = &aTC;
+      newTC.m_assignedID = iD;
+      newTC.m_tcType = isReference ? TCType::Reference : TCType::Unclassified;
       return newTC;
     }
 
@@ -66,8 +66,8 @@ namespace Belle2 {
     static void markUnused(std::vector<AnalizerTCInfo>& tcs, TCType::Type newType)
     {
       for (AnalizerTCInfo& aTC : tcs) {
-        if (aTC.assignedTC == nullptr) {
-          aTC.tcType = newType;
+        if (aTC.m_assignedTC == nullptr) {
+          aTC.m_tcType = newType;
         }
       }
     }
@@ -77,18 +77,18 @@ namespace Belle2 {
     static TCType::Type classifyTC(AnalizerTCInfo& referenceTC, AnalizerTCInfo& testTC, double purityThreshold,
                                    unsigned int ndfThreshold)
     {
-      std::pair<int, float> testPurity = testTC.assignedID.getPurity();
-      std::pair<int, float> refPurity = referenceTC.assignedID.getPurity();
+      std::pair<int, float> testPurity = testTC.m_assignedID.getPurity();
+      std::pair<int, float> refPurity = referenceTC.m_assignedID.getPurity();
       // catch ill case
       if (testPurity.first != refPurity.first) { return TCType::Unclassified; }
 
       if (testPurity.second < purityThreshold) { return TCType::Ghost; }
 
-      if (testTC.assignedID.getNDFTotal() < ndfThreshold) { return TCType::SmallStump; }
+      if (testTC.m_assignedID.getNDFTotal() < ndfThreshold) { return TCType::SmallStump; }
 
       if (testPurity.second < 1.f) { return TCType::Contaminated; }
 
-      if (testTC.assignedID.getNClustersTotal() < referenceTC.assignedID.getNClustersTotal()) { return TCType::Clean; }
+      if (testTC.m_assignedID.getNClustersTotal() < referenceTC.m_assignedID.getNClustersTotal()) { return TCType::Clean; }
 
       return TCType::Perfect;
     }
@@ -100,16 +100,16 @@ namespace Belle2 {
      */
     void discardTC()
     {
-      assignedTC->tcType = TCType::Clone;
-      assignedTC = nullptr;
+      m_assignedTC->m_tcType = TCType::Clone;
+      m_assignedTC = nullptr;
     }
 
 
     /** function for assigning TCs to each other */
     void assignTCs(AnalizerTCInfo* otherTC)
     {
-      assignedTC = otherTC;
-      otherTC->assignedTC = this;
+      m_assignedTC = otherTC;
+      otherTC->m_assignedTC = this;
     }
 
 
@@ -117,25 +117,25 @@ namespace Belle2 {
     void pairUp(AnalizerTCInfo* otherTC)
     {
       // case: this TC was not assigned before
-      if (assignedTC == nullptr) {
+      if (m_assignedTC == nullptr) {
         assignTCs(otherTC);
         return;
       }
 
       // case: was already assigned, but old one was not as good as the new one
-      if (assignedTC->tcType < otherTC->tcType) {
+      if (m_assignedTC->m_tcType < otherTC->m_tcType) {
         discardTC();
         assignTCs(otherTC);
         return;
       }
 
       // case: was already assigned, but old one was better.
-      otherTC->assignedTC = this;
-      otherTC->tcType = TCType::Clone;
+      otherTC->m_assignedTC = this;
+      otherTC->m_tcType = TCType::Clone;
     }
 
 
     /** a type-identifier function */
-    TCType::Type getType() const { return tcType; }
+    TCType::Type getType() const { return m_tcType; }
   };
 }

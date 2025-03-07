@@ -7,8 +7,6 @@
  **************************************************************************/
 #include <sstream>
 #include <string.h>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
 
 //#include <geant4/G4LogicalVolume.hh>
 
@@ -42,7 +40,6 @@
 #include <arich/simulation/SensitiveAero.h>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 

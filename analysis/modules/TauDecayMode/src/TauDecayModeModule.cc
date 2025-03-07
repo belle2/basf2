@@ -11,13 +11,11 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
-#include <iostream>
 #include <vector>
 #include <algorithm>
 #include <TParticlePDG.h>
 #include <map>
 #include <fstream>
-#include <set>
 #include <Math/LorentzRotation.h>
 #include <Math/Boost.h>
 using namespace std;
@@ -67,7 +65,7 @@ TauDecayModeModule::TauDecayModeModule() : Module(), m_taum_no(0), m_taup_no(0),
   m_isOmegaPimPipFromTauMinus(false), m_isOmegaPimPipFromTauPlus(false)
 {
   // Set module properties
-  setDescription("Module to identify generated tau pair decays, using MCParticle information."
+  setDescription("Module to identify generated tau pair decays, using MCParticle information.\n"
                  "By default, each tau decay is numbered as TauolaBelle2DecayMode [Ref: BELLE2-NOTE-PH-2020-055]");
   //Parameter definition
   addParam("printmode",  m_printmode, "Printout more information from each event", std::string("default"));

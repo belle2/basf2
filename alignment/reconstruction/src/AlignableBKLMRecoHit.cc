@@ -10,7 +10,6 @@
 
 #include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
-#include <alignment/Hierarchy.h>
 #include <framework/geometry/B2Vector3.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/KLMElementNumbers.h>

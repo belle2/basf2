@@ -8,12 +8,12 @@
 
 // Own header.
 #include <analysis/modules/PhotonEfficiencySystematics/PhotonEfficiencySystematics.h>
-#include <iostream>
+
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/core/Environment.h>
-#include <analysis/VariableManager/Manager.h>
 
 #include <map>
 
@@ -39,6 +39,7 @@ PhotonEfficiencySystematicsModule::PhotonEfficiencySystematicsModule() : Module(
     mypath.add_module("PhotonEfficiencySystematics", particleLists=['gamma:cut'], tableName=tableName_Weight)
 
 		     )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("tableName", m_tableName, "ID of table used for reweighing");

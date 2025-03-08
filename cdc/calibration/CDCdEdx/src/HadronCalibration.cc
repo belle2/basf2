@@ -495,14 +495,14 @@ void HadronCalibration::plotMonitoring(std::vector< std::string > particles, con
     for (int j = 0; j < hadron->GetEntries(); ++j) {
 
       hadron->GetEvent(j);
-      double var, varerr, xvar;
-      if (syvar == "chi") {var = chimean;  varerr = chimean_err;}
-      else  {var = chisigma;  varerr = chisigmaerr;}
+      double var, xvar; //varerr
+      if (syvar == "chi") {var = chimean;} //  varerr = chimean_err;}
+      else  {var = chisigma;} //  varerr = chisigmaerr;}
       if (sxvar == "mom") xvar = avg * mass;
       else xvar = avg;
 
       grchim[i].SetPoint(j, xvar, var);
-      // grchim[i].SetPointError(j, 0, varerr);
+      //grchim[i].SetPointError(j, 0, varerr);
     }
 
     tlegPart.AddEntry(&grchim[i], particles[i].data(), "p");

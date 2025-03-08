@@ -33,11 +33,7 @@ int main(int argc, char** argv)
 
     sleep(interval);
     //    printf("hrelay2 : collecting histograms\n");
-    try {
-      hrelay2.collect();
-    } catch (...) {
-      continue;
-    }
+    hrelay2.collect();
   }
 
 }

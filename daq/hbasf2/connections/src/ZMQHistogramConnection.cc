@@ -48,15 +48,15 @@ void ZMQHistoServerToFileOutput::mergeAndSend(const std::map<std::string, Histog
 
   increment("histogram_merges");
 
-  // We do not care if this is the run end, or run start or anything. We just write it out.
-  HistogramMapping mergeHistograms;
-
   TFile memFile(("/tmp/tmp_" + m_dqmMemFileName).c_str(), "RECREATE");
   if (!memFile.IsOpen()) {
     B2ASSERT("Writing to shared memory failed! ", ("/tmp/tmp_" + m_dqmMemFileName).c_str());
     return;
   }
   memFile.cd();
+
+  // We do not care if this is the run end, or run start or anything. We just write it out.
+  HistogramMapping mergeHistograms;
 
   log("last_merged_histograms", static_cast<long>(storedMessages.size()));
   average("average_merged_histograms", static_cast<double>(storedMessages.size()));
@@ -68,6 +68,9 @@ void ZMQHistoServerToFileOutput::mergeAndSend(const std::map<std::string, Histog
   }
 
   memFile.Write();
+
+  mergeHistograms.clear();
+
   memFile.Close();
 
   average("memory_file_size", memFile.GetSize());
@@ -88,8 +91,6 @@ void ZMQHistoServerToFileOutput::mergeAndSend(const std::map<std::string, Histog
       perror("Rename shm file failed ");
     }
   }
-
-  mergeHistograms.clear();
 }
 
 void ZMQHistoServerToFileOutput::handleIncomingData()

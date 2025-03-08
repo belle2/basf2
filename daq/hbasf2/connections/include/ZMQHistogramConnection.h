@@ -29,10 +29,6 @@ namespace Belle2 {
    * This "connection" class needs to be wrapped with a ZMQHistogramOutput
    * before using it as a real output connection (which adds the common functionalities).
    *
-   * The ROOT and shared memory are written using ROOTs own serialization. The shared memory
-   * is herby filled with the content of a temporary TMemFile.
-   * On clear the shared memory is cleared (ROOT files stay what they are).
-   *
    * Nothing special happens on stop or terminate other than that a merge is performed.
    *
    * The given file path for the root file can include placeholders

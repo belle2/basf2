@@ -51,9 +51,9 @@ void ZMQHistoServerToFileOutput::mergeAndSend(const std::map<std::string, Histog
   // We do not care if this is the run end, or run start or anything. We just write it out.
   HistogramMapping mergeHistograms;
 
-  TFile memFile(("/dev/shm/tmp_" + m_dqmMemFileName).c_str(), "RECREATE");
+  TFile memFile(("/tmp/tmp_" + m_dqmMemFileName).c_str(), "RECREATE");
   if (!memFile.IsOpen()) {
-    B2ASSERT("Writing to shared memory failed! ", ("/dev/shm/tmp_" + m_dqmMemFileName).c_str());
+    B2ASSERT("Writing to shared memory failed! ", ("/tmp/tmp_" + m_dqmMemFileName).c_str());
     return;
   }
   memFile.cd();
@@ -75,7 +75,7 @@ void ZMQHistoServerToFileOutput::mergeAndSend(const std::map<std::string, Histog
   // Also write the memory content out to a regular ROOT file
   auto outputFileName = boost::replace_all_copy(m_rootFileName, "{run_number}", (boost::format("%05d") % *run).str());
   boost::replace_all(outputFileName, "{experiment_number}", (boost::format("%04d") % *experiment).str());
-  if (!std::filesystem::copy_file("/dev/shm/tmp_" + m_dqmMemFileName, outputFileName,
+  if (!std::filesystem::copy_file("/tmp/tmp_" + m_dqmMemFileName, outputFileName,
                                   std::filesystem::copy_options::overwrite_existing)) {
     perror("Copy from shm file failed ");
   }
@@ -83,7 +83,7 @@ void ZMQHistoServerToFileOutput::mergeAndSend(const std::map<std::string, Histog
   log("last_written_file_name", outputFileName);
 
   {
-    if (!std::filesystem::copy_file("/dev/shm/tmp_" + m_dqmMemFileName, "/dev/shm/" + m_dqmMemFileName,
+    if (!std::filesystem::copy_file("/tmp/tmp_" + m_dqmMemFileName, "/tmp/" + m_dqmMemFileName,
                                     std::filesystem::copy_options::overwrite_existing)) {
       perror("Rename shm file failed ");
     }
@@ -106,12 +106,12 @@ void ZMQHistoServerToFileOutput::clear()
 {
   // Clear the shared memory by writing an empty ROOT file into it
   {
-    TFile memFile(("/dev/shm/tmp_" + m_dqmMemFileName).c_str(), "RECREATE");
+    TFile memFile(("/tmp/tmp_" + m_dqmMemFileName).c_str(), "RECREATE");
     if (!memFile.IsOpen()) {
-      B2ASSERT("Writing to shared memory failed! ", ("/dev/shm/tmp_" + m_dqmMemFileName).c_str());
+      B2ASSERT("Writing to shared memory failed! ", ("/tmp/tmp_" + m_dqmMemFileName).c_str());
     }
     memFile.Close();
-    if (!std::filesystem::copy_file("/dev/shm/tmp_" + m_dqmMemFileName, "/dev/shm/" + m_dqmMemFileName,
+    if (!std::filesystem::copy_file("/tmp/tmp_" + m_dqmMemFileName, "/tmp/" + m_dqmMemFileName,
                                     std::filesystem::copy_options::overwrite_existing)) {
       perror("Rename shm file failed ");
     }

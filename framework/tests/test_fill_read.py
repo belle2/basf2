@@ -1,10 +1,8 @@
-import basf2  # noqa: needed to load pythonizations
-import ROOT
-from ROOT.Belle2 import VxdID, PXDDigit
-
-
 import unittest
 import numpy as np
+
+import basf2  # noqa: needed to load pythonizations
+from ROOT import Belle2
 
 from b2test_utils import skip_test_if_light
 skip_test_if_light()
@@ -26,9 +24,9 @@ class TestFillReadArray(unittest.TestCase):
         charges = np.array([10, 50, 100, 150, 200], dtype=np.ushort)
 
         for sid, u, v, c in zip(sids, ucells, vcells, charges):
-            l_pxd.append(PXDDigit(VxdID(int(sid)), int(u), int(v), int(c)))
+            l_pxd.append(Belle2.PXDDigit(Belle2.VxdID(int(sid)), int(u), int(v), int(c)))
 
-        store = ROOT.Belle2.PyStoreArray("PXDDigits")
+        store = Belle2.PyStoreArray("PXDDigits")
         store.registerInDataStore()
 
         for pxd in l_pxd:
@@ -54,7 +52,7 @@ class TestFillReadArray(unittest.TestCase):
         vcells = np.array([15, 25, 35, 45, 55])
         charges = np.array([10, 50, 100, 150, 200])
 
-        store = ROOT.Belle2.PyStoreArray("PXDDigits")
+        store = Belle2.PyStoreArray("PXDDigits")
         store.registerInDataStore()
 
         store.fillArray(sensorID=sids, uCellID=ucells, vCellID=vcells, charge=charges)

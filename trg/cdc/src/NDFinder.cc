@@ -480,18 +480,8 @@ NDFinder::allHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClus
 void NDFinder::getCM()
 {
   c3array& houghPlane = *m_phoughPlane;
-  std::vector<SimpleCluster> allClusters;
-  std::vector<ROOT::Math::XYZVector> houghspace;
-  c3array copiedPlane = houghPlane;
-  m_clusterer.setNewPlane(copiedPlane);
-  std::vector<SimpleCluster> fixedClusters = m_clusterer.makeClusters();
-  allClusters = fixedClusters;
-  std::vector<SimpleCluster> clusters;
-  for (SimpleCluster& clu : allClusters) {
-    if (clu.getEntries().size() >= 1) {
-      clusters.push_back(clu);
-    }
-  }
+  m_clusterer.setNewPlane(houghPlane);
+  std::vector<SimpleCluster> clusters = m_clusterer.makeClusters();
   std::vector<std::vector<unsigned short>> hitsVsClusters = getHitsVsClusters(clusters);
   // New hit to cluster relation
   std::vector<SimpleCluster> useClusters = allHitsToClusters(hitsVsClusters, clusters);
@@ -509,6 +499,7 @@ void NDFinder::getCM()
 
     // READOUTS, uncomment what needed:
     std::vector<ROOT::Math::XYZVector> ndreadout;
+    std::vector<ROOT::Math::XYZVector> houghspace;
 
     // Readout of the peak weight
     /* ndreadout.push_back(ROOT::Math::XYZVector(maxval, 0, 0)); */

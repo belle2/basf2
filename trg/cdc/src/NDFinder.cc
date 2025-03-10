@@ -522,10 +522,6 @@ void NDFinder::getCM()
     ushort maxval = houghPlane[maxid[0]][maxid[1]][maxid[2]];
     float cutoff = m_params.thresh * maxval;
     std::vector<cellweight> highWeight = getHighWeight(entries, cutoff);
-    std::vector<std::vector<long int>> flatHW;
-    for (auto cx : highWeight) {
-      flatHW.push_back({cx.index[0], cx.index[1], cx.index[2], (unsigned short int)cx.weight});
-    }
     std::vector<double> result = getWeightedMean(highWeight);
     std::vector<double> estimate = getBinToVal(result);
     std::vector<double> transformed = transform(estimate);
@@ -595,6 +591,8 @@ float NDFinder::transformVar(float estVal, int idx)
     return cos(thetRad) / sin(thetRad);
   }
 }
+
+
 std::vector<double> NDFinder::transform(std::vector<double> estimate)
 {
   std::vector<double> transformed;
@@ -674,7 +672,11 @@ ushort NDFinder::hitContrib(cell_index peak, ushort ihit)
   ushort contrib = 0;
   ushort iHoughPhi = peak[1];
   short Dstart = m_vecDstart[ihit];
-  ushort iphi = iHoughPhi - Dstart;
+  short iphi_signed = iHoughPhi - Dstart;
+  if (iphi_signed < 0) {
+    iphi_signed += m_nPhiFull;  // Wrap phi properly
+  }
+  ushort iphi = (ushort)iphi_signed;
   if (Dstart > iHoughPhi && Dstart > 300) {
     iphi = m_nPhiFull - Dstart + iHoughPhi;
   }
@@ -684,7 +686,7 @@ ushort NDFinder::hitContrib(cell_index peak, ushort ihit)
 
   const c2array& arrayHitMod = *m_parrayHitMod;
   c2elem hitr = arrayHitMod[m_hitIds[ihit]][1];
-  unsigned short prio = m_prioPos[ ihit ];
+  unsigned short prio = m_prioPos[ihit];
   if (Dstart > m_nPhiFull) {
     B2ERROR("phi overflow: iHoughPhi = " << iHoughPhi << ", Dstart = " << Dstart << ", iphi=" << iphi);
   }

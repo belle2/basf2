@@ -112,43 +112,26 @@ namespace Belle2 {
       /** Clustering options */
       /**  Only accept clusters with minSuperAxial */
       unsigned char minSuperAxial  = 4;
-
       /**  Required number of stereo super layers */
       unsigned char minSuperStereo  = 3;
-
       /**  houghspace must have thresh x maxweight of cluster */
       float thresh = 0.85;
-
-      /** Minimum number of cells in the track parameter space */
-      unsigned char minCells  = 1;
-
-      /** Clustering method: When true: dbscan, when false: fixed 3d volume */
-      bool dbscanning = false;
-
       /** Clustering: minimum of the total weight in all cells of the 3d volume */
       unsigned short minTotalWeight = 450;
-
       /** Clustering: minimum peak cell weight */
       unsigned short minPeakWeight = 32;
-
       /** Clustering: number of iterations for the cluster search in each Hough space quadrant */
       unsigned char iterations = 2;
-
       /** Clustering: number of deleted cells in each omega direction from the maximum */
       unsigned char omegaTrim = 5;
-
       /** Clustering: number of deleted cells in each phi direction from the maximum */
       unsigned char phiTrim = 4;
-
       /** Clustering: number of deleted cells in each theta direction from the maximum */
       unsigned char thetaTrim = 4;
-
       /** CDC symmetry: repeat wire pattern 32 times in phi */
       unsigned short phigeo = 32;
-
       /** CDC symmetry: phi range covered by hit data [0 .. phigeo] */
       unsigned short parcels = 7;
-
       /** CDC symmetry: phi range covered by expanded hit data [0 .. phigeo] */
       unsigned short parcelsExp = 11;
     };
@@ -175,14 +158,9 @@ namespace Belle2 {
     /** initialization */
 
     /** Set parameters
-     * @param minWeight minimum weight of cluster member cells
-     * @param minPts minimum neighboring cells with minWeight for core cells
-     * @param diagonal consider diagonal neighbor cells in the clustering
      * @param minSuperAxial minimum number of axial super layers per cluster
      * @param minSuperStereo minimum number of stereo super layers per cluster
      * @param thresh selection of cells for weighted mean track estimation
-     * @param minCells minimum number of cells per cluster
-     * @param dbscanning when true: dbscan, when false: fixed three dim volume
      * @param minTotalWeight minimum total weight of all cells in the 3d volume
      * @param minPeakWeight minimum peak cell weight
      * @param iterations number of cluster searches in each Hough space quadrant
@@ -193,9 +171,8 @@ namespace Belle2 {
      * @param axialFile axial hit data
      * @param stereoFile stereo hit data
      * */
-    void init(unsigned short minWeight, unsigned char minPts, bool diagonal,
-              unsigned char minSuperAxial, unsigned char minSuperStereo, float thresh,
-              unsigned char minCells, bool dbscanning, unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned char iterations,
+    void init(unsigned char minSuperAxial, unsigned char minSuperStereo, float thresh,
+              unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned char iterations,
               unsigned char omegaTrim, unsigned char phiTrim, unsigned char thetaTrim,
               bool verbose, std::string& axialFile, std::string& stereoFile);
 
@@ -256,7 +233,7 @@ namespace Belle2 {
     /** main function for track finding */
     void findTracks();
 
-    /** retrieve the results */
+    /** retreive the results */
     std::vector<NDFinderTrack>* getFinderTracks()
     {
       return &m_NDFinderTracks;
@@ -355,7 +332,7 @@ namespace Belle2 {
      * elements: super layer number in [0,1,...,8]*/
     std::vector<unsigned short> m_hitSLIds;
 
-    /** Priority position within the TS in the current event
+    /** Priority positon within the TS in the current event
      * elements basf2: [0,3] first, left, right, no hit
      * elements stored: 3 - basf2prio*/
     std::vector<unsigned short> m_prioPos;
@@ -389,7 +366,6 @@ namespace Belle2 {
 
     /** Configuration of the clustering module */
     clustererParams m_clustererParams;
-    std::vector<ushort> m_planeShape;
 
     /** Default bins */
     unsigned short m_nPhiFull{0};
@@ -408,7 +384,6 @@ namespace Belle2 {
 
     /** Clustering module */
     Belle2::Clusterizend m_clusterer;
-    Belle2::Clusterizend m_clusterer2;
 
     /** Print Hough planes and verbose output */
     bool m_verbose{false};

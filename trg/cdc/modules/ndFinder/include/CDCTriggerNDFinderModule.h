@@ -59,24 +59,11 @@ namespace Belle2 {
     /** Cluster pruning: Minimum number of stereo super layer hits related to a cluster
      * for the cluster to be considered as a track */
     int m_minSuperStereo;
-    /** Clustering: Minimum weight of a cell in Hough space
-     * for the cell to be considered as a cluster member */
-    int m_minWeight;
-    /** Clustering: Minimum number of neighbor cells with minWeight
-     * for a cell to be considered a core cell */
-    int m_minPts;
     /** Track estimation: Minimum weight of a cluster member cell
      * relative to the peak weight of the cluster
      * for the cell to enter in the weighted mean
      * track parameter value estimation */
     double m_thresh;
-    /** Clustering: consider diagonal neighbors */
-    bool m_diagonal;
-    /**Clustering: minimum number of cells for a cluster */
-    int m_minCells;
-    /** Clustering method: When true: dbscan, when false: fixed three
-     * dimensional volume */
-    bool m_dbscanning;
     /** Clustering with 3d volume: Cut on the total weight in this volume */
     int m_minTotalWeight;
     /** Clustering with 3d volume: Cut on the peak cell weight */

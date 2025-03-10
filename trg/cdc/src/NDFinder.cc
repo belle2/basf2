@@ -20,25 +20,16 @@
 
 using namespace Belle2;
 
-
-void NDFinder::init(unsigned short minWeight, unsigned char minPts,
-                    bool diagonal, unsigned char minSuperAxial, unsigned char minSuperStereo,
-                    float thresh,
-                    unsigned char minCells, bool dbscanning, unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned char iterations,
+void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, float thresh,
+                    unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned char iterations,
                     unsigned char omegaTrim, unsigned char phiTrim, unsigned char thetaTrim,
-                    bool verbose,
-                    std::string& axialFile, std::string& stereoFile)
+                    bool verbose, std::string& axialFile, std::string& stereoFile)
 {
   m_params.minSuperAxial = (unsigned char) minSuperAxial;
   m_params.minSuperStereo = (unsigned char) minSuperStereo;
   m_params.thresh = (float) thresh;
-  m_params.minCells = (unsigned char) minCells;
-  m_params.dbscanning = (bool) dbscanning;
   m_params.axialFile = axialFile;
   m_params.stereoFile = stereoFile;
-  m_clustererParams.minWeight = (unsigned short) minWeight;
-  m_clustererParams.minPts = (unsigned char) minPts;
-  m_clustererParams.diagonal = diagonal;
   m_clustererParams.minTotalWeight = (unsigned short) minTotalWeight;
   m_clustererParams.minPeakWeight = (unsigned short) minPeakWeight;
   m_clustererParams.iterations = (unsigned char) iterations;
@@ -46,7 +37,6 @@ void NDFinder::init(unsigned short minWeight, unsigned char minPts,
   m_clustererParams.phiTrim = (unsigned char) phiTrim;
   m_clustererParams.thetaTrim = (unsigned char) thetaTrim;
   m_verbose = verbose;
-
 
   initBins();
   B2DEBUG(25, "initialized binnings");
@@ -72,7 +62,6 @@ void NDFinder::init(unsigned short minWeight, unsigned char minPts,
 
   reset();
   m_clusterer = Clusterizend(m_clustererParams);
-  m_clusterer.setPlaneShape(m_planeShape);
 }
 
 void NDFinder::initBins()
@@ -143,8 +132,6 @@ void NDFinder::initBins()
 
   m_nWires = {160, 160, 192, 224, 256, 288, 320, 352, 384};
 
-  m_planeShape = {m_nOmega, m_nPhiFull, m_nTheta}; //{40, 384, 9};
-
   /** Acceptance Ranges */
   std::vector<float> omegaRange = { -5., 5.};
   std::vector<float> phiRange = {0., 11.25};
@@ -159,7 +146,6 @@ void NDFinder::initBins()
   m_slotSizes.push_back(ssPhi);
   m_slotSizes.push_back(ssTheta);
 }
-
 
 
 void NDFinder::loadArray(const std::string& filename, ndbinning bins, c5array& hitsToTracks)
@@ -496,18 +482,13 @@ void NDFinder::getCM()
   c3array& houghPlane = *m_phoughPlane;
   std::vector<SimpleCluster> allClusters;
   std::vector<ROOT::Math::XYZVector> houghspace;
-  if (m_params.dbscanning) {
-    m_clusterer.setNewPlane(houghPlane);
-    allClusters = m_clusterer.dbscan();
-  } else {
-    c3array copiedPlane = houghPlane;
-    m_clusterer.setNewPlane(copiedPlane);
-    std::vector<SimpleCluster> fixedClusters = m_clusterer.makeClusters();
-    allClusters = fixedClusters;
-  }
+  c3array copiedPlane = houghPlane;
+  m_clusterer.setNewPlane(copiedPlane);
+  std::vector<SimpleCluster> fixedClusters = m_clusterer.makeClusters();
+  allClusters = fixedClusters;
   std::vector<SimpleCluster> clusters;
   for (SimpleCluster& clu : allClusters) {
-    if (clu.getEntries().size() > m_params.minCells) {
+    if (clu.getEntries().size() >= 1) {
       clusters.push_back(clu);
     }
   }
@@ -704,12 +685,11 @@ ushort NDFinder::hitContrib(cell_index peak, ushort ihit)
 void
 NDFinder::printParams()
 {
-  clustererParams cpa = m_clusterer.getParams();
-  B2DEBUG(25, "clustererParams minWeight=" << cpa.minWeight << ", minPts=" << cpa.minPts << ", diagonal=" << cpa.diagonal);
-  B2DEBUG(25, "ndFinderParams minSuperAxial=" << m_params.minSuperAxial <<
+  B2DEBUG(25,
+          "ndFinderParams minSuperAxial=" << m_params.minSuperAxial <<
           ", minSuperStereo=" << m_params.minSuperStereo << ", thresh=" << m_params.thresh <<
-          ", minCells=" << m_params.minCells << ", dbscanning=" << m_params.dbscanning << ", minTotalWeight=" << m_params.minTotalWeight <<
-          ", minPeakWeight=" << m_params.minPeakWeight <<
-          ", iterations=" << m_params.iterations << ", omegaTrim=" << m_params.omegaTrim << ", phiTrim=" << m_params.phiTrim << ", thetaTrim="
-          << m_params.thetaTrim);
+          ", minTotalWeight=" << m_params.minTotalWeight <<
+          ", minPeakWeight=" << m_params.minPeakWeight << ", iterations=" << m_params.iterations <<
+          ", omegaTrim=" << m_params.omegaTrim << ", phiTrim=" << m_params.phiTrim <<
+          ", thetaTrim=" << m_params.thetaTrim);
 }

@@ -35,29 +35,12 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            "Cluster pruning: Minimum number of stereo super layer hits related to a cluster "
            "for the cluster to be considered as a track.",
            3);
-  addParam("minWeight", m_minWeight,
-           "Clustering: Minimum weight of a cell in Hough space "
-           "for the cell to be considered as a cluster member.",
-           24);
-  addParam("minPts", m_minPts,
-           "Clustering: Minimum number of neighbor cells with minWeight "
-           "for a cell to be considered a core cell.",
-           1);
   addParam("thresh", m_thresh,
            "Track estimation: Minimum weight of a cluster member cell "
            "relative to the peak weight of the cluster "
            "for the cell to enter in the weighted mean "
            "track parameter value estimation.",
            0.85);
-  addParam("diagonal", m_diagonal,
-           "Clustering: consider diagonal neighbors.",
-           true);
-  addParam("minCells", m_minCells,
-           "Clustering: minimum number of cells for a cluster.",
-           1);
-  addParam("dbscanning", m_dbscanning,
-           ".Clustering method: When true: dbscan, when false: fixed 3d volume.",
-           false);
   addParam("minTotalWeight", m_minTotalWeight,
            "Clustering: minimum total weight of all cells in the 3d volume.",
            450);
@@ -90,18 +73,14 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            std::string("CDCTriggerClusterInfos"));
 }
 
-CDCTriggerNDFinderModule::~CDCTriggerNDFinderModule()
-{
-}
+CDCTriggerNDFinderModule::~CDCTriggerNDFinderModule() {}
 
 void CDCTriggerNDFinderModule::initialize()
 {
-  B2DEBUG(25, "CDCTriggerNDFinderModule initialize, m_minWeight=" << m_minWeight <<
-          ", m_minPts=" << m_minPts << ", m_diagonal=" << m_diagonal <<
-          ", m_minSuperAxial=" << m_minSuperAxial << ", m_minSuperStereo=" << m_minSuperStereo <<
+  B2DEBUG(25, "CDCTriggerNDFinderModule initialize, " <<
+          ", m_minSuperAxial=" << m_minSuperAxial <<
+          ", m_minSuperStereo=" << m_minSuperStereo <<
           ", m_thresh= " << m_thresh <<
-          ", m_minCells=" << m_minCells <<
-          ", m_dbscanning=" << m_dbscanning <<
           ", m_minTotalWeight=" << m_minTotalWeight <<
           ", m_minPeakWeight=" << m_minPeakWeight <<
           ", m_iterations=" << m_iterations <<
@@ -114,16 +93,14 @@ void CDCTriggerNDFinderModule::initialize()
   m_NDFinderTracks.registerRelationTo(m_TrackSegmentHits);
   m_NDFinderInfos.registerInDataStore(m_NDFinderInfosName);
   m_NDFinderTracks.registerRelationTo(m_NDFinderInfos);
-  m_NDFinder.init(m_minWeight, m_minPts, m_diagonal, m_minSuperAxial, m_minSuperStereo,
-                  m_thresh, m_minCells, m_dbscanning, m_minTotalWeight, m_minPeakWeight, m_iterations,
+  m_NDFinder.init(m_minSuperAxial, m_minSuperStereo, m_thresh,
+                  m_minTotalWeight, m_minPeakWeight, m_iterations,
                   m_omegaTrim, m_phiTrim, m_thetaTrim, m_verbose,
                   m_axialFile, m_stereoFile);
   m_NDFinder.printParams();
 }
 
-void CDCTriggerNDFinderModule::beginRun()
-{
-}
+void CDCTriggerNDFinderModule::beginRun() {}
 
 void CDCTriggerNDFinderModule::event()
 {
@@ -151,9 +128,7 @@ void CDCTriggerNDFinderModule::event()
   }
 }
 
-void CDCTriggerNDFinderModule::endRun()
-{
-}
+void CDCTriggerNDFinderModule::endRun() {}
 
 void CDCTriggerNDFinderModule::terminate()
 {

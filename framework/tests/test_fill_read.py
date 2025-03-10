@@ -6,6 +6,9 @@ from ROOT.Belle2 import VxdID, PXDDigit
 import unittest
 import numpy as np
 
+from b2test_utils import skip_test_if_light
+skip_test_if_light()
+
 
 class TestFillReadArray(unittest.TestCase):
     '''

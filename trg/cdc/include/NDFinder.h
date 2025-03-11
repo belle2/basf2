@@ -128,12 +128,6 @@ namespace Belle2 {
       unsigned char phiTrim = 4;
       /** Clustering: number of deleted cells in each theta direction from the maximum */
       unsigned char thetaTrim = 4;
-      /** CDC symmetry: repeat wire pattern 32 times in phi */
-      unsigned short phigeo = 32;
-      /** CDC symmetry: phi range covered by hit data [0 .. phigeo] */
-      unsigned short parcels = 7;
-      /** CDC symmetry: phi range covered by expanded hit data [0 .. phigeo] */
-      unsigned short parcelsExp = 11;
     };
     std::vector<std::vector<float>> m_acceptRanges;
     std::vector<float> m_slotSizes;
@@ -147,7 +141,7 @@ namespace Belle2 {
       delete m_parrayAxial;
       delete m_parrayStereo;
       delete m_phoughPlane;
-      delete m_parrayHitMod;
+      delete m_trackSegmentToSectorIDs;
       delete m_pcompAxial;
       delete m_pcompStereo;
       delete m_parrayAxialExp;
@@ -197,8 +191,8 @@ namespace Belle2 {
      * 2D (omega,phi) planes */
     void squeezeAll(ndbinning writebins, c5array& writeArray, c5array& readArray, int outparcels, int inparcels);
 
-    /** Initialize hit modulo mappings */
-    void initHitModAxSt(c2array& hitMod);
+    /* Fills the m_trackSegmentToSectorIDs array */
+    void initHitToSectorMap(c2array& hitMod);
 
     /** NDFinder reset data structure to process next event */
     void reset()
@@ -212,7 +206,8 @@ namespace Belle2 {
       m_vecDstart.clear();
       m_hitOrients.clear();
       delete m_phoughPlane;
-      m_phoughPlane = new c3array(m_pc3shape);
+      std::array<c3index, 3> shapeHough = {{ m_nOmega, m_nPhiFull, m_nTheta }};
+      m_phoughPlane = new c3array(shapeHough);
     }
 
     /** Debug: print configured parameters */
@@ -298,28 +293,15 @@ namespace Belle2 {
     /** NDFinder */
   private:
 
-    /** Shapes of the arrays holding the hit patterns */
-    boost::array<c5index, 5> m_pc5shapeax;
-    boost::array<c5index, 5> m_pc5shapest;
-    boost::array<c3index, 3> m_pc3shape;
-    boost::array<c2index, 2> m_pc2shapeHitMod;
-    boost::array<c5index, 5> m_pc5shapeCompAx;
-    boost::array<c5index, 5> m_pc5shapeCompSt;
-    boost::array<c5index, 5> m_pc5shapeExpAx;
-    boost::array<c5index, 5> m_pc5shapeExpSt;
-
     /** Array pointers to the hit patterns */
     c5array* m_parrayAxial = nullptr;
     c5array* m_parrayStereo = nullptr;
     c3array* m_phoughPlane = nullptr;
-    c2array* m_parrayHitMod = nullptr;
+    c2array* m_trackSegmentToSectorIDs = nullptr;
     c5array* m_pcompAxial = nullptr;
     c5array* m_pcompStereo = nullptr;
     c5array* m_parrayAxialExp = nullptr;
     c5array* m_parrayStereoExp = nullptr;
-
-    /** Number of first priority wires in each super layer (TS per SL) */
-    std::vector<int> m_nWires;
 
     /** Result: vector of the found tracks */
     std::vector<NDFinderTrack> m_NDFinderTracks;
@@ -381,6 +363,13 @@ namespace Belle2 {
     unsigned short m_nAx{0};
     unsigned short m_nSt{0};
     unsigned short m_nPrio{0};
+
+    /** CDC symmetry: repeat wire pattern 32 times in phi */
+    unsigned short m_phiGeo{0};
+    /** CDC symmetry: phi range covered by hit data [0 .. m_phiGeo] */
+    unsigned short m_parcels{0};
+    /** CDC symmetry: phi range covered by expanded hit data [0 .. m_phiGeo] */
+    unsigned short m_parcelsExp{0};
 
     /** Clustering module */
     Belle2::Clusterizend m_clusterer;

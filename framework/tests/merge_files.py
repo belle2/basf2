@@ -533,7 +533,7 @@ def check_27_ntuple_trees():
 def check_28_streaming():
     """Check if we can merge streamed input files"""
     # Here we use as input a mdst file from GitHub
-    input_file = 'https://github.com/belle2/basf2/raw/refs/heads/main/mdst/tests/mdst-v06-00-00.root'
+    input_file = 'https://github.com/belle2/basf2/raw/refs/heads/main/mdst/tests/mdst-v09-00-00.root'
     return merge_files(input_file) == 0
 
 

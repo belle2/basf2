@@ -95,8 +95,8 @@ namespace Belle2 {
      * Get the log configuration for the module with the given name.
      * If no package specific configuration exists a new one is created.
      *
-     * @param package The name of the package whose log configuration should be returned
-     * @return The log configuration of the given package
+     * @param module The name of the package whose log configuration should be returned
+     * @return The log configuration of the given module
      */
     LogConfig& getModuleLogConfig(const std::string& module) { return m_moduleLogConfigs[module]; }
 

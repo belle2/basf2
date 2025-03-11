@@ -64,7 +64,6 @@ namespace Belle2 {
 
     /**
      * Calculate avg offline occupancy for one specific sensor, especially
-     * @param iLayer index of layer
      * @param hU, hV pointers to histograms
      * @param layer layer index
      * @param ladder ladder index

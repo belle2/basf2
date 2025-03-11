@@ -5,9 +5,9 @@ In the following we describe the ``background`` package (documentation still und
 The background package is how we introduce beam background hit rates in MC samples. 
 Things users should consider when using this package are the following: 
 
-* Run conditions (i.e. indepedent vs dependent MC samples): 
+* Run conditions (i.e. independent vs dependent MC samples): 
 
-  * Run Indepedent or Simulated Beam Backgrounds: The experiment number used for "Exp: 100X" (ex. 1002 for phase 2, 1003 for phase 3 Run 1, and 1004 for Run 2). 
+  * Run Independent or Simulated Beam Backgrounds: The experiment number used for "Exp: 100X" (ex. 1002 for phase 2, 1003 for phase 3 Run 1, and 1004 for Run 2). 
     The files produced from these 'experiments' are in coordination with the background group and are used in run-independent MC proudction.
   * Run Dependent or Random Trigger Events: These files are used to produce BG overlay files for use in run-dependent MC production. 
     Essentially, a random trigger is used to collect events that don't contain physic signals and therefore represent the effect of beam backgrounds and detector noise.

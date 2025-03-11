@@ -24,6 +24,7 @@
 #include <TText.h>
 #include <TLine.h>
 #include <TArrow.h>
+#include <TString.h>
 
 namespace Belle2 {
   /*! Class definition for common method */
@@ -44,6 +45,8 @@ namespace Belle2 {
     ~ DQMHistAnalysisSVDModule();
 
     void setStatusOfCanvas(int status, TCanvas* canvas, bool plotLeg = true, bool online = false); /**< set status of Canvas */
+    TString getHistoNameFromCanvas(TString cName, TString view = "",
+                                   TString cPrefix = "c_", TString hPrefix = ""); /**< get histogram name from Canvas name*/
 
   protected:
     TPaveText* m_legProblem = nullptr;  /**< plot legend, problem */

@@ -42,8 +42,8 @@ Here we use the worked example of a veto for background photons from a :math:`\p
         In this case we simply skip the :doc:`RestOfEvent` by executing a *so called* "dead end" path.
         
      
-#. Fill a `ParticleList`_ with all (or selected) photons from the :doc:`RestOfEvent`
-#. Fill a `ParticleList`_ with signal photon candidates which is used in the reconstruction of the current signal side candidate (related to current :doc:`RestOfEvent`)
+#. Fill a :doxygen:`ParticleList <classBelle2_1_1ParticleList>` with all (or selected) photons from the :doc:`RestOfEvent`
+#. Fill a :doxygen:`ParticleList <classBelle2_1_1ParticleList>` with signal photon candidates which is used in the reconstruction of the current signal side candidate (related to current :doc:`RestOfEvent`)
 #. Combine the two lists to form pi0 candidates
 #. Use TMVA or any other method to determine the probability or likelihood that signal photon originates from :math:`\pi^0` decay
 #. Select the best :math:`\pi^0` candidate
@@ -55,8 +55,6 @@ Here we use the worked example of a veto for background photons from a :math:`\p
 All analysis actions coloured in blue are executed once per event and all coloured in green are executed once per each :doc:`RestOfEvent` object in the event. The analysis actions coloured with green together construct a veto.
 
 .. seealso:: This is an important usecase of the `basf2.Path.for_each` functionality.
-
-.. _ParticleList: https://software.belle2.org/development/classBelle2_1_1ParticleList.html
 
 Examples
 --------

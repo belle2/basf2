@@ -105,7 +105,7 @@ std::vector<zmq::socket_t*> ZMQHistoServerToFileOutput::getSockets() const
 
 void ZMQHistoServerToFileOutput::clear()
 {
-  // Clear the shared memory by writing an empty ROOT file into it
+  // Make sure that the ROOT file is empty, and then closed.
   TFile memFile(("/dev/shm/tmp_" + m_dqmMemFileName).c_str(), "RECREATE");
   if (!memFile.IsOpen()) {
     B2ASSERT("Writing to shared memory failed! ", ("/dev/shm/tmp_" + m_dqmMemFileName).c_str());

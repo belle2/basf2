@@ -105,7 +105,7 @@ TRGGRLProjectsModule::TRGGRLProjectsModule() : Module()
            "Name of the StoreArray holding the tracks made by the neural network (NN).",
            string("TRGCDCNeuroTracks"));
   addParam("2DmatchCollection", m_2DmatchCollectionName,
-           "Name of the StoreArray holding the macthed tracks and clusters made by the 2D fitter.",
+           "Name of the StoreArray holding the matched tracks and clusters made by the 2D fitter.",
            string("TRG2DMatchTracks"));
   addParam("PhimatchCollection", m_phimatch_tracklist, "the 2d tracklist with associated cluster", std::string("TRGPhiMatchTracks"));
   addParam("KLMmatchCollection", m_klmmatch_tracklist, "the 2d tracklist with KLM", std::string("TRGKLMMatchTracks"));

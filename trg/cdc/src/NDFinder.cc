@@ -25,17 +25,17 @@ void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, f
                     unsigned char omegaTrim, unsigned char phiTrim, unsigned char thetaTrim,
                     bool verbose, std::string& axialFile, std::string& stereoFile)
 {
-  m_params.minSuperAxial = (unsigned char) minSuperAxial;
-  m_params.minSuperStereo = (unsigned char) minSuperStereo;
-  m_params.thresh = (float) thresh;
+  m_params.minSuperAxial = minSuperAxial;
+  m_params.minSuperStereo = minSuperStereo;
+  m_params.thresh = thresh;
   m_params.axialFile = axialFile;
   m_params.stereoFile = stereoFile;
-  m_clustererParams.minTotalWeight = (unsigned short) minTotalWeight;
-  m_clustererParams.minPeakWeight = (unsigned short) minPeakWeight;
-  m_clustererParams.iterations = (unsigned char) iterations;
-  m_clustererParams.omegaTrim = (unsigned char) omegaTrim;
-  m_clustererParams.phiTrim = (unsigned char) phiTrim;
-  m_clustererParams.thetaTrim = (unsigned char) thetaTrim;
+  m_clustererParams.minTotalWeight = minTotalWeight;
+  m_clustererParams.minPeakWeight = minPeakWeight;
+  m_clustererParams.iterations = iterations;
+  m_clustererParams.omegaTrim = omegaTrim;
+  m_clustererParams.phiTrim = phiTrim;
+  m_clustererParams.thetaTrim = thetaTrim;
   m_verbose = verbose;
 
   initBins();
@@ -44,13 +44,13 @@ void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, f
   initHitToSectorMap(*m_trackSegmentToSectorIDs);
   B2DEBUG(25, "initialized HitMod, a map of tsid to (orient, relid, letter).");
 
-  /** Load the axial and stereo track to hit relations from file.*/
+  /* Load the axial and stereo track to hit relations from file.*/
   loadArray(m_params.axialFile, m_compAxBins, *m_pcompAxial);
   B2DEBUG(25, "loaded zero suppressed axial array ");
   loadArray(m_params.stereoFile, m_compStBins, *m_pcompStereo);
   B2DEBUG(25, "loaded zero suppressed stereo array ");
 
-  /** Unpack zero suppressed track to hit relations.*/
+  /* Unpack zero suppresed track to hit relations.*/
   restoreZeros(m_expAxBins, m_compAxBins, *m_parrayAxialExp, *m_pcompAxial);
   B2DEBUG(25, "restored expanded axial array (11/32 phi) ");
   restoreZeros(m_expStBins, m_compStBins, *m_parrayStereoExp, *m_pcompStereo);
@@ -74,29 +74,26 @@ void NDFinder::initBins()
    * The total number of 2336 TS corresponds to (41 axial + 32 stereo) * 32.
    *
    * The number of track bins (full phi) is: (omega, phi, theta) = (40, 384, 9)
-   * */
+   **/
 
   m_nTS = 2336;
   m_nSL = 9;
-
   m_nAx = 41;
   m_nSt = 32;
   m_nPrio = 3;
+
+  m_nOmega = 40;
+  m_nPhi = 384;
+  m_nTheta = 9;
 
   m_phiGeo = 32;
   m_parcels = 7;
   m_parcelsExp = 11;
 
-  m_nOmega = 40;
-  m_nPhiFull = 384;
-  m_nTheta = 9;
-  m_nPhiOne = m_nPhiFull / m_phiGeo; // 384/32  = 12
-  /** compressed phi: phi_start, phi_width, phi_0, ..., phi_12 */
-  m_nPhiComp = 15;
-  /** use phi bins: 84 = 7 * (384/32) */
-  m_nPhiUse =  m_parcels * m_nPhiOne;
-  /** expanded phi: 132 = 11 * (384/32) */
-  m_nPhiExp =  m_parcelsExp * m_nPhiOne;
+  m_nPhiSector = m_nPhi / m_phiGeo; // 384/32  = 12
+  m_nPhiComp = 15; // compressed phi: phi_start, phi_width, phi_0, ..., phi_12
+  m_nPhiUse =  m_parcels * m_nPhiSector; // 84 (7 sectors)
+  m_nPhiExp =  m_parcelsExp * m_nPhiSector; // 132 (11 sectors)
 
   m_axBins.hitid = m_nAx;
   m_stBins.hitid = m_nSt;
@@ -113,12 +110,12 @@ void NDFinder::initBins()
   m_expStBins.phi = m_nPhiExp; //132
 
   m_fullBins.hitid = m_nTS;
-  m_fullBins.phi = m_nPhiFull;
+  m_fullBins.phi = m_nPhi;
 
   /* Shapes of the arrays holding the hit patterns */
   std::array<c5index, 5> shapeAxial = {{ m_nAx, m_nPrio, m_nOmega, m_nPhiUse, m_nTheta }};
   std::array<c5index, 5> shapeStereo = {{ m_nSt, m_nPrio, m_nOmega, m_nPhiUse, m_nTheta }};
-  std::array<c3index, 3> shapeHough = {{ m_nOmega, m_nPhiFull, m_nTheta }};
+  std::array<c3index, 3> shapeHough = {{ m_nOmega, m_nPhi, m_nTheta }};
   std::array<c2index, 2> shapeTrackSegmentToSectorIDs = {{ m_nTS, m_nPrio }};
   std::array<c5index, 5> shapeCompAxial = {{ m_nAx, m_nPrio, m_nOmega, m_nPhiComp, 1 }};
   std::array<c5index, 5> shapeCompStereo = {{ m_nSt, m_nPrio, m_nOmega, m_nPhiComp, m_nTheta }};
@@ -128,10 +125,6 @@ void NDFinder::initBins()
   m_parrayAxial             = new c5array(shapeAxial);
   m_parrayStereo            = new c5array(shapeStereo);
   m_phoughPlane             = new c3array(shapeHough);
-  /* m_trackSegmentToSectorIDs: 2D array mapping TS-ID ([0, 2335]) to: */
-  /*   - [0]: Orientation (0 = axial, 1 = stereo) */
-  /*   - [1]: Relative wire ID in the sector ([0, 40]) */
-  /*   - [2]: Relative phi-sector ID in the super layer ([0, 31]) */
   m_trackSegmentToSectorIDs = new c2array(shapeTrackSegmentToSectorIDs);
   m_pcompAxial              = new c5array(shapeCompAxial);
   m_pcompStereo             = new c5array(shapeCompStereo);
@@ -143,7 +136,7 @@ void NDFinder::initBins()
   std::vector<float> phiRange = {0., 11.25};
   std::vector<float> thetaRange = {19., 140.};
   float ssOmega = (omegaRange[1] - omegaRange[0]) / m_nOmega; //40;
-  float ssPhi = (phiRange[1] - phiRange[0]) / m_nPhiOne; //12;
+  float ssPhi = (phiRange[1] - phiRange[0]) / m_nPhiSector; //12;
   float ssTheta = (thetaRange[1] - thetaRange[0]) / m_nTheta; //9;
   m_acceptRanges.push_back(omegaRange);
   m_acceptRanges.push_back(phiRange);
@@ -187,7 +180,7 @@ void NDFinder::loadArray(const std::string& filename, ndbinning bins, c5array& h
 }
 
 /* Fills the m_trackSegmentToSectorIDs array */
-void NDFinder::initHitToSectorMap(c2array& hitMod)
+void NDFinder::initHitToSectorMap(c2array& mapArray)
 {
   /* Number of first priority wires in each super layer (TS per SL) */
   constexpr std::array<int, 9> nWires = {160, 160, 192, 224, 256, 288, 320, 352, 384};
@@ -214,9 +207,9 @@ void NDFinder::initHitToSectorMap(c2array& hitMod)
     int wireIDinSector = wireIDinSL % wiresPerSector[sl];
     int relativeWireIDinSector = cumulativeSectorWires[sl] + wireIDinSector;
     int relativeSectorIDinSuperLayer = (int) floor(wireIDinSL / wiresPerSector[sl]);
-    hitMod[ts][0] = (int)(isAxial);
-    hitMod[ts][1] = relativeWireIDinSector;
-    hitMod[ts][2] = relativeSectorIDinSuperLayer;
+    mapArray[ts][0] = (int)(isAxial);
+    mapArray[ts][1] = relativeWireIDinSector;
+    mapArray[ts][2] = relativeSectorIDinSuperLayer;
   }
 }
 
@@ -280,55 +273,7 @@ void NDFinder::restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& exp
   }
 }
 
-
-void NDFinder::printArray3D(c3array& hitsToTracks, ndbinning bins, ushort phiInc = 1, ushort omInc = 1, ushort divide = 4,
-                            ushort minWeightShow = 1)
-{
-  ushort phistart = 0;
-  ushort phiend = bins.phi;
-  bool started = false;
-  unsigned long phiSlice = 0;
-  for (c3index iphi = 0; iphi < bins.phi; iphi++) {
-    for (c3index itheta = 0; itheta < bins.theta; itheta++) {
-      for (c3index iomega = 0; iomega < bins.omega; iomega++) {
-        phiSlice += hitsToTracks[iomega][iphi][itheta];
-      }
-    }
-    if (phiSlice == 0 and not started) {
-      phistart = iphi + 1;
-    } else if (phiSlice != 0 and not started) {
-      started = true;
-    } else if (phiSlice != 0 and started) {
-      phiend = iphi;
-    } else if (phiSlice == 0 and started) {
-      phiend = iphi;
-      break;
-    }
-  }
-
-  B2DEBUG(25, "printArray3D, phistart = " << phistart << ", phiend = " << phiend);
-  auto d3shp = hitsToTracks.shape();
-  B2DEBUG(25, "printArray shape: " << d3shp[0] << ", " << d3shp[1] << ", " << d3shp[2]);
-
-  if (phiend == phistart) {
-    return;
-  }
-  c3index itheta = 4; // only print itheta = 4
-  for (c3index iomega = 0; iomega < bins.omega; iomega += omInc) {
-    for (c3index iphi = phistart; iphi < phiend; iphi += phiInc) {
-      // reduce printed weight
-      ushort valRed = (ushort)((hitsToTracks[iomega][iphi][itheta]) / divide);
-      if (valRed <= minWeightShow) // skip small weights
-        std::cout << " ";
-      else
-        std::cout << valRed;
-    }
-    std::cout << "|" << std::endl;
-  }
-}
-
-
-/** orient: {1 : axial, 0 : stereo} */
+/* orient: {1 : axial, 0 : stereo} */
 void NDFinder::addLookup(unsigned short ihit)
 {
   c2array& arrayHitMod = *m_trackSegmentToSectorIDs;
@@ -342,12 +287,12 @@ void NDFinder::addLookup(unsigned short ihit)
 
   // Get hit contribution to cluster:
   // 7 of 32 phi parcels: center = 3
-  short DstartShort = (letterShort - 3) % m_phiGeo  * m_nPhiOne;
-  if (DstartShort < 0) {DstartShort = m_nPhiFull + DstartShort;}
+  short DstartShort = (letterShort - 3) % m_phiGeo  * m_nPhiSector;
+  if (DstartShort < 0) {DstartShort = m_nPhi + DstartShort;}
   // Add hit to hough plane
   // 11 of 32 phi parcels: center = 5
-  short DstartComp = (letterShort - 5) % m_phiGeo * m_nPhiOne;
-  if (DstartComp < 0) {DstartComp = m_nPhiFull + DstartComp;}
+  short DstartComp = (letterShort - 5) % m_phiGeo * m_nPhiSector;
+  if (DstartComp < 0) {DstartComp = m_nPhi + DstartComp;}
 
   m_vecDstart.push_back(DstartShort);
   m_hitOrients.push_back(orient);
@@ -378,7 +323,7 @@ void NDFinder::addC3Comp(ushort hitr,
       for (ushort iphiz = 0; iphiz < xlen; iphiz++) {
         ushort iphix = iphiz + 2;
         ushort iphi = iphiz + xstart;
-        ushort iHoughPhi = (iphi + Dstart) % m_nPhiFull;
+        ushort iHoughPhi = (iphi + Dstart) % m_nPhi;
         houghPlane[iomega][iHoughPhi][itheta] += hitsToTracks[hitr][prio][iomega][iphix][ntheta];
       }
     }
@@ -388,13 +333,9 @@ void NDFinder::addC3Comp(ushort hitr,
 
 void NDFinder::findTracks()
 {
-  /** Build the Houghplane by summing up all single hit contributions */
+  /* Build the Houghplane by summing up all single hit contributions */
   for (unsigned short ihit = 0; ihit < m_nHits; ihit++) {
     addLookup(ihit);
-  }
-  if (m_verbose) {
-    B2DEBUG(25, "m_houghPlane, 2");
-    printArray3D(*m_phoughPlane, m_fullBins);
   }
   getCM();
 }
@@ -600,11 +541,13 @@ std::vector<double> NDFinder::getWeightedMean(std::vector<cellweight> highWeight
   double axomega = 0.;
   double axphi = 0.;
   double axtheta = 0.;
+  int ncells = 0;
   long weightSum = 0;
   for (cellweight& elem : highWeight) {
     axomega += elem.index[0] * elem.weight;
     axphi += elem.index[1] * elem.weight;
     axtheta += elem.index[2] * elem.weight;
+    ncells++;
     weightSum += elem.weight;
   }
   axomega /= weightSum;
@@ -655,11 +598,11 @@ ushort NDFinder::hitContrib(cell_index peak, ushort ihit)
   short Dstart = m_vecDstart[ihit];
   short iphi_signed = iHoughPhi - Dstart;
   if (iphi_signed < 0) {
-    iphi_signed += m_nPhiFull;  // Wrap phi properly
+    iphi_signed += m_nPhi;  // Wrap phi properly
   }
   ushort iphi = (ushort)iphi_signed;
   if (Dstart > iHoughPhi && Dstart > 300) {
-    iphi = m_nPhiFull - Dstart + iHoughPhi;
+    iphi = m_nPhi - Dstart + iHoughPhi;
   }
   ushort iomega = peak[0];
   ushort itheta = peak[2];
@@ -668,7 +611,7 @@ ushort NDFinder::hitContrib(cell_index peak, ushort ihit)
   const c2array& arrayHitMod = *m_trackSegmentToSectorIDs;
   c2elem hitr = arrayHitMod[m_hitIds[ihit]][1];
   unsigned short prio = m_prioPos[ihit];
-  if (Dstart > m_nPhiFull) {
+  if (Dstart > m_nPhi) {
     B2ERROR("phi overflow: iHoughPhi = " << iHoughPhi << ", Dstart = " << Dstart << ", iphi=" << iphi);
   }
   if (iphi < m_nPhiUse) { // hit covers current phi area, get contribution
@@ -679,17 +622,4 @@ ushort NDFinder::hitContrib(cell_index peak, ushort ihit)
     }
   }
   return contrib;
-}
-
-
-void
-NDFinder::printParams()
-{
-  B2DEBUG(25,
-          "ndFinderParams minSuperAxial=" << m_params.minSuperAxial <<
-          ", minSuperStereo=" << m_params.minSuperStereo << ", thresh=" << m_params.thresh <<
-          ", minTotalWeight=" << m_params.minTotalWeight <<
-          ", minPeakWeight=" << m_params.minPeakWeight << ", iterations=" << m_params.iterations <<
-          ", omegaTrim=" << m_params.omegaTrim << ", phiTrim=" << m_params.phiTrim <<
-          ", thetaTrim=" << m_params.thetaTrim);
 }

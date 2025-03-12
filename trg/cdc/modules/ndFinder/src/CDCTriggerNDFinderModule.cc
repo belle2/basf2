@@ -97,7 +97,6 @@ void CDCTriggerNDFinderModule::initialize()
                   m_minTotalWeight, m_minPeakWeight, m_iterations,
                   m_omegaTrim, m_phiTrim, m_thetaTrim, m_verbose,
                   m_axialFile, m_stereoFile);
-  m_NDFinder.printParams();
 }
 
 void CDCTriggerNDFinderModule::beginRun() {}
@@ -130,7 +129,4 @@ void CDCTriggerNDFinderModule::event()
 
 void CDCTriggerNDFinderModule::endRun() {}
 
-void CDCTriggerNDFinderModule::terminate()
-{
-  m_NDFinder.printParams();
-}
+void CDCTriggerNDFinderModule::terminate() {}

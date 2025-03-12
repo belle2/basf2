@@ -15,12 +15,21 @@
 
 namespace Belle2 {
 
+  /* Default binning in a (7/32) phi-sector */
+  struct ndbinning {
+    c5elem omega = 40;
+    c5elem phi = 84;
+    c5elem theta = 9;
+    c5elem hitid; // 41 axial, 32 stereo
+    c5elem prio = 3;
+  };
+
   struct cellweight {
     cell_index index;
     ushort weight;
   };
 
-  /** Store track parameters of found tracks. */
+  /* Store track parameters of found tracks. */
   class NDFinderTrack {
   public:
     NDFinderTrack(std::vector<double> values, const SimpleCluster& cluster,
@@ -34,7 +43,7 @@ namespace Belle2 {
       m_ndreadout = ndreadout;
     }
 
-    /** Default destructor. */
+    /* Default destructor. */
     virtual ~NDFinderTrack() {}
     double getOmega()
     {
@@ -80,62 +89,60 @@ namespace Belle2 {
     }
 
   private:
-    /** 2D track curvature */
+    /* 2D track curvature */
     double m_omega;
-    /** 2D azimuthal angle */
+    /* 2D azimuthal angle */
     double m_phi;
-    /** 3D polar angle */
+    /* 3D polar angle */
     double m_cotTheta;
-    /** vector of the indices of the related hits
-     *  in the list of CDC hits (StoreArray<CDCHits>) */
+    /* Vector of the indices of the related hits */
+    /* in the list of CDC hits (StoreArray<CDCHits>) */
     std::vector<unsigned short> m_relHits;
-    /** vector of the weights for each related hit. */
+    /* Vector of the weights for each related hit. */
     std::vector<double> m_hitWeights;
+    /* The found cluster of the track */
     SimpleCluster m_cluster;
+    /* Vector storing the complete Hough space for analysis */
     std::vector<ROOT::Math::XYZVector> m_houghspace;
+    /* Vector storing cluster informations for analysis */
     std::vector<ROOT::Math::XYZVector> m_ndreadout;
   };
 
 
-  /** Class to represent the CDC NDFinder.
-   *
-   */
+  /* Class to represent the CDC NDFinder. */
   class NDFinder {
   public:
 
-    /** Struct of ndFinder parameters */
+    /* Struct of ndFinder parameters */
     struct ndparameters {
-      /** Zero-Suppressed trained hit data */
+      /* Zero-Suppressed trained hit data */
       std::string axialFile = "data/trg/cdc/ndFinderArrayAxialComp.txt.gz";
       std::string stereoFile = "data/trg/cdc/ndFinderArrayStereoComp.txt.gz";
 
-      /** Clustering options */
-      /**  Only accept clusters with minSuperAxial */
+      /* Required number of axial super layers */
       unsigned char minSuperAxial  = 4;
-      /**  Required number of stereo super layers */
+      /* Required number of stereo super layers */
       unsigned char minSuperStereo  = 3;
-      /**  houghspace must have thresh x maxweight of cluster */
+      /* Hough space cells must have (thresh * maxweight) to be considered */
       float thresh = 0.85;
-      /** Clustering: minimum of the total weight in all cells of the 3d volume */
+      /* Clustering: Minimum of the total weight in all cells of the 3d volume */
       unsigned short minTotalWeight = 450;
-      /** Clustering: minimum peak cell weight */
+      /* Clustering: Minimum peak cell weight */
       unsigned short minPeakWeight = 32;
-      /** Clustering: number of iterations for the cluster search in each Hough space quadrant */
+      /* Clustering: Number of iterations for the cluster search in each Hough space quadrant */
       unsigned char iterations = 2;
-      /** Clustering: number of deleted cells in each omega direction from the maximum */
+      /* Clustering: Number of deleted cells in each omega direction from the maximum */
       unsigned char omegaTrim = 5;
-      /** Clustering: number of deleted cells in each phi direction from the maximum */
+      /* Clustering: Number of deleted cells in each phi direction from the maximum */
       unsigned char phiTrim = 4;
-      /** Clustering: number of deleted cells in each theta direction from the maximum */
+      /* Clustering: Number of deleted cells in each theta direction from the maximum */
       unsigned char thetaTrim = 4;
     };
-    std::vector<std::vector<float>> m_acceptRanges;
-    std::vector<float> m_slotSizes;
 
-    /** Default constructor. */
+    /* Default constructor. */
     NDFinder() {}
 
-    /** Default destructor. */
+    /* Destructor. */
     virtual ~NDFinder()
     {
       delete m_parrayAxial;
@@ -148,8 +155,7 @@ namespace Belle2 {
       delete m_parrayStereoExp;
     }
 
-
-    /** initialization */
+    /* Initialization */
 
     /** Set parameters
      * @param minSuperAxial minimum number of axial super layers per cluster
@@ -170,31 +176,7 @@ namespace Belle2 {
               unsigned char omegaTrim, unsigned char phiTrim, unsigned char thetaTrim,
               bool verbose, std::string& axialFile, std::string& stereoFile);
 
-    /** Initialize the binnings and reserve the arrays */
-    void initBins();
-
-    /** Load an NDFinder array of hit representations in track phase space.
-     * Used to load axial and stereo hit arrays.
-     * Represented in a 7/32 phi sector of the CDC. */
-    void loadArray(const std::string& filename, ndbinning bins, c5array& hitsToTracks);
-    /** Restore non-zero suppressed hit curves.
-     * will make m_params.arrayAxialFile and m_params.arrayStereoFile obsolete */
-    void restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, const c5array& compArray);
-
-    /** Squeeze phi-axis in a 2D (omega,phi) plane
-     * @param inparcels number of 1/32 sectors in input plane
-     * @param outparcels number of 1/32 sectors in output plane */
-    void squeezeOne(c5array& writeArray, c5array& readArray, int outparcels, int inparcels, c5index ihit, c5index iprio, c5index itheta,
-                    c5elem nomega);
-
-    /** Loop over all hits and theta bins and squeeze all
-     * 2D (omega,phi) planes */
-    void squeezeAll(ndbinning writebins, c5array& writeArray, c5array& readArray, int outparcels, int inparcels);
-
-    /* Fills the m_trackSegmentToSectorIDs array */
-    void initHitToSectorMap(c2array& hitMod);
-
-    /** NDFinder reset data structure to process next event */
+    /* NDFinder reset data structure to process next event */
     void reset()
     {
       m_NDFinderTracks.clear();
@@ -206,14 +188,11 @@ namespace Belle2 {
       m_vecDstart.clear();
       m_hitOrients.clear();
       delete m_phoughPlane;
-      std::array<c3index, 3> shapeHough = {{ m_nOmega, m_nPhiFull, m_nTheta }};
+      std::array<c3index, 3> shapeHough = {{ m_nOmega, m_nPhi, m_nTheta }};
       m_phoughPlane = new c3array(shapeHough);
     }
 
-    /** Debug: print configured parameters */
-    void printParams();
-
-    /** fill hit info of the event */
+    /* fill hit info of the event */
     void addHit(unsigned short hitId, unsigned short hitSLId, unsigned short hitPrioPos, long hitPrioTime)
     {
       if (hitPrioPos > 0) { // skip "no hit"
@@ -225,119 +204,162 @@ namespace Belle2 {
       }
     }
 
-    /** main function for track finding */
+    /* main function for track finding */
     void findTracks();
 
-    /** retreive the results */
+    /* retreive the results */
     std::vector<NDFinderTrack>* getFinderTracks()
     {
       return &m_NDFinderTracks;
     }
 
-    /** Debug Tool: Print part of the houghmap */
-    void printArray3D(c3array& hitsToTracks, ndbinning bins, ushort, ushort, ushort, ushort);
-
-    /** NDFinder internal functions for track finding*/
+    /* NDFinder internal functions for track finding*/
   protected:
 
-    /** Core track finding logic in the constructed houghmap */
+    /* Initialize the binnings and reserve the arrays */
+    void initBins();
+
+    /* Fills the m_trackSegmentToSectorIDs array */
+    void initHitToSectorMap(c2array& mapArray);
+
+    /* Load an NDFinder array of hit representations in track phase space. */
+    /* Used to load axial and stereo hit arrays. */
+    /* Represented in a 7/32 phi sector of the CDC. */
+    void loadArray(const std::string& filename, ndbinning bins, c5array& hitsToTracks);
+
+    /* Restore non-zero suppressed hit curves. */
+    /* will make m_params.arrayAxialFile and m_params.arrayStereoFile obsolete */
+    void restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, const c5array& compArray);
+
+    /* Squeeze phi-axis in a 2D (omega,phi) plane */
+    /* @param inparcels number of 1/32 sectors in input plane */
+    /* @param outparcels number of 1/32 sectors in output plane */
+    void squeezeOne(c5array& writeArray, c5array& readArray, int outparcels, int inparcels, c5index ihit, c5index iprio, c5index itheta,
+                    c5elem nomega);
+
+    /* Loop over all hits and theta bins and squeeze all */
+    /* 2D (omega,phi) planes */
+    void squeezeAll(ndbinning writebins, c5array& writeArray, c5array& readArray, int outparcels, int inparcels);
+
+    /* Core track finding logic in the constructed houghmap */
     void getCM();
 
-    /** Add a single axial or stereo hit to the houghmap.
-     * Determines the phi window of the hit in the full houghmap (Dstart, Dend).
-     * Uses: m_arrayHitMod
-     * Fills: m_vecDstart, m_hitOrients   */
+    /* Add a single axial or stereo hit to the houghmap. */
+    /* Determines the phi window of the hit in the full houghmap (Dstart, Dend). */
+    /* Uses: m_arrayHitMod */
+    /* Fills: m_vecDstart, m_hitOrients */
     void addLookup(unsigned short ihit);
 
-    /** In place array addition to houghmap Comp: A = A + B */
+    /* In place array addition to houghmap Comp: A = A + B */
     void addC3Comp(ushort hitr, ushort prio, const c5array& hitsToTracks,
                    short Dstart, ndbinning bins);
 
-    /** Create hits to clusters confusion matrix */
+    /* Create hits to clusters confusion matrix */
     std::vector<std::vector<unsigned short>> getHitsVsClusters(
                                             std::vector<SimpleCluster>& clusters);
 
-    /** Peak cell in cluster */
+    /* Peak cell in cluster */
     cell_index getMax(const std::vector<cell_index>&);
 
-    /** Determine weight contribution of a single hit to a single cell.
-     * Used to create the hitsVsClusters confusion matrix. */
+    /* Determine weight contribution of a single hit to a single cell. */
+    /* Used to create the hitsVsClusters confusion matrix. */
     ushort hitContrib(cell_index peak, ushort ihit);
 
-    /** Relate all hits in a cluster to the cluster
-     * Remove small clusters with less than minsuper related hits. */
+    /* Relate all hits in a cluster to the cluster */
+    /* Remove small clusters with less than minsuper related hits. */
     std::vector<SimpleCluster> allHitsToClusters(
       std::vector<std::vector<unsigned short>>& hitsVsClusters,
       std::vector<SimpleCluster>& clusters);
 
-    /** Candidate cells as seed for the clustering.
-     * Selects all cells with weight > minWeight */
+    /* Candidate cells as seed for the clustering. */
+    /* Selects all cells with weight > minWeight */
     std::vector<cellweight> getHighWeight(std::vector<cell_index> entries, float cutoff);
 
-    /** Calculate the weighted center of a cluster */
+    /* Calculate the weighted center of a cluster */
     std::vector<double> getWeightedMean(std::vector<cellweight>);
 
-    /** Scale the weighted center to track parameter values */
+    /* Scale the weighted center to track parameter values */
     std::vector<double> getBinToVal(std::vector<double>);
 
-    /** Transverse momentum to radius */
+    /* Transverse momentum to radius */
     double cdcTrackRadius(double pt)
     {
       return pt * 1e11 / (3e8 * 1.5); // div (c * B)
     }
 
-    /** Calculate physical units */
+    /* Calculate physical units */
     float transformVar(float estVal, int idx);
     std::vector<double> transform(std::vector<double> estimate);
 
-    /** NDFinder */
+    /* NDFinder */
   private:
-
-    /** Array pointers to the hit patterns */
-    c5array* m_parrayAxial = nullptr;
-    c5array* m_parrayStereo = nullptr;
-    c3array* m_phoughPlane = nullptr;
-    c2array* m_trackSegmentToSectorIDs = nullptr;
-    c5array* m_pcompAxial = nullptr;
-    c5array* m_pcompStereo = nullptr;
-    c5array* m_parrayAxialExp = nullptr;
-    c5array* m_parrayStereoExp = nullptr;
-
-    /** Result: vector of the found tracks */
+    /* Result: vector of the found tracks */
     std::vector<NDFinderTrack> m_NDFinderTracks;
 
-    /** TS-Ids of the hits in the current event
-     * elements: [0,2335] for 2336 TS in total*/
+    /* TS-Ids of the hits in the current event */
+    /* elements: [0,2335] for 2336 TS in total */
     std::vector<unsigned short> m_hitIds;
 
-    /** SL-Ids of the hits in the current event
-     * elements: super layer number in [0,1,...,8]*/
+    /* SL-Ids of the hits in the current event */
+    /* elements: super layer number in [0,1,...,8] */
     std::vector<unsigned short> m_hitSLIds;
 
-    /** Priority positon within the TS in the current event
-     * elements basf2: [0,3] first, left, right, no hit
-     * elements stored: 3 - basf2prio*/
+    /* Priority positon within the TS in the current event */
+    /* elements basf2: [0,3] first, left, right, no hit */
+    /* elements stored: 3 - basf2prio */
     std::vector<unsigned short> m_prioPos;
 
-    /** Drift time of the priority wire */
+    /* Drift time of the priority wire */
     std::vector<long> m_prioTime;
 
-    /** Orients
-     * TS-Ids of the hits in the current event
-     * elements: [0,2335] for 2336 TS in total*/
+    /* Orients */
+    /* TS-Ids of the hits in the current event */
+    /* elements: [0,2335] for 2336 TS in total */
     std::vector<unsigned short> m_hitOrients;
 
-    /** Phi-start of 7/32 hit representation in full track parameter space.
-     * Used to get the weight contribution of a hit to a cluster. */
+    /* Phi-start of 7/32 hit representation in full track parameter space. */
+    /* Used to get the weight contribution of a hit to a cluster. */
     std::vector<short> m_vecDstart;
 
-    /** Counter for the number of hits in the current event */
+    /* Counter for the number of hits in the current event */
     unsigned short m_nHits{0};
 
-    /** Configuration parameters of the 3DFinder */
+    /* Print Hough planes and verbose output */
+    bool m_verbose{false};
+
+    /* Configuration parameters of the 3DFinder */
     ndparameters m_params;
 
-    /** Binnings in different hit pattern arrays */
+    /* Configuration of the clustering module */
+    clustererParams m_clustererParams;
+
+    /* Clustering module */
+    Belle2::Clusterizend m_clusterer;
+
+    /* Track segments */
+    unsigned short m_nTS{0}; // Number of track segments
+    unsigned short m_nSL{0}; // Number of super layers
+    unsigned short m_nAx{0}; // Number of unique axial track segments
+    unsigned short m_nSt{0}; // Number of unique stereo track segments
+    unsigned short m_nPrio{0}; // Number of priority wires
+
+    /* Full Hough space bins */
+    unsigned short m_nPhi{0}; // Bins in the phi dimension
+    unsigned short m_nOmega{0}; // Bins in the omega dimension
+    unsigned short m_nTheta{0}; // Bins in the theta dimension
+
+    /* CDC symmetry in phi */
+    unsigned short m_phiGeo{0}; // Repetition of the wire pattern
+    unsigned short m_parcels{0}; // phi range: hit data
+    unsigned short m_parcelsExp{0}; // phi range: expanded hit data
+
+    /* Phi sectors in the CDC */
+    unsigned short m_nPhiSector{0}; // Bins of one phi sector
+    unsigned short m_nPhiComp{0}; // Bins of compressed phi
+    unsigned short m_nPhiUse{0}; // Bins of 7 phi sectors
+    unsigned short m_nPhiExp{0}; // Bins of 11 phi sectors
+
+    /* Binnings in different hit pattern arrays */
     ndbinning m_axBins;
     ndbinning m_stBins;
     ndbinning m_fullBins;
@@ -346,35 +368,22 @@ namespace Belle2 {
     ndbinning m_expAxBins;
     ndbinning m_expStBins;
 
-    /** Configuration of the clustering module */
-    clustererParams m_clustererParams;
+    /* Acceptance Ranges to convert bins to track parameters */
+    std::vector<std::vector<float>> m_acceptRanges;
+    std::vector<float> m_slotSizes;
 
-    /** Default bins */
-    unsigned short m_nPhiFull{0};
-    unsigned short m_nPhiOne{0};
-    unsigned short m_nPhiComp{0};
-    unsigned short m_nPhiExp{0};
-    unsigned short m_nPhiUse{0};
-    unsigned short m_nOmega{0};
-    unsigned short m_nTheta{0};
-
-    unsigned short m_nSL{0};
-    unsigned short m_nTS{0};
-    unsigned short m_nAx{0};
-    unsigned short m_nSt{0};
-    unsigned short m_nPrio{0};
-
-    /** CDC symmetry: repeat wire pattern 32 times in phi */
-    unsigned short m_phiGeo{0};
-    /** CDC symmetry: phi range covered by hit data [0 .. m_phiGeo] */
-    unsigned short m_parcels{0};
-    /** CDC symmetry: phi range covered by expanded hit data [0 .. m_phiGeo] */
-    unsigned short m_parcelsExp{0};
-
-    /** Clustering module */
-    Belle2::Clusterizend m_clusterer;
-
-    /** Print Hough planes and verbose output */
-    bool m_verbose{false};
+    /* Array pointers to the hit patterns */
+    /* m_trackSegmentToSectorIDs: 2D array mapping TS-ID ([0, 2335]) to: */
+    /*   - [0]: Orientation (0 = axial, 1 = stereo) */
+    /*   - [1]: Relative wire ID in the sector ([0, 40]) */
+    /*   - [2]: Relative phi-sector ID in the super layer ([0, 31]) */
+    c2array* m_trackSegmentToSectorIDs = nullptr;
+    c5array* m_parrayAxial = nullptr;
+    c5array* m_parrayStereo = nullptr;
+    c3array* m_phoughPlane = nullptr;
+    c5array* m_pcompAxial = nullptr;
+    c5array* m_pcompStereo = nullptr;
+    c5array* m_parrayAxialExp = nullptr;
+    c5array* m_parrayStereoExp = nullptr;
   };
 }

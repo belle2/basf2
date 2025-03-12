@@ -18,15 +18,15 @@
 
 namespace Belle2 {
 
-  /** CDC Trigger NDFinder Module */
+  /* CDC Trigger NDFinder Module */
   class CDCTriggerNDFinderModule : public Module {
   public:
-    /** Constructor */
+    /* Constructor */
     CDCTriggerNDFinderModule();
-    /** Destructor */
+    /* Destructor */
     virtual ~CDCTriggerNDFinderModule();
 
-    /** Module functions */
+    /* Module functions */
     virtual void initialize() override;
     virtual void beginRun() override;
     virtual void event() override;
@@ -35,52 +35,52 @@ namespace Belle2 {
 
   private:
 
-    /** Name for TS hits */
+    /* Name for TS hits */
     std::string m_TrackSegmentHitsName;
-    /** Name for NDFinder tracks */
+    /* Name for NDFinder tracks */
     std::string m_NDFinderTracksName;
-    /** Name for NDFinder Track To Hit Array */
+    /* Name for NDFinder Track To Hit Array */
     std::string m_NDFinderTrackToHitArrayName;
-    /** Name for the NDFinder Cluster Data */
+    /* Name for the NDFinder Cluster Data */
     std::string m_NDFinderInfosName;
 
-    /** StoreArray for TS hits */
+    /* StoreArray for TS hits */
     StoreArray<CDCTriggerSegmentHit> m_TrackSegmentHits;
-    /** StoreArray for 2D finder tracks from unpacker */
+    /* StoreArray for 2D finder tracks from unpacker */
     StoreArray<CDCTriggerTrack> m_NDFinderTracks;
-    /** StoreArray for NDFinder Cluster Data */
+    /* StoreArray for NDFinder Cluster Data */
     StoreArray<CDCTrigger3DFinderInfo> m_NDFinderInfos;
 
-    /** Instance of the 3D Track Finder */
+    /* Instance of the 3D Track Finder */
     NDFinder m_NDFinder;
-    /** Cluster pruning: Minimum number of axial super layer hits related to a cluster
-     * for the cluster to be considered as a track */
+    /* Cluster pruning: Minimum number of axial super layer hits related to a cluster */
+    /* for the cluster to be considered as a track */
     int m_minSuperAxial;
-    /** Cluster pruning: Minimum number of stereo super layer hits related to a cluster
-     * for the cluster to be considered as a track */
+    /* Cluster pruning: Minimum number of stereo super layer hits related to a cluster */
+    /* for the cluster to be considered as a track */
     int m_minSuperStereo;
-    /** Track estimation: Minimum weight of a cluster member cell
-     * relative to the peak weight of the cluster
-     * for the cell to enter in the weighted mean
-     * track parameter value estimation */
+    /* Track estimation: Minimum weight of a cluster member cell */
+    /* relative to the peak weight of the cluster */
+    /* for the cell to enter in the weighted mean */
+    /* track parameter value estimation */
     double m_thresh;
-    /** Clustering with 3d volume: Cut on the total weight in this volume */
+    /* Clustering with 3d volume: Cut on the total weight in this volume */
     int m_minTotalWeight;
-    /** Clustering with 3d volume: Cut on the peak cell weight */
+    /* Clustering with 3d volume: Cut on the peak cell weight */
     int m_minPeakWeight;
-    /** Clustering with 3d volume: Number of global maximum searches per Hough space quadrant */
+    /* Clustering with 3d volume: Number of global maximum searches per Hough space quadrant */
     int m_iterations;
-    /** Clustering with 3d volume: Max deletion in omega (number of cells in each direction from max */
+    /* Clustering with 3d volume: Max deletion in omega (number of cells in each direction from max */
     int m_omegaTrim;
-    /** Clustering with 3d volume: Max deletion in phi (number of cells in each direction from max */
+    /* Clustering with 3d volume: Max deletion in phi (number of cells in each direction from max */
     int m_phiTrim;
-    /** Clustering with 3d volume: Max deletion in theta (number of cells in each direction from max */
+    /* Clustering with 3d volume: Max deletion in theta (number of cells in each direction from max */
     int m_thetaTrim;
-    /** Print Hough planes and verbose output */
+    /* Print Hough planes and verbose output */
     bool m_verbose;
-    /** File name of the axial hit patterns */
+    /* File name of the axial hit patterns */
     std::string m_axialFile;
-    /** File name of the stereo hit patterns */
+    /* File name of the stereo hit patterns */
     std::string m_stereoFile;
   };
 }

@@ -107,7 +107,7 @@ namespace Belle2 {
   };
 
 
-  /** Clustering module */
+  /* Clustering module */
   class Clusterizend {
   public:
     Clusterizend() {}

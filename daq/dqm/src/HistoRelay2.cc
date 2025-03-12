@@ -52,7 +52,7 @@ int HistoRelay2::collect()
 // Copy Shared Memory to local and stream
 EvtMessage* HistoRelay2::StreamFile(string& filename)
 {
-  TFile* file = new TFile(filename.c_str(), "read");
+  TFile* file = new TFile((std::string("/dev/shm/") + filename).c_str(), "read");
   if (file == NULL) return NULL;
   //  file->ls();
   //  file->Print();

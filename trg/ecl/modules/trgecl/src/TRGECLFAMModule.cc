@@ -164,7 +164,7 @@ namespace Belle2 {
       // no-fit method = backup method 1
       obj_trgeclDigi->digitization01(m_TCDigiE, m_TCDigiT);
     } else if (m_famMethod == 3) {
-      // orignal method = backup method 2
+      // original method = backup method 2
       obj_trgeclDigi->digitization02(m_TCDigiE, m_TCDigiT);
     }
     obj_trgeclDigi->save(m_nEvent);
@@ -179,7 +179,7 @@ namespace Belle2 {
 
     if (m_famMethod == 1) { obj_trgeclfit->FAMFit01(m_TCDigiE, m_TCDigiT); }      // fitting method
     else if (m_famMethod == 2) { obj_trgeclfit->FAMFit02(m_TCDigiE, m_TCDigiT); } // no-fit method = backup method 1
-    else if (m_famMethod == 3) { obj_trgeclfit->FAMFit03(m_TCDigiE, m_TCDigiT); } // orignal method = backup method 2
+    else if (m_famMethod == 3) { obj_trgeclfit->FAMFit03(m_TCDigiE, m_TCDigiT); } // original method = backup method 2
     obj_trgeclfit-> save(m_nEvent);
 
     // Count number of trigger cells in each ECL region for EventLevelClusteringInfo

@@ -57,19 +57,19 @@ namespace Belle2 {
              m_debugLevel);
     addParam("Bhabha",
              m_Bhabha,
-             "TRGECL Bhabha method  0 : Belle I, 1 :belle II(defult)",
+             "TRGECL Bhabha method  0 : Belle I, 1 :belle II(default)",
              m_Bhabha);
     addParam("Clustering",
              m_Clustering,
-             "TRGECL Clustering method  0 : use only ICN, 1 : ICN + Energy(Defult)",
+             "TRGECL Clustering method  0 : use only ICN, 1 : ICN + Energy(Default)",
              m_Clustering);
     addParam("ClusterLimit",
              m_ClusterLimit,
-             "The Limit number of cluster (Defult:6)",
+             "The Limit number of cluster (Default:6)",
              m_ClusterLimit);
     addParam("EventTiming",
              m_EventTiming,
-             "TRGECL EventTiming method  0 : Belle I, 1 : Energetic TC, 2 : Energy Weighted timing (defult)",
+             "TRGECL EventTiming method  0 : Belle I, 1 : Energetic TC, 2 : Energy Weighted timing (default)",
              m_EventTiming);
     addParam("NofTopTC",
              m_NofTopTC,
@@ -89,7 +89,7 @@ namespace Belle2 {
              m_SelectEvent);
     addParam("ConditionDB",
              m_ConditionDB,
-             "Flag to use Condition Database (0:=not use, 1:=use(defult))",
+             "Flag to use Condition Database (0:=not use, 1:=use(default))",
              m_ConditionDB);
     //-----------------------------------------------
     addParam("ADCtoEnergy",
@@ -102,11 +102,11 @@ namespace Belle2 {
              m_TotalEnergy);
     addParam("Bhabha2DThresholdFWD",
              m_2DBhabhaThresholdFWD,
-             "set energy treshold(14 regions) of 2D Bhabha veto for FWD side in Lab. (GeV) : ",
+             "set energy threshold(14 regions) of 2D Bhabha veto for FWD side in Lab. (GeV) : ",
              m_2DBhabhaThresholdFWD);
     addParam("Bhabha2DThresholdBWD",
              m_2DBhabhaThresholdBWD,
-             "set energy treshold(14 regions) of 2D Bhabha veto for BWD side in Lab. (GeV) : ",
+             "set energy threshold(14 regions) of 2D Bhabha veto for BWD side in Lab. (GeV) : ",
              m_2DBhabhaThresholdBWD);
     addParam("Bhabha3DVetoThreshold",
              m_3DBhabhaVetoThreshold,
@@ -557,9 +557,9 @@ namespace Belle2 {
             << m_lmlCLECMSCut[0] << ", "
             << m_lmlCLECMSCut[1] << ", "
             << m_lmlCLECMSCut[2] << ")");
-    B2DEBUG(100, "[TRGECLModule] lml00 the number of cluster for minimum energy cluser = "
+    B2DEBUG(100, "[TRGECLModule] lml00 the number of cluster for minimum energy cluster = "
             << m_lml00NCLforMinE);
-    B2DEBUG(100, "[TRGECLModule] lml12 the number of cluster for minimum energy cluser = "
+    B2DEBUG(100, "[TRGECLModule] lml12 the number of cluster for minimum energy cluster = "
             << m_lml12NCLforMinE);
     B2DEBUG(100, "[TRGECLModule] lml13 ThetaID selection = "
             << m_lml13ThetaIdSelection);
@@ -607,7 +607,7 @@ namespace Belle2 {
     B2DEBUG(100, "[TRGECLModule] Taub2b3 Cluster energy cut(low, high) in lab. for all clusters (GeV) = ("
             << m_taub2b3CLELabCut[0] << ", "
             << m_taub2b3CLELabCut[1] << ")");
-    B2DEBUG(100, "[TRGECLModule] (hie4) CL E cut for miniimum energy cluster = "
+    B2DEBUG(100, "[TRGECLModule] (hie4) CL E cut for minimum energy cluster = "
             << m_hie4LowCLELabCut);
 
     // set parameters to TRGECLMaster

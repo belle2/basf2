@@ -35,7 +35,7 @@ namespace Belle2 {
 
     /** Destructor */
     virtual ~TRGECLFAMModule();
-    /** Initilizes TRGECLFAMModule. */
+    /** Initializes TRGECLFAMModule. */
     virtual void initialize() override;
     /** Called when new run started.*/
     virtual void beginRun() override;

@@ -112,7 +112,7 @@ namespace Belle2 {
     {
       m_ADCtoEnergy = ADCtoEnergy;
     }
-    //! set Total Energy Theshold (low, high, lum)
+    //! set Total Energy Threshold (low, high, lum)
     void setTotalEnergyThreshold(const std::vector<double>& iTotalEnergy)
     {
       m_TotalEnergy = iTotalEnergy;
@@ -156,7 +156,7 @@ namespace Belle2 {
     {
       m_mumuAngle = imumuAngle;
     }
-    //! set hie12 3D Bhabha addtion Angle
+    //! set hie12 3D Bhabha addition Angle
     void sethie12BhabhaVetoAngle(const std::vector<int>&  ihie12BhabhaVetoAngle)
     {
       m_hie12BhabhaVetoAngle = ihie12BhabhaVetoAngle;
@@ -277,7 +277,7 @@ namespace Belle2 {
     /** TRG Decision overlap window */
     double m_OverlapWindow;
 
-    /** clutering option*/
+    /** clustering option*/
     int m_Clustering;
     /** Bhabha option*/
     int m_Bhabha;
@@ -289,16 +289,16 @@ namespace Belle2 {
     int m_ClusterLimit;
     //! ECL Trigger  bit
     int m_Triggerbit[4];
-    //!  Low Multiplicity bit
+    //! Low Multiplicity bit
     int m_Lowmultibit;
-    //!  Bhabha Prescale Factor
+    //! Bhabha Prescale Factor
     int m_PrescaleFactor;
-    //! Bhabha Prescale Countor
+    //! Bhabha Prescale Counter
     int m_PrescaleCounter;
 
     //! conversion factor of ADC to Energy in Lab in GeV
     double m_ADCtoEnergy;
-    //! Total Energy Theshold (low, high, lum) in Lab in GeV
+    //! Total Energy Threshold (low, high, lum) in Lab in GeV
     std::vector<double> m_TotalEnergy;
     //! 2D Bhabha Energy Threshold
     std::vector<double> m_2DBhabhaThresholdFWD;
@@ -332,7 +332,7 @@ namespace Belle2 {
     std::vector<int> m_taub2b2AngleCut;
     //! taub2b2 total energy (TC theta ID =1-17) (GeV)
     double m_taub2b2EtotCut;
-    //! taub2b2 cluseter energy cut(high, low) (GeV) in lab
+    //! taub2b2 cluster energy cut(high, low) (GeV) in lab
     std::vector<double> m_taub2b2CLELabCut;
     //! taub2b3 selection cuts
     //! (3,2,1,0) = (dphi low, dphi high, theta_sum low, theta_sum high)
@@ -359,7 +359,7 @@ namespace Belle2 {
     std::vector<int> m_3DBhabhaVetoInTrackThetaRegion;
     //! energy threshold(low, high) for quality flag (GeV)
     std::vector<double> m_EventTimingQualityThreshold;
-    //! (hie4) CL E cut for miniimum energy cluster in Lab in GeV
+    //! (hie4) CL E cut for minimum energy cluster in Lab in GeV
     double m_hie4LowCLELabCut;
 
     /** Mapping object */
@@ -370,9 +370,9 @@ namespace Belle2 {
     TrgEclTiming* m_obj_timing;
     /**  Bhabha object */
     TrgEclBhabha* m_obj_bhabha;
-    /**  Beam Backgroud veto object */
+    /**  Beam Background veto object */
     TrgEclBeamBKG* m_obj_beambkg;
-    /**  Beam Backgroud veto object */
+    /**  Beam Background veto object */
     TrgEclDataBase* m_obj_database;
 
   };

@@ -7,6 +7,7 @@
 ##########################################################################
 """CDC badwire calibration."""
 import basf2
+from ROOT import gInterpreter
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_cdc import settings as cdc_tracking_calibration
 from prompt.utils import ExpRun
@@ -15,7 +16,7 @@ from caf.framework import Calibration
 from caf import strategies
 from tracking import add_hit_preparation_modules, add_track_finding, add_track_fit_and_track_creator
 from rawdata import add_unpackers
-
+gInterpreter.ProcessLine("#include <tracking/trackFindingCDC/rootification/StoreWrapper.h>")
 settings = CalibrationSettings(name="CDC badwire",
                                expert_username="manhtt",
                                description=__doc__,
@@ -27,6 +28,7 @@ settings = CalibrationSettings(name="CDC badwire",
                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[cdc_tracking_calibration],
                                expert_config={
+                                   "fileFormat": "RAW",
                                    "min_events_per_file": 500,
                                    "max_events_per_file": 10000,
                                    "components": ["CDC", "ECL", "KLM"],
@@ -41,7 +43,7 @@ def get_calibrations(input_data, **kwargs):
     min_events_per_file = expert_config["min_events_per_file"]
     max_events_per_file = expert_config["max_events_per_file"]
     components = expert_config["components"]
-
+    fileFormat = expert_config["fileFormat"]
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
     file_to_iov_mumu = input_data["mumu_tight_or_highm_calib"]
@@ -50,7 +52,6 @@ def get_calibrations(input_data, **kwargs):
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
     basf2.B2INFO("Complete input data selection.")
     basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_mumu)}")
-
     payload_boundaries = []
     payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
     basf2.B2INFO(f"Payload boundaries from expert_config: {payload_boundaries}")
@@ -64,7 +65,6 @@ def get_calibrations(input_data, **kwargs):
         basf2.B2INFO('Found payload_boundaries: set collector granularity to run')
     # call collector module
     col = basf2.register_module("CDCBadWireCollector")
-
     # call algorighm
     algo = Belle2.CDC.WireEfficiencyAlgorithm()
     algo.setInputFileNames("histo_badwire.root")
@@ -74,7 +74,8 @@ def get_calibrations(input_data, **kwargs):
                                 algorithms=algo,
                                 input_files=input_files_mumu,
                                 pre_collector_path=pre_collector(max_events_per_file,
-                                                                 components=components))
+                                                                 components=components,
+                                                                 fileFormat=fileFormat))
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun
     if payload_boundaries:
@@ -89,7 +90,7 @@ def get_calibrations(input_data, **kwargs):
     return [badwire_calib]
 
 
-def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"]):
+def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"], fileFormat="RAW"):
 
     # Create an execution path
     path = basf2.create_path()

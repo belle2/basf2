@@ -16,7 +16,7 @@ from ROOT.Belle2 import SVDdEdxCalibrationAlgorithm, SVDdEdxValidationAlgorithm
 
 import modularAnalysis as ma
 import vertex as vx
-import reconstruction as re
+from reconstruction import prepare_user_cdst_analysis
 
 settings = CalibrationSettings(
     name="caf_svd_dedx",
@@ -33,8 +33,8 @@ settings = CalibrationSettings(
     expert_config={
         "isMC": False,
         "listOfMutedCalibrations": [],  # dEdxCalibration, dEdxValidation
-        "rerun_reco": False,  # need to rerun reconstruction for calibration?
-        "rerun_reco_val": True,  # need to rerun reconstruction for validation?
+        "rerun_pid": False,  # need to rerun VXD PID for calibration?
+        "rerun_pid_val": True,  # need to rerun VXD PID for validation?
         "validation_mode": "basic",  # full or basic; full also produces global PID performance plots
         "MaxFilesPerRun": 10,  # 15,
         "MaxFilesPerRunValidation": 6,  # be careful in MC to not exclude certain event types
@@ -53,37 +53,16 @@ settings = CalibrationSettings(
     depends_on=[])
 
 
-def create_path(rerun_reco, isMC, expert_config):
+def create_path(rerun_pid, isMC, expert_config):
     rec_path = b2.Path()
 
     # expert_config = kwargs.get("expert_config")
     max_events_per_file = expert_config["MaxEvtsPerFile"]
 
-    if rerun_reco:
-        rec_path.add_module(
-            'RootInput',
-            branchNames=[
-                'RawARICHs',
-                'RawCDCs',
-                'RawECLs',
-                'RawFTSWs',
-                'RawKLMs',
-                'RawPXDs',
-                'RawSVDs',
-                'RawTOPs',
-                'RawTRGs',
-                'RawDataBlock',
-                'RawCOPPER'],
-            entrySequences=[f'0:{max_events_per_file - 1}'],
-            logLevel=b2.LogLevel.ERROR)
-        if not isMC:
-            re.add_unpackers(path=rec_path)
-        else:
-            rec_path.add_module("Gearbox")
-            rec_path.add_module("Geometry")
-
-        re.add_reconstruction(path=rec_path, pruneTracks=False)
-        rec_path.add_module('VXDDedxPID')
+    if rerun_pid:
+        rec_path.add_module('RootInput', entrySequences=[f'0:{max_events_per_file - 1}']
+                            )
+        prepare_user_cdst_analysis(rec_path, mc=isMC)
     else:
         rec_path.add_module('RootInput')
 
@@ -207,8 +186,8 @@ def get_calibrations(input_data, **kwargs):
 
     isMC = expert_config["isMC"]
     listOfMutedCalibrations = expert_config["listOfMutedCalibrations"]
-    rerun_reco = expert_config["rerun_reco"]
-    rerun_reco_val = expert_config["rerun_reco_val"]
+    rerun_pid = expert_config["rerun_pid"]
+    rerun_pid_val = expert_config["rerun_pid_val"]
     max_files_per_run = expert_config["MaxFilesPerRun"]
     max_files_per_run_validation = expert_config["MaxFilesPerRunValidation"]
 
@@ -265,8 +244,8 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.framework import Calibration
 
-    rec_path = create_path(rerun_reco, isMC, expert_config)
-    rec_path_validation = create_path(rerun_reco_val, isMC, expert_config)
+    rec_path = create_path(rerun_pid, isMC, expert_config)
+    rec_path_validation = create_path(rerun_pid_val, isMC, expert_config)
 
     dedx_calibration = Calibration("SVDdEdxCalibration",
                                    collector="SVDdEdxCollector",

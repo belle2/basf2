@@ -3771,10 +3771,10 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
 
                       )DOC",  Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("isNAN(variable)", isNAN,
-                      "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
+                      "[Eventbased] Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
                       "Useful for debugging.", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("ifNANgiveX(variable, x)", ifNANgiveX,
-                      "Returns x (has to be a number) if variable value is nan (determined via std::isnan(double)).\n"
+                      "[Eventbased] Returns x (has to be a number) if variable value is nan (determined via std::isnan(double)).\n"
                       "Useful for technical purposes while training MVAs.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"

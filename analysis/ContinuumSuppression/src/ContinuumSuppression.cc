@@ -15,7 +15,6 @@
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
 
 #include <vector>
 #include <Math/Vector3D.h>
@@ -32,11 +31,11 @@ namespace Belle2 {
     // Create relation: Particle <-> ContinuumSuppression
     particle->addRelationTo(qqVars);
 
-    std::vector<ROOT::Math::XYZVector> p3_cms_sigB, p3_cms_roe, p3_cms_all;
+    std::vector<ROOT::Math::PxPyPzEVector> p_cms_sigB, p_cms_roe, p_cms_all;
 
-    std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_sigA;
-    std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_sigB;
-    std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_roe;
+    std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_sigA;
+    std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_sigB;
+    std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_roe;
 
     std::vector<float> ksfwFS0;
     std::vector<float> ksfwFS1;
@@ -70,7 +69,7 @@ namespace Belle2 {
     for (const Belle2::Particle* sigFS0 : signalDaughters) {
       ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * sigFS0->get4Vector();
 
-      p3_cms_q_sigA.emplace_back(p_cms.Vect(), sigFS0->getCharge());
+      p_cms_q_sigA.emplace_back(p_cms, sigFS0->getCharge());
 
       p_cms_missA -= p_cms;
       et[0] += p_cms.Pt();
@@ -82,10 +81,10 @@ namespace Belle2 {
     for (const Belle2::Particle* sigFS1 : signalFSParticles) {
       ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * sigFS1->get4Vector();
 
-      p3_cms_all.push_back(p_cms.Vect());
-      p3_cms_sigB.push_back(p_cms.Vect());
+      p_cms_all.push_back(p_cms);
+      p_cms_sigB.push_back(p_cms);
 
-      p3_cms_q_sigB.emplace_back(p_cms.Vect(), sigFS1->getCharge());
+      p_cms_q_sigB.emplace_back(p_cms, sigFS1->getCharge());
 
       p_cms_missB -= p_cms;
       et[1] += p_cms.Pt();
@@ -107,10 +106,10 @@ namespace Belle2 {
 
         ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * chargedROEParticle->get4Vector();
 
-        p3_cms_all.push_back(p_cms.Vect());
-        p3_cms_roe.push_back(p_cms.Vect());
+        p_cms_all.push_back(p_cms);
+        p_cms_roe.push_back(p_cms);
 
-        p3_cms_q_roe.emplace_back(p_cms.Vect(), chargedROEParticle->getCharge());
+        p_cms_q_roe.emplace_back(p_cms, chargedROEParticle->getCharge());
 
         p_cms_missA -= p_cms;
         p_cms_missB -= p_cms;
@@ -127,10 +126,10 @@ namespace Belle2 {
         if (photon->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
 
           ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * photon->get4Vector();
-          p3_cms_all.push_back(p_cms.Vect());
-          p3_cms_roe.push_back(p_cms.Vect());
+          p_cms_all.push_back(p_cms);
+          p_cms_roe.push_back(p_cms);
 
-          p3_cms_q_roe.emplace_back(p_cms.Vect(), photon->getCharge());
+          p_cms_q_roe.emplace_back(p_cms, photon->getCharge());
 
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;
@@ -140,20 +139,20 @@ namespace Belle2 {
       }
 
       // Thrust variables
-      thrustB = Thrust::calculateThrust(p3_cms_sigB);
-      thrustO = Thrust::calculateThrust(p3_cms_roe);
+      thrustB = Thrust::calculateThrust(p_cms_sigB);
+      thrustO = Thrust::calculateThrust(p_cms_roe);
       thrustBm = thrustB.R();
       thrustOm = thrustO.R();
       cosTBTO  = fabs(thrustB.Unit().Dot(thrustO.Unit()));
       cosTBz   = fabs(cos(thrustB.Theta()));
 
       // Cleo Cones
-      CleoCones cc(p3_cms_all, p3_cms_roe, thrustB, true, true);
+      CleoCones cc(p_cms_all, p_cms_roe, thrustB, true, true);
       cleoConesAll = cc.cleo_cone_with_all();
       cleoConesROE = cc.cleo_cone_with_roe();
 
       // Fox-Wolfram Moments: Uses all final-state tracks (= sigB + ROE)
-      FoxWolfram FW(p3_cms_all);
+      FoxWolfram FW(p_cms_all);
       FW.calculateBasicMoments();
       R2 = FW.getR(2);
 
@@ -161,9 +160,9 @@ namespace Belle2 {
       ROOT::Math::PxPyPzEVector p_cms_B = T.rotateLabToCms() * particle->get4Vector();
       double Hso0_max(2 * (2 * BeamEnergy - p_cms_B.E()));
       KsfwMoments KsfwM(Hso0_max,
-                        p3_cms_q_sigA,
-                        p3_cms_q_sigB,
-                        p3_cms_q_roe,
+                        p_cms_q_sigA,
+                        p_cms_q_sigB,
+                        p_cms_q_roe,
                         p_cms_missA,
                         p_cms_missB,
                         et);

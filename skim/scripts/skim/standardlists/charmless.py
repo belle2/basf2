@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -25,8 +24,8 @@ def loadStdVeryLooseTracks(particletype, path):
     """
 
     # basic quality cut strings
-    trackQuality = 'thetaInCDCAcceptance and chiProb > 0 '
-    ipCut = 'abs(dr) < 0.5 and abs(dz) < 3'
+    trackQuality = 'thetaInCDCAcceptance'
+    ipCut = 'abs(dr) < 0.5 and abs(dz) < 2'
     goodTrack = trackQuality + ' and ' + ipCut
 
     if particletype not in ['pi', 'K', 'p', 'e', 'mu']:
@@ -73,7 +72,7 @@ def loadStdPi0ForBToCharmless(path):
     """
     stdPi0s.stdPi0s(listtype='eff60_May2020', path=path)
     ma.cutAndCopyList('pi0:charmlessFit', 'pi0:eff60_May2020', 'M > 0.105 and M < 0.160', path=path)
-    kFit('pi0:charmlessFit', 0.0, fit_type='mass', path=path)
+    kFit('pi0:charmlessFit', -1, fit_type='mass', path=path)
 
 
 def loadStdVeryLooseKstarPlus(path):

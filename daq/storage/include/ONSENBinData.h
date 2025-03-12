@@ -44,9 +44,6 @@ namespace Belle2 {
     unsigned int getONSENMagic() const;
 
   private:
-    unsigned int* m_magic;
-    unsigned int* m_framenr;
-    unsigned int* m_length_of_frame;
     mutable sose_frame_t* m_start_frame;
 
   };

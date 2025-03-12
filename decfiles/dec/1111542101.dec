@@ -1,11 +1,11 @@
 # EventType: 1111542101
 # Descriptor: [B0 -> psi(2S) [-> e+ e-] pi0 [-> gamma gamma] K_S0 [-> pi+ pi-]]
-# NickName: Bd_psi2spiKS_ee
+# NickName: Bd_psi2spi0KS_ee
 # Documentation: B -> charmonium decays.
 # Tested: Yes
-# PhysicsWG: Charmonium
+# PhysicsWG: Quarkonium
 # Responsible: Kirill Chilikin
-# Email: chilikin@lebedev.ru
+# Email: K.A.Chilikin@inp.nsk.su
 # Cuts: None
 # Date: 20220601
 #
@@ -21,7 +21,7 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B0sig
-1.0 psi(2S)sig pi0sig K_S0sig PHOTOS PHSP;
+1.0 psi(2S)sig pi0sig K_S0sig PHSP;
 Enddecay
 
 CDecay anti-B0sig

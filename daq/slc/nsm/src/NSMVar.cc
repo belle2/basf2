@@ -59,7 +59,7 @@ const NSMVar& NSMVar::operator=(const std::vector<int>& val)
 const NSMVar& NSMVar::operator=(const std::vector<float>& val)
 {
   if (m_value) free(m_value);
-  float* v = (float*)malloc(val.size() * sizeof(int));
+  float* v = (float*)malloc(val.size() * sizeof(float));
   for (size_t i = 0; i < val.size(); i++)
     v[i] = val[i];
   m_value = v;
@@ -73,7 +73,7 @@ int NSMVar::size() const
 {
   int s = 1;
   switch (m_type) {
-    case NONE: s = 0; return 0;
+    case NONE: return 0;
     case INT: s = 4; break;
     case FLOAT: s = 4; break;
     case TEXT: return m_len + 1;

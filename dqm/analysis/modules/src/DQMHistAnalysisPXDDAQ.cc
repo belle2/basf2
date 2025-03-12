@@ -30,10 +30,10 @@ DQMHistAnalysisPXDDAQModule::DQMHistAnalysisPXDDAQModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("DQM Analysis for PXD DAQ Statistics and Issues");
 
-  //Parameter definition
+  // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:DAQ:"));
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
   B2DEBUG(1, "DQMHistAnalysisPXDDAQ: Constructor done.");
 
@@ -41,11 +41,6 @@ DQMHistAnalysisPXDDAQModule::DQMHistAnalysisPXDDAQModule()
 
 DQMHistAnalysisPXDDAQModule::~DQMHistAnalysisPXDDAQModule()
 {
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
 }
 
 void DQMHistAnalysisPXDDAQModule::initialize()
@@ -74,33 +69,26 @@ void DQMHistAnalysisPXDDAQModule::initialize()
   m_hMissingDHC = new TH2F("hPXDMissingDHC", "PXD Missing DHC", 16, 0, 16, 2, 0, 2);
   m_hMissingDHE = new TH2F("hPXDMissingDHE", "PXD Missing DHE", 64, 0, 64, 2, 0, 2);
 
-#ifdef _BELLE2_EPICS
-  mychid.resize(20);
-  if (getUseEpics()) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    SEVCHK(ca_create_channel((m_pvPrefix + "HLTRej").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Trunc").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "HER_Trunc").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "LER_Trunc").data(), NULL, NULL, 10, &mychid[3]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "CM63").data(), NULL, NULL, 10, &mychid[4]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "HER_CM63").data(), NULL, NULL, 10, &mychid[5]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "LER_CM63").data(), NULL, NULL, 10, &mychid[6]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "HER_CM63_1ms").data(), NULL, NULL, 10, &mychid[7]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "LER_CM63_1ms").data(), NULL, NULL, 10, &mychid[8]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "HER_Trunc_1ms").data(), NULL, NULL, 10, &mychid[9]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "LER_Trunc_1ms").data(), NULL, NULL, 10, &mychid[10]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "MissFrame").data(), NULL, NULL, 10, &mychid[11]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Timeout").data(), NULL, NULL, 10, &mychid[12]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "LinkDown").data(), NULL, NULL, 10, &mychid[13]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Mismatch").data(), NULL, NULL, 10, &mychid[14]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "HER_Miss").data(), NULL, NULL, 10, &mychid[15]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "LER_Miss").data(), NULL, NULL, 10, &mychid[16]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "HER_Miss_1ms").data(), NULL, NULL, 10, &mychid[17]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "LER_Miss_1ms").data(), NULL, NULL, 10, &mychid[18]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "unused").data(), NULL, NULL, 10, &mychid[19]), "ca_create_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  registerEpicsPV("PXD:DAQ:HLTRej", "HLTReject");
+  registerEpicsPV("PXD:DAQ:Trunc", "Trunc");
+  registerEpicsPV("PXD:DAQ:HER_Trunc", "HER_Trunc");
+  registerEpicsPV("PXD:DAQ:LER_Trunc", "LER_Trunc");
+  registerEpicsPV("PXD:DAQ:CM63", "CM63");
+  registerEpicsPV("PXD:DAQ:HER_CM63", "HER_CM63");
+  registerEpicsPV("PXD:DAQ:LER_CM63", "LER_CM63");
+  registerEpicsPV("PXD:DAQ:HER_CM63_1ms", "HER_CM63_1ms");
+  registerEpicsPV("PXD:DAQ:LER_CM63_1ms", "LER_CM63_1ms");
+  registerEpicsPV("PXD:DAQ:HER_Trunc_1ms", "HER_Trunc_1ms");
+  registerEpicsPV("PXD:DAQ:LER_Trunc_1ms", "LER_Trunc_1ms");
+  registerEpicsPV("PXD:DAQ:MissFrame", "MissFrame");
+  registerEpicsPV("PXD:DAQ:Timeout", "Timeout");
+  registerEpicsPV("PXD:DAQ:LinkDown", "LinkDown");
+  registerEpicsPV("PXD:DAQ:Mismatch", "Mismatch");
+  registerEpicsPV("PXD:DAQ:HER_Miss", "HER_Miss");
+  registerEpicsPV("PXD:DAQ:LER_Miss", "LER_Miss");
+  registerEpicsPV("PXD:DAQ:HER_Miss_1ms", "HER_Miss_1ms");
+  registerEpicsPV("PXD:DAQ:LER_Miss_1ms", "LER_Miss_1ms");
+  registerEpicsPV("PXD:DAQ:unused", "unused");
 }
 
 void DQMHistAnalysisPXDDAQModule::beginRun()
@@ -108,6 +96,9 @@ void DQMHistAnalysisPXDDAQModule::beginRun()
   B2DEBUG(1, "DQMHistAnalysisPXDDAQ: beginRun called.");
 
   m_cMissingDHP->Clear();
+  m_cMissingDHE->Clear();
+  m_cMissingDHC->Clear();
+  m_cStatistic->Clear();
   m_cStatisticUpd->Clear();
 }
 
@@ -117,23 +108,15 @@ void DQMHistAnalysisPXDDAQModule::event()
   if (m_cMissingDHP == nullptr || m_cMissingDHE == nullptr || m_cMissingDHC == nullptr
       || m_cStatistic == nullptr) return; // we could assume this
 
-  m_cDAQError->Clear();
-  m_cMissingDHP->Clear();
-  m_cMissingDHE->Clear();
-  m_cMissingDHC->Clear();
-  m_cStatistic->Clear();
-
   {
     std::string name = "PXDDAQError";
 
-    if (m_hDAQError) { delete m_hDAQError; m_hDAQError = nullptr;}
+//    if (m_hDAQError) { delete m_hDAQError; m_hDAQError = nullptr;}
 
-    TH1* hh1 = findHist(name);
-    if (hh1 == NULL) {
-      hh1 = findHist(m_histogramDirectoryName, name);
-    }
-    m_cDAQError->cd();
+    auto hh1 = findHist(m_histogramDirectoryName, name, true);
     if (hh1) {
+      m_cDAQError->Clear();
+      m_cDAQError->cd();
       m_hDAQError = (TH1D*)hh1->DrawClone("text");
       m_hDAQError->SetName("hPXDDAQError");
       m_hDAQError->SetTitle("PXD Fraction of DAQ Errors");
@@ -141,19 +124,18 @@ void DQMHistAnalysisPXDDAQModule::event()
         m_hDAQError->Scale(1.0 / m_hDAQError->GetBinContent(0));
       }
       m_hDAQError->Draw("text,hist");
+      UpdateCanvas(m_cDAQError, true);
     }
   }
   {
     // DHC histogram
     std::string name = "PXDDAQDHCError";
 
-    TH1* hh1 = findHist(name);
-    if (hh1 == NULL) {
-      hh1 = findHist(m_histogramDirectoryName, name);
-    }
-    m_cMissingDHC->cd();
+    auto hh1 = findHist(m_histogramDirectoryName, name, true);
     if (hh1) {
       auto events = hh1->GetBinContent(hh1->GetBin(-1, -1));
+      m_cMissingDHC->Clear();
+      m_cMissingDHC->cd();
       // first, we have to relate the per-DHC overflow (DHC object count) to the overall overflow (event count)
       // second, we have to relate the "fake data" DHC bin to the per-DHC overflow (DHC object count)
       m_hMissingDHC->Reset();
@@ -164,6 +146,7 @@ void DQMHistAnalysisPXDDAQModule::event()
         if (dhecount > 0) m_hMissingDHC->Fill((double)i, 1.0, hh1->GetBinContent(hh1->GetBin(i, 29) / dhecount));
       }
       m_hMissingDHC->Draw("text");
+      UpdateCanvas(m_cMissingDHC, true);
     }
   }
 
@@ -171,15 +154,13 @@ void DQMHistAnalysisPXDDAQModule::event()
     // DHE histogram
     std::string name = "PXDDAQDHEError";
 
-    TH1* hh1 = findHist(name);
-    if (hh1 == NULL) {
-      hh1 = findHist(m_histogramDirectoryName, name);
-    }
-    m_cMissingDHE->cd();
+    auto hh1 = findHist(m_histogramDirectoryName, name, true);
     if (hh1) {
       auto events = hh1->GetBinContent(hh1->GetBin(-1, -1));
       // first, we have to relate the per-DHE overflow (DHE object count) to the overall overflow (event count)
       // second, we have to relate the "fake data" DHE bin to the per-DHE overflow (DHE object count)
+      m_cMissingDHE->Clear();
+      m_cMissingDHE->cd();
       m_hMissingDHE->Reset();
       for (int i = 0; i < 64; i++) {
         auto dhecount = hh1->GetBinContent(hh1->GetBin(i, -1));
@@ -188,33 +169,34 @@ void DQMHistAnalysisPXDDAQModule::event()
         if (dhecount > 0) m_hMissingDHE->Fill((double)i, 1.0, hh1->GetBinContent(hh1->GetBin(i, 29) / dhecount));
       }
       m_hMissingDHE->Draw("text");
+      UpdateCanvas(m_cMissingDHE, true);
     }
   }
 
   {
     // DHP histogram
-    if (m_hMissingDHP) { delete m_hMissingDHP; m_hMissingDHP = nullptr;}
+    //if (m_hMissingDHP) { delete m_hMissingDHP; m_hMissingDHP = nullptr;}
 
     std::string name = "PXDDAQDHPDataMissing";
 
-    TH1* hh1 = findHist(name);
-    if (hh1 == NULL) {
-      hh1 = findHist(m_histogramDirectoryName, name);
-    }
-    m_cMissingDHP->cd();
+    auto hh1 = findHist(m_histogramDirectoryName, name, true);
     if (hh1) {
+      m_cMissingDHP->Clear();
+
+      m_cMissingDHP->cd();
       m_hMissingDHP = (TH1F*)hh1->DrawClone("text");
       if (m_hMissingDHP->GetBinContent(0)) {
         m_hMissingDHP->Scale(1.0 / m_hMissingDHP->GetBinContent(0));
         m_hMissingDHP->Draw("text");
       }
+      m_cMissingDHP->Modified();
+      m_cMissingDHP->Update();
+      UpdateCanvas(m_cMissingDHP, true);
     }
     //   double data = m_hMissingDHP->Max???;
     //
     //   m_monObj->setVariable("missingDHPFraction", data);
     //
-    m_cMissingDHP->Modified();
-    m_cMissingDHP->Update();
   }
 
   std::string name = "PXDDAQStat";
@@ -222,7 +204,7 @@ void DQMHistAnalysisPXDDAQModule::event()
   auto* statsum = findHist(m_histogramDirectoryName, name, true);
   if (statsum) {
     // Stat histogram
-    if (m_hStatistic) { delete m_hStatistic; m_hStatistic = nullptr;}
+    //if (m_hStatistic) { delete m_hStatistic; m_hStatistic = nullptr;}
     m_cStatistic->cd();
     m_hStatistic = (TH1D*)statsum->DrawClone("text");
     if (m_hStatistic->GetBinContent(0)) {
@@ -231,6 +213,7 @@ void DQMHistAnalysisPXDDAQModule::event()
     }
     m_cStatistic->Modified();
     m_cStatistic->Update();
+    UpdateCanvas(m_cStatistic, true);
   }
 
   // now the important part, check fraction of "errors" and export
@@ -314,31 +297,40 @@ void DQMHistAnalysisPXDDAQModule::event()
     m_monObj->setVariable("HER_Miss_1ms", data_HER_Miss_1ms);
     m_monObj->setVariable("LER_Miss_1ms", data_LER_Miss_1ms);
 
-#ifdef _BELLE2_EPICS
-    if (getUseEpics()) {
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data_HLTRej), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&data_Trunc), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[2], (void*)&data_HER_Trunc), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[3], (void*)&data_LER_Trunc), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[4], (void*)&data_CM63), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[5], (void*)&data_HER_CM63), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[6], (void*)&data_LER_CM63), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[7], (void*)&data_HER_CM63_1ms), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[8], (void*)&data_LER_CM63_1ms), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[9], (void*)&data_HER_Trunc_1ms), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[10], (void*)&data_LER_Trunc_1ms), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[11], (void*)&data_MissFrame), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[12], (void*)&data_Timeout), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[13], (void*)&data_LinkDown), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[14], (void*)&data_Mismatch), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[15], (void*)&data_HER_Miss), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[16], (void*)&data_LER_Miss), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[17], (void*)&data_HER_Miss_1ms), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[18], (void*)&data_LER_Miss_1ms), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[19], (void*)&data_unused), "ca_set failure");
-      // write out
-      SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-    }
-#endif
+    setEpicsPV("HLTReject", data_HLTRej);
+    setEpicsPV("Trunc", data_Trunc);
+    setEpicsPV("HER_Trunc", data_HER_Trunc);
+    setEpicsPV("LER_Trunc", data_LER_Trunc);
+    setEpicsPV("CM63", data_CM63);
+    setEpicsPV("HER_CM63", data_HER_CM63);
+    setEpicsPV("LER_CM63", data_LER_CM63);
+    setEpicsPV("HER_CM63_1ms", data_HER_CM63_1ms);
+    setEpicsPV("LER_CM63_1ms", data_LER_CM63_1ms);
+    setEpicsPV("HER_Trunc_1ms", data_HER_Trunc_1ms);
+    setEpicsPV("LER_Trunc_1ms", data_LER_Trunc_1ms);
+    setEpicsPV("MissFrame", data_MissFrame);
+    setEpicsPV("Timeout", data_Timeout);
+    setEpicsPV("LinkDown", data_LinkDown);
+    setEpicsPV("Mismatch", data_Mismatch);
+    setEpicsPV("HER_Miss", data_HER_Miss);
+    setEpicsPV("LER_Miss", data_LER_Miss);
+    setEpicsPV("HER_Miss_1ms", data_HER_Miss_1ms);
+    setEpicsPV("LER_Miss_1ms", data_LER_Miss_1ms);
+    setEpicsPV("unused", data_unused);
   }
+}
+
+void DQMHistAnalysisPXDDAQModule::terminate()
+{
+  B2DEBUG(1, "DQMHistAnalysisPXDDAQ: terminate called.");
+  // delete dynamical variables
+  if (m_cDAQError) delete m_cDAQError;
+  if (m_cMissingDHC) delete m_cMissingDHC;
+  if (m_cMissingDHE) delete m_cMissingDHE;
+  if (m_cMissingDHP) delete m_cMissingDHP;
+  if (m_cStatistic) delete m_cStatistic;
+  if (m_cStatisticUpd) delete m_cStatisticUpd;
+
+  if (m_hMissingDHC) delete m_hMissingDHC;
+  if (m_hMissingDHE) delete m_hMissingDHE;
 }

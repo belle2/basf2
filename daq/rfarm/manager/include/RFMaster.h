@@ -39,7 +39,7 @@ namespace Belle2 {
 
   private:
     RFConf*            m_conf;
-    RFSharedMem*       m_shm;
+    // RFSharedMem*       m_shm;
     RFLogManager*      m_log;
 
   };

@@ -35,8 +35,8 @@ Decay B+Rare
 0.000078000   pi0  e+  nu_e                                BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 0.000078000   pi0  mu+  nu_mu                              BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 
-0.000038000   eta  e+  nu_e                                ISGW2; #[PDG2017]
-0.000038000   eta  mu+  nu_mu                              ISGW2; #[PDG2017]
+0.000035000   eta  e+  nu_e                                ISGW2; #[PDG2023]
+0.000035000   eta  mu+  nu_mu                              ISGW2; #[PDG2023]
 
 # rho0, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
 # fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
@@ -45,8 +45,8 @@ Decay B+Rare
 0.000119000   omega  e+  nu_e                              BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
 0.000119000   omega  mu+  nu_mu                            BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
 
-0.000023000   eta'  e+  nu_e                               ISGW2; #[PDG2017]
-0.000023000   eta'  mu+  nu_mu                             ISGW2; #[PDG2017]
+0.000024000   eta'  e+  nu_e                               ISGW2; #[PDG2023]
+0.000024000   eta'  mu+  nu_mu                             ISGW2; #[PDG2023]
 0.000000000   anti-D(2S)0  e+  nu_e                        ISGW2;
 0.000000000   anti-D(2S)0  mu+  nu_mu                      ISGW2;
 0.000000000   anti-D*(2S)0  e+  nu_e                       ISGW2;
@@ -54,9 +54,9 @@ Decay B+Rare
 0.001724000   Xu0  e+  nu_e                                VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 0.001724000   Xu0  mu+  nu_mu                              VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
-0.000050804   pi0  tau+  nu_tau                            BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
-0.000084530   rho0  tau+  nu_tau                           BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
-0.000064974   omega  tau+  nu_tau                          BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000049998   pi0  tau+  nu_tau                            BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BCL model update - KMA 06/2022] #[BF update - AN 11/2023]
+0.000084530   rho0  tau+  nu_tau                           BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (arXiv:2104.05739). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000064617   omega  tau+  nu_tau                          BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (arXiv:2104.05739). #[BCL model update - KMA 06/2022] #[BF update - AN 11/2023]
 0.000012000   eta  tau+  nu_tau                            ISGW2;
 0.000018000   eta'  tau+  nu_tau                           ISGW2;
 0.000046000   a_10  tau+  nu_tau                           ISGW2;
@@ -724,9 +724,9 @@ Decay B+Rare
 0.000010700   f'_0  K+                                     PHSP; #UL
 0.000004400   f_0(1500)  K+                                PHSP; #UL
 0.000003000   f'_0  pi+                                    PHSP; #UL
-0.000003400   f'_2  K+                                     STS;	 #UL
-0.000012000   K''*0  pi+                                   SVS;	 #UL
-0.000000590   K*0  K+                                      SVS;	 #[BF update - PG 09/2020]
+0.000003400   f'_2  K+                                     STS;  #UL
+0.000012000   K''*0  pi+                                   SVS;  #UL
+0.000000590   K*0  K+                                      SVS;  #[BF update - PG 09/2020]
 0.000005000   rho(3S)0  K+                                 SVS;
 0.000005000   rho(2S)+  K0                                 SVS;
 0.000002500   rho(3S)+  K0                                 SVS;
@@ -736,7 +736,7 @@ Decay B+Rare
 
 # TP
 #
-0.000001100   a_20  K+                                     STS;	 #UL
+0.000001100   a_20  K+                                     STS;  #UL
 
 # KKK
 #
@@ -1087,7 +1087,7 @@ Decay B+Rare
 0.000001000   anti-Sigma+  Lambda0                         PHSP;
 0.000001000   anti-Sigma+  Sigma0                          PHSP;
 0.000000100   anti-Xi+  Xi0                                PHSP;
-0.000001500   Lambda(1520)0  p+                            PHSP; #UL
+0.000000315   anti-Lambda(1520)0  p+                       PHSP; # updated to https://inspirehep.net/literature/1307247
 
 # b->u (cs)
 # Ds- pi+:hep-ex/0207077 Belle + isospin. Others are ASSUMED like that.
@@ -1132,7 +1132,7 @@ Decay B+Rare
 # Others are ASSUMED like that. The ratio D-rho+/D-pi+ is same as the ratioD+K*0/D+K0.
 #
 0.000000220   K*0  D+                                      SVS;
-0.000000020   D+  K+  pi-                                  PHSP;
+0.000005600   D+  K+  pi-                                  PHSP; #[BF update - SB 06/2024]
 0.000000010   D+  K0  pi0                                  PHSP;
 0.000000180   D*+  K*0                                     SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
 0.000000150   D*+  K+  pi-                                 PHSP;
@@ -1181,8 +1181,8 @@ Decay B-Rare
 0.000078000   pi0  e-  anti-nu_e                           BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 0.000078000   pi0  mu-  anti-nu_mu                         BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 
-0.000038000   eta  e-  anti-nu_e                           ISGW2; #[PDG2017]
-0.000038000   eta  mu-  anti-nu_mu                         ISGW2; #[PDG2017]
+0.000035000   eta  e-  anti-nu_e                           ISGW2; #[PDG2023]
+0.000035000   eta  mu-  anti-nu_mu                         ISGW2; #[PDG2023]
 
 # rho, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
 # fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
@@ -1191,8 +1191,8 @@ Decay B-Rare
 0.000119000   omega  e-  anti-nu_e                         BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
 0.000119000   omega  mu-  anti-nu_mu                       BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
 
-0.000023000   eta'  e-  anti-nu_e                          ISGW2; #[PDG2017]
-0.000023000   eta'  mu-  anti-nu_mu                        ISGW2; #[PDG2017]
+0.000024000   eta'  e-  anti-nu_e                          ISGW2; #[PDG2023]
+0.000024000   eta'  mu-  anti-nu_mu                        ISGW2; #[PDG2023]
 0.000000000   D(2S)0  e-  anti-nu_e                        ISGW2;
 0.000000000   D(2S)0  mu-  anti-nu_mu                      ISGW2;
 0.000000000   D*(2S)0  e-  anti-nu_e                       ISGW2;
@@ -1200,9 +1200,9 @@ Decay B-Rare
 0.001724000   Xu0  e-  anti-nu_e                           VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 0.001724000   Xu0  mu-  anti-nu_mu                         VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
-0.000050804   pi0  tau-  anti-nu_tau                       BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
-0.000084530   rho0  tau-  anti-nu_tau                      BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
-0.000064974   omega  tau-  anti-nu_tau                     BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000049998   pi0  tau-  anti-nu_tau                       BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BCL model update - KMA 06/2022] #[BF update - AN 11/2023]
+0.000084530   rho0  tau-  anti-nu_tau                      BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (arXiv:2104.05739). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000064617   omega  tau-  anti-nu_tau                     BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (arXiv:2104.05739). #[BCL model update - KMA 06/2022] #[BF update - AN 11/2023]
 0.000012000   eta  tau-  anti-nu_tau                       ISGW2;
 0.000018000   eta'  tau-  anti-nu_tau                      ISGW2;
 0.000046000   a_10  tau-  anti-nu_tau                      ISGW2;
@@ -1870,9 +1870,9 @@ Decay B-Rare
 0.000010700   f'_0  K-                                     PHSP; #UL
 0.000004400   f_0(1500)  K-                                PHSP; #UL
 0.000003000   f'_0  pi-                                    PHSP; #UL
-0.000003400   f'_2  K-                                     STS;	 #UL
-0.000012000   anti-K''*0  pi-                              SVS;	 #UL
-0.000000590   anti-K*0  K-                                 SVS;	 #[BF update - PG 09/2020]
+0.000003400   f'_2  K-                                     STS;  #UL
+0.000012000   anti-K''*0  pi-                              SVS;  #UL
+0.000000590   anti-K*0  K-                                 SVS;  #[BF update - PG 09/2020]
 0.000005000   rho(3S)0  K-                                 SVS;
 0.000005000   rho(2S)-  anti-K0                            SVS;
 0.000002500   rho(3S)-  anti-K0                            SVS;
@@ -2233,7 +2233,7 @@ Decay B-Rare
 0.000001000   Sigma-  anti-Lambda0                         PHSP;
 0.000001000   Sigma-  anti-Sigma0                          PHSP;
 0.000000100   Xi-  anti-Xi0                                PHSP;
-0.000001500   Lambda(1520)0  anti-p-                       PHSP; #UL
+0.000000315   Lambda(1520)0  anti-p-                       PHSP; # updated to https://inspirehep.net/literature/1307247
 
 # b->u (cs)
 # Ds- pi+:hep-ex/0207077 Belle + isospin. Others are ASSUMED like that.
@@ -2278,7 +2278,7 @@ Decay B-Rare
 # Others are ASSUMED like that. The ratio D-rho+/D-pi+ is same as the ratioD+K*0/D+K0.
 #
 0.000000220   anti-K*0  D-                                 SVS;
-0.000000020   D-  K-  pi+                                  PHSP;
+0.000005600   D-  K-  pi+                                  PHSP; #[BF update - SB 06/2024]
 0.000000010   D-  anti-K0  pi0                             PHSP;
 0.000000180   D*-  anti-K*0                                SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
 0.000000150   D*-  K-  pi+                                 PHSP;

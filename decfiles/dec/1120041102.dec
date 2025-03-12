@@ -1,0 +1,40 @@
+# EventType: 1120041102
+# Descriptor: [B0 -> [K_10 -> K_S0 pi+ pi-] gamma] cc
+# NickName: Bd_KSpipigamma_via_K1_S0p4
+# Documentation: Rare b->s gamma process
+# Tested: Yes
+# PhysicsWG: TDCPV
+# Responsible: Petros Stavroulakis
+# Email: petros.stavroulakis@iphc.cnrs.fr
+# Cuts: None
+# Date: 20231030
+#
+#
+Alias K_S0sig K_S0
+Alias anti_K_S0sig K_S0
+ChargeConj K_S0sig anti_K_S0sig
+
+Alias K10sig K_10
+Alias anti_K10sig anti-K_10
+ChargeConj K10sig anti_K10sig
+
+Decay Upsilon(4S)
+1.000    B0sig anti-B0sig B0  anti-B0  VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.000    K10sig  gamma  SVP_CP -0.20575842 dm 1 1.0 0.0 1.0 0.0;
+Enddecay
+CDecay anti-B0sig
+
+Decay K10sig
+1.000    rho0 K_S0sig  VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+CDecay anti_K10sig
+
+Decay K_S0sig
+1.000    pi- pi+ PHSP;
+Enddecay
+
+
+End

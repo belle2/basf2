@@ -56,7 +56,7 @@ if [ ! -d "$BELLE2_VALIDATION_DATA_DIR" ]; then
     exit 1
 fi
 
-# take settings from validation data dir unless all are already set to allow overriding which file to use in bamboo
+# take settings from validation data dir unless all are already set to allow overriding which file to use in GitLab pipeline
 if [ -z "$VALIDATION_RAWDATA" ] || [ -z "$VALIDATION_EXP" ] || [ -z "$VALIDATION_RUN" ]; then
     if [ ! -f "${BELLE2_VALIDATION_DATA_DIR}/hltvalidation/info.sh" ]; then
         echo "no info.sh in \${BELLE2_VALIDATION_DATA_DIR}/hltvalidation, cannot continue"

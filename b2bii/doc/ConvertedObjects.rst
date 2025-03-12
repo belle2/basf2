@@ -21,9 +21,7 @@ in the case of conversion of ``V0``'s daughter tracks.
    There is nothing special to note regarding the usage of converted charged
    tracks in BASF2. Use the usual ``fillParticleList(...)`` or
    ``fillParticleLists(...)`` analysis functions to create and fill charged
-   kaon, pion, electron, muon and proton `ParticleList`_ s.
-
-.. _ParticleList: https://software.belle2.org/|release|/classBelle2_1_1ParticleList.html
+   kaon, pion, electron, muon and proton :doxygen:`ParticleList <classBelle2_1_1ParticleList>` s.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Particle Identification
@@ -90,7 +88,7 @@ ParticleLists, which are filled with particle objects created for each
    However, the covariance matrix is not stored in panther tables. If you need
    this information in the analysis, you can redo the mass-constrained fit in basf2.
 
-You can also set the argument ``convertNbar`` of `convertBelleMdstToBelleIIMdst` to ``true`` to copy Particles with an energy
+You can also set the argument ``convertNbar`` of `convertBelleMdstToBelleIIMdst` to ``true`` to copy particles with an energy
 above 500 MeV in ``gamma:mdst`` and create a ParticleList ``anti-n0:mdst``. In the steering file,
 you should use the module ``BelleNbarMVA`` to evaluate an MVA dedicated to the separation of
 anti-neutrons from photons. Assuming that you have appended the globaltag ``BellePID``,
@@ -146,13 +144,18 @@ The quality indicators for :math:`K_S^0` and :math:`\Lambda` as estimated by the
 
 The vertex fit information of ``V0`` particles is also attached as ``extraInfo`` variables.
 
+.. note::
+   :b2:var:`goodBelleKshort` and :b2:var:`goodBelleLambda` return the values of ``extraInfo(goodKs)`` and 
+   ``extraInfo(goodLambda)``.
+
+
 ---------------------------
 :math:`K_{L}^{0}` Particles
 ---------------------------
 :math:`K_{L}^{0}` candidates are stored in the default ``K_L0:mdst`` ParticleList.
 
 .. note::
-   Use K_L0:mdst ParticleList. Don't use ``fillParticleList(...)``.
+   Use ``K_L0:mdst`` ParticleList. Don't use ``fillParticleList(...)``.
 
 In Belle there was no explicit MC Matching for :math:`K_L^0`. Instead, people
 used a hack. If a (MC) :math:`K_L^0` in ``Gen_HEPEVT`` panther table is found,

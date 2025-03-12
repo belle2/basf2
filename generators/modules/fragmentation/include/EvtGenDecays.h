@@ -364,11 +364,9 @@ double EvtGenDecays::decay()
       bfs.push_back(signal->second.bfs[0]);
       wgt *= 1 - bfs.back();
       egPro->deleteDaughters();
-      EvtParticle* egDau = EvtParticleFactory::particleFactory
-                           (EvtPDL::evtIdFromStdHep(pyPro->id()),
-                            EvtVector4R(pyPro->e(), pyPro->px(), pyPro->py(), pyPro->pz()));
-      egDau->addDaug(egPro);
-      egDau->setDiagonalSpinDensity();
+      // The following problematic part of the Pythia's code was removed, see
+      // https://gitlab.com/Pythia8/releases/
+      // -/blob/pythia8310/include/Pythia8Plugins/EvtGen.h?ref_type=tags#L321-325
 
       // If not signal, add to event record.
     } else updateEvent(pyPro, egPro, &pySigs, &egSigs, &bfs, &wgt);

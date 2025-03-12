@@ -19,20 +19,20 @@
 </header>
 """
 
-import tracking
+from tracking.path_utils import add_hit_preparation_modules, add_vxd_track_finding_vxdtf2
 from tracking.validation.run import TrackingValidationRun
 import logging
 import basf2
+import os
+
 VALIDATION_OUTPUT_FILE = 'VXDTF2TrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
-basf2.set_random_seed(1337)
-
 
 def setupFinderModule(path):
-    tracking.add_hit_preparation_modules(path, components=["SVD"])
-    tracking.add_vxd_track_finding_vxdtf2(path, components=["SVD"])
+    add_hit_preparation_modules(path, components=["SVD"])
+    add_vxd_track_finding_vxdtf2(path, components=["SVD"])
 
 
 class VXDTF2TrackingValidationBkg(TrackingValidationRun):
@@ -68,17 +68,23 @@ class VXDTF2TrackingValidationBkg(TrackingValidationRun):
     #: output file of plots
     output_file_name = VALIDATION_OUTPUT_FILE
 
-    # tweak sectormap
-    # def adjust_path(self, path):
-    #     basf2.set_module_parameters( path, "SectorMapBootstrap", ReadSecMapFromDB=False)
-    #     basf2.set_module_parameters( path, "SectorMapBootstrap", ReadSectorMap=True)
-    #     basf2.set_module_parameters( path, "SectorMapBootstrap", SectorMapsInputFile="mymap.root")
+    # ugly way to set a local SectorMap if corresponding environment var is set
+    # TODO: Find more elegant way!
+    def adjust_path(self, path):
+        # if environment variable is set, use the SectorMap this variable is pointing to!
+        testing_secmap_name = os.getenv("BELLE2_TESTING_VXDTF2_SECMAP")
+        if testing_secmap_name is not None:
+            basf2.B2WARNING("Using non-default (the one in the db) SectorMap: " + testing_secmap_name)
+            basf2.set_module_parameters(path, "SectorMapBootstrap", ReadSecMapFromDB=False)
+            basf2.set_module_parameters(path, "SectorMapBootstrap", ReadSectorMap=True)
+            basf2.set_module_parameters(path, "SectorMapBootstrap", SectorMapsInputFile=testing_secmap_name)
 
 
 def main():
     """
     create SVD validation class and execute
     """
+    basf2.set_random_seed(1337)
     validation_run = VXDTF2TrackingValidationBkg()
     validation_run.configure_and_execute_from_commandline()
 
@@ -87,3 +93,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     if ACTIVE:
         main()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

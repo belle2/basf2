@@ -19,11 +19,13 @@
 import basf2
 from ROOT import Belle2
 
-import tracking
+from tracking import add_tracking_reconstruction
 from tracking.harvest.peelers import peel_mc_particle, peel_reco_track_hit_content
 
 from tracking.harvest.harvesting import HarvestingModule
 from tracking.harvest import refiners
+
+ACTIVE = True
 
 
 class VxdCdcPartFinderHarvester(HarvestingModule):
@@ -105,7 +107,7 @@ def run():
     path.add_module("Gearbox")
 
     # Add the tracking reconstruction and store the fitted RecoTracks elsewhere
-    tracking.add_tracking_reconstruction(path, prune_temporary_tracks=False, components=["SVD", "CDC"])
+    add_tracking_reconstruction(path, prune_temporary_tracks=False, components=["SVD", "CDC"])
     path.add_module("FittedTracksStorer", inputRecoTracksStoreArrayName="RecoTracks",
                     outputRecoTracksStoreArrayName="FittedRecoTracks")
 
@@ -136,10 +138,15 @@ def run():
     # Gather the results into ROOT files
     path.add_module(VxdCdcPartFinderHarvester("../matching_validation.root"))
 
-    path.add_module("ProgressBar")
+    path.add_module("Progress")
     basf2.process(path)
     print(basf2.statistics)
 
 
 if __name__ == "__main__":
-    run()
+    if ACTIVE:
+        run()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

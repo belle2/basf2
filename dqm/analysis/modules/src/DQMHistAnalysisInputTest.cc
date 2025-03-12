@@ -34,6 +34,7 @@ REG_MODULE(DQMHistAnalysisInputTest);
 DQMHistAnalysisInputTestModule::DQMHistAnalysisInputTestModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("Testing input file functionality for DQMHistAnalysisModules");
   addParam("Experiment", m_expno, "Experiment Nr", 26u);
   addParam("Run", m_runno, "Run Number List", 1u);
   addParam("RunType", m_runtype, "Run Type", std::string("physics"));
@@ -113,7 +114,7 @@ void DQMHistAnalysisInputTestModule::initialize()
       if (dir == "" or name == "") {
         std::cout << "Both Dir and Name must be given. -> parse error"  << std::endl;
       } else {
-        // as we are already on analyis side, we dont
+        // as we are already on analysis side, we dont
         // need to put it in the directory
         // (even so it may be a cleaner solution)
         m_testHisto.push_back((TH1*) new TH1F(name.data(), "test Histo", histparm.at(0), histparm.at(1), histparm.at(2)));
@@ -175,7 +176,7 @@ void DQMHistAnalysisInputTestModule::event()
   }
 
   for (auto h : m_testHisto) {
-    addHist("test", h->GetName(), h);
+    addHist("test", h->GetName(), (TH1*)h->Clone());
   }
 
   /*{
@@ -205,9 +206,10 @@ void DQMHistAnalysisInputTestModule::event()
 void DQMHistAnalysisInputTestModule::PlotDelta(void)
 {
   B2INFO("Delta");
-  for (auto a : getDeltaList()) {
-    B2INFO(a.first << " " << a.second->m_type << " " << a.second->m_parameter
-           << " " << a.second->m_amountDeltas << " " << a.second->m_deltaHists.size());
+  for (auto& a : getDeltaList()) {
+    // must be reference iterator
+    B2INFO(a.first << " " << a.second.m_type << " " << a.second.m_parameter
+           << " " << a.second.m_amountDeltas << " " << a.second.m_deltaHists.size());
   }
 
   for (auto n : m_myNames) {
@@ -224,20 +226,20 @@ void DQMHistAnalysisInputTestModule::PlotDelta(void)
     c->cd(2);
     auto it = getDeltaList().find(name);
     if (it != getDeltaList().end()) {
-      h = it->second->m_lastHist;
+      h = it->second.m_lastHist.get();
       if (h) h->Draw("hist");
 
-      for (unsigned int i = 0; i < it->second->m_amountDeltas; i++) {
+      for (unsigned int i = 0; i < it->second.m_amountDeltas; i++) {
         c->cd(i + 4);
-        h = it->second->getDelta(i);
-        if (h) {
-          h->Draw("hist");
+        auto hist = it->second.getDelta(i);
+        if (hist) {
+          hist->Draw("hist");
           c->cd(3);
           if (i == 0) {
-            h->Draw();
+            hist->Draw();
           } else {
-            h->SetLineColor(i + 2);
-            h->Draw("same");
+            hist->SetLineColor(i + 2);
+            hist->Draw("same");
           }
         }
         if (i + 4 == 9) break;
@@ -258,7 +260,7 @@ void DQMHistAnalysisInputTestModule::endRun()
   B2INFO("DQMHistAnalysisInputTest: endRun called. Run: " << m_runno);
 
   B2INFO("DQMHistAnalysisInputTest: endRun: Histos");
-  for (auto a : getHistList()) {
+  for (auto& a : getHistList()) {
     B2INFO(a.first);
   }
   // The following will produce errors, as the histograms may not exist in endRun
@@ -270,4 +272,5 @@ void DQMHistAnalysisInputTestModule::endRun()
 void DQMHistAnalysisInputTestModule::terminate()
 {
   B2INFO("DQMHistAnalysisInputTest: terminate called. Run: " << m_runno);
+  clearlist(); // necessary in the Input Module! Otherwise ROOT may clean before we do
 }

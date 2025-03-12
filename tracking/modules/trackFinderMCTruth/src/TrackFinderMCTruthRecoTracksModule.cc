@@ -65,18 +65,17 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            false);
   addParam("UseNLoops",
            m_useNLoops,
-           "Set the number of loops whose hits will be marked as priortiy hits. All other hits "
-           "will be marked as auxiliary and therfore not considered for efficiency computations "
+           "Set the number of loops whose hits will be marked as priority hits. All other hits "
+           "will be marked as auxiliary and therefore not considered for efficiency computations "
            "By default, all hits will be priority hits.",
            INFINITY);
   addParam("UseOnlyBeforeTOP",
            m_useOnlyBeforeTOP,
-           "Mark hits as auxiliary after the track left the CDC and touched the TOP detector "
-           "(only implemented for CDCHits).",
+           "Mark hits as auxiliary after the track left the CDC and touched the TOP detector.",
            false);
   addParam("UseReassignedHits",
            m_useReassignedHits,
-           "Include hits reassigned from discarded seconardy daughters in the tracks.",
+           "Include hits reassigned from discarded secondary daughters in the tracks.",
            false);
   addParam("UseSecondCDCHits",
            m_useSecondCDCHits,
@@ -168,7 +167,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
   addParam("SplitAfterDeltaT",
            m_splitAfterDeltaT,
            "Minimal time delay between two sim hits (in ns) after which MC reco track will be "
-           "split into seperate tracks. If < 0, don't do splitting."
+           "split into separate tracks. If < 0, don't do splitting."
            "This feature was designed to be used in MC cosmics reconstruction to get two MCRecoTracks"
            "when track pass through empty SVD region, so that number of MCRecoTracks can be compared with"
            "number of non merged reco tracks. ",
@@ -265,7 +264,7 @@ void TrackFinderMCTruthRecoTracksModule::initialize()
 
 
 
-    //transfom the smearingCov vector into a TMatrixD
+    //transform the smearingCov vector into a TMatrixD
     //first check if it can be transformed into a 6x6 matrix
     if (m_smearingCov.size() != 36) {
       B2FATAL("SmearingCov does not have exactly 36 elements. So 6x6 covariance matrix can be formed from it");
@@ -562,6 +561,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
+          // check if the particle left hits in TOP and add mark hits after that as auxiliary.
+          if (m_useOnlyBeforeTOP and didParticleExitCDC<PXDCluster, PXDTrueHit>(relatedClusters.object(i))) {
+            mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+          }
+
           // if flag is set discard all auxiliary hits:
           if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
 
@@ -627,6 +631,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
+          // check if the particle left hits in TOP and add mark hits after that as auxiliary.
+          if (m_useOnlyBeforeTOP and didParticleExitCDC<SVDCluster, SVDTrueHit>(relatedClusters.object(i))) {
+            mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+          }
+
           // if flag is set discard all auxiliary hits:
           if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
 
@@ -670,27 +679,6 @@ void TrackFinderMCTruthRecoTracksModule::event()
       }
     } // end if m_useSVDHits
 
-
-    auto didParticleExitCDC = [](const CDCHit * hit) {
-      const CDCSimHit* simHit = hit->getRelated<CDCSimHit>();
-      if (not simHit) return false;
-
-      const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
-      if (not mcParticle) return false;
-      if (not mcParticle->hasSeenInDetector(Const::TOP)) return false;
-
-      RelationVector<TOPBarHit> topHits = mcParticle->getRelationsWith<TOPBarHit>();
-      if (topHits.size() == 0) return false;
-
-      // Get hit with the smallest time.
-      auto lessTime = [](const TOPBarHit & lhs, const TOPBarHit & rhs) {
-        return lhs.getTime() < rhs.getTime();
-      };
-      auto itFirstTopHit = std::min_element(topHits.begin(), topHits.end(), lessTime);
-
-      return simHit->getGlobalTime() > itFirstTopHit->getTime();
-    };
-
     if (m_useCDCHits) {
       // create a list containing the indices to the CDCHits that belong to one track
       int nAxialHits = 0;
@@ -729,7 +717,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
           }
 
           // check if the particle left hits in TOP and add mark hits after that as auxiliary.
-          if (m_useOnlyBeforeTOP and didParticleExitCDC(cdcHit)) {
+          if (m_useOnlyBeforeTOP and didParticleExitCDC<CDCHit, CDCSimHit>(cdcHit)) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
@@ -782,7 +770,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
       }
     } // end if m_useCDCHits
 
-    if (m_initialCov(0, 0) > 0.0) { //using a user set initial cov and corresponding smearing of inital state adds information
+    if (m_initialCov(0, 0) > 0.0) { //using a user set initial cov and corresponding smearing of initial state adds information
       ndf += 5;
     }
     if (ndf < m_minimalNdf) {
@@ -989,6 +977,28 @@ bool TrackFinderMCTruthRecoTracksModule::isWithinNLoops(double Bz, const THit* a
     return true;
   }
 }
+
+template< class THit, class TSimHit>
+bool TrackFinderMCTruthRecoTracksModule::didParticleExitCDC(const THit* ahit)
+{
+  const TSimHit* simHit = ahit->template getRelated<TSimHit>();
+  if (not simHit) return false;
+
+  const MCParticle* mcParticle = simHit->template getRelated<MCParticle>();
+  if (not mcParticle) return false;
+  if (not mcParticle->hasSeenInDetector(Const::TOP)) return false;
+
+  RelationVector<TOPBarHit> topHits = mcParticle->getRelationsWith<TOPBarHit>();
+  if (topHits.size() == 0) return false;
+
+  // Get hit with the smallest time.
+  auto lessTime = [](const TOPBarHit & lhs, const TOPBarHit & rhs) {
+    return lhs.getTime() < rhs.getTime();
+  };
+  auto itFirstTopHit = std::min_element(topHits.begin(), topHits.end(), lessTime);
+
+  return simHit->getGlobalTime() > itFirstTopHit->getTime();
+};
 
 
 

@@ -493,7 +493,7 @@ G4LongLivedNeutralTransportation::StartTracking(G4Track* aTrack)
 
   // Inform field propagator of new track
   //
-  fFieldPropagator->PrepareNewTrack();
+  if (fFieldPropagator) fFieldPropagator->PrepareNewTrack();
 }
 
 /////////////////////////////////////////////////////////////////////////////

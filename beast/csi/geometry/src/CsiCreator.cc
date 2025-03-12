@@ -16,8 +16,6 @@
 
 #include <cmath>
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 #include <G4AssemblyVolume.hh>
 #include <G4LogicalVolume.hh>
 
@@ -30,8 +28,6 @@
 #include <G4VisAttributes.hh>
 
 using namespace std;
-using namespace boost;
-
 
 namespace Belle2 {
 
@@ -124,7 +120,7 @@ namespace Belle2 {
         return ;
       }
 
-      counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
+      counter.append((boost::format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
       double h1 = counter.getLength("K_h1") * CLHEP::cm;
       double h2 = counter.getLength("K_h2") * CLHEP::cm;
       double bl1 = counter.getLength("K_bl1") * CLHEP::cm;
@@ -163,8 +159,8 @@ namespace Belle2 {
       double foilhalflength = halflength + foilthickness;
       ///////////////////////////////////////////////////////////
 
-      string cryLogiVolName = (format("Enclosure_%1%_Crystal_%2%") % iEnclosure % iCry).str();
-      G4Trap* CrystalShape = new G4Trap((format("sCrystal_%1%") % iCry).str().c_str(),
+      string cryLogiVolName = (boost::format("Enclosure_%1%_Crystal_%2%") % iEnclosure % iCry).str();
+      G4Trap* CrystalShape = new G4Trap((boost::format("sCrystal_%1%") % iCry).str().c_str(),
                                         halflength, 0, 0, h1,   bl1, tl1, alpha1, h2, bl2, tl2, alpha2);
       G4LogicalVolume* Crystal = new G4LogicalVolume(CrystalShape, crystalMaterial,
                                                      cryLogiVolName.c_str(),
@@ -177,20 +173,20 @@ namespace Belle2 {
       //<< " density " << crystalMaterial->GetDensity() / CLHEP::g * CLHEP::cm * CLHEP::cm * CLHEP::cm << endl;
 
       /////////////////  add actual foil ///////////////////////////////////////
-      G4Trap* Foilout = new G4Trap((format("Foilout_%1%") % iCry).str().c_str(),
+      G4Trap* Foilout = new G4Trap((boost::format("Foilout_%1%") % iCry).str().c_str(),
                                    foilhalflength, 0, 0, foilh1,  foilbl1,
                                    foiltl1, alpha1, foilh2, foilbl2,
                                    foiltl2, alpha2);
 
-      G4Trap* Foilin = new G4Trap((format("solidEclCrystal_%1%") % iCry).str().c_str(),
+      G4Trap* Foilin = new G4Trap((boost::format("solidEclCrystal_%1%") % iCry).str().c_str(),
                                   halflength * avoidov, 0, 0, h1 * avoidov,
                                   bl1 * avoidov, tl1 * avoidov, alpha1, h2 * avoidov,
                                   bl2 * avoidov, tl2 * avoidov, alpha2);
-      G4SubtractionSolid* FoilShape = new G4SubtractionSolid((format("sFoil_%1%") % iCry).str().c_str(),
+      G4SubtractionSolid* FoilShape = new G4SubtractionSolid((boost::format("sFoil_%1%") % iCry).str().c_str(),
                                                              Foilout, Foilin);
 
       G4LogicalVolume* Foil = new G4LogicalVolume(FoilShape, foilMaterial,
-                                                  (format("Foil_%1%") % iCry).str().c_str(),
+                                                  (boost::format("Foil_%1%") % iCry).str().c_str(),
                                                   0, 0, 0);
 
       G4VisAttributes* FoilVisAtt = new G4VisAttributes(G4Colour(0.1, 0.1, 0.1, 0.5));
@@ -245,9 +241,9 @@ namespace Belle2 {
           enclosureShapeT, opening, transform);
 
       //Thread the strings
-      string enclosurePath = (format("/%1%[%2%]") % gearPath % iEnclosure).str();
-      string logiVolName   = (format("%1%Enclosure_%2%") % side % iEnclosure).str();
-      string logiLidVolName = (format("%1%EnclosureLid_%2%") % side % iEnclosure).str();
+      string enclosurePath = (boost::format("/%1%[%2%]") % gearPath % iEnclosure).str();
+      string logiVolName   = (boost::format("%1%Enclosure_%2%") % side % iEnclosure).str();
+      string logiLidVolName = (boost::format("%1%EnclosureLid_%2%") % side % iEnclosure).str();
 
       // Connect the appropriate Gearbox path
       GearDir enclosureContent(content);
@@ -307,7 +303,7 @@ namespace Belle2 {
 
       for (int iSlot = 1; iSlot <= nSlots; iSlot++) {
         //Thread the strings
-        string slotPath = (format("/Enclosures/Slot[%1%]") % iSlot).str();
+        string slotPath = (boost::format("/Enclosures/Slot[%1%]") % iSlot).str();
 
         GearDir slotContent(content);
         slotContent.append(slotPath);
@@ -319,7 +315,7 @@ namespace Belle2 {
 
         G4Transform3D Pos = G4Translate3D(SlotX, SlotY, SlotZ);
 
-        int    CryID  = enclosureContent.getInt((format("/CrystalInSlot[%1%]") % iSlot).str());
+        int    CryID  = enclosureContent.getInt((boost::format("/CrystalInSlot[%1%]") % iSlot).str());
 
         PutCrystal(content, assembly, adjust * Tr * Pos,  iEnclosure, CryID);
       }

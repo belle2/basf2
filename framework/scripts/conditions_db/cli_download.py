@@ -26,17 +26,25 @@ import textwrap
 from urllib.parse import urljoin
 from . import ConditionsDB, encode_name, file_checksum
 from .cli_utils import ItemFilter
+from .iov import IntervalOfValidity
 from .local_metadata import LocalMetadataProvider
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging
 from basf2.utils import get_terminal_width
 from concurrent.futures import ThreadPoolExecutor
 
 
-def check_payload(destination, payloadinfo):
+def check_payload(destination, payloadinfo, run_range=None):
+    """Return a list of all iovs for a given payload together with the file checksum and filenames.
+
+    Args:
+        destination (str): local folder where to download the payload
+        payloadinfo (dict): pyload information as returned by the REST API
+        run_range (b2conditions_db.iov.IntervalOfValidity, optional): Interval of validity . Defaults to None.
+
+    Returns:
+        tuple: local file name, remote file name, checksum, list of iovs
     """
-    Download a single payload and return a list of all iovs. If the functions
-    returns None there was an error downloading.
-    """
+
     payload = payloadinfo["payloadId"]
     module = payload["basf2Module"]["name"]
     revision = int(payload["revision"])
@@ -49,6 +57,14 @@ def check_payload(destination, payloadinfo):
 
     iovlist = []
     for iov in payloadinfo["payloadIovs"]:
+        if run_range is not None:
+            if (
+               IntervalOfValidity(
+                    iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]
+               ).intersect(run_range)
+                    is None
+               ):
+                continue
         iovlist.append([module, revision, iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]])
 
     return (local_file, remote_file, checksum, iovlist)
@@ -62,10 +78,10 @@ def download_file(db, local_file, remote_file, checksum, iovlist=None):
             # done, nothing else to do
             return iovlist
         else:
-            B2WARNING("Checksum mismatch for %s, downloading again" % local_file)
+            B2WARNING(f"Checksum mismatch for {local_file}, downloading again")
 
     # download the file
-    B2INFO("download %s" % local_file)
+    B2INFO(f"download {local_file}")
     with open(local_file, "wb") as out:
         file_req = db._session.get(remote_file, stream=True)
         if file_req.status_code != requests.codes.ok:
@@ -75,7 +91,7 @@ def download_file(db, local_file, remote_file, checksum, iovlist=None):
 
     # and check it
     if file_checksum(local_file) != checksum:
-        B2ERROR("Checksum mismatch after download: %s" % local_file)
+        B2ERROR(f"Checksum mismatch after download: {local_file}")
         return None
 
     return iovlist
@@ -155,6 +171,10 @@ def command_legacydownload(args, db=None):
         args.add_argument("--retries", type=int, default=3,
                           help="Number of retries on connection problems (default: "
                           "%(default)s)")
+        args.add_argument("--run-range", nargs=4, default=None, type=int,
+                          metavar=("FIRST_EXP", "FIRST_RUN", "FINAL_EXP", "FINAL_RUN"),
+                          help="Can be four numbers to limit the run range to be downloaded"
+                          "Only iovs overlapping, even partially, with this range will be downloaded.")
         group = args.add_mutually_exclusive_group()
         group.add_argument("--tag-pattern", default=False, action="store_true",
                            help="if given, all globaltags which match the shell-style "
@@ -177,6 +197,9 @@ def command_legacydownload(args, db=None):
     if not payloadfilter.check_arguments():
         return 1
 
+    run_range_str = f' valid in {tuple(args.run_range)}' if args.run_range else ''
+    args.run_range = IntervalOfValidity(args.run_range) if args.run_range else None
+
     # modify logging to remove the useless module: lines
     for level in LogLevel.values.values():
         logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.TIMESTAMP)
@@ -189,8 +212,8 @@ def command_legacydownload(args, db=None):
     failed = 0
     for tagname in sorted(tagnames):
         try:
-            req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(tagname)),
-                             f"Downloading list of payloads for {tagname} tag{payloadfilter}")
+            req = db.request("GET", f"/globalTag/{encode_name(tagname)}/globalTagPayloads",
+                             f"Downloading list of payloads for {tagname} tag{payloadfilter}{run_range_str}")
         except ConditionsDB.RequestError as e:
             B2ERROR(str(e))
             continue
@@ -199,11 +222,12 @@ def command_legacydownload(args, db=None):
         for payload in req.json():
             name = payload["payloadId"]["basf2Module"]["name"]
             if payloadfilter.check(name):
-                local_file, remote_file, checksum, iovlist = check_payload(args.destination, payload)
-                if local_file in download_list:
-                    download_list[local_file][-1] += iovlist
-                else:
-                    download_list[local_file] = [local_file, remote_file, checksum, iovlist]
+                local_file, remote_file, checksum, iovlist = check_payload(args.destination, payload, args.run_range)
+                if iovlist:
+                    if local_file in download_list:
+                        download_list[local_file][-1] += iovlist
+                    else:
+                        download_list[local_file] = [local_file, remote_file, checksum, iovlist]
 
         # do the downloading
         full_iovlist = []
@@ -224,7 +248,7 @@ def command_legacydownload(args, db=None):
                 txtfile.writelines(dbfile)
 
     if failed > 0:
-        B2ERROR("{} out of {} payloads could not be downloaded".format(failed, len(download_list)))
+        B2ERROR(f"{failed} out of {len(download_list)} payloads could not be downloaded")
         return 1
 
 
@@ -310,7 +334,7 @@ def command_download(args, db=None):
                 return None
             return tag_info['globalTagId'], tag_info['name'], tag_info['globalTagStatus']['name']
 
-        # so lets get info on all our tags and check if soem are missing ...
+        # so lets get info on all our tags and check if some are missing ...
         with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
             tags = list(pool.map(get_taginfo, args.tag))
 

@@ -3,7 +3,7 @@
 Variables
 =========
 
-While ``basf2`` operates on `ParticleList <https://software.belle2.org/|release|/classBelle2_1_1ParticleList.html>`_ s, it is also important to calculate physics quantities associated with a given candidate or event.
+While ``basf2`` operates on :doxygen:`ParticleList <classBelle2_1_1ParticleList>` s, it is also important to calculate physics quantities associated with a given candidate or event.
 
 In ``basf2`` analysis, variables are handled by the `VariableManager`.
 There are many variables available for use in analysis.
@@ -20,7 +20,7 @@ The VariableManager handles all variables in ``basf2`` analysis.
 It is implemented as a `singleton <https://en.wikipedia.org/wiki/Singleton_pattern>`_
 C++ class with a python interface.
 
-The C++ documentation is `here <https://software.belle2.org/development/classBelle2_1_1Variable_1_1Manager.html>`_.
+The C++ documentation is :doxygen:`here <classBelle2_1_1Variable_1_1Manager>`.
 
 .. tip::
 
@@ -156,6 +156,16 @@ Here is a list of track variables for V0 daughters:
 .. b2-variables::
    :group: V0Daughter
 
+.. _kinkvariables:
+
+Kink
+~~~~
+
+Here is a list of variables for kinks, which are reconstructed since release-09:
+
+.. b2-variables::
+   :group: Kink
+
 PID
 ~~~
 
@@ -248,8 +258,7 @@ Here is a list of trigger variables:
    :group: L1 Trigger
 
 .. tip::
-  Please see the `Trigger Bits section
-  <https://software.belle2.org/development/sphinx/trg/doc/index.html#trigger-bits>`__
+  Please see the :sphinx:`Trigger Bits section <trg/doc/index.html#trigger-bits>`
   for further details.
   
 .. b2-variables::
@@ -498,6 +507,30 @@ Other variable that can be handy in development:
 .. b2-variables::
    :group: Miscellaneous
 
+FEI Variables
+~~~~~~~~~~~~~
+
+As known by many analysts by using the ``isSignal`` flag for truth matching
+for the  tagging B meson from the FEI there is still a peak visible for the
+background in e.g. the :math:`M_{\text{bc}}` distribution making it hard to
+determine e.g. a yield there.
+
+New variables seem to be found to address this problem.
+
+.. b2-variables::
+   :group: FEIVariables
+
+Beam Background Overlay
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Here is a list of variables useful for studying the Beam Background Overlay
+events used for producing MC samples (both run-independent and run-dependent).
+
+.. warning:: These variables will always return ``NaN`` when running on data.
+
+.. b2-variables::
+   :group: BeamBackgroundOverlay
+
 Calibration
 ~~~~~~~~~~~
 
@@ -513,19 +546,6 @@ They have a **[Calibration]** pretag.
    :group: ECL calibration
 .. b2-variables::
    :group: ECL trigger calibration
-
-FEIVariables
-~~~~~~~~~~~~
-
-As known by many analysts by using the ``isSignal`` flag for truth matching
-for the  tagging B meson from the FEI there is still a peak visible for the
-background in e.g. the :math:`M_{\text{bc}}` distribution making it hard to
-determine e.g. a yield there.
-
-New variables seem to be found to address this problem.
-
-.. b2-variables::
-   :group: FEIVariables
 
 Collections and Lists
 ---------------------
@@ -601,7 +621,7 @@ Miscellaneous helpers for using variables
 Writing your own variable
 -------------------------
 
-The code of VariableManager lives inside the analysis package. If you want to write your own variables you have a couple of options. You can (and should) try to make your variables general, so that they are useful for many collaborators. In this case, we recommend you make a pull request. Then your variables will be made available in a central release to many people.
+The code of VariableManager lives inside the analysis package. If you want to write your own variables you have a couple of options. You can (and should) try to make your variables general, so that they are useful for many collaborators. In this case, we recommend you make a merge request. Then your variables will be made available in a central release to many people.
 
 In case you have something really analysis-specific that no one else will need. You can still use the VariableManager.
 
@@ -800,4 +820,4 @@ with the -f option of ``gbasf2``:
 >>> gbasf2 ./steering.py -p project -i dataset -f myanalysis.so myanalysis.b2modmap
 
 .. warning:: This line implies that you already have working ``gbasf2`` installation and ``gbasf2`` syntax didn't
-  change since the moment of writing. Please refer gbasf2 `documentation <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ for more details.
+  change since the moment of writing. Please refer to the :doc:`gbasf2 documentation <gbasf2:index>` for more details.

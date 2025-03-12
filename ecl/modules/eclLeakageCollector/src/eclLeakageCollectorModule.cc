@@ -10,14 +10,12 @@
 #include <ecl/modules/eclLeakageCollector/eclLeakageCollectorModule.h>
 
 /* ECL headers. */
-#include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLLeakagePosition.h>
 #include <ecl/dataobjects/ECLElementNumbers.h>
 
 /* Basf2 headers. */
-#include <framework/gearbox/Const.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/geometry/VectorUtil.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -25,7 +23,6 @@
 /* Root headers. */
 #include <Math/Vector3D.h>
 #include <Math/VectorUtil.h>
-#include <TMath.h>
 #include <TTree.h>
 
 /* C++ headers. */
@@ -56,7 +53,7 @@ eclLeakageCollectorModule::eclLeakageCollectorModule() : CalibrationCollectorMod
   addParam("energies_forward", m_energies_forward, "generated photon energies, forward", std::vector<double> {0.030, 0.050, 0.100, 0.200, 0.483, 1.166, 2.816, 6.800});
   addParam("energies_barrel", m_energies_barrel, "generated photon energies, barrel", std::vector<double> {0.030, 0.050, 0.100, 0.200, 0.458, 1.049, 2.402, 5.500});
   addParam("energies_backward", m_energies_backward, "generated photon energies, backward", std::vector<double> {0.030, 0.050, 0.100, 0.200, 0.428, 0.917, 1.962, 4.200});
-  addParam("showerArrayName", m_showerArrayName, "name of ECLShower data object", std::string("ECLShowers"));
+  addParam("showerArrayName", m_showerArrayName, "name of ECLShower data object", std::string("ECLTrimmedShowers"));
 }
 
 
@@ -79,9 +76,9 @@ void eclLeakageCollectorModule::prepare()
   //..Store generated energies as integers in MeV
   i_energies.resize(nLeakReg, std::vector<int>(m_number_energies, 0));
   for (int ie = 0; ie < m_number_energies; ie++) {
-    i_energies[0][ie] = (int)(1000.*m_energies_forward[ie] + 0.001);
-    i_energies[1][ie] = (int)(1000.*m_energies_barrel[ie] + 0.001);
-    i_energies[2][ie] = (int)(1000.*m_energies_backward[ie] + 0.001);
+    i_energies[0][ie] = (int)(1000.*m_energies_forward[ie] + 0.5);
+    i_energies[1][ie] = (int)(1000.*m_energies_barrel[ie] + 0.5);
+    i_energies[2][ie] = (int)(1000.*m_energies_backward[ie] + 0.5);
   }
 
   //..Require all energies are different, and that there are at least two
@@ -253,11 +250,12 @@ void eclLeakageCollectorModule::collect()
   //-----------------------------------------------------------------
   //..Generated and reconstructed energy quantities
 
-  //..Find the generated energy bin
-  const int iGenEnergyMeV = (int)(1000.*mcLabE + 0.001);
+  //..Find the generated energy bin by requiring it be close enough to expected value
+  const float genEnergyMeV = 1000.*mcLabE;
+  const float tolerance = std::max(0.002 * genEnergyMeV, 1.0);
   t_energyBin = -1;
   for (int ie = 0; ie < m_number_energies; ie++) {
-    if (iGenEnergyMeV == i_energies[t_region][ie]) {
+    if (std::abs(genEnergyMeV - i_energies[t_region][ie]) < tolerance) {
       t_energyBin = ie;
       break;
     }
@@ -278,7 +276,15 @@ void eclLeakageCollectorModule::collect()
   //  Note that payload may have been updated since events were generated, so
   //  we need to redo the sum of energies of the nOptimal crystals.
   const int ig = m_groupNumber[maxECellId - 1];
-  const double e3x3 = m_eclShowerArray[minShower]->getNOptimalEnergy();
+  const double e3x3Orig = m_eclShowerArray[minShower]->getNOptimalEnergy();
+  double e3x3 = e3x3Orig;
+
+  //..Alternate e3x3, for samples produced before nOptimal was introduced
+  const double eHighestCorr = m_eclShowerArray[minShower]->getEnergyHighestCrystal();
+  const double correction = m_eclShowerArray[minShower]->getEnergy() / m_eclShowerArray[minShower]->getEnergyRaw();
+  const double eHighestRaw = eHighestCorr / correction;
+  const double e3x3Alt = eHighestRaw / m_eclShowerArray[minShower]->getE1oE9();
+  if (e3x3 < 0.001) {e3x3 = e3x3Alt;}
 
   //..Need the detector region to get the energy bin boundaries
   int iRegion = 1; // barrel
@@ -380,12 +386,13 @@ void eclLeakageCollectorModule::collect()
   //..Debug: dump some events
   if (m_nDump < 100) {
     m_nDump++;
-    B2DEBUG(170, " ");
-    B2DEBUG(170, "cellID " << t_cellID << " ig " << ig << " Eraw " << eRaw * mcLabE << " ESum " << eSumOfN << " ie " << t_energyBin <<
-            " nOpt " << t_nCrys << " eFrac " << t_energyFrac);
-    B2DEBUG(170, " 3 log E " << logELower << " " << logENom << " " << logEHigher << " log E " << logESumN);
-    B2DEBUG(170, "  3 biases " << biasLower << " " << biasNom << " " << biasHigher << " bias " << bias);
-    B2DEBUG(170, "  3 peaks " << peakLower << " " << peakNom << " " << peakHigher << " peak " << peak);
+    B2INFO(" ");
+    B2INFO("cellID " << t_cellID << " ig " << ig << " iEnergy " << iEnergy << " ie " << t_energyBin << " nOpt " << t_nCrys);
+    B2INFO(" e3x3Orig " << e3x3Orig << " e3x3Alt " << e3x3Alt << " Eraw " << eRaw << " ESum " << eSumOfN << " eFrac " <<
+           t_energyFrac);
+    B2INFO(" 3 log E " << logELower << " " << logENom << " " << logEHigher << " log E " << logESumN);
+    B2INFO(" 3 biases " << biasLower << " " << biasNom << " " << biasHigher << " bias " << bias);
+    B2INFO(" 3 peaks " << peakLower << " " << peakNom << " " << peakHigher << " peak " << peak);
   }
 
   //-----------------------------------------------------------------

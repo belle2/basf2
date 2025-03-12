@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,7 +11,7 @@
 import basf2 as b2
 
 
-def add_ecl_trigger(path):
+def add_ecl_trigger(path, SourceOfTC=3):
     """
     add ecl trigger module to path
     """
@@ -21,6 +20,9 @@ def add_ecl_trigger(path):
     trgeclfam.param('TCWaveform', 0)
     # save only measured TC data(=0) or both measured and true TC data(=1)
     trgeclfam.param('FAMAnaTable', 0)
+    # select source of TC data (1=ECLHit, 2=ECLSimHit, 3=ECLHit+TRGECLBGTCHit)
+    # ("1:=ECLHit" is used for signal w/o bkg, and real time background monitor)
+    trgeclfam.param('SourceOfTC', SourceOfTC)
     #
     path.add_module(trgeclfam)
     #

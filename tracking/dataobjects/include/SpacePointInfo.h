@@ -18,19 +18,7 @@ namespace Belle2 {
   class SpacePointInfo : public TObject {
   public:
     /// constructor
-    SpacePointInfo() :
-      m_position(0., 0., 0.),
-      m_positionError(1., 1., 1.),
-      m_normalizedLocalU(0.),
-      m_normalizedLocalV(0.),
-      m_clustersAssignedU(false),
-      m_clustersAssignedV(false),
-      m_vxdID(Belle2::VxdID::baseType(0)),
-      m_sensorType(-1),
-      m_qualityIndicator(0.5),
-      m_isAssigned(false)
-    {
-    }
+    SpacePointInfo() {}
 
     /// destructor
     ~SpacePointInfo() {}
@@ -129,37 +117,37 @@ namespace Belle2 {
 
 
   private:
-    /// 3-vector with positon in global coordinates
-    ROOT::Math::XYZVector m_position;
+    /// 3-vector with position in global coordinates
+    ROOT::Math::XYZVector m_position = {0., 0., 0.};
 
     /// uncertainty on the position
-    ROOT::Math::XYZVector m_positionError;
+    ROOT::Math::XYZVector m_positionError = {1., 1., 1.};
 
     /// normalized coordinates of spacepoint in local coordinates u-direction
-    double m_normalizedLocalU;
+    double m_normalizedLocalU = 0.;
 
     /// normalized coordinates of spacepoint in local coordinates v -direction
-    double m_normalizedLocalV;
-
-    /// true if SP has a u-cluster assigned
-    bool m_clustersAssignedU;
-
-    /// true if SP has a v-cluster assigned
-    bool m_clustersAssignedV;
-
-    /// used the baseType instead of VxdID as root seems to have problems with it
-    Belle2::VxdID::baseType m_vxdID;
-
-    /// the sensor type
-    int m_sensorType;
+    double m_normalizedLocalV = 0.;
 
     /// the quality indicator for that SP
-    double m_qualityIndicator;
+    double m_qualityIndicator = 0.5;
+
+    /// used the baseType instead of VxdID as root seems to have problems with it
+    Belle2::VxdID::baseType m_vxdID = Belle2::VxdID::baseType(0);
+
+    /// the sensor type
+    int m_sensorType = -1;
+
+    /// true if SP has a u-cluster assigned
+    bool m_clustersAssignedU = false;
+
+    /// true if SP has a v-cluster assigned
+    bool m_clustersAssignedV = false;
 
     /// true if is assigned
-    bool m_isAssigned;
+    bool m_isAssigned = false;
 
     //! needed by root
-    ClassDef(SpacePointInfo, 2);
+    ClassDef(SpacePointInfo, 3);
   };
 }

@@ -5,7 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/zmq/processModules/ZMQRxOutputModule.h>
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
@@ -49,6 +48,9 @@ void ZMQRxOutputModule::event()
       m_zmqClient.subscribe(EMessageTypes::c_lastEventMessage);
       m_zmqClient.subscribe(EMessageTypes::c_terminateMessage);
       m_firstEvent = false;
+
+      m_beginRun = Environment::Instance().getNumberProcesses();
+      m_endRun = Environment::Instance().getNumberProcesses();
     }
 
     const auto multicastAnswer = [this](const auto & socket) {
@@ -80,6 +82,28 @@ void ZMQRxOutputModule::event()
         B2DEBUG(100, "received event " << m_eventMetaData->getEvent());
         auto confirmMessage = ZMQMessageFactory::createMessage(EMessageTypes::c_confirmMessage, m_eventMetaData);
         m_zmqClient.publish(std::move(confirmMessage));
+        // Check EventMetaData and repeat poll until all end run records received
+        if (m_eventMetaData->isEndOfRun()) {
+          m_endRun--;
+          if (m_endRun == 0) {
+            m_endRun = Environment::Instance().getNumberProcesses();
+            B2INFO("ZMQOutputModule : sending out EndRun record.");
+            return false;
+          } else {
+            return true;
+          }
+        } else if (Environment::Instance().isZMQDAQFirstEvent(m_eventMetaData->getExperiment(),
+                                                              m_eventMetaData->getRun())) {    // Special first event
+          m_beginRun--;
+          if (m_beginRun == 0) {
+            m_beginRun = Environment::Instance().getNumberProcesses();
+            B2INFO("ZMQOutputModule : sending out HLTZMQ first event.");
+            return false;
+          } else {
+            return true;
+          }
+        }
+
         return false;
       }
 
@@ -89,10 +113,13 @@ void ZMQRxOutputModule::event()
 
 
     B2DEBUG(100, "Start polling");
-    const int pollReply = m_zmqClient.poll(m_param_maximalWaitingTime, multicastAnswer, socketAnswer);
+    //    const int pollReply = m_zmqClient.poll(m_param_maximalWaitingTime, multicastAnswer, socketAnswer);
+    //    const int pollReply = m_zmqClient.poll((unsigned int)7200 * 1000, multicastAnswer, socketAnswer);
+    const int pollReply = m_zmqClient.poll(Environment::Instance().getZMQMaximalWaitingTime(), multicastAnswer, socketAnswer);
     B2ASSERT("Output process did not receive any message in some time. Aborting.", pollReply);
+    //    B2INFO ( "ZMQRxOutput : event received" );
 
-    B2DEBUG(100, "finished reading in an event.");
+    B2DEBUG(30, "finished reading in an event.");
   } catch (zmq::error_t& ex) {
     if (ex.num() != EINTR) {
       B2ERROR("There was an error during the Rx output event: " << ex.what());

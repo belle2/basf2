@@ -16,15 +16,13 @@ B->Xgamma, B->Xll, B->Xll (LFV modes)
 
 """
 
-import basf2 as b2
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
-from variables import variables as vm
 
-__liaison__ = "Rahul Tiwary <rahul.tiwary@tifr.res.in>"
-_VALIDATION_SAMPLE = "mdst14.root"
+__liaison__ = "Ihor Prudiiev <Ihor.Prudiiev@ijs.si>"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -43,7 +41,7 @@ class BtoXgamma(BaseSkim):
     Cuts on photons:
 
     * :math:`\\text{clusterE9E21}>0.9`
-    * :math:`1.4\\,\\text{GeV}<\\E_{\\gamma}<3.4\\,\\text{GeV}` in CMS frame
+    * :math:`1.4\\,\\text{GeV}< E_{\\gamma}<3.4\\,\\text{GeV}` in CMS frame
     """
 
     __authors__ = ["Trevor Shillington"]
@@ -52,6 +50,8 @@ class BtoXgamma(BaseSkim):
     __category__ = "physics, electroweak penguins, radiative decays"
 
     validation_sample = _VALIDATION_SAMPLE
+
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -62,6 +62,9 @@ class BtoXgamma(BaseSkim):
         # event level cuts: R2 and require a minimum number of tracks + decent photons
         ma.fillParticleList(decayString='pi+:BtoXgamma_eventshape', cut='pt > 0.1', path=path)
         ma.fillParticleList(decayString='gamma:BtoXgamma_eventshape', cut='E > 0.1', path=path)
+
+        # Event cleanup
+        Event_cleanup = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2) >= 3"
 
         ma.buildEventShape(inputListNames=['pi+:BtoXgamma_eventshape', 'gamma:BtoXgamma_eventshape'],
                            allMoments=False,
@@ -75,13 +78,13 @@ class BtoXgamma(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        # Apply event cuts R2 < 0.7 and nTracks >= 3
-        path = self.skim_event_cuts('foxWolframR2 < 0.7 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.7
+        path = self.skim_event_cuts(f'{Event_cleanup} and foxWolframR2 < 0.7', path=path)
 
         # Apply gamma cuts clusterE9E21 > 0.9 and 1.4 < E_gamma < 3.4 GeV (in CMS frame)
-        ma.cutAndCopyList('gamma:ewp', 'gamma:loose', 'clusterE9E21 > 0.9 and 1.4 < useCMSFrame(E) < 3.4', path=path)
+        ma.cutAndCopyList('gamma:ewp_BtoXgamma', 'gamma:loose', 'clusterE9E21 > 0.9 and 1.4 < useCMSFrame(E) < 3.4', path=path)
 
-        ma.reconstructDecay('B+:gamma -> gamma:ewp', '', path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:gamma -> gamma:ewp_BtoXgamma', '', path=path, allowChargeViolation=True)
 
         return ['B+:gamma']
 
@@ -94,15 +97,15 @@ class BtoXgamma(BaseSkim):
 
         stdK('all', path=path)
         stdPhotons('cdc', path=path)
-        ma.cutAndCopyList('gamma:sig', 'gamma:cdc', 'clusterNHits > 1.5 and E > 1.5', True, path)
+        ma.cutAndCopyList('gamma:sig_btxg', 'gamma:cdc', 'clusterNHits > 1.5 and E > 1.5', True, path)
 
-        ma.reconstructDecay('K*0:sig  -> K+:all pi-:all', '0.6 < M < 1.6', path=path)
-        ma.reconstructDecay('B0:sig ->  K*0:sig gamma:sig', '5.22 < Mbc < 5.3 and  abs(deltaE)< .5', path=path)
+        ma.reconstructDecay('K*0:sig_btxg  -> K+:all pi-:all', '0.6 < M < 1.6', path=path)
+        ma.reconstructDecay('B0:sig_btxg ->  K*0:sig_btxg gamma:sig_btxg', '5.22 < Mbc < 5.3 and  abs(deltaE)< .5', path=path)
 
         # the variables that are printed out are: Mbc and deltaE
         create_validation_histograms(
             rootfile=histogram_filename,
-            particlelist='B0:sig',
+            particlelist='B0:sig_btxg',
             variables_1d=[
                 ('Mbc', 100, 5.2, 5.3, 'Signal B0 Mbc', __liaison__,
                  'Mbc of the signal B0', '', 'Mbc [GeV/c^2]', 'Candidates'),
@@ -116,37 +119,37 @@ class BtoXgamma(BaseSkim):
 @fancy_skim_header
 class BtoXll(BaseSkim):
     """
-        Reconstructed decay modes:
+    Reconstructed decay modes:
 
-      * :math:`B^+ \\to X e^+ e^-`
-      * :math:`B^+ \\to X e^+ e^+`
-      * :math:`B^+ \\to X \\mu^+ \\mu^-`
-      * :math:`B^+ \\to X \\mu^+ \\mu^+`
-
-
-      Event-level cuts:
-
-      * :math:`\\text{foxWolframR2} < 0.7` constructed using tracks with
-        :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
-      * :math:`n_{\\text{tracks}} \\geq 3`
-
-      Cuts on electrons:
-
-      * :math:`\\text{electronID} > 0.1`
-      * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-      * :math:`dr<0.5 and abs(dz)<2`
-
-      Cuts on muons:
-
-      * :math:`\\text{muonID} > 0.5`
-      * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-      * :math:`dr<0.5 and abs(dz)<2`
+    * :math:`B^+ \\to X e^+ e^-`
+    * :math:`B^+ \\to X e^+ e^+`
+    * :math:`B^+ \\to X \\mu^+ \\mu^-`
+    * :math:`B^+ \\to X \\mu^+ \\mu^+`
 
 
-      Cut on dilepton energy:
+    Event-level cuts:
 
-      * :math:`E_{\\ell\\ell}>1.5\\,\\text{GeV}` in CMS frame.
-      """
+    * :math:`\\text{foxWolframR2} < 0.7` constructed using tracks with
+      :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
+    * :math:`n_{\\text{tracks}} \\geq 3`
+
+    Cuts on electrons:
+
+    * :math:`\\text{electronID} > 0.1`
+    * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+    * :math:`dr<0.5` and :math:`abs(dz)<2`
+
+    Cuts on muons:
+
+    * :math:`\\text{muonID} > 0.5`
+    * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+    * :math:`dr<0.5` and :math:`abs(dz)<2`
+
+
+    Cut on dilepton energy:
+
+    * :math:`E_{\\ell\\ell}>1.5\\,\\text{GeV}` in CMS frame.
+    """
 
     __authors__ = ["Trevor Shillington"]
     __description__ = ":math:`B\\to X\\ell\\ell` (no LFV modes) inclusive skim."
@@ -154,6 +157,8 @@ class BtoXll(BaseSkim):
     __category__ = "physics, electroweak penguins, radiative decays"
 
     validation_sample = _VALIDATION_SAMPLE
+
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -168,6 +173,9 @@ class BtoXll(BaseSkim):
         ma.fillParticleList(decayString='pi+:BtoXll_eventshape', cut='pt > 0.1', path=path)
         ma.fillParticleList(decayString='gamma:BtoXll_eventshape', cut='E > 0.1', path=path)
 
+        # Event cleanup
+        Event_cleanup = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2) >= 3"
+
         ma.buildEventShape(inputListNames=['pi+:BtoXll_eventshape', 'gamma:BtoXll_eventshape'],
                            allMoments=False,
                            foxWolfram=True,
@@ -180,26 +188,26 @@ class BtoXll(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        # Apply event cuts R2 < 0.7 and nTracks >= 3
-        path = self.skim_event_cuts('foxWolframR2 < 0.7 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.7
+        path = self.skim_event_cuts(f'{Event_cleanup} and foxWolframR2 < 0.7', path=path)
 
         # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
         fairTrack = 'dr < 0.5 and abs(dz) < 2'
 
-        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID_noTOP > 0.1 and ' + fairTrack, path=path)
-        ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('e+:ewp_btxll', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('mu+:ewp_btxll', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
 
         # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
         E_dilep_cut = 'formula(daughter(0, useCMSFrame(E))+daughter(1, useCMSFrame(E))) > 1.5'
 
         # B+ reconstruction:
         # oppositely charged leptons
-        ma.reconstructDecay('B+:ch1 -> e+:ewp e-:ewp', E_dilep_cut, dmID=1, path=path, allowChargeViolation=True)
-        ma.reconstructDecay('B+:ch2 -> mu+:ewp mu-:ewp', E_dilep_cut, dmID=2, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:ch1 -> e+:ewp_btxll e-:ewp_btxll', E_dilep_cut, dmID=1, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:ch2 -> mu+:ewp_btxll mu-:ewp_btxll', E_dilep_cut, dmID=2, path=path, allowChargeViolation=True)
         # same charge leptons
-        ma.reconstructDecay('B+:ch3 -> e+:ewp e+:ewp', E_dilep_cut, dmID=3, path=path, allowChargeViolation=True)
-        ma.reconstructDecay('B+:ch4 -> mu+:ewp mu+:ewp', E_dilep_cut, dmID=4, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:ch3 -> e+:ewp_btxll e+:ewp_btxll', E_dilep_cut, dmID=3, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:ch4 -> mu+:ewp_btxll mu+:ewp_btxll', E_dilep_cut, dmID=4, path=path, allowChargeViolation=True)
 
         ma.copyLists('B+:xll', ['B+:ch1', 'B+:ch2', 'B+:ch3', 'B+:ch4'], path=path)
 
@@ -214,11 +222,12 @@ class BtoXll(BaseSkim):
 
         stdK(listtype='good', path=path)
         stdMu(listtype='good', path=path)
-        ma.reconstructDecay("B+:signal -> K+:good mu+:good mu-:good", "Mbc > 5.2 and deltaE < 0.5 and deltaE > -0.5", path=path)
+        ma.reconstructDecay("B+:signal_btxll -> K+:good mu+:good mu-:good",
+                            "Mbc > 5.2 and deltaE < 0.5 and deltaE > -0.5", path=path)
 
         create_validation_histograms(
             rootfile=histogram_filename,
-            particlelist='B+:signal',
+            particlelist='B+:signal_btxll',
             variables_1d=[
                 ('deltaE', 100, -0.5, 0.5, 'Signal B deltaE', __liaison__,
                  'deltaE of the Signal B', '', 'deltaE [GeV]', 'Candidates'),
@@ -231,7 +240,7 @@ class BtoXll(BaseSkim):
 @fancy_skim_header
 class BtoXll_LFV(BaseSkim):
     """
-      Reconstructed decay modes:
+    Reconstructed decay modes:
 
     * :math:`B^+ \\to X e^+ \\mu^-`
     * :math:`B^+ \\to X \\mu^+ e^-`
@@ -248,13 +257,13 @@ class BtoXll_LFV(BaseSkim):
 
     * :math:`\\text{electronID} > 0.1`
     * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-    * :math:`dr<0.5 and abs(dz)<2`
+    * :math:`dr<0.5` and :math:`abs(dz)<2`
 
     Cuts on muons:
 
     * :math:`\\text{muonID} > 0.5`
     * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-    * :math:`dr<0.5 and abs(dz)<2`
+    * :math:`dr<0.5` and :math:`abs(dz)<2`
 
 
     Cut on dilepton energy:
@@ -267,6 +276,8 @@ class BtoXll_LFV(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
+    ApplyHLTHadronCut = False
+
     def load_standard_lists(self, path):
         stdE("all", path=path)
         stdMu("all", path=path)
@@ -278,6 +289,9 @@ class BtoXll_LFV(BaseSkim):
         # Create lists for buildEventShape (basically all tracks and clusters)
         ma.cutAndCopyList('pi+:BtoXllLFV_eventshape', 'pi+:all', 'pt> 0.1', path=path)
         ma.cutAndCopyList('gamma:BtoXllLFV_eventshape', 'gamma:all', 'E > 0.1', path=path)
+
+        # Event cleanup
+        Event_cleanup = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2) >= 3"
 
         # buildEventShape to access R2
         ma.buildEventShape(inputListNames=['pi+:BtoXllLFV_eventshape', 'gamma:BtoXllLFV_eventshape'],
@@ -292,158 +306,243 @@ class BtoXll_LFV(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        # Apply event cuts R2 < 0.7 and nTracks >= 3
-        path = self.skim_event_cuts('foxWolframR2 < 0.7 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.7
+        path = self.skim_event_cuts(f'{Event_cleanup} and foxWolframR2 < 0.7', path=path)
 
         # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
         fairTrack = 'dr < 0.5 and abs(dz) < 2'
 
-        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID_noTOP > 0.1 and ' + fairTrack, path=path)
-        ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('e+:ewp_btxlllfv', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('mu+:ewp_btxlllfv', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
 
         # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
         E_dilep_cut = 'formula(daughter(0, useCMSFrame(E))+daughter(1, useCMSFrame(E))) > 1.5'
 
         # B+ reconstruction:
         # oppositely charged leptons
-        ma.reconstructDecay('B+:lfvch1 -> e+:ewp mu-:ewp', E_dilep_cut, dmID=1, path=path, allowChargeViolation=True)
-        ma.reconstructDecay('B+:lfvch2 -> mu+:ewp e-:ewp', E_dilep_cut, dmID=2, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:lfvch1 -> e+:ewp_btxlllfv mu-:ewp_btxlllfv',
+                            E_dilep_cut, dmID=1, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:lfvch2 -> mu+:ewp_btxlllfv e-:ewp_btxlllfv',
+                            E_dilep_cut, dmID=2, path=path, allowChargeViolation=True)
         # same charge leptons
-        ma.reconstructDecay('B+:lfvch3 -> e+:ewp mu+:ewp', E_dilep_cut, dmID=3, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:lfvch3 -> e+:ewp_btxlllfv mu+:ewp_btxlllfv',
+                            E_dilep_cut, dmID=3, path=path, allowChargeViolation=True)
 
         ma.copyLists('B+:lfv', ['B+:lfvch1', 'B+:lfvch2', 'B+:lfvch3'], path=path)
 
         return ['B+:lfv']
 
 
-class inclusiveBplusToKplusNuNu(BaseSkim):
+@fancy_skim_header
+class B0TwoBody(BaseSkim):
     """
-      Reconstructed decay modes:
+    Reconstructed decays
+        * :math:`B^0 \\to e^+ e^-`
+        * :math:`B^0 \\to e^+ \\mu^-`
+        * :math:`B^0 \\to e^- \\mu^+`
+        * :math:`B^0 \\to \\mu^+ \\mu^-`
+        * :math:`B^0 \\to \\pi^+ \\pi^-`
 
-    * :math:`B^+ \\to K\\nu\\nu` inclusive
-
-    Track cleanup:
-    * :math:`p_t > 0.1`
-    * :math:`thetaInCDCAcceptance`
-    * :math:`dr<0.5 and abs(dz)<3.0`
-
-    Event cleanup:
-    * :math:`3 < nCleanedTracks < 11`
-
-    Kaon cuts:
-    * :math:`track cleanup + event cleanup + nPXDHits > 0`
-    * :math:`p_t rank=1`
-    * :math:`kaonID>0.01`
-
-    MVA info and cuts:
-    * mva_identifier: MVAFastBDT_InclusiveBplusToKplusNuNu_Skim
-    * Global Tag: mva_inclusiveBplusToKplusNuNu
-    * :math:`mva\\_identifier > 0.5`
+    Cuts applied
+        * :math:`n_{\\text{tracks}} \\geq 3`
+        * :math:`|\\delta E| < 0.5 \\text{GeV}`
+        * :math:`M_{bc} > 5.2 \\text{GeV}/c^2`
+        * :math:`dr < 0.5 \\text{cm}, |dz| < 2 \\text{cm}`
     """
 
-    __authors__ = ["Cyrille Praz"]
-    __description__ = "Inclusive skim for :math:`B\\to K\\nu\\nu` analysis"
+    __authors__ = ["Ryan Mueller and Santi Naylor"]
     __contact__ = __liaison__
-    __category__ = "physics, electroweak penguins, radiative decays"
+    __description__ = "Skim for 2 body B0 decays"
+    __category__ = "Physics, 2 Body, no PID"
 
-    NoisyModules = ["ParticleCombiner"]
     validation_sample = _VALIDATION_SAMPLE
+
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+        stdPi("all", path=path)
 
     def build_lists(self, path):
 
-        # Default cleanup also used in and ma.buildEventShape
-        track_cleanup = 'pt > 0.1'
-        track_cleanup += ' and thetaInCDCAcceptance'
-        track_cleanup += ' and abs(dz) < 3.0'
-        track_cleanup += ' and dr < 0.5'
+        cut_trk = 'dr < 0.5 and abs(dz) < 2'
+        ma.cutAndCopyList('e+:ewp_2b', 'e+:all', cut_trk, path=path)
+        ma.cutAndCopyList('mu+:ewp_2b', 'mu+:all', cut_trk, path=path)
+        ma.cutAndCopyList('pi+:ewp_2b', 'pi+:all', cut_trk, path=path)
 
-        # Min 4 tracks and Max 10 tracks per event.
-        event_cleanup = 'nCleanedTracks({}) > 3'.format(track_cleanup)
-        event_cleanup += ' and nCleanedTracks({}) < 11'.format(track_cleanup)
+        cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=3"
+        cut_b = "abs(deltaE) < 0.5 and Mbc > 5.2"
+        path = self.skim_event_cuts(cut_evt, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_1 -> e+:ewp_2b e-:ewp_2b", cut_b, dmID=1, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_2 -> e+:ewp_2b mu-:ewp_2b", cut_b, dmID=2, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_3 -> e-:ewp_2b mu+:ewp_2b", cut_b, dmID=3, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_4 -> mu-:ewp_2b mu+:ewp_2b", cut_b, dmID=4, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_5 -> pi-:ewp_2b pi+:ewp_2b", cut_b, dmID=5, path=path)
 
-        # Define the signal
-        total_cleanup = track_cleanup + ' and ' + event_cleanup + ' and ' + 'nPXDHits>0'
-        ma.fillParticleList('K+:inclusiveBplusToKplusNuNu', cut=total_cleanup, path=path)
-        ma.rankByHighest('K+:inclusiveBplusToKplusNuNu', 'pt', path=path)
-        ma.applyCuts('K+:inclusiveBplusToKplusNuNu', 'extraInfo(pt_rank)==1', path=path)
-        ma.applyCuts('K+:inclusiveBplusToKplusNuNu', 'kaonID>1e-2', path=path)
-        ma.reconstructDecay(decayString='B+:inclusiveBplusToKplusNuNu -> K+:inclusiveBplusToKplusNuNu', cut='', path=path)
-
-        # Build the event-based variables that we need
-        ma.buildEventShape(inputListNames=[],
-                           default_cleanup=True,
-                           allMoments=False,
-                           cleoCones=True,
-                           collisionAxis=False,
-                           foxWolfram=True,
-                           harmonicMoments=True,
-                           jets=False,
-                           sphericity=True,
-                           thrust=True,
-                           checkForDuplicates=False,
-                           path=path)
-
-        # Apply a MVA by reading from the DB
-        mva_identifier = 'MVAFastBDT_InclusiveBplusToKplusNuNu_Skim'
-        b2.conditions.append_globaltag('mva_inclusiveBplusToKplusNuNu')
-        path.add_module('MVAExpert', listNames=['B+:inclusiveBplusToKplusNuNu'],
-                        extraInfoName=mva_identifier, identifier=mva_identifier)
-        vm.addAlias(mva_identifier, f'extraInfo({mva_identifier})')
-        ma.applyCuts('B+:inclusiveBplusToKplusNuNu', mva_identifier + '>0.5', path=path)
-
-        return ['B+:inclusiveBplusToKplusNuNu']
+        return ['B0:B0TwoBody_1', 'B0:B0TwoBody_2', 'B0:B0TwoBody_3', 'B0:B0TwoBody_4', 'B0:B0TwoBody_5']
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        histogram_filename = f'{self}_Validation.root'
-        # Default cleanup also used in and ma.buildEventShape
-        track_cleanup = 'pt > 0.1'
-        track_cleanup += ' and thetaInCDCAcceptance'
-        track_cleanup += ' and abs(dz) < 3.0'
-        track_cleanup += ' and abs(dr) < 0.5'
+        ma.cutAndCopyLists("B0:B0TwoBody", "B0:B0TwoBody_5", "", path=path)
 
-        # Define a couple of aliases
-        vm.addAlias('kaon_pt', 'daughter(0,pt)')
-        vm.addAlias('nCleanedTracks_simple_cleanup', 'nCleanedTracks({})'.format(track_cleanup))
+        histogramFilename = f"{self}_Validation.root"
 
-        # Output validation histograms
         create_validation_histograms(
-            rootfile=histogram_filename,
-            particlelist='B+:inclusiveBplusToKplusNuNu',
+            rootfile=histogramFilename,
+            particlelist="B0:B0TwoBody",
             variables_1d=[
-                ('kaon_pt',
-                 10,
-                 0,
-                 5,
-                 'Kaon pt',
-                 __liaison__,
-                 'Transverse momentum of the kaon candidate',
-                 'Maximum between 1.5 and 2 GeV/c',
-                 'Kaon pt [GeV/c]',
-                 'Candidates'),
-                ('nCleanedTracks_simple_cleanup',
-                 12,
-                 0,
-                 12,
-                 'Number of cleaned tracks',
-                 __liaison__,
-                 'Number of cleaned tracks in the event',
-                 'Should be between 4 and 10, with two local maxima at 4 and 6',
-                 'Number of cleaned tracks',
-                 'Events'),
-                ('sphericity',
-                 10,
-                 0,
-                 1,
-                 'Event Sphericity',
-                 __liaison__,
-                 'Sphericity computed by ma.buildEventShape',
-                 'Maximum around 0.3',
-                 'Event Sphericity',
-                 'Events')],
-            variables_2d=[],
-            path=path)
+                ("Mbc", 100, 5.19, 5.3, "Signal B Mbc", __liaison__,
+                 "Mbc of the Signal B", "", 'Mbc [GeV/c^2]', 'Candidates'),
+                ("deltaE", 100, -0.5, 0.5, "Signal B deltaE", __liaison__,
+                 "deltaE of the Signal B", "", "deltaE [GeV]", "Candidates"),
+            ],
+            variables_2d=[
+                ("deltaE", 100, -0.6, 0.6, "Mbc", 100, 5.19, 5.3, "Mbc vs deltaE", __liaison__,
+                 "", "")
+            ],
+            path=path,
+        )
+
+
+@fancy_skim_header
+class FourLepton(BaseSkim):
+    """
+    Reconstructed decays
+        * :math:`B^0 \\to e^- e^+ e^- e^+`
+        * :math:`B^0 \\to e^- e^+ mu^- mu^+`
+
+    Cuts applied
+        * :math:`n_{\\text{tracks}} \\geq 5`
+        * :math:`-1.5 < \\delta E < 0.5 \\text{GeV}`
+        * :math:`5.2 < M_{bc} < 5.3 \\text{GeV}/c^2`
+        * :math:`dr < 0.5 \\text{cm}, |dz| < 2 \\text{cm}`
+        * :math:`muonID>0.1`
+        * :math:`electronID>0.1`
+    """
+
+    __authors__ = ["Santi Naylor and Ryan Mueller"]
+    __contact__ = __liaison__
+    __description__ = "Skim for 4 body leptonic analyses"
+    __category__ = "Physics, Leptonic, 4 Body"
+
+    validation_sample = _VALIDATION_SAMPLE
+
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+
+    def build_lists(self, path):
+        cut_trk = 'dr < 0.5 and abs(dz) < 2 '
+
+        ma.cutAndCopyList('e+:ewp_4b', 'e+:all', 'pt > 0.1 and electronID > 0.1 and ' + cut_trk, path=path)
+        ma.cutAndCopyList('mu+:ewp_4b', 'mu+:all', 'pt > 0.1 and muonID > 0.1 and ' + cut_trk, path=path)
+
+        cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=5"
+        cut_b = "deltaE < 0.5 and deltaE > -1.5 and Mbc > 5.2 and Mbc < 5.3"
+        path = self.skim_event_cuts(cut_evt, path=path)
+
+        ma.reconstructDecay("B0:FourLepton_1 -> e+:ewp_4b e-:ewp_4b e+:ewp_4b e-:ewp_4b", cut_b, dmID=1, path=path)
+        ma.reconstructDecay("B0:FourLepton_2 -> e+:ewp_4b e-:ewp_4b mu+:ewp_4b mu-:ewp_4b", cut_b, dmID=2, path=path)
+        return ["B0:FourLepton_1", "B0:FourLepton_2"]
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        ma.cutAndCopyLists("B0:FourLepton", "B0:FourLepton_1", "", path=path)
+
+        histogramFilename = f"{self}_Validation.root"
+
+        create_validation_histograms(
+            rootfile=histogramFilename,
+            particlelist="B0:FourLepton",
+            variables_1d=[
+                ("Mbc", 100, 5.19, 5.3, "Signal B Mbc", __liaison__,
+                 "Mbc of the Signal B", "", 'Mbc [GeV/c^2]', 'Candidates'),
+                ("deltaE", 100, -1.5, 0.5, "Signal B deltaE", __liaison__,
+                 "deltaE of the Signal B", "", "deltaE [GeV]", "Candidates"),
+            ],
+            variables_2d=[
+                ("deltaE", 100, -0.6, 0.6, "Mbc", 100, 5.19, 5.3, "Mbc vs deltaE", __liaison__,
+                 "", "")
+            ],
+            path=path,
+        )
+
+
+@fancy_skim_header
+class RadiativeDilepton(BaseSkim):
+    """
+    Reconstructed decays
+        * :math:`B^0 \\to e^- e^+ \\gamma`
+        * :math:`B^0 \\to mu^- mu^+ \\gamma`
+
+    Cuts applied
+        * :math:`n_{\\text{tracks}} \\geq 3`
+        * :math:`-1.0 < \\delta E < 0.5 \\text{GeV}`
+        * :math:` 5.2 < M_{bc} < 5.3 \\text{GeV}/c^2`
+        * :math:`dr < 0.5 \\text{cm}, |dz| < 2 \\text{cm}`
+        * :math:`muonID>0.1`
+        * :math:`electronID>0.1`
+    """
+
+    __authors__ = ["Santi Naylor and Ryan Mueller"]
+    __contact__ = __liaison__
+    __description__ = "Skim for 3 body leptonic analyses "
+    __category__ = "Physics, Leptonic, 3 body"
+
+    validation_sample = _VALIDATION_SAMPLE
+
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+        stdPhotons("all", path=path)
+
+    def build_lists(self, path):
+
+        cut_trk = 'dr < 0.5 and abs(dz) < 2'
+        ma.cutAndCopyList('e+:ewp_radll', 'e+:all', 'pt > 0.1 and electronID > 0.1 and ' + cut_trk, path=path)
+        ma.cutAndCopyList('mu+:ewp_radll', 'mu+:all', 'pt > 0.1 and muonID > 0.1 and ' + cut_trk, path=path)
+
+        cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=3"
+        cut_b = "deltaE < 0.5 and deltaE > -1.0 and Mbc > 5.2 and Mbc < 5.3"
+        path = self.skim_event_cuts(cut_evt, path=path)
+
+        ma.reconstructDecay("B0:RadiativeDilepton_1 -> e+:ewp_radll e-:ewp_radll gamma:all", cut_b, dmID=1, path=path)
+        ma.reconstructDecay("B0:RadiativeDilepton_2 -> mu+:ewp_radll mu-:ewp_radll gamma:all", cut_b, dmID=1, path=path)
+        return ["B0:RadiativeDilepton_1", "B0:RadiativeDilepton_2"]
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        ma.cutAndCopyLists("B0:RadiativeDilepton", "B0:RadiativeDilepton_1", "", path=path)
+
+        histogramFilename = f"{self}_Validation.root"
+
+        create_validation_histograms(
+            rootfile=histogramFilename,
+            particlelist="B0:RadiativeDilepton",
+            variables_1d=[
+                ("Mbc", 100, 5.19, 5.3, "Signal B Mbc", __liaison__,
+                 "Mbc of the Signal B", "", 'Mbc [GeV/c^2]', 'Candidates'),
+                ("deltaE", 100, -1.0, 0.5, "Signal B deltaE", __liaison__,
+                 "deltaE of the Signal B", "", "deltaE [GeV]", "Candidates"),
+            ],
+            variables_2d=[
+                ("deltaE", 100, -0.6, 0.6, "Mbc", 100, 5.19, 5.3, "Mbc vs deltaE", __liaison__,
+                 "", "")
+            ],
+            path=path,
+        )

@@ -160,7 +160,7 @@ Let's create a python file from terminal and run it
 .. admonition:: Hint
   :class: xhint stacked toggle
 
-  Add the ``import`` command inside your python file using your favourite
+  Add the ``import`` command inside your python file using your favorite
   editor. Previous tutorials introduced the ``nano`` editor to you.
 
 .. admonition:: Solution
@@ -515,7 +515,7 @@ which is a large 2D numpy matrix
 
 However ``to_numpy`` may not be the most visually pleasing (or easy) way to inspect the contents of your dataframe.
 
-A useful feature to quickly summarize your data is to use the ``descibe`` method:
+A useful feature to quickly summarize your data is to use the ``describe`` method:
 
 .. code:: ipython3
 
@@ -787,7 +787,7 @@ Making your plots pretty
 
 Let's face it, physicists aren't well known for their amazing graphical
 representations, but here's our chance to shine! We can implement matplotlib
-functions to make our plots GREAT. You can even choose a `colourblind friendly colour scheme <https://confluence.desy.de/display/BI/Colo%28u%29r+Blind+Friendly+Plots+and+Displays>`_!
+functions to make our plots GREAT. You can even choose a `colourblind friendly colour scheme <https://xwiki.desy.de/xwiki/rest/p/a2fdc>`_!
 
 It is possible to display multiple plots at once using ``plt.subplots``. As you can see
 below, rather than simply having our histograms show up using ``plt``, we define a
@@ -916,7 +916,7 @@ The implementation of 2D histograms are often very useful and are easily done:
 
   Note that this also solves the last exercise (we only call ``query`` once).
 
-Finally, Belle II does have an `official plot style <https://stash.desy.de/projects/B2/repos/plot_style/browse>`_, for plots that are *published* internally and externally.
+Finally, Belle II does have an `official plot style <https://gitlab.desy.de/belle2/software/belle2style>`_, for plots that are *published* internally and externally.
 You do not need to worry about this at this stage, but keep it in mind.
 
 .. warning::
@@ -942,7 +942,7 @@ Importing the style is as easy as "one, two, ...
 .. admonition:: Exercise
   :class: exercise stacked
 
-  Select your favorit plot from the ``matplotlib`` gallery. Can you generate
+  Select your favorite plot from the ``matplotlib`` gallery. Can you generate
   it in your notebook? Try to modify some properties of the plotting
   (different colors, labels or data).
 
@@ -1050,7 +1050,7 @@ However, your python journey has just begun and there's a lot to learn.
 
 .. seealso::
 
-  We have started to compile a reading list for python `on confluence <https://confluence.desy.de/x/ARC3Cg>`_.
+  We have started to compile a reading list for python `on XWiki <https://xwiki.desy.de/xwiki/rest/p/9bd7e>`_.
   Please help us extend it!
 
 .. include:: ../lesson_footer.rstinclude

@@ -137,7 +137,6 @@ size_t TCPSocket::read_once(void* buf, size_t count)
       }
     }
     return ret;
-    break;
   }
   return 0;
 }
@@ -195,7 +194,7 @@ unsigned int TCPSocket::getAddress()
     unsigned long ip_address = inet_addr(m_ip.c_str());
     if ((signed long) ip_address < 0) {
       throw (std::exception());
-      throw (IOException("Wrong host name or ip"));
+      // throw (IOException("Wrong host name or ip")); // TODO which throw is the correct one?
     } else {
       host = gethostbyaddr((char*)&ip_address, sizeof(ip_address), AF_INET);
     }

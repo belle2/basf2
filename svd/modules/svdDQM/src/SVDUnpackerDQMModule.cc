@@ -154,26 +154,50 @@ void SVDUnpackerDQMModule::beginRun()
   m_runNumber = evtMetaData->getRun();
   m_errorFraction = 0;
 
-  TString histoTitle = TString::Format("SVD Data Format Monitor, Exp %d Run %d", m_expNumber, m_runNumber);
+  TString runID = TString::Format(" ~ Exp%d Run%d", m_expNumber, m_runNumber);
 
   if (m_DQMUnpackerHisto != nullptr) {
+    TString tmp = m_DQMUnpackerHisto->GetTitle();
+    Int_t pos = tmp.Last('~');
+    if (pos == -1) pos = tmp.Length() + 2;
+    TString title = tmp(0, pos - 2);
+    m_DQMUnpackerHisto->SetTitle(title + runID);
     m_DQMUnpackerHisto->Reset();
-    m_DQMUnpackerHisto->SetTitle(histoTitle.Data());
   }
 
   if (m_DQMEventFractionHisto != nullptr) {
+    TString tmp = m_DQMEventFractionHisto->GetTitle();
+    Int_t pos = tmp.Last('~');
+    if (pos == -1) pos = tmp.Length() + 2;
+    TString title = tmp(0, pos - 2);
+    m_DQMEventFractionHisto->SetTitle(title + runID);
     m_DQMEventFractionHisto->Reset();
   }
 
   if (m_DQMnSamplesHisto != nullptr) {
+    TString tmp = m_DQMnSamplesHisto->GetTitle();
+    Int_t pos = tmp.Last('~');
+    if (pos == -1) pos = tmp.Length() + 2;
+    TString title = tmp(0, pos - 2);
+    m_DQMnSamplesHisto->SetTitle(title + runID);
     m_DQMnSamplesHisto->Reset();
   }
 
   if (m_DQMnSamplesHisto2 != nullptr) {
+    TString tmp = m_DQMnSamplesHisto2->GetTitle();
+    Int_t pos = tmp.Last('~');
+    if (pos == -1) pos = tmp.Length() + 2;
+    TString title = tmp(0, pos - 2);
+    m_DQMnSamplesHisto2->SetTitle(title + runID);
     m_DQMnSamplesHisto2->Reset();
   }
 
   if (m_DQMtrgQuality != nullptr) {
+    TString tmp = m_DQMtrgQuality->GetTitle();
+    Int_t pos = tmp.Last('~');
+    if (pos == -1) pos = tmp.Length() + 2;
+    TString title = tmp(0, pos - 2);
+    m_DQMtrgQuality->SetTitle(title + runID);
     m_DQMtrgQuality->Reset();
   }
 
@@ -331,13 +355,10 @@ void SVDUnpackerDQMModule::event()
   m_errorFraction = 100 * float(m_nBadEvents) / float(m_nEvents);
 
   if (m_DQMEventFractionHisto != nullptr) {
-    TString histoFractionTitle = TString::Format("SVD bad events fraction: %f %%,  Exp %d Run %d", m_errorFraction, m_expNumber,
-                                                 m_runNumber);
+    TString histoFractionTitle = TString::Format("SVD bad events,  Exp %d Run %d", m_expNumber, m_runNumber);
     m_DQMEventFractionHisto->SetTitle(histoFractionTitle.Data());
+    m_DQMEventFractionHisto->Fill(m_badEvent);
   }
-
-
-  m_DQMEventFractionHisto->Fill(m_badEvent);
 
 } // end event function
 

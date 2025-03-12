@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  /** ClassBgoHit - Geant4 ulated hit for the Bgo crystal in beast..
+  /** ClassBgoHit - Geant4 ulated hit for the Bgo crystal in beast.
     *
     * This class holds particle hit data from geant4 ulation. As the ulated
     * hit classes are used to generate detector response information.

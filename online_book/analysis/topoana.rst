@@ -185,7 +185,7 @@ Generally, the functionalities of the program are as follows.
       (titled **Reconstruction restrictions on truth particles**) in the user
       guide we introduce in :numref:`TopologyAnalysis`.
 
-   3. In addition, there are some functionality overlaps betweeen ``TopoAna``
+   3. In addition, there are some functionality overlaps between ``TopoAna``
       and :b2:mod:`MCMatcherParticles`. If highly needed, in the future we could
       also develop some new functionalities in ``TopoAna`` for the cross-checks
       of the MC matching results obtained with :b2:mod:`MCMatcherParticles`.
@@ -205,8 +205,8 @@ Please follow the steps below to install the software.
 
 2. ``cd yourDirectoryForTopoAna``
 
-3. Clone the ``TopoAna`` repository from Stash with
-   ``git clone ssh://git@stash.desy.de:7999/~zhouxy/topoana.git topoana``
+3. Clone the ``TopoAna`` repository from GitLab with
+   ``git clone git@gitlab.desy.de:belle2/software/topoana.git``
 
 4. ``cd topoana``
 
@@ -505,7 +505,7 @@ The column headers expressed with abbreviations are explained as follows:
       table. This is the reason why they are not in natural order like the
       values of ``rowNo``.
 
-   2. Considering :math:`\pi^0` has a very large production rate and approximatively
+   2. Considering :math:`\pi^0` has a very large production rate and approximately
       99\% of it decays to :math:`\gamma \gamma`, the program is designed to discard
       the decay :math:`\pi^0 \to \gamma \gamma` by default at the early phase of
       processing the input data. As a result, :math:`\pi^0 \to \gamma \gamma`

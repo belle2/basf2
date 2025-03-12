@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -49,7 +48,7 @@ else:
 
 main.add_module(input)
 histo = b2.register_module('HistoManager')
-histo.param("histoFileName", "dqm.%s.superlayer3.root" % basename)
+histo.param("histoFileName", f"dqm.{basename}.superlayer3.root")
 
 # Unpacker
 trgcdctsfUnpacker = b2.register_module("TRGCDCTSFUnpacker")
@@ -62,7 +61,7 @@ trgcdctsfdqm = b2.register_module('TRGCDCTSFDQM')
 trgcdctsfdqm.param('generatePostscript', True)
 trgcdctsfdqm.param('TSFMOD', 3)
 # postscript file name
-psname = "dqm.%s.ps" % basename
+psname = f"dqm.{basename}.ps"
 trgcdctsfdqm.param('postScriptName', psname)
 
 main.add_module(trgcdctsfdqm)

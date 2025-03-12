@@ -20,7 +20,9 @@ import basf2
 from ROOT import TFile, TNamed
 import os
 
-VALIDATION_OUTPUT_FILE = "fullTrackingTableValidation.root"
+ACTIVE = True
+
+VALIDATION_OUTPUT_FILE = "fullTrackingValidationTable.root"
 
 try:
     import uproot  # noqa
@@ -91,15 +93,15 @@ def write_value_cell(key, value):
     else:
         color = "white"
 
-    return """
+    return f"""
         <td style="border: 1px solid black" colspan={colspan}
         align="center" valign=middle bgcolor="{color}">{value}</td>
-    """.format(colspan=colspan, color=color, value=value)
+    """
 
 
 def make_html_row(x):
-    keys = [key for key, _ in x.iteritems()]
-    titles = [key[2] for key, _ in x.iteritems()]
+    keys = [key for key, _ in x.items()]
+    titles = [key[2] for key, _ in x.items()]
 
     chunked_titles = make_chunks(titles, 2)
     common_prefixes = list(map(os.path.commonprefix, chunked_titles))
@@ -111,7 +113,7 @@ def make_html_row(x):
     row_content = "".join([write_value_cell(key, value) for key, value in zip(keys, shorter_titles)])
     html = "<tr>" + row_content + "</tr>"
 
-    row_content = "".join([write_value_cell(key, value) for key, value in x.sort_index().iteritems()])
+    row_content = "".join([write_value_cell(key, value) for key, value in x.sort_index().items()])
     html += "<tr>" + row_content + "</tr>"
 
     return html
@@ -132,19 +134,24 @@ def get_html(df, test):
 
 
 if __name__ == '__main__':
-    # These are the categories to be tested successively
-    test = [
-        ("all", None),
-        ("has_vxd", lambda x: (x.n_svd_hits >= 2)),
-        ("vxd_was_found", lambda x: x["vxd_was_found"] == 1),
-        ("has_cdc", lambda x: x.n_cdc_hits >= 3),
-        ("cdc_was_found", lambda x: x["cdc_was_found"] == 1),
-    ]
+    if ACTIVE:
+        # These are the categories to be tested successively
+        test = [
+            ("all", None),
+            ("has_vxd", lambda x: (x.n_svd_hits >= 2)),
+            ("vxd_was_found", lambda x: x["vxd_was_found"] == 1),
+            ("has_cdc", lambda x: x.n_cdc_hits >= 3),
+            ("cdc_was_found", lambda x: x["cdc_was_found"] == 1),
+        ]
 
-    df = uproot.open("../matching_validation.root")['VxdCdcPartFinderHarvester_tree'].arrays(library='pd')
-    html = get_html(df, test)
+        df = uproot.open("../matching_validation.root")['VxdCdcPartFinderHarvester_tree'].arrays(library='pd')
+        html = get_html(df, test)
 
-    tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")
-    html_content = TNamed("Tracking Table Validation", html)
-    html_content.Write()
-    tfile.Close()
+        tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")
+        html_content = TNamed("Tracking Table Validation", html)
+        html_content.Write()
+        tfile.Close()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

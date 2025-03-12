@@ -42,14 +42,14 @@ class Histogrammer(b2.Module):
         #: list of digits histograms
         self.hist = []
         self.hist.append(TH1F('PXDDigits', 'PXDDigits (no data reduction)',
-                              200, 10000, 80000))
-        self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 8000))
+                              200, 0, 100000))
+        self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 10000))
         self.hist.append(TH1F('SVDShaperDigitsZS5', 'ZS5 SVDShaperDigits', 100, 0, 8000))
         self.hist.append(TH1F('CDCHits', 'CDCHits above threshold', 100, 0, 6000))
         self.hist.append(TH1F('TOPDigits', 'TOPDigits', 100, 0, 2000))
         self.hist.append(TH1F('ARICHDigits', 'ARICHDigits', 100, 0, 300))
         self.hist.append(TH1F('ECLDigits', 'ECLDigits, m_Amp > 500 (roughly 25 MeV)',
-                              100, 0, 200))
+                              100, 0, 400))
         self.hist.append(TH1F('KLMDigits', 'KLMDigits', 150, 0, 150))
 
         #: list of occupancy-like histograms
@@ -62,7 +62,7 @@ class Histogrammer(b2.Module):
         self.hist2.append(TH1F('CDCOuterHitRate', 'CDC Hit Rate per wire for the Outer layers', 100, 0, 1000))
         self.hist2.append(TH1F('CDCHitRate', 'CDC Hit Rate per wire', 100, 0, 1000))
         self.hist2.append(TH1F("TOPHitTime", "TOP Hit Time Distribution; time [ns]", 300, -150, 150))
-        #: numnber of events
+        #: number of events
         self.nTOPev = 0
         #: min TOP hit time
         self.minTOPTime = None

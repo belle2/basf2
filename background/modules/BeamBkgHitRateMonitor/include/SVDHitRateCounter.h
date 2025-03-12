@@ -38,10 +38,10 @@ namespace Belle2 {
        */
       struct TreeStruct {
         float layerAverageRates[4] = {0}; /**< layer average occupancy */
-        float layerLadderAverageRates[4][16] = {{0}}; /**< [#layer][#ladder] */
-        float layerSensorAverageRates[4][5] = {{0}}; /**< [#layer][#sensor] */
+        float layerLadderAverageRates[4][16] = {{0}}; /**< [\#layer][\#ladder] */
+        float layerSensorAverageRates[4][5] = {{0}}; /**< [\#layer][\#sensor] */
         float averageRate = 0; /**< total SVD average occupancy */
-        float l3LadderSensorAverageRates[7][2] = {{0}}; /**< Layer 3 sensors [#ladder][#sensor] */
+        float l3LadderSensorAverageRates[7][2] = {{0}}; /**< Layer 3 sensors [\#ladder][\#sensor] */
         int numEvents = 0; /**< number of events accumulated */
         bool valid = false;  /**< status: true = rates valid */
 
@@ -143,14 +143,14 @@ namespace Belle2 {
 
       /**
        * Returns the (active) mass of the given sensor in Kg.
-       * @param layer tha layer number (starting from 0, not 3)
+       * @param layer the layer number (starting from 0, not 3)
        * @param ladder the ladder number (starting from 0, not 1)
        * @param sensor the sensor number (starting from 0, not 1)
        */
       double massOfSensor(int layer, int ladder, int sensor);
 
       /**
-       * Returns wether a strips is active (neither hot nor masked),
+       * Returns whether a strips is active (neither hot nor masked),
        * taking into account the ignoreHotStrips and ignoreMaskedStrips
        * settings.
        * @param sensorID The VxdID of the sensor

@@ -14,11 +14,6 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 #include <TH2F.h>
 
 namespace Belle2 {
@@ -54,14 +49,17 @@ namespace Belle2 {
      */
     void event(void) override final;
 
+    /**
+     * Terminator.
+     */
+    void terminate(void) override final;
+
   private:
 
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
-    //! prefix for EPICS PVs
-    std::string m_pvPrefix;
-    /** Update entry intervall */
+    /** Update entry interval */
     int m_minEntries = 10000;
 
     //! Histogram covering all error types
@@ -90,11 +88,6 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-#ifdef _BELLE2_EPICS
-    //! one EPICS PV
-    std::vector <chid> mychid;
-#endif
   };
 } // end namespace Belle2
 

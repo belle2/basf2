@@ -8,8 +8,9 @@
 
 #pragma once
 
-// BEAMSPOT AND DATABASE
+// DATABASE objects
 #include <mdst/dbobjects/BeamSpot.h>
+#include <analysis/dbobjects/ECLPhotonEnergyResolution.h>
 #include <framework/database/DBObjPtr.h>
 
 // MDST
@@ -19,6 +20,8 @@
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 #include <TMatrixD.h>
+
+#include <framework/gearbox/Const.h>
 
 namespace Belle2 {
 
@@ -31,7 +34,6 @@ namespace Belle2 {
   class ClusterUtils {
 
   public:
-
     /**
      * Constructor
      */
@@ -67,6 +69,12 @@ namespace Belle2 {
      */
     const TMatrixD GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, const ROOT::Math::XYZVector& vertex,
                                                  ECLCluster::EHypothesisBit hypo);
+
+    /**
+     * Returns 3x3 covariance matrix (E, theta, phi)
+     * @return const TMatrixDSym
+     */
+    const TMatrixDSym GetCovarianceMatrix3x3FromCluster(const ECLCluster* cluster, int particleHypo = Const::photon.getPDGCode());
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)
@@ -109,8 +117,31 @@ namespace Belle2 {
     const TMatrixDSym GetIPPositionCovarianceMatrix();
 
   private:
+    /**
+     * Beam spot database object
+     */
+    DBObjPtr<BeamSpot> m_beamSpotDB;
 
-    DBObjPtr<BeamSpot> m_beamSpotDB; /**< Beam spot database object */
+    /**
+     * Photon energy resolution database object
+     */
+    OptionalDBObjPtr<ECLPhotonEnergyResolution> m_photonEnergyResolutionDB;
+
+    /**
+     * Neutron position resolution database objects
+     */
+    OptionalDBObjPtr<ECLPhotonEnergyResolution> m_neutronPositionResolutionDB{"neutronPositionResolutionDB"};
+
+    /**
+     * Antineutron position resolution database objects
+     */
+    OptionalDBObjPtr<ECLPhotonEnergyResolution> m_antiNeutronPositionResolutionDB{"antiNeutronPositionResolutionDB"};
+
+    /**
+     * Neutral kaon position resolution database objects
+     */
+    OptionalDBObjPtr<ECLPhotonEnergyResolution> m_kaonPositionResolutionDB{"kaonPositionResolutionDB"};
+
   };
 
 } // Belle2 namespace

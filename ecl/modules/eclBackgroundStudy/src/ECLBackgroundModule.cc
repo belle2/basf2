@@ -27,7 +27,6 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TMath.h>
-#include <TVector3.h>
 
 using namespace std;
 using namespace Belle2;
@@ -58,13 +57,13 @@ ECLBackgroundModule::~ECLBackgroundModule()
 {
 }
 
-//If a histogram is initalized here, it will be saved.
+//If a histogram is initialized here, it will be saved.
 void ECLBackgroundModule::defineHisto()
 {
   std::ostringstream s;
   s << m_sampleTime;
 
-  //initalize histograms
+  //initialize histograms
   h_nECLSimHits = new TH1F("ECL_Sim_Hits", "ECL Sim Hits", 100, 0, 100);
 
 
@@ -388,7 +387,7 @@ void ECLBackgroundModule::endRun()
       B2WARNING("ECLBackgroundModule: Invalid cell ID. must be less than 8736");
       continue;
     }
-    double dose = hEMDose->GetBinContent(m_CryInt[i] + 1); //add 1 since bin #1 corrosponds to cell ID #0
+    double dose = hEMDose->GetBinContent(m_CryInt[i] + 1); //add 1 since bin #1 corresponds to cell ID #0
     int thetaID = Crystal[m_CryInt[i]]->GetThetaID();
     int phiID   = Crystal[m_CryInt[i]]->GetPhiID();
     B2RESULT("Dose in Crystal " << m_CryInt[i] << ": " << dose << " ThetaID=" << thetaID << ", PhiID=" << phiID);

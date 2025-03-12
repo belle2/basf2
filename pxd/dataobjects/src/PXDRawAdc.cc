@@ -22,7 +22,7 @@ using namespace std;
 using namespace Belle2;
 
 PXDRawAdc::PXDRawAdc(VxdID sensorID, void* data, int len):
-  m_sensorID(sensorID), m_adcs()
+  m_adcs(), m_sensorID(sensorID)
 {
   unsigned char* d = (unsigned char*)data;
   m_dhp_header = ((boost::endian::big_uint16_t*)data)[2];
@@ -33,6 +33,6 @@ PXDRawAdc::PXDRawAdc(VxdID sensorID, void* data, int len):
   } else {
     m_adcs.resize(len);// resize vector
     std::memcpy(&m_adcs[0], d, len);// lowlevel hardcore, TODO maybe better use std::copy ?
-    // seems endianess swapping is not needed
+    // seems endianness swapping is not needed
   }
 };

@@ -73,7 +73,7 @@ namespace Belle2 {
       void cook();
 
       /** Get pixel number if the given coordinate is in the
-       *  correspondin internal gate trapping region or -1 otherwise
+       *  corresponding internal gate trapping region or -1 otherwise
        * @param x u-coordinate in the local system
        * @param y v-coordinate in the local system
        * @return pixel number id = ix + 250*iy, or -1
@@ -137,13 +137,11 @@ namespace Belle2 {
       double getElectronMobility(double E) const;
       /** Model of the E field inside the sensor.
        * @param point Desired position in local coordinates.
-       * @param info The SensorInfo for the current sensor.
        * @return The E field vector in local coordinates.
        */
       const ROOT::Math::XYZVector getEField(const ROOT::Math::XYZVector& point) const;
       /** Get B field value from the field map.
        * @param point Desired position in local coordinates.
-       * @param info the SensorInfo for the current sensor.
        * @return The B field vector in local coordinates.
        */
       const ROOT::Math::XYZVector getBField(const ROOT::Math::XYZVector& point) const;

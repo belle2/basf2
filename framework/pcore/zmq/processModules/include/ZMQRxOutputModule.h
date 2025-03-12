@@ -22,7 +22,7 @@ namespace Belle2 {
    */
   class ZMQRxOutputModule : public Module {
   public:
-    /// Constructor setting the moudle paramters
+    /// Constructor setting the module parameters
     ZMQRxOutputModule();
     /// Receive an event and store it in the datastore. Confirm to the input process.
     void event() override;
@@ -58,5 +58,10 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaData;
     /// The random generator in the data store
     StoreObjPtr<RandomGenerator> m_randomgenerator;
+
+    /// Begin Run counter
+    int m_beginRun;
+    /// End Run counter
+    int m_endRun;
   };
 }

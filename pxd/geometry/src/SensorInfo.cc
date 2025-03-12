@@ -68,7 +68,7 @@ SensorInfo::getDriftVelocity(const ROOT::Math::XYZVector& E,
 
 int SensorInfo::getPixelKind(const VxdID sensorID, double v) const
 {
-  const SensorInfo& Info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+  const SensorInfo& Info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
   int i_pixelKind = Info.getVPitchID(v);
   if (Info.getID().getLayerNumber() == 2) i_pixelKind += 4;
   if (Info.getID().getSensorNumber() == 2) i_pixelKind += 2;
@@ -77,7 +77,7 @@ int SensorInfo::getPixelKind(const VxdID sensorID, double v) const
 
 int SensorInfo::getPixelKindNew(const VxdID& sensorID, int vID) const
 {
-  const SensorInfo& Info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+  const SensorInfo& Info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
   double v = Info.getVCellPosition(vID);
   double vPitch = Info.getVPitch(v);
   int  i_pixelKind = 0;

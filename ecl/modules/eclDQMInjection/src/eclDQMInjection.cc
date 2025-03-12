@@ -47,7 +47,7 @@ ECLDQMInjectionModule::ECLDQMInjectionModule()
            std::string("ECLINJ"));
   addParam("ECLDigitsName", m_ECLDigitsName, "Name of ECL hits", std::string(""));
   // BeamRevolutionCycle is set based on 'Timing distribution for the Belle II
-  // data acquistion system'. RF clock of 508 MHz is synchronized to
+  // data acquisition system'. RF clock of 508 MHz is synchronized to
   // beam-revolution cycle (5120 RF bunches in one cycle).
   addParam("BeamRevolutionCycle", m_revolutionTime, "Beam revolution cycle in musec", 5120 / 508.);
   addParam("ECLThresholdforVetoTuning", m_ECLThresholdforVetoTuning, "ECL Threshold for injection veto tuning, ADC channels", 400.);
@@ -81,12 +81,22 @@ void ECLDQMInjectionModule::defineHisto()
                               "Time since last injection in #mus;Time within beam cycle in #mus", 500, 0, 30000, 100, 0,
                               m_revolutionTime);
   hOccAfterInjLER = new TH2F("ECLOccAfterInjLER",
-                             "ECL Occupancy after LER injection (E > 1 MeV); Time since last injection in #mus;Occupancy (Nhits/ECLElementNumbers::c_NCrystals) [%]",
+                             "ECL Occupancy after LER injection (E > 1 MeV);Time since last injection in #mus;Occupancy (Nhits/8736) [%]",
                              100, 0, 20000, 98, 2, 100);
   hOccAfterInjHER = new TH2F("ECLOccAfterInjHER",
-                             "ECL Occupancy after HER injection (E > 1 MeV); Time since last injection in #mus;Occupancy (Nhits/ECLElementNumbers::c_NCrystals) [%]",
+                             "ECL Occupancy after HER injection (E > 1 MeV);Time since last injection in #mus;Occupancy (Nhits/8736) [%]",
                              100, 0, 20000, 98, 2, 100);
 
+  hInjkickTimeShift[0] = new TH2F("ECLInjkickTimeShiftLER",
+                                  "LER Injection peak position in ECL data;"
+                                  "Time within beam cycle [ADC ticks];"
+                                  "Inj peak position [ADC ticks]",
+                                  18, 0, 18, 16, 0, 16);
+  hInjkickTimeShift[1] = new TH2F("ECLInjkickTimeShiftHER",
+                                  "HER Injection peak position in ECL data;"
+                                  "Time within beam cycle [ADC ticks];"
+                                  "Inj peak position [ADC ticks]",
+                                  18, 0, 18, 16, 0, 16);
 
   //== Fill h_ped_peak vector
 
@@ -131,7 +141,7 @@ void ECLDQMInjectionModule::defineHisto()
 void ECLDQMInjectionModule::initialize()
 {
   REG_HISTOGRAM
-  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failin
+  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
   m_storeHits.isRequired(m_ECLDigitsName);
   m_ECLTrigs.isOptional();
   m_ECLDsps.isOptional();
@@ -145,7 +155,7 @@ void ECLDQMInjectionModule::initialize()
 
 void ECLDQMInjectionModule::beginRun()
 {
-  // Assume that everthing is non-yero ;-)
+  // Assume that everything is non-yero ;-)
   hHitsAfterInjLER->Reset();
   hHitsAfterInjHER->Reset();
   hEHitsAfterInjLER->Reset();
@@ -217,56 +227,87 @@ void ECLDQMInjectionModule::event()
     // get last injection time
     auto difference = it.GetTimeSinceLastInjection(0);
     // check time overflow, too long ago
-    if (difference != 0x7FFFFFFF) {
-      unsigned int all = m_storeHits.getEntries();
-      float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
-      int is_her = it.GetIsHER(0);
-      if (is_her) {
-        hHitsAfterInjHER->Fill(diff2, all);
-        hEHitsAfterInjHER->Fill(diff2);
-        hBurstsAfterInjHER->Fill(diff2, discarded_wfs);
-        hEBurstsAfterInjHER->Fill(diff2);
-        hVetoAfterInjHER->Fill(diff2, diff2 - int(diff2 / m_revolutionTime)*m_revolutionTime, ECLDigitsAboveThr);
-        if (all > 0) hOccAfterInjHER->Fill(diff2, ECLDigitsAboveThr1MeV / ECLElementNumbers::c_NCrystals * 100.);
-      } else {
-        hHitsAfterInjLER->Fill(diff2, all);
-        hEHitsAfterInjLER->Fill(diff2);
-        hBurstsAfterInjLER->Fill(diff2, discarded_wfs);
-        hEBurstsAfterInjLER->Fill(diff2);
-        hVetoAfterInjLER->Fill(diff2, diff2 - int(diff2 / m_revolutionTime)*m_revolutionTime, ECLDigitsAboveThr);
-        if (all > 0) hOccAfterInjLER->Fill(diff2, ECLDigitsAboveThr1MeV / ECLElementNumbers::c_NCrystals * 100.);
+    if (difference == 0x7FFFFFFF) continue;
+
+    unsigned int all = m_storeHits.getEntries();
+    float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+
+    // Time within beam revolution (in 127 MHz ticks)
+    int time_within_cycle = difference % 1280;
+    // Time within beam revolution (in microseconds)
+    double time_in_cycle_us = time_within_cycle / 127.;
+    // Time within beam revolution (in ADC ticks)
+    // https://xwiki.desy.de/xwiki/rest/p/4630a
+    int time_within_cycle_adc_ticks = (1280 - time_within_cycle) / 72;
+
+    int is_her = it.GetIsHER(0);
+
+    if (is_her < 0 || is_her > 1) continue;
+
+    if (is_her) {
+      hHitsAfterInjHER->Fill(diff2, all);
+      hEHitsAfterInjHER->Fill(diff2);
+      hBurstsAfterInjHER->Fill(diff2, discarded_wfs);
+      hEBurstsAfterInjHER->Fill(diff2);
+      hVetoAfterInjHER->Fill(diff2, time_in_cycle_us, ECLDigitsAboveThr);
+      if (all > 0) hOccAfterInjHER->Fill(diff2, ECLDigitsAboveThr1MeV * 100.0 / ECLElementNumbers::c_NCrystals);
+    } else {
+      hHitsAfterInjLER->Fill(diff2, all);
+      hEHitsAfterInjLER->Fill(diff2);
+      hBurstsAfterInjLER->Fill(diff2, discarded_wfs);
+      hEBurstsAfterInjLER->Fill(diff2);
+      hVetoAfterInjLER->Fill(diff2, time_in_cycle_us, ECLDigitsAboveThr);
+      if (all > 0) hOccAfterInjLER->Fill(diff2, ECLDigitsAboveThr1MeV * 100.0 / ECLElementNumbers::c_NCrystals);
+    }
+
+    //== Filling h_ped_peak histograms
+    int range_count = m_ped_peak_range.size() - 1;
+    if (diff2 < m_ped_peak_range[range_count] * 1000) {
+      //== Identify which histogram to fill (according to inj time range)
+      int range_id;
+      for (range_id = 0; range_id < range_count; range_id++) {
+        // Converting from ms to us
+        float min_time = m_ped_peak_range[range_id    ] * 1000;
+        float max_time = m_ped_peak_range[range_id + 1] * 1000;
+        if (diff2 > min_time && diff2 < max_time) break;
       }
+      //== Find pedestal peaks in all available waveforms
+      if (range_id < range_count) {
+        for (auto& aECLDsp : m_ECLDsps) {
+          auto result = ECLDspUtilities::pedestalFit(aECLDsp.getDspA());
 
-      //== Filling h_ped_peak histograms
-      int range_count = m_ped_peak_range.size() - 1;
-      if (diff2 < m_ped_peak_range[range_count] * 1000) {
-        //== Identify which histogram to fill (according to inj time range)
-        int range_id;
-        for (range_id = 0; range_id < range_count; range_id++) {
-          // Converting from ms to us
-          float min_time = m_ped_peak_range[range_id    ] * 1000;
-          float max_time = m_ped_peak_range[range_id + 1] * 1000;
-          if (diff2 > min_time && diff2 < max_time) break;
-        }
-        //== Find pedestal peaks in all available waveforms
-        if (range_id < range_count) {
-          for (auto& aECLDsp : m_ECLDsps) {
-            auto result = ECLDspUtilities::pedestalFit(aECLDsp.getDspA());
+          //== Identify which histogram to fill (HER/LER,FWD/BAR/BWD)
+          int cid = aECLDsp.getCellId();
+          int part_id = 0;              // forward endcap
+          if (ECLElementNumbers::isBarrel(cid)) part_id = 1; // barrel
+          if (ECLElementNumbers::isBackward(cid)) part_id = 2; // backward endcap
 
-            //== Identify which histogram to fill (HER/LER,FWD/BAR/BWD)
-            int cid = aECLDsp.getCellId();
-            int part_id = 0;              // forward endcap
-            if (ECLElementNumbers::isBarrel(cid)) part_id = 1; // barrel
-            if (ECLElementNumbers::isBackward(cid)) part_id = 2; // backward endcap
-
-            int hist_id = is_her * 3 * range_count + part_id * range_count + range_id;
-            // NOTE: We are using the approximate conversion to energy here.
-            // (20'000 ADC counts ~= 1 GeV)
-            h_ped_peak[hist_id]->Fill(result.amp / 2e4);
-          }
+          int hist_id = is_her * 3 * range_count + part_id * range_count + range_id;
+          // NOTE: We are using the approximate conversion to energy here.
+          // (20'000 ADC counts ~= 1 GeV)
+          h_ped_peak[hist_id]->Fill(result.amp / 2e4);
         }
       }
     }
+
+    //== Filling hInjkickTimeShift histograms
+
+    if (diff2 < 10e3) {
+      for (auto& aECLDsp : m_ECLDsps) {
+        int adc[31];
+        aECLDsp.getDspA(adc);
+        // Do a naive estimate of inj peak position by
+        // searching for the maximum ADC sample in the
+        // pedestal part of the waveform.
+        int* ped_max = std::max_element(adc, adc + 16);
+        int* ped_min = std::min_element(adc, adc + 16);
+        // The waveform should have at least ~10 MeV peak amplitude
+        if (*ped_max - *ped_min < 200) continue;
+        int max_ped_id = ped_max - adc;
+        hInjkickTimeShift[is_her]->Fill(time_within_cycle_adc_ticks, max_ped_id);
+      }
+    }
+
 
     break;
   }

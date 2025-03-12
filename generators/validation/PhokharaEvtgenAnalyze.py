@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 <header>
@@ -21,7 +20,7 @@ class PhokharaEvtgenAnalysisModule(b2.Module):
 
     def __init__(self):
         """Initialization."""
-        super(PhokharaEvtgenAnalysisModule, self).__init__()
+        super().__init__()
         #: Output file.
         self.output_file = ROOT.TFile('PhokharaEvtgenAnalysis.root', 'recreate')
         #: Output tree.
@@ -101,6 +100,8 @@ class PhokharaEvtgenAnalysisModule(b2.Module):
         self.output_file.Close()
 
 
+#: \cond Doxygen_suppress
+
 # Input.
 root_input = b2.register_module('RootInput')
 root_input.param('inputFileName', 'PhokharaEvtgenData.root')
@@ -110,6 +111,8 @@ phokhara_evtgen = PhokharaEvtgenAnalysisModule()
 
 # Create main path.
 main = b2.create_path()
+
+#: \endcond
 
 # Add modules to main path
 main.add_module(root_input)

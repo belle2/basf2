@@ -103,7 +103,7 @@ namespace Belle2 {
           component.getHeight() = sub.getHeight() + p.getWOffset();
         }
 
-        //Check if compoent will fit inside width,length. If we can resize do it if needed, otherwise bail
+        //Check if component will fit inside width,length. If we can resize do it if needed, otherwise bail
         double minWidth =  max(abs(p.getU() + sub.getWidth() / 2.0), abs(p.getU() - sub.getWidth() / 2.0));
         double minLength = max(abs(p.getV() + sub.getLength() / 2.0), abs(p.getV() - sub.getLength() / 2.0));
         if (minWidth > component.getWidth() + component.getWidth() * numeric_limits<double>::epsilon()) {
@@ -215,7 +215,7 @@ namespace Belle2 {
       const double width = params.getWidth();
       const double length = params.getLength();
       const double height = params.getHeight();
-      G4Box* shape = new G4Box("radiationSensorDiamond", width / 2 * CLHEP::cm, length / 2 * CLHEP::cm, height / 2 * CLHEP::cm);
+      G4Box* shape = 0;
       G4Material* material = geometry::Materials::get(params.getMaterial());
 
       //Now loop over all positions
@@ -235,6 +235,7 @@ namespace Belle2 {
           //then we create a nice name
           const std::string name = params.getSubDetector() + ".DiamondSensor." + std::to_string(id);
           //and create the sensor volume
+          if (not shape) shape = new G4Box("radiationSensorDiamond", width / 2 * CLHEP::cm, length / 2 * CLHEP::cm, height / 2 * CLHEP::cm);
           G4LogicalVolume* volume = new G4LogicalVolume(shape, material, name);
           //add a sensitive detector implementation
           BkgSensitiveDetector* sensitive = new BkgSensitiveDetector(params.getSubDetector().c_str(), id);
@@ -281,7 +282,7 @@ namespace Belle2 {
 
       G4Translate3D ladderPos(m_ladder.getRadius(), m_ladder.getShift(), 0);
       G4Transform3D ladderPlacement = placement * G4RotateZ3D(phi) * ladderPos * getAlignment(parameters.getAlignment(ladder));
-      // The actuall coordinate system of ladder (w still points to Z, there is only phi rotation + move to correct radius + shift)
+      // The actual coordinate system of ladder (w still points to Z, there is only phi rotation + move to correct radius + shift)
       VXD::GeoCache::getInstance().addLadderPlacement(m_halfShellVxdIDs[m_currentHalfShell], ladder, ladderPlacement);
 
 

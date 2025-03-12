@@ -11,8 +11,6 @@
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
-#include <vector>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -35,14 +33,19 @@ void WireHitBackgroundDetector::exposeParameters(ModuleParamList* moduleParamLis
 
 void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
 {
-  for (CDCWireHit& wireHit : wireHits) {
+  // we will apply classifier to all hits at once, this is much faster for python-based MVA
+  std::vector<CDCWireHit*> wireHitsPtr(wireHits.size());
+  for (size_t iHit = 0;  iHit < wireHits.size(); iHit += 1) {
+    wireHitsPtr[iHit] = &wireHits[iHit];
+  }
 
-    Weight wireHitWeight = m_wireHitFilter(wireHit);
+  auto probs = m_wireHitFilter(wireHitsPtr);
 
-    if (std::isnan(wireHitWeight)) {
-      wireHit->setBackgroundFlag();
-      wireHit->setTakenFlag();
-      wireHit->setBadADCOrTOTFlag();
+  for (size_t iHit = 0; iHit < probs.size(); iHit += 1) {
+    if (std::isnan(probs[iHit])) {
+      wireHits[iHit]->setTakenFlag();
+      wireHits[iHit]->setBackgroundFlag();
+      wireHits[iHit]->setBadADCOrTOTFlag();
     }
   }
 }

@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  /** ClassDosiHit - Geant4 ulated hit for the Dosi crystal in beast..
+  /** ClassDosiHit - Geant4 ulated hit for the Dosi crystal in beast.
     *
     * This class holds particle hit data from geant4 ulation. As the ulated
     * hit classes are used to generate detector response information.

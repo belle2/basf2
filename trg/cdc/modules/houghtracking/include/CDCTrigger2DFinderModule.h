@@ -101,12 +101,12 @@ namespace Belle2 {
                             unsigned ix_s, unsigned iy_s);
 
     /** count the number of super layers with hits
-     *  @param array of hit/no hit for all super layers */
-    unsigned short countSL(bool*);
+     *  @param superLayers array of hit/no hit for all super layers */
+    unsigned short countSL(bool* superLayers);
     /** check the short track condition
      *  (= hits in the inner super layers rather than any super layers)
-     *  @param array of hit/no hit for all super layers */
-    bool shortTrack(bool*);
+     *  @param superLayers array of hit/no hit for all super layers */
+    bool shortTrack(bool* superLayers);
 
     /** Combine Hough candidates to tracks by merging connected cells.
      *  The track coordinate is the center of gravity of the resulting cell cluster. */
@@ -225,6 +225,12 @@ namespace Belle2 {
     /** switch to send only the first found track and suppress the subsequent clones */
     bool m_suppressClone;
 
+    /** switch to use hit pattern inside TSF */
+    bool m_usehitpattern;
+
+    /** switch to use hit pattern inside TSF with ADC cut*/
+    bool m_useadc;
+
     /** switch to save the Hough plane in DataStore
      *  (0: don't save, 1: save only peaks, 2: save full plane) */
     unsigned m_storePlane;
@@ -257,7 +263,7 @@ namespace Belle2 {
     std::vector<CDCTriggerHoughCand> houghCand;
 
     /** Radius of the CDC layers with priority wires (2 per super layer). Initialized at 0 by the SW shifter*/
-    double radius[9][2] = {{0.}};
+    double radius[9][5] = {{0.}};
     /** Number of track segments up to super layer. Initialized at 0 by the SW shifter */
     unsigned TSoffset[10] = {0};
 

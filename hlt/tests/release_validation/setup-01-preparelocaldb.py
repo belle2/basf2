@@ -90,8 +90,8 @@ if __name__ == "__main__":
 
     db = ConditionsDB()
 
-    # check if we have a prepared globaltag to check Also allow overriding this in
-    # a bamboo build variable if necessary. If we have a prepared globaltag we don't
+    # check if we have a prepared globaltag to check Also allow overriding this variable in
+    # a GitLab pipeline if necessary. If we have a prepared globaltag we don't
     # build our own version but just download it.
     existing_gt = os.environ.get("VALIDATION_GLOBALTAG", "").strip()
     if existing_gt:

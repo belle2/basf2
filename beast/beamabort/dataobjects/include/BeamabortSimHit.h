@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  /** ClassBeamabortSimHit - Geant4 simulated hit for the Beamabort crystal in beast..
+  /** ClassBeamabortSimHit - Geant4 simulated hit for the Beamabort crystal in beast.
     *
     * This class holds particle hit data from geant4 simulation. As the simulated
     * hit classes are used to generate detector response information.

@@ -20,7 +20,7 @@ import sys
 # Example of simulation/reconstruction of events with beam background only.
 #
 # This example runs full simulation of beam BG only events using BGOverlayExecutor,
-# then runs full reconstruction and finaly writes the results to mdst file.
+# then runs full reconstruction and finally writes the results to mdst file.
 # ---------------------------------------------------------------------------------
 
 b2.set_log_level(b2.LogLevel.ERROR)
@@ -44,7 +44,7 @@ eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Simulation
-add_simulation(main, bkgfiles=bg, bkgOverlay=True)
+add_simulation(main, bkgfiles=bg, bkgOverlay=True, simulateT0jitter=False)
 
 # Set debug level for overlay executor module (all instances)
 paths = [main]

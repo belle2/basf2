@@ -13,6 +13,7 @@
 #include <framework/logging/Logger.h>
 
 #include <list>
+#include <memory>
 
 namespace Belle2 {
   /**

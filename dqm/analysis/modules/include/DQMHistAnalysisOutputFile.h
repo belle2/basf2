@@ -13,6 +13,9 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 
 #include <string>
 
@@ -40,11 +43,6 @@ namespace Belle2 {
     void initialize() override final;
 
     /**
-     * Called when entering a new run.
-     */
-    void beginRun() override final;
-
-    /**
      * This method is called for each event.
      */
     void event() override final;
@@ -59,13 +57,25 @@ namespace Belle2 {
      */
     void terminate() override final;
 
+    /**
+     * Opens the root file and saves the content.
+     */
+    void save_to_file();
+
     // Data members
   private:
 
+    std::string m_folder;/**< output folder to save root file */
+    std::string m_prefix;/**< prefix for the output file name */
     std::string m_filename;/**< file name of root file */
-    std::string m_histogramDirectoryName;/**< Directory name within root file where to place things */
+
     bool m_saveHistos;/**< Write all Histos to file */
     bool m_saveCanvases;/**< Write all Canvases to file */
+    bool m_savePerEvent;/**< Whether save to file per event */
+    bool m_savePerRun;/**< Whether save to file per run */
+
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;/**< event metadata object*/
+
   };
 } // end namespace Belle2
 

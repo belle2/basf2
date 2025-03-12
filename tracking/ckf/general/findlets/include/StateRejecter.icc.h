@@ -41,12 +41,28 @@ namespace Belle2 {
     B2DEBUG(29, "Starting with " << childStates.size() << " states.");
     m_firstFilter.apply(currentPath, childStates);
     B2DEBUG(29, "After first filter " << childStates.size() << " states.");
+    // Nothing to do anymore
+    if (childStates.size() == 0) {
+      return;
+    }
     m_advanceFilter.apply(currentPath, childStates);
     B2DEBUG(29, "After advance filter " << childStates.size() << " states.");
+    // Nothing to do anymore
+    if (childStates.size() == 0) {
+      return;
+    }
     m_secondFilter.apply(currentPath, childStates);
     B2DEBUG(29, "After second filter " << childStates.size() << " states.");
+    // Nothing to do anymore
+    if (childStates.size() == 0) {
+      return;
+    }
     m_updateFilter.apply(currentPath, childStates);
     B2DEBUG(29, "After update filter " << childStates.size() << " states.");
+    // Nothing to do anymore
+    if (childStates.size() == 0) {
+      return;
+    }
     m_thirdFilter.apply(currentPath, childStates);
     B2DEBUG(29, "After third filter " << childStates.size() << " states.");
   };

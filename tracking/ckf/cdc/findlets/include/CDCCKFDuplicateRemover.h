@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/ckf/cdc/entities/CDCCKFResult.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 #include <tracking/ckf/cdc/filters/paths/CDCPathFilterFactory.h>
 
 #include <tracking/ckf/cdc/filters/pathPairs/CDCPathPairFilterFactory.h>
@@ -90,7 +90,7 @@ namespace Belle2 {
           // find tracks from same seed
           if (iter2->front().getSeed()->getRelated<ECLShower>() == iter2->front().getSeed()->getRelated<ECLShower>()) {
             // let filter decide which one to keep
-            bool selectFirst = m_filter_duplicateTrack({&*iter, &*iter2}) > 0;
+            bool selectFirst = m_filter_duplicateTrack(std::pair(&*iter, &*iter2)) > 0;
             if (selectFirst) {
               iter2 = goodResults.erase(iter2);
             } else {
@@ -134,13 +134,13 @@ namespace Belle2 {
           if (std::abs(ROOT::Math::VectorUtil::Phi_mpi_pi(iter2->front().getSeed()->getPositionSeed().Phi() - phiClus)) < duplicateSeed_maxPhi
               && std::abs(iter2->front().getSeed()->getPositionSeed().Theta() - thetaClus) < duplicateSeed_maxTheta) {
             // let filter decide which one to keep
-            bool isDuplicate = m_filter_duplicateSeed({&*iter, &*iter2}) > 0;
+            bool isDuplicate = m_filter_duplicateSeed(std::pair(&*iter, &*iter2)) > 0;
             if (! isDuplicate) {
               B2DEBUG(29, "Keeping both tracks");
               ++iter2;
             } else {
               B2DEBUG(29, "Duplicate hits found");
-              bool selectFirst = m_filter_duplicateTrack({&*iter, &*iter2}) > 0;
+              bool selectFirst = m_filter_duplicateTrack(std::pair(&*iter, &*iter2)) > 0;
               if (selectFirst) {
                 iter2 = goodResults.erase(iter2);
               } else {

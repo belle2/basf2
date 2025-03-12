@@ -31,9 +31,6 @@
 #include <framework/logging/Logger.h>
 
 #include <vector>
-#include <iostream>
-#include <cmath>
-
 
 namespace Belle2 {
   namespace Variable {

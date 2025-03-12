@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -33,6 +32,7 @@ class SetMetaTimeModule(Module):
 
     def initialize(self):
         """initialize"""
+        #: Store object of EventMetaData
         self.meta = Belle2.PyStoreObj('EventMetaData')
         if not self.meta:
             B2FATAL("no EventMetaData object")

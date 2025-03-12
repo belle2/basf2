@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 
   RFConf* conf = new RFConf(argv[1]);
 
-  int nnodes = 0;
+  int nnodes [[maybe_unused]] = 0;
   int maxnodes = conf->getconfi("processor", "nnodes");
   int idbase = conf->getconfi("processor", "idbase");
   char* hostbase = conf->getconf("processor", "ctlhostbase");

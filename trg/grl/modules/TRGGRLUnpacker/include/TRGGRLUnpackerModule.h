@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace TRGGRLUNPACKERSPACE {
 
     /** num of leafs in data_b2l **/
-    const int nLeafs = 128 + 3 + 32 + 7;
+    const int nLeafs = 128 + 7 + 32 + 7;
     /** num of leafs for others **/
     const int nLeafsExtra = 7;
     /** num of clk time window **/
@@ -65,11 +65,15 @@ namespace Belle2 {
       "1GeV_2",
       "1GeV_1",
       "1GeV_0",
-      "wire_tsf0",
-      "wire_tsf2",
-      "wire_tsf4",
-      "wire_tsf1",
-      "wire_tsf3",
+      "wirecnt_tsf8",
+      "wirecnt_tsf7",
+      "wirecnt_tsf6",
+      "wirecnt_tsf5",
+      "wirecnt_tsf4",
+      "wirecnt_tsf3",
+      "wirecnt_tsf2",
+      "wirecnt_tsf1",
+      "wirecnt_tsf0",
       "theta_11",
       "phi_11",
       "t_11",
@@ -239,11 +243,15 @@ namespace Belle2 {
       e_1GeV_2,
       e_1GeV_1,
       e_1GeV_0,
-      e_wire_tsf0,
-      e_wire_tsf2,
-      e_wire_tsf4,
-      e_wire_tsf1,
-      e_wire_tsf3,
+      e_wirecnt_tsf8,
+      e_wirecnt_tsf7,
+      e_wirecnt_tsf6,
+      e_wirecnt_tsf5,
+      e_wirecnt_tsf4,
+      e_wirecnt_tsf3,
+      e_wirecnt_tsf2,
+      e_wirecnt_tsf1,
+      e_wirecnt_tsf0,
       e_theta_11,
       e_phi_11,
       e_t_11,
@@ -416,11 +424,15 @@ namespace Belle2 {
       {1993, 0}, // 1GeV_1
       {1992, 0}, // 1GeV_0
 
-      {1584 + 31, 31}, // wire counter TSF0
-      {1552 + 31, 31}, // wire counter TSF2
-      {1520 + 31, 31}, // wire counter TSF4
-      {1488 + 31, 31}, // wire counter TSF1
-      {1456 + 31, 31}, // wire counter TSF3
+      {1563, 11}, // wirecnt_tsf8
+      {1551, 11}, // wirecnt_tsf7
+      {1539, 11}, // wirecnt_tsf6
+      {1527, 11}, // wirecnt_tsf5
+      {1515, 11}, // wirecnt_tsf4
+      {1503, 11}, // wirecnt_tsf3
+      {1491, 11}, // wirecnt_tsf2
+      {1479, 11}, // wirecnt_tsf1
+      {1467, 11}, // wirecnt_tsf0
 
       {1671 - 216, 6}, // theta_11
       {1664 - 216, 7}, // phi_11
@@ -610,11 +622,15 @@ namespace Belle2 {
       if (leafID == e_1GeV_1) return store->get_1GeV_ECL(1);
       if (leafID == e_1GeV_0) return store->get_1GeV_ECL(0);
 
-      if (leafID == e_wire_tsf0) return store->get_wire_tsf0();
-      if (leafID == e_wire_tsf2) return store->get_wire_tsf2();
-      if (leafID == e_wire_tsf4) return store->get_wire_tsf4();
-      if (leafID == e_wire_tsf1) return store->get_wire_tsf1();
-      if (leafID == e_wire_tsf3) return store->get_wire_tsf3();
+      if (leafID == e_wirecnt_tsf0) return store->get_wirecnt_tsf0();
+      if (leafID == e_wirecnt_tsf1) return store->get_wirecnt_tsf1();
+      if (leafID == e_wirecnt_tsf2) return store->get_wirecnt_tsf2();
+      if (leafID == e_wirecnt_tsf3) return store->get_wirecnt_tsf3();
+      if (leafID == e_wirecnt_tsf4) return store->get_wirecnt_tsf4();
+      if (leafID == e_wirecnt_tsf5) return store->get_wirecnt_tsf5();
+      if (leafID == e_wirecnt_tsf6) return store->get_wirecnt_tsf6();
+      if (leafID == e_wirecnt_tsf7) return store->get_wirecnt_tsf7();
+      if (leafID == e_wirecnt_tsf8) return store->get_wirecnt_tsf8();
 
       if (leafID == e_theta_11) return store->get_theta_ECL(11);
       if (leafID == e_phi_11) return store->get_phi_ECL(11);
@@ -798,11 +814,15 @@ namespace Belle2 {
       if (leafID == e_1GeV_1) store->set_1GeV_ECL(1, value);
       if (leafID == e_1GeV_0) store->set_1GeV_ECL(0, value);
 
-      if (leafID == e_wire_tsf0) store->set_wire_tsf0(value);
-      if (leafID == e_wire_tsf2) store->set_wire_tsf2(value);
-      if (leafID == e_wire_tsf4) store->set_wire_tsf4(value);
-      if (leafID == e_wire_tsf1) store->set_wire_tsf1(value);
-      if (leafID == e_wire_tsf3) store->set_wire_tsf3(value);
+      if (leafID == e_wirecnt_tsf0) store->set_wirecnt_tsf0(value);
+      if (leafID == e_wirecnt_tsf1) store->set_wirecnt_tsf1(value);
+      if (leafID == e_wirecnt_tsf2) store->set_wirecnt_tsf2(value);
+      if (leafID == e_wirecnt_tsf3) store->set_wirecnt_tsf3(value);
+      if (leafID == e_wirecnt_tsf4) store->set_wirecnt_tsf4(value);
+      if (leafID == e_wirecnt_tsf5) store->set_wirecnt_tsf5(value);
+      if (leafID == e_wirecnt_tsf6) store->set_wirecnt_tsf6(value);
+      if (leafID == e_wirecnt_tsf7) store->set_wirecnt_tsf7(value);
+      if (leafID == e_wirecnt_tsf8) store->set_wirecnt_tsf8(value);
 
       if (leafID == e_theta_11) store->set_theta_ECL(11, value);
       if (leafID == e_phi_11) store->set_phi_ECL(11, value);

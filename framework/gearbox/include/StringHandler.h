@@ -32,7 +32,7 @@ namespace Belle2 {
     /**
      * InputHandler which just takes the uri as XML data.
      * Intended for ease of unit testing, beware that the current implementation
-     * does always return the same fragment regardles of resource name, so
+     * does always return the same fragment regardless of resource name, so
      * xincludes will lead to endless loop
      */
     class StringHandler: public InputHandler {

@@ -26,7 +26,7 @@ CDCTangentSegment CDCTangentSegment::condense(const std::vector<const CDCFacet* 
 
       tangentSegment.push_back(facet.getStartToMiddle());
       //tangentSegment.push_back(facet.getStartToEnd());
-      //the alignement of the tangents does not play a major role here
+      //the alignment of the tangents does not play a major role here
     }
     tangentSegment.push_back(facetPath.back()->getMiddleToEnd());
   }

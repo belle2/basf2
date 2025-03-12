@@ -47,7 +47,7 @@ PXDDQMClustersModule::PXDDQMClustersModule() : HistoModule()
 {
   //Set module properties
   setDescription("PXD DQM clusters module "
-                 "Recommended Number of events for monitorin is 40 kEvents or more to fill all histograms "
+                 "Recommended Number of events for monitoring is 40 kEvents or more to fill all histograms "
                 );
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
@@ -171,7 +171,7 @@ void PXDDQMClustersModule::defineHisto()
     int iLadder = id.getLadderNumber();
     int iSensor = id.getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
-    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     auto nUPixels = SensorInfo.getUCells();/** Number of pixels on PXD u direction */
     auto nVPixels = SensorInfo.getVCells();/** Number of pixels on PXD v direction */
@@ -425,7 +425,7 @@ void PXDDQMClustersModule::event()
     int iSensor = digit.getSensorID().getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getPXDSensorIndex(sensorID);
-    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     Pixels[index]++;
     int iChip = PXDMappingLookup::getDCDID(digit.getUCellID(), digit.getVCellID(), sensorID);
     int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);
@@ -459,7 +459,7 @@ void PXDDQMClustersModule::event()
     int iSensor = cluster.getSensorID().getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getPXDSensorIndex(sensorID);
-    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     Clusters[index]++;
     int iChip = PXDMappingLookup::getDCDID(SensorInfo.getUCellID(cluster.getU()), SensorInfo.getVCellID(cluster.getV()), sensorID);
     int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);
@@ -521,7 +521,7 @@ void PXDDQMClustersModule::event()
     for (auto& cluster : storePXDClusters) {
       VxdID sensorID = cluster.getSensorID();
       int index = gTools->getPXDSensorIndex(sensorID);
-      PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
 
       float fDistance = SensorInfo.getVCellID(cluster.getV()) - startRows[cluster.getSensorID()];
       if (fDistance < 0) fDistance += SensorInfo.getVCells();

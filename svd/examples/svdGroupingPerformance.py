@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -61,7 +60,7 @@ parser.add_argument("--CoG3TimeCalibration_bucket32", action="store_true",
 parser.add_argument("--is3sample", action="store_true",
                     help="Emulate SVD 3 samples")
 parser.add_argument("--executionTime", action="store_true",
-                    help="Store exection time tree")
+                    help="Store execution time tree")
 parser.add_argument("--test", action="store_true",
                     help="Test with small numbers of events")
 args = parser.parse_args()
@@ -119,7 +118,7 @@ class SVDGroupingPerformance(b2.Module):
 
         timeBin = int(maxTime - minTime)
 
-        #: \cond
+        #: \cond Doxygen_suppress
         self.TH1F_Index = {}
         self.TH1F_Store = []
         TH1F_Store_Count = 0
@@ -694,7 +693,8 @@ else:
 trk.add_tracking_reconstruction(
     main,
     mcTrackFinding=MCTracking,
-    append_full_grid_cdc_eventt0=True)
+    append_full_grid_cdc_eventt0=True,
+    skip_full_grid_cdc_eventt0_if_svd_time_present=False)
 
 main.add_module(SVDGroupingPerformance())
 

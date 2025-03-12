@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "run this scipt: source CalibrationCheck_Input_Files_List_tool.sh <name of the folder that will cointain the txt output files>"
+echo "run this script: source CalibrationCheck_Input_Files_List_tool.sh <name of the folder that will contain the txt output files>"
 
 OUTPUTLIST=${1}
 

@@ -31,6 +31,5 @@ namespace Belle2 {
   typedef boost::multi_array<c2elem, 2> c2array;
   typedef c2array::index c2index;
   typedef std::vector<c3index> cell_index;
-  typedef unsigned short ushort;
 }
 #endif

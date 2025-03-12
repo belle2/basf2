@@ -15,18 +15,26 @@
 
 namespace Belle2 {
 
-  /* Default binning in a (7/32) phi-sector */
-  struct ndbinning {
-    c5elem omega = 40;
-    c5elem phi = 84;
-    c5elem theta = 9;
-    c5elem hitid; // 41 axial, 32 stereo
-    c5elem prio = 3;
+  /* Data type to collect a binning */
+  struct SectorBinning {
+    c5elem omega;
+    c5elem phi;
+    c5elem theta;
+    c5elem hitid;
+    c5elem priorityWire;
   };
 
-  struct cellweight {
+  /* Data type for a cluster cell */
+  struct CellWeight {
     cell_index index;
-    ushort weight;
+    unsigned short weight;
+  };
+
+  struct HitInfo {
+    unsigned short relativeWireID;
+    unsigned short priorityWire;
+    short Dstart;
+    SectorBinning bins;
   };
 
   /* Store track parameters of found tracks. */
@@ -148,9 +156,9 @@ namespace Belle2 {
       delete m_parrayAxial;
       delete m_parrayStereo;
       delete m_phoughPlane;
-      delete m_trackSegmentToSectorIDs;
-      delete m_pcompAxial;
-      delete m_pcompStereo;
+      delete m_hitToSectorIDs;
+      delete m_compAxialHitReps;
+      delete m_compStereoHitReps;
       delete m_parrayAxialExp;
       delete m_parrayStereoExp;
     }
@@ -180,10 +188,10 @@ namespace Belle2 {
     void reset()
     {
       m_NDFinderTracks.clear();
-      m_hitIds.clear();
+      m_hitIDs.clear();
       m_hitSLIds.clear();
-      m_prioPos.clear();
-      m_prioTime.clear();
+      m_priorityWirePos.clear();
+      m_priorityWireTime.clear();
       m_nHits = 0;
       m_vecDstart.clear();
       m_hitOrients.clear();
@@ -196,10 +204,10 @@ namespace Belle2 {
     void addHit(unsigned short hitId, unsigned short hitSLId, unsigned short hitPrioPos, long hitPrioTime)
     {
       if (hitPrioPos > 0) { // skip "no hit"
-        m_hitIds.push_back(hitId);
+        m_hitIDs.push_back(hitId);
         m_hitSLIds.push_back(hitSLId);
-        m_prioPos.push_back(3 - hitPrioPos);
-        m_prioTime.push_back(hitPrioTime);
+        m_priorityWirePos.push_back(3 - hitPrioPos);
+        m_priorityWireTime.push_back(hitPrioTime);
         m_nHits++;
       }
     }
@@ -219,27 +227,28 @@ namespace Belle2 {
     /* Initialize the binnings and reserve the arrays */
     void initBins();
 
-    /* Fills the m_trackSegmentToSectorIDs array */
+    /* Fills the m_hitToSectorIDs array */
     void initHitToSectorMap(c2array& mapArray);
 
     /* Load an NDFinder array of hit representations in track phase space. */
     /* Used to load axial and stereo hit arrays. */
     /* Represented in a 7/32 phi sector of the CDC. */
-    void loadArray(const std::string& filename, ndbinning bins, c5array& hitsToTracks);
+    void loadHitRepresentations(const std::string& filename, SectorBinning bins, c5array& hitsToTracks);
 
     /* Restore non-zero suppressed hit curves. */
     /* will make m_params.arrayAxialFile and m_params.arrayStereoFile obsolete */
-    void restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, const c5array& compArray);
+    void restoreZeros(SectorBinning zerobins, SectorBinning compbins, c5array& expArray, const c5array& compArray);
 
     /* Squeeze phi-axis in a 2D (omega,phi) plane */
     /* @param inparcels number of 1/32 sectors in input plane */
     /* @param outparcels number of 1/32 sectors in output plane */
-    void squeezeOne(c5array& writeArray, c5array& readArray, int outparcels, int inparcels, c5index ihit, c5index iprio, c5index itheta,
+    void squeezeOne(c5array& writeArray, c5array& readArray, int outparcels, int inparcels, c5index ihit, c5index priorityIndex,
+                    c5index itheta,
                     c5elem nomega);
 
     /* Loop over all hits and theta bins and squeeze all */
     /* 2D (omega,phi) planes */
-    void squeezeAll(ndbinning writebins, c5array& writeArray, c5array& readArray, int outparcels, int inparcels);
+    void squeezeAll(SectorBinning writebins, c5array& writeArray, c5array& readArray, int outparcels, int inparcels);
 
     /* Core track finding logic in the constructed houghmap */
     void getCM();
@@ -251,8 +260,7 @@ namespace Belle2 {
     void addLookup(unsigned short ihit);
 
     /* In place array addition to houghmap Comp: A = A + B */
-    void addC3Comp(ushort hitr, ushort prio, const c5array& hitsToTracks,
-                   short Dstart, ndbinning bins);
+    void addC3Comp(const HitInfo& hitInfo, const c5array& hitsToTracks);
 
     /* Create hits to clusters confusion matrix */
     std::vector<std::vector<unsigned short>> getHitsVsClusters(
@@ -263,7 +271,7 @@ namespace Belle2 {
 
     /* Determine weight contribution of a single hit to a single cell. */
     /* Used to create the hitsVsClusters confusion matrix. */
-    ushort hitContrib(cell_index peak, ushort ihit);
+    unsigned short hitContrib(cell_index peak, unsigned short ihit);
 
     /* Relate all hits in a cluster to the cluster */
     /* Remove small clusters with less than minsuper related hits. */
@@ -273,10 +281,10 @@ namespace Belle2 {
 
     /* Candidate cells as seed for the clustering. */
     /* Selects all cells with weight > minWeight */
-    std::vector<cellweight> getHighWeight(std::vector<cell_index> entries, float cutoff);
+    std::vector<CellWeight> getHighWeight(std::vector<cell_index> entries, float cutoff);
 
     /* Calculate the weighted center of a cluster */
-    std::vector<double> getWeightedMean(std::vector<cellweight>);
+    std::vector<double> getWeightedMean(std::vector<CellWeight>);
 
     /* Scale the weighted center to track parameter values */
     std::vector<double> getBinToVal(std::vector<double>);
@@ -298,7 +306,7 @@ namespace Belle2 {
 
     /* TS-Ids of the hits in the current event */
     /* elements: [0,2335] for 2336 TS in total */
-    std::vector<unsigned short> m_hitIds;
+    std::vector<unsigned short> m_hitIDs;
 
     /* SL-Ids of the hits in the current event */
     /* elements: super layer number in [0,1,...,8] */
@@ -307,10 +315,10 @@ namespace Belle2 {
     /* Priority positon within the TS in the current event */
     /* elements basf2: [0,3] first, left, right, no hit */
     /* elements stored: 3 - basf2prio */
-    std::vector<unsigned short> m_prioPos;
+    std::vector<unsigned short> m_priorityWirePos;
 
     /* Drift time of the priority wire */
-    std::vector<long> m_prioTime;
+    std::vector<long> m_priorityWireTime;
 
     /* Orients */
     /* TS-Ids of the hits in the current event */
@@ -339,8 +347,8 @@ namespace Belle2 {
     /* Track segments */
     unsigned short m_nTS{0}; // Number of track segments
     unsigned short m_nSL{0}; // Number of super layers
-    unsigned short m_nAx{0}; // Number of unique axial track segments
-    unsigned short m_nSt{0}; // Number of unique stereo track segments
+    unsigned short m_nAxial{0}; // Number of unique axial track segments
+    unsigned short m_nStereo{0}; // Number of unique stereo track segments
     unsigned short m_nPrio{0}; // Number of priority wires
 
     /* Full Hough space bins */
@@ -355,34 +363,34 @@ namespace Belle2 {
 
     /* Phi sectors in the CDC */
     unsigned short m_nPhiSector{0}; // Bins of one phi sector
-    unsigned short m_nPhiComp{0}; // Bins of compressed phi
+    unsigned short m_nPhiComp{0}; // Bins of compressed phi: phi_start, phi_width, phi_0, ..., phi_12
     unsigned short m_nPhiUse{0}; // Bins of 7 phi sectors
     unsigned short m_nPhiExp{0}; // Bins of 11 phi sectors
 
     /* Binnings in different hit pattern arrays */
-    ndbinning m_axBins;
-    ndbinning m_stBins;
-    ndbinning m_fullBins;
-    ndbinning m_compAxBins;
-    ndbinning m_compStBins;
-    ndbinning m_expAxBins;
-    ndbinning m_expStBins;
+    SectorBinning m_compAxialBins;
+    SectorBinning m_compStereoBins;
+    SectorBinning m_axialBins;
+    SectorBinning m_stereoBins;
+    SectorBinning m_expAxialBins;
+    SectorBinning m_expStereoBins;
+    SectorBinning m_fullBins;
 
     /* Acceptance Ranges to convert bins to track parameters */
     std::vector<std::vector<float>> m_acceptRanges;
     std::vector<float> m_slotSizes;
 
     /* Array pointers to the hit patterns */
-    /* m_trackSegmentToSectorIDs: 2D array mapping TS-ID ([0, 2335]) to: */
-    /*   - [0]: Orientation (0 = axial, 1 = stereo) */
-    /*   - [1]: Relative wire ID in the sector ([0, 40]) */
-    /*   - [2]: Relative phi-sector ID in the super layer ([0, 31]) */
-    c2array* m_trackSegmentToSectorIDs = nullptr;
+    /* m_hitToSectorIDs: 2D array mapping TS-ID ([0, 2335]) to: */
+    /*   - [0]: Orientation (1 = axial, 0 = stereo) */
+    /*   - [1]: Relative wire ID in the sector ([0, 40] for axials, [0, 31] for stereos) */
+    /*   - [2]: Relative phi-sector ID in the super layer ([0, 31] in each SL) */
+    c2array* m_hitToSectorIDs = nullptr;
     c5array* m_parrayAxial = nullptr;
     c5array* m_parrayStereo = nullptr;
     c3array* m_phoughPlane = nullptr;
-    c5array* m_pcompAxial = nullptr;
-    c5array* m_pcompStereo = nullptr;
+    c5array* m_compAxialHitReps = nullptr;
+    c5array* m_compStereoHitReps = nullptr;
     c5array* m_parrayAxialExp = nullptr;
     c5array* m_parrayStereoExp = nullptr;
   };

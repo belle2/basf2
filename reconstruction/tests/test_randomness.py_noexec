@@ -7,8 +7,7 @@
 ##########################################################################
 
 '''
-We generate, simulate and reconstruct few events with two different processes
-and we check the two processes give exactly the same output.
+We generate, simulate and reconstruct few mu-mu+ events
 '''
 
 

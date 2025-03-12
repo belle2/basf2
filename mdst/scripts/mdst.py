@@ -131,7 +131,7 @@ def add_mdst_dump(path, print_untested=False, print_mutable=True):
             "hasSVDCKFAbortionFlag", "hasPXDCKFAbortionFlag", "hasSVDSpacePointCreatorAbortionFlag"], {
             "hasCDCLayer": range(56)
         }, array=False),
-        DataStorePrinter("PIDLikelihood", ["getMostLikely"],
+        DataStorePrinter("PIDLikelihood", ["getMostLikely", "isAvailable", "areAllAvailable"],
                          (
                              {
                                  "isAvailable": pid_detectors,

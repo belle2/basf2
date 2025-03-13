@@ -20,7 +20,7 @@ namespace Belle2 {
     c5elem omega;
     c5elem phi;
     c5elem theta;
-    c5elem hitid;
+    c5elem hitID;
     c5elem priorityWire;
   };
 
@@ -30,6 +30,7 @@ namespace Belle2 {
     unsigned short weight;
   };
 
+  /* Collection of the hit information needed for the hit representations */
   struct HitInfo {
     unsigned short relativeWireID;
     unsigned short priorityWire;
@@ -40,40 +41,42 @@ namespace Belle2 {
   /* Store track parameters of found tracks. */
   class NDFinderTrack {
   public:
-    NDFinderTrack(std::vector<double> values, const SimpleCluster& cluster,
-                  std::vector<ROOT::Math::XYZVector> houghspace, std::vector<ROOT::Math::XYZVector> ndreadout):
-      m_cluster(cluster)
+    NDFinderTrack(std::vector<double> values,
+                  const SimpleCluster& cluster,
+                  const std::vector<ROOT::Math::XYZVector>& readoutHoughSpace,
+                  const std::vector<ROOT::Math::XYZVector>& readoutCluster)
+      : m_cluster(cluster),
+        m_houghSpace(readoutHoughSpace),
+        m_readoutCluster(readoutCluster)
     {
       m_omega = values[0];
       m_phi = values[1];
       m_cotTheta = values[2];
-      m_houghspace = houghspace;
-      m_ndreadout = ndreadout;
     }
 
     /* Default destructor. */
     virtual ~NDFinderTrack() {}
-    double getOmega()
+    double getOmega() const
     {
       return m_omega;
     }
-    double getPhi0()
+    double getPhi0() const
     {
       return m_phi;
     }
-    double getCot()
+    double getCot() const
     {
       return m_cotTheta;
     }
-    double getNRelHits()
+    double getNRelHits() const
     {
       return m_cluster.getHits().size();
     }
-    std::vector<unsigned short> getRelHits()
+    std::vector<unsigned short> getRelHits() const
     {
       return m_cluster.getHits();
     }
-    std::vector<unsigned short> getRelHitsWeights()
+    std::vector<unsigned short> getRelHitsWeights() const
     {
       return m_cluster.getWeights();
     }
@@ -83,17 +86,17 @@ namespace Belle2 {
       m_phi = 0.;
       m_cotTheta = 0.;
     }
-    SimpleCluster getCluster()
+    SimpleCluster getCluster() const
     {
       return m_cluster;
     }
-    std::vector<ROOT::Math::XYZVector> getHoughSpace()
+    std::vector<ROOT::Math::XYZVector> getHoughSpace() const
     {
-      return m_houghspace;
+      return m_houghSpace;
     }
-    std::vector<ROOT::Math::XYZVector> getNDReadout()
+    std::vector<ROOT::Math::XYZVector> getClusterReadout() const
     {
-      return m_ndreadout;
+      return m_readoutCluster;
     }
 
   private:
@@ -111,9 +114,9 @@ namespace Belle2 {
     /* The found cluster of the track */
     SimpleCluster m_cluster;
     /* Vector storing the complete Hough space for analysis */
-    std::vector<ROOT::Math::XYZVector> m_houghspace;
+    std::vector<ROOT::Math::XYZVector> m_houghSpace;
     /* Vector storing cluster informations for analysis */
-    std::vector<ROOT::Math::XYZVector> m_ndreadout;
+    std::vector<ROOT::Math::XYZVector> m_readoutCluster;
   };
 
 
@@ -155,7 +158,7 @@ namespace Belle2 {
     {
       delete m_parrayAxial;
       delete m_parrayStereo;
-      delete m_phoughPlane;
+      delete m_phoughSpace;
       delete m_hitToSectorIDs;
       delete m_compAxialHitReps;
       delete m_compStereoHitReps;
@@ -189,23 +192,23 @@ namespace Belle2 {
     {
       m_NDFinderTracks.clear();
       m_hitIDs.clear();
-      m_hitSLIds.clear();
+      m_hitSLIDs.clear();
       m_priorityWirePos.clear();
       m_priorityWireTime.clear();
       m_nHits = 0;
       m_vecDstart.clear();
       m_hitOrients.clear();
-      delete m_phoughPlane;
+      delete m_phoughSpace;
       std::array<c3index, 3> shapeHough = {{ m_nOmega, m_nPhi, m_nTheta }};
-      m_phoughPlane = new c3array(shapeHough);
+      m_phoughSpace = new c3array(shapeHough);
     }
 
     /* fill hit info of the event */
-    void addHit(unsigned short hitId, unsigned short hitSLId, unsigned short hitPrioPos, long hitPrioTime)
+    void addHit(unsigned short hitID, unsigned short hitSLID, unsigned short hitPrioPos, long hitPrioTime)
     {
       if (hitPrioPos > 0) { // skip "no hit"
-        m_hitIDs.push_back(hitId);
-        m_hitSLIds.push_back(hitSLId);
+        m_hitIDs.push_back(hitID);
+        m_hitSLIDs.push_back(hitSLID);
         m_priorityWirePos.push_back(3 - hitPrioPos);
         m_priorityWireTime.push_back(hitPrioTime);
         m_nHits++;
@@ -233,7 +236,7 @@ namespace Belle2 {
     /* Load an NDFinder array of hit representations in track phase space. */
     /* Used to load axial and stereo hit arrays. */
     /* Represented in a 7/32 phi sector of the CDC. */
-    void loadHitRepresentations(const std::string& filename, SectorBinning bins, c5array& hitsToTracks);
+    void loadHitRepresentations(const std::string& fileName, const SectorBinning& bins, c5array& hitsToWeights);
 
     /* Restore non-zero suppressed hit curves. */
     /* will make m_params.arrayAxialFile and m_params.arrayStereoFile obsolete */
@@ -260,7 +263,7 @@ namespace Belle2 {
     void addLookup(unsigned short ihit);
 
     /* In place array addition to houghmap Comp: A = A + B */
-    void addC3Comp(const HitInfo& hitInfo, const c5array& hitsToTracks);
+    void addC3Comp(const HitInfo& hitInfo, const c5array& hitsToWeights);
 
     /* Create hits to clusters confusion matrix */
     std::vector<std::vector<unsigned short>> getHitsVsClusters(
@@ -310,7 +313,7 @@ namespace Belle2 {
 
     /* SL-Ids of the hits in the current event */
     /* elements: super layer number in [0,1,...,8] */
-    std::vector<unsigned short> m_hitSLIds;
+    std::vector<unsigned short> m_hitSLIDs;
 
     /* Priority positon within the TS in the current event */
     /* elements basf2: [0,3] first, left, right, no hit */
@@ -388,7 +391,7 @@ namespace Belle2 {
     c2array* m_hitToSectorIDs = nullptr;
     c5array* m_parrayAxial = nullptr;
     c5array* m_parrayStereo = nullptr;
-    c3array* m_phoughPlane = nullptr;
+    c3array* m_phoughSpace = nullptr;
     c5array* m_compAxialHitReps = nullptr;
     c5array* m_compStereoHitReps = nullptr;
     c5array* m_parrayAxialExp = nullptr;

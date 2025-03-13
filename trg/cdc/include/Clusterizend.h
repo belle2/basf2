@@ -12,6 +12,7 @@
 #include <Math/Vector3D.h>
 
 namespace Belle2 {
+  /* Struct containing the parameters for the clustering */
   struct clustererParams  {
     /* Cut on the total weight of all cells in the 3d volume */
     unsigned short minTotalWeight = 450;
@@ -25,6 +26,27 @@ namespace Belle2 {
     unsigned char phiTrim = 4;
     /* Number of deleted cells in theta in each direction of the maximum */
     unsigned char thetaTrim = 4;
+    /* The Hough space dimensions (set in initBins() method of the NDFinder) */
+    unsigned short nOmega = 40;
+    unsigned short nPhi = 384;
+    unsigned short nTheta = 9;
+  };
+
+  /* Struct containing the bounds of a 3x3 cluster */
+  struct ClusterBounds {
+    c3index thetaLowerBound;
+    c3index thetaUpperBound;
+    c3index phiLowerBound;
+    c3index phiUpperBound;
+    c3index omega;
+  };
+
+  /* Struct containing the deletion bounds of a omega row */
+  struct DeletionBounds {
+    c3index phiLowerBound;
+    c3index phiUpperBound;
+    c3index omega;
+    c3index theta;
   };
 
   /* Type for found clusters */
@@ -56,7 +78,7 @@ namespace Belle2 {
       m_orientSum = 0;
     }
     /* Get member cells in the cluster */
-    std::vector<cell_index> getEntries()
+    std::vector<cell_index> getEntries() const
     {
       return m_C;
     }
@@ -73,22 +95,22 @@ namespace Belle2 {
       m_orientSum += orient; /* orient == 1: axial, orient == 0: stereo */
     }
     /* Get number related axial hits */
-    unsigned long getNAxial()
+    unsigned long getNAxial() const
     {
       return m_orientSum;
     }
     /* Get number related stereo hits */
-    unsigned long getNStereo()
+    unsigned long getNStereo() const
     {
       return m_hits.size() - m_orientSum;
     }
     /* Get ids of related hits (indices of the TS StoreArray) */
-    std::vector<unsigned short> getHits()
+    std::vector<unsigned short> getHits() const
     {
       return m_hits;
     }
     /* Get weight contribution of each related hit to the cluster */
-    std::vector<unsigned short> getWeights()
+    std::vector<unsigned short> getWeights() const
     {
       return m_hitWeights;
     }
@@ -114,33 +136,31 @@ namespace Belle2 {
     virtual ~Clusterizend() {}
     explicit Clusterizend(const clustererParams& params): m_params(params) {}
 
-    /* Returns the struct containing the clustering parameters */
-    clustererParams getParams()
-    {
-      return m_params;
-    }
-
-    /* Event initialization: */
     /* Set a new hough space for clustering and track finding */
     void setNewPlane(c3array& houghmapPlain)
     {
-      m_houghVals = &houghmapPlain;
+      m_houghSpace = &houghmapPlain;
     }
 
     /* Clustering logic */
     /* Main function for the fixed clustering logic */
     std::vector<SimpleCluster> makeClusters();
     /* Returns the global maximum (of one quadrant) */
-    std::pair<cell_index, unsigned long> getGlobalMax(unsigned char quadrant);
+    std::pair<cell_index, unsigned long> getGlobalMax(const unsigned char quadrant);
     /* Creates the cluster around the global maximum */
-    std::pair<SimpleCluster, unsigned long> createCluster(cell_index maxIndex);
+    std::pair<SimpleCluster, unsigned long> createCluster(const cell_index& maxIndex);
     /* Deletes the surroundings of such a cluster */
-    void deleteMax(cell_index maxIndex);
+    void deleteMax(const cell_index& maxIndex);
 
     /* Clusterizend */
   private:
+    /* Method to add a 3x3 to the cluster in createCluster */
+    void addClusterCells(const ClusterBounds& bounds, SimpleCluster& fixedCluster, unsigned long& totalClusterWeight);
+    /* Method to delete a omega row for the cluster deletion in deleteMax */
+    void clearHoughSpaceRow(const DeletionBounds& bounds);
+    /* The struct holding the cluster parameters */
     clustererParams m_params;
     /* Pointer to the Hough space */
-    c3array* m_houghVals{0};
+    c3array* m_houghSpace{0};
   };
 }

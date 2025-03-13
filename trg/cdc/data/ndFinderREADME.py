@@ -32,10 +32,14 @@ import numpy as np
 
 # Files containing the zero suppressed track to hit relations
 # (hit curves in track parameter space).
-fileAxial = 'ndFinderAxialShallow.txt.gz'
-fileStereo = 'ndFinderStereoShallow.txt.gz'
+fileAxial = 'ndFinderArrayAxialComp.txt.gz'
+fileStereo = 'ndFinderArrayStereoComp.txt.gz'
 
 axialFlat = np.loadtxt(fileAxial, dtype='uint8')
 stereoFlat = np.loadtxt(fileStereo, dtype='uint8')
 axialComp = axialFlat.reshape((41, 3, 40, 15))
 stereoComp = stereoFlat.reshape((32, 3, 40, 15, 9))
+
+# Phi start values for the track segment 2038 (ID 31):
+for i in range(40):
+    print(axialComp[31][0][i][0])

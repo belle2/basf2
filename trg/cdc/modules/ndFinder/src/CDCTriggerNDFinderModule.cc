@@ -115,14 +115,14 @@ void CDCTriggerNDFinderModule::event()
       m_NDFinderTracks.appendNew(trackND.getPhi0(), trackND.getOmega(),
                                  0., 0., trackND.getCot(), 0.);
     SimpleCluster Cluster = trackND.getCluster();
-    std::vector<ROOT::Math::XYZVector> houghspace = trackND.getHoughSpace();
-    std::vector<ROOT::Math::XYZVector> ndreadout = trackND.getNDReadout();
+    std::vector<ROOT::Math::XYZVector> readoutHoughSpace = trackND.getHoughSpace();
+    std::vector<ROOT::Math::XYZVector> readoutCluster = trackND.getClusterReadout();
     const CDCTrigger3DFinderInfo* NDFinderInfo =
-      m_NDFinderInfos.appendNew(houghspace, ndreadout);
+      m_NDFinderInfos.appendNew(readoutHoughSpace, readoutCluster);
     NDFinderTrack->addRelationTo(NDFinderInfo);
-    std::vector<unsigned short> relHits = trackND.getRelHits();
-    for (ulong i = 0; i < relHits.size(); i++) {
-      NDFinderTrack->addRelationTo(m_TrackSegmentHits[relHits[i]]);
+    std::vector<unsigned short> relatedHits = trackND.getRelHits();
+    for (ulong i = 0; i < relatedHits.size(); i++) {
+      NDFinderTrack->addRelationTo(m_TrackSegmentHits[relatedHits[i]]);
     }
   }
 }

@@ -18,7 +18,6 @@
 #include "trg/cdc/NDFinder.h"
 #include "TMath.h"
 
-#define print(x) std::cout << #x << " = " << (x) << "\n";
 using namespace Belle2;
 
 void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, float thresh,
@@ -31,16 +30,9 @@ void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, f
   m_params.thresh = thresh;
   m_params.axialFile = axialFile;
   m_params.stereoFile = stereoFile;
-  m_clustererParams.minTotalWeight = minTotalWeight;
-  m_clustererParams.minPeakWeight = minPeakWeight;
-  m_clustererParams.iterations = iterations;
-  m_clustererParams.omegaTrim = omegaTrim;
-  m_clustererParams.phiTrim = phiTrim;
-  m_clustererParams.thetaTrim = thetaTrim;
   m_verbose = verbose;
 
   initBins();
-
   initHitToSectorMap(*m_hitToSectorIDs);
 
   /* Load the axial and stereo track to hit relations from file.*/
@@ -60,6 +52,17 @@ void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, f
   B2DEBUG(25, "squeezed stereo array (11/32 phi) --> (7/32 phi)");
 
   reset();
+
+  /* Parameters necessary for the clustering algorithm */
+  m_clustererParams.minTotalWeight = minTotalWeight;
+  m_clustererParams.minPeakWeight = minPeakWeight;
+  m_clustererParams.iterations = iterations;
+  m_clustererParams.omegaTrim = omegaTrim;
+  m_clustererParams.phiTrim = phiTrim;
+  m_clustererParams.thetaTrim = thetaTrim;
+  m_clustererParams.nOmega = m_nOmega;
+  m_clustererParams.nPhi = m_nPhi;
+  m_clustererParams.nTheta = m_nTheta;
   m_clusterer = Clusterizend(m_clustererParams);
 }
 
@@ -97,47 +100,47 @@ void NDFinder::initBins()
   m_compAxialBins.omega = m_nOmega; // 40
   m_compAxialBins.phi = m_nPhiComp; // 15
   m_compAxialBins.theta = 1;
-  m_compAxialBins.hitid = m_nAxial; // 41
+  m_compAxialBins.hitID = m_nAxial; // 41
   m_compAxialBins.priorityWire = m_nPrio; // 3
 
   m_compStereoBins.omega = m_nOmega; // 40
   m_compStereoBins.phi = m_nPhiComp; // 15
   m_compStereoBins.theta = m_nTheta; // 9
-  m_compStereoBins.hitid = m_nStereo; // 32
+  m_compStereoBins.hitID = m_nStereo; // 32
   m_compStereoBins.priorityWire = m_nPrio; // 3
 
   m_axialBins.omega = m_nOmega; // 40
   m_axialBins.phi = m_nPhiUse; // 84
   m_axialBins.theta = m_nTheta; // 9
-  m_axialBins.hitid = m_nAxial; // 41
+  m_axialBins.hitID = m_nAxial; // 41
   m_axialBins.priorityWire = m_nPrio; // 3
 
   m_stereoBins.omega = m_nOmega; // 40
   m_stereoBins.phi = m_nPhiUse; // 84
   m_stereoBins.theta = m_nTheta; // 9
-  m_stereoBins.hitid = m_nStereo; // 32
+  m_stereoBins.hitID = m_nStereo; // 32
   m_stereoBins.priorityWire = m_nPrio; // 3
 
   m_expAxialBins.omega = m_nOmega; // 40
   m_expAxialBins.phi = m_nPhiExp; // 132
   m_expAxialBins.theta = m_nTheta; // 9
-  m_expAxialBins.hitid = m_nAxial; // 41
+  m_expAxialBins.hitID = m_nAxial; // 41
   m_expAxialBins.priorityWire = m_nPrio; // 3
 
   m_expStereoBins.omega = m_nOmega; // 40
   m_expStereoBins.phi = m_nPhiExp; // 132
   m_expStereoBins.theta = m_nTheta; // 9
-  m_expStereoBins.hitid = m_nStereo; // 32
+  m_expStereoBins.hitID = m_nStereo; // 32
   m_expStereoBins.priorityWire = m_nPrio; // 3
 
   m_fullBins.omega = m_nOmega; // 40
   m_fullBins.phi = m_nPhi; // 384
   m_fullBins.theta = m_nTheta; // 9
-  m_fullBins.hitid = m_nTS; // 2336
+  m_fullBins.hitID = m_nTS; // 2336
   m_fullBins.priorityWire = m_nPrio; // 3
 
   /* Shapes of the arrays holding the hit patterns */
-  std::array<c2index, 2> shapeTrackSegmentToSectorIDs = {{ m_nTS, m_nPrio }};
+  std::array<c2index, 2> shapeHitToSectorIDs = {{ m_nTS, m_nPrio }};
   std::array<c5index, 5> shapeCompAxial = {{ m_nAxial, m_nPrio, m_nOmega, m_nPhiComp, 1 }};
   std::array<c5index, 5> shapeCompStereo = {{ m_nStereo, m_nPrio, m_nOmega, m_nPhiComp, m_nTheta }};
   std::array<c5index, 5> shapeAxial = {{ m_nAxial, m_nPrio, m_nOmega, m_nPhiUse, m_nTheta }};
@@ -146,12 +149,12 @@ void NDFinder::initBins()
   std::array<c5index, 5> shapeExpAxial = {{ m_nAxial, m_nPrio, m_nOmega, m_nPhiExp, m_nTheta }};
   std::array<c5index, 5> shapeExpStereo = {{ m_nStereo, m_nPrio, m_nOmega, m_nPhiExp, m_nTheta }};
 
-  m_hitToSectorIDs = new c2array(shapeTrackSegmentToSectorIDs);
+  m_hitToSectorIDs          = new c2array(shapeHitToSectorIDs);
   m_compAxialHitReps        = new c5array(shapeCompAxial);
   m_compStereoHitReps       = new c5array(shapeCompStereo);
   m_parrayAxial             = new c5array(shapeAxial);
   m_parrayStereo            = new c5array(shapeStereo);
-  m_phoughPlane             = new c3array(shapeHough);
+  m_phoughSpace             = new c3array(shapeHough);
   m_parrayAxialExp          = new c5array(shapeExpAxial);
   m_parrayStereoExp         = new c5array(shapeExpStereo);
 
@@ -168,8 +171,6 @@ void NDFinder::initBins()
   m_slotSizes.push_back(ssOmega);
   m_slotSizes.push_back(ssPhi);
   m_slotSizes.push_back(ssTheta);
-
-  /* Bins necessary for the clustering algorithm */
 }
 
 /* Fills the m_hitToSectorIDs array */
@@ -183,7 +184,7 @@ void NDFinder::initHitToSectorMap(c2array& mapArray)
   std::vector<int> hitToSuperLayer;
   /* Integrated number of priority wires for each SL */
   std::vector<int> cumulativeWires = {0};
-  /* Integrated number of sector priority wires for each SL (Ax event, St odd) */
+  /* Integrated number of sector priority wires for each SL (Axial even, Stereo odd) */
   std::vector<int> cumulativeSectorWires = {0, 0};
   for (int sl = 0; sl < m_nSL; sl++) {
     wiresPerSector.push_back(nWires[sl] / m_phiGeo);
@@ -207,12 +208,12 @@ void NDFinder::initHitToSectorMap(c2array& mapArray)
 }
 
 
-void NDFinder::loadHitRepresentations(const std::string& filename, SectorBinning bins, c5array& hitsToTracks)
+void NDFinder::loadHitRepresentations(const std::string& fileName, const SectorBinning& bins, c5array& hitsToWeights)
 {
-  std::vector<c5elem> flatArray; // Array of the entries in trg/cdc/data/ndFinderArray*.txt.gz
-  std::ifstream arrayFileGZ(filename, std::ios_base::in | std::ios_base::binary);
+  std::vector<c5elem> flatArray; // Array of the entries in trg/cdc/data/ndFinderArray*Comp.txt.gz
+  std::ifstream arrayFileGZ(fileName, std::ios_base::in | std::ios_base::binary);
   if (!arrayFileGZ.is_open()) {
-    B2ERROR("could not open array file: " << filename);
+    B2ERROR("could not open array file: " << fileName);
     return;
   }
   boost::iostreams::filtering_istream arrayStream;
@@ -223,14 +224,14 @@ void NDFinder::loadHitRepresentations(const std::string& filename, SectorBinning
     flatArray.push_back(uline);
   }
   arrayFileGZ.close();
-  B2DEBUG(25, "loaded array from file " << filename);
+  B2DEBUG(25, "loaded array from file " << fileName);
   unsigned long icount = 0;
-  for (c5index ihit = 0; ihit < bins.hitid; ihit++) {
+  for (c5index ihit = 0; ihit < bins.hitID; ihit++) {
     for (c5index priorityIndex = 0; priorityIndex < bins.priorityWire; priorityIndex++) {
       for (c5index iomega = 0; iomega < bins.omega; iomega++) {
         for (c5index iphi = 0; iphi < bins.phi; iphi++) {
           for (c5index itheta = 0; itheta < bins.theta; itheta++) {
-            hitsToTracks[ihit][priorityIndex][iomega][iphi][itheta] = flatArray[icount];
+            hitsToWeights[ihit][priorityIndex][iomega][iphi][itheta] = flatArray[icount];
             icount++;
           }
         }
@@ -241,8 +242,7 @@ void NDFinder::loadHitRepresentations(const std::string& filename, SectorBinning
 
 
 void NDFinder::squeezeOne(c5array& writeArray, c5array& readArray, int outparcels, int inparcels, c5index ihit,
-                          c5index priorityIndex,
-                          c5index itheta, c5elem nomega)
+                          c5index priorityIndex, c5index itheta, c5elem nomega)
 {
   int outnphi = (int)(12 * outparcels);
   c5index trafstart = (c5index)((inparcels - outparcels) / 2 * 12);
@@ -266,7 +266,7 @@ void NDFinder::squeezeOne(c5array& writeArray, c5array& readArray, int outparcel
 
 void NDFinder::squeezeAll(SectorBinning writebins, c5array& writeArray, c5array& readArray, int outparcels, int inparcels)
 {
-  for (c5index ihit = 0; ihit < writebins.hitid; ihit++) {
+  for (c5index ihit = 0; ihit < writebins.hitID; ihit++) {
     for (c5index priorityIndex = 0; priorityIndex < writebins.priorityWire; priorityIndex++) {
       for (c5index itheta = 0; itheta < writebins.theta; itheta++) {
         squeezeOne(writeArray, readArray, outparcels, inparcels, ihit, priorityIndex, itheta, writebins.omega);
@@ -279,7 +279,7 @@ void NDFinder::squeezeAll(SectorBinning writebins, c5array& writeArray, c5array&
 void NDFinder::restoreZeros(SectorBinning zerobins, SectorBinning compbins, c5array& expArray, const c5array& compArray)
 {
   B2DEBUG(25, "restoreZeros: zerobins.theta " << zerobins.theta << ", combins.theta " << compbins.theta);
-  for (c5index ihit = 0; ihit < compbins.hitid; ihit++) {
+  for (c5index ihit = 0; ihit < compbins.hitID; ihit++) {
     for (c5index priorityIndex = 0; priorityIndex < compbins.priorityWire; priorityIndex++) {
       for (c5index iomega = 0; iomega < compbins.omega; iomega++) {
         for (c5index itheta = 0; itheta < compbins.theta; itheta++) {
@@ -300,7 +300,7 @@ void NDFinder::restoreZeros(SectorBinning zerobins, SectorBinning compbins, c5ar
   }
 }
 
-// Writes the hit to the Hough space and creates the inverse lookup table
+/* Writes the hit to the Hough space and creates the inverse lookup table */
 void NDFinder::addLookup(unsigned short ihit)
 {
   c2array& arrayHitMod = *m_hitToSectorIDs;
@@ -332,20 +332,20 @@ void NDFinder::addLookup(unsigned short ihit)
 }
 
 
-void NDFinder::addC3Comp(const HitInfo& hitInfo, const c5array& hitsToTracks)
+void NDFinder::addC3Comp(const HitInfo& hitInfo, const c5array& hitsToWeights)
 {
   unsigned short ntheta = 0;
-  c3array& houghPlane = *m_phoughPlane;
+  c3array& houghSpace = *m_phoughSpace;
   for (unsigned short itheta = 0; itheta < m_nTheta; itheta++) {
     if (hitInfo.bins.theta > 1) { // stereo
       ntheta = itheta;
     }
     for (unsigned short iomega = 0; iomega < m_nOmega; iomega++) {
-      unsigned short phiStart = hitsToTracks[hitInfo.relativeWireID][hitInfo.priorityWire][iomega][0][ntheta];
-      unsigned short nPhiEntries = hitsToTracks[hitInfo.relativeWireID][hitInfo.priorityWire][iomega][1][ntheta];
+      unsigned short phiStart = hitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][iomega][0][ntheta];
+      unsigned short nPhiEntries = hitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][iomega][1][ntheta];
       for (unsigned short entry = 0; entry < nPhiEntries; entry++) {
         unsigned short iHoughPhi = (entry + phiStart + hitInfo.Dstart) % m_nPhi;
-        houghPlane[iomega][iHoughPhi][itheta] += hitsToTracks[hitInfo.relativeWireID][hitInfo.priorityWire][iomega][entry + 2][ntheta];
+        houghSpace[iomega][iHoughPhi][itheta] += hitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][iomega][entry + 2][ntheta];
       }
     }
   }
@@ -394,7 +394,7 @@ NDFinder::allHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClus
       for (unsigned long ihit = 0; ihit < m_hitIDs.size(); ihit++) {
         unsigned short contribution = hitsVsClusters[iclus][ihit];
         if (contribution > 0) {
-          superLayerNumbers.push_back({static_cast<long>(ihit), contribution, m_hitSLIds[ihit], m_priorityWireTime[ihit]});
+          superLayerNumbers.push_back({static_cast<long>(ihit), contribution, m_hitSLIDs[ihit], m_priorityWireTime[ihit]});
         }
       }
       // Iteration over all super layers
@@ -431,7 +431,7 @@ NDFinder::allHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClus
       std::vector<unsigned short> clusterHits = clu.getHits();
       std::vector<unsigned short> clusterSLNumbers;
       for (const auto& element : clusterHits) {
-        clusterSLNumbers.push_back(m_hitSLIds[element]);
+        clusterSLNumbers.push_back(m_hitSLIDs[element]);
       }
       // A cut on the super layer numbers is applied
       std::set<unsigned short> uniqueSLNumbers(clusterSLNumbers.begin(), clusterSLNumbers.end());
@@ -451,18 +451,17 @@ NDFinder::allHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClus
 
 void NDFinder::getCM()
 {
-  c3array& houghPlane = *m_phoughPlane;
-  m_clusterer.setNewPlane(houghPlane);
-  std::vector<SimpleCluster> clusters = m_clusterer.makeClusters();
-  std::vector<std::vector<unsigned short>> hitsVsClusters = getHitsVsClusters(clusters);
+  c3array& houghSpace = *m_phoughSpace;
+  m_clusterer.setNewPlane(houghSpace);
+  std::vector<SimpleCluster> allClusters = m_clusterer.makeClusters();
+  std::vector<std::vector<unsigned short>> hitsVsClusters = getHitsVsClusters(allClusters);
   // New hit to cluster relation
-  std::vector<SimpleCluster> useClusters = allHitsToClusters(hitsVsClusters, clusters);
+  std::vector<SimpleCluster> validClusters = allHitsToClusters(hitsVsClusters, allClusters);
 
-  for (unsigned long iclus = 0; iclus < useClusters.size(); iclus++) {
-    SimpleCluster cli = useClusters[iclus];
-    std::vector<cell_index> entries = cli.getEntries();
+  for (const SimpleCluster& cluster : validClusters) {
+    std::vector<cell_index> entries = cluster.getEntries();
     cell_index maxid = getMax(entries);
-    unsigned short maxval = houghPlane[maxid[0]][maxid[1]][maxid[2]];
+    unsigned short maxval = houghSpace[maxid[0]][maxid[1]][maxid[2]];
     float cutoff = m_params.thresh * maxval;
     std::vector<CellWeight> highWeight = getHighWeight(entries, cutoff);
     std::vector<double> result = getWeightedMean(highWeight);
@@ -470,48 +469,48 @@ void NDFinder::getCM()
     std::vector<double> transformed = transform(estimate);
 
     // READOUTS, uncomment what needed:
-    std::vector<ROOT::Math::XYZVector> ndreadout;
-    std::vector<ROOT::Math::XYZVector> houghspace;
+    std::vector<ROOT::Math::XYZVector> readoutCluster;
+    std::vector<ROOT::Math::XYZVector> readoutHoughSpace;
 
     // Readout of the peak weight
-    /* ndreadout.push_back(ROOT::Math::XYZVector(maxval, 0, 0)); */
+    readoutCluster.push_back(ROOT::Math::XYZVector(maxval, 0, 0));
 
     // Readout of the total weight
-    /* unsigned long totalWeight = 0; */
-    /* for (const cell_index& cellIndex : entries) { */
-    /*   totalWeight += houghPlane[cellIndex[0]][cellIndex[1]][cellIndex[2]]; */
-    /* } */
-    /* ndreadout.push_back(ROOT::Math::XYZVector(totalWeight, 0, 0)); */
+    unsigned long totalWeight = 0;
+    for (const cell_index& cellIndex : entries) {
+      totalWeight += houghSpace[cellIndex[0]][cellIndex[1]][cellIndex[2]];
+    }
+    readoutCluster.push_back(ROOT::Math::XYZVector(totalWeight, 0, 0));
 
     // Readout of the number of cluster cells
-    /* int ncells = entries.size(); */
-    /* ndreadout.push_back(ROOT::Math::XYZVector(ncells, 0, 0)); */
+    int ncells = entries.size();
+    readoutCluster.push_back(ROOT::Math::XYZVector(ncells, 0, 0));
 
     // Readout of the cluster center of gravity
-    /* ndreadout.push_back(ROOT::Math::XYZVector(result[0], result[1], result[2])); */
+    readoutCluster.push_back(ROOT::Math::XYZVector(result[0], result[1], result[2]));
 
     // Readout of the cluster weights
-    /* for (const cell_index& cellIndex : entries) { */
-    /*   c3elem element = houghPlane[cellIndex[0]][cellIndex[1]][cellIndex[2]]; */
-    /*   ndreadout.push_back(ROOT::Math::XYZVector(element, 0, 0)); */
-    /* } */
+    for (const cell_index& cellIndex : entries) {
+      c3elem element = houghSpace[cellIndex[0]][cellIndex[1]][cellIndex[2]];
+      readoutCluster.push_back(ROOT::Math::XYZVector(element, 0, 0));
+    }
 
     // Readout of the cluster cell indices
-    /* for (const cell_index& cellIndex : entries) { */
-    /*   ndreadout.push_back(ROOT::Math::XYZVector(cellIndex[0], cellIndex[1], cellIndex[2])); */
-    /* } */
+    for (const cell_index& cellIndex : entries) {
+      readoutCluster.push_back(ROOT::Math::XYZVector(cellIndex[0], cellIndex[1], cellIndex[2]));
+    }
 
     // Readout of the complete Hough space:
-    /* for (c3index i = 0; i < static_cast<c3index>(houghPlane.shape()[0]); ++i) { */
-    /*   for (c3index j = 0; j < static_cast<c3index>(houghPlane.shape()[1]); ++j) { */
-    /*     for (c3index k = 0; k < static_cast<c3index>(houghPlane.shape()[2]); ++k) { */
-    /*       c3elem element = houghPlane[i][j][k]; */
-    /*       houghspace.push_back(ROOT::Math::XYZVector(element, 0, 0)); */
-    /*     } */
-    /*   } */
-    /* } */
+    for (c3index i = 0; i < static_cast<c3index>(houghSpace.shape()[0]); ++i) {
+      for (c3index j = 0; j < static_cast<c3index>(houghSpace.shape()[1]); ++j) {
+        for (c3index k = 0; k < static_cast<c3index>(houghSpace.shape()[2]); ++k) {
+          c3elem element = houghSpace[i][j][k];
+          readoutHoughSpace.push_back(ROOT::Math::XYZVector(element, 0, 0));
+        }
+      }
+    }
 
-    m_NDFinderTracks.push_back(NDFinderTrack(transformed, cli, houghspace, ndreadout));
+    m_NDFinderTracks.push_back(NDFinderTrack(transformed, cluster, readoutHoughSpace, readoutCluster));
   }
 }
 
@@ -584,11 +583,11 @@ cell_index NDFinder::getMax(const std::vector<cell_index>& entries)
 {
   unsigned short curWeight = 0;
   cell_index curMaxIndex = {0, 0, 0};
-  const c3array& houghPlane = *m_phoughPlane;
+  const c3array& houghSpace = *m_phoughSpace;
 
   for (const cell_index& entry : entries) {
-    if (houghPlane[entry[0]][entry[1]][entry[2]] > curWeight) {
-      curWeight = houghPlane[entry[0]][entry[1]][entry[2]];
+    if (houghSpace[entry[0]][entry[1]][entry[2]] > curWeight) {
+      curWeight = houghSpace[entry[0]][entry[1]][entry[2]];
       curMaxIndex = entry;
     }
   }
@@ -599,9 +598,9 @@ cell_index NDFinder::getMax(const std::vector<cell_index>& entries)
 std::vector<CellWeight> NDFinder::getHighWeight(std::vector<cell_index> entries, float cutoff)
 {
   std::vector<CellWeight> cellsAndWeight;
-  const c3array& houghPlane = *m_phoughPlane;
+  const c3array& houghSpace = *m_phoughSpace;
   for (cell_index& entry : entries) {
-    unsigned short cellWeight = houghPlane[entry[0]][entry[1]][entry[2]];
+    unsigned short cellWeight = houghSpace[entry[0]][entry[1]][entry[2]];
     if (cellWeight > cutoff) {
       CellWeight curElem;
       curElem.index = entry;

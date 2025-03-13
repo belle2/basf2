@@ -32,7 +32,7 @@ def _unified_diff(expected, actual):
 if __name__ == '__main__':
 
     steering = b2.find_file('reconstruction/tests/test_randomness.py_noexec')
-    command = f'basf2 {steering} -n 5 --random-seed aSeed'
+    command = f'basf2 {steering} -n 10 --random-seed aSeed'
 
     b2.B2INFO('Executing first job...')
     with b2tu.clean_working_directory():

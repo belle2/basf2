@@ -10,12 +10,15 @@
 We generate, simulate and reconstruct few mu-mu+ events
 '''
 
-
 import basf2 as b2
 import generators as ge
 import simulation as si
 import reconstruction as re
 import mdst
+
+# We need to suppress the warnings from Tensorflow
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
 class PrintRandomNumber(b2.Module):
@@ -62,7 +65,7 @@ main.add_module('Progress')
 
 main.add_module(PrintRandomNumber())
 
-ge.add_kkmc_generator(main, 'mu-mu+')
+ge.add_kkmc_generator(main, 'tau-tau+')
 
 main.add_module(PrintRandomNumber())
 

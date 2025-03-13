@@ -174,12 +174,12 @@ def set_GNNFlavorTagger_aliases(categories):
         'px_c': 'px*charge',
         'py_c': 'py*charge',
         'pz_c': 'pz*charge',
-        'electronID_c': 'electronID*charge',
-        'muonID_c': 'muonID*charge',
-        'pionID_c': 'pionID*charge',
-        'kaonID_c': 'kaonID*charge',
-        'protonID_c': 'protonID*charge',
-        'deuteronID_c': 'deuteronID*charge',
+        'electronID_c': 'electronIDNN*charge',
+        'muonID_c': 'muonIDNN*charge',
+        'pionID_c': 'pionIDNN*charge',
+        'kaonID_c': 'kaonIDNN*charge',
+        'protonID_c': 'protonIDNN*charge',
+        'deuteronID_c': 'deuteronIDNN*charge',
         'electronID_noSVD_noTOP_c': 'electronID_noSVD_noTOP*charge',
     }
 
@@ -344,9 +344,9 @@ def getTrainingVariables(category=None):
     NOTE: This function is not called the Expert mode. It is not necessary to be consistent with variables list of weight files.
     """
 
-    KId = {'Belle': 'ifNANgiveX(atcPIDBelle(3,2), 0.5)', 'Belle2': 'kaonID'}
-    muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
-    eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
+    KId = {'Belle': 'ifNANgiveX(atcPIDBelle(3,2), 0.5)', 'Belle2': 'kaonIDNN'}
+    muId = {'Belle': 'muIDBelle', 'Belle2': 'muonIDNN'}
+    eId = {'Belle': 'eIDBelle', 'Belle2': 'electronIDNN'}
 
     variables = []
     if category == 'Electron' or category == 'IntermediateElectron':
@@ -449,7 +449,7 @@ def getTrainingVariables(category=None):
                      'cosTheta',
                      'p',
                      'pt',
-                     'pionID',
+                     'pionIDNN',
                      'piid_TOP',
                      'piid_ARICH',
                      'pi_vs_edEdxid',
@@ -478,7 +478,7 @@ def getTrainingVariables(category=None):
                      'cosTheta',
                      'p',
                      'pt',
-                     'pionID',
+                     'pionIDNN',
                      'piid_dEdx',
                      'piid_TOP',
                      'piid_ARICH',
@@ -516,8 +516,8 @@ def getTrainingVariables(category=None):
                      'chiProb',
                      ]
         if getBelleOrBelle2() == "Belle2":
-            variables.append('daughter(1,protonID)')  # protonID always 0 in B2BII check in future
-            variables.append('daughter(0,pionID)')  # not very powerful in B2BII
+            variables.append('daughter(1,protonIDNN)')  # protonID always 0 in B2BII check in future
+            variables.append('daughter(0,pionIDNN)')  # not very powerful in B2BII
         else:
             variables.append('distance')
 

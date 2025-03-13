@@ -10,7 +10,6 @@ import basf2
 from ROOT import gInterpreter
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_cdc import settings as cdc_tracking_calibration
-from prompt.calibrations.caf_vxdcdc_alignment import settings as full_alignment
 from prompt.utils import ExpRun
 from ROOT import Belle2
 from caf.framework import Calibration
@@ -27,7 +26,7 @@ settings = CalibrationSettings(name="CDC badwire",
                                                    [INPUT_DATA_FILTERS["Data Tag"]["mumu_tight_or_highm_calib"],
                                                     INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
-                               depends_on=[cdc_tracking_calibration, full_alignment],
+                               depends_on=[cdc_tracking_calibration],
                                expert_config={
                                    "fileFormat": "RAW",
                                    "min_events_per_file": 500,

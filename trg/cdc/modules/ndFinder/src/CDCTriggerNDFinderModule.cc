@@ -59,8 +59,8 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
   addParam("thetaTrim", m_thetaTrim,
            "Clustering: Number of deleted cells in each theta direction of the maximum.",
            4);
-  addParam("verbose", m_verbose,
-           "Print Hough planes and verbose output. ",
+  addParam("storeAdditionalReadout", m_storeAdditionalReadout,
+           "Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class.",
            false);
   addParam("axialFile", m_axialFile,
            "File name of the axial hit patterns. ",
@@ -87,7 +87,7 @@ void CDCTriggerNDFinderModule::initialize()
           ", m_omegaTrim=" << m_omegaTrim <<
           ", m_phiTrim=" << m_phiTrim <<
           ", m_thetaTrim=" << m_thetaTrim <<
-          ", m_verbose= " << m_verbose);
+          ", m_storeAdditionalReadout" << m_storeAdditionalReadout);
   m_TrackSegmentHits.isRequired(m_TrackSegmentHitsName);
   m_NDFinderTracks.registerInDataStore(m_NDFinderTracksName);
   m_NDFinderTracks.registerRelationTo(m_TrackSegmentHits);
@@ -95,7 +95,7 @@ void CDCTriggerNDFinderModule::initialize()
   m_NDFinderTracks.registerRelationTo(m_NDFinderInfos);
   m_NDFinder.init(m_minSuperAxial, m_minSuperStereo, m_thresh,
                   m_minTotalWeight, m_minPeakWeight, m_iterations,
-                  m_omegaTrim, m_phiTrim, m_thetaTrim, m_verbose,
+                  m_omegaTrim, m_phiTrim, m_thetaTrim, m_storeAdditionalReadout,
                   m_axialFile, m_stereoFile);
 }
 

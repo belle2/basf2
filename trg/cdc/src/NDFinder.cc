@@ -23,14 +23,14 @@ using namespace Belle2;
 void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, float thresh,
                     unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned char iterations,
                     unsigned char omegaTrim, unsigned char phiTrim, unsigned char thetaTrim,
-                    bool verbose, std::string& axialFile, std::string& stereoFile)
+                    bool storeAdditionalReadout, std::string& axialFile, std::string& stereoFile)
 {
   m_params.minSuperAxial = minSuperAxial;
   m_params.minSuperStereo = minSuperStereo;
   m_params.thresh = thresh;
   m_params.axialFile = axialFile;
   m_params.stereoFile = stereoFile;
-  m_verbose = verbose;
+  m_params.storeAdditionalReadout = storeAdditionalReadout;
 
   initBins();
   initHitToSectorMap(*m_hitToSectorIDs);
@@ -468,48 +468,43 @@ void NDFinder::getCM()
     std::vector<double> estimate = getBinToVal(result);
     std::vector<double> transformed = transform(estimate);
 
-    // READOUTS, uncomment what needed:
-    std::vector<ROOT::Math::XYZVector> readoutCluster;
+    /* Readouts for the 3DFinderInfo class for analysis (Hough space + cluster info) */
     std::vector<ROOT::Math::XYZVector> readoutHoughSpace;
+    std::vector<ROOT::Math::XYZVector> readoutCluster;
 
-    // Readout of the peak weight
-    readoutCluster.push_back(ROOT::Math::XYZVector(maxval, 0, 0));
-
-    // Readout of the total weight
-    unsigned long totalWeight = 0;
-    for (const cell_index& cellIndex : entries) {
-      totalWeight += houghSpace[cellIndex[0]][cellIndex[1]][cellIndex[2]];
-    }
-    readoutCluster.push_back(ROOT::Math::XYZVector(totalWeight, 0, 0));
-
-    // Readout of the number of cluster cells
-    int ncells = entries.size();
-    readoutCluster.push_back(ROOT::Math::XYZVector(ncells, 0, 0));
-
-    // Readout of the cluster center of gravity
-    readoutCluster.push_back(ROOT::Math::XYZVector(result[0], result[1], result[2]));
-
-    // Readout of the cluster weights
-    for (const cell_index& cellIndex : entries) {
-      c3elem element = houghSpace[cellIndex[0]][cellIndex[1]][cellIndex[2]];
-      readoutCluster.push_back(ROOT::Math::XYZVector(element, 0, 0));
-    }
-
-    // Readout of the cluster cell indices
-    for (const cell_index& cellIndex : entries) {
-      readoutCluster.push_back(ROOT::Math::XYZVector(cellIndex[0], cellIndex[1], cellIndex[2]));
-    }
-
-    // Readout of the complete Hough space:
-    for (c3index i = 0; i < static_cast<c3index>(houghSpace.shape()[0]); ++i) {
-      for (c3index j = 0; j < static_cast<c3index>(houghSpace.shape()[1]); ++j) {
-        for (c3index k = 0; k < static_cast<c3index>(houghSpace.shape()[2]); ++k) {
-          c3elem element = houghSpace[i][j][k];
-          readoutHoughSpace.push_back(ROOT::Math::XYZVector(element, 0, 0));
+    if (m_params.storeAdditionalReadout) {
+      /* Readout of the complete Hough space */
+      for (c3index i = 0; i < static_cast<c3index>(houghSpace.shape()[0]); ++i) {
+        for (c3index j = 0; j < static_cast<c3index>(houghSpace.shape()[1]); ++j) {
+          for (c3index k = 0; k < static_cast<c3index>(houghSpace.shape()[2]); ++k) {
+            c3elem element = houghSpace[i][j][k];
+            readoutHoughSpace.push_back(ROOT::Math::XYZVector(element, 0, 0));
+          }
         }
       }
+      /* Readout of the peak weight */
+      readoutCluster.push_back(ROOT::Math::XYZVector(maxval, 0, 0));
+      /* Readout of the total weight */
+      unsigned long totalWeight = 0;
+      for (const cell_index& cellIndex : entries) {
+        totalWeight += houghSpace[cellIndex[0]][cellIndex[1]][cellIndex[2]];
+      }
+      readoutCluster.push_back(ROOT::Math::XYZVector(totalWeight, 0, 0));
+      /* Readout of the number of cluster cells */
+      int ncells = entries.size();
+      readoutCluster.push_back(ROOT::Math::XYZVector(ncells, 0, 0));
+      /* Readout of the cluster center of gravity */
+      readoutCluster.push_back(ROOT::Math::XYZVector(result[0], result[1], result[2]));
+      /* Readout of the cluster weights */
+      for (const cell_index& cellIndex : entries) {
+        c3elem element = houghSpace[cellIndex[0]][cellIndex[1]][cellIndex[2]];
+        readoutCluster.push_back(ROOT::Math::XYZVector(element, 0, 0));
+      }
+      /* Readout of the cluster cell indices */
+      for (const cell_index& cellIndex : entries) {
+        readoutCluster.push_back(ROOT::Math::XYZVector(cellIndex[0], cellIndex[1], cellIndex[2]));
+      }
     }
-
     m_NDFinderTracks.push_back(NDFinderTrack(transformed, cluster, readoutHoughSpace, readoutCluster));
   }
 }

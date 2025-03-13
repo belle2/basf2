@@ -148,6 +148,8 @@ namespace Belle2 {
       unsigned char phiTrim = 4;
       /* Clustering: Number of deleted cells in each theta direction from the maximum */
       unsigned char thetaTrim = 4;
+      /* Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class */
+      bool storeAdditionalReadout = false;
     };
 
     /* Default constructor. */
@@ -178,14 +180,14 @@ namespace Belle2 {
      * @param omegaTrim number deleted cells in each omega direction from the maximum
      * @param phiTrim number deleted cells in each phi direction from the maximum
      * @param thetaTrim number deleted cells in each theta direction from the maximum
-     * @param verbose print Hough planes and verbose output
+     * @param storeAdditionalReadout switch for Hough space + cluster readout
      * @param axialFile axial hit data
      * @param stereoFile stereo hit data
      * */
     void init(unsigned char minSuperAxial, unsigned char minSuperStereo, float thresh,
               unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned char iterations,
               unsigned char omegaTrim, unsigned char phiTrim, unsigned char thetaTrim,
-              bool verbose, std::string& axialFile, std::string& stereoFile);
+              bool storeAdditionalReadout, std::string& axialFile, std::string& stereoFile);
 
     /* NDFinder reset data structure to process next event */
     void reset()
@@ -334,9 +336,6 @@ namespace Belle2 {
 
     /* Counter for the number of hits in the current event */
     unsigned short m_nHits{0};
-
-    /* Print Hough planes and verbose output */
-    bool m_verbose{false};
 
     /* Configuration parameters of the 3DFinder */
     ndparameters m_params;

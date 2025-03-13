@@ -673,7 +673,7 @@ namespace Belle2 {
     for( int i=0;i<olhitmgr.count();i++ ){
     Belle::Datcdc_olhit&  h = olhitmgr[i];
     }
-    doubt(Debugout::B2INFO,"SensitiveDetector")
+    cout(Debugout::B2INFO,"SensitiveDetector")
     << "AddbgOne " << olhitmgr.size()
     << std::endl;
     }

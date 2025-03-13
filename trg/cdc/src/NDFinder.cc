@@ -32,23 +32,21 @@ void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, f
   m_params.stereoFile = stereoFile;
   m_params.storeAdditionalReadout = storeAdditionalReadout;
 
-  initBins();
+  initLookUpArrays();
   initHitToSectorMap(*m_hitToSectorIDs);
 
   /* Load the axial and stereo track to hit relations from file.*/
   loadHitRepresentations(m_params.axialFile, m_compAxialBins, *m_compAxialHitReps);
-  B2DEBUG(25, "loaded zero suppressed axial array ");
   loadHitRepresentations(m_params.stereoFile, m_compStereoBins, *m_compStereoHitReps);
-  B2DEBUG(25, "loaded zero suppressed stereo array ");
 
   /* Unpack zero suppresed track to hit relations.*/
-  restoreZeros(m_expAxialBins, m_compAxialBins, *m_parrayAxialExp, *m_compAxialHitReps);
+  restoreZeros(m_compAxialBins, *m_parrayAxialExp, *m_compAxialHitReps);
   B2DEBUG(25, "restored expanded axial array (11/32 phi) ");
-  restoreZeros(m_expStereoBins, m_compStereoBins, *m_parrayStereoExp, *m_compStereoHitReps);
+  restoreZeros(m_compStereoBins, *m_parrayStereoExp, *m_compStereoHitReps);
   B2DEBUG(25, "restored expanded stereo array (11/32 phi) ");
-  squeezeAll(m_axialBins, *m_parrayAxial, *m_parrayAxialExp, m_parcels, m_parcelsExp);
+  squeezeAll(m_axialBins, *m_parrayAxial, *m_parrayAxialExp);
   B2DEBUG(25, "squeezed axial array (11/32 phi) --> (7/32 phi): ");
-  squeezeAll(m_stereoBins, *m_parrayStereo, *m_parrayStereoExp, m_parcels, m_parcelsExp);
+  squeezeAll(m_stereoBins, *m_parrayStereo, *m_parrayStereoExp);
   B2DEBUG(25, "squeezed stereo array (11/32 phi) --> (7/32 phi)");
 
   reset();
@@ -66,7 +64,7 @@ void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, f
   m_clusterer = Clusterizend(m_clustererParams);
 }
 
-void NDFinder::initBins()
+void NDFinder::initLookUpArrays()
 {
   /** Create the arrays of the track to hit relations
    * for axial and stereo hits.
@@ -77,67 +75,6 @@ void NDFinder::initBins()
    *
    * The number of track bins (full phi) is: (omega, phi, theta) = (40, 384, 9)
    **/
-
-  m_nTS = 2336;
-  m_nSL = 9;
-  m_nAxial = 41;
-  m_nStereo = 32;
-  m_nPrio = 3;
-
-  m_nOmega = 40;
-  m_nPhi = 384;
-  m_nTheta = 9;
-
-  m_phiGeo = 32;
-  m_parcels = 7;
-  m_parcelsExp = 11;
-
-  m_nPhiSector = m_nPhi / m_phiGeo; // 12
-  m_nPhiComp = 15;
-  m_nPhiUse =  m_parcels * m_nPhiSector; // 84
-  m_nPhiExp =  m_parcelsExp * m_nPhiSector; // 132
-
-  m_compAxialBins.omega = m_nOmega; // 40
-  m_compAxialBins.phi = m_nPhiComp; // 15
-  m_compAxialBins.theta = 1;
-  m_compAxialBins.hitID = m_nAxial; // 41
-  m_compAxialBins.priorityWire = m_nPrio; // 3
-
-  m_compStereoBins.omega = m_nOmega; // 40
-  m_compStereoBins.phi = m_nPhiComp; // 15
-  m_compStereoBins.theta = m_nTheta; // 9
-  m_compStereoBins.hitID = m_nStereo; // 32
-  m_compStereoBins.priorityWire = m_nPrio; // 3
-
-  m_axialBins.omega = m_nOmega; // 40
-  m_axialBins.phi = m_nPhiUse; // 84
-  m_axialBins.theta = m_nTheta; // 9
-  m_axialBins.hitID = m_nAxial; // 41
-  m_axialBins.priorityWire = m_nPrio; // 3
-
-  m_stereoBins.omega = m_nOmega; // 40
-  m_stereoBins.phi = m_nPhiUse; // 84
-  m_stereoBins.theta = m_nTheta; // 9
-  m_stereoBins.hitID = m_nStereo; // 32
-  m_stereoBins.priorityWire = m_nPrio; // 3
-
-  m_expAxialBins.omega = m_nOmega; // 40
-  m_expAxialBins.phi = m_nPhiExp; // 132
-  m_expAxialBins.theta = m_nTheta; // 9
-  m_expAxialBins.hitID = m_nAxial; // 41
-  m_expAxialBins.priorityWire = m_nPrio; // 3
-
-  m_expStereoBins.omega = m_nOmega; // 40
-  m_expStereoBins.phi = m_nPhiExp; // 132
-  m_expStereoBins.theta = m_nTheta; // 9
-  m_expStereoBins.hitID = m_nStereo; // 32
-  m_expStereoBins.priorityWire = m_nPrio; // 3
-
-  m_fullBins.omega = m_nOmega; // 40
-  m_fullBins.phi = m_nPhi; // 384
-  m_fullBins.theta = m_nTheta; // 9
-  m_fullBins.hitID = m_nTS; // 2336
-  m_fullBins.priorityWire = m_nPrio; // 3
 
   /* Shapes of the arrays holding the hit patterns */
   std::array<c2index, 2> shapeHitToSectorIDs = {{ m_nTS, m_nPrio }};
@@ -157,24 +94,10 @@ void NDFinder::initBins()
   m_phoughSpace             = new c3array(shapeHough);
   m_parrayAxialExp          = new c5array(shapeExpAxial);
   m_parrayStereoExp         = new c5array(shapeExpStereo);
-
-  /* Acceptance Ranges (for getBinToVal method) */
-  std::vector<float> omegaRange = { -5., 5.};
-  std::vector<float> phiRange = {0., 11.25};
-  std::vector<float> thetaRange = {19., 140.};
-  float ssOmega = (omegaRange[1] - omegaRange[0]) / m_nOmega; // 40;
-  float ssPhi = (phiRange[1] - phiRange[0]) / m_nPhiSector; // 12;
-  float ssTheta = (thetaRange[1] - thetaRange[0]) / m_nTheta; // 9;
-  m_acceptRanges.push_back(omegaRange);
-  m_acceptRanges.push_back(phiRange);
-  m_acceptRanges.push_back(thetaRange);
-  m_slotSizes.push_back(ssOmega);
-  m_slotSizes.push_back(ssPhi);
-  m_slotSizes.push_back(ssTheta);
 }
 
 /* Fills the m_hitToSectorIDs array */
-void NDFinder::initHitToSectorMap(c2array& mapArray)
+void NDFinder::initHitToSectorMap(c2array& hitsToSectorsArray)
 {
   /* Number of first priority wires in each super layer (TS per SL) */
   constexpr std::array<int, 9> nWires = {160, 160, 192, 224, 256, 288, 320, 352, 384};
@@ -201,19 +124,20 @@ void NDFinder::initHitToSectorMap(c2array& mapArray)
     int wireIDinSector = wireIDinSL % wiresPerSector[sl];
     int relativeWireIDinSector = cumulativeSectorWires[sl] + wireIDinSector;
     int relativeSectorIDinSuperLayer = (int) floor(wireIDinSL / wiresPerSector[sl]);
-    mapArray[hit][0] = (int)(isAxial);
-    mapArray[hit][1] = relativeWireIDinSector;
-    mapArray[hit][2] = relativeSectorIDinSuperLayer;
+    hitsToSectorsArray[hit][0] = (int)(isAxial);
+    hitsToSectorsArray[hit][1] = relativeWireIDinSector;
+    hitsToSectorsArray[hit][2] = relativeSectorIDinSuperLayer;
   }
 }
 
-
+/* Fills the m_compAxialHitReps/m_compStereoHitReps arrays */
 void NDFinder::loadHitRepresentations(const std::string& fileName, const SectorBinning& bins, c5array& hitsToWeights)
 {
-  std::vector<c5elem> flatArray; // Array of the entries in trg/cdc/data/ndFinderArray*Comp.txt.gz
+  /* Array of the entries in trg/cdc/data/ndFinderArray*Comp.txt.gz */
+  std::vector<c5elem> flatArray;
   std::ifstream arrayFileGZ(fileName, std::ios_base::in | std::ios_base::binary);
   if (!arrayFileGZ.is_open()) {
-    B2ERROR("could not open array file: " << fileName);
+    B2ERROR("Could not open array file: " << fileName);
     return;
   }
   boost::iostreams::filtering_istream arrayStream;
@@ -224,15 +148,14 @@ void NDFinder::loadHitRepresentations(const std::string& fileName, const SectorB
     flatArray.push_back(uline);
   }
   arrayFileGZ.close();
-  B2DEBUG(25, "loaded array from file " << fileName);
-  unsigned long icount = 0;
-  for (c5index ihit = 0; ihit < bins.hitID; ihit++) {
-    for (c5index priorityIndex = 0; priorityIndex < bins.priorityWire; priorityIndex++) {
-      for (c5index iomega = 0; iomega < bins.omega; iomega++) {
-        for (c5index iphi = 0; iphi < bins.phi; iphi++) {
-          for (c5index itheta = 0; itheta < bins.theta; itheta++) {
-            hitsToWeights[ihit][priorityIndex][iomega][iphi][itheta] = flatArray[icount];
-            icount++;
+  unsigned long arrayIndex = 0;
+  for (c5index hitID = 0; hitID < bins.nHitIDs; hitID++) {
+    for (c5index priorityWire = 0; priorityWire < bins.nPriorityWires; priorityWire++) {
+      for (c5index omegaIdx = 0; omegaIdx < bins.omega; omegaIdx++) {
+        for (c5index phiIdx = 0; phiIdx < bins.phi; phiIdx++) {
+          for (c5index thetaIdx = 0; thetaIdx < bins.theta; thetaIdx++) {
+            hitsToWeights[hitID][priorityWire][omegaIdx][phiIdx][thetaIdx] = flatArray[arrayIndex];
+            arrayIndex++;
           }
         }
       }
@@ -241,61 +164,63 @@ void NDFinder::loadHitRepresentations(const std::string& fileName, const SectorB
 }
 
 
-void NDFinder::squeezeOne(c5array& writeArray, c5array& readArray, int outparcels, int inparcels, c5index ihit,
-                          c5index priorityIndex, c5index itheta, c5elem nomega)
+void NDFinder::restoreZeros(SectorBinning compBins, c5array& expArray, const c5array& hitsToWeights)
 {
-  int outnphi = (int)(12 * outparcels);
-  c5index trafstart = (c5index)((inparcels - outparcels) / 2 * 12);
-  c5index trafend = (c5index)(trafstart + outnphi);
-  for (c5index iomega = 0; iomega < nomega; iomega++) {
-    for (c5index iphi = 0; iphi < outnphi; iphi++) {
-      c5index readPhi = trafstart + iphi;
-      writeArray[ihit][priorityIndex][iomega][iphi][itheta] = readArray[ihit][priorityIndex][iomega][readPhi][itheta];
-    }
-    for (c5index iphi = 0; iphi < trafstart; iphi++) {
-      c5index writePhi = (c5index)(outnphi - trafstart + iphi);
-      writeArray[ihit][priorityIndex][iomega][writePhi][itheta] += readArray[ihit][priorityIndex][iomega][iphi][itheta];
-    }
-    for (c5index iphi = 0; iphi < trafstart; iphi++) {
-      c5index readPhi = trafend + iphi;
-      writeArray[ihit][priorityIndex][iomega][iphi][itheta] += readArray[ihit][priorityIndex][iomega][readPhi][itheta];
-    }
-  }
-}
-
-
-void NDFinder::squeezeAll(SectorBinning writebins, c5array& writeArray, c5array& readArray, int outparcels, int inparcels)
-{
-  for (c5index ihit = 0; ihit < writebins.hitID; ihit++) {
-    for (c5index priorityIndex = 0; priorityIndex < writebins.priorityWire; priorityIndex++) {
-      for (c5index itheta = 0; itheta < writebins.theta; itheta++) {
-        squeezeOne(writeArray, readArray, outparcels, inparcels, ihit, priorityIndex, itheta, writebins.omega);
-      }
-    }
-  }
-}
-
-
-void NDFinder::restoreZeros(SectorBinning zerobins, SectorBinning compbins, c5array& expArray, const c5array& compArray)
-{
-  B2DEBUG(25, "restoreZeros: zerobins.theta " << zerobins.theta << ", combins.theta " << compbins.theta);
-  for (c5index ihit = 0; ihit < compbins.hitID; ihit++) {
-    for (c5index priorityIndex = 0; priorityIndex < compbins.priorityWire; priorityIndex++) {
-      for (c5index iomega = 0; iomega < compbins.omega; iomega++) {
-        for (c5index itheta = 0; itheta < compbins.theta; itheta++) {
-          c5elem phiStart = compArray[ihit][priorityIndex][iomega][0][itheta];
-          c5elem phiWidth = compArray[ihit][priorityIndex][iomega][1][itheta];
-          for (c5index iphi = 0; iphi < phiWidth; iphi++) {
-            c5elem phiCur = phiStart + iphi;
-            expArray[ihit][priorityIndex][iomega][phiCur][itheta] = compArray[ihit][priorityIndex][iomega][iphi + 2][itheta];
-            if (compbins.theta == 1) { // case axial, expand in theta
-              for (c5index jtheta = 1; jtheta < zerobins.theta; jtheta++) {
-                expArray[ihit][priorityIndex][iomega][phiCur][jtheta] = compArray[ihit][priorityIndex][iomega][iphi + 2][itheta];
+  for (c5index hitID = 0; hitID < compBins.nHitIDs; hitID++) {
+    for (c5index priorityWire = 0; priorityWire < compBins.nPriorityWires; priorityWire++) {
+      for (c5index omegaIdx = 0; omegaIdx < compBins.omega; omegaIdx++) {
+        for (c5index thetaIdx = 0; thetaIdx < compBins.theta; thetaIdx++) {
+          unsigned short phiStart = hitsToWeights[hitID][priorityWire][omegaIdx][0][thetaIdx];
+          unsigned short nPhiEntries = hitsToWeights[hitID][priorityWire][omegaIdx][1][thetaIdx];
+          for (c5index phiEntry = 0; phiEntry < nPhiEntries; phiEntry++) {
+            unsigned short currentPhi = phiStart + phiEntry;
+            expArray[hitID][priorityWire][omegaIdx][currentPhi][thetaIdx] =
+              hitsToWeights[hitID][priorityWire][omegaIdx][phiEntry + 2][thetaIdx];
+            if (compBins.theta == 1) { // case axial, expand in theta
+              for (c5index jtheta = 1; jtheta < m_nTheta; jtheta++) {
+                expArray[hitID][priorityWire][omegaIdx][currentPhi][jtheta] =
+                  hitsToWeights[hitID][priorityWire][omegaIdx][phiEntry + 2][thetaIdx];
               }
             }
           }
         }
       }
+    }
+  }
+}
+
+
+void NDFinder::squeezeAll(SectorBinning writebins, c5array& writeArray, const c5array& readArray)
+{
+  for (c5index hitID = 0; hitID < writebins.nHitIDs; hitID++) {
+    for (c5index priorityIdx = 0; priorityIdx < writebins.nPriorityWires; priorityIdx++) {
+      for (c5index itheta = 0; itheta < writebins.theta; itheta++) {
+        squeezeOne(writeArray, readArray, hitID, priorityIdx, itheta, writebins.omega);
+      }
+    }
+  }
+}
+
+
+void NDFinder::squeezeOne(c5array& writeArray, const c5array& readArray, c5index hitID,
+                          c5index priorityIdx, c5index itheta, c5elem nomega)
+{
+  const int outnphi = (int)(m_nPhiSector * m_parcels); // 12 * 7 = 84
+  const c5index trafstart = (c5index)((m_parcelsExp - m_parcels) / 2 * m_nPhiSector); // (11 - 7) / 2 * 12 = 24
+  const c5index trafend = (c5index)(trafstart + outnphi); // 24 + 84 = 108
+  for (c5index iomega = 0; iomega < nomega; iomega++) { // 40
+    for (c5index iphi = 0; iphi < outnphi; iphi++) { // 84
+      c5index readPhi = trafstart + iphi; // 24 -> 108
+      writeArray[hitID][priorityIdx][iomega][iphi][itheta] = readArray[hitID][priorityIdx][iomega][readPhi][itheta];
+      /* Maps 0 -> 24, 1 -> 25, ..., 84 -> 108 */
+    }
+    for (c5index iphi = 0; iphi < trafstart; iphi++) { // 24
+      c5index writePhi = (c5index)(outnphi - trafstart + iphi); // 60 -> 84
+      writeArray[hitID][priorityIdx][iomega][writePhi][itheta] += readArray[hitID][priorityIdx][iomega][iphi][itheta];
+    }
+    for (c5index iphi = 0; iphi < trafstart; iphi++) { // 24
+      c5index readPhi = trafend + iphi; // 108 -> 132
+      writeArray[hitID][priorityIdx][iomega][iphi][itheta] += readArray[hitID][priorityIdx][iomega][readPhi][itheta];
     }
   }
 }
@@ -334,18 +259,19 @@ void NDFinder::addLookup(unsigned short ihit)
 
 void NDFinder::addC3Comp(const HitInfo& hitInfo, const c5array& hitsToWeights)
 {
-  unsigned short ntheta = 0;
+  unsigned short nTheta = 0;
   c3array& houghSpace = *m_phoughSpace;
-  for (unsigned short itheta = 0; itheta < m_nTheta; itheta++) {
+  for (unsigned short thetaIdx = 0; thetaIdx < m_nTheta; thetaIdx++) {
     if (hitInfo.bins.theta > 1) { // stereo
-      ntheta = itheta;
+      nTheta = thetaIdx;
     }
-    for (unsigned short iomega = 0; iomega < m_nOmega; iomega++) {
-      unsigned short phiStart = hitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][iomega][0][ntheta];
-      unsigned short nPhiEntries = hitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][iomega][1][ntheta];
-      for (unsigned short entry = 0; entry < nPhiEntries; entry++) {
-        unsigned short iHoughPhi = (entry + phiStart + hitInfo.Dstart) % m_nPhi;
-        houghSpace[iomega][iHoughPhi][itheta] += hitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][iomega][entry + 2][ntheta];
+    for (unsigned short omegaIdx = 0; omegaIdx < m_nOmega; omegaIdx++) {
+      unsigned short phiStart = hitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][omegaIdx][0][nTheta];
+      unsigned short nPhiEntries = hitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][omegaIdx][1][nTheta];
+      for (unsigned short phiEntry = 0; phiEntry < nPhiEntries; phiEntry++) {
+        unsigned short houghPhiIdx = (phiEntry + phiStart + hitInfo.Dstart) % m_nPhi;
+        houghSpace[omegaIdx][houghPhiIdx][thetaIdx] +=
+          hitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][omegaIdx][phiEntry + 2][nTheta];
       }
     }
   }
@@ -458,7 +384,7 @@ void NDFinder::getCM()
   // New hit to cluster relation
   std::vector<SimpleCluster> validClusters = allHitsToClusters(hitsVsClusters, allClusters);
 
-  for (const SimpleCluster& cluster : validClusters) {
+  for (SimpleCluster& cluster : validClusters) {
     std::vector<cell_index> entries = cluster.getEntries();
     cell_index maxid = getMax(entries);
     unsigned short maxval = houghSpace[maxid[0]][maxid[1]][maxid[2]];
@@ -505,7 +431,7 @@ void NDFinder::getCM()
         readoutCluster.push_back(ROOT::Math::XYZVector(cellIndex[0], cellIndex[1], cellIndex[2]));
       }
     }
-    m_NDFinderTracks.push_back(NDFinderTrack(transformed, cluster, readoutHoughSpace, readoutCluster));
+    m_NDFinderTracks.push_back(NDFinderTrack(transformed, std::move(cluster), std::move(readoutHoughSpace), std::move(readoutCluster)));
   }
 }
 
@@ -545,7 +471,7 @@ std::vector<double> NDFinder::getBinToVal(std::vector<double> thisAv)
 {
   std::vector<double> estimate;
   for (unsigned short idim = 0; idim < 3; idim++) {
-    double trafd = m_acceptRanges[idim][0] + (thisAv[idim] + 0.5) * m_slotSizes[idim];
+    double trafd = m_acceptanceRanges[idim][0] + (thisAv[idim] + 0.5) * m_binSizes[idim];
     estimate.push_back(trafd);
   }
   return estimate;

@@ -12,6 +12,7 @@
 #include "trg/cdc/NDFinderDefs.h"
 #include "trg/cdc/Clusterizend.h"
 #include <Math/Vector3D.h>
+#include <utility>
 
 namespace Belle2 {
 
@@ -20,8 +21,8 @@ namespace Belle2 {
     c5elem omega;
     c5elem phi;
     c5elem theta;
-    c5elem hitID;
-    c5elem priorityWire;
+    c5elem nHitIDs;
+    c5elem nPriorityWires;
   };
 
   /* Data type for a cluster cell */
@@ -42,12 +43,12 @@ namespace Belle2 {
   class NDFinderTrack {
   public:
     NDFinderTrack(std::vector<double> values,
-                  const SimpleCluster& cluster,
-                  const std::vector<ROOT::Math::XYZVector>& readoutHoughSpace,
-                  const std::vector<ROOT::Math::XYZVector>& readoutCluster)
-      : m_cluster(cluster),
-        m_houghSpace(readoutHoughSpace),
-        m_readoutCluster(readoutCluster)
+                  SimpleCluster&& cluster,
+                  std::vector<ROOT::Math::XYZVector>&& readoutHoughSpace,
+                  std::vector<ROOT::Math::XYZVector>&& readoutCluster)
+      : m_cluster(std::move(cluster)),
+        m_houghSpace(std::move(readoutHoughSpace)),
+        m_readoutCluster(std::move(readoutCluster))
     {
       m_omega = values[0];
       m_phi = values[1];
@@ -131,9 +132,9 @@ namespace Belle2 {
       std::string stereoFile = "data/trg/cdc/ndFinderArrayStereoComp.txt.gz";
 
       /* Required number of axial super layers */
-      unsigned char minSuperAxial  = 4;
+      unsigned char minSuperAxial = 4;
       /* Required number of stereo super layers */
-      unsigned char minSuperStereo  = 3;
+      unsigned char minSuperStereo = 3;
       /* Hough space cells must have (thresh * maxweight) to be considered */
       float thresh = 0.85;
       /* Clustering: Minimum of the total weight in all cells of the 3d volume */
@@ -230,30 +231,26 @@ namespace Belle2 {
   protected:
 
     /* Initialize the binnings and reserve the arrays */
-    void initBins();
+    void initLookUpArrays();
 
-    /* Fills the m_hitToSectorIDs array */
-    void initHitToSectorMap(c2array& mapArray);
+    /* Fills the m_hitToSectorIDs array with the hit to orientation/sectorWire/sectorID relations */
+    void initHitToSectorMap(c2array& hitsToSectorsArray);
 
-    /* Load an NDFinder array of hit representations in track phase space. */
-    /* Used to load axial and stereo hit arrays. */
-    /* Represented in a 7/32 phi sector of the CDC. */
+    /* Fills the m_compAxialHitReps/m_compStereoHitReps arrays with the hit representations (hits to weights) */
     void loadHitRepresentations(const std::string& fileName, const SectorBinning& bins, c5array& hitsToWeights);
 
     /* Restore non-zero suppressed hit curves. */
     /* will make m_params.arrayAxialFile and m_params.arrayStereoFile obsolete */
-    void restoreZeros(SectorBinning zerobins, SectorBinning compbins, c5array& expArray, const c5array& compArray);
+    void restoreZeros(SectorBinning compBins, c5array& expArray, const c5array& hitsToWeights);
+
+    /* Loop over all hits and theta bins and squeeze all */
+    /* 2D (omega,phi) planes */
+    void squeezeAll(SectorBinning writebins, c5array& writeArray, const c5array& readArray);
 
     /* Squeeze phi-axis in a 2D (omega,phi) plane */
     /* @param inparcels number of 1/32 sectors in input plane */
     /* @param outparcels number of 1/32 sectors in output plane */
-    void squeezeOne(c5array& writeArray, c5array& readArray, int outparcels, int inparcels, c5index ihit, c5index priorityIndex,
-                    c5index itheta,
-                    c5elem nomega);
-
-    /* Loop over all hits and theta bins and squeeze all */
-    /* 2D (omega,phi) planes */
-    void squeezeAll(SectorBinning writebins, c5array& writeArray, c5array& readArray, int outparcels, int inparcels);
+    void squeezeOne(c5array& writeArray, const c5array& readArray, c5index ihit, c5index priorityIndex, c5index itheta, c5elem nomega);
 
     /* Core track finding logic in the constructed houghmap */
     void getCM();
@@ -347,40 +344,46 @@ namespace Belle2 {
     Belle2::Clusterizend m_clusterer;
 
     /* Track segments */
-    unsigned short m_nTS{0}; // Number of track segments
-    unsigned short m_nSL{0}; // Number of super layers
-    unsigned short m_nAxial{0}; // Number of unique axial track segments
-    unsigned short m_nStereo{0}; // Number of unique stereo track segments
-    unsigned short m_nPrio{0}; // Number of priority wires
+    static constexpr unsigned short m_nTS = 2336; // Number of track segments
+    static constexpr unsigned short m_nSL = 9; // Number of super layers
+    static constexpr unsigned short m_nAxial = 41; // Number of unique axial track segments
+    static constexpr unsigned short m_nStereo = 32; // Number of unique stereo track segments
+    static constexpr unsigned short m_nPrio = 3; // Number of priority wires
 
     /* Full Hough space bins */
-    unsigned short m_nPhi{0}; // Bins in the phi dimension
-    unsigned short m_nOmega{0}; // Bins in the omega dimension
-    unsigned short m_nTheta{0}; // Bins in the theta dimension
+    static constexpr unsigned short m_nOmega = 40; // Bins in the phi dimension
+    static constexpr unsigned short m_nPhi = 384; // Bins in the omega dimension
+    static constexpr unsigned short m_nTheta = 9; // Bins in the theta dimension
 
     /* CDC symmetry in phi */
-    unsigned short m_phiGeo{0}; // Repetition of the wire pattern
-    unsigned short m_parcels{0}; // phi range: hit data
-    unsigned short m_parcelsExp{0}; // phi range: expanded hit data
+    static constexpr unsigned short m_phiGeo = 32; // Repetition of the wire pattern
+    static constexpr unsigned short m_parcels = 7; // phi range: hit data
+    static constexpr unsigned short m_parcelsExp = 11; // phi range: expanded hit data
 
     /* Phi sectors in the CDC */
-    unsigned short m_nPhiSector{0}; // Bins of one phi sector
-    unsigned short m_nPhiComp{0}; // Bins of compressed phi: phi_start, phi_width, phi_0, ..., phi_12
-    unsigned short m_nPhiUse{0}; // Bins of 7 phi sectors
-    unsigned short m_nPhiExp{0}; // Bins of 11 phi sectors
+    static constexpr unsigned short m_nPhiSector = m_nPhi / m_phiGeo; // Bins of one phi sector (12)
+    static constexpr unsigned short m_nPhiComp = 15; // Bins of compressed phi: phi_start, phi_width, phi_0, ..., phi_12
+    static constexpr unsigned short m_nPhiUse =  m_parcels * m_nPhiSector; // Bins of 7 phi sectors (84)
+    static constexpr unsigned short m_nPhiExp =  m_parcelsExp * m_nPhiSector; // Bins of 11 phi sectors (132)
 
     /* Binnings in different hit pattern arrays */
-    SectorBinning m_compAxialBins;
-    SectorBinning m_compStereoBins;
-    SectorBinning m_axialBins;
-    SectorBinning m_stereoBins;
-    SectorBinning m_expAxialBins;
-    SectorBinning m_expStereoBins;
-    SectorBinning m_fullBins;
+    static constexpr SectorBinning m_compAxialBins = {m_nOmega, m_nPhiComp, 1, m_nAxial, m_nPrio}; // 40, 15, 1, 41, 3
+    static constexpr SectorBinning m_compStereoBins = {m_nOmega, m_nPhiComp, m_nTheta, m_nStereo, m_nPrio}; // 40, 15, 9, 32, 3
+    static constexpr SectorBinning m_axialBins = {m_nOmega, m_nPhiUse, m_nTheta, m_nAxial, m_nPrio}; // 40, 84, 9, 41, 3
+    static constexpr SectorBinning m_stereoBins = {m_nOmega, m_nPhiUse, m_nTheta, m_nStereo, m_nPrio}; // 40, 84, 9, 32, 3
+    static constexpr SectorBinning m_expAxialBins = {m_nOmega, m_nPhiExp, m_nTheta, m_nAxial, m_nPrio}; // 40, 132, 9, 32, 3
+    static constexpr SectorBinning m_expStereoBins = {m_nOmega, m_nPhiExp, m_nTheta, m_nStereo, m_nPrio}; // 40, 132, 9, 32, 3
+    static constexpr SectorBinning m_fullBins = {m_nOmega, m_nPhi, m_nTheta, m_nTS, m_nPrio}; // 40, 384, 9, 2336, 3
 
-    /* Acceptance Ranges to convert bins to track parameters */
-    std::vector<std::vector<float>> m_acceptRanges;
-    std::vector<float> m_slotSizes;
+    /* Acceptance ranges + slot sizes to convert bins to track parameters (for getBinToVal method) */
+    static constexpr std::array<float, 2> m_omegaRange = {-5., 5.};
+    static constexpr std::array<float, 2> m_phiRange = {0., 11.25};
+    static constexpr std::array<float, 2> m_thetaRange = {19., 140.};
+    static constexpr float m_binSizeOmega = (m_omegaRange[1] - m_omegaRange[0]) / m_nOmega; // 0.25
+    static constexpr float m_binSizePhi = (m_phiRange[1] - m_phiRange[0]) / m_nPhiSector; // 0.9375
+    static constexpr float m_binSizeTheta = (m_thetaRange[1] - m_thetaRange[0]) / m_nTheta; // 13.444
+    static constexpr std::array<std::array<float, 2>, 3> m_acceptanceRanges = {m_omegaRange, m_phiRange, m_thetaRange};
+    static constexpr std::array<float, 3> m_binSizes = {m_binSizeOmega, m_binSizePhi, m_binSizeTheta};
 
     /* Array pointers to the hit patterns */
     /* m_hitToSectorIDs: 2D array mapping TS-ID ([0, 2335]) to: */
@@ -388,11 +391,18 @@ namespace Belle2 {
     /*   - [1]: Relative wire ID in the sector ([0, 40] for axials, [0, 31] for stereos) */
     /*   - [2]: Relative phi-sector ID in the super layer ([0, 31] in each SL) */
     c2array* m_hitToSectorIDs = nullptr;
+    /* m_compAxialHitReps/m_compStereoHitReps: 5D array mapping: */
+    /* 1. [hitID]: Relative hit number of the track segment (axial [0, 40], stereo [0, 31]) */
+    /* 2. [priorityWire]: Hit priority wire ([0, 2]) */
+    /* 3. [omegaIdx]: Omega index of the Hough space ([0, 39]) */
+    /* 4. [phiIdx]: Phi start value, number of phi bins, phi values (0, 1, [2, 14]) */
+    /* 5. [thetaIdx]: Theta index of the Hough space (0 for axial TS, [0, 8] for stereo TS) */
+    /* to the Hough space weight contribution at the corresponding bin (int, [0, 7]) */
+    c5array* m_compAxialHitReps = nullptr;
+    c5array* m_compStereoHitReps = nullptr;
     c5array* m_parrayAxial = nullptr;
     c5array* m_parrayStereo = nullptr;
     c3array* m_phoughSpace = nullptr;
-    c5array* m_compAxialHitReps = nullptr;
-    c5array* m_compStereoHitReps = nullptr;
     c5array* m_parrayAxialExp = nullptr;
     c5array* m_parrayStereoExp = nullptr;
   };

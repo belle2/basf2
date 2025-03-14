@@ -49,7 +49,7 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            32);
   addParam("iterations", m_iterations,
            "Clustering: Number of iterations for the cluster finding in one Hough space quadrant.",
-           2);
+           1);
   addParam("omegaTrim", m_omegaTrim,
            "Clustering: Number of deleted cells in each omega direction of the maximum.",
            5);
@@ -64,10 +64,10 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            false);
   addParam("axialFile", m_axialFile,
            "File name of the axial hit patterns. ",
-           std::string("data/trg/cdc/ndFinderAxialShallow.txt.gz"));
+           std::string("data/trg/cdc/ndFinderArrayAxialComp.txt.gz"));
   addParam("stereoFile", m_stereoFile,
            "File name of the stereo hit patterns. ",
-           std::string("data/trg/cdc/ndFinderStereoShallow.txt.gz"));
+           std::string("data/trg/cdc/ndFinderArrayStereoComp.txt.gz"));
   addParam("NDFinderInfosName", m_NDFinderInfosName,
            "The name of the StoreArray where the tracks clusters found by this NDFinder Module are stored.",
            std::string("CDCTriggerClusterInfos"));

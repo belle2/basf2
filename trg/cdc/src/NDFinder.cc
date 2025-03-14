@@ -250,13 +250,13 @@ void NDFinder::addLookup(unsigned short hitIdx)
   if (DstartShort < 0) {DstartShort = m_nPhi + DstartShort;}
   // Add hit to hough plane
   // 11 of 32 phi parcels: center = 5
-  short phiOffset = ((short)relativeSectorID - 5) % m_phiGeo * m_nPhiSector;
-  if (phiOffset < 0) {phiOffset = m_nPhi + phiOffset;}
+  short phiSectorStart = ((short)relativeSectorID - 5) % m_phiGeo * m_nPhiSector;
+  if (phiSectorStart < 0) {phiSectorStart = m_nPhi + phiSectorStart;}
 
   m_vecDstart.push_back(DstartShort);
   m_hitOrients.push_back(orient);
 
-  HitInfo hitInfo = {relativeWireID, priorityWire, phiOffset};
+  HitInfo hitInfo = {relativeWireID, priorityWire, phiSectorStart};
 
   if (orient == 1) {
     writeHitToHoughSpace(hitInfo, *m_expAxialHitReps);
@@ -272,7 +272,7 @@ void NDFinder::writeHitToHoughSpace(const HitInfo& hitInfo, const c5array& expHi
   for (unsigned short thetaIdx = 0; thetaIdx < m_nTheta; ++thetaIdx) {
     for (unsigned short omegaIdx = 0; omegaIdx < m_nOmega; ++omegaIdx) {
       for (unsigned short phiIdx = 0; phiIdx < m_nPhiExp; ++phiIdx) {
-        unsigned short houghPhiIdx = (phiIdx + hitInfo.phiOffset) % m_nPhi;
+        unsigned short houghPhiIdx = (phiIdx + hitInfo.phiSectorStart) % m_nPhi;
         houghSpace[omegaIdx][houghPhiIdx][thetaIdx] +=
           expHitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][omegaIdx][phiIdx][thetaIdx];
       }

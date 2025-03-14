@@ -35,7 +35,7 @@ namespace Belle2 {
   struct HitInfo {
     unsigned short relativeWireID;
     unsigned short priorityWire;
-    short phiOffset;
+    short phiSectorStart;
   };
 
   /* Store track parameters of found tracks. */
@@ -141,7 +141,7 @@ namespace Belle2 {
       /* Clustering: Minimum peak cell weight */
       unsigned short minPeakWeight = 32;
       /* Clustering: Number of iterations for the cluster search in each Hough space quadrant */
-      unsigned char iterations = 2;
+      unsigned char iterations = 1;
       /* Clustering: Number of deleted cells in each omega direction from the maximum */
       unsigned char omegaTrim = 5;
       /* Clustering: Number of deleted cells in each phi direction from the maximum */

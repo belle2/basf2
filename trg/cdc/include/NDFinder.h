@@ -35,8 +35,7 @@ namespace Belle2 {
   struct HitInfo {
     unsigned short relativeWireID;
     unsigned short priorityWire;
-    short Dstart;
-    SectorBinning bins;
+    short phiOffset;
   };
 
   /* Store track parameters of found tracks. */
@@ -159,14 +158,14 @@ namespace Belle2 {
     /* Destructor. */
     virtual ~NDFinder()
     {
-      delete m_parrayAxial;
-      delete m_parrayStereo;
-      delete m_phoughSpace;
+      delete m_axialHitContributions;
+      delete m_stereoHitContributions;
+      delete m_houghSpace;
       delete m_hitToSectorIDs;
       delete m_compAxialHitReps;
       delete m_compStereoHitReps;
-      delete m_parrayAxialExp;
-      delete m_parrayStereoExp;
+      delete m_expAxialHitReps;
+      delete m_expStereoHitReps;
     }
 
     /* Initialization */
@@ -201,12 +200,12 @@ namespace Belle2 {
       m_nHits = 0;
       m_vecDstart.clear();
       m_hitOrients.clear();
-      delete m_phoughSpace;
+      delete m_houghSpace;
       std::array<c3index, 3> shapeHough = {{ m_nOmega, m_nPhi, m_nTheta }};
-      m_phoughSpace = new c3array(shapeHough);
+      m_houghSpace = new c3array(shapeHough);
     }
 
-    /* fill hit info of the event */
+    /* Fill hit info of the event */
     void addHit(unsigned short hitID, unsigned short hitSLID, unsigned short hitPrioPos, long hitPrioTime)
     {
       if (hitPrioPos > 0) { // skip "no hit"
@@ -214,7 +213,7 @@ namespace Belle2 {
         m_hitSLIDs.push_back(hitSLID);
         m_priorityWirePos.push_back(3 - hitPrioPos);
         m_priorityWireTime.push_back(hitPrioTime);
-        m_nHits++;
+        ++m_nHits;
       }
     }
 
@@ -233,24 +232,24 @@ namespace Belle2 {
     /* Initialize the binnings and reserve the arrays */
     void initLookUpArrays();
 
-    /* Fills the m_hitToSectorIDs array with the hit to orientation/sectorWire/sectorID relations */
-    void initHitToSectorMap(c2array& hitsToSectorsArray);
+    /* Fills the m_hitToSectorIDs (see below) array with the hit to orientation/sectorWire/sectorID relations */
+    void initHitToSectorMap(c2array& hitsToSectors);
 
-    /* Fills the m_compAxialHitReps/m_compStereoHitReps arrays with the hit representations (hits to weights) */
-    void loadHitRepresentations(const std::string& fileName, const SectorBinning& bins, c5array& hitsToWeights);
+    /* Fills the m_compAxialHitReps/m_compStereoHitReps (see below) arrays with the hit representations (hits to weights) */
+    void loadCompressedHitReps(const std::string& fileName, const SectorBinning& compBins, c5array& compHitsToWeights);
 
-    /* Restore non-zero suppressed hit curves. */
-    /* will make m_params.arrayAxialFile and m_params.arrayStereoFile obsolete */
-    void restoreZeros(SectorBinning compBins, c5array& expArray, const c5array& hitsToWeights);
+    /* Fills the m_expAxialHitReps/m_expStereoHitReps (see below) arrays with the expanded hit representations (hits to weights) */
+    void fillExpandedHitReps(const SectorBinning& compBins, const c5array& compHitsToWeights, c5array& expHitsToWeights);
 
     /* Loop over all hits and theta bins and squeeze all */
     /* 2D (omega,phi) planes */
-    void squeezeAll(SectorBinning writebins, c5array& writeArray, const c5array& readArray);
+    void squeezeAll(const SectorBinning& writebins, c5array& writeArray, const c5array& expHitsToWeights);
 
     /* Squeeze phi-axis in a 2D (omega,phi) plane */
     /* @param inparcels number of 1/32 sectors in input plane */
     /* @param outparcels number of 1/32 sectors in output plane */
-    void squeezeOne(c5array& writeArray, const c5array& readArray, c5index ihit, c5index priorityIndex, c5index itheta, c5elem nomega);
+    void squeezeOne(c5array& writeArray, const c5array& expHitsToWeights, c5index hitIdx, c5index priorityIndex, c5index itheta,
+                    c5elem nomega);
 
     /* Core track finding logic in the constructed houghmap */
     void getCM();
@@ -259,21 +258,20 @@ namespace Belle2 {
     /* Determines the phi window of the hit in the full houghmap (Dstart, Dend). */
     /* Uses: m_arrayHitMod */
     /* Fills: m_vecDstart, m_hitOrients */
-    void addLookup(unsigned short ihit);
+    void addLookup(unsigned short hitIdx);
 
-    /* In place array addition to houghmap Comp: A = A + B */
-    void addC3Comp(const HitInfo& hitInfo, const c5array& hitsToWeights);
+    /* Write (add) a single hit (Hough curve) to the Hough space */
+    void writeHitToHoughSpace(const HitInfo& hitInfo, const c5array& expHitsToWeights);
 
     /* Create hits to clusters confusion matrix */
-    std::vector<std::vector<unsigned short>> getHitsVsClusters(
-                                            std::vector<SimpleCluster>& clusters);
+    std::vector<std::vector<unsigned short>> getHitsVsClusters(std::vector<SimpleCluster>& clusters);
 
     /* Peak cell in cluster */
     cell_index getMax(const std::vector<cell_index>&);
 
     /* Determine weight contribution of a single hit to a single cell. */
     /* Used to create the hitsVsClusters confusion matrix. */
-    unsigned short hitContrib(cell_index peak, unsigned short ihit);
+    unsigned short hitContrib(cell_index peak, unsigned short hitIdx);
 
     /* Relate all hits in a cluster to the cluster */
     /* Remove small clusters with less than minsuper related hits. */
@@ -369,10 +367,10 @@ namespace Belle2 {
     /* Binnings in different hit pattern arrays */
     static constexpr SectorBinning m_compAxialBins = {m_nOmega, m_nPhiComp, 1, m_nAxial, m_nPrio}; // 40, 15, 1, 41, 3
     static constexpr SectorBinning m_compStereoBins = {m_nOmega, m_nPhiComp, m_nTheta, m_nStereo, m_nPrio}; // 40, 15, 9, 32, 3
-    static constexpr SectorBinning m_axialBins = {m_nOmega, m_nPhiUse, m_nTheta, m_nAxial, m_nPrio}; // 40, 84, 9, 41, 3
-    static constexpr SectorBinning m_stereoBins = {m_nOmega, m_nPhiUse, m_nTheta, m_nStereo, m_nPrio}; // 40, 84, 9, 32, 3
     static constexpr SectorBinning m_expAxialBins = {m_nOmega, m_nPhiExp, m_nTheta, m_nAxial, m_nPrio}; // 40, 132, 9, 32, 3
     static constexpr SectorBinning m_expStereoBins = {m_nOmega, m_nPhiExp, m_nTheta, m_nStereo, m_nPrio}; // 40, 132, 9, 32, 3
+    static constexpr SectorBinning m_axialBins = {m_nOmega, m_nPhiUse, m_nTheta, m_nAxial, m_nPrio}; // 40, 84, 9, 41, 3
+    static constexpr SectorBinning m_stereoBins = {m_nOmega, m_nPhiUse, m_nTheta, m_nStereo, m_nPrio}; // 40, 84, 9, 32, 3
     static constexpr SectorBinning m_fullBins = {m_nOmega, m_nPhi, m_nTheta, m_nTS, m_nPrio}; // 40, 384, 9, 2336, 3
 
     /* Acceptance ranges + slot sizes to convert bins to track parameters (for getBinToVal method) */
@@ -391,7 +389,7 @@ namespace Belle2 {
     /*   - [1]: Relative wire ID in the sector ([0, 40] for axials, [0, 31] for stereos) */
     /*   - [2]: Relative phi-sector ID in the super layer ([0, 31] in each SL) */
     c2array* m_hitToSectorIDs = nullptr;
-    /* m_compAxialHitReps/m_compStereoHitReps: 5D array mapping: */
+    /* m_compAxialHitReps/m_compStereoHitReps (~ Compressed in phi (width, start, values)) 5D array mapping: */
     /* 1. [hitID]: Relative hit number of the track segment (axial [0, 40], stereo [0, 31]) */
     /* 2. [priorityWire]: Hit priority wire ([0, 2]) */
     /* 3. [omegaIdx]: Omega index of the Hough space ([0, 39]) */
@@ -400,10 +398,17 @@ namespace Belle2 {
     /* to the Hough space weight contribution at the corresponding bin (int, [0, 7]) */
     c5array* m_compAxialHitReps = nullptr;
     c5array* m_compStereoHitReps = nullptr;
-    c5array* m_parrayAxial = nullptr;
-    c5array* m_parrayStereo = nullptr;
-    c3array* m_phoughSpace = nullptr;
-    c5array* m_parrayAxialExp = nullptr;
-    c5array* m_parrayStereoExp = nullptr;
+    /* m_expAxialHitReps/m_expStereoHitReps (~ Expands to 11/32 phi sectors) 5D array mapping: */
+    /* 1. [hitID]: Relative hit number of the track segment (axial [0, 40], stereo [0, 31]) */
+    /* 2. [priorityWire]: Hit priority wire ([0, 2]) */
+    /* 3. [omegaIdx]: Omega index of the Hough space ([0, 39]) */
+    /* 4. [phiIdx]: The actual relative phi index in the Hough space ([0, 131]), Dstart must be added */
+    /* 5. [thetaIdx]: Theta index of the Hough space ([0, 8] for both axial and stereo!) */
+    /* to the Hough space weight contribution at the corresponding bin (int, [0, 7]) */
+    c5array* m_expAxialHitReps = nullptr;
+    c5array* m_expStereoHitReps = nullptr;
+    c5array* m_axialHitContributions = nullptr;
+    c5array* m_stereoHitContributions = nullptr;
+    c3array* m_houghSpace = nullptr;
   };
 }

@@ -137,9 +137,9 @@ namespace Belle2 {
     explicit Clusterizend(const clustererParams& params): m_params(params) {}
 
     /* Set a new hough space for clustering and track finding */
-    void setNewPlane(c3array& houghmapPlain)
+    void setNewPlane(c3array& houghSpace)
     {
-      m_houghSpace = &houghmapPlain;
+      m_houghSpace = &houghSpace;
     }
 
     /* Clustering logic */

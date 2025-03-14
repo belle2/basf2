@@ -20,6 +20,7 @@
 
 using namespace Belle2;
 
+#define print(x) std::cout << #x << " = " << (x) << "\n";
 void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, float thresh,
                     unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned char iterations,
                     unsigned char omegaTrim, unsigned char phiTrim, unsigned char thetaTrim,
@@ -36,17 +37,16 @@ void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, f
   initHitToSectorMap(*m_hitToSectorIDs);
 
   /* Load the axial and stereo track to hit relations from file.*/
-  loadHitRepresentations(m_params.axialFile, m_compAxialBins, *m_compAxialHitReps);
-  loadHitRepresentations(m_params.stereoFile, m_compStereoBins, *m_compStereoHitReps);
+  loadCompressedHitReps(m_params.axialFile, m_compAxialBins, *m_compAxialHitReps);
+  loadCompressedHitReps(m_params.stereoFile, m_compStereoBins, *m_compStereoHitReps);
 
-  /* Unpack zero suppresed track to hit relations.*/
-  restoreZeros(m_compAxialBins, *m_parrayAxialExp, *m_compAxialHitReps);
-  B2DEBUG(25, "restored expanded axial array (11/32 phi) ");
-  restoreZeros(m_compStereoBins, *m_parrayStereoExp, *m_compStereoHitReps);
-  B2DEBUG(25, "restored expanded stereo array (11/32 phi) ");
-  squeezeAll(m_axialBins, *m_parrayAxial, *m_parrayAxialExp);
+  /* Fills the the expanded hit representations (from compressed hits to weights) */
+  fillExpandedHitReps(m_compAxialBins, *m_compAxialHitReps, *m_expAxialHitReps);
+  fillExpandedHitReps(m_compStereoBins, *m_compStereoHitReps, *m_expStereoHitReps);
+
+  squeezeAll(m_axialBins, *m_axialHitContributions, *m_expAxialHitReps);
   B2DEBUG(25, "squeezed axial array (11/32 phi) --> (7/32 phi): ");
-  squeezeAll(m_stereoBins, *m_parrayStereo, *m_parrayStereoExp);
+  squeezeAll(m_stereoBins, *m_stereoHitContributions, *m_expStereoHitReps);
   B2DEBUG(25, "squeezed stereo array (11/32 phi) --> (7/32 phi)");
 
   reset();
@@ -77,27 +77,27 @@ void NDFinder::initLookUpArrays()
    **/
 
   /* Shapes of the arrays holding the hit patterns */
-  std::array<c2index, 2> shapeHitToSectorIDs = {{ m_nTS, m_nPrio }};
-  std::array<c5index, 5> shapeCompAxial = {{ m_nAxial, m_nPrio, m_nOmega, m_nPhiComp, 1 }};
-  std::array<c5index, 5> shapeCompStereo = {{ m_nStereo, m_nPrio, m_nOmega, m_nPhiComp, m_nTheta }};
-  std::array<c5index, 5> shapeAxial = {{ m_nAxial, m_nPrio, m_nOmega, m_nPhiUse, m_nTheta }};
-  std::array<c5index, 5> shapeStereo = {{ m_nStereo, m_nPrio, m_nOmega, m_nPhiUse, m_nTheta }};
-  std::array<c3index, 3> shapeHough = {{ m_nOmega, m_nPhi, m_nTheta }};
-  std::array<c5index, 5> shapeExpAxial = {{ m_nAxial, m_nPrio, m_nOmega, m_nPhiExp, m_nTheta }};
-  std::array<c5index, 5> shapeExpStereo = {{ m_nStereo, m_nPrio, m_nOmega, m_nPhiExp, m_nTheta }};
+  std::array<c2index, 2> shapeHitToSectorIDs = {{m_nTS, m_nPrio}};
+  std::array<c5index, 5> shapeCompAxialHitReps = {{m_nAxial, m_nPrio, m_nOmega, m_nPhiComp, 1}};
+  std::array<c5index, 5> shapeCompStereoHitReps = {{m_nStereo, m_nPrio, m_nOmega, m_nPhiComp, m_nTheta}};
+  std::array<c5index, 5> shapeExpAxialHitReps = {{m_nAxial, m_nPrio, m_nOmega, m_nPhiExp, m_nTheta}};
+  std::array<c5index, 5> shapeExpStereoHitReps = {{m_nStereo, m_nPrio, m_nOmega, m_nPhiExp, m_nTheta}};
+  std::array<c5index, 5> shapeAxial = {{m_nAxial, m_nPrio, m_nOmega, m_nPhiUse, m_nTheta}};
+  std::array<c5index, 5> shapeStereo = {{m_nStereo, m_nPrio, m_nOmega, m_nPhiUse, m_nTheta}};
+  std::array<c3index, 3> shapeHough = {{m_nOmega, m_nPhi, m_nTheta}};
 
-  m_hitToSectorIDs          = new c2array(shapeHitToSectorIDs);
-  m_compAxialHitReps        = new c5array(shapeCompAxial);
-  m_compStereoHitReps       = new c5array(shapeCompStereo);
-  m_parrayAxial             = new c5array(shapeAxial);
-  m_parrayStereo            = new c5array(shapeStereo);
-  m_phoughSpace             = new c3array(shapeHough);
-  m_parrayAxialExp          = new c5array(shapeExpAxial);
-  m_parrayStereoExp         = new c5array(shapeExpStereo);
+  m_hitToSectorIDs    = new c2array(shapeHitToSectorIDs);
+  m_compAxialHitReps  = new c5array(shapeCompAxialHitReps);
+  m_compStereoHitReps = new c5array(shapeCompStereoHitReps);
+  m_expAxialHitReps   = new c5array(shapeExpAxialHitReps);
+  m_expStereoHitReps  = new c5array(shapeExpStereoHitReps);
+  m_axialHitContributions       = new c5array(shapeAxial);
+  m_stereoHitContributions      = new c5array(shapeStereo);
+  m_houghSpace       = new c3array(shapeHough);
 }
 
 /* Fills the m_hitToSectorIDs array */
-void NDFinder::initHitToSectorMap(c2array& hitsToSectorsArray)
+void NDFinder::initHitToSectorMap(c2array& hitsToSectors)
 {
   /* Number of first priority wires in each super layer (TS per SL) */
   constexpr std::array<int, 9> nWires = {160, 160, 192, 224, 256, 288, 320, 352, 384};
@@ -109,29 +109,29 @@ void NDFinder::initHitToSectorMap(c2array& hitsToSectorsArray)
   std::vector<int> cumulativeWires = {0};
   /* Integrated number of sector priority wires for each SL (Axial even, Stereo odd) */
   std::vector<int> cumulativeSectorWires = {0, 0};
-  for (int sl = 0; sl < m_nSL; sl++) {
+  for (int sl = 0; sl < m_nSL; ++sl) {
     wiresPerSector.push_back(nWires[sl] / m_phiGeo);
-    for (int _ = 0; _ < nWires[sl]; _++) {
+    for (int _ = 0; _ < nWires[sl]; ++_) {
       hitToSuperLayer.push_back(sl);
     }
     cumulativeWires.push_back(cumulativeWires[sl] + nWires[sl]);
     cumulativeSectorWires.push_back(cumulativeSectorWires[sl] + nWires[sl] / m_phiGeo);
   }
-  for (int hit = 0; hit < m_nTS; hit++) {
+  for (int hit = 0; hit < m_nTS; ++hit) {
     int sl = hitToSuperLayer[hit];
     bool isAxial = (sl % 2 == 0);
     int wireIDinSL = hit - cumulativeWires[sl];
     int wireIDinSector = wireIDinSL % wiresPerSector[sl];
     int relativeWireIDinSector = cumulativeSectorWires[sl] + wireIDinSector;
     int relativeSectorIDinSuperLayer = (int) floor(wireIDinSL / wiresPerSector[sl]);
-    hitsToSectorsArray[hit][0] = (int)(isAxial);
-    hitsToSectorsArray[hit][1] = relativeWireIDinSector;
-    hitsToSectorsArray[hit][2] = relativeSectorIDinSuperLayer;
+    hitsToSectors[hit][0] = (int)(isAxial);
+    hitsToSectors[hit][1] = relativeWireIDinSector;
+    hitsToSectors[hit][2] = relativeSectorIDinSuperLayer;
   }
 }
 
 /* Fills the m_compAxialHitReps/m_compStereoHitReps arrays */
-void NDFinder::loadHitRepresentations(const std::string& fileName, const SectorBinning& bins, c5array& hitsToWeights)
+void NDFinder::loadCompressedHitReps(const std::string& fileName, const SectorBinning& compBins, c5array& compHitsToWeights)
 {
   /* Array of the entries in trg/cdc/data/ndFinderArray*Comp.txt.gz */
   std::vector<c5elem> flatArray;
@@ -149,13 +149,13 @@ void NDFinder::loadHitRepresentations(const std::string& fileName, const SectorB
   }
   arrayFileGZ.close();
   unsigned long arrayIndex = 0;
-  for (c5index hitID = 0; hitID < bins.nHitIDs; hitID++) {
-    for (c5index priorityWire = 0; priorityWire < bins.nPriorityWires; priorityWire++) {
-      for (c5index omegaIdx = 0; omegaIdx < bins.omega; omegaIdx++) {
-        for (c5index phiIdx = 0; phiIdx < bins.phi; phiIdx++) {
-          for (c5index thetaIdx = 0; thetaIdx < bins.theta; thetaIdx++) {
-            hitsToWeights[hitID][priorityWire][omegaIdx][phiIdx][thetaIdx] = flatArray[arrayIndex];
-            arrayIndex++;
+  for (c5index hitID = 0; hitID < compBins.nHitIDs; ++hitID) {
+    for (c5index priorityWire = 0; priorityWire < compBins.nPriorityWires; ++priorityWire) {
+      for (c5index omegaIdx = 0; omegaIdx < compBins.omega; ++omegaIdx) {
+        for (c5index phiIdx = 0; phiIdx < compBins.phi; ++phiIdx) {
+          for (c5index thetaIdx = 0; thetaIdx < compBins.theta; ++thetaIdx) {
+            compHitsToWeights[hitID][priorityWire][omegaIdx][phiIdx][thetaIdx] = flatArray[arrayIndex];
+            ++arrayIndex;
           }
         }
       }
@@ -163,23 +163,23 @@ void NDFinder::loadHitRepresentations(const std::string& fileName, const SectorB
   }
 }
 
-
-void NDFinder::restoreZeros(SectorBinning compBins, c5array& expArray, const c5array& hitsToWeights)
+/* Fills the m_expAxialHitReps/m_expStereoHitReps arrays */
+void NDFinder::fillExpandedHitReps(const SectorBinning& compBins, const c5array& compHitsToWeights, c5array& expHitsToWeights)
 {
-  for (c5index hitID = 0; hitID < compBins.nHitIDs; hitID++) {
-    for (c5index priorityWire = 0; priorityWire < compBins.nPriorityWires; priorityWire++) {
-      for (c5index omegaIdx = 0; omegaIdx < compBins.omega; omegaIdx++) {
-        for (c5index thetaIdx = 0; thetaIdx < compBins.theta; thetaIdx++) {
-          unsigned short phiStart = hitsToWeights[hitID][priorityWire][omegaIdx][0][thetaIdx];
-          unsigned short nPhiEntries = hitsToWeights[hitID][priorityWire][omegaIdx][1][thetaIdx];
-          for (c5index phiEntry = 0; phiEntry < nPhiEntries; phiEntry++) {
-            unsigned short currentPhi = phiStart + phiEntry;
-            expArray[hitID][priorityWire][omegaIdx][currentPhi][thetaIdx] =
-              hitsToWeights[hitID][priorityWire][omegaIdx][phiEntry + 2][thetaIdx];
-            if (compBins.theta == 1) { // case axial, expand in theta
-              for (c5index jtheta = 1; jtheta < m_nTheta; jtheta++) {
-                expArray[hitID][priorityWire][omegaIdx][currentPhi][jtheta] =
-                  hitsToWeights[hitID][priorityWire][omegaIdx][phiEntry + 2][thetaIdx];
+  for (c5index hitID = 0; hitID < compBins.nHitIDs; ++hitID) {
+    for (c5index priorityWire = 0; priorityWire < compBins.nPriorityWires; ++priorityWire) {
+      for (c5index omegaIdx = 0; omegaIdx < compBins.omega; ++omegaIdx) {
+        for (c5index thetaIdx = 0; thetaIdx < compBins.theta; ++thetaIdx) {
+          unsigned short phiStart = compHitsToWeights[hitID][priorityWire][omegaIdx][0][thetaIdx];
+          unsigned short nPhiEntries = compHitsToWeights[hitID][priorityWire][omegaIdx][1][thetaIdx];
+          for (c5index phiEntry = 0; phiEntry < nPhiEntries; ++phiEntry) {
+            unsigned short currentPhi = phiStart + phiEntry; // currentPhi goes now from [0, 131]
+            expHitsToWeights[hitID][priorityWire][omegaIdx][currentPhi][thetaIdx] =
+              compHitsToWeights[hitID][priorityWire][omegaIdx][phiEntry + 2][thetaIdx];
+            if (compBins.theta == 1) { // axial case: expand the same curve in all theta bins
+              for (c5index axialThetaIdx = 1; axialThetaIdx < m_nTheta; ++axialThetaIdx) {
+                expHitsToWeights[hitID][priorityWire][omegaIdx][currentPhi][axialThetaIdx] =
+                  compHitsToWeights[hitID][priorityWire][omegaIdx][phiEntry + 2][thetaIdx];
               }
             }
           }
@@ -190,50 +190,59 @@ void NDFinder::restoreZeros(SectorBinning compBins, c5array& expArray, const c5a
 }
 
 
-void NDFinder::squeezeAll(SectorBinning writebins, c5array& writeArray, const c5array& readArray)
+void NDFinder::squeezeAll(const SectorBinning& writebins, c5array& writeArray, const c5array& expHitsToWeights)
 {
-  for (c5index hitID = 0; hitID < writebins.nHitIDs; hitID++) {
-    for (c5index priorityIdx = 0; priorityIdx < writebins.nPriorityWires; priorityIdx++) {
-      for (c5index itheta = 0; itheta < writebins.theta; itheta++) {
-        squeezeOne(writeArray, readArray, hitID, priorityIdx, itheta, writebins.omega);
+  for (c5index hitID = 0; hitID < writebins.nHitIDs; ++hitID) {
+    for (c5index priorityIdx = 0; priorityIdx < writebins.nPriorityWires; ++priorityIdx) {
+      for (c5index itheta = 0; itheta < writebins.theta; ++itheta) {
+        squeezeOne(writeArray, expHitsToWeights, hitID, priorityIdx, itheta, writebins.omega);
       }
     }
   }
 }
 
 
-void NDFinder::squeezeOne(c5array& writeArray, const c5array& readArray, c5index hitID,
+void NDFinder::squeezeOne(c5array& writeArray, const c5array& expHitsToWeights, c5index hitID,
                           c5index priorityIdx, c5index itheta, c5elem nomega)
 {
   const int outnphi = (int)(m_nPhiSector * m_parcels); // 12 * 7 = 84
   const c5index trafstart = (c5index)((m_parcelsExp - m_parcels) / 2 * m_nPhiSector); // (11 - 7) / 2 * 12 = 24
   const c5index trafend = (c5index)(trafstart + outnphi); // 24 + 84 = 108
-  for (c5index iomega = 0; iomega < nomega; iomega++) { // 40
-    for (c5index iphi = 0; iphi < outnphi; iphi++) { // 84
+  for (c5index iomega = 0; iomega < nomega; ++iomega) { // 40
+    for (c5index iphi = 0; iphi < outnphi; ++iphi) { // 84
       c5index readPhi = trafstart + iphi; // 24 -> 108
-      writeArray[hitID][priorityIdx][iomega][iphi][itheta] = readArray[hitID][priorityIdx][iomega][readPhi][itheta];
+      writeArray[hitID][priorityIdx][iomega][iphi][itheta] = expHitsToWeights[hitID][priorityIdx][iomega][readPhi][itheta];
       /* Maps 0 -> 24, 1 -> 25, ..., 84 -> 108 */
     }
-    for (c5index iphi = 0; iphi < trafstart; iphi++) { // 24
+    for (c5index iphi = 0; iphi < trafstart; ++iphi) { // 24
       c5index writePhi = (c5index)(outnphi - trafstart + iphi); // 60 -> 84
-      writeArray[hitID][priorityIdx][iomega][writePhi][itheta] += readArray[hitID][priorityIdx][iomega][iphi][itheta];
+      writeArray[hitID][priorityIdx][iomega][writePhi][itheta] += expHitsToWeights[hitID][priorityIdx][iomega][iphi][itheta];
     }
-    for (c5index iphi = 0; iphi < trafstart; iphi++) { // 24
+    for (c5index iphi = 0; iphi < trafstart; ++iphi) { // 24
       c5index readPhi = trafend + iphi; // 108 -> 132
-      writeArray[hitID][priorityIdx][iomega][iphi][itheta] += readArray[hitID][priorityIdx][iomega][readPhi][itheta];
+      writeArray[hitID][priorityIdx][iomega][iphi][itheta] += expHitsToWeights[hitID][priorityIdx][iomega][readPhi][itheta];
     }
   }
 }
 
-/* Writes the hit to the Hough space and creates the inverse lookup table */
-void NDFinder::addLookup(unsigned short ihit)
+void NDFinder::findTracks()
 {
-  c2array& arrayHitMod = *m_hitToSectorIDs;
+  /* Build the Houghplane by summing up all single hit contributions */
+  for (unsigned short hitIdx = 0; hitIdx < m_nHits; ++hitIdx) {
+    addLookup(hitIdx);
+  }
+  getCM();
+}
 
-  c2elem orient = arrayHitMod[m_hitIDs[ihit]][0];
-  c2elem relativeWireID   = arrayHitMod[m_hitIDs[ihit]][1];
-  c2elem relativeSectorID =  arrayHitMod[m_hitIDs[ihit]][2];
-  unsigned short priorityWire = m_priorityWirePos[ihit];
+
+/* Writes the hit to the Hough space and creates the inverse lookup table */
+void NDFinder::addLookup(unsigned short hitIdx)
+{
+  const c2array& hitToSectorIDs = *m_hitToSectorIDs;
+  c2elem orient = hitToSectorIDs[m_hitIDs[hitIdx]][0];
+  c2elem relativeWireID = hitToSectorIDs[m_hitIDs[hitIdx]][1];
+  c2elem relativeSectorID = hitToSectorIDs[m_hitIDs[hitIdx]][2];
+  unsigned short priorityWire = m_priorityWirePos[hitIdx];
 
   // Get hit contribution to cluster:
   // 7 of 32 phi parcels: center = 3
@@ -241,50 +250,34 @@ void NDFinder::addLookup(unsigned short ihit)
   if (DstartShort < 0) {DstartShort = m_nPhi + DstartShort;}
   // Add hit to hough plane
   // 11 of 32 phi parcels: center = 5
-  short DstartComp = ((short)relativeSectorID - 5) % m_phiGeo * m_nPhiSector;
-  if (DstartComp < 0) {DstartComp = m_nPhi + DstartComp;}
+  short phiOffset = ((short)relativeSectorID - 5) % m_phiGeo * m_nPhiSector;
+  if (phiOffset < 0) {phiOffset = m_nPhi + phiOffset;}
 
   m_vecDstart.push_back(DstartShort);
   m_hitOrients.push_back(orient);
 
-  HitInfo hitInfo = {relativeWireID, priorityWire, DstartComp, (orient == 1) ? m_compAxialBins : m_compStereoBins};
+  HitInfo hitInfo = {relativeWireID, priorityWire, phiOffset};
 
   if (orient == 1) {
-    addC3Comp(hitInfo, *m_compAxialHitReps);
+    writeHitToHoughSpace(hitInfo, *m_expAxialHitReps);
   } else {
-    addC3Comp(hitInfo, *m_compStereoHitReps);
+    writeHitToHoughSpace(hitInfo, *m_expStereoHitReps);
   }
 }
 
-
-void NDFinder::addC3Comp(const HitInfo& hitInfo, const c5array& hitsToWeights)
+/* Write (add) a single hit (Hough curve) to the Hough space */
+void NDFinder::writeHitToHoughSpace(const HitInfo& hitInfo, const c5array& expHitsToWeights)
 {
-  unsigned short nTheta = 0;
-  c3array& houghSpace = *m_phoughSpace;
-  for (unsigned short thetaIdx = 0; thetaIdx < m_nTheta; thetaIdx++) {
-    if (hitInfo.bins.theta > 1) { // stereo
-      nTheta = thetaIdx;
-    }
-    for (unsigned short omegaIdx = 0; omegaIdx < m_nOmega; omegaIdx++) {
-      unsigned short phiStart = hitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][omegaIdx][0][nTheta];
-      unsigned short nPhiEntries = hitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][omegaIdx][1][nTheta];
-      for (unsigned short phiEntry = 0; phiEntry < nPhiEntries; phiEntry++) {
-        unsigned short houghPhiIdx = (phiEntry + phiStart + hitInfo.Dstart) % m_nPhi;
+  c3array& houghSpace = *m_houghSpace;
+  for (unsigned short thetaIdx = 0; thetaIdx < m_nTheta; ++thetaIdx) {
+    for (unsigned short omegaIdx = 0; omegaIdx < m_nOmega; ++omegaIdx) {
+      for (unsigned short phiIdx = 0; phiIdx < m_nPhiExp; ++phiIdx) {
+        unsigned short houghPhiIdx = (phiIdx + hitInfo.phiOffset) % m_nPhi;
         houghSpace[omegaIdx][houghPhiIdx][thetaIdx] +=
-          hitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][omegaIdx][phiEntry + 2][nTheta];
+          expHitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][omegaIdx][phiIdx][thetaIdx];
       }
     }
   }
-}
-
-
-void NDFinder::findTracks()
-{
-  /* Build the Houghplane by summing up all single hit contributions */
-  for (unsigned short ihit = 0; ihit < m_nHits; ihit++) {
-    addLookup(ihit);
-  }
-  getCM();
 }
 
 
@@ -295,13 +288,13 @@ std::vector<std::vector<unsigned short>> NDFinder::getHitsVsClusters(std::vector
   std::vector<unsigned short> hitElem(m_nHits, defaultValue);
   std::vector<std::vector<unsigned short>> hitsVsClusters(nClusters, hitElem);
 
-  for (unsigned long iclus = 0; iclus < clusters.size(); iclus++) {
-    SimpleCluster cli = clusters[iclus];
-    std::vector<cell_index> entries = cli.getEntries();
+  for (unsigned long clusterIdx = 0; clusterIdx < clusters.size(); ++clusterIdx) {
+    SimpleCluster cluster = clusters[clusterIdx];
+    std::vector<cell_index> entries = cluster.getEntries();
     cell_index maxid = getMax(entries);
-    for (unsigned long ihit = 0; ihit < m_hitIDs.size(); ihit++) {
-      unsigned short contrib = hitContrib(maxid, ihit);
-      hitsVsClusters[iclus][ihit] = contrib;
+    for (unsigned long hitIdx = 0; hitIdx < m_hitIDs.size(); ++hitIdx) {
+      unsigned short contrib = hitContrib(maxid, hitIdx);
+      hitsVsClusters[clusterIdx][hitIdx] = contrib;
     }
   }
   return hitsVsClusters;
@@ -314,19 +307,19 @@ NDFinder::allHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClus
   std::vector<SimpleCluster> useClusters;
   if (hitsVsClusters.size() > 0) {
     // Iteration over the number of clusters
-    for (unsigned long iclus = 0; iclus < hitsVsClusters.size(); iclus++) {
+    for (unsigned long iclus = 0; iclus < hitsVsClusters.size(); ++iclus) {
       std::vector<std::vector<long>> superLayerNumbers;
       // Iteration over all track segment hits
-      for (unsigned long ihit = 0; ihit < m_hitIDs.size(); ihit++) {
-        unsigned short contribution = hitsVsClusters[iclus][ihit];
+      for (unsigned long hitIdx = 0; hitIdx < m_hitIDs.size(); ++hitIdx) {
+        unsigned short contribution = hitsVsClusters[iclus][hitIdx];
         if (contribution > 0) {
-          superLayerNumbers.push_back({static_cast<long>(ihit), contribution, m_hitSLIDs[ihit], m_priorityWireTime[ihit]});
+          superLayerNumbers.push_back({static_cast<long>(hitIdx), contribution, m_hitSLIDs[hitIdx], m_priorityWireTime[hitIdx]});
         }
       }
       // Iteration over all super layers
-      for (unsigned short sl = 0; sl < 9; sl++) {
+      for (unsigned short sl = 0; sl < 9; ++sl) {
         std::vector<std::vector<long>> oneSuperLayerContributions;
-        for (unsigned long nTS = 0; nTS < superLayerNumbers.size(); nTS++) {
+        for (unsigned long nTS = 0; nTS < superLayerNumbers.size(); ++nTS) {
           if (superLayerNumbers[nTS][2] == sl) {
             oneSuperLayerContributions.push_back({superLayerNumbers[nTS][0], superLayerNumbers[nTS][1], superLayerNumbers[nTS][3]});
           }
@@ -343,7 +336,7 @@ NDFinder::allHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClus
         long maxHit = oneSuperLayerContributions[0][0];
         long maxContribution = oneSuperLayerContributions[0][1];
         // Iteration over all track segments in this super layer
-        for (size_t index = 0; index < oneSuperLayerContributions.size(); index++) {
+        for (size_t index = 0; index < oneSuperLayerContributions.size(); ++index) {
           // The maximum weight contribution gets identified
           if (oneSuperLayerContributions[index][1] > maxContribution) {
             maxContribution = oneSuperLayerContributions[index][1];
@@ -377,7 +370,7 @@ NDFinder::allHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClus
 
 void NDFinder::getCM()
 {
-  c3array& houghSpace = *m_phoughSpace;
+  c3array& houghSpace = *m_houghSpace;
   m_clusterer.setNewPlane(houghSpace);
   std::vector<SimpleCluster> allClusters = m_clusterer.makeClusters();
   std::vector<std::vector<unsigned short>> hitsVsClusters = getHitsVsClusters(allClusters);
@@ -460,7 +453,7 @@ float NDFinder::transformVar(float estVal, int idx)
 std::vector<double> NDFinder::transform(std::vector<double> estimate)
 {
   std::vector<double> transformed;
-  for (int idx = 0; idx < 3; idx++) {
+  for (int idx = 0; idx < 3; ++idx) {
     transformed.push_back(transformVar(estimate[idx], idx));
   }
   return transformed;
@@ -470,7 +463,7 @@ std::vector<double> NDFinder::transform(std::vector<double> estimate)
 std::vector<double> NDFinder::getBinToVal(std::vector<double> thisAv)
 {
   std::vector<double> estimate;
-  for (unsigned short idim = 0; idim < 3; idim++) {
+  for (unsigned short idim = 0; idim < 3; ++idim) {
     double trafd = m_acceptanceRanges[idim][0] + (thisAv[idim] + 0.5) * m_binSizes[idim];
     estimate.push_back(trafd);
   }
@@ -483,13 +476,11 @@ std::vector<double> NDFinder::getWeightedMean(std::vector<CellWeight> highWeight
   double axomega = 0.;
   double axphi = 0.;
   double axtheta = 0.;
-  int ncells = 0;
   long weightSum = 0;
   for (CellWeight& elem : highWeight) {
     axomega += elem.index[0] * elem.weight;
     axphi += elem.index[1] * elem.weight;
     axtheta += elem.index[2] * elem.weight;
-    ncells++;
     weightSum += elem.weight;
   }
   axomega /= weightSum;
@@ -504,8 +495,7 @@ cell_index NDFinder::getMax(const std::vector<cell_index>& entries)
 {
   unsigned short curWeight = 0;
   cell_index curMaxIndex = {0, 0, 0};
-  const c3array& houghSpace = *m_phoughSpace;
-
+  const c3array& houghSpace = *m_houghSpace;
   for (const cell_index& entry : entries) {
     if (houghSpace[entry[0]][entry[1]][entry[2]] > curWeight) {
       curWeight = houghSpace[entry[0]][entry[1]][entry[2]];
@@ -519,7 +509,7 @@ cell_index NDFinder::getMax(const std::vector<cell_index>& entries)
 std::vector<CellWeight> NDFinder::getHighWeight(std::vector<cell_index> entries, float cutoff)
 {
   std::vector<CellWeight> cellsAndWeight;
-  const c3array& houghSpace = *m_phoughSpace;
+  const c3array& houghSpace = *m_houghSpace;
   for (cell_index& entry : entries) {
     unsigned short cellWeight = houghSpace[entry[0]][entry[1]][entry[2]];
     if (cellWeight > cutoff) {
@@ -533,11 +523,11 @@ std::vector<CellWeight> NDFinder::getHighWeight(std::vector<cell_index> entries,
 }
 
 
-unsigned short NDFinder::hitContrib(cell_index peak, unsigned short ihit)
+unsigned short NDFinder::hitContrib(cell_index peak, unsigned short hitIdx)
 {
   unsigned short contrib = 0;
   unsigned short iHoughPhi = peak[1];
-  short Dstart = m_vecDstart[ihit];
+  short Dstart = m_vecDstart[hitIdx];
   short iphi_signed = iHoughPhi - Dstart;
   if (iphi_signed < 0) {
     iphi_signed += m_nPhi;  // Wrap phi properly
@@ -548,19 +538,18 @@ unsigned short NDFinder::hitContrib(cell_index peak, unsigned short ihit)
   }
   unsigned short iomega = peak[0];
   unsigned short itheta = peak[2];
-  unsigned short orient = m_hitOrients[ihit];
+  unsigned short orient = m_hitOrients[hitIdx];
 
-  const c2array& arrayHitMod = *m_hitToSectorIDs;
-  c2elem relativeWireID = arrayHitMod[m_hitIDs[ihit]][1];
-  unsigned short priorityWire = m_priorityWirePos[ihit];
+  c2elem relativeWireID = (*m_hitToSectorIDs)[m_hitIDs[hitIdx]][1];
+  unsigned short priorityWire = m_priorityWirePos[hitIdx];
   if (Dstart > m_nPhi) {
     B2ERROR("phi overflow: iHoughPhi = " << iHoughPhi << ", Dstart = " << Dstart << ", iphi=" << iphi);
   }
   if (iphi < m_nPhiUse) { // hit covers current phi area, get contribution
     if (orient == 1) { // axial
-      contrib = (*m_parrayAxial)[relativeWireID][priorityWire][iomega][iphi][itheta];
+      contrib = (*m_axialHitContributions)[relativeWireID][priorityWire][iomega][iphi][itheta];
     } else { // stereo
-      contrib = (*m_parrayStereo)[relativeWireID][priorityWire][iomega][iphi][itheta];
+      contrib = (*m_stereoHitContributions)[relativeWireID][priorityWire][iomega][iphi][itheta];
     }
   }
   return contrib;

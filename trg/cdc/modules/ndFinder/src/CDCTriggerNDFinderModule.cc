@@ -121,7 +121,7 @@ void CDCTriggerNDFinderModule::event()
       m_NDFinderInfos.appendNew(readoutHoughSpace, readoutCluster);
     NDFinderTrack->addRelationTo(NDFinderInfo);
     std::vector<unsigned short> relatedHits = trackND.getRelHits();
-    for (ulong i = 0; i < relatedHits.size(); i++) {
+    for (ulong i = 0; i < relatedHits.size(); ++i) {
       NDFinderTrack->addRelationTo(m_TrackSegmentHits[relatedHits[i]]);
     }
   }

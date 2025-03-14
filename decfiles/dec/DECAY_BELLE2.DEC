@@ -84,7 +84,7 @@
 #   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
 #
 # December 2021, V. Bertacchi (bertacchi@cppm.in2p3.fr)
-#   fixed a_1+ and a_10 BR decay table to restore isospin simmetry and reimplement the resonant contribution (KK*)
+#   fixed a_1+ and a_10 BR decay table to restore isospin symmetry and reimplement the resonant contribution (KK*)
 #   rescaled B->DKK* BR to take into account of resonant contribution B->D(a1->KK*), preserving the BR(NR+Res)= Belle measurement (https://doi.org/10.1016/S0370-2693(02)02373-0)
 #   https://gitlab.desy.de/belle2/software/basf2/-/merge_requests/581
 #
@@ -403,7 +403,7 @@ Decay B0
 0.000210000   D-  pi+  pi-  mu+  nu_mu                     PHSP;
 0.000140000   anti-D0  pi-  pi0  mu+  nu_mu                PHSP;
 0.000140000   D-  pi0  pi0  mu+  nu_mu                     PHSP;
-# B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+# B->D*pipilnu ; modes with pi0 are inferred assuming isospin symmetry
 0.001050000   D*-  pi+  pi-  mu+  nu_mu                    PHSP;
 0.000700000   anti-D*0  pi-  pi0  mu+  nu_mu               PHSP;
 0.000700000   D*-  pi0  pi0  mu+  nu_mu                    PHSP;
@@ -2213,7 +2213,7 @@ Decay anti-B0
 0.000210000   D+  pi+  pi-  mu-  anti-nu_mu                PHSP;
 0.000140000   D0  pi+  pi0  mu-  anti-nu_mu                PHSP;
 0.000140000   D+  pi0  pi0  mu-  anti-nu_mu                PHSP;
-# B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry.
+# B->D*pipilnu ; modes with pi0 are inferred assuming isospin symmetry.
 0.001050000   D*+  pi+  pi-  mu-  anti-nu_mu               PHSP;
 0.000700000   D*0  pi+  pi0  mu-  anti-nu_mu               PHSP;
 0.000700000   D*+  pi0  pi0  mu-  anti-nu_mu               PHSP;
@@ -10107,7 +10107,7 @@ Decay eta' # Edited by U. Tamponi, October 2016
 0.293511000   rho0  gamma                                  SVP_HELAMP  1.0 0.0 1.0 0.0;
 0.027500000   omega  gamma                                 SVP_HELAMP  1.0 0.0 1.0 0.0;
 0.022200000   gamma  gamma                                 PHSP;
-0.001680000   pi0  pi0  pi0                                ETA_PI0DALITZ -0.5; # PDG reporst -0.61 +- 0.08, outside of the physical boudaries. Forced back to the closest maeningful value
+0.001680000   pi0  pi0  pi0                                ETA_PI0DALITZ -0.5; # PDG reporst -0.61 +- 0.08, outside of the physical boundaries. Forced back to the closest maeningful value
 0.000109000   gamma  mu-  mu+                              PHSP;
 0.003600000   pi+  pi-  pi0                                PHSP;
 0.002400000   pi+  pi-  e+  e-                             PHSP;
@@ -10181,7 +10181,7 @@ CDecay a_0-
 # a_1's
 #
 # - Without a dedicated dalitz, but given the known rho pi dominance, the decay si modeled with incoherent sum of
-#   paritial amplitudes. Interference effects are significant but neglected here
+#   partial amplitudes. Interference effects are significant but neglected here
 # - Partial amplitudes from CLEO, Phys.Rev. D61 (2000) 01200.
 
 Decay a_10 #  Edited by U. Tamponi (March 2016), and V. Bertacchi (December 2021)
@@ -10263,7 +10263,7 @@ Enddecay
 #  The most complete and coherent study seems to be Phys.Atom.Nucl. 65 (2002) 1545-1552, Yad.Fiz. 65 (2002) 1583-1590, whose
 #  results are used here.
 #  The dominant 4 pi decay has actually sizable contribution by 2-body intermediate states (sigma sigma, rho rho...), whose
-#  amplitudes are not well measured. Therefore, PHSP is used in lack of realiable alternative models
+#  amplitudes are not well measured. Therefore, PHSP is used in lack of reliable alternative models
 
 Decay f'_0 # Edited by U. Tamponi, October 2016
 0.135700000   pi+  pi-                                     PHSP;
@@ -10328,7 +10328,7 @@ Decay f_2
 Enddecay
 
 # The dominant 4 pi decay has actually sizable contribution by 2-body intermediate states (sigma sigma, rho rho...), whose
-# amplitudes are not well measured. Therefore, PHSP is used in lack of realiable alternative models
+# amplitudes are not well measured. Therefore, PHSP is used in lack of reliable alternative models
 # Checked by U. Tamponi, october 2016. No changes are needed
 
 Decay f_0(1500)
@@ -10426,7 +10426,7 @@ Decay phi(1680) # Edited by U. Tamponi October 2016
 0.015000000   K+  K-                                       VSS;
 Enddecay
 
-# Combining the informations from Phys.Rev. D73 (2006) 052003 and Z.Phys. C56 (1992) 15-20
+# Combining the information from Phys.Rev. D73 (2006) 052003 and Z.Phys. C56 (1992) 15-20
 # one can estimate the ratios  BF(rho pi) : BF(omega pi pi) : BF(eta pi) = 2:2:0.6
 Decay omega(1650) # Edited by U. Tamponi October 2016
 0.145000000   rho+  pi-                                    PHSP;
@@ -11790,7 +11790,7 @@ Decay Lambda_c+
 0.002430000   p+  pi+  pi+  pi-  pi-                       PHSP;  # [PDG2021]
 0.001690000   p+  pi+  pi-  pi0  pi0                       PHSP;  # [Isospin model]
 0.001160000   p+  pi0  pi0  pi0  pi0                       PHSP;  # [Isospin model]
-0.000530000   p+  K+  K-                                   PHSP;  # [PDG2021 in addtion to pphi mode]
+0.000530000   p+  K+  K-                                   PHSP;  # [PDG2021 in addition to pphi mode]
 0.004860000   n0  pi+  pi0                                 PHSP;  # [Isospin model]
 0.002430000   n0  pi+  pi0  pi+  pi-                       PHSP;  # [Isospin model]
 0.001690000   n0  pi+  pi0  pi0  pi0                       PHSP;  # [Isospin model]

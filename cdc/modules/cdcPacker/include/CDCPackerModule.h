@@ -98,7 +98,7 @@ namespace Belle2 {
 
       /**
        * Getter for CDC data mode.
-       * 1 for raw data mode, 2 for supressed mode.
+       * 1 for raw data mode, 2 for suppressed mode.
        */
       int getDataType()
       {
@@ -212,12 +212,12 @@ namespace Belle2 {
       bool m_enablePrintOut;
 
       /**
-       * Name of the RawCDC dataobject (supressed mode).
+       * Name of the RawCDC dataobject (suppressed mode).
        */
       std::string m_rawCDCName;
 
       /**
-       * Name of the CDCRawHit dataobject (supressed mode).
+       * Name of the CDCRawHit dataobject (suppressed mode).
        */
       std::string m_cdcRawHitName;
 

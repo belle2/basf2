@@ -24,6 +24,7 @@
 #include <filesystem>
 #include <iostream>
 #include <iomanip>
+#include <memory>
 #include <string>
 #include <set>
 #include <regex>
@@ -334,8 +335,8 @@ The following restrictions apply:
 
   // OK we have a valid FileMetaData and merged all persistent objects, now do
   // the conversion of the event trees and create the output file.
-  TFile output(outputfilename.c_str(), "RECREATE");
-  if (output.IsZombie()) {
+  auto output = std::unique_ptr<TFile>{TFile::Open(outputfilename.c_str(), "RECREATE")};
+  if (output == nullptr or output->IsZombie()) {
     B2ERROR("Could not create output file " << std::quoted(outputfilename));
     return 1;
   }
@@ -344,12 +345,14 @@ The following restrictions apply:
     TTree* outputEventTree{nullptr};
     for (const auto& input : inputfilenames) {
       B2INFO("processing events from " << std::quoted(input + ":" + treeName));
-      TFile tfile(input.c_str());
-      auto* tree = dynamic_cast<TTree*>(tfile.Get(treeName.c_str()));
-      if(!outputEventTree){
-        output.cd();
+      auto tfile = std::unique_ptr<TFile>{TFile::Open(input.c_str(), "READ")};
+      // At this point, we already checked that the input files are valid and exist
+      // so it's safe to access tfile directly
+      auto* tree = dynamic_cast<TTree*>(tfile->Get(treeName.c_str()));
+      if (!outputEventTree){
+        output->cd();
         outputEventTree = tree->CloneTree(0);
-      }else{
+      } else {
         outputEventTree->CopyAddresses(tree);
       }
       // Now let's copy all entries without unpacking (fast), layout the
@@ -360,7 +363,7 @@ The following restrictions apply:
       outputEventTree->CopyAddresses(tree, true);
       // finally clean up and close file.
       delete tree;
-      tfile.Close();
+      tfile->Close();
     }
     assert(outputEventTree);
     // make sure we have an index ...
@@ -369,7 +372,7 @@ The following restrictions apply:
       RootIOUtilities::buildIndex(outputEventTree);
     }
     // and finally write the tree
-    output.cd();
+    output->cd();
     outputEventTree->Write();
     // check if the number of full events in the metadata is zero:
     // if so calculate number of full events now:
@@ -388,7 +391,7 @@ The following restrictions apply:
   }
   B2INFO("Writing FileMetaData");
   // Create persistent tree
-  output.cd();
+  output->cd();
   TTree outputMetaDataTree("persistent", "persistent");
   outputMetaDataTree.Branch("FileMetaData", &outputMetaData);
   for(auto &it: persistentMergeables){
@@ -404,7 +407,7 @@ The following restrictions apply:
   persistentMergeables.clear();
   auto outputMetaDataCopy = *outputMetaData;
   delete outputMetaData;
-  output.Close();
+  output->Close();
 
   // and now add it to the metadata service
   MetadataService::Instance().addRootOutputFile(outputfilename, &outputMetaDataCopy, "b2file-merge");

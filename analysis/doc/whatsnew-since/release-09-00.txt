@@ -7,6 +7,15 @@ Kinematic Fitting tools
 * Added functionality to ParticleKinematicFitter module to specify whether only ECL cluster direction information is to be used in the fit (intended for fits involving neutral hadrons).
 * Added to ECLPhotonEnergyResolution dbobject ability to store position resolution information for neutral hadrons
 
+Variables
++++++++++
+* Changed return type of the variables `isInRestOfEvent`, `isCloneOfSignalSide`, `hasAncestorFromSignalSide`,
+  `currentROEIsInList`, `passesROEMask`, and `hasCorrectROECombination` from double to bool.
+* Changed return type of the variables `nROE_KLMClusters`, `nROE_Tracks`, `nROE_ECLClusters`,
+  `nROE_NeutralECLClusters`, `nROE_Photons`, `nROE_NeutralHadrons`, `nROE_Charged`, `nROE_Composites`, and
+  `nROE_ParticlesInList` from double to int.
+* Extended functionality of the variable `passesROEMask` to handle composite particles as well.
+
 Changes in the analysis package in light-2501-betelgeuse
 --------------------------------------------------------
 

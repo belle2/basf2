@@ -12,6 +12,7 @@
 #include <framework/pcore/Mergeable.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/utilities/KeyValuePrinter.h>
+#include <framework/core/MetadataService.h>
 
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -51,6 +52,7 @@ int main(int argc, char* argv[])
   // Parse options
   std::string outputfilename;
   std::vector<std::string> inputfilenames;
+  std::string jsonfilename;
   po::options_description options("Options");
   options.add_options()
   ("help,h", "print all available options")
@@ -59,6 +61,7 @@ int main(int argc, char* argv[])
   ("force,f", "overwrite existing file")
   ("no-catalog", "don't register output file in file catalog, This is now the default")
   ("add-to-catalog", "register the output file in the file catalog")
+  ("job-information", po::value<std::string>(&jsonfilename), "create json file with metadata of output file and execution status")
   ("quiet,q", "if given don't print infos, just warnings and errors");
   po::positional_options_description positional;
   positional.add("output", 1);
@@ -84,6 +87,12 @@ The following restrictions apply:
   - The event tree needs to contain the same DataStore entries in all files.
 )DOC");
     return 1;
+  }
+
+  //Initialize metadata service
+  MetadataService::Instance();
+  if (!jsonfilename.empty()) {
+    MetadataService::Instance().setJsonFileName(jsonfilename);
   }
 
   // Remove the {module:} from log messages
@@ -396,6 +405,14 @@ The following restrictions apply:
     delete val.second.first;
   }
   persistentMergeables.clear();
+  auto outputMetaDataCopy = *outputMetaData;
   delete outputMetaData;
   output->Close();
+
+  // and now add it to the metadata service
+  MetadataService::Instance().addRootOutputFile(outputfilename, &outputMetaDataCopy, "b2file-merge");
+
+  // report completion in job metadata
+  MetadataService::Instance().addBasf2Status("finished successfully");
+  MetadataService::Instance().finishBasf2();
 }

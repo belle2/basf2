@@ -237,7 +237,7 @@ if __name__ == '__main__':
         p = plotting.CorrelationMatrix()
         p.add(variables_data, variable_abbreviations.values(),
               test_target[first_identifier_abbr] == 1,
-              test_target[first_identifier_abbr] == 0)
+              test_target[first_identifier_abbr] != 1)
         p.finish()
         p.save('correlation_plot.pdf')
         graphics.add('correlation_plot.pdf', width=1.0)
@@ -249,7 +249,7 @@ if __name__ == '__main__':
             graphics = b2latex.Graphics()
             p = plotting.VerboseDistribution(normed=True, range_in_std=3, x_axis_label=v)
             p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 1, label="Signal")
-            p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 0, label="Background")
+            p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] != 1, label="Background")
             p.finish()
             p.save(f'variable_{hash(v)}.pdf')
             graphics.add(f'variable_{hash(v)}.pdf', width=1.0)
@@ -265,7 +265,7 @@ if __name__ == '__main__':
         graphics = b2latex.Graphics()
         p = plotting.RejectionOverEfficiency(fom=True)
         for identifier in identifier_abbreviations.values():
-            p.add(test_probability, identifier, test_target[identifier] == 1, test_target[identifier] == 0)
+            p.add(test_probability, identifier, test_target[identifier] == 1, test_target[identifier] != 1)
         p.finish()
         p.axis.set_title("ROC Rejection Plot on independent data")
         p.save('roc_plot_test.pdf')
@@ -278,9 +278,9 @@ if __name__ == '__main__':
                 p = plotting.RejectionOverEfficiency(fom=True)
                 identifier_abbr = identifier_abbreviations[identifier]
                 p.add(train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
-                      train_target[identifier_abbr] == 0, label='Train')
+                      train_target[identifier_abbr] != 1, label='Train')
                 p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
-                      test_target[identifier_abbr] == 0, label='Test')
+                      test_target[identifier_abbr] != 1, label='Test')
                 p.finish()
                 p.axis.set_title(identifier)
                 p.save(f'roc_test_{hash(identifier)}.pdf')
@@ -295,11 +295,11 @@ if __name__ == '__main__':
             graphics = b2latex.Graphics()
             p = plotting.Multiplot(plotting.PurityAndEfficiencyOverCut, 2)
             p.add(0, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
-                  test_target[identifier_abbr] == 0, normed=True)
+                  test_target[identifier_abbr] != 1, normed=True)
             p.sub_plots[0].axis.set_title(f"Classification result in test data for {identifier}")
 
             p.add(1, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
-                  test_target[identifier_abbr] == 0, normed=False)
+                  test_target[identifier_abbr] != 1, normed=False)
             p.sub_plots[1].axis.set_title(f"Classification result in test data for {identifier}")
             p.finish()
 
@@ -313,7 +313,7 @@ if __name__ == '__main__':
         for identifier in identifiers:
             o += b2latex.SubSection(format.string(identifier_abbr))
             identifier_abbr = identifier_abbreviations[identifier]
-            p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1, test_target[identifier_abbr] == 0)
+            p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1, test_target[identifier_abbr] != 1)
         p.finish()
         p.axis.set_title("Diagonal plot on independent data")
         p.save('diagonal_plot_test.pdf')
@@ -330,8 +330,8 @@ if __name__ == '__main__':
                 graphics = b2latex.Graphics()
                 p = plotting.Overtraining()
                 p.add(probability, identifier_abbr,
-                      train_mask == 1, train_mask == 0,
-                      target == 1, target == 0, )
+                      train_mask == 1, train_mask != 1,
+                      target == 1, target != 1, )
                 p.finish()
                 p.axis.set_title(f"Overtraining check for {identifier}")
                 p.save(f'overtraining_plot_{hash(identifier)}.pdf')
@@ -353,7 +353,7 @@ if __name__ == '__main__':
             graphics = b2latex.Graphics()
             p = plotting.VerboseDistribution()
             p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 1, label="Signal")
-            p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 0, label="Background")
+            p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] != 1, label="Background")
             p.finish()
             p.save(f'spectator_{hash(spectator)}.pdf')
             graphics.add(f'spectator_{hash(spectator)}.pdf', width=1.0)
@@ -367,7 +367,7 @@ if __name__ == '__main__':
                 p = plotting.Correlation()
                 p.add(data, spectator_abbr, identifier_abbr, list(range(10, 100, 10)),
                       test_target[identifier_abbr] == 1,
-                      test_target[identifier_abbr] == 0)
+                      test_target[identifier_abbr] != 1)
                 p.finish()
                 p.save(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf')
                 graphics.add(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf', width=1.0)

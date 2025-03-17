@@ -317,8 +317,8 @@ if __name__ == '__main__':
                 p.add(variables_train_data, variable_abbr, train_target[first_identifier_abbr] == 1, label="Sig_train")
                 p.add(variables_train_data, variable_abbr, train_target[first_identifier_abbr] != 1, label="Bkg_train")
             p.finish()
-            p.save(f'variable_{hash(v)}.pdf')
-            graphics.add(f'variable_{hash(v)}.pdf', width=1.0)
+            p.save(f'variable_{variable_abbr}_{hash(v)}.pdf')
+            graphics.add(f'variable_{variable_abbr}_{hash(v)}.pdf', width=1.0)
             o += graphics.finish()
 
         o += b2latex.Section("Classifier Plot")

@@ -58,7 +58,7 @@ namespace Belle2 {
       appendCell(newClusterCell);
     }
     // Get member cells in the cluster
-    std::vector<cell_index> getEntries() const { return m_clusterCells; }
+    std::vector<cell_index> getCells() const { return m_clusterCells; }
     // Add a track-space cell to the cluster
     void appendCell(const cell_index& newClusterCell) { m_clusterCells.push_back(newClusterCell); }
     // Relate a hit to the cluster
@@ -76,8 +76,7 @@ namespace Belle2 {
   // Clustering module
   class Clusterizend {
   public:
-    Clusterizend() {}
-    virtual ~Clusterizend() {}
+    Clusterizend() = default;
     explicit Clusterizend(const clustererParams& params): m_params(params) {}
 
     // Set a new hough space for clustering and track finding

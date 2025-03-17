@@ -8,9 +8,9 @@
 
 #pragma once
 
+#include <utility>
 #include <framework/datastore/RelationsObject.h>
 #include "Math/Vector3D.h"
-#include <utility>
 
 namespace Belle2 {
 

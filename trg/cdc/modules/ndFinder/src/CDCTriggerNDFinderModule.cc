@@ -77,17 +77,6 @@ CDCTriggerNDFinderModule::~CDCTriggerNDFinderModule() {}
 
 void CDCTriggerNDFinderModule::initialize()
 {
-  B2DEBUG(25, "CDCTriggerNDFinderModule initialize, " <<
-          ", m_minSuperAxial=" << m_minSuperAxial <<
-          ", m_minSuperStereo=" << m_minSuperStereo <<
-          ", m_thresh= " << m_thresh <<
-          ", m_minTotalWeight=" << m_minTotalWeight <<
-          ", m_minPeakWeight=" << m_minPeakWeight <<
-          ", m_iterations=" << m_iterations <<
-          ", m_omegaTrim=" << m_omegaTrim <<
-          ", m_phiTrim=" << m_phiTrim <<
-          ", m_thetaTrim=" << m_thetaTrim <<
-          ", m_storeAdditionalReadout" << m_storeAdditionalReadout);
   m_TrackSegmentHits.isRequired(m_TrackSegmentHitsName);
   m_NDFinderTracks.registerInDataStore(m_NDFinderTracksName);
   m_NDFinderTracks.registerRelationTo(m_TrackSegmentHits);
@@ -110,18 +99,18 @@ void CDCTriggerNDFinderModule::event()
   m_NDFinder.findTracks();
 
   std::vector<NDFinderTrack>* resultTracks = m_NDFinder.getFinderTracks();
-  for (NDFinderTrack trackND : *resultTracks) {
+  for (NDFinderTrack track : *resultTracks) {
     const CDCTriggerTrack* NDFinderTrack =
-      m_NDFinderTracks.appendNew(trackND.getPhi0(), trackND.getOmega(),
-                                 0., 0., trackND.getCot(), 0.);
-    std::vector<ROOT::Math::XYZVector> readoutHoughSpace = trackND.getHoughSpace();
-    std::vector<ROOT::Math::XYZVector> readoutCluster = trackND.getClusterReadout();
+      m_NDFinderTracks.appendNew(track.getPhi0(), track.getOmega(),
+                                 0., 0., track.getCot(), 0.);
+    std::vector<ROOT::Math::XYZVector> readoutHoughSpace = track.getHoughSpace();
+    std::vector<ROOT::Math::XYZVector> readoutCluster = track.getClusterReadout();
     const CDCTrigger3DFinderInfo* NDFinderInfo =
       m_NDFinderInfos.appendNew(readoutHoughSpace, readoutCluster);
     NDFinderTrack->addRelationTo(NDFinderInfo);
-    std::vector<unsigned short> relatedHits = trackND.getRelatedHits();
-    for (ulong i = 0; i < relatedHits.size(); ++i) {
-      NDFinderTrack->addRelationTo(m_TrackSegmentHits[relatedHits[i]]);
+    std::vector<unsigned short> relatedHits = track.getRelatedHits();
+    for (unsigned short hitIdx = 0; hitIdx < relatedHits.size(); ++hitIdx) {
+      NDFinderTrack->addRelationTo(m_TrackSegmentHits[relatedHits[hitIdx]]);
     }
   }
 }

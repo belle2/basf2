@@ -8,6 +8,7 @@
 
 #include "trg/cdc/NDFinderDefs.h"
 #include "trg/cdc/Clusterizend.h"
+
 using namespace Belle2;
 
 // Main function to find the clusters in the Hough space

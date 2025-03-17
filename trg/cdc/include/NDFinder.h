@@ -9,13 +9,12 @@
 #pragma once
 
 #include <cmath>
+#include <utility>
+#include <Math/Vector3D.h>
 #include "trg/cdc/NDFinderDefs.h"
 #include "trg/cdc/Clusterizend.h"
-#include <Math/Vector3D.h>
-#include <utility>
 
 namespace Belle2 {
-
   // Data type to collect a binning
   struct SectorBinning {
     unsigned short omega;
@@ -34,14 +33,22 @@ namespace Belle2 {
   // Collection of the hit information needed for the hit representations
   struct HitInfo {
     unsigned short relativeWireID;
-    unsigned short priorityWire;
     unsigned short phiSectorStart;
+    unsigned short priorityWire;
+  };
+
+  // Collection of the hit contribution information needed for the hit to cluster relations
+  struct ContributionInfo {
+    unsigned short hitIndex;
+    unsigned short contribution;
+    unsigned short superLayer;
+    long priorityTime;
   };
 
   // Store track parameters of found tracks
   class NDFinderTrack {
   public:
-    NDFinderTrack(std::vector<double> values,
+    NDFinderTrack(std::array<double, 3> estimatedParameters,
                   SimpleCluster&& cluster,
                   std::vector<ROOT::Math::XYZVector>&& readoutHoughSpace,
                   std::vector<ROOT::Math::XYZVector>&& readoutCluster)
@@ -49,9 +56,9 @@ namespace Belle2 {
         m_houghSpace(std::move(readoutHoughSpace)),
         m_readoutCluster(std::move(readoutCluster))
     {
-      m_omega = values[0];
-      m_phi = values[1];
-      m_cotTheta = values[2];
+      m_omega = estimatedParameters[0];
+      m_phi = estimatedParameters[1];
+      m_cotTheta = estimatedParameters[2];
     }
 
     // Get the track parameters (z always 0)
@@ -100,7 +107,7 @@ namespace Belle2 {
       // Required number of stereo super layers
       unsigned char minSuperStereo = 3;
       // Hough space cells must have (thresh * maxweight) to be considered
-      float thresh = 0.85;
+      double thresh = 0.85;
       // Clustering: Minimum of the total weight in all cells of the 3d volume
       unsigned short minTotalWeight = 450;
       // Clustering: Minimum peak cell weight
@@ -132,7 +139,6 @@ namespace Belle2 {
     }
 
     // Initialization
-
     /*
       Set parameters
       @param minSuperAxial minimum number of axial super layers per cluster
@@ -148,12 +154,11 @@ namespace Belle2 {
       @param axialFile axial hit data
       @param stereoFile stereo hit data
     */
-    void init(unsigned char minSuperAxial, unsigned char minSuperStereo, float thresh,
+    void init(unsigned char minSuperAxial, unsigned char minSuperStereo, double thresh,
               unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned char iterations,
               unsigned char omegaTrim, unsigned char phiTrim, unsigned char thetaTrim,
               bool storeAdditionalReadout, std::string& axialFile, std::string& stereoFile);
-
-    // NDFinder reset data structure to process next event
+    // Reset the NDFinder data structure to process next event
     void reset()
     {
       m_NDFinderTracks.clear();
@@ -167,7 +172,6 @@ namespace Belle2 {
       std::array<c3index, 3> shapeHough = {{m_nOmega, m_nPhi, m_nTheta}};
       m_houghSpace = new c3array(shapeHough);
     }
-
     // Fill hit info of the event
     void addHit(unsigned short hitID, unsigned short hitSLID, unsigned short hitPrioPos, long hitPrioTime)
     {
@@ -186,41 +190,46 @@ namespace Belle2 {
 
     // NDFinder: Internal functions for track finding
   protected:
-    // Initialize the binnings and reserve the arrays
+    // Initialize the arrays LUT arrays
     void initLookUpArrays();
     // Fills the m_hitToSectorIDs (see below) array with the hit to orientation/sectorWire/sectorID relations
-    void initHitToSectorMap(c2array& hitsToSectors);
+    void initHitToSectorMap();
     // Fills the m_compAxialHitReps/m_compStereoHitReps (see below) arrays with the hit representations (hits to weights)
     void loadCompressedHitReps(const std::string& fileName, const SectorBinning& compBins, c5array& compHitsToWeights);
     // Fills the m_expAxialHitReps/m_expStereoHitReps (see below) arrays with the expanded hit representations (hits to weights)
     void fillExpandedHitReps(const SectorBinning& compBins, const c5array& compHitsToWeights, c5array& expHitsToWeights);
-    // Core track finding logic in the constructed houghmap
-    void getCM();
-    // Add a single axial or stereo hit to the houghmap, fills m_phiSectorStarts and m_hitOrientations (see below).
-    void addLookup(unsigned short hitIdx);
+    // Process a single axial or stereo hit for the Hough space
+    void processHitForHoughSpace(const unsigned short hitIdx);
+    // Computes the phi bin of the sector start, given the relative SectorID. Saves the result in m_phiSectorStarts (see below).
+    unsigned short computePhiSectorStart(unsigned short relativeSectorID);
     // Write (add) a single hit (Hough curve) to the Hough space
     void writeHitToHoughSpace(const HitInfo& hitInfo, const c5array& expHitsToWeights);
+    // Core track finding logic in the constructed Hough space
+    void runTrackFinding();
+    // Relate the hits in the maximum of the cluster to the cluster. Applies a cut on the clusters.
+    std::vector<SimpleCluster> relateHitsToClusters(std::vector<SimpleCluster>& clusters);
     // Create hits to clusters confusion matrix
-    std::vector<std::vector<unsigned short>> getHitsVsClusters(std::vector<SimpleCluster>& clusters);
-    // Peak cell in cluster
-    cell_index getMax(const std::vector<cell_index>&);
-    // Returns the hit contribution of a TS at a certain peak cell
-    unsigned short getHitContribution(const cell_index& peakCell, const unsigned short hitIdx);
-    // Relate all hits in a cluster to the cluster Remove small clusters with less than minsuper related hits.
-    std::vector<SimpleCluster> allHitsToClusters(
-      const std::vector<std::vector<unsigned short>>& hitsVsClusters,
-      std::vector<SimpleCluster>& clusters);
-    // Candidate cells as seed for the clustering. Selects all cells with weight > minWeight
-    std::vector<CellWeight> getHighWeight(std::vector<cell_index> entries, float cutoff);
-    // Calculate the weighted center of a cluster
-    std::vector<double> getWeightedMean(std::vector<CellWeight>);
-    // Scale the weighted center to track parameter values
-    std::vector<double> getBinToVal(std::vector<double>);
+    std::vector<std::vector<unsigned short>> getHitsVsClustersTable(const std::vector<SimpleCluster>& clusters);
+    // Returns the cell index of the maximum in the cluster
+    cell_index getMaximumInCluster(const SimpleCluster& cluster);
+    // Returns the hit contribution of a TS at a certain cluster cell (= peak/maximum cell)
+    unsigned short getHitContribution(const cell_index& maximumCell, const unsigned short hitIdx);
+    // Extract relevant hit information (hitIdx, contribution, super layer, drift time)
+    std::vector<ContributionInfo> extractContributionInfos(const std::vector<unsigned short>& clusterHits);
+    // Find the hit with the maximum contribution in a given super layer
+    long getMaximumHitInSuperLayer(const std::vector<ContributionInfo>& contributionInfos, unsigned short superLayer);
+    // Cut on the number of hit axial/stereo super layers
+    bool checkHitSuperLayers(const SimpleCluster& cluster);
+    // Select the cells which are used in the center of gravity calculation
+    std::vector<CellWeight> getCenterOfGravityCells(const SimpleCluster& cluster, unsigned short maximum);
+    // Calculate the center of gravity (weighted mean) for the track parameters
+    std::array<double, 3> calculateCenterOfGravity(const std::vector<CellWeight>& validCells);
+    // Transform the center of gravity (cells) into the estimated track parameters
+    std::array<double, 3> getTrackParameterEstimate(const std::array<double, 3>& centerOfGravity);
+    // Transform to physical units
+    std::array<double, 3> transformTrackParameters(const std::array<double, 3>& estimatedParameters);
     // Transverse momentum to radius
-    double cdcTrackRadius(double pt) { return pt * 1e11 / (3e8 * 1.5); } // div (c * B)
-    // Calculate physical units
-    float transformVar(float estVal, int idx);
-    std::vector<double> transform(std::vector<double> estimate);
+    static inline double getTrackRadius(double transverseMomentum) { return transverseMomentum * 1e11 / (3e8 * 1.5); }
 
     // NDFinder: Member data stores
   private:
@@ -246,6 +255,12 @@ namespace Belle2 {
     // Clustering module
     Belle2::Clusterizend m_clusterer;
 
+    /*
+      Since the CDC wire pattern is repeated 32 times, the hit IDs are stored for 1/32 of the CDC only.
+      The total number of 2336 TS corresponds to (41 axial + 32 stereo) * 32.
+      The number of track bins (full phi) is: (omega, phi, theta) = (40, 384, 9)
+    */
+
     // Track segments
     static constexpr unsigned short m_nTS = 2336; // Number of track segments
     static constexpr unsigned short m_nSL = 9; // Number of super layers
@@ -266,7 +281,6 @@ namespace Belle2 {
     // Phi sectors in the CDC
     static constexpr unsigned short m_nPhiSector = m_nPhi / m_phiGeo; // Bins of one phi sector (12)
     static constexpr unsigned short m_nPhiComp = 15; // Bins of compressed phi: phi_start, phi_width, phi_0, ..., phi_12
-    static constexpr unsigned short m_nPhiUse =  m_parcels * m_nPhiSector; // Bins of 7 phi sectors (84)
     static constexpr unsigned short m_nPhiExp =  m_parcelsExp * m_nPhiSector; // Bins of 11 phi sectors (132)
 
     // Binnings in different hit pattern arrays
@@ -277,14 +291,14 @@ namespace Belle2 {
     static constexpr SectorBinning m_fullBins = {m_nOmega, m_nPhi, m_nTheta, m_nTS, m_nPrio}; // 40, 384, 9, 2336, 3
 
     // Acceptance ranges + slot sizes to convert bins to track parameters (for getBinToVal method)
-    static constexpr std::array<float, 2> m_omegaRange = {-5., 5.};
-    static constexpr std::array<float, 2> m_phiRange = {0., 11.25};
-    static constexpr std::array<float, 2> m_thetaRange = {19., 140.};
-    static constexpr float m_binSizeOmega = (m_omegaRange[1] - m_omegaRange[0]) / m_nOmega; // 0.25
-    static constexpr float m_binSizePhi = (m_phiRange[1] - m_phiRange[0]) / m_nPhiSector; // 0.9375
-    static constexpr float m_binSizeTheta = (m_thetaRange[1] - m_thetaRange[0]) / m_nTheta; // 13.444
-    static constexpr std::array<std::array<float, 2>, 3> m_acceptanceRanges = {m_omegaRange, m_phiRange, m_thetaRange};
-    static constexpr std::array<float, 3> m_binSizes = {m_binSizeOmega, m_binSizePhi, m_binSizeTheta};
+    static constexpr std::array<double, 2> m_omegaRange = {-5., 5.};
+    static constexpr std::array<double, 2> m_phiRange = {0., 11.25};
+    static constexpr std::array<double, 2> m_thetaRange = {19., 140.};
+    static constexpr double m_binSizeOmega = (m_omegaRange[1] - m_omegaRange[0]) / m_nOmega; // 0.25
+    static constexpr double m_binSizePhi = (m_phiRange[1] - m_phiRange[0]) / m_nPhiSector; // 0.9375
+    static constexpr double m_binSizeTheta = (m_thetaRange[1] - m_thetaRange[0]) / m_nTheta; // 13.444
+    static constexpr std::array<std::array<double, 2>, 3> m_acceptanceRanges = {m_omegaRange, m_phiRange, m_thetaRange};
+    static constexpr std::array<double, 3> m_binSizes = {m_binSizeOmega, m_binSizePhi, m_binSizeTheta};
 
     // Array pointers to the hit representations and Hough space
     /*

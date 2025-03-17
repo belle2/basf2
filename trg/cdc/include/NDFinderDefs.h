@@ -8,9 +8,9 @@
 
 #pragma once
 
+#include <array>
 #define BOOST_MULTI_ARRAY_NO_GENERATORS
 #include "boost/multi_array.hpp"
-#include <array>
 
 namespace Belle2 {
 

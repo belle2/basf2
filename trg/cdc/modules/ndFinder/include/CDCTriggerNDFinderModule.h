@@ -34,7 +34,6 @@ namespace Belle2 {
     virtual void terminate() override;
 
   private:
-
     // Name for TS hits
     std::string m_TrackSegmentHitsName;
     // Name for NDFinder tracks

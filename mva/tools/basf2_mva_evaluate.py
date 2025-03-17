@@ -166,18 +166,30 @@ if __name__ == '__main__':
 
     print("Load variables array")
     rootchain = ROOT.TChain(args.treename)
+    rootchain_spec = ROOT.TChain(args.treename)
     for datafile in datafiles:
         rootchain.Add(datafile)
+        rootchain_spec.Add(datafile)
 
     variables_data = basf2_mva_util.chain2dict(rootchain, root_variables, list(variable_abbreviations.values()))
     spectators_data = basf2_mva_util.chain2dict(rootchain, root_spectators, list(spectator_abbreviations.values()))
+    varSpec_data = basf2_mva_util.chain2dict(
+        rootchain_spec,
+        root_variables +
+        root_spectators,
+        list(
+            variable_abbreviations.values()) +
+        list(
+            spectator_abbreviations.values()))
 
     if args.fillnan:
         for column in variable_abbreviations.values():
             np.nan_to_num(variables_data[column], copy=False)
+            np.nan_to_num(varSpec_data[column], copy=False)
 
         for column in spectator_abbreviations.values():
             np.nan_to_num(spectators_data[column], copy=False)
+            np.nan_to_num(varSpec_data[column], copy=False)
 
     print("Create latex file")
     # Change working directory after experts run, because they might want to access
@@ -388,6 +400,22 @@ if __name__ == '__main__':
                 p.save(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf')
                 graphics.add(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf', width=1.0)
                 o += graphics.finish()
+
+        if len(spectators) > 0:
+            o += b2latex.SubSection("Correlation of Spectators")
+            first_identifier_abbr = list(identifier_abbreviations.values())[0]
+            graphics = b2latex.Graphics()
+            p = plotting.CorrelationMatrix()
+            p.add(
+                varSpec_data,
+                list(variable_abbreviations.values()) + list(spectator_abbreviations.values()),
+                test_target[first_identifier_abbr] == 1,
+                test_target[first_identifier_abbr] != 1
+            )
+            p.finish()
+            p.save('correlation_spec_plot.pdf')
+            graphics.add('correlation_spec_plot.pdf', width=1.0)
+            o += graphics.finish()
 
         if args.compile:
             B2INFO(f"Creating a PDF file at {args.outputfile}. Please remove the '-c' switch if this fails.")

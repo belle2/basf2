@@ -641,12 +641,12 @@ class Distribution(Plotter):
 
         if self.normed_to_all_entries:
             normalization = float(numpy.sum(hist))
-            hist = hist / normalization
-            hist_error = hist_error / normalization
+            hist = hist / normalization if normalization > 0 else hist
+            hist_error = hist_error / normalization if normalization > 0 else hist_error
 
         if self.normed_to_bin_width:
-            hist = hist / hists.bin_widths
-            hist_error = hist_error / hists.bin_widths
+            hist = hist / hists.bin_widths if normalization > 0 else hist
+            hist_error = hist_error / hists.bin_widths if normalization > 0 else hist_error
 
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
         self.ymin = numpy.nanmin([hist.min(), self.ymin])
@@ -1115,13 +1115,18 @@ class Correlation(Plotter):
         axes = [self.axis, self.axis_d1, self.axis_d2]
 
         for i, (l, m) in enumerate([('.', signal_mask | bckgrd_mask), ('S', signal_mask), ('B', bckgrd_mask)]):
-
             if weight_column is not None:
                 weights = numpy.array(data[weight_column][m])
             else:
                 weights = numpy.ones(len(data[column][m]))
 
             xrange = numpy.percentile(data[column][m], [5, 95])
+            isfinite = numpy.isfinite(data[column][m])
+            if not numpy.all(isfinite):
+                xrange = numpy.percentile(data[column][m][isfinite], [5, 95])
+            elif numpy.all(numpy.isnan(data[column][m])):
+                b2.B2WARNING("All data is NaN, cannot calculate range and ignore Correlation.")
+                return self
 
             colormap = plt.get_cmap('coolwarm')
             tmp, x = numpy.histogram(data[column][m], bins=100,

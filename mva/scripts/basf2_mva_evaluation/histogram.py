@@ -171,8 +171,9 @@ class Histograms:
         cumsignal = (signal.sum() - signal.cumsum()).astype('float')
         cumbckgrd = (bckgrd.sum() - bckgrd.cumsum()).astype('float')
 
-        purity = cumsignal / (cumsignal + cumbckgrd)
-        purity_error = binom_error(cumsignal, cumsignal + cumbckgrd)
+        with numpy.errstate(divide='ignore', invalid='ignore'):
+            purity = cumsignal / (cumsignal + cumbckgrd)
+            purity_error = binom_error(cumsignal, cumsignal + cumbckgrd)
         return purity, purity_error
 
     def get_signal_to_noise(self, signal_names, bckgrd_names):
@@ -186,8 +187,9 @@ class Histograms:
         cumsignal = (signal.sum() - signal.cumsum()).astype('float')
         cumbckgrd = (bckgrd.sum() - bckgrd.cumsum()).astype('float')
 
-        signal2noise = cumsignal / (cumsignal + cumbckgrd)**0.5
-        signal2noise_error = numpy.sqrt(cumsignal / (cumsignal + cumbckgrd) + (cumsignal / (2 * (cumsignal + cumbckgrd)))**2)
+        with numpy.errstate(divide='ignore', invalid='ignore'):
+            signal2noise = cumsignal / (cumsignal + cumbckgrd)**0.5
+            signal2noise_error = numpy.sqrt(cumsignal / (cumsignal + cumbckgrd) + (cumsignal / (2 * (cumsignal + cumbckgrd)))**2)
         return signal2noise, signal2noise_error
 
     def get_purity_per_bin(self, signal_names, bckgrd_names):
@@ -201,6 +203,7 @@ class Histograms:
         signal = signal.astype('float')
         bckgrd = bckgrd.astype('float')
 
-        purity = signal / (signal + bckgrd)
-        purity_error = binom_error(signal, signal + bckgrd)
+        with numpy.errstate(divide='ignore', invalid='ignore'):
+            purity = signal / (signal + bckgrd)
+            purity_error = binom_error(signal, signal + bckgrd)
         return purity, purity_error

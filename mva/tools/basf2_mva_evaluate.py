@@ -75,10 +75,26 @@ def flatten(input_list: List[List[Any]]) -> List[Any]:
     return [item for sublist in input_list for item in sublist]
 
 
+def smart_abbreviation(name):
+    shortName = name
+    shortName = shortName.replace("daughter", "d")
+    shortName = shortName.replace("Angle", "Ang")
+    shortName = shortName.replace("useCMSFrame", "")
+    shortName = shortName.replace("useLabFrame", "")
+    shortName = shortName.replace("useRestFrame", "")
+    shortName = shortName.replace("formula", "")
+    shortName = shortName.replace("(", "")
+    shortName = shortName.replace(")", "")
+    shortName = shortName.replace("conditionalVariableSelector", "")
+    shortName = shortName.replace(",", "")
+    shortName = shortName.replace(" ", "")
+    return shortName
+
+
 def create_abbreviations(names, length=5):
     count = dict()
     for name in names:
-        abbreviation = name[:length]
+        abbreviation = smart_abbreviation(name)[:length]
         if abbreviation not in count:
             count[abbreviation] = 0
         count[abbreviation] += 1
@@ -86,7 +102,7 @@ def create_abbreviations(names, length=5):
 
     count2 = dict()
     for name in names:
-        abbreviation = name[:length]
+        abbreviation = smart_abbreviation(name)[:length]
         abbreviations[name] = abbreviation
         if count[abbreviation] > 1:
             if abbreviation not in count2:

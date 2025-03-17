@@ -10,6 +10,7 @@
 #include "trg/cdc/Clusterizend.h"
 using namespace Belle2;
 
+// Main function to find the clusters in the Hough space
 std::vector<SimpleCluster> Clusterizend::makeClusters()
 {
   std::vector<SimpleCluster> candidateClusters;
@@ -25,13 +26,14 @@ std::vector<SimpleCluster> Clusterizend::makeClusters()
       if (totalWeight >= m_params.minTotalWeight) {
         candidateClusters.push_back(newCluster);
       }
-      deleteMax(globalMax);
+      deleteGlobalMax(globalMax);
     }
     *m_houghSpace = houghSpaceBackup;
   }
   return candidateClusters;
 }
 
+// Returns the global maximum index and weight for one quadrant
 std::pair<cell_index, unsigned long> Clusterizend::getGlobalMax(const unsigned char quadrant)
 {
   unsigned long maxValue = 0;
@@ -52,7 +54,7 @@ std::pair<cell_index, unsigned long> Clusterizend::getGlobalMax(const unsigned c
   return {maxIndex, maxValue};
 }
 
-
+// Creates the surrounding cluster (fixed shape) around the global maximum index
 std::pair<SimpleCluster, unsigned long> Clusterizend::createCluster(const cell_index& maxIndex)
 {
   SimpleCluster fixedCluster;
@@ -65,7 +67,7 @@ std::pair<SimpleCluster, unsigned long> Clusterizend::createCluster(const cell_i
   c3index thetaLower = std::max<int>(0, thetaMax - 1);
   c3index thetaUpper = std::min<int>(m_params.nTheta, thetaMax + 2);
 
-  /* First 3x3: omegaMax */
+  // First 3x3: omegaMax
   ClusterBounds firstBounds = {
     thetaLower,
     thetaUpper,
@@ -75,7 +77,7 @@ std::pair<SimpleCluster, unsigned long> Clusterizend::createCluster(const cell_i
   };
   addClusterCells(firstBounds, fixedCluster, totalClusterWeight);
 
-  /* Second 3x3: omegaMax - 1 (if valid) */
+  // Second 3x3: omegaMax - 1 (if valid)
   if (omegaMax - 1 >= 0) {
     ClusterBounds secondBounds = {
       thetaLower,
@@ -87,7 +89,7 @@ std::pair<SimpleCluster, unsigned long> Clusterizend::createCluster(const cell_i
     addClusterCells(secondBounds, fixedCluster, totalClusterWeight);
   }
 
-  /* Third 3x3: omegaMax + 1 (if valid) */
+  // Third 3x3: omegaMax + 1 (if valid)
   if (omegaMax + 1 < m_params.nOmega) {
     ClusterBounds thirdBounds = {
       thetaLower,
@@ -101,21 +103,21 @@ std::pair<SimpleCluster, unsigned long> Clusterizend::createCluster(const cell_i
   return {fixedCluster, totalClusterWeight};
 }
 
-
+// Adds the 3x3 cluster cells (fixed shape) for each of the three omega bins)
 void Clusterizend::addClusterCells(const ClusterBounds& bounds, SimpleCluster& fixedCluster, unsigned long& totalClusterWeight)
 {
   for (c3index thetaIdx = bounds.thetaLowerBound; thetaIdx < bounds.thetaUpperBound; ++thetaIdx) {
     for (c3index phiIdx = bounds.phiLowerBound; phiIdx < bounds.phiUpperBound; ++phiIdx) {
       c3index phiIdxMod = (phiIdx + m_params.nPhi) % m_params.nPhi;
       cell_index newMemberIndex = {bounds.omega, phiIdxMod, thetaIdx};
-      fixedCluster.append(newMemberIndex);
+      fixedCluster.appendCell(newMemberIndex);
       totalClusterWeight += (*m_houghSpace)[bounds.omega][phiIdxMod][thetaIdx];
     }
   }
 }
 
-
-void Clusterizend::deleteMax(const cell_index& maxIndex)
+// Deletes the surroundings of the global maximum with a butterfly cutout
+void Clusterizend::deleteGlobalMax(const cell_index& maxIndex)
 {
   c3index omegaMax = maxIndex[0];
   c3index phiMax = maxIndex[1];
@@ -160,7 +162,7 @@ void Clusterizend::deleteMax(const cell_index& maxIndex)
   }
 }
 
-
+// Clears a single omega row
 void Clusterizend::clearHoughSpaceRow(const DeletionBounds& bounds)
 {
   for (c3index phiIdx = bounds.phiLowerBound; phiIdx < bounds.phiUpperBound; ++phiIdx) {

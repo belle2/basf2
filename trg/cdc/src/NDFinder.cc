@@ -20,7 +20,6 @@
 
 using namespace Belle2;
 
-#define print(x) std::cout << #x << " = " << (x) << "\n";
 void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, float thresh,
                     unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned char iterations,
                     unsigned char omegaTrim, unsigned char phiTrim, unsigned char thetaTrim,
@@ -36,22 +35,17 @@ void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, f
   initLookUpArrays();
   initHitToSectorMap(*m_hitToSectorIDs);
 
-  /* Load the axial and stereo track to hit relations from file.*/
+  // Load the axial and stereo track to hit relations from file.
   loadCompressedHitReps(m_params.axialFile, m_compAxialBins, *m_compAxialHitReps);
   loadCompressedHitReps(m_params.stereoFile, m_compStereoBins, *m_compStereoHitReps);
 
-  /* Fills the the expanded hit representations (from compressed hits to weights) */
+  // Fills the the expanded hit representations (from compressed hits to weights)
   fillExpandedHitReps(m_compAxialBins, *m_compAxialHitReps, *m_expAxialHitReps);
   fillExpandedHitReps(m_compStereoBins, *m_compStereoHitReps, *m_expStereoHitReps);
 
-  squeezeAll(m_axialBins, *m_axialHitContributions, *m_expAxialHitReps);
-  B2DEBUG(25, "squeezed axial array (11/32 phi) --> (7/32 phi): ");
-  squeezeAll(m_stereoBins, *m_stereoHitContributions, *m_expStereoHitReps);
-  B2DEBUG(25, "squeezed stereo array (11/32 phi) --> (7/32 phi)");
-
   reset();
 
-  /* Parameters necessary for the clustering algorithm */
+  // Parameters necessary for the clustering algorithm
   m_clustererParams.minTotalWeight = minTotalWeight;
   m_clustererParams.minPeakWeight = minPeakWeight;
   m_clustererParams.iterations = iterations;
@@ -66,24 +60,22 @@ void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, f
 
 void NDFinder::initLookUpArrays()
 {
-  /** Create the arrays of the track to hit relations
-   * for axial and stereo hits.
-   *
-   * Since the CDC wire pattern is repeated 32 times,
-   * the hit ids are stored for 1/32 of the CDC only.
-   * The total number of 2336 TS corresponds to (41 axial + 32 stereo) * 32.
-   *
-   * The number of track bins (full phi) is: (omega, phi, theta) = (40, 384, 9)
-   **/
+  /*
+    Create the arrays of the track to hit relations for axial and stereo hits.
 
-  /* Shapes of the arrays holding the hit patterns */
+    Since the CDC wire pattern is repeated 32 times,
+    the hit ids are stored for 1/32 of the CDC only.
+    The total number of 2336 TS corresponds to (41 axial + 32 stereo) * 32.
+
+    The number of track bins (full phi) is: (omega, phi, theta) = (40, 384, 9)
+   */
+
+  // Shapes of the arrays holding the hit patterns
   std::array<c2index, 2> shapeHitToSectorIDs = {{m_nTS, m_nPrio}};
   std::array<c5index, 5> shapeCompAxialHitReps = {{m_nAxial, m_nPrio, m_nOmega, m_nPhiComp, 1}};
   std::array<c5index, 5> shapeCompStereoHitReps = {{m_nStereo, m_nPrio, m_nOmega, m_nPhiComp, m_nTheta}};
   std::array<c5index, 5> shapeExpAxialHitReps = {{m_nAxial, m_nPrio, m_nOmega, m_nPhiExp, m_nTheta}};
   std::array<c5index, 5> shapeExpStereoHitReps = {{m_nStereo, m_nPrio, m_nOmega, m_nPhiExp, m_nTheta}};
-  std::array<c5index, 5> shapeAxial = {{m_nAxial, m_nPrio, m_nOmega, m_nPhiUse, m_nTheta}};
-  std::array<c5index, 5> shapeStereo = {{m_nStereo, m_nPrio, m_nOmega, m_nPhiUse, m_nTheta}};
   std::array<c3index, 3> shapeHough = {{m_nOmega, m_nPhi, m_nTheta}};
 
   m_hitToSectorIDs    = new c2array(shapeHitToSectorIDs);
@@ -91,23 +83,21 @@ void NDFinder::initLookUpArrays()
   m_compStereoHitReps = new c5array(shapeCompStereoHitReps);
   m_expAxialHitReps   = new c5array(shapeExpAxialHitReps);
   m_expStereoHitReps  = new c5array(shapeExpStereoHitReps);
-  m_axialHitContributions       = new c5array(shapeAxial);
-  m_stereoHitContributions      = new c5array(shapeStereo);
-  m_houghSpace       = new c3array(shapeHough);
+  m_houghSpace        = new c3array(shapeHough);
 }
 
-/* Fills the m_hitToSectorIDs array */
+// Fills the m_hitToSectorIDs array
 void NDFinder::initHitToSectorMap(c2array& hitsToSectors)
 {
-  /* Number of first priority wires in each super layer (TS per SL) */
+  // Number of first priority wires in each super layer (TS per SL)
   constexpr std::array<int, 9> nWires = {160, 160, 192, 224, 256, 288, 320, 352, 384};
-  /* Number of priority wires (= number of TS) per SL in a single (1/32) phi sector */
+  // Number of priority wires (= number of TS) per SL in a single (1/32) phi sector
   std::vector<int> wiresPerSector;
-  /* Lookup table: Maps the TS id to the SL number */
+  // Lookup table: Maps the TS id to the SL number
   std::vector<int> hitToSuperLayer;
-  /* Integrated number of priority wires for each SL */
+  // Integrated number of priority wires for each SL
   std::vector<int> cumulativeWires = {0};
-  /* Integrated number of sector priority wires for each SL (Axial even, Stereo odd) */
+  // Integrated number of sector priority wires for each SL (Axial even, Stereo odd)
   std::vector<int> cumulativeSectorWires = {0, 0};
   for (int sl = 0; sl < m_nSL; ++sl) {
     wiresPerSector.push_back(nWires[sl] / m_phiGeo);
@@ -130,11 +120,11 @@ void NDFinder::initHitToSectorMap(c2array& hitsToSectors)
   }
 }
 
-/* Fills the m_compAxialHitReps/m_compStereoHitReps arrays */
+// Fills the m_compAxialHitReps/m_compStereoHitReps arrays
 void NDFinder::loadCompressedHitReps(const std::string& fileName, const SectorBinning& compBins, c5array& compHitsToWeights)
 {
-  /* Array of the entries in trg/cdc/data/ndFinderArray*Comp.txt.gz */
-  std::vector<c5elem> flatArray;
+  // Array of the entries in trg/cdc/data/ndFinderArray*Comp.txt.gz
+  std::vector<unsigned short> flatArray;
   std::ifstream arrayFileGZ(fileName, std::ios_base::in | std::ios_base::binary);
   if (!arrayFileGZ.is_open()) {
     B2ERROR("Could not open array file: " << fileName);
@@ -143,7 +133,7 @@ void NDFinder::loadCompressedHitReps(const std::string& fileName, const SectorBi
   boost::iostreams::filtering_istream arrayStream;
   arrayStream.push(boost::iostreams::gzip_decompressor());
   arrayStream.push(arrayFileGZ);
-  c5elem uline;
+  unsigned short uline;
   while (arrayStream >> uline) {
     flatArray.push_back(uline);
   }
@@ -163,7 +153,7 @@ void NDFinder::loadCompressedHitReps(const std::string& fileName, const SectorBi
   }
 }
 
-/* Fills the m_expAxialHitReps/m_expStereoHitReps arrays */
+// Fills the m_expAxialHitReps/m_expStereoHitReps arrays
 void NDFinder::fillExpandedHitReps(const SectorBinning& compBins, const c5array& compHitsToWeights, c5array& expHitsToWeights)
 {
   for (c5index hitID = 0; hitID < compBins.nHitIDs; ++hitID) {
@@ -190,71 +180,28 @@ void NDFinder::fillExpandedHitReps(const SectorBinning& compBins, const c5array&
 }
 
 
-void NDFinder::squeezeAll(const SectorBinning& writebins, c5array& writeArray, const c5array& expHitsToWeights)
-{
-  for (c5index hitID = 0; hitID < writebins.nHitIDs; ++hitID) {
-    for (c5index priorityIdx = 0; priorityIdx < writebins.nPriorityWires; ++priorityIdx) {
-      for (c5index itheta = 0; itheta < writebins.theta; ++itheta) {
-        squeezeOne(writeArray, expHitsToWeights, hitID, priorityIdx, itheta, writebins.omega);
-      }
-    }
-  }
-}
-
-
-void NDFinder::squeezeOne(c5array& writeArray, const c5array& expHitsToWeights, c5index hitID,
-                          c5index priorityIdx, c5index itheta, c5elem nomega)
-{
-  const int outnphi = (int)(m_nPhiSector * m_parcels); // 12 * 7 = 84
-  const c5index trafstart = (c5index)((m_parcelsExp - m_parcels) / 2 * m_nPhiSector); // (11 - 7) / 2 * 12 = 24
-  const c5index trafend = (c5index)(trafstart + outnphi); // 24 + 84 = 108
-  for (c5index iomega = 0; iomega < nomega; ++iomega) { // 40
-    for (c5index iphi = 0; iphi < outnphi; ++iphi) { // 84
-      c5index readPhi = trafstart + iphi; // 24 -> 108
-      writeArray[hitID][priorityIdx][iomega][iphi][itheta] = expHitsToWeights[hitID][priorityIdx][iomega][readPhi][itheta];
-      /* Maps 0 -> 24, 1 -> 25, ..., 84 -> 108 */
-    }
-    for (c5index iphi = 0; iphi < trafstart; ++iphi) { // 24
-      c5index writePhi = (c5index)(outnphi - trafstart + iphi); // 60 -> 84
-      writeArray[hitID][priorityIdx][iomega][writePhi][itheta] += expHitsToWeights[hitID][priorityIdx][iomega][iphi][itheta];
-    }
-    for (c5index iphi = 0; iphi < trafstart; ++iphi) { // 24
-      c5index readPhi = trafend + iphi; // 108 -> 132
-      writeArray[hitID][priorityIdx][iomega][iphi][itheta] += expHitsToWeights[hitID][priorityIdx][iomega][readPhi][itheta];
-    }
-  }
-}
-
 void NDFinder::findTracks()
 {
-  /* Build the Houghplane by summing up all single hit contributions */
+  // Build the Houghplane by summing up all single hit contributions
   for (unsigned short hitIdx = 0; hitIdx < m_nHits; ++hitIdx) {
     addLookup(hitIdx);
   }
   getCM();
 }
 
-
-/* Writes the hit to the Hough space and creates the inverse lookup table */
+// Writes the hit to the Hough space and creates the inverse lookup table
 void NDFinder::addLookup(unsigned short hitIdx)
 {
   const c2array& hitToSectorIDs = *m_hitToSectorIDs;
-  c2elem orient = hitToSectorIDs[m_hitIDs[hitIdx]][0];
-  c2elem relativeWireID = hitToSectorIDs[m_hitIDs[hitIdx]][1];
-  c2elem relativeSectorID = hitToSectorIDs[m_hitIDs[hitIdx]][2];
+  unsigned short orient = hitToSectorIDs[m_hitIDs[hitIdx]][0];
+  unsigned short relativeWireID = hitToSectorIDs[m_hitIDs[hitIdx]][1];
+  unsigned short relativeSectorID = hitToSectorIDs[m_hitIDs[hitIdx]][2];
   unsigned short priorityWire = m_priorityWirePos[hitIdx];
 
-  // Get hit contribution to cluster:
-  // 7 of 32 phi parcels: center = 3
-  short DstartShort = ((short)relativeSectorID - 3) % m_phiGeo * m_nPhiSector;
-  if (DstartShort < 0) {DstartShort = m_nPhi + DstartShort;}
-  // Add hit to hough plane
   // 11 of 32 phi parcels: center = 5
-  short phiSectorStart = ((short)relativeSectorID - 5) % m_phiGeo * m_nPhiSector;
-  if (phiSectorStart < 0) {phiSectorStart = m_nPhi + phiSectorStart;}
+  unsigned short phiSectorStart = ((relativeSectorID - 5) % m_phiGeo + m_phiGeo) % m_phiGeo * m_nPhiSector;
 
-  m_vecDstart.push_back(DstartShort);
-  m_hitOrients.push_back(orient);
+  m_phiSectorStarts.push_back(phiSectorStart);
 
   HitInfo hitInfo = {relativeWireID, priorityWire, phiSectorStart};
 
@@ -265,7 +212,7 @@ void NDFinder::addLookup(unsigned short hitIdx)
   }
 }
 
-/* Write (add) a single hit (Hough curve) to the Hough space */
+// Write (add) a single hit (Hough curve) to the Hough space
 void NDFinder::writeHitToHoughSpace(const HitInfo& hitInfo, const c5array& expHitsToWeights)
 {
   c3array& houghSpace = *m_houghSpace;
@@ -277,6 +224,67 @@ void NDFinder::writeHitToHoughSpace(const HitInfo& hitInfo, const c5array& expHi
           expHitsToWeights[hitInfo.relativeWireID][hitInfo.priorityWire][omegaIdx][phiIdx][thetaIdx];
       }
     }
+  }
+}
+
+
+void NDFinder::getCM()
+{
+  c3array& houghSpace = *m_houghSpace;
+  m_clusterer.setNewPlane(houghSpace);
+  std::vector<SimpleCluster> allClusters = m_clusterer.makeClusters();
+  std::vector<std::vector<unsigned short>> hitsVsClusters = getHitsVsClusters(allClusters);
+  // New hit to cluster relation
+  std::vector<SimpleCluster> validClusters = allHitsToClusters(hitsVsClusters, allClusters);
+
+  for (SimpleCluster& cluster : validClusters) {
+    std::vector<cell_index> entries = cluster.getEntries();
+    cell_index maxid = getMax(entries);
+    unsigned short maxval = houghSpace[maxid[0]][maxid[1]][maxid[2]];
+    float cutoff = m_params.thresh * maxval;
+    std::vector<CellWeight> highWeight = getHighWeight(entries, cutoff);
+    std::vector<double> result = getWeightedMean(highWeight);
+    std::vector<double> estimate = getBinToVal(result);
+    std::vector<double> transformed = transform(estimate);
+
+    // Readouts for the 3DFinderInfo class for analysis (Hough space + cluster info)
+    std::vector<ROOT::Math::XYZVector> readoutHoughSpace;
+    std::vector<ROOT::Math::XYZVector> readoutCluster;
+
+    if (m_params.storeAdditionalReadout) {
+      // Readout of the complete Hough space
+      for (c3index i = 0; i < static_cast<c3index>(houghSpace.shape()[0]); ++i) {
+        for (c3index j = 0; j < static_cast<c3index>(houghSpace.shape()[1]); ++j) {
+          for (c3index k = 0; k < static_cast<c3index>(houghSpace.shape()[2]); ++k) {
+            unsigned short element = houghSpace[i][j][k];
+            readoutHoughSpace.push_back(ROOT::Math::XYZVector(element, 0, 0));
+          }
+        }
+      }
+      // Readout of the peak weight
+      readoutCluster.push_back(ROOT::Math::XYZVector(maxval, 0, 0));
+      // Readout of the total weight
+      unsigned long totalWeight = 0;
+      for (const cell_index& cellIndex : entries) {
+        totalWeight += houghSpace[cellIndex[0]][cellIndex[1]][cellIndex[2]];
+      }
+      readoutCluster.push_back(ROOT::Math::XYZVector(totalWeight, 0, 0));
+      // Readout of the number of cluster cells
+      int ncells = entries.size();
+      readoutCluster.push_back(ROOT::Math::XYZVector(ncells, 0, 0));
+      // Readout of the cluster center of gravity
+      readoutCluster.push_back(ROOT::Math::XYZVector(result[0], result[1], result[2]));
+      // Readout of the cluster weights
+      for (const cell_index& cellIndex : entries) {
+        unsigned short element = houghSpace[cellIndex[0]][cellIndex[1]][cellIndex[2]];
+        readoutCluster.push_back(ROOT::Math::XYZVector(element, 0, 0));
+      }
+      // Readout of the cluster cell indices
+      for (const cell_index& cellIndex : entries) {
+        readoutCluster.push_back(ROOT::Math::XYZVector(cellIndex[0], cellIndex[1], cellIndex[2]));
+      }
+    }
+    m_NDFinderTracks.push_back(NDFinderTrack(transformed, std::move(cluster), std::move(readoutHoughSpace), std::move(readoutCluster)));
   }
 }
 
@@ -293,16 +301,46 @@ std::vector<std::vector<unsigned short>> NDFinder::getHitsVsClusters(std::vector
     std::vector<cell_index> entries = cluster.getEntries();
     cell_index maxid = getMax(entries);
     for (unsigned long hitIdx = 0; hitIdx < m_hitIDs.size(); ++hitIdx) {
-      unsigned short contrib = hitContrib(maxid, hitIdx);
-      hitsVsClusters[clusterIdx][hitIdx] = contrib;
+      unsigned short contribution = getHitContribution(maxid, hitIdx);
+      hitsVsClusters[clusterIdx][hitIdx] = contribution;
     }
   }
   return hitsVsClusters;
 }
 
+// Returns the hit contribution of a TS at a certain peak cell
+unsigned short NDFinder::getHitContribution(const cell_index& peakCell, const unsigned short hitIdx)
+{
+  unsigned short contribution = 0;
+
+  unsigned short omegaIdx = peakCell[0];
+  unsigned short houghPhiIdx = peakCell[1];
+  unsigned short thetaIdx = peakCell[2];
+
+  unsigned short phiSectorStart = m_phiSectorStarts[hitIdx];
+
+  // Inverse Hough transformation (inverse of writeHitToHoughSpace method)
+  unsigned short phiIdx = (houghPhiIdx - phiSectorStart + m_nPhi) % m_nPhi;
+
+  const c2array& hitToSectorIDs = *m_hitToSectorIDs;
+
+  unsigned short orient = hitToSectorIDs[m_hitIDs[hitIdx]][0];
+  unsigned short relativeWireID = hitToSectorIDs[m_hitIDs[hitIdx]][1];
+  unsigned short priorityWire = m_priorityWirePos[hitIdx];
+
+  if (phiIdx < m_nPhiExp) { // Get the contribution if the hit covers the current phi-area
+    if (orient == 1) { // Axial TS
+      contribution = (*m_expAxialHitReps)[relativeWireID][priorityWire][omegaIdx][phiIdx][thetaIdx];
+    } else { // Stereo TS
+      contribution = (*m_expStereoHitReps)[relativeWireID][priorityWire][omegaIdx][phiIdx][thetaIdx];
+    }
+  }
+  return contribution;
+}
+
 // New hit-to-cluster relation, replaces relateHitsToClusters
 std::vector<SimpleCluster>
-NDFinder::allHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClusters, std::vector<SimpleCluster>& clusters)
+NDFinder::allHitsToClusters(const std::vector<std::vector<unsigned short>>& hitsVsClusters, std::vector<SimpleCluster>& clusters)
 {
   std::vector<SimpleCluster> useClusters;
   if (hitsVsClusters.size() > 0) {
@@ -339,15 +377,14 @@ NDFinder::allHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClus
         for (size_t index = 0; index < oneSuperLayerContributions.size(); ++index) {
           // The maximum weight contribution gets identified
           if (oneSuperLayerContributions[index][1] > maxContribution) {
-            maxContribution = oneSuperLayerContributions[index][1];
             maxHit = oneSuperLayerContributions[index][0];
           }
         }
-        clusters[iclus].addHit(maxHit, maxContribution, m_hitOrients[maxHit]);
+        clusters[iclus].addHitToCluster(maxHit);
       }
       SimpleCluster& clu = clusters[iclus];
       // The hits of the current cluster get extracted
-      std::vector<unsigned short> clusterHits = clu.getHits();
+      std::vector<unsigned short> clusterHits = clu.getClusterHits();
       std::vector<unsigned short> clusterSLNumbers;
       for (const auto& element : clusterHits) {
         clusterSLNumbers.push_back(m_hitSLIDs[element]);
@@ -365,67 +402,6 @@ NDFinder::allHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClus
     }
   }
   return useClusters;
-}
-
-
-void NDFinder::getCM()
-{
-  c3array& houghSpace = *m_houghSpace;
-  m_clusterer.setNewPlane(houghSpace);
-  std::vector<SimpleCluster> allClusters = m_clusterer.makeClusters();
-  std::vector<std::vector<unsigned short>> hitsVsClusters = getHitsVsClusters(allClusters);
-  // New hit to cluster relation
-  std::vector<SimpleCluster> validClusters = allHitsToClusters(hitsVsClusters, allClusters);
-
-  for (SimpleCluster& cluster : validClusters) {
-    std::vector<cell_index> entries = cluster.getEntries();
-    cell_index maxid = getMax(entries);
-    unsigned short maxval = houghSpace[maxid[0]][maxid[1]][maxid[2]];
-    float cutoff = m_params.thresh * maxval;
-    std::vector<CellWeight> highWeight = getHighWeight(entries, cutoff);
-    std::vector<double> result = getWeightedMean(highWeight);
-    std::vector<double> estimate = getBinToVal(result);
-    std::vector<double> transformed = transform(estimate);
-
-    /* Readouts for the 3DFinderInfo class for analysis (Hough space + cluster info) */
-    std::vector<ROOT::Math::XYZVector> readoutHoughSpace;
-    std::vector<ROOT::Math::XYZVector> readoutCluster;
-
-    if (m_params.storeAdditionalReadout) {
-      /* Readout of the complete Hough space */
-      for (c3index i = 0; i < static_cast<c3index>(houghSpace.shape()[0]); ++i) {
-        for (c3index j = 0; j < static_cast<c3index>(houghSpace.shape()[1]); ++j) {
-          for (c3index k = 0; k < static_cast<c3index>(houghSpace.shape()[2]); ++k) {
-            c3elem element = houghSpace[i][j][k];
-            readoutHoughSpace.push_back(ROOT::Math::XYZVector(element, 0, 0));
-          }
-        }
-      }
-      /* Readout of the peak weight */
-      readoutCluster.push_back(ROOT::Math::XYZVector(maxval, 0, 0));
-      /* Readout of the total weight */
-      unsigned long totalWeight = 0;
-      for (const cell_index& cellIndex : entries) {
-        totalWeight += houghSpace[cellIndex[0]][cellIndex[1]][cellIndex[2]];
-      }
-      readoutCluster.push_back(ROOT::Math::XYZVector(totalWeight, 0, 0));
-      /* Readout of the number of cluster cells */
-      int ncells = entries.size();
-      readoutCluster.push_back(ROOT::Math::XYZVector(ncells, 0, 0));
-      /* Readout of the cluster center of gravity */
-      readoutCluster.push_back(ROOT::Math::XYZVector(result[0], result[1], result[2]));
-      /* Readout of the cluster weights */
-      for (const cell_index& cellIndex : entries) {
-        c3elem element = houghSpace[cellIndex[0]][cellIndex[1]][cellIndex[2]];
-        readoutCluster.push_back(ROOT::Math::XYZVector(element, 0, 0));
-      }
-      /* Readout of the cluster cell indices */
-      for (const cell_index& cellIndex : entries) {
-        readoutCluster.push_back(ROOT::Math::XYZVector(cellIndex[0], cellIndex[1], cellIndex[2]));
-      }
-    }
-    m_NDFinderTracks.push_back(NDFinderTrack(transformed, std::move(cluster), std::move(readoutHoughSpace), std::move(readoutCluster)));
-  }
 }
 
 
@@ -520,37 +496,4 @@ std::vector<CellWeight> NDFinder::getHighWeight(std::vector<cell_index> entries,
     }
   }
   return cellsAndWeight;
-}
-
-
-unsigned short NDFinder::hitContrib(cell_index peak, unsigned short hitIdx)
-{
-  unsigned short contrib = 0;
-  unsigned short iHoughPhi = peak[1];
-  short Dstart = m_vecDstart[hitIdx];
-  short iphi_signed = iHoughPhi - Dstart;
-  if (iphi_signed < 0) {
-    iphi_signed += m_nPhi;  // Wrap phi properly
-  }
-  unsigned short iphi = (unsigned short)iphi_signed;
-  if (Dstart > iHoughPhi && Dstart > 300) {
-    iphi = m_nPhi - Dstart + iHoughPhi;
-  }
-  unsigned short iomega = peak[0];
-  unsigned short itheta = peak[2];
-  unsigned short orient = m_hitOrients[hitIdx];
-
-  c2elem relativeWireID = (*m_hitToSectorIDs)[m_hitIDs[hitIdx]][1];
-  unsigned short priorityWire = m_priorityWirePos[hitIdx];
-  if (Dstart > m_nPhi) {
-    B2ERROR("phi overflow: iHoughPhi = " << iHoughPhi << ", Dstart = " << Dstart << ", iphi=" << iphi);
-  }
-  if (iphi < m_nPhiUse) { // hit covers current phi area, get contribution
-    if (orient == 1) { // axial
-      contrib = (*m_axialHitContributions)[relativeWireID][priorityWire][iomega][iphi][itheta];
-    } else { // stereo
-      contrib = (*m_stereoHitContributions)[relativeWireID][priorityWire][iomega][iphi][itheta];
-    }
-  }
-  return contrib;
 }

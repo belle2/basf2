@@ -307,6 +307,7 @@ class PurityAndEfficiencyOverCut(Plotter):
         self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(efficiency), numpy.nanmin(purity), self.ymin]), \
             numpy.nanmax([numpy.nanmax(efficiency), numpy.nanmax(purity), self.ymax])
 
+        self.set_errorbar_options({'fmt': '-o'})
         self.plots.append(self._plot_datapoints(self.axis, cuts, efficiency, xerr=0, yerr=efficiency_error))
 
         if normed:
@@ -314,6 +315,7 @@ class PurityAndEfficiencyOverCut(Plotter):
         else:
             self.labels.append("True positive")
 
+        self.set_errorbar_options({'fmt': '-o'})
         self.plots.append(self._plot_datapoints(self.axis, cuts, purity, xerr=0, yerr=purity_error))
 
         if normed:
@@ -364,6 +366,7 @@ class SignalToNoiseOverCut(Plotter):
         self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(signal2noise), self.ymin]), \
             numpy.nanmax([numpy.nanmax(signal2noise), self.ymax])
 
+        self.set_errorbar_options({'fmt': '-o'})
         self.plots.append(self._plot_datapoints(self.axis, cuts, signal2noise, xerr=0, yerr=signal2noise_error))
 
         self.labels.append(column)
@@ -407,6 +410,7 @@ class PurityOverEfficiency(Plotter):
         self.xmin, self.xmax = numpy.nanmin([efficiency.min(), self.xmin]), numpy.nanmax([efficiency.max(), self.xmax])
         self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(purity), self.ymin]), numpy.nanmax([numpy.nanmax(purity), self.ymax])
 
+        self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, efficiency, purity, xerr=efficiency_error, yerr=purity_error)
         self.plots.append(p)
         if label is not None:
@@ -463,6 +467,7 @@ class RejectionOverEfficiency(Plotter):
 
         auc = numpy.abs(numpy.trapz(rejection, efficiency))
 
+        self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, efficiency, rejection, xerr=efficiency_error, yerr=rejection_error)
         self.plots.append(p)
         if label is not None:
@@ -561,6 +566,7 @@ class Diagonal(Plotter):
         # self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(purity), self.ymin]), numpy.nanmax([numpy.nanmax(purity), self.ymax])
         self.ymin, self.ymax = 0, 1
 
+        self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, hists.bin_centers, purity, xerr=hists.bin_widths / 2.0, yerr=purity_error)
         self.plots.append(p)
         self.labels.append(column)
@@ -652,6 +658,7 @@ class Distribution(Plotter):
         self.ymin = numpy.nanmin([hist.min(), self.ymin])
         self.ymax = numpy.nanmax([(hist + hist_error).max(), self.ymax])
 
+        self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, hists.bin_centers, hist, xerr=hists.bin_widths / 2, yerr=hist_error)
         self.plots.append(p)
         self.x_axis_label = column
@@ -831,6 +838,7 @@ class Difference(Plotter):
         self.ymin = min((difference - difference_error).min(), self.ymin)
         self.ymax = max((difference + difference_error).max(), self.ymax)
 
+        self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, hists.bin_centers, difference, xerr=hists.bin_widths / 2, yerr=difference_error)
         self.plots.append(p)
         if label is None:

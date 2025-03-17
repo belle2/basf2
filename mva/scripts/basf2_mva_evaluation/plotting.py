@@ -441,6 +441,14 @@ class RejectionOverEfficiency(Plotter):
     #: @var ymax
     #: Maximum y value
 
+    def __init__(self, figure=None, axis=None, fom=False):
+        super().__init__(figure, axis)
+        self.fom = fom
+        self.twinxax = None
+        if self.fom:
+            self.twinxax = self.axis.twinx()
+        self.twinxaxMax = 0
+
     def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
         """
         Add a new curve to the ROC plot
@@ -474,6 +482,35 @@ class RejectionOverEfficiency(Plotter):
             self.labels.append(label[:10] + f" ({auc:.2f})")
         else:
             self.labels.append(column[:10] + f" ({auc:.2f})")
+
+        if self.fom:  # fom = nSignal / sqrt(nSignal + nBackground)
+            tp, tp_error = hists.get_true_positives(['Signal'])
+            fp, fp_error = hists.get_false_positives(['Background'])
+            if isinstance(tp, int) and not isinstance(fp, int):
+                tp = numpy.array([tp] * len(fp))
+            elif isinstance(fp, int) and not isinstance(tp, int):
+                fp = numpy.array([fp] * len(tp))
+            elif isinstance(fp, int) and isinstance(tp, int):
+                tp = numpy.array([tp])
+                fp = numpy.array([fp])
+
+            with numpy.errstate(divide='ignore', invalid='ignore'):
+                fom = tp/numpy.sqrt(tp + fp)
+                fom_err = numpy.sqrt(numpy.power((tp+2.*fp)/(2.*numpy.power(tp+fp, 1.5)), 2) * numpy.power(tp_error,
+                                     2) + numpy.power((-1.)*tp/(2.*numpy.power(tp+fp, 1.5)), 2) * numpy.power(fp_error, 2))
+            binsCut = hists.bin_centers
+
+            max_fom = numpy.nanmax(fom)
+            self.twinxaxMax = numpy.nanmax([self.twinxaxMax, max_fom])
+            max_fom_cut = binsCut[numpy.nanargmax(fom)]
+
+            p2 = self._plot_datapoints(self.twinxax, binsCut, fom, xerr=0, yerr=fom_err)
+            self.twinxax.vlines(max_fom_cut, 0, max_fom, colors=p2[1].get_color(), linestyles='dashed')
+            self.plots.append(p2)
+            if label is not None:
+                self.labels.append(label[:10] + " FOM: " + f"({max_fom:.2f}, {max_fom_cut:.2f})")
+            else:
+                self.labels.append(column[:10] + " FOM: " + f"({max_fom:.2f}, {max_fom_cut:.2f})")
         return self
 
     def finish(self):
@@ -483,9 +520,18 @@ class RejectionOverEfficiency(Plotter):
         self.axis.set_xlim((self.xmin, self.xmax))
         self.axis.set_ylim((self.ymin, self.ymax))
         self.axis.set_title("ROC Rejection Plot")
-        self.axis.get_xaxis().set_label_text('Signal Efficiency')
         self.axis.get_yaxis().set_label_text('Background Rejection')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
+
+        if self.fom:
+            self.twinxax.set_ylim((0, self.twinxaxMax * 1.1))
+            self.twinxax.set_xlim((0, 1))
+            self.axis.set_xlim((0, 1))
+            self.twinxax.get_yaxis().set_label_text('FOM')
+            self.twinxax.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
+            self.axis.get_yaxis().set_label_text('Signal Efficiency / Cut')
+        else:
+            self.axis.get_xaxis().set_label_text('Signal Efficiency')
         return self
 
 

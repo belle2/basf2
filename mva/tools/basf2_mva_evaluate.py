@@ -263,7 +263,7 @@ if __name__ == '__main__':
 
         o += b2latex.Section("ROC Plot")
         graphics = b2latex.Graphics()
-        p = plotting.RejectionOverEfficiency()
+        p = plotting.RejectionOverEfficiency(fom=True)
         for identifier in identifier_abbreviations.values():
             p.add(test_probability, identifier, test_target[identifier] == 1, test_target[identifier] == 0)
         p.finish()
@@ -275,7 +275,7 @@ if __name__ == '__main__':
         if train_probability:
             for i, identifier in enumerate(identifiers):
                 graphics = b2latex.Graphics()
-                p = plotting.RejectionOverEfficiency()
+                p = plotting.RejectionOverEfficiency(fom=True)
                 identifier_abbr = identifier_abbreviations[identifier]
                 p.add(train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
                       train_target[identifier_abbr] == 0, label='Train')

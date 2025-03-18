@@ -1082,47 +1082,23 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_DeltaE(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
-      std::string opt;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 1) {
-        maskName = RestOfEvent::c_defaultMaskName;
-        opt = arguments[0];
-      } else if (arguments.size() == 2) {
+      if (arguments.size() == 1)
         maskName = arguments[0];
-        opt = arguments[1];
-      } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function weDeltae");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function weDeltae.");
 
-      auto func = [maskName, opt](const Particle * particle) -> double {
+      auto func = [maskName](const Particle * particle) -> double {
 
         PCmsLabTransform T;
-        ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
-        ROOT::Math::PxPyPzEVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
-        ROOT::Math::PxPyPzEVector sig4vecLAB = particle->get4Vector();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        ROOT::Math::PxPyPzEVector boostvec = frame.getMomentum(T.getBeamFourMomentum());
+        ROOT::Math::PxPyPzEVector sig4vec = frame.getMomentum(particle->get4Vector());
         ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle, maskName, "1");
-        ROOT::Math::PxPyPzEVector neutrino4vecLAB = missing4Vector(particle, maskName, "6");
 
-        double deltaE = Const::doubleNaN;
-
-        // Definition 0: CMS
-        if (opt == "0")
-        {
-          double totalSigEnergy = (sig4vec + neutrino4vec).energy();
-          double E = T.getCMSEnergy() / 2;
-          deltaE = totalSigEnergy - E;
-        }
-
-        // Definition 1: LAB
-        else if (opt == "1")
-        {
-          double Ecms = T.getCMSEnergy();
-          double s = Ecms * Ecms;
-          deltaE = ((sig4vecLAB + neutrino4vecLAB).Dot(boostvec) - s / 2.0) / sqrt(s);
-        }
-
-        else
-          B2FATAL("Option for correctedB_deltae variable should only be 0/1 (CMS/LAB)");
+        double E = T.getCMSEnergy();
+        double deltaE = (sig4vec + neutrino4vec).Dot(boostvec) / E - E / 2.0;
 
         return deltaE;
       };
@@ -2177,8 +2153,9 @@ namespace Belle2 {
                           "Returns beam constrained mass of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`. The unit of the beam constrained mass is :math:`\\text{GeV/c}^2`.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weDeltae(maskName, opt)", WE_DeltaE,
-                          "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`. The unit of the energy is ``GeV`` ",
+    REGISTER_METAVARIABLE("weDeltae(maskName)", WE_DeltaE, R"DOC(
+                          Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_{\mathrm{cms}}/2`.
+                          The variable can be used with the ``use***Frame()`` function. The unit of the energy is ``GeV``.)DOC",
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weMbc(maskName, opt)", WE_Mbc,

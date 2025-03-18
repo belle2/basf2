@@ -340,7 +340,7 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), TMath::Sqrt(E0 * E0 - mask4VecCMS.P2()));
 
-    var = Manager::Instance().getVariable("weDeltae(my_mask,0)");
+    var = Manager::Instance().getVariable("useCMSFrame(weDeltae(my_mask))");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), mask4VecCMS.E() + sig4VecCMS.E() - E0);
 

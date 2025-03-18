@@ -355,15 +355,27 @@ namespace {
     PxPyPzEVector miss4VecCMS = - (sig4VecCMS + mask4VecCMS);
     miss4VecCMS.SetE(2 * E0 - (sig4VecCMS.E() + mask4VecCMS.E()));
 
-    var = Manager::Instance().getVariable("weMissM2(my_mask,0)");
+    var = Manager::Instance().getVariable("useCMSFrame(weMissM2(my_mask,0))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), miss4VecCMS.mag2());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 5.3290705e-15);
 
-    var = Manager::Instance().getVariable("weMissP(my_mask,0)");
+    var = Manager::Instance().getVariable("useCMSFrame(weMissP(my_mask,0))");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), miss4VecCMS.P());
 
-    var = Manager::Instance().getVariable("weMissE(my_mask,0)");
+    var = Manager::Instance().getVariable("useCMSFrame(weMissPx(my_mask,0))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.);
+
+    var = Manager::Instance().getVariable("useCMSFrame(weMissPy(my_mask,0))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.);
+
+    var = Manager::Instance().getVariable("useCMSFrame(weMissPz(my_mask,0))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), - E0 / 2);
+
+    var = Manager::Instance().getVariable("useCMSFrame(weMissE(my_mask,0))");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), miss4VecCMS.E());
 

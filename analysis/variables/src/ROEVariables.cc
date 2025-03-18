@@ -1391,6 +1391,7 @@ namespace Belle2 {
 
         double pz = 0;
         double energy = 0;
+        const auto& frame = ReferenceFrame::GetCurrent();
 
         // Get all Tracks on reconstructed side
         std::vector<const Particle*> recTrackParticles = particle->getFinalStateDaughters();
@@ -1398,16 +1399,16 @@ namespace Belle2 {
         // Loop the reconstructed side
         for (auto& recTrackParticle : recTrackParticles)
         {
-          pz += recTrackParticle->getPz();
-          energy += recTrackParticle->getEnergy();
+          pz += frame.getMomentum(recTrackParticle->get4Vector()).Pz();
+          energy += frame.getMomentum(recTrackParticle->get4Vector()).E();
         }
 
         // Loop the ROE side
         auto roeParticles = roe->getChargedParticles(maskName);
         for (auto* roeParticle : roeParticles)
         {
-          pz += roeParticle->getPz();
-          energy += roeParticle->getEnergy();
+          pz += frame.getMomentum(roeParticle->get4Vector()).Pz();
+          energy += frame.getMomentum(roeParticle->get4Vector()).E();
         }
 
         return pz / energy;

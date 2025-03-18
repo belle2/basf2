@@ -303,7 +303,8 @@ class PreReconstruction:
         for particle in self.particles:
             for channel in particle.channels:
 
-                if len(channel.daughters) == 1:
+                if (len(channel.daughters) == 1) and (pdg.from_name(
+                        channel.daughters[0].split(':')[0]) == pdg.from_name(particle.name)):
                     ma.cutAndCopyList(channel.name, channel.daughters[0], channel.preCutConfig.userCut, writeOut=True, path=path)
                     v2EI = basf2.register_module('VariablesToExtraInfo')
                     v2EI.set_name('VariablesToExtraInfo_' + channel.name)

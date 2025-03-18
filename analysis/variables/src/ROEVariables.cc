@@ -1472,9 +1472,9 @@ namespace Belle2 {
           return Const::doubleNaN;
 
         // Assumes lepton is the last particle in the reco decay chain!
-        PCmsLabTransform T;
+        const auto& frame = ReferenceFrame::GetCurrent();
         const Particle* lep = particle->getDaughter(n - 1);
-        ROOT::Math::PxPyPzEVector lep4vec = T.rotateLabToCms() * lep->get4Vector();
+        ROOT::Math::PxPyPzEVector lep4vec = frame.getMomentum(lep->get4Vector());
         ROOT::Math::PxPyPzEVector nu4vec = missing4Vector(particle, maskName, option);
 
         return (lep4vec + nu4vec).M2();

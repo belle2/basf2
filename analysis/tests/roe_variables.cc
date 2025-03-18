@@ -384,9 +384,9 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.31122509);
 
-    var = Manager::Instance().getVariable("weQ2lnuSimple(my_mask,0)");
+    var = Manager::Instance().getVariable("useCMSFrame(weQ2lnuSimple(my_mask))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), -1.7763568e-14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.);
 
     // FIXME: This value is the same as for weQ2lnuSimple
     // More complicated test setup is required to pass abs(cos_angle_nu) < 1

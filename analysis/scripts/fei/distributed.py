@@ -209,6 +209,10 @@ def submit_job(args, i):
     os.chdir(args.directory + f'/jobs/{i}/')
     if args.site == 'kekcc':
         ret = subprocess.call("bsub -q l -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
+    elif args.site == 'kekccs':
+        ret = subprocess.call(f"bsub -q s -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
+    elif 'kekccX' in args.site:
+        ret = subprocess.call(f"bsub -q l -n {args.site[6:]} -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
     elif args.site == 'kekcc2':
         ret = subprocess.call("bsub -q b2_fei -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
     elif args.site == 'kitekp':

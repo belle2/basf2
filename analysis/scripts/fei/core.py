@@ -235,13 +235,20 @@ class TrainingData:
             for channel in particle.channels:
                 filename = 'training_input.root'
 
+                # nBackground = nEvents * nBestCandidates
                 nBackground = self.mc_counts[0]['sum'] * channel.preCutConfig.bestCandidateCut
                 inverseSamplingRates = {}
                 # For some very pure channels (Jpsi), this sampling can be too aggressive and training fails.
                 # It can therefore be disabled in the preCutConfig.
                 if nBackground > Teacher.MaximumNumberOfMVASamples and not channel.preCutConfig.noBackgroundSampling:
                     inverseSamplingRates[0] = int(nBackground / Teacher.MaximumNumberOfMVASamples) + 1
-                if nSignal > Teacher.MaximumNumberOfMVASamples:
+                else:
+                    inverseSamplingRates[0] = 1
+                inverseSamplingRates[0] = int(inverseSamplingRates[0] * channel.bkgSamplingFactor)
+                if inverseSamplingRates[0] == 0:
+                    inverseSamplingRates[0] = 1
+
+                if nSignal > Teacher.MaximumNumberOfMVASamples and not channel.preCutConfig.noSignalSampling:
                     inverseSamplingRates[1] = int(nSignal / Teacher.MaximumNumberOfMVASamples) + 1
 
                 spectators = [channel.mvaConfig.target]

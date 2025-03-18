@@ -348,6 +348,39 @@ class PreReconstruction:
                 else:
                     raise RuntimeError("Unknown bestCandidateMode " + repr(channel.preCutConfig.bestCandidateMode))
 
+                if 'gamma' in channel.decayString and channel.pi0veto:
+                    ma.buildRestOfEvent(channel.name, path=path)
+                    Ddaughter_roe_path = basf2.Path()
+                    deadEndPath = basf2.Path()
+                    ma.signalSideParticleFilter(channel.name, '', Ddaughter_roe_path, deadEndPath)
+                    ma.fillParticleList('gamma:roe', 'isInRestOfEvent == 1', path=Ddaughter_roe_path)
+
+                    matches = list(re.finditer('gamma', channel.decayString))
+                    pi0lists = []
+                    for igamma in range(len(matches)):
+                        start, end = matches[igamma-1].span()
+                        tempString = channel.decayString[:start] + '^gamma' + channel.decayString[end:]
+                        ma.fillSignalSideParticleList('gamma:sig_'+str(igamma), tempString, path=Ddaughter_roe_path)
+                        ma.reconstructDecay(
+                            'pi0:veto_' +
+                            str(igamma) +
+                            ' -> gamma:sig_' +
+                            str(igamma) +
+                            ' gamma:roe',
+                            '',
+                            path=Ddaughter_roe_path)
+                        pi0lists.append('pi0:veto_'+str(igamma))
+                    ma.cutAndCopyLists('pi0:veto', pi0lists, '', writeOut=False, path=Ddaughter_roe_path)
+                    ma.rankByLowest('pi0:veto', 'abs( formula(InvM - 0.135) )', 1, path=Ddaughter_roe_path)
+                    ma.matchMCTruth('pi0:veto', path=Ddaughter_roe_path)
+                    ma.variableToSignalSideExtraInfo('pi0:veto', {'InvM': 'pi0vetoMass'}, path=Ddaughter_roe_path)
+                    ma.variableToSignalSideExtraInfo(
+                        'pi0:veto',
+                        {'formula((daughter(0,E)-daughter(1,E))/(daughter(0,E)+daughter(1,E)))': 'pi0vetoEneAsy'},
+                        path=Ddaughter_roe_path
+                    )
+                    path.for_each('RestOfEvent', 'RestOfEvents', Ddaughter_roe_path)
+
                 if self.config.monitor:
                     filename = 'Monitor_PreReconstruction_AfterRanking.root'
                     hist_variables += ['extraInfo(preCut_rank)']

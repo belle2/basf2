@@ -80,8 +80,9 @@ PostCutConfiguration.__doc__ = "PostCut configuration class. This cut is employe
 PostCutConfiguration.value.__doc__ = "Absolute value used to cut on the SignalProbability of each candidate."
 PostCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to keep, ranked by SignalProbability."
 
-DecayChannel = collections.namedtuple('DecayChannel', 'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID')
-DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None)
+DecayChannel = collections.namedtuple('DecayChannel',
+                                      'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID, pi0veto')
+DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None, False)
 DecayChannel.__doc__ = "Decay channel of a Particle."
 DecayChannel.name.__doc__ = "str:Name of the channel e.g. :code:`D0:generic_0`"
 DecayChannel.label.__doc__ = "Label used to identify the decay channel e.g. for weight files independent of decayModeID"
@@ -90,7 +91,7 @@ DecayChannel.daughters.__doc__ = "List of daughter particles of the decay channe
 DecayChannel.mvaConfig.__doc__ = "MVAConfiguration object which is used for this channel."
 DecayChannel.preCutConfig.__doc__ = "PreCutConfiguration object which is used for this channel."
 DecayChannel.decayModeID.__doc__ = "DecayModeID of this channel. Unique ID for each channel of this particle."
-
+DecayChannel.pi0veto.__doc__ = "If true, additional pi0veto variables are added to the MVAs, useful only for decays with gammas."
 
 MonitoringVariableBinning = {'mcErrors': ('mcErrors', 513, -0.5, 512.5),
                              'mcParticleStatus': ('mcParticleStatus', 257, -0.5, 256.5),
@@ -211,12 +212,14 @@ class Particle:
     def addChannel(self,
                    daughters: typing.Sequence[str],
                    mvaConfig: MVAConfiguration = None,
-                   preCutConfig: PreCutConfiguration = None):
+                   preCutConfig: PreCutConfiguration = None,
+                   pi0veto: bool = False):
         """
         Appends a new decay channel to the Particle object.
             @param daughters is a list of pdg particle names e.g. ['pi+','K-']
             @param mvaConfig multivariate analysis configuration
             @param preCutConfig pre cut configuration object
+            @param pi0veto if true, additional pi0veto variables are added to the MVA configuration
         """
         # Append generic label to all defined daughters if no label was set yet
         daughters = [d + ':generic' if ':' not in d else d for d in daughters]
@@ -280,7 +283,8 @@ class Particle:
                                           daughters=daughters,
                                           mvaConfig=mvaConfig,
                                           preCutConfig=preCutConfig,
-                                          decayModeID=decayModeID))
+                                          decayModeID=decayModeID,
+                                          pi0veto=pi0veto))
         return self
 
 # @endcond

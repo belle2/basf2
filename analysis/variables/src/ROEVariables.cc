@@ -1864,26 +1864,22 @@ namespace Belle2 {
       }
 
       PCmsLabTransform T;
-      ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
-
-      ROOT::Math::PxPyPzEVector rec4vecLAB = particle->get4Vector();
-      ROOT::Math::PxPyPzEVector roe4vecLAB = roe->get4Vector(maskName);
-
-      ROOT::Math::PxPyPzEVector rec4vec = T.rotateLabToCms() * rec4vecLAB;
-      ROOT::Math::PxPyPzEVector roe4vec = T.rotateLabToCms() * roe4vecLAB;
+      const auto& frame = ReferenceFrame::GetCurrent();
+      ROOT::Math::PxPyPzEVector boostvec = frame.getMomentum(T.getBeamFourMomentum());
+      ROOT::Math::PxPyPzEVector rec4vec = frame.getMomentum(particle->get4Vector());
+      ROOT::Math::PxPyPzEVector roe4vec = frame.getMomentum(roe->get4Vector(maskName));
 
       ROOT::Math::PxPyPzEVector miss4vec;
       double E_beam_cms = T.getCMSEnergy() / 2.0;
 
-      // Definition 0: CMS, use energy and momentum of tracks and clusters
-      if (opt == "0") {
-        miss4vec = - (rec4vec + roe4vec);
-        miss4vec.SetE(2 * E_beam_cms - (rec4vec.E() + roe4vec.E()));
+      // Definition 0: use energy and momentum of tracks and clusters
+      if (opt == "0" or opt == "5") {
+        miss4vec = boostvec - (rec4vec + roe4vec);
       }
 
-      // Definition 1: CMS, same as 0, fix Emiss = pmiss
-      else if (opt == "1") {
-        miss4vec = - (rec4vec + roe4vec);
+      // Definition 1: same as 0, fix Emiss = pmiss
+      else if (opt == "1" or opt == "6") {
+        miss4vec = boostvec - (rec4vec + roe4vec);
         miss4vec.SetE(miss4vec.P());
       }
 
@@ -1905,17 +1901,6 @@ namespace Belle2 {
         pB.SetMag(0.340);
         pB -= rec4vec.Vect();
         miss4vec.SetPxPyPzE(pB.X(), pB.Y(), pB.Z(), E_beam_cms - rec4vec.E());
-      }
-
-      // Definition 5: LAB, use energy and momentum of tracks and clusters from whole event
-      else if (opt == "5") {
-        miss4vec = boostvec - (rec4vecLAB + roe4vecLAB);
-      }
-
-      // Definition 6: LAB, same as 5, fix Emiss = pmiss
-      else if (opt == "6") {
-        miss4vec = boostvec - (rec4vecLAB + roe4vecLAB);
-        miss4vec.SetE(miss4vec.P());
       }
 
       // Definition 7: CMS, correct pmiss 3-momentum vector with factor alpha so that dE = 0 (used for Mbc calculation)

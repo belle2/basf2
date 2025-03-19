@@ -4483,6 +4483,18 @@ def getAnalysisGlobaltagB2BII() -> str:
     return recommended_b2bii_analysis_global_tag()
 
 
+def getECLKLID(particleList: str, path=None):
+    import b2bii
+
+    if b2bii.isB2BII():
+        B2ERROR("The MVA-based anti-neutron PID is only available for Belle II data.")
+
+    from variables import variables
+    path.add_module('MVAExpert', listNames=particleList, extraInfoName='ECLKLID', identifier='ECLKLID')
+
+    variables.addAlias('ECLKLID', 'extraInfo(ECLKLID)')
+
+
 def getNbarIDMVA(particleList: str, path=None):
     """
     This function can give a score to predict if it is a anti-n0.

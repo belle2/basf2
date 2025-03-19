@@ -16,8 +16,8 @@ std::vector<SimpleCluster> Clusterizend::makeClusters()
 {
   std::vector<SimpleCluster> candidateClusters;
   c3array houghSpaceBackup = *m_houghSpace;
-  for (unsigned char quadrant = 0; quadrant < 4; ++quadrant) {
-    for (unsigned char _ = 0; _ < m_params.iterations; ++_) {
+  for (unsigned short quadrant = 0; quadrant < 4; ++quadrant) {
+    for (unsigned short _ = 0; _ < m_params.iterations; ++_) {
       auto [globalMax, peakWeight] = getGlobalMax(quadrant);
       if (peakWeight < m_params.minPeakWeight || peakWeight == 0) {
         *m_houghSpace = houghSpaceBackup;
@@ -35,7 +35,7 @@ std::vector<SimpleCluster> Clusterizend::makeClusters()
 }
 
 // Returns the global maximum index and weight for one quadrant
-std::pair<cell_index, unsigned long> Clusterizend::getGlobalMax(const unsigned char quadrant)
+std::pair<cell_index, unsigned long> Clusterizend::getGlobalMax(const unsigned short quadrant)
 {
   unsigned long maxValue = 0;
   cell_index maxIndex = {0, 0, 0};
@@ -65,8 +65,8 @@ std::pair<SimpleCluster, unsigned long> Clusterizend::createCluster(const cell_i
   c3index phiMax = maxIndex[1];
   c3index thetaMax = maxIndex[2];
 
-  c3index thetaLower = std::max<int>(0, thetaMax - 1);
-  c3index thetaUpper = std::min<int>(m_params.nTheta, thetaMax + 2);
+  c3index thetaLower = std::max<unsigned short>(0, thetaMax - 1);
+  c3index thetaUpper = std::min<unsigned short>(m_params.nTheta, thetaMax + 2);
 
   // First 3x3: omegaMax
   ClusterBounds firstBounds = {
@@ -124,10 +124,10 @@ void Clusterizend::deleteGlobalMax(const cell_index& maxIndex)
   c3index phiMax = maxIndex[1];
   c3index thetaMax = maxIndex[2];
 
-  c3index thetaLowerBound = std::max<int>(0, thetaMax - m_params.thetaTrim);
-  c3index thetaUpperBound = std::min<int>(m_params.nTheta, thetaMax + m_params.thetaTrim + 1);
-  c3index omegaLowerBound = std::max<int>(0, omegaMax - m_params.omegaTrim);
-  c3index omegaUpperBound = std::min<int>(m_params.nOmega, omegaMax + m_params.omegaTrim + 1);
+  c3index thetaLowerBound = std::max<unsigned short>(0, thetaMax - m_params.thetaTrim);
+  c3index thetaUpperBound = std::min<unsigned short>(m_params.nTheta, thetaMax + m_params.thetaTrim + 1);
+  c3index omegaLowerBound = std::max<unsigned short>(0, omegaMax - m_params.omegaTrim);
+  c3index omegaUpperBound = std::min<unsigned short>(m_params.nOmega, omegaMax + m_params.omegaTrim + 1);
 
   for (c3index thetaIdx = thetaLowerBound; thetaIdx < thetaUpperBound; ++thetaIdx) {
     for (c3index omegaIdx = omegaLowerBound; omegaIdx < omegaUpperBound; ++omegaIdx) {

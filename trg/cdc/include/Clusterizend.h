@@ -19,13 +19,13 @@ namespace Belle2 {
     // Cut on the peak cell weight
     unsigned short minPeakWeight = 32;
     // Number of iterations of the cluster searching for each Hough space quadrant
-    unsigned char iterations = 1;
+    unsigned short iterations = 1;
     // Number of deleted cells in omega in each direction of the maximum
-    unsigned char omegaTrim = 5;
+    unsigned short omegaTrim = 5;
     // Number of deleted cells in phi in each direction of the maximum
-    unsigned char phiTrim = 4;
+    unsigned short phiTrim = 4;
     // Number of deleted cells in theta in each direction of the maximum
-    unsigned char thetaTrim = 4;
+    unsigned short thetaTrim = 4;
     // The Hough space dimensions (set in initBins() method of the NDFinder)
     unsigned short nOmega = 40;
     unsigned short nPhi = 384;
@@ -86,7 +86,7 @@ namespace Belle2 {
 
   private:
     // Returns the global maximum (of one quadrant)
-    std::pair<cell_index, unsigned long> getGlobalMax(const unsigned char quadrant);
+    std::pair<cell_index, unsigned long> getGlobalMax(const unsigned short quadrant);
     // Creates the cluster around the global maximum
     std::pair<SimpleCluster, unsigned long> createCluster(const cell_index& maxIndex);
     // Deletes the surroundings of such a cluster

@@ -20,9 +20,9 @@
 using namespace Belle2;
 
 // Run the necessary initialization of the NDFinder
-void NDFinder::init(unsigned char minSuperAxial, unsigned char minSuperStereo, double thresh,
-                    unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned char iterations,
-                    unsigned char omegaTrim, unsigned char phiTrim, unsigned char thetaTrim,
+void NDFinder::init(unsigned short minSuperAxial, unsigned short minSuperStereo, double thresh,
+                    unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned short iterations,
+                    unsigned short omegaTrim, unsigned short phiTrim, unsigned short thetaTrim,
                     bool storeAdditionalReadout, std::string& axialFile, std::string& stereoFile)
 {
   m_params.minSuperAxial = minSuperAxial;
@@ -83,33 +83,34 @@ void NDFinder::initLookUpArrays()
 void NDFinder::initHitToSectorMap()
 {
   // Number of first priority wires in each super layer (TS per SL)
-  constexpr std::array<int, 9> nWires = {160, 160, 192, 224, 256, 288, 320, 352, 384};
+  constexpr std::array<unsigned short, 9> nWires = {160, 160, 192, 224, 256, 288, 320, 352, 384};
   // Number of priority wires (= number of TS) per SL in a single (1/32) phi sector
-  std::vector<int> wiresPerSector;
+  std::vector<unsigned short> wiresPerSector;
   // Lookup table: Maps the TS id to the SL number
-  std::vector<int> hitToSuperLayer;
+  std::vector<unsigned short> hitToSuperLayer;
   // Integrated number of priority wires for each SL
-  std::vector<int> cumulativeWires = {0};
+  std::vector<unsigned short> cumulativeWires = {0};
   // Integrated number of sector priority wires for each SL (Axial even, Stereo odd)
-  std::vector<int> cumulativeSectorWires = {0, 0};
-  for (int superLayer = 0; superLayer < m_nSL; ++superLayer) {
+  std::vector<unsigned short> cumulativeSectorWires = {0, 0};
+  for (unsigned short superLayer = 0; superLayer < m_nSL; ++superLayer) {
     wiresPerSector.push_back(nWires[superLayer] / m_phiGeo);
-    for (int _ = 0; _ < nWires[superLayer]; ++_) {
+    for (unsigned short _ = 0; _ < nWires[superLayer]; ++_) {
       hitToSuperLayer.push_back(superLayer);
     }
     cumulativeWires.push_back(cumulativeWires[superLayer] + nWires[superLayer]);
     cumulativeSectorWires.push_back(cumulativeSectorWires[superLayer] + nWires[superLayer] / m_phiGeo);
   }
-  for (int hit = 0; hit < m_nTS; ++hit) {
-    int superLayer = hitToSuperLayer[hit];
+  for (unsigned short hit = 0; hit < m_nTS; ++hit) {
+    unsigned short superLayer = hitToSuperLayer[hit];
     bool isAxial = (superLayer % 2 == 0);
-    int wireIDinSL = hit - cumulativeWires[superLayer];
-    int wireIDinSector = wireIDinSL % wiresPerSector[superLayer];
-    int relativeWireIDinSector = cumulativeSectorWires[superLayer] + wireIDinSector;
-    int relativeSectorIDinSuperLayer = static_cast<int>(floor(wireIDinSL / wiresPerSector[superLayer]));
-    (*m_hitToSectorIDs)[hit][0] = static_cast<unsigned short>(isAxial);
-    (*m_hitToSectorIDs)[hit][1] = relativeWireIDinSector;
-    (*m_hitToSectorIDs)[hit][2] = relativeSectorIDinSuperLayer;
+    unsigned short wireIDinSL = hit - cumulativeWires[superLayer];
+    unsigned short wireIDinSector = wireIDinSL % wiresPerSector[superLayer];
+    unsigned short relativeWireIDinSector = cumulativeSectorWires[superLayer] + wireIDinSector;
+    unsigned short relativeSectorIDinSuperLayer = static_cast<unsigned short>(floor(wireIDinSL / wiresPerSector[superLayer]));
+    c2array& hitToSectorIDs = *m_hitToSectorIDs;
+    hitToSectorIDs[hit][0] = static_cast<unsigned short>(isAxial);
+    hitToSectorIDs[hit][1] = relativeWireIDinSector;
+    hitToSectorIDs[hit][2] = relativeSectorIDinSuperLayer;
   }
 }
 
@@ -262,7 +263,7 @@ void NDFinder::runTrackFinding()
       }
       readoutCluster.push_back(ROOT::Math::XYZVector(totalWeight, 0, 0));
       // Readout of the number of cluster cells
-      int nCells = cluster.getCells().size();
+      unsigned short nCells = cluster.getCells().size();
       readoutCluster.push_back(ROOT::Math::XYZVector(nCells, 0, 0));
       // Readout of the cluster center of gravity
       readoutCluster.push_back(ROOT::Math::XYZVector(centerOfGravity[0], centerOfGravity[1], centerOfGravity[2]));

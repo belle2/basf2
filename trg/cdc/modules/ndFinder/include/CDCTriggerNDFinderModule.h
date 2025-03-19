@@ -53,26 +53,26 @@ namespace Belle2 {
     // Instance of the 3D Track Finder
     NDFinder m_NDFinder;
     // Minimum number of axial super layers for the cluster to be considered as a track
-    int m_minSuperAxial;
+    unsigned short m_minSuperAxial;
     // Minimum number of stereo super layers for the cluster to be considered as a track
-    int m_minSuperStereo;
+    unsigned short m_minSuperStereo;
     // Track estimation: Minimum weight of a cluster member cell
     // relative to the peak weight of the cluster
     // for the cell to enter in the weighted mean
     // track parameter value estimation
     double m_thresh;
     // Clustering with 3d volume: Cut on the total weight in this volume
-    int m_minTotalWeight;
+    unsigned short m_minTotalWeight;
     // Clustering with 3d volume: Cut on the peak cell weight
-    int m_minPeakWeight;
+    unsigned short m_minPeakWeight;
     // Clustering with 3d volume: Number of global maximum searches per Hough space quadrant
-    int m_iterations;
+    unsigned short m_iterations;
     // Clustering with 3d volume: Max deletion in omega (number of cells in each direction from max)
-    int m_omegaTrim;
+    unsigned short m_omegaTrim;
     // Clustering with 3d volume: Max deletion in phi (number of cells in each direction from max)
-    int m_phiTrim;
+    unsigned short m_phiTrim;
     // Clustering with 3d volume: Max deletion in theta (number of cells in each direction from max)
-    int m_thetaTrim;
+    unsigned short m_thetaTrim;
     // Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class
     bool m_storeAdditionalReadout;
     // File name of the axial hit patterns

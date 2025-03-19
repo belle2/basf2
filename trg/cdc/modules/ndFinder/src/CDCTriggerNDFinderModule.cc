@@ -30,11 +30,11 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
   addParam("minSuperAxial", m_minSuperAxial,
            "Cluster pruning: Minimum number of axial super layer hits related to a cluster "
            "for the cluster to be considered as a track.",
-           4);
+           static_cast<unsigned short>(4));
   addParam("minSuperStereo", m_minSuperStereo,
            "Cluster pruning: Minimum number of stereo super layer hits related to a cluster "
            "for the cluster to be considered as a track.",
-           3);
+           static_cast<unsigned short>(3));
   addParam("thresh", m_thresh,
            "Track estimation: Minimum weight of a cluster member cell "
            "relative to the peak weight of the cluster "
@@ -43,22 +43,22 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            0.85);
   addParam("minTotalWeight", m_minTotalWeight,
            "Clustering: minimum total weight of all cells in the 3d volume.",
-           450);
+           static_cast<unsigned short>(450));
   addParam("minPeakWeight", m_minPeakWeight,
            "Clustering: minimum peak cell weight of a cluster.",
-           32);
+           static_cast<unsigned short>(32));
   addParam("iterations", m_iterations,
            "Clustering: Number of iterations for the cluster finding in one Hough space quadrant.",
-           1);
+           static_cast<unsigned short>(1));
   addParam("omegaTrim", m_omegaTrim,
            "Clustering: Number of deleted cells in each omega direction of the maximum.",
-           5);
+           static_cast<unsigned short>(5));
   addParam("phiTrim", m_phiTrim,
            "Clustering: Number of deleted cells in each phi direction of the maximum.",
-           4);
+           static_cast<unsigned short>(4));
   addParam("thetaTrim", m_thetaTrim,
            "Clustering: Number of deleted cells in each theta direction of the maximum.",
-           4);
+           static_cast<unsigned short>(4));
   addParam("storeAdditionalReadout", m_storeAdditionalReadout,
            "Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class.",
            false);

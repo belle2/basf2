@@ -103,9 +103,9 @@ namespace Belle2 {
       std::string stereoFile = "data/trg/cdc/ndFinderArrayStereoComp.txt.gz";
 
       // Required number of axial super layers
-      unsigned char minSuperAxial = 4;
+      unsigned short minSuperAxial = 4;
       // Required number of stereo super layers
-      unsigned char minSuperStereo = 3;
+      unsigned short minSuperStereo = 3;
       // Hough space cells must have (thresh * maxweight) to be considered
       double thresh = 0.85;
       // Clustering: Minimum of the total weight in all cells of the 3d volume
@@ -113,13 +113,13 @@ namespace Belle2 {
       // Clustering: Minimum peak cell weight
       unsigned short minPeakWeight = 32;
       // Clustering: Number of iterations for the cluster search in each Hough space quadrant
-      unsigned char iterations = 1;
+      unsigned short iterations = 1;
       // Clustering: Number of deleted cells in each omega direction from the maximum
-      unsigned char omegaTrim = 5;
+      unsigned short omegaTrim = 5;
       // Clustering: Number of deleted cells in each phi direction from the maximum
-      unsigned char phiTrim = 4;
+      unsigned short phiTrim = 4;
       // Clustering: Number of deleted cells in each theta direction from the maximum
-      unsigned char thetaTrim = 4;
+      unsigned short thetaTrim = 4;
       // Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class
       bool storeAdditionalReadout = false;
     };
@@ -154,9 +154,9 @@ namespace Belle2 {
       @param axialFile axial hit data
       @param stereoFile stereo hit data
     */
-    void init(unsigned char minSuperAxial, unsigned char minSuperStereo, double thresh,
-              unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned char iterations,
-              unsigned char omegaTrim, unsigned char phiTrim, unsigned char thetaTrim,
+    void init(unsigned short minSuperAxial, unsigned short minSuperStereo, double thresh,
+              unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned short iterations,
+              unsigned short omegaTrim, unsigned short phiTrim, unsigned short thetaTrim,
               bool storeAdditionalReadout, std::string& axialFile, std::string& stereoFile);
     // Reset the NDFinder data structure to process next event
     void reset()

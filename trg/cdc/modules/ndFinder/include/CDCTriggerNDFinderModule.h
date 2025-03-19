@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <string>
 #include "framework/core/Module.h"
 #include "framework/datastore/StoreArray.h"
 #include "trg/cdc/dataobjects/CDCTriggerTrack.h"
@@ -71,8 +72,6 @@ namespace Belle2 {
     unsigned short m_omegaTrim;
     // Clustering with 3d volume: Max deletion in phi (number of cells in each direction from max)
     unsigned short m_phiTrim;
-    // Clustering with 3d volume: Max deletion in theta (number of cells in each direction from max)
-    unsigned short m_thetaTrim;
     // Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class
     bool m_storeAdditionalReadout;
     // File name of the axial hit patterns

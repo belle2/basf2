@@ -6,6 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <vector>
+#include <utility>
+#include <cmath>
 #include "trg/cdc/NDFinderDefs.h"
 #include "trg/cdc/Clusterizend.h"
 
@@ -122,14 +125,11 @@ void Clusterizend::deleteGlobalMax(const cell_index& maxIndex)
 {
   c3index omegaMax = maxIndex[0];
   c3index phiMax = maxIndex[1];
-  c3index thetaMax = maxIndex[2];
 
-  c3index thetaLowerBound = std::max<unsigned short>(0, thetaMax - m_params.thetaTrim);
-  c3index thetaUpperBound = std::min<unsigned short>(m_params.nTheta, thetaMax + m_params.thetaTrim + 1);
   c3index omegaLowerBound = std::max<unsigned short>(0, omegaMax - m_params.omegaTrim);
   c3index omegaUpperBound = std::min<unsigned short>(m_params.nOmega, omegaMax + m_params.omegaTrim + 1);
 
-  for (c3index thetaIdx = thetaLowerBound; thetaIdx < thetaUpperBound; ++thetaIdx) {
+  for (c3index thetaIdx = 0; thetaIdx < m_params.nTheta; ++thetaIdx) {
     for (c3index omegaIdx = omegaLowerBound; omegaIdx < omegaUpperBound; ++omegaIdx) {
       c3index phiIndex = phiMax + omegaMax - omegaIdx;
       c3index relativePhi = phiIndex - phiMax;

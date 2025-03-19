@@ -8,7 +8,9 @@
 
 #pragma once
 
-#include <cmath>
+#include <string>
+#include <vector>
+#include <array>
 #include <utility>
 #include <Math/Vector3D.h>
 #include "trg/cdc/NDFinderDefs.h"
@@ -118,8 +120,6 @@ namespace Belle2 {
       unsigned short omegaTrim = 5;
       // Clustering: Number of deleted cells in each phi direction from the maximum
       unsigned short phiTrim = 4;
-      // Clustering: Number of deleted cells in each theta direction from the maximum
-      unsigned short thetaTrim = 4;
       // Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class
       bool storeAdditionalReadout = false;
     };
@@ -149,15 +149,14 @@ namespace Belle2 {
       @param iterations number of cluster searches in each Hough space quadrant
       @param omegaTrim number deleted cells in each omega direction from the maximum
       @param phiTrim number deleted cells in each phi direction from the maximum
-      @param thetaTrim number deleted cells in each theta direction from the maximum
       @param storeAdditionalReadout switch for Hough space + cluster readout
       @param axialFile axial hit data
       @param stereoFile stereo hit data
     */
     void init(unsigned short minSuperAxial, unsigned short minSuperStereo, double thresh,
               unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned short iterations,
-              unsigned short omegaTrim, unsigned short phiTrim, unsigned short thetaTrim,
-              bool storeAdditionalReadout, std::string& axialFile, std::string& stereoFile);
+              unsigned short omegaTrim, unsigned short phiTrim, bool storeAdditionalReadout,
+              std::string& axialFile, std::string& stereoFile);
     // Reset the NDFinder data structure to process next event
     void reset()
     {

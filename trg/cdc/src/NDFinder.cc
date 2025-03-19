@@ -7,9 +7,13 @@
  **************************************************************************/
 
 #include <string>
-#include <cmath>
-#include <set>
+#include <vector>
+#include <array>
+#include <utility>
+#include <string>
 #include <fstream>
+#include <set>
+#include <cmath>
 #include "framework/logging/Logger.h"
 #include "boost/iostreams/filter/gzip.hpp"
 #include "boost/iostreams/filtering_streambuf.hpp"
@@ -22,8 +26,8 @@ using namespace Belle2;
 // Run the necessary initialization of the NDFinder
 void NDFinder::init(unsigned short minSuperAxial, unsigned short minSuperStereo, double thresh,
                     unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned short iterations,
-                    unsigned short omegaTrim, unsigned short phiTrim, unsigned short thetaTrim,
-                    bool storeAdditionalReadout, std::string& axialFile, std::string& stereoFile)
+                    unsigned short omegaTrim, unsigned short phiTrim, bool storeAdditionalReadout,
+                    std::string& axialFile, std::string& stereoFile)
 {
   m_params.minSuperAxial = minSuperAxial;
   m_params.minSuperStereo = minSuperStereo;
@@ -53,7 +57,6 @@ void NDFinder::init(unsigned short minSuperAxial, unsigned short minSuperStereo,
   m_clustererParams.iterations = iterations;
   m_clustererParams.omegaTrim = omegaTrim;
   m_clustererParams.phiTrim = phiTrim;
-  m_clustererParams.thetaTrim = thetaTrim;
   m_clustererParams.nOmega = m_nOmega;
   m_clustererParams.nPhi = m_nPhi;
   m_clustererParams.nTheta = m_nTheta;
@@ -246,9 +249,9 @@ void NDFinder::runTrackFinding()
 
     if (m_params.storeAdditionalReadout) {
       // Readout of the complete Hough space
-      for (c3index omegaIdx = 0; omegaIdx < static_cast<c3index>(houghSpace.shape()[0]); ++omegaIdx) {
-        for (c3index phiIdx = 0; phiIdx < static_cast<c3index>(houghSpace.shape()[1]); ++phiIdx) {
-          for (c3index thetaIdx = 0; thetaIdx < static_cast<c3index>(houghSpace.shape()[2]); ++thetaIdx) {
+      for (c3index omegaIdx = 0; omegaIdx < m_nOmega; ++omegaIdx) {
+        for (c3index phiIdx = 0; phiIdx < m_nPhi; ++phiIdx) {
+          for (c3index thetaIdx = 0; thetaIdx < m_nTheta; ++thetaIdx) {
             unsigned short element = houghSpace[omegaIdx][phiIdx][thetaIdx];
             readoutHoughSpace.push_back(ROOT::Math::XYZVector(element, 0, 0));
           }
@@ -257,7 +260,7 @@ void NDFinder::runTrackFinding()
       // Readout of the maximum cluster weight
       readoutCluster.push_back(ROOT::Math::XYZVector(maximum, 0, 0));
       // Readout of the total cluster weight
-      unsigned long totalWeight = 0;
+      unsigned int totalWeight = 0;
       for (const cell_index& cellIndex : cluster.getCells()) {
         totalWeight += houghSpace[cellIndex[0]][cellIndex[1]][cellIndex[2]];
       }
@@ -289,7 +292,7 @@ std::vector<SimpleCluster> NDFinder::relateHitsToClusters(std::vector<SimpleClus
   std::vector<SimpleCluster> goodClusters;
   if (hitsVsClusters.empty()) return goodClusters;
 
-  for (size_t clusterIdx = 0; clusterIdx < hitsVsClusters.size(); ++clusterIdx) {
+  for (unsigned short clusterIdx = 0; clusterIdx < hitsVsClusters.size(); ++clusterIdx) {
     std::vector<ContributionInfo> contributionInfos = extractContributionInfos(hitsVsClusters[clusterIdx]);
     for (unsigned short superLayer = 0; superLayer < 9; ++superLayer) {
       long maximumHit = getMaximumHitInSuperLayer(contributionInfos, superLayer);
@@ -311,10 +314,10 @@ std::vector<std::vector<unsigned short>> NDFinder::getHitsVsClustersTable(const 
   std::vector<unsigned short> hitElem(m_nHits, 0);
   std::vector<std::vector<unsigned short>> hitsVsClusters(clusters.size(), hitElem);
   // Fill the matrix with all the hit contributions
-  for (unsigned long clusterIdx = 0; clusterIdx < clusters.size(); ++clusterIdx) {
+  for (unsigned short clusterIdx = 0; clusterIdx < clusters.size(); ++clusterIdx) {
     SimpleCluster cluster = clusters[clusterIdx];
     cell_index maximumIdx = getMaximumInCluster(cluster);
-    for (unsigned long hitIdx = 0; hitIdx < m_hitIDs.size(); ++hitIdx) {
+    for (unsigned short hitIdx = 0; hitIdx < m_hitIDs.size(); ++hitIdx) {
       unsigned short contribution = getHitContribution(maximumIdx, hitIdx);
       hitsVsClusters[clusterIdx][hitIdx] = contribution;
     }
@@ -390,8 +393,8 @@ long NDFinder::getMaximumHitInSuperLayer(const std::vector<ContributionInfo>& co
   std::vector<std::vector<long>> contributionsInSL;
   for (const ContributionInfo& contributionInfo : contributionInfos) {
     if (contributionInfo.superLayer == superLayer) {
-      long hitIdx = contributionInfo.hitIndex;
-      long contribution = contributionInfo.contribution;
+      unsigned short hitIdx = contributionInfo.hitIndex;
+      unsigned short contribution = contributionInfo.contribution;
       long priorityTime = contributionInfo.priorityTime;
       contributionsInSL.push_back({hitIdx, contribution, priorityTime});
     }
@@ -422,11 +425,11 @@ bool NDFinder::checkHitSuperLayers(const SimpleCluster& cluster)
     uniqueSLNumbers.insert(m_hitSLIDs[hitIdx]);
   }
   // Calculate the number of hit axial and stereo super layers
-  size_t nSL = uniqueSLNumbers.size();
+  unsigned short nSL = uniqueSLNumbers.size();
   uniqueSLNumbers.insert({0, 2, 4, 6, 8});
-  size_t withAxialSLs = uniqueSLNumbers.size();
-  size_t axialNumber = 5 - (withAxialSLs - nSL);
-  size_t stereoNumber = nSL - axialNumber;
+  unsigned short withAxialSLs = uniqueSLNumbers.size();
+  unsigned short axialNumber = 5 - (withAxialSLs - nSL);
+  unsigned short stereoNumber = nSL - axialNumber;
   // Cut away all clusters that do have enough hit super layers
   bool isValid = axialNumber >= m_params.minSuperAxial && stereoNumber >= m_params.minSuperStereo;
   return isValid;
@@ -454,7 +457,7 @@ std::array<double, 3> NDFinder::calculateCenterOfGravity(const std::vector<CellW
   double weightedSumOmega = 0.;
   double weightedSumPhi = 0.;
   double weightedSumTheta = 0.;
-  long weightSum = 0;
+  unsigned int weightSum = 0;
   for (const CellWeight& cell : validCells) {
     weightedSumOmega += cell.index[0] * cell.weight;
     weightedSumPhi += cell.index[1] * cell.weight;

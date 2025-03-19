@@ -6,6 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <string>
+#include <vector>
+#include <Math/Vector3D.h>
 #include "trg/cdc/modules/ndFinder/CDCTriggerNDFinderModule.h"
 
 using namespace Belle2;
@@ -56,9 +59,6 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
   addParam("phiTrim", m_phiTrim,
            "Clustering: Number of deleted cells in each phi direction of the maximum.",
            static_cast<unsigned short>(4));
-  addParam("thetaTrim", m_thetaTrim,
-           "Clustering: Number of deleted cells in each theta direction of the maximum.",
-           static_cast<unsigned short>(4));
   addParam("storeAdditionalReadout", m_storeAdditionalReadout,
            "Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class.",
            false);
@@ -84,7 +84,7 @@ void CDCTriggerNDFinderModule::initialize()
   m_NDFinderTracks.registerRelationTo(m_NDFinderInfos);
   m_NDFinder.init(m_minSuperAxial, m_minSuperStereo, m_thresh,
                   m_minTotalWeight, m_minPeakWeight, m_iterations,
-                  m_omegaTrim, m_phiTrim, m_thetaTrim, m_storeAdditionalReadout,
+                  m_omegaTrim, m_phiTrim, m_storeAdditionalReadout,
                   m_axialFile, m_stereoFile);
 }
 

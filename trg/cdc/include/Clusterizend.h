@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <cmath>
-#include <Math/Vector3D.h>
+#include <vector>
+#include <utility>
 
 namespace Belle2 {
   // Struct containing the parameters for the clustering
@@ -24,8 +24,6 @@ namespace Belle2 {
     unsigned short omegaTrim = 5;
     // Number of deleted cells in phi in each direction of the maximum
     unsigned short phiTrim = 4;
-    // Number of deleted cells in theta in each direction of the maximum
-    unsigned short thetaTrim = 4;
     // The Hough space dimensions (set in initBins() method of the NDFinder)
     unsigned short nOmega = 40;
     unsigned short nPhi = 384;

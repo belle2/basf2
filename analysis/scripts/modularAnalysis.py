@@ -4484,10 +4484,17 @@ def getAnalysisGlobaltagB2BII() -> str:
 
 
 def getECLKLID(particleList: str, path=None):
+    """
+    The function gives the MVA value for Klong and it is only for the Klong from ECL cluster.
+
+    @param particleList     the input ParticleList
+    @param path             modules are added to this path
+    """
+
     import b2bii
 
     if b2bii.isB2BII():
-        B2ERROR("The MVA-based anti-neutron PID is only available for Belle II data.")
+        B2ERROR("The ECL variables based Klong Identification is only available for Belle II data.")
 
     from variables import variables
     path.add_module('MVAExpert', listNames=particleList, extraInfoName='ECLKLID', identifier='ECLKLID')
@@ -4602,7 +4609,7 @@ def updateMassHypothesis(particleList, pdg, writeOut=False, path=None):
 func_requiring_analysisGT = [
     correctTrackEnergy, scaleTrackMomenta, smearTrackMomenta, oldwritePi0EtaVeto, writePi0EtaVeto, lowEnergyPi0Identification,
     getBeamBackgroundProbability, getFakePhotonProbability, tagCurlTracks, applyChargedPidMVA, correctEnergyBias,
-    addPhotonEfficiencyRatioVariables, addPi0VetoEfficiencySystematics, getNbarIDMVA]
+    addPhotonEfficiencyRatioVariables, addPi0VetoEfficiencySystematics, getNbarIDMVA, getECLKLID]
 for _ in func_requiring_analysisGT:
     _.__doc__ += "\n    .. note:: This function (optionally) requires a payload stored in the analysis GlobalTag. "\
                     "Please append or prepend the latest one from `getAnalysisGlobaltag` or `getAnalysisGlobaltagB2BII`.\n"

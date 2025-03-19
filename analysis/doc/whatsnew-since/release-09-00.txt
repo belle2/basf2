@@ -16,6 +16,11 @@ Variables
   `nROE_ParticlesInList` from double to int.
 * Extended functionality of the variable `passesROEMask` to handle composite particles as well.
 
+Modular Analysis
+++++++++++++++++
+* In `modularAnalysis.getECLKLID`:
+  * Add function to use the weight files trained with ECL information. This can be used only for ECL cluster.
+
 Changes in the analysis package in light-2501-betelgeuse
 --------------------------------------------------------
 
@@ -137,8 +142,4 @@ Charm Flavor Tagger
   function ``charmFlavorTagger``) to ``CFT_ragdoll``. This value must be used for all releases as recent as
   light-2406-ragdoll and release-09.
 
-Modular Analysis
-++++++++++++++++
-* In `modularAnalysis.getECLKLID`:
-  * Add function to use the weight files trained with ECL information. This can be used only for ECL cluster.
 

@@ -1132,6 +1132,32 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr WE_MbcWithdEZero(const std::vector<std::string>& arguments)
+    {
+      std::string maskName = RestOfEvent::c_defaultMaskName;
+
+      if (arguments.size() == 1) {
+        maskName = arguments[0];
+      } else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function weMbc");
+
+      auto func = [maskName](const Particle * particle) -> double {
+
+        PCmsLabTransform T;
+        ROOT::Math::PxPyPzEVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
+        UseReferenceFrame<CMSFrame> frame;
+        ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle, maskName, "7");
+
+        ROOT::Math::PxPyPzEVector bmom = sig4vec + neutrino4vec;
+        double E = T.getCMSEnergy() / 2;
+        double m2 = E * E - bmom.P2();
+        double mbc = m2 > 0 ? sqrt(m2) : 0;
+
+        return mbc;
+      };
+      return func;
+    }
+
     Manager::FunctionPtr WE_MissM2(const std::vector<std::string>& arguments)
     {
       std::string maskName;
@@ -2126,6 +2152,11 @@ namespace Belle2 {
     REGISTER_METAVARIABLE("weMbc(maskName)", WE_Mbc, R"DOC(
                           Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_{\mathrm{cms}}/2`.
                           The variable can be used with the ``use***Frame()`` function. The unit of the beam constrained mass is :math:`\text{GeV/c}^2`.)DOC",
+                          Manager::VariableDataType::c_double);
+
+    REGISTER_METAVARIABLE("weMbcWithdEZero(maskName)", WE_MbcWithdEZero, R"DOC(
+                          Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_{\mathrm{cms}}/2`.
+                          The missing neutrino momentum is scaled so that the energy difference :math:`d_E = 0`. The unit of the beam constrained mass is :math:`\text{GeV/c}^2`.)DOC",
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weMissM2(maskName, opt)", WE_MissM2, R"DOC(

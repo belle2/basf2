@@ -1107,61 +1107,25 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_Mbc(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
-      std::string opt;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
       if (arguments.size() == 1) {
-        maskName = RestOfEvent::c_defaultMaskName;
-        opt = arguments[0];
-      } else if (arguments.size() == 2) {
         maskName = arguments[0];
-        opt = arguments[1];
-      } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function weMbc");
+      } else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function weMbc");
 
-      auto func = [maskName, opt](const Particle * particle) -> double {
+      auto func = [maskName](const Particle * particle) -> double {
 
         PCmsLabTransform T;
-        ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
-        ROOT::Math::PxPyPzEVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
-        ROOT::Math::PxPyPzEVector sig4vecLAB = particle->get4Vector();
-        ROOT::Math::PxPyPzEVector neutrino4vec;
+        const auto& frame = ReferenceFrame::GetCurrent();
+        ROOT::Math::PxPyPzEVector boostvec = frame.getMomentum(T.getBeamFourMomentum());
+        ROOT::Math::PxPyPzEVector sig4vec = frame.getMomentum(particle->get4Vector());
+        ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle, maskName, "1");
 
-        double mbc = Const::doubleNaN;
-
-        // Definition 0: CMS
-        if (opt == "0")
-        {
-          neutrino4vec = missing4Vector(particle, maskName, "1");
-          B2Vector3D bmom = (sig4vec + neutrino4vec).Vect();
-          double E = T.getCMSEnergy() / 2;
-          double m2 = E * E - bmom.Mag2();
-          mbc = m2 > 0 ? sqrt(m2) : 0;
-        }
-
-        // Definition 1: LAB
-        else if (opt == "1")
-        {
-          neutrino4vec = missing4Vector(particle, maskName, "6");
-          B2Vector3D bmom = (sig4vecLAB + neutrino4vec).Vect();
-          double Ecms = T.getCMSEnergy();
-          double s = Ecms * Ecms;
-          double m2 = pow((s / 2.0 + bmom * B2Vector3D(boostvec.Vect())) / boostvec.energy(), 2.0) - bmom.Mag2();
-          mbc = m2 > 0 ? sqrt(m2) : 0;
-        }
-
-        // Definition 2: CMS with factor alpha (so that dE == 0)
-        else if (opt == "2")
-        {
-          neutrino4vec = missing4Vector(particle, maskName, "7");
-          B2Vector3D bmom = (sig4vec + neutrino4vec).Vect();
-          double E = T.getCMSEnergy() / 2;
-          double m2 = E * E - bmom.Mag2();
-          mbc = m2 > 0 ? sqrt(m2) : 0;
-        }
-
-        else
-          B2FATAL("Option for weMbc variable should only be 0/1/2 (CMS/LAB/CMS with factor)");
+        ROOT::Math::PxPyPzEVector bmom = sig4vec + neutrino4vec;
+        double Ecms = T.getCMSEnergy();
+        double m2 = pow((Ecms* Ecms / 2.0 + bmom.Vect().Dot(boostvec.Vect())) / boostvec.energy(), 2.0) - bmom.P2();
+        double mbc = m2 > 0 ? sqrt(m2) : 0;
 
         return mbc;
       };
@@ -2159,8 +2123,9 @@ namespace Belle2 {
                           The variable can be used with the ``use***Frame()`` function. The unit of the energy is ``GeV``.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMbc(maskName, opt)", WE_Mbc,
-                          "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`. The unit of the beam constrained mass is :math:`\\text{GeV/c}^2`.",
+    REGISTER_METAVARIABLE("weMbc(maskName)", WE_Mbc, R"DOC(
+                          Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_{\mathrm{cms}}/2`.
+                          The variable can be used with the ``use***Frame()`` function. The unit of the beam constrained mass is :math:`\text{GeV/c}^2`.)DOC",
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weMissM2(maskName, opt)", WE_MissM2, R"DOC(

@@ -10,38 +10,57 @@
     </Safety>
 
     <!-- ########## IP pipe ########## -->
-    
-    <Lv1SUS>     
-      <sec name="L1" unit="cm">0.45</sec>
-      <sec name="L2" unit="cm">0.9</sec>
-      <sec name="L3" unit="cm">0.25</sec>
-      <sec name="L4" unit="cm">0.65</sec>
-      <sec name="L5" unit="cm">0.35</sec>
-      <sec name="L6" unit="cm">4.03</sec>
-      <sec name="L7" unit="cm">0.07</sec>
-      <sec name="L8" unit="cm">2.45</sec>
-      <sec name="L9" unit="cm">4.65</sec>
-      <sec name="L10" unit="cm">0.07</sec>
-      <sec name="L11" unit="cm">5.78</sec>
-      <sec name="L12" unit="cm">0.35</sec>
-      <sec name="L13" unit="cm">0.65</sec>
-      <sec name="L14" unit="cm">0.25</sec>
-      <sec name="L15" unit="cm">0.9</sec>
-      <sec name="L16" unit="cm">0.9</sec>
-      <sec name="R1" unit="cm">1.16</sec>
-      <sec name="R2" unit="cm">2.5</sec>
-      <sec name="R3" unit="cm">2.25</sec>
-      <sec name="R4" unit="cm">1.6</sec>
-      <sec name="R5" unit="cm">1.25</sec>
-      <sec name="R6" unit="cm">1.2002</sec>
-      <sec name="R7" unit="cm">1.25</sec>
-      <sec name="R8" unit="cm">1.6</sec>
-      <sec name="R9" unit="cm">2.25</sec>
-      <sec name="R10" unit="cm">2.5</sec>
-      <sec name="R11" unit="cm">1.45</sec>
-      <Material>Ti</Material>      
+
+    <Lv1SUS>
+      <N desc="Number of planes">21</N>
+
+      <sec name="Z0" unit="mm">-91.5</sec>
+      <sec name="Z1" unit="mm">-87.0</sec>
+      <sec name="Z2" unit="mm">-87.0</sec>
+      <sec name="Z3" unit="mm">-78.0</sec>
+      <sec name="Z4" unit="mm">-75.5</sec>
+      <sec name="Z5" unit="mm">-75.5</sec>
+      <sec name="Z6" unit="mm">-69.0</sec>
+      <sec name="Z7" unit="mm">-65.5</sec>
+      <sec name="Z8" unit="mm">-25.2</sec>
+      <sec name="Z9" unit="mm">-24.5</sec>
+      <sec name="Z10" unit="mm">0.0</sec>
+      <sec name="Z11" unit="mm">46.5</sec>
+      <sec name="Z12" unit="mm">47.2</sec>
+      <sec name="Z13" unit="mm">105.0</sec>
+      <sec name="Z14" unit="mm">108.5</sec>
+      <sec name="Z15" unit="mm">115.0</sec>
+      <sec name="Z16" unit="mm">115.0</sec>
+      <sec name="Z17" unit="mm">117.5</sec>
+      <sec name="Z18" unit="mm">126.5</sec>
+      <sec name="Z19" unit="mm">126.5</sec>
+      <sec name="Z20" unit="mm">135.5</sec>
+
+      <sec name="R0" unit="mm">11.6</sec>
+      <sec name="R1" unit="mm">11.6</sec>
+      <sec name="R2" unit="mm">25.0</sec>
+      <sec name="R3" unit="mm">25.0</sec>
+      <sec name="R4" unit="mm">22.5</sec>
+      <sec name="R5" unit="mm">16.0</sec>
+      <sec name="R6" unit="mm">16.0</sec>
+      <sec name="R7" unit="mm">12.5</sec>
+      <sec name="R8" unit="mm">12.5</sec>
+      <sec name="R9" unit="mm">12.002</sec>
+      <sec name="R10" unit="mm">12.002</sec>
+      <sec name="R11" unit="mm">12.002</sec>
+      <sec name="R12" unit="mm">12.5</sec>
+      <sec name="R13" unit="mm">12.5</sec>
+      <sec name="R14" unit="mm">16.0</sec>
+      <sec name="R15" unit="mm">16.0</sec>
+      <sec name="R16" unit="mm">22.5</sec>
+      <sec name="R17" unit="mm">25.0</sec>
+      <sec name="R18" unit="mm">25.0</sec>
+      <sec name="R19" unit="mm">14.5</sec>
+      <sec name="R20" unit="mm">14.5</sec>
+
+      <Material>Ti</Material>
     </Lv1SUS>
-        
+
     <Lv2OutTi>
       <sec name="L1" unit="cm">2.90</sec>
       <sec name="L2" unit="cm">5.10</sec>
@@ -57,7 +76,7 @@
       <sec name="R2" unit="cm">1.20</sec>
       <Material>Be</Material>
     </Lv2OutBe>
-      
+
     <Lv2InBe>
       <sec name="L1" unit="cm">3.70</sec>
       <sec name="L2" unit="cm">5.90</sec>
@@ -65,43 +84,89 @@
       <sec name="R2" unit="cm">1.06</sec>
       <Material>Be</Material>
     </Lv2InBe>
-    
-    <Lv2Paraf>      
-      <sec name="L1" unit="cm">0.35</sec>
-      <sec name="L2" unit="cm">0.1</sec>
-      <sec name="L3" unit="cm">0.625</sec>
-      <sec name="L4" unit="cm">0.3</sec>
-      <sec name="L5" unit="cm">3.35</sec>
-      <sec name="L6" unit="cm">0.075</sec>
-      <sec name="L7" unit="cm">0.125</sec>
-      <sec name="L8" unit="cm">0.075</sec>
-      <sec name="L9" unit="cm">3.00</sec>
-      <sec name="L10" unit="cm">5.20</sec>
-      <sec name="L11" unit="cm">0.025</sec>
-      <sec name="L12" unit="cm">0.175</sec>
-      <sec name="L13" unit="cm">0.075</sec>
-      <sec name="L14" unit="cm">5.1</sec>
-      <sec name="L15" unit="cm">0.285</sec>
-      <sec name="L16" unit="cm">0.065</sec>
-      <sec name="L17" unit="cm">0.115</sec>
-      <sec name="L18" unit="cm">0.46</sec>
-      <sec name="L19" unit="cm">0.1</sec>
-      <sec name="L20" unit="cm">0.35</sec>
-      <sec name="R1" unit="cm">1.12</sec>
-      <sec name="R2" unit="cm">2.25</sec>
-      <sec name="R3" unit="cm">1.6</sec>
-      <sec name="R4" unit="cm">1.5</sec>
-      <sec name="R5" unit="cm">1.18</sec>
-      <sec name="R6" unit="cm">1.06</sec>
-      <sec name="R7" unit="cm">1.16</sec>
-      <sec name="R8" unit="cm">1.18</sec>
-      <sec name="R9" unit="cm">1.12</sec>
-      <sec name="R10" unit="cm">1.5</sec>
-      <sec name="R11" unit="cm">1.31</sec>
-      <sec name="R12" unit="cm">1.6</sec>
-      <sec name="R13" unit="cm">2.25</sec>
-      <Material>Paraffin</Material>      
-    </Lv2Paraf>
+
+    <Lv2Paraf1>
+      <N desc="Number of planes">20</N>
+
+      <sec name="Z0" unit="mm">-80.0</sec>
+      <sec name="Z1" unit="mm">-76.5</sec>
+      <sec name="Z2" unit="mm">-76.5</sec>
+      <sec name="Z3" unit="mm">-75.5</sec>
+      <sec name="Z4" unit="mm">-69.25</sec>
+      <sec name="Z5" unit="mm">-66.25</sec>
+      <sec name="Z6" unit="mm">-32.75</sec>
+      <sec name="Z7" unit="mm">-32.0</sec>
+      <sec name="Z8" unit="mm">-30.75</sec>
+      <sec name="Z9" unit="mm">-30.0</sec>
+      <sec name="Z10" unit="mm">52.0</sec>
+      <sec name="Z11" unit="mm">52.25</sec>
+      <sec name="Z12" unit="mm">54.0</sec>
+      <sec name="Z13" unit="mm">54.75</sec>
+      <sec name="Z14" unit="mm">105.75</sec>
+      <sec name="Z15" unit="mm">109.25</sec>
+      <sec name="Z16" unit="mm">115.0</sec>
+      <sec name="Z17" unit="mm">116.0</sec>
+      <sec name="Z18" unit="mm">116.0</sec>
+      <sec name="Z19" unit="mm">119.5</sec>
+
+      <sec name="R0" unit="mm">22.5</sec>
+      <sec name="R1" unit="mm">22.5</sec>
+      <sec name="R2" unit="mm">16.0</sec>
+      <sec name="R3" unit="mm">15.0</sec>
+      <sec name="R4" unit="mm">15.0</sec>
+      <sec name="R5" unit="mm">11.8</sec>
+      <sec name="R6" unit="mm">11.8</sec>
+      <sec name="R7" unit="mm">11.8</sec>
+      <sec name="R8" unit="mm">11.8</sec>
+      <sec name="R9" unit="mm">11.6</sec>
+      <sec name="R10" unit="mm">11.6</sec>
+      <sec name="R11" unit="mm">11.8</sec>
+      <sec name="R12" unit="mm">11.8</sec>
+      <sec name="R13" unit="mm">11.8</sec>
+      <sec name="R14" unit="mm">11.8</sec>
+      <sec name="R15" unit="mm">15.0</sec>
+      <sec name="R16" unit="mm">15.0</sec>
+      <sec name="R17" unit="mm">16.0</sec>
+      <sec name="R18" unit="mm">22.5</sec>
+      <sec name="R19" unit="mm">22.5</sec>
+
+      <sec name="r0" unit="mm">11.2</sec>
+      <sec name="r1" unit="mm">11.2</sec>
+      <sec name="r2" unit="mm">11.2</sec>
+      <sec name="r3" unit="mm">11.2</sec>
+      <sec name="r4" unit="mm">11.2</sec>
+      <sec name="r5" unit="mm">11.2</sec>
+      <sec name="r6" unit="mm">11.2</sec>
+      <sec name="r7" unit="mm">10.6</sec>
+      <sec name="r8" unit="mm">10.6</sec>
+      <sec name="r9" unit="mm">10.6</sec>
+      <sec name="r10" unit="mm">10.6</sec>
+      <sec name="r11" unit="mm">10.6</sec>
+      <sec name="r12" unit="mm">10.6</sec>
+      <sec name="r13" unit="mm">11.2</sec>
+      <sec name="r14" unit="mm">11.2</sec>
+      <sec name="r15" unit="mm">11.2</sec>
+      <sec name="r16" unit="mm">11.2</sec>
+      <sec name="r17" unit="mm">11.2</sec>
+      <sec name="r18" unit="mm">11.2</sec>
+      <sec name="r19" unit="mm">11.2</sec>
+
+      <Material>Paraffin</Material>
+    </Lv2Paraf1>
+
+    <Lv2Paraf2>
+      <N desc="Number of planes">3</N>
+
+      <sec name="Z0" unit="mm">108.6</sec>
+      <sec name="Z1" unit="mm">110.4</sec>
+      <sec name="Z2" unit="mm">120.5</sec>
+
+      <sec name="R0" unit="mm">11.2</sec>
+      <sec name="R1" unit="mm">13.1</sec>
+      <sec name="R2" unit="mm">13.1</sec>
+
+      <Material>Paraffin</Material>
+    </Lv2Paraf2>
 
     <Lv2Vacuum>
       <sec name="L1" unit="cm">9.25</sec>
@@ -115,7 +180,7 @@
       <sec name="A2" unit="rad">0.07</sec>
       <Material>Vacuum</Material>
     </Lv2Vacuum>
-    
+
     <Lv3AuCoat>
       <sec name="L1" unit="cm">6.55</sec>
       <sec name="L2" unit="cm">10.5</sec>
@@ -123,7 +188,7 @@
       <sec name="R2" unit="cm">1.000</sec>
       <Material>Au</Material>
     </Lv3AuCoat>
-    
+
     <Lv1TaFwd>
       <sec name="D1" unit="cm">13.65</sec>
       <sec name="L1" unit="cm">34.55</sec>
@@ -140,8 +205,8 @@
       <sec name="bL3" unit="cm">4.00</sec>
       <Material>Ta</Material>
     </Lv1TaFwd>
-    
-    <Lv2VacFwd>      
+
+    <Lv2VacFwd>
       <sec name="D1" unit="cm">11.0</sec>
       <sec name="D2" unit="cm">27.0</sec>
       <sec name="D3" unit="cm">45.2</sec>
@@ -156,7 +221,7 @@
       <sec name="A2" unit="rad">0.07</sec>
       <Material>Vacuum</Material>
     </Lv2VacFwd>
-    
+
     <Lv1TaBwd>
       <sec name="D1" unit="cm">9.15</sec>
       <sec name="L1" unit="cm">39.05</sec>
@@ -173,7 +238,7 @@
       <sec name="bL3" unit="cm">1.93</sec>
       <Material>Ta</Material>
     </Lv1TaBwd>
-    
+
     <Lv2VacBwd>
       <sec name="D1" unit="cm">9.15</sec>
       <sec name="D2" unit="cm">24.5</sec>
@@ -187,23 +252,23 @@
       <sec name="R4" unit="cm">1.0</sec>
       <sec name="A1" unit="rad">0.0415</sec>
       <sec name="A2" unit="rad">0.06775543</sec>
-      <Material>Vacuum</Material> 
+      <Material>Vacuum</Material>
     </Lv2VacBwd>
-        
-    <Flange>      
+
+    <Flange>
       <sec name="R" unit="cm">3.45</sec>
       <sec name="L1" unit="cm">1.8</sec>
-      <sec name="L2" unit="cm">4.5</sec>
+      <sec name="L2" unit="cm">4.24</sec>
       <sec name="D" unit="cm">47.3</sec>
       <sec name="T" unit="cm">0.9</sec>
     </Flange>
-    
+
     <AreaTubeFwd>
       <sec name="R1" unit="cm">12.</sec>
       <sec name="D1" unit="cm">48.2</sec>
       <sec name="D2" unit="cm">63.35</sec>
     </AreaTubeFwd>
-    
+
     <Lv1TaLERUp>
       <sec name="R1" unit="cm">1.7</sec>
       <sec name="R2" unit="cm">1.7</sec>
@@ -230,7 +295,7 @@
       <sec name="L11" unit="cm">62.5</sec>
       <sec name="L12" unit="cm">100.0</sec>
       <sec name="A1" unit="rad">-0.0415</sec>
-      <Material>Cu</Material>      
+      <Material>Cu</Material>
     </Lv1TaLERUp>
 
     <Lv1SUSLERUp>
@@ -259,7 +324,7 @@
       <sec name="R1" unit="cm">1.0</sec>
       <Material>Vacuum</Material>
     </Lv2VacLERUp>
-       
+
     <Lv1TaHERDwn>
       <sec name="R1" unit="cm">1.7</sec>
       <sec name="R2" unit="cm">1.7</sec>
@@ -275,7 +340,7 @@
       <sec name="R12" unit="cm">1.2</sec>
       <sec name="L1" unit="cm">30.0</sec>
       <sec name="L2" unit="cm">48.2</sec>
-      <sec name="L3" unit="cm">48.2</sec> 
+      <sec name="L3" unit="cm">48.2</sec>
       <sec name="L4" unit="cm">50.0</sec>
       <sec name="L5" unit="cm">50.0</sec>
       <sec name="L6" unit="cm">55.7</sec>
@@ -288,7 +353,7 @@
       <sec name="A1" unit="rad">0.0415</sec>
       <Material>Cu</Material>
     </Lv1TaHERDwn>
-   
+
     <Lv1SUSHERDwn>
       <sec name="Z1" unit="cm">54.5</sec>
       <sec name="Z2" unit="cm">55.7</sec>
@@ -310,17 +375,17 @@
       <sec name="RO6" unit="cm">2.14</sec>
       <Material>Ti</Material>
     </Lv1SUSHERDwn>
- 
+
     <Lv2VacHERDwn>
       <sec name="R1" unit="cm">1.0</sec>
       <Material>Vacuum</Material>
     </Lv2VacHERDwn>
-    
-    <AreaTubeBwd>      
+
+    <AreaTubeBwd>
       <sec name="R1" unit="cm">12</sec>
       <sec name="D1" unit="cm">48.2</sec>
       <sec name="D2" unit="cm">62.73</sec>
-    </AreaTubeBwd>    
+    </AreaTubeBwd>
 
     <Lv1TaHERUp>
       <sec name="R1" unit="cm">1.7</sec>
@@ -348,9 +413,9 @@
       <sec name="L11" unit="cm">62.5</sec>
       <sec name="L12" unit="cm">100.0</sec>
       <sec name="A1" unit="rad">0.0415</sec>
-      <Material>Cu</Material>      
+      <Material>Cu</Material>
     </Lv1TaHERUp>
-  
+
     <Lv1SUSHERUp>
       <sec name="Z1" unit="cm">54.5</sec>
       <sec name="Z2" unit="cm">55.7</sec>
@@ -371,14 +436,14 @@
       <sec name="RO5" unit="cm">2.14</sec>
       <sec name="RO6" unit="cm">2.14</sec>
       <Material>Ti</Material>
-    </Lv1SUSHERUp>       
+    </Lv1SUSHERUp>
 
- 
-    <Lv2VacHERUp>      
+
+    <Lv2VacHERUp>
       <sec name="R1" unit="cm">1.0</sec>
       <Material>Vacuum</Material>
     </Lv2VacHERUp>
-   
+
     <Lv1TaLERDwn>
       <sec name="R1" unit="cm">1.7</sec>
       <sec name="R2" unit="cm">1.7</sec>
@@ -407,7 +472,7 @@
       <sec name="A1" unit="rad">-0.0415</sec>
       <Material>Cu</Material>
     </Lv1TaLERDwn>
-   
+
     <Lv1SUSLERDwn>
       <sec name="Z1" unit="cm">54.5</sec>
       <sec name="Z2" unit="cm">55.7</sec>
@@ -429,7 +494,7 @@
       <sec name="RO6" unit="cm">2.14</sec>
       <Material>Ti</Material>
     </Lv1SUSLERDwn>
- 
+
     <Lv2VacLERDwn>
       <sec name="R1" unit="cm">1.0</sec>
       <Material>Vacuum</Material>
@@ -464,7 +529,7 @@
       <sec name="L2" unit="cm">0.75</sec>
       <Material>W</Material>
     </PXDMountBwd>
-    
+
     <PXDMountFixtureBwd>
       <sec name="Z1" unit="cm">10.8</sec>
       <sec name="R1" unit="cm">3.2</sec>

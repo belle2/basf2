@@ -132,4 +132,15 @@
   <Muid>
     <xi:include href="../klm/MuidParameters.xml"/>
   </Muid>
+
+  <!-- early phase 3 beam pipe -->
+  <DetectorComponent name="BeamPipe-earlyPhase3" isDefault="false">
+    <xi:include href="../ir/BeamPipe-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
+  <!-- early phase 3 far beam line -->
+  <DetectorComponent name="FarBeamLine-earlyPhase3" isDefault="false">
+    <xi:include href="../ir/FarBeamLine-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
 </Detector>

@@ -65,16 +65,16 @@ namespace Belle2 {
 
     void GeoFarBeamLineCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes)
     {
+      // basf2 uses cm, Geant4 uses mm
+      const double unitFactor = Unit::cm / Unit::mm;
 
       const int N = 2;
 
-      double stepMax = 5.0 * Unit::mm;
+      double stepMax = 5.0 * Unit::mm * unitFactor;
       int flag_limitStep = int(m_config.getParameter("LimitStepLength"));
 
 
-      //double unitFactor = 10.0;
-      const double unitFactor = Unit::cm / Unit::mm;
-
+      // keep created elements
       map<string, FarBeamLineElement> elements;
 
 
@@ -754,8 +754,7 @@ namespace Belle2 {
       //-   Additional concrete shield left (backward)
       //-   Fills gap between end-of-tunnel shield and QCS
 
-      if (m_config.getParameter("ACSL.box1_W", -1) > 0) {
-        B2WARNING("Creating new shields");
+      if (m_config.getParameter("ACSL.box1_W", -1) > 0) { // Run2
         FarBeamLineElement ACSL;
 
         //get parameters from .xml file

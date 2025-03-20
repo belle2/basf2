@@ -68,8 +68,8 @@ std::pair<SimpleCluster, unsigned long> Clusterizend::createCluster(const cell_i
   c3index phiMax = maxIndex[1];
   c3index thetaMax = maxIndex[2];
 
-  c3index thetaLower = std::max<unsigned short>(0, thetaMax - 1);
-  c3index thetaUpper = std::min<unsigned short>(m_params.nTheta, thetaMax + 2);
+  c3index thetaLower = std::max<short>(0, thetaMax - 1);
+  c3index thetaUpper = std::min<short>(m_params.nTheta, thetaMax + 2);
 
   // First 3x3: omegaMax
   ClusterBounds firstBounds = {

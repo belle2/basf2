@@ -228,6 +228,14 @@ def create_latex(output_file, monitoringParticle):
                 g.add(filename, width=0.49)
             o += g.finish()
 
+        for spectator in p.particle.mvaConfig.spectators:
+            money_plot_filename = monitoring.removeJPsiSlash(p.particle.identifier + '_' + spectator + '_Money')
+            monitoring.MonitorSpectatorPlot(p, spectator, money_plot_filename)
+            g = b2latex.Graphics()
+            for filename in glob.glob(money_plot_filename + '_*.png'):
+                g.add(filename, width=0.49)
+            o += g.finish()
+
         table = b2latex.LongTable(columnspecs=r'c|rr|rrr',
                                   caption='Per-channel efficiency before and after the applied pre-cut.',
                                   head=r'Particle & \multicolumn{2}{c}{Covered BR} '

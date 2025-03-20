@@ -390,7 +390,7 @@ def MonitorCosBDLPlot(particle, filename):
         common = (np.abs(df['cosThetaBDl']) < 10) & (df['probability'] >= cut)
         df = df[common]
         p.add(df, 'cosThetaBDl', (df['signal'] == 1), label="Signal")
-        p.add(df, 'cosThetaBDl', (df['signal'] == 0), label="Background")
+        p.add(df, 'cosThetaBDl', (df['signal'] != 1), label="Background")
         p.finish()
         p.axis.set_title(f"Cosine of Theta between B and Dl system for signal probability >= {cut:.2f}")
         p.axis.set_xlabel("CosThetaBDl")
@@ -410,7 +410,7 @@ def MonitorMbcPlot(particle, filename):
         common = (df['Mbc'] > 5.23) & (df['probability'] >= cut)
         df = df[common]
         p.add(df, 'Mbc', (df['signal'] == 1), label="Signal")
-        p.add(df, 'Mbc', (df['signal'] == 0), label="Background")
+        p.add(df, 'Mbc', (df['signal'] != 1), label="Background")
         p.finish()
         p.axis.set_title(f"Beam constrained mass for signal probability >= {cut:.2f}")
         p.axis.set_xlabel("Mbc")
@@ -437,6 +437,26 @@ def MonitorSigProbPlot(particle, filename):
     p.save(filename + '.png')
 
 
+def MonitorSpectatorPlot(particle, spectator, filename):
+    """ Creates a spectator plot using ROOT. """
+    if not particle.final_ntuple.valid:
+        return
+    df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
+                                   ['extraInfo__bouniqueSignal__bc', spectator,
+                                    'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                   ['unique', spectator, 'probability', 'signal'])
+    for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
+        p = plotting.VerboseDistribution(range_in_std=5.0)
+        common = (df['probability'] >= cut)
+        df = df[common]
+        p.add(df, spectator, (df['signal'] == 1), label="Signal")
+        p.add(df, spectator, (df['signal'] != 1), label="Background")
+        p.finish()
+        p.axis.set_title(f"{spectator} for signal probability >= {cut:.2f}")
+        p.axis.set_xlabel(spectator)
+        p.save(f'{filename}_{i}.png')
+
+
 def MonitorROCPlot(particle, filename):
     """ Creates a ROC plot using ROOT. """
     if not particle.final_ntuple.valid:
@@ -446,7 +466,7 @@ def MonitorROCPlot(particle, filename):
                                     'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
                                    ['unique', 'probability', 'signal'])
     p = plotting.RejectionOverEfficiency()
-    p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0, label='All')
+    p.add(df, 'probability', df['signal'] == 1, df['signal'] != 1, label='All')
     p.finish()
     p.save(filename + '.png')
 
@@ -460,7 +480,7 @@ def MonitorDiagPlot(particle, filename):
                                     'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
                                    ['unique', 'probability', 'signal'])
     p = plotting.Diagonal()
-    p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0)
+    p.add(df, 'probability', df['signal'] == 1, df['signal'] != 1)
     p.finish()
     p.save(filename + '.png')
 

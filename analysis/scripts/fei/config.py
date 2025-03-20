@@ -50,10 +50,10 @@ FeiConfiguration.training.__doc__ = "If you train the FEI set this to True, othe
 FeiConfiguration.monitoring_path.__doc__ = "Path where monitoring histograms are stored."
 
 
-MVAConfiguration = collections.namedtuple('MVAConfiguration', 'method, config, variables, target, sPlotVariable')
+MVAConfiguration = collections.namedtuple('MVAConfiguration', 'method, config, variables, target, sPlotVariable, spectators')
 MVAConfiguration.__new__.__defaults__ = ('FastBDT',
                                          '--nTrees 400  --nCutLevels 10 --nLevels 3 --shrinkage 0.1 --randRatio 0.5',
-                                         None, 'isSignal', None)
+                                         None, 'isSignal', None, None)
 MVAConfiguration.__doc__ = "Multivariate analysis configuration class."
 MVAConfiguration.method.__doc__ = "Method used by MVAInterface."
 MVAConfiguration.config.__doc__ = "Method specific configuration string passed to basf2_mva_teacher"
@@ -61,6 +61,7 @@ MVAConfiguration.variables.__doc__ = "List of variables from the VariableManager
                                      " {} is expanded to one variable per daughter particle."
 MVAConfiguration.target.__doc__ = "Target variable from the VariableManager."
 MVAConfiguration.sPlotVariable.__doc__ = "Discriminating variable used by sPlot to do data-driven training."
+MVAConfiguration.spectators.__doc__ = "List of spectator variables from the VariableManager."
 
 
 PreCutConfiguration = collections.namedtuple(

@@ -250,7 +250,7 @@ class TrainingData:
                 if nSignal > Teacher.MaximumNumberOfMVASamples and not channel.preCutConfig.noSignalSampling:
                     inverseSamplingRates[1] = int(nSignal / Teacher.MaximumNumberOfMVASamples) + 1
 
-                spectators = [channel.mvaConfig.target]
+                spectators = [channel.mvaConfig.target] + channel.mvaConfig.spectators
                 if channel.mvaConfig.sPlotVariable is not None:
                     spectators.append(channel.mvaConfig.sPlotVariable)
 
@@ -587,11 +587,12 @@ class PostReconstruction:
 
                 variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
                              'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+                variables += particle.mvaConfig.spectators
 
-                if 'B_s0' == particle.name:
+                if 'B' in particle.name and 'Mbc' not in variables:
                     variables += ['Mbc']
-                elif 'B' in particle.name:
-                    variables += ['Mbc', 'cosThetaBetweenParticleAndNominalB']
+                if 'B_s0' != particle.name and 'cosThetaBetweenParticleAndNominalB' not in variables:
+                    variables += ['cosThetaBetweenParticleAndNominalB']
 
                 filename = os.path.join(self.config.monitoring_path, 'Monitor_Final.root')
                 ma.variablesToNtuple(
@@ -728,13 +729,20 @@ class Teacher:
                                 continue
                             variable_str = "' '".join(channel.mvaConfig.variables)
 
+                            spectators = channel.mvaConfig.spectators
+                            if channel.mvaConfig.sPlotVariable is not None:
+                                spectators.append(channel.mvaConfig.sPlotVariable)
+                            spectators_str = "' '".join(spectators)
+
                             command = (f"{self.config.externTeacher}"
                                        f" --method '{channel.mvaConfig.method}'"
                                        f" --target_variable '{channel.mvaConfig.target}'"
                                        f" --treename '{channel.label} variables' --datafile 'training_input.root'"
                                        f" --signal_class 1 --variables '{variable_str}'"
-                                       f" --identifier '{channel.label}.xml'"
-                                       f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1")
+                                       f" --identifier '{channel.label}.xml'")
+                            if len(spectators) > 0:
+                                command += f" --spectators '{spectators_str}'"
+                            command += f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1"
                             B2INFO(f"Used following command to invoke teacher: \n {command}")
                             job_list.append((channel.label, command))
             f.Close()

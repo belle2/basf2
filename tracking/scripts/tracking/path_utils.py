@@ -7,7 +7,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from pybasf2 import B2WARNING
+from pybasf2 import B2WARNING, B2FATAL
 
 from basf2 import register_module
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, add_cosmics_pxd_ckf
@@ -1274,6 +1274,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
                                         use_mc_truth=False,
                                         add_both_directions=True,
                                         prune_temporary_tracks=True,
+                                        temporary_reco_tracks_merging_strategy='before_ToSVDCKF',
                                         **kwargs,):
     """
     Add an inverted SVD based tracking chain to the path, i.e. SVD standalone followed by the ToCDCCKF, the CDC standalone
@@ -1305,11 +1306,17 @@ def add_inverted_svd_cdc_tracking_chain(path,
            extrapolate also in the other direction.
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
+    :param temporary_reco_tracks_merging_strategy: When are the temporary CDC RecoTracks merged? Before or after the ToSVDCKF?
+        Allowed options: \"before_ToSVDCKF\" (default) and \"after_ToCDCCKF\".
     """
 
     B2WARNING("The inverted tracking chain starting from SVD is an experimental feature. "
               "It is neither well optimised nor tested for the time being. "
               "Please be careful when interpreting the results!")
+
+    if temporary_reco_tracks_merging_strategy not in ["before_ToSVDCKF", "after_ToCDCCKF"]:
+        B2FATAL("Invalid option for 'temporary_reco_tracks_merging_strategy'. "
+                "Allowed options are 'before_ToSVDCKF' and 'after_ToCDCCKF'.")
 
     # collections that will be pruned
     temporary_reco_track_list = []
@@ -1367,17 +1374,44 @@ def add_inverted_svd_cdc_tracking_chain(path,
         temporary_reco_track_list.append(cdc_reco_tracks)
         latest_reco_tracks = cdc_reco_tracks
 
+    if temporary_reco_tracks_merging_strategy == "before_ToSVDCKF":
+        path.add_module("RecoTrackStoreArrayCombiner",
+                        Temp1RecoTracksStoreArrayName=latest_reco_tracks,
+                        Temp2RecoTracksStoreArrayName=svd_cdc_reco_tracks,
+                        recoTracksStoreArrayName="CombinedCDCSVDRecoTracks")
+        temporary_reco_track_list.append("CombinedCDCSVDRecoTracks")
+        latest_reco_tracks = "CombinedCDCSVDRecoTracks"
+
     if is_svd_used(components):
+        # combined_reco_tracks_name is only relevant in the 'after_ToCDCCKF' option
+        combined_reco_tracks_name = "CDCSVDRecoTracks"
+
+        # The output of the additional SVD tracking (ToSVDCKF in this case) depends on whether
+        # the CKF is the last or second to last algorithm to run. If it's the last one, use 'output_reco_tracks',
+        # else use 'CDCSVDRecoTracks'
+        tmp_output_reco_tracks = output_reco_tracks if "before_ToSVDCKF" else combined_reco_tracks_name
         add_svd_track_finding(path,
                               components=components,
                               input_reco_tracks=latest_reco_tracks,
-                              output_reco_tracks=output_reco_tracks,
+                              output_reco_tracks=tmp_output_reco_tracks,
                               temporary_reco_tracks=svd_reco_tracks,
                               use_mc_truth=use_mc_truth,
                               svd_ckf_mode="ckf_merger_plus_spacepoint_ckf",
                               add_both_directions=add_both_directions,
                               use_svd_to_cdc_ckf=False,
                               prune_temporary_tracks=prune_temporary_tracks)
+        if temporary_reco_tracks_merging_strategy == "before_ToSVDCKF":
+            temporary_reco_track_list.append(output_reco_tracks)
+            latest_reco_tracks = output_reco_tracks
+        elif temporary_reco_tracks_merging_strategy == "after_ToSVDCKF":
+            temporary_reco_track_list.append(combined_reco_tracks_name)
+            latest_reco_tracks = combined_reco_tracks_name
+
+    if temporary_reco_tracks_merging_strategy == "after_ToSVDCKF":
+        path.add_module("RecoTrackStoreArrayCombiner",
+                        Temp1RecoTracksStoreArrayName=latest_reco_tracks,
+                        Temp2RecoTracksStoreArrayName=svd_cdc_reco_tracks,
+                        recoTracksStoreArrayName=output_reco_tracks)
         temporary_reco_track_list.append(output_reco_tracks)
         latest_reco_tracks = output_reco_tracks
 

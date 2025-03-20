@@ -436,8 +436,8 @@ if __name__ == '__main__':
                 p.add(spectators_train_data, spectator_abbr, train_target[first_identifier_abbr] == 1, label="Sig_train")
                 p.add(spectators_train_data, spectator_abbr, train_target[first_identifier_abbr] != 1, label="Bkg_train")
             p.finish()
-            p.save(f'spectator_{hash(spectator)}.pdf')
-            graphics.add(f'spectator_{hash(spectator)}.pdf', width=1.0)
+            p.save(f'spectator_{spectator_abbr}_{hash(spectator)}.pdf')
+            graphics.add(f'spectator_{spectator_abbr}_{hash(spectator)}.pdf', width=1.0)
             o += graphics.finish()
 
             for identifier in identifiers:

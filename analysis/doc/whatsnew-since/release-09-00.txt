@@ -18,8 +18,7 @@ Variables
 
 Modular Analysis
 ++++++++++++++++
-* In `modularAnalysis.getECLKLID`:
-  * Add function to use the weight files trained with ECL information. This can be used only for ECL cluster.
+* Added new function `getECLKLID` that calculates the PID for Klongs by using weight files trained with ECL information. It should only be applied to Klongs constructed from ECL cluster.
 
 Changes in the analysis package in light-2501-betelgeuse
 --------------------------------------------------------

@@ -4483,11 +4483,12 @@ def getAnalysisGlobaltagB2BII() -> str:
     return recommended_b2bii_analysis_global_tag()
 
 
-def getECLKLID(particleList: str, path=None):
+def getECLKLID(particleList: str, variable='ECLKLID', path=None):
     """
-    The function gives the MVA value for Klong and it is only for the Klong from ECL cluster.
+    The function calculates the PID value for Klongs that are constructed from ECL cluster.
 
     @param particleList     the input ParticleList
+    @param variable         the variable name for Klong ID
     @param path             modules are added to this path
     """
 
@@ -4499,7 +4500,7 @@ def getECLKLID(particleList: str, path=None):
     from variables import variables
     path.add_module('MVAExpert', listNames=particleList, extraInfoName='ECLKLID', identifier='ECLKLID')
 
-    variables.addAlias('ECLKLID', 'extraInfo(ECLKLID)')
+    variables.addAlias(variable, 'extraInfo(ECLKLID)')
 
 
 def getNbarIDMVA(particleList: str, path=None):

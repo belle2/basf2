@@ -636,8 +636,8 @@ class PostReconstruction:
                         variables={
                             "formula(conditionalVariableSelector(extraInfo(uniqueSignal) == 1, 1, 0))": "uniqueSignalTarget"},
                         path=path)
-                    hist_variables = ['extraInfo(signalTarget)', 'extraInfo(decayModeID)']
-                    hist_variables_2d = [('extraInfo(signalTarget)', 'extraInfo(decayModeID)')]
+                    hist_variables = ['extraInfo(uniqueSignalTarget)', 'extraInfo(decayModeID)']
+                    hist_variables_2d = [('extraInfo(uniqueSignalTarget)', 'extraInfo(decayModeID)')]
                     ma.variablesToHistogram(
                         particle.identifier,
                         variables=config.variables2binnings(hist_variables),

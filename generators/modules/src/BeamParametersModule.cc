@@ -26,7 +26,7 @@ BeamParametersModule::BeamParametersModule() : Module()
 {
   // Set module properties
   setDescription("Setting of beam parameters. This module allows to set the "
-                 "beamparameters to be used by generators and analyis. One can "
+                 "beamparameters to be used by generators and analysis. One can "
                  "either select from a list of predefined parameter sets or "
                  "manually set the parameters to use.");
 
@@ -39,7 +39,7 @@ BeamParametersModule::BeamParametersModule() : Module()
   addParam("covHER", m_covHER, "covariance matrix of the High Energy Ring. This "
            "can either be one value which is the squared energy spread, three "
            "values corresponding to the variances of energy and the horizontal "
-           "and vertial spread (E, theta_x, theta_y) or a full covariance "
+           "and vertical spread (E, theta_x, theta_y) or a full covariance "
            "matrix with 9 elements", std::vector<double>(1, 0));
   addParam("energyLER", m_energyLER, "Energy of the Low Energy Ring", 4.0);
   addParam("angleXLER", m_angleXLER, "angle of the Low Energy Ring in the x-z plane. "
@@ -49,7 +49,7 @@ BeamParametersModule::BeamParametersModule() : Module()
   addParam("covLER", m_covLER, "covariance matrix of the Low Energy Ring. This "
            "can either be one value which is the squared energy spread, three "
            "values corresponding to the variances of energy and the horizontal "
-           "and vertial spread (E, theta_x, theta_y) or a full covariance "
+           "and vertical spread (E, theta_x, theta_y) or a full covariance "
            "matrix with 9 elements", std::vector<double>(1, 0));
   addParam("vertex", m_vertex, "nominal vertex position", std::vector<double>(3, 0));
   addParam("covVertex", m_covVertex, "covariance matrix of the nominal vertex "

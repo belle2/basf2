@@ -21,7 +21,7 @@
 
 
 namespace Belle2 {
-  class klm_trig_linear_fit_t {
+  class klmtrgLinearFit {
   public:
     void clear_geometry();
     void add_geometry(const KLM_TRG_definitions::KLM_geo_fit_t&  geometry);

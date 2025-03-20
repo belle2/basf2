@@ -116,14 +116,6 @@ def create_testfile_ntuple(input, output, treeNames=["tree", "anotherTree"], **a
     f.Close()
 
 
-def get_metadata(name="output.root"):
-    """Get the metadata out of a root file"""
-    out = ROOT.TFile(name)
-    t = out.Get("persistent")
-    t.GetEntry(0)
-    return FileMetaData(t.FileMetaData)
-
-
 def merge_files(*args, output="output.root", filter_modified=False):
     """run the merging tool on all passed files
 

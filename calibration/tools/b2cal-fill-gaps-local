@@ -101,13 +101,17 @@ def get_local_payloads(database):
 
 
 def get_start_end_time(obj, module):
+    """
+    Get start and end time as float from the payload object.
+    The start and end time are in seconds since the epoch.
+    """
     if module == "BeamSpot":
         cov = obj.getIPPositionCovMatrix()
     elif iov1.module == "CollisionBoostVector":
         cov = obj.getBoostCovariance()
     # hack to get start/end times from payloads
-    tStart = int(math.frexp(cov(0, 1))[0] * 2**53) % 2**32 / 3600.0
-    tEnd = int(math.frexp(cov(0, 2))[0] * 2**53) % 2**32 / 3600.0
+    tStart = int(math.frexp(cov(0, 1))[0] * 2**53) % 2**32
+    tEnd = int(math.frexp(cov(0, 2))[0] * 2**53) % 2**32
     return (tStart, tEnd)
 
 
@@ -133,13 +137,17 @@ if __name__ == "__main__":
                         b2.conditions.expert_settings(save_payloads=args.database)
                         last_object = all_objects.getObjectByIndex(num_conditions - 1)
                         if iov1.module in ["BeamSpot", "CollisionBoostVector"]:
-                            t1 = get_start_end_time(last_object, iov1.module)[-1] + 1e-3
+                            # Add one second to avoid rounding errors
+                            t1 = get_start_end_time(last_object, iov1.module)[-1] + 1
                             payload_file2 = r.TFile.Open(iov2.filename)
                             all_objects2 = payload_file2.Get(iov2.module)
                             first_object2 = all_objects2.getObjectByIndex(0)
+                            # Remove one second to avoid rounding errors
                             t2 = (
-                                get_start_end_time(first_object2, iov2.module)[0] - 1e-3
+                                get_start_end_time(first_object2, iov2.module)[0] - 1
                             )
+                            # If I add a new payload I encode as lenght 5 seconds (or the gap between the two payloads if it is smaller). In this payloads that are supposed to cover gaps will not seem long and so important in validation.
+                            t2 = min(t2, t1 + 5)
                             if iov1.module == "BeamSpot":
                                 val = last_object.getIPPosition()
                                 cov = last_object.getIPPositionCovMatrix()
@@ -149,8 +157,8 @@ if __name__ == "__main__":
                                 val = last_object.getBoost()
                                 cov = last_object.getBoostCovariance()
 
-                            valStart = encode_number(cov(0, 1), round(t1 * 3600))
-                            valEnd = encode_number(cov(0, 2), round(t2 * 3600))
+                            valStart = encode_number(cov(0, 1), round(t1))
+                            valEnd = encode_number(cov(0, 2), round(t2))
                             cov = r.TMatrixDSym(cov)
                             cov[0][1] = valStart
                             cov[1][0] = valStart

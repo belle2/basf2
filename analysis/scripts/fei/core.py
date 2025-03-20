@@ -325,10 +325,23 @@ class PreReconstruction:
                 if self.config.monitor:
                     ma.matchMCTruth(channel.name, path=path)
                     bc_variable = channel.preCutConfig.bestCandidateVariable
-                    hist_variables = [bc_variable, 'mcErrors', 'mcParticleStatus', channel.mvaConfig.target]
-                    hist_variables_2d = [(bc_variable, channel.mvaConfig.target),
-                                         (bc_variable, 'mcErrors'),
-                                         (bc_variable, 'mcParticleStatus')]
+                    if self.config.monitor == 'simple':
+                        ma.variablesToExtraInfo(
+                            channel.name,
+                            variables={
+                                "formula(conditionalVariableSelector("+channel.mvaConfig.target+" == 1, 1, 0))": "signalTarget"},
+                            path=path)
+                        hist_variables = ['extraInfo(signalTarget)', 'extraInfo(decayModeID)']
+                        hist_variables_2d = [('extraInfo(signalTarget)', 'extraInfo(decayModeID)')]
+                    else:
+                        hist_variables = [bc_variable, 'mcErrors', 'mcParticleStatus',
+                                          channel.mvaConfig.target] + channel.mvaConfig.spectators
+                        hist_variables_2d = [(bc_variable, channel.mvaConfig.target),
+                                             (bc_variable, 'mcErrors'),
+                                             (bc_variable, 'mcParticleStatus')]
+                        for specVar in channel.mvaConfig.spectators:
+                            hist_variables_2d.append((bc_variable, specVar))
+                            hist_variables_2d.append((channel.mvaConfig.target, specVar))
                     filename = os.path.join(self.config.monitoring_path, 'Monitor_PreReconstruction_BeforeRanking.root')
                     ma.variablesToHistogram(
                         channel.name,
@@ -384,10 +397,13 @@ class PreReconstruction:
 
                 if self.config.monitor:
                     filename = os.path.join(self.config.monitoring_path, 'Monitor_PreReconstruction_AfterRanking.root')
-                    hist_variables += ['extraInfo(preCut_rank)']
-                    hist_variables_2d += [('extraInfo(preCut_rank)', channel.mvaConfig.target),
-                                          ('extraInfo(preCut_rank)', 'mcErrors'),
-                                          ('extraInfo(preCut_rank)', 'mcParticleStatus')]
+                    if self.config.monitor != 'simple':
+                        hist_variables += ['extraInfo(preCut_rank)']
+                        hist_variables_2d += [('extraInfo(preCut_rank)', channel.mvaConfig.target),
+                                              ('extraInfo(preCut_rank)', 'mcErrors'),
+                                              ('extraInfo(preCut_rank)', 'mcParticleStatus')]
+                        for specVar in channel.mvaConfig.spectators:
+                            hist_variables_2d.append(('extraInfo(preCut_rank)', specVar))
                     ma.variablesToHistogram(
                         channel.name,
                         variables=config.variables2binnings(hist_variables),
@@ -426,10 +442,18 @@ class PreReconstruction:
                     path.add_module(pvfit)
 
                 if self.config.monitor:
-                    hist_variables = ['chiProb', 'mcErrors', 'mcParticleStatus', channel.mvaConfig.target]
-                    hist_variables_2d = [('chiProb', channel.mvaConfig.target),
-                                         ('chiProb', 'mcErrors'),
-                                         ('chiProb', 'mcParticleStatus')]
+                    if self.config.monitor == 'simple':
+                        hist_variables = ['extraInfo(signalTarget)', 'extraInfo(decayModeID)']
+                        hist_variables_2d = [('extraInfo(signalTarget)', 'extraInfo(decayModeID)')]
+                    else:
+                        hist_variables = ['chiProb', 'mcErrors', 'mcParticleStatus',
+                                          channel.mvaConfig.target] + channel.mvaConfig.spectators
+                        hist_variables_2d = [('chiProb', channel.mvaConfig.target),
+                                             ('chiProb', 'mcErrors'),
+                                             ('chiProb', 'mcParticleStatus')]
+                        for specVar in channel.mvaConfig.spectators:
+                            hist_variables_2d.append(('chiProb', specVar))
+                            hist_variables_2d.append((channel.mvaConfig.target, specVar))
                     filename = os.path.join(self.config.monitoring_path, 'Monitor_PreReconstruction_AfterVertex.root')
                     ma.variablesToHistogram(
                         channel.name,
@@ -503,14 +527,23 @@ class PostReconstruction:
                 path.add_module(expert)
 
                 if self.config.monitor:
-                    hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(SignalProbability)',
-                                      channel.mvaConfig.target, 'extraInfo(decayModeID)']
-                    hist_variables_2d = [('extraInfo(SignalProbability)', channel.mvaConfig.target),
-                                         ('extraInfo(SignalProbability)', 'mcErrors'),
-                                         ('extraInfo(SignalProbability)', 'mcParticleStatus'),
-                                         ('extraInfo(decayModeID)', channel.mvaConfig.target),
-                                         ('extraInfo(decayModeID)', 'mcErrors'),
-                                         ('extraInfo(decayModeID)', 'mcParticleStatus')]
+                    if self.config.monitor == 'simple':
+                        hist_variables = ['extraInfo(signalTarget)', 'extraInfo(decayModeID)']
+                        hist_variables_2d = [('extraInfo(signalTarget)', 'extraInfo(decayModeID)')]
+                    else:
+                        hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)',
+                                          channel.mvaConfig.target, 'extraInfo(decayModeID)'] + channel.mvaConfig.spectators
+                        hist_variables_2d = [('extraInfo(SignalProbability)', channel.mvaConfig.target),
+                                             ('extraInfo(SignalProbability)', 'mcErrors'),
+                                             ('extraInfo(SignalProbability)', 'mcParticleStatus'),
+                                             ('extraInfo(decayModeID)', channel.mvaConfig.target),
+                                             ('extraInfo(decayModeID)', 'mcErrors'),
+                                             ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
+                                             ('extraInfo(decayModeID)', 'mcParticleStatus')]
+                        for specVar in channel.mvaConfig.spectators:
+                            hist_variables_2d.append(('extraInfo(SignalProbability)', specVar))
+                            hist_variables_2d.append(('extraInfo(decayModeID)', specVar))
+                            hist_variables_2d.append((channel.mvaConfig.target, specVar))
                     filename = os.path.join(self.config.monitoring_path, 'Monitor_PostReconstruction_AfterMVA.root')
                     ma.variablesToHistogram(
                         channel.name,
@@ -529,11 +562,19 @@ class PostReconstruction:
                                            variable='particleSource', writeOut=True, path=path)
 
             if self.config.monitor:
-                hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(SignalProbability)',
-                                  particle.mvaConfig.target, 'extraInfo(decayModeID)']
-                hist_variables_2d = [('extraInfo(decayModeID)', particle.mvaConfig.target),
-                                     ('extraInfo(decayModeID)', 'mcErrors'),
-                                     ('extraInfo(decayModeID)', 'mcParticleStatus')]
+                if self.config.monitor == 'simple':
+                    hist_variables = ['extraInfo(signalTarget)', 'extraInfo(decayModeID)']
+                    hist_variables_2d = [('extraInfo(signalTarget)', 'extraInfo(decayModeID)')]
+                else:
+                    hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)',
+                                      particle.mvaConfig.target, 'extraInfo(decayModeID)'] + particle.mvaConfig.spectators
+                    hist_variables_2d = [('extraInfo(decayModeID)', particle.mvaConfig.target),
+                                         ('extraInfo(decayModeID)', 'mcErrors'),
+                                         ('extraInfo(decayModeID)', 'mcParticleStatus')]
+                    for specVar in particle.mvaConfig.spectators:
+                        hist_variables_2d.append(('extraInfo(SignalProbability)', specVar))
+                        hist_variables_2d.append(('extraInfo(decayModeID)', specVar))
+                        hist_variables_2d.append((particle.mvaConfig.target, specVar))
                 filename = os.path.join(self.config.monitoring_path, 'Monitor_PostReconstruction_BeforePostCut.root')
                 ma.variablesToHistogram(
                     particle.identifier,
@@ -570,11 +611,14 @@ class PostReconstruction:
             path.add_module(uniqueSignal)
 
             if self.config.monitor:
-                hist_variables += ['extraInfo(postCut_rank)']
-                hist_variables_2d += [('extraInfo(decayModeID)', 'extraInfo(postCut_rank)'),
-                                      (particle.mvaConfig.target, 'extraInfo(postCut_rank)'),
-                                      ('mcErrors', 'extraInfo(postCut_rank)'),
-                                      ('mcParticleStatus', 'extraInfo(postCut_rank)')]
+                if self.config.monitor != 'simple':
+                    hist_variables += ['extraInfo(postCut_rank)']
+                    hist_variables_2d += [('extraInfo(decayModeID)', 'extraInfo(postCut_rank)'),
+                                          (particle.mvaConfig.target, 'extraInfo(postCut_rank)'),
+                                          ('mcErrors', 'extraInfo(postCut_rank)'),
+                                          ('mcParticleStatus', 'extraInfo(postCut_rank)')]
+                    for specVar in particle.mvaConfig.spectators:
+                        hist_variables_2d.append(('extraInfo(postCut_rank)', specVar))
                 filename = os.path.join(self.config.monitoring_path, 'Monitor_PostReconstruction_AfterRanking.root')
                 ma.variablesToHistogram(
                     particle.identifier,
@@ -585,18 +629,35 @@ class PostReconstruction:
                     directory=config.removeJPsiSlash(f'{particle.identifier}'),
                     path=path)
 
-                variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
-                             'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
-                variables += list(particle.mvaConfig.spectators.keys())
-
                 filename = os.path.join(self.config.monitoring_path, 'Monitor_Final.root')
-                ma.variablesToNtuple(
-                    particle.identifier,
-                    variables,
-                    treename=config.removeJPsiSlash(f'{particle.identifier} variables'),
-                    filename=filename,
-                    ignoreCommandLineOverride=True,
-                    path=path)
+                if self.config.monitor == 'simple':
+                    ma.variablesToExtraInfo(
+                        particle.identifier,
+                        variables={
+                            "formula(conditionalVariableSelector(extraInfo(uniqueSignal) == 1, 1, 0))": "uniqueSignalTarget"},
+                        path=path)
+                    hist_variables = ['extraInfo(signalTarget)', 'extraInfo(decayModeID)']
+                    hist_variables_2d = [('extraInfo(signalTarget)', 'extraInfo(decayModeID)')]
+                    ma.variablesToHistogram(
+                        particle.identifier,
+                        variables=config.variables2binnings(hist_variables),
+                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                        filename=filename,
+                        ignoreCommandLineOverride=True,
+                        directory=config.removeJPsiSlash(f'{particle.identifier}'),
+                        path=path)
+                else:
+                    variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
+                                 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+                    variables += list(particle.mvaConfig.spectators.keys())
+
+                    ma.variablesToNtuple(
+                        particle.identifier,
+                        variables,
+                        treename=config.removeJPsiSlash(f'{particle.identifier} variables'),
+                        filename=filename,
+                        ignoreCommandLineOverride=True,
+                        path=path)
         return path
 
 

@@ -47,7 +47,7 @@
 
 # Import basf2
 import basf2
-from basf2 import B2INFO, B2WARNING
+from basf2 import B2INFO, B2WARNING, B2ERROR
 import pybasf2
 import modularAnalysis as ma
 import b2bii
@@ -83,15 +83,18 @@ class TrainingDataInformation:
     where we calculate reconstruction efficiencies.
     """
 
-    def __init__(self, particles: typing.Sequence[config.Particle]):
+    def __init__(self, particles: typing.Sequence[config.Particle], outputPath: str = None):
         """
         Create a new TrainingData object
         @param particles list of config.Particle objects
+        @param outputPath path to the output directory
         """
         #: list of config.Particle objects
         self.particles = particles
         #: filename
         self.filename = 'mcParticlesCount.root'
+        if outputPath is not None:
+            self.filename = outputPath + self.filename
 
     def available(self) -> bool:
         """
@@ -186,7 +189,7 @@ class FSPLoader:
 
         if self.config.monitor:
             names = ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'K_S0', 'p+', 'K_L0', 'Lambda0', 'pi0']
-            filename = 'Monitor_FSPLoader.root'
+            filename = self.config.monitoring_path+'Monitor_FSPLoader.root'
             pdgs = {abs(pdg.from_name(name)) for name in names}
             variables = [(f'NumberOfMCParticlesInEvent({pdg})', 100, -0.5, 99.5) for pdg in pdgs]
             ma.variablesToHistogram('', variables=variables, filename=filename, ignoreCommandLineOverride=True, path=path)
@@ -259,7 +262,7 @@ class TrainingData:
                     hist_variables = ['mcErrors', 'mcParticleStatus'] + channel.mvaConfig.variables + spectators
                     hist_variables_2d = [(x, channel.mvaConfig.target)
                                          for x in channel.mvaConfig.variables + spectators if x is not channel.mvaConfig.target]
-                    hist_filename = 'Monitor_TrainingData.root'
+                    hist_filename = self.config.monitoring_path+'Monitor_TrainingData.root'
                     ma.variablesToHistogram(channel.name, variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
                                             filename=config.removeJPsiSlash(hist_filename),
@@ -330,7 +333,7 @@ class PreReconstruction:
                     hist_variables_2d = [(bc_variable, channel.mvaConfig.target),
                                          (bc_variable, 'mcErrors'),
                                          (bc_variable, 'mcParticleStatus')]
-                    filename = 'Monitor_PreReconstruction_BeforeRanking.root'
+                    filename = self.config.monitoring_path+'Monitor_PreReconstruction_BeforeRanking.root'
                     ma.variablesToHistogram(
                         channel.name,
                         variables=config.variables2binnings(hist_variables),
@@ -389,7 +392,7 @@ class PreReconstruction:
                     path.for_each('RestOfEvent', 'RestOfEvents', Ddaughter_roe_path)
 
                 if self.config.monitor:
-                    filename = 'Monitor_PreReconstruction_AfterRanking.root'
+                    filename = self.config.monitoring_path+'Monitor_PreReconstruction_AfterRanking.root'
                     hist_variables += ['extraInfo(preCut_rank)']
                     hist_variables_2d += [('extraInfo(preCut_rank)', channel.mvaConfig.target),
                                           ('extraInfo(preCut_rank)', 'mcErrors'),
@@ -436,7 +439,7 @@ class PreReconstruction:
                     hist_variables_2d = [('chiProb', channel.mvaConfig.target),
                                          ('chiProb', 'mcErrors'),
                                          ('chiProb', 'mcParticleStatus')]
-                    filename = 'Monitor_PreReconstruction_AfterVertex.root'
+                    filename = self.config.monitoring_path+'Monitor_PreReconstruction_AfterVertex.root'
                     ma.variablesToHistogram(
                         channel.name,
                         variables=config.variables2binnings(hist_variables),
@@ -527,7 +530,7 @@ class PostReconstruction:
                                          ('extraInfo(decayModeID)', 'mcErrors'),
                                          ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                          ('extraInfo(decayModeID)', 'mcParticleStatus')]
-                    filename = 'Monitor_PostReconstruction_AfterMVA.root'
+                    filename = self.config.monitoring_path+'Monitor_PostReconstruction_AfterMVA.root'
                     ma.variablesToHistogram(
                         channel.name,
                         variables=config.variables2binnings(hist_variables),
@@ -550,7 +553,7 @@ class PostReconstruction:
                 hist_variables_2d = [('extraInfo(decayModeID)', particle.mvaConfig.target),
                                      ('extraInfo(decayModeID)', 'mcErrors'),
                                      ('extraInfo(decayModeID)', 'mcParticleStatus')]
-                filename = 'Monitor_PostReconstruction_BeforePostCut.root'
+                filename = self.config.monitoring_path+'Monitor_PostReconstruction_BeforePostCut.root'
                 ma.variablesToHistogram(
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
@@ -563,7 +566,7 @@ class PostReconstruction:
             ma.applyCuts(particle.identifier, cutstring, path=path)
 
             if self.config.monitor:
-                filename = 'Monitor_PostReconstruction_BeforeRanking.root'
+                filename = self.config.monitoring_path+'Monitor_PostReconstruction_BeforeRanking.root'
                 ma.variablesToHistogram(
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
@@ -582,7 +585,7 @@ class PostReconstruction:
                                       (particle.mvaConfig.target, 'extraInfo(postCut_rank)'),
                                       ('mcErrors', 'extraInfo(postCut_rank)'),
                                       ('mcParticleStatus', 'extraInfo(postCut_rank)')]
-                filename = 'Monitor_PostReconstruction_AfterRanking.root'
+                filename = self.config.monitoring_path+'Monitor_PostReconstruction_AfterRanking.root'
                 ma.variablesToHistogram(
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
@@ -600,7 +603,7 @@ class PostReconstruction:
                 elif 'B' in particle.name:
                     variables += ['Mbc', 'cosThetaBetweenParticleAndNominalB']
 
-                filename = 'Monitor_Final.root'
+                filename = self.config.monitoring_path+'Monitor_Final.root'
                 ma.variablesToNtuple(
                     particle.identifier,
                     variables,
@@ -822,24 +825,28 @@ def do_trainings(particles: typing.Sequence[config.Particle], configuration: con
     return teacher.do_all_trainings()
 
 
-def save_summary(particles: typing.Sequence[config.Particle], configuration: config.FeiConfiguration, cache: int):
+def save_summary(particles: typing.Sequence[config.Particle],
+                 configuration: config.FeiConfiguration,
+                 cache: int,
+                 pickleName: str = 'Summary.pickle'):
     """
     Creates the Summary.pickle, which is used to keep track of the stage during the training,
     and can be used later to investigate which configuration was used exactly to create the training.
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
     @param cache current cache level
+    @param pickleName name of the pickle file
     """
     configuration = config.FeiConfiguration(configuration.prefix, cache,
                                             configuration.monitor, configuration.legacy, configuration.externTeacher,
                                             configuration.training)
     # Backup existing Summary.pickle files
     for i in [8, 7, 6, 5, 4, 3, 2, 1, 0]:
-        if os.path.isfile(f'Summary.pickle.backup_{i}'):
-            shutil.copyfile(f'Summary.pickle.backup_{i}', f'Summary.pickle.backup_{i + 1}')
-    if os.path.isfile('Summary.pickle'):
-        shutil.copyfile('Summary.pickle', 'Summary.pickle.backup_0')
-    pickle.dump((particles, configuration), open('Summary.pickle', 'wb'))
+        if os.path.isfile(f'{pickleName}.backup_{i}'):
+            shutil.copyfile(f'{pickleName}.backup_{i}', f'{pickleName}.backup_{i + 1}')
+    if os.path.isfile(pickleName):
+        shutil.copyfile(pickleName, f'{pickleName}.backup_0')
+    pickle.dump((particles, configuration), open(pickleName, 'wb'))
 
 
 def get_path(particles: typing.Sequence[config.Particle], configuration: config.FeiConfiguration) -> FeiState:
@@ -887,10 +894,17 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     # which is used to determine the number of candidates we have to write out for the FSP trainings in stage 0.
     # For inference/application we start by default with 0, because we don't need the TrainingDataInformation in stage 0.
     # During the training we save the particles and configuration (including the current cache stage) in the Summary.pickle object.
+    if configuration.training and (configuration.monitor and (configuration.monitoring_path != '')):
+        B2ERROR("FEI-core: Custom Monitoring path is not allowed during training!")
+
     if configuration.cache is None:
-        if os.path.isfile('Summary.pickle'):
+        pickleName = 'Summary.pickle'
+        if configuration.monitor:
+            pickleName = configuration.monitoring_path + pickleName
+
+        if os.path.isfile(pickleName):
             print("Cache: Replaced particles and configuration with the ones from Summary.pickle!")
-            particles, configuration = pickle.load(open('Summary.pickle', 'rb'))
+            particles, configuration = pickle.load(open(pickleName, 'rb'))
             cache = configuration.cache
         else:
             if configuration.training:
@@ -920,7 +934,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     # That's why we have to write out the TrainingDataInformation before doing anything during the training phase.
     # During application we only need this if we run in monitor mode, and want to write out a summary in the end,
     # the summary contains efficiency, and the efficiency calculation requires the total number of MC particles.
-    training_data_information = TrainingDataInformation(particles)
+    training_data_information = TrainingDataInformation(particles, outputPath=configuration.monitoring_path)
     if cache < 0 and configuration.training:
         print("Stage 0: Run over all files to count the number of events and McParticles")
         path.add_path(training_data_information.reconstruct())
@@ -982,7 +996,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     # these statistics contain the runtime for each module which was run.
     if configuration.monitor:
         output = basf2.register_module('RootOutput')
-        output.param('outputFileName', 'Monitor_ModuleStatistics.root')
+        output.param('outputFileName', configuration.monitoring_path+'Monitor_ModuleStatistics.root')
         output.param('branchNames', ['EventMetaData'])  # cannot be removed, but of only small effect on file size
         output.param('branchNamesPersistent', ['ProcessStatistics'])
         output.param('ignoreCommandLineOverride', True)
@@ -991,7 +1005,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     # As mentioned above the FEI keeps track of the stages which are already reconstructed during the training
     # so we write out the Summary.pickle here, and increase the stage by one.
     if configuration.training or configuration.monitor:
-        save_summary(particles, configuration, stage + 1)
+        save_summary(particles, configuration, stage + 1, pickleName=configuration.monitoring_path+'Summary.pickle')
 
     # Finally we return the path, the stage and the used lists to the user.
     return FeiState(path, stage + 1, plists=used_lists)

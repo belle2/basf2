@@ -33,8 +33,9 @@ import basf2
 # Define classes at top level to make them pickable
 # Creates new class via namedtuple, which are like a struct in C
 
-FeiConfiguration = collections.namedtuple('FeiConfiguration', 'prefix, cache, monitor, legacy, externTeacher, training')
-FeiConfiguration.__new__.__defaults__ = ('FEI_TEST', None, True, None, 'basf2_mva_teacher', False)
+FeiConfiguration = collections.namedtuple('FeiConfiguration',
+                                          'prefix, cache, monitor, legacy, externTeacher, training, monitoring_path')
+FeiConfiguration.__new__.__defaults__ = ('FEI_TEST', None, True, None, 'basf2_mva_teacher', False, '')
 FeiConfiguration.__doc__ = "Fei Global Configuration class"
 FeiConfiguration.prefix.__doc__ = "The database prefix used for all weight files"
 FeiConfiguration.cache.__doc__ = "The stage which is passed as input, it is assumed that all previous stages"\
@@ -46,6 +47,7 @@ FeiConfiguration.legacy.__doc__ = "Pass the summary file of a legacy FEI trainin
                                   " and the algorithm will be able to apply this training."
 FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, b2mva-kekcc-cluster-teacher"
 FeiConfiguration.training.__doc__ = "If you train the FEI set this to True, otherwise to False"
+FeiConfiguration.monitoring_path.__doc__ = "Path were monitoring histograms are stored."
 
 
 MVAConfiguration = collections.namedtuple('MVAConfiguration', 'method, config, variables, target, sPlotVariable')

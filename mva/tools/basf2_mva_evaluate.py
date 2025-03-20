@@ -330,8 +330,14 @@ if __name__ == '__main__':
         o += b2latex.Section("ROC Plot")
         graphics = b2latex.Graphics()
         p = plotting.RejectionOverEfficiency(fom=True)
-        for identifier in identifier_abbreviations.values():
-            p.add(test_probability, identifier, test_target[identifier] == 1, test_target[identifier] != 1)
+        for i, identifier in enumerate(identifiers):
+            identifier_abbr = identifier_abbreviations[identifier]
+            p.add(
+                test_probability,
+                identifier_abbr,
+                test_target[identifier_abbr] == 1,
+                test_target[identifier_abbr] != 1,
+                label=identifier_abbr)
         p.finish()
         p.axis.set_title("ROC Rejection Plot on independent data")
         p.save('roc_plot_test.pdf')
@@ -344,17 +350,16 @@ if __name__ == '__main__':
                 p = plotting.RejectionOverEfficiency(fom=True)
                 identifier_abbr = identifier_abbreviations[identifier]
                 p.add(train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
-                      train_target[identifier_abbr] != 1, label='Train')
+                      train_target[identifier_abbr] != 1, label=f'Train {identifier_abbr}')
                 p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
-                      test_target[identifier_abbr] != 1, label='Test')
+                      test_target[identifier_abbr] != 1, label=f'Test {identifier_abbr}')
                 p.finish()
-                p.axis.set_title(identifier)
-                p.save(f'roc_test_{hash(identifier)}.pdf')
-                graphics.add(f'roc_test_{hash(identifier)}.pdf', width=1.0)
+                p.axis.set_title("ROC Rejection Plot for " + identifier)
+                p.save(f'roc_plot_{hash(identifier)}.pdf')
+                graphics.add(f'roc_plot_{hash(identifier)}.pdf', width=1.0)
                 o += graphics.finish()
 
         o += b2latex.Section("Classification Results")
-
         for identifier in identifiers:
             identifier_abbr = identifier_abbreviations[identifier]
             o += b2latex.SubSection(format.string(identifier_abbr))
@@ -389,9 +394,13 @@ if __name__ == '__main__':
         graphics = b2latex.Graphics()
         p = plotting.Diagonal()
         for identifier in identifiers:
-            o += b2latex.SubSection(format.string(identifier_abbr))
             identifier_abbr = identifier_abbreviations[identifier]
-            p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1, test_target[identifier_abbr] != 1)
+            p.add(
+                test_probability,
+                identifier_abbr,
+                test_target[identifier_abbr] == 1,
+                test_target[identifier_abbr] != 1,
+                label=identifier_abbr)
         p.finish()
         p.axis.set_title("Diagonal plot on independent data")
         p.save('diagonal_plot_test.pdf')
@@ -399,7 +408,33 @@ if __name__ == '__main__':
         o += graphics.finish()
 
         if train_probability:
-            o += b2latex.SubSection("Overtraining Plot")
+            for identifier in identifiers:
+                identifier_abbr = identifier_abbreviations[identifier]
+                o += b2latex.SubSection(format.string(identifier_abbr))
+                graphics = b2latex.Graphics()
+                p = plotting.Diagonal()
+
+                p.add(
+                    train_probability,
+                    identifier_abbr,
+                    train_target[identifier_abbr] == 1,
+                    train_target[identifier_abbr] != 1,
+                    label='Train')
+                p.add(
+                    test_probability,
+                    identifier_abbr,
+                    test_target[identifier_abbr] == 1,
+                    test_target[identifier_abbr] != 1,
+                    label='Test')
+
+                p.finish()
+                p.axis.set_title("Diagonal plot for " + identifier)
+                p.save(f'diagonal_plot_{hash(identifier)}.pdf')
+                graphics.add(f'diagonal_plot_{hash(identifier)}.pdf', width=1.0)
+                o += graphics.finish()
+
+        if train_probability:
+            o += b2latex.Section("Overtraining Plot")
             for identifier in identifiers:
                 identifier_abbr = identifier_abbreviations[identifier]
                 probability = {identifier_abbr: np.r_[train_probability[identifier_abbr], test_probability[identifier_abbr]]}
@@ -450,8 +485,8 @@ if __name__ == '__main__':
                       test_target[identifier_abbr] == 1,
                       test_target[identifier_abbr] != 1)
                 p.finish()
-                p.save(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf')
-                graphics.add(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf', width=1.0)
+                p.save(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}.pdf')
+                graphics.add(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}.pdf', width=1.0)
                 o += graphics.finish()
 
                 if train_probability:
@@ -465,8 +500,8 @@ if __name__ == '__main__':
                           train_target[identifier_abbr] == 1,
                           train_target[identifier_abbr] != 1)
                     p.finish()
-                    p.save(f'correlation_plot_{hash(spectator)}_{hash(identifier)}_train.pdf')
-                    graphics.add(f'correlation_plot_{hash(spectator)}_{hash(identifier)}_train.pdf', width=1.0)
+                    p.save(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}_train.pdf')
+                    graphics.add(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}_train.pdf', width=1.0)
                     o += graphics.finish()
 
         if len(spectators) > 0:
@@ -498,7 +533,7 @@ if __name__ == '__main__':
                 p.finish()
                 p.save('correlation_spec_plot_train.pdf')
                 graphics.add('correlation_spec_plot_train.pdf', width=1.0)
-                o += graphics.finish
+                o += graphics.finish()
 
         if args.compile:
             B2INFO(f"Creating a PDF file at {args.outputfile}. Please remove the '-c' switch if this fails.")

@@ -596,7 +596,7 @@ class Diagonal(Plotter):
     #: @var ymax
     #: Maximum y value
 
-    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None):
+    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
         """
         Add a new curve to the Diagonal plot
         @param data pandas.DataFrame containing all data
@@ -615,7 +615,10 @@ class Diagonal(Plotter):
         self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, hists.bin_centers, purity, xerr=hists.bin_widths / 2.0, yerr=purity_error)
         self.plots.append(p)
-        self.labels.append(column)
+        if label is None:
+            self.labels.append(column)
+        else:
+            self.labels.append(label)
         return self
 
     def finish(self):
@@ -959,6 +962,7 @@ class Overtraining(Plotter):
         @param weight_column column in data containing the weights for each event
         """
         distribution = Distribution(self.figure, self.axis, normed_to_all_entries=True)
+        self.axis.set_yscale('log')
 
         distribution.set_plot_options(self.plot_kwargs)
         distribution.set_errorbar_options(self.errorbar_kwargs)

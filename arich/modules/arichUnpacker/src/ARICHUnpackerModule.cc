@@ -11,8 +11,6 @@
 
 #include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
 
-#include <framework/core/ModuleManager.h>
-
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

@@ -10,7 +10,6 @@
 #include <analysis/modules/BelleNbarMVAModule/BelleNbarMVAModule.h>
 
 //Basf2 headers
-#include <framework/database/DBObjPtr.h>
 #include <framework/database/Database.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mdst/dataobjects/ECLCluster.h>

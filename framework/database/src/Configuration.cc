@@ -19,7 +19,6 @@
 
 #include <set>
 #include <regex>
-#include <TPython.h>
 
 // Current default globaltag when generating events.
 #define CURRENT_DEFAULT_TAG "main_2024-12-20"

@@ -54,8 +54,8 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("enableDatabase", m_enableDatabase, "Enable database to read the channel map.", true);
   addParam("enable2ndHit", m_enable2ndHit, "Enable 2nd hit timing as a individual CDCHit object.", false);
   addParam("tdcAuxOffset", m_tdcAuxOffset, "TDC auxiliary offset (in TDC count).", 0);
-  addParam("pedestalSubtraction", m_pedestalSubtraction, "Enbale ADC pedestal subtraction.", m_pedestalSubtraction);
-  addParam("relationRawHits", m_relationRawHits, "Enbale relation of CDCHits, CDCRawHits, and CDCRawHitWaveForms.", false);
+  addParam("pedestalSubtraction", m_pedestalSubtraction, "Enable ADC pedestal subtraction.", m_pedestalSubtraction);
+  addParam("relationRawHits", m_relationRawHits, "Enable relation of CDCHits, CDCRawHits, and CDCRawHitWaveForms.", false);
   addParam("recoverBoardIdError", m_recoverBoardIdError, "Recover boardID errors", true);
 }
 
@@ -140,7 +140,7 @@ void CDCUnpackerModule::event()
   }
 
   //
-  // Proccess RawCDC data block.
+  // Process RawCDC data block.
   //
 
   const int nEntries = m_rawCDCs.getEntries();
@@ -208,16 +208,8 @@ void CDCUnpackerModule::event()
 
         // Skip invalid boardsIDs
         if (m_boardId > 300) {
-          B2WARNING("Invalid board " << std::hex << m_boardId << std::dec << " readout buffer block: " << i << " block channel: " << iFiness);
-          if (m_recoverBoardIdError) {
-            m_boardId = m_boardId & 0x01ff;
-            if (m_boardId > 300) {
-              B2WARNING("Unrecoverable board " << std::hex << m_boardId);
-              continue;
-            }
-          } else {
-            continue;
-          }
+          B2WARNING("Unrecoverable board " << std::hex << m_boardId);
+          continue;
         }
 
         const int dataType = getDataType();
@@ -252,7 +244,7 @@ void CDCUnpackerModule::event()
         }
 
         //
-        // Check the data type (raw or supressed mode?).
+        // Check the data type (raw or suppressed mode?).
         //
 
         if (dataType == 1) { //  Raw data mode.
@@ -277,7 +269,7 @@ void CDCUnpackerModule::event()
 
           for (int iCh = 0; iCh < fadcTdcChannels; ++iCh) {
             const int offset = fadcTdcChannels;
-            unsigned short fadcSum = 0;     // FADC sum below thereshold.
+            unsigned short fadcSum = 0;     // FADC sum below threshold.
             unsigned short tdc1 = 0x7fff;   // Fastest TDC.
             unsigned short tdc2 = 0x7fff;   // 2nd fastest TDC.
 

@@ -74,7 +74,7 @@ ECLBhabhaTCollectorModule::ECLBhabhaTCollectorModule() : CalibrationCollectorMod
   addParam("skipTrgSel", skipTrgSel, "boolean to skip the trigger skim selection", false);
 
   addParam("hadronEventT0_TO_bhabhaEventT0_correction", m_hadronEventT0_TO_bhabhaEventT0_correction,
-           "CDC bhabha t0 bias correction (ns)", 0.);
+           "SVD bhabha t0 bias correction (ns)", 0.);
 
   // specify this flag if you need parallel processing
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -154,7 +154,7 @@ void ECLBhabhaTCollectorModule::inDefineHisto()
     m_dbgTree_evt_allCuts->Branch("maxEcrysTimeNegClust",
                                   &m_tree_maxEcrystNegClust)->SetTitle("Time of maximum energy crystal in cluster with -ve charge, GeV");
     m_dbgTree_evt_allCuts->Branch("t0", &m_tree_t0)->SetTitle("T0, ns");
-    m_dbgTree_evt_allCuts->Branch("t0_ECL_closestCDC", &m_tree_t0_ECLclosestCDC)->SetTitle("T0 ECL closest to CDC t0, ns");
+    m_dbgTree_evt_allCuts->Branch("t0_ECL_closestSVD", &m_tree_t0_ECLclosestSVD)->SetTitle("T0 ECL closest to SVD t0, ns");
     m_dbgTree_evt_allCuts->Branch("t0_ECL_minChi2", &m_tree_t0_ECL_minChi2)->SetTitle("T0 ECL with smallest chi squared, ns");
 
     m_dbgTree_evt_allCuts->SetAutoSave(10);
@@ -175,7 +175,7 @@ void ECLBhabhaTCollectorModule::inDefineHisto()
     m_dbgTree_crys_allCuts->Branch("timetsPreviousTimeCalibs",
                                    &m_tree_timetsPreviousTimeCalibs)->SetTitle("Time t_psi after application of previous Ts, ns");
     m_dbgTree_crys_allCuts->Branch("t0", &m_tree_t0)->SetTitle("T0, ns");
-    m_dbgTree_crys_allCuts->Branch("t0_ECL_closestCDC", &m_tree_t0_ECLclosestCDC)->SetTitle("T0 ECL closest to CDC t0, ns");
+    m_dbgTree_crys_allCuts->Branch("t0_ECL_closestSVD", &m_tree_t0_ECLclosestSVD)->SetTitle("T0 ECL closest to SVD t0, ns");
     m_dbgTree_crys_allCuts->Branch("t0_ECL_minChi2", &m_tree_t0_ECL_minChi2)->SetTitle("T0 ECL with smallest chi squared, ns");
     m_dbgTree_crys_allCuts->Branch("CrystalCellID", &m_tree_cid)->SetTitle("Cell ID, 1..8736");
 
@@ -205,7 +205,7 @@ void ECLBhabhaTCollectorModule::inDefineHisto()
                             &m_tree_timetsPreviousTimeCalibs)->SetTitle("Time t_psi after application of previous Ts, ns");
   m_dbgTree_allCuts->Branch("massInvTracks", &m_massInvTracks)->SetTitle("Invariant mass of the two tracks");
   m_dbgTree_allCuts->Branch("t0", &m_tree_t0)->SetTitle("T0, ns");
-  m_dbgTree_allCuts->Branch("t0_ECL_closestCDC", &m_tree_t0_ECLclosestCDC)->SetTitle("T0 ECL closest to CDC t0, ns");
+  m_dbgTree_allCuts->Branch("t0_ECL_closestSVD", &m_tree_t0_ECLclosestSVD)->SetTitle("T0 ECL closest to SVD t0, ns");
   m_dbgTree_allCuts->Branch("t0_ECL_minChi2", &m_tree_t0_ECL_minChi2)->SetTitle("T0 ECL with smallest chi squared, ns");
 
   m_dbgTree_allCuts->Branch("clusterTime", &m_tree_tClust)->SetTitle("Cluster time of cluster with +ve charge, GeV");
@@ -290,6 +290,9 @@ void ECLBhabhaTCollectorModule::prepare()
   auto cutflow = new TH1F("cutflow", ";Cut label number;Number of events passing cut", 20, 0, 20);
   registerObject<TH1F>("cutflow", cutflow);
 
+  auto svdEventT0 = new TH1D("svdEventT0", ";EventT0 from SVD", 200, -50, 50);
+  registerObject<TH1D>("svdEventT0", svdEventT0);
+
   auto maxEcrsytalEnergyFraction = new TH1F("maxEcrsytalEnergyFraction",
                                             ";Maximum energy crystal energy / (sum) cluster energy;Number", 22, 0, 1.1);
   registerObject<TH1F>("maxEcrsytalEnergyFraction", maxEcrsytalEnergyFraction);
@@ -298,8 +301,8 @@ void ECLBhabhaTCollectorModule::prepare()
                                         ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
   registerObject<TH1F>("refCrysIDzeroingCrate", refCrysIDzeroingCrate);
 
-  auto CDCEventT0Correction = new TH1F("CDCEventT0Correction", ";;CDC event t0 offset correction  [ns]", 1, 1, 2);
-  registerObject<TH1F>("CDCEventT0Correction", CDCEventT0Correction);
+  auto SVDEventT0Correction = new TH1F("SVDEventT0Correction", ";;SVD event t0 offset correction  [ns]", 1, 1, 2);
+  registerObject<TH1F>("SVDEventT0Correction", SVDEventT0Correction);
 
 
   //=== Required data objects
@@ -310,7 +313,7 @@ void ECLBhabhaTCollectorModule::prepare()
   m_eclDigitArray.isRequired();
 
   B2INFO("hadronEventT0_TO_bhabhaEventT0_correction = " <<  m_hadronEventT0_TO_bhabhaEventT0_correction <<
-         " ns correction to CDC event t0 will be applied");
+         " ns correction to SVD event t0 will be applied");
 
   B2INFO("skipTrgSel = " << skipTrgSel);
 
@@ -351,7 +354,7 @@ void ECLBhabhaTCollectorModule::collect()
     }
   }
 
-  /*  Fill the histogram showing that the trigger skim cut passed OR that we
+  /*  Fill the histgram showing that the trigger skim cut passed OR that we
       are skipping this selection. */
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
@@ -487,41 +490,39 @@ void ECLBhabhaTCollectorModule::collect()
 
 
 
-  // Save what CDC event t0 correction was applied
-  getObjectPtr<TH1F>("CDCEventT0Correction")->SetBinContent(1, m_hadronEventT0_TO_bhabhaEventT0_correction);
+  // Save what SVD event t0 correction was applied
+  getObjectPtr<TH1F>("SVDEventT0Correction")->SetBinContent(1, m_hadronEventT0_TO_bhabhaEventT0_correction);
 
 
 
 
-  /* Getting the event t0 using the full event t0 rather than from the CDC specifically */
+  /* Getting the event t0 using the full event t0 rather than from the SVD specifically */
   double evt_t0 = -1;
   double evt_t0_unc = -1;
-  double evt_t0_ECL_closestCDC = -1;
+  double evt_t0_ECL_closestSVD = -1;
   double evt_t0_ECL_minChi2 = -1;
 
-  // Determine if there is an event t0 to use and then extract the information about it
+  // Determine if the event t0 comes from the SVD then extract the information about it
   if (!m_eventT0.isValid()) {
     //cout << "event t0 not valid\n";
     return;
-  } else if (!m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
+  } else if (!m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD)) {
     //cout << "no event t0\n";
     return;
   } else {
-    // Event has a t0 from CDC
+    // SVD eventT0 is available
     cutIndexPassed++;
     getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
     B2DEBUG(22, "Cutflow: Event t0 exists: index = " << cutIndexPassed);
 
+    // Get eventT0 from SVD
+    const auto bestSVDEventT0Candidate = m_eventT0->getBestSVDTemporaryEventT0();
+    evt_t0 = bestSVDEventT0Candidate->eventT0;   // time value
+    evt_t0_unc = bestSVDEventT0Candidate->eventT0Uncertainty;   // uncertainty on event t0
+    getObjectPtr<TH1D>("svdEventT0")->Fill(evt_t0);
 
-    // Get event t0 from CDC.  We don't want event t0 from ECL as we are calibrating the ECL wrt the more accurately measured time measurements of the time.  Start with the CDC since it has an event t0 but in the future we may switch to the TOP detector.
-    // Based on the information from Thomas Hauth <Thomas.Hauth@kit.edu> (leaving physics) we should take the last event t0 in the list of event t0's from the CDC as the later event t0 measurements are calculated in slower but more accurate ways.
-    const auto bestCDCEventT0Candidate = m_eventT0->getBestCDCTemporaryEventT0();
-    evt_t0 = bestCDCEventT0Candidate->eventT0;   // time value
-    evt_t0_unc = bestCDCEventT0Candidate->eventT0Uncertainty;   // uncertainty on event t0
-
-
-    // Correct the CDC event t0 value for the bhabha bias
-    evt_t0 = evt_t0 + m_hadronEventT0_TO_bhabhaEventT0_correction;   // Bias not yet fixed in CDC t0 reco.
+    // Correct the SVD event t0 value for the bhabha bias, if any
+    evt_t0 = evt_t0 + m_hadronEventT0_TO_bhabhaEventT0_correction;
 
 
     // Get the ECL event t0 for comparison - validations
@@ -529,18 +530,18 @@ void ECLBhabhaTCollectorModule::collect()
       vector<EventT0::EventT0Component> evt_t0_list_ECL = m_eventT0->getTemporaryEventT0s(Const::EDetector::ECL);
 
 
-      double smallest_CDC_ECL_t0_diff = fabs(evt_t0_list_ECL[0].eventT0 - evt_t0);
-      int smallest_CDC_ECL_t0_diff_idx = 0;
+      double smallest_SVD_ECL_t0_diff = fabs(evt_t0_list_ECL[0].eventT0 - evt_t0);
+      int smallest_SVD_ECL_t0_diff_idx = 0;
       for (long unsigned int ECLi = 0; ECLi < evt_t0_list_ECL.size(); ECLi++) {
         double tempt_ECL_t0 = evt_t0_list_ECL[ECLi].eventT0;
-        if (fabs(tempt_ECL_t0 - evt_t0) < smallest_CDC_ECL_t0_diff) {
-          smallest_CDC_ECL_t0_diff = fabs(tempt_ECL_t0 - evt_t0);
-          smallest_CDC_ECL_t0_diff_idx = ECLi;
+        if (fabs(tempt_ECL_t0 - evt_t0) < smallest_SVD_ECL_t0_diff) {
+          smallest_SVD_ECL_t0_diff = fabs(tempt_ECL_t0 - evt_t0);
+          smallest_SVD_ECL_t0_diff_idx = ECLi;
         }
       }
 
-      evt_t0_ECL_closestCDC = evt_t0_list_ECL[smallest_CDC_ECL_t0_diff_idx].eventT0;   // time value
-      B2DEBUG(26, "evt_t0_ECL_closestCDC = " << evt_t0_ECL_closestCDC);
+      evt_t0_ECL_closestSVD = evt_t0_list_ECL[smallest_SVD_ECL_t0_diff_idx].eventT0;   // time value
+      B2DEBUG(26, "evt_t0_ECL_closestSVD = " << evt_t0_ECL_closestSVD);
 
 
 
@@ -709,7 +710,7 @@ void ECLBhabhaTCollectorModule::collect()
 
   /* Determine if the two tracks have the opposite electric charge.
      We know this because the track indices stores the max pt track in [0] for negatively charged track
-     and [1] for the positively charged track.  If both are filled then both a negatively charged
+     and [1] fo the positively charged track.  If both are filled then both a negatively charged
      and positively charged track were found.   */
   bool oppositelyChargedTracksPassed = maxiTrk[0] != -1  &&  maxiTrk[1] != -1;
   if (!oppositelyChargedTracksPassed) {
@@ -1035,7 +1036,7 @@ void ECLBhabhaTCollectorModule::collect()
       m_tree_E1p      = crystalEnergies[iCharge] / trkpLab[iCharge];
       m_tree_timetsPreviousTimeCalibs = times_noPreviousCalibrations[iCharge] - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge];
       m_tree_t0       = evt_t0;
-      m_tree_t0_ECLclosestCDC   = evt_t0_ECL_closestCDC;
+      m_tree_t0_ECLclosestSVD   = evt_t0_ECL_closestSVD;
       m_tree_t0_ECL_minChi2   = evt_t0_ECL_minChi2;
       m_tree_tClust = clusterTime[iCharge];
 
@@ -1060,7 +1061,7 @@ void ECLBhabhaTCollectorModule::collect()
     m_tree_maxEcrystPosClust = times_noPreviousCalibrations[0] - ts_prevCalib[0] - tcrate_prevCalib[0];
     m_tree_maxEcrystNegClust = times_noPreviousCalibrations[1] - ts_prevCalib[1] - tcrate_prevCalib[1];
     m_tree_t0       = evt_t0;
-    m_tree_t0_ECLclosestCDC   = evt_t0_ECL_closestCDC;
+    m_tree_t0_ECLclosestSVD   = evt_t0_ECL_closestSVD;
     m_tree_t0_ECL_minChi2   = evt_t0_ECL_minChi2;
 
     //  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Tree saving
@@ -1073,7 +1074,7 @@ void ECLBhabhaTCollectorModule::collect()
 
   B2DEBUG(26, "m_tree_maxEcrystPosClust + evt_t0 = " << m_tree_maxEcrystPosClust + evt_t0);
   B2DEBUG(26, "m_tree_maxEcrystNegClust + evt_t0 = " << m_tree_maxEcrystNegClust + evt_t0);
-  B2DEBUG(26, "CDC evt_t0 = " << evt_t0);
+  B2DEBUG(26, "SVD evt_t0 = " << evt_t0);
   B2DEBUG(26, "ECL min chi2 even t0, m_tree_t0_ECL_minChi2 = " << m_tree_t0_ECL_minChi2);
 
 
@@ -1085,7 +1086,7 @@ void ECLBhabhaTCollectorModule::collect()
     m_tree_ECLCalDigitE = E_ECLCaldigits_bothClusters[digit_i];
     m_tree_ECLDigitAmplitude = amp_ECLDigits_bothClusters[digit_i];
     m_tree_t0       = evt_t0;
-    m_tree_t0_ECLclosestCDC   = evt_t0_ECL_closestCDC;
+    m_tree_t0_ECLclosestSVD   = evt_t0_ECL_closestSVD;
     m_tree_t0_ECL_minChi2   = evt_t0_ECL_minChi2;
     m_tree_timetsPreviousTimeCalibs = times_noPreviousCalibrations[chargeID_ECLCaldigits_bothClusters[digit_i]] -
                                       ts_prevCalib[chargeID_ECLCaldigits_bothClusters[digit_i]] -

@@ -31,7 +31,7 @@ The post-reconstruction dataobjects are C++ classes found in the mdst dataobject
 
         ls $BELLE2_RELASE_DIR/mdst/dataobjects/include
 
-Or in the C++ doxygen documentation `here <https://software.belle2.org/|release|/group__mdst__dataobjects.html>`__.
+Or in the C++ doxygen documentation :doxygen:`here <group__mdst__dataobjects>`.
 
 ROOT and compatibility guarantee
 ================================

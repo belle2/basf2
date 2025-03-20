@@ -12,8 +12,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-// Magnetic field
-#include <framework/geometry/BFieldManager.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 using namespace std;
 

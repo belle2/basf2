@@ -11,7 +11,7 @@
 namespace Belle2 {
   namespace CDC {
     //! The Class for CDC Simulation Control Parameters
-    /*! This class provides control paramters for CDC simulation.
+    /*! This class provides control parameters for CDC simulation.
     */
     class CDCSimControlPar {
 

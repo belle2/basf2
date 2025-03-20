@@ -12,7 +12,6 @@
 #include <TRandom.h>
 #include <gtest/gtest.h>
 #include <cmath>
-#include <iostream>
 
 using namespace Belle2;
 

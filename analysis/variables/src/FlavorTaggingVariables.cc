@@ -109,7 +109,7 @@ namespace Belle2 {
           return 0;
       }
 
-      std::vector<ROOT::Math::XYZVector> p3_cms_roe;
+      std::vector<ROOT::Math::PxPyPzEVector> p_cms_roe;
       static const double P_MAX(3.2);
 
       // Charged tracks
@@ -120,7 +120,7 @@ namespace Belle2 {
         ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
         if (p_cms != p_cms) continue;
         if (p_cms.P() > P_MAX) continue;
-        p3_cms_roe.push_back(p_cms.Vect());
+        p_cms_roe.push_back(p_cms);
       }
 
       // ECLCluster->Gamma
@@ -133,7 +133,7 @@ namespace Belle2 {
           ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
           if (p_cms != p_cms) continue;
           if (p_cms.P() > P_MAX) continue;
-          p3_cms_roe.push_back(p_cms.Vect());
+          p_cms_roe.push_back(p_cms);
         }
       }
 
@@ -146,11 +146,11 @@ namespace Belle2 {
           ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
           if (p_cms != p_cms) continue;
           if (p_cms.P() > P_MAX) continue;
-          p3_cms_roe.push_back(p_cms.Vect());
+          p_cms_roe.push_back(p_cms);
         }
       }
 
-      const B2Vector3D thrustO = Thrust::calculateThrust(p3_cms_roe);
+      const B2Vector3D thrustO = Thrust::calculateThrust(p_cms_roe);
       const B2Vector3D pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
 
       double result = 0 ;
@@ -182,7 +182,7 @@ namespace Belle2 {
             return 0;
         }
 
-        std::vector<ROOT::Math::XYZVector> p3_cms_roe;
+        std::vector<ROOT::Math::PxPyPzEVector> p_cms_roe;
         // static const double P_MAX(3.2);
 
         // Charged tracks
@@ -194,7 +194,7 @@ namespace Belle2 {
           ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
           if (p_cms != p_cms) continue;
           // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
-          p3_cms_roe.push_back(p_cms.Vect());
+          p_cms_roe.push_back(p_cms);
         }
 
         // ECLCluster->Gamma
@@ -208,7 +208,7 @@ namespace Belle2 {
             ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
             if (p_cms != p_cms) continue;
             // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
-            p3_cms_roe.push_back(p_cms.Vect());
+            p_cms_roe.push_back(p_cms);
           }
         }
 
@@ -223,11 +223,11 @@ namespace Belle2 {
             ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
             if (p_cms != p_cms) continue;
             // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
-            p3_cms_roe.push_back(p_cms.Vect());
+            p_cms_roe.push_back(p_cms);
           }
         }
 
-        const B2Vector3D thrustO  = Thrust::calculateThrust(p3_cms_roe);
+        const B2Vector3D thrustO  = Thrust::calculateThrust(p_cms_roe);
         const B2Vector3D pAxis = PCmsLabTransform::labToCms(particle->get4Vector()).Vect();
 
         double result = 0 ;
@@ -1930,7 +1930,7 @@ namespace Belle2 {
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
         if (!ListOfParticles.isValid()) return 0;
 
-        const auto mdstIndex = particle->getMdstArrayIndex();
+        const auto mdstSource = particle->getMdstSource();
 
         Particle* target = nullptr; //Particle selected as target
         for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
@@ -1939,7 +1939,7 @@ namespace Belle2 {
           if (!particlei)
             continue;
 
-          if (particlei->getMdstArrayIndex() == mdstIndex) {
+          if (particlei->getMdstSource() == mdstSource) {
             target = particlei;
             break;
           }

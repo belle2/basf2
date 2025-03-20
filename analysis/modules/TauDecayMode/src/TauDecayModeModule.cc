@@ -11,13 +11,11 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
-#include <iostream>
 #include <vector>
 #include <algorithm>
 #include <TParticlePDG.h>
 #include <map>
 #include <fstream>
-#include <set>
 #include <Math/LorentzRotation.h>
 #include <Math/Boost.h>
 using namespace std;

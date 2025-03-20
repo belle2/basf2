@@ -36,7 +36,7 @@ add_reconstruction(main)
 
 # enable debug output for the module added by add_reconstruction()
 for m in main.modules():
-    if m.name() == 'CDCDedxPID':
+    if m.name() == 'CDCDedxPIDCreator':
         m.param('enableDebugOutput', True)
 
 

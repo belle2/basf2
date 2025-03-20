@@ -5,13 +5,14 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #pragma once
 
 #include <framework/core/HistoModule.h>
+
 #include <TH1D.h>
 
 #include <limits>
-#include <vector>
 
 namespace Belle2 {
   /**

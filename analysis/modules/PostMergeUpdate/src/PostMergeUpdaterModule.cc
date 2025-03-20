@@ -9,7 +9,6 @@
 #include <analysis/modules/PostMergeUpdate/PostMergeUpdaterModule.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <framework/logging/Logger.h>
-#include <analysis/utility/RotationTools.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <TDatabasePDG.h>
 #include <Math/Vector3D.h>

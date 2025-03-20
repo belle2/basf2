@@ -309,7 +309,7 @@ class MonitoringModuleStatistics:
                                                                'VariablesToHistogram': 0.0,
                                                                'VariablesToNtuple': 0.0}
             for key, time in statistic.items():
-                if(channel.decayString in key or channel.name in key):
+                if (channel.decayString in key or channel.name in key):
                     self.channel_time[channel.label] += time
                     for k in self.channel_time_per_module[channel.label]:
                         if k in key:
@@ -326,10 +326,10 @@ def MonitorCosBDLPlot(particle, filename):
     """ Creates a CosBDL plot using ROOT. """
     if not particle.final_ntuple.valid:
         return
-    df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
-                                  ['extraInfo__bouniqueSignal__bc', 'cosThetaBetweenParticleAndNominalB',
-                                   'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
-                                  ['unique', 'cosThetaBDl', 'probability', 'signal'])
+    df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
+                                   ['extraInfo__bouniqueSignal__bc', 'cosThetaBetweenParticleAndNominalB',
+                                    'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                   ['unique', 'cosThetaBDl', 'probability', 'signal'])
     for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
         p = plotting.VerboseDistribution(range_in_std=5.0)
         common = (np.abs(df['cosThetaBDl']) < 10) & (df['probability'] >= cut)
@@ -346,10 +346,10 @@ def MonitorMbcPlot(particle, filename):
     """ Creates a Mbc plot using ROOT. """
     if not particle.final_ntuple.valid:
         return
-    df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
-                                  ['extraInfo__bouniqueSignal__bc', 'Mbc',
-                                   'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
-                                  ['unique', 'Mbc', 'probability', 'signal'])
+    df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
+                                   ['extraInfo__bouniqueSignal__bc', 'Mbc',
+                                    'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                   ['unique', 'Mbc', 'probability', 'signal'])
     for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
         p = plotting.VerboseDistribution(range_in_std=5.0)
         common = (df['Mbc'] > 5.23) & (df['probability'] >= cut)
@@ -366,10 +366,10 @@ def MonitorROCPlot(particle, filename):
     """ Creates a ROC plot using ROOT. """
     if not particle.final_ntuple.valid:
         return
-    df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
-                                  ['extraInfo__bouniqueSignal__bc',
-                                   'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
-                                  ['unique', 'probability', 'signal'])
+    df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
+                                   ['extraInfo__bouniqueSignal__bc',
+                                    'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                   ['unique', 'probability', 'signal'])
     p = plotting.RejectionOverEfficiency()
     p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0, label='All')
     p.finish()
@@ -380,10 +380,10 @@ def MonitorDiagPlot(particle, filename):
     """ Creates a Diagonal plot using ROOT. """
     if not particle.final_ntuple.valid:
         return
-    df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
-                                  ['extraInfo__bouniqueSignal__bc',
-                                   'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
-                                  ['unique', 'probability', 'signal'])
+    df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
+                                   ['extraInfo__bouniqueSignal__bc',
+                                    'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                   ['unique', 'probability', 'signal'])
     p = plotting.Diagonal()
     p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0)
     p.finish()

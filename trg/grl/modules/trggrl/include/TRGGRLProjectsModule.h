@@ -32,7 +32,7 @@ namespace Belle2 {
     /// Destructor
     virtual ~TRGGRLProjectsModule() {};
 
-    /// Initilizes TRGGRLProjectsModule.
+    /// Initializes TRGGRLProjectsModule.
     virtual void initialize() override;
 
     /// Called when new run started.

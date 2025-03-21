@@ -103,7 +103,7 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
                                 "z Resolution of Simulated HW Tracks; delta z [cm]",
                                 200, -100, 100);
 
-  // histograms wih just hwneuro and hw2dtracks:
+  // histograms with just hwneuro and hw2dtracks:
 
   m_neuroHWOutZ = new TH1F("NeuroHWOutZ",
                            "z distribution of unpacked and valid neuro tracks; z [cm]",

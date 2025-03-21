@@ -718,7 +718,7 @@ class Teacher:
                     for channel in particle.channels:
                         weightfile = channel.label + '.xml'
                         if not basf2_mva.available(weightfile):
-                            keys = [m for m in f.GetListOfKeys() if f"{channel.label}" in m.GetName()]
+                            keys = [m for m in f.GetListOfKeys() if f"{channel.label} variables" in m.GetName()]
                             if not keys:
                                 continue
                             tree = keys[0].ReadObj()

@@ -36,7 +36,7 @@ ma.matchMCTruth(list_name='Lambda0:merged', path=my_path)
 ma.cutAndCopyLists('Lambda0:V0Selector', 'Lambda0:merged', cut='mcPDG!=310', path=my_path)
 # apply cuts suitable for KsVeto
 # only include long lived particle, K_S0 and Lambda
-ma.cutAndCopyLists('Lambda0:KsVeto',     'Lambda0:merged', cut='isSignal==1 or abs(mcPDG)==310', path=my_path)
+ma.cutAndCopyLists('Lambda0:KsVeto',     'Lambda0:merged', cut='isSignal==1 or mcPDG==310', path=my_path)
 
 # add variable aliases required for Lambda0Selector training
 LambdaSelector.add_variable_collection()

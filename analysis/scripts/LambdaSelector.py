@@ -1,9 +1,16 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 import modularAnalysis as ma
 import variables
 from variables import utils
 from basf2 import B2INFO, B2ERROR
 import basf2_mva
-
 # import torch as torch
 # Check if GPU is available
 # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -127,7 +134,7 @@ def V0Selector_Training(
              'max_depth': 8,
              'max_bin': 250,
              'boosting': 'gbdt',
-             'trainFraction': '0.8',
+             'trainFraction': 0.8,
              }
     if isinstance(parameters, dict):
         param.update(parameters)
@@ -197,7 +204,7 @@ def KsVeto_Training(
              'max_bin': 250,
              'boosting': 'gbdt',
              'max_depth': 8,
-             'trainFraction': '0.8',
+             'trainFraction': 0.8,
              'min_data_in_leaf': 300,
              'objective': 'cross_entropy',
              }
@@ -236,7 +243,7 @@ def LambdaSelector(
     You can apply preset cut or custom cut by giving parameters. In this case,
     a new particleList is created from the original particleList applying cuts on the MVA output.
 
-    @param particleLists                Reconstructed Lambda0 -> p+ pi- list.
+    @param particleListName             Reconstructed Lambda0 -> p+ pi- list.
     @param output_label_name            Label of the returned Lambda particleList.
                                         When empty '', no cut is applied and new particleList is not created.
                                         When custom name, the custom threshold is used, and useCustomThreshold

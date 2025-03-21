@@ -12,7 +12,7 @@
 #                                                                        #
 # This tutorial demonstrates how to train weight file for LambdaSelector #
 # Data sample for this training is created by                            #
-# B2A916-CreateTrainData_Lambda.py                                       #
+# CreateTrainData_Lambda.py                                              #
 #                                                                        #
 ##########################################################################
 

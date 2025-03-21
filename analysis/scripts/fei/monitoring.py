@@ -30,6 +30,7 @@ import math
 import os
 import numpy as np
 import pdg
+import fei
 
 
 def removeJPsiSlash(string):
@@ -61,52 +62,67 @@ class Statistic:
         @param nBg the number of reconstructed background candidates
         """
         #: the number of true signal particles
-        self.nTrueSig = nTrueSig
+        self._nTrueSig = nTrueSig
         #: the number of reconstructed signal candidates
-        self.nSig = nSig
+        self._nSig = nSig
         #: the number of reconstructed background candidates
-        self.nBg = nBg
+        self._nBg = nBg
+
+    @property
+    def nSig(self):
+        """ Returns the number of reconstructed signal candidates. """
+        return self._nSig
+
+    @property
+    def nTrueSig(self):
+        """ Returns the number of reconstructed true signal candidates. """
+        return self._nTrueSig
+
+    @property
+    def nBg(self):
+        """ Returns the number of reconstructed background candidates. """
+        return self._nBg
 
     @property
     def nTotal(self):
         """ Returns total number of reconstructed candidates. """
-        return self.nSig + self.nBg
+        return self._nSig + self._nBg
 
     @property
     def purity(self):
         """ Returns the purity of the reconstructed candidates. """
-        if self.nSig == 0:
+        if self._nSig == 0:
             return 0.0
         if self.nTotal == 0:
             return 0.0
-        return self.nSig / float(self.nTotal)
+        return self._nSig / float(self.nTotal)
 
     @property
     def efficiency(self):
         """ Returns the efficiency of the reconstructed signal candidates with respect to the number of true signal particles. """
-        if self.nSig == 0:
+        if self._nSig == 0:
             return 0.0
-        if self.nTrueSig == 0:
+        if self._nTrueSig == 0:
             return float('inf')
-        return self.nSig / float(self.nTrueSig)
+        return self._nSig / float(self._nTrueSig)
 
     @property
     def purityError(self):
         """ Returns the uncertainty of the purity. """
         if self.nTotal == 0:
             return 0.0
-        return self.calcStandardDeviation(self.nSig, self.nTotal)
+        return self.calcStandardDeviation(self._nSig, self.nTotal)
 
     @property
     def efficiencyError(self):
         """
         Returns the uncertainty of the efficiency.
-        For an efficiency eps = self.nSig/self.nTrueSig, this function calculates the
+        For an efficiency eps = self._nSig/self._nTrueSig, this function calculates the
         standard deviation according to http://arxiv.org/abs/physics/0701199 .
         """
-        if self.nTrueSig == 0:
+        if self._nTrueSig == 0:
             return float('inf')
-        return self.calcStandardDeviation(self.nSig, self.nTrueSig)
+        return self.calcStandardDeviation(self._nSig, self._nTrueSig)
 
     def calcStandardDeviation(self, k, n):
         """ Helper method to calculate the standard deviation for efficiencies. """
@@ -252,12 +268,16 @@ class MonitoringNTuple:
         import ROOT  # noqa
         #: Indicates if the ntuple were successfully read
         self.valid = os.path.isfile(filename)
+        print(f'FEI-monitoring: Looking for {filename}')
         if not self.valid:
+            raise RuntimeError(f"Could not find {filename}: current dir is {os.getcwd()}")
             return
         #: Reference to the ROOT file, so it isn't closed
         self.f = ROOT.TFile.Open(filename, 'read')
+        print(f'FEI-monitoring: Found {filename}')
         #: Reference to the tree named variables inside the ROOT file
         self.tree = self.f.Get(f'{treenameprefix} variables')
+        print(f'FEI-monitoring: Found {treenameprefix} variables')
         #: Filename so we can use it later
         self.filename = filename
 
@@ -360,6 +380,26 @@ def MonitorMbcPlot(particle, filename):
         p.axis.set_title(f"Beam constrained mass for signal probability >= {cut:.2f}")
         p.axis.set_xlabel("Mbc")
         p.save(f'{filename}_{i}.png')
+
+
+def MonitorSigProbPlot(particle, filename):
+    """ Creates a Signal probability plot using ROOT. """
+    if not particle.final_ntuple.valid:
+        return
+    df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
+                                   ['extraInfo__bouniqueSignal__bc',
+                                    'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                   ['unique', 'probability', 'signal'])
+
+    p = plotting.VerboseDistribution(range_in_std=5.0)
+    common = (df['probability'] >= 0) & (df['probability'] <= 1)
+    df = df[common]
+    p.add(df, 'probability', (df['signal'] == 1), label="Signal")
+    p.add(df, 'probability', (df['signal'] != 1), label="Background")
+    p.finish()
+    p.axis.set_title("Signal probability")
+    p.axis.set_xlabel("Probability")
+    p.save(filename + '.png')
 
 
 def MonitorROCPlot(particle, filename):
@@ -556,6 +596,16 @@ class MonitoringParticle:
         """
         #: Particle containing its configuration
         self.particle = particle
+        particlesInStages = fei.core.get_stages_from_particles([particle])
+        stage = 0
+        for i in range(len(particlesInStages)):
+            for iparticle in particlesInStages[i]:
+                if iparticle.identifier == self.particle.identifier:
+                    stage = i+1
+                    break
+        if stage == 0:
+            raise RuntimeError(f"Could not find particle {self.particle.identifier} in the list of stages.")
+
         #: Dictionary with 'sum', 'std', 'mean', 'min' and 'max' of the MC counts
         self.mc_count = MonitoringMCCount(particle)
         #: Module statistics
@@ -621,10 +671,10 @@ class MonitoringParticle:
         self.after_ranking_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
         #: Statistic object before unique tagging of signals
         self.before_tag = self.calculateStatistic(hist, self.particle.mvaConfig.target)
-        #: Statistic object after unique tagging of signals
-        self.after_tag = self.calculateUniqueStatistic(hist)
         #: Reference to the final ntuple
         self.final_ntuple = MonitoringNTuple('Monitor_Final.root', f'{plist}')
+        #: Statistic object after unique tagging of signals
+        self.after_tag = self.calculateUniqueStatistic(self.final_ntuple)
 
     def calculateStatistic(self, hist, target):
         """
@@ -639,17 +689,20 @@ class MonitoringParticle:
         nBg = hist.values[target][bckgrd_bins].sum()
         return Statistic(nTrueSig, nSig, nBg)
 
-    def calculateUniqueStatistic(self, hist):
+    def calculateUniqueStatistic(self, tree):
         """
         Calculate Static object where only unique signal candidates are considered signal
         """
         nTrueSig = self.mc_count['sum']
-        if not hist.valid:
+        if not tree:
             return Statistic(nTrueSig, 0, 0)
-        signal_bins = hist.centers['extraInfo(uniqueSignal)'] > 0.5
-        bckgrd_bins = hist.centers['extraInfo(uniqueSignal)'] <= 0.5
-        nSig = hist.values['extraInfo(uniqueSignal)'][signal_bins].sum()
-        nBg = hist.values['extraInfo(uniqueSignal)'][bckgrd_bins].sum()
+
+        nSig, nBg = 0, 0
+        for entry in tree:
+            if getattr(entry, "extraInfo__bouniqueSignal__bc") == 1:
+                nSig += 1
+            else:
+                nBg += 1
         return Statistic(nTrueSig, nSig, nBg)
 
 # @endcond

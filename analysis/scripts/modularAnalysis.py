@@ -4500,7 +4500,7 @@ def getECLKLID(particleList: str, variable='ECLKLID', path=None):
     from variables import variables
     path.add_module('MVAExpert', listNames=particleList, extraInfoName='ECLKLID', identifier='ECLKLID')
 
-    variables.addAlias(variable, 'extraInfo(ECLKLID)')
+    variables.addAlias(variable, 'conditionalVariableSelector(isFromECL and PDG==130, extraInfo(ECLKLID), constant(NaN))')
 
 
 def getNbarIDMVA(particleList: str, path=None):

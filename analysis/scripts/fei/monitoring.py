@@ -171,6 +171,8 @@ class MonitoringHist:
         self.values = {}
         #: Dictionary of bin-centers for each histogram
         self.centers = {}
+        #: Dictionary of 2D mode for each histogram
+        self.two_dimensional = {}
         #: Dictionary of number of bins for each histogram
         self.nbins = {}
         #: Indicates if the histograms were successfully read
@@ -188,12 +190,12 @@ class MonitoringHist:
             if not (isinstance(hist, ROOT.TH1D) or isinstance(hist, ROOT.TH1F) or
                     isinstance(hist, ROOT.TH2D) or isinstance(hist, ROOT.TH2F)):
                 continue
-            two_dimensional = isinstance(hist, ROOT.TH2D) or isinstance(hist, ROOT.TH2F)
-            if two_dimensional:
+            self.two_dimensional[name] = isinstance(hist, ROOT.TH2D) or isinstance(hist, ROOT.TH2F)
+            if self.two_dimensional[name]:
                 nbins = (hist.GetNbinsX(), hist.GetNbinsY())
-                self.centers[name] = np.array([[hist.GetXaxis().GetBinCenter(i) for i in range(nbins[0] + 2)],
-                                               [hist.GetYaxis().GetBinCenter(i) for i in range(nbins[1] + 2)]])
-                self.values[name] = np.array([[hist.GetBinContent(i, j) for i in range(nbins[0] + 2)] for j in range(nbins[1] + 2)])
+                self.centers[name] = [[hist.GetXaxis().GetBinCenter(i) for i in range(nbins[0] + 2)],
+                                      [hist.GetYaxis().GetBinCenter(i) for i in range(nbins[1] + 2)]]
+                self.values[name] = [[hist.GetBinContent(i, j) for i in range(nbins[0] + 2)] for j in range(nbins[1] + 2)]
                 self.nbins[name] = nbins
             else:
                 nbins = hist.GetNbinsX()
@@ -208,6 +210,12 @@ class MonitoringHist:
         """
         if name not in self.centers:
             return np.nan
+        if self.two_dimensional[name]:
+            tempsum = 0
+            for i in range(len(self.values[name])):
+                for j in range(len(self.values[name][i])):
+                    tempsum += self.values[name][i][j]
+            return tempsum
         return np.sum(self.values[name])
 
     def mean(self, name):
@@ -217,6 +225,12 @@ class MonitoringHist:
         """
         if name not in self.centers:
             return np.nan
+        if self.two_dimensional[name]:
+            tempsum = 0
+            for i in range(len(self.values[name])):
+                for j in range(len(self.values[name][i])):
+                    tempsum += self.centers[name][i][j] * self.values[name][i][j]
+            return tempsum / self.sum(name)
         return np.average(self.centers[name], weights=self.values[name])
 
     def std(self, name):
@@ -226,6 +240,13 @@ class MonitoringHist:
         """
         if name not in self.centers:
             return np.nan
+        if self.two_dimensional[name]:
+            avg = self.mean(name)
+            tempsum = 0
+            for i in range(len(self.values[name])):
+                for j in range(len(self.values[name][i])):
+                    tempsum += self.values[name][i][j] * (self.centers[name][i][j] - avg)**2
+            return np.sqrt(tempsum / self.sum(name))
         avg = np.average(self.centers[name], weights=self.values[name])
         return np.sqrt(np.average((self.centers[name] - avg)**2, weights=self.values[name]))
 
@@ -239,6 +260,13 @@ class MonitoringHist:
         nonzero = np.nonzero(self.values[name])[0]
         if len(nonzero) == 0:
             return np.nan
+        if self.two_dimensional[name]:
+            tempmin = np.inf
+            for i in range(len(self.values[name])):
+                for j in range(len(self.values[name][i])):
+                    if self.values[name][i][j] < tempmin:
+                        tempmin = self.centers[name][i][j]
+            return tempmin
         return self.centers[name][nonzero[0]]
 
     def max(self, name):
@@ -251,6 +279,13 @@ class MonitoringHist:
         nonzero = np.nonzero(self.values[name])[0]
         if len(nonzero) == 0:
             return np.nan
+        if self.two_dimensional[name]:
+            tempmax = -np.inf
+            for i in range(len(self.values[name])):
+                for j in range(len(self.values[name][i])):
+                    if self.values[name][i][j] > tempmax:
+                        tempmax = self.centers[name][i][j]
+            return tempmax
         return self.centers[name][nonzero[-1]]
 
 

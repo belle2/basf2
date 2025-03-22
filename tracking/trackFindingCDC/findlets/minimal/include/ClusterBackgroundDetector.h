@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/filters/cluster/ChooseableClusterFilter.h>
 
@@ -21,11 +21,11 @@ namespace Belle2 {
     class CDCWireHitCluster;
 
     /// Marks clusters as background based on a background measure
-    class ClusterBackgroundDetector : public Findlet<CDCWireHitCluster&> {
+    class ClusterBackgroundDetector : public TrackingUtilities::Findlet<CDCWireHitCluster&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHitCluster&>;
+      using Super = TrackingUtilities::Findlet<CDCWireHitCluster&>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.

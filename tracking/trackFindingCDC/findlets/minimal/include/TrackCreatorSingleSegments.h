@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
 
 #include <map>
 #include <vector>
@@ -17,9 +17,12 @@
 
 namespace Belle2 {
 
+  namespace TrackingUtilities {
+    class CDCTrack;
+  }
+
   namespace TrackFindingCDC {
     class CDCSegment2D;
-    class CDCTrack;
 
     /**
      *  Searches for segments that have not been used at all and creates tracks from them.
@@ -27,11 +30,11 @@ namespace Belle2 {
      *  This number can be set differently for each super layer
      *  Usually only the segments of the inner most super layer might be interesting to be treated as tracks.
      */
-    class TrackCreatorSingleSegments : public Findlet<const CDCSegment2D, CDCTrack&> {
+    class TrackCreatorSingleSegments : public TrackingUtilities::Findlet<const CDCSegment2D, TrackingUtilities::CDCTrack&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCSegment2D, CDCTrack&>;
+      using Super = TrackingUtilities::Findlet<const CDCSegment2D, TrackingUtilities::CDCTrack&>;
 
     public:
       /// Constructor setting up default parameters.
@@ -46,7 +49,7 @@ namespace Belle2 {
     public:
       /// Main algorithm
       void
-      apply(const std::vector<CDCSegment2D>& segments, std::vector<CDCTrack>& tracks) final;
+      apply(const std::vector<CDCSegment2D>& segments, std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
     private:
       /**
@@ -57,7 +60,7 @@ namespace Belle2 {
        *  Defaults to {{0, 15}}, meaning a segment with more then 15 hits
        *  in the first super layer will become a track.
        */
-      std::map<ISuperLayer, size_t> m_param_minimalHitsBySuperLayerId;
+      std::map<TrackingUtilities::ISuperLayer, size_t> m_param_minimalHitsBySuperLayerId;
     };
   }
 }

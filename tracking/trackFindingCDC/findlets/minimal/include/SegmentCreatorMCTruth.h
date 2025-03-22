@@ -7,23 +7,26 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
 
+  namespace TrackingUtilities {
+    class CDCWireHit;
+  }
+
   namespace TrackFindingCDC {
     class CDCSegment2D;
-    class CDCWireHit;
 
     /// Findlet that generates segments from wire hits using the mc truth information.
-    class SegmentCreatorMCTruth : public Findlet<const CDCWireHit, CDCSegment2D> {
+    class SegmentCreatorMCTruth : public TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit, CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHit, CDCSegment2D>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit, CDCSegment2D>;
 
     public:
       /// Expose the parameters to a module
@@ -39,7 +42,7 @@ namespace Belle2 {
       void beginEvent() final;
 
       /// Main function of the segment finding by the cellular automaton.
-      void apply(const std::vector<CDCWireHit>& inputWireHits,
+      void apply(const std::vector<TrackingUtilities::CDCWireHit>& inputWireHits,
                  std::vector<CDCSegment2D>& outputSegments) final;
 
     private:

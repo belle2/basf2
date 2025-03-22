@@ -7,25 +7,30 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
+#include <tracking/trackingUtilities/ca/MultipassCellularPathFinder.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
+  namespace TrackingUtilities {
+    class CDCTrack;
+  }
   namespace TrackFindingCDC {
     class CDCSegment3D;
 
     /// Combines two sets of tracks to one final set by merging tracks that have large overlaps
-    class TrackCombiner : public Findlet<const CDCTrack, const CDCTrack, CDCTrack> {
+    class TrackCombiner : public
+      TrackingUtilities::Findlet<const TrackingUtilities::CDCTrack, const TrackingUtilities::CDCTrack, TrackingUtilities::CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCTrack, const CDCTrack, CDCTrack>;
+      using Super =
+        TrackingUtilities::Findlet<const TrackingUtilities::CDCTrack, const TrackingUtilities::CDCTrack, TrackingUtilities::CDCTrack>;
 
     public:
       /// Default constructor
@@ -39,9 +44,9 @@ namespace Belle2 {
 
     public:
       /// Main algorithm
-      void apply(const std::vector<CDCTrack>& inputTracks,
-                 const std::vector<CDCTrack>& secondInputTracks,
-                 std::vector<CDCTrack>& tracks) final;
+      void apply(const std::vector<TrackingUtilities::CDCTrack>& inputTracks,
+                 const std::vector<TrackingUtilities::CDCTrack>& secondInputTracks,
+                 std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
     private:
       /// Parameter : Activate the identification of common segments
@@ -49,7 +54,7 @@ namespace Belle2 {
 
     private:
       /// Instance of the cellular automaton path finder
-      MultipassCellularPathFinder<const CDCSegment3D> m_cellularPathFinder;
+      TrackingUtilities::MultipassCellularPathFinder<const CDCSegment3D> m_cellularPathFinder;
     };
   }
 }

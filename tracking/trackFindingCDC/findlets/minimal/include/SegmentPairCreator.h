@@ -7,13 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/AxialSegmentPairCreator.h>
 
 #include <tracking/trackFindingCDC/filters/segmentPair/ChooseableSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
 
 #include <vector>
 #include <array>
@@ -27,11 +27,11 @@ namespace Belle2 {
     class CDCSegmentPair;
 
     /// Class providing construction combinatorics for the axial stereo segment pairs.
-    class SegmentPairCreator : public Findlet<const CDCSegment2D, CDCSegmentPair> {
+    class SegmentPairCreator : public TrackingUtilities::Findlet<const CDCSegment2D, CDCSegmentPair> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCSegment2D, CDCSegmentPair>;
+      using Super = TrackingUtilities::Findlet<const CDCSegment2D, CDCSegmentPair>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -66,7 +66,7 @@ namespace Belle2 {
 
       // Object pools
       /// Structure for the segments grouped by super layer id.
-      std::array<std::vector<const CDCSegment2D*>, ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
+      std::array<std::vector<const CDCSegment2D*>, TrackingUtilities::ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
     };
   }
 }

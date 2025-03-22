@@ -8,20 +8,23 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
+  }
+
+  namespace TrackFindingCDC {
 
     /**
      * A small findlet that removes flags from hits not accepted by conventional tracking.
      */
-    class HitReclaimer : public Findlet<const CDCWireHit> {
+    class HitReclaimer : public TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHit>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit>;
 
     public:
       /// Constructor
@@ -34,7 +37,7 @@ namespace Belle2 {
       std::string getDescription() final;
 
       /// Execute over wireHits
-      void apply(const std::vector<CDCWireHit>& wireHits);
+      void apply(const std::vector<TrackingUtilities::CDCWireHit>& wireHits);
     };
   }
 }

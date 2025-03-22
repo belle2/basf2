@@ -7,13 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
-#include <tracking/trackFindingCDC/topology/EWirePosition.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/EWirePosition.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <cdc/geometry/CDCGeometryParConstants.h>
 
@@ -30,18 +30,21 @@ namespace Belle2 {
     class TDCCountTranslatorBase;
     class ADCCountTranslatorBase;
   }
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
+  }
+
+  namespace TrackFindingCDC {
 
     /**
      *  Combines the geometrical information and the raw hit information into wire hits,
      *  which can be used from all modules after that.
      */
-    class WireHitCreator : public Findlet<CDCWireHit> {
+    class WireHitCreator : public TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHit>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit>;
 
     public:
       /// Default constructor
@@ -63,7 +66,7 @@ namespace Belle2 {
       void beginRun() final;
 
       /// Main algorithm creating the wire hits
-      void apply(std::vector<CDCWireHit>& outputWireHits) final;
+      void apply(std::vector<TrackingUtilities::CDCWireHit>& outputWireHits) final;
 
     private:
       /// Parameter : Geometry set to be used. Either "base", "misalign" or " aligned"
@@ -104,25 +107,25 @@ namespace Belle2 {
 
     private: // Prepared variables
       /// Geometry set to be used.
-      EWirePosition m_wirePosition = EWirePosition::c_Base;
+      TrackingUtilities::EWirePosition m_wirePosition = TrackingUtilities::EWirePosition::c_Base;
 
       /// Cut for approximate drift time (super-layer dependent)
-      std::array<float, ISuperLayerUtil::c_N> m_maxDriftTimes = { -1, -1, -1, -1, -1, -1, -1, -1, -1};
+      std::array<float, TrackingUtilities::ISuperLayerUtil::c_N> m_maxDriftTimes = { -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
       /// Method for the initial time of flight estimation
       EPreferredDirection m_flightTimeEstimation = EPreferredDirection::c_None;
 
       /// Central location of the flight time zero position. Usually the location of the trigger.
-      Vector3D m_triggerPoint = Vector3D(0.0, 0.0, 0.0);
+      TrackingUtilities::Vector3D m_triggerPoint = TrackingUtilities::Vector3D(0.0, 0.0, 0.0);
 
       /// Bits for the used super layers
-      std::array<bool, ISuperLayerUtil::c_N> m_useSuperLayers{};
+      std::array<bool, TrackingUtilities::ISuperLayerUtil::c_N> m_useSuperLayers{};
 
       /// Bits for the used layers
       std::array<bool, c_maxNSenseLayers> m_useLayers{};
 
       /// Unit vectors denoting the sector for which hits should be created
-      std::array<Vector2D, 2> m_useSector{};
+      std::array<TrackingUtilities::Vector2D, 2> m_useSector{};
 
     private: // Translators
       /// TDC Count translator to be used to calculate the initial dirft length estiamtes

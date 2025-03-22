@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/SimpleSegmentHoughTree.h>
 #include <tracking/trackFindingCDC/hough/algorithms/InPhi0ImpactCurvBox.h>
@@ -17,17 +17,19 @@
 #include <memory>
 
 namespace Belle2 {
+  namespace TrackingUtilities {
+    class CDCTrack;
+  }
 
   namespace TrackFindingCDC {
     class CDCSegment2D;
-    class CDCTrack;
 
     /// Generates axial tracks from segments using the hough algorithm
-    class AxialTrackCreatorSegmentHough : public Findlet<const CDCSegment2D, CDCTrack> {
+    class AxialTrackCreatorSegmentHough : public TrackingUtilities::Findlet<const CDCSegment2D, TrackingUtilities::CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCSegment2D, CDCTrack>;
+      using Super = TrackingUtilities::Findlet<const CDCSegment2D, TrackingUtilities::CDCTrack>;
 
     public:
       /// Short description of the findlet
@@ -40,7 +42,7 @@ namespace Belle2 {
       void initialize() final;
 
       /// Generates the tracks from the given segments into the output argument.
-      void apply(const std::vector<CDCSegment2D>& segments, std::vector<CDCTrack>& tracks) final;
+      void apply(const std::vector<CDCSegment2D>& segments, std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
       /// Cleanup the findlet after event processing
       void terminate() final;

@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
@@ -28,11 +28,11 @@ namespace Belle2 {
 
     /// Fits segments with the Riemann method.
     class SegmentFitter:
-      public Findlet<CDCSegment2D&> {
+      public TrackingUtilities::Findlet<CDCSegment2D&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCSegment2D&>;
+      using Super = TrackingUtilities::Findlet<CDCSegment2D&>;
 
     public:
       /// Short description of the findlet

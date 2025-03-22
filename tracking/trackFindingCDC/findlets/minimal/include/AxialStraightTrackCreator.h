@@ -8,24 +8,29 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 namespace Belle2 {
   class ECLCluster;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
     class CDCWireHit;
     class CDCTrajectory2D;
+  }
+
+  namespace TrackFindingCDC {
 
     /**
      * A findlet that searches for straight tracks in CDC coming form IP to an ECL cluster.
      */
-    class AxialStraightTrackCreator : public Findlet<const ECLCluster* const, const CDCWireHit* const, CDCTrack> {
+    class AxialStraightTrackCreator : public
+      TrackingUtilities::Findlet<const ECLCluster* const, const TrackingUtilities::CDCWireHit* const, TrackingUtilities::CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const ECLCluster* const, const CDCWireHit* const, CDCTrack>;
+      using Super =
+        TrackingUtilities::Findlet<const ECLCluster* const, const TrackingUtilities::CDCWireHit* const, TrackingUtilities::CDCTrack>;
 
     public:
       /// Constructor
@@ -42,13 +47,13 @@ namespace Belle2 {
 
       /// Execute one pass over given clusters and wirehits and create tracks
       void apply(const std::vector<const ECLCluster*>& eclClusters,
-                 const std::vector<const CDCWireHit*>& axialWireHits,
-                 std::vector<CDCTrack>& tracks) final;
+                 const std::vector<const TrackingUtilities::CDCWireHit*>& axialWireHits,
+                 std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
     private:
       /// Search for hits compatible with given trajectory
-      std::vector<const CDCWireHit*> search(const std::vector<const CDCWireHit*>& axialWireHits,
-                                            const CDCTrajectory2D& guidingTrajectory2D);
+      std::vector<const TrackingUtilities::CDCWireHit*> search(const std::vector<const TrackingUtilities::CDCWireHit*>& axialWireHits,
+                                                               const TrackingUtilities::CDCTrajectory2D& guidingTrajectory2D);
 
     private:
       /// ECL cluster energy threshold

@@ -7,26 +7,29 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
+
+  namespace TrackFindingCDC {
 
     /// Findlet for normalizing the track (trajectory) into common requirements (e.g. let it start at the first hit etc.)
-    class TrackNormalizer : public Findlet<CDCTrack&> {
+    class TrackNormalizer : public TrackingUtilities::Findlet<TrackingUtilities::CDCTrack&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCTrack&>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCTrack&>;
 
     public:
       /// Short description of the findlet
       std::string getDescription() final;
 
       /// Fit the tracks.
-      void apply(std::vector<CDCTrack>& tracks) final;
+      void apply(std::vector<TrackingUtilities::CDCTrack>& tracks) final;
     };
   }
 }

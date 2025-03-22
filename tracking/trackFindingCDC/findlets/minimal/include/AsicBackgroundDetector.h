@@ -9,20 +9,23 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <framework/database/DBArray.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
+  }
+
+  namespace TrackFindingCDC {
 
     /// Marks hits as background based on the result of a filter
-    class AsicBackgroundDetector : public Findlet<CDCWireHit&> {
+    class AsicBackgroundDetector : public TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&> {
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHit&>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&>;
 
     public:
       /// Default constructor
@@ -41,12 +44,12 @@ namespace Belle2 {
       virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)  final;
 
       /// Main algorithm marking hit as background
-      virtual void apply(std::vector<CDCWireHit>& wireHits) final;
+      virtual void apply(std::vector<TrackingUtilities::CDCWireHit>& wireHits) final;
 
     private:
 
       /// Algorithm marking hit as background for each CDC ASIC
-      void applyAsicFilter(std::vector<CDCWireHit*>& wireHits);
+      void applyAsicFilter(std::vector<TrackingUtilities::CDCWireHit*>& wireHits);
       /**
        * Channel map retrieved from DB.
        */

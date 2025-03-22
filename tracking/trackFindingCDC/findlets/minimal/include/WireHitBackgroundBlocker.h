@@ -7,22 +7,24 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
+  }
+  namespace TrackFindingCDC {
 
     /// Marks hits as background based on simple heuristics
-    class WireHitBackgroundBlocker : public Findlet<CDCWireHit&> {
+    class WireHitBackgroundBlocker : public TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHit&>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&>;
 
     public:
       /// Short description of the findlet
@@ -32,7 +34,7 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main algorithm marking hit as background
-      void apply(std::vector<CDCWireHit>& wireHits) final;
+      void apply(std::vector<TrackingUtilities::CDCWireHit>& wireHits) final;
 
     private:
       /// Parameter : Switch to drop negative drift lengths from the created wire hits

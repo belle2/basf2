@@ -7,28 +7,31 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/filters/wireHitRelation/WholeWireHitRelationFilter.h>
 
-#include <tracking/trackFindingCDC/ca/Clusterizer.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/ca/Clusterizer.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
+  }
+
+  namespace TrackFindingCDC {
     class CDCWireHitCluster;
 
     /// Refines the clustering of wire hits from  clusters to clusters
-    class SuperClusterCreator : public Findlet<CDCWireHit&, CDCWireHitCluster> {
+    class SuperClusterCreator : public TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&, CDCWireHitCluster> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHit, CDCWireHitCluster>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit, CDCWireHitCluster>;
 
     public:
       /// Constructor
@@ -42,7 +45,7 @@ namespace Belle2 {
 
     public:
       /// Main algorithm applying the cluster refinement
-      void apply(std::vector<CDCWireHit>& inputWireHits,
+      void apply(std::vector<TrackingUtilities::CDCWireHit>& inputWireHits,
                  std::vector<CDCWireHitCluster>& outputSuperClusters) final;
 
     private:
@@ -51,10 +54,10 @@ namespace Belle2 {
 
     private:
       /// Instance of the hit cluster generator
-      Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
+      TrackingUtilities::Clusterizer<TrackingUtilities::CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
 
       /// Memory for the wire hit neighborhood in a cluster.
-      std::vector<WeightedRelation<CDCWireHit>> m_wireHitRelations;
+      std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCWireHit>> m_wireHitRelations;
 
       /// Wire hit neighborhood relation filter
       WholeWireHitRelationFilter m_wireHitRelationFilter{2};

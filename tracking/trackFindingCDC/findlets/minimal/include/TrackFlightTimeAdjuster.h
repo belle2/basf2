@@ -7,15 +7,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
+
+  namespace TrackFindingCDC {
 
     /**
      *  Findlet to adjust the flight time of tracks relative to the flight time zero.
@@ -24,18 +27,18 @@ namespace Belle2 {
      *  and the time which is need to reach the flight time zero location with the speed of flight
      *  on the curved trajectory is set as the flight time.
      */
-    class TrackFlightTimeAdjuster : public Findlet<CDCTrack&> {
+    class TrackFlightTimeAdjuster : public TrackingUtilities::Findlet<TrackingUtilities::CDCTrack&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCTrack>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCTrack>;
 
     public:
       /// Short description of the findlet
       std::string getDescription() final;
 
       /// Adjust the flight time of the given tracks
-      void apply(std::vector<CDCTrack>& tracks) final;
+      void apply(std::vector<TrackingUtilities::CDCTrack>& tracks) final;
     };
   }
 }

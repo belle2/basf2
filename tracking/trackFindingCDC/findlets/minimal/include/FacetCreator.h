@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/filters/facet/ChooseableFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
@@ -15,24 +15,27 @@
 
 #include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
 
+  namespace TrackingUtilities {
+    class CDCWireHit;
+  }
 
   namespace TrackFindingCDC {
     class CDCFacet;
     class CDCWireHitCluster;
 
     /// Class providing construction combinatorics for the facets.
-    class FacetCreator : public Findlet<const CDCWireHitCluster, CDCFacet> {
+    class FacetCreator : public TrackingUtilities::Findlet<const CDCWireHitCluster, CDCFacet> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHitCluster, CDCFacet>;
+      using Super = TrackingUtilities::Findlet<const CDCWireHitCluster, CDCFacet>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -58,8 +61,8 @@ namespace Belle2 {
        *  Generates facets on the given wire hits generating neighboring triples of hits.
        *  Inserts the result to the end of the GenericFacetCollection.
        */
-      void createFacets(const std::vector<CDCWireHit*>& wireHits,
-                        const std::vector<WeightedRelation<CDCWireHit> >& wireHitRelations,
+      void createFacets(const std::vector<TrackingUtilities::CDCWireHit*>& wireHits,
+                        const std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCWireHit> >& wireHitRelations,
                         std::vector<CDCFacet>& facets);
 
       /**
@@ -67,9 +70,9 @@ namespace Belle2 {
        *  over the 8 left right passage combinations.
        *  Inserts the result to the end of the GenericFacetCollection.
        */
-      void createFacetsForHitTriple(const CDCWireHit& startWireHit,
-                                    const CDCWireHit& middleWireHit,
-                                    const CDCWireHit& endWireHit,
+      void createFacetsForHitTriple(const TrackingUtilities::CDCWireHit& startWireHit,
+                                    const TrackingUtilities::CDCWireHit& middleWireHit,
+                                    const TrackingUtilities::CDCWireHit& endWireHit,
                                     std::vector<CDCFacet>& facets);
     private:
       /// Parameter : Switch to apply the rl feasibility cut
@@ -96,7 +99,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the wire hit neighborhood in within a cluster.
-      std::vector<WeightedRelation<CDCWireHit> > m_wireHitRelations;
+      std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCWireHit> > m_wireHitRelations;
     };
   }
 }

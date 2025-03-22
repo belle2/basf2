@@ -7,32 +7,36 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
+#include <tracking/trackingUtilities/collectors/selectors/SingleMatchSelector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackNormalizer.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-#include <tracking/trackFindingCDC/utilities/HitComperator.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/HitComperator.h>
 
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
-    class CDCSegment2D;
     class CDCRecoHit3D;
+  }
+
+  namespace TrackFindingCDC {
+    class CDCSegment2D;
 
     /**
      * Add the matched segments to the tracks and normalize the tracks afterwards.
      * Also deletes all hits from the tracks, that are part of segments, that were not matched to these tracks.
      */
     class SegmentTrackAdderWithNormalization
-      : public Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>&, CDCTrack&, const CDCSegment2D> {
+      : public TrackingUtilities::Findlet<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCSegment2D>&, TrackingUtilities::CDCTrack&, const CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>&, CDCTrack&, const CDCSegment2D>;
+      using Super =
+        TrackingUtilities::Findlet<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCSegment2D>&, TrackingUtilities::CDCTrack&, const CDCSegment2D>;
 
     public:
       /// Constructor for registering the sub-findlets
@@ -45,8 +49,8 @@ namespace Belle2 {
       std::string getDescription() override;
 
       /// Apply the findlet
-      void apply(std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>>& relations,
-                 std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segment) override;
+      void apply(std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCSegment2D>>& relations,
+                 std::vector<TrackingUtilities::CDCTrack>& tracks, const std::vector<CDCSegment2D>& segment) override;
 
     private:
       // Parameters
@@ -55,7 +59,8 @@ namespace Belle2 {
 
       // Findlets
       /// The selector for finding the track each hit should belong to.
-      SingleMatchSelector<CDCTrack, CDCRecoHit3D, HitComperator> m_singleHitSelector;
+      TrackingUtilities::SingleMatchSelector<TrackingUtilities::CDCTrack, TrackingUtilities::CDCRecoHit3D, TrackingUtilities::HitComperator>
+      m_singleHitSelector;
 
       /// Findlet for performing the normalization of the tracks afterwards
       TrackNormalizer m_trackNormalizer;

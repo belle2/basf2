@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
@@ -22,11 +22,11 @@ namespace Belle2 {
     class CDCSegment2D;
 
     /// Resolves between the potential alias versions of the segments and contained hits
-    class SegmentAliasResolver : public Findlet<CDCSegment2D&> {
+    class SegmentAliasResolver : public TrackingUtilities::Findlet<CDCSegment2D&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCSegment2D&>;
+      using Super = TrackingUtilities::Findlet<CDCSegment2D&>;
 
     public:
       /// Short description of the findlet

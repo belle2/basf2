@@ -5,16 +5,16 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
+#include <tracking/trackingUtilities/testFixtures/TrackingUtilitiesTestWithTopology.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
-#include <tracking/trackFindingCDC/rootification/StoreWrapper.h>
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+#include <tracking/trackingUtilities/rootification/StoreWrapper.h>
+#include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
@@ -24,16 +24,17 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
-TEST(TrackFindingCDCTest, cpp_storeWrapper)
+TEST(TrackingUtilitiesTest, cpp_storeWrapper)
 {
   StoreObjPtr<StoreWrapper<std::vector<CDCWireHit> > > stdVector;
   // do something so that cppcheck is happy
   stdVector.isOptional();
 }
 
-TEST(TrackFindingCDCTest, cpp_storeWrappedObjPtr)
+TEST(TrackingUtilitiesTest, cpp_storeWrappedObjPtr)
 {
   StoreWrappedObjPtr<std::vector<CDCWireHit> > stdVector;
   // do something so that cppcheck is happy
@@ -41,7 +42,7 @@ TEST(TrackFindingCDCTest, cpp_storeWrappedObjPtr)
 }
 
 template <class T>
-class TrackFindingCDCTestRootification : public TrackFindingCDCTestWithTopology {
+class TrackingUtilitiesTestRootification : public TrackingUtilitiesTestWithTopology {
 };
 
 using RootifiedTypes =
@@ -50,9 +51,9 @@ using RootifiedTypes =
   std::vector<CDCTrack>,
   std::vector<WeightedRelation<const CDCTrack> > >;
 
-TYPED_TEST_SUITE(TrackFindingCDCTestRootification, RootifiedTypes);
+TYPED_TEST_SUITE(TrackingUtilitiesTestRootification, RootifiedTypes);
 
-TYPED_TEST(TrackFindingCDCTestRootification, rootification_UsableAsStoreWrappedObjPtr)
+TYPED_TEST(TrackingUtilitiesTestRootification, rootification_UsableAsStoreWrappedObjPtr)
 {
   DataStore& datastore = DataStore::Instance();
   StoreWrappedObjPtr< TypeParam > storeObj;

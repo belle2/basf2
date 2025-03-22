@@ -11,7 +11,7 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /** This template functions as a wrapper for objects
      *  that do not inherit from TObject to be put on the DataStore.

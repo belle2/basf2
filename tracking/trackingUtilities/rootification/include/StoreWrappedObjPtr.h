@@ -8,12 +8,12 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/rootification/StoreWrapper.h>
+#include <tracking/trackingUtilities/rootification/StoreWrapper.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /** This class is for convenience access and registration of objects,
      *  that are stored inside the StoreWrapper on the DataStore.

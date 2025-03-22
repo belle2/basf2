@@ -7,23 +7,23 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/Helix.h>
+#include <tracking/trackingUtilities/geometry/Helix.h>
 
-#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
-#include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
-#include <tracking/trackFindingCDC/geometry/SZLine.h>
+#include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/UncertainSZLine.h>
+#include <tracking/trackingUtilities/geometry/SZLine.h>
 
-#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
-#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
-#include <tracking/trackFindingCDC/geometry/SZParameters.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/HelixParameters.h>
+#include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
+#include <tracking/trackingUtilities/geometry/SZParameters.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <cstddef>
 #include <iosfwd>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class Vector3D;
 
     /// A general helix class including a covariance matrix.

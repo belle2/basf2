@@ -7,18 +7,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
-#include <tracking/trackFindingCDC/geometry/SZLine.h>
+#include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/SZLine.h>
 
-#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/HelixParameters.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <iosfwd>
 #include <cmath>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Extension of the generalized circle also caching the perigee coordinates.
     class Helix {

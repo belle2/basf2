@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
-#include <tracking/trackFindingCDC/geometry/SZParameters.h>
+#include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
+#include <tracking/trackingUtilities/geometry/SZParameters.h>
 
-#include <tracking/trackFindingCDC/geometry/UncertainParameters.h>
+#include <tracking/trackingUtilities/geometry/UncertainParameters.h>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Namespace to hide the contained enum constants
     namespace NHelixParameterIndices {
@@ -75,7 +75,7 @@ namespace Belle2 {
                                                      const SZUtil::CovarianceMatrix& szCov);
 
       /// Matrix type for the ambiguity to the perigee parameters, e.g. under the stereo projection.
-      using PerigeeAmbiguity = TrackFindingCDC::JacobianMatrix<3, 5>;
+      using PerigeeAmbiguity = TrackingUtilities::JacobianMatrix<3, 5>;
 
       /// Initialise a default covariance matrix to zero.
       static PerigeeAmbiguity defaultPerigeeAmbiguity();

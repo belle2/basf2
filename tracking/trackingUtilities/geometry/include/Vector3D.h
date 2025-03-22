@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/numerics/Quadratic.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/numerics/Quadratic.h>
 
 #include <framework/geometry/B2Vector3.h>
 #include <Math/Vector3D.h>
@@ -20,7 +20,7 @@
 class TVector3;
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// A three dimensional vector
     /** A three dimensional vector which is equipped with the expected vector methods. \n

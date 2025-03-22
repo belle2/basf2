@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/UncertainParameters.h>
+#include <tracking/trackingUtilities/geometry/UncertainParameters.h>
 
-#include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
-#include <tracking/trackFindingCDC/numerics/JacobianMatrixUtil.h>
-#include <tracking/trackFindingCDC/numerics/ParameterVectorUtil.h>
+#include <tracking/trackingUtilities/numerics/CovarianceMatrixUtil.h>
+#include <tracking/trackingUtilities/numerics/JacobianMatrixUtil.h>
+#include <tracking/trackingUtilities/numerics/ParameterVectorUtil.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     template <class T, class AEParameters>
     void UncertainParametersUtil<T, AEParameters>::transport(const JacobianMatrix& jacobian,

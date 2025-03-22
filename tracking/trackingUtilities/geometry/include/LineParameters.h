@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/UncertainParameters.h>
+#include <tracking/trackingUtilities/geometry/UncertainParameters.h>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Namespace to hide the contained enum constants
     namespace NLineParameterIndices {

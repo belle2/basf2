@@ -7,16 +7,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/SZLine.h>
+#include <tracking/trackingUtilities/geometry/SZLine.h>
 
-#include <tracking/trackFindingCDC/geometry/SZParameters.h>
+#include <tracking/trackingUtilities/geometry/SZParameters.h>
 
 #include <cstddef>
 #include <iosfwd>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class Vector2D;
 
     /// A line in sz where s is the transverse travel distance as seen in the xy projection with

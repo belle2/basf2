@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/SZParameters.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/SZParameters.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      *  A line in the sz space

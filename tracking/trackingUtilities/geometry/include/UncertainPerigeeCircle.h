@@ -7,15 +7,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
-#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
+#include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
 
 #include <cstddef>
 #include <iosfwd>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class GeneralizedCircle;
     class Vector2D;
 

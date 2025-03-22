@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Quadratic.h>
+#include <tracking/trackingUtilities/numerics/Quadratic.h>
 
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
-#include <tracking/trackFindingCDC/numerics/ERotation.h>
-#include <tracking/trackFindingCDC/numerics/ESign.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/ERotation.h>
+#include <tracking/trackingUtilities/numerics/ESign.h>
 
 #include <utility>
 #include <string>
@@ -20,7 +20,7 @@
 #include <cmath>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /**
      * A two dimensional vector which is equipped with functions for correct handling \n
      * of orientation related issues in addition to the expected vector methods. \n

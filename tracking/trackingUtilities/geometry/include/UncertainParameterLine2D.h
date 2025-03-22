@@ -7,13 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/LineParameters.h>
-#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/LineParameters.h>
+#include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <cstddef>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// A parameter line including including an line covariance matrix which is interpreted as
     /// located in the support point

@@ -7,13 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/Line2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Line2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
-#include <tracking/trackFindingCDC/numerics/ERotation.h>
-#include <tracking/trackFindingCDC/numerics/ESign.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/ERotation.h>
+#include <tracking/trackingUtilities/numerics/ESign.h>
 
 #include <utility>
 #include <iosfwd>
@@ -21,7 +21,7 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class Circle2D;
 
     /**
@@ -426,7 +426,7 @@ namespace Belle2 {
       chooseNextForwardOf(const Vector2D& start, const Vector2D& end1, const Vector2D& end2) const;
 
       /// Calculates the two points with the given cylindrical radius on the generalised circle
-      std::pair<Belle2::TrackFindingCDC::Vector2D, Belle2::TrackFindingCDC::Vector2D>
+      std::pair<Vector2D, Vector2D>
       atCylindricalR(double cylindricalR) const;
 
       /**

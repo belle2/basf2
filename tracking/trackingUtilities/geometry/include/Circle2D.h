@@ -6,16 +6,16 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
-#include <tracking/trackFindingCDC/numerics/ERotation.h>
-#include <tracking/trackFindingCDC/numerics/ESign.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/ERotation.h>
+#include <tracking/trackingUtilities/numerics/ESign.h>
 
 #include <cmath>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// A two dimensional circle in its natural representation using center and radius as
     /// parameters.

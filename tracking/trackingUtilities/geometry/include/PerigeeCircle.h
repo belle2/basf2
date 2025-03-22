@@ -7,17 +7,17 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
-#include <tracking/trackFindingCDC/geometry/Line2D.h>
+#include <tracking/trackingUtilities/geometry/GeneralizedCircle.h>
+#include <tracking/trackingUtilities/geometry/Line2D.h>
 
-#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
+#include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
-#include <tracking/trackFindingCDC/numerics/ERotation.h>
-#include <tracking/trackFindingCDC/numerics/ESign.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/ERotation.h>
+#include <tracking/trackingUtilities/numerics/ESign.h>
 
 #include <utility>
 #include <cmath>
@@ -25,7 +25,7 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class Circle2D;
 
     /// Extension of the generalized circle also caching the perigee coordinates.

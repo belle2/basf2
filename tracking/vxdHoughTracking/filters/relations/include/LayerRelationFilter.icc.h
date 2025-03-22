@@ -8,8 +8,8 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/filters/relations/LayerRelationFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.icc.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <vxd/geometry/GeoCache.h>
@@ -26,7 +26,7 @@ namespace Belle2 {
     template <class AFilter>
     void LayerRelationFilter<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitJumping"), m_hitJumping,
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "hitJumping"), m_hitJumping,
                                     "Make it possible to jump over N layers.", m_hitJumping);
 
       m_filter.exposeParameters(moduleParamList, prefix);
@@ -114,7 +114,7 @@ namespace Belle2 {
     }
 
     template <class AFilter>
-    TrackFindingCDC::Weight LayerRelationFilter<AFilter>::operator()(const VXDHoughState& from, const VXDHoughState& to)
+    TrackingUtilities::Weight LayerRelationFilter<AFilter>::operator()(const VXDHoughState& from, const VXDHoughState& to)
     {
       return m_filter(std::make_pair(&from, &to));
     }

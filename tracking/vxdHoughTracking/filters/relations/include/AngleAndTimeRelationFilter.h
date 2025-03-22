@@ -17,7 +17,7 @@ namespace Belle2 {
     class AngleAndTimeRelationFilter : public BaseRelationFilter {
     public:
       /// Return the weight based on azimuthal-angle separation and the time difference of the hits on both sides.
-      TrackFindingCDC::Weight operator()(const std::pair<const VXDHoughState*, const VXDHoughState*>& relation) override;
+      TrackingUtilities::Weight operator()(const std::pair<const VXDHoughState*, const VXDHoughState*>& relation) override;
       /// Expose the parameters.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

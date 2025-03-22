@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.dcl.h>
 #include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 
 #include <array>
@@ -17,9 +17,9 @@ namespace Belle2 {
 
     /// Relation filter the creation of relations
     template <class AFilter>
-    class LayerRelationFilter : public TrackFindingCDC::RelationFilter<VXDHoughState> {
+    class LayerRelationFilter : public TrackingUtilities::RelationFilter<VXDHoughState> {
       /// The parent class
-      using Super = TrackFindingCDC::RelationFilter<VXDHoughState>;
+      using Super = TrackingUtilities::RelationFilter<VXDHoughState>;
 
     public:
       using Super::operator();
@@ -37,7 +37,7 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Get the weight of the relation between from and to
-      TrackFindingCDC::Weight operator()(const VXDHoughState& from, const VXDHoughState& to) final;
+      TrackingUtilities::Weight operator()(const VXDHoughState& from, const VXDHoughState& to) final;
 
       /// Initialize the maximal ladder cache
       void beginRun() final;

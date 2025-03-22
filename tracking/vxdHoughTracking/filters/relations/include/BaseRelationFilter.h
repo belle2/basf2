@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/Filter.dcl.h>
 #include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
     /// Base filter for hits stored in the VXDHoughState
-    using BaseRelationFilter = TrackFindingCDC::Filter<std::pair<const VXDHoughState*, const VXDHoughState*>>;
+    using BaseRelationFilter = TrackingUtilities::Filter<std::pair<const VXDHoughState*, const VXDHoughState*>>;
   }
 }

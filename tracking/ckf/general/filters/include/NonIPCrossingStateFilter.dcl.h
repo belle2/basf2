@@ -7,7 +7,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/svd/filters/states/AllSVDStateFilter.h>
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <string>
 

@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/UncertainHelix.h>
-#include <tracking/trackFindingCDC/geometry/Helix.h>
-#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
+#include <tracking/trackingUtilities/geometry/UncertainHelix.h>
+#include <tracking/trackingUtilities/geometry/Helix.h>
+#include <tracking/trackingUtilities/geometry/HelixParameters.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/ESign.h>
+#include <tracking/trackingUtilities/numerics/ESign.h>
 
 #include <TMath.h>
 #include <cmath>
@@ -28,7 +28,7 @@ namespace genfit {
 namespace Belle2 {
   class MCParticle;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrajectory2D;
     class CDCTrajectorySZ;
 

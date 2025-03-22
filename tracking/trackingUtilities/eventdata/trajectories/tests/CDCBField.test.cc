@@ -6,16 +6,16 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
 #include <framework/geometry/BFieldManager.h>
 #include <gtest/gtest.h>
 
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
-TEST(TrackFindingCDCTest, eventdata_trajectories_CDCBField_getBFieldZSign)
+TEST(TrackingUtilitiesTest, eventdata_trajectories_CDCBField_getBFieldZSign)
 {
   ROOT::Math::XYZVector bFieldAtOrigin = BFieldManager::getField(0, 0, 0) / Unit::T;
   Double_t bZAtOrigin = bFieldAtOrigin.Z();

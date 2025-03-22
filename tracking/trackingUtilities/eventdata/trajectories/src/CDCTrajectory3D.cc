@@ -5,31 +5,31 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
 
-#include <tracking/trackFindingCDC/geometry/UncertainHelix.h>
-#include <tracking/trackFindingCDC/geometry/Helix.h>
-#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
-#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
-#include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
-#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/UncertainHelix.h>
+#include <tracking/trackingUtilities/geometry/Helix.h>
+#include <tracking/trackingUtilities/geometry/HelixParameters.h>
+#include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/UncertainSZLine.h>
+#include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/ESign.h>
-#include <tracking/trackFindingCDC/numerics/Quadratic.h>
+#include <tracking/trackingUtilities/numerics/ESign.h>
+#include <tracking/trackingUtilities/numerics/Quadratic.h>
 
-#include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
-#include <tracking/trackFindingCDC/numerics/JacobianMatrixUtil.h>
-#include <tracking/trackFindingCDC/numerics/TMatrixConversion.h>
+#include <tracking/trackingUtilities/numerics/CovarianceMatrixUtil.h>
+#include <tracking/trackingUtilities/numerics/JacobianMatrixUtil.h>
+#include <tracking/trackingUtilities/numerics/TMatrixConversion.h>
 
 #include <genfit/TrackCand.h>
 
@@ -42,7 +42,7 @@
 #include <ostream>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
                                  const CDCTrajectorySZ& trajectorySZ)
@@ -374,7 +374,7 @@ double CDCTrajectory3D::setLocalOrigin(const Vector3D& localOrigin)
   return arcLength2D;
 }
 
-std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const CDCTrajectory3D& trajectory3D)
+std::ostream& TrackingUtilities::operator<<(std::ostream& output, const CDCTrajectory3D& trajectory3D)
 {
   return output << "Local origin : " << trajectory3D.getLocalOrigin() << ", "
          << "local helix : " << trajectory3D.getLocalHelix();

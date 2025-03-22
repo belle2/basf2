@@ -5,19 +5,19 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/topology/WireLine.h>
+#include <tracking/trackingUtilities/topology/WireLine.h>
 
 #include <framework/logging/Logger.h>
 
 #include <gtest/gtest.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
-TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory2D_constructorPosMomCharge)
+TEST(TrackingUtilitiesTest, eventdata_trajectories_CDCTrajectory2D_constructorPosMomCharge)
 {
   Vector2D newMom2D(1.0, 2.0);
   Vector2D newPos2D(1.0, 2.0);
@@ -41,7 +41,7 @@ TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory2D_constructorPosM
 }
 
 
-TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory2D_reconstruct)
+TEST(TrackingUtilitiesTest, eventdata_trajectories_CDCTrajectory2D_reconstruct)
 {
   Vector3D forward(-1.0, 1.0, 10.0);
   Vector3D backward(1.0, 1.0, -10.0);

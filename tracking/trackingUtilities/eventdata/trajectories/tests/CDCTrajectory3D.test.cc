@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <genfit/TrackCand.h>
 
@@ -16,9 +16,9 @@
 
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory3D_constructorPosMomCharge)
+TEST(TrackingUtilitiesTest, eventdata_trajectories_CDCTrajectory3D_constructorPosMomCharge)
 {
   Vector3D newMom3D(1.0, 2.0, 1.0);
   Vector3D newPos3D(1.0, 2.0, 1.0);
@@ -46,7 +46,7 @@ TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory3D_constructorPosM
 
 
 
-TEST(TrackFindingCDCTest, CDCTrajectory3D_clear)
+TEST(TrackingUtilitiesTest, CDCTrajectory3D_clear)
 {
   Vector3D newMom3D(1.0, 2.0, 1.0);
   Vector3D newPos3D(1.0, 2.0, 1.0);
@@ -78,7 +78,7 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_clear)
 }
 
 
-TEST(TrackFindingCDCTest, CDCTrajectory3D_GFTrackRoundTrip)
+TEST(TrackingUtilitiesTest, CDCTrajectory3D_GFTrackRoundTrip)
 {
   Vector3D expectedMomentum(1.0, 0.0, 0.0);
   Vector3D expectedPosition(0.0, 1.0, 0.0);

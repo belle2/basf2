@@ -7,25 +7,28 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/topology/EStereoKind.h>
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
 
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
-#include <tracking/trackFindingCDC/numerics/ESign.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/ESign.h>
 
 #include <iosfwd>
+
+
 
 namespace Belle2 {
   class CDCSimHit;
   class CDCHit;
   class WireID;
-
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrajectory2D;
     class CDCWireHit;
     class CDCWire;
     class Vector3D;
     class Vector2D;
+  }
+  namespace TrackFindingCDC {
 
     /**
      *  Class representing an oriented hit wire including a hypotheses
@@ -45,7 +48,8 @@ namespace Belle2 {
        *  @param wireHit      The wire hit the oriented hit is associated with.
        *  @param rlInfo       The right left passage information of the _wire_ relative to the track
        */
-      explicit CDCRLWireHit(const CDCWireHit* wireHit, ERightLeft rlInfo = ERightLeft::c_Unknown);
+      explicit CDCRLWireHit(const TrackingUtilities::CDCWireHit* wireHit,
+                            TrackingUtilities::ERightLeft rlInfo = TrackingUtilities::ERightLeft::c_Unknown);
 
       /**
        *  Constructs an oriented wire hit.
@@ -54,8 +58,8 @@ namespace Belle2 {
        *  @param driftLength  The re-estimated drift length
        *  @param driftLengthVariance  The re-estimated drift length variance
        */
-      CDCRLWireHit(const CDCWireHit* wireHit,
-                   ERightLeft rlInfo,
+      CDCRLWireHit(const TrackingUtilities::CDCWireHit* wireHit,
+                   TrackingUtilities::ERightLeft rlInfo,
                    double driftLength,
                    double driftLengthVariance);
 
@@ -79,13 +83,13 @@ namespace Belle2 {
        *  reconstructed values from the algorithm with the Monte Carlo information.
        *  It merely evaluates, if the true trajectory passes right or left of the wire.
        */
-      static CDCRLWireHit fromSimHit(const CDCWireHit* wirehit, const CDCSimHit& simhit);
+      static CDCRLWireHit fromSimHit(const TrackingUtilities::CDCWireHit* wirehit, const CDCSimHit& simhit);
 
       /// Returns the oriented wire hit with the opposite right left information.
       CDCRLWireHit reversed() const
       {
         return CDCRLWireHit(m_wireHit,
-                            NRightLeft::reversed(m_rlInfo),
+                            TrackingUtilities::NRightLeft::reversed(m_rlInfo),
                             m_refDriftLength,
                             m_refDriftLengthVariance);
       }
@@ -93,7 +97,7 @@ namespace Belle2 {
       /// Switches the right left passage to its opposite in place.
       void reverse()
       {
-        m_rlInfo = NRightLeft::reversed(m_rlInfo);
+        m_rlInfo = TrackingUtilities::NRightLeft::reversed(m_rlInfo);
       }
 
       /// Returns the aliased version of this oriented wire hit - here same as reverse
@@ -119,13 +123,13 @@ namespace Belle2 {
       }
 
       /// Defines wires and oriented wire hits to be coaligned on the wire on which they are based.
-      friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWire& wire)
+      friend bool operator<(const CDCRLWireHit& rlWireHit, const TrackingUtilities::CDCWire& wire)
       {
         return &rlWireHit.getWire() < &wire;
       }
 
       /// Defines oriented wire hits and wires to be coaligned on the wire on which they are based.
-      friend bool operator<(const CDCWire& wire, const CDCRLWireHit& rlWireHit)
+      friend bool operator<(const TrackingUtilities::CDCWire& wire, const CDCRLWireHit& rlWireHit)
       {
         return &wire < &rlWireHit.getWire();
       }
@@ -134,7 +138,7 @@ namespace Belle2 {
        *  Defines wire hits and oriented wire hits to be coaligned on the wire hit
        *  on which they are based.
        */
-      friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWireHit& wireHit)
+      friend bool operator<(const CDCRLWireHit& rlWireHit, const TrackingUtilities::CDCWireHit& wireHit)
       {
         return &rlWireHit.getWireHit() < &wireHit;
       }
@@ -143,7 +147,7 @@ namespace Belle2 {
        *  Defines oriented wire hits and wire hits to be coaligned on the wire hit
        *  on which they are based.
        */
-      friend bool operator<(const CDCWireHit& wireHit, const CDCRLWireHit& rlWireHit)
+      friend bool operator<(const TrackingUtilities::CDCWireHit& wireHit, const CDCRLWireHit& rlWireHit)
       {
         return &wireHit < rlWireHit.m_wireHit;
       }
@@ -158,10 +162,10 @@ namespace Belle2 {
       const CDCHit* getHit() const;
 
       /// Getter for the wire the oriented hit associated to.
-      const CDCWire& getWire() const;
+      const TrackingUtilities::CDCWire& getWire() const;
 
       /// Checks if the oriented hit is associated with the give wire.
-      bool isOnWire(const CDCWire& wire) const
+      bool isOnWire(const TrackingUtilities::CDCWire& wire) const
       {
         return &getWire() == &wire;
       }
@@ -170,28 +174,28 @@ namespace Belle2 {
       const WireID& getWireID() const;
 
       /// Getter for the superlayer id.
-      ISuperLayer getISuperLayer() const;
+      TrackingUtilities::ISuperLayer getISuperLayer() const;
 
       /// Getter for the stereo type of the underlying wire.
-      EStereoKind getStereoKind() const;
+      TrackingUtilities::EStereoKind getStereoKind() const;
 
       /// Indicator if the underlying wire is axial.
       bool isAxial() const;
 
       /// The two dimensional reference position of the underlying wire.
-      const Vector2D& getRefPos2D() const;
+      const TrackingUtilities::Vector2D& getRefPos2D() const;
 
       /// The distance from the beam line at reference position of the underlying wire.
       double getRefCylindricalR() const;
 
       /// Getter for the wire hit associated with the oriented hit.
-      const CDCWireHit& getWireHit() const
+      const TrackingUtilities::CDCWireHit& getWireHit() const
       {
         return *m_wireHit;
       }
 
       /// Checks if the oriented hit is associated with the give wire hit.
-      bool hasWireHit(const CDCWireHit& wirehit) const
+      bool hasWireHit(const TrackingUtilities::CDCWireHit& wirehit) const
       {
         return &getWireHit() == &wirehit;
       }
@@ -227,13 +231,13 @@ namespace Belle2 {
       }
 
       /// Getter for the right left passage information.
-      ERightLeft getRLInfo() const
+      TrackingUtilities::ERightLeft getRLInfo() const
       {
         return m_rlInfo;
       }
 
       /// Setter for the right left passage information.
-      void setRLInfo(const ERightLeft rlInfo)
+      void setRLInfo(const TrackingUtilities::ERightLeft rlInfo)
       {
         m_rlInfo = rlInfo;
       }
@@ -247,7 +251,7 @@ namespace Belle2 {
        *  Also the right left passage hypotheses does not play a role in
        *  the reconstruction in any way.
        */
-      Vector2D reconstruct2D(const CDCTrajectory2D& trajectory2D) const;
+      TrackingUtilities::Vector2D reconstruct2D(const TrackingUtilities::CDCTrajectory2D& trajectory2D) const;
 
       /**
        *  Attempts to reconstruct a three dimensional position (especially of stereo hits).
@@ -262,11 +266,11 @@ namespace Belle2 {
        *    yield the closest approach of the drift circle to the trajectory
        *    in the reference plane.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, double z = 0) const;
+      TrackingUtilities::Vector3D reconstruct3D(const TrackingUtilities::CDCTrajectory2D& trajectory2D, double z = 0) const;
 
     private:
       /// Memory for the reference to the assiziated wire hit.
-      const CDCWireHit* m_wireHit = nullptr;
+      const TrackingUtilities::CDCWireHit* m_wireHit = nullptr;
 
       /// Memory for the reestimated drift length
       double m_refDriftLength = 0.0;
@@ -275,7 +279,7 @@ namespace Belle2 {
       double m_refDriftLengthVariance = 0.0;
 
       /// Memory for the right left passage information of the oriented wire hit.
-      ERightLeft m_rlInfo = ERightLeft::c_Unknown;
+      TrackingUtilities::ERightLeft m_rlInfo = TrackingUtilities::ERightLeft::c_Unknown;
     };
 
     /// Output operator. Help debugging.

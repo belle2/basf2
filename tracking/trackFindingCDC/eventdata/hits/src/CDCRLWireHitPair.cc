@@ -9,15 +9,16 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackingUtilities/topology/WireNeighborKind.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
 
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
 
 #include <utility>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CDCRLWireHitPair::CDCRLWireHitPair(const CDCRLWireHit& fromRLWireHit,
                                    const CDCRLWireHit& toRLWireHit,

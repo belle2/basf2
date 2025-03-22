@@ -9,13 +9,13 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/EStereoKind.h>
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
 
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
-#include <tracking/trackFindingCDC/numerics/ERotation.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/ERotation.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <iosfwd>
 
@@ -23,11 +23,14 @@ namespace Belle2 {
   class CDCSimHit;
   class CDCHit;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrajectory2D;
     class CDCWireHit;
     class CDCWire;
     class Vector3D;
+  }
+
+  namespace TrackFindingCDC {
 
     /**
      *  Class representing a two dimensional reconstructed hit in the central drift chamber.
@@ -51,7 +54,7 @@ namespace Belle2 {
        *  displacement from the wire reference position.
        */
       CDCRecoHit2D(const CDCRLWireHit& rlWireHit,
-                   const Vector2D& recoDisp2D);
+                   const TrackingUtilities::Vector2D& recoDisp2D);
 
       /// Constructs a reconstructed hit based on the oriented wire hit with no displacement.
       explicit CDCRecoHit2D(const CDCRLWireHit& rlWireHit);
@@ -85,7 +88,7 @@ namespace Belle2 {
        *  @param snap      optional indicator if the displacement shall be shrank to the drift circle (default true)
        */
       static CDCRecoHit2D
-      fromRecoPos2D(const CDCRLWireHit& rlWireHit, const Vector2D& recoPos2D, bool snap = true);
+      fromRecoPos2D(const CDCRLWireHit& rlWireHit, const TrackingUtilities::Vector2D& recoPos2D, bool snap = true);
 
       /**
        *  Turns the orientation in place.
@@ -107,7 +110,7 @@ namespace Belle2 {
        *  It merely takes the displacement from the wire, projects it to the reference plane and
        *  scales it onto the drift circle defined by the wire.
        */
-      static CDCRecoHit2D fromSimHit(const CDCWireHit* wireHit, const CDCSimHit& simHit);
+      static CDCRecoHit2D fromSimHit(const TrackingUtilities::CDCWireHit* wireHit, const CDCSimHit& simHit);
 
 
       /// Make the wire hit automatically castable to its underlying cdcHit.
@@ -134,23 +137,23 @@ namespace Belle2 {
       }
 
       /// Defines wires and the two dimensional reconstructed hits as coaligned.
-      friend bool operator<(const CDCRecoHit2D& recoHit2D, const CDCWire& wire)
+      friend bool operator<(const CDCRecoHit2D& recoHit2D, const TrackingUtilities::CDCWire& wire)
       { return recoHit2D.getRLWireHit() < wire; }
 
       /// Defines wires and the two dimensional reconstructed hits as coaligned.
-      friend bool operator<(const CDCWire& wire, const CDCRecoHit2D& recoHit2D)
+      friend bool operator<(const TrackingUtilities::CDCWire& wire, const CDCRecoHit2D& recoHit2D)
       { return wire < recoHit2D.getRLWireHit(); }
 
       /// Defines wire hits and the two dimensional reconstructed hits as coaligned.
-      friend bool operator<(const CDCRecoHit2D& recoHit2D, const CDCWireHit& wireHit)
+      friend bool operator<(const CDCRecoHit2D& recoHit2D, const TrackingUtilities::CDCWireHit& wireHit)
       { return recoHit2D.getRLWireHit() < wireHit; }
 
       /// Defines wire hits and the two dimensional reconstructed hits as coaligned.
-      friend bool operator<(const CDCWireHit& wireHit, const CDCRecoHit2D& recoHit2D)
+      friend bool operator<(const TrackingUtilities::CDCWireHit& wireHit, const CDCRecoHit2D& recoHit2D)
       { return wireHit < recoHit2D.getRLWireHit(); }
 
       /// Getter for the stereo type of the underlying wire.
-      EStereoKind getStereoKind() const
+      TrackingUtilities::EStereoKind getStereoKind() const
       {
         return getRLWireHit().getStereoKind();
       }
@@ -162,49 +165,49 @@ namespace Belle2 {
       }
 
       /// Getter for the superlayer id.
-      ISuperLayer getISuperLayer() const
+      TrackingUtilities::ISuperLayer getISuperLayer() const
       {
         return getRLWireHit().getISuperLayer();
       }
 
       /// Getter for the wire the reconstructed hit associated to.
-      const CDCWire& getWire() const
+      const TrackingUtilities::CDCWire& getWire() const
       {
         return getRLWireHit().getWire();
       }
 
       /// Getter for the reference position of the wire.
-      const Vector2D& getRefPos2D() const
+      const TrackingUtilities::Vector2D& getRefPos2D() const
       {
         return getRLWireHit().getRefPos2D();
       }
 
       /// Checks if the reconstructed hit is associated with the give wire.
-      bool isOnWire(const CDCWire& wire) const
+      bool isOnWire(const TrackingUtilities::CDCWire& wire) const
       {
         return getRLWireHit().isOnWire(wire);
       }
 
       /// Getter for the wire hit associated with the reconstructed hit.
-      const CDCWireHit& getWireHit() const
+      const TrackingUtilities::CDCWireHit& getWireHit() const
       {
         return getRLWireHit().getWireHit();
       }
 
       /// Checks if the reconstructed hit is associated with the give wire hit.
-      bool hasWireHit(const CDCWireHit& wireHit) const
+      bool hasWireHit(const TrackingUtilities::CDCWireHit& wireHit) const
       {
         return getRLWireHit().hasWireHit(wireHit);
       }
 
       /// Getter for the right left passage information.
-      ERightLeft getRLInfo() const
+      TrackingUtilities::ERightLeft getRLInfo() const
       {
         return getRLWireHit().getRLInfo();
       }
 
       /// Setter the right left passage information.
-      void setRLInfo(ERightLeft& rlInfo)
+      void setRLInfo(TrackingUtilities::ERightLeft& rlInfo)
       {
         m_rlWireHit.setRLInfo(rlInfo);
       }
@@ -231,27 +234,27 @@ namespace Belle2 {
       }
 
       /// Getter for the position in the reference plane.
-      Vector2D getRecoPos2D() const
+      TrackingUtilities::Vector2D getRecoPos2D() const
       {
         return getRecoDisp2D() + getRefPos2D();
       }
 
       /// Setter for the position in the reference plane.
-      void setRecoPos2D(const Vector2D& recoPos2D)
+      void setRecoPos2D(const TrackingUtilities::Vector2D& recoPos2D)
       {
         m_recoDisp2D = recoPos2D - getRefPos2D();
       }
 
       /// Getter for the displacement from the wire reference position.
-      const Vector2D& getRecoDisp2D() const
+      const TrackingUtilities::Vector2D& getRecoDisp2D() const
       {
         return m_recoDisp2D;
       }
 
       /// Getter for the direction of flight
-      Vector2D getFlightDirection2D() const
+      TrackingUtilities::Vector2D getFlightDirection2D() const
       {
-        ERotation rotation = static_cast<ERotation>(-getRLInfo());
+        TrackingUtilities::ERotation rotation = static_cast<TrackingUtilities::ERotation>(-getRLInfo());
         return getRecoDisp2D().orthogonal(rotation);
       }
 
@@ -271,7 +274,7 @@ namespace Belle2 {
        *  moved parallel to the stereo wire.
        *  For axial hits the point of closest approach on the trajectory is returned.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, const double z = 0) const;
+      TrackingUtilities::Vector3D reconstruct3D(const TrackingUtilities::CDCTrajectory2D& trajectory2D, const double z = 0) const;
 
       /// Getter for the oriented wire hit associated with the reconstructed hit.
       const CDCRLWireHit& getRLWireHit() const
@@ -290,7 +293,7 @@ namespace Belle2 {
       CDCRLWireHit m_rlWireHit;
 
       /// Memory for the displacement of the associated wire reference position.
-      Vector2D m_recoDisp2D;
+      TrackingUtilities::Vector2D m_recoDisp2D;
     };
 
 

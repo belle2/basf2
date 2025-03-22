@@ -7,18 +7,18 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/topology/EStereoKind.h>
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>
 
@@ -29,9 +29,10 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class WireLine;
   }
 }

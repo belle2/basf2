@@ -9,8 +9,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
 
-#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <iosfwd>
 
@@ -48,29 +48,29 @@ namespace Belle2 {
       /// Construct a tangent from a pair of oriented wire hits taking the given
       /// tangential line instead of a computed one.
       CDCTangent(const CDCRLWireHitPair& rlWireHitPair,
-                 const ParameterLine2D& line);
+                 const TrackingUtilities::ParameterLine2D& line);
 
       /// Construct a tangent from two oriented wire hits taking the given tangential line instead of a computed one.
       CDCTangent(const CDCRLWireHit& fromRLWireHit,
                  const CDCRLWireHit& toRLWireHit,
-                 const ParameterLine2D& line);
+                 const TrackingUtilities::ParameterLine2D& line);
 
       /// Getter for the touching point of the tangent to the first drift circle.
-      const Vector2D& getFromRecoPos2D() const
+      const TrackingUtilities::Vector2D& getFromRecoPos2D() const
       { return getLine().support(); }
 
       /// Getter for displacement of the touching point from the first wire in the reference plane.
-      Vector2D getFromRecoDisp2D() const;
+      TrackingUtilities::Vector2D getFromRecoDisp2D() const;
 
       /// Getter for the touching point of the tangent to the second drift circle.
-      Vector2D getToRecoPos2D() const
+      TrackingUtilities::Vector2D getToRecoPos2D() const
       { return getLine().at(1); }
 
       /// Getter for displacement of the touching point from the second wire in the reference plane.
-      Vector2D getToRecoDisp2D() const;
+      TrackingUtilities::Vector2D getToRecoDisp2D() const;
 
       /// Getter for the vector from the first to the second touch point.*/
-      const Vector2D& getFlightVec2D() const
+      const TrackingUtilities::Vector2D& getFlightVec2D() const
       { return getLine().tangential(); }
 
       /// Returns the cosine of the angle between the two flight directions of the tangents.
@@ -102,12 +102,12 @@ namespace Belle2 {
        *  The line stretches between the two the touch point.
        *  The first touch point is at(0) the second at(1).
        */
-      const ParameterLine2D& getLine() const
+      const TrackingUtilities::ParameterLine2D& getLine() const
       { return m_line; }
 
     private:
       /// Memory for the line between the two touching points. The first touch point at(0), second at(1).
-      ParameterLine2D m_line;
+      TrackingUtilities::ParameterLine2D m_line;
     };
 
     /// Print tangent for debugging.

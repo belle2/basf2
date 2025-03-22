@@ -8,15 +8,16 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
-#include <tracking/trackFindingCDC/numerics/Modulo.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <tracking/trackingUtilities/topology/WireNeighborKind.h>
+#include <tracking/trackingUtilities/numerics/Modulo.h>
 
 #include <iostream>
 #include <limits.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CDCRLWireHitTriple::Shape::Shape()
   : m_startToMiddleCellDistance(CHAR_MAX / 2)

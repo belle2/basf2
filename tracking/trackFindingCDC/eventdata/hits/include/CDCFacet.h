@@ -8,17 +8,19 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
-#include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
+#include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
 
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
 namespace Belle2 {
+  namespace TrackingUtilities {
+    class ParameterLine2D;
+    class Vector2D;
+  }
   namespace TrackFindingCDC {
     class CDCTangent;
     class CDCRecoHit2D;
     class CDCRLWireHit;
-    class ParameterLine2D;
-    class Vector2D;
 
     /**
      * Class representing a triple of neighboring oriented wire with additional trajectory information.
@@ -39,7 +41,7 @@ namespace Belle2 {
       CDCFacet(const CDCRLWireHit& startRLWireHit,
                const CDCRLWireHit& middleRLWireHit,
                const CDCRLWireHit& endRLWireHit,
-               const UncertainParameterLine2D& fitLine);
+               const TrackingUtilities::UncertainParameterLine2D& fitLine);
 
       /// Reverses the facet in place including the fit line.
       void reverse();
@@ -54,13 +56,13 @@ namespace Belle2 {
       void invalidateFitLine();
 
       /// Getter for the contained line fit information.
-      const UncertainParameterLine2D& getFitLine() const
+      const TrackingUtilities::UncertainParameterLine2D& getFitLine() const
       {
         return m_fitLine;
       }
 
       /// Setter for the contained line fit information.
-      void setFitLine(const UncertainParameterLine2D& fitLine) const
+      void setFitLine(const TrackingUtilities::UncertainParameterLine2D& fitLine) const
       {
         m_fitLine = fitLine;
       }
@@ -70,30 +72,30 @@ namespace Belle2 {
        *  The line is computed as touching the first and second drift circle
        *  assuming the stored right left passage information.
        */
-      ParameterLine2D getStartToMiddleLine() const;
+      TrackingUtilities::ParameterLine2D getStartToMiddleLine() const;
 
       /**
        *  Getter for the tangential line from the first to the third hit.
        *  The line is computed as touching the first and third drift circle
        *  assuming the stored right left passage information
        */
-      ParameterLine2D getStartToEndLine() const;
+      TrackingUtilities::ParameterLine2D getStartToEndLine() const;
 
       /**
        *  Getter for the tangential line from the second to the third hit.
        *  The line is computed as touching the second and third drift circle
        *  assuming the stored right left passage information
        */
-      ParameterLine2D getMiddleToEndLine() const;
+      TrackingUtilities::ParameterLine2D getMiddleToEndLine() const;
 
       /// Getter for the reconstructed position at the first hit on the fit line
-      Vector2D getStartRecoPos2D() const;
+      TrackingUtilities::Vector2D getStartRecoPos2D() const;
 
       /// Getter for the reconstructed position at the second hit on the fit line
-      Vector2D getMiddleRecoPos2D() const;
+      TrackingUtilities::Vector2D getMiddleRecoPos2D() const;
 
       /// Getter for the reconstructed position at the third hit on the fit line
-      Vector2D getEndRecoPos2D() const;
+      TrackingUtilities::Vector2D getEndRecoPos2D() const;
 
       /// Getter for the first reconstructed hit
       CDCRecoHit2D getStartRecoHit2D() const;
@@ -123,17 +125,17 @@ namespace Belle2 {
       void receiveMaskedFlag() const;
 
       /// Mutable getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() const
+      TrackingUtilities::AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
       }
 
     private:
       /// Memory for a line fit to the three contained hits
-      mutable UncertainParameterLine2D m_fitLine;
+      mutable TrackingUtilities::UncertainParameterLine2D m_fitLine;
 
       /// Memory for the cellular automaton cell associated with the facet.
-      mutable AutomatonCell m_automatonCell;
+      mutable TrackingUtilities::AutomatonCell m_automatonCell;
     };
   }
 }

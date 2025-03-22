@@ -10,17 +10,19 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
-#include <tracking/trackFindingCDC/topology/EStereoKind.h>
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
 
 #include <iosfwd>
 #include <cassert>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
     class CDCWire;
+  }
+  namespace TrackFindingCDC {
 
     /**
      *  Class representing a triple of neighboring wire hits.
@@ -134,86 +136,86 @@ namespace Belle2 {
       Shape getShape() const;
 
       /// Getter for the common superlayer id of the pair
-      ISuperLayer getISuperLayer() const
+      TrackingUtilities::ISuperLayer getISuperLayer() const
       {
         assert(getStartRLWireHit().getISuperLayer() == getRearRLWireHitPair().getISuperLayer());
         return getStartRLWireHit().getISuperLayer();
       }
 
       /// Getter for the common stereo type of the superlayer of the pair.
-      EStereoKind getStereoKind() const
+      TrackingUtilities::EStereoKind getStereoKind() const
       {
-        return ISuperLayerUtil::getStereoKind(getISuperLayer());
+        return TrackingUtilities::ISuperLayerUtil::getStereoKind(getISuperLayer());
       }
 
       /// Indicator if the underlying wires are axial.
       bool isAxial() const
       {
-        return getStereoKind() == EStereoKind::c_Axial;
+        return getStereoKind() == TrackingUtilities::EStereoKind::c_Axial;
       }
 
       /// Getter for the wire the first oriented wire hit is based on.
-      const CDCWire& getStartWire() const
+      const TrackingUtilities::CDCWire& getStartWire() const
       {
         return getStartRLWireHit().getWire();
       }
 
       /// Getter for the wire the second oriented wire hit is based on.
-      const CDCWire& getMiddleWire() const
+      const TrackingUtilities::CDCWire& getMiddleWire() const
       {
         return getMiddleRLWireHit().getWire();
       }
 
       /// Getter for the wire the third oriented wire hit is based on.
-      const CDCWire& getEndWire() const
+      const TrackingUtilities::CDCWire& getEndWire() const
       {
         return getEndRLWireHit().getWire();
       }
 
       /// Indicator if any of the three oriented wire hits is based on the given wire.
-      bool hasWire(const CDCWire& wire) const
+      bool hasWire(const TrackingUtilities::CDCWire& wire) const
       {
         return getStartRLWireHit().isOnWire(wire) or getRearRLWireHitPair().hasWire(wire);
       }
 
       /// Getter for the right left passage information of the first oriented wire hit.
-      ERightLeft getStartRLInfo() const
+      TrackingUtilities::ERightLeft getStartRLInfo() const
       {
         return getStartRLWireHit().getRLInfo();
       }
 
       /// Getter for the right left passage information of the second oriented wire hit.
-      ERightLeft getMiddleRLInfo() const
+      TrackingUtilities::ERightLeft getMiddleRLInfo() const
       {
         return getMiddleRLWireHit().getRLInfo();
       }
 
       /// Getter for the right left passage information of the third oriented wire hit.
-      ERightLeft getEndRLInfo() const
+      TrackingUtilities::ERightLeft getEndRLInfo() const
       {
         return getEndRLWireHit().getRLInfo();
       }
 
       /// Getter for the hit wire of the first oriented wire hit.
-      const CDCWireHit& getStartWireHit() const
+      const TrackingUtilities::CDCWireHit& getStartWireHit() const
       {
         return getStartRLWireHit().getWireHit();
       }
 
       /// Getter for the hit wire of the second oriented wire hit.
-      const CDCWireHit& getMiddleWireHit() const
+      const TrackingUtilities::CDCWireHit& getMiddleWireHit() const
       {
         return getMiddleRLWireHit().getWireHit();
       }
 
       /// Getter for the hit wire of the third oriented wire hit.
-      const CDCWireHit& getEndWireHit() const
+      const TrackingUtilities::CDCWireHit& getEndWireHit() const
       {
         return getEndRLWireHit().getWireHit();
       }
 
       /// Indicator if any of the three oriented wire hits is based on the given wire hit.
-      bool hasWireHit(const CDCWireHit& wirehit) const
+      bool hasWireHit(const TrackingUtilities::CDCWireHit& wirehit) const
       {
         return getStartRLWireHit().hasWireHit(wirehit) or
                getRearRLWireHitPair().hasWireHit(wirehit);
@@ -286,19 +288,19 @@ namespace Belle2 {
       }
 
       /// Setter for the right left passage information of the first oriented wire hit.
-      void setStartRLInfo(const ERightLeft startRLInfo)
+      void setStartRLInfo(const TrackingUtilities::ERightLeft startRLInfo)
       {
         m_startRLWireHit.setRLInfo(startRLInfo);
       }
 
       /// Setter for the right left passage information of the second oriented wire hit.
-      void setMiddleRLInfo(const ERightLeft middleRLInfo)
+      void setMiddleRLInfo(const TrackingUtilities::ERightLeft middleRLInfo)
       {
         getRearRLWireHitPair().setFromRLInfo(middleRLInfo);
       }
 
       /// Setter for the right left passage information of the third oriented wire hit.
-      void setEndRLInfo(const ERightLeft endRLInfo)
+      void setEndRLInfo(const TrackingUtilities::ERightLeft endRLInfo)
       {
         getRearRLWireHitPair().setToRLInfo(endRLInfo);
       }

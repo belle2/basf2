@@ -11,18 +11,19 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
 
-#include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
-#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
+#include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CDCFacet::CDCFacet(const CDCRLWireHit& startRLWireHit,
                    const CDCRLWireHit& middleRLWireHit,
@@ -86,7 +87,7 @@ Vector2D CDCFacet::getEndRecoPos2D() const
 ParameterLine2D CDCFacet::getStartToMiddleLine() const
 {
   return ParameterLine2D::touchingCircles(getStartRLWireHit().getRefPos2D(),
-                                          getStartRLWireHit().getSignedRefDriftLength() ,
+                                          getStartRLWireHit().getSignedRefDriftLength(),
                                           getMiddleRLWireHit().getRefPos2D(),
                                           getMiddleRLWireHit().getSignedRefDriftLength());
 }
@@ -94,7 +95,7 @@ ParameterLine2D CDCFacet::getStartToMiddleLine() const
 ParameterLine2D CDCFacet::getStartToEndLine() const
 {
   return ParameterLine2D::touchingCircles(getStartRLWireHit().getRefPos2D(),
-                                          getStartRLWireHit().getSignedRefDriftLength() ,
+                                          getStartRLWireHit().getSignedRefDriftLength(),
                                           getEndRLWireHit().getRefPos2D(),
                                           getEndRLWireHit().getSignedRefDriftLength());
 }
@@ -102,7 +103,7 @@ ParameterLine2D CDCFacet::getStartToEndLine() const
 ParameterLine2D CDCFacet::getMiddleToEndLine() const
 {
   return ParameterLine2D::touchingCircles(getMiddleRLWireHit().getRefPos2D(),
-                                          getMiddleRLWireHit().getSignedRefDriftLength() ,
+                                          getMiddleRLWireHit().getSignedRefDriftLength(),
                                           getEndRLWireHit().getRefPos2D(),
                                           getEndRLWireHit().getSignedRefDriftLength());
 }

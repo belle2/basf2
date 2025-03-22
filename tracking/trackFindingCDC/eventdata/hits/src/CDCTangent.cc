@@ -11,15 +11,16 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
-#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
 
 #include <iostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair):
   CDCRLWireHitPair(rlWireHitPair), m_line()

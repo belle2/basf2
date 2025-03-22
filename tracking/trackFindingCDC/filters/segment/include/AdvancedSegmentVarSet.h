@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -45,13 +45,13 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct AdvancedSegmentVarNames : public VarNames<CDCSegment2D> {
+    struct AdvancedSegmentVarNames : public TrackingUtilities::VarNames<CDCSegment2D> {
 
       /// Number of variables to be generated
       // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
       // at least tell cppcheck that everything is fine
       // cppcheck-suppress duplInheritedMember
-      static const size_t nVars = size(advancedSegmentVarNames);
+      static const size_t nVars = TrackingUtilities::size(advancedSegmentVarNames);
 
       /// Getter for the name at the given index
       static constexpr char const* getName(int iName)
@@ -64,7 +64,7 @@ namespace Belle2 {
      *  Class to compute floating point variables from a segment
      *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
-    class AdvancedSegmentVarSet : public VarSet<AdvancedSegmentVarNames> {
+    class AdvancedSegmentVarSet : public TrackingUtilities::VarSet<AdvancedSegmentVarNames> {
 
     public:
       /// Generate and assign the contained variables

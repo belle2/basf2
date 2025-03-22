@@ -8,7 +8,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/boxes/Box.h>
-#include <tracking/trackFindingCDC/topology/ILayer.h>
+#include <tracking/trackingUtilities/topology/ILayer.h>
 
 #include <array>
 #include <cmath>
@@ -38,13 +38,13 @@ namespace Belle2 {
        *   * ESign::c_Zero if the drift circle lies on any of the curves
        *   * ESign::c_Invalid if the drift circle is on the wrong arm of the curve.
        */
-      ESign getDistanceSign(const HoughBox& houghBox,
-                            float x,
-                            float y,
-                            float l,
-                            float /*dxdz*/ = 0,
-                            float /*dydz*/ = 0,
-                            ILayer /*iCLayer*/ = -1) const
+      TrackingUtilities::ESign getDistanceSign(const HoughBox& houghBox,
+                                               float x,
+                                               float y,
+                                               float l,
+                                               float /*dxdz*/ = 0,
+                                               float /*dydz*/ = 0,
+                                               TrackingUtilities::ILayer /*iCLayer*/ = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
         const std::array<ContinuousImpact, 2>& impact = houghBox.getBounds<ContinuousImpact>();
@@ -56,7 +56,7 @@ namespace Belle2 {
         const bool onlyPositiveArm = 0 < m_curlCurv;
         if (onlyPositiveArm) {
           // Reject hit if it is on the inward going branch but the curvature suggest it is no curler
-          if (xRot[0] < 0 and xRot[1] < 0) return ESign::c_Invalid;
+          if (xRot[0] < 0 and xRot[1] < 0) return TrackingUtilities::ESign::c_Invalid;
         }
 
         std::array<float, 2> yRotPlusL;
@@ -70,7 +70,7 @@ namespace Belle2 {
         dist[0b01] = yRotPlusL[0] - static_cast<float>(impact[1]);
         dist[0b11] = yRotPlusL[1] - static_cast<float>(impact[1]);
 
-        return ESignUtil::common(dist);
+        return TrackingUtilities::ESignUtil::common(dist);
       }
 
     private:

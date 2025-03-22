@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
 #include <tracking/trackFindingCDC/hough/boxes/Box.h>
-#include <tracking/trackFindingCDC/topology/ILayer.h>
+#include <tracking/trackingUtilities/topology/ILayer.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -29,13 +29,13 @@ namespace Belle2 {
 
     public:
       /// Function that gives the sign of the distance from an observed drift circle to the sweeped object.
-      ESign getDistanceSign(const HoughBox& houghBox,
-                            float x,
-                            float y,
-                            float l,
-                            float dxdz,
-                            float dydz,
-                            ILayer /*iCLayer*/ = -1) const
+      TrackingUtilities::ESign getDistanceSign(const HoughBox& houghBox,
+                                               float x,
+                                               float y,
+                                               float l,
+                                               float dxdz,
+                                               float dydz,
+                                               TrackingUtilities::ILayer /*iCLayer*/ = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
         const std::array<ContinuousTanL, 2>& tanL = houghBox.getBounds<ContinuousTanL>();
@@ -62,7 +62,7 @@ namespace Belle2 {
         const bool onlyPositiveArm = 0 < m_curlCurv;
         if (onlyPositiveArm) {
           // Reject hit if it is on the inward going branch but the curvature suggest it is no curler
-          if (xRot[0] < 0 and xRot[1] < 0) return ESign::c_Invalid;
+          if (xRot[0] < 0 and xRot[1] < 0) return TrackingUtilities::ESign::c_Invalid;
         }
 
         // cppcheck-suppress unreadVariable
@@ -80,7 +80,7 @@ namespace Belle2 {
         dist[0b10] = -(yRot[1] + dydzRot[1] * sCor[0b10] * static_cast<float>(tanL[0]) + l);
         dist[0b11] = -(yRot[1] + dydzRot[1] * sCor[0b11] * static_cast<float>(tanL[1]) + l);
 
-        return ESignUtil::common(dist);
+        return TrackingUtilities::ESignUtil::common(dist);
       }
 
     private:

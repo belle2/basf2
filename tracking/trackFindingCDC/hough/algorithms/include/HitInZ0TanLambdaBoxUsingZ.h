@@ -9,12 +9,12 @@
 
 #include <tracking/trackFindingCDC/hough/boxes/Z0TanLambdaBox.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/topology/WireLine.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <tracking/trackingUtilities/topology/WireLine.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -37,11 +37,11 @@ namespace Belle2 {
        * and the hit in the xy-plane.
        * Note that this is not a binary decision and must be used with some sort of cutoff (because otherwise all hits belong in all boxes).
        */
-      Weight operator()(const CDCRecoHit3D& recoHit,
-                        const HoughBox* z0TanLambdaBox)
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCRecoHit3D& recoHit,
+                                           const HoughBox* z0TanLambdaBox)
       {
-        const CDCWire& wire = recoHit.getWire();
-        const WireLine& wireLine = wire.getWireLine();
+        const TrackingUtilities::CDCWire& wire = recoHit.getWire();
+        const TrackingUtilities::WireLine& wireLine = wire.getWireLine();
 
         float lowerZ0 = z0TanLambdaBox->getLowerZ0();
         float upperZ0 = z0TanLambdaBox->getUpperZ0();
@@ -52,11 +52,11 @@ namespace Belle2 {
         const float centerTanLambda = 0.5 * (lowerTanLambda + upperTanLambda);
 
         float perpS = recoHit.getArcLength2D();
-        const Vector2D& recoPosition = recoHit.getRecoPos2D();
+        const TrackingUtilities::Vector2D& recoPosition = recoHit.getRecoPos2D();
 
         float hitZ = centerTanLambda * perpS + centerZ0;
 
-        Vector2D pos2D = wireLine.nominalPos2DAtZ(hitZ);
+        TrackingUtilities::Vector2D pos2D = wireLine.nominalPos2DAtZ(hitZ);
 
         float distanceToRecoPosition = (pos2D - recoPosition).norm();
 
@@ -67,7 +67,8 @@ namespace Belle2 {
        * Compares distances from two hits to the track represented by the given box.
        * The comparison is done based on reconstructed Z coordinates of hits and track Z position.
        */
-      static bool compareDistances(const HoughBox& z0TanLambdaBox, const CDCRecoHit3D& lhsRecoHit, const CDCRecoHit3D& rhsRecoHit)
+      static bool compareDistances(const HoughBox& z0TanLambdaBox, const TrackingUtilities::CDCRecoHit3D& lhsRecoHit,
+                                   const TrackingUtilities::CDCRecoHit3D& rhsRecoHit)
       {
         const double z0Mean = (z0TanLambdaBox.getLowerZ0() + z0TanLambdaBox.getUpperZ0()) / 2.0;
         const double tanLambdaMean = (z0TanLambdaBox.getLowerTanLambda() + z0TanLambdaBox.getUpperTanLambda()) / 2.0;

@@ -8,9 +8,9 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -28,12 +28,12 @@ namespace Belle2 {
        *  and simply uses the values from the contained trajectory
        *  The calling code has to ensure this situation
        */
-      Weight operator()(const CDCSegment2D* segment,
-                        const Phi0CurvBox* phi0CurvBox)
+      TrackingUtilities::Weight operator()(const CDCSegment2D* segment,
+                                           const Phi0CurvBox* phi0CurvBox)
       {
         if (segment->empty()) return NAN;
-        const CDCTrajectory2D& trajectory2D = segment->getTrajectory2D();
-        Weight weight = operator()(&trajectory2D, phi0CurvBox);
+        const TrackingUtilities::CDCTrajectory2D& trajectory2D = segment->getTrajectory2D();
+        TrackingUtilities::Weight weight = operator()(&trajectory2D, phi0CurvBox);
         return weight * segment->size();
       }
 
@@ -41,11 +41,11 @@ namespace Belle2 {
        *  Checks if the given trajectory is considered part of the hough box in phi0, curvature space.
        *  Returns a finit weight if it is contained, NAN if not contained.
        */
-      Weight operator()(const CDCTrajectory2D* trajectory2D,
-                        const Phi0CurvBox* phi0CurvBox)
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCTrajectory2D* trajectory2D,
+                                           const Phi0CurvBox* phi0CurvBox)
       {
         double curvature = trajectory2D->getCurvature();
-        const Vector2D& phi0Vec = trajectory2D->getStartUnitMom2D();
+        const TrackingUtilities::Vector2D& phi0Vec = trajectory2D->getStartUnitMom2D();
 
         bool in = isPhi0CurvPointIn(phi0Vec, curvature, phi0CurvBox);
         return in ? 1 : NAN;
@@ -56,13 +56,13 @@ namespace Belle2 {
        *  Checks if the given hit triplet is considered part of the hough box in phi0, curvature space.
        *  Returns a finit weight if it is contained, NAN if not contained.
        */
-      Weight operator()(const CDCFacet* facet,
-                        const Phi0CurvBox* phi0CurvBox)
+      TrackingUtilities::Weight operator()(const CDCFacet* facet,
+                                           const Phi0CurvBox* phi0CurvBox)
       {
         const ParameterLine2D& line = facet->getStartToEndLine();
 
-        const Vector2D pos2D = facet->getMiddleRecoPos2D();
-        const Vector2D phiVec = line.tangential().unit();
+        const TrackingUtilities::Vector2D pos2D = facet->getMiddleRecoPos2D();
+        const TrackingUtilities::Vector2D phiVec = line.tangential().unit();
 
         // Calculate the curvature and phi0 of the circle through the origin
         // that touches the position pos2D under the angle phiVec.
@@ -78,13 +78,13 @@ namespace Belle2 {
       }
 
       /// Predicate checking if the phi0 vector and curvature are contained in the given box.
-      bool isPhi0CurvPointIn(const Vector2D& phi0Vec,
+      bool isPhi0CurvPointIn(const TrackingUtilities::Vector2D& phi0Vec,
                              const double curvature,
                              const Phi0CurvBox* phi0CurvBox)
       {
 
-        const Vector2D& lowerPhi0Vec = phi0CurvBox->getLowerPhi0Vec();
-        const Vector2D& upperPhi0Vec = phi0CurvBox->getUpperPhi0Vec();
+        const TrackingUtilities::Vector2D& lowerPhi0Vec = phi0CurvBox->getLowerPhi0Vec();
+        const TrackingUtilities::Vector2D& upperPhi0Vec = phi0CurvBox->getUpperPhi0Vec();
 
         // Allow containment to keep the reversal symmetry
         if (phi0CurvBox->isIn<1>(curvature)) {

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/hough/boxes/Z0TanLambdaBox.h>
 #include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
 
@@ -28,8 +28,8 @@ namespace Belle2 {
        *  Checks if the wire hit is contained in a z0 tan lambda hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
-      Weight operator()(const CDCRecoHit3D& recoHit,
-                        const HoughBox* z0TanLambdaBox)
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCRecoHit3D& recoHit,
+                                           const HoughBox* z0TanLambdaBox)
       {
         float lowerZ0 = z0TanLambdaBox->getLowerZ0();
         float upperZ0 = z0TanLambdaBox->getUpperZ0();
@@ -58,7 +58,8 @@ namespace Belle2 {
        * Compares distances from two hits to the track represented by the given box.
        * The comparison is done based on reconstructed Z coordinates of hits and track Z position.
        */
-      static bool compareDistances(const HoughBox& z0TanLambdaBox, const CDCRecoHit3D& lhsRecoHit, const CDCRecoHit3D& rhsRecoHit)
+      static bool compareDistances(const HoughBox& z0TanLambdaBox, const TrackingUtilities::CDCRecoHit3D& lhsRecoHit,
+                                   const TrackingUtilities::CDCRecoHit3D& rhsRecoHit)
       {
         const double z0Mean = (z0TanLambdaBox.getLowerZ0() + z0TanLambdaBox.getUpperZ0()) / 2.0;
         const double tanLambdaMean = (z0TanLambdaBox.getLowerTanLambda() + z0TanLambdaBox.getUpperTanLambda()) / 2.0;

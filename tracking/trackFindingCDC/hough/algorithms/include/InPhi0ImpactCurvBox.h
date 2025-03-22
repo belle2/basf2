@@ -8,7 +8,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/boxes/Box.h>
-#include <tracking/trackFindingCDC/topology/ILayer.h>
+#include <tracking/trackingUtilities/topology/ILayer.h>
 
 #include <array>
 #include <cmath>
@@ -41,13 +41,13 @@ namespace Belle2 {
        *   * ESign::c_Zero if the drift circle lies on any of the curves
        *   * ESign::c_Invalid if the drift circle is on the wrong arm of the curve.
        */
-      ESign getDistanceSign(const HoughBox& houghBox,
-                            float x,
-                            float y,
-                            float l,
-                            float /*dxdz*/ = 0,
-                            float /*dydz*/ = 0,
-                            ILayer /*iCLayer*/ = -1) const
+      TrackingUtilities::ESign getDistanceSign(const HoughBox& houghBox,
+                                               float x,
+                                               float y,
+                                               float l,
+                                               float /*dxdz*/ = 0,
+                                               float /*dydz*/ = 0,
+                                               TrackingUtilities::ILayer /*iCLayer*/ = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
         const std::array<DiscreteCurv, 2>& curv = houghBox.getBounds<DiscreteCurv>();
@@ -62,7 +62,7 @@ namespace Belle2 {
 
         if (onlyPositiveArm) {
           // Reject hit if it is on the inward going branch but the curvature suggest it is no curler
-          if (xRot[0] < 0 and xRot[1] < 0) return ESign::c_Invalid;
+          if (xRot[0] < 0 and xRot[1] < 0) return TrackingUtilities::ESign::c_Invalid;
         }
 
         std::array<float, 2> yRot;
@@ -87,7 +87,7 @@ namespace Belle2 {
 
 
         // Using binary notation encoding lower and upper box bounds to fill the flat array.
-        std::array<ESign, 2> distSign;
+        std::array<TrackingUtilities::ESign, 2> distSign;
         for (int c_Curv = 0; c_Curv < 2; ++c_Curv) {
           std::array<float, 4> dist;
           float curvHalf  = static_cast<float>(curv[c_Curv]) / 2;
@@ -95,10 +95,10 @@ namespace Belle2 {
           dist[0b01] = - yRotMinusI[0b01] + r2MinusI[0b01] * curvHalf - l;
           dist[0b10] = - yRotMinusI[0b10] + r2MinusI[0b10] * curvHalf - l;
           dist[0b11] = - yRotMinusI[0b11] + r2MinusI[0b11] * curvHalf - l;
-          distSign[c_Curv] = ESignUtil::common(dist);
+          distSign[c_Curv] = TrackingUtilities::ESignUtil::common(dist);
         }
 
-        return ESignUtil::common(distSign[0], distSign[1]);
+        return TrackingUtilities::ESignUtil::common(distSign[0], distSign[1]);
 
       }
 

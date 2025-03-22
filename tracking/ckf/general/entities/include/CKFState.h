@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <framework/logging/Logger.h>
@@ -112,7 +112,7 @@ namespace Belle2 {
     }
 
     /// Getter for the automaton cell.
-    TrackFindingCDC::AutomatonCell& getAutomatonCell()
+    TrackingUtilities::AutomatonCell& getAutomatonCell()
     {
       return m_automatonCell;
     }
@@ -160,7 +160,7 @@ namespace Belle2 {
     /// MSoP after advancing. Is undetermined before extrapolating!
     genfit::MeasuredStateOnPlane m_measuredStateOnPlane;
     /// Memory for the automaton cell.
-    TrackFindingCDC::AutomatonCell m_automatonCell;
+    TrackingUtilities::AutomatonCell m_automatonCell;
     /// Flag, if this state was already fitted.
     bool m_isFitted = false;
     /// Flag, if this state has a valid mSoP

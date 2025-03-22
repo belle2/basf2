@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/utilities/ProcessingSignalListener.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/SharedPlanePtr.h>
@@ -30,7 +30,7 @@ namespace Belle2 {
    *    * the extrapolation failed or
    *    * the extrapolation was into another direction as the direction parameter. See below.
    */
-  class Advancer : public TrackFindingCDC::ProcessingSignalListener {
+  class Advancer : public TrackingUtilities::ProcessingSignalListener {
   public:
     /// Extrapolate the mSoP of one plane to another plane and return the traveled distance or NAN, if travelling into the wrong direction.
     double extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
@@ -55,6 +55,6 @@ namespace Belle2 {
     /// Parameter for the distance given to the framework (can not handle EForwardBackward directly)
     std::string m_param_directionAsString = "both";
     /// Direction parameter converted from the string parameters
-    TrackFindingCDC::EForwardBackward m_param_direction = TrackFindingCDC::EForwardBackward::c_Unknown;
+    TrackingUtilities::EForwardBackward m_param_direction = TrackingUtilities::EForwardBackward::c_Unknown;
   };
 }

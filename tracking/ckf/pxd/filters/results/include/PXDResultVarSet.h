@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/FixedSizeNamedFloatTuple.h>
 
 #include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 #include <tracking/ckf/pxd/utilities/PXDAdvancer.h>
@@ -49,14 +49,14 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class PXDResultVarNames : public TrackFindingCDC::VarNames<CKFToPXDResult> {
+  class PXDResultVarNames : public TrackingUtilities::VarNames<CKFToPXDResult> {
 
   public:
     /// Number of variables to be generated.
     // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
     // at least tell cppcheck that everything is fine
     // cppcheck-suppress duplInheritedMember
-    static const size_t nVars = TrackFindingCDC::size(pxdResultVarNames);
+    static const size_t nVars = TrackingUtilities::size(pxdResultVarNames);
 
     /// Get the name of the column.
     constexpr
@@ -70,9 +70,9 @@ namespace Belle2 {
    * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match,
    * which knows the truth information if two tracks belong together or not.
    */
-  class PXDResultVarSet : public TrackFindingCDC::VarSet<PXDResultVarNames> {
+  class PXDResultVarSet : public TrackingUtilities::VarSet<PXDResultVarNames> {
     /// Type of the base class
-    using Super = TrackFindingCDC::VarSet<PXDResultVarNames>;
+    using Super = TrackingUtilities::VarSet<PXDResultVarNames>;
 
   public:
     PXDResultVarSet();

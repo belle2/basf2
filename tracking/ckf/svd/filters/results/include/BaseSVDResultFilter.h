@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 
 namespace Belle2 {
   /// Base filter for CKF SVD results (on overlap check)
-  using BaseSVDResultFilter = TrackFindingCDC::Filter<CKFToSVDResult>;
+  using BaseSVDResultFilter = TrackingUtilities::Filter<CKFToSVDResult>;
 }

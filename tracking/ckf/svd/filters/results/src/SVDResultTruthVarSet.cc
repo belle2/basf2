@@ -11,7 +11,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool SVDResultTruthVarSet::extract(const CKFToSVDResult* result)
 {

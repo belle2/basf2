@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/FixedSizeNamedFloatTuple.h>
 
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 #include <tracking/ckf/svd/utilities/SVDMCUtil.h>
@@ -32,14 +32,14 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class SVDResultTruthVarNames : public TrackFindingCDC::VarNames<CKFToSVDResult> {
+  class SVDResultTruthVarNames : public TrackingUtilities::VarNames<CKFToSVDResult> {
 
   public:
     /// Number of variables to be generated.
     // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
     // at least tell cppcheck that everything is fine
     // cppcheck-suppress duplInheritedMember
-    static const size_t nVars = TrackFindingCDC::size(svdResultTruthNames);
+    static const size_t nVars = TrackingUtilities::size(svdResultTruthNames);
 
     /// Get the name of the column.
     constexpr
@@ -53,7 +53,7 @@ namespace Belle2 {
    * Var set used in the CKF for calculating the probability of a correct result,
    * which knows the truth information if two tracks belong together or not.
    */
-  class SVDResultTruthVarSet : public TrackFindingCDC::VarSet<SVDResultTruthVarNames> {
+  class SVDResultTruthVarSet : public TrackingUtilities::VarSet<SVDResultTruthVarNames> {
   public:
     /// Generate and assign the variables from the object.
     bool extract(const CKFToSVDResult* result) final;

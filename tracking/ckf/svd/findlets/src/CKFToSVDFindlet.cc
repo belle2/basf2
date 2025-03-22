@@ -18,13 +18,13 @@
 #include <tracking/ckf/general/findlets/ResultStorer.icc.h>
 #include <tracking/ckf/general/utilities/Helpers.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 #include <tracking/ckf/svd/filters/relations/LayerSVDRelationFilter.icc.h>
 
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CKFToSVDFindlet::~CKFToSVDFindlet() = default;
 
@@ -91,7 +91,7 @@ void CKFToSVDFindlet::beginEvent()
   m_seedStates.clear();
   checkResizeClear<CKFToSVDState>(m_states, 40000);
 
-  checkResizeClear<TrackFindingCDC::WeightedRelation<CKFToSVDState>>(m_relations, 100000);
+  checkResizeClear<TrackingUtilities::WeightedRelation<CKFToSVDState>>(m_relations, 100000);
 
   m_results.clear();
   m_filteredResults.clear();
@@ -120,7 +120,7 @@ void CKFToSVDFindlet::apply()
   const auto hasLowHitNumber = [this](const CKFResult<RecoTrack, SpacePoint>& result) {
     return result.getHits().size() < m_param_minimalHitRequirement;
   };
-  TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
+  TrackingUtilities::erase_remove_if(m_results, hasLowHitNumber);
 
   m_overlapResolver.apply(m_results, m_filteredResults);
 

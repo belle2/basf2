@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>

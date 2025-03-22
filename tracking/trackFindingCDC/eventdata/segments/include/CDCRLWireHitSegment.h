@@ -8,18 +8,18 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 #include <vector>
 
 namespace Belle2 {
   namespace TrackingUtilities {
     class CDCWire;
+    class CDCRLWireHit;
   }
   namespace TrackFindingCDC {
 
     /// A segment consisting of two dimensional reconstructed hits
-    class CDCRLWireHitSegment :  public CDCSegment<CDCRLWireHit> {
+    class CDCRLWireHitSegment :  public CDCSegment<TrackingUtilities::CDCRLWireHit> {
     public:
       /// Default constructor for ROOT compatibility.
       CDCRLWireHitSegment() {}

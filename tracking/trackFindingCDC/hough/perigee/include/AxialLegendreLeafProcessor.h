@@ -8,7 +8,7 @@
 #pragma once
 
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
@@ -33,7 +33,7 @@ namespace Belle2 {
 
     public:
       /// Preliminary structure to save found hits and trajectory information
-      using Candidate = std::pair<TrackingUtilities::CDCTrajectory2D, std::vector<CDCRLWireHit> >;
+      using Candidate = std::pair<TrackingUtilities::CDCTrajectory2D, std::vector<TrackingUtilities::CDCRLWireHit> >;
 
     public:
       /// Initialize a new processor with the maximum level.
@@ -96,7 +96,7 @@ namespace Belle2 {
       /**
        *  Look for more hits near a ftted trajectory from hits available in the give node.
        */
-      std::vector<WithSharedMark<CDCRLWireHit> >
+      std::vector<WithSharedMark<TrackingUtilities::CDCRLWireHit> >
       searchRoad(const ANode& node, const TrackingUtilities::CDCTrajectory2D& trajectory2D);
 
     public:

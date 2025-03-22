@@ -19,7 +19,7 @@
 #include <stddef.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCRLWireHit;
   }
 }

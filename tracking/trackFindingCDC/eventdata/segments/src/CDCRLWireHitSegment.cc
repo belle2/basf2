@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

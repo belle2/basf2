@@ -48,7 +48,7 @@ namespace Belle2 {
       CDCKarimakiFitter fitter;
       // Tested alternative CDCRiemannFitter with only marginal differences;
 
-      std::vector<WithSharedMark<CDCRLWireHit>> hits(leaf->begin(), leaf->end());
+      std::vector<WithSharedMark<TrackingUtilities::CDCRLWireHit>> hits(leaf->begin(), leaf->end());
       std::sort(hits.begin(), hits.end()); // Hits should be naturally sorted
       observations2D.appendRange(hits);
       TrackingUtilities::CDCTrajectory2D trajectory2D = fitter.fit(observations2D);
@@ -81,7 +81,7 @@ namespace Belle2 {
 
           // Second version always holding on to the originally found hits
           int nHitsBefore = hits.size();
-          std::vector<WithSharedMark<CDCRLWireHit>> roadHits = this->searchRoad(*roadNode, trajectory2D);
+          std::vector<WithSharedMark<TrackingUtilities::CDCRLWireHit>> roadHits = this->searchRoad(*roadNode, trajectory2D);
           std::sort(roadHits.begin(), roadHits.end());
           hits.insert(hits.end(), roadHits.begin(), roadHits.end());
           std::inplace_merge(hits.begin(), hits.begin() + nHitsBefore, hits.end());
@@ -98,14 +98,14 @@ namespace Belle2 {
       // Mark found hit as used and safe them with the trajectory
       /////////////////////////////////////////////////////////////////////////
       std::vector<const TrackingUtilities::CDCWireHit*> foundWireHits;
-      for (CDCRLWireHit& rlWireHit : hits) {
+      for (TrackingUtilities::CDCRLWireHit& rlWireHit : hits) {
         foundWireHits.push_back(&rlWireHit.getWireHit());
       }
 
       AxialTrackUtil::addCandidateFromHits(foundWireHits, m_axialWireHits, m_tracks, true);
 
       // Sync up the marks with the used hits
-      for (WithSharedMark<CDCRLWireHit>& markableRLWireHit : leaf->getTree()->getTopNode()) {
+      for (WithSharedMark<TrackingUtilities::CDCRLWireHit>& markableRLWireHit : leaf->getTree()->getTopNode()) {
         const TrackingUtilities::AutomatonCell& automatonCell = markableRLWireHit.getWireHit().getAutomatonCell();
         if (automatonCell.hasTakenFlag() or automatonCell.hasMaskedFlag()) {
           markableRLWireHit.mark();
@@ -116,7 +116,7 @@ namespace Belle2 {
     }
 
     template <class ANode>
-    std::vector<WithSharedMark<CDCRLWireHit> >
+    std::vector<WithSharedMark<TrackingUtilities::CDCRLWireHit> >
     AxialLegendreLeafProcessor<ANode>::searchRoad(const ANode& node, const TrackingUtilities::CDCTrajectory2D& trajectory2D)
     {
       TrackingUtilities::PerigeeCircle circle = trajectory2D.getGlobalCircle();
@@ -145,10 +145,10 @@ namespace Belle2 {
                                         ContinuousImpact::getRange(impactBounds),
                                         DiscreteCurv::getRange(curvBounds));
 
-      std::vector<WithSharedMark<CDCRLWireHit>> hitsInPrecisionBox;
+      std::vector<WithSharedMark<TrackingUtilities::CDCRLWireHit>> hitsInPrecisionBox;
 
       // Explicitly making a copy here to ensure that we do not change the node content
-      for (WithSharedMark<CDCRLWireHit> markableRLWireHit : node) {
+      for (WithSharedMark<TrackingUtilities::CDCRLWireHit> markableRLWireHit : node) {
         // Skip marked hits
         if (markableRLWireHit.isMarked()) continue;
         TrackingUtilities::Weight weight = hitInPhi0CurvBox(markableRLWireHit, &precisionPhi0CurvBox);
@@ -168,7 +168,7 @@ namespace Belle2 {
     {
       std::vector<Candidate> result;
       for (const TrackingUtilities::CDCTrack& track : m_tracks) {
-        std::vector<CDCRLWireHit> rlWireHits;
+        std::vector<TrackingUtilities::CDCRLWireHit> rlWireHits;
         for (const TrackingUtilities::CDCRecoHit3D& recoHit3D : track) {
           rlWireHits.push_back(recoHit3D.getRLWireHit());
         }

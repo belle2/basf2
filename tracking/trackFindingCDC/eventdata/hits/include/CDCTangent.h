@@ -15,9 +15,11 @@
 #include <iosfwd>
 
 namespace Belle2 {
+  namespace TrackingUtilities {
+    class CDCRLWireHit;
+  }
   namespace TrackFindingCDC {
     class CDCRecoHit2D;
-    class CDCRLWireHit;
 
     /// Class representing a linear track piece between two oriented wire hits.
     /** A tangent is an approximation of the possible trajectory between two oriented wire hits.
@@ -42,8 +44,8 @@ namespace Belle2 {
       explicit CDCTangent(const CDCRLWireHitPair& rlWireHitPair);
 
       /// Construct a tangent from two oriented wire hits.
-      CDCTangent(const CDCRLWireHit& fromRLWireHit,
-                 const CDCRLWireHit& toRLWireHit);
+      CDCTangent(const TrackingUtilities::CDCRLWireHit& fromRLWireHit,
+                 const TrackingUtilities::CDCRLWireHit& toRLWireHit);
 
       /// Construct a tangent from a pair of oriented wire hits taking the given
       /// tangential line instead of a computed one.
@@ -51,8 +53,8 @@ namespace Belle2 {
                  const TrackingUtilities::ParameterLine2D& line);
 
       /// Construct a tangent from two oriented wire hits taking the given tangential line instead of a computed one.
-      CDCTangent(const CDCRLWireHit& fromRLWireHit,
-                 const CDCRLWireHit& toRLWireHit,
+      CDCTangent(const TrackingUtilities::CDCRLWireHit& fromRLWireHit,
+                 const TrackingUtilities::CDCRLWireHit& toRLWireHit,
                  const TrackingUtilities::ParameterLine2D& line);
 
       /// Getter for the touching point of the tangent to the first drift circle.

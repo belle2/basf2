@@ -8,7 +8,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackingUtilities/topology/CDCWire.h>
@@ -104,7 +104,7 @@ namespace Belle2 {
        *  Accepts if either the right passage hypothesis or the left passage hypothesis
        *  is in the hough box.
        */
-      TrackingUtilities::Weight operator()(CDCRLWireHit& rlTaggedWireHit,
+      TrackingUtilities::Weight operator()(TrackingUtilities::CDCRLWireHit& rlTaggedWireHit,
                                            const HoughBox* houghBox)
       {
         const TrackingUtilities::CDCWire& wire = rlTaggedWireHit.getWire();

@@ -21,6 +21,7 @@
 namespace Belle2 {
 
   namespace TrackingUtilities {
+    class CDCRLWireHit;
     class CDCTrajectory2D;
     class CDCWire;
     class CDCWireHit;
@@ -28,7 +29,6 @@ namespace Belle2 {
     class CDCRecoHit3D;
   }
   namespace TrackFindingCDC {
-    class CDCRLWireHit;
     class CDCRLWireHitPair;
     class CDCRLWireHitTriple;
     class CDCFacet;
@@ -193,7 +193,7 @@ namespace Belle2 {
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.
        */
-      std::size_t append(const CDCRLWireHit& rlWireHit);
+      std::size_t append(const TrackingUtilities::CDCRLWireHit& rlWireHit);
 
       /// Appends the two observed position
       std::size_t append(const CDCRLWireHitPair& rlWireHitPair);

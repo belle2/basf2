@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackingUtilities/topology/WireNeighborKind.h>
 #include <tracking/trackingUtilities/topology/CDCWire.h>

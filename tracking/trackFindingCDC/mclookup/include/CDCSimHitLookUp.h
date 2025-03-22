@@ -23,12 +23,12 @@ namespace Belle2 {
     class CDCWireHit;
     class Vector3D;
     class CDCRecoHit3D;
+    class CDCRLWireHit;
   }
 
   namespace TrackFindingCDC {
     class CDCMCMap;
     class CDCRecoHit2D;
-    class CDCRLWireHit;
 
     /// Singletone class to gather local information about the hits.
     /** Because of the reassignment of secondary hits and the different definition of the right
@@ -99,8 +99,8 @@ namespace Belle2 {
                                                       const std::vector<TrackingUtilities::CDCWireHit>& wireHits) const;
 
       /// Retrieve the wire hit including right left passage information for the given CDCHit form the given wire hits
-      CDCRLWireHit getRLWireHit(const CDCHit* ptrHit,
-                                const std::vector<TrackingUtilities::CDCWireHit>& wireHits) const;
+      TrackingUtilities::CDCRLWireHit getRLWireHit(const CDCHit* ptrHit,
+                                                   const std::vector<TrackingUtilities::CDCWireHit>& wireHits) const;
 
       /// Construct an CDCRecoHit3D from the (potential secondary) CDCSimHit information related to the CDCHit.
       TrackingUtilities::CDCRecoHit3D getRecoHit3D(const CDCHit* ptrHit,

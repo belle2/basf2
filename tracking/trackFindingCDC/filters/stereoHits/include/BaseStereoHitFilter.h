@@ -14,15 +14,15 @@
 namespace Belle2 {
   namespace TrackingUtilities {
     class CDCTrack;
+    class CDCRLWireHit;
   }
   namespace TrackFindingCDC {
-    class CDCRLWireHit;
 
     // Guard to prevent repeated instantiations
     // extern template class TrackingUtilities::Filter<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCRLWireHit>>;
 
     /// Base filter for stereo hit - track relations.
     using BaseStereoHitFilter =
-      TrackingUtilities::Filter<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCRLWireHit>>;
+      TrackingUtilities::Filter<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const TrackingUtilities::CDCRLWireHit>>;
   }
 }

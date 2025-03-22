@@ -8,7 +8,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/RLTaggedWireHitCreator.h>
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
 #include <vector>
 

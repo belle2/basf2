@@ -8,7 +8,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/perigee/SimpleHitBasedHoughTree.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -16,7 +16,7 @@ namespace Belle2 {
     /// A simple hough tree taking rl tagable wire hits as smallest units.
     template<class AInBox, size_t ... divisions>
     using SimpleRLTaggedWireHitHoughTree =
-      SimpleHitBasedHoughTree<CDCRLWireHit, AInBox, divisions ... >;
+      SimpleHitBasedHoughTree<TrackingUtilities::CDCRLWireHit, AInBox, divisions ... >;
 
   }
 }

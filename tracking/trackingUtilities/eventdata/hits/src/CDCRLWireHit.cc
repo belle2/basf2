@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
@@ -28,7 +28,6 @@
 #include <type_traits>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 
 namespace Belle2 {
@@ -190,7 +189,7 @@ Vector3D CDCRLWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const 
   }
 }
 
-std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const CDCRLWireHit& rlWireHit)
+std::ostream& TrackingUtilities::operator<<(std::ostream& output, const CDCRLWireHit& rlWireHit)
 {
   output << "CDCRLWireHit(" << rlWireHit.getWireHit() << ","
          << static_cast<typename std::underlying_type<ERightLeft>::type>(rlWireHit.getRLInfo()) << ")" ;

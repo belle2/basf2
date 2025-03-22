@@ -16,11 +16,11 @@ namespace Belle2 {
   namespace TrackingUtilities {
     class ParameterLine2D;
     class Vector2D;
+    class CDCRLWireHit;
   }
   namespace TrackFindingCDC {
     class CDCTangent;
     class CDCRecoHit2D;
-    class CDCRLWireHit;
 
     /**
      * Class representing a triple of neighboring oriented wire with additional trajectory information.
@@ -33,14 +33,14 @@ namespace Belle2 {
       CDCFacet() = default;
 
       /// Constructor taking three oriented wire hits.
-      CDCFacet(const CDCRLWireHit& startRLWireHit,
-               const CDCRLWireHit& middleRLWireHit,
-               const CDCRLWireHit& endRLWireHit);
+      CDCFacet(const TrackingUtilities::CDCRLWireHit& startRLWireHit,
+               const TrackingUtilities::CDCRLWireHit& middleRLWireHit,
+               const TrackingUtilities::CDCRLWireHit& endRLWireHit);
 
       /// Constructor taking three oriented wire hits and the fit line.
-      CDCFacet(const CDCRLWireHit& startRLWireHit,
-               const CDCRLWireHit& middleRLWireHit,
-               const CDCRLWireHit& endRLWireHit,
+      CDCFacet(const TrackingUtilities::CDCRLWireHit& startRLWireHit,
+               const TrackingUtilities::CDCRLWireHit& middleRLWireHit,
+               const TrackingUtilities::CDCRLWireHit& endRLWireHit,
                const TrackingUtilities::UncertainParameterLine2D& fitLine);
 
       /// Reverses the facet in place including the fit line.

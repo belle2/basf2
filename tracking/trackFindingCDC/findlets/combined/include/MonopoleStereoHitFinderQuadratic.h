@@ -71,10 +71,10 @@ namespace Belle2 {
       /// Find matching hits to a track
       StereoHitTrackQuadTreeMatcher<HitQuadraticLegendre> m_matcher;
       /// Filter for the Stereo Hits added to the track
-      TrackingUtilities::FilterSelector<TrackingUtilities::CDCTrack, CDCRLWireHit, TrackingUtilities::ChooseableFilter<StereoHitFilterFactory>>
+      TrackingUtilities::FilterSelector<TrackingUtilities::CDCTrack, TrackingUtilities::CDCRLWireHit, TrackingUtilities::ChooseableFilter<StereoHitFilterFactory>>
           m_filterSelector;
       /// Select only those where the relation is unique (or the best one in those groups)
-      TrackingUtilities::SingleMatchSelector<TrackingUtilities::CDCTrack, CDCRLWireHit, TrackingUtilities::HitComperator>
+      TrackingUtilities::SingleMatchSelector<TrackingUtilities::CDCTrack, TrackingUtilities::CDCRLWireHit, TrackingUtilities::HitComperator>
       m_singleMatchSelector;
       /// Add the hits to the tracks
       StereoHitTrackAdder m_adder;
@@ -84,9 +84,9 @@ namespace Belle2 {
 
       // Object pools
       /// Vector holding all possible wire hits with all possible RL combinations
-      std::vector<CDCRLWireHit> m_rlTaggedWireHits;
+      std::vector<TrackingUtilities::CDCRLWireHit> m_rlTaggedWireHits;
       /// Vector of relations between tracks and hits
-      std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCRLWireHit>> m_relations;
+      std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const TrackingUtilities::CDCRLWireHit>> m_relations;
     };
   }
 }

@@ -123,7 +123,7 @@ void SegmentFitter::apply(std::vector<CDCSegment2D>& outputSegments)
         ERightLeft rlInfo = trajectory2D.isRightOrLeft(recoHit2D.getRefPos2D());
         if (rlInfo != recoHit2D.getRLInfo()) ++nRLChanges;
         recoHit2D.setRLInfo(rlInfo);
-        const CDCRLWireHit& rlWireHit = recoHit2D.getRLWireHit();
+        const TrackingUtilities::CDCRLWireHit& rlWireHit = recoHit2D.getRLWireHit();
         Vector2D recoPos2D = rlWireHit.reconstruct2D(trajectory2D);
         recoHit2D.setRecoPos2D(recoPos2D);
       }

@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
@@ -53,7 +53,7 @@ namespace Belle2 {
       CDCRecoHit3D() = default;
 
       /// Constructor taking all stored variables of the reconstructed hit.
-      CDCRecoHit3D(const TrackFindingCDC::CDCRLWireHit& rlWireHit, const Vector3D& recoPos3D, double arcLength2D = 0);
+      CDCRecoHit3D(const CDCRLWireHit& rlWireHit, const Vector3D& recoPos3D, double arcLength2D = 0);
 
       /**
        *  Constructs a three dimensional reconstructed hit from a sim hit and the associated wirehit.
@@ -85,7 +85,7 @@ namespace Belle2 {
        *  information by shifting it to a z coordinate, where it touches the two dimensional trajectory
        *  from the side indicated by the right left passage.
        */
-      static CDCRecoHit3D reconstruct(const TrackFindingCDC::CDCRLWireHit& rlWireHit,
+      static CDCRecoHit3D reconstruct(const CDCRLWireHit& rlWireHit,
                                       const CDCTrajectory2D& trajectory2D);
 
       /**
@@ -245,13 +245,13 @@ namespace Belle2 {
       }
 
       /// Getter for the oriented wire hit.
-      const TrackFindingCDC::CDCRLWireHit& getRLWireHit() const
+      const CDCRLWireHit& getRLWireHit() const
       {
         return m_rlWireHit;
       }
 
       /// Setter for the oriented wire hit associated with the reconstructed hit.
-      void setRLWireHit(const TrackFindingCDC::CDCRLWireHit& rlWireHit)
+      void setRLWireHit(const CDCRLWireHit& rlWireHit)
       {
         m_rlWireHit = rlWireHit;
       }
@@ -384,7 +384,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the oriented wire hit reference.
-      TrackFindingCDC::CDCRLWireHit m_rlWireHit;
+      CDCRLWireHit m_rlWireHit;
 
       /// Memory for the reconstructed hit position.
       Vector3D m_recoPos3D;

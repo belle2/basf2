@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackingUtilities/topology/EStereoKind.h>
 #include <tracking/trackingUtilities/topology/ISuperLayer.h>
@@ -53,11 +53,11 @@ namespace Belle2 {
        *  Constructs a reconstructed hit based on the given oriented wire hit with the given
        *  displacement from the wire reference position.
        */
-      CDCRecoHit2D(const CDCRLWireHit& rlWireHit,
+      CDCRecoHit2D(const TrackingUtilities::CDCRLWireHit& rlWireHit,
                    const TrackingUtilities::Vector2D& recoDisp2D);
 
       /// Constructs a reconstructed hit based on the oriented wire hit with no displacement.
-      explicit CDCRecoHit2D(const CDCRLWireHit& rlWireHit);
+      explicit CDCRecoHit2D(const TrackingUtilities::CDCRLWireHit& rlWireHit);
 
       /**
        *  Constructs the average of two reconstructed hit positions and snaps it to the drift circle.
@@ -88,7 +88,7 @@ namespace Belle2 {
        *  @param snap      optional indicator if the displacement shall be shrank to the drift circle (default true)
        */
       static CDCRecoHit2D
-      fromRecoPos2D(const CDCRLWireHit& rlWireHit, const TrackingUtilities::Vector2D& recoPos2D, bool snap = true);
+      fromRecoPos2D(const TrackingUtilities::CDCRLWireHit& rlWireHit, const TrackingUtilities::Vector2D& recoPos2D, bool snap = true);
 
       /**
        *  Turns the orientation in place.
@@ -277,20 +277,20 @@ namespace Belle2 {
       TrackingUtilities::Vector3D reconstruct3D(const TrackingUtilities::CDCTrajectory2D& trajectory2D, const double z = 0) const;
 
       /// Getter for the oriented wire hit associated with the reconstructed hit.
-      const CDCRLWireHit& getRLWireHit() const
+      const TrackingUtilities::CDCRLWireHit& getRLWireHit() const
       {
         return m_rlWireHit;
       }
 
       /// Setter for the oriented wire hit associated with the reconstructed hit.
-      void setRLWireHit(const CDCRLWireHit& rlWireHit)
+      void setRLWireHit(const TrackingUtilities::CDCRLWireHit& rlWireHit)
       {
         m_rlWireHit = rlWireHit;
       }
 
     private:
       /// Memory for the reference to the associated wire hit.
-      CDCRLWireHit m_rlWireHit;
+      TrackingUtilities::CDCRLWireHit m_rlWireHit;
 
       /// Memory for the displacement of the associated wire reference position.
       TrackingUtilities::Vector2D m_recoDisp2D;

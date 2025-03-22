@@ -91,16 +91,16 @@ namespace Belle2 {
       }
 
       /// Draw the results to a ROOT TCanvas
-      void drawDebugPlot(const std::vector<CDCRecoHit3D>& allHits,
-                         const std::vector<CDCRecoHit3D>& foundHits,
+      void drawDebugPlot(const std::vector<TrackingUtilities::CDCRecoHit3D>& allHits,
+                         const std::vector<TrackingUtilities::CDCRecoHit3D>& foundHits,
                          const typename AInBoxAlgorithm::HoughBox& node)
       {
         TGraph* allHitsGraph = new TGraph();
         allHitsGraph->SetLineWidth(2);
         allHitsGraph->SetLineColor(9);
 
-        for (const CDCRecoHit3D& recoHit3D : allHits) {
-          const Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
+        for (const TrackingUtilities::CDCRecoHit3D& recoHit3D : allHits) {
+          const TrackingUtilities::Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
           const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
           const double Z = recoPos3D.z();
           allHitsGraph->SetPoint(allHitsGraph->GetN(), R, Z);
@@ -117,8 +117,8 @@ namespace Belle2 {
         foundHitsGraph->SetMarkerStyle(8);
         foundHitsGraph->SetMarkerColor(2);
 
-        for (const CDCRecoHit3D& recoHit3D : foundHits) {
-          const Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
+        for (const TrackingUtilities::CDCRecoHit3D& recoHit3D : foundHits) {
+          const TrackingUtilities::Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
           const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
           const double Z = recoPos3D.z();
           foundHitsGraph->SetPoint(foundHitsGraph->GetN(), R, Z);

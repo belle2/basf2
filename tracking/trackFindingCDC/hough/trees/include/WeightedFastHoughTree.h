@@ -66,7 +66,7 @@ namespace Belle2 {
         for (auto&& item : items) {
           m_marks.push_back(false);
           bool& markOfItem = m_marks.back();
-          Weight weight = DBL_MAX;
+          TrackingUtilities::Weight weight = DBL_MAX;
           topNode.insert(WithSharedMark<T>(T(item), &markOfItem), weight);
         }
       }
@@ -130,7 +130,7 @@ namespace Belle2 {
       std::vector<std::pair<ADomain, std::vector<T>>>
       findHeaviestLeafRepeated(AItemInDomainMeasure& weightItemInDomain,
                                int maxLevel,
-                               const Weight minWeight = NAN)
+                               const TrackingUtilities::Weight minWeight = NAN)
       {
         auto skipLowWeightNode = [minWeight](const Node * node) {
           return not(node->getWeight() >= minWeight);
@@ -199,14 +199,14 @@ namespace Belle2 {
                              ASkipNodePredicate& skipNode)
       {
         Node* heaviestNode = nullptr;
-        Weight heighestWeigth = NAN;
+        TrackingUtilities::Weight heighestWeigth = NAN;
         auto isLeaf = [&heaviestNode, &heighestWeigth, maxLevel, &skipNode](Node * node) {
           // Skip the expansion and the filling of the children
           if (skipNode(node)) {
             return true;
           }
 
-          Weight nodeWeight = node->getWeight();
+          TrackingUtilities::Weight nodeWeight = node->getWeight();
           // Skip the expansion and filling of the children if the node has not enough weight
           if (not std::isnan(heighestWeigth) and not(nodeWeight > heighestWeigth)) {
             return true;
@@ -254,7 +254,7 @@ namespace Belle2 {
               assert(childNode.getChildren() == nullptr);
               assert(childNode.size() == 0);
               auto measure =
-              [&childNode, &weightItemInDomain](WithSharedMark<T>& markableItem) -> Weight {
+              [&childNode, &weightItemInDomain](WithSharedMark<T>& markableItem) -> TrackingUtilities::Weight {
                 // Weighting function should not see the mark, but only the item itself.
                 T & item(markableItem);
                 return weightItemInDomain(item, &childNode);

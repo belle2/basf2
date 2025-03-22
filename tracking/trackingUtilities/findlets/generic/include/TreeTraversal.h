@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
-#include <tracking/trackFindingCDC/utilities/Range.h>
+#include <tracking/trackingUtilities/utilities/Relation.h>
+#include <tracking/trackingUtilities/utilities/Range.h>
 
 #include <framework/logging/Logger.h>
 
@@ -19,7 +19,7 @@
 
 namespace Belle2 {
   class ModuleParamList;
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /**
      * General implementation of a tree search algorithm using a given classes as state and results
      * and one strategy class to decide, which child states should be traversed next.

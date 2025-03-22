@@ -7,21 +7,21 @@
  **************************************************************************/
 
 #include <gtest/gtest.h>
-#include <tracking/trackFindingCDC/findlets/generic/TreeTraversal.h>
-#include <tracking/trackFindingCDC/findlets/generic/WeightedTreeTraversal.h>
+#include <tracking/trackingUtilities/findlets/generic/TreeTraversal.h>
+#include <tracking/trackingUtilities/findlets/generic/WeightedTreeTraversal.h>
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 #include <vector>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   using State = int;
@@ -48,7 +48,7 @@ namespace {
 }
 
 
-TEST(TrackFindingCDCTest, Findlet_generic_TreeTraversal)
+TEST(TrackingUtilitiesTest, Findlet_generic_TreeTraversal)
 {
   TreeTraversal<AcceptAll, State, Result> testTreeTraversal;
 
@@ -82,7 +82,7 @@ TEST(TrackFindingCDCTest, Findlet_generic_TreeTraversal)
   EXPECT_EQ(3, *results[1][1]);
 }
 
-TEST(TrackFindingCDCTest, Findlet_generic_WeightedTreeTraversal)
+TEST(TrackingUtilitiesTest, Findlet_generic_WeightedTreeTraversal)
 {
   WeightedTreeTraversal<AcceptHighWeight, State> testWeightedTreeTraversal;
 

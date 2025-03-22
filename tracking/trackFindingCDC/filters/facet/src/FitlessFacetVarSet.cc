@@ -7,12 +7,13 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool FitlessFacetVarSet::extract(const CDCFacet* ptrFacet)
 {

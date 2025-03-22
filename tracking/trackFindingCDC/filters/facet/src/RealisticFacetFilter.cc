@@ -9,9 +9,9 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/numerics/Quadratic.h>
+#include <tracking/trackingUtilities/numerics/Quadratic.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
@@ -19,6 +19,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 RealisticFacetFilter::RealisticFacetFilter()
   : m_param_phiPullCut(11)

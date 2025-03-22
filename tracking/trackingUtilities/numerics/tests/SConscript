@@ -1,7 +1,7 @@
 Import('env')
 
 env['LIBS'] = [
-    'tracking_trackFindingCDC',
+    'tracking_trackingUtilities',
     'framework',
     '$ROOT_LIBS',
     '$PYTHON_LIBS',

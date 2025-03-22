@@ -5,18 +5,18 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/numerics/PlainMatrixUtil.h>
-#include <tracking/trackFindingCDC/numerics/PlainMatrix.h>
+#include <tracking/trackingUtilities/numerics/PlainMatrixUtil.h>
+#include <tracking/trackingUtilities/numerics/PlainMatrix.h>
 
-#include <tracking/trackFindingCDC/numerics/EigenView.h>
+#include <tracking/trackingUtilities/numerics/EigenView.h>
 
 #include <gtest/gtest.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
-TEST(TrackFindingCDCTest, PlainMatrix_zero)
+TEST(TrackingUtilitiesTest, PlainMatrix_zero)
 {
   /// Implicit zero
   {
@@ -40,7 +40,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_zero)
 }
 
 
-TEST(TrackFindingCDCTest, PlainMatrix_id)
+TEST(TrackingUtilitiesTest, PlainMatrix_id)
 {
   auto result = PlainMatrix<double, 5, 5>::Identity();
   for (int i = 0; i < result.rows(); ++i) {
@@ -55,7 +55,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_id)
 }
 
 
-TEST(TrackFindingCDCTest, PlainMatrix_diag)
+TEST(TrackingUtilitiesTest, PlainMatrix_diag)
 {
   PlainMatrix<double, 5, 1> diagElements{{0, 1, 2, 3, 4}};
   auto result = PlainMatrixUtil::Diag(diagElements);
@@ -75,7 +75,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_diag)
 }
 
 
-TEST(TrackFindingCDCTest, PlainMatrix_constant)
+TEST(TrackingUtilitiesTest, PlainMatrix_constant)
 {
   auto result = PlainMatrix<double, 5, 5>::Constant(3);
   for (int i = 0; i < result.rows(); ++i) {
@@ -86,7 +86,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_constant)
 }
 
 
-TEST(TrackFindingCDCTest, PlainMatrix_aggregate_initialization)
+TEST(TrackingUtilitiesTest, PlainMatrix_aggregate_initialization)
 {
   auto result = PlainMatrix<double, 2, 1>({ -1.0, 1.0});
   EXPECT_EQ(-1, result(0, 0));
@@ -101,7 +101,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_aggregate_initialization)
 }
 
 
-TEST(TrackFindingCDCTest, PlainMatrix_vstack)
+TEST(TrackingUtilitiesTest, PlainMatrix_vstack)
 {
 
   auto a = PlainMatrix<double, 2, 1>({1, 2});
@@ -119,7 +119,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_vstack)
   EXPECT_EQ(5, result(4, 0));
 }
 
-TEST(TrackFindingCDCTest, PlainMatrix_hstack)
+TEST(TrackingUtilitiesTest, PlainMatrix_hstack)
 {
 
   auto a = PlainMatrix<double, 2, 1>({1, 2});
@@ -138,7 +138,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_hstack)
 
 
 
-TEST(TrackFindingCDCTest, PlainMatrix_blockstack)
+TEST(TrackingUtilitiesTest, PlainMatrix_blockstack)
 {
 
   auto a = PlainMatrix<double, 2, 1>({1, 2});
@@ -161,7 +161,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_blockstack)
   EXPECT_EQ(5, result(4, 1));
 }
 
-TEST(TrackFindingCDCTest, PlainMatrix_element_access)
+TEST(TrackingUtilitiesTest, PlainMatrix_element_access)
 {
   auto a = PlainMatrix<double, 3, 1>::Zero();
   a(0, 0) = 1;
@@ -173,7 +173,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_element_access)
   EXPECT_EQ(3, a(2));
 }
 
-TEST(TrackFindingCDCTest, PlainMatrix_minus)
+TEST(TrackingUtilitiesTest, PlainMatrix_minus)
 {
   auto a = PlainMatrix<double, 2, 1>({1, 2});
   auto b = PlainMatrix<double, 2, 1>({2, 3});
@@ -186,7 +186,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_minus)
   }
 }
 
-TEST(TrackFindingCDCTest, PlainMatrix_plus)
+TEST(TrackingUtilitiesTest, PlainMatrix_plus)
 {
   auto a = PlainMatrix<double, 2, 1>({1, 2});
   auto b = PlainMatrix<double, 2, 1>({2, 1});
@@ -199,7 +199,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_plus)
   }
 }
 
-TEST(TrackFindingCDCTest, PlainMatrix_divide)
+TEST(TrackingUtilitiesTest, PlainMatrix_divide)
 {
   auto a = PlainMatrix<double, 2, 1>({2, 2});
 
@@ -212,7 +212,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_divide)
 }
 
 
-TEST(TrackFindingCDCTest, PlainMatrix_inverse_divide)
+TEST(TrackingUtilitiesTest, PlainMatrix_inverse_divide)
 {
   auto a = PlainMatrix<double, 2, 1>({2, 2});
 
@@ -224,7 +224,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_inverse_divide)
   }
 }
 
-TEST(TrackFindingCDCTest, PlainMatrix_muliplication)
+TEST(TrackingUtilitiesTest, PlainMatrix_muliplication)
 {
   auto a = PlainMatrix<double, 2, 1>({2, 2});
   auto b = PlainMatrix<double, 1, 2>({1.0 / 4.0, 1.0 / 4.0});
@@ -247,7 +247,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_muliplication)
   EXPECT_EQ(1.0 / 2.0, result2(1, 1));
 }
 
-TEST(TrackFindingCDCTest, PlainMatrix_block)
+TEST(TrackingUtilitiesTest, PlainMatrix_block)
 {
   auto a = PlainMatrix<double, 2, 1>({1, 2});
   auto b = PlainMatrix<double, 3, 1>({3, 4, 5});
@@ -261,7 +261,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_block)
   EXPECT_TRUE(std::equal(b.data(), b.data() + b.size(), bNew.data()));
 }
 
-TEST(TrackFindingCDCTest, PlainMatrixEigenMap_mapToEigen)
+TEST(TrackingUtilitiesTest, PlainMatrixEigenMap_mapToEigen)
 {
   auto a = PlainMatrix<double, 2, 1>({1, 2});
   auto b = PlainMatrix<double, 3, 1>({3, 4, 5});
@@ -290,7 +290,7 @@ TEST(TrackFindingCDCTest, PlainMatrixEigenMap_mapToEigen)
   }
 }
 
-TEST(TrackFindingCDCTest, PlainMatrixEigenMap_output_operator)
+TEST(TrackingUtilitiesTest, PlainMatrixEigenMap_output_operator)
 {
   auto a = PlainMatrix<double, 2, 1>({1, 2});
   std::stringstream oss;

@@ -5,15 +5,15 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/numerics/SinEqLine.h>
+#include <tracking/trackingUtilities/numerics/SinEqLine.h>
 
-#include <tracking/trackFindingCDC/geometry/Line2D.h>
+#include <tracking/trackingUtilities/geometry/Line2D.h>
 
-#include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
+#include <tracking/trackingUtilities/numerics/CovarianceMatrixUtil.h>
 
-#include <tracking/trackFindingCDC/numerics/Median.h>
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
-#include <tracking/trackFindingCDC/numerics/ESign.h>
+#include <tracking/trackingUtilities/numerics/Median.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/ESign.h>
 
 #include <framework/gearbox/Unit.h>
 
@@ -21,10 +21,10 @@
 
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
-TEST(TrackFindingCDCTest, numerics_sign)
+TEST(TrackingUtilitiesTest, numerics_sign)
 {
   EXPECT_EQ(ESign::c_Plus, sign(INFINITY));
   EXPECT_EQ(ESign::c_Plus, sign(2));
@@ -48,7 +48,7 @@ TEST(TrackFindingCDCTest, numerics_sign)
 }
 
 
-TEST(TrackFindingCDCTest, numerics_SinEqLine_isIncreasing)
+TEST(TrackingUtilitiesTest, numerics_SinEqLine_isIncreasing)
 {
 
   Vector2D lower(0.0, 1.0);
@@ -59,7 +59,7 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_isIncreasing)
 }
 
 
-TEST(TrackFindingCDCTest, numerics_SinEqLine_getIPeriodFromIHalfPeriod)
+TEST(TrackingUtilitiesTest, numerics_SinEqLine_getIPeriodFromIHalfPeriod)
 {
   int iHalfPeriod = -1;
   int iPeriod = SinEqLine::getIPeriodFromIHalfPeriod(iHalfPeriod);
@@ -67,7 +67,7 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_getIPeriodFromIHalfPeriod)
 }
 
 
-TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_simple)
+TEST(TrackingUtilitiesTest, numerics_SinEqLine_computeRootInInterval_simple)
 {
 
   // Simple sin.
@@ -83,7 +83,7 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_simple)
 
 
 
-TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_const)
+TEST(TrackingUtilitiesTest, numerics_SinEqLine_computeRootInInterval_const)
 {
 
   // Constant sin.
@@ -98,7 +98,7 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_const)
 }
 
 
-TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_complex)
+TEST(TrackingUtilitiesTest, numerics_SinEqLine_computeRootInInterval_complex)
 {
 
   // Setup a line that is a
@@ -117,7 +117,7 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_complex)
 }
 
 
-TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalfPeriod_simple)
+TEST(TrackingUtilitiesTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalfPeriod_simple)
 {
 
   // Setup a line that is a
@@ -135,7 +135,7 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalfP
 }
 
 
-TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalfPeriod)
+TEST(TrackingUtilitiesTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalfPeriod)
 {
 
   // Setup a line that is a
@@ -154,7 +154,7 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalfP
 }
 
 
-TEST(TrackFindingCDCTest, numerics_SinEqLine_computeSmallestPositiveRoot)
+TEST(TrackingUtilitiesTest, numerics_SinEqLine_computeSmallestPositiveRoot)
 {
 
   // Setup a line that is a
@@ -174,7 +174,7 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeSmallestPositiveRoot)
 
 
 
-TEST(TrackFindingCDCTest, numerics_SinEqLine_computeSmallestPositiveRoot_largeSlope)
+TEST(TrackingUtilitiesTest, numerics_SinEqLine_computeSmallestPositiveRoot_largeSlope)
 {
 
   // Setup a line that is a
@@ -194,7 +194,7 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeSmallestPositiveRoot_largeSl
 
 
 
-TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootForLargeSlope)
+TEST(TrackingUtilitiesTest, numerics_SinEqLine_computeRootForLargeSlope)
 {
   // Setup a line that is a
   double rootX = 150.0 * Unit::deg;
@@ -210,7 +210,7 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootForLargeSlope)
   EXPECT_NEAR(0.0, solvedRootY, 10e-7);
 }
 
-TEST(TrackFindingCDCTest, numerics_median)
+TEST(TrackingUtilitiesTest, numerics_median)
 {
   std::vector<double> fourValues{0.0, 3.0, 5.0, 100};
   EXPECT_EQ(4.0, median(std::move(fourValues)));
@@ -226,7 +226,7 @@ TEST(TrackFindingCDCTest, numerics_median)
   EXPECT_EQ(100.0, weightedMedian(std::move(weightedValues)));
 }
 
-TEST(TrackFindingCDCTest, covariance_simple_average)
+TEST(TrackingUtilitiesTest, covariance_simple_average)
 {
   // Simple average of two scalar values
   const ParameterVector<1> par1{ -1};
@@ -244,7 +244,7 @@ TEST(TrackFindingCDCTest, covariance_simple_average)
   EXPECT_NEAR(1, chi2, 1E-8);
 }
 
-TEST(TrackFindingCDCTest, covariance_half_projection_average)
+TEST(TrackingUtilitiesTest, covariance_half_projection_average)
 {
   // Same average of two scalar values but one is 'projected' stretched by a factor of 2
   const JacobianMatrix<1, 1> ambi1{2};// Ambiguity is 2.
@@ -263,7 +263,7 @@ TEST(TrackFindingCDCTest, covariance_half_projection_average)
   EXPECT_NEAR(1, chi2, 1E-8);
 }
 
-TEST(TrackFindingCDCTest, covariance_kalman_update_average)
+TEST(TrackingUtilitiesTest, covariance_kalman_update_average)
 {
   // Same average of two scalar values but one is 'projected' / stretched by a factor of 2
   // Now as an inplace update using the Kalman formula.

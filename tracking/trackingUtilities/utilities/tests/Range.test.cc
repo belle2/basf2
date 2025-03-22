@@ -7,17 +7,17 @@
  **************************************************************************/
 #include <gtest/gtest.h>
 
-#include <tracking/trackFindingCDC/utilities/Range.h>
+#include <tracking/trackingUtilities/utilities/Range.h>
 
-#include <tracking/trackFindingCDC/utilities/GetValueType.h>
-#include <tracking/trackFindingCDC/utilities/GetIterator.h>
+#include <tracking/trackingUtilities/utilities/GetValueType.h>
+#include <tracking/trackingUtilities/utilities/GetIterator.h>
 #include <map>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
-  TEST(TrackFindingCDCTest, utilities_Range_works_with_equal_range)
+  TEST(TrackingUtilitiesTest, utilities_Range_works_with_equal_range)
   {
     using IntMap = std::map<int, int>;
     IntMap myMap;

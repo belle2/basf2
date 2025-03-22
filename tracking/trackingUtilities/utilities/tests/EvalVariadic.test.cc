@@ -6,15 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
+#include <tracking/trackingUtilities/utilities/EvalVariadic.h>
 
 #include <gtest/gtest.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
-  TEST(TrackFindingCDCTest, utilities_EvalVariadic_TypeInTuple)
+  TEST(TrackingUtilitiesTest, utilities_EvalVariadic_TypeInTuple)
   {
     using TestTuple = std::tuple<float, int>;
 

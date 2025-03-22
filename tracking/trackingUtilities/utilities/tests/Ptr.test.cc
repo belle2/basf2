@@ -6,22 +6,22 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/utilities/Ptr.h>
+#include <tracking/trackingUtilities/utilities/Ptr.h>
 
 #include <gtest/gtest.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
-  TEST(TrackFindingCDCTest, utilities_Ptr_construct)
+  TEST(TrackingUtilitiesTest, utilities_Ptr_construct)
   {
     int i = 4;
     Ptr<int> ptrIFromPointer {&i};
     EXPECT_EQ(4, *ptrIFromPointer);
   }
 
-  TEST(TrackFindingCDCTest, utilities_Ptr_const_conversion)
+  TEST(TrackingUtilitiesTest, utilities_Ptr_const_conversion)
   {
     int i = 4;
     Ptr<int> ptrI{&i};

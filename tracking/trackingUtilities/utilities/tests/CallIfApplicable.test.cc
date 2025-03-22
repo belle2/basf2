@@ -5,15 +5,15 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
 
 #include <gtest/gtest.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
-  TEST(TrackFindingCDCTest, utilities_clearIfApplicable)
+  TEST(TrackingUtilitiesTest, utilities_clearIfApplicable)
   {
     float f = 2;
     std::vector<float> v{0, 1};
@@ -35,7 +35,7 @@ namespace {
     }
   };
 
-  TEST(TrackFindingCDCTest, utilities_getIfApplicable)
+  TEST(TrackingUtilitiesTest, utilities_getIfApplicable)
   {
     const float f = 2;
     const std::vector<float> v{0.0, 1.0};

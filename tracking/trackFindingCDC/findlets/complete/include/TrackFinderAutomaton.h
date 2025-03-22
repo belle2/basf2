@@ -14,22 +14,22 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
+#include <tracking/trackingUtilities/findlets/base/StoreVectorSwapper.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Complete findlet implementing track finding with the cellular automaton in two stages.
-    class TrackFinderAutomaton : public Findlet<> {
+    class TrackFinderAutomaton : public TrackingUtilities::Findlet<> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<>;
+      using Super = TrackingUtilities::Findlet<>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -68,17 +68,17 @@ namespace Belle2 {
       TrackExporter m_trackExporter;
 
       /// Puts the internal segments on the DataStore
-      StoreVectorSwapper<CDCWireHit, true> m_wireHitsSwapper{"CDCWireHitVector"};
+      TrackingUtilities::StoreVectorSwapper<TrackingUtilities::CDCWireHit, true> m_wireHitsSwapper{"CDCWireHitVector"};
 
       /// Puts the internal segments on the DataStore
-      StoreVectorSwapper<CDCSegment2D> m_segmentsSwapper{"CDCSegment2DVector"};
+      TrackingUtilities::StoreVectorSwapper<CDCSegment2D> m_segmentsSwapper{"CDCSegment2DVector"};
 
       /// Puts the internal segments on the DataStore
-      StoreVectorSwapper<CDCTrack> m_tracksSwapper{"CDCTrackVector"};
+      TrackingUtilities::StoreVectorSwapper<TrackingUtilities::CDCTrack> m_tracksSwapper{"CDCTrackVector"};
 
       // Object pools
       /// Memory for the wire hits
-      std::vector<CDCWireHit> m_wireHits;
+      std::vector<TrackingUtilities::CDCWireHit> m_wireHits;
 
       /// Memory for the wire hits cluster
       std::vector<CDCWireHitCluster> m_clusters;
@@ -90,7 +90,7 @@ namespace Belle2 {
       std::vector<CDCSegment2D> m_segments;
 
       /// Memory for the tracks
-      std::vector<CDCTrack> m_tracks;
+      std::vector<TrackingUtilities::CDCTrack> m_tracks;
     };
   }
 }

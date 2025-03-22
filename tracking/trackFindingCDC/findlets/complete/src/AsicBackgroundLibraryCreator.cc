@@ -6,12 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/complete/AsicBackgroundLibraryCreator.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <framework/logging/Logger.h>
@@ -19,33 +19,29 @@
 #include <TTree.h>
 #include <TFile.h>
 #include <TBranch.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using std::vector;
-using std::map;
-using std::pair;
-using std::sort;
-using std::min;
-using std::max;
+using namespace TrackingUtilities;
 
 /// Helper function to reconstruct 2D distance from a hit to a 3D track
 
-float getDist2D(const TrackFindingCDC::CDCTrajectory3D& trajectory, const TrackFindingCDC::CDCWireHit* wireHit)
+float getDist2D(const CDCTrajectory3D& trajectory, const CDCWireHit* wireHit)
 {
-  const TrackFindingCDC::CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
-  const TrackFindingCDC::CDCTrajectorySZ& trajectorySZ = trajectory.getTrajectorySZ();
-  TrackFindingCDC::Vector2D recoPos2D;
+  const CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
+  const CDCTrajectorySZ& trajectorySZ = trajectory.getTrajectorySZ();
+  Vector2D recoPos2D;
   if (wireHit->isAxial()) {
     recoPos2D = wireHit->reconstruct2D(trajectory2D);
   } else {
-    const TrackFindingCDC::CDCWire& wire = wireHit->getWire();
-    const TrackFindingCDC::Vector2D& posOnXYPlane = wireHit->reconstruct2D(trajectory2D);
+    const CDCWire& wire = wireHit->getWire();
+    const Vector2D& posOnXYPlane = wireHit->reconstruct2D(trajectory2D);
     const double arcLength = trajectory2D.calcArcLength2D(posOnXYPlane);
     const double z = trajectorySZ.mapSToZ(arcLength);
-    const TrackFindingCDC::Vector2D& wirePos2DAtZ = wire.getWirePos2DAtZ(z);
-    const TrackFindingCDC::Vector2D& recoPosOnTrajectory = trajectory2D.getClosest(wirePos2DAtZ);
+    const Vector2D& wirePos2DAtZ = wire.getWirePos2DAtZ(z);
+    const Vector2D& recoPosOnTrajectory = trajectory2D.getClosest(wirePos2DAtZ);
     const double driftLength = wireHit->getRefDriftLength();
-    TrackFindingCDC::Vector2D disp2D = recoPosOnTrajectory - wirePos2DAtZ;
+    Vector2D disp2D = recoPosOnTrajectory - wirePos2DAtZ;
     disp2D.normalizeTo(driftLength);
     recoPos2D = wirePos2DAtZ + disp2D;
   }
@@ -110,13 +106,13 @@ std::string AsicBackgroundLibraryCreator::getDescription()
 void AsicBackgroundLibraryCreator::apply(const std::vector<CDCWireHit>& wireHits, const std::vector<CDCTrack>& tracks)
 {
 
-  map< pair<int, int>, vector<const CDCWireHit*>> groupedByAsic;
+  std::map< std::pair<int, int>, std::vector<const CDCWireHit*>> groupedByAsic;
   for (const CDCWireHit& wireHit : wireHits) {
     auto eWire = wireHit.getWireID().getEWire();
     B2ASSERT("Channel map NOT found for the channel", m_map.count(eWire) > 0);
     auto board = m_map[eWire].first;
     auto channel = m_map[eWire].second;
-    auto asicID = pair<int, int>(board, channel / 8);  // ASIC are groups of 8 channels
+    auto asicID = std::pair<int, int>(board, channel / 8);  // ASIC are groups of 8 channels
     groupedByAsic[asicID].push_back(&wireHit);
   };
   for (auto& asicList :  groupedByAsic) {
@@ -129,37 +125,37 @@ void AsicBackgroundLibraryCreator::apply(const std::vector<CDCWireHit>& wireHits
 void AsicBackgroundLibraryCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimalHitNumberASIC"),
+  moduleParamList->addParameter(prefixed(prefix, "minimalHitNumberASIC"),
                                 m_minimal_hit_number,
                                 "Required number of hits per ASIC for library creation",
                                 m_minimal_hit_number);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "AsicLibraryFileName"),
+  moduleParamList->addParameter(prefixed(prefix, "AsicLibraryFileName"),
                                 m_library_name,
                                 "ASIC library file name",
                                 m_library_name);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalDistanceSignal"),
+  moduleParamList->addParameter(prefixed(prefix, "maximalDistanceSignal"),
                                 m_distance_signal_max,
                                 "maximal distance in cm from track to signal hit",
                                 m_distance_signal_max);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimalDistanceBackground"),
+  moduleParamList->addParameter(prefixed(prefix, "minimalDistanceBackground"),
                                 m_distance_background_min,
                                 "minimal distance in cm from track to background hit",
                                 m_distance_background_min);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useAxialHitsOnly"),
+  moduleParamList->addParameter(prefixed(prefix, "useAxialHitsOnly"),
                                 m_use_axial_hits_only,
                                 "use axial layers only",
                                 m_use_axial_hits_only);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeExtraVars"),
+  moduleParamList->addParameter(prefixed(prefix, "writeExtraVars"),
                                 m_write_extra_vars,
                                 "Write extra variables to the library",
                                 m_write_extra_vars);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimalHitsOnTrack"),
+  moduleParamList->addParameter(prefixed(prefix, "minimalHitsOnTrack"),
                                 m_minimal_hits_on_track,
                                 "Required number of hits on track for library creation",
                                 m_minimal_hits_on_track);
@@ -248,7 +244,7 @@ void AsicBackgroundLibraryCreator::selectAsic(const std::vector<const CDCWireHit
       m_dist_signal = dist;
       if (dist > m_distance_signal_max) return;
     } else {
-      m_dist_bg = min(m_dist_bg, dist);
+      m_dist_bg = std::min(m_dist_bg, dist);
       if (dist < m_distance_background_min) return;
     }
   }
@@ -277,7 +273,7 @@ void AsicBackgroundLibraryCreator::selectAsic(const std::vector<const CDCWireHit
     m_asic_info[asicCH].TOT = hit->getHit()->getTOT();
 
     if (hit != signal) {
-      m_adc_max_bg = max(m_adc_max_bg, m_asic_info[asicCH].ADC);
+      m_adc_max_bg = std::max(m_adc_max_bg, m_asic_info[asicCH].ADC);
     }
   }
   // also signal hit info

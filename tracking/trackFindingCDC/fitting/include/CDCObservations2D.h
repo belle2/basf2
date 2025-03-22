@@ -10,30 +10,33 @@
 #include <tracking/trackFindingCDC/fitting/EFitPos.h>
 #include <tracking/trackFindingCDC/fitting/EFitVariance.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 
 #include <vector>
 #include <iterator>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+
+  namespace TrackingUtilities {
     class CDCTrajectory2D;
     class CDCWire;
     class CDCWireHit;
+    class CDCTrack;
+    class CDCRecoHit3D;
+  }
+  namespace TrackFindingCDC {
     class CDCRLWireHit;
     class CDCRLWireHitPair;
     class CDCRLWireHitTriple;
     class CDCFacet;
     class CDCRecoHit2D;
-    class CDCRecoHit3D;
     class CDCWireHitSegment;
     class CDCSegment2D;
     class CDCSegment3D;
     class CDCAxialSegmentPair;
-    class CDCTrack;
 
     /// Class serving as a storage of observed drift circles to present to the Riemann fitter
     class CDCObservations2D {
@@ -68,7 +71,7 @@ namespace Belle2 {
       }
 
       /// Calculate the pseudo variance from the drift length and its variance.
-      static double getPseudoDriftLengthVariance(const CDCWireHit& wireHit);
+      static double getPseudoDriftLengthVariance(const TrackingUtilities::CDCWireHit& wireHit);
 
       /// Returns the number of observations stored
       std::size_t size() const
@@ -151,7 +154,7 @@ namespace Belle2 {
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.
        */
-      std::size_t fill(const Vector2D& pos2D, double signedRadius = 0.0, double weight = 1.0);
+      std::size_t fill(const TrackingUtilities::Vector2D& pos2D, double signedRadius = 0.0, double weight = 1.0);
 
       /**
        *  Appends the hit circle at wire reference position without a right left passage hypotheses.
@@ -164,7 +167,8 @@ namespace Belle2 {
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.
        */
-      std::size_t append(const CDCWireHit& wireHit, ERightLeft rlInfo = ERightLeft::c_Unknown);
+      std::size_t append(const TrackingUtilities::CDCWireHit& wireHit,
+                         TrackingUtilities::ERightLeft rlInfo = TrackingUtilities::ERightLeft::c_Unknown);
 
       /**
        *  Appends the position information of the given wire hit to the
@@ -176,7 +180,8 @@ namespace Belle2 {
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.
        */
-      std::size_t append(const CDCWireHit* wireHit, ERightLeft rlInfo = ERightLeft::c_Unknown);
+      std::size_t append(const TrackingUtilities::CDCWireHit* wireHit,
+                         TrackingUtilities::ERightLeft rlInfo = TrackingUtilities::ERightLeft::c_Unknown);
 
       /**
        *  Appends the hit circle at wire reference position with a right left passage hypotheses.
@@ -203,7 +208,7 @@ namespace Belle2 {
       std::size_t append(const CDCRecoHit2D& recoHit2D);
 
       /// Appends the observed position
-      std::size_t append(const CDCRecoHit3D& recoHit3D);
+      std::size_t append(const TrackingUtilities::CDCRecoHit3D& recoHit3D);
 
       /**
        *  Appends all reconstructed hits from the two dimensional segment.
@@ -227,14 +232,14 @@ namespace Belle2 {
        *  Appends all reconstructed hits from the three dimensional track.
        *  @return  Number of added hits
        */
-      std::size_t appendRange(const CDCTrack& track);
+      std::size_t appendRange(const TrackingUtilities::CDCTrack& track);
 
       /**
        *  Appends all the reference wire positions.
        *  @note For cross check to Legendre finder.
        *  @return  Number of added hits
        */
-      std::size_t appendRange(const std::vector<const CDCWire*>& wires);
+      std::size_t appendRange(const std::vector<const TrackingUtilities::CDCWire*>& wires);
 
       /**
        *  Appends all the wire hit reference positions with the pseudo variance.
@@ -257,28 +262,28 @@ namespace Belle2 {
       }
 
       /// Get the position of the first observation.
-      Vector2D getFrontPos2D() const
+      TrackingUtilities::Vector2D getFrontPos2D() const
       {
-        return empty() ? Vector2D() : Vector2D(getX(0), getY(0));
+        return empty() ? TrackingUtilities::Vector2D() : TrackingUtilities::Vector2D(getX(0), getY(0));
       }
 
       /// Get the position of the first observation.
-      Vector2D getBackPos2D() const
+      TrackingUtilities::Vector2D getBackPos2D() const
       {
-        return empty() ? Vector2D() : Vector2D(getX(size() - 1), getY(size() - 1));
+        return empty() ? TrackingUtilities::Vector2D() : TrackingUtilities::Vector2D(getX(size() - 1), getY(size() - 1));
       }
 
       /**
        *  Calculate the total transverse travel distance traversed by these observations comparing
        *  the travel distance of first and last position.
        */
-      double getTotalPerpS(const CDCTrajectory2D& trajectory2D) const;
+      double getTotalPerpS(const TrackingUtilities::CDCTrajectory2D& trajectory2D) const;
 
       /**
        *  Checks if the last position of these observations lies at greater travel distance than the
        *  first.
        */
-      bool isForwardTrajectory(const CDCTrajectory2D& trajectory2D) const
+      bool isForwardTrajectory(const TrackingUtilities::CDCTrajectory2D& trajectory2D) const
       {
         return getTotalPerpS(trajectory2D) > 0.0;
       }
@@ -288,19 +293,19 @@ namespace Belle2 {
        *  @retval     EForwardBackward::c_Forward if the last observation lies behind the first.
        *  @retval     EForwardBackward::c_Backward if the last observation lies before the first.
        */
-      EForwardBackward isCoaligned(const CDCTrajectory2D& trajectory2D) const
+      TrackingUtilities::EForwardBackward isCoaligned(const TrackingUtilities::CDCTrajectory2D& trajectory2D) const
       {
-        return static_cast<EForwardBackward>(sign(getTotalPerpS(trajectory2D)));
+        return static_cast<TrackingUtilities::EForwardBackward>(TrackingUtilities::sign(getTotalPerpS(trajectory2D)));
       }
 
       /// Extracts the observation center that is at the index in the middle.
-      Vector2D getCentralPoint() const;
+      TrackingUtilities::Vector2D getCentralPoint() const;
 
       /// Moves all observations passively such that the given vector becomes to origin of the new coordinate system
-      void passiveMoveBy(const Vector2D& origin);
+      void passiveMoveBy(const TrackingUtilities::Vector2D& origin);
 
       /// Picks one observation as a reference point and transform all observations to that new origin
-      Vector2D centralize();
+      TrackingUtilities::Vector2D centralize();
 
       /// Returns the number of observations having a drift radius radius
       std::size_t getNObservationsWithDriftRadius() const;

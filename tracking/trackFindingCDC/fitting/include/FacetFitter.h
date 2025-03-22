@@ -7,12 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Matrix.h>
+#include <tracking/trackingUtilities/numerics/Matrix.h>
 
 namespace Belle2 {
+  namespace TrackingUtilities {
+    class UncertainParameterLine2D;
+  }
   namespace TrackFindingCDC {
     class CDCFacet;
-    class UncertainParameterLine2D;
 
     /// Utility class to fit hit triplet and relations of them
     class FacetFitter {
@@ -29,9 +31,9 @@ namespace Belle2 {
        *  @param toFacet   Second facet from the pair of facets
        *  @param nSteps Maximal number of steps to be taken in the mimisation
        */
-      static UncertainParameterLine2D fit(const CDCFacet& fromFacet,
-                                          const CDCFacet& toFacet,
-                                          int nSteps = 100);
+      static TrackingUtilities::UncertainParameterLine2D fit(const CDCFacet& fromFacet,
+                                                             const CDCFacet& toFacet,
+                                                             int nSteps = 100);
 
       /**
        *  Fit a line the positions xyl and the weights.
@@ -45,9 +47,9 @@ namespace Belle2 {
        *  @param w      An array of weights corresponding to the observations
        *  @param nSteps Maximal number of steps to be taken in the mimisation
        */
-      static UncertainParameterLine2D fit(Matrix<double, 3, 3> xyl,
-                                          Matrix<double, 3, 1> w,
-                                          int nSteps = 100);
+      static TrackingUtilities::UncertainParameterLine2D fit(TrackingUtilities::Matrix<double, 3, 3> xyl,
+                                                             TrackingUtilities::Matrix<double, 3, 1> w,
+                                                             int nSteps = 100);
     };
   }
 }

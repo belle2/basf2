@@ -12,17 +12,18 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+    class CDCWireHit;
+    class CDCWire;
+    class CDCTrajectory2D;
+  }
+  namespace TrackFindingCDC {
     class CDCSegment3D;
     class CDCAxialSegmentPair;
     class CDCSegment2D;
     class CDCWireHitSegment;
-    class CDCWireHit;
-    class CDCTrajectory2D;
     class CDCObservations2D;
-
-    class CDCWire;
 
     /// Class implementing a fit for two dimensional trajectory circle using a generic fitting backend.
     template<class AFitMethod>
@@ -36,66 +37,66 @@ namespace Belle2 {
       ~CDCFitter2D();
 
       /// Fits a collection of observation drift circles.
-      CDCTrajectory2D fit(const CDCObservations2D& observations2D) const;
+      TrackingUtilities::CDCTrajectory2D fit(const CDCObservations2D& observations2D) const;
 
       /// Fits a collection of observation drift circles.
-      CDCTrajectory2D fit(CDCObservations2D&& observations2D) const;
+      TrackingUtilities::CDCTrajectory2D fit(CDCObservations2D&& observations2D) const;
 
       /// Update the trajectory with a fit to the observations.
-      void update(CDCTrajectory2D& trajectory2D, const CDCObservations2D& observations2D) const;
+      void update(TrackingUtilities::CDCTrajectory2D& trajectory2D, const CDCObservations2D& observations2D) const;
 
       /// Update the trajectory with a fit to the observations.
-      void update(CDCTrajectory2D& trajectory2D, CDCObservations2D&& observations2D) const;
+      void update(TrackingUtilities::CDCTrajectory2D& trajectory2D, CDCObservations2D&& observations2D) const;
 
       /// Fits the track
-      CDCTrajectory2D fit(const CDCTrack& track) const;
+      TrackingUtilities::CDCTrajectory2D fit(const TrackingUtilities::CDCTrack& track) const;
 
       /// Fits the segment
-      CDCTrajectory2D fit(const CDCSegment3D& segment) const;
+      TrackingUtilities::CDCTrajectory2D fit(const CDCSegment3D& segment) const;
 
       /// Fits to the two segments
-      CDCTrajectory2D fit(const CDCSegment2D& fromSegment, const CDCSegment2D& toSegment) const;
+      TrackingUtilities::CDCTrajectory2D fit(const CDCSegment2D& fromSegment, const CDCSegment2D& toSegment) const;
 
       /// Fits the segment
-      CDCTrajectory2D fit(const CDCSegment2D& segment) const;
+      TrackingUtilities::CDCTrajectory2D fit(const CDCSegment2D& segment) const;
 
       /// Fits to the wire hit observations.
-      CDCTrajectory2D fit(const std::vector<const CDCWireHit*>& wireHit) const;
+      TrackingUtilities::CDCTrajectory2D fit(const std::vector<const TrackingUtilities::CDCWireHit*>& wireHit) const;
 
       /// Fits to the wire positions. Explicit specialisation to be used from python.
-      CDCTrajectory2D fit(const std::vector<const CDCWire*>& wires) const;
+      TrackingUtilities::CDCTrajectory2D fit(const std::vector<const TrackingUtilities::CDCWire*>& wires) const;
 
       /// Fits to the wire positions. Explicit specialisation to be used from python.
-      CDCTrajectory2D fit(const CDCWireHitSegment& wireHits) const;
+      TrackingUtilities::CDCTrajectory2D fit(const CDCWireHitSegment& wireHits) const;
 
       /// Updates the given trajectory inplace from the given segment
-      void update(CDCTrajectory2D& trajectory2D, const CDCSegment2D& segment) const;
+      void update(TrackingUtilities::CDCTrajectory2D& trajectory2D, const CDCSegment2D& segment) const;
 
       /// Updates the given trajectory inplace from the given segment pair
-      void update(CDCTrajectory2D& trajectory2D, const CDCAxialSegmentPair& axialSegmentPair) const;
+      void update(TrackingUtilities::CDCTrajectory2D& trajectory2D, const CDCAxialSegmentPair& axialSegmentPair) const;
 
     private:
       /// Fits a collection of hit typs which are convertible to observation circles.
       template<class AHits>
-      CDCTrajectory2D fitGeneric(const AHits& hits) const;
+      TrackingUtilities::CDCTrajectory2D fitGeneric(const AHits& hits) const;
 
       /// Fits together two collections of hit types which are convertible to observation circles.
       template<class AStartHits, class AEndHits>
-      CDCTrajectory2D fitGeneric(const AStartHits& startHits, const AEndHits& endHits) const;
+      TrackingUtilities::CDCTrajectory2D fitGeneric(const AStartHits& startHits, const AEndHits& endHits) const;
 
       /**
        *  Updates a given trajectory with a fit to a collection of hits types,
        * which are convertible to observation circles.
        */
       template <class AHits>
-      void updateGeneric(CDCTrajectory2D& trajectory2D, const AHits& hits) const;
+      void updateGeneric(TrackingUtilities::CDCTrajectory2D& trajectory2D, const AHits& hits) const;
 
       /**
        *  Updates a given trajectory with a fit to two collection of hit types,
        *  which are convertible to observation circles.
        */
       template <class AStartHits, class AEndHits>
-      void updateGeneric(CDCTrajectory2D& trajectory2D,
+      void updateGeneric(TrackingUtilities::CDCTrajectory2D& trajectory2D,
                          const AStartHits& startHits,
                          const AEndHits& endHits) const;
 

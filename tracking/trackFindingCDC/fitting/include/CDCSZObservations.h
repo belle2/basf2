@@ -12,11 +12,15 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+
+  namespace TrackingUtilities {
     class Vector2D;
-    class CDCRecoHit3D;
-    class CDCSegment3D;
     class CDCTrack;
+    class CDCRecoHit3D;
+  }
+
+  namespace TrackFindingCDC {
+    class CDCSegment3D;
 
     /// Class serving as a storage of observed sz positions to present to the sz line fitters.
     class CDCSZObservations {
@@ -99,13 +103,13 @@ namespace Belle2 {
       std::size_t fill(double s, double z, double weight = 1.0);
 
       /// Appends the observed position
-      std::size_t append(const CDCRecoHit3D& recoHit3D);
+      std::size_t append(const TrackingUtilities::CDCRecoHit3D& recoHit3D);
 
       /**
        *  Appends all reconstructed hits from the three dimensional track.
        *  @return  Number of added hits
        */
-      std::size_t appendRange(const std::vector<CDCRecoHit3D>& recoHit3Ds);
+      std::size_t appendRange(const std::vector<TrackingUtilities::CDCRecoHit3D>& recoHit3Ds);
 
       /**
        *  Appends all reconstructed hits from the three dimensional segment.
@@ -117,16 +121,16 @@ namespace Belle2 {
        *  Appends all reconstructed hits from the three dimensional track.
        *  @return  Number of added hits
        */
-      std::size_t appendRange(const CDCTrack& track);
+      std::size_t appendRange(const TrackingUtilities::CDCTrack& track);
 
       /// Extracts the observation center that is at the index in the middle.
-      Vector2D getCentralPoint() const;
+      TrackingUtilities::Vector2D getCentralPoint() const;
 
       /// Moves all observations passively such that the given vector becomes to origin of the new coordinate system
-      void passiveMoveBy(const Vector2D& origin);
+      void passiveMoveBy(const TrackingUtilities::Vector2D& origin);
 
       /// Picks one observation as a reference point and transform all observations to that new origin
-      Vector2D centralize();
+      TrackingUtilities::Vector2D centralize();
 
     public:
       /// Setter for the indicator that the drift variance should be used.

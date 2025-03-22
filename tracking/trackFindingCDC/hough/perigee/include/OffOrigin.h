@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/topology/ILayer.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/topology/ILayer.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -33,13 +33,13 @@ namespace Belle2 {
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object
        */
-      ESign getDistanceSign(const HoughBox& houghBox,
-                            float x,
-                            float y,
-                            float signedDriftLength,
-                            float dxdz = 0,
-                            float dydz = 0,
-                            ILayer /*iCLayer*/ = -1) const
+      TrackingUtilities::ESign getDistanceSign(const HoughBox& houghBox,
+                                               float x,
+                                               float y,
+                                               float signedDriftLength,
+                                               float dxdz = 0,
+                                               float dydz = 0,
+                                               TrackingUtilities::ILayer /*iCLayer*/ = -1) const
       {
         return Super::getDistanceSign(houghBox,
                                       x - m_localOriginX,
@@ -52,11 +52,11 @@ namespace Belle2 {
 
     public:
       /// Getter for the local origin relative to which the parameters of the hough space are understood
-      Vector2D getLocalOrigin() const
-      { return Vector2D(m_localOriginX, m_localOriginY); }
+      TrackingUtilities::Vector2D getLocalOrigin() const
+      { return TrackingUtilities::Vector2D(m_localOriginX, m_localOriginY); }
 
       /// Setter for the local origin relative to which the parameters of the hough space are understood
-      void setLocalOrigin(const Vector2D& localOrigin)
+      void setLocalOrigin(const TrackingUtilities::Vector2D& localOrigin)
       {
         m_localOriginX = localOrigin.x();
         m_localOriginY = localOrigin.y();

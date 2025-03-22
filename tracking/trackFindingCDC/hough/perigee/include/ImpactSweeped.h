@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/ImpactRep.h>
 #include <tracking/trackFindingCDC/hough/boxes/SweepBox.h>
 #include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
-#include <tracking/trackFindingCDC/topology/ILayer.h>
+#include <tracking/trackingUtilities/topology/ILayer.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -35,33 +35,33 @@ namespace Belle2 {
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object
        */
-      ESign getDistanceSign(const HoughBox& houghBox,
-                            float x,
-                            float y,
-                            float signedDriftLength,
-                            float dxdz = 0,
-                            float dydz = 0,
-                            ILayer iCLayer = -1) const
+      TrackingUtilities::ESign getDistanceSign(const HoughBox& houghBox,
+                                               float x,
+                                               float y,
+                                               float signedDriftLength,
+                                               float dxdz = 0,
+                                               float dydz = 0,
+                                               TrackingUtilities::ILayer iCLayer = -1) const
       {
         float lowerImpact(houghBox.template getLowerBound<AImpact>());
         float upperImpact(houghBox.template getUpperBound<AImpact>());
         const SubordinaryHoughBox& subordinaryHoughBox = houghBox.getSubordinaryBox();
 
         const float lowerY = y - lowerImpact;
-        const ESign lowerDistSign = T::getDistanceSign(subordinaryHoughBox,
+        const TrackingUtilities::ESign lowerDistSign = T::getDistanceSign(subordinaryHoughBox,
                                                        x, lowerY,
                                                        signedDriftLength,
                                                        dxdz, dydz,
                                                        iCLayer);
 
         const float upperY = y - upperImpact;
-        const ESign upperDistSign = T::getDistanceSign(subordinaryHoughBox,
+        const TrackingUtilities::ESign upperDistSign = T::getDistanceSign(subordinaryHoughBox,
                                                        x, upperY,
                                                        signedDriftLength,
                                                        dxdz, dydz,
                                                        iCLayer);
 
-        return ESignUtil::common(lowerDistSign, upperDistSign);
+        return TrackingUtilities::ESignUtil::common(lowerDistSign, upperDistSign);
       }
     };
   }

@@ -49,7 +49,7 @@ namespace Belle2 {
     public:
       /// Find disjoint leaves heavier than minWeight
       std::vector<std::pair<HoughBox,  std::vector<AHitPtr> > >
-      find(const Weight& minWeight, const double maxCurv = NAN)
+      find(const TrackingUtilities::Weight& minWeight, const double maxCurv = NAN)
       {
         auto skipHighCurvatureAndLowWeightNode = [minWeight, maxCurv](const Node * node) {
           const HoughBox& houghBox = *node;
@@ -62,7 +62,7 @@ namespace Belle2 {
 
       /// Find the best trajectory and repeat the process until no bin heavier than minWeight can be found
       std::vector<std::pair<HoughBox,  std::vector<AHitPtr> > >
-      findBest(const Weight& minWeight, const double maxCurv = NAN)
+      findBest(const TrackingUtilities::Weight& minWeight, const double maxCurv = NAN)
       {
         auto skipHighCurvatureAndLowWeightNode = [minWeight, maxCurv](const Node * node) {
           const HoughBox& houghBox = *node;
@@ -75,7 +75,7 @@ namespace Belle2 {
 
       /// Find the best trajectory from the single heaviest bin heavier than minWeight
       std::vector<std::pair<HoughBox,  std::vector<AHitPtr> > >
-      findSingleBest(const Weight& minWeight, const double maxCurv = NAN)
+      findSingleBest(const TrackingUtilities::Weight& minWeight, const double maxCurv = NAN)
       {
         auto skipHighCurvatureAndLowWeightNode = [minWeight, maxCurv](const Node * node) {
           const HoughBox& houghBox = *node;

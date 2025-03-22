@@ -9,12 +9,12 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
 
-#include <tracking/trackFindingCDC/numerics/ESign.h>
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/ESign.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <numeric>
 
@@ -40,23 +40,23 @@ namespace Belle2 {
 
       /** Checks if more than 66% of the hits in this segment are contained in the phi0 curv hough space
        *  Returns the sum of the individual hit weights in this case. Else returns NAN.*/
-      Weight operator()(const CDCSegment2D* segment2D,
-                        const HoughBox* houghBox)
+      TrackingUtilities::Weight operator()(const CDCSegment2D* segment2D,
+                                           const HoughBox* houghBox)
       {
         size_t nHits = segment2D->size();
-        auto weightOfHit = [this, &houghBox](const Weight & totalWeight,
-        const CDCRecoHit2D & recoHit2D) -> Weight {
-          Weight hitWeight = this->operator()(&recoHit2D, houghBox);
+        auto weightOfHit = [this, &houghBox](const TrackingUtilities::Weight & totalWeight,
+        const CDCRecoHit2D & recoHit2D) -> TrackingUtilities::Weight {
+          TrackingUtilities::Weight hitWeight = this->operator()(&recoHit2D, houghBox);
           return std::isnan(hitWeight) ? totalWeight : totalWeight + hitWeight;
         };
 
-        Weight totalWeight = std::accumulate(segment2D->begin(),
-                                             segment2D->end(),
-                                             static_cast<Weight>(0.0),
-                                             weightOfHit);
+        TrackingUtilities::Weight totalWeight = std::accumulate(segment2D->begin(),
+                                                                segment2D->end(),
+                                                                static_cast<TrackingUtilities::Weight>(0.0),
+                                                                weightOfHit);
 
         // Require a efficiency of 66%
-        constexpr const Weight minEfficiency = 2.0 / 3;
+        constexpr const TrackingUtilities::Weight minEfficiency = 2.0 / 3;
         if (totalWeight > nHits * minEfficiency) {
           return totalWeight;
         } else {
@@ -67,13 +67,13 @@ namespace Belle2 {
       /** Checks if the two dimensional reconstructed hit is contained in a phi0 curv hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
-      Weight operator()(const CDCRecoHit2D* recoHit2D,
-                        const HoughBox* houghBox)
+      TrackingUtilities::Weight operator()(const CDCRecoHit2D* recoHit2D,
+                                           const HoughBox* houghBox)
       {
-        const CDCWire& wire = recoHit2D->getWire();
+        const TrackingUtilities::CDCWire& wire = recoHit2D->getWire();
         const double signedDriftLength = recoHit2D->getSignedRefDriftLength();
         bool isIn = contains(*houghBox, wire, signedDriftLength);
-        ERightLeft rlInfo = recoHit2D->getRLInfo();
+        TrackingUtilities::ERightLeft rlInfo = recoHit2D->getRLInfo();
         return isIn ? 1.0 + isValid(rlInfo) * m_rlWeightGain : NAN;
       }
 
@@ -83,13 +83,13 @@ namespace Belle2 {
        *  Accepts if either the right passage hypothesis or the left passage hypothesis
        *  is in the hough box.
        */
-      Weight operator()(const CDCWireHit* wireHit,
-                        const HoughBox* houghBox)
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCWireHit* wireHit,
+                                           const HoughBox* houghBox)
       {
-        const CDCWire& wire = wireHit->getWire();
+        const TrackingUtilities::CDCWire& wire = wireHit->getWire();
         const double driftLength = wireHit->getRefDriftLength();
 
-        ERightLeft rlInfo = containsRightOrLeft(*houghBox, wire, driftLength);
+        TrackingUtilities::ERightLeft rlInfo = containsRightOrLeft(*houghBox, wire, driftLength);
         return isValid(rlInfo) ? 1.0 + std::abs(rlInfo) * m_rlWeightGain : NAN;
       }
 
@@ -104,14 +104,14 @@ namespace Belle2 {
        *  Accepts if either the right passage hypothesis or the left passage hypothesis
        *  is in the hough box.
        */
-      Weight operator()(CDCRLWireHit& rlTaggedWireHit,
-                        const HoughBox* houghBox)
+      TrackingUtilities::Weight operator()(CDCRLWireHit& rlTaggedWireHit,
+                                           const HoughBox* houghBox)
       {
-        const CDCWire& wire = rlTaggedWireHit.getWire();
-        const ERightLeft rlInfo = rlTaggedWireHit.getRLInfo();
+        const TrackingUtilities::CDCWire& wire = rlTaggedWireHit.getWire();
+        const TrackingUtilities::ERightLeft rlInfo = rlTaggedWireHit.getRLInfo();
         const double driftLength = rlTaggedWireHit.getRefDriftLength();
 
-        ERightLeft newRLInfo =
+        TrackingUtilities::ERightLeft newRLInfo =
           containsRightOrLeft(*houghBox, wire, driftLength, rlInfo);
 
         rlTaggedWireHit.setRLInfo(newRLInfo);
@@ -129,39 +129,39 @@ namespace Belle2 {
        *      * ERightLeft::c_Right if only right is still possible.
        *      * ERightLeft::c_Invalid if non of the orientations is possible.
        */
-      ERightLeft containsRightOrLeft(const HoughBox& houghBox,
-                                     const CDCWire& wire,
-                                     double driftLength,
-                                     ERightLeft rlInfo = ERightLeft::c_Unknown)
+      TrackingUtilities::ERightLeft containsRightOrLeft(const HoughBox& houghBox,
+                                                        const TrackingUtilities::CDCWire& wire,
+                                                        double driftLength,
+                                                        TrackingUtilities::ERightLeft rlInfo = TrackingUtilities::ERightLeft::c_Unknown)
       {
-        bool isRightIn = rlInfo != ERightLeft::c_Left and contains(houghBox, wire, driftLength);
-        bool isLeftIn = rlInfo != ERightLeft::c_Right and contains(houghBox, wire, -driftLength);
+        bool isRightIn = rlInfo != TrackingUtilities::ERightLeft::c_Left and contains(houghBox, wire, driftLength);
+        bool isLeftIn = rlInfo != TrackingUtilities::ERightLeft::c_Right and contains(houghBox, wire, -driftLength);
 
         if (isRightIn and isLeftIn) {
-          return ERightLeft::c_Unknown;
+          return TrackingUtilities::ERightLeft::c_Unknown;
         } else if (isRightIn) {
-          return ERightLeft::c_Right;
+          return TrackingUtilities::ERightLeft::c_Right;
         } else if (isLeftIn) {
-          return ERightLeft::c_Left;
+          return TrackingUtilities::ERightLeft::c_Left;
         } else {
-          return ERightLeft::c_Invalid;
+          return TrackingUtilities::ERightLeft::c_Invalid;
         }
       }
 
       /** Checks if a wire hit at a signed drift length is contained in the hough space part */
-      bool contains(const HoughBox& houghBox, const CDCWire& wire, double signedDriftLength)
+      bool contains(const HoughBox& houghBox, const TrackingUtilities::CDCWire& wire, double signedDriftLength)
       {
-        const Vector2D& pos2D = wire.getRefPos2D();
+        const TrackingUtilities::Vector2D& pos2D = wire.getRefPos2D();
         //const Vector2D& pos2D = wire.getWirePos2DAtZ(0);
-        const Vector2D& movePerZ = wire.getMovePerZ();
-        ILayer iCLayer(wire.getICLayer());
+        const TrackingUtilities::Vector2D& movePerZ = wire.getMovePerZ();
+        TrackingUtilities::ILayer iCLayer(wire.getICLayer());
         //B2INFO("movePerZ = " << movePerZ);
-        const ESign distSign = this->getDistanceSign(houghBox,
-                                                     pos2D.x(),  pos2D.y(),
-                                                     signedDriftLength,
-                                                     movePerZ.x(), movePerZ.y(),
-                                                     iCLayer);
-        const bool isIn = distSign == ESign::c_Zero;
+        const TrackingUtilities::ESign distSign = this->getDistanceSign(houghBox,
+                                                  pos2D.x(),  pos2D.y(),
+                                                  signedDriftLength,
+                                                  movePerZ.x(), movePerZ.y(),
+                                                  iCLayer);
+        const bool isIn = distSign == TrackingUtilities::ESign::c_Zero;
         return isIn;
       }
 

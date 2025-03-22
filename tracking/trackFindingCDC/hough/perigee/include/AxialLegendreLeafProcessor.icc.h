@@ -15,14 +15,14 @@
 #include <tracking/trackFindingCDC/hough/algorithms/InPhi0ImpactCurvBox.h>
 #include <tracking/trackFindingCDC/hough/baseelements/WithSharedMark.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
-#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
 
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
@@ -51,18 +51,18 @@ namespace Belle2 {
       std::vector<WithSharedMark<CDCRLWireHit>> hits(leaf->begin(), leaf->end());
       std::sort(hits.begin(), hits.end()); // Hits should be naturally sorted
       observations2D.appendRange(hits);
-      CDCTrajectory2D trajectory2D = fitter.fit(observations2D);
+      TrackingUtilities::CDCTrajectory2D trajectory2D = fitter.fit(observations2D);
       {
         const double curv = trajectory2D.getCurvature();
         std::array<DiscreteCurv, 2> curvs = leaf->template getBounds<DiscreteCurv>();
 
         float lowerCurv = *(curvs[0]);
         float upperCurv = *(curvs[1]);
-        if (static_cast<double>(ESignUtil::common(lowerCurv, upperCurv)) * curv < 0) {
+        if (static_cast<double>(TrackingUtilities::ESignUtil::common(lowerCurv, upperCurv)) * curv < 0) {
           trajectory2D.reverse();
         }
       }
-      trajectory2D.setLocalOrigin(Vector2D(0, 0));
+      trajectory2D.setLocalOrigin(TrackingUtilities::Vector2D(0, 0));
 
       // Look for more hits near the found trajectory
       /////////////////////////////////////////////////////////////////////////
@@ -91,13 +91,13 @@ namespace Belle2 {
           observations2D.clear();
           observations2D.appendRange(hits);
           trajectory2D = fitter.fit(observations2D);
-          trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
+          trajectory2D.setLocalOrigin(TrackingUtilities::Vector2D(0.0, 0.0));
         }
       }
 
       // Mark found hit as used and safe them with the trajectory
       /////////////////////////////////////////////////////////////////////////
-      std::vector<const CDCWireHit*> foundWireHits;
+      std::vector<const TrackingUtilities::CDCWireHit*> foundWireHits;
       for (CDCRLWireHit& rlWireHit : hits) {
         foundWireHits.push_back(&rlWireHit.getWireHit());
       }
@@ -106,7 +106,7 @@ namespace Belle2 {
 
       // Sync up the marks with the used hits
       for (WithSharedMark<CDCRLWireHit>& markableRLWireHit : leaf->getTree()->getTopNode()) {
-        const AutomatonCell& automatonCell = markableRLWireHit.getWireHit().getAutomatonCell();
+        const TrackingUtilities::AutomatonCell& automatonCell = markableRLWireHit.getWireHit().getAutomatonCell();
         if (automatonCell.hasTakenFlag() or automatonCell.hasMaskedFlag()) {
           markableRLWireHit.mark();
         } else {
@@ -117,10 +117,10 @@ namespace Belle2 {
 
     template <class ANode>
     std::vector<WithSharedMark<CDCRLWireHit> >
-    AxialLegendreLeafProcessor<ANode>::searchRoad(const ANode& node, const CDCTrajectory2D& trajectory2D)
+    AxialLegendreLeafProcessor<ANode>::searchRoad(const ANode& node, const TrackingUtilities::CDCTrajectory2D& trajectory2D)
     {
-      PerigeeCircle circle = trajectory2D.getGlobalCircle();
-      Vector2D support = trajectory2D.getGlobalPerigee();
+      TrackingUtilities::PerigeeCircle circle = trajectory2D.getGlobalCircle();
+      TrackingUtilities::Vector2D support = trajectory2D.getGlobalPerigee();
       const float curv = circle.curvature();
       const float phi0 = circle.phi0();
 
@@ -135,12 +135,12 @@ namespace Belle2 {
       // Earlier version
       // const float levelPrecision = 10.5 - 0.24 * exp(-4.13118 * PrecisionUtil::convertRhoToPt(curv) + 2.74);
       const float phi0Precision = M_PI / std::pow(2.0, levelPrecision + 1.0);
-      const float impactPrecision = 0.0 * std::sqrt(CDCWireHit::c_simpleDriftLengthVariance);
+      const float impactPrecision = 0.0 * std::sqrt(TrackingUtilities::CDCWireHit::c_simpleDriftLengthVariance);
       const float curvPrecision = 0.15 / std::pow(2.0, levelPrecision);
 
       DiscreteCurv::Array curvBounds{{curv - curvPrecision, curv + curvPrecision}};
       ContinuousImpact::Array impactBounds{{ -impactPrecision, impactPrecision}};
-      DiscretePhi0::Array phi0Bounds{{Vector2D::Phi(phi0 - phi0Precision), Vector2D::Phi(phi0 + phi0Precision)}};
+      DiscretePhi0::Array phi0Bounds{{TrackingUtilities::Vector2D::Phi(phi0 - phi0Precision), TrackingUtilities::Vector2D::Phi(phi0 + phi0Precision)}};
       RoadHoughBox precisionPhi0CurvBox(DiscretePhi0::getRange(phi0Bounds),
                                         ContinuousImpact::getRange(impactBounds),
                                         DiscreteCurv::getRange(curvBounds));
@@ -151,7 +151,7 @@ namespace Belle2 {
       for (WithSharedMark<CDCRLWireHit> markableRLWireHit : node) {
         // Skip marked hits
         if (markableRLWireHit.isMarked()) continue;
-        Weight weight = hitInPhi0CurvBox(markableRLWireHit, &precisionPhi0CurvBox);
+        TrackingUtilities::Weight weight = hitInPhi0CurvBox(markableRLWireHit, &precisionPhi0CurvBox);
         if (not std::isnan(weight)) hitsInPrecisionBox.push_back(markableRLWireHit);
       }
 
@@ -167,12 +167,12 @@ namespace Belle2 {
     AxialLegendreLeafProcessor<ANode>::getCandidates() const
     {
       std::vector<Candidate> result;
-      for (const CDCTrack& track : m_tracks) {
+      for (const TrackingUtilities::CDCTrack& track : m_tracks) {
         std::vector<CDCRLWireHit> rlWireHits;
-        for (const CDCRecoHit3D& recoHit3D : track) {
+        for (const TrackingUtilities::CDCRecoHit3D& recoHit3D : track) {
           rlWireHits.push_back(recoHit3D.getRLWireHit());
         }
-        CDCTrajectory2D trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+        TrackingUtilities::CDCTrajectory2D trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
         result.emplace_back(std::move(trajectory2D), std::move(rlWireHits));
       }
       return result;
@@ -182,37 +182,37 @@ namespace Belle2 {
     void AxialLegendreLeafProcessor<ANode>::exposeParameters(ModuleParamList* moduleParamList,
                                                              const std::string& prefix)
     {
-      moduleParamList->addParameter(prefixed(prefix, "maxLevel"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maxLevel"),
                                     m_param_maxLevel,
                                     "Level of divisions in the hough space at which a leaf is reached",
                                     m_param_maxLevel);
 
-      moduleParamList->addParameter(prefixed(prefix, "minWeight"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minWeight"),
                                     m_param_minWeight,
                                     "Minimal exceptable weight of a leaf to be considered",
                                     m_param_minWeight);
 
-      moduleParamList->addParameter(prefixed(prefix, "maxCurv"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maxCurv"),
                                     m_param_maxCurv,
                                     "Maximal curvature of a leaf to be considered",
                                     m_param_maxCurv);
 
-      moduleParamList->addParameter(prefixed(prefix, "curlCurv"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "curlCurv"),
                                     m_param_curlCurv,
                                     "Curvature below which hits on both arms of the trajectory are allowed",
                                     m_param_curlCurv);
 
-      moduleParamList->addParameter(prefixed(prefix, "nRoadSearches"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "nRoadSearches"),
                                     m_param_nRoadSearches,
                                     "How often the road search should be performed to find new hits",
                                     m_param_nRoadSearches);
 
-      moduleParamList->addParameter(prefixed(prefix, "roadLevel"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "roadLevel"),
                                     m_param_roadLevel,
                                     "Level of the read from which additional hits in the road search can be taken",
                                     m_param_roadLevel);
 
-      moduleParamList->addParameter(prefixed(prefix, "curvResolution"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "curvResolution"),
                                     m_param_curvResolution,
                                     "The name of the resolution function to be used. "
                                     "Valid values are 'none', 'const', 'basic', 'origin', 'nonOrigin'",

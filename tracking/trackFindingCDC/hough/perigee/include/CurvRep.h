@@ -8,7 +8,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
 
 #include <type_traits>
 
@@ -124,7 +124,7 @@ namespace Belle2 {
     template <class AHoughBox>
     float getLowerCurv(const AHoughBox& houghBox)
     {
-      return getIfApplicable<float>(GetLowerCurv(), houghBox, 0.0);
+      return TrackingUtilities::getIfApplicable<float>(GetLowerCurv(), houghBox, 0.0);
     }
 
     /**
@@ -134,7 +134,7 @@ namespace Belle2 {
     template <class AHoughBox>
     float getUpperCurv(const AHoughBox& houghBox)
     {
-      return getIfApplicable<float>(GetUpperCurv(), houghBox, 0.0);
+      return TrackingUtilities::getIfApplicable<float>(GetUpperCurv(), houghBox, 0.0);
     }
   }
 }

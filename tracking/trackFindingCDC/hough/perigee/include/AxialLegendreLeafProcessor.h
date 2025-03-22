@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 
@@ -33,7 +33,7 @@ namespace Belle2 {
 
     public:
       /// Preliminary structure to save found hits and trajectory information
-      using Candidate = std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> >;
+      using Candidate = std::pair<TrackingUtilities::CDCTrajectory2D, std::vector<CDCRLWireHit> >;
 
     public:
       /// Initialize a new processor with the maximum level.
@@ -97,14 +97,14 @@ namespace Belle2 {
        *  Look for more hits near a ftted trajectory from hits available in the give node.
        */
       std::vector<WithSharedMark<CDCRLWireHit> >
-      searchRoad(const ANode& node, const CDCTrajectory2D& trajectory2D);
+      searchRoad(const ANode& node, const TrackingUtilities::CDCTrajectory2D& trajectory2D);
 
     public:
       /// Getter for the candidates structure still used in some tests.
       std::vector<Candidate> getCandidates() const;
 
       /// Getter for the tracks
-      const std::vector<CDCTrack>& getTracks() const
+      const std::vector<TrackingUtilities::CDCTrack>& getTracks() const
       {
         return m_tracks;
       }
@@ -117,7 +117,7 @@ namespace Belle2 {
       }
 
       /// Set the pool of all axial wire hits to be used in the postprocessing
-      void setAxialWireHits(std::vector<const CDCWireHit*> axialWireHits)
+      void setAxialWireHits(std::vector<const TrackingUtilities::CDCWireHit*> axialWireHits)
       {
         m_axialWireHits = std::move(axialWireHits);
       }
@@ -173,10 +173,10 @@ namespace Belle2 {
       std::function<double(double)> m_curvResolution;
 
       /// Memory for found trajectories.
-      std::vector<CDCTrack> m_tracks;
+      std::vector<TrackingUtilities::CDCTrack> m_tracks;
 
       /// Memory for the pool of axial wire hits to can be used in the post processing
-      std::vector<const CDCWireHit*> m_axialWireHits;
+      std::vector<const TrackingUtilities::CDCWireHit*> m_axialWireHits;
     };
   }
 }

@@ -11,7 +11,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 #include <tracking/trackFindingCDC/hough/boxes/SweepBox.h>
 #include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
-#include <tracking/trackFindingCDC/topology/ILayer.h>
+#include <tracking/trackingUtilities/topology/ILayer.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -38,16 +38,16 @@ namespace Belle2 {
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object
        */
-      ESign getDistanceSign(const HoughBox& houghBox,
-                            float x,
-                            float y,
-                            float signedDriftLength,
-                            float dxdz = 0,
-                            float dydz = 0,
-                            ILayer iCLayer = -1) const
+      TrackingUtilities::ESign getDistanceSign(const HoughBox& houghBox,
+                                               float x,
+                                               float y,
+                                               float signedDriftLength,
+                                               float dxdz = 0,
+                                               float dydz = 0,
+                                               TrackingUtilities::ILayer iCLayer = -1) const
       {
-        const Vector2D& lowerPhi0Vec(houghBox.template getLowerBound<APhi0>());
-        const Vector2D& upperPhi0Vec(houghBox.template getUpperBound<APhi0>());
+        const TrackingUtilities::Vector2D& lowerPhi0Vec(houghBox.template getLowerBound<APhi0>());
+        const TrackingUtilities::Vector2D& upperPhi0Vec(houghBox.template getUpperBound<APhi0>());
         const SubordinaryHoughBox& subordinaryHoughBox = houghBox.getSubordinaryBox();
 
         const float lowerX = x * lowerPhi0Vec.x() + y * lowerPhi0Vec.y();
@@ -73,19 +73,19 @@ namespace Belle2 {
         const float lowerDYDZ = -dxdz * lowerPhi0Vec.y() + dydz * lowerPhi0Vec.x();
         const float upperDYDZ = -dxdz * upperPhi0Vec.y() + dydz * upperPhi0Vec.x();
 
-        const ESign lowerDistSign = T::getDistanceSign(subordinaryHoughBox,
+        const TrackingUtilities::ESign lowerDistSign = T::getDistanceSign(subordinaryHoughBox,
                                                        lowerX, lowerY,
                                                        signedDriftLength,
                                                        lowerDXDZ, lowerDYDZ.
                                                        iCLayer);
 
-        const ESign upperDistSign = T::getDistanceSign(subordinaryHoughBox,
+        const TrackingUtilities::ESign upperDistSign = T::getDistanceSign(subordinaryHoughBox,
                                                        upperX, upperY,
                                                        signedDriftLength,
                                                        upperDXDZ, upperDYDZ,
                                                        iCLayer);
 
-        return ESignUtil::common(lowerDistSign, upperDistSign);
+        return TrackingUtilities::ESignUtil::common(lowerDistSign, upperDistSign);
       }
 
     private:

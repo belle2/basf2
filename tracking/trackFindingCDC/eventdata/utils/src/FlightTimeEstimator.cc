@@ -7,15 +7,16 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
-#include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
-#include <tracking/trackFindingCDC/numerics/Angle.h>
+#include <tracking/trackingUtilities/numerics/SpecialFunctions.h>
+#include <tracking/trackingUtilities/numerics/Angle.h>
 
 #include <framework/gearbox/Const.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 const FlightTimeEstimator&
 FlightTimeEstimator::instance(std::unique_ptr<FlightTimeEstimator> replacement)

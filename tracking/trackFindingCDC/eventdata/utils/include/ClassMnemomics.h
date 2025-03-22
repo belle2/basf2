@@ -1,0 +1,102 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+#pragma once
+
+#include <string>
+
+/**
+ *  @file
+ *  Utility functions to lookup identifier and description for event data objects useful to define module parameters.
+ *
+ *  The functions are typically called unqualified to be found at compile time by argument dependent lookup.
+ */
+
+namespace Belle2 {
+
+  namespace TrackFindingCDC {
+    class CDCWireHitCluster;
+    class CDCFacet;
+    class CDCSegment2D;
+    class CDCSegmentPair;
+    class CDCAxialSegmentPair;
+    class CDCSegmentTriple;
+
+    /// Returns a short name for class CDCWireHitCluster to be used in names of parameters.
+    inline std::string getClassMnemomicParameterName(const CDCWireHitCluster* dispatchTag __attribute__((unused)))
+    {
+      return "cluster";
+    }
+
+    /// Returns a short description for class CDCWireHitCluster to be used in descriptions of parameters.
+    inline std::string getClassMnemomicParameterDescription(const CDCWireHitCluster* dispatchTag __attribute__((unused)))
+    {
+      return "wire hit cluster";
+    }
+
+    /// Returns a short name for class CDCFacet to be used in names of parameters.
+    inline std::string getClassMnemomicParameterName(const CDCFacet* dispatchTag __attribute__((unused)))
+    {
+      return "facet";
+    }
+
+    /// Returns a short description for class CDCFacet to be used in descriptions of parameters.
+    inline std::string getClassMnemomicParameterDescription(const CDCFacet* dispatchTag __attribute__((unused)))
+    {
+      return "facet";
+    }
+
+    /// Returns a short name for class CDCSegment2D to be used in names of parameters.
+    inline std::string getClassMnemomicParameterName(const CDCSegment2D* dispatchTag __attribute__((unused)))
+    {
+      return "segment";
+    }
+
+    /// Returns a short description for class CDCSegment2D to be used in descriptions of parameters.
+    inline std::string getClassMnemomicParameterDescription(const CDCSegment2D* dispatchTag __attribute__((unused)))
+    {
+      return "segment";
+    }
+
+    /// Returns a short name for class CDCSegmentPair to be used in names of parameters.
+    inline std::string getClassMnemomicParameterName(const CDCSegmentPair* dispatchTag __attribute__((unused)))
+    {
+      return "segmentPair";
+    }
+
+    /// Returns a short description for class CDCSegmentPair to be used in descriptions of parameters.
+    inline std::string getClassMnemomicParameterDescription(const CDCSegmentPair* dispatchTag __attribute__((unused)))
+    {
+      return "segment pair";
+    }
+
+    /// Returns a short name for class CDCAxialSegmentPair to be used in names of parameters.
+    inline std::string getClassMnemomicParameterName(const CDCAxialSegmentPair* dispatchTag __attribute__((unused)))
+    {
+      return "axialSegmentPair";
+    }
+
+    /// Returns a short description for class CDCAxialSegmentPair to be used in descriptions of parameters.
+    inline std::string getClassMnemomicParameterDescription(const CDCAxialSegmentPair* tag __attribute__((unused)))
+    {
+      return "axial segment pair";
+    }
+
+    /// Returns a short name for class CDCSegmentTriple to be used in names of parameters.
+    inline std::string getClassMnemomicParameterName(const CDCSegmentTriple* dispatchTag __attribute__((unused)))
+    {
+      return "segmentTriple";
+    }
+
+    /// Returns a short description for class CDCSegmentTriple to be used in descriptions of parameters.
+    inline std::string getClassMnemomicParameterDescription(const CDCSegmentTriple* dispatchTag __attribute__((unused)))
+    {
+      return "segment triple";
+    }
+
+  }
+}

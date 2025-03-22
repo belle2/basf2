@@ -9,25 +9,25 @@
 #include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
 #include <tracking/trackFindingCDC/display/Styling.h>
 
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+#include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
 
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/MCAxialSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/MCSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTriple/MCSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
+#include <tracking/trackingUtilities/utilities/ReversedRange.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -45,6 +45,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   template<bool a_drawTrajectory, class AObject>

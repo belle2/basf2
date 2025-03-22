@@ -15,6 +15,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 const std::string c_bkgSegmentColor = "orange";
 

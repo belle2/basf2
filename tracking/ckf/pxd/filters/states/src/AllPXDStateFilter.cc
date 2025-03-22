@@ -11,12 +11,12 @@
 #include <vector>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 Weight AllPXDStateFilter::operator()(const BasePXDStateFilter::Object& pair)
 {
-  const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& previousStates = pair.first;
+  const std::vector<TrackingUtilities::WithWeight<const CKFToPXDState*>>& previousStates = pair.first;
   CKFToPXDState* currentState = pair.second;
 
   if (previousStates.size() < 3) {

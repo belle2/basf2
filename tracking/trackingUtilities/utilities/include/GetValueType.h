@@ -11,7 +11,7 @@
 #include <type_traits>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Type function to extract the bare value type from a range of values
     template<class Ts>

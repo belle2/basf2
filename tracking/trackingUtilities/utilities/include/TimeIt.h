@@ -19,7 +19,7 @@
 #include <numeric>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Class to capture the time a repeated execution took
     class TimeItResult {

@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/IsDetected.h>
+#include <tracking/trackingUtilities/utilities/IsDetected.h>
 #include <type_traits>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      *  Typical application of the detection idiom

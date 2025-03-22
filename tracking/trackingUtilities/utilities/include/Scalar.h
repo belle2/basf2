@@ -10,7 +10,7 @@
 #include <type_traits>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      *  Class wrapping a scalar type (for which std::is_scalar is true).

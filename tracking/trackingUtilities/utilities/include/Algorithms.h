@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Range.h>
+#include <tracking/trackingUtilities/utilities/Range.h>
 
 #include <algorithm>
 #include <iterator>
@@ -15,19 +15,7 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
-
-    /**
-     *  Returns the common category value if all items in a range belong to the same category
-     *  or the default value if the categories of the items differ.
-     */
-    template <class Ts, class ACategoryFunction, class ACategory>
-    ACategory common(const Ts& items, const ACategoryFunction& catFunc, const ACategory defaultCat)
-    {
-      auto it = std::begin(items);
-      auto itEnd = std::end(items);
-      return common(it, itEnd, catFunc, defaultCat);
-    }
+  namespace TrackingUtilities {
 
     /**
      *  Returns the common category value if all items in a range belong to the same category
@@ -44,6 +32,18 @@ namespace Belle2 {
         };
       }
       return cat;
+    }
+
+    /**
+     *  Returns the common category value if all items in a range belong to the same category
+     *  or the default value if the categories of the items differ.
+     */
+    template <class Ts, class ACategoryFunction, class ACategory>
+    ACategory common(const Ts& items, const ACategoryFunction& catFunc, const ACategory defaultCat)
+    {
+      auto it = std::begin(items);
+      auto itEnd = std::end(items);
+      return common(it, itEnd, catFunc, defaultCat);
     }
 
     /**

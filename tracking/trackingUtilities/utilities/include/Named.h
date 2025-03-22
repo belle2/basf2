@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Scalar.h>
+#include <tracking/trackingUtilities/utilities/Scalar.h>
 
 #include <string>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// A mixin class to attach a name to an object.
     template<class T>

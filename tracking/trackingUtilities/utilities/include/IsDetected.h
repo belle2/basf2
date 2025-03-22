@@ -10,7 +10,7 @@
 #include <type_traits>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Helper template that always amounts to void
     template<typename... Ts>

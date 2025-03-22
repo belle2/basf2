@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Scalar.h>
+#include <tracking/trackingUtilities/utilities/Scalar.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Class that behaves like a pointer.
     template<typename T>

@@ -11,7 +11,7 @@
 #include <type_traits>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /** Function serves as a placeholder for a variadic list of statements to be evaluated.
      *  The variadic syntax of C++ allows for variadic calls to a function which first map each element in an expression

@@ -7,13 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 #include <algorithm>
 #include <sstream>
 #include <string>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /// Adds a prefix and capitalises the name if necessary to get a camelCase concatenated name.
     inline std::string prefixed(const std::string& prefix, const std::string& name)
     {

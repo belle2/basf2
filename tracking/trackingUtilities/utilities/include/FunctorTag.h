@@ -10,7 +10,7 @@
 #include <type_traits>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Tag class to facilitate marking of class as a functor in the sense of this code
     struct FunctorTag {

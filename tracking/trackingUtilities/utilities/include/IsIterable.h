@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/IsDetected.h>
-#include <tracking/trackFindingCDC/utilities/GetIterator.h>
+#include <tracking/trackingUtilities/utilities/IsDetected.h>
+#include <tracking/trackingUtilities/utilities/GetIterator.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Type predicate to check if Ts is iterable by means of std::begin().
     template<class Ts>

@@ -10,7 +10,7 @@
 #include <framework/logging/LogConfig.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Dump the current call stack to the logging with the given level
     void printBacktrace(LogConfig::ELogLevel logLevel, int nFrames = 100);

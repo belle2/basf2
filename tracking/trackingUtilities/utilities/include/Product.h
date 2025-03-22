@@ -11,7 +11,7 @@
 #include <cstddef>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /// Template class for compile time computation of products
     template<std::size_t... factors>
     struct Product;

@@ -10,7 +10,7 @@
 #include <utility>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Type for two related objects
     template <class AFrom, class ATo = AFrom>

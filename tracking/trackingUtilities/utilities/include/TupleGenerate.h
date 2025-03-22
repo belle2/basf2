@@ -11,7 +11,7 @@
 #include <utility>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Apply the template function F to each element of the index sequence.
     template< template<size_t> class AGenerator, class AIndexSequence>

@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <algorithm>
 #include <utility>
@@ -15,7 +15,7 @@
 #include <cassert>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Type for two related objects with a weight.
     template <class AFrom, class ATo = AFrom>

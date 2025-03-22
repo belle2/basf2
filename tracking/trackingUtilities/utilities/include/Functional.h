@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
+#include <tracking/trackingUtilities/utilities/FunctorTag.h>
 
 #include <type_traits>
 #include <utility>
@@ -15,7 +15,7 @@
 #include <cmath>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Generic identity functor.
     struct Id {

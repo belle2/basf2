@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Range.h>
-#include <tracking/trackFindingCDC/utilities/GetIterator.h>
+#include <tracking/trackingUtilities/utilities/Range.h>
+#include <tracking/trackingUtilities/utilities/GetIterator.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     template<class Ts, class It = GetIterator<Ts> >
     Range<std::reverse_iterator<It> > reversedRange(Ts& ts)

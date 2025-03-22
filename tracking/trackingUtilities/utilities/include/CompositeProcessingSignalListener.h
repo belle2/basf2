@@ -7,13 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
+#include <tracking/trackingUtilities/utilities/ProcessingSignalListener.h>
 
 #include <vector>
 
 namespace Belle2 {
   class ModuleParamList;
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /// Partial implementation for an algorithm part that wants to dispatch processing signals to subobjects.
     class CompositeProcessingSignalListener : public ProcessingSignalListener {
 

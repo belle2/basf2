@@ -18,7 +18,7 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Type variant with allowed parameters types
     using ParameterVariant =
@@ -60,7 +60,7 @@ namespace Belle2 {
 
   }
 
-  extern template class Belle2::ModuleParam<TrackFindingCDC::ParameterVariant>;
-  extern template class Belle2::ModuleParam<TrackFindingCDC::ParameterVariantMap>;
-  extern template class Belle2::ModuleParam<std::vector<TrackFindingCDC::ParameterVariantMap> >;
+  extern template class Belle2::ModuleParam<TrackingUtilities::ParameterVariant>;
+  extern template class Belle2::ModuleParam<TrackingUtilities::ParameterVariantMap>;
+  extern template class Belle2::ModuleParam<std::vector<TrackingUtilities::ParameterVariantMap> >;
 }

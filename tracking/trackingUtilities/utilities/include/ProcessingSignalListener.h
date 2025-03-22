@@ -10,7 +10,7 @@
 #include <string>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Interface for an algorithm part that needs to receive the module processing signals.
     class ProcessingSignalListener {

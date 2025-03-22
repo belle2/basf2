@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Range.h>
+#include <tracking/trackingUtilities/utilities/Range.h>
 
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// A pair of iterators into a vector usable with the range base for loop.
     template<class T>

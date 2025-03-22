@@ -7,24 +7,24 @@
  **************************************************************************/
 #include <tracking/ckf/svd/filters/states/ResidualSVDStateFilter.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/core/ModuleParamList.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 void ResidualSVDStateFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalResidual"), m_param_maximalResidual,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maximalResidual"), m_param_maximalResidual,
                                 "Maximum residual between extrapolated and measured position based on Kalman step.",
                                 m_param_maximalResidual);
 }
 
 Weight ResidualSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
 {
-  const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& previousStates = pair.first;
+  const std::vector<TrackingUtilities::WithWeight<const CKFToSVDState*>>& previousStates = pair.first;
   CKFToSVDState* currentState = pair.second;
 
   const auto* spacePoint = currentState->getHit();

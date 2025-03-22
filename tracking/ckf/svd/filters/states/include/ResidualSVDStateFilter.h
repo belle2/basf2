@@ -16,7 +16,7 @@ namespace Belle2 {
   class ResidualSVDStateFilter : public BaseSVDStateFilter {
   public:
     /// Return 1/residual and cut at the maximum residual.
-    TrackFindingCDC::Weight operator()(const BaseSVDStateFilter::Object& pair) final;
+    TrackingUtilities::Weight operator()(const BaseSVDStateFilter::Object& pair) final;
 
     /// Expose the maximal residual
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

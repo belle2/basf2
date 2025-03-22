@@ -7,13 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/findlets/base/StoreArrayLoader.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/StoreArrayLoader.h>
 
 #include <type_traits>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      * Findlet which can wrap another Findlet and forward the contents of a StoreArray to the
@@ -26,11 +26,11 @@ namespace Belle2 {
      * an std::vector for each event.
      */
     template <class TWrappedFindlet>
-    class FindletStoreArrayInput : public TrackFindingCDC::Findlet<> {
+    class FindletStoreArrayInput : public Findlet<> {
 
     private:
       /// Type of the base class
-      using Super = TrackFindingCDC::Findlet<>;
+      using Super = Findlet<>;
 
     public:
 
@@ -79,7 +79,7 @@ namespace Belle2 {
 
       /// This class will transfer the content of the StoreArrey into a std::vector for each event
       /// The std::vector is used as input for the wrapped findlet
-      TrackFindingCDC::StoreArrayLoader<DataStoreInputTypeRefType> m_storeArrayLoader;
+      StoreArrayLoader<DataStoreInputTypeRefType> m_storeArrayLoader;
 
       /// Instance of the wrapped findlet
       TWrappedFindlet m_wrappedFindlet;

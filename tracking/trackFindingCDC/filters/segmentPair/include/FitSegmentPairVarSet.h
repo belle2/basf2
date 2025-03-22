@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -29,13 +29,13 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct FitSegmentPairVarNames : public VarNames<CDCSegmentPair> {
+    struct FitSegmentPairVarNames : public TrackingUtilities::VarNames<CDCSegmentPair> {
 
       /// Number of variables to be generated
       // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
       // at least tell cppcheck that everything is fine
       // cppcheck-suppress duplInheritedMember
-      static const size_t nVars = size(fitSegmentPairVarNames);
+      static const size_t nVars = TrackingUtilities::size(fitSegmentPairVarNames);
 
       /// Getter for the name at the given index
       static constexpr char const* getName(int iName)
@@ -48,11 +48,11 @@ namespace Belle2 {
      *  Class to compute floating point variables from an axial stereo segment pair
      *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
-    class FitSegmentPairVarSet : public VarSet<FitSegmentPairVarNames> {
+    class FitSegmentPairVarSet : public TrackingUtilities::VarSet<FitSegmentPairVarNames> {
 
     private:
       /// Type of the base class
-      using Super = VarSet<FitSegmentPairVarNames>;
+      using Super = TrackingUtilities::VarSet<FitSegmentPairVarNames>;
 
     public:
       /// Construct the varset with a switch to only do the prelimiary axial stereo fusion fit
@@ -62,7 +62,7 @@ namespace Belle2 {
       bool extract(const CDCSegmentPair* ptrSegmentPair) final;
 
       /// Get access to the values and names of the variables - includes a prefix_ "pre" for the prelimiary fit
-      std::vector<Named<Float_t*>> getNamedVariables(const std::string& prefix) final;
+      std::vector<TrackingUtilities::Named<Float_t*>> getNamedVariables(const std::string& prefix) final;
 
     private:
       /// Indicator that only the prelimiary fit should be used.

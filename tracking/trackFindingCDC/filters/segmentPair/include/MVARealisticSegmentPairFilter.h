@@ -15,29 +15,29 @@
 #include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/FitSegmentPairVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     using MVARealisticSegmentPairVarSet =
-      VariadicUnionVarSet<BasicSegmentPairVarSet, FitlessSegmentPairVarSet, FitSegmentPairVarSet>;
+      TrackingUtilities::VariadicUnionVarSet<BasicSegmentPairVarSet, FitlessSegmentPairVarSet, FitSegmentPairVarSet>;
 
     /// Final filter for the construction of segment pairs.
-    class MVARealisticSegmentPairFilter : public MVAFilter<MVARealisticSegmentPairVarSet> {
+    class MVARealisticSegmentPairFilter : public TrackingUtilities::MVAFilter<MVARealisticSegmentPairVarSet> {
 
     private:
       /// Type of the base class
-      using Super = MVAFilter<MVARealisticSegmentPairVarSet>;
+      using Super = TrackingUtilities::MVAFilter<MVARealisticSegmentPairVarSet>;
 
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.
       MVARealisticSegmentPairFilter();
 
       /// Function to object for its signalness
-      Weight operator()(const CDCSegmentPair& segmentPair) final;
+      TrackingUtilities::Weight operator()(const CDCSegmentPair& segmentPair) final;
 
     private:
       /// Feasibility filter applied first before invoking the main cut

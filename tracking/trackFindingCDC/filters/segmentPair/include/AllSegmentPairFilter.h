@@ -14,14 +14,14 @@ namespace Belle2 {
     class CDCSegmentPair;
 
     /// Filter for the construction of axial to stereo segment pairs based on simple criteria.
-    class AllSegmentPairFilter : public Filter<CDCSegmentPair> {
+    class AllSegmentPairFilter : public TrackingUtilities::Filter<CDCSegmentPair> {
 
     public:
       /**
        *  Checks if a pair of segments is a good combination.
        *  All implementation always accepts with the total number of hits as weight.
        */
-      Weight operator()(const CDCSegmentPair& segmentPair) final;
+      TrackingUtilities::Weight operator()(const CDCSegmentPair& segmentPair) final;
     };
   }
 }

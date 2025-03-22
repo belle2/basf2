@@ -9,22 +9,22 @@
 
 #include <tracking/trackFindingCDC/filters/segmentPair/SkimmedHitGapSegmentPairVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterOnVarSet.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegmentPair;
 
     /// Filter for the construction of segment pairs based on simple criteria without the common fit.
-    class FitlessSegmentPairFilter : public FilterOnVarSet<SkimmedHitGapSegmentPairVarSet> {
+    class FitlessSegmentPairFilter : public TrackingUtilities::FilterOnVarSet<SkimmedHitGapSegmentPairVarSet> {
 
     private:
       /// Type of the base class
-      using Super = FilterOnVarSet<SkimmedHitGapSegmentPairVarSet>;
+      using Super = TrackingUtilities::FilterOnVarSet<SkimmedHitGapSegmentPairVarSet>;
 
     public:
       /// Checks if a pair of segments is a good combination
-      Weight operator()(const CDCSegmentPair& segmentPair) final;
+      TrackingUtilities::Weight operator()(const CDCSegmentPair& segmentPair) final;
     };
   }
 }

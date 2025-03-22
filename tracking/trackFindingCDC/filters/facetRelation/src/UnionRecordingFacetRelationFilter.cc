@@ -16,14 +16,15 @@
 
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/UnionRecordingFilter.icc.h>
 
-#include <tracking/trackFindingCDC/varsets/RelationVarSet.h>
+#include <tracking/trackingUtilities/varsets/RelationVarSet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::UnionRecordingFilter<FacetRelationFilterFactory>;
+template class TrackingUtilities::UnionRecordingFilter<FacetRelationFilterFactory>;
 
 std::vector<std::string>
 UnionRecordingFacetRelationFilter::getValidVarSetNames() const

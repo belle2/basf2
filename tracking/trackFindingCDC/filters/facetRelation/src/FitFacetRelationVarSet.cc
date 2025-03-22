@@ -12,17 +12,18 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
-#include <tracking/trackFindingCDC/geometry/LineParameters.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
+#include <tracking/trackingUtilities/geometry/LineParameters.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/Angle.h>
+#include <tracking/trackingUtilities/numerics/Angle.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRelation)
 {

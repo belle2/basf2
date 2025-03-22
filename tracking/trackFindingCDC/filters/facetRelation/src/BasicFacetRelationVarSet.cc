@@ -8,10 +8,11 @@
 #include <tracking/trackFindingCDC/filters/facetRelation/BasicFacetRelationVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
+#include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool BasicFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRelation)
 {

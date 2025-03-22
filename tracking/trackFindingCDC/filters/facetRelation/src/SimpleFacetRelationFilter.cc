@@ -8,14 +8,15 @@
 #include <tracking/trackFindingCDC/filters/facetRelation/SimpleFacetRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 SimpleFacetRelationFilter::SimpleFacetRelationFilter()
   : m_param_deviationCosCut(cos(0.4))

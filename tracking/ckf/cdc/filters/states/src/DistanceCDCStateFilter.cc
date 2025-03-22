@@ -8,18 +8,18 @@
 #include <tracking/ckf/cdc/filters/states/DistanceCDCStateFilter.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 using namespace Belle2;
 
 void DistanceCDCStateFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalDistance"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maximalDistance"),
                                 m_maximalDistance, "Maximal distance  between track and hit post kalman update", m_maximalDistance);
 }
 
 
-TrackFindingCDC::Weight DistanceCDCStateFilter::operator()(const BaseCDCStateFilter::Object& pair)
+TrackingUtilities::Weight DistanceCDCStateFilter::operator()(const BaseCDCStateFilter::Object& pair)
 {
   const CDCCKFState& state = *(pair.second);
 

@@ -12,6 +12,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 Weight SimpleSegmentPairRelationFilter::operator()(const CDCSegmentPair& fromSegmentPair,
                                                    const CDCSegmentPair& toSegmentPair)

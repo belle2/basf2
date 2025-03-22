@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Matrix.h>
+#include <tracking/trackingUtilities/numerics/Matrix.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// The representation type of an inverse covariance matrix of n related parameters
     template <int N>

@@ -8,7 +8,7 @@
 #pragma once
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /**
      *  Computes the modulo operation always yielding a positive result.
      *  The implementation asserts the proper behaviour even if negative numbers are put in.

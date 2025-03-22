@@ -8,7 +8,7 @@
 #pragma once
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Standard sinus cardinalis function sinc x = sin x / x
     double sinc(double x);

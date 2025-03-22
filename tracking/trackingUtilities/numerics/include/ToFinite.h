@@ -11,7 +11,7 @@
 #include <RtypesCore.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Helper function to replace a non-finite value with a defined value
     inline Float_t toFinite(Float_t value, Float_t replacement)

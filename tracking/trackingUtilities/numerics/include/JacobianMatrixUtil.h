@@ -7,17 +7,17 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
-#include <tracking/trackFindingCDC/numerics/ParameterVector.h>
+#include <tracking/trackingUtilities/numerics/JacobianMatrix.h>
+#include <tracking/trackingUtilities/numerics/ParameterVector.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/EigenView.h>
+#include <tracking/trackingUtilities/numerics/EigenView.h>
 
 #include <Eigen/Core>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Collection of functions related to jacobian matrices
     struct JacobianMatrixUtil {

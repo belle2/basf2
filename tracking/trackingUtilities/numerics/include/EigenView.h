@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/PlainMatrix.h>
+#include <tracking/trackingUtilities/numerics/PlainMatrix.h>
 
 #include <Eigen/Core>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Obtain a view of the values in the given plain matrix as an Eigen::Matrix
     template <class T, int M, int N>

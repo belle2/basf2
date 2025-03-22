@@ -8,12 +8,12 @@
 #pragma once
 
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
-#include <tracking/trackFindingCDC/utilities/Scalar.h>
+#include <tracking/trackingUtilities/utilities/Scalar.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// A mixin class to attach a weight to an object.
     template<class T>

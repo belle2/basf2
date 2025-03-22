@@ -7,18 +7,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Modulo.h>
+#include <tracking/trackingUtilities/numerics/Modulo.h>
 
-#include <tracking/trackFindingCDC/geometry/Line2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Line2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/EIncDec.h>
+#include <tracking/trackingUtilities/numerics/EIncDec.h>
 
 #include <cmath>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /** Helper class to calculate roots for the function f(x) = sin x - slope * x - intercept.
      *  Solves the equation sin x = slope * x + intercept by Newton's method on the function f(x) = sin x - slope * x - intercept.

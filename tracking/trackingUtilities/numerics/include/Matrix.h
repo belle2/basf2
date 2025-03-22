@@ -9,15 +9,15 @@
 
 // #include <Eigen/Core>
 // namespace Belle2 {
-//   namespace TrackFindingCDC {
+//   namespace TrackingUtilities {
 //     template <class T, int M, int N>
 //     using Matrix = Eigen::Matrix<T, M, N>;
 //   }
 // }
 
-#include <tracking/trackFindingCDC/numerics/PlainMatrix.h>
+#include <tracking/trackingUtilities/numerics/PlainMatrix.h>
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     template <class T, int M, int N>
     using Matrix = PlainMatrix<T, M, N>;
   }

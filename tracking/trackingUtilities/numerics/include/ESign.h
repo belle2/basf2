@@ -14,7 +14,7 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Namespace to hide the constants of the ESign enumeration.
     namespace ESignUtil {

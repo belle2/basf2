@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/CovarianceMatrix.h>
+#include <tracking/trackingUtilities/numerics/CovarianceMatrix.h>
 
 #include <TMatrixDSymfwd.h>
 
 /** Declarations (pure .h) **/
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Convert between TMatrix and CovarianceMatrix representations
     struct TMatrixConversion {
@@ -35,7 +35,7 @@ namespace Belle2 {
 #include <TMatrixDSym.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     template <int N>
     CovarianceMatrix<N> TMatrixConversion::fromTMatrix(const TMatrixDSym& tCov)

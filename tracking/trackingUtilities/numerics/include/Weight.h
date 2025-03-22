@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
+#include <tracking/trackingUtilities/utilities/FunctorTag.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// An additive measure of quality
     using Weight = double;

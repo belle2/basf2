@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/ParameterVector.h>
+#include <tracking/trackingUtilities/numerics/ParameterVector.h>
 
-#include <tracking/trackFindingCDC/numerics/EigenView.h>
+#include <tracking/trackingUtilities/numerics/EigenView.h>
 
 #include <type_traits>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Structure to gather some utility functions for the ParameterVector.
     struct ParameterVectorUtil {

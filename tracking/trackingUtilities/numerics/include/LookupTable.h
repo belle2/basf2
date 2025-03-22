@@ -14,7 +14,7 @@
 #include <cassert>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
     template <class AResultType = double>
     std::vector<AResultType> linspace(double start,

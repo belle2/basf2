@@ -12,7 +12,7 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Computes the square of an input value, and allows for operations like
     /// TVector3 * TVector3, which results in a double return type

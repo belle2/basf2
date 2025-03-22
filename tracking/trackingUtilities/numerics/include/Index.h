@@ -11,7 +11,7 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// A positive index which may indicate an invalid by returning a negative number
     using Index = int;

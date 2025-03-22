@@ -7,15 +7,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/PrecisionMatrixUtil.h>
-#include <tracking/trackFindingCDC/numerics/JacobianMatrixUtil.h>
+#include <tracking/trackingUtilities/numerics/PrecisionMatrixUtil.h>
+#include <tracking/trackingUtilities/numerics/JacobianMatrixUtil.h>
 
-#include <tracking/trackFindingCDC/numerics/CovarianceMatrix.h>
-#include <tracking/trackFindingCDC/numerics/PrecisionMatrix.h>
-#include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
-#include <tracking/trackFindingCDC/numerics/ParameterVector.h>
+#include <tracking/trackingUtilities/numerics/CovarianceMatrix.h>
+#include <tracking/trackingUtilities/numerics/PrecisionMatrix.h>
+#include <tracking/trackingUtilities/numerics/JacobianMatrix.h>
+#include <tracking/trackingUtilities/numerics/ParameterVector.h>
 
-#include <tracking/trackFindingCDC/numerics/EigenView.h>
+#include <tracking/trackingUtilities/numerics/EigenView.h>
 
 #include <Eigen/Core>
 #include <Eigen/LU>
@@ -26,7 +26,7 @@
 #include <cassert>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Collection of functions related to covariance matrices
     struct CovarianceMatrixUtil {

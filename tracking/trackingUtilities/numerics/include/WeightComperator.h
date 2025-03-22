@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Operator to sort for lowest according to the weight of the object.
     using LessWeight = LessOf<MayIndirectTo<GetWeight>>;

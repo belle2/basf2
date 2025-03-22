@@ -13,7 +13,7 @@
 #include <cassert>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      *  A matrix implementation to be used as an interface typ through out the track finder.

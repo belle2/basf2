@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/PlainMatrix.h>
+#include <tracking/trackingUtilities/numerics/PlainMatrix.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Utility functions for the PlainMatrix
     struct PlainMatrixUtil {

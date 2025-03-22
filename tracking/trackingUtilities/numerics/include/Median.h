@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Return the median of the given values.
     double median(std::vector<double> values);

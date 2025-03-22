@@ -10,7 +10,7 @@
 #include <cmath>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Extended equality for floating point values such at all NANs are identical to each other
     template<class AFloat>

@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilterUtil.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
 
 #include <vector>
@@ -21,10 +21,10 @@ namespace Belle2 {
 
     /// Findlet for applying filters for creating hit-hit relations in each track candidate
     template<class AHit, class ARelationFilter>
-    class RelationCreator : public TrackFindingCDC::Findlet<AHit*, TrackFindingCDC::WeightedRelation<AHit>> {
+    class RelationCreator : public TrackingUtilities::Findlet<AHit*, TrackingUtilities::WeightedRelation<AHit>> {
     public:
       /// The parent class
-      using Super = TrackFindingCDC::Findlet<AHit*, TrackFindingCDC::WeightedRelation<AHit>>;
+      using Super = TrackingUtilities::Findlet<AHit*, TrackingUtilities::WeightedRelation<AHit>>;
 
       /// Construct this findlet and add the subfindlet as listener
       RelationCreator()
@@ -38,15 +38,15 @@ namespace Belle2 {
       /// Expose the parameters of the subfindlet
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final
       {
-        m_relationFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("relation", prefix));
+        m_relationFilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed("relation", prefix));
       };
 
       /// Apply both filters for creating state-hit and hit-hit relations
       void apply(std::vector<AHit*>& hits,
-                 std::vector<TrackFindingCDC::WeightedRelation<AHit>>& relations) override
+                 std::vector<TrackingUtilities::WeightedRelation<AHit>>& relations) override
       {
         // relations += hits -> hits in each track candidate
-        TrackFindingCDC::RelationFilterUtil::appendUsing(m_relationFilter, hits, hits, relations, 100000);
+        TrackingUtilities::RelationFilterUtil::appendUsing(m_relationFilter, hits, hits, relations, 100000);
       };
 
     private:

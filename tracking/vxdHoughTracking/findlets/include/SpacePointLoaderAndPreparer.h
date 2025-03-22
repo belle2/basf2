@@ -12,8 +12,8 @@
 #include <framework/geometry/B2Vector3.h>
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/geometry/GeoCache.h>
@@ -28,9 +28,9 @@ namespace Belle2 {
     * in which the BeamSpotPosition is used to calculate the conformal transformed x,y coordinates and the creating pairs
     * of coordinates for finding track candidates in r-phi and r-z.
     */
-    class SpacePointLoaderAndPreparer : public TrackFindingCDC::Findlet<const SpacePoint*, VXDHoughState> {
+    class SpacePointLoaderAndPreparer : public TrackingUtilities::Findlet<const SpacePoint*, VXDHoughState> {
       /// Parent class
-      using Super = TrackFindingCDC::Findlet<const SpacePoint*, VXDHoughState>;
+      using Super = TrackingUtilities::Findlet<const SpacePoint*, VXDHoughState>;
 
     public:
       /// Load clusters and prepare them for intercept finding
@@ -41,10 +41,10 @@ namespace Belle2 {
       {
         Super::exposeParameters(moduleParamList, prefix);
 
-        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "SVDSpacePointStoreArrayName"), m_SVDSpacePointStoreArrayName,
+        moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "SVDSpacePointStoreArrayName"), m_SVDSpacePointStoreArrayName,
                                       "Name of the SVDSpacePoints Store Array.", m_SVDSpacePointStoreArrayName);
 
-        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useAllSpacePoints"), m_useAllSpacePoints,
+        moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "useAllSpacePoints"), m_useAllSpacePoints,
                                       "Use all SVDSpacePoints for track finding or only unassigned ones?", m_useAllSpacePoints);
       };
 

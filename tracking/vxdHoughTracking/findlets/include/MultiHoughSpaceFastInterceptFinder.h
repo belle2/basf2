@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/vxdHoughTracking/findlets/HitSelector.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -28,9 +28,9 @@ namespace Belle2 {
     * The found track candidates are then clustered via a recursive search. Afterwards track candidates are formed
     * and stored in the output vector.
     */
-    class MultiHoughSpaceFastInterceptFinder : public TrackFindingCDC::Findlet<VXDHoughState, std::vector<VXDHoughState*>> {
+    class MultiHoughSpaceFastInterceptFinder : public TrackingUtilities::Findlet<VXDHoughState, std::vector<VXDHoughState*>> {
       /// Parent class
-      using Super = TrackFindingCDC::Findlet<VXDHoughState, std::vector<VXDHoughState*>>;
+      using Super = TrackingUtilities::Findlet<VXDHoughState, std::vector<VXDHoughState*>>;
 
       /// Map that contains the "friend" sensors for each SVD L6 sensor
       typedef std::map<VxdID, std::vector<VxdID>> friendSensorMap;

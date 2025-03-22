@@ -17,12 +17,12 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 using namespace vxdHoughTracking;
 
 RecoTrackStorer::~RecoTrackStorer() = default;
@@ -35,26 +35,26 @@ void RecoTrackStorer::exposeParameters(ModuleParamList* moduleParamList, const s
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "SVDClustersStoreArrayName"), m_SVDClustersStoreArrayName,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "SVDClustersStoreArrayName"), m_SVDClustersStoreArrayName,
                                 "Name of the SVDClusters Store Array.", m_SVDClustersStoreArrayName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "RecoTracksStoreArrayName"), m_RecoTracksStoreArrayName,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "RecoTracksStoreArrayName"), m_RecoTracksStoreArrayName,
                                 "Name of the RecoTracks Store Array.", m_RecoTracksStoreArrayName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "SVDSpacePointTrackCandsStoreArrayName"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "SVDSpacePointTrackCandsStoreArrayName"),
                                 m_SVDSpacePointTrackCandsStoreArrayName,
                                 "Name of the SpacePointTrackCand Store Array.", m_SVDSpacePointTrackCandsStoreArrayName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResultStorerQualityEstimationMethod"), m_EstimationMethod,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "ResultStorerQualityEstimationMethod"), m_EstimationMethod,
                                 "Identifier which estimation method to use. Valid identifiers are: [mcInfo, circleFit, tripletFit, helixFit].",
                                 m_EstimationMethod);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResultStorerMCRecoTracksStoreArrayName"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "ResultStorerMCRecoTracksStoreArrayName"),
                                 m_MCRecoTracksStoreArrayName,
                                 "Only required for MCInfo method. Name of StoreArray containing MCRecoTracks.",
                                 m_MCRecoTracksStoreArrayName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResultStorerMCStrictQualityEstimator"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "ResultStorerMCStrictQualityEstimator"),
                                 m_MCStrictQualityEstimator,
                                 "Only required for MCInfo method. If false combining several MCTracks is allowed.",
                                 m_MCStrictQualityEstimator);
@@ -178,14 +178,14 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
   }
 
   for (const SpacePoint* spacePoint : spacePoints) {
-    if (TrackFindingCDC::is_in(spacePoint, m_usedSpacePoints)) {
+    if (TrackingUtilities::is_in(spacePoint, m_usedSpacePoints)) {
       spacePoint->setAssignmentState(true);
       continue;
     }
 
     const auto& relatedClusters = spacePoint->getRelationsTo<SVDCluster>(m_SVDClustersStoreArrayName);
     for (const SVDCluster& relatedCluster : relatedClusters) {
-      if (TrackFindingCDC::is_in(&relatedCluster, m_usedClusters)) {
+      if (TrackingUtilities::is_in(&relatedCluster, m_usedClusters)) {
         spacePoint->setAssignmentState(true);
         break;
       }

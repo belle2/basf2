@@ -8,7 +8,7 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <vxd/dataobjects/VxdID.h>
 
 #include <string>
@@ -22,7 +22,7 @@ namespace Belle2 {
     /**
     * Select hits to be analysed in the Hough Space intercept finder for a given layer 6 sensor based on the simple sensor friend map.
     */
-    class HitSelector : public TrackFindingCDC::Findlet<VXDHoughState, const VxdID, VXDHoughState*> {
+    class HitSelector : public TrackingUtilities::Findlet<VXDHoughState, const VxdID, VXDHoughState*> {
 
     public:
       /// Load the hits in a sensor friend list for a given L6 sensor from hits and store them in selectedHits, which then are used for the Hough trafo and intercept finding

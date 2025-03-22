@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/vxdHoughTracking/findlets/RelationCreator.h>
 #include <tracking/vxdHoughTracking/findlets/SVDHoughTrackingTreeSearcher.dcl.h>
 #include <tracking/vxdHoughTracking/findlets/TrackCandidateResultRefiner.h>
@@ -26,12 +26,12 @@ namespace Belle2 {
 
     /// Findlet for rejecting wrong SpacePointTrackCands and for removing bad hits.
     template<class AHit>
-    class RawTrackCandCleaner : public TrackFindingCDC::Findlet<std::vector<AHit*>, SpacePointTrackCand> {
+    class RawTrackCandCleaner : public TrackingUtilities::Findlet<std::vector<AHit*>, SpacePointTrackCand> {
       /// Parent class
-      using Super =  TrackFindingCDC::Findlet<std::vector<AHit*>, SpacePointTrackCand>;
+      using Super =  TrackingUtilities::Findlet<std::vector<AHit*>, SpacePointTrackCand>;
 
       /// Shortcut definition for Result
-      using Result = std::vector<TrackFindingCDC::WithWeight<const AHit*>>;
+      using Result = std::vector<TrackingUtilities::WithWeight<const AHit*>>;
 
     public:
       /// Find intercepts in the 2D Hough space
@@ -61,7 +61,7 @@ namespace Belle2 {
       TrackCandidateResultRefiner m_resultRefiner;
 
       /// vector containing the relations between the hits in the raw track candidate
-      std::vector<TrackFindingCDC::WeightedRelation<AHit>> m_relations;
+      std::vector<TrackingUtilities::WeightedRelation<AHit>> m_relations;
 
       /// vector containing track candidates after tree search
       std::vector<Result> m_results;

@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
-#include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/ca/CellularAutomaton.h>
 
 #include <vector>
 #include <string>
@@ -31,10 +31,10 @@ namespace Belle2 {
     */
     template <class AHit, class APathFilter, class AResult>
     class SVDHoughTrackingTreeSearcher : public
-      TrackFindingCDC::Findlet<AHit*, const TrackFindingCDC::WeightedRelation<AHit>, AResult> {
+      TrackingUtilities::Findlet<AHit*, const TrackingUtilities::WeightedRelation<AHit>, AResult> {
     private:
       /// Parent class
-      using Super = TrackFindingCDC::Findlet<AHit*, const TrackFindingCDC::WeightedRelation<AHit>, AResult>;
+      using Super = TrackingUtilities::Findlet<AHit*, const TrackingUtilities::WeightedRelation<AHit>, AResult>;
 
     public:
       /// Construct this findlet and add the subfindlet as listener
@@ -50,13 +50,13 @@ namespace Belle2 {
       * traversal.
       */
       void apply(std::vector<AHit*>& hits,
-                 const std::vector<TrackFindingCDC::WeightedRelation<AHit>>& relations,
+                 const std::vector<TrackingUtilities::WeightedRelation<AHit>>& relations,
                  std::vector<AResult>& results) final;
 
     private:
       /// Implementation of the traverseTree function
-      void traverseTree(std::vector<TrackFindingCDC::WithWeight<const AHit*>>& path,
-                        const std::vector<TrackFindingCDC::WeightedRelation<AHit>>& relations,
+      void traverseTree(std::vector<TrackingUtilities::WithWeight<const AHit*>>& path,
+                        const std::vector<TrackingUtilities::WeightedRelation<AHit>>& relations,
                         std::vector<AResult>& results);
 
     private:
@@ -64,7 +64,7 @@ namespace Belle2 {
       APathFilter m_pathFilter;
 
       /// Findlet for adding a recursion cell state to the hits
-      TrackFindingCDC::CellularAutomaton<AHit> m_automaton;
+      TrackingUtilities::CellularAutomaton<AHit> m_automaton;
 
       /// TwoHitFilter activarion cut
       uint m_applyTwoHitFilterIfMoreChildStates = 50;

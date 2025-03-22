@@ -8,8 +8,8 @@
 #pragma once
 
 #include <framework/datastore/StoreArray.h>
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 
 #include <string>
@@ -25,9 +25,9 @@ namespace Belle2 {
   namespace vxdHoughTracking {
 
     /// Store RecoTracks into StoreArray
-    class RecoTrackStorer : public TrackFindingCDC::Findlet<SpacePointTrackCand, const SpacePoint* const> {
+    class RecoTrackStorer : public TrackingUtilities::Findlet<SpacePointTrackCand, const SpacePoint* const> {
       /// Parent class
-      using Super = TrackFindingCDC::Findlet<SpacePointTrackCand, const SpacePoint* const>;
+      using Super = TrackingUtilities::Findlet<SpacePointTrackCand, const SpacePoint* const>;
 
     public:
       /// Constructor

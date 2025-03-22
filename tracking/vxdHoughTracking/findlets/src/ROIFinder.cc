@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/vxdHoughTracking/findlets/ROIFinder.h>
 #include <tracking/vxdHoughTracking/findlets/RawTrackCandCleaner.icc.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
@@ -21,7 +21,7 @@
 #include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 using namespace vxdHoughTracking;
 
 ROIFinder::~ROIFinder() = default;
@@ -34,75 +34,75 @@ void ROIFinder::exposeParameters(ModuleParamList* moduleParamList, const std::st
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "calculateROI"), m_calculateROI,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "calculateROI"), m_calculateROI,
                                 "Calculate PXDIntercepts and ROIs in this findlet based on a simple circle extrapolation (r-phi) and straight line extrapolation (z, theta)?",
                                 m_calculateROI);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storePXDInterceptsName"), m_storePXDInterceptsName,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "storePXDInterceptsName"), m_storePXDInterceptsName,
                                 "Name of the PXDIntercepts StoreArray produced by SVDHoughTracking using a simple circle extrapolation in r-phi and a straight line extrapolation in theta.",
                                 m_storePXDInterceptsName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storeROIsName"), m_storeROIsName,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "storeROIsName"), m_storeROIsName,
                                 "Name of the ROIs StoreArray produced by SVDHoughTracking using a simple circle extrapolation in r-phi and a straight line extrapolation in theta.",
                                 m_storeROIsName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "tolerancePhi"), m_tolerancePhi,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "tolerancePhi"), m_tolerancePhi,
                                 "Allowed tolerance in phi (in radians) (for ROI calculation in u direction). If the intercept is within this range of the active region, an intercept is created.",
                                 m_tolerancePhi);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "toleranceZ"), m_toleranceZ,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "toleranceZ"), m_toleranceZ,
                                 "Allowed tolerance in z (in cm) (for ROI calculation in v direction). If the intercept is within this range of the active region of a sensor, an intercept is created.",
                                 m_toleranceZ);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "radiusCorrectionFactorL1"), m_radiusCorrectionFactorL1,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "radiusCorrectionFactorL1"), m_radiusCorrectionFactorL1,
                                 "Correct charge-dependent bias of the extrapolated hit on L1 with radiusCorrectionFactor * trackCharge / trackRadius.",
                                 m_radiusCorrectionFactorL1);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "radiusCorrectionFactorL2"), m_radiusCorrectionFactorL2,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "radiusCorrectionFactorL2"), m_radiusCorrectionFactorL2,
                                 "Correct charge-dependent bias of the extrapolated hit on L2 with radiusCorrectionFactor * trackCharge / trackRadius.",
                                 m_radiusCorrectionFactorL2);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "sinPhiCorrectionFactor"), m_sinPhiCorrectionFactor,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "sinPhiCorrectionFactor"), m_sinPhiCorrectionFactor,
                                 "Correct sin(trackPhi) dependent bias with sinPhiCorrectionFactor * sin(trackPhi).",
                                 m_sinPhiCorrectionFactor);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cosPhiCorrectionFactor"), m_cosPhiCorrectionFactor,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "cosPhiCorrectionFactor"), m_cosPhiCorrectionFactor,
                                 "Correct cos(trackPhi) dependent bias with cosPhiCorrectionFactor * cos(trackPhi).",
                                 m_cosPhiCorrectionFactor);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "zPositionCorrectionFactor"), m_zPositionCorrectionFactor,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "zPositionCorrectionFactor"), m_zPositionCorrectionFactor,
                                 "Correction factor for the extrapolated z position.",
                                 m_zPositionCorrectionFactor);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumROISizeUL1"), m_minimumROISizeUL1,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minimumROISizeUL1"), m_minimumROISizeUL1,
                                 "Minimum ROI size (in pixel) in u direction on L1.", m_minimumROISizeUL1);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumROISizeVL1"), m_minimumROISizeVL1,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minimumROISizeVL1"), m_minimumROISizeVL1,
                                 "Minimum ROI size (in pixel) in v direction on L1.", m_minimumROISizeVL1);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumROISizeUL2"), m_minimumROISizeUL2,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minimumROISizeUL2"), m_minimumROISizeUL2,
                                 "Minimum ROI size (in pixel) in u direction on L2.", m_minimumROISizeUL2);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumROISizeVL2"), m_minimumROISizeVL2,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minimumROISizeVL2"), m_minimumROISizeVL2,
                                 "Minimum ROI size (in pixel) in v direction on L2.", m_minimumROISizeVL2);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "multiplierUL1"), m_multiplierUL1,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "multiplierUL1"), m_multiplierUL1,
                                 "Multiplier term for ROI size estimation for L1 u direction. Usage: multiplierUL1 * 1/R + minimumROISizeUL1, with R in cm.",
                                 m_multiplierUL1);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "multiplierUL2"), m_multiplierUL2,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "multiplierUL2"), m_multiplierUL2,
                                 "Multiplier term for ROI size estimation for L2 u direction. Usage: multiplierUL2 * 1/R + minimumROISizeUL2, with R in cm.",
                                 m_multiplierUL2);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "multiplierVL1"), m_multiplierVL1,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "multiplierVL1"), m_multiplierVL1,
                                 "Multiplier term for ROI size estimation for L1 v direction. Usage: (1 + abs(tan(lambda)) * multiplierVL1) + minimumROISizeVL1.",
                                 m_multiplierVL1);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "multiplierVL2"), m_multiplierVL2,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "multiplierVL2"), m_multiplierVL2,
                                 "Multiplier term for ROI size estimation for L2 v direction. Usage: (1 + abs(tan(lambda)) * multiplierVL2) + minimumROISizeVL2.",
                                 m_multiplierVL2);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumROISizeU"), m_maximumROISizeU,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maximumROISizeU"), m_maximumROISizeU,
                                 "Maximum ROI size in u.", m_maximumROISizeU);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumROISizeV"), m_maximumROISizeV,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maximumROISizeV"), m_maximumROISizeV,
                                 "Maximum ROI size in v.", m_maximumROISizeV);
 
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "refit"), m_refit,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "refit"), m_refit,
                                 "Refit the track with trackQualityEstimationMethod?", m_refit);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "addVirtualIP"), m_addVirtualIP,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "addVirtualIP"), m_addVirtualIP,
                                 "Add virtual IP to fit the tracks again for ROI creation?", m_addVirtualIP);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ROIFitMethod"), m_ROIFitMethod,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "ROIFitMethod"), m_ROIFitMethod,
                                 "Identifier which fit method to use. Valid identifiers are: [circleFit, tripletFit, helixFit]",
                                 m_ROIFitMethod);
 

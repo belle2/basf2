@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <vector>
 
@@ -23,21 +23,21 @@ namespace Belle2 {
     */
     template <class AHit>
     class OnHitApplier : public
-      TrackFindingCDC::Findlet<const TrackFindingCDC::WithWeight<const AHit*>, TrackFindingCDC::WithWeight<AHit*>> {
+      TrackingUtilities::Findlet<const TrackingUtilities::WithWeight<const AHit*>, TrackingUtilities::WithWeight<AHit*>> {
     private:
       /// Parent class
-      using Super = TrackFindingCDC::Findlet<const TrackFindingCDC::WithWeight<const AHit*>, TrackFindingCDC::WithWeight<AHit*>>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::WithWeight<const AHit*>, TrackingUtilities::WithWeight<AHit*>>;
 
     public:
       /// The object this filter refers to
-      using Object = std::pair<const std::vector<TrackFindingCDC::WithWeight<const AHit*>>, AHit*>;
+      using Object = std::pair<const std::vector<TrackingUtilities::WithWeight<const AHit*>>, AHit*>;
 
       /// Apply the () operator to all pairs of hit and current path.
-      void apply(const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& currentPath,
-                 std::vector<TrackFindingCDC::WithWeight<AHit*>>& childHits) override;
+      void apply(const std::vector<TrackingUtilities::WithWeight<const AHit*>>& currentPath,
+                 std::vector<TrackingUtilities::WithWeight<AHit*>>& childHits) override;
 
       /// The filter operator for this class
-      virtual TrackFindingCDC::Weight operator()(const Object& object);
+      virtual TrackingUtilities::Weight operator()(const Object& object);
     };
 
   }

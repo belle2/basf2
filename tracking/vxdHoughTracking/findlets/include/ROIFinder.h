@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
@@ -26,9 +26,9 @@ namespace Belle2 {
     /**
     * Findlet for performing the simple SVDHoughTracking ROI calculation.
     */
-    class ROIFinder : public TrackFindingCDC::Findlet<const SpacePointTrackCand> {
+    class ROIFinder : public TrackingUtilities::Findlet<const SpacePointTrackCand> {
       /// Parent class
-      using Super = TrackFindingCDC::Findlet<const SpacePointTrackCand>;
+      using Super = TrackingUtilities::Findlet<const SpacePointTrackCand>;
 
     public:
       /// Constructor for adding the subfindlets

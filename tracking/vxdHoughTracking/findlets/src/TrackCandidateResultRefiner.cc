@@ -14,10 +14,10 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 using namespace vxdHoughTracking;
 
 TrackCandidateResultRefiner::~TrackCandidateResultRefiner() = default;
@@ -32,29 +32,29 @@ void TrackCandidateResultRefiner::exposeParameters(ModuleParamList* moduleParamL
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  m_overlapResolver.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "refinerOverlapResolver"));
+  m_overlapResolver.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "refinerOverlapResolver"));
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackQualityEstimationMethod"), m_EstimationMethod,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "trackQualityEstimationMethod"), m_EstimationMethod,
                                 "Identifier which estimation method to use. Valid identifiers are: [mcInfo, circleFit, tripletFit, helixFit]",
                                 m_EstimationMethod);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCRecoTracksStoreArrayName"), m_MCRecoTracksStoreArrayName,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "MCRecoTracksStoreArrayName"), m_MCRecoTracksStoreArrayName,
                                 "Only required for MCInfo method. Name of StoreArray containing MCRecoTracks.",
                                 m_MCRecoTracksStoreArrayName);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCStrictQualityEstimator"), m_MCStrictQualityEstimator,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "MCStrictQualityEstimator"), m_MCStrictQualityEstimator,
                                 "Only required for MCInfo method. If false combining several MCTracks is allowed.",
                                 m_MCStrictQualityEstimator);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minQualitiyIndicatorSize3"), m_minQualitiyIndicatorSize3,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minQualitiyIndicatorSize3"), m_minQualitiyIndicatorSize3,
                                 "Cut on quality indicator value for track candidates of size 3. Only accept SpacePointTrackCands with QI above this value.",
                                 m_minQualitiyIndicatorSize3);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minQualitiyIndicatorSize4"), m_minQualitiyIndicatorSize4,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minQualitiyIndicatorSize4"), m_minQualitiyIndicatorSize4,
                                 "Cut on quality indicator value for track candidates of size 4. Only accept SpacePointTrackCands with QI above this value.",
                                 m_minQualitiyIndicatorSize4);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minQualitiyIndicatorSize5"), m_minQualitiyIndicatorSize5,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minQualitiyIndicatorSize5"), m_minQualitiyIndicatorSize5,
                                 "Cut on quality indicator value for track candidates of size 5. Only accept SpacePointTrackCands with QI above this value.",
                                 m_minQualitiyIndicatorSize5);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxNumberOfEachPathLength"), m_maxNumberOfEachPathLength,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maxNumberOfEachPathLength"), m_maxNumberOfEachPathLength,
                                 "Maximum number of SpacePointTrackCands with a length of 3, 4, 5, or 6 each.",
                                 m_maxNumberOfEachPathLength);
 }

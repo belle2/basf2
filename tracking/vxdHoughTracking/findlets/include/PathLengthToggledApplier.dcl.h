@@ -8,7 +8,7 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/findlets/OnHitApplier.dcl.h>
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
 
 #include <vector>
 
@@ -30,8 +30,8 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// The weight is calculated using the subfilter based on the geometrical layer of the state.
-      void apply(const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& currentPath,
-                 std::vector<TrackFindingCDC::WithWeight<AHit*>>& childHits) override;
+      void apply(const std::vector<TrackingUtilities::WithWeight<const AHit*>>& currentPath,
+                 std::vector<TrackingUtilities::WithWeight<AHit*>>& childHits) override;
 
     private:
       /// Findlet used for currentPath.size() == 1

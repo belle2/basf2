@@ -7,17 +7,17 @@
  **************************************************************************/
 #include <tracking/modules/reattachCDCWireHitsToRecoTracks/ReattachCDCWireHitsToRecoTracksModule.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 REG_MODULE(ReattachCDCWireHitsToRecoTracks);
 

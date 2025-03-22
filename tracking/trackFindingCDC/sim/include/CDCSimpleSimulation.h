@@ -7,21 +7,24 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/trackingUtilities/utilities/VectorRange.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <vector>
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Forward declaration
     class CDCTrack;
     class CDCTrajectory3D;
     class Helix;
+  }
+
+  namespace TrackFindingCDC {
 
     /**
      *  Class providing a simple simulation of the CDC mainly for quick unit test checks.
@@ -48,9 +51,9 @@ namespace Belle2 {
          *  Constructor from limited truth information
          *  Mainly used by the manually prepared event
          */
-        SimpleSimHit(const CDCWireHit& wireHit,
+        SimpleSimHit(const TrackingUtilities::CDCWireHit& wireHit,
                      size_t iMCTrack,
-                     ERightLeft rlInfo) :
+                     TrackingUtilities::ERightLeft rlInfo) :
           m_wireHit(wireHit),
           m_iMCTrack(iMCTrack),
           m_rlInfo(rlInfo)
@@ -60,10 +63,10 @@ namespace Belle2 {
          *  Constructor from complete truth information.
          *  Mainly used in the simple simulation procedure.
          */
-        SimpleSimHit(const CDCWireHit& wireHit,
+        SimpleSimHit(const TrackingUtilities::CDCWireHit& wireHit,
                      size_t iMCTrack,
-                     ERightLeft rlInfo,
-                     const Vector3D& pos3D,
+                     TrackingUtilities::ERightLeft rlInfo,
+                     const TrackingUtilities::Vector3D& pos3D,
                      double arcLength2D = NAN,
                      double trueDriftLength = NAN) :
           m_wireHit(wireHit),
@@ -75,16 +78,16 @@ namespace Belle2 {
         {}
 
         /// Memory for the wire hit instance that will be given to the reconstruction
-        CDCWireHit m_wireHit;
+        TrackingUtilities::CDCWireHit m_wireHit;
 
         /// Memory for the true index of the track this hit is contained in
         size_t m_iMCTrack;
 
         /// Memory for the true right left passage information
-        ERightLeft m_rlInfo;
+        TrackingUtilities::ERightLeft m_rlInfo;
 
         /// Memory for the true position on the track closest to the wire
-        Vector3D m_pos3D  = m_wireHit.getRefPos3D();
+        TrackingUtilities::Vector3D m_pos3D  = m_wireHit.getRefPos3D();
 
         /// Memory for the true two dimensional arc length on the helix to this hit
         double m_arcLength2D = NAN;
@@ -95,7 +98,7 @@ namespace Belle2 {
 
     public:
       /// Getter for the wire hits created in the simulation
-      ConstVectorRange<CDCWireHit> getWireHits() const;
+      TrackingUtilities::ConstVectorRange<TrackingUtilities::CDCWireHit> getWireHits() const;
 
     public:
       /**
@@ -104,29 +107,29 @@ namespace Belle2 {
        *  @param trajectories3D   Ideal trajectories to be propagated.
        *  @return The true tracks containing the hits generated in this process
        */
-      std::vector<CDCTrack> simulate(const std::vector<CDCTrajectory3D>& trajectories3D);
+      std::vector<TrackingUtilities::CDCTrack> simulate(const std::vector<TrackingUtilities::CDCTrajectory3D>& trajectories3D);
 
       /// Same as above for one trajectory.
-      CDCTrack simulate(const CDCTrajectory3D& trajectory3D);
+      TrackingUtilities::CDCTrack simulate(const TrackingUtilities::CDCTrajectory3D& trajectory3D);
 
       /// Fills the wire hits with a hard coded event from the real simulation.
-      std::vector<CDCTrack> loadPreparedEvent();
+      std::vector<TrackingUtilities::CDCTrack> loadPreparedEvent();
 
     private:
-      /// Creates CDCWireHits and uses them to construct the true CDCTracks.
-      std::vector<CDCTrack> constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> simpleSimHits);
+      /// Creates TrackingUtilities::CDCWireHits and uses them to construct the true TrackingUtilities::CDCTracks.
+      std::vector<TrackingUtilities::CDCTrack> constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> simpleSimHits);
 
       /// Generate hits for the given helix in starting from the two dimensional arc length.
-      std::vector<SimpleSimHit> createHits(const Helix& globalHelix, double arcLength2DOffset) const;
+      std::vector<SimpleSimHit> createHits(const TrackingUtilities::Helix& globalHelix, double arcLength2DOffset) const;
 
       /// Generate connected hits for wires in the same layer close to the given wire.
-      std::vector<SimpleSimHit> createHitsForLayer(const CDCWire& nearWire,
-                                                   const Helix& globalHelix,
+      std::vector<SimpleSimHit> createHitsForLayer(const TrackingUtilities::CDCWire& nearWire,
+                                                   const TrackingUtilities::Helix& globalHelix,
                                                    double arcLength2DOffset) const;
 
       /// Generate a hit for the given wire.
-      SimpleSimHit createHitForCell(const CDCWire& wire,
-                                    const Helix& globalHelix,
+      SimpleSimHit createHitForCell(const TrackingUtilities::CDCWire& wire,
+                                    const TrackingUtilities::Helix& globalHelix,
                                     double arcLength2DOffset) const;
 
     public:
@@ -156,7 +159,7 @@ namespace Belle2 {
 
     private:
       /// Space for the memory of the generated wire hits
-      std::shared_ptr<const std::vector<CDCWireHit> > m_sharedWireHits;
+      std::shared_ptr<const std::vector<TrackingUtilities::CDCWireHit> > m_sharedWireHits;
 
       /// Default drift length variance
       const double s_nominalDriftLengthVariance = 0.000169;

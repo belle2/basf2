@@ -12,6 +12,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_straight)
 {

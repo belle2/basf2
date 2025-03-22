@@ -6,9 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/collectors/matchers/MatcherInterface.h>
+#include <tracking/trackingUtilities/collectors/matchers/MatcherInterface.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 namespace Belle2 {
@@ -18,10 +18,10 @@ namespace Belle2 {
      * to tracks.
      */
     template <class AQuadTree>
-    class StereoHitTrackQuadTreeMatcher : public MatcherInterface<CDCTrack, CDCRLWireHit> {
+    class StereoHitTrackQuadTreeMatcher : public TrackingUtilities::MatcherInterface<TrackingUtilities::CDCTrack, CDCRLWireHit> {
 
       /// The parent class.
-      using Super = MatcherInterface<CDCTrack, CDCRLWireHit>;
+      using Super = MatcherInterface<TrackingUtilities::CDCTrack, CDCRLWireHit>;
 
     public:
       /// Expose the parameters to the module.
@@ -40,7 +40,7 @@ namespace Belle2 {
        * Each bin with a high number of items (= stereo hits) in it is stored. Later, the one node with the highest number of items in it is taken
        * and each hit is assigned to the track.
        */
-      void match(CDCTrack& track, const std::vector<CDCRLWireHit>& rlWireHits,
+      void match(TrackingUtilities::CDCTrack& track, const std::vector<CDCRLWireHit>& rlWireHits,
                  std::vector<Super::WeightedRelationItem>& relationsForCollector) override;
 
       /// Use the writeDebugInformation function of the quad tree to write the tree into a root file with a ascending number.

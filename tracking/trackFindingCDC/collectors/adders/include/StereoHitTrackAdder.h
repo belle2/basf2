@@ -6,18 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/collectors/adders/AdderInterface.h>
+#include <tracking/trackingUtilities/collectors/adders/AdderInterface.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
+  namespace TrackFindingCDC {
     class CDCRLWireHit;
 
     /** Class to add the matched hits to the track and set the taken flag correctly. */
-    class StereoHitTrackAdder : public AdderInterface<CDCTrack, CDCRLWireHit> {
+    class StereoHitTrackAdder : public TrackingUtilities::AdderInterface<TrackingUtilities::CDCTrack, CDCRLWireHit> {
     private:
       /** Add the matched hits to the track and set the taken flag correctly. We ignore the weight completely here. */
-      void add(CDCTrack& track, const CDCRLWireHit& hit, Weight weight) override;
+      void add(TrackingUtilities::CDCTrack& track, const CDCRLWireHit& hit, TrackingUtilities::Weight weight) override;
     };
   }
 }

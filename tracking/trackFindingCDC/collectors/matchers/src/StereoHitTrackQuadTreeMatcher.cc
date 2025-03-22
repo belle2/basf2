@@ -11,22 +11,23 @@
 #include <tracking/trackFindingCDC/hough/quadratic/HitQuadraticLegendre.h>
 #include <tracking/trackFindingCDC/hough/hyperbolic/HitHyperHough.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <utility>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 template <class AQuadTree>
 void StereoHitTrackQuadTreeMatcher<AQuadTree>::exposeParameters(ModuleParamList* moduleParamList,

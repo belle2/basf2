@@ -6,16 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/trackFindingCDC/collectors/adders/StereoHitTrackAdder.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 void StereoHitTrackAdder::add(CDCTrack& track, const CDCRLWireHit& hit, Weight weight __attribute__((unused)))
 {

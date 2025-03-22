@@ -7,18 +7,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
-#include <tracking/trackFindingCDC/topology/WireNeighborPair.h>
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
-#include <tracking/trackFindingCDC/topology/ILayer.h>
-#include <tracking/trackFindingCDC/topology/IWire.h>
-#include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
-#include <tracking/trackFindingCDC/topology/EStereoKind.h>
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
-#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+#include <tracking/trackingUtilities/topology/CDCWireLayer.h>
+#include <tracking/trackingUtilities/topology/WireNeighborPair.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/ILayer.h>
+#include <tracking/trackingUtilities/topology/IWire.h>
+#include <tracking/trackingUtilities/topology/WireNeighborKind.h>
+#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <tracking/trackingUtilities/utilities/VectorRange.h>
+#include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      *  Class representing a sense wire superlayer in the central drift chamber.

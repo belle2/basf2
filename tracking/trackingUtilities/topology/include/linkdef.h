@@ -3,12 +3,12 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::TrackFindingCDC::WireLine-;
-#pragma link C++ class Belle2::TrackFindingCDC::WireNeighborKind-;
-#pragma link C++ class Belle2::TrackFindingCDC::WireNeighborPair-;
-#pragma link C++ class Belle2::TrackFindingCDC::CDCWire-;
-#pragma link C++ class Belle2::TrackFindingCDC::CDCWireLayer-;
-#pragma link C++ class Belle2::TrackFindingCDC::CDCWireSuperLayer-;
-#pragma link C++ class Belle2::TrackFindingCDC::CDCWireTopology-;
+#pragma link C++ class Belle2::TrackingUtilities::WireLine-;
+#pragma link C++ class Belle2::TrackingUtilities::WireNeighborKind-;
+#pragma link C++ class Belle2::TrackingUtilities::WireNeighborPair-;
+#pragma link C++ class Belle2::TrackingUtilities::CDCWire-;
+#pragma link C++ class Belle2::TrackingUtilities::CDCWireLayer-;
+#pragma link C++ class Belle2::TrackingUtilities::CDCWireSuperLayer-;
+#pragma link C++ class Belle2::TrackingUtilities::CDCWireTopology-;
 
-#pragma link C++ class Belle2::TrackFindingCDC::CDCGeometryLoader-;
+#pragma link C++ class Belle2::TrackingUtilities::CDCGeometryLoader-;

@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
-#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+#include <tracking/trackingUtilities/topology/WireNeighborKind.h>
+#include <tracking/trackingUtilities/utilities/MayBePtr.h>
 #include <utility>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     class CDCWire;
 

@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/topology/EWirePosition.h>
+#include <tracking/trackingUtilities/topology/EWirePosition.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /// Translate the wire position enum to the cdc version
     CDC::CDCGeometryPar::EWirePosition toCDC(EWirePosition wirePosition);
 

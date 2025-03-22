@@ -7,26 +7,26 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
-#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
+#include <tracking/trackingUtilities/topology/CDCWireSuperLayer.h>
+#include <tracking/trackingUtilities/topology/CDCWireLayer.h>
 
-#include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
-#include <tracking/trackFindingCDC/topology/WireNeighborPair.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackingUtilities/topology/WireNeighborKind.h>
+#include <tracking/trackingUtilities/topology/WireNeighborPair.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
-#include <tracking/trackFindingCDC/topology/ILayer.h>
-#include <tracking/trackFindingCDC/topology/IWire.h>
-#include <tracking/trackFindingCDC/topology/EWirePosition.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/ILayer.h>
+#include <tracking/trackingUtilities/topology/IWire.h>
+#include <tracking/trackingUtilities/topology/EWirePosition.h>
 
-#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+#include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
 #include <cdc/dataobjects/WireID.h>
 
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      *  Class representing the sense wire arrangement in the whole of the central drift chamber.
@@ -107,7 +107,7 @@ namespace Belle2 {
       { return getWireSuperLayer(iSuperLayer).getWireLayer(iLayer).getWire(iWire) ; }
 
       /// Getter for the underlying storing wire vector.
-      const std::vector<Belle2::TrackFindingCDC::CDCWire>& getWires() const
+      const std::vector<CDCWire>& getWires() const
       { return m_wires; }
       ///@}
 
@@ -142,7 +142,7 @@ namespace Belle2 {
       { return getWireSuperLayer(iSuperLayer).getWireLayer(iLayer); }
 
       /// Getter for the underlying storing layer vector
-      const std::vector<Belle2::TrackFindingCDC::CDCWireLayer>& getWireLayers() const
+      const std::vector<CDCWireLayer>& getWireLayers() const
       { return m_wireLayers; }
       ///@}
 
@@ -174,7 +174,7 @@ namespace Belle2 {
       }
 
       /// Getter for the underlying storing superlayer vector
-      const std::vector<Belle2::TrackFindingCDC::CDCWireSuperLayer>& getWireSuperLayers() const
+      const std::vector<CDCWireSuperLayer>& getWireSuperLayers() const
       { return m_wireSuperLayers; }
       ///@}
 
@@ -473,13 +473,13 @@ namespace Belle2 {
 
     private:
       /// Storage for all wires in the CDC
-      std::vector<Belle2::TrackFindingCDC::CDCWire> m_wires;
+      std::vector<CDCWire> m_wires;
 
       /// Storage for all wire layers in the CDC
-      std::vector<Belle2::TrackFindingCDC::CDCWireLayer> m_wireLayers;
+      std::vector<CDCWireLayer> m_wireLayers;
 
       /// Storage for all wire superlayers in the CDC
-      std::vector<Belle2::TrackFindingCDC::CDCWireSuperLayer> m_wireSuperLayers;
+      std::vector<CDCWireSuperLayer> m_wireSuperLayers;
 
       /// Offset of first layer
       ILayer m_FirstLayerOffset = 0;

@@ -9,7 +9,7 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Namespace hiding the constants of the enum
     namespace NWireNeighborKind {

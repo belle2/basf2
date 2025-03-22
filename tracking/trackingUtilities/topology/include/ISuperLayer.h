@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/topology/EStereoKind.h>
+#include <tracking/trackingUtilities/topology/EStereoKind.h>
 
-#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
+#include <tracking/trackingUtilities/utilities/FunctorTag.h>
 
 #include <climits>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// The type of the layer and superlayer ids
     using ISuperLayer = signed short;

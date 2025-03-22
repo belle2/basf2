@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Modulo.h>
+#include <tracking/trackingUtilities/numerics/Modulo.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// The type of the wire ids enumerating wires within a given layer
     using IWire = signed short;

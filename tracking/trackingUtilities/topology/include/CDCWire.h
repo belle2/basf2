@@ -7,21 +7,21 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/topology/WireNeighborPair.h>
-#include <tracking/trackFindingCDC/topology/WireLine.h>
+#include <tracking/trackingUtilities/topology/WireNeighborPair.h>
+#include <tracking/trackingUtilities/topology/WireLine.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
-#include <tracking/trackFindingCDC/topology/ILayer.h>
-#include <tracking/trackFindingCDC/topology/IWire.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/ILayer.h>
+#include <tracking/trackingUtilities/topology/IWire.h>
 
-#include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
-#include <tracking/trackFindingCDC/topology/EStereoKind.h>
-#include <tracking/trackFindingCDC/topology/EWirePosition.h>
+#include <tracking/trackingUtilities/topology/WireNeighborKind.h>
+#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <tracking/trackingUtilities/topology/EWirePosition.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+#include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
 #include <cdc/dataobjects/WireID.h>
 
@@ -32,7 +32,7 @@ namespace Belle2 {
 }
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     // Forward declarations
     class CDCWireLayer;

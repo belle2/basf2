@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
+#include <tracking/trackingUtilities/utilities/ParameterVariant.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/core/ModuleParam.templateDetails.h>
@@ -13,7 +13,7 @@
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 AssignParameterVisitor::AssignParameterVisitor(ModuleParamList* moduleParamList,
                                                const std::string& paramName)
@@ -55,6 +55,6 @@ template void AssignParameterVisitor::operator()(const std::string&) const;
 template void AssignParameterVisitor::operator()(const std::vector<double>&) const;
 template void AssignParameterVisitor::operator()(const std::vector<std::string>&) const;
 
-template class Belle2::ModuleParam<TrackFindingCDC::ParameterVariant>;
-template class Belle2::ModuleParam<TrackFindingCDC::ParameterVariantMap>;
-template class Belle2::ModuleParam<std::vector<TrackFindingCDC::ParameterVariantMap> >;
+template class Belle2::ModuleParam<TrackingUtilities::ParameterVariant>;
+template class Belle2::ModuleParam<TrackingUtilities::ParameterVariantMap>;
+template class Belle2::ModuleParam<std::vector<TrackingUtilities::ParameterVariantMap> >;

@@ -5,16 +5,16 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
+#include <tracking/trackingUtilities/utilities/ProcessingSignalListener.h>
 
-#include <tracking/trackFindingCDC/utilities/Backtrace.h>
+#include <tracking/trackingUtilities/utilities/Backtrace.h>
 
 #include <framework/logging/Logger.h>
 
 #include <typeinfo>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 ProcessingSignalListener::ProcessingSignalListener() = default;
 

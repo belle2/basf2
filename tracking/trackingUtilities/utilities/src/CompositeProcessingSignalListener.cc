@@ -5,12 +5,12 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
+#include <tracking/trackingUtilities/utilities/CompositeProcessingSignalListener.h>
 
-#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
+#include <tracking/trackingUtilities/utilities/ReversedRange.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 void CompositeProcessingSignalListener::initialize()
 {

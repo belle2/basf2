@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/utilities/Backtrace.h>
+#include <tracking/trackingUtilities/utilities/Backtrace.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConfig.h>
@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-void TrackFindingCDC::printBacktrace(LogConfig::ELogLevel logLevel, int nFrames)
+void TrackingUtilities::printBacktrace(LogConfig::ELogLevel logLevel, int nFrames)
 {
   std::vector<void*> buffer(nFrames);
   void** rawBuffer = buffer.data();

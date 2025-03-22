@@ -37,7 +37,7 @@ namespace Belle2 {
       bool m_param_requireRLPure = false;
 
       /// Checks if a segment relation is a good combination.
-      Weight operator()(const CDCSegment2D& fromSegment, const CDCSegment2D& toSegment) final;
+      TrackingUtilities::Weight operator()(const CDCSegment2D& fromSegment, const CDCSegment2D& toSegment) final;
     };
   }
 }

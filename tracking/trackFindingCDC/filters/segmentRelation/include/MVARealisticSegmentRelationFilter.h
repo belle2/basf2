@@ -15,22 +15,22 @@
 #include <tracking/trackFindingCDC/filters/segmentRelation/FitlessSegmentRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentRelation/FitSegmentRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Final filter for the construction of segment pairs.
-    class MVARealisticSegmentRelationFilter : public MVA<BaseSegmentRelationFilter> {
+    class MVARealisticSegmentRelationFilter : public TrackingUtilities::MVA<BaseSegmentRelationFilter> {
 
     private:
       /// Type of the base class
-      using Super = MVA<BaseSegmentRelationFilter>;
+      using Super = TrackingUtilities::MVA<BaseSegmentRelationFilter>;
 
-      /// Type of the VarSet the filter is working on
-      using VarSet = VariadicUnionVarSet<BasicSegmentRelationVarSet,
+      /// Type of the TrackingUtilities::VarSet the filter is working on
+      using VarSet = TrackingUtilities::VariadicUnionVarSet<BasicSegmentRelationVarSet,
             FitlessSegmentRelationVarSet,
             FitSegmentRelationVarSet>;
 
@@ -43,7 +43,7 @@ namespace Belle2 {
 
     private:
       /// Function to object for its signalness
-      Weight operator()(const Relation<const CDCSegment2D>& segmentRelation) override;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::Relation<const CDCSegment2D>& segmentRelation) override;
 
     private:
       /// Feasibility filter applied first before invoking the main cut

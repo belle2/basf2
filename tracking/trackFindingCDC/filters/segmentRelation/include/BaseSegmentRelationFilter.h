@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackingUtilities/utilities/Relation.h>
 
 #include <vector>
 
@@ -20,14 +20,14 @@ namespace Belle2 {
     class CDCSegment2D;
 
     // Guard to prevent repeated instantiations
-    extern template class RelationFilter<const CDCSegment2D>;
+    // extern template class TrackingUtilities::RelationFilter<const CDCSegment2D>;
 
     /// Base class for filtering the neighborhood of segments
-    class BaseSegmentRelationFilter : public RelationFilter<const CDCSegment2D> {
+    class BaseSegmentRelationFilter : public TrackingUtilities::RelationFilter<const CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = RelationFilter<const CDCSegment2D>;
+      using Super = TrackingUtilities::RelationFilter<const CDCSegment2D>;
 
     public:
       /// Default constructor
@@ -48,7 +48,7 @@ namespace Belle2 {
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.
        */
-      Weight operator()(const Relation<const CDCSegment2D>& relation) override;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::Relation<const CDCSegment2D>& relation) override;
     };
   }
 }

@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/ckf/cdc/entities/CDCCKFResult.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 #include <tracking/ckf/cdc/filters/paths/CDCPathFilterFactory.h>
 
 #include <tracking/ckf/cdc/filters/pathPairs/CDCPathPairFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 #include <ecl/dataobjects/ECLShower.h>
 
@@ -23,7 +23,7 @@
 namespace Belle2 {
   /// Remove duplicate paths created from ECLShowers
   /// These typically come from the seeding with two charge assumptions and Bremsstrahlung
-  class CDCCKFDuplicateRemover : public TrackFindingCDC::Findlet<CDCCKFResult> {
+  class CDCCKFDuplicateRemover : public TrackingUtilities::Findlet<CDCCKFResult> {
   public:
     CDCCKFDuplicateRemover()
     {
@@ -35,16 +35,16 @@ namespace Belle2 {
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
-      m_filter_badTracks.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("badTracks", prefix));
-      m_filter_duplicateTrack.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("duplicateTrack", prefix));
-      m_filter_duplicateSeed.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("duplicateSeed", prefix));
+      m_filter_badTracks.exposeParameters(moduleParamList, TrackingUtilities::prefixed("badTracks", prefix));
+      m_filter_duplicateTrack.exposeParameters(moduleParamList, TrackingUtilities::prefixed("duplicateTrack", prefix));
+      m_filter_duplicateSeed.exposeParameters(moduleParamList, TrackingUtilities::prefixed("duplicateSeed", prefix));
 
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "duplicateSeed_maxPhi"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "duplicateSeed_maxPhi"),
                                     duplicateSeed_maxPhi,
                                     "Seeds within this dPhi can be considered as duplicates (-1 to neglect)",
                                     duplicateSeed_maxPhi);
 
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "duplicateSeed_maxTheta"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "duplicateSeed_maxTheta"),
                                     duplicateSeed_maxTheta,
                                     "Seeds within this dTheta can be considered as duplicates (-1 to neglect)",
                                     duplicateSeed_maxTheta);
@@ -58,7 +58,7 @@ namespace Belle2 {
       std::vector<CDCCKFResult> goodResults;
 
       // Additional filter (typically check if charge of reconstructed track is equal to charge of seed)
-      TrackFindingCDC::Weight weight;
+      TrackingUtilities::Weight weight;
       std::unordered_map<double, CDCCKFResult> resultToWeightList;
       for (const auto& result : results) {
         weight = m_filter_badTracks(result);
@@ -175,11 +175,11 @@ namespace Belle2 {
 
   private:
     /// Filter  to remove badly reconstructed tracks (e.g. wrongly assigned charge)
-    TrackFindingCDC::ChooseableFilter<CDCPathFilterFactory> m_filter_badTracks;
+    TrackingUtilities::ChooseableFilter<CDCPathFilterFactory> m_filter_badTracks;
     /// Filter to remove duplicates from helix extrapolation (2 charge assumptions)
-    TrackFindingCDC::ChooseableFilter<CDCPathPairFilterFactory> m_filter_duplicateTrack;
+    TrackingUtilities::ChooseableFilter<CDCPathPairFilterFactory> m_filter_duplicateTrack;
     /// Merge duplicate paths (mostly seeds from Bremstrahlung)
-    TrackFindingCDC::ChooseableFilter<CDCPathPairFilterFactory> m_filter_duplicateSeed;
+    TrackingUtilities::ChooseableFilter<CDCPathPairFilterFactory> m_filter_duplicateSeed;
 
     /// Seeds within this dPhi can be considered as duplicates
     double duplicateSeed_maxPhi = 2.;

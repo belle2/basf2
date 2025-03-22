@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/ckf/cdc/findlets/CDCCKFEclSeedCreator.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
@@ -26,35 +26,35 @@ CDCCKFEclSeedCreator::CDCCKFEclSeedCreator() : Super()
 
 void CDCCKFEclSeedCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "inputECLshowersStoreArrayName"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "inputECLshowersStoreArrayName"),
                                 m_param_inputEclShowerStoreArrayName,
                                 "StoreArray name of the input Shower Store Array.");
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "eclSeedRecoTrackStoreArrayName"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "eclSeedRecoTrackStoreArrayName"),
                                 m_param_eclSeedRecoTrackStoreArrayName,
                                 "StoreArray name of the output Track Store Array.");
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimalEnRequirementCluster"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minimalEnRequirementCluster"),
                                 m_param_minimalEnRequirement,
                                 "Minimal energy requirement for the input clusters",
                                 m_param_minimalEnRequirement);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "restrictToForwardSeeds"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "restrictToForwardSeeds"),
                                 m_param_restrictToForwardSeeds,
                                 "Don't do Ecl seeding in central region to save computing time",
                                 m_param_restrictToForwardSeeds);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "tanLambdaForwardNeg"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "tanLambdaForwardNeg"),
                                 m_param_tanLambdaForwardNeg,
                                 "Up to which (neg) tanLambda value should the seeding be performed",
                                 m_param_tanLambdaForwardNeg);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "tanLambdaForwardPos"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "tanLambdaForwardPos"),
                                 m_param_tanLambdaForwardPos,
                                 "Up to which (pos) tanLambda value should the seeding be performed",
                                 m_param_tanLambdaForwardPos);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "showerDepth"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "showerDepth"),
                                 m_param_showerDepth,
                                 "Don't do Ecl seeding in central region to save computing time",
                                 m_param_showerDepth);

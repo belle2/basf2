@@ -7,28 +7,28 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
+#include <tracking/trackingUtilities/numerics/WeightComperator.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 #include <tracking/ckf/cdc/filters/states/CDCStateFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
   /// A stack of pre-, helix-extrapolation- , Kalman-extrapolation- and Kalman-update-filters.
-  class CDCCKFStateFilter : public TrackFindingCDC::Findlet<const CDCCKFState, CDCCKFState> {
+  class CDCCKFStateFilter : public TrackingUtilities::Findlet<const CDCCKFState, CDCCKFState> {
   public:
     /// Add all sub findlets
     CDCCKFStateFilter()
@@ -43,22 +43,22 @@ namespace Belle2 {
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalHitCandidates"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maximalHitCandidates"),
                                     m_maximalHitCandidates, "Maximal hit candidates to test",
                                     m_maximalHitCandidates);
-      m_preFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "pre"));
-      m_basicFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "basic"));
-      m_extrapolationFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "extrapolation"));
-      m_finalSelection.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "final"));
+      m_preFilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "pre"));
+      m_basicFilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "basic"));
+      m_extrapolationFilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "extrapolation"));
+      m_finalSelection.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "final"));
     }
 
     /// Apply the findlet and do the state selection
     void apply(const CDCCKFPath& path, std::vector<CDCCKFState>& nextStates) override
     {
       const CDCCKFState& lastState = path.back();
-      const TrackFindingCDC::CDCTrajectory3D& trajectory = lastState.getTrajectory();
+      const TrackingUtilities::CDCTrajectory3D& trajectory = lastState.getTrajectory();
 
-      TrackFindingCDC::Weight weight;
+      TrackingUtilities::Weight weight;
 
       B2DEBUG(29, "On layer: " << (lastState.isSeed() ? -1 : lastState.getWireHit()->getWire().getICLayer()));
 
@@ -91,7 +91,7 @@ namespace Belle2 {
         }
 
         // Do a final hit selection based on the new state
-        const TrackFindingCDC::CDCTrajectory3D& thisTrajectory = nextState.getTrajectory();
+        const TrackingUtilities::CDCTrajectory3D& thisTrajectory = nextState.getTrajectory();
         reconstruct(nextState, thisTrajectory, nextState.getArcLength());
 
         weight = m_finalSelection({&path, &nextState});
@@ -104,52 +104,52 @@ namespace Belle2 {
 
       B2DEBUG(29, "Starting with " << nextStates.size() << " possible hits");
 
-      TrackFindingCDC::erase_remove_if(nextStates,
-                                       TrackFindingCDC::Composition<TrackFindingCDC::IsNaN, TrackFindingCDC::GetWeight>());
+      TrackingUtilities::erase_remove_if(nextStates,
+                                         TrackingUtilities::Composition<TrackingUtilities::IsNaN, TrackingUtilities::GetWeight>());
 
       B2DEBUG(29, "Now have " << nextStates.size());
 
-      std::sort(nextStates.begin(), nextStates.end(), TrackFindingCDC::GreaterWeight());
+      std::sort(nextStates.begin(), nextStates.end(), TrackingUtilities::GreaterWeight());
 
-      TrackFindingCDC::only_best_N(nextStates, m_maximalHitCandidates);
+      TrackingUtilities::only_best_N(nextStates, m_maximalHitCandidates);
     }
 
   private:
     /// Parameter: max number of candidates
     size_t m_maximalHitCandidates = 4;
     /// Pre Filter
-    TrackFindingCDC::ChooseableFilter<CDCStateFilterFactory> m_preFilter;
+    TrackingUtilities::ChooseableFilter<CDCStateFilterFactory> m_preFilter;
     /// Basic Filter (uses helix extrapolation)
-    TrackFindingCDC::ChooseableFilter<CDCStateFilterFactory> m_basicFilter;
+    TrackingUtilities::ChooseableFilter<CDCStateFilterFactory> m_basicFilter;
     /// Extrapolation Filter  (after Kalman extrapolation)
-    TrackFindingCDC::ChooseableFilter<CDCStateFilterFactory> m_extrapolationFilter;
+    TrackingUtilities::ChooseableFilter<CDCStateFilterFactory> m_extrapolationFilter;
     /// Final Selection Filter (after Kalman update)
-    TrackFindingCDC::ChooseableFilter<CDCStateFilterFactory> m_finalSelection;
+    TrackingUtilities::ChooseableFilter<CDCStateFilterFactory> m_finalSelection;
 
     /// Helper function to reconstruct the arc length and the hit distance of a state according to the trajectory
-    void reconstruct(CDCCKFState& state, const TrackFindingCDC::CDCTrajectory3D& trajectory, const double lastArcLength) const
+    void reconstruct(CDCCKFState& state, const TrackingUtilities::CDCTrajectory3D& trajectory, const double lastArcLength) const
     {
       // TODO: actually we do not need to do any trajectory creation here. We could save some computing time!
-      const TrackFindingCDC::CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
-      const TrackFindingCDC::CDCTrajectorySZ& trajectorySZ = trajectory.getTrajectorySZ();
+      const TrackingUtilities::CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
+      const TrackingUtilities::CDCTrajectorySZ& trajectorySZ = trajectory.getTrajectorySZ();
 
-      const TrackFindingCDC::CDCWireHit* wireHit = state.getWireHit();
+      const TrackingUtilities::CDCWireHit* wireHit = state.getWireHit();
 
-      TrackFindingCDC::Vector2D recoPos2D;
+      TrackingUtilities::Vector2D recoPos2D;
       if (wireHit->isAxial()) {
         recoPos2D = wireHit->reconstruct2D(trajectory2D);
       } else {
-        const TrackFindingCDC::CDCWire& wire = wireHit->getWire();
-        const TrackFindingCDC::Vector2D& posOnXYPlane = wireHit->reconstruct2D(trajectory2D);
+        const TrackingUtilities::CDCWire& wire = wireHit->getWire();
+        const TrackingUtilities::Vector2D& posOnXYPlane = wireHit->reconstruct2D(trajectory2D);
 
         const double arcLength = trajectory2D.calcArcLength2D(posOnXYPlane);
         const double z = trajectorySZ.mapSToZ(arcLength);
 
-        const TrackFindingCDC::Vector2D& wirePos2DAtZ = wire.getWirePos2DAtZ(z);
+        const TrackingUtilities::Vector2D& wirePos2DAtZ = wire.getWirePos2DAtZ(z);
 
-        const TrackFindingCDC::Vector2D& recoPosOnTrajectory = trajectory2D.getClosest(wirePos2DAtZ);
+        const TrackingUtilities::Vector2D& recoPosOnTrajectory = trajectory2D.getClosest(wirePos2DAtZ);
         const double driftLength = wireHit->getRefDriftLength();
-        TrackFindingCDC::Vector2D disp2D = recoPosOnTrajectory - wirePos2DAtZ;
+        TrackingUtilities::Vector2D disp2D = recoPosOnTrajectory - wirePos2DAtZ;
         disp2D.normalizeTo(driftLength);
         recoPos2D = wirePos2DAtZ + disp2D;
       }

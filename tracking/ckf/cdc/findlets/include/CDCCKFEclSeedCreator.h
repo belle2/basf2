@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 #include <ecl/dataobjects/ECLShower.h>
@@ -24,9 +24,9 @@ namespace Belle2 {
   /**
    * Findlet for
    */
-  class CDCCKFEclSeedCreator : public TrackFindingCDC::Findlet<CDCCKFPath> {
+  class CDCCKFEclSeedCreator : public TrackingUtilities::Findlet<CDCCKFPath> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<CDCCKFPath>;
+    using Super = TrackingUtilities::Findlet<CDCCKFPath>;
 
   public:
     /// Add the subfindlets

@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/ckf/cdc/findlets/CDCCKFEclSeedCreator.h>
 #include <tracking/ckf/cdc/findlets/StackTreeSearcher.h>
@@ -17,7 +17,7 @@
 
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <vector>
 
@@ -25,9 +25,9 @@ namespace Belle2 {
   class ModuleParamList;
 
   /// Main findlet of the ToCDCCKF module
-  class CKFToCDCFromEclFindlet : public TrackFindingCDC::Findlet<const TrackFindingCDC::CDCWireHit> {
+  class CKFToCDCFromEclFindlet : public TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const TrackFindingCDC::CDCWireHit>;
+    using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit>;
 
   public:
     /// Constructor, for setting module description and parameters.
@@ -40,7 +40,7 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     /// Do the track/hit finding/merging.
-    void apply(const std::vector<TrackFindingCDC::CDCWireHit>& wireHits) override;
+    void apply(const std::vector<TrackingUtilities::CDCWireHit>& wireHits) override;
 
     /// Clear the object pools
     void beginEvent() override;

@@ -7,31 +7,31 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/ckf/general/utilities/SearchDirection.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
-#include <tracking/trackFindingCDC/numerics/Angle.h>
+#include <tracking/trackingUtilities/numerics/Angle.h>
 
 
 namespace Belle2 {
 
   /// Create CKF states, based on the current path. Perform some basic selection at this stage (based on phi, max. jump of layers)
   class CDCCKFStateCreator
-    : public TrackFindingCDC::Findlet<CDCCKFState, const CDCCKFState,
-      const TrackFindingCDC::CDCWireHit* const > {
+    : public TrackingUtilities::Findlet<CDCCKFState, const CDCCKFState,
+      const TrackingUtilities::CDCWireHit* const > {
 
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<CDCCKFState, const CDCCKFState, const TrackFindingCDC::CDCWireHit* const>;
+    using Super = TrackingUtilities::Findlet<CDCCKFState, const CDCCKFState, const TrackingUtilities::CDCWireHit* const>;
 
     /// Store basic wire info for faster access
     struct CDCCKFWireHitCache {
@@ -47,13 +47,13 @@ namespace Belle2 {
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalLayerJump"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maximalLayerJump"),
                                     m_maximalLayerJump, "Maximal jump over N layers", m_maximalLayerJump);
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalLayerJumpBackwardSeed"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maximalLayerJumpBackwardSeed"),
                                     m_maximalLayerJump_backwardSeed, "Maximal jump over N layers", m_maximalLayerJump_backwardSeed);
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalDeltaPhi"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maximalDeltaPhi"),
                                     m_maximalDeltaPhi, "Maximal distance in phi between wires for Z=0 plane", m_maximalDeltaPhi);
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitFindingDirection"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "hitFindingDirection"),
                                     m_param_writeOutDirectionAsString, "Start from innermost/outermost CDC layers", m_param_writeOutDirectionAsString);
     }
 
@@ -66,9 +66,9 @@ namespace Belle2 {
       // Determine direction of track building
       m_param_writeOutDirection = fromString(m_param_writeOutDirectionAsString);
 
-      if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Forward) {
+      if (m_param_writeOutDirection == TrackingUtilities::EForwardBackward::c_Forward) {
         doForward = true;
-      } else if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward) {
+      } else if (m_param_writeOutDirection == TrackingUtilities::EForwardBackward::c_Backward) {
         doForward = false;
       } else {
         B2FATAL("CDCCKFStateCreator: No valid direction specified. Please use forward/backward.");
@@ -77,7 +77,7 @@ namespace Belle2 {
 
     /// Main method of the findlet. Select + create states (output parameter nextStates) suitable for the input path, based on input wireHits
     void apply(std::vector<CDCCKFState>& nextStates, const CDCCKFPath& path,
-               const std::vector<const TrackFindingCDC::CDCWireHit*>& wireHits) override
+               const std::vector<const TrackingUtilities::CDCWireHit*>& wireHits) override
     {
       // TODO: as we do not need any information on the current state (track state) of the path, we could in principle
       // TODO: precalculate everything in here
@@ -106,28 +106,28 @@ namespace Belle2 {
         if (doForward) {
           lastICLayer = 0;
         } else {
-          const auto& wireTopology = TrackFindingCDC::CDCWireTopology::getInstance();
+          const auto& wireTopology = TrackingUtilities::CDCWireTopology::getInstance();
           const auto& wires = wireTopology.getWires();
           const float maxForwardZ = wires.back().getForwardZ();     // 157.615
           const float maxBackwardZ = wires.back().getBackwardZ();   // -72.0916
 
-          const TrackFindingCDC::Vector3D seedPos(lastState.getSeed()->getPositionSeed());
+          const TrackingUtilities::Vector3D seedPos(lastState.getSeed()->getPositionSeed());
           const float seedPosZ = seedPos.z();
 
           if (seedPosZ < maxForwardZ && seedPosZ > maxBackwardZ) {
             lastICLayer = 56;
           } else {
             // do straight extrapolation of seed momentum to CDC outer walls
-            TrackFindingCDC::Vector3D seedMomZOne(lastState.getSeed()->getMomentumSeed());
+            TrackingUtilities::Vector3D seedMomZOne(lastState.getSeed()->getMomentumSeed());
             seedMomZOne = seedMomZOne / seedMomZOne.z();
             // const float maxZ = seedPosZ > 0 ? maxForwardZ : maxBackwardZ;
-            // const TrackFindingCDC::Vector3D extrapolatedPos = seedPos - seedMom / seedMom.norm() * (seedPosZ - maxZ);
+            // const TrackingUtilities::Vector3D extrapolatedPos = seedPos - seedMom / seedMom.norm() * (seedPosZ - maxZ);
 
             // find closest iCLayer
             float minDist = 99999;
             for (const auto& wire : wires) {
               const float maxZ = seedPosZ > 0 ? wire.getForwardZ() : wire.getBackwardZ();
-              const TrackFindingCDC::Vector3D extrapolatedPos = seedPos - seedMomZOne * (seedPosZ - maxZ);
+              const TrackingUtilities::Vector3D extrapolatedPos = seedPos - seedMomZOne * (seedPosZ - maxZ);
 
               const auto distance = wire.getDistance(extrapolatedPos);
               if (distance < minDist) {
@@ -144,7 +144,7 @@ namespace Belle2 {
       }
 
       // Get sorted vector of wireHits on the path for faster search
-      std::vector<const TrackFindingCDC::CDCWireHit*> wireHitsOnPath;
+      std::vector<const TrackingUtilities::CDCWireHit*> wireHitsOnPath;
       for (auto const& state : path) {
         if (! state.isSeed()) {
           wireHitsOnPath.push_back(state.getWireHit());
@@ -158,7 +158,7 @@ namespace Belle2 {
         int idx = doForward ? i : nHits - i - 1;
 
         const auto iCLayer =  m_wireHitCache[idx].icLayer; // wireHit->getWire().getICLayer();
-        if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward && lastState.isSeed()) {
+        if (m_param_writeOutDirection == TrackingUtilities::EForwardBackward::c_Backward && lastState.isSeed()) {
           if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump_backwardSeed) {
             continue;
           }
@@ -167,13 +167,13 @@ namespace Belle2 {
         }
 
         if (! lastState.isSeed()) {
-          double deltaPhi = TrackFindingCDC::AngleUtil::normalised(lastPhi - m_wireHitCache[idx].phi);
+          double deltaPhi = TrackingUtilities::AngleUtil::normalised(lastPhi - m_wireHitCache[idx].phi);
           if (fabs(deltaPhi)  > m_maximalDeltaPhi)  {
             continue;
           }
         }
 
-        const TrackFindingCDC::CDCWireHit* wireHit = wireHits[idx];
+        const TrackingUtilities::CDCWireHit* wireHit = wireHits[idx];
 
         if (std::binary_search(wireHitsOnPath.begin(), wireHitsOnPath.end(), wireHit)) {
           continue;
@@ -193,7 +193,7 @@ namespace Belle2 {
     /// Parameter for the direction in which the tracks are built
     std::string m_param_writeOutDirectionAsString = "forward";
     /// Direction parameter converted from the string parameters
-    TrackFindingCDC::EForwardBackward m_param_writeOutDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
+    TrackingUtilities::EForwardBackward m_param_writeOutDirection = TrackingUtilities::EForwardBackward::c_Unknown;
     /// Direction parameter converted to boolean for convenience
     bool doForward = true;
 

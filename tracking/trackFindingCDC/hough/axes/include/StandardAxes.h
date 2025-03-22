@@ -10,8 +10,8 @@
 #include <tracking/trackFindingCDC/hough/axes/DiscreteValue.h>
 #include <tracking/trackFindingCDC/hough/axes/ContinuousValue.h>
 
-#include <tracking/trackFindingCDC/topology/ILayer.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/topology/ILayer.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -49,7 +49,7 @@ namespace Belle2 {
       }
 
       /// Return the two dimensional arc length to the given layer id
-      float getArcLength2D(ILayer iCLayer, bool secondArm = false) const
+      float getArcLength2D(TrackingUtilities::ILayer iCLayer, bool secondArm = false) const
       {
         return secondArm ? m_secondaryArcLength2DByICLayer[iCLayer] : m_arcLength2DByICLayer[iCLayer];
       }
@@ -93,7 +93,7 @@ namespace Belle2 {
     class Phi0Tag;
 
     /// Type for discrete phi0 values
-    using DiscretePhi0 = DiscreteValue<Vector2D, Phi0Tag>;
+    using DiscretePhi0 = DiscreteValue<TrackingUtilities::Vector2D, Phi0Tag>;
 
     // NOTE The following is for quadratic and hyperbolic tracks
     /// Phantom type tag for the discrete p representation

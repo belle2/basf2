@@ -8,12 +8,13 @@
 
 #include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
-#include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/topology/CDCWireLayer.h>
+#include <tracking/trackingUtilities/geometry/GeneralizedCircle.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CurvWithArcLength2DCache::CurvWithArcLength2DCache(float curv)
   : m_arcLength2DByICLayer{{0}}

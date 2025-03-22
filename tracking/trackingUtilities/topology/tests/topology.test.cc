@@ -6,17 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <gtest/gtest.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
-#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
+#include <tracking/trackingUtilities/testFixtures/TrackingUtilitiesTestWithTopology.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-class SecondaryWireNeighborhoodTest : public TrackFindingCDCTestWithTopology,
+class SecondaryWireNeighborhoodTest : public TrackingUtilitiesTestWithTopology,
   public ::testing::WithParamInterface<int> {
 };
 
@@ -50,7 +50,7 @@ INSTANTIATE_TEST_SUITE_P(SecondaryWireNeighborhoodTest_IsSymmetric,
                          ::testing::Range(0, 12));
 
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CWInwards)
+TEST_F(TrackingUtilitiesTestWithTopology, topology_WireNeighborSymmetry_CWInwards)
 {
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
@@ -69,7 +69,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CWInwards)
   }
 }
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCWInwards)
+TEST_F(TrackingUtilitiesTestWithTopology, topology_WireNeighborSymmetry_CCWInwards)
 {
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
@@ -88,7 +88,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCWInwards
   }
 }
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CWOutwards)
+TEST_F(TrackingUtilitiesTestWithTopology, topology_WireNeighborSymmetry_CWOutwards)
 {
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
@@ -107,7 +107,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CWOutwards
   }
 }
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCWOutwards)
+TEST_F(TrackingUtilitiesTestWithTopology, topology_WireNeighborSymmetry_CCWOutwards)
 {
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
@@ -126,7 +126,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCWOutward
   }
 }
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCW)
+TEST_F(TrackingUtilitiesTestWithTopology, topology_WireNeighborSymmetry_CCW)
 {
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
@@ -145,7 +145,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCW)
   }
 }
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CW)
+TEST_F(TrackingUtilitiesTestWithTopology, topology_WireNeighborSymmetry_CW)
 {
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
@@ -164,7 +164,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CW)
   }
 }
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_CDCWire_stereoAngle)
+TEST_F(TrackingUtilitiesTestWithTopology, topology_CDCWire_stereoAngle)
 {
   // Test if the all wires in the same superlayer have similar skew parameters.
 
@@ -202,7 +202,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_CDCWire_stereoAngle)
 
 
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_RefCylindricalRVersusZInSuperLayers)
+TEST_F(TrackingUtilitiesTestWithTopology, topology_RefCylindricalRVersusZInSuperLayers)
 {
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
   for (const CDCWireSuperLayer& wireSuperLayer : theWireTopology.getWireSuperLayers()) {
@@ -219,7 +219,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_RefCylindricalRVersusZInSuperLa
   }
 }
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_ShowCurlCurv)
+TEST_F(TrackingUtilitiesTestWithTopology, topology_ShowCurlCurv)
 {
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
@@ -254,7 +254,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_ShowCurlCurv)
   }
 }
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_ShowLayerLimits)
+TEST_F(TrackingUtilitiesTestWithTopology, topology_ShowLayerLimits)
 {
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
   ISuperLayer iL = -1;
@@ -266,7 +266,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_ShowLayerLimits)
   }
 }
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_CDCGeometryPar_cellId)
+TEST_F(TrackingUtilitiesTestWithTopology, topology_CDCGeometryPar_cellId)
 {
   // Testing for a discrepancy in the cellId method of CDCGeometryPar
   // Example in layer four
@@ -280,7 +280,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_CDCGeometryPar_cellId)
   EXPECT_LT(iWireInFourthLayer, 160);
 }
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_sag)
+TEST_F(TrackingUtilitiesTestWithTopology, topology_sag)
 {
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
   for (const CDCWire& wire : theWireTopology.getWires()) {

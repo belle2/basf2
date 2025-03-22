@@ -10,15 +10,15 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/trackingUtilities/utilities/VectorRange.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
@@ -27,6 +27,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 const CDCSimHitLookUp& CDCSimHitLookUp::getInstance()
 {

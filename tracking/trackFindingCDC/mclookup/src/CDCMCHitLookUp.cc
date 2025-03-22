@@ -12,12 +12,12 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
@@ -25,6 +25,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 const CDCMCHitLookUp& CDCMCHitLookUp::getInstance()

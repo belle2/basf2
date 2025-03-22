@@ -55,44 +55,47 @@ namespace Belle2 {
       }
 
       /// Short description of the findlet
-      std::string getDescription() final {
+      std::string getDescription() final
+      {
         return "Constructs geometrically constrained relations between " +
-        getClassMnemomicParameterDescription((AObject*)nullptr) +
-        " filter by some acceptance criterion.";
+               getClassMnemomicParameterDescription((AObject*)nullptr) +
+               " filter by some acceptance criterion.";
       }
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final
+      {
         m_relationFilter.exposeParameters(moduleParamList, prefix);
         moduleParamList->addParameter(prefixed(prefix, "onlyBest"),
-        m_param_onlyBest,
-        "Maximal number of the best relation to keep from each " +
-        getClassMnemomicParameterDescription((AObject*)nullptr),
-        m_param_onlyBest);
+                                      m_param_onlyBest,
+                                      "Maximal number of the best relation to keep from each " +
+                                      getClassMnemomicParameterDescription((AObject*)nullptr),
+                                      m_param_onlyBest);
       }
 
       /// Main function
       void apply(const std::vector<AObject*>& inputObjects,
-                 std::vector<WeightedRelation<AObject>>& weightedRelations) final {
+                 std::vector<WeightedRelation<AObject>>& weightedRelations) final
+      {
 
         B2ASSERT("Expected the objects on which relations are constructed to be sorted",
-        std::is_sorted(inputObjects.begin(), inputObjects.end(), LessOf<Deref>()));
+                 std::is_sorted(inputObjects.begin(), inputObjects.end(), LessOf<Deref>()));
 
         RelationFilterUtil::appendUsing(m_relationFilter, inputObjects, weightedRelations);
 
-        if (m_param_onlyBest > 0)
-        {
+        if (m_param_onlyBest > 0) {
           const int nMaxRepetitions = m_param_onlyBest;
           int nCurrentRepetitions = 1;
           auto sameFrom =
-          [&nMaxRepetitions,
-          &nCurrentRepetitions](const WeightedRelation<AObject>& relation,
+            [&nMaxRepetitions,
+             &nCurrentRepetitions](const WeightedRelation<AObject>& relation,
           const WeightedRelation<AObject>& otherRelation) -> bool {
             if (relation.getFrom() == otherRelation.getFrom())
             {
               ++nCurrentRepetitions;
               return nCurrentRepetitions > nMaxRepetitions;
-            } else {
+            } else
+            {
               // cppcheck-suppress unreadVariable
               nCurrentRepetitions = 1;
               return false;

@@ -11,19 +11,20 @@
 #include <tracking/trackFindingCDC/filters/wireHit/AllWireHitFilter.h>
 #include <tracking/trackFindingCDC/filters/wireHit/CDCWireHitVarSet.h>
 #include <tracking/trackFindingCDC/filters/wireHit/CutsFromDBWireHitFilter.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
 
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// MVA filter for CDC states
   using MVACDCWireHitFilter = MVAFilter<CDCWireHitVarSet>;
 }
 
-template class TrackFindingCDC::FilterFactory<BaseWireHitFilter>;
+template class TrackingUtilities::FilterFactory<BaseWireHitFilter>;
 
 WireHitFilterFactory::WireHitFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

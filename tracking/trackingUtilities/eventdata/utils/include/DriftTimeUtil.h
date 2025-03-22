@@ -12,7 +12,7 @@
 #include <cdc/geometry/CDCGeoControlPar.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Structure to expose some drift time and length functions from the CDCGeometryPar to Python.
     struct DriftTimeUtil {

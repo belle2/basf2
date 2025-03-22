@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <string>
@@ -21,9 +21,9 @@ namespace Belle2 {
    * This findlet does also handle the storing of the results.
    */
   template <class AResult>
-  class ResultStorer : public TrackFindingCDC::Findlet<AResult> {
+  class ResultStorer : public TrackingUtilities::Findlet<AResult> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<AResult>;
+    using Super = TrackingUtilities::Findlet<AResult>;
 
   public:
     /// Expose the parameters of the sub findlets.
@@ -40,7 +40,7 @@ namespace Belle2 {
     /// Parameter for the distance given to the framework (can not handle EForwardBackward directly)
     std::string m_param_writeOutDirectionAsString = "both";
     /// Direction parameter converted from the string parameters
-    TrackFindingCDC::EForwardBackward m_param_writeOutDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
+    TrackingUtilities::EForwardBackward m_param_writeOutDirection = TrackingUtilities::EForwardBackward::c_Unknown;
     /// Export the tracks or not
     bool m_param_exportTracks = true;
     /// StoreArray name of the output Track Store Array.

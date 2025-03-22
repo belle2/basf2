@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/general/findlets/TrackFitterAndDeleter.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -23,5 +23,5 @@ void TrackFitterAndDeleter::apply(std::vector<RecoTrack*>& recoTracks)
   const auto trackWasNotFitted = [](RecoTrack * recoTrack) {
     return not recoTrack->wasFitSuccessful();
   };
-  TrackFindingCDC::erase_remove_if(recoTracks, trackWasNotFitted);
+  TrackingUtilities::erase_remove_if(recoTracks, trackWasNotFitted);
 }

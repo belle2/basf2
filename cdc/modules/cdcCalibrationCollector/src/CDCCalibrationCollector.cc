@@ -10,8 +10,8 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
 
 #include <genfit/TrackPoint.h>
 #include <genfit/KalmanFitterInfo.h>
@@ -29,7 +29,7 @@
 using namespace Belle2;
 using namespace CDC;
 using namespace genfit;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 REG_MODULE(CDCCalibrationCollector);
@@ -314,7 +314,7 @@ const CDCWire& CDCCalibrationCollectorModule::getIntersectingWire(const ROOT::Ma
 
 void CDCCalibrationCollectorModule::buildEfficiencies(std::vector<unsigned short> wireHits, const Helix helixFit)
 {
-  static const TrackFindingCDC::CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+  static const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
     const double radiusofLayer = wireLayer.getRefCylindricalR();
     //simple extrapolation of fit

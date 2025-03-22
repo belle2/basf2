@@ -10,8 +10,8 @@
 
 #include <calibration/CalibrationAlgorithm.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/topology/CDCWireLayer.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dbobjects/CDCBadWires.h>
@@ -29,7 +29,8 @@
 
 using namespace Belle2;
 using namespace CDC;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
+
 WireEfficiencyAlgorithm::WireEfficiencyAlgorithm(): CalibrationAlgorithm("CDCCalibrationCollector")
 {
 

@@ -1,6 +1,6 @@
 Import('env')
 	
-env['LIBS'] = ['tracking_trackFindingCDC','$ROOT_LIBS','Minuit', 'cdc', 'cdc_dataobjects', 'framework',
+env['LIBS'] = ['tracking_trackingUtilities','$ROOT_LIBS','Minuit', 'cdc', 'cdc_dataobjects', 'framework',
 	    'calibration', 'calibration_dataobjects', 'cdc_dbobjects']
 env['SUBLIB'] = True
 

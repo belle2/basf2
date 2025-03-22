@@ -101,7 +101,7 @@ void CDCUnpackerModule::initialize()
     B2INFO("CDCUnpacker: " << LogVar("FADC threshold", m_fadcThreshold));
   }
 
-  TrackFindingCDC::CDCWireTopology::getInstance();
+  TrackingUtilities::CDCWireTopology::getInstance();
 }
 
 void CDCUnpackerModule::beginRun()
@@ -124,7 +124,7 @@ void CDCUnpackerModule::event()
   // TDC count for the trigger scinti.
   int tdcCountTrig = m_tdcOffset;
 
-  const TrackFindingCDC::CDCWireTopology& wireTopology = TrackFindingCDC::CDCWireTopology::getInstance();
+  const TrackingUtilities::CDCWireTopology& wireTopology = TrackingUtilities::CDCWireTopology::getInstance();
 
   // Create Data objects.
   m_CDCHits.clear();

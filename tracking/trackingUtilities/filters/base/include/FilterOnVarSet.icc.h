@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterOnVarSet.dcl.h>
 
-#include <tracking/trackFindingCDC/utilities/Named.h>
+#include <tracking/trackingUtilities/utilities/Named.h>
 
 #include <framework/logging/Logger.h>
 
@@ -22,7 +22,7 @@
 #include <cmath>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     template <class AFilter>
     OnVarSet<AFilter>::OnVarSet(std::unique_ptr<AVarSet> varSet)

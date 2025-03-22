@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
-#include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NotFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AndFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NotFilter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.h>
 
@@ -25,7 +25,7 @@
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     template <class AFilter>
     FilterFactory<AFilter>::FilterFactory(const std::string& defaultFilterName)

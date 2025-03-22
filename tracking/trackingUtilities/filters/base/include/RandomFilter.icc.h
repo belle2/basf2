@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RandomFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/RandomFilter.dcl.h>
 
 #include <TRandom.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     template <class AFilter>
     Weight RandomFilter<AFilter>::operator()(const Object& obj __attribute__((unused)))

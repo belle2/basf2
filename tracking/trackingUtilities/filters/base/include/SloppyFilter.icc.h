@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/SloppyFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/SloppyFilter.dcl.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <TRandom.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     template<class AFilter>
     void Sloppy<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)

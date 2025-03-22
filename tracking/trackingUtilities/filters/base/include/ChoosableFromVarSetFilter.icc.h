@@ -7,19 +7,19 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterOnVarSet.icc.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <string>
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     template <class AFilter>
     ChoosableFromVarSet<AFilter>::ChoosableFromVarSet(std::unique_ptr<AVarSet> varSet,

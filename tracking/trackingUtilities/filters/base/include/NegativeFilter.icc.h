@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/NegativeFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/NegativeFilter.dcl.h>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     template<class AFilter>
     Weight NegativeFilter<AFilter>::operator()(const typename AFilter::Object& obj)
     {

@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <memory>
 
 namespace Belle2 {
   class ModuleParamList;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /// Filter adapter type that joins two filter results in an and like fashion
     template<class AFilter>
     class AndFilter : public AFilter {

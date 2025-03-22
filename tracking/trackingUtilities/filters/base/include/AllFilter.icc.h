@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/AllFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.dcl.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     template <class AFilter>
     Weight AllFilter<AFilter>::operator()(const Object& obj __attribute__((unused)))

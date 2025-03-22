@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/PassThroughFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/PassThroughFilter.dcl.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     template <class AFilter>
     Weight PassThroughFilter<AFilter>::operator()(const Object& object)

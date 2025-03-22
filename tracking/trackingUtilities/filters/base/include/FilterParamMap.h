@@ -16,7 +16,7 @@
 
 namespace Belle2 {
   class ModuleParamList;
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /// Variant of types allowed to be forwarded to a filter selected at runtime
     // using FilterParamVariant = boost::variant<bool, int, double, std::string, std::vector<std::string> >;
 

@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterOnVarSet.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+#include <tracking/trackingUtilities/varsets/BaseVarSet.h>
 
 #include <RtypesCore.h>
 
@@ -18,7 +18,7 @@
 
 namespace Belle2 {
   class ModuleParamList;
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      *  Filter adapter to make a filter work on a set of variables and return

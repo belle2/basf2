@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
 
-#include <tracking/trackFindingCDC/utilities/Named.h>
-#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+#include <tracking/trackingUtilities/utilities/Named.h>
+#include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
 #include <RtypesCore.h>
 
@@ -19,7 +19,7 @@
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Vehicle class to transport the variable names
     template<class AFilter>

@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.fwd.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.fwd.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterParamMap.h>
+#include <tracking/trackingUtilities/filters/base/FilterParamMap.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <string>
 
@@ -22,7 +22,7 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /// Filter can delegate to a filter chosen and set up at run time by parameters
     template <class AFilter>
     class Chooseable : public AFilter {

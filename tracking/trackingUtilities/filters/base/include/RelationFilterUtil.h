@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-#include <tracking/trackFindingCDC/utilities/Relation.h>
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/Relation.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
@@ -26,7 +26,7 @@
 #include <algorithm>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      *  name Structured creation of neighborhoods

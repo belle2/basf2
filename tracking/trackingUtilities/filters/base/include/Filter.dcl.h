@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.fwd.h>
+#include <tracking/trackingUtilities/filters/base/Filter.fwd.h>
 
-#include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
+#include <tracking/trackingUtilities/utilities/CompositeProcessingSignalListener.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <string>
 
@@ -20,7 +20,7 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Base class for filters on a generic object type.
     template<class AObject>

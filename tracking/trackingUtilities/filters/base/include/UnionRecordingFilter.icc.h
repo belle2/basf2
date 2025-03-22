@@ -7,24 +7,24 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/UnionRecordingFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterVarSet.icc.h>
-#include <tracking/trackFindingCDC/filters/base/FilterVarSet.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterVarSet.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterVarSet.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/UnionVarSet.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <vector>
 #include <string>
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /* UnionRecording<> */
     template <class AFilter>

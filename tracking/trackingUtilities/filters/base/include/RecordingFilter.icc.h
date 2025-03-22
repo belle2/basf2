@@ -7,19 +7,19 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.icc.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterOnVarSet.icc.h>
 
-#include <tracking/trackFindingCDC/mva/Recorder.h>
+#include <tracking/trackingUtilities/mva/Recorder.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /* Recording<> */
     template <class AFilter>

@@ -5,18 +5,18 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/base/FilterParamMap.h>
+#include <tracking/trackingUtilities/filters/base/FilterParamMap.h>
 
-#include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
+#include <tracking/trackingUtilities/utilities/ParameterVariant.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     using FilterParamVariant = boost::variant<bool, int, double, std::string, std::vector<std::string> >;
   }
 }
@@ -25,7 +25,7 @@ namespace Belle2 {
 template class Belle2::ModuleParam<std::map<std::string, FilterParamVariant> >;
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Define the implementation
     class FilterParamMap::Impl {

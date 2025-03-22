@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.dcl.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /// MC Filter Type using a VarSet and the truth variable in it.
     template<class ATruthVarSet>
     class TruthVarFilter : public ChoosableFromVarSetFilter<ATruthVarSet> {

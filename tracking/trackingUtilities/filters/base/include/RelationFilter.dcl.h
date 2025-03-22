@@ -7,18 +7,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/Filter.dcl.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackingUtilities/utilities/Relation.h>
 
 #include <vector>
 
 #include <cmath>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Base class for filtering the neighborhood of objects
     template <class AObject>

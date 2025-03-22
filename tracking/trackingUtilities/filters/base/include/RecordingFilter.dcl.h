@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterOnVarSet.dcl.h>
 
-#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+#include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <string>
 #include <memory>
@@ -19,7 +19,7 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class Recorder;
 
     /**

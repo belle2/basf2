@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/FilterVarSet.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterVarSet.dcl.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/core/ModuleParam.h>
@@ -21,7 +21,7 @@
 #include <cstddef>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     constexpr
     static char const* const filterVarNames[] = {

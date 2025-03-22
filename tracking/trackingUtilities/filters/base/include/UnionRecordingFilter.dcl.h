@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.fwd.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.fwd.h>
 
-#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+#include <tracking/trackingUtilities/varsets/BaseVarSet.h>
 
 #include <vector>
 #include <string>
@@ -19,7 +19,7 @@
 
 namespace Belle2 {
   class ModuleParamList;
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      *  A filter that records variables form given objects.

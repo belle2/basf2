@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/SloppyFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/SloppyFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/TruthVarFilter.dcl.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      * Sloppy MC Filter Type using a VarSet and the truth variable in it. It will return true for correct ones and

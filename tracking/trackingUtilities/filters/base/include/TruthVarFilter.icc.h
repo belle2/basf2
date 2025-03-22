@@ -7,16 +7,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/TruthVarFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.icc.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <cmath>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     template <class ATruthVarSet>
     TruthVarFilter<ATruthVarSet>::TruthVarFilter()

@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.fwd.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.fwd.h>
 
 #include <map>
 #include <string>
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Factory that can create appropriate filter instances from a name
     template<class AFilter>

@@ -7,16 +7,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/mva/MVAExpert.h>
+#include <tracking/trackingUtilities/mva/MVAExpert.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterOnVarSet.icc.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
-#include <tracking/trackFindingCDC/utilities/Named.h>
+#include <tracking/trackingUtilities/utilities/Named.h>
 #include <mva/interface/Dataset.h>
 #include <RtypesCore.h>
 
@@ -27,7 +27,7 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     template <class AFilter>
     MVA<AFilter>::MVA(std::unique_ptr<AVarSet> varSet,

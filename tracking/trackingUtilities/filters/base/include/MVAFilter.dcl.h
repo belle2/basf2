@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.fwd.h>
+#include <tracking/trackingUtilities/filters/base/FilterOnVarSet.dcl.h>
+#include <tracking/trackingUtilities/filters/base/Filter.fwd.h>
 
-#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+#include <tracking/trackingUtilities/varsets/BaseVarSet.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <tracking/dbobjects/TrackingMVAFilterParameters.h>
@@ -24,7 +24,7 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class MVAExpert;
 
     /// Filter based on a mva method.

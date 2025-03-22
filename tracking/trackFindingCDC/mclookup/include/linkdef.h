@@ -13,5 +13,5 @@
 #pragma link C++ class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<Belle2::TrackFindingCDC::CDCSegment3D>-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCMCSegment3DLookUp-;
 
-#pragma link C++ class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<Belle2::TrackFindingCDC::CDCTrack>-;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<Belle2::TrackingUtilities::CDCTrack>-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCMCTrackLookUp-;

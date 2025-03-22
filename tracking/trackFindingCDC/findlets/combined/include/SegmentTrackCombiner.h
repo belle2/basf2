@@ -7,34 +7,36 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/collectors/matchers/SharingHitsMatcher.h>
-#include <tracking/trackFindingCDC/collectors/selectors/CutSelector.h>
-#include <tracking/trackFindingCDC/collectors/selectors/FilterSelector.h>
-#include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
+#include <tracking/trackingUtilities/collectors/matchers/SharingHitsMatcher.h>
+#include <tracking/trackingUtilities/collectors/selectors/CutSelector.h>
+#include <tracking/trackingUtilities/collectors/selectors/FilterSelector.h>
+#include <tracking/trackingUtilities/collectors/selectors/SingleMatchSelector.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/TrackNormalizer.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentTrackAdderWithNormalization.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 #include <tracking/trackFindingCDC/filters/segmentTrack/BaseSegmentTrackFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilterFactory.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
 #include <vector>
 
 namespace Belle2 {
-
+  namespace TrackingUtilities {
+    class CDCTrack;
+  }
   namespace TrackFindingCDC {
 
     // Guard to prevent repeated instantiations
-    extern template class TrackFindingCDC::Chooseable<BaseSegmentTrackFilter>;
-    extern template class TrackFindingCDC::ChooseableFilter<SegmentTrackFilterFactory>;
+    // extern template class TrackingUtilities::Chooseable<BaseSegmentTrackFilter>;
+    // extern template class TrackingUtilities::ChooseableFilter<SegmentTrackFilterFactory>;
 
     /**
      * Findlet for the combination of tracks and segments.
@@ -51,11 +53,11 @@ namespace Belle2 {
      *  3. Filtering of fake tracks in the made combinations.
      *  4. Cleanup of the lookup cache.
      */
-    class SegmentTrackCombiner : public Findlet<CDCSegment2D&, CDCTrack&> {
+    class SegmentTrackCombiner : public TrackingUtilities::Findlet<CDCSegment2D&, TrackingUtilities::CDCTrack&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCSegment2D&, CDCTrack&>;
+      using Super = TrackingUtilities::Findlet<CDCSegment2D&, TrackingUtilities::CDCTrack&>;
 
     public:
       /// Constructor setting up the filter parameters
@@ -72,21 +74,22 @@ namespace Belle2 {
 
       /// Try to combine the segments and the tracks.
       void apply(std::vector<CDCSegment2D>& segments,
-                 std::vector<CDCTrack>& tracks) override;
+                 std::vector<TrackingUtilities::CDCTrack>& tracks) override;
 
     private:
       // Findlets
       /// Matcher for creating relations between tracks and segments based on the number of shared hits
-      SharingHitsMatcher<CDCTrack, CDCSegment2D> m_sharedHitsMatcher;
+      TrackingUtilities::SharingHitsMatcher<TrackingUtilities::CDCTrack, CDCSegment2D> m_sharedHitsMatcher;
 
       /// Select only those pairs, which share at least a certain amount of hits
-      CutSelector<CDCTrack, CDCSegment2D> m_selectPairsWithSharedHits;
+      TrackingUtilities::CutSelector<TrackingUtilities::CDCTrack, CDCSegment2D> m_selectPairsWithSharedHits;
 
       /// Reference to the chooser to be used for matching segments and tracks in the first step.
-      FilterSelector<CDCTrack, CDCSegment2D, ChooseableFilter<SegmentTrackFilterFactory>> m_chooseableSegmentTrackSelector;
+      TrackingUtilities::FilterSelector<TrackingUtilities::CDCTrack, CDCSegment2D, TrackingUtilities::ChooseableFilter<SegmentTrackFilterFactory>>
+          m_chooseableSegmentTrackSelector;
 
       /// Select only the best matching segment-track relations and remove the hits from the other ones
-      SingleMatchSelector<CDCTrack, CDCSegment2D> m_singleMatchSelector;
+      TrackingUtilities::SingleMatchSelector<TrackingUtilities::CDCTrack, CDCSegment2D> m_singleMatchSelector;
 
       /// Add the matched segments to tracks
       SegmentTrackAdderWithNormalization m_segmentTrackAdderWithNormalization;
@@ -98,7 +101,7 @@ namespace Belle2 {
       TrackNormalizer m_trackNormalizer;
 
       /// Object pools
-      std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>> m_relations;
+      std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCSegment2D>> m_relations;
     };
   }
 }

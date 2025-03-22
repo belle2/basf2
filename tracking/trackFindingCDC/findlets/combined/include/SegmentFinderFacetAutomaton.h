@@ -21,19 +21,19 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
-#include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
+#include <tracking/trackingUtilities/findlets/minimal/WeightedRelationCreator.h>
+#include <tracking/trackingUtilities/findlets/base/StoreVectorSwapper.h>
 
 #include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Findlet implementing the segment finding part of the full track finder
-    class SegmentFinderFacetAutomaton : public Findlet<CDCWireHitCluster&, CDCSegment2D> {
+    class SegmentFinderFacetAutomaton : public TrackingUtilities::Findlet<CDCWireHitCluster&, CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHitCluster&, CDCSegment2D>;
+      using Super = TrackingUtilities::Findlet<CDCWireHitCluster&, CDCSegment2D>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -57,7 +57,8 @@ namespace Belle2 {
       FacetCreator m_facetCreator;
 
       /// Creates the facet (hit triplet) relations of the cellular automaton
-      WeightedRelationCreator<const CDCFacet, ChooseableFacetRelationFilter> m_facetRelationCreator;
+      TrackingUtilities::WeightedRelationCreator<const TrackFindingCDC::CDCFacet, TrackFindingCDC::ChooseableFacetRelationFilter>
+      m_facetRelationCreator;
 
       /// Find the segments by composition of facets path from a cellular automaton
       SegmentCreatorFacetAutomaton m_segmentCreatorFacetAutomaton;
@@ -75,14 +76,14 @@ namespace Belle2 {
       SegmentLinker m_segmentLinker;
 
       /// Puts the internal facets on the DataStore
-      StoreVectorSwapper<CDCFacet> m_facetSwapper{"CDCFacetVector"};
+      TrackingUtilities::StoreVectorSwapper<CDCFacet> m_facetSwapper{"CDCFacetVector"};
 
       // Object pools
       /// Memory for the generated facets
       std::vector<CDCFacet> m_facets;
 
       /// Memory for the generated facet relations
-      std::vector<WeightedRelation<const CDCFacet> > m_facetRelations;
+      std::vector<TrackingUtilities::WeightedRelation<const CDCFacet> > m_facetRelations;
 
       /// Memory for the reconstructed segments
       std::vector<CDCSegment2D> m_segments;

@@ -7,19 +7,19 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/RLTaggedWireHitCreator.h>
 // #include <tracking/trackFindingCDC/findlets/minimal/TrackSZFitter.h>
 
 #include <tracking/trackFindingCDC/collectors/matchers/StereoHitTrackQuadTreeMatcher.h>
-#include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
-#include <tracking/trackFindingCDC/collectors/selectors/FilterSelector.h>
+#include <tracking/trackingUtilities/collectors/selectors/SingleMatchSelector.h>
+#include <tracking/trackingUtilities/collectors/selectors/FilterSelector.h>
 #include <tracking/trackFindingCDC/collectors/adders/StereoHitTrackAdder.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
-#include <tracking/trackFindingCDC/utilities/HitComperator.h>
+#include <tracking/trackingUtilities/utilities/HitComperator.h>
 
 #include <tracking/trackFindingCDC/hough/quadratic/HitQuadraticLegendre.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackInspector.h>
@@ -27,9 +27,11 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
-    class CDCWireHit;
+  namespace TrackingUtilities {
     class CDCTrack;
+    class CDCWireHit;
+  }
+  namespace TrackFindingCDC {
 
     /**
      * Complex findlet for finding stereo hits from monopoles to a list of cdc tracks.
@@ -39,11 +41,12 @@ namespace Belle2 {
      *
      * I guess uses collector framework and a quadtree search for quadratic tracks from IP
      */
-    class MonopoleStereoHitFinderQuadratic : public Findlet<CDCWireHit&, CDCTrack&> {
+    class MonopoleStereoHitFinderQuadratic : public
+      TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&, TrackingUtilities::CDCTrack&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHit&, CDCTrack&>;
+      using Super = Findlet<TrackingUtilities::CDCWireHit&, TrackingUtilities::CDCTrack&>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -59,7 +62,7 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Generates the segment from wire hits
-      void apply(std::vector<CDCWireHit>& inputWireHits, std::vector<CDCTrack>& tracks) final;
+      void apply(std::vector<TrackingUtilities::CDCWireHit>& inputWireHits, std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
     private:
       // Findlets
@@ -68,9 +71,11 @@ namespace Belle2 {
       /// Find matching hits to a track
       StereoHitTrackQuadTreeMatcher<HitQuadraticLegendre> m_matcher;
       /// Filter for the Stereo Hits added to the track
-      FilterSelector<CDCTrack, CDCRLWireHit, ChooseableFilter<StereoHitFilterFactory>> m_filterSelector;
+      TrackingUtilities::FilterSelector<TrackingUtilities::CDCTrack, CDCRLWireHit, TrackingUtilities::ChooseableFilter<StereoHitFilterFactory>>
+          m_filterSelector;
       /// Select only those where the relation is unique (or the best one in those groups)
-      SingleMatchSelector<CDCTrack, CDCRLWireHit, HitComperator> m_singleMatchSelector;
+      TrackingUtilities::SingleMatchSelector<TrackingUtilities::CDCTrack, CDCRLWireHit, TrackingUtilities::HitComperator>
+      m_singleMatchSelector;
       /// Add the hits to the tracks
       StereoHitTrackAdder m_adder;
       /// Print found tracks if requested in module options
@@ -81,7 +86,7 @@ namespace Belle2 {
       /// Vector holding all possible wire hits with all possible RL combinations
       std::vector<CDCRLWireHit> m_rlTaggedWireHits;
       /// Vector of relations between tracks and hits
-      std::vector<WeightedRelation<CDCTrack, const CDCRLWireHit>> m_relations;
+      std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCRLWireHit>> m_relations;
     };
   }
 }

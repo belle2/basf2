@@ -7,16 +7,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackingUtilities/eventdata/utils/ClassMnemomics.h>
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilterUtil.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
@@ -28,7 +28,7 @@
 namespace Belle2 {
 
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      *  Findlet that combines geometrical constrained pairs of objects to relations and

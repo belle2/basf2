@@ -9,7 +9,7 @@
 
 #include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.dcl.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -20,11 +20,11 @@
 namespace Belle2 {
 
   /// Findlet to extract the T0 time of an event only using CDC Hits
-  class HitBasedT0Extractor final : public BaseEventTimeExtractor<TrackFindingCDC::CDCWireHit&> {
+  class HitBasedT0Extractor final : public BaseEventTimeExtractor<TrackingUtilities::CDCWireHit&> {
 
   private:
     /// Type of the base class
-    using Super = BaseEventTimeExtractor<TrackFindingCDC::CDCWireHit&>;
+    using Super = BaseEventTimeExtractor<TrackingUtilities::CDCWireHit&>;
 
   public:
     /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -40,7 +40,7 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
 
     /// Collects all Wire Hits and executes the t0 fit
-    void apply(std::vector<TrackFindingCDC::CDCWireHit>& inputWireHits) override final;
+    void apply(std::vector<TrackingUtilities::CDCWireHit>& inputWireHits) override final;
 
     /// Initialize the event meta data
     void initialize() override final;

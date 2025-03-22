@@ -9,7 +9,7 @@
 
 #include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.dcl.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
@@ -22,7 +22,7 @@ namespace Belle2 {
   template<class ... AIOTypes>
   void BaseEventTimeExtractor<AIOTypes...>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "overwriteExistingEstimation"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "overwriteExistingEstimation"),
                                   m_param_overwriteExistingEstimation,
                                   "Is it fine to overwrite the current EventT0?",
                                   m_param_overwriteExistingEstimation);

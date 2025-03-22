@@ -11,8 +11,8 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
 
 using namespace Belle2;
 
@@ -94,7 +94,7 @@ bool CDCPathBasicVarSet::extract(const BaseCDCPathFilter::Object* path)
   var<named("totalHitsSeedTrack")>() = seedRecoTrack->getNumberOfCDCHits();
 
   // get ICLayer assigned to seed (only really defined for ECL seeds)
-  const auto& wireTopology = TrackFindingCDC::CDCWireTopology::getInstance();
+  const auto& wireTopology = TrackingUtilities::CDCWireTopology::getInstance();
   const auto& wires = wireTopology.getWires();
   const float maxForwardZ = wires.back().getForwardZ();     // 157.615
   const float maxBackwardZ = wires.back().getBackwardZ();   // -72.0916
@@ -112,7 +112,7 @@ bool CDCPathBasicVarSet::extract(const BaseCDCPathFilter::Object* path)
     for (const auto& wire : wires) {
       const float maxZ = seedPosZ > 0 ? wire.getForwardZ() : wire.getBackwardZ();
 
-      const auto distance = wire.getDistance(TrackFindingCDC::Vector3D(seedPos - seedMomZOne * (seedPosZ - maxZ)));
+      const auto distance = wire.getDistance(TrackingUtilities::Vector3D(seedPos - seedMomZOne * (seedPosZ - maxZ)));
       if (distance < minDist) {
         minDist = distance;
         seedICLayer = wire.getICLayer();

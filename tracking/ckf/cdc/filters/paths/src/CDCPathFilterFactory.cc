@@ -7,15 +7,15 @@
  **************************************************************************/
 #include <tracking/ckf/cdc/filters/paths/CDCPathFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
 
 #include <tracking/ckf/cdc/filters/paths/SizeCDCPathFilter.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AndFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.icc.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/ckf/cdc/filters/paths/CDCPathBasicVarSet.h>
 #include <tracking/ckf/cdc/filters/paths/CDCPathTruthVarSet.h>
@@ -24,7 +24,7 @@
 #include <tracking/ckf/cdc/filters/paths/SeedChargeCDCPathFilter.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// Recording filter
@@ -72,10 +72,10 @@ std::unique_ptr<BaseCDCPathFilter>
 CDCPathFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BaseCDCPathFilter>>();
+    return std::make_unique<TrackingUtilities::NoneFilter<BaseCDCPathFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
-    return std::make_unique<TrackFindingCDC::AllFilter<BaseCDCPathFilter>>();
+    return std::make_unique<TrackingUtilities::AllFilter<BaseCDCPathFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "size") {
     return std::make_unique<SizeCDCPathFilter>();

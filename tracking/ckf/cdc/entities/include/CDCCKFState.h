@@ -9,11 +9,11 @@
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
 
 namespace Belle2 {
 
@@ -25,10 +25,10 @@ namespace Belle2 {
       m_seed(seed), m_trackState(trackState) {}
 
     /// constructor from the CDC wireHit
-    explicit CDCCKFState(const TrackFindingCDC::CDCWireHit* wireHit) : m_cdcWireHit(wireHit) {}
+    explicit CDCCKFState(const TrackingUtilities::CDCWireHit* wireHit) : m_cdcWireHit(wireHit) {}
 
     /// Get CDCWireHit corresponding to the state
-    const TrackFindingCDC::CDCWireHit* getWireHit() const
+    const TrackingUtilities::CDCWireHit* getWireHit() const
     {
       B2ASSERT("State does not represent a wire hit", static_cast<bool>(m_cdcWireHit));
       return *m_cdcWireHit;
@@ -68,15 +68,15 @@ namespace Belle2 {
     }
 
     /// Set right-left info for the hit
-    void setRLinfo(const TrackFindingCDC::ERightLeft& rl)
+    void setRLinfo(const TrackingUtilities::ERightLeft& rl)
     {
       m_rl = rl;
     }
 
     /// Return right-left info (check if present first)
-    TrackFindingCDC::ERightLeft getRLinfo() const
+    TrackingUtilities::ERightLeft getRLinfo() const
     {
-      B2ASSERT("LR info is not present yet", m_rl != TrackFindingCDC::ERightLeft::c_Unknown);
+      B2ASSERT("LR info is not present yet", m_rl != TrackingUtilities::ERightLeft::c_Unknown);
       return m_rl;
     }
 
@@ -141,20 +141,20 @@ namespace Belle2 {
     }
 
     /// Helper method to get trajectory from the trackState.
-    TrackFindingCDC::CDCTrajectory3D getTrajectory() const
+    TrackingUtilities::CDCTrajectory3D getTrajectory() const
     {
       const auto& trackState = getTrackState();
-      const TrackFindingCDC::Vector3D trackPosition(trackState.getPos());
-      const TrackFindingCDC::Vector3D trackMomentum(trackState.getMom());
-      return TrackFindingCDC::CDCTrajectory3D(trackPosition, trackState.getTime(),
-                                              trackMomentum, trackState.getCharge());
+      const TrackingUtilities::Vector3D trackPosition(trackState.getPos());
+      const TrackingUtilities::Vector3D trackMomentum(trackState.getMom());
+      return TrackingUtilities::CDCTrajectory3D(trackPosition, trackState.getTime(),
+                                                trackMomentum, trackState.getCharge());
     }
 
   private:
     /// (optional) pointer to the seed track
     std::optional<const RecoTrack*> m_seed;
     /// (optional) pointer to the wire hit
-    std::optional<const TrackFindingCDC::CDCWireHit*> m_cdcWireHit;
+    std::optional<const TrackingUtilities::CDCWireHit*> m_cdcWireHit;
 
     /// (optional) genfit MeasuredStateOnPlane
     std::optional<genfit::MeasuredStateOnPlane> m_trackState;
@@ -175,7 +175,7 @@ namespace Belle2 {
     double m_reconstructedZ = 0;
 
     /// Store if the track is on the right or left side of the hit
-    TrackFindingCDC::ERightLeft m_rl = TrackFindingCDC::ERightLeft::c_Unknown;
+    TrackingUtilities::ERightLeft m_rl = TrackingUtilities::ERightLeft::c_Unknown;
   };
 
   /// print state info

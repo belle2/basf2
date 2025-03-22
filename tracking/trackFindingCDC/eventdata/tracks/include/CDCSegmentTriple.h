@@ -10,19 +10,21 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCStereoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCAxialSegment2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
 
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
 #include <tuple>
 
 namespace Belle2 {
+  namespace TrackingUtilities {
+    class CDCTrajectory2D;
+    class CDCTrajectorySZ;
+  }
   namespace TrackFindingCDC {
     class CDCAxialSegmentPair;
-    class CDCTrajectorySZ;
-    class CDCTrajectory2D;
 
     /// Class representing a triple of reconstructed segments in adjacent superlayer
     class CDCSegmentTriple {
@@ -47,7 +49,7 @@ namespace Belle2 {
       CDCSegmentTriple(const CDCAxialSegment2D* startSegment,
                        const CDCStereoSegment2D* middleSegment,
                        const CDCAxialSegment2D* endSegment,
-                       const CDCTrajectory3D& trajectory3D);
+                       const TrackingUtilities::CDCTrajectory3D& trajectory3D);
 
       /// Equality comparison based on the pointers to the stored segments
       bool operator==(CDCSegmentTriple const& rhs) const
@@ -85,13 +87,13 @@ namespace Belle2 {
       }
 
       /// Getter for the superlayer id of the start segment
-      ISuperLayer getStartISuperLayer() const;
+      TrackingUtilities::ISuperLayer getStartISuperLayer() const;
 
       /// Getter for the superlayer id of the middle segment
-      ISuperLayer getMiddleISuperLayer() const;
+      TrackingUtilities::ISuperLayer getMiddleISuperLayer() const;
 
       /// Getter for the superlayer id of the end segment
-      ISuperLayer getEndISuperLayer() const;
+      TrackingUtilities::ISuperLayer getEndISuperLayer() const;
 
       /// Getter for the start axial segment.
       const CDCAxialSegment2D* getStartSegment() const
@@ -130,19 +132,19 @@ namespace Belle2 {
       }
 
       /// Getter for the linear trajectory in the sz direction.
-      CDCTrajectorySZ getTrajectorySZ() const;
+      TrackingUtilities::CDCTrajectorySZ getTrajectorySZ() const;
 
       /// Getter for the circular trajectory in the xy direction.
-      CDCTrajectory2D getTrajectory2D() const;
+      TrackingUtilities::CDCTrajectory2D getTrajectory2D() const;
 
       /// Getter for the three dimensional helix trajectory
-      const CDCTrajectory3D& getTrajectory3D() const
+      const TrackingUtilities::CDCTrajectory3D& getTrajectory3D() const
       {
         return m_trajectory3D;
       }
 
       /// Setter for the three dimensional helix trajectory
-      void setTrajectory3D(const CDCTrajectory3D& trajectory3D) const
+      void setTrajectory3D(const TrackingUtilities::CDCTrajectory3D& trajectory3D) const
       {
         m_trajectory3D = trajectory3D;
       }
@@ -163,7 +165,7 @@ namespace Belle2 {
       void receiveMaskedFlag() const;
 
       /// Mutable getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() const
+      TrackingUtilities::AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
       }
@@ -179,10 +181,10 @@ namespace Belle2 {
       const CDCAxialSegment2D* m_endSegment;
 
       /// Memory of the linear trajectory in the sz direction associated with the triple.
-      mutable CDCTrajectory3D m_trajectory3D;
+      mutable TrackingUtilities::CDCTrajectory3D m_trajectory3D;
 
       /// Automaton cell associated with the pair of segments
-      mutable AutomatonCell m_automatonCell;
+      mutable TrackingUtilities::AutomatonCell m_automatonCell;
     };
   }
 }

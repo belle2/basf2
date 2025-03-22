@@ -9,13 +9,13 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCAxialSegment2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
 
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 
 #include <tuple>
 
@@ -37,7 +37,7 @@ namespace Belle2 {
       /// Constructor from two segments and an associated trajectory
       CDCAxialSegmentPair(const CDCAxialSegment2D* startSegment,
                           const CDCAxialSegment2D* endSegment,
-                          const CDCTrajectory2D& trajectory2D);
+                          const TrackingUtilities::CDCTrajectory2D& trajectory2D);
 
       /// Equality comparison based on the pointers to the stored segments.
       bool operator==(CDCAxialSegmentPair const& rhs) const
@@ -76,10 +76,10 @@ namespace Belle2 {
       }
 
       /// Getter for the superlayer id of the start segment
-      ISuperLayer getStartISuperLayer() const;
+      TrackingUtilities::ISuperLayer getStartISuperLayer() const;
 
       /// Getter for the superlayer id of the end segment
-      ISuperLayer getEndISuperLayer() const;
+      TrackingUtilities::ISuperLayer getEndISuperLayer() const;
 
       /// Getter for the start segment.
       const CDCAxialSegment2D* getStartSegment() const
@@ -114,13 +114,13 @@ namespace Belle2 {
       }
 
       /// Getter for the trajectory of the two dimensional trajectory
-      CDCTrajectory2D& getTrajectory2D() const
+      TrackingUtilities::CDCTrajectory2D& getTrajectory2D() const
       {
         return m_trajectory2D;
       }
 
       /// Setter for the trajectory of the two dimensional trajectory
-      void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const
+      void setTrajectory2D(const TrackingUtilities::CDCTrajectory2D& trajectory2D) const
       { m_trajectory2D =  trajectory2D; }
 
       /// Invalidates the currently stored trajectory information
@@ -142,10 +142,10 @@ namespace Belle2 {
        *  * EForwardBackward::c_Forward if the last entity lies behind the first.
        *  * EForwardBackward::c_Backward if the last entity lies before the first.
        */
-      EForwardBackward isCoaligned(const CDCTrajectory2D& trajectory2D) const;
+      TrackingUtilities::EForwardBackward isCoaligned(const TrackingUtilities::CDCTrajectory2D& trajectory2D) const;
 
       /// Mutable getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() const
+      TrackingUtilities::AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
       }
@@ -158,10 +158,10 @@ namespace Belle2 {
       const CDCAxialSegment2D* m_endSegment;
 
       /// Reference to the common trajectory
-      mutable CDCTrajectory2D m_trajectory2D;
+      mutable TrackingUtilities::CDCTrajectory2D m_trajectory2D;
 
       /// Automaton cell associated with the pair of segments
-      mutable AutomatonCell m_automatonCell;
+      mutable TrackingUtilities::AutomatonCell m_automatonCell;
     };
   }
 }

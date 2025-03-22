@@ -7,23 +7,25 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
-#include <tracking/trackFindingCDC/topology/EStereoKind.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/EStereoKind.h>
 
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 
 #include <cassert>
 #include <cstddef>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
-    class CDCSegment2D;
+  namespace TrackingUtilities {
     class CDCTrajectory2D;
     class CDCTrajectorySZ;
+  }
+  namespace TrackFindingCDC {
+    class CDCSegment2D;
 
     /// Class representing a pair of one reconstructed axial segment and one stereo segment in
     /// adjacent superlayer.
@@ -38,7 +40,7 @@ namespace Belle2 {
       /// Constructor from two segments and an associated trajectory
       CDCSegmentPair(const CDCSegment2D* fromSegment,
                      const CDCSegment2D* toSegment,
-                     const CDCTrajectory3D& trajectory3D);
+                     const TrackingUtilities::CDCTrajectory3D& trajectory3D);
 
       /// Equality comparison based on the pointers to the stored segments.
       bool operator==(CDCSegmentPair const& rhs) const
@@ -76,8 +78,8 @@ namespace Belle2 {
       /// Checks if the two segments are of different axial type.
       bool checkSegmentsStereoKinds() const
       {
-        return (getFromStereoKind() == EStereoKind::c_Axial) xor
-               (getToStereoKind() == EStereoKind::c_Axial);
+        return (getFromStereoKind() == TrackingUtilities::EStereoKind::c_Axial) xor
+               (getToStereoKind() == TrackingUtilities::EStereoKind::c_Axial);
       }
 
       /// Checks the references to the contained three segment for nullptrs and exactly one of them
@@ -88,16 +90,16 @@ namespace Belle2 {
       }
 
       /// Getter for the stereo type of the first segment.
-      EStereoKind getFromStereoKind() const;
+      TrackingUtilities::EStereoKind getFromStereoKind() const;
 
       /// Getter for the stereo type of the second segment.
-      EStereoKind getToStereoKind() const;
+      TrackingUtilities::EStereoKind getToStereoKind() const;
 
       /// Getter for the superlayer id of the from segment.
-      ISuperLayer getFromISuperLayer() const;
+      TrackingUtilities::ISuperLayer getFromISuperLayer() const;
 
       /// Getter for the superlayer id of the to segment.
-      ISuperLayer getToISuperLayer() const;
+      TrackingUtilities::ISuperLayer getToISuperLayer() const;
 
       /// Getter for the total number of hits in this segment pair
       std::size_t size() const;
@@ -129,13 +131,13 @@ namespace Belle2 {
       /// Getter for the stereo segment
       const CDCSegment2D* getStereoSegment() const
       {
-        return getFromStereoKind() != EStereoKind::c_Axial ? getFromSegment() : getToSegment();
+        return getFromStereoKind() != TrackingUtilities::EStereoKind::c_Axial ? getFromSegment() : getToSegment();
       }
 
       /// Getter for the axial segment
       const CDCSegment2D* getAxialSegment() const
       {
-        return getFromStereoKind() == EStereoKind::c_Axial ? getFromSegment() : getToSegment();
+        return getFromStereoKind() == TrackingUtilities::EStereoKind::c_Axial ? getFromSegment() : getToSegment();
       }
 
       /// Setter for both segments simultaneously
@@ -187,25 +189,25 @@ namespace Belle2 {
        *  * EForwardBackward::c_Forward if the last entity lies behind the first.
        *  * EForwardBackward::c_Backward if the last entity lies before the first.
        */
-      EForwardBackward isCoaligned(const CDCTrajectory2D& trajectory2D) const;
+      TrackingUtilities::EForwardBackward isCoaligned(const TrackingUtilities::CDCTrajectory2D& trajectory2D) const;
 
       /// Setter for the three dimensional trajectory
-      void setTrajectory3D(const CDCTrajectory3D& trajectory3D) const
+      void setTrajectory3D(const TrackingUtilities::CDCTrajectory3D& trajectory3D) const
       {
         m_trajectory3D = trajectory3D;
       }
 
       /// Getter for the three dimensional trajectory.
-      CDCTrajectory3D& getTrajectory3D() const
+      TrackingUtilities::CDCTrajectory3D& getTrajectory3D() const
       {
         return m_trajectory3D;
       }
 
       /// Getter for the two dimensional projection of the common three dimensional trajectory.
-      CDCTrajectory2D getTrajectory2D() const;
+      TrackingUtilities::CDCTrajectory2D getTrajectory2D() const;
 
       /// Getter for the sz projection of the common three dimensional trajectory.
-      CDCTrajectorySZ getTrajectorySZ() const;
+      TrackingUtilities::CDCTrajectorySZ getTrajectorySZ() const;
 
       /// Invalides the currently stored trajectory information.
       void clearTrajectory3D() const
@@ -226,7 +228,7 @@ namespace Belle2 {
       void receiveMaskedFlag() const;
 
       /// Mutable getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() const
+      TrackingUtilities::AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
       }
@@ -239,10 +241,10 @@ namespace Belle2 {
       const CDCSegment2D* m_toSegment;
 
       /// Memory for the common three dimensional trajectory
-      mutable CDCTrajectory3D m_trajectory3D;
+      mutable TrackingUtilities::CDCTrajectory3D m_trajectory3D;
 
       /// Automaton cell associated with the pair of segments
-      mutable AutomatonCell m_automatonCell;
+      mutable TrackingUtilities::AutomatonCell m_automatonCell;
     };
   }
 }

@@ -18,14 +18,14 @@
 #include <map>
 #include <vector>
 
-TEST(TrackFindingCDCTest, cpp_float)
+TEST(TrackingUtilitiesTest, cpp_float)
 {
   EXPECT_TRUE(std::signbit(-0.0));
   EXPECT_FALSE(std::signbit(0.0));
   EXPECT_FALSE(std::signbit(NAN));
 }
 
-TEST(TrackFindingCDCTest, cpp_max)
+TEST(TrackingUtilitiesTest, cpp_max)
 {
   float value = 1.0;
 
@@ -37,7 +37,7 @@ TEST(TrackFindingCDCTest, cpp_max)
   EXPECT_EQ(value, maximum2);
 }
 
-TEST(TrackFindingCDCTest, cpp_array_init)
+TEST(TrackingUtilitiesTest, cpp_array_init)
 {
   float values[10] = {};
   for (int i = 0; i < 10; ++i) {
@@ -45,13 +45,13 @@ TEST(TrackFindingCDCTest, cpp_array_init)
   }
 }
 
-TEST(TrackFindingCDCTest, cpp_char_is_signed)
+TEST(TrackingUtilitiesTest, cpp_char_is_signed)
 {
   char isSigned = -1;
   EXPECT_GT(0, isSigned);
 }
 
-TEST(TrackFindingCDCTest, cpp_stringstream_copy)
+TEST(TrackingUtilitiesTest, cpp_stringstream_copy)
 {
   // Howto copy a string stream even if its constant.
   std::stringstream filled_non_const;
@@ -73,7 +73,7 @@ TEST(TrackFindingCDCTest, cpp_stringstream_copy)
   EXPECT_EQ(filled.str(), copy2.str());
 }
 
-TEST(TrackFindingCDCTest, cpp_map_insert)
+TEST(TrackingUtilitiesTest, cpp_map_insert)
 {
   std::map<int, int> defaults{{1, 1}, {2, 2}};
 
@@ -88,7 +88,7 @@ TEST(TrackFindingCDCTest, cpp_map_insert)
   EXPECT_EQ(2, concret[2]);
 }
 
-TEST(TrackFindingCDCTest, cpp_remainder)
+TEST(TrackingUtilitiesTest, cpp_remainder)
 {
   // Test if remainder brings a value to the range [-1, 1]
   // proving that remainder is the best function to transform an angle to range [-M_PI, M_PI]

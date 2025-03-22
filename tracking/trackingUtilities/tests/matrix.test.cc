@@ -23,7 +23,7 @@ This file contains some basic investigation on numerically matrix algorithms.
 // * full pivoted LU
 
 // no good for inversion if rank of the matrix is not full.
-// TEST(TrackFindingCDCTest, TMatrixDSym_invert)
+// TEST(TrackingUtilitiesTest, TMatrixDSym_invert)
 // {
 //   TMatrixDSym weight(2);
 //   weight(0,0) = 2;
@@ -51,7 +51,7 @@ This file contains some basic investigation on numerically matrix algorithms.
 // }
 
 // no good for inversion if rank of the matrix is not full.
-// TEST(TrackFindingCDCTest, SMatrixDSym_inverse)
+// TEST(TrackingUtilitiesTest, SMatrixDSym_inverse)
 // {
 //   using CovarianceMatrix = ROOT::Math::SMatrix< double, 2, 2, ROOT::Math::MatRepSym< double, 2>
 //   >;
@@ -73,7 +73,7 @@ This file contains some basic investigation on numerically matrix algorithms.
 // }
 
 // no good for inversion if rank of the matrix is not full.
-// TEST(TrackFindingCDCTest, SMatrixDSym_inverseChol)
+// TEST(TrackingUtilitiesTest, SMatrixDSym_inverseChol)
 // {
 //   using CovarianceMatrix = ROOT::Math::SMatrix< double, 2, 2, ROOT::Math::MatRepSym< double, 2>
 //   >;
@@ -95,7 +95,7 @@ This file contains some basic investigation on numerically matrix algorithms.
 // }
 
 // no good for inversion if rank of the matrix is not full.
-// TEST(TrackFindingCDCTest, Eigen_inverse)
+// TEST(TrackingUtilitiesTest, Eigen_inverse)
 // {
 //   Eigen::Matrix<double, 2, 2> weight;
 //   weight(0,0) = 2;
@@ -112,7 +112,7 @@ This file contains some basic investigation on numerically matrix algorithms.
 // }
 
 // no good for inversion if rank of the matrix is not full.
-// TEST(TrackFindingCDCTest, Eigen_llt_inverse)
+// TEST(TrackingUtilitiesTest, Eigen_llt_inverse)
 // {
 //   Eigen::Matrix<double, 2, 2> weight;
 //   weight(0,0) = 2;
@@ -129,7 +129,7 @@ This file contains some basic investigation on numerically matrix algorithms.
 // }
 
 // No good for inversion if rank of the matrix is not full.
-// TEST(TrackFindingCDCTest, Eigen_lldt_inverse)
+// TEST(TrackingUtilitiesTest, Eigen_lldt_inverse)
 // {
 //   Eigen::Matrix<double, 2, 2> weight;
 //   weight(0,0) = 2;
@@ -145,7 +145,7 @@ This file contains some basic investigation on numerically matrix algorithms.
 //   EXPECT_NEAR(0.0, cov(1,1), 10e-7);
 // }
 
-TEST(TrackFindingCDCTest, Eigen_fullPivLu_inverse)
+TEST(TrackingUtilitiesTest, Eigen_fullPivLu_inverse)
 {
   Eigen::Matrix<double, 2, 2> weight;
   weight(0, 0) = 2;
@@ -162,7 +162,7 @@ TEST(TrackFindingCDCTest, Eigen_fullPivLu_inverse)
 }
 
 // No good for inversion if rank of the matrix is not full.
-// TEST(TrackFindingCDCTest, Eigen_partialPivLu_inverse)
+// TEST(TrackingUtilitiesTest, Eigen_partialPivLu_inverse)
 // {
 //   Eigen::Matrix<double, 2, 2> weight;
 //   weight(0,0) = 2;
@@ -179,7 +179,7 @@ TEST(TrackFindingCDCTest, Eigen_fullPivLu_inverse)
 // }
 
 // Can not do inversion
-// TEST(TrackFindingCDCTest, Eigen_householderQr_inverse)
+// TEST(TrackingUtilitiesTest, Eigen_householderQr_inverse)
 // {
 //   Eigen::Matrix<double, 2, 2> weight;
 //   weight(0,0) = 2;
@@ -196,7 +196,7 @@ TEST(TrackFindingCDCTest, Eigen_fullPivLu_inverse)
 // }
 
 /* Method of choice for covariance <-> weight matrices */
-TEST(TrackFindingCDCTest, Eigen_colPivHouseholderQr_inverse)
+TEST(TrackingUtilitiesTest, Eigen_colPivHouseholderQr_inverse)
 {
   Eigen::Matrix<double, 2, 2> weight;
   weight(0, 0) = 2;
@@ -212,7 +212,7 @@ TEST(TrackFindingCDCTest, Eigen_colPivHouseholderQr_inverse)
   EXPECT_NEAR(0.0, cov(1, 1), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, Eigen_fullPivHouseholderQr_inverse)
+TEST(TrackingUtilitiesTest, Eigen_fullPivHouseholderQr_inverse)
 {
   Eigen::Matrix<double, 2, 2> weight;
   weight(0, 0) = 2;

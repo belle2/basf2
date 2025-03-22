@@ -16,7 +16,7 @@ Its purpose is mainly to assure the programmer that his assumptions about run ti
 
 #include <gtest/gtest.h>
 
-TEST(TrackFindingCDCTest, root_TMatrixD)
+TEST(TrackingUtilitiesTest, root_TMatrixD)
 {
   TMatrixD jacobian(2, 2);
   jacobian(0, 0) = 0;
@@ -47,7 +47,7 @@ TEST(TrackFindingCDCTest, root_TMatrixD)
 }
 
 
-TEST(TrackFindingCDCTest, root_TMatrixDSym_Similarity_differing_rows_columns)
+TEST(TrackingUtilitiesTest, root_TMatrixDSym_Similarity_differing_rows_columns)
 {
   // Test if the number of rows gets augmented correctly,
   // when transformed with a on square jacobian matrix.

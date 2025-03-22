@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 #include <tracking/modules/cosmicsTrackMerger/CosmicsTrackMergerFindlet.h>
 
 namespace Belle2 {
   /**
    * Module linking tracks based on their Phi parameter.
    */
-  class CosmicsTrackMergerModule : public TrackFindingCDC::FindletModule<CosmicsTrackMergerFindlet> {
+  class CosmicsTrackMergerModule : public TrackingUtilities::FindletModule<CosmicsTrackMergerFindlet> {
 
   public:
     /// Set description

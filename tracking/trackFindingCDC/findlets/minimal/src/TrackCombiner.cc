@@ -7,17 +7,17 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCombiner.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/numerics/Index.h>
+#include <tracking/trackingUtilities/numerics/Index.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-#include <tracking/trackFindingCDC/utilities/Range.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/Range.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
@@ -26,6 +26,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   std::array<int, ISuperLayerUtil::c_N>  getNHitsByISuperLayer(const CDCTrack& track)
@@ -37,7 +38,7 @@ namespace {
     return nHitsBySLayer;
   }
 
-  CDCTrack condense(const TrackFindingCDC::Path<const CDCSegment3D>& segmentPath)
+  CDCTrack condense(const Path<const CDCSegment3D>& segmentPath)
   {
     CDCTrack result;
     for (const CDCSegment3D* segment : segmentPath) {
@@ -298,7 +299,7 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
   std::vector<const CDCSegment3D*> segmentPtrs = as_pointers<const CDCSegment3D>(segments);
 
   // Memory for the track paths generated from the graph.
-  std::vector<TrackFindingCDC::Path<const CDCSegment3D>> segmentPaths;
+  std::vector<Path<const CDCSegment3D>> segmentPaths;
   m_cellularPathFinder.apply(segmentPtrs, segmentRelations, segmentPaths);
 
   // Put the linked segments together

@@ -7,16 +7,17 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSegmentTripleAutomaton.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
-#include <tracking/trackFindingCDC/ca/Path.h>
+#include <tracking/trackingUtilities/ca/Path.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 std::string TrackCreatorSegmentTripleAutomaton::getDescription()
 {
@@ -29,7 +30,7 @@ void TrackCreatorSegmentTripleAutomaton::exposeParameters(ModuleParamList* modul
 }
 
 void TrackCreatorSegmentTripleAutomaton::apply(const std::vector<CDCSegmentTriple>& inputSegmentTriples,
-                                               const std::vector<WeightedRelation<const CDCSegmentTriple>>& inputSegmentTripleRelations,
+                                               const std::vector<TrackingUtilities::WeightedRelation<const CDCSegmentTriple>>& inputSegmentTripleRelations,
                                                std::vector<CDCTrack>& outputTracks)
 {
   // Obtain the segment triples as pointers

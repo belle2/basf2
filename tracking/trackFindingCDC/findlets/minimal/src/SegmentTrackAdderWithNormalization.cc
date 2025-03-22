@@ -7,17 +7,18 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentTrackAdderWithNormalization.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 #include <vector>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 SegmentTrackAdderWithNormalization::SegmentTrackAdderWithNormalization()
   : Super()
@@ -150,7 +151,7 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
   }
 
   // Drop tracks which have no hits
-  TrackFindingCDC::erase_remove_if(tracks, [](const CDCTrack & track) { return track.empty(); });
+  erase_remove_if(tracks, [](const CDCTrack & track) { return track.empty(); });
 
   // Establish the ordering
   for (CDCTrack& track : tracks) {

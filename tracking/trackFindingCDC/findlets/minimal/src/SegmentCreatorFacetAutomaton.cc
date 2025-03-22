@@ -13,13 +13,13 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/VectorRange.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
@@ -28,6 +28,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   void setRLWireHit(CDCRLWireHitTriple& rlWireHitTriple, int iRLWireHit, const CDCRLWireHit& rlWireHit)
@@ -74,7 +75,7 @@ void SegmentCreatorFacetAutomaton::exposeParameters(ModuleParamList* moduleParam
 
 void SegmentCreatorFacetAutomaton::apply(
   const std::vector<CDCFacet>& inputFacets,
-  const std::vector<WeightedRelation<const CDCFacet>>& inputFacetRelations,
+  const std::vector<TrackingUtilities::WeightedRelation<const CDCFacet>>& inputFacetRelations,
   std::vector<CDCSegment2D>& outputSegments)
 {
   std::vector<ConstVectorRange<CDCFacet>> facetsByICluster =

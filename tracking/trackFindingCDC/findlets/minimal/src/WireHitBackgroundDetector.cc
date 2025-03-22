@@ -7,12 +7,13 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundDetector.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 WireHitBackgroundDetector::WireHitBackgroundDetector()
 {

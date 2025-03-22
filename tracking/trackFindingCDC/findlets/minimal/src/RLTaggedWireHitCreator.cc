@@ -7,13 +7,14 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/RLTaggedWireHitCreator.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 #include <vector>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 std::string RLTaggedWireHitCreator::getDescription()
 {

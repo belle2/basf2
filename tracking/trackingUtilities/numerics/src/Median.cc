@@ -5,16 +5,16 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/numerics/Median.h>
+#include <tracking/trackingUtilities/numerics/Median.h>
 
-#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/numerics/WeightComperator.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 #include <cmath>
 
 using namespace Belle2;
 
-double TrackFindingCDC::median(std::vector<double> values)
+double TrackingUtilities::median(std::vector<double> values)
 {
   auto notfinite = [](double v) { return not std::isfinite(v); };
   erase_remove_if(values, notfinite);
@@ -34,7 +34,7 @@ double TrackFindingCDC::median(std::vector<double> values)
   }
 }
 
-double TrackFindingCDC::weightedMedian(std::vector<WithWeight<double> > weightedValues)
+double TrackingUtilities::weightedMedian(std::vector<WithWeight<double> > weightedValues)
 {
   auto notfinite = [](const WithWeight<double>& weightedValue) {
     return not std::isfinite(weightedValue) or not std::isfinite(weightedValue.getWeight());

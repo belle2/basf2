@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
+#include <tracking/trackingUtilities/numerics/SpecialFunctions.h>
 
 #include <boost/math/tools/precision.hpp>
 #include <boost/math/special_functions/sinc.hpp>
@@ -13,14 +13,14 @@
 #include <cmath>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-double TrackFindingCDC::sinc(double x)
+double TrackingUtilities::sinc(double x)
 {
   return boost::math::sinc_pi(x);
 }
 
-double TrackFindingCDC::asinc(double x)
+double TrackingUtilities::asinc(double x)
 {
   // Implementation inspired by BOOST's sinc
   BOOST_MATH_STD_USING;

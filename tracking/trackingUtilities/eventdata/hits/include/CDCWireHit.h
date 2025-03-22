@@ -7,16 +7,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/topology/EStereoKind.h>
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
-#include <tracking/trackFindingCDC/topology/ILayer.h>
+#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/ILayer.h>
 
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
-#include <tracking/trackFindingCDC/numerics/Index.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/Index.h>
 
-#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
+#include <tracking/trackingUtilities/utilities/FunctorTag.h>
 
 #include <cdc/dataobjects/WireID.h>
 
@@ -30,7 +30,7 @@ namespace Belle2 {
     class TDCCountTranslatorBase;
     class ADCCountTranslatorBase;
   }
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrajectory2D;
     class CDCWireSuperLayer;
     class CDCWire; // IWYU pragma: keep

@@ -9,25 +9,27 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/topology/EStereoKind.h>
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
 
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
-#include <tracking/trackFindingCDC/numerics/ERotation.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/ERotation.h>
 
 namespace Belle2 {
   class CDCSimHit;
   class CDCHit;
 
   namespace TrackFindingCDC {
+    class CDCRecoHit2D;
+  }
+  namespace TrackingUtilities {
     // Forward declaration.
     class CDCTrajectory3D;
     class CDCTrajectory2D;
     class CDCTrajectorySZ;
-    class CDCRecoHit2D;
     class CDCWireHit;
     class CDCWire;
 
@@ -51,7 +53,7 @@ namespace Belle2 {
       CDCRecoHit3D() = default;
 
       /// Constructor taking all stored variables of the reconstructed hit.
-      CDCRecoHit3D(const CDCRLWireHit& rlWireHit, const Vector3D& recoPos3D, double arcLength2D = 0);
+      CDCRecoHit3D(const TrackFindingCDC::CDCRLWireHit& rlWireHit, const Vector3D& recoPos3D, double arcLength2D = 0);
 
       /**
        *  Constructs a three dimensional reconstructed hit from a sim hit and the associated wirehit.
@@ -75,7 +77,7 @@ namespace Belle2 {
        *  as seen from the xy plane. Hence also xy position and transverse travel distance are available.
        *  Only the stereo hits have then the full information to go head and make the sz trajectory.
        */
-      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit2D,
+      static CDCRecoHit3D reconstruct(const TrackFindingCDC::CDCRecoHit2D& recoHit2D,
                                       const CDCTrajectory2D& trajectory2D);
 
       /**
@@ -83,7 +85,7 @@ namespace Belle2 {
        *  information by shifting it to a z coordinate, where it touches the two dimensional trajectory
        *  from the side indicated by the right left passage.
        */
-      static CDCRecoHit3D reconstruct(const CDCRLWireHit& rlWireHit,
+      static CDCRecoHit3D reconstruct(const TrackFindingCDC::CDCRLWireHit& rlWireHit,
                                       const CDCTrajectory2D& trajectory2D);
 
       /**
@@ -108,7 +110,7 @@ namespace Belle2 {
                                              const CDCTrajectory2D& trajectory2D);
 
       /// Convenience function to call the other reconstruct method with the sz- and 2d-trajectory contained in the 3d one.
-      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
+      static CDCRecoHit3D reconstruct(const TrackFindingCDC::CDCRecoHit2D& recoHit,
                                       const CDCTrajectory3D& trajectory3D);
 
       /**
@@ -127,7 +129,7 @@ namespace Belle2 {
        *  at just calculated the transverse travel distance, since the trajectory should be more exact than the shifting
        *  along the wire.
        */
-      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit2D,
+      static CDCRecoHit3D reconstruct(const TrackFindingCDC::CDCRecoHit2D& recoHit2D,
                                       const CDCTrajectory2D& trajectory2D,
                                       const CDCTrajectorySZ& trajectorySZ);
 
@@ -243,13 +245,13 @@ namespace Belle2 {
       }
 
       /// Getter for the oriented wire hit.
-      const CDCRLWireHit& getRLWireHit() const
+      const TrackFindingCDC::CDCRLWireHit& getRLWireHit() const
       {
         return m_rlWireHit;
       }
 
       /// Setter for the oriented wire hit associated with the reconstructed hit.
-      void setRLWireHit(const CDCRLWireHit& rlWireHit)
+      void setRLWireHit(const TrackFindingCDC::CDCRLWireHit& rlWireHit)
       {
         m_rlWireHit = rlWireHit;
       }
@@ -321,13 +323,13 @@ namespace Belle2 {
        *  Constructs a two dimensional reconstructed hit by
        *  carrying out the stereo ! projection to the wire reference position.
        */
-      CDCRecoHit2D getRecoHit2D() const;
+      TrackFindingCDC::CDCRecoHit2D getRecoHit2D() const;
 
       /**
        *  Constructs a two dimensional reconstructed hit by
        *  carrying out the stereo ! projection to the wire reference position.
        */
-      CDCRecoHit2D stereoProjectToRef() const;
+      TrackFindingCDC::CDCRecoHit2D stereoProjectToRef() const;
 
       /// Returns the position of the wire in the xy plain the reconstructed position is located in.
       Vector2D getRecoWirePos2D() const;
@@ -382,7 +384,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the oriented wire hit reference.
-      CDCRLWireHit m_rlWireHit;
+      TrackFindingCDC::CDCRLWireHit m_rlWireHit;
 
       /// Memory for the reconstructed hit position.
       Vector3D m_recoPos3D;

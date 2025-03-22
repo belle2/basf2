@@ -5,20 +5,20 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/topology/EStereoKind.h>
+#include <tracking/trackingUtilities/topology/CDCWireSuperLayer.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <tracking/trackingUtilities/topology/EStereoKind.h>
 
-#include <tracking/trackFindingCDC/geometry/Circle2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Circle2D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
-#include <tracking/trackFindingCDC/numerics/Index.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/Index.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
@@ -34,7 +34,7 @@
 
 using namespace Belle2;
 using namespace CDC;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 TDCCountTranslatorBase& CDCWireHit::getTDCCountTranslator()
 {
@@ -136,22 +136,22 @@ bool CDCWireHit::operator<(const CDCHit& hit)
   return this->getWireID().getEWire() < hit.getID();
 }
 
-bool TrackFindingCDC::operator<(const CDCWireHit& wireHit, const CDCWireSuperLayer& wireSuperLayer)
+bool TrackingUtilities::operator<(const CDCWireHit& wireHit, const CDCWireSuperLayer& wireSuperLayer)
 {
   return wireHit.getISuperLayer() < wireSuperLayer.getISuperLayer();
 }
 
-bool TrackFindingCDC::operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCWireHit& wireHit)
+bool TrackingUtilities::operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCWireHit& wireHit)
 {
   return wireSuperLayer.getISuperLayer() < wireHit.getISuperLayer();
 }
 
-bool TrackFindingCDC::operator<(const CDCWireHit& wireHit, const CDCHit& hit)
+bool TrackingUtilities::operator<(const CDCWireHit& wireHit, const CDCHit& hit)
 {
   return wireHit.getWireID().getEWire() < hit.getID();
 }
 
-bool TrackFindingCDC::operator<(const CDCHit& hit, const CDCWireHit& wireHit)
+bool TrackingUtilities::operator<(const CDCHit& hit, const CDCWireHit& wireHit)
 {
   return hit.getID() < wireHit.getWireID().getEWire();
 }
@@ -224,7 +224,7 @@ double CDCWireHit::getRefCylindricalR() const
   return getWire().getRefCylindricalR();
 }
 
-std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const CDCWireHit& wirehit)
+std::ostream& TrackingUtilities::operator<<(std::ostream& output, const CDCWireHit& wirehit)
 {
   return output << "CDCWireHit(" << wirehit.getWireID()
          << ", drift length=" << wirehit.getRefDriftLength() << ")";

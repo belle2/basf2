@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.dcl.h>
 
 #include <vector>
 #include <string>
@@ -15,11 +15,13 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
+  }
+  namespace TrackFindingCDC {
 
     /// Class mapping the neighborhood of wires to the neighborhood of wire hits.
-    class WholeWireHitRelationFilter : public RelationFilter<CDCWireHit> {
+    class WholeWireHitRelationFilter : public TrackingUtilities::RelationFilter<TrackingUtilities::CDCWireHit> {
 
     public:
       /// Constructor form the default neighborhood degree
@@ -35,8 +37,8 @@ namespace Belle2 {
        *  Returns a vector containing the neighboring wire hits of the given wire hit out of the
        *  sorted range given by the two iterator other arguments.
        */
-      std::vector<CDCWireHit*> getPossibleTos(CDCWireHit* from,
-                                              const std::vector<CDCWireHit*>& wireHits) const final;
+      std::vector<TrackingUtilities::CDCWireHit*> getPossibleTos(TrackingUtilities::CDCWireHit* from,
+                                                                 const std::vector<TrackingUtilities::CDCWireHit*>& wireHits) const final;
 
     private:
       /// Degree of the neighbor extend

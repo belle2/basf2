@@ -5,14 +5,14 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
+#include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <ostream>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 ParameterLine2D ParameterLine2D::touchingCircles(const Vector2D& fromCenter,
                                                  const double fromSignedRadius,
@@ -36,7 +36,7 @@ ParameterLine2D ParameterLine2D::touchingCircles(const Vector2D& fromCenter,
   return ParameterLine2D::throughPoints(fromPos, toPos);
 }
 
-std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const ParameterLine2D& line)
+std::ostream& TrackingUtilities::operator<<(std::ostream& output, const ParameterLine2D& line)
 {
   output << "ParameterLine2D(" << line.support() << "," << line.tangential() << ")";
   return output;

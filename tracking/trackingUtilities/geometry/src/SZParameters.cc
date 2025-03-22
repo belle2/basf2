@@ -5,11 +5,11 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/geometry/SZParameters.h>
+#include <tracking/trackingUtilities/geometry/SZParameters.h>
 
-#include <tracking/trackFindingCDC/geometry/UncertainParameters.icc.h>
+#include <tracking/trackingUtilities/geometry/UncertainParameters.icc.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template struct TrackFindingCDC::UncertainParametersUtil<SZUtil, ESZParameter>;
+template struct TrackingUtilities::UncertainParametersUtil<SZUtil, ESZParameter>;

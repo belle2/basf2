@@ -5,16 +5,16 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
+#include <tracking/trackingUtilities/geometry/UncertainSZLine.h>
 
-#include <tracking/trackFindingCDC/geometry/SZLine.h>
+#include <tracking/trackingUtilities/geometry/SZLine.h>
 
 #include <ostream>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const UncertainSZLine& uncertainSZLine)
+std::ostream& TrackingUtilities::operator<<(std::ostream& output, const UncertainSZLine& uncertainSZLine)
 {
   return output << "UncertainSZLine("
          << "tanL=" << uncertainSZLine->slope() << ","

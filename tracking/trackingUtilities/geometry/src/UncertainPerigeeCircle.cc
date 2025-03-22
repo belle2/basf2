@@ -5,15 +5,15 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
 
-#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
-#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
+#include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
 
 #include <ostream>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 UncertainPerigeeCircle
 UncertainPerigeeCircle::average(const UncertainPerigeeCircle& fromPerigeeCircle,
@@ -36,7 +36,7 @@ UncertainPerigeeCircle::average(const UncertainPerigeeCircle& fromPerigeeCircle,
   return UncertainPerigeeCircle(avgPar, avgCov, chi2, ndf);
 }
 
-std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const UncertainPerigeeCircle& circle)
+std::ostream& TrackingUtilities::operator<<(std::ostream& output, const UncertainPerigeeCircle& circle)
 {
   return output << "UncertainPerigeeCircle("
          << "curvature=" << circle->curvature() << ","

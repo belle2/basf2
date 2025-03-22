@@ -5,32 +5,32 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
 
-#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
+#include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
 
-#include <tracking/trackFindingCDC/geometry/Circle2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Circle2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
-#include <tracking/trackFindingCDC/numerics/ERotation.h>
-#include <tracking/trackFindingCDC/numerics/Quadratic.h>
-#include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
-#include <tracking/trackFindingCDC/numerics/Angle.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/numerics/ERotation.h>
+#include <tracking/trackingUtilities/numerics/Quadratic.h>
+#include <tracking/trackingUtilities/numerics/SpecialFunctions.h>
+#include <tracking/trackingUtilities/numerics/Angle.h>
 
 #include <ostream>
 #include <utility>
 #include <cmath>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class GeneralizedCircle;
     class Line2D;
   }
 }
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 
@@ -347,7 +347,7 @@ void PerigeeCircle::setN(double n0, const Vector2D& n12, double n3)
   m_impact = distance(n0 / normalization); // Uses the new curvature
 }
 
-std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const PerigeeCircle& circle)
+std::ostream& TrackingUtilities::operator<<(std::ostream& output, const PerigeeCircle& circle)
 {
   return output << "PerigeeCircle("
          << "curvature=" << circle.curvature() << ","

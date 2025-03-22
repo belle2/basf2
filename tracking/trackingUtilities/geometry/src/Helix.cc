@@ -5,15 +5,15 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/geometry/Helix.h>
+#include <tracking/trackingUtilities/geometry/Helix.h>
 
-#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
-#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
-#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
-#include <tracking/trackFindingCDC/geometry/SZLine.h>
-#include <tracking/trackFindingCDC/geometry/SZParameters.h>
+#include <tracking/trackingUtilities/geometry/HelixParameters.h>
+#include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
+#include <tracking/trackingUtilities/geometry/SZLine.h>
+#include <tracking/trackingUtilities/geometry/SZParameters.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <boost/math/tools/minima.hpp>
 
@@ -24,7 +24,7 @@
 #include <cstdint>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) const
 {
@@ -107,7 +107,7 @@ HelixJacobian Helix::passiveMoveByJacobian(const Vector3D& by) const
   return jacobian;
 }
 
-std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const Helix& helix)
+std::ostream& TrackingUtilities::operator<<(std::ostream& output, const Helix& helix)
 {
   return output << "Helix("
          << "curv=" << helix.curvatureXY() << ","

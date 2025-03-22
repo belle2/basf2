@@ -5,20 +5,20 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/geometry/UncertainHelix.h>
+#include <tracking/trackingUtilities/geometry/UncertainHelix.h>
 
-#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
 
-#include <tracking/trackFindingCDC/geometry/Helix.h>
+#include <tracking/trackingUtilities/geometry/Helix.h>
 
-#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
-#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
-#include <tracking/trackFindingCDC/geometry/SZParameters.h>
+#include <tracking/trackingUtilities/geometry/HelixParameters.h>
+#include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
+#include <tracking/trackingUtilities/geometry/SZParameters.h>
 
 #include <ostream>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 UncertainHelix UncertainHelix::average(const UncertainHelix& fromHelix,
                                        const UncertainHelix& toHelix)
@@ -92,7 +92,7 @@ UncertainHelix UncertainHelix::average(const UncertainPerigeeCircle& fromPerigee
   return UncertainHelix(avgPar, avgCov, chi2, ndf);
 }
 
-std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const UncertainHelix& uncertainHelix)
+std::ostream& TrackingUtilities::operator<<(std::ostream& output, const UncertainHelix& uncertainHelix)
 {
   return output << "Uncertain" << uncertainHelix.helix();
 }

@@ -5,19 +5,19 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/geometry/UncertainParameters.icc.h>
+#include <tracking/trackingUtilities/geometry/UncertainParameters.icc.h>
 
-#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
+#include <tracking/trackingUtilities/geometry/HelixParameters.h>
 
-#include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
-#include <tracking/trackFindingCDC/numerics/ParameterVectorUtil.h>
+#include <tracking/trackingUtilities/numerics/CovarianceMatrixUtil.h>
+#include <tracking/trackingUtilities/numerics/ParameterVectorUtil.h>
 
-#include <tracking/trackFindingCDC/numerics/Angle.h>
+#include <tracking/trackingUtilities/numerics/Angle.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template struct TrackFindingCDC::UncertainParametersUtil<HelixUtil, EHelixParameter>;
+template struct TrackingUtilities::UncertainParametersUtil<HelixUtil, EHelixParameter>;
 
 HelixUtil::ParameterVector HelixUtil::reversalSigns()
 {

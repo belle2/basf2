@@ -5,9 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <TVector3.h>
 
@@ -15,7 +15,7 @@
 #include <ostream>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 Vector3D::Vector3D(const TVector3& tVector3)
   : m_xy(tVector3.X(), tVector3.Y())
@@ -74,7 +74,7 @@ Vector3D::operator const ROOT::Math::XYZVector() const
   return ROOT::Math::XYZVector(x(), y(), z());
 }
 
-std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const Vector3D& vector3D)
+std::ostream& TrackingUtilities::operator<<(std::ostream& output, const Vector3D& vector3D)
 {
   return output << "Vector3D(" << vector3D.x() << "," << vector3D.y() << "," << vector3D.z() << ")";
 }

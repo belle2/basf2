@@ -5,23 +5,23 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
+#include <tracking/trackingUtilities/geometry/GeneralizedCircle.h>
 
-#include <tracking/trackFindingCDC/geometry/Circle2D.h>
-#include <tracking/trackFindingCDC/geometry/Line2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Circle2D.h>
+#include <tracking/trackingUtilities/geometry/Line2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
-#include <tracking/trackFindingCDC/numerics/ERotation.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/numerics/ERotation.h>
 
-#include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
-#include <tracking/trackFindingCDC/numerics/Quadratic.h>
+#include <tracking/trackingUtilities/numerics/SpecialFunctions.h>
+#include <tracking/trackingUtilities/numerics/Quadratic.h>
 
 #include <ostream>
 #include <cmath>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 GeneralizedCircle::GeneralizedCircle()
   : m_n3(0.0)
@@ -359,7 +359,7 @@ Vector2D GeneralizedCircle::atArcLength(const double arcLength) const
   return Vector2D::compose(-n12().unit(), atX, atY);
 }
 
-std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const GeneralizedCircle& circle)
+std::ostream& TrackingUtilities::operator<<(std::ostream& output, const GeneralizedCircle& circle)
 {
   if (circle.isLine()) {
     output << "Line support point = " << circle.perigee();

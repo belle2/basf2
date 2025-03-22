@@ -6,10 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/geometry/SZLine.h>
+#include <tracking/trackingUtilities/geometry/SZLine.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 Vector2D SZLine::intersection(const SZLine& szLine) const
 {

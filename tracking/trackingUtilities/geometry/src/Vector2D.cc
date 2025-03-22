@@ -5,15 +5,15 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <sstream>
 #include <ostream>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const Vector2D& vector2D)
+std::ostream& TrackingUtilities::operator<<(std::ostream& output, const Vector2D& vector2D)
 {
   output << "Vector2D(" << vector2D.x() << "," << vector2D.y() << ")";
   return output;

@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/mva/PyEstimator.h>
+#include <tracking/trackingUtilities/mva/PyEstimator.h>
 #include <framework/utilities/FileSystem.h>
 
 #include <boost/python/import.hpp>
@@ -17,7 +17,7 @@
 #include <cstdio>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 PyEstimator::PyEstimator(const std::string& pickleFileName)
   : m_pickleFileName(pickleFileName)

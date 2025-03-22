@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
+#include <tracking/trackingUtilities/varsets/NamedFloatTuple.h>
 #include <boost/python/object.hpp>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     class NamedFloatTuple;
 

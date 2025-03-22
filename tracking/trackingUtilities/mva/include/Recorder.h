@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Named.h>
+#include <tracking/trackingUtilities/utilities/Named.h>
 
 #include <RtypesCore.h>
 
@@ -19,7 +19,7 @@
 class TTree;
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Class to fill a tree from a set of variables
     class Recorder {

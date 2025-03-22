@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Named.h>
+#include <tracking/trackingUtilities/utilities/Named.h>
 #include <RtypesCore.h>
 
 #include <vector>
@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Class to interact with the MVA package
     class MVAExpert {

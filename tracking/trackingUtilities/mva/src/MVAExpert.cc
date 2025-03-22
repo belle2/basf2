@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/mva/MVAExpert.h>
+#include <tracking/trackingUtilities/mva/MVAExpert.h>
 
 /** Impl Declaration **/
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
@@ -22,7 +22,7 @@ namespace Belle2 {
     class Weightfile;
   }
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /// Implementation of the class to interact with the MVA package
     class MVAExpert::Impl {
 
@@ -68,7 +68,7 @@ namespace Belle2 {
 #include <algorithm>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 MVAExpert::Impl::Impl(const std::string& identifier,
                       std::vector<Named<Float_t*> > namedVariables)

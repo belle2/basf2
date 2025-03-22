@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/mva/Recorder.h>
+#include <tracking/trackingUtilities/mva/Recorder.h>
 
 /** Impl Declaration **/
 #include <framework/datastore/StoreObjPtr.h>
@@ -18,7 +18,7 @@ class TTree;
 class TFile;
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Record the MVA variables
     class Recorder::Impl {
@@ -59,7 +59,7 @@ namespace Belle2 {
 #include <TTree.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 Recorder::Impl::Impl(const std::function<void(TTree&)>& setBranches,
                      const std::string& rootFileName,

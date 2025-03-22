@@ -7,8 +7,8 @@
  **************************************************************************/
 #include <gtest/gtest.h>
 
-#include <tracking/trackFindingCDC/mva/PyEstimator.h>
-#include <tracking/trackFindingCDC/utilities/TimeIt.h>
+#include <tracking/trackingUtilities/mva/PyEstimator.h>
+#include <tracking/trackingUtilities/utilities/TimeIt.h>
 
 #include <framework/logging/Logger.h>
 
@@ -20,8 +20,8 @@
 #include <cstdio>
 
 namespace {
-  using namespace Belle2::TrackFindingCDC;
-  TEST(TrackFindingCDCTest, PyEstimator_predict_regression)
+  using namespace Belle2::TrackingUtilities;
+  TEST(TrackingUtilitiesTest, PyEstimator_predict_regression)
   {
     Py_Initialize();
     // Create dummy regression object
@@ -57,7 +57,7 @@ with open("first_var_regressor.pickle", "wb") as first_var_regressor_file:
     remove("first_var_regressor.pickle");
   }
 
-  TEST(TrackFindingCDCTest, PyEstimator_predict_classifier)
+  TEST(TrackingUtilitiesTest, PyEstimator_predict_classifier)
   {
     Py_Initialize();
     // Create dummy regression object
@@ -98,7 +98,7 @@ with open("first_var_classifier.pickle", "wb") as first_var_classifier_file:
   }
 
 
-  TEST(TrackFindingCDCTest, PyEstimator_predict_sklearn_regressor)
+  TEST(TrackingUtilitiesTest, PyEstimator_predict_sklearn_regressor)
   {
     Py_Initialize();
     try {

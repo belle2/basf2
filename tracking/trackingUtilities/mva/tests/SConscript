@@ -2,7 +2,7 @@ Import('env')
 
 # Use the common libraries of the track finder for the test compilation
 env['LIBS'] = [
-    'tracking_trackFindingCDC',
+    'tracking_trackingUtilities',
     'framework',
     'boost_python',
     '$ROOT_LIBS',

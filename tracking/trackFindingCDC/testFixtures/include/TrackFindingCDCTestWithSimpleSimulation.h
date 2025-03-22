@@ -10,17 +10,17 @@
 #include <tracking/trackFindingCDC/display/EventDataPlotter.h>
 #include <tracking/trackFindingCDC/sim/CDCSimpleSimulation.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
 
-#include <tracking/trackFindingCDC/geometry/Helix.h>
+#include <tracking/trackingUtilities/geometry/Helix.h>
 
-#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
-#include <tracking/trackFindingCDC/utilities/TimeIt.h>
+#include <tracking/trackingUtilities/testFixtures/TrackingUtilitiesTestWithTopology.h>
+#include <tracking/trackingUtilities/utilities/TimeIt.h>
 
 #include <array>
 
@@ -29,7 +29,7 @@ namespace Belle2 {
 
     /// Equivalent to \sa TrackFindingCDCTestWithTopology for disabled tests.
     class TrackFindingCDCTestWithSimpleSimulation :
-      public TrackFindingCDCTestWithTopology {
+      public TrackingUtilities::TrackingUtilitiesTestWithTopology {
 
     public:
       TrackFindingCDCTestWithSimpleSimulation() : m_simpleSimulation()
@@ -59,32 +59,32 @@ namespace Belle2 {
       }
 
       /// Populate the event with hits generated from the given helices.
-      void simulate(const std::initializer_list<Helix>& helices)
+      void simulate(const std::initializer_list<TrackingUtilities::Helix>& helices)
       {
-        simulate(std::vector<Helix>(helices));
+        simulate(std::vector<TrackingUtilities::Helix>(helices));
       }
 
 
       /// Populate the event with hits generated from the given helices.
-      void simulate(const std::vector<Helix>& helices)
+      void simulate(const std::vector<TrackingUtilities::Helix>& helices)
       {
-        std::vector<CDCTrajectory3D> trajectories;
+        std::vector<TrackingUtilities::CDCTrajectory3D> trajectories;
         trajectories.reserve(helices.size());
-        for (const Helix& helix : helices) {
+        for (const TrackingUtilities::Helix& helix : helices) {
           // had to make the implicit conversion to an explicit conversion. Maybe there is a more elegant way to do it
-          trajectories.emplace_back(UncertainHelix(helix));
+          trajectories.emplace_back(TrackingUtilities::UncertainHelix(helix));
         }
         simulate(trajectories);
       }
 
       /// Populate the event with hits generated from the given trajectories.
-      void simulate(const std::initializer_list<CDCTrajectory3D>& trajectories)
+      void simulate(const std::initializer_list<TrackingUtilities::CDCTrajectory3D>& trajectories)
       {
-        simulate(std::vector<CDCTrajectory3D>(trajectories));
+        simulate(std::vector<TrackingUtilities::CDCTrajectory3D>(trajectories));
       }
 
       /// Populate the event with hits generated from the given trajectories.
-      void simulate(const std::vector<CDCTrajectory3D>& trajectories)
+      void simulate(const std::vector<TrackingUtilities::CDCTrajectory3D>& trajectories)
       {
         m_mcTrajectories = trajectories;
 
@@ -114,7 +114,7 @@ namespace Belle2 {
         }
 
         // Prepare the monte carlo segments
-        for (const CDCTrack& mcTrack : m_mcTracks) {
+        for (const TrackingUtilities::CDCTrack& mcTrack : m_mcTracks) {
           std::vector<CDCSegment3D> segment3DsInTrack = mcTrack.splitIntoSegments();
           for (const CDCSegment3D& segment3D :  segment3DsInTrack) {
             m_mcSegment2Ds.push_back(segment3D.stereoProjectToRef());
@@ -123,37 +123,37 @@ namespace Belle2 {
 
         // Filter the axial segments
         for (const CDCSegment2D& segment2D : m_mcSegment2Ds) {
-          if (segment2D.getStereoKind() == EStereoKind::c_Axial) {
+          if (segment2D.getStereoKind() == TrackingUtilities::EStereoKind::c_Axial) {
             m_mcAxialSegment2Ds.push_back(&segment2D);
           }
         }
 
         // Filter for axial hits
-        for (const CDCWireHit& wireHit : m_simpleSimulation.getWireHits()) {
+        for (const TrackingUtilities::CDCWireHit& wireHit : m_simpleSimulation.getWireHits()) {
           if (wireHit.isAxial()) {
             m_axialWireHits.push_back(&wireHit);
           }
         }
 
         // Pick up points for all hits
-        for (const CDCWireHit& wireHit : m_simpleSimulation.getWireHits()) {
+        for (const TrackingUtilities::CDCWireHit& wireHit : m_simpleSimulation.getWireHits()) {
           m_wireHits.push_back(&wireHit);
         }
 
-        m_plotter.draw(CDCWireTopology::getInstance());
-        for (const CDCWireHit& wireHit : m_simpleSimulation.getWireHits()) {
+        m_plotter.draw(TrackingUtilities::CDCWireTopology::getInstance());
+        for (const TrackingUtilities::CDCWireHit& wireHit : m_simpleSimulation.getWireHits()) {
           m_plotter.draw(wireHit);
         }
       }
 
       /// Add the Monte Carlo tracks to the event plot
       void plotMCTracks()
-      { for (const CDCTrack& mcTrack : m_mcTracks) m_plotter.draw(mcTrack); }
+      { for (const TrackingUtilities::CDCTrack& mcTrack : m_mcTracks) m_plotter.draw(mcTrack); }
 
       /// Add the Monte Carlo trajectories to the event plot
       void plotMCTrajectories()
       {
-        for (const CDCTrajectory3D& mcTrajectory : m_mcTrajectories) {
+        for (const TrackingUtilities::CDCTrajectory3D& mcTrajectory : m_mcTrajectories) {
           m_plotter.draw(mcTrajectory.getTrajectory2D());
         }
       }
@@ -175,22 +175,22 @@ namespace Belle2 {
        *  The default is to run it once.
        */
       template<class AFunction >
-      TimeItResult
+      TrackingUtilities::TimeItResult
       timeIt(size_t nExecutions,
              bool activateCallgrind,
              const AFunction& function,
-             const std::function<void()>& setUp = doNothing,
-             const std::function<void()>& tearDown = doNothing)
+             const std::function<void()>& setUp = TrackingUtilities::doNothing,
+             const std::function<void()>& tearDown = TrackingUtilities::doNothing)
       {
         bool run_disabled = ::testing::GTEST_FLAG(also_run_disabled_tests);
         if (not run_disabled) {
           nExecutions = 1;
         }
-        return Belle2::TrackFindingCDC::timeIt(nExecutions,
-                                               activateCallgrind,
-                                               function,
-                                               setUp,
-                                               tearDown);
+        return TrackingUtilities::timeIt(nExecutions,
+                                         activateCallgrind,
+                                         function,
+                                         setUp,
+                                         tearDown);
 
       }
 
@@ -230,10 +230,10 @@ namespace Belle2 {
       CDCSimpleSimulation m_simpleSimulation;
 
       /// Memory for the Monte Carlo trajectories of the current event.
-      std::vector<CDCTrajectory3D> m_mcTrajectories;
+      std::vector<TrackingUtilities::CDCTrajectory3D> m_mcTrajectories;
 
       /// Memory for the Monte Carlo tracks of the current event.
-      std::vector<CDCTrack> m_mcTracks;
+      std::vector<TrackingUtilities::CDCTrack> m_mcTracks;
 
       /// Memory for the Monte Carlo segments of the current event.
       std::vector<CDCSegment2D> m_mcSegment2Ds;
@@ -242,10 +242,10 @@ namespace Belle2 {
       std::vector<const CDCSegment2D*> m_mcAxialSegment2Ds;
 
       /// Memory for the axial hits of the current event.
-      std::vector<const CDCWireHit*> m_axialWireHits;
+      std::vector<const TrackingUtilities::CDCWireHit*> m_axialWireHits;
 
       /// Memory for the hits of the current event.
-      std::vector<const CDCWireHit*> m_wireHits;
+      std::vector<const TrackingUtilities::CDCWireHit*> m_wireHits;
 
     private:
       /// Plotter facility to generate visual representations

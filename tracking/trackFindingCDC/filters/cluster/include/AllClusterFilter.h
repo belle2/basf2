@@ -18,7 +18,7 @@ namespace Belle2 {
 
     public:
       /// Basic filter method to override. All implementation rejects all clusters.
-      Weight operator()(const CDCWireHitCluster& cluster) final;
+      TrackingUtilities::Weight operator()(const CDCWireHitCluster& cluster) final;
     };
   }
 }

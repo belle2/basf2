@@ -9,10 +9,11 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
-#include <tracking/trackFindingCDC/numerics/Angle.h>
+#include <tracking/trackingUtilities/numerics/Angle.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool FitlessSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* ptrSegmentRelation)
 {

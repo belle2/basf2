@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
 
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
@@ -21,6 +21,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 template class TrackFindingCDC::MCSymmetric<BaseSegmentRelationFilter>;
 

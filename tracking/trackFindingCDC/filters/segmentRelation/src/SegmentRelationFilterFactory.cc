@@ -13,18 +13,19 @@
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVAFeasibleSegmentRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVARealisticSegmentRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NotFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AndFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NotFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
 
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::FilterFactory<BaseSegmentRelationFilter>;
+template class TrackingUtilities::FilterFactory<BaseSegmentRelationFilter>;
 
 SegmentRelationFilterFactory::SegmentRelationFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

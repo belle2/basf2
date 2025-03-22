@@ -15,13 +15,14 @@
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVAFeasibleSegmentRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVARealisticSegmentRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/UnionRecordingFilter.icc.h>
 
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::UnionRecordingFilter<SegmentRelationFilterFactory>;
+template class TrackingUtilities::UnionRecordingFilter<SegmentRelationFilterFactory>;
 
 std::vector<std::string>
 UnionRecordingSegmentRelationFilter::getValidVarSetNames() const

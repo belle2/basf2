@@ -9,16 +9,16 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.icc.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/trackingUtilities/utilities/Relation.h>
+#include <tracking/trackingUtilities/utilities/VectorRange.h>
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
 
 #include <vector>
 #include <algorithm>
@@ -26,8 +26,9 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::RelationFilter<const CDCSegment2D>;
+template class TrackingUtilities::RelationFilter<const CDCSegment2D>;
 
 BaseSegmentRelationFilter::BaseSegmentRelationFilter() = default;
 

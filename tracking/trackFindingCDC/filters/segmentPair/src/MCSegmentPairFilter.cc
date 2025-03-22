@@ -18,6 +18,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 template class TrackFindingCDC::MCSymmetric<BaseSegmentPairFilter>;
 

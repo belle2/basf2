@@ -7,12 +7,13 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/MVAFeasibleSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::MVAFilter<MVAFeasibleSegmentPairVarSet>;
+template class TrackingUtilities::MVAFilter<MVAFeasibleSegmentPairVarSet>;
 
 MVAFeasibleSegmentPairFilter::MVAFeasibleSegmentPairFilter()
   : Super("trackfindingcdc_FeasibleSegmentPairFilter", 0.004, "trackfindingcdc_FeasibleSegmentPairFilterParameters")

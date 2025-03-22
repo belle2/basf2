@@ -12,6 +12,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool BasicSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 {

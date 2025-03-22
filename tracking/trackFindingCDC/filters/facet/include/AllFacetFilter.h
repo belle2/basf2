@@ -18,7 +18,7 @@ namespace Belle2 {
 
     public:
       /// Main filter method returning the weight of the facet. Returns 3 to accept all facets.
-      Weight operator()(const CDCFacet& facet __attribute__((unused))) final
+      TrackingUtilities::Weight operator()(const CDCFacet& facet __attribute__((unused))) final
       {
         return 3.0;
       }

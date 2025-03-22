@@ -42,7 +42,7 @@ namespace Belle2 {
        *  Main filter method returning the weight of the facet.
        *  Returns NAN if the cell shall be rejected.
        */
-      Weight operator()(const CDCFacet& facet) final;
+      TrackingUtilities::Weight operator()(const CDCFacet& facet) final;
 
     public:
       /// Setter for the flag that the borderline cases should be excluded.

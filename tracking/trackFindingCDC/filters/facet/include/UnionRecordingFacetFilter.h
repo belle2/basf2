@@ -9,9 +9,9 @@
 
 #include <tracking/trackFindingCDC/filters/facet/FacetFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/UnionRecordingFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+#include <tracking/trackingUtilities/varsets/BaseVarSet.h>
 
 #include <vector>
 #include <string>
@@ -22,18 +22,18 @@ namespace Belle2 {
     class CDCFacet;
 
     /// Filter to record multiple chooseable variable sets for facets
-    class UnionRecordingFacetFilter: public UnionRecordingFilter<FacetFilterFactory> {
+    class UnionRecordingFacetFilter: public TrackingUtilities::UnionRecordingFilter<FacetFilterFactory> {
 
     private:
       /// Type of the base class
-      using Super = UnionRecordingFilter<FacetFilterFactory>;
+      using Super = TrackingUtilities::UnionRecordingFilter<FacetFilterFactory>;
 
     public:
       /// Get the valid names of variable sets for facets.
       std::vector<std::string> getValidVarSetNames() const final;
 
       /// Create a concrete variables set for facets from a name.
-      std::unique_ptr<BaseVarSet<const CDCFacet>> createVarSet(const std::string& name) const final;
+      std::unique_ptr<TrackingUtilities::BaseVarSet<const CDCFacet>> createVarSet(const std::string& name) const final;
     };
   }
 }

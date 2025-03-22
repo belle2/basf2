@@ -12,26 +12,25 @@
 #include <tracking/trackFindingCDC/filters/facet/BasicFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/Chi2FacetFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterVarSet.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterVarSet.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCFacet;
 
     /// Variable set used in the application of mva methods for facet filtering
-    using MVAFacetVarSet = VariadicUnionVarSet<BasicFacetVarSet,
-          FilterVarSet<Chi2FacetFilter>>;
+    using MVAFacetVarSet = TrackingUtilities::VariadicUnionVarSet<BasicFacetVarSet, TrackingUtilities::FilterVarSet<Chi2FacetFilter>>;
 
     /// Background facet detection based on MVA.
-    class MVAFacetFilter: public MVA<BaseFacetFilter> {
+    class MVAFacetFilter: public TrackingUtilities::MVA<BaseFacetFilter> {
 
     public:
       /// Type of the base class
-      using Super = MVA<BaseFacetFilter>;
+      using Super = TrackingUtilities::MVA<BaseFacetFilter>;
 
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.
@@ -41,7 +40,7 @@ namespace Belle2 {
        *  Main filter method returning the weight of the facet.
        *  The size of the facet with a small penalty depending on the mva probability.
        */
-      Weight predict(const CDCFacet& facet) final;
+      TrackingUtilities::Weight predict(const CDCFacet& facet) final;
     };
   }
 }

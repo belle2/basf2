@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
 
 #include <vector>
 #include <array>
@@ -45,7 +45,7 @@ namespace Belle2 {
        *  Main filter method returning the weight of the facet
        *  Returns NAN if the cell shall be rejected.
        */
-      Weight operator()(const CDCFacet& facet) final;
+      TrackingUtilities::Weight operator()(const CDCFacet& facet) final;
 
     private: // Parameters
       /// Parameter : The chi2 cut values distinguished by superlayer
@@ -56,10 +56,10 @@ namespace Belle2 {
 
     private: // Cached values
       /// Memory for the chi2 cut values distinguished by superlayer
-      std::array<double, ISuperLayerUtil::c_N> m_chi2CutByISuperLayer{};
+      std::array<double, TrackingUtilities::ISuperLayerUtil::c_N> m_chi2CutByISuperLayer{};
 
       /// Memory for the chi2 cut values distinguished by superlayer
-      std::array<double, ISuperLayerUtil::c_N> m_penaltyWidthByISuperLayer{};
+      std::array<double, TrackingUtilities::ISuperLayerUtil::c_N> m_penaltyWidthByISuperLayer{};
     };
   }
 }

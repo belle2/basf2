@@ -6,14 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/collectors/matchers/MatcherInterface.h>
+#include <tracking/trackingUtilities/collectors/matchers/MatcherInterface.h>
 
-#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
+#include <tracking/trackingUtilities/numerics/WeightComperator.h>
 
 #include <gtest/gtest.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// Test derived class from a MatcherInterface
@@ -24,7 +24,7 @@ namespace {
     }
   };
   /// Test for the MatcherInterface
-  TEST(TrackFindingCDCTest, matcher_interface)
+  TEST(TrackingUtilitiesTest, matcher_interface)
   {
     SimpleMatcher matcher;
 

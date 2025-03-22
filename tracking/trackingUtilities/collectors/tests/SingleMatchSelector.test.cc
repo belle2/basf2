@@ -6,18 +6,18 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
+#include <tracking/trackingUtilities/collectors/selectors/SingleMatchSelector.h>
 
-#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
+#include <tracking/trackingUtilities/numerics/WeightComperator.h>
 
 #include <gtest/gtest.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// Test for the SingleMatchSelector
-  TEST(TrackFindingCDCTest, single_match_selector)
+  TEST(TrackingUtilitiesTest, single_match_selector)
   {
     SingleMatchSelector<int, double> selector;
 
@@ -47,7 +47,7 @@ namespace {
   }
 
   /// Test for the SingleMatchSelector with use single best set to false
-  TEST(TrackFindingCDCTest, single_best_match_selector)
+  TEST(TrackingUtilitiesTest, single_best_match_selector)
   {
     SingleMatchSelector<int, double> selector;
     selector.setUseOnlySingleBestCandidate(false);
@@ -89,7 +89,7 @@ namespace {
   };
 
   /// Test for the SingleMatchSelector using a custom comperator
-  TEST(TrackFindingCDCTest, single_match_selector_with_comparer)
+  TEST(TrackingUtilitiesTest, single_match_selector_with_comparer)
   {
     SingleMatchSelector<int, double, CustomComparer> selector;
 

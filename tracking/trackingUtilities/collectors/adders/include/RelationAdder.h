@@ -6,10 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/collectors/adders/AdderInterface.h>
+#include <tracking/trackingUtilities/collectors/adders/AdderInterface.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /** Class to add relations between the matched items. */
     template <class ACollectorItem, class ACollectionItem>
     class RelationAdder : public AdderInterface<ACollectorItem, ACollectionItem> {

@@ -6,18 +6,18 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/collectors/selectors/BestMatchSelector.h>
+#include <tracking/trackingUtilities/collectors/selectors/BestMatchSelector.h>
 
-#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
+#include <tracking/trackingUtilities/numerics/WeightComperator.h>
 
 #include <gtest/gtest.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// Test for the BestMatchSelector
-  TEST(TrackFindingCDCTest, best_match_selector)
+  TEST(TrackingUtilitiesTest, best_match_selector)
   {
     BestMatchSelector<int, double> selector;
 

@@ -6,18 +6,18 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/collectors/selectors/CutSelector.h>
+#include <tracking/trackingUtilities/collectors/selectors/CutSelector.h>
 
-#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
+#include <tracking/trackingUtilities/numerics/WeightComperator.h>
 
 #include <gtest/gtest.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// Test for the CutSelector
-  TEST(TrackFindingCDCTest, cut_selector)
+  TEST(TrackingUtilitiesTest, cut_selector)
   {
     CutSelector<int, double> selector;
 

@@ -10,15 +10,16 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool AdvancedSegmentVarSet::extract(const CDCSegment2D* segment)
 {

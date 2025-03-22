@@ -117,7 +117,7 @@ namespace Belle2 {
         filter->exposeParameters(&moduleParamList, prefix);
 
         std::map<std::string, std::string> filterParameters;
-        for (auto && name : moduleParamList.getParameterNames()) {
+        for (auto&& name : moduleParamList.getParameterNames()) {
           filterParameters[name] = moduleParamList.getParameterDescription(name);
         }
 

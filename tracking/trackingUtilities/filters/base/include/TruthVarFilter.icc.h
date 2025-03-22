@@ -28,7 +28,8 @@ namespace Belle2 {
     TruthVarFilter<ATruthVarSet>::~TruthVarFilter() = default;
 
     template<class ATruthVarSet>
-    auto TruthVarFilter<ATruthVarSet>::operator()(const Object& object) -> Weight {
+    auto TruthVarFilter<ATruthVarSet>::operator()(const Object& object) -> Weight
+    {
       Weight value = Super::operator()(object);
       if (std::isnan(value) or value == 0) return NAN;
       return 1.0;

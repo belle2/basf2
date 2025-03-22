@@ -9,10 +9,10 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/VectorRange.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
 
 #include <vector>
 #include <algorithm>
@@ -20,8 +20,9 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::RelationFilter<const CDCSegmentTriple>;
+template class TrackingUtilities::RelationFilter<const CDCSegmentTriple>;
 
 BaseSegmentTripleRelationFilter::BaseSegmentTripleRelationFilter() = default;
 

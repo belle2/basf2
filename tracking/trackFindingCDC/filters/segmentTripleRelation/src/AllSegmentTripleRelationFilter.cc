@@ -12,6 +12,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 Weight AllSegmentTripleRelationFilter::operator()(const CDCSegmentTriple& fromSegmentTriple
                                                   __attribute__((unused)),

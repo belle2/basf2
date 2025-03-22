@@ -6,16 +6,16 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <gtest/gtest.h>
 
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_identity)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMoveByJacobian_identity)
 {
   for (double curvature : { -1.0, 0.0, 1.0}) {
     PerigeeCircle circle(curvature, -M_PI / 2, 0.5);
@@ -35,7 +35,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_identity)
   }
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_roundtrip)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMoveByJacobian_roundtrip)
 {
   for (double curvature : { -1.0, 0.0, 1.0}) {
     PerigeeCircle circle(curvature, -M_PI / 2, 0.5);
@@ -79,7 +79,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_roundtrip
   }
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMoveByJacobian)
 {
   PerigeeCircle circle(1.0, -M_PI / 2, 0);
 
@@ -122,7 +122,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
   EXPECT_NEAR(2.0 * mu * nu, moveByTwoYJacobian(2, 2), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
 {
   PerigeeCovariance perigeeVariance;
   perigeeVariance(0, 0) = 1.0;
@@ -211,7 +211,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
   }
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMove)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMove)
 {
 
   PerigeeCovariance perigeeVariance;

@@ -6,15 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/GeneralizedCircle.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <gtest/gtest.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_Getters)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_Getters)
 {
   float absError = 10e-6;
 
@@ -38,7 +38,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_Getters)
   EXPECT_NEAR(0, circle.impact(), absError);
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_orientation)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_orientation)
 {
   GeneralizedCircle circle(1.0, 0.0, 0.0, 1.0);
   EXPECT_EQ(ERotation::c_CounterClockwise, circle.orientation());
@@ -53,7 +53,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_orientation)
   EXPECT_EQ(ERotation::c_Clockwise, reversedLine.orientation());
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_conformalTranform)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_conformalTranform)
 {
   Vector2D center(1.0, 0.0);
   double radius = 1.0;
@@ -92,7 +92,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_conformalTranform)
   EXPECT_NEAR(0.0, conformalCopy.impact(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_closest)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_closest)
 {
   GeneralizedCircle circle(0.0, -1.0, 0.0, 1.0 / 2.0);
   Vector2D up(1.0, 2.0);
@@ -110,7 +110,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_closest)
   EXPECT_NEAR(near.y(), closestOfNear.y(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthFactor)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_arcLengthFactor)
 {
   GeneralizedCircle circle(0.0, -1.0, 0.0, 1.0 / 2.0);
   double smallAngle = M_PI / 100;
@@ -120,7 +120,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthFactor)
   EXPECT_NEAR(expectedArcLengthFactor, circle.arcLengthFactor(near.cylindricalR()), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthBetween)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_arcLengthBetween)
 {
   GeneralizedCircle circle(0.0, -1.0, 0.0, 1.0 / 2.0);
   Vector2D origin(0.0, 0.0);
@@ -153,7 +153,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthBetween)
   EXPECT_NEAR(0, reverseLine.arcLengthBetween(origin, far), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_passiveMoveBy)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_passiveMoveBy)
 {
   Vector2D center(4.0, 2.0);
   double radius = 5.0;
@@ -166,7 +166,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_passiveMoveBy)
   EXPECT_NEAR(-1.0, circle.center().y(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_intersections)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_intersections)
 {
 
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(Vector2D(1.0, 1.0), 1);
@@ -184,7 +184,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_intersections)
   EXPECT_NEAR(1 - sqrt(2.0) / 2.0, intersection2.y(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atArcLength)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_atArcLength)
 {
   double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -212,7 +212,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atArcLength)
   EXPECT_NEAR(down.y(), atDown.y(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthToCylindricalR)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_arcLengthToCylindricalR)
 {
   double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -254,7 +254,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthToCylindricalR)
   }
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atCylindricalR)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_atCylindricalR)
 {
   double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -269,7 +269,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atCylindricalR)
   EXPECT_NEAR(-1, solutions.second.y(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isLine)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_isLine)
 {
   double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -285,7 +285,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isLine)
   EXPECT_TRUE(line.isLine());
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isCircle)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_isCircle)
 {
   double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -301,7 +301,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isCircle)
   EXPECT_FALSE(line.isCircle());
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_perigeeConversion)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_perigeeConversion)
 {
   float curvature = -0.5;
   float phi0 = M_PI / 2;
@@ -313,7 +313,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_perigeeConversion)
   EXPECT_NEAR(curvature, circle.curvature(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_distance)
+TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_distance)
 {
   float absError = 10e-6;
 

@@ -6,17 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
-#include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/GeneralizedCircle.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <gtest/gtest.h>
 
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_inheritance)
 {
 
   double curvature = 1.0;
@@ -53,7 +53,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
   EXPECT_NEAR(phi0, roundTripCircle2.phi0(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_isLine)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_isLine)
 {
   double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -69,7 +69,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_isLine)
   EXPECT_TRUE(line.isLine());
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_isCircle)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_isCircle)
 {
   double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -85,7 +85,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_isCircle)
   EXPECT_FALSE(line.isCircle());
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_orientation)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_orientation)
 {
   double curvature = 1;
   Vector2D phi0 = Vector2D::Phi(1);
@@ -105,7 +105,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_orientation)
   EXPECT_EQ(ERotation::c_Clockwise, reversedLine.orientation());
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalCylindricalR)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_minimalCylindricalR)
 {
   double curvature = 1.0 / 2.0;
   double tangtialPhi = M_PI / 4.0;
@@ -117,7 +117,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalCylindricalR)
   EXPECT_EQ(1, perigeeCircle.minimalCylindricalR());
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_maximalCylindricalR)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_maximalCylindricalR)
 {
   double curvature = 1.0 / 2.0;
   double tangtialPhi = M_PI / 4.0;
@@ -129,7 +129,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_maximalCylindricalR)
   EXPECT_EQ(3, perigeeCircle.maximalCylindricalR());
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setCenterAndRadius)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_setCenterAndRadius)
 {
   PerigeeCircle circle;
   Vector2D center(0.5, 0.0);
@@ -144,7 +144,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setCenterAndRadius)
   EXPECT_NEAR(0.0, circle.center().y(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_distance)
 {
 
   double curvature = -1.;
@@ -174,7 +174,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
   EXPECT_NEAR(-0.5, circle.distance(Vector2D(2.5, 1.0)), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_invalidate)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_invalidate)
 {
   PerigeeCircle defaultCircle;
   EXPECT_TRUE(defaultCircle.isInvalid());
@@ -201,7 +201,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_invalidate)
   EXPECT_TRUE(circle.isInvalid());
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveBy)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMoveBy)
 {
   Vector2D center(4.0, 2.0);
   double radius = 5.0;
@@ -214,7 +214,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveBy)
   EXPECT_NEAR(-3.0, circle.perigee().y(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_conformalTranform)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_conformalTranform)
 {
   Vector2D center(1.0, 0.0);
   double radius = 1.0;
@@ -252,7 +252,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_conformalTranform)
   EXPECT_NEAR(0.0, conformalCopy.impact(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_closest)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_closest)
 {
   PerigeeCircle circle(1.0, Vector2D(0.0, -1.0), 1.0);
   Vector2D up(2.0, 2.0);
@@ -270,7 +270,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_closest)
   EXPECT_NEAR(near.y(), closestOfNear.y(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atArcLength)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_atArcLength)
 {
   double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -298,7 +298,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atArcLength)
   EXPECT_NEAR(down.y(), atDown.y(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
 {
   double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -340,7 +340,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
   }
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atCylindricalR)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_atCylindricalR)
 {
   double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -355,7 +355,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atCylindricalR)
   EXPECT_NEAR(-1, solutions.second.y(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atCylindricalR_opposite_orientation)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_atCylindricalR_opposite_orientation)
 {
   double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -370,7 +370,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atCylindricalR_opposite_orienta
   EXPECT_NEAR(1, solutions.second.y(), 10e-7);
 }
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_OriginCircleFromPointDirection)
+TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_OriginCircleFromPointDirection)
 {
   double expectedCurvature = 1.0 / 2.0;
   double expectedPhi0 = M_PI / 4.0;

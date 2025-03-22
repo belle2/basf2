@@ -6,15 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/geometry/Helix.h>
+#include <tracking/trackingUtilities/geometry/Helix.h>
 
 #include <gtest/gtest.h>
 
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-TEST(TrackFindingCDCTest, geometry_Helix_closest)
+TEST(TrackingUtilitiesTest, geometry_Helix_closest)
 {
   // Tests the calculation of points of closest approach under various orientation of the helix.
   // Here this is done by moving the coordinate system and thereby changing the perigee point to
@@ -60,7 +60,7 @@ TEST(TrackFindingCDCTest, geometry_Helix_closest)
   }
 }
 
-TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToCylndricalR)
+TEST(TrackingUtilitiesTest, geometry_Helix_arcLength2DToCylndricalR)
 {
   double curvature = -1.0;
   double phi0 = +M_PI / 2.0;
@@ -87,7 +87,7 @@ TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToCylndricalR)
   EXPECT_TRUE(std::isnan(unreachableLowArcLength2D));
 }
 
-TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToXY)
+TEST(TrackingUtilitiesTest, geometry_Helix_arcLength2DToXY)
 {
   double curvature = -1.0;
   double phi0 = +M_PI / 2.0;

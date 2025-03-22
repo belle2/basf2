@@ -6,15 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <gtest/gtest.h>
 
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-TEST(TrackFindingCDCTest, geometry_Vector2D_isBetween)
+TEST(TrackingUtilitiesTest, geometry_Vector2D_isBetween)
 {
   {
     Vector2D lower = Vector2D::Phi(0);
@@ -65,7 +65,7 @@ TEST(TrackFindingCDCTest, geometry_Vector2D_isBetween)
   }
 }
 
-TEST(TrackFindingCDCTest, geometry_Vector2D_flippedOver)
+TEST(TrackingUtilitiesTest, geometry_Vector2D_flippedOver)
 {
   Vector2D diag(0.5, 0.5);
   Vector2D test(1, 0);
@@ -75,7 +75,7 @@ TEST(TrackFindingCDCTest, geometry_Vector2D_flippedOver)
   EXPECT_EQ(1, flippedOver.y());
 }
 
-TEST(TrackFindingCDCTest, geometry_Vector2D_flippedAlong)
+TEST(TrackingUtilitiesTest, geometry_Vector2D_flippedAlong)
 {
   Vector2D diag(0.5, 0.5);
   Vector2D test(1, 0);

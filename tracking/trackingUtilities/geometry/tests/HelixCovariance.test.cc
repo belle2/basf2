@@ -6,15 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
+#include <tracking/trackingUtilities/geometry/HelixParameters.h>
 
 #include <gtest/gtest.h>
 
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-TEST(TrackFindingCDCTest, geometry_HelixCovariance_constructFromPerigeeAndSZCovariance)
+TEST(TrackingUtilitiesTest, geometry_HelixCovariance_constructFromPerigeeAndSZCovariance)
 {
   PerigeeCovariance perigeeCovariance = PerigeeCovariance::Zero();
   {

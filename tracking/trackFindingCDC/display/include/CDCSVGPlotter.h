@@ -32,7 +32,7 @@ namespace Belle2 {
       /**
        * Draws the wires.
        */
-      void drawWires(const CDCWireTopology& cdcWireTopology);
+      void drawWires(const TrackingUtilities::CDCWireTopology& cdcWireTopology);
 
       /**
        * Draws the interaction point.

@@ -6,20 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackingUtilities/topology/CDCWire.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
-#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/topology/CDCWireSuperLayer.h>
+#include <tracking/trackingUtilities/topology/CDCWireLayer.h>
 
-#include <tracking/trackFindingCDC/topology/EWirePositionToCDC.h>
-#include <tracking/trackFindingCDC/topology/EWirePosition.h>
+#include <tracking/trackingUtilities/topology/EWirePositionToCDC.h>
+#include <tracking/trackingUtilities/topology/EWirePosition.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 const CDCWire* CDCWire::getInstance(const WireID& wireID)
 {

@@ -6,12 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/topology/CDCWireLayer.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CDCWireLayer::CDCWireLayer(const ConstVectorRange<CDCWire>& wireRange)
   : Super(wireRange)

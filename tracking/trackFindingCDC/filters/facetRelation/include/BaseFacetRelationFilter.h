@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.dcl.h>
 
 #include <vector>
 
@@ -16,10 +16,10 @@ namespace Belle2 {
     class CDCFacet;
 
     // Guard to prevent repeated instantiations
-    extern template class RelationFilter<const CDCFacet>;
+    // extern template class TrackingUtilities::RelationFilter<const CDCFacet>;
 
     /// Base class for filtering the neighborhood of facets.
-    class BaseFacetRelationFilter : public RelationFilter<const CDCFacet> {
+    class BaseFacetRelationFilter : public TrackingUtilities::RelationFilter<const CDCFacet> {
 
     public:
       /// Default constructor

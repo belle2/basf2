@@ -11,9 +11,9 @@
 
 #include <tracking/trackFindingCDC/filters/facetRelation/BasicFacetRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackingUtilities/utilities/Relation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -23,11 +23,11 @@ namespace Belle2 {
     using MVAFacetRelationVarSet = BasicFacetRelationVarSet;
 
     /// Background facetRelation detection based on MVA.
-    class MVAFacetRelationFilter: public MVA<BaseFacetRelationFilter> {
+    class MVAFacetRelationFilter: public TrackingUtilities::MVA<BaseFacetRelationFilter> {
 
     private:
       /// Type of the base class
-      using Super = MVA<BaseFacetRelationFilter>;
+      using Super = TrackingUtilities::MVA<BaseFacetRelationFilter>;
 
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.
@@ -37,7 +37,7 @@ namespace Belle2 {
        *  Main filter method returning the weight of the facet relation.
        *  The size of the facetRelation with a small penalty depending on the mva probability.
        */
-      Weight predict(const Relation<const CDCFacet>& facetRelation) final;
+      TrackingUtilities::Weight predict(const TrackingUtilities::Relation<const CDCFacet>& facetRelation) final;
     };
   }
 }

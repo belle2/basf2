@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/filters/facetRelation/BaseFacetRelationFilter.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
 
 #include <array>
 #include <vector>
@@ -42,7 +42,7 @@ namespace Belle2 {
 
     public:
       /// Main filter method returning the weight of the neighborhood relation.
-      Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final;
+      TrackingUtilities::Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final;
 
     private: // Parameters
       /// Parameter : The chi2 cut values distinguished by superlayer
@@ -53,10 +53,10 @@ namespace Belle2 {
 
     private: // Cached values
       /// Memory for the chi2 cut values distinguished by superlayer
-      std::array<double, ISuperLayerUtil::c_N> m_chi2CutByISuperLayer{};
+      std::array<double, TrackingUtilities::ISuperLayerUtil::c_N> m_chi2CutByISuperLayer{};
 
       /// Memory for the chi2 cut values distinguished by superlayer
-      std::array<double, ISuperLayerUtil::c_N> m_penaltyWidthByISuperLayer{};
+      std::array<double, TrackingUtilities::ISuperLayerUtil::c_N> m_penaltyWidthByISuperLayer{};
     };
   }
 }

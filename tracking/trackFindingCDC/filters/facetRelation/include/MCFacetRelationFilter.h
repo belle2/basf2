@@ -42,7 +42,7 @@ namespace Belle2 {
        *  Main filter method returning the weight of the neighborhood relation.
        *  Return NAN if relation shall be rejected.
        */
-      Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final;
+      TrackingUtilities::Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final;
 
     public:
       /// Setter for the allow reverse parameter

@@ -37,7 +37,7 @@ namespace Belle2 {
 
     public:
       /// Main filter method returning the weight of the neighborhood relation.
-      Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final;
+      TrackingUtilities::Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final;
 
     private:
       /// Memory for the used direction of flight deviation.

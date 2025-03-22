@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
+#include <tracking/trackingUtilities/utilities/CompositeProcessingSignalListener.h>
 
 #include <vector>
 #include <tuple>
@@ -16,7 +16,7 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /// Interface for a minimal algorithm part that wants to expose some parameters to a module
     template<class ... AIOTypes>
     class Findlet : public CompositeProcessingSignalListener {

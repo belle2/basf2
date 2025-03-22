@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+#include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
 
-#include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
+#include <tracking/trackingUtilities/utilities/EvalVariadic.h>
 
 #include <framework/core/Module.h>
 #include <framework/core/ModuleParamList.h>
@@ -19,7 +19,7 @@
 #include <array>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Adapter of a findlet to a module that exposes the parameters of the findlet and manages the IO with the DataStore
     template<class AFindlet>

@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/Path.h>
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/ca/Path.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
 #include <cassert>
 #include <cmath>
@@ -18,7 +18,7 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      *  Implements to pick up of the highest value path in neighborhood

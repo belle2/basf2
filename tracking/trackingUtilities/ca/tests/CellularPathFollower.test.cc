@@ -7,15 +7,15 @@
  **************************************************************************/
 #include <gtest/gtest.h>
 
-#include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/ca/WithAutomatonCell.h>
+#include <tracking/trackingUtilities/ca/MultipassCellularPathFinder.h>
+#include <tracking/trackingUtilities/ca/WithAutomatonCell.h>
 
 #include <utility>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-TEST(TrackFindingCDCTest, CellularPathFollower_followSingle)
+TEST(TrackingUtilitiesTest, CellularPathFollower_followSingle)
 {
   using Element = WithAutomatonCell<std::pair<int, int> >;
   Element startElement(std::make_pair(1, 1));

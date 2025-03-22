@@ -6,10 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/ca/Clusterizer.h>
+#include <tracking/trackingUtilities/ca/Clusterizer.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 

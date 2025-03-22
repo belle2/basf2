@@ -10,7 +10,7 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Type for a path through a neighborhood
     template<class T>

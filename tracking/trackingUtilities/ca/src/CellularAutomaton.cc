@@ -7,10 +7,10 @@
  **************************************************************************/
 
 
-#include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
+#include <tracking/trackingUtilities/ca/CellularAutomaton.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 

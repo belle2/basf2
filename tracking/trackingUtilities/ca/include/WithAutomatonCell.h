@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-#include <tracking/trackFindingCDC/utilities/Scalar.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/utilities/Scalar.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Mixin class to attach an automaton cell to an object or pointer.
     template<class T>

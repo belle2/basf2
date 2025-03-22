@@ -7,13 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
-#include <tracking/trackFindingCDC/ca/CellularPathFollower.h>
+#include <tracking/trackingUtilities/ca/CellularAutomaton.h>
+#include <tracking/trackingUtilities/ca/CellularPathFollower.h>
 
-#include <tracking/trackFindingCDC/ca/Path.h>
-#include <tracking/trackFindingCDC/ca/CellHolder.h>
+#include <tracking/trackingUtilities/ca/Path.h>
+#include <tracking/trackingUtilities/ca/CellHolder.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
@@ -21,7 +21,7 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /**
      *  Class to combine the run of the cellular automaton and the repeated path extraction.
      *  Execute the cellular automaton and extracting paths iteratively blocking the already used

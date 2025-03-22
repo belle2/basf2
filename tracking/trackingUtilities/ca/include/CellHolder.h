@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/IsApplicable.h>
+#include <tracking/trackingUtilities/utilities/IsApplicable.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class AutomatonCell;
 
     /// Getter functor for the automaton cell of an object

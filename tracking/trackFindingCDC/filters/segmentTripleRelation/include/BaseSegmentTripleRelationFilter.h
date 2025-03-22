@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.dcl.h>
 
 #include <vector>
 
@@ -16,10 +16,10 @@ namespace Belle2 {
     class CDCSegmentTriple;
 
     // Guard to prevent repeated instantiations
-    extern template class RelationFilter<const CDCSegmentTriple>;
+    // extern template class TrackingUtilities::RelationFilter<const CDCSegmentTriple>;
 
     /// Base class for filtering the neighborhood of segment triples
-    class BaseSegmentTripleRelationFilter : public RelationFilter<const CDCSegmentTriple> {
+    class BaseSegmentTripleRelationFilter : public TrackingUtilities::RelationFilter<const CDCSegmentTriple> {
 
     public:
       /// Default constructor

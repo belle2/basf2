@@ -7,17 +7,19 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
 
 #include <tracking/trackFindingCDC/filters/segmentTrack/BaseSegmentTrackFilter.h>
 
 #include <utility>
 
 namespace Belle2 {
+  namespace TrackingUtilities {
+    class CDCTrack;
+  }
   namespace TrackFindingCDC {
     class CDCSegment2D;
-    class CDCTrack;
 
     /// Names of the variables to be generated
     constexpr
@@ -49,13 +51,13 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct SegmentTrackVarNames : public VarNames<BaseSegmentTrackFilter::Object> {
+    struct SegmentTrackVarNames : public TrackingUtilities::VarNames<BaseSegmentTrackFilter::Object> {
 
       /// Number of variables to be generated
       // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
       // at least tell cppcheck that everything is fine
       // cppcheck-suppress duplInheritedMember
-      static const size_t nVars = size(segmentTrackVarNames);
+      static const size_t nVars = TrackingUtilities::size(segmentTrackVarNames);
 
       /// Getter for the name at the given index
       static constexpr char const* getName(int iName)
@@ -68,7 +70,7 @@ namespace Belle2 {
      *  Class to compute floating point variables from a segment to track match
      *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
-    class SegmentTrackVarSet : public VarSet<SegmentTrackVarNames> {
+    class SegmentTrackVarSet : public TrackingUtilities::VarSet<SegmentTrackVarNames> {
 
     public:
       /// Generate and assign the contained variables

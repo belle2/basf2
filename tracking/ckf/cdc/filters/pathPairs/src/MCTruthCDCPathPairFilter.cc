@@ -35,7 +35,7 @@ namespace {
   }
 }
 
-TrackFindingCDC::Weight MCTruthCDCPathPairFilter::operator()(const BaseCDCPathPairFilter::Object& pair)
+TrackingUtilities::Weight MCTruthCDCPathPairFilter::operator()(const BaseCDCPathPairFilter::Object& pair)
 {
   const auto& lhs = *pair.first;
   const auto& rhs = *pair.second;

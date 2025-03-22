@@ -6,15 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/svd/filters/relations/LooseSVDPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-TrackFindingCDC::Weight
+TrackingUtilities::Weight
 LooseSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation)
 {
   const CKFToSVDState::stateCache& currentStateCache = relation.first->getStateCache();
@@ -47,12 +47,12 @@ LooseSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFTo
 
 void LooseSVDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaOverlayRegionCut"), m_param_ThetaOverlayRegionPrecut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "thetaOverlayRegionCut"), m_param_ThetaOverlayRegionPrecut,
                                 "Pre-cut in theta for the overlay region.", m_param_ThetaOverlayRegionPrecut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiSeedHitCut"), m_param_PhiSeedHitPrecut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "phiSeedHitCut"), m_param_PhiSeedHitPrecut,
                                 "Pre-cut in phi for relations between seed states and hit states.", m_param_PhiSeedHitPrecut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitPrecut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitPrecut,
                                 "Pre-cut in phi for relations between hit states.", m_param_PhiHitHitPrecut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaHitHitCut"), m_param_ThetaHitHitPrecut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "thetaHitHitCut"), m_param_ThetaHitHitPrecut,
                                 "Pre-cut in theta for relations between hit states.", m_param_ThetaHitHitPrecut);
 }

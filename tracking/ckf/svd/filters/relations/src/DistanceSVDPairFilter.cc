@@ -6,14 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/svd/filters/relations/DistanceSVDPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-TrackFindingCDC::Weight
+TrackingUtilities::Weight
 DistanceSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation)
 {
   const CKFToSVDState& fromState = *(relation.first);

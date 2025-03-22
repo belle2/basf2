@@ -6,11 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
-#include <tracking/trackFindingCDC/numerics/LookupTable.h>
+#include <tracking/trackingUtilities/numerics/LookupTable.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CurvBinsSpec::CurvBinsSpec(double lowerBound, double upperBound, long nBins, int nOverlap, int nWidth)
   : m_lowerBound(lowerBound)

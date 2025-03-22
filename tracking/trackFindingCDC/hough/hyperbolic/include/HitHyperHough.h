@@ -8,7 +8,7 @@
 #pragma once
 #include <tracking/trackFindingCDC/hough/hyperbolic/HyperHough.h>
 #include <tracking/trackFindingCDC/hough/algorithms/FirstOfPairInBox.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/hough/algorithms/HitInHyperBox.h>
 
@@ -22,6 +22,6 @@ namespace Belle2 {
      * This class is only an alias. The real algorithm can be found in OtherSimpleBoxDivisionHoughTree and HitInHyperBox algorithm.
      */
     using HitHyperHough =
-      HyperHough<std::pair<CDCRecoHit3D, const CDCRLWireHit*>, FirstOfPairInBox<HitInHyperBox>, 4, 3, 2>;
+      HyperHough<std::pair<TrackingUtilities::CDCRecoHit3D, const CDCRLWireHit*>, FirstOfPairInBox<HitInHyperBox>, 4, 3, 2>;
   }
 }

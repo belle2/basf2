@@ -27,7 +27,7 @@
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CKFToPXDFindlet::~CKFToPXDFindlet() = default;
 
@@ -100,7 +100,7 @@ void CKFToPXDFindlet::beginEvent()
   m_seedStates.clear();
   checkResizeClear<CKFToPXDState>(m_states, 2000);
 
-  checkResizeClear<TrackFindingCDC::WeightedRelation<CKFToPXDState>>(m_relations, 2000);
+  checkResizeClear<TrackingUtilities::WeightedRelation<CKFToPXDState>>(m_relations, 2000);
 
   m_results.clear();
   m_filteredResults.clear();
@@ -119,7 +119,7 @@ void CKFToPXDFindlet::apply()
   const auto notFromPXD = [](const SpacePoint * spacePoint) {
     return spacePoint->getType() != VXD::SensorInfoBase::PXD;
   };
-  TrackFindingCDC::erase_remove_if(m_spacePointVector, notFromPXD);
+  TrackingUtilities::erase_remove_if(m_spacePointVector, notFromPXD);
 
   if (m_param_onlyUseTracksWithSVD) {
     const auto hasNoSVD = [this](const RecoTrack * recoTrack) {
@@ -129,7 +129,7 @@ void CKFToPXDFindlet::apply()
       return m_param_reverseSeed ? svdHitList.back()->getSensorID().getLayerNumber() > 4
              : svdHitList.front()->getSensorID().getLayerNumber() > 4;
     };
-    TrackFindingCDC::erase_remove_if(m_recoTracksVector, hasNoSVD);
+    TrackingUtilities::erase_remove_if(m_recoTracksVector, hasNoSVD);
   }
 
   B2DEBUG(29, "Now have " << m_spacePointVector.size() << " hits.");
@@ -147,7 +147,7 @@ void CKFToPXDFindlet::apply()
   const auto hasLowHitNumber = [this](const CKFResult<RecoTrack, SpacePoint>& result) {
     return result.getHits().size() < m_param_minimalHitRequirement;
   };
-  TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
+  TrackingUtilities::erase_remove_if(m_results, hasLowHitNumber);
 
   m_overlapResolver.apply(m_results, m_filteredResults);
 

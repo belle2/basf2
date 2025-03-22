@@ -7,22 +7,23 @@
  **************************************************************************/
 #include <gtest/gtest.h>
 
-#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
+#include <tracking/trackingUtilities/testFixtures/TrackingUtilitiesTestWithTopology.h>
 
 #include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
 
 #include <framework/utilities/TestHelpers.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-TEST_F(TrackFindingCDCTestWithTopology, filter_facet_FeasibleRLFacetFilter_accepts_long_para)
+TEST_F(TrackingUtilitiesTestWithTopology, filter_facet_FeasibleRLFacetFilter_accepts_long_para)
 {
   FeasibleRLFacetFilter filter;
 

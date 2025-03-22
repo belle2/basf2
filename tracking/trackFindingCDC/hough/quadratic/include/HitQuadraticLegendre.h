@@ -8,7 +8,7 @@
 #pragma once
 #include <tracking/trackFindingCDC/hough/quadratic/QuadraticLegendre.h>
 #include <tracking/trackFindingCDC/hough/algorithms/FirstOfPairInBox.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/hough/algorithms/HitInQuadraticBox.h>
 
@@ -21,6 +21,6 @@ namespace Belle2 {
      * This class is only an alias. The real algorithm can be found in SimpleBoxDivisionHoughTree.
      */
     using HitQuadraticLegendre =
-      QuadraticLegendre<std::pair<CDCRecoHit3D, const CDCRLWireHit*>, FirstOfPairInBox<HitInQuadraticBox>, 2, 2>;
+      QuadraticLegendre<std::pair<TrackingUtilities::CDCRecoHit3D, const CDCRLWireHit*>, FirstOfPairInBox<HitInQuadraticBox>, 2, 2>;
   }
 }

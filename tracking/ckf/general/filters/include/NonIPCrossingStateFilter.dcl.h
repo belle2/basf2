@@ -7,7 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/ckf/svd/filters/states/AllSVDStateFilter.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <string>
 
 namespace Belle2 {
@@ -31,7 +32,7 @@ namespace Belle2 {
     using Super = AllStateFilter;
   public:
     /// Main function testing the object for the direction
-    TrackFindingCDC::Weight operator()(const Object& pair) final;
+    TrackingUtilities::Weight operator()(const Object& pair) final;
 
     /// Expose the direction parameter
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
@@ -43,6 +44,6 @@ namespace Belle2 {
     /// Parameter for the distance given to the framework (can not handle EForwardBackward directly)
     std::string m_param_directionAsString = "unknown";
     /// Direction parameter converted from the string parameters
-    TrackFindingCDC::EForwardBackward m_param_direction = TrackFindingCDC::EForwardBackward::c_Unknown;
+    TrackingUtilities::EForwardBackward m_param_direction = TrackingUtilities::EForwardBackward::c_Unknown;
   };
 }

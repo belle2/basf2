@@ -181,7 +181,7 @@ TEST(TrackFindingCDCTest, PlainMatrix_minus)
   auto result = b - a;
   for (int i = 0; i < result.rows(); ++i) {
     for (int j = 0; j < result.cols(); ++j) {
-      EXPECT_EQ(1 , result(i, j));
+      EXPECT_EQ(1, result(i, j));
     }
   }
 }
@@ -271,7 +271,7 @@ TEST(TrackFindingCDCTest, PlainMatrixEigenMap_mapToEigen)
 
   for (int i = 0; i < result.rows(); ++i) {
     for (int j = 0; j < result.cols(); ++j) {
-      EXPECT_EQ(result(i, j) , eigenMap(i, j));
+      EXPECT_EQ(result(i, j), eigenMap(i, j));
     }
   }
 

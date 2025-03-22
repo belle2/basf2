@@ -69,7 +69,7 @@ WireNeighborKind CDCWireSuperLayer::getNeighborKind(ILayer iLayer,
     slope = -slope;
   }
 
-  int oClockDirection = moduloFast(slope + 3 , 12);
+  int oClockDirection = moduloFast(slope + 3, 12);
   return WireNeighborKind(cellDistance, oClockDirection);
 }
 
@@ -90,7 +90,7 @@ WireNeighborPair CDCWireSuperLayer::getNeighborsInwards(ILayer iLayer, IWire iWi
   } else {
     B2WARNING("Wire numbering shift bigger than one in magnitude. Adjust getNeighbor functions " << static_cast<int>(deltaShift));
     B2WARNING("From iLayer " << iLayer << " and wire " << iWire << " to iLayer " << iLayer - 1);
-    return WireNeighborPair(nullptr , nullptr);
+    return WireNeighborPair(nullptr, nullptr);
   }
 
 }
@@ -112,7 +112,7 @@ WireNeighborPair CDCWireSuperLayer::getNeighborsOutwards(ILayer iLayer, IWire iW
   } else {
     B2WARNING("Wire numbering shift bigger than one in magnitude. Adjust getNeighbor functions " << static_cast<int>(deltaShift));
     B2WARNING("From iLayer " << iLayer << " and wire " << iWire << " to iLayer " << iLayer + 1);
-    return WireNeighborPair(nullptr , nullptr);
+    return WireNeighborPair(nullptr, nullptr);
   }
 
 }

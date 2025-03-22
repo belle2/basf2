@@ -20,7 +20,7 @@ namespace Belle2 {
     class FiveHitFilter : public BasePathFilter {
     public:
       /// Return the weight based on azimuthal-angle separation
-      TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;
+      TrackingUtilities::Weight operator()(const BasePathFilter::Object& pair) override;
       /// Expose the parameters.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

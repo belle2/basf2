@@ -26,7 +26,7 @@ namespace Belle2 {
       /// Returns NAN if m_threeHitVariables.getCosAngleRZSimple() of the hit triplet is smaller than m_cosRZCut
       /// Returns NAN if m_threeHitVariables.getCircleDistanceIP() of the hit triplet is larger than m_circleIPDistanceCut
       /// Returns 1/m_threeHitVariables.getCircleDistanceIP() else
-      TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;
+      TrackingUtilities::Weight operator()(const BasePathFilter::Object& pair) override;
       /// Expose the parameters.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

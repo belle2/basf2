@@ -6,21 +6,21 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/vxdHoughTracking/filters/pathFilters/ThreeHitFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 using namespace vxdHoughTracking;
 
 void ThreeHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cosRZCut"), m_cosRZCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "cosRZCut"), m_cosRZCut,
                                 "Cut on the absolute value of cosine between the vectors (oHit - cHit) and (cHit - iHit).",
                                 m_cosRZCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleIPDistanceCut"), m_circleIPDistanceCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "circleIPDistanceCut"), m_circleIPDistanceCut,
                                 "Cut on the difference between circle radius and circle center to check whether the circle is compatible with passing through the IP.",
                                 m_circleIPDistanceCut);
 }
@@ -31,10 +31,10 @@ void ThreeHitFilter::beginRun()
   m_threeHitVariables.setBFieldZ(bFieldZ);
 }
 
-TrackFindingCDC::Weight
+TrackingUtilities::Weight
 ThreeHitFilter::operator()(const BasePathFilter::Object& pair)
 {
-  const std::vector<TrackFindingCDC::WithWeight<const VXDHoughState*>>& previousHits = pair.first;
+  const std::vector<TrackingUtilities::WithWeight<const VXDHoughState*>>& previousHits = pair.first;
 
   // Do nothing if path is too short or too long
   if (previousHits.size() != 2) {

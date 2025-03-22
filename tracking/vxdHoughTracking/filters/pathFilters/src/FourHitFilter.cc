@@ -6,22 +6,22 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/vxdHoughTracking/filters/pathFilters/FourHitFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 using namespace vxdHoughTracking;
 
 void FourHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleRadiusDifferenceCut"), m_CircleRadiusDifferenceCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "circleRadiusDifferenceCut"), m_CircleRadiusDifferenceCut,
                                 "Cut on the difference of the radii of the two circles that can be defined by two hit triplets.",
                                 m_CircleRadiusDifferenceCut);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleCenterPositionDifferenceCut"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "circleCenterPositionDifferenceCut"),
                                 m_CircleCenterPositionDifferenceCut,
                                 "Cut on the difference between the center positions of the two circles that can be defined by two hit triplets.",
                                 m_CircleCenterPositionDifferenceCut);
@@ -33,10 +33,10 @@ void FourHitFilter::beginRun()
   m_fourHitVariables.setBFieldZ(bFieldZ);
 }
 
-TrackFindingCDC::Weight
+TrackingUtilities::Weight
 FourHitFilter::operator()(const BasePathFilter::Object& pair)
 {
-  const std::vector<TrackFindingCDC::WithWeight<const VXDHoughState*>>& previousHits = pair.first;
+  const std::vector<TrackingUtilities::WithWeight<const VXDHoughState*>>& previousHits = pair.first;
 
   // Do nothing if path is too short or too long
   if (previousHits.size() != 3) {

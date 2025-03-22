@@ -13,13 +13,13 @@
 #include <tracking/vxdHoughTracking/filters/pathFilters/FiveHitFilter.h>
 #include <tracking/vxdHoughTracking/filters/pathFilters/TwoHitVirtualIPQIFilter.h>
 #include <tracking/vxdHoughTracking/filters/pathFilters/QualityIndicatorFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 using namespace vxdHoughTracking;
 
 PathFilterFactory::PathFilterFactory(const std::string& defaultFilterName)
@@ -57,11 +57,11 @@ std::unique_ptr<BasePathFilter>
 PathFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
-    return std::make_unique<TrackFindingCDC::AllFilter<BasePathFilter>>();
+    return std::make_unique<TrackingUtilities::AllFilter<BasePathFilter>>();
   }
   // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BasePathFilter>>();
+    return std::make_unique<TrackingUtilities::NoneFilter<BasePathFilter>>();
   }
   // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "twoHitVirtualIP") {

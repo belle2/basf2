@@ -9,11 +9,11 @@
 #include <tracking/vxdHoughTracking/findlets/LimitedOnHitApplier.icc.h>
 #include <tracking/vxdHoughTracking/findlets/PathLengthToggledApplier.icc.h>
 #include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 using namespace vxdHoughTracking;
 
 template class
-Belle2::vxdHoughTracking::PathLengthToggledApplier<VXDHoughState, LimitedOnHitApplier<VXDHoughState, ChooseableFilter<PathFilterFactory>>>;
+Belle2::vxdHoughTracking::PathLengthToggledApplier<VXDHoughState, LimitedOnHitApplier<VXDHoughState, TrackingUtilities::ChooseableFilter<PathFilterFactory>>>;

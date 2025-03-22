@@ -24,7 +24,7 @@ namespace Belle2 {
       /// Returns NAN if m_fourHitVariables.getCircleRadiusDifference() of the hit triplet is larger than m_CircleRadiusDifferenceCut
       /// Returns NAN if m_fourHitVariables.getCircleCenterPositionDifference() of the hit triplet is larger than m_CircleCenterPositionDifferenceCut
       /// Returns 1/m_fourHitVariables.getCircleRadiusDifference() else
-      TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;
+      TrackingUtilities::Weight operator()(const BasePathFilter::Object& pair) override;
       /// Expose the parameters.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

@@ -20,7 +20,7 @@ namespace Belle2 {
       /// Return the weight based on the quality estimator.
       /// Returns the QI value obtained from the fit with the chosen QualityEstimator if above the m_QIcut,
       /// and NAN if the QI is below the cut.
-      TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;
+      TrackingUtilities::Weight operator()(const BasePathFilter::Object& pair) override;
       /// Expose the parameters.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

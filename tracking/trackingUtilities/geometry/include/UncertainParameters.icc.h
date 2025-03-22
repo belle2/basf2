@@ -26,12 +26,14 @@ namespace Belle2 {
     template <class T, class AEParameters>
     auto UncertainParametersUtil<T, AEParameters>::transported(const JacobianMatrix& jacobian,
                                                                const CovarianceMatrix& cov)
-    -> CovarianceMatrix {
+    -> CovarianceMatrix
+    {
       return CovarianceMatrixUtil::transported(jacobian, cov);
     }
 
     template <class T, class AEParameters>
-    auto UncertainParametersUtil<T, AEParameters>::reversalJacobian() -> JacobianMatrix {
+    auto UncertainParametersUtil<T, AEParameters>::reversalJacobian() -> JacobianMatrix
+    {
       return JacobianMatrixUtil::scale(T::reversalSigns());
     }
 
@@ -43,12 +45,14 @@ namespace Belle2 {
 
     template <class T, class AEParameters>
     auto UncertainParametersUtil<T, AEParameters>::reversed(const CovarianceMatrix& cov)
-    -> CovarianceMatrix {
+    -> CovarianceMatrix
+    {
       return transported(reversalJacobian(), cov);
     }
 
     template <class T, class AEParameters>
-    auto UncertainParametersUtil<T, AEParameters>::identity() -> CovarianceMatrix {
+    auto UncertainParametersUtil<T, AEParameters>::identity() -> CovarianceMatrix
+    {
       return CovarianceMatrixUtil::identity<c_N>();
     }
 
@@ -71,28 +75,32 @@ namespace Belle2 {
     template <class T, class AEParameters>
     auto
     UncertainParametersUtil<T, AEParameters>::covarianceFromPrecision(const PrecisionMatrix& prec)
-    -> CovarianceMatrix {
+    -> CovarianceMatrix
+    {
       return CovarianceMatrixUtil::fromPrecision(prec);
     }
 
     template <class T, class AEParameters>
     auto
     UncertainParametersUtil<T, AEParameters>::precisionFromCovariance(const CovarianceMatrix& cov)
-    -> PrecisionMatrix {
+    -> PrecisionMatrix
+    {
       return CovarianceMatrixUtil::toPrecision(cov);
     }
 
     template <class T, class AEParameters>
     auto
     UncertainParametersUtil<T, AEParameters>::covarianceFromFullPrecision(const PrecisionMatrix& prec)
-    -> CovarianceMatrix {
+    -> CovarianceMatrix
+    {
       return CovarianceMatrixUtil::fromFullPrecision(prec);
     }
 
     template <class T, class AEParameters>
     auto
     UncertainParametersUtil<T, AEParameters>::precisionFromFullCovariance(const CovarianceMatrix& cov)
-    -> PrecisionMatrix {
+    -> PrecisionMatrix
+    {
       return CovarianceMatrixUtil::fullToPrecision(cov);
     }
   }

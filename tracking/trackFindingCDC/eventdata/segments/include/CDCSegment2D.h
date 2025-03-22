@@ -11,11 +11,17 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
 #include <vector>
 
 namespace Belle2 {
+  namespace TrackingUtilities {
+    class CDCWire;
+
+    template<class T, class S> class WeightedRelation;
+    template<class T, class S> class Relation;
+  }
   namespace TrackFindingCDC {
 
     class CDCFacetSegment;
@@ -25,11 +31,6 @@ namespace Belle2 {
 
     class CDCFacet;
     class CDCTangent;
-
-    class CDCWire;
-
-    template<class T, class S> class WeightedRelation;
-    template<class T, class S> class Relation;
 
     //! A reconstructed sequence of two dimensional hits in one super layer
     class CDCSegment2D : public CDCSegment<CDCRecoHit2D> {
@@ -80,15 +81,15 @@ namespace Belle2 {
       bool operator<(const CDCSegment2D& segment2D) const;
 
       //! Helper constructor to create a relation in python
-      Relation<const CDCSegment2D, const CDCSegment2D>
+      TrackingUtilities::Relation<const CDCSegment2D, const CDCSegment2D>
       makeRelation(const CDCSegment2D* segment) const;
 
       //! Helper constructor to create a relation in python
-      WeightedRelation<const CDCSegment2D, const CDCSegment2D>
+      TrackingUtilities::WeightedRelation<const CDCSegment2D, const CDCSegment2D>
       makeWeightedRelation(double weight, const CDCSegment2D* segment) const;
 
       //! Getter for the vector of wires the hits of this segment are based on in the same order.
-      std::vector<const CDCWire*> getWireSegment() const;
+      std::vector<const TrackingUtilities::CDCWire*> getWireSegment() const;
 
       //! Getter for the vector of the wire hits of this segment are based on in the same order.
       CDCWireHitSegment getWireHitSegment() const;
@@ -112,13 +113,13 @@ namespace Belle2 {
       void reverse();
 
       //! Mutable getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() const
+      TrackingUtilities::AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
       }
 
       //! Indirection to the automaton cell for easier access to the flags
-      AutomatonCell* operator->() const
+      TrackingUtilities::AutomatonCell* operator->() const
       {
         return &m_automatonCell;
       }
@@ -166,7 +167,7 @@ namespace Belle2 {
        *  It is declared mutable because it can vary
        *  rather freely despite of the hit content might be required fixed.
        */
-      mutable AutomatonCell m_automatonCell;
+      mutable TrackingUtilities::AutomatonCell m_automatonCell;
 
       //! Memory for the global super cluster id.
       mutable int m_iSuperCluster = -1;

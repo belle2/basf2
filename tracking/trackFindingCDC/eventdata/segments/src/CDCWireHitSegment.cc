@@ -7,10 +7,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 std::vector<const CDCWire*> CDCWireHitSegment::getWireSegment() const
 {

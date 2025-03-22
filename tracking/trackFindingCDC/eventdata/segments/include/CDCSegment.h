@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
-#include <tracking/trackFindingCDC/topology/EStereoKind.h>
+#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <tracking/trackingUtilities/topology/EStereoKind.h>
 
 #include <vector>
 
@@ -32,27 +32,27 @@ namespace Belle2 {
        * returns the stereo type of the later. Returns EStereoKind::c_Invalid if the superlayer \n
        * is not shared among the tracking hits.
        */
-      EStereoKind getStereoKind() const
+      TrackingUtilities::EStereoKind getStereoKind() const
       {
-        return ISuperLayerUtil::getStereoKind(getISuperLayer());
+        return  TrackingUtilities::ISuperLayerUtil::getStereoKind(getISuperLayer());
       }
 
       /// Indicator if the underlying wires are axial.
       bool isAxial() const
       {
-        return getStereoKind() == EStereoKind::c_Axial;
+        return getStereoKind() ==  TrackingUtilities::EStereoKind::c_Axial;
       }
 
       /**
        * Returns the common super layer id of all stored tracking hits
        *
        * This checks if all items are located in the same superlayer and
-       * returns the superlayer id of the later. Returns ISuperLayerUtil::c_Invalid,
+       * returns the superlayer id of the later. Returns  TrackingUtilities::ISuperLayerUtil::c_Invalid,
        * if the superlayer is not shared among the hits.
        */
-      ISuperLayer getISuperLayer() const
+      TrackingUtilities::ISuperLayer getISuperLayer() const
       {
-        return ISuperLayerUtil::getFrom(this->front());
+        return  TrackingUtilities::ISuperLayerUtil::getFrom(this->front());
       }
 
       /// Legacy accessor for the items of the segments, still used in some corners
@@ -62,13 +62,13 @@ namespace Belle2 {
       }
 
       /// Getter for the two dimensional trajectory fitted to the segment
-      CDCTrajectory2D& getTrajectory2D() const
+      TrackingUtilities::CDCTrajectory2D& getTrajectory2D() const
       {
         return m_trajectory2D;
       }
 
       /// Setter for the two dimensional trajectory fitted to the segment
-      void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const
+      void setTrajectory2D(const TrackingUtilities::CDCTrajectory2D& trajectory2D) const
       {
         m_trajectory2D = trajectory2D;
       }
@@ -96,7 +96,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the two dimensional trajectory fitted to this segment
-      mutable CDCTrajectory2D m_trajectory2D;
+      mutable TrackingUtilities::CDCTrajectory2D m_trajectory2D;
 
       /// Boolean flag to indicate that this segment has a valid alias version
       double m_aliasScore;

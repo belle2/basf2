@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 #include <framework/logging/Logger.h>
 
@@ -26,6 +26,7 @@ namespace Belle2 {
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CDCFacetSegment CDCFacetSegment::create(const CDCRLWireHitSegment& rlWireHitSegment)
 {

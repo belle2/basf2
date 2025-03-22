@@ -10,14 +10,16 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
+  }
+  namespace TrackFindingCDC {
 
     /// An aggregation of CDCWireHits.
-    class CDCWireHitCluster : public std::vector<CDCWireHit*> {
+    class CDCWireHitCluster : public std::vector<TrackingUtilities::CDCWireHit*> {
 
       /// Type of the base class
-      using Super = std::vector<CDCWireHit*>;
+      using Super = std::vector<TrackingUtilities::CDCWireHit*>;
 
     public:
       /// Default constructor
@@ -28,7 +30,7 @@ namespace Belle2 {
 
       /// Constructor from a bunch of wire hits
       // cppcheck-suppress passedByValue
-      explicit CDCWireHitCluster(std::vector<CDCWireHit*> wireHits)
+      explicit CDCWireHitCluster(std::vector<TrackingUtilities::CDCWireHit*> wireHits)
         : Super(std::move(wireHits))
       {
       }

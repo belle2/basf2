@@ -8,23 +8,25 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
 namespace Belle2 {
+  namespace TrackingUtilities {
+    class CDCTrajectory2D;
+  }
   namespace TrackFindingCDC {
     class CDCSegment2D;
-    class CDCTrajectory2D;
 
     /// A segment consisting of three dimensional reconstructed hits.
-    class CDCSegment3D : public CDCSegment<CDCRecoHit3D> {
+    class CDCSegment3D : public CDCSegment<TrackingUtilities::CDCRecoHit3D> {
 
     public:
       /// Reconstructs a two dimensional stereo segment by shifting each hit onto the given two dimensional trajectory.
       static CDCSegment3D reconstruct(const CDCSegment2D& segment2D,
-                                      const CDCTrajectory2D& trajectory2D);
+                                      const TrackingUtilities::CDCTrajectory2D& trajectory2D);
 
       /**
        *  Constructs a two dimensional segment by carrying out the stereo ! projection to the wire reference position.
@@ -33,13 +35,13 @@ namespace Belle2 {
       CDCSegment2D stereoProjectToRef() const;
 
       /// Mutable getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() const
+      TrackingUtilities::AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
       }
 
       /// Indirection to the automaton cell for easier access to the flags
-      AutomatonCell* operator->() const
+      TrackingUtilities::AutomatonCell* operator->() const
       {
         return &m_automatonCell;
       }
@@ -64,13 +66,13 @@ namespace Belle2 {
       void receiveMaskedFlag(bool fromHits = true) const;
 
       /// Getter for the two dimensional trajectory fitted to the segment
-      CDCTrajectory3D& getTrajectory3D() const
+      TrackingUtilities::CDCTrajectory3D& getTrajectory3D() const
       {
         return m_trajectory3D;
       }
 
       /// Setter for the two dimensional trajectory fitted to the segment
-      void setTrajectory3D(const CDCTrajectory3D& trajectory3D) const
+      void setTrajectory3D(const TrackingUtilities::CDCTrajectory3D& trajectory3D) const
       {
         m_trajectory3D = trajectory3D;
       }
@@ -81,10 +83,10 @@ namespace Belle2 {
        *  It is declared mutable because it can vary
        *  rather freely despite of the hit content might be required fixed.
        */
-      mutable AutomatonCell m_automatonCell;
+      mutable TrackingUtilities::AutomatonCell m_automatonCell;
 
       /// Memory for the three dimensional trajectory fitted to this segment
-      mutable CDCTrajectory3D m_trajectory3D;
+      mutable TrackingUtilities::CDCTrajectory3D m_trajectory3D;
     };
   }
 }

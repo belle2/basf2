@@ -15,7 +15,7 @@ namespace Belle2 {
   class CylinderDistancePXDPairFilter : public BasePXDPairFilter {
   public:
     /// Return the weight based on azimuthal-angle separation
-    TrackFindingCDC::Weight operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation) override;
+    TrackingUtilities::Weight operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation) override;
     /// Expose the parameters.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

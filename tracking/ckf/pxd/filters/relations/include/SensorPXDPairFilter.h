@@ -15,7 +15,7 @@ namespace Belle2 {
   class SensorPXDPairFilter : public BasePXDPairFilter {
   public:
     /// Return the weight based on layer
-    TrackFindingCDC::Weight operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation) override;
+    TrackingUtilities::Weight operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation) override;
     /// Expose the parameters.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

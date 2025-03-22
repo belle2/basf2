@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/pxd/filters/relations/InterceptDistancePXDPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/PXDIntercept.h>
@@ -15,13 +15,13 @@
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-TrackFindingCDC::Weight
+TrackingUtilities::Weight
 InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation)
 {
   const CKFToPXDState& fromState = *(relation.first);
@@ -99,30 +99,30 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
 
 void InterceptDistancePXDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ptThresholdTrackToHitCut"), m_param_PtThresholdTrackToHitCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "ptThresholdTrackToHitCut"), m_param_PtThresholdTrackToHitCut,
                                 "Threshold on pT to apply inverse pT scale on cut value.",
                                 m_param_PtThresholdTrackToHitCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiInterceptToHitCut"), m_param_PhiInterceptToHitCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "phiInterceptToHitCut"), m_param_PhiInterceptToHitCut,
                                 "Cut in phi for the difference between PXDIntercept from RecoTrack on the same layer and current hit-based state.",
                                 m_param_PhiInterceptToHitCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "etaInterceptToHitCut"), m_param_EtaInterceptToHitCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "etaInterceptToHitCut"), m_param_EtaInterceptToHitCut,
                                 "Cut in eta for the difference between PXDIntercept from RecoTrack on the same layer and current hit-based state.",
                                 m_param_EtaInterceptToHitCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiRecoTrackToHitCut"), m_param_PhiRecoTrackToHitCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "phiRecoTrackToHitCut"), m_param_PhiRecoTrackToHitCut,
                                 "Cut in phi for the difference between RecoTrack information and current hit-based state.",
                                 m_param_PhiRecoTrackToHitCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "etaRecoTrackToHitCut"), m_param_EtaRecoTrackToHitCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "etaRecoTrackToHitCut"), m_param_EtaRecoTrackToHitCut,
                                 "Cut in eta for the difference between RecoTrack information and current hit-based state.",
                                 m_param_EtaRecoTrackToHitCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitCut,
                                 "Cut in phi between two hit-based states.", m_param_PhiHitHitCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "etaHitHitCut"), m_param_EtaHitHitCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "etaHitHitCut"), m_param_EtaHitHitCut,
                                 "Cut in eta between two hit-based states.", m_param_EtaHitHitCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiOverlapHitHitCut"), m_param_PhiOverlapHitHitCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "phiOverlapHitHitCut"), m_param_PhiOverlapHitHitCut,
                                 "Cut in phi between two hit-based states in ladder overlap.", m_param_PhiOverlapHitHitCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "etaOverlapHitHitCut"), m_param_EtaOverlapHitHitCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "etaOverlapHitHitCut"), m_param_EtaOverlapHitHitCut,
                                 "Cut in eta between two hit-based states in ladder overlap.", m_param_EtaOverlapHitHitCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "PXDInterceptsName"), m_param_PXDInterceptsName,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "PXDInterceptsName"), m_param_PXDInterceptsName,
                                 "Name of the PXDIntercepts StoreArray.", m_param_PXDInterceptsName);
 }
 

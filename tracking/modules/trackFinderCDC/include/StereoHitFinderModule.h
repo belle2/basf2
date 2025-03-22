@@ -11,8 +11,8 @@
 #include <tracking/trackFindingCDC/findlets/combined/MonopoleStereoHitFinder.h>
 #include <tracking/trackFindingCDC/findlets/combined/MonopoleStereoHitFinderQuadratic.h>
 
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/eventdata/utils/ClassMnemomics.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -34,10 +34,10 @@ namespace Belle2 {
      *   - Smarter Handling of segments (which is worse in the moment but should be better in general)
      *   - Make the precuts on the hits more transparent
      *  */
-    class TFCDC_StereoHitFinderModule : public FindletModule<StereoHitFinder> {
+    class TFCDC_StereoHitFinderModule : public TrackingUtilities::FindletModule<StereoHitFinder> {
 
       /// The base class
-      using Super = FindletModule<StereoHitFinder>;
+      using Super = TrackingUtilities::FindletModule<StereoHitFinder>;
 
     public:
       /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a 2D hough quad tree. */
@@ -54,10 +54,10 @@ namespace Belle2 {
      *
      * Non-zero q's indicate magnetic charge of the track
      *  */
-    class TFCDC_MonopoleStereoHitFinderQuadraticModule : public FindletModule<MonopoleStereoHitFinderQuadratic> {
+    class TFCDC_MonopoleStereoHitFinderQuadraticModule : public TrackingUtilities::FindletModule<MonopoleStereoHitFinderQuadratic> {
 
       /// The base class
-      using Super = FindletModule<MonopoleStereoHitFinderQuadratic>;
+      using Super = TrackingUtilities::FindletModule<MonopoleStereoHitFinderQuadratic>;
 
     public:
       /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree. */
@@ -68,10 +68,10 @@ namespace Belle2 {
      *
      * Description of the actual algorithm is in tracking/trackFindingCDC/hough/algorithms/include/HitInHyperBox.h
      *  */
-    class TFCDC_MonopoleStereoHitFinderModule : public FindletModule<MonopoleStereoHitFinder> {
+    class TFCDC_MonopoleStereoHitFinderModule : public TrackingUtilities::FindletModule<MonopoleStereoHitFinder> {
 
       /// The base class
-      using Super = FindletModule<MonopoleStereoHitFinder>;
+      using Super = TrackingUtilities::FindletModule<MonopoleStereoHitFinder>;
 
     public:
       /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree. */

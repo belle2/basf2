@@ -11,6 +11,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 REG_MODULE(TFCDC_SegmentTrackCombiner);
 

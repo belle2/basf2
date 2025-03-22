@@ -16,9 +16,9 @@
 #include <tracking/trackFindingCDC/findlets/combined/MonopoleAxialTrackFinderLegendre.h>
 #include <tracking/trackFindingCDC/findlets/combined/AxialStraightTrackFinder.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackingUtilities/eventdata/utils/ClassMnemomics.h>
 
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -29,10 +29,10 @@ namespace Belle2 {
      * "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers"
      * by T. Alexopoulus, et al. NIM A592 456-462 (2008).
      */
-    class TFCDC_AxialTrackFinderLegendreModule : public FindletModule<AxialTrackFinderLegendre> {
+    class TFCDC_AxialTrackFinderLegendreModule : public TrackingUtilities::FindletModule<AxialTrackFinderLegendre> {
 
       /// Type of the base class
-      using Super = FindletModule<AxialTrackFinderLegendre>;
+      using Super = TrackingUtilities::FindletModule<AxialTrackFinderLegendre>;
 
     public:
       /// Constructor setting the default store vector names
@@ -42,10 +42,10 @@ namespace Belle2 {
     /**
      * Module implementation using the AxialTrackFinderHough
      */
-    class TFCDC_AxialTrackFinderHoughModule : public FindletModule<AxialTrackFinderHough> {
+    class TFCDC_AxialTrackFinderHoughModule : public TrackingUtilities::FindletModule<AxialTrackFinderHough> {
 
       /// Type of the base class
-      using Super = FindletModule<AxialTrackFinderHough>;
+      using Super = TrackingUtilities::FindletModule<AxialTrackFinderHough>;
 
     public:
       /// Constructor setting the default store vector names
@@ -55,10 +55,10 @@ namespace Belle2 {
     /**
      * Module implementation using the AxialTrackCreatorSegmentHough
      */
-    class TFCDC_AxialTrackCreatorSegmentHoughModule : public FindletModule<AxialTrackCreatorSegmentHough> {
+    class TFCDC_AxialTrackCreatorSegmentHoughModule : public TrackingUtilities::FindletModule<AxialTrackCreatorSegmentHough> {
 
       /// Type of the base class
-      using Super = FindletModule<AxialTrackCreatorSegmentHough>;
+      using Super = TrackingUtilities::FindletModule<AxialTrackCreatorSegmentHough>;
 
     public:
       /// Constructor setting the default store vector names
@@ -68,10 +68,10 @@ namespace Belle2 {
     /**
      * Module implementation using the AxialTrackCreatorMCTruth
      */
-    class TFCDC_AxialTrackCreatorMCTruthModule : public FindletModule<AxialTrackCreatorMCTruth> {
+    class TFCDC_AxialTrackCreatorMCTruthModule : public TrackingUtilities::FindletModule<AxialTrackCreatorMCTruth> {
 
       /// Type of the base class
-      using Super = FindletModule<AxialTrackCreatorMCTruth>;
+      using Super = TrackingUtilities::FindletModule<AxialTrackCreatorMCTruth>;
 
     public:
       /// Constructor setting the default store vector names
@@ -82,10 +82,10 @@ namespace Belle2 {
      * Module implementation using the MonopoleAxialTrackFinderLegendre
      * Modification of conventional AxialTrackFinderLegendre
      */
-    class TFCDC_MonopoleAxialTrackFinderLegendreModule : public FindletModule<MonopoleAxialTrackFinderLegendre> {
+    class TFCDC_MonopoleAxialTrackFinderLegendreModule : public TrackingUtilities::FindletModule<MonopoleAxialTrackFinderLegendre> {
 
       /// Type of the base class
-      using Super = FindletModule<MonopoleAxialTrackFinderLegendre>;
+      using Super = TrackingUtilities::FindletModule<MonopoleAxialTrackFinderLegendre>;
 
     public:
       /// Constructor setting the default store vector names
@@ -95,10 +95,10 @@ namespace Belle2 {
     /**
      * Module implementation using the AxialStraightTrackFinder
      */
-    class TFCDC_AxialStraightTrackFinderModule : public FindletModule<AxialStraightTrackFinder> {
+    class TFCDC_AxialStraightTrackFinderModule : public TrackingUtilities::FindletModule<AxialStraightTrackFinder> {
 
       /// Type of the base class
-      using Super = FindletModule<AxialStraightTrackFinder>;
+      using Super = TrackingUtilities::FindletModule<AxialStraightTrackFinder>;
 
     public:
       /// Constructor setting the default store vector names

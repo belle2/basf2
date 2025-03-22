@@ -18,8 +18,8 @@
 #include <tracking/trackFindingCDC/findlets/minimal/AxialSegmentPairCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentTripleCreator.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -27,10 +27,10 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackFinderSegmentPairAutomaton
      */
-    class TFCDC_TrackFinderSegmentPairAutomatonModule : public FindletModule<TrackFinderSegmentPairAutomaton> {
+    class TFCDC_TrackFinderSegmentPairAutomatonModule : public TrackingUtilities::FindletModule<TrackFinderSegmentPairAutomaton> {
 
       /// Type of the base class
-      using Super = FindletModule<TrackFinderSegmentPairAutomaton>;
+      using Super = TrackingUtilities::FindletModule<TrackFinderSegmentPairAutomaton>;
 
     public:
       /// Constructor setting the default store vector names
@@ -40,10 +40,10 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackFinderSegmentTripleAutomaton
      */
-    class TFCDC_TrackFinderSegmentTripleAutomatonModule : public FindletModule<TrackFinderSegmentTripleAutomaton> {
+    class TFCDC_TrackFinderSegmentTripleAutomatonModule : public TrackingUtilities::FindletModule<TrackFinderSegmentTripleAutomaton> {
 
       /// Type of the base class
-      using Super = FindletModule<TrackFinderSegmentTripleAutomaton>;
+      using Super = TrackingUtilities::FindletModule<TrackFinderSegmentTripleAutomaton>;
 
     public:
       /// Constructor setting the default store vector names
@@ -53,10 +53,10 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackCreatorSingleSegments
      */
-    class TFCDC_TrackCreatorSingleSegmentsModule : public FindletModule<TrackCreatorSingleSegments> {
+    class TFCDC_TrackCreatorSingleSegmentsModule : public TrackingUtilities::FindletModule<TrackCreatorSingleSegments> {
 
       /// Type of the base class
-      using Super = FindletModule<TrackCreatorSingleSegments>;
+      using Super = TrackingUtilities::FindletModule<TrackCreatorSingleSegments>;
 
     public:
       /// Constructor setting the default store vector names
@@ -71,10 +71,10 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackCreatorSegmentPairAutomaton
      */
-    class TFCDC_TrackCreatorSegmentPairAutomatonModule : public FindletModule<TrackCreatorSegmentPairAutomaton> {
+    class TFCDC_TrackCreatorSegmentPairAutomatonModule : public TrackingUtilities::FindletModule<TrackCreatorSegmentPairAutomaton> {
 
       /// Type of the base class
-      using Super = FindletModule<TrackCreatorSegmentPairAutomaton>;
+      using Super = TrackingUtilities::FindletModule<TrackCreatorSegmentPairAutomaton>;
 
     public:
       /// Constructor setting the default store vector names
@@ -84,10 +84,10 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackCreatorSegmentTripleAutomaton
      */
-    class TFCDC_TrackCreatorSegmentTripleAutomatonModule : public FindletModule<TrackCreatorSegmentTripleAutomaton> {
+    class TFCDC_TrackCreatorSegmentTripleAutomatonModule : public TrackingUtilities::FindletModule<TrackCreatorSegmentTripleAutomaton> {
 
       /// Type of the base class
-      using Super = FindletModule<TrackCreatorSegmentTripleAutomaton>;
+      using Super = TrackingUtilities::FindletModule<TrackCreatorSegmentTripleAutomaton>;
 
     public:
       /// Constructor setting the default store vector names
@@ -97,10 +97,10 @@ namespace Belle2 {
     /**
      * Module implementation using the SegmentPairCreator
      */
-    class TFCDC_SegmentPairCreatorModule : public FindletModule<SegmentPairCreator> {
+    class TFCDC_SegmentPairCreatorModule : public TrackingUtilities::FindletModule<SegmentPairCreator> {
 
       /// Type of the base class
-      using Super = FindletModule<SegmentPairCreator>;
+      using Super = TrackingUtilities::FindletModule<SegmentPairCreator>;
 
     public:
       /// Constructor setting the default store vector names
@@ -110,10 +110,10 @@ namespace Belle2 {
     /**
      * Module implementation using the AxialSegmentPairCreator
      */
-    class TFCDC_AxialSegmentPairCreatorModule : public FindletModule<AxialSegmentPairCreator> {
+    class TFCDC_AxialSegmentPairCreatorModule : public TrackingUtilities::FindletModule<AxialSegmentPairCreator> {
 
       /// Type of the base class
-      using Super = FindletModule<AxialSegmentPairCreator>;
+      using Super = TrackingUtilities::FindletModule<AxialSegmentPairCreator>;
 
     public:
       /// Constructor setting the default store vector names
@@ -123,10 +123,10 @@ namespace Belle2 {
     /**
      * Module implementation using the SegmentTripleCreator
      */
-    class TFCDC_SegmentTripleCreatorModule : public FindletModule<SegmentTripleCreator> {
+    class TFCDC_SegmentTripleCreatorModule : public TrackingUtilities::FindletModule<SegmentTripleCreator> {
 
       /// Type of the base class
-      using Super = FindletModule<SegmentTripleCreator>;
+      using Super = TrackingUtilities::FindletModule<SegmentTripleCreator>;
 
     public:
       /// Constructor setting the default store vector names

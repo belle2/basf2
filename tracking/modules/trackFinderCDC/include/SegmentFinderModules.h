@@ -17,8 +17,8 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentRejecter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorMCTruth.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 
 /******* Combined Findlets **********/
 namespace Belle2 {
@@ -26,10 +26,10 @@ namespace Belle2 {
     /**
      * Module implementation using the SegmentFinderFacetAutomaton
      */
-    class TFCDC_SegmentFinderFacetAutomatonModule : public FindletModule<SegmentFinderFacetAutomaton> {
+    class TFCDC_SegmentFinderFacetAutomatonModule : public TrackingUtilities::FindletModule<SegmentFinderFacetAutomaton> {
 
       /// Type of the base class
-      using Super = FindletModule<SegmentFinderFacetAutomaton>;
+      using Super = TrackingUtilities::FindletModule<SegmentFinderFacetAutomaton>;
 
     public:
       /// Constructor setting the default store vector names
@@ -44,10 +44,10 @@ namespace Belle2 {
     /**
      * Module implementation using the FacetCreator
      */
-    class TFCDC_FacetCreatorModule : public FindletModule<FacetCreator> {
+    class TFCDC_FacetCreatorModule : public TrackingUtilities::FindletModule<FacetCreator> {
 
       /// Type of the base class
-      using Super = FindletModule<FacetCreator>;
+      using Super = TrackingUtilities::FindletModule<FacetCreator>;
 
     public:
       /// Constructor setting the default store vector names
@@ -57,10 +57,10 @@ namespace Belle2 {
     /**
      * Module implementation using the SegmentCreatorFacetAutomaton
      */
-    class TFCDC_SegmentCreatorFacetAutomatonModule : public FindletModule<SegmentCreatorFacetAutomaton> {
+    class TFCDC_SegmentCreatorFacetAutomatonModule : public TrackingUtilities::FindletModule<SegmentCreatorFacetAutomaton> {
 
       /// Type of the base class
-      using Super = FindletModule<SegmentCreatorFacetAutomaton>;
+      using Super = TrackingUtilities::FindletModule<SegmentCreatorFacetAutomaton>;
 
     public:
       /// Constructor setting the default store vector names
@@ -70,10 +70,10 @@ namespace Belle2 {
     /**
      * Module implementation using the SegmentLinker
      */
-    class TFCDC_SegmentLinkerModule : public FindletModule<SegmentLinker> {
+    class TFCDC_SegmentLinkerModule : public TrackingUtilities::FindletModule<SegmentLinker> {
 
       /// Type of the base class
-      using Super = FindletModule<SegmentLinker>;
+      using Super = TrackingUtilities::FindletModule<SegmentLinker>;
 
     public:
       /// Constructor setting the default store vector names
@@ -83,10 +83,10 @@ namespace Belle2 {
     /**
      * Module implementation using the SegmentOrienter
      */
-    class TFCDC_SegmentOrienterModule : public FindletModule<SegmentOrienter> {
+    class TFCDC_SegmentOrienterModule : public TrackingUtilities::FindletModule<SegmentOrienter> {
 
       /// Type of the base class
-      using Super = FindletModule<SegmentOrienter>;
+      using Super = TrackingUtilities::FindletModule<SegmentOrienter>;
 
     public:
       /// Constructor setting the default store vector names
@@ -96,9 +96,9 @@ namespace Belle2 {
     /**
      * Module implementation using the SegmentFitter
      */
-    class TFCDC_SegmentFitterModule : public FindletModule<SegmentFitter> {
+    class TFCDC_SegmentFitterModule : public TrackingUtilities::FindletModule<SegmentFitter> {
       /// Type of the base class
-      using Super = FindletModule<SegmentFitter>;
+      using Super = TrackingUtilities::FindletModule<SegmentFitter>;
 
     public:
       /// Constructor setting the default store vector names
@@ -108,9 +108,9 @@ namespace Belle2 {
     /**
      * Module implementation using the SegmentRejecter
      */
-    class TFCDC_SegmentRejecterModule : public FindletModule<SegmentRejecter> {
+    class TFCDC_SegmentRejecterModule : public TrackingUtilities::FindletModule<SegmentRejecter> {
       /// Type of the base class
-      using Super = FindletModule<SegmentRejecter>;
+      using Super = TrackingUtilities::FindletModule<SegmentRejecter>;
 
     public:
       /// Constructor setting the default store vector names
@@ -120,10 +120,10 @@ namespace Belle2 {
     /**
      * Module implementation using the SegmentCreatorMCTruth
      */
-    class TFCDC_SegmentCreatorMCTruthModule : public FindletModule<SegmentCreatorMCTruth> {
+    class TFCDC_SegmentCreatorMCTruthModule : public TrackingUtilities::FindletModule<SegmentCreatorMCTruth> {
 
       /// Type of the base class
-      using Super = FindletModule<SegmentCreatorMCTruth>;
+      using Super = TrackingUtilities::FindletModule<SegmentCreatorMCTruth>;
 
     public:
       /// Constructor setting the default store vector names

@@ -7,22 +7,23 @@
  **************************************************************************/
 #include <gtest/gtest.h>
 #include <framework/utilities/TestHelpers.h>
-#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
+#include <tracking/trackingUtilities/testFixtures/TrackingUtilitiesTestWithTopology.h>
 
 #include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/WireID.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <vector>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 TEST(BasicTrackVarSetCalculation, test_empty_track)
 {
@@ -63,7 +64,7 @@ TEST(BasicTrackVarSetCalculation, test_empty_track)
   EXPECT_EQ(0, *trackVarSet.find("s_range"));
 }
 
-TEST_F(TrackFindingCDCTestWithTopology, basicTrackVarSet_test_one_hit_track)
+TEST_F(TrackingUtilitiesTestWithTopology, basicTrackVarSet_test_one_hit_track)
 {
   // create a dummy track with only one hit
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
@@ -112,7 +113,7 @@ TEST_F(TrackFindingCDCTestWithTopology, basicTrackVarSet_test_one_hit_track)
   EXPECT_EQ(-1, *trackVarSet.find("empty_s_variance"));
 }
 
-TEST_F(TrackFindingCDCTestWithTopology, basicTrackVarSet_test_two_hit_track)
+TEST_F(TrackingUtilitiesTestWithTopology, basicTrackVarSet_test_two_hit_track)
 {
 
   // create a dummy track with only one hit
@@ -172,7 +173,7 @@ TEST_F(TrackFindingCDCTestWithTopology, basicTrackVarSet_test_two_hit_track)
   EXPECT_EQ(-1, *trackVarSet.find("empty_s_variance"));
 }
 
-TEST_F(TrackFindingCDCTestWithTopology, basicTrackVarSet_test_empty_s_for_three_hit_track)
+TEST_F(TrackingUtilitiesTestWithTopology, basicTrackVarSet_test_empty_s_for_three_hit_track)
 {
   // Just test the empty_s calculations also with three hits, which result in two empty_s values
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();

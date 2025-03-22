@@ -8,15 +8,16 @@
 #include <tracking/trackFindingCDC/findlets/combined/SegmentTrackCombiner.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::Chooseable<BaseSegmentTrackFilter>;
-template class TrackFindingCDC::ChooseableFilter<SegmentTrackFilterFactory>;
+template class TrackingUtilities::Chooseable<BaseSegmentTrackFilter>;
+template class TrackingUtilities::ChooseableFilter<SegmentTrackFilterFactory>;
 
 SegmentTrackCombiner::SegmentTrackCombiner()
 {
@@ -61,8 +62,8 @@ void SegmentTrackCombiner::exposeParameters(ModuleParamList* moduleParamList, co
 }
 
 // Do the combination work. See the SegmentTrackCombiner methods for full details.
-void SegmentTrackCombiner::apply(std::vector<TrackFindingCDC::CDCSegment2D>& segments,
-                                 std::vector<TrackFindingCDC::CDCTrack>& tracks)
+void SegmentTrackCombiner::apply(std::vector<CDCSegment2D>& segments,
+                                 std::vector<TrackingUtilities::CDCTrack>& tracks)
 {
   m_trackNormalizer.apply(tracks);
 

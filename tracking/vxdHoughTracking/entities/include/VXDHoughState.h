@@ -8,7 +8,7 @@
 #pragma once
 
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 #include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
@@ -59,7 +59,7 @@ namespace Belle2 {
       const SpacePoint* getHit() const { return m_hit; }
 
       /// Getter for the automaton cell.
-      TrackFindingCDC::AutomatonCell& getAutomatonCell() { return m_automatonCell; }
+      TrackingUtilities::AutomatonCell& getAutomatonCell() { return m_automatonCell; }
 
 
       /// Cache containing the most important information of this state which will often be needed
@@ -106,7 +106,7 @@ namespace Belle2 {
       /// Pointer to hit
       const SpacePoint* m_hit = nullptr;
       /// Memory for the automaton cell.
-      TrackFindingCDC::AutomatonCell m_automatonCell;
+      TrackingUtilities::AutomatonCell m_automatonCell;
     };
 
   }

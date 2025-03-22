@@ -17,7 +17,7 @@ namespace Belle2 {
 
     public:
       /// Main filter method weighting the relation between the segment pairs.
-      Weight operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
+      TrackingUtilities::Weight operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
     };
   }
 }

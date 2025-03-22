@@ -21,7 +21,7 @@ namespace Belle2 {
 
     public:
       /// Implementation accepting all possible neighbors. Weight subtracts the overlap penalty.
-      Weight operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
+      TrackingUtilities::Weight operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
     };
   }
 }

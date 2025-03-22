@@ -9,11 +9,11 @@
 
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/SegmentPairRelationFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/UnionRecordingFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+#include <tracking/trackingUtilities/varsets/BaseVarSet.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackingUtilities/utilities/Relation.h>
 
 #include <vector>
 #include <string>
@@ -25,18 +25,18 @@ namespace Belle2 {
 
     /// Filter to record multiple chooseable variable sets for segment pair relations
     class UnionRecordingSegmentPairRelationFilter
-      : public UnionRecordingFilter<SegmentPairRelationFilterFactory> {
+      : public TrackingUtilities::UnionRecordingFilter<SegmentPairRelationFilterFactory> {
 
     private:
       /// Type of the base class
-      using Super = UnionRecordingFilter<SegmentPairRelationFilterFactory>;
+      using Super = TrackingUtilities::UnionRecordingFilter<SegmentPairRelationFilterFactory>;
 
     public:
       /// Get the valid names of variable sets for segment pair relations.
       std::vector<std::string> getValidVarSetNames() const final;
 
       /// Create a concrete variables set for segment pair relations from a name.
-      std::unique_ptr<BaseVarSet<Relation<const CDCSegmentPair> > >
+      std::unique_ptr<TrackingUtilities::BaseVarSet<TrackingUtilities::Relation<const CDCSegmentPair> > >
       createVarSet(const std::string& name) const final;
     };
   }

@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
+#include <tracking/trackingUtilities/utilities/CompositeProcessingSignalListener.h>
 
-#include <tracking/trackFindingCDC/utilities/Named.h>
-#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+#include <tracking/trackingUtilities/utilities/Named.h>
+#include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
 #include <RtypesCore.h>
 
@@ -20,7 +20,7 @@
 
 namespace Belle2 {
   class ModuleParamList;
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /**
      *  Generic class that generates some named float values from a given object.
      *

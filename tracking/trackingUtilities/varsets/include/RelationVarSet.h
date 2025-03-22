@@ -7,17 +7,17 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+#include <tracking/trackingUtilities/varsets/BaseVarSet.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
-#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+#include <tracking/trackingUtilities/utilities/Relation.h>
+#include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
 #include <vector>
 #include <string>
 #include <cassert>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /// Generic class that generates the same variables from a each of a pair of instances.
     template <class ABaseVarSet>
     class RelationVarSet : public BaseVarSet<Relation<const typename ABaseVarSet::Object> > {

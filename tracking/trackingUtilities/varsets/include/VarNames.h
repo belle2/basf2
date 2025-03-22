@@ -10,7 +10,7 @@
 #include <cstddef>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// Class that specifies the names of the variables.
     template<class AObject>

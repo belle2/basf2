@@ -9,15 +9,15 @@
 
 #include <RtypesCore.h>
 
-#include <tracking/trackFindingCDC/utilities/Named.h>
-#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+#include <tracking/trackingUtilities/utilities/Named.h>
+#include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
 #include <vector>
 #include <map>
 #include <string>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /// An abstract tuple of float value where each value has an associated name.
     class NamedFloatTuple {

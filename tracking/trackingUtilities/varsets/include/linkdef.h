@@ -3,6 +3,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::TrackFindingCDC::NamedFloatTuple-;
-#pragma link C++ class std::vector<Belle2::TrackFindingCDC::NamedFloatTuple*>-;
-#pragma link C++ class std::vector<const Belle2::TrackFindingCDC::NamedFloatTuple*>-;
+#pragma link C++ class Belle2::TrackingUtilities::NamedFloatTuple-;
+#pragma link C++ class std::vector<Belle2::TrackingUtilities::NamedFloatTuple*>-;
+#pragma link C++ class std::vector<const Belle2::TrackingUtilities::NamedFloatTuple*>-;

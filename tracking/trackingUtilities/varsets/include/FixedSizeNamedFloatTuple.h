@@ -7,13 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
+#include <tracking/trackingUtilities/varsets/NamedFloatTuple.h>
 
 #include <string>
 #include <cassert>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      *  Const expression that can compare two string at compile time

@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
-#include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/BaseVarSet.h>
+#include <tracking/trackingUtilities/varsets/UnionVarSet.h>
 
-#include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
-#include <tracking/trackFindingCDC/utilities/Named.h>
-#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+#include <tracking/trackingUtilities/utilities/EvalVariadic.h>
+#include <tracking/trackingUtilities/utilities/Named.h>
+#include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
 #include <cassert>
 #include <memory>
@@ -20,7 +20,7 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
 
     /**
      *  Class that accommodates many variable sets and presents them as on set of variables.

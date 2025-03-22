@@ -31,7 +31,7 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Checks if a pair of axial segments is a good combination
-      Weight operator()(const CDCAxialSegmentPair& axialSegmentPair) final;
+      TrackingUtilities::Weight operator()(const CDCAxialSegmentPair& axialSegmentPair) final;
 
     private:
       /// Parameter : Switch to require the segment combination contain mostly correct rl information

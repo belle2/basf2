@@ -7,16 +7,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/Filter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCAxialSegmentPair;
 
     // Guard to prevent repeated instantiations
-    extern template class Filter<CDCAxialSegmentPair>;
+    // extern template class TrackingUtilities::Filter<CDCAxialSegmentPair>;
 
     /// Base class for filter for the construction of axial to axial segment pairs.
-    using BaseAxialSegmentPairFilter = Filter<CDCAxialSegmentPair>;
+    using BaseAxialSegmentPairFilter = TrackingUtilities::Filter<CDCAxialSegmentPair>;
   }
 }

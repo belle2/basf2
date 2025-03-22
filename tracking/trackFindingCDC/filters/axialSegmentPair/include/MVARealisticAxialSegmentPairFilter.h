@@ -15,22 +15,22 @@
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/FitlessAxialSegmentPairVarSet.h>
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/FitAxialSegmentPairVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Final filter for the construction of segment pairs.
-    class MVARealisticAxialSegmentPairFilter : public MVA<BaseAxialSegmentPairFilter> {
+    class MVARealisticAxialSegmentPairFilter : public TrackingUtilities::MVA<BaseAxialSegmentPairFilter> {
 
     private:
       /// Type of the base class
-      using Super = MVA<BaseAxialSegmentPairFilter>;
+      using Super = TrackingUtilities::MVA<BaseAxialSegmentPairFilter>;
 
-      /// Type of the VarSet the filter is working on
-      using VarSet = VariadicUnionVarSet<BasicAxialSegmentPairVarSet,
+      /// Type of the TrackingUtilities::VarSet the filter is working on
+      using VarSet = TrackingUtilities::VariadicUnionVarSet<BasicAxialSegmentPairVarSet,
             FitlessAxialSegmentPairVarSet,
             FitAxialSegmentPairVarSet>;
 
@@ -43,7 +43,7 @@ namespace Belle2 {
 
     private:
       /// Function to object for its signalness
-      Weight operator()(const CDCAxialSegmentPair& axialSegmentPair) override;
+      TrackingUtilities::Weight operator()(const CDCAxialSegmentPair& axialSegmentPair) override;
 
     private:
       /// Feasibility filter applied first before invoking the main cut

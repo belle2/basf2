@@ -14,29 +14,32 @@
 #include <tracking/trackFindingCDC/filters/trackRelation/BasicTrackRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/FitTrackRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
+  namespace TrackingUtilities {
+    class CDCTrack;
+  }
   namespace TrackFindingCDC {
 
     /// Final filter for the construction of segment pairs.
-    class MVARealisticTrackRelationFilter : public MVA<BaseTrackRelationFilter> {
+    class MVARealisticTrackRelationFilter : public TrackingUtilities::MVA<BaseTrackRelationFilter> {
 
     private:
       /// Type of the base class
-      using Super = MVA<BaseTrackRelationFilter>;
+      using Super = TrackingUtilities::MVA<BaseTrackRelationFilter>;
 
       /// Set of variables used in this filter
-      using VarSet = VariadicUnionVarSet<BasicTrackRelationVarSet, FitTrackRelationVarSet>;
+      using VarSet = TrackingUtilities::VariadicUnionVarSet<BasicTrackRelationVarSet, FitTrackRelationVarSet>;
 
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.
       MVARealisticTrackRelationFilter();
 
       /// Function to object for its signalness
-      Weight operator()(const Relation<const CDCTrack>& trackRelation) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::Relation<const TrackingUtilities::CDCTrack>& trackRelation) final;
 
     private:
       /// Feasibility filter applied first before invoking the main cut

@@ -18,7 +18,7 @@ namespace Belle2 {
 
     public:
       /// All implementation returns the size of the segment triples accepting all.
-      Weight operator()(const CDCSegmentTriple& segmentTriple) final;
+      TrackingUtilities::Weight operator()(const CDCSegmentTriple& segmentTriple) final;
     };
   }
 }

@@ -15,11 +15,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the construction of segment triples based on simple criteria
-    class SimpleSegmentTripleFilter : public Filter<CDCSegmentTriple> {
+    class SimpleSegmentTripleFilter : public TrackingUtilities::Filter<CDCSegmentTriple> {
 
     private:
       /// Type of the base class.
-      using Super = Filter<CDCSegmentTriple>;
+      using Super = TrackingUtilities::Filter<CDCSegmentTriple>;
 
     public:
       /**
@@ -28,7 +28,7 @@ namespace Belle2 {
        *  Returns NAN if the connection shall not be made or
        *  a finit value be used as the cell weight of the cell to constructed.
        */
-      Weight operator()(const CDCSegmentTriple& segmentTriple) final;
+      TrackingUtilities::Weight operator()(const CDCSegmentTriple& segmentTriple) final;
 
     private:
       /// Returns the xy fitter instance that is used by this filter

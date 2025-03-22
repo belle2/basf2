@@ -38,7 +38,7 @@ namespace Belle2 {
 
     public:
       /// Check if the segment triple is aligned in the Monte Carlo track. Signals NAN if not.
-      Weight operator()(const CDCSegmentTriple& segmentTriple) final;
+      TrackingUtilities::Weight operator()(const CDCSegmentTriple& segmentTriple) final;
 
     private:
       /// Sets the trajectories of the segment triple from Monte Carlo information. Is executed for good segment triples.

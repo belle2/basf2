@@ -391,7 +391,7 @@ class CDCSVGDisplayModule(basf2.Module):
         # Now preferred way of plotting the wires
         if self.draw_wires:
             theCDCWireTopology = \
-                Belle2.TrackFindingCDC.CDCWireTopology.getInstance()
+                Belle2.TrackingUtilities.CDCWireTopology.getInstance()
 
             if self.use_cpp:
                 cppplotter.drawWires(theCDCWireTopology)
@@ -430,7 +430,7 @@ class CDCSVGDisplayModule(basf2.Module):
 
         # if self.draw_wires:
         #    theCDCWireTopology = \
-        #        Belle2.TrackFindingCDC.CDCWireTopology.getInstance()
+        #        Belle2.TrackingUtilities.CDCWireTopology.getInstance()
         #    cppplotter.draw(theCDCWireTopology)
 
         # Plotter instance receiving drawable tracking objects.
@@ -601,14 +601,14 @@ class CDCSVGDisplayModule(basf2.Module):
                             fromHit = fromSimHit.getRelated(self.cdc_hits_store_array_name)
                             toHit = toSimHit.getRelated(self.cdc_hits_store_array_name)
 
-                            fromWireHit = Belle2.TrackFindingCDC.CDCWireHit(fromHit)
-                            toWireHit = Belle2.TrackFindingCDC.CDCWireHit(toHit)
+                            fromWireHit = Belle2.TrackingUtilities.CDCWireHit(fromHit)
+                            toWireHit = Belle2.TrackingUtilities.CDCWireHit(toHit)
 
-                            fromRLWireHit = Belle2.TrackFindingCDC.CDCRLWireHit(fromWireHit, 0)
-                            toRLWireHit = Belle2.TrackFindingCDC.CDCRLWireHit(toWireHit, 0)
+                            fromRLWireHit = Belle2.TrackingUtilities.CDCRLWireHit(fromWireHit, 0)
+                            toRLWireHit = Belle2.TrackingUtilities.CDCRLWireHit(toWireHit, 0)
 
-                            fromDisplacement = Belle2.TrackFindingCDC.Vector3D(fromSimHit.getPosTrack() - fromSimHit.getPosWire())
-                            toDisplacement = Belle2.TrackFindingCDC.Vector3D(toSimHit.getPosTrack() - toSimHit.getPosWire())
+                            fromDisplacement = Belle2.TrackingUtilities.Vector3D(fromSimHit.getPosTrack() - fromSimHit.getPosWire())
+                            toDisplacement = Belle2.TrackingUtilities.Vector3D(toSimHit.getPosTrack() - toSimHit.getPosWire())
 
                             fromRecoHit2D = Belle2.TrackFindingCDC.CDCRecoHit2D(fromRLWireHit, fromDisplacement.xy())
                             toRecoHit2D = Belle2.TrackFindingCDC.CDCRecoHit2D(toRLWireHit, toDisplacement.xy())
@@ -998,14 +998,14 @@ class CDCSVGDisplayModule(basf2.Module):
                         tPosition = recotrack.getPositionSeed()
                         time = recotrack.getTimeSeed()
 
-                        momentum = Belle2.TrackFindingCDC.Vector2D(tMomentum.X(),
-                                                                   tMomentum.Y())
-                        position = Belle2.TrackFindingCDC.Vector2D(tPosition.X(),
-                                                                   tPosition.Y())
+                        momentum = Belle2.TrackingUtilities.Vector2D(tMomentum.X(),
+                                                                     tMomentum.Y())
+                        position = Belle2.TrackingUtilities.Vector2D(tPosition.X(),
+                                                                     tPosition.Y())
 
                         trajectory = \
-                            Belle2.TrackFindingCDC.CDCTrajectory2D(position, time,
-                                                                   momentum, charge)
+                            Belle2.TrackingUtilities.CDCTrajectory2D(position, time,
+                                                                     momentum, charge)
                         trajectories.append(trajectory)
 
                     plotter.draw_iterable(trajectories, **styleDict)

@@ -177,7 +177,7 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
 
         params
         ------
-        position: TrackFindingCDC.Vector2D
+        position: TrackingUtilities.Vector2D
         """
         position = position.conformalTransformed()
 
@@ -293,7 +293,7 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
 
             def f(segment):
                 trajectory = fitter.fit(segment)
-                momentum = trajectory.getUnitMom2D(Belle2.TrackFindingCDC.Vector2D(0, 0)).scale(trajectory.getAbsMom2D())
+                momentum = trajectory.getUnitMom2D(Belle2.TrackingUtilities.Vector2D(0, 0)).scale(trajectory.getAbsMom2D())
                 theta, r = self.convertToQuadTreePicture(momentum.phi(), momentum.norm(), trajectory.getChargeSign())
                 plt.plot(theta, r, color=list(map(0, segment)), marker="o")
 
@@ -370,14 +370,14 @@ class StereoQuadTreePlotter(QuadTreePlotter):
 
     def create_trajectory_from_track(self, track):
         """
-        Convert a genfit::TrackCand into a TrackFindingCDC.CDCTrajectory3D
+        Convert a genfit::TrackCand into a TrackingUtilities.CDCTrajectory3D
 
         params
         ------
         track: genfit::TrackCand
         """
-        Vector3D = Belle2.TrackFindingCDC.Vector3D
-        Trajectory3D = Belle2.TrackFindingCDC.CDCTrajectory3D
+        Vector3D = Belle2.TrackingUtilities.Vector3D
+        Trajectory3D = Belle2.TrackingUtilities.CDCTrajectory3D
 
         position = Vector3D(track.getPosSeed())
         momentum = Vector3D(track.getMomSeed())
@@ -392,15 +392,15 @@ class StereoQuadTreePlotter(QuadTreePlotter):
         params
         ------
         cdcHit: CDCHit
-        trajectory3D: TrackFindingCDC.CDCTrajectory3D
+        trajectory3D: TrackingUtilities.CDCTrajectory3D
         rlInfo: RightLeftInfo ( = short)
         """
         storedWireHits = Belle2.PyStoreObj('CDCWireHitVector')
         wireHits = storedWireHits.obj().get()
 
-        CDCRecoHit3D = Belle2.TrackFindingCDC.CDCRecoHit3D
+        CDCRecoHit3D = Belle2.TrackingUtilities.CDCRecoHit3D
         wireHit = wireHits.at(bisect.bisect_left(wireHits, cdcHit))
-        rightLeftWireHit = Belle2.TrackFindingCDC.CDCRLWireHit(wireHit, rlInfo)
+        rightLeftWireHit = Belle2.TrackingUtilities.CDCRLWireHit(wireHit, rlInfo)
         if rightLeftWireHit.getStereoType() != 0:
             recoHit3D = CDCRecoHit3D.reconstruct(rightLeftWireHit, trajectory3D.getTrajectory2D())
             return recoHit3D
@@ -512,7 +512,7 @@ class StereoQuadTreePlotter(QuadTreePlotter):
 
             for wireHit in wireHits:
                 for rlInfo in (-1, 1):
-                    recoHit3D = Belle2.TrackFindingCDC.CDCRecoHit3D.reconstruct(wireHit, rlInfo, trajectory)
+                    recoHit3D = Belle2.TrackingUtilities.CDCRecoHit3D.reconstruct(wireHit, rlInfo, trajectory)
 
                     if (self.delete_bad_hits and
                         (wireHit.getRLInfo() != mcHitLookUp.getRLInfo(wireHit.getWireHit().getHit()) or

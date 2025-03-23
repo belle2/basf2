@@ -318,18 +318,18 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
             track_pt = track_momentum.Pt()
             track_phi = track_momentum.Phi()
             # trajectory_track = \
-            #     Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(track_position),
-            #                                            Belle2.TrackFindingCDC.Vector3D(track_momentum),
-            #                                            related_mc_track_cand.getChargeSeed())
+            #     Belle2.TrackingUtilities.CDCTrajectory3D(Belle2.TrackingUtilities.Vector3D(track_position),
+            #                                              Belle2.TrackingUtilities.Vector3D(track_momentum),
+            #                                              related_mc_track_cand.getChargeSeed())
 
             segment_momentum = local_track_cand.getMomSeed()
             # segment_position = local_track_cand.getPosSeed()
             segment_pt = segment_momentum.Pt()
             segment_phi = segment_momentum.Phi()
             # trajectory_segment = \
-            #     Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(segment_position),
-            #                                            Belle2.TrackFindingCDC.Vector3D(segment_momentum),
-            #                                            local_track_cand.getChargeSeed())
+            #     Belle2.TrackingUtilities.CDCTrajectory3D(Belle2.TrackingUtilities.Vector3D(segment_position),
+            #                                              Belle2.TrackingUtilities.Vector3D(segment_momentum),
+            #                                              local_track_cand.getChargeSeed())
 
         return dict(is_matched=is_matched,
                     is_background=is_background,

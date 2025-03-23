@@ -1012,3 +1012,44 @@ class DarkShower(BaseSkim):
         )
 
         return [f"K_S0:{skim_str}"]
+
+
+@fancy_skim_header
+class ALP2Gamma(BaseSkim):
+    __authors__ = ["Hyuna Kim"]
+    __contact__ = __liaison__
+    __description__ = (
+        "Dark sector skim list for the ALP 2-photon analysis: "
+        r":math:`B \to a(\to \gamma \gamma)`"
+    )
+    __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
+
+    def build_lists(self, path):
+        kaons = (
+            'K+:mk',
+            'kaonID > 0.6 and formula(kaonID/protonID) > 0.4'
+        )
+
+        gamma = (
+            'gamma:g',
+            '(clusterReg == 1 and E > 0.150) or '
+            '(clusterReg == 2 and E > 0.05) or '
+            '(clusterReg == 3 and E > 0.1)'
+        )
+
+        ma.fillParticleLists([kaons, gamma], path=path)
+
+        ma.reconstructDecay(
+            'A0:rec -> gamma:g gamma:g',
+            cut='[daughter(0,E) > daughter(1,E)]',
+            path=path
+        )
+
+        ma.reconstructDecay(
+            'B+:rec -> K+:mk A0:rec',
+            cut='[Mbc > 5.27] and [abs(deltaE) < 0.1]',
+            path=path
+        )
+
+        return ["B+:rec"]

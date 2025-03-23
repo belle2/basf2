@@ -31,18 +31,13 @@ ma.inputMdst(filename=b2.find_file('B02JpsiKs_Jpsi2mumu_Ks2pipi.root', 'examples
 # load stdLambda0s
 stdV0s.stdLambdas(path=my_path)
 
-# now, we used the personal tag
-b2.conditions.prepend_globaltag('temp_tsshuai_')
-# if merge the personal global tag to Belle II, the following command line is fine
-# b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
+b2.conditions.prepend_globaltag("analysis_tools_light-2503-ceres")
 
 # apply LambdaSelector to the Lambda0 particle list
 # the Lambda0 particle list type can be 'all', 'standard', 'tight', or 'loose'
 # If 'all', no cut is applied by LambdaSelector, and mva output become available via extraInfo.
 # if other list type, cut is applied on the original particle list.
 LambdaSelector.LambdaSelector(particleListName='Lambda0:merged',
-                              identifier_Lambda="Lambda_LGBM_V0Selector",
-                              identifier_vKs="Lambda_LGBM_KsVeto",
                               output_label_name='standard',
                               extraInfoName_V0Selector='V0_mva',
                               extraInfoName_KsVeto='Ks_mva',

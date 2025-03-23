@@ -24,7 +24,7 @@ class TutorialsTest(unittest.TestCase):
     #: list of the broken tutorials (to be removed when they are individually fixed)
     broken_tutorials = ['B2A910-ApplyKsSelector.py']
     #: list of the tutorials whose output file name cannot be overwritten
-    do_not_overwrite = ['B2A911-CreateTrainData.py']
+    do_not_overwrite = []
 
     @unittest.skipIf(not os.getenv('BELLE2_EXAMPLES_DATA_DIR'),
                      "$BELLE2_EXAMPLES_DATA_DIR not found.")

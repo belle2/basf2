@@ -98,7 +98,7 @@ In principle, one can already try to use some of the Rest of Event variables.
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Use the search feature in the basf2 documentation, or use the offline help by typing ``b2help-variables``
+     Use the search feature in the `basf2` documentation, or use the offline help by typing ``b2help-variables``
      in your bash terminal (for example ``b2help-variables | grep -i roe``).
 
 .. admonition:: Solution

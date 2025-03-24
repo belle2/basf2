@@ -152,7 +152,7 @@ Code structure
 
 In my opinion the best way to use and learn about the FEI is to read the code itself. I wrote an extensive documentation. Hence I describe here the code structure. If you don't want to read code, you can just skip this part.
 
-The FEI is completely written in Python and does only use general purpose basf2 modules. You can find the code under: ``analysis/scripts/fei/``
+The FEI is completely written in Python and does only use general purpose `basf2` modules. You can find the code under: ``analysis/scripts/fei/``
 
 config.py
 *********
@@ -229,7 +229,7 @@ Most stages consists of:
 *    Apply a multivariate classification method
 *    Apply more Cuts
 
- The FEI will reconstruct these 7 stages during the training phase, since the stages depend on one another, you have to run basf2 multiple (7) times on the same data to train all the necessary multivariate classifiers.
+ The FEI will reconstruct these 7 stages during the training phase, since the stages depend on one another, you have to run `basf2` multiple (7) times on the same data to train all the necessary multivariate classifiers.
 
 Since running a 7-phase training by hand would be very difficult there is a tool which implements the training (including distributing the jobs on a cluster, merging the training files, running the training, ...)
 
@@ -278,7 +278,7 @@ A typical training of the generic FEI will take about a week on the new KEKCC cl
 distributed.py
 **************
 
-This script can be used to train the FEI on a cluster like available at KEKCC. All you need is a basf2 steering file (see ``analysis/examples/FEI/`` ) and some MC O(100) million
+This script can be used to train the FEI on a cluster like available at KEKCC. All you need is a `basf2` steering file (see ``analysis/examples/FEI/`` ) and some MC O(100) million
 
 The script will automatically create some directories collection containing weightfiles, monitoring files and other stuff jobs containing temporary files during the training (can be deleted afterwards)
 
@@ -325,7 +325,7 @@ In general a FEI training steering file consists of
 
 * a decay channel configuration usually you can just use the default configuration in fei.get_default_channels. This configuration defines all the channels which should be reconstructed, the cuts, and the mva methods. You can write your own configuration, just take a look in ``analysis/scripts/fei/default_channels.py``
 * a FeiConfiguration object, this defines the database prefix for the weightfiles and some other things which influence the training (e.g. if you want to run with the monitoring)
-* a feistate object, which contains the basf2 path for the current stage, you get this with the get_path function
+* a feistate object, which contains the `basf2` path for the current stage, you get this with the get_path function
 
 The user is responsible for writing the input and output part of the steering file. Depending on the training mode (generic / specific) this part is different for each training (see below for examples).
 The FEI algorithm itself just assumes that the DataStore already contains a valid reconstructed event, and starts to reconstruct B mesons. During the training the steering file is executed multiple times. The first time it is called with the Monte Carlo files you provided, and the complete DataStore is written out at the end. The following calls must receive the previous output as input.
@@ -383,7 +383,7 @@ The last step is to install :doc:`gbasf2:index`. For that purpose, please switch
 on your machine, and follow the steps for `gbasf2 installation <https://xwiki.desy.de/xwiki/rest/p/78b3b/#HgBasf2installationprocedure>`_.
 
 In the following, an adaption for the :doc:`gbasf2:index` package is discussed, which is required until the GitLab issue
-`BIIDCD-1256 <https://gitlab.desy.de/belle2/computing/distributed-computing/belledirac/-/issues/1256>`_ is resolved. It enables to upload non-basf2 data to remote SE's on the grid.
+`BIIDCD-1256 <https://gitlab.desy.de/belle2/computing/distributed-computing/belledirac/-/issues/1256>`_ is resolved. It enables to upload non- `basf2` data to remote SE's on the grid.
 
 Within the file ``BelleDIRAC/gbasf2/lib/ds/manager.py`` in function ``putDatasetMetadata(...)``, the lines
 
@@ -751,10 +751,10 @@ If you are on KEKCC and get a crash you probably forgot to set the correct ``LD_
 
 ``export LD_LIBRARY_PATH=/sw/belle/local/neurobayes/lib/:$LD_LIBRARY_PATH``
 
-You have to set this AFTER you set up basf2, otherwise basf2 will override the LD_LIBRARY_PATH again.
+You have to set this AFTER you set up `basf2`, otherwise `basf2` will override the LD_LIBRARY_PATH again.
 
-Note that the NeuroBayes libraries which are shipped with the basf2 externals are only dummy libraries which are used during the linking of b2bii.
-They do not contain any NeuroBayes code, only functions with the correct signatures which will crash if they are called. Therefore it is important that the correct NeuroBayes libraries are found by the runtime-linker BEFORE the libraries shipped with basf2. This means you have to add the neurobayes path before the library path of the externals.
+Note that the NeuroBayes libraries which are shipped with the `basf2` externals are only dummy libraries which are used during the linking of b2bii.
+They do not contain any NeuroBayes code, only functions with the correct signatures which will crash if they are called. Therefore it is important that the correct NeuroBayes libraries are found by the runtime-linker BEFORE the libraries shipped with `basf2`. This means you have to add the neurobayes path before the library path of the externals.
 
 Running FEI on converted Belle MC outside of KEK
 ************************************************
@@ -794,11 +794,11 @@ Since the latest neurobayes release 4.3.1 this license requirement is no longer 
 
 Neurobayes versions for Ubuntu (instead of SL6) are available as well.
 
-Anyway don't forget to add neurobayes to your ``LD_LIBRARY_PATH`` **after(!)** you set up basf2
+Anyway don't forget to add neurobayes to your ``LD_LIBRARY_PATH`` **after(!)** you set up `basf2`
 
 ``export LD_LIBRARY_PATH=/sw/belle/local/neurobayes/lib/:$LD_LIBRARY_PATH``
 
-Btw, the Neurobayes libraries which are shipped with the basf2 externals are only dummy libraries which will just crash if you try to use them.
+Btw, the Neurobayes libraries which are shipped with the `basf2` externals are only dummy libraries which will just crash if you try to use them.
 They are only used so everybody can compile b2bii (because you require the libraries to link the b2bii modules).
 
 

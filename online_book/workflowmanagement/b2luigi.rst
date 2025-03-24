@@ -25,7 +25,7 @@ b2luigi
 
 `Luigi <https://luigi.readthedocs.io/en/stable/>`_ is a workflow management framework named after a well-known plumber and widely used in industry. It was originally developed by the Spotify group and open-sourced in 2012. In luigi, the workflow logic is decentralized and integrated with the analysis code for every processing step.
 
-For Belle II workflows, the helper package :doc:`b2luigi:index` adds additional support for remote execution and ROOT file handling. In the following, we will provide a full example of a minimal Belle II analysis, employing gbasf2, basf2 and the LSF batch system. A full guide to :doc:`b2luigi:index` and luigi can be found elsewhere.
+For Belle II workflows, the helper package :doc:`b2luigi:index` adds additional support for remote execution and ROOT file handling. In the following, we will provide a full example of a minimal Belle II analysis, employing gbasf2, `basf2` and the LSF batch system. A full guide to :doc:`b2luigi:index` and luigi can be found elsewhere.
 
 Let us outline the general processing steps (called tasks in :doc:`b2luigi:index`) for a generic Belle II workflow:
 

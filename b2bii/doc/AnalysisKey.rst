@@ -24,7 +24,7 @@ There are three groups of lookup tables in Belle:
 Details of these tables and how they were studies can be found at
 `Belle PID Joint Homepage <https://belle.kek.jp/group/pid_joint/>`_.
 
-The weights for LID and KID are available in basf2 and can be retrieved via payloads in ``Belle_PID``;
+The weights for LID and KID are available in `basf2` and can be retrieved via payloads in ``Belle_PID``;
 naming schemes of each PID payloads are slightly different.
 
 

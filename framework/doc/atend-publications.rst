@@ -56,7 +56,7 @@ Conference proceedings
 Additional publications
 +++++++++++++++++++++++
 
-Here you can find a list of additional Belle II software publications covering algorithms currently under development. When fully implemented in basf2, these publications will be moved in the sections above.
+Here you can find a list of additional Belle II software publications covering algorithms currently under development. When fully implemented in `basf2`, these publications will be moved in the sections above.
 
 +-------------------------------------------------------------------------------------------+----------------------------------------------------------------------------+------------------------+
 | Title                                                                                     | DOI                                                                        | Topic                  |

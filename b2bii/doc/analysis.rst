@@ -17,7 +17,7 @@ over converted ROOT files.
 
 Global tags
 ~~~~~~~~~~~
-As all basf2 analysis, the necessary payloads are handled by basf2 and are stored
+As all `basf2` analyses, the necessary payloads are handled by `basf2` and are stored
 in the corresponding global tags in the conditions database at BNL.
 
 To avoid creating excess load to the BNL server, we have prepared a local database
@@ -39,8 +39,8 @@ following two lines **must** be added in the beginning of your b2bii analysis sc
    release older than the recommended ones.
 
 
-It is very easy to run any existing basf2 analysis python script over the Belle MC
-or data. If you already have a working basf2 physics analysis python script that
+It is very easy to run any existing `basf2` analysis python script over the Belle MC
+or data. If you already have a working `basf2` physics analysis python script that
 performs some kind of reconstruction, you simply need to replace the loading of
 Belle II MDST files with the Belle MDST files and executing the conversion.
 

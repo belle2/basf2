@@ -153,7 +153,7 @@ By default SectorMaps are read from the database. So you need to tell those scri
   echo $BELLE2_TESTING_VXDTF2_SECMAP
 
 
-Once this variable is set you can simply run either of the two above given validation scripts and check their output to validate the SectorMap. The validation can be run automatically with either of the following two shell commands (after basf2 is set up):
+Once this variable is set you can simply run either of the two above given validation scripts and check their output to validate the SectorMap. The validation can be run automatically with either of the following two shell commands (after `basf2` is set up):
 
 .. code-block:: bash
   :caption: run the VXDTF2 validation scripts

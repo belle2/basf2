@@ -114,7 +114,7 @@ classification performance.
 
 It is described in detail in this `MSc thesis <https://publish.etp.kit.edu/record/21416>`_.
 Tutorial files are available in
-``basf2`` in ``analysis/examples/tutorials/``.
+`basf2` in ``analysis/examples/tutorials/``.
 
 There are two big differences when using the DCS instead of the Continuum Suppression:
 

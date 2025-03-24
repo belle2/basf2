@@ -3,7 +3,7 @@
 Cut strings and selections
 --------------------------
 
-Cut strings in ``basf2`` analysis scripts work quite intuitively, particularly if you're comfortable with python logic.
+Cut strings in `basf2` analysis scripts work quite intuitively, particularly if you're comfortable with python logic.
 There are some minor differences with respect to  `ROOT <https://root.cern.ch>`_ cut strings.
 
 Cut strings are used to manipulate candidates (i.e. :doxygen:`ParticleList <classBelle2_1_1ParticleList>` s) with `modularAnalysis.applyCuts`, and `modularAnalysis.cutAndCopyList`.

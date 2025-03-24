@@ -20,30 +20,30 @@ The basics.
 
     **Questions**:
 
-    * What is basf2 and what does it do?
-    * What is a basf2 module, path, steering file?
+    * What is `basf2` and what does it do?
+    * What is a `basf2` module, path, steering file?
     * How can I get help?
 
     **Objectives**:
 
     * Correctly set up the Belle II environment.
     * Find the right chapters in this documentation.
-    * Run basf2 and display a list of variables
-    * Run basf2 in interactive ipython shell mode.
+    * Run `basf2` and display a list of variables
+    * Run `basf2` in interactive ipython shell mode.
     * Access the help in 3 different ways.
     * Confidently read the source code for a `modularAnalysis` convenience
       function.
 
-The Belle II software is called basf2.
+The Belle II software is called `basf2`.
 It is an abbreviation for "Belle II Analysis Software Framework".
-You may see also "BASF2" or "Basf2" in some outdated documentation, but the
-official way for writing it is basf2, using only lower case letters.
+You may see also "`BASF2`" or "`Basf2`" in some outdated documentation, but the
+official way for writing it is `basf2`, using only lower case letters.
 You might wonder why we didn't choose "b2asf", and when you get a bit further
 you will probably wonder why it has "analysis" in the name (it does much more
 than analysis)?
-Well historic reasons: Belle had BASF, we have basf2.
+Well historic reasons: Belle had BASF, we have `basf2`.
 
-basf2 is used in all aspects of the data-processing chain at Belle II:
+The `basf2` software is used in all aspects of the data-processing chain at Belle II:
 
 * generating simulated data,
 * unpacking of real raw data,
@@ -51,12 +51,12 @@ basf2 is used in all aspects of the data-processing chain at Belle II:
 * and high-level "analysis" reconstruction (such as applying cuts,
   vertex-fitting, ...).
 
-basf2 is not normally used for the final analysis steps (histogramming, fitting
+It is not normally used for the final analysis steps (histogramming, fitting
 1D distributions, ...).
 These final steps are usually called the "offline" analysis and will be covered
 in later lessons :ref:`onlinebook_offline_analysis`.
 
-There is a citable reference for basf2:
+There is a citable reference for `basf2`:
 
 Kuhr, T. *et al*. *Comput Softw Big Sci* **3**, 1 (2019)
 https://doi.org/10.1007/s41781-018-0017-9
@@ -68,9 +68,9 @@ https://doi.org/10.1007/s41781-018-0017-9
     :width: 300px
     :alt: The basf2 logo.
 
-    The basf2 logo.
+    The `basf2` logo.
 
-Pragmatically, you will encounter two separate objects named ``basf2``.
+Pragmatically, you will encounter two separate objects named `basf2`.
 It is both a **command-line executable which you can invoke**, and a **python
 module** from which you import functions.
 
@@ -92,11 +92,11 @@ You will soon be running commands that look like:
 Core concepts
 -------------
 
-There are some concepts we use in basf2, which you will definitely need to
+There are some concepts we use in `basf2`, which you will definitely need to
 understand.
 These are:
 
-* basf2 module,
+* `basf2` module,
 * path,
 * package,
 * steering script / steering file.
@@ -121,10 +121,10 @@ A good place to look for Belle II-specific jargon is the **Belle II Glossary**.
 
      `Belle II Glossary <https://xwiki.desy.de/xwiki/rest/p/1e1f2>`_
 
-basf2 modules
+`basf2` modules
 ~~~~~~~~~~~~~
 
-A basf2 module is a piece of (usually) C++ code that does a specific "unit" of
+A `basf2` module is a piece of (usually) C++ code that does a specific "unit" of
 data processing.
 The full documentation can be found here in this website under
 the section :ref:`general_modpath`.
@@ -140,7 +140,7 @@ the section :ref:`general_modpath`.
 Path
 ~~~~
 
-A basf2 path is an ordered list of modules that will be used to process the
+A `basf2` path is an ordered list of modules that will be used to process the
 data.
 You can think of building a path by adding modules in a chain.
 It is a python object: `basf2.Path`.
@@ -173,11 +173,11 @@ It is a python object: `basf2.Path`.
 Package
 ~~~~~~~
 
-A package is a logical collection of code in basf2.
+A package is a logical collection of code in `basf2`.
 A typical package has several modules and some python scripts which configure
 paths to do common things.
 
-You will encounter some basf2 packages in these lessons.
+You will encounter some `basf2` packages in these lessons.
 We try to give them meaningful names (tracking, reconstruction, ...)
 or name the package after the subdetector that they are related to (ecl, klm,
 cdc, top, ...).
@@ -209,7 +209,7 @@ Steering
 
 A steering file or a steering script is some python code that sets up some
 analysis or data-processing task.
-A typical steering file will declare a `basf2.Path`, configure basf2 modules,
+A typical steering file will declare a `basf2.Path`, configure `basf2` modules,
 and then add them to the path.
 Then it will call `basf2.process` and maybe print some information.
 We use the word "steering" since no real data **processing** is done in python.
@@ -265,9 +265,9 @@ good to be aware of the jargon.
 .. admonition:: Key points
     :class: key-points
 
-    * basf2 is the name of the Belle II software.
-    * You work in basf2 by adding modules to a path.
-    * *Most* basf2 modules are written in C++.
+    * `basf2` is the name of the Belle II software.
+    * You work in `basf2` by adding modules to a path.
+    * *Most* `basf2` modules are written in C++.
     * Data-processing happens when you process the path.
     * You do all of this configuration of the path, etc in python in
       a *steering file*.
@@ -286,7 +286,7 @@ good to be aware of the jargon.
 Getting started, and getting help interactively
 -----------------------------------------------
 
-Now let's setup the environment, actually execute ``basf2``, and navigate the
+Now let's setup the environment, actually execute `basf2`, and navigate the
 command line help.
 
 Please ``ssh`` onto your favourite site.
@@ -298,18 +298,18 @@ You shouldn't need to *install* anything
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A common misconception by newcomers (and even by senior people in the
-collaboration), is that you need to "install" basf2 or "install a release".
+collaboration), is that you need to "install" `basf2` or "install a release".
 
 It is possible to install from scratch, but you almost certainly **do not**
 want or need to do this.
-If you are working at KEK (for certain) and at many many other sites, basf2
+If you are working at KEK (for certain) and at many many other sites, `basf2`
 is available preinstalled.
 It is distributed by something called `/cvmfs <https://cernvm.cern.ch/fs/>`_.
 
 b2setup
 ~~~~~~~
 
-To set up your environment to work with ``basf2`` you first have to source the
+To set up your environment to work with `basf2` you first have to source the
 setup script...
 
 .. code-block:: bash
@@ -321,7 +321,7 @@ Some people like to put an alias to the setup script in their ``.profile`` (or
 You are welcome to do this if you like.
 
 So now you have a Belle II environment.
-You might have noticed that you still don't have the ``basf2`` executable:
+You might have noticed that you still don't have the `basf2` executable:
 
 .. code-block:: bash
 
@@ -333,7 +333,7 @@ You might have noticed that you still don't have the ``basf2`` executable:
 Note: we only used the ``$`` character to distinguish the commands from the
 expected output, it should not be typed.
 
-In order to get the ``basf2`` executable you need to choose a release
+In order to get the `basf2` executable you need to choose a release
 (a specific version of the software).
 If you don't know what release you want, you should take the latest stable
 full release or the latest light release (see below).
@@ -535,12 +535,12 @@ Try:
 You should notice that this is the same documentation that you will find by
 clicking on: `basf2.Path` here in this online documentation.
 
-In addition, there are some basf2-specific commands.
+In addition, there are some `basf2`-specific commands.
 
-Listing the basf2 modules
+Listing the `basf2` modules
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To find information about a basf2 module, try:
+To find information about a `basf2` module, try:
 
 .. code-block:: bash
 
@@ -548,16 +548,15 @@ To find information about a basf2 module, try:
     b2help-modules | grep "Particle"
     b2help-modules ParticleCombiner
 
-Listing the basf2 variables
+Listing the `basf2` variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In the next lessons, you will need to refer to physics quantities in plain
-text format.
-basf2 defines many **variables** for you.
+text format. Many variables are already defined in `basf2`. 
 These variables are collected in something called the
 :ref:`analysis_variablemanager_class`.
 
-To check the list of basf2 variables known to the :ref:`analysis_variablemanager_class`, run
+To check the list of `basf2` variables known to the :ref:`analysis_variablemanager_class`, run
 
 .. code-block:: bash
 
@@ -578,7 +577,7 @@ Listing the modular analysis convenience functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We have a python module full of useful shorthand functions which configure
-basf2 modules in the recommended way.
+`basf2` modules in the recommended way.
 It is called `modularAnalysis`.
 More on this later.
 
@@ -590,13 +589,13 @@ For now, you can list them all with:
 
 .. _onlinebook_basf2basics_b2help_particles:
 
-basf2 particles
+`basf2` particles
 ^^^^^^^^^^^^^^^
 
 Sometimes you will need to write particles' names in plain text format.
-basf2 adopts the convention used by ROOT, the PDG, EvtGen, ...
+`basf2` adopts the convention used by ROOT, the PDG, EvtGen, ...
 
-To show information about all the particles and properties known to basf2,
+To show information about all the particles and properties known to `basf2`,
 there is a tool ``b2help-particles``.
 
 .. code-block:: bash
@@ -663,15 +662,15 @@ there is a tool ``b2help-particles``.
 Other useful features
 ^^^^^^^^^^^^^^^^^^^^^
 
-If you just execute basf2 without any arguments, you will start an
-`IPython <https://ipython.org>`_ session with many basf2 functions imported.
+If you just execute `basf2` without any arguments, you will start an
+`IPython <https://ipython.org>`_ session with many `basf2` functions imported.
 Try just:
 
 .. code-block:: bash
 
     basf2
 
-In your IPython session, you can try the basf2 python interface to the `PDG
+In your IPython session, you can try the `basf2` python interface to the `PDG
 <https://pdg.lbl.gov>`_ database:
 
 .. code-block:: ipython
@@ -702,7 +701,7 @@ You can remind yourself of the documentation for a `basf2.Path` in yet another w
    In [12]: print(help(basf2.Path))
 
 
-To leave interactive basf2 / IPython, simply:
+To leave interactive `basf2` / IPython, simply:
 
 .. code-block:: ipython
 
@@ -716,11 +715,11 @@ To leave interactive basf2 / IPython, simply:
 Other useful things in your environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You might notice that setting up the basf2 environment means that you also have
+You might notice that setting up the `basf2` environment means that you also have
 tools like ROOT, and (an up-to-date version of) git.
 
 These come via the Belle II **externals**.
-We call software "external" if is not specific to Belle II but used *by* basf2.
+We call software "external" if is not specific to Belle II but used *by* `basf2`.
 
 .. seealso::
 
@@ -742,20 +741,20 @@ You will meet them in the :ref:`onlinebook_offline_analysis` lessons.
     * ``b2help-releases``
     * ``b2setup <choose a release>``
     * ``b2help-particles``
-    * basf2 has a python interface. You can use python tools to find help.
-    * ``basf2`` without any tools gets you into a basf2-flavoured IPython shell.
+    * `basf2` has a python interface. You can use python tools to find help.
+    * `basf2` without any tools gets you into a `basf2`-flavoured IPython shell.
 
 
-The basf2 analysis package
+The `basf2` analysis package
 --------------------------
 
-The analysis package of basf2 contains python functions and C++ basf2 modules
+The analysis package of `basf2` contains python functions and C++ `basf2` modules
 to help you perform your specific analysis on *reconstructed dataobjects*.
 It will probably become your favourite package.
 
 The collection of "reconstructed dataobjects" is actually a well-defined list.
 You will hear people call these "mdst dataobjects".
-The "mdst" is both a file-format and another basf2 package containing the
+The "mdst" is both a file-format and another `basf2` package containing the
 post-reconstruction dataobjects.
 
 .. admonition:: Exercise
@@ -785,7 +784,7 @@ post-reconstruction dataobjects.
      There are (at least) two ways to do this.
 
      * You can look at the function source code for `mdst.add_mdst_output`.
-     * You can browse the mdst/dataobjects directory in the basf2 source code:
+     * You can browse the mdst/dataobjects directory in the `basf2` source code:
        https://gitlab.desy.de/belle2/software/basf2/-/tree/main/mdst/dataobjects/include
 
      The important mdst dataobjects are:

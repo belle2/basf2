@@ -142,7 +142,7 @@ to be modified with corresponding ``RunNo`` accordingly.
 Generating signal MC with B2BII
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Signal MC samples can also be generated in basf2, using the ``BelleMCOutput`` module.
+Signal MC samples can also be generated in `basf2`, using the ``BelleMCOutput`` module.
 An example script of how to generate a MC sample with ``BelleMCOutput`` is at
 
 .. code-block:: csh
@@ -220,6 +220,6 @@ To generate user-defined decay files (aka signal decay files), use the following
 
 
 .. note::
-   Because the Belle detector geometry is not and will not be implemented in basf2, the simulation part can
+   Because the Belle detector geometry is not and will not be implemented in `basf2`, the simulation part can
    only be done in basf.
 

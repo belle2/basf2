@@ -1281,8 +1281,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
     track finding, a CKF based merger for standalone tracks, and finally the CDCToSVDSpacePointCKF.
 
     ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
-    One known issue is a reduced hit efficiency when using the full chain.
-    Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
+    ATTENTION: Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
@@ -1310,7 +1309,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
         Allowed options: \"before_ToSVDCKF\" (default) and \"after_ToCDCCKF\".
     """
 
-    B2WARNING("The inverted tracking chain starting from SVD is an experimental feature. "
+    B2WARNING("ATTENTION: The inverted tracking chain starting from SVD is an experimental feature. "
               "It is neither well optimised nor tested for the time being. "
               "Please be careful when interpreting the results!")
 

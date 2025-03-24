@@ -10,7 +10,7 @@ For the inference part, a well trained neural network
 (parameters saved in global tag ``SmartBKG_GATGAP`` with payload ``GATGAPgen.pth``)
 to filter out events that can pass FEI hadronic B0 skim is available. The corresponding neural network
 built with PyTorch is stored in ``generators/scripts/smartBKG/models/gatgap.py`` while
-``generators/scripts/smartBKG/b2modules/NN_filter_module.py`` is a wrapper (``basf2.module``) suited in `basf2`
+``generators/scripts/smartBKG/b2modules/NN_filter_module.py`` is a wrapper (``basf2.module``) suited in ``basf2``
 framework. An example of how to generate skimmed events using SmartBKG can be found in 
 ``generators/examples/SmartBKGEvtGen.py``.
 
@@ -48,7 +48,7 @@ specifying file names and/or job IDs.
 
 .. note:: A substantial number of passing events (O(10^5)) is necessary for effective training of the neural network.
 
-The neural network can be trained using ``generators/examples/SmartBKGTrain.py`` without the need for the `basf2` 
+The neural network can be trained using ``generators/examples/SmartBKGTrain.py`` without the need for the ``basf2`` 
 environment. This allows you to conduct training or fine-tuning locally on your GPU device, enhancing performance 
 and speeding up the process.
 

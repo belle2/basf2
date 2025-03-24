@@ -87,7 +87,7 @@ results of a physics validation performed with ``b2validation``.
 Convenience Functions
 =====================
 
-In order to simplify the generation of validation histograms in your `basf2`
+In order to simplify the generation of validation histograms in your ``basf2``
 steering file, you can use the following:
 
 .. autofunction:: validation_tools.metadata.create_validation_histograms

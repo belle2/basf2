@@ -10,7 +10,7 @@ The inter-detector track finding is done through a `Combinatorial Kalman Filter 
 
 The base of our CKF is a generic *state* object. A state in a CKF can either be based on the :ref:`RecoTrack<recotrack>` that is extrapolated in the current detector, or the hits in the detector that is extrapolated to. These states are from here on referred to as track-based and hit-based, respectively.
 
-The base concept of the CKF in `basf2` is described here briefly. The first step is the *relation creation*:
+The base concept of the CKF in ``basf2`` is described here briefly. The first step is the *relation creation*:
 
 1. Use the track-based states to build relations to hit-based states, applying rather loose cuts to build and keep all the correct relations.
 
@@ -38,7 +38,7 @@ Each of the filters thus has different information available to decide whether o
 
 After the tree has been traversed and no more hit-bases states can be added to any path, a final *result filter* is employed. It checks for all the paths belonging to a given seed state which is the best path overall. Only the best overall path for each seed is kept.
 
-These are the CKF algorithms that are used in `basf2`. Each section contains more information about the specific implementation.
+These are the CKF algorithms that are used in ``basf2``. Each section contains more information about the specific implementation.
 
 .. _tracking_cdc2svd_ckf:
 

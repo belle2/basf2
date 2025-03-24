@@ -105,15 +105,15 @@ The production of a MC sample can be divided in three main steps:
 
    We can produce MC samples only by using a full release, and not a light one. In a light release we do not have
    the generators, simulation and reconstruction packages, meaning that running with a light release a steering file
-   intended for some MC production will result in a `basf2` crash.
+   intended for some MC production will result in a ``basf2`` crash.
 
 
 How to write a steering file for the Monte Carlo production
 -----------------------------------------------------------
 
-Of course, for the production of a MC sample we have to write `basf2` a steering file. Let's see how to write it.
+Of course, for the production of a MC sample we have to write ``basf2`` a steering file. Let's see how to write it.
 
-As usual, one has to start by importing `basf2` and creating a main path.
+As usual, one has to start by importing ``basf2`` and creating a main path.
 
 
 .. code-block:: python
@@ -148,7 +148,7 @@ number.
         main.add_module('EventInfoSetter', evtNumList=[10], expList=[0])
 
      Alternatively, you can just add the module to the steering path without setting the module's parameters and
-     you can set the number of events and the experiment number via command line using the `basf2` arguments:
+     you can set the number of events and the experiment number via command line using the ``basf2`` arguments:
 
      .. code-block:: bash
 
@@ -208,7 +208,7 @@ Now we have to add to the steering path the relevant functions for:
 .. warning::
 
    Even if the produced mDST file is a ``.root`` file, you can not open it like you did in previous lessons using
-   ``pandas``, because it contains `basf2` objects and it is not designed to be properly opened with different
+   ``pandas``, because it contains ``basf2`` objects and it is not designed to be properly opened with different
    software. In case you are really curious to know which objects are stored there, you can run
    ``b2file-size my_mdst_output.root`` in your shell.
 

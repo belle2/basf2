@@ -81,13 +81,13 @@ Prerequisites
 *************
 
 As usual, we start our steering file by importing the  necessary python packages,
-creating a `basf2` path and loading input data.
-In addition to the usual python packages (`basf2` and `modularAnalysis`) we also import the ``fei`` package.
+creating a ``basf2`` path and loading input data.
+In addition to the usual python packages (``basf2`` and `modularAnalysis`) we also import the ``fei`` package.
 
 .. admonition:: Exercise
     :class: exercise stacked
 
-    Import `basf2`, ``modularAnalysis`` and ``fei``.
+    Import ``basf2``, ``modularAnalysis`` and ``fei``.
     In addition, we will be using variable aliases so be sure to import the variable manager.
     Then create a path and
     load input data from an ``mdst`` file.
@@ -108,7 +108,7 @@ with the mdst file as argument.
 But there is also a handy method in the `modularAnalysis` package. Can you find it?
 
 The correct Global Tag must then be used in your steering file by prepending it
-to the `conditions.globaltags <ConditionsConfiguration.globaltags>` list in the `basf2` namespace.
+to the `conditions.globaltags <ConditionsConfiguration.globaltags>` list in the ``basf2`` namespace.
 There is also a convenience function for that!
 
 .. admonition:: Exercise
@@ -191,7 +191,7 @@ in a single Global Tag and is ``prefix=FEIv4_2021_MC14_release_05_01_12`` for th
         :start-at: S20
         :end-at: E20
 
-The configuration created above must now be turned into a `basf2` path which can be appended to the main path.
+The configuration created above must now be turned into a ``basf2`` path which can be appended to the main path.
 This is done with the `fei.get_path` function which takes the channel configuration
 and the general FEI configuration as arguments and returns a `FeiState <fei.core.FeiState>` object.
 The ``path`` attribute of this newly-created `FeiState  <fei.core.FeiState>` (e.g. ``feistate.path``) is then appended
@@ -599,7 +599,7 @@ There are different implementations of the missing mass squared in *basf2*, this
 B\ :sub:`tag` momentum (here reconstructed by the FEI) and has therefore a high resolution.
 
 A second variable with high separating power is the number of additional charged tracks introduced above.
-This variable is called `nROE_Charged` in `basf2`. It needs the ROE mask name defined above as an argument in brackets.
+This variable is called `nROE_Charged` in ``basf2``. It needs the ROE mask name defined above as an argument in brackets.
 
 .. admonition:: Exercise
     :class: exercise stacked

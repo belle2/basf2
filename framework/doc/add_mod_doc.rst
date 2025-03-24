@@ -1,11 +1,11 @@
-Add `basf2` Modules Documentation to Sphinx
--------------------------------------------
+Add ``basf2`` Modules Documentation to Sphinx
+---------------------------------------------
 
-Documentation for `basf2` modules can be added to sphinx automatically using
+Documentation for ``basf2`` modules can be added to sphinx automatically using
 
 .. rst:directive:: b2-modules
 
-  Will automatically document `basf2` modules. Without any arguments it will
+  Will automatically document ``basf2`` modules. Without any arguments it will
   document all existing modules. It has the following optional parameters
 
   .. rst:role:: package

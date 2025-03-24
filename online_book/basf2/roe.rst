@@ -27,7 +27,7 @@ The Rest of Event (ROE)
 
 After the reconstruction of the signal particle list it is very useful
 to look into the the particles that are not associated to the signal particle list.
-In `basf2` these particles are called "Rest of Event" and this is the main topic of the chapter.
+In ``basf2`` these particles are called "Rest of Event" and this is the main topic of the chapter.
 
 The Rest of Event (ROE) can contain a lot of information: in case of B-physics, the ROE of one B-meson includes
 particles from the partner B-meson and in case of charm and tau analysis, the ROE of the lepton has the partner
@@ -98,7 +98,7 @@ In principle, one can already try to use some of the Rest of Event variables.
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Use the search feature in the `basf2` documentation, or use the offline help by typing ``b2help-variables``
+     Use the search feature in the ``basf2`` documentation, or use the offline help by typing ``b2help-variables``
      in your bash terminal (for example ``b2help-variables | grep -i roe``).
 
 .. admonition:: Solution

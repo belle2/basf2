@@ -204,7 +204,7 @@ Skim flags can also be used in combined skims, with the individual flags being a
 
 .. seealso::
 
-   Skim flags are implemented using two `basf2` modules, which are documented in `skim-utils-flags`_.
+   Skim flags are implemented using two ``basf2`` modules, which are documented in `skim-utils-flags`_.
 
 .. _skim-running:
 
@@ -220,7 +220,7 @@ In the skim package, there are command-line tools available for running skims, d
 
 .. tip::
    This tool completely supplants the ``<SkimName>_Skim_Standalone.py`` steering files from
-   previous versions of `basf2`. The ``standalone/`` and ``combined/`` directories no longer exist in
+   previous versions of ``basf2``. The ``standalone/`` and ``combined/`` directories no longer exist in
    the skim package from version-05-00-00 onwards.
 
 .. argparse::
@@ -281,7 +281,7 @@ The skim numbering convention is defined on the `XWiki skim page`_.
 Testing skim performance
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-When skims are developed, it is important to test the performance of the skim on a data and on a range of background MC samples. Two command-line tools are provided in the skim package to aid in this: :ref:`b2skim-stats-submit<b2skim-stats-submit>` and :ref:`b2skim-stats-print<b2skim-stats-print>`. They are available in the ``PATH`` after setting up the `basf2` environment after calling ``b2setup``. The former submits a series of test jobs for a skim on data and MC samples, and the latter uses the output files of the jobs to calculate performance statistics for each sample including retention rate, CPU time, and uDST size per event. ``b2skim-stats-print`` also provides estimates for combined MC samples, where the statistics are weighted by the cross-section of each background process.
+When skims are developed, it is important to test the performance of the skim on a data and on a range of background MC samples. Two command-line tools are provided in the skim package to aid in this: :ref:`b2skim-stats-submit<b2skim-stats-submit>` and :ref:`b2skim-stats-print<b2skim-stats-print>`. They are available in the ``PATH`` after setting up the ``basf2`` environment after calling ``b2setup``. The former submits a series of test jobs for a skim on data and MC samples, and the latter uses the output files of the jobs to calculate performance statistics for each sample including retention rate, CPU time, and uDST size per event. ``b2skim-stats-print`` also provides estimates for combined MC samples, where the statistics are weighted by the cross-section of each background process.
 
 First run ``b2skim-stats-submit``, which will submit small skim jobs on test files of MC and data using ``bsub``. For example,
 

@@ -62,7 +62,7 @@ An example for the 1st MVA is reported below:
 step 3: 1st-MVA performance evaluation
 """"""""""""""""""""""""""""""""""""""
 
-The performance evaluation is done with the dedicated `basf2` tool for MVA evaluation, ``basf2_mva_evaluate.py``.
+The performance evaluation is done with the dedicated ``basf2`` tool for MVA evaluation, ``basf2_mva_evaluate.py``.
 An example is reported in the following:
 
 .. code:: bash

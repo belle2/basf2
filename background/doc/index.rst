@@ -19,7 +19,7 @@ Things users should consider when using this package are the following:
   * Mixing: Adding simulated hits of many simulated background events to a single simulated physics event. Each simulated background event is in addition randomly shifted within the given time window. 
     The number of events added is determined from the rate of a particular background type. 
     There are two categories: beam-induced backgrounds (Touschek, beam-gas interactions etc), luminosity backgrounds (radiative Bhabha, two-photon). 
-    The former ones are simulated with SAD simulation provided by the Accelerator group and the latter ones within `basf2` using the corresponding particle generator. 
+    The former ones are simulated with SAD simulation provided by the Accelerator group and the latter ones within ``basf2`` using the corresponding particle generator. 
     The rates of the beam-induced backgrounds depend on the accelerator lattice, collimator settings, gas pressure and beam currents, while the rates of luminosity backgrounds are proportional to luminosity. 
     Needless to say that this method is slow and very much statistically limited. For the list of background types see framework/dataobjects/include/BackgroundMetaData.h
 

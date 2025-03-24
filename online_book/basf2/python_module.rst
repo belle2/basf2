@@ -3,7 +3,7 @@
 A simple python module
 =======================
 
-This lesson will give you an idea about the structure and use of `basf2` modules.
+This lesson will give you an idea about the structure and use of ``basf2`` modules.
 Most of the modules in our software are implemented in C++ and are made
 available for analysis by `modularAnalysis`. This package consists of python
 wrapper functions around the C++ modules in order to use them in the python
@@ -11,7 +11,7 @@ steering file. You have already learned about this in
 :ref:`onlinebook_basf2_introduction`
 
 C++ is very strong and fast, but usually much more complicated to read and write
-than Python. For this reason the `basf2` framework provides the possibility to
+than Python. For this reason the ``basf2`` framework provides the possibility to
 write modules also in Python. This can be very helpful if you want to
 investigate or test something.
 
@@ -23,7 +23,7 @@ Minimal example
 ---------------
 
 Let's begin with the following minimal example for a new python module. It is
-the "Hello World" of `basf2` modules. The magic happens in the class
+the "Hello World" of ``basf2`` modules. The magic happens in the class
 ``MinModule(basf2.Module)``. In this basic example, the class only consists of
 one member function ``event`` that is called once for each event. We use the
 logging function ``basf2.B2INFO()`` to print our message. To execute the model,

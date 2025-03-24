@@ -84,7 +84,7 @@ If You Want to Save All (or Most of) the Secondary Particle Information in the M
 From time to time, you may want to save all the secondary particle information in the output ``MCParticle``
 block for the detector response studies such as shower shape analysis, etc. Here is the way to do as you want.
 A certain ``FullSim`` parameters should be modified to steer the writing process for the secondary particles
-in the correct way. In the python steering file for your `basf2` job script, use the following lines in place
+in the correct way. In the python steering file for your ``basf2`` job script, use the following lines in place
 of the corresponding ``add_simulation`` lines or the equivalent:
 
 .. code-block:: python
@@ -112,7 +112,7 @@ This is stored in the MCParticles and can be retrieved as
 
 
 Between the physics process type and subtype, the subtype parameter gives more detailed information.
-What is implemented in `basf2` is the subtype information. Unfortunately, the *Geant4* people did not store the
+What is implemented in ``basf2`` is the subtype information. Unfortunately, the *Geant4* people did not store the
 definition of subtypes in one file, so one should check several Geant4 files for these numbers. The following is
 the list of constants implemented in *Geant4 v9.6*. They used the same list for v10, too.
 

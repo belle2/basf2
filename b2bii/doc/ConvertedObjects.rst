@@ -8,7 +8,7 @@ converted objects should be used in the analysis.
 -----------------------------
 Charged Final State Particles
 -----------------------------
-The basf and `basf2` softwares use different helix parameterisations, however there is a
+The basf and ``basf2`` softwares use different helix parameterisations, however there is a
 well defined transformation from one parameterisation to the other. The Belle MDST
 format stores in addition to the five helix parameters also the reference point
 (or pivot point), which is assumed to be always point ``(0,0,0)`` in the case of
@@ -19,7 +19,7 @@ in the case of conversion of ``V0``'s daughter tracks.
 
 .. note::
    There is nothing special to note regarding the usage of converted charged
-   tracks in `basf2`. Use the usual ``fillParticleList(...)`` or
+   tracks in ``basf2``. Use the usual ``fillParticleList(...)`` or
    ``fillParticleLists(...)`` analysis functions to create and fill charged
    kaon, pion, electron, muon and proton :doxygen:`ParticleList <classBelle2_1_1ParticleList>` s.
 
@@ -27,7 +27,7 @@ in the case of conversion of ``V0``'s daughter tracks.
 Particle Identification
 ~~~~~~~~~~~~~~~~~~~~~~~
 Despite the different parameterisations, charged final state particles can still
-be reconstructed using the `fillParticleList` function in `basf2`.
+be reconstructed using the `fillParticleList` function in ``basf2``.
 But due to the different definition, as well as detector, it is not
 recommended to use Belle II style PID in b2bii.
 
@@ -41,7 +41,7 @@ systems (CDC, ACC, TOF, ECL, KLM). The combination of individual likelihoods fro
 each sub detector system is in some cases (eID) combined with the usage of external
 information, such as a priori probabilities of each particle type that is read from
 the Belle DB.
-Due to this fact the Belle-like PID probabilities can not be reproduced in `basf2` from
+Due to this fact the Belle-like PID probabilities can not be reproduced in ``basf2`` from
 the raw likelihoods and special Belle-legacy variables that reproduce them are
 introduced.
 
@@ -67,13 +67,13 @@ reproduce them:
 -----------------------------
 Neutral Final State Particles
 -----------------------------
-When it comes to ECL related objects the basf and `basf2` MDST data formats differ
+When it comes to ECL related objects the basf and ``basf2`` MDST data formats differ
 substantially, which makes one-to-one conversion impossible. The reconstructed
 ``ECL clusters``, both charged (with matched charged track) and neutral
 (without matched charged track), are in basf stored as ``Mdst_ecl`` (and ``Mdst_ecl_aux``)
-and in `basf2` as ECLClusters. These two data types match quite well.
+and in ``basf2`` as ECLClusters. These two data types match quite well.
 However, the basf MDST format has two additional data types: ``Mdst_Gamma`` and ``Mdst_Pi0``,
-for which there is no equivalent data type in the `basf2` MDST format.
+for which there is no equivalent data type in the ``basf2`` MDST format.
 Instead, the B2BII converter by default creates ``gamma:mdst`` and ``pi0:mdst``
 ParticleLists, which are filled with particle objects created for each
 ``Mdst_Gamma`` and ``Mdst_Pi0`` entry.
@@ -86,7 +86,7 @@ ParticleLists, which are filled with particle objects created for each
 .. note::
    A mass-constrained fit has been applied to ``pi0`` candidates in ``Mdst_Pi0``.
    However, the covariance matrix is not stored in panther tables. If you need
-   this information in the analysis, you can redo the mass-constrained fit in `basf2`.
+   this information in the analysis, you can redo the mass-constrained fit in ``basf2``.
 
 You can also set the argument ``convertNbar`` of `convertBelleMdstToBelleIIMdst` to ``true`` to copy particles with an energy
 above 500 MeV in ``gamma:mdst`` and create a ParticleList ``anti-n0:mdst``. In the steering file,
@@ -104,7 +104,7 @@ V0 Particles
 ------------
 As mentioned above (section on charged final state particles) all charged
 tracks are parametrised with helix with the reference point set to (0,0,0)
-in `basf2`. This is not optimal in the case of ``V0s`` whose decay vertices can
+in ``basf2``. This is not optimal in the case of ``V0s`` whose decay vertices can
 be far away from the origin. Therefore all ``V0`` candidates from the ``Mdst_Vee2``
 table in basf are converted to Particles and collected in the ``K_S0:mdst``,
 ``Lambda0:mdst``, and ``gamma:v0mdst`` ParticleLists.

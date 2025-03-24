@@ -169,11 +169,11 @@ Generally, the functionalities of the program are as follows.
 .. note::
 
    Below are some general remarks on the relationship between the ``TopoAna``
-   program and the :ref:`mcmatching` module in `basf2`, namely
+   program and the :ref:`mcmatching` module in ``basf2``, namely
    :b2:mod:`MCMatcherParticles`.
 
    1. As we introduce in :numref:`TopologyAnalysis`, ``TopoAna`` is an offline
-      tool independent of `basf2`. It gets the human-friendly topology
+      tool independent of ``basf2``. It gets the human-friendly topology
       information on its own from the raw MC truth information obtained with
       the interface ``MCGenTopo``. Obviously, it does not rely on
       :b2:mod:`MCMatcherParticles`.
@@ -195,12 +195,12 @@ Install the software
 
 Please follow the steps below to install the software.
 
-1. Set up `basf2` (see :numref:`cvmfs_setup`) if you have not
+1. Set up ``basf2`` (see :numref:`cvmfs_setup`) if you have not
 
  .. note::
 
     This guarantees you have ``ROOT`` installed in your environment.
-    It does not mean ``TopoAna`` is a software based on `basf2`.
+    It does not mean ``TopoAna`` is a software based on ``basf2``.
     Instead, the software is only based on ``ROOT``.
 
 2. ``cd yourDirectoryForTopoAna``
@@ -242,7 +242,7 @@ Get the input data
 ------------------
 
 As we mention in :numref:`TopologyAnalysis`, ``MCGenTopo`` is the interface of
-`basf2` to ``TopoAna``.
+``basf2`` to ``TopoAna``.
 In the following we introduce the steps to get the input data to ``TopoAna``
 with the interface.
 
@@ -263,7 +263,7 @@ with the interface.
  Here, ``n`` is the number of ``MCGenPDG_i``/``MCGenMothIndex_i`` variables,
  and its default value is 200.
 
-3. Run your python steering script with `basf2`
+3. Run your python steering script with ``basf2``
 
 Below is an example of the python steering script.
 
@@ -460,8 +460,8 @@ After the following steps:
          topoana.exe: error while loading shared libraries: libCore.so: cannot open shared object
          file: No such file or directory
 
-      setting up `basf2` before executing the command solves the problem, 
-      in cases that you installed ``TopoAna`` in the `basf2` environment
+      setting up ``basf2`` before executing the command solves the problem, 
+      in cases that you installed ``TopoAna`` in the ``basf2`` environment
       previously.
 
 you can get the following four output files: ``topoana.txt``, ``topoana.tex``,
@@ -591,7 +591,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
 
    Reivse your python steering script by adding ``import os`` to the end of its
    preamble and appending ``os.system('topoana.exe topoana.card')`` at its end,
-   and then run the script with `basf2`.
+   and then run the script with ``basf2``.
 
    Below is an example of the revised script.
 

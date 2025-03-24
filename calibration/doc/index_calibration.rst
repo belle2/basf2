@@ -3,12 +3,12 @@
 Calibration
 ===========
 
-Calibration processes at Belle II are designed to be run within the `basf2` environment so that any
-`basf2` user can develop and run them without needing to install anything else.
+Calibration processes at Belle II are designed to be run within the ``basf2`` environment so that any
+``basf2`` user can develop and run them without needing to install anything else.
 The calibration package contains three main components:
 
-#. The calibration framework C++ code that defines base classes and `basf2` modules to extract calibration
-   data objects during a `basf2` process and save them.
+#. The calibration framework C++ code that defines base classes and ``basf2`` modules to extract calibration
+   data objects during a ``basf2`` process and save them.
 
 #. The calibration framework Python code which is essentially a job submission and monitoring system.
 

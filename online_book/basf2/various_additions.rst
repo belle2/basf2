@@ -414,7 +414,7 @@ random seed.
 .. admonition:: Exercise
    :class: exercise stacked
 
-   Set the `basf2` random seed to ``"Belle II StarterKit"``.
+   Set the ``basf2`` random seed to ``"Belle II StarterKit"``.
    Then, rank your B mesons using the `random` variable, with the one with the
    highest value first.
    Keep only the best candidate.

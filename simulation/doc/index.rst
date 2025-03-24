@@ -9,7 +9,7 @@ tracks they leave). MC with detector simulation can then be processed in the sam
 data, allowing for an accurate comparison that takes detector effects into account as well.
 
 The core of the simulation library is `Geant4`_, which is an external library.
-A simulation library module, **FullSim**, was created as a wrapper for the `basf2`
+A simulation library module, **FullSim**, was created as a wrapper for the ``basf2``
 - Geant4 interface. The default input parameters for FullSim are stored in two places,
 
 * `simulation/scripts/simulation.py <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/simulation/scripts/simulation.py>`_ and
@@ -20,7 +20,7 @@ Geant4 version in the externals library
 
 The Geant4 version information is stored in the variable ``G4Version`` in the Geant4 source code `global/management/include/G4Version.hh <https://geant4.kek.jp/lxr/source/global/management/include/G4Version.hh>`_.
  
-The history of Geant4 version information in the `basf2` external library is as follows:
+The history of Geant4 version information in the ``basf2`` external library is as follows:
 
 
 +------------------------+----------------+
@@ -41,7 +41,7 @@ The history of Geant4 version information in the `basf2` external library is as 
 | v00-00-01 to v00-00-04 |     9.3.0      |
 +------------------------+----------------+
 
-To check the externals version of your current `basf2` setup, use::
+To check the externals version of your current ``basf2`` setup, use::
 
   echo $BELLE2_EXTERNALS_VERSION
 
@@ -52,7 +52,7 @@ Physics list for Geant4
 PhysicsList collects information on all the particles, physics processes and production thresholds to
 be used in the detector simulation. This class is passed to the Geant4 run manager as the
 "physics configuration” of the application.
-The `basf2` software has two options for the input physics list for Geant4.
+The ``basf2`` software has two options for the input physics list for Geant4.
 
 The default physics list
 """"""""""""""""""""""""
@@ -68,7 +68,7 @@ The details on the *Belle2PhysicsList* are explained below.
 
 .. note:: 
 
-   The **Belle2PhysicsList** option became the default option with `basf2` release 05-00-00.
+   The **Belle2PhysicsList** option became the default option with ``basf2`` release 05-00-00.
 
 
 .. toctree::

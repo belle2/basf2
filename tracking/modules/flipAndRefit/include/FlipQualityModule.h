@@ -10,8 +10,10 @@
 #include <tracking/trackFindingVXD/mva/MVAExpert.h>
 
 #include <framework/core/Module.h>
-#include <tracking/trackFitting/trackQualityEstimator/variableExtractors/FlipRecoTrackExtractor.h>
-#include <tracking/trackFitting/trackQualityEstimator/variableExtractors/Flip2ndRecoTrackExtractor.h>
+#include <tracking/modules/flipAndRefit/utilities/FlipRecoTrackExtractor.h>
+//#include <tracking/trackFitting/trackQualityEstimator/variableExtractors/FlipRecoTrackExtractor.h>
+#include <tracking/modules/flipAndRefit/utilities/Flip2ndRecoTrackExtractor.h>
+//#include <tracking/trackFitting/trackQualityEstimator/variableExtractors/Flip2ndRecoTrackExtractor.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/RecoTrack.h>

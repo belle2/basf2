@@ -23,12 +23,12 @@ namespace Belle2 {
     class CDCWireHit;
     class Vector3D;
     class CDCRecoHit3D;
+    class CDCRecoHit2D;
     class CDCRLWireHit;
   }
 
   namespace TrackFindingCDC {
     class CDCMCMap;
-    class CDCRecoHit2D;
 
     /// Singletone class to gather local information about the hits.
     /** Because of the reassignment of secondary hits and the different definition of the right
@@ -110,13 +110,13 @@ namespace Belle2 {
       TrackingUtilities::CDCRecoHit3D getClosestPrimaryRecoHit3D(const CDCHit* ptrHit,
                                                                  const std::vector<TrackingUtilities::CDCWireHit>& wireHits) const;
 
-      /// Construct an CDCRecoHit2D from the (potential secondary) CDCSimHit information related to the CDCHit.
-      CDCRecoHit2D getRecoHit2D(const CDCHit* ptrHit,
-                                const std::vector<TrackingUtilities::CDCWireHit>& wireHits) const;
+      /// Construct an TrackingUtilities::CDCRecoHit2D from the (potential secondary) CDCSimHit information related to the CDCHit.
+      TrackingUtilities::CDCRecoHit2D getRecoHit2D(const CDCHit* ptrHit,
+                                                   const std::vector<TrackingUtilities::CDCWireHit>& wireHits) const;
 
-      /// Construct an CDCRecoHit2D from the closest primary CDCSimHit information related to the CDCHit.
-      CDCRecoHit2D getClosestPrimaryRecoHit2D(const CDCHit* ptrHit,
-                                              const std::vector<TrackingUtilities::CDCWireHit>& wireHits) const;
+      /// Construct an TrackingUtilities::CDCRecoHit2D from the closest primary CDCSimHit information related to the CDCHit.
+      TrackingUtilities::CDCRecoHit2D getClosestPrimaryRecoHit2D(const CDCHit* ptrHit,
+                                                                 const std::vector<TrackingUtilities::CDCWireHit>& wireHits) const;
 
     private:
       /// Reference to the CDCMCMap to be used in this event

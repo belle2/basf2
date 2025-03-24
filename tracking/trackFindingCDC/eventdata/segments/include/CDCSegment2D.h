@@ -9,7 +9,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit2D.h>
 
 #include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
@@ -33,7 +33,7 @@ namespace Belle2 {
     class CDCTangent;
 
     //! A reconstructed sequence of two dimensional hits in one super layer
-    class CDCSegment2D : public CDCSegment<CDCRecoHit2D> {
+    class CDCSegment2D : public CDCSegment<TrackingUtilities::CDCRecoHit2D> {
     public:
       /*!
        *  Averages the reconstructed positions from hits that overlap

@@ -7,9 +7,11 @@
 
 #pragma link C++ class Belle2::TrackingUtilities::CDCWireHit+; // checksum=0x567f0541, version=-1
 
+#pragma link C++ class Belle2::TrackingUtilities::CDCRecoHit2D+; // checksum=0xf5157ad0, version=-1
 #pragma link C++ class Belle2::TrackingUtilities::CDCRecoHit3D+; // checksum=0xad1a22b2, version=-1
 
 // Some dictionaries for vectors and pairs that will be needed
+#pragma link C++ class std::vector<Belle2::TrackingUtilities::CDCRecoHit2D>+; // checksum=0x72a8a06f, version=6
 #pragma link C++ class std::vector<Belle2::TrackingUtilities::CDCRecoHit3D>+; // checksum=0x72a8a078, version=6
 #pragma link C++ class std::vector<Belle2::TrackingUtilities::CDCWireHit>+; // checksum=0x7e84c4b7, version=6
 #pragma link C++ class std::vector<const Belle2::TrackingUtilities::CDCWireHit*>+; // checksum=0xbbf2d42a, version=6

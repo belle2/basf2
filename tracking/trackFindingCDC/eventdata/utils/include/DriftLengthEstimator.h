@@ -18,10 +18,10 @@ namespace Belle2 {
   namespace TrackingUtilities {
     class CDCTrack;
     class CDCRecoHit3D;
+    class CDCRecoHit2D;
   }
   namespace TrackFindingCDC {
     class CDCFacet;
-    class CDCRecoHit2D;
     class CDCSegment2D;
     class CDCSegment3D;
 
@@ -32,7 +32,7 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
       /// Update the drift length of the reconstructed hit in place.
-      double updateDriftLength(CDCRecoHit2D& recoHit2D);
+      double updateDriftLength(TrackingUtilities::CDCRecoHit2D& recoHit2D);
 
       /// Update the drift length of the reconstructed hit in place.
       double updateDriftLength(TrackingUtilities::CDCRecoHit3D& recoHit3D, double tanLambda);

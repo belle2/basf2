@@ -28,12 +28,12 @@ namespace Belle2 {
     class CDCWireHit;
     class CDCTrack;
     class CDCRecoHit3D;
+    class CDCRecoHit2D;
   }
 
   namespace TrackFindingCDC {
     class BoundingBox;
     class CDCTangent;
-    class CDCRecoHit2D;
     class CDCWireHitCluster;
     class CDCSegment2D;
     class CDCSegment3D;
@@ -186,8 +186,8 @@ namespace Belle2 {
       void draw(const TrackingUtilities::CDCWireHit& wireHit,
                 const AttributeMap& attributeMap = AttributeMap());
 
-      /// Draws the CDCRecoHit2D as a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
-      void draw(const CDCRecoHit2D& recoHit2D,
+      /// Draws the TrackingUtilities::CDCRecoHit2D as a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
+      void draw(const TrackingUtilities::CDCRecoHit2D& recoHit2D,
                 const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the CDCRecoHit3D as a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""

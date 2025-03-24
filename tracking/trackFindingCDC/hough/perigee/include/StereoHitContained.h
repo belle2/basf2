@@ -45,7 +45,7 @@ namespace Belle2 {
       {
         size_t nHits = segment2D->size();
         auto weightOfHit = [this, &houghBox](const TrackingUtilities::Weight & totalWeight,
-        const CDCRecoHit2D & recoHit2D) -> TrackingUtilities::Weight {
+        const TrackingUtilities::CDCRecoHit2D & recoHit2D) -> TrackingUtilities::Weight {
           TrackingUtilities::Weight hitWeight = this->operator()(&recoHit2D, houghBox);
           return std::isnan(hitWeight) ? totalWeight : totalWeight + hitWeight;
         };
@@ -67,7 +67,7 @@ namespace Belle2 {
       /** Checks if the two dimensional reconstructed hit is contained in a phi0 curv hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
-      TrackingUtilities::Weight operator()(const CDCRecoHit2D* recoHit2D,
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCRecoHit2D* recoHit2D,
                                            const HoughBox* houghBox)
       {
         const TrackingUtilities::CDCWire& wire = recoHit2D->getWire();

@@ -11,7 +11,7 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackingUtilities/topology/CDCWireTopology.h>

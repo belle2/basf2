@@ -19,7 +19,7 @@
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<Belle2::TrackingUtilities::CDCWireHit>+; // checksum=0x2c23b551, version=-1
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<const Belle2::TrackingUtilities::CDCWireHit *>+; // checksum=0xf77f3101, version=-1
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<Belle2::TrackingUtilities::CDCRLWireHit>+; // checksum=0xc51a8461, version=-1
-#pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<Belle2::TrackFindingCDC::CDCRecoHit2D>+; // checksum=0x399c5239, version=-1
+#pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<Belle2::TrackingUtilities::CDCRecoHit2D>+; // checksum=0x399c5239, version=-1
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<Belle2::TrackFindingCDC::CDCTangent>+; // checksum=0xa1d46fad, version=-1
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<Belle2::TrackFindingCDC::CDCFacet>+; // checksum=0x5b641185, version=-1
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<Belle2::TrackingUtilities::CDCRecoHit3D>+; // checksum=0x871014ad, version=-1

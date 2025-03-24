@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit2D.h>
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
@@ -19,7 +19,6 @@
 #include <ostream>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 
 CDCRecoHit2D::CDCRecoHit2D(const CDCRLWireHit& rlWireHit) :
@@ -132,7 +131,7 @@ Vector3D CDCRecoHit2D::reconstruct3D(const CDCTrajectory2D& trajectory2D, double
   return getRLWireHit().reconstruct3D(trajectory2D, z);
 }
 
-std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const CDCRecoHit2D& recohit)
+std::ostream& TrackingUtilities::operator<<(std::ostream& output, const CDCRecoHit2D& recohit)
 {
   output << "CDCRecoHit2D(" << recohit.getRLWireHit() << ","
          << recohit.getRecoDisp2D() << ")" ;

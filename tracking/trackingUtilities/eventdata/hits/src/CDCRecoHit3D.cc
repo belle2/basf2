@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
@@ -32,7 +32,6 @@
 #include <cmath>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 
 CDCRecoHit3D::CDCRecoHit3D(const CDCRLWireHit& rlWireHit,

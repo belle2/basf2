@@ -17,9 +17,9 @@
 namespace Belle2 {
   namespace TrackingUtilities {
     class CDCRLWireHit;
+    class CDCRecoHit2D;
   }
   namespace TrackFindingCDC {
-    class CDCRecoHit2D;
 
     /// Class representing a linear track piece between two oriented wire hits.
     /** A tangent is an approximation of the possible trajectory between two oriented wire hits.
@@ -80,10 +80,10 @@ namespace Belle2 {
       { return getFlightVec2D().cosWith(tangent.getFlightVec2D()); }
 
       /// Getter for the reconstructed hit on the first oriented wire hit using reconstructed touch point as position.
-      CDCRecoHit2D getFromRecoHit2D() const;
+      TrackingUtilities::CDCRecoHit2D getFromRecoHit2D() const;
 
       /// Getter for the reconstructed hit on the second oriented wire hit using reconstructed touch point as position.
-      CDCRecoHit2D getToRecoHit2D() const;
+      TrackingUtilities::CDCRecoHit2D getToRecoHit2D() const;
 
       /// Adjusts the line to touch the drift circles with the correct right left passage information.
       void adjustLine();

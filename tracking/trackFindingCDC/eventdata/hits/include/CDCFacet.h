@@ -17,10 +17,10 @@ namespace Belle2 {
     class ParameterLine2D;
     class Vector2D;
     class CDCRLWireHit;
+    class CDCRecoHit2D;
   }
   namespace TrackFindingCDC {
     class CDCTangent;
-    class CDCRecoHit2D;
 
     /**
      * Class representing a triple of neighboring oriented wire with additional trajectory information.
@@ -98,13 +98,13 @@ namespace Belle2 {
       TrackingUtilities::Vector2D getEndRecoPos2D() const;
 
       /// Getter for the first reconstructed hit
-      CDCRecoHit2D getStartRecoHit2D() const;
+      TrackingUtilities::CDCRecoHit2D getStartRecoHit2D() const;
 
       /// Getter for the second reconstructed hit
-      CDCRecoHit2D getMiddleRecoHit2D() const;
+      TrackingUtilities::CDCRecoHit2D getMiddleRecoHit2D() const;
 
       /// Getter for the third reconstructed hit
-      CDCRecoHit2D getEndRecoHit2D() const;
+      TrackingUtilities::CDCRecoHit2D getEndRecoHit2D() const;
 
       /// Getter for the tangential line including the hits from the first to the second hit.
       CDCTangent getStartToMiddle() const;

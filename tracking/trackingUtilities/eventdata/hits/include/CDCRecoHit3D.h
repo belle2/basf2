@@ -22,9 +22,6 @@ namespace Belle2 {
   class CDCSimHit;
   class CDCHit;
 
-  namespace TrackFindingCDC {
-    class CDCRecoHit2D;
-  }
   namespace TrackingUtilities {
     // Forward declaration.
     class CDCTrajectory3D;
@@ -32,6 +29,7 @@ namespace Belle2 {
     class CDCTrajectorySZ;
     class CDCWireHit;
     class CDCWire;
+    class CDCRecoHit2D;
 
     /**
      *  Class representing a three dimensional reconstructed hit.
@@ -77,7 +75,7 @@ namespace Belle2 {
        *  as seen from the xy plane. Hence also xy position and transverse travel distance are available.
        *  Only the stereo hits have then the full information to go head and make the sz trajectory.
        */
-      static CDCRecoHit3D reconstruct(const TrackFindingCDC::CDCRecoHit2D& recoHit2D,
+      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit2D,
                                       const CDCTrajectory2D& trajectory2D);
 
       /**
@@ -110,7 +108,7 @@ namespace Belle2 {
                                              const CDCTrajectory2D& trajectory2D);
 
       /// Convenience function to call the other reconstruct method with the sz- and 2d-trajectory contained in the 3d one.
-      static CDCRecoHit3D reconstruct(const TrackFindingCDC::CDCRecoHit2D& recoHit,
+      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
                                       const CDCTrajectory3D& trajectory3D);
 
       /**
@@ -129,7 +127,7 @@ namespace Belle2 {
        *  at just calculated the transverse travel distance, since the trajectory should be more exact than the shifting
        *  along the wire.
        */
-      static CDCRecoHit3D reconstruct(const TrackFindingCDC::CDCRecoHit2D& recoHit2D,
+      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit2D,
                                       const CDCTrajectory2D& trajectory2D,
                                       const CDCTrajectorySZ& trajectorySZ);
 
@@ -323,13 +321,13 @@ namespace Belle2 {
        *  Constructs a two dimensional reconstructed hit by
        *  carrying out the stereo ! projection to the wire reference position.
        */
-      TrackFindingCDC::CDCRecoHit2D getRecoHit2D() const;
+      CDCRecoHit2D getRecoHit2D() const;
 
       /**
        *  Constructs a two dimensional reconstructed hit by
        *  carrying out the stereo ! projection to the wire reference position.
        */
-      TrackFindingCDC::CDCRecoHit2D stereoProjectToRef() const;
+      CDCRecoHit2D stereoProjectToRef() const;
 
       /// Returns the position of the wire in the xy plain the reconstructed position is located in.
       Vector2D getRecoWirePos2D() const;

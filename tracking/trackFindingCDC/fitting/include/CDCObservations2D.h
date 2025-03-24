@@ -27,12 +27,12 @@ namespace Belle2 {
     class CDCWireHit;
     class CDCTrack;
     class CDCRecoHit3D;
+    class CDCRecoHit2D;
   }
   namespace TrackFindingCDC {
     class CDCRLWireHitPair;
     class CDCRLWireHitTriple;
     class CDCFacet;
-    class CDCRecoHit2D;
     class CDCWireHitSegment;
     class CDCSegment2D;
     class CDCSegment3D;
@@ -205,7 +205,7 @@ namespace Belle2 {
       std::size_t append(const CDCFacet& facet);
 
       /// Appends the hit using the reconstructed position if useRecoPos indicates it
-      std::size_t append(const CDCRecoHit2D& recoHit2D);
+      std::size_t append(const TrackingUtilities::CDCRecoHit2D& recoHit2D);
 
       /// Appends the observed position
       std::size_t append(const TrackingUtilities::CDCRecoHit3D& recoHit3D);

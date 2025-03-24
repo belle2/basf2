@@ -41,7 +41,7 @@ official way for writing it is `basf2`, using only lower case letters.
 You might wonder why we didn't choose "b2asf", and when you get a bit further
 you will probably wonder why it has "analysis" in the name (it does much more
 than analysis)?
-Well historic reasons: Belle had BASF, we have `basf2`.
+Well historic reasons: Belle had basf, we have `basf2`.
 
 The `basf2` software is used in all aspects of the data-processing chain at Belle II:
 

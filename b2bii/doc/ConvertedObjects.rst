@@ -8,7 +8,7 @@ converted objects should be used in the analysis.
 -----------------------------
 Charged Final State Particles
 -----------------------------
-The `basf2` and `basf2` softwares use different helix parameterisations, however there is a
+The basf and `basf2` softwares use different helix parameterisations, however there is a
 well defined transformation from one parameterisation to the other. The Belle MDST
 format stores in addition to the five helix parameters also the reference point
 (or pivot point), which is assumed to be always point ``(0,0,0)`` in the case of

@@ -54,7 +54,7 @@ vars += ['extraInfo(Ks_mva)']
 ma.variablesToNtuple('Lambda0:standard',
                      variables=vars,
                      filename='test.root',
-                     treename='tree',
+                     treename='mvalam',
                      path=my_path)
 
 b2.process(my_path)

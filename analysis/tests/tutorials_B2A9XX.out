@@ -265,6 +265,34 @@ TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_s
 TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_stat_dn, 0.9664
 TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_up, 1.011
 TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_dn, 0.9941
+TFile: B2A910-ApplyKsSelector.root
+TTree: tree
+TBranch: __experiment__, 0
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: px, -1.547
+TBranch: py, -0.6457
+TBranch: pz, 0.9127
+TBranch: pt, 1.676
+TBranch: p, 1.909
+TBranch: E, 1.973
+TBranch: mcE, 1.968
+TBranch: mcP, 1.904
+TBranch: mcPT, 1.674
+TBranch: mcPX, -1.544
+TBranch: mcPY, -0.6454
+TBranch: mcPZ, 0.9073
+TBranch: mcPhi, -2.746
+TBranch: isSignal, 1
+TBranch: mcErrors, 0
+TBranch: mcPDG, 310
+TBranch: extraInfo__boV0_mva__bc, 0.9998
+TBranch: extraInfo__boLam_mva__bc, 0.9825
 TFile: B2A913-CharmFlavorTagger.root
 TTree: D0tree
 TBranch: __experiment__, 0
@@ -304,3 +332,31 @@ TBranch: pi_E, 0.7346
 TBranch: pi_isSignal, 1
 TBranch: pi_mcErrors, 0
 TBranch: pi_mcPDG, 211
+TFile: B2A914-ApplyLambdaSelector.root
+TTree: mvalam
+TBranch: __experiment__, 0
+TBranch: __run__, 0
+TBranch: __event__, 89
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: px, 1.561
+TBranch: py, 0.4047
+TBranch: pz, 1.016
+TBranch: pt, 1.612
+TBranch: p, 1.906
+TBranch: E, 2.203
+TBranch: mcE, 2.002
+TBranch: mcP, 1.939
+TBranch: mcPT, 1.644
+TBranch: mcPX, 1.59
+TBranch: mcPY, 0.4153
+TBranch: mcPZ, 1.028
+TBranch: mcPhi, 0.2554
+TBranch: isSignal, 0
+TBranch: mcErrors, 384
+TBranch: mcPDG, 310
+TBranch: extraInfo__boV0_mva__bc, 1
+TBranch: extraInfo__boKs_mva__bc, 0.6603

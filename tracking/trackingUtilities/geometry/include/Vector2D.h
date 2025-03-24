@@ -14,6 +14,8 @@
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
+#include <Math/Vector2D.h>
+
 #include <utility>
 #include <string>
 #include <iosfwd>
@@ -35,12 +37,21 @@ namespace Belle2 {
       {
       }
 
+      /// Constructor translating from a ROOT::Math::XYVector instance
+      explicit Vector2D(const ROOT::Math::XYVector& xyVector);
+
       /// Constructor from two coordinates
       Vector2D(const double x, const double y)
         : m_x(x)
         , m_y(y)
       {
       }
+
+      /// Assignment translating from a ROOT::Math::XYZVector instance
+      Vector2D& operator=(const ROOT::Math::XYVector& xyVector);
+
+      /// Casting the back to ROOT::Math::XYVector seamlessly
+      operator const ROOT::Math::XYVector() const;
 
       /**
        * Constructs a vector from a unit coordinate system vector and the coordinates in that

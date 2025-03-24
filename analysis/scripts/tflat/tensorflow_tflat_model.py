@@ -11,6 +11,23 @@
 import keras
 
 
+class MyConcatenate(keras.layers.Layer):
+    """Concatenate the 3D input tensors and their 2D masks along the axis=1 dimension."""
+
+    def call(self, inputs):
+        # Expect the input to be list of 3D tensors
+        return keras.ops.concatenate(inputs, axis=1)
+
+    def compute_mask(self, inputs, mask=None):
+        # Expect the mask to be list of 2D mask tensors
+        if mask is None:
+            return None
+        return keras.ops.concatenate(mask, axis=1)
+
+    def get_config(self):
+        return super().get_config()
+
+
 def create_mlp(hidden_units, dropout_rate, activation, normalization_layer, name=None):
     mlp_layers = []
     for units in hidden_units:
@@ -27,13 +44,22 @@ def get_tflat_model(parameters, number_of_features):
     """
     clip_value = parameters.get("clip_value")
     mask_value = parameters.get("mask_value")
-    num_tracks = parameters.get("num_tracks")
-    num_features = parameters.get("num_features")
+    num_trk = parameters.get("num_trk")
+    num_trk_features = parameters.get("num_trk_features")
+    num_ecl = parameters.get("num_ecl")
+    num_ecl_features = parameters.get("num_ecl_features")
+    num_roe = parameters.get("num_roe")
+    num_roe_features = parameters.get("num_roe_features")
     num_transformer_blocks = parameters.get("num_transformer_blocks")
     num_heads = parameters.get("num_heads")
     embedding_dims = parameters.get("embedding_dims")
     mlp_hidden_units_factors = parameters.get("mlp_hidden_units_factors")
     dropout_rate = parameters.get("dropout_rate")
+
+    # Compute start columns for tracks, ecl clusters and rest of event
+    trk_start = 0
+    ecl_start = num_trk*num_trk_features
+    roe_start = ecl_start + num_ecl*num_ecl_features
 
     # Create model inputs
     inputs = keras.layers.Input((number_of_features,))
@@ -44,27 +70,89 @@ def get_tflat_model(parameters, number_of_features):
     # Clip features to mitigate outliers
     raw_features = keras.ops.clip(raw_features, x_min=-clip_value, x_max=clip_value)
 
+    # Preprocess the track features
+
+    # Get the track features
+    raw_trk_features = raw_features[:, trk_start:trk_start+num_trk*num_trk_features]
+
     # 3D tensor with axes for samples, tracks and features
-    reshaped_features = keras.layers.Reshape((num_tracks, num_features))(raw_features)
+    reshaped_trk_features = keras.layers.Reshape((num_trk, num_trk_features))(raw_trk_features)
 
     # Create a keras mask for padded tracks
-    masked_features = keras.layers.Masking(mask_value=mask_value)(reshaped_features)
+    masked_trk_features = keras.layers.Masking(mask_value=mask_value)(reshaped_trk_features)
 
     # Normalize the input features
-    normed_features = keras.layers.BatchNormalization()(masked_features)
+    normed_trk_features = keras.layers.BatchNormalization()(masked_trk_features)
 
     # Embed features in latent space with embedding_dims
-    encoded_features = keras.layers.Dense(
+    encoded_trk_features = keras.layers.Dense(
         units=embedding_dims,
         activation=keras.activations.selu,
-        name="Embedding_dense_1")(normed_features)
-    encoded_features = keras.layers.Dropout(dropout_rate, name="Embedding_dropout_1")(encoded_features)
-    encoded_features = keras.layers.BatchNormalization(name="Embedding_batchnorm")(encoded_features)
-    encoded_features = keras.layers.Dense(
+        name="Embedding_trk_dense_1")(normed_trk_features)
+    encoded_trk_features = keras.layers.Dropout(dropout_rate, name="Embedding_trk_dropout_1")(encoded_trk_features)
+    encoded_trk_features = keras.layers.BatchNormalization(name="Embedding_trk_batchnorm")(encoded_trk_features)
+    encoded_trk_features = keras.layers.Dense(
         units=embedding_dims,
         activation=keras.activations.selu,
-        name="Embedding_dense_2")(encoded_features)
-    encoded_features = keras.layers.Dropout(dropout_rate, name="Embedding_dropout_2")(encoded_features)
+        name="Embedding_trk_dense_2")(encoded_trk_features)
+    encoded_trk_features = keras.layers.Dropout(dropout_rate, name="Embedding_trk_dropout_2")(encoded_trk_features)
+
+    # Preprocess the ecl features
+
+    # Get the ecl features
+    raw_ecl_features = raw_features[:, ecl_start:ecl_start+num_ecl*num_ecl_features]
+
+    # 3D tensor with axes for samples, ecl candidates and features
+    reshaped_ecl_features = keras.layers.Reshape((num_ecl, num_ecl_features))(raw_ecl_features)
+
+    # Create a keras mask for padded ecl candidates
+    masked_ecl_features = keras.layers.Masking(mask_value=mask_value)(reshaped_ecl_features)
+
+    # Normalize the input features
+    normed_ecl_features = keras.layers.BatchNormalization()(masked_ecl_features)
+
+    # Embed features in latent space with embedding_dims
+    encoded_ecl_features = keras.layers.Dense(
+        units=embedding_dims,
+        activation=keras.activations.selu,
+        name="Embedding_ecl_dense_1")(normed_ecl_features)
+    encoded_ecl_features = keras.layers.Dropout(dropout_rate, name="Embedding_ecl_dropout_1")(encoded_ecl_features)
+    encoded_ecl_features = keras.layers.BatchNormalization(name="Embedding_ecl_batchnorm")(encoded_ecl_features)
+    encoded_ecl_features = keras.layers.Dense(
+        units=embedding_dims,
+        activation=keras.activations.selu,
+        name="Embedding_ecl_dense_2")(encoded_ecl_features)
+    encoded_ecl_features = keras.layers.Dropout(dropout_rate, name="Embedding_ecl_dropout_2")(encoded_ecl_features)
+
+    # Preprocess the rest of event features
+
+    # Get the roe features
+    raw_roe_features = raw_features[:, roe_start:roe_start+num_roe*num_roe_features]
+
+    # 3D tensor with axes for samples, roe's and features
+    reshaped_roe_features = keras.layers.Reshape((num_roe, num_roe_features))(raw_roe_features)
+
+    # Create a keras mask for padded roe
+    masked_roe_features = keras.layers.Masking(mask_value=mask_value)(reshaped_roe_features)
+
+    # Normalize the input features
+    normed_roe_features = keras.layers.BatchNormalization()(masked_roe_features)
+
+    # Embed features in latent space with embedding_dims
+    encoded_roe_features = keras.layers.Dense(
+        units=embedding_dims,
+        activation=keras.activations.selu,
+        name="Embedding_roe_dense_1")(normed_roe_features)
+    encoded_roe_features = keras.layers.Dropout(dropout_rate, name="Embedding_roe_dropout_1")(encoded_roe_features)
+    encoded_roe_features = keras.layers.BatchNormalization(name="Embedding_roe_batchnorm")(encoded_roe_features)
+    encoded_roe_features = keras.layers.Dense(
+        units=embedding_dims,
+        activation=keras.activations.selu,
+        name="Embedding_roe_dense_2")(encoded_roe_features)
+    encoded_roe_features = keras.layers.Dropout(dropout_rate, name="Embedding_roe_dropout_2")(encoded_roe_features)
+
+    # Concatenate all encoded features and their masks
+    encoded_features = MyConcatenate()([encoded_trk_features, encoded_ecl_features, encoded_roe_features])
 
     # Create multiple layers of the Transformer block.
     for block_idx in range(num_transformer_blocks):

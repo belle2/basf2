@@ -15,6 +15,8 @@ from basf2 import B2FATAL
 import basf2
 from variables import variables as vm
 import modularAnalysis as ma
+from stdPhotons import stdPhotons
+from vertex import kFit
 
 
 def get_variables(particle_list, ranked_variable, variables=None, particleNumber=1):
@@ -65,7 +67,7 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
         B2FATAL(f'Invalid mode  {mode}')
 
     if mode in ['sampler', 'teacher']:
-        variable_list = [
+        trk_variable_list = [
             'charge',
             'useCMSFrame(p)',
             'useCMSFrame(cosTheta)',
@@ -84,7 +86,25 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
             'BtagToWBosonVariables(recoilMassSqrd)/15',
             'BtagToWBosonVariables(pMissCMS)',
             'BtagToWBosonVariables(cosThetaMissCMS)',
-            'cosTPTO']
+            'cosTPTO',
+            'clusterEoP',
+            'clusterLAT']
+
+        ecl_variable_list = [
+            'useCMSFrame(p)',
+            'useCMSFrame(cosTheta)',
+            'useCMSFrame(phi)',
+            'clusterE1E9',
+            'clusterE9E21',
+            'clusterLAT',
+            'clusterTiming']
+
+        roe_variable_list = [
+            'nCleanedECLClusters(isInRestOfEvent == 1)/8',
+            'nCleanedTracks(isInRestOfEvent == 1)/6',
+            'NumberOfKShortsInRoe',
+            'ptTracksRoe',
+        ]
 
     if classifier_args is None:
         classifier_args = {}
@@ -107,22 +127,30 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
     # filter rest of events only for specific particle list
     ma.signalSideParticleListsFilter(particle_lists, 'hasRestOfEventTracks > 0', roe_path, dead_end_path)
 
-    # create final state particle lists
+    # create particle list with pions
     ma.fillParticleList(roe_particle_list, roe_particle_list_cut, path=roe_path)
 
-    tflat_particle_lists = ['pi+:pos_charged',]
+    # create lists with objects for tflat
+    tflat_particle_lists = ['pi+:tflat', 'gamma:tflat']
 
-    pos_cut = 'isInRestOfEvent == 1 and passesROEMask(' + maskName + ') > 0.5 and p < infinity'
+    trk_cut = 'isInRestOfEvent == 1 and passesROEMask(' + maskName + ') > 0.5 and p < infinity'
+    ma.cutAndCopyList(tflat_particle_lists[0], roe_particle_list, trk_cut, writeOut=True, path=roe_path)
 
-    ma.cutAndCopyList(tflat_particle_lists[0], roe_particle_list, pos_cut, writeOut=True, path=roe_path)
+    stdPhotons(listtype='tight',  path=roe_path)
+    gamma_cut = 'isInRestOfEvent == 1 and passesROEMask(' + maskName + ')'
+    ma.cutAndCopyList(tflat_particle_lists[1], 'gamma:tight', gamma_cut, writeOut=True, path=roe_path)
+
+    ma.reconstructDecay('K_S0:inRoe -> pi+:tflat pi-:tflat', '0.40<=M<=0.60', writeOut=True, path=roe_path)
+    kFit('K_S0:inRoe', 0.01, path=roe_path)
 
     # sort pattern for tagging specific variables
     rank_variable = 'p'
-    # rank_variable = 'useCMSFrame(p)'
 
     # create tagging specific variables
     if mode != 'expert':
-        features = get_variables(tflat_particle_lists[0], rank_variable, variable_list, particleNumber=10)
+        features = get_variables(tflat_particle_lists[0], rank_variable, trk_variable_list, particleNumber=10)
+        features += get_variables(tflat_particle_lists[1], rank_variable, ecl_variable_list, particleNumber=20)
+        features += get_variables(tflat_particle_lists[0], rank_variable, roe_variable_list, particleNumber=1)
 
     for particles in tflat_particle_lists:
         ma.rankByHighest(particles, rank_variable, path=roe_path)

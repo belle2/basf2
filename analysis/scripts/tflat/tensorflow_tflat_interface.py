@@ -47,8 +47,12 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     parameters["clip_value"] = 4
     parameters['mask_value'] = 0
-    parameters['num_tracks'] = 10
-    parameters['num_features'] = 19
+    parameters['num_trk'] = 10
+    parameters['num_trk_features'] = 21
+    parameters['num_ecl'] = 20
+    parameters['num_ecl_features'] = 7
+    parameters['num_roe'] = 1
+    parameters['num_roe_features'] = 4
     parameters["num_transformer_blocks"] = 6
     parameters["num_heads"] = 4
     parameters["embedding_dims"] = 128

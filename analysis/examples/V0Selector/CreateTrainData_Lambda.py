@@ -49,14 +49,14 @@ vars += vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.mc_flight_info
 # output
 ma.variablesToNtuple('Lambda0:V0Selector',
                      variables=vars,
-                     filename='Lambda0Selector_train_V0Selector.root',
-                     treename='tree',
+                     filename='LambdaSelector_train_V0Selector.root',
+                     treename='lamtree',
                      path=my_path)
 
 ma.variablesToNtuple('Lambda0:KsVeto',
                      variables=vars,
-                     filename='Lambda0Selector_train_KsVeto.root',
-                     treename='tree',
+                     filename='LambdaSelector_train_KsVeto.root',
+                     treename='lamtree',
                      path=my_path)
 
 # Process the events

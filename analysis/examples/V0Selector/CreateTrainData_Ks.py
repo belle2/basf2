@@ -48,13 +48,13 @@ vars = ['ks_selector_info', 'isNotContinuumEvent', 'isSignal']
 ma.variablesToNtuple('K_S0:V0Selector',
                      variables=vars,
                      filename='KsSelector_train_V0Selector.root',
-                     treename='tree',
+                     treename='kstree',
                      path=my_path)
 
 ma.variablesToNtuple('K_S0:LambdaVeto',
                      variables=vars,
                      filename='KsSelector_train_LambdaVeto.root',
-                     treename='tree',
+                     treename='kstree',
                      path=my_path)
 
 # Process the events

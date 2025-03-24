@@ -67,12 +67,12 @@ reproduce them:
 -----------------------------
 Neutral Final State Particles
 -----------------------------
-When it comes to ECL related objects the `basf` and `basf2` MDST data formats differ
+When it comes to ECL related objects the basf and `basf2` MDST data formats differ
 substantially, which makes one-to-one conversion impossible. The reconstructed
 ``ECL clusters``, both charged (with matched charged track) and neutral
-(without matched charged track), are in `basf` stored as ``Mdst_ecl`` (and ``Mdst_ecl_aux``)
+(without matched charged track), are in basf stored as ``Mdst_ecl`` (and ``Mdst_ecl_aux``)
 and in `basf2` as ECLClusters. These two data types match quite well.
-However, the `basf` MDST format has two additional data types: ``Mdst_Gamma`` and ``Mdst_Pi0``,
+However, the basf MDST format has two additional data types: ``Mdst_Gamma`` and ``Mdst_Pi0``,
 for which there is no equivalent data type in the `basf2` MDST format.
 Instead, the B2BII converter by default creates ``gamma:mdst`` and ``pi0:mdst``
 ParticleLists, which are filled with particle objects created for each
@@ -106,7 +106,7 @@ As mentioned above (section on charged final state particles) all charged
 tracks are parametrised with helix with the reference point set to (0,0,0)
 in `basf2`. This is not optimal in the case of ``V0s`` whose decay vertices can
 be far away from the origin. Therefore all ``V0`` candidates from the ``Mdst_Vee2``
-table in BASF are converted to Particles and collected in the ``K_S0:mdst``,
+table in basf are converted to Particles and collected in the ``K_S0:mdst``,
 ``Lambda0:mdst``, and ``gamma:v0mdst`` ParticleLists.
 The created particles have momentum and decay vertex position set to values
 given in Belle's ``Mdst_Vee2`` table and their daughters particles with
@@ -192,5 +192,6 @@ flags:
    Please refer to `bn390`_ for the details of Hadronic Event Selection.
 
 .. _bn390: http://belle.kek.jp/secured/belle_note/gn390/bn390_012901.ps.gz
+
 
 

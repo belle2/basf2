@@ -1,5 +1,5 @@
 Add `basf2` Modules Documentation to Sphinx
------------------------------------------
+-------------------------------------------
 
 Documentation for `basf2` modules can be added to sphinx automatically using
 

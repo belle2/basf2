@@ -1,5 +1,5 @@
 Add `basf2` Variables Documentation to Sphinx
--------------------------------------------
+---------------------------------------------
 
 We can also add documentation for `basf2` variables with a very similar syntax to modules:
 

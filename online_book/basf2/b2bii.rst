@@ -244,7 +244,7 @@ modifications are needed.
 .. _Charged_Final_State_Particles:
 .. rubric:: Charged Final State Particles
 
-The `basf` and `basf2` softwares use different helix parameterisations, however there exist a well
+The basf and `basf2` softwares use different helix parameterisations, however there exist a well
 defined transformation from one parameterisation to the other.
 Belle MDST stores in addition to the five helix parameters also the reference
 point (or pivot point), which is assumed to be always point ``(0,0,0)`` in the
@@ -428,4 +428,5 @@ The Klongs are stored in the default ``K_L0:mdst``.
 .. rubric:: Author of this lesson
 
 Chia-Ling Hsu
+
 

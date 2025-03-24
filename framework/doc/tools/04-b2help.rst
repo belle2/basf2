@@ -4,7 +4,7 @@ Tools which will provide you help
 .. _b2help-modules:
 
 ``b2help-modules``: List available `basf2` modules and ask about their details
-----------------------------------------------------------------------------
+------------------------------------------------------------------------------
 
 .. argparse::
     :filename: framework/tools/b2help-modules
@@ -90,3 +90,4 @@ Specifically, ``-i`` is required to select the input mdst file.
 .. rubric:: Optional Arguments
 
 -h, --help               show this help message and exit
+

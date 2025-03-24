@@ -36,7 +36,7 @@ The basics.
 
 The Belle II software is called `basf2`.
 It is an abbreviation for "Belle II Analysis Software Framework".
-You may see also "`BASF2`" or "`Basf2`" in some outdated documentation, but the
+You may see also "BASF2" or "Basf2" in some outdated documentation, but the
 official way for writing it is `basf2`, using only lower case letters.
 You might wonder why we didn't choose "b2asf", and when you get a bit further
 you will probably wonder why it has "analysis" in the name (it does much more
@@ -122,7 +122,7 @@ A good place to look for Belle II-specific jargon is the **Belle II Glossary**.
      `Belle II Glossary <https://xwiki.desy.de/xwiki/rest/p/1e1f2>`_
 
 `basf2` modules
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 A `basf2` module is a piece of (usually) C++ code that does a specific "unit" of
 data processing.
@@ -538,7 +538,7 @@ clicking on: `basf2.Path` here in this online documentation.
 In addition, there are some `basf2`-specific commands.
 
 Listing the `basf2` modules
-^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To find information about a `basf2` module, try:
 
@@ -549,7 +549,7 @@ To find information about a `basf2` module, try:
     b2help-modules ParticleCombiner
 
 Listing the `basf2` variables
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In the next lessons, you will need to refer to physics quantities in plain
 text format. Many variables are already defined in `basf2`. 
@@ -590,7 +590,7 @@ For now, you can list them all with:
 .. _onlinebook_basf2basics_b2help_particles:
 
 `basf2` particles
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 Sometimes you will need to write particles' names in plain text format.
 `basf2` adopts the convention used by ROOT, the PDG, EvtGen, ...
@@ -746,7 +746,7 @@ You will meet them in the :ref:`onlinebook_offline_analysis` lessons.
 
 
 The `basf2` analysis package
---------------------------
+----------------------------
 
 The analysis package of `basf2` contains python functions and C++ `basf2` modules
 to help you perform your specific analysis on *reconstructed dataobjects*.

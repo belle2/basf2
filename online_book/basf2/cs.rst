@@ -166,7 +166,7 @@ has an extensive overview over these quantities.
     are mostly used with machine learning methods.
 
 First Continuum Suppression steps in `basf2`
-------------------------------------------
+--------------------------------------------
 
 Now, how do we access the shape of events in `basf2`?
 
@@ -582,3 +582,4 @@ Moritz Bauer, Yaroslav Kulii
 .. rubric:: Code contributors
 
 Pablo Goldenzweig, Ilya Komarov
+

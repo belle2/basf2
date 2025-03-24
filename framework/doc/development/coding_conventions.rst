@@ -1,5 +1,5 @@
 How to write `basf2` code (coding conventions)
-============================================
+==============================================
 
 The following rules and conventions should ensure a good usability and maintainability of
 the Belle II software. They are written for C++, but have to be followed for Python code
@@ -491,3 +491,4 @@ Further Suggestions
     of a one-dimensional C array or ``boost::multi_array`` instead of multi-dimensional C arrays.
     See these `slides <http://kds.kek.jp/getFile.py/access?contribId=0&resId=0&materialId=slides&confId=19219>`_
     or `mail <https://belle2.kek.jp/sympa/arc/software/2015-07/msg00061.html>`_ for more information.
+

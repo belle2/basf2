@@ -4,7 +4,7 @@
 B2BII
 =====
 
-The b2bii package in `basf2` converts Belle MDST files (`basf` data format) to
+The b2bii package in `basf2` converts Belle MDST files (basf data format) to
 Belle II MDST (`basf2` data format). This enables performing physics analysis
 using data collected with Belle detector with the analysis software and algorithms
 developed for the analysis of data collected with the Belle II detector.

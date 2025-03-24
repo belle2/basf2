@@ -29,9 +29,9 @@ Vector3D::Vector3D(const B2Vector3D& b2Vector3)
 {
 }
 
-Vector3D::Vector3D(const ROOT::Math::XYZVector& xyzVector3)
-  : m_xy(xyzVector3.X(), xyzVector3.Y())
-  , m_z(xyzVector3.Z())
+Vector3D::Vector3D(const ROOT::Math::XYZVector& xyzVector)
+  : m_xy(xyzVector.X(), xyzVector.Y())
+  , m_z(xyzVector.Z())
 {
 }
 
@@ -51,11 +51,11 @@ Vector3D& Vector3D::operator=(const B2Vector3D& b2Vector3)
   return *this;
 }
 
-Vector3D& Vector3D::operator=(const ROOT::Math::XYZVector& xyzVector3)
+Vector3D& Vector3D::operator=(const ROOT::Math::XYZVector& xyzVector)
 {
-  m_xy.setX(xyzVector3.X());
-  m_xy.setY(xyzVector3.Y());
-  m_z = xyzVector3.Z();
+  m_xy.setX(xyzVector.X());
+  m_xy.setY(xyzVector.Y());
+  m_z = xyzVector.Z();
   return *this;
 }
 

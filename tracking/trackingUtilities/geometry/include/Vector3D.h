@@ -42,8 +42,8 @@ namespace Belle2 {
       /// Constructor translating from a B2Vector3 instance
       explicit Vector3D(const B2Vector3D& b2Vector3);
 
-      /// Constructor translating from a B2Vector3 instance
-      explicit Vector3D(const ROOT::Math::XYZVector& xyzVector3);
+      /// Constructor translating from a ROOT::Math::XYZVector instance
+      explicit Vector3D(const ROOT::Math::XYZVector& xyzVector);
 
       /// Constructor from three coordinates
       Vector3D(double x, double y, double z)
@@ -72,8 +72,8 @@ namespace Belle2 {
       /// Assignment translating from a B2Vector3 instance
       Vector3D& operator=(const B2Vector3D& b2Vector3);
 
-      /// Assignment translating from a B2Vector3 instance
-      Vector3D& operator=(const ROOT::Math::XYZVector& xyzVector3);
+      /// Assignment translating from a ROOT::Math::XYZVector instance
+      Vector3D& operator=(const ROOT::Math::XYZVector& xyzVector);
 
       /// Constructs the average of two vectors
       /** Computes the average of two vectors.
@@ -121,7 +121,7 @@ namespace Belle2 {
       /// Casting the back to B2Vector3 seamlessly
       operator const B2Vector3D() const;
 
-      /// Casting the back to B2Vector3 seamlessly
+      /// Casting the back to ROOT::Math::XYZVector seamlessly
       operator const ROOT::Math::XYZVector() const;
 
       /// Equality comparison with all three coordinates

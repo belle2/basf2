@@ -9,7 +9,7 @@ basics of creating a such a model in BAT and how the binned likelihood
 is formulated.
 
 To run this code, you will need to install BAT with the Cuba
-library. See the intructions in :ref:`bat_install` for how install
+library. See the intructions in :ref:`bat_installation` for how install
 BAT with Cuba.
 
 The Data

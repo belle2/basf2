@@ -1,5 +1,3 @@
-.. _bat_intro:
-
 What is BAT?
 ############
 

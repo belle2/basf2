@@ -29,17 +29,17 @@ namespace Belle2 {
     class CDCTrack;
     class CDCRecoHit3D;
     class CDCRecoHit2D;
-  }
-
-  namespace TrackFindingCDC {
-    class BoundingBox;
-    class CDCTangent;
     class CDCWireHitCluster;
     class CDCSegment2D;
     class CDCSegment3D;
     class CDCSegmentPair;
     class CDCAxialSegmentPair;
     class CDCSegmentTriple;
+    class CDCTangent;
+  }
+
+  namespace TrackFindingCDC {
+    class BoundingBox;
 
 
     /// A class that can plot event related data types.
@@ -195,29 +195,29 @@ namespace Belle2 {
                 const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the CDCRecoHit3D as a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
-      void draw(const CDCTangent& tangent,
+      void draw(const TrackingUtilities::CDCTangent& tangent,
                 const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the CDCTrajectory from the start point until it first exits the CDC.
       void draw(const TrackingUtilities::CDCTrajectory2D& trajectory2D, AttributeMap attributeMap = AttributeMap());
 
       /// Draws all CDCWireHits of the cluster
-      void draw(const CDCWireHitCluster& wireHitCluster, const AttributeMap& attributeMap = AttributeMap());
+      void draw(const TrackingUtilities::CDCWireHitCluster& wireHitCluster, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws all CDCRecoHits2D of the segment
-      void draw(const CDCSegment2D& segment2D, const AttributeMap& attributeMap = AttributeMap());
+      void draw(const TrackingUtilities::CDCSegment2D& segment2D, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws all CDCRecoHits3D of the segment
-      void draw(const CDCSegment3D& segment3D, const AttributeMap& attributeMap = AttributeMap());
+      void draw(const TrackingUtilities::CDCSegment3D& segment3D, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the pair of segments as an arrow connecting the centers of them.
-      void draw(const CDCAxialSegmentPair& axialSegmentPair, const AttributeMap& attributeMap = AttributeMap());
+      void draw(const TrackingUtilities::CDCAxialSegmentPair& axialSegmentPair, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the pair of segments as an arrow connecting the centers of them.
-      void draw(const CDCSegmentPair& segmentPair, const AttributeMap& attributeMap = AttributeMap());
+      void draw(const TrackingUtilities::CDCSegmentPair& segmentPair, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the triple of segments as two arrows connecting the centers from start to the middle segment and from the middle to the end segment.
-      void draw(const CDCSegmentTriple& segmentTriple, const AttributeMap& attributeMap = AttributeMap());
+      void draw(const TrackingUtilities::CDCSegmentTriple& segmentTriple, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws all CDCRecoHits3D of the segment
       void draw(const TrackingUtilities::CDCTrack& track, const AttributeMap& attributeMap = AttributeMap());
@@ -229,10 +229,10 @@ namespace Belle2 {
       void drawTrajectory(const MCParticle& mcParticle, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws trajectory of the CDCSegment2D
-      void drawTrajectory(const CDCSegment2D& segment, const AttributeMap& attributeMap = AttributeMap());
+      void drawTrajectory(const TrackingUtilities::CDCSegment2D& segment, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws trajectory of the CDCSegmentTriple
-      void drawTrajectory(const CDCSegmentTriple& segmentTriple, const AttributeMap& attributeMap = AttributeMap());
+      void drawTrajectory(const TrackingUtilities::CDCSegmentTriple& segmentTriple, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws trajectory of the CDCTrack
       void drawTrajectory(const TrackingUtilities::CDCTrack& track, const AttributeMap& attributeMap = AttributeMap());

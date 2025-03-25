@@ -10,7 +10,7 @@
 #include <tracking/trackingUtilities/eventdata/utils/ClassMnemomics.h>
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 #include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -48,10 +48,11 @@ namespace Belle2 {
     /**
      *  Findlet for storing in mdsts some segment-based information per event.
      */
-    class CDCTrackingEventLevelMdstInfoFillerFromSegmentsFindlet : public TrackingUtilities::Findlet<const CDCSegment2D> {
+    class CDCTrackingEventLevelMdstInfoFillerFromSegmentsFindlet : public
+      TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D> {
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<const CDCSegment2D>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D>;
 
     public:
       /// Getter for the module description
@@ -62,7 +63,7 @@ namespace Belle2 {
 
     public:
       /// Main method to make the heavy lifting
-      void apply(const std::vector<CDCSegment2D>& inputSegment2Ds) final;
+      void apply(const std::vector<TrackingUtilities::CDCSegment2D>& inputSegment2Ds) final;
 
     private:
       /** Access to the EventLevelTrackingInfo object in the datastore. */

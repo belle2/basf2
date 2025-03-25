@@ -60,9 +60,6 @@ void DQMHistOutputToEPICSModule::initialize()
 #endif
   }
 
-#ifdef _BELLE2_EPICS
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-#endif
   B2DEBUG(99, "DQMHistOutputToEPICS: initialized.");
 }
 
@@ -123,7 +120,6 @@ void DQMHistOutputToEPICSModule::event()
       SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, (void*)it->data.data()), "ca_set failure");
     }
   }
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
 
@@ -162,7 +158,6 @@ void DQMHistOutputToEPICSModule::terminate()
     if (it->mychid) SEVCHK(ca_clear_channel(it->mychid), "ca_clear_channel failure");
     if (it->mychid_last) SEVCHK(ca_clear_channel(it->mychid_last), "ca_clear_channel failure");
   }
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
 

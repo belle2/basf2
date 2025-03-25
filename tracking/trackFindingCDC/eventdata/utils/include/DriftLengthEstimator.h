@@ -19,11 +19,11 @@ namespace Belle2 {
     class CDCTrack;
     class CDCRecoHit3D;
     class CDCRecoHit2D;
-  }
-  namespace TrackFindingCDC {
     class CDCFacet;
     class CDCSegment2D;
     class CDCSegment3D;
+  }
+  namespace TrackFindingCDC {
 
     /// Helper construct implementing the (re)estimation of the drift length for various hit objects
     struct DriftLengthEstimator {
@@ -42,13 +42,13 @@ namespace Belle2 {
        *  Using the additional flight direction information the accuracy of the drift length
        *  can be increased a lot helping the filters following this step
        */
-      void updateDriftLength(CDCFacet& facet);
+      void updateDriftLength(TrackingUtilities::CDCFacet& facet);
 
       /// Update the drift length of the contained reconstructed hit in place.
-      void updateDriftLength(CDCSegment2D& segment);
+      void updateDriftLength(TrackingUtilities::CDCSegment2D& segment);
 
       /// Update the drift length of the contained reconstructed hit in place.
-      void updateDriftLength(CDCSegment3D& segment, double tanLambda);
+      void updateDriftLength(TrackingUtilities::CDCSegment3D& segment, double tanLambda);
 
       /// Update the drift length of the contained reconstructed hit in place.
       void updateDriftLength(TrackingUtilities::CDCTrack& track, double tanLambda);

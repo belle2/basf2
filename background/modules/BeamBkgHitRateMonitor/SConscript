@@ -10,7 +10,7 @@ env['LIBS'] = ['framework', 'framework_io', 'mdst_dataobjects',
                'ecl_dataobjects', 'ecl', 'ecl_dbobjects', 'Geom',
                'klm_dataobjects', 'klm_dbobjects',
                'hlt',
-               'tracking_trackingUtilities',
+               'tracking',
                '$ROOT_LIBS']
 
 Return('env')

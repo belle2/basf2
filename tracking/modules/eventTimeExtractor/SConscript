@@ -5,6 +5,6 @@ env['LIBS'] = ['framework',
   'tracking_eventTimeExtraction', 
   'cdc_dataobjects', 
   'tracking_dataobjects', 
-  'tracking_trackingUtilities']
+  ]
 
 Return('env')

@@ -13,5 +13,4 @@ import basf2  # noqa
 from ROOT import gSystem
 gSystem.Load('libcdc')
 gSystem.Load('libtracking')
-gSystem.Load('libtracking_trackingUtilities')
 gSystem.Load('libgenfit2')

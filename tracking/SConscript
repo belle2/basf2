@@ -4,7 +4,6 @@ env['LIBS'] = [
     'alignment',
     'tracking_dataobjects',
     'tracking_trackFindingCDC',
-    'tracking_trackingUtilities',
     'pxd', 'pxd_dataobjects',
     'svd', 'svd_dataobjects',
     'vxd', 'vxd_dataobjects',

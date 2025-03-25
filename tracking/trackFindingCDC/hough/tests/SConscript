@@ -1,7 +1,8 @@
 Import('env')
 
 env['LIBS'] = [
-    'tracking_trackFindingCDC',
+    # 'tracking_trackFindingCDC',
+    'tracking',
     'genfit2',
     'simulation_dataobjects',
     'framework',

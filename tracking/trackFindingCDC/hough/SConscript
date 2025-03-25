@@ -9,7 +9,6 @@ env.Append(CCFLAGS = ['-g'])
 env['LIBS'] = [
     'genfit2',
     'simulation_dataobjects',
-    'tracking_trackingUtilities'
     ]
 
 Return('env')

@@ -35,9 +35,6 @@ DQMHistAnalysisSVDDoseModule::DQMHistAnalysisSVDDoseModule()
 
 DQMHistAnalysisSVDDoseModule::~DQMHistAnalysisSVDDoseModule()
 {
-#ifdef _BELLE2_EPICS
-  if (getUseEpics() && ca_current_context()) ca_context_destroy();
-#endif
 }
 
 void DQMHistAnalysisSVDDoseModule::initialize()

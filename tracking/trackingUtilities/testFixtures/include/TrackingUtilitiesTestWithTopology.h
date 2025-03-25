@@ -32,7 +32,7 @@ namespace Belle2 {
      *
      *  Alternativelly it is now possible to run
      *
-     *  $ test_tracking_trackFindingCDC
+     *  $ test_tracking_trackingUtilities
      *
      *  as a separate executable.
      */

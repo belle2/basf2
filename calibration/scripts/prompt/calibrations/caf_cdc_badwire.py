@@ -7,15 +7,16 @@
 ##########################################################################
 """CDC badwire calibration."""
 import basf2
+from ROOT import gInterpreter
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
-from prompt.calibrations.caf_cdc import settings as cdctrackingcalib
+from prompt.calibrations.caf_cdc import settings as cdc_tracking_calibration
 from prompt.utils import ExpRun
 from ROOT import Belle2
 from caf.framework import Calibration
 from caf import strategies
 from tracking import add_hit_preparation_modules, add_track_finding, add_track_fit_and_track_creator
 from rawdata import add_unpackers
-
+gInterpreter.ProcessLine("#include <tracking/trackFindingCDC/rootification/StoreWrapper.h>")
 settings = CalibrationSettings(name="CDC badwire",
                                expert_username="manhtt",
                                description=__doc__,
@@ -25,7 +26,7 @@ settings = CalibrationSettings(name="CDC badwire",
                                                    [INPUT_DATA_FILTERS["Data Tag"]["mumu_tight_or_highm_calib"],
                                                     INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
-                               depends_on=[cdctrackingcalib],
+                               depends_on=[cdc_tracking_calibration],
                                expert_config={
                                    "min_events_per_file": 500,
                                    "max_events_per_file": 10000,

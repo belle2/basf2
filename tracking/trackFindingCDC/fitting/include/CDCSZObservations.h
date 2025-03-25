@@ -17,10 +17,10 @@ namespace Belle2 {
     class Vector2D;
     class CDCTrack;
     class CDCRecoHit3D;
+    class CDCSegment3D;
   }
 
   namespace TrackFindingCDC {
-    class CDCSegment3D;
 
     /// Class serving as a storage of observed sz positions to present to the sz line fitters.
     class CDCSZObservations {
@@ -115,7 +115,7 @@ namespace Belle2 {
        *  Appends all reconstructed hits from the three dimensional segment.
        *  @return  Number of added hits
        */
-      std::size_t appendRange(const CDCSegment3D& segment3D);
+      std::size_t appendRange(const TrackingUtilities::CDCSegment3D& segment3D);
 
       /**
        *  Appends all reconstructed hits from the three dimensional track.

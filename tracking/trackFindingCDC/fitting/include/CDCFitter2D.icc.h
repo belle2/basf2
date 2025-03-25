@@ -64,13 +64,13 @@ namespace Belle2 {
     }
 
     template <class AFitMethod>
-    TrackingUtilities::CDCTrajectory2D CDCFitter2D<AFitMethod>::fit(const CDCSegment3D& segment) const
+    TrackingUtilities::CDCTrajectory2D CDCFitter2D<AFitMethod>::fit(const TrackingUtilities::CDCSegment3D& segment) const
     {
       return fitGeneric(segment);
     }
 
     template <class AFitMethod>
-    TrackingUtilities::CDCTrajectory2D CDCFitter2D<AFitMethod>::fit(const CDCSegment2D& segment) const
+    TrackingUtilities::CDCTrajectory2D CDCFitter2D<AFitMethod>::fit(const TrackingUtilities::CDCSegment2D& segment) const
     {
       return fitGeneric(segment);
     }
@@ -89,28 +89,28 @@ namespace Belle2 {
     }
 
     template <class AFitMethod>
-    TrackingUtilities::CDCTrajectory2D CDCFitter2D<AFitMethod>::fit(const CDCWireHitSegment& wireHits) const
+    TrackingUtilities::CDCTrajectory2D CDCFitter2D<AFitMethod>::fit(const TrackingUtilities::CDCWireHitSegment& wireHits) const
     {
       return fitGeneric(wireHits);
     }
 
     template <class AFitMethod>
-    TrackingUtilities::CDCTrajectory2D CDCFitter2D<AFitMethod>::fit(const CDCSegment2D& fromSegment,
-        const CDCSegment2D& toSegment) const
+    TrackingUtilities::CDCTrajectory2D CDCFitter2D<AFitMethod>::fit(const TrackingUtilities::CDCSegment2D& fromSegment,
+        const TrackingUtilities::CDCSegment2D& toSegment) const
     {
       return fitGeneric(fromSegment, toSegment);
     }
 
     template <class AFitMethod>
     void CDCFitter2D<AFitMethod>::update(TrackingUtilities::CDCTrajectory2D& trajectory2D,
-                                         const CDCSegment2D& segment) const
+                                         const TrackingUtilities::CDCSegment2D& segment) const
     {
       updateGeneric(trajectory2D, segment);
     }
 
     template <class AFitMethod>
     void CDCFitter2D<AFitMethod>::update(TrackingUtilities::CDCTrajectory2D& trajectory2D,
-                                         const CDCAxialSegmentPair& axialSegmentPair) const
+                                         const TrackingUtilities::CDCAxialSegmentPair& axialSegmentPair) const
     {
       return updateGeneric(trajectory2D, axialSegmentPair);
     }

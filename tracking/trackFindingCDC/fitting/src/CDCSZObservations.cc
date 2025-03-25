@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/fitting/EigenObservationMatrix.h>
 
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
 
 #include <tracking/trackingUtilities/topology/CDCWire.h>

@@ -13,14 +13,13 @@ namespace Belle2 {
     class CDCTrack;
     class CDCTrajectory2D;
     class CDCTrajectorySZ;
+    class CDCSegmentPair;
+    class CDCSegment3D;
+    class CDCSegment2D;
   }
   namespace TrackFindingCDC {
     class CDCSZObservations;
     class CDCObservations2D;
-
-    class CDCSegmentPair;
-    class CDCSegment3D;
-    class CDCSegment2D;
 
     /// Class implementing the z coordinate over travel distance line fit.
     class CDCSZFitter {
@@ -34,11 +33,11 @@ namespace Belle2 {
       TrackingUtilities::CDCTrajectorySZ fitWithStereoHits(const TrackingUtilities::CDCTrack& track) const;
 
       /// Returns a fitted trajectory
-      TrackingUtilities::CDCTrajectorySZ fit(const CDCSegment2D& stereoSegment,
+      TrackingUtilities::CDCTrajectorySZ fit(const TrackingUtilities::CDCSegment2D& stereoSegment,
                                              const TrackingUtilities::CDCTrajectory2D& axialTrajectory2D) const;
 
       /// Fits a linear sz trajectory to the z and s coordinates in the stereo segment.
-      TrackingUtilities::CDCTrajectorySZ fit(const CDCSegment3D& segment3D) const;
+      TrackingUtilities::CDCTrajectorySZ fit(const TrackingUtilities::CDCSegment3D& segment3D) const;
 
       /// Fits a linear sz trajectory to the s and z coordinates given in the observations.
       TrackingUtilities::CDCTrajectorySZ fit(CDCSZObservations observationsSZ) const;
@@ -47,11 +46,11 @@ namespace Belle2 {
       TrackingUtilities::CDCTrajectorySZ fit(const CDCObservations2D& observations2D) const;
 
       /// Updates the trajectory of the axial stereo segment pair inplace
-      void update(const CDCSegmentPair& segmentPair) const;
+      void update(const TrackingUtilities::CDCSegmentPair& segmentPair) const;
 
       /// Update the given sz trajectory reconstructing the stereo segment with a near by axial segment
       void update(TrackingUtilities::CDCTrajectorySZ& trajectorySZ,
-                  const CDCSegment2D& stereoSegment,
+                  const TrackingUtilities::CDCSegment2D& stereoSegment,
                   const TrackingUtilities::CDCTrajectory2D& axialTrajectory2D) const;
 
       /// Update the trajectory with a fit to the observations.

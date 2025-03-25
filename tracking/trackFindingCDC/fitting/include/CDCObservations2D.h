@@ -28,8 +28,6 @@ namespace Belle2 {
     class CDCTrack;
     class CDCRecoHit3D;
     class CDCRecoHit2D;
-  }
-  namespace TrackFindingCDC {
     class CDCRLWireHitPair;
     class CDCRLWireHitTriple;
     class CDCFacet;
@@ -37,6 +35,8 @@ namespace Belle2 {
     class CDCSegment2D;
     class CDCSegment3D;
     class CDCAxialSegmentPair;
+  }
+  namespace TrackFindingCDC {
 
     /// Class serving as a storage of observed drift circles to present to the Riemann fitter
     class CDCObservations2D {
@@ -196,13 +196,13 @@ namespace Belle2 {
       std::size_t append(const TrackingUtilities::CDCRLWireHit& rlWireHit);
 
       /// Appends the two observed position
-      std::size_t append(const CDCRLWireHitPair& rlWireHitPair);
+      std::size_t append(const TrackingUtilities::CDCRLWireHitPair& rlWireHitPair);
 
       /// Appends the three observed position
-      std::size_t append(const CDCRLWireHitTriple& rlWireHitTriple);
+      std::size_t append(const TrackingUtilities::CDCRLWireHitTriple& rlWireHitTriple);
 
       /// Appends the three observed position
-      std::size_t append(const CDCFacet& facet);
+      std::size_t append(const TrackingUtilities::CDCFacet& facet);
 
       /// Appends the hit using the reconstructed position if useRecoPos indicates it
       std::size_t append(const TrackingUtilities::CDCRecoHit2D& recoHit2D);
@@ -214,19 +214,19 @@ namespace Belle2 {
        *  Appends all reconstructed hits from the two dimensional segment.
        *  @return  Number of added hits
        */
-      std::size_t appendRange(const CDCSegment2D& segment2D);
+      std::size_t appendRange(const TrackingUtilities::CDCSegment2D& segment2D);
 
       /**
        *  Appends all reconstructed hits from the three dimensional segment.
        *  @return  Number of added hits
        */
-      std::size_t appendRange(const CDCSegment3D& segment3D);
+      std::size_t appendRange(const TrackingUtilities::CDCSegment3D& segment3D);
 
       /**
        *  Appends all reconstructed hits from the two axial segments,
        *  @return  Number of added hits
        */
-      std::size_t appendRange(const CDCAxialSegmentPair& axialSegmentPair);
+      std::size_t appendRange(const TrackingUtilities::CDCAxialSegmentPair& axialSegmentPair);
 
       /**
        *  Appends all reconstructed hits from the three dimensional track.
@@ -246,7 +246,7 @@ namespace Belle2 {
        *  @note For cross check to Legendre finder.
        *  @return  Number of added hits
        */
-      std::size_t appendRange(const CDCWireHitSegment& wireHits);
+      std::size_t appendRange(const TrackingUtilities::CDCWireHitSegment& wireHits);
 
       /// Append all hits from a generic range.
       template<class ARange>

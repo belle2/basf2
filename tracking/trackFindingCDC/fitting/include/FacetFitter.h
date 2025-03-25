@@ -12,16 +12,16 @@
 namespace Belle2 {
   namespace TrackingUtilities {
     class UncertainParameterLine2D;
+    class CDCFacet;
   }
   namespace TrackFindingCDC {
-    class CDCFacet;
 
     /// Utility class to fit hit triplet and relations of them
     class FacetFitter {
 
     public:
       /// Fits a proper line to facet and returns the chi2.
-      static double fit(const CDCFacet& facet,
+      static double fit(const TrackingUtilities::CDCFacet& facet,
                         int nSteps = 100);
 
       /**
@@ -31,8 +31,8 @@ namespace Belle2 {
        *  @param toFacet   Second facet from the pair of facets
        *  @param nSteps Maximal number of steps to be taken in the mimisation
        */
-      static TrackingUtilities::UncertainParameterLine2D fit(const CDCFacet& fromFacet,
-                                                             const CDCFacet& toFacet,
+      static TrackingUtilities::UncertainParameterLine2D fit(const TrackingUtilities::CDCFacet& fromFacet,
+                                                             const TrackingUtilities::CDCFacet& toFacet,
                                                              int nSteps = 100);
 
       /**

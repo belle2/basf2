@@ -17,12 +17,12 @@ namespace Belle2 {
     class CDCWireHit;
     class CDCWire;
     class CDCTrajectory2D;
-  }
-  namespace TrackFindingCDC {
     class CDCSegment3D;
     class CDCAxialSegmentPair;
     class CDCSegment2D;
     class CDCWireHitSegment;
+  }
+  namespace TrackFindingCDC {
     class CDCObservations2D;
 
     /// Class implementing a fit for two dimensional trajectory circle using a generic fitting backend.
@@ -52,13 +52,14 @@ namespace Belle2 {
       TrackingUtilities::CDCTrajectory2D fit(const TrackingUtilities::CDCTrack& track) const;
 
       /// Fits the segment
-      TrackingUtilities::CDCTrajectory2D fit(const CDCSegment3D& segment) const;
+      TrackingUtilities::CDCTrajectory2D fit(const TrackingUtilities::CDCSegment3D& segment) const;
 
       /// Fits to the two segments
-      TrackingUtilities::CDCTrajectory2D fit(const CDCSegment2D& fromSegment, const CDCSegment2D& toSegment) const;
+      TrackingUtilities::CDCTrajectory2D fit(const TrackingUtilities::CDCSegment2D& fromSegment,
+                                             const TrackingUtilities::CDCSegment2D& toSegment) const;
 
       /// Fits the segment
-      TrackingUtilities::CDCTrajectory2D fit(const CDCSegment2D& segment) const;
+      TrackingUtilities::CDCTrajectory2D fit(const TrackingUtilities::CDCSegment2D& segment) const;
 
       /// Fits to the wire hit observations.
       TrackingUtilities::CDCTrajectory2D fit(const std::vector<const TrackingUtilities::CDCWireHit*>& wireHit) const;
@@ -67,13 +68,13 @@ namespace Belle2 {
       TrackingUtilities::CDCTrajectory2D fit(const std::vector<const TrackingUtilities::CDCWire*>& wires) const;
 
       /// Fits to the wire positions. Explicit specialisation to be used from python.
-      TrackingUtilities::CDCTrajectory2D fit(const CDCWireHitSegment& wireHits) const;
+      TrackingUtilities::CDCTrajectory2D fit(const TrackingUtilities::CDCWireHitSegment& wireHits) const;
 
       /// Updates the given trajectory inplace from the given segment
-      void update(TrackingUtilities::CDCTrajectory2D& trajectory2D, const CDCSegment2D& segment) const;
+      void update(TrackingUtilities::CDCTrajectory2D& trajectory2D, const TrackingUtilities::CDCSegment2D& segment) const;
 
       /// Updates the given trajectory inplace from the given segment pair
-      void update(TrackingUtilities::CDCTrajectory2D& trajectory2D, const CDCAxialSegmentPair& axialSegmentPair) const;
+      void update(TrackingUtilities::CDCTrajectory2D& trajectory2D, const TrackingUtilities::CDCAxialSegmentPair& axialSegmentPair) const;
 
     private:
       /// Fits a collection of hit typs which are convertible to observation circles.

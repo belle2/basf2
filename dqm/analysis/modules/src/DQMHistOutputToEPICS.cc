@@ -38,16 +38,10 @@ DQMHistOutputToEPICSModule::DQMHistOutputToEPICSModule()
 
 DQMHistOutputToEPICSModule::~DQMHistOutputToEPICSModule()
 {
-#ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
-#endif
 }
 
 void DQMHistOutputToEPICSModule::initialize()
 {
-#ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-#endif
   for (auto& it : m_histlist) {
     if (it.size() < 2) {
       B2WARNING("Histolist with wrong nr of parameters " << it.size());

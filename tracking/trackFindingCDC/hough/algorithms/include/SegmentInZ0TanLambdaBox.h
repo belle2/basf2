@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFindingCDC/hough/boxes/Z0TanLambdaBox.h>
 #include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
@@ -29,7 +29,8 @@ namespace Belle2 {
        *  Checks if the wire hit is contained in a z0 tan lambda hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
-      TrackingUtilities::Weight operator()(const std::pair<CDCSegment3D, TrackingUtilities::CDCTrajectorySZ>& segmentWithTrajectorySZ,
+      TrackingUtilities::Weight operator()(const std::pair<TrackingUtilities::CDCSegment3D, TrackingUtilities::CDCTrajectorySZ>&
+                                           segmentWithTrajectorySZ,
                                            const HoughBox* z0TanLambdaBox)
       {
         float lowerZ0 = z0TanLambdaBox->getLowerZ0();

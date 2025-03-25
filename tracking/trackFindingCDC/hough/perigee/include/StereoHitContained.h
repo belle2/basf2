@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
@@ -40,7 +40,7 @@ namespace Belle2 {
 
       /** Checks if more than 66% of the hits in this segment are contained in the phi0 curv hough space
        *  Returns the sum of the individual hit weights in this case. Else returns NAN.*/
-      TrackingUtilities::Weight operator()(const CDCSegment2D* segment2D,
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCSegment2D* segment2D,
                                            const HoughBox* houghBox)
       {
         size_t nHits = segment2D->size();

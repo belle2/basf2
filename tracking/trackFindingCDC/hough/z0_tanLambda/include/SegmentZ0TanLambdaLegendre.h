@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/Z0TanLambdaLegendre.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFindingCDC/hough/algorithms/RangeInBox.h>
 #include <tracking/trackFindingCDC/hough/algorithms/FirstOfPairInBox.h>

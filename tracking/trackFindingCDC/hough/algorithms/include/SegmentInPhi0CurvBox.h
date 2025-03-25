@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
@@ -28,7 +28,7 @@ namespace Belle2 {
        *  and simply uses the values from the contained trajectory
        *  The calling code has to ensure this situation
        */
-      TrackingUtilities::Weight operator()(const CDCSegment2D* segment,
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCSegment2D* segment,
                                            const Phi0CurvBox* phi0CurvBox)
       {
         if (segment->empty()) return NAN;
@@ -56,7 +56,7 @@ namespace Belle2 {
        *  Checks if the given hit triplet is considered part of the hough box in phi0, curvature space.
        *  Returns a finit weight if it is contained, NAN if not contained.
        */
-      TrackingUtilities::Weight operator()(const CDCFacet* facet,
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCFacet* facet,
                                            const Phi0CurvBox* phi0CurvBox)
       {
         const ParameterLine2D& line = facet->getStartToEndLine();

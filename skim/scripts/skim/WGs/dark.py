@@ -1020,7 +1020,7 @@ class ALP2Gamma(BaseSkim):
     __contact__ = __liaison__
     __description__ = (
         "Dark sector skim list for the ALP 2-photon analysis: "
-        r":math:`B \to a(\to \gamma \gamma)`"
+        ":math:`B \\to a(\\to \\gamma \\gamma)`"
     )
     __category__ = "physics, dark sector"
     ApplyHLTHadronCut = False
@@ -1033,9 +1033,9 @@ class ALP2Gamma(BaseSkim):
 
         gamma = (
             'gamma:g_ALP2Gamma',
-            '(clusterReg == 1 and E > 0.150) or '
-            '(clusterReg == 2 and E > 0.05) or '
-            '(clusterReg == 3 and E > 0.1)'
+            '[[clusterReg == 1] and [E > 0.150]] or'
+            '[[clusterReg == 2] and [E > 0.05]] or '
+            '[[clusterReg == 3] and [E > 0.1]]'
         )
 
         ma.fillParticleLists([kaons, gamma], path=path)

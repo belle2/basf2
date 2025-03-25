@@ -27,7 +27,6 @@ using namespace CDC;
 using namespace TrackFindingCDC;
 WireEfficiencyAlgorithm::WireEfficiencyAlgorithm(): CalibrationAlgorithm("CDCBadWireCollector")
 {
-
   setDescription(
     " -------------------------- Wire Efficiency Estimation Algorithm -------------------------\n"
   );
@@ -57,22 +56,18 @@ bool WireEfficiencyAlgorithm::buildEfficiencies()
 
   for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
     unsigned short layerNo = wireLayer.getICLayer();
-    B2INFO("Got layer " << layerNo);
-    std::string m_nameOfLayer = std::string("effLayer_").append(std::to_string(layerNo));
-    std::string m_titleOfLayer = std::string("Efficiency of wires in layer ").append(std::to_string(layerNo));
-    B2INFO("Built names for " << layerNo);
+    //B2INFO("Got layer " << layerNo);
+    //std::string m_nameOfLayer = std::string("effLayer_").append(std::to_string(layerNo));
+    //std::string m_titleOfLayer = std::string("Efficiency of wires in layer ").append(std::to_string(layerNo));
+    //B2INFO("Built names for " << layerNo);
 
     unsigned short nzbins = 30 - layerNo / 7;
     unsigned short nwidbins = cdcgeo.nWiresInLayer(layerNo);
     double widbins[2] = { -0.5, cdcgeo.nWiresInLayer(layerNo) - 0.5};
     double zbins[2] = {wireLayer.getBackwardZ(), wireLayer.getForwardZ()};
 
-    B2INFO("Built bins for " << layerNo);
-
-    TEfficiency* effInLayer = new TEfficiency(m_nameOfLayer.c_str(), m_titleOfLayer.c_str(), nzbins, zbins[0], zbins[1], nwidbins,
-                                              widbins[0], widbins[1]);
-    B2INFO("TEfficiency for " << layerNo << "successfully built");
-
+    TEfficiency* effInLayer = new TEfficiency(Form("effLayer_%d", layerNo), Form("Hit efficiency pf L%d ; z (cm) ; IWire ", layerNo),
+                                              nzbins, zbins[0], zbins[1], nwidbins,  widbins[0], widbins[1]);
     m_efficiencyList->Add(effInLayer);
     B2INFO("Teff for layer " << layerNo << " was successfully listed.");
   }

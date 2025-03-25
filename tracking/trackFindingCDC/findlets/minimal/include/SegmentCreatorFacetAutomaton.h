@@ -18,18 +18,20 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegment2D;
     class CDCFacet;
+  }
+  namespace TrackFindingCDC {
 
     /// Findlet that generates segments within clusters based on a cellular automaton on triples of hits
     class SegmentCreatorFacetAutomaton
-      : public TrackingUtilities::Findlet<const CDCFacet, const TrackingUtilities::WeightedRelation<const CDCFacet>, CDCSegment2D> {
+      : public TrackingUtilities::Findlet<const TrackingUtilities::CDCFacet, const TrackingUtilities::WeightedRelation<const TrackingUtilities::CDCFacet>, TrackingUtilities::CDCSegment2D> {
 
     private:
       /// Type of the base class
       using Super =
-        TrackingUtilities::Findlet<const CDCFacet, const TrackingUtilities::WeightedRelation<const CDCFacet>, CDCSegment2D>;
+        TrackingUtilities::Findlet<const TrackingUtilities::CDCFacet, const TrackingUtilities::WeightedRelation<const TrackingUtilities::CDCFacet>, TrackingUtilities::CDCSegment2D>;
 
     public:
       /// Short description of the findlet
@@ -39,9 +41,9 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main function of the segment finding by the cellular automaton.
-      void apply(const std::vector<CDCFacet>& inputFacets,
-                 const std::vector<TrackingUtilities::WeightedRelation<const CDCFacet>>& inputFacetRelations,
-                 std::vector<CDCSegment2D>& outputSegments) final;
+      void apply(const std::vector<TrackingUtilities::CDCFacet>& inputFacets,
+                 const std::vector<TrackingUtilities::WeightedRelation<const TrackingUtilities::CDCFacet>>& inputFacetRelations,
+                 std::vector<TrackingUtilities::CDCSegment2D>& outputSegments) final;
 
     private:
       /// Parameter : Switch to construct the reversed segment if it is available in the facet graph as well
@@ -58,11 +60,11 @@ namespace Belle2 {
 
     private: // cellular automaton
       /// Instance of the cellular automaton path finder
-      TrackingUtilities::MultipassCellularPathFinder<const CDCFacet> m_cellularPathFinder;
+      TrackingUtilities::MultipassCellularPathFinder<const TrackingUtilities::CDCFacet> m_cellularPathFinder;
 
     private: // object pools
       /// Memory for the facet paths generated from the graph.
-      std::vector< TrackingUtilities::Path<const CDCFacet> > m_facetPaths;
+      std::vector< TrackingUtilities::Path<const TrackingUtilities::CDCFacet> > m_facetPaths;
     };
   }
 }

@@ -16,15 +16,17 @@
 namespace Belle2 {
 
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     /// Fixes the orientation of segments by a simple heuristic
-    class SegmentOrienter: public TrackingUtilities::Findlet<const CDCSegment2D, CDCSegment2D> {
+    class SegmentOrienter: public TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D, TrackingUtilities::CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<const CDCSegment2D, CDCSegment2D>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D, TrackingUtilities::CDCSegment2D>;
 
     public:
       /// Short description of the findlet
@@ -37,8 +39,8 @@ namespace Belle2 {
       void initialize() final;
 
       /// Main algorithm applying the adjustment of the orientation.
-      void apply(const std::vector<CDCSegment2D>& inputSegments,
-                 std::vector<CDCSegment2D>& outputSegments) final;
+      void apply(const std::vector<TrackingUtilities::CDCSegment2D>& inputSegments,
+                 std::vector<TrackingUtilities::CDCSegment2D>& outputSegments) final;
 
     private:
       /**

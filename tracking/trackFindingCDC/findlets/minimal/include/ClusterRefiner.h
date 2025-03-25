@@ -9,7 +9,7 @@
 
 #include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackingUtilities/ca/Clusterizer.h>
@@ -27,11 +27,12 @@ namespace Belle2 {
 
     /// Refines the clustering of wire hits from super clusters to clustexrs
     template <class AWireHitRelationFilter>
-    class ClusterRefiner : public TrackingUtilities::Findlet<const CDCWireHitCluster, CDCWireHitCluster> {
+    class ClusterRefiner : public
+      TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHitCluster, TrackingUtilities::CDCWireHitCluster> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<const CDCWireHitCluster, CDCWireHitCluster>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHitCluster, TrackingUtilities::CDCWireHitCluster>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -54,10 +55,10 @@ namespace Belle2 {
 
     public:
       /// Main algorithm applying the cluster refinement
-      void apply(const std::vector<CDCWireHitCluster>& inputSuperClusters,
-                 std::vector<CDCWireHitCluster>& outputClusters) final
+      void apply(const std::vector<TrackingUtilities::CDCWireHitCluster>& inputSuperClusters,
+                 std::vector<TrackingUtilities::CDCWireHitCluster>& outputClusters) final
       {
-        for (const CDCWireHitCluster& superCluster : inputSuperClusters) {
+        for (const TrackingUtilities::CDCWireHitCluster& superCluster : inputSuperClusters) {
           B2ASSERT("Expect the clusters to be sorted", std::is_sorted(superCluster.begin(),
                                                                       superCluster.end()));
 
@@ -74,7 +75,7 @@ namespace Belle2 {
           // Update the super cluster id of the just created clusters
           int iSuperCluster = superCluster.getISuperCluster();
           for (std::size_t iCluster = nClustersBefore; iCluster < nClustersAfter; ++iCluster) {
-            CDCWireHitCluster& cluster = outputClusters[iCluster];
+            TrackingUtilities::CDCWireHitCluster& cluster = outputClusters[iCluster];
             cluster.setISuperCluster(iSuperCluster);
             std::sort(cluster.begin(), cluster.end());
           }
@@ -83,7 +84,7 @@ namespace Belle2 {
 
     private:
       /// Instance of the hit cluster generator
-      TrackingUtilities::Clusterizer<TrackingUtilities::CDCWireHit, CDCWireHitCluster> m_wireHitClusterizer;
+      TrackingUtilities::Clusterizer<TrackingUtilities::CDCWireHit, TrackingUtilities::CDCWireHitCluster> m_wireHitClusterizer;
 
       /// Memory for the wire hit neighborhood in a super cluster.
       std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCWireHit>> m_wireHitRelations;

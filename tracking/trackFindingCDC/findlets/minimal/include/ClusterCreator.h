@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/wireHitRelation/WholeWireHitRelationFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackingUtilities/ca/Clusterizer.h>
@@ -32,11 +32,11 @@ namespace Belle2 {
 
     /// Refines the clustering of wire hits from  clusters to clusters
     template <class AWireHitRelationFilter = WholeWireHitRelationFilter>
-    class ClusterCreator : public TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&, CDCWireHitCluster> {
+    class ClusterCreator : public TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&, TrackingUtilities::CDCWireHitCluster> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit, CDCWireHitCluster>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit, TrackingUtilities::CDCWireHitCluster>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -54,7 +54,7 @@ namespace Belle2 {
     public:
       /// Main algorithm applying the cluster refinement
       void apply(std::vector<TrackingUtilities::CDCWireHit>& inputWireHits,
-                 std::vector<CDCWireHitCluster>& outputClusters) final
+                 std::vector<TrackingUtilities::CDCWireHitCluster>& outputClusters) final
       {
 
         // Obtain the wire hits as pointers.
@@ -74,7 +74,7 @@ namespace Belle2 {
 
     private:
       /// Instance of the hit cluster generator
-      TrackingUtilities::Clusterizer<TrackingUtilities::CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
+      TrackingUtilities::Clusterizer<TrackingUtilities::CDCWireHit, TrackingUtilities::CDCWireHitCluster> m_wirehitClusterizer;
 
       /// Memory for the wire hit neighborhood in a cluster.
       std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCWireHit>> m_wireHitRelations;

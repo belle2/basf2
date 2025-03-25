@@ -19,10 +19,10 @@ namespace Belle2 {
 
   namespace TrackingUtilities {
     class CDCTrack;
+    class CDCSegment2D;
   }
 
   namespace TrackFindingCDC {
-    class CDCSegment2D;
 
     /**
      *  Searches for segments that have not been used at all and creates tracks from them.
@@ -30,11 +30,12 @@ namespace Belle2 {
      *  This number can be set differently for each super layer
      *  Usually only the segments of the inner most super layer might be interesting to be treated as tracks.
      */
-    class TrackCreatorSingleSegments : public TrackingUtilities::Findlet<const CDCSegment2D, TrackingUtilities::CDCTrack&> {
+    class TrackCreatorSingleSegments : public
+      TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D, TrackingUtilities::CDCTrack&> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<const CDCSegment2D, TrackingUtilities::CDCTrack&>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D, TrackingUtilities::CDCTrack&>;
 
     public:
       /// Constructor setting up default parameters.
@@ -49,7 +50,7 @@ namespace Belle2 {
     public:
       /// Main algorithm
       void
-      apply(const std::vector<CDCSegment2D>& segments, std::vector<TrackingUtilities::CDCTrack>& tracks) final;
+      apply(const std::vector<TrackingUtilities::CDCSegment2D>& segments, std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
     private:
       /**

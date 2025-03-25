@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/SuperClusterCreator.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackingUtilities/topology/CDCWireLayer.h>

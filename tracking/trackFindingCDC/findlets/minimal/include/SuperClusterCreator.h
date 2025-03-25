@@ -21,17 +21,18 @@ namespace Belle2 {
 
   namespace TrackingUtilities {
     class CDCWireHit;
+    class CDCWireHitCluster;
   }
 
   namespace TrackFindingCDC {
-    class CDCWireHitCluster;
 
     /// Refines the clustering of wire hits from  clusters to clusters
-    class SuperClusterCreator : public TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&, CDCWireHitCluster> {
+    class SuperClusterCreator : public
+      TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&, TrackingUtilities::CDCWireHitCluster> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit, CDCWireHitCluster>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit, TrackingUtilities::CDCWireHitCluster>;
 
     public:
       /// Constructor
@@ -46,7 +47,7 @@ namespace Belle2 {
     public:
       /// Main algorithm applying the cluster refinement
       void apply(std::vector<TrackingUtilities::CDCWireHit>& inputWireHits,
-                 std::vector<CDCWireHitCluster>& outputSuperClusters) final;
+                 std::vector<TrackingUtilities::CDCWireHitCluster>& outputSuperClusters) final;
 
     private:
       /// Parameter : Expand the super clusters over the typical gap at the apogee of the trajectory
@@ -54,7 +55,7 @@ namespace Belle2 {
 
     private:
       /// Instance of the hit cluster generator
-      TrackingUtilities::Clusterizer<TrackingUtilities::CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
+      TrackingUtilities::Clusterizer<TrackingUtilities::CDCWireHit, TrackingUtilities::CDCWireHitCluster> m_wirehitClusterizer;
 
       /// Memory for the wire hit neighborhood in a cluster.
       std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCWireHit>> m_wireHitRelations;

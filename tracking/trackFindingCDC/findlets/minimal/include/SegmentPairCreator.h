@@ -22,16 +22,20 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegment2D;
     class CDCSegmentPair;
+    class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     /// Class providing construction combinatorics for the axial stereo segment pairs.
-    class SegmentPairCreator : public TrackingUtilities::Findlet<const CDCSegment2D, CDCSegmentPair> {
+    class SegmentPairCreator : public
+      TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D, TrackingUtilities::CDCSegmentPair> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<const CDCSegment2D, CDCSegmentPair>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D, TrackingUtilities::CDCSegmentPair>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -44,14 +48,14 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main method constructing pairs in adjacent super layers
-      void apply(const std::vector<CDCSegment2D>& inputSegments,
-                 std::vector<CDCSegmentPair>& segmentPairs) final;
+      void apply(const std::vector<TrackingUtilities::CDCSegment2D>& inputSegments,
+                 std::vector<TrackingUtilities::CDCSegmentPair>& segmentPairs) final;
 
     private:
       /// Creates segment pairs from a combination of from segments and to segments.
-      void create(const std::vector<const CDCSegment2D*>& fromSegments,
-                  const std::vector<const CDCSegment2D*>& toSegments,
-                  std::vector<CDCSegmentPair>& segmentPairs);
+      void create(const std::vector<const TrackingUtilities::CDCSegment2D*>& fromSegments,
+                  const std::vector<const TrackingUtilities::CDCSegment2D*>& toSegments,
+                  std::vector<TrackingUtilities::CDCSegmentPair>& segmentPairs);
 
     private:
       /// Parameter : Switch to enable the search for axial to axial pairs to enable more stable reconstruction of the middle stereo.
@@ -66,7 +70,7 @@ namespace Belle2 {
 
       // Object pools
       /// Structure for the segments grouped by super layer id.
-      std::array<std::vector<const CDCSegment2D*>, TrackingUtilities::ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
+      std::array<std::vector<const TrackingUtilities::CDCSegment2D*>, TrackingUtilities::ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
     };
   }
 }

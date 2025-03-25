@@ -7,8 +7,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/AxialSegmentPairCreator.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCAxialSegmentPair.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
 #include <vector>
 #include <algorithm>

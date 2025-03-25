@@ -17,15 +17,17 @@
 namespace Belle2 {
 
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHitCluster;
+  }
+  namespace TrackFindingCDC {
 
     /// Marks clusters as background based on a background measure
-    class ClusterBackgroundDetector : public TrackingUtilities::Findlet<CDCWireHitCluster&> {
+    class ClusterBackgroundDetector : public TrackingUtilities::Findlet<TrackingUtilities::CDCWireHitCluster&> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<CDCWireHitCluster&>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHitCluster&>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -38,7 +40,7 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main algorithm applying the cluster background detection
-      void apply(std::vector<CDCWireHitCluster>& outputClusters) final;
+      void apply(std::vector<TrackingUtilities::CDCWireHitCluster>& outputClusters) final;
 
     private:
       /// Chooseable cluster filter to be used to filter background

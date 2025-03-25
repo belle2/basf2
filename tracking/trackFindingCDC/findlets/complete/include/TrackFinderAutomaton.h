@@ -15,8 +15,8 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackingUtilities/findlets/base/StoreVectorSwapper.h>
@@ -71,7 +71,7 @@ namespace Belle2 {
       TrackingUtilities::StoreVectorSwapper<TrackingUtilities::CDCWireHit, true> m_wireHitsSwapper{"CDCWireHitVector"};
 
       /// Puts the internal segments on the DataStore
-      TrackingUtilities::StoreVectorSwapper<CDCSegment2D> m_segmentsSwapper{"CDCSegment2DVector"};
+      TrackingUtilities::StoreVectorSwapper<TrackingUtilities::CDCSegment2D> m_segmentsSwapper{"CDCSegment2DVector"};
 
       /// Puts the internal segments on the DataStore
       TrackingUtilities::StoreVectorSwapper<TrackingUtilities::CDCTrack> m_tracksSwapper{"CDCTrackVector"};
@@ -81,13 +81,13 @@ namespace Belle2 {
       std::vector<TrackingUtilities::CDCWireHit> m_wireHits;
 
       /// Memory for the wire hits cluster
-      std::vector<CDCWireHitCluster> m_clusters;
+      std::vector<TrackingUtilities::CDCWireHitCluster> m_clusters;
 
       /// Memory for the wire hits super clusters
-      std::vector<CDCWireHitCluster> m_superClusters;
+      std::vector<TrackingUtilities::CDCWireHitCluster> m_superClusters;
 
       /// Memory for the segments
-      std::vector<CDCSegment2D> m_segments;
+      std::vector<TrackingUtilities::CDCSegment2D> m_segments;
 
       /// Memory for the tracks
       std::vector<TrackingUtilities::CDCTrack> m_tracks;

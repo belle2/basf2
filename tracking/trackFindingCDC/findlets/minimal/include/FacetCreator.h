@@ -24,18 +24,18 @@ namespace Belle2 {
 
   namespace TrackingUtilities {
     class CDCWireHit;
+    class CDCFacet;
+    class CDCWireHitCluster;
   }
 
   namespace TrackFindingCDC {
-    class CDCFacet;
-    class CDCWireHitCluster;
 
     /// Class providing construction combinatorics for the facets.
-    class FacetCreator : public TrackingUtilities::Findlet<const CDCWireHitCluster, CDCFacet> {
+    class FacetCreator : public TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHitCluster, TrackingUtilities::CDCFacet> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<const CDCWireHitCluster, CDCFacet>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHitCluster, TrackingUtilities::CDCFacet>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -54,7 +54,8 @@ namespace Belle2 {
        *  the output hit triplets follow the order of the input clusters
        *  such that the triplets of the same cluster remain close to each other.
        */
-      void apply(const std::vector<CDCWireHitCluster>& inputClusters, std::vector<CDCFacet>& facets) final;
+      void apply(const std::vector<TrackingUtilities::CDCWireHitCluster>& inputClusters,
+                 std::vector<TrackingUtilities::CDCFacet>& facets) final;
 
     private:
       /**
@@ -63,7 +64,7 @@ namespace Belle2 {
        */
       void createFacets(const std::vector<TrackingUtilities::CDCWireHit*>& wireHits,
                         const std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCWireHit> >& wireHitRelations,
-                        std::vector<CDCFacet>& facets);
+                        std::vector<TrackingUtilities::CDCFacet>& facets);
 
       /**
        *  Generates reconstruted facets on the three given wire hits by hypothesizing
@@ -73,7 +74,7 @@ namespace Belle2 {
       void createFacetsForHitTriple(const TrackingUtilities::CDCWireHit& startWireHit,
                                     const TrackingUtilities::CDCWireHit& middleWireHit,
                                     const TrackingUtilities::CDCWireHit& endWireHit,
-                                    std::vector<CDCFacet>& facets);
+                                    std::vector<TrackingUtilities::CDCFacet>& facets);
     private:
       /// Parameter : Switch to apply the rl feasibility cut
       bool m_param_feasibleRLOnly = true;

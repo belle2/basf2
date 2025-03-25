@@ -9,7 +9,7 @@
 
 #include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentTriple.h>
 
 #include <tracking/trackingUtilities/ca/MultipassCellularPathFinder.h>
 #include <tracking/trackingUtilities/ca/Path.h>
@@ -23,19 +23,19 @@ namespace Belle2 {
 
   namespace TrackingUtilities {
     class CDCTrack;
+    class CDCSegmentTriple;
   }
 
   namespace TrackFindingCDC {
-    class CDCSegmentTriple;
 
     /// Findlet that generates tracks based on a cellular automaton of segment triples
     class TrackCreatorSegmentTripleAutomaton
-      : public TrackingUtilities::Findlet<const CDCSegmentTriple, const TrackingUtilities::WeightedRelation<const CDCSegmentTriple>, TrackingUtilities::CDCTrack> {
+      : public TrackingUtilities::Findlet<const TrackingUtilities::CDCSegmentTriple, const TrackingUtilities::WeightedRelation<const TrackingUtilities::CDCSegmentTriple>, TrackingUtilities::CDCTrack> {
 
     private:
       /// Type of the base class
       using Super =
-        TrackingUtilities::Findlet<const CDCSegmentTriple, const TrackingUtilities::WeightedRelation<const CDCSegmentTriple>, TrackingUtilities::CDCTrack>;
+        TrackingUtilities::Findlet<const TrackingUtilities::CDCSegmentTriple, const TrackingUtilities::WeightedRelation<const TrackingUtilities::CDCSegmentTriple>, TrackingUtilities::CDCTrack>;
 
     public:
       /// Short description of the findlet
@@ -45,17 +45,17 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main function of the segment finding by the cellular automaton.
-      void apply(const std::vector<CDCSegmentTriple>& inputSegmentTriples,
-                 const std::vector<TrackingUtilities::WeightedRelation<const CDCSegmentTriple>>& inputSegmentTripleRelations,
+      void apply(const std::vector<TrackingUtilities::CDCSegmentTriple>& inputSegmentTriples,
+                 const std::vector<TrackingUtilities::WeightedRelation<const TrackingUtilities::CDCSegmentTriple>>& inputSegmentTripleRelations,
                  std::vector<TrackingUtilities::CDCTrack>& outputTracks) final;
 
     private: // cellular automaton
       /// Instance of the cellular automaton path finder
-      TrackingUtilities::MultipassCellularPathFinder<const CDCSegmentTriple> m_cellularPathFinder;
+      TrackingUtilities::MultipassCellularPathFinder<const TrackingUtilities::CDCSegmentTriple> m_cellularPathFinder;
 
     private: // object pools
       /// Memory for the segment triple paths generated from the graph.
-      std::vector<TrackingUtilities::Path<const CDCSegmentTriple>> m_segmentTriplePaths;
+      std::vector<TrackingUtilities::Path<const TrackingUtilities::CDCSegmentTriple>> m_segmentTriplePaths;
     };
   }
 }

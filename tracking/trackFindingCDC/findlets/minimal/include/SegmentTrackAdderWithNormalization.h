@@ -21,22 +21,22 @@ namespace Belle2 {
   namespace TrackingUtilities {
     class CDCTrack;
     class CDCRecoHit3D;
+    class CDCSegment2D;
   }
 
   namespace TrackFindingCDC {
-    class CDCSegment2D;
 
     /**
      * Add the matched segments to the tracks and normalize the tracks afterwards.
      * Also deletes all hits from the tracks, that are part of segments, that were not matched to these tracks.
      */
     class SegmentTrackAdderWithNormalization
-      : public TrackingUtilities::Findlet<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCSegment2D>&, TrackingUtilities::CDCTrack&, const CDCSegment2D> {
+      : public TrackingUtilities::Findlet<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const TrackingUtilities::CDCSegment2D>&, TrackingUtilities::CDCTrack&, const TrackingUtilities::CDCSegment2D> {
 
     private:
       /// Type of the base class
       using Super =
-        TrackingUtilities::Findlet<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCSegment2D>&, TrackingUtilities::CDCTrack&, const CDCSegment2D>;
+        TrackingUtilities::Findlet<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const TrackingUtilities::CDCSegment2D>&, TrackingUtilities::CDCTrack&, const TrackingUtilities::CDCSegment2D>;
 
     public:
       /// Constructor for registering the sub-findlets
@@ -49,8 +49,9 @@ namespace Belle2 {
       std::string getDescription() override;
 
       /// Apply the findlet
-      void apply(std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCSegment2D>>& relations,
-                 std::vector<TrackingUtilities::CDCTrack>& tracks, const std::vector<CDCSegment2D>& segment) override;
+      void apply(std::vector<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const TrackingUtilities::CDCSegment2D>>&
+                 relations,
+                 std::vector<TrackingUtilities::CDCTrack>& tracks, const std::vector<TrackingUtilities::CDCSegment2D>& segment) override;
 
     private:
       // Parameters

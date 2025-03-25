@@ -19,9 +19,9 @@
 namespace Belle2 {
   namespace TrackingUtilities {
     class CDCTrack;
+    class CDCSegment3D;
   }
   namespace TrackFindingCDC {
-    class CDCSegment3D;
 
     /// Combines two sets of tracks to one final set by merging tracks that have large overlaps
     class TrackCombiner : public
@@ -54,7 +54,7 @@ namespace Belle2 {
 
     private:
       /// Instance of the cellular automaton path finder
-      TrackingUtilities::MultipassCellularPathFinder<const CDCSegment3D> m_cellularPathFinder;
+      TrackingUtilities::MultipassCellularPathFinder<const TrackingUtilities::CDCSegment3D> m_cellularPathFinder;
     };
   }
 }

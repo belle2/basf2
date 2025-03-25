@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentLinker.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 #include <tracking/trackingUtilities/utilities/Algorithms.h>

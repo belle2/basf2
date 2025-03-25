@@ -20,18 +20,21 @@
 namespace Belle2 {
 
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegmentTriple;
     class CDCAxialSegmentPair;
     class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     /// Class providing construction combinatorics for the axial stereo segment pairs.
     class SegmentTripleCreator
-      : public TrackingUtilities::Findlet<const CDCSegment2D, const CDCAxialSegmentPair, CDCSegmentTriple> {
+      : public TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D, const TrackingUtilities::CDCAxialSegmentPair, TrackingUtilities::CDCSegmentTriple> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<const CDCSegment2D, const CDCAxialSegmentPair, CDCSegmentTriple>;
+      using Super =
+        TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D, const TrackingUtilities::CDCAxialSegmentPair, TrackingUtilities::CDCSegmentTriple>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -44,19 +47,19 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main method constructing pairs in adjacent super layers
-      void apply(const std::vector<CDCSegment2D>& inputSegments,
-                 const std::vector<CDCAxialSegmentPair>& inputAxialSegmentPairs,
-                 std::vector<CDCSegmentTriple>& segmentTriples) final;
+      void apply(const std::vector<TrackingUtilities::CDCSegment2D>& inputSegments,
+                 const std::vector<TrackingUtilities::CDCAxialSegmentPair>& inputAxialSegmentPairs,
+                 std::vector<TrackingUtilities::CDCSegmentTriple>& segmentTriples) final;
 
     private:
       /// Creates segment triples by adding the middle segment to the axial segments and filter out the valuable combinations
-      void create(const CDCAxialSegmentPair& axialSegmentPair,
-                  const std::vector<const CDCSegment2D*>& middleSegments,
-                  std::vector<CDCSegmentTriple>& segmentTriples);
+      void create(const TrackingUtilities::CDCAxialSegmentPair& axialSegmentPair,
+                  const std::vector<const TrackingUtilities::CDCSegment2D*>& middleSegments,
+                  std::vector<TrackingUtilities::CDCSegmentTriple>& segmentTriples);
 
     private:
       /// Structure for the segments grouped by super layer id.
-      std::array<std::vector<const CDCSegment2D*>, TrackingUtilities::ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
+      std::array<std::vector<const TrackingUtilities::CDCSegment2D*>, TrackingUtilities::ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
 
       /// The filter to be used for the segment triple generation.
       ChooseableSegmentTripleFilter m_segmentTripleFilter;

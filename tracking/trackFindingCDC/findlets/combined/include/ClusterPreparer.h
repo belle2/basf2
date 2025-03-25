@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <vector>
@@ -25,11 +25,13 @@ namespace Belle2 {
   }
   namespace TrackFindingCDC {
     /// Findlet to cluster the wire hits in the CDC to form locally connected groups with two granularities.";
-    class ClusterPreparer : public TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&, CDCWireHitCluster, CDCWireHitCluster> {
+    class ClusterPreparer : public
+      TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&, TrackingUtilities::CDCWireHitCluster, TrackingUtilities::CDCWireHitCluster> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&, CDCWireHitCluster, CDCWireHitCluster>;
+      using Super =
+        TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&, TrackingUtilities::CDCWireHitCluster, TrackingUtilities::CDCWireHitCluster>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -43,8 +45,8 @@ namespace Belle2 {
 
       /// Generates the segment from wire hits
       void apply(std::vector<TrackingUtilities::CDCWireHit>& inputWireHits,
-                 std::vector<CDCWireHitCluster>& clusters,
-                 std::vector<CDCWireHitCluster>& superClusters) final;
+                 std::vector<TrackingUtilities::CDCWireHitCluster>& clusters,
+                 std::vector<TrackingUtilities::CDCWireHitCluster>& superClusters) final;
 
     private:
       // Findlets

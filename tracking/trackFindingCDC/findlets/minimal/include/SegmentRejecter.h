@@ -19,19 +19,21 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     // Guard to prevent repeated instantiations
     // extern template class TrackingUtilities::Chooseable<BaseSegmentFilter>;
     // extern template class TrackingUtilities::ChooseableFilter<SegmentFilterFactory>;
 
     /// Deletes fake segments that have been rejected by a filter
-    class SegmentRejecter : public TrackingUtilities::Findlet<CDCSegment2D&> {
+    class SegmentRejecter : public TrackingUtilities::Findlet<TrackingUtilities::CDCSegment2D&> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<CDCSegment2D&>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCSegment2D&>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -44,7 +46,7 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main algorithm
-      void apply(std::vector<CDCSegment2D>& segment2Ds) final;
+      void apply(std::vector<TrackingUtilities::CDCSegment2D>& segment2Ds) final;
 
     private:
       /// Parameter : Switch to delete the segments instead of marking them as background.

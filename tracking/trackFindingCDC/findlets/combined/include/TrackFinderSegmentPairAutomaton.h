@@ -15,7 +15,7 @@
 
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/ChooseableSegmentPairRelationFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackingUtilities/findlets/minimal/WeightedRelationCreator.h>
@@ -29,11 +29,12 @@ namespace Belle2 {
   }
   namespace TrackFindingCDC {
     /// Findlet implementing the track finding from segments using a cellular automaton over segment pairs
-    class TrackFinderSegmentPairAutomaton : public TrackingUtilities::Findlet<const CDCSegment2D, TrackingUtilities::CDCTrack> {
+    class TrackFinderSegmentPairAutomaton : public
+      TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D, TrackingUtilities::CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<const CDCSegment2D, TrackingUtilities::CDCTrack>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D, TrackingUtilities::CDCTrack>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -49,7 +50,8 @@ namespace Belle2 {
       void beginEvent() final;
 
       /// Generates the tracks from segments
-      void apply(const std::vector<CDCSegment2D>& inputSegments, std::vector<TrackingUtilities::CDCTrack>& tracks) final;
+      void apply(const std::vector<TrackingUtilities::CDCSegment2D>& inputSegments,
+                 std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
     private:
       // Findlets
@@ -57,7 +59,7 @@ namespace Belle2 {
       SegmentPairCreator m_segmentPairCreator;
 
       /// Findlet responsible for the creation of segment pairs relations of the CA.
-      TrackingUtilities::WeightedRelationCreator<const TrackFindingCDC::CDCSegmentPair, TrackFindingCDC::ChooseableSegmentPairRelationFilter>
+      TrackingUtilities::WeightedRelationCreator<const TrackingUtilities::CDCSegmentPair, TrackFindingCDC::ChooseableSegmentPairRelationFilter>
       m_segmentPairRelationCreator;
 
       /// Reference to the relation filter to be used to construct the segment pair network.
@@ -73,14 +75,14 @@ namespace Belle2 {
       TrackOrienter m_trackOrienter;
 
       /// Puts the internal segment pairs on the DataStore
-      TrackingUtilities::StoreVectorSwapper<CDCSegmentPair> m_segmentPairSwapper{"CDCSegmentPairVector"};
+      TrackingUtilities::StoreVectorSwapper<TrackingUtilities::CDCSegmentPair> m_segmentPairSwapper{"CDCSegmentPairVector"};
 
       // Object pools
       /// Memory for the axial stereo segment pairs.
-      std::vector<CDCSegmentPair> m_segmentPairs;
+      std::vector<TrackingUtilities::CDCSegmentPair> m_segmentPairs;
 
       /// Memory for the axial stereo segment pair relations.
-      std::vector<TrackingUtilities::WeightedRelation<const CDCSegmentPair> > m_segmentPairRelations;
+      std::vector<TrackingUtilities::WeightedRelation<const TrackingUtilities::CDCSegmentPair> > m_segmentPairRelations;
 
       /// Memory for the tracks before linking was applied.
       std::vector<TrackingUtilities::CDCTrack> m_preLinkingTracks;

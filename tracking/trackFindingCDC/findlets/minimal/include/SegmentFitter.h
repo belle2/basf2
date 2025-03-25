@@ -23,16 +23,18 @@
 namespace Belle2 {
 
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     /// Fits segments with the Riemann method.
     class SegmentFitter:
-      public TrackingUtilities::Findlet<CDCSegment2D&> {
+      public TrackingUtilities::Findlet<TrackingUtilities::CDCSegment2D&> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<CDCSegment2D&>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCSegment2D&>;
 
     public:
       /// Short description of the findlet
@@ -46,7 +48,7 @@ namespace Belle2 {
 
     public:
       /// Main algorithm applying the fit to each segment
-      void apply(std::vector<CDCSegment2D>& outputSegments) override;
+      void apply(std::vector<TrackingUtilities::CDCSegment2D>& outputSegments) override;
 
     private:
       /// Parameter : Switch to use Karimaki fit

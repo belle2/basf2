@@ -20,15 +20,17 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     /// Links segments in the same super cluster by linking paths of segments in a cellular automaton
-    class SegmentLinker : public TrackingUtilities::Findlet<const CDCSegment2D, CDCSegment2D> {
+    class SegmentLinker : public TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D, TrackingUtilities::CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::Findlet<const CDCSegment2D, CDCSegment2D>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCSegment2D, TrackingUtilities::CDCSegment2D>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -42,8 +44,8 @@ namespace Belle2 {
 
     public:
       /// Main algorithm
-      void apply(const std::vector<CDCSegment2D>& inputSegment2Ds,
-                 std::vector<CDCSegment2D>& outputSegment2Ds) final;
+      void apply(const std::vector<TrackingUtilities::CDCSegment2D>& inputSegment2Ds,
+                 std::vector<TrackingUtilities::CDCSegment2D>& outputSegment2Ds) final;
 
     private: // Parameters
       /// Parameter : Switch to activate segment linking in the whole superlayer instead of only the super cluster
@@ -57,17 +59,17 @@ namespace Belle2 {
 
     private:
       /// Creator of the segment relations for linking
-      TrackingUtilities::WeightedRelationCreator<const TrackFindingCDC::CDCSegment2D, TrackFindingCDC::ChooseableSegmentRelationFilter>
+      TrackingUtilities::WeightedRelationCreator<const TrackingUtilities::CDCSegment2D, TrackFindingCDC::ChooseableSegmentRelationFilter>
       m_segment2DRelationCreator;
 
       /// Instance of the cellular automaton path finder
-      TrackingUtilities::MultipassCellularPathFinder<const CDCSegment2D> m_cellularPathFinder;
+      TrackingUtilities::MultipassCellularPathFinder<const TrackingUtilities::CDCSegment2D> m_cellularPathFinder;
 
       /// Memory for the relations between segments to be followed on linking
-      std::vector<TrackingUtilities::WeightedRelation<const CDCSegment2D>> m_segment2DRelations;
+      std::vector<TrackingUtilities::WeightedRelation<const TrackingUtilities::CDCSegment2D>> m_segment2DRelations;
 
       /// Memory for the segment paths generated from the graph.
-      std::vector<TrackingUtilities::Path<const CDCSegment2D>> m_segment2DPaths;
+      std::vector<TrackingUtilities::Path<const TrackingUtilities::CDCSegment2D>> m_segment2DPaths;
     };
   }
 }

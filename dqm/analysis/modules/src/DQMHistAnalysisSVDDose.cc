@@ -112,8 +112,6 @@ void DQMHistAnalysisSVDDoseModule::initialize()
 
 #ifdef _BELLE2_EPICS
   if (getUseEpics()) {
-    if (!ca_current_context())
-      SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     // Channels for the occupancies
     m_myPVs.resize(c_sensorGroups.size());
     for (unsigned int g = 0; g < c_sensorGroups.size(); g++)

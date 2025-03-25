@@ -10,7 +10,6 @@ env['LIBS'] = [
     'mdst_dataobjects',
     'mdst_dbobjects',
     'tracking',
-    'tracking_trackUtilities',
     'tracking_dataobjects',
     'framework',
     'svd_dataobjects',

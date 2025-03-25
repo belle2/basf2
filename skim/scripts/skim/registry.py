@@ -224,7 +224,7 @@ _RegisteredSkims = [
     ("18022400", "dark", "DimuonRecoilMassSquared"),
     ("18530600", "lowMulti", "LowMassOneTrack"),
     ("18022500", "dark", "DarkShower"),
-    ("18027100", "dark", "ALP2Gamma"),
+    ("18022600", "dark", "ALP2Gamma"),
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),

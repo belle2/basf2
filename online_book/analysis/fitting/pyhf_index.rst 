@@ -1,0 +1,19 @@
+Basic Introduction to pyhf
+##########################
+
+"**pyhf** = **py**\ thonic **H**\ ist\ **F**\ actory"
+
+`pyhf <https://pyhf.readthedocs.io>`_ is a Python implementation of the `HistFactory <https://cds.cern.ch/record/1456844/files/CERN-OPEN-2012-016.pdf>`_ statistical model. This is a very general tool for statistical inference of binned data.
+
+If can easily be installed with
+
+.. code-block:: sh
+
+   pip install pyhf
+
+.. toctree::
+   :maxdepth: 2
+
+   pyhf_introduction.rst
+   pyhf_basic_use.rst
+   pyhf_references.rst

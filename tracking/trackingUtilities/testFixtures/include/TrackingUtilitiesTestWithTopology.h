@@ -29,12 +29,6 @@ namespace Belle2 {
      *
      *  to exclude test with this fixture. Also consider
      *  test_tracking --help for more details
-     *
-     *  Alternativelly it is now possible to run
-     *
-     *  $ test_tracking_trackingUtilities
-     *
-     *  as a separate executable.
      */
     class TrackingUtilitiesTestWithTopology : public TestHelpers::TestWithGearbox {
 

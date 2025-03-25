@@ -15,8 +15,9 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::CDCMCHitCollectionLookUp<TrackingUtilities::CDCTrack>;
+template class TrackFindingCDC::CDCMCHitCollectionLookUp<CDCTrack>;
 
 const CDCMCTrackLookUp& CDCMCTrackLookUp::getInstance()
 {

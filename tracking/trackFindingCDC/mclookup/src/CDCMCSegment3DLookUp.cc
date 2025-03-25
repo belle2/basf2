@@ -11,10 +11,11 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitCollectionLookUp.icc.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment3D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 template class TrackFindingCDC::CDCMCHitCollectionLookUp<CDCSegment3D>;
 

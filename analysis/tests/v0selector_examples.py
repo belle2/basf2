@@ -10,14 +10,16 @@
 ###########################################################################
 import b2test_utils as b2tu
 import b2test_utils_analysis as b2tua
-# extend the examples test class to actually run over the V0 selector examples:
+
+#: extend the examples test class to actually run over the V0Selector examples:
 
 
 class ExamplesTest(b2tua.ExamplesTest):
-    def test_base_examples(self):
+    def test_tagging_examples(self):
         """
-        Test supported V0 selector examples.
+        Test supported V0Selector.
         """
+
         self._test_examples_dir('analysis/examples/V0Selector/')
 
 

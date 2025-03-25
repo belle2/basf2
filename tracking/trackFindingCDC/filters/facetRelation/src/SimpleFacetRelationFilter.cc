@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/SimpleFacetRelationFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>

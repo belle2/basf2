@@ -10,15 +10,17 @@
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCFacet;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter for the construction of good facets based on simple criteria.
     class AllFacetFilter : public BaseFacetFilter {
 
     public:
       /// Main filter method returning the weight of the facet. Returns 3 to accept all facets.
-      TrackingUtilities::Weight operator()(const CDCFacet& facet __attribute__((unused))) final
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCFacet& facet __attribute__((unused))) final
       {
         return 3.0;
       }

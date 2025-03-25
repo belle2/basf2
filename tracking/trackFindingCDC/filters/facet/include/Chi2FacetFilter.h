@@ -16,8 +16,10 @@
 #include <string>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCFacet;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter for the construction of good facets based in the chi2 fit
     class Chi2FacetFilter : public BaseFacetFilter {
@@ -45,7 +47,7 @@ namespace Belle2 {
        *  Main filter method returning the weight of the facet
        *  Returns NAN if the cell shall be rejected.
        */
-      TrackingUtilities::Weight operator()(const CDCFacet& facet) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCFacet& facet) final;
 
     private: // Parameters
       /// Parameter : The chi2 cut values distinguished by superlayer

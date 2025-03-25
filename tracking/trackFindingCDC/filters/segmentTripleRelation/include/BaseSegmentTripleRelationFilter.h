@@ -12,14 +12,16 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegmentTriple;
+  }
+  namespace TrackFindingCDC {
 
     // Guard to prevent repeated instantiations
     // extern template class TrackingUtilities::RelationFilter<const CDCSegmentTriple>;
 
     /// Base class for filtering the neighborhood of segment triples
-    class BaseSegmentTripleRelationFilter : public TrackingUtilities::RelationFilter<const CDCSegmentTriple> {
+    class BaseSegmentTripleRelationFilter : public TrackingUtilities::RelationFilter<const TrackingUtilities::CDCSegmentTriple> {
 
     public:
       /// Default constructor
@@ -29,9 +31,9 @@ namespace Belle2 {
       ~BaseSegmentTripleRelationFilter();
 
       /// Returns the segment triples form the range that continue on the to site of the given segment triple.
-      std::vector<const CDCSegmentTriple*> getPossibleTos(
-        const CDCSegmentTriple* from,
-        const std::vector<const CDCSegmentTriple*>& segmentTriples) const final;
+      std::vector<const TrackingUtilities::CDCSegmentTriple*> getPossibleTos(
+        const TrackingUtilities::CDCSegmentTriple* from,
+        const std::vector<const TrackingUtilities::CDCSegmentTriple*>& segmentTriples) const final;
     };
   }
 }

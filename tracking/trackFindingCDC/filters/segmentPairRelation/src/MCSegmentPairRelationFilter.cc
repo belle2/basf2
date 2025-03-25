@@ -7,8 +7,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/MCSegmentPairRelationFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
 

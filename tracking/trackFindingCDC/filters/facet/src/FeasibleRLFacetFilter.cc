@@ -7,8 +7,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHitTriple.h>
 
 #include <tracking/trackingUtilities/numerics/Modulo.h>
 

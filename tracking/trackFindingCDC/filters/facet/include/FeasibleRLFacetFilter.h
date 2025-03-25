@@ -13,10 +13,11 @@
 
 namespace Belle2 {
 
-
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCFacet;
     class CDCRLWireHitTriple;
+  }
+  namespace TrackFindingCDC {
 
     /**
      *  Filter for the construction of good facets investigating the feasibility
@@ -42,7 +43,7 @@ namespace Belle2 {
        *  Main filter method returning the weight of the facet.
        *  Returns NAN if the cell shall be rejected.
        */
-      TrackingUtilities::Weight operator()(const CDCFacet& facet) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCFacet& facet) final;
 
     public:
       /// Setter for the flag that the borderline cases should be excluded.
@@ -59,7 +60,7 @@ namespace Belle2 {
 
     private:
       /// Check if the hit triplet is a feasible combination for shape and rl passage information.
-      bool isFeasible(const CDCRLWireHitTriple& rlWireHitTriple) const;
+      bool isFeasible(const TrackingUtilities::CDCRLWireHitTriple& rlWireHitTriple) const;
 
     private:
       /// Switch for hard selection.

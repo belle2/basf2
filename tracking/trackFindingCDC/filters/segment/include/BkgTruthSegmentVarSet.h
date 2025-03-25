@@ -10,8 +10,10 @@
 #include <tracking/trackFindingCDC/filters/segment/TruthSegmentVarSet.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     /**
      *  Class to compute floating point variables from a segment
@@ -25,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the contained variables
-      bool extract(const CDCSegment2D* segment) final
+      bool extract(const TrackingUtilities::CDCSegment2D* segment) final
       {
         bool extracted = Super::extract(segment);
         var<named("truth")>() = not var<named("segment_is_fake_truth")>();

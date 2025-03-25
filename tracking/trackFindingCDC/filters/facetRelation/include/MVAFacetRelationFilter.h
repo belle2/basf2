@@ -16,8 +16,10 @@
 #include <tracking/trackingUtilities/utilities/Relation.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCFacet;
+  }
+  namespace TrackFindingCDC {
 
     /// Set of variables to be used by the mva classifier
     using MVAFacetRelationVarSet = BasicFacetRelationVarSet;
@@ -37,7 +39,7 @@ namespace Belle2 {
        *  Main filter method returning the weight of the facet relation.
        *  The size of the facetRelation with a small penalty depending on the mva probability.
        */
-      TrackingUtilities::Weight predict(const TrackingUtilities::Relation<const CDCFacet>& facetRelation) final;
+      TrackingUtilities::Weight predict(const TrackingUtilities::Relation<const TrackingUtilities::CDCFacet>& facetRelation) final;
     };
   }
 }

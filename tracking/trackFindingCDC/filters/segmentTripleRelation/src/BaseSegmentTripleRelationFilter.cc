@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/BaseSegmentTripleRelationFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentTriple.h>
 
 #include <tracking/trackingUtilities/filters/base/RelationFilter.icc.h>
 

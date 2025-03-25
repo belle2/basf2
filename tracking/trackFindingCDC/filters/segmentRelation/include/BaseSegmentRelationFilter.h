@@ -16,18 +16,20 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     // Guard to prevent repeated instantiations
     // extern template class TrackingUtilities::RelationFilter<const CDCSegment2D>;
 
     /// Base class for filtering the neighborhood of segments
-    class BaseSegmentRelationFilter : public TrackingUtilities::RelationFilter<const CDCSegment2D> {
+    class BaseSegmentRelationFilter : public TrackingUtilities::RelationFilter<const TrackingUtilities::CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = TrackingUtilities::RelationFilter<const CDCSegment2D>;
+      using Super = TrackingUtilities::RelationFilter<const TrackingUtilities::CDCSegment2D>;
 
     public:
       /// Default constructor
@@ -37,9 +39,9 @@ namespace Belle2 {
       virtual ~BaseSegmentRelationFilter();
 
       /// Returns all equivalent segment in the range.
-      std::vector<const CDCSegment2D*> getPossibleTos(
-        const CDCSegment2D* from,
-        const std::vector<const CDCSegment2D*>& segments) const final;
+      std::vector<const TrackingUtilities::CDCSegment2D*> getPossibleTos(
+        const TrackingUtilities::CDCSegment2D* from,
+        const std::vector<const TrackingUtilities::CDCSegment2D*>& segments) const final;
 
       using Super::operator();
 
@@ -48,7 +50,7 @@ namespace Belle2 {
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.
        */
-      TrackingUtilities::Weight operator()(const TrackingUtilities::Relation<const CDCSegment2D>& relation) override;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::Relation<const TrackingUtilities::CDCSegment2D>& relation) override;
     };
   }
 }

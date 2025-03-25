@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/BasicSegmentRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackingUtilities/topology/CDCWire.h>
 

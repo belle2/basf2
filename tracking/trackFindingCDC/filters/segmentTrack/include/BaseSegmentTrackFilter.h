@@ -14,15 +14,15 @@
 namespace Belle2 {
   namespace TrackingUtilities {
     class CDCTrack;
+    class CDCSegment2D;
   }
   namespace TrackFindingCDC {
-    class CDCSegment2D;
 
     // Guard to prevent repeated instantiations
-    // extern template class TrackingUtilities::Filter<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCSegment2D>>;
+    // extern template class TrackingUtilities::Filter<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const TrackingUtilities::CDCSegment2D>>;
 
     /// Base class for segment to track association filters
     using BaseSegmentTrackFilter =
-      TrackingUtilities::Filter<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCSegment2D>>;
+      TrackingUtilities::Filter<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const TrackingUtilities::CDCSegment2D>>;
   }
 }

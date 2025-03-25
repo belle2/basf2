@@ -15,26 +15,26 @@ namespace Belle2 {
   namespace TrackingUtilities {
     class CDCTrajectory3D;
     class CDCTrajectory2D;
-  }
-  namespace TrackFindingCDC {
     class CDCSegmentPair;
     class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter for the construction of axial to axial segment pairs based on simple criterions
     class SimpleSegmentPairFilter : public BaseSegmentPairFilter {
 
     public:
       /// Checks if a pair of segments is a good combination
-      TrackingUtilities::Weight operator()(const CDCSegmentPair& segmentPair) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCSegmentPair& segmentPair) final;
 
       /// Returns the trajectory of the segment. Also fits it if necessary.
-      const TrackingUtilities::CDCTrajectory2D& getFittedTrajectory2D(const CDCSegment2D& segment) const;
+      const TrackingUtilities::CDCTrajectory2D& getFittedTrajectory2D(const TrackingUtilities::CDCSegment2D& segment) const;
 
       /**
        *  Returns the three dimensional trajectory of the axial stereo segment pair.
        *  Also fits it if necessary.
        */
-      const TrackingUtilities::CDCTrajectory3D& getFittedTrajectory3D(const CDCSegmentPair& segmentPair) const;
+      const TrackingUtilities::CDCTrajectory3D& getFittedTrajectory3D(const TrackingUtilities::CDCSegmentPair& segmentPair) const;
 
       /// Returns the xy fitter instance that is used by this filter.
       const CDCRiemannFitter& getRiemannFitter() const

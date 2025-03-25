@@ -10,15 +10,17 @@
 #include <tracking/trackFindingCDC/filters/segmentTriple/BaseSegmentTripleFilter.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegmentTriple;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter for the construction of segment triples based on simple criteria
     class AllSegmentTripleFilter : public BaseSegmentTripleFilter {
 
     public:
       /// All implementation returns the size of the segment triples accepting all.
-      TrackingUtilities::Weight operator()(const CDCSegmentTriple& segmentTriple) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCSegmentTriple& segmentTriple) final;
     };
   }
 }

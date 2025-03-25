@@ -19,8 +19,10 @@
 #include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCFacet;
+  }
+  namespace TrackFindingCDC {
 
     /// Variable set used in the application of mva methods for facet filtering
     using MVAFacetVarSet = TrackingUtilities::VariadicUnionVarSet<BasicFacetVarSet, TrackingUtilities::FilterVarSet<Chi2FacetFilter>>;
@@ -40,7 +42,7 @@ namespace Belle2 {
        *  Main filter method returning the weight of the facet.
        *  The size of the facet with a small penalty depending on the mva probability.
        */
-      TrackingUtilities::Weight predict(const CDCFacet& facet) final;
+      TrackingUtilities::Weight predict(const TrackingUtilities::CDCFacet& facet) final;
     };
   }
 }

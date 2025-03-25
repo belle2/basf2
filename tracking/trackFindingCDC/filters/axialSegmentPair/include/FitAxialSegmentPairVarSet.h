@@ -11,8 +11,10 @@
 #include <tracking/trackingUtilities/varsets/VarNames.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCAxialSegmentPair;
+  }
+  namespace TrackFindingCDC {
 
     /// Names of the variables to be generated
     constexpr
@@ -29,7 +31,7 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct FitAxialSegmentPairVarNames : public TrackingUtilities::VarNames<CDCAxialSegmentPair> {
+    struct FitAxialSegmentPairVarNames : public TrackingUtilities::VarNames<TrackingUtilities::CDCAxialSegmentPair> {
 
       /// Number of variables to be generated
       // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
@@ -52,7 +54,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the contained variables
-      bool extract(const CDCAxialSegmentPair* ptrAxialSegmentPair) final;
+      bool extract(const TrackingUtilities::CDCAxialSegmentPair* ptrAxialSegmentPair) final;
     };
   }
 }

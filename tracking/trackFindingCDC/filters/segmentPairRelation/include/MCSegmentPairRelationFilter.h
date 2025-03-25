@@ -37,7 +37,8 @@ namespace Belle2 {
        *  Main filter method returning the weight of the neighborhood relation.
        *  Return NAN if relation shall be rejected.
        */
-      TrackingUtilities::Weight operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCSegmentPair& fromSegmentPair,
+                                           const TrackingUtilities::CDCSegmentPair& toSegmentPair) final;
 
     public:
       /// Setter for the allow reverse parameter

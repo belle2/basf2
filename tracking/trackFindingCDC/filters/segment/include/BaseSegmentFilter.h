@@ -10,13 +10,15 @@
 #include <tracking/trackingUtilities/filters/base/Filter.dcl.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     // Guard to prevent repeated instantiations
     // extern template class TrackingUtilities::Filter<CDCSegment2D>;
 
     /// Base filter to distinguish fake from real segments.
-    using BaseSegmentFilter = TrackingUtilities::Filter<CDCSegment2D>;
+    using BaseSegmentFilter = TrackingUtilities::Filter<TrackingUtilities::CDCSegment2D>;
   }
 }

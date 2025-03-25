@@ -10,18 +10,20 @@
 #include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegmentPair;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter for the construction of axial to stereo segment pairs based on simple criteria.
-    class AllSegmentPairFilter : public TrackingUtilities::Filter<CDCSegmentPair> {
+    class AllSegmentPairFilter : public TrackingUtilities::Filter<TrackingUtilities::CDCSegmentPair> {
 
     public:
       /**
        *  Checks if a pair of segments is a good combination.
        *  All implementation always accepts with the total number of hits as weight.
        */
-      TrackingUtilities::Weight operator()(const CDCSegmentPair& segmentPair) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCSegmentPair& segmentPair) final;
     };
   }
 }

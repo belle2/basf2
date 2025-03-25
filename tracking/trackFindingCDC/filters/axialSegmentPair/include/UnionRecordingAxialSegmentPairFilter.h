@@ -16,8 +16,10 @@
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCAxialSegmentPair;
+  }
+  namespace TrackFindingCDC {
 
     // extern template class TrackingUtilities::UnionRecordingFilter<AxialSegmentPairFilterFactory>;
 
@@ -33,7 +35,7 @@ namespace Belle2 {
       std::vector<std::string> getValidVarSetNames() const final;
 
       /// Create a concrete variables set for axial segment pairs from a name.
-      std::unique_ptr<TrackingUtilities::BaseVarSet<CDCAxialSegmentPair> >
+      std::unique_ptr<TrackingUtilities::BaseVarSet<TrackingUtilities::CDCAxialSegmentPair> >
       createVarSet(const std::string& name) const final;
     };
   }

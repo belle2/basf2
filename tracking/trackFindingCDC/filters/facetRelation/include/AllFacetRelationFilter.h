@@ -21,7 +21,8 @@ namespace Belle2 {
        *  Return -2 for all valid combinations to accepting all facets,
        *  but compensating for overlap.
        */
-      TrackingUtilities::Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCFacet& fromFacet,
+                                           const TrackingUtilities::CDCFacet& toFacet) final;
     };
   }
 }

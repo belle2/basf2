@@ -13,8 +13,10 @@
 #include <tracking/trackingUtilities/utilities/Relation.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCFacet;
+  }
+  namespace TrackFindingCDC {
 
     /// Names of the variables to be generated
     constexpr
@@ -28,7 +30,8 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct BendFacetRelationVarNames : public TrackingUtilities::VarNames<TrackingUtilities::Relation<const CDCFacet>> {
+    struct BendFacetRelationVarNames : public
+      TrackingUtilities::VarNames<TrackingUtilities::Relation<const TrackingUtilities::CDCFacet>> {
 
       /// Number of variables to be generated
       // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
@@ -51,7 +54,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the contained variables
-      bool extract(const TrackingUtilities::Relation<const CDCFacet>* ptrFacetRelation) final;
+      bool extract(const TrackingUtilities::Relation<const TrackingUtilities::CDCFacet>* ptrFacetRelation) final;
     };
   }
 }

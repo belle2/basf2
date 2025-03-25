@@ -10,15 +10,17 @@
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHitCluster;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter accepting all clusters
     class AllClusterFilter : public BaseClusterFilter {
 
     public:
       /// Basic filter method to override. All implementation rejects all clusters.
-      TrackingUtilities::Weight operator()(const CDCWireHitCluster& cluster) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCWireHitCluster& cluster) final;
     };
   }
 }

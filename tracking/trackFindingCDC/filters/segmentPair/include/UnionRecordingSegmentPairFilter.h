@@ -18,8 +18,10 @@
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegmentPair;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter to record multiple chooseable variable sets for segment pairs
     class UnionRecordingSegmentPairFilter: public TrackingUtilities::UnionRecordingFilter<SegmentPairFilterFactory> {
@@ -33,7 +35,7 @@ namespace Belle2 {
       std::vector<std::string> getValidVarSetNames() const final;
 
       /// Create a concrete variables set for segment pairs from a name.
-      std::unique_ptr<TrackingUtilities::BaseVarSet<CDCSegmentPair> >
+      std::unique_ptr<TrackingUtilities::BaseVarSet<TrackingUtilities::CDCSegmentPair> >
       createVarSet(const std::string& name) const final;
     };
   }

@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>

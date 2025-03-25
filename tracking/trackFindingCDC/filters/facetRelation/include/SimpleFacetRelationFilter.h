@@ -14,8 +14,10 @@
 namespace Belle2 {
 
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCFacet;
+  }
+  namespace TrackFindingCDC {
 
     /// Class filtering the neighborhood of facets based on simple criterions.
     class SimpleFacetRelationFilter : public BaseFacetRelationFilter {
@@ -37,7 +39,8 @@ namespace Belle2 {
 
     public:
       /// Main filter method returning the weight of the neighborhood relation.
-      TrackingUtilities::Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCFacet& fromFacet,
+                                           const TrackingUtilities::CDCFacet& toFacet) final;
 
     private:
       /// Memory for the used direction of flight deviation.

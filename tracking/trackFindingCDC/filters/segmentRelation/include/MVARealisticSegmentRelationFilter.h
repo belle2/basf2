@@ -43,7 +43,8 @@ namespace Belle2 {
 
     private:
       /// Function to object for its signalness
-      TrackingUtilities::Weight operator()(const TrackingUtilities::Relation<const CDCSegment2D>& segmentRelation) override;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::Relation<const TrackingUtilities::CDCSegment2D>& segmentRelation)
+      override;
 
     private:
       /// Feasibility filter applied first before invoking the main cut

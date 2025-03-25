@@ -10,8 +10,10 @@
 #include <tracking/trackFindingCDC/filters/segmentPair/HitGapSegmentPairVarSet.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegmentPair;
+  }
+  namespace TrackFindingCDC {
 
     /**
      *  Class to compute floating point variables from an axial stereo segment pair
@@ -29,7 +31,7 @@ namespace Belle2 {
 
     public:
       /// Implement the skim cut, otherwise generate and assign the variables from the segment pair
-      bool extract(const CDCSegmentPair* ptrSegmentPair) final;
+      bool extract(const TrackingUtilities::CDCSegmentPair* ptrSegmentPair) final;
     };
   }
 }

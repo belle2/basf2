@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 using namespace Belle2;

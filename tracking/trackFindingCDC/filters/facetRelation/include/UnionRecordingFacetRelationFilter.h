@@ -20,8 +20,10 @@
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCFacet;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter to record multiple chooseable variable sets for facet relations
     class UnionRecordingFacetRelationFilter: public TrackingUtilities::UnionRecordingFilter<FacetRelationFilterFactory> {
@@ -35,7 +37,7 @@ namespace Belle2 {
       std::vector<std::string> getValidVarSetNames() const override;
 
       /// Create a concrete variables set for facet relations from a name.
-      std::unique_ptr<TrackingUtilities::BaseVarSet<TrackingUtilities::Relation<const CDCFacet> > >
+      std::unique_ptr<TrackingUtilities::BaseVarSet<TrackingUtilities::Relation<const TrackingUtilities::CDCFacet> > >
       createVarSet(const std::string& name) const override;
     };
   }

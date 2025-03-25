@@ -12,8 +12,10 @@
 #include <tracking/trackingUtilities/filters/base/FilterOnVarSet.dcl.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegmentPair;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter for the construction of segment pairs based on simple criteria without the common fit.
     class FitlessSegmentPairFilter : public TrackingUtilities::FilterOnVarSet<SkimmedHitGapSegmentPairVarSet> {
@@ -24,7 +26,7 @@ namespace Belle2 {
 
     public:
       /// Checks if a pair of segments is a good combination
-      TrackingUtilities::Weight operator()(const CDCSegmentPair& segmentPair) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCSegmentPair& segmentPair) final;
     };
   }
 }

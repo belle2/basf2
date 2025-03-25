@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/BaseSegmentPairRelationFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentPair.h>
 
 #include <tracking/trackingUtilities/filters/base/RelationFilter.icc.h>
 

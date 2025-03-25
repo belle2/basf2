@@ -12,8 +12,10 @@
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.dcl.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegmentTriple;
+  }
+  namespace TrackFindingCDC {
 
     /// Class filtering the neighborhood of segment triples with monte carlo information
     class MCSegmentTripleRelationFilter : public MCSymmetric<BaseSegmentTripleRelationFilter> {
@@ -37,7 +39,8 @@ namespace Belle2 {
        *  Main filter method returning the weight of the neighborhood relation.
        *  Return NAN if relation shall be rejected.
        */
-      TrackingUtilities::Weight operator()(const CDCSegmentTriple& fromTriple, const CDCSegmentTriple& toTriple) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCSegmentTriple& fromTriple,
+                                           const TrackingUtilities::CDCSegmentTriple& toTriple) final;
 
     public:
       /// Setter for the allow reverse parameter

@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackingUtilities/geometry/HelixParameters.h>
 #include <tracking/trackingUtilities/geometry/Vector3D.h>

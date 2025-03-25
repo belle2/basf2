@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/FitSegmentRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 

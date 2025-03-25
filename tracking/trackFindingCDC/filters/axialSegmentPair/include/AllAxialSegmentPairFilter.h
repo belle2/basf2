@@ -16,7 +16,7 @@ namespace Belle2 {
     class AllAxialSegmentPairFilter : public BaseAxialSegmentPairFilter {
 
       /// Checks if a pair of axial segments is a good combination
-      TrackingUtilities::Weight operator()(const CDCAxialSegmentPair& axialSegmentPair) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCAxialSegmentPair& axialSegmentPair) final;
     };
 
   }

@@ -21,8 +21,8 @@ namespace Belle2 {
 
     public:
       /// Implementation currently accepts all combinations
-      TrackingUtilities::Weight operator()(const CDCSegmentTriple& fromSegmentTriple,
-                                           const CDCSegmentTriple& toSegmentTriple) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCSegmentTriple& fromSegmentTriple,
+                                           const TrackingUtilities::CDCSegmentTriple& toSegmentTriple) final;
     };
   }
 }

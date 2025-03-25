@@ -12,8 +12,10 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     using CDCAxialSegment2D = class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter for the construction of axial to axial segment pairs based on simple criteria
     class SimpleAxialSegmentPairFilter : public BaseAxialSegmentPairFilter {
@@ -23,14 +25,15 @@ namespace Belle2 {
       SimpleAxialSegmentPairFilter();
 
       /// Checks if a pair of axial segments is a good combination
-      TrackingUtilities::Weight operator()(const CDCAxialSegmentPair& axialSegmentPair) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCAxialSegmentPair& axialSegmentPair) final;
 
     public:
       /// Returns the trajectory of the axial segment. Also fits it if necessary.
-      const TrackingUtilities::CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialSegment2D& segment) const;
+      const TrackingUtilities::CDCTrajectory2D& getFittedTrajectory2D(const TrackingUtilities::CDCAxialSegment2D& segment) const;
 
       /// Returns the trajectory of the axial to axial segment pair. Also fits it if necessary.
-      const TrackingUtilities::CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialSegmentPair& axialSegmentPair) const;
+      const TrackingUtilities::CDCTrajectory2D& getFittedTrajectory2D(const TrackingUtilities::CDCAxialSegmentPair& axialSegmentPair)
+      const;
 
       /// Returns the xy fitter instance that is used by this filter
       const CDCRiemannFitter& getRiemannFitter() const

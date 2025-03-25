@@ -16,8 +16,10 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegmentTriple;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter for the construction of segment triples based on Monte Carlo information
     class MCSegmentTripleFilter  : public MCSymmetric<BaseSegmentTripleFilter> {
@@ -38,11 +40,11 @@ namespace Belle2 {
 
     public:
       /// Check if the segment triple is aligned in the Monte Carlo track. Signals NAN if not.
-      TrackingUtilities::Weight operator()(const CDCSegmentTriple& segmentTriple) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCSegmentTriple& segmentTriple) final;
 
     private:
       /// Sets the trajectories of the segment triple from Monte Carlo information. Is executed for good segment triples.
-      void setTrajectoryOf(const CDCSegmentTriple& segmentTriple) const;
+      void setTrajectoryOf(const TrackingUtilities::CDCSegmentTriple& segmentTriple) const;
 
     public:
       /// Setter for the allow reverse parameter

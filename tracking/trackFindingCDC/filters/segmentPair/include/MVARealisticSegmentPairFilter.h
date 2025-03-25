@@ -37,7 +37,7 @@ namespace Belle2 {
       MVARealisticSegmentPairFilter();
 
       /// Function to object for its signalness
-      TrackingUtilities::Weight operator()(const CDCSegmentPair& segmentPair) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCSegmentPair& segmentPair) final;
 
     private:
       /// Feasibility filter applied first before invoking the main cut

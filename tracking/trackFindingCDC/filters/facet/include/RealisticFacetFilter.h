@@ -14,8 +14,10 @@
 namespace Belle2 {
 
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCFacet;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter for the construction of good facets based on simple criteria.
     class RealisticFacetFilter : public BaseFacetFilter {
@@ -40,7 +42,7 @@ namespace Belle2 {
        *  Main filter method returning the weight of the facet
        *  Returns NAN if the cell shall be rejected.
        */
-      TrackingUtilities::Weight operator()(const CDCFacet& facet) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCFacet& facet) final;
 
     private:
       /// Memory for the pull cu

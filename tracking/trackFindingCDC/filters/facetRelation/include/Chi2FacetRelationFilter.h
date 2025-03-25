@@ -16,8 +16,10 @@
 #include <string>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCFacet;
+  }
+  namespace TrackFindingCDC {
 
     /// Class filtering the neighborhood of facets based on chi2 from a fit both facets.
     class Chi2FacetRelationFilter : public BaseFacetRelationFilter {
@@ -42,7 +44,8 @@ namespace Belle2 {
 
     public:
       /// Main filter method returning the weight of the neighborhood relation.
-      TrackingUtilities::Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCFacet& fromFacet,
+                                           const TrackingUtilities::CDCFacet& toFacet) final;
 
     private: // Parameters
       /// Parameter : The chi2 cut values distinguished by superlayer

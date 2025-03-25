@@ -29,7 +29,7 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Checks if a axial stereo segment pair is a good combination.
-      TrackingUtilities::Weight operator()(const CDCSegmentPair& segmentPair) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCSegmentPair& segmentPair) final;
 
     private:
       /// Parameter : Switch to require the segment combination contain mostly correct rl information

@@ -11,8 +11,10 @@
 #include <tracking/trackingUtilities/varsets/VarNames.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegmentPair;
+  }
+  namespace TrackFindingCDC {
 
     /// Names of the variables to be generated
     constexpr
@@ -29,7 +31,7 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct FitSegmentPairVarNames : public TrackingUtilities::VarNames<CDCSegmentPair> {
+    struct FitSegmentPairVarNames : public TrackingUtilities::VarNames<TrackingUtilities::CDCSegmentPair> {
 
       /// Number of variables to be generated
       // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
@@ -59,7 +61,7 @@ namespace Belle2 {
       explicit FitSegmentPairVarSet(bool preliminaryFit = false);
 
       /// Generate and assign the contained variables
-      bool extract(const CDCSegmentPair* ptrSegmentPair) final;
+      bool extract(const TrackingUtilities::CDCSegmentPair* ptrSegmentPair) final;
 
       /// Get access to the values and names of the variables - includes a prefix_ "pre" for the prelimiary fit
       std::vector<TrackingUtilities::Named<Float_t*>> getNamedVariables(const std::string& prefix) final;

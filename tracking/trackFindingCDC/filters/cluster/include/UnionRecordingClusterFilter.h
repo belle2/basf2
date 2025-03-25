@@ -18,8 +18,10 @@
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHitCluster;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter to record multiple chooseable variable sets for wire hit clusters
     class UnionRecordingClusterFilter : public TrackingUtilities::UnionRecordingFilter<ClusterFilterFactory> {
@@ -33,7 +35,7 @@ namespace Belle2 {
       std::vector<std::string> getValidVarSetNames() const override;
 
       /// Create a concrete variables set for wire hit clusters from a name.
-      std::unique_ptr<TrackingUtilities::BaseVarSet<CDCWireHitCluster> >
+      std::unique_ptr<TrackingUtilities::BaseVarSet<TrackingUtilities::CDCWireHitCluster> >
       createVarSet(const std::string& name) const override;
     };
   }

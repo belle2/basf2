@@ -17,9 +17,9 @@
 namespace Belle2 {
   namespace TrackingUtilities {
     class CDCTrack;
+    class CDCSegment2D;
   }
   namespace TrackFindingCDC {
-    class CDCSegment2D;
 
     /// Names of the variables to be generated
     constexpr

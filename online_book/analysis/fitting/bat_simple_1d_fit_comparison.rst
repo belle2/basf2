@@ -16,7 +16,7 @@ The Data
 ========
 
 The data to be analyzed in this example is stored in a file in a
-directory above this one at: ``../../example-data/fitme.root``. In
+directory above this one at: ``example-data/fitme.root``. In
 this ROOT file is a ``TTree`` ("BtoKstG") with a branch named
 "B0_mbc", that contains the beam-constrained masses of reconstructed
 B0 mesons. We will perform binned fits to this data. Nothing in this

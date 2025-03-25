@@ -1,7 +1,7 @@
 .. _onlinebook_fitting:
 
-Fitting
-=======
+Fitting Training
+================
 
 This section includes documentation of the training material and example code provided 
 by the Belle II fitting tools taskforce in the 
@@ -9,7 +9,7 @@ by the Belle II fitting tools taskforce in the
 repository.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :glob:
    :caption: Contents:
 

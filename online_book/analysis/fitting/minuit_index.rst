@@ -2,7 +2,7 @@ Basic Introduction to Minuit
 ============================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    
    minuit_install.rst
    minuit_background.rst

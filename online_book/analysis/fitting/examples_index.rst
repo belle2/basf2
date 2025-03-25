@@ -1,4 +1,4 @@
-Fitting examples
+Fitting Examples
 ================
 
 Fits used in Belle II analyses can be simple or challenging. The examples listed below cover different levels of complexity and represent a good starting point for anybody interested to learn the basics of fitting:

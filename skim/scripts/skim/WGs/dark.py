@@ -1027,12 +1027,12 @@ class ALP2Gamma(BaseSkim):
 
     def build_lists(self, path):
         kaons = (
-            'K+:mk',
+            'K+:mk_ALP2Gamma',
             'kaonID > 0.6 and formula(kaonID/protonID) > 0.4'
         )
 
         gamma = (
-            'gamma:g',
+            'gamma:g_ALP2Gamma',
             '(clusterReg == 1 and E > 0.150) or '
             '(clusterReg == 2 and E > 0.05) or '
             '(clusterReg == 3 and E > 0.1)'
@@ -1041,15 +1041,15 @@ class ALP2Gamma(BaseSkim):
         ma.fillParticleLists([kaons, gamma], path=path)
 
         ma.reconstructDecay(
-            'A0:rec -> gamma:g gamma:g',
+            'A0:rec_ALP2Gamma -> gamma:g_ALP2Gamma gamma:g_ALP2Gamma',
             cut='[daughter(0,E) > daughter(1,E)]',
             path=path
         )
 
         ma.reconstructDecay(
-            'B+:rec -> K+:mk A0:rec',
+            'B+:rec_ALP2Gamma -> K+:mk_ALP2Gamma A0:rec_ALP2Gamma',
             cut='[Mbc > 5.27] and [abs(deltaE) < 0.1]',
             path=path
         )
 
-        return ["B+:rec"]
+        return ["B+:rec_ALP2Gamma"]

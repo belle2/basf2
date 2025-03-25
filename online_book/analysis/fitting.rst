@@ -18,7 +18,6 @@ repository.
    fitting/minuit_index.rst 
    fitting/hydra_index.rst 
    fitting/bat_index.rst 
-   fitting/pyhf_index.rst 
 
 
 .. topic:: Author(s) of this lesson

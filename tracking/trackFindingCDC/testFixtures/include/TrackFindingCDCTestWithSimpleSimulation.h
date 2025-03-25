@@ -11,8 +11,8 @@
 #include <tracking/trackFindingCDC/sim/CDCSimpleSimulation.h>
 
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackingUtilities/topology/CDCWireTopology.h>
@@ -115,14 +115,14 @@ namespace Belle2 {
 
         // Prepare the monte carlo segments
         for (const TrackingUtilities::CDCTrack& mcTrack : m_mcTracks) {
-          std::vector<CDCSegment3D> segment3DsInTrack = mcTrack.splitIntoSegments();
-          for (const CDCSegment3D& segment3D :  segment3DsInTrack) {
+          std::vector<TrackingUtilities::CDCSegment3D> segment3DsInTrack = mcTrack.splitIntoSegments();
+          for (const TrackingUtilities::CDCSegment3D& segment3D :  segment3DsInTrack) {
             m_mcSegment2Ds.push_back(segment3D.stereoProjectToRef());
           }
         }
 
         // Filter the axial segments
-        for (const CDCSegment2D& segment2D : m_mcSegment2Ds) {
+        for (const TrackingUtilities::CDCSegment2D& segment2D : m_mcSegment2Ds) {
           if (segment2D.getStereoKind() == TrackingUtilities::EStereoKind::c_Axial) {
             m_mcAxialSegment2Ds.push_back(&segment2D);
           }
@@ -236,10 +236,10 @@ namespace Belle2 {
       std::vector<TrackingUtilities::CDCTrack> m_mcTracks;
 
       /// Memory for the Monte Carlo segments of the current event.
-      std::vector<CDCSegment2D> m_mcSegment2Ds;
+      std::vector<TrackingUtilities::CDCSegment2D> m_mcSegment2Ds;
 
       /// Memory for the axial Monte Carlo segments of the current event.
-      std::vector<const CDCSegment2D*> m_mcAxialSegment2Ds;
+      std::vector<const TrackingUtilities::CDCSegment2D*> m_mcAxialSegment2Ds;
 
       /// Memory for the axial hits of the current event.
       std::vector<const TrackingUtilities::CDCWireHit*> m_axialWireHits;

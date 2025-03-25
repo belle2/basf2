@@ -325,7 +325,7 @@ In general a FEI training steering file consists of
 
 * a decay channel configuration usually you can just use the default configuration in fei.get_default_channels. This configuration defines all the channels which should be reconstructed, the cuts, and the mva methods. You can write your own configuration, just take a look in ``analysis/scripts/fei/default_channels.py``
 * a FeiConfiguration object, this defines the database prefix for the weightfiles and some other things which influence the training (e.g. if you want to run with the monitoring)
-* a feistate object, which contains the `basf2.Path` path for the current stage, you get this with the get_path function
+* a feistate object, which contains the `basf2.Path` for the current stage, you get this with the get_path function
 
 The user is responsible for writing the input and output part of the steering file. Depending on the training mode (generic / specific) this part is different for each training (see below for examples).
 The FEI algorithm itself just assumes that the DataStore already contains a valid reconstructed event, and starts to reconstruct B mesons. During the training the steering file is executed multiple times. The first time it is called with the Monte Carlo files you provided, and the complete DataStore is written out at the end. The following calls must receive the previous output as input.
@@ -476,7 +476,7 @@ B_generic_train.py
 
 In contrast to the original steering file from ``analysis/examples/FEI/B_generic_train.py``, it is adapted to run both locally on your machine in the development setup of ``basf2``, as well as to run on remote resources using an official ``basf2`` release and a pickled path created from the steering file. To achieve this, two steps are performed:
 
-* The path creation is summarized in a corresponding function ``def create_fei_path(filelist=[], cache=0, monitor=False, verbose=False):``, which returns a `basf2.Path` path. This function is then used within the :doc:`b2luigi:index` setup to create a corresponding fixed and pickled `basf2.Path` path.
+* The path creation is summarized in a corresponding function ``def create_fei_path(filelist=[], cache=0, monitor=False, verbose=False):``, which returns a `basf2.Path`. This function is then used within the :doc:`b2luigi:index` setup to create a corresponding fixed and pickled `basf2.Path`.
 * The adaptions of histogram and n-tuple outputs needed for FEI training are reduced to a small set of files to avoid long lasting downloads of a large set of small files. In case these adaptions are not in an official release yet, which is supported by :doc:`gbasf2:index`, these need to be done by hand. This is accomplished within the ``for``-loops ``for m in path.modules():``.
 
 .. _fei-ana:
@@ -513,7 +513,7 @@ To spawn several instances of ``FEIAnalysisTask`` at a certain stage, the follow
 * Time stamp of inputs listed above, which were successfully uploaded to TMP-SE as a tarball by ``PrepareInputsTask`` of the previous stage.
 
 During the sequential execution of all required instances of ``FEIAnalysisTask``, symlinks are created for all input files (``mcParticlesCount.root`` and ``*.xml``, where applicable)
-to the current directory to correctly configure the `basf2.Path` path. The path is then pickled by :doc:`b2luigi:index` and send out to the grid with :doc:`gbasf2:index` with an appropriate configuration of the grid
+to the current directory to correctly configure the `basf2.Path`. The path is then pickled by :doc:`b2luigi:index` and send out to the grid with :doc:`gbasf2:index` with an appropriate configuration of the grid
 path to the inputs tarball. The jobs are then monitored with corresponding :doc:`gbasf2:index` tools and are resubmitted, if necessary. As soon as all jobs of an instance of ``FEIAnalysisTask``
 are successfully completed, the job outputs required for further processing are downloaded.
 
@@ -642,7 +642,7 @@ Following inputs are required for ``FEITrainingTask`` depending on the current s
 For the required inputs listed above, symlinks are created to the current directory for stages 0 to 6. In case of merged ``training_input.root`` files from stages 0 to 5 to create
 ``training_input_merged.root``, the paths to the original files are used directly to merge them.
 
-To correctly configure the training for stages 0 to 5, the `basf2.Path` path needs to be created again to have the ``Summary.pickle`` file created, containing a local pickled version of the path.
+To correctly configure the training for stages 0 to 5, the `basf2.Path` needs to be created again to have the ``Summary.pickle`` file created, containing a local pickled version of the path.
 After that, the ``do_trainings(particles, configuration)`` function of the ``fei`` package is called to start BDT trainings needed for the current stage.
 
 For stage 6, the scripts ``analysis/scripts/fei/printReporting.py`` and ``analysis/scripts/fei/latexReporting.py`` are executed on top of the inputs provided via symlinks, and the script

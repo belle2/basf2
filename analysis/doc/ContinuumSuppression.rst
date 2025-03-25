@@ -113,8 +113,8 @@ variables describing nearly every track (cluster) in the event to increase the
 classification performance.
 
 It is described in detail in this `MSc thesis <https://publish.etp.kit.edu/record/21416>`_.
-Tutorial files are available in
-`basf2 <https://gitlab.desy.de/belle2/software/basf2>`_ in ``analysis/examples/tutorials/``.
+Tutorial files are available in the
+`basf2 <https://gitlab.desy.de/belle2/software/basf2>`_ repository under ``analysis/examples/tutorials/``.
 
 There are two big differences when using the DCS instead of the Continuum Suppression:
 

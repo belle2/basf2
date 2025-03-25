@@ -14,7 +14,6 @@
 #include <cdc/dataobjects/WireID.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 
 TEST_F(TrackingUtilitiesTestWithTopology, eventdata_tracks_CDCTrack_modifyable)

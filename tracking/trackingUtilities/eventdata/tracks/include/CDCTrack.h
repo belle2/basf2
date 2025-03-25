@@ -22,18 +22,14 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
+    class CDCWireHit;
+    class Vector2D;
+    class Vector3D;
     class CDCSegment2D;
     class CDCSegment3D;
     class CDCSegmentPair;
     class CDCSegmentTriple;
-  }
-
-  namespace TrackingUtilities {
-
-    class CDCWireHit;
-    class Vector2D;
-    class Vector3D;
 
     /// Class representing a sequence of three dimensional reconstructed hits
     class CDCTrack : public std::vector<CDCRecoHit3D> {
@@ -46,16 +42,16 @@ namespace Belle2 {
       explicit CDCTrack(const std::vector<CDCRecoHit3D>& recoHits3D);
 
       /// Constructor from a two dimensional segment filling the third dimension with 0 values.
-      explicit CDCTrack(const TrackFindingCDC::CDCSegment2D& segment);
+      explicit CDCTrack(const CDCSegment2D& segment);
 
       /// concatenates several tracks from a path
       static CDCTrack condense(const Path<const CDCTrack>& trackPath);
 
       /// Reconstructs the hit content of the segment triple track to a CDCTrack averaging overlapping parts
-      static CDCTrack condense(const Path<const TrackFindingCDC::CDCSegmentTriple>& segmentTriplePath);
+      static CDCTrack condense(const Path<const CDCSegmentTriple>& segmentTriplePath);
 
       /// Reconstructs the hit content of the axial stereo segment pair path to a CDCTrack averaging overlapping parts.
-      static CDCTrack condense(const Path<const TrackFindingCDC::CDCSegmentPair>& segmentPairPath);
+      static CDCTrack condense(const Path<const CDCSegmentPair>& segmentPairPath);
 
       /// Comparison of track - no particular order has been defined so far, all tracks are equivalent
       bool operator<(const CDCTrack& track __attribute__((unused))) const
@@ -65,7 +61,7 @@ namespace Belle2 {
 
       /** Splits the track into segments.
        *  Note : No trajectory information is copied*/
-      std::vector<TrackFindingCDC::CDCSegment3D> splitIntoSegments() const;
+      std::vector<CDCSegment3D> splitIntoSegments() const;
 
       /// Getter for the superlayer id the track starts from.
       ISuperLayer getStartISuperLayer() const

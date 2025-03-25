@@ -7,10 +7,10 @@
  **************************************************************************/
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
@@ -43,7 +43,6 @@ namespace Belle2 {
 }
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 
 namespace {

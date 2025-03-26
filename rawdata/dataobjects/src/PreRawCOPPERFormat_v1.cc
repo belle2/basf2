@@ -323,23 +323,23 @@ void PreRawCOPPERFormat_v1::CheckData(int n,
 //   printf("[DEBUG] ===COPPER BLOCK==============\n");
 //   printData(GetBuffer(n), GetBlockNwords(n));
 
-//   printf("[DEBUG] ===FINNESSE A ==============\n");
+//   printf("[DEBUG] ===FINESSE A ==============\n");
 //   printData(Get1stDetectorBuffer(n), Get1stDetectorNwords(n));
 
-//   printf("[DEBUG] ===FINNESSE B ==============\n");
+//   printf("[DEBUG] ===FINESSE B ==============\n");
 //   printData(Get2ndDetectorBuffer(n), Get2ndDetectorNwords(n));
 
-//   printf("[DEBUG] ===FINNESSE C ==============\n");
+//   printf("[DEBUG] ===FINESSE C ==============\n");
 //   printData(Get3rdDetectorBuffer(n), Get3rdDetectorNwords(n));
 
-//   printf("[DEBUG] ===FINNESSE D ==============\n");
+//   printf("[DEBUG] ===FINESSE D ==============\n");
 //   printData(Get4thDetectorBuffer(n), Get4thDetectorNwords(n));
 //   printf("[DEBUG] === END ==============\n");
 
 // #endif
 
 //   if (err_flag == 1) {
-//     printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
+//     printf("[DEBUG] ========== dump a data block : block # %d==========\n", n);
 //     PrintData(GetBuffer(n), GetBlockNwords(n));
 //     printf("%s", err_buf); fflush(stdout);
 //     string err_str = err_buf;
@@ -460,7 +460,7 @@ unsigned int PreRawCOPPERFormat_v1::FillTopBlockRawHeader(unsigned int m_node_id
 //   m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] |= tmp_header.MAGIC_WORD;
 
 //   //
-//   // Check FINESSEs which containes data
+//   // Check FINESSEs which contains data
 //   //
 //   int* copper_buf = &(m_buffer[ tmp_header.RAWHEADER_NWORDS ]);
 //   if (copper_buf[ POS_CH_A_DATA_LENGTH ] == 0 &&
@@ -883,7 +883,7 @@ int PreRawCOPPERFormat_v1::CopyReducedBuffer(int n, int* buf_to)
         + SIZE_B2LHSLB_HEADER
         + POS_B2L_CTIME; //the last word of B2LFEE
 
-      // check finesse buffer size : ( When dumhslb was used, this type of error occured and RecvStream0.py died by Segmentation Fault. ) 2014.12.01.
+      // check finesse buffer size : ( When dumhslb was used, this type of error occurred and RecvStream0.py died by Segmentation Fault. ) 2014.12.01.
       if (finesse_nwords - SIZE_B2LHSLB_HEADER - SIZE_B2LFEE_HEADER
           - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER < 0) {
         char err_buf[500];

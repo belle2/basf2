@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/FlippedRecoTracksMerger/FlippedRecoTracksMergerModule.h>
+#include <tracking/modules/flipAndRefit/FlippedRecoTracksMergerModule.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 using namespace Belle2;

@@ -1577,7 +1577,7 @@ def applyEventCuts(cut, path, metavariables=None):
                    'sin', 'asin',
                    'exp', 'log', 'log10',
                    'min', 'max',
-                   'isNAN']
+                   'isNAN', 'ifNANgiveX']
     if metavariables:
         metavar_ids += metavariables
 

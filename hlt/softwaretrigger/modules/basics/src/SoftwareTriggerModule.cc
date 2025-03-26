@@ -69,6 +69,15 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
 
 void SoftwareTriggerModule::initialize()
 {
+  // Check if the SoftwareTriggerResult is already present in the datastore:
+  // if so, warn the user that the SoftwareTriggerResult will be recalculated and overwritten
+  // Let's not warn the user if we are skimming, since the module is called twice and we might throw a false warning
+  if (m_resultStoreObjectPointer.isOptional(m_param_resultStoreArrayName) and m_param_baseIdentifier == "filter") {
+    B2WARNING("The object "
+              << (m_param_resultStoreArrayName == "" ? SoftwareTriggerResult::Class_Name() : m_param_resultStoreArrayName)
+              << " is already present in the DataStore: the module SoftwareTrigger will overwrite the filter answer from HLT.");
+  }
+
   m_resultStoreObjectPointer.registerInDataStore(m_param_resultStoreArrayName);
   m_dbHandler.reset(new SoftwareTriggerDBHandler(m_param_baseIdentifier));
 

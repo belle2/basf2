@@ -58,7 +58,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to unconditionally make StoreWrapper a ROOT class.
-      ClassDef(StoreWrapper, 1);
+      ClassDef(StoreWrapper, 2);
     };
 
   }

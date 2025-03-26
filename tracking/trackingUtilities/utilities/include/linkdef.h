@@ -10,5 +10,5 @@
 
 // Sentinel to trigger the dictionary generation of the StoreWrapper.
 // Other instances can be defined in other linkdef.h files.
-#pragma link C++ class Belle2::TrackingUtilities::Relation<int, int>+; // checksum=0x4ceedc3e, version=-1
-#pragma link C++ class Belle2::TrackingUtilities::WeightedRelation<int, int>+; // checksum=0x612ec9bc, version=-1
+#pragma link C++ class Belle2::TrackingUtilities::Relation<int, int>+; // checksum=0x9641adef, version=-1
+#pragma link C++ class Belle2::TrackingUtilities::WeightedRelation<int, int>+; // checksum=0x7dfe1a7f, version=-1

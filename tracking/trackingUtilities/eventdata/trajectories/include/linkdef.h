@@ -5,7 +5,7 @@
 
 #pragma link C++ class Belle2::TrackingUtilities::CDCBFieldUtil-;
 
-#pragma link C++ class Belle2::TrackingUtilities::CDCTrajectory2D+; // checksum=0xf6b99f97, version=-1
-#pragma link C++ class Belle2::TrackingUtilities::CDCTrajectorySZ+; // checksum=0x9f79949, version=-1
+#pragma link C++ class Belle2::TrackingUtilities::CDCTrajectory2D+; // checksum=0x5269626, version=-1
+#pragma link C++ class Belle2::TrackingUtilities::CDCTrajectorySZ+; // checksum=0x82b6bc0b, version=-1
 
-#pragma link C++ class Belle2::TrackingUtilities::CDCTrajectory3D+; // checksum=0xf757abc5, version=-1
+#pragma link C++ class Belle2::TrackingUtilities::CDCTrajectory3D+; // checksum=0xcecf7dd4, version=-1

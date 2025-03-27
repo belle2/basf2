@@ -1850,19 +1850,19 @@ namespace Belle2 {
         miss4vec.SetE(miss4vec.P());
       }
 
-      // Definition 2: CMS, same as 0, fix Eroe = Ecms/2
+      // Definition 2: same as 0, fix Eroe = Ecms/2
       else if (opt == "2") {
         miss4vec = - (rec4vec + roe4vec);
         miss4vec.SetE(E_beam_cms - rec4vec.E());
       }
 
-      // Definition 3: CMS, use only energy and momentum of signal side
+      // Definition 3: use only energy and momentum of signal side
       else if (opt == "3") {
         miss4vec = - rec4vec;
         miss4vec.SetE(E_beam_cms - rec4vec.E());
       }
 
-      // Definition 4: CMS, same as 3, update with direction of ROE momentum
+      // Definition 4: same as 3, update with direction of ROE momentum
       else if (opt == "4") {
         B2Vector3D pB = - roe4vec.Vect();
         pB.SetMag(0.340);
@@ -1870,7 +1870,7 @@ namespace Belle2 {
         miss4vec.SetPxPyPzE(pB.X(), pB.Y(), pB.Z(), E_beam_cms - rec4vec.E());
       }
 
-      // Definition 7: CMS, correct pmiss 3-momentum vector with factor alpha so that dE = 0 (used for Mbc calculation)
+      // Definition 7: correct pmiss 3-momentum vector with factor alpha so that dE = 0 (used for Mbc calculation)
       else if (opt == "7") {
         miss4vec = - (rec4vec + roe4vec);
         miss4vec.SetE(miss4vec.P());
@@ -2202,7 +2202,7 @@ namespace Belle2 {
 - ``1``: same as ``0``, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}`
 - ``2``: same as ``0``, fix :math:`E_\mathrm{roe} = E_\mathrm{cms}/2`
 - ``3``: use only energy and momentum of signal side
-- ``4``: same as ``3``, update with direction of ROE momentum
+- ``4``: same as ``3``, update with direction of ROE momentum. Only works in CMS frame.
 - ``7``: correct pmiss 3-momentum vector with factor alpha so that :math:`d_E = 0` (used for :math:`M_\mathrm{bc}` calculation). Only works in CMS frame.)DOC",
                           Manager::VariableDataType::c_double);
 

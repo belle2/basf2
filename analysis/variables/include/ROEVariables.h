@@ -355,15 +355,12 @@ namespace Belle2 {
 
     /**
      * Helper function: Returns the missing 4-momentum vector.
-     * Option 0: CMS: Take momentum and energy of all ROE and REC side tracks and clusters into account ("event based" variable)
-     * Option 1: CMS: Same as option 0, but fix Emiss = pmiss (missing mass set to 0)
-     * Option 2: CMS: Same as option 0, but fix Eroe = Ecms/2 (ignore energy from ROE side)
-     * Option 3: CMS: Don't take any ROE tracks and clusters into account, use signal side only (signal based variable)
-     * Option 4: CMS: Same as option 3, but use the correction of the B meson momentum magnitude in LAB (update with pB in opposite ROE direction)
-     *           system in the opposite direction of the ROE momentum
-     * Option 5: LAB: Use momentum and energy of all ROE and REC side tracks and clusters into account ("event based" variable)
-     * Option 6: LAB: Same as option 5, but fix Emiss = pmiss (missing mass set to 0)
-     * Option 7: LAB: Same as 6, correct pmiss 4vector with factor
+     * Option 0: Take momentum and energy of all ROE and REC side tracks and clusters into account ("event based" variable)
+     * Option 1: Same as option 0, but fix Emiss = pmiss, i.e., set missing mass to 0
+     * Option 2: Same as option 0, but fix Eroe = Ecms/2, i.e., ignore energy from ROE side
+     * Option 3: Don't take any ROE tracks and clusters into account, use signal side only (signal based variable)
+     * Option 4: For energy use only signal side, while for momentum additionally use ROE, but fix the latter's magnitude to 340 MeV/c
+     * Option 7: Same as option 1, but correct pmiss with factor so that dE = 0
      */
     ROOT::Math::PxPyPzEVector missing4Vector(const Particle* particle, const std::string& maskName, const std::string& opt);
 
@@ -380,9 +377,8 @@ namespace Belle2 {
     bool isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe,
                              const std::string& maskName = RestOfEvent::c_defaultMaskName);
 
-
     /**
-     * temp
+     * returns Bs* - Bs mass difference
      */
     Manager::FunctionPtr bssMassDifference(const std::vector<std::string>& arguments);
     /**

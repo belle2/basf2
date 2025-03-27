@@ -117,8 +117,8 @@ def V0Selector_Training(
 
     python_options = basf2_mva.PythonOptions()
 
-    python_options.m_framework = "custom"
-    python_options.m_steering_file = "mva/scripts/basf2_mva_python_interface/lightgbm.py"
+    python_options.m_framework = "lightgbm"
+    python_options.m_steering_file = ""
 
     import json
     param = {'num_leaves': 256,
@@ -189,8 +189,8 @@ def KsVeto_Training(
 
     python_options = basf2_mva.PythonOptions()
 
-    python_options.m_framework = "custom"
-    python_options.m_steering_file = "mva/scripts/basf2_mva_python_interface/lightgbm.py"
+    python_options.m_framework = "lightgbm"
+    python_options.m_steering_file = ""
 
     import json
     param = {'num_leaves': 256,

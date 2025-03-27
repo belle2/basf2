@@ -44,7 +44,7 @@ namespace Belle2 {
 
   protected :
 
-    //! File descripter
+    //! File descriptor
     FILE* m_fp_out;
 
     //! Output filename

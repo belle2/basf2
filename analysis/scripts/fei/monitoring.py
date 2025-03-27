@@ -257,9 +257,6 @@ class MonitoringHist:
         """
         if name not in self.centers:
             return np.nan
-        nonzero = np.nonzero(self.values[name])[0]
-        if len(nonzero) == 0:
-            return np.nan
         if self.two_dimensional[name]:
             tempmin = np.inf
             for i in range(len(self.values[name])):
@@ -267,6 +264,9 @@ class MonitoringHist:
                     if self.values[name][i][j] < tempmin:
                         tempmin = self.centers[name][i][j]
             return tempmin
+        nonzero = np.nonzero(self.values[name])[0]
+        if len(nonzero) == 0:
+            return np.nan
         return self.centers[name][nonzero[0]]
 
     def max(self, name):
@@ -276,9 +276,6 @@ class MonitoringHist:
         """
         if name not in self.centers:
             return np.nan
-        nonzero = np.nonzero(self.values[name])[0]
-        if len(nonzero) == 0:
-            return np.nan
         if self.two_dimensional[name]:
             tempmax = -np.inf
             for i in range(len(self.values[name])):
@@ -286,6 +283,9 @@ class MonitoringHist:
                     if self.values[name][i][j] > tempmax:
                         tempmax = self.centers[name][i][j]
             return tempmax
+        nonzero = np.nonzero(self.values[name])[0]
+        if len(nonzero) == 0:
+            return np.nan
         return self.centers[name][nonzero[-1]]
 
 
@@ -709,7 +709,7 @@ class MonitoringParticle:
         #: Reference to the final ntuple
         self.final_ntuple = MonitoringNTuple('Monitor_Final.root', f'{plist}')
         #: Statistic object after unique tagging of signals
-        self.after_tag = self.calculateUniqueStatistic(self.final_ntuple)
+        self.after_tag = self.calculateUniqueStatistic(self.final_ntuple.tree)
 
     def calculateStatistic(self, hist, target):
         """

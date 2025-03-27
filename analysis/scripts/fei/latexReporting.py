@@ -60,7 +60,6 @@ def create_latex(output_file, monitoringParticle):
                               format_string=r'{name} & {exc_br} & {inc_br} & {user_pre_cut:.3f} & {ranking_pre_cut:.3f}'
                                             r' & {vertex_pre_cut:.3f}  & {absolute_post_cut:.3f}'
                                             r' & {ranking_post_cut:.3f} & {after_tag:.3f}')
-
     for p in monitoringParticle:
         table.add(name=format.decayDescriptor(p.particle.identifier),
                   exc_br=f"{sum(p.exc_br_per_channel.values()):.3f}",

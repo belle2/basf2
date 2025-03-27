@@ -42,7 +42,7 @@ FeiConfiguration.cache.__doc__ = "The stage which is passed as input, it is assu
                                  " do not have to be reconstructed again. Can be either a number or"\
                                  " a filename containing a pickled number or"\
                                  " None in this case the environment variable FEI_STAGE is used."
-FeiConfiguration.monitor.__doc__ = "If true, monitor histograms are created"
+FeiConfiguration.monitor.__doc__ = "If not False, monitor histograms are created."
 FeiConfiguration.legacy.__doc__ = "Pass the summary file of a legacy FEI training,"\
                                   " and the algorithm will be able to apply this training."
 FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, b2mva-kekcc-cluster-teacher"
@@ -85,8 +85,9 @@ PostCutConfiguration.__doc__ = "PostCut configuration class. This cut is employe
 PostCutConfiguration.value.__doc__ = "Absolute value used to cut on the SignalProbability of each candidate."
 PostCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to keep, ranked by SignalProbability."
 
-DecayChannel = collections.namedtuple('DecayChannel',
-                                      'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID, pi0veto')
+DecayChannel = collections.namedtuple(
+    'DecayChannel',
+    'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID, pi0veto')
 DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None, False)
 DecayChannel.__doc__ = "Decay channel of a Particle."
 DecayChannel.name.__doc__ = "str:Name of the channel e.g. :code:`D0:generic_0`"

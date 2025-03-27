@@ -1069,7 +1069,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle->getDaughter(0), maskName, "6");
+        ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle->getDaughter(0), maskName, "1");
         ROOT::Math::PxPyPzEVector sig4vec = particle->getDaughter(0)->get4Vector();
 
         ROOT::Math::PxPyPzEVector bsMom = neutrino4vec + sig4vec;
@@ -1426,7 +1426,8 @@ namespace Belle2 {
           return Const::doubleNaN;
         }
 
-        return missing4Vector(particle, maskName, "5").M2() / (2.0 * missing4Vector(particle, maskName, "5").energy());
+        ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle, maskName, "0");
+        return neutrino4vec.M2() / (2.0 * neutrino4vec.energy());
       };
       return func;
     }
@@ -1571,7 +1572,7 @@ namespace Belle2 {
 
       auto func = [maskName](const Particle * particle) -> double {
 
-        ROOT::Math::PxPyPzEVector pNu = missing4Vector(particle, maskName, "6");
+        ROOT::Math::PxPyPzEVector pNu = missing4Vector(particle, maskName, "1");
 
         ROOT::Math::PxPyPzEVector pLep;
         // TODO: avoid hardocoded values

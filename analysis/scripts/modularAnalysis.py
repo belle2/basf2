@@ -4483,6 +4483,26 @@ def getAnalysisGlobaltagB2BII() -> str:
     return recommended_b2bii_analysis_global_tag()
 
 
+def getECLKLID(particleList: str, variable='ECLKLID', path=None):
+    """
+    The function calculates the PID value for Klongs that are constructed from ECL cluster.
+
+    @param particleList     the input ParticleList
+    @param variable         the variable name for Klong ID
+    @param path             modules are added to this path
+    """
+
+    import b2bii
+
+    if b2bii.isB2BII():
+        B2ERROR("The ECL variables based Klong Identification is only available for Belle II data.")
+
+    from variables import variables
+    path.add_module('MVAExpert', listNames=particleList, extraInfoName='ECLKLID', identifier='ECLKLID')
+
+    variables.addAlias(variable, 'conditionalVariableSelector(isFromECL and PDG==130, extraInfo(ECLKLID), constant(NaN))')
+
+
 def getNbarIDMVA(particleList: str, path=None):
     """
     This function can give a score to predict if it is a anti-n0.
@@ -4590,7 +4610,7 @@ def updateMassHypothesis(particleList, pdg, writeOut=False, path=None):
 func_requiring_analysisGT = [
     correctTrackEnergy, scaleTrackMomenta, smearTrackMomenta, oldwritePi0EtaVeto, writePi0EtaVeto, lowEnergyPi0Identification,
     getBeamBackgroundProbability, getFakePhotonProbability, tagCurlTracks, applyChargedPidMVA, correctEnergyBias,
-    addPhotonEfficiencyRatioVariables, addPi0VetoEfficiencySystematics, getNbarIDMVA]
+    addPhotonEfficiencyRatioVariables, addPi0VetoEfficiencySystematics, getNbarIDMVA, getECLKLID]
 for _ in func_requiring_analysisGT:
     _.__doc__ += "\n    .. note:: This function (optionally) requires a payload stored in the analysis GlobalTag. "\
                     "Please append or prepend the latest one from `getAnalysisGlobaltag` or `getAnalysisGlobaltagB2BII`.\n"

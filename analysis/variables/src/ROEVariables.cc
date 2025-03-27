@@ -1462,9 +1462,9 @@ namespace Belle2 {
           return Const::doubleNaN;
 
         // Assumes lepton is the last particle in the reco decay chain!
-        const auto& frame = ReferenceFrame::GetCurrent();
         const Particle* lep = particle->getDaughter(n - 1);
-        ROOT::Math::PxPyPzEVector lep4vec = frame.getMomentum(lep->get4Vector());
+        bool enforceCMSFrame = (option == "4" or option == "7");
+        ROOT::Math::PxPyPzEVector lep4vec = transformVector(lep->get4Vector(), enforceCMSFrame);
         ROOT::Math::PxPyPzEVector nu4vec = missing4Vector(particle, maskName, option);
 
         return (lep4vec + nu4vec).M2();
@@ -1819,6 +1819,18 @@ namespace Belle2 {
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
 
+    ROOT::Math::PxPyPzEVector transformVector(const ROOT::Math::PxPyPzEVector& vec, bool enforceCMSFrame)
+    {
+      if (enforceCMSFrame) {
+        UseReferenceFrame<CMSFrame> cmsFrame;
+        const auto& frame = ReferenceFrame::GetCurrent();
+        return frame.getMomentum(vec);
+      } else {
+        const auto& frame = ReferenceFrame::GetCurrent();
+        return frame.getMomentum(vec);
+      }
+    }
+
     ROOT::Math::PxPyPzEVector missing4Vector(const Particle* particle, const std::string& maskName, const std::string& opt)
     {
       // Get related ROE object
@@ -1830,11 +1842,11 @@ namespace Belle2 {
         return empty;
       }
 
+      bool enforceCMSFrame = (opt == "4" or opt == "7");
       PCmsLabTransform T;
-      const auto& frame = ReferenceFrame::GetCurrent();
-      ROOT::Math::PxPyPzEVector boostvec = frame.getMomentum(T.getBeamFourMomentum());
-      ROOT::Math::PxPyPzEVector rec4vec = frame.getMomentum(particle->get4Vector());
-      ROOT::Math::PxPyPzEVector roe4vec = frame.getMomentum(roe->get4Vector(maskName));
+      ROOT::Math::PxPyPzEVector boostvec = transformVector(T.getBeamFourMomentum(), enforceCMSFrame);
+      ROOT::Math::PxPyPzEVector rec4vec = transformVector(particle->get4Vector(), enforceCMSFrame);
+      ROOT::Math::PxPyPzEVector roe4vec = transformVector(roe->get4Vector(maskName), enforceCMSFrame);
 
       ROOT::Math::PxPyPzEVector miss4vec;
       double E_beam_cms = T.getCMSEnergy() / 2.0;

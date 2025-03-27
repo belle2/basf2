@@ -354,6 +354,11 @@ namespace Belle2 {
     // ------------------------------------------------------------------------------
 
     /**
+     * Helper function to return 4-vector in reference frame that is picked based on an argument
+     */
+    ROOT::Math::PxPyPzEVector transformVector(const ROOT::Math::PxPyPzEVector& vec, bool enforceCMSFrame);
+
+    /**
      * Helper function: Returns the missing 4-momentum vector.
      * Option 0: Take momentum and energy of all ROE and REC side tracks and clusters into account ("event based" variable)
      * Option 1: Same as option 0, but fix Emiss = pmiss, i.e., set missing mass to 0

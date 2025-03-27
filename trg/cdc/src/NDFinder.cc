@@ -489,7 +489,7 @@ std::array<double, 3> NDFinder::transformTrackParameters(const std::array<double
   // Omega
   if (estimatedParameters[0] == 0.) {
     transformed[0] = estimatedParameters[0];
-  } else {
+  } else { // omega = sign(q)/r, r in cm
     transformed[0] = -1 / getTrackRadius(1. / estimatedParameters[0]);
   }
   // Phi

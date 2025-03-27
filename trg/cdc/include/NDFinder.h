@@ -58,7 +58,7 @@ namespace Belle2 {
         m_houghSpace(std::move(readoutHoughSpace)),
         m_readoutCluster(std::move(readoutCluster))
     {
-      m_omega = estimatedParameters[0];
+      m_omega = estimatedParameters[0]; // This is the "real" omega (curvature), i.e., sign(q)/(r_2d[cm])
       m_phi = estimatedParameters[1];
       m_cotTheta = estimatedParameters[2];
     }
@@ -174,10 +174,11 @@ namespace Belle2 {
     // Fill hit info of the event
     void addHit(unsigned short hitID, unsigned short hitSLID, unsigned short hitPrioPos, long hitPrioTime)
     {
-      if (hitPrioPos > 0) { // skip "no hit" case
+      // Priority position from the track segment finder: 0 = no hit, 3 = 1st priority, 1 = 2nd right, 2 = 2nd left
+      if (hitPrioPos > 0) { // Skip "no hit" case
         m_hitIDs.push_back(hitID);
         m_hitSLIDs.push_back(hitSLID);
-        m_priorityWirePos.push_back(3 - hitPrioPos);
+        m_priorityWirePos.push_back(3 - hitPrioPos); // 0 = 1st priority, 1 = 2nd left, 2 = 2nd right
         m_priorityWireTime.push_back(hitPrioTime);
         ++m_nHits;
       }
@@ -227,7 +228,7 @@ namespace Belle2 {
     std::array<double, 3> getTrackParameterEstimate(const std::array<double, 3>& centerOfGravity);
     // Transform to physical units
     std::array<double, 3> transformTrackParameters(const std::array<double, 3>& estimatedParameters);
-    // Transverse momentum to radius
+    // Transverse momentum (which is 1/omega, in GeV/c) to radius (in cm)
     static inline double getTrackRadius(double transverseMomentum) { return transverseMomentum * 1e11 / (3e8 * 1.5); }
 
     // NDFinder: Member data stores
@@ -258,6 +259,7 @@ namespace Belle2 {
       Since the CDC wire pattern is repeated 32 times, the hit IDs are stored for 1/32 of the CDC only.
       The total number of 2336 TS corresponds to (41 axial + 32 stereo) * 32.
       The number of track bins (full phi) is: (omega, phi, theta) = (40, 384, 9)
+      Note: The omega dimension here represents just sign(q)/(p_T[GeV/c]) (0.2 -> inf -> -inf -> -0.2 for 0 -> 19.5 -> 39)
     */
 
     // Track segments
@@ -274,13 +276,12 @@ namespace Belle2 {
 
     // CDC symmetry in phi
     static constexpr unsigned short m_phiGeo = 32; // Repetition of the wire pattern
-    static constexpr unsigned short m_parcels = 7; // phi range: hit data
-    static constexpr unsigned short m_parcelsExp = 11; // phi range: expanded hit data
+    static constexpr unsigned short m_nExpPhiSectors = 11; // Number of phi sectors defining the range of the expanded hits
 
     // Phi sectors in the CDC
     static constexpr unsigned short m_nPhiSector = m_nPhi / m_phiGeo; // Bins of one phi sector (12)
     static constexpr unsigned short m_nPhiComp = 15; // Bins of compressed phi: phi_start, phi_width, phi_0, ..., phi_12
-    static constexpr unsigned short m_nPhiExp =  m_parcelsExp * m_nPhiSector; // Bins of 11 phi sectors (132)
+    static constexpr unsigned short m_nPhiExp =  m_nExpPhiSectors * m_nPhiSector; // Bins of 11 phi sectors (132)
 
     // Binnings in different hit pattern arrays
     static constexpr SectorBinning m_compAxialBins = {m_nOmega, m_nPhiComp, 1, m_nAxial, m_nPrio}; // 40, 15, 1, 41, 3
@@ -290,7 +291,7 @@ namespace Belle2 {
     static constexpr SectorBinning m_fullBins = {m_nOmega, m_nPhi, m_nTheta, m_nTS, m_nPrio}; // 40, 384, 9, 2336, 3
 
     // Acceptance ranges + slot sizes to convert bins to track parameters (for getBinToVal method)
-    static constexpr std::array<double, 2> m_omegaRange = {-5., 5.};
+    static constexpr std::array<double, 2> m_omegaRange = {-5., 5.}; // 1/5 = 0.2 (minimum transverse momentum)
     static constexpr std::array<double, 2> m_phiRange = {0., 11.25};
     static constexpr std::array<double, 2> m_thetaRange = {19., 140.};
     static constexpr double m_binSizeOmega = (m_omegaRange[1] - m_omegaRange[0]) / m_nOmega; // 0.25

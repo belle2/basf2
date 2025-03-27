@@ -1145,7 +1145,6 @@ namespace Belle2 {
 
         PCmsLabTransform T;
         ROOT::Math::PxPyPzEVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
-        UseReferenceFrame<CMSFrame> frame;
         ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle, maskName, "7");
 
         ROOT::Math::PxPyPzEVector bmom = sig4vec + neutrino4vec;
@@ -1575,7 +1574,6 @@ namespace Belle2 {
         ROOT::Math::PxPyPzEVector pNu = missing4Vector(particle, maskName, "1");
 
         ROOT::Math::PxPyPzEVector pLep;
-        // TODO: avoid hardocoded values
         for (unsigned i = 0; i < particle->getNDaughters(); i++)
         {
           int absPDG = abs(particle->getDaughter(i)->getPDGCode());
@@ -1865,14 +1863,14 @@ namespace Belle2 {
 
       // Definition 2: same as 0, fix Eroe = Ecms/2
       else if (opt == "2") {
-        miss4vec = - (rec4vec + roe4vec);
-        miss4vec.SetE(E_beam_cms - rec4vec.E());
+        miss4vec = boostvec - (rec4vec + roe4vec);
+        miss4vec.SetE(boostvec.E() / 2. - rec4vec.E());
       }
 
       // Definition 3: use only energy and momentum of signal side
       else if (opt == "3") {
-        miss4vec = - rec4vec;
-        miss4vec.SetE(E_beam_cms - rec4vec.E());
+        miss4vec = boostvec - rec4vec;
+        miss4vec.SetE(boostvec.E() / 2. - rec4vec.E());
       }
 
       // Definition 4: same as 3, update with direction of ROE momentum

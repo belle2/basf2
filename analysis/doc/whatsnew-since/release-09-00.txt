@@ -15,6 +15,9 @@ Variables
   `nROE_NeutralECLClusters`, `nROE_Photons`, `nROE_NeutralHadrons`, `nROE_Charged`, `nROE_Composites`, and
   `nROE_ParticlesInList` from double to int.
 * Extended functionality of the variable `passesROEMask` to handle composite particles as well.
+* Modified whole event variables, e.g., `weDeltae`, to work with ``useXXXFrame`` instead of requiring additional argument.
+  A down-side is that if you used for example ``weMissM2(maskname, 0)`` before, you must now use ``useCMSFrame(weMissM2(maskname, 0))``,
+  otherwise you're implicitly calling ``weMissM2(maskname, 5)``.
 
 Changes in the analysis package in light-2501-betelgeuse
 --------------------------------------------------------

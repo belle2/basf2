@@ -26,7 +26,6 @@ settings = CalibrationSettings(name="CDC badwire",
                                                    [INPUT_DATA_FILTERS["Data Tag"]["mumu_tight_or_highm_calib"],
                                                     INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
-                               depends_on=[],
                                expert_config={
                                    "min_events_per_file": 500,
                                    "max_events_per_file": 10000,

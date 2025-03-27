@@ -99,7 +99,7 @@ namespace Belle2 {
   public:
 
     // Struct of ndFinder parameters
-    struct ndparameters {
+    struct NDFinderParameters {
       // Zero-Suppressed trained hit data
       std::string axialFile = "data/trg/cdc/ndFinderArrayAxialComp.txt.gz";
       std::string stereoFile = "data/trg/cdc/ndFinderArrayStereoComp.txt.gz";
@@ -248,9 +248,9 @@ namespace Belle2 {
     // Counter for the number of hits in the current event
     unsigned short m_nHits{0};
     // Configuration parameters of the 3DFinder
-    ndparameters m_params;
+    NDFinderParameters m_ndFinderParams;
     // Configuration of the clustering module
-    clustererParams m_clustererParams;
+    ClustererParameters m_clustererParams;
 
     // Clustering module
     Belle2::Clusterizend m_clusterer;

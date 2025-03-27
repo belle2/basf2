@@ -29,20 +29,20 @@ void NDFinder::init(unsigned short minSuperAxial, unsigned short minSuperStereo,
                     unsigned short omegaTrim, unsigned short phiTrim, bool storeAdditionalReadout,
                     std::string& axialFile, std::string& stereoFile)
 {
-  m_params.minSuperAxial = minSuperAxial;
-  m_params.minSuperStereo = minSuperStereo;
-  m_params.thresh = thresh;
-  m_params.axialFile = axialFile;
-  m_params.stereoFile = stereoFile;
-  m_params.storeAdditionalReadout = storeAdditionalReadout;
+  m_ndFinderParams.minSuperAxial = minSuperAxial;
+  m_ndFinderParams.minSuperStereo = minSuperStereo;
+  m_ndFinderParams.thresh = thresh;
+  m_ndFinderParams.axialFile = axialFile;
+  m_ndFinderParams.stereoFile = stereoFile;
+  m_ndFinderParams.storeAdditionalReadout = storeAdditionalReadout;
 
   // Initialization of the pointer arrays, fills hit to sector LUT
   initLookUpArrays();
   initHitToSectorMap();
 
   // Load the axial and stereo track to hit relations from file.
-  loadCompressedHitReps(m_params.axialFile, m_compAxialBins, *m_compAxialHitReps);
-  loadCompressedHitReps(m_params.stereoFile, m_compStereoBins, *m_compStereoHitReps);
+  loadCompressedHitReps(m_ndFinderParams.axialFile, m_compAxialBins, *m_compAxialHitReps);
+  loadCompressedHitReps(m_ndFinderParams.stereoFile, m_compStereoBins, *m_compStereoHitReps);
 
   // Fills the expanded hit representations (from compressed hits to weights)
   fillExpandedHitReps(m_compAxialBins, *m_compAxialHitReps, *m_expAxialHitReps);
@@ -247,7 +247,7 @@ void NDFinder::runTrackFinding()
     std::vector<ROOT::Math::XYZVector> readoutHoughSpace;
     std::vector<ROOT::Math::XYZVector> readoutCluster;
 
-    if (m_params.storeAdditionalReadout) {
+    if (m_ndFinderParams.storeAdditionalReadout) {
       // Readout of the complete Hough space
       for (c3index omegaIdx = 0; omegaIdx < m_nOmega; ++omegaIdx) {
         for (c3index phiIdx = 0; phiIdx < m_nPhi; ++phiIdx) {
@@ -431,7 +431,7 @@ bool NDFinder::checkHitSuperLayers(const SimpleCluster& cluster)
   unsigned short axialNumber = 5 - (withAxialSLs - nSL);
   unsigned short stereoNumber = nSL - axialNumber;
   // Cut away all clusters that do have enough hit super layers
-  bool isValid = axialNumber >= m_params.minSuperAxial && stereoNumber >= m_params.minSuperStereo;
+  bool isValid = axialNumber >= m_ndFinderParams.minSuperAxial && stereoNumber >= m_ndFinderParams.minSuperStereo;
   return isValid;
 }
 
@@ -443,7 +443,7 @@ std::vector<CellWeight> NDFinder::getCenterOfGravityCells(const SimpleCluster& c
   std::vector<cell_index> clusterCells = cluster.getCells();
   for (const cell_index& clusterCell : clusterCells) {
     unsigned short cellWeight = houghSpace[clusterCell[0]][clusterCell[1]][clusterCell[2]];
-    if (cellWeight > m_params.thresh * maximum) {
+    if (cellWeight > m_ndFinderParams.thresh * maximum) {
       CellWeight validCell = {clusterCell, cellWeight};
       validCells.push_back(validCell);
     }

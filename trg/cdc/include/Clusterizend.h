@@ -13,7 +13,7 @@
 
 namespace Belle2 {
   // Struct containing the parameters for the clustering
-  struct clustererParams  {
+  struct ClustererParameters  {
     // Cut on the total weight of all cells in the 3d volume
     unsigned short minTotalWeight = 450;
     // Cut on the peak cell weight
@@ -24,7 +24,7 @@ namespace Belle2 {
     unsigned short omegaTrim = 5;
     // Number of deleted cells in phi in each direction of the maximum
     unsigned short phiTrim = 4;
-    // The Hough space dimensions (set in initBins() method of the NDFinder)
+    // The Hough space dimensions
     unsigned short nOmega = 40;
     unsigned short nPhi = 384;
     unsigned short nTheta = 9;
@@ -75,7 +75,7 @@ namespace Belle2 {
   class Clusterizend {
   public:
     Clusterizend() = default;
-    explicit Clusterizend(const clustererParams& params): m_params(params) {}
+    explicit Clusterizend(const ClustererParameters& parameters): m_clustererParams(parameters) {}
 
     // Set a new hough space for clustering and track finding
     void setNewPlane(c3array& houghSpace) { m_houghSpace = &houghSpace; }
@@ -94,7 +94,7 @@ namespace Belle2 {
     // Method to delete a omega row for the cluster deletion in deleteGlobalMax
     void clearHoughSpaceRow(const DeletionBounds& bounds);
     // The struct holding the cluster parameters
-    clustererParams m_params;
+    ClustererParameters m_clustererParams;
     // Pointer to the Hough space
     c3array* m_houghSpace{0};
   };

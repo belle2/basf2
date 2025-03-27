@@ -1069,11 +1069,12 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
+        const auto& frame = ReferenceFrame::GetCurrent();
         ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle->getDaughter(0), maskName, "1");
-        ROOT::Math::PxPyPzEVector sig4vec = particle->getDaughter(0)->get4Vector();
+        ROOT::Math::PxPyPzEVector sig4vec = frame.getMomentum(particle->getDaughter(0)->get4Vector());
 
         ROOT::Math::PxPyPzEVector bsMom = neutrino4vec + sig4vec;
-        ROOT::Math::PxPyPzEVector bssMom = bsMom + particle->getDaughter(1)->get4Vector();
+        ROOT::Math::PxPyPzEVector bssMom = bsMom + frame.getMomentum(particle->getDaughter(1)->get4Vector());
 
         return bssMom.M() - bsMom.M();
       };
@@ -1573,18 +1574,19 @@ namespace Belle2 {
 
         ROOT::Math::PxPyPzEVector pNu = missing4Vector(particle, maskName, "1");
 
+        const auto& frame = ReferenceFrame::GetCurrent();
         ROOT::Math::PxPyPzEVector pLep;
         for (unsigned i = 0; i < particle->getNDaughters(); i++)
         {
           int absPDG = abs(particle->getDaughter(i)->getPDGCode());
           if (absPDG == Const::electron.getPDGCode() || absPDG == Const::muon.getPDGCode() || absPDG == 15) {
-            pLep = particle->getDaughter(i)->get4Vector();
+            pLep = frame.getMomentum(particle->getDaughter(i)->get4Vector());
             break;
           }
         }
 
         ROOT::Math::PxPyPzEVector pW = pNu + pLep;
-        ROOT::Math::PxPyPzEVector pB = particle->get4Vector() + pNu;
+        ROOT::Math::PxPyPzEVector pB = frame.getMomentum(particle->get4Vector()) + pNu;
 
         // boost lepton and B momentum to W frame
         B2Vector3D boost2W = pW.BoostToCM();

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/flipQualityModule/FlipQualityModule.h>
+#include <tracking/modules/flipAndRefit/FlipQualityModule.h>
 #include <mva/interface/Interface.h>
 
 #include <memory>

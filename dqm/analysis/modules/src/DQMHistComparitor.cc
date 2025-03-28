@@ -86,18 +86,19 @@ void DQMHistComparitorModule::beginRun()
 void DQMHistComparitorModule::event()
 {
   for (auto& it : m_pnode) {
-
-    TH1* hist1, *hist2;
-
     B2DEBUG(20, "== Search for " << it->histo1 << " with ref " << it->histo2 << "==");
-    hist1 = findHist(it->histo1, true); // only if changed
-    if (!hist1) B2DEBUG(20, "NOT Found " << it->histo1);
-    if (!hist1) continue;
-    hist2 = findRefHist(it->histo2, ERefScaling::c_RefScaleEntries, hist1);
-    if (!hist2) B2DEBUG(20, "NOT Found " << it->histo2);
-    // Dont compare if any of hists is missing ... TODO We should clean CANVAS, raise some error if we cannot compare
-    if (!hist2) continue;
-
+    auto hist1 = findHist(it->histo1, true); // only if changed
+    if (!hist1) {
+      B2DEBUG(20, "NOT Found " << it->histo1);
+      // Dont compare if missing or not updated ...
+      continue;
+    }
+    auto hist2 = findRefHist(it->histo2, ERefScaling::c_RefScaleEntries, hist1);
+    if (!hist2) {
+      B2DEBUG(20, "NOT Found " << it->histo2);
+      // Dont compare if any of hists is missing ...
+      continue;
+    }
     B2DEBUG(20, "Compare " << it->histo1 << " with ref " << it->histo2);
     // if compare normalized ... does not work!
     // hist2->Scale(hist1->GetEntries()/hist2->GetEntries());

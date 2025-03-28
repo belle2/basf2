@@ -13,13 +13,7 @@
 
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <dqm/analysis/modules/DQMHistComparitor.h>
-#include <TROOT.h>
 #include <TStyle.h>
-#include <TClass.h>
-#include <TDirectory.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TKey.h>
 
 using namespace std;
 using namespace Belle2;

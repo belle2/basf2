@@ -47,104 +47,6 @@ DQMHistComparitorModule::~DQMHistComparitorModule()
 {
 }
 
-TH1* DQMHistComparitorModule::GetHisto(TString histoname)
-{
-  TH1* hh1;
-  gROOT->cd();
-  hh1 = findHist(histoname.Data());
-  if (hh1 == NULL) {
-    B2DEBUG(20, "findHist failed " << histoname << " not in memfile");
-
-    // first search reference root file ... if there is one
-    if (m_refFile && m_refFile->IsOpen()) {
-      TDirectory* d = m_refFile;
-      TString myl = histoname;
-      TString tok;
-      Ssiz_t from = 0;
-      B2DEBUG(20, myl);
-      while (myl.Tokenize(tok, from, "/")) {
-        TString dummy;
-        Ssiz_t f;
-        f = from;
-        if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-          auto e = d->GetDirectory(tok);
-          if (e) {
-            B2DEBUG(20, "Cd Dir " << tok << " from " << d->GetPath());
-            d = e;
-          } else {
-            B2DEBUG(20, "cd failed " << tok << " from " << d->GetPath());
-          }
-        } else {
-          break;
-        }
-      }
-      TObject* obj = d->FindObject(tok);
-      if (obj != NULL) {
-        if (obj->IsA()->InheritsFrom("TH1")) {
-          B2DEBUG(20, "Histo " << histoname << " found in ref file");
-          hh1 = (TH1*)obj;
-        } else {
-          B2DEBUG(20, "Histo " << histoname << " found in ref file but wrong type");
-        }
-      } else {
-        // seems find will only find objects, not keys, thus get the object on first access
-        TIter next(d->GetListOfKeys());
-        TKey* key;
-        while ((key = (TKey*)next())) {
-          TObject* obj2 = key->ReadObj() ;
-          if (obj2->InheritsFrom("TH1")) {
-            if (obj2->GetName() == tok) {
-              hh1 = (TH1*)obj2;
-              B2DEBUG(20, "Histo " << histoname << " found as key -> readobj");
-              break;
-            }
-          }
-        }
-        if (hh1 == NULL) B2DEBUG(20, "Histo " << histoname << " NOT found in ref file " << tok);
-      }
-    }
-
-    if (hh1 == NULL) {
-      B2DEBUG(20, "Histo " << histoname << " not in memfile or ref file");
-
-      TDirectory* d = gROOT;
-      TString myl = histoname;
-      TString tok;
-      Ssiz_t from = 0;
-      while (myl.Tokenize(tok, from, "/")) {
-        TString dummy;
-        Ssiz_t f;
-        f = from;
-        if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-          auto e = d->GetDirectory(tok);
-          if (e) {
-            B2DEBUG(20, "Cd Dir " << tok);
-            d = e;
-          } else B2DEBUG(20, "cd failed " << tok);
-          d->cd();
-        } else {
-          break;
-        }
-      }
-      TObject* obj = d->FindObject(tok);
-      if (obj != NULL) {
-        if (obj->IsA()->InheritsFrom("TH1")) {
-          B2DEBUG(20, "Histo " << histoname << " found in mem");
-          hh1 = (TH1*)obj;
-        }
-      } else {
-        B2DEBUG(20, "Histo " << histoname << " NOT found in mem");
-      }
-    }
-  }
-
-  if (hh1 == NULL) {
-    B2DEBUG(20, "Histo " << histoname << " not found");
-  }
-
-  return hh1;
-}
-
 void DQMHistComparitorModule::initialize()
 {
   m_refFile = NULL;
@@ -162,14 +64,10 @@ void DQMHistComparitorModule::initialize()
       continue;
     }
 
-    // Do not check for histogram existence here, as it might not be
-    // in memfile when analysis task is started
-    TString a = it.at(2).c_str();
-
     auto n = new CMPNODE;
     n->histo1 = it.at(0);
     n->histo2 = it.at(1);
-    TCanvas* c = new TCanvas(a);
+    TCanvas* c = new TCanvas(it.at(2).c_str());
     n->canvas = c;
 
     n->min_entries = atoi(it.at(3).c_str());
@@ -198,12 +96,12 @@ void DQMHistComparitorModule::event()
     TH1* hist1, *hist2;
 
     B2DEBUG(20, "== Search for " << it->histo1 << " with ref " << it->histo2 << "==");
-    hist1 = findHistInCanvas(it->histo1.Data());
+    hist1 = findHist(it->histo1, true); // only if changed
     if (!hist1) B2DEBUG(20, "NOT Found " << it->histo1);
-    hist2 = GetHisto(it->histo2);
+    if (!hist1) continue;
+    hist2 = findRefHist(it->histo2, ERefScaling::c_RefScaleEntries, hist1);
     if (!hist2) B2DEBUG(20, "NOT Found " << it->histo2);
     // Dont compare if any of hists is missing ... TODO We should clean CANVAS, raise some error if we cannot compare
-    if (!hist1) continue;
     if (!hist2) continue;
 
     B2DEBUG(20, "Compare " << it->histo1 << " with ref " << it->histo2);
@@ -229,23 +127,14 @@ void DQMHistComparitorModule::event()
       }
     }
 
-    // if draw normalized
-    TH1* h;
-    if (1) {
-      h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
-      if (abs(hist2->Integral()) > 0)
-        h->Scale(hist1->Integral() / hist2->Integral());
-    } else {
-      hist2->Draw("hist");
-    }
-
-    h->SetFillColor(0);
-    h->SetStats(kFALSE);
+    hist2->Draw("hist");
+    hist2->SetFillColor(0);
+    hist2->SetStats(kFALSE);
     hist1->SetFillColor(0);
-    if (h->GetMaximum() > hist1->GetMaximum())
-      hist1->SetMaximum(1.1 * h->GetMaximum());
+    if (hist2->GetMaximum() > hist1->GetMaximum())
+      hist1->SetMaximum(1.1 * hist2->GetMaximum());
     hist1->Draw("hist");
-    h->Draw("hist,same");
+    hist2->Draw("hist,same");
 
     it->canvas->Pad()->SetFrameFillColor(10);
     if (m_color) {

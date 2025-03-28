@@ -22,8 +22,6 @@
 
 #include <fstream>
 #include <numeric>
-#include <iostream>
-#include <string>
 
 namespace Belle2 {
   namespace MVA {

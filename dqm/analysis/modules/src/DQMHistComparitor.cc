@@ -175,19 +175,12 @@ void DQMHistComparitorModule::initialize()
     n->min_entries = atoi(it.at(3).c_str());
     n->warning = atof(it.at(4).c_str());
     n->error = atof(it.at(5).c_str());
-    n->epicsflag = false;
-
-#ifdef _BELLE2_EPICS
-    if (it.at(6) != "") {
-      SEVCHK(ca_create_channel(it.at(6).c_str(), NULL, NULL, 10, &n->mychid), "ca_create_channel failure");
-      n->epicsflag = true;
+    n->pvname = it.at(6);
+    if (n->pvname != "") {
+      registerEpicsPV(n->pvname);
     }
-#endif
     m_pnode.push_back(n);
   }
-#ifdef _BELLE2_EPICS
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-#endif
 
   B2DEBUG(20, "DQMHistComparitor: initialized.");
 }
@@ -221,9 +214,7 @@ void DQMHistComparitorModule::event()
     //     data = hist1->Chi2Test(hist2);// return p value (0 bad, 1 good), ignores normalization
     //     data= BinByBinTest(hits1,hist2);// user function (like Peters test)
     //     printf(" %.2f %.2f %.2f\n",(float)data,it->warning,it->error);
-#ifdef _BELLE2_EPICS
-    if (it->epicsflag) SEVCHK(ca_put(DBR_DOUBLE, it->mychid, (void*)&data), "ca_set failure");
-#endif
+    if (it->pvname != "") setEpicsPV(it->pvname, data);
     it->canvas->cd();
     hist2->SetLineStyle(3);// 2 or 3
     hist2->SetLineColor(3);
@@ -276,9 +267,6 @@ void DQMHistComparitorModule::event()
     it->canvas->Modified();
     it->canvas->Update();
   }
-#ifdef _BELLE2_EPICS
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-#endif
 }
 
 void DQMHistComparitorModule::endRun()

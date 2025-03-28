@@ -16,8 +16,14 @@
 #include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TRandomWrapper.h>
 
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
 #include <fstream>
 #include <numeric>
+#include <iostream>
+#include <string>
 
 namespace Belle2 {
   namespace MVA {
@@ -242,13 +248,25 @@ namespace Belle2 {
 
         // Load framework
         auto framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
+
+        // Create a new empty module with a unique name.
+        // This way we dont end up with multiple mvas trying to overwrite the same apply method with the last one being used by all.
+        boost::python::object type = boost::python::import("types");
+
+        // Generate a unique module
+        boost::uuids::random_generator uuid_gen;
+        std::string unique_mva_module_name = "unique_module_name" + boost::uuids::to_string(uuid_gen());
+        auto unique_mva_module = type.attr("ModuleType")(unique_mva_module_name.c_str());  // Convert proxy to object
+
+        // Copy framework's __dict__ to the new module
+        unique_mva_module.attr("__dict__").attr("update")(boost::python::object(framework.attr("__dict__")));
         // Overwrite framework with user-defined code from the steering file
-        builtins.attr("exec")(steering_file_source_code.c_str(), boost::python::object(framework.attr("__dict__")));
+        builtins.attr("exec")(steering_file_source_code.c_str(), unique_mva_module.attr("__dict__"));
 
         // Call get_model with the parameters provided by the user
         auto parameters = json.attr("loads")(m_specific_options.m_config.c_str());
-        auto model = framework.attr("get_model")(numberOfFeatures, numberOfSpectators,
-                                                 numberOfEvents,  m_specific_options.m_training_fraction, parameters);
+        auto model = unique_mva_module.attr("get_model")(numberOfFeatures, numberOfSpectators,
+                                                         numberOfEvents,  m_specific_options.m_training_fraction, parameters);
 
         // Call begin_fit with validation sample
         for (uint64_t iEvent = 0; iEvent < numberOfValidationEvents; ++iEvent) {
@@ -273,7 +291,7 @@ namespace Belle2 {
 
         uint64_t nBatches = std::floor(numberOfTrainingEvents / batch_size);
 
-        auto state = framework.attr("begin_fit")(model, ndarray_X_v, ndarray_S_v, ndarray_y_v, ndarray_w_v, nBatches);
+        auto state = unique_mva_module.attr("begin_fit")(model, ndarray_X_v, ndarray_S_v, ndarray_y_v, ndarray_w_v, nBatches);
 
         bool continue_loop = true;
 
@@ -314,15 +332,15 @@ namespace Belle2 {
 
             // Reactivate Global Interpreter Lock to safely execute python code
             PyEval_RestoreThread(m_thread_state);
-            auto r = framework.attr("partial_fit")(state, ndarray_X, ndarray_S, ndarray_y,
-                                                   ndarray_w, iIteration, iBatch);
+            auto r = unique_mva_module.attr("partial_fit")(state, ndarray_X, ndarray_S, ndarray_y,
+                                                           ndarray_w, iIteration, iBatch);
             boost::python::extract<bool> proxy(r);
             if (proxy.check())
               continue_loop = static_cast<bool>(proxy);
           }
         }
 
-        auto result = framework.attr("end_fit")(state);
+        auto result = unique_mva_module.attr("end_fit")(state);
 
         auto pickle = boost::python::import("pickle");
         auto file = builtins.attr("open")(custom_weightfile.c_str(), "wb");
@@ -331,7 +349,7 @@ namespace Belle2 {
         auto steeringfile = builtins.attr("open")(custom_steeringfile.c_str(), "wb");
         pickle.attr("dump")(steering_file_source_code.c_str(), steeringfile);
 
-        auto importances = framework.attr("feature_importance")(state);
+        auto importances = unique_mva_module.attr("feature_importance")(state);
         if (len(importances) == 0) {
           B2INFO("Python method returned empty feature importance. There won't be any information about the feature importance in the weightfile.");
         } else if (numberOfFeatures != static_cast<uint64_t>(len(importances))) {
@@ -393,19 +411,32 @@ namespace Belle2 {
       try {
         auto pickle = boost::python::import("pickle");
         auto builtins = boost::python::import("builtins");
-        m_framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
 
+        auto framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
+
+        // Create a new empty module with a unique name.
+        // This way we dont end up with multiple mvas trying to implement
+        // the same apply method with the last one being used by all.
+        boost::uuids::random_generator uuid_gen;
+        std::string unique_mva_module_name = "custom_framework_" + boost::uuids::to_string(uuid_gen());
+        boost::python::object type = boost::python::import("types");
+        m_unique_mva_module = type.attr("ModuleType")(unique_mva_module_name.c_str());
+
+        // Copy framework's __dict__ to the new module
+        m_unique_mva_module.attr("__dict__").attr("update")(boost::python::object(framework.attr("__dict__")));
+
+        // Overwrite framework with user-defined code from the steering file if defined
         if (weightfile.containsElement("Python_Steeringfile")) {
           std::string custom_steeringfile = weightfile.generateFileName();
           weightfile.getFile("Python_Steeringfile", custom_steeringfile);
           auto steeringfile = builtins.attr("open")(custom_steeringfile.c_str(), "rb");
           auto source_code = pickle.attr("load")(steeringfile);
-          builtins.attr("exec")(boost::python::object(source_code), boost::python::object(m_framework.attr("__dict__")));
+          builtins.attr("exec")(boost::python::object(source_code), boost::python::object(m_unique_mva_module.attr("__dict__")));
         }
 
         auto file = builtins.attr("open")(custom_weightfile.c_str(), "rb");
         auto unpickled_fit_object = pickle.attr("load")(file);
-        m_state = m_framework.attr("load")(unpickled_fit_object);
+        m_state = m_unique_mva_module.attr("load")(unpickled_fit_object);
       } catch (...) {
         PyErr_Print();
         PyErr_Clear();
@@ -439,7 +470,7 @@ namespace Belle2 {
 
       try {
         auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
-        auto result = m_framework.attr("apply")(m_state, ndarray_X);
+        auto result = m_unique_mva_module.attr("apply")(m_state, ndarray_X);
         for (uint64_t iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
           // We have to do some nasty casting here, because the Python C-Api uses structs which are binary compatible
           // to a PyObject but do not inherit from it!
@@ -482,7 +513,7 @@ namespace Belle2 {
 
       try {
         auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
-        auto result = m_framework.attr("apply")(m_state, ndarray_X);
+        auto result = m_unique_mva_module.attr("apply")(m_state, ndarray_X);
         for (uint64_t iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
           // We have to do some nasty casting here, because the Python C-Api uses structs which are binary compatible
           // to a PyObject but do not inherit from it!

@@ -35,16 +35,16 @@
 //  @ Bhabha for veto
 //  160 degree < (CM Phi_Cluster 1 - CM Phi_Cluster 2) < 200 degree
 //  165 degree < (CM Theta Cluster 1 + CM Theta Cluster 2 ) < 190 degree
-//  Boths Cluster CM E > 3 GeV  and One of cluster CM E > 4.5 GeV
+//  Both Cluster CM E > 3 GeV  and One of cluster CM E > 4.5 GeV
 //  @ Bhabha for calibration  (selection bhabha)
 //  140 degree < (CM Phi_Cluster 1 - CM Phi_Cluster 2) < 220 degree
 //  160 degree < (CM Theta Cluster 1 + CM Theta Cluster 2 ) < 200 degree
-//  Boths Cluster CM E > 2.5 GeV  and One of cluster CM E > 4.0 GeV
+//  Both Cluster CM E > 2.5 GeV  and One of cluster CM E > 4.0 GeV
 //
 //    ee->mumu selection
 //  160 degree < (CM Phi_Cluster 1 - CM Phi_Cluster 2) < 200 degree
 //  165 degree < (CM Theta Cluster 1 + CM Theta Cluster 2 ) < 190 degree
-//  Boths Cluster CM E < 2 GeV  and One of cluster CM E < 2 GeV
+//  Both Cluster CM E < 2 GeV  and One of cluster CM E < 2 GeV
 //
 //---------------------------------------------------------------
 
@@ -784,7 +784,7 @@ bool TrgEclBhabha::GetTaub2b3(double E_total1to17)
     MaxTCId.push_back(maxTCId);
     MaxTCThetaId.push_back(aTRGECLCluster->getMaxThetaId());
 
-    // All clusters in the event shoule be E > 0.12 GeV in lab.
+    // All clusters in the event should be E > 0.12 GeV in lab.
     if (clusterenergy <= m_taub2b3CLELowCut) {
       taub2b3CLELowCutFlag = 0;
     }

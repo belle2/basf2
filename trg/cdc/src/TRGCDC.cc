@@ -2395,7 +2395,7 @@ namespace Belle2 {
     // [FIXME] Not really firmware mode. Just for display.
     int t_eventTime = _eventTime.back()->getT0();
     // Update WireHit driftTime using eventTime
-    // [FIXME] This method is a temorary method. Next time change everything inside EventTime class.
+    // [FIXME] This method is a temporary method. Next time change everything inside EventTime class.
     //cout<<"Hit timing ";
     for (unsigned iHits = 0; iHits < _hits.size(); iHits++) {
       //cout<<"["<<_hits[iHits]->wire().layerId()<<"]["<<_hits[iHits]->wire().localId()<<"]: "<<(_hits[iHits]->drift(0))<<" ";
@@ -2536,7 +2536,7 @@ namespace Belle2 {
 
       //...Make a merger board if necessary... 2013,0908: physjg: I
       // think this should be done only when a new frontboard is
-      // created. i.e., inlcuded in the if(!f) { .... } block.
+      // created. i.e., included in the if(!f) { .... } block.
       // Or I can put this part inside the new FrontEnd creation
       // part, well, seems not good in coding
       //

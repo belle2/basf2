@@ -7,6 +7,19 @@ Kinematic Fitting tools
 * Added functionality to ParticleKinematicFitter module to specify whether only ECL cluster direction information is to be used in the fit (intended for fits involving neutral hadrons).
 * Added to ECLPhotonEnergyResolution dbobject ability to store position resolution information for neutral hadrons
 
+Variables
++++++++++
+* Changed return type of the variables `isInRestOfEvent`, `isCloneOfSignalSide`, `hasAncestorFromSignalSide`,
+  `currentROEIsInList`, `passesROEMask`, and `hasCorrectROECombination` from double to bool.
+* Changed return type of the variables `nROE_KLMClusters`, `nROE_Tracks`, `nROE_ECLClusters`,
+  `nROE_NeutralECLClusters`, `nROE_Photons`, `nROE_NeutralHadrons`, `nROE_Charged`, `nROE_Composites`, and
+  `nROE_ParticlesInList` from double to int.
+* Extended functionality of the variable `passesROEMask` to handle composite particles as well.
+
+Modular Analysis
+++++++++++++++++
+* Added new function `getECLKLID` that calculates the PID for Klongs by using weight files trained with ECL information. It should only be applied to Klongs constructed from ECL cluster.
+
 Changes in the analysis package in light-2501-betelgeuse
 --------------------------------------------------------
 
@@ -127,3 +140,4 @@ Charm Flavor Tagger
 * Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
   function ``charmFlavorTagger``) to ``CFT_ragdoll``. This value must be used for all releases as recent as
   light-2406-ragdoll and release-09.
+  

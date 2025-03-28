@@ -33,7 +33,7 @@ REG_MODULE(Display);
 
 DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 {
-  setDescription("Interactive visualisation of Monte Carlo, intermediate and reconstructed objects, plus geometry. See https://software.belle2.org/development/sphinx/display/doc/index.html for detailed documentation.");
+  setDescription("Interactive visualisation of Monte Carlo, intermediate and reconstructed objects, plus geometry. See https://software.belle2.org/|release|/sphinx/display/doc/index.html for detailed documentation.");
 
   addParam("options", m_options,
            "Drawing options for RecoTracks, a combination of DHMP. See EVEVisualization::setOptions or the display.py example for an explanation.",
@@ -43,7 +43,7 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            "If true, hits created by secondary particles (after scattering, decay-in-flight, ...) will be assigned to the original primary particle.",
            false);
   addParam("showAllPrimaries", m_showAllPrimaries,
-           "If true, all primary MCParticles will be shown, regardless of wether hits are produced.", true);
+           "If true, all primary MCParticles will be shown, regardless of whether hits are produced.", true);
   addParam("hideSecondaries", m_hideSecondaries, "If true, secondary MCParticles (and hits created by them) will not be shown.",
            false);
   addParam("showCharged", m_showCharged,

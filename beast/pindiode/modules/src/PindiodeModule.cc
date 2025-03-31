@@ -29,8 +29,8 @@ PindiodeModule::PindiodeModule() : Module(), m_intParameter(0), m_doubleParamete
   setDescription("Creates PINDIODE crystals - sub-detector of BEASTII");
 
   //We can define parameters which can be set from the steering file. The arguments are:
-  // name, reference to the veriable where the value will be stored, description, default value
-  //If the default value is ommited the user has to specify this parameter, otherwise an error is produced
+  // name, reference to the variable where the value will be stored, description, default value
+  //If the default value is omitted the user has to specify this parameter, otherwise an error is produced
   addParam("intParameter", m_intParameter,
            "Useless parameter of type integer", 0);
   addParam("doubleParameter", m_doubleParameter,
@@ -59,7 +59,7 @@ void PindiodeModule::initialize()
   StoreArray<PindiodeSimHit>  simHits;
   RelationArray relMCSimHit(mcParticles, simHits);
   if (!(mcParticles.isRequired() && simHits.isRequired() && relMCSimHit.isRequired())) {
-    //Fatal is not neccessary here as the storeArrays should just look
+    //Fatal is not necessary here as the storeArrays should just look
     //empty if not registered but let's make sure everything is present
     B2FATAL("Not all collections found, exiting processing");
   }

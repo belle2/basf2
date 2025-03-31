@@ -303,7 +303,7 @@ void TRGGRLMatchModule::event()
     }
   }
 
-//pick up isolated clusters as photons with energy thrshold
+//pick up isolated clusters as photons with energy threshold
   for (int j = 0; j < clusterlist.getEntries(); j++) {
     if (photon_cluster(clusterlist[j], track_phimap, m_e_threshold)) {
       TRGGRLPHOTON* photon = grlphoton.appendNew();

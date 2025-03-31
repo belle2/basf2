@@ -18,7 +18,7 @@ CDCDedx1DCellAlgorithm::CDCDedx1DCellAlgorithm() :
   CalibrationAlgorithm("CDCDedxElectronCollector"),
   m_eaMin(-TMath::Pi() / 2),
   m_eaMax(+TMath::Pi() / 2),
-  m_eaBin(316),
+  m_eaB(316),
   m_dedxMin(0.0),
   m_dedxMax(5.0),
   m_dedxBin(250),
@@ -67,7 +67,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   ttree->SetBranchAddress("costh", &costh);
 
   //repair nbins if they are not divisible accordingly
-  m_eaBin = m_eaBin * m_binSplit;
+  m_eaBin = m_eaB * m_binSplit;
   m_eaBW = (m_eaMax - m_eaMin) / m_eaBin;
 
   //Settings of variables bins
@@ -210,6 +210,11 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   }
 
   delete hptcosth;
+  m_eaBinLocal.clear();
+  for (int il = 0; il < 2; il++) {
+    m_binValue[il].clear();
+    m_binIndex[il].clear();
+  }
   return c_OK;
 }
 
@@ -246,9 +251,9 @@ void CDCDedx1DCellAlgorithm::CreateBinMapping()
   std::map<int, std::vector<int>> steps;
 
   const std::array<int, 2> nDev{8, 4};
-  bounds[0] = {0, 108, 123, 133, 158, 183, 193, 208, 316}; //il boundries
+  bounds[0] = {0, 108, 123, 133, 158, 183, 193, 208, 316}; //il boundaries
   steps[0] = {9, 3, 2, 1, 1, 2, 3, 9};  //il steps
-  bounds[1] = {0, 38, 158, 278, 316}; //OL boundries
+  bounds[1] = {0, 38, 158, 278, 316}; //OL boundaries
   steps[1] = {2, 1, 1, 2};  //OL steps
 
   for (int il = 0; il < 2; il++) {
@@ -599,7 +604,7 @@ void CDCDedx1DCellAlgorithm::plotConstants()
     max[il] = hnewconst[il]->GetMaximum();
   }
 
-  //Ploting final constants
+  //Plotting final constants
   if (max[1] < max[0])max[1] = max[0];
   if (min[1] > min[0])min[1] = min[0];
 

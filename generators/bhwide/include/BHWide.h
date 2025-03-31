@@ -87,7 +87,7 @@ namespace Belle2 {
      */
     void enableWeights(bool weighted = true) { m_weighted = weighted; }
 
-    /** Set the type of the randomN nmber generator.
+    /** Set the type of the randomN number generator.
      * @param randomGenerator The type of the random number generator: Ranmar or Ranecu.
      */
     void setRandomGenerator(RandomGenerator randomGenerator) { m_randomGenerator = randomGenerator; }

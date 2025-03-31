@@ -19,7 +19,7 @@
 </header>
 """
 
-import tracking
+from tracking.path_utils import add_hit_preparation_modules, add_vxd_track_finding_vxdtf2
 from tracking.validation.run import TrackingValidationRun
 import logging
 import basf2
@@ -31,8 +31,8 @@ ACTIVE = False
 
 
 def setupFinderModule(path):
-    tracking.add_hit_preparation_modules(path, components=["SVD"])
-    tracking.add_vxd_track_finding_vxdtf2(path, components=["SVD"])
+    add_hit_preparation_modules(path, components=["SVD"])
+    add_vxd_track_finding_vxdtf2(path, components=["SVD"])
 
 
 class VXDTF2TrackingValidation(TrackingValidationRun):

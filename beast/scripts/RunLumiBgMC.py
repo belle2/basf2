@@ -219,7 +219,7 @@ main.add_module(geometry)
 
 fullsim = b2.register_module('FullSim')
 fullsim.param('PhysicsList', 'FTFP_BERT_HP')
-fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
+fullsim.param('UICommandsAtIdle', ['/process/deactivate nKiller'])
 fullsim.param('StoreAllSecondaries', True)
 fullsim.param('SecondariesEnergyCut', 0.0)  # [MeV]
 main.add_module(fullsim)

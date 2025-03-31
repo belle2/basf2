@@ -201,7 +201,8 @@ namespace Belle2 {
      * Get the list of the reference histograms.
      * @return The list of the reference  histograms.
      */
-    static /*const*/ RefList& getRefList() { return s_refList;};
+    // Unused:
+    //static const RefList& getRefList() { return s_refList;};
 
     /**
      * Get the Run Type.
@@ -322,14 +323,12 @@ namespace Belle2 {
     static bool addHist(const std::string& dirname,
                         const std::string& histname, TH1* h);
 
-    // /**
-    //  * Add reference.
-    //  * @param dirname The name of the directory.
-    //  * @param histname The name of the histogram.
-    //  * @param ref The TH1 pointer for the reference.
-    //  */
-    // void addRef(const std::string& dirname,
-    //             const std::string& histname, TH1* ref);
+    /**
+     * Add reference histogram.
+     * @param dirname The name of the directory.
+     * @param hist The TH1 pointer for the reference.
+    */
+    void addRefHist(const std::string& dirname, TH1* hist);
 
 
     /**
@@ -423,7 +422,7 @@ namespace Belle2 {
     /**
      * Extract event processed from daq histogram, called from input module
      */
-    void ExtractEvent(std::vector <TH1*>& hs);
+    void ExtractNEvent(std::vector <TH1*>& hs);
 
     /// EPICS related Functions
 

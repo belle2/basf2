@@ -315,6 +315,10 @@ There are different sub-directories:
 - ``mva/examples/orthogonal_discriminators`` – create orthongonal discriminators with ugBoost or adversary networks
 - ``mva/examples/<backend>`` – backend specific examples e.g. for tmva and tensorflow
 
+For an example on how to apply these multivariate methods within a physics analysis context, the 
+:sphinx:`Continuum Suppression using Boosted Decision Trees <online_book/basf2/cs.html#continuum-suppression-using-boosted-decision-trees>` 
+walkthrough is a particularly helpful resource. 
+
 Contributions
 -------------
 

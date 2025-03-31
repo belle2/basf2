@@ -12,7 +12,6 @@
 #include <analysis/modules/TreeFitter/TreeFitterModule.h>
 #include <analysis/VertexFitting/TreeFitter/FitManager.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 
 #include <analysis/utility/ParticleCopy.h>
@@ -39,9 +38,10 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            0.01);
   addParam("massConstraintList", m_massConstraintList,
            "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).", {});
-  addParam("massConstraintListParticlename", m_massConstraintListParticlename,
-           "Type::[string]. List of particles to mass constrain with string = particle name.", {});
-
+  addParam("massConstraintDecayString", m_massConstraintDecayString,
+           "Type::[string]. Decay string to select which particles' mass should be constrained to their nominal value. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).", {});
+  addParam("massConstraintMassValues", m_massConstraintMassValues,
+           "Type::[double]. List of invariant masses to be used for the mass constraints of the particles selected via the decay string massConstraintDecayString", {});
 
   addParam("geoConstraintList", m_geoConstraintListPDG,
            "Type::[int], if 'autoSetGeoConstraintAndMergeVertices==False' you can manually set the particles that will be geometrically constrained here.", {});
@@ -81,9 +81,6 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            0);
   addParam("expertRemoveConstraintList", m_removeConstraintList,
            "Type::[string]. List of constraints that you do not want to be used in the fit. WARNING don't use if you don't know exactly what it does.", {});
-  addParam("expertUseReferencing", m_useReferencing,
-           "Type::[bool]. Use the Extended Kalman Filter. This implementation linearises around the previous state vector which gives smoother convergence.",
-           true);
   addParam("inflationFactorCovZ", m_inflationFactorCovZ,
            "Inflate the covariance of the beamspot by this number so that the 3d beam constraint becomes weaker in Z.And: thisnumber->infinity : dim(beamspot constr) 3d->2d.",
            1);
@@ -100,19 +97,27 @@ void TreeFitterModule::initialize()
   m_particles.isRequired();
   m_nCandidatesBeforeFit = 0;
   m_nCandidatesAfter = 0;
+  m_usePDGMassForMassConstraint = m_massConstraintMassValues.empty();
 
-  if ((m_massConstraintList.size()) == 0 && (m_massConstraintListParticlename.size()) > 0) {
-    for (auto& containedParticle : m_massConstraintListParticlename) {
-      TParticlePDG* particletemp = TDatabasePDG::Instance()->GetParticle((containedParticle).c_str());
-      m_massConstraintList.push_back(particletemp->PdgCode());
+  if (!m_massConstraintDecayString.empty()) {
+    if (!m_massConstraintList.empty())
+      B2ERROR("TreeFitterModule::initialize Either provide a decay string or a list of particles to determine which particles' mass should be constrained not both!");
+    bool valid = m_pDDescriptorMassConstraint.init(m_massConstraintDecayString);
+    if (!valid)
+      B2ERROR("TreeFitterModule::initialize Invalid decay descriptor: " << m_massConstraintDecayString);
+    if (m_usePDGMassForMassConstraint) {
+      B2INFO("Use nominal PDG values for mass constraints in TreeFit.");
+    } else if (static_cast<size_t>(std::count(m_massConstraintDecayString.begin(), m_massConstraintDecayString.end(),
+                                              '^')) != m_massConstraintMassValues.size()) {
+      B2ERROR("TreeFitterModule::initialize The number of selected particles and given invariant masses for the mass constraint doesn't match!");
     }
   }
 
   if (!m_treatAsInvisible.empty()) {
-    bool valid = m_pDDescriptorInvisibles.init(m_treatAsInvisible);
+    bool valid = m_pDDescriptorInvisible.init(m_treatAsInvisible);
     if (!valid)
       B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_treatAsInvisible);
-    else if (m_pDDescriptorInvisibles.getSelectionPDGCodes().size() != 1)
+    else if (m_pDDescriptorInvisible.getSelectionPDGCodes().size() != 1)
       B2ERROR("TreeFitterModule::initialize Please select exactly one particle to ignore: " << m_treatAsInvisible);
   }
 
@@ -121,7 +126,6 @@ void TreeFitterModule::initialize()
     if (!valid)
       B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_ignoreFromVertexFit);
   }
-
 }
 
 void TreeFitterModule::beginRun()
@@ -172,8 +176,23 @@ void TreeFitterModule::event()
       ParticleCopy::copyDaughters(particle);
     }
 
+    if (!m_massConstraintDecayString.empty()) {
+      std::vector<const Particle*> selParticlesMassConstraint = m_pDDescriptorMassConstraint.getSelectionParticles(particle);
+      size_t nSelParticlesMassConstraint = selParticlesMassConstraint.size();
+      for (size_t i = 0; i < nSelParticlesMassConstraint; ++i) {
+        Particle* selParticle = m_particles[selParticlesMassConstraint[i]->getArrayIndex()];
+        Particle* selParticleCopy = ParticleCopy::copyParticle(selParticle);
+        selParticleCopy->writeExtraInfo("treeFitterMassConstraint", 1);
+        if (!m_usePDGMassForMassConstraint) selParticleCopy->writeExtraInfo("treeFitterMassConstraintValue", m_massConstraintMassValues[i]);
+
+        bool isReplaced = particle->replaceDaughterRecursively(selParticle, selParticleCopy);
+        if (!isReplaced)
+          B2ERROR("TreeFitterModule::event Cannot find particle selected in " << m_massConstraintDecayString);
+      }
+    }
+
     if (!m_treatAsInvisible.empty()) {
-      std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisibles.getSelectionParticles(particle);
+      std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisible.getSelectionParticles(particle);
       Particle* targetD = m_particles[selParticlesTarget[0]->getArrayIndex()];
       Particle* daughterCopy = ParticleCopy::copyParticle(targetD);
       daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
@@ -251,8 +270,7 @@ bool TreeFitterModule::fitTree(Particle* head)
       head,
       constrConfig,
       m_precision,
-      m_updateDaughters,
-      m_useReferencing
+      m_updateDaughters
     )
   );
   bool rc = TreeFitter->fit();

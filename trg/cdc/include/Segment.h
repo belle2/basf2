@@ -111,9 +111,9 @@ namespace Belle2 {
               const std::string& prefix = std::string("")) const override;
 
 
-    /// initilize variables.
+    /// initialize variables.
     void initialize(void);
-    /// initilize variables.
+    /// initialize variables.
     void initialize(bool fevtTime);
 
   public:// Utility functions

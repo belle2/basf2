@@ -172,7 +172,7 @@ namespace Belle2 {
 //* We now have the smallest angle that guarantees <X**2> > <Y**2>
 //*
 //*  To get the SIGN of the charge right, the new X-AXIS must point
-//*  outward from the orgin.  We are free to change signs of both
+//*  outward from the origin.  We are free to change signs of both
 //*  COSROT and SINROT simultaneously to accomplish this.
 //*
 //*  Choose SIGN of C wisely to be able to get the sign of the charge

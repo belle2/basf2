@@ -30,9 +30,6 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
-CONTACT = "oliver.frost@desy.de"
-
-
 class LegendreBinningValidationRun(HarvestingRun):
     """Harvester to generate, postprocess and inspect MC events for track-segment evaluation"""
     #: number of events to generate

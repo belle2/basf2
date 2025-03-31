@@ -63,9 +63,9 @@ namespace Belle2 {
       virtual void CreateHisto();
       /// Read profile xt file
       virtual void readProfile();
-      /// read xt paramter (wrap text mode and database mode)
+      /// read xt parameter (wrap text mode and database mode)
       virtual void readXT();
-      /// Store calibrated constand
+      /// Store calibrated constant
       virtual void Write();
       /// Store histogram to file
       virtual void storeHisto();
@@ -82,7 +82,7 @@ namespace Belle2 {
       bool m_BField = true;  /**< with b field or none*/
 
       //double m_XT_fit[56][2][18][7][8];  /**< Fitted parameter*/
-      double xtold[56][2][18][7][8];     /**< Old paremeter */
+      double xtold[56][2][18][7][8];     /**< Old parameter */
       int fitflag[56][2][20][10];         /**< Fit flag */
       TF1* xtf5r[56][2][20][10];          /**< XTFunction */
 
@@ -92,7 +92,7 @@ namespace Belle2 {
       TH1D* hist2d_1[56][2][20][10];       /**< 1D xt histo, results of slice fit*/
       /*********************************
       Fit Flag
-      =-1: low statitic
+      =-1: low statistic
        =1: good
       =0: Fit failure
       =2: Error Outer
@@ -115,20 +115,20 @@ namespace Belle2 {
       //unsigned short m_nXtParams;      /*!< no. of xt parameters per bin */
       int m_nalpha; /**<number of alpha bins*/
       int m_ntheta;/**<number of  theta bins*/
-      double l_alpha[18];/**< Lower boundays of alpha bins. */
-      double u_alpha[18];/**< Upper boundays of alpha bins. */
+      double l_alpha[18];/**< Lower boundaries of alpha bins. */
+      double u_alpha[18];/**< Upper boundaries of alpha bins. */
       double ialpha[18]; /**< represented alphas of alpha bins. */
-      double l_theta[7]; /**< Lower boundays of theta bins. */
-      double u_theta[7];/**< Upper boundays of theta bins. */
+      double l_theta[7]; /**< Lower boundaries of theta bins. */
+      double u_theta[7];/**< Upper boundaries of theta bins. */
       double itheta[7]; /**< represented alphas of theta bins. */
 
       int nalpha_old; /**<number of alpha bins from input*/
       int ntheta_old;/**<number of  theta bins from input*/
-      double l_alpha_old[18];/**< Lower boundays of alpha bins from input */
-      double u_alpha_old[18];/**< Upper boundays of alpha bins from input */
+      double l_alpha_old[18];/**< Lower boundaries of alpha bins from input */
+      double u_alpha_old[18];/**< Upper boundaries of alpha bins from input */
       double ialpha_old[18]; /**< represented alphas of alpha bins from input. */
-      double l_theta_old[7]; /**< Lower boundays of theta bins from input. */
-      double u_theta_old[7];/**< Upper boundays of theta bins from input. */
+      double l_theta_old[7]; /**< Lower boundaries of theta bins from input. */
+      double u_theta_old[7];/**< Upper boundaries of theta bins from input. */
       double itheta_old[7]; /**< represented alphas of theta bins from input. */
 
       unsigned short xtmode_old; /**< XT mode old, 0-polynomial, 1 Cheb*/

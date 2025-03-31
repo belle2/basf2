@@ -310,7 +310,7 @@ void FANGSDigitizerModule::getXMLData()
   m_Workfct = content.getDouble("Workfct");
   m_Fanofac = content.getDouble("Fanofac");
 
-  B2INFO("FANGSDigitizer: Aquired FANGS locations and gas parameters");
+  B2INFO("FANGSDigitizer: Acquired FANGS locations and gas parameters");
   B2INFO("              from FANGS.xml. There are " << m_nFANGS << " FANGSs implemented");
 
 }

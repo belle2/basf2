@@ -21,7 +21,6 @@
 #pragma link C++ class Belle2::ECLHitAssignment+; // checksum=0x2bf88ae8, version=1
 #pragma link C++ class Belle2::ECLShower+; // checksum=0xcbb98e2e, version=18
 #pragma link C++ class Belle2::ECLPidLikelihood+; // checksum=0x25e90278, version=3
-#pragma link C++ class Belle2::ECLCNNPid+; // checksum=0x9cef66b7, version=1
 
 //----------------------------------------------------------
 //Support ECLShowers classDefversion < 9

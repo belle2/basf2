@@ -54,7 +54,7 @@ void ClawsDigitizerModule::initialize()
   B2INFO("ClawsDigitizer: Initializing");
   m_clawsHit.registerInDataStore();
 
-  //get the garfield drift data, gas, and CLAWS paramters
+  //get the garfield drift data, gas, and CLAWS parameters
   getXMLData();
 
 }
@@ -133,7 +133,7 @@ void ClawsDigitizerModule::getXMLData()
   m_PEthres = content.getDouble("PEthres");
   m_C_keV_to_MIP = content.getDouble("C_keV_to_MIP");
   //m_C_MIP_to_PE = content.getDouble("C_MIP_to_PE");
-  B2INFO("ClawsDigitizer: Aquired claws locations and gas parameters");
+  B2INFO("ClawsDigitizer: Acquired claws locations and gas parameters");
 
 }
 

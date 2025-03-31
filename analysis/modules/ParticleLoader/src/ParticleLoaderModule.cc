@@ -180,7 +180,8 @@ void ParticleLoaderModule::initialize()
       if (!particleList.isOptional()) {
         DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
         particleList.registerInDataStore(flags);
-        if (!isSelfConjugatedParticle) {
+        // Neutrons are not self-conjugated, but we cannot distinguish particle from anti-particle
+        if (!isSelfConjugatedParticle and (abs(pdgCode) != abs(Const::neutron.getPDGCode()) or m_useMCParticles)) {
           StoreObjPtr<ParticleList> antiParticleList(antiListName);
           antiParticleList.registerInDataStore(flags);
         }

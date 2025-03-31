@@ -162,8 +162,8 @@ void ParticleLoaderModule::initialize()
       // The default list name is "all"
       string listName = mother->getName() + ":all";
 
-      // Full name for ROE, dummy, MCParticle, chargedCluster particles
-      if (m_useROEs or m_useDummy or m_useMCParticles or m_loadChargedCluster)
+      // Full name for ROE, dummy, MCParticle, chargedCluster particles, and (anti-)neutrons
+      if (m_useROEs or m_useDummy or m_useMCParticles or m_loadChargedCluster or abs(pdgCode) == abs(Const::neutron.getPDGCode()))
         listName = mother->getFullName();
       // Kinks get the label "kink"
       else if (nProducts == 1)

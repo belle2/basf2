@@ -883,7 +883,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     * neutral final state particles
         - "gamma"           (input ``mdst`` type = ECLCluster)
         - "K_S0", "Lambda0" (input ``mdst`` type = V0)
-        - "K_L0"            (input ``mdst`` type = KLMCluster or ECLCluster)
+        - "K_L0", "n0"      (input ``mdst`` type = KLMCluster or ECLCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -967,7 +967,8 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                          writeOut, path)
             if (decayDescriptor.getNDaughters() > 1) & (decayDescriptor.getMother().getLabel() != 'V0'):
                 copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
-        elif decayDescriptor.getMother().getLabel() != 'all':
+        elif (decayDescriptor.getMother().getLabel() != 'all' and
+              abs(decayDescriptor.getMother().getPDGCode()) != Belle2.Const.neutron.getPDGCode()):
             # then we have a non-V0/kink particle which the particle loader automatically calls "all"
             # as with the special V0 and kink cases we have to copy over the list to the name/format requested
             copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
@@ -1002,7 +1003,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     * neutral final state particles
         - "gamma"           (input ``mdst`` type = ECLCluster)
         - "K_S0", "Lambda0" (input ``mdst`` type = V0)
-        - "K_L0"            (input ``mdst`` type = KLMCluster or ECLCluster)
+        - "K_L0", "n0"      (input ``mdst`` type = KLMCluster or ECLCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -1078,7 +1079,8 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
         if (decayDescriptor.getNDaughters() > 1) & (decayDescriptor.getMother().getLabel() != 'V0'):
             copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut,
                      path)
-    elif decayDescriptor.getMother().getLabel() != 'all':
+    elif (decayDescriptor.getMother().getLabel() != 'all' and
+          abs(decayDescriptor.getMother().getPDGCode()) != Belle2.Const.neutron.getPDGCode()):
         # then we have a non-V0/kink particle which the particle loader automatically calls "all"
         # as with the special V0 and kink cases we have to copy over the list to the name/format requested
         copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)

@@ -52,7 +52,7 @@ namespace Belle2 {
       /** Destructor */
       virtual ~TRGCDCT3DConverterModule();
 
-      /** Initilizes TRGCDCT3DConverterModule.*/
+      /** Initializes TRGCDCT3DConverterModule.*/
       virtual void initialize() override;
 
       /** Called event by event.*/
@@ -119,7 +119,7 @@ namespace Belle2 {
       /** converts to signed value*/
       int toSigned(int value, int nBits);
 
-      /** converts to 2D rho to 3D rho value,  obselete*/
+      /** converts to 2D rho to 3D rho value,  obsolete*/
 //     int t2DRhoTot3DRho(int value, bool isSigned = 1);
 
       /** converts to 2D phi to 3D phi value*/

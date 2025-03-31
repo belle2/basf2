@@ -32,6 +32,7 @@ SignalSideParticleFilterModule::SignalSideParticleFilterModule() : Module()
   setDescription("The module returns true if the current RestOfEvent object is related to\n"
                  "any of the Particles from the input ParticleList and passes selection criteria.\n"
                  "The module should be executed only in the for_each ROE path.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("particleLists", m_particleLists, "Input ParticleList name", std::vector<std::string>());

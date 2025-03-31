@@ -13,8 +13,6 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 
-#include <framework/gearbox/Const.h>
-
 #define FDEEP_FLOAT_TYPE float
 #include <fdeep/fdeep.hpp>
 

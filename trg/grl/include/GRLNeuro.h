@@ -84,7 +84,7 @@ namespace Belle2 {
     /** ReLu activation function*/
     float relu(float x);
 
-    /** change the percision of number, m = number of integer bits, n = number of decimal**/
+    /** change the precision of number, m = number of integer bits, n = number of decimal**/
     float float_to_fixed(float num, int m, int n);
 
     /** discrete sigmoid activation function (1024 bins) **/

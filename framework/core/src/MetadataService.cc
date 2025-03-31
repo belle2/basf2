@@ -29,12 +29,12 @@ MetadataService& MetadataService::Instance()
   return instance;
 }
 
-void MetadataService::addRootOutputFile(const std::string& fileName, const FileMetaData* metaData)
+void MetadataService::addRootOutputFile(const std::string& fileName, const FileMetaData* metaData, const char* type)
 {
   if (m_fileName.empty()) return;
   if (!FileSystem::isFile(fileName)) return;
 
-  nlohmann::json file_json = {{"type", "RootOutput"}, {"filename", fileName}};
+  nlohmann::json file_json = {{"type", type}, {"filename", fileName}};
 
   if (metaData) {
     file_json["metadata"] = nlohmann::json::parse(metaData->getJsonStr());

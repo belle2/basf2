@@ -45,7 +45,7 @@ CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationColl
            true);
   addParam("storeTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", false);
   addParam("eventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", true);
-  addParam("minimumPt", m_minimumPt, "Tracks with tranverse momentum smaller than this value will not used", 0.15);
+  addParam("minimumPt", m_minimumPt, "Tracks with transverse momentum smaller than this value will not used", 0.15);
   addParam("minimumNDF", m_minimumNDF, "Discard tracks whose degree-of-freedom below this value", 5.);
   addParam("isCosmic", m_isCosmic, "True when we process cosmic events, else False (collision)", m_isCosmic);
   addParam("effStudy", m_effStudy, "When true module collects info only  necessary for wire eff study", false);

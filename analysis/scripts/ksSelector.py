@@ -13,7 +13,6 @@ import basf2_mva
 import modularAnalysis as ma
 import variables
 from variables import utils
-from basf2 import conditions as b2_conditions
 
 
 def add_default_ks_Selector_aliases():
@@ -240,7 +239,7 @@ def LambdaVeto_Training(
 
 def ksSelector(
     particleListName,
-    identifier_Ks="Ks_LGBM_V0_Selector",
+    identifier_Ks="Ks_LGBM_V0Selector",
     identifier_vLambda="Ks_LGBM_LambdaVeto",
     output_label_name='',
     extraInfoName_V0Selector='KsSelector_V0Selector',
@@ -275,12 +274,6 @@ def ksSelector(
     """
 
     add_default_ks_Selector_aliases()
-
-    # if using weights files, prepend related conditiondb
-    centralDB = 'user_liuyux_KsFinder_dev'
-    if not(centralDB in b2_conditions.globaltags) and (identifier_Ks ==
-                                                       "Ks_LGBM_V0_Selector" or identifier_vLambda == "Ks_LGBM_LambdaVeto"):
-        b2_conditions.prepend_globaltag(centralDB)
 
     path.add_module('MVAMultipleExperts',
                     listNames=[particleListName],

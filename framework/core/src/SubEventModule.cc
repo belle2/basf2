@@ -112,7 +112,7 @@ void SubEventModule::setDoWhileConditions()
   // If the last module has a condition attached the looping cannot be done
   // reliably as event processing might take that conditional path.
   // Obviously this does nothing right now until we fix the nested
-  // c_Continue->c_End inconsitency and allow some conditions
+  // c_Continue->c_End inconsistency and allow some conditions
   if (m_loopConditionModule->hasCondition()) {
     B2FATAL("do_while(): The last module in the loop path (" <<
             m_loopConditionModule->getName() << ") cannot have a condition");
@@ -189,7 +189,7 @@ void SubEventModule::terminate()
   if (!ProcHandler::parallelProcessingUsed() or m_processID == ProcHandler::EvtProcID()) {
     processTerminate(m_moduleList);
   } else {
-    //we're in another process than we actually belong to, only call terminate where approriate
+    //we're in another process than we actually belong to, only call terminate where appropriate
     ModulePtrList tmpModuleList;
     for (const ModulePtr& m : m_moduleList) {
       if (m->hasProperties(c_TerminateInAllProcesses))

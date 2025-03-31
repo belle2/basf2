@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #include <arich/dbobjects/ARICHGlobalAlignment.h>
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;

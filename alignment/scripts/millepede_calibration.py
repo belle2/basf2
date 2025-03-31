@@ -182,7 +182,7 @@ def create_collector(dbobjects, **argk):
     m.param('granularity', 'all')
     # Let's enable this always - will be in effect only if BeamSpot is in dbobjects
     m.param('calibrateVertex', True)
-    # Not yet implemeted -> alwas OFF for now
+    # Not yet implemented -> always OFF for now
     m.param('calibrateKinematics', False)
     m.param('minUsedCDCHitFraction', 0.8)
     m.param('minPValue', 0.0)
@@ -233,7 +233,7 @@ def create(name,
         - name : str
             Collection name has to math entry in 'files' dictionary.
         - files : list(str) | None
-            Optional list of files. Can (should if not set here) be overriden by 'files' parameter
+            Optional list of files. Can (should if not set here) be overridden by 'files' parameter
         - path : basf2.Path
             The reprocessing path
         - dict(...) : additional dictionary of parameters passed to the collector.
@@ -257,7 +257,7 @@ def create(name,
         event lists.
 
     commands : list(str | tuple(str, None))
-        List of commands for Millepede. Default commands can be overriden be specifing different values for them.
+        List of commands for Millepede. Default commands can be overridden be specifying different values for them.
         A command can be erased completely from the default commands if instead a ('command_name', None) is passed.
     constraints : list(alignment.Constraints)
         List of constraints from alignment.constraints to be used.
@@ -346,10 +346,10 @@ def create(name,
         # This function runs with DB chain set up
         # TODO: we ignore the local DBs from CAF etc., that is, the constraints
         # are always build only from last valid central GT. As constraints are only
-        # linearizations, small alignment changes have numerical neglible effects on
+        # linearizations, small alignment changes have numerical negligible effects on
         # constraint coefficients. But we can do even better -> should be not difficult
         # but needs much more testing.
-        # NOTE: rversed (highest priority last) order expected here
+        # NOTE: reversed (highest priority last) order expected here
         constraint_tags = [tag for tag in reversed(basf2.conditions.globaltags)]
 
         if len(consts):
@@ -400,7 +400,7 @@ def create(name,
     if params is None:
         params = dict()
 
-    print("- Overriden common collector parameters:")
+    print("- Overridden common collector parameters:")
     for parname, parval in params.items():
         print("    ", parname, ":", parval)
 

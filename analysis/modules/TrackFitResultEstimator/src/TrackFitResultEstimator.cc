@@ -8,15 +8,12 @@
 
 #include <analysis/modules/TrackFitResultEstimator/TrackFitResultEstimator.h>
 
-#include <framework/datastore/RelationArray.h>
 #include <framework/geometry/BFieldManager.h>
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <analysis/ClusterUtility/ClusterUtils.h>
 
 #include <TDatabasePDG.h>
 #include <Math/Vector3D.h>
-#include <vector>
 
 using namespace Belle2;
 using namespace ROOT::Math;
@@ -39,6 +36,7 @@ covariance, detector hit information, and fit-related information (pValue, NDF) 
 Particles must not have already Track or TrackFitResult and thus are supposed to be composite particles, recoil, dummy particles,
 and so on. Since the source type is not overwritten as Track, not all track-related variables are guaranteed to be available.
 )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("inputListName", m_inputListName,

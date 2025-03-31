@@ -27,10 +27,7 @@
 // random generator
 #include <TRandom.h>
 
-#include <Math/VectorUtil.h>
-
 // coordinates translation
-#include <iostream>
 #include <TGeoMatrix.h>
 #include <generators/SAD/ReaderSAD.h>
 

@@ -58,6 +58,6 @@ namespace Belle2 {
     std::string m_id; /**< Parameter given to set the UniqueID of the payload*/
     std::optional<float> m_previousRawTimeMeanL3V; /**< Raw CoG of the previous run*/
     float m_allowedTimeShift = 2.; /**< Allowed Raw CoGshift*/
-    float m_minEntries = 10000; /**< Set the minimun number of entries required in the histograms of layer 3*/
+    float m_minEntries = 10000; /**< Set the minimum number of entries required in the histograms of layer 3*/
   };
 } // namespace Belle2

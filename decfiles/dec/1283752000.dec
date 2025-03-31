@@ -1,0 +1,31 @@
+# EventType: 1283752000
+# Descriptor: [B- -> [D** -> D(*) pi] l nu]
+# NickName: Bu_D**lnu_cocktail
+# Documentation: B- decay to the four D** particles, a light lepton and a neutrino.
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Eyluel Uenlue
+# Email: eyluel.uenlue@campus.lmu.de
+# Cuts: None
+# Date: 20250113
+
+Decay Upsilon(4S) 
+0.5  B+ B-sig VSS;
+0.5  B- B+sig VSS;
+Enddecay
+
+Decay B-sig
+0.007570000   D_10  e-  anti-nu_e                          LLSW 0.71 -1.6 -0.5 2.9;
+0.003890000   D_0*0  e-  anti-nu_e                         LLSW 0.68 -0.2 0.3;
+0.004310000   D'_10  e-  anti-nu_e                         LLSW 0.68 -0.2 0.3;
+0.003730000   D_2*0  e-  anti-nu_e                         LLSW 0.71 -1.6 -0.5 2.9;
+
+0.007570000   D_10  mu-  anti-nu_mu                        LLSW 0.71 -1.6 -0.5 2.9;
+0.003890000   D_0*0  mu-  anti-nu_mu                       LLSW 0.68 -0.2 0.3;
+0.004310000   D'_10  mu-  anti-nu_mu                       LLSW 0.68 -0.2 0.3;
+0.003730000   D_2*0  mu-  anti-nu_mu                       LLSW 0.71 -1.6 -0.5 2.9;
+Enddecay
+CDecay B+sig
+
+
+End

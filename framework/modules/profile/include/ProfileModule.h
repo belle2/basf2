@@ -22,7 +22,7 @@ namespace Belle2 {
    * Both the virtual memory and the resident set size (rss) of the process
    * is reported. Both quantities are important and have a complementary meaning:
    *
-   * virtual size (vsize): The memory region the kernal has reserved for the process
+   * virtual size (vsize): The memory region the kernel has reserved for the process
    * in its memory management, included swapped pages (which are not in RAM, but on disk) and
    * half-filled pages.
    * It also includes files which get mapped into the memory region of the process, but are only
@@ -94,7 +94,7 @@ namespace Belle2 {
 
     /**
      * Signature of the lambda functions, which are used to extract the memory
-     * usage from teh MemTime structure.
+     * usage from the MemTime structure.
      * Depending on the type of memory usage (rss, vsize), this lamdba function
      * can contain different statements.
      */
@@ -114,12 +114,12 @@ namespace Belle2 {
      * Stores the memory usage of the application over time in plots.
      * @param name The name used to store the memory plot in the data store
      * @param title The title displayed on the memory plot
-     * @param xAxisName Text displayed on the y-axis. Depending on the plotted quantitiy,
+     * @param xAxisName Text displayed on the y-axis. Depending on the plotted quantity,
      *                  either vsize or rss, this can vary.
      * @param imgOutput If this string is not empty a plot of the memory consumption over
      *                  time is also written to disk using imgOutput as file name (must include
      *                  file extension)
-     * @param lmdMemoryExtract Lambda expression to extrat the plotted memory quantity from the MemTime
+     * @param lmdMemoryExtract Lambda expression to extract the plotted memory quantity from the MemTime
      *                         data structure. Use either m_extractVirtualMem or m_extractRssMem here
      */
     void storeMemoryGraph(const std::string& name, const std::string& title, const std::string& xAxisName, const std::string& imgOutput,

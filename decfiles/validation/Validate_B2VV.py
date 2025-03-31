@@ -36,13 +36,13 @@ create_validation_histograms(
     [
         ('cosThetaRhoZ', 60, -1.2, 1.2, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
          r'B2VV helicity angle of the $\rho^0 \to \pi^+ \pi^-$ in $B^+ \to \rho^0 \rho^+$ (truth values)',
-         'should follow the reference', 'cos#theta_{helicity}(V1)'),
+         'should follow the reference', 'cos#theta_{helicity}(V1)', '', 'shifter'),
         ('cosThetaRhoP', 60, -1.2, 1.2, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
          r'B2VV helicity angle of the $\rho^+ \to \pi^0 \pi^+$ in $B^+ \to \rho^0 \rho^+$ (truth values)',
-         'should follow the reference', 'cos#theta_{helicity}(V1)'),
+         'should follow the reference', 'cos#theta_{helicity}(V1)', '', 'shifter'),
         ('cosPlanarAngle', 60, -1.2, 1.2, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
          r'Cosine of B2VV planar angle of the $B^+ \to \rho^0 \rho^+$ (truth values)',
-         'should follow the reference', 'cos#chi (planar angle)'),
+         'should follow the reference', 'cos#chi (planar angle)', '', 'shifter'),
     ],
     description='B2VV Validation to check generator level distributions',
 )

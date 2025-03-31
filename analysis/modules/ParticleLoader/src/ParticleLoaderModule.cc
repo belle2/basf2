@@ -14,6 +14,7 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 
 // utilities
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ValueIndexPairSorting.h>
@@ -119,7 +120,6 @@ void ParticleLoaderModule::initialize()
 
   m_particles.registerInDataStore();
   m_particleExtraInfoMap.registerInDataStore();
-  m_eventExtraInfo.registerInDataStore();
   //register relations if these things exists
   if (m_mcparticles.isOptional()) {
     m_particles.registerRelationTo(m_mcparticles);
@@ -165,8 +165,11 @@ void ParticleLoaderModule::initialize()
       // Full name for ROE, dummy, MCParticle, chargedCluster particles
       if (m_useROEs or m_useDummy or m_useMCParticles or m_loadChargedCluster)
         listName = mother->getFullName();
+      // Kinks get the label "kink"
+      else if (nProducts == 1)
+        listName = mother->getName() + ":kink";
       // V0s get the label "V0"
-      else if (nProducts > 0)
+      else if (nProducts > 1)
         listName = mother->getName() + ":V0";
 
       string antiListName = ParticleListName::antiParticleListName(listName);
@@ -201,6 +204,14 @@ void ParticleLoaderModule::initialize()
            || (abs(pdgCode) == abs(Const::photon.getPDGCode()) && m_addDaughters == true)))
         mdstSourceIsV0 = true;
 
+      // if we're not loading MCParticles, and we are loading kaon/pion/muon/charged sigmas with one daughter,
+      // then this decaystring is a kink
+      bool mdstSourceIsKink = false;
+      if (!m_useMCParticles && nProducts == 1 &&
+          (abs(pdgCode) == abs(Const::kaon.getPDGCode()) || abs(pdgCode) == abs(Const::pion.getPDGCode())
+           || abs(pdgCode) == abs(Const::muon.getPDGCode()) || abs(pdgCode) == abs(3222) || abs(pdgCode) == abs(3112)))
+        mdstSourceIsKink = true;
+
       if (mdstSourceIsV0) {
         if (nProducts == 2) {
           m_properties = m_decaydescriptor.getProperty() | mother->getProperty(); // only used for V0s
@@ -211,7 +222,7 @@ void ParticleLoaderModule::initialize()
                   << ". MDST source of the particle list is V0, DecayString should contain exactly two daughters, as well as the mother particle.");
         }
       } else {
-        if (nProducts > 0) {
+        if (!mdstSourceIsKink && nProducts > 0) {
           if (m_useROEs or m_useDummy) {
             B2INFO("ParticleLoaderModule: Replacing the source particle list name by " <<
                    m_decaydescriptor.getDaughter(0)->getMother()->getFullName()
@@ -249,8 +260,13 @@ void ParticleLoaderModule::initialize()
       } else {
         bool chargedFSP = Const::chargedStableSet.contains(Const::ParticleType(abs(pdgCode)));
         if (chargedFSP) {
-          B2INFO("   -> MDST source: Tracks");
-          m_Tracks2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+          if (!mdstSourceIsKink) {
+            B2INFO("   -> MDST source: Tracks");
+            m_Tracks2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+          } else {
+            B2INFO("   -> MDST source: Kinks");
+            m_Kink2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+          }
         }
 
         if (abs(pdgCode) == abs(Const::photon.getPDGCode())) {
@@ -304,6 +320,8 @@ void ParticleLoaderModule::event()
     tracksToParticles();
     eclAndKLMClustersToParticles();
     v0sToParticles();
+    kinksToParticles();
+
   }
 }
 
@@ -605,6 +623,75 @@ void ParticleLoaderModule::v0sToParticles()
     }
 
     plist->setEditable(false); // set the :V0 list as not editable.
+  }
+}
+
+void ParticleLoaderModule::kinksToParticles()
+{
+
+  if (m_Kink2Plists.empty()) // nothing to do
+    return;
+
+  // loop over all ParticleLists
+  for (size_t ilist = 0; ilist < m_Kink2Plists.size(); ilist++) {
+    auto kink2Plist = m_Kink2Plists[ilist];
+    string listName = get<c_PListName>(kink2Plist);
+    string antiListName = get<c_AntiPListName>(kink2Plist);
+    int pdgCode = get<c_PListPDGCode>(kink2Plist);
+    bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(kink2Plist);
+
+    StoreObjPtr<ParticleList> plist(listName);
+    // since a particle list in the ParticleLoader always contains all possible objects
+    // we check whether it already exists in this path and can skip any further steps if it does
+    if (plist.isValid())
+      continue;
+    plist.create();
+    plist->initialize(pdgCode, listName);
+
+    if (!isSelfConjugatedParticle) {
+      StoreObjPtr<ParticleList> antiPlist(antiListName);
+      antiPlist.create();
+      antiPlist->initialize(-1 * pdgCode, antiListName);
+
+      antiPlist->bindAntiParticleList(*(plist));
+    }
+
+    plist->setEditable(true); // :kink list is originally reserved. we have to set it as editable.
+
+    // load reconstructed Kinks according to requested mother hypothesis
+    for (int i = 0; i < m_kinks.getEntries(); i++) {
+      const Kink* kink = m_kinks[i];
+
+      Const::ChargedStable motherType(abs(pdgCode));
+      const Track* motherTrack = kink->getMotherTrack();
+      const TrackFitResult* motherTrackFit = kink->getMotherTrackFitResultStart();
+
+      int motherCharge = motherTrackFit->getChargeSign();
+      if (motherCharge == 0) {
+        B2DEBUG(19, "Kink track with charge = 0 skipped!");
+        continue;
+      }
+
+      const auto& motherMCParticleWithWeight = motherTrack->getRelatedToWithWeight<MCParticle>();
+      const PIDLikelihood* motherPID = motherTrack->getRelated<PIDLikelihood>();
+
+      // a particle object creation from kink mother with the correct option
+      Particle kinkP(kink, motherType, kink->getTrackFitResultIndexMotherStart());
+
+      // append the particle to the Particle StoreArray
+      Particle* newPart = m_particles.appendNew(kinkP);
+
+      if (motherPID)
+        newPart->addRelationTo(motherPID);
+      if (motherMCParticleWithWeight.first)
+        newPart->addRelationTo(motherMCParticleWithWeight.first, motherMCParticleWithWeight.second);
+      newPart->writeExtraInfo("kinkDaughterPDGCode", m_decaydescriptor.getDaughter(0)->getMother()->getPDGCode());
+
+      // add the new particle to the ParticleList
+      plist->addParticle(newPart);
+    }
+
+    plist->setEditable(false); // set the :kink list as not editable.
   }
 }
 

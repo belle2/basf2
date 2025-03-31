@@ -249,15 +249,6 @@ namespace Belle2 {
     /** carries all nodes */
     std::unordered_map<NodeID, Node*> m_nodeMap;
 
-    /** temporal storage for last outer node added, used for speed-up */
-    NodeID m_lastOuterNodeID;
-
-    /** temporal storage for last inner node added, used for speed-up */
-    NodeID m_lastInnerNodeID;
-
-    /** keeps track of the state of the network to fill the vectors m_nodes, m_outerEnds, m_innerEnds only if required */
-    bool m_isFinalized;
-
     /** After the network is finalized this vector will also carry all nodes to be able to keep the old interface.
      * This shouldn't affect the performance drastically in comparison to directly accessing the nodeMap.
      */
@@ -270,5 +261,15 @@ namespace Belle2 {
     /** keeps track of current innerEnds (nodes which have no innerNodes)
      *  entries are the NodeIds of the nodes which currently form an innermost node */
     std::vector<Node*> m_innerEnds;
+
+    /** temporal storage for last outer node added, used for speed-up */
+    NodeID m_lastOuterNodeID;
+
+    /** temporal storage for last inner node added, used for speed-up */
+    NodeID m_lastInnerNodeID;
+
+    /** keeps track of the state of the network to fill the vectors m_nodes, m_outerEnds, m_innerEnds only if required */
+    bool m_isFinalized;
+
   };
 }

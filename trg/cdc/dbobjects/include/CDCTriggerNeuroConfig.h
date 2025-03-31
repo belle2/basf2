@@ -101,14 +101,14 @@ namespace Belle2 {
       delete MLPs;
       datafile.Close();
     }
-    /** add some notes to the verison of MLPS  */
+    /** add some notes to the version of MLPS  */
     void setNNNotes(const std::string& notes)
     {
       if (notes.size() <= 255) {
         m_NNNotes = notes;
       }
     }
-    /** set bool wether ETF is used or not */
+    /** set bool whether ETF is used or not */
     void setUseETF(bool b)
     {
       m_useETF = b;
@@ -142,7 +142,7 @@ namespace Belle2 {
     std::vector<CDCTriggerMLP> getMLPs()     const  {return m_MLPs;}
     /**return neural network notes  */
     std::string getNNNotes()                 const  {return m_NNNotes;}
-    /** return bool wether ETF is used or not  */
+    /** return bool whether ETF is used or not  */
     bool getUseETF()                         const  {return m_useETF;}
     /**return notes on preprocessing  */
     std::string getPPNotes()                 const  {return m_PPNotes;}
@@ -164,7 +164,7 @@ namespace Belle2 {
     /** short field for notes */
     std::string m_NNNotes;
 
-    /** switch wether the ETF is used or the first priority time of the
+    /** switch whether the ETF is used or the first priority time of the
      * TSF is  used during preprocessing**/
     bool m_useETF = false;
 

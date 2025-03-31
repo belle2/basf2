@@ -134,7 +134,7 @@ namespace Belle2 {
       const float levelPrecision = 9.0;
       // Earlier version
       // const float levelPrecision = 10.5 - 0.24 * exp(-4.13118 * PrecisionUtil::convertRhoToPt(curv) + 2.74);
-      const float phi0Precision = 3.1415 / std::pow(2.0, levelPrecision + 1.0);
+      const float phi0Precision = M_PI / std::pow(2.0, levelPrecision + 1.0);
       const float impactPrecision = 0.0 * std::sqrt(CDCWireHit::c_simpleDriftLengthVariance);
       const float curvPrecision = 0.15 / std::pow(2.0, levelPrecision);
 

@@ -141,7 +141,7 @@ namespace Belle2 {
     /** AccessorParams of the StoreArray the relation points to. */
     AccessorParams m_storeTo;
 
-    /** Indicate wether the relation is valid. */
+    /** Indicate whether the relation is valid. */
     bool m_valid;
 
     /** Allow the RelationIndexManager to create instances. */

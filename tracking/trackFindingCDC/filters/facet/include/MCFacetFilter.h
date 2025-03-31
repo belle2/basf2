@@ -23,6 +23,10 @@ namespace Belle2 {
       using Super = MCSymmetric<BaseFacetFilter>;
 
     public:
+      /// Making expicit the Filter operator() to avoid [-Woverloaded-virtual=]
+      using Super::operator();
+
+    public:
       /**
        *  Constructor also setting the switch,
        *  if the reversed version of a facet (in comparison to MC truth) shall be accepted.

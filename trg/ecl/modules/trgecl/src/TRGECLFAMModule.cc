@@ -167,7 +167,7 @@ namespace Belle2 {
       // no-fit method = backup method 1
       obj_trgeclDigi->digitization01(TCDigiE, TCDigiT);
     } else if (_famMethod == 3) {
-      // orignal method = backup method 2
+      // original method = backup method 2
       obj_trgeclDigi->digitization02(TCDigiE, TCDigiT);
     }
     obj_trgeclDigi-> save(m_nEvent);
@@ -182,7 +182,7 @@ namespace Belle2 {
 
     if (_famMethod == 1) {obj_trgeclfit->  FAMFit01(TCDigiE, TCDigiT); } // fitting method
     else if (_famMethod == 2) {obj_trgeclfit->  FAMFit02(TCDigiE, TCDigiT); } // no-fit method = backup method 1
-    else if (_famMethod == 3) { obj_trgeclfit-> FAMFit03(TCDigiE, TCDigiT); } // orignal method = backup method 2
+    else if (_famMethod == 3) { obj_trgeclfit-> FAMFit03(TCDigiE, TCDigiT); } // original method = backup method 2
     obj_trgeclfit-> save(m_nEvent);
 
 

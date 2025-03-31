@@ -137,7 +137,7 @@ class TestSysVar(unittest.TestCase):
         n_variations = 50
         reweighter = Reweighter(n_variations=n_variations)
         thresholds = {11: ('electronID', 0.8)}
-        reweighter.add_pid_particle('', self.pid_tables, thresholds)
+        reweighter.add_pid_particle('', self.pid_tables, thresholds, sys_seed=42)
         reweighter.add_fei_particle('B0', self.fei_table, 0.01, None)
         local_data = self.user_data.copy(deep=True)
         reweighter.reweight(local_data)

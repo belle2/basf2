@@ -11,16 +11,13 @@
 
 //c, c++
 #include <iostream>
-#include <string>
 #include <iomanip>
 #include <vector>
 
 //root
 #include <TCanvas.h>
 #include <TMath.h>
-#include <TPad.h>
 #include <TString.h>
-#include <TFile.h>
 #include <TAxis.h>
 
 using namespace std;

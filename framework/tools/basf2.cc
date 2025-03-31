@@ -20,8 +20,6 @@
 #include <framework/core/Environment.h>
 #include <framework/core/DataFlowVisualization.h>
 #include <framework/core/MetadataService.h>
-#include <framework/core/Module.h>
-#include <framework/core/ModuleManager.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConfig.h>
@@ -35,7 +33,6 @@
 #include <csignal>
 #include <cstdlib>
 #include <iostream>
-#include <algorithm>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -263,7 +260,7 @@ int main(int argc, char* argv[])
         cmd.push_back(nullptr);
         //And call this thing. Execvp will not return if successful as the
         //current process will be replaced so we do not need to care about what
-        //happens if succesful
+        //happens if successful
         if (execvp(cmd[0], cmd.data()) == -1) {
           int errsv = errno;
           perror("Problem calling valgrind");

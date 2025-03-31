@@ -92,6 +92,15 @@ namespace Belle2 {
         return m_multiVarSet.find(varName);
       }
 
+      /**
+       *  Forward prefixed parameters of this findlet to the module parameter list.
+       */
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      {
+        Super::exposeParameters(moduleParamList, prefix);
+        m_multiVarSet.exposeParameters(moduleParamList, prefix);
+      }
+
     private:
       /// Container for the multiple variable sets.
       UnionVarSet<Object> m_multiVarSet;

@@ -18,19 +18,19 @@
 [INFO]  o) creating (anti-)ParticleList with name: mu+:all (mu-:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
+[INFO]  o) creating ParticleList with name: K_S0:V0
 [INFO]    -> MDST source: V0
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0:V0 (anti-Lambda0:V0)
 [INFO]    -> MDST source: V0
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_L0:all (K_L0:all)
+[INFO]  o) creating ParticleList with name: K_L0:all
 [INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:all (gamma:all)
+[INFO]  o) creating ParticleList with name: gamma:all
 [INFO]    -> MDST source: ECLClusters and KLMClusters
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: n0:all (anti-n0:all)
+[INFO]  o) creating ParticleList with name: n0
 [INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+:MC (e-:MC)
@@ -43,13 +43,13 @@
 [INFO]    -> MDST source: MCParticles
 [INFO]  o) creating (anti-)ParticleList with name: mu+:MC (mu-:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]  o) creating (anti-)ParticleList with name: K_S0:MC (K_S0:MC)
+[INFO]  o) creating ParticleList with name: K_S0:MC
 [INFO]    -> MDST source: MCParticles
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0:MC (anti-Lambda0:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]  o) creating (anti-)ParticleList with name: K_L0:MC (K_L0:MC)
+[INFO]  o) creating ParticleList with name: K_L0:MC
 [INFO]    -> MDST source: MCParticles
-[INFO]  o) creating (anti-)ParticleList with name: gamma:MC (gamma:MC)
+[INFO]  o) creating ParticleList with name: gamma:MC
 [INFO]    -> MDST source: MCParticles
 [INFO]  o) creating (anti-)ParticleList with name: n0:MC (anti-n0:MC)
 [INFO]    -> MDST source: MCParticles
@@ -58,7 +58,7 @@
 [INFO]  o) creating (anti-)ParticleList with name: D0:MC (anti-D0:MC)
 [INFO]    -> MDST source: MCParticles
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S):ROE (Upsilon(4S):ROE)
+[INFO]  o) creating ParticleList with name: Upsilon(4S):ROE
 [INFO]    -> MDST source: RestOfEvents
 [INFO] Number of ParticleLists to be studied: 10 
 [INFO] Number of ParticleLists to be studied: 12 
@@ -205,19 +205,19 @@ Total Number of Particles created in the DataStore: 20578625
 [INFO]  o) creating (anti-)ParticleList with name: mu+:all (mu-:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
+[INFO]  o) creating ParticleList with name: K_S0:V0
 [INFO]    -> MDST source: V0
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0:V0 (anti-Lambda0:V0)
 [INFO]    -> MDST source: V0
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_L0:all (K_L0:all)
+[INFO]  o) creating ParticleList with name: K_L0:all
 [INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:all (gamma:all)
+[INFO]  o) creating ParticleList with name: gamma:all
 [INFO]    -> MDST source: ECLClusters and KLMClusters
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: n0:all (anti-n0:all)
+[INFO]  o) creating ParticleList with name: n0
 [INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+:MC (e-:MC)
@@ -230,13 +230,13 @@ Total Number of Particles created in the DataStore: 20578625
 [INFO]    -> MDST source: MCParticles
 [INFO]  o) creating (anti-)ParticleList with name: mu+:MC (mu-:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]  o) creating (anti-)ParticleList with name: K_S0:MC (K_S0:MC)
+[INFO]  o) creating ParticleList with name: K_S0:MC
 [INFO]    -> MDST source: MCParticles
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0:MC (anti-Lambda0:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]  o) creating (anti-)ParticleList with name: K_L0:MC (K_L0:MC)
+[INFO]  o) creating ParticleList with name: K_L0:MC
 [INFO]    -> MDST source: MCParticles
-[INFO]  o) creating (anti-)ParticleList with name: gamma:MC (gamma:MC)
+[INFO]  o) creating ParticleList with name: gamma:MC
 [INFO]    -> MDST source: MCParticles
 [INFO]  o) creating (anti-)ParticleList with name: n0:MC (anti-n0:MC)
 [INFO]    -> MDST source: MCParticles
@@ -245,7 +245,7 @@ Total Number of Particles created in the DataStore: 20578625
 [INFO]  o) creating (anti-)ParticleList with name: D0:MC (anti-D0:MC)
 [INFO]    -> MDST source: MCParticles
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S):ROE (Upsilon(4S):ROE)
+[INFO]  o) creating ParticleList with name: Upsilon(4S):ROE
 [INFO]    -> MDST source: RestOfEvents
 [INFO] Number of ParticleLists to be studied: 10 
 [INFO] Number of ParticleLists to be studied: 12 

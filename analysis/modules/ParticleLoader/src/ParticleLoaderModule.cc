@@ -239,7 +239,10 @@ void ParticleLoaderModule::initialize()
         B2ERROR("The sourceParticleListName is not given. The charged ParticleList is required for the chargedCluster loading.");
 
       // add PList to corresponding collection of Lists
-      B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");
+      if (isSelfConjugatedParticle or (abs(pdgCode) == Const::neutron.getPDGCode() and not m_useMCParticles))
+        B2INFO(" o) creating ParticleList with name: " << listName);
+      else
+        B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");
       if (m_useROEs) {
         B2INFO("   -> MDST source: RestOfEvents");
         m_ROE2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);

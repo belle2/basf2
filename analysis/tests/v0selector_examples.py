@@ -22,7 +22,7 @@ class V0SelectorTest(unittest.TestCase):
     """Test to run all scripts in V0Selector. Will fail if no the directory is found."""
 
     #: list of the broken V0Selectors (to be removed when they are individually fixed)
-    broken_V0Selectors = ['TrainLambdaSelector.py']
+    broken_V0Selectors = []
     #: list of the V0Selectors whose output file name cannot be overwritten
     do_not_overwrite = ['CreateTrainData_Ks.py', 'CreateTrainData_Lambda.py']
 

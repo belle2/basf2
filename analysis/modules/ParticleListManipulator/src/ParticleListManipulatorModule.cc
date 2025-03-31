@@ -228,7 +228,7 @@ void ParticleListManipulatorModule::event()
 
 void ParticleListManipulatorModule::fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence, bool ignoreMotherFlavor)
 {
-  if (ignoreMotherFlavor) idSequence.push_back(abs(p->getPDGCode()));
+  if (ignoreMotherFlavor or abs(p->getPDGCode()) == Const::neutron.getPDGCode()) idSequence.push_back(abs(p->getPDGCode()));
   else idSequence.push_back(p->getPDGCode());
 
   if (p->getNDaughters() == 0) {

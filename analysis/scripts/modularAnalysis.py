@@ -962,10 +962,10 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
             # or a kink (if 1 daughter)
             # the particle loader automatically calls this "V0" or "kink", respectively, so we have to copy over
             # the list to name/format that user wants
-            if (decayDescriptor.getNDaughters() == 1) & (decayDescriptor.getMother().getLabel() != 'kink'):
+            if (decayDescriptor.getNDaughters() == 1) and (decayDescriptor.getMother().getLabel() != 'kink'):
                 copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':kink',
                          writeOut, path)
-            if (decayDescriptor.getNDaughters() > 1) & (decayDescriptor.getMother().getLabel() != 'V0'):
+            if (decayDescriptor.getNDaughters() > 1) and (decayDescriptor.getMother().getLabel() != 'V0'):
                 copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
         elif (decayDescriptor.getMother().getLabel() != 'all' and
               abs(decayDescriptor.getMother().getPDGCode()) != Belle2.Const.neutron.getPDGCode()):
@@ -1073,10 +1073,10 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
         # or a kink (if 1 daughter)
         # the particle loader automatically calls this "V0" or "kink", respectively, so we have to copy over
         # the list to name/format that user wants
-        if (decayDescriptor.getNDaughters() == 1) & (decayDescriptor.getMother().getLabel() != 'kink'):
+        if (decayDescriptor.getNDaughters() == 1) and (decayDescriptor.getMother().getLabel() != 'kink'):
             copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':kink',
                      writeOut, path)
-        if (decayDescriptor.getNDaughters() > 1) & (decayDescriptor.getMother().getLabel() != 'V0'):
+        if (decayDescriptor.getNDaughters() > 1) and (decayDescriptor.getMother().getLabel() != 'V0'):
             copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut,
                      path)
     elif (decayDescriptor.getMother().getLabel() != 'all' and

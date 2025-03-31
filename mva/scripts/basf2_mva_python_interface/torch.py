@@ -12,7 +12,7 @@
 import tempfile
 import pathlib
 import numpy as np
-import torch
+import torch as pytorch
 
 
 class State(object):
@@ -42,7 +42,7 @@ def feature_importance(state):
     return []
 
 
-class myModel(torch.nn.Module):
+class myModel(pytorch.nn.Module):
     """
     My dense neural network
     """
@@ -55,13 +55,13 @@ class myModel(torch.nn.Module):
         super(myModel, self).__init__()
 
         #: a dense model with one hidden layer
-        self.network = torch.nn.Sequential(
-            torch.nn.Linear(number_of_features, 128),
-            torch.nn.ReLU(),
-            torch.nn.Linear(128, 128),
-            torch.nn.ReLU(),
-            torch.nn.Linear(128, 1),
-            torch.nn.Sigmoid(),
+        self.network = pytorch.nn.Sequential(
+            pytorch.nn.Linear(number_of_features, 128),
+            pytorch.nn.ReLU(),
+            pytorch.nn.Linear(128, 128),
+            pytorch.nn.ReLU(),
+            pytorch.nn.Linear(128, 1),
+            pytorch.nn.Sigmoid(),
         )
 
     def forward(self, x):
@@ -83,11 +83,11 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     if parameters is None:
         parameters = {}
 
-    state.optimizer = torch.optim.SGD(state.model.parameters(), parameters.get('learning_rate', 1e-3))
+    state.optimizer = pytorch.optim.SGD(state.model.parameters(), parameters.get('learning_rate', 1e-3))
 
     # we recreate the loss function on each batch so that we can pass in the weights
     # this is a weird feature of how torch handles event weights
-    state.loss_fn = torch.nn.BCELoss
+    state.loss_fn = pytorch.nn.BCELoss
 
     return state
 
@@ -98,9 +98,9 @@ def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     # transform to torch tensor and store the validation sample for later use
     device = "cpu"
-    state.Xtest = torch.from_numpy(Xtest).to(device)
-    state.ytest = torch.from_numpy(ytest).to(device)
-    state.wtest = torch.from_numpy(wtest).to(device)
+    state.Xtest = pytorch.from_numpy(Xtest).to(device)
+    state.ytest = pytorch.from_numpy(ytest).to(device)
+    state.wtest = pytorch.from_numpy(wtest).to(device)
     return state
 
 
@@ -117,9 +117,9 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     """
     # transform to torch tensor
     device = "cpu"
-    tensor_x = torch.from_numpy(X).to(device)
-    tensor_y = torch.from_numpy(y).to(device).type(torch.float)
-    tensor_w = torch.from_numpy(w).to(device)
+    tensor_x = pytorch.from_numpy(X).to(device)
+    tensor_y = pytorch.from_numpy(y).to(device).type(pytorch.float)
+    tensor_w = pytorch.from_numpy(w).to(device)
 
     # Compute prediction and loss
     loss_fn = state.loss_fn(weight=tensor_w)
@@ -139,11 +139,11 @@ def partial_fit(state, X, S, y, w, epoch, batch):
         if len(state.ytest) > 0:
             # run the validation set:
             state.model.eval()
-            with torch.no_grad():
+            with pytorch.no_grad():
                 test_pred = state.model(state.Xtest)
             test_loss_fn = state.loss_fn(weight=state.wtest)
             test_loss = test_loss_fn(test_pred, state.ytest).item()
-            test_correct = (test_pred.round() == state.ytest).type(torch.float).sum().item()
+            test_correct = (test_pred.round() == state.ytest).type(pytorch.float).sum().item()
 
             print(f"Epoch: {epoch-1:04d},\t Training Cost: {np.mean((state.avg_costs)):.4f},"
                   f"\t Testing Cost: {test_loss:.4f}, \t Testing Accuracy: {test_correct/len(state.ytest)}")
@@ -165,8 +165,8 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    with torch.no_grad():
-        r = state.model(torch.from_numpy(X)).detach().numpy()
+    with pytorch.no_grad():
+        r = state.model(pytorch.from_numpy(X)).detach().numpy()
     if r.shape[1] == 1:
         r = r[:, 0]  # cannot use squeeze because we might have output of shape [1,X classes]
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
@@ -187,10 +187,7 @@ def load(obj):
             with open(path, 'w+b') as file:
                 file.write(bytes(obj[1][file_index]))
 
-        # state = get_model(*args, **kwargs)
-        # model = torch.jit.load(temp_path.joinpath(file_names[0]))
-        # model.load_state_dict(torch.load(temp_path.joinpath(file_names[0])))
-        model = torch.load(temp_path.joinpath(file_names[0]))
+        model = pytorch.load(temp_path.joinpath(file_names[0]))
         model.eval()  # sets dropout and batch norm layers to eval mode
         device = "cpu"
         model.to(device)
@@ -212,7 +209,7 @@ def end_fit(state):
 
         # this creates:
         # path/my_model.pt
-        torch.save(state.model, temp_path.joinpath('my_model.pt'))
+        pytorch.save(state.model, temp_path.joinpath('my_model.pt'))
 
         file_names = ['my_model.pt']
         files = []

@@ -2486,7 +2486,7 @@ Total Number of Particles created in the DataStore: 20578625
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleLists: n0:all (30+0) + anti-n0:all (0+0)
+[INFO]  ParticleLists: n0:all (30+0)
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
  flavorType=1 particleSource=2 particleTypeUsedForFit=0

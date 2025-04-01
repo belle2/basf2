@@ -85,8 +85,9 @@ void ParticleListManipulatorModule::initialize()
   // If people apply cuts or merge particle lists, the resulting particle lists are not allowed to have these names.
   // Otherwise, very dangerous bugs could be introduced.
   string listLabel = mother->getLabel();
-  // For final state particles we protect the label "all".
-  if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(m_pdgCode))) and listLabel == "all") {
+  // For final state particles, except for neutrons, we protect the label "all".
+  if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(m_pdgCode))) and listLabel == "all" and
+      abs(m_pdgCode) != Const::neutron.getPDGCode()) {
     B2FATAL("You have tried to create the list " << m_outputListName <<
             " but the label 'all' is forbidden for user-defined lists of final-state particles." <<
             " It could introduce *very* dangerous bugs.");

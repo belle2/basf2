@@ -1,6 +1,13 @@
 Changes in the analysis package in light-2503-ceres
 ---------------------------------------------------
 
+Lambda0 selector module
+++++++++++++++++++++++++
+* Add the new Lambda0 selector based on LightGBM with optimized hyperparameters (LambdaSelector.py)
+* The input features are the same as K_S0 selector except assign the pion mass to the proton of Lambda0 candidates (Mks_hypo)
+* The weight files (V0 selector and Ks veto) are uploaded in analysis_tools_light-2503-ceres
+* Apply three common cuts for Lamdba0 efficiency: 90%(standard),85%(loose),95%(tight)
+
 Kinematic Fitting tools
 +++++++++++++++++++++++
 * Added functionality to ParticleKinematicFitter module to change mass hypothesis for photons (eg to n0 or n0bar) used in the fit.
@@ -148,4 +155,5 @@ Charm Flavor Tagger
 * Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
   function ``charmFlavorTagger``) to ``CFT_ragdoll``. This value must be used for all releases as recent as
   light-2406-ragdoll and release-09.
+ 
   

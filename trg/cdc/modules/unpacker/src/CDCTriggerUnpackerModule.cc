@@ -631,6 +631,8 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            false);
   addParam("isDNN", m_isDNN,
            "flag to unpack DNN trigger data", false);
+  addParam("configName", m_neurotrigger_config_name,
+           "name of stored config, keep empty for neurotrigger config", (std::string)"");
 }
 
 void CDCTriggerUnpackerModule::initialize()
@@ -672,6 +674,9 @@ void CDCTriggerUnpackerModule::initialize()
     m_NeuroTracks.registerRelationTo(m_NNInput2DFinderTracks);
     m_NeuroTracks.registerRelationTo(m_NeuroInputs);
   }
+  //make datastore object for neurotrigger config
+  m_cdctriggerneuroconfig = std::make_unique<DBObjPtr<CDCTriggerNeuroConfig>>(m_neurotrigger_config_name);
+
   for (int iSL = 0; iSL < 9; iSL += 2) {
     if (m_unpackMerger) {
       const int nInnerMergers = std::accumulate(nMergers.begin(),
@@ -742,12 +747,12 @@ void CDCTriggerUnpackerModule::beginRun()
   m_exp = bevt->getExperiment();
   m_run = bevt->getRun();
 
-  if (not m_cdctriggerneuroconfig.isValid())
+  if (not m_cdctriggerneuroconfig->isValid())
     B2FATAL("CDCTriggerNeuroConfig is not valid.");
   if (m_useDB == true) {
-    B2DEBUG(2, "Load Neurotrigger configuration for network " << m_cdctriggerneuroconfig->getNNName() << " from database ");
+    B2DEBUG(2, "Load Neurotrigger configuration for network " << (*m_cdctriggerneuroconfig)->getNNName() << " from database ");
     B2DEBUG(10, padright("Name", 50) << padright("start", 10) << padright("end", 10) << padright("offset", 10));
-    for (auto x : m_cdctriggerneuroconfig->getB2Format()) {
+    for (auto x : (*m_cdctriggerneuroconfig)->getB2Format()) {
       B2DEBUG(10, padright(x.name, 48) << ": " << padright(std::to_string(x.start), 10) <<  padright(std::to_string(x.end),
               10) << padright(std::to_string(x.offset), 10));
     }
@@ -883,10 +888,10 @@ void CDCTriggerUnpackerModule::event()
       if (m_isDNN) {
         //std::cout<<"This is decode IO"<<std::endl;
         decodeDNNIO(&m_bitsDNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NNInputTSHitsAll, &m_NeuroInputs, m_ETFTime,
-                    m_cdctriggerneuroconfig, m_sim13dt);
+                    *m_cdctriggerneuroconfig, m_sim13dt);
       } else {
         decodeNNIO(&m_bitsNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NNInputTSHitsAll, &m_NeuroInputs, m_ETFTime,
-                   m_cdctriggerneuroconfig, m_sim13dt);
+                   *m_cdctriggerneuroconfig, m_sim13dt);
       }
     } else {
       decodeNNIO_old(&m_bitsNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs);

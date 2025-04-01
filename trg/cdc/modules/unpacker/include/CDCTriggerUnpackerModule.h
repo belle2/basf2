@@ -367,12 +367,14 @@ namespace Belle2 {
     std::string m_neuro_in_etf_name;
     /*name for unpacked Neurotrigger scaled input array*/
     std::string m_neuro_scaled_input_name;
+    /*name for config saved in datastore*/
+    std::string m_neurotrigger_config_name;
     /** vector holding the pointers to all the dynamically allocated SubTriggers */
     std::vector<SubTrigger*> m_subTrigger;
     //condition database for number of TS in 2D
     DBObjPtr<CDCTrigger2DConfig> m_dbn2DTS;
     /** current neurotrigger config from database; used for unscaling network target */
-    DBObjPtr<CDCTriggerNeuroConfig> m_cdctriggerneuroconfig;
+    std::unique_ptr<DBObjPtr<CDCTriggerNeuroConfig>> m_cdctriggerneuroconfig;
     /** output scale for the neural network output */
     std::vector<float> m_NNOutputScale;
     /** fake object to assign the user set scaling values to */

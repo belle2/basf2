@@ -34,6 +34,8 @@ int HistoRelay2::collect()
   //  printf ( "HistoRelay2 : collect!!\n" );
   EvtMessage* msg = StreamFile(m_filename);
 
+  if (!msg) return 1; // error indicator
+
   auto ret = m_sock->send(msg);
 
   delete (msg);

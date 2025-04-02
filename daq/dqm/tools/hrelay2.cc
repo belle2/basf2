@@ -29,11 +29,12 @@ int main(int argc, char** argv)
   HistoRelay2 hrelay2(file, dest, port);
 
   for (;;) {
-    // why not first collect and then sleep, is there arace condition?
-
-    sleep(interval);
     //    printf("hrelay2 : collecting histograms\n");
-    hrelay2.collect();
+    if (hrelay2.collect()) {
+      sleep(1); // just short if file is just updated
+    } else {
+      sleep(interval);
+    }
   }
 
 }

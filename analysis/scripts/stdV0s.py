@@ -20,7 +20,7 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
     a list of particles combined using the analysis ParticleCombiner module.
 
     The ParticleList is named ``K_S0:merged``. A vertex fit is performed and only
-    candidates with an invariant mass in the range :math:`0.450 < M < 0.550~GeV`,
+    candidates with an invariant mass in the range :math:`0.450 < M < 0.550~GeV` after the vertex fit,
     and for which the vertex fit did not fail, are kept.
 
     The vertex fitter can be selected among ``TreeFit``, ``KFit``, and ``Rave``.
@@ -75,7 +75,7 @@ def goodBelleKshort(path):
     Load the Belle goodKshort list. Creates a ParticleList named
     ``K_S0:legacyGoodKS``. A vertex fit is performed and only candidates that
     satisfy the :b2:var:`goodBelleKshort` criteria, with an invariant mass in the range
-    :math:`0.468 < M < 0.528~GeV`, and for which the vertex fit did not fail, are kept
+    :math:`0.468 < M < 0.528~GeV` after the vertex fit, and for which the vertex fit did not fail, are kept.
 
     Parameters:
         path (basf2.Path): the path to load the modules

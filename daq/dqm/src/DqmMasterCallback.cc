@@ -143,7 +143,7 @@ void DqmMasterCallback::stop(void)
   MsgHandler hdl(0);
   int numobjs = 0;
 
-  snprintf(outfile, sizeof(outfile), "DQMRC:SAVE:%s/%sdqm_histo_e%4.4dr%6.6d.root", m_histodir.c_str(), m_instance.c_str(), m_expno,
+  snprintf(outfile, sizeof(outfile), "DQMRC:SAVE:%s/%s_dqm_histo_e%4.4dr%6.6d.root", m_histodir.c_str(), m_instance.c_str(), m_expno,
            m_runno);
 
   TText rc_save(0, 0, outfile);

@@ -3,16 +3,7 @@ from ROOT import Belle2
 from reconstruction import add_reconstruction
 import rawdata
 
-# basf2.conditions.override_globaltags()
-# basf2.conditions.prepend_globaltag('data_processing_sproc5')
-basf2.conditions.append_globaltag('patch_main_release-08_flip_refit')
-basf2.conditions.append_globaltag('patch_main_release-08')
-basf2.conditions.append_globaltag('patch_main_release-07')
-basf2.conditions.append_globaltag('ecl_test')
-basf2.conditions.append_globaltag('Legacy_CollisionAxisCMS')
-basf2.conditions.append_globaltag('data_reprocessing_prompt')
-basf2.conditions.append_globaltag('online')
-
+basf2.conditions.append_globaltag('patch_main_release-09')
 
 nthreads = 30
 RecoTrackName = "RecoTracks"
@@ -120,7 +111,7 @@ main.add_module('CDCTriggerNeuroData',
                 NeuroTrackInputMode=False,
                 singleUse=True,
                 writeconfigFileName='',
-                configFileName='test_config_for_generate_nn_train_data.conf',
+                configFileName=Belle2.FileSystem.findFile('trg/cdc/examples/test_config_for_generate_nn_train_data.conf'),
                 SaveFakeTrack=True,
                 logLevel=basf2.LogLevel.DEBUG,  # show some debug output
                 debugLevel=500,

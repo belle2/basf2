@@ -55,16 +55,10 @@ int HistoRelay2::collect()
 EvtMessage* HistoRelay2::StreamFile(string& filename)
 {
   TFile* file = new TFile((std::string("/dev/shm/") + filename).c_str(), "read");
-  if (file == NULL) return NULL;
-  //  file->ls();
-  //  file->Print();
+  if (file == NULL || file->IsZombie()) return NULL;
   file->cd();
-  //  gDirectory->ls();
-  //  TList* keylist = file->GetListOfKeys();
-  //  keylist->ls();
   MsgHandler hdl(0);
   int numobjs = 0;
-  //  StreamHistograms ( file->GetDirectory(NULL), &hdl, numobjs );
   StreamHistograms(gDirectory, &hdl, numobjs);
   file->Close();
   delete file;
@@ -78,20 +72,15 @@ EvtMessage* HistoRelay2::StreamFile(string& filename)
 int HistoRelay2::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numobjs)
 {
   TList* keylist = curdir->GetListOfKeys();
-  //  keylist->ls();
 
   TIter nextkey(keylist);
   TKey* key = 0;
-  int nkeys [[maybe_unused]] = 0;
-  int nobjs [[maybe_unused]] = 0;
   while ((key = (TKey*)nextkey())) {
-    nkeys++;
     TObject* obj = curdir->FindObjectAny(key->GetName());
     if (obj->IsA()->InheritsFrom("TH1")) {
       TH1* h1 = (TH1*) obj;
       //      printf ( "Key = %s, entry = %f\n", key->GetName(), h1->GetEntries() );
       msg->add(h1, h1->GetName());
-      nobjs++;
       numobjs++;
     } else if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
       //      printf ( "New directory found  %s, Go into subdir\n", obj->GetName() );
@@ -99,13 +88,11 @@ int HistoRelay2::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numo
       //      m_msg->add(tdir, tdir->GetName());
       TText subdir(0, 0, tdir->GetName());
       msg->add(&subdir, "SUBDIR:" + string(obj->GetName())) ;
-      nobjs++;
       numobjs++;
       tdir->cd();
       StreamHistograms(tdir, msg, numobjs);
       TText command(0, 0, "COMMAND:EXIT");
       msg->add(&command, "SUBDIR:EXIT");
-      nobjs++;
       numobjs++;
       curdir->cd();
     }

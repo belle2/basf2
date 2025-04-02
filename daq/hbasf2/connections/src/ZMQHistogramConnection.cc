@@ -85,12 +85,7 @@ void ZMQHistoServerToFileOutput::mergeAndSend(const std::map<std::string, Histog
 
   log("last_written_file_name", outputFileName);
 
-  {
-    if (!std::filesystem::copy_file("/dev/shm/tmp_" + m_dqmMemFileName, "/dev/shm/" + m_dqmMemFileName,
-                                    std::filesystem::copy_options::overwrite_existing)) {
-      perror("Rename shm file failed ");
-    }
-  }
+  std::filesystem::rename("/dev/shm/tmp_" + m_dqmMemFileName, "/dev/shm/" + m_dqmMemFileName);
 }
 
 void ZMQHistoServerToFileOutput::handleIncomingData()
@@ -111,10 +106,7 @@ void ZMQHistoServerToFileOutput::clear()
     B2ASSERT("Writing to shared memory failed! ", ("/dev/shm/tmp_" + m_dqmMemFileName).c_str());
   }
   memFile.Close();
-  if (!std::filesystem::copy_file("/dev/shm/tmp_" + m_dqmMemFileName, "/dev/shm/" + m_dqmMemFileName,
-                                  std::filesystem::copy_options::overwrite_existing)) {
-    perror("Rename shm file failed ");
-  }
+  std::filesystem::rename("/dev/shm/tmp_" + m_dqmMemFileName, "/dev/shm/" + m_dqmMemFileName);
 }
 
 ZMQHistoServerToZMQOutput::ZMQHistoServerToZMQOutput(const std::string& outputAddress, const std::shared_ptr<ZMQParent>& parent) :

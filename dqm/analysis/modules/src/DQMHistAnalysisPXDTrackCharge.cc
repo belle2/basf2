@@ -213,22 +213,30 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       m_hTrackedClusters->SetFillColor(kWhite);
       m_hTrackedClusters->SetStats(kFALSE);
       m_hTrackedClusters->SetLineStyle(1);// 2 or 3
-      m_hTrackedClusters->SetLineColor(kBlue);
+      m_hTrackedClusters->SetLineColor(kBlack);
       m_hTrackedClusters->Draw("hist");
 
       // get ref histogram
       auto href2 = findRefHist(name); // no scaling!
+      // TODO: we would expect that it changes with luminosity and maybe beam condition, but not clear how to factor this out. simple scaling seems not the right way.
       if (href2) {
         href2->SetLineStyle(3);// 2 or 3
-        href2->SetLineColor(kBlack);
+        href2->SetLineColor(kBlue);
         href2->Draw("same,hist");
       }
 
-      // keep this commented code as we may have excluded modules in phase4
-//       auto tt = new TLatex(5.5, 0, " 1.3.2 Module is excluded, please ignore");
-//       tt->SetTextAngle(90);// Rotated
-//       tt->SetTextAlign(12);// Centered
-//       tt->Draw();
+      for (auto& it : m_excluded) {
+        static std::map <int, TLatex*> ltmap;
+        auto tt = ltmap[it];
+        if (!tt) {
+          tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+          tt->SetTextSize(0.035);
+          tt->SetTextAngle(90);// Rotated
+          tt->SetTextAlign(12);// Centered
+          ltmap[it] = tt;
+        }
+        tt->Draw();
+      }
 
       UpdateCanvas(m_cTrackedClusters);
     }

@@ -252,6 +252,7 @@ class Particle:
                 basf2.B2FATAL(f'Variable {v} contains both '+'{}'+f' and {matches}. Only one is allowed!')
             elif len(matches) > 0:
                 ranges = []
+                skip = False
                 for match in matches:
                     tempRange = match[1:-1].split('..')
                     if tempRange[0] == '':
@@ -259,14 +260,20 @@ class Particle:
                     else:
                         tempRange[0] = int(tempRange[0])
                         if tempRange[0] >= len(daughters):
-                            basf2.B2FATAL(f'Variable {v} contains index {tempRange[0]} which is more than daughters!')
+                            basf2.B2WARNING(f'Variable {v} contains index {tempRange[0]} which is more than daughters, skipping!')
+                            skip = True
+                            break
                     if tempRange[1] == '':
                         tempRange[1] = len(daughters)
                     else:
                         tempRange[1] = int(tempRange[1])
                         if tempRange[1] > len(daughters):
-                            basf2.B2FATAL(f'Variable {v} contains index {tempRange[1]} which is more than daughters!')
+                            basf2.B2WARNING(f'Variable {v} contains index {tempRange[1]} which is more than daughters, skipping!')
+                            skip = True
+                            break
                     ranges.append(tempRange)
+                if skip:
+                    continue
                 if len(ranges) == 1:
                     mvaVars += [v.replace(matches[0], str(c)) for c in range(ranges[0][0], ranges[0][1])]
                 else:

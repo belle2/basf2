@@ -589,10 +589,11 @@ class PostReconstruction:
                              'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
                 variables += particle.mvaConfig.spectators
 
-                if 'B' in particle.name and 'Mbc' not in variables:
-                    variables += ['Mbc']
-                if 'B_s0' != particle.name and 'cosThetaBetweenParticleAndNominalB' not in variables:
-                    variables += ['cosThetaBetweenParticleAndNominalB']
+                if 'B' in particle.name:
+                    if 'Mbc' not in variables:
+                        variables += ['Mbc']
+                    if 'B_s0' != particle.name and 'cosThetaBetweenParticleAndNominalB' not in variables:
+                        variables += ['cosThetaBetweenParticleAndNominalB']
 
                 filename = os.path.join(self.config.monitoring_path, 'Monitor_Final.root')
                 ma.variablesToNtuple(

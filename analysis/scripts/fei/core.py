@@ -247,7 +247,7 @@ class TrainingData:
                     inverseSamplingRates[0] = int(nBackground / Teacher.MaximumNumberOfMVASamples) + 1
                 else:
                     inverseSamplingRates[0] = 1
-                inverseSamplingRates[0] = int(inverseSamplingRates[0] * channel.bkgSamplingFactor)
+                inverseSamplingRates[0] = int(inverseSamplingRates[0] * channel.preCutConfig.bkgSamplingFactor)
                 if inverseSamplingRates[0] == 0:
                     inverseSamplingRates[0] = 1
 

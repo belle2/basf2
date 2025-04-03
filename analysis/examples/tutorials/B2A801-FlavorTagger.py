@@ -89,6 +89,8 @@ ma.buildRestOfEvent(target_list_name='B0:sig', fillWithMostLikely=True,
                     path=cp_val_path)
 
 b2.conditions.append_globaltag(ma.getAnalysisGlobaltag())
+# Global tag containing the PIDNN weigh files is needed. Name of global tag: ‘pid_nn_<release>’
+b2.conditions.prepend_globaltag('pid_nn_release08_v1')
 
 # The default working directory is '.'
 # Note that if you also train by yourself the weights of the trained Methods are saved therein.

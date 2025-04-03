@@ -162,29 +162,18 @@ void DQMHistAnalysisPXDTrackChargeModule::beginRun()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: beginRun called.");
 
-  m_cCharge->Clear();
+  if (m_cCharge) m_cCharge->Clear();
+  if (m_cTrackedClusters) m_cTrackedClusters->Clear();
 }
 
 void DQMHistAnalysisPXDTrackChargeModule::event()
 {
-  if (!m_cCharge) return;
-
   gStyle->SetOptStat(0);
   gStyle->SetStatStyle(1);
   gStyle->SetOptDate(22);// Date and Time in Bottom Right, does no work
 
-  bool enough = false;
-
-//   auto landau = m_rfws->pdf("landau");
-//   auto gauss = m_rfws->pdf("gauss");
-  auto model = m_rfws->pdf("lxg");
-
-  auto ml = m_rfws->var("ml");
-//   auto sl = m_rfws->var("sl");
-//   auto mg = m_rfws->var("mg");
-//   auto sg = m_rfws->var("sg");
-
-  {
+  if (m_cTrackedClusters and m_hTrackedClusters) { // tracked clusters
+    // we already have a plot, but we need to rearrange the X labels in a new plot and scale to events
     std::string name = "Tracked_Clusters"; // new name
     TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters", true);
     if (hh2) {// update only if histogram is updated
@@ -194,6 +183,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
       auto scale = hh2->GetBinContent(0);// overflow misused as event counter!
       if (scale > 0) {
+        auto iscale = 1. / scale;
         int j = 1;
         for (int i = 0; i < 64; i++) {
           auto layer = (((i >> 5) & 0x1) + 1);
@@ -203,7 +193,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
           auto id = Belle2::VxdID(layer, ladder, sensor);
           // Check if sensor exist
           if (Belle2::VXD::GeoCache::getInstance().validSensorID(id)) {
-            m_hTrackedClusters->SetBinContent(j, hh2->GetBinContent(i + 1) / scale);
+            m_hTrackedClusters->SetBinContent(j, hh2->GetBinContent(i + 1) * iscale);
             j++;
           }
         }
@@ -240,8 +230,20 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
       UpdateCanvas(m_cTrackedClusters);
     }
-  }
+  } // end of tracked clusters plot
 
+  bool enough = false;
+
+//   auto landau = m_rfws->pdf("landau");
+//   auto gauss = m_rfws->pdf("gauss");
+  auto model = m_rfws->pdf("lxg");
+
+  auto ml = m_rfws->var("ml");
+//   auto sl = m_rfws->var("sl");
+//   auto mg = m_rfws->var("mg");
+//   auto sg = m_rfws->var("sg");
+
+  if (!m_cCharge) return;
   m_gCharge->Set(0);
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {

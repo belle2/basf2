@@ -432,7 +432,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   setEpicsPV("Diff", diff);
 
   // FIXME: what is the acceptable limit?
-  auto status = makeStatus(any_enought_flag, fabs(data - 30) > 15. || diff > 8), fabs(data - 30.) > 20. || diff > 12);
+  auto status = makeStatus(any_enought_flag, fabs(data - 30) > 15. || diff > 8, fabs(data - 30.) > 20. || diff > 12);
   colorizeCanvas(m_cCharge, status);
 
   setEpicsPV("Status", status);

@@ -88,6 +88,8 @@ ma.buildRestOfEvent(target_list_name='B0:sig', fillWithMostLikely=True,
                     path=main)
 
 b2.conditions.append_globaltag(ma.getAnalysisGlobaltag())
+# Global tag containing the PIDNN weigh files is needed. Name of global tag: ‘pid_nn_<release>’
+b2.conditions.prepend_globaltag('pid_nn_release08_v1')
 
 
 # GNN Flavor Tagging Function. Default Expert mode to use the official weight files.

@@ -46,7 +46,6 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 80.);
 //   addParam("PeakBefore", m_peakBefore, "Range for fit before peak (positive)", 5.);
 //   addParam("PeakAfter", m_peakAfter, "Range for after peak", 40.);
-  addParam("ColorAlert", m_color, "Whether to show the color alert", true);
   addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: Constructor done.");
 }
@@ -232,7 +231,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     }
   } // end of tracked clusters plot
 
-  bool enough = false;
+  bool any_enought_flag = false;
 
 //   auto landau = m_rfws->pdf("landau");
 //   auto gauss = m_rfws->pdf("gauss");
@@ -306,24 +305,15 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       }
 
       // add coloring, cuts? based on fit, compare with ref?
-      canvas->Pad()->SetFrameFillColor(10);
-      if (m_color) {
-        if (hh1->GetEntries() < 100) {
-          // not enough Entries
-          canvas->Pad()->SetFillColor(kGray);
-        } else {
-          canvas->Pad()->SetFillColor(kGreen);
-        }
-      } else {
-        canvas->Pad()->SetFillColor(kWhite);// White
-      }
+      auto status = makeStatus(hh1->GetEntries() >= 100, false, false); // only statistics, no alarm (yet)
+      colorizeCanvas(canvas, status);
 
       canvas->Modified();
       canvas->Update();
       UpdateCanvas(canvas);
 
-      // means if ANY plot is > 100 entries, all plots are assumed to be o.k.
-      if (hh1->GetEntries() >= 1000) enough = true;
+      // means if ANY plot is > 100 entries, all plots are assumed to be o.k. from statistics
+      if (hh1->GetEntries() >= 1000) any_enought_flag = true;
     }
   }
 
@@ -415,7 +405,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
   double data = 0;
   double diff = 0;
-  if (m_gCharge && enough) {
+  if (m_gCharge && any_enought_flag) {
 //     double currentMin, currentMax;
     m_gCharge->Fit(m_fMean, "R");
     double mean = m_gCharge->GetMean(2);
@@ -441,29 +431,9 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   setEpicsPV("Mean", data);
   setEpicsPV("Diff", diff);
 
-  int status = 0;
-
-  if (!enough) {
-    // not enough Entries
-    m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
-    status = 0; // default
-  } else {
-    /// FIXME: what is the acceptable limit?
-    if (fabs(data - 30.) > 20. || diff > 12) {
-      m_cCharge->Pad()->SetFillColor(kRed);// Red
-      status = 4;
-    } else if (fabs(data - 30) > 15. || diff > 8) {
-      m_cCharge->Pad()->SetFillColor(kYellow);// Yellow
-      status = 3;
-    } else {
-      m_cCharge->Pad()->SetFillColor(kGreen);// Green
-      status = 2;
-    }
-
-    // FIXME overwrite for now
-    // m_cCharge->Pad()->SetFillColor(kGreen);// Green
-
-  }
+  // FIXME: what is the acceptable limit?
+  auto status = makeStatus(any_enought_flag, fabs(data - 30) > 15. || diff > 8), fabs(data - 30.) > 20. || diff > 12);
+  colorizeCanvas(m_cCharge, status);
 
   setEpicsPV("Status", status);
 }

@@ -182,7 +182,7 @@ PerigeeHelixAmbiguity CDCAxialStereoFusion::calcAmbiguity(const CDCSegment3D& se
     const Vector2D localRecoPos2D = recoPos2D - localOrigin2D;
     const Vector2D normal = localCircle->normal(localRecoPos2D);
     const CDCWire& wire = recoHit3D.getWire();
-    zeta += wire.getWireLine().sagMovePerZ(recoHit3D.getRecoZ()).dot(normal);
+    zeta += wire.getWireLine().sagMovePerZ(recoHit3D.getRecoZ()).Dot(normal);
   }
   zeta /= nHits;
 

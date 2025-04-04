@@ -37,8 +37,15 @@ namespace Belle2 {
       {
       }
 
+      // /// Constructor translating from a ROOT::Math::XYVector instance
+      // TODO / FIXME:
+      //   had to comment this explicit constructor because of compilation issues that I did not
+      //   fully understand nor really wanted to investigate and solve - just using the non-explicit
+      //   version solved all the issues, but for the future I think it would be better to solve this
+      //   issue and use the explicit constructor
+      // explicit Vector2D(const ROOT::Math::XYVector& xyVector)
       /// Constructor translating from a ROOT::Math::XYVector instance
-      explicit Vector2D(const ROOT::Math::XYVector& xyVector);
+      Vector2D(const ROOT::Math::XYVector& xyVector);
 
       /// Constructor from two coordinates
       Vector2D(const double x, const double y)
@@ -47,7 +54,7 @@ namespace Belle2 {
       {
       }
 
-      /// Assignment translating from a ROOT::Math::XYZVector instance
+      /// Assignment translating from a ROOT::Math::XYVector instance
       Vector2D& operator=(const ROOT::Math::XYVector& xyVector);
 
       /// Casting the back to ROOT::Math::XYVector seamlessly
@@ -414,6 +421,12 @@ namespace Belle2 {
         return Vector2D(x() - rhs.x(), y() - rhs.y());
       }
 
+      /// Returns a new vector as differenc of this and rhs
+      Vector2D operator-(const ROOT::Math::XYVector& rhs) const
+      {
+        return Vector2D(x() - rhs.X(), y() - rhs.Y());
+      }
+
       /// Calculates the component parallel to the given vector
       double parallelComp(const Vector2D& relativTo) const
       {
@@ -603,6 +616,11 @@ namespace Belle2 {
       {
         return m_x;
       }
+      /// Getter for the x coordinate
+      double X() const
+      {
+        return m_x;
+      }
       /// Setter for the x coordinate
       void setX(const double x)
       {
@@ -610,6 +628,11 @@ namespace Belle2 {
       }
       /// Getter for the y coordinate
       double y() const
+      {
+        return m_y;
+      }
+      /// Getter for the y coordinate
+      double Y() const
       {
         return m_y;
       }
@@ -673,6 +696,13 @@ namespace Belle2 {
       /// Memory for the second coordinate
       double m_y;
     };
+
+    /// non-memberfunction for subtracting a Vector2D from any generic Vector that implements .X() and .Y()
+    template<class Vector>
+    Vector2D operator- (const Vector& a, const Vector2D& b)
+    {
+      return Vector2D(a.X() - b.X(), a.Y() - b.Y());
+    }
 
     /// Output operator for debugging
     std::ostream& operator<<(std::ostream& output, const Vector2D& vector2D);

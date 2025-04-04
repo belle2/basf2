@@ -20,6 +20,8 @@
 
 #include <cdc/dataobjects/WireID.h>
 
+#include <Math/Vector2D.h>
+
 #include <utility>
 #include <iosfwd>
 #include <cassert>
@@ -208,7 +210,7 @@ namespace Belle2 {
       }
 
       /// The two dimensional reference position (z=0) of the underlying wire.
-      const Vector2D& getRefPos2D() const;
+      const ROOT::Math::XYVector& getRefPos2D() const;
 
       /// The three dimensional reference position of the underlying wire.
       const Vector3D& getRefPos3D() const;

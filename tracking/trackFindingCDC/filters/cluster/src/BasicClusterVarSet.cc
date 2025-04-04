@@ -51,7 +51,7 @@ bool BasicClusterVarSet::extract(const CDCWireHitCluster* ptrCluster)
     totalNNeighbors += nNeighbors;
 
     // hit position information
-    totalInnerDistance += wireHit->getRefPos2D().norm();
+    totalInnerDistance += wireHit->getRefPos2D().R();
 
     // Drift circle information
     double driftLength = wireHit->getRefDriftLength();

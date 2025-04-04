@@ -301,7 +301,7 @@ const CDCWire& CDCCalibrationCollectorModule::getIntersectingWire(const ROOT::Ma
     crosspoint = Vector3D(xyz);
   else {
     const CDCWire& oneWire = layer.getWire(1);
-    double newR = oneWire.getWirePos2DAtZ(xyz.Z()).norm();
+    double newR = oneWire.getWirePos2DAtZ(xyz.Z()).R();
     double arcLength = helixFit.getArcLength2DAtCylindricalR(newR);
     ROOT::Math::XYZVector xyzOnWire = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
     crosspoint = Vector3D(xyzOnWire);

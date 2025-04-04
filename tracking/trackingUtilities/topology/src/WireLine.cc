@@ -16,11 +16,14 @@ WireLine::WireLine(const Vector3D& forward,
                    const Vector3D& backward,
                    double sagCoeff)
   : m_refPos3D{(backward * forward.z() - forward * backward.z()) / (forward.z() - backward.z()) }
-  , m_nominalMovePerZ{(forward.xy() - backward.xy()) / (forward.z() - backward.z())}
   , m_forwardZ{forward.z()}
   , m_backwardZ{backward.z()}
   , m_sagCoeff(sagCoeff)
 {
+  m_refPos2D = ROOT::Math::XYVector(m_refPos3D.x(), m_refPos3D.y());
+  const double deltaZ = forward.z() - backward.z();
+  m_nominalMovePerZ = ROOT::Math::XYVector((forward.x() - backward.x()) / deltaZ, (forward.y() - backward.y()) / deltaZ);
+
   B2ASSERT("Wire reference position is not at 0", m_refPos3D.z() == 0);
 }
 
@@ -33,7 +36,7 @@ WireLine WireLine::movedBy(const Vector3D& offset) const
   return moved;
 }
 
-WireLine WireLine::movedBy(const Vector2D& offset) const
+WireLine WireLine::movedBy(const ROOT::Math::XYVector& offset) const
 {
   WireLine moved = *this;
   moved.m_refPos3D += offset;

@@ -79,7 +79,7 @@ void CDCWire::initialize(EWirePosition wirePosition, bool ignoreWireSag)
   double sagCoeff = ignoreWireSag ? 0 : cdcgp.getWireSagCoef(wirePosSet, iCLayer, iWire);
 
   m_wireLine = WireLine(forwardPos, backwardPos, sagCoeff);
-  m_refCylindricalR = getRefPos2D().norm();
+  m_refCylindricalR = getRefPos2D().R();
 
   /// used to check for odd stereo wires -- did not trigger in ages
   if (not isAxial() and (m_wireLine.tanTheta() == 0)) {

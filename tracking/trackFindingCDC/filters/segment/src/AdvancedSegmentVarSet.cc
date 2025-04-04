@@ -61,7 +61,7 @@ bool AdvancedSegmentVarSet::extract(const CDCSegment2D* segment)
     totalNNeighbors += nNeighbors;
 
     // hit position information
-    totalInnerDistance += wireHit.getRefPos2D().norm();
+    totalInnerDistance += wireHit.getRefPos2D().R();
 
     // Drift circle information
     double driftLength = wireHit.getRefDriftLength();

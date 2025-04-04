@@ -19,11 +19,12 @@
 #include <tracking/trackingUtilities/topology/EWirePosition.h>
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
 #include <cdc/dataobjects/WireID.h>
+
+#include <Math/Vector2D.h>
 
 #include <iostream>
 
@@ -180,7 +181,7 @@ namespace Belle2 {
       { return m_wireLine; }
 
       /// Gives the xy projected position of the wire at the given z coordinate
-      Vector2D getWirePos2DAtZ(const double z) const
+      ROOT::Math::XYVector getWirePos2DAtZ(const double z) const
       { return getWireLine().sagPos2DAtZ(z); }
 
       /// Gives position of the wire at the given z coordinate
@@ -217,7 +218,7 @@ namespace Belle2 {
        *  Getter for the wire reference position for 2D tracking
        *  Gives the wire's reference position projected to the xy plane.
        */
-      const Vector2D& getRefPos2D() const
+      const ROOT::Math::XYVector& getRefPos2D() const
       { return getWireLine().refPos2D(); }
 
       /**
@@ -240,11 +241,11 @@ namespace Belle2 {
       { return getWireLine().wireVector(); }
 
       /// Getter for the vector describing the nominal positional change in the xy plane per unit z.
-      Vector2D getMovePerZ() const
+      ROOT::Math::XYVector getMovePerZ() const
       { return getWireLine().nominalMovePerZ(); }
 
       /// Getter for the vector describing the real positional change in the xy plane per unit z at the z position of the wire .
-      Vector2D getMovePerZAtZ(double z) const
+      ROOT::Math::XYVector getMovePerZAtZ(double z) const
       { return getWireLine().sagMovePerZ(z); }
 
       /// Getter for the cylindrical radius at the wire reference position
@@ -253,7 +254,7 @@ namespace Belle2 {
 
       /// Getter for the closest distance to the beamline ( z-axes )
       double getMinCylindricalR() const
-      { return getWireLine().nominalPerigee2D().norm(); }
+      { return getWireLine().nominalPerigee2D().R(); }
 
       /// Getter for the nominal distance to the beamline ( z-axes ) at the forward joint point
       double getForwardCylindricalR() const

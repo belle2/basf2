@@ -272,7 +272,7 @@ namespace Belle2 {
       }
 
       /// Getter for the reference position of the wire.
-      const Vector2D& getRefPos2D() const
+      const ROOT::Math::XYVector& getRefPos2D() const
       {
         return getRLWireHit().getRefPos2D();
       }

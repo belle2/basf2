@@ -209,7 +209,7 @@ Index CDCWireHit::getStoreIHit() const
   return getHit() ? getHit()->getArrayIndex() : c_InvalidIndex;
 }
 
-const Vector2D& CDCWireHit::getRefPos2D() const
+const ROOT::Math::XYVector& CDCWireHit::getRefPos2D() const
 {
   return getWire().getRefPos2D();
 }

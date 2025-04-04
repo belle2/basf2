@@ -13,6 +13,8 @@
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
+#include <Math/Vector2D.h>
+
 #include <iosfwd>
 
 
@@ -181,7 +183,7 @@ namespace Belle2 {
       bool isAxial() const;
 
       /// The two dimensional reference position of the underlying wire.
-      const Vector2D& getRefPos2D() const;
+      const ROOT::Math::XYVector& getRefPos2D() const;
 
       /// The distance from the beam line at reference position of the underlying wire.
       double getRefCylindricalR() const;

@@ -569,6 +569,11 @@ namespace Belle2 {
       /// Memory for the third coordinate
       double m_z;
     };
+    // /// non-memberfunction for subtracting a Vector2D from a ROOT::Math::XYVector */
+    // Vector3D operator- (const ROOT::Math::XYZVector& a, const Vector3D& b)
+    // {
+    //   return Vector3D(a.X() - b.x(), a.Y() - b.y(), a.Z() - b.z());
+    // }
 
     /// Output operator for debugging
     std::ostream& operator<<(std::ostream& output, const Vector3D& vector3D);

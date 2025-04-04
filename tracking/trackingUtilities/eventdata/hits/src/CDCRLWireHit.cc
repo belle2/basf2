@@ -146,7 +146,7 @@ bool CDCRLWireHit::isAxial() const
   return getWire().isAxial();
 }
 
-const Vector2D& CDCRLWireHit::getRefPos2D() const
+const ROOT::Math::XYVector& CDCRLWireHit::getRefPos2D() const
 {
   return getWire().getRefPos2D();
 }

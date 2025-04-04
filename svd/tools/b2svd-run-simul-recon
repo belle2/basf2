@@ -70,7 +70,7 @@ if __name__ == "__main__":
         for gt in reversed(args.prepend_gt):
             b2c.prepend_globaltag(gt)
 
-    b2c.prepend_globaltag("svd_onlySVDinGeoConfiguration")
+    b2c.prepend_globaltag("user_casarosa_onlySVDinGeoConfiguration")
 
     bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
     if args.no_bkg:

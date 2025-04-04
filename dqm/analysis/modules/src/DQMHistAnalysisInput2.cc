@@ -63,7 +63,7 @@ void DQMHistAnalysisInput2Module::beginRun()
 
 void DQMHistAnalysisInput2Module::addToHistList(std::vector<TH1*>& inputHistList, std::string dirname, TKey* key)
 {
-  TH1* h = (TH1*)key->ReadObj();
+  auto h = (TH1*)key->ReadObj();
   if (h == nullptr) return; // would be strange, but better check
   std::string hname = h->GetName();
 
@@ -157,8 +157,7 @@ void DQMHistAnalysisInput2Module::event()
   // first check sub-directories
   pFile->cd();
   TIter next(pFile->GetListOfKeys());
-  TKey* key = NULL;
-  while ((key = (TKey*)next())) {
+  while (auto key = (TKey*)next()) {
     TClass* cl = gROOT->GetClass(key->GetClassName());
     if (cl->InheritsFrom("TDirectory")) {
       TDirectory* d = (TDirectory*)key->ReadObj();
@@ -167,11 +166,10 @@ void DQMHistAnalysisInput2Module::event()
       d->cd();
       TIter nextd(d->GetListOfKeys());
 
-      TKey* dkey;
-      while ((dkey = (TKey*)nextd())) {
-        TClass* dcl = gROOT->GetClass(dkey->GetClassName());
-        if (!dcl->InheritsFrom("TH1")) continue;
-        addToHistList(inputHistList, dirname, dkey);
+      while (auto dkey = (TKey*)nextd()) {
+        if (gROOT->GetClass(dkey->GetClassName())->InheritsFrom("TH1")) {
+          addToHistList(inputHistList, dirname, dkey);
+        }
       }
       pFile->cd();
     } else if (cl->InheritsFrom("TH1")) {

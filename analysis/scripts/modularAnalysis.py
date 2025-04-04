@@ -883,7 +883,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     * neutral final state particles
         - "gamma"           (input ``mdst`` type = ECLCluster)
         - "K_S0", "Lambda0" (input ``mdst`` type = V0)
-        - "K_L0"            (input ``mdst`` type = KLMCluster or ECLCluster)
+        - "K_L0", "n0"      (input ``mdst`` type = KLMCluster or ECLCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -909,6 +909,18 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
         klongs = ('K_L0', 'isFromKLM > 0')
         fillParticleLists([kaons, pions, klongs], path=mypath)
 
+    * Charged kinks final state particles (input ``mdst`` type = Kink)
+
+    Note:
+        To reconstruct charged particle kink you must specify the daughter.
+
+    For example, to load Kinks as :math:`K^- \\to \\pi^-\\pi^0` decays from Kinks:
+
+    .. code-block:: python
+
+        kinkKaons = ('K- -> pi-', yourCut)
+        fillParticleLists([kaons, pions, v0lambdas, kinkKaons], path=mypath)
+
 
     Parameters:
         decayStringsWithCuts (list): A list of python ntuples of (decayString, cut).
@@ -917,7 +929,9 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      If the input MDST type is V0 the whole
                                      decay chain needs to be specified, so that
                                      the user decides and controls the daughters
-                                     ' order (e.g. ``K_S0 -> pi+ pi-``)
+                                     ' order (e.g. ``K_S0 -> pi+ pi-``).
+                                     If the input MDST type is Kink the decay chain needs to be specified
+                                     with only one daughter (e.g. ``K- -> pi-``).
                                      The cut is the selection criteria
                                      to be added to the ParticleList. It can be an empty string.
         writeOut (bool):             whether RootOutput module should save the created ParticleList
@@ -944,14 +958,19 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
             raise ValueError("Invalid decay string")
         # need to check some logic to unpack possible scenarios
         if decayDescriptor.getNDaughters() > 0:
-            # ... then we have an actual decay in the decay string which must be a V0
-            # the particle loader automatically calls this "V0" so we have to copy over
+            # ... then we have an actual decay in the decay string which must be a V0 (if more than 1 daughter)
+            # or a kink (if 1 daughter)
+            # the particle loader automatically calls this "V0" or "kink", respectively, so we have to copy over
             # the list to name/format that user wants
-            if decayDescriptor.getMother().getLabel() != 'V0':
+            if (decayDescriptor.getNDaughters() == 1) and (decayDescriptor.getMother().getLabel() != 'kink'):
+                copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':kink',
+                         writeOut, path)
+            if (decayDescriptor.getNDaughters() > 1) and (decayDescriptor.getMother().getLabel() != 'V0'):
                 copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
-        elif decayDescriptor.getMother().getLabel() != 'all':
-            # then we have a non-V0 particle which the particle loader automatically calls "all"
-            # as with the special V0 case we have to copy over the list to the name/format requested
+        elif (decayDescriptor.getMother().getLabel() != 'all' and
+              abs(decayDescriptor.getMother().getPDGCode()) != Belle2.Const.neutron.getPDGCode()):
+            # then we have a non-V0/kink particle which the particle loader automatically calls "all"
+            # as with the special V0 and kink cases we have to copy over the list to the name/format requested
             copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
 
         # optionally apply a cut
@@ -984,7 +1003,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     * neutral final state particles
         - "gamma"           (input ``mdst`` type = ECLCluster)
         - "K_S0", "Lambda0" (input ``mdst`` type = V0)
-        - "K_L0"            (input ``mdst`` type = KLMCluster or ECLCluster)
+        - "K_L0", "n0"      (input ``mdst`` type = KLMCluster or ECLCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -1008,10 +1027,24 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
 
         fillParticleList('K_L0', 'isFromKLM > 0', path=mypath)
 
+    * Charged kinks final state particles (input ``mdst`` type = Kink)
+
+    .. note::
+        To reconstruct charged particle kink you must specify the daughter.
+
+    For example, to load Kinks as :math:`K^- \\to \\pi^-\\pi^0` decays from Kinks:
+
+    .. code-block:: python
+
+        fillParticleList('K- -> pi-', yourCut, path=mypath)
+
+
     Parameters:
         decayString (str):           Type of Particle and determines the name of the ParticleList.
                                      If the input MDST type is V0 the whole decay chain needs to be specified, so that
-                                     the user decides and controls the daughters' order (e.g. ``K_S0 -> pi+ pi-``)
+                                     the user decides and controls the daughters' order (e.g. ``K_S0 -> pi+ pi-``).
+                                     If the input MDST type is Kink the decay chain needs to be specified
+                                     with only one daughter (e.g. ``K- -> pi-``).
         cut (str):                   Particles need to pass these selection criteria to be added to the ParticleList
         writeOut (bool):             whether RootOutput module should save the created ParticleList
         path (basf2.Path):           modules are added to this path
@@ -1036,14 +1069,20 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     if not decayDescriptor.init(decayString):
         raise ValueError("Invalid decay string")
     if decayDescriptor.getNDaughters() > 0:
-        # ... then we have an actual decay in the decay string which must be a V0
-        # the particle loader automatically calls this "V0" so we have to copy over
+        # ... then we have an actual decay in the decay string which must be a V0 (if more than 1 daughter)
+        # or a kink (if 1 daughter)
+        # the particle loader automatically calls this "V0" or "kink", respectively, so we have to copy over
         # the list to name/format that user wants
-        if decayDescriptor.getMother().getLabel() != 'V0':
-            copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
-    elif decayDescriptor.getMother().getLabel() != 'all':
-        # then we have a non-V0 particle which the particle loader automatically calls "all"
-        # as with the special V0 case we have to copy over the list to the name/format requested
+        if (decayDescriptor.getNDaughters() == 1) and (decayDescriptor.getMother().getLabel() != 'kink'):
+            copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':kink',
+                     writeOut, path)
+        if (decayDescriptor.getNDaughters() > 1) and (decayDescriptor.getMother().getLabel() != 'V0'):
+            copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut,
+                     path)
+    elif (decayDescriptor.getMother().getLabel() != 'all' and
+          abs(decayDescriptor.getMother().getPDGCode()) != Belle2.Const.neutron.getPDGCode()):
+        # then we have a non-V0/kink particle which the particle loader automatically calls "all"
+        # as with the special V0 and kink cases we have to copy over the list to the name/format requested
         copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
 
     # optionally apply a cut
@@ -1540,7 +1579,7 @@ def applyEventCuts(cut, path, metavariables=None):
                    'sin', 'asin',
                    'exp', 'log', 'log10',
                    'min', 'max',
-                   'isNAN']
+                   'isNAN', 'ifNANgiveX']
     if metavariables:
         metavar_ids += metavariables
 
@@ -4446,6 +4485,26 @@ def getAnalysisGlobaltagB2BII() -> str:
     return recommended_b2bii_analysis_global_tag()
 
 
+def getECLKLID(particleList: str, variable='ECLKLID', path=None):
+    """
+    The function calculates the PID value for Klongs that are constructed from ECL cluster.
+
+    @param particleList     the input ParticleList
+    @param variable         the variable name for Klong ID
+    @param path             modules are added to this path
+    """
+
+    import b2bii
+
+    if b2bii.isB2BII():
+        B2ERROR("The ECL variables based Klong Identification is only available for Belle II data.")
+
+    from variables import variables
+    path.add_module('MVAExpert', listNames=particleList, extraInfoName='ECLKLID', identifier='ECLKLID')
+
+    variables.addAlias(variable, 'conditionalVariableSelector(isFromECL and PDG==130, extraInfo(ECLKLID), constant(NaN))')
+
+
 def getNbarIDMVA(particleList: str, path=None):
     """
     This function can give a score to predict if it is a anti-n0.
@@ -4553,7 +4612,7 @@ def updateMassHypothesis(particleList, pdg, writeOut=False, path=None):
 func_requiring_analysisGT = [
     correctTrackEnergy, scaleTrackMomenta, smearTrackMomenta, oldwritePi0EtaVeto, writePi0EtaVeto, lowEnergyPi0Identification,
     getBeamBackgroundProbability, getFakePhotonProbability, tagCurlTracks, applyChargedPidMVA, correctEnergyBias,
-    addPhotonEfficiencyRatioVariables, addPi0VetoEfficiencySystematics, getNbarIDMVA]
+    addPhotonEfficiencyRatioVariables, addPi0VetoEfficiencySystematics, getNbarIDMVA, getECLKLID]
 for _ in func_requiring_analysisGT:
     _.__doc__ += "\n    .. note:: This function (optionally) requires a payload stored in the analysis GlobalTag. "\
                     "Please append or prepend the latest one from `getAnalysisGlobaltag` or `getAnalysisGlobaltagB2BII`.\n"

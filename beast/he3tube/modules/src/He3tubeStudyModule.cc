@@ -174,7 +174,7 @@ void He3tubeStudyModule::event()
     }
   }
 
-  //initalize various counters
+  //initialize various counters
   double edepSum = 0;
   double edepSum_1H = 0;
   double edepSum_3H = 0;

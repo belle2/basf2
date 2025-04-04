@@ -317,7 +317,7 @@ namespace Belle2 {
                                                   i).Data(), l_airbox, false, 0);
               }
         */
-        //Create PIN plastic subtrate
+        //Create PIN plastic substrate
         /*
         h_hole = 0.6 / 2.*CLHEP::cm;
         sA_hole = 0.*deg;

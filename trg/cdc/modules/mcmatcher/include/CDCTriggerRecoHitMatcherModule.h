@@ -57,7 +57,7 @@ namespace Belle2 {
     StoreArray<MCParticle> m_mcParticles;
     /** list of MCParticles considered as trackable */
     StoreArray<MCParticle> m_mcTracks;
-    /** list of MCParticles where x and p is overriden with the matched RecoTrack values */
+    /** list of MCParticles where x and p is overridden with the matched RecoTrack values */
     StoreArray<MCParticle> m_recoTrackable;
     /** list of mdst Tracks */
     StoreArray<Track> m_mdstTracks;

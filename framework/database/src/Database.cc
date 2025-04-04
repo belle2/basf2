@@ -22,7 +22,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/DBStore.h>
-#include <framework/database/PayloadFile.h>
 
 #include <framework/database/PayloadProvider.h>
 #include <framework/database/MetadataProvider.h>

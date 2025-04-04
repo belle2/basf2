@@ -119,7 +119,7 @@ void ClawStudyModule::initialize()
 
   REG_HISTOGRAM
 
-  //get CLAWS paramters ie energy threshold
+  //get CLAWS parameters ie energy threshold
   getXMLData();
 }
 

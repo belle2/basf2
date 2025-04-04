@@ -257,7 +257,7 @@ void TPCStudyModule::getXMLData()
   m_ChipRowY = content.getDouble("ChipRowY");
   m_z_DG = content.getDouble("z_DG");
 
-  B2INFO("TpcDigitizer: Aquired tpc locations and gas parameters");
+  B2INFO("TpcDigitizer: Acquired tpc locations and gas parameters");
   B2INFO("              from MICROTPC.xml. There are " << nTPC << " TPCs implemented");
 
 }

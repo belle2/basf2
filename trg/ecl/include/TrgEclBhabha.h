@@ -37,7 +37,7 @@ namespace Belle2 {
     /** Copy constructor, deleted. */
     TrgEclBhabha(TrgEclBhabha&) = delete;
 
-    /** Assignement operator, deleted. */
+    /** Assignment operator, deleted. */
     TrgEclBhabha& operator=(TrgEclBhabha&) = delete;
 
   public:
@@ -92,7 +92,7 @@ namespace Belle2 {
     void setmumuThreshold(int mumuThreshold) {_mumuThreshold = mumuThreshold; }
     //! set mumu bit Angle selection
     void setmumuAngle(const std::vector<double>&  imumuAngle) {_mumuAngle = imumuAngle; }
-    //! set 3D Bhabha addtion Angle selection
+    //! set 3D Bhabha addition Angle selection
     void set3DBhabhaAddAngleCut(const std::vector<double>&  i3DBhabhaAddAngleCut)
     {
       m_3DBhabhaAddAngleCut = i3DBhabhaAddAngleCut;
@@ -144,7 +144,7 @@ namespace Belle2 {
       m_taub2b3CLELowCut    = iTaub2b3CLELowCut;
       m_taub2b3CLEHighCut   = iTaub2b3CLEHighCut;
     }
-    //! get trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
+    //! get trigger bit of flag(1bit) whether two clusters satisfy 3D Bhabha veto
     //! are in CDCTRG region in theta (="InTrack") or not
     int get3DBhabhaVetoInTrackFlag(void)
     {
@@ -310,7 +310,7 @@ namespace Belle2 {
     //! taub2b3 cluster energy cut3 (GeV)
     double m_taub2b3CLEHighCut;
 
-    //! trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
+    //! trigger bit of flag(1bit) whether two clusters satisfy 3D Bhabha veto
     //! are in CDCTRG region in theta (="InTrack") or not
     int                 m_3DBhabhaVetoInTrackFlag;
     //! TCIDs of two clusters of 3D Bhabha veto

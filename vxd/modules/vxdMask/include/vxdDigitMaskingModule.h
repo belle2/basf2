@@ -41,7 +41,7 @@ namespace Belle2 {
 
   private:
 
-    /** directory fo histograms name */
+    /** directory of histograms name */
     std::string m_histogramDirectoryName;
     /** PXDDigits StoreArray name */
     std::string m_storePXDDigitsName;

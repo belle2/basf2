@@ -11,7 +11,7 @@
 #############################################################
 # Python basf2 module to determine the multiplicities of a particle of a certain pdg code
 # (antiparticles not included) on generator level. We loop over the number of mcParticles and
-# count the number of particles of a certain pdg code. In addition, the mutiplicities are split
+# count the number of particles of a certain pdg code. In addition, the multiplicities are split
 # into categories depending on whether they originate from a B+/B-/B0/antiB0.
 # We need to write the information as extraInfo to reconstructed particles, hence the need for
 # a reco particle list as input.

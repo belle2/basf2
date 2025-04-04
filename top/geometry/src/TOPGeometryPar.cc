@@ -96,13 +96,13 @@ namespace Belle2 {
       }
       if ((*m_geoDB)->getWavelengthFilter().getName().empty()) {
         m_oldPayload = true;
-        B2WARNING("TOPGeometry: obsolete payload revision (pixel independent PDE) - please, check global tag");
+        B2ERROR("TOPGeometry: obsolete payload revision (pixel independent PDE) - please, check global tag");
       }
       if ((*m_geoDB)->getTTSes().empty()) {
-        B2WARNING("TOPGeometry: obsolete payload revision (nominal TTS only) - please, check global tag");
+        B2ERROR("TOPGeometry: obsolete payload revision (nominal TTS only) - please, check global tag");
       }
       if ((*m_geoDB)->arePDETuningFactorsEmpty()) {
-        B2WARNING("TOPGeometry: old payload revision (before bugfix and update of optical properties)");
+        B2ERROR("TOPGeometry: obsolete payload revision (before bugfix and update of optical properties) - please, check global tag");
       }
 
       // Make sure that we abort as soon as the geometry changes
@@ -136,6 +136,7 @@ namespace Belle2 {
       // add call backs for PMT data
       m_pmtInstalled.addCallback(this, &TOPGeometryPar::clearCache);
       m_pmtQEData.addCallback(this, &TOPGeometryPar::clearCache);
+      m_pulseHeights.addCallback(this, &TOPGeometryPar::clearCache);
 
       // print geometry if the debug level for 'top' is set 10000
       const auto& logSystem = LogSystem::Instance();
@@ -155,6 +156,7 @@ namespace Belle2 {
       m_envelopeQE.clear();
       m_pmts.clear();
       m_relEfficiencies.clear();
+      m_relPDEonMC.clear();
       m_pmtTypes.clear();
     }
 
@@ -236,6 +238,15 @@ namespace Belle2 {
 
       int id = getUniquePixelID(moduleID, pixelID);
       return m_relEfficiencies[id] * RQE * thrEffi;
+    }
+
+
+    double TOPGeometryPar::getRelativePDEonMC(int moduleID, int pixelID) const
+    {
+      if (m_relPDEonMC.empty()) prepareRelPDEonMC();
+
+      int id = getUniquePixelID(moduleID, pixelID);
+      return m_relPDEonMC[id];
     }
 
 
@@ -411,18 +422,50 @@ namespace Belle2 {
              << m_relEfficiencies.size());
     }
 
+    void TOPGeometryPar::prepareRelPDEonMC() const
+    {
+      m_relPDEonMC.clear();
+      if (m_relEfficiencies.empty()) prepareRelEfficiencies();
+
+      const auto* geo = getGeometry();
+
+      for (const auto& module : geo->getModules()) {
+        auto moduleID = module.getModuleID();
+        const auto& pmtArray = module.getPMTArray();
+        int numPMTs = pmtArray.getSize();
+        int numPMTPixels = pmtArray.getPMT().getNumPixels();
+        for (int pmtID = 1; pmtID <= numPMTs; pmtID++) {
+          double tuneFactor = getGeometry()->getPDETuningFactor(getPMTType(moduleID, pmtID));
+          for (int pmtPixel = 1; pmtPixel <= numPMTPixels; pmtPixel++) {
+            auto pixelID = pmtArray.getPixelID(pmtID, pmtPixel);
+            auto channel = getChannelMapper().getChannel(pixelID);
+            double thrEffi = 0.973; //TODO(rel-10) get rid of hard coding
+            if (m_pulseHeights->isCalibrated(moduleID, channel)) {
+              thrEffi = m_pulseHeights->getParameters(moduleID, channel).getThresholdEffi(40, 9.7); //TODO(rel-10) get rid of hard coding
+            }
+            int id = getUniquePixelID(moduleID, pixelID);
+            m_relPDEonMC[id] = m_relEfficiencies[id] * tuneFactor * thrEffi;
+          }
+        }
+      }
+
+      B2INFO("TOPGeometryPar: pixel relative PDE on MC have been set, size = " << m_relPDEonMC.size());
+    }
 
     double TOPGeometryPar::integralOfQE(const std::vector<float>& qe, double ce,
                                         double lambdaFirst, double lambdaStep) const
     {
       if (qe.empty()) return 0;
 
+      const auto* geo = getGeometry();
+      const auto& filter = geo->getWavelengthFilter();
+
       double s = 0;
       double lambda = lambdaFirst;
-      double f1 = qe[0] / (lambda * lambda);
+      double f1 = qe[0] * filter.getBulkTransmittance(lambda) / (lambda * lambda);
       for (size_t i = 1; i < qe.size(); i++) {
         lambda += lambdaStep;
-        double f2 = qe[i] / (lambda * lambda);
+        double f2 = qe[i] * filter.getBulkTransmittance(lambda) / (lambda * lambda);
         s += (f1 + f2) / 2;
         f1 = f2;
       }

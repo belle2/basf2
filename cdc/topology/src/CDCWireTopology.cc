@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireTopology.h>
 
 #include <tracking/trackingUtilities/utilities/Algorithms.h>
 
@@ -15,6 +15,7 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 CDCWireTopology& CDCWireTopology::getInstance()
@@ -35,7 +36,7 @@ void CDCWireTopology::initialize()
   m_wireSuperLayers.reserve(c_NSuperLayers);
 
   // create all wires
-  CDC::CDCGeometryPar& cdcGeo = CDC::CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcGeo = CDCGeometryPar::Instance();
   m_FirstLayerOffset = cdcGeo.getOffsetOfFirstLayer();
 
   for (size_t iCLayer = 0; iCLayer < cdcGeo.nWireLayers() ; ++iCLayer) {

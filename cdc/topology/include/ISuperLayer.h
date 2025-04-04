@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <cdc/topology/EStereoKind.h>
 
 #include <tracking/trackingUtilities/utilities/FunctorTag.h>
 
 #include <climits>
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
 
     /// The type of the layer and superlayer ids
     using ISuperLayer = signed short;
@@ -22,7 +22,7 @@ namespace Belle2 {
     /// Generic functor to get the superlayer id from an object.
     struct GetISuperLayer {
       /// Marker function for the isFunctor test
-      operator FunctorTag();
+      operator TrackingUtilities::FunctorTag();
 
       /// Returns the superlayer of an object.
       template<class T, class SFINAE = decltype(&T::getISuperLayer)>

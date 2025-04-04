@@ -10,7 +10,7 @@
 #include <tracking/trackingUtilities/numerics/Modulo.h>
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
 
     /// The type of the wire ids enumerating wires within a given layer
     using IWire = signed short;
@@ -32,7 +32,7 @@ namespace Belle2 {
        */
       static IWire wrappedAround(IWire iWire, IWire nWires)
       {
-        return moduloFast(iWire, nWires);
+        return TrackingUtilities::moduloFast(iWire, nWires);
       }
 
       /// Gets the next counter clockwise wire id properly wrapping near wire of highest index.

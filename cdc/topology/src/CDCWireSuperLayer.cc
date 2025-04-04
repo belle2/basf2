@@ -5,11 +5,12 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackingUtilities/topology/CDCWireSuperLayer.h>
+#include <cdc/topology/CDCWireSuperLayer.h>
 
 #include <tracking/trackingUtilities/numerics/Modulo.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 CDCWireSuperLayer::CDCWireSuperLayer(const ConstVectorRange<CDCWireLayer>& wireLayers)

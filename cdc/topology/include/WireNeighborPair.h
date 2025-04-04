@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackingUtilities/topology/WireNeighborKind.h>
+#include <cdc/topology/WireNeighborKind.h>
 #include <tracking/trackingUtilities/utilities/MayBePtr.h>
 #include <utility>
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
 
     class CDCWire;
 
@@ -23,20 +23,20 @@ namespace Belle2 {
      *  Hence you have to check before accessing the wires.
      */
     class WireNeighborPair
-      : public std::pair<MayBePtr<const CDCWire>, MayBePtr<const CDCWire> > {
+      : public std::pair<TrackingUtilities::MayBePtr<const CDCWire>, TrackingUtilities::MayBePtr<const CDCWire> > {
     public:
       /// Type of the base class
-      using Super = std::pair<MayBePtr<const CDCWire>, MayBePtr<const CDCWire> >;
+      using Super = std::pair<TrackingUtilities::MayBePtr<const CDCWire>, TrackingUtilities::MayBePtr<const CDCWire> >;
 
       /// Constructor from the base class
       using Super::Super;
 
       /// Getter for the first wire
-      MayBePtr<const CDCWire> getFirst() const
+      TrackingUtilities::MayBePtr<const CDCWire> getFirst() const
       { return this->first; }
 
       /// Getter for the second wire
-      MayBePtr<const CDCWire> getSecond() const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecond() const
       { return this->second; }
 
       /// Getter for the kind of neighbor hood relation the first wire has with the second

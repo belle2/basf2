@@ -8,7 +8,7 @@
 #pragma once
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
 
     /// The type of the layer ids enumerating layers within a superlayer.
     using ILayer = signed short;

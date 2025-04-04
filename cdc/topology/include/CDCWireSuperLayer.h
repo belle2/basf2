@@ -7,18 +7,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackingUtilities/topology/CDCWireLayer.h>
-#include <tracking/trackingUtilities/topology/WireNeighborPair.h>
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
-#include <tracking/trackingUtilities/topology/ILayer.h>
-#include <tracking/trackingUtilities/topology/IWire.h>
-#include <tracking/trackingUtilities/topology/WireNeighborKind.h>
-#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <cdc/topology/CDCWireLayer.h>
+#include <cdc/topology/WireNeighborPair.h>
+#include <cdc/topology/ISuperLayer.h>
+#include <cdc/topology/ILayer.h>
+#include <cdc/topology/IWire.h>
+#include <cdc/topology/WireNeighborKind.h>
+#include <cdc/topology/EStereoKind.h>
 #include <tracking/trackingUtilities/utilities/VectorRange.h>
 #include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
 
     /**
      *  Class representing a sense wire superlayer in the central drift chamber.
@@ -37,18 +37,18 @@ namespace Belle2 {
      *  it should be avoided.
      */
     class CDCWireSuperLayer
-      : public ConstVectorRange<CDCWireLayer> {
+      : public TrackingUtilities::ConstVectorRange<CDCWireLayer> {
 
     public:
       /// Type of the base class
-      using Super = ConstVectorRange<CDCWireLayer>;
+      using Super = TrackingUtilities::ConstVectorRange<CDCWireLayer>;
 
       /// Empty constructor for creating an empty dummy CDCWireSuperLayer for studies with a CDC with missing super layers
       CDCWireSuperLayer() : m_innerRefZ(0.0), m_outerRefZ(0.0), m_refTanLambda(0.0)
       {};
 
       /// Constructor taking the range of layers the superlayer shall contain. Use rather getInstance() to avoid instance constructions.
-      explicit CDCWireSuperLayer(const ConstVectorRange<CDCWireLayer>& wireLayers);
+      explicit CDCWireSuperLayer(const TrackingUtilities::ConstVectorRange<CDCWireLayer>& wireLayers);
 
       /// Disallow copy construction of wire super layers.
       CDCWireSuperLayer(const CDCWireSuperLayer& wireSuperLayer) = delete;
@@ -172,11 +172,11 @@ namespace Belle2 {
        *  Getter for the two closest neighbors in the given o'clock direction.
        *  Valid values for the o clock direction are 1, 3, 5, 7, 9, 11.
        */
-      MayBePtr<const CDCWire> getPrimaryNeighbor(short oClockDirection,
-                                                 ILayer iLayer,
-                                                 IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getPrimaryNeighbor(short oClockDirection,
+          ILayer iLayer,
+          IWire iWire) const
       {
-        oClockDirection = modulo(oClockDirection, 12);
+        oClockDirection = TrackingUtilities::modulo(oClockDirection, 12);
         switch (oClockDirection) {
           case 1:
             return getNeighborCWOutwards(iLayer, iWire);
@@ -202,27 +202,27 @@ namespace Belle2 {
       WireNeighborPair getNeighborsInwards(ILayer iLayer, IWire iWire) const;
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards by wire id and layer id with in this superlayer.
-      MayBePtr<const CDCWire> getNeighborCCWOutwards(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getNeighborCCWOutwards(ILayer iLayer, IWire iWire) const
       { return getNeighborsOutwards(iLayer, iWire).first; }  // not optimal since a second wire gets fetched additionally
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards by wire id and layer id with in this superlayer.
-      MayBePtr<const CDCWire> getNeighborCWOutwards(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getNeighborCWOutwards(ILayer iLayer, IWire iWire) const
       { return getNeighborsOutwards(iLayer, iWire).second; }  // not optimal since a second wire gets fetched additionally
 
       /// Getter for the nearest clockwise neighbor by wire id and layer id with in this superlayer.
-      MayBePtr<const CDCWire> getNeighborCW(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getNeighborCW(ILayer iLayer, IWire iWire) const
       { return &(getWireLayer(iLayer).getNeighborCW(iWire)); }
 
       /// Getter for the nearest counterclockwise neighbor by wire id and layer id with in this superlayer.
-      MayBePtr<const CDCWire> getNeighborCCW(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getNeighborCCW(ILayer iLayer, IWire iWire) const
       { return &(getWireLayer(iLayer).getNeighborCCW(iWire)); }
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards by wire id and layer id with in this superlayer.
-      MayBePtr<const CDCWire> getNeighborCCWInwards(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getNeighborCCWInwards(ILayer iLayer, IWire iWire) const
       { return getNeighborsInwards(iLayer, iWire).first; }  // not optimal since a second wire gets fetched additionally
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards by wire id and layer id with in this superlayer.
-      MayBePtr<const CDCWire> getNeighborCWInwards(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getNeighborCWInwards(ILayer iLayer, IWire iWire) const
       { return getNeighborsInwards(iLayer, iWire).second; }  // not optimal since a second wire gets fetched additionally
       /**@}*/
 
@@ -238,11 +238,11 @@ namespace Belle2 {
        *  In case the neighbor asked for does not exist, the functions return nullptr instead.
        */
       /**@{*/
-      MayBePtr<const CDCWire> getSecondaryNeighbor(short oClockDirection,
-                                                   ILayer iLayer,
-                                                   IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondaryNeighbor(short oClockDirection,
+          ILayer iLayer,
+          IWire iWire) const
       {
-        oClockDirection = modulo(oClockDirection, 12);
+        oClockDirection = TrackingUtilities::modulo(oClockDirection, 12);
         switch (oClockDirection) {
           case 0:
             return getSecondNeighborTwelveOClock(iLayer, iWire);
@@ -274,55 +274,55 @@ namespace Belle2 {
       }
 
       /// Getter for secondary neighbor at the one o'clock position
-      MayBePtr<const CDCWire> getSecondNeighborOneOClock(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondNeighborOneOClock(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer + 2) ? &(getWireLayer(iLayer + 2).getWireWrappedAround(iWire - 1)) : nullptr;  }
 
 
       /// Getter for secondary neighbor at the two o'clock position
-      MayBePtr<const CDCWire> getSecondNeighborTwoOClock(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondNeighborTwoOClock(ILayer iLayer, IWire iWire) const
       { return getNeighborCWOutwards(iLayer, iWire - 1); }
 
       /// Getter for secondary neighbor at the three o'clock position
-      MayBePtr<const CDCWire> getSecondNeighborThreeOClock(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondNeighborThreeOClock(ILayer iLayer, IWire iWire) const
       { return getNeighborCW(iLayer, iWire - 1); }
 
       /// Getter for secondary neighbor at the four o'clock position
-      MayBePtr<const CDCWire> getSecondNeighborFourOClock(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondNeighborFourOClock(ILayer iLayer, IWire iWire) const
       { return getNeighborCWInwards(iLayer, iWire - 1); }
 
 
       /// Getter for secondary neighbor at the five o'clock position
-      MayBePtr<const CDCWire> getSecondNeighborFiveOClock(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondNeighborFiveOClock(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer - 2) ? &(getWireLayer(iLayer - 2).getWireWrappedAround(iWire - 1)) : nullptr;  }
 
       /// Getter for secondary neighbor at the six o'clock position
-      MayBePtr<const CDCWire> getSecondNeighborSixOClock(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondNeighborSixOClock(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer - 2) ? &(getWireLayer(iLayer - 2).getWireWrappedAround(iWire)) : nullptr;  }
 
       /// Getter for secondary neighbor at the seven o'clock position
-      MayBePtr<const CDCWire> getSecondNeighborSevenOClock(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondNeighborSevenOClock(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer - 2) ? &(getWireLayer(iLayer - 2).getWireWrappedAround(iWire + 1)) : nullptr;  }
 
 
       /// Getter for secondary neighbor at the eight o'clock position
-      MayBePtr<const CDCWire> getSecondNeighborEightOClock(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondNeighborEightOClock(ILayer iLayer, IWire iWire) const
       { return getNeighborCCWInwards(iLayer, iWire + 1); }
 
       /// Getter for secondary neighbor at the nine o'clock position
-      MayBePtr<const CDCWire> getSecondNeighborNineOClock(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondNeighborNineOClock(ILayer iLayer, IWire iWire) const
       { return getNeighborCCW(iLayer, iWire + 1); }
 
       /// Getter for secondary neighbor at the ten o'clock position
-      MayBePtr<const CDCWire> getSecondNeighborTenOClock(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondNeighborTenOClock(ILayer iLayer, IWire iWire) const
       { return getNeighborCCWOutwards(iLayer, iWire + 1); }
 
 
       /// Getter for secondary neighbor at the elven o'clock position
-      MayBePtr<const CDCWire> getSecondNeighborElevenOClock(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondNeighborElevenOClock(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer + 2) ? &(getWireLayer(iLayer + 2).getWireWrappedAround(iWire + 1)) : nullptr;  }
 
       /// Getter for secondary neighbor at the twelve o'clock position
-      MayBePtr<const CDCWire> getSecondNeighborTwelveOClock(ILayer iLayer, IWire iWire) const
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondNeighborTwelveOClock(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer + 2) ? &(getWireLayer(iLayer + 2).getWireWrappedAround(iWire)) : nullptr;  }
       /**@}*/
 

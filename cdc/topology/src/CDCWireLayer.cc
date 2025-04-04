@@ -6,11 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackingUtilities/topology/CDCWireLayer.h>
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireLayer.h>
+#include <cdc/topology/CDCWireTopology.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 CDCWireLayer::CDCWireLayer(const ConstVectorRange<CDCWire>& wireRange)
@@ -35,7 +36,7 @@ void CDCWireLayer::initialize()
   ILayer iCLayer = getICLayer();
 
   // values from CDCGeometryPar
-  CDC::CDCGeometryPar& cdcgp = CDC::CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
 
   const double* innerRadiusWireLayer = cdcgp.innerRadiusWireLayer();
   const double* outerRadiusWireLayer = cdcgp.outerRadiusWireLayer();
@@ -88,7 +89,7 @@ void CDCWireLayer::initialize()
 
 const CDCWire& CDCWireLayer::getClosestWire(const ROOT::Math::XYZVector& pos3D) const
 {
-  IWire iWire = CDC::CDCGeometryPar::Instance().cellId(getICLayer(), pos3D);
+  IWire iWire = CDCGeometryPar::Instance().cellId(getICLayer(), pos3D);
   // Safety measure against error in the cellId function
   iWire %= size();
   return getWire(iWire);

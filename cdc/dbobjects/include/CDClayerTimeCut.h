@@ -8,7 +8,7 @@
 #pragma once
 
 #include <TObject.h>
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/ISuperLayer.h>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
@@ -36,7 +36,7 @@ namespace Belle2 {
 
           m_maxDriftTimes[iLayer] = value.second.get_value<float>();
           iLayer += 1;
-          if (iLayer > TrackingUtilities::ISuperLayerUtil::c_N) {
+          if (iLayer > CDC::ISuperLayerUtil::c_N) {
             B2FATAL("Cannot parse CDClayerTimeCut: too many layers");
           }
         }
@@ -62,14 +62,14 @@ namespace Belle2 {
     void dump() const
     {
       std::cout << "Content of CDClayerTimeCut" << std::endl;
-      for (int iLayer = 0; iLayer < TrackingUtilities::ISuperLayerUtil::c_N; iLayer++) {
+      for (int iLayer = 0; iLayer < CDC::ISuperLayerUtil::c_N; iLayer++) {
         std::cout << " Layer :" << iLayer << " Cut:" <<  getLayerTimeCut(iLayer) << std::endl;
       }
     }
 
   private:
     /// Cut for approximate drift time (super-layer dependent)
-    std::array<float, TrackingUtilities::ISuperLayerUtil::c_N> m_maxDriftTimes = { -1, -1, -1, -1, -1, -1, -1, -1, -1};
+    std::array<float, CDC::ISuperLayerUtil::c_N> m_maxDriftTimes = { -1, -1, -1, -1, -1, -1, -1, -1, -1};
     ClassDef(CDClayerTimeCut, 1); /**< ClassDef */
   };
 

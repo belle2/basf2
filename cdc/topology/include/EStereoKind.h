@@ -10,7 +10,7 @@
 #include <tracking/trackingUtilities/utilities/FunctorTag.h>
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
 
     /// Type for the stereo property of the wire
     enum class EStereoKind {
@@ -30,7 +30,7 @@ namespace Belle2 {
     /// Generic functor to get the stereo kind from an object.
     struct GetEStereoKind {
       /// Marker function for the isFunctor test
-      operator FunctorTag();
+      operator TrackingUtilities::FunctorTag();
 
       /// Returns the stereo kind of an object.
       template<class T, class SFINAE = decltype(&T::getStereoKind)>

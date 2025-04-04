@@ -8,14 +8,13 @@
 #pragma once
 
 #include <framework/geometry/VectorUtil.h>
-// #include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <Math/Vector2D.h>
 #include <Math/Vector3D.h>
 
 #include <cmath>
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
     /**
      *  A three dimensional limited line represented by its closest approach to the z-axes (reference position ) and its skew parameter.
      *  The representation is only suitable for lines out of the xy plane.

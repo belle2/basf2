@@ -5,12 +5,12 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackingUtilities/topology/WireLine.h>
+#include <cdc/topology/WireLine.h>
 
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
-using namespace TrackingUtilities;
+using namespace CDC;
 
 WireLine::WireLine(const ROOT::Math::XYZVector& forward,
                    const ROOT::Math::XYZVector& backward,

@@ -7,17 +7,17 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
-#include <tracking/trackingUtilities/topology/ILayer.h>
-#include <tracking/trackingUtilities/topology/IWire.h>
-#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <cdc/topology/CDCWire.h>
+#include <cdc/topology/ISuperLayer.h>
+#include <cdc/topology/ILayer.h>
+#include <cdc/topology/IWire.h>
+#include <cdc/topology/EStereoKind.h>
 
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 #include <tracking/trackingUtilities/utilities/VectorRange.h>
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
 
     /**
      *  Class representing a sense wire layer in the central drift chamber.
@@ -35,11 +35,11 @@ namespace Belle2 {
      *  it should be avoided.
      */
     class CDCWireLayer
-      : public ConstVectorRange<CDCWire> {
+      : public TrackingUtilities::ConstVectorRange<CDCWire> {
 
     private:
       /// Type of the base class
-      using Super = ConstVectorRange<CDCWire>;
+      using Super = TrackingUtilities::ConstVectorRange<CDCWire>;
 
     public:
       /**
@@ -59,7 +59,7 @@ namespace Belle2 {
        *  Constructor taking the range of wires the layer shall contain.
        *  Use rather getInstance() to avoid instance constructions.
        */
-      explicit CDCWireLayer(const ConstVectorRange<CDCWire>& wireRange);
+      explicit CDCWireLayer(const TrackingUtilities::ConstVectorRange<CDCWire>& wireRange);
 
 
       /// Disallow copy construction of wire layers.
@@ -107,7 +107,7 @@ namespace Belle2 {
        *  This can be used to speed up the lookup inward and outward neighbors \n
        *  of the wires in this layer. For even layers the shift should be ESign::c_Zero. \n
        */
-      ERotation getShift() const
+      TrackingUtilities::ERotation getShift() const
       { return m_shift; }
 
       /**
@@ -117,8 +117,8 @@ namespace Belle2 {
        *  @param baseLayer  Wire layer that should be used as reference to the numbering shift
        *  @return           Shift in numbering from the given layer to this layer.
        */
-      ERotation getShiftDelta(const CDCWireLayer& baseLayer) const
-      { return static_cast<ERotation>(getShift() - baseLayer.getShift()); }
+      TrackingUtilities::ERotation getShiftDelta(const CDCWireLayer& baseLayer) const
+      { return static_cast<TrackingUtilities::ERotation>(getShift() - baseLayer.getShift()); }
       /**@}*/
 
       /**
@@ -314,7 +314,7 @@ namespace Belle2 {
        *  This can be used to speed up the lookup inward and outward \n
        *  neighbors of the wires in this layer. For even layers the shift should be 0.
        */
-      ERotation m_shift = ERotation::c_Invalid;
+      TrackingUtilities::ERotation m_shift = TrackingUtilities::ERotation::c_Invalid;
     };
 
   }

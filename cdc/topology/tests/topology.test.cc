@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <gtest/gtest.h>
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireTopology.h>
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
 #include <tracking/trackingUtilities/testFixtures/TrackingUtilitiesTestWithTopology.h>
@@ -14,6 +14,7 @@
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 class SecondaryWireNeighborhoodTest : public TrackingUtilitiesTestWithTopology,

@@ -8,7 +8,7 @@
 #pragma once
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
 
     /// Load the CDC geometry from the conditions database
     class CDCGeometryLoader {

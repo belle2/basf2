@@ -8,7 +8,7 @@
 #pragma once
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
 
     /// Namespace guarding the contained enum values
     namespace NWirePosition {

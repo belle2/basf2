@@ -7,16 +7,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackingUtilities/topology/WireNeighborPair.h>
-#include <tracking/trackingUtilities/topology/WireLine.h>
+#include <cdc/topology/WireNeighborPair.h>
+#include <cdc/topology/WireLine.h>
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
-#include <tracking/trackingUtilities/topology/ILayer.h>
-#include <tracking/trackingUtilities/topology/IWire.h>
+#include <cdc/topology/ISuperLayer.h>
+#include <cdc/topology/ILayer.h>
+#include <cdc/topology/IWire.h>
 
-#include <tracking/trackingUtilities/topology/WireNeighborKind.h>
-#include <tracking/trackingUtilities/topology/EStereoKind.h>
-#include <tracking/trackingUtilities/topology/EWirePosition.h>
+#include <cdc/topology/WireNeighborKind.h>
+#include <cdc/topology/EStereoKind.h>
+#include <cdc/topology/EWirePosition.h>
 
 #include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
@@ -27,14 +27,11 @@
 
 #include <iostream>
 
-namespace Belle2 {
-  class CDCHit;
-}
 
 namespace Belle2 {
-  namespace TrackingUtilities {
-
+  namespace CDC {
     // Forward declarations
+    class CDCHit;
     class CDCWireLayer;
     class CDCWireSuperLayer;
 
@@ -346,7 +343,7 @@ namespace Belle2 {
        *  It never returns nullptr (if the wire itself is valid),
        *  but we give it as pointer for homogeneity of the interface.
        */
-      MayBePtr<const CDCWire> getNeighborCCW() const;
+      TrackingUtilities::MayBePtr<const CDCWire> getNeighborCCW() const;
 
       /**
        *  Gives the closest neighbor in the clockwise direction - always exists.
@@ -354,7 +351,7 @@ namespace Belle2 {
        *  It never returns nullptr (if the wire itself is valid),
        *  but we give it as pointer for homogeneity of the interface.
        */
-      MayBePtr<const CDCWire> getNeighborCW() const;
+      TrackingUtilities::MayBePtr<const CDCWire> getNeighborCW() const;
 
       /**
        *  Gives the closest neighbor in the countclockwise inwards direction
@@ -362,7 +359,7 @@ namespace Belle2 {
        *  from a wire in the innermost layer of a superlayer will return a nullptr.
        *  So the result has to be checked before referencing.
        */
-      MayBePtr<const CDCWire> getNeighborCCWInwards() const;
+      TrackingUtilities::MayBePtr<const CDCWire> getNeighborCCWInwards() const;
 
       /**
        *  Gives the closest neighbor in the clockwise inwards direction
@@ -370,7 +367,7 @@ namespace Belle2 {
        *  from a wire in the innermost layer of a superlayer will return a nullptr.
        *  So the result has to be checked before referencing.
        */
-      MayBePtr<const CDCWire> getNeighborCWInwards() const;
+      TrackingUtilities::MayBePtr<const CDCWire> getNeighborCWInwards() const;
 
       /**
        *  Gives the closest neighbor in the countclockwise outwards direction
@@ -378,7 +375,7 @@ namespace Belle2 {
        *  from a wire in the outermost layer of a superlayer will return a nullptr.
        *  So the result has to be checked before referencing.
        */
-      MayBePtr<const CDCWire> getNeighborCCWOutwards() const;
+      TrackingUtilities::MayBePtr<const CDCWire> getNeighborCCWOutwards() const;
 
       /**
        *  Gives the closest neighbor in the clockwise outwards direction
@@ -386,11 +383,11 @@ namespace Belle2 {
        *  from a wire in the outermost layer of a superlayer will return a nullptr.
        *  So the result has to be checked before referencing.
        */
-      MayBePtr<const CDCWire> getNeighborCWOutwards() const;
+      TrackingUtilities::MayBePtr<const CDCWire> getNeighborCWOutwards() const;
       /**@}*/
 
       /// Getter for the secondary neighbors of this wire id following the direction on the clock
-      MayBePtr<const CDCWire> getSecondaryNeighbor(short oClockDirection) const;
+      TrackingUtilities::MayBePtr<const CDCWire> getSecondaryNeighbor(short oClockDirection) const;
 
       /// String output operator for wire objects to help debugging
       friend std::ostream& operator<<(std::ostream& output, const CDCWire& wire)

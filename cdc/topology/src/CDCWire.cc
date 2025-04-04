@@ -6,19 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <cdc/topology/CDCWire.h>
 
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
-#include <tracking/trackingUtilities/topology/CDCWireSuperLayer.h>
-#include <tracking/trackingUtilities/topology/CDCWireLayer.h>
+#include <cdc/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireSuperLayer.h>
+#include <cdc/topology/CDCWireLayer.h>
 
-#include <tracking/trackingUtilities/topology/EWirePositionToCDC.h>
-#include <tracking/trackingUtilities/topology/EWirePosition.h>
+#include <cdc/topology/EWirePositionToCDC.h>
+#include <cdc/topology/EWirePosition.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 const CDCWire* CDCWire::getInstance(const WireID& wireID)
@@ -68,8 +69,8 @@ CDCWire::CDCWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire)
 
 void CDCWire::initialize(EWirePosition wirePosition, bool ignoreWireSag)
 {
-  CDC::CDCGeometryPar& cdcgp = CDC::CDCGeometryPar::Instance();
-  CDC::CDCGeometryPar::EWirePosition wirePosSet = toCDC(wirePosition);
+  CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
+  CDCGeometryPar::EWirePosition wirePosSet = toCDC(wirePosition);
 
   IWire iWire = getIWire();
   ILayer iCLayer = getICLayer();
@@ -107,7 +108,7 @@ bool CDCWire::isInCell(const ROOT::Math::XYZVector& pos3D) const
   bool inCylindricalR = innerCylindricalR < cylindricalR and cylindricalR < outerCylindricalR;
   if (not inCylindricalR) return false;
 
-  IWire iWire = CDC::CDCGeometryPar::Instance().cellId(iCLayer, pos3D);
+  IWire iWire = CDCGeometryPar::Instance().cellId(iCLayer, pos3D);
   // Safety measure against error in the cellId function
   iWire %= wireLayer.size();
   bool inPhi = iWire == getIWire();

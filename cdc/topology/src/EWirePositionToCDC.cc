@@ -5,31 +5,32 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/trackingUtilities/topology/EWirePositionToCDC.h>
+#include <cdc/topology/EWirePositionToCDC.h>
 
 using namespace Belle2;
-using namespace TrackingUtilities;
+using namespace CDC;
+// using namespace TrackingUtilities;
 
-CDC::CDCGeometryPar::EWirePosition TrackingUtilities::toCDC(EWirePosition wirePosition)
+CDCGeometryPar::EWirePosition toCDC(EWirePosition wirePosition)
 {
   if (wirePosition == EWirePosition::c_Base) {
-    return CDC::CDCGeometryPar::EWirePosition::c_Base;
+    return CDCGeometryPar::EWirePosition::c_Base;
   } else if (wirePosition == EWirePosition::c_Misaligned) {
-    return CDC::CDCGeometryPar::EWirePosition::c_Misaligned;
+    return CDCGeometryPar::EWirePosition::c_Misaligned;
   } else if (wirePosition == EWirePosition::c_Aligned) {
-    return CDC::CDCGeometryPar::EWirePosition::c_Aligned;
+    return CDCGeometryPar::EWirePosition::c_Aligned;
   }
   B2ERROR("Unexpected EWirePosition");
-  return CDC::CDCGeometryPar::EWirePosition::c_Base;
+  return CDCGeometryPar::EWirePosition::c_Base;
 }
 
-EWirePosition TrackingUtilities::fromCDC(CDC::CDCGeometryPar::EWirePosition wirePosSet)
+EWirePosition fromCDC(CDCGeometryPar::EWirePosition wirePosSet)
 {
-  if (wirePosSet == CDC::CDCGeometryPar::EWirePosition::c_Base) {
+  if (wirePosSet == CDCGeometryPar::EWirePosition::c_Base) {
     return EWirePosition::c_Base;
-  } else if (wirePosSet == CDC::CDCGeometryPar::EWirePosition::c_Misaligned) {
+  } else if (wirePosSet == CDCGeometryPar::EWirePosition::c_Misaligned) {
     return EWirePosition::c_Misaligned;
-  } else if (wirePosSet == CDC::CDCGeometryPar::EWirePosition::c_Aligned) {
+  } else if (wirePosSet == CDCGeometryPar::EWirePosition::c_Aligned) {
     return EWirePosition::c_Aligned;
   }
   B2ERROR("Unexpected EWirePosition");

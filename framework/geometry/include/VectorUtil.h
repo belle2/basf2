@@ -146,13 +146,50 @@ namespace Belle2 {
      * {
      *   return relativTo.scaled(relativTo.cross(*this) / relativTo.normSquared()).orthogonal();
      * }
-     * with v2 = relativeTo and v1 = *this
+     * with v2 = relativTo and v1 = *this
      */
     inline ROOT::Math::XYVector orthogonalVector(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& v2)
     {
       const double cross = v1.X() * v2.Y() - v1.Y() - v2.X();     // = relativTo.cross(*this)
-      const ROOT::Math::XYVector tmp = v2 * (cross / v2.Mag2());  // = relativeTo.scaled(cross) / relativTo.normSquared()
+      const ROOT::Math::XYVector tmp = v2 * (cross / v2.Mag2());  // = relativTo.scaled(cross / relativTo.normSquared())
       return ROOT::Math::XYVector(-tmp.Y(), tmp.X());             // = .orthogonal()
+    }
+
+    /** Calculates the part of this vector that is parallel to the given vector
+     *  Adapted from tracking/trackingUtilities/geometry/Vector3D:
+     *  https://gitlab.desy.de/belle2/software/basf2/-/blob/main/tracking/trackingUtilities/geometry/include/Vector3D.h?ref_type=heads#L442
+     *
+     * Vector3D parallelVector(const Vector3D& relativTo) const
+     * {
+     *   return relativTo.scaled(relativTo.dot(*this) / relativTo.normSquared());
+     * }
+     * with v2 = relativTo and v1 = *this
+     */
+    inline ROOT::Math::XYZVector parallelVector(const ROOT::Math::XYZVector& v1, const ROOT::Math::XYZVector& v2)
+    {
+      const double dotp = v1.Dot(v2);                           // = relativTo.dot(*this)
+      const ROOT::Math::XYZVector tmp = v2 * (dotp / v2.Mag2());  // = relativTo.scaled(dotp / relativTo.normSquared())
+      return tmp;
+    }
+
+    /// Calculates the component orthogonal to the given vector
+    /** The orthogonal component is the rest of the vector not parallel to \n
+     *  relative to. Since the three dimensional space does not have a unique \n
+     *  orientation given by the vector relative to, the sign of the orthogonal \n
+     *  component is meaningless and is always set to positive
+     *
+     *  Adapted from tracking/trackingUtilities/geometry/Vector3D:
+     *  https://gitlab.desy.de/belle2/software/basf2/-/blob/main/tracking/trackingUtilities/geometry/include/Vector3D.h?ref_type=heads#L436
+     *
+     * Vector3D orthogonalComp(const Vector3D& relativTo) const
+     * {
+     *   return relativTo.cross(*this).norm() / relativTo.norm();
+     * }
+     * with v2 = relativTo and v1 = *this
+     */
+    inline double orthogonalComp(const ROOT::Math::XYZVector& v1, const ROOT::Math::XYZVector& v2)
+    {
+      return v2.Cross(v1).R() / v2.R();
     }
 
   }

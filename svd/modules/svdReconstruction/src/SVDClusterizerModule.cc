@@ -413,12 +413,14 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
     if (isMC) {
       alterClusterPosition();
       alterClusterTime();
-    } else {
-      if (m_svdClusterTimeShifter.isValid() &&
-          !m_returnRawClusterTime &&
-          m_shiftSVDClusterTime) {
-        shiftSVDClusterTime();
-      }
+    }
+
+    //shift cluter time:
+    //1. by cluster size
+    if (m_svdClusterTimeShifter.isValid() &&
+        !m_returnRawClusterTime &&
+        m_shiftSVDClusterTime) {
+      shiftSVDClusterTime();
     }
   }
 }

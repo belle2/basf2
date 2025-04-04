@@ -29,9 +29,9 @@
 
 
 namespace Belle2 {
+  class CDCHit;
   namespace CDC {
     // Forward declarations
-    class CDCHit;
     class CDCWireLayer;
     class CDCWireSuperLayer;
 

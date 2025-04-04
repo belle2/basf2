@@ -10,8 +10,8 @@
 
 #include <calibration/CalibrationAlgorithm.h>
 
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
-#include <tracking/trackingUtilities/topology/CDCWireLayer.h>
+#include <cdc/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireLayer.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dbobjects/CDCBadWires.h>

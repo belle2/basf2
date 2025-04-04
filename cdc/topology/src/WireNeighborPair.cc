@@ -10,6 +10,7 @@
 #include <cdc/topology/CDCWireTopology.h>
 
 using namespace Belle2;
+using namespace CDC;
 
 WireNeighborKind WireNeighborPair::getNeighborKind() const
 {

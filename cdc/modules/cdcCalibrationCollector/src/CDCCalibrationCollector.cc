@@ -11,7 +11,7 @@
 #include <framework/datastore/RelationArray.h>
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireTopology.h>
 
 #include <genfit/TrackPoint.h>
 #include <genfit/KalmanFitterInfo.h>

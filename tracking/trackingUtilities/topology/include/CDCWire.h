@@ -18,13 +18,12 @@
 #include <tracking/trackingUtilities/topology/EStereoKind.h>
 #include <tracking/trackingUtilities/topology/EWirePosition.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-
 #include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
 #include <cdc/dataobjects/WireID.h>
 
 #include <Math/Vector2D.h>
+#include <Math/Vector3D.h>
 
 #include <iostream>
 
@@ -185,15 +184,15 @@ namespace Belle2 {
       { return getWireLine().sagPos2DAtZ(z); }
 
       /// Gives position of the wire at the given z coordinate
-      Vector3D getWirePos3DAtZ(const double z) const
+      ROOT::Math::XYZVector getWirePos3DAtZ(const double z) const
       { return getWireLine().sagPos3DAtZ(z); }
 
       /// Calculates the distance from the position to the wire
-      double getDistance(const Vector3D& pos3D) const
+      double getDistance(const ROOT::Math::XYZVector& pos3D) const
       { return getWireLine().sagDistance(pos3D); }
 
       /// Calculates the closest approach in the wire to the position
-      Vector3D getClosest(const Vector3D& pos3D) const
+      ROOT::Math::XYZVector getClosest(const ROOT::Math::XYZVector& pos3D) const
       { return getWireLine().sagClosest3D(pos3D); }
 
       /**
@@ -203,7 +202,7 @@ namespace Belle2 {
       *  * the position is outside of the CDC
       *  * the position is outside of the drift cell
       */
-      double getDriftLength(const Vector3D& pos3D) const
+      double getDriftLength(const ROOT::Math::XYZVector& pos3D) const
       { return isInCell(pos3D) ? getDistance(pos3D) : NAN; }
 
       /**
@@ -211,7 +210,7 @@ namespace Belle2 {
        *  Gives the wire's reference position
        *  which is the point of closest approach to the beam axes.
        */
-      const Vector3D& getRefPos3D() const
+      const ROOT::Math::XYZVector& getRefPos3D() const
       { return getWireLine().refPos3D(); }
 
       /**
@@ -237,7 +236,7 @@ namespace Belle2 {
       { return getWireLine().theta(); }
 
       /// Getter for the vector pointing from the back end of the wire to the front end of the wire
-      Vector3D getWireVector() const
+      ROOT::Math::XYZVector getWireVector() const
       { return getWireLine().wireVector(); }
 
       /// Getter for the vector describing the nominal positional change in the xy plane per unit z.
@@ -273,18 +272,18 @@ namespace Belle2 {
       { return getWireLine().backwardZ(); }
 
       /// Getter for the forward joint point of the wire with the wall.
-      Vector3D getForwardPos3D() const
+      ROOT::Math::XYZVector getForwardPos3D() const
       { return getWireLine().forward3D(); }
 
       /// Getter for the forward joint point of the wire with the wall.
-      Vector3D getBackwardPos3D() const
+      ROOT::Math::XYZVector getBackwardPos3D() const
       { return getWireLine().backward3D(); }
 
       /// Checks whether the position is in the drift cell surrounding the wire
-      bool isInCell(const Vector3D& pos3D) const;
+      bool isInCell(const ROOT::Math::XYZVector& pos3D) const;
 
       /// Checks whether the position is in the z bounds of the drift cell (scaled by the factor) surrounding the wire
-      bool isInCellZBounds(const Vector3D& pos3D, const double factor = 1) const
+      bool isInCellZBounds(const ROOT::Math::XYZVector& pos3D, const double factor = 1) const
       { return getBackwardZ() * factor < pos3D.z() and pos3D.z() < getForwardZ() * factor; }
 
       /// Getter for the cell widths in radial direction

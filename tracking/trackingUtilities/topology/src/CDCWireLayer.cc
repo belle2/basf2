@@ -86,7 +86,7 @@ void CDCWireLayer::initialize()
   m_backwardZ /= nWiresInLayer;
 }
 
-const CDCWire& CDCWireLayer::getClosestWire(const Vector3D& pos3D) const
+const CDCWire& CDCWireLayer::getClosestWire(const ROOT::Math::XYZVector& pos3D) const
 {
   IWire iWire = CDC::CDCGeometryPar::Instance().cellId(getICLayer(), pos3D);
   // Safety measure against error in the cellId function

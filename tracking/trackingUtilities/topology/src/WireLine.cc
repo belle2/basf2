@@ -12,8 +12,8 @@
 using namespace Belle2;
 using namespace TrackingUtilities;
 
-WireLine::WireLine(const Vector3D& forward,
-                   const Vector3D& backward,
+WireLine::WireLine(const ROOT::Math::XYZVector& forward,
+                   const ROOT::Math::XYZVector& backward,
                    double sagCoeff)
   : m_refPos3D{(backward * forward.z() - forward * backward.z()) / (forward.z() - backward.z()) }
   , m_forwardZ{forward.z()}
@@ -27,10 +27,11 @@ WireLine::WireLine(const Vector3D& forward,
   B2ASSERT("Wire reference position is not at 0", m_refPos3D.z() == 0);
 }
 
-WireLine WireLine::movedBy(const Vector3D& offset) const
+WireLine WireLine::movedBy(const ROOT::Math::XYZVector& offset) const
 {
   WireLine moved = *this;
-  moved.m_refPos3D += offset.xy() + nominalMovePerZ() * offset.z();
+  const ROOT::Math::XYVector tmp = nominalMovePerZ();
+  moved.m_refPos3D += ROOT::Math::XYZVector(offset.X(), offset.Y(), 0) + ROOT::Math::XYZVector(tmp.X(), tmp.Y(), 0)  * offset.z();
   moved.m_forwardZ += offset.z();
   moved.m_backwardZ += offset.z();
   return moved;
@@ -39,6 +40,6 @@ WireLine WireLine::movedBy(const Vector3D& offset) const
 WireLine WireLine::movedBy(const ROOT::Math::XYVector& offset) const
 {
   WireLine moved = *this;
-  moved.m_refPos3D += offset;
+  moved.m_refPos3D += ROOT::Math::XYZVector(offset.X(), offset.Y(), 0);
   return moved;
 }

@@ -195,7 +195,7 @@ TEST_F(TrackingUtilitiesTestWithTopology, topology_CDCWire_stereoAngle)
     B2INFO("   Stereo angle : " << stereoAngleByICLayer[iCLayer]);
     B2INFO("   Z range : " << wireLayer.getBackwardZ() << " to " << wireLayer.getForwardZ());
     B2INFO("   Ref. cylindricalR : " << refCylindricalRByICLayer[iCLayer]);
-    B2INFO("   Max abs displacement : " << wireLayer.getWire(0).getWireVector().xy().norm());
+    B2INFO("   Max abs displacement : " << wireLayer.getWire(0).getWireVector().Rho());
   }
 
 }

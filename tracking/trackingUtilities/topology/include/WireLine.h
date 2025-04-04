@@ -8,8 +8,9 @@
 #pragma once
 
 #include <framework/geometry/VectorUtil.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
+// #include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <Math/Vector2D.h>
+#include <Math/Vector3D.h>
 
 #include <cmath>
 
@@ -33,19 +34,19 @@ namespace Belle2 {
       {}
 
       /// Constructor for a wire line between forward and backward point
-      WireLine(const Vector3D& forward, const Vector3D& backward, double sagCoeff);
+      WireLine(const ROOT::Math::XYZVector& forward, const ROOT::Math::XYZVector& backward, double sagCoeff);
 
       /// Returns a copy of the wire line moved by a three dimensional offset
-      WireLine movedBy(const Vector3D& offset) const;
+      WireLine movedBy(const ROOT::Math::XYZVector& offset) const;
 
       /// Returns a copy of the wire line moved by a two dimensional offset
       WireLine movedBy(const ROOT::Math::XYVector& offset) const;
 
       /// Gives the three dimensional position *without* wire sag effect of the line at the given z value
-      Vector3D nominalPos3DAtZ(const double z) const
+      ROOT::Math::XYZVector nominalPos3DAtZ(const double z) const
       {
         const ROOT::Math::XYVector& tmp = nominalPos2DAtZ(z);
-        return Vector3D(tmp.X(), tmp.Y(), z);
+        return ROOT::Math::XYZVector(tmp.X(), tmp.Y(), z);
       }
 
       /// Gives the two dimensional position *without* wire sag effect of the line at the given z value
@@ -53,10 +54,10 @@ namespace Belle2 {
       { return refPos2D() + nominalMovePerZ() * z; }
 
       /// Gives the three dimensional position *with* wire sag effect of the line at the given z value
-      Vector3D sagPos3DAtZ(const double z) const
+      ROOT::Math::XYZVector sagPos3DAtZ(const double z) const
       {
         const ROOT::Math::XYVector& tmp = sagPos2DAtZ(z);
-        return Vector3D(tmp.X(), tmp.Y(), z);
+        return ROOT::Math::XYZVector(tmp.X(), tmp.Y(), z);
       }
 
       /// Gives the two dimensional position *with* wire sag effect of the line at the given z value
@@ -86,33 +87,38 @@ namespace Belle2 {
       }
 
       /// Calculates the distance of the given point to the wire *without* wire sag effect
-      double nominalDistance(const Vector3D& pos3D) const
-      { return (pos3D - refPos3D()).orthogonalComp(Vector3D(nominalMovePerZ().X(), nominalMovePerZ().Y(), 1)); }
+      double nominalDistance(const ROOT::Math::XYZVector& pos3D) const
+      {
+        return VectorUtil::orthogonalComp((pos3D - refPos3D()), ROOT::Math::XYZVector(nominalMovePerZ().X(), nominalMovePerZ().Y(), 1));
+      }
 
       /// Calculates the distance of the given point to the wire *with* wire sag effect
-      double sagDistance(const Vector3D& pos3D) const
+      double sagDistance(const ROOT::Math::XYZVector& pos3D) const
       {
-        Vector3D wirePos3D = sagPos3DAtZ(pos3D.z());
+        const ROOT::Math::XYZVector& wirePos3D = sagPos3DAtZ(pos3D.z());
         const ROOT::Math::XYVector& tmp = sagMovePerZ(pos3D.z());
-        Vector3D movePerZ(tmp.X(), tmp.Y(), 1);
-        return (pos3D - wirePos3D).orthogonalComp(movePerZ);
+        const ROOT::Math::XYZVector movePerZ(tmp.X(), tmp.Y(), 1);
+        return VectorUtil::orthogonalComp((pos3D - wirePos3D), movePerZ);
       }
 
       /// Returns the closest approach on the wire *without* wire sag effect to the give point
-      Vector3D nominalClosest3D(const Vector3D& point) const
-      { return  refPos3D() - (point - refPos3D()).parallelVector(Vector3D(nominalMovePerZ().X(), nominalMovePerZ().Y(), 1)); }
+      ROOT::Math::XYZVector nominalClosest3D(const ROOT::Math::XYZVector& point) const
+      {
+        return refPos3D() - VectorUtil::parallelVector((point - refPos3D()), ROOT::Math::XYZVector(nominalMovePerZ().X(),
+                                                       nominalMovePerZ().Y(), 1));
+      }
 
       /// Returns the closest approach on the wire *with* wire sag effect to the give point
-      Vector3D sagClosest3D(const Vector3D& point) const
+      ROOT::Math::XYZVector sagClosest3D(const ROOT::Math::XYZVector& point) const
       {
-        Vector3D wirePos3D = sagPos3DAtZ(point.z());
+        const ROOT::Math::XYZVector& wirePos3D = sagPos3DAtZ(point.z());
         const ROOT::Math::XYVector& tmp = sagMovePerZ(point.z());
-        Vector3D movePerZ(tmp.X(), tmp.Y(), 1);
-        return  wirePos3D - (point - wirePos3D).parallelVector(movePerZ);
+        const ROOT::Math::XYZVector movePerZ(tmp.X(), tmp.Y(), 1);
+        return  wirePos3D - VectorUtil::parallelVector((point - wirePos3D), movePerZ);
       }
 
       /// Gives the position of the forward point
-      Vector3D forward3D() const
+      ROOT::Math::XYZVector forward3D() const
       { return nominalPos3DAtZ(forwardZ()); }
 
       /// Gives the xy position of the forward point
@@ -120,7 +126,7 @@ namespace Belle2 {
       { return nominalPos2DAtZ(forwardZ()); }
 
       /// Gives the position of the backward point
-      Vector3D backward3D() const
+      ROOT::Math::XYZVector backward3D() const
       { return nominalPos3DAtZ(backwardZ()); }
 
       /// Gives the xy position of the backward point
@@ -128,10 +134,10 @@ namespace Belle2 {
       { return nominalPos2DAtZ(backwardZ()); }
 
       /// Getter for the vector from backward to  the forward position
-      Vector3D wireVector() const
+      ROOT::Math::XYZVector wireVector() const
       {
         const ROOT::Math::XYVector& tmp = nominalMovePerZ() * deltaZ();
-        return Vector3D(tmp.X(), tmp.Y(), deltaZ());
+        return ROOT::Math::XYZVector(tmp.X(), tmp.Y(), deltaZ());
       }
 
       /// Gives the forward z coordinate
@@ -204,7 +210,7 @@ namespace Belle2 {
       { return -refPos2D().Dot(nominalMovePerZ()) / nominalMovePerZ().Mag2(); }
 
       /// Returns the point of nominal closest approach to the z axes.
-      Vector3D nominalPerigee3D() const
+      ROOT::Math::XYZVector nominalPerigee3D() const
       { return nominalPos3DAtZ(nominalPerigeeZ()); }
 
       /// Returns the point of nominal closest approach to the z axes.
@@ -225,14 +231,14 @@ namespace Belle2 {
 
       /// Returns the cylindrical radius of the reference position
       double refCylindricalRSquared() const
-      { return m_refPos3D.cylindricalRSquared(); }
+      { return m_refPos3D.Perp2(); }
 
       /// Returns the xy vector of the reference position
       const ROOT::Math::XYVector& refPos2D() const
       { return m_refPos2D; }
 
       /// Returns the reference position
-      const Vector3D& refPos3D() const
+      const ROOT::Math::XYZVector& refPos3D() const
       { return m_refPos3D; }
 
       /// Returns the wire sag coefficient due to gravity
@@ -241,7 +247,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the reference position
-      Vector3D m_refPos3D;
+      ROOT::Math::XYZVector m_refPos3D;
 
       /// Memory for the 2D reference position (to avoid [-Wreturn-stack-address] in refPos2D())
       ROOT::Math::XYVector m_refPos2D;

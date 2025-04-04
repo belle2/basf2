@@ -214,7 +214,7 @@ const ROOT::Math::XYVector& CDCWireHit::getRefPos2D() const
   return getWire().getRefPos2D();
 }
 
-const Vector3D& CDCWireHit::getRefPos3D() const
+const ROOT::Math::XYZVector& CDCWireHit::getRefPos3D() const
 {
   return getWire().getRefPos3D();
 }

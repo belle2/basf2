@@ -21,6 +21,7 @@
 #include <cdc/dataobjects/WireID.h>
 
 #include <Math/Vector2D.h>
+#include <Math/Vector3D.h>
 
 #include <utility>
 #include <iosfwd>
@@ -213,7 +214,7 @@ namespace Belle2 {
       const ROOT::Math::XYVector& getRefPos2D() const;
 
       /// The three dimensional reference position of the underlying wire.
-      const Vector3D& getRefPos3D() const;
+      const ROOT::Math::XYZVector& getRefPos3D() const;
 
       /// The distance from the beam line at reference position of the underlying wire.
       double getRefCylindricalR() const;

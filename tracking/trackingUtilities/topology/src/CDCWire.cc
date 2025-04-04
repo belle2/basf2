@@ -74,8 +74,8 @@ void CDCWire::initialize(EWirePosition wirePosition, bool ignoreWireSag)
   IWire iWire = getIWire();
   ILayer iCLayer = getICLayer();
 
-  Vector3D forwardPos{cdcgp.wireForwardPosition(iCLayer, iWire, wirePosSet)};
-  Vector3D backwardPos{cdcgp.wireBackwardPosition(iCLayer, iWire, wirePosSet)};
+  const ROOT::Math::XYZVector forwardPos{cdcgp.wireForwardPosition(iCLayer, iWire, wirePosSet)};
+  const ROOT::Math::XYZVector backwardPos{cdcgp.wireBackwardPosition(iCLayer, iWire, wirePosSet)};
   double sagCoeff = ignoreWireSag ? 0 : cdcgp.getWireSagCoef(wirePosSet, iCLayer, iWire);
 
   m_wireLine = WireLine(forwardPos, backwardPos, sagCoeff);
@@ -93,7 +93,7 @@ void CDCWire::initialize(EWirePosition wirePosition, bool ignoreWireSag)
   }
 }
 
-bool CDCWire::isInCell(const Vector3D& pos3D) const
+bool CDCWire::isInCell(const ROOT::Math::XYZVector& pos3D) const
 {
   bool inZ = getBackwardZ() < pos3D.z() and pos3D.z() < getForwardZ();
   if (not inZ) return false;
@@ -102,7 +102,7 @@ bool CDCWire::isInCell(const Vector3D& pos3D) const
   const CDCWireLayer& wireLayer = getWireLayer();
   double innerCylindricalR = wireLayer.getInnerCylindricalR();
   double outerCylindricalR = wireLayer.getOuterCylindricalR();
-  double cylindricalR = pos3D.cylindricalR();
+  double cylindricalR = pos3D.Rho();
 
   bool inCylindricalR = innerCylindricalR < cylindricalR and cylindricalR < outerCylindricalR;
   if (not inCylindricalR) return false;

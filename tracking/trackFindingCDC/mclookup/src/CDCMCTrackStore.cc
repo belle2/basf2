@@ -16,6 +16,7 @@
 
 #include <tracking/trackingUtilities/utilities/Functional.h>
 #include <tracking/trackingUtilities/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>

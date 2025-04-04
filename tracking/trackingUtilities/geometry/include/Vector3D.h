@@ -43,7 +43,7 @@ namespace Belle2 {
       explicit Vector3D(const B2Vector3D& b2Vector3);
 
       /// Constructor translating from a ROOT::Math::XYZVector instance
-      explicit Vector3D(const ROOT::Math::XYZVector& xyzVector);
+      Vector3D(const ROOT::Math::XYZVector& xyzVector);
 
       /// Constructor from three coordinates
       Vector3D(double x, double y, double z)
@@ -569,11 +569,13 @@ namespace Belle2 {
       /// Memory for the third coordinate
       double m_z;
     };
-    // /// non-memberfunction for subtracting a Vector2D from a ROOT::Math::XYVector */
-    // Vector3D operator- (const ROOT::Math::XYZVector& a, const Vector3D& b)
-    // {
-    //   return Vector3D(a.X() - b.x(), a.Y() - b.y(), a.Z() - b.z());
-    // }
+
+    /// non-memberfunction for subtracting a Vector2D from any generic Vector that implements .X(), .Y(), and Z()
+    template<class Vector>
+    Vector3D operator- (const Vector& a, const Vector3D& b)
+    {
+      return Vector3D(a.X() - b.x(), a.Y() - b.y(), a.Z() - b.z());
+    }
 
     /// Output operator for debugging
     std::ostream& operator<<(std::ostream& output, const Vector3D& vector3D);

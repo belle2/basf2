@@ -138,7 +138,7 @@ namespace Belle2 {
       }
 
       /// Gets the wire in this layer that is closest to the given position
-      const CDCWire& getClosestWire(const Vector3D& pos3D) const;
+      const CDCWire& getClosestWire(const ROOT::Math::XYZVector& pos3D) const;
       /**@}*/
 
 

@@ -7,7 +7,7 @@
  **************************************************************************/
 //+
 // File : DQMHistComparitor.h
-// Description :
+// Description : Compare a list of histograms with its reference
 //-
 
 #pragma once
@@ -23,14 +23,22 @@ namespace Belle2 {
      * The struct for reference histogram comparison.
      */
     typedef struct {
-      /** The name of the PV, empty if none */
-      std::string pvname;
+      /** The name of the fit result PV, empty if none */
+      std::string pvfit;
+      /** The name of the status PV, empty if none */
+      std::string pvstatus;
+      /** Whether to use delta. */
+      bool deltaflag;
+      /** Whether to Colorize. */
+      bool colorflag;
       /** The name of the histogram to be compared. */
-      std::string histo1;
+      std::string histName;
       /** The name of the reference histogram. */
-      std::string histo2;
+      std::string refName;
       /** The canvas to display both original and reference histograms. */
       TCanvas* canvas;
+      /** The algo to use: 0=Chi2Test (default), 1=KolmogorovTest (2.. not used yet) */
+      int algo;
       /** The warning level for the histogram difference. */
       float warning;
       /** The error level for the histogram difference. */
@@ -47,6 +55,7 @@ namespace Belle2 {
      */
     DQMHistComparitorModule();
 
+  private:
     /**
      * Destructor.
      */
@@ -78,24 +87,10 @@ namespace Belle2 {
     void terminate() override final;
 
     // Data members
-  private:
     /** Parameter list for histograms */
     std::vector< std::vector<std::string>> m_histlist;
     /** Struct for extracted parameters + EPICS PV */
     std::vector<CMPNODE*> m_pnode;
-    /** Reference Histogram Root file name */
-    std::string m_refFileName;
-    /** The pointer to the reference file */
-    TFile* m_refFile = nullptr;
-    /** Whether to use the color code for warnings and errors. */
-    bool m_color = true;
-
-    /**
-     * Get histogram by its name.
-     * @param histoname The name of the histogram.
-     * @return The pointer to the histogram, or nullptr if not found.
-     */
-    TH1* GetHisto(TString histoname);
 
   };
 } // end namespace Belle2

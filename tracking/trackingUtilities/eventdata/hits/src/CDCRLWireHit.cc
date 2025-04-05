@@ -11,9 +11,9 @@
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
-#include <tracking/trackingUtilities/topology/EStereoKind.h>
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/CDCWire.h>
+#include <cdc/topology/EStereoKind.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
@@ -28,10 +28,11 @@
 #include <type_traits>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
     class WireLine;
   }
 }

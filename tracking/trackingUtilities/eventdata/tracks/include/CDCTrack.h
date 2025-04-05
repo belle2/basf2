@@ -11,7 +11,7 @@
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
@@ -64,13 +64,13 @@ namespace Belle2 {
       std::vector<CDCSegment3D> splitIntoSegments() const;
 
       /// Getter for the superlayer id the track starts from.
-      ISuperLayer getStartISuperLayer() const
+      CDC::ISuperLayer getStartISuperLayer() const
       {
         return front().getISuperLayer();
       }
 
       /// Getter for the superlayer id the track ends in.
-      ISuperLayer getEndISuperLayer() const
+      CDC::ISuperLayer getEndISuperLayer() const
       {
         return back().getISuperLayer();
       }

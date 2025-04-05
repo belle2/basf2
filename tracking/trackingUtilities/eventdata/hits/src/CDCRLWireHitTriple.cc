@@ -8,14 +8,15 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHitTriple.h>
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackingUtilities/topology/CDCWire.h>
-#include <tracking/trackingUtilities/topology/WireNeighborKind.h>
+#include <cdc/topology/CDCWire.h>
+#include <cdc/topology/WireNeighborKind.h>
 #include <tracking/trackingUtilities/numerics/Modulo.h>
 
 #include <iostream>
 #include <limits.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 CDCRLWireHitTriple::Shape::Shape()

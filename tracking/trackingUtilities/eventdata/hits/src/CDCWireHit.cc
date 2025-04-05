@@ -9,9 +9,9 @@
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackingUtilities/topology/CDCWireSuperLayer.h>
-#include <tracking/trackingUtilities/topology/CDCWire.h>
-#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <cdc/topology/CDCWireSuperLayer.h>
+#include <cdc/topology/CDCWire.h>
+#include <cdc/topology/EStereoKind.h>
 
 #include <tracking/trackingUtilities/geometry/Circle2D.h>
 #include <tracking/trackingUtilities/geometry/Vector3D.h>

@@ -9,8 +9,8 @@
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
-#include <tracking/trackingUtilities/topology/EStereoKind.h>
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/EStereoKind.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
@@ -23,10 +23,13 @@ namespace Belle2 {
   class CDCSimHit;
   class CDCHit;
 
+  namespace CDC {
+    class CDCWire;
+  }
+
   namespace TrackingUtilities {
     class CDCTrajectory2D;
     class CDCWireHit;
-    class CDCWire;
     class Vector3D;
 
     /**
@@ -134,11 +137,11 @@ namespace Belle2 {
       }
 
       /// Defines wires and the two dimensional reconstructed hits as coaligned.
-      friend bool operator<(const CDCRecoHit2D& recoHit2D, const CDCWire& wire)
+      friend bool operator<(const CDCRecoHit2D& recoHit2D, const CDC::CDCWire& wire)
       { return recoHit2D.getRLWireHit() < wire; }
 
       /// Defines wires and the two dimensional reconstructed hits as coaligned.
-      friend bool operator<(const CDCWire& wire, const CDCRecoHit2D& recoHit2D)
+      friend bool operator<(const CDC::CDCWire& wire, const CDCRecoHit2D& recoHit2D)
       { return wire < recoHit2D.getRLWireHit(); }
 
       /// Defines wire hits and the two dimensional reconstructed hits as coaligned.
@@ -150,7 +153,7 @@ namespace Belle2 {
       { return wireHit < recoHit2D.getRLWireHit(); }
 
       /// Getter for the stereo type of the underlying wire.
-      EStereoKind getStereoKind() const
+      CDC::EStereoKind getStereoKind() const
       {
         return getRLWireHit().getStereoKind();
       }
@@ -162,13 +165,13 @@ namespace Belle2 {
       }
 
       /// Getter for the superlayer id.
-      ISuperLayer getISuperLayer() const
+      CDC::ISuperLayer getISuperLayer() const
       {
         return getRLWireHit().getISuperLayer();
       }
 
       /// Getter for the wire the reconstructed hit associated to.
-      const CDCWire& getWire() const
+      const CDC::CDCWire& getWire() const
       {
         return getRLWireHit().getWire();
       }
@@ -180,7 +183,7 @@ namespace Belle2 {
       }
 
       /// Checks if the reconstructed hit is associated with the give wire.
-      bool isOnWire(const CDCWire& wire) const
+      bool isOnWire(const CDC::CDCWire& wire) const
       {
         return getRLWireHit().isOnWire(wire);
       }

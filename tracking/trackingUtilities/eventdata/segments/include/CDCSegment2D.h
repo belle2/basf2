@@ -16,8 +16,10 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
     class CDCWire;
+  }
+  namespace TrackingUtilities {
 
     template<class T, class S> class WeightedRelation;
     template<class T, class S> class Relation;
@@ -87,7 +89,7 @@ namespace Belle2 {
       makeWeightedRelation(double weight, const CDCSegment2D* segment) const;
 
       //! Getter for the vector of wires the hits of this segment are based on in the same order.
-      std::vector<const CDCWire*> getWireSegment() const;
+      std::vector<const CDC::CDCWire*> getWireSegment() const;
 
       //! Getter for the vector of the wire hits of this segment are based on in the same order.
       CDCWireHitSegment getWireHitSegment() const;

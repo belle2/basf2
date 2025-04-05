@@ -7,13 +7,14 @@
  **************************************************************************/
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackingUtilities/topology/WireLine.h>
+#include <cdc/topology/WireLine.h>
 
 #include <framework/logging/Logger.h>
 
 #include <gtest/gtest.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 

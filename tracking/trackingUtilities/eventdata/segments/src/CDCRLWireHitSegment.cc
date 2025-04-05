@@ -10,6 +10,7 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 std::vector<const CDCWire*> CDCRLWireHitSegment::getWireSegment() const

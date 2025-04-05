@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackingUtilities/topology/EStereoKind.h>
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/EStereoKind.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
@@ -23,10 +23,13 @@ namespace Belle2 {
   class CDCSimHit;
   class CDCHit;
   class WireID;
+
+  namespace CDC {
+    class CDCWire;
+  }
   namespace TrackingUtilities {
     class CDCTrajectory2D;
     class CDCWireHit;
-    class CDCWire;
     class Vector3D;
     class Vector2D;
 
@@ -123,13 +126,13 @@ namespace Belle2 {
       }
 
       /// Defines wires and oriented wire hits to be coaligned on the wire on which they are based.
-      friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWire& wire)
+      friend bool operator<(const CDCRLWireHit& rlWireHit, const CDC::CDCWire& wire)
       {
         return &rlWireHit.getWire() < &wire;
       }
 
       /// Defines oriented wire hits and wires to be coaligned on the wire on which they are based.
-      friend bool operator<(const CDCWire& wire, const CDCRLWireHit& rlWireHit)
+      friend bool operator<(const CDC::CDCWire& wire, const CDCRLWireHit& rlWireHit)
       {
         return &wire < &rlWireHit.getWire();
       }
@@ -162,10 +165,10 @@ namespace Belle2 {
       const CDCHit* getHit() const;
 
       /// Getter for the wire the oriented hit associated to.
-      const CDCWire& getWire() const;
+      const CDC::CDCWire& getWire() const;
 
       /// Checks if the oriented hit is associated with the give wire.
-      bool isOnWire(const CDCWire& wire) const
+      bool isOnWire(const CDC::CDCWire& wire) const
       {
         return &getWire() == &wire;
       }
@@ -174,10 +177,10 @@ namespace Belle2 {
       const WireID& getWireID() const;
 
       /// Getter for the superlayer id.
-      ISuperLayer getISuperLayer() const;
+      CDC::ISuperLayer getISuperLayer() const;
 
       /// Getter for the stereo type of the underlying wire.
-      EStereoKind getStereoKind() const;
+      CDC::EStereoKind getStereoKind() const;
 
       /// Indicator if the underlying wire is axial.
       bool isAxial() const;

@@ -8,12 +8,13 @@
 
 #include <tracking/trackingUtilities/testFixtures/TrackingUtilitiesTestWithTopology.h>
 
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
-#include <tracking/trackingUtilities/topology/CDCGeometryLoader.h>
+#include <cdc/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCGeometryLoader.h>
 
 #include <cmath>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 

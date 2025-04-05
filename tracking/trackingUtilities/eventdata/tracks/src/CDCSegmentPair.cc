@@ -13,8 +13,8 @@
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 
-#include  <tracking/trackingUtilities/topology/EStereoKind.h>
-#include  <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include  <cdc/topology/EStereoKind.h>
+#include  <cdc/topology/ISuperLayer.h>
 
 #include  <tracking/trackingUtilities/geometry/Vector2D.h>
 
@@ -28,6 +28,7 @@
 #include <cmath>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 CDCSegmentPair::CDCSegmentPair()

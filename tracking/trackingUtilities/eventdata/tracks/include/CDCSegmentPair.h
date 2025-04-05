@@ -9,8 +9,8 @@
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
-#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <cdc/topology/ISuperLayer.h>
+#include <cdc/topology/EStereoKind.h>
 
 #include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
@@ -76,8 +76,8 @@ namespace Belle2 {
       /// Checks if the two segments are of different axial type.
       bool checkSegmentsStereoKinds() const
       {
-        return (getFromStereoKind() == EStereoKind::c_Axial) xor
-               (getToStereoKind() == EStereoKind::c_Axial);
+        return (getFromStereoKind() == CDC::EStereoKind::c_Axial) xor
+               (getToStereoKind() == CDC::EStereoKind::c_Axial);
       }
 
       /// Checks the references to the contained three segment for nullptrs and exactly one of them
@@ -88,16 +88,16 @@ namespace Belle2 {
       }
 
       /// Getter for the stereo type of the first segment.
-      EStereoKind getFromStereoKind() const;
+      CDC::EStereoKind getFromStereoKind() const;
 
       /// Getter for the stereo type of the second segment.
-      EStereoKind getToStereoKind() const;
+      CDC::EStereoKind getToStereoKind() const;
 
       /// Getter for the superlayer id of the from segment.
-      ISuperLayer getFromISuperLayer() const;
+      CDC::ISuperLayer getFromISuperLayer() const;
 
       /// Getter for the superlayer id of the to segment.
-      ISuperLayer getToISuperLayer() const;
+      CDC::ISuperLayer getToISuperLayer() const;
 
       /// Getter for the total number of hits in this segment pair
       std::size_t size() const;
@@ -129,13 +129,13 @@ namespace Belle2 {
       /// Getter for the stereo segment
       const CDCSegment2D* getStereoSegment() const
       {
-        return getFromStereoKind() != EStereoKind::c_Axial ? getFromSegment() : getToSegment();
+        return getFromStereoKind() != CDC::EStereoKind::c_Axial ? getFromSegment() : getToSegment();
       }
 
       /// Getter for the axial segment
       const CDCSegment2D* getAxialSegment() const
       {
-        return getFromStereoKind() == EStereoKind::c_Axial ? getFromSegment() : getToSegment();
+        return getFromStereoKind() == CDC::EStereoKind::c_Axial ? getFromSegment() : getToSegment();
       }
 
       /// Setter for both segments simultaneously

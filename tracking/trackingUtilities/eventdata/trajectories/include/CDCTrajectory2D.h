@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
@@ -25,8 +25,10 @@
 #include <iosfwd>
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
     class WireLine;
+  }
+  namespace TrackingUtilities {
 
     /// Particle trajectory as it is seen in xy projection represented as a circle.
     class CDCTrajectory2D  {
@@ -91,7 +93,7 @@ namespace Belle2 {
        *  @param distance  The desired distance from the wire line a.k.a. drift length
        *  @param z         The expected value of z to which to closest solution should be selected.
        */
-      std::array<double, 2> reconstructBothZ(const WireLine& wireLine, double distance = 0.0, double z = 0) const;
+      std::array<double, 2> reconstructBothZ(const CDC::WireLine& wireLine, double distance = 0.0, double z = 0) const;
 
       /**
        *  Gives the one z positions within the CDC closest to the given z
@@ -103,7 +105,7 @@ namespace Belle2 {
        *  @param distance  The desired distance from the wire line a.k.a. drift length
        *  @param z         The expected value of z to which to closest solution should be selected.
        */
-      double reconstructZ(const WireLine& wireLine, double distance = 0.0, double z = 0) const;
+      double reconstructZ(const CDC::WireLine& wireLine, double distance = 0.0, double z = 0) const;
 
       /**
        *  Gives the two three dimensional points where the drift circle touches the wire line.
@@ -114,7 +116,7 @@ namespace Belle2 {
        *  @param distance  The desired distance from the wire line a.k.a. drift length
        *  @param z         The expected value of z to which to closest solution should be selected.
        */
-      std::array<Vector3D, 2> reconstructBoth3D(const WireLine& wireLine, double distance = 0.0, double z = 0) const;
+      std::array<Vector3D, 2> reconstructBoth3D(const CDC::WireLine& wireLine, double distance = 0.0, double z = 0) const;
 
       /**
        *  Gives the one three dimensional positions within the CDC  closest to the given z
@@ -128,7 +130,7 @@ namespace Belle2 {
        *  @param distance  The desired distance from the wire line a.k.a. drift length
        *  @param z         The expected value of z to which to closest solution should be selected.
        */
-      Vector3D reconstruct3D(const WireLine& wireLine, double distance = 0.0, double z = 0) const;
+      Vector3D reconstruct3D(const CDC::WireLine& wireLine, double distance = 0.0, double z = 0) const;
 
       /// Calculates the closest approach on the trajectory to the given point
       Vector2D getClosest(const Vector2D& point) const;
@@ -138,52 +140,52 @@ namespace Belle2 {
        * Returns which superlayer is traversed after the current one following
        * the trajectory outward or inward as indicated by the boolean input.
        */
-      ISuperLayer getISuperLayerAfter(ISuperLayer iSuperLayer, bool movingOutward) const;
+      CDC::ISuperLayer getISuperLayerAfter(CDC::ISuperLayer iSuperLayer, bool movingOutward) const;
 
       /**
        *  Returns which superlayer is traversed after the current one following
        *  the trajectory outward or inward as indicated by the boolean input.
        */
-      ISuperLayer getISuperLayerAfterStart(bool movingOutward) const;
+      CDC::ISuperLayer getISuperLayerAfterStart(bool movingOutward) const;
 
       /**
        *  Indicates which superlayer is traversed after the current one following
        *  the trajectory forward or backward as indicated by the input.
        */
-      ISuperLayer getISuperLayerAfterStart(EForwardBackward forwardBackwardInfo) const;
+      CDC::ISuperLayer getISuperLayerAfterStart(EForwardBackward forwardBackwardInfo) const;
 
       /**
        *  Indicates which axial superlayer is traversed after the one, where the start point of the
        * trajectory is located considering
        *  if you want to follow the trajectory in the forward or backward direction.
        */
-      ISuperLayer getAxialISuperLayerAfterStart(EForwardBackward forwardBackwardInfo) const;
+      CDC::ISuperLayer getAxialISuperLayerAfterStart(EForwardBackward forwardBackwardInfo) const;
 
     public:
       /// Indicates which superlayer the trajectory traverses after the one, where the start point
       /// of the trajectory is located.
-      ISuperLayer getNextISuperLayer() const;
+      CDC::ISuperLayer getNextISuperLayer() const;
 
       /// Indicates which superlayer the trajectory traverses before the one, where the start point
       /// of the trajectory is located.
-      ISuperLayer getPreviousISuperLayer() const;
+      CDC::ISuperLayer getPreviousISuperLayer() const;
 
       /// Indicates which axial superlayer the trajectory traverses after the one, where the start
       /// point of the trajectory is located.
-      ISuperLayer getNextAxialISuperLayer() const;
+      CDC::ISuperLayer getNextAxialISuperLayer() const;
 
       /// Indicates which axial superlayer the trajectory traverses before the one, where the start
       /// point of the trajectory is located.
-      ISuperLayer getPreviousAxialISuperLayer() const;
+      CDC::ISuperLayer getPreviousAxialISuperLayer() const;
 
       /// Indicates the maximal superlayer the trajectory traverses
-      ISuperLayer getMaximalISuperLayer() const;
+      CDC::ISuperLayer getMaximalISuperLayer() const;
 
       /// Indicates the superlayer the trajectory starts in.
-      ISuperLayer getStartISuperLayer() const;
+      CDC::ISuperLayer getStartISuperLayer() const;
 
       /// Indicates the minimal superlayer the trajectory traverses
-      ISuperLayer getMinimalISuperLayer() const;
+      CDC::ISuperLayer getMinimalISuperLayer() const;
 
     public:
       /**

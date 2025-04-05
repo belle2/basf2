@@ -18,7 +18,7 @@
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
@@ -43,6 +43,7 @@ namespace Belle2 {
 }
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 namespace {

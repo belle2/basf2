@@ -12,7 +12,7 @@
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
@@ -85,13 +85,13 @@ namespace Belle2 {
       }
 
       /// Getter for the superlayer id of the start segment
-      ISuperLayer getStartISuperLayer() const;
+      CDC::ISuperLayer getStartISuperLayer() const;
 
       /// Getter for the superlayer id of the middle segment
-      ISuperLayer getMiddleISuperLayer() const;
+      CDC::ISuperLayer getMiddleISuperLayer() const;
 
       /// Getter for the superlayer id of the end segment
-      ISuperLayer getEndISuperLayer() const;
+      CDC::ISuperLayer getEndISuperLayer() const;
 
       /// Getter for the start axial segment.
       const CDCAxialSegment2D* getStartSegment() const

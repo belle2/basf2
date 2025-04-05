@@ -46,6 +46,7 @@ namespace Belle2 {
 }
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 namespace {

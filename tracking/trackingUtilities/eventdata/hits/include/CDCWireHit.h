@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackingUtilities/topology/EStereoKind.h>
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
-#include <tracking/trackingUtilities/topology/ILayer.h>
+#include <cdc/topology/EStereoKind.h>
+#include <cdc/topology/ISuperLayer.h>
+#include <cdc/topology/ILayer.h>
 
 #include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
@@ -32,11 +32,11 @@ namespace Belle2 {
   namespace CDC {
     class TDCCountTranslatorBase;
     class ADCCountTranslatorBase;
+    class CDCWireSuperLayer;
+    class CDCWire; // IWYU pragma: keep
   }
   namespace TrackingUtilities {
     class CDCTrajectory2D;
-    class CDCWireSuperLayer;
-    class CDCWire; // IWYU pragma: keep
     class Circle2D;
     class Vector3D;
     class Vector2D;
@@ -117,21 +117,21 @@ namespace Belle2 {
       }
 
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
-      friend bool operator<(const CDCWireHit& wireHit, const CDCWire& wire)
+      friend bool operator<(const CDCWireHit& wireHit, const CDC::CDCWire& wire)
       {
         return &wireHit.getWire() < &wire;
       }
 
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
       // Same as above but the other way round.
-      friend bool operator<(const CDCWire& wire, const CDCWireHit& wireHit)
+      friend bool operator<(const CDC::CDCWire& wire, const CDCWireHit& wireHit)
       {
         return &wire < &wireHit.getWire();
       }
 
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
       // Same as above but with CDCWireHit as a pointer.
-      friend bool operator<(const CDCWireHit* wireHit, const CDCWire& wire)
+      friend bool operator<(const CDCWireHit* wireHit, const CDC::CDCWire& wire)
       {
         assert(wireHit);
         return *wireHit < wire;
@@ -139,7 +139,7 @@ namespace Belle2 {
 
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
       // Same as above but the other way round and with CDCWireHit as a pointer.
-      friend bool operator<(const CDCWire& wire, const CDCWireHit* wireHit)
+      friend bool operator<(const CDC::CDCWire& wire, const CDCWireHit* wireHit)
       {
         assert(wireHit);
         return wire < *wireHit;
@@ -164,7 +164,7 @@ namespace Belle2 {
       Index getStoreIHit() const;
 
       /// Getter for the CDCWire the hit is located on.
-      const CDCWire& getWire() const
+      const CDC::CDCWire& getWire() const
       {
         // if (not m_wire) return attachWire();
         if (not m_wire) return attachWire();
@@ -178,7 +178,7 @@ namespace Belle2 {
        *  DataStore is stream across an interprocess boundary or to file.
        *  In this case this method can be called to lookup the wire again.
        */
-      const CDCWire& attachWire() const;
+      const CDC::CDCWire& attachWire() const;
 
       /// Getter for the WireID of the wire the hit is located on.
       const WireID& getWireID() const
@@ -187,25 +187,25 @@ namespace Belle2 {
       }
 
       /// Getter for the stereo type of the underlying wire.
-      EStereoKind getStereoKind() const
+      CDC::EStereoKind getStereoKind() const
       {
-        return ISuperLayerUtil::getStereoKind(getISuperLayer());
+        return CDC::ISuperLayerUtil::getStereoKind(getISuperLayer());
       }
 
       /// Indicator if the underlying wire is axial.
       bool isAxial() const
       {
-        return ISuperLayerUtil::isAxial(getISuperLayer());
+        return CDC::ISuperLayerUtil::isAxial(getISuperLayer());
       }
 
       /// Getter for the super layer id.
-      ISuperLayer getISuperLayer() const
+      CDC::ISuperLayer getISuperLayer() const
       {
         return getWireID().getISuperLayer();
       }
 
       /// Getter for the layer id.
-      ILayer getILayer() const
+      CDC::ILayer getILayer() const
       {
         return getWireID().getILayer();
       }
@@ -238,7 +238,7 @@ namespace Belle2 {
       }
 
       /// Checks if the wire hit is based on the given wire.
-      bool isOnWire(const CDCWire& wire) const
+      bool isOnWire(const CDC::CDCWire& wire) const
       {
         return &getWire() == &wire;
       }
@@ -316,7 +316,7 @@ namespace Belle2 {
       WireID m_wireID;
 
       /// Memory for the CDCWire pointer - Trailing comment indicates to not stream this member
-      mutable CDCWire const* m_wire = nullptr; //!
+      mutable CDC::CDCWire const* m_wire = nullptr; //!
 
       /// Memory for the CDCHit pointer.
       const CDCHit* m_hit = nullptr;
@@ -369,10 +369,10 @@ namespace Belle2 {
     bool operator<(const CDCHit& hit, const CDCWireHit& wireHit);;
 
     /// Defines CDCWireSuperLayer and CDCWireHit to be coordered with the super layers
-    bool operator<(const CDCWireHit& wireHit, const CDCWireSuperLayer& wireSuperLayer);
+    bool operator<(const CDCWireHit& wireHit, const CDC::CDCWireSuperLayer& wireSuperLayer);
 
     /// Defines CDCWireSuperLayer and CDCWireHit to be coordered with the super layers
     // Same as above but the other way round.
-    bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCWireHit& wireHit);
+    bool operator<(const CDC::CDCWireSuperLayer& wireSuperLayer, const CDCWireHit& wireHit);
   }
 }

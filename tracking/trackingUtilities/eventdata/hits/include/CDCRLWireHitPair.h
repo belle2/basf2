@@ -10,16 +10,19 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
-#include <tracking/trackingUtilities/topology/EStereoKind.h>
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/EStereoKind.h>
+#include <cdc/topology/ISuperLayer.h>
 
 namespace Belle2 {
 
-  namespace TrackingUtilities {
-    class CDCWireHit;
+  namespace CDC {
     class CDCWire;
     class WireNeighborKind;
 
+  }
+
+  namespace TrackingUtilities {
+    class CDCWireHit;
     /// A pair of oriented wire hits.
     class CDCRLWireHitPair {
     public:
@@ -73,41 +76,41 @@ namespace Belle2 {
       }
 
       /// Getter for the WireNeighborKind of the two underlying wires
-      WireNeighborKind getNeighborKind() const;
+      CDC::WireNeighborKind getNeighborKind() const;
 
       /// Getter for the common superlayer id of the pair.
-      ISuperLayer getISuperLayer() const
+      CDC::ISuperLayer getISuperLayer() const
       {
-        ISuperLayer result = getFromRLWireHit().getISuperLayer();
-        return result == getToRLWireHit().getISuperLayer() ? result : ISuperLayerUtil::c_Invalid;
+        CDC::ISuperLayer result = getFromRLWireHit().getISuperLayer();
+        return result == getToRLWireHit().getISuperLayer() ? result : CDC::ISuperLayerUtil::c_Invalid;
       }
 
       /// Getter for the common stereo type of the superlayer of the pair.
-      EStereoKind getStereoKind() const
+      CDC::EStereoKind getStereoKind() const
       {
-        return ISuperLayerUtil::getStereoKind(getISuperLayer());
+        return CDC::ISuperLayerUtil::getStereoKind(getISuperLayer());
       }
 
       /// Indicator if the underlying wires are axial.
       bool isAxial() const
       {
-        return getStereoKind() == EStereoKind::c_Axial;
+        return getStereoKind() == CDC::EStereoKind::c_Axial;
       }
 
       /// Getter for the wire the first oriented wire hit is based on.
-      const CDCWire& getFromWire() const
+      const CDC::CDCWire& getFromWire() const
       {
         return getFromRLWireHit().getWire();
       }
 
       /// Getter for the wire the second oriented wire hit is based on.
-      const CDCWire& getToWire() const
+      const CDC::CDCWire& getToWire() const
       {
         return getToRLWireHit().getWire();
       }
 
       /// Indicator if any of the two oriented wire hits is based on the given wire.
-      bool hasWire(const CDCWire& wire) const
+      bool hasWire(const CDC::CDCWire& wire) const
       {
         return getFromRLWireHit().isOnWire(wire) or getToRLWireHit().isOnWire(wire);
       }

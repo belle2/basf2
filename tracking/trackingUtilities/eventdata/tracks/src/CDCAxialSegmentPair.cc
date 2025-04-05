@@ -12,7 +12,7 @@
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
@@ -21,6 +21,7 @@
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 CDCAxialSegmentPair::CDCAxialSegmentPair()

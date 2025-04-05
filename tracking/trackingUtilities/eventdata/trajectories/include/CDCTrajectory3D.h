@@ -27,12 +27,13 @@ namespace genfit {
 
 namespace Belle2 {
   class MCParticle;
+  namespace CDC {
+    class WireLine;
+  }
 
   namespace TrackingUtilities {
     class CDCTrajectory2D;
     class CDCTrajectorySZ;
-
-    class WireLine;
 
     class UncertainPerigeeCircle;
     class UncertainSZLine;
@@ -161,7 +162,7 @@ namespace Belle2 {
        *  stereo layer of the stereo wires.  The point is determined such that it is at the (signed)
        *  distance to  the wire line.
        */
-      Vector3D reconstruct3D(const WireLine& wireLine, double distance = 0.0) const;
+      Vector3D reconstruct3D(const CDC::WireLine& wireLine, double distance = 0.0) const;
 
       /**
        *  Calculate the travel distance from the start position of the trajectory.

@@ -17,7 +17,7 @@ namespace Belle2 {
     class ParameterLine2D;
     class Vector2D;
     class CDCRLWireHit;
-    class CDCRecoHit2D; \
+    class CDCRecoHit2D;
     class CDCTangent;
 
     /**

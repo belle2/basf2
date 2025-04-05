@@ -9,8 +9,8 @@
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
-#include <tracking/trackingUtilities/topology/EStereoKind.h>
+#include <cdc/topology/ISuperLayer.h>
+#include <cdc/topology/EStereoKind.h>
 
 #include <vector>
 
@@ -32,27 +32,27 @@ namespace Belle2 {
        * returns the stereo type of the later. Returns EStereoKind::c_Invalid if the superlayer \n
        * is not shared among the tracking hits.
        */
-      EStereoKind getStereoKind() const
+      CDC::EStereoKind getStereoKind() const
       {
-        return  ISuperLayerUtil::getStereoKind(getISuperLayer());
+        return  CDC::ISuperLayerUtil::getStereoKind(getISuperLayer());
       }
 
       /// Indicator if the underlying wires are axial.
       bool isAxial() const
       {
-        return getStereoKind() ==  EStereoKind::c_Axial;
+        return getStereoKind() ==  CDC::EStereoKind::c_Axial;
       }
 
       /**
        * Returns the common super layer id of all stored tracking hits
        *
        * This checks if all items are located in the same superlayer and
-       * returns the superlayer id of the later. Returns  ISuperLayerUtil::c_Invalid,
+       * returns the superlayer id of the later. Returns  CDC::ISuperLayerUtil::c_Invalid,
        * if the superlayer is not shared among the hits.
        */
-      ISuperLayer getISuperLayer() const
+      CDC::ISuperLayer getISuperLayer() const
       {
-        return  ISuperLayerUtil::getFrom(this->front());
+        return  CDC::ISuperLayerUtil::getFrom(this->front());
       }
 
       /// Legacy accessor for the items of the segments, still used in some corners

@@ -12,8 +12,10 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace CDC {
     class CDCWire;
+  }
+  namespace TrackingUtilities {
     class CDCRLWireHit;
 
     /// A segment consisting of two dimensional reconstructed hits
@@ -23,7 +25,7 @@ namespace Belle2 {
       CDCRLWireHitSegment() {}
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
-      std::vector<const CDCWire*> getWireSegment() const;
+      std::vector<const CDC::CDCWire*> getWireSegment() const;
     };
   }
 }

@@ -12,7 +12,7 @@
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
 
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireTopology.h>
 
 #include <tracking/trackingUtilities/geometry/UncertainHelix.h>
 #include <tracking/trackingUtilities/geometry/Helix.h>
@@ -42,6 +42,7 @@
 #include <ostream>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,

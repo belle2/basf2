@@ -9,10 +9,10 @@
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
 
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
-#include <tracking/trackingUtilities/topology/CDCWireLayer.h>
-#include <tracking/trackingUtilities/topology/WireLine.h>
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireLayer.h>
+#include <cdc/topology/WireLine.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
@@ -32,6 +32,7 @@
 #include <cassert>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 CDCTrajectory2D::CDCTrajectory2D()

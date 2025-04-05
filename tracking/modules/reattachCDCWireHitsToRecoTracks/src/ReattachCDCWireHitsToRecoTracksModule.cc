@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/modules/reattachCDCWireHitsToRecoTracks/ReattachCDCWireHitsToRecoTracksModule.h>
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <cdc/topology/CDCWire.h>
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
@@ -17,6 +17,7 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackingUtilities;
 
 REG_MODULE(ReattachCDCWireHitsToRecoTracks);

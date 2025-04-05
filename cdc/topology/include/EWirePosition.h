@@ -11,6 +11,7 @@
 namespace Belle2 {
   namespace CDC {
 
+    /// For ease-of-use just create a new alias for CDCGeometryPar::EWirePosition
     using EWirePosition = CDCGeometryPar::EWirePosition;
 
   }

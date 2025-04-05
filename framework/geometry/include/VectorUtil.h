@@ -146,7 +146,11 @@ namespace Belle2 {
      * {
      *   return relativTo.scaled(relativTo.cross(*this) / relativTo.normSquared()).orthogonal();
      * }
-     * with v2 = relativTo and v1 = *this
+     * with v2 = relativTo and v1 = *this.
+     *
+     * TODO: check whether this can be replaced by ROOT::Math::VectorUtil::PerpVector()
+     * https://root.cern/doc/v628/namespaceROOT_1_1Math_1_1VectorUtil.html#a7503c235c5e71f762d44d253e5f6e9a3
+     * though likely not for the 2D case as we use here.
      */
     inline ROOT::Math::XYVector orthogonalVector(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& v2)
     {
@@ -163,7 +167,10 @@ namespace Belle2 {
      * {
      *   return relativTo.scaled(relativTo.dot(*this) / relativTo.normSquared());
      * }
-     * with v2 = relativTo and v1 = *this
+     * with v2 = relativTo and v1 = *this.
+     *
+     * TODO: check whether this can be replaced by ROOT::Math::VectorUtil::ProjVector()
+     * https://root.cern/doc/v628/namespaceROOT_1_1Math_1_1VectorUtil.html#ad067df491cad5594499d9a1860a00f4c
      */
     inline ROOT::Math::XYZVector parallelVector(const ROOT::Math::XYZVector& v1, const ROOT::Math::XYZVector& v2)
     {
@@ -185,7 +192,10 @@ namespace Belle2 {
      * {
      *   return relativTo.cross(*this).norm() / relativTo.norm();
      * }
-     * with v2 = relativTo and v1 = *this
+     * with v2 = relativTo and v1 = *this.
+     *
+     * TODO: check whether this can be replaced by ROOT::Math::VectorUtil::Perp()
+     * https://root.cern/doc/v628/namespaceROOT_1_1Math_1_1VectorUtil.html#a1dc4268cc95f8121f1833e24175b0ea2
      */
     inline double orthogonalComp(const ROOT::Math::XYZVector& v1, const ROOT::Math::XYZVector& v2)
     {

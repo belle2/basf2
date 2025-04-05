@@ -12,7 +12,6 @@
 #include <cdc/topology/CDCWireSuperLayer.h>
 #include <cdc/topology/CDCWireLayer.h>
 
-#include <cdc/topology/EWirePositionToCDC.h>
 #include <cdc/topology/EWirePosition.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>

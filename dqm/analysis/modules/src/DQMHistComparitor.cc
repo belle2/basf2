@@ -13,13 +13,7 @@
 
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <dqm/analysis/modules/DQMHistComparitor.h>
-#include <TROOT.h>
 #include <TStyle.h>
-#include <TClass.h>
-#include <TDirectory.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TKey.h>
 
 using namespace std;
 using namespace Belle2;
@@ -45,107 +39,6 @@ DQMHistComparitorModule::DQMHistComparitorModule()
 
 DQMHistComparitorModule::~DQMHistComparitorModule()
 {
-#ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
-#endif
-}
-
-TH1* DQMHistComparitorModule::GetHisto(TString histoname)
-{
-  TH1* hh1;
-  gROOT->cd();
-  hh1 = findHist(histoname.Data());
-  if (hh1 == NULL) {
-    B2DEBUG(20, "findHist failed " << histoname << " not in memfile");
-
-    // first search reference root file ... if there is one
-    if (m_refFile && m_refFile->IsOpen()) {
-      TDirectory* d = m_refFile;
-      TString myl = histoname;
-      TString tok;
-      Ssiz_t from = 0;
-      B2DEBUG(20, myl);
-      while (myl.Tokenize(tok, from, "/")) {
-        TString dummy;
-        Ssiz_t f;
-        f = from;
-        if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-          auto e = d->GetDirectory(tok);
-          if (e) {
-            B2DEBUG(20, "Cd Dir " << tok << " from " << d->GetPath());
-            d = e;
-          } else {
-            B2DEBUG(20, "cd failed " << tok << " from " << d->GetPath());
-          }
-        } else {
-          break;
-        }
-      }
-      TObject* obj = d->FindObject(tok);
-      if (obj != NULL) {
-        if (obj->IsA()->InheritsFrom("TH1")) {
-          B2DEBUG(20, "Histo " << histoname << " found in ref file");
-          hh1 = (TH1*)obj;
-        } else {
-          B2DEBUG(20, "Histo " << histoname << " found in ref file but wrong type");
-        }
-      } else {
-        // seems find will only find objects, not keys, thus get the object on first access
-        TIter next(d->GetListOfKeys());
-        TKey* key;
-        while ((key = (TKey*)next())) {
-          TObject* obj2 = key->ReadObj() ;
-          if (obj2->InheritsFrom("TH1")) {
-            if (obj2->GetName() == tok) {
-              hh1 = (TH1*)obj2;
-              B2DEBUG(20, "Histo " << histoname << " found as key -> readobj");
-              break;
-            }
-          }
-        }
-        if (hh1 == NULL) B2DEBUG(20, "Histo " << histoname << " NOT found in ref file " << tok);
-      }
-    }
-
-    if (hh1 == NULL) {
-      B2DEBUG(20, "Histo " << histoname << " not in memfile or ref file");
-
-      TDirectory* d = gROOT;
-      TString myl = histoname;
-      TString tok;
-      Ssiz_t from = 0;
-      while (myl.Tokenize(tok, from, "/")) {
-        TString dummy;
-        Ssiz_t f;
-        f = from;
-        if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-          auto e = d->GetDirectory(tok);
-          if (e) {
-            B2DEBUG(20, "Cd Dir " << tok);
-            d = e;
-          } else B2DEBUG(20, "cd failed " << tok);
-          d->cd();
-        } else {
-          break;
-        }
-      }
-      TObject* obj = d->FindObject(tok);
-      if (obj != NULL) {
-        if (obj->IsA()->InheritsFrom("TH1")) {
-          B2DEBUG(20, "Histo " << histoname << " found in mem");
-          hh1 = (TH1*)obj;
-        }
-      } else {
-        B2DEBUG(20, "Histo " << histoname << " NOT found in mem");
-      }
-    }
-  }
-
-  if (hh1 == NULL) {
-    B2DEBUG(20, "Histo " << histoname << " not found");
-  }
-
-  return hh1;
 }
 
 void DQMHistComparitorModule::initialize()
@@ -159,41 +52,27 @@ void DQMHistComparitorModule::initialize()
   gStyle->SetStatStyle(1);
   gStyle->SetOptDate(22);// Date and Time in Bottom Right, does no work
 
-#ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-#endif
   for (auto& it : m_histlist) {
     if (it.size() != 7) {
       B2WARNING("Histolist with wrong nr of parameters (" << it.size() << "), hist1=" << it.at(0));
       continue;
     }
 
-    // Do not check for histogram existence here, as it might not be
-    // in memfile when analysis task is started
-    TString a = it.at(2).c_str();
-
     auto n = new CMPNODE;
     n->histo1 = it.at(0);
     n->histo2 = it.at(1);
-    TCanvas* c = new TCanvas(a);
+    TCanvas* c = new TCanvas(it.at(2).c_str());
     n->canvas = c;
 
     n->min_entries = atoi(it.at(3).c_str());
     n->warning = atof(it.at(4).c_str());
     n->error = atof(it.at(5).c_str());
-    n->epicsflag = false;
-
-#ifdef _BELLE2_EPICS
-    if (it.at(6) != "") {
-      SEVCHK(ca_create_channel(it.at(6).c_str(), NULL, NULL, 10, &n->mychid), "ca_create_channel failure");
-      n->epicsflag = true;
+    n->pvname = it.at(6);
+    if (n->pvname != "") {
+      registerEpicsPV(n->pvname);
     }
-#endif
     m_pnode.push_back(n);
   }
-#ifdef _BELLE2_EPICS
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-#endif
 
   B2DEBUG(20, "DQMHistComparitor: initialized.");
 }
@@ -207,18 +86,19 @@ void DQMHistComparitorModule::beginRun()
 void DQMHistComparitorModule::event()
 {
   for (auto& it : m_pnode) {
-
-    TH1* hist1, *hist2;
-
     B2DEBUG(20, "== Search for " << it->histo1 << " with ref " << it->histo2 << "==");
-    hist1 = findHistInCanvas(it->histo1.Data());
-    if (!hist1) B2DEBUG(20, "NOT Found " << it->histo1);
-    hist2 = GetHisto(it->histo2);
-    if (!hist2) B2DEBUG(20, "NOT Found " << it->histo2);
-    // Dont compare if any of hists is missing ... TODO We should clean CANVAS, raise some error if we cannot compare
-    if (!hist1) continue;
-    if (!hist2) continue;
-
+    auto hist1 = findHist(it->histo1, true); // only if changed
+    if (!hist1) {
+      B2DEBUG(20, "NOT Found " << it->histo1);
+      // Dont compare if missing or not updated ...
+      continue;
+    }
+    auto hist2 = findRefHist(it->histo2, ERefScaling::c_RefScaleEntries, hist1);
+    if (!hist2) {
+      B2DEBUG(20, "NOT Found " << it->histo2);
+      // Dont compare if any of hists is missing ...
+      continue;
+    }
     B2DEBUG(20, "Compare " << it->histo1 << " with ref " << it->histo2);
     // if compare normalized ... does not work!
     // hist2->Scale(hist1->GetEntries()/hist2->GetEntries());
@@ -227,9 +107,7 @@ void DQMHistComparitorModule::event()
     //     data = hist1->Chi2Test(hist2);// return p value (0 bad, 1 good), ignores normalization
     //     data= BinByBinTest(hits1,hist2);// user function (like Peters test)
     //     printf(" %.2f %.2f %.2f\n",(float)data,it->warning,it->error);
-#ifdef _BELLE2_EPICS
-    if (it->epicsflag) SEVCHK(ca_put(DBR_DOUBLE, it->mychid, (void*)&data), "ca_set failure");
-#endif
+    if (it->pvname != "") setEpicsPV(it->pvname, data);
     it->canvas->cd();
     hist2->SetLineStyle(3);// 2 or 3
     hist2->SetLineColor(3);
@@ -244,23 +122,14 @@ void DQMHistComparitorModule::event()
       }
     }
 
-    // if draw normalized
-    TH1* h;
-    if (1) {
-      h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
-      if (abs(hist2->Integral()) > 0)
-        h->Scale(hist1->Integral() / hist2->Integral());
-    } else {
-      hist2->Draw("hist");
-    }
-
-    h->SetFillColor(0);
-    h->SetStats(kFALSE);
+    hist2->Draw("hist");
+    hist2->SetFillColor(0);
+    hist2->SetStats(kFALSE);
     hist1->SetFillColor(0);
-    if (h->GetMaximum() > hist1->GetMaximum())
-      hist1->SetMaximum(1.1 * h->GetMaximum());
+    if (hist2->GetMaximum() > hist1->GetMaximum())
+      hist1->SetMaximum(1.1 * hist2->GetMaximum());
     hist1->Draw("hist");
-    h->Draw("hist,same");
+    hist2->Draw("hist,same");
 
     it->canvas->Pad()->SetFrameFillColor(10);
     if (m_color) {
@@ -282,9 +151,6 @@ void DQMHistComparitorModule::event()
     it->canvas->Modified();
     it->canvas->Update();
   }
-#ifdef _BELLE2_EPICS
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-#endif
 }
 
 void DQMHistComparitorModule::endRun()

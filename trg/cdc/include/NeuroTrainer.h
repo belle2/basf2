@@ -27,8 +27,7 @@
 #include <framework/geometry/B2Vector3.h>
 
 
-using namespace Belle2;
-namespace NeuroTrainer {
+namespace Belle2::NeuroTrainer {
   std::vector<float> getTrainTargets(bool& trainonreco, CDCTriggerTrack* twodtrack, std::string targetcollectionname)
   {
     std::vector<float> ret;

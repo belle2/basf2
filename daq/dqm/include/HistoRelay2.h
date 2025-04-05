@@ -5,27 +5,30 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include "dqm/analysis/HistObject.h"
+#pragma once
 
-using namespace Belle2;
+#include <string>
+#include <TDirectory.h>
 
-HistObject::~HistObject()
-{
+#include <daq/dataflow/EvtSocket.h>
+#include <framework/pcore/MsgHandler.h>
+
+namespace Belle2 {
+  class HistoRelay2 {
+  public:
+    HistoRelay2(std::string& filename, std::string& dest, int port);
+    ~HistoRelay2();
+
+    int collect();
+  private:
+    std::string m_filename;
+    EvtSocketSend* m_sock;
+    std::string m_dest;
+    int m_port;
+
+    EvtMessage* StreamFile(std::string& filename);
+    int StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numobjs);
+
+  };
 }
 
-bool HistObject::update(TH1* hist)
-{
-  if (hist) {
-    // usual check for nullptr
-    m_updated |= hist->GetEntries() != m_entries;
-    m_entries = hist->GetEntries();
-  }
-  m_hist = std::unique_ptr<TH1>(hist); // even if it is nullptr
-  return m_updated;
-}
-
-void HistObject::resetBeforeEvent(void)
-{
-  m_hist = nullptr;
-  m_updated = false;
-}

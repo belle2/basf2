@@ -100,6 +100,13 @@ void CKFToSVDFindlet::beginEvent()
 void CKFToSVDFindlet::apply()
 {
   m_dataHandler.apply(m_cdcRecoTrackVector);
+  // Don't use RecoTracks that don't have CDC hits, which can happen in an SVD based tracking
+  // where the SVD standalone tracking is followed by the ToCDCCKF and the CDC standalone tracking.
+  const auto hasNoCDCHits = [](const RecoTrack * recoTrack) {
+    return recoTrack->getNumberOfCDCHits() == 0;
+  };
+  TrackFindingCDC::erase_remove_if(m_cdcRecoTrackVector, hasNoCDCHits);
+
   m_hitsLoader.apply(m_spacePointVector);
 
   B2DEBUG(29, "Now have " << m_spacePointVector.size() << " hits.");

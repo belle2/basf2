@@ -12,19 +12,7 @@
 
 #pragma once
 
-// EPICS
-#ifdef _BELLE2_EPICS
-#include "cadef.h"
-// #include "dbDefs.h"
-// #include "epicsString.h"
-// #include "cantProceed.h"
-#endif
-
 #include <dqm/core/DQMHistAnalysis.h>
-#include <TH1.h>
-#include <TCanvas.h>
-#include <TFile.h>
-#include <TString.h>
 
 namespace Belle2 {
   /** Class definition for the reference histogram display. */
@@ -35,15 +23,12 @@ namespace Belle2 {
      * The struct for reference histogram comparison.
      */
     typedef struct {
-#ifdef _BELLE2_EPICS
-      chid    mychid;
-#endif
-      /** Whether to use EPICS. */
-      bool epicsflag;
+      /** The name of the PV, empty if none */
+      std::string pvname;
       /** The name of the histogram to be compared. */
-      TString histo1;
+      std::string histo1;
       /** The name of the reference histogram. */
-      TString histo2;
+      std::string histo2;
       /** The canvas to display both original and reference histograms. */
       TCanvas* canvas;
       /** The warning level for the histogram difference. */

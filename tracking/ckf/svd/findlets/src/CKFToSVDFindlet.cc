@@ -105,7 +105,7 @@ void CKFToSVDFindlet::apply()
   const auto hasNoCDCHits = [](const RecoTrack * recoTrack) {
     return recoTrack->getNumberOfCDCHits() == 0;
   };
-  TrackFindingCDC::erase_remove_if(m_cdcRecoTrackVector, hasNoCDCHits);
+  TrackingUtilities::erase_remove_if(m_cdcRecoTrackVector, hasNoCDCHits);
 
   m_hitsLoader.apply(m_spacePointVector);
 

@@ -151,6 +151,7 @@ namespace Belle2 {
      * TODO: check whether this can be replaced by ROOT::Math::VectorUtil::PerpVector()
      * https://root.cern/doc/v628/namespaceROOT_1_1Math_1_1VectorUtil.html#a7503c235c5e71f762d44d253e5f6e9a3
      * though likely not for the 2D case as we use here.
+     * If we can use it, obviously replace the function and where it's used.
      */
     inline ROOT::Math::XYVector orthogonalVector(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& v2)
     {
@@ -171,6 +172,7 @@ namespace Belle2 {
      *
      * TODO: check whether this can be replaced by ROOT::Math::VectorUtil::ProjVector()
      * https://root.cern/doc/v628/namespaceROOT_1_1Math_1_1VectorUtil.html#ad067df491cad5594499d9a1860a00f4c
+     * and if so, obviously replace where it is used.
      */
     inline ROOT::Math::XYZVector parallelVector(const ROOT::Math::XYZVector& v1, const ROOT::Math::XYZVector& v2)
     {
@@ -196,6 +198,7 @@ namespace Belle2 {
      *
      * TODO: check whether this can be replaced by ROOT::Math::VectorUtil::Perp()
      * https://root.cern/doc/v628/namespaceROOT_1_1Math_1_1VectorUtil.html#a1dc4268cc95f8121f1833e24175b0ea2
+     * and if so, obviously replace where it is used.
      */
     inline double orthogonalComp(const ROOT::Math::XYZVector& v1, const ROOT::Math::XYZVector& v2)
     {

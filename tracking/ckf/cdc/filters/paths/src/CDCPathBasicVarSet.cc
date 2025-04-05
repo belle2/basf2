@@ -11,8 +11,8 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWire.h>
+#include <cdc/topology/CDCWireTopology.h>
 
 using namespace Belle2;
 
@@ -94,7 +94,7 @@ bool CDCPathBasicVarSet::extract(const BaseCDCPathFilter::Object* path)
   var<named("totalHitsSeedTrack")>() = seedRecoTrack->getNumberOfCDCHits();
 
   // get ICLayer assigned to seed (only really defined for ECL seeds)
-  const auto& wireTopology = TrackingUtilities::CDCWireTopology::getInstance();
+  const auto& wireTopology = CDC::CDCWireTopology::getInstance();
   const auto& wires = wireTopology.getWires();
   const float maxForwardZ = wires.back().getForwardZ();     // 157.615
   const float maxBackwardZ = wires.back().getBackwardZ();   // -72.0916

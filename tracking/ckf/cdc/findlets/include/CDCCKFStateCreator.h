@@ -15,8 +15,8 @@
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWire.h>
+#include <cdc/topology/CDCWireTopology.h>
 
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
@@ -106,7 +106,7 @@ namespace Belle2 {
         if (doForward) {
           lastICLayer = 0;
         } else {
-          const auto& wireTopology = TrackingUtilities::CDCWireTopology::getInstance();
+          const auto& wireTopology = CDC::CDCWireTopology::getInstance();
           const auto& wires = wireTopology.getWires();
           const float maxForwardZ = wires.back().getForwardZ();     // 157.615
           const float maxBackwardZ = wires.back().getBackwardZ();   // -72.0916

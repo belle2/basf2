@@ -139,7 +139,7 @@ namespace Belle2 {
       if (wireHit->isAxial()) {
         recoPos2D = wireHit->reconstruct2D(trajectory2D);
       } else {
-        const TrackingUtilities::CDCWire& wire = wireHit->getWire();
+        const CDC::CDCWire& wire = wireHit->getWire();
         const TrackingUtilities::Vector2D& posOnXYPlane = wireHit->reconstruct2D(trajectory2D);
 
         const double arcLength = trajectory2D.calcArcLength2D(posOnXYPlane);

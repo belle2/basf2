@@ -20,7 +20,7 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <cdc/topology/CDCWire.h>
 
 #include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
@@ -37,6 +37,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 

@@ -16,11 +16,12 @@
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <cdc/topology/CDCWire.h>
 
 #include <tracking/trackingUtilities/numerics/ToFinite.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 

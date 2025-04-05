@@ -13,7 +13,7 @@
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <cdc/topology/CDCWire.h>
 
 #include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 #include <tracking/trackingUtilities/utilities/Functional.h>

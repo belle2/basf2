@@ -11,7 +11,7 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <cdc/topology/CDCWire.h>
 
 #include <tracking/trackingUtilities/numerics/ESign.h>
 #include <tracking/trackingUtilities/numerics/Weight.h>
@@ -70,7 +70,7 @@ namespace Belle2 {
       TrackingUtilities::Weight operator()(const TrackingUtilities::CDCRecoHit2D* recoHit2D,
                                            const HoughBox* houghBox)
       {
-        const TrackingUtilities::CDCWire& wire = recoHit2D->getWire();
+        const CDC::CDCWire& wire = recoHit2D->getWire();
         const double signedDriftLength = recoHit2D->getSignedRefDriftLength();
         bool isIn = contains(*houghBox, wire, signedDriftLength);
         TrackingUtilities::ERightLeft rlInfo = recoHit2D->getRLInfo();
@@ -86,7 +86,7 @@ namespace Belle2 {
       TrackingUtilities::Weight operator()(const TrackingUtilities::CDCWireHit* wireHit,
                                            const HoughBox* houghBox)
       {
-        const TrackingUtilities::CDCWire& wire = wireHit->getWire();
+        const CDC::CDCWire& wire = wireHit->getWire();
         const double driftLength = wireHit->getRefDriftLength();
 
         TrackingUtilities::ERightLeft rlInfo = containsRightOrLeft(*houghBox, wire, driftLength);
@@ -107,7 +107,7 @@ namespace Belle2 {
       TrackingUtilities::Weight operator()(TrackingUtilities::CDCRLWireHit& rlTaggedWireHit,
                                            const HoughBox* houghBox)
       {
-        const TrackingUtilities::CDCWire& wire = rlTaggedWireHit.getWire();
+        const CDC::CDCWire& wire = rlTaggedWireHit.getWire();
         const TrackingUtilities::ERightLeft rlInfo = rlTaggedWireHit.getRLInfo();
         const double driftLength = rlTaggedWireHit.getRefDriftLength();
 
@@ -130,7 +130,7 @@ namespace Belle2 {
        *      * ERightLeft::c_Invalid if non of the orientations is possible.
        */
       TrackingUtilities::ERightLeft containsRightOrLeft(const HoughBox& houghBox,
-                                                        const TrackingUtilities::CDCWire& wire,
+                                                        const CDC::CDCWire& wire,
                                                         double driftLength,
                                                         TrackingUtilities::ERightLeft rlInfo = TrackingUtilities::ERightLeft::c_Unknown)
       {
@@ -149,12 +149,12 @@ namespace Belle2 {
       }
 
       /** Checks if a wire hit at a signed drift length is contained in the hough space part */
-      bool contains(const HoughBox& houghBox, const TrackingUtilities::CDCWire& wire, double signedDriftLength)
+      bool contains(const HoughBox& houghBox, const CDC::CDCWire& wire, double signedDriftLength)
       {
         const TrackingUtilities::Vector2D& pos2D = wire.getRefPos2D();
         //const Vector2D& pos2D = wire.getWirePos2DAtZ(0);
         const TrackingUtilities::Vector2D& movePerZ = wire.getMovePerZ();
-        TrackingUtilities::ILayer iCLayer(wire.getICLayer());
+        CDC::ILayer iCLayer(wire.getICLayer());
         //B2INFO("movePerZ = " << movePerZ);
         const TrackingUtilities::ESign distSign = this->getDistanceSign(houghBox,
                                                   pos2D.x(),  pos2D.y(),

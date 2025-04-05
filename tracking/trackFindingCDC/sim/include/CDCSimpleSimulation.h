@@ -123,12 +123,12 @@ namespace Belle2 {
       std::vector<SimpleSimHit> createHits(const TrackingUtilities::Helix& globalHelix, double arcLength2DOffset) const;
 
       /// Generate connected hits for wires in the same layer close to the given wire.
-      std::vector<SimpleSimHit> createHitsForLayer(const TrackingUtilities::CDCWire& nearWire,
+      std::vector<SimpleSimHit> createHitsForLayer(const CDC::CDCWire& nearWire,
                                                    const TrackingUtilities::Helix& globalHelix,
                                                    double arcLength2DOffset) const;
 
       /// Generate a hit for the given wire.
-      SimpleSimHit createHitForCell(const TrackingUtilities::CDCWire& wire,
+      SimpleSimHit createHitForCell(const CDC::CDCWire& wire,
                                     const TrackingUtilities::Helix& globalHelix,
                                     double arcLength2DOffset) const;
 

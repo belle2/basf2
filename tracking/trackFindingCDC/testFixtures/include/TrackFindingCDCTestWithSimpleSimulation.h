@@ -15,7 +15,7 @@
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireTopology.h>
 
 #include <tracking/trackingUtilities/geometry/Helix.h>
 
@@ -123,7 +123,7 @@ namespace Belle2 {
 
         // Filter the axial segments
         for (const TrackingUtilities::CDCSegment2D& segment2D : m_mcSegment2Ds) {
-          if (segment2D.getStereoKind() == TrackingUtilities::EStereoKind::c_Axial) {
+          if (segment2D.getStereoKind() == CDC::EStereoKind::c_Axial) {
             m_mcAxialSegment2Ds.push_back(&segment2D);
           }
         }
@@ -140,7 +140,7 @@ namespace Belle2 {
           m_wireHits.push_back(&wireHit);
         }
 
-        m_plotter.draw(TrackingUtilities::CDCWireTopology::getInstance());
+        m_plotter.draw(CDC::CDCWireTopology::getInstance());
         for (const TrackingUtilities::CDCWireHit& wireHit : m_simpleSimulation.getWireHits()) {
           m_plotter.draw(wireHit);
         }

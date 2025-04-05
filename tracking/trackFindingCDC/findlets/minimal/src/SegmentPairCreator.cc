@@ -21,6 +21,7 @@
 #include <algorithm>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 

@@ -12,7 +12,7 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/ISuperLayer.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 
@@ -34,6 +34,7 @@
 #include <cmath>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 

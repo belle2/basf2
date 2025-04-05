@@ -83,7 +83,7 @@ namespace Belle2 {
     }
 
     template <class AFitMethod>
-    TrackingUtilities::CDCTrajectory2D CDCFitter2D<AFitMethod>::fit(const std::vector<const TrackingUtilities::CDCWire*>& wires) const
+    TrackingUtilities::CDCTrajectory2D CDCFitter2D<AFitMethod>::fit(const std::vector<const CDC::CDCWire*>& wires) const
     {
       return fitGeneric(wires);
     }

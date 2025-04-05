@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/filters/facetRelation/BaseFacetRelationFilter.h>
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <array>
 #include <vector>
@@ -56,10 +56,10 @@ namespace Belle2 {
 
     private: // Cached values
       /// Memory for the chi2 cut values distinguished by superlayer
-      std::array<double, TrackingUtilities::ISuperLayerUtil::c_N> m_chi2CutByISuperLayer{};
+      std::array<double, CDC::ISuperLayerUtil::c_N> m_chi2CutByISuperLayer{};
 
       /// Memory for the chi2 cut values distinguished by superlayer
-      std::array<double, TrackingUtilities::ISuperLayerUtil::c_N> m_penaltyWidthByISuperLayer{};
+      std::array<double, CDC::ISuperLayerUtil::c_N> m_penaltyWidthByISuperLayer{};
     };
   }
 }

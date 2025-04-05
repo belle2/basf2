@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireTopology.h>
 
 #include <tracking/trackingUtilities/utilities/Functional.h>
 #include <tracking/trackingUtilities/utilities/Algorithms.h>
@@ -23,6 +23,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 

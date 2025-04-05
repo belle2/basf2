@@ -9,7 +9,7 @@
 
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <cdc/topology/CDCWire.h>
 
 #include <tracking/trackingUtilities/utilities/Functional.h>
 

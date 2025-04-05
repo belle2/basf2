@@ -10,14 +10,15 @@
 #include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/CDCWireTopology.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <cassert>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 

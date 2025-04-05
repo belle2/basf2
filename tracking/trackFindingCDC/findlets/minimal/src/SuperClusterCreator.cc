@@ -10,8 +10,8 @@
 #include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackingUtilities/topology/CDCWireLayer.h>
-#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <cdc/topology/CDCWireLayer.h>
+#include <cdc/topology/CDCWire.h>
 
 #include <tracking/trackingUtilities/filters/base/RelationFilterUtil.h>
 
@@ -25,6 +25,7 @@
 #include <utility>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 

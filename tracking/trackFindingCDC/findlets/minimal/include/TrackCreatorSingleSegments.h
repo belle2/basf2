@@ -9,7 +9,7 @@
 
 #include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <map>
 #include <vector>
@@ -61,7 +61,7 @@ namespace Belle2 {
        *  Defaults to {{0, 15}}, meaning a segment with more then 15 hits
        *  in the first super layer will become a track.
        */
-      std::map<TrackingUtilities::ISuperLayer, size_t> m_param_minimalHitsBySuperLayerId;
+      std::map<CDC::ISuperLayer, size_t> m_param_minimalHitsBySuperLayerId;
     };
   }
 }

@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/ISuperLayer.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
 #include <array>
@@ -115,16 +115,16 @@ namespace Belle2 {
 
     private:
       /** Helper function getting the empty axial! super layers that appear in the chain of super layers that is supposed to be occupied*/
-      static std::vector<TrackingUtilities::ISuperLayer> getSLayerHoles(const std::array<int, TrackingUtilities::ISuperLayerUtil::c_N>&
-          nHitsBySLayer);  // return 0;
+      static std::vector<CDC::ISuperLayer> getSLayerHoles(const std::array<int, CDC::ISuperLayerUtil::c_N>&
+                                                          nHitsBySLayer);  // return 0;
 
       /** Helper function to extract the first filled entry in the array of super layers ( = the start superlayer of the track). */
-      static TrackingUtilities::ISuperLayer getFirstOccupiedISuperLayer(const std::array<int, TrackingUtilities::ISuperLayerUtil::c_N>&
-          nHitsBySLayer);
+      static CDC::ISuperLayer getFirstOccupiedISuperLayer(const std::array<int, CDC::ISuperLayerUtil::c_N>&
+                                                          nHitsBySLayer);
 
       /** Helper function to extract the last filled entry in the array of super layers ( = the final superlayer of the track). */
-      static TrackingUtilities::ISuperLayer getLastOccupiedISuperLayer(const std::array<int, TrackingUtilities::ISuperLayerUtil::c_N>&
-          nHitsBySLayer);
+      static CDC::ISuperLayer getLastOccupiedISuperLayer(const std::array<int, CDC::ISuperLayerUtil::c_N>&
+                                                         nHitsBySLayer);
     };
   }
 }

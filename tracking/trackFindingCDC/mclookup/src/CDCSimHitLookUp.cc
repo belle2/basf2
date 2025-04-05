@@ -14,7 +14,7 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireTopology.h>
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
 
@@ -26,6 +26,7 @@
 #include <vector>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 

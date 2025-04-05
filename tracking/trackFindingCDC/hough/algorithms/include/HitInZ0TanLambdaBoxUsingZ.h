@@ -11,8 +11,8 @@
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
-#include <tracking/trackingUtilities/topology/WireLine.h>
+#include <cdc/topology/CDCWire.h>
+#include <cdc/topology/WireLine.h>
 
 #include <tracking/trackingUtilities/numerics/Weight.h>
 
@@ -40,8 +40,8 @@ namespace Belle2 {
       TrackingUtilities::Weight operator()(const TrackingUtilities::CDCRecoHit3D& recoHit,
                                            const HoughBox* z0TanLambdaBox)
       {
-        const TrackingUtilities::CDCWire& wire = recoHit.getWire();
-        const TrackingUtilities::WireLine& wireLine = wire.getWireLine();
+        const CDC::CDCWire& wire = recoHit.getWire();
+        const CDC::WireLine& wireLine = wire.getWireLine();
 
         float lowerZ0 = z0TanLambdaBox->getLowerZ0();
         float upperZ0 = z0TanLambdaBox->getUpperZ0();

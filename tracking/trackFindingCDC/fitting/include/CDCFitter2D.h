@@ -12,10 +12,12 @@
 #include <vector>
 
 namespace Belle2 {
+  namespace CDC {
+    class CDCWire;
+  }
   namespace TrackingUtilities {
     class CDCTrack;
     class CDCWireHit;
-    class CDCWire;
     class CDCTrajectory2D;
     class CDCSegment3D;
     class CDCAxialSegmentPair;
@@ -65,7 +67,7 @@ namespace Belle2 {
       TrackingUtilities::CDCTrajectory2D fit(const std::vector<const TrackingUtilities::CDCWireHit*>& wireHit) const;
 
       /// Fits to the wire positions. Explicit specialisation to be used from python.
-      TrackingUtilities::CDCTrajectory2D fit(const std::vector<const TrackingUtilities::CDCWire*>& wires) const;
+      TrackingUtilities::CDCTrajectory2D fit(const std::vector<const CDC::CDCWire*>& wires) const;
 
       /// Fits to the wire positions. Explicit specialisation to be used from python.
       TrackingUtilities::CDCTrajectory2D fit(const TrackingUtilities::CDCWireHitSegment& wireHits) const;

@@ -391,7 +391,7 @@ class CDCSVGDisplayModule(basf2.Module):
         # Now preferred way of plotting the wires
         if self.draw_wires:
             theCDCWireTopology = \
-                Belle2.TrackingUtilities.CDCWireTopology.getInstance()
+                Belle2.CDC.CDCWireTopology.getInstance()
 
             if self.use_cpp:
                 cppplotter.drawWires(theCDCWireTopology)
@@ -430,7 +430,7 @@ class CDCSVGDisplayModule(basf2.Module):
 
         # if self.draw_wires:
         #    theCDCWireTopology = \
-        #        Belle2.TrackingUtilities.CDCWireTopology.getInstance()
+        #        Belle2.CDC.CDCWireTopology.getInstance()
         #    cppplotter.draw(theCDCWireTopology)
 
         # Plotter instance receiving drawable tracking objects.

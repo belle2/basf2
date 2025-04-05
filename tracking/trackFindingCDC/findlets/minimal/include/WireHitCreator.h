@@ -10,8 +10,8 @@
 #include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
-#include <tracking/trackingUtilities/topology/EWirePosition.h>
+#include <cdc/topology/ISuperLayer.h>
+#include <cdc/topology/EWirePosition.h>
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
 
@@ -107,10 +107,10 @@ namespace Belle2 {
 
     private: // Prepared variables
       /// Geometry set to be used.
-      TrackingUtilities::EWirePosition m_wirePosition = TrackingUtilities::EWirePosition::c_Base;
+      CDC::EWirePosition m_wirePosition = CDC::EWirePosition::c_Base;
 
       /// Cut for approximate drift time (super-layer dependent)
-      std::array<float, TrackingUtilities::ISuperLayerUtil::c_N> m_maxDriftTimes = { -1, -1, -1, -1, -1, -1, -1, -1, -1};
+      std::array<float, CDC::ISuperLayerUtil::c_N> m_maxDriftTimes = { -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
       /// Method for the initial time of flight estimation
       EPreferredDirection m_flightTimeEstimation = EPreferredDirection::c_None;
@@ -119,7 +119,7 @@ namespace Belle2 {
       TrackingUtilities::Vector3D m_triggerPoint = TrackingUtilities::Vector3D(0.0, 0.0, 0.0);
 
       /// Bits for the used super layers
-      std::array<bool, TrackingUtilities::ISuperLayerUtil::c_N> m_useSuperLayers{};
+      std::array<bool, CDC::ISuperLayerUtil::c_N> m_useSuperLayers{};
 
       /// Bits for the used layers
       std::array<bool, c_maxNSenseLayers> m_useLayers{};

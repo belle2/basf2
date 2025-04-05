@@ -24,7 +24,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <cdc/topology/CDCWire.h>
 
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
@@ -36,6 +36,7 @@
 #include <TRandom.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 

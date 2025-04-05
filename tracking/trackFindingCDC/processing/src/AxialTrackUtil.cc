@@ -19,6 +19,7 @@
 #include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 

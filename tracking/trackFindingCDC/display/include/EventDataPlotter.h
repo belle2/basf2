@@ -19,11 +19,14 @@ namespace Belle2 {
   class CDCHit;
   class CDCSimHit;
 
-  namespace TrackingUtilities {
-    class Circle2D;
+  namespace CDC {
     class CDCWireTopology;
     class CDCWireSuperLayer;
     class CDCWire;
+  }
+
+  namespace TrackingUtilities {
+    class Circle2D;
     class CDCTrajectory2D;
     class CDCWireHit;
     class CDCTrack;
@@ -163,15 +166,15 @@ namespace Belle2 {
                 AttributeMap attributeMap = AttributeMap());
 
       /// Draws the CDCWire as a small circle at the reference position.
-      void draw(const TrackingUtilities::CDCWire& wire,
+      void draw(const CDC::CDCWire& wire,
                 const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the inner and the outer bound of the super layer.
-      void draw(const TrackingUtilities::CDCWireSuperLayer& wireSuperLayer,
+      void draw(const CDC::CDCWireSuperLayer& wireSuperLayer,
                 const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the all wires in the CDC
-      void draw(const TrackingUtilities::CDCWireTopology& wireTopology,
+      void draw(const CDC::CDCWireTopology& wireTopology,
                 AttributeMap attributeMap = AttributeMap());
 
       /// Draws the CDCSimHit as a momentum arrow starting at the track position with a length proportional to its momentum.

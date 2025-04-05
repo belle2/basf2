@@ -8,11 +8,12 @@
 
 #include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
 
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
-#include <tracking/trackingUtilities/topology/CDCWireLayer.h>
+#include <cdc/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireLayer.h>
 #include <tracking/trackingUtilities/geometry/GeneralizedCircle.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 

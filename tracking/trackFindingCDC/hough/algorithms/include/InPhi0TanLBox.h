@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
 #include <tracking/trackFindingCDC/hough/boxes/Box.h>
-#include <tracking/trackingUtilities/topology/ILayer.h>
+#include <cdc/topology/ILayer.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -35,7 +35,7 @@ namespace Belle2 {
                                                float l,
                                                float dxdz,
                                                float dydz,
-                                               TrackingUtilities::ILayer /*iCLayer*/ = -1) const
+                                               CDC::ILayer /*iCLayer*/ = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
         const std::array<ContinuousTanL, 2>& tanL = houghBox.getBounds<ContinuousTanL>();

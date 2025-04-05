@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/segmentTriple/ChooseableSegmentTripleFilter.h>
 
-#include <tracking/trackingUtilities/topology/ISuperLayer.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <vector>
 #include <array>
@@ -59,7 +59,7 @@ namespace Belle2 {
 
     private:
       /// Structure for the segments grouped by super layer id.
-      std::array<std::vector<const TrackingUtilities::CDCSegment2D*>, TrackingUtilities::ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
+      std::array<std::vector<const TrackingUtilities::CDCSegment2D*>, CDC::ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
 
       /// The filter to be used for the segment triple generation.
       ChooseableSegmentTripleFilter m_segmentTripleFilter;

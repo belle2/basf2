@@ -13,11 +13,12 @@
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
 
-#include <tracking/trackingUtilities/topology/CDCWire.h>
+#include <cdc/topology/CDCWire.h>
 
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 

@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/hough/axes/DiscreteValue.h>
 #include <tracking/trackFindingCDC/hough/axes/ContinuousValue.h>
 
-#include <tracking/trackingUtilities/topology/ILayer.h>
+#include <cdc/topology/ILayer.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 namespace Belle2 {
@@ -49,7 +49,7 @@ namespace Belle2 {
       }
 
       /// Return the two dimensional arc length to the given layer id
-      float getArcLength2D(TrackingUtilities::ILayer iCLayer, bool secondArm = false) const
+      float getArcLength2D(CDC::ILayer iCLayer, bool secondArm = false) const
       {
         return secondArm ? m_secondaryArcLength2DByICLayer[iCLayer] : m_arcLength2DByICLayer[iCLayer];
       }

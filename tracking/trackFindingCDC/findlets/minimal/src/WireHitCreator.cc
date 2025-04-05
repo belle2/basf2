@@ -12,7 +12,7 @@
 
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
-#include <tracking/trackingUtilities/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireTopology.h>
 
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
@@ -28,6 +28,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 

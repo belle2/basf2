@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/Phi0Rep.h>
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 #include <tracking/trackFindingCDC/hough/boxes/Box.h>
-#include <tracking/trackingUtilities/topology/ILayer.h>
+#include <cdc/topology/ILayer.h>
 
 #include <array>
 #include <cmath>
@@ -47,7 +47,7 @@ namespace Belle2 {
                                                float l,
                                                float /*dxdz*/ = 0,
                                                float /*dydz*/ = 0,
-                                               TrackingUtilities::ILayer /*iCLayer*/ = -1) const
+                                               CDC::ILayer /*iCLayer*/ = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
         const std::array<DiscreteCurv, 2>& curv = houghBox.getBounds<DiscreteCurv>();

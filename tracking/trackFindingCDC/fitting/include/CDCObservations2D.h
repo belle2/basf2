@@ -19,11 +19,13 @@
 #include <iterator>
 
 namespace Belle2 {
+  namespace CDC {
+    class CDCWire;
+  }
 
   namespace TrackingUtilities {
     class CDCRLWireHit;
     class CDCTrajectory2D;
-    class CDCWire;
     class CDCWireHit;
     class CDCTrack;
     class CDCRecoHit3D;
@@ -239,7 +241,7 @@ namespace Belle2 {
        *  @note For cross check to Legendre finder.
        *  @return  Number of added hits
        */
-      std::size_t appendRange(const std::vector<const TrackingUtilities::CDCWire*>& wires);
+      std::size_t appendRange(const std::vector<const CDC::CDCWire*>& wires);
 
       /**
        *  Appends all the wire hit reference positions with the pseudo variance.

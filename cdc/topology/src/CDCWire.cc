@@ -70,7 +70,7 @@ CDCWire::CDCWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire)
 void CDCWire::initialize(EWirePosition wirePosition, bool ignoreWireSag)
 {
   CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar::EWirePosition wirePosSet = toCDC(wirePosition);
+  CDCGeometryPar::EWirePosition wirePosSet = wirePosition;
 
   IWire iWire = getIWire();
   ILayer iCLayer = getICLayer();

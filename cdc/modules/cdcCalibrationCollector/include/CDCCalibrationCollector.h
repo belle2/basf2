@@ -85,7 +85,7 @@ namespace Belle2 {
       StoreArray<RecoTrack> m_RecoTracks;           /**< Tracks. */
       StoreArray<TrackFitResult> m_TrackFitResults; /**< Track fit results. */
       StoreArray<CDCHit> m_CDCHits;                 /**< CDC hits. */
-      StoreWrappedObjPtr<std::vector<CDCTrack>> m_CDCTracks; /**< CDC tracks. */
+      TrackingUtilities::StoreWrappedObjPtr<std::vector<TrackingUtilities::CDCTrack>> m_CDCTracks; /**< CDC tracks. */
 
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_cdcHitArrayName;          /**< Belle2::CDCHit StoreArray name*/

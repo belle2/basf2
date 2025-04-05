@@ -11,24 +11,6 @@
 namespace Belle2 {
   namespace CDC {
 
-    // /// Namespace guarding the contained enum values
-    // namespace NWirePosition {
-
-    //   /**
-    //    *  Wire position set.
-    //    *
-    //    *  This corresponds to the CDC::CDCGeometryPar::EWirePosition
-    //    *
-    //    *  Rational:
-    //    *  Creating this copy relieves the headers that want to use the
-    //    *  EWirePosition from including the heavy CDCGeometryPar and its includes
-    //    *  resulting in improved compilation speed and safer rootification.
-    //    */
-    //   enum EWirePosition { c_Base = 0, c_Misaligned, c_Aligned };
-    // }
-
-    // using EWirePosition = NWirePosition::EWirePosition;
-
     using EWirePosition = CDCGeometryPar::EWirePosition;
 
   }

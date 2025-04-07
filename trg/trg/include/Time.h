@@ -26,14 +26,14 @@ namespace Belle2 {
     TRGTime(const TRGTime&);
 
     /// Constructor with clock. For rising edge, edge must be
-    /// true. Given timing is syncronized to clock.
+    /// true. Given timing is synchronized to clock.
     TRGTime(double timing,
             bool edge,
             const TRGClock& clock,
             const std::string& name = "signal");
 
     /// Constructor with clock. For rising edge, edge must be
-    /// true. Given timing is syncronized to clock.
+    /// true. Given timing is synchronized to clock.
     TRGTime(int clockPosition,
             bool edge,
             const TRGClock& clock,

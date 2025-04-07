@@ -858,7 +858,7 @@ with
 
   path.add_module('CRYInput')
 
-in your steering file (the module parameter "acceptance" has to be set, see the module docummentation).''')
+in your steering file (the module parameter "acceptance" has to be set, see the module documentation).''')
 
     import cdc.cr as cosmics_setup
 

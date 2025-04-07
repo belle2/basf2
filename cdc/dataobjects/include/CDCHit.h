@@ -303,7 +303,7 @@ namespace Belle2 {
     /** Status of CDCHit. */
     unsigned short  m_status;
 
-    /** Time over threshod. */
+    /** Time over threshold. */
     unsigned short  m_tot;
 
     /** Index to the other hit. */

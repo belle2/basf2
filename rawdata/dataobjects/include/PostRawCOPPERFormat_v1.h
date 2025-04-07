@@ -64,7 +64,7 @@ namespace Belle2 {
     int* Get4thDetectorBuffer(int n) OVERRIDE_CPP17;
     ///////////////////////////////////////////////////////////////////////////////////////
 
-    //! get posistion of COPPER block in unit of word
+    //! get position of COPPER block in unit of word
     //    virtual int GetBufferPos(int n);
 
     //

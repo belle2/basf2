@@ -76,7 +76,7 @@ namespace Belle2 {
     /// returns pull.
     double pull(void) const;
 
-    /// returns middle position of a wire. z componet is 0.
+    /// returns middle position of a wire. z component is 0.
     const HepGeom::Point3D<double>& xyPosition(void) const;
 
     /// returns the closest point on wire to a track.
@@ -200,7 +200,7 @@ namespace Belle2 {
                                  unsigned minNHits);
 
     /// returns \# of missing axial super layers.
-    /// Stereo super layers are not taken into accout.
+    /// Stereo super layers are not taken into account.
     static unsigned nMissingAxialSuperLayers(
       const std::vector<TRGCDCLink*>& links);
 
@@ -383,7 +383,7 @@ namespace Belle2 {
     ///  2D fitted or not
     unsigned m_fit2D;
     //
-    // for quick dicision
+    // for quick decision
     //
     /// ms_smallcell
     static bool ms_smallcell;

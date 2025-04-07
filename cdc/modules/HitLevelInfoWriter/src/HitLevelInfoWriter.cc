@@ -476,7 +476,7 @@ void HitLevelInfoWriterModule::recalculateDedx(CDCDedxTrack* dedxTrack, map<int,
       correction *= GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, m_cosTheta, m_injring, m_injtime);
       if (!m_DBWireGains && dedxTrack->getWireGain(ihit) == 0) correction = 0;
     } else {
-      //get modifed adc + abs correction factor
+      //get modified adc + abs correction factor
       correction = GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, m_cosTheta, m_injring, m_injtime);
     }
 

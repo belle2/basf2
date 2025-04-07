@@ -16,6 +16,7 @@
 
 #include <Math/Vector4D.h>
 
+#include <cmath>
 #include <map>
 
 using namespace Belle2;
@@ -45,9 +46,9 @@ The module modifies the input particleLists by subtracting the correction value 
 
 void TrackingEnergyLossCorrectionModule::initialize()
 {
-  if (!isnan(m_correction) && !m_payloadName.empty()) {
+  if (!std::isnan(m_correction) && !m_payloadName.empty()) {
     B2FATAL("It's not allowed to provide both a valid value for the scale parameter and a non-empty table name. Please decide for one of the two options!");
-  } else if (isnan(m_correction) && m_payloadName.empty()) {
+  } else if (std::isnan(m_correction) && m_payloadName.empty()) {
     B2FATAL("Neither a valid value for the scale parameter nor a non-empty table name was provided. Please set (exactly) one of the two options!");
   } else if (!m_payloadName.empty()) {
     m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_payloadName);
@@ -132,7 +133,7 @@ void TrackingEnergyLossCorrectionModule::setEnergyLossCorrection(Particle* parti
     const ROOT::Math::PxPyPzEVector vec(px, py, pz, E);
     particle->set4Vector(vec);
   } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track) {
-    if (!isnan(m_correction)) {
+    if (!std::isnan(m_correction)) {
       particle->setEnergyLossCorrection(m_correction);
     } else if (!m_correctionName.empty()) {
       particle->setEnergyLossCorrection(getCorrectionValue(particle));

@@ -3,8 +3,8 @@ Tools which will provide you help
 
 .. _b2help-modules:
 
-``b2help-modules``: List available basf2 modules and ask about their details
-----------------------------------------------------------------------------
+``b2help-modules``: List available ``basf2`` modules and ask about their details
+--------------------------------------------------------------------------------
 
 .. argparse::
     :filename: framework/tools/b2help-modules
@@ -76,7 +76,7 @@ Tools which will provide you help
 This command prints the MCParticles of the input mdst file and outputs an ntuple including ``__MCDecayString__``.
 Default output file name is ``ntuple.root``.
 
-You can use any of basf2's options, e.g. ``-o``, ``-n``, and ``--skip-events``.
+You can use any of ``basf2``'s options, e.g. ``-o``, ``-n``, and ``--skip-events``.
 Specifically, ``-i`` is required to select the input mdst file.
 
 ::
@@ -90,3 +90,4 @@ Specifically, ``-i`` is required to select the input mdst file.
 .. rubric:: Optional Arguments
 
 -h, --help               show this help message and exit
+

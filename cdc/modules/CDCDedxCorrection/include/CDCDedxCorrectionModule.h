@@ -95,7 +95,7 @@ namespace Belle2 {
     double D2I(const double cosTheta, const double D) const;
 
     /** Saturation correction:
-     * convert the actural ionization (I) to measured ionization (D) */
+     * convert the actual ionization (I) to measured ionization (D) */
     double I2D(const double cosTheta, const double I) const;
 
   private:

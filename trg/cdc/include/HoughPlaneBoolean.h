@@ -27,7 +27,7 @@ namespace Belle2 {
   class TRGCDCHoughPlaneBoolean : public TRGCDCHoughPlaneBase {
 
   public:
-    /// Contructor.
+    /// Constructor.
     TRGCDCHoughPlaneBoolean(const std::string& name,
                             const TRGCDCHoughTransformation& transformation,
                             unsigned nX,
@@ -43,7 +43,7 @@ namespace Belle2 {
     /// Copy constructor, deleted
     TRGCDCHoughPlaneBoolean(TRGCDCHoughPlaneBoolean&) = delete;
 
-    /// Assignement operator, delete
+    /// Assignment operator, delete
     TRGCDCHoughPlaneBoolean& operator=(TRGCDCHoughPlaneBoolean&) = delete;
 
   public:// Selectors

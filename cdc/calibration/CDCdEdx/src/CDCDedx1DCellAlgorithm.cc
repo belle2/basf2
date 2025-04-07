@@ -259,9 +259,9 @@ void CDCDedx1DCellAlgorithm::CreateBinMapping()
   std::map<int, std::vector<int>> steps;
 
   const std::array<int, 2> nDev{8, 4};
-  bounds[0] = {0, 108, 123, 133, 158, 183, 193, 208, 316}; //il boundries
+  bounds[0] = {0, 108, 123, 133, 158, 183, 193, 208, 316}; //il boundaries
   steps[0] = {9, 3, 2, 1, 1, 2, 3, 9};  //il steps
-  bounds[1] = {0, 38, 158, 278, 316}; //OL boundries
+  bounds[1] = {0, 38, 158, 278, 316}; //OL boundaries
   steps[1] = {2, 1, 1, 2};  //OL steps
 
   for (int il = 0; il < 2; il++) {
@@ -612,7 +612,7 @@ void CDCDedx1DCellAlgorithm::plotConstants()
     max[il] = hnewconst[il]->GetMaximum();
   }
 
-  //Ploting final constants
+  //Plotting final constants
   if (max[1] < max[0])max[1] = max[0];
   if (min[1] > min[0])min[1] = min[0];
 

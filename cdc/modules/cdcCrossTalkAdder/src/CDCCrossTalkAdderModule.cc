@@ -168,7 +168,7 @@ void CDCCrossTalkAdderModule::event()
 
         //Set TOT for signal+background case. It is assumed that the start timing
         //of a pulse (input to ADC) is given by the TDC-count. This is an
-        //approximation becasue analog (for ADC) and digital (for TDC) parts are
+        //approximation because analog (for ADC) and digital (for TDC) parts are
         //different in the front-end electronics.
         unsigned short s1 = tdc4Sg; //start time of 1st pulse
         unsigned short s2 = tdc4Bg; //start time of 2nd pulse
@@ -233,7 +233,7 @@ void CDCCrossTalkAdderModule::setFEElectronics()
     }
   }
 
-  //ovewrite    values for specific channels if mode=1
+  //overwrite    values for specific channels if mode=1
   //set typical values for all channels if mode=0
   for (const auto& fpp : (*m_fEElectronicsFromDB)) {
     int bdi = fpp.getBoardID();

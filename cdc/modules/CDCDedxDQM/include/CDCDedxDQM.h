@@ -44,7 +44,7 @@ namespace Belle2 {
     /** Default constructor */
     CDCDedxDQMModule();
 
-    /** Defination of histograms */
+    /** Definition of histograms */
     virtual void defineHisto() override;
 
     /** Initialize the module */

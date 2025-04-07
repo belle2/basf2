@@ -65,7 +65,7 @@ namespace Belle2 {
     bool m_createEventMetaData;                /**< Parameter to allow the module to create EventMetaData and set event info */
 
   private:
-    StoreObjPtr<EventMetaData> m_eventMetaDataPtr; /**< event meta data pointer to control event nubmer etc */
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr; /**< event meta data pointer to control event number etc */
   };
 
 } // end namespace Belle2

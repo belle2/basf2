@@ -484,7 +484,7 @@ void CDCDedxPIDModule::event()
           double onedcor = (m_DB1DCell && m_usePrediction && numMCParticles == 0) ? m_DB1DCell->getMean(currentLayer, entAngRS) : 1.0;
 
           // apply the calibration to dE to propagate to both hit and layer measurements
-          // Note: could move the sin(theta) here since it is common accross the track
+          // Note: could move the sin(theta) here since it is common across the track
           //       It is applied in two places below (hit level and layer level)
           double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * dedxTrack->m_cosEdgeCor * dedxTrack->m_timeGain * wiregain *
                               twodcor * onedcor;

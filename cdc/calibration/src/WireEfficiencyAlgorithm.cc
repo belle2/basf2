@@ -76,7 +76,7 @@ bool WireEfficiencyAlgorithm::buildEfficiencies()
     B2INFO("TEfficiency for " << layerNo << "successfully built");
 
     m_efficiencyList->Add(effInLayer);
-    B2INFO("Teff for layer " << layerNo << " was sucessfully listed.");
+    B2INFO("Teff for layer " << layerNo << " was successfully listed.");
   }
   TFile* outputCollection = new TFile("LayerEfficiencies.root", "RECREATE");
 
@@ -189,7 +189,7 @@ void WireEfficiencyAlgorithm::detectBadWires()
   }
   m_badWireList->outputToFile("wireFile.txt");
   saveCalibration(m_badWireList, "CDCBadWires");
-  B2INFO("Bad wire list sucessfully saved.");
+  B2INFO("Bad wire list successfully saved.");
 }
 
 double WireEfficiencyAlgorithm::chiTest(TGraphAsymmErrors* graph1, TGraphAsymmErrors* graph2, double minValue, double maxValue)

@@ -459,7 +459,7 @@ void SpaceResolutionCalibration::write()
   }
   ofs.close();
   B2RESULT("Number of histogram: " << 56 * 2 * m_nalpha * m_ntheta);
-  B2RESULT("Histos succesfully fitted: " << nfitted);
+  B2RESULT("Histos successfully fitted: " << nfitted);
   B2RESULT("Histos fit failure: " << nfailure);
   if (m_useDB) {
     CDCDatabaseImporter import(0, 0, -1, -1);
@@ -636,7 +636,7 @@ void SpaceResolutionCalibration::readProfile()
     double dumy1, dumy2, dumy3;
     proxt >> m_nalpha;
     B2INFO("Number of alpha bins: " << m_nalpha);
-    if (m_nalpha > Max_nalpha) {B2FATAL("number of  alpha bin excess limit; please increse uplimit: " << m_nalpha << " > " << Max_nalpha);}
+    if (m_nalpha > Max_nalpha) {B2FATAL("number of  alpha bin excess limit; please increase uplimit: " << m_nalpha << " > " << Max_nalpha);}
     for (int i = 0; i < m_nalpha; ++i) {
       proxt >> dumy1 >> dumy2 >> dumy3;
       l_alpha[i] = dumy1;    u_alpha[i] = dumy2;     ialpha[i] = dumy3;
@@ -644,12 +644,12 @@ void SpaceResolutionCalibration::readProfile()
     }
     proxt >> m_ntheta;
     B2INFO("Number of theta bins: " << m_ntheta);
-    if (m_ntheta > Max_ntheta) {B2FATAL("number of  theta bin excess limit; please increse uplimit: " << m_ntheta << " > " << Max_ntheta);}
+    if (m_ntheta > Max_ntheta) {B2FATAL("number of  theta bin excess limit; please increase uplimit: " << m_ntheta << " > " << Max_ntheta);}
     for (int i = 0; i < m_ntheta; ++i) {
       proxt >> dumy1 >> dumy2 >> dumy3;
       l_theta[i] = dumy1;    u_theta[i] = dumy2;     itheta[i] = dumy3;
       B2INFO("" << i << " |" << l_theta[i] << " " << u_theta[i] << " " << itheta[i]);
     }
   }
-  B2INFO("Finish asssign sigma bining");
+  B2INFO("Finish assign sigma bining");
 }

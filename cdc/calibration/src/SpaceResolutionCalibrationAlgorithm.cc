@@ -528,7 +528,7 @@ void SpaceResolutionCalibrationAlgorithm::write()
   saveCalibration(dbSigma, "CDCSpaceResols");
 
   B2RESULT("Number of histogram: " << 56 * 2 * m_nAlphaBins * m_nThetaBins);
-  B2RESULT("Histos succesfully fitted: " << nfitted);
+  B2RESULT("Histos successfully fitted: " << nfitted);
   B2RESULT("Histos fit failure: " << nfailure);
 
 

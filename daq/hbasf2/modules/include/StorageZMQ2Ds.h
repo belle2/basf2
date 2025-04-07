@@ -17,6 +17,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/RandomGenerator.h>
 
+#include <limits>
 #include <memory>
 #include <zmq.hpp>
 
@@ -85,9 +86,9 @@ namespace Belle2 {
     bool m_param_addExpressRecoObjects = false;
 
     /// Default experiment number to be set during initialization/run end to have something to load the geometry. Module parameter but will be updated
-    unsigned int m_lastExperiment = 42;
+    unsigned int m_lastExperiment = std::numeric_limits<int>::max();
     /// Default run number to be set during initialization/run end to have something to load the geometry. Module parameter but will be updated
-    unsigned int m_lastRun = 8;
+    unsigned int m_lastRun = std::numeric_limits<int>::max();
 
     /// Reference to the event meta data to set numbers and flags according to the state and received messages
     StoreObjPtr<EventMetaData> m_eventMetaData;

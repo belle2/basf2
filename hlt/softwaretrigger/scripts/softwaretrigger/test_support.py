@@ -131,22 +131,30 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
                 # First event: Add all the results that are used on express reco just to test all paths
                 if (self.EventMetaData.obj().getEvent() == 1):
                     self.results.addResult("software_trigger_cut&all&total_result", 1)
+                    self.results.addResult("software_trigger_cut&filter&total_result", 1)
+                    self.results.addResult("software_trigger_cut&skim&total_result", 1)
                     self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
                     self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
                     self.results.addResult("software_trigger_cut&filter&L1_trigger", 1)
                 # Second event: No skim lines to replicate a HLT discared event with filter ON
                 elif (self.EventMetaData.obj().getEvent() == 2):
                     self.results.addResult("software_trigger_cut&all&total_result", 1)
+                    self.results.addResult("software_trigger_cut&filter&total_result", 1)
+                    self.results.addResult("software_trigger_cut&skim&total_result", 0)
                     self.results.addResult("software_trigger_cut&filter&L1_trigger", 1)
                 # Third event: Does not pass through L1 passthrough
                 elif (self.EventMetaData.obj().getEvent() == 3):
                     self.results.addResult("software_trigger_cut&all&total_result", 1)
+                    self.results.addResult("software_trigger_cut&filter&total_result", 0)
+                    self.results.addResult("software_trigger_cut&skim&total_result", 1)
                     self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
                     self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
                     self.results.addResult("software_trigger_cut&filter&L1_trigger", 0)
                 # Fourth event: HLT discarded but passes HLT skims (possible in HLT filter OFF mode)
                 elif (self.EventMetaData.obj().getEvent() == 4):
                     self.results.addResult("software_trigger_cut&all&total_result", 0)
+                    self.results.addResult("software_trigger_cut&filter&total_result", 0)
+                    self.results.addResult("software_trigger_cut&skim&total_result", 1)
                     self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
                     self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
                     self.results.addResult("software_trigger_cut&filter&L1_trigger", 0)
@@ -157,6 +165,7 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
     branch_names = RAWDATA_OBJECTS + ["EventMetaData", "TRGSummary"]
     if not passthrough:
         branch_names += ["SoftwareTriggerResult"]
+
     if location == constants.Location.hlt:
         branch_names.remove("RawPXDs")
         branch_names.remove("ROIs")

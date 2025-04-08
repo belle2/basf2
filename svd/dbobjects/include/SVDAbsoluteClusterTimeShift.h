@@ -10,8 +10,8 @@
 
 #include <framework/logging/Logger.h>
 
-#include "TObject.h"
-#include "TString.h"
+#include <TObject.h>
+#include <TString.h>
 #include <map>
 
 namespace Belle2 {

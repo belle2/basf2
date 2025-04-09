@@ -8,11 +8,12 @@
 
 #include <cdc/modules/CDCDedxElectronCollector/CDCDedxElectronCollectorModule.h>
 
-
 #include <TTree.h>
 #include <TH1D.h>
 #include <TH1I.h>
 #include <TMath.h>
+
+#include <cmath>
 
 using namespace Belle2;
 //-----------------------------------------------------------------
@@ -217,8 +218,8 @@ void CDCDedxElectronCollectorModule::collect()
 
     if (m_cuts) {
       // apply cleanup cuts
-      if (fabs(fitResult->getD0()) >= 1.0)continue;
-      if (fabs(fitResult->getZ0()) >= 1.0) continue;
+      if (fstd::abs(fitResult->getD0()) >= 1.0)continue;
+      if (fstd::abs(fitResult->getZ0()) >= 1.0) continue;
       htstats->Fill(1);
 
       //if outside CDC
@@ -244,7 +245,7 @@ void CDCDedxElectronCollectorModule::collect()
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
       if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         double TrkEoverP = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().R());
-        if (abs(TrkEoverP - 1.0) > m_setEoP)continue;
+        if (std::abs(TrkEoverP - 1.0) > m_setEoP)continue;
       }
       htstats->Fill(4);
     }
@@ -256,9 +257,9 @@ void CDCDedxElectronCollectorModule::collect()
       //checking if dedx of other track is restricted
       //will not do too much as radee is clean enough
       for (int jdedx = 0; jdedx < nTracks; jdedx++) {
-        CDCDedxTrack* dedxOtherTrack = m_dedxTracks[abs(jdedx - 1)];
+        CDCDedxTrack* dedxOtherTrack = m_dedxTracks[std::abs(jdedx - 1)];
         if (!dedxOtherTrack)continue;
-        if (abs(dedxOtherTrack->getDedxNoSat() - 1.0) > 0.25)continue; //loose for uncalibrated
+        if (std::abs(dedxOtherTrack->getDedxNoSat() - 1.0) > 0.25)continue; //loose for uncalibrated
         goodradee = true;
         break;
       }

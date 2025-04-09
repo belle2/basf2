@@ -218,8 +218,8 @@ void CDCDedxElectronCollectorModule::collect()
 
     if (m_cuts) {
       // apply cleanup cuts
-      if (fstd::abs(fitResult->getD0()) >= 1.0)continue;
-      if (fstd::abs(fitResult->getZ0()) >= 1.0) continue;
+      if (std::abs(fitResult->getD0()) >= 1.0)continue;
+      if (std::abs(fitResult->getZ0()) >= 1.0) continue;
       htstats->Fill(1);
 
       //if outside CDC

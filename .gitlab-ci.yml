@@ -51,7 +51,7 @@ workflow:
       when: always
 
 default:
-  image: belle2/externals-ubuntu2004:v01-12-01
+  image: belle2/belle2-base-ubuntu2004:latest
   tags:
     - $GITLAB_RUNNER  # The runner is dynamically assigned by the workflow rules
   cache:

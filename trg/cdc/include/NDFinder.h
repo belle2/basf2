@@ -17,37 +17,39 @@
 #include "trg/cdc/Clusterizend.h"
 
 namespace Belle2 {
-  // Data type to collect a binning
-  struct SectorBinning {
-    unsigned short omega;
-    unsigned short phi;
-    unsigned short theta;
-    unsigned short nHitIDs;
-    unsigned short nPriorityWires;
+
+  // Struct of NDFinder parameters
+  struct NDFinderParameters {
+    // Required number of axial super layers
+    unsigned short minSuperAxial = 4;
+    // Required number of stereo super layers
+    unsigned short minSuperStereo = 3;
+    // Clustering: Minimum of the total weight in all cells of the 3d volume
+    unsigned short minTotalWeight = 100;
+    // Clustering: Minimum peak cell weight
+    unsigned short minPeakWeight = 32;
+    // Clustering: Number of iterations for the cluster search in each Hough space quadrant
+    unsigned short iterations = 1;
+    // Clustering: Number of deleted cells in each omega direction from the maximum
+    unsigned short omegaTrim = 5;
+    // Clustering: Number of deleted cells in each phi direction from the maximum
+    unsigned short phiTrim = 4;
+    // Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class
+    bool storeAdditionalReadout = false;
+    // Axial and stereo hit representations that should be used
+    std::string axialFile = "data/trg/cdc/ndFinderArrayAxialComp.txt.gz";
+    std::string stereoFile = "data/trg/cdc/ndFinderArrayStereoComp.txt.gz";
   };
 
-  // Data type for a cluster cell
-  struct CellWeight {
-    cell_index index;
-    unsigned short weight;
-  };
-
-  // Collection of the hit information needed for the hit representations
+  // Struct containing the track segment (hit) information from the Track Segment Finder (TSF)
   struct HitInfo {
-    unsigned short relativeWireID;
-    unsigned short phiSectorStart;
-    unsigned short priorityWire;
+    unsigned short hitID;
+    unsigned short hitSLID;
+    unsigned short hitPrioPos;
+    short hitPrioTime;
   };
 
-  // Collection of the hit contribution information needed for the hit to cluster relations
-  struct ContributionInfo {
-    unsigned short hitIndex;
-    unsigned short contribution;
-    unsigned short superLayer;
-    long priorityTime;
-  };
-
-  // Store track parameters of found tracks
+  // Class for a found NDFinder track
   class NDFinderTrack {
   public:
     NDFinderTrack(std::array<double, 3> estimatedParameters,
@@ -97,31 +99,28 @@ namespace Belle2 {
   // Class to represent the CDC NDFinder.
   class NDFinder {
   public:
+    // Data type to collect a binning
+    struct SectorBinning {
+      unsigned short omega;
+      unsigned short phi;
+      unsigned short theta;
+      unsigned short nHitIDs;
+      unsigned short nPriorityWires;
+    };
 
-    // Struct of ndFinder parameters
-    struct NDFinderParameters {
-      // Zero-Suppressed trained hit data
-      std::string axialFile = "data/trg/cdc/ndFinderArrayAxialComp.txt.gz";
-      std::string stereoFile = "data/trg/cdc/ndFinderArrayStereoComp.txt.gz";
+    // Collection of the hit information needed for the hit representations
+    struct WireInfo {
+      unsigned short relativeWireID;
+      unsigned short phiSectorStart;
+      unsigned short priorityWire;
+    };
 
-      // Required number of axial super layers
-      unsigned short minSuperAxial = 4;
-      // Required number of stereo super layers
-      unsigned short minSuperStereo = 3;
-      // Hough space cells must have (thresh * maxweight) to be considered
-      double thresh = 0.85;
-      // Clustering: Minimum of the total weight in all cells of the 3d volume
-      unsigned short minTotalWeight = 450;
-      // Clustering: Minimum peak cell weight
-      unsigned short minPeakWeight = 32;
-      // Clustering: Number of iterations for the cluster search in each Hough space quadrant
-      unsigned short iterations = 1;
-      // Clustering: Number of deleted cells in each omega direction from the maximum
-      unsigned short omegaTrim = 5;
-      // Clustering: Number of deleted cells in each phi direction from the maximum
-      unsigned short phiTrim = 4;
-      // Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class
-      bool storeAdditionalReadout = false;
+    // Collection of the hit contribution information needed for the hit to cluster relations
+    struct ContributionInfo {
+      unsigned short hitIndex;
+      unsigned short contribution;
+      unsigned short superLayer;
+      short priorityTime;
     };
 
     // Default constructor
@@ -138,55 +137,16 @@ namespace Belle2 {
       delete m_houghSpace;
     }
 
-    // Initialization
-    /*
-      Set parameters
-      @param minSuperAxial minimum number of axial super layers per cluster
-      @param minSuperStereo minimum number of stereo super layers per cluster
-      @param thresh selection of cells for weighted mean track estimation
-      @param minTotalWeight minimum total weight of all cells in the 3d volume
-      @param minPeakWeight minimum peak cell weight
-      @param iterations number of cluster searches in each Hough space quadrant
-      @param omegaTrim number deleted cells in each omega direction from the maximum
-      @param phiTrim number deleted cells in each phi direction from the maximum
-      @param storeAdditionalReadout switch for Hough space + cluster readout
-      @param axialFile axial hit data
-      @param stereoFile stereo hit data
-    */
-    void init(unsigned short minSuperAxial, unsigned short minSuperStereo, double thresh,
-              unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned short iterations,
-              unsigned short omegaTrim, unsigned short phiTrim, bool storeAdditionalReadout,
-              std::string& axialFile, std::string& stereoFile);
+    // Initialization of the NDFinder (parameters and lookup tables)
+    void init(const NDFinderParameters& ndFinderParameters);
     // Reset the NDFinder data structure to process next event
-    void reset()
-    {
-      m_NDFinderTracks.clear();
-      m_hitIDs.clear();
-      m_hitSLIDs.clear();
-      m_priorityWirePos.clear();
-      m_priorityWireTime.clear();
-      m_nHits = 0;
-      m_phiSectorStarts.clear();
-      delete m_houghSpace;
-      std::array<c3index, 3> shapeHough = {{m_nOmega, m_nPhi, m_nTheta}};
-      m_houghSpace = new c3array(shapeHough);
-    }
-    // Fill hit info of the event
-    void addHit(unsigned short hitID, unsigned short hitSLID, unsigned short hitPrioPos, long hitPrioTime)
-    {
-      // Priority position from the track segment finder: 0 = no hit, 3 = 1st priority, 1 = 2nd right, 2 = 2nd left
-      if (hitPrioPos > 0) { // Skip "no hit" case
-        m_hitIDs.push_back(hitID);
-        m_hitSLIDs.push_back(hitSLID);
-        m_priorityWirePos.push_back(3 - hitPrioPos); // 0 = 1st priority, 1 = 2nd left, 2 = 2nd right
-        m_priorityWireTime.push_back(hitPrioTime);
-        ++m_nHits;
-      }
-    }
+    void reset();
+    // Add the hit info of a single track segment to the NDFinder
+    void addHit(const HitInfo& hitInfo);
     // Main function for track finding
     void findTracks();
     // Retreive the results
-    std::vector<NDFinderTrack>* getFinderTracks() { return &m_NDFinderTracks; }
+    std::vector<NDFinderTrack>* getFinderTracks() { return &m_ndFinderTracks; }
 
     // NDFinder: Internal functions for track finding
   protected:
@@ -203,27 +163,23 @@ namespace Belle2 {
     // Computes the phi bin of the sector start, given the relative SectorID. Saves the result in m_phiSectorStarts (see below).
     unsigned short computePhiSectorStart(unsigned short relativeSectorID);
     // Write (add) a single hit (Hough curve) to the Hough space
-    void writeHitToHoughSpace(const HitInfo& hitInfo, const c5array& expHitsToWeights);
+    void writeHitToHoughSpace(const WireInfo& hitInfo, const c5array& expHitsToWeights);
     // Core track finding logic in the constructed Hough space
     void runTrackFinding();
-    // Relate the hits in the maximum of the cluster to the cluster. Applies a cut on the clusters.
+    // Relate the hits in the peak of the cluster to the cluster. Applies a cut on the clusters.
     std::vector<SimpleCluster> relateHitsToClusters(std::vector<SimpleCluster>& clusters);
     // Create hits to clusters confusion matrix
     std::vector<std::vector<unsigned short>> getHitsVsClustersTable(const std::vector<SimpleCluster>& clusters);
-    // Returns the cell index of the maximum in the cluster
-    cell_index getMaximumInCluster(const SimpleCluster& cluster);
     // Returns the hit contribution of a TS at a certain cluster cell (= peak/maximum cell)
-    unsigned short getHitContribution(const cell_index& maximumCell, const unsigned short hitIdx);
+    unsigned short getHitContribution(const cell_index& peakCell, const unsigned short hitIdx);
     // Extract relevant hit information (hitIdx, contribution, super layer, drift time)
     std::vector<ContributionInfo> extractContributionInfos(const std::vector<unsigned short>& clusterHits);
     // Find the hit with the maximum contribution in a given super layer
-    long getMaximumHitInSuperLayer(const std::vector<ContributionInfo>& contributionInfos, unsigned short superLayer);
+    int getMaximumHitInSuperLayer(const std::vector<ContributionInfo>& contributionInfos, unsigned short superLayer);
     // Cut on the number of hit axial/stereo super layers
     bool checkHitSuperLayers(const SimpleCluster& cluster);
-    // Select the cells which are used in the center of gravity calculation
-    std::vector<CellWeight> getCenterOfGravityCells(const SimpleCluster& cluster, unsigned short maximum);
     // Calculate the center of gravity (weighted mean) for the track parameters
-    std::array<double, 3> calculateCenterOfGravity(const std::vector<CellWeight>& validCells);
+    std::array<double, 3> calculateCenterOfGravity(const SimpleCluster& cluster);
     // Transform the center of gravity (cells) into the estimated track parameters
     std::array<double, 3> getTrackParameterEstimate(const std::array<double, 3>& centerOfGravity);
     // Transform to physical units
@@ -234,7 +190,7 @@ namespace Belle2 {
     // NDFinder: Member data stores
   private:
     // Result: Vector of the found tracks
-    std::vector<NDFinderTrack> m_NDFinderTracks;
+    std::vector<NDFinderTrack> m_ndFinderTracks;
     // TS-IDs of the hits in the current event: Elements = [0,2335] for 2336 TS in total
     std::vector<unsigned short> m_hitIDs;
     // SL-IDs of the hits in the current event: Elements = Super layer number in [0,1,...,8]
@@ -242,7 +198,7 @@ namespace Belle2 {
     // Priority positon within the TS. Elements basf2: [0,3] first, left, right, no hit
     std::vector<unsigned short> m_priorityWirePos;
     // Drift time of the priority wire.
-    std::vector<long> m_priorityWireTime;
+    std::vector<short> m_priorityWireTime;
     // Start phi-sector index of the hit representation (11/32) in full track parameter space
     std::vector<unsigned short> m_phiSectorStarts;
     // Counter for the number of hits in the current event
@@ -251,9 +207,8 @@ namespace Belle2 {
     NDFinderParameters m_ndFinderParams;
     // Configuration of the clustering module
     ClustererParameters m_clustererParams;
-
     // Clustering module
-    Belle2::Clusterizend m_clusterer;
+    Clusterizend m_clusterer;
 
     /*
       Since the CDC wire pattern is repeated 32 times, the hit IDs are stored for 1/32 of the CDC only.

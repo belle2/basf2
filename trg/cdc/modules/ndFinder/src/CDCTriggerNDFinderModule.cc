@@ -10,6 +10,7 @@
 #include <vector>
 #include <Math/Vector3D.h>
 #include "trg/cdc/modules/ndFinder/CDCTriggerNDFinderModule.h"
+#include "trg/cdc/NDFinder.h"
 
 using namespace Belle2;
 
@@ -24,10 +25,10 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
                  "stereo TS and a density based clustering \n"
                  "algorithm.\n");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("TrackSegmentHitsName", m_TrackSegmentHitsName,
+  addParam("TrackSegmentHitsName", m_trackSegmentHitsName,
            "The name of the StoreArray of the CDCTriggerSegmentHits.",
            std::string("CDCTriggerSegmentHits"));
-  addParam("NDFinderTracksName", m_NDFinderTracksName,
+  addParam("NDFinderTracksName", m_ndFinderTracksName,
            "The name of the StoreArray where the tracks found by this NDFinder Module are stored.",
            std::string("CDCTrigger3DFinderTracks"));
   addParam("minSuperAxial", m_minSuperAxial,
@@ -38,15 +39,9 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            "Cluster pruning: Minimum number of stereo super layer hits related to a cluster "
            "for the cluster to be considered as a track.",
            static_cast<unsigned short>(3));
-  addParam("thresh", m_thresh,
-           "Track estimation: Minimum weight of a cluster member cell "
-           "relative to the peak weight of the cluster "
-           "for the cell to enter in the weighted mean "
-           "track parameter value estimation.",
-           0.85);
   addParam("minTotalWeight", m_minTotalWeight,
            "Clustering: minimum total weight of all cells in the 3d volume.",
-           static_cast<unsigned short>(450));
+           static_cast<unsigned short>(100));
   addParam("minPeakWeight", m_minPeakWeight,
            "Clustering: minimum peak cell weight of a cluster.",
            static_cast<unsigned short>(32));
@@ -68,7 +63,7 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
   addParam("stereoFile", m_stereoFile,
            "File name of the stereo hit patterns. ",
            std::string("data/trg/cdc/ndFinderArrayStereoComp.txt.gz"));
-  addParam("NDFinderInfosName", m_NDFinderInfosName,
+  addParam("NDFinderInfosName", m_ndFinderInfosName,
            "The name of the StoreArray where the tracks clusters found by this NDFinder Module are stored.",
            std::string("CDCTriggerClusterInfos"));
 }
@@ -77,15 +72,19 @@ CDCTriggerNDFinderModule::~CDCTriggerNDFinderModule() {}
 
 void CDCTriggerNDFinderModule::initialize()
 {
-  m_TrackSegmentHits.isRequired(m_TrackSegmentHitsName);
-  m_NDFinderTracks.registerInDataStore(m_NDFinderTracksName);
-  m_NDFinderTracks.registerRelationTo(m_TrackSegmentHits);
-  m_NDFinderInfos.registerInDataStore(m_NDFinderInfosName);
-  m_NDFinderTracks.registerRelationTo(m_NDFinderInfos);
-  m_NDFinder.init(m_minSuperAxial, m_minSuperStereo, m_thresh,
-                  m_minTotalWeight, m_minPeakWeight, m_iterations,
-                  m_omegaTrim, m_phiTrim, m_storeAdditionalReadout,
-                  m_axialFile, m_stereoFile);
+  m_trackSegmentHits.isRequired(m_trackSegmentHitsName);
+  m_ndFinderTracks.registerInDataStore(m_ndFinderTracksName);
+  m_ndFinderTracks.registerRelationTo(m_trackSegmentHits);
+  m_ndFinderInfos.registerInDataStore(m_ndFinderInfosName);
+  m_ndFinderTracks.registerRelationTo(m_ndFinderInfos);
+  NDFinderParameters ndFinderParameters = {
+    m_minSuperAxial, m_minSuperStereo,
+    m_minTotalWeight, m_minPeakWeight,
+    m_iterations, m_omegaTrim, m_phiTrim,
+    m_storeAdditionalReadout,
+    m_axialFile, m_stereoFile
+  };
+  m_NDFinder.init(ndFinderParameters);
 }
 
 void CDCTriggerNDFinderModule::beginRun() {}
@@ -93,24 +92,32 @@ void CDCTriggerNDFinderModule::beginRun() {}
 void CDCTriggerNDFinderModule::event()
 {
   m_NDFinder.reset();
-  for (CDCTriggerSegmentHit& hit : m_TrackSegmentHits) {
-    m_NDFinder.addHit(hit.getSegmentID(), hit.getISuperLayer(), hit.getPriorityPosition(), hit.priorityTime());
+
+  for (CDCTriggerSegmentHit& hit : m_trackSegmentHits) {
+    HitInfo hitInfo = {
+      hit.getSegmentID(),
+      hit.getISuperLayer(),
+      hit.getPriorityPosition(),
+      hit.priorityTime()
+    };
+    m_NDFinder.addHit(hitInfo);
   }
+
   m_NDFinder.findTracks();
 
   std::vector<NDFinderTrack>* resultTracks = m_NDFinder.getFinderTracks();
   for (NDFinderTrack track : *resultTracks) {
-    const CDCTriggerTrack* NDFinderTrack =
-      m_NDFinderTracks.appendNew(track.getPhi0(), track.getOmega(),
+    const CDCTriggerTrack* ndFinderTrack =
+      m_ndFinderTracks.appendNew(track.getPhi0(), track.getOmega(),
                                  0., 0., track.getCot(), 0.);
     std::vector<ROOT::Math::XYZVector> readoutHoughSpace = track.getHoughSpace();
     std::vector<ROOT::Math::XYZVector> readoutCluster = track.getClusterReadout();
-    const CDCTrigger3DFinderInfo* NDFinderInfo =
-      m_NDFinderInfos.appendNew(readoutHoughSpace, readoutCluster);
-    NDFinderTrack->addRelationTo(NDFinderInfo);
+    const CDCTrigger3DFinderInfo* ndFinderInfo =
+      m_ndFinderInfos.appendNew(readoutHoughSpace, readoutCluster);
+    ndFinderTrack->addRelationTo(ndFinderInfo);
     std::vector<unsigned short> relatedHits = track.getRelatedHits();
     for (unsigned short hitIdx = 0; hitIdx < relatedHits.size(); ++hitIdx) {
-      NDFinderTrack->addRelationTo(m_TrackSegmentHits[relatedHits[hitIdx]]);
+      ndFinderTrack->addRelationTo(m_trackSegmentHits[relatedHits[hitIdx]]);
     }
   }
 }

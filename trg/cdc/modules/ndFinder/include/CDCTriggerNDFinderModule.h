@@ -36,20 +36,20 @@ namespace Belle2 {
 
   private:
     // Name for TS hits
-    std::string m_TrackSegmentHitsName;
+    std::string m_trackSegmentHitsName;
     // Name for NDFinder tracks
-    std::string m_NDFinderTracksName;
+    std::string m_ndFinderTracksName;
     // Name for NDFinder Track To Hit Array
-    std::string m_NDFinderTrackToHitArrayName;
+    std::string m_ndFinderTrackToHitArrayName;
     // Name for the NDFinder Cluster Data
-    std::string m_NDFinderInfosName;
+    std::string m_ndFinderInfosName;
 
     // StoreArray for TS hits
-    StoreArray<CDCTriggerSegmentHit> m_TrackSegmentHits;
+    StoreArray<CDCTriggerSegmentHit> m_trackSegmentHits;
     // StoreArray for 2D finder tracks from unpacker
-    StoreArray<CDCTriggerTrack> m_NDFinderTracks;
+    StoreArray<CDCTriggerTrack> m_ndFinderTracks;
     // StoreArray for NDFinder Cluster Data
-    StoreArray<CDCTrigger3DFinderInfo> m_NDFinderInfos;
+    StoreArray<CDCTrigger3DFinderInfo> m_ndFinderInfos;
 
     // Instance of the 3D Track Finder
     NDFinder m_NDFinder;
@@ -57,11 +57,6 @@ namespace Belle2 {
     unsigned short m_minSuperAxial;
     // Minimum number of stereo super layers for the cluster to be considered as a track
     unsigned short m_minSuperStereo;
-    // Track estimation: Minimum weight of a cluster member cell
-    // relative to the peak weight of the cluster
-    // for the cell to enter in the weighted mean
-    // track parameter value estimation
-    double m_thresh;
     // Clustering with 3d volume: Cut on the total weight in this volume
     unsigned short m_minTotalWeight;
     // Clustering with 3d volume: Cut on the peak cell weight

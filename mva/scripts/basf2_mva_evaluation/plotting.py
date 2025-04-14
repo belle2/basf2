@@ -441,6 +441,13 @@ class RejectionOverEfficiency(Plotter):
     #: @var ymax
     #: Maximum y value
 
+    #: @var fom
+    #: Whether to plot the Figure of Merit (FOM).
+    #: @var twinxax
+    #: Secondary axis used for validation dataset.
+    #: @var twinxaxMax
+    #: Maximum y value for validation dataset.
+
     def __init__(self, figure=None, axis=None, fom=False):
         super().__init__(figure, axis)
         self.fom = fom

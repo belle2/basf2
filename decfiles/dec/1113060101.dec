@@ -1,0 +1,50 @@
+# EventType: 1113060101
+# Descriptor:  [Y(4S) -> B0 anti-B0
+#                        B0 -> D*- pi+
+#                              D*- -> anti-D0 pi-
+#                                     anti-D0 -> K_S0 pi+ pi-
+#                                                K_S0 -> pi+ pi-
+#                            anti-B0 -> anything]cc       
+# NickName: Bd_Dst-pi+_D0pi-_K_S0pi+pi-_pi+pi-
+# Documentation: For phi3 GGSZ studies. Dalitz decay of D.
+# Tested: yes
+# PhysicsWG: BHadronic
+# Responsible: Ansu Johnson
+# Email: ansujohnson@physics.iitm.ac.in
+# Cuts: None
+# Date: 2025-04-13
+
+Alias K_S0sig K_S0
+
+
+# Upsilon(4S) decay
+Decay Upsilon(4S)
+0.500 B0sig anti-B0   VSS_BMIX dm;
+0.500 B0 anti-B0sig  VSS_BMIX dm;
+Enddecay
+
+
+Decay B0sig
+1.000 D*-sig pi+ PHOTOS SVS;
+Enddecay
+CDecay anti-B0sig
+
+
+Decay D*-sig
+1.000 anti-D0sig  pi- PHOTOS VSS;
+Enddecay
+CDecay D*+sig
+
+
+Decay anti-D0sig
+1.000 K_S0sig pi+ pi- PHOTOS D_DALITZ;
+Enddecay
+CDecay D0sig
+
+
+Decay K_S0sig
+1.000 pi+ pi- PHSP;
+Enddecay
+
+
+End

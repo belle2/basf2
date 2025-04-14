@@ -87,10 +87,6 @@ def add_pxd_ckf(
         reverse_seed = False
 
     if use_mc_truth:
-        path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
-                        mcRecoTracksStoreArrayName="MCRecoTracks",
-                        prRecoTracksStoreArrayName=svd_cdc_reco_tracks)
-
         module_parameters = dict(
             firstHighFilter="truth",
             secondHighFilter="all",

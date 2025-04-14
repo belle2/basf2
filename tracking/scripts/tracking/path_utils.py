@@ -161,7 +161,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
     path.add_module("DAFRecoFitter",
                     recoTracksStoreArrayName=reco_tracks,
                     probCut=0.00001,
-                    pdgCodesToUseForFitting=13)
+                    pdgCodesToUseForFitting=13).set_name(f"DAFRecoFitter {reco_tracks}")
 
     # Correct time seed
     path.add_module("PlaneTriggerTrackTimeEstimator",
@@ -175,7 +175,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
     path.add_module("DAFRecoFitter",
                     recoTracksStoreArrayName=reco_tracks,
                     pdgCodesToUseForFitting=13
-                    )
+                    ).set_name(f"DAFRecoFitter {reco_tracks}")
 
     if event_timing_extraction:
         # Extract the time
@@ -191,7 +191,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
                         # probCut=0.00001,
                         recoTracksStoreArrayName=reco_tracks,
                         pdgCodesToUseForFitting=13
-                        )
+                        ).set_name(f"DAFRecoFitter {reco_tracks}")
 
     # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
@@ -1333,7 +1333,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
         temporary_reco_track_list.append(svd_reco_tracks)
         latest_reco_tracks = svd_reco_tracks
 
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks)
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks).set_name(f"DAFRecoFitter {svd_reco_tracks}")
 
     if is_cdc_used(components):
         path.add_module("TFCDC_WireHitPreparer",

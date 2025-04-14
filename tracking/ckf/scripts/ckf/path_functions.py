@@ -17,7 +17,7 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
     :param direction: where to extrapolate to. Valid options are forward and backward
     """
     # The CDC tracks need to be fitted
-    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks).set_name(f"DAFRecoFitter {cdc_reco_tracks}")
 
     if use_mc_truth:
         # MC CKF needs MC matching information
@@ -79,7 +79,7 @@ def add_pxd_ckf(
     if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
         path.add_module("PXDSpacePointCreator")
 
-    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks).set_name(f"DAFRecoFitter {svd_cdc_reco_tracks}")
 
     if direction == "forward":
         reverse_seed = True
@@ -291,7 +291,7 @@ def add_cosmics_pxd_ckf(
     if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
         path.add_module("PXDSpacePointCreator")
 
-    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks).set_name(f"DAFRecoFitter {svd_cdc_reco_tracks}")
 
     if direction == "forward":
         reverse_seed = True

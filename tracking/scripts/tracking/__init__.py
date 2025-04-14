@@ -606,7 +606,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
             roiName = "ROIs"
             intercepts_name = "PXDIntercepts"
             if not use_HLT_ROIs or create_intercepts_for_pxd_ckf:
-                path.add_module("DAFRecoFitter", recoTracksStoreArrayName=latest_reco_tracks)
+                path.add_module("DAFRecoFitter", recoTracksStoreArrayName=latest_reco_tracks).set_name(
+                    f"DAFRecoFitter {latest_reco_tracks}")
 
                 roiName = "ROIs_offline"
                 intercepts_name = "CKF" + intercepts_name

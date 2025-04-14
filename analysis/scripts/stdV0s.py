@@ -8,6 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+import b2bii
 from basf2 import B2ERROR
 import modularAnalysis as ma
 from stdCharged import stdPi, stdPr
@@ -80,7 +81,10 @@ def goodBelleKshort(path):
     Parameters:
         path (basf2.Path): the path to load the modules
     """
-    ma.fillParticleList('K_S0:legacyGoodKS -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
+    if b2bii.isB2BII():
+        ma.cutAndCopyList('K_S0:legacyGoodKS', 'K_S0:mdst', '0.3 < M < 0.7', writeOut=True, path=path)
+    else:
+        ma.fillParticleList('K_S0:legacyGoodKS -> pi+ pi-', '0.3 < M < 0.7', writeOut=True, path=path)
     vertex.kFit('K_S0:legacyGoodKS', conf_level=0.0, path=path)
     ma.applyCuts('K_S0:legacyGoodKS', '0.468 < M < 0.528 and goodBelleKshort==1', path=path)
 

@@ -260,7 +260,7 @@ class Particle:
                     else:
                         tempRange[0] = int(tempRange[0])
                         if tempRange[0] >= len(daughters):
-                            basf2.B2WARNING(f'Variable {v} contains index {tempRange[0]} which is more than daughters, skipping!')
+                            basf2.B2INFO(f'Variable {v} contains index {tempRange[0]} which is more than daughters, skipping!')
                             skip = True
                             break
                     if tempRange[1] == '':
@@ -268,7 +268,7 @@ class Particle:
                     else:
                         tempRange[1] = int(tempRange[1])
                         if tempRange[1] > len(daughters):
-                            basf2.B2WARNING(f'Variable {v} contains index {tempRange[1]} which is more than daughters, skipping!')
+                            basf2.B2INFO(f'Variable {v} contains index {tempRange[1]} which is more than daughters, skipping!')
                             skip = True
                             break
                     ranges.append(tempRange)
@@ -283,7 +283,7 @@ class Particle:
             elif v.count('{}') <= len(daughters):
                 mvaVars += [v.format(*c) for c in itertools.combinations(list(range(0, len(daughters))), v.count('{}'))]
             elif v.count('{}') > len(daughters):
-                basf2.B2WARNING(f'Variable {v} contains more brackets than daughters, which is why it will be ignored!')
+                basf2.B2INFO(f'Variable {v} contains more brackets than daughters, which is why it will be ignored!')
                 continue
             else:
                 basf2.B2FATAL(f'Something went wrong with variable {v}!')

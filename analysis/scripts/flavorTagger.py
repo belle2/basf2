@@ -152,7 +152,7 @@ def set_FlavorTagger_pid_aliases_legacy():
         variables.variables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC), 0.5)')
 
 
-def set_GNNFlavorTagger_aliases(categories):
+def set_GNNFlavorTagger_aliases(categories, usePIDNN):
     """
     This function adds aliases for the GNN-based flavor tagger.
     """
@@ -174,12 +174,12 @@ def set_GNNFlavorTagger_aliases(categories):
         'px_c': 'px*charge',
         'py_c': 'py*charge',
         'pz_c': 'pz*charge',
-        'electronID_c': 'electronIDNN*charge',
-        'muonID_c': 'muonIDNN*charge',
-        'pionID_c': 'pionIDNN*charge',
-        'kaonID_c': 'kaonIDNN*charge',
-        'protonID_c': 'protonIDNN*charge',
-        'deuteronID_c': 'deuteronIDNN*charge',
+        'electronID_c': 'electronIDNN*charge' if usePIDNN else 'electronID*charge',
+        'muonID_c': 'muonIDNN*charge' if usePIDNN else 'muonID*charge',
+        'pionID_c': 'pionIDNN*charge' if usePIDNN else 'pionID*charge',
+        'kaonID_c': 'kaonIDNN*charge' if usePIDNN else 'kaonID*charge',
+        'protonID_c': 'protonIDNN*charge' if usePIDNN else 'protonID*charge',
+        'deuteronID_c': 'deuteronIDNN*charge' if usePIDNN else 'deuteronID*charge',
         'electronID_noSVD_noTOP_c': 'electronID_noSVD_noTOP*charge',
     }
 
@@ -337,16 +337,16 @@ AvailableCategories = {
 }
 
 
-def getTrainingVariables(category=None):
+def getTrainingVariables(category=None, usePIDNN=False):
     """
     Helper function to get training variables.
 
     NOTE: This function is not called the Expert mode. It is not necessary to be consistent with variables list of weight files.
     """
 
-    KId = {'Belle': 'ifNANgiveX(atcPIDBelle(3,2), 0.5)', 'Belle2': 'kaonIDNN'}
-    muId = {'Belle': 'muIDBelle', 'Belle2': 'muonIDNN'}
-    eId = {'Belle': 'eIDBelle', 'Belle2': 'electronIDNN'}
+    KId = {'Belle': 'ifNANgiveX(atcPIDBelle(3,2), 0.5)', 'Belle2': 'kaonIDNN' if usePIDNN else 'kaonID'}
+    muId = {'Belle': 'muIDBelle', 'Belle2': 'muonIDNN' if usePIDNN else 'muonID'}
+    eId = {'Belle': 'eIDBelle', 'Belle2': 'electronIDNN' if usePIDNN else 'electronID'}
 
     variables = []
     if category == 'Electron' or category == 'IntermediateElectron':
@@ -449,7 +449,7 @@ def getTrainingVariables(category=None):
                      'cosTheta',
                      'p',
                      'pt',
-                     'pionIDNN',
+                     'pionIDNN' if usePIDNN else 'pionID',
                      'piid_TOP',
                      'piid_ARICH',
                      'pi_vs_edEdxid',
@@ -478,7 +478,7 @@ def getTrainingVariables(category=None):
                      'cosTheta',
                      'p',
                      'pt',
-                     'pionIDNN',
+                     'pionIDNN' if usePIDNN else 'pionID',
                      'piid_dEdx',
                      'piid_TOP',
                      'piid_ARICH',
@@ -516,8 +516,10 @@ def getTrainingVariables(category=None):
                      'chiProb',
                      ]
         if getBelleOrBelle2() == "Belle2":
-            variables.append('daughter(1,protonIDNN)')  # protonID always 0 in B2BII check in future
-            variables.append('daughter(0,pionIDNN)')  # not very powerful in B2BII
+            # protonID always 0 in B2BII check in future
+            variables.append('daughter(1,protonIDNN)' if usePIDNN else 'daughter(1,protonID)')
+            # not very powerful in B2BII
+            variables.append('daughter(0,pionIDNN)' if usePIDNN else 'daughter(0,pionID)')
         else:
             variables.append('distance')
 
@@ -617,7 +619,7 @@ def FillParticleLists(maskName='all', categories=None, path=None):
                                   trainingMode=1)  # Multiclass
 
 
-def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=None):
+def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, usePIDNN=False, path=None):
     """
     Samples data for training or tests all categories all categories at event level.
     """
@@ -761,9 +763,16 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=N
                 ntuple = register_module('VariablesToNtuple')
                 ntuple.param('fileName', filesDirectory + '/' + methodPrefixEventLevel + "sampled" + fileId + ".root")
                 ntuple.param('treeName', methodPrefixEventLevel + "_tree")
-                variablesToBeSaved = getTrainingVariables(category) + [targetVariable, 'ancestorHasWhichFlavor',
-                                                                       'isSignal', 'mcPDG', 'mcErrors', 'genMotherPDG',
-                                                                       'nMCMatches', 'B0mcErrors']
+                variablesToBeSaved = getTrainingVariables(category, usePIDNN) + [
+                                                        targetVariable,
+                                                        'ancestorHasWhichFlavor',
+                                                        'isSignal',
+                                                        'mcPDG',
+                                                        'mcErrors',
+                                                        'genMotherPDG',
+                                                        'nMCMatches',
+                                                        'B0mcErrors'
+                                                        ]
                 if category != 'KaonPion' and category != 'FSC':
                     variablesToBeSaved = variablesToBeSaved + \
                         ['extraInfo(isRightTrack(' + category + '))',
@@ -778,7 +787,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=N
         return True
 
 
-def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None):
+def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None, usePIDNN=False):
     """
     Trains all categories at event level.
     """
@@ -810,7 +819,7 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None):
             trainingOptionsEventLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
             trainingOptionsEventLevel.m_treename = methodPrefixEventLevel + "_tree"
             trainingOptionsEventLevel.m_identifier = weightFile
-            trainingOptionsEventLevel.m_variables = basf2_mva.vector(*getTrainingVariables(category))
+            trainingOptionsEventLevel.m_variables = basf2_mva.vector(*getTrainingVariables(category, usePIDNN))
             trainingOptionsEventLevel.m_target_variable = targetVariable
             trainingOptionsEventLevel.m_max_events = maxEventsNumber
 
@@ -1055,6 +1064,7 @@ def flavorTagger(
     prefix='MC15ri_light-2207-bengal_0',
     useGNN=False,
     identifierGNN='GFlaT_MC15ri_light_2303_iriomote_0',
+    usePIDNN=False,
     path=None,
 ):
     """
@@ -1112,6 +1122,8 @@ def flavorTagger(
                                                [Expert] In the sampler mode, training files for GNN-based Flavor Tagger is produced.
       @param identifierGNN                     The name of weight file of the GNN-based Flavor Tagger.
                                                [Expert] Multiple identifiers can be given with list(str).
+      @param usePIDNN                          if True, PID probabilities calculated from PID neural network are used
+                                               (default is False)
       @param path                              Modules are added to this path
 
     """
@@ -1198,7 +1210,7 @@ def flavorTagger(
 
     alias_list_for_GNN = []
     if useGNN:
-        alias_list_for_GNN = set_GNNFlavorTagger_aliases(categories)
+        alias_list_for_GNN = set_GNNFlavorTagger_aliases(categories, usePIDNN)
 
     setInputVariablesWithMask()
     if prefix != '':
@@ -1254,7 +1266,7 @@ def flavorTagger(
         FillParticleLists(maskName, categories, roe_path)
 
         if useGNN:
-            if eventLevel('Expert', weightFiles, categories, roe_path):
+            if eventLevel('Expert', weightFiles, categories, usePIDNN, roe_path):
 
                 ma.rankByHighest('pi+:inRoe', 'p', numBest=0, allowMultiRank=False,
                                  outputVariable='FT_p_rank', overwriteRank=True, path=roe_path)
@@ -1267,7 +1279,7 @@ def flavorTagger(
                                      path=roe_path)
 
         else:
-            if eventLevel(mode, weightFiles, categories, roe_path):
+            if eventLevel(mode, weightFiles, categories, usePIDNN, roe_path):
                 combinerLevel(mode, weightFiles, categories, variablesCombinerLevel, categoriesCombinationCode, roe_path)
 
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
@@ -1283,7 +1295,7 @@ def flavorTagger(
 
         FillParticleLists(maskName, categories, roe_path)
 
-        if eventLevel(mode, weightFiles, categories, roe_path):
+        if eventLevel(mode, weightFiles, categories, usePIDNN, roe_path):
             combinerLevel(mode, weightFiles, categories, variablesCombinerLevel, categoriesCombinationCode, roe_path)
 
             flavorTaggerInfoFiller = basf2.register_module('FlavorTaggerInfoFiller')
@@ -1332,7 +1344,7 @@ def flavorTagger(
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
     elif mode == 'Teacher':
-        if eventLevelTeacher(weightFiles, categories):
+        if eventLevelTeacher(weightFiles, categories, usePIDNN):
             combinerLevelTeacher(weightFiles, variablesCombinerLevel, categoriesCombinationCode)
 
 

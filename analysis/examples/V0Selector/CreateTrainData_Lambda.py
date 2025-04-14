@@ -11,50 +11,52 @@
 ##########################################################################
 #                                                                        #
 # This tutorial demonstrates how to create data sample for training of   #
-# KsSelector.                                                            #
+# LambdaSelector.                                                        #
 #                                                                        #
 ##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma
 import stdV0s as stdV0s
-import ksSelector as ksSelector
+import variables.collections as vc
 
-# create path
+import LambdaSelector as LambdaSelector
+
+# Creat analysis path
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst(filename=b2.find_file('ccbar_background.root', 'examples', False),
-             path=my_path)
-
-# load K_S0 particle list
-stdV0s.stdKshorts(path=my_path)
-ma.matchMCTruth(list_name='K_S0:merged', path=my_path)
+ma.inputMdst(filename=b2.find_file('ccbar_background.root', 'examples', False), path=my_path)
+# load Lambda0 particle list
+stdV0s.stdLambdas(path=my_path)
+ma.matchMCTruth(list_name='Lambda0:merged', path=my_path)
 
 # apply cuts suitable for V0Selector
-# remove Lambda from particle list
-ma.cutAndCopyLists('K_S0:V0Selector', 'K_S0:merged', cut='mcPDG!=3122', path=my_path)
-# apply cuts suitable for LambdaVeto
+# remove KS0 from particle list
+ma.cutAndCopyLists('Lambda0:V0Selector', 'Lambda0:merged', cut='mcPDG!=310', path=my_path)
+# apply cuts suitable for KsVeto
 # only include long lived particle, K_S0 and Lambda
-ma.cutAndCopyLists('K_S0:LambdaVeto', 'K_S0:merged', cut='isSignal==1 or abs(mcPDG)==3122', path=my_path)
+ma.cutAndCopyLists('Lambda0:KsVeto',     'Lambda0:merged', cut='isSignal==1 or mcPDG==310', path=my_path)
 
-# add variable aliases required for KsSelector training
-ksSelector.add_variable_collection()
+# add variable aliases required for Lambda0Selector training
+LambdaSelector.add_variable_collection()
 
-# add variables required for KsSelector training
-vars = ['ks_selector_info', 'isNotContinuumEvent', 'isSignal']
+# add variables required for Lambda0Selector training
+vars = ['lambda_selector_info', 'isNotContinuumEvent', 'isSignal', 'nMCDaughters', 'mcErrors', 'mcPDG',
+        'ArmenterosLongitudinalMomentumAsymmetry', 'pt', 'p', 'InvM', 'M', 'V0Deltad0', 'V0Deltaz0']
+vars += vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.mc_flight_info
 
 # output
-ma.variablesToNtuple('K_S0:V0Selector',
+ma.variablesToNtuple('Lambda0:V0Selector',
                      variables=vars,
-                     filename='KsSelector_train_V0Selector.root',
-                     treename='tree',
+                     filename='LambdaSelector_train_V0Selector.root',
+                     treename='lambdatree',
                      path=my_path)
 
-ma.variablesToNtuple('K_S0:LambdaVeto',
+ma.variablesToNtuple('Lambda0:KsVeto',
                      variables=vars,
-                     filename='KsSelector_train_LambdaVeto.root',
-                     treename='tree',
+                     filename='LambdaSelector_train_KsVeto.root',
+                     treename='ksvetotree',
                      path=my_path)
 
 # Process the events

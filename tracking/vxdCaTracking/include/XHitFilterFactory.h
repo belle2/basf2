@@ -74,7 +74,7 @@ namespace Belle2 {
     TwoHitFunction get2HitInterface(XHitFilterType variableType)
     {
       // prepare stuff for 2-hit-filters:
-      auto prepareStuff = [ = ](const PointType & outerHit, const PointType & innerHit) -> void {
+      auto prepareStuff = [ this ](const PointType & outerHit, const PointType & innerHit) -> void {
         B2Vector3D tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
         B2Vector3D tInnerHit(innerHit.X(), innerHit.Y(), innerHit.Z());
         m_twoHit.resetValues(tOuterHit, tInnerHit);
@@ -82,42 +82,42 @@ namespace Belle2 {
 
       /// 2-hit:
       if (variableType == FilterID::distance3D) {
-        return [ = ](const PointType & outerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff ](const PointType & outerHit, const PointType & innerHit) -> double {
           prepareStuff(outerHit, innerHit);
           return m_twoHit.calcDist3D();
         };
       }
 
       if (variableType == FilterID::distanceXY) {
-        return [ = ](const PointType & outerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff ](const PointType & outerHit, const PointType & innerHit) -> double {
           prepareStuff(outerHit, innerHit);
           return m_twoHit.calcDistXY();
         };
       }
 
       if (variableType == FilterID::distanceZ) {
-        return [ = ](const PointType & outerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff ](const PointType & outerHit, const PointType & innerHit) -> double {
           prepareStuff(outerHit, innerHit);
           return m_twoHit.calcDistZ();
         };
       }
 
       if (variableType == FilterID::slopeRZ) {
-        return [ = ](const PointType & outerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff ](const PointType & outerHit, const PointType & innerHit) -> double {
           prepareStuff(outerHit, innerHit);
           return m_twoHit.calcSlopeRZ();
         };
       }
 
       if (variableType == FilterID::normedDistance3D) {
-        return [ = ](const PointType & outerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff ](const PointType & outerHit, const PointType & innerHit) -> double {
           prepareStuff(outerHit, innerHit);
           return m_twoHit.calcNormedDist3D();
         };
       }
 
       // prepare stuff for 2+1-hit-filters
-      auto prepareStuffHiOc = [ = ](const PointType & outerHit, const PointType & innerHit) -> void {
+      auto prepareStuffHiOc = [ this ](const PointType & outerHit, const PointType & innerHit) -> void {
         B2Vector3D tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
         B2Vector3D tInnerHit(innerHit.X(), innerHit.Y(), innerHit.Z());
         m_threeHit.resetValues(tOuterHit, tInnerHit, m_virtualIP);
@@ -126,49 +126,49 @@ namespace Belle2 {
 
       /// 2+1-hit:
       if (variableType == FilterID::anglesHighOccupancy3D) {
-        return [ = ](const PointType & outerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuffHiOc ](const PointType & outerHit, const PointType & innerHit) -> double {
           prepareStuffHiOc(outerHit, innerHit);
           return m_threeHit.calcAngle3D();
         };
       }
 
       if (variableType == FilterID::anglesHighOccupancyXY) {
-        return [ = ](const PointType & outerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuffHiOc ](const PointType & outerHit, const PointType & innerHit) -> double {
           prepareStuffHiOc(outerHit, innerHit);
           return m_threeHit.calcAngleXY();
         };
       }
 
       if (variableType == FilterID::anglesHighOccupancyRZ) {
-        return [ = ](const PointType & outerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuffHiOc ](const PointType & outerHit, const PointType & innerHit) -> double {
           prepareStuffHiOc(outerHit, innerHit);
           return m_threeHit.calcAngleRZ();
         };
       }
 
       if (variableType == FilterID::distanceHighOccupancy2IP) {
-        return [ = ](const PointType & outerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuffHiOc ](const PointType & outerHit, const PointType & innerHit) -> double {
           prepareStuffHiOc(outerHit, innerHit);
           return m_threeHit.calcCircleDist2IP();
         };
       }
 
       if (variableType == FilterID::deltaSlopeHighOccupancyRZ) {
-        return [ = ](const PointType & outerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuffHiOc ](const PointType & outerHit, const PointType & innerHit) -> double {
           prepareStuffHiOc(outerHit, innerHit);
           return m_threeHit.calcDeltaSlopeRZ();
         };
       }
 
       if (variableType == FilterID::pTHighOccupancy) {
-        return [ = ](const PointType & outerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuffHiOc ](const PointType & outerHit, const PointType & innerHit) -> double {
           prepareStuffHiOc(outerHit, innerHit);
           return m_threeHit.calcPt();
         };
       }
 
       if (variableType == FilterID::helixParameterHighOccupancyFit) {
-        return [ = ](const PointType & outerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuffHiOc ](const PointType & outerHit, const PointType & innerHit) -> double {
           prepareStuffHiOc(outerHit, innerHit);
           return m_threeHit.calcHelixParameterFit();
         };
@@ -198,7 +198,7 @@ namespace Belle2 {
     ThreeHitFunction get3HitInterface(XHitFilterType variableType)
     {
       // prepare stuff for 3-hit-filters
-      auto prepareStuff3Hit = [ = ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> void {
+      auto prepareStuff3Hit = [ this ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> void {
         B2Vector3D tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
         B2Vector3D tCenterHit(centerHit.X(), centerHit.Y(), centerHit.Z());
         B2Vector3D tInnerHit(innerHit.X(), innerHit.Y(), innerHit.Z());
@@ -207,63 +207,63 @@ namespace Belle2 {
 
       /// 3-hit:
       if (variableType == FilterID::angles3D) {
-        return [ = ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff3Hit ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
           prepareStuff3Hit(outerHit, centerHit, innerHit);
           return m_threeHit.calcAngle3D();
         };
       }
 
       if (variableType == FilterID::anglesRZ) {
-        return [ = ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff3Hit ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
           prepareStuff3Hit(outerHit, centerHit, innerHit);
           return m_threeHit.calcAngleRZ();
         };
       }
 
       if (variableType == FilterID::anglesXY) {
-        return [ = ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff3Hit ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
           prepareStuff3Hit(outerHit, centerHit, innerHit);
           return m_threeHit.calcAngleXY();
         };
       }
 
       if (variableType == FilterID::deltaSlopeRZ) {
-        return [ = ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff3Hit ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
           prepareStuff3Hit(outerHit, centerHit, innerHit);
           return m_threeHit.calcDeltaSlopeRZ();
         };
       }
 
       if (variableType == FilterID::pT) {
-        return [ = ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff3Hit ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
           prepareStuff3Hit(outerHit, centerHit, innerHit);
           return m_threeHit.calcPt();
         };
       }
 
       if (variableType == FilterID::distance2IP) {
-        return [ = ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff3Hit ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
           prepareStuff3Hit(outerHit, centerHit, innerHit);
           return m_threeHit.calcCircleDist2IP();
         };
       }
 
       if (variableType == FilterID::helixParameterFit) {
-        return [ = ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff3Hit ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
           prepareStuff3Hit(outerHit, centerHit, innerHit);
           return m_threeHit.calcHelixParameterFit();
         };
       }
 
       if (variableType == FilterID::deltaSOverZ) {
-        return [ = ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff3Hit ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
           prepareStuff3Hit(outerHit, centerHit, innerHit);
           return m_threeHit.calcDeltaSOverZ();
         };
       }
 
       if (variableType == FilterID::deltaSlopeZOverS) {
-        return [ = ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff3Hit ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
           prepareStuff3Hit(outerHit, centerHit, innerHit);
           return m_threeHit.calcDeltaSlopeZOverS();
         };
@@ -271,7 +271,7 @@ namespace Belle2 {
 
 
       // prepare stuff for 3+1-hit-filters
-      auto prepareStuff4Hit = [ = ](const PointType & outerHit, const PointType & centerHit,
+      auto prepareStuff4Hit = [ this ](const PointType & outerHit, const PointType & centerHit,
       const PointType & innerHit) -> void {
         B2Vector3D tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
         B2Vector3D tCenterHit(centerHit.X(), centerHit.Y(), centerHit.Z());
@@ -281,14 +281,14 @@ namespace Belle2 {
 
       ///3+1hit:
       if (variableType == FilterID::deltapTHighOccupancy) {
-        return [ = ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff4Hit ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
           prepareStuff4Hit(outerHit, centerHit, innerHit);
           return m_fourHit.calcDeltapT();
         };
       }
 
       if (variableType == FilterID::deltaDistanceHighOccupancy2IP) {
-        return [ = ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
+        return [ this, &prepareStuff4Hit ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> double {
           prepareStuff4Hit(outerHit, centerHit, innerHit);
           return m_fourHit.calcDeltaDistCircleCenter();
         };
@@ -318,7 +318,7 @@ namespace Belle2 {
     {
 
       // prepare stuff for 4-hit-filters
-      auto prepareStuff4Hit = [ = ](const PointType & outerHit, const PointType & outerCenterHit,
+      auto prepareStuff4Hit = [ this ](const PointType & outerHit, const PointType & outerCenterHit,
       const PointType & innerCenterHit, const PointType & innerHit) -> void {
         B2Vector3D tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
         B2Vector3D tOuterCenterHit(outerCenterHit.X(), outerCenterHit.Y(), outerCenterHit.Z());
@@ -329,7 +329,7 @@ namespace Belle2 {
 
       /// 4-hit:
       if (variableType == FilterID::deltapT) {
-        return [ = ](const PointType & outerHit, const PointType & outerCenterHit,
+        return [ this, &prepareStuff4Hit ](const PointType & outerHit, const PointType & outerCenterHit,
         const PointType & innerCenterHit, const PointType & innerHit) -> double {
           prepareStuff4Hit(outerHit, outerCenterHit, innerCenterHit, innerHit);
           return m_fourHit.calcDeltapT();
@@ -337,7 +337,7 @@ namespace Belle2 {
       }
 
       if (variableType == FilterID::deltaDistance2IP) {
-        return [ = ](const PointType & outerHit, const PointType & outerCenterHit,
+        return [ this, &prepareStuff4Hit ](const PointType & outerHit, const PointType & outerCenterHit,
         const PointType & innerCenterHit, const PointType & innerHit) -> double {
           prepareStuff4Hit(outerHit, outerCenterHit, innerCenterHit, innerHit);
           return m_fourHit.calcDeltaDistCircleCenter();

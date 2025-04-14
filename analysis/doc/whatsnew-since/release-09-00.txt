@@ -7,8 +7,8 @@ FEI
 
 Modular Analysis
 ++++++++++++++++
-* Fixed `goodBelleKshort` and `loadStdGoodBellePhoton` functions to apply cuts on the `:mdst` lists when using b2bii, instead of using `fillParticleList`.
-* Fixed documentation explicitly mentioning that the invariant mass cuts are applied "after the vertex fit" in `stdLambdas`, `stdKshorts` and `goodBelleKshort` functions.
+* Fixed :py:func:`stdV0s.goodBelleKshort` and `loadStdGoodBellePhoton` functions to apply cuts on the corresponding :mdst lists when using b2bii, instead of using `fillParticleList`.
+* Fixed documentation explicitly mentioning that the invariant mass cuts are applied "after the vertex fit" in `stdLambdas`, `stdKshorts` and :py:func:`stdV0s.goodBelleKshort` functions.
 
 Changes in the analysis package in light-2503-ceres
 ---------------------------------------------------

@@ -10,7 +10,7 @@
 
 ##############################################################################
 # This steering file creates the Belle II Magnetic field map and plots the
-# result overlayed over the Material distribution
+# result overlaid over the Material distribution
 ##############################################################################
 
 from matplotlib.backends.backend_pdf import PdfPages

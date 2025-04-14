@@ -315,7 +315,7 @@ namespace Belle2 {
     //
     // Global parameters
     //
-    //! Global rotation angle bewteen coil and detector
+    //! Global rotation angle between coil and detector
     double m_GlobalRotAngle;
     //! Global offset along beam axis between coil and detector
     double m_GlobalOffsetZ;

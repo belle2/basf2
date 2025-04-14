@@ -39,7 +39,7 @@ namespace Belle2 {
 
   public:
 
-    /// Contructor.
+    /// Constructor.
     TRGCDCHoughFinder(const std::string& name,
                       const TRGCDC&,
                       unsigned peakMin,

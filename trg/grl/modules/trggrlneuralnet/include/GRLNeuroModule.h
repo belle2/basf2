@@ -70,7 +70,7 @@ namespace Belle2 {
     int trainMode;
     /** Name of the StoreArray containing the ECL clusters. */
     std::string m_TrgECLClusterName;
-    /** Number of nodes in all laysers. */
+    /** Number of nodes in all layers. */
     std::vector<float> m_nNodes;
     /** cut on MVA to separate signal */
     std::vector<float> m_nn_thres;

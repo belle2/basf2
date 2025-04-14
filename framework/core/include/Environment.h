@@ -11,10 +11,11 @@
 #include <framework/logging/LogConfig.h>
 #include <framework/gearbox/Const.h>
 
+#include <limits>
 #include <list>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace Belle2 {
   class Path;
@@ -423,8 +424,8 @@ namespace Belle2 {
     bool m_zmqRestartFailedWorkers = true; /**< If a worker dies, restart it. */
     bool m_zmqFailOnFailedWorkers = true; /**< If a worker dies, fail also. Will not be used if restartFailedWorkers is true. */
     bool m_zmqDAQEnvironment = false;   /**< True in DAQ environment */
-    int m_zmqDAQFirstEventExp = 42; /**< Exp no. for the special first event */
-    int m_zmqDAQFirstEventRun = 8; /**< Exp no. for the special first event */
+    int m_zmqDAQFirstEventExp = std::numeric_limits<int>::max(); /**< Exp no. for the special first event */
+    int m_zmqDAQFirstEventRun = std::numeric_limits<int>::max(); /**< Exp no. for the special first event */
 
     /**
      *  Set up environment from standard BELLE2_ environment variables.

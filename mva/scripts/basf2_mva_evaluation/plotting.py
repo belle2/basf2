@@ -509,7 +509,10 @@ class RejectionOverEfficiency(Plotter):
 
             max_fom = numpy.nanmax(fom)
             self.twinxaxMax = numpy.nanmax([self.twinxaxMax, max_fom])
-            max_fom_cut = binsCut[numpy.nanargmax(fom)]
+            if numpy.isnan(max_fom).all():
+                max_fom_cut = 0
+            else:
+                max_fom_cut = binsCut[numpy.nanargmax(fom)]
 
             p2 = self._plot_datapoints(self.twinxax, binsCut, fom, xerr=0, yerr=fom_err)
             self.twinxax.vlines(max_fom_cut, 0, max_fom, colors=p2[1].get_color(), linestyles='dashed')

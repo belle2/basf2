@@ -177,7 +177,7 @@ namespace Belle2 {
         const int Lv2OutTi_num = 2;
         //
         double Lv2OutTi_Z[Lv2OutTi_num];
-        Lv2OutTi_Z[0] = -m_config.getParameter(prep + "L1") * unitFactor;
+        Lv2OutTi_Z[0] = m_config.getParameter(prep + "L1") * unitFactor;
         Lv2OutTi_Z[1] = m_config.getParameter(prep + "L2") * unitFactor;
         //
         double Lv2OutTi_rI[Lv2OutTi_num];
@@ -212,7 +212,7 @@ namespace Belle2 {
       const int Lv2OutBe_num = 2;
       //
       double Lv2OutBe_Z[Lv2OutBe_num];
-      Lv2OutBe_Z[0] = -m_config.getParameter(prep + "L1") * unitFactor;
+      Lv2OutBe_Z[0] = m_config.getParameter(prep + "L1") * unitFactor;
       Lv2OutBe_Z[1] = m_config.getParameter(prep + "L2") * unitFactor;
       //
       double Lv2OutBe_rI[Lv2OutBe_num];
@@ -246,7 +246,7 @@ namespace Belle2 {
       const int Lv2InBe_num = 2;
       //
       double Lv2InBe_Z[Lv2InBe_num];
-      Lv2InBe_Z[0] = -m_config.getParameter(prep + "L1") * unitFactor;
+      Lv2InBe_Z[0] = m_config.getParameter(prep + "L1") * unitFactor;
       Lv2InBe_Z[1] = m_config.getParameter(prep + "L2") * unitFactor;
       //
       double Lv2InBe_rI[Lv2InBe_num];
@@ -288,7 +288,7 @@ namespace Belle2 {
         const int Lv2Vacuum1_num = 2;
         //
         double Lv2Vacuum1_Z[Lv2Vacuum1_num];
-        Lv2Vacuum1_Z[0] = -Lv2Vacuum_L1;
+        Lv2Vacuum1_Z[0] = Lv2Vacuum_L1;
         Lv2Vacuum1_Z[1] = Lv2Vacuum_L2;
         double Lv2Vacuum1_rI[Lv2Vacuum1_num];
         for (int tmpn = 0; tmpn < Lv2Vacuum1_num; tmpn++) {
@@ -370,7 +370,7 @@ namespace Belle2 {
         const int Lv2Vacuum1_num = 2;
         //
         double Lv2Vacuum1_Z[Lv2Vacuum1_num];
-        Lv2Vacuum1_Z[0] = -Lv2Vacuum_L1;
+        Lv2Vacuum1_Z[0] = Lv2Vacuum_L1;
         Lv2Vacuum1_Z[1] = Lv2Vacuum_L2;
         double Lv2Vacuum1_rI[Lv2Vacuum1_num];
         for (int tmpn = 0; tmpn < Lv2Vacuum1_num; tmpn++) {
@@ -559,8 +559,8 @@ namespace Belle2 {
         // Part1
         //
         double Lv2AuCoat1_Z[Lv2AuCoat_num];
-        Lv2AuCoat1_Z[0] = -m_config.getParameter(prep + "L1") * unitFactor;
-        Lv2AuCoat1_Z[1] = -m_config.getParameter(prep + "L2") * unitFactor;
+        Lv2AuCoat1_Z[0] = m_config.getParameter(prep + "L1") * unitFactor;
+        Lv2AuCoat1_Z[1] = m_config.getParameter(prep + "L2") * unitFactor;
         double Lv2AuCoat1_rI[Lv2AuCoat_num];
         Lv2AuCoat1_rI[0] = m_config.getParameter(prep + "R1") * unitFactor;
         Lv2AuCoat1_rI[1] = Lv2AuCoat1_rI[0];
@@ -660,7 +660,7 @@ namespace Belle2 {
       const int Lv3AuCoat_num = 2;
       //
       double Lv3AuCoat_Z[Lv3AuCoat_num];
-      Lv3AuCoat_Z[0] = -m_config.getParameter(prep + "L1") * unitFactor;
+      Lv3AuCoat_Z[0] = m_config.getParameter(prep + "L1") * unitFactor;
       Lv3AuCoat_Z[1] = m_config.getParameter(prep + "L2") * unitFactor;
       //
       double Lv3AuCoat_rI[Lv3AuCoat_num];
@@ -760,12 +760,33 @@ namespace Belle2 {
         = new G4UnionSolid("geo_Lv1TaFwd_x_name", geo_Lv1TaFwd_xx, geo_Flange,
                            G4Translate3D(0, 0, Flange_D - (Lv1TaFwd_D1 + Lv1TaFwd_L1 / 2.0)));
 
-      //===MODIFY ME!!===
-      //avoid overlap with HeavyMetalShield
-      double HMS_Z[4]  = {350, 410, 450, 482};
-      double HMS_rI[4] = {35.5, 35.5, 42.5, 42.5};
-      double HMS_rO[4] = {100, 100, 100, 100};
-      G4Polycone* geo_HMS = new G4Polycone("geo_HMS_name", 0, 2 * M_PI, 4, HMS_Z, HMS_rI, HMS_rO);
+      // Avoid overlap with HeavyMetalShield
+      prep = "HMS.";
+      int HMS_num = int(m_config.getParameter(prep + "N"));
+      vector<double> HMS_Z(HMS_num);
+      vector<double> HMS_rI(HMS_num);
+      vector<double> HMS_rO(HMS_num);
+
+      for (int i = 0; i < HMS_num; ++i) {
+        ostringstream ossZID;
+        ossZID << "Z" << i;
+
+        ostringstream ossrIID;
+        ossrIID << "rI" << i;
+
+        ostringstream ossrOID;
+        ossrOID << "rO" << i;
+
+        HMS_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        HMS_rI[i] = m_config.getParameter(prep + ossrIID.str()) * unitFactor;
+        HMS_rO[i] = m_config.getParameter(prep + ossrOID.str()) * unitFactor;
+      }
+
+      //double HMS_Z[4]  = {350, 410, 450, 482};
+      //double HMS_rI[4] = {35.5, 35.5, 42.5, 42.5};
+      //double HMS_rO[4] = {100, 100, 100, 100};
+      //G4Polycone* geo_HMS = new G4Polycone("geo_HMS_name", 0, 2 * M_PI, 4, HMS_Z, HMS_rI, HMS_rO);
+      G4Polycone* geo_HMS = new G4Polycone("geo_HMS_name", 0, 2 * M_PI, HMS_num, &(HMS_Z[0]), &(HMS_rI[0]), &(HMS_rO[0]));
       G4SubtractionSolid* geo_Lv1TaFwd = new G4SubtractionSolid("geo_Lv1TaFwd_name", geo_Lv1TaFwd_x, geo_HMS,
                                                                 G4Translate3D(0, 0, -(Lv1TaFwd_D1 + Lv1TaFwd_L1 / 2.0)));
 
@@ -1075,8 +1096,7 @@ namespace Belle2 {
       // Part1+2+3
       //tmp begin
       G4Transform3D transform_Lv2VacBwdPart1 = G4Translate3D((Lv2VacBwd_D1 * sin(Lv2VacBwd_A1) + Lv2VacBwd_D2 * sin(
-                                                                2.*Lv2VacBwd_A1)) / 2.,
-                                                             0.,
+                                                                2.*Lv2VacBwd_A1)) / 2., 0.,
                                                              -(Lv2VacBwd_D1 * cos(Lv2VacBwd_A1) + Lv2VacBwd_D2 * cos(2.*Lv2VacBwd_A1)) / 2.);
       //G4Transform3D transform_Lv2VacBwdPart1 = G4Translate3D((Lv2VacBwd_D1 * sin(Lv2VacBwd_A1) + Lv2VacBwd_D2 * sin(2.*Lv2VacBwd_A1)) / 2.05,
       //                                                       0.,
@@ -1084,8 +1104,7 @@ namespace Belle2 {
       transform_Lv2VacBwdPart1 = transform_Lv2VacBwdPart1 * G4RotateY3D(-Lv2VacBwd_A1 - Lv2VacBwd_A2);
       //tmp end
       //
-      G4Transform3D transform_Lv2VacBwdPart2 = G4Translate3D((Lv2VacBwd_D2 + Lv2VacBwd_L1 / 2.0) * sin(2.*Lv2VacBwd_A1),
-                                                             0.,
+      G4Transform3D transform_Lv2VacBwdPart2 = G4Translate3D((Lv2VacBwd_D2 + Lv2VacBwd_L1 / 2.0) * sin(2.*Lv2VacBwd_A1), 0.,
                                                              -(Lv2VacBwd_D2 + Lv2VacBwd_L1 / 2.0) * cos(2.*Lv2VacBwd_A1));
       transform_Lv2VacBwdPart2 = transform_Lv2VacBwdPart2 * G4RotateY3D(-2.*Lv2VacBwd_A1);
       //
@@ -1143,22 +1162,20 @@ namespace Belle2 {
       //
       double Lv1TaLERUp_A1 = m_config.getParameter(prep + "A1");
       //
-      const int Lv1TaLERUp_num = 12;
-      //
-      double Lv1TaLERUp_Z[Lv1TaLERUp_num];
-      double Lv1TaLERUp_rO[Lv1TaLERUp_num];
+      int Lv1TaLERUp_num = int(m_config.getParameter(prep + "N"));
+      vector<double> Lv1TaLERUp_Z(Lv1TaLERUp_num);
+      vector<double> Lv1TaLERUp_rI(Lv1TaLERUp_num);
+      vector<double> Lv1TaLERUp_rO(Lv1TaLERUp_num);
       for (int i = 0; i < Lv1TaLERUp_num; i++) {
         ostringstream ossZ_Lv1TaLERUp;
-        ossZ_Lv1TaLERUp << "L" << i + 1;
+        ossZ_Lv1TaLERUp << "L" << i;
 
         ostringstream ossR_Lv1TaLERUp;
-        ossR_Lv1TaLERUp << "R" << i + 1;
+        ossR_Lv1TaLERUp << "R" << i;
 
         Lv1TaLERUp_Z[i] = m_config.getParameter(prep + ossZ_Lv1TaLERUp.str()) * unitFactor;
         Lv1TaLERUp_rO[i] = m_config.getParameter(prep + ossR_Lv1TaLERUp.str()) * unitFactor;
       }
-      //
-      double Lv1TaLERUp_rI[Lv1TaLERUp_num];
       for (int i = 0; i < Lv1TaLERUp_num; i++) {
         Lv1TaLERUp_rI[i] = 0.0;
       }
@@ -1167,8 +1184,9 @@ namespace Belle2 {
       G4Material* mat_Lv1TaLERUp = Materials::get(strMat_Lv1TaLERUp);
 
       // Define geometry
-      G4Polycone* geo_Lv1TaLERUppcon = new G4Polycone("geo_Lv1TaLERUppcon_name", 0, 2 * M_PI, Lv1TaLERUp_num, Lv1TaLERUp_Z, Lv1TaLERUp_rI,
-                                                      Lv1TaLERUp_rO);
+      G4Polycone* geo_Lv1TaLERUppcon = new G4Polycone("geo_Lv1TaLERUppcon_name", 0, 2 * M_PI, Lv1TaLERUp_num, &(Lv1TaLERUp_Z[0]),
+                                                      &(Lv1TaLERUp_rI[0]),
+                                                      &(Lv1TaLERUp_rO[0]));
       G4Transform3D transform_AreaTubeFwdForLER = G4Translate3D(0., 0., 0.);
       transform_AreaTubeFwdForLER = transform_AreaTubeFwdForLER * G4RotateY3D(-Lv1TaLERUp_A1);
       G4IntersectionSolid* geo_Lv1TaLERUp = new G4IntersectionSolid("geo_Lv1TaLERUp_name", geo_Lv1TaLERUppcon, geo_AreaTubeFwdpcon,
@@ -1184,18 +1202,18 @@ namespace Belle2 {
       //----------
       //-Lv1SUSLERUp
       prep = "Lv1SUSLERUp.";
-      const int Lv1SUSLERUp_num = 6;
-      double Lv1SUSLERUp_Z[Lv1SUSLERUp_num];
-      double Lv1SUSLERUp_rO[Lv1SUSLERUp_num];
-      double Lv1SUSLERUp_rI[Lv1SUSLERUp_num];
+      int Lv1SUSLERUp_num = int(m_config.getParameter(prep + "N"));
+      vector<double> Lv1SUSLERUp_Z(Lv1SUSLERUp_num);
+      vector<double> Lv1SUSLERUp_rI(Lv1SUSLERUp_num);
+      vector<double> Lv1SUSLERUp_rO(Lv1SUSLERUp_num);
 
       for (int i = 0; i < Lv1SUSLERUp_num; i++) {
         ostringstream ossZ_Lv1SUSLERUp;
-        ossZ_Lv1SUSLERUp << "Z" << i + 1;
+        ossZ_Lv1SUSLERUp << "Z" << i;
         ostringstream ossRI_Lv1SUSLERUp;
-        ossRI_Lv1SUSLERUp << "RI" << i + 1;
+        ossRI_Lv1SUSLERUp << "RI" << i;
         ostringstream ossRO_Lv1SUSLERUp;
-        ossRO_Lv1SUSLERUp << "RO" << i + 1;
+        ossRO_Lv1SUSLERUp << "RO" << i;
 
         Lv1SUSLERUp_Z[i] = m_config.getParameter(prep + ossZ_Lv1SUSLERUp.str()) * unitFactor;
         Lv1SUSLERUp_rI[i] = m_config.getParameter(prep + ossRI_Lv1SUSLERUp.str()) * unitFactor;
@@ -1205,8 +1223,8 @@ namespace Belle2 {
       string strMat_Lv1SUSLERUp = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv1SUSLERUp = Materials::get(strMat_Lv1SUSLERUp);
 
-      G4Polycone* geo_Lv1SUSLERUppcon = new G4Polycone("geo_Lv1SUSLERUppcon_name", 0, 2 * M_PI, Lv1SUSLERUp_num, Lv1SUSLERUp_Z,
-                                                       Lv1SUSLERUp_rI, Lv1SUSLERUp_rO);
+      G4Polycone* geo_Lv1SUSLERUppcon = new G4Polycone("geo_Lv1SUSLERUppcon_name", 0, 2 * M_PI, Lv1SUSLERUp_num, &(Lv1SUSLERUp_Z[0]),
+                                                       &(Lv1SUSLERUp_rI[0]), &(Lv1SUSLERUp_rO[0]));
       G4IntersectionSolid* geo_Lv1SUSLERUp = new G4IntersectionSolid("", geo_Lv1SUSLERUppcon, geo_AreaTubeFwdpcon,
           transform_AreaTubeFwdForLER);
       G4LogicalVolume* logi_Lv1SUSLERUp = new G4LogicalVolume(geo_Lv1SUSLERUp, mat_Lv1SUSLERUp, "logi_Lv1SUSLERUp_name");
@@ -1230,8 +1248,8 @@ namespace Belle2 {
       G4Material* mat_Lv2VacLERUp = Materials::get(strMat_Lv2VacLERUp);
 
       // Define geometry
-      G4Polycone* geo_Lv2VacLERUppcon = new G4Polycone("geo_Lv2VacLERUppcon_name", 0, 2 * M_PI, Lv1TaLERUp_num, Lv1TaLERUp_Z,
-                                                       Lv1TaLERUp_rI, Lv2VacLERUp_rO);
+      G4Polycone* geo_Lv2VacLERUppcon = new G4Polycone("geo_Lv2VacLERUppcon_name", 0, 2 * M_PI, Lv1TaLERUp_num, &(Lv1TaLERUp_Z[0]),
+                                                       &(Lv1TaLERUp_rI[0]), &(Lv2VacLERUp_rO[0]));
       G4IntersectionSolid* geo_Lv2VacLERUp = new G4IntersectionSolid("geo_Lv2VacLERUp_name", geo_Lv2VacLERUppcon, geo_AreaTubeFwdpcon,
           transform_AreaTubeFwdForLER);
       G4LogicalVolume* logi_Lv2VacLERUp = new G4LogicalVolume(geo_Lv2VacLERUp, mat_Lv2VacLERUp, "logi_Lv2VacLERUp_name");
@@ -1252,22 +1270,20 @@ namespace Belle2 {
       //
       double Lv1TaHERDwn_A1 = m_config.getParameter(prep + "A1");
       //
-      const int Lv1TaHERDwn_num = 12;
-      //
-      double Lv1TaHERDwn_Z[Lv1TaHERDwn_num];
-      double Lv1TaHERDwn_rO[Lv1TaHERDwn_num];
+      int Lv1TaHERDwn_num = int(m_config.getParameter(prep + "N"));
+      vector<double> Lv1TaHERDwn_Z(Lv1TaHERDwn_num);
+      vector<double> Lv1TaHERDwn_rI(Lv1TaHERDwn_num);
+      vector<double> Lv1TaHERDwn_rO(Lv1TaHERDwn_num);
       for (int i = 0; i < Lv1TaHERDwn_num; i++) {
         ostringstream ossZ_Lv1TaHERDwn;
-        ossZ_Lv1TaHERDwn << "L" << i + 1;
+        ossZ_Lv1TaHERDwn << "L" << i;
 
         ostringstream ossR_Lv1TaHERDwn;
-        ossR_Lv1TaHERDwn << "R" << i + 1;
+        ossR_Lv1TaHERDwn << "R" << i;
 
         Lv1TaHERDwn_Z[i] = m_config.getParameter(prep + ossZ_Lv1TaHERDwn.str()) * unitFactor;
         Lv1TaHERDwn_rO[i] = m_config.getParameter(prep + ossR_Lv1TaHERDwn.str()) * unitFactor;
       }
-      //
-      double Lv1TaHERDwn_rI[Lv1TaHERDwn_num];
       for (int i = 0; i < Lv1TaHERDwn_num; i++) {
         Lv1TaHERDwn_rI[i] = 0.0;
       }
@@ -1276,8 +1292,8 @@ namespace Belle2 {
       G4Material* mat_Lv1TaHERDwn = Materials::get(strMat_Lv1TaHERDwn);
 
       // Define geometry
-      G4Polycone* geo_Lv1TaHERDwnpcon = new G4Polycone("geo_Lv1TaHERDwnpcon_name", 0, 2 * M_PI, Lv1TaHERDwn_num, Lv1TaHERDwn_Z,
-                                                       Lv1TaHERDwn_rI, Lv1TaHERDwn_rO);
+      G4Polycone* geo_Lv1TaHERDwnpcon = new G4Polycone("geo_Lv1TaHERDwnpcon_name", 0, 2 * M_PI, Lv1TaHERDwn_num, &(Lv1TaHERDwn_Z[0]),
+                                                       &(Lv1TaHERDwn_rI[0]), &(Lv1TaHERDwn_rO[0]));
       G4Transform3D transform_AreaTubeFwdForHER = G4Translate3D(0., 0., 0.);
       transform_AreaTubeFwdForHER = transform_AreaTubeFwdForHER * G4RotateY3D(-Lv1TaHERDwn_A1);
       G4IntersectionSolid* geo_Lv1TaHERDwn = new G4IntersectionSolid("", geo_Lv1TaHERDwnpcon, geo_AreaTubeFwdpcon,
@@ -1293,18 +1309,18 @@ namespace Belle2 {
       //----------
       //-Lv1SUSHERDwn
       prep = "Lv1SUSHERDwn.";
-      const int Lv1SUSHERDwn_num = 6;
-      double Lv1SUSHERDwn_Z[Lv1SUSHERDwn_num];
-      double Lv1SUSHERDwn_rO[Lv1SUSHERDwn_num];
-      double Lv1SUSHERDwn_rI[Lv1SUSHERDwn_num];
+      int Lv1SUSHERDwn_num = int(m_config.getParameter(prep + "N"));
+      vector<double> Lv1SUSHERDwn_Z(Lv1SUSHERDwn_num);
+      vector<double> Lv1SUSHERDwn_rI(Lv1SUSHERDwn_num);
+      vector<double> Lv1SUSHERDwn_rO(Lv1SUSHERDwn_num);
 
       for (int i = 0; i < Lv1SUSHERDwn_num; i++) {
         ostringstream ossZ_Lv1SUSHERDwn;
-        ossZ_Lv1SUSHERDwn << "Z" << i + 1;
+        ossZ_Lv1SUSHERDwn << "Z" << i;
         ostringstream ossRI_Lv1SUSHERDwn;
-        ossRI_Lv1SUSHERDwn << "RI" << i + 1;
+        ossRI_Lv1SUSHERDwn << "RI" << i;
         ostringstream ossRO_Lv1SUSHERDwn;
-        ossRO_Lv1SUSHERDwn << "RO" << i + 1;
+        ossRO_Lv1SUSHERDwn << "RO" << i;
 
         Lv1SUSHERDwn_Z[i] = m_config.getParameter(prep + ossZ_Lv1SUSHERDwn.str()) * unitFactor;
         Lv1SUSHERDwn_rI[i] = m_config.getParameter(prep + ossRI_Lv1SUSHERDwn.str()) * unitFactor;
@@ -1315,8 +1331,8 @@ namespace Belle2 {
       G4Material* mat_Lv1SUSHERDwn = Materials::get(strMat_Lv1SUSHERDwn);
       //G4Material* mat_Lv1SUSHERDwn = mat_Lv1SUS;
 
-      G4Polycone* geo_Lv1SUSHERDwnpcon = new G4Polycone("geo_Lv1SUSHERDwnpcon_name", 0, 2 * M_PI, Lv1SUSHERDwn_num, Lv1SUSHERDwn_Z,
-                                                        Lv1SUSHERDwn_rI, Lv1SUSHERDwn_rO);
+      G4Polycone* geo_Lv1SUSHERDwnpcon = new G4Polycone("geo_Lv1SUSHERDwnpcon_name", 0, 2 * M_PI, Lv1SUSHERDwn_num, &(Lv1SUSHERDwn_Z[0]),
+                                                        &(Lv1SUSHERDwn_rI[0]), &(Lv1SUSHERDwn_rO[0]));
       G4IntersectionSolid* geo_Lv1SUSHERDwn = new G4IntersectionSolid("", geo_Lv1SUSHERDwnpcon, geo_AreaTubeFwdpcon,
           transform_AreaTubeFwdForHER);
       G4LogicalVolume* logi_Lv1SUSHERDwn = new G4LogicalVolume(geo_Lv1SUSHERDwn, mat_Lv1SUSHERDwn, "logi_Lv1SUSHERDwn_name");
@@ -1340,8 +1356,8 @@ namespace Belle2 {
       G4Material* mat_Lv2VacHERDwn = Materials::get(strMat_Lv2VacHERDwn);
 
       // Define geometry
-      G4Polycone* geo_Lv2VacHERDwnpcon = new G4Polycone("geo_Lv2VacHERDwnpcon_name", 0, 2 * M_PI, Lv1TaHERDwn_num, Lv1TaHERDwn_Z,
-                                                        Lv1TaHERDwn_rI, Lv2VacHERDwn_rO);
+      G4Polycone* geo_Lv2VacHERDwnpcon = new G4Polycone("geo_Lv2VacHERDwnpcon_name", 0, 2 * M_PI, Lv1TaHERDwn_num, &(Lv1TaHERDwn_Z[0]),
+                                                        &(Lv1TaHERDwn_rI[0]), &(Lv2VacHERDwn_rO[0]));
       G4IntersectionSolid* geo_Lv2VacHERDwn = new G4IntersectionSolid("", geo_Lv2VacHERDwnpcon, geo_AreaTubeFwdpcon,
           transform_AreaTubeFwdForHER);
       G4LogicalVolume* logi_Lv2VacHERDwn = new G4LogicalVolume(geo_Lv2VacHERDwn, mat_Lv2VacHERDwn, "logi_Lv2VacHERDwn_name");
@@ -1366,8 +1382,8 @@ namespace Belle2 {
       const int AreaTubeBwd_num = 2;
       //
       double AreaTubeBwd_Z[AreaTubeBwd_num];
-      AreaTubeBwd_Z[0] = -m_config.getParameter(prep + "D1") * unitFactor;
-      AreaTubeBwd_Z[1] = -m_config.getParameter(prep + "D2") * unitFactor;
+      AreaTubeBwd_Z[0] = m_config.getParameter(prep + "D1") * unitFactor;
+      AreaTubeBwd_Z[1] = m_config.getParameter(prep + "D2") * unitFactor;
       //
       double AreaTubeBwd_rI[AreaTubeBwd_num];
       for (int i = 0; i < AreaTubeBwd_num; i++) {
@@ -1390,21 +1406,20 @@ namespace Belle2 {
       //
       double Lv1TaHERUp_A1 = m_config.getParameter(prep + "A1");
       //
-      const int Lv1TaHERUp_num = 12;
-      double Lv1TaHERUp_Z[Lv1TaHERUp_num];
-      double Lv1TaHERUp_rO[Lv1TaHERUp_num];
+      int Lv1TaHERUp_num = int(m_config.getParameter(prep + "N"));
+      vector<double> Lv1TaHERUp_Z(Lv1TaHERUp_num);
+      vector<double> Lv1TaHERUp_rI(Lv1TaHERUp_num);
+      vector<double> Lv1TaHERUp_rO(Lv1TaHERUp_num);
       for (int i = 0; i < Lv1TaHERUp_num; i++) {
         ostringstream ossZ_Lv1TaHERUp;
-        ossZ_Lv1TaHERUp << "L" << i + 1;
+        ossZ_Lv1TaHERUp << "L" << i;
 
         ostringstream ossR_Lv1TaHERUp;
-        ossR_Lv1TaHERUp << "R" << i + 1;
+        ossR_Lv1TaHERUp << "R" << i;
 
         Lv1TaHERUp_Z[i] = -m_config.getParameter(prep + ossZ_Lv1TaHERUp.str()) * unitFactor;
         Lv1TaHERUp_rO[i] = m_config.getParameter(prep + ossR_Lv1TaHERUp.str()) * unitFactor;
       }
-      //
-      double Lv1TaHERUp_rI[Lv1TaHERUp_num];
       for (int i = 0; i < Lv1TaHERUp_num; i++) {
         Lv1TaHERUp_rI[i] = 0.0;
       }
@@ -1413,8 +1428,9 @@ namespace Belle2 {
       G4Material* mat_Lv1TaHERUp = Materials::get(strMat_Lv1TaHERUp);
 
       // Define geometry
-      G4Polycone* geo_Lv1TaHERUppcon = new G4Polycone("geo_Lv1TaHERUppcon_name", 0, 2 * M_PI, Lv1TaHERUp_num, Lv1TaHERUp_Z, Lv1TaHERUp_rI,
-                                                      Lv1TaHERUp_rO);
+      G4Polycone* geo_Lv1TaHERUppcon = new G4Polycone("geo_Lv1TaHERUppcon_name", 0, 2 * M_PI, Lv1TaHERUp_num, &(Lv1TaHERUp_Z[0]),
+                                                      &(Lv1TaHERUp_rI[0]),
+                                                      &(Lv1TaHERUp_rO[0]));
       G4Transform3D transform_AreaTubeBwdForHER = G4Translate3D(0., 0., 0.);
       transform_AreaTubeBwdForHER = transform_AreaTubeBwdForHER * G4RotateY3D(-Lv1TaHERUp_A1);
       G4IntersectionSolid* geo_Lv1TaHERUp = new G4IntersectionSolid("", geo_Lv1TaHERUppcon, geo_AreaTubeBwdpcon,
@@ -1430,18 +1446,18 @@ namespace Belle2 {
       //----------
       //-Lv1SUSHERUp
       prep = "Lv1SUSHERUp.";
-      const int Lv1SUSHERUp_num = 6;
-      double Lv1SUSHERUp_Z[Lv1SUSHERUp_num];
-      double Lv1SUSHERUp_rO[Lv1SUSHERUp_num];
-      double Lv1SUSHERUp_rI[Lv1SUSHERUp_num];
+      int Lv1SUSHERUp_num = int(m_config.getParameter(prep + "N"));
+      vector<double> Lv1SUSHERUp_Z(Lv1SUSHERUp_num);
+      vector<double> Lv1SUSHERUp_rI(Lv1SUSHERUp_num);
+      vector<double> Lv1SUSHERUp_rO(Lv1SUSHERUp_num);
 
       for (int i = 0; i < Lv1SUSHERUp_num; i++) {
         ostringstream ossZ_Lv1SUSHERUp;
-        ossZ_Lv1SUSHERUp << "Z" << i + 1;
+        ossZ_Lv1SUSHERUp << "Z" << i;
         ostringstream ossRI_Lv1SUSHERUp;
-        ossRI_Lv1SUSHERUp << "RI" << i + 1;
+        ossRI_Lv1SUSHERUp << "RI" << i;
         ostringstream ossRO_Lv1SUSHERUp;
-        ossRO_Lv1SUSHERUp << "RO" << i + 1;
+        ossRO_Lv1SUSHERUp << "RO" << i;
 
         Lv1SUSHERUp_Z[i] = -m_config.getParameter(prep + ossZ_Lv1SUSHERUp.str()) * unitFactor;
         Lv1SUSHERUp_rI[i] = m_config.getParameter(prep + ossRI_Lv1SUSHERUp.str()) * unitFactor;
@@ -1451,8 +1467,8 @@ namespace Belle2 {
       string strMat_Lv1SUSHERUp = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv1SUSHERUp = Materials::get(strMat_Lv1SUSHERUp);
 
-      G4Polycone* geo_Lv1SUSHERUppcon = new G4Polycone("geo_Lv1SUSHERUppcon_name", 0, 2 * M_PI, Lv1SUSHERUp_num, Lv1SUSHERUp_Z,
-                                                       Lv1SUSHERUp_rI, Lv1SUSHERUp_rO);
+      G4Polycone* geo_Lv1SUSHERUppcon = new G4Polycone("geo_Lv1SUSHERUppcon_name", 0, 2 * M_PI, Lv1SUSHERUp_num, &(Lv1SUSHERUp_Z[0]),
+                                                       &(Lv1SUSHERUp_rI[0]), &(Lv1SUSHERUp_rO[0]));
       G4IntersectionSolid* geo_Lv1SUSHERUp = new G4IntersectionSolid("", geo_Lv1SUSHERUppcon, geo_AreaTubeBwdpcon,
           transform_AreaTubeFwdForHER);
       G4LogicalVolume* logi_Lv1SUSHERUp = new G4LogicalVolume(geo_Lv1SUSHERUp, mat_Lv1SUSHERUp, "logi_Lv1SUSHERUp_name");
@@ -1476,8 +1492,8 @@ namespace Belle2 {
       G4Material* mat_Lv2VacHERUp = Materials::get(strMat_Lv2VacHERUp);
 
       // Define geometry
-      G4Polycone* geo_Lv2VacHERUppcon = new G4Polycone("geo_Lv2VacHERUppcon_name", 0, 2 * M_PI, Lv1TaHERUp_num, Lv1TaHERUp_Z,
-                                                       Lv1TaHERUp_rI, Lv2VacHERUp_rO);
+      G4Polycone* geo_Lv2VacHERUppcon = new G4Polycone("geo_Lv2VacHERUppcon_name", 0, 2 * M_PI, Lv1TaHERUp_num, &(Lv1TaHERUp_Z[0]),
+                                                       &(Lv1TaHERUp_rI[0]), &(Lv2VacHERUp_rO[0]));
       G4IntersectionSolid* geo_Lv2VacHERUp = new G4IntersectionSolid("", geo_Lv2VacHERUppcon, geo_AreaTubeBwdpcon,
           transform_AreaTubeFwdForHER);
       G4LogicalVolume* logi_Lv2VacHERUp = new G4LogicalVolume(geo_Lv2VacHERUp, mat_Lv2VacHERUp, "logi_Lv2VacHERUp_name");
@@ -1498,22 +1514,20 @@ namespace Belle2 {
       //
       double Lv1TaLERDwn_A1 = m_config.getParameter(prep + "A1");
       //
-      const int Lv1TaLERDwn_num = 12;
-      //
-      double Lv1TaLERDwn_Z[Lv1TaLERDwn_num];
-      double Lv1TaLERDwn_rO[Lv1TaLERDwn_num];
+      int Lv1TaLERDwn_num = int(m_config.getParameter(prep + "N"));
+      vector<double> Lv1TaLERDwn_Z(Lv1TaLERDwn_num);
+      vector<double> Lv1TaLERDwn_rI(Lv1TaLERDwn_num);
+      vector<double> Lv1TaLERDwn_rO(Lv1TaLERDwn_num);
       for (int i = 0; i < Lv1TaLERDwn_num; i++) {
         ostringstream ossZ_Lv1TaLERDwn;
-        ossZ_Lv1TaLERDwn << "L" << i + 1;
+        ossZ_Lv1TaLERDwn << "L" << i;
 
         ostringstream ossR_Lv1TaLERDwn;
-        ossR_Lv1TaLERDwn << "R" << i + 1;
+        ossR_Lv1TaLERDwn << "R" << i;
 
         Lv1TaLERDwn_Z[i] = -m_config.getParameter(prep + ossZ_Lv1TaLERDwn.str()) * unitFactor;
         Lv1TaLERDwn_rO[i] = m_config.getParameter(prep + ossR_Lv1TaLERDwn.str()) * unitFactor;
       }
-      //
-      double Lv1TaLERDwn_rI[Lv1TaLERDwn_num];
       for (int i = 0; i < Lv1TaLERDwn_num; i++) {
         Lv1TaLERDwn_rI[i] = 0.0;
       }
@@ -1522,8 +1536,8 @@ namespace Belle2 {
       G4Material* mat_Lv1TaLERDwn = Materials::get(strMat_Lv1TaLERDwn);
 
       // Define geometry
-      G4Polycone* geo_Lv1TaLERDwnpcon = new G4Polycone("geo_Lv1TaLERDwnpcon_name", 0, 2 * M_PI, Lv1TaLERDwn_num, Lv1TaLERDwn_Z,
-                                                       Lv1TaLERDwn_rI, Lv1TaLERDwn_rO);
+      G4Polycone* geo_Lv1TaLERDwnpcon = new G4Polycone("geo_Lv1TaLERDwnpcon_name", 0, 2 * M_PI, Lv1TaLERDwn_num, &(Lv1TaLERDwn_Z[0]),
+                                                       &(Lv1TaLERDwn_rI[0]), &(Lv1TaLERDwn_rO[0]));
       G4Transform3D transform_AreaTubeBwdForLER = G4Translate3D(0., 0., 0.);
       transform_AreaTubeBwdForLER = transform_AreaTubeBwdForLER * G4RotateY3D(-Lv1TaLERDwn_A1);
       G4IntersectionSolid* geo_Lv1TaLERDwn = new G4IntersectionSolid("", geo_Lv1TaLERDwnpcon, geo_AreaTubeBwdpcon,
@@ -1539,18 +1553,18 @@ namespace Belle2 {
       //----------
       //-Lv1SUSLERDwn
       prep = "Lv1SUSLERDwn.";
-      const int Lv1SUSLERDwn_num = 6;
-      double Lv1SUSLERDwn_Z[Lv1SUSLERDwn_num];
-      double Lv1SUSLERDwn_rO[Lv1SUSLERDwn_num];
-      double Lv1SUSLERDwn_rI[Lv1SUSLERDwn_num];
+      int Lv1SUSLERDwn_num = int(m_config.getParameter(prep + "N"));
+      vector<double> Lv1SUSLERDwn_Z(Lv1SUSLERDwn_num);
+      vector<double> Lv1SUSLERDwn_rI(Lv1SUSLERDwn_num);
+      vector<double> Lv1SUSLERDwn_rO(Lv1SUSLERDwn_num);
 
       for (int i = 0; i < Lv1SUSLERDwn_num; i++) {
         ostringstream ossZ_Lv1SUSLERDwn;
-        ossZ_Lv1SUSLERDwn << "Z" << i + 1;
+        ossZ_Lv1SUSLERDwn << "Z" << i;
         ostringstream ossRI_Lv1SUSLERDwn;
-        ossRI_Lv1SUSLERDwn << "RI" << i + 1;
+        ossRI_Lv1SUSLERDwn << "RI" << i;
         ostringstream ossRO_Lv1SUSLERDwn;
-        ossRO_Lv1SUSLERDwn << "RO" << i + 1;
+        ossRO_Lv1SUSLERDwn << "RO" << i;
 
         Lv1SUSLERDwn_Z[i] = -m_config.getParameter(prep + ossZ_Lv1SUSLERDwn.str()) * unitFactor;
         Lv1SUSLERDwn_rI[i] = m_config.getParameter(prep + ossRI_Lv1SUSLERDwn.str()) * unitFactor;
@@ -1560,8 +1574,8 @@ namespace Belle2 {
       string strMat_Lv1SUSLERDwn = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv1SUSLERDwn = Materials::get(strMat_Lv1SUSLERDwn);
 
-      G4Polycone* geo_Lv1SUSLERDwnpcon = new G4Polycone("geo_Lv1SUSLERDwnpcon_name", 0, 2 * M_PI, Lv1SUSLERDwn_num, Lv1SUSLERDwn_Z,
-                                                        Lv1SUSLERDwn_rI, Lv1SUSLERDwn_rO);
+      G4Polycone* geo_Lv1SUSLERDwnpcon = new G4Polycone("geo_Lv1SUSLERDwnpcon_name", 0, 2 * M_PI, Lv1SUSLERDwn_num, &(Lv1SUSLERDwn_Z[0]),
+                                                        &(Lv1SUSLERDwn_rI[0]), &(Lv1SUSLERDwn_rO[0]));
       G4IntersectionSolid* geo_Lv1SUSLERDwn = new G4IntersectionSolid("", geo_Lv1SUSLERDwnpcon, geo_AreaTubeBwdpcon,
           transform_AreaTubeFwdForHER);
       G4LogicalVolume* logi_Lv1SUSLERDwn = new G4LogicalVolume(geo_Lv1SUSLERDwn, mat_Lv1SUSLERDwn, "logi_Lv1SUSLERDwn_name");
@@ -1585,8 +1599,8 @@ namespace Belle2 {
       G4Material* mat_Lv2VacLERDwn = Materials::get(strMat_Lv2VacLERDwn);
 
       // Define geometry
-      G4Polycone* geo_Lv2VacLERDwnpcon = new G4Polycone("geo_Lv2VacLERDwnpcon_name", 0, 2 * M_PI, Lv1TaLERDwn_num, Lv1TaLERDwn_Z,
-                                                        Lv1TaLERDwn_rI, Lv2VacLERDwn_rO);
+      G4Polycone* geo_Lv2VacLERDwnpcon = new G4Polycone("geo_Lv2VacLERDwnpcon_name", 0, 2 * M_PI, Lv1TaLERDwn_num, &(Lv1TaLERDwn_Z[0]),
+                                                        &(Lv1TaLERDwn_rI[0]), &(Lv2VacLERDwn_rO[0]));
       G4IntersectionSolid* geo_Lv2VacLERDwn = new G4IntersectionSolid("", geo_Lv2VacLERDwnpcon, geo_AreaTubeBwdpcon,
           transform_AreaTubeBwdForLER);
       G4LogicalVolume* logi_Lv2VacLERDwn = new G4LogicalVolume(geo_Lv2VacLERDwn, mat_Lv2VacLERDwn, "logi_Lv2VacLERDwn_name");
@@ -2005,8 +2019,4 @@ namespace Belle2 {
     }
   }
 }
-
-
-
-
 

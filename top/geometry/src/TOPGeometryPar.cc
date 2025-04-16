@@ -96,13 +96,13 @@ namespace Belle2 {
       }
       if ((*m_geoDB)->getWavelengthFilter().getName().empty()) {
         m_oldPayload = true;
-        B2ERROR("TOPGeometry: obsolete payload revision (pixel independent PDE) - please, check global tag");
+        B2WARNING("TOPGeometry: obsolete payload revision (pixel independent PDE) - please, check global tags");
       }
       if ((*m_geoDB)->getTTSes().empty()) {
-        B2ERROR("TOPGeometry: obsolete payload revision (nominal TTS only) - please, check global tag");
+        B2WARNING("TOPGeometry: obsolete payload revision (nominal TTS only) - please, check global tags");
       }
       if ((*m_geoDB)->arePDETuningFactorsEmpty()) {
-        B2ERROR("TOPGeometry: obsolete payload revision (before bugfix and update of optical properties) - please, check global tag");
+        B2WARNING("TOPGeometry: obsolete payload revision (before bugfix and update of optical properties) - please, check global tags");
       }
 
       // Make sure that we abort as soon as the geometry changes
@@ -243,6 +243,11 @@ namespace Belle2 {
 
     double TOPGeometryPar::getRelativePDEonMC(int moduleID, int pixelID) const
     {
+      if (m_oldPayload) {
+        B2ERROR("TOPGeometryPar::getRelativePDEonMC: called using obsolete TOPGeometry payload revision - please, check global tags");
+        return 0; // to prevent wrong RQE calibration - see TOPPhotonYieldsAlgorithm.cc
+      }
+
       if (m_relPDEonMC.empty()) prepareRelPDEonMC();
 
       int id = getUniquePixelID(moduleID, pixelID);

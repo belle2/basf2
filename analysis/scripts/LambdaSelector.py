@@ -116,7 +116,6 @@ def V0Selector_Training(
     general_options.m_target_variable = target_variable
 
     python_options = basf2_mva.PythonOptions()
-
     python_options.m_framework = "lightgbm"
     python_options.m_steering_file = ""
 
@@ -188,7 +187,6 @@ def KsVeto_Training(
     general_options.m_target_variable = target_variable
 
     python_options = basf2_mva.PythonOptions()
-
     python_options.m_framework = "lightgbm"
     python_options.m_steering_file = ""
 
@@ -215,9 +213,9 @@ def KsVeto_Training(
     python_options.m_config = config_string
 
     python_options.m_normalize = False  # we do it inside MVA torch
-
     python_options.m_nIterations = 1
     python_options.m_mini_batch_size = 0
+
     basf2_mva.teacher(general_options, python_options)
 
 # ****************************************

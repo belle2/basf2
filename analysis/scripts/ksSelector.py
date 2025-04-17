@@ -106,10 +106,7 @@ def V0Selector_Training(
     general_options.m_identifier = mva_identifier
     general_options.m_variables = basf2_mva.vector(*trainVars)
     general_options.m_target_variable = target_variable
-    fastbdt_options = basf2_mva.FastBDTOptions()
-    basf2_mva.teacher(general_options, fastbdt_options)
 
-    general_options.m_identifier = mva_identifier+'.root'
     python_options = basf2_mva.PythonOptions()
     python_options.m_framework = "custom"
     python_options.m_steering_file = "mva/scripts/basf2_mva_python_interface/lightgbm.py"
@@ -130,7 +127,6 @@ def V0Selector_Training(
              'max_depth': 8,
              'objective': 'cross_entropy'
              }
-
     if isinstance(parameters, dict):
         param.update(parameters)
     config_string = json.dumps(param)
@@ -138,11 +134,10 @@ def V0Selector_Training(
     python_options.m_config = config_string
 
     python_options.m_training_fraction = 1
-
     python_options.m_normalize = False  # we do it inside MVA torch
-
     python_options.m_nIterations = 1
     python_options.m_mini_batch_size = 0
+
     basf2_mva.teacher(general_options, python_options)
 
 
@@ -174,16 +169,14 @@ def LambdaVeto_Training(
         'ArmenterosDaughter1Qt',
         'ArmenterosDaughter2Qt'
     ]
+
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector(train_data)
     general_options.m_treename = tree_name
     general_options.m_identifier = mva_identifier
     general_options.m_variables = basf2_mva.vector(*trainVars)
     general_options.m_target_variable = target_variable
-    fastbdt_options = basf2_mva.FastBDTOptions()
-    basf2_mva.teacher(general_options, fastbdt_options)
 
-    general_options.m_identifier = mva_identifier+'.root'
     python_options = basf2_mva.PythonOptions()
     python_options.m_framework = "custom"
     python_options.m_steering_file = "mva/scripts/basf2_mva_python_interface/lightgbm.py"
@@ -204,7 +197,6 @@ def LambdaVeto_Training(
              'max_depth': 8,
              'objective': 'cross_entropy'
              }
-
     if isinstance(parameters, dict):
         param.update(parameters)
     config_string = json.dumps(param)
@@ -212,12 +204,12 @@ def LambdaVeto_Training(
     python_options.m_config = config_string
 
     python_options.m_training_fraction = 1
-
     python_options.m_normalize = False  # we do it inside MVA torch
-
     python_options.m_nIterations = 1
     python_options.m_mini_batch_size = 0
+
     basf2_mva.teacher(general_options, python_options)
+
 # ****************************************
 # KS Selector MAIN FUNCTION
 # ****************************************

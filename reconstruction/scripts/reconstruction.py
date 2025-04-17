@@ -83,9 +83,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        append_full_grid_cdc_eventt0=True,
                        legacy_ecl_charged_pid=False, emulate_HLT=False,
                        skip_full_grid_cdc_eventt0_if_svd_time_present=True,
-                       switch_off_slow_modules_for_online=False,
-                       svd_ckf_mode="SVD_after",
-                       use_svd_to_cdc_ckf=True):
+                       switch_off_slow_modules_for_online=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -173,9 +171,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
                                  append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
-                                 switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
-                                 svd_ckf_mode=svd_ckf_mode,
-                                 use_svd_to_cdc_ckf=use_svd_to_cdc_ckf)
+                                 switch_off_slow_modules_for_online=switch_off_slow_modules_for_online)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
@@ -209,9 +205,7 @@ def add_prefilter_reconstruction(path,
                                  create_intercepts_for_pxd_ckf=False,
                                  append_full_grid_cdc_eventt0=True,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=True,
-                                 switch_off_slow_modules_for_online=False,
-                                 svd_ckf_mode="SVD_after",
-                                 use_svd_to_cdc_ckf=True):
+                                 switch_off_slow_modules_for_online=False):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -276,8 +270,6 @@ def add_prefilter_reconstruction(path,
         skipGeometryAdding=skipGeometryAdding,
         trackFitHypotheses=trackFitHypotheses,
         use_second_cdc_hits=use_second_cdc_hits,
-        svd_ckf_mode=svd_ckf_mode,
-        use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
         pxd_filtering_offline=pxd_filtering_offline,
         create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,

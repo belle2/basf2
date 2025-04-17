@@ -73,7 +73,8 @@ def V0Selector_Training(
     tree_name="tree",
     mva_identifier="MVAFastBDT_V0Selector.root",
     target_variable="isSignal",
-    parameters={}
+    parameters={},
+    options={}
 ):
     """
     Defines the configuration of V0Selector Training.
@@ -84,7 +85,7 @@ def V0Selector_Training(
     @param mva_identifier               Name for output MVA weight file.
     @param target_variable              Target variable for MVA training.
     @param parameters                   hyperparameter for LGBM
-
+    @param options                      MVA options
     """
     trainVars = [
         'cosVertexMomentum',
@@ -145,7 +146,8 @@ def LambdaVeto_Training(
     tree_name="tree",
     mva_identifier="MVAFastBDT_LambdaVeto.root",
     target_variable="isSignal",
-    parameters={}
+    parameters={},
+    options={}
 ):
     """
     Defines the configuration of LambdaVeto Training.
@@ -156,6 +158,7 @@ def LambdaVeto_Training(
     @param mva_identifier               Name for output MVA weight file.
     @param target_variable              Target variable for MVA training.
     @param parameters                   hyperparameter for LGBM
+    @param options                      MVA options
     """
     trainVars = [
         'pip_protonID',

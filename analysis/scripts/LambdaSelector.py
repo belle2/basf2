@@ -80,6 +80,7 @@ def V0Selector_Training(
         mva_identifier="MVA_LightGBM_V0Selector.root",
         target_variable="isSignal",
         parameters={},
+        options={}
         ):
     """
     Defines the configuration of V0Selector Training.
@@ -90,6 +91,7 @@ def V0Selector_Training(
     @param mva_identifier               Name for output MVA weight file.
     @param target_variable              Target variable for MVA training.
     @param parameters                   hyperparameter for LGBM
+    @param options                      MVA options
     """
 
     # Create The GeneralOptions object as always
@@ -154,6 +156,7 @@ def KsVeto_Training(
     mva_identifier="MVA_LightGBM_KsVeto.root",
     target_variable="isSignal",
     parameters={},
+    options={}
 ):
     """
     Defines the configuration of KsVeto Training.
@@ -164,6 +167,7 @@ def KsVeto_Training(
     @param mva_identifier               Name for output MVA weight file.
     @param target_variable              Target variable for MVA training.
     @param parameters                   hyperparameter for LGBM
+    @param options                      MVA options
     """
 
     # Create The GeneralOptions object as always

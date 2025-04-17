@@ -116,6 +116,7 @@ def V0Selector_Training(
     general_options.m_identifier = mva_identifier
     general_options.m_variables = basf2_mva.vector(*trainVars)
     general_options.m_target_variable = target_variable
+    general_options.m_max_events = 0 if 'max_events' not in options else options['max_events']
 
     python_options = basf2_mva.PythonOptions()
     python_options.m_framework = "lightgbm"
@@ -188,6 +189,7 @@ def KsVeto_Training(
     general_options.m_identifier = mva_identifier
     general_options.m_variables = basf2_mva.vector(*trainVars)
     general_options.m_target_variable = target_variable
+    general_options.m_max_events = 0 if 'max_events' not in options else options['max_events']
 
     python_options = basf2_mva.PythonOptions()
     python_options.m_framework = "lightgbm"

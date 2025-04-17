@@ -210,6 +210,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
 def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                    reco_tracks="RecoTracks", use_second_cdc_hits=False,
                    split_after_delta_t=-1.0, matching_method="hit",
+                   relate_tracks_to_mcparticles=True,
                    chi2_cutoffs=[128024, 95, 173, 424, 90, 424],
                    chi2_linalg=False):
     """
@@ -227,6 +228,9 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                                 distance between two adjacent SimHits is more than the given value
     :param matching_method:     hit: uses the hit-matching
                                 chi2: uses the chi2-matching
+    :param relate_tracks_to_mcparticles:    If True (default), Tracks are related to MCParticles. Only works
+                                            if the TrackCreator is in the path before. Needs to be set to False
+                                            if only track finding is performed, but no Tracks are created.
     :param chi2_cutoffs:        If chi2 matching method is used, this list defines the individual cut-off values
                                 for the chi2 values. Thereby each charged stable particle gets its cut-off
                                 value. The order of the pdgs is [11,13,211,2212,321,1000010020]. The default
@@ -253,7 +257,8 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                         UseSVDHits=is_svd_used(components),
                         UseCDCHits=is_cdc_used(components))
 
-        path.add_module('TrackToMCParticleRelator')
+        if relate_tracks_to_mcparticles:
+            path.add_module('TrackToMCParticleRelator')
 
     elif (matching_method == "chi2"):
         print("Warning: The Chi2MCTrackMatcherModule is currently not fully developed and tested!")

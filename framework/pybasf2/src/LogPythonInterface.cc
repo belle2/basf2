@@ -20,7 +20,6 @@
 
 #include <framework/core/Environment.h>
 
-#include <iostream>
 #include <string>
 #include <map>
 #include <utility>

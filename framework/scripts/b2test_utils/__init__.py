@@ -112,6 +112,7 @@ def configure_logging_for_tests(user_replacements=None):
     3. Intercept all log messages and replace
 
         * the current working directory in log messaged with ``${cwd}``
+        * the current release version with ``${release_version}``
         * the current default globaltags with ``${default_globaltag}``
         * the contents of the following environment variables with their name
           (or the listed replacement string):
@@ -147,6 +148,10 @@ def configure_logging_for_tests(user_replacements=None):
     # current directory should go first and might be overridden if for example
     # the BELLE2_LOCAL_DIR is identical to the current working directory
     replacements = OrderedDict()
+    try:
+        replacements[basf2.version.get_version()] = "${release_version}"
+    except Exception:
+        pass
     replacements[", ".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
     # add a special replacement for the CDB metadata provider URL, since it's not set via env. variable
     replacements[basf2.conditions.default_metadata_provider_url] = "${BELLE2_CONDB_METADATA}"

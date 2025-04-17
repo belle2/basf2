@@ -112,46 +112,50 @@ void DQMHistAnalysisSVDOccupancyModule::initialize()
     m_cOnlineOccupancyRPhiViewV = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewV", "", 800, 800);
 
     if (m_RPhiViewId0) {
-      m_cOccupancyRPhiViewUGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewUGroupId0", "", 800, 800);
-      m_cOccupancyRPhiViewVGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewVGroupId0", "", 800, 800);
+      m_cOccupancyRPhiViewUGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewGroupId0U", "", 800, 800);
+      m_cOccupancyRPhiViewVGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewGroupId0V", "", 800, 800);
     }
   }
 
-  if (m_3Samples) {
-    m_cOccupancyU3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyU3Samples");
-    m_cOccupancyV3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyV3Samples");
-
-    m_cOnlineOccupancyU3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyU3Samples");
-    m_cOnlineOccupancyV3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyV3Samples");
-
-    if (m_RPhiView) {
-      m_cOccupancyRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewU3Samples", "", 800, 800);
-      m_cOccupancyRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewV3Samples", "", 800, 800);
-
-      m_cOnlineOccupancyRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewU3Samples", "", 800, 800);
-      m_cOnlineOccupancyRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewV3Samples", "", 800, 800);
-    }
-  }
-
-  m_hOccupancy =  new SVDSummaryPlots("hOccupancy@view", "Average OFFLINE Sensor Occupancy (%), @view/@side Side");
+  TString hName = getHistoNameFromCanvas(m_cOccupancyU->GetName(), "@view");
+  m_hOccupancy =  new SVDSummaryPlots(hName.Data(), "Average OFFLINE Sensor Occupancy (%), @view/@side Side");
   m_hOccupancy->setStats(0);
 
-  m_hOnlineOccupancy  =  new SVDSummaryPlots("hOnlineOccupancy@view", "Average ONLINE Sensor Occupancy (%), @view/@side Side");
+  hName = getHistoNameFromCanvas(m_cOnlineOccupancyU->GetName(), "@view");
+  m_hOnlineOccupancy = new SVDSummaryPlots(hName.Data(), "Average ONLINE Sensor Occupancy (%), @view/@side Side");
   m_hOnlineOccupancy->setStats(0);
 
-  m_hOccupancyGroupId0  =  new SVDSummaryPlots("hOccupancyGroupId0@view",
-                                               "Average OFFLINE Sensor Occupancy (%), @view/@side Side for cluster time group Id = 0");
+  // change name by hand cos side index not at the end
+  hName = getHistoNameFromCanvas("SVDAnalysis/c_SVDOccupancyGroupId0U", "@view");
+  m_hOccupancyGroupId0 = new SVDSummaryPlots(hName.Data(),
+                                             "Average OFFLINE Sensor Occupancy (%), @view/@side Side for cluster time group Id = 0");
   m_hOccupancyGroupId0->setStats(0);
 
   if (m_3Samples) {
-    m_hOccupancy3Samples  =  new SVDSummaryPlots("hOccupancy3@view",
-                                                 "Average OFFLINE Sensor Occupancy (%), @view/@side Side for 3 samples");
+    m_cOccupancyU3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancy3SamplesU");
+    m_cOccupancyV3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancy3SamplesV");
+
+    m_cOnlineOccupancyU3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancy3SamplesU");
+    m_cOnlineOccupancyV3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancy3SamplesV");
+
+    if (m_RPhiView) {
+      m_cOccupancyRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiView3SamplesU", "", 800, 800);
+      m_cOccupancyRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiView3SamplesV", "", 800, 800);
+
+      m_cOnlineOccupancyRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiView3SamplesU", "", 800, 800);
+      m_cOnlineOccupancyRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiView3SamplesV", "", 800, 800);
+    }
+
+    hName = getHistoNameFromCanvas(m_cOccupancyU3Samples->GetName(), "@view");
+    m_hOccupancy3Samples = new SVDSummaryPlots(hName.Data(), "Average OFFLINE Sensor Occupancy (%), @view/@side Side for 3 samples");
     m_hOnlineOccupancy->setStats(0);
 
-    m_hOnlineOccupancy3Samples  =  new SVDSummaryPlots("hOnlineOccupancy3@view",
-                                                       "Average ONLINE Sensor Occupancy (%), @view/@side Side for 3 samples");
+    hName = getHistoNameFromCanvas(m_cOnlineOccupancyU3Samples->GetName(), "@view");
+    m_hOnlineOccupancy3Samples = new SVDSummaryPlots(hName.Data(),
+                                                     "Average ONLINE Sensor Occupancy (%), @view/@side Side for 3 samples");
     m_hOnlineOccupancy3Samples->setStats(0);
   }
+
 
   //register limits for EPICS
   registerEpicsPV(m_pvPrefix + "occupancyLimits", "occLimits");

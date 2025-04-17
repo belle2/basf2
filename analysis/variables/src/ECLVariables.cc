@@ -1496,10 +1496,12 @@ The MVA has been trained using MC and the features used are:
 - `clusterPulseShapeDiscriminationMVA`
 - `clusterE`
 - `clusterTheta`
-- `clusterZernikeMVA`
 
+The variable `clusterZernikeMVA` is also used but only for the MC15 training. 
 Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
 the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
+
+Please cite `this <https://inspirehep.net/literature/2785196>`_ if using this tool. 
 )DOC");
     REGISTER_VARIABLE("fakePhotonSuppression", fakePhotonSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from fake photon clusters (e.g. split-offs,
@@ -1509,15 +1511,17 @@ The MVA has been trained using MC and the features are:
 
 - `clusterPulseShapeDiscriminationMVA`
 - `minC2TDist`
-- `clusterZernikeMVA`
 - `clusterE`
 - `clusterTiming`
 - `clusterTheta`
 
-This MVA is the same as the one used for `hadronicSplitOffSuppression` but that variable should not be used as it is deprecated and does not use the new weights. 
-
+The variable `clusterZernikeMVA` is also used but only for the MC15 training. 
 Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
 the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
+
+Please cite `this <https://inspirehep.net/literature/2785196>`_ if using this tool. 
+
+(This MVA is the same as the one used for `hadronicSplitOffSuppression` but that variable should not be used as it is deprecated and does not use the new weights). 
 )DOC");
     REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.
@@ -1536,7 +1540,7 @@ The MVA has been trained using samples of signal photons and hadronic splitoff p
 - `clusterE1E9`
 - `clusterSecondMoment`
 )DOC");
-    MAKE_DEPRECATED("hadronicSplitOffSuppression", false, "light-2302-genetta", R"DOC(
+    MAKE_DEPRECATED("hadronicSplitOffSuppression", true, "light-2302-genetta", R"DOC(
                      Use the variable `fakePhotonSuppression` instead which is maintained and uses the latest weight files.
 )DOC");
     REGISTER_VARIABLE("clusterKlId", eclClusterKlId, R"DOC(

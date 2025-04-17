@@ -877,13 +877,14 @@ class SystematicsCombinedLowMulti(CombinedSkim):
           SystematicsRadmumuFromHLTFlag,
           SystematicsBhabha,
           SystematicsPhiGamma,
+          SystematicsRadMuMu,
           TauThrust.
 
       This is required for  technical (data production) reasons, as it keeps the number of files low.
       See the definitions of the individual skims for the details.
     """
     __authors__ = ["Marcel Hohmann"]
-    __description__ = "Combined Skim of the systematic low multi skims: FourLepton, Radmumu, Bhabha, PhiGamma, TauThrust."
+    __description__ = "Combined Skim of the systematic low multi skims: FourLepton, Radmumu, Bhabha, PhiGamma, RadMuMu, TauThrust."
     __contact__ = __liaison_leptonID__
     __category__ = "performance, leptonID"
     __name__ = "SystematicsCombinedLowMulti"
@@ -906,5 +907,6 @@ class SystematicsCombinedLowMulti(CombinedSkim):
             SystematicsRadMuMuFromHLTFlag(),
             SystematicsBhabha(),
             SystematicsPhiGamma(),
+            SystematicsRadMuMu(),
             TauThrust()]
         super().__init__(*skims_list, **kwargs)

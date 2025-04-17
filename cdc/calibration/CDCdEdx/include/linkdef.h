@@ -15,5 +15,7 @@
 #pragma link C++ class Belle2::CDCDedxMomentumAlgorithm-;
 #pragma link C++ class Belle2::CDCDedxInjectTimeAlgorithm-;
 #pragma link C++ class Belle2::CDCDedxValidationAlgorithm-;
+#pragma link C++ class Belle2::CDCDedxHadSatAlgorithm-;
+#pragma link C++ class Belle2::CDCDedxHadBGAlgorithm-;
 
 #endif

@@ -1,10 +1,10 @@
 Tools for file handling
 +++++++++++++++++++++++
 
-``b2file-metadata-show``: Show the metadata of a basf2 output file
-------------------------------------------------------------------
+``b2file-metadata-show``: Show the metadata of a ``basf2`` output file
+----------------------------------------------------------------------
 
-This tool shows the recorded metadata of a basf2 output file like number of
+This tool shows the recorded metadata of a ``basf2`` output file like number of
 events, lowest event number and so forth. It can either work on a root file or
 look for the file in a local xml file catalog using an logical file name (LFN)::
 
@@ -26,7 +26,7 @@ look for the file in a local xml file catalog using an logical file name (LFN)::
 ---------------------------------------------------
 
 This tools allows to modify the LFN and the data descriptions stored in a given
-basf2 output file. It will also update the xml file catalog if the file was
+``basf2`` output file. It will also update the xml file catalog if the file was
 registered in it before.
 
 .. versionchanged:: after release-03-00-00
@@ -78,8 +78,8 @@ found as a parent file independent of the local name or folder structure::
 
 .. _b2file-check:
 
-``b2file-check``: Check a basf2 output file for consistency
------------------------------------------------------------
+``b2file-check``: Check a ``basf2`` output file for consistency
+---------------------------------------------------------------
 
 .. argparse::
     :filename: framework/tools/b2file-check
@@ -120,8 +120,8 @@ The ``--json`` parameter can be used to get detailed output for all tests in a m
 
 .. _b2file-merge:
 
-``b2file-merge``: Merge multiple basf2 output files
----------------------------------------------------
+``b2file-merge``: Merge multiple ``basf2`` output files
+-------------------------------------------------------
 
 This program merges files created by separate ``basf2`` jobs with the `RootOutput`
 module. It's similar to ROOT ``hadd`` but does correctly update the metadata
@@ -191,8 +191,8 @@ restrictions apply:
 
 .. _b2file-remove-branches:
 
-``b2file-remove-branches``: Create a copy of a basf2 output file removing a list of given branches in the process
------------------------------------------------------------------------------------------------------------------
+``b2file-remove-branches``: Create a copy of a ``basf2`` output file removing a list of given branches in the process
+---------------------------------------------------------------------------------------------------------------------
 
 .. argparse::
     :filename: framework/tools/b2file-remove-branches
@@ -238,3 +238,4 @@ restrictions apply:
     :nogroupsections:
 
 .. versionadded:: release-04-00-00
+

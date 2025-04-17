@@ -108,8 +108,7 @@ def V0Selector_Training(
     general_options.m_target_variable = target_variable
 
     python_options = basf2_mva.PythonOptions()
-    python_options.m_framework = "custom"
-    python_options.m_steering_file = "mva/scripts/basf2_mva_python_interface/lightgbm.py"
+    python_options.m_framework = "lightgbm"
 
     import json
     param = {'num_leaves': 256,
@@ -178,8 +177,7 @@ def LambdaVeto_Training(
     general_options.m_target_variable = target_variable
 
     python_options = basf2_mva.PythonOptions()
-    python_options.m_framework = "custom"
-    python_options.m_steering_file = "mva/scripts/basf2_mva_python_interface/lightgbm.py"
+    python_options.m_framework = "lightgbm"
 
     import json
     param = {'num_leaves': 256,

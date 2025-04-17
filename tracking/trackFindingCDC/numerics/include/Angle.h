@@ -19,7 +19,7 @@ namespace Belle2 {
      */
     struct AngleUtil {
 
-      /// Combines two angluar values to the one that lies half way between them on the short arc
+      /// Combines two angular values to the one that lies half way between them on the short arc
       static double average(const double angle1, double angle2)
       {
         return normalised(angle1 + normalised(angle2 - angle1) / 2);

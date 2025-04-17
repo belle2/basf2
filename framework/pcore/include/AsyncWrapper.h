@@ -52,7 +52,7 @@ namespace Belle2 {
     /** returns true if the current process is on the receiving (async) side of an AsyncWrapper. */
     static bool isAsync() { return s_isAsync; }
 
-    /** Retun number of events available in the RingBuffer. */
+    /** Return number of events available in the RingBuffer. */
     static int numAvailableEvents();
 
 

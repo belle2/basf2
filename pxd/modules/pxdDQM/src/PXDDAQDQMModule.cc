@@ -143,8 +143,9 @@ void PXDDAQDQMModule::initialize()
 {
   REG_HISTOGRAM
   m_storeDAQEvtStats.isRequired();
-  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
   m_rawSVD.isOptional(); /// just for checking EODB / Hlt rejections
+  m_EventLevelTriggerTimeInfo.isRequired();
+
 }
 
 void PXDDAQDQMModule::beginRun()
@@ -243,7 +244,7 @@ void PXDDAQDQMModule::event()
         // TODO differentiate between link-lost and truncation
         for (int i = 0; i < 4 * 2; i++) {
           auto sm = (emask >> i * 4) & 0xF;
-          if (sm >= 8) sm = 7; // clip unknow to 7, as value >6 undefined for now
+          if (sm >= 8) sm = 7; // clip unknown to 7, as value >6 undefined for now
           if (sm > 0) hDAQEndErrorDHE->Fill(dhe.getDHEID(), i * 8 + sm); // we dont want to fill noerror=0
           missingFlag |= sm == 0x1; // missing
           timeoutFlag |= sm == 0x2; // timeout
@@ -275,65 +276,62 @@ void PXDDAQDQMModule::event()
       }
     }
   }
-// Now fill the histograms which need flags set above
-// the code is unluckily a copy of whats in PXDInjection Module, but there we dont have the DAQ flags :-/
-  for (auto& it : m_rawTTD) {
-//     B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
-//             (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
-//             it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
 
-    double lasttrig = it.GetTimeSincePrevTrigger(0) / 127.; //  127MHz clock ticks to us, inexact rounding
+
+
+  // And check if the stored data is valid
+  if (m_EventLevelTriggerTimeInfo.isValid() and m_EventLevelTriggerTimeInfo->isValid()) {
+
+    double lasttrig = m_EventLevelTriggerTimeInfo->getTimeSincePrevTrigger() / 127.; //  127MHz clock ticks to us, inexact rounding
     if (eodbFlag && hEODBTrgDiff) hEODBTrgDiff->Fill(lasttrig);
     if (cm63Flag && hCM63TrgDiff) hCM63TrgDiff->Fill(lasttrig);
     if (truncFlag && hTruncTrgDiff) hTruncTrgDiff->Fill(lasttrig);
     if (missingFlag && hMissTrgDiff) hMissTrgDiff->Fill(lasttrig);
 
-    // get last injection time
-    auto difference = it.GetTimeSinceLastInjection(0);
     // check time overflow, too long ago
-    if (difference != 0x7FFFFFFF) {
-      double diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
-      if (it.GetIsHER(0)) {
+    if (m_EventLevelTriggerTimeInfo->hasInjection()) {
+      // get last injection time
+      double difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection() / 127.; //  127MHz clock ticks to us, inexact rounding
+      if (m_EventLevelTriggerTimeInfo->isHER()) {
         if (eodbFlag) {
-          if (hEODBAfterInjHER) hEODBAfterInjHER->Fill(diff2);
+          if (hEODBAfterInjHER) hEODBAfterInjHER->Fill(difference);
         }
         if (cm63Flag) {
           hDAQStat->Fill(5); // sum CM63 after HER
-          if (diff2 > 1000) hDAQStat->Fill(7); // sum CM63 after HER, but outside injections, 1ms
-          if (hCM63AfterInjHER) hCM63AfterInjHER->Fill(diff2);
+          if (difference > 1000) hDAQStat->Fill(7); // sum CM63 after HER, but outside injections, 1ms
+          if (hCM63AfterInjHER) hCM63AfterInjHER->Fill(difference);
         }
         if (truncFlag) {
           hDAQStat->Fill(2); // sum truncs after HER
-          if (diff2 > 1000) hDAQStat->Fill(9); // sum truncs after HER, but outside injections, 1ms
-          if (hTruncAfterInjHER) hTruncAfterInjHER->Fill(diff2);
+          if (difference > 1000) hDAQStat->Fill(9); // sum truncs after HER, but outside injections, 1ms
+          if (hTruncAfterInjHER) hTruncAfterInjHER->Fill(difference);
         }
         if (missingFlag) {
           hDAQStat->Fill(15); // sum missframe after HER
-          if (diff2 > 1000) hDAQStat->Fill(17); // sum missframe after HER, but outside injections, 1ms
-          if (hMissAfterInjHER) hMissAfterInjHER->Fill(diff2);
+          if (difference > 1000) hDAQStat->Fill(17); // sum missframe after HER, but outside injections, 1ms
+          if (hMissAfterInjHER) hMissAfterInjHER->Fill(difference);
         }
       } else {
         if (eodbFlag) {
-          if (hEODBAfterInjLER) hEODBAfterInjLER->Fill(diff2);
+          if (hEODBAfterInjLER) hEODBAfterInjLER->Fill(difference);
         }
         if (cm63Flag) {
           hDAQStat->Fill(6); // sum CM63 after LER
-          if (diff2 > 1000) hDAQStat->Fill(8); // sum CM63 after LER, but outside injections, 1ms
-          if (hCM63AfterInjLER) hCM63AfterInjLER->Fill(diff2);
+          if (difference > 1000) hDAQStat->Fill(8); // sum CM63 after LER, but outside injections, 1ms
+          if (hCM63AfterInjLER) hCM63AfterInjLER->Fill(difference);
         }
         if (truncFlag) {
           hDAQStat->Fill(3); // sum truncs after LER
-          if (diff2 > 1000) hDAQStat->Fill(10); // sum truncs after LER, but outside injections, 1ms
-          if (hTruncAfterInjLER) hTruncAfterInjLER->Fill(diff2);
+          if (difference > 1000) hDAQStat->Fill(10); // sum truncs after LER, but outside injections, 1ms
+          if (hTruncAfterInjLER) hTruncAfterInjLER->Fill(difference);
         }
         if (missingFlag) {
           hDAQStat->Fill(16); // sum missframe after LER
-          if (diff2 > 1000) hDAQStat->Fill(18); // sum missframe after LER, but outside injections, 1ms
-          if (hMissAfterInjLER) hMissAfterInjLER->Fill(diff2);
+          if (difference > 1000) hDAQStat->Fill(18); // sum missframe after LER, but outside injections, 1ms
+          if (hMissAfterInjLER) hMissAfterInjLER->Fill(difference);
         }
       }
     }
-    break; // only first TTD packet
   }
 
 // make some nice statistics

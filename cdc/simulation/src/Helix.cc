@@ -243,7 +243,7 @@ Helix::x(double phi, HepSymMatrix& Ex) const
   //
   //   Calculate position error matrix.
   //   Ex(phi) = (@x/@a)(Ea)(@x/@a)^T, phi is deflection angle to specify the
-  //   point to be calcualted.
+  //   point to be calculated.
   //
   // HepMatrix dXDA(3, 5, 0);
   // dXDA = delXDelA(phi);

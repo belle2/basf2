@@ -72,7 +72,7 @@ MCInitialParticles  EvtGenInputModule::createBeamParticle(double minMass, double
   for (int i = 0; i < m_maxTries; ++i) {
     const MCInitialParticles initial = m_initial.generate();
 
-    // check if we fullfill the mass window
+    // check if we fulfill the mass window
     if (minMass <= initial.getMass() && initial.getMass() < maxMass)
       return initial;
   }
@@ -105,7 +105,7 @@ void EvtGenInputModule::generatorEvent()
 
   MCInitialParticles initial;
 
-  //Initialize the beam energy for each event separatly
+  //Initialize the beam energy for each event separately
   if (EvtPDL::getStdHep(m_parentId) == 10022) {
     //virtual photon (vpho), no mass window, we accept everything
     initial = createBeamParticle();

@@ -46,7 +46,7 @@ namespace Belle2 {
     double m_minPairMass{9.0}; /**< minimum invariant mass of the muon pair (9 GeV/c^2) */
     double m_minTrackLength{30.0}; /**< minimum extrapolated track length in the crystal (30 cm) */
     double m_MaxNeighbourE{0.010}; /**< maximum signal allowed in a neighbouring crystal (0.010 GeV) */
-    double m_thetaLabMinDeg{17.0}; /**< miniumum muon theta in lab (17 degrees) */
+    double m_thetaLabMinDeg{17.0}; /**< minimum muon theta in lab (17 degrees) */
     double m_thetaLabMaxDeg{150.0}; /**< maximum muon theta in lab (150 degrees) */
     bool m_measureTrueEnergy{false}; /**< use eclCalDigit to determine MC deposited energy (false) */
     bool m_requireL1{true}; /**< require events to satisfy a level 1 trigger (true) */

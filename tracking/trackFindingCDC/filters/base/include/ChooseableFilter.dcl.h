@@ -35,6 +35,9 @@ namespace Belle2 {
       /// Type of the object to be analysed.
       using Object = typename AFilter::Object;
 
+      /// Making expicit the RelationFilter operator() to avoid [-Woverloaded-virtual=]
+      using Super::operator();
+
     public:
       /// Setup the chooseable filter with available choices from the factory
       explicit Chooseable(std::unique_ptr<FilterFactory<AFilter>> filterFactory);

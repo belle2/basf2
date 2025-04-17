@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <unistd.h>
 
 #include <daq/dqm/HistoRelay.h>
 

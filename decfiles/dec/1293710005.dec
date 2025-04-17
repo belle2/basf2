@@ -36,11 +36,11 @@ Decay B+sig
 0.0005   anti-D*0  pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
 0.0010   D-        pi+   e+   nu_e    PHOTOS  GOITY_ROBERTS;
 0.0005   anti-D0   pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
-# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are inferred assuming isospin symmetry
 0.00023  anti-D0 pi+ pi- e+   nu_e      PHOTOS  PHSP;
 0.00015  D- pi+ pi0      e+   nu_e      PHOTOS  PHSP;
 0.00015  anti-D0 pi0 pi0 e+   nu_e      PHOTOS  PHSP;
-# the B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+# the B->D*pipilnu ; modes with pi0 are inferred assuming isospin symmetry
 0.00113  anti-D*0 pi+ pi- e+   nu_e      PHOTOS  PHSP;
 0.00075  D*- pi+ pi0      e+   nu_e      PHOTOS  PHSP;
 0.00075  anti-D*0 pi0 pi0 e+   nu_e      PHOTOS  PHSP;
@@ -64,11 +64,11 @@ Decay B+sig
 0.0005   anti-D*0 pi0   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
 0.0010   D-       pi+   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
 0.0005   anti-D0  pi0   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
-# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are inferred assuming isospin symmetry
 0.00023  anti-D0 pi+ pi- mu+   nu_mu      PHOTOS  PHSP;
 0.00015  D- pi+ pi0      mu+   nu_mu      PHOTOS  PHSP;
 0.00015  anti-D0 pi0 pi0 mu+   nu_mu      PHOTOS  PHSP;
-# the B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+# the B->D*pipilnu ; modes with pi0 are inferred assuming isospin symmetry
 0.00113  anti-D*0 pi+ pi- mu+   nu_mu      PHOTOS  PHSP;
 0.00075  D*- pi+ pi0      mu+   nu_mu      PHOTOS  PHSP;
 0.00075  anti-D*0 pi0 pi0 mu+   nu_mu      PHOTOS  PHSP;

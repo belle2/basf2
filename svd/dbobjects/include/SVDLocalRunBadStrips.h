@@ -30,7 +30,7 @@ namespace Belle2 {
      * Currently, return "false" as default (= all good strips).
      *
      * Input:
-     * @param vxdID: identitiy of the sensor for which the
+     * @param vxdID: identity of the sensor for which the
      * calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number

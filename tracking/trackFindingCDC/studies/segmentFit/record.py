@@ -31,9 +31,6 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
-CONTACT = "oliver.frost@desy.de"
-
-
 class SegmentFitValidationRun(HarvestingRun):
     """Harvester to read, postprocess and inspect MC events for track-segment fit validation"""
 

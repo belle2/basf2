@@ -35,15 +35,15 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       PerigeeCircle();
 
-      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given
+      /// Constructor from the perigee parameters. The direction of travel at the perigee is given
       /// as vector.
       PerigeeCircle(double curvature, const Vector2D& phi0Vec, double impact);
 
-      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given
+      /// Constructor from the perigee parameters. The direction of travel at the perigee is given
       /// as azimuth angle
       PerigeeCircle(double curvature, double phi0, double impact);
 
-      /// Constructor from the perigee parammeters.
+      /// Constructor from the perigee parameters.
       explicit PerigeeCircle(const PerigeeParameters& perigeeParameters);
 
     private:
@@ -72,7 +72,7 @@ namespace Belle2 {
        *  The center and radius alone do not carry any orientation.
        *  However the perigee parameterisation does.
        *  Therefore the constructor also excepts an orientated representation from them.
-       *  If no orientation is given, it defaults to mathematical positiv counterclockwise.
+       *  If no orientation is given, it defaults to mathematical positive counterclockwise.
        */
       static PerigeeCircle
       fromCenterAndRadius(const Vector2D& center,
@@ -137,7 +137,7 @@ namespace Belle2 {
 
       /**
        *  Calculates the arc length between two points of closest approach on the circle.
-       *  The arc length is signed positiv for travel in orientation direction.
+       *  The arc length is signed positive for travel in orientation direction.
        *  In the circle case the arc length is between -pi*radius and pi*radius,
        *  hence the discontinuity is on the far side of the circle relative to the given from point.
        *  The points are essentially first taken to their closest approach
@@ -186,9 +186,9 @@ namespace Belle2 {
 
       /**
        *  Returns the one of two end point which is first reached from the given start
-       *  if one stricly follows the forward direction of the circle.
+       *  if one strictly follows the forward direction of the circle.
        *
-       *  If the generalized circle is truely a line none of the points might lie
+       *  If the generalized circle is truly a line none of the points might lie
        *  in the forward direction and Vector2D(NAN,NAN) is returned.
        *  @param start Point to start the traversal
        *  @param end1 One possible end point

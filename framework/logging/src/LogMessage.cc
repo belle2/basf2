@@ -16,7 +16,7 @@
 #include <framework/core/ProcessStatistics.h>
 
 #include <boost/property_tree/json_parser.hpp>
-#include <ostream>
+#include <sstream>
 #include <utility>
 
 using namespace std;

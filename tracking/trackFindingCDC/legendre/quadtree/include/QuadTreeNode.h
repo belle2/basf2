@@ -57,15 +57,14 @@ namespace Belle2 {
         xSpan[1] - (xSpan[1] - xSpan[0]) / 2,
         xSpan[1]
       }
-      , m_yBinBounds(
-        {
-          ySpan[0],
-          ySpan[0] + (ySpan[1] - ySpan[0]) / 2,
-          ySpan[1] - (ySpan[1] - ySpan[0]) / 2,
-          ySpan[1]
-        })
-      , m_level(level)
+      , m_yBinBounds({
+        ySpan[0],
+        ySpan[0] + (ySpan[1] - ySpan[0]) / 2,
+        ySpan[1] - (ySpan[1] - ySpan[0]) / 2,
+        ySpan[1]
+      })
       , m_parent(level > 0 ? parent : nullptr)
+      , m_level(level)
       , m_filled(false)
       {
         B2ASSERT("QuadTree datastructure only supports levels < 255", level < 255);
@@ -217,20 +216,20 @@ namespace Belle2 {
       /// bins range on theta
       XBinBounds m_xBinBounds;
 
-      /// bins range on r
-      YBinBounds m_yBinBounds;
-
-      /// Level of node in the tree
-      int m_level;
-
-      /// Pointer to the parent node
-      This* m_parent;
-
       /// Vector of items which belongs to the node
       std::vector<AItem*> m_items;
 
       /// Pointers to the children nodes
       std::vector<This> m_children;
+
+      /// bins range on r
+      YBinBounds m_yBinBounds;
+
+      /// Pointer to the parent node
+      This* m_parent;
+
+      /// Level of node in the tree
+      int m_level;
 
       /// Is the node has been filled with items
       bool m_filled;

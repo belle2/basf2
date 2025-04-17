@@ -25,7 +25,7 @@ namespace Belle2 {
    * [physics.ins-det] to build the full covariance matrix for the
    * Kalman-fitted track (DAF counts as Kalman).  We then evaluate the
    * change in event time that minimizes the sum of chi^2s of the tracks
-   * following the same procedure that is decribed in loc.cit.
+   * following the same procedure that is described in loc.cit.
    *
    * Unlike the case of alignment, we only have one free parameter (time),
    * and therefore there are no large matrices to invert.  The necessary
@@ -85,7 +85,7 @@ namespace Belle2 {
      * the covariance matrices at a single measurement whereas the off diagonal elements connect different measurements.
      *
      * The off-diagnal elements are calculated, by either using one prediction step forward (because the two hits
-     * are neighbors), by using the fact that if thei are not neighbors they can be connected by a finite number of
+     * are neighbors), by using the fact that if they are not neighbors they can be connected by a finite number of
      * forward predictions which breaks this down to the first case and some multiplications again
      * or by using symmetry aspects (e.g. no background prediction is needed).
      *

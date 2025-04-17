@@ -178,7 +178,7 @@ void SVDTimeGroupingModule::event()
   if (int(m_svdClusters.getEntries()) < 10) return;
 
 
-  // first take Event Informations:
+  // first take Event Information:
   StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);
   if (!temp_eventinfo.isValid())
     m_svdEventInfoName = "SVDEventInfoSim";
@@ -292,7 +292,7 @@ void SVDTimeGroupingModule::searchGausPeaksInHistogram(TH1D& hist, std::vector<G
 
 
 
-    // preparing the gaus function for fitting the peak
+    // preparing the gauss function for fitting the peak
     TF1 ngaus("ngaus", myGaus,
               hist.GetXaxis()->GetXmin(), hist.GetXaxis()->GetXmax(), 3);
 
@@ -326,7 +326,7 @@ void SVDTimeGroupingModule::searchGausPeaksInHistogram(TH1D& hist, std::vector<G
         std::fabs(ngaus.GetParameter(2)) // sigma
       };
 
-      // fit converges but paramters are at limit
+      // fit converges but parameters are at limit
       // Do a rough cleaning
       if (pars[2] <= m_usedPars.limitSigma[0] + 0.01 || pars[2] >= m_usedPars.limitSigma[1] - 0.01) {
         // subtract the faulty part from the histogram

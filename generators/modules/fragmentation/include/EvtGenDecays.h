@@ -217,7 +217,7 @@ protected:
 // instance. This is to ensure a consistent random number generator
 // across the two, as well as any updates to particle data, etc. Note
 // that if multiple EvtGenDecays objects exist, that they will modify
-// one anothers particle databases due to the design of EvtGen.
+// one another particle databases due to the design of EvtGen.
 
 // This constructor also sets all particles to be decayed by EvtGen as
 // stable within Pythia. The parameters within Pythia used to check if

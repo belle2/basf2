@@ -125,7 +125,7 @@ namespace Belle2 {
     ~ServiceGapsMomVolPar() {}
 
     /** Append a new node */
-    void appendNode(double rmin, double rmax , double z)
+    void appendNode(double rmin, double rmax, double z)
     {
       m_rmin.push_back(rmin);
       m_rmax.push_back(rmax);
@@ -134,11 +134,11 @@ namespace Belle2 {
 
     /** Get the number of the mother volume nodes */
     int getNNodes() const { return m_rmin.size();}
-    /** Get the list of the Rmin corrdinates */
+    /** Get the list of the Rmin coordinates */
     std::vector<double> getRmin() const { return m_rmin;}
-    /** Get the list of the Rmax corrdinates */
+    /** Get the list of the Rmax coordinates */
     std::vector<double> getRmax() const { return m_rmax;}
-    /** Get the list of the z corrdinates */
+    /** Get the list of the z coordinates */
     std::vector<double> getZ() const { return m_z;}
 
 
@@ -272,7 +272,7 @@ namespace Belle2 {
     ~ServiceGapsMaterialsPar() {}
 
     /** Append a new node */
-    void appendNode(double rmin, double rmax , double z)
+    void appendNode(double rmin, double rmax, double z)
     {
       m_rmin.push_back(rmin);
       m_rmax.push_back(rmax);
@@ -281,11 +281,11 @@ namespace Belle2 {
 
     /** Get the number of the mother volume nodes */
     int getNNodes() const { return m_rmin.size();}
-    /** Get the list of the Rmin corrdinates */
+    /** Get the list of the Rmin coordinates */
     std::vector<double> getRmin() const { return m_rmin;}
-    /** Get the list of the Rmax corrdinates */
+    /** Get the list of the Rmax coordinates */
     std::vector<double> getRmax() const { return m_rmax;}
-    /** Get the list of the z corrdinates */
+    /** Get the list of the z coordinates */
     std::vector<double> getZ() const { return m_z;}
     /** Get Backward Top Gap MomVolume */
     const ServiceGapsMomVolPar& getMomVolTopBack(void) const { return m_momvoltopback; }

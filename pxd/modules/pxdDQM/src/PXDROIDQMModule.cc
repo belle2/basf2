@@ -147,8 +147,8 @@ void PXDROIDQMModule::event()
     int nr;
     nr = it.getNrROIs();
     if (hrawROIcount) hrawROIcount->Fill(nr);
-    if (hrawROIDC_DHHID) hrawROIDC_DHHID->Fill(-1); // misuse underflow for roi raw paket"event" count
-    if (hrawROIHLT_DHHID) hrawROIHLT_DHHID->Fill(-1); // misuse underflow for roi raw paket"event" count
+    if (hrawROIDC_DHHID) hrawROIDC_DHHID->Fill(-1); // misuse underflow for roi raw packet"event" count
+    if (hrawROIHLT_DHHID) hrawROIHLT_DHHID->Fill(-1); // misuse underflow for roi raw packet"event" count
     for (auto j = 0; j < nr; j++) {
       if (hrawROItype) hrawROItype->Fill(it.getType(j));
       int Vmin, Vmax, Umin, Umax, Vmean, Umean, Vsize, Usize;

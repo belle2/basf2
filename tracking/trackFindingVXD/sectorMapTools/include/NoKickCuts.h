@@ -62,7 +62,7 @@ namespace Belle2 {
     */
     std::vector<double> cutSelector(double sintheta, double momentum, int layer1, int layer2, EParameters par);
 
-    /*  This methods select the cuts as function parameters from TH3F cointained
+    /*  This methods select the cuts as function parameters from TH3F contained
     *  in cutfile in function of track parameter and layer only. EMinMax represent
     *  if you want the maximum or minimum cut, instead ECutName are the three
     *  parameters of the theta-p parametrization of the cuts (see the enum type)

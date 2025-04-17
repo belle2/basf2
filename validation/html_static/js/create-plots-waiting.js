@@ -5,7 +5,7 @@
  * will check for the plot creation progress on the server
  * To identify a specific plotting request, the progress_key
  * handed out by the server must be passed here
- * The joined_revisions parameter is needed ot reload the
+ * The joined_revisions parameter is needed to reload the
  * correct combination of revisions.
  * This method will either start a new time, if the plots are
  * not complete yet or will hide the wait dialog if the plotting

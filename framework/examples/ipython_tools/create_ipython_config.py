@@ -53,7 +53,7 @@ def main():
                 check_output(['jupyter', 'notebook', '--generate-config'])
             except BaseException:
                 print("Could not start jupyter notebook. There are many possible reasons for this.\n"
-                      "Please see https://confluence.desy.de/display/BI/Software+Jupyter+Notebooks for possible fixes \n"
+                      "Please see https://xwiki.desy.de/xwiki/rest/p/83b56 for possible fixes \n"
                       "and feel free to contact software@belle2.org for questions.")
 
         config_file = template.render(port=port)

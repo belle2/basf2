@@ -16,10 +16,6 @@ The Belle II Event Display
         created with the event display (so no excuses for ugly low-resolution
         screenshots).
 
-.. seealso::
-        `Here is a gallery of nice event display images
-        <https://confluence.desy.de/x/1nQHAg>`_.
-
 .. _display_starting_the_display:
 
 Starting the display

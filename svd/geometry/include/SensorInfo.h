@@ -41,7 +41,7 @@ namespace Belle2 {
        * @param width Width of the sensor.
        * @param length Length of the sensor.
        * @param thickness Thickness of the senosr.
-       * @param uCells Number of strips in u dirrection.
+       * @param uCells Number of strips in u direction.
        * @param vCells Number of strips in v direction.
        * @param width2 For wedge sensors, width is the width at 0, width2 is the width at maximum u.
        */

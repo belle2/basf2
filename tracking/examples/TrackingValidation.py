@@ -62,7 +62,7 @@ def main():
         'to perform a fit but use the seed values generated in track finding.')
 
     argument_parser.add_argument('-s', '--show', action='store_true',
-                                 help='Show generated plots in a TBrowser immediatly.')
+                                 help='Show generated plots in a TBrowser immediately.')
 
     argument_parser.add_argument('-i', '--input', type=str,
                                  nargs="?", default=None, required=True,

@@ -32,13 +32,13 @@ namespace Belle2 {
       void beginRun() override;
 
     private:
+      /// Construct empty ThreeHitVariables instance
+      FourHitVariables m_fourHitVariables;
+
       /// Cut on difference of the two circle radii estimated from two triplets
       double m_CircleRadiusDifferenceCut = 10.;
       /// Cut on difference of the two circle center estimated from two triplets
       double m_CircleCenterPositionDifferenceCut = 10.;
-
-      /// Construct empty ThreeHitVariables instance
-      FourHitVariables m_fourHitVariables;
     };
 
   }

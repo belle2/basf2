@@ -577,7 +577,7 @@ def peel_subdetector_hit_purity(reco_track, mc_reco_track, key="{part_name}"):
 #: Get hit level information information
 @format_crop_keys
 def peel_hit_information(hit_info, reco_track, key="{part_name}"):
-    nan = np.float("nan")
+    nan = float("nan")
 
     crops = dict(residual=nan,
                  residual_x=nan,

@@ -19,7 +19,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCFacet;
 
-    /// Filter for the constuction of good facets based in the chi2 fit
+    /// Filter for the construction of good facets based in the chi2 fit
     class Chi2FacetFilter : public BaseFacetFilter {
 
     private:

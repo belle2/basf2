@@ -70,7 +70,7 @@ namespace Belle2 {
 
   private:
     std::string m_gfTrackColName; ///< m_gfTrackColName
-    std::string m_outputFileName; ///< ouput filename string
+    std::string m_outputFileName; ///< output filename string
 
     /** Genfit tracks. */
     StoreArray<genfit::Track> m_GenfitTracks;

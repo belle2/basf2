@@ -106,11 +106,11 @@ namespace Belle2 {
     //--------------------------------- default name stuff -----------------------------------------------------
 
     /** Tries to deduce the TClass from a default object name, which is generally the name of the C++ class.
-     *  The namespace qualification Belle2:: can be ommitted. */
+     *  The namespace qualification Belle2:: can be omitted. */
     static TClass* getTClassFromDefaultObjectName(const std::string& objectName);
 
     /** Tries to deduce the TClass from a default array name, which is generally the name of the C++ class with an appended 's'.
-     *  The namespace qualification Belle2:: can be ommitted */
+     *  The namespace qualification Belle2:: can be omitted */
     static TClass* getTClassFromDefaultArrayName(const std::string& arrayName);
 
     /** Return the default storage name for given class name. */
@@ -304,7 +304,7 @@ namespace Belle2 {
      *  @param object     Pointer to the object that should be stored. If 0, a new default object is created.
      *  @param replace    If an object already exists, it will be replaced if this is true. If false, an error will be printed.
      *  @param accessor   Encapsulates name, durability, and type
-     *  @return           Wether the object was successfully inserted/created
+     *  @return           Whether the object was successfully inserted/created
      */
     bool createObject(TObject* object, bool replace, const StoreAccessorBase& accessor);
 
@@ -372,7 +372,7 @@ namespace Belle2 {
 
     /** Add a relation from an object in a store array to another object in a store array.
      *
-     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary if fromObject is of type genfit::...
+     *  @note If possible, use RelationsObject members instead, as they allow more efficient caching. Currently this should only be necessary if fromObject is of type genfit::...
      *
      *  @sa RelationsObject::addRelationTo
      *  @param fromObject     Pointer to the object from which the relation points.
@@ -394,7 +394,7 @@ namespace Belle2 {
      *
      *  Relations in both directions are returned.
      *
-     *  @note Using this function should only be necessary if type(object) == genfit::.... If possible, use RelationsObject members instead, as they allow more efficent caching.
+     *  @note Using this function should only be necessary if type(object) == genfit::.... If possible, use RelationsObject members instead, as they allow more efficient caching.
      *
      *  @sa RelationsObject::getRelationsWith
      *  @param object         Pointer to the object from or to which the relations point.
@@ -415,7 +415,7 @@ namespace Belle2 {
 
     /** Get the object to or from which another object has a relation.
      *
-     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary if type(object) == genfit::..
+     *  @note If possible, use RelationsObject members instead, as they allow more efficient caching. Currently this should only be necessary if type(object) == genfit::..
      *
      *  @param object  Pointer to the object to or from which the relation points.
      *  @tparam T      The class of objects to or from which the relation points.
@@ -516,7 +516,7 @@ namespace Belle2 {
      */
     void reset();
 
-    /** Return map of depedencies between modules. */
+    /** Return map of dependencies between modules. */
     DependencyMap& getDependencyMap() { return *m_dependencyMap; }
 
 

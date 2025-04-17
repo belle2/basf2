@@ -21,7 +21,6 @@
 #include <string>
 
 namespace Belle2 {
-  class Particle;
 
   /**
    * Ranks particles by the values of a variable. The ranking also takes

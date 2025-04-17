@@ -23,7 +23,7 @@ namespace Belle2 {
     ~TrackFlippingCuts() {}
 
     /** Set the cuts for the two filters
-     * @param status the option ot trun on/off flip&refit
+     * @param status the option to turn on/off flip&refit
      * @param cutPt the cut on Pt to do flip&refit
      * @param cutFirst the cut for the 1st MVA
      * @param cutSecond the cut for the 2nd MVA
@@ -37,7 +37,7 @@ namespace Belle2 {
     }
 
 
-    /** get the info about turnning on/off the flip&refit */
+    /** get the info about turning on/off the flip&refit */
     bool getOnOffInfo() const
     {
       return m_status;

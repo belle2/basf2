@@ -175,7 +175,7 @@ void DQMHistAnalysisPXDChargeModule::event()
 //     m_line2->Draw();
 //     m_line3->Draw();
     m_hCharge->Fit(m_fMean, "R");
-    data = m_fMean->GetParameter(0); // we are more interessted in the maximum deviation from mean
+    data = m_fMean->GetParameter(0); // we are more interested in the maximum deviation from mean
     m_hCharge->GetMinimumAndMaximum(currentMin, currentMax);
     diff = fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
     if (0) B2INFO("Mean: " << data << " Max Diff: " << diff);
@@ -191,7 +191,7 @@ void DQMHistAnalysisPXDChargeModule::event()
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
     status = 0; // default
   } else {
-    /// FIXME: what is the accpetable limit?
+    /// FIXME: what is the acceptable limit?
     if (fabs(data - 50.) > 20. || diff > 30) {
       m_cCharge->Pad()->SetFillColor(kRed);// Red
       status = 4;
@@ -210,10 +210,15 @@ void DQMHistAnalysisPXDChargeModule::event()
   setEpicsPV("Status", status);
 
   for (auto& it : m_excluded) {
-    auto tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
-    tt->SetTextSize(0.035);
-    tt->SetTextAngle(90);// Rotated
-    tt->SetTextAlign(12);// Centered
+    static std::map <int, TLatex*> ltmap;
+    auto tt = ltmap[it];
+    if (!tt) {
+      tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+      tt->SetTextSize(0.035);
+      tt->SetTextAngle(90);// Rotated
+      tt->SetTextAlign(12);// Centered
+      ltmap[it] = tt;
+    }
     tt->Draw();
   }
 
@@ -231,5 +236,10 @@ void DQMHistAnalysisPXDChargeModule::endRun()
 void DQMHistAnalysisPXDChargeModule::terminate()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: terminate called");
+
+  if (m_cCharge) delete m_cCharge;
+  if (m_hCharge) delete m_hCharge;
+  if (m_fLandau) delete m_fLandau;
+  if (m_fMean) delete m_fMean;
 }
 

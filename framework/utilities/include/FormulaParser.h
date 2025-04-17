@@ -34,7 +34,7 @@ namespace Belle2 {
       c_minus              = 0x12, /**< Subtraction */
       c_multiply           = 0x21, /**< Multiply */
       c_divide             = 0x22, /**< Division */
-      c_power              = 0x31  /**< Exponentation */
+      c_power              = 0x31  /**< Exponentiation */
     };
 
     /** States of a string literal when checking if it is a valid number */
@@ -134,7 +134,7 @@ namespace Belle2 {
     /** typedef for output tokens on the stack: either a variable or a double */
     typedef std::variant<VariableType, double> OutputToken;
 
-    /** Parse the formula and return a varible object of the correct type.
+    /** Parse the formula and return a variable object of the correct type.
      * Throws  std::runtime_error if there is a problem with parsing.
      */
     VariableType parse(const std::string& formula)

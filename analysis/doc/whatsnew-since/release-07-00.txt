@@ -107,7 +107,7 @@ Graph Neural Network based Flavor Tagger
 * The Graph Neural Network based Flavor Tagger is available from the basf2. The new options ``useGNN`` and ``identifierGNN`` are
   added to `flavorTagger.flavorTagger`. If ``useGNN`` is set to ``True`` and ``identifierGNN`` is set to the trained weight file
   name, the qr value is stored in the alias variable ``qrGNN``. One can find the information on the identifier and the global tag
-  which includes the payload on the `TDCPV WG Confluence Page <https://confluence.desy.de/display/BI/Recipes+for+TDCPV+tools>`_.
+  which includes the payload on the `TDCPV WG XWiki Page <https://xwiki.desy.de/xwiki/rest/p/4acf6>`_.
 
 Modules
 +++++++
@@ -125,10 +125,10 @@ Modules
 * Parameters for `stdPhotons`, `stdPi0s` and `stdHyperons` have been changed in both name and type. The new parameters are called
   ``beamBackgroundMVAWeight`` and ``fakePhotonMVAWeight``, and they are now strings to specify which weight files should be used. For
   run-independent training use ``MCri`` while for run-dependent training use ``MCrd``. More information on the new weights can be
-  found on the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+  found on the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
 * Added an optional parameter ``biasCorrectionTable`` to `stdHyperons` so that users can specify a table name with photon energy
   bias corrections for the ``stdXi0`` particle list. The latest information on the bias correction can be found on the `Neutrals
-  Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+  Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
 * Added a parameter ``updateAllDaughters`` to `stdKshorts` and `stdLambdas` so that users can instruct the vertex fitter to
   update the variables of the V0 daughters. The parameter is ``False`` by default for backward compatibility.
 * New function `modularAnalysis.fillParticleListFromChargedCluster` is added to load the neutral final-state-particles from the
@@ -212,7 +212,7 @@ stdPhoton and stdPi0
 * Added an optional parameter ``biasCorrectionTable`` to `stdPhotons` and `stdPi0s` that allows the user to specify a table name
   for the photon energy bias correction. Providing a table name will automatically apply the bias correction to all particles in
   the particle lists. This is available for all list types. The latest information on the bias correction can be found on the
-  `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+  `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
 
 Modules
 +++++++

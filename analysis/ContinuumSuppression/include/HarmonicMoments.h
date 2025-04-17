@@ -8,6 +8,7 @@
 
 #pragma once
 #include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 #include <vector>
 
 
@@ -37,7 +38,7 @@ namespace Belle2 {
      * @param momenta A vector of XYZVectors containing the 3-momenta to be used to the moments' calculation
      * @param axis The reference axis
      */
-    HarmonicMoments(const std::vector<ROOT::Math::XYZVector>& momenta, const ROOT::Math::XYZVector& axis)
+    HarmonicMoments(const std::vector<ROOT::Math::PxPyPzEVector>& momenta, const ROOT::Math::XYZVector& axis)
     {
       m_momenta.clear();
       m_momenta = momenta;
@@ -51,9 +52,9 @@ namespace Belle2 {
 
     /**
      * Sets the list of momenta, overwriting whatever list has been set before.
-     * @param momenta A vector of XYZVectors containing the 3-momenta to be used to the moments' calculation
+     * @param momenta A vector of PxPyPzEVectors containing the 4-momenta to be used for the moments' calculation
      */
-    void setMomenta(const std::vector<ROOT::Math::XYZVector>& momenta)
+    void setMomenta(const std::vector<ROOT::Math::PxPyPzEVector>& momenta)
     {
       m_momenta.clear();
       m_momenta = momenta;
@@ -97,7 +98,7 @@ namespace Belle2 {
 
   private:
     double m_moment[9] = {0.}; /**< The harmonic moments */
-    std::vector<ROOT::Math::XYZVector> m_momenta; /**< The list of particles */
+    std::vector<ROOT::Math::PxPyPzEVector> m_momenta; /**< The list of particles */
     ROOT::Math::XYZVector m_axis; /**< The reference axis */
   };
 

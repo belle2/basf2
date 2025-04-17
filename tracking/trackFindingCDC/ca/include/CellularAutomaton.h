@@ -58,10 +58,10 @@ namespace Belle2 {
           }
 
           try {
-            // Assignes flags and the cell state
+            // Assigns flags and the cell state
             getFinalCellState(cellHolder, cellHolderRelations);
           } catch (CycleException) {
-            // TODO: Come up with some handeling for cycles.
+            // TODO: Come up with some handling for cycles.
             // For now we continue to look for long paths in the graph
             // hoping to find a part that does not enter the cycle.
 
@@ -158,13 +158,13 @@ namespace Belle2 {
           // Get the value of the neighbor
           Weight neighborCellState = getFinalCellState(neighborCellHolder, cellHolderRelations);
 
-          // Add the value of the connetion to the gain value
+          // Add the value of the connection to the gain value
           Weight stateWithContinuation = neighborCellState + relation.getWeight();
 
           // Remember only the maximum value of all neighbors
           if (std::isnan(maxStateWithContinuation) or maxStateWithContinuation < stateWithContinuation) {
             maxStateWithContinuation = stateWithContinuation;
-            // Remember whether the best continuation marks a priorty path
+            // Remember whether the best continuation marks a priority path
             // construction ensures that priority paths have at least two elements
             isPriorityPath = neighborCell.hasPriorityFlag() or neighborCell.hasPriorityPathFlag();
           }

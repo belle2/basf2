@@ -60,7 +60,7 @@ TrackFilterFactory::getValidFilterNamesAndDescriptions() const
     {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
     {"recording_data", "record reco-variables to a TTree (no truth information)"},
-    {"eval", "record truth and the mva response for insitu comparision"},
+    {"eval", "record truth and the mva response for insitu comparison"},
     {"mva", "test with a mva method"}
   };
 }

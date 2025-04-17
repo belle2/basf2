@@ -21,8 +21,8 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     *  Class representating a sense wire superlayer in the central drift chamber.
-     *  This class represents the a CDC superlayer as a range of wire layers. \n
+     *  Class representing a sense wire superlayer in the central drift chamber.
+     *  This class represents a CDC superlayer as a range of wire layers. \n
      *  The range is sorted with increasing layer ids for maximal fast look up. \n
      *  It provides methods for checking the validity of layer and wire ids as well as \n
      *  a getter for the layers and wires in this layer. \n
@@ -60,7 +60,7 @@ namespace Belle2 {
       void operator=(const CDCWireSuperLayer& wireSuperLayer) = delete;
 
     public:
-      /// Intializes the superlayer variables of according the layer range. Set the numbering shift of contained layers.
+      /// Initializes the superlayer variables of according the layer range. Set the numbering shift of contained layers.
       void initialize();
 
       /**
@@ -124,11 +124,11 @@ namespace Belle2 {
       EStereoKind getStereoKind() const
       { return front().getStereoKind(); }
 
-      /// Getter for the inner radius of the layer as retrived from the CDCGeometryPar by the inner most layer
+      /// Getter for the inner radius of the layer as retrieved from the CDCGeometryPar by the inner most layer
       double getInnerCylindricalR() const
       { return front().getInnerCylindricalR(); }
 
-      /// Getter for the outer radius of the layer as retrived from the CDCGeometryPar by the outer most layer
+      /// Getter for the outer radius of the layer as retrieved from the CDCGeometryPar by the outer most layer
       double getOuterCylindricalR() const
       { return back().getOuterCylindricalR(); }
 
@@ -145,7 +145,7 @@ namespace Belle2 {
       double getOuterRefZ() const
       { return m_outerRefZ; }
 
-      /// Getter for (fitted) proporitionality factor between the increasing cylindrical radius and the refernce z coordinate in this superlayer.
+      /// Getter for (fitted) proportionality factor between the increasing cylindrical radius and the reference z coordinate in this superlayer.
       double getRefTanLambda() const
       { return m_refTanLambda; }
       /**@}*/
@@ -232,7 +232,7 @@ namespace Belle2 {
        *
        *  Due to the hexogonal arrangement of the wires, the secondary neighbors are positioned
        *  just like the numbers on the clock if you took the center of the clock to the wire position
-       *  and the twelve o'clock poing in the outwards direction.
+       *  and the twelve o'clock points in the outwards direction.
        *
        *  Note : Not all neighbors might be present at the boundaries of the superlayer.
        *  In case the neighbor asked for does not exist, the functions return nullptr instead.
@@ -333,7 +333,7 @@ namespace Belle2 {
       /// Memory for the (fitted) z of the reference wire reference points at the outer cylindricalR of this super layer.
       double m_outerRefZ;
 
-      /// Memory for (fitted) proporitionality factor between the increasing cylindrical radius and the refernce z coordinate in this superlayer.
+      /// Memory for (fitted) proportionality factor between the increasing cylindrical radius and the reference z coordinate in this superlayer.
       double m_refTanLambda;
 
     };

@@ -40,7 +40,7 @@ Warning:
            "can be used to scale all components by the same factor. If a component is "
            "specified manually and '*' is present the result will be the product of both)");
   addParam("ignoredMaterials", m_ignoredMaterials, "A set of material names which should "
-           "**not** be scaled, usually things like vaccum or air. To scale everything this "
+           "**not** be scaled, usually things like vacuum or air. To scale everything this "
            "parameter should be set to an empty set (``{}`` or ``set()``)",
            geometry::Materials::getInstance().getDensityScaleIgnoredMaterials());
 }

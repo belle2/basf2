@@ -34,7 +34,7 @@ extern "C" {
   /** Wrap BHwide random number generator and use ROOT.
    * This method returns an array of random numbers in the range ]0,1[
    * @param drvec array to store the random numbers
-   * @param lenght size of the array
+   * @param length size of the array
    */
   void varran_(double* drvec, const int* lengt)
   {

@@ -123,10 +123,10 @@ namespace Belle2 {
     /** StoreArray for the TCs created in this module. */
     StoreArray<Belle2::SpacePointTrackCand> m_TCs;
 
-    /** Pointer to SPTC selector class which performes the x best candidate selection. */
+    /** Pointer to SPTC selector class which performs the x best candidate selection. */
     std::unique_ptr<SPTCSelectorXBestPerFamily> m_sptcSelector;
 
-    /** Acccess to the EventLevelTrackingInfo object in the datastore. */
+    /** Access to the EventLevelTrackingInfo object in the datastore. */
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
 
     /** Event number counter. */

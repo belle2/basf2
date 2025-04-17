@@ -20,11 +20,11 @@ namespace Belle2 {
     inline auto square(ANumber t) -> decltype(t* t) {return t * t;}
 
     /**
-     *  Faster version of the hypot2 funcion.
+     *  Faster version of the hypot2 function.
      *
      *  hypot2 turned out to be a major bottleneck for many calculations
      *  Keep the name though because the expressions can be spelled more clearly
-     *  in comparision to std::sqrt(someStuff() * someStuff() + otherStuff() * otherStuff());
+     *  in comparison to std::sqrt(someStuff() * someStuff() + otherStuff() * otherStuff());
      */
     inline double hypot2(double x, double y) { return sqrt(x * x + y * y); }
 
@@ -34,8 +34,8 @@ namespace Belle2 {
     /**
      *  Returns the two roots of abc formula.
      *  Calculates the two roots of the parabola a*x*x + b*x + c = 0 in stable manner. \n
-     *  The first value of the returned pair is the solution with the bigger absolut value. \n
-     *  The formula also handels the case a == 0 correctly. Here to only root of the linear \n
+     *  The first value of the returned pair is the solution with the bigger absolute value. \n
+     *  The formula also handles the case a == 0 correctly. Here to only root of the linear \n
      *  form b*x + c = 0 is returned in the .second  of the pair, while the bigger 'solution' \n
      *  .first is infinity.
      */

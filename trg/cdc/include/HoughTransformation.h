@@ -27,7 +27,7 @@ namespace Belle2 {
   class TRGCDCHoughTransformation {
 
   public:
-    /// Contructor.
+    /// Constructor.
     TRGCDCHoughTransformation(const std::string& name);
 
     /// Destructor
@@ -52,7 +52,7 @@ namespace Belle2 {
     virtual bool negativeDiverge(float xReal, float yReal, float x0, float x1)
     const = 0;
 
-//     /// returns a gradient at given regsion.
+//     /// returns a gradient at given region.
 //     virtual float gradient(float xReal, float yReal, float x) const = 0;
 
     /// converts Point2D(r, phi) in real plane into Point2D(r, phi) in Hough plane.

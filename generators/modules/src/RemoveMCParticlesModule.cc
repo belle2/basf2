@@ -96,7 +96,7 @@ void RemoveMCParticlesModule::event()
   m_mpg.clear();
   m_mpg.loadList(m_particleList);
   //We know that all MCParticles in the list are also 1:1 in the graph with the
-  //same index. This helps also removing children if neccessary. No we apply
+  //same index. This helps also removing children if necessary. No we apply
   //cuts to all particles having no mother and the applyCuts method will then
   //do all the children
   for (unsigned i = 0; i < nPart; ++i) {

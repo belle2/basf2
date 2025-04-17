@@ -11,7 +11,6 @@
 #include <analysis/VariableManager/Manager.h>
 
 #include <vector>
-#include <string>
 
 namespace Belle2 {
   class Particle;
@@ -137,6 +136,7 @@ namespace Belle2 {
      * return uncertainty in z relative to interaction point
      */
     double particleDZUncertainty(const Particle* part);
+
     /**
      * return transverse distance relative to interaction point
      */

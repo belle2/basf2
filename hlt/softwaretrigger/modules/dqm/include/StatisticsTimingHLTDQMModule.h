@@ -8,10 +8,17 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <mdst/dataobjects/TRGSummary.h>
 #include <vector>
 #include <string>
 
 class TH1F;
+class TH2F;
 
 namespace Belle2 {
   namespace SoftwareTrigger {
@@ -73,6 +80,30 @@ namespace Belle2 {
       /// Number of processes per unit
       TH1F* m_processesPerUnitHistogram;
 
+      /// Processing time distribution of events passing passive injection veto
+      TH1F* m_processingTimePassiveVeto;
+
+      /// Processing time distribution of events not passing passive injection veto
+      TH1F* m_processingTimeNotPassiveVeto;
+
+      /// Processing time vs nSVDShaperDigits distribution of events passing passive injection veto
+      TH2F* m_procTimeVsnSVDShaperDigitsPassiveVeto;
+
+      /// Processing time vs nSVDShaperDigits distribution of events not passing passive injection veto
+      TH2F* m_procTimeVsnSVDShaperDigitsNotPassiveVeto;
+
+      /// Processing time vs nCDCHits distribution of events passing passive injection veto
+      TH2F* m_procTimeVsnCDCHitsPassiveVeto;
+
+      /// Processing time vs nCDCHits distribution of events not passing passive injection veto
+      TH2F* m_procTimeVsnCDCHitsNotPassiveVeto;
+
+      /// Processing time vs nECLDigits distribution of events passing passive injection veto
+      TH2F* m_procTimeVsnECLDigitsPassiveVeto;
+
+      /// Processing time vs nECLDigits distribution of events not passing passive injection veto
+      TH2F* m_procTimeVsnECLDigitsNotPassiveVeto;
+
       /// Storage for the last full time sum
       double m_lastFullTimeSum = 0;
 
@@ -120,6 +151,36 @@ namespace Belle2 {
 
       /// Number of bins for the histograms of fullMemory
       const double m_fullMemoryNBins = 100;
+
+      /// Maximum for the histograms of nSVDShaperDigits
+      const double m_nSVDShaperDigitsMax = 20000;
+
+      /// Number of bins for the histograms of nSVDShaperDigits
+      const double m_nSVDShaperDigitsNBins = 100;
+
+      /// Maximum for the histograms of nCDCHits
+      const double m_nCDCHitsMax = 10000;
+
+      /// Number of bins for the histograms of nCDCHits
+      const double m_nCDCHitsNBins = 100;
+
+      /// Maximum for the histograms of nECLDigits
+      const double m_nECLDigitsMax = 10000;
+
+      /// Number of bins for the histograms of nECLDigits
+      const double m_nECLDigitsNBins = 100;
+
+      /// TRG Summary
+      StoreObjPtr<TRGSummary> m_trgSummary;
+
+      /// SVD strips
+      StoreArray<SVDShaperDigit> m_svdShaperDigits;
+
+      /// CDC Hits
+      StoreArray<CDCHit> m_cdcHits;
+
+      /// ECL Digits
+      StoreArray<ECLDigit> m_eclDigits;
     };
 
   }

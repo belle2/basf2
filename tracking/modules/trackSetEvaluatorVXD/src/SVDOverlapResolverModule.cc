@@ -111,7 +111,7 @@ void SVDOverlapResolverModule::event()
   }
 
   if (m_resolveMethod == "greedy") {
-    //make a Scrooge and udpate the activity
+    //make a Scrooge and update the activity
     Scrooge scrooge;
     scrooge.performSelection(qiTrackOverlap);
 

@@ -40,7 +40,7 @@ PXDRawHitMaskingModule::PXDRawHitMaskingModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a digit to carry", 0);
-  addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits whit out-of-range coordinates", true);
+  addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits with out-of-range coordinates", true);
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
   addParam("rawHitsOut", m_storeRawHitsNameOut, "PXDRawHit Out collection name", string("PXDRawHitsOut"));
 }

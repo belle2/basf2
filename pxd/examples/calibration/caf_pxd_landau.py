@@ -49,10 +49,10 @@ from caf.strategies import SequentialRunByRun
 from caf.utils import ExpRun, IoV
 from caf.backends import LSF
 from caf.framework import Calibration, CAF
+import ROOT  # noqa (makes ROOT.Belle2 accessible)
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm
 from ROOT.Belle2 import PXDChargeCalibrationAlgorithm
 from ROOT.Belle2 import PXDGainCalibrationAlgorithm
-import ROOT
 import pickle
 import basf2 as b2
 b2.set_log_level(b2.LogLevel.INFO)

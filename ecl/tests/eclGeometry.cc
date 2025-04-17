@@ -176,7 +176,7 @@ namespace {
     EXPECT_NEAR(pMax_real.z(), pMax.z(), absolute_tolerance);
   }
 
-  // Bouding limits for half circle starting at 3pi/2
+  // Bounding limits for half circle starting at 3pi/2
   TEST_F(BelleLatheTest, BoundingBoxSect1)
   {
     // Create the Belle Lathe
@@ -201,7 +201,7 @@ namespace {
     EXPECT_NEAR(pMax_real.z(), pMax.z(), absolute_tolerance);
   }
 
-  // Bouding limits for quarter starting at pi
+  // Bounding limits for quarter starting at pi
   TEST_F(BelleLatheTest, BoundingBoxSect2)
   {
     // Create the Belle Lathe
@@ -226,7 +226,7 @@ namespace {
     EXPECT_NEAR(pMax_real.z(), pMax.z(), absolute_tolerance);
   }
 
-  // Bouding limits for three quarter starting at 0
+  // Bounding limits for three quarter starting at 0
   TEST_F(BelleLatheTest, BoundingBoxSect3)
   {
     // Create the Belle Lathe
@@ -251,7 +251,7 @@ namespace {
     EXPECT_NEAR(pMax_real.z(), pMax.z(), absolute_tolerance);
   }
 
-  // Bouding limits for quarter starting at pi/4 w/ hole
+  // Bounding limits for quarter starting at pi/4 w/ hole
   TEST_F(BelleLatheTest, BoundingBoxSect4)
   {
     // Create the Belle Lathe

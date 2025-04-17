@@ -29,7 +29,7 @@ namespace Belle2 {
   /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD, and also testbeam telescopes */
   namespace VXD {
     /**
-     * Class to faciliate easy access to sensor information of the VXD like
+     * Class to facilitate easy access to sensor information of the VXD like
      * coordinate transformations or pitch size.
      */
     class GeoCache {
@@ -66,7 +66,7 @@ namespace Belle2 {
       void addSensor(SensorInfoBase* sensorinfo);
 
       /** Return a set of all known Layers.
-       * @param sensortype Wether to only return the layer IDs for PXD, SVD or all VXD layers (default)
+       * @param sensortype Whether to only return the layer IDs for PXD, SVD or all VXD layers (default)
        * @return a set containing all existing Layers with the requested type
        */
       const std::set<Belle2::VxdID>  getLayers(SensorInfoBase::SensorType sensortype = SensorInfoBase::VXD);
@@ -87,7 +87,7 @@ namespace Belle2 {
        */
       const std::vector<VxdID> getListOfSensors() const;
 
-      /** Return a referecne to the SensorInfo of a given SensorID */
+      /** Return a reference to the SensorInfo of a given SensorID */
       /* If sensor not found, it returns a warning and the first sensor!*/
       const SensorInfoBase& getSensorInfo(Belle2::VxdID id) const;
 
@@ -120,7 +120,7 @@ namespace Belle2 {
       /// of DB objects to keep the hierarchy up-to-date.
       void setupReconstructionTransformations();
 
-      /// Covenient function to convert G4Transform3D to TGeoHMatrix
+      /// Convenient function to convert G4Transform3D to TGeoHMatrix
       static TGeoHMatrix g4Transform3DToTGeo(const G4Transform3D& g4);
 
       /// Convert 6 rigid body params (alignment corrections) to corresponding TGeoHMatrix
@@ -129,16 +129,11 @@ namespace Belle2 {
 
       // --------------------------------------------------------------------------------------------------
 
-      /** Return a reference to the SensorInfo of a given SensorID.
-       * This function is a shorthand for GeoCache::getInstance().getSensorInfo
-       */
-      static const SensorInfoBase& get(Belle2::VxdID id) { return getInstance().getSensorInfo(id); }
-
       /** Return a reference to the singleton instance */
       static GeoCache& getInstance();
 
       /** Return a raw pointer to a GeoTools object.
-       * @return const GeoTools* : raw pointer, no onwership transfer
+       * @return const GeoTools* : raw pointer, no ownership transfer
        */
       const GeoTools* getGeoTools()
       {

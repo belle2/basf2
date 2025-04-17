@@ -265,6 +265,6 @@ def dry_run_steering_file(SteeringFile):
         stderr = proc.stderr.decode("utf-8")
 
         raise RuntimeError(
-            f"An error occured while dry-running steering file {SteeringFile}\n"
+            f"An error occurred while dry-running steering file {SteeringFile}\n"
             f"Script output:\n{stdout}\n{stderr}"
         )

@@ -28,7 +28,7 @@ namespace Belle2 {
 
 
     /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: cm */
-    /** TODO: a straight line exception is thrown and not catched (at least here) in calcCircleCenter */
+    /** TODO: a straight line exception is thrown and not caught (at least here) in calcCircleCenter */
     static double value(const PointType& outerHit, const PointType& outerCenterHit, const PointType& innerCenterHit,
                         const PointType& innerHit)
     {

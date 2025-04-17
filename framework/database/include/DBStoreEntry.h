@@ -53,7 +53,7 @@ namespace Belle2 {
     };
     /** Construct a new DBStoreEntry
      * @param type store entry type
-     * @param name name of the payload, ususally the class name of the payload
+     * @param name name of the payload, usually the class name of the payload
      *        but can be any string identifying the payload in the database
      * @param objClass TClass* pointer of the payload, used to check that we
      *        actually obtained the correct payload from the database
@@ -67,7 +67,7 @@ namespace Belle2 {
      * directly. The constructor arguments type, objClass and isArray will be
      * filled correctly by looking at obj
      *
-     * @param name name of the payload, ususally the class name of the payload
+     * @param name name of the payload, usually the class name of the payload
      *        but can be any string identifying the payload in the database
      * @param obj instance of an object representing the correct type
      * @param isRequired if false don't emit errors if the payload cannot be found for any run
@@ -88,7 +88,7 @@ namespace Belle2 {
     const std::string& getName() const { return m_name; }
     /** get the globaltag name (or testing payloads path) from which the payload is picked. */
     const std::string& getGlobaltag() const { return m_globaltag; }
-    /** get the revision of the payload, this is an abitrary number which
+    /** get the revision of the payload, this is an arbitrary number which
      * indicates the conditions version */
     unsigned int getRevision() const { return m_revision; }
     /** get the validity of the payload */
@@ -143,7 +143,7 @@ namespace Belle2 {
     void loadPayload(const EventMetaData& event);
     /** update the payload object according to the new event information.
      * If the payload has no intra run dependency this does nothing, otherwise
-     * it will load the appropirate object for the given event and call the
+     * it will load the appropriate object for the given event and call the
      * update notifications on changes to the object.
      */
     void updateObject(const EventMetaData& event);

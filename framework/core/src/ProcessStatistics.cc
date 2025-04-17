@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <fstream>
 
 using namespace std;
 using namespace Belle2;
@@ -162,6 +163,15 @@ void ProcessStatistics::appendUnmergedModules(const ProcessStatistics* otherObje
   }
 }
 
+void ProcessStatistics::write_csv(const char* filename) const
+{
+  std::ofstream output(filename);
+  m_global.csv_header(output);
+  for (auto stats : m_stats) {
+    stats.csv(output);
+  }
+  m_global.csv(output);
+}
 
 void ProcessStatistics::merge(const Mergeable* other)
 {

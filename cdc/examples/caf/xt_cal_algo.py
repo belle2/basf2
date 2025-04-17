@@ -23,7 +23,7 @@ b2.use_local_database("/home/belle/muchida/basf2/release/cdc/examples/caf/localD
 algo = Belle2.CDC.XTCalibrationAlgorithm()
 algo.setInputFileNames(['rootfile/*/CollectorOutput.root'])
 
-# Ture, f you set IOV for whole exp and runs.
+# True, f you set IOV for whole exp and runs.
 # iov = Belle2.IntervalOfValidity.always()
 # print("Result of calibration =", algo.execute([], 0, iov))
 print("Result of calibration =", algo.execute())

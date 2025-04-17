@@ -26,7 +26,7 @@ namespace Belle2 {
     : public TRGCDCHoughTransformation {
 
   public:
-    /// Contructor.
+    /// Constructor.
     explicit TRGCDCHoughTransformationCircle(const std::string& name);
 
     /// Destructor

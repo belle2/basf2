@@ -104,7 +104,7 @@ namespace Belle2 {
       double m_esum; /**< total energy deposited in a volume by a track */
 
       std::vector<hit_t> m_hits; /**< array of hits*/
-      std::vector<int> m_cells; /**< array of hitted crystals */
+      std::vector<int> m_cells; /**< array of hit crystals */
       StoreArray<ECLHit> m_eclHits;  /**< ECLHit array */
     };
 

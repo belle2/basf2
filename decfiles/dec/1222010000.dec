@@ -1,0 +1,36 @@
+# EventType: 1222010000
+# Descriptor: [B+ -> K+ X_1(3872) [-> rho0 [-> pi+ pi-] J/psi [-> l+ l-]]]
+# NickName: Bu_KX_1(3872)_rho0Jpsi_pipill
+# Documentation:
+# Tested: Yes
+# Physics WG: Quarkonium WG
+# Responsible: Eunji Jang
+# Email: jej6744@gnu.ac.kr
+# Cuts: None
+# Date: 20250119
+# Comments:
+Alias rho0sig   rho0
+
+Decay Upsilon(4S)
+0.50  B+sig   B-   VSS;
+0.50  B+   B-sig   VSS;
+Enddecay
+
+Decay B+sig
+1.00  X_1(3872)sig  K+  SVS;
+Enddecay
+CDecay B-sig
+
+Decay X_1(3872)sig
+1.00  J/psisig  rho0sig  PHSP;
+Enddecay
+
+Decay rho0sig
+1.00  pi+     pi-     VSS;
+Enddecay
+
+Decay J/psisig
+0.50  mu+    mu-    PHOTOS VLL;
+0.50  e+     e-     PHOTOS VLL;	
+Enddecay
+End

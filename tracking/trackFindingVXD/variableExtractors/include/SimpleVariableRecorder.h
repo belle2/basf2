@@ -34,7 +34,7 @@ namespace Belle2 {
      *  create the underlying TTree and add let the given function setup branches.
      *
      *  @param setBranches    Function invoked with the underlying TTree as argument
-     *                        which is supposed create Branches and provide the value adresses.
+     *                        which is supposed create Branches and provide the value addresses.
      *  @param rootFileName   Name of ROOT file to which should be written.
      *  @param treeName       Name of the TTree in the ROOT file.
      */
@@ -66,7 +66,7 @@ namespace Belle2 {
      *  Construct the Recorder opening the given ROOT file and
      *  create the underlying TTree and add let the given function setup branches.
      *
-     *  @param namedVariables  Vector of collected named varibles to be turned into Branches in a TTree
+     *  @param namedVariables  Vector of collected named variables to be turned into Branches in a TTree
      *  @param fileName   Name of ROOT file to which should be written.
      *  @param treeName       Name of the TTree in the ROOT file.
      */
@@ -103,7 +103,7 @@ namespace Belle2 {
     SimpleVariableRecorder& operator=(SimpleVariableRecorder&) = delete;
 
 
-    /// Record varibles by filling the TTree
+    /// Record variables by filling the TTree
     void record() { m_tTree->get().Fill();}
 
     /// Write out TFile to root file

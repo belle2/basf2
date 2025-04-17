@@ -97,7 +97,7 @@ OffOriginExtension::roadSearch(const std::vector<const CDCWireHit*>& wireHits)
 std::vector<const CDCWireHit*>
 OffOriginExtension::getHitsWRTtoRefPos(const Vector2D& refPos, float curv, float theta)
 {
-  float thetaPrecision = 3.1415 / (pow(2., m_levelPrecision + 1));
+  float thetaPrecision = M_PI / (pow(2., m_levelPrecision + 1));
   float curvPrecision = 0.15 / (pow(2., m_levelPrecision));
 
   using YSpan = AxialHitQuadTreeProcessor::YSpan;

@@ -118,7 +118,7 @@ namespace Belle2 {
       {
         if (m_timeWindowUpperEdge_smallCell  - m_timeWindowLowerEdge_smallCell  <= 0 ||
             m_timeWindowUpperEdge_normalCell - m_timeWindowLowerEdge_normalCell <= 0) {
-          B2FATAL("invalid seting of CDC time window");
+          B2FATAL("invalid setting of CDC time window");
         }
       }
       /**

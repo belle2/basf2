@@ -21,7 +21,7 @@ namespace Belle2 {
      * Constructor to access an object in the DBStore.
      * @param name Name under which the object is stored in the database (and DBStore).
      * @param required If false don't emit an error if the payload cannot be found.
-     *     If the same payload is requested in different places then all occurences need to specify false
+     *     If the same payload is requested in different places then all occurrences need to specify false
      *     here to suppress any payload error messages.
      */
     explicit DBObjPtr(const std::string& name = "", bool required = true):

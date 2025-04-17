@@ -19,7 +19,7 @@ namespace Belle2 {
     class CDCRLWireHitTriple;
 
     /**
-     *  Filter for the constuction of good facets investigating the feasability
+     *  Filter for the construction of good facets investigating the feasibility
      *  of the right left passage hypotheses combination.
      *  If the given combination cannot be made by a track reject it.
      */
@@ -30,7 +30,7 @@ namespace Belle2 {
       using Super = BaseFacetFilter;
 
     public:
-      /// Constructor taking a flag if boarderline feasable cases should be excluded.
+      /// Constructor taking a flag if borderline feasible cases should be excluded.
       explicit FeasibleRLFacetFilter(bool hardRLCut = true);
 
     public:
@@ -45,13 +45,13 @@ namespace Belle2 {
       Weight operator()(const CDCFacet& facet) final;
 
     public:
-      /// Setter for the flag that the boarderline cases should be excluded.
+      /// Setter for the flag that the borderline cases should be excluded.
       void setHardRLCut(bool hardRLCut)
       {
         m_param_hardRLCut = hardRLCut;
       }
 
-      /// Getter for the flag that the boarderline cases should be excluded.
+      /// Getter for the flag that the borderline cases should be excluded.
       bool getHardRLCut() const
       {
         return m_param_hardRLCut;

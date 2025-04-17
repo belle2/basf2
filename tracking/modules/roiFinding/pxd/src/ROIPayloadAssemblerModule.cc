@@ -39,10 +39,10 @@ ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
   addParam("ROIpayloadName", m_ROIpayloadName, "name of the payload of ROIs", std::string(""));
   addParam("SendAllDownscaler", mSendAllDS,
-           "Send all Data (no selection) downscaler; Workaround for missing ONSEN functionality, 0 never set, 1 alway set, 2 set in every second...",
+           "Send all Data (no selection) downscaler; Workaround for missing ONSEN functionality, 0 never set, 1 always set, 2 set in every second...",
            9u);
   addParam("SendROIsDownscaler", mSendROIsDS,
-           "Send ROIs downscaler; Workaround for missing ONSEN functionality, 0 never set, 1 alway set, 2 set in every second...", 3u);
+           "Send ROIs downscaler; Workaround for missing ONSEN functionality, 0 never set, 1 always set, 2 set in every second...", 3u);
   addParam("CutNrROIs", mCutNrROIs,
            "If Nr of ROIs per DHHID reach this, send out only one full sensor ROI", 32u);
   addParam("AcceptAll", mAcceptAll, "Accept all, Ignore HLT decision", false);
@@ -55,7 +55,7 @@ void ROIPayloadAssemblerModule::initialize()
   m_ROIList.isOptional(m_ROIListName);
 
   m_roiPayloads.registerInDataStore(
-    m_ROIpayloadName); // DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered will not work with two modules in seperate path branches
+    m_ROIpayloadName); // DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered will not work with two modules in separate path branches
 
   // in case we don't accept all events, we have to look
   // up the trigger decision

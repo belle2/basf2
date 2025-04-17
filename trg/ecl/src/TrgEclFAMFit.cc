@@ -424,6 +424,9 @@ TrgEclFAMFit::save(int m_nEvent)
   //---------------
   int hitNum = 0;
 
+  // adjust TC timing (ns) to T=0 ns
+  double tc_timing_correction = -15;
+
   for (int iTCIdm = 0; iTCIdm < 576;  iTCIdm++) {
     const int hitsize = TCFitEnergy[iTCIdm].size();
     for (int iHit = 0; iHit < hitsize; iHit++) {
@@ -433,7 +436,7 @@ TrgEclFAMFit::save(int m_nEvent)
       TrgEclHitArray[hitNum]->setEventId(m_nEvent);
       TrgEclHitArray[hitNum]->setTCId(iTCIdm + 1);
       TrgEclHitArray[hitNum]->setEnergyDep(TCFitEnergy[iTCIdm][iHit]);
-      TrgEclHitArray[hitNum]->setTimeAve(TCFitTiming[iTCIdm][iHit]);
+      TrgEclHitArray[hitNum]->setTimeAve(TCFitTiming[iTCIdm][iHit] + tc_timing_correction);
       if (_BeamBkgTag == 1) {
         TrgEclHitArray[hitNum]->setBeamBkgTag(BeamBkgTag[iTCIdm][iHit]);
       }
@@ -461,7 +464,7 @@ TrgEclFAMFit::save(int m_nEvent)
         double ene_d = (double) ene_i0 * p_ene2adc /  100000;
         TrgEclAnaArray[hitNum]->setFitEnergy(ene_d);
 
-        TrgEclAnaArray[hitNum]->setFitTiming(TCFitTiming[iTCIdm][iHit]);
+        TrgEclAnaArray[hitNum]->setFitTiming(TCFitTiming[iTCIdm][iHit] + tc_timing_correction);
         TrgEclAnaArray[hitNum]->setBeamBkgTag(BeamBkgTag[iTCIdm][iHit]);
       }
     }

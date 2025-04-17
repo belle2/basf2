@@ -251,7 +251,7 @@ class StatisticsViewer(IPythonWidget):
 
 class ProcessViewer:
     """
-    A widget to summarize all the infromation from different processes.
+    A widget to summarize all the information from different processes.
     Must be filled with the widgets of the single processes
     """
 

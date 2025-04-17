@@ -80,7 +80,7 @@ void CDCPackerModule::beginRun()
 int CDCPackerModule::getFEEID(int copper_id, int slot_id)
 {
   //
-  // The releation between COPPER ID and FEE ID depends on
+  // The relation between COPPER ID and FEE ID depends on
   // cable connection, which has not been finalized yet. ( 2015.6.16 )
   //
 

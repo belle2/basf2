@@ -43,7 +43,7 @@ class EdgeLayer(nn.Module):
     Args:
         nfeat_in_dim (int): Node features input dimension (number of node features in input).
         efeat_in_dim (int): Edge features input dimension (number of edge features in input).
-        gfeat_in_dim (int): Gloabl features input dimension (number of global features in input).
+        gfeat_in_dim (int): Global features input dimension (number of global features in input).
         efeat_hid_dim (int): Edge features dimension in hidden layers.
         efeat_out_dim (int): Edge features output dimension.
         num_hid_layers (int): Number of hidden layers.
@@ -155,7 +155,7 @@ class NodeLayer(nn.Module):
     Args:
         nfeat_in_dim (int): Node features input dimension (number of node features in input).
         efeat_in_dim (int): Edge features input dimension (number of edge features in input).
-        gfeat_in_dim (int): Gloabl features input dimension (number of global features in input).
+        gfeat_in_dim (int): Global features input dimension (number of global features in input).
         nfeat_hid_dim (int): Node features dimension in hidden layers.
         nfeat_out_dim (int): Node features output dimension.
         num_hid_layers (int): Number of hidden layers.
@@ -273,7 +273,7 @@ class GlobalLayer(nn.Module):
     Args:
         nfeat_in_dim (int): Node features input dimension (number of node features in input).
         efeat_in_dim (int): Edge features input dimension (number of edge features in input).
-        gfeat_in_dim (int): Gloabl features input dimension (number of global features in input).
+        gfeat_in_dim (int): Global features input dimension (number of global features in input).
         nfeat_hid_dim (int): Global features dimension in hidden layers.
         nfeat_out_dim (int): Global features output dimension.
         num_hid_layers (int): Number of hidden layers.

@@ -72,7 +72,7 @@ namespace Belle2 {
       /// Indicates if the given number corresponds to the logical superlayer of the column inside the CDC.
       static bool isInnerVolume(ISuperLayer iSuperLayer);
 
-      /// Indicates if the given number corresponds to the logical superlayer of the volumn outside the CDC.
+      /// Indicates if the given number corresponds to the logical superlayer of the volume outside the CDC.
       static bool isOuterVolume(ISuperLayer iSuperLayer);
 
       /// Returns if the super layer with the given id is axial

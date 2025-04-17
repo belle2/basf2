@@ -25,7 +25,7 @@ namespace Belle2 {
     struct DetectPropertyImpl<ToVoid<AToPredicate<Ts...>>, AToPredicate, Ts...> : std::true_type {};
 
     /**
-     *  Detection idiom checking whether the given template type instatiates well with the given types.
+     *  Detection idiom checking whether the given template type instantiates well with the given types.
      *
      *  Checks whether the ToPredicate results in a valid type.
      *  It can be used to detect whether a given type (or a list of types) supports

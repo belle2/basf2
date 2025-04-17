@@ -195,8 +195,8 @@ void ReattachCDCWireHitsToRecoTracksModule::addHits()
                     << "ADC of the background hit: " << hitToAdd.getHit()->getADCCount() << std::endl
                     << "TOT of the background hit: " << hitToAdd.getHit()->getTOT() << std::endl
                     << "Distance from track to hit: " << results.distanceToTrack << std::endl
-                    << "Previous arc lenght of the hit: " << previousArcLength[&hitToAdd] << std::endl
-                    << "Current arc lenght of the hit: " << currentArcLength[&hitToAdd] << std::endl);
+                    << "Previous arc length of the hit: " << previousArcLength[&hitToAdd] << std::endl
+                    << "Current arc length of the hit: " << currentArcLength[&hitToAdd] << std::endl);
 
             if ((previousArcLength[&hitToAdd] > 0) and (currentArcLength[&hitToAdd] < 0)) { // Hit needs to be added here.
 

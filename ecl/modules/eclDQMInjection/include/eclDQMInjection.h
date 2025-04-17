@@ -64,7 +64,7 @@ namespace Belle2 {
       StoreArray<RawFTSW> m_rawTTD;
       /** Input array for ECL Raw Hits. */
       StoreArray<ECLDigit> m_storeHits;
-      /** Input array for ECL burst suppresions. */
+      /** Input array for ECL burst suppressions. */
       StoreArray<ECLTrig> m_ECLTrigs;
       /** Input array for ECL waveform data */
       StoreArray<ECLDsp> m_ECLDsps;

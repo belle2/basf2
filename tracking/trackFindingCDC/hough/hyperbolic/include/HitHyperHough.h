@@ -18,7 +18,7 @@ namespace Belle2 {
     /**
      * Hough Tree for finding StereoHits using CDCRecoHit3D as the item type.
      * This implementation uses the HitInHyperBox decision algorithm with 4, 3, and 2 divisions of each axis for each step.
-     * Precision is driven by the frist axis.
+     * Precision is driven by the first axis.
      * This class is only an alias. The real algorithm can be found in OtherSimpleBoxDivisionHoughTree and HitInHyperBox algorithm.
      */
     using HitHyperHough =

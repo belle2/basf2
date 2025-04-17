@@ -59,7 +59,7 @@ namespace Belle2 {
     unsigned getMergerIDfromSN(unsigned mergerSN) const;
 
     /**
-     * Get serial number of marger from its ID
+     * Get serial number of merger from its ID
      * @param mergerID merger ID number
      * @return mergerSN merger serial number
      */
@@ -75,7 +75,7 @@ namespace Belle2 {
     void addMapping(unsigned moduleID, unsigned mergerID, unsigned febSlot, unsigned mergerSN);
 
     /**
-     * Pring mapping
+     * Print mapping
      */
     void print() const;
 

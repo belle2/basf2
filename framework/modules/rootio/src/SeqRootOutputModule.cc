@@ -31,7 +31,7 @@ REG_MODULE(SeqRootOutput);
 SeqRootOutputModule::SeqRootOutputModule() : Module(), m_nevt(0), m_streamer(nullptr), m_size(0), m_size2(0)
 {
   //Set module properties
-  setDescription("Save a sequential ROOT file (non-standard I/O format used in DAQ). See https://confluence.desy.de/display/BI/Software+PersistencyModules for further information and a comparison with the .root format.");
+  setDescription("Save a sequential ROOT file (non-standard I/O format used in DAQ). See https://xwiki.desy.de/xwiki/rest/p/401e7 for further information and a comparison with the .root format.");
   m_file = nullptr;
   m_msghandler = nullptr;
   m_streamerinfo = nullptr;
@@ -43,7 +43,7 @@ SeqRootOutputModule::SeqRootOutputModule() : Module(), m_nevt(0), m_streamer(nul
            "Output file name. Add a .gz suffix to save a gzip-compressed file. Parameter can be overridden using the -o argument to basf2.",
            string("SeqRootOutput.sroot"));
   addParam("compressionLevel", m_compressionLevel,
-           "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticable effect. NOTE: Because of a ROOT bug ( https://sft.its.cern.ch/jira/browse/ROOT-4550 ), this option currently causes memory leaks and is disabled.",
+           "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticeable effect. NOTE: Because of a ROOT bug ( https://sft.its.cern.ch/jira/browse/ROOT-4550 ), this option currently causes memory leaks and is disabled.",
            0);
   addParam("saveObjs", m_saveObjs, "List of objects/arrays to be saved", emptyvector);
   addParam("fileNameIsPattern", m_fileNameIsPattern, "If true interpret the output filename as a boost::format pattern "

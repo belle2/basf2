@@ -14,7 +14,6 @@
 #include <boost/iostreams/filter/gzip.hpp>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
   namespace CDC {

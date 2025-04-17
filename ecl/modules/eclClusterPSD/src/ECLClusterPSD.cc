@@ -71,8 +71,9 @@ void ECLClusterPSDModule::initializeMVAweightFile(const std::string& identifier,
 void ECLClusterPSDModule::initialize()
 {
   // ECL dataobjects
-  m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
+  m_eclShowers.isRequired(eclShowerArrayName());
+  m_eclCalDigits.isRequired(eclCalDigitArrayName());
+  m_eclShowers.requireRelationTo(m_eclCalDigits);
   initializeMVAweightFile(m_MVAidentifier, m_weightfile_representation);
 }
 

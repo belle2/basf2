@@ -36,7 +36,7 @@ namespace Belle2 {
     /// Constructor for adding the subfindlets
     DATCONFPGAFindlet();
 
-    /// Default desctructor
+    /// Default destructor
     ~DATCONFPGAFindlet();
 
     /// Expose the parameters of the sub findlets.

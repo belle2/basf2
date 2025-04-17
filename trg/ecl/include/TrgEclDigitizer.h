@@ -27,7 +27,7 @@ namespace Belle2 {
     virtual ~TrgEclDigitizer();
 
     /** setup fam module  */
-    void setup();
+    void setup(int);
     /** get TC Hits from Xtal hits */
     void getTCHit(int);
     /** fit method,    digi with 125ns interval */

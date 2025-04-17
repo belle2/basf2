@@ -14,7 +14,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Filter for the constuction of axial to stereo segment pairs based on MC information.
+    /// Filter for the construction of axial to stereo segment pairs based on MC information.
     class MCSegmentPairFilter : public MCSymmetric<BaseSegmentPairFilter> {
 
     private:

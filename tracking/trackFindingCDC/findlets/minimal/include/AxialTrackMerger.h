@@ -78,8 +78,8 @@ namespace Belle2 {
 
       /**
        *  Function to merge two track candidates.
-       *  The hits of track2 are deleted and transfered to track1 and the track1 is resorted.
-       *  The method also applys some postprocessing and splits the track1 in case it appears
+       *  The hits of track2 are deleted and transferred to track1 and the track1 is resorted.
+       *  The method also applies some post processing and splits the track1 in case it appears
        *  to contain two back-to-back arms,
        */
       static void mergeTracks(CDCTrack& track1,

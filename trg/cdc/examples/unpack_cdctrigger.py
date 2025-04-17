@@ -42,7 +42,7 @@ if unpack_CDCHit:
 
 unpacker = b2.register_module('CDCTriggerUnpacker')
 unpacker.logging.log_level = b2.LogLevel.DEBUG
-# increase this value to get debug mesages in more detail
+# increase this value to get debug messages in more detail
 unpacker.logging.debug_level = 10
 unpacker.logging.set_info(b2.LogLevel.DEBUG, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
 # size (number of words) of the Belle2Link header

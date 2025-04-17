@@ -82,7 +82,7 @@ SectorMapComparer::fillSectorToTreeIndexMap(TTree* tree, std::unordered_map<std:
 {
   // the branchnames which store the sectorIDs
   std::vector<std::string> bNames = {"innerFullSecID", "centerFullSecID", "outerFullSecID"};
-  std::vector<uint> bVals = {0, 0, 0}; // lets hope there is no inner sector id 0! But need to be 0 here as later no check for existance in the map for segments, so default value is used.
+  std::vector<uint> bVals = {0, 0, 0}; // lets hope there is no inner sector id 0! But need to be 0 here as later no check for existence in the map for segments, so default value is used.
 
   for (uint i = 0; i < bNames.size(); i++) {
     TLeaf* l = tree->GetLeaf(bNames[i].c_str());
@@ -207,7 +207,7 @@ SectorMapComparer::compareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
     // NOTE: in case unmatchedEntries==true the values in the the second tree do not make any sense, so not fill any histograms with them
     for (TObject* o : *leafList) {
       TString leafName = o->GetName();
-      // TODO: find a better way to destinguish the secid leaves from the others
+      // TODO: find a better way to distinguish the secid leaves from the others
       if (leafName.Contains("FullSecID")) continue;
       m_histo_map_first[ leafName.Data() ].Fill(vals_t_first[leafName.Data()]);
       if (!unmatchedEntries) {

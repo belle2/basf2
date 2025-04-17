@@ -148,7 +148,10 @@ Warning:
 }
 
 
-StorageRootOutputModule::~StorageRootOutputModule() = default;
+StorageRootOutputModule::~StorageRootOutputModule()
+{
+  delete m_outputFileMetaData;
+}
 
 void StorageRootOutputModule::initialize()
 {
@@ -201,6 +204,7 @@ void StorageRootOutputModule::endRun() {
     while (m_file) closeFile(); // I hope that this will not be failed
     m_fileIndex = 0;
   }
+  m_runno++;
 }
 
 void StorageRootOutputModule::openFile()

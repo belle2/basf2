@@ -35,7 +35,7 @@ namespace Belle2 {
 
     /** Destructor */
     virtual ~TRGECLFAMModule();
-    /** Initilizes TRGECLFAMModule. */
+    /** Initializes TRGECLFAMModule. */
     virtual void initialize() override;
     /** Called when new run started.*/
     virtual void beginRun() override;
@@ -70,10 +70,9 @@ namespace Belle2 {
     int _FADC;
     /** Use Condition DB*/
     int _ConditionDB;
-
-
-
-
+    /** Set source of TC data (1:=ECLHit or 2:=ECLSimHit or 3:=ECLHit+TRGECLBGTCHit) */
+    /** ("1:=ECLHit" is used for signal w/o bkg, and real time background monitor) */
+    int m_SourceOfTC;
 
     /** Config. file name. */
     std::string _configFilename;

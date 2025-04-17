@@ -69,7 +69,7 @@ namespace Belle2 {
       /// Short description of the findlet
       std::string getDescription() override
       {
-        return "Swaps an interal vector of " + m_classMnemomicDescription + "s to the DataStore";
+        return "Swaps an internal vector of " + m_classMnemomicDescription + "s to the DataStore";
       }
 
       /// Receive signal before the start of the event processing
@@ -81,14 +81,14 @@ namespace Belle2 {
       }
 
       /// Loads the items from the DataStore
-      void apply(std::vector<IOType*>& output) final {
+      void apply(std::vector<IOType*>& output) final
+      {
         // Swap items to the DataStore
         StoreArray<IOType> storeArray(m_param_storeArrayName);
 
         output.reserve(output.size() + storeArray.getEntries());
 
-        for (auto& item : storeArray)
-        {
+        for (auto& item : storeArray) {
           // cppcheck-suppress useStlAlgorithm
           output.push_back(&item);
         }

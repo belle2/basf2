@@ -19,6 +19,7 @@
 #include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
   namespace TrackFindingCDC {
     /**
      *  Generic class that generates some named float values from a given object.
@@ -56,7 +57,7 @@ namespace Belle2 {
 
       /**
        *  Getter for the named references to the individual variables
-       *  Base implementaton returns empty vector
+       *  Base implementation returns empty vector
        *  @param prefix: Name prefix to apply to all variable names.
        *  @return: in base implementation always an empty vector
        */

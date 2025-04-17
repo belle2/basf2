@@ -39,7 +39,7 @@ XTCalibration::XTCalibration()
 {
   /*
    setDescription(
-    " -------------------------- Test Calibration Algoritm -------------------------\n"
+    " -------------------------- Test Calibration Algorithm -------------------------\n"
     "                                                                               \n"
     "  Testing algorithm which just gets mean of a test histogram collected by      \n"
   0    "  CaTest module and provides a DB object with another histogram with one       \n"
@@ -176,7 +176,7 @@ void XTCalibration::readProfile()
     proxt >> m_nalpha;
     B2DEBUG(99, "Number of alpha bin" << m_nalpha);
     if (m_nalpha > m_MAXalpha) {
-      B2FATAL("number of  alpha bin excess limit; please increse uplimit: " << m_nalpha << " > " << m_MAXalpha);
+      B2FATAL("number of  alpha bin excess limit; please increase uplimit: " << m_nalpha << " > " << m_MAXalpha);
     }
     for (int i = 0; i < m_nalpha; ++i) {
       proxt >> dumy1 >> dumy2 >> dumy3;
@@ -186,7 +186,7 @@ void XTCalibration::readProfile()
     }
     proxt >> m_ntheta;
     B2DEBUG(99, "Number of theta bin" << m_nalpha);
-    if (m_ntheta > m_MAXtheta) {B2FATAL("number of  theta bin excess limit; please increse uplimit: " << m_ntheta << " > " << m_MAXtheta);}
+    if (m_ntheta > m_MAXtheta) {B2FATAL("number of  theta bin excess limit; please increase uplimit: " << m_ntheta << " > " << m_MAXtheta);}
     for (int i = 0; i < m_ntheta; ++i) {
       proxt >> dumy1 >> dumy2 >> dumy3;
       l_theta[i] = dumy1;
@@ -194,7 +194,7 @@ void XTCalibration::readProfile()
       itheta[i] = dumy3;
     }
   }
-  B2INFO("Finish asssign XT bining");
+  B2INFO("Finish assign XT bining");
 }
 
 bool XTCalibration::calibrate()

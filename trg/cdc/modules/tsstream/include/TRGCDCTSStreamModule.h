@@ -30,7 +30,7 @@ namespace Belle2 {
     /// Destructor
     virtual ~TRGCDCTSStreamModule();
 
-    /// Initilizes TRGCDCTSStreamModule.
+    /// Initializes TRGCDCTSStreamModule.
     virtual void initialize() override;
 
     /// Called when new run started.

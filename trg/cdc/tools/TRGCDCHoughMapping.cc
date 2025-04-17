@@ -181,7 +181,7 @@ superLayer(const unsigned id)
   ofstream outputfM(vhM);
   ofstream outputfP(vhP);
 
-  //generate firware code(Minus)
+  //generate firmware code(Minus)
   outputfM << "library IEEE;" << endl;
   outputfM << "use IEEE.STD_LOGIC_1164.ALL;" << endl;
   outputfM << " " << endl;

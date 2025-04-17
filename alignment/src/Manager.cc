@@ -139,7 +139,7 @@ namespace Belle2 {
       }
 
       //TODO: this is now probably redundant. If time-dependence is not set, constraints coefficients will
-      // be just overriden...
+      // be just overridden...
       if (m_globalVector->hasBeenChangedInDB(getAlignmentHierarchy().getUsedDBObjUniqueIDs(), false)) {
         lorentzHierarchyChanged = true;
       }

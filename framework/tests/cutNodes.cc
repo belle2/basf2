@@ -764,7 +764,7 @@ namespace {
     node = NodeFactory::compile_boolean_node<MockVariableManager>(bRelTuple);
     EXPECT_FALSE(node->check(nullptr));
 
-    // Note: almostEqualDouble does not work if one input is exactely 0.0
+    // Note: almostEqualDouble does not work if one input is exactly 0.0
     //       and the other input is almost equal to 0.0
     child1 = py::make_tuple(static_cast<int>(NodeType::DoubleNode), 0.0);
     child2 = py::make_tuple(static_cast<int>(NodeType::IntegerNode), 0);
@@ -866,7 +866,7 @@ namespace {
     // Uses almostEqualDouble and should evaluate to false
     EXPECT_FALSE(node->check(nullptr));
 
-    // Note: almostEqualDouble does not work if one input is exactely 0.0
+    // Note: almostEqualDouble does not work if one input is exactly 0.0
     //       and the other input is almost equal to 0.0
     child1 = py::make_tuple(static_cast<int>(NodeType::DoubleNode), 0.0);
     child2 = py::make_tuple(static_cast<int>(NodeType::BooleanNode), false);

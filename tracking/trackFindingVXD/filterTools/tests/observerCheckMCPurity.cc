@@ -32,7 +32,7 @@ namespace ObserverCheckMCPurityTests {
   /** tests initialize and terminate */
   TEST_F(ObserverCheckMCPurityTest, TestInitializeAndTerminate)
   {
-    // accessable instance of the observer:
+    // accessible instance of the observer:
     ObserverCheckMCPurity testObserver = ObserverCheckMCPurity();
 
 /// check the initializer:
@@ -82,7 +82,7 @@ namespace ObserverCheckMCPurityTests {
 // // //     // SelectionVariable to be used for the test (needed since the Filter has no getter for that):
 // // //     CircleRadius<SpacePoint> cRadius = CircleRadius<SpacePoint>();
 // // //
-// // //     // accessable instance of the observer:
+// // //     // accessible instance of the observer:
 // // //     ObserverCheckMCPurity testObserver = ObserverCheckMCPurity();
 // // //     testObserver.initialize< CircleRadius<SpacePoint>, ClosedRange<double, double>>(CircleRadius<SpacePoint>(),
 // // //         ClosedRange<double, double>(), nullptr);

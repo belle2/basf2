@@ -110,7 +110,7 @@ if __name__ == "__main__":
         "test_noext": "test_noext.f00000.root",
         # any other extension: replace
         "test_otherext.foo": "test_otherext.f00000.root",
-        # but keep paremeters or anchors in urls untouched. TFile::Open ignores
+        # but keep parameters or anchors in urls untouched. TFile::Open ignores
         # them for file:// urls but they are printed on the command line
         "file://test_param?foo=bar": "test_param.f00000.root",
         "file://test_anchor#foo": "test_anchor.f00000.root",

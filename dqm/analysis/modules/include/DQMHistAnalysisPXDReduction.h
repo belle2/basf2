@@ -69,7 +69,7 @@ namespace Belle2 {
     double m_meanUpperWarn{NAN};
     //! high error limit for alarm
     double m_meanUpperAlarm{NAN};
-    /** Update entry intervall */
+    /** Update entry interval */
     int m_minEntries = 1000;
     /** Indizes of excluded PXD Modules */
     std::vector<int> m_excluded;

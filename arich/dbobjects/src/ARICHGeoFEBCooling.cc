@@ -8,10 +8,7 @@
 
 //basf2
 #include <arich/dbobjects/ARICHGeoFEBCooling.h>
-#include <arich/dbobjects/tessellatedSolidStr.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <math.h>
 #include <iostream>
 #include <iomanip>
 

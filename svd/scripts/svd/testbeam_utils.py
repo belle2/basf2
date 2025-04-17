@@ -45,7 +45,7 @@ def add_geometry(
         excluded_components += ['MagneticField']
         additonal_components += ['MagneticFieldConstant']
 
-    # Add gearbox, additonally override field value if set
+    # Add gearbox, additionally override field value if set
     if field_override is not None:
         path.add_module('Gearbox',
                         fileName=geometry_xml,
@@ -120,7 +120,7 @@ def add_reconstruction(
     if mc:
         path.add_module('TrackFinderMCTruthRecoTracks')
     else:
-        if(vxdtf2):
+        if (vxdtf2):
             add_vxdtf_v2(path,
                          magnet_on=magnet,
                          filter_overlapping=True,

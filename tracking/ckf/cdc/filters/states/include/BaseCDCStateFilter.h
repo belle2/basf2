@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 

@@ -48,7 +48,7 @@ class SetModuleParameters(unittest.TestCase):
                 self.assertEqual(p.values, params[p.name])
 
     def check_unset(self, module):
-        """Check that all parameters of a given module are not set explicitely"""
+        """Check that all parameters of a given module are not set explicitly"""
         for p in module.available_params():
             self.assertFalse(p.setInSteering)
 

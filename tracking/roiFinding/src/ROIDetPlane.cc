@@ -87,6 +87,6 @@ bool ROIDetPlane::isSensorInRange(const ROOT::Math::XYZVector& trackPosition, in
     return false;
   }
 
-  // fullfilled all conditions
+  // fulfilled all conditions
   return true;
 }

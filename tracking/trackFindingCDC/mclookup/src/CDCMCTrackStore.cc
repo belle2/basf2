@@ -67,10 +67,10 @@ void CDCMCTrackStore::fill(const CDCMCMap* ptrMCMap, const CDCSimHitLookUp* ptrS
   // Assign the reverse mapping from CDCHits to position in track
   fillInTrackId();
 
-  // Assigne the reverse mapping from CDCHits to segment ids
+  // Assigns the reverse mapping from CDCHits to segment ids
   fillInTrackSegmentId();
 
-  // Assigne the reverse mapping from CDCHits to the number of already traversed superlayers
+  // Assigns the reverse mapping from CDCHits to the number of already traversed superlayers
   fillNLoopsAndNPassedSuperLayers();
 
   B2DEBUG(28, "m_mcTracksByMCParticleIdx.size(): " << m_mcTracksByMCParticleIdx.size());

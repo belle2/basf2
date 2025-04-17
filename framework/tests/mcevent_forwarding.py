@@ -17,7 +17,7 @@ import json
 
 
 def check_mc_events(outfile, expect):
-    """Check if the number of MC events reported by the file metadata is what whe expect"""
+    """Check if the number of MC events reported by the file metadata is what we expect"""
     try:
         metadata = subprocess.check_output(["b2file-metadata-show", "--json", outfile])
         mcEvents = json.loads(metadata)["mcEvents"]
@@ -40,7 +40,7 @@ def run_rootio(outfile, infiles, expect, *, N=0, **input_kwargs):
     Arguments:
         outfile (str): filename for the output
         infiles (list): list of input filenames
-        expect (int): numer of MC events we expect in the final file
+        expect (int): number of MC events we expect in the final file
         N (int): pass to process() as second argument to limit the number of events
 
     All other arguments are passed to RootInput as module parameters

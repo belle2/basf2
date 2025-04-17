@@ -14,7 +14,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <mva/interface/Interface.h>
 
@@ -68,10 +67,10 @@ void MVAExpertModule::initialize()
 
   if (m_listNames.empty()) {
     StoreObjPtr<EventExtraInfo> extraInfo("", DataStore::c_Event);
-    extraInfo.registerInDataStore();
+    extraInfo.isRequired();
   } else {
     StoreObjPtr<ParticleExtraInfoMap> extraInfo("", DataStore::c_Event);
-    extraInfo.registerInDataStore();
+    extraInfo.isRequired();
   }
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {

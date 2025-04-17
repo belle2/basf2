@@ -19,7 +19,7 @@
 import basf2
 from ROOT import Belle2
 
-import tracking
+from tracking import add_tracking_reconstruction
 from tracking.harvest.peelers import peel_mc_particle, peel_reco_track_hit_content
 
 from tracking.harvest.harvesting import HarvestingModule
@@ -107,7 +107,7 @@ def run():
     path.add_module("Gearbox")
 
     # Add the tracking reconstruction and store the fitted RecoTracks elsewhere
-    tracking.add_tracking_reconstruction(path, prune_temporary_tracks=False, components=["SVD", "CDC"])
+    add_tracking_reconstruction(path, prune_temporary_tracks=False, components=["SVD", "CDC"])
     path.add_module("FittedTracksStorer", inputRecoTracksStoreArrayName="RecoTracks",
                     outputRecoTracksStoreArrayName="FittedRecoTracks")
 

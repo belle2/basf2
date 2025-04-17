@@ -13,6 +13,9 @@
 #include <TH2F.h>
 #include <TProfile.h>
 
+#include <TH2Poly.h>
+#include <TMath.h>
+
 namespace Belle2 {
 
   /** class to summarize SVD quantities per sensor and side*/
@@ -77,8 +80,7 @@ namespace Belle2 {
       int ladder = vxdID.getLadderNumber();
       int sensor = vxdID.getSensorNumber();
 
-      int bin = m_histos[view]->FindBin(ladder, findBinY(layer, sensor));
-      return getHistogram(view)->GetBinContent(bin);
+      return getValue(layer, ladder, sensor, view);
     }
 
     /** get the value contained in the corresponding bin, given
@@ -114,7 +116,7 @@ namespace Belle2 {
       int ladder = vxdID.getLadderNumber();
       int sensor = vxdID.getSensorNumber();
 
-      getHistogram(view)->Fill(ladder, findBinY(layer, sensor), value);
+      fill(layer, ladder, sensor, view, value);
     }
 
     /** set run ids in title
@@ -157,7 +159,7 @@ namespace Belle2 {
       int ladder = vxdID.getLadderNumber();
       int sensor = vxdID.getSensorNumber();
 
-      getHistogram(view)->Fill(ladder, findBinY(layer, sensor), value);
+      fill(layer, ladder, sensor, view, value);
     }
 
     /** replaces layer ladder sensor view and apv with the current numbers*/
@@ -167,6 +169,73 @@ namespace Belle2 {
       base = std::regex_replace(base, std::regex("[@]view"), view);
       std::string side = isU ? "P" : "N" ;
       base = std::regex_replace(base, std::regex("[@]side"), side);
+    }
+
+    /** set histogram minimum
+     * @param value
+     */
+    void setMinimum(Int_t value = 0)
+    {
+      for (int view = VIndex ; view < UIndex + 1; view++)
+        getHistogram(view)->SetMinimum(value);
+    }
+
+    /** set histogram maximum
+     * @param value
+     */
+    void setMaximum(Int_t value = 0)
+    {
+      for (int view = VIndex ; view < UIndex + 1; view++)
+        getHistogram(view)->SetMaximum(value);
+    }
+
+    /** Create the TH2Poly version of the plot
+     */
+    TH2Poly* getPoly(int view, int min = -1111, int max = -1111) //-1111 set the minimum depending on the content
+    {
+      TH2F* histogram = getHistogram(view);
+      TString name = histogram->GetName();
+      TString title = histogram->GetTitle();
+
+      double xLow = -210.;
+      double xHigh = 210.;
+      double yLow = -210.;
+      double yHigh = 210.;
+
+      if (m_polyHistos[view] == NULL) {
+        m_polyHistos[view] = new TH2Poly(name + "_poly", title, xLow, xHigh, yLow, yHigh);
+        generateHistogramBins(m_polyHistos[view]);
+        m_polyHistos[view]->GetXaxis()->SetTitle("x");
+        m_polyHistos[view]->GetXaxis()->SetLabelSize(0);
+        m_polyHistos[view]->GetXaxis()->SetTickLength(0);
+        m_polyHistos[view]->GetXaxis()->SetTitleOffset(0.5);
+
+        m_polyHistos[view]->GetYaxis()->SetTitle("y");
+        m_polyHistos[view]->GetYaxis()->SetLabelSize(0);
+        m_polyHistos[view]->GetYaxis()->SetTickLength(0);
+        m_polyHistos[view]->GetYaxis()->SetTitleOffset(0.5);
+      }
+
+      m_polyHistos[view]->SetName(name + "poly");
+      m_polyHistos[view]->SetTitle(title);
+
+      m_polyHistos[view]->SetMinimum(min);
+      m_polyHistos[view]->SetMaximum(max);
+
+      const double nLadders[4] = {7, 10, 12, 16}; // per layer
+      const double nSensors[4] = {2, 3, 4, 5}; // per ladder
+
+      for (int layer = 0; layer < 4; layer++) {
+        for (int ladder = 1; ladder < nLadders[layer] + 1; ladder++) {
+          for (int sensor = 1; sensor < nSensors[layer] + 1; sensor++) {
+            double value = getValue(layer + 3, ladder, sensor, view);
+            int bin = findBinPoly(layer + 3, ladder, sensor);
+            m_polyHistos[view]->SetBinContent(bin, value);
+          }
+        }
+      }
+
+      return m_polyHistos[view];
     }
 
     /** delete pointers*/
@@ -196,6 +265,8 @@ namespace Belle2 {
     }
 
     TH2F* m_histos[2]; /**< vector containing the U and V histograms*/
+
+    TH2Poly* m_polyHistos[2] = {nullptr}; /**< vector containing the U and V poly-histograms*/
 
     TH2F* m_defaultHistogram = nullptr; /**< default histograms*/
 
@@ -237,8 +308,72 @@ namespace Belle2 {
 
     }
 
+    /** generate histogram bins */
+    void generateHistogramBins(TH2Poly* histogram)
+    {
+      // parameters
+      const double rLayer[4] = {40, 70, 110, 160}; // arbitrary units. True radii are {39, 80, 104, 135}; // mm
+      const double nLadders[4] = {7, 10, 12, 16}; // per layer
+      const double nSensors[4] = {2, 3, 4, 5}; // per ladder
+      const double inclination[4] = {-17, -5, -13, -12}; // de.g. Layer inclination with respect to the x-axis
+      const double delta[4] = {9, 8, 8, 8}; // arbitrary units. Width of the bins for each sensor
 
-    ClassDef(SVDSummaryPlots, 2);  /**< needed by root */
+      double pi = TMath::Pi();
+
+      for (int layer = 0; layer < 4; layer ++) {
+        for (int ladder = 1; ladder <= nLadders[layer]; ladder++) {
+          for (int sensor = 1; sensor <= nSensors[layer]; sensor++) {
+            double r = rLayer[layer] + (delta[layer]) * (sensor - 1); //position of the layer + position of the sensor
+            double phi = 2 * pi / nLadders[layer]; // angle for each sensor (step)
+            double dphiThisPoint = (ladder - 1) * phi - phi / 2 + inclination[layer] * pi /
+                                   180.; // position of the edge of the sensor (ladder-1 to start from zero)
+            double dphiNextPoint = dphiThisPoint + phi; // position of the next edge of the sensor
+            // bin coordinates
+            double xr0 = r * TMath::Cos(dphiThisPoint);
+            double xr1 = (r + delta[layer]) * TMath::Cos(dphiThisPoint);
+            double xr2 = (r + delta[layer]) * TMath::Cos(dphiNextPoint);
+            double xr3 = r * TMath::Cos(dphiNextPoint);
+            double yr0 = r * TMath::Sin(dphiThisPoint);
+            double yr1 = (r + delta[layer]) * TMath::Sin(dphiThisPoint);
+            double yr2 = (r + delta[layer]) * TMath::Sin(dphiNextPoint);
+            double yr3 = r * TMath::Sin(dphiNextPoint);
+            // add bin to the histogram
+            double xbin[4] = {xr0, xr1, xr2, xr3};
+            double ybin[4] = {yr0, yr1, yr2, yr3};
+            histogram->AddBin(4, xbin, ybin);
+            // resetting bin coordinates
+            for (int k = 0; k < 4; k++) {
+              xbin[k] = 0.;
+              ybin[k] = 0.;
+            }
+          }
+        }
+      }
+    }
+
+    /** find the poly-bin given the layer, ladder and sensor number */
+    Int_t findBinPoly(Int_t layer, Int_t ladder, Int_t sensor)
+    {
+      const int initBinPerLayer[4] = {1, 15, 45, 93};
+
+      const double nLadders[4] = {7, 10, 12, 16}; // per layer
+      const double nSensors[4] = {2, 3, 4, 5}; // per ladder
+
+      int bin = initBinPerLayer[layer - 3];
+
+      for (int ld = 1; ld <= nLadders[layer - 3]; ld++) {
+        bool binFound = false;
+        for (int s = 1; s <= nSensors[layer - 3]; s++) {
+          if (ld == ladder && s == sensor) binFound = true;
+          if (binFound) break;
+          bin += 1;
+        }
+        if (binFound) break;
+      }
+      return bin;
+    }
+
+    ClassDef(SVDSummaryPlots, 3);  /**< needed by root */
   };
 
 

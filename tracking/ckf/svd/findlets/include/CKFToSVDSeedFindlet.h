@@ -48,7 +48,7 @@ namespace Belle2 {
     /// Constructor, for setting module description and parameters.
     CKFToSVDSeedFindlet();
 
-    /// Default desctructor
+    /// Default destructor
     ~CKFToSVDSeedFindlet();
 
     /// Expose the parameters (also of the sub findlets).

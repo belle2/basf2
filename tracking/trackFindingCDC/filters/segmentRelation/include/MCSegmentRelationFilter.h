@@ -15,7 +15,7 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    /// Filter for the constuction of segment relations based on MC information.
+    /// Filter for the construction of segment relations based on MC information.
     class MCSegmentRelationFilter : public MCSymmetric<BaseSegmentRelationFilter> {
 
     private:

@@ -9,14 +9,14 @@
 ##########################################################################
 
 """\
-This program is inteded to merge a set of basf2 output files and to make them
+This program is intended to merge a set of basf2 output files and to make them
 look like one run of mixed data. The events from the different files will be
 added together by picking a random input file for each event. All events will be
 added exactly once and the relative order of events from the same input file
 will be the same but they will be mixed between files.
 
 The EventMetaData of the events will be modified so that the output file will
-have continously numbered events starting at 1 (or at --start-event=N). The
+have continuously numbered events starting at 1 (or at --start-event=N). The
 experiment and run number will be set to the same value for all events and can
 be chosen using the --exp/--run parameter. In contrast, with --keep-eventinfo the
 original event and run numbers will be kept. This can lead to duplicate event
@@ -40,11 +40,6 @@ import argparse
 import random
 import time
 from collections import defaultdict
-from ROOT import PyConfig
-# why does ROOT try to parse the comman line arguments? *sigh*
-PyConfig.IgnoreCommandLineOptions = True
-PyConfig.StartGuiThread = False
-import ROOT
 
 
 def create_argumentparser():
@@ -63,9 +58,18 @@ def create_argumentparser():
     parser.add_argument("--seed", type=str, default=None,
                         help="Random seed to use for shuffling, can be used to "
                         "reproduce the event order from a previous run")
-    parser.add_argument("--start-event", type=int, default=1, help="Event number of the first event in the final file. Other events will be numbered sequentially")
-    parser.add_argument("--globaltags", type=str, default=None, help="Globaltags to put in the final file. If not given the globaltags from the first input file will be used.")
-    parser.add_argument("-n", "--output-events", type=int, default=None, help="Limit the events in the output file to be maximum this value")
+    parser.add_argument(
+        "--start-event",
+        type=int,
+        default=1,
+        help="Event number of the first event in the final file. Other events will be numbered sequentially")
+    parser.add_argument(
+        "--globaltags",
+        type=str,
+        default=None,
+        help="Globaltags to put in the final file. If not given the globaltags from the first input file will be used.")
+    parser.add_argument("-n", "--output-events", type=int, default=None,
+                        help="Limit the events in the output file to be maximum this value")
     parser.add_argument("--exclude", type=str, default=[], action="append",
                         help="Branch names to exclude from the output file")
     parser.add_argument("--keep-eventinfo", default=False, action="store_true",
@@ -76,6 +80,7 @@ def create_argumentparser():
 def open_rootfile(filename):
     """Open a basf2 output root file and return a tuple (event_tree,
     FileMetaData, TFile) if everything is ok, None if there was any error"""
+    import ROOT
     try:
         tfile = ROOT.TFile.Open(filename)
         if not tfile or tfile.IsZombie():
@@ -89,7 +94,7 @@ def open_rootfile(filename):
         persistent.GetEntry(0)
         try:
             filemeta = getattr(persistent, "FileMetaData")
-        except AttributeError as e:
+        except AttributeError:
             raise Exception("Cannot find FileMetaData")
     except Exception as e:
         basf2.B2ERROR(f"{filename}: {e}")
@@ -107,7 +112,7 @@ def sort_by_entryindex(indexlist):
     """Sort the file,entry list by entries but keep the order of file indices
     the same. Just make sure we read the events in order from their respective files"""
     event_indices = defaultdict(list)
-    for fileindex, entry  in indexlist:
+    for fileindex, entry in indexlist:
         event_indices[fileindex].append(entry)
 
     for entries in event_indices.values():
@@ -117,10 +122,6 @@ def sort_by_entryindex(indexlist):
 
 
 if __name__ == "__main__":
-    # load the framework_io library because it contains helper functions to fill the
-    # FileMetaData
-    ROOT.gSystem.Load('libframework_io')
-    ROOT.gROOT.LoadMacro(basf2.find_file("include/framework/io/RootIOUtilities.h"))
 
     parser = create_argumentparser()
     args = parser.parse_args()
@@ -129,6 +130,12 @@ if __name__ == "__main__":
 
     if args.seed is not None:
         basf2.set_random_seed(args.seed)
+
+    # load the framework_io library because it contains helper functions to fill the
+    # FileMetaData
+    import ROOT  # noqa
+    ROOT.gSystem.Load('libframework_io')
+    ROOT.gROOT.LoadMacro(basf2.find_file("include/framework/io/RootIOUtilities.h"))
 
     # open all input files
     inputfiles = [open_rootfile(e) for e in args.inputfile]
@@ -152,7 +159,8 @@ if __name__ == "__main__":
 
     basf2.B2INFO(f"Found a total of {len(indexlist)} events in {len(inputevents)} files, shuffling ...")
     # make sure events are randomized.
-    random.shuffle(indexlist, ROOT.gRandom.Rndm)
+    random.seed(str(basf2.get_random_seed()))
+    random.shuffle(indexlist)
 
     if args.output_events is not None and args.output_events < len(indexlist):
         indexlist = indexlist[:args.output_events]
@@ -199,7 +207,9 @@ if __name__ == "__main__":
         if (curr_time-last_time) > 2 and evt >= 10:
             elapsed = curr_time - start
             eta = (elapsed/evt)*(total_events-evt)
-            basf2.B2INFO(f"{evt:{total_events_len}d}/{total_events} events done ({100 * evt / total_events:5.2f}%), approx {eta:.0f} seconds remaining")
+            basf2.B2INFO(
+                f"{evt:{total_events_len}d}/{total_events} events done "
+                f"({100 * evt / total_events:5.2f}%), approx {eta:.0f} seconds remaining")
             last_time = curr_time
 
     low = (9999, 9999, 99999)
@@ -265,7 +275,7 @@ if __name__ == "__main__":
     total_mcevents = 0
     for index, (events, meta, tfile) in enumerate(inputfiles):
         total_mcevents += meta.getMcEvents()
-        # make it a bit easer to fine the input files again by adding them to
+        # make it a bit easier to fine the input files again by adding them to
         # the data description. Also add the number of events
         filemeta.setDataDescription(f"inputfile_{index}_lfn", meta.getLfn())
         filemeta.setDataDescription(f"inputfile_{index}_events", str(meta.getNEvents()))

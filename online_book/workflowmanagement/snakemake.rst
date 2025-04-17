@@ -16,7 +16,7 @@ snakemake
     **Questions**:
 
     * How do I implement my analysis in a snakemake workflow?
-    * How do I automatize job submission and job steering on remote computing resources?
+    * How do I automate job submission and job steering on remote computing resources?
 
     **Objectives**:
 
@@ -25,7 +25,7 @@ snakemake
 
 `Snakemake <https://snakemake.readthedocs.io/en/v3.11.1/index.html>`_ is a workflow management framework designed for uses in research, with extensive support for environment management and remote execution. It features a very simple Python-based syntax and accommodates shell commands and external scripts in multiple programming languages with minimal adaptations. A full guide can be found elsewhere.
 
-Let us reproduce the full Belle II workflow that we dicussed for :ref:`onlinebook_workflowmanagement_b2luigi`.
+Let us reproduce the full Belle II workflow that we discussed for :ref:`onlinebook_workflowmanagement_b2luigi`.
 
 Again, we submit four skims (two for B mesons and two for quark-antiquark continuum) to the grid, which are each reconstructed in three batches on the KEKcc batch system. The reconstructed batches are merged and finally we fill some histograms in the offline analysis.
 

@@ -72,7 +72,7 @@ namespace Belle2 {
     /** map of histograms to be filled once per roi */
     std::unordered_multimap<Belle2::VxdID, ROIHistoAndFill, std::function<size_t (const Belle2::VxdID&)> > hROIDictionary;
 
-    /** struct: histograms to be filled once per event + filling fucntion + accumulate function*/
+    /** struct: histograms to be filled once per event + filling function + accumulate function*/
     struct ROIHistoAccumulateAndFill {
       TH1* hPtr;  /**< histogram pointer */
       std::function< void (const ROIid*, double&) > accumulate;   /**< accumulate function*/

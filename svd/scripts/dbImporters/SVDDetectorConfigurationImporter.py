@@ -14,7 +14,6 @@ Script to the configuration parameters, Local and Global, into a local DB
 """
 
 import basf2 as b2
-from ROOT.Belle2 import SVDDetectorConfigurationImporter
 import sys
 import argparse
 from termcolor import colored
@@ -27,7 +26,7 @@ parser.add_argument('--cfgXML', metavar='config xml', dest='calib', type=str, na
 
 print('')
 
-if(str(sys.argv[1]) == "help"):
+if (str(sys.argv[1]) == "help"):
     parser.print_help()
     exit(1)
 
@@ -86,6 +85,9 @@ class configImporterToDBModule(b2.Module):
 
     def beginRun(self):
         '''begin run'''
+        # avoid top level ROOT imports
+        from ROOT import Belle2  # noqa: make Belle2 namespace available
+        from ROOT.Belle2 import SVDDetectorConfigurationImporter
 
         # call the importer class
         configImporterToDB = SVDDetectorConfigurationImporter(experiment, run, experiment, -1)
@@ -104,4 +106,4 @@ main.add_module(configImporterToDBModule())
 
 b2.process(main)
 
-print("IMPORT COMPLETED, check the localDB folder and then proceeed with the upload to the central DB")
+print("IMPORT COMPLETED, check the localDB folder and then proceed with the upload to the central DB")

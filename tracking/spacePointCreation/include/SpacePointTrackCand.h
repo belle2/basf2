@@ -45,7 +45,7 @@ namespace Belle2 {
     /**
      * Exception thrown, when trying to access SpacePoints by their index inside of SpacePointTrackCand, but index is out of bounds
      */
-    BELLE2_DEFINE_EXCEPTION(SPTCIndexOutOfBounds, "Trying to acces a SpacePoint from a SpacePointTrackCand via an"\
+    BELLE2_DEFINE_EXCEPTION(SPTCIndexOutOfBounds, "Trying to access a SpacePoint from a SpacePointTrackCand via an"\
                             " index that is out of bounds!");
 
     /**
@@ -85,7 +85,7 @@ namespace Belle2 {
 
     /** Empty constructor with default values, including it to be active.
      *
-     *  Sets pdg code to zero to make it  possible to determine, whether a particle hyptohesis has been asigned
+     *  Sets pdg code to zero to make it  possible to determine, whether a particle hyptohesis has been assigned
      *  to the track candidate or not.MCTrackID is initialized to -1. <br>
      *  Each SPTC is created in c_isActive-state and has to be deactivated manually, if need be.
      */
@@ -128,7 +128,7 @@ namespace Belle2 {
 
     /**
      * get hits (SpacePoints) in range (indices of SpacePoint inside SpacePointTrackCand)
-     * including first index and excluding last index (the SpacePoint on firstInd but not the one on lastIndex wil be returned!).
+     * including first index and excluding last index (the SpacePoint on firstInd but not the one on lastIndex will be returned!).
      * NOTE: For all hits range is from 0 to getNHits(). throws an exception when trying to access hits outside the allowed range!
      */
     const std::vector<const Belle2::SpacePoint*> getHitsInRange(int firstInd, int lastInd) const;
@@ -191,7 +191,7 @@ namespace Belle2 {
     int getMcTrackId() const { return m_MCTrackID; }
 
     /**
-     * Return the refere status code of the SpacePointTrackCand.
+     * Return the referee status code of the SpacePointTrackCand.
      * @param bitmask is an optional bitmask that is compared to the referee status of the SpacePointTrackCand
      */
     unsigned short int getRefereeStatus(unsigned short int bitmask = USHRT_MAX) const { return m_refereeStatus & bitmask; }
@@ -259,7 +259,7 @@ namespace Belle2 {
 
     /**
      * get the refereeStatus as a string (easier to read than an unsigned short int)
-     * @param delimiter delimiter to be put inbetween the individual strings, defaults to whitespace (1 character)
+     * @param delimiter delimiter to be put in between the individual strings, defaults to white space (1 character)
      * NOTE: mainly for easier readability of debug output!
      */
     std::string getRefereeStatusString(std::string delimiter = " ") const;
@@ -346,6 +346,16 @@ namespace Belle2 {
 
   protected:
     /**
+     * global momentum plus position state (seed) vector
+     */
+    TVectorD m_state6D = TVectorD(6);
+
+    /**
+     * global momentum plus position state (seed) covariance matrix
+     */
+    TMatrixDSym m_cov6D = TMatrixDSym(6);
+
+    /**
      * pointers to SpacePoints in the datastore
      */
     std::vector<const SpacePoint*> m_trackSpacePoints;
@@ -355,11 +365,18 @@ namespace Belle2 {
      */
     std::vector<double> m_sortingParameters;
 
+    /**
+     * charge of the particle in units of elementary charge
+     */
+    double m_q = 0;
 
     /**
-     * identifier for tracks that share at least two SpacePoints.
-     */
-    short m_family = -1;
+     * An estimation for the quality of the track.
+     *
+     * Normally defined between 0-1 to describe the probability that this track is real(istic).
+     * The quality of the track has to be determined by another function or module.
+     * */
+    double m_qualityIndicator = 0.5;
 
     /**
      * PDG code of particle
@@ -372,26 +389,6 @@ namespace Belle2 {
     int m_MCTrackID = -1;
 
     /**
-     * global momentum plus position state (seed) vector
-     */
-    TVectorD m_state6D = TVectorD(6);
-
-    /**
-     * global momentum plus position state (seed) covariance matrix
-     */
-    TMatrixDSym m_cov6D = TMatrixDSym(6);
-
-    /**
-     * charge of the particle in units of elementary charge
-     */
-    double m_q = 0;
-
-    /**
-     * direction of flight. true is outgoing, false is ingoing
-     */
-    bool m_flightDirection = true;
-
-    /**
      * Index of TrackStub in a curling Track Candidate.
      * + If the TrackCandidate is not curling this value is set to 0.
      * + If it is not yet checked if the TrackCand is curling it is set to -1.
@@ -401,19 +398,21 @@ namespace Belle2 {
     int m_iTrackStub = -1;
 
     /**
+     * identifier for tracks that share at least two SpacePoints.
+     */
+    short m_family = -1;
+
+    /**
      * bit-field to indicate different properties that are checked by the referee module
      */
     unsigned short int m_refereeStatus = c_isActive;
 
     /**
-     * An estimation for the quality of the track.
-     *
-     * Normally defined between 0-1 to describe the propability that this track is real(istic).
-     * The quality of the track has to be determined by another function or module.
-     * */
-    double m_qualityIndicator = 0.5;
+     * direction of flight. true is outgoing, false is ingoing
+     */
+    bool m_flightDirection = true;
 
     // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2), m_qualityIndicator
-    ClassDef(SpacePointTrackCand, 10)
+    ClassDef(SpacePointTrackCand, 11)
   };
 }

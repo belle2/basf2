@@ -186,7 +186,7 @@ public:
   /// Changes integer to float value.
   static void changeReal(double& real, int integer, double minValue, double maxValue, int bitSize);
 
-  /// Finds maximum and minium values.
+  /// Finds maximum and minimum values.
   static void findExtreme(double& m_max, double& m_min, double value);
 };
 

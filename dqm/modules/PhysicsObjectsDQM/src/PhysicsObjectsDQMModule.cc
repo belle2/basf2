@@ -210,12 +210,12 @@ void PhysicsObjectsDQMModule::event()
 
       //variables for hadronb2 tight
       StoreObjPtr<ParticleList> hadpiParticles(m_hadbphysDQM);
-      std::vector<ROOT::Math::XYZVector> m_pionHadv3;
+      std::vector<ROOT::Math::PxPyPzEVector> m_pionHad;
       double EsumPiHad = 0.;
       for (unsigned int i = 0; i < hadpiParticles->getListSize(); i++) {
         const Particle* parPiHad = hadpiParticles->getParticle(i);
         ROOT::Math::PxPyPzEVector V4PiHad = PCmsLabTransform::labToCms(parPiHad->get4Vector());
-        m_pionHadv3.push_back(parPiHad->getMomentum());
+        m_pionHad.push_back(V4PiHad);
         EsumPiHad += V4PiHad.E();
       }
       //EnECLClustersLE
@@ -238,7 +238,7 @@ void PhysicsObjectsDQMModule::event()
       }
       double visibleEnergyCMSnorm = (EsumPiHad + EsumGamma) / (Belle2::SoftwareTrigger::BeamEnergyCMS() * 2.0);
       double EsumCMSnorm = eneclClusters / (Belle2::SoftwareTrigger::BeamEnergyCMS() * 2.0);
-      FoxWolfram fw(m_pionHadv3);
+      FoxWolfram fw(m_pionHad);
       fw.calculateBasicMoments();
       double R2 = fw.getR(2);
       bool hadronb_tag = visibleEnergyCMSnorm > 0.4 && EsumCMSnorm > 0.2 && R2 < 0.2;

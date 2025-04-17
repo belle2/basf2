@@ -43,15 +43,14 @@ MCMatcherParticlesModule::MCMatcherParticlesModule() : Module()
                  "particles while the normal algorithm finds the common mother of all daughters.\n"
                  "The results of loose mc matching algorithm are stored to the following extraInfo\n"
                  "items:\n\n"
-                 " - looseMCMotherPDG: PDG code of most common mother\n"
-                 " - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother\n"
-                 " - looseMCWrongDaughterN: number of daughters that don't originate from the most\n"
-                 "                          common mother\n"
-                 " - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't originate from\n"
-                 "                            the most common mother \n"
-                 "                            (only if looseMCWrongDaughterN = 1)\n"
-                 " - looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background\n"
-                 "                            Particle\n\n");
+                 "- looseMCMotherPDG: PDG code of most common mother\n"
+                 "- looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother\n"
+                 "- looseMCWrongDaughterN: number of daughters that don't originate from the most"
+                 "  common mother\n"
+                 "- looseMCWrongDaughterPDG: PDG code of the daughter that doesn't originate from\n"
+                 "  the most common mother (only if looseMCWrongDaughterN = 1)\n"
+                 "- looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background\n"
+                 "  Particle");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 

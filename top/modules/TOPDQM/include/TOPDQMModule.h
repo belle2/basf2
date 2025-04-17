@@ -26,6 +26,7 @@
 #include <TH1D.h>
 #include <TH2F.h>
 #include <TProfile.h>
+#include <TProfile2D.h>
 
 // C++ headers.
 #include <string>
@@ -107,6 +108,15 @@ namespace Belle2 {
     TH1F* m_TOPEOccAfterInjLER = 0; /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
     TH1F* m_TOPEOccAfterInjHER = 0; /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
 
+    TProfile2D* m_nhitInjLER = 0; /**< average number of good digits (LER injection) */
+    TProfile2D* m_nhitInjHER = 0; /**< average number of good digits (HER injection) */
+    TProfile2D* m_nhitInjLERcut = 0; /**< average number of good digits after cut (LER injection) */
+    TProfile2D* m_nhitInjHERcut = 0; /**< average number of good digits after cut (HER injection) */
+    TH2F* m_eventInjLER = 0; /**< event distribution (LER injection) */
+    TH2F* m_eventInjHER = 0; /**< event distribution (HER injection) */
+    TH2F* m_eventInjLERcut = 0; /**< event distribution after cut (LER injection) */
+    TH2F* m_eventInjHERcut = 0; /**< event distribution after cut (HER injection) */
+
     std::vector<TH2F*> m_window_vs_asic; /**< Histograms window w.r.t reference vs. ASIC */
     std::vector<TH2F*> m_goodHitsXY; /**< Histograms (2D) for good hits in pixels */
     std::vector<TH2F*> m_badHitsXY; /**< Histograms (2D) for bad hits in pixels */
@@ -122,9 +132,10 @@ namespace Belle2 {
 
     // other
     int m_numModules = 0; /**< number of TOP modules */
+    double m_bunchTimeSep = 0; /**< bunch separation time */
 
     // dataobjects
-    StoreArray<RawFTSW> m_rawFTSW; /**< Input array for DAQ Status. */
+    StoreArray<RawFTSW> m_rawFTSWs; /**< Input array for DAQ Status. */
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch and event T0 */
     StoreArray<TOPTimeZero> m_timeZeros; /**< reconstructed event T0 in case of cosmics */

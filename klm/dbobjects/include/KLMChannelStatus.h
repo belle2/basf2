@@ -72,7 +72,7 @@ namespace Belle2 {
     void setChannelStatus(KLMChannelNumber channel, enum ChannelStatus status);
 
     /**
-     * Set staus for all channels.
+     * Set status for all channels.
      * @param[in] status Status.
      */
     void setStatusAllChannels(enum ChannelStatus status);

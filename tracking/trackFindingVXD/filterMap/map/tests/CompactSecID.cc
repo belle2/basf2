@@ -36,15 +36,15 @@ TEST(CompactSecIDs, basicCheck)
       counter ++;
     }
   }
-  // succesfully insert
+  // successfully insert
   EXPECT_EQ(sectors.size()*sectors[0].size(),
             compactSecIds.addSectors(uSup, vSup, sectors)) ;
 
-  // succesfully retrieve
+  // successfully retrieve
   EXPECT_EQ(1, compactSecIds.getCompactID(sectors[0][0]));
   EXPECT_EQ(2, compactSecIds.getCompactIDFastAndDangerous(sectors[0][1]));
 
-  // unsuccesfully retrieve
+  // successfully retrieve
   EXPECT_EQ(0, compactSecIds.getCompactID(FullSecID(VxdID(6, 3, 2), false, 1)));
   EXPECT_EQ(0, compactSecIds.getCompactID(FullSecID(VxdID(7, 3, 2), false, 1)));
   EXPECT_EQ(0, compactSecIds.getCompactID(FullSecID(VxdID(5, 3, 2), false, 1)));
@@ -88,7 +88,7 @@ TEST(CompactSecIDs, stressTest)
           }
         }
 
-        // succesfully insert
+        // Assert successful insertion
         EXPECT_EQ(sectors.size()*sectors[0].size(), compactSecIds.addSectors(uSup, vSup, sectors));
       }
 
@@ -105,7 +105,7 @@ TEST(CompactSecIDs, stressTest)
           }
         }
 
-        // un succesfully insert because the sectors are already in compactSecIds
+        // unsuccessful insertion because the sectors are already in compactSecIds
         EXPECT_EQ(0, compactSecIds.addSectors(uSup, vSup, sectors));
       }
 
@@ -118,7 +118,7 @@ TEST(CompactSecIDs, stressTest)
           FullSecID aSector(VxdID(layer, ladder, sensor),
                             sensor % 2 == 0 ? false : true
                             , sector);
-          // succesfully retrieve
+          // successful retrieve
           EXPECT_EQ(++ expected, compactSecIds.getCompactID(aSector));
 
         }
@@ -131,7 +131,7 @@ TEST(CompactSecIDs, stressTest)
     cout << endl;
   }
 
-  // the compactsecids dont throw exceptions anymore
+  // the compactsecids don't throw exceptions anymore
   /**
   for (double u = 1.e-6 ; u < 1.3; u += .25) {
     for (double v = 1.e-6; v < 1.3; v += .2) {

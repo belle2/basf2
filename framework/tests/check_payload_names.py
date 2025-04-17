@@ -11,7 +11,6 @@ Check if the database correctly returns the names of all the payloads used by th
 
 import basf2 as b2
 import b2test_utils as b2tu
-import ROOT.Belle2 as B2
 
 
 class CheckPayloadNames(b2.Module):
@@ -21,6 +20,7 @@ class CheckPayloadNames(b2.Module):
 
     def __init__(self):
         '''Constructor.'''
+        from ROOT import Belle2 as B2
         super().__init__()
         #: Payload names to be required
         self.payload_names = [
@@ -36,10 +36,11 @@ class CheckPayloadNames(b2.Module):
 
     def event(self):
         '''Event.'''
+        from ROOT import Belle2 as B2  # this is only run once
         payload_names = sorted(B2.Database.Instance().getAllDataNames())
         print('Set payloads:', self.payload_names)
         print('Got payloads:', payload_names)
-        assert(self.payload_names == payload_names)
+        assert (self.payload_names == payload_names)
 
 
 if __name__ == '__main__':

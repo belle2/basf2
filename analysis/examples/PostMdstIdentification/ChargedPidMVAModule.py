@@ -130,7 +130,7 @@ if __name__ == '__main__':
     # Add input.
     # ----------
 
-    ma.inputMdst(filename=basf2.find_file("mdst14.root", "validation"),
+    ma.inputMdst(filename=basf2.find_file("mdst16.root", "validation"),
                  path=path)
 
     # ---------------------------------------

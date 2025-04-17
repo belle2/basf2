@@ -269,9 +269,9 @@ void SVDPerformanceTTreeModule::event()
 
           const double res_U_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
           const ROOT::Math::XYZVector svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
-          const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
+          const VXD::SensorInfoBase& svdSensor_1 = geo.getSensorInfo(svd_id_1);
           const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-          double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X()); // maybe use svdGlobal_1.Phi()
+          double svdPhi_1 = svdGlobal_1.Phi();
           double svdZ_1 = svdGlobal_1.Z();
 
           m_svdFF = svd_1->getFirstFrame();
@@ -321,7 +321,7 @@ void SVDPerformanceTTreeModule::event()
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
             B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize << " cluster size");
 
-          //skip clusters created beacuse of missing APV
+          //skip clusters created because of missing APV
           if (m_svdSize < 128)
             for (unsigned int d = 0; d < m_svdSize; d++) {
 
@@ -347,9 +347,9 @@ void SVDPerformanceTTreeModule::event()
           const int strips_1 = svd_1->getSize();
           const double res_V_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
           const ROOT::Math::XYZVector svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
-          const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
+          const VXD::SensorInfoBase& svdSensor_1 = geo.getSensorInfo(svd_id_1);
           const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-          double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X());  // maybe use svdGlobal_1.Phi()
+          double svdPhi_1 = svdGlobal_1.Phi();
           double svdZ_1 = svdGlobal_1.Z();
 
           m_svdFF = svd_1->getFirstFrame();
@@ -399,7 +399,7 @@ void SVDPerformanceTTreeModule::event()
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
             B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize << " cluster size");
 
-          //skip clusters created beacuse of missing APV
+          //skip clusters created because of missing APV
           if (m_svdSize < 128)
             for (unsigned int d = 0; d < m_svdSize; d++) {
               SVDShaperDigit* ShaperDigit = theRecoDigits[d]->getRelated<SVDShaperDigit>();

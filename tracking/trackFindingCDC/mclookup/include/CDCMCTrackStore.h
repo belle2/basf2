@@ -68,7 +68,7 @@ namespace Belle2 {
       /// Construct the segments by dividing the mc tracks in to disconnected parts and sorted them for the FlightTime of the related CDCSimHits.
       void fillMCSegments();
 
-      /// Sorts the given track for the FlightTime of the assoziated CDCSimHits
+      /// Sorts the given track for the FlightTime of the associated CDCSimHits
       void arrangeMCTrack(CDCHitVector& mcTrack) const;
 
       /// Fill the look up table for the in track index of each hit
@@ -84,7 +84,7 @@ namespace Belle2 {
       /** The number of passed superlayers is easily detectable in a switch of the superlayer number form one segment to the next.
        *  An exception to this rule happens were particles are curling back exiting the super layer 0 and reentering the CDC super layer 0.
        *  There is no change of super layer number in this case since consecutive segments (only looking at the CDC) have the super layer number 0.
-       *  Since this case would screw the evaluation of segment pair or triple selection we have to treat it seperatly.
+       *  Since this case would screw the evaluation of segment pair or triple selection we have to treat it separately.
        */
       bool changedSuperLayer(const CDCHitVector& mcSegment, const CDCHitVector& nextMCSegment) const;
 
@@ -108,10 +108,10 @@ namespace Belle2 {
       /// Reference to the CDCSimHit look up for additional information about related primary sim hits
       const CDCSimHitLookUp* m_ptrSimHitLookUp;
 
-      /// The memory for the tracks made of CDCHits sorted for the time of flight and assoziated to the Monte Carlo particle id
+      /// The memory for the tracks made of CDCHits sorted for the time of flight and associated to the Monte Carlo particle id
       std::map<ITrackType, CDCHitVector> m_mcTracksByMCParticleIdx;
 
-      /// The memory for the segments made of CDCHits sorted for the time of flight and assoziated to the Monte Carlo particle id
+      /// The memory for the segments made of CDCHits sorted for the time of flight and associated to the Monte Carlo particle id
       std::map<ITrackType, std::vector<CDCHitVector> > m_mcSegmentsByMCParticleIdx;
 
       /// Look up table for index of the hit within its track

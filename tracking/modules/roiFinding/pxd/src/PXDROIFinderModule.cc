@@ -71,6 +71,9 @@ PXDROIFinderModule::PXDROIFinderModule() : Module(), m_ROIinfo()
   addParam("overrideDBROICalculation", m_overrideDBROICalculation,
            "Override the parameters from DB for testing or debugging. Required to be True to use the other ROI calculation parameters.",
            false);
+  addParam("ROIFindingForDQM", m_ROIFindingForDQM,
+           "Is this ROI finding for DQM? If false, create PXDIntercepts by extrapolating tracks in both directions. If true, only extrapolate backwards.",
+           m_ROIFindingForDQM);
 }
 
 
@@ -132,7 +135,8 @@ void PXDROIFinderModule::beginRun()
 
   m_thePXDInterceptor = new VXDInterceptor<PXDIntercept>(m_toleranceZ, m_tolerancePhi,
                                                          std::vector<float> {1.42854, 2.21218},
-                                                         VXD::SensorInfoBase::PXD);
+                                                         VXD::SensorInfoBase::PXD,
+                                                         m_ROIFindingForDQM);
   m_thePixelTranslator = new ROIToUnitTranslator<PXDIntercept>(&m_ROIinfo);
 
 }

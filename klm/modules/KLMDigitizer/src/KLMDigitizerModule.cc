@@ -25,6 +25,25 @@ using namespace Belle2;
 
 REG_MODULE(KLMDigitizer);
 
+/**
+ * Comparison of MCParticles by index.
+ */
+class CompareMCParticlesByIndex {
+
+public:
+
+  /**
+   * Compare MCParticles by index.
+   *
+   * @param[in] particle1 MC particle 1.
+   * @param[in] particle2 MC particle 2.
+   */
+  bool operator()(const MCParticle* particle1, const MCParticle* particle2) const
+  {
+    return particle1->getIndex() < particle2->getIndex();
+  }
+};
+
 KLMDigitizerModule::KLMDigitizerModule() :
   Module(),
   m_Time(&(KLMTime::Instance())),
@@ -152,7 +171,7 @@ bool KLMDigitizerModule::efficiencyCorrection(float efficiency)
 {
   if (std::isnan(efficiency))
     B2FATAL("Incomplete KLM efficiency data.");
-  double selection = gRandom->Rndm();
+  double selection = gRandom->Uniform();
   return (selection < efficiency);
 }
 
@@ -414,7 +433,13 @@ void KLMDigitizerModule::event()
       }
     }
     std::multimap<KLMPlaneNumber, const KLMSimHit*>::iterator it, it2;
-    std::multimap<const MCParticle*, const KLMSimHit*> particleHitMap;
+    /**
+     * Compare MCParticles by index to avoid memory layout dependence.
+     * For the default pointer comparison, it is introduced because of
+     * the different order of efficiencyCorrection() calls below.
+     */
+    std::multimap<const MCParticle*, const KLMSimHit*,
+        CompareMCParticlesByIndex> particleHitMap;
     std::multimap<const MCParticle*, const KLMSimHit*>::iterator
     itParticle, it2Particle;
     it = m_MapPlaneSimHit.begin();

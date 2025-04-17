@@ -23,7 +23,7 @@ namespace Belle2 {
 
   /**  This class implement some methods useful for the application of cuts
   *  evaluated in NoKickCutsEval module. Use and auxiliary class (NoKickCuts)
-  *  that cointains the cuts used in selection.
+  *  that contains the cuts used in selection.
   */
 
   class NoKickRTSel: public TObject {
@@ -34,23 +34,24 @@ namespace Belle2 {
     std::vector<hitXP> m_8hitTrack; /**< vector of selected hit */
     NoKickCuts m_trackCuts; /**< auxiliary member to apply the cuts */
     double m_pmax = 10.; /**< range analyzed with cuts */
-    int m_numberOfCuts; /**< number of catastrophic interaction for each track */
-    bool m_outputFlag; /**< true=produce validation output */
-
-    TFile* m_noKickOutputTFile; /**< validartion output TFile */
-    TH1F* m_momSel; /**< histogram of selected tracks */
-    TH1F* m_momCut; /**< histrogram of cutted tracks */
-    TH1F* m_momEff; /**< histogram for efficiency */
-    TH1F* m_PDGIDCut; /**< histogram for PDGID of cutted track */
-    TH1F* m_PDGIDSel; /**< histogram for PDGID of selected track */
-    TH1F* m_PDGIDEff; /**< histogram for efficiency for each PDGID */
-    TH1F* m_nCutHit; /**< histogram for number of cutted hist per track */
-    bool m_isCutted; /**< Indicator if cut is applied */
     double m_pMag; /**< momentum magnitut */
     double m_pt; /**< transverse momentum */
     double m_pdgID; /**< pdg Code */
-    int m_Ncuts; /**< number of times the cut is applied on a particle */
+
+    TFile* m_noKickOutputTFile; /**< validation output TFile */
     TTree* m_noKickTree; /**< TTree to which the information is written */
+    TH1F* m_momSel; /**< histogram of selected tracks */
+    TH1F* m_momCut; /**< histogram of cut tracks */
+    TH1F* m_momEff; /**< histogram for efficiency */
+    TH1F* m_PDGIDCut; /**< histogram for PDGID of cut track */
+    TH1F* m_PDGIDSel; /**< histogram for PDGID of selected track */
+    TH1F* m_PDGIDEff; /**< histogram for efficiency for each PDGID */
+    TH1F* m_nCutHit; /**< histogram for number of cut hist per track */
+
+    int m_numberOfCuts; /**< number of catastrophic interaction for each track */
+    int m_Ncuts; /**< number of times the cut is applied on a particle */
+    bool m_outputFlag; /**< true=produce validation output */
+    bool m_isCutted; /**< Indicator if cut is applied */
 
     /** Constructor with input file for use specific cuts file and allows validation */
     NoKickRTSel(const std::string& fileName, bool outputHisto) :
@@ -68,7 +69,7 @@ namespace Belle2 {
       initNoKickRTSel();
     }
 
-    /** Inizialize the class cleaning the member vectors */
+    /** Initialize the class cleaning the member vectors */
     void initNoKickRTSel()
     {
       m_hitXP.clear();
@@ -77,14 +78,14 @@ namespace Belle2 {
       m_numberOfCuts = 0;
     }
 
-    /**  this method build a vector of hitXP from a track. The ouput is the
+    /**  this method build a vector of hitXP from a track. The output is the
     *  member of the class.
     * input (one reconstructed track)
     */
     void hitXPBuilder(const RecoTrack& track);
 
-    /**  this metod build a vector of hitXP from a track selecting the first
-    *  hit on each layer of VXD (8 hit for SVD only, counting overlaps). The ouput
+    /**  this method build a vector of hitXP from a track selecting the first
+    *  hit on each layer of VXD (8 hit for SVD only, counting overlaps). The output
     *  is the member of the class.
     * input (one reconstructed track)
     */
@@ -92,7 +93,7 @@ namespace Belle2 {
 
 
     /**   This method return true if every segment (see segmentSelector) of the
-    **   input track respects the cuts contraints.
+    **   input track respects the cuts constraints.
     ** input (one reconstructed track)
     */
     bool trackSelector(const RecoTrack& track);
@@ -108,7 +109,7 @@ namespace Belle2 {
     */
     bool globalCut(const std::vector<hitXP>& track8);
 
-    /** This metod initialize some validation histograms of the Training Sample Selection.
+    /** This method initialize some validation histograms of the Training Sample Selection.
     * The input boolean allows the initialization, otherwise the method is empty (no validation)
     */
     void initHistoNoKick(bool outHisto)
@@ -144,6 +145,6 @@ namespace Belle2 {
     void produceHistoNoKick();
 
     /// Making this class a ROOT class
-    ClassDef(NoKickRTSel, 1);
+    ClassDef(NoKickRTSel, 2);
   };
 } /** end namespace Belle2 */

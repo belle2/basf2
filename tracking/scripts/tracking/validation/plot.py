@@ -37,7 +37,7 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
-#: A map from quanity name symbols to their usual units in Belle II standard units.
+#: A map from quantity name symbols to their usual units in Belle II standard units.
 units_by_quantity_name = {
     'x': 'cm',
     'y': 'cm',
@@ -355,7 +355,7 @@ class ValidationPlot:
                 self.ylabel = 'probability'
 
             min_y = 0
-            if(is_asymmetry):
+            if (is_asymmetry):
                 min_y = -1.05
             for histogram in self.histograms:
                 histogram.SetMinimum(min_y)
@@ -409,7 +409,7 @@ class ValidationPlot:
 
         # Trying to make the graph lines invisible
         color_index = 0  # white
-        # Transperent white
+        # Transparent white
         graph.SetLineColorAlpha(color_index, 0)
         graph.SetLineStyle(self.very_sparse_dots_line_style_index)
 
@@ -615,7 +615,7 @@ class ValidationPlot:
         return self
 
     def fit_gaus(self, z_score=None):
-        """Fit a gaus belle curve to the central portion of a one dimensional histogram
+        """Fit a Gaus bell curve to the central portion of a one dimensional histogram
 
         The fit is applied to the central mean +- z_score * std interval of the histogram,
         such that it is less influence by non gaussian tails further away than the given z score.
@@ -687,7 +687,7 @@ class ValidationPlot:
         Parameters
         ----------
         formula : str or TF1
-            Formula string or TH1 to be fitted. See TF1 constructurs for that is a valid formula
+            Formula string or TH1 to be fitted. See TF1 constructors for that is a valid formula
         options : str
            Options string to be used in the fit. See TH1::Fit()
         lower_bound : float
@@ -1264,7 +1264,7 @@ class ValidationPlot:
     def fill_into_tgrapherror(self, graph, xs, ys, filter=None):
         """fill point values and error of the x and y axis into the graph"""
 
-        assert(len(xs[0]) == len(ys[0]))
+        assert (len(xs[0]) == len(ys[0]))
         # set the overall amount of points
         graph.Set(len(xs[0]))
 
@@ -1689,7 +1689,7 @@ class ValidationPlot:
             Preset bin edges or preset number of desired bins.
             The default, None, means the bound should be extracted from data.
             The rice rule is used the determine the number of bins.
-            If a list of floats is given return them immediatly.
+            If a list of floats is given return them immediately.
         lower_bound : float or None, optional
             Preset lower bound of the binning range.
             The default, None, means the bound should be extracted from data.
@@ -1719,7 +1719,7 @@ class ValidationPlot:
             # Special value for the flat distribution binning
             n_bins = None
 
-        elif isinstance(bins, collections.Iterable):
+        elif isinstance(bins, collections.abc.Iterable):
             # Bins is considered as an array
             # Construct a float array forwardable to root.
             bin_edges = bins
@@ -1805,8 +1805,8 @@ class ValidationPlot:
         if lower_bound != upper_bound:
             if bins == "flat":
                 debug("Creating flat distribution binning")
-                precentiles = np.linspace(0.0, 100.0, n_bin_edges)
-                bin_edges = np.unique(np.nanpercentile(xs[(lower_bound <= xs) & (xs <= upper_bound)], precentiles))
+                percentiles = np.linspace(0.0, 100.0, n_bin_edges)
+                bin_edges = np.unique(np.nanpercentile(xs[(lower_bound <= xs) & (xs <= upper_bound)], percentiles))
             else:
                 # Correct the upper bound such that all values are strictly smaller than the upper bound
                 # Make one step in single precision in the positive direction
@@ -1848,7 +1848,7 @@ class ValidationPlot:
         and always include them in the range if it finds any.
         Exceptional values means exact values that appear often in the series for whatever reason.
         Possible reasons include
-        * Interal / default values
+        * Integral / default values
         * Failed evaluation conditions
         * etc.
         which should be not cropped away automatically if you are locking on the quality of your data.
@@ -1971,7 +1971,7 @@ class ValidationPlot:
         make_symmetric = False
         exclude_outliers = outlier_z_score is not None and (lower_bound is None or upper_bound is None)
 
-        # Look for exceptionally frequent values in the series, e.g. interal delta values like -999
+        # Look for exceptionally frequent values in the series, e.g. integral delta values like -999
         if include_exceptionals or exclude_outliers:
             exceptional_xs = self.get_exceptional_values(finite_xs)
             exceptional_indices = np.in1d(finite_xs, exceptional_xs)
@@ -1979,7 +1979,7 @@ class ValidationPlot:
         # Prepare for the estimation of outliers
         if exclude_outliers:
             if not np.all(exceptional_indices):
-                # Exclude excecptional values from the estimation to be unbiased
+                # Exclude exceptional values from the estimation to be unbiased
                 # even in case exceptional values fall into the central region near the mean
                 x_mean, x_std = self.get_robust_mean_and_std(finite_xs[~exceptional_indices])
             else:
@@ -2137,13 +2137,13 @@ class ValidationPlot:
         # Formula string looks like 0*[0]+0*[1]+0*[2]+...
         formula_string = '+'.join('0*[' + str(i) + ']' for i in range(len(additional_stats)))
 
-        # Compose a function that carries the addtional information
+        # Compose a function that carries the additional information
         additional_stats_tf1 = ROOT.TF1("Stats", formula_string, lower_bound, upper_bound)
 
         for (i, (label, value)) in enumerate(additional_stats.items()):
             # root 6 does not like labels with spaces ..
             # bug report:  https://sft.its.cern.ch/jira/browse/ROOT-7460
-            # therefor this workaround:
+            # therefore this workaround:
             label = label.replace(" ", "-")
             additional_stats_tf1.SetParName(i, label)
             additional_stats_tf1.FixParameter(i, value)

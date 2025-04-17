@@ -110,7 +110,7 @@ namespace Belle2 {
     PedeSteering m_steering{"PedeSteering.txt"};
     /// The result (invalid until execution)
     alignment::PedeResult m_result{};
-    /// The Pede application (unsuccesfull until execution)
+    /// The Pede application (unsuccessful until execution)
     alignment::PedeApplication m_pede{};
     /// Report failure(false) or success (true) even if some parameters could not be determined
     bool m_ignoreUndeterminedParams{false};

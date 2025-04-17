@@ -37,8 +37,8 @@ namespace Belle2 {
     enum boardType {
       innerInside  = 0,       // inner of the inner-most super layer
       innerOutside = 1,       // outer of the inner-most super layer
-      outerInside  = 2,       // inner of the ouer super layer
-      outerOutside = 3,       // outer of the ouer super layer
+      outerInside  = 2,       // inner of the outer super layer
+      outerOutside = 3,       // outer of the outer super layer
       unknown = 999
     };
 
@@ -104,7 +104,7 @@ namespace Belle2 {
                                      const TRGState& output);
 
     /// make a VHDL component file. Non-zero value will be returned if
-    /// errors occured.
+    /// errors occurred.
     static int implementation(const boardType& type, std::ofstream&);
 
     /// writes a port map.

@@ -26,7 +26,7 @@ namespace Belle2 {
     };
 
     /**
-     *  Helper function to translate user provided strings to the enum values of the postion information
+     *  Helper function to translate user provided strings to the enum values of the position information
      *  information used in the two dimensional fit
      */
     inline EFitPos getFitPos(const std::string& fitPosString)
@@ -38,7 +38,7 @@ namespace Belle2 {
       } else if (fitPosString == std::string("wirePos")) {
         return EFitPos::c_WirePos;
       } else {
-        throw std::invalid_argument("Unexpected fit postion string : '" + fitPosString + "'");
+        throw std::invalid_argument("Unexpected fit position string : '" + fitPosString + "'");
       }
     }
 

@@ -155,7 +155,7 @@ namespace Belle2 {
     public:
       /**
        *  Calculates the signed distance of the point to the line.
-       *  Returns the signed distance of the point to the line. The sign is positiv \n
+       *  Returns the signed distance of the point to the line. The sign is positive \n
        *  below the curve and negative above it.
        */
       double distance(const Vector2D& szPoint) const
@@ -165,7 +165,7 @@ namespace Belle2 {
 
       /**
        *  Calculates the signed distance of the point given by its to coordinates to the line.
-       *  Returns the signed distance of the point to the line. The sign is positiv \n
+       *  Returns the signed distance of the point to the line. The sign is positive \n
        *  below the curve and negative above it.
        */
       double distance(double s, double z) const
@@ -176,25 +176,25 @@ namespace Belle2 {
       /// Calculates the intersection point of two line. Infinity for parallels
       Vector2D intersection(const SZLine& szLine) const;
 
-      /// Passivelly move the coordinate system in place by the given sz vector
+      /// Passively move the coordinate system in place by the given sz vector
       void passiveMoveBy(const Vector2D& bySZ)
       {
         passiveMoveBy(bySZ.first(), bySZ.second());
       }
 
-      /// Passivelly move the coordinate system in place by the given s and z coordinates
+      /// Passively move the coordinate system in place by the given s and z coordinates
       void passiveMoveBy(double s, double z)
       {
         m_z0 = map(s) - z;
       }
 
-      /// Return a line passivelly move by the given vector as a copy
+      /// Return a line passively move by the given vector as a copy
       SZLine passiveMovedBy(const Vector2D& bySZ) const
       {
         return passiveMovedBy(bySZ.first(), bySZ.second());
       }
 
-      /// Return a line passivelly move by the given s and z coordinates as a copy
+      /// Return a line passively move by the given s and z coordinates as a copy
       SZLine passiveMovedBy(double s, double z) const
       {
         return SZLine(tanLambda(), map(s) - z);

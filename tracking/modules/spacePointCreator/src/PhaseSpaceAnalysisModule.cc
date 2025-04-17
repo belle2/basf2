@@ -23,7 +23,7 @@ PhaseSpaceAnalysisModule::PhaseSpaceAnalysisModule() : Module()
   setDescription("Module for analysing the phase space covered by TrackCands (resp. their related MCParticles)");
 
   std::vector<std::string> defaultNames = { std::string("") };
-  addParam("containerNames", m_PARAMcontainerNames, "Collection names of trackCands to be analized.", defaultNames);
+  addParam("containerNames", m_PARAMcontainerNames, "Collection names of trackCands to be analyzed.", defaultNames);
   addParam("trackCandTypes", m_PARAMtrackCandTypes, "Either 'GFTC' for genfit::TrackCand or 'SPTC' for SpacePointTrackCand." \
            "If there are more 'containerNames' than 'trackCandTypes' the last type is assumed for all the names that cannot be matched"\
            "one-to-one with a trackCandType. If there are as much names as types the i-th name is assumed to be of the i-th type");
@@ -54,7 +54,7 @@ void PhaseSpaceAnalysisModule::initialize()
   if (nTypes > nNames) { B2FATAL("Passed " << nTypes << " trackCandTypese but only " << nNames << " containerNames!"); }
 
   for (size_t iName = 0; iName < nNames; ++iName) {
-    size_t iType = iName < nTypes ? iName : nTypes - 1; // only acces values that are possible
+    size_t iType = iName < nTypes ? iName : nTypes - 1; // only access values that are possible
     std::string tcType = m_PARAMtrackCandTypes.at(iType);
     if (tcType.compare(std::string("GFTC")) != 0 && tcType.compare(std::string("SPTC")) != 0) {
       B2FATAL("Found id " << tcType << " in 'trackCandTypes' but only 'GFTC' and 'SPTC' are allowed!");

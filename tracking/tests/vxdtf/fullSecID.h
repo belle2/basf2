@@ -21,7 +21,7 @@ namespace Belle2 {
   /** Test simple Setters and Getters. */
   TEST_F(FullSecIDTest, constructorAndGetterTests)
   {
-    // first, we need a usefull vxdID:
+    // first, we need a useful vxdID:
     VxdID vxdID = VxdID(34624); // this should be a sensor on layer 4
     int vxdIDInt = vxdID;
 

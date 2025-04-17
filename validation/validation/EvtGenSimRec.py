@@ -27,7 +27,7 @@ from background import get_background_files
 
 set_random_seed(12345)
 
-# set one parallel process to excercise the basf2 parallel code
+# set one parallel process to exercise the basf2 parallel code
 # set_nprocesses(1)
 
 main = create_path()

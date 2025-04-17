@@ -10,6 +10,7 @@
 
 #include <framework/utilities/CalcMeanCov.h>
 #include <string>
+#include <ostream>
 
 namespace Belle2 {
 
@@ -43,7 +44,7 @@ namespace Belle2 {
     /** Construct with a given name */
     explicit ModuleStatistics(const std::string& name = ""): m_index(0), m_name(name) {}
 
-    /** Add a time and memory measurment to the counter of a given type.
+    /** Add a time and memory measurement to the counter of a given type.
      * @param type Type of counter to add the value to
      * @param time time used during execution
      * @param memory memory size change during execution
@@ -115,6 +116,11 @@ namespace Belle2 {
     {
       return m_stats[type].getCorrelation<0, 1>();
     }
+
+    /** write csv header to the given stream */
+    void csv_header(std::ostream& output) const;
+    /** write data to the given stream in csv format */
+    void csv(std::ostream& output) const;
 
     /** Check if name is identical. */
     bool operator==(const ModuleStatistics& other) const { return m_name == other.m_name; }

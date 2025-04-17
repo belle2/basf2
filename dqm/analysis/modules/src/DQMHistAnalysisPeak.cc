@@ -39,10 +39,11 @@ DQMHistAnalysisPeakModule::DQMHistAnalysisPeakModule()
   addParam("MonitorObjectName", m_monObjectName, "Monitor Object Name", std::string(""));
   addParam("minEntries", m_minEntries, "minimum number of new Entries for a fit", m_minEntries);
   addParam("plot", m_plot, "plot histogram in canvas", m_plot);
-  addParam("zoom", m_zoom, "zoom on peak", m_zoom);
+  addParam("zoom", m_zoom, "zoom on peak with +-(zoom*rms); 0 disable", m_zoom);
   addParam("mean", m_mean, "extract and plot mean", m_mean);
   addParam("median", m_median, "extract and plot median", m_median);
   addParam("rms", m_rms, "extract rms", m_rms);
+  addParam("PlotLimits", m_plotLimits, "plot limits from PV", m_plotLimits);
   B2DEBUG(20, "DQMHistAnalysisPeak: Constructor done.");
 }
 
@@ -82,19 +83,106 @@ void DQMHistAnalysisPeakModule::initialize()
     if (m_median) registerEpicsPV(m_pvPrefix + "Median", "Median");
     if (m_rms) registerEpicsPV(m_pvPrefix + "RMS", "RMS");
   }
+
+  double xvalues[2] = {-1000, 1000};
+  double yvalues[2] = {0, 0};
+  m_g_alarmlo = new TGraph(2, xvalues, yvalues);
+  m_g_warnlo = new TGraph(2, xvalues, yvalues);
+  m_g_good = new TGraph(2, xvalues, yvalues);
+  m_g_warnhi = new TGraph(2, xvalues, yvalues);
+  m_g_alarmhi = new TGraph(2, xvalues, yvalues);
+
+  m_g_alarmlo->SetLineColor(c_ColorError);
+  m_g_alarmlo->SetLineWidth(-902);
+  m_g_alarmlo->SetFillStyle(3002);
+  m_g_alarmlo->SetFillColor(c_ColorError);
+
+  m_g_warnlo->SetLineColor(c_ColorWarning);
+  m_g_warnlo->SetLineWidth(-602);
+  m_g_warnlo->SetFillStyle(3002);
+  m_g_warnlo->SetFillColor(c_ColorWarning);
+
+  m_g_good->SetLineColor(c_ColorGood);
+  m_g_good->SetLineWidth(-302);
+  m_g_good->SetFillStyle(3002);
+  m_g_good->SetFillColor(c_ColorGood);
+
+  m_g_warnhi->SetLineColor(c_ColorWarning);
+  m_g_warnhi->SetLineWidth(-602);
+  m_g_warnhi->SetFillStyle(3002);
+  m_g_warnhi->SetFillColor(c_ColorWarning);
+
+  m_g_alarmhi->SetLineColor(c_ColorError);
+  m_g_alarmhi->SetLineWidth(-902);
+  m_g_alarmhi->SetFillStyle(3002);
+  m_g_alarmhi->SetFillColor(c_ColorError);
 }
 
+void DQMHistAnalysisPeakModule::terminate()
+{
+  if (m_lineMean) delete m_lineMean;
+  if (m_lineMedian) delete m_lineMedian;
+  if (m_canvas) delete m_canvas;
+}
 
 void DQMHistAnalysisPeakModule::beginRun()
 {
   B2DEBUG(20, "DQMHistAnalysisPeak: beginRun called.");
   if (m_canvas) m_canvas->Clear();
+
+  m_valid_alarmlo = m_plotLimits;
+  m_valid_warnlo = m_plotLimits;
+  m_valid_good = m_plotLimits;
+  m_valid_warnhi = m_plotLimits;
+  m_valid_alarmhi = m_plotLimits;
+
+  m_g_good->SetPoint(0, -9e9, 0);
+  m_g_good->SetPoint(1, 9e9, 0);
+
+  m_lowarnlevel = NAN, m_hiwarnlevel = NAN, m_loerrorlevel = NAN, m_hierrorlevel = NAN;
+  if (requestLimitsFromEpicsPVs("Median", m_loerrorlevel, m_lowarnlevel, m_hiwarnlevel, m_hierrorlevel)) {
+    m_g_alarmlo->SetPoint(0, -9e9, 0);
+    m_valid_alarmlo &= m_loerrorlevel == m_loerrorlevel;
+    if (m_valid_alarmlo) {
+      m_g_alarmlo->SetPoint(1, m_loerrorlevel, 0);
+      m_g_warnlo->SetPoint(0, m_loerrorlevel, 0);
+      m_g_good->SetPoint(0, m_loerrorlevel, 0);
+    } else {
+      m_g_warnlo->SetPoint(0, -9e9, 0);
+      m_loerrorlevel = -9e9;
+    }
+
+    m_valid_warnlo &= m_lowarnlevel == m_lowarnlevel and m_lowarnlevel >= m_loerrorlevel;
+    m_g_warnlo->SetPoint(1, m_lowarnlevel, 0);
+    if (m_valid_warnlo) m_g_good->SetPoint(0, m_lowarnlevel, 0);
+
+    m_g_alarmhi->SetPoint(1, 9e9, 0);
+    m_valid_alarmhi &= m_hierrorlevel == m_hierrorlevel;
+    if (m_valid_alarmhi) {
+      m_g_warnhi->SetPoint(1, m_hierrorlevel, 0);
+      m_g_alarmhi->SetPoint(0, m_hierrorlevel, 0);
+      m_g_good->SetPoint(1, m_hierrorlevel, 0);
+    } else {
+      m_g_warnhi->SetPoint(1, 9e9, 0);
+      m_hierrorlevel = 9e9;
+    }
+
+    m_valid_warnhi &= m_hiwarnlevel == m_hiwarnlevel and m_hiwarnlevel <= m_hierrorlevel;
+    m_g_warnhi->SetPoint(0, m_hiwarnlevel, 0);
+    if (m_valid_warnhi) m_g_good->SetPoint(1, m_hiwarnlevel, 0);
+  } else {
+    m_valid_alarmlo = false;
+    m_valid_warnlo = false;
+    m_valid_good = false;
+    m_valid_warnhi = false;
+    m_valid_alarmhi = false;
+  }
 }
 
 void DQMHistAnalysisPeakModule::event()
 {
   auto delta = getDelta(m_histoDirectory, m_histoName);
-  // do not care about initial filling handling. we wont show or update unless we reach the min req entries
+  // do not care about initial filling handling. we won't show or update unless we reach the min req entries
   UpdateCanvas(m_canvas, delta != nullptr);
   if (delta != nullptr) {
 
@@ -118,7 +206,7 @@ void DQMHistAnalysisPeakModule::event()
       m_canvas->cd();// necessary!
       delta->Draw("hist");
 
-      if (m_zoom) delta->GetXaxis()->SetRangeUser(mean - 3 * rms, mean + 3 * rms);
+      if (m_zoom > 0) delta->GetXaxis()->SetRangeUser(mean - m_zoom * rms, mean + m_zoom * rms);
       if (m_lineMean) {
         m_lineMean->SetY1(y1 + (y1 - y2) * 0.05);
         m_lineMean->SetX1(mean);
@@ -131,6 +219,14 @@ void DQMHistAnalysisPeakModule::event()
         m_lineMedian->SetX2(median);
         m_lineMedian->Draw();
       }
+      m_canvas->Paint(); // needed, otherwise Graph overlay doesn't work
+      if (m_g_good and m_valid_good) m_g_good->Draw("RY");
+      if (m_g_warnlo and m_valid_warnlo) m_g_warnlo->Draw("RY");
+      if (m_g_warnhi and m_valid_warnhi) m_g_warnhi->Draw("RY");
+      if (m_g_alarmlo and m_valid_alarmlo) m_g_alarmlo->Draw("RY");
+      if (m_g_alarmhi and m_valid_alarmhi) m_g_alarmhi->Draw("RY");
+
+//      m_canvas->Print((m_histoName + ".pdf").c_str());
       m_canvas->Modified();
       m_canvas->Update();
     }

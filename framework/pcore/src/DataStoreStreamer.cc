@@ -207,7 +207,7 @@ EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, boo
 int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
 {
   if (msg->type() == MSG_TERMINATE) {
-    B2INFO("Got termination message. Exitting...");
+    B2INFO("Got termination message. Exiting...");
     //msg doesn't really contain data, set EventMetaData to something equivalent
     StoreObjPtr<EventMetaData> eventMetaData;
     if (m_initStatus == 0 && DataStore::Instance().getInitializeActive())
@@ -280,7 +280,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
           delete obj;
         }
       } else {
-        //DataStore always has non-NULL content (wether they're available is a different matter)
+        //DataStore always has non-NULL content (whether they're available is a different matter)
         B2ERROR("restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");
       }
     }
@@ -402,7 +402,7 @@ int DataStoreStreamer::restoreDataStoreAsync()
   pthread_mutex_lock(&mutex);
   int nobjs = my_nobjs.front(); my_nobjs.pop();
   if (nobjs == -1) {
-    printf("restoreDataStore: EOF detected. exitting with status 0\n");
+    printf("restoreDataStore: EOF detected. exiting with status 0\n");
     pthread_mutex_unlock(&mutex);
     return 0;
   }
@@ -443,7 +443,7 @@ int DataStoreStreamer::restoreDataStoreAsync()
         delete obj;
       }
     } else {
-      //DataStore always has non-NULL content (wether they're available is a different matter)
+      //DataStore always has non-NULL content (whether they're available is a different matter)
       B2ERROR("restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");
     }
   }

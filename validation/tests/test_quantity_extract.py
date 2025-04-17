@@ -61,7 +61,7 @@ class TestQuantityExtract(unittest.TestCase):
 
     def test_ntuple(self):
         """
-        Test getting the quanities contained in a TNtuple
+        Test getting the quantities contained in a TNtuple
         """
 
         tn = ROOT.TNtuple("particle_list", "particle_list", "x:y:z:energy")

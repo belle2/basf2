@@ -89,7 +89,7 @@ namespace Belle2 {
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_cdcHitArrayName;          /**< Belle2::CDCHit StoreArray name*/
       std::string m_cdcTrackVectorName = "CDCTrackVector";       /**< Belle2::CDCTrack vectorpointer name*/
-      std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray nam.e */
+      std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray name.e */
       std::string m_trackFitResultArrayName;  /**< Belle2::TrackFitResult StoreArray name. */
       std::string m_relRecoTrackTrackName;    /**< Relation between RecoTrack and Belle2:Track. */
       std::string m_treeName;                 /**< Name of tree for the output file. */
@@ -126,7 +126,7 @@ namespace Belle2 {
 
       unsigned short wireID;                   /**< wireID for hit-level wire monitoring */
       unsigned short layerID;                  /**< layerID for hit-level wire monitoring */
-      float z;                                 /**< z of hit fot hit-level wire monitoring */
+      float z;                                 /**< z of hit for hit-level wire monitoring */
       bool isFound;                            /**< flag for a hit that has been found near a track as expected by extrapolation */
     };
   }

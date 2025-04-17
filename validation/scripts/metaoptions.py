@@ -94,7 +94,7 @@ class MetaOptionParser:
         """
         Searches the meta options list for a key value entry and parses it
         @param key: The key to look for
-        @retun: The value which was associated to the key or None if the
+        @return: The value which was associated to the key or None if the
                 key was not found.
         """
         it = [s for s in self.mo if s.startswith(key + "=")]

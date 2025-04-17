@@ -34,7 +34,7 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
     while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
     while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
-    if (fabs(phiDiff) < m_param_PhiRecoTrackToHitCut) {
+    if (fabs(phiDiff) < static_cast<float>(m_param_PhiRecoTrackToHitCut)) {
       return 1.0;
     }
     // If the current state (fromState) is a RecoTrack-based state, but no relations could be created
@@ -56,7 +56,7 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
   while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
-  if (fabs(phiDiff) < m_param_PhiHitHitCut) {
+  if (fabs(phiDiff) < static_cast<float>(m_param_PhiHitHitCut)) {
     return 1.0;
   }
 
@@ -66,7 +66,9 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
 void SensorPXDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiRecoTrackToHitCut"), m_param_PhiRecoTrackToHitCut,
-                                "Cut in phi for the difference between RecoTrack (seed) mSoP and current hit-based state.", m_param_PhiRecoTrackToHitCut);
+                                "Cut in phi for the difference between RecoTrack (seed) mSoP.getPos().Phi() and current hit-based state using its sensor centre phi.",
+                                m_param_PhiRecoTrackToHitCut);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitCut,
-                                "Cut in phi between two hit-based states.", m_param_PhiHitHitCut);
+                                "Cut in phi between two hit-based states comparing the sensor centre phi of both states.",
+                                m_param_PhiHitHitCut);
 }

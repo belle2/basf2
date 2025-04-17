@@ -136,7 +136,7 @@ void SVDDQMDoseModule::initialize()
   for (const auto& layer : geo.getLayers(VXD::SensorInfoBase::SVD)) {
     for (const auto& ladder : geo.getLadders(layer)) {
       for (const auto& sensor : geo.getSensors(ladder)) {
-        const auto& sInfo = VXD::GeoCache::get(sensor);
+        const auto& sInfo = geo.getSensorInfo(sensor);
         for (const SensorGroup& group : c_sensorGroups) {
           if (group.contains(sensor)) {
             // TODO exclude strips that are masked on FADC? It shouldn't matter much...

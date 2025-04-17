@@ -65,7 +65,7 @@ void eclAutocovarianceCalibrationC3CollectorModule::startRun()
 void eclAutocovarianceCalibrationC3CollectorModule::collect()
 {
 
-  std::vector<float> m_tempArray; /**< temp vector to store baseline subracted waveform */
+  std::vector<float> m_tempArray; /**< temp vector to store baseline subtracted waveform */
 
   const int NumDsp = m_eclDsps.getEntries();
 
@@ -90,7 +90,7 @@ void eclAutocovarianceCalibrationC3CollectorModule::collect()
         for (int i = 0; i < m_nADCWaveformPoints; i++) m_tempArray.push_back(aECLDsp.getDspA()[i] - baseline);
 
         /*
-        Info on convariance matrix calucation:
+        Info on convariance matrix calculation:
 
         We store only nADCWaveformPoints numbers because there are several symmetries:
         -  In general the matrix is nADCWaveformPointsxnADCWaveformPoints, however, the matrix symmetric so we only compute the upper part of the matrix.

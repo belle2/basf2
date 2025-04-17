@@ -25,28 +25,28 @@ namespace Belle2 {
     class CDCTrajectory2D;
     class CDCTrajectorySZ;
 
-    /// Class representing a pair of one reconstructed axial segement and one stereo segment in
+    /// Class representing a pair of one reconstructed axial segment and one stereo segment in
     /// adjacent superlayer.
     class CDCSegmentPair {
     public:
-      /// Default constructor - for ROOT compatability.
+      /// Default constructor - for ROOT compatibility.
       CDCSegmentPair();
 
       /// Constructor from two segments
       CDCSegmentPair(const CDCSegment2D* fromSegment, const CDCSegment2D* toSegment);
 
-      /// Constructor from two segments and an assoziated trajectory
+      /// Constructor from two segments and an associated trajectory
       CDCSegmentPair(const CDCSegment2D* fromSegment,
                      const CDCSegment2D* toSegment,
                      const CDCTrajectory3D& trajectory3D);
 
-      /// Equality comparision based on the pointers to the stored segments.
+      /// Equality comparison based on the pointers to the stored segments.
       bool operator==(CDCSegmentPair const& rhs) const
       {
         return getFromSegment() == rhs.getFromSegment() and getToSegment() == rhs.getToSegment();
       }
 
-      /// Total ordering sheme comparing the segment pointers.
+      /// Total ordering scheme comparing the segment pointers.
       bool operator<(CDCSegmentPair const& rhs) const
       {
         return (getFromSegment() < rhs.getFromSegment() or
@@ -67,7 +67,7 @@ namespace Belle2 {
         return segment < segmentPair.getFromSegment();
       }
 
-      /// Checks if both stored segments are not nullptr. Returns true if check is succeded.
+      /// Checks if both stored segments are not nullptr. Returns true if check is succeeded.
       bool checkSegmentsNonNullptr() const
       {
         return getFromSegment() != nullptr and getToSegment() != nullptr;
@@ -138,7 +138,7 @@ namespace Belle2 {
         return getFromStereoKind() == EStereoKind::c_Axial ? getFromSegment() : getToSegment();
       }
 
-      /// Setter for both segments simultaniously
+      /// Setter for both segments simultaneously
       void setSegments(const CDCSegment2D* fromSegment, const CDCSegment2D* toSegment)
       {
         m_fromSegment = fromSegment;
@@ -241,7 +241,7 @@ namespace Belle2 {
       /// Memory for the common three dimensional trajectory
       mutable CDCTrajectory3D m_trajectory3D;
 
-      /// Automaton cell assoziated with the pair of segments
+      /// Automaton cell associated with the pair of segments
       mutable AutomatonCell m_automatonCell;
     };
   }

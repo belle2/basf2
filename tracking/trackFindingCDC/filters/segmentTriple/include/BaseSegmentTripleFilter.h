@@ -16,7 +16,7 @@ namespace Belle2 {
     // Guard to prevent repeated instantiations
     extern template class Filter<CDCSegmentTriple>;
 
-    /// Base filter for the constuction of segment triples.
+    /// Base filter for the construction of segment triples.
     using BaseSegmentTripleFilter = Filter<CDCSegmentTriple>;
   }
 }

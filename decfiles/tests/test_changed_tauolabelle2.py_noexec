@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-# Descriptor: test_steering_file for MC Production for Tau WG
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 #############################################################
 # Steering file for official Checking TauolaBelle2 files MC #
 # production of signal samples                              #
-# Author: Naveen Kumar Baghel                               #
-# FEB 2024 - Belle II Collaboration                        #
 #############################################################
 
 
@@ -31,7 +35,6 @@ main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=5)
 
 # Add KKMC generator module
 ge.add_kkmc_generator(path=main, finalstate='tau-tau+', signalconfigfile=decfile)
-
 
 # Add Progress module
 main.add_module("Progress")

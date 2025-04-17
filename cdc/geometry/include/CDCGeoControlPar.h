@@ -13,7 +13,7 @@
 namespace Belle2 {
   namespace CDC {
     //! The Class for CDC Geometry Control Parameters
-    /*! This class provides control paramters for CDC geometry.
+    /*! This class provides control parameters for CDC geometry.
     */
     class CDCGeoControlPar {
 
@@ -45,7 +45,7 @@ namespace Belle2 {
       }
 
       /**
-       * Set material defition mode
+       * Set material definition mode
        */
       void setMaterialDefinitionMode(int input)
       {
@@ -601,7 +601,7 @@ namespace Belle2 {
       bool m_printMaterialTable = false;       /*!< Switch for printing the G4 material table. */
 
       int m_materialDefinitionMode = 0;     /*!< Material definition mode. */
-      int m_senseWireZposMode = 1;     /*!< Sense wire z postion mode. */
+      int m_senseWireZposMode = 1;     /*!< Sense wire z position mode. */
 
       bool m_displacement = true;  /**< Switch for displacement. */
       bool m_alignment = true;  /**< Switch for alignment. */

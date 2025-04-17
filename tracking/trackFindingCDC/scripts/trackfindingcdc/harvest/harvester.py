@@ -19,7 +19,7 @@ class ReconstructionPositionHarvester(HarvestingModule):
     """ Harvester module to check for the reconstructed positions """
 
     def __init__(self, output_file_name, tracks_store_vector_name="CDCTrackVector"):
-        """ Initiialize with the output file name of the root file and the store obj with the
+        """ Initialize with the output file name of the root file and the store obj with the
         CDCTrack vector to use. MC track cands are needed. """
         super().__init__(
             foreach=tracks_store_vector_name,

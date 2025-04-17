@@ -28,7 +28,7 @@ namespace Belle2 {
       UncertainPerigeeCircle fitInternal(CDCObservations2D& observations2D) const;
 
     public:
-      /// Getter for the indictor that lines should be fitted by this fitter
+      /// Getter for the indicator that lines should be fitted by this fitter
       bool isLineConstrained() const
       {
         return m_lineConstrained;

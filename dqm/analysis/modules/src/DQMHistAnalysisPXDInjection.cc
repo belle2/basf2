@@ -228,3 +228,22 @@ void DQMHistAnalysisPXDInjectionModule::event()
   }
 }
 
+
+void DQMHistAnalysisPXDInjectionModule::terminate()
+{
+  if (m_cInjectionLERPXD) delete m_cInjectionLERPXD;
+  if (m_cInjectionHERPXD) delete m_cInjectionHERPXD;
+  if (m_hInjectionLERPXD) delete m_hInjectionLERPXD;
+  if (m_hInjectionHERPXD) delete m_hInjectionHERPXD;
+
+  for (VxdID& avxdid : m_sensors) {
+    if (m_cInjectionLERPXDMod[avxdid]) delete m_cInjectionLERPXDMod[avxdid];
+    if (m_cInjectionHERPXDMod[avxdid]) delete m_cInjectionHERPXDMod[avxdid];
+    if (m_hInjectionLERPXDMod[avxdid]) delete m_hInjectionLERPXDMod[avxdid];
+    if (m_hInjectionHERPXDMod[avxdid]) delete m_hInjectionHERPXDMod[avxdid];
+    if (m_cInjectionLERPXDModNorm[avxdid]) delete m_cInjectionLERPXDModNorm[avxdid];
+    if (m_cInjectionHERPXDModNorm[avxdid]) delete m_cInjectionHERPXDModNorm[avxdid];
+    if (m_hInjectionLERPXDModNorm[avxdid]) delete m_hInjectionLERPXDModNorm[avxdid];
+    if (m_hInjectionHERPXDModNorm[avxdid]) delete m_hInjectionHERPXDModNorm[avxdid];
+  }
+}

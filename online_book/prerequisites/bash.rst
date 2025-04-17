@@ -374,7 +374,7 @@ for you (after some time you might be surprised with how many commands you remem
 
 .. seealso::
 
-  We have started to compile a reading list for git `on confluence <https://confluence.desy.de/x/pRG3Cg>`_.
+  We have started to compile a reading list for bash `on XWiki <https://xwiki.desy.de/xwiki/rest/p/9e863/>`_.
   Please take a look (and help us extend it if you can recommend other tutorials)!
 
 .. include:: ../lesson_footer.rstinclude

@@ -18,7 +18,7 @@
 """
 
 from tracking.validation.run import TrackingValidationRun
-import tracking
+from tracking import add_tracking_reconstruction
 import logging
 import reconstruction
 import basf2
@@ -44,8 +44,8 @@ class fullTrackingValidation_plusECL(TrackingValidationRun):
 
         reconstruction.add_prefilter_pretracking_reconstruction(path, components=components)
 
-        tracking.add_tracking_reconstruction(path, components=components,
-                                             use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=True)
+        add_tracking_reconstruction(path, components=components,
+                                    use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=True)
 
     #: Define the user parameters for the track-finding module
     tracking_coverage = {

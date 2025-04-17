@@ -14,8 +14,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <boost/endian/arithmetic.hpp>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
@@ -307,7 +305,7 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
 
     if (!m_continueOnError && (m_errorMaskPacket & PXDErrorFlags(m_errorSkipPacketMask)) != PXDErrorFlags(0)) {
       // skip full package on error, recovery to next DHC/DHE Start might be possible in some cases
-      // But thats to hard to implement
+      // But that's to hard to implement
       // Remark: PXD data for broken events is removed in next PXDPostChecker module, thus skipping the
       // unpacking is not strictly necessary here.
       break;
@@ -371,7 +369,7 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
     return;
   }
 
-  /// Endian Swapping is done in Contructors of Raw Objects!
+  /// Endian Swapping is done in Constructors of Raw Objects!
   B2DEBUG(29, "Raw ADC Data");
   // size checked already above
   m_storeRawAdc.appendNew(vxd_id, data, frame_len);
@@ -1040,8 +1038,8 @@ void PXDUnpackerModule::unpack_dhc_frame_v01(void* data, const int len, const in
   }
 
   // TODO How do we handle Frames where Error Bit is set in header?
-  // Currently there is no documentation what it actually means... ony an error bit is set (below)
-  // the following errors must be "accepted", as all firmware sets it wrong fro Ghost frames.
+  // Currently there is no documentation what it actually means... only an error bit is set (below)
+  // the following errors must be "accepted", as all firmware sets it wrong for Ghost frames.
   if (hw->getErrorFlag()) {
     if (frame_type != EDHCFrameHeaderDataType::c_GHOST) {
       m_errorMask[c_nrHEADER_ERR] = true;// TODO this should have some effect ... when does it mean something? documentation missing
@@ -1077,7 +1075,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v01(void* data, const int len, const in
       break;
     };
     case EDHCFrameHeaderDataType::c_ONSEN_DHP:
-      // Set the counted size invalid if negativ, needs a large negative value because we are adding up to that
+      // Set the counted size invalid if negative, needs a large negative value because we are adding up to that
       cancheck_countedBytesInDHC = false;
       cancheck_countedBytesInDHE = false;
       [[fallthrough]];
@@ -1117,7 +1115,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v01(void* data, const int len, const in
       break;
     };
     case EDHCFrameHeaderDataType::c_ONSEN_FCE:
-      // Set the counted size invalid if negativ, needs a large negative value because we are adding up to that
+      // Set the counted size invalid if negative, needs a large negative value because we are adding up to that
       cancheck_countedBytesInDHC = false;
       cancheck_countedBytesInDHE = false;
       [[fallthrough]];
@@ -1332,7 +1330,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v01(void* data, const int len, const in
       }
       // calculate the VXDID for DHE and save them for DHP unpacking
       {
-        /// refering to BelleII Note Nr 0010, the numbers run from ... to
+        /// referring to BelleII Note Nr 0010, the numbers run from ... to
         ///   unsigned int layer, ladder, sensor;
         ///   layer= vxdid.getLayerNumber();/// 1 ... 2
         ///   ladder= vxdid.getLadderNumber();/// 1 ... 8 and 1 ... 12
@@ -1375,7 +1373,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v01(void* data, const int len, const in
       /// Attention: Firmware might be changed such, that ghostframe come for all DHPs, not only active ones...
       found_mask_active_dhp |= 1 << dhc.data_ghost_frame->getDHPPort();
 
-      //found_mask_active_dhp = mask_active_dhp;/// TODO Workaround for DESY TB 2016 doesnt work
+      //found_mask_active_dhp = mask_active_dhp;/// TODO Workaround for DESY TB 2016 doesn't work
 
       dhc.check_crc(m_errorMask, m_suppressErrorMask[c_nrDHE_CRC]);
 
@@ -1504,7 +1502,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v01(void* data, const int len, const in
         }
       }
       m_errorMaskDHE = 0;
-      currentDHEID |= 0xFF000000;// differenciate from 0xFFFFFFFFF as initial value
+      currentDHEID |= 0xFF000000;// differentiate from 0xFFFFFFFFF as initial value
       currentVxdId = 0; /// invalid
       break;
     };
@@ -1524,7 +1522,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v01(void* data, const int len, const in
           //}
           unsigned int l;
           l = (len - dhc.data_onsen_roi_frame->getMinSize()) / 8;
-          // Endian swapping is done in Contructor of RawRoi object
+          // Endian swapping is done in Constructor of RawRoi object
           m_storeROIs.appendNew(l, &((unsigned int*) data)[1]);
         }
       }
@@ -1675,7 +1673,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v01(void* data, const int len, const in
   }
 
   if (frame_type != EDHCFrameHeaderDataType::c_ONSEN_ROI  && frame_type != EDHCFrameHeaderDataType::c_ONSEN_TRG) {
-    // actually, they should not be withing Start and End, but better be sure.
+    // actually, they should not be within Start and End, but better be sure.
     countedBytesInDHC += len;
     countedBytesInDHE += len;
   }
@@ -1754,7 +1752,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v10(void* data, const int len, const in
     }
   }
 
-  // What do we do with wrong checksum frames? As we do not know WHAT is wrong, we have to skip them alltogether.
+  // What do we do with wrong checksum frames? As we do not know WHAT is wrong, we have to skip them altogether.
   // As they might contain HEADER Info, we might better skip the processing of the full package, too.
   dhc.check_crc(m_errorMask, m_suppressErrorMask[c_nrDHE_CRC]);
   if (!m_continueOnError && m_errorMask[c_nrDHE_CRC]) {
@@ -1862,7 +1860,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v10(void* data, const int len, const in
       break;
     };
     case EDHCFrameHeaderDataType::c_ONSEN_DHP:
-      // Set the counted size invalid if negativ, needs a large negative value because we are adding up to that
+      // Set the counted size invalid if negative, needs a large negative value because we are adding up to that
       cancheck_countedBytesInDHC = false;
       cancheck_countedBytesInDHE = false;
       [[fallthrough]];
@@ -1906,7 +1904,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v10(void* data, const int len, const in
       break;
     };
     case EDHCFrameHeaderDataType::c_ONSEN_FCE:
-      // Set the counted size invalid if negativ, needs a large negative value because we are adding up to that
+      // Set the counted size invalid if negative, needs a large negative value because we are adding up to that
       cancheck_countedBytesInDHC = false;
       cancheck_countedBytesInDHE = false;
       [[fallthrough]];
@@ -2127,7 +2125,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v10(void* data, const int len, const in
       }
       // calculate the VXDID for DHE and save them for DHP unpacking
       {
-        /// refering to BelleII Note Nr 0010, the numbers run from ... to
+        /// referring to BelleII Note Nr 0010, the numbers run from ... to
         ///   unsigned int layer, ladder, sensor;
         ///   layer= vxdid.getLayerNumber();/// 1 ... 2
         ///   ladder= vxdid.getLadderNumber();/// 1 ... 8 and 1 ... 12
@@ -2302,7 +2300,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v10(void* data, const int len, const in
         }
       }
       m_errorMaskDHE = 0;
-      currentDHEID |= 0xFF000000;// differenciate from 0xFFFFFFFFF as initial value
+      currentDHEID |= 0xFF000000;// differentiate from 0xFFFFFFFFF as initial value
       currentVxdId = 0; /// invalid
       break;
     };
@@ -2322,7 +2320,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v10(void* data, const int len, const in
           //}
           unsigned int l;
           l = (len - dhc.data_onsen_roi_frame->getMinSize()) / 8;
-          // Endian swapping is done in Contructor of RawRoi object
+          // Endian swapping is done in Constructor of RawRoi object
           m_storeROIs.appendNew(l, &((unsigned int*) data)[1]);
         }
       }
@@ -2473,7 +2471,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v10(void* data, const int len, const in
   }
 
   if (frame_type != EDHCFrameHeaderDataType::c_ONSEN_ROI  && frame_type != EDHCFrameHeaderDataType::c_ONSEN_TRG) {
-    // actually, they should not be withing Start and End, but better be sure.
+    // actually, they should not be within Start and End, but better be sure.
     countedBytesInDHC += len;
     countedBytesInDHE += len;
   }

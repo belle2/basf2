@@ -68,7 +68,7 @@ void HLTEventProcessor::sendTerminatedMessage(unsigned int pid, bool waitForConf
       auto acceptMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       B2ASSERT("Should be an accept message", acceptMessage->isMessage(EMessageTypes::c_confirmMessage));
     } else {
-      B2FATAL("Did not receive a confirmation message!");
+      B2FATAL("Did not receive a confirmation message! waitForConfirmation is " << waitForConfirmation);
     }
   }
 }
@@ -343,9 +343,14 @@ bool HLTEventProcessor::processEvent(PathIterator moduleIter, bool firstRound)
         return false;
       } else if (m_previousEventMetaData.isEndOfData() or m_previousEventMetaData.isEndOfRun()) {
         // The run has changes (or we never had one), so call beginRun() before going on
-        m_processStatisticsPtr->suspendGlobal();
-        processBeginRun();
-        m_processStatisticsPtr->resumeGlobal();
+        // The run number should not be 0
+        if (m_eventMetaDataPtr->getRun() != 0) {
+          m_processStatisticsPtr->suspendGlobal();
+          processBeginRun();
+          m_processStatisticsPtr->resumeGlobal();
+        } else {
+          return false;
+        }
       }
 
       const bool runChanged = ((m_eventMetaDataPtr->getExperiment() != m_previousEventMetaData.getExperiment()) or

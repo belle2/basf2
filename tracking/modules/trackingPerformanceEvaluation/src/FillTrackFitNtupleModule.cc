@@ -11,6 +11,7 @@
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
+#include <cmath>
 #include <map>
 
 using namespace Belle2;
@@ -127,8 +128,8 @@ void FillTrackFitNtupleModule::event()
       trk_phi[pdgIter] = fitResult->getMomentum().Phi() * TMath::RadToDeg();
       trk_charge[pdgIter] = fitResult->getChargeSign();
       double chi2 = recoTrack->getTrackFitStatus(recoTrack->getTrackRepresentationForPDG(pdgIter.getPDGCode()))->getChi2();
-      if (isnan(chi2)) chi2 = -10;
-      if (isinf(chi2)) chi2 = -20;
+      if (std::isnan(chi2)) chi2 = -10;
+      if (std::isinf(chi2)) chi2 = -20;
       trk_chi2[pdgIter] =  chi2;
       trk_ndf[pdgIter] =  fitResult->getNDF();
       trk_pvalue[pdgIter] =  fitResult->getPValue();

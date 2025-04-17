@@ -1,0 +1,47 @@
+# EventType: 1240018000 
+# Descriptor: [B+ -> eta(-> gamma gamma / pi+ pi- pi0) rho+]
+# NickName: Bu_etarho
+# Documentation: B+ -> eta rho+ 
+# Tested: Yes
+# PhysicsWG: Bhadronic
+# Responsible: Ming-Chuan Chang
+# Email: jeri.mcchang@gmail.com
+# Cuts: None
+# Date: 20241011
+
+
+Alias      etasig     eta
+Alias      pi0sig     pi0
+
+Alias      rho+sig    rho+
+Alias      rho-sig    rho-
+ChargeConj rho+sig    rho-sig
+
+Decay Upsilon(4S)
+0.5  B+sig   B-   VSS;
+0.5  B+      B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.000   rho+sig   etasig   SVS;  
+Enddecay
+CDecay B-sig
+
+Decay rho+sig
+1.000   pi+  pi0sig  VSS;
+Enddecay
+CDecay rho-sig
+
+Decay etasig
+0.5  gamma  gamma        PHSP;
+0.5  pi+  pi-  pi0sig    PHSP;
+Enddecay 
+
+Decay  pi0sig
+1.0  gamma  gamma  PHSP;
+Enddecay
+
+End
+
+
+

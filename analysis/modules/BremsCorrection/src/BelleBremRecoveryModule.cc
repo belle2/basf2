@@ -10,7 +10,6 @@
 #include <analysis/modules/BremsCorrection/BelleBremRecoveryModule.h>
 // framework aux
 #include <framework/logging/Logger.h>
-#include <framework/datastore/RelationArray.h>
 
 // dataobjects
 #include <mdst/dataobjects/Track.h>
@@ -48,10 +47,10 @@ BelleBremRecoveryModule::BelleBremRecoveryModule() :
 {
   // set module description (e.g. insert text)
   setDescription(R"DOC(
-                 Takes the charged particle from the given charged particle list (``inputListName``) and
-                 copies it to the output list (``outputListName``). The 4-vector of the nearest (all) photon(s)
-                 from ``gammaListName`` (considered as radiative) is added to the charged particle, if it is
-                 found inside the cone around the charged particle with the given maximum angle (``angleThreshold``).
+Takes the charged particle from the given charged particle list (``inputListName``) and
+copies it to the output list (``outputListName``). The 4-vector of the nearest (all) photon(s)
+from ``gammaListName`` (considered as radiative) is added to the charged particle, if it is
+found inside the cone around the charged particle with the given maximum angle (``angleThreshold``).
                  )DOC");
   setPropertyFlags(c_ParallelProcessingCertified);
 

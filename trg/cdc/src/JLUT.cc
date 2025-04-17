@@ -182,7 +182,7 @@ namespace Belle2 {
       for (int iData = 0; iData < int(m_data.size()); iData++) {
         cout << "[" << iData << "] " << m_data[iData] << endl;
       }
-      cout << "TTRGCDCJLUT ... LUT(" << m_name << ") initilized with " << filename << endl;
+      cout << "TTRGCDCJLUT ... LUT(" << m_name << ") initialized with " << filename << endl;
     }
     coeFile.close();
   }
@@ -560,7 +560,7 @@ namespace Belle2 {
     ////m_shiftOutputMin.dump();
     ////cout<<"max"<<endl;
     ////cout<<" JB:LUT::operate dump end"<<endl;
-    //// Add offseted output signal with output min.
+    //// Add offsetted output signal with output min.
 
     //out <= t_offsetOutput.invOffset(m_shiftOutputMin,m_shiftOutputMin+m_shiftOffsetOutputMax);
     out <= t_offsetOutput.invOffset(m_shiftOutputMin);

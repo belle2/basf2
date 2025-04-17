@@ -73,7 +73,7 @@ if __name__ == "__main__":
     store_mc_truth = not args.no_mc_truth
 
     path = b2.create_path()
-    ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False), path=path)
+    ma.inputMdst(filename=b2.find_file('mdst16.root', 'validation', False), path=path)
 
     b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
     if args.globaltag:
@@ -152,20 +152,10 @@ if __name__ == "__main__":
     particle_types = [x.split(":")[0] for x in particle_lists]
     charged_types = [x.split(":")[0] for x in charged_lists]
 
-    ma.combineAllParticles(
-        [f"{part}:final" for part in particle_types], "Upsilon(4S):final", path=path
-    )
-
-    if store_mc_truth:
-        ma.fillParticleListFromMC("Upsilon(4S):MC", "", path=path)
-
-        # Flag each particle according to the B meson and decay it came from
-        for i, particle_list in enumerate(particle_lists):
-            # Match MC particles for all lists
-            ma.matchMCTruth(particle_list, path=path)
-
-    graFEI(
+    graFEI_vars = graFEI(
         "Upsilon(4S):final",
+        particle_lists=particle_lists,
+        store_mc_truth=store_mc_truth,
         cfg_path=args.config,
         param_file=args.weight,
         sig_side_lcas=args.lcas,
@@ -176,22 +166,17 @@ if __name__ == "__main__":
     )
 
     # Define signal-side B
-    # Here we consider all charged basf2 mass hypotheses
-    # since not necessarily they coincide with those
-    # predicted by graFEI which we require to be kaons
-    for part in charged_types:
-        ma.reconstructDecay(
-            f"B+:{part[:-1]} -> {part}:final",
-            "daughter(0, extraInfo(graFEI_sigSide)) == 1",
-            path=path,
-        )
-    ma.copyLists("B+:Bsgn", [f"B+:{part[:-1]}" for part in charged_types], path=path)
+    ma.reconstructDecay(
+        "B+:Bsgn -> K+:graFEI",
+        "daughter(0, extraInfo(graFEI_sigSide)) == 1",
+        path=path,
+    )
 
     # Define tag-side B
     for part in particle_types:
         ma.cutAndCopyList(
             f"{part}:Btag",
-            f"{part}:final",
+            f"{part}:graFEI",
             cut="extraInfo(graFEI_sigSide) == 0",
             writeOut=True,
             path=path,
@@ -254,58 +239,7 @@ if __name__ == "__main__":
         "mcPDG",
     ] if store_mc_truth else []
 
-    # graFEI variables
-    graFEI_vars = [
-        "graFEI_probEdgeProd",
-        "graFEI_probEdgeMean",
-        "graFEI_probEdgeGeom",
-        # "graFEI_validTree", # Always 1 in this case
-        # "graFEI_goodEvent", # Always 1 in this case
-        "graFEI_nFSP",
-        "graFEI_nCharged_preFit",
-        "graFEI_nElectrons_preFit",
-        "graFEI_nMuons_preFit",
-        "graFEI_nPions_preFit",
-        "graFEI_nKaons_preFit",
-        "graFEI_nProtons_preFit",
-        "graFEI_nLeptons_preFit",
-        "graFEI_nPhotons_preFit",
-        "graFEI_nOthers_preFit",
-        "graFEI_nCharged_postFit",
-        "graFEI_nElectrons_postFit",
-        "graFEI_nMuons_postFit",
-        "graFEI_nPions_postFit",
-        "graFEI_nKaons_postFit",
-        "graFEI_nProtons_postFit",
-        "graFEI_nLeptons_postFit",
-        "graFEI_nPhotons_postFit",
-        "graFEI_nOthers_postFit",
-        "graFEI_nPredictedUnmatched",
-        "graFEI_nPredictedUnmatched_noPhotons",
-    ]
-
-    graFEI_tm_vars = [
-        "graFEI_truth_perfectLCA",
-        "graFEI_truth_perfectMasses",
-        "graFEI_truth_perfectEvent",
-        "graFEI_truth_nFSP",
-        "graFEI_truth_nPhotons",
-        "graFEI_truth_nElectrons",
-        "graFEI_truth_nMuons",
-        "graFEI_truth_nPions",
-        "graFEI_truth_nKaons",
-        "graFEI_truth_nProtons",
-        "graFEI_truth_nOthers",
-    ] if store_mc_truth else []
-
     default_vars += tm_vars
-    graFEI_vars += graFEI_tm_vars
-
-    ma.variablesToEventExtraInfo(
-        "Upsilon(4S):final",
-        dict((f"extraInfo({var})", var) for var in graFEI_vars),
-        path=path,
-    )
 
     # Aliases
     for var in default_vars:

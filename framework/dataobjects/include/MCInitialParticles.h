@@ -11,7 +11,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/LabToCms.h>
 
-#include <TVector3.h>
 #include <Math/Boost.h>
 #include <Math/LorentzRotation.h>
 #include <Math/Vector3D.h>

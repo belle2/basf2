@@ -35,7 +35,7 @@ New Modular Analysis Tools
 * Separation of `EventShape <eventShapeVariables>` and `EventKinematics <eventKinematicsVariables>` and addition of many global event shape variables based on particle lists. 
 
   .. seealso::
- 	`This event shape / continuum suppression tutorial <https://confluence.desy.de/download/attachments/99515171/Continuum_suppression_lecture_V2.pdf>`_ (October 2018) for more details.
+ 	`This event shape / continuum suppression tutorial <https://xwiki.desy.de/xwiki/bin/download/BI/Belle%20II%20Internal/Software/Documentation%2C%20Training%20and%20Software%20outreach/Training%20events/B2-StarterKit%20Jun-2019%20Agenda/WebHome/Continuum_suppression_lecture_V2.pdf?rev=1.1>`_ (October 2018) for more details.
 
 Fitters
 +++++++
@@ -44,7 +44,7 @@ Fitters
   Please refer to the `TreeFitter documentation <treeFitter>` for full details.
 
   .. seealso::
- 	`This TreeFitter tutorial <https://confluence.desy.de/download/attachments/99515171/slides_oct_2018.pdf>`_ (October 2018).
+ 	`This TreeFitter tutorial <https://xwiki.desy.de/xwiki/bin/download/BI/Belle%20II%20Internal/Software/Documentation%2C%20Training%20and%20Software%20outreach/Training%20events/B2-Starterkit%20Oct-2018%20Agenda/WebHome/slides_oct_2018.pdf?rev=1.1>`_ (October 2018).
 
 * Bug fixes to OrcaKinFit.
 

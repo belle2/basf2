@@ -26,7 +26,7 @@ SmearPrimaryVertexModule::SmearPrimaryVertexModule() : Module(),
   m_Initial(BeamParameters::c_smearVertex)
 {
   /* Module description. */
-  setDescription("Smears primary vertex and all subsequent vertices of all the MCParticles using the informations stored in BeamParameters.");
+  setDescription("Smears primary vertex and all subsequent vertices of all the MCParticles using the information stored in BeamParameters.");
   /* Parameters definition. */
   addParam("MCParticlesStoreArrayName", m_MCParticlesName, "Name of the MCParticles StoreArray.", std::string(""));
 }

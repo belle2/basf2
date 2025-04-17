@@ -176,7 +176,7 @@ namespace Belle2 {
     EXPECT_B2FATAL(m_recoTrack->setRightLeftInformation(cdcHit, RecoHitInformation::RightLeftInformation::c_left));
   }
 
-  /** Test simple Correct handling fo the MCFinder hit classification */
+  /** Test simple Correct handling of the MCFinder hit classification */
   TEST_F(RecoTrackTest, cdcHitMCFinderCategory)
   {
     StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
@@ -208,7 +208,7 @@ namespace Belle2 {
     ROOT::Math::XYZVector position(4, 23, 5.6);
     ROOT::Math::XYZVector momentum(4, 23, 5.6);
     short int charge = 1;
-    // We can not add these parameters immediately - we hve to convert them to the perigee parameters
+    // We can not add these parameters immediately - we have to convert them to the perigee parameters
     newCreatedTrackCand.setPosMomSeed(XYZToTVector(position), XYZToTVector(momentum), charge);
     newCreatedTrackCand.addHit(new genfit::WireTrackCandHit(Const::CDC, 0, -1, 0, 0));
     newCreatedTrackCand.addHit(new genfit::WireTrackCandHit(Const::CDC, 1, -1, 1, 0));

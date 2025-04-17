@@ -22,7 +22,7 @@ namespace Belle2 {
     class Findlet : public CompositeProcessingSignalListener {
 
     public:
-      /// Types that should be served to apply on invokation
+      /// Types that should be served to apply on invocation
       using IOTypes = std::tuple<AIOTypes...>;
 
     protected:
@@ -45,26 +45,17 @@ namespace Belle2 {
       using ToVector = typename ToVectorImpl<T>::Type;
 
     public:
-      /// Vector types that should be served to apply on invokation
+      /// Vector types that should be served to apply on invocation
       using IOVectors = std::tuple< std::vector<AIOTypes>... >;
 
       /// Make destructor of interface virtual
       virtual ~Findlet() = default;
 
     public:
-      /// Brief description of the purpose of the concret findlet.
+      /// Brief description of the purpose of the concrete findlet.
       virtual std::string getDescription()
       {
         return "(no description)";
-      }
-
-      /**
-       *  Forward prefixed parameters of this findlet to the module parameter list.
-       *
-       */
-      virtual void exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
-                                    const std::string& prefix __attribute__((unused)))
-      {
       }
 
       /// Main function executing the algorithm

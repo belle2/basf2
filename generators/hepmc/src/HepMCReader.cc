@@ -161,7 +161,7 @@ void HepMCReader::readNextEvent(HepMC::GenEvent& evt)
 
 int HepMCReader::countEvents(const std::string& filename)
 {
-  //different way to read file for consitency check
+  //different way to read file for consistency check
   HepMC::IO_GenEvent ascii_in(filename.c_str(), std::ios::in);
   int count = 0;
   HepMC::GenEvent* evt = ascii_in.read_next_event();

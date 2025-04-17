@@ -16,7 +16,6 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
-#include <TFile.h>
 #include <TH2.h>
 #include <TF1.h>
 #include <TLine.h>
@@ -113,13 +112,6 @@ namespace Belle2 {
     TLine* m_line_mean{};
     /** TLine object for lower limit of track cluster charge */
     TLine* m_line_low{};
-
-    /** Reference Histogram Root file name */
-    std::string m_refFileName;
-    /** The pointer to the reference file */
-    TFile* m_refFile = nullptr;
-    /** Whether to use the color code for warnings and errors. */
-    bool m_color = true;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

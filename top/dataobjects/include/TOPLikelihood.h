@@ -36,20 +36,39 @@ namespace Belle2 {
     void setFlag(int flag) {m_flag = flag;}
 
     /**
+     * Sets module ID
+     * @param moduleID module ID
+     */
+    void setModuleID(int moduleID) {m_moduleID = moduleID;}
+
+    /**
+     * Sets assumed photon emission point within the quartz
+     * @param x coordinate in local (module) frame
+     * @param z coordinate in local (module) frame
+     */
+    void setXZ(double x, double z)
+    {
+      m_x = x;
+      m_z = z;
+    }
+
+    /**
      * Sets other data members for a given particle hypothesis
      * @param part particle hypothesis
      * @param numPhot number of measured photons
      * @param logL log likelihood
      * @param estPhot expected number of photons (including background)
      * @param estBkg expected number of background hits
+     * @param effYield effective signal yield in data (number of signal photons)
      */
-    void set(const Const::ChargedStable& part, int numPhot, double logL, double estPhot, double estBkg)
+    void set(const Const::ChargedStable& part, int numPhot, double logL, double estPhot, double estBkg, double effYield)
     {
       auto i = part.getIndex();
       m_numPhot = numPhot;
       m_logL[i] = logL;
       m_estPhot[i] = estPhot;
       m_estBkg = estBkg;
+      m_effYields[i] = effYield;
     }
 
     /**
@@ -57,6 +76,24 @@ namespace Belle2 {
      * @return reconstruction flag: 1 = OK, 0 = out of acceptance, -1 = error in reconstruction
      */
     int getFlag() const {return m_flag;}
+
+    /**
+     * Return module ID
+     * @return module ID
+     */
+    int getModuleID() const {return m_moduleID;}
+
+    /**
+     * Return assumed emision position within the quartz
+     * @return x coordinate in local (module) frame
+     */
+    double getX() const {return m_x;}
+
+    /**
+     * Return assumed emision position within the quartz
+     * @return z coordinate in local (module) frame
+     */
+    double getZ() const {return m_z;}
 
     /**
      * Return number of detected photons
@@ -89,6 +126,16 @@ namespace Belle2 {
      * @return estimated background
      */
     float getEstBkg() const {return m_estBkg;}
+
+    /**
+     * Return effective signal yield in data (number of signal photons)
+     * @param part charged stable particle
+     * @return measured effective signal yield for a given particle
+     */
+    float getEffectiveSignalYield(const Const::ChargedStable& part) const
+    {
+      return m_effYields[part.getIndex()];
+    }
 
     /**
      * Return electron log likelihood
@@ -156,8 +203,12 @@ namespace Belle2 {
     float m_logL[Const::ChargedStable::c_SetSize] = {0};    /**< log likelihoods */
     float m_estPhot[Const::ChargedStable::c_SetSize] = {0}; /**< estimated number of photons */
     float m_estBkg = 0; /**< estimated background */
+    float m_effYields[Const::ChargedStable::c_SetSize] = {0}; /**< effective number of signal photons in data */
+    int m_moduleID = 0; /**< module ID */
+    float m_x = 0; /**< assumed photon emission position x in local (module) frame */
+    float m_z = 0; /**< assumed photon emission position z in local (module) frame */
 
-    ClassDef(TOPLikelihood, 2); /**< ClassDef */
+    ClassDef(TOPLikelihood, 3); /**< ClassDef */
 
   };
 

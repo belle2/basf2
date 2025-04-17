@@ -922,7 +922,7 @@ class Validation:
         """!
         This method will take the validation file name ( e.g.
         "FullTrackingValidation.py" ), determine all the script it depends on
-        and set the status of theses scripts to "waiting", The status of all
+        and set the status of these scripts to "waiting", The status of all
         other scripts will be set to "skipped", which means they will not be
         executed in the validation run.  If ignore_dependencies is True,
         dependencies will also be set to "skipped".

@@ -30,7 +30,7 @@ namespace Belle2 {
 
       /**
        *  Returns the selection of facets covering the range of possible neighboring
-       *  facets of the given facet out of the sorted range given by the two other argumets.
+       *  facets of the given facet out of the sorted range given by the two other arguments.
        */
       std::vector<const CDCFacet*> getPossibleTos(
         const CDCFacet* from,

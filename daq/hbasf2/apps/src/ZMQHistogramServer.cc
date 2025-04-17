@@ -16,7 +16,7 @@ void ZMQHistogramToFileServer::initialize()
   ZMQStandardApp::initialize();
   m_input.reset(new ZMQConfirmedInput(m_inputAddress, m_parent));
   m_output.reset(
-    new ZMQHistoServerToFile(m_maximalUncompressedBufferSize, m_maximalUncompressedBufferSize, m_sharedMemoryName, m_rootFileName));
+    new ZMQHistoServerToFile(m_maximalUncompressedBufferSize, m_sharedMemoryName, m_rootFileName));
 }
 
 void ZMQHistogramToFileServer::addOptions(po::options_description& desc)

@@ -16,15 +16,10 @@
 #include <framework/gearbox/Const.h>
 #include <cmath>
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <string>
 
 // ROOT
 #include <Math/Vector3D.h>
-#include <TH1.h>
-#include <TH2.h>
 #include <TMath.h>
 
 int eventNum = 0;
@@ -179,7 +174,7 @@ void He3tubeStudyModule::event()
     }
   }
 
-  //initalize various counters
+  //initialize various counters
   double edepSum = 0;
   double edepSum_1H = 0;
   double edepSum_3H = 0;

@@ -11,7 +11,6 @@
 #include <TClonesArray.h>
 #include <TNamed.h>
 
-#include <fstream>
 #include <gtest/gtest.h>
 
 using namespace std;

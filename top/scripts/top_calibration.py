@@ -18,6 +18,7 @@ from reconstruction import add_cosmics_reconstruction
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 from caf.framework import Calibration, Collection
 from caf.strategies import SequentialRunByRun, SingleIOV, SequentialBoundaries
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import TOP
 
 

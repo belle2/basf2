@@ -45,7 +45,7 @@ namespace Belle2 {
   void ARICHRelateModule::initialize()
 
   {
-    // Dependecies check
+    // Dependencies check
     m_mcParticles.isRequired();
     m_mdstTracks.isRequired();
     m_aeroHits.isRequired();

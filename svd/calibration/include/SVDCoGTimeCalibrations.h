@@ -64,7 +64,7 @@ namespace Belle2 {
     }
 
     /** Return the strip time error, given the raw strip time,
-     * and tje raw time error
+     * and the raw time error
      *
      * Input:
      * @param sensorID: identity of the sensor for which the calibration is required

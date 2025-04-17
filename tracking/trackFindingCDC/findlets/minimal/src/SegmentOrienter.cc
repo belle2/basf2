@@ -92,7 +92,7 @@ void SegmentOrienter::apply(const std::vector<CDCSegment2D>& inputSegments,
           outputSegments.push_back(segment);
         }
       } else {
-        // Ambigious keep both options
+        // Ambiguous keep both options
         outputSegments.push_back(segment);
         outputSegments.back()->setReverseFlag();
         outputSegments.push_back(segment.reversed());

@@ -56,13 +56,12 @@ void DriftLengthEstimator::exposeParameters(ModuleParamList* moduleParamList, co
 double DriftLengthEstimator::updateDriftLength(CDCRecoHit2D& recoHit2D)
 {
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
-  const FlightTimeEstimator& flightTimeEstimator = FlightTimeEstimator::instance();
 
   Vector2D flightDirection = recoHit2D.getFlightDirection2D();
   Vector2D recoPos2D = recoHit2D.getRecoPos2D();
   double alpha = recoPos2D.angleWith(flightDirection);
   const double beta = 1;
-  double flightTimeEstimate = flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
+  double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);
 
   const CDCWire& wire = recoHit2D.getWire();
   const CDCHit* hit = recoHit2D.getWireHit().getHit();
@@ -88,7 +87,6 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit2D& recoHit2D)
 void DriftLengthEstimator::updateDriftLength(CDCFacet& facet)
 {
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
-  const FlightTimeEstimator& flightTimeEstimator = FlightTimeEstimator::instance();
 
   const UncertainParameterLine2D& line = facet.getFitLine();
   Vector2D flightDirection = line->tangential();
@@ -103,7 +101,7 @@ void DriftLengthEstimator::updateDriftLength(CDCFacet& facet)
     const CDCHit* hit = rlWireHit.getWireHit().getHit();
     const bool rl = rlWireHit.getRLInfo() == ERightLeft::c_Right;
     const double beta = 1;
-    double flightTimeEstimate = flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
+    double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);
     double driftLength = tdcCountTranslator.getDriftLength(hit->getTDCCount(),
                                                            wire.getWireID(),
                                                            flightTimeEstimate,
@@ -139,14 +137,13 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit3D& recoHit3D,
                                                double tanLambda)
 {
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
-  const FlightTimeEstimator& flightTimeEstimator = FlightTimeEstimator::instance();
 
   Vector2D flightDirection = recoHit3D.getFlightDirection2D();
   const Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
   const Vector2D& recoPos2D = recoPos3D.xy();
   double alpha = recoPos2D.angleWith(flightDirection);
   const double beta = 1;
-  double flightTimeEstimate = flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
+  double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);
 
   if (std::isnan(tanLambda)) {
     tanLambda = recoPos3D.z() / recoPos3D.cylindricalR();

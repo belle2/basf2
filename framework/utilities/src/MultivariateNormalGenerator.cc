@@ -45,7 +45,7 @@ bool MultivariateNormalGenerator::setMeanCov(const Eigen::VectorXd& mean, const 
     return false;
   }
 
-  // The usual way to calulate multivariate normal distributed values is to use
+  // The usual way to calculate multivariate normal distributed values is to use
   // the cholesky decomposition C = ll' and then calculate y = mean + l * x
   // where x is a vector of standard normal distributed values. However this
   // only works for positive definite matrices so we use the LDLT composition

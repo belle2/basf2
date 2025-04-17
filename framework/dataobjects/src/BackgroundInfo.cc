@@ -111,6 +111,7 @@ void BackgroundInfo::merge(const Mergeable* other)
     for (auto& bg : m_backgrounds) {
       if (otherBg.tag != bg.tag) continue;
       if (otherBg.fileType != bg.fileType) continue;
+      if (otherBg.runNumber != bg.runNumber) continue;
       if (otherBg.fileNames == bg.fileNames) {
         if (otherBg.scaleFactor != bg.scaleFactor) {
           B2ERROR("BackgroundInfo: objects cannot be merged (different scaleFactor)");
@@ -210,6 +211,7 @@ void BackgroundInfo::printForOverlay() const
   cout << "Samples: " << endl;
   for (const auto& bkg : m_backgrounds) {
     cout << " " << bkg.type << endl;
+    cout << " run number: " << bkg.runNumber << endl;
     cout << " events: " << bkg.numEvents;
     cout << ", re-used: " << bkg.reused << " times";
     cout << endl;

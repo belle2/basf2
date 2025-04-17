@@ -24,7 +24,7 @@ LooseSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFTo
   // but as there could in principle be a chance between sensors (X.X.1 -> X.(X+-1).2 or X.X.2 -> X.(X+-1).1)
   // check for a similar theta value instead of v
   if (currentStateCache.geoLayer == nextStateCache.geoLayer) {
-    if (fabs(currentStateCache.theta - nextStateCache.theta) > m_param_ThetaOverlayRegionPrecut) {
+    if (fabs(currentStateCache.theta - nextStateCache.theta) > static_cast<float>(m_param_ThetaOverlayRegionPrecut)) {
       return NAN;
     }
   }
@@ -34,11 +34,11 @@ LooseSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFTo
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
   if (not currentStateCache.isHitState) {
-    if (fabs(phiDiff) > m_param_PhiSeedHitPrecut) {
+    if (fabs(phiDiff) > static_cast<float>(m_param_PhiSeedHitPrecut)) {
       return NAN;
     }
-  } else if (!(fabs(phiDiff) < m_param_PhiHitHitPrecut and
-               fabs(currentStateCache.theta - nextStateCache.theta) < m_param_ThetaHitHitPrecut)) {
+  } else if (!(fabs(phiDiff) < static_cast<float>(m_param_PhiHitHitPrecut) and
+               fabs(currentStateCache.theta - nextStateCache.theta) < static_cast<float>(m_param_ThetaHitHitPrecut))) {
     return NAN;
   }
 

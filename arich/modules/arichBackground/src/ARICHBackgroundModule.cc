@@ -15,13 +15,11 @@
 
 #include <simulation/dataobjects/BeamBackHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
-#include <arich/dataobjects/ARICHDigit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 
 // framework - DataStore
 #include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/logging/Logger.h>

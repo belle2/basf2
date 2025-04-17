@@ -8,9 +8,6 @@
 
 #pragma once
 
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-
 #include <TObject.h>
 
 namespace Belle2 {

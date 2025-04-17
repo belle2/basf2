@@ -95,7 +95,7 @@
     }
   }
   function buildLink(path) {
-    // the name of the id is script file, so we need to extraxt the last field of the full path
+    // the name of the id is script file, so we need to extract the last field of the full path
     var fields = path.split('/');
     var li = document.getElementById(fields[fields.length-1]);
     var package = li.parentElement.parentElement.id;

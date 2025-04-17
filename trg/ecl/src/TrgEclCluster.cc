@@ -486,9 +486,9 @@ TrgEclCluster::setForwardICN(int Method)
     TCFirePosition[TCId[ihit] - 1][2] = (_TCMap->getTCPosition(TCId[ihit])).Z();
 
     //------------------------------------
-    // To rearrange the hitted map
+    // To rearrange the hit map
     //
-    //   orignal       converted
+    //   original       converted
     //  (<- Theta)    (<- Theta)
     //
     //   3  2  1       64 32  0
@@ -1008,9 +1008,9 @@ void TrgEclCluster::setBackwardICN(int Method)
     TCFirePosition[TCId[ihit] - 513][2] = (_TCMap->getTCPosition(TCId[ihit])).Z();
 
     //------------------------------------
-    // To rearrange the hitted map
+    // To rearrange the hit map
     //
-    //   orignal       converted
+    //   original       converted
     //  (<- Theta)    (<- Theta)
     //
     //     516  515       32  0
@@ -1464,9 +1464,9 @@ TrgEclCluster::setForwardICN()
 
 
     //------------------------------------
-    // To rearrange the hitted map
+    // To rearrange the hit map
     //
-    //   orignal       converted
+    //   original       converted
     //  (<- Theta)    (<- Theta)
     //
     //   3  2  1       64 32  0
@@ -1617,9 +1617,9 @@ int TrgEclCluster::setBackwardICN()
 
     //    TCFire[TCId[ihit] - 513] = TCId[ihit];
     //------------------------------------
-    // To rearrange the hitted map
+    // To rearrange the hit map
     //
-    //   orignal       converted
+    //   original       converted
     //  (<- Theta)    (<- Theta)
     //
     //     516  515       32  0

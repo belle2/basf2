@@ -13,6 +13,7 @@
 # --------------------------------------------------------------------------------
 
 import basf2 as b2
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import TOPDatabaseImporter
 
 # Create path

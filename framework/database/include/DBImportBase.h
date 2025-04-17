@@ -77,7 +77,7 @@ namespace Belle2 {
   protected:
 
     /**
-     * Intra run dependency types (used only internaly)
+     * Intra run dependency types (used only internally)
      */
     enum EIntraRunDependency { c_None = 0,
                                c_Event = 1,

@@ -24,11 +24,15 @@
 
 namespace Belle2 {
 
-#define ARICH_BUFFER_NWORDS 252 // arich number of words (ints) in buffer;  3 + 33 + 6 * 36; 3 merger header words + 5.5 FEB header words / FEB + 36 data words per / FEB
-  //-----------------------------------------------------------------
-  ///                Register module
-  //-----------------------------------------------------------------
+  /**
+   * Arich number of words (ints) in buffer: 3 + 33 + 6 * 36 (3 merger header
+   * words + 5.5 FEB header words / FEB + 36 data words per / FEB).
+   */
+#define ARICH_BUFFER_NWORDS 252
 
+  //!----------------------------------------------------------------
+  //                 Register module
+  //-----------------------------------------------------------------
   REG_MODULE(ARICHPacker);
 
   //-----------------------------------------------------------------

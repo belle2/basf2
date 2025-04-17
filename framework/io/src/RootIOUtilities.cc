@@ -151,7 +151,17 @@ long RootIOUtilities::getEntryNumberWithEvtRunExp(TTree* tree, long event, long 
 
 void RootIOUtilities::buildIndex(TTree* tree)
 {
-  tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run", "EventMetaData.m_event");
+  std::string treeName = tree->GetName();
+  TBranch* EventMetaDataBranch = tree->GetBranch("EventMetaData");
+  if ((strcmp(treeName.c_str(), "tree") == 0) && EventMetaDataBranch) {
+    tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run", "EventMetaData.m_event");
+  }
+  // for ntuple trees that do not have EventMetaData branch we use the tree level branches
+  else {
+    std::string key = "1000000*" + treeName + ".__experiment__+" + treeName + ".__run__";
+    std::string event = treeName + ".__event__";
+    tree->BuildIndex(key.c_str(), event.c_str());
+  }
 }
 
 bool RootIOUtilities::hasStreamer(const TClass* cl)

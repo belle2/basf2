@@ -1,0 +1,38 @@
+# EventType: 1110040009 
+# Descriptor: B0 -> [K*0 -> K+ pi-] [rho0 -> pi+ pi-] 
+# NickName: B0_Kstar0rho0_Kpi_pipi
+# Documentation:  
+# Tested: Yes
+# PhysicsWG: BHadronic
+# Responsible: Renu
+# Email: renu2@andrew.cmu.edu
+# Cuts: None
+# Date: 20240525
+
+Alias rho0sig rho0
+
+Alias K*0sig K*0
+Alias anti-K*0sig anti-K*0
+ChargeConj K*0sig   anti-K*0sig
+
+Decay Upsilon(4S)
+1.0     B0sig   anti-B0sig  B0  anti-B0        VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0   rho0sig  K*0sig      PHOTOS SVV_HELAMP  0.64 0.0 0.42 0.0 0.64 0.0; 
+Enddecay
+
+CDecay anti-B0sig
+
+Decay rho0sig
+1.0   pi+  pi-                            PHOTOS VSS;
+Enddecay
+
+Decay K*0sig
+1.0   K+  pi-                            PHOTOS VSS;
+Enddecay
+
+CDecay anti-K*0sig
+
+End

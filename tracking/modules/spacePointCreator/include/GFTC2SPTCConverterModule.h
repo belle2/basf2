@@ -33,13 +33,13 @@ namespace Belle2 {
    * + a StoreArray with SVD SpacePoints, where only SpacePoints with a U & a V Cluster are present
    * + a StoreArray with SVD SpacePoints, where every Cluster has its own SpacePoint (if 'useSingleClusterSP' is set to true)
    *
-   * Intended Behaviour: The Module takes a genfit::TrackCand and converts it to a SpacePointTrackCand by taking the TrackCandHits of the TrackCand and searching the DataStore for the according Clusters and then look for Relations of these Clusters to SpacePoints (without loosing any information of the genfit::TrackCand, such that every hit in the genfit::TrackCand can be found in a SpacePoint in the SpacePointTrackCand). Employing a somewhat sloppy notation below regarding Clusters and TrackCandHits, since they are essentially the same for this Module.
+   * Intended Behaviour: The Module takes a genfit::TrackCand and converts it to a SpacePointTrackCand by taking the TrackCandHits of the TrackCand and searching the DataStore for the according Clusters and then look for Relations of these Clusters to SpacePoints (without losing any information of the genfit::TrackCand, such that every hit in the genfit::TrackCand can be found in a SpacePoint in the SpacePointTrackCand). Employing a somewhat sloppy notation below regarding Clusters and TrackCandHits, since they are essentially the same for this Module.
    *
    * NOTE: There are cases where the conversion cannot be done properly, in this case the genfit::TrackCand is skipped and will not be converted (by default, there are parameters that can change this behavior to only skip problematic Clusters)!
    * Problems only occur, when a Cluster is not unambiguously related to a SpacePoint (i.e. a Cluster is related to more than one SpacePoint), because:
    * + the decision which SpacePoint to use is not trivial in most cases. If no well defined decision can be made, the TrackCand will be skipped (see below how this decision is made, and when it is considered 'well defined')
    * + If no decision can be made and every SpacePoint would be added, problems would only be postponed to the conversion of SpacePointTrackCand to genfit::TrackCand, where it is even harder to decide what is right and what is wrong.
-   * + To have a handle later on SpacePointTrackCands now have some flags to check what problems occured during conversion
+   * + To have a handle later on SpacePointTrackCands now have some flags to check what problems occurred during conversion
    *
    * Some statements on how the module works for a given (SVD) Cluster (TrackCandHit)
    * 1) Check if the Cluster (TrackCandHit) has already been used (i.e. it is already contained in the SpacePointTrackCand via a SpacePoint). If not used
@@ -272,7 +272,7 @@ namespace Belle2 {
 // #endif
 
     template<typename T> using flaggedPair =
-      boost::tuple<bool, T, T>; /**< typdef, for avoiding having a vector<bool> and a vector<pair<T,T>> */
+      boost::tuple<bool, T, T>; /**< typedef, for avoiding having a vector<bool> and a vector<pair<T,T>> */
 
     // ============================================================================ MODULE METHODS ==============================================================================
 
@@ -288,7 +288,7 @@ namespace Belle2 {
     createSpacePointTC(const genfit::TrackCand* genfitTC);
 
     /**
-     * process a TrackCandHit (i.e. do the handling of the different ClusterTypes), this is essentially nothing more than a wrapper, that directly returns whats returned from getSpacePoint(args) that is called within!
+     * process a TrackCandHit (i.e. do the handling of the different ClusterTypes), this is essentially nothing more than a wrapper, that directly returns what's returned from getSpacePoint(args) that is called within!
      */
     std::pair<Belle2::SpacePoint*, conversionStatus>
     processTrackCandHit(genfit::TrackCandHit* hit, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit);
@@ -353,7 +353,7 @@ namespace Belle2 {
      */
     bool checkUsedAllHits(std::vector<flaggedPair<int> >& flaggedHitIDs);
 
-    /** check if there is a related TrueHit for a given SpacePoint. Possibility to pass an optional argument on the maximum number of allowed relations (defautls to 1) */
+    /** check if there is a related TrueHit for a given SpacePoint. Possibility to pass an optional argument on the maximum number of allowed relations (defaults to 1) */
     template <typename TrueHitType>
     bool foundRelatedTrueHit(const Belle2::SpacePoint* spacePoint, unsigned int allowedRelations = 1);
 

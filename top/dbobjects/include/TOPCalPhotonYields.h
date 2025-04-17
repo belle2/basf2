@@ -112,13 +112,8 @@ namespace Belle2 {
 
   private:
 
-    /**
-     * Number of pixel rows and columns
-     */
-    enum EPixels {
-      c_numRows = 8, /**< number of pixel rows */
-      c_numCols = 64 /**< number of pixel columns */
-    };
+    static constexpr int c_numRows = 8; /**< number of pixel rows */
+    static constexpr int c_numCols = 64; /**< number of pixel columns */
 
     /**
      * Copy content of 1D histogram into 2D histogram.

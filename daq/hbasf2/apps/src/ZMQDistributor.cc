@@ -19,7 +19,9 @@ void ZMQDistributor::addOptions(po::options_description& desc)
   ("output", boost::program_options::value<std::string>(&m_outputAddress)->required(),
    "where to send the events to")
   ("expressRecoMode", boost::program_options::bool_switch(&m_expressRecoMode)->default_value(m_expressRecoMode),
-   "express reco mode: dismiss events if no worker is ready and send out event messages (instead of raw messages)")
+   "express reco mode: send out event messages (instead of raw messages)")
+  ("lax", boost::program_options::bool_switch(&m_lax)->default_value(m_lax),
+   "lax mode: dismiss events if no worker is ready")
   ("maximalBufferSize",
    boost::program_options::value<unsigned int>(&m_maximalBufferSize)->default_value(m_maximalBufferSize),
    "size of the input buffer")
@@ -32,7 +34,7 @@ void ZMQDistributor::initialize()
 {
   ZMQStandardApp::initialize();
   m_input.reset(new ZMQRawInput(m_inputAddress, m_maximalBufferSize, m_expressRecoMode, m_parent));
-  m_output.reset(new ZMQLoadBalancedOutput(m_outputAddress, m_expressRecoMode, m_parent));
+  m_output.reset(new ZMQLoadBalancedOutput(m_outputAddress, m_lax, m_parent));
 }
 
 void ZMQDistributor::handleExternalSignal(EMessageTypes type)

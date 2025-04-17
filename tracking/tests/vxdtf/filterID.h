@@ -20,7 +20,7 @@ namespace Belle2 {
   /** Test simple Setters and Getters. */
   TEST_F(FilterIDTest, simpleTest)
   {
-    // provides a usefull filterType
+    // provides a useful filterType
     Belle2::FilterID aFilterIDTranslator;
     Belle2::FilterID::filterTypes aFilterType = aFilterIDTranslator.getFilterType(Belle2::FilterID::nameHelixParameterFit);
     EXPECT_EQ(Belle2::FilterID::nameHelixParameterFit, aFilterIDTranslator.getFilterString(aFilterType));

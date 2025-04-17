@@ -401,7 +401,7 @@ namespace Belle2 {
                                        m_sigmas;    /*!< Sigma coefficients for each layer, Left/Right, entrance angle and polar angle.  */
 
     ClassDef(CDCSpaceResols, 2); /**< ClassDef */
-    // Version histroy:
+    // Version history:
     // v1: original.
     // v2: added m_maxSpaceResol and related functions.
     //     m_maxSpaceResol for an object with ver=1 is set in linkdef.h.

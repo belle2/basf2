@@ -35,7 +35,7 @@ namespace Belle2 {
     std::string m_param_MergedRecoTracksStoreArrayName = "__MergedRecoTracks";
     /// Flag to delete the not RecoTracks from the input StoreArray.
     bool m_param_deleteOtherRecoTracks = true;
-    /// Minium NDF required for each track (up and down).
+    /// Minimum NDF required for each track (up and down).
     double m_MinimumNumHitCut = 40;
     /// Tracks.
     StoreArray<RecoTrack> m_RecoTracks;

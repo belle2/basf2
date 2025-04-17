@@ -47,7 +47,7 @@ main.add_module('BKLMDigitAnalyzer',
 basf2.process(main)
 print(basf2.statistics)
 
-# Prodce a .pdf file with the hitmap
+# Produce a .pdf file with the hitmap
 # Here we process only the last file produced
 # by the BKLMDigitAnalyzer module
 # The command to be executed is:

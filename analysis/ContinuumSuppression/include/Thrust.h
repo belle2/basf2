@@ -8,6 +8,7 @@
 #pragma once
 
 #include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 
 #include <vector>
 
@@ -20,7 +21,7 @@ namespace Belle2 {
     /**
      * calculates the thrust axis
      */
-    static ROOT::Math::XYZVector calculateThrust(const std::vector<ROOT::Math::XYZVector>& momenta);
+    static ROOT::Math::XYZVector calculateThrust(const std::vector<ROOT::Math::PxPyPzEVector>& momenta);
   };
 
 

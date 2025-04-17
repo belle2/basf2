@@ -28,7 +28,7 @@ AxialTrackFinderLegendre::AxialTrackFinderLegendre()
 
 std::string AxialTrackFinderLegendre::getDescription()
 {
-  return "Performs the pattern recognition in the CDC with the legendre hough finder";
+  return "Performs the pattern recognition in the CDC with the Legendre hough finder";
 }
 
 void AxialTrackFinderLegendre::exposeParameters(ModuleParamList* moduleParamList,
@@ -36,7 +36,7 @@ void AxialTrackFinderLegendre::exposeParameters(ModuleParamList* moduleParamList
 {
   m_axialTrackHitMigrator.exposeParameters(moduleParamList, prefix);
   m_axialTrackMerger.exposeParameters(moduleParamList, prefixed("merge", prefix));
-  // No parameters exposed for the legendre passes
+  // No parameters exposed for the Legendre passes
 }
 
 void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
@@ -55,13 +55,13 @@ void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
     axialWireHits.emplace_back(&wireHit);
   }
 
-  // First legendre pass
+  // First Legendre pass
   m_nonCurlerAxialTrackCreatorHitLegendre.apply(axialWireHits, tracks);
 
   // Assign new hits to the tracks
   m_axialTrackHitMigrator.apply(axialWireHits, tracks);
 
-  // Second legendre pass
+  // Second Legendre pass
   m_nonCurlersWithIncreasingThresholdAxialTrackCreatorHitLegendre.apply(axialWireHits, tracks);
 
   // Assign new hits to the tracks
@@ -69,11 +69,11 @@ void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
 
   // Iterate the last finding pass until no track is found anymore
 
-  // Loop counter to guard against infinit loop
+  // Loop counter to guard against infinite loop
   for (int iPass = 0; iPass < 20; ++iPass) {
     int nCandsAdded = tracks.size();
 
-    // Third legendre pass
+    // Third Legendre pass
     m_fullRangeAxialTrackCreatorHitLegendre.apply(axialWireHits, tracks);
 
     // Assign new hits to the tracks
@@ -81,7 +81,7 @@ void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
 
     nCandsAdded = tracks.size() - nCandsAdded;
 
-    if (iPass == 19) B2WARNING("Reached maximal number of legendre search passes");
+    if (iPass == 19) B2WARNING("Reached maximal number of Legendre search passes");
     if (nCandsAdded == 0) break;
   }
 

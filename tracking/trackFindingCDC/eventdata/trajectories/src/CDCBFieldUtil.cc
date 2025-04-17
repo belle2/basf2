@@ -47,7 +47,7 @@ double CDCBFieldUtil::getBFieldZ(const Vector2D& pos2D)
 double CDCBFieldUtil::getBFieldZ(const Vector3D& pos3D)
 {
   // The BFieldMap can not handle positions with not a number coordinates
-  // which can occure if fits fail.
+  // which can occur if fits fail.
   // Return NAN to the caller and let him decide what to do next.
   if (pos3D.hasNAN()) return NAN;
   auto mag3D = BFieldManager::getField(pos3D.x(), pos3D.y(), pos3D.z());

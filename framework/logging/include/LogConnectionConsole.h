@@ -50,7 +50,7 @@ namespace Belle2 {
 
     /** Check whether console logging via python is enabled */
     static bool getPythonLoggingEnabled() { return s_pythonLoggingEnabled; }
-    /** Set whether console logging via pyhthon is enabled */
+    /** Set whether console logging via python is enabled */
     static void setPythonLoggingEnabled(bool enabled) { s_pythonLoggingEnabled = enabled; }
     /** Check whether we want to escape newlines on console */
     static bool getEscapeNewlinesEnabled() { return s_escapeNewlinesEnabled; }

@@ -79,7 +79,7 @@ namespace Belle2 {
       m_useTrackingSeeds = useTrackingSeeds;
     }
 
-    /** Get the underlaying hit (cluster). */
+    /** Get the underlying hit (cluster). */
     HitType* getHit() const
     {
       return m_hit;
@@ -99,7 +99,7 @@ namespace Belle2 {
     /** Value of the measurement sigma. */
     double m_sigma = 0.03;
 
-    /** Underlaying hit/cluster. */
+    /** Underlying hit/cluster. */
     HitType* m_hit = nullptr;
     /** RecoTrack for which the hit is created. */
     const RecoTrack* m_recoTrack = nullptr;

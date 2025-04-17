@@ -60,7 +60,7 @@ namespace Belle2 {
 
     /** Set map content
      * @param sensorID unique ID of the sensor
-     * @param globalID unique ID for part of sensor (uBin,vBin) and cluser size
+     * @param globalID unique ID for part of sensor (uBin,vBin) and cluster size
      * @param value cluster position error value to store
      */
     void setContent(unsigned short sensorID, unsigned short globalID, float value)
@@ -124,7 +124,7 @@ namespace Belle2 {
 
     /** Set scaling factor at sensor U edge
      * @param sensorID unique ID of the sensor
-     * @param globalID unique ID for part of sensor (uBin,vBin) and cluser size
+     * @param globalID unique ID for part of sensor (uBin,vBin) and cluster size
      * @param factor scale factor value to store
      */
     void setSensorUEdgeFactor(unsigned short sensorID, unsigned short globalID, float factor)
@@ -158,7 +158,7 @@ namespace Belle2 {
 
     /** Set scaling factor at sensor V edge
      * @param sensorID unique ID of the sensor
-     * @param globalID unique ID for part of sensor (uBin,vBin) and cluser size
+     * @param globalID unique ID for part of sensor (uBin,vBin) and cluster size
      * @param factor scale factor value to store
      */
     void setSensorVEdgeFactor(unsigned short sensorID, unsigned short globalID, float factor)
@@ -192,7 +192,7 @@ namespace Belle2 {
 
     /** Set scaling factor when neighbouring dead rows/columns
      * @param sensorID unique ID of the sensor
-     * @param globalID unique ID for part of sensor (uBin,vBin) and cluser size
+     * @param globalID unique ID for part of sensor (uBin,vBin) and cluster size
      * @param factor scale factor value to store
      */
     void setDeadNeighbourFactor(unsigned short sensorID, unsigned short globalID, float factor)
@@ -334,7 +334,7 @@ namespace Belle2 {
     /** Scaling factor at sensor V edge for layers 1 or 2 and FWD/BWD sensors with sensor number 1 or 2*/
     std::unordered_map<unsigned short, std::vector<float> > m_factorSensorVEdgeMap;
 
-    /** Scaling factor when neighbouring dead rows/colums for FWD/BWD sensors by sensor number 1 or 2 */
+    /** Scaling factor when neighbouring dead rows/columns for FWD/BWD sensors by sensor number 1 or 2 */
     std::unordered_map<unsigned short, std::vector<float> > m_factorDeadNeighbourMap;
 
     /** Map for holding the cluster position errors for all PXD sensors by sensor id (unsigned short). */

@@ -39,7 +39,7 @@ namespace Belle2 {
         m_tdcMax = window.at(1);
       }
       /**
-       * Set inital value for fitting.
+       * Set initial value for fitting.
        */
       void setInitialValue(float t)
       {
@@ -73,7 +73,7 @@ namespace Belle2 {
       EResult calibrate() override;
       ///create histo for each channel
       virtual void createHisto(StoreObjPtr<EventMetaData>& evtPtr);
-      /// write outut or store db
+      /// write output or store db
       virtual void write(StoreObjPtr<EventMetaData>& evtPtr);
     private:
 

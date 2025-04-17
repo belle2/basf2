@@ -207,7 +207,7 @@ namespace Belle2 {
     std::string m_moduleName;
     /** Stores the log configuration objects for packages. */
     std::map<std::string, LogConfig> m_packageLogConfigs;
-    /** Wether to re-print errors-warnings encountered during execution at the end. */
+    /** Whether to re-print errors-warnings encountered during execution at the end. */
     bool m_printErrorSummary;
     /** Count of previous log messages for the summary and to suppress repetitive messages */
     std::unordered_map<LogMessage, int, LogMessage::TextHasher, LogMessage::TextHasher> m_messageLog{100};

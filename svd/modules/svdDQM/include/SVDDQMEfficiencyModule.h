@@ -84,6 +84,8 @@ namespace Belle2 {
 
     std::string m_histogramDirectoryName; /**< name of the directory where to store the histograms*/
 
+    bool m_3Samples = false;  /**< if true enable 3 samples histograms analysis */
+
     bool m_saveExpertHistos; /**< save additional histograms id set True*/
 
     int m_u_bins; /**< number of U-bins for expert histogram*/
@@ -99,11 +101,11 @@ namespace Belle2 {
 
 
     SVDSummaryPlots* m_TrackHits = nullptr; /**< track hits summary plot*/
-    SVDSummaryPlots* m_TrackHits3 = nullptr; /**< track hits summary plot for 3 samples*/
-    SVDSummaryPlots* m_TrackHits6 = nullptr; /**< track hits summary plot for 6 samples*/
+    SVDSummaryPlots* m_TrackHits3Sample = nullptr; /**< track hits summary plot for 3 samples*/
+    SVDSummaryPlots* m_TrackHits6Sample = nullptr; /**< track hits summary plot for 6 samples*/
     SVDSummaryPlots* m_MatchedHits = nullptr; /**< matched hits summary plot*/
-    SVDSummaryPlots* m_MatchedHits3 = nullptr; /**< matched hits summary plot for 3 samples*/
-    SVDSummaryPlots* m_MatchedHits6 = nullptr; /**< matched hits summary plot for 6 samples*/
+    SVDSummaryPlots* m_MatchedHits3Sample = nullptr; /**< matched hits summary plot for 3 samples*/
+    SVDSummaryPlots* m_MatchedHits6Sample = nullptr; /**< matched hits summary plot for 6 samples*/
 
   };
 }

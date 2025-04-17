@@ -184,7 +184,7 @@ main(int argc, char* argv[])
     }
   }
 
-  //...Otain file name...
+  //...Obtain file name...
   string filename = argv[1];
   string::size_type s = filename.find_last_of("/");
   if (s != string::npos)
@@ -481,7 +481,7 @@ breakup(const string& logic)
   string s = logic;
   string sp = " ";
 
-  //...Instert spaces...
+  //...Insert spaces...
 //  for (string::size_type i = s.size(); i >= 0; i--) {
   int len = int(s.size());
   for (int i = len; i >= 0; i--) {

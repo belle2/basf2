@@ -75,6 +75,7 @@ namespace Belle2 {
 
       // module parameters
       std::string m_listName;            /**< particle list name */
+      std::string m_prefix;            /**< prefix attached to extrainfo names */
       std::string m_kinematicFitter;     /**< Kinematic Fitter name */
       std::string m_orcaFitterEngine;    /**< Orca Fitter Engine name */
       std::string m_orcaTracer;          /**< Tracer (None, Text or ROOT) */
@@ -90,6 +91,8 @@ namespace Belle2 {
       bool m_updateDaughters;            /**< update daughter kinematics*/
       double m_recoilMass;               /**< Recoil mass for RecoilMass constraint */
       double m_invMass;                  /**< Invariant mass for Mass constraint */
+      std::vector<int> m_listAlternateMassHypo;  /**< index of particles where only direction is used */
+      std::vector<bool> m_listDirectionOnlyParticles;  /**< pdg values for particles where different mass hypo. is used */
 
       // internal variables
       TextTracer* m_textTracer;                           /**< internal text output variable */
@@ -111,6 +114,15 @@ namespace Belle2 {
       // UNUSED YET
       std::string m_decayString;         /**< daughter particles selection */
       DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
+
+      std::string m_decayStringForDirectionOnlyParticles;         /**< direction only particles selection */
+      DecayDescriptor m_decaydescriptorForDirectionOnlyParticles; /**< Decay descriptor of direction only particles selection */
+
+      std::string m_decayStringForAlternateMassParticles;         /**< alternate mass particles selection */
+      DecayDescriptor m_decaydescriptorForAlternateMassParticles; /**< Decay descriptor of alternate particles selection */
+
+      std::string m_decayStringForNeutronVsAntiNeutron;         /**< n or nbar particle tag selection */
+      DecayDescriptor m_decaydescriptorForNeutronVsAntiNeutron; /**< Decay descriptor of n or nbar particle tag selection */
 
       /**
        * Main steering routine for any kinematic fitter
@@ -142,8 +154,10 @@ namespace Belle2 {
        * @param fitter reference to OrcaKinFit fitter object
        * @param particle pointer to particle
        * @param index used to name particles: particle_%index
+       * @param useOnlyDirection flag to indicate if only position information is used
+       * @param massHypoPDG PDG code for alternate mass hypothesis
        */
-      void addParticleToOrcaKinFit(BaseFitter& fitter, Particle* particle, const int index);
+      void addParticleToOrcaKinFit(BaseFitter& fitter, Particle* particle, const int index, bool useOnlyDirection, int massHypoPDG);
 
       /**
        * Adds Orca fit object to the constraints.
@@ -216,12 +230,12 @@ namespace Belle2 {
 
       /**
        * store fit object information as ExtraInfo
-       * @param prefix can be used to distinguish e.g. "Fitted" and "Measured"
+       * @param fitSuffix can be used to distinguish e.g. "Fitted" and "Measured"
        * @param fitter reference to OrcaKinFit fitter object
        * @param particleChildren list of all particle children
        * @param mother mother particle
        */
-      bool storeOrcaKinFitParticles(const std::string& prefix, BaseFitter& fitter, std::vector<Particle*>& particleChildren,
+      bool storeOrcaKinFitParticles(const std::string& fitSuffix, BaseFitter& fitter, std::vector<Particle*>& particleChildren,
                                     Particle* mother);
 
 

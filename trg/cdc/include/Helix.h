@@ -124,7 +124,7 @@ namespace Belle2 {
     /// sets helix parameters.
     const CLHEP::HepVector& a(const CLHEP::HepVector& newA);
 
-    /// sets helix paramters and error matrix.
+    /// sets helix parameters and error matrix.
     const CLHEP::HepSymMatrix& Ea(const CLHEP::HepSymMatrix& newdA);
 
     /// sets pivot position.
@@ -138,10 +138,10 @@ namespace Belle2 {
     /// unsets error matrix. Error calculations will be ignored after this function call until an error matrix be set again. 0 matrix will be return as a return value for error matrix when you call functions which returns an error matrix.
     void ignoreErrorMatrix(void);
 
-    /// returns z componet of the magnetic field.
+    /// returns z component of the magnetic field.
     double bFieldZ(void) const;
 
-    /// sets and returns z componet of the magnetic field.
+    /// sets and returns z component of the magnetic field.
     double bFieldZ(double);
 
     /// set limits for helix parameters
@@ -171,16 +171,16 @@ namespace Belle2 {
     /// Copy operator
     TRGCDCHelix& operator = (const TRGCDCHelix&);
 
-  public:// Mathmatical functions
-    /// Mathmatical functions
+  public:// Mathematical functions
+    /// Mathematical functions
     CLHEP::HepMatrix delApDelA(const CLHEP::HepVector& ap) const;
-    /// Mathmatical functions
+    /// Mathematical functions
     CLHEP::HepMatrix delXDelA(double phi) const;
-    /// Mathmatical functions
+    /// Mathematical functions
     CLHEP::HepMatrix delMDelA(double phi) const;
-    /// Mathmatical functions
+    /// Mathematical functions
     CLHEP::HepMatrix del4MDelA(double phi, double mass) const;
-    /// Mathmatical functions
+    /// Mathematical functions
     CLHEP::HepMatrix del4MXDelA(double phi, double mass) const;
 
   private:

@@ -1,7 +1,7 @@
 Tools for Validation of the SoftwareTrigger
 ===========================================
 
-The HLT is documented more fully on the `HLT confluence pages <https://confluence.desy.de/x/ghGGAg>`_
+The HLT is documented more fully on the `HLT XWiki pages <https://xwiki.desy.de/xwiki/rest/p/6eea2>`_
 and in `BELLE2-NOTE-TE-2019-019 <https://docs.belle2.org/record/1541>`_.
 
 There are some command-line tools for offline study of the HLT and SoftwareTrigger.

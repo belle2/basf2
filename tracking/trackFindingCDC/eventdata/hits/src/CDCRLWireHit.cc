@@ -45,9 +45,9 @@ CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wireHit,
                            double driftLength,
                            double driftLengthVariance)
   : m_wireHit(wireHit)
-  , m_rlInfo(rlInfo)
   , m_refDriftLength(driftLength)
   , m_refDriftLengthVariance(driftLengthVariance)
+  , m_rlInfo(rlInfo)
 {
 }
 

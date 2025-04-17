@@ -85,7 +85,7 @@ namespace Belle2 {
     /**
      * Does this Path contain a module of the given type?
      *
-     * Useable in Python via '"ModuleType" in path' syntax.
+     * Usable in Python via '"ModuleType" in path' syntax.
      */
     bool contains(const std::string& moduleType) const;
 

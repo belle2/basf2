@@ -98,10 +98,10 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit2D,
   double arcLength2D = 0;
   if (stereoKind == EStereoKind::c_StereoU or stereoKind == EStereoKind::c_StereoV) {
     //the closest approach of a wire line to a helix
-    //( in this case representated by the two trajectories )
+    //( in this case represented by the two trajectories )
     //can not be solved as a closed expression
     //in the common case the z fit has been derived from the reconstructed points generated
-    //with the reconstruct methode above in the other reconstruct method.
+    //with the reconstruct method above in the other reconstruct method.
     //sticking to that method but using the average z from the sz fit
     Vector3D recoPos3D = recoHit2D.reconstruct3D(trajectory2D);
     arcLength2D = trajectory2D.calcArcLength2D(recoPos3D.xy());

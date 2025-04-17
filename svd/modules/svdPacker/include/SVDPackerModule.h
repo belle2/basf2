@@ -181,7 +181,7 @@ namespace Belle2 {
       StoreObjPtr<SVDEventInfo> m_svdEventInfoPtr;  /**< SVDEventInfo from simulation */
       StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
       StoreArray<SVDShaperDigit> m_svdShaperDigit; /**< Required input for SVDShaperDigit */
-      int m_FADCTriggerNumberOffset; /**< FADC trigger numnber offset*/
+      int m_FADCTriggerNumberOffset; /**< FADC trigger number offset*/
 
     };
   } //SVD

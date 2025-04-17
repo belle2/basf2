@@ -392,7 +392,7 @@ void hough3D(){
       }
     }
 
-    // Filling houghMesh. Combines the seperate houghMeshs per layer
+    // Filling houghMesh. Combines the separate houghMeshs per layer
     for(int houghCot=0;houghCot<nCotSteps;houghCot++){
       for(int houghZ0=0;houghZ0<nZ0Steps;houghZ0++){
         //Change back tempHoughz0 if minus
@@ -535,7 +535,7 @@ void hough3D(){
       //cout<<"stTSs["<<int(i/25)<<"]: "<<stTSs[i]<<endl;
     }
 
-    // Find closest phi out of canidates
+    // Find closest phi out of candidates
     double minDiff[4]={999,999,999,999};
     double bestTS[4]={999,999,999,999};
     for(int i=0; i<100; i++){

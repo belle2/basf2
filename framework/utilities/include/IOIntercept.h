@@ -74,9 +74,9 @@ namespace Belle2 {
     public:
       /** This class is basically empty so the constructor does nothing */
       KeepStream(std::ostream&, FILE*) {}
-      /** doing nothing always succeds */
+      /** doing nothing always succeeds */
       bool start() const { return true; }
-      /** doing nothing always succeds */
+      /** doing nothing always succeeds */
       bool finish() const { return true; }
     };
 
@@ -214,7 +214,7 @@ namespace Belle2 {
      * \warning to NOT use this class for big periods of time. It is intended
      *   to be used around short calls to external software which produces
      *   output that cannot be converted to log messages otherwise. Don't try
-     *   to just enable it the whole time. Not only will this cut off ouput
+     *   to just enable it the whole time. Not only will this cut off output
      *   that is longer then 64kB, it will also generate long and meaningless
      *   messages and will intercept normal log messages emitted while capture
      *   is active as well.
@@ -256,7 +256,7 @@ namespace Belle2 {
     private:
       /** Name of the output producing tool/library */
       const std::string m_name;
-      /** Identation to add to the beginning of each line of output. defaults to "${m_name}: " */
+      /** Indentation to add to the beginning of each line of output. defaults to "${m_name}: " */
       std::string m_indent;
       /** severity of the log message to be emitted for output on stdout */
       LogConfig::ELogLevel m_stdoutLevel;

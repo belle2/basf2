@@ -74,7 +74,7 @@ namespace Belle2 {
                                                EvtId lepton, EvtId nudaug,
                                                EvtBSemiTauonicHelicityAmplitudeCalculator* CalcHelAmp)
   {
-    //This routine takes the arguements parent, meson, and lepton
+    //This routine takes the arguments parent, meson, and lepton
     //number, and a form factor model, and returns a maximum
     //probability for this semileptonic form factor model.  A
     //brute force method is used.  The 2D cos theta lepton and

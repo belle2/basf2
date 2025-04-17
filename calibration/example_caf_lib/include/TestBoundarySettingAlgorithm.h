@@ -7,8 +7,8 @@
  **************************************************************************/
 
 #pragma once
+
 #include <calibration/CalibrationAlgorithm.h>
-#include <algorithm>
 
 namespace Belle2 {
   /**

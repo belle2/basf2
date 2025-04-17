@@ -31,7 +31,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return tcs.refTC->momSeed.X() - tcs.testTC->momSeed.X();
+      return tcs.refTC->m_momSeed.X() - tcs.testTC->m_momSeed.X();
     }
   };
 
@@ -49,7 +49,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return tcs.refTC->momSeed.Y() - tcs.testTC->momSeed.Y();
+      return tcs.refTC->m_momSeed.Y() - tcs.testTC->m_momSeed.Y();
     }
   };
 
@@ -67,7 +67,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return tcs.refTC->momSeed.Z() - tcs.testTC->momSeed.Z();
+      return tcs.refTC->m_momSeed.Z() - tcs.testTC->m_momSeed.Z();
     }
   };
 
@@ -85,7 +85,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return tcs.refTC->momSeed.Rho() - tcs.testTC->momSeed.Rho();
+      return tcs.refTC->m_momSeed.Rho() - tcs.testTC->m_momSeed.Rho();
     }
   };
 
@@ -103,7 +103,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return tcs.refTC->momSeed.R() - tcs.testTC->momSeed.R();
+      return tcs.refTC->m_momSeed.R() - tcs.testTC->m_momSeed.R();
     }
   };
 
@@ -121,7 +121,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return tcs.refTC->momSeed.Theta() * TMath::RadToDeg() - tcs.testTC->momSeed.Theta() * TMath::RadToDeg();
+      return tcs.refTC->m_momSeed.Theta() * TMath::RadToDeg() - tcs.testTC->m_momSeed.Theta() * TMath::RadToDeg();
     }
   };
 
@@ -139,7 +139,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return tcs.refTC->momSeed.Phi() * TMath::RadToDeg() - tcs.testTC->momSeed.Phi() * TMath::RadToDeg();
+      return tcs.refTC->m_momSeed.Phi() * TMath::RadToDeg() - tcs.testTC->m_momSeed.Phi() * TMath::RadToDeg();
     }
   };
 
@@ -157,7 +157,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return ROOT::Math::VectorUtil::Angle(tcs.testTC->momSeed, tcs.refTC->momSeed) * TMath::RadToDeg();
+      return ROOT::Math::VectorUtil::Angle(tcs.testTC->m_momSeed, tcs.refTC->m_momSeed) * TMath::RadToDeg();
     }
   };
 
@@ -175,9 +175,9 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      VectorType refMom = tcs.refTC->momSeed;
+      VectorType refMom = tcs.refTC->m_momSeed;
       refMom.SetZ(0.);
-      VectorType testMom = tcs.testTC->momSeed;
+      VectorType testMom = tcs.testTC->m_momSeed;
       testMom.SetZ(0.);
       return ROOT::Math::VectorUtil::Angle(testMom, refMom) * TMath::RadToDeg();
     }
@@ -197,7 +197,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return (tcs.refTC->posSeed - tcs.testTC->posSeed).R();
+      return (tcs.refTC->m_posSeed - tcs.testTC->m_posSeed).R();
     }
   };
 
@@ -215,7 +215,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return (tcs.refTC->posSeed - tcs.testTC->posSeed).Rho();
+      return (tcs.refTC->m_posSeed - tcs.testTC->m_posSeed).Rho();
     }
   };
 

@@ -9,7 +9,9 @@
 #include <tracking/modules/eventTimeExtractor/SVDEventT0EstimatorModule.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/geometry/B2Vector3.h>
+#include <framework/dataobjects/EventT0.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dbobjects/SVDEventT0Configuration.h>
 
 #include <cmath>
 
@@ -27,7 +29,7 @@ REG_MODULE(SVDEventT0Estimator);
 
 SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
 {
-  setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks. The EventT0 is set to NaN if there are not RecoTracks or there are not SVD clusters associated to tracks or RecoTrack pt < ptMin OR RecoTrack pz < pzMin. The EventT0 estimated is added to the temporaryEventT0s to the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.");
+  setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks. The EventT0 is set to NaN if there are not RecoTracks or there are not SVD clusters associated to tracks or RecoTrack pt < ptMin OR RecoTrack pz < pzMin. The EventT0 estimated is added to the temporaryEventT0s to the StoreObjPtr as EventT0Component that contains: eventT0, eventT0_error, detector=SVD, algorithm, quality.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //* Definition of input parameters */
@@ -37,6 +39,14 @@ SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
   addParam("absPzMinSelection", m_absPzSelection,
            "Cut on minimum absolute value of the longitudinal momentum, abs(pz), for RecoTrack selection",
            m_absPzSelection);
+  addParam("absD0Selection", m_absD0Selection,
+           "Cut on maximum absolute value of the d0 for RecoTrack selection", m_absD0Selection);
+  addParam("absZ0Selection", m_absZ0Selection,
+           "Cut on maximum absolute value of the z0 for RecoTrack selection", m_absZ0Selection);
+  addParam("selectTracksFromIP", m_selectTracksFromIP,
+           "Apply the selection based on the absolute values of d0 and z0 to select tracks from the IP to compute SVDEventT0",
+           m_selectTracksFromIP);
+  addParam("useDB", m_useDB, "To compute EvetT0, use configuration of selections stored in the DB", m_useDB);
 }
 
 
@@ -55,6 +65,22 @@ void SVDEventT0EstimatorModule::initialize()
   m_recoTracks.isRequired(m_recoTracksName);
 }
 
+void SVDEventT0EstimatorModule::beginRun()
+{
+  if (m_useDB) {
+    if (!m_svdEventT0Config.isValid())
+      B2FATAL("no valid configuration found for SVD EventT0 computation");
+    else
+      B2DEBUG(20, "SVDEventT0Configuration: from now on we are using " << m_svdEventT0Config->get_uniqueID());
+
+
+    m_selectTracksFromIP = m_svdEventT0Config->getSelectTracksFromIP();
+    m_ptSelection = m_svdEventT0Config->getMinimumPtSelection();
+    m_absPzSelection = m_svdEventT0Config->getAbsPzSelection();
+    m_absD0Selection = m_svdEventT0Config->getAbsD0Selection();
+    m_absZ0Selection = m_svdEventT0Config->getAbsZ0Selection();
+  }
+}
 
 void SVDEventT0EstimatorModule::event()
 {
@@ -74,9 +100,16 @@ void SVDEventT0EstimatorModule::event()
   // loop on recotracks
   for (auto& recoTrack : m_recoTracks) {
     const B2Vector3D& p = recoTrack.getMomentumSeed();
+    const UncertainHelix uncertainHelix = constructUncertainHelix(recoTrack);
+    double d0 = uncertainHelix.getD0();
+    double z0 = uncertainHelix.getZ0();
 
     // selection on recoTracks
     if (p.Perp() < m_ptSelection || std::fabs(p.Z()) < m_absPzSelection) continue;
+
+    if (m_selectTracksFromIP) {
+      if (std::fabs(d0) > m_absD0Selection || std::fabs(z0) > m_absZ0Selection) continue;
+    }
 
     // use outgoing/ingoing arm time to compute SVD EventT0
     // if both outgoing and ingoing are estimated we take the smallest one
@@ -139,4 +172,21 @@ void SVDEventT0EstimatorModule::event()
   m_eventT0->addTemporaryEventT0(evtT0Component);
   m_eventT0->setEventT0(evtT0Component);
 
+}
+
+const UncertainHelix SVDEventT0EstimatorModule::constructUncertainHelix(const RecoTrack& recoTrack)
+{
+
+  const ROOT::Math::XYZVector& position = recoTrack.getPositionSeed();
+  const B2Vector3D& momentum = recoTrack.getMomentumSeed();
+  const TMatrixDSym& covariance = recoTrack.getSeedCovariance();
+  short int charge = recoTrack.getChargeSeed();
+  if (charge < 0) charge = -1;
+  else charge = 1;
+  const float pValue = float(std::numeric_limits<double>::quiet_NaN());
+  const float bField = Belle2::BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
+
+  const UncertainHelix uncertainHelix(position, momentum, charge, bField, covariance, pValue);
+
+  return uncertainHelix;
 }

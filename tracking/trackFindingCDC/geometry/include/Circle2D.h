@@ -36,7 +36,7 @@ namespace Belle2 {
       {
       }
 
-      /// Constructs a circle with given center, absolut value of the radius and orientation
+      /// Constructs a circle with given center, absolute value of the radius and orientation
       Circle2D(const Vector2D& center, const double absRadius, const ERotation ccwInfo)
         : m_center(center)
         , m_radius(fabs(absRadius) * static_cast<double>(ccwInfo))
@@ -104,7 +104,7 @@ namespace Belle2 {
         return copysign(center().norm(), radius()) - radius();
       }
 
-      /// Returns the euclidian distance of the point to the circle line
+      /// Returns the euclidean distance of the point to the circle line
       double absDistance(const Vector2D& point) const
       {
         return fabs(center().distance(point) - absRadius());
@@ -221,37 +221,37 @@ namespace Belle2 {
 
       /** @name Transformations of the circle */
       /**@{*/
-      /// Activelly moves the circle in the direction given in place by the vector given
+      /// Actively moves the circle in the direction given in place by the vector given
       void moveBy(const Vector2D& by)
       {
         m_center += by;
       }
 
-      /// Activelly moves the circle in the direction given in place along the first coordinate
+      /// Actively moves the circle in the direction given in place along the first coordinate
       void moveAlongFirst(const double first)
       {
         m_center.setFirst(m_center.first() + first);
       }
 
-      /// Activelly moves the circle in the direction given in place along the second coordinate
+      /// Actively moves the circle in the direction given in place along the second coordinate
       void moveAlongSecond(const double second)
       {
         m_center.setSecond(m_center.second() + second);
       }
 
-      /// Passivelly move the coordinate system  in place by the given vector
+      /// Passively move the coordinate system  in place by the given vector
       void passiveMoveBy(const Vector2D& by)
       {
         m_center -= by;
       }
 
-      /// Passivelly move the coordinate system in place along the first coordinate
+      /// Passively move the coordinate system in place along the first coordinate
       void passiveMoveAlongFirst(const double first)
       {
         m_center.setFirst(m_center.first() - first);
       }
 
-      /// Passivelly move the coordinate system in place along the second coordinate
+      /// Passively move the coordinate system in place along the second coordinate
       void passiveMoveAlongSecond(const double second)
       {
         m_center.setSecond(m_center.second() - second);

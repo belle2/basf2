@@ -94,7 +94,7 @@ void CopyRecoTracksWithOverlapModule::processRecoTrack(const RecoTrack& track)
   bool hasOverlap = false;
 
   // Let's be as explicit as possible here:
-  // NOTE: for SVD, U and V hits are stored separatelly in the RecoTrack.
+  // NOTE: for SVD, U and V hits are stored separately in the RecoTrack.
   //       Therefore double hit in a layer means 4 SVD clusters (at same layer)
   // NOTE: We ignore the possibility of curlers, non-2D SVD hits etc.
 

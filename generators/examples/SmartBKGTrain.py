@@ -103,7 +103,7 @@ def fit(model, name, ds_train, ds_val, retention_rate, device=device,
         retention_rate (float): The rate at which events are retained by the filter.
         device (torch.device): The place to save dataset and model (`cpu` or `cuda`) during processing.
         min_epochs (int): The minimal number of epochs for the training.
-        patience (int): The maximal number of continious epochs allowed to have no update.
+        patience (int): The maximal number of continuous epochs allowed to have no update.
         lr_start (float): The learning rate at the beginning of the training.
         lr_end (float): The minimal learning rate for the training. The strategy of dynamic learning rate
         is hard-coded with ReduceLROnPlateau scheduler and factor 1/2. This can be manually changed according
@@ -111,7 +111,7 @@ def fit(model, name, ds_train, ds_val, retention_rate, device=device,
         epochs (int): The maximal number of epochs for the training.
 
     Returns:
-        dict: The hitories of loss and accuracy for training and validation during the training.
+        dict: The histories of loss and accuracy for training and validation during the training.
     """
     history = {"loss": [], "val_loss": [], "acc": [], "val_acc": []}
     lr = lr_start

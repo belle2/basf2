@@ -107,7 +107,7 @@ void PyEstimator::unpickleEstimator(const std::string& pickleFileName)
     m_predict = m_estimator.attr("predict_proba");
     m_is_binary_classification = true;
   } catch (const boost::python::error_already_set&) {
-    // AttributeError occured, but this is allowed to fail
+    // AttributeError occurred, but this is allowed to fail
     // Clear the exception and carry on.
     PyErr_Clear();
     B2INFO("Estimator in " << m_pickleFileName << " is not a binary classifier. Trying as regressor");

@@ -358,7 +358,7 @@ namespace TreeFitter {
     vertex.SetY(0.5 * (y1[ibest] + y2[ibest]));
     vertex.SetZ(0.5 * (z1 + z2));
 
-    return hypot(x2[ibest] - x1[ibest], y2[ibest] - y1[ibest], z2 - z1);
+    return std::hypot(x2[ibest] - x1[ibest], y2[ibest] - y1[ibest], z2 - z1);
   }
 
   //POCA between a track and a point

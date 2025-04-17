@@ -45,7 +45,7 @@ namespace Belle2 {
        */
       bool operator()(const Pixel& px, float significance) const { return getSignificance(px) >= significance; }
 
-      /** Check wether a signal exceeds a given significance using the average noise level
+      /** Check whether a signal exceeds a given significance using the average noise level
        * @param signal signal to check
        * @param significance minimum significance
        */

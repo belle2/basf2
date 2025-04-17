@@ -100,7 +100,7 @@ namespace Belle2 {
       double m_ttime;                    /**< hit global time */
       int m_moduleID;                    /**< hit module ID */
       double m_phnw;                     /**< neutron 1MeV equiv. weight */
-      double m_trackLength;              /**< particle track lenght in hit volume */
+      double m_trackLength;              /**< particle track length in hit volume */
       double m_energy;                 /**< energy of particle */
       TFile* m_outputFile;               /**< Output root file.   */
       TTree* m_outputTree;               /**< Output tree */

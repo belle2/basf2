@@ -72,9 +72,9 @@ namespace Belle2 {
 
     /** Correlations and hit maps from space points */
     TH2F** m_correlationsSP{nullptr};
-    /** Correlations and hit maps from space points - differencies in Phi*/
+    /** Correlations and hit maps from space points - differences in Phi*/
     TH1F** m_correlationsSP1DPhi{nullptr};
-    /** Correlations and hit maps from space points - differencies in Theta*/
+    /** Correlations and hit maps from space points - differences in Theta*/
     TH1F** m_correlationsSP1DTheta{nullptr};
 
   };

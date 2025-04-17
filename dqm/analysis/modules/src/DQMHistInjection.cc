@@ -79,10 +79,10 @@ void DQMHistInjectionModule::initialize()
                                 20000);
 
   m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0, 20000);
-  m_hInjectionHERPXDOcc = new TH1F("HitInjectionPXDHEROcc", "PXD Occ after HER Injection;Time in #mus;Mean Occ in % per modul", 4000,
+  m_hInjectionHERPXDOcc = new TH1F("HitInjectionPXDHEROcc", "PXD Occ after HER Injection;Time in #mus;Mean Occ in % per module", 4000,
                                    0, 20000);
   m_hInjectionHERSVD = new TH1F("HitInjectionHERSVD", "SVD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0, 20000);
-  m_hInjectionHERSVDOcc = new TH1F("HitInjectionSVDHEROcc", "SVD Occ after HER Injection;Time in #mus;Mean Occ in % per modul", 4000,
+  m_hInjectionHERSVDOcc = new TH1F("HitInjectionSVDHEROcc", "SVD Occ after HER Injection;Time in #mus;Mean Occ in % per module", 4000,
                                    0, 20000);
   m_hInjectionHERECL = new TH1F("HitInjectionHERECL", "ECL Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0, 20000);
   m_hBurstHERECL = new TH1F("BurstInjectionHERECL", "ECL Bursts after HER Injection;Time in #mus;Suppressions/event (1 #mus bins)",

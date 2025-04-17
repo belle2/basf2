@@ -12,15 +12,9 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 #include <dqm/core/DQMHistAnalysis.h>
 
 #include <TF1.h>
-#include <TCanvas.h>
 #include <TLine.h>
 
 namespace Belle2 {
@@ -88,9 +82,8 @@ namespace Belle2 {
     /** The line for the higher bound. */
     TLine* m_line_hi = nullptr;
 
-#ifdef _BELLE2_EPICS
-    chid mychid[10];// hard limit max 10 parameters
-#endif
+    /** list of pv names */
+    std::vector<std::string> mypv;
   };
 } // end namespace Belle2
 

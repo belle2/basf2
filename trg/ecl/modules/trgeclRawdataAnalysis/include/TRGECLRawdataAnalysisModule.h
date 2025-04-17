@@ -37,7 +37,7 @@ namespace Belle2 {
     /** Destructor  */
     virtual ~TRGECLRawdataAnalysisModule();
 
-    /** Initilizes TRGECLModule.*/
+    /** Initializes TRGECLModule.*/
     virtual void initialize() override;
 
     /** Called when new run started.*/

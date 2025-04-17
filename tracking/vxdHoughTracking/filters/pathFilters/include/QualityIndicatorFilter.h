@@ -35,13 +35,14 @@ namespace Belle2 {
       std::string m_EstimationMethod = "tripletFit";
       /// sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method
       std::string m_MCRecoTracksStoreArrayName = "MCRecoTracks";
-      /// Only required for MCInfo method
-      bool m_MCStrictQualityEstimator = true;
       /// pointer to the selected QualityEstimator
       std::unique_ptr<QualityEstimatorBase> m_estimator;
 
       /// cut on quality indicator
       double m_QIcut = 0.0;
+
+      /// Only required for MCInfo method
+      bool m_MCStrictQualityEstimator = true;
     };
 
   }

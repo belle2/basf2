@@ -17,7 +17,7 @@ rl = os.path.realpath
 
 def expect_missing(*args):
     """Return true if passing the arguments to find_file raises a FileNotFoundError, otherwise False"""
-    # raises a file not found exception if not found (unless supressed)
+    # raises a file not found exception if not found (unless suppressed)
     try:
         find_file(*args)
     except FileNotFoundError:

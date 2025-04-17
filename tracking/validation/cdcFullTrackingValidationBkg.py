@@ -19,7 +19,7 @@
 """
 
 from tracking.validation.run import TrackingValidationRun
-import tracking
+from tracking.path_utils import add_cdc_track_finding
 import logging
 import basf2
 VALIDATION_OUTPUT_FILE = 'CDCFullTrackingValidationBkg.root'
@@ -38,7 +38,7 @@ class CDCFull(TrackingValidationRun):
 
     def finder_module(self, path):
         """Add the CDC track-finding module to the basf2 path"""
-        tracking.add_cdc_track_finding(path)
+        add_cdc_track_finding(path)
         # adjust_module(path, "TFCDC_WireHitPreparer",
         #               UseNLoops=1)
 

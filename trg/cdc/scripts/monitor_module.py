@@ -46,8 +46,8 @@ hpri = TH1F('pri', 'priority position', 4, 0, 4)
 hpritime = TH1F('pritime', 'priority time', 512, 0, 512)
 hftime = TH1F('found time', 'found time', 48, -35, 13)
 
-used = numpy.zeros(2336, numpy.int)
-in_tsim = numpy.zeros(2336, numpy.int)
+used = numpy.zeros(2336, numpy.int32)
+in_tsim = numpy.zeros(2336, numpy.int32)
 
 
 class Monitor(b2.Module):
@@ -57,7 +57,7 @@ class Monitor(b2.Module):
 
     def initialize(self):
         """
-        Initilization
+        Initialization
         """
         #: Event info
         self.event_info = Belle2.PyStoreObj('EventMetaData')

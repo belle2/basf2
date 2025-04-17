@@ -149,7 +149,7 @@ function loadSelectedRevisions(button=false) {
         else {
             console.warn("Selected reference not in revisions.")
         }
-        // add reference to fron of revisions
+        // add reference to the list of revisions
         revList.unshift(reference);
     }
     else {
@@ -278,7 +278,7 @@ function onReferenceSelectionChanged(){
 
     console.log(`referenceSelectionChanged: Will compare '${newestRevision}' (newest selected revision) with '${selectedReference}' (reference).`);
 
-    // Upddate boldness
+    // Update boldness
 
     $(`.revision-label`).each(
         (i, obj) => {
@@ -305,7 +305,7 @@ function onReferenceSelectionChanged(){
 
 /**
  * Sets the state of the revision checkboxes
- * @parm mode: "all" (all revisions), "r" (last revision only), "n" (last
+ * @param mode: "all" (all revisions), "r" (last revision only), "n" (last
  *  nightly only), "nnn" (all nightlies), "rbn"
  *  (default, nightly and revision).
  */
@@ -510,7 +510,7 @@ function updateComparisonData(_comparisonData) {
                     pkgDict["scriptfiles"] = scriptfiles;
                     pkgDict["newest_revision"] = label;
                     // Also add keys that usually come from the
-                    // comparison file and are nescessary for things to work
+                    // comparison file and are necessary for things to work
                     pkgDict["visible"] = true;
                     pkgDict["comparison_error"] = 0; // else problems in package template
                     comparisonData["packages"].push(pkgDict);

@@ -89,7 +89,7 @@ def root_style():
 
 def df_plot_errorbar(df, x, y, yerr_low, yerr_up, ax=None, *args, **kwargs):
     """
-    errorbar extention for pandas.DataFrame
+    errorbar extension for pandas.DataFrame
     Parameters:
       df: pandas.DataFrame
       x (str): column used as the x-axis

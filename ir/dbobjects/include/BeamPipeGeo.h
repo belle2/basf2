@@ -27,7 +27,7 @@ namespace Belle2 {
     {}
 
     /**
-     * Initialze from the gearbox (xml file)
+     * Initialize from the gearbox (xml file)
      * @param content gearbox folder
      */
     void initialize(const GearDir& content);

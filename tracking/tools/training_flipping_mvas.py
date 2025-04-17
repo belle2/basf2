@@ -19,7 +19,7 @@ import argparse
 
 
 def get_argument_parser() -> argparse.ArgumentParser:
-    """ Parses the command line options of the fliping mva training and returns the corresponding arguments. """
+    """ Parses the command line options of the flipping mva training and returns the corresponding arguments. """
     parser = argparse.ArgumentParser()
     parser.add_argument('-train', default='', type=str,
                         help='Data file containing ROOT TTree used during training. Default: \'\'.')
@@ -28,7 +28,7 @@ def get_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument('-tree', default='', type=str,
                         help='Treename in data file. Default: \'\'.')
     parser.add_argument('-mva', default=1, type=int,
-                        help='index of mva to be trainned. Default: 1')
+                        help='index of mva to be trained. Default: 1')
 
     return parser
 

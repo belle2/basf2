@@ -43,39 +43,39 @@ namespace Belle2 {
     ~CDCTriggerMLP() { }
 
     /** check if weights are default values or set by some trainer */
-    bool isTrained() const { return m_trained; }
+    bool isTrained() const { return trained; }
     /** get number of layers */
-    unsigned nLayers() const { return m_nNodes.size(); }
+    unsigned nLayers() const { return nNodes.size(); }
     /** get number of nodes in a layer */
-    unsigned nNodesLayer(unsigned iLayer) const { return m_nNodes[iLayer]; }
+    unsigned nNodesLayer(unsigned iLayer) const { return nNodes[iLayer]; }
     /** get number of weights from length of weights vector */
-    unsigned nWeights() const { return m_weights.size(); }
+    unsigned nWeights() const { return weights.size(); }
     /** calculate number of weights from number of nodes */
     unsigned nWeightsCal() const;
     /** get weights vector */
-    std::vector<float> getWeights() const { return m_weights; }
+    std::vector<float> getWeights() const { return weights; }
     /** set weights vector */
-    void setWeights(std::vector<float> xweights) {m_weights = xweights; }
+    void setWeights(std::vector<float> xweights) {weights = xweights; }
     /** get maximum hit number for a single super layer */
-    unsigned short getMaxHitsPerSL() const { return m_maxHitsPerSL; }
+    unsigned short getMaxHitsPerSL() const { return maxHitsPerSL; }
     /** get super layer pattern */
-    unsigned long getSLpattern() const { return m_SLpattern & m_SLpatternMask; }
+    unsigned long getSLpattern() const { return SLpattern & SLpatternMask; }
     /** get bitmask for super layer pattern */
-    unsigned long getSLpatternMask() const { return m_SLpatternMask; }
+    unsigned long getSLpatternMask() const { return SLpatternMask; }
     /** get raw super layer pattern */
-    unsigned long getSLpatternUnmasked() const { return m_SLpattern; }
+    unsigned long getSLpatternUnmasked() const { return SLpattern; }
     /** get maximal drift time */
-    unsigned short getTMax() const { return m_tMax; }
+    unsigned short getTMax() const { return tMax; }
     /** get relevant ID range for given super layer */
     std::vector<float> getIDRange(unsigned iSL) const
     {
-      return {m_relevantID[2 * iSL], m_relevantID[2 * iSL + 1]};
+      return {relevantID[2 * iSL], relevantID[2 * iSL + 1]};
     }
     /** set and get total relevant ID range */
-    void setRelID(std::vector<float> relid) {m_relevantID = relid;}
-    std::vector<float> getRelID() const {return m_relevantID;}
+    void setRelID(std::vector<float> relid) {relevantID = relid;}
+    std::vector<float> getRelID() const {return relevantID;}
     /** Returns way of obtaining the event time */
-    std::string get_et_option() const { return m_et_option; }
+    std::string get_et_option() const { return et_option; }
 
     /** check whether given phi value is in sector */
     bool inPhiRangeUse(float phi) const;
@@ -111,55 +111,55 @@ namespace Belle2 {
 
   private:
     /** Number of nodes in each layer, not including bias nodes. */
-    std::vector<unsigned short> m_nNodes;
+    std::vector<unsigned short> nNodes;
     /** Weights of the network. */
-    std::vector<float> m_weights;
+    std::vector<float> weights;
     /** Indicator whether the weights are just default values or have
      *  been set by some trainer (set to true when setWeights() is first called). */
-    bool m_trained;
+    bool trained;
 
     /** output variables: 1: z, 2: theta, 3: (z, theta) */
-    unsigned short m_targetVars;
+    unsigned short targetVars;
     /** Output[i] of the MLP is scaled from [-1, 1]
      *  to [outputScale[2i], outputScale[2i+1]]. */
-    std::vector<float> m_outputScale;
+    std::vector<float> outputScale;
 
     /** Phi region in radian for which this expert is used.
       * Valid ranges go from -2pi to 2pi. */
-    std::vector<float> m_phiRangeUse;
+    std::vector<float> phiRangeUse;
     /** Charge / Pt region in 1/GeV for which this expert is used.
       * Taking 1 / Pt instead of Pt means that straight tracks are at 0,
       * i.e. there is a smooth transition from positive to negative charge. */
-    std::vector<float> m_invptRangeUse;
+    std::vector<float> invptRangeUse;
     /** Theta region in radian for which this expert is trained. */
-    std::vector<float> m_thetaRangeUse;
+    std::vector<float> thetaRangeUse;
     /** Phi region in radian for which this expert is used.
       * Valid ranges go from -2pi to 2pi. */
-    std::vector<float> m_phiRangeTrain;
+    std::vector<float> phiRangeTrain;
     /** Charge / Pt region in 1/GeV for which this expert is trained.
       * Taking 1 / Pt instead of Pt means that straight tracks are at 0,
       * i.e. there is a smooth transition from positive to negative charge. */
-    std::vector<float> m_invptRangeTrain;
+    std::vector<float> invptRangeTrain;
     /** Theta region in radian for which this expert is trained. */
-    std::vector<float> m_thetaRangeTrain;
+    std::vector<float> thetaRangeTrain;
 
     /** Maximum number of inputs for a single super layer. */
-    unsigned short m_maxHitsPerSL;
+    unsigned short maxHitsPerSL;
     /** Super layer pattern for which this expert is trained.
       * Binary pattern of 9 * maxHitsPerSL bits (on/off for each hit).
       * 0 means no restriction rather than no inputs. */
-    unsigned long m_SLpattern;
+    unsigned long SLpattern;
     /** Bitmask for comparing the super layer pattern.
       * A track matches a sector, if
       * SLpattern & SLpatternMask == hitPattern(track) & SLpatternMask. */
-    unsigned long m_SLpatternMask;
+    unsigned long SLpatternMask;
 
     /** Maximal drift time (for scaling), hits with larger values are ignored. */
-    unsigned short m_tMax;
+    unsigned short tMax;
     /** Hits must be within ID region around 2D track to be used as input.
       * Default for axial layers is +- 1 wire,
       * default for stereo layers is region spanned by stereos +- 1 wire. */
-    std::vector<float> m_relevantID;
+    std::vector<float> relevantID;
 
     /**
      * Returns way of obtaining the event time.
@@ -175,10 +175,10 @@ namespace Belle2 {
      *                                  "fastestppriority" is used.
      *   "etf_or_zero"              :   the event time is obtained by the ETF, if
      */
-    std::string m_et_option;
+    std::string et_option;
 
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerMLP, 10);
+    ClassDef(CDCTriggerMLP, 11);
   };
 }
 #endif

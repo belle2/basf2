@@ -9,8 +9,6 @@
 #include <alignment/GlobalParam.h>
 
 #include <alignment/Hierarchy.h>
-#include <cdc/dbobjects/CDCLayerAlignment.h>
-#include <framework/database/Database.h>
 #include <framework/geometry/B2Vector3.h>
 #include <framework/logging/Logger.h>
 #include <vxd/geometry/GeoCache.h>
@@ -181,7 +179,7 @@ namespace Belle2 {
               continue;
 
             rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(sensor, VxdID(0, 0, 0, 1),
-                geo.get(sensor).getTransformation(true));
+                geo.getSensorInfo(sensor).getTransformation(true));
           }
         } else if (s_hierarchyType == c_HalfShells) {
           /**
@@ -223,7 +221,7 @@ namespace Belle2 {
                                vxdAlignments->get(ladderPlacement.first, VXDAlignment::dBeta),
                                vxdAlignments->get(ladderPlacement.first, VXDAlignment::dGamma)
                              );
-              // Do not insert ladder, but insert sensor directly into half-shells bellow, with the additional transformation from ladder
+              // Do not insert ladder, but insert sensor directly into half-shells below, with the additional transformation from ladder
               //rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(ladderPlacement.first, halfShellPlacement.first, trafoLadder);
 
               for (auto& sensorPlacement : geo.getSensorPlacements(ladderPlacement.first)) {

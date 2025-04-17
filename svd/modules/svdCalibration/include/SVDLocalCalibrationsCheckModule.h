@@ -125,7 +125,7 @@ namespace Belle2 {
 
     bool m_plotGoodAPVs = false; /**< if true also the good APVs are plotted on the DIFF canvas*/
 
-    //analsyis parameters
+    //analysis parameters
     int m_cutN_out = -1; /**< maximum number of allowed outliers */
     float m_cutNoise_ave = -1; /**< maximum relative deviation APV-average (noise)*/
     float m_cutNoise_out = -1; /**< maximum relative deviation strip  (noise)*/

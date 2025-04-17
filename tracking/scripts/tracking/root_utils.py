@@ -115,7 +115,7 @@ def root_cd(tdirectory):
             if not tdirectory:
                 raise RuntimeError(f"Could not create or find folder {tdirectory_name}")
 
-            # If tdirectory_name is as hierachy like a/b/c make sure we select the most nested folder
+            # If tdirectory_name is as hierarchy like a/b/c make sure we select the most nested folder
             # (and not a as the documentation of TDirectory.mkdir suggests).
             tdirectory = save_tdirectory.GetDirectory(tdirectory_name)
 
@@ -178,8 +178,8 @@ def root_browse(tobject):
 def root_ls(obj):
     """Returns a list of names that are contained in the given obj.
 
-    This is a convinience function to invesitigate the content of ROOT objects,
-    that dispatches on to object type and retieves different things depending on the type.
+    This is a convenience function to investigate the content of ROOT objects,
+    that dispatches on to object type and retrieves different things depending on the type.
     If the obj is a string it is interpreted as a filename.
     """
     return list(obj)

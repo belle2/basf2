@@ -184,7 +184,7 @@ class CleanBasf2Execution:
         I would rather use self._handled_process.wait() or poll()
         which does exactly the same.
         However: the main process is also waiting for the return code
-        so the threading.lock in the .wait() function will never aquire a lock :-(
+        so the threading.lock in the .wait() function will never acquire a lock :-(
         """
         pid, sts = process._try_wait(os.WNOHANG)
         assert pid == process.pid or pid == 0

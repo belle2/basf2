@@ -10,13 +10,14 @@
 
 """ Skim list building functions for the low multiplicity physics working group """
 
+import math
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm
 
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -68,7 +69,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
         # candidates are : vpho -> e+ e- or vpho -> e gamma
         # daughter indices are:    0  1             0 1
         deltaTheta_cut = (
-            '[abs(formula(daughter(0, useCMSFrame(theta)) + daughter(1, useCMSFrame(theta)) - 3.1415927)) < 0.17453293]'
+            f'[abs(formula(daughter(0, useCMSFrame(theta)) + daughter(1, useCMSFrame(theta)) - {math.pi})) < 0.17453293]'
         )
 
         # convert the prescale from trigger convention
@@ -182,12 +183,13 @@ class LowMassTwoTrack(BaseSkim):
         return ParticleLists
 
     def validation_histograms(self, path):
+        from ROOT import Belle2
         vm.addAlias('pip_p_cms', 'daughter(0, useCMSFrame(p))')
         vm.addAlias('pim_p_cms', 'daughter(1, useCMSFrame(p))')
         vm.addAlias('gamma_E_cms', 'daughter(2, useCMSFrame(E))')
-        vm.addAlias('pip_theta_lab', 'formula(daughter(0, theta)*180/3.1415927)')
-        vm.addAlias('pim_theta_lab', 'formula(daughter(1, theta)*180/3.1415927)')
-        vm.addAlias('gamma_theta_lab', 'formula(daughter(2, theta)*180/3.1415927)')
+        vm.addAlias('pip_theta_lab', f'formula(daughter(0, theta)/{Belle2.Unit.deg})')
+        vm.addAlias('pim_theta_lab', f'formula(daughter(1, theta)/{Belle2.Unit.deg})')
+        vm.addAlias('gamma_theta_lab', f'formula(daughter(2, theta)/{Belle2.Unit.deg})')
         vm.addAlias('Mpipi', 'daughterInvM(0,1)')
 
         ma.copyLists('vpho:LowMassTwoTrack', self.SkimLists, path=path)
@@ -260,10 +262,10 @@ class SingleTagPseudoScalar(BaseSkim):
         for dmID, (mode, cut) in enumerate(ModesAndCuts):
             ma.reconstructDecay(mode, cut, dmID=dmID, path=path)
 
-        ma.cutAndCopyList(f"pi0:{label}_highE", f"pi0:{label}_loose", "E > 0.5", path=path)
+        ma.cutAndCopyList(f"pi0:{label}_highE_SingleTagPseudoScalar", f"pi0:{label}_loose", "E > 0.5", path=path)
 
         particles = [
-            f"pi0:{label}_highE",
+            f"pi0:{label}_highE_SingleTagPseudoScalar",
             "eta:gg",
             "eta:pipipi0",
             "eta:pipig",

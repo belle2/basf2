@@ -298,6 +298,8 @@ class Pager:
         os.dup2(self._original_stderr_fd, sys.stderr.fileno())
         # and the original __stdout__/__stderr__ object just in case. Will also
         # close the copied file descriptors
+        sys.__stdout__.close()
+        sys.__stderr__.close()
         sys.__stderr__ = self._original_stderr
         sys.__stdout__ = self._original_stdout
         # and clean up our monkey patch of isatty
@@ -342,7 +344,7 @@ class InputEditor():
         """Constructor"""
         # Use provided editor command or editor command from environment variables
         editor_command_string = editor_command or self._default_environment_editor()
-        #: command line for the editor, split to seperate executable name command line arguments
+        #: command line for the editor, split to separate executable name command line arguments
         self.editor_command_list = shlex.split(editor_command_string, posix=True)
         # check if editor executable exists and if not, prompt for new editor command
         if shutil.which(self.editor_command_list[0]) is None:

@@ -75,7 +75,7 @@ namespace Belle2 {
     //implementation secondVersion, setters and getters
     /** set the minimum time distance wrt t0 */
     void setDeltaTime(double deltaT) { m_deltaT = deltaT; }
-    /** returns the minimum time distnace wrt t0 */
+    /** returns the minimum time distance wrt t0 */
     float getDeltaTime() const { return m_deltaT; };
 
     //implementation thirdVersion, setters and getters
@@ -120,7 +120,7 @@ namespace Belle2 {
 
     /** current function ID */
     int m_current;
-    /** vector of fuctions, we use the m_current*/
+    /** vector of functions, we use the m_current*/
     static std::vector < selFunction > m_implementations; //! Do not stream this, please throw it in the WC
 
 

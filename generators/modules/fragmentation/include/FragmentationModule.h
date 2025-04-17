@@ -84,6 +84,8 @@ namespace Belle2 {
     std::string m_DecFile;  /**< EvtGen decay file */
     std::string m_UserDecFile;  /**< User EvtGen decay file */
     bool m_coherentMixing;  /**< decay the B0-B0bar coherently. */
+    int m_quarkPairMotherParticle;  /**< PDG Code of the mother particle of the quark pair. */
+    std::vector<int> m_additionalPDGCodes;  /**< Additional particles used in Pythia. */
 
     MCParticleGraph mcParticleGraph; /**< An instance of the MCParticle graph. */
 

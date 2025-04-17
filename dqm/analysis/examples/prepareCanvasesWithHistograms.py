@@ -20,7 +20,7 @@ if len(argv) < 3:
     print()
     print('To make this script work, first build dqm package b2code-package-add daq; scons')
     print()
-    print('For more information see https://confluence.desy.de/display/BI/Develop+DQM+Analysis+Modules')
+    print('For more information see https://xwiki.desy.de/xwiki/rest/p/a331d')
     print()
     print(f'Usage: {argv[0]} input_filename output_filename')
     print()

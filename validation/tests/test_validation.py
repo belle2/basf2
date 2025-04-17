@@ -100,7 +100,7 @@ class ValidationTest(unittest.TestCase):
 
     def test_apply_package_selection(self):
         """
-        Test if the package selection works and if the required dependecies are
+        Test if the package selection works and if the required dependencies are
         properly honored
         """
 

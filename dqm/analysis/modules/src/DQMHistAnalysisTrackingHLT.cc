@@ -34,9 +34,6 @@ DQMHistAnalysisTrackingHLTModule::DQMHistAnalysisTrackingHLTModule()
 
   setDescription("DQM Analysis Module of the Tracking HLT Plots.");
 
-  addParam("failureRateThreshold", m_failureRateThreshold,
-           "Maximum Fraction of Events in which Tracking Aborts before turning Canvas to Red. Will be taken from Epics by default, \
-    this value is only taken if Epics is not available!", double(m_failureRateThreshold));
   addParam("minNoEvents", m_statThreshold,
            "Minimum Number of Events before scaring CR shifters. Will be taken from Epics by default, \
     this value is only taken if Epics is not available!", int(m_statThreshold));
@@ -49,18 +46,12 @@ DQMHistAnalysisTrackingHLTModule::DQMHistAnalysisTrackingHLTModule()
 void DQMHistAnalysisTrackingHLTModule::beginRun()
 {
   // get the abort rate and statThreshold from epics
-  double buffThreshold(NAN);
   double buffMinEvents(NAN);
-  double dummy_lowerAlarm, dummy_lowerWarn, dummy_upperWarn, dummy_upperAlarm;
+  double dummyLowerAlarm, dummyUpperWarn, dummyUpperAlarm;
 
   // read thresholds from EPICS
-  requestLimitsFromEpicsPVs("abortRate", dummy_lowerAlarm, dummy_lowerWarn, dummy_upperWarn, buffThreshold);
-  requestLimitsFromEpicsPVs("minNoEvents",          dummy_lowerAlarm, buffMinEvents, dummy_upperWarn, dummy_upperAlarm);
+  requestLimitsFromEpicsPVs("minNoEvents", dummyLowerAlarm, buffMinEvents, dummyUpperWarn, dummyUpperAlarm);
 
-  if (!std::isnan(buffThreshold)) {
-    B2INFO(getName() << ": Setting failure rate threshold from EPICS. New failureRateThreshold " << buffThreshold);
-    m_failureRateThreshold = buffThreshold;
-  }
   if (!std::isnan(buffMinEvents)) {
     B2INFO(getName() << ": Setting min number of events threshold from EPICS. New minNoEvents " << buffMinEvents);
     m_statThreshold = buffMinEvents;
@@ -73,7 +64,6 @@ void DQMHistAnalysisTrackingHLTModule::initialize()
 {
 
   gROOT->cd();
-  m_cAbortRate = new TCanvas("TrackingAnalysis/c_AbortRate");
   m_cAbortRateHER = new TCanvas("TrackingAnalysis/c_AbortRateHER");
   m_cAbortRateLER = new TCanvas("TrackingAnalysis/c_AbortRateLER");
 
@@ -88,50 +78,11 @@ void DQMHistAnalysisTrackingHLTModule::initialize()
   registerEpicsPV("trackingHLT:nVXDTracksPerEvent", "nVXDTracksPerEvent");
   registerEpicsPV("trackingHLT:nCDCTracksPerEvent", "nCDCTracksPerEvent");
   registerEpicsPV("trackingHLT:nVXDCDCTracksPerEvent", "nVXDCDCTracksPerEvent");
-  registerEpicsPV("trackingHLT:abortRate", "abortRate");
 
 }
 
 void DQMHistAnalysisTrackingHLTModule::event()
 {
-
-  //check Tracking Abort Rate
-  TH1* hAbort = findHist("TrackingHLTDQM/NumberTrackingErrorFlags");
-  if (hAbort != nullptr) {
-
-    bool hasError = false;
-    int nEvents = hAbort->GetEntries();
-    double abortRate = hAbort->GetMean();
-    hAbort->SetTitle(Form("Fraction of Events in which Tracking aborts = %.4f %%", abortRate * 100));
-
-    if (nEvents >= m_statThreshold) {
-      m_monObj->setVariable("abortRate", abortRate);
-      setEpicsPV("abortRate", abortRate);
-    }
-
-    //check if number of errors is above the allowed limit
-    if (abortRate > m_failureRateThreshold)
-      hasError = true;
-
-    m_cAbortRate->cd();
-    hAbort->Draw();
-
-    if (nEvents < m_statThreshold) colorizeCanvas(m_cAbortRate, EStatus::c_StatusTooFew);
-    else if (hasError) colorizeCanvas(m_cAbortRate, EStatus::c_StatusError);
-    else colorizeCanvas(m_cAbortRate, EStatus::c_StatusGood);
-
-  } else { // histogram not found
-    B2WARNING("Histogram TrackingHLTDQM/NumberTrackingErrorFlags from Tracking DQM not found!");
-    m_cAbortRate->SetFillColor(kGray);
-  }
-
-  m_cAbortRate->Modified();
-  m_cAbortRate->Update();
-
-
-  if (m_printCanvas)
-    m_cAbortRate->Print("c_AbortRate.pdf");
-
 
   // check tracking abort rate VS time after last HER injection and time within a beam cycle HER
   TH2F* hAbortHER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/TrkAbortVsTimeHER"));
@@ -150,16 +101,15 @@ void DQMHistAnalysisTrackingHLTModule::event()
       }
 
     m_cAbortRateHER->cd();
-    m_cAbortRateHER->SetFillColor(kWhite);
+    colorizeCanvas(m_cAbortRateHER, EStatus::c_StatusDefault);
     hAbortRateHER->SetTitle("Fraction of Events with Tracking Aborts vs HER injection");
     hAbortRateHER->GetZaxis()->SetTitle("Fraction of events / bin");
     hAbortRateHER->Draw("colz");
 
 
-  } else { // histogram not found
-    B2WARNING("Histograms TrackingHLTDQM/TrkAbortVsTimeHER or allEvtsVsTimeHER from Tracking DQM not found!");
-    m_cAbortRateHER->SetFillColor(kGray);
-  }
+  } else
+    colorizeCanvas(m_cAbortRateHER, EStatus::c_StatusTooFew);
+
   if (m_printCanvas)
     m_cAbortRateHER->Print("c_AbortRateHER.pdf");
 
@@ -167,6 +117,7 @@ void DQMHistAnalysisTrackingHLTModule::event()
   // check tracking abort rate VS time after last LER injection and time within a beam cycle LER
   TH2F* hAbortLER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/TrkAbortVsTimeLER"));
   TH2F* hAllLER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/allEvtsVsTimeLER"));
+
   if (hAbortLER != nullptr && hAllLER != nullptr) {
 
     TH2F* hAbortRateLER = new TH2F(*hAbortLER);
@@ -181,15 +132,14 @@ void DQMHistAnalysisTrackingHLTModule::event()
       }
 
     m_cAbortRateLER->cd();
-    m_cAbortRateLER->SetFillColor(kWhite);
+    colorizeCanvas(m_cAbortRateLER, EStatus::c_StatusDefault);
     hAbortRateLER->SetTitle("Fraction of Events with Tracking Aborts vs LER injection");
     hAbortRateLER->GetZaxis()->SetTitle("Fraction of events / bin");
     hAbortRateLER->Draw("colz");
 
-  } else { // histogram not found
-    B2WARNING("Histograms TrackingHLTDQM/TrkAbortVsTimeLER or allEvtsVsTimeLER from Tracking DQM not found!");
-    m_cAbortRateLER->SetFillColor(kGray);
-  }
+  } else
+    colorizeCanvas(m_cAbortRateLER, EStatus::c_StatusTooFew);
+
   if (m_printCanvas)
     m_cAbortRateLER->Print("c_AbortRateLER.pdf");
 

@@ -215,7 +215,7 @@ fullsim = b2.register_module('FullSim')
 param_fullsim = {'RegisterOptics': 1, 'PhotonFraction': 0.3}
 fullsim.param(param_fullsim)
 fullsim.param('PhysicsList', 'QGSP_BERT_HP')
-fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
+fullsim.param('UICommandsAtIdle', ['/process/deactivate nKiller'])
 
 # If you want to store all secondaries in MCParticles, use following lines.
 # Default is False and 1MeV cut.

@@ -96,7 +96,7 @@ namespace Belle2 {
       /// signal channelID
       UChar_t m_channel{0};
 
-      /// For debuging, store also number of channels with hits
+      /// For debugging, store also number of channels with hits
       UChar_t m_n_hit{0};
 
       // Store also distance to the signal as well as minimal distance to bg

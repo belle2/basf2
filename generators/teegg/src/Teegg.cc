@@ -147,7 +147,7 @@ void Teegg::setDefaultSettings()
 void Teegg::initExtraInfo()
 {
   StoreObjPtr<EventExtraInfo> eventextrainfo;
-  eventextrainfo.registerInDataStore();
+  eventextrainfo.isRequired();
 }
 
 void Teegg::init()

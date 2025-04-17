@@ -20,7 +20,7 @@ namespace Belle2 {
    * \code
      setPropertyFlags(c_Parallelprocessing | c_terminateInAllProcesses);
      \endcode
-     create SetMergeable<X> in initalize (or in your constructor) of durability DataStore::c_Persistent,
+     create SetMergeable<X> in initialize (or in your constructor) of durability DataStore::c_Persistent,
      register it by calling registerInDataStore() and construct() the actual container.
    *
    * Each template instance needs its own entry in framework/pcore/include/linkdef.h,

@@ -9,7 +9,7 @@
 ##########################################################################
 
 # Steering file to apply the specific FEI on Belle II MC, but it can be also easily adapted for converted Belle MC.
-# For reference see Confluence and Thomas Keck's PhD thesis.
+# For reference see XWiki and Thomas Keck's PhD thesis.
 #
 # Please adapt for your signal channel.
 # This example is for hadronic tagging.
@@ -23,7 +23,7 @@ import modularAnalysis as ma
 path = b2.create_path()
 
 # Load input ROOT file
-ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False),
+ma.inputMdst(filename=b2.find_file('mdst16.root', 'validation', False),
              path=path)
 
 # Max 12 tracks per event - this avoids much computing time.

@@ -11,13 +11,12 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/core/RandomNumbers.h>
 
 #include <TMath.h>
+#include <TRandom.h>
 
 //c++
 #include <string>
-#include <fstream>
 #include <vector>
 
 using namespace std;
@@ -115,7 +114,7 @@ void CsiDigitizer_v2Module::getXMLData()
     iRange++;
   }
 
-  B2INFO("CsiDigitizer_V2: Aquired csi locations and gas parameters");
+  B2INFO("CsiDigitizer_V2: Acquired csi locations and gas parameters");
   B2INFO("              from CSI.xml. There are " << nCSI << " CSIs implemented");
 
 }

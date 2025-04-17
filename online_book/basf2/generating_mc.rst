@@ -41,7 +41,7 @@ this is one of the duty of the Data Production group.
 Each physics Working Group has a dedicated person (the `Data Production liaison`_) to assist the analysers
 and to collect their requests concerning the MC production.
 
-.. _Data production liaison: https://confluence.desy.de/display/BI/Data+production+WebHome
+.. _Data production liaison: https://xwiki.desy.de/xwiki/rest/p/df1b0
 
 There are several reasons for discouraging the self-production of very large MC samples:
 

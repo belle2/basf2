@@ -27,8 +27,6 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
-CONTACT = "oliver.frost@desy.de"
-
 n_toys = 10000
 
 radius = 1

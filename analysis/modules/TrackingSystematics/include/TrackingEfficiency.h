@@ -9,10 +9,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
-#include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
-
-#include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
 

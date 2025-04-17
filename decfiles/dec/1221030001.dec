@@ -1,0 +1,31 @@
+# EventType: 1221030001 
+# Descriptor: [B- -> p- [ P -> J/psi Lambda0 ] ] and cc
+# NickName: Bu_P_Jpsi_anti-Lambda_p
+# Documentation: B -> pentaquark baryon.
+# Tested: Yes
+# PhysicsWG: B2Hadronic 
+# Responsible: Shanette De La Motte 
+# Email: saphdlm@gmail.com 
+# Cuts: None
+# Date: 25/02/2025
+# This decay model is intended for pentaquark studies
+# Pentaquark particle to be generated with parameters:
+# pdg.add_particle('P_Lambda_psis0', 9432142 , 4.3382, 0.007,0, 0.5)
+# pdg.add_particle('anti-P_Lambda_psis0', -9432142 , 4.3382, 0.007,0, 0.5)
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B-sig
+1.0 P_Lambda_psis0 anti-p- PHSP;
+Enddecay
+CDecay B+sig
+
+Decay P_Lambda_psis0
+1.0 J/psi Lambda0 PHSP;
+Enddecay
+CDecay anti-P_Lambda_psis0
+
+End

@@ -15,7 +15,7 @@ from tracking.harvesting_validation.eventwise_module import EventwiseTrackingVal
 
 
 class CombinedTrackingValidationModule(metamodules.PathModule):
-    """Harvesting validation module combining eventwise, pr side and mc side tracking valiation parts"""
+    """Harvesting validation module combining eventwise, pr side and mc side tracking validation parts"""
 
     #: MC side validation module to use
     MCSideModule = MCSideTrackingValidationModule
@@ -35,7 +35,7 @@ class CombinedTrackingValidationModule(metamodules.PathModule):
                  expert_level=None):
         """Constructor"""
 
-        #: Output TFile to be opened in the initialize methode
+        #: Output TFile to be opened in the initialize method
         self.output_file_name = output_file_name or name + 'TrackingValidation.root'
 
         # First forward the output_file_name to the separate modules

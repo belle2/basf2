@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>

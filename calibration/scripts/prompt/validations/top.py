@@ -138,7 +138,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
                 graphs.append(g_under)
     canvas.Print(outputFileName)
 
-    # make plots of channelT0 residual distirbutions
+    # make plots of channelT0 residual distributions
 
     canvas.Clear()
     canvas.Divide(4, 4)

@@ -79,7 +79,7 @@ namespace Belle2 {
      * @param yold old y coordinate.
      * @param xnew new x coordinate.
      * @param ynew new y coordinate.
-     * @param phi roration angle.
+     * @param phi rotation angle.
      */
     void makeRotation(double xold, double yold, double& xnew, double& ynew, double phi);
 

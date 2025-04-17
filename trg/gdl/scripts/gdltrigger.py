@@ -17,7 +17,7 @@ def add_gdl_trigger(path, SimulationMode=1, FilterEvents=False, simulateT0jitter
     add the gdl module to path
     @param path            module is added to this path
     @param SimulationMode  the simulation mode in TSIM, 1: fast simulation,
-                           trigger algoritm simulation only, no firmware simulation
+                           trigger algorithm simulation only, no firmware simulation
                            2: full simulation, both trigger algorithm and firmware
                            are simulated
     @param FilterEvents    if True only the events that pass the L1 trigger will

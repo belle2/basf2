@@ -29,6 +29,24 @@
 
 using namespace Belle2;
 
+
+//------------------------------------------------------------------------
+//  eclElectronicsPayloads.cc produces payloads ECLCrystalElectronics or
+//  ECLCrystalElectronicsTime using payloads ECLRefAmpl, ECLRefTime,
+//  ECLRefAmplNom, and ECLRefTimeNom, which must be present in the specified
+//  global tag. The payloads are written to subdirectory localdb.
+
+//  Usage to produce payload ECLCrystalElectronics or ECLCrystalElectronicsTime:
+//  eclElectronicsPayloads ECLCrystalElectronics[Time] experiment run
+//            global_tag [iWrite]
+//  Set optional argument iWrite = 0 to disable the writing of the payload.
+
+//  Diagnostic histograms are written to a root file.
+
+//  Code can also find payloads ECLRefAmplNom or ECLRefTimeNom. This option
+//  is rarely used.
+
+
 //------------------------------------------------------------------------
 //..Set experiment, run, and event numbers before reading a payload from the DB
 namespace {
@@ -50,8 +68,8 @@ namespace {
 //------------------------------------------------------------------------
 int main(int argc, char** argv)
 {
-  if (argc < 4 || argc > 5) {
-    std::cout << "insufficient arguments for eclElectronicsPayloads" << std::endl;
+  if (argc < 5 || argc > 6) {
+    std::cout << "incorrected number of arguments for eclElectronicsPayloads" << std::endl;
     return -1;
   }
   std::string payloadName = argv[1];
@@ -63,10 +81,11 @@ int main(int argc, char** argv)
   }
   int experiment = std::stoi(argv[2]);
   int run = std::stoi(argv[3]);
+  std::string globalTag = argv[4];
   bool writeOutput = true;
-  if (argc == 5) writeOutput = std::stoi(argv[4]);
-  std::cout << "eclElectronicsPayloads called with arguments " << payloadName << " " << experiment << " " << run << " " << writeOutput
-            << std::endl;
+  if (argc == 6) writeOutput = std::stoi(argv[5]);
+  std::cout << "eclElectronicsPayloads called with arguments " << payloadName << " " << experiment << " " << run << " " << globalTag
+            << " " << writeOutput << std::endl;
 
   //------------------------------------------------------------------------
   //..Specify database
@@ -74,7 +93,7 @@ int main(int argc, char** argv)
   auto states = conf.getUsableTagStates();
   states.insert("OPEN");
   conf.setUsableTagStates(states);
-  conf.prependGlobalTag("ECL_localrun_data");
+  conf.prependGlobalTag(globalTag);
   conf.prependTestingPayloadLocation("localdb/database.txt");
 
   //..set debug level

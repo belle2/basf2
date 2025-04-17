@@ -55,12 +55,12 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
                        const double driftTime)
   : m_wireID(ptrHit->getID())
   , m_wire(CDCWire::getInstance(*ptrHit))
+  , m_hit(ptrHit)
   , m_automatonCell(1)
   , m_refDriftLength(driftLength)
   , m_refDriftLengthVariance(driftLengthVariance)
   , m_refChargeDeposit(chargeDeposit)
   , m_refDriftTime(driftTime)
-  , m_hit(ptrHit)
 {
 }
 
@@ -69,8 +69,8 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
                        CDC::ADCCountTranslatorBase* ptrADCCountTranslator)
   : m_wireID(ptrHit->getID())
   , m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr)
-  , m_automatonCell(1)
   , m_hit(ptrHit)
+  , m_automatonCell(1)
 {
   if (not ptrHit) {
     B2ERROR("CDCWireHit constructor invoked with nullptr CDCHit");
@@ -123,11 +123,11 @@ CDCWireHit::CDCWireHit(const WireID& wireID,
                        const double chargeDeposit)
   : m_wireID(wireID)
   , m_wire(CDCWire::getInstance(wireID))
+  , m_hit(nullptr)
   , m_automatonCell(1)
   , m_refDriftLength(driftLength)
   , m_refDriftLengthVariance(driftLengthVariance)
   , m_refChargeDeposit(chargeDeposit)
-  , m_hit(nullptr)
 {
 }
 

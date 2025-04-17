@@ -141,7 +141,7 @@ you, e.g.::
 
 import itertools
 import subprocess
-
+import basf2_mva
 import basf2
 # from tracking import add_track_finding
 from tracking.path_utils import add_hit_preparation_modules, add_cdc_track_finding, add_svd_standalone_tracking
@@ -150,6 +150,7 @@ import background
 import simulation
 
 from ckf_training import my_basf2_mva_teacher, create_fbdt_option_string
+from tracking_mva_filter_payloads.write_tracking_mva_filter_payloads_to_db import write_tracking_mva_filter_payloads_to_db
 
 # wrap python modules that are used here but not in the externals into a try except block
 install_helpstring_formatter = ("\nCould not find {module} python module.Try installing it via\n"
@@ -478,10 +479,9 @@ class CKFResultFilterTeacherTask(Basf2Task):
         #: \endcond
     )
 
-    def get_weightfile_xml_identifier(self, fast_bdt_option=None):
+    def get_weightfile_identifier(self, fast_bdt_option=None):
         """
-        Name of the xml weightfile that is created by the teacher task.
-        It is subsequently used as a local weightfile in the following validation tasks.
+        Name of weightfile that is created by the teacher task.
 
         :param fast_bdt_option: FastBDT option that is used to train this MVA
         """
@@ -489,7 +489,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
             fast_bdt_option = self.fast_bdt_option
         fast_bdt_string = create_fbdt_option_string(fast_bdt_option)
         weightfile_name = "trk_CDCToSVDSeedResultFilter" + fast_bdt_string
-        return weightfile_name + ".xml"
+        return weightfile_name
 
     def requires(self):
         """
@@ -507,7 +507,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
         Generate list of output files that the task should produce.
         The task is considered finished if and only if the outputs all exist.
         """
-        yield self.add_to_output(self.get_weightfile_xml_identifier())
+        yield self.add_to_output(self.get_weightfile_identifier() + ".root")
 
     def process(self):
         """
@@ -518,18 +518,20 @@ class CKFResultFilterTeacherTask(Basf2Task):
         is inherited from ``Basf2Task``.
         """
         records_files = self.get_input_file_names(self.result_filter_records_name)
-
+        weightfile_identifier = self.get_weightfile_identifier()
         my_basf2_mva_teacher(
             records_files=records_files,
             tree_name="records",
-            weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier()),
+            weightfile_identifier=weightfile_identifier,
             target_variable=self.training_target,
             exclude_variables=self.exclude_variables,
             fast_bdt_option=self.fast_bdt_option,
         )
+        basf2_mva.download(weightfile_identifier, self.get_output_file_name(weightfile_identifier + ".root"))
 
 
 class ValidationAndOptimisationTask(Basf2PathTask):
+
     """
     Validate the performance of the trained filters by trying various combinations of FastBDT options, as well as cut values for
     the states, the number of best candidates kept after each filter, and similar for the result filter.
@@ -548,6 +550,9 @@ class ValidationAndOptimisationTask(Basf2PathTask):
     n_events_testing = b2luigi.IntParameter()
     #: Value of the cut on the MVA classifier output for a result candidate.
     result_filter_cut = b2luigi.FloatParameter()
+
+    # prepend the testing payloads
+    basf2.conditions.prepend_testing_payloads("localdb/database.txt")
 
     def output(self):
         """
@@ -609,6 +614,18 @@ class ValidationAndOptimisationTask(Basf2PathTask):
 
         direction = "backward"
         fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
+
+        # write the tracking MVA filter parameters and the cut on MVA classifier to be applied on a local db
+        iov = [0, 0, 0, -1]
+        write_tracking_mva_filter_payloads_to_db(
+            f"trk_CDCToSVDSeedResultFilterParameter{fbdt_string}",
+            iov,
+            f"trk_CDCToSVDSeedResultFilter{fbdt_string}",
+            self.result_filter_cut)
+
+        basf2.conditions.prepend_testing_payloads("localdb/database.txt")
+        result_filter_parameters = {"DBPayloadName": f"trk_CDCToSVDSeedResultFilterParameter{fbdt_string}"}
+
         path.add_module(
             "CDCToSVDSeedCKF",
             inputRecoTrackStoreArrayName=cdc_reco_tracks,
@@ -626,9 +643,8 @@ class ValidationAndOptimisationTask(Basf2PathTask):
             writeOutDirection=direction,
             endEarly=False,
             filter='mva_with_relations',
-            filterParameters={
-                "identifier": self.get_input_file_names(f"trk_CDCToSVDSeedResultFilter{fbdt_string}.xml")[0],
-                "cut": self.result_filter_cut})
+            filterParameters=result_filter_parameters
+            )
 
         path.add_module('RelatedTracksCombiner',
                         VXDRecoTracksStoreArrayName=svd_reco_tracks,
@@ -734,7 +750,8 @@ class MainTask(b2luigi.WrapperTask):
 
 
 if __name__ == "__main__":
+
     b2luigi.set_setting("env_script", "./setup_basf2.sh")
-    b2luigi.set_setting("batch_system", "htcondor")
+    b2luigi.get_setting("batch_system", default="lsf")
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MainTask(), workers=workers, batch=True)

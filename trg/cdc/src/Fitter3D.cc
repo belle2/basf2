@@ -858,7 +858,7 @@ namespace Belle2 {
 
     // Save values to file
     // To prevent crash when there are no tracks in first event.
-    // If there is no track in first evnet then the HandleRoot saving functions will fail.
+    // If there is no track in first event then the HandleRoot saving functions will fail.
     // This is due to bad HandleRoot software design.
     // The first event that have tracks will be event 0 in ROOT file.
     if (m_mBool["fRootFile"]) {
@@ -961,7 +961,7 @@ namespace Belle2 {
   {
     // Access to track's MC particle.
     const TCRelation& trackRelation = aTrack->relation();
-    // Biggest contibutor is 0. Next is 1 and so on.
+    // Biggest contributor is 0. Next is 1 and so on.
     const MCParticle& trackMCParticle = trackRelation.mcParticle(0);
 
     // Calculated impact position

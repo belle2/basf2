@@ -11,11 +11,6 @@
 #include <framework/datastore/RelationsObject.h>
 
 #include <TMatrixFSym.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
-#include <iostream>
-#include <vector>
-#include <set>
 #include <Eigen/Core>
 
 namespace Belle2 {

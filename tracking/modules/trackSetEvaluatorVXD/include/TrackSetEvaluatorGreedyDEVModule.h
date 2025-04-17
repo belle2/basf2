@@ -15,7 +15,7 @@
 
 namespace Belle2 {
 
-  /** The Greedy algoritm Track-set-evaluator.
+  /** The Greedy algorithm Track-set-evaluator.
    *
    *  Expects SpacePointTrackCandidates and an OverlapNetwork.
    *  Selects a subset of non-overlapping Track candidates

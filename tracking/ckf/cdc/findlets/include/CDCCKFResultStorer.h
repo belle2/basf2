@@ -20,7 +20,7 @@
 namespace Belle2 {
   class ModuleParamInfo;
 
-  /// Store resutling tracks and relations on the dataStore
+  /// Store resulting tracks and relations on the dataStore
   class CDCCKFResultStorer : public TrackFindingCDC::Findlet<const CDCCKFResult> {
     /// Parent class
     using Super = TrackFindingCDC::Findlet<const CDCCKFResult>;

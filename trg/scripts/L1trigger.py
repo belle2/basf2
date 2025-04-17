@@ -29,7 +29,7 @@ def add_trigger_simulation(
     Add the L1 trigger simulation (TSIM) modules to path.
 
     @param path: Modules are added to this path.
-    @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algoritm simulation only,
+    @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algorithm simulation only,
         no firmware simulation; 2) full simulation, both trigger algorithm and firmware are simulated.
     @param shortTracks: The standard CDC track finding requires hits in 4 axial super layers. With the shortTracks
         option, tracks with hits in the 3 innermost super layers are also found.
@@ -70,7 +70,7 @@ def add_subdetector_tsim(
     Add subdetector modules to the TSIM with no GRL and no GDL.
 
     @param path: Modules are added to this path.
-    @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algoritm simulation only,
+    @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algorithm simulation only,
         no firmware simulation; 2) full simulation, both trigger algorithm and firmware are simulated.
     @param shortTracks: The standard CDC track finding requires hits in 4 axial super layers. With the shortTracks
         option, tracks with hits in the 3 innermost super layers are also found.
@@ -96,7 +96,7 @@ def add_grl_gdl_tsim(
     Add GRL and GDL modules to the TSIM with no subdetectors. The function have to applied based on the dataobjects
     produced by add_subdetector_tsim.
 
-    @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algoritm simulation only,
+    @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algorithm simulation only,
         no firmware simulation; 2) full simulation, both trigger algorithm and firmware are simulated.
     @param FilterEvents: if True only the events that pass the L1 trigger will survive simulation, the other are discarded.
         Make sure you do need to filter events before you set the value to True.

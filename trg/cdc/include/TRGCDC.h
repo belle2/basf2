@@ -510,10 +510,10 @@ namespace Belle2 {
     /// bit6 : dump COE from ETF
     unsigned _firmwareSimulationMode;
 
-    /// Fimrware simulation start clock in FE.
+    /// Firmware simulation start clock in FE.
     int _firmwareSimulationStart;
 
-    /// Fimrware simulation stop clock in FE.
+    /// Firmware simulation stop clock in FE.
     int _firmwareSimulationStop;
 
     /// Firmware simulation time window in FE.
@@ -703,7 +703,7 @@ namespace Belle2 {
     /// CDC 2D finder boards.
     std::vector <TRGCDCTracker2D*> _tracker2Ds;
 
-    /// Track Segement Finder.
+    /// Track Segment Finder.
     TRGCDCTrackSegmentFinder* _tsFinder;
 
     /// Perfect 2D finder.

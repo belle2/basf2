@@ -18,7 +18,7 @@ class TNiel {
 
 private:
 
-  double nielfactor[1710];   /**< factor values, enough to acommodate the longest file.*/
+  double nielfactor[1710];   /**< factor values, enough to accommodate the longest file.*/
   double E_nielfactor[1710]; /**< particle energies at which the NIEL factor is tabulated.*/
   int niel_N; /**< number of rows in NIEL table */
 

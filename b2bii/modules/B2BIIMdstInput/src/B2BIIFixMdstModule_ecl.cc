@@ -56,7 +56,7 @@
 // update for exp27 (by Miyabayashi, Sanjay, Senyo).
 //
 // Revision 1.16  2003/05/31 09:22:54  hitoshi
-// updae for exp25 (ny Miyabayashi and Senyo).
+// update for exp25 (ny Miyabayashi and Senyo).
 //
 // Revision 1.15  2003/03/19 05:02:53  hitoshi
 // minor change (by Miyabayashi).
@@ -77,7 +77,7 @@
 // New for exp. 7 from Senyo and Miyabayashi sans
 //
 // Revision 1.9  2002/06/10 17:33:48  hitoshi
-// added new corections for e11 (by Miyabayashi).
+// added new corrections for e11 (by Miyabayashi).
 //
 // Revision 1.8  2002/06/09 15:28:29  hitoshi
 // added corrections for run<460 in e19.
@@ -140,7 +140,7 @@ namespace Belle2 {
 
 //==================================
 // The function giving correction factor.
-// Correcponding Data/MC so that energy in data should be divided by this.
+// Corresponding Data/MC so that energy in data should be divided by this.
 //==================================
 //Original definition.
 //static double ecl_adhoc_corr( int Exp, int Run, double Energy, double)
@@ -630,7 +630,7 @@ namespace Belle2 {
     return return_value;
   }
 
-//===== mpi0pdg.cc ===== cerated 2001/07/17 =====
+//===== mpi0pdg.cc ===== created 2001/07/17 =====
 // Make MC mass peak to PDG's one.
 // Version0.1 2001/07/17 trial version.
 //===============================================
@@ -1301,7 +1301,7 @@ namespace Belle2 {
         } else { // Previous version is unsupported one.
           // Make Warning and exit.
           B2WARNING("correct_ecl :: Warning! ");
-          B2WARNING("Previously, uncorrect version was used. ");
+          B2WARNING("Previously, incorrect version was used. ");
           B2WARNING(" Exit doing nothing");
           return;
         }
@@ -1556,7 +1556,7 @@ namespace Belle2 {
 //                     low_limit and up_limit are ignored.
 //         option = 1; users can modify mass window as they
 //                    like. The boundary of window is defined
-//                    by low_limit ans up_limit (in GeV).
+//                    by low_limit and up_limit (in GeV).
 //         option = 2; users can modify mass window in the manner of
 //                    -Xsigma < Mgg - Mpi0 < +Xsigma. The value of
 //                    sigma(mass resolution) is calculated by pi0resol
@@ -1724,7 +1724,7 @@ namespace Belle2 {
 
           // Copy them to proper matrix which is given to fit.
           CLHEP::HepMatrix y(y0);
-          // Delivative.
+          // Derivative.
           CLHEP::HepMatrix Dy(6, 1, 0);
 
           int iter = 0;
@@ -1928,7 +1928,7 @@ namespace Belle2 {
 
           // Copy them to proper matrix which is given to fit.
           CLHEP::HepMatrix y(y0);
-          // Delivative.
+          // Derivative.
           CLHEP::HepMatrix Dy(6, 1, 0);
 
           int iter = 0;

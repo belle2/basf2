@@ -6,11 +6,11 @@ Updating the main globaltag
 .. tip::
    Please have a look to :ref:`this page<conditionsdb_overview>` for a broader overview about the Conditions Database.
 
-basf2 needs payloads to work so we need a special globaltag (usually called "main" globaltag) for software development.
+The ``basf2`` software needs payloads to work so we need a special globaltag (usually called "main" globaltag) for software development.
 The main globaltag is also used as baseline for our run-independent MC productions. Due to the development model there
 are a few requirements for this globaltag:
 
-- The contents of the database should work correctly for any commit on the main basf2 branch. We have to be sure that
+- The contents of the database should work correctly for any commit on the main ``basf2`` branch. We have to be sure that
   updates to the globaltag do not affect existing development on other branches. As such every change to the code which
   requires changes to the payloads to work needs to be coordinated and result in a new globaltag.
 

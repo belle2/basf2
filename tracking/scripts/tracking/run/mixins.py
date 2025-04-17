@@ -77,7 +77,7 @@ class BrowseTFileOnTerminateRunMixin(PostProcessingRunMixin):
             action='store_true',
             default=self.show_results,
             dest='show_results',
-            help='Show generated plots in a TBrowser immediatly.',)
+            help='Show generated plots in a TBrowser immediately.',)
 
         return argument_parser
 

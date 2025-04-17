@@ -47,10 +47,10 @@ namespace Belle2 {
       /// Parameter : Setup the drift length as it can be estimated from two dimensional information
       bool m_param_reconstructedDriftLength = true;
 
-      /// Parameter : Switch to reconstruct the positions in the tracks immitating the legendre finder.
+      /// Parameter : Switch to reconstruct the positions in the tracks imitating the Legendre finder.
       bool m_param_reconstructedPositions = false;
 
-      /// Parameter : Fit the track instead of forwarding the mc truth information
+      /// Parameter : Fit the track instead of forwarding the MC truth information
       bool m_param_fit = false;
 
       /// Parameter : Cut tracks after the last layer of the CDC has been reached, assuming the tracks left the CDC

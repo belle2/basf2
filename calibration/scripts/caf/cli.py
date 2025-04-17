@@ -43,7 +43,7 @@ def command_lsf(args, backend_args=None):
     if backend_args is None:
         backend_args = {}
     backend_args = {**backend_args, **command_line_backend_args}
-    backend = LSF(backend_args=backend_args)  # Sets the backend defaults (can be overriden at the Job level)
+    backend = LSF(backend_args=backend_args)  # Sets the backend defaults (can be overridden at the Job level)
     backend.global_job_limit = args.global_job_limit
     backend.sleep_between_submission_checks = args.submission_check_heartbeat
     return backend
@@ -64,7 +64,7 @@ def command_pbs(args, backend_args=None):
     if backend_args is None:
         backend_args = {}
     backend_args = {**backend_args, **command_line_backend_args}
-    backend = PBS(backend_args=backend_args)  # Sets the backend defaults (can be overriden at the Job level)
+    backend = PBS(backend_args=backend_args)  # Sets the backend defaults (can be overridden at the Job level)
     backend.global_job_limit = args.global_job_limit
     backend.sleep_between_submission_checks = args.submission_check_heartbeat
     return backend
@@ -89,7 +89,7 @@ def command_condor(args, backend_args=None):
     if backend_args is None:
         backend_args = {}
     backend_args = {**backend_args, **command_line_backend_args}
-    backend = HTCondor(backend_args=backend_args)  # Sets the backend defaults (can be overriden at the Job level)
+    backend = HTCondor(backend_args=backend_args)  # Sets the backend defaults (can be overridden at the Job level)
     backend.global_job_limit = args.global_job_limit
     backend.sleep_between_submission_checks = args.submission_check_heartbeat
     return backend
@@ -124,7 +124,7 @@ def add_job_options(parser):
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--max-files-per-subjob", dest="files_per_subjob",
                        type=int, metavar="",
-                       help="Sets the number of input files that wil be used per subjob.")
+                       help="Sets the number of input files that will be used per subjob.")
     group.add_argument("--max-subjobs", dest="max_subjobs",
                        type=int, metavar="",
                        help=("Sets the maximum number of subjobs that will be submitted. "

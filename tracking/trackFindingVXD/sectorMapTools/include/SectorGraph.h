@@ -50,7 +50,7 @@ namespace Belle2 {
     /** returns number of collected subgraphs so far. */
     unsigned size() const { return m_subgraphs.size(); }
 
-    /** returns number of occurances for all subGraphs found together. */
+    /** returns number of occurrences for all subGraphs found together. */
     unsigned long nFoundTotal() const
     {
       unsigned long nFound = 0;
@@ -81,7 +81,7 @@ namespace Belle2 {
       return out;
     }
 
-    /** returns removed occurances. */
+    /** returns removed occurrences. */
     unsigned pruneGraph(double rarenessCut)
     {
       //sanity checks:
@@ -90,7 +90,7 @@ namespace Belle2 {
       if (rarenessCut == 0) { B2DEBUG(20, "pruneGraph: nothing to be done, stopping prune-process."); return 0; }
 
       /// vector of trunks (= outer sector(s)):
-      // .first counts total number of occurances of branches of this trunk (= outer sector(s))
+      // .first counts total number of occurrences of branches of this trunk (= outer sector(s))
       // .second is a vector of pointers to the subgraphs of that trunk.
       std::vector< std::pair<unsigned, std::vector<SubGraph<FilterType>*> >> trunks;
 
@@ -160,7 +160,7 @@ namespace Belle2 {
       return nKilled;
     }
 
-    /** Get the absolute treshold (# nfound) given a relative threshold. */
+    /** Get the absolute threshold (# nfound) given a relative threshold. */
     int getAbsThreshold(int relThreshold)
     {
       if (relThreshold == 0) {return 0;}
@@ -199,7 +199,7 @@ namespace Belle2 {
       return 0;
     }
 
-    /** returns removed occurances. */
+    /** returns removed occurrences. */
     unsigned pruneGraphBeforeTraining(int absThreshold)
     {
       if (absThreshold == 0) {return 0;}

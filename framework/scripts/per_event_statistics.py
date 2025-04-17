@@ -34,7 +34,7 @@ class PerEventStatisticsGetterModule(basf2.Module):
         self.event_number = np.zeros(3, dtype=float)
         #: The columns for the statistics TTree (they will be filled in the event function).
         self.ttree_inputs = None
-        #: Last recored sum of event calls for all modules
+        #: Last recorded sum of event calls for all modules
         self.last_time_sum = None
 
         #: A flag to indicate that we have already added the Branches to the TTree (which we will do in the first event)

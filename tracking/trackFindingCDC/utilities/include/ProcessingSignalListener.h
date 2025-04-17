@@ -44,10 +44,10 @@ namespace Belle2 {
       virtual void terminate();
 
     private:
-      /// Flag to keep track whether initialization happend before
+      /// Flag to keep track whether initialization happened before
       bool m_initialized = false;
 
-      /// Flag to keep track whether termination happend before
+      /// Flag to keep track whether termination happened before
       bool m_terminated = false;
 
       /// Name of the type during initialisation

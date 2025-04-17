@@ -23,7 +23,8 @@ SwitchDataStoreModule::SwitchDataStoreModule() : Module()
   addParam("toID", m_to, "active DataStore id after this module", std::string(""));
   addParam("doCopy", m_doCopy,
            "should data be copied to DataStore 'toID'? This should be true only when toID refers to a _new_ DataStore ID", false);
-  addParam("mergeBack", m_mergeBack, "if given, copy the given objects/arrays over even if doCopy is fals.", std::vector<std::string> {});
+  addParam("mergeBack", m_mergeBack, "if given, copy the given objects/arrays over even if doCopy is false.",
+           std::vector<std::string> {});
 }
 
 SwitchDataStoreModule::~SwitchDataStoreModule() = default;

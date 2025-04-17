@@ -16,7 +16,7 @@ using namespace TrackFindingCDC;
 Weight SimpleSegmentPairRelationFilter::operator()(const CDCSegmentPair& fromSegmentPair,
                                                    const CDCSegmentPair& toSegmentPair)
 {
-  // Just let all found neighors pass since we have the same to -> from segment
+  // Just let all found neighbors pass since we have the same to -> from segment
   // and let the cellular automaton figure auto which is longest
 
   // neighbor weight is a penalty for the overlap of the segments since we would

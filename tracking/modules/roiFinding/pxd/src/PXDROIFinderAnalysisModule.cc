@@ -102,7 +102,7 @@ PXDROIFinderAnalysisModule::PXDROIFinderAnalysisModule() : Module()
   setDescription("This module performs the analysis of the PXDROIFinder module output");
 
   addParam("writeToRoot", m_writeToRoot,
-           "set true if you want to save the informations in a root file named by parameter 'rootFileName'", bool(true));
+           "set true if you want to save the information in a root file named by parameter 'rootFileName'", bool(true));
 
   addParam("rootFileName", m_rootFileName,
            "fileName used for . Will be ignored if parameter 'writeToRoot' is false (standard)",
@@ -445,7 +445,7 @@ void PXDROIFinderAnalysisModule::event()
     B2DEBUG(1, "Number of RecoTracks = " << recoTracks_MCParticle.size() << " and PXDDigits = " << pxdDigits_MCParticle.size() <<
             " related to this MCParticle");
 
-    //retrieve general informations of MCParticle
+    //retrieve general information about MCParticle
     m_momXmc = (aMcParticle->getMomentum()).X();
     m_momYmc = (aMcParticle->getMomentum()).Y();
     m_momZmc = (aMcParticle->getMomentum()).Z();

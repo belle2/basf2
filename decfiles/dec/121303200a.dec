@@ -1,0 +1,33 @@
+# EventType: 121303200a
+# Descriptor: [B+ -> D(pipipi0) pi+ ]cc
+# NickName: B+_omegapi+
+# Documentation: Acp in B+ -> D(pipipi0) pi+ for phi3
+# Responsible: Yiwei Huang
+# Email: huangyw@mail.nankai.edu.cn
+# Tested: yes
+# PhysicsWG: Bhadronic
+# Cuts: None
+# Date: 24/07/2024
+#
+#
+Alias pi0sig pi0
+
+Decay Upsilon(4S)
+0.5   B+sig   B-      VSS;
+0.5   B+      B-sig   VSS;
+Enddecay
+
+Decay B+sig
+1.0   D0sig pi+ PHSP;
+Enddecay
+CDecay B-sig
+
+Decay D0sig
+1.0   pi+  pi-  pi0sig                                D_DALITZ; # [PDG2019 - Dalitz model added]
+Enddecay
+CDecay anti-D0sig
+
+Decay pi0sig
+1.0 gamma gamma PHSP;
+Enddecay
+End

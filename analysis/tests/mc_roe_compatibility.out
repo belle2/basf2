@@ -6,13 +6,13 @@
 [INFO]  o) creating (anti-)ParticleList with name: mu+:MC (mu-:MC)
 [INFO]    -> MDST source: MCParticles
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_S0:MC (K_S0:MC)
+[INFO]  o) creating ParticleList with name: K_S0:MC
 [INFO]    -> MDST source: MCParticles
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0:MC (anti-Lambda0:MC)
 [INFO]    -> MDST source: MCParticles
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:MC (gamma:MC)
+[INFO]  o) creating ParticleList with name: gamma:MC
 [INFO]    -> MDST source: MCParticles
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: mu+ (1+0) + mu- (1+0)

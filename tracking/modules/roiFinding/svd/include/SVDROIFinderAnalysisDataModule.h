@@ -57,7 +57,7 @@ namespace Belle2 {
 
   private:
 
-    StoreArray<SVDShaperDigit> m_shapers; /**< shaper digits sotre array*/
+    StoreArray<SVDShaperDigit> m_shapers; /**< shaper digits store array*/
     StoreArray<ROIid> m_ROIs; /**< rois store array*/
     StoreArray<RecoTrack> m_recoTracks;/**< reco track store array */
     StoreArray<Track> m_tracks;/**< reco track store array */

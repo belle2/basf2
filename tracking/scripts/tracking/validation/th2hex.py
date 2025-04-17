@@ -63,7 +63,7 @@ def TH2Hex(name,
                                  y_upper_bound)
 
     # Construct points of a hexagon with unit radius
-    # Go clockwise such that root understands what the interal of the polygon is
+    # Go clockwise such that root understands what the internal part of the polygon is
     pi = math.pi
 
     unit_radius_hex_xs = np.array([math.sin(2.0 * pi * i / 6.0) for i in range(-2, 4)])
@@ -127,7 +127,7 @@ def TH2Hex(name,
 
 
 def test():
-    # Test plot of a two dimensional gaus distribution with hex binning.
+    # Test plot of a two dimensional Gaussian distribution with hex binning.
     n_data = 1000000
     normal_distributed_x_values = np.random.randn(n_data)
     normal_distributed_y_values = 2.0 * np.random.randn(n_data)

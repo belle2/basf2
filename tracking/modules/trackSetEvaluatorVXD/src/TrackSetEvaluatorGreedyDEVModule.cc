@@ -45,7 +45,7 @@ void TrackSetEvaluatorGreedyDEVModule::event()
                                 true);
   }
 
-  //make a Scrooge and udpate the activity
+  //make a Scrooge and update the activity
   Scrooge scrooge;
   scrooge.performSelection(qiTrackOverlap);
 

@@ -60,7 +60,7 @@ namespace Belle2 {
     /** Test that clusters get merged if they are found to have a common pixel.
      *
      * If we have to clusters called 1 and 2 like shown below and we add a
-     * pixel at X than all occurences of 1 and 2 should be merged to one of
+     * pixel at X than all occurrences of 1 and 2 should be merged to one of
      * those two. It does not matter who is merged to whom but after adding
      * X the result must be
      * - one of the two clusters is empty

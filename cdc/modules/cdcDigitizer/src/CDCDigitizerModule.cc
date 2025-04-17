@@ -130,7 +130,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("OffsetForGetTriggerBin", m_offsetForTriggerBin, "Input to getCDCTriggerBin(offset), either of 0,1,2 or 3",
            m_offsetForTriggerBin);
   addParam("TrgTimingOffsetInCount", m_trgTimingOffsetInCount,
-           "L1 trigger timing offset in count, [0,7] in a trigger bin. The defaut value is from exp14, while the value from exp12 is 2. This run dependence may be taken into account later if needed",
+           "L1 trigger timing offset in count, [0,7] in a trigger bin. The default value is from exp14, while the value from exp12 is 2. This run dependence may be taken into account later if needed",
            m_trgTimingOffsetInCount);
   addParam("ShiftOfTimeWindowIn32Count", m_shiftOfTimeWindowIn32Count,
            "Shift of time window in 32count for synchronization (L1 timing=0)", m_shiftOfTimeWindowIn32Count);
@@ -300,7 +300,7 @@ void CDCDigitizerModule::initialize()
 
   // Set timing sim. mode
   if (m_useDB4FEE) {
-    if (m_synchronization) { // syncronization
+    if (m_synchronization) { // synchronization
       m_tSimMode = 0;
     } else {
       if (m_randomization) { // radomization
@@ -544,7 +544,7 @@ void CDCDigitizerModule::event()
     }
 
     // Reject totally-dead wire; to be replaced by isDeadWire() in future
-    // N.B. The following lines for badwire must be after the above lines for trigger becuse badwires are different between trigger and tracking.
+    // N.B. The following lines for badwire must be after the above lines for trigger because badwires are different between trigger and tracking.
     // Badwires for trigger are taken into account separately in the tsim module
     if (m_cdcgp->isBadWire(m_wireID)) {
       //      std::cout<<"badwire= " << m_wireID.getICLayer() <<" "<< m_wireID.getIWire() << std::endl;
@@ -1143,7 +1143,7 @@ void CDCDigitizerModule::setFEElectronics()
     }
   }
 
-  //ovewrite    values for specific channels if mode=1
+  //overwrite    values for specific channels if mode=1
   //set typical values for all channels if mode=0
   for (const auto& fpp : (*m_fEElectronicsFromDB)) {
     int bdi = fpp.getBoardID();
@@ -1374,7 +1374,7 @@ void CDCDigitizerModule::addXTalk()
 
         //Set TOT for signal+background case. It is assumed that the start timing
         //of a pulse (input to ADC) is given by the TDC-count. This is an
-        //approximation becasue analog (for ADC) and digital (for TDC) parts are
+        //approximation because analog (for ADC) and digital (for TDC) parts are
         //different in the front-end electronics.
         unsigned short s1 = tdc4Sg; //start time of 1st pulse
         unsigned short s2 = tdc4Bg; //start time of 2nd pulse

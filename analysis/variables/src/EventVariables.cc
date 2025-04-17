@@ -990,19 +990,19 @@ In such cases the event numbers are sequential *only within a production*, so ex
     REGISTER_VARIABLE("totalEnergyMC", getTotalEnergyMC, "[Eventbased] Truth value of sum of energies of all the generated particles\n\n", "GeV");
 
 
-    REGISTER_VARIABLE("PxHER", getPxHER, "[Eventbased] Returns truth value of the x component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("PyHER", getPyHER, "[Eventbased] Returns truth value of the y component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("PzHER", getPzHER, "[Eventbased] Returns truth value of the z component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("PxLER", getPxLER, "[Eventbased] Returns truth value of the x component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("PyLER", getPyLER, "[Eventbased] Returns truth value of the y component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("PzLER", getPzLER, "[Eventbased] Returns truth value of the z component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PxHER", getPxHER, "[Eventbased] Returns x component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PyHER", getPyHER, "[Eventbased] Returns y component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PzHER", getPzHER, "[Eventbased] Returns z component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PxLER", getPxLER, "[Eventbased] Returns x component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PyLER", getPyLER, "[Eventbased] Returns y component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PzLER", getPzLER, "[Eventbased] Returns z component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
 
-    REGISTER_VARIABLE("mcPxHER", getMcPxHER, "[Eventbased] Returns x component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("mcPyHER", getMcPyHER, "[Eventbased] Returns y component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("mcPzHER", getMcPzHER, "[Eventbased] Returns z component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("mcPxLER", getMcPxLER, "[Eventbased] Returns x component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("mcPyLER", getMcPyLER, "[Eventbased] Returns y component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("mcPzLER", getMcPzLER, "[Eventbased] Returns z component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPxHER", getMcPxHER, "[Eventbased] Returns truth value of the x component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPyHER", getMcPyHER, "[Eventbased] Returns truth value of the y component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPzHER", getMcPzHER, "[Eventbased] Returns truth value of the z component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPxLER", getMcPxLER, "[Eventbased] Returns truth value of the x component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPyLER", getMcPyLER, "[Eventbased] Returns truth value of the y component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPzLER", getMcPzLER, "[Eventbased] Returns truth value of the z component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
 
 
 

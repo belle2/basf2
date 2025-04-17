@@ -18,7 +18,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Class that accomodates many variable sets and presents them as on set of variables
+    /// Class that accommodates many variable sets and presents them as on set of variables
     template <class AObject>
     class UnionVarSet : public BaseVarSet<AObject> {
 
@@ -35,9 +35,9 @@ namespace Belle2 {
 
     public:
       /// Initialize all contained variable set before event processing.
-      void initialize() final {
-        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets)
-        {
+      void initialize() final
+      {
+        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
           this->addProcessingSignalListener(varSet.get());
         }
         Super::initialize();
@@ -51,10 +51,10 @@ namespace Belle2 {
        *
        *  @returns  Indication whether the extraction could be completed successfully.
        */
-      bool extract(const Object* obj) final {
+      bool extract(const Object* obj) final
+      {
         bool result = true;
-        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets)
-        {
+        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
           result &= varSet->extract(obj);
         }
         return result;
@@ -62,7 +62,7 @@ namespace Belle2 {
 
       /**
        *  Getter for the named references to the individual variables
-       *  Base implementaton returns empty vector
+       *  Base implementation returns empty vector
        */
       std::vector<Named<Float_t*>> getNamedVariables(const std::string& prefix) override
       {
@@ -105,6 +105,17 @@ namespace Belle2 {
       size_t size() const
       {
         return m_varSets.size();
+      }
+
+      /**
+       *  Forward prefixed parameters of this findlet to the module parameter list.
+       */
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      {
+        Super::exposeParameters(moduleParamList, prefix);
+        for (const std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
+          varSet->exposeParameters(moduleParamList, prefix);
+        }
       }
 
     private:

@@ -19,18 +19,18 @@ namespace Belle2 {
 
     void GlobalDerivativesHierarchy::buildConstraints(Constraints& constraints)
     {
-      for (auto& parent_childs : m_hierarchy) {
-        auto parent = parent_childs.first;
-        auto childs = parent_childs.second;
+      for (auto& parent_children : m_hierarchy) {
+        auto parent = parent_children.first;
+        auto children = parent_children.second;
 
         // We need to check if such constraint entry already exists.
         // For timedep parameters, some to all labels (and coefficients optionally, too) can change and
         // in such case, we need a new constraint entry.
         // Note the checksum for a constraint does not depend on the parent element. If parent object changes,
-        // the relative transofrmation to its children are unchanged. While if (some of) the childs change,
+        // the relative transformation to its children are unchanged. While if (some of) the children change,
         // for each time interval they are constant, there must a new constraint entry as this is an independent
         // linear combination of parameters (because there are other parameters).
-        // Continued bellow...
+        // Continued below...
         boost::crc_32_type crc32;
 
         auto parentLabels = getElementLabels(parent);
@@ -43,8 +43,8 @@ namespace Belle2 {
           // and rotating the detectors could only happen due cohherent movements of sub-structures (CDC layers, VXD half-shells)
           if (parentLabels[iCon] == 0) continue;
 
-          for (unsigned int j = 0; j < childs.size(); j++) {
-            auto child = childs[j];
+          for (unsigned int j = 0; j < children.size(); j++) {
+            auto child = children[j];
             auto childLabels = getElementLabels(child);
 
             for (unsigned int iPar = 0; iPar < childLabels.size(); iPar++) {

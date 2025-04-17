@@ -13,7 +13,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegmentTriple;
 
-    /// Filter for the constuction of segment triples based on simple criterions
+    /// Filter for the construction of segment triples based on simple criteria
     class AllSegmentTripleFilter : public BaseSegmentTripleFilter {
 
     public:

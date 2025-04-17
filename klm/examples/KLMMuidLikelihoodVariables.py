@@ -15,7 +15,7 @@
 #  steering file for calibration studies.
 #
 #  In the first part of the script we generate a sample
-#  of muons and we simulate and reconstuct them.
+#  of muons and we simulate and reconstruct them.
 #  In the second part we run a (very) simple analysis
 #  and save some variables to ntuple.
 #

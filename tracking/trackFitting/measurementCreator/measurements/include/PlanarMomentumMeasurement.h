@@ -22,7 +22,7 @@ namespace Belle2 {
   class PlanarMomentumMeasurement : public genfit::PlanarMeasurement {
 
   public:
-    /** Default contructor with 1 dim. */
+    /** Default constructor with 1 dim. */
     PlanarMomentumMeasurement() : genfit::PlanarMeasurement(1) {}
 
     /** Copy from other planar measurement and resize the hit coords to one dimension. */

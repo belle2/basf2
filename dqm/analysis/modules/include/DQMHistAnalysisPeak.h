@@ -13,6 +13,7 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
+#include <TGraph.h>
 #include <TLine.h>
 
 namespace Belle2 {
@@ -34,6 +35,11 @@ namespace Belle2 {
      * Initializer.
      */
     void initialize() override final;
+
+    /**
+     * Terminate.
+     */
+    void terminate() override final;
 
     /**
      * Called when entering a new run.
@@ -61,14 +67,16 @@ namespace Belle2 {
     int m_minEntries = 1000;
     /** Flag: plot into canvas */
     bool m_plot = true;
-    /** Flag: zoom on peak */
-    bool m_zoom = true;
+    /** Zoom on peak with range +- zoom*rms ; 0 disable */
+    float m_zoom = 3.0;
     /** Flag: extract mean */
     bool m_mean = true;
     /** Flag: extract median */
     bool m_median = true;
     /** Flag: extract rms */
     bool m_rms = true;
+    /** Flag for plotting limits from PV */
+    bool m_plotLimits = true;
 
     /** The drawing canvas. */
     TCanvas* m_canvas = nullptr;
@@ -79,6 +87,38 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
+
+    /** Graph for Limit plot */
+    TGraph* m_g_alarmlo{};
+    /** Graph for Limit plot */
+    TGraph* m_g_warnlo{};
+    /** Graph for Limit plot */
+    TGraph* m_g_good{};
+    /** Graph for Limit plot */
+    TGraph* m_g_warnhi{};
+    /** Graph for Limit plot */
+    TGraph* m_g_alarmhi{};
+
+    /** warn/alarm limit */
+    double m_lowarnlevel = NAN;
+    /** warn/alarm limit */
+    double m_hiwarnlevel = NAN;
+    /** warn/alarm limit */
+    double m_loerrorlevel = NAN;
+    /** warn/alarm limit */
+    double m_hierrorlevel = NAN;
+
+    /** flag for valid limit/graph */
+    bool m_valid_alarmlo = false;
+    /** flag for valid limit/graph */
+    bool m_valid_warnlo = false;
+    /** flag for valid limit/graph */
+    bool m_valid_good = false;
+    /** flag for valid limit/graph */
+    bool m_valid_warnhi = false;
+    /** flag for valid limit/graph */
+    bool m_valid_alarmhi = false;
+
   };
 } // end namespace Belle2
 

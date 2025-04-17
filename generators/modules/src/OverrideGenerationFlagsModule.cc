@@ -22,7 +22,7 @@ REG_MODULE(OverrideGenerationFlags);
 
 OverrideGenerationFlagsModule::OverrideGenerationFlagsModule() : Module()
 {
-  setDescription("Ovverride generation flags for BeamParameters "
+  setDescription("Override generation flags for BeamParameters "
                  "from database.");
   addParam("smearEnergy", m_SmearEnergy,
            "Smear energy when generating initial events.", true);

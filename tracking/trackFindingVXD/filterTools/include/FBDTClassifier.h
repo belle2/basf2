@@ -17,16 +17,12 @@
 #include <vector>
 #include <iostream>
 
-#if FastBDT_VERSION_MAJOR >= 3
 typedef FastBDT::Forest<unsigned int> FBDTForest;
-#else
-typedef FastBDT::Forest FBDTForest;
-#endif
 
 namespace Belle2 {
 
   /**
-   * FastBDT as RelationsObject to make it storeable and accesible on/via the DataStore
+   * FastBDT as RelationsObject to make it storable and accessible on/via the DataStore
    *
    * Ndims: number of inputs (dimension of input vector)
    *

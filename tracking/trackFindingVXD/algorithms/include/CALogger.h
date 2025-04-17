@@ -25,7 +25,7 @@ namespace Belle2 {
     /** counts number of fails happened so far */
     unsigned int nFails = 0;
 
-    /** returns string containing number of Cells for each state occured: */
+    /** returns string containing number of Cells for each state occurred: */
     // small lambda function for printing the results
     std::string getStringCellsOfState(std::vector<unsigned int>& nCellsOfState)
     {

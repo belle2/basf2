@@ -20,7 +20,7 @@ namespace Belle2 {
    *
    * |M|^2 = 1 + 2*alpha*Z,
    *
-   * where the kinematic variable Z is funciton of the kinetic energies of the 3 pi0s in the
+   * where the kinematic variable Z is function of the kinetic energies of the 3 pi0s in the
    * mother reference frame.
    *
    * The model takes 1 parameter corresponding to the slope coeafficient alpha. alpha should be greater

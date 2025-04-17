@@ -81,7 +81,7 @@ Prerequisites
 *************
 
 As usual, we start our steering file by importing the  necessary python packages,
-creating a basf2 path and loading input data.
+creating a ``basf2`` path and loading input data.
 In addition to the usual python packages (``basf2`` and `modularAnalysis`) we also import the ``fei`` package.
 
 .. admonition:: Exercise
@@ -599,7 +599,7 @@ There are different implementations of the missing mass squared in *basf2*, this
 B\ :sub:`tag` momentum (here reconstructed by the FEI) and has therefore a high resolution.
 
 A second variable with high separating power is the number of additional charged tracks introduced above.
-This variable is called `nROE_Charged` in basf2. It needs the ROE mask name defined above as an argument in brackets.
+This variable is called `nROE_Charged` in ``basf2``. It needs the ROE mask name defined above as an argument in brackets.
 
 .. admonition:: Exercise
     :class: exercise stacked

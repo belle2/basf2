@@ -17,7 +17,6 @@
 # -----------------------------------------------------------------------------------
 
 import basf2
-import ROOT.Belle2
 
 import sys  # get argv
 argvs = sys.argv  # get arg
@@ -72,6 +71,8 @@ else:
 
 
 if __name__ == '__main__':
+    from ROOT import Belle2  # noqa: make Belle2 namespace available
+    import ROOT.Belle2
 
     basf2.use_central_database("development")
 #    Hot fix for CDCFudgeFactorFromSigma

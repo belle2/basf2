@@ -17,7 +17,7 @@ from L1trigger import add_grl_gdl_tsim
 
 main = b2.create_path()
 main.add_module('RootInput')
-# add trigger simlation of sub detectors (CDC, ECL, and bKLM are included currently)
+# add trigger simulation of sub detectors (CDC, ECL, and bKLM are included currently)
 add_grl_gdl_tsim(main)
 
 # output

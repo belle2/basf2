@@ -53,7 +53,7 @@ CurlingTrackCandSplitterModule::CurlingTrackCandSplitterModule()
            "Collection name under which all but the first outgoing parts of a curling TrackCand will be stored in the StoreArray",
            std::string(""));
   addParam("completeCurlerName", m_PARAMcompleteCurlerName,
-           "Collection name under which all parts of a curling TrackCand will be stored in the StoreArray together. NOTE: only if this parameter is set to a non-empty string a complete (but splitted) curling TrackCand will be stored!",
+           "Collection name under which all parts of a curling TrackCand will be stored in the StoreArray together. NOTE: only if this parameter is set to a non-empty string a complete (but split) curling TrackCand will be stored!",
            std::string(""));
 
   // WARNING TODO: find out the units that are used internally!!!
@@ -651,7 +651,7 @@ void CurlingTrackCandSplitterModule::getValuesForRoot(const Belle2::SpacePoint* 
 
   // get positions from SpacePoint
   const B2Vector3D& spacePointGlobal =
-    spacePoint->getPosition(); // COULDDO: uneccesary, spacePoint->X(), etc. returns the same information!
+    spacePoint->getPosition(); // COULDDO: unnecessary, spacePoint->X(), etc. returns the same information!
 //   std::pair<double, double> spacePointUV = getUV(spacePoint);
   TaggedUVPos spacePointUV = getUV(spacePoint);
   const B2Vector3D spacePointLocal = B2Vector3D(spacePointUV.m_U, spacePointUV.m_V, 0);
@@ -762,7 +762,7 @@ CurlingTrackCandSplitterModule::TaggedUVPos CurlingTrackCandSplitterModule::getU
 {
   TaggedUVPos returnVals; // initialized to: both bools false, both doubles to 0.
 
-  // get the normalized local coordinates from SpacePoint and convert them to local coordinates (have to do so because at the slanted parts the local U-position is dependant on the local V-position)
+  // get the normalized local coordinates from SpacePoint and convert them to local coordinates (have to do so because at the slanted parts the local U-position is dependent on the local V-position)
   double normU = spacePoint->getNormalizedLocalU();
   double normV = spacePoint->getNormalizedLocalV();
 

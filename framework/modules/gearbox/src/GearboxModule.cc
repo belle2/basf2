@@ -49,7 +49,7 @@ GearboxModule::GearboxModule() : Module()
            "framework/examples/gearbox_override.py", m_unitOverrides);
   addParam("overrideMultiple", m_multipleOverrides, "Same as override but the "
            "xpath expression may evaluate to more than one node in which case "
-           "all occurances are set to the supplied value and unit",
+           "all occurrences are set to the supplied value and unit",
            m_multipleOverrides);
   addParam("overridePrefix", m_overridePrefix, "Common prefix which is "
            "prepended to all overrides. Beware that '//' has a special meaning "

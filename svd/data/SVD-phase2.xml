@@ -52,7 +52,7 @@
 			 To do this we don't include the full components file but do it in pieces
 			 and modify the shifts -->
 		<Components>
-			<!-- Inlude everything from the ladder definition except the shift from phase 3 using xpointer -->
+			<!-- Include everything from the ladder definition except the shift from phase 3 using xpointer -->
 			<Ladder layer="3">
 				<shift unit="mm">0</shift>
 				<xi:include href="SVD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=3]/*[not(self::shift)])" />

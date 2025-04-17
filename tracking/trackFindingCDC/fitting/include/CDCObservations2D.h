@@ -40,7 +40,7 @@ namespace Belle2 {
 
     public:
       /**
-       *  Constructor taking the flag if the reconstructed positon of the hits should be used when they are available
+       *  Constructor taking the flag if the reconstructed position of the hits should be used when they are available
        *  The default is to use the wire position and the drift length signed by the right left passage hypotheses.
        */
       explicit CDCObservations2D(EFitPos fitPos = EFitPos::c_RecoPos,
@@ -168,7 +168,7 @@ namespace Belle2 {
 
       /**
        *  Appends the position information of the given wire hit to the
-       *  stored obseravations. Obtionally includes the drift length with
+       *  stored observations. Optionally includes the drift length with
        *  the given right left orientation
 
        *  @param wireHit      Hit information to be appended as observation.
@@ -231,14 +231,14 @@ namespace Belle2 {
 
       /**
        *  Appends all the reference wire positions.
-       *  @note For cross check to legendre finder.
+       *  @note For cross check to Legendre finder.
        *  @return  Number of added hits
        */
       std::size_t appendRange(const std::vector<const CDCWire*>& wires);
 
       /**
        *  Appends all the wire hit reference positions with the pseudo variance.
-       *  @note For cross check to legendre finder.
+       *  @note For cross check to Legendre finder.
        *  @return  Number of added hits
        */
       std::size_t appendRange(const CDCWireHitSegment& wireHits);
@@ -256,20 +256,20 @@ namespace Belle2 {
         return nAppendedHits;
       }
 
-      /// Get the postion of the first observation.
+      /// Get the position of the first observation.
       Vector2D getFrontPos2D() const
       {
         return empty() ? Vector2D() : Vector2D(getX(0), getY(0));
       }
 
-      /// Get the postion of the first observation.
+      /// Get the position of the first observation.
       Vector2D getBackPos2D() const
       {
         return empty() ? Vector2D() : Vector2D(getX(size() - 1), getY(size() - 1));
       }
 
       /**
-       *  Calculate the total transvers travel distance traversed by these observations comparing
+       *  Calculate the total transverse travel distance traversed by these observations comparing
        *  the travel distance of first and last position.
        */
       double getTotalPerpS(const CDCTrajectory2D& trajectory2D) const;
@@ -327,7 +327,7 @@ namespace Belle2 {
     private:
       /**
        *  Memory for the individual observations.
-       *  Arrangement of values is x,y, drift raduis, weight, x, y, .....
+       *  Arrangement of values is x,y, drift radius, weight, x, y, .....
        */
       std::vector<double> m_observations;
 

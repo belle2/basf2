@@ -21,7 +21,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Final filter for the constuction of segment pairs.
+    /// Final filter for the construction of segment pairs.
     class MVARealisticTrackRelationFilter : public MVA<BaseTrackRelationFilter> {
 
     private:

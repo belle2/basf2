@@ -60,6 +60,11 @@ void DQMHistAutoCanvasModule::beginRun()
   }
 }
 
+void DQMHistAutoCanvasModule::terminate()
+{
+  m_cs.clear();
+}
+
 void DQMHistAutoCanvasModule::event()
 {
   gStyle->SetOptStat(0);
@@ -132,11 +137,11 @@ void DQMHistAutoCanvasModule::event()
       if (m_cs.find(name) == m_cs.end()) {
         // no canvas exists yet, create one
         TCanvas* c = new TCanvas(cname.c_str(), ("c_" + hname).c_str());
-        m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+        m_cs.insert(std::pair<std::string, std::unique_ptr<TCanvas>>(name, c));
         B2DEBUG(1, "DQMHistAutoCanvasModule: new canvas " << c->GetName());
       }
 
-      TCanvas* c = m_cs[name]; // access already created canvas
+      TCanvas* c = m_cs[name].get(); // access already created canvas
       c->cd();
       // Maybe we want to have it Cleared? Otherwise colored border could stay?
       // but if, then only if histogram has changed!
@@ -149,10 +154,29 @@ void DQMHistAutoCanvasModule::event()
           // assume users are expecting non-0-suppressed axis
           if (hist->GetMinimum() > 0) hist->SetMinimum(0);
           hist->Draw("hist");
+          // reference only for 1dim and only if *both* not empty
+          if (hist->Integral() != 0) { // ignore empty histogram
+            // default scaling to number of entries
+            auto refCopy = findRefHist(it.first, ERefScaling::c_RefScaleEntries, hist);
+            if (refCopy and abs(refCopy->Integral()) > 0) { // only if we have entries in reference
+              // Adjust the y scale to cover the reference
+              if (refCopy->GetMaximum() > hist->GetMaximum())
+                hist->SetMaximum(1.1 * refCopy->GetMaximum());
+
+              refCopy->Draw("hist,same");
+
+              /* We could consider to add some auto-comparison here later, thus adding coloring option....
+                double data = 0;
+                if (m_color) {
+                data = hist1->KolmogorovTest(hist2, ""); // returns p value (0 bad, 1 good), N - do not compare normalized
+                }
+              */
+            }
+          }
         } else if (hist->GetDimension() == 2) {
           // ... but not in 2d
           hist->Draw("colz");
-        }
+        } // else 3D or others?
       }
 
       // set Canvas "name" update flag if histo was updated

@@ -36,10 +36,10 @@ SVDClusterQualityEstimatorCalibrationModule::SVDClusterQualityEstimatorCalibrati
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
-           "allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module", string(""));
-  addParam("binSizeCharge", m_binSizeCharge, "Number of bins in charge distribtuion.",
+           "allows the user to set an identifier for this module. Useful if one wants to use several instances of that module", string(""));
+  addParam("binSizeCharge", m_binSizeCharge, "Number of bins in charge distribution.",
            int(100));
-  addParam("binSizeTime", m_binSizeTime, "Number of bins in charge distribtuion.",
+  addParam("binSizeTime", m_binSizeTime, "Number of bins in charge distribution.",
            int(40));
 
   addParam("maxClusterSize", m_maxClusterSize, "Max number of strips the PDF are separated into.",

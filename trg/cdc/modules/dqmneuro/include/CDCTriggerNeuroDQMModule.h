@@ -163,7 +163,7 @@ namespace Belle2 {
     }
     /** Name of the histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
-    /** Switch to supress output for dqm online module */
+    /** Switch to suppress output for dqm online module */
     bool m_limitedoutput;
     /** Number of identical track segments to be required for matching between HW and SW Neurotrigger */
     int m_nsamets;
@@ -299,7 +299,7 @@ namespace Belle2 {
     TH1F* m_neuroDeltaTSID = nullptr;                  /**< unpacked selected TSID - TSIM selected TSID */
     TH1F* m_neuroDeltaSector = nullptr;                /**< unpacked sector - TSIM sector */
     TH1F* m_simSameTS = nullptr;                       /**< number of TS selected in both, unpacked and TSIM tracks */
-    TH1F* m_simDiffTS = nullptr;                       /**< number of TS selcted in TSIM but not in unpacked */
+    TH1F* m_simDiffTS = nullptr;                       /**< number of TS selected in TSIM but not in unpacked */
 
     // hw NN output for each quadrant
     TH1F* m_neuroHWOutQuad5Z = nullptr;                /**< z distribution from unpacker (no quadrant set) */

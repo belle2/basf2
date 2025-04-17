@@ -37,7 +37,7 @@ namespace Belle2 {
       moduleParamList->addParameter(prefixed(prefix, "allowReverse"),
                                     m_param_allowReverse,
                                     "Indication whether the reverse to the truth is accepted"
-                                    "preserving the progagation reversal symmetry.",
+                                    "preserving the propagation reversal symmetry.",
                                     m_param_allowReverse);
     }
 

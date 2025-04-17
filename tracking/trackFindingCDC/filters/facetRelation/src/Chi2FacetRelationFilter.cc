@@ -83,13 +83,13 @@ Weight Chi2FacetRelationFilter::operator()(const CDCFacet& fromFacet, const CDCF
   if (chi2 > m_chi2CutByISuperLayer[iSL] or std::isnan(chi2)) {
     return NAN;
   } else {
-    // Introducing a mini penilty to distiguish better facets.
+    // Introducing a mini penalty to distinguish better facets.
     double penalty = std::erf(chi2 / m_penaltyWidthByISuperLayer[iSL]);
 
     // The facets contain three hits of the track each.
-    // However they have 2 common hits which we have to substract
+    // However they have 2 common hits which we have to subtract
     // to avoid double counting.
-    // Also introduce a small penalty value to distiguish better continuations
+    // Also introduce a small penalty value to distinguish better continuations
     // in the graph
     return -2 - penalty;
   }

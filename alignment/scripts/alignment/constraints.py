@@ -73,8 +73,8 @@ class Constraints():
 
     def generate(self):
         """
-        Should be overriden by the deriving classes and actually
-        fill the dictionary with the constraints (this runs withing a basf2 module
+        Should be overridden by the deriving classes and actually
+        fill the dictionary with the constraints (this runs within a basf2 module
         event function - so you have geometry available)
         """
         consts = []
@@ -82,7 +82,7 @@ class Constraints():
 
     def configure_collector(self, collector):
         """
-        Can be overriden be child classes to pass additional configuration to the
+        Can be overridden be child classes to pass additional configuration to the
         MillepedeCollector (activated by the use of the constraints)
         """
         pass

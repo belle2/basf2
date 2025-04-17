@@ -131,5 +131,5 @@ At the end of this section, we list two use cases of ``TopoAna`` at Belle II:
 one for semitauonic analyses and the other for charm analyses.
 You can refer to them if you work in the related analysis groups.
 
-* `Using TopoAna with the semitauonic framework <https://confluence.desy.de/display/BI/Using+topoAna+with+the+semitauonic+framework>`_ by Hannah Marie Wakeling
+* `Using TopoAna with the semitauonic framework <https://xwiki.desy.de/xwiki/rest/p/5cd19>`_ by Hannah Marie Wakeling
 * `TopoAna Wrapper for Charm Analysis <https://gitlab.desy.de/belle2/physics/charm/software/charm_topoanawrapper>`_ by Guanda Gong

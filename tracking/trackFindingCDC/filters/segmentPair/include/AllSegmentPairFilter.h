@@ -13,7 +13,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegmentPair;
 
-    /// Filter for the constuction of axial to stereo segment pairs based on simple criteria.
+    /// Filter for the construction of axial to stereo segment pairs based on simple criteria.
     class AllSegmentPairFilter : public Filter<CDCSegmentPair> {
 
     public:

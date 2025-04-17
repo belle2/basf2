@@ -26,6 +26,7 @@ ContinuumSuppressionBuilderModule::ContinuumSuppressionBuilderModule() : Module(
 {
   // Set module properties
   setDescription("Creates for each Particle in the given ParticleLists a ContinuumSuppression dataobject and makes basf2 relation between them.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("particleList", m_particleListName, "Name of the ParticleList", std::string(""));

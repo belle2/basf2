@@ -852,6 +852,7 @@ namespace Belle2 {
         }
         LL.logL += log(f);
         LL.numPhotons++;
+        LL.effectiveSignalYield += m_f0 / f;
       }
       return LL;
     }
@@ -879,6 +880,7 @@ namespace Belle2 {
         }
         LL.logL += log(f);
         LL.numPhotons++;
+        LL.effectiveSignalYield += m_f0 / f;
       }
       return LL;
     }
@@ -939,6 +941,7 @@ namespace Belle2 {
         auto& LL = m_pixelLLs[k];
         LL.logL += log(f);
         LL.numPhotons++;
+        LL.effectiveSignalYield += m_f0 / f;
       }
 
       return m_pixelLLs;

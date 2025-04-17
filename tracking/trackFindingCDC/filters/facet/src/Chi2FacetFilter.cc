@@ -81,7 +81,7 @@ Weight Chi2FacetFilter::operator()(const CDCFacet& facet)
   if (chi2 > m_chi2CutByISuperLayer[iSL] or std::isnan(chi2)) {
     return NAN;
   } else {
-    // Introducing a mini penilty to distiguish better facets.
+    // Introducing a mini penalty to distinguish better facets.
     double penalty = std::erf(chi2 / m_penaltyWidthByISuperLayer[iSL]);
 
     // Good facet contains three points of the track

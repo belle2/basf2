@@ -318,8 +318,8 @@ The plots here will help the user to regularly (just simple ideas, not rigorous)
      reduce in size by a significant amount.
    * look for crate time jumps.  Jumps aren't bad but should be reported to the ECL group.  Definitely report if ~8ns in size but jumps of 
      roughly 1ns are probably from the CDC updating their constants or powercycling etc.  Report to the ECL group any jump larger than ~1ns. 
-     These could be compared with the DQM plots that monitor for crate time jumps.  See the ECL DQM confluence page:
-     https://confluence.desy.de/pages/viewpage.action?pageId=87337319
+     These could be compared with the DQM plots that monitor for crate time jumps.  See the `ECL DQM XWiki page
+     <https://xwiki.desy.de/xwiki/rest/p/59bee>`__
    * look at the size of the time biases as a function of energy, crystal, and physics process (bhabhas vs photons from hadronic selection).  
      New detector regions (large groups of crystals) with sizable biases (>~2ns) should be reported to the ECL group.
    * See how the calibration constants have changed compared to the initial values, which if they were taken from a previous bucket show 

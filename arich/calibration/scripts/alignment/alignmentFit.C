@@ -32,7 +32,7 @@ static void FCN(int &npar, Double_t *gin, Double_t &f, const Double_t *par, int 
         fitval += par[k]/malt[k]*amp[k][i]*cos((-3.0+j*0.5)+phase[k][i]);
       }
       fitval +=par[6]*offsetsum/parsum; //Add weighted mean of offset 
-      f += (dataval-fitval)*(dataval-fitval)/err/err;  //caluculation of chi2
+      f += (dataval-fitval)*(dataval-fitval)/err/err;  //calculation of chi2
     }
   }
 }
@@ -196,7 +196,7 @@ void alignmentFit(){
     g[i]->Draw("AP");
     func->Draw("SAME P");
 #else  
-    // Write fit curve(black) and each compoments(tx: red, ty: green, tz: blue, 
+    // Write fit curve(black) and each components(tx: red, ty: green, tz: blue, 
     //                                            rx: yellow, ry: magenta, rz: cyan)
     func->SetLineColor(1);
     func->Draw();

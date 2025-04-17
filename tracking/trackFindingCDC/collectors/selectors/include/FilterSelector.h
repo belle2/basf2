@@ -24,7 +24,7 @@ namespace Belle2 {
     /**
      * Selector to remove all weighted relations, where a definable Filter
      * gives NaN as a result. Will also update all stored weights with the result of the filter.
-     * Please note that all other stored weights will be overriden!
+     * Please note that all other stored weights will be overridden!
      *
      * Most likely, the full stack is used as follows:
      * * match two lists of elements (Collectors and Collections) resulting in a list of weighted relations among those

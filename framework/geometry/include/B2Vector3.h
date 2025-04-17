@@ -542,7 +542,7 @@ namespace Belle2 {
     return B2Vector3<DataType>(a.X() + b.X(), a.Y() + b.Y(), a.Z() + b.Z());
   }
 
-  /** non-memberfunction for substracting a TVector3 from a B2Vector3 */
+  /** non-memberfunction for subtracting a TVector3 from a B2Vector3 */
   template < typename DataType>
   B2Vector3<DataType> operator - (const TVector3& a, const B2Vector3<DataType>& b)
   {
@@ -556,7 +556,7 @@ namespace Belle2 {
     return B2Vector3<DataType>(a.X() + b.X(), a.Y() + b.Y(), a.Z() + b.Z());
   }
 
-  /** non-memberfunction for substracting a B2Vector3 from a TVector3 */
+  /** non-memberfunction for subtracting a B2Vector3 from a TVector3 */
   template < typename DataType>
   B2Vector3<DataType> operator - (const B2Vector3<DataType>& a, const TVector3& b)
   {
@@ -570,7 +570,7 @@ namespace Belle2 {
     return B2Vector3<DataType>(a.X() + b.X(), a.Y() + b.Y(), a.Z() + b.Z());
   }
 
-  /** non-memberfunction for substracting a XYZVector from a B2Vector3 */
+  /** non-memberfunction for subtracting a XYZVector from a B2Vector3 */
   template < typename DataType>
   B2Vector3<DataType> operator - (const ROOT::Math::XYZVector& a, const B2Vector3<DataType>& b)
   {
@@ -584,7 +584,7 @@ namespace Belle2 {
     return B2Vector3<DataType>(a.X() + b.X(), a.Y() + b.Y(), a.Z() + b.Z());
   }
 
-  /** non-memberfunction for substracting a B2Vector3 from a XYZVector */
+  /** non-memberfunction for subtracting a B2Vector3 from a XYZVector */
   template < typename DataType>
   B2Vector3<DataType> operator - (const B2Vector3<DataType>& a, const ROOT::Math::XYZVector& b)
   {

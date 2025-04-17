@@ -11,7 +11,6 @@
 
 
 namespace Belle2 {
-  class Particle;
 
   /**
    * Adds continuum suppression variables

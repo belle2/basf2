@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 #include <tracking/ckf/cdc/filters/paths/CDCPathFilterFactory.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
@@ -61,7 +61,7 @@ namespace Belle2 {
     }
 
   private:
-    /// Filter to weigth the best path
+    /// Filter to weight the best path
     TrackFindingCDC::ChooseableFilter<CDCPathFilterFactory> m_filter;
   };
 }

@@ -448,7 +448,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
       std::string name = "eSum_" + std::to_string(ig) + "_" + std::to_string(ie);
       auto eSum = getObjectPtr<TH2F>(name);
 
-      //..Also the corresponding bias histgram
+      //..Also the corresponding bias histogram
       std::string biasName = "biasSum_" + std::to_string(ig) + "_" + std::to_string(ie);
       auto biasSum = getObjectPtr<TH2F>(biasName);
 
@@ -485,7 +485,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
         //..Check stats, and rebin as required
         const double minESumEntries = 800.;
         if (hEnergy->GetEntries() < minESumEntries) {
-          B2INFO("Insuffient entries in eSum: " << hEnergy->GetEntries() << " for group " << ig << " energy point " << ie);
+          B2INFO("Insufficient entries in eSum: " << hEnergy->GetEntries() << " for group " << ig << " energy point " << ie);
           histFile->Close();
           B2INFO("closed histFile; quitting");
           return c_NotEnoughData;

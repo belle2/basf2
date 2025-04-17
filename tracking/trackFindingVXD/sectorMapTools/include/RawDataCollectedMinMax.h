@@ -22,21 +22,21 @@ namespace Belle2 {
   /// takes care of collecting raw data and staying below RAM-threshold.
   class RawDataCollectedMinMax {
   protected:
-    unsigned m_currentSize; ///< the current size of the data sample.
-    unsigned m_fillIntermediateThreshold; ///< an internal threshold taking care of collecting intermediate results during sample collection
+    MinMaxCollector<double> m_collector; ///< collects raw data in an RAM-saving way.
     std::pair<double, double> m_minMaxQuantiles; ///< the quantiles to be collected in the end (defined in [0;1])
     std::vector<std::pair<double, double>> m_intermediateValues; ///< collects intermediate threshold if expected size is too big.
-    MinMaxCollector<double> m_collector; ///< collects raw data in an RAM-saving way.
+    unsigned m_currentSize; ///< the current size of the data sample.
+    unsigned m_fillIntermediateThreshold; ///< an internal threshold taking care of collecting intermediate results during sample collection
   public:
 
     /// constructor. please use for quantiles [min, max] min ~0 & max ~1 (range 0-1)
     RawDataCollectedMinMax(unsigned expectedSize,
                            std::pair<double, double> quantiles,
                            unsigned maxSizeThreshold = 100000) :
-      m_currentSize(0),
-      m_fillIntermediateThreshold(std::numeric_limits<unsigned>::max()),
+      m_collector((quantiles.first > (1. - quantiles.second) ? quantiles.first * 2. : (1. - quantiles.second) * 2.)),
       m_minMaxQuantiles(quantiles),
-      m_collector((quantiles.first > (1. - quantiles.second) ? quantiles.first * 2. : (1. - quantiles.second) * 2.))
+      m_currentSize(0),
+      m_fillIntermediateThreshold(std::numeric_limits<unsigned>::max())
     {
       if (double(expectedSize) / (double(maxSizeThreshold) * 0.05) > double(maxSizeThreshold))
       { B2FATAL("RawDataCollectedMinMax: expected data to big, can not execute!"); }

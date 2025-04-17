@@ -196,14 +196,14 @@ namespace Belle2::IOIntercept {
     /** small helper function to format output into a nice error message:
      *  - do nothing if message is empty
      *  - trim white space from message
-     *  - replace all newlines and add an indentation marker to distuingish
+     *  - replace all newlines and add an indentation marker to distinguish
      *    that this is sill part of the message
      *
      *  @param logLevel log level of the message
      *  @param debugLevel debug level in case logLevel is c_Debug
      *  @param name name of the thing causing the output, e.g. Geant4
      *  @param indent string to add to the beginning of each line of the message
-     *  @param message actuall message to output
+     *  @param message actual message to output
      */
     void sendLogMessage(LogConfig::ELogLevel logLevel, int debugLevel, const std::string& name, const std::string& indent,
                         std::string message)

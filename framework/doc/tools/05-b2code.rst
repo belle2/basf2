@@ -158,4 +158,10 @@ All other options will be forwarded to ``sphinx-build``
 ---------------------------------------------------------------------------------
 
 This script will create the sphinx documentation and check whether there are any warnings.
+
+.. rubric:: Options
+
+-o, --output DIR       Specify the output directory.
+-h, --help             Display this help message.
+
 All extra arguments are forwarded to ``b2code-sphinx-build``.

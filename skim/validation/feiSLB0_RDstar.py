@@ -28,6 +28,7 @@ path = b2.Path()
 skim = feiSLB0_RDstar(
     validation=True,
     udstOutput=False,
+    analysisGlobaltag=ma.getAnalysisGlobaltag(),
 )
 
 ma.inputMdstList(
@@ -37,4 +38,4 @@ ma.inputMdstList(
 skim(path)
 
 path.add_module('Progress')
-b2.process(path)
+b2.process(path, max_event=50000)

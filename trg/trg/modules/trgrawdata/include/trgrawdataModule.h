@@ -52,7 +52,7 @@ namespace Belle2 {
   class TRGRAWDATAModule : public HistoModule {
 
   public:
-    //! Costructor
+    //! Constructor
     TRGRAWDATAModule();
     //! Destrunctor
     virtual ~TRGRAWDATAModule() {}

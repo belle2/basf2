@@ -7,24 +7,12 @@
  **************************************************************************/
 //+
 // File : DQMHistComparitor.h
-// Description :
+// Description : Compare a list of histograms with its reference
 //-
 
 #pragma once
 
-// EPICS
-#ifdef _BELLE2_EPICS
-#include "cadef.h"
-// #include "dbDefs.h"
-// #include "epicsString.h"
-// #include "cantProceed.h"
-#endif
-
 #include <dqm/core/DQMHistAnalysis.h>
-#include <TH1.h>
-#include <TCanvas.h>
-#include <TFile.h>
-#include <TString.h>
 
 namespace Belle2 {
   /** Class definition for the reference histogram display. */
@@ -35,22 +23,27 @@ namespace Belle2 {
      * The struct for reference histogram comparison.
      */
     typedef struct {
-#ifdef _BELLE2_EPICS
-      chid    mychid;
-#endif
-      /** Whether to use EPICS. */
-      bool epicsflag;
+      /** The name of the fit result PV, empty if none */
+      std::string pvfit;
+      /** The name of the status PV, empty if none */
+      std::string pvstatus;
+      /** Whether to use delta. */
+      bool deltaflag;
+      /** Whether to Colorize. */
+      bool colorflag;
       /** The name of the histogram to be compared. */
-      TString histo1;
+      std::string histName;
       /** The name of the reference histogram. */
-      TString histo2;
+      std::string refName;
       /** The canvas to display both original and reference histograms. */
       TCanvas* canvas;
+      /** The algo to use: 0=Chi2Test (default), 1=KolmogorovTest (2.. not used yet) */
+      int algo;
       /** The warning level for the histogram difference. */
       float warning;
       /** The error level for the histogram difference. */
       float error;
-      /** The mininum entries for histogram comparison. */
+      /** The minimum entries for histogram comparison. */
       int min_entries;
     } CMPNODE;
 
@@ -62,6 +55,7 @@ namespace Belle2 {
      */
     DQMHistComparitorModule();
 
+  private:
     /**
      * Destructor.
      */
@@ -93,24 +87,10 @@ namespace Belle2 {
     void terminate() override final;
 
     // Data members
-  private:
     /** Parameter list for histograms */
     std::vector< std::vector<std::string>> m_histlist;
     /** Struct for extracted parameters + EPICS PV */
     std::vector<CMPNODE*> m_pnode;
-    /** Reference Histogram Root file name */
-    std::string m_refFileName;
-    /** The pointer to the reference file */
-    TFile* m_refFile = nullptr;
-    /** Whether to use the color code for warnings and errors. */
-    bool m_color = true;
-
-    /**
-     * Get histogram by its name.
-     * @param histoname The name of the histogram.
-     * @return The pointer to the histogram, or nullptr if not found.
-     */
-    TH1* GetHisto(TString histoname);
 
   };
 } // end namespace Belle2

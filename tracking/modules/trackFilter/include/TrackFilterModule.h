@@ -40,16 +40,16 @@ namespace Belle2 {
     /** init the module */
     virtual void initialize() override;
 
-    static double m_min_d0; /**< d0 miminum value*/
+    static double m_min_d0; /**< d0 minimum value*/
     static double m_max_d0; /**< d0 maximum value*/
-    static double m_min_z0; /**< z0 miminum value*/
+    static double m_min_z0; /**< z0 minimum value*/
     static double m_max_z0; /**< z0 maximum value*/
-    static int m_min_NumHitsPXD; /**< miminum value of PXD hits*/
-    static int m_min_NumHitsSVD; /**< miminum value of SVD hits*/
-    static int m_min_NumHitsCDC; /**< miminum value of CDC hits*/
-    static double m_min_pCM; /**< miminum value of the center of mass momentum*/
-    static double m_min_pT; /**< miminum value of the transverse momentum*/
-    static double m_min_Pval;  /**< miminum P-value of the track fit*/
+    static int m_min_NumHitsPXD; /**< minimum value of PXD hits*/
+    static int m_min_NumHitsSVD; /**< minimum value of SVD hits*/
+    static int m_min_NumHitsCDC; /**< minimum value of CDC hits*/
+    static double m_min_pCM; /**< minimum value of the center of mass momentum*/
+    static double m_min_pT; /**< minimum value of the transverse momentum*/
+    static double m_min_Pval;  /**< minimum P-value of the track fit*/
 
     static bool m_saveControlNtuples; /**< if true produces a rootfile with control ntupled*/
     std::string m_rootFileName;   /**< root file name */

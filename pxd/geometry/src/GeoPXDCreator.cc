@@ -34,7 +34,6 @@
 #include <G4Region.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
   using namespace geometry;

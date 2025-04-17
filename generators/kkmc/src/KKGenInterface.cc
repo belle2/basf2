@@ -243,12 +243,48 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
     gParticle->addStatus(MCParticleGraph::GraphParticle::c_StableInGenerator);
   }
 
-  // set photon flags (for now: set ISR and FSR (CEEX is undefined by definition, unsure about IFI))
-  // PHOTOS could be called by TAUOLA, not sure what to do about that
+  // set photon flags
   if (hepevt_.idhep[index - 1] == 22) {
+    // ISR and FSR from incoming beams AND at the production vertex of outgoing fermions
+    // added by KKMC using CEEX model which cannot be split into ISR and FSR due to interference
     if (hepevt_.jmohep[index - 1][0] == 1) {
       gParticle->addStatus(MCParticleGraph::GraphParticle::c_IsISRPhoton);
       gParticle->addStatus(MCParticleGraph::GraphParticle::c_IsFSRPhoton);
+    } else {
+      // FSR from leptonic tau decay added by Tauola
+      // FSR from hadronic tau decay added by PHOTOS, but electromagnetic decay of hadrons by Tauola
+      // No interference with radiation from CEEX because tau decay vertices are separated due to lifetime
+      int moth = hepevt_.jmohep[index - 1][0];
+      int mothid = hepevt_.idhep[moth - 1];
+      int gmoth = hepevt_.jmohep[moth - 1][0];
+      int gmothid = hepevt_.idhep[gmoth - 1];
+      if (abs(mothid) == 15 || abs(mothid) == 24) {
+        B2DEBUG(200, "moth, mothid, gmoth, gmothid = " << moth << " " << mothid << " " << gmoth << " " << gmothid);
+      }
+      int leptonicdecay = 0;
+      int mothdau1 = hepevt_.jdahep[moth - 1][0];
+      int mothdau2 = hepevt_.jdahep[moth - 1][1];
+      for (int idau = mothdau1; idau <= mothdau2; ++idau) {
+        int dauid = abs(hepevt_.idhep[idau - 1]);
+        if (dauid == 11 || dauid == 12 || dauid == 13 || dauid == 14 || dauid == 16) {
+          leptonicdecay++;
+        }
+      }
+      if (abs(mothid) == 15 && leptonicdecay > 1) {
+        B2DEBUG(200, "mothdau1, mothdau2, leptonicdecay = " << mothdau1 << " " << mothdau2 << " " << leptonicdecay);
+      }
+      if ((abs(mothid) == 15) ||  // from tau decays
+          (abs(mothid) == 24 && abs(gmothid) == 15)) { // from W in tau -> W nu decays
+        if (leptonicdecay == 3) { // leptonic tau decay
+          gParticle->addStatus(MCParticleGraph::GraphParticle::c_IsFSRPhoton);
+        } else {
+          // PHOTOSPhoton flag to mark FSR photons added by PHOTOS, which cannot be separated otherwise
+          if (hepevt_.jdahep[index - 1][0] == 0 && hepevt_.jdahep[index - 1][1] == -1) {
+            gParticle->addStatus(MCParticleGraph::GraphParticle::c_IsFSRPhoton);
+            gParticle->addStatus(MCParticleGraph::GraphParticle::c_IsPHOTOSPhoton);
+          }
+        }
+      }
     }
   }
 

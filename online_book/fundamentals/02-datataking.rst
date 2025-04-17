@@ -492,7 +492,7 @@ system.
 The HLT system is a computing cluster of about 10000 CPU cores located right next
 to the detector. It receives the full raw subdetector data for each
 triggered event and performs an immediate full reconstruction using the
-exact same basf2 software as is used in offline data analysis. Based on the
+exact same `basf2` software as is used in offline data analysis. Based on the
 result of this reconstruction, events are classified and either stored to a
 local offline storage hard disk drive or discarded. This high level event
 selection is expected to reduce the amount of data written to the offline
@@ -539,7 +539,7 @@ named prescaling. When working on your own analysis, it is very important to
 keep in mind potential prescaling of the triggers that yield the events you use
 in your analysis. Since the prescaling settings can (and will) change over
 the lifetime of the experiment, updated numbers for each run can be
-found `here <https://confluence.desy.de/display/BI/TriggerBitTable>`_.. See also
+found `here <https://xwiki.desy.de/xwiki/rest/p/2471f>`_.. See also
 `this question <https://questions.belle2.org/question/9437/where-to-find-pre-scaling-factors/>`_.
 for more details.
 

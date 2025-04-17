@@ -15,7 +15,7 @@
 namespace Belle2 {
 
   /**
-   * Class to store debugging informations from the unpacker (event based).
+   * Class to store debugging information from the unpacker (event based).
    */
   class KLMDigitEventInfo : public RelationsObject {
 

@@ -26,7 +26,7 @@ namespace Belle2 {
      *  The vector (n1, n2) is called unit normal vector.
      *  It has an orientation. It is defining a right half plane with all points having
      *  n0 + n1*x + n2*y > 0 and a left half plane for point having n0 + n1*x + n2*y < 0
-     *  This naturally corresponds to a direction of positiv advance being the tangential
+     *  This naturally corresponds to a direction of positive advance being the tangential
      *  to the line (-n2, n1).
      *  This line is best suited for linear least square fits.
      */
@@ -59,9 +59,9 @@ namespace Belle2 {
       /**
        *  Constructs a line from its slope and intercept over the first coordinate (default forward
        * orientation).
-       *  Constucts a line of the points fullfilling y = slope *x + intercept.
+       *  Constructs a line of the points fulfilling y = slope *x + intercept.
        *  The Line2D has an additional orientation in contrast to y = slope *x + intercept.
-       *  The default orientation for the line is forward with the positiv x axes.
+       *  The default orientation for the line is forward with the positive x axes.
        */
       static Line2D fromSlopeIntercept(const double slope, const double intercept)
       {
@@ -71,11 +71,11 @@ namespace Belle2 {
       /**
        *  Constructs a line from its slope and intercept over the first coordinate with the given
        * orientation.
-       *  Constucts a line of the points fullfilling y = slope *x + intercept.
+       *  Constructs a line of the points fulfilling y = slope *x + intercept.
        *  The Line2D has an additional orientation in contrast to y = slope *x + intercept.
        *  The forward backward info sets if the constructed line shall have the direction with
        * increasing or \n
-       *  decreasing x respectivly.
+       *  decreasing x respectively.
        */
       static Line2D fromSlopeIntercept(const double slope,
                                        const double intercept,
@@ -128,13 +128,13 @@ namespace Belle2 {
       }
 
     private:
-      /// Setter for the second line parameter. May violate the normlization.
+      /// Setter for the second line parameter. May violate the normalization.
       void setN1(const double n1)
       {
         m_n12.setFirst(n1);
       }
 
-      /// Setter for the third line parameter. May violate the normlization.
+      /// Setter for the third line parameter. May violate the normalization.
       void setN2(const double n2)
       {
         m_n12.setSecond(n2);
@@ -233,8 +233,8 @@ namespace Belle2 {
     public:
       /**
        *  Calculates the signed distance of the point to the line.
-       *  Returns the signed distance of the point to the line. The sign is positiv \n
-       *  for the right side of the line and negativ for the left side.
+       *  Returns the signed distance of the point to the line. The sign is positive \n
+       *  for the right side of the line and negative for the left side.
        */
       double distance(const Vector2D& point) const
       {
@@ -243,8 +243,8 @@ namespace Belle2 {
 
       /**
        *  Calculates the signed distance of the point given by its to coordinates to the line.
-       *  Returns the signed distance of the point to the line. The sign is positiv \n
-       *  for the right side of the line and negativ for the left side.
+       *  Returns the signed distance of the point to the line. The sign is positive \n
+       *  for the right side of the line and negative for the left side.
        */
       double distance(const double first, const double second) const
       {
@@ -303,7 +303,7 @@ namespace Belle2 {
        *
        *  Takes to two point to their closest approach to the origin
        *  and calculates the distance between them. The length is signed
-       *  take relativ to the direction of positiv advance.
+       *  taken relative to the direction of positive advance.
        */
       double lengthOnCurve(const Vector2D& from, const Vector2D& to) const
       {
@@ -316,7 +316,7 @@ namespace Belle2 {
         return n0() == 0.0 and n12().isNull();
       }
 
-      /// Gives the tangential vector in the direction of positiv advance on the line
+      /// Gives the tangential vector in the direction of positive advance on the line
       Vector2D tangential() const
       {
         return normal().orthogonal();
@@ -340,14 +340,14 @@ namespace Belle2 {
         return closestToOrigin();
       }
 
-      /// Returns if the direction of positiv advance has a common component aligned or anti aligned
+      /// Returns if the direction of positive advance has a common component aligned or anti aligned
       /// with the first coordinate.
       EForwardBackward alignedWithFirst() const
       {
         return static_cast<EForwardBackward>(-sign(n2()));
       }
 
-      /// Returns if the direction of positiv advance has a common component aligned or anti aligned
+      /// Returns if the direction of positive advance has a common component aligned or anti aligned
       /// with the second coordinate.
       EForwardBackward alignedWithSecond() const
       {
@@ -359,37 +359,37 @@ namespace Belle2 {
 
       /** @name Transformations of the line */
       /**@{*/
-      /// Activelly moves the line in the direction given in place by the vector given
+      /// Actively moves the line in the direction given in place by the vector given
       void moveBy(const Vector2D& by)
       {
         m_n0 -= by.unnormalizedParallelComp(n12());
       }
 
-      /// Activelly moves the line in the direction given in place along the first coordinate
+      /// Actively moves the line in the direction given in place along the first coordinate
       void moveAlongFirst(const double first)
       {
         m_n0 -= n1() * first;
       }
 
-      /// Activelly moves the line in the direction given in place along the second coordinate
+      /// Actively moves the line in the direction given in place along the second coordinate
       void moveAlongSecond(const double second)
       {
         m_n0 -= n2() * second;
       }
 
-      /// Return a copy of the line activally moved long the first coordinate
+      /// Return a copy of the line actively moved long the first coordinate
       Line2D movedAlongFirst(const double first) const
       {
         return Line2D(n0() - n1() * first, n1(), n2());
       }
 
-      /// Return a copy of the line activally moved long the first coordinate
+      /// Return a copy of the line actively moved long the first coordinate
       Line2D movedAlongSecond(const double second) const
       {
         return Line2D(n0() - n2() * second, n1(), n2());
       }
 
-      /// Passivelly move the coordinate system  in place by the given vector
+      /// Passively move the coordinate system  in place by the given vector
       void passiveMoveBy(const Vector2D& by)
       {
         m_n0 += by.unnormalizedParallelComp(n12());
@@ -419,27 +419,27 @@ namespace Belle2 {
         return Line2D(n0() + n2() * second, n1(), n2());
       }
 
-      /// Flips the first coordinate inplace (no difference between active and pasive)
+      /// Flips the first coordinate inplace (no difference between active and passive)
       void flipFirst()
       {
         m_n12.flipFirst();
       }
 
-      /// Flips the first coordinate inplace (no difference between active and pasive)
+      /// Flips the first coordinate inplace (no difference between active and passive)
       void flipSecond()
       {
         m_n12.flipSecond();
       }
 
       /// Makes a copy of the line with the first coordinate flipped (no difference between active
-      /// and pasive)
+      /// and passive)
       Line2D flippedFirst() const
       {
         return Line2D(n0(), n12().flippedFirst());
       }
 
       /// Makes a copy of the line with the second coordinate flipped (no difference between active
-      /// and pasive)
+      /// and passive)
       Line2D flippedSecond() const
       {
         return Line2D(n0(), n12().flippedSecond());

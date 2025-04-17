@@ -46,7 +46,7 @@ namespace Belle2 {
       /// Parameter : Setup the drift length as it can be estimated from two dimensional information
       bool m_param_reconstructedDriftLength = false;
 
-      /// Parameter : Switch to reconstruct the positions in the segments immitating the facet ca picking up all correct hits.
+      /// Parameter : Switch to reconstruct the positions in the segments imitating the facet ca picking up all correct hits.
       bool m_param_reconstructedPositions = false;
     };
   }

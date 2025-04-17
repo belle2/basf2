@@ -18,7 +18,7 @@ import basf2_cli.modules
 
 def get_argument_parser():
     parser = argparse.ArgumentParser(description="""
-This returns either all available modules within basf2 or returs specific information about a module when requested.
+This returns either all available modules within basf2 or returns specific information about a module when requested.
 
 Usage:
     ``b2help-modules`` will return the full list of available modules.

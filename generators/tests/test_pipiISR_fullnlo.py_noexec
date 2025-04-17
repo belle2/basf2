@@ -1,0 +1,29 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+'''
+Phokhara was compiled with wrong options which leads to issues to call qlI1()
+when FullNLO is enabled for pi pi generation. This script is used to detect the error message.
+'''
+
+
+import basf2 as b2
+
+n_events = 100
+b2.set_random_seed('pipiISR')
+main = b2.Path()
+main.add_module('EventInfoSetter')
+main.add_module(
+        "PhokharaInput",
+        FinalState=1,        # pi+pi-
+        LO=0, NLO=1, QED=2,
+        IFSNLO=1, FullNLO=1,
+        Alpha=1,
+        MinInvMassHadrons=0.,
+        )
+b2.process(main, n_events)
+print(b2.statistics)

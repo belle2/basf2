@@ -52,7 +52,7 @@ eclMuMuECollectorModule::eclMuMuECollectorModule() : CalibrationCollectorModule(
   addParam("minPairMass", m_minPairMass, "minimum invariant mass of the muon pair (GeV/c^2)", 9.0);
   addParam("minTrackLength", m_minTrackLength, "minimum extrapolated track length in the crystal (cm)", 30.);
   addParam("MaxNeighbourE", m_MaxNeighbourE, "maximum energy allowed in a neighbouring crystal (GeV)", 0.010);
-  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "miniumum muon theta in lab (degrees)", 17.);
+  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "minimum muon theta in lab (degrees)", 17.);
   addParam("thetaLabMaxDeg", m_thetaLabMaxDeg, "maximum muon theta in lab (degrees)", 150.);
   addParam("measureTrueEnergy", m_measureTrueEnergy, "use MC events to obtain expected energies", false);
   addParam("requireL1", m_requireL1, "only use events that have a level 1 trigger", true);

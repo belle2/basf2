@@ -39,7 +39,7 @@ namespace Belle2 {
     /// strategy to used for gain calibration, 0 for medians, 1 for landau fit
     int strategy;
 
-    /// flag to perform full calibration or only esitmate charge:
+    /// flag to perform full calibration or only estimate charge:
     /// False: only estimate charge, input can be data or mc
     /// True:  estimate data charge and calibrate using mc charge from payloads
     bool doCalibration;
@@ -75,7 +75,7 @@ namespace Belle2 {
     /// calculate MPV from 1D histogram
     double FitLandau(TH1D* histo_signals);
 
-    /// Retrive charge value from pulled in data base payload
+    /// Retrieve charge value from pulled in data base payload
     //double GetChargeFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin, TTree *dbtree);
 
   };

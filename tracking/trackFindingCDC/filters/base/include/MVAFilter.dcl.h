@@ -91,7 +91,7 @@ namespace Belle2 {
       std::vector<Named<Float_t*>> m_namedVariables;
     };
 
-    /// Convience template to create a mva filter for a set of variables.
+    /// Convenience template to create a mva filter for a set of variables.
     template<class AVarSet>
     class MVAFilter: public MVA<Filter<typename AVarSet::Object> > {
 

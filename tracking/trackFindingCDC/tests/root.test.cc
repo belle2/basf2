@@ -8,7 +8,7 @@
 
 /*
 This file contains test to check the behaviour of ROOT.
-Its purpose is mainly to asure the programmer that his assumptions about run time behaviour are correct.
+Its purpose is mainly to assure the programmer that his assumptions about run time behaviour are correct.
 */
 
 #include <TMatrixD.h>

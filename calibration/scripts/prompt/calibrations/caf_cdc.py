@@ -124,7 +124,7 @@ def get_calibrations(input_data, **kwargs):
 
     fraction_of_event_for_types = expert_config["fractions_for_each_type"]
     max_jobs = expert_config["max_job_for_each_type"]
-    basf2.B2INFO(f"Number of job for each type are limitted at [di-muon, hadron, cosmic]: {max_jobs}")
+    basf2.B2INFO(f"Number of job for each type are limited at [di-muon, hadron, cosmic]: {max_jobs}")
     basf2.B2INFO(f"Fraction for [di-muon, hadron, cosmic]: {fraction_of_event_for_types}")
     if len(fraction_of_event_for_types) != 3:
         basf2.B2FATAL("fraction of event must be an array with the size of 3, with order [mumu, hadron, cosmic]")

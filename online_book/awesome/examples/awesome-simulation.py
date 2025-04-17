@@ -53,7 +53,7 @@ main.add_module('ParticleGun',
                 xVertexParams=[0.0],
                 yVertexParams=[0.0],
                 zVertexParams=[0.0],
-                # and the same vertex vor all particles
+                # and the same vertex for all particles
                 independentVertices=False)
 
 # Simulate our awesome detector

@@ -12,11 +12,6 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 #include <dqm/core/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
@@ -88,10 +83,6 @@ namespace Belle2 {
 
     /** The drawing canvas for plotting the fitting result. */
     TCanvas* m_c0 = nullptr;
-
-#ifdef _BELLE2_EPICS
-    chid  mychid;
-#endif
   };
 } // end namespace Belle2
 

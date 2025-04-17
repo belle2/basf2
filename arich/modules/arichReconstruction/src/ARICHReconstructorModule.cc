@@ -203,7 +203,7 @@ namespace Belle2 {
 
   void ARICHReconstructorModule::printModuleParams()
   {
-    if (m_inputTrackType == 0) { B2DEBUG(100, "ARICHReconstructorModule: track infromation is taken from mdst Tracks.");}
+    if (m_inputTrackType == 0) { B2DEBUG(100, "ARICHReconstructorModule: track information is taken from mdst Tracks.");}
     else  B2DEBUG(100, "ARICHReconstructorModule: track information is taken from MC (ARICHAeroHit).");
   }
 

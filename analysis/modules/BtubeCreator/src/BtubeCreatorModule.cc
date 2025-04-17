@@ -44,6 +44,7 @@ BtubeCreatorModule::BtubeCreatorModule() : Module(),
 {
   // Set module properties
   setDescription("BtubeCreator : This module creates Btube object, an object geometrically similar to a very long ellipsoid along a particular direction and can be used as a constraint in vertexing B particles. Upsilon4S decays to two Bs. the user selects one B with a ^ in decaystring. The order of daughters in reconstructdecay of Upsilon4S and this decaystring should be same. Using selected B as reference, the module calculates the direction in which the other B should fly and constructs a Btube object along that direction. In semi-leptonic analyses, the selected B is usually the fully reconstructed one, while for time dependent studies, the selected B is usually signal B which can be partially reconstructed");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("listName", m_listName, "name of mother particle list", string(""));

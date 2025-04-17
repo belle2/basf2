@@ -10,8 +10,6 @@
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/vxdHoughTracking/findlets/SVDHoughTracking.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
-
 namespace Belle2 {
   /**
    * Full Hough Transformation based SVD track finding.

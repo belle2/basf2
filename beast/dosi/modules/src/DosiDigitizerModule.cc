@@ -10,16 +10,13 @@
 #include <beast/dosi/dataobjects/DosiSimHit.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/core/RandomNumbers.h>
 
 // ROOT
 #include <TMath.h>
+#include <TRandom.h>
 
 //c++
 #include <string>
-#include <fstream>
-#include <vector>
 
 using namespace std;
 using namespace Belle2;
@@ -86,7 +83,7 @@ void DosiDigitizerModule::getXMLData()
 {
   //GearDir content = GearDir("/Detector/DetectorComponent[@name=\"DOSI\"]/Content/");
 
-  B2INFO("DosiDigitizer: Aquired dosi locations and gas parameters");
+  B2INFO("DosiDigitizer: Acquired dosi locations and gas parameters");
   B2INFO("              from DOSI.xml. There are " << nDOSI << " DOSIs implemented");
 
 }

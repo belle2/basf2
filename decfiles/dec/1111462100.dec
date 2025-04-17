@@ -21,7 +21,7 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B0sig
-1.0 psi(2S)sig pi0sig K_S0sig PHOTOS PHSP;
+1.0 psi(2S)sig pi0sig K_S0sig PHSP;
 Enddecay
 
 CDecay anti-B0sig

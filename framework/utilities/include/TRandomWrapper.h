@@ -12,7 +12,7 @@
 
 namespace Belle2 {
 
-  /** Wrap TRandom to be useable as a uniform random number generator with STL algorithms like std::shuffle. */
+  /** Wrap TRandom to be usable as a uniform random number generator with STL algorithms like std::shuffle. */
   struct TRandomWrapper {
 
     /** Define the result type to be a normal unsigned int. */

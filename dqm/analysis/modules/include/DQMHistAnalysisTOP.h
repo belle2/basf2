@@ -89,11 +89,38 @@ namespace Belle2 {
     void updateEventMonitorCanvas();
 
     /**
+     * Updates canvas of number of good hits per event w/ alarming (injection BG)
+     */
+    void updateNGoodHitsCanvas();
+
+    /**
+     * Updates canvas of event T0 w/ alarming
+     */
+    void updateEventT0Canvas();
+
+    /**
+     * Updates canvas of bunch offset w/ alarming
+     */
+    void updateBunchOffsetCanvas();
+
+    /**
+     * Updates canvas of timing plot w/ alarming
+     */
+    void updateTimingCanvas();
+
+    /**
+     * Checks if histograms are defined in the same way (nbins, xmin, xmax)
+     * @param h1 first histogram
+     * @param h2 second histogram
+     * @return true if (nbins, xmin, xmax) match
+     */
+    bool sameHistDefinition(TH1* h1, TH1* h2);
+
+    /**
      * Makes a plot of dead and hot channel fractions per slot
      * @return fraction of active channels per slot
      */
     const TH1F* makeDeadAndHotFractionsPlot();
-
 
     /**
      * Make plots of dead-and-hot-channel corrected photon yields and BG rates per slot.
@@ -119,12 +146,17 @@ namespace Belle2 {
      * @param trackHits histogram used to scale background in case it is available
      * @param slot slot number
      */
-    void makeBGSubtractedTimimgPlot(const std::string& name, const TH2F* trackHits, int slot);
+    void makeBGSubtractedTimingPlot(const std::string& name, const TH2F* trackHits, int slot);
 
     /**
      * Makes plots of the number of PMT hits per event
      */
     void makePMTHitRatesPlots();
+
+    /**
+     * Makes projections of injection BG plots
+     */
+    void makeInjectionBGPlots();
 
     /**
      * Sets MiraBelle variables from the histogram with bins corresponding to slot numbers.
@@ -216,6 +248,13 @@ namespace Belle2 {
     std::vector<std::string> m_excludedBoardstacks; /**< list of boarstacks to be excluded from alarming */
     std::string  m_pvPrefix;  /**< Epics PV prefix */
 
+    std::vector<double> m_injectionBGAlarmLevels = {5, 10}; /**< alarm levels for injection background (in % of events) */
+    std::vector<double> m_timingAlarmLevels = {0.15, 0.30}; /**< alarm levels for time distribution (fraction of area difference) */
+    std::vector<double> m_eventT0MeanAlarmLevels = {8, 20}; /**< alarm levels for mean of event T0 [ns] */
+    std::vector<double> m_eventT0RmsAlarmLevels = {10, 20}; /**< alarm levels for r.m.s. of event T0 [ ns] */
+    std::vector<double> m_offsetMeanAlarmLevels = {0.2, 0.5}; /**< alarm levels for mean of bunch offset [ns] */
+    std::vector<double> m_offsetRmsAlarmLevels = {0.25, 0.50}; /**< alarm levels for r.m.s. of bunch offset [ns] */
+
     // other
 
     std::vector<int> m_alarmColors = {c_ColorTooFew, c_ColorGood, c_ColorWarning, c_ColorError}; /**< alarm colors (see base class) */
@@ -223,6 +262,7 @@ namespace Belle2 {
     std::vector<bool> m_includedBoardstacks; /**< boardstacks included in alarming */
     std::map<std::string, int> m_bsmap;  /**< a map of boardstack names to ID's */
     int m_alarmStateOverall = 0; /**< overall alarm state of histograms to be sent by EpicsPV */
+    double m_averageRate = 0; /**< average BG rate (to pass to EpicsPV) */
 
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
     std::string m_runType; /**< Run type */
@@ -248,16 +288,22 @@ namespace Belle2 {
     std::vector<TH1F*> m_pmtHitRates; /**< histograms of PMT hits per event (index = slot - 1) */
     std::vector<TCanvas*> m_c_pmtHitRates; /**< Canvases of PMT hits per event (index = slot - 1) */
 
+    std::map<std::string, TCanvas*> m_c_injBGs; /**< Canvases for projections of injection BG histograms */
+    std::map<std::string, TProfile*> m_profiles; /**< profiles of injection BG */
+    std::map<std::string, TH1D*> m_projections; /**< projections of injection BG */
+
     std::vector<TLine*> m_asicWindowsBandLines; /**< lines denoting a band of good windows */
     std::vector<TLine*> m_verticalLines; /**< vertical lines splitting slots */
     std::vector<TLine*> m_junkHitsAlarmLines; /**< lines representing alarm levels */
     std::vector<TLine*> m_deadChannelsAlarmLines; /**< lines representing alarm levels */
     std::vector<TLine*> m_backgroundAlarmLines; /**< lines representing alarm levels */
     std::vector<TLine*> m_photonYieldsAlarmLines; /**< lines representing alarm levels */
+    TLine* m_injBGCutLine = nullptr; /**< a line denoting the cut on the number of hits for injection BG counting */
 
     TPaveText* m_text1 = nullptr; /**< text to be written to window_vs_slot */
     TPaveText* m_text2 = nullptr; /**< text to be written to event desynchonization monitor */
     TPaveText* m_text3 = nullptr; /**< text to be written to background rates */
+    TPaveText* m_text4 = nullptr; /**< text to be written to number of good hits per event */
 
     std::map<std::string, double> m_mirabelleVariables; /**< variables for MiraBelle */
     MonitoringObject* m_monObj = nullptr; /**< MiraBelle monitoring object */

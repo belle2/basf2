@@ -112,6 +112,7 @@ class TrainingDataInformation:
         module.set_name("VariablesToHistogram_MCCount")
         module.param('variables', [(f'NumberOfMCParticlesInEvent({pdg})', 100, -0.5, 99.5) for pdg in pdgs])
         module.param('fileName', self.filename)
+        module.param('ignoreCommandLineOverride', True)
         path.add_module(module)
         return path
 
@@ -188,7 +189,7 @@ class FSPLoader:
             filename = 'Monitor_FSPLoader.root'
             pdgs = {abs(pdg.from_name(name)) for name in names}
             variables = [(f'NumberOfMCParticlesInEvent({pdg})', 100, -0.5, 99.5) for pdg in pdgs]
-            ma.variablesToHistogram('', variables=variables, filename=filename, path=path)
+            ma.variablesToHistogram('', variables=variables, filename=filename, ignoreCommandLineOverride=True, path=path)
         return path
 
 
@@ -255,6 +256,7 @@ class TrainingData:
                     ma.variablesToHistogram(channel.name, variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
                                             filename=config.removeJPsiSlash(hist_filename),
+                                            ignoreCommandLineOverride=True,
                                             directory=config.removeJPsiSlash(f'{channel.label}'), path=path)
 
                 teacher = basf2.register_module('VariablesToNtuple')
@@ -264,6 +266,7 @@ class TrainingData:
                 teacher.param('variables', channel.mvaConfig.variables + spectators)
                 teacher.param('particleList', channel.name)
                 teacher.param('sampling', (channel.mvaConfig.target, inverseSamplingRates))
+                teacher.param('ignoreCommandLineOverride', True)
                 path.add_module(teacher)
         return path
 
@@ -320,10 +323,14 @@ class PreReconstruction:
                                          (bc_variable, 'mcErrors'),
                                          (bc_variable, 'mcParticleStatus')]
                     filename = 'Monitor_PreReconstruction_BeforeRanking.root'
-                    ma.variablesToHistogram(channel.name,
-                                            variables=config.variables2binnings(hist_variables),
-                                            variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=filename, directory=f'{channel.label}', path=path)
+                    ma.variablesToHistogram(
+                        channel.name,
+                        variables=config.variables2binnings(hist_variables),
+                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                        filename=filename,
+                        ignoreCommandLineOverride=True,
+                        directory=f'{channel.label}',
+                        path=path)
 
                 if channel.preCutConfig.bestCandidateMode == 'lowest':
                     ma.rankByLowest(channel.name,
@@ -346,10 +353,14 @@ class PreReconstruction:
                     hist_variables_2d += [('extraInfo(preCut_rank)', channel.mvaConfig.target),
                                           ('extraInfo(preCut_rank)', 'mcErrors'),
                                           ('extraInfo(preCut_rank)', 'mcParticleStatus')]
-                    ma.variablesToHistogram(channel.name,
-                                            variables=config.variables2binnings(hist_variables),
-                                            variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=filename, directory=f'{channel.label}', path=path)
+                    ma.variablesToHistogram(
+                        channel.name,
+                        variables=config.variables2binnings(hist_variables),
+                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                        filename=filename,
+                        ignoreCommandLineOverride=True,
+                        directory=f'{channel.label}',
+                        path=path)
                 # If we are not in monitor mode we do the mc matching now,
                 # otherwise we did it above already!
                 elif self.config.training:
@@ -385,10 +396,14 @@ class PreReconstruction:
                                          ('chiProb', 'mcErrors'),
                                          ('chiProb', 'mcParticleStatus')]
                     filename = 'Monitor_PreReconstruction_AfterVertex.root'
-                    ma.variablesToHistogram(channel.name,
-                                            variables=config.variables2binnings(hist_variables),
-                                            variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=filename, directory=f'{channel.label}', path=path)
+                    ma.variablesToHistogram(
+                        channel.name,
+                        variables=config.variables2binnings(hist_variables),
+                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                        filename=filename,
+                        ignoreCommandLineOverride=True,
+                        directory=f'{channel.label}',
+                        path=path)
 
         return path
 
@@ -472,10 +487,14 @@ class PostReconstruction:
                                          ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                          ('extraInfo(decayModeID)', 'mcParticleStatus')]
                     filename = 'Monitor_PostReconstruction_AfterMVA.root'
-                    ma.variablesToHistogram(channel.name,
-                                            variables=config.variables2binnings(hist_variables),
-                                            variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=filename, directory=f'{channel.label}', path=path)
+                    ma.variablesToHistogram(
+                        channel.name,
+                        variables=config.variables2binnings(hist_variables),
+                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                        filename=filename,
+                        ignoreCommandLineOverride=True,
+                        directory=f'{channel.label}',
+                        path=path)
 
             cutstring = ''
             if particle.postCutConfig.value > 0.0:
@@ -496,6 +515,7 @@ class PostReconstruction:
                     variables=config.variables2binnings(hist_variables),
                     variables_2d=config.variables2binnings_2d(hist_variables_2d),
                     filename=config.removeJPsiSlash(filename),
+                    ignoreCommandLineOverride=True,
                     directory=config.removeJPsiSlash(f'{particle.identifier}'),
                     path=path)
 
@@ -508,6 +528,7 @@ class PostReconstruction:
                     variables=config.variables2binnings(hist_variables),
                     variables_2d=config.variables2binnings_2d(hist_variables_2d),
                     filename=config.removeJPsiSlash(filename),
+                    ignoreCommandLineOverride=True,
                     directory=config.removeJPsiSlash(f'{particle.identifier}'),
                     path=path)
 
@@ -526,6 +547,7 @@ class PostReconstruction:
                     variables=config.variables2binnings(hist_variables),
                     variables_2d=config.variables2binnings_2d(hist_variables_2d),
                     filename=config.removeJPsiSlash(filename),
+                    ignoreCommandLineOverride=True,
                     directory=config.removeJPsiSlash(f'{particle.identifier}'),
                     path=path)
 
@@ -538,8 +560,13 @@ class PostReconstruction:
                     variables += ['Mbc', 'cosThetaBetweenParticleAndNominalB']
 
                 filename = 'Monitor_Final.root'
-                ma.variablesToNtuple(particle.identifier, variables, treename=config.removeJPsiSlash(
-                    f'{particle.identifier} variables'), filename=config.removeJPsiSlash(filename), path=path)
+                ma.variablesToNtuple(
+                    particle.identifier,
+                    variables,
+                    treename=config.removeJPsiSlash(f'{particle.identifier} variables'),
+                    filename=config.removeJPsiSlash(filename),
+                    ignoreCommandLineOverride=True,
+                    path=path)
         return path
 
 

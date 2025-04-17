@@ -19,7 +19,7 @@
 #include <cmath>
 
 namespace Belle2 {
-  /**This module takes the SVDShaperDigit as input and select three consecutive samples starting from the one choosen by the user. The modules creates a new StoreArray of the class ShaperDigit whit three samples only, selected from the original ShaperDigits. The three samples are stored in the first three positions of the APVSamples store array, and the last three are set to 0.
+  /**This module takes the SVDShaperDigit as input and select three consecutive samples starting from the one chosen by the user. The modules creates a new StoreArray of the class ShaperDigit with three samples only, selected from the original ShaperDigits. The three samples are stored in the first three positions of the APVSamples store array, and the last three are set to 0.
    */
   class SVD3SamplesEmulatorModule : public Module {
 

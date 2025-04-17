@@ -1,0 +1,38 @@
+# EventType: 1212531003
+# Descriptor: [B+ -> X_0(3915) [-> pi0 chi_c2 [-> gamma  J/psi [->e+ e-]]]  K+]
+# NickName: Bu_X3915K__X3915_pi0chic2__chic2_gJpsi__Jpsiee
+# Documentation: X->pi0 chicJ studies.
+# Tested:
+# PhysicsWG:  Quarkonium
+# Responsible: Junxi Cui
+# Email: jxcui@seu.edu.cn
+# Cuts: None
+# Date: 20250123
+
+Alias X_0(3915)sig X_0(3915)
+ChargeConj X_0(3915)sig      X_0(3915)sig
+
+yesPhotos
+
+Decay Upsilon(4S)
+0.5  B+sig B-    VSS;
+0.5  B+    B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.00  X_0(3915)sig  K+   PHSP;
+Enddecay
+CDecay B-sig
+
+Decay X_0(3915)sig
+1.00  pi0  chi_c2sig  PHSP;
+Enddecay
+
+Decay chi_c2sig
+1.00  J/psisig   gamma   PHSP;
+Enddecay
+
+Decay J/psisig
+1.00  e+  e-  VLL;
+Enddecay
+End

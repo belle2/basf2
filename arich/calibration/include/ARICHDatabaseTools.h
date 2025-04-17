@@ -39,7 +39,7 @@ namespace Belle2 {
 
       /**
        * @brief isValidChannel defines the range of valid channels.
-       * @param channel
+       * @param channel channel
        * @return true if channel id/number is in the valid range otherwise false.
        */
       static constexpr auto isValidChannel(const int channel) noexcept -> bool
@@ -47,6 +47,11 @@ namespace Belle2 {
         return (channel >= 0) && (channel <= m_gMaxChannel);
       }
 
+      /**
+       * @brief isValidSector checks whether a given sector is valid.
+       * @param sector sector to be checked
+       * @return true if sector id/number is in the valid range otherwise false.
+       */
       static auto isValidSector(const uint8_t sector) noexcept -> bool
       {
         return std::find(m_gValidSectors.begin(), m_gValidSectors.end(), sector) !=
@@ -82,7 +87,7 @@ namespace Belle2 {
       }
 
       /**
-       * @brief getSector returns the definded sectors.
+       * @brief getSector returns the defined sectors.
        * @return sector id
        * @see ModuleID_t::m_gValidSectors
        */
@@ -127,7 +132,7 @@ namespace Belle2 {
 
       /**
        * comparison operator==
-       * @note if using c++17 replace thi one with <=> operator
+       * @note if using c++17 replace this one with <=> operator
        */
       inline auto operator==(const ModuleID_t& rOther) const noexcept -> bool
       {
@@ -136,7 +141,7 @@ namespace Belle2 {
 
       /**
        * comparison operator!=
-       * @note if using c++17 replace thi one with <=> operator
+       * @note if using c++17 replace this one with <=> operator
        */
       inline auto operator!=(const ModuleID_t& rOther) const noexcept -> bool
       {
@@ -145,7 +150,7 @@ namespace Belle2 {
 
       /**
        * comparison operator<
-       * @note if using c++17 replace thi one with <=> operator
+       * @note if using c++17 replace this one with <=> operator
        */
       inline auto operator<(const ModuleID_t& rOther) const noexcept -> bool
       {
@@ -154,7 +159,7 @@ namespace Belle2 {
 
       /**
        * comparison operator<=
-       * @note if using c++17 replace thi one with <=> operator
+       * @note if using c++17 replace this one with <=> operator
        */
       inline auto operator<=(const ModuleID_t& rOther) const noexcept -> bool
       {
@@ -163,7 +168,7 @@ namespace Belle2 {
 
       /**
        * comparison operator>
-       * @note if using c++17 replace thi one with <=> operator
+       * @note if using c++17 replace this one with <=> operator
        */
       inline auto operator>(const ModuleID_t& rOther) const noexcept -> bool
       {
@@ -172,7 +177,7 @@ namespace Belle2 {
 
       /**
        * comparison operator>=
-       * @note if using c++17 replace thi one with <=> operator
+       * @note if using c++17 replace this one with <=> operator
        */
       inline auto operator>=(const ModuleID_t& rOther) const noexcept -> bool
       {
@@ -232,9 +237,9 @@ namespace Belle2 {
        */
       template <> struct TokenCast<int> {
         /**
-         * @brief isValidChar defines characters that are allowed for the convertion
+         * @brief isValidChar defines characters that are allowed for the conversion
          * @param character
-         * @return true if its allowed for convertion
+         * @return true if its allowed for conversion
          */
         inline auto isValidChar(const unsigned char character) const noexcept
         -> bool
@@ -246,7 +251,7 @@ namespace Belle2 {
          * @brief operator () converts given token to an integer.
          * @param rToken
          * @throw invalid_argument in case the given string is invalid for
-         * convertion
+         * conversion
          * @throw std::out_of_range if the given number is smaller/greater than a
          * integer.
          */
@@ -264,9 +269,9 @@ namespace Belle2 {
        */
       template <> struct TokenCast<double> {
         /**
-         * @brief isValidChar defines characters that are allowed for the convertion
+         * @brief isValidChar defines characters that are allowed for the conversion
          * @param character
-         * @return true if its allowed for convertion
+         * @return true if its allowed for conversion
          */
         inline auto isValidChar(const unsigned char character) const noexcept
         -> bool
@@ -278,7 +283,7 @@ namespace Belle2 {
          * @brief operator () converts given token to an integer.
          * @param rToken
          * @throw invalid_argument in case the given string is invalid for
-         * convertion
+         * conversion
          * @throw std::out_of_range if the given number is smaller/greater than a
          * double.
          */
@@ -293,9 +298,9 @@ namespace Belle2 {
        */
       template <> struct TokenCast<ModuleID_t> {
         /**
-         * @brief isValidChar defines characters that are allowed for the convertion
+         * @brief isValidChar defines characters that are allowed for the conversion
          * @param character
-         * @return true if its allowed for convertion
+         * @return true if its allowed for conversion
          */
         inline auto isValidChar(const unsigned char character) const noexcept
         -> bool
@@ -307,7 +312,7 @@ namespace Belle2 {
          * @brief operator () converts given token to an integer.
          * @param rToken
          * @throw invalid_argument in case the given string is invalid for
-         * convertion
+         * conversion
          * @throw std::out_of_range if the given number is smaller/greater than a
          * double.
          */
@@ -349,8 +354,8 @@ namespace Belle2 {
     public:
       /**
        * @brief convert<T> converts the given string in to a std::vector<T> elements
-       * seperated by the given delimiter
-       * @param rLine tokens seperated by the delimiter
+       * separated by the given delimiter
+       * @param rLine tokens separated by the delimiter
        * @param delim delimiter character
        * @return std::vector<T>
        * @throw std::runtime_error() if
@@ -400,7 +405,7 @@ namespace Belle2 {
        * @return the evaluated std::string.
        * @throw std::runtime_error() if
        *   - invalid argument for during the operator parsing
-       *   - out of range convertion, ie casting 0xffff into int8_t
+       *   - out of range conversion, ie casting 0xffff into int8_t
        */
       template <typename T>
       static inline auto parse(const std::string& rLine, const char delim = ' ')
@@ -444,7 +449,7 @@ namespace Belle2 {
     private:
       /**
        * @brief expand<T> applies the given range and fills the given std::ostream
-       * with each element in range seperated by the delimiter char
+       * with each element in range separated by the delimiter char
        * @param rStream
        * @param delim
        * @param rToken
@@ -464,7 +469,7 @@ namespace Belle2 {
 
         if (lhs >= rhs)
           throw std::runtime_error(
-            "Invalid expansion! lhs ist greater then rhs, got: '" + rToken +
+            "Invalid expansion! lhs is greater then rhs, got: '" + rToken +
             "'!");
 
         rStream << lhs;
@@ -482,7 +487,7 @@ namespace Belle2 {
      * @param chipID in range of ['A' = 0, 'B' = 36, 'C' = 2*36, 'D'=3*36]
      * (chipID=offset)
      * @param line
-     * @return std::vector<int> of channel with a denined offset.
+     * @return std::vector<int> of channel with a defined offset.
      */
     auto getDeadCutList(const char chipID, const std::string& line)
     -> std::vector<int>
@@ -507,7 +512,7 @@ namespace Belle2 {
      */
     std::string& remove_nondigit(std::string& s)
     {
-      // changed to unsigned char see documention of std::isdigit in <cctype>
+      // changed to unsigned char see documentation of std::isdigit in <cctype>
       s.erase(remove_if(s.begin(), s.end(),
       [](const unsigned char& c) { return !std::isdigit(c); }),
       s.end());

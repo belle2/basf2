@@ -142,11 +142,11 @@ CalibrationAlgorithm::EResult PXDAnalyticGainCalibrationAlgorithm::calibrate()
 
   for (const auto& sensorID : pxdSensors) {
 
-    // Special treatement for the last 2 vBin as Bhabha 2-track events
+    // Special treatment for the last 2 vBin as Bhabha 2-track events
     // have no enough statistics there if nBinsV = 6
     if (correctForward && sensorID.getSensorNumber() == 1)
       for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
-        // Search for a vaid gain along v
+        // Search for a valid gain along v
         double gainForwardRegion = 1.0;
         unsigned short vBinToCheck = nBinsV - 1;
         for (unsigned short vBinGood = nBinsV - 2; vBinGood >= 1; --vBinGood) {
@@ -189,7 +189,7 @@ CalibrationAlgorithm::EResult PXDAnalyticGainCalibrationAlgorithm::calibrate()
       B2RESULT("Gain calibration on sensor=" << sensorID << " and vBin=" << vBin << " was successful on " << nGood << "/" << nBinsU <<
                " uBins.");
 
-      // Check if we can repair bad calibrations with a local avarage
+      // Check if we can repair bad calibrations with a local average
       if (nGood > 0 && nBad > 0) {
         meanGain /= nGood;
         for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {

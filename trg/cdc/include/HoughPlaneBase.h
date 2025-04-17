@@ -30,7 +30,7 @@ namespace Belle2 {
 
   public:
 
-    /// Contructor.
+    /// Constructor.
     TRGCDCHoughPlaneBase(const std::string& name,
                          const TRGCDCHoughTransformation& transformation,
                          unsigned nX,

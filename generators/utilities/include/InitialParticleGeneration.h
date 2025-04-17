@@ -89,7 +89,7 @@ namespace Belle2 {
   private:
 
     /**
-     * Generate a new event wit a particular set of allowed flags.
+     * Generate a new event with a particular set of allowed flags.
      * @param[in] allowedFlags Allowed flags.
      */
     MCInitialParticles& generate(int allowedFlags);

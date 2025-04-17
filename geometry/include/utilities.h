@@ -80,7 +80,7 @@ namespace Belle2 {
     G4Polycone* createPolyCone(const std::string& name, const GearDir& params, double& minZ, double& maxZ);
 
     /**
-     * Create a solid by roating two polylines around the Z-Axis.
+     * Create a solid by rotating two polylines around the Z-Axis.
      * This function will create a polycone shape directly from Gearbox
      * Parameters describing the inner and the outer envelope of the polycone.
      * The XML Parameters should be of the form

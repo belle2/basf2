@@ -23,7 +23,7 @@ namespace Belle2 {
 
     /// Interface class to the Monte Carlo information for individual hits
     /** This class provides a stable interface for the underlying implementation for look ups
-     *  into the Monte Carlo informations for the first stage of the algorithm.*/
+     *  into the Monte Carlo information for the first stage of the algorithm.*/
     class CDCMCHitLookUp {
 
     public:

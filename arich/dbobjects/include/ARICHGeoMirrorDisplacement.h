@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * Sets displacement parameters (element) for mirror plate
      * @param id mirror id
-     * @param element displacement element
+     * @param pars element displacement element
      */
     void setDisplacementElement(int id, const ARICHPositionElement& pars)
     {

@@ -75,7 +75,7 @@ class TrackingValidationResult:
                 c in enumerate(calculations)]
 
     def get_figure_of_merits(self):
-        """Return the figures of merit from the file. Mosty used for internal seeting of the properties."""
+        """Return the figures of merit from the file. Mostly used for internal setting of the properties."""
         if self.finding_efficiency is None:
             overview = uproot.open(
                 self.filename)["ExpertMCSideTrackingValidationModule_overview_figures_of_merit"].arrays(
@@ -111,7 +111,7 @@ class TrackingValidationResult:
         return latex_string
 
     def plot_efficiency_point(self):
-        """Plot a oint in the finding-efficiency/hit-efficiency plane."""
+        """Plot a point in the finding-efficiency/hit-efficiency plane."""
         import matplotlib.pyplot as plt
         self.plot(100 * self.finding_efficiency, 100 * self.hit_efficiency, loc=3)
         plt.xlabel("finding efficiency")

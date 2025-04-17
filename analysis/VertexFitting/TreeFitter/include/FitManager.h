@@ -28,15 +28,14 @@ namespace TreeFitter {
     /** constructor  */
     FitManager() : m_particle(0), m_decaychain(0), m_status(VertexStatus::UnFitted),
       m_chiSquare(-1), m_prec(0.01), m_updateDaugthers(false), m_ndf(0),
-      m_fitparams(0), m_useReferencing(false)
+      m_fitparams(0)
     {}
 
     /** constructor  */
     FitManager(Belle2::Particle* particle,
                const ConstraintConfiguration& config,
                double prec = 0.01,
-               bool updateDaughters = false,
-               const bool useReferencing = false
+               bool updateDaughters = false
               );
 
     /** use default copy constructor */
@@ -105,9 +104,6 @@ namespace TreeFitter {
 
     /** parameters to be fitted */
     FitParams* m_fitparams;
-
-    /** use referencing */
-    bool m_useReferencing;
 
     /** config container */
     const ConstraintConfiguration m_config;

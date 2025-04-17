@@ -53,8 +53,8 @@ void ECLShowerCorrectorModule::initialize()
   B2DEBUG(28, "ECLShowerCorrectorModule::initialize()");
 
   //..Register in datastore
-  m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eventLevelClusteringInfo.registerInDataStore();
+  m_eclShowers.isRequired(eclShowerArrayName());
+  m_eventLevelClusteringInfo.isRequired();
 
   //..Class to find cellID and position within crystal from theta and phi
   m_leakagePosition = new ECLLeakagePosition();

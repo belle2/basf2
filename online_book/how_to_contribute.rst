@@ -40,7 +40,9 @@ Submitting a MR
 You need to
 
 1. Create a development setup as explained in
-   :ref:`build/tools_doc/cvmfs_setup:Development Setup`
+   :ref:`build/tools_doc/cvmfs_setup:Development Setup`.
+   If you just want to contribute to the analysis package documentation or the online book, setting up a local light release is enough.
+   This can be achieved by adding the ``--light`` flag to the ``b2code-create`` command.
 2. Change to a new branch ``feature/describe-your-change`` or ``bugfix/something``
    (if your merge request is based on a GitLab issue, you can name it in the MR description).
    You will not be able to push your branch if it isn't prefixed with ``feature/`` or ``bugfix/``

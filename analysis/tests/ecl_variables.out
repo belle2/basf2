@@ -6,7 +6,7 @@
 [INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:all (gamma:all)
+[INFO]  o) creating ParticleList with name: gamma:all
 [INFO]    -> MDST source: ECLClusters and KLMClusters
 [INFO] ParticleSelector: gamma:all
 [INFO]    -> With cuts  : isFromECL

@@ -38,7 +38,7 @@ SVDDatabaseTestModule::SVDDatabaseTestModule() : Module()
 void SVDDatabaseTestModule::initialize()
 { }
 
-/** Get access to calibration results retreived from database */
+/** Get access to calibration results retrieved from database */
 void SVDDatabaseTestModule::event()
 {
 

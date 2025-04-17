@@ -14,7 +14,7 @@ import b2test_utils
 # This test does the following:
 # 1. Simulate a few hundred ParticleGun events to produce a sample of
 #    SVD simhits.
-# 2. Use SVDDigitizer with varius zero-suppression cut settings and check
+# 2. Use SVDDigitizer with various zero-suppression cut settings and check
 #    that the settings work.
 # ====================================================================
 

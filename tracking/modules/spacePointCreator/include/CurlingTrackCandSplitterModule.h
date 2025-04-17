@@ -80,7 +80,7 @@ namespace Belle2 {
       /** Z-position (global) difference between TrueHit and SpacePoint (layerwise) */
       std::array<std::vector<double>, c_nPlanes> PosResidueZGlobal;
 
-      /** U-position (local) differnece between TrueHit and SpacePoint (layerwise) */
+      /** U-position (local) difference between TrueHit and SpacePoint (layerwise) */
       std::array<std::vector<double>, c_nPlanes> PosResidueULocal;
       /** V-position (local) difference between TrueHit and SpacePoint (layerwise) */
       std::array<std::vector<double>, c_nPlanes> PosResidueVLocal;
@@ -242,7 +242,7 @@ namespace Belle2 {
     /** Z-position (global) difference between TrueHit and SpacePoint (layerwise) */
     std::array<std::vector<double>, c_nPlanes> m_rootPosResidueZGlobal;
 
-    /** U-position (local) differnece between TrueHit and SpacePoint (layerwise) */
+    /** U-position (local) difference between TrueHit and SpacePoint (layerwise) */
     std::array<std::vector<double>, c_nPlanes> m_rootPosResidueULocal;
     /** V-position (local) difference between TrueHit and SpacePoint (layerwise) */
     std::array<std::vector<double>, c_nPlanes> m_rootPosResidueVLocal;

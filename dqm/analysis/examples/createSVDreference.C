@@ -7,7 +7,7 @@
  **************************************************************************/
 /******************************************************************
  * simple macro to create reference plots for the 
- * DQM analsyis module:
+ * DQM analysis module:
  *
  *    DQMHistAnalysisSVDGeneral
  * 

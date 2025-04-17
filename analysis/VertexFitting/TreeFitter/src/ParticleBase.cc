@@ -23,8 +23,6 @@
 #include <analysis/VertexFitting/TreeFitter/Origin.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
-#include <framework/geometry/BFieldManager.h>
-
 namespace TreeFitter {
 
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration* config) :
@@ -314,7 +312,10 @@ namespace TreeFitter {
   ErrCode ParticleBase::projectMassConstraintDaughters(const FitParams& fitparams,
                                                        Projection& p) const
   {
-    const double mass = particle()->getPDGMass();
+    double mass = 0;
+    if (particle()->hasExtraInfo("treeFitterMassConstraintValue")) {
+      mass = particle()->getExtraInfo("treeFitterMassConstraintValue");
+    } else mass = particle()->getPDGMass();
     const double mass2 = mass * mass;
     double px = 0;
     double py = 0;
@@ -336,7 +337,10 @@ namespace TreeFitter {
         E += fitparams.getStateVector()(momindex + 3);
       } else {
         // final states dont have an energy index
-        const double m = daughter->particle()->getPDGMass();
+        double m = 0;
+        if (daughter->particle()->hasExtraInfo("treeFitterMassConstraintValue")) {
+          m = daughter->particle()->getExtraInfo("treeFitterMassConstraintValue");
+        } else m = daughter->particle()->getPDGMass();
         E += std::sqrt(m * m + px_daughter * px_daughter + py_daughter * py_daughter + pz_daughter * pz_daughter);
       }
     }
@@ -359,7 +363,10 @@ namespace TreeFitter {
         const double px_daughter = fitparams.getStateVector()(momindex);
         const double py_daughter = fitparams.getStateVector()(momindex + 1);
         const double pz_daughter = fitparams.getStateVector()(momindex + 2);
-        const double m = daughter->particle()->getPDGMass();
+        double m = 0;
+        if (daughter->particle()->hasExtraInfo("treeFitterMassConstraintValue")) {
+          m = daughter->particle()->getExtraInfo("treeFitterMassConstraintValue");
+        } else m = daughter->particle()->getPDGMass();
 
         const double E_daughter = std::sqrt(m * m + px_daughter * px_daughter + py_daughter * py_daughter + pz_daughter * pz_daughter);
         const double E_by_E_daughter = E / E_daughter;
@@ -375,7 +382,9 @@ namespace TreeFitter {
   ErrCode ParticleBase::projectMassConstraintParticle(const FitParams& fitparams,
                                                       Projection& p) const
   {
-    const double mass = particle()->getPDGMass();
+    double mass = 0;
+    if (particle()->hasExtraInfo("treeFitterMassConstraintValue")) mass = particle()->getExtraInfo("treeFitterMassConstraintValue");
+    else mass = particle()->getPDGMass();
     const double mass2 = mass * mass;
     const int momindex = momIndex();
     const double px = fitparams.getStateVector()(momindex);
@@ -437,7 +446,7 @@ namespace TreeFitter {
       const Eigen::Matrix < double, 1, -1, 1, 1, 3 > vertex_dist =
         fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
       const Eigen::Matrix < double, 1, -1, 1, 1, 3 >
-      mom = fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
+      mom = fitparams.getStateVector().segment(posindex, dim);
 
       // if an intermediate vertex is not well defined by a track or so it will be initialised with 0
       // same for the momentum of for example B0, it might be initialised with 0

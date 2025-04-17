@@ -88,7 +88,7 @@ int SVDStripNoiseMap::initializeMap(const string& noisefilename)
              &pedestal, &gaus_noise, &noise, &rms, &cmc);
 
       //**************************************************
-      //*** This fadc_id definition is workround solution
+      //*** This fadc_id definition is workaround solution
       //*** for DESY beam data analysis.
       //*** It must be removed in future. (Katsuro)
       //**************************************************

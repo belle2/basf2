@@ -141,7 +141,7 @@ namespace Belle2 {
     template<typename T> struct Type { /** type name. */ static std::string name() { return "???";} };
     /** Converts a template argument into a string for corresponding Python type. */
     template<typename T> struct Type<std::vector<T> > { /** type name. */ static std::string name() { return std::string("list(") + Type<T>::name() + ")"; } };
-    /** Convert a templeate arugment into a string for corresponding Python type */
+    /** Convert a templeate argument into a string for corresponding Python type */
     template<typename T> struct Type<std::set<T>> { /** type name */ static std::string name() { return std::string("set(") + Type<T>::name() + ")"; }};
     /** Converts a template argument into a string for corresponding Python type. */
     template<typename A, typename B> struct Type<std::map<A, B> > { /** type name. */ static std::string name() { return std::string("dict(") + Type<A>::name() + " -> " + Type<B>::name() + ")"; } };
@@ -296,7 +296,7 @@ namespace Belle2 {
       return CheckTuple(tuple, pyTuple, std::index_sequence_for<Types ...>());
     }
 
-    /// Recursion sentinal for the case that all former type checks failed for the variant.
+    /// Recursion sentinel for the case that all former type checks failed for the variant.
     template<typename VariantType>
     bool CheckVariant(const VariantType&,
                       const boost::python::object&,

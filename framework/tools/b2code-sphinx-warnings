@@ -8,19 +8,36 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# check for help argument
-echo $@ | grep -E -- "(^|\\s)(--help|-h)($|\\s)" &>/dev/null
-if [ $? -eq 0 ]; then
-    cat <<EOT
-This script will create the sphinx documentation and check whether there are any warnings.
+output_dir=$(mktemp -d)
+use_temp_dir=true
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -o|--output)
+            output_dir="$2"
+            use_temp_dir=false
+            shift 2
+            ;;
+        -h|--help)
+            cat <<EOT
+This script will create the Sphinx documentation and check whether there are any warnings.
+Options:
+  -o, --output DIR       Specify the output directory.
+  -h, --help             Display this help message.
 All extra arguments are forwarded to b2code-sphinx-build.
 EOT
-    exit 1;
+            exit 1
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+# remove temporary directory on exit if it was created
+if [ "$use_temp_dir" = true ]; then
+    trap "rm -rf $output_dir" EXIT
 fi
 
-# create temp dir for output
-tmpdir=`mktemp -d`
-# remove temporary directory on exit
-trap "rm -rf $tmpdir" EXIT
 # build sphinx documentation with html option
-b2code-sphinx-build --output-dir ${tmpdir} -t html -q "$@" 2>&1 | grep WARNING && exit 1 || exit 0
+b2code-sphinx-build --output-dir ${output_dir} -t html -q "$@" 2>&1 | grep WARNING && exit 1 || exit 0

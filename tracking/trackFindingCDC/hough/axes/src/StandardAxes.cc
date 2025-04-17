@@ -16,8 +16,8 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 CurvWithArcLength2DCache::CurvWithArcLength2DCache(float curv)
-  : m_curv(curv)
-  , m_arcLength2DByICLayer{{0}}
+  : m_arcLength2DByICLayer{{0}}
+, m_curv(curv)
 {
   CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 

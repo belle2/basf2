@@ -312,6 +312,10 @@ class GraFEIModule(b2.Module):
             graFEI_nLeptons_postFit = graFEI_nElectrons_postFit + graFEI_nMuons_postFit
             graFEI_nOthers_postFit = (predicted_masses == 0).sum()
 
+            # Assign new mass hypotheses as extraInfo
+            for i, p in enumerate(p_list):
+                p.addExtraInfo("graFEI_massHypothesis", predicted_masses[i])
+
             # Get square matrices
             edge_probability_square = torch.sparse_coo_tensor(
                 edge_index, edge_probability
@@ -483,7 +487,7 @@ class GraFEIModule(b2.Module):
                     # Here we look if the candidate has a perfectly reconstructed LCA
                     for genP in gen_list.obj():
                         mcp = genP.getMCParticle()
-                        # If storing true info on B decays and we have matched paricles coming
+                        # If storing true info on B decays and we have matched particles coming
                         # from different Bs the decay will not have a perfectLCA
                         if self.mc_particle != "Upsilon(4S):MC" and len(B_indices) != 1:
                             break

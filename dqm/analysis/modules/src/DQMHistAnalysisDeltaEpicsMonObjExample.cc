@@ -148,7 +148,7 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
   // get basic histogram (run integrated up) but only if updated since last call
   // auto hist = findHist(m_histogramDirectoryName, m_histogramName, true);// only if updated
 
-  // the following cases do not make sense, unless you want to archieve something special.
+  // the following cases do not make sense, unless you want to achieve something special.
   // get most recent delta even if not updated
   // auto hist =  getDelta(m_histogramDirectoryName, m_histogramName, 0, false);// even if no update
   // get basic histogram (run integrated up) even if not updated
@@ -159,7 +159,7 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
     data_width = hist->GetRMS();
 
     // your conditions for warn and alarm
-    // here we would have to check agains NaN, too ... just too lazy to write the code in this example
+    // here we would have to check against NaN, too ... just too lazy to write the code in this example
     // maybe other condition, e.g. too low to judge -> 0
     status = makeStatus(true,
                         data_mean > m_meanUpperWarn || data_mean < m_meanLowerWarn || data_width > m_widthUpperWarn,

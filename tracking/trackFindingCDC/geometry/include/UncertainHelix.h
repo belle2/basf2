@@ -173,7 +173,7 @@ namespace Belle2 {
        * on the same origin.
        *  The circle is considered to be fitted in the sz space defined by the given helix.
        *
-       *  @param fromPerigeeCircle    Perigee circle to be incoorporated
+       *  @param fromPerigeeCircle    Perigee circle to be incorporated
        *  @param fromAmbiguity  Ambiguity matrix of the perigee parameters with respect to the
        * helix parameters
        *  @param toHelix            Second perigee circle
@@ -186,11 +186,11 @@ namespace Belle2 {
       /**
        *  Access to the constant interface of the underlying parameter line
        *  Allows the user of this "super" class to use the getters and
-       *  other methods to get inforamation about the line but disallows mutation
+       *  other methods to get information about the line but disallows mutation
        *  of internal state.
        *  This ensures that the parameters are not changed without proper adjustment to
        *  the covariance matrix in this class, which can be achieved by the more limited
-       *  set of methods in this class accessable by normal . method calls
+       *  set of methods in this class accessible by normal . method calls
        */
       const Helix* operator->() const
       {

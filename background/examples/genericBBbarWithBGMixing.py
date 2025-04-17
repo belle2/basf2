@@ -20,7 +20,7 @@ import glob
 # Example of simulation/reconstruction of generic BBbar events with beam background.
 #
 # This example generates BBbar events using EvtGenInput module, runs full simulation
-# with BG mixing using BeamBkgMixer module, then runs full reconstruction and finaly
+# with BG mixing using BeamBkgMixer module, then runs full reconstruction and finally
 # writes the results to mdst file.
 # ----------------------------------------------------------------------------------
 

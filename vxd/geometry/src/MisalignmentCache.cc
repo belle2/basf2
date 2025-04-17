@@ -54,12 +54,12 @@ namespace Belle2 {
       try {
         read_xml(xmlFullPath, propertyTree);
       } catch (std::exception const& ex) {
-        B2ERROR("Excpetion raised during xml parsing " << ex.what() << endl <<
+        B2ERROR("Exception raised during xml parsing " << ex.what() << endl <<
                 "Misaligner cache cannot be initialized." << endl <<
                 "No misalignment will be applied." << endl);
         return;
       } catch (...) {
-        B2ERROR("Unknown excpetion raised during xml parsing "
+        B2ERROR("Unknown exception raised during xml parsing "
                 "Misaligner cache cannot be initialized." << endl <<
                 "No misalignment will be applied." << endl);
         return;
@@ -84,7 +84,7 @@ namespace Belle2 {
               }
         }
       } catch (...) {
-        B2ERROR("Unknown excpetion raised during map initialization! "
+        B2ERROR("Unknown exception raised during map initialization! "
                 "Misalignment data corrupted." << endl <<
                 "No misalignment will be applied." << endl);
         m_misalignments.clear();

@@ -43,7 +43,7 @@ class GraFEIModel(torch.nn.Module):
         hidden_layer_dim (int): Intermediate features dimension (same for node, edge and global).
         num_hid_layers (int): Number of hidden layers in every MetaLayer.
         num_ML (int): Number of intermediate MetaLayers.
-        droput (float): Dropout rate :math:`r \\in [0,1]`.
+        dropout (float): Dropout rate :math:`r \\in [0,1]`.
         global_layer (bool): Whether to use global layer.
 
     :return: Node, edge and global features after model evaluation.

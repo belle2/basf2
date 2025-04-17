@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# A script used to submit jobs to the queue to generate data for SectorMap training. 
+# By default 10Mio Y(4S) + muon events and 2Mio Bhabha events will be generated, 
+# which is what we currently use for SectorMap training. 
+# There are several command line arguments to adjust settings. For a full list 
+# of command line arguments execute:
+# tracking-vxdtf2-submitAllCollectionJobs --help
+
+
+import time
+from tracking.secMapTraining.SectorMapTrainingUtils import create_unique_random_numbers
+
+import os
+import argparse
+import shutil
+import basf2 as b2
+
+if __name__ == "__main__": 
+
+    parser = argparse.ArgumentParser(description='This script will submit 2500 jobs \
+        for generating BBbar and 500 jobs for generating BhaBha events. It is \
+        assumed that an LSF queue is connected (e.g. at KEKcc).')
+
+    parser.add_argument(
+        '--nEvents', 
+        type=int, 
+        default=4000,
+        dest='nEvents',
+        help="Number of events generated for each of the jobs.")
+    
+    parser.add_argument(
+        '--outputDir',
+        dest='outputDir',
+        default='./datadir/',
+        help='The directory where all the output will be written to.')
+    
+    parser.add_argument(
+        '--queue',
+        dest='queue',
+        default='l',
+        help='The name of the queue the jobs will be sent to. By default the \"l\" queue \
+          at KEK is used, because only this can handle the default 4000 events per job.')
+  
+
+    parser.add_argument(
+        '--nBBbar',
+        dest='nBBbar',
+        type=int,
+        default=2500,
+        help='Number of jobs to generate BBbar events. (Note: total number of BBbar events \
+          generated is Ntotal = nBBbar * nEvents)')
+
+    parser.add_argument(
+        '--nBhaBha',
+        dest='nBhaBha',
+        type=int,
+        default=500,
+        help='Number of jobs to generate BhaBha events. (Note: total number of BhaBha events \
+          generated is Ntotal = nBhaBha * nEvents)')
+
+    parser.add_argument(
+        '--prependGT', 
+        dest='prependGT',
+        default='',
+        help='Optional Global tag that will be prepend to the list of GT. Useful for e.g. training \
+          SectorMaps on an altered Geometry.')
+
+    args = parser.parse_args()
+
+    # check if LSF queue is attached, if not FATAL out
+    if shutil.which("bsub") is None:
+        b2.B2FATAL('Sorry this script assumes an attached LSF queue (e.g. at KEKcc). Please switch \
+          to a system with LSF or you need to adjust the script.')
+
+    # check if the output directory exists 
+    if not os.path.isdir(args.outputDir):
+        b2.B2FATAL('Output directory ' + args.outputDir + ' does not exist. Create it to proceed!')
+    
+    # 2500 seeds (with nevts=4000 : 10Mio {Y(4S)+uniform muon particlegun} evts)
+    rndseeds_BB= create_unique_random_numbers(n=args.nBBbar,random_seed=12345)
+
+    # Bhabha 500 seeds (with nevts=4000 & eventSimulationBhabha.py: 2Mio BhaBha evts)
+    rndseeds_BhaBha= create_unique_random_numbers(n=args.nBhaBha,random_seed=54321)
+
+
+    
+    
+    
+    
+    # submit all BBbar 
+    for seed in rndseeds_BB: 
+       
+      command = "bsub -q " + args.queue + " -o " + args.outputDir + "/log" + str(seed) + \
+          ".log tracking-vxdtf2-collect-train-data --nEvents " + str(args.nEvents) + " --rndSeed " +\
+          str(seed) + " --outputDir " + args.outputDir + " --eventType BBbar"  
+      if not (args.prependGT == ''):
+          command = command +  " --prependGT " + args.prependGT
+      os.system(command)
+      time.sleep(0.05)  # sleep a bit to avoid hammering the queue too frequently 
+    
+    # submit all BhaBha 
+    for seed in rndseeds_BhaBha: 
+      print(seed)
+
+      # build the submit command 
+      command = "bsub -q " + args.queue + " -o " + args.outputDir + "/log" + str(seed) + \
+          ".log tracking-vxdtf2-collect-train-data --nEvents " + str(args.nEvents) + " --rndSeed " +\
+          str(seed) + " --outputDir " + args.outputDir + " --eventType BhaBha"
+      if not (args.prependGT == ''):
+          command = command +  " --prependGT " + args.prependGT
+      os.system(command)
+      time.sleep(0.05)  # sleep a bit to avoid hammering the queue too frequently 

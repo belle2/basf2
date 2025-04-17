@@ -19,7 +19,6 @@
 //////////////////////////////////////////
 #pragma once
 
-#include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 
 #include <vector>
@@ -55,9 +54,9 @@ namespace Belle2 {
      * Constructor
      */
     KsfwMoments(double Hso0_max,
-                std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_sigA,
-                std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_sigB,
-                std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_roe,
+                std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_sigA,
+                std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_sigB,
+                std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_roe,
                 const ROOT::Math::PxPyPzEVector& p_cms_missA,
                 const ROOT::Math::PxPyPzEVector& p_cms_missB,
                 const double et[2]

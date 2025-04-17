@@ -23,7 +23,7 @@ namespace Belle2 {
      */
     enum EDHCFrameHeaderDataType {
       c_DHP_RAW   = 0x0, // DHP memory dump ("pedestals")
-      c_DHP_ZSD   = 0x5, // DHP zero supressed data
+      c_DHP_ZSD   = 0x5, // DHP zero suppressed data
       c_FCE_RAW   = 0x1, // Clustered data
       c_COMMODE   = 0x6, // Common mode data
       c_GHOST     = 0x2, // Ghost frame, no data
@@ -34,7 +34,7 @@ namespace Belle2 {
       c_DHC_START = 0xB, // DHC Start
       c_DHC_END   = 0xC, // DHC End
       // Onsen processed data, new
-      c_ONSEN_DHP = 0xD, // Onsen processed zero supressed DHP
+      c_ONSEN_DHP = 0xD, // Onsen processed zero suppressed DHP
       c_ONSEN_FCE = 0x9, // Onsen processed clustered
       c_ONSEN_ROI = 0xF, // Onsen ROIs (HLT+DATCON)
       c_ONSEN_TRG = 0xE,  // Trigger frame (the 1st frame)

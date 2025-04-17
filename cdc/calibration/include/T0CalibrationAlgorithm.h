@@ -54,7 +54,7 @@ namespace Belle2 {
       EResult calibrate() override;
       ///create histo for each channel
       void createHisto();
-      /// write outut or store db
+      /// write output or store db
       int write();
       /// calculate mean of the T0 distribution
       double getMeanT0(TH1F* h1);

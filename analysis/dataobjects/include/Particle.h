@@ -30,6 +30,7 @@ namespace Belle2 {
   class MCParticle;
   class PIDLikelihood;
   class V0;
+  class Kink;
 
   /**
    * Class to store reconstructed particles.
@@ -83,7 +84,8 @@ namespace Belle2 {
       c_V0            = 4,
       c_MCParticle    = 5,
       c_Composite     = 6,
-      c_NoMDSTSource  = 7
+      c_NoMDSTSource  = 7,
+      c_Kink          = 8
     };
 
     /** describes flavor type, see getFlavorType(). */
@@ -220,6 +222,15 @@ namespace Belle2 {
      */
     Particle(int trackArrayIndex, const TrackFitResult* trackFit,
              const Const::ChargedStable& chargedStable);
+
+    /**
+     * Constructor from a kink object
+     * @param kink pointer to Kink object
+     * @param chargedStable Type of charged particle
+     * @param trackFitResultIndex index of TrackFitResult to be associated with Particle
+     */
+    Particle(const Kink* kink, const Const::ChargedStable& chargedStable,
+             const unsigned trackFitResultIndex);
 
     /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
@@ -483,6 +494,15 @@ namespace Belle2 {
     unsigned getMdstArrayIndex(void) const
     {
       return m_mdstIndex;
+    }
+
+    /**
+     * Returns 0-based index of the TrackFitResult that should be associated with the Particle
+     * @return index of TrackFitResult
+     */
+    unsigned getTrackFitResultIndex(void) const
+    {
+      return m_trackFitResultIndex;
     }
 
     /**
@@ -844,6 +864,14 @@ namespace Belle2 {
     const V0* getV0() const;
 
     /**
+     * Returns the pointer to the Kink object that was used to create this
+     * Particle (if ParticleType == c_Kink). NULL pointer is returned if the
+     * Particle was not made from a Kink.
+     * @return const pointer to the Kink
+     */
+    const Kink* getKink() const;
+
+    /**
      * Returns the pointer to the PIDLikelihood object that is related to the Track, which
      * was used to create this Particle (ParticleType == c_Track).
      * NULL pointer is returned, if the Particle was not made from Track or if the Track has no
@@ -1067,6 +1095,7 @@ namespace Belle2 {
     EFlavorType m_flavorType;  /**< flavor type. */
     EParticleSourceObject m_particleSource;  /**< (mdst) source of particle */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
+    unsigned m_trackFitResultIndex; /**< 0-based index of related TrackFitResult, relevant for kinks */
     int m_properties; /**< particle property */
     std::vector<int> m_daughterProperties; /**< daughter particle properties */
 
@@ -1152,7 +1181,7 @@ namespace Belle2 {
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDefOverride(Particle, 17); /**< Class to store reconstructed particles. */
+    ClassDefOverride(Particle, 18); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
@@ -1163,6 +1192,7 @@ namespace Belle2 {
     // v15: added m_momentumScalingFactor and m_momentumSmearingFactor
     // v16: use double precision for private members
     // v17: added m_energyLossCorrection
+    // v18: added m_trackFitResultIndex
     friend class ParticleSubset;
   };
 

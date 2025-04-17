@@ -124,7 +124,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
   // We are potentially using data from several runs at once during execution
   // (which may have different DBObject values). So in general you would need to
-  // average them, or aply them to the correct collector data.
+  // average them, or apply them to the correct collector data.
 
   // However since this is the geometry lets assume it is fixed for now.
   const auto exprun = getRunList()[0];
@@ -145,8 +145,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   auto hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
   double dEventT0 = hEvtT0->GetMean();
   createHisto();
-  TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 500, -10, 10);
-  TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 100, 0, 10);
+  TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all channels", 500, -10, 10);
+  TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all channels", 100, 0, 10);
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   TF1* g1 = new TF1("g1", "gaus", -100, 100);
@@ -276,7 +276,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   }
   B2INFO("Writing constants...");
   int Ngood_T0 = write();
-  B2INFO("Checking conversion conditons...");
+  B2INFO("Checking conversion conditions...");
   double rms_dT = hm_All->GetRMS();
   double n_below = hm_All->Integral(0, hm_All->GetXaxis()->FindBin(m_offsetMeanDt - 5 * rms_dT));
   double n_upper = hm_All->Integral(hm_All->GetXaxis()->FindBin(m_offsetMeanDt + 5 * rms_dT), hm_All->GetXaxis()->GetNbins() - 1);

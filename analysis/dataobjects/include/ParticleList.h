@@ -290,11 +290,20 @@ namespace Belle2 {
 
     /**
      * Returns the particle from the list matching the given mdst array index, if any is found.
+     * WARNING:: It is recommended to use getParticleWithMdstSouce instead of this function for safety.
      * @param mdstIdx mdst array index
      * @param includingAntiList consider anti-particle list as well?
      * @return pointer to Particle or NULL if no match is found.
      */
     Particle* getParticleWithMdstIdx(unsigned int mdstIdx, bool includingAntiList = true) const;
+
+    /**
+     * Returns the particle from the list matching the given mdst source, if any is found.
+     * @param mdstSource mdst source id
+     * @param includingAntiList consider anti-particle list as well?
+     * @return pointer to Particle or NULL if no match is found.
+     */
+    Particle* getParticleWithMdstSource(int mdstSource, bool includingAntiList = true) const;
 
     /**
      * Returns the number of flavor-specific particles or self-conjugated particles in this list or its anti-particle list

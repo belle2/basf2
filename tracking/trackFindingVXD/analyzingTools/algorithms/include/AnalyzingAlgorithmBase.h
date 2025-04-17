@@ -68,40 +68,40 @@ namespace Belle2 {
 
     /** copy constructor should not be used so delete it*/
     AnalyzingAlgorithmBase(const AnalyzingAlgorithmBase& algo) = delete;
-    /** also assignement constructor should not be used */
+    /** also assignment constructor should not be used */
     AnalyzingAlgorithmBase& operator = (const AnalyzingAlgorithmBase& algo) = delete;
 
 
     /** virtual class to determine the correct TC to be used for algorithm calculation.
     *
-    * - throws exeption if there are problems.
+    * - throws exception if there are problems.
     * More explanations @ m_storeRefTCDataForTestTC.
     */
     virtual const TCInfoType& chooseCorrectTC(const TCInfoType& aTC) const
     {
       // capture cases of aTC == referenceTC first:
-      if (TCType::isReference(aTC.tcType)) { return aTC; }
+      if (TCType::isReference(aTC.m_tcType)) { return aTC; }
 
       // is no reference TC and own data usage is allowed:
       if (m_storeRefTCDataForTestTC == false) { return aTC; }
 
       // handle cases when attached reference TC has to be used instead of own data:
-      if (aTC.assignedTC != nullptr) { return *aTC.assignedTC; }
+      if (aTC.m_assignedTC != nullptr) { return *aTC.m_assignedTC; }
 
       throw AnalyzingAlgorithmBase::No_refTC_Attached();
     }
 
 
-    /** makes sure that TcPair.refTC and .testTC are correctly set - throws exeption if there are problems */
+    /** makes sure that TcPair.refTC and .testTC are correctly set - throws exception if there are problems */
     virtual const TcPair chooseCorrectPairOfTCs(const TCInfoType& aTC) const
     {
       // capture bad case, where second TC is missing:
-      if (aTC.assignedTC == nullptr) { throw AnalyzingAlgorithmBase::No_refTC_Attached(); }
+      if (aTC.m_assignedTC == nullptr) { throw AnalyzingAlgorithmBase::No_refTC_Attached(); }
 
-      if (aTC.tcType == TCType::Reference or aTC.tcType == TCType::Lost) {
-        return TcPair(aTC, *aTC.assignedTC);
+      if (aTC.m_tcType == TCType::Reference or aTC.m_tcType == TCType::Lost) {
+        return TcPair(aTC, *aTC.m_assignedTC);
       }
-      return TcPair(*aTC.assignedTC, aTC);
+      return TcPair(*aTC.m_assignedTC, aTC);
     }
 
   public:

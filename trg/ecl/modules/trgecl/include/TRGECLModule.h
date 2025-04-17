@@ -32,7 +32,7 @@ namespace Belle2 {
     /** Destructor  */
     virtual ~TRGECLModule();
 
-    /** Initilizes TRGECLModule.*/
+    /** Initializes TRGECLModule.*/
     virtual void initialize() override;
 
     /** Called when new run started.*/
@@ -94,7 +94,7 @@ namespace Belle2 {
     int _EventTiming;
     //! Trigger decision time window
     double _TimeWindow;
-    //! Trigger decision overlap window in oder to avoid boundary effect
+    //! Trigger decision overlap window in order to avoid boundary effect
     double _OverlapWindow;
     //! # of considered TC in energy weighted Timing method
     int _NofTopTC;
@@ -124,7 +124,7 @@ namespace Belle2 {
     int _n300MeVCluster;
     //!ECL Burst Bit Threshold
     double _ECLBurstThreshold;
-    //! Total Energy Theshold (low, high, lum)
+    //! Total Energy Threshold (low, high, lum)
     std::vector<double> _TotalEnergy;
     //! Low Multiplicity Threshold
     std::vector<double> _LowMultiThreshold;

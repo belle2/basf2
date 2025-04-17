@@ -89,7 +89,6 @@ namespace Belle2 {
     double m_smearing;            /**< smearing width applied to IP tube */
     double m_recoilMass;            /**< recoil mass for constraint*/
     std::vector<int> m_massConstraintList; /**< PDG codes of the particles to be mass constraint (massfourC)*/
-    std::vector<std::string> m_massConstraintListParticlename; /**< Name of the particles to be mass constraint (massfourC)*/
 
     /**
      * Main steering routine

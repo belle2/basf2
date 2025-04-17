@@ -131,7 +131,7 @@ void TCConvertersTestModule::event()
         B2DEBUG(20, "It is OK for the two TrackCands to differ (i.e. the hits that miss are due to their absence in the SPTC!)");
         m_differButOKCtr++;
       } else {
-        B2WARNING("Two genfit::TrackCands differ but there is no appearant reason why they should be allowed to do so!");
+        B2WARNING("Two genfit::TrackCands differ but there is no apparent reason why they should be allowed to do so!");
         m_failedOther++;
       }
     }

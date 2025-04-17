@@ -58,7 +58,7 @@ namespace Belle2 {
         return std::is_const<IOType<I>>::value or std::is_reference<IOType<I>>::value;
       }
 
-      /// Number of typpes served to the findlet
+      /// Number of types served to the findlet
       static const std::size_t c_nTypes = std::tuple_size<IOTypes>::value;
 
       /// Helper class to iterate over the individual types served to the findlet
@@ -246,7 +246,7 @@ namespace Belle2 {
 
       /** Compose a parameter name for the name of the vector on the DataStore.
        *  @param classMnemonic Short name of the value type that is stored in the vector
-       *  @param order In case of mulitple occurances of the same type which occurance is it. 1 and 2  are supported.
+       *  @param order In case of multiple occurrences of the same type which occurrence is it. 1 and 2  are supported.
        *  @param input Should the parameter name state that this is an input.
        *  @return rname of the StoreVector
        */
@@ -275,7 +275,7 @@ namespace Belle2 {
 
       /** Compose a parameter description for the name of the vector on the DataStore.
        *  @param classMnemonic Short name of the value type that is stored in the vector
-       *  @param order In case of mulitple occurances of the same type which occurance is it. 1 and 2 are supported.
+       *  @param order In case of multiple occurrences of the same type which occurrence is it. 1 and 2 are supported.
        *  @param input Should the parameter name state that this is an input.
        *  @return description for the StoreVector
        */

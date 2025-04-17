@@ -38,7 +38,7 @@ namespace Belle2 {
     short int n2{0};
   };
 
-  /** A simple 2d vector stucture */
+  /** A simple 2d vector structure */
   struct xy_t {
     double x{0}; /**< x component */
     double y{0}; /**< y component */
@@ -56,7 +56,7 @@ namespace Belle2 {
    */
   class TriangularInterpolation {
   public:
-    /** returns list of verticies */
+    /** returns list of vertices */
     [[nodiscard]] const vector<xy_t>& getPoints() const { return m_points;}
     /** returns list of triangles */
     [[nodiscard]] const vector<triangle_t>& getTriangles() const { return m_triangles;}
@@ -77,7 +77,7 @@ namespace Belle2 {
      * Calculate extents of a triangular mesh and build spatial
      * index. Moves vector contents inside the class.
      *
-     * @param points    List of verticies
+     * @param points    List of vertices
      * @param triangles List of triangles
      * @param d         Hint how close spatial index should be built
      */

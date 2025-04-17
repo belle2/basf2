@@ -15,9 +15,6 @@
 #include <THashList.h>
 #include <TBufferJSON.h>
 
-#include <boost/format.hpp>
-#include <boost/algorithm/string/replace.hpp>
-
 #include <lz4.h>
 #include <zmq.hpp>
 

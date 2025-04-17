@@ -67,5 +67,6 @@ namespace Belle2 {
     /** List of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions_2d_2;
 
+    bool m_ignoreCommandLineOverride; /**< if true, ignore override of filename */
   };
 } // end namespace Belle2

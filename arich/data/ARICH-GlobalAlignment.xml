@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <GlobalAlignment>
-  <x desc="diplacement in x" unit="mm">0.0</x>
+  <x desc="displacement in x" unit="mm">0.0</x>
   <y desc="displacement in y" unit="mm">0.0</y>
   <z desc="displacement in z" unit="mm">0.0</z>
   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
@@ -11,7 +11,7 @@
 
 <!--GlobalAlignment>
   <"Phase2 - by Tamechika-san">
-  <x desc="diplacement in x" unit="mm">-0.82</x>
+  <x desc="displacement in x" unit="mm">-0.82</x>
   <y desc="displacement in y" unit="mm">0.35</y>
   <z desc="displacement in z" unit="mm">1.79</z>
   <alpha desc="x angle displacement" unit="deg">0.054</alpha>

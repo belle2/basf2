@@ -133,7 +133,7 @@ namespace Belle2 {
       TH2F* h_mche3_zr[10];
       /** Number of neutrons */
       int nNeutronHits = 0;
-      /** Number of definte neutrons */
+      /** Number of definite neutrons */
       int nDefiniteNeutron = 0;
       /** number of Tritium hits*/
       int n3Hhits = 0;

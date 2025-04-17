@@ -63,7 +63,7 @@ namespace Belle2 {
     void addMapping(int slot, int layer, float refractiveIndex, float transmissionLength, float thickness);
 
     /**
-     * Pring mapping
+     * Print mapping
      */
     void print() const;
 

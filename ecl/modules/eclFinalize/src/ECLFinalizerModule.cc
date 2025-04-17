@@ -69,7 +69,7 @@ void ECLFinalizerModule::initialize()
   // Register relations.
   m_eclClusters.registerRelationTo(m_eclShowers);
   m_eclClusters.registerRelationTo(m_eclCalDigits);
-
+  m_eclShowers.requireRelationTo(m_eclCalDigits);
 }
 
 void ECLFinalizerModule::beginRun()

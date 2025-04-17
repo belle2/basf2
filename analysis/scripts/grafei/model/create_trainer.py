@@ -215,7 +215,7 @@ class GraFEIIgniteTrainer:
 
     def _score_fn(self, engine):
         """Metric to use for early stoppging"""
-        return engine.state.metrics["loss"]
+        return -engine.state.metrics["loss"]
 
     def _perfect_score_fn(self, engine):
         """Metric to use for checkpoints"""
@@ -306,7 +306,7 @@ class GraFEIIgniteTrainer:
         for tag, values in mode_tags.items():
             evaluator = self.evaluators[tag]
 
-            # Need to wrap this in autocast since it caculates metrics (i.e. loss) without autocast switched on
+            # Need to wrap this in autocast since it calculates metrics (i.e. loss) without autocast switched on
             # This is mostly fine except it fails to correctly cast the class weights tensor passed to the loss
             if self.configs["train"]["mixed_precision"] and self.device == torch.device("cuda"):
                 with torch.cuda.amp.autocast():

@@ -13,7 +13,7 @@
 namespace Belle2 {
 
   /**
-   * Klong identifcation (KlId) datastore object to store results from KlId calculations.
+   * Klong identification (KlId) datastore object to store results from KlId calculations.
    * Note that the KlId is stored as the weight between the KLMCluster and this object.
    */
   class KlId : public RelationsObject {

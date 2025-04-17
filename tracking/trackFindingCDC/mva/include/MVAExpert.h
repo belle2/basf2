@@ -48,7 +48,7 @@ namespace Belle2 {
       /// Get selected variable names
       std::vector<std::string> getVariableNames();
     private:
-      /// Forward declartion of implementation.
+      /// Forward declaration of implementation.
       class Impl;
 
       /// Pointer to implementation hiding the details.

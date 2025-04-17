@@ -259,7 +259,7 @@ int AxialTrackUtil::getArmSignVote(const CDCTrack& track, const Vector2D& center
   int voteNeg = 0;
 
   if (center.hasNAN()) {
-    B2WARNING("Trajectory is not setted or wrong!");
+    B2WARNING("Trajectory is not set or wrong!");
     return 0;
   }
 

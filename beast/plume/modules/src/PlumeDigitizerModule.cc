@@ -13,11 +13,9 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/GearDir.h>
 
 //c++
 #include <string>
-#include <fstream>
 
 using namespace std;
 using namespace Belle2;
@@ -111,7 +109,7 @@ void PlumeDigitizerModule::getXMLData()
   //GearDir content = GearDir("/Detector/DetectorComponent[@name=\"PLUME\"]/Content/");
 
   //get the location of the sensors
-//  BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+//  for (const GearDir& activeParams : content.getNodes("Active")) {
 //  }
 
   B2INFO("Parameters gotten from PLUME.xml: ");

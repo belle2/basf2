@@ -18,7 +18,7 @@ namespace Belle2 {
    * The PXD Gated Info Class
    *
    * Here we store the information for all gates of all modules
-   * if the read out value is useable for reco.
+   * if the read out value is usable for reco.
    * if the sensor was completely gated, no gate contains any
    * signal information
    * if the sensor was gates during readout, a few gates do not
@@ -94,7 +94,7 @@ namespace Belle2 {
     bool m_readoutGated; /**< Sensor switched to gated mode during readout */
 
     std::vector <bool>
-    m_gateStatus; /**< Status of Gates (true=gated), the gates are numbered as (VCellID/4) for Layer 2 (as rolling shutter runs in V direction), and invers for Layer 1 */
+    m_gateStatus; /**< Status of Gates (true=gated), the gates are numbered as (VCellID/4) for Layer 2 (as rolling shutter runs in V direction), and inverse for Layer 1 */
 
     /** necessary for ROOT */
     ClassDef(PXDGatedModeInfo, 1)

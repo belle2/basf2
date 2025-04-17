@@ -12,7 +12,6 @@
 
 using namespace Belle2;
 using namespace std;
-using namespace boost;
 
 void CDCGeometry::MotherVolume::appendNode(double rmin, double rmax, double z)
 {
@@ -52,9 +51,9 @@ void CDCGeometry::read(const GearDir& content)
   // Mother volume.
   const int nBound = content.getNumberNodes("MomVol/ZBound");
   for (int iBound = 0; iBound < nBound; iBound++) {
-    const double rmin = content.getLength((format("MomVol/ZBound[%1%]/Rmin") % (iBound + 1)).str()) / Unit::mm;
-    const double rmax = content.getLength((format("MomVol/ZBound[%1%]/Rmax") % (iBound + 1)).str()) / Unit::mm;
-    const double z = content.getLength((format("MomVol/ZBound[%1%]/Z") % (iBound + 1)).str()) / Unit::mm;
+    const double rmin = content.getLength((boost::format("MomVol/ZBound[%1%]/Rmin") % (iBound + 1)).str()) / Unit::mm;
+    const double rmax = content.getLength((boost::format("MomVol/ZBound[%1%]/Rmax") % (iBound + 1)).str()) / Unit::mm;
+    const double z = content.getLength((boost::format("MomVol/ZBound[%1%]/Z") % (iBound + 1)).str()) / Unit::mm;
     m_mother.appendNode(rmin, rmax, z);
   }
 
@@ -64,7 +63,7 @@ void CDCGeometry::read(const GearDir& content)
 
   for (int iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {
     GearDir layerContent(content);
-    layerContent.append((format("/SLayers/SLayer[%1%]/") % (iSLayer + 1)).str());
+    layerContent.append((boost::format("/SLayers/SLayer[%1%]/") % (iSLayer + 1)).str());
     const double r = layerContent.getLength("Radius");
     const double zfwd = layerContent.getLength("ForwardZ");
     const double zbwd = layerContent.getLength("BackwardZ");
@@ -85,7 +84,7 @@ void CDCGeometry::read(const GearDir& content)
 
   for (int iFLayer = 0; iFLayer < nFLayer; ++iFLayer) {
     GearDir layerContent(content);
-    layerContent.append((format("/FLayers/FLayer[%1%]/") % (iFLayer + 1)).str());
+    layerContent.append((boost::format("/FLayers/FLayer[%1%]/") % (iFLayer + 1)).str());
     const double r = layerContent.getLength("Radius");
     const double zfwd = layerContent.getLength("ForwardZ");
     const double zbwd = layerContent.getLength("BackwardZ");
@@ -100,12 +99,12 @@ void CDCGeometry::read(const GearDir& content)
     EndPlate ep(i);
 
     GearDir epContent(content);
-    epContent.append((format("/Endplates/Endplate[%1%]/") % (i + 1)).str());
+    epContent.append((boost::format("/Endplates/Endplate[%1%]/") % (i + 1)).str());
     const int nEPLayer = epContent.getNumberNodes("EndplateLayer");
 
     for (int iEPLayer = 0; iEPLayer < nEPLayer; ++iEPLayer) {
       GearDir epLayerContent(epContent);
-      epLayerContent.append((format("/EndplateLayer[%1%]/") % (iEPLayer + 1)).str());
+      epLayerContent.append((boost::format("/EndplateLayer[%1%]/") % (iEPLayer + 1)).str());
       string epName = epLayerContent.getString("Name");
       double rmin = epLayerContent.getLength("InnerR");
       double rmax = epLayerContent.getLength("OuterR");
@@ -122,7 +121,7 @@ void CDCGeometry::read(const GearDir& content)
   const int nInnerWall = content.getNumberNodes("InnerWalls/InnerWall");
   for (int i = 0; i < nInnerWall; ++i) {
     GearDir innerWallContent(content);
-    innerWallContent.append((format("/InnerWalls/InnerWall[%1%]/") % (i + 1)).str());
+    innerWallContent.append((boost::format("/InnerWalls/InnerWall[%1%]/") % (i + 1)).str());
 
     string sInnerWallID = innerWallContent.getString("@id");
     const string name = "InnerWall_" + sInnerWallID + "_" + innerWallContent.getString("Name");
@@ -142,7 +141,7 @@ void CDCGeometry::read(const GearDir& content)
   const int nOuterWall = content.getNumberNodes("OuterWalls/OuterWall");
   for (int i = 0; i < nOuterWall; ++i) {
     GearDir outerWallContent(content);
-    outerWallContent.append((format("/OuterWalls/OuterWall[%1%]/") % (i + 1)).str());
+    outerWallContent.append((boost::format("/OuterWalls/OuterWall[%1%]/") % (i + 1)).str());
 
     string sOuterWallID = outerWallContent.getString("@id");
     const string name = "OuterWall_" + sOuterWallID + "_" + outerWallContent.getString("Name");
@@ -162,7 +161,7 @@ void CDCGeometry::read(const GearDir& content)
   const int nEB = content.getNumberNodes("ElectronicsBoards/ElectronicsBoard");
   for (int iEB = 0; iEB < nEB; ++iEB) {
     GearDir ebContent(content);
-    ebContent.append((format("/ElectronicsBoards/ElectronicsBoard[%1%]/") % (iEB + 1)).str());
+    ebContent.append((boost::format("/ElectronicsBoards/ElectronicsBoard[%1%]/") % (iEB + 1)).str());
 
     const double rmin = ebContent.getLength("EBInnerR");
     const double rmax = ebContent.getLength("EBOuterR");
@@ -176,7 +175,7 @@ void CDCGeometry::read(const GearDir& content)
   const int nShields = content.getNumberNodes("Shields/Shield");
   for (int i = 0; i < nShields; ++i) {
     GearDir neuContent(content);
-    neuContent.append((format("/Shields/Shield[%1%]/") % (i + 1)).str());
+    neuContent.append((boost::format("/Shields/Shield[%1%]/") % (i + 1)).str());
 
     const double rmin1 = neuContent.getLength("InnerR1");
     const double rmin2 = neuContent.getLength("InnerR2");
@@ -192,7 +191,7 @@ void CDCGeometry::read(const GearDir& content)
   const int nCovers = content.getNumberNodes("Covers/Cover");
   for (int i = 0; i < nCovers; ++i) {
     GearDir coverContent(content);
-    coverContent.append((format("/Covers/Cover[%1%]/") % (i + 1)).str());
+    coverContent.append((boost::format("/Covers/Cover[%1%]/") % (i + 1)).str());
 
     const int coverID = atoi((coverContent.getString("@id")).c_str());
     const double rmin1 = coverContent.getLength("InnerR1");
@@ -208,7 +207,7 @@ void CDCGeometry::read(const GearDir& content)
   const int nCover2s = content.getNumberNodes("Covers/Cover2");
   for (int i = 0; i < nCover2s; ++i) {
     GearDir cover2Content(content);
-    cover2Content.append((format("/Covers/Cover2[%1%]/") % (i + 1)).str());
+    cover2Content.append((boost::format("/Covers/Cover2[%1%]/") % (i + 1)).str());
 
     const int cover2ID = atoi((cover2Content.getString("@id")).c_str());
     const double rmin = cover2Content.getLength("InnerR");
@@ -224,7 +223,7 @@ void CDCGeometry::read(const GearDir& content)
   const int nRibs = content.getNumberNodes("Covers/Rib");
   for (int i = 0; i < nRibs; ++i) {
     GearDir ribContent(content);
-    ribContent.append((format("/Covers/Rib[%1%]/") % (i + 1)).str());
+    ribContent.append((boost::format("/Covers/Rib[%1%]/") % (i + 1)).str());
 
     const int ribID = atoi((ribContent.getString("@id")).c_str());
     const double length = ribContent.getLength("Length");
@@ -245,7 +244,7 @@ void CDCGeometry::read(const GearDir& content)
   const int nRib2s = content.getNumberNodes("Covers/Rib2");
   for (int i = 0; i < nRib2s; ++i) {
     GearDir rib2Content(content);
-    rib2Content.append((format("/Covers/Rib2[%1%]/") % (i + 1)).str());
+    rib2Content.append((boost::format("/Covers/Rib2[%1%]/") % (i + 1)).str());
 
     const int rib2ID = atoi((rib2Content.getString("@id")).c_str());
     const double length = rib2Content.getLength("Length");
@@ -268,7 +267,7 @@ void CDCGeometry::read(const GearDir& content)
   const int nRib3s = content.getNumberNodes("Covers/Rib3");
   for (int i = 0; i < nRib3s; ++i) {
     GearDir rib3Content(content);
-    rib3Content.append((format("/Covers/Rib3[%1%]/") % (i + 1)).str());
+    rib3Content.append((boost::format("/Covers/Rib3[%1%]/") % (i + 1)).str());
 
     const int rib3ID = atoi((rib3Content.getString("@id")).c_str());
     const double length = rib3Content.getLength("Length");
@@ -290,7 +289,7 @@ void CDCGeometry::read(const GearDir& content)
   const int nRib4s = content.getNumberNodes("Covers/Rib4");
   for (int i = 0; i < nRib4s; ++i) {
     GearDir rib4Content(content);
-    rib4Content.append((format("/Covers/Rib4[%1%]/") % (i + 1)).str());
+    rib4Content.append((boost::format("/Covers/Rib4[%1%]/") % (i + 1)).str());
 
     const int rib4ID = atoi((rib4Content.getString("@id")).c_str());
     const double length = rib4Content.getLength("Length");
@@ -314,7 +313,7 @@ void CDCGeometry::read(const GearDir& content)
   const int nRib5s = content.getNumberNodes("Covers/Rib5");
   for (int i = 0; i < nRib5s; ++i) {
     GearDir rib5Content(content);
-    rib5Content.append((format("/Covers/Rib5[%1%]/") % (i + 1)).str());
+    rib5Content.append((boost::format("/Covers/Rib5[%1%]/") % (i + 1)).str());
 
     const int rib5ID = atoi((rib5Content.getString("@id")).c_str());
     const double dr = rib5Content.getLength("DR");

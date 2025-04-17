@@ -131,8 +131,8 @@ namespace Belle2 {
 
   private:
 
-    Const::DetectorSet m_detectors;   /**< set of detectors with cluster information */
     float m_logl[Const::ClusterDetectors::c_size][Const::Cluster::c_SetSize]; /**< log likelihoods */
+    Const::DetectorSet m_detectors;   /**< set of detectors with cluster information */
 
     /**
      * Calculate likelihood probabilities
@@ -145,7 +145,8 @@ namespace Belle2 {
                      Const::ClusterDetectorSet detSet) const;
 
 
-    ClassDefOverride(Cluster, 1); /**< Initial version. */
+    ClassDefOverride(Cluster, 2); /**< Initial version. */
+    // version 2: reorder class members to improve memory layout
 
   };
 

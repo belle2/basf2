@@ -89,7 +89,7 @@ bool BremFindingMatchCompute::isMatch()
 
     return (true);
 
-    // todo: can use weight here to signal assigment confidence
+    // todo: can use weight here to signal assignment confidence
 
   } else {
     return (false);

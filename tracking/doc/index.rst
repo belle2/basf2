@@ -61,5 +61,4 @@ The tracking package includes the following sub-packages
    svdROIFinder
    tests
    validation
-   vxdCaTracking
    vxdMomentumEstimation

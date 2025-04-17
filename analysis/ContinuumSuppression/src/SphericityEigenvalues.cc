@@ -12,8 +12,6 @@
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
 
-#include <string>
-
 using namespace Belle2;
 
 void SphericityEigenvalues::calculateEigenvalues()
@@ -52,7 +50,7 @@ void SphericityEigenvalues::calculateEigenvalues()
     elements[6] += p.Z() * p.X();
     elements[7] += p.Z() * p.Y();
     elements[8] += p.Z() * p.Z(); // diag
-    norm += p.Mag2();
+    norm += p.P2();
   }
 
   for (short i = 0; i < 3; i++) {

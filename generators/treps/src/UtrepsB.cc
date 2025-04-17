@@ -8,6 +8,7 @@
 
 #include <TLorentzVector.h>
 #include <generators/treps/UtrepsB.h>
+#include <cmath>
 #include <complex>
 
 using namespace Belle2;
@@ -148,7 +149,7 @@ double UtrepsB::tpangd(double _z, double _w)
              15. / 8.*pow(1. - zz * zz, 2)
              + speak * 0.25 * gtot0 * gtot0 / (pow(ww - mr0, 2) + 0.25 * gtot0 * gtot0);
     } else {
-      if (abs(zz) < 0.8)  dcs2 = 263. / pow(ww, 6) / pow(1. - zz * zz, 2);
+      if (std::abs(zz) < 0.8)  dcs2 = 263. / pow(ww, 6) / pow(1. - zz * zz, 2);
       else dcs2 = 263. / pow(ww, 6) / pow(1. - 0.8 * 0.8, 2);
     }
     return dcs2 * 0.5;
@@ -191,7 +192,7 @@ double UtrepsB::tpangd(double _z, double _w)
               + speak * 0.25 * gtotfa * gtotfa / (pow(ww - mrfa, 2) + 0.25 * gtotfa * gtotfa)) *
              15. / 8.*pow(1. - zz * zz, 2) ;
     } else {
-      if (abs(zz) < 0.8)  dcs2 = 241. / pow(ww, 6) / pow(1. - zz * zz, 2);
+      if (std::abs(zz) < 0.8)  dcs2 = 241. / pow(ww, 6) / pow(1. - zz * zz, 2);
       else dcs2 = 241. / pow(ww, 6) / pow(1. - 0.8 * 0.8, 2);
     }
     return dcs2 * 0.5;

@@ -39,7 +39,6 @@
 #include <G4Material.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
   //-----------------------------------------------------------------

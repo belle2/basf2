@@ -15,9 +15,9 @@
 
 /**
  *  @file
- *  Utility functions to lookup identifier and description for event data objects useful to define moduel parameters.
+ *  Utility functions to lookup identifier and description for event data objects useful to define module parameters.
  *
- *  The functions are typically called unqualified to be found at compile time by aragument dependent lookup.
+ *  The functions are typically called unqualified to be found at compile time by argument dependent lookup.
  */
 
 namespace Belle2 {

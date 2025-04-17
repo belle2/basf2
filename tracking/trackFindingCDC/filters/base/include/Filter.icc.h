@@ -28,12 +28,6 @@ namespace Belle2 {
     Filter<AObject>::~Filter() = default;
 
     template <class AObject>
-    void Filter<AObject>::exposeParameters(ModuleParamList* moduleParamListw __attribute__((unused)),
-                                           const std::string& prefix  __attribute__((unused)))
-    {
-    }
-
-    template <class AObject>
     bool Filter<AObject>::needsTruthInformation()
     {
       return false;

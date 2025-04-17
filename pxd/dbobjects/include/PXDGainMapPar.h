@@ -25,7 +25,7 @@ namespace Belle2 {
    *  1) baseline_eToADU = baseline_ADCUnit / baseline_Gq
    *
    *  and depends on the unit of the ADC channel and the Gq of the
-   *  DEPFET transistor. These basline numbers are what is applied
+   *  DEPFET transistor. These baseline numbers are what is applied
    *  in the PXDDigitizer.
    *
    *  The gain corrected conversion factor is

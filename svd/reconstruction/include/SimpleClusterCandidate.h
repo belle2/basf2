@@ -18,7 +18,7 @@ namespace Belle2 {
   namespace SVD {
 
     /**
-     * structure containing the relevant informations
+     * structure containing the relevant information
      * of eachstrip of the cluster
      */
     struct stripInCluster {
@@ -177,17 +177,14 @@ namespace Belle2 {
 
     protected:
 
-      /** cluster is not good if something goes wrong */
-      bool m_stopCreationCluster = false;
+      /** Name of the collection to use for the SVDShaperDigits */
+      std::string m_storeShaperDigitsName;
 
-      /** VxdID of the cluster */
-      VxdID m_vxdID;
+      /** Name of the collection to use for the SVDRecoDigits */
+      std::string m_storeRecoDigitsName;
 
-      /** side of the cluster */
-      bool m_isUside;
-
-      /** number of strips after which we switch from COG to HeadTail estimation of the position*/
-      int m_sizeHeadTail;
+      /** vector containing the strips in the cluster */
+      std::vector<stripInCluster> m_strips;
 
       /** SNR above which the strip can be considered as seed*/
       double m_cutSeed;
@@ -197,6 +194,9 @@ namespace Belle2 {
 
       /** SNR above which the cluster is ok*/
       double m_cutCluster;
+
+      /** number of strips after which we switch from COG to HeadTail estimation of the position*/
+      int m_sizeHeadTail;
 
       /** selects the algorithm to compute the cluster tim
        *  0 = 6-sample CoG (default)
@@ -235,17 +235,17 @@ namespace Belle2 {
       /** SVDRecoDigit index of the seed strip of the cluster */
       int m_seedIndex;
 
+      /** VxdID of the cluster */
+      VxdID m_vxdID;
+
+      /** cluster is not good if something goes wrong */
+      bool m_stopCreationCluster = false;
+
+      /** side of the cluster */
+      bool m_isUside;
+
       /** first frame selected with the max-sum algorithm */
       //      int m_firstFrame = 0;
-
-      /** vector containing the strips in the cluster */
-      std::vector<stripInCluster> m_strips;
-
-      /** Name of the collection to use for the SVDShaperDigits */
-      std::string m_storeShaperDigitsName;
-
-      /** Name of the collection to use for the SVDRecoDigits */
-      std::string m_storeRecoDigitsName;
 
     };
 

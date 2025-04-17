@@ -169,7 +169,7 @@ namespace Belle2 {
 
     }
 
-    //--- if background not overlayed add electronic noise hits
+    //--- if background not overlaid add electronic noise hits
     if (m_bgOverlay) return;
     uint8_t bitmap = 1;
     unsigned nSlots = m_geoPar->getDetectorPlane().getNSlots();

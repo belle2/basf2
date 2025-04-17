@@ -74,7 +74,7 @@ for skipNEvents in range(10):
     # Create main path
     main = basf2.Path()
 
-    # not used for anything, just checking wether the master module
+    # not used for anything, just checking whether the master module
     # can be found if it's not the first module in the path.
     main.add_module(NoopModule())
 

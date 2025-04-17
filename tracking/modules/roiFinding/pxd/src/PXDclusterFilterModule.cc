@@ -72,12 +72,12 @@ void PXDclusterFilterModule::beginRun()
 bool PXDclusterFilterModule::Overlaps(const ROIid& theROI, const PXDCluster& thePXDCluster)
 {
   // Not so easy, we have to check every pixel which is time consuming
-  // maybe optimze: we can first check the cluster as rectangular but that only helps if we have that property before
+  // maybe optimize: we can first check the cluster as rectangular but that only helps if we have that property before
   // PXDClusters do not have them ...
 
   if (theROI.getSensorID() != thePXDCluster.getSensorID()) return false; // anyway checked before?
 
-  // Loop over all Pixel related to this CLuster
+  // Loop over all Pixel related to this Cluster
   for (auto thePixel : thePXDCluster.getRelationsTo<PXDDigit>()) {
     // if any pixel inside
     if (theROI.getMinUid() <= thePixel.getUCellID() &&
@@ -135,7 +135,7 @@ void PXDclusterFilterModule::filterClusters()
   m_selectorIN.select([ROIids, this](const PXDCluster * thePxdCluster) {
     auto ROIidsRange = ROIids.equal_range(thePxdCluster->getSensorID()) ;
     for (auto theROI = ROIidsRange.first ; theROI != ROIidsRange.second; theROI ++)
-      if (Overlaps(theROI->second, *thePxdCluster)) // *or* Cluster has intersting Properties. TODO
+      if (Overlaps(theROI->second, *thePxdCluster)) // *or* Cluster has interesting Properties. TODO
         return true;
 
     return false;
@@ -145,7 +145,7 @@ void PXDclusterFilterModule::filterClusters()
     m_selectorOUT.select([ROIids, this](const PXDCluster * thePxdCluster) {
       auto ROIidsRange = ROIids.equal_range(thePxdCluster->getSensorID()) ;
       for (auto theROI = ROIidsRange.first ; theROI != ROIidsRange.second; theROI ++)
-        if (Overlaps(theROI->second, *thePxdCluster)) // *and* Cluster has NO intersting Properties. TODO
+        if (Overlaps(theROI->second, *thePxdCluster)) // *and* Cluster has NO interesting Properties. TODO
           return false;
 
       return true;

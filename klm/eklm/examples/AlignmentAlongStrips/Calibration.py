@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# EKLM alingment along strips.
+# EKLM alignment along strips.
 
 import basf2
 from ROOT import Belle2

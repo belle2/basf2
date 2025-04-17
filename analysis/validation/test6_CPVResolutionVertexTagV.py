@@ -410,7 +410,7 @@ for VXDReq in VXDReqs:
     if resolutionErr < 0.01:
         resolutionErr = 0.01
 
-    Numbr = f'{int((f1 + f2) * fitDataDT.numEntries()):d}'
+    Number = f'{int((f1 + f2) * fitDataDT.numEntries()):d}'
 
     c1.cd()
     Pad = ROOT.TPad("p1", "p1", 0, 0, 1, 1, 0, 0, 0)
@@ -420,7 +420,7 @@ for VXDReq in VXDReqs:
     Pad.cd()
     resFrame.Draw()
     legend = ROOT.TLegend(0.59, 0.6, 0.9, 0.9)
-    # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Numbr))
+    # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Number))
     legend.AddEntry(0, f'#splitline{{#mu_{{#Delta t}} = {shift:4.2f}}}{{    #pm {shiftErr:4.2f} ps}}')
     legend.AddEntry(0, f'#splitline{{#sigma_{{#Delta t}} = {resolution:4.2f}}}{{    #pm {resolutionErr:4.2f} ps}}')
     legend.SetTextSize(0.054)
@@ -453,7 +453,7 @@ for VXDReq in VXDReqs:
     Pad.cd()
     resFrameDtErr.Draw()
     legend = ROOT.TLegend(0.59, 0.6, 0.9, 0.9)
-    # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Numbr))
+    # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Number))
     legend.AddEntry(0, f'#splitline{{#mu_{{#Delta t}} = {meanCBS.getVal():4.2f}}}{{    #pm '
                     f'{meanCBS.getError():4.2f} ps}}')  # '{:>6}'.format(Shift)
     legend.AddEntry(0, f'#splitline{{#sigma_{{#Delta t}} = {sigmaCBS.getVal():4.2f}}}'

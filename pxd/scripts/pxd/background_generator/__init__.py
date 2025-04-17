@@ -19,6 +19,7 @@ from itertools import product
 from typing import Callable, Union
 
 import basf2
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import DataStore, PyStoreArray, PyStoreObj
 from ROOT.Belle2 import DBAccessorBase, DBStoreEntry
 from ROOT.Belle2 import VxdID, PXDDigit

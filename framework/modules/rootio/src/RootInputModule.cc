@@ -74,11 +74,11 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
            "Names of persistent durability branches NOT to be read. Takes precedence over branchNamesPersistent.", excludePersistent);
 
   addParam("parentLevel", m_parentLevel,
-           "Number of generations of parent files (files used as input when creating a file) to be read. This can be useful if a file is missing some information available in its parent. See https://confluence.desy.de/display/BI/Software+ParentFiles for details.",
+           "Number of generations of parent files (files used as input when creating a file) to be read. This can be useful if a file is missing some information available in its parent. See https://xwiki.desy.de/xwiki/rest/p/077a2 for details.",
            0);
 
   addParam("collectStatistics", m_collectStatistics,
-           "Collect statistics on amount of data read and print statistics (seperate for input & parent files) after processing. Data is collected from TFile using GetBytesRead(), GetBytesReadExtra(), GetReadCalls()",
+           "Collect statistics on amount of data read and print statistics (separate for input & parent files) after processing. Data is collected from TFile using GetBytesRead(), GetBytesReadExtra(), GetReadCalls()",
            false);
   addParam("cacheSize", m_cacheSize,
            "file cache size in Mbytes. If negative, use root default", 0);

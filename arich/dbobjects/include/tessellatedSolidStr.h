@@ -20,13 +20,21 @@ namespace Belle2 {
    * Initially for ARICH detector (merger cooling bodies).
    */
   struct tessellatedSolidStr {
-    int tessellatedSolidID;
-    unsigned int nCells;
-    unsigned int nApexPerCell;
-    // Tessellated solid represented by the array (vector) of triangles
-    std::vector<std::vector<double>> posV1; // x, y, z of apex1
-    std::vector<std::vector<double>> posV2; // x, y, z of apex2
-    std::vector<std::vector<double>> posV3; // x, y, z of apex3
+    int tessellatedSolidID; /**< tessellated solid ID */
+    unsigned int nCells; /**< number of cells */
+    unsigned int nApexPerCell; /**< number of apexes per cell */
+
+    /* Tessellated solid represented by the array (vector) of triangles. */
+
+    /** x, y, z of apex1. */
+    std::vector<std::vector<double>> posV1;
+
+    /** x, y, z of apex2. */
+    std::vector<std::vector<double>> posV2;
+
+    /** x, y, z of apex3. */
+    std::vector<std::vector<double>> posV3;
+
     tessellatedSolidStr()
     {
       tessellatedSolidID = 0;
@@ -34,6 +42,10 @@ namespace Belle2 {
       nApexPerCell = 0;
     }
     ~tessellatedSolidStr() {;}
+
+    /**
+     * Define dummy apex
+     */
     void defineDummyApex()
     {
       std::vector<double> apex;
@@ -43,6 +55,10 @@ namespace Belle2 {
       posV2.push_back(apex);
       posV3.push_back(apex);
     }
+
+    /**
+     * Fill coordinates of apexes
+     */
     void pushBackApexesCoordinates(const std::vector<double>& apex1x, const std::vector<double>& apex1y,
                                    const std::vector<double>& apex1z,
                                    const std::vector<double>& apex2x, const std::vector<double>& apex2y, const std::vector<double>& apex2z,
@@ -84,6 +100,10 @@ namespace Belle2 {
         posV3.push_back(apex3);
       }
     }
+
+    /**
+     * Print info about tessellation volumes
+     */
     void printInfo(int verboseLevel = 0)
     {
       std::cout << "tessellatedSolidID " << tessellatedSolidID << std::endl

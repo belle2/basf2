@@ -75,7 +75,7 @@ bool HitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const CDCWire& stereoWire = stereoHit.getWire();
   const WireLine& wireLine = stereoWire.getWireLine();
 
-  // Caluculate point were the wire is first method
+  // Calculate point were the wire is first method
   Vector2D relRefPos = wireLine.refPos2D() - axialHitPos;
   Vector2D movePerZ = wireLine.nominalMovePerZ();
 

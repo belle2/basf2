@@ -169,14 +169,14 @@ namespace Belle2 {
       double m_param_newHitDistance = 0.15;
       */
     private:
+      /// Memory for the freely defined curvature resolution function
+      std::function<double(double)> m_curvResolution;
+
       /// Memory for found trajectories.
       std::vector<CDCTrack> m_tracks;
 
       /// Memory for the pool of axial wire hits to can be used in the post processing
       std::vector<const CDCWireHit*> m_axialWireHits;
-
-      /// Memory for the freely defined curvature resolution function
-      std::function<double(double)> m_curvResolution;
     };
   }
 }

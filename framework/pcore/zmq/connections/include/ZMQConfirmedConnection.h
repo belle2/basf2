@@ -78,6 +78,10 @@ namespace Belle2 {
     bool m_allTerminateMessages = false;
     /// The set of all registered inputs
     std::set<std::string> m_registeredWorkersInput;
+    /// A flag to check the events appear after the all stop messages
+    bool m_eventAfterAllStopMessages = false;
+    /// A time when the eventAfterAllStopMessages is issued
+    std::chrono::time_point<std::chrono::system_clock> m_whenEventAfterAllStopMessages;
   };
 
   /**

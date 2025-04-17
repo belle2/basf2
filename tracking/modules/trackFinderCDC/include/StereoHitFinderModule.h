@@ -23,7 +23,7 @@ namespace Belle2 {
      * or all found segments to match the r-phi trajectory of this track. The z-information is then used to determine the bin in the quad tree.
      * The hits resemble a straight line in the quad tree in z_0-tan lambda.
      *
-     * The module can use the old and the new quad tree implementation - however the new one is prefered because it contains
+     * The module can use the old and the new quad tree implementation - however the new one is preferred because it contains
      * a optimization step the old one does not have in the moment (but can be implemented easily).
      *
      * Everything action in hidden in the configurable collector algorithm, which can be used to perform various

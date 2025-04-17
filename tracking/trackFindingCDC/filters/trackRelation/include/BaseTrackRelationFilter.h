@@ -28,7 +28,7 @@ namespace Belle2 {
       /// Default destructor
       ~BaseTrackRelationFilter();
 
-      /// Reenforce that the full range of tracks is possible as no particular default is applicable.
+      /// Reinforce that the full range of tracks is possible as no particular default is applicable.
       std::vector<const CDCTrack*> getPossibleTos(
         const CDCTrack* from,
         const std::vector<const CDCTrack*>& tracks) const final;

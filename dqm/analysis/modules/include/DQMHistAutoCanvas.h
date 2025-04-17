@@ -38,6 +38,11 @@ namespace Belle2 {
      */
     void event() override final;
 
+    /**
+     * This method is called at terminate
+     */
+    void terminate() override final;
+
     // Data members
   private:
     /** The list of folders for which automatically generate canvases. */
@@ -47,11 +52,11 @@ namespace Belle2 {
     /** The filename of a list canvas names to auto generate. */
     std::string m_listfile;
 
-    /** list of wanted canvas name if included as list file*/
+    /** list of wanted canvas name if included as list file */
     std::set<std::string> m_canvaslist;
 
     /** The map of histogram names to canvas pointers for buffering. */
-    std::map<std::string, TCanvas*> m_cs;
+    std::map<std::string, std::unique_ptr<TCanvas>> m_cs;
   };
 } // end namespace Belle2
 

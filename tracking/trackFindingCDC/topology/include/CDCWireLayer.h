@@ -20,7 +20,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     *  Class representating a sense wire layer in the central drift chamber.
+     *  Class representing a sense wire layer in the central drift chamber.
      *  This class represents a CDC layer as a range of wires. \n
      *  The range is sorted with increasing wire ids for maximal fast look up. \n
      *  It offers methods for checking the validity of wire ids, a getter for the wires in this layer \n
@@ -72,7 +72,7 @@ namespace Belle2 {
       void operator=(const CDCWireLayer& wireLayer) = delete;
 
     public:
-      /// Intializes the wire layer variables to the average of according variables in the wire range
+      /// Initializes the wire layer variables to the average of according variables in the wire range
       void initialize();
 
       /**
@@ -151,7 +151,7 @@ namespace Belle2 {
        *  Returns the wire by its id in the layer.
        *  Gives the wire by its id, but transforms it to valid range first, \n
        *  so even if the id is out of range you will get a valid wire object. \n
-       *  This makes the retrival of neighbors much easier if the neighborhood \n
+       *  This makes the retrieval of neighbors much easier if the neighborhood \n
        *  is around the discontinuity near the zero wires.
        */
       const CDCWire& getWireWrappedAround(IWire iWire) const
@@ -261,16 +261,6 @@ namespace Belle2 {
 
     private:
       /**
-       *  Indicates if this layer is shifted clockwise or counterclockwise. \n
-       *  The shift indicates if the wire with index zero in this layer \n
-       *  is more clockwise or counterclockwise than  \n
-       *  the zero wire in the zero layer within this superlayer. \n
-       *  This can be used to speed up the lookup inward and outward \n
-       *  neighbors of the wires in this layer. For even layers the shift should be 0.
-       */
-      ERotation m_shift = ERotation::c_Invalid;
-
-      /**
        *  @name Property averages from the contained CDCWires
        *  The following variables are calculated from the contained CDCWire
        *  on initialization of the CDCWireLayer.
@@ -316,7 +306,15 @@ namespace Belle2 {
       double m_outerCylindricalR = 0.0;
       //@}
 
-
+      /**
+       *  Indicates if this layer is shifted clockwise or counterclockwise. \n
+       *  The shift indicates if the wire with index zero in this layer \n
+       *  is more clockwise or counterclockwise than  \n
+       *  the zero wire in the zero layer within this superlayer. \n
+       *  This can be used to speed up the lookup inward and outward \n
+       *  neighbors of the wires in this layer. For even layers the shift should be 0.
+       */
+      ERotation m_shift = ERotation::c_Invalid;
     };
 
   }

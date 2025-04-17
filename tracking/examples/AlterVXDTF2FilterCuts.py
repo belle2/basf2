@@ -58,9 +58,9 @@ SMBSM1.param("twoHitFilterAdjustFunctions", [(12, "-TMath::Infinity()"), (13, "T
 #     - set CosAngleXY low bound to the FullSecID of the static sector it is attached to (index 15)
 SMBSM1.param("threeHitFilterAdjustFunctions", [(0, "0"), (1, "x+3"), (15, "[0]")])
 
-# this will, in addition to other debbugging output, print the original filter ("BEFORE")
+# this will, in addition to other debugging output, print the original filter ("BEFORE")
 # and the altered filter ("AFTER") to the screen.
-# NOTE: there are order of 10th of thousends of filters both for 2-hits and 3-hits. So expect lots of output.
+# NOTE: there are order of 10th of thousands of filters both for 2-hits and 3-hits. So expect lots of output.
 SMBSM1.logging.log_level = b2.LogLevel.DEBUG
 
 

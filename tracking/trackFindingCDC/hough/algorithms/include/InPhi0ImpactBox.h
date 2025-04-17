@@ -26,17 +26,17 @@ namespace Belle2 {
       {}
 
     public:
-      /// The box to which this object correspondes.
+      /// The box to which this object corresponds.
       using HoughBox = Box<DiscretePhi0, ContinuousImpact>;
 
     public:
       /**
-       *  Function that gives the sign of the distance from an observed drift circle to the familiy of curves
+       *  Function that gives the sign of the distance from an observed drift circle to the family of curves
        *  @returns
        *   * ESign::c_Plus if the drift circle is always on the positive / right site
        *   * ESign::c_Minus means the drift circle is always on the negative / left site
-       *   * ESign::c_Zero if the dirft circle lies on any of the curves
-       *   * ESign::c_Invalid if the drift cirlce is on the the wrong arm of the curve.
+       *   * ESign::c_Zero if the drift circle lies on any of the curves
+       *   * ESign::c_Invalid if the drift circle is on the wrong arm of the curve.
        */
       ESign getDistanceSign(const HoughBox& houghBox,
                             float x,

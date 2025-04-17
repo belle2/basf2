@@ -52,7 +52,7 @@ namespace Belle2 {
     std::string getUniqueMilleName();
 
     /**
-     * Get all useable tracks for particles
+     * Get all usable tracks for particles
      *
      * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
      * @param addVertexPoint flag for adding the vertex point
@@ -64,7 +64,7 @@ namespace Belle2 {
      * @param recoTrack A RecoTrack object to be fitted
      * @param particle Pointer to reconstructed daughter particle updated by vertex fit OR nullptr for single track
      *
-     * @return true for success, false when some problems occured (or track too much down-weighted by previous DAF fit)
+     * @return true for success, false when some problems occurred (or track too much down-weighted by previous DAF fit)
      */
     bool fitRecoTrack(RecoTrack& recoTrack, Particle* particle = nullptr);
 
@@ -82,7 +82,7 @@ namespace Belle2 {
     ///  both particles in pair. Only for decays of type V0(*)->f+f- (same mass for f)
     ///  @param mother The mother Belle2::Particle with two daughters, its 4-momenta should already be updated by a previous vertex fit done
     ///  by modularAnalysis.
-    ///  @param motherMass This function expect the assumed invariant mass of the pair. This is to allow to set artifical values
+    ///  @param motherMass This function expect the assumed invariant mass of the pair. This is to allow to set artificial values
     ///  (e.g. for e+e- -> mu+mu-)
     ///  @return a pair of 5x9 matrices {dq+/d(v,z), dq-/d(v,z)}. One for each particle in list (in list order).
     ///  NOTE: The signs DO NOT refer to charges of the particles! If you want to know: (+) particle is that one which goes *along* the mother

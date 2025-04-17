@@ -42,7 +42,7 @@ Chi2MCTrackMatcherModule::Chi2MCTrackMatcherModule() : Module()
 //,defaultCutOffs);
   addParam("linalg",
            m_param_linalg,
-           "Parameter to switch between ROOT and Eigen, to invert the covariance5 matrix. ROOT has shown a shorter runtime therefore its recomended. false: ROOT is used; true: Eigen is used",
+           "Parameter to switch between ROOT and Eigen, to invert the covariance5 matrix. ROOT has shown a shorter runtime therefore its recommended. false: ROOT is used; true: Eigen is used",
            false);
   addParam("MCRecoTracksArrayName",
            m_MCRecoTracksArrayName,
@@ -92,7 +92,7 @@ void Chi2MCTrackMatcherModule::event()
   m_trackCount += nTracks;
   // check if there are m_Tracks and m_MCParticles to match to
   if (not nMCParticles or not nTracks) {
-    // Cannot perfom matching
+    // Cannot perform matching
     return;
   }
   // compare all tracks with all mcParticles in event
@@ -113,15 +113,15 @@ void Chi2MCTrackMatcherModule::event()
       if (not Const::chargedStableSet.contains(mcParticleType)) {
         continue;
       }
-      // get trackfitresult of current track with clossest mass to current mcparticle Type
+      // get trackfitresult of current track with closest mass to current mcparticle Type
       auto trackFitResult = track.getTrackFitResultWithClosestMass(mcParticleType);
       TMatrixD Covariance5 = trackFitResult->getCovariance5();
-      // statistic variable counting number of covariance matricies
+      // statistic variable counting number of covariance matrices
       m_covarianceMatrixCount += 1;
       // check if matrix is invertable
       double det = Covariance5.Determinant();
       if (det == 0.0) {
-        // statistic variable counting number of not invertable covariance matricies
+        // statistic variable counting number of not invertable covariance matrices
         m_notInvertableCount = + 1;
         //Covariance5.Print();
         continue;
@@ -132,7 +132,7 @@ void Chi2MCTrackMatcherModule::event()
       UncertainHelix helix = trackFitResult->getUncertainHelix();
       auto b_field = BFieldManager::getField(helix.getPerigee()).Z() / Belle2::Unit::T;
       auto mcParticleHelix = Helix(mcParticle.getVertex(), mcParticle.getMomentum(), charge_sign, b_field);
-      // initialize the curent chi2
+      // initialize the current chi2
       double chi2Cur;
       // Check which linear algebra system should be used and calculate chi2Cur
       if (not m_param_linalg) {

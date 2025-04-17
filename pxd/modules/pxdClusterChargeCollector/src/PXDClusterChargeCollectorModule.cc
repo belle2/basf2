@@ -195,7 +195,7 @@ void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
       if (cluster.getCharge() >= m_minClusterCharge && cluster.getSize() >= m_minClusterSize && cluster.getSize() <= m_maxClusterSize) {
 
         VxdID sensorID = cluster.getSensorID();
-        const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+        const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
         auto uID = Info.getUCellID(cluster.getU());
         auto vID = Info.getVCellID(cluster.getV());
         auto iSensor = gTools->getPXDSensorIndex(sensorID);
@@ -208,7 +208,7 @@ void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
 
         // Compute variables from cluster needed for gain estimation
         m_signal = cluster.getCharge();
-        // Fill variabels into tree
+        // Fill variables into tree
         getObjectPtr<TTree>(treename)->Fill();
         // Increment the counter & store charge (optional)
         getObjectPtr<TH1I>("PXDClusterCounter")->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin);
@@ -248,7 +248,7 @@ void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
         if (cluster.getCharge() >= m_minClusterCharge && cluster.getSize() >= m_minClusterSize && cluster.getSize() <= m_maxClusterSize) {
 
           VxdID sensorID = cluster.getSensorID();
-          const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+          const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
           auto uID = Info.getUCellID(cluster.getU());
           auto vID = Info.getVCellID(cluster.getV());
           auto iSensor = gTools->getPXDSensorIndex(sensorID);
@@ -261,7 +261,7 @@ void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
 
           // Compute variables from cluster needed for gain estimation
           m_signal = cluster.getCharge();
-          // Fill variabels into tree
+          // Fill variables into tree
           getObjectPtr<TTree>(treename)->Fill();
           // Increment the counter & store charge (optional)
           getObjectPtr<TH1I>("PXDClusterCounter")->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin);

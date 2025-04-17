@@ -1,0 +1,193 @@
+[INFO] Steering file: analysis/tests/graFEI_examples.py
+TFile: graFEI_ntupliser_B.root
+TTree: tree
+No entry found
+TBranch: __experiment__
+TBranch: __run__
+TBranch: __event__
+TBranch: __production__
+TBranch: __candidate__
+TBranch: __ncandidates__
+TBranch: __eventType__
+TBranch: __weight__
+TBranch: Bsig_D_E
+TBranch: Bsig_D_M
+TBranch: Bsig_D_p
+TBranch: Bsig_D_pt
+TBranch: Bsig_E
+TBranch: Bsig_M
+TBranch: Bsig_Mbc
+TBranch: Bsig_Rank
+TBranch: Bsig_cosTBz
+TBranch: Bsig_cosThetaBetweenParticleAndNominalB
+TBranch: Bsig_deltaE
+TBranch: Bsig_genMotherPDG
+TBranch: Bsig_isSignal
+TBranch: Bsig_isSignalAcceptMissingNeutrino
+TBranch: Bsig_mcErrors
+TBranch: Bsig_mcPDG
+TBranch: Bsig_p
+TBranch: Bsig_phi
+TBranch: Bsig_pt
+TBranch: Bsig_px
+TBranch: Bsig_py
+TBranch: Bsig_pz
+TBranch: Bsig_theta
+TBranch: Btag_E
+TBranch: Btag_M
+TBranch: Btag_Mbc
+TBranch: Btag_cosTBz
+TBranch: Btag_cosThetaBetweenParticleAndNominalB
+TBranch: Btag_deltaE
+TBranch: Btag_genMotherPDG
+TBranch: Btag_graFEI_goodEvent
+TBranch: Btag_graFEI_nCharged_postFit
+TBranch: Btag_graFEI_nCharged_preFit
+TBranch: Btag_graFEI_nElectrons_postFit
+TBranch: Btag_graFEI_nElectrons_preFit
+TBranch: Btag_graFEI_nFSP
+TBranch: Btag_graFEI_nKaons_postFit
+TBranch: Btag_graFEI_nKaons_preFit
+TBranch: Btag_graFEI_nLeptons_postFit
+TBranch: Btag_graFEI_nLeptons_preFit
+TBranch: Btag_graFEI_nMuons_postFit
+TBranch: Btag_graFEI_nMuons_preFit
+TBranch: Btag_graFEI_nOthers_postFit
+TBranch: Btag_graFEI_nOthers_preFit
+TBranch: Btag_graFEI_nPhotons_postFit
+TBranch: Btag_graFEI_nPhotons_preFit
+TBranch: Btag_graFEI_nPions_postFit
+TBranch: Btag_graFEI_nPions_preFit
+TBranch: Btag_graFEI_nPredictedUnmatched
+TBranch: Btag_graFEI_nPredictedUnmatched_noPhotons
+TBranch: Btag_graFEI_nProtons_postFit
+TBranch: Btag_graFEI_nProtons_preFit
+TBranch: Btag_graFEI_probEdgeGeom
+TBranch: Btag_graFEI_probEdgeMean
+TBranch: Btag_graFEI_probEdgeProd
+TBranch: Btag_graFEI_truth_isSemileptonic
+TBranch: Btag_graFEI_truth_nElectrons
+TBranch: Btag_graFEI_truth_nFSP
+TBranch: Btag_graFEI_truth_nKaons
+TBranch: Btag_graFEI_truth_nMuons
+TBranch: Btag_graFEI_truth_nOthers
+TBranch: Btag_graFEI_truth_nPhotons
+TBranch: Btag_graFEI_truth_nPions
+TBranch: Btag_graFEI_truth_nProtons
+TBranch: Btag_graFEI_truth_perfectEvent
+TBranch: Btag_graFEI_truth_perfectLCA
+TBranch: Btag_graFEI_truth_perfectMasses
+TBranch: Btag_graFEI_validTree
+TBranch: Btag_isSignal
+TBranch: Btag_isSignalAcceptMissingNeutrino
+TBranch: Btag_mcErrors
+TBranch: Btag_mcPDG
+TBranch: Btag_p
+TBranch: Btag_phi
+TBranch: Btag_pt
+TBranch: Btag_px
+TBranch: Btag_py
+TBranch: Btag_pz
+TBranch: Btag_theta
+TFile: graFEI_ntupliser_Upsilon.root
+TTree: tree
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 6
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: Bsgn_d0_CMS_E, 2.137
+TBranch: Bsgn_d0_CMS_p, 2.079
+TBranch: Bsgn_d0_CMS_pt, 1.981
+TBranch: Bsgn_d0_CMS_px, -1.567
+TBranch: Bsgn_d0_CMS_py, 1.211
+TBranch: Bsgn_d0_CMS_pz, 0.6322
+TBranch: Bsgn_d0_E, 2.337
+TBranch: Bsgn_d0_M, 0.4937
+TBranch: Bsgn_d0_Mbc, 4.864
+TBranch: Bsgn_d0_PDG, 321
+TBranch: Bsgn_d0_deltaE, -3.153
+TBranch: Bsgn_d0_genMotherPDG, 521
+TBranch: Bsgn_d0_mcErrors, 128
+TBranch: Bsgn_d0_mcPDG, 211
+TBranch: Bsgn_d0_p, 2.285
+TBranch: Bsgn_d0_pt, 1.904
+TBranch: Bsgn_d0_px, -1.469
+TBranch: Bsgn_d0_py, 1.211
+TBranch: Bsgn_d0_pz, 1.263
+TBranch: Bsgn_genMotherPDG, 3.006e+05
+TBranch: Bsgn_mcErrors, 176
+TBranch: Bsgn_mcPDG, 521
+TBranch: Btag_CMS_E, 4.941
+TBranch: Btag_CMS_p, 1.119
+TBranch: Btag_CMS_pt, 1.049
+TBranch: Btag_CMS_px, 0.9542
+TBranch: Btag_CMS_py, -0.4367
+TBranch: Btag_CMS_pz, -0.3891
+TBranch: Btag_E, 5.069
+TBranch: Btag_M, 4.813
+TBranch: Btag_Mbc, 5.17
+TBranch: Btag_PDG, 521
+TBranch: Btag_deltaE, -0.3487
+TBranch: Btag_genMotherPDG, 0
+TBranch: Btag_mcErrors, 438
+TBranch: Btag_mcPDG, 3.006e+05
+TBranch: Btag_p, 1.593
+TBranch: Btag_pt, 1.243
+TBranch: Btag_px, 1.164
+TBranch: Btag_py, -0.4367
+TBranch: Btag_pz, 0.9964
+TBranch: Ups_E, 7.407
+TBranch: Ups_M, 7.004
+TBranch: Ups_Mbc, 5.191
+TBranch: Ups_PDG, 300553
+TBranch: Ups_deltaE, 1.788
+TBranch: Ups_genMotherPDG, 0
+TBranch: Ups_mcErrors, 438
+TBranch: Ups_mcPDG, 3.006e+05
+TBranch: Ups_p, 2.408
+TBranch: Ups_pt, 0.8324
+TBranch: Ups_px, -0.3051
+TBranch: Ups_py, 0.7745
+TBranch: Ups_pz, 2.259
+TBranch: graFEI_goodEvent, 1
+TBranch: graFEI_nCharged_postFit, 9
+TBranch: graFEI_nCharged_preFit, 9
+TBranch: graFEI_nElectrons_postFit, 0
+TBranch: graFEI_nElectrons_preFit, 1
+TBranch: graFEI_nFSP, 16
+TBranch: graFEI_nKaons_postFit, 1
+TBranch: graFEI_nKaons_preFit, 0
+TBranch: graFEI_nLeptons_postFit, 0
+TBranch: graFEI_nLeptons_preFit, 1
+TBranch: graFEI_nMuons_postFit, 0
+TBranch: graFEI_nMuons_preFit, 0
+TBranch: graFEI_nOthers_postFit, 0
+TBranch: graFEI_nOthers_preFit, 0
+TBranch: graFEI_nPhotons_postFit, 7
+TBranch: graFEI_nPhotons_preFit, 7
+TBranch: graFEI_nPions_postFit, 8
+TBranch: graFEI_nPions_preFit, 8
+TBranch: graFEI_nPredictedUnmatched, 0
+TBranch: graFEI_nPredictedUnmatched_noPhotons, 0
+TBranch: graFEI_nProtons_postFit, 0
+TBranch: graFEI_nProtons_preFit, 0
+TBranch: graFEI_probEdgeGeom, 0.006048
+TBranch: graFEI_probEdgeMean, 0.5455
+TBranch: graFEI_probEdgeProd, 3.201e-36
+TBranch: graFEI_truth_isSemileptonic, 0
+TBranch: graFEI_truth_nElectrons, 0
+TBranch: graFEI_truth_nFSP, 31
+TBranch: graFEI_truth_nKaons, 0
+TBranch: graFEI_truth_nMuons, 0
+TBranch: graFEI_truth_nOthers, 0
+TBranch: graFEI_truth_nPhotons, 6
+TBranch: graFEI_truth_nPions, 10
+TBranch: graFEI_truth_nProtons, 0
+TBranch: graFEI_truth_perfectEvent, 0
+TBranch: graFEI_truth_perfectLCA, 0
+TBranch: graFEI_truth_perfectMasses, 0
+TBranch: graFEI_validTree, 1

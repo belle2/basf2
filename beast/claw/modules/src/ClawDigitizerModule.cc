@@ -13,7 +13,6 @@
 
 //c++
 #include <string>
-#include <fstream>
 #include <vector>
 
 using namespace std;
@@ -54,7 +53,7 @@ void ClawDigitizerModule::initialize()
   B2INFO("ClawDigitizer: Initializing");
   m_clawHit.registerInDataStore();
 
-  //get the garfield drift data, gas, and CLAW paramters
+  //get the garfield drift data, gas, and CLAW parameters
   getXMLData();
 
 }
@@ -130,7 +129,7 @@ void ClawDigitizerModule::getXMLData()
   m_C_keV_to_MIP = content.getDouble("C_keV_to_MIP");
   //m_C_MIP_to_PE = content.getDouble("C_MIP_to_PE");
 
-  B2INFO("ClawDigitizer: Aquired claw locations and gas parameters");
+  B2INFO("ClawDigitizer: Acquired claw locations and gas parameters");
 
 }
 

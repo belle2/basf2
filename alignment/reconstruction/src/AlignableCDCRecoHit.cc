@@ -178,19 +178,19 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
   );
 
   // Difference between wire ends (end plates)
-  // Alignment of layer dX, dX = foward - backward endplate
+  // Alignment of layer dX, dX = forward - backward endplate
   globals.add(
     GlobalLabel::construct<CDCAlignment>(layerID, CDCAlignment::layerDx),
     drldg(0, 0) * zRel
   );
 
-  // Alignment of layer dY, dY = foward - backward endplate
+  // Alignment of layer dY, dY = forward - backward endplate
   globals.add(
     GlobalLabel::construct<CDCAlignment>(layerID, CDCAlignment::layerDy),
     drldg(0, 1) * zRel
   );
 
-  // Alignment of layer rotation difference d(gamma or phi), dPhi = foward - backward endplate
+  // Alignment of layer rotation difference d(gamma or phi), dPhi = forward - backward endplate
   globals.add(
     GlobalLabel::construct<CDCAlignment>(layerID, CDCAlignment::layerDPhi),
     drldg(0, 5) * zRel
@@ -267,7 +267,7 @@ TMatrixD AlignableCDCRecoHit::localDerivatives(const genfit::StateOnPlane* sop)
   TMatrixD locals(2, 1);
   if (driftTime > 20 && driftTime < 200 && fabs(driftVelocity) < 1.0e-2) {
     locals(0, 0) = - double(int(m_leftRight)) * driftVelocity;
-    locals(1, 0) = 0.; // insesitive coordinate along wire
+    locals(1, 0) = 0.; // insensitive coordinate along wire
   }
 
   return locals;

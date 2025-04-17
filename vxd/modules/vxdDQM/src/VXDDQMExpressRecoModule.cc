@@ -332,7 +332,7 @@ void VXDDQMExpressRecoModule::event()
         float fCharge1 = digitPXD1.getCharge();
         if (fCharge1 < m_CutCorrelationSigPXD) continue;
         VxdID sensorID1 = digitPXD1.getSensorID();
-        auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID1));
+        auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID1));
         ROOT::Math::XYZVector rLocal1(info.getUCellPosition(digitPXD1.getUCellID()), info.getVCellPosition(digitPXD1.getVCellID()), 0);
         ROOT::Math::XYZVector ral1 = info.pointToGlobal(rLocal1);
         iIsPXD1 = 1;
@@ -351,7 +351,7 @@ void VXDDQMExpressRecoModule::event()
         index1 = iLayer1 - firstVXDLayer;
         fTime1 = digitSVD1.getFADCTime();
         VxdID sensorID1 = digitSVD1.getSensorID();
-        auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID1));
+        auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID1));
         SVDShaperDigit::APVFloatSamples samples = digitSVD1.getSamples();
         if (digitSVD1.isUStrip()) {
           int iCont = 0;
@@ -391,7 +391,7 @@ void VXDDQMExpressRecoModule::event()
         float fCharge1 = clusterPXD1.getCharge();
         if (fCharge1 < m_CutCorrelationSigPXD) continue;
         VxdID sensorID1 = clusterPXD1.getSensorID();
-        auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID1));
+        auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID1));
         ROOT::Math::XYZVector rLocal1(clusterPXD1.getU(), clusterPXD1.getV(), 0);
         ROOT::Math::XYZVector ral1 = info.pointToGlobal(rLocal1);
         iIsPXD1 = 1;
@@ -411,7 +411,7 @@ void VXDDQMExpressRecoModule::event()
         float fCharge1 = clusterSVD1.getCharge();
         fTime1 = clusterSVD1.getClsTime();
         VxdID sensorID1 = clusterSVD1.getSensorID();
-        auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID1));
+        auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID1));
         if (clusterSVD1.isUCluster()) {
           if (fCharge1 < m_CutCorrelationSigUSVD * 200) continue;  // in electrons
           ROOT::Math::XYZVector rLocal1(clusterSVD1.getPosition(), 0, 0);
@@ -455,7 +455,7 @@ void VXDDQMExpressRecoModule::event()
           float fCharge2 = digitPXD2.getCharge();
           if (fCharge2 < m_CutCorrelationSigPXD) continue;
           VxdID sensorID2 = digitPXD2.getSensorID();
-          auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID2));
+          auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID2));
           ROOT::Math::XYZVector rLocal2(info.getUCellPosition(digitPXD2.getUCellID()), info.getVCellPosition(digitPXD2.getVCellID()), 0);
           ROOT::Math::XYZVector ral2 = info.pointToGlobal(rLocal2);
           iIsPXD2 = 1;
@@ -474,7 +474,7 @@ void VXDDQMExpressRecoModule::event()
           index2 = iLayer2 - firstVXDLayer;
           fTime2 = digitSVD2.getFADCTime();
           VxdID sensorID2 = digitSVD2.getSensorID();
-          auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID2));
+          auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID2));
 
           SVDShaperDigit::APVFloatSamples samples = digitSVD2.getSamples();
           if (digitSVD2.isUStrip()) {
@@ -512,7 +512,7 @@ void VXDDQMExpressRecoModule::event()
           float fCharge2 = clusterPXD2.getCharge();
           if (fCharge2 < m_CutCorrelationSigPXD) continue;
           VxdID sensorID2 = clusterPXD2.getSensorID();
-          auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID2));
+          auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID2));
           ROOT::Math::XYZVector rLocal2(clusterPXD2.getU(), clusterPXD2.getV(), 0);
           ROOT::Math::XYZVector ral2 = info.pointToGlobal(rLocal2);
           iIsPXD2 = 1;
@@ -532,7 +532,7 @@ void VXDDQMExpressRecoModule::event()
           float fCharge2 = clusterSVD2.getCharge();
           fTime2 = clusterSVD2.getClsTime();
           VxdID sensorID2 = clusterSVD2.getSensorID();
-          auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID2));
+          auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID2));
           if (clusterSVD2.isUCluster()) {
             if (fCharge2 < m_CutCorrelationSigUSVD * 200) continue;  // in electrons
             ROOT::Math::XYZVector rLocal2(clusterSVD2.getPosition(), 0, 0);

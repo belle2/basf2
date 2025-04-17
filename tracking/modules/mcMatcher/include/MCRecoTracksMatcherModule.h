@@ -24,9 +24,9 @@ namespace Belle2 {
    *
    *  In order to match the tracks the module takes two StoreArrays of RecoTracks, which should be compared.
    *
-   *  One of them contains RecoTracks composed by the patter recognition algorithm to be assessed. They are refered to as PRTracks.
+   *  One of them contains RecoTracks composed by the pattern recognition algorithm to be assessed. They are referred to as PRTracks.
    *
-   *  The second StoreArray holds the reference tracks, which should ideally be reconstructed. These are refered to as MCTracks and
+   *  The second StoreArray holds the reference tracks, which should ideally be reconstructed. These are referred to as MCTracks and
    *  should generally be composed by the MCTrackingModule.
    *  (Design note : We use the tracks composed by the MCTrackFinder as reference, because the mere definition of
    *   what a trackable particle and what the best achievable track is, lies within the implementation of the MCTrackFinder.
@@ -43,14 +43,14 @@ namespace Belle2 {
    *   .
    *
    *  The RelationArray for purity and efficiency generally store only the single highest purity and
-   *  the single highest efficiency for a given PRTrack, MCTrack respectivelly. However these values are stored with
+   *  the single highest efficiency for a given PRTrack, MCTrack respectively. However these values are stored with
    *  a minus sign if the PRTrack is a clone, or the MCTrack is merged into another PRTrack. The McTrackId is either set to the
    *  index of the MCParticle or to some negative value indicating the severity of the mismatch. (Classification details below).
    *
    *  Moreover, only PRTracks that exceed the minimal purity requirement and a minimal efficiency requirement
    *  will have their purity/efficiency stored and will take part in the matching.
-   *  The minimal purity can be choosen by the minimalPurity parameter (default 2.0/3.0).
-   *  The minimal efficiency can be choosen by the minimalEfficiency parameter (default 0.05).
+   *  The minimal purity can be chosen by the minimalPurity parameter (default 2.0/3.0).
+   *  The minimal efficiency can be chosen by the minimalEfficiency parameter (default 0.05).
    *
    *  Last but not least a RelationArray from matched PRTracks to MCParticles is build and
    *  the McTrackId property of the PRTrack is set to the StoreArray index of the MCParticle
@@ -58,7 +58,7 @@ namespace Belle2 {
    *  By default clone tracks are also assigned to their MCParticle.
    *  This behaviour can be switched off by the relateClonesToMCParticles.
    *
-   *  In the following a more detailed explaination is given for the matching and
+   *  In the following a more detailed explanation is given for the matching and
    *  the classification of PRTracks and MCTracks.
    *
    *  The PRTracks can be classified into six categories:
@@ -124,7 +124,7 @@ namespace Belle2 {
    *  - GHOST
    *      - The highest purity MCTrack to this PRTrack has a purity lower than the minimal purity given in the parameter minimalPurity or
    *      - has an efficiency lower than the efficiency given in the parameter minimalEfficiency.
-   *      - This means that the PRTrack does not contain a significat number of a specific MCTrack nor can it considered only made of background.
+   *      - This means that the PRTrack does not contain a significant number of a specific MCTrack nor can it considered only made of background.
    *      - For ghost tracks the McTrackId of the RecoTracks is set to -999.
    *      - No relation from the PRTrack to the MCParticle is inserted.
    *      - PRTracks classified as ghost are not entered in the purity RelationArray.
@@ -163,7 +163,7 @@ namespace Belle2 {
    *        to be able to distinguish them from the matched tracks.
    *
    *  - MISSING
-   *      - There is no highest efficiency PRTrack to this MCTrack, which also fullfills the minimal purity requirement.
+   *      - There is no highest efficiency PRTrack to this MCTrack, which also fulfills the minimal purity requirement.
    *      - For this category no efficiency relation is inserted.
    *  .
    *
@@ -231,7 +231,7 @@ namespace Belle2 {
     //! Flag to indicated whether the Monte Carlo track are on the DataStore
     bool m_mcParticlesPresent = false;
 
-    //! Descriptive type defintion for a number of degrees of freedom.
+    //! Descriptive type definition for a number of degrees of freedom.
     using NDF = int;
 
     //! Map storing the standard number degrees of freedom for a single hit by detector */

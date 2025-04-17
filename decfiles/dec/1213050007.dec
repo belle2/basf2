@@ -1,0 +1,32 @@
+# EventType: 1213050007
+# Descriptor: [B- -> D*+ (-> D0 (-> K- pi+) pi+) pi- pi-]  
+# NickName: Bu_Dstpipi_DsttoD0pi_D0toKpi
+# Documentation: B- to D*+ pi- pi-
+# Responsible: Agrim Aggarwal
+# Email: s6agagga@uni-bonn.de 
+# Tested: Yes 
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 2025/02/03
+
+Decay Upsilon(4S)
+0.5  B-sig  B+  VSS;
+0.5  B-  B+sig  VSS;
+Enddecay
+
+Decay B-sig
+1.00   D*+sig  pi-  pi-        PHSP;
+Enddecay
+CDecay B+sig
+
+Decay D*+sig
+1.00 D0sig pi+                VSS;
+Enddecay
+CDecay D*-sig
+
+Decay D0sig
+1.00 K- pi+                PHSP;
+Enddecay
+CDecay anti-D0sig
+
+End

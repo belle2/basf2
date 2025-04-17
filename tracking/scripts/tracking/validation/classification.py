@@ -176,9 +176,9 @@ class ClassificationAnalysis:
         # Figures of merit
         if cut_value is not None:
             fom_name = formatter.format(plot_name, subplot_name="classification_figures_of_merits")
-            fom_description = f"Efficiency, purity and background rejection of the classifiction with {quantity_name}"
+            fom_description = f"Efficiency, purity and background rejection of the classification with {quantity_name}"
 
-            fom_check = "Check that the classifcation quality stays stable."
+            fom_check = "Check that the classification quality stays stable."
 
             fom_title = f"Summary of the classification quality with {quantity_name}"
 

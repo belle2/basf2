@@ -92,7 +92,7 @@ namespace Belle2 {
                               const TRGState& output);
 
     /// make a VHDL component file. Non-zero value will be returned if
-    /// errors occured.
+    /// errors occurred.
     static int implementation(const unitType& type, std::ofstream&);
 
     /// writes a port map.

@@ -38,13 +38,13 @@ namespace Belle2 {
      * example ":" for path lists or ", " for comma or space separated values
      *
      * In case the variable is not set this function will convert the fallback
-     * string to a list using the same rules as would apply for the envirnoment
+     * string to a list using the same rules as would apply for the environment
      * value itself.
      */
     static std::vector<std::string> getOrCreateList(const std::string& name, const std::string& fallback,
                                                     const std::string& separators = " \t\n\r");
 
-    /** Modify the given string and replace every occurence of $NAME or ${NAME}
+    /** Modify the given string and replace every occurrence of $NAME or ${NAME}
      * with the value of the environment variable NAME. Variables which are not
      * found are returned unchanged
      */

@@ -20,7 +20,7 @@ namespace Belle2 {
     template<class AHitInBoxAlgorithm>
     class RangeInBox {
     public:
-      /// The type of the underlaying HoughBox (copied from the udnerlaying hit algorithm)
+      /// The type of the underlying HoughBox (copied from the udnerlaying hit algorithm)
       using HoughBox = typename AHitInBoxAlgorithm::HoughBox;
 
       /**  When called, it goes through all items in the range object (e.g. a CDCSegment) and checks the

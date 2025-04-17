@@ -31,7 +31,7 @@ Belle2::CDC::T0Correction::T0Correction():
 {
   /*
    setDescription(
-    " -------------------------- Test Calibration Algoritm -------------------------\n"
+    " -------------------------- Test Calibration Algorithm -------------------------\n"
     "                                                                               \n"
     "  Testing algorithm which just gets mean of a test histogram collected by      \n"
     "  CaTest module and provides a DB object with another histogram with one       \n"

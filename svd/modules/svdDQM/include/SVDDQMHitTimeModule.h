@@ -63,6 +63,9 @@ namespace Belle2 {
     /** if TRUE: svdTime back in SVD time reference*/
     bool m_desynchSVDTime = false;
 
+    /** if true enable 3 samples histograms analysis */
+    bool m_3Samples = false;
+
     StoreObjPtr<TRGSummary>    m_objTrgSummary;   /**< Trigger Summary data object */
 
     /** L1 timing source from getTimeType() in TRGSummary
@@ -90,23 +93,22 @@ namespace Belle2 {
     TH1F* m_l3v_mumu_L1_CDCTRG{nullptr};   /**< svd time histogram for mu mu events wrt the CDC trigger time*/
     TH1F* m_l3vEvtT0_mumu_L1_CDCTRG{nullptr};   /**< svd time histogram for mu mu events wrt the CDC trigger time*/
 
-    TH1F* m_SVD3EventT0{nullptr};    /**<  SVD event T0  for 3 sampels */
-    TH1F* m_SVD6EventT0{nullptr};    /**<  SVD event T0  for 6 sampels */
+    TH1F* m_SVDEventT03Sample{nullptr};    /**<  SVD event T0  for 3 samples */
+    TH1F* m_SVDEventT06Sample{nullptr};    /**<  SVD event T0  for 6 samples */
 
+    TH1F* m_SVDEventT03Sample_bhabha_L1_ECLTRG{nullptr}; /**< svd eventT0 histogram for bhabha events wrt the ECL trigger time for 3 samples*/
+    TH1F* m_SVDEventT03Sample_hadron_L1_ECLTRG{nullptr}; /**< svd eventT0 histogram for hadronic events wrt the ECL trigger time for 3 samples */
+    TH1F* m_SVDEventT03Sample_mumu_L1_ECLTRG{nullptr};   /**< svd eventT0 histogram for mu mu events wrt the ECL trigger time for 3 samples*/
+    TH1F* m_SVDEventT03Sample_bhabha_L1_CDCTRG{nullptr}; /**< svd eventT0 histogram for bhabha events wrt the CDC trigger time for 3 samples*/
+    TH1F* m_SVDEventT03Sample_hadron_L1_CDCTRG{nullptr}; /**< svd eventT0 histogram for hadronic events wrt the CDC trigger time  for 3 samples*/
+    TH1F* m_SVDEventT03Sample_mumu_L1_CDCTRG{nullptr};   /**< svd eventT0 histogram for mu mu events wrt the CDC trigger time for 3 samples*/
 
-    TH1F* m_SVD3EventT0_bhabha_L1_ECLTRG{nullptr}; /**< svd eventT0 histogram for bhabha events wrt the ECL trigger time for 3 samples*/
-    TH1F* m_SVD3EventT0_hadron_L1_ECLTRG{nullptr}; /**< svd eventT0 histogram for hadronic events wrt the ECL trigger time for 3 samples */
-    TH1F* m_SVD3EventT0_mumu_L1_ECLTRG{nullptr};   /**< svd eventT0 histogram for mu mu events wrt the ECL trigger time for 3 samples*/
-    TH1F* m_SVD3EventT0_bhabha_L1_CDCTRG{nullptr}; /**< svd eventT0 histogram for bhabha events wrt the CDC trigger time for 3 samples*/
-    TH1F* m_SVD3EventT0_hadron_L1_CDCTRG{nullptr}; /**< svd eventT0 histogram for hadronic events wrt the CDC trigger time  for 3 samples*/
-    TH1F* m_SVD3EventT0_mumu_L1_CDCTRG{nullptr};   /**< svd eventT0 histogram for mu mu events wrt the CDC trigger time for 3 samples*/
-
-    TH1F* m_SVD6EventT0_bhabha_L1_ECLTRG{nullptr}; /**< svd eventT0 histogram for bhabha events wrt the ECL trigger time for 6 samples*/
-    TH1F* m_SVD6EventT0_hadron_L1_ECLTRG{nullptr}; /**< svd eventT0 histogram for hadronic events wrt the ECL trigger time for 6 samples */
-    TH1F* m_SVD6EventT0_mumu_L1_ECLTRG{nullptr};   /**< svd eventT0 histogram for mu mu events wrt the ECL trigger time for 6 samples*/
-    TH1F* m_SVD6EventT0_bhabha_L1_CDCTRG{nullptr}; /**< svd eventT0 histogram for bhabha events wrt the CDC trigger time for 6 samples*/
-    TH1F* m_SVD6EventT0_hadron_L1_CDCTRG{nullptr}; /**< svd EventT0 histogram for hadronic events wrt the CDC trigger time  for 6 samples**/
-    TH1F* m_SVD6EventT0_mumu_L1_CDCTRG{nullptr};   /**< svd eventT0 histogram for mu mu events wrt the CDC trigger time for 6 samples*/
+    TH1F* m_SVDEventT06Sample_bhabha_L1_ECLTRG{nullptr}; /**< svd eventT0 histogram for bhabha events wrt the ECL trigger time for 6 samples*/
+    TH1F* m_SVDEventT06Sample_hadron_L1_ECLTRG{nullptr}; /**< svd eventT0 histogram for hadronic events wrt the ECL trigger time for 6 samples */
+    TH1F* m_SVDEventT06Sample_mumu_L1_ECLTRG{nullptr};   /**< svd eventT0 histogram for mu mu events wrt the ECL trigger time for 6 samples*/
+    TH1F* m_SVDEventT06Sample_bhabha_L1_CDCTRG{nullptr}; /**< svd eventT0 histogram for bhabha events wrt the CDC trigger time for 6 samples*/
+    TH1F* m_SVDEventT06Sample_hadron_L1_CDCTRG{nullptr}; /**< svd EventT0 histogram for hadronic events wrt the CDC trigger time  for 6 samples**/
+    TH1F* m_SVDEventT06Sample_mumu_L1_CDCTRG{nullptr};   /**< svd eventT0 histogram for mu mu events wrt the CDC trigger time for 6 samples*/
 
   };
 

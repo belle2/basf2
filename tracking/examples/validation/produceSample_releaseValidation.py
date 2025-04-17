@@ -7,62 +7,69 @@ import logging
 
 import reconstruction as re
 
-basf2.set_random_seed(1234)
 
-path = basf2.create_path()
+def main():
+    """Only execute the code if the script is run but not when it's imported."""
+    basf2.set_random_seed(1234)
 
-environment = Belle2.Environment.Instance()
-environment.setNumberEventsOverride(10000)
+    path = basf2.create_path()
 
-# Simulate events first (e.g. sample produced by validation/validation/EvtGenSim.py)
-path.add_module('RootInput', inputFileName='./EvtGenSim.root')
+    environment = Belle2.Environment.Instance()
+    environment.setNumberEventsOverride(10000)
 
-# Some default modules
-path.add_module('Progress')
+    # Simulate events first (e.g. sample produced by validation/validation/EvtGenSim.py)
+    path.add_module('RootInput', inputFileName='./EvtGenSim.root')
 
-path.add_module("Gearbox")
-path.add_module("Geometry")
+    # Some default modules
+    path.add_module('Progress')
 
-# Do not prune the tracks (usually all but first and last hit are removed)
-re.add_reconstruction(path, pruneTracks=False, reconstruct_cdst="rawFormat")
+    path.add_module("Gearbox")
+    path.add_module("Geometry")
 
-# Set a few options of modules that we need for the studies
-for module in path.modules():
-    if 'TrackFinderMCTruthRecoTracks' in module.name():
-        module.param({"UseReassignedHits": True, 'UseNLoops': 1})
-    if 'V0Finder' in module.name():
-        module.param("Validation", True)
+    # Do not prune the tracks (usually all but first and last hit are removed)
+    re.add_reconstruction(path, pruneTracks=False, reconstruct_cdst="rawFormat")
 
-# Add MC information for V0s
-path.add_module('MCV0Matcher', V0ColName='V0ValidationVertexs')
+    # Set a few options of modules that we need for the studies
+    for module in path.modules():
+        if 'TrackFinderMCTruthRecoTracks' in module.name():
+            module.param({"UseReassignedHits": True, 'UseNLoops': 1})
+        if 'V0Finder' in module.name():
+            module.param("Validation", True)
 
-# Add a bunch of branches that we need (on top of cdst)
-re.add_cdst_output(
-    path,
-    mc=True,
-    filename='./validationSample.root',
-    additionalBranches=[
-        'SVDClusters',
-        'PXDClusters',
-        'CDCSimHits',
-        'CDCSimHitsToCDCHits',
-        'MCRecoTracks',
-        'RecoHitInformations',
-        'RecoTracksToRecoHitInformations',
-        'MCRecoTracksToRecoHitInformations',
-        'MCRecoTracksToMCParticles',
-        'MCRecoTracksToRecoTracks',
-        'RecoTracksToMCParticles',
-        'RecoTracksToMCRecoTracks',
-        'V0ValidationVertexs',
-        'V0ValidationVertexsToMCParticles',
-        'V0sToV0ValidationVertexs',
-        'TracksToRecoTracks',
-        'TracksToMCParticles'])
+    # Add MC information for V0s
+    path.add_module('MCV0Matcher', V0ColName='V0ValidationVertexs')
 
-basf2.print_path(path)
-basf2.process(path)
+    # Add a bunch of branches that we need (on top of cdst)
+    re.add_cdst_output(
+        path,
+        mc=True,
+        filename='./validationSample.root',
+        additionalBranches=[
+            'SVDClusters',
+            'PXDClusters',
+            'CDCSimHits',
+            'CDCSimHitsToCDCHits',
+            'MCRecoTracks',
+            'RecoHitInformations',
+            'RecoTracksToRecoHitInformations',
+            'MCRecoTracksToRecoHitInformations',
+            'MCRecoTracksToMCParticles',
+            'MCRecoTracksToRecoTracks',
+            'RecoTracksToMCParticles',
+            'RecoTracksToMCRecoTracks',
+            'V0ValidationVertexs',
+            'V0ValidationVertexsToMCParticles',
+            'V0sToV0ValidationVertexs',
+            'TracksToRecoTracks',
+            'TracksToMCParticles'])
 
-logging.basicConfig(level=logging.INFO)
+    basf2.print_path(path)
+    basf2.process(path)
 
-print(basf2.statistics)
+    logging.basicConfig(level=logging.INFO)
+
+    print(basf2.statistics)
+
+
+if __name__ == "__main__":
+    main()

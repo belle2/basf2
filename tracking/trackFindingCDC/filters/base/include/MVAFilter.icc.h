@@ -52,7 +52,7 @@ namespace Belle2 {
 
       moduleParamList->addParameter(prefixed(prefix, "identifier"),
                                     m_identifier,
-                                    "Database identfier of the expert of weight file name",
+                                    "Database identifier of the expert of weight file name",
                                     m_identifier);
 
       moduleParamList->addParameter(prefixed(prefix, "DBPayloadName"),

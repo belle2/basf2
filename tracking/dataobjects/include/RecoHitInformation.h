@@ -284,7 +284,7 @@ namespace Belle2 {
     OriginTrackFinder m_foundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder;
     /// An additional flag to be used.
     RecoHitFlag m_flag = RecoHitFlag::c_undefinedRecoHitFlag;
-    /// Set this flag to falso to not create a measurement out of this hit
+    /// Set this flag to false to not create a measurement out of this hit
     bool m_useInFit = true;
     /**
      * The index for the created TrackPoint in the genfit::Track of the related RecoTrack.

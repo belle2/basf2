@@ -39,6 +39,7 @@ void VariablesToEventExtraInfoModule::initialize()
 {
   StoreArray<Particle>().isRequired();
   m_inputList.isRequired(m_inputListName);
+  m_eventExtraInfo.isRequired();
 
   //collection function pointers
   for (const auto& pair : m_variables) {

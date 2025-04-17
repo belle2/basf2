@@ -351,7 +351,7 @@ def select_good_decay(predicted_lcas, predicted_masses, sig_side_lcas=None, sig_
     if root.lcas_level not in [5, 6]:
         return (False, root.lcas_level, [-1])
 
-    # If root is B don't go any further (function is supposed to check wheter signal-side on Ups decay is good)
+    # If root is B don't go any further (function is supposed to check whether signal-side on Ups decay is good)
     if root.lcas_level == 5:
         return (True, 5, [i for i in range(predicted_lcas.shape[0])])
 

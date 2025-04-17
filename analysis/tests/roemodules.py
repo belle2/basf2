@@ -10,13 +10,13 @@
 
 """
 A test of the ROE-related module tests using a large test file
-(mdst14.root from the validation server)
+(mdst16.root from the validation server)
 """
 
 import b2test_utils
 from basf2 import set_random_seed, create_path, process
 
-inputFile = b2test_utils.require_file('mdst14.root', 'validation')
+inputFile = b2test_utils.require_file('mdst16.root', 'validation')
 # make logging more reproducible by replacing some strings
 b2test_utils.configure_logging_for_tests()
 set_random_seed("1337")

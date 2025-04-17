@@ -8,7 +8,6 @@
 
 #include <arich/utility/ARICHChannelHist.h>
 #include <framework/logging/Logger.h>
-#include <math.h>
 #include <iostream>
 #include <algorithm>
 #include <TGraph.h>

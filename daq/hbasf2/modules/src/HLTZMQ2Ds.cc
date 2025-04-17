@@ -96,11 +96,9 @@ void HLTZMQ2DsModule::event()
         B2DEBUG(10, "Received run change request");
 
         m_eventMetaData.create();
-        if (m_firstEventIsSpecialMessage) {
-          m_eventMetaData->setExperiment(m_lastExperiment);
-          m_eventMetaData->setRun(m_lastRun);
-        } else {
+        if (!m_lastEventIsSpecialMessage) {
           m_eventMetaData->setEndOfRun(m_lastExperiment, m_lastRun);
+          m_lastEventIsSpecialMessage = true;
         }
         return;
       } else if (eventMessage->isMessage(EMessageTypes::c_terminateMessage)) {
@@ -120,7 +118,7 @@ void HLTZMQ2DsModule::event()
       B2ASSERT("There is still no event meta data present!", m_eventMetaData);
       m_lastRun = m_eventMetaData->getRun();
       m_lastExperiment = m_eventMetaData->getExperiment();
-      m_firstEventIsSpecialMessage = false;
+      m_lastEventIsSpecialMessage = false;
     };
 
     bool result = ZMQConnection::poll({{m_input.get(), reactToInput}}, -1);
@@ -128,8 +126,13 @@ void HLTZMQ2DsModule::event()
       // didn't get any events, probably interrupted by a signal.
       // We're the input module so let's better have some event meta data
       // even if it's not useful
-      m_eventMetaData.create();
-      m_eventMetaData->setEndOfData();
+      // If the m_lastRun is 0, it is probably the lastEventMessage. Do not issue the endOfData.
+      if (m_lastRun != 0) {
+        m_eventMetaData.create();
+        m_eventMetaData->setEndOfData();
+      } else {
+        m_eventMetaData->setEndOfRun(m_lastExperiment, m_lastRun);
+      }
     }
   } catch (zmq::error_t& error) {
     // This is an unexpected error: better report it.

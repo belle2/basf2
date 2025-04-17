@@ -22,7 +22,6 @@
 #include <vector>
 
 namespace Belle2 {
-  class Particle;
 
   /**
    * particle combiner module

@@ -39,7 +39,7 @@ SVDShaperDigitSorterModule::SVDShaperDigitSorterModule() : Module()
                  "updates the corresponding relations to MCParticles and TrueHits. This is "
                  "needed for background overlay as the Clusterizer expects sorted input. "
                  "The module is otherwise not required for simulation or reconstruction, "
-                 "as both SVDDigitzer ond SVDUnpacker output sorted digit collections.");
+                 "as both SVDDigitzer and SVDUnpacker output sorted digit collections.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("digits", m_storeShaperDigitsName, "SVDShaperDigit collection name", string(""));
   addParam("truehits", m_storeTrueHitsName, "SVDTrueHit collection name", string(""));

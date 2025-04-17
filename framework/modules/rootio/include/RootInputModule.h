@@ -25,7 +25,7 @@
 namespace Belle2 {
   /** Module to read TTree data from file into the data store.
    *
-   *  For more information consult the basf2 Software Portal confluence page.
+   *  For more information consult the `basf2 Software Portal XWiki page <https://xwiki.desy.de/xwiki/rest/p/899ba>`_.
    *  You can specify different TTrees for different durabilities, and specify
    *  if only specific branches should be read (branchNames), or if some should
    *  be excluded (excludeBranchNames).
@@ -142,7 +142,7 @@ namespace Belle2 {
     /** Level of parent files to be read. */
     int m_parentLevel;
 
-    /** Collect statistics on amount of data read and print statistics (seperate for input & parent files) after processing. */
+    /** Collect statistics on amount of data read and print statistics (separate for input & parent files) after processing. */
     bool m_collectStatistics;
 
     /** experiment, run, event number of first event to load */

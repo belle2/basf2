@@ -96,7 +96,7 @@ namespace Belle2 {
     //! Once-only flag to write FBX only on the first event
     bool m_First{true};
 
-    //! User-specified flag to select whether to write and re-use logical- and physical-volume
+    //! User-specified flag to select whether to write and reuse logical- and physical-volume
     //! prototypes once (true) or to write duplicates of each such volume (false).
     bool m_UsePrototypes{false};
 

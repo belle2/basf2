@@ -56,7 +56,7 @@ particlegun.param({  # Shoot electrons and positrons
                      # between 0 and 360 degree
                      # but from a fixed position
                      # namely 0,0,0
-                     # and the same vertex vor all particles
+                     # and the same vertex for all particles
     'pdgCodes': [11, 22, -11],
     'nTracks': 1000,
     'varyNTracks': True,

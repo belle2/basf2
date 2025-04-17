@@ -341,7 +341,7 @@ void TimeWalkCalibrationAlgorithm::fitToExponentialFunc(TH1D* h1)
     p0 = h1->GetFunction("pol0")->GetParameter(0);
   }
   //create histo = old-p0;
-  // fit with expo function to find intial parameters
+  // fit with expo function to find initial parameters
   TH1D* hshift  = new TH1D("hshift", "shift", h1->GetNbinsX(), 0, 500);
   hshift->SetDirectory(0);
   for (int i = 0; i <= h1->GetNbinsX(); ++i) {

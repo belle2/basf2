@@ -18,7 +18,8 @@
 """
 
 from tracking.validation.run import TrackingValidationRun
-import tracking
+from tracking import add_track_finding
+from tracking.path_utils import add_hit_preparation_modules
 import logging
 import basf2
 VALIDATION_OUTPUT_FILE = 'NoCKFValidationBkg.root'
@@ -27,8 +28,8 @@ ACTIVE = True
 
 
 def setupFinderModule(path):
-    tracking.add_hit_preparation_modules(path, components=["SVD", "PXD"])
-    tracking.add_track_finding(path, svd_ckf_mode="SVD_alone")
+    add_hit_preparation_modules(path, components=["SVD", "PXD"])
+    add_track_finding(path, svd_ckf_mode="SVD_alone")
 
 
 class CKFBkg(TrackingValidationRun):

@@ -118,7 +118,7 @@ void PXDClusterPositionCollectorModule::collect() // Do your event() stuff here
       grid->Fill(thetaU, thetaV);
 
       VxdID sensorID = truehit.getSensorID();
-      const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
 
       // Sort all pixels related to the cluster
       set<PXD::Pixel> pixels;

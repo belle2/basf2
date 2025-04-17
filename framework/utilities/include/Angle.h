@@ -15,7 +15,7 @@
 namespace Belle2 {
 
   /**
-   * Class to compare if two angles are compatible withing a given error range.
+   * Class to compare if two angles are compatible within a given error range.
    */
   class BaseAngle {
   public:

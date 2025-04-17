@@ -38,7 +38,7 @@ namespace Belle2 {
       /// Constructor for adding the subfindlets
       SVDHoughTracking();
 
-      /// Default desctructor
+      /// Default destructor
       ~SVDHoughTracking();
 
       /// Expose the parameters of the sub findlets.
@@ -83,10 +83,10 @@ namespace Belle2 {
       /// Vector containing the cached hit information
       std::vector<VXDHoughState> m_vxdHoughStates;
 
-      /// Vector containint raw track candidates
+      /// Vector containing raw track candidates
       std::vector<std::vector<VXDHoughState*>> m_rawTrackCandidates;
 
-      /// A track candidate is a vector of SpacePoint, and in each event multple track candidates
+      /// A track candidate is a vector of SpacePoint, and in each event multiple track candidates
       /// will be created, which are stored in a vector themselves.
       std::vector<SpacePointTrackCand> m_trackCandidates;
 

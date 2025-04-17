@@ -37,7 +37,7 @@ int DQMCommonUtils::SetFlag(int Type, int bin, const double* pars, double ratio,
     flagInt += temp->GetBinContent(j + 1);
     flagrInt += refhist->GetBinContent(j + 1);
   }
-  if (NEvents < 100) {  // not enough information for comparition
+  if (NEvents < 100) {  // not enough information for comparison
     iret = -1;
     flaghist->SetBinContent(bin + 1, -1);
     return iret;

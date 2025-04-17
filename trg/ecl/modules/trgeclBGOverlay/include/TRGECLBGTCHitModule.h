@@ -28,7 +28,7 @@ namespace Belle2 {
 
     /** Destructor */
     virtual ~TRGECLBGTCHitModule();
-    /** Initilizes TRGECLBGTCHitModule. */
+    /** Initializes TRGECLBGTCHitModule. */
     virtual void initialize() override;
     /** Called when new run started.*/
     virtual void beginRun() override;

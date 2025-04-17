@@ -183,7 +183,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_CDCWire_stereoAngle)
 
     for (const CDCWire& wire : wireLayer) {
       // this limits can change when a per-wire alignment is done using CDC dat
-      // therefore, this test might fail in the future, if new aligments for the CDC
+      // therefore, this test might fail in the future, if new alignments for the CDC
       // are created.
       EXPECT_NEAR(tanThetaByICLayer[iCLayer], wire.getTanStereoAngle(), 10e-2);
       EXPECT_NEAR(stereoAngleByICLayer[iCLayer], wire.getStereoAngle(), 10e-2);

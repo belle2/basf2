@@ -17,7 +17,7 @@ namespace Belle2 {
      */
     float gain;
 
-    /** peakTimes (in ns) is the time at wich the shaper output reach the
+    /** peakTimes (in ns) is the time at which the shaper output reach the
      * maximum. TO BE CLARIFIED: where do we put the time origin of the injection?
      */
     float peakTime;

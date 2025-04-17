@@ -390,7 +390,7 @@ namespace Belle2 {
       }
 
     private:
-      /// Bound in the first coordindate
+      /// Bound in the first coordinate
       std::array<FirstType, 2> m_firstBounds;
 
       /// Box in the other coordinate

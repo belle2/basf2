@@ -79,7 +79,7 @@ namespace Belle2 {
     int readhapd(unsigned int len, unsigned int* data);
     //! Read the data from the file (can be compressed)
     int readdata(gzFile fp, int rec_id, int print);
-    //! file desriptor of the data file
+    //! file descriptor of the data file
     gzFile m_fp;
     //! EOF flag
     int m_end;

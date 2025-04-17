@@ -45,13 +45,13 @@ namespace Belle2 {
      *              weather a matching candidate pair`s chi2-value is reasonable.
      *              The cut-off values in the list for the  different pdgs have to be in the
      *              following order  [11,13,211,2212,321,1000010020].
-     *              The default values determined from a small study investigating the chi2 value destribution
+     *              The default values determined from a small study investigating the chi2 value distribution
      *              from Track-MCParticle pairs for events with only one Track and one MCParticle. Latter
      *              makes the matching trivial and therefore one can determine the so-called 99% border that
      *              gives the cut-off value for each charged stable particle.
      */
     std::vector<double> m_param_CutOffs{128024, 95, 173, 424, 90, 424};
-    /** Parameter: Possibility to switch beween ROOT and Eigen for inversion of the covariance matrix
+    /** Parameter: Possibility to switch between ROOT and Eigen for inversion of the covariance matrix
      *  false: ROOT is used for matrix inversion
      *  true: Eigen is used for matrix inversion
      */

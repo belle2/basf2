@@ -36,7 +36,7 @@ class Cluster(ClusterBase):
             return True
         except ImportError:
             print(
-                "drmaa library is not installed, please ues 'pip3 install "
+                "drmaa library is not installed, please use 'pip3 install "
                 "drmaa'"
             )
             return False

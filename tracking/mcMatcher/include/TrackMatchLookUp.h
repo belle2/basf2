@@ -55,7 +55,7 @@ namespace Belle2 {
   public:
     /*!
      * Constructor taking the names of the StoreArrays containing the Monte Carlo tracks
-     * and the pattern recognition tracks respectivelly.
+     * and the pattern recognition tracks respectively.
      *
      * Only the name of StoreArray of the Monte Carlo reference tracks has to be given.
      * The name of the StoreArray of the pattern recognition tracks to defaults to the standard
@@ -184,7 +184,7 @@ namespace Belle2 {
      * The given track can be both Monte Carlo track or pattern recognition track
      * since the match is one to one relation.
      * The returned efficiency is positive, hence the absolute value of the relation weight.
-     * If no exact match is assoziated with the track return NAN.
+     * If no exact match is associated with the track return NAN.
      */
     float getMatchedEfficiency(const RecoTrack& recoTrack) const;
 

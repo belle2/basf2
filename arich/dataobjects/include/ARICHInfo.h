@@ -14,7 +14,7 @@
 namespace Belle2 {
 
 
-  //! Datastore class to keep ARICH event infomation e.g. trigger type.
+  //! Datastore class to keep ARICH event information e.g. trigger type.
   class ARICHInfo : public RelationsObject {
   public:
 

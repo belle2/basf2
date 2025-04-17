@@ -97,7 +97,7 @@ def to_name(pdg):
 
 def to_names(pdg_codes):
     """
-    for a list/tuple of pdg codes, return list of paricle names.
+    for a list/tuple of pdg codes, return list of particle names.
 
     >>> pdg.to_names([11, -11, -211, 3212])
     ['e-', 'e+', 'pi-', 'Sigma0']

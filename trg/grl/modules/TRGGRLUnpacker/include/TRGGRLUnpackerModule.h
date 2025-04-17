@@ -977,7 +977,7 @@ namespace Belle2 {
       /** Destructor */
       virtual ~TRGGRLUnpackerModule();
 
-      /** Initilizes TRGGRLUnpackerUnpackerModule.*/
+      /** Initializes TRGGRLUnpackerUnpackerModule.*/
       virtual void initialize() override;
 
       /** Called event by event.*/

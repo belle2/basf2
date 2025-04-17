@@ -69,7 +69,7 @@ class Test_Machine(TestCase):
 
     def test_true_condition(self):
         """
-        Check that when a condition for a transition evaulates true it will transition
+        Check that when a condition for a transition evaluates true it will transition
         to the correct state
         """
         self.m.add_state("airborne")
@@ -84,7 +84,7 @@ class Test_Machine(TestCase):
 
     def test_false_condition(self):
         """
-        Check that when a condition for a transition evaulates false it will raise
+        Check that when a condition for a transition evaluates false it will raise
         the correct error.
         """
         self.m.add_state("airborne")
@@ -99,7 +99,7 @@ class Test_Machine(TestCase):
 
     def test_true_conditions(self):
         """
-        Check that when multiple conditions for a transition all evaulate true it will transition
+        Check that when multiple conditions for a transition all evaluate true it will transition
         to the correct state
         """
         self.m.add_state("airborne")
@@ -116,7 +116,7 @@ class Test_Machine(TestCase):
 
     def test_halftrue_conditions(self):
         """
-        Check that when a single condition out of many for a transition evaulates true it will
+        Check that when a single condition out of many for a transition evaluates true it will
         fail to move to the correct state
         """
         self.m.add_state("airborne")

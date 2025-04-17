@@ -144,7 +144,7 @@ class AttrDict:
         self.__content = content
 
     def __getattr__(self, key):
-        """Return any dictionay element as attribute"""
+        """Return any dictionary element as attribute"""
         return self.__content[key]
 
 

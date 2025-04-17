@@ -90,7 +90,7 @@ namespace Belle2 {
       unsigned short layer   = id.getLayerNumber() - 1;
       unsigned short ladder  = id.getLadderNumber();
       //unsigned short sensor  = id.getSensorNumber();
-      unsigned short sensor  = 0; // workround solution for DESY beam data
+      unsigned short sensor  = 0; // workaround solution for DESY beam data
       //unsigned short segment = id.getSegmentNumber();
 
       unsigned short pn      = (is_u) ? 0 : 1; // 0: p-side, 1: n-side

@@ -225,7 +225,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
 
-  if (m_convertEvtcls || m_convertRecTrg) m_evtInfo.registerInDataStore();
+  if (m_convertEvtcls || m_convertRecTrg) m_evtInfo.isRequired();
 
   if (m_convertTrkExtra) m_belleTrkExtra.registerInDataStore();
 
@@ -473,6 +473,17 @@ void B2BIIConvertMdstModule::convertMdstChargedTable()
   for (Belle::Mdst_charged_Manager::iterator chargedIterator = m.begin(); chargedIterator != m.end(); ++chargedIterator) {
     Belle::Mdst_charged belleTrack = *chargedIterator;
 
+    Belle::Mdst_trk& trk = belleTrack.trk();
+    bool foundValidTrackFitResult = false;
+    for (int mhyp = 0 ; mhyp < c_nHyp; ++mhyp) {
+      Belle::Mdst_trk_fit& trk_fit = trk.mhyp(mhyp);
+
+      double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
+      if (std::isnan(pValue)) continue;
+      foundValidTrackFitResult = true;
+    }
+    if (not foundValidTrackFitResult) continue;
+
     auto track = m_tracks.appendNew();
 
     // convert MDST_Charged -> Track
@@ -597,6 +608,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       if (nTrack == 2)
         break;
     }
+    if (std::max(trackID[0], trackID[1]) > m_tracks.getEntries()) continue;
 
     HepPoint3D dauPivot(belleV0.vx(), belleV0.vy(), belleV0.vz());
     int trackFitPIndex = -1;
@@ -622,7 +634,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         belleVeeDaughterToCartesian(belleV0, 1, pTypeP, momentumP, positionP, error7x7P);
         TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumP, positionP, error7x7P, 1, pTypeP, 0.5, -1, -1, 0));
-        // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
+        // TrackFitResult internally stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
 
         for (unsigned i = 0; i < 7; i++)
@@ -637,6 +649,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       } else {
         Belle::Mdst_trk_fit& trk_fit = charged_mag[trackID[0] - 1].trk().mhyp(belleHypP);
         double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
+        if (std::isnan(pValue)) continue;
 
         std::vector<float> helixParam(5);
         std::vector<float> helixError(15);
@@ -678,7 +691,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         belleVeeDaughterToCartesian(belleV0, -1, pTypeM, momentumM, positionM, error7x7M);
         TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumM, positionM, error7x7M, -1, pTypeM, 0.5, -1, -1, 0));
-        // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
+        // TrackFitResult internally stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
         for (unsigned i = 0; i < 7; i++)
           for (unsigned j = 0; j < 7; j++)
@@ -692,6 +705,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       } else {
         Belle::Mdst_trk_fit& trk_fit = charged_mag[trackID[1] - 1].trk().mhyp(belleHypM);
         double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
+        if (std::isnan(pValue)) continue;
 
         std::vector<float> helixParam(5);
         std::vector<float> helixError(15);
@@ -1682,10 +1696,13 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
   Belle::Mdst_trk& trk = belleTrack.trk();
 
   for (int mhyp = 0 ; mhyp < c_nHyp; ++mhyp) {
+    Belle::Mdst_trk_fit& trk_fit = trk.mhyp(mhyp);
+
+    double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
+    if (std::isnan(pValue)) continue;
+
     const Const::ChargedStable& pType = c_belleHyp_to_chargedStable[mhyp];
     double thisMass = pType.getMass();
-
-    Belle::Mdst_trk_fit& trk_fit = trk.mhyp(mhyp);
 
     // Converted helix parameters
     std::vector<float> helixParam(5);
@@ -1708,8 +1725,6 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     for (unsigned int i = 0; i < size; i++)
       for (unsigned int j = i; j < size; j++)
         helixError[counter++] = error5x5[i][j];
-
-    double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
 
     // Create an empty cdc hitpattern and set the number of total hits
     // use hits from 0: axial-wire, 1:stereo-wire, 2:cathode
@@ -2017,7 +2032,7 @@ void B2BIIConvertMdstModule::setTracksToECLClustersRelations()
 
       // the numbering in mdst_charged
       // not necessarily the same as in mdst_trk
-      // therfore have to find corresponding mdst_charged
+      // therefore have to find corresponding mdst_charged
       for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); ++chgIterator) {
         Belle::Mdst_charged mChar = *chgIterator;
         Belle::Mdst_trk mTRK_in_charged = mChar.trk();

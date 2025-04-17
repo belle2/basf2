@@ -12,11 +12,7 @@
 
 #include <Math/RotationY.h>
 
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 

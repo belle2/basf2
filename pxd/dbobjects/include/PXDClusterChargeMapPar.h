@@ -20,7 +20,7 @@ namespace Belle2 {
    *  stored in raw ADC units (called ADU).
    *
    *  The granularity of the grid is user adjustable. The default
-   *  value of a missing calibraiton is -1.0.
+   *  value of a missing calibration is -1.0.
    */
 
   class PXDClusterChargeMapPar: public TObject {

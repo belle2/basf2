@@ -138,7 +138,7 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
   }
   std::sort(rankedTracks.begin(), rankedTracks.end(), GreaterOf<First>());
 
-  // Memory for the splitted segments
+  // Memory for the split segments
   std::deque<CDCSegment3D> segments;
 
   // Memory for the relations between tracks to be followed on linking
@@ -310,7 +310,7 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
   }
 
   // Simple approach
-  // Incoporate the second input tracks in to the first input tracks by looking for large overlaps
+  // Incorporate the second input tracks in to the first input tracks by looking for large overlaps
   // Very simple approach use the first tracks and add the ones from the second tracks with no overlap to the first
   // outputTracks.insert(outputTracks.end(), inputTracks.begin(), inputTracks.end());
   // for (const CDCTrack& secondTrack : secondInputTracks) {

@@ -23,7 +23,7 @@
 
 namespace Belle2 {
   //! The Class for ARICH Geometry Parameters
-  /*! This class provides ARICH gemetry paramters for simulation, reconstruction and so on.
+  /*! This class provides ARICH geometry parameters for simulation, reconstruction and so on.
     These parameters are gotten from gearbox.
   */
 
@@ -121,7 +121,7 @@ namespace Belle2 {
     int getDetectorXPadNumber();
     //! get QE scaling factor for photons internally reflected in HAPD window
     double getQEScaling();
-    //! get absorbtion probability for photons internally reflected in HAPD window
+    //! get absorption probability for photons internally reflected in HAPD window
     double getWindowAbsorbtion();
     //! get factor to suppress p.e. detection efficiency due to negative polarity crosstalk among chip channels
     double getChipNegativeCrosstalk();
@@ -193,7 +193,7 @@ namespace Belle2 {
     int m_nRad;                            /*!< Number of aerogel layers */
     bool m_init;                          /*!< True if parametrization is already initialized */
     bool m_simple;                        /*!< True if parametrization initialized with simple geometry (beamtest) */
-    double m_aeroTrLength[MAX_N_ALAYERS];  /*!< Array of aerogel transmission lenths */
+    double m_aeroTrLength[MAX_N_ALAYERS];  /*!< Array of aerogel transmission lengths */
     double m_aeroRefIndex[MAX_N_ALAYERS];  /*!< Array of aerogel refracive indices */
     double m_aeroZPosition[MAX_N_ALAYERS]; /*!< Array of aerogel Z positions */
     double m_aeroThickness[MAX_N_ALAYERS]; /*!< Array of aerogel thickness */
@@ -206,7 +206,7 @@ namespace Belle2 {
     double m_LambdaStep;                  /*!< wavelength [nm]: step */
     int m_NpointsQE;                      /*!< number of QE data points */
     double m_qeScale;                     /*!< QE scale factor for photons internally reflected in HAPD window */
-    double m_windowAbsorbtion;            /*!< absorbtion probability for photons internally reflected in HAPD window */
+    double m_windowAbsorbtion;            /*!< absorption probability for photons internally reflected in HAPD window */
     double m_chipNegativeCrosstalk;       /*!< to simulate opposite polarity crosstalk among channels on chip */
     double m_QE[MAXPTS_QE];               /*!< quantum efficiency curve */
 

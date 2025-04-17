@@ -38,7 +38,7 @@ EventT0GeneratorModule::EventT0GeneratorModule() : Module()
                  "production and decay times of MCParticles. This means that after "
                  "this module the time origin (t = 0) is set to what L1 trigger "
                  "would give as the collision time. In case of cosmics, the L1 trigger"
-                 "jitter is generated according to a continuos double gaussian distribution");
+                 "jitter is generated according to a continuous double gaussian distribution");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -139,7 +139,7 @@ void EventT0GeneratorModule::event()
   if (not m_initialParticles.isValid()) m_initialParticles.create();
   m_initialParticles->setTime(eventTime);
 
-  // store revo9count (modulo range) in order to be distibuted to sub-detectors
+  // store revo9count (modulo range) in order to be distributed to sub-detectors
   revo9count %= revo9range;
   if (revo9count < 0) revo9count += revo9range;
 

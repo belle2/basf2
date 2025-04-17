@@ -63,7 +63,7 @@ void processDstar(){
   h_md0_pi->SetMarkerColor(1);
   h_md0_k->SetMarkerColor(1);
     
-  // make fit functions (double gaussian for signal peak + flat backgroud)
+  // make fit functions (double gaussian for signal peak + flat background)
   TF1* fitf = new TF1("fitf", "[0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[1])/[4])**2)) + [5]",1.81,1.9);
   TF1* sigf = new TF1("sigf", "[0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[1])/[4])**2))",1.81,1.9);
   TF1* bkgf = new TF1("bkgf", "pol0",1.81,1.9);

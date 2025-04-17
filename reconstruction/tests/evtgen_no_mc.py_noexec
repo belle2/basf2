@@ -9,7 +9,7 @@
 ##########################################################################
 
 # This script checks if the standard reconstruction also runs without attached
-# MC inforamation (which is the case for real data).
+# MC information (which is the case for real data).
 #
 # To test this, we simulate 1 event with evtgen, then get rid of all the
 # "none-detector" data (in the future we should probably use the packers for

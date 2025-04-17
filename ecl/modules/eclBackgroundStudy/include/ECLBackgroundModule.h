@@ -59,7 +59,7 @@ namespace Belle2 {
     /** terminate */
     virtual void terminate() override;
 
-    /** Initalize the histograms*/
+    /** Initialize the histograms*/
     virtual void defineHisto() override;
 
   private:
@@ -178,7 +178,7 @@ namespace Belle2 {
     const double DiodeMass = DiodeArea * DiodeThk * SiRho;;
 
 
-    /** ARICH geometry paramaters */
+    /** ARICH geometry parameters */
 #ifdef DOARICH
     ARICHGeometryPar* m_arichgp {0};   /**< Geometry parameters of ARICH. */
 #endif

@@ -22,7 +22,7 @@
     <coolingPosR>
       705 877 791 1006.5 920.5 705 877 791 1006.5 920.5 705 877 791 1006.5 920.5 705 877 791 1006.5 920.5 705 877 791 1006.5 920.5 705 877 791 1006.5 920.5
     </coolingPosR>
-    <!-- Azimuthal angle of rotation aroud Z - axis of the cooling system object in polar coordinate system in deg -->
+    <!-- Azimuthal angle of rotation around Z - axis of the cooling system object in polar coordinate system in deg -->
     <coolinRotationAngle>
       30 27.7013 0.287129 55.023 59.7074 90 92.2987 119.713 64.977 60.2926 150 152.299 179.713 124.977 120.293 210 207.701 180.287 235.023 239.707 270 272.299 299.713 244.977 240.293 330 332.299 359.713 304.977 300.293
     </coolinRotationAngle>
@@ -46,7 +46,7 @@
     <!-- Please note that ARICH detector envelope does not have enough 
 	 space for 8 mm thick cooling test plate (5.5 mm is only available). 
 	 For this reason the material assigned to the volume (aluminum, copper) 
-	 will have a bigger dencity for effective descrption of the material. -->
+	 will have a bigger dencity for effective description of the material. -->
     <material desc="Material of cooling test plate">ARICH_cooling_plate_Al</material>
     <materialColdTube desc="Material of cold tube">ARICH_cold_tube_Cu</materialColdTube>
     <!-- Please note the sizes given for x, y, z are before the rotation -->

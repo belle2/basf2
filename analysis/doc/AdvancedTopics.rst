@@ -26,3 +26,5 @@ Advanced Topics
 .. toctree:: PIDCalibrationWeights
 
 .. toctree:: embedding
+
+.. toctree:: OfflineReweighting

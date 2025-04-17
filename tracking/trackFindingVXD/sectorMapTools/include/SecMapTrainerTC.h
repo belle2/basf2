@@ -47,7 +47,7 @@ namespace Belle2 {
     /** returns pdgCode of current track. */
     int getPDG() const { return m_pdg; }
 
-    /** returns number of hits attached to curren track. */
+    /** returns number of hits attached to current track. */
     unsigned size() const { return m_hits.size(); }
 
     /** get Pt of track. */

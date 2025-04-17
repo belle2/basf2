@@ -9,7 +9,7 @@
 /* Own header. */
 #include <online_book/awesome/geometry/AWESOMEGeometryCreator.h>
 
-/* Belle2 haders. */
+/* Belle2 headers. */
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <geometry/CreatorFactory.h>

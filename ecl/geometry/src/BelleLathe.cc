@@ -961,9 +961,9 @@ double BelleLathe::mindist(const zr_t& r) const
   do {
     const cachezr_t& s = fcache[i];
     double dz = r.z - s.z, dr = r.r - s.r;
-    double dot = s.dz * dz + s.dr * dr; // projection of the point on the segement
+    double dot = s.dz * dz + s.dr * dr; // projection of the point on the segment
     if (dot <   0) {
-      d = min(d, dz * dz + dr * dr); // distance to the first point of the segement
+      d = min(d, dz * dz + dr * dr); // distance to the first point of the segment
     } else if (dot <= s.s2) { // point should be within the segment
       double crs = s.dr * dz - s.dz * dr;
       d = min(d, crs * crs * s.is2);
@@ -1025,9 +1025,9 @@ zr_t BelleLathe::normal(const zr_t& r, double& d2) const
   for (int i = 0, imax = fcache.size(); i < imax; i++) {
     const cachezr_t& s = fcache[i];
     double dz = r.z - s.z, dr = r.r - s.r;
-    double dot = s.dz * dz + s.dr * dr; // projection of the point on the segement
+    double dot = s.dz * dz + s.dr * dr; // projection of the point on the segment
     if (dot <   0) {
-      double dist = dz * dz + dr * dr; // distance to the first point of the segement
+      double dist = dz * dz + dr * dr; // distance to the first point of the segment
       if (dist < d) { d = dist; t = dot * s.is2; iseg = i;}
     } else if (dot <= s.s2) { // point should be within the segment
       double crs = s.dr * dz - s.dz * dr;
@@ -2019,7 +2019,7 @@ double mindistsimd(const zr_t& r, const vector<cachezr_t>& contour)
     const cachezr_t& s = contour[i];
     double dz = r.z - s.z, dr = r.r - s.r;
     double crs = s.dr * dz - s.dz * dr;
-    double dot = s.dz * dz + s.dr * dr; // projection of the point on the segement
+    double dot = s.dz * dz + s.dr * dr; // projection of the point on the segment
     //    if(s.zmin<=r.z&&r.z<s.zmax) wn -= (crs>0) - (crs<0);
     __m128d crssd =  _mm_set_sd(crs);
     __m128d maskgt = _mm_cmpgt_sd(crssd, zero);
@@ -2080,12 +2080,12 @@ double mindist(const zr_t& r, const vector<zr_t>& contour)
     double dz = r.z - s0.z, dr = r.r - s0.r;
     double crs = dz * sr - sz * dr;
     if (zmin <= r.z && r.z < zmax) wn -= (crs > 0) - (crs < 0);
-    double dot = sz * dz + sr * dr; // projection of the point on the segement
+    double dot = sz * dz + sr * dr; // projection of the point on the segment
     double s2 = sz * sz + sr * sr;
     if (dot > s2) return; // point should be within the segment
     if (dot < 0)
     {
-      double d2 = dz * dz + dr * dr; // distance to the first point of the segement
+      double d2 = dz * dz + dr * dr; // distance to the first point of the segment
       d = min(d, d2);
     } else
     {
@@ -2111,11 +2111,11 @@ double mindist(const zr_t& r, const vector<cachezr_t>& contour)
     const cachezr_t& s = contour[i];
     double dz = r.z - s.z, dr = r.r - s.r;
     double crs = s.dr * dz - s.dz * dr;
-    double dot = s.dz * dz + s.dr * dr; // projection of the point on the segement
+    double dot = s.dz * dz + s.dr * dr; // projection of the point on the segment
     if (s.zmin <= r.z && r.z < s.zmax) wn -= (crs > 0) - (crs < 0);
     if (dot > s.s2) continue; // point should be within the segment
     if (dot <   0) {
-      d = min(d, dz * dz + dr * dr); // distance to the first point of the segement
+      d = min(d, dz * dz + dr * dr); // distance to the first point of the segment
     } else {
       d = min(d, crs * crs * s.is2);
     }

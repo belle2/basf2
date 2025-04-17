@@ -12,8 +12,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-// Magnetic field
-#include <framework/geometry/BFieldManager.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 using namespace std;
 
@@ -32,6 +31,7 @@ SelectDaughtersModule::SelectDaughtersModule() : Module()
 {
   // Set module properties
   setDescription("SelectDaughters");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   //Parameter definitions
   addParam("listName", m_listName, "name of particle list", string(""));

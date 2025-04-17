@@ -10,7 +10,6 @@
 
 #include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
-#include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>

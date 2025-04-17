@@ -9,7 +9,7 @@
 ##########################################################################
 
 """
-Check for possible problems on the processing path that will affect HLT procesing
+Check for possible problems on the processing path that will affect HLT processing
 
 1. Conditions not continuing to main path
 
@@ -20,7 +20,7 @@ Check for possible problems on the processing path that will affect HLT procesin
 2. Multiple EventErrorFlags on one path
 
    We don't want to sent multiple error flags unconditionally after each other so
-   if there are two ore more EventErrorFlags on one path this is wrong.
+   if there are two or more EventErrorFlags on one path this is wrong.
 """
 
 import sys

@@ -13,19 +13,17 @@
 #include <beast/csi/geometry/CsiGeometryPar.h>
 
 // Basf2 headers
-#include <framework/core/RandomNumbers.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // ROOT headers
 #include <TGraph.h>
-#include <TH1F.h>
+#include <TH1.h>
 #include <TH1I.h>
-#include <TMath.h>
+#include <TRandom.h>
 #include <Math/Vector3D.h>
 
 // C++ headers
-#include <math.h>
 #include <vector>
 
 using namespace std;

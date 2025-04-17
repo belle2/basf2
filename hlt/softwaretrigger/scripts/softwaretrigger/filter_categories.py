@@ -54,7 +54,8 @@ PHYSICS = [
     "filter singleTagLowMassB",
     "filter singleTagHighMassB",
     "filter b2b phi photons",
-    "filter displaced vertex"
+    "filter displaced vertex",
+    "filter single diPhoton"
 ]
 
 # QED channels

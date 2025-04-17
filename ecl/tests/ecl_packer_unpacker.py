@@ -97,7 +97,7 @@ class ECLPackerUnpackerTestModule(b2.Module):
         # first convert to a python-list to be able to sort
         py_list = [x for x in unsortedPyStoreArray]
 
-        # sort via a hierachy of sort keys
+        # sort via a hierarchy of sort keys
         return sorted(
             py_list,
             key=lambda x: (
@@ -177,7 +177,7 @@ main.add_module(addECLDigitsModule())
 ecl_packer = b2.register_module('ECLPacker')
 main.add_module(ecl_packer)
 
-# add the unpacker which unpacks the RawECL into ECLDigits and store them in a seperate datstore container
+# add the unpacker which unpacks the RawECL into ECLDigits and store them in a separate datstore container
 ecl_unpacker = b2.register_module('ECLUnpacker')
 # set the unpacker output datastore name, so that we don't overwrite the "normal" ECLDigits
 ecl_unpacker.param('ECLDigitsName', unpackerOutputDatastoreName)

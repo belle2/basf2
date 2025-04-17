@@ -51,7 +51,7 @@ namespace Belle2 {
 
     /**
      * Set Physical Identifier on the device
-     * @param Physical Identifier
+     * @param id Physical Identifier
      */
     void setHighVoltageID(int id) { m_id = id;}
 
@@ -61,7 +61,7 @@ namespace Belle2 {
     ARICHCableInfo getArichCable() const {return m_cable; }
 
     /** Set Cable Identifier
-     * @param Cable Identifier
+     * @param cable Cable Identifier
      */
     void setArichCable(ARICHCableInfo cable) {m_cable = cable; }
 
@@ -72,7 +72,7 @@ namespace Belle2 {
 
     /**
      * Set High Voltage
-     * @param High Voltage
+     * @param hvSet High Voltage
      */
     void setHighVoltage(float hvSet) { m_vSet = hvSet;}
 
@@ -82,7 +82,7 @@ namespace Belle2 {
     float getMaximumHighVoltage() const {return m_vMax; }
 
     /** Set Maximum High Voltage
-     * @param Maximum High Voltage
+     * @param vMax Maximum High Voltage
      */
     void setMaximumHighVoltage(float vMax) {m_vMax = vMax; }
 
@@ -92,7 +92,7 @@ namespace Belle2 {
     float getMaximumCurrent() const {return m_iMax; }
 
     /** Set Maximum Current
-     * @param Maximum Current
+     * @param iMax Maximum Current
      */
     void setMaximumCurrent(float iMax) {m_iMax = iMax; }
 
@@ -103,7 +103,7 @@ namespace Belle2 {
 
     /**
      * Set Rate of the Voltage increase during ramp up
-     * @param Rate during ramp up
+     * @param rampU Rate during ramp up
      */
     void setRateDuringRampUp(float rampU) { m_rampUp = rampU;}
 
@@ -114,7 +114,7 @@ namespace Belle2 {
 
     /**
      * Set Rate of the Voltage increase during ramp down
-     * @param Rate during ramp down
+     * @param rampD Rate during ramp down
      */
     void setRateDuringRampDown(float rampD) { m_rampDown = rampD;}
 
@@ -124,7 +124,7 @@ namespace Belle2 {
     TTimeStamp getTimeStamp() const {return m_timeStamp; }
 
     /** Set Time of the constant creation
-     * @param Time of the constant creation
+     * @param timeStamp Time of the constant creation
      */
     void setTimeStamp(TTimeStamp timeStamp) {m_timeStamp = timeStamp; }
 

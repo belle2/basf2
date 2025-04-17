@@ -18,10 +18,10 @@ import collections
 class ArgumentParser(argparse.ArgumentParser):
 
     """An argparse.Argument parse slightly changed such
-    that it always prints an extended help message incase of a parsing error."""
+    that it always prints an extended help message increase of a parsing error."""
 
     def error(self, message):
-        """Method invoked when a parsing error occured.
+        """Method invoked when a parsing error occurred.
         Writes an extended help over the base ArgumentParser.
         """
         self.print_help()
@@ -82,7 +82,7 @@ def extend_path(path,
                 module,
                 module_by_short_name={},
                 allow_function_import=False):
-    """Convenience adder function that can resolve addtional short hand module names from a dictionary"""
+    """Convenience adder function that can resolve additional short hand module names from a dictionary"""
     if isinstance(module, basf2.Module):
         # A module instance
         path.add_module(module)
@@ -131,7 +131,7 @@ def extend_path(path,
         # try it as a convenience function that add modules to the path
         module(path)
 
-    elif isinstance(module, collections.Iterable):
+    elif isinstance(module, collections.abc.Iterable):
         # A list of modules or basf2.Path
         modules = module
         for module in modules:
@@ -143,7 +143,7 @@ def extend_path(path,
 * a module (python) class
 * a module name
 * a add_* function
-* a short name resolveable from %s.'
+* a short name resolvable from %s.'
 * an iterable of the above (e.g. basf2.Path)
 """
         raise ValueError(message_template % (module,

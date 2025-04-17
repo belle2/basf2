@@ -9,10 +9,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
+
 namespace Belle2 {
   /**
    *  Module to geometrically match neutral hadrons (KL, neutrons) to ECL clusters

@@ -164,7 +164,7 @@ for nproc in [0, 3]:
             # SIGPIPE would be nice, too. just stops immediately now
         except Exception as e:
             # Note: Without specifying exception type, we might get those from forked processes, too
-            basf2.B2WARNING(f"Exception occured for nproc={nproc}, test_in_process={in_proc}")
+            basf2.B2WARNING(f"Exception occurred for nproc={nproc}, test_in_process={in_proc}")
             raise e
 
 print("\n")

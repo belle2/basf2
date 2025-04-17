@@ -24,16 +24,16 @@ namespace Belle2 {
       /// Getter for the sign of the magnetic field in z direction
       static ESign getBFieldZSign();
 
-      /// Getter for the signed magnetic field stength in z direction at the origin ( in Tesla )
+      /// Getter for the signed magnetic field strength in z direction at the origin ( in Tesla )
       static double getBFieldZ();
 
-      /// Getter for the signed magnetic field stength in z direction ( in Tesla )
+      /// Getter for the signed magnetic field strength in z direction ( in Tesla )
       static double getBFieldZ(const Vector2D& pos2D);
 
-      /// Getter for the signed magnetic field stength in z direction ( in Tesla )
+      /// Getter for the signed magnetic field strength in z direction ( in Tesla )
       static double getBFieldZ(const Vector3D& pos3D);
 
-      /// Translater from magnetic field strength in Tesla to the alpha value.
+      /// Translator from magnetic field strength in Tesla to the alpha value.
       static double getAlphaFromBField(double bField);
 
       /// Getter for the signed alpha of the magnetic field in z direction

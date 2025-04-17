@@ -72,11 +72,11 @@ namespace Belle2 {
       std::size_t size() const
       { return std::distance(begin(), end()); }
 
-      /// Returns the derefenced iterator at begin()
+      /// Returns the dereferenced iterator at begin()
       Reference front() const
       { return *(begin()); }
 
-      /// Returns the derefenced iterator before end()
+      /// Returns the dereferenced iterator before end()
       Reference back() const
       { return *(end() - 1); }
 

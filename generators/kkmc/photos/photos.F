@@ -1063,8 +1063,8 @@ C let-s take newcomers to the end of HEPEVT.
          ISTHEP(NHEP0+LL)=ISTPHO(NA+LL)
          JMOHEP(1,NHEP0+LL)=IP
          JMOHEP(2,NHEP0+LL)=JMOHEP(2,JDAHEP(1,IP))
-         JDAHEP(1,NHEP0+LL)=0
-         JDAHEP(2,NHEP0+LL)=0
+         JDAHEP(1,NHEP0+LL)=JDAPHO(1,NA+LL)
+         JDAHEP(2,NHEP0+LL)=JDAPHO(2,NA+LL)
            DO I=1,5
              PHEP(I,NHEP0+LL) = PPHO(I,NA+LL)
            ENDDO
@@ -2223,7 +2223,7 @@ C--   Photon mother and daughter pointers !
       JMOPHO(1,NPHO)=IP
       JMOPHO(2,NPHO)=0
       JDAPHO(1,NPHO)=0
-      JDAPHO(2,NPHO)=0
+      JDAPHO(2,NPHO)=-1
       PPHO(4,NPHO)=EPHOTO*PPHO(5,IP)/PMAVIR
 C--
 C--   ...and photon momenta

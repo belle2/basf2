@@ -17,7 +17,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCFacet;
 
-    /// Class filtering the neighborhood of facets with monte carlo information
+    /// Class filtering the neighborhood of facets with Monte Carlo information
     class MCFacetRelationFilter : public MCSymmetric<BaseFacetRelationFilter> {
 
     private:
@@ -27,7 +27,7 @@ namespace Belle2 {
     public:
       /**
        *  Constructor also setting the switch if the reversed version of a facet
-       *  (in comparision to MC truth) shall be accepted.
+       *  (in comparison to MC truth) shall be accepted.
        */
       explicit MCFacetRelationFilter(bool allowReverse = false);
 

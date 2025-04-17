@@ -60,7 +60,7 @@ namespace Belle2 {
       CDCTrajectory3D fusePreliminary(const CDCSegment2D& fromSegment2D,
                                       const CDCSegment2D& toSegment2D);
 
-      /// Combine the two segments given a prelimiary reference trajectory to which a creation is applied
+      /// Combine the two segments given a preliminary reference trajectory to which a creation is applied
       CDCTrajectory3D reconstructFuseTrajectories(const CDCSegment2D& fromSegment2D,
                                                   const CDCSegment2D& toSegment2D,
                                                   const CDCTrajectory3D& preliminaryTrajectory3D);
@@ -75,7 +75,7 @@ namespace Belle2 {
 
 
     private:
-      /// Swtich to reestimate the  drift length.
+      /// Switch to re-estimate the  drift length.
       bool m_reestimateDriftLength;
 
       /// Helper object to carry out the drift length estimation

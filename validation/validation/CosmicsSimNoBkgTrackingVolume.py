@@ -34,7 +34,7 @@ main.add_module(
 )
 
 # Generate cosmic events. Note: with default settings the cosmics are
-# generated on a cylinder of 125cm (closely outside the tracking valume)!
+# generated on a cylinder of 125cm (closely outside the tracking volume)!
 main.add_module("Cosmics")
 
 # detector simulation

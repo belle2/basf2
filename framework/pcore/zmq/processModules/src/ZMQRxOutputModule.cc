@@ -5,7 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/zmq/processModules/ZMQRxOutputModule.h>
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
@@ -114,8 +113,6 @@ void ZMQRxOutputModule::event()
 
 
     B2DEBUG(100, "Start polling");
-    //    const int pollReply = m_zmqClient.poll(m_param_maximalWaitingTime, multicastAnswer, socketAnswer);
-    //    const int pollReply = m_zmqClient.poll((unsigned int)7200 * 1000, multicastAnswer, socketAnswer);
     const int pollReply = m_zmqClient.poll(Environment::Instance().getZMQMaximalWaitingTime(), multicastAnswer, socketAnswer);
     B2ASSERT("Output process did not receive any message in some time. Aborting.", pollReply);
     //    B2INFO ( "ZMQRxOutput : event received" );

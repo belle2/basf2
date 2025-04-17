@@ -300,7 +300,7 @@ Vector2D CDCTrajectory2D::getInnerExit() const
   const Vector2D support = getSupport();
   const PerigeeCircle globalCircle = getGlobalCircle();
   if (support.cylindricalR() < innerCylindricalR) {
-    // If we start within the inner volumn of the CDC we want the trajectory to enter the CDC
+    // If we start within the inner volume of the CDC we want the trajectory to enter the CDC
     // and not stop at first intersection with the inner wall.
     // Therefore we take the inner exit that comes after the apogee (far point of the circle).
     const Vector2D apogee = globalCircle.apogee();

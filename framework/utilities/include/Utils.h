@@ -90,10 +90,10 @@ namespace Belle2 {
 
   /**
    * Print an INFO message txt followed by the time it took to execute the
-   * statment given as second argument.
+   * statement given as second argument.
    *
    * Care should be taken not to define variables in this call since they will
-   * be scoped and thus unavaiable after the macro
+   * be scoped and thus unavailable after the macro
    */
 #define B2INFO_MEASURE_TIME(txt, ...) {\
     std::stringstream __b2_timer_str__;\

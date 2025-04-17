@@ -10,6 +10,8 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/EventLimit.h>
 
 namespace Belle2 {
   /** The EventLimiter module.
@@ -40,8 +42,14 @@ namespace Belle2 {
     /** Datastore pointers */
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
+    /** DB object to get event limit from the conditions database */
+    OptionalDBObjPtr<EventLimit> m_eventLimitFromDB;
+
     /** Maximum number of events to be collected at the start of each run (-1 = no maximum) */
     int m_maxEventsPerRun;
+
+    /** If true, load event limits from the ConditionsDB. */
+    bool m_loadFromDB;
 
     /** Flag that will be returned by the module. Gets set to True at the start of the run
      * and False once we hit the maximum events */

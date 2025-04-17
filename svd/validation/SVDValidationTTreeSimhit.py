@@ -23,7 +23,7 @@ import basf2 as b2
 
 # Some ROOT tools
 import ROOT
-from ROOT import Belle2  # make Belle2 namespace available
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT import gROOT, addressof
 
 # Define a ROOT struct to hold output data in the TTree

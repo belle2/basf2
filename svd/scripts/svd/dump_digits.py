@@ -58,7 +58,7 @@ class dump_digits(b2.Module):
 
             s = ''
 
-            # Sesnor/side/strip identification
+            # Sensor/side/strip identification
             [layer, ladder, sensor] = self.decode(reco_digit.getRawSensorID())
             s += f'{event_number} {layer} {ladder} {sensor} {"u" if reco_digit.isUStrip() else "v"} {reco_digit.getCellID()} '
             sensorID = reco_digit.getSensorID()

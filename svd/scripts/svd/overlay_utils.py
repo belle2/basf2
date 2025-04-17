@@ -40,14 +40,14 @@ def prepare_svd_overlay(path, inputFiles, outputFileTag="overlay"):
         b2.conditions.override_globaltags()
         b2.conditions.globaltags = ['svd_basic', "online"]
         splittext = ""
-        if(str(outputFileTag) == "ZS3"):
+        if (str(outputFileTag) == "ZS3"):
             splittext = inputfile.split(".root")
         else:
             splittext = inputfile.split("_ZS3.root")
         outputfile = splittext[0]+"_"+str(outputFileTag)+".root"
         main = b2.create_path()
         main.add_module("RootInput", inputFileNames=inputfile)
-        if(str(outputFileTag) == "ZS3"):
+        if (str(outputFileTag) == "ZS3"):
             main.add_module("SVDUnpacker", svdShaperDigitListName="SVDShaperDigitsZS3")
 
         zs = 3

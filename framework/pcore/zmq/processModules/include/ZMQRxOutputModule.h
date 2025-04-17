@@ -22,7 +22,7 @@ namespace Belle2 {
    */
   class ZMQRxOutputModule : public Module {
   public:
-    /// Constructor setting the moudle paramters
+    /// Constructor setting the module parameters
     ZMQRxOutputModule();
     /// Receive an event and store it in the datastore. Confirm to the input process.
     void event() override;

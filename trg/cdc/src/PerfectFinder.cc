@@ -126,7 +126,7 @@ namespace Belle2 {
         continue;
       }
 
-      //...Check uniquness...
+      //...Check uniqueness...
       vector<TCLink*> layers[9];
       vector<TCLink*> forCircle;
       TCLink::separate(links, 9, layers);

@@ -11,14 +11,11 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>
 
-
 // framework - DataStore
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // DataObjects
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/V0.h>
 #include <mdst/dataobjects/ECLCluster.h>

@@ -22,7 +22,6 @@
 #include <TFile.h>
 
 #include <filesystem>
-#include <iostream>
 #include <string>
 
 using namespace std;
@@ -228,7 +227,7 @@ namespace {
 
   }
 
-  /// Test finalization of the timetable and its adressing
+  /// Test finalization of the timetable and its addressing
   TEST_F(TimeLineTest, TimeTable)
   {
     finalizeTimeTable(initTimeTable);

@@ -46,7 +46,7 @@ class GlobalDeformation:
         return d_xyz
 
     def _transform(self, r, phi, z):
-        """ Fcn to be overriden by child classes, return vector (list of 3 numbers) of displacement """
+        """ Fcn to be overridden by child classes, return vector (list of 3 numbers) of displacement """
 
     def _xyz_to_rphiz(self, xyz):
         """ Convert (x,y,z) to (r,phi,z) """

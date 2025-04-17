@@ -74,8 +74,11 @@ class addECLCalDigitsModule(b2.Module):
         """ module initialize - register ECLCalDigit in datastore """
 
         #: ECLCalDigits datastore
-        self.eclCalDigits = Belle2.PyStoreArray(Belle2.ECLCalDigit.Class(), "ECLCalDigits")
+        self.eclCalDigits = Belle2.PyStoreArray(Belle2.ECLCalDigit.Class())
         self.eclCalDigits.registerInDataStore()
+        # Necessary for ECLDigitCalibrator
+        eclDigits = Belle2.PyStoreArray(Belle2.ECLDigit.Class())
+        eclDigits.registerInDataStore()
 
     def event(self):
         """

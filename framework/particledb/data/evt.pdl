@@ -399,10 +399,10 @@ add  p Particle  D_1-                          -10413      2423.2e-3          25
 add  p Particle  D_10                           10423      2420.8e-3        31.7e-3         160e-3     0     2              0      10423
 add  p Particle  anti-D_10                     -10423      2420.8e-3        31.7e-3         160e-3     0     2              0     -10423
 * D_1(2430). The D_1(2430)+ has not been observed.
-add  p Particle  D'_1+                          20413        2427e-3         384e-3        1000e-3     3     2              0      20413
-add  p Particle  D'_1-                         -20413        2427e-3         384e-3        1000e-3    -3     2              0     -20413
-add  p Particle  D'_10                          20423        2427e-3         384e-3        1000e-3     0     2              0      20423
-add  p Particle  anti-D'_10                    -20423        2427e-3         384e-3        1000e-3     0     2              0     -20423
+add  p Particle  D'_1+                          20413        2427e-3         314e-3        1000e-3     3     2              0      20413
+add  p Particle  D'_1-                         -20413        2427e-3         314e-3        1000e-3    -3     2              0     -20413
+add  p Particle  D'_10                          20423        2427e-3         314e-3        1000e-3     0     2              0      20423
+add  p Particle  anti-D'_10                    -20423        2427e-3         314e-3        1000e-3     0     2              0     -20423
 * D_2*(2460)
 add  p Particle  D_2*+                            415      2465.4e-3        46.7e-3         240e-3     3     4              0        415
 add  p Particle  D_2*-                           -415      2465.4e-3        46.7e-3         240e-3    -3     4              0       -415
@@ -528,7 +528,7 @@ add  p Particle  psi(3770)                      30443      3773.7e-3        27.2
 * The chi_c1(3872) width upper limit is Gamma < 1.2 MeV (90% C. L.) in PDG 2020 data.
 * However, it was measured to be (1.39 +- 0.24 +- 0.10) MeV in arXiv:2005.13419 and
 * (0.96 +0.19 -0.18 +- 0.21) MeV in arXiv:2005.13422 (both preprints by the LHCb collaboration).
-* Although the data sets partially overlap (3 fb^{-1} from b-hadron decays and 9 fb^{-1} fron B+ -> J/psi pi+ pi- K+),
+* Although the data sets partially overlap (3 fb^{-1} from b-hadron decays and 9 fb^{-1} from B+ -> J/psi pi+ pi- K+),
 * an uncorrelated weighted average is used. It is equal to Gamma = (1.15 +- 0.19) MeV.
 add  p Particle  X_1(3872)                    9920443     3871.69e-3        1.15e-3           6e-3     0     2              0    9920443
 add  p Particle  X_2(3872)                    9910445     3871.69e-3        1.15e-3           6e-3     0     4              0    9910445

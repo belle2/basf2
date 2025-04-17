@@ -38,5 +38,3 @@ In the following we describe the ``svd`` package .
 .. toctree:: datastore
 
 .. toctree:: dbstore
-
-.. toctree:: todo

@@ -8,7 +8,7 @@
 # Email: otittel@mpp.mpg.de
 # Cuts: None
 # Date: 30/08/2023
-# Changes: speicify the decay of K_S0; date: 20231129; author: Xiaodong Shi
+# Changes: specify the decay of K_S0; date: 20231129; author: Xiaodong Shi
 
 Alias pi(2S)+sig pi(2S)+
 Alias pi(2S)-sig pi(2S)-

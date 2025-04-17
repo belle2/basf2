@@ -44,8 +44,15 @@ def check_simulation(path):
         b2.B2ERROR(f"Simulation modules in wrong order. Should be '{', '.join(required)}' but is '{', '.join(found)}'")
 
 
-def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered_digits',
-                         doCleanup=True, overrideDB=False, usePXDDataReduction=True, save_slow_pions_in_mc=False):
+def add_PXDDataReduction(
+        path,
+        components,
+        pxd_unfiltered_digits='pxd_unfiltered_digits',
+        doCleanup=True,
+        overrideDB=False,
+        usePXDDataReduction=True,
+        save_slow_pions_in_mc=False,
+        save_all_charged_particles_in_mc=False):
     """
     This function adds the standard simulation modules to a path.
     @param pxd_unfiltered_digits: the name of the StoreArray containing the input PXDDigits
@@ -67,8 +74,12 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
 
     add_roiFinder(path, svd_reco_tracks)
 
-    if save_slow_pions_in_mc:
-        path.add_module('MCSlowPionPXDROICreator', PXDDigitsName=pxd_unfiltered_digits, ROIsName='ROIs')
+    if save_slow_pions_in_mc or save_all_charged_particles_in_mc:
+        path.add_module('MCPXDROICreator',
+                        PXDDigitsName=pxd_unfiltered_digits,
+                        ROIsName='ROIs',
+                        createROIForSlowPionsOnly=save_slow_pions_in_mc,
+                        createROIForAll=save_all_charged_particles_in_mc)
 
     # Filtering of PXDDigits
     pxd_digifilter = b2.register_module('PXDdigiFilter')
@@ -81,24 +92,31 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
 
     # empty the StoreArrays which were used for the PXDDatareduction as those are not needed anymore
     if doCleanup:
+        StoreArrays_to_clean = ['ROIs', '__ROIsvdRecoDigits', '__ROIsvdClusters', '__ROIsvdRecoTracks',
+                                'SPTrackCands__ROI', 'SpacePoints__ROI',
+                                # till here it are StoreArrays, the following are relations and Datastore objects
+                                'SegmentNetwork__ROI', 'PXDInterceptsToROIs',
+                                'RecoHitInformationsTo__ROIsvdClusters',
+                                'SpacePoints__ROITo__ROIsvdClusters', '__ROIsvdClustersToMCParticles',
+                                '__ROIsvdRecoDigitsToMCParticles',
+                                '__ROIsvdClustersTo__ROIsvdRecoDigits', '__ROIsvdClustersToSVDTrueHits',
+                                '__ROIsvdClustersTo__ROIsvdRecoTracks', '__ROIsvdRecoTracksToPXDIntercepts',
+                                '__ROIsvdRecoTracksToRecoHitInformations',
+                                '__ROIsvdRecoTracksToSPTrackCands__ROI']
+
+        # not only prune the pxd_unfiltered_digits, but also their relations to
+        # MCParticles, PXDDigits (the filtered ones), and PXDTrueHits
+        # Only prune the unfiltered PXD if their name is not 'PXDDigits', otherwise all PXDDigits would be lost
+        if pxd_unfiltered_digits != 'PXDDigits':
+            unfiltered_pxd_digits_arrays = [pxd_unfiltered_digits,
+                                            f'{pxd_unfiltered_digits}ToMCParticles',
+                                            f'{pxd_unfiltered_digits}ToPXDDigits',
+                                            f'{pxd_unfiltered_digits}ToPXDTrueHits']
+            StoreArrays_to_clean += unfiltered_pxd_digits_arrays
+
         datastore_cleaner = b2.register_module('PruneDataStore')
         datastore_cleaner.param('keepMatchedEntries', False)
-        datastore_cleaner.param('matchEntries', ['ROIs', '__ROIsvdRecoDigits', '__ROIsvdClusters', '__ROIsvdRecoTracks',
-                                                 'SPTrackCands__ROI', 'SpacePoints__ROI', pxd_unfiltered_digits,
-                                                 # till here it are StoreArrays, the following are relations and Datastore objects
-                                                 'SegmentNetwork__ROI', 'PXDInterceptsToROIs',
-                                                 'RecoHitInformationsTo__ROIsvdClusters',
-                                                 'SpacePoints__ROITo__ROIsvdClusters', '__ROIsvdClustersToMCParticles',
-                                                 '__ROIsvdRecoDigitsToMCParticles',
-                                                 '__ROIsvdClustersTo__ROIsvdRecoDigits', '__ROIsvdClustersToSVDTrueHits',
-                                                 '__ROIsvdClustersTo__ROIsvdRecoTracks', '__ROIsvdRecoTracksToPXDIntercepts',
-                                                 '__ROIsvdRecoTracksToRecoHitInformations',
-                                                 '__ROIsvdRecoTracksToSPTrackCands__ROI',
-                                                 # not only prune the pxd_unfiltered_digits, but also their relations to
-                                                 # MCParticles, PXDDigits (the filtered ones), and PXDTrueHits
-                                                 f'{pxd_unfiltered_digits}ToMCParticles',
-                                                 f'{pxd_unfiltered_digits}ToPXDDigits',
-                                                 f'{pxd_unfiltered_digits}ToPXDTrueHits'])
+        datastore_cleaner.param('matchEntries', StoreArrays_to_clean)
         path.add_module(datastore_cleaner)
 
 
@@ -116,7 +134,8 @@ def add_simulation(
         FilterEvents=False,
         usePXDGatedMode=False,
         skipExperimentCheckForBG=False,
-        save_slow_pions_in_mc=False):
+        save_slow_pions_in_mc=False,
+        save_all_charged_particles_in_mc=False):
     """
     This function adds the standard simulation modules to a path.
     @param forceSetPXDDataReduction: override settings from the DB with the value set in 'usePXDDataReduction'
@@ -130,6 +149,8 @@ def add_simulation(
       process and the beam background files. Note that this check should be skipped only by experts.
     @param save_slow_pions_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
       of slow pions from D* -> D pi^{\\pm} decays using the MCSlowPionPXDROICreator based on MC truth information
+    @param save_all_charged_particles_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
+      of all charged primary MCParticles that traverse PXD
     """
 
     path.add_module('StatisticsSummary').set_name('Sum_PreSimulation')
@@ -256,7 +277,8 @@ def add_simulation(
                     doCleanup=cleanupPXDDataReduction,
                     overrideDB=forceSetPXDDataReduction,
                     usePXDDataReduction=usePXDDataReduction,
-                    save_slow_pions_in_mc=save_slow_pions_in_mc)
+                    save_slow_pions_in_mc=save_slow_pions_in_mc,
+                    save_all_charged_particles_in_mc=save_all_charged_particles_in_mc)
         else:
             # use DB conditional module to decide whether ROI finding should be activated
             path_disableROI_Sim = b2.create_path()
@@ -277,7 +299,8 @@ def add_simulation(
                 components,
                 pxd_unfiltered_digits='pxd_unfiltered_digits',
                 doCleanup=cleanupPXDDataReduction,
-                save_slow_pions_in_mc=save_slow_pions_in_mc)
+                save_slow_pions_in_mc=save_slow_pions_in_mc,
+                save_all_charged_particles_in_mc=save_all_charged_particles_in_mc)
 
             roi_condition_module_Sim = path.add_module('ROIfindingConditionFromDB')
             roi_condition_module_Sim.if_true(path_enableROI_Sim, b2.AfterConditionPath.CONTINUE)

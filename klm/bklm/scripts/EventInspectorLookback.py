@@ -171,7 +171,7 @@ class EventInspectorLookback(basf2.Module):
                                  nWindows, self.windowMinValue, self.windowMaxValue+self.windowStepValue)
         hist_nEvents.SetStats(False)
         hist_nEvents.SetMinimum(0)
-        values = array.array('d', [0])  # dummy vaue for the histogram's underflow bin
+        values = array.array('d', [0])  # dummy value for the histogram's underflow bin
         for key in self.dict_nEvents:
             values.append(self.dict_nEvents[key])
         values.append(0)  # dummy value for the histogram's overflow bin
@@ -295,7 +295,7 @@ class EventInspectorLookback(basf2.Module):
                         self.hist_mappedRPCTimeCalByWindow = self.dict_mappedRPCTimeCalByWindow[windowValue]
                         self.hist_occupancyXYByWindow = self.dict_occupancyXYByWindow[windowValue]
                     else:
-                        return  # skip bogus event, incuding event with seed value of 0xcafe
+                        return  # skip bogus event, including event with seed value of 0xcafe
                 if lastWord & 0xffff != 0:
                     print("##1 Event", event, 'copper', copper, 'finesse', finesse, 'n=', nWords, 'lastWord=', hex(lastWord))
                 if (nWords % 2) == 0:

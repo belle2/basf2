@@ -26,7 +26,7 @@ namespace Belle2 {
       //! Run Pede and return full result with parameter corrections
       //! @param steering Pede steering object with commands
       PedeResult calibrate(PedeSteering& steering);
-      //! Was Pede successfull (can the result be used)?
+      //! Was Pede successful (can the result be used)?
       bool success() {return warnings() <= 1;}
       //! Level of warnings converted to int
       int warnings() const;

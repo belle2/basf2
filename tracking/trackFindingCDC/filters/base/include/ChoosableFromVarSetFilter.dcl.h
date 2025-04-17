@@ -66,7 +66,7 @@ namespace Belle2 {
       Float_t* m_variable = nullptr;
     };
 
-    /// Convience template to create a filter returning on variable from a set of variables.
+    /// Convince template to create a filter returning on variable from a set of variables.
     template <class ATruthVarSet>
     class ChoosableFromVarSetFilter
       : public ChoosableFromVarSet<Filter<typename ATruthVarSet::Object>> {

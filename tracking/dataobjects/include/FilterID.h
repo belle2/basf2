@@ -50,7 +50,7 @@ namespace Belle2 {
       deltaSlopeRZ, /**< string name of filter dslopeRZ */
       pT, /**< string name of filter pT */
       distance2IP, /**< string name of filter d2IP */
-      helixParameterFit, /**< string name of filter helix Paramater Fit */
+      helixParameterFit, /**< string name of filter helix Parameter Fit */
       deltaSOverZ,  /**< deltaSOverZ Filter */
       deltaSlopeZOverS, /**< deltaSlopeZOverS Filter */
 

@@ -15,10 +15,10 @@ import argparse
 class DefaultHelpArgumentParser(argparse.ArgumentParser):
 
     """An argparse.Argument parse slightly changed such
-    that it always prints an extended help message incase of a parsing error."""
+    that it always prints an extended help message in case of a parsing error."""
 
     def error(self, message):
-        """Method invoked when a parsing error occured.
+        """Method invoked when a parsing error occurred.
         Writes an extended help over the base ArgumentParser.
         """
         self.print_help()

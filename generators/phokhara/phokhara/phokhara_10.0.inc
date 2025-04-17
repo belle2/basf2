@@ -209,3 +209,6 @@ c-------------------common quad momenta--------------------------------
      1 mpi_q,mjp_q,gamjp_q,el_m2q,me_q,alpha_q
        common/quad_param/ piq,Sp_q,w_q,ebeam_q,Qjp_q,Qp2s_q,
      1 mpi_q,mjp_q,gamjp_q,el_m2q,me_q,alpha_q
+      
+      integer error_flag
+      common /belle2_error_flag/ error_flag

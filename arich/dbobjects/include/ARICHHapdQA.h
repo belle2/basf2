@@ -60,7 +60,7 @@ namespace Belle2 {
     TTimeStamp getHapdArrivalDate() const {return m_arrivalDate; }
 
     /** Set HAPD measurement date
-     * @param HAPD measurement date
+     * @param arrivalDate HAPD measurement date
      */
     void setHapdArrivalDate(TTimeStamp arrivalDate) {m_arrivalDate = arrivalDate; }
 
@@ -72,7 +72,7 @@ namespace Belle2 {
 
     /**
      * set Leakeage Current as a function of bias voltage
-     * @param current Leakeage current
+     * @param leakCurrent Leakeage current
      */
     void setHapdLeakCurrent(std::vector<TGraph*> leakCurrent);
 
@@ -84,7 +84,7 @@ namespace Belle2 {
 
     /**
      * Set 2D hit data
-     * @param hit data 2D
+     * @param hitData2D hit data 2D
      */
     void setHapdHitData2D(TH2F* hitData2D) { m_hitData2D = hitData2D;}
 
@@ -108,7 +108,7 @@ namespace Belle2 {
 
     /**
      * set Hit count vs. threshold
-     * @param Hit count vs. threshold
+     * @param hitCount Hit count vs. threshold
      */
     void setHapdHitCount(std::vector<TH1S*> hitCount);
 

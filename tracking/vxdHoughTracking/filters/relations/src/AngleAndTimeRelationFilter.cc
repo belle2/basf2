@@ -10,6 +10,8 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
+#include <cmath>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace vxdHoughTracking;
@@ -38,7 +40,7 @@ AngleAndTimeRelationFilter::operator()(const std::pair<const VXDHoughState*, con
   const VXDHoughState::DataCache& currentHitData = relation.first->getDataCache();
   const VXDHoughState::DataCache& nextHitData = relation.second->getDataCache();
 
-  const double absThetaDiff = abs(currentHitData.theta - nextHitData.theta);
+  const double absThetaDiff = std::abs(currentHitData.theta - nextHitData.theta);
 
   // if the connection is possible in u, it should also be possible in v, but as there could in principle be a chance that the hits
   // are on different sensors (X.X.1 -> X.(X+-1).2 or X.X.2 -> X.(X+-1).1) check for a similar theta value instead of v
@@ -52,7 +54,7 @@ AngleAndTimeRelationFilter::operator()(const std::pair<const VXDHoughState*, con
     return 1.0;
   }
 
-  const ushort absLayerDiff = abs(currentHitData.layer - nextHitData.layer);
+  const ushort absLayerDiff = std::abs(currentHitData.layer - nextHitData.layer);
   if ((absLayerDiff == 1 and absThetaDiff < m_ThetaCutDeltaL1) or
       (absLayerDiff == 2 and absThetaDiff < m_ThetaCutDeltaL2)) {
 

@@ -88,7 +88,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         """Receive signal at the start of event processing"""
         TrackingValidationModule.initialize(self)
 
-        # Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
+        # Use dequeues in favour of lists to prevent repeated memory allocation of cost O(n)
         #: number of all hits
         self.number_of_total_hits = collections.deque()
         #: number of hits on MC track
@@ -126,7 +126,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         #: This number gives information about the "badness" of the fake.
         self.number_of_wrong_hits = collections.deque()
         # It is calculated by going through all hits of the fake track and the connected mc track cands and counting the number.
-        # These numbers are than summed up and substracted by the biggest number
+        # These numbers are than summed up and subtracted by the biggest number
         # of hits this candidates shares with the mc track cands.
         #: list of the number of pattern-reconstructed hits
         self.pr_number_of_hits = collections.deque()

@@ -148,14 +148,11 @@ namespace Belle2 {
 
   protected:
 
-
-    /** The activated sector is created each event where this sector inhabits a spacePoint. */
-    ActivatedSector* m_myActiveSector;
-
-
     /** This vector carries a pointer to each SectorFriendship for faster access during events */
     std::vector<SectorFriendship*> m_myFriends;
 
+    /** The activated sector is created each event where this sector inhabits a spacePoint. */
+    ActivatedSector* m_myActiveSector;
 
     /** secID allows identification of sector.
      *
@@ -181,6 +178,6 @@ namespace Belle2 {
     bool m_useDistance4sort;
 
 
-    ClassDef(Sector, 1)
+    ClassDef(Sector, 2)
   };
 } //Belle2 namespace

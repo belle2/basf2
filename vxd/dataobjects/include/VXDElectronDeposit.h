@@ -27,7 +27,7 @@ namespace Belle2 {
    */
   class VXDElectronDeposit {
   public:
-    /** Enum storing the bit informations for the packed information */
+    /** Enum storing the bit information for the packed information */
     enum EBits {
       /** Number of bits to encode the fraction along the path */
       c_FractionBits = 10,

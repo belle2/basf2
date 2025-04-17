@@ -46,9 +46,9 @@ namespace Belle2 {
       std::vector<double> MomY; /**< y momentum */
       std::vector<double> MomZ; /**< z momentum */
 
-      /** pseudo rapidity. could also be calculated from momentum variables afterwards. here only for convienience */
+      /** pseudo rapidity. could also be calculated from momentum variables afterwards. here only for convenience */
       std::vector<double> Eta;
-      /** transverse momentum. could also be calculated from momentum variables afterwards. here only for convienience */
+      /** transverse momentum. could also be calculated from momentum variables afterwards. here only for convenience */
       std::vector<double> pT;
 
       std::vector<double> VertX; /**< x position of vertex*/
@@ -79,7 +79,7 @@ namespace Belle2 {
 
     std::vector<std::string> m_PARAMrootFileName; /**< name of the output root file name */
 
-    /** take containers pair-wise and only analize those particles that are found in one container but not in the other */
+    /** take containers pair-wise and only analyze those particles that are found in one container but not in the other */
     bool m_PARAMdiffAnalysis;
 
     // ======================================== INTERNALLY USED MEMBERS ===========================================================
@@ -97,7 +97,7 @@ namespace Belle2 {
 
     unsigned int m_skippedTCsCtr; /**< Counter for negative MC particle ids (should always be zero. safety measure) */
 
-    std::vector<unsigned int> m_mcPartCtr; /**< container wise coutner of TrackCands / MCParticles */
+    std::vector<unsigned int> m_mcPartCtr; /**< container wise counter of TrackCands / MCParticles */
 
     /** initialize all counters to 0 to avoid undefined behavior */
     void initializeCounters(size_t nContainers)

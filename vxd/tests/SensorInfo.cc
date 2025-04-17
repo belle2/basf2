@@ -19,7 +19,7 @@ namespace Belle2 {
   namespace VXD {
 
     /**
-     * Check wether all the getters work for a normal, rectangular sensor
+     * Check whether all the getters work for a normal, rectangular sensor
      * with only one pixel/strip size.
      */
     TEST(SensorInfoBase, Rectangular)
@@ -57,7 +57,7 @@ namespace Belle2 {
     }
 
     /**
-     * Check wether all the getters work for a trapezoidal sensor
+     * Check whether all the getters work for a trapezoidal sensor
      * with only one pixel/strip size.
      */
     TEST(SensorInfoBase, Trapezoidal)
@@ -89,7 +89,7 @@ namespace Belle2 {
     }
 
     /**
-     * Check wether all the getters work for a trapezoidal sensor with two
+     * Check whether all the getters work for a trapezoidal sensor with two
      * pixel sizes.
      */
     TEST(SensorInfoBase, Segmented)

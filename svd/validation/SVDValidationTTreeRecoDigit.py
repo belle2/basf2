@@ -43,7 +43,7 @@ from ROOT import EventDataRecoDigit  # noqa
 
 
 class SVDValidationTTreeRecoDigit(b2.Module):
-    '''class to create reco digitis ttree'''
+    '''class to create reco digits ttree'''
 
     def __init__(self):
         """Initialize the module"""

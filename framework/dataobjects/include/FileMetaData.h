@@ -184,6 +184,12 @@ namespace Belle2 {
      */
     void setRandomSeed(const std::string& seed) {m_randomSeed = seed;}
 
+    /** Release version setter.
+     *
+     * @param release The release version.
+     */
+    void setRelease(const std::string& release) {m_release = release;}
+
     /** Steering file content setter.
      *
      *  @param steering The content of the steering file.
@@ -295,6 +301,7 @@ namespace Belle2 {
     friend class B2BIIMdstInputModule;
     friend class BeamBkgHitRateMonitorModule;
     friend class StorageRootOutputModule;
+    friend class VariablesToNtupleModule;
 
     ClassDefOverride(FileMetaData, 11); /**< Metadata information about a file. */
 

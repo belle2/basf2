@@ -161,7 +161,7 @@
 
 
 {
-   Unitialized value in TGeoHMatrix false positive
+   Uninitialized value in TGeoHMatrix false positive
    Memcheck:Cond
    fun:_ZN11TGeoHMatrixaSERK10TGeoMatrix
    fun:_ZN6Belle230SetupGenfitExtrapolationModule18updateVXDAlignmentEv
@@ -170,7 +170,7 @@
 
 
 {
-   Unitialized value in TGeoHMatrix false positive
+   Uninitialized value in TGeoHMatrix false positive
    Memcheck:Cond
    ...
    fun:_ZNK10TGeoMatrixmlERKS_

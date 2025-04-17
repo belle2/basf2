@@ -23,7 +23,7 @@ namespace Belle2 {
 
     /**
      *  A filter that records variables form given objects.
-     *  It may record native varsets and/or weigths from other filters.
+     *  It may record native varsets and/or weights from other filters.
      */
     template <class AFilter>
     class UnionRecording : public Recording<AFilter> {
@@ -58,7 +58,7 @@ namespace Belle2 {
       /// Initialize the recorder before event processing.
       void initialize() override;
 
-      /// Getter for the list of valid names of concret variable sets.
+      /// Getter for the list of valid names of concrete variable sets.
       virtual std::vector<std::string> getValidVarSetNames() const;
 
       /// Getter for the names of valid filters
@@ -81,7 +81,7 @@ namespace Belle2 {
       std::unique_ptr<AFilterFactory> m_filterFactory;
     };
 
-    /// Convience template to create a recording filter for a filter factory.
+    /// Convenience template to create a recording filter for a filter factory.
     template <class AFilterFactory>
     class UnionRecordingFilter : public UnionRecording<typename AFilterFactory::CreatedFilter> {
 

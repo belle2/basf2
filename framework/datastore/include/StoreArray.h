@@ -94,7 +94,7 @@ namespace Belle2 {
       \endcode
    *
    *  In initialize(), you should also use registerInDataStore() or isOptional()/isRequired()
-   *  to specify wether it is an input or output.
+   *  to specify whether it is an input or output.
    *  For <b>non-default names</b> (which you might not know in the constructor, e.g. in the
    *  case of module parameters), set the 'name' argument of any of these three functions to
    *  permanently bind the StoreArray to the array with the given name.
@@ -274,7 +274,7 @@ namespace Belle2 {
     }
 
 
-    /** Check wether the array was registered.
+    /** Check whether the array was registered.
      *
      *  @note Iterating over the array or calling getEntries() is safe even
      *        if this returns false. (getEntries() will return 0)
@@ -287,7 +287,7 @@ namespace Belle2 {
       return m_storeArray;
     }
 
-    /** Check wether the array was registered.
+    /** Check whether the array was registered.
      *
      *  @note Iterating over the array or calling getEntries() is safe even
      *        if this returns false. (getEntries() will return 0)
@@ -353,7 +353,7 @@ namespace Belle2 {
       }
     }
 
-    /** Check wether the array object was created.  **/
+    /** Check whether the array object was created.  **/
     inline bool isCreated() const
     {
       ensureAttached();

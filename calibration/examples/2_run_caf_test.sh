@@ -7,7 +7,7 @@
 # First define and create directories to store the output.
 DATA_DIR=$1
 
-# Feel free to run either of these basf2 scripts. Note that the CAF curently won't let
+# Feel free to run either of these basf2 scripts. Note that the CAF currently won't let
 # you run a new calibration using the same output directory so this will
 # fail quickly if you try and re-run a script without removing the CAF output
 # of the previous process.

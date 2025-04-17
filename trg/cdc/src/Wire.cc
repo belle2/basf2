@@ -35,9 +35,11 @@ namespace Belle2 {
                          const TRGClock& clock)
     : TCCell(id, localId, l, fp, bp),
       _mcHits(),
-      _signal(clock)
+      _signal(clock),
+      _signal_adc(clock)
   {
     _signal.name(name());
+    _signal_adc.name(name());
   }
 
   TRGCDCWire::~TRGCDCWire()
@@ -371,6 +373,8 @@ namespace Belle2 {
 
     _signal.clear();
     _signal.name(name());
+    _signal_adc.clear();
+    _signal_adc.name(name());
   }
 
   string

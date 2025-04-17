@@ -36,9 +36,9 @@ namespace Belle2 {
       double updateDriftLength(CDCRecoHit3D& recoHit3D, double tanLambda);
 
       /**
-       *  Reestimate the drift length of all three contained drift circles.
+       *  Re-estimate the drift length of all three contained drift circles.
        *  Using the additional flight direction information the accuracy of the drift length
-       *  can be increased alot helping the filters following this step
+       *  can be increased a lot helping the filters following this step
        */
       void updateDriftLength(CDCFacet& facet);
 

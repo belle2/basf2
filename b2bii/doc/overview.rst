@@ -1,7 +1,7 @@
 Overview
 ========
 
-The B2BII converter reads and converts Belle MDST within basf2. The converted
+The B2BII converter reads and converts Belle MDST within ``basf2``. The converted
 data is to be analysed within the same job, without any intermediate conversion
 to output ROOT file (Belle II MDST format). The B2BII conversion plus analysis
 workflow is illustrated in this figure:
@@ -19,6 +19,6 @@ Conversion modules:
   After this final step the DataStore is filled with Belle II-type MDST
   dataobjects (Tracks, ECLClusters, PIDLikelihhoods,...).
 
-basf2 analysis:
+The ``basf2`` analysis:
 
-- This part contains the usual sequence of basf2 physics analysis modules.
+- This part contains the usual sequence of ``basf2`` physics analysis modules.

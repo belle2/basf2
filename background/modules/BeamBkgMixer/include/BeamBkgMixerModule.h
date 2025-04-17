@@ -116,7 +116,7 @@ namespace Belle2 {
         tree(nullptr), numFiles(0), numEvents(0), eventCount(0), rate(0.0), index(0)
       {}
       /**
-       * usefull constructor
+       * useful constructor
        * @param bkgTag background tag
        * @param bkgType background type
        * @param fileName file name
@@ -279,7 +279,7 @@ namespace Belle2 {
 
     std::map<std::string, int> m_rejected; /**< messages: rejected events */
     std::map<std::string, int> m_reused;  /**< messages: rejused events */
-    int m_rejectedCount = 0;  /**< counter for suppresing "rejected event" messages */
+    int m_rejectedCount = 0;  /**< counter for suppressing "rejected event" messages */
 
   };
 

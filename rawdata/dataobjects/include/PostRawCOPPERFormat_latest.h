@@ -54,7 +54,7 @@ namespace Belle2 {
 
     ///////////////////////////////////////////////////////////////////////////////////////
 
-    //! get posistion of COPPER block in unit of word
+    //! get position of COPPER block in unit of word
     //    virtual int GetBufferPos(int n);
 
     //

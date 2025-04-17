@@ -104,14 +104,14 @@ namespace Belle2 {
 
 
     /** ************************* DATA MEMBERS ************************* */
-    /** Entry can be of any type, DirectedNode is just the carrier */
-    EntryType& m_entry;
-
     /** Carries all links to inner nodes */
     std::vector<DirectedNode<EntryType, MetaInfoType>*> m_innerNodes;
 
     /** Carries all links to outer nodes */
     std::vector<DirectedNode<EntryType, MetaInfoType>*> m_outerNodes;
+
+    /** Entry can be of any type, DirectedNode is just the carrier */
+    EntryType& m_entry;
 
     /** Contains a MetaInfo for doing extra-stuff (whatever you need) */
     MetaInfoType m_metaInfo;

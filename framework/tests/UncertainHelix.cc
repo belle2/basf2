@@ -8,11 +8,8 @@
 
 #include <framework/dataobjects/UncertainHelix.h>
 #include <TVectorD.h>
-#include <boost/range/irange.hpp>
 #include <framework/utilities/TestHelpers.h>
 #include <gtest/gtest.h>
-
-using boost::irange;
 
 using namespace std;
 using namespace Belle2;
@@ -58,8 +55,8 @@ namespace {
 
     EXPECT_EQ(expectedCharge, charge);
 
-    for (int i : irange(0, 6)) {
-      for (int j : irange(0, 6)) {
+    for (int i = 0; i < 6; ++i) {
+      for (int j = 0; j < 6; ++j) {
         EXPECT_NEAR(expectedCov6(i, j), cov6(i, j), 1e-7);
       }
     }
@@ -77,8 +74,8 @@ namespace {
     TMatrixDSym expectedCov6(6);
     expectedCov6.Zero();
     expectedCov6(0, 0) = 0; // There cannot be a covariance in the x direction since the direction along the track has no constraint.
-    for (int i : irange(1, 6)) {
-      for (int j : irange(1, 6)) {
+    for (int i = 1; i < 6; ++i) {
+      for (int j = 1; j < 6; ++j) {
         // Assign some values to the covariances to check the correct propagation of signs.
         expectedCov6(i, j) = 1;
       }
@@ -124,7 +121,7 @@ namespace {
     nullSpace[5] = 0;
 
     TVectorD nullVector = cov6 * nullSpace;
-    for (int j : irange(0, 6)) {
+    for (int j = 0; j < 6; ++j) {
       EXPECT_NEAR(0, nullVector(j), 1e-7);
     }
 
@@ -138,8 +135,8 @@ namespace {
                                    pValue);
 
     const TMatrixDSym cov6_2 = uncertainHelix2.getCartesianCovariance(bZ);
-    for (int i : irange(0, 6)) {
-      for (int j : irange(0, 6)) {
+    for (int i = 0; i < 6; ++i) {
+      for (int j = 0; j < 6; ++j) {
         EXPECT_NEAR(cov6(i, j), cov6_2(i, j), 1e-7);
       }
     }
@@ -153,7 +150,7 @@ namespace {
     const double bZ = 2;
     const double pValue = 0.5;
 
-    for (int i : irange(1, 6)) {
+    for (int i = 1; i < 6; ++i) {
 
       TMatrixDSym expectedCov6(6);
       expectedCov6.Zero();
@@ -195,7 +192,7 @@ namespace {
       nullSpace[5] = 0;
 
       TVectorD nullVector = cov6 * nullSpace;
-      for (int j : irange(0, 6)) {
+      for (int j = 0; j < 6; ++j) {
         EXPECT_NEAR(0, nullVector(j), 1e-7);
       }
 
@@ -209,8 +206,8 @@ namespace {
                                      pValue);
 
       const TMatrixDSym cov6_2 = uncertainHelix2.getCartesianCovariance(bZ);
-      for (int j : irange(0, 6)) {
-        for (int k : irange(0, 6)) {
+      for (int j = 0; j < 6; ++j) {
+        for (int k = 0; k < 6; ++k) {
           EXPECT_NEAR(cov6(j, k), cov6_2(j, k), 1e-7);
         }
       }
@@ -228,7 +225,7 @@ namespace {
     const double bZ = 2;
     const double pValue = 0.5;
 
-    for (int i : irange(0, 5)) {
+    for (int i = 0; i < 5; ++i) {
 
       TMatrixDSym expectedCov5(5);
       expectedCov5.Zero();
@@ -258,8 +255,8 @@ namespace {
       const TMatrixDSym& cov5 = uncertainHelix2.getCovariance();
       EXPECT_EQ(-1, charge);
 
-      for (int j : irange(0, 5)) {
-        for (int k : irange(0, 5)) {
+      for (int j = 0; j < 5; ++j) {
+        for (int k = 0; k < 5; ++k) {
           EXPECT_NEAR(expectedCov5(j, k), cov5(j, k), 1e-7);
         }
       }
@@ -339,8 +336,8 @@ namespace {
     const TMatrixDSym& cov5 = uncertainHelix2.getCovariance();
     EXPECT_EQ(1, charge);
 
-    for (int i : boost::irange(0, 5)) {
-      for (int j : boost::irange(0, 5)) {
+    for (int i = 0; i < 5; ++i) {
+      for (int j = 0; j < 5; ++j) {
         EXPECT_NEAR(expectedCov5(i, j), cov5(i, j), 1e-7);
       }
     }
@@ -370,8 +367,8 @@ namespace {
 
     const TMatrixDSym cov6 = uncertainHelix.getCartesianCovariance(bZ);
 
-    for (int i : irange(0, 6)) {
-      for (int j : irange(0, 6)) {
+    for (int i = 0; i < 6; ++i) {
+      for (int j = 0; j < 6; ++j) {
         TEST_CONTEXT("Failed for index (" << i << ", " << j << ")");
         EXPECT_NEAR(expectedCov6(i, j), cov6(i, j), 1e-7);
       }
@@ -406,8 +403,8 @@ namespace {
     expectedCov6.Zero();
     expectedCov6(4, 4) = absMom2D * absMom2D;
 
-    for (int i : irange(0, 6)) {
-      for (int j : irange(0, 6)) {
+    for (int i = 0; i < 6; ++i) {
+      for (int j = 0; j < 6; ++j) {
         TEST_CONTEXT("Failed for index (" << i << ", " << j << ")");
         EXPECT_NEAR(expectedCov6(i, j), cov6(i, j), 1e-7);
       }
@@ -430,8 +427,8 @@ namespace {
     const TMatrixDSym& cov5 = uncertainHelix2.getCovariance();
     EXPECT_EQ(-1, charge);
 
-    for (int i : irange(0, 5)) {
-      for (int j : irange(0, 5)) {
+    for (int i = 0; i < 5; ++i) {
+      for (int j = 0; j < 5; ++j) {
         TEST_CONTEXT("Failed for index (" << i << ", " << j << ")");
         EXPECT_NEAR(expectedCov5(i, j), cov5(i, j), 1e-7);
       }
@@ -454,8 +451,8 @@ namespace {
 
     TMatrixDSym initialCov5(5);
     initialCov5.Zero();
-    for (int i : irange(0, 5)) {
-      for (int j : irange(0, 5)) {
+    for (int i = 0; i < 5; ++i) {
+      for (int j = 0; j < 5; ++j) {
         initialCov5(i, j) = i + j;
       }
     }
@@ -490,8 +487,8 @@ namespace {
     EXPECT_NEAR(expectedMovedUncertainHelix.getZ0(), movedUncertainHelix.getZ0(), 1e-7);
     EXPECT_NEAR(expectedMovedUncertainHelix.getTanLambda(), movedUncertainHelix.getTanLambda(), 1e-7);
 
-    for (int i : irange(0, 5)) {
-      for (int j : irange(0, 5)) {
+    for (int i = 0; i < 5; ++i) {
+      for (int j = 0; j < 5; ++j) {
         TEST_CONTEXT("Failed for index (" << i << ", " << j << ")");
         EXPECT_NEAR(expectedCov5(i, j), cov5(i, j), 1e-7);
       }

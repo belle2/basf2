@@ -250,7 +250,7 @@ CDCTriggerMCMatcherModule::event()
   B2DEBUG(200, "totalHits_by_prTrackId : " << endl << totalHits_by_prTrackId);
   B2DEBUG(200, "totalHits_by_mcTrackId : " << endl << totalHits_by_mcTrackId);
 
-  // ### Building the patter recognition track to highest purity Monte-Carlo track relation ###
+  // ### Building the pattern recognition track to highest purity Monte-Carlo track relation ###
   vector<pair<TrackId, Purity>> purestMCTrackId_by_prTrackId(nPRTracks);
 
   for (TrackId prTrackId = 0; prTrackId < nPRTracks; ++prTrackId) {

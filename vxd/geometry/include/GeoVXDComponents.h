@@ -128,7 +128,7 @@ namespace Belle2 {
     void setSensorInfo(VXD::SensorInfoBase* info) { m_info = info; }
     /** get the pointer to the SensorInfo class */
     const VXD::SensorInfoBase* getSensorInfo() const { return m_info; }
-    /** return wether or not the sensor is slanted (usually only the first sensor in layers 4-6) */
+    /** return whether or not the sensor is slanted (usually only the first sensor in layers 4-6) */
     bool getSlanted() const { return m_slanted; }
   private:
     /** Paramerers of the active area */
@@ -137,7 +137,7 @@ namespace Belle2 {
     VXDGeoPlacement m_activePlacement;
     /** Sensor Information instance */
     VXD::SensorInfoBase* m_info;
-    /** Indication wether this is a slanted sensor */
+    /** Indication whether this is a slanted sensor */
     bool m_slanted;
     /** List of all components to be placed */
     std::vector<VXDGeoPlacement> m_components;

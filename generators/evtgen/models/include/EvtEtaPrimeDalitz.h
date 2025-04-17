@@ -14,7 +14,7 @@ class EvtParticle;
 namespace Belle2 {
   /**Class for the simulation of the eta' -> pi+ pi- eta and pi0 pi0 eta decays
    *
-   * Please not that the order of the daugther particles matters! The eta must be the last one.
+   * Please not that the order of the daughter particles matters! The eta must be the last one.
    *
    * Evolution of the former EvtEtaDalitz, that implements a simpler Dalitz description with
    * hard-coded parameters. The general structure of the class, as well as several methods, are inherited
@@ -28,7 +28,7 @@ namespace Belle2 {
    * where the kinematic variable X and Y are both linear combinations of the pions' and eta kinetic energies in
    * the eta' frame.
    *
-   * The model takes 4 parameters corresponing to the six coeafficients a,b,c,d;
+   * The model takes 4 parameters corresponding to the six coeafficients a,b,c,d;
    * c!=0 is indication of CP violation in eta decay, and it is therefore usually set to 0.
    * An implementation of the model with the parameters measure by BESIII collab, Phys.Rev. D92 (2015) 012014 is:
    *

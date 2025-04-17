@@ -27,10 +27,10 @@ DummyDataPackerModule::DummyDataPackerModule() : Module()
   ///Set module properties
   setDescription("an Example to pack data to a RawCOPPER object");
 
-  ///  maximum # of events to produce( -1 : inifinite)
+  ///  maximum # of events to produce( -1 : infinite)
   addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);
 
-  ///  maximum # of events to produce( -1 : inifinite)
+  ///  maximum # of events to produce( -1 : infinite)
   //  addParam("NodeID", m_nodeid, "Node ID", 0);
 
   B2INFO("DummyDataPacker: Constructor done.");

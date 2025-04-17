@@ -175,7 +175,7 @@ namespace Belle2 {
       } else  if (boost::ends_with(weightfilePath, ".xml")) {
         weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(weightfilePath);
       } else {
-        B2WARNING("Unkown file extension for file: " << weightfilePath << ", fallback to xml...");
+        B2WARNING("Unknown file extension for file: " << weightfilePath << ", fallback to xml...");
         weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(weightfilePath);
       }
       std::stringstream ss;
@@ -331,7 +331,7 @@ namespace Belle2 {
 
     /**
      * A vector of unodered maps. The vector corresponds to the return values of the MVA, one for each class correspondonding to charged stable particles considered by the MVA. In general this is the full six charged stable particles {e, mu, pi, K, p, d}.
-     * The unordered map maps the hypothesis pdg values to their matching TF1 pdfs from which the liklihood will be taken.
+     * The unordered map maps the hypothesis pdg values to their matching TF1 pdfs from which the likelihood will be taken.
      */
     std::vector<std::unordered_map<unsigned int, TF1>> m_pdfs;
 
@@ -349,7 +349,7 @@ namespace Belle2 {
     std::vector<std::unordered_map<unsigned int, TH1F>> m_cdfs;
 
     /**
-     * Decorrelation matrices. To be used (optionally) afer gaussianisation.
+     * Decorrelation matrices. To be used (optionally) after gaussianisation.
      * The unordered map maps the hypothesis pdg values to their matching linearised decorrelation matrix.
      */
     std::unordered_map<unsigned int, std::vector<float>> m_decorrelationMatrices;

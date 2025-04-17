@@ -11,6 +11,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
 
+#include <cassert>
 #include <stdexcept>
 
 namespace Belle2 {
@@ -132,7 +133,7 @@ namespace Belle2 {
     //------------------------ Imitate pointer functionality -----------------------------------------------
     inline T& operator *()  const {return *operator->();}  /**< Imitate pointer functionality. */
 #ifdef __clang_analyzer__
-    inline T* operator ->() const {ensureValid(); std::assert(m_storeObjPtr); return static_cast<T*>(*m_storeObjPtr);}   /**< Imitate pointer functionality. */
+    inline T* operator ->() const {ensureValid(); assert(m_storeObjPtr); return static_cast<T*>(*m_storeObjPtr);}   /**< Imitate pointer functionality. */
 #else
     inline T* operator ->() const {ensureValid(); return static_cast<T*>(*m_storeObjPtr);}   /**< Imitate pointer functionality. */
 #endif

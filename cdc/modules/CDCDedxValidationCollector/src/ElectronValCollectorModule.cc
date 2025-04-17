@@ -252,8 +252,6 @@ void ElectronValCollectorModule::collect()
     m_wire.clear();
     m_dedxhit.clear();
 
-    // Simple numbers don't need to be cleared
-    // make sure to use the truncated mean without the hadron saturation correction
     for (int i = 0; i < m_nhits; ++i) {
       m_wire.push_back(dedxTrack->getWire(i));
       m_dedxhit.push_back(dedxTrack->getDedx(i));

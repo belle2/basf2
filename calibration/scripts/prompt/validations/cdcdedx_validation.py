@@ -25,7 +25,6 @@ import process_onedcell as oned
 import process_rungain as rg
 
 from prompt import ValidationSettings
-# from caf.backends import get_input_data
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)

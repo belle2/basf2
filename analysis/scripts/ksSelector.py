@@ -109,15 +109,8 @@ def V0Selector_Training(
     fastbdt_options = basf2_mva.FastBDTOptions()
     basf2_mva.teacher(general_options, fastbdt_options)
 
-    general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector(train_data)
-    general_options.m_treename = tree_name
     general_options.m_identifier = mva_identifier+'.root'
-    general_options.m_variables = basf2_mva.vector(*trainVars)
-    general_options.m_target_variable = target_variable
-
     python_options = basf2_mva.PythonOptions()
-
     python_options.m_framework = "custom"
     python_options.m_steering_file = "mva/scripts/basf2_mva_python_interface/lightgbm.py"
 
@@ -190,15 +183,8 @@ def LambdaVeto_Training(
     fastbdt_options = basf2_mva.FastBDTOptions()
     basf2_mva.teacher(general_options, fastbdt_options)
 
-    general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector(train_data)
-    general_options.m_treename = tree_name
     general_options.m_identifier = mva_identifier+'.root'
-    general_options.m_variables = basf2_mva.vector(*trainVars)
-    general_options.m_target_variable = target_variable
-
     python_options = basf2_mva.PythonOptions()
-
     python_options.m_framework = "custom"
     python_options.m_steering_file = "mva/scripts/basf2_mva_python_interface/lightgbm.py"
 

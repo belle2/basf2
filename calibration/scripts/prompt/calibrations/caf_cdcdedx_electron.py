@@ -7,12 +7,9 @@
 ##########################################################################
 
 """
-Airflow script for automatic CDC dEdx calibration. It is currently for the electron based
-calibration, where at present only RunGain, injection time, Cosine and WireGain are implimented.
-The remaining two 2D and 1D will be implimented in the near future.
-
-Second part called "Hadron calibration" are not compitable with CAF/AirFlow
-and will be done offline for a while.
+Airflow script for automatic CDC dEdx calibration. It is the electron based
+calibration, where at present only RunGain, injection time, Cosine, WireGain and 1D are implemented.
+The remaining two 2D will be implemented in the near future.
 """
 
 import ROOT

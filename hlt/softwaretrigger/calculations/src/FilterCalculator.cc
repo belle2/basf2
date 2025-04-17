@@ -134,6 +134,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["eeBrem"] = 0;
   calculationResult["isrRadBhabha"] = 0;
   calculationResult["muonPairECL"] = 0;
+  calculationResult["ggHighPt"] = 0;
   calculationResult["selectee1leg1trk"] = 0;
   calculationResult["selectee1leg1clst"] = 0;
   calculationResult["selectee"] = 0;
@@ -347,7 +348,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
 
     const double dt99 = cluster.getDeltaTime99();
 
-    // Store infos if above the single photon threshold
+    // Store cluster information
     SelectedECLCluster selectedCluster;
     selectedCluster.p4Lab = cUtil.Get4MomentumFromCluster(&cluster, clustervertex,
                                                           Belle2::ECLCluster::EHypothesisBit::c_nPhotons);
@@ -481,7 +482,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
         calculationResult["n2GeVPhotonEndcap"] += 1;
       }
     }
-  }
+  } // end of loop over clusters
+
+  //..Order clusters by CMS energy
   std::sort(selectedClusters.begin(), selectedClusters.end(), [](const auto & lhs, const auto & rhs) {
     return lhs.energyCMS > rhs.energyCMS;
   });
@@ -619,7 +622,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     }
   }
 
-  //..Bhabha and gamma gamma vetoes using two maximum-energy clusters
+  //..Filters and vetoes using two maximum-energy clusters
   if (selectedClusters.size() >= 2) {
     const SelectedECLCluster& firstCluster = selectedClusters[0];
     const SelectedECLCluster& secondCluster = selectedClusters[1];
@@ -705,7 +708,20 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       calculationResult["muonPairECL"] = 1;
     }
 
-  }
+    //..diPhoton line
+    const double thetaLab0 = firstCluster.p4Lab.Theta() * TMath::RadToDeg();
+    const double thetaLab1 = secondCluster.p4Lab.Theta() * TMath::RadToDeg();
+    const bool inHieRegion0 = thetaLab0 > 26. and thetaLab0 < 130.;
+    const bool inHieRegion1 = thetaLab1 > 26. and thetaLab1 < 130.;
+    const bool firstIsNeutral = not firstCluster.isTrack;
+    const bool secondIsNeutral = not secondCluster.isTrack;
+
+    if (secondEnergy > 0.3 and inHieRegion0 and inHieRegion1 and firstIsNeutral and secondIsNeutral) {
+      const ROOT::Math::PxPyPzEVector ggP4CMS = firstCluster.p4CMS + secondCluster.p4CMS;
+      if (ggP4CMS.pt() > 1.) {calculationResult["ggHighPt"] = 1;}
+    }
+
+  } // end of two-clusters lines
 
   // Bhabha accept triggers.
   // Use theta_lab of negative track if available; otherwise cluster.

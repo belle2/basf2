@@ -14,5 +14,6 @@
 #pragma link C++ class Belle2::CDCDedxBadWireAlgorithm-;
 #pragma link C++ class Belle2::CDCDedxMomentumAlgorithm-;
 #pragma link C++ class Belle2::CDCDedxInjectTimeAlgorithm-;
+#pragma link C++ class Belle2::CDCDedxValidationAlgorithm-;
 
 #endif

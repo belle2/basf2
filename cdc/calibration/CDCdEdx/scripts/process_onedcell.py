@@ -10,8 +10,10 @@
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import ROOT
 from ROOT.Belle2 import CDCDedxValidationAlgorithm
 import process_cosgain as cg
+ROOT.gROOT.SetBatch(True)
 
 
 def process_onedgain(onedpath, gt):

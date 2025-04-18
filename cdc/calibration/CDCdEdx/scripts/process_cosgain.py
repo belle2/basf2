@@ -12,7 +12,9 @@ Implements cosgain correction
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import ROOT
 from ROOT.Belle2 import CDCDedxValidationAlgorithm
+ROOT.gROOT.SetBatch(True)
 
 
 def hist(y_min=None, y_max=None, x_min=None, x_max=None, xlabel="", ylabel="", space=None, fs1=20, fs2=8, font=18, rota=30):

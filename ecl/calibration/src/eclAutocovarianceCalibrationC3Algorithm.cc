@@ -13,9 +13,6 @@
 #include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLAutoCovariance.h>
 
-/* std headers */
-#include <array>
-
 /* ROOT headers. */
 #include <TFile.h>
 #include <TGraph.h>

@@ -13,6 +13,8 @@
 #include <TDatabasePDG.h>
 #include <Math/Vector3D.h>
 
+#include <cmath>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -91,9 +93,9 @@ ROOT::Math::Rotation3D PostMergeUpdaterModule::tag_vertex_rotation()
     // Closure test that rotation does what expected:
     ROOT::Math::XYZVector test = rot * sec3v;
     double smallValue = 1e-12;
-    if ((abs(sin(test.Phi() - tag3v.Phi())) > smallValue) or (abs(test.Theta() - tag3v.Theta()) > smallValue)) {
-      B2ERROR("Loss of accuracy during rotation" << LogVar("Delta phi", abs(sin(test.Phi() - tag3v.Phi())))
-              << LogVar("Delta Theta", abs(test.Theta() - tag3v.Theta())));
+    if ((std::abs(sin(test.Phi() - tag3v.Phi())) > smallValue) or (std::abs(test.Theta() - tag3v.Theta()) > smallValue)) {
+      B2ERROR("Loss of accuracy during rotation" << LogVar("Delta phi", std::abs(sin(test.Phi() - tag3v.Phi())))
+              << LogVar("Delta Theta", std::abs(test.Theta() - tag3v.Theta())));
     }
   } else {
     B2ERROR("No momentum information provided for the tag/simulated particle list, can not update tracks");

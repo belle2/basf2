@@ -26,7 +26,7 @@ namespace Belle2 {
    * where the kinematic variable X and Y are both linear combinations of the pions' kinetic energies in
    * the eta frame.
    *
-   * The model takes 6 parameters corresponing to the six coeafficients a,b,c,d,e,f;
+   * The model takes 6 parameters corresponding to the six coeafficients a,b,c,d,e,f;
    * c!=0 or  e=0 are indication of CP violation in eta decay, and are therefore usually set to 0.
    * An implementation of the model with the parameters report in  Phys.Rev. D92 (2015) 012014 is:
    *

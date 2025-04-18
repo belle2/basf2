@@ -14,6 +14,8 @@
 
 #include <TDatabasePDG.h>
 
+#include <cmath>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -112,7 +114,7 @@ void InclusiveDstarReconstructionModule::event()
 
     ROOT::Math::PxPyPzEVector dstar_four_vector = estimateDstarFourMomentum(pion);
 
-    if (isnan(dstar_four_vector.P())) continue;
+    if (std::isnan(dstar_four_vector.P())) continue;
 
     /*
     decay 1:

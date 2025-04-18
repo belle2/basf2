@@ -31,11 +31,14 @@
 
 #include <cdc/dataobjects/CDCDedxTrack.h>
 
-#include <numeric>
 #include <TDatabasePDG.h>
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 #include <Math/VectorUtil.h>
+
+#include <cmath>
+#include <numeric>
+
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
@@ -200,7 +203,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       const ROOT::Math::PxPyPzEVector V4g2CMS = PCmsLabTransform::labToCms(V4g2);
       double Thetag1 = V4g1CMS.Theta() * TMath::RadToDeg();
       double Thetag2 = V4g2CMS.Theta() * TMath::RadToDeg();
-      double deltphi = fabs(ROOT::Math::VectorUtil::DeltaPhi(V4g1CMS, V4g2CMS) * TMath::RadToDeg());
+      double deltphi = std::abs(ROOT::Math::VectorUtil::DeltaPhi(V4g1CMS, V4g2CMS) * TMath::RadToDeg());
       double Tsum = Thetag1 + Thetag2;
       if (deltphi > 170. && (Eg1 > 0.25 && Eg2 > 0.25)) nb2bcc_PhiHigh++;
       if (deltphi > 170. && (Eg1 < 0.25 || Eg2 < 0.25)) nb2bcc_PhiLow++;
@@ -259,7 +262,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         const auto chSum = par1->getCharge() + par2->getCharge();
         const double mSum = V4pSum.M();
         const double JpsidM = mSum - TDatabasePDG::Instance()->GetParticle(443)->Mass();
-        if (abs(JpsidM) < jPsiMasswindow && chSum == 0)  nJpsi++;
+        if (std::abs(JpsidM) < jPsiMasswindow && chSum == 0)  nJpsi++;
         const ROOT::Math::PxPyPzEVector V4p1CMS = PCmsLabTransform::labToCms(V4p1);
         const ROOT::Math::PxPyPzEVector V4p2CMS = PCmsLabTransform::labToCms(V4p2);
         const double temp = ROOT::Math::VectorUtil::Angle(V4p1CMS, V4p2CMS);
@@ -373,7 +376,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   double rp2ob = rhoOfTrackWithSecondMaximumRho / BeamEnergyCMS();
   bool bhabha2trk_tag =
     ntrk_bha >= 2 && maxAngleTTLE > 2.88 && nEidLE >= 1 && rp1ob > 0.35 && rp2ob > 0.35 && (Etot) > 4.0
-    && (abs(charget1) == 1 && abs(charget2) == 1 && (charget1 + charget2) == 0);
+    && (std::abs(charget1) == 1 && std::abs(charget2) == 1 && (charget1 + charget2) == 0);
   if (bhabha2trk_tag) Bhabha2Trk = 1;
   calculationResult["Bhabha2Trk"] = Bhabha2Trk;
 
@@ -407,7 +410,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       double Eg2ob = V4g2.E() / (2 * BeamEnergyCMS());
       double Thetag1 = V4g1.Theta() * TMath::RadToDeg();
       double Thetag2 = V4g2.Theta() * TMath::RadToDeg();
-      double deltphi = fabs(ROOT::Math::VectorUtil::DeltaPhi(V4g1, V4g2) * TMath::RadToDeg());
+      double deltphi = std::abs(ROOT::Math::VectorUtil::DeltaPhi(V4g1, V4g2) * TMath::RadToDeg());
       double Tsum = Thetag1 + Thetag2;
       if ((deltphi > 165. && deltphi < 178.5) && (Eg1ob > 0.4 && Eg2ob > 0.4 && (Eg1ob > 0.45 || Eg2ob > 0.45)) && (Tsum > 178.
           && Tsum < 182.)) BhabhaECL = 1;
@@ -429,7 +432,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       if (!part1) continue;
 
       const auto chargep1 = part1->getCharge();
-      if (abs(chargep1) != 1) continue;
+      if (std::abs(chargep1) != 1) continue;
 
       const ECLCluster* eclTrack1 = part1->getECLCluster();
       if (!eclTrack1) continue;
@@ -456,7 +459,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         if (!part2) continue;
 
         const auto chargep2 = part2->getCharge();
-        if (abs(chargep2) != 1 || (chargep1 + chargep2 != 0)) continue;
+        if (std::abs(chargep2) != 1 || (chargep1 + chargep2 != 0)) continue;
 
         const ECLCluster* eclTrack2 = part2->getECLCluster();
         if (!eclTrack2) continue;
@@ -516,7 +519,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       if (!part1) continue;
 
       const auto chargep1 = part1->getCharge();
-      if (abs(chargep1) != 1) continue;
+      if (std::abs(chargep1) != 1) continue;
 
       const ECLCluster* eclTrack1 = part1->getECLCluster();
       if (!eclTrack1) continue;
@@ -556,7 +559,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         if (!part2) continue;
 
         const auto chargep2 = part2->getCharge();
-        if (abs(chargep2) != 1 || (chargep1 + chargep2 != 0)) continue;
+        if (std::abs(chargep2) != 1 || (chargep1 + chargep2 != 0)) continue;
 
         const ECLCluster* eclTrack2 = part2->getECLCluster();
         if (!eclTrack2) continue;
@@ -584,8 +587,8 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         const double Thetap2 = V4p2CMS.Theta() * TMath::RadToDeg();
         const double Phip2 = V4p2CMS.Phi() * TMath::RadToDeg();
 
-        const double acopPhi = fabs(180 - fabs(Phip1 - Phip2));
-        const double acopTheta = fabs(fabs(Thetap1 + Thetap2) - 180);
+        const double acopPhi = std::abs(180 - std::abs(Phip1 - Phip2));
+        const double acopTheta = std::abs(std::abs(Thetap1 + Thetap2) - 180);
 
         const double enECLTrack2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
@@ -606,7 +609,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         }
 
         double diffPhi = p1clusPhi - p2clusPhi;
-        if (fabs(diffPhi) > M_PI) {
+        if (std::abs(diffPhi) > M_PI) {
           if (diffPhi > M_PI) {
             diffPhi = diffPhi - 2 * M_PI;
           } else {
@@ -649,7 +652,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   double EsumCMSnorm = eneclClusters / (BeamEnergyCMS() * 2.0);
   double PzTotCMSnorm = (PzPiHad + PzGamma) / (BeamEnergyCMS() * 2.0);
 
-  bool hadronb_tag = nHadTracks >= 3 && visibleEnergyCMSnorm > 0.2 && abs(PzTotCMSnorm) < 0.5 && neclClusters > 1
+  bool hadronb_tag = nHadTracks >= 3 && visibleEnergyCMSnorm > 0.2 && std::abs(PzTotCMSnorm) < 0.5 && neclClusters > 1
                      && EsumCMSnorm > 0.1 && EsumCMSnorm < 0.8;
 
   if (hadronb_tag) {
@@ -706,7 +709,8 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         const double pzCMS = V4pSumCMS.Pz();
         const double mSum = V4pSum.M();
 
-        const bool fourLepCand = chSum == 0 && (V4p1.P() > 0.4 && V4p2.P() > 0.4) && cos(opAng) > -0.997 && ptCMS < 0.15 && abs(pzCMS) < 2.5
+        const bool fourLepCand = chSum == 0 && (V4p1.P() > 0.4 && V4p2.P() > 0.4) && cos(opAng) > -0.997 && ptCMS < 0.15
+                                 && std::abs(pzCMS) < 2.5
                                  && mSum < 6;
 
         if (fourLepCand)  nFourLep++;
@@ -839,15 +843,15 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     const double phi2CMS = V4p2.Phi() * TMath::RadToDeg();
 
     double diffPhi = phi1CMS - phi2CMS;
-    if (fabs(diffPhi) > 180) {
+    if (std::abs(diffPhi) > 180) {
       if (diffPhi > 180) {
         diffPhi = diffPhi - 2 * 180;
       } else {
         diffPhi = 2 * 180 + diffPhi;
       }
     }
-    const double delThetaCMS = fabs(fabs(thetaSumCMS) - 180);
-    const double delPhiCMS = fabs(180 - fabs(diffPhi));
+    const double delThetaCMS = std::abs(std::abs(thetaSumCMS) - 180);
+    const double delPhiCMS = std::abs(180 - std::abs(diffPhi));
 
     const bool mumuHighMassCand = chSum == 0 && (mSum > 8. && mSum < 12.) && hasClus > 0 && eclE1 <= 1
                                   && eclE2 <= 1 && delThetaCMS < 10 && delPhiCMS < 10;

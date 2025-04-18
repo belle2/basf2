@@ -1,11 +1,51 @@
+Changes in the analysis package in light-2504-d
+-----------------------------------------------
+
+FEI
++++
+* Added option to use PIDNN variables instead of PID variables as input features and best candidate variables.
+
+Modular Analysis
+++++++++++++++++
+* Fixed :py:func:`stdV0s.goodBelleKshort` and `loadStdGoodBellePhoton` functions to apply cuts on the corresponding :mdst lists when using b2bii, instead of using `fillParticleList`.
+* Fixed documentation explicitly mentioning that the invariant mass cuts are applied "after the vertex fit" in `stdLambdas`, `stdKshorts` and :py:func:`stdV0s.goodBelleKshort` functions.
+
 Changes in the analysis package in light-2503-ceres
 ---------------------------------------------------
+
+Lambda0 selector module
+++++++++++++++++++++++++
+* Add the new Lambda0 selector based on LightGBM with optimized hyperparameters (LambdaSelector.py)
+* The input features are the same as K_S0 selector except assign the pion mass to the proton of Lambda0 candidates (Mks_hypo)
+* The weight files (V0 selector and Ks veto) are uploaded in analysis_tools_light-2503-ceres
+* Apply three common cuts for Lamdba0 efficiency: 90%(standard),85%(loose),95%(tight)
 
 Kinematic Fitting tools
 +++++++++++++++++++++++
 * Added functionality to ParticleKinematicFitter module to change mass hypothesis for photons (eg to n0 or n0bar) used in the fit.
 * Added functionality to ParticleKinematicFitter module to specify whether only ECL cluster direction information is to be used in the fit (intended for fits involving neutral hadrons).
 * Added to ECLPhotonEnergyResolution dbobject ability to store position resolution information for neutral hadrons
+
+Variables
++++++++++
+* Changed return type of the variables `isInRestOfEvent`, `isCloneOfSignalSide`, `hasAncestorFromSignalSide`,
+  `currentROEIsInList`, `passesROEMask`, and `hasCorrectROECombination` from double to bool.
+* Changed return type of the variables `nROE_KLMClusters`, `nROE_Tracks`, `nROE_ECLClusters`,
+  `nROE_NeutralECLClusters`, `nROE_Photons`, `nROE_NeutralHadrons`, `nROE_Charged`, `nROE_Composites`, and
+  `nROE_ParticlesInList` from double to int.
+* Extended functionality of the variable `passesROEMask` to handle composite particles as well.
+
+Modular Analysis
+++++++++++++++++
+* Added new function `getECLKLID` that calculates the PID for Klongs by using weight files trained with ECL information. It should only be applied to Klongs constructed from ECL cluster.
+
+Neutrons
+++++++++
+* Neutral ECL and KLM cluster can now be loaded into a neutron and an anti-neutron list in the same event. This wasn't possible before.
+* The list label ``all`` is no longer protected for neutrons.
+* The charge-conjugated (anti-)neutron particle list is not automatically created and registered in the datastore.
+* A protection is implemented that prevents the merging of neutron and anti-neutron particle candidates that are built from the same neutral cluster.
+  It is recommended to use `mergeListsWithBestDuplicate` to combine neutrons and anti-neutrons with an appropriate best candidate variable.
 
 Changes in the analysis package in light-2501-betelgeuse
 --------------------------------------------------------
@@ -127,3 +167,5 @@ Charm Flavor Tagger
 * Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
   function ``charmFlavorTagger``) to ``CFT_ragdoll``. This value must be used for all releases as recent as
   light-2406-ragdoll and release-09.
+ 
+  

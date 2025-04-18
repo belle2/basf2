@@ -25,7 +25,7 @@ namespace Belle2 {
      */
     CDCRawHit();
     /**
-     * Consturctor.
+     * Constructor.
      */
     CDCRawHit(unsigned short status, int trgNumber, unsigned short node,
               unsigned short finess, unsigned short board,
@@ -58,7 +58,7 @@ namespace Belle2 {
     }
 
     /**
-     * Getter fot Finess ID.
+     * Getter for Finess ID.
      */
 
     inline unsigned short getFiness(void) const

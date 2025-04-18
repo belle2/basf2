@@ -15,7 +15,7 @@
 namespace Belle2 {
 
   /**
-  * The Class for VXD global paramter payload
+  * The Class for VXD global parameter payload
   */
   class VXDGlobalPar: public TObject {
 

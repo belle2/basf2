@@ -74,11 +74,11 @@ namespace Belle2 {
       const MCParticle* parentParticle; /**< parent particle, or nullptr. */
     };
 
-    /** Group of TEveElements, remembers wether user wants it visible or not. */
+    /** Group of TEveElements, remembers whether user wants it visible or not. */
     struct ElementGroup {
       ElementGroup(): group(nullptr), visible(true) { }
       TEveElementList* group; /**< Contains elements of this group. Set to nullptr after event. */
-      bool visible; /**< Stores wether this group was visible in last event. */
+      bool visible; /**< Stores whether this group was visible in last event. */
     };
 
     /** Color for reco hits. */
@@ -176,7 +176,7 @@ namespace Belle2 {
     /** Add a reconstructed 2d hit in the EKLM. */
     void addEKLMHit2d(const KLMHit2d* eklm2dhit);
 
-    /** Add recontructed hit in ARICH */
+    /** Add reconstructed hit in ARICH */
     void addARICHHit(const ARICHHit* hit);
 
     /** Add a Region Of Interest, computed by the PXDDataReduction module */

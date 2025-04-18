@@ -147,7 +147,7 @@ namespace Belle2 {
       /** Determine which SimHits to create.
        * A SimHit is a linear approximation of the particle trajectory. As such
        * we try to combine as many Geant4 steps as possible by defining a
-       * distance tolerance and using the Douglas-Peucker algortihm to
+       * distance tolerance and using the Douglas-Peucker algorithm to
        * determine the required number of SimHits to keep the maximum distance
        * of all Geant4 steps below that tolerance.
        *

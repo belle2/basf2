@@ -11,6 +11,8 @@
 
 #include "TDirectory.h"
 
+#include <cmath>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -155,7 +157,7 @@ void SVDDQMEfficiencyModule::event()
         }
 
 
-        if (abs(resid) < maxResid) {
+        if (std::abs(resid) < maxResid) {
           if (m_svdClusters[cls]->isUCluster()) {
             foundU = true;
           } else

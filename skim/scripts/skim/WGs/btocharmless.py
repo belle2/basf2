@@ -26,7 +26,8 @@ from skim.standardlists.charmless import (
 from skim.standardlists.lightmesons import (
     loadStdSkimHighEffTracks,
     loadStdSkimHighEffEtaPrime,
-    loadStdSkimHighEffEta)
+    loadStdSkimHighEffEta,
+    )
 from stdPi0s import stdPi0s
 from stdPhotons import stdPhotons
 
@@ -392,4 +393,47 @@ class BtoEtapKstp(BaseSkim):
         BsigList = []
         ma.reconstructDecay("B+:Charmless_b2etapkst -> eta':SkimHighEff K*+:veryLoose", Bcuts, path=path)
         BsigList.append('B+:Charmless_b2etapkst')
+        return BsigList
+
+
+@fancy_skim_header
+class BtoEtapRhop(BaseSkim):
+    """
+    Reconstructed decay mode:
+
+    * :math:`B^{+}\\to \\eta^{prime} \\rho^+`
+
+    Cuts applied:
+
+    * ``5.20 < Mbc < 5.29``
+    * ``abs(deltaE) < 0.5``
+    * ``0.8< M_{etap} < 1.1``
+    * ``0.4 < M_{rhop} < 1.0``
+
+    """
+
+    __authors__ = ["Ruei-Si Hsiao"]
+    __description__ = "Skim list for B+ to etap rho+."
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charmless"
+
+    ApplyHLTHadronCut = True
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
+    def load_standard_lists(self, path):
+        stdPhotons('tight', path=path)
+        stdPi0s("eff40_May2020", path=path)
+        loadStdSkimHighEffTracks('pi', path=path)
+
+    def build_lists(self, path):
+        Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        BsigList = []
+        ma.reconstructDecay("eta:gamgam -> gamma:tight gamma:tight", '0.4 < M < 0.6', path=path)
+        ma.reconstructDecay('rho0:Eff -> pi-:SkimHighEff pi+:SkimHighEff', '0.47 < M < 1.07', path=path)
+        ma.reconstructDecay("eta\':loose1 -> pi+:SkimHighEff pi-:SkimHighEff eta:gamgam", '0.8 < M < 1.1', 1, path=path)
+        ma.reconstructDecay("eta\':loose2 -> rho0:Eff gamma:tight", '0.8 < M < 1.1', 2, path=path)
+        ma.copyLists("eta\':loose", ["eta\':loose1", "eta\':loose2"], path=path)
+        ma.reconstructDecay('rho+:loose -> pi+:SkimHighEff pi0:eff40_May2020', '0.47 < M < 1.07', path=path)
+        ma.reconstructDecay("B+:Charmless_b2etaprhop -> eta\':loose rho+:loose", Bcuts, path=path)
+        BsigList.append("B+:Charmless_b2etaprhop")
         return BsigList

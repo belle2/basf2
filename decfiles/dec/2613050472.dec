@@ -68,25 +68,16 @@ Enddecay
 Decay Xi_c+sig
 1.000   myXi- pi+ pi+      PHOTOS PHSP;
 Enddecay
-
-Decay anti-Xi_c-sig
-1.000   myanti-Xi+ pi- pi- PHOTOS PHSP;
-Enddecay
+CDecay anti-Xi_c-sig
 
 Decay myXi-
 1.0 myLambda0 pi- PHOTOS PHSP;
 Enddecay
-
-Decay myanti-Xi+
-1.0 myanti-Lambda0 pi+ PHOTOS PHSP;
-Enddecay
+CDecay myanti-Xi+
 
 Decay myLambda0
 1.0 p+ pi- PHOTOS PHSP;
 Enddecay
-
-Decay myanti-Lambda0
-1.0 anti-p- pi+ PHOTOS PHSP;
-Enddecay
+CDecay myanti-Lambda0
 
 End

@@ -253,7 +253,7 @@ class DataStorePrinter:
         elif isinstance(result, TVector3):
             print("(" + ",".join(f"{result[i]:.6g}" for i in range(3)) + ")")
         elif isinstance(result, XYZVector):
-            print(f"({result.X():.6g}, {result.Y():.6g}, {result.Z():.6g})")
+            print(f"({result.X():.6g},{result.Y():.6g},{result.Z():.6g})")
         elif isinstance(result, TLorentzVector):
             print("(" + ",".join(f"{result[i]:.6g}" for i in range(4)) + ")")
         # or, does it look like a std::pair?

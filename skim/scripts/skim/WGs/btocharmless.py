@@ -393,3 +393,49 @@ class BtoEtapKstp(BaseSkim):
         ma.reconstructDecay("B+:Charmless_b2etapkst -> eta':SkimHighEff K*+:veryLoose", Bcuts, path=path)
         BsigList.append('B+:Charmless_b2etapkst')
         return BsigList
+
+
+@fancy_skim_header
+class BtoEtaOmega(BaseSkim):
+    """
+    Reconstructed decay mode:
+
+    * :math:`B^{0}\\to \\eta \\omega`
+
+    Cuts applied:
+
+    * ``5.20 < Mbc < 5.29``
+    * ``abs(deltaE) < 0.5``
+    * ``0.4 < M_{eta} < 0.6``
+    * ``0.73 < M_{omega} < 0.83``
+
+    """
+
+    __authors__ = ["Jen-Kuan Wang"]
+    __description__ = "Skim list for B0 to eta omega."
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charmless"
+
+    ApplyHLTHadronCut = True
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
+    def load_standard_lists(self, path):
+
+        stdPhotons('loose', path=path)
+        stdPi0s("eff40_May2020", path=path)
+        loadStdVeryLooseTracks('pi', path)
+
+    def build_lists(self, path):
+
+        Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        BsigList = []
+
+        ma.reconstructDecay('omega:loose -> pi0:eff40_May2020 pi-:SkimVeryLoose pi+:SkimVeryLoose', '0.73 < M < 0.83', 1, path=path)
+        ma.reconstructDecay('eta:loose1 -> gamma:loose gamma:loose', '0.4 < M < 0.6', 1, path=path)
+        ma.reconstructDecay('eta:loose2 -> pi0:eff40_May2020 pi-:SkimVeryLoose pi+:SkimVeryLoose', '0.4 < M < 0.6', 2, path=path)
+        ma.copyLists('eta:loose', ['eta:loose1', 'eta:loose2'], path=path)
+
+        ma.reconstructDecay("B0:Charmless_b2etaomega -> eta:loose omega:loose", Bcuts, path=path)
+
+        BsigList.append('B0:Charmless_b2etaomega')
+        return BsigList

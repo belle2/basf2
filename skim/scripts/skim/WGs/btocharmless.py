@@ -13,6 +13,7 @@ Skim list building functions for :math:`B\\to X_u +h` analyses
 """
 
 import modularAnalysis as ma
+
 from skim import BaseSkim, fancy_skim_header
 from stdV0s import stdKshorts
 from skim.standardlists.charmless import (
@@ -22,11 +23,13 @@ from skim.standardlists.charmless import (
     loadStdVeryLooseRho0,
     loadStdVeryLooseKstarPlus,
     loadStdVeryLooseKstarPlusPi0,
-    loadStdVeryLooseRhoPlus)
+    loadStdVeryLooseRhoPlus
+    )
 from skim.standardlists.lightmesons import (
     loadStdSkimHighEffTracks,
     loadStdSkimHighEffEtaPrime,
-    loadStdSkimHighEffEta)
+    loadStdSkimHighEffEta
+    )
 from stdPi0s import stdPi0s
 from stdPhotons import stdPhotons
 
@@ -44,7 +47,7 @@ class BtoPi0Pi0(BaseSkim):
     Cuts applied:
 
     * ``5.20 < Mbc < 5.29``
-    * ``abs(deltaE) < 0.5``
+    * ``abs(deltaE) < 0.5``eta}
 
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Francis Pham", "Benedikt Wach"]
@@ -392,4 +395,50 @@ class BtoEtapKstp(BaseSkim):
         BsigList = []
         ma.reconstructDecay("B+:Charmless_b2etapkst -> eta':SkimHighEff K*+:veryLoose", Bcuts, path=path)
         BsigList.append('B+:Charmless_b2etapkst')
+        return BsigList
+
+
+@fancy_skim_header
+class BtoEtapOmega(BaseSkim):
+    """
+    Reconstructed decay mode:
+
+    * :math:`B^{0}\\to \\eta^{prime} \\omega`
+
+    Cuts applied:
+
+    * ``5.20 < Mbc < 5.29``
+    * ``abs(deltaE) < 0.5``
+    * ``0.8< M_{etap} < 1.1``
+    * ``0.73 < M_{omega} < 0.83``
+    * ``0.4 < M_{eta} < 0.6``
+    * ``0.47 < M_{rho0} < 1.07``
+    """
+
+    __authors__ = ["Yu-Teng Teng"]
+    __description__ = "Skim list for B0 to etap omega."
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charmless"
+
+    ApplyHLTHadronCut = True
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
+    def load_standard_lists(self, path):
+        stdPhotons('loose', path=path)
+        stdPi0s("eff40_May2020", path=path)
+        loadStdVeryLooseTracks("pi", path=path)
+
+    def build_lists(self, path):
+
+        Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        BsigList = []
+        ma.reconstructDecay("eta:gamgam -> gamma:loose gamma:loose", '0.4 < M < 0.6', path=path)
+        ma.reconstructDecay('rho0:loose -> pi-:SkimVeryLoose pi+:SkimVeryLoose', '0.47 < M < 1.07', path=path)
+        ma.reconstructDecay("eta\':loose1 -> pi+:SkimVeryLoose pi-:SkimVeryLoose eta:gamgam", '0.8 < M < 1.1', 1, path=path)
+        ma.reconstructDecay("eta\':loose2 -> rho0:loose gamma:loose", '0.8 < M < 1.1', 2, path=path)
+        ma.copyLists("eta\':loose", ["eta\':loose1", "eta\':loose2"], path=path)
+        ma.reconstructDecay('omega:loose -> pi0:eff40_May2020 pi-:SkimVeryLoose pi+:SkimVeryLoose', '0.73 < M < 0.83', path=path)
+
+        ma.reconstructDecay("B0:Charmless_b2etapomega -> eta\':loose omega:loose", Bcuts, path=path)
+        BsigList.append("B0:Charmless_b2etapomega")
         return BsigList

@@ -1,5 +1,5 @@
-Changes in the analysis package in light-2504-d
------------------------------------------------
+Changes in the analysis package in light-2504-deimos
+----------------------------------------------------
 
 FEI
 +++

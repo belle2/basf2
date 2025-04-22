@@ -10,6 +10,7 @@
 
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
 
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
@@ -560,8 +561,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     const ROOT::Math::PxPyPzEVector p4Miss = p4ofCOM - negativeTrack.p4CMS - positiveTrack.p4CMS;
     const double pmissTheta = p4Miss.Theta() * TMath::RadToDeg();
     const double pmissp = p4Miss.P();
-    const double relMissAngle0 = B2Vector3D(negativeTrack.p4CMS.Vect()).Angle(B2Vector3D(p4Miss.Vect())) * TMath::RadToDeg();
-    const double relMissAngle1 = B2Vector3D(positiveTrack.p4CMS.Vect()).Angle(B2Vector3D(p4Miss.Vect())) * TMath::RadToDeg();
+    const double relMissAngle0 = ROOT::Math::VectorUtil::Angle(negativeTrack.p4CMS, p4Miss) * TMath::RadToDeg();
+    const double relMissAngle1 = ROOT::Math::VectorUtil::Angle(positiveTrack.p4CMS, p4Miss) * TMath::RadToDeg();
 
     const bool electronEP = positiveClusterSum > 0.8 * positiveP or negativeClusterSum > 0.8 * negativeP;
     const bool notMuonPair = negativeClusterSumLab > 1 or positiveClusterSumLab > 1;

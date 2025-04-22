@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <framework/geometry/B2Vector3.h>
-
 /* External headers. */
 #include <CLHEP/Geometry/Point3D.h>
 #include <CLHEP/Matrix/SymMatrix.h>
@@ -32,15 +30,6 @@ namespace Belle2 {
     {
       return CLHEP::HepLorentzVector(vector.X(), vector.Y(), vector.Z(),
                                      vector.T());
-    }
-
-    /**
-     * Convert B2Vector3 to HepGeom::Point3D<double>.
-     * @param[in] vector Vector.
-     */
-    inline HepGeom::Point3D<double> getPoint3DFromB2Vector(const B2Vector3D& vector)
-    {
-      return HepGeom::Point3D<double>(vector.X(), vector.Y(), vector.Z());
     }
 
     /**

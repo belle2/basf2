@@ -35,12 +35,12 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
-#include <framework/geometry/B2Vector3.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/Conversion.h>
 
 #include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
 #include <TRandom.h>
 #include <TVectorF.h>
 
@@ -353,7 +353,7 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
-      return cos((B2Vector3D(part->getVertex()) - beamSpotDB->getIPPosition()).Angle(B2Vector3D(part->getMomentum())));
+      return ROOT::Math::VectorUtil::CosTheta(part->getVertex() - beamSpotDB->getIPPosition(), part->getMomentum());
     }
 
     double cosThetaBetweenParticleAndNominalB(const Particle* part)
@@ -390,9 +390,9 @@ namespace Belle2 {
         return Const::doubleNaN;
       }
       PCmsLabTransform T;
-      B2Vector3D th = evtShape->getThrustAxis();
-      B2Vector3D particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
-      return std::cos(th.Angle(particleMomentum));
+      ROOT::Math::XYZVector th = evtShape->getThrustAxis();
+      ROOT::Math::PxPyPzEVector particleMomentum = T.rotateLabToCms() * part->get4Vector();
+      return ROOT::Math::VectorUtil::CosTheta(th, particleMomentum);
     }
 
     double ImpactXY(const Particle* particle)
@@ -401,9 +401,9 @@ namespace Belle2 {
 
       ROOT::Math::XYZVector mom = particle->getMomentum();
 
-      ROOT::Math::XYZVector r = particle->getVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition());
+      ROOT::Math::XYZVector r = particle->getVertex() - beamSpotDB->getIPPosition();
 
-      ROOT::Math::XYZVector Bfield = BFieldManager::getInstance().getFieldInTesla(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      ROOT::Math::XYZVector Bfield = BFieldManager::getInstance().getFieldInTesla(beamSpotDB->getIPPosition());
 
       ROOT::Math::XYZVector curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
       double T = TMath::Sqrt(mom.Perp2() - 2.0 * curvature.Dot(r.Cross(mom)) + curvature.Mag2() * r.Perp2());
@@ -419,14 +419,14 @@ namespace Belle2 {
         B2FATAL("You are trying to use an Armenteros variable. The mother particle is required to have exactly two daughters");
 
       const auto& daughters = part -> getDaughters();
-      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
-      B2Vector3D daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
-      B2Vector3D daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
+      ROOT::Math::XYZVector motherMomentum = frame.getMomentum(part).Vect();
+      ROOT::Math::XYZVector daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
+      ROOT::Math::XYZVector daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
 
       int daughter1Charge = daughters[0] -> getCharge();
       int daughter2Charge = daughters[1] -> getCharge();
-      double daughter1Ql = daughter1Momentum.Dot(motherMomentum) / motherMomentum.Mag();
-      double daughter2Ql = daughter2Momentum.Dot(motherMomentum) / motherMomentum.Mag();
+      double daughter1Ql = daughter1Momentum.Dot(motherMomentum) / motherMomentum.R();
+      double daughter2Ql = daughter2Momentum.Dot(motherMomentum) / motherMomentum.R();
 
       double Arm_alpha;
       if (daughter2Charge > daughter1Charge)
@@ -445,9 +445,9 @@ namespace Belle2 {
         B2FATAL("You are trying to use an Armenteros variable. The mother particle is required to have exactly two daughters.");
 
       const auto& daughters = part -> getDaughters();
-      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
-      B2Vector3D daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
-      double qt = daughter1Momentum.Perp(motherMomentum);
+      ROOT::Math::XYZVector motherMomentum = frame.getMomentum(part).Vect().Unit();
+      ROOT::Math::XYZVector daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
+      double qt = std::sqrt(daughter1Momentum.Mag2() - daughter1Momentum.Dot(motherMomentum) * daughter1Momentum.Dot(motherMomentum));
 
       return qt;
     }
@@ -460,9 +460,9 @@ namespace Belle2 {
         B2FATAL("You are trying to use an Armenteros variable. The mother particle is required to have exactly two daughters.");
 
       const auto& daughters = part -> getDaughters();
-      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
-      B2Vector3D daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
-      double qt = daughter2Momentum.Perp(motherMomentum);
+      ROOT::Math::XYZVector motherMomentum = frame.getMomentum(part).Vect().Unit();
+      ROOT::Math::XYZVector daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
+      double qt = std::sqrt(daughter2Momentum.Mag2() - daughter2Momentum.Dot(motherMomentum) * daughter2Momentum.Dot(motherMomentum));
 
       return qt;
     }

@@ -72,7 +72,7 @@ void TrackFitResultEstimatorModule::event()
 
   XYZVector position(0,0,0);
   if (m_beamSpotDB)
-    position = XYZVector(m_beamSpotDB->getIPPosition().X(), m_beamSpotDB->getIPPosition().Y(), m_beamSpotDB->getIPPosition().Z());
+    position = m_beamSpotDB->getIPPosition();
 
   const double bfield = BFieldManager::getFieldInTesla(position).Z();
 

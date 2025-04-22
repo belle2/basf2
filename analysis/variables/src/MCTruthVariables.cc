@@ -31,6 +31,8 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/BeamParameters.h>
 
+#include <Math/VectorUtil.h>
+
 #include <cmath>
 #include <queue>
 
@@ -742,30 +744,30 @@ namespace Belle2 {
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      B2Vector3D herVec = beamParamsDB->getHER().Vect();
-      B2Vector3D lerVec = beamParamsDB->getLER().Vect();
+      ROOT::Math::PxPyPzEVector herVec = beamParamsDB->getHER();
+      ROOT::Math::PxPyPzEVector lerVec = beamParamsDB->getLER();
 
       // only looking at the horizontal (XZ plane) -> set y-coordinates to zero
-      herVec.SetY(0);
-      lerVec.SetY(0);
+      herVec.SetPy(0);
+      lerVec.SetPy(0);
 
       //calculate the crossing angle
-      return herVec.Angle(-lerVec);
+      return ROOT::Math::VectorUtil::Angle(herVec, -lerVec);
     }
 
     double getCrossingAngleY(const Particle*)
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      B2Vector3D herVec = beamParamsDB->getHER().Vect();
-      B2Vector3D lerVec = beamParamsDB->getLER().Vect();
+      ROOT::Math::PxPyPzEVector herVec = beamParamsDB->getHER();
+      ROOT::Math::PxPyPzEVector lerVec = beamParamsDB->getLER();
 
       // only looking at the vertical (YZ plane) -> set x-coordinates to zero
-      herVec.SetX(0);
-      lerVec.SetX(0);
+      herVec.SetPx(0);
+      lerVec.SetPx(0);
 
       //calculate the crossing angle
-      return herVec.Angle(-lerVec);
+      return ROOT::Math::VectorUtil::Angle(herVec, -lerVec);
     }
 
 

@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <dqm/analysis/HistDelta.h>
+#include <dqm/core/HistDelta.h>
 #include <dqm/core/DQMHistAnalysis.h>
 #include <string>
 #include <TROOT.h>

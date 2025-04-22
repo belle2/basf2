@@ -6,7 +6,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include "dqm/analysis/RefHistObject.h"
+#include "dqm/core/RefHistObject.h"
 
 using namespace Belle2;
 

@@ -33,6 +33,7 @@
 #include <TRandom.h>
 #include <TMath.h>
 #include <Math/AxisAngle.h>
+#include <Math/VectorUtil.h>
 
 #include <iostream>
 
@@ -1533,12 +1534,12 @@ namespace Belle2 {
         rotated_neu.SetPt(neu_cm.pt());
         rotated_neu.SetE(neu_cm.E());
 
-        B2Vector3D Yneu_norm = Y_cm.Vect().Cross(neu_cm.Vect());
-        B2Vector3D Yrot_norm = Y_cm.Vect().Cross(rotated_neu.Vect());
+        ROOT::Math::XYZVector Yneu_norm = Y_cm.Vect().Cross(neu_cm.Vect());
+        ROOT::Math::XYZVector Yrot_norm = Y_cm.Vect().Cross(rotated_neu.Vect());
         //angle between the two crossproducts -> angle between the two vectors perpendicular to the Y-p_inc and Y-B planes -> angle between the planes
         //this angle needs to come out as zero
 
-        double rot_angle = Yneu_norm.Angle(Yrot_norm);
+        double rot_angle = ROOT::Math::VectorUtil::Angle(Yneu_norm, Yrot_norm);
 
         ROOT::Math::PxPyPzEVector rotated_neu2(rotated_neu);
         //unfortunately don't -and probably can't- know in which direction to rotate without trying
@@ -1589,16 +1590,11 @@ namespace Belle2 {
         ROOT::Math::PxPyPzEVector pB = frame.getMomentum(particle->get4Vector()) + pNu;
 
         // boost lepton and B momentum to W frame
-        B2Vector3D boost2W = pW.BoostToCM();
+        ROOT::Math::XYZVector boost2W = pW.BoostToCM();
         pLep = ROOT::Math::Boost(boost2W) * pLep;
         pB = ROOT::Math::Boost(boost2W) * pB;
 
-        B2Vector3D lep3Vector     = pLep.Vect();
-        B2Vector3D B3Vector       = pB.Vect();
-        double numerator   = lep3Vector.Dot(B3Vector);
-        double denominator = (lep3Vector.Mag()) * (B3Vector.Mag());
-
-        return numerator / denominator;
+        return ROOT::Math::VectorUtil::CosTheta(pLep, pB);
       };
       return func;
     }
@@ -1877,8 +1873,8 @@ namespace Belle2 {
 
       // Definition 4: same as 3, update with direction of ROE momentum
       else if (opt == "4") {
-        B2Vector3D pB = - roe4vec.Vect();
-        pB.SetMag(0.340);
+        ROOT::Math::XYZVector pB = - roe4vec.Vect();
+        pB = 0.340 * pB.Unit();
         pB -= rec4vec.Vect();
         miss4vec.SetPxPyPzE(pB.X(), pB.Y(), pB.Z(), E_beam_cms - rec4vec.E());
       }

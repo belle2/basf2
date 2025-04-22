@@ -8,14 +8,15 @@
 
 #pragma once
 
-#include <framework/geometry/B2Vector3.h>
-
 /* External headers. */
 #include <TMatrixDSym.h>
 #include <TMatrixD.h>
 #include <TVectorD.h>
-#include <TRotation.h>
+#include <Math/RotationX.h>
+#include <Math/RotationY.h>
+#include <Math/RotationZ.h>
 #include <Math/Vector3D.h>
+#include <Math/VectorUtil.h>
 
 namespace Belle2 {
 
@@ -25,12 +26,10 @@ namespace Belle2 {
      * Convert TRotation to TMatrixD.
      * @param[in] r TRotation object.
      */
-    inline TMatrixD toMatrix(TRotation r)
+    inline TMatrixD toMatrix(ROOT::Math::Rotation3D r)
     {
       TMatrixD rM(3, 3);
-      for (int i = 0; i < 3; ++i)
-        for (int j = 0; j < 3; ++j)
-          rM(i, j) = r(i, j);
+      r.GetRotationMatrix(rM);
       return rM;
     }
 
@@ -43,13 +42,29 @@ namespace Belle2 {
     inline TMatrixD getRotationMatrixZtoZp(ROOT::Math::XYZVector zPrime)
     {
       ROOT::Math::XYZVector zAxis(0, 0, 1);
-      zPrime = zPrime.Unit();
-      ROOT::Math::XYZVector rotAxis = zAxis.Cross(zPrime);
-      double angle = asin(sqrt(rotAxis.Mag2()));
+      double angle = ROOT::Math::VectorUtil::Angle(zAxis, zPrime);
 
-      TRotation r;
-      r.Rotate(angle, TVector3(rotAxis.x(), rotAxis.y(), rotAxis.z()));
-      return toMatrix(r);
+      ROOT::Math::XYZVector rotAxis = zAxis.Cross(zPrime).Unit();
+      double x = rotAxis.x();
+      double y = rotAxis.y();
+
+      double cosA = std::cos(angle);
+      double sinA = std::sin(angle);
+      double oneMinusCosA = 1 - cosA;
+
+      double xx = cosA + x * x * oneMinusCosA;
+      double xy = x * y * oneMinusCosA;
+      double xz = y * sinA;
+
+      double yx = y * x * oneMinusCosA;
+      double yy = cosA + y * y * oneMinusCosA;
+      double yz = - x * sinA;
+
+      double zx = - y * sinA;
+      double zy = x * sinA;
+      double zz = cosA;
+
+      return toMatrix(ROOT::Math::Rotation3D(xx, xy, xz, yx, yy, yz, zx, zy, zz));
     }
 
 
@@ -61,9 +76,9 @@ namespace Belle2 {
      */
     inline TMatrixD getRotationMatrixXY(double angleX, double angleY)
     {
-      TRotation r;
-      r.RotateX(angleX);
-      r.RotateY(angleY);
+      ROOT::Math::RotationX rX(angleX);
+      ROOT::Math::RotationY rY(angleY);
+      ROOT::Math::Rotation3D r = rX * rY;
       return toMatrix(r);
     }
 
@@ -75,7 +90,7 @@ namespace Belle2 {
      * @param[in] vTo  vector defining rotation
      * @param[in] orgMat tensor before rotation
      */
-    inline TMatrixD rotateTensor(const B2Vector3D& vTo, const TMatrixD& orgMat)
+    inline TMatrixD rotateTensor(const ROOT::Math::XYZVector& vTo, const TMatrixD& orgMat)
     {
       TMatrixD r = getRotationMatrixZtoZp(vTo);
       TMatrixD rT = r; rT.T();
@@ -114,10 +129,10 @@ namespace Belle2 {
 
 
     /**
-     * Convert B2Vector3D to TVectorD
+     * Convert XYZVector to TVectorD
      *
      */
-    inline TVectorD toVec(B2Vector3D v)
+    inline TVectorD toVec(ROOT::Math::XYZVector v)
     {
       return TVectorD(0, 2, v.X(), v.Y(), v.Z(), "END");
     }
@@ -126,9 +141,9 @@ namespace Belle2 {
      * Get a vector orthogonal to v of the unit length
      *
      */
-    B2Vector3D getUnitOrthogonal(B2Vector3D v)
+    ROOT::Math::XYZVector getUnitOrthogonal(ROOT::Math::XYZVector v)
     {
-      return B2Vector3D(v.Z(), 0, -v.X()).Unit();
+      return ROOT::Math::XYZVector(v.Z(), 0, -v.X()).Unit();
     }
 
   }

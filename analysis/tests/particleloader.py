@@ -57,7 +57,7 @@ testpath.add_module('ParticleLoader', decayStrings=[roe_side],
 for i in range(len(fsps)):
     if 'K_S0' in fsps[i] or 'Lambda0' in fsps[i]:
         fsps[i] = fsps[i] + ':V0'
-    elif "gamma" not in fsps[i]:
+    elif fsps[i] not in ["gamma", "n0"]:
         fsps[i] = fsps[i] + ':all'
 
 testpath.add_module('ParticleStats', particleLists=fsps)

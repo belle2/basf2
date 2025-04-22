@@ -10,38 +10,40 @@
 
 ##########################################################################
 #                                                                        #
-# This tutorial demonstrates how to train weight file for KsSelector     #
+# This tutorial demonstrates how to train weight file for LambdaSelector #
 # Data sample for this training is created by                            #
-# B2A911-CreateTrainData.py                                              #
+# CreateTrainData_Lambda.py                                              #
 #                                                                        #
 ##########################################################################
 
 import basf2 as b2
 import basf2_mva
-import ksSelector as ksSelector
+import LambdaSelector as LambdaSelector
 
 # Train weight file for V0 Selection.
 # name of output file is specified by the argument 'mva_identifier'.
-ksSelector.V0Selector_Training(
-    train_data=b2.find_file('KsSelector_train_V0Selector.root', 'examples', False),
+LambdaSelector.V0Selector_Training(
+    train_data=b2.find_file('LambdaSelector_train_V0Selector.root', 'examples', False),
     tree_name="tree",
-    mva_identifier="MVAFastBDT_V0Selector.root",
-    target_variable="isSignal"
+    mva_identifier="MVA_LGBM_V0Selector.root",
+    target_variable="isSignal",
+    options={'max_events': 1000}  # number of training events manually reduced to speed up test, set to 0 for full statistics
 )
 
 # Train weight file for V0 Selection.
 # name of output file is specified by the argument 'mva_identifier'.
-ksSelector.LambdaVeto_Training(
-    train_data=b2.find_file('KsSelector_train_LambdaVeto.root', 'examples', False),
+LambdaSelector.KsVeto_Training(
+    train_data=b2.find_file('LambdaSelector_train_KsVeto.root', 'examples', False),
     tree_name="tree",
-    mva_identifier="MVAFastBDT_LambdaVeto.root",
-    target_variable="isSignal"
+    mva_identifier="MVA_LGBM_KsVeto.root",
+    target_variable="isSignal",
+    options={'max_events': 1000}  # number of training events manually reduced to speed up test, set to 0 for full statistics
 )
 
 # apply mva to the training data
-basf2_mva.expert(basf2_mva.vector('MVAFastBDT_V0Selector.root'),
-                 basf2_mva.vector(b2.find_file('KsSelector_train_V0Selector.root', 'examples', False)),
+basf2_mva.expert(basf2_mva.vector('MVA_LGBM_V0Selector.root'),
+                 basf2_mva.vector(b2.find_file('LambdaSelector_train_V0Selector.root', 'examples', False)),
                  'tree', 'MVAExpert_V0Selector.root')
-basf2_mva.expert(basf2_mva.vector('MVAFastBDT_LambdaVeto.root'),
-                 basf2_mva.vector(b2.find_file('KsSelector_train_LambdaVeto.root', 'examples', False)),
-                 'tree', 'MVAExpert_LambdaVeto.root')
+basf2_mva.expert(basf2_mva.vector('MVA_LGBM_KsVeto.root'),
+                 basf2_mva.vector(b2.find_file('LambdaSelector_train_KsVeto.root', 'examples', False)),
+                 'tree', 'MVAExpert_KsVeto.root')

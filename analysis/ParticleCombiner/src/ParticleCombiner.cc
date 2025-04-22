@@ -110,8 +110,10 @@ namespace Belle2 {
 
     DecayDescriptor decaydescriptor;
     bool valid = decaydescriptor.init(decayString);
-    if (!valid)
+    if (!valid) {
       B2ERROR("Invalid input DecayString: " << decayString);
+      return;
+    }
 
     m_properties = decaydescriptor.getProperty();
 

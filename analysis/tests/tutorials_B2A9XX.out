@@ -332,3 +332,31 @@ TBranch: pi_E, 0.7346
 TBranch: pi_isSignal, 1
 TBranch: pi_mcErrors, 0
 TBranch: pi_mcPDG, 211
+TFile: B2A914-ApplyLambdaSelector.root
+TTree: mvalam
+TBranch: __experiment__, 0
+TBranch: __run__, 0
+TBranch: __event__, 89
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: px, 1.561
+TBranch: py, 0.4047
+TBranch: pz, 1.016
+TBranch: pt, 1.612
+TBranch: p, 1.906
+TBranch: E, 2.203
+TBranch: mcE, 2.002
+TBranch: mcP, 1.939
+TBranch: mcPT, 1.644
+TBranch: mcPX, 1.59
+TBranch: mcPY, 0.4153
+TBranch: mcPZ, 1.028
+TBranch: mcPhi, 0.2554
+TBranch: isSignal, 0
+TBranch: mcErrors, 384
+TBranch: mcPDG, 310
+TBranch: extraInfo__boV0_mva__bc, 1
+TBranch: extraInfo__boKs_mva__bc, 0.6603

@@ -147,6 +147,18 @@
   <DetectorComponent name="VTX-CMOS-6layer-staggered-L3mod" isDefault="false">
     <xi:include href="../vtx/VTX-CMOS6-staggered-L3mod.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-6layer-staggered-L3mod-2xL12" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS6-staggered-L3mod-2xL12.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-6layer-staggered-L3mod-3xL12" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS6-staggered-L3mod-3xL12.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-6layer-staggered-L3mod-3xL12-2xL3456" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS6-staggered-L3mod-3xL12-2xL3456.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-6layer-staggered-L3mod-3xL12-1_5xL3456" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS6-staggered-L3mod-3xL12-1_5xL3456.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
   <DetectorComponent name="VTX-CMOS-testbeam-2020-03-12" isDefault="false">
     <xi:include href="../vtx/VTX-testbeam-2020-03-12.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>

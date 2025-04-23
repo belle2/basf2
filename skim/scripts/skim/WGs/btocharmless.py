@@ -13,7 +13,6 @@ Skim list building functions for :math:`B\\to X_u +h` analyses
 """
 
 import modularAnalysis as ma
-
 from skim import BaseSkim, fancy_skim_header
 from stdV0s import stdKshorts
 from skim.standardlists.charmless import (
@@ -23,13 +22,11 @@ from skim.standardlists.charmless import (
     loadStdVeryLooseRho0,
     loadStdVeryLooseKstarPlus,
     loadStdVeryLooseKstarPlusPi0,
-    loadStdVeryLooseRhoPlus
-    )
+    loadStdVeryLooseRhoPlus)
 from skim.standardlists.lightmesons import (
     loadStdSkimHighEffTracks,
     loadStdSkimHighEffEtaPrime,
-    loadStdSkimHighEffEta
-    )
+    loadStdSkimHighEffEta)
 from stdPi0s import stdPi0s
 from stdPhotons import stdPhotons
 
@@ -47,7 +44,7 @@ class BtoPi0Pi0(BaseSkim):
     Cuts applied:
 
     * ``5.20 < Mbc < 5.29``
-    * ``abs(deltaE) < 0.5``eta}
+    * ``abs(deltaE) < 0.5``
 
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Francis Pham", "Benedikt Wach"]

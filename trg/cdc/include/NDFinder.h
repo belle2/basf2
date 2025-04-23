@@ -231,7 +231,7 @@ namespace Belle2 {
 
     // CDC symmetry in phi
     static constexpr unsigned short m_phiGeo = 32; // Repetition of the wire pattern
-    static constexpr unsigned short m_nExpPhiSectors = 11; // Number of phi sectors defining the range of the expanded hits
+    static constexpr unsigned short m_nExpPhiSectors = 13; // Number of phi sectors defining the range of the expanded hits
 
     // Phi sectors in the CDC
     static constexpr unsigned short m_nPhiSector = m_nPhi / m_phiGeo; // Bins of one phi sector (12)
@@ -246,10 +246,10 @@ namespace Belle2 {
     static constexpr SectorBinning m_fullBins = {m_nOmega, m_nPhi, m_nTheta, m_nTS, m_nPrio}; // 40, 384, 9, 2336, 3
 
     // Acceptance ranges + slot sizes to convert bins to track parameters (for getBinToVal method)
-    static constexpr std::array<double, 2> m_omegaRange = {-5., 5.}; // 1/5 = 0.2 (minimum transverse momentum)
+    static constexpr std::array<double, 2> m_omegaRange = {-4., 4.}; // 1/4 = 0.25 (minimum transverse momentum)
     static constexpr std::array<double, 2> m_phiRange = {0., 11.25};
     static constexpr std::array<double, 2> m_thetaRange = {19., 140.};
-    static constexpr double m_binSizeOmega = (m_omegaRange[1] - m_omegaRange[0]) / m_nOmega; // 0.25
+    static constexpr double m_binSizeOmega = (m_omegaRange[1] - m_omegaRange[0]) / m_nOmega; // 0.2
     static constexpr double m_binSizePhi = (m_phiRange[1] - m_phiRange[0]) / m_nPhiSector; // 0.9375
     static constexpr double m_binSizeTheta = (m_thetaRange[1] - m_thetaRange[0]) / m_nTheta; // 13.444
     static constexpr std::array<std::array<double, 2>, 3> m_acceptanceRanges = {m_omegaRange, m_phiRange, m_thetaRange};

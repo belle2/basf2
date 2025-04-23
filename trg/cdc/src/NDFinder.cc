@@ -232,8 +232,8 @@ void NDFinder::processHitForHoughSpace(const unsigned short hitIdx)
 // Computes the phi bin where the corresponding sector starts given the relative SectorID and saves the result
 unsigned short NDFinder::computePhiSectorStart(unsigned short relativeSectorID)
 {
-  // 11/32 phi Sectors (size of the expanded hit representations): Center = 5
-  unsigned short phiSectorStart = ((relativeSectorID - 5) % m_phiGeo + m_phiGeo) % m_phiGeo * m_nPhiSector;
+  // 11/32 phi Sectors (size of the expanded hit representations): Center = 6
+  unsigned short phiSectorStart = ((relativeSectorID - 6) % m_phiGeo + m_phiGeo) % m_phiGeo * m_nPhiSector;
   m_phiSectorStarts.push_back(phiSectorStart);
   return phiSectorStart;
 }

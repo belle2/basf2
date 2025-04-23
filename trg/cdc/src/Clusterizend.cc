@@ -40,7 +40,7 @@ std::array<c3index, 2> Clusterizend::getSectionBounds(const unsigned short quadr
 
   c3index quadrantStart = quadrant * quadrantSize + quadrantOffset;
   c3index sectionStart = quadrantStart + section * sectionSize;
-  c3index sectionEnd = quadrantStart + (section + 1) * sectionSize;
+  c3index sectionEnd = sectionStart + sectionSize;
 
   return {sectionStart, sectionEnd};
 }

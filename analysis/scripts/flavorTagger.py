@@ -1052,9 +1052,9 @@ def flavorTagger(
     downloadFromDatabaseIfNotFound=False,
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',
-    prefix='MC15ri_light-2207-bengal_0',
+    prefix='MC16rd_light-2501-betelgeuse',
     useGNN=False,
-    identifierGNN='GFlaT_MC15ri_light_2303_iriomote_0',
+    identifierGNN='GFlaT_MC16rd_light-2501-betelgeuse',
     path=None,
 ):
     """
@@ -1105,7 +1105,8 @@ def flavorTagger(
                                                want to parallelize the sampling, you can run several sampling scripts in
                                                parallel. By changing this parameter you will not overwrite an older sample.
       @param prefix                            Prefix of weight files.
-                                               ``MC15ri_light-2207-bengal_0`` (default): Weight files trained for MC15ri samples.
+                                               ``MC16rd_light-2501-betelgeuse`` (default): Weight files trained for MC16rd samples.
+                                               ``MC15ri_light-2207-bengal_0``: Weight files trained for MC15ri samples.
                                                ``''``: Weight files trained for MC13 samples.
       @param useGNN                            Use GNN-based Flavor Tagger in addition with FastBDT-based one.
                                                Please specify the weight file with the option ``identifierGNN``.

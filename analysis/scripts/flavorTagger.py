@@ -1053,7 +1053,7 @@ def flavorTagger(
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',
     prefix='MC16rd_light-2501-betelgeuse',
-    useGNN=False,
+    useGNN=True,
     identifierGNN='GFlaT_MC16rd_light-2501-betelgeuse',
     path=None,
 ):

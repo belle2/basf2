@@ -101,12 +101,10 @@ b2.conditions.append_globaltag(ma.getAnalysisGlobaltag())
 # to avoid that the flavor tagger learns asymmetries on the tag side.
 # Only this kind of weight files are supported since release-03-01-00.
 
-weightfiles = 'B2nunubarBGx1'
-
 # Flavor Tagging Function. Default Expert mode to use the official weight files.
 ft.flavorTagger(
     particleLists=['B0:sig'],
-    weightFiles=weightfiles,
+    useGNN=False,
     path=cp_val_path)
 
 # By default the flavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.

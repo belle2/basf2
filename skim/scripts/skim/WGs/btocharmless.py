@@ -408,7 +408,9 @@ class BtoEtapRhop(BaseSkim):
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
     * ``0.8< M_{etap} < 1.1``
-    * ``0.4 < M_{rhop} < 1.0``
+    * ``0.4< M_{eta} < 0.6``
+    * ``0.47 < M_{rhop} < 1.15``
+    * ``0.47 < M_{rho0} < 1.07``
 
     """
 
@@ -433,7 +435,7 @@ class BtoEtapRhop(BaseSkim):
         ma.reconstructDecay("eta\':loose1 -> pi+:SkimHighEff pi-:SkimHighEff eta:gamgam", '0.8 < M < 1.1', 1, path=path)
         ma.reconstructDecay("eta\':loose2 -> rho0:Eff gamma:tight", '0.8 < M < 1.1', 2, path=path)
         ma.copyLists("eta\':loose", ["eta\':loose1", "eta\':loose2"], path=path)
-        ma.reconstructDecay('rho+:loose -> pi+:SkimHighEff pi0:eff40_May2020', '0.47 < M < 1.07', path=path)
+        ma.reconstructDecay('rho+:loose -> pi+:SkimHighEff pi0:eff40_May2020', '0.47 < M < 1.15', path=path)
         ma.reconstructDecay("B+:Charmless_b2etaprhop -> eta\':loose rho+:loose", Bcuts, path=path)
         BsigList.append("B+:Charmless_b2etaprhop")
         return BsigList

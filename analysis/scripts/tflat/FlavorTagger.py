@@ -132,15 +132,12 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
     # create particle list with pions
     ma.fillParticleList(roe_particle_list, roe_particle_list_cut, path=roe_path)
 
-    # create lists with objects for tflat
-    tflat_particle_lists = ['pi+:tflat', 'gamma:tflat']
-
-    trk_cut = 'isInRestOfEvent == 1 and passesROEMask(' + maskName + ') > 0.5 and p < infinity'
-    ma.cutAndCopyList(tflat_particle_lists[0], roe_particle_list, trk_cut, writeOut=True, path=roe_path)
+    trk_cut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and p < infinity'
+    ma.cutAndCopyList('pi+:tflat', roe_particle_list, trk_cut, writeOut=True, path=roe_path)
 
     stdPhotons(listtype='tight',  path=roe_path)
-    gamma_cut = 'isInRestOfEvent == 1 and passesROEMask(' + maskName + ')'
-    ma.cutAndCopyList(tflat_particle_lists[1], 'gamma:tight', gamma_cut, writeOut=True, path=roe_path)
+    gamma_cut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5'
+    ma.cutAndCopyList('gamma:tflat', 'gamma:tight', gamma_cut, writeOut=True, path=roe_path)
 
     ma.reconstructDecay('K_S0:inRoe -> pi+:tflat pi-:tflat', '0.40<=M<=0.60', writeOut=True, path=roe_path)
     kFit('K_S0:inRoe', 0.01, path=roe_path)
@@ -150,12 +147,12 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
 
     # create tagging specific variables
     if mode != 'expert':
-        features = get_variables(tflat_particle_lists[0], rank_variable, trk_variable_list, particleNumber=10)
-        features += get_variables(tflat_particle_lists[1], rank_variable, ecl_variable_list, particleNumber=20)
-        features += get_variables(tflat_particle_lists[0], rank_variable, roe_variable_list, particleNumber=1)
+        features = get_variables('pi+:tflat', rank_variable, trk_variable_list, particleNumber=10)
+        features += get_variables('gamma:tflat', rank_variable, ecl_variable_list, particleNumber=20)
+        features += get_variables('pi+:tflat', rank_variable, roe_variable_list, particleNumber=1)
 
-    for particles in tflat_particle_lists:
-        ma.rankByHighest(particles, rank_variable, path=roe_path)
+    ma.rankByHighest('pi+:tflat', rank_variable, path=roe_path)
+    ma.rankByHighest('gamma:tflat', rank_variable, path=roe_path)
 
     if mode == 'sampler':
         if os.path.isfile(output_file_name) and not overwrite:

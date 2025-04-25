@@ -25,7 +25,7 @@
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
-WireEfficiencyAlgorithm::WireEfficiencyAlgorithm(): CalibrationAlgorithm("CDCCalibrationCollector")
+WireEfficiencyAlgorithm::WireEfficiencyAlgorithm(): CalibrationAlgorithm("CDCBadWireCollector")
 {
   setDescription(
     " -------------------------- Wire Efficiency Estimation Algorithm -------------------------\n"

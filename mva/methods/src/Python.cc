@@ -25,6 +25,20 @@
 
 namespace Belle2 {
   namespace MVA {
+    static std::string loadPythonFileAsString(std::string name)
+    {
+      std::string filename = FileSystem::findFile(name);
+      std::ifstream steering_file(filename);
+      if (not steering_file) {
+        throw std::runtime_error(std::string("Couldn't open file ") + filename);
+      }
+      steering_file.seekg(0, std::ios::end);
+      std::string output_string;
+      output_string.resize(steering_file.tellg());
+      steering_file.seekg(0, std::ios::beg);
+      steering_file.read(&output_string[0], output_string.size());
+      return output_string;
+    }
 
     void PythonOptions::load(const boost::property_tree::ptree& pt)
     {
@@ -152,7 +166,6 @@ namespace Belle2 {
       PythonInitializerSingleton::GetInstance();
     }
 
-
     Weightfile PythonTeacher::train(Dataset& training_data) const
     {
 
@@ -204,15 +217,7 @@ namespace Belle2 {
 
       std::string steering_file_source_code;
       if (m_specific_options.m_steering_file != "") {
-        std::string filename = FileSystem::findFile(m_specific_options.m_steering_file);
-        std::ifstream steering_file(filename);
-        if (not steering_file) {
-          throw std::runtime_error(std::string("Couldn't open file ") + filename);
-        }
-        steering_file.seekg(0, std::ios::end);
-        steering_file_source_code.resize(steering_file.tellg());
-        steering_file.seekg(0, std::ios::beg);
-        steering_file.read(&steering_file_source_code[0], steering_file_source_code.size());
+        steering_file_source_code = loadPythonFileAsString(m_specific_options.m_steering_file);
       }
 
       std::vector<float> means(numberOfFeatures, 0.0);
@@ -244,9 +249,6 @@ namespace Belle2 {
         auto builtins = boost::python::import("builtins");
         auto inspect = boost::python::import("inspect");
 
-        // Load framework
-        auto framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
-
         // Create a new empty module with a unique name.
         // This way we dont end up with multiple mvas trying to overwrite the same apply method with the last one being used by all.
         boost::python::object type = boost::python::import("types");
@@ -256,8 +258,12 @@ namespace Belle2 {
         std::string unique_mva_module_name = "unique_module_name" + boost::uuids::to_string(uuid_gen());
         boost::python::object unique_mva_module = type.attr("ModuleType")(unique_mva_module_name.c_str());
 
-        // Copy framework's __dict__ to the new module
-        unique_mva_module.attr("__dict__").attr("update")(boost::python::object(framework.attr("__dict__")));
+        // Find the framework file. Then execute it in the scope of the new module
+        auto framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
+        auto framework_file = framework.attr("__file__");
+        auto framework_file_source_code = loadPythonFileAsString(boost::python::extract<std::string>(boost::python::object(
+                                                                   framework_file)));
+        builtins.attr("exec")(framework_file_source_code.c_str(), boost::python::object(unique_mva_module.attr("__dict__")));
         // Overwrite framework with user-defined code from the steering file
         builtins.attr("exec")(steering_file_source_code.c_str(), boost::python::object(unique_mva_module.attr("__dict__")));
 
@@ -410,8 +416,6 @@ namespace Belle2 {
         auto pickle = boost::python::import("pickle");
         auto builtins = boost::python::import("builtins");
 
-        auto framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
-
         // Create a new empty module with a unique name.
         // This way we dont end up with multiple mvas trying to implement
         // the same apply method with the last one being used by all.
@@ -420,8 +424,12 @@ namespace Belle2 {
         boost::python::object type = boost::python::import("types");
         m_unique_mva_module = type.attr("ModuleType")(unique_mva_module_name.c_str());
 
-        // Copy framework's __dict__ to the new module
-        m_unique_mva_module.attr("__dict__").attr("update")(boost::python::object(framework.attr("__dict__")));
+        // Find the framework file. Then execute it in the scope of the new module
+        auto framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
+        auto framework_file = framework.attr("__file__");
+        auto framework_file_source_code = loadPythonFileAsString(boost::python::extract<std::string>(boost::python::object(
+                                                                   framework_file)));
+        builtins.attr("exec")(framework_file_source_code.c_str(), boost::python::object(m_unique_mva_module.attr("__dict__")));
 
         // Overwrite framework with user-defined code from the steering file if defined
         if (weightfile.containsElement("Python_Steeringfile")) {

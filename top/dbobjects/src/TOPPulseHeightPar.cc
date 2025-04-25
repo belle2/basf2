@@ -14,7 +14,7 @@ namespace Belle2 {
 
   double TOPPulseHeightPar::getValue(double x) const
   {
-    if (x <= 0) return 0;
+    if (x <= 0 or x0 == 0) return 0;
     double xx = x / x0;
     double f = std::pow(xx, p1) * std::exp(-std::pow(xx, p2));
     return f;
@@ -44,6 +44,7 @@ namespace Belle2 {
 
   double TOPPulseHeightPar::getThresholdEffi(double threshold, double rmsNoise, int n) const
   {
+    if (x0 == 0) return 0;
     double s = 0;
     double dx = (threshold + rmsNoise) / n;
     double f0 = 0;

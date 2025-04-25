@@ -340,14 +340,22 @@ namespace Belle2 {
                                     };
       const double nfotMC[8] = {2.5503, 2.5504, 2.6065, 2.7892, 2.9729, 3.0088, 3.045, 2.6138};
 
-      if (row < 0 or row > 7) return 1;
+      if (row < 0 or row > 7) return 0;
+
+      if (h_mu->GetNbinsX() != 100 or h_mu->GetXaxis()->GetXmin() != -130 or h_mu->GetXaxis()->GetXmax() != 130) {
+        B2ERROR("Histogram " << h_mu->GetTitle() << ": wrong number of bins or wrong range, no yield corrections possible");
+        return 0;
+      }
 
       const double* nFot = numFot[row];
       double nfot = 0;
+      double suma = 0;
       for (int i = 0; i < 100; i++) {
-        nfot += nFot[i] * h_mu->GetBinContent(i + 1);
+        double binContent = h_mu->GetBinContent(i + 1);
+        nfot += nFot[i] * binContent;
+        suma += binContent;
       }
-      nfot /= h_mu->Integral();
+      if (suma != 0) nfot /= suma;
 
       return nfot / nfotMC[row];
     }

@@ -417,7 +417,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
 
     # plot RQE
 
-    gStyle.SetOptStat("rme")
+    gStyle.SetOptStat("rmei")
     canvas.Clear()
     canvas.Divide(2, 2)
 

@@ -1,6 +1,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <analysis/dataobjects/Particle.h>
+#include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <analysis/VariableManager/Manager.h>
 
@@ -13,9 +14,8 @@ namespace {
     return track->getRelatedTo<Belle2::RecoTrack>();
   }
 
-  Belle2::SVDCluster* getSVDCluster(const Belle2::Particle* particle, unsigned int clusterIndex)
+  Belle2::SVDCluster* getSVDCluster(const Belle2::RecoTrack* recoTrack, unsigned int clusterIndex)
   {
-    const Belle2::RecoTrack* recoTrack = getRecoTrack(particle);
     if (!recoTrack) {
       return nullptr;
     }
@@ -25,6 +25,12 @@ namespace {
       return nullptr;
     }
     return svdClusters[clusterIndex];
+  }
+
+  Belle2::SVDCluster* getSVDCluster(const Belle2::Particle* particle, unsigned int clusterIndex)
+  {
+    const Belle2::RecoTrack* recoTrack = getRecoTrack(particle);
+    return getSVDCluster(recoTrack, clusterIndex);
   }
 }
 
@@ -95,7 +101,7 @@ namespace Belle2::Variable {
       {
         return Const::doubleNaN;
       }
-      const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+      const SVDCluster* svdCluster = getSVDCluster(recoTrack, clusterIndex);
       if (!svdCluster)
       {
         return Const::doubleNaN;
@@ -109,13 +115,86 @@ namespace Belle2::Variable {
       {
         genfit::MeasuredStateOnPlane measuredState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(recoHitInformation);
         return svdCluster->isUCluster()
-        ? measuredState.getState()[1] * Unit::convertValueToUnit(1.0, "um")
-        : measuredState.getState()[2] * Unit::convertValueToUnit(1.0, "um");
+        ? measuredState.getState()[1]
+        : measuredState.getState()[2];
       } catch (const NoTrackFitResult&)
       {
         B2WARNING("No track fit result available for this hit!");
         return Const::doubleNaN;
       }
+    };
+  }
+
+  Manager::FunctionPtr SVDTrackPositionErrorUnbiased(const std::vector<std::string>& arguments)
+  {
+    if (arguments.size() != 1) {
+      B2FATAL("Exactly one parameter (cluster index) is required.");
+    }
+    const auto clusterIndex = std::stoi(arguments[0]);
+
+    return [clusterIndex](const Particle * particle) -> double {
+      const RecoTrack* recoTrack = getRecoTrack(particle);
+      if (!recoTrack)
+      {
+        return Const::doubleNaN;
+      }
+      const SVDCluster* svdCluster = getSVDCluster(recoTrack, clusterIndex);
+      if (!svdCluster)
+      {
+        return Const::doubleNaN;
+      }
+      const RecoHitInformation* recoHitInformation = recoTrack->getRecoHitInformation(svdCluster);
+      if (!recoHitInformation)
+      {
+        return Const::doubleNaN;
+      }
+      const genfit::TrackPoint* trackPoint = recoTrack->getCreatedTrackPoint(recoHitInformation);
+      if (!trackPoint)
+      {
+        return Const::doubleNaN;
+      }
+      const genfit::AbsFitterInfo* fitterInfo = trackPoint->getFitterInfo();
+      if (!fitterInfo)
+      {
+        return Const::doubleNaN;
+      }
+      try
+      {
+        genfit::MeasuredStateOnPlane unbiasedState = fitterInfo->getFittedState(false);
+        return svdCluster->isUCluster()
+        ? sqrt(unbiasedState.getCov()[3][3])
+        : sqrt(unbiasedState.getCov()[4][4]);
+      } catch (...)
+      {
+        B2WARNING("Could not compute SVDTrackPositionErrorUnbiased.");
+        return Const::doubleNaN;
+      }
+    };
+  }
+
+  Manager::FunctionPtr SVDTruePosition(const std::vector<std::string>& arguments)
+  {
+    if (arguments.size() != 1) {
+      B2FATAL("Exactly one parameter (cluster index) is required.");
+    }
+    const auto clusterIndex = std::stoi(arguments[0]);
+
+    return [clusterIndex](const Particle * particle) -> double {
+      SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+      if (!svdCluster)
+      {
+        return Const::doubleNaN;
+      }
+
+      const auto trueHit = svdCluster->getRelatedTo<Belle2::SVDTrueHit>();
+
+      if (!trueHit)
+      {
+        return Const::doubleNaN;
+      }
+      return svdCluster->isUCluster()
+      ? trueHit->getU()
+      : trueHit->getV();
     };
   }
 
@@ -132,7 +211,7 @@ namespace Belle2::Variable {
       {
         return Const::doubleNaN;
       }
-      const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+      const SVDCluster* svdCluster = getSVDCluster(recoTrack, clusterIndex);
       if (!svdCluster)
       {
         return Const::doubleNaN;
@@ -238,6 +317,12 @@ namespace Belle2::Variable {
                         Manager::VariableDataType::c_double);
   REGISTER_METAVARIABLE("SVDResidual(i)", SVDResidual,
                         "Returns the track residual of the i-th SVD cluster related to the Particle.",
+                        Manager::VariableDataType::c_double);
+  REGISTER_METAVARIABLE("SVDTrackPositionErrorUnbiased(i)", SVDTrackPositionErrorUnbiased,
+                        "Returns the unbiased track position error of the i-th SVD cluster related to the Particle.",
+                        Manager::VariableDataType::c_double);
+  REGISTER_METAVARIABLE("SVDTruePosition(i)", SVDTruePosition,
+                        "Returns the true position of the i-th SVD cluster related to the Particle.",
                         Manager::VariableDataType::c_double);
   REGISTER_METAVARIABLE("SVDLayer(i)", SVDLayer,
                         "Returns the layer number of the i-th SVD cluster related to the Particle.",

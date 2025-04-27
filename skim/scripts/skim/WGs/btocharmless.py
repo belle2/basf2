@@ -426,10 +426,9 @@ class BtoEtaRhop(BaseSkim):
         loadStdSkimHighEffEta(path=path)
 
     def build_lists(self, path):
-        rhocut = '0.47 < M < 1.15'
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
         BsigList = []
-        ma.reconstructDecay("rho+:pipiz -> pi+:SkimHighEff pi0:eff40_May2020", rhocut, path=path)
+        ma.reconstructDecay("rho+:pipiz -> pi+:SkimHighEff pi0:eff40_May2020", '0.47 < M < 1.15', path=path)
         ma.reconstructDecay("B+:Charmless_b2etarho -> eta:SkimHighEff rho+:pipiz", Bcuts, path=path)
         BsigList.append('B+:Charmless_b2etarho')
         return BsigList

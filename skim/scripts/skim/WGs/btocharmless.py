@@ -407,7 +407,7 @@ class BtoEtaRhop(BaseSkim):
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
     * ``0.4 < M_{eta} < 0.6``
-    * ``0.47 < M_{rho+} < 1.05``
+    * ``0.47 < M_{rho+} < 1.07``
 
     """
 
@@ -426,7 +426,7 @@ class BtoEtaRhop(BaseSkim):
         loadStdSkimHighEffEta(path=path)
 
     def build_lists(self, path):
-        rhocut = '0.47 < M < 1.05'
+        rhocut = '0.47 < M < 1.07'
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
         BsigList = []
         ma.reconstructDecay("rho+:pipiz -> pi+:SkimHighEff pi0:eff40_May2020", rhocut, path=path)

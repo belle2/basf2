@@ -70,9 +70,9 @@ ECLSplitterN1Module::ECLSplitterN1Module() : Module(),
            "Minimum digit energy to be included in the shower energy calculation. (NOT USED)", 0.5 * Belle2::Unit::MeV);
   addParam("cutDigitTimeResidualForEnergy", m_cutDigitTimeResidualForEnergy,
            "Maximum time residual to be included in the shower energy calculation. (NOT USED)", 5.0);
-  addParam("removeShiftedLMs", m_removeShiftedLMs, "Remove LMs if they shifted too much during energy sharing.", 1);
+  addParam("removeShiftedLMs", m_removeShiftedLMs, "Remove LMs if they shifted too much during energy sharing.", 0);
   addParam("sharingDistanceMolierMultiplier", m_sharingDistanceMolierMultiplier,
-           "Maximum distance d to use when sharing energy d = m_sharingDistanceMolierMultiplier*c_molierRadius.", -1.);
+           "Maximum distance d to use when sharing energy d = m_sharingDistanceMolierMultiplier*c_molierRadius.", 50.);
 
   // Neighbour definitions
   addParam("useOptimalNumberOfDigitsForEnergy", m_useOptimalNumberOfDigitsForEnergy,

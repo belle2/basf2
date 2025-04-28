@@ -44,21 +44,17 @@ PythiaBothParam StringZ:usePetersonH=off
 #JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
 PythiaBothParam StringZ:rFactC=1.0
 
-Alias myD0 D0
-Alias myanti-D0 anti-D0
-ChargeConj myD0 myanti-D0
-
 Decay D*0sig
-1.000   myD0 e+ e-                                    PHSP;
+1.000   D0sig e+ e-                                    PHSP;
 Enddecay
 CDecay anti-D*0sig
 
-Decay myD0
+Decay D0sig
 0.131  K- pi+                                       PHSP;
 0.481  K- pi+ pi0                                   D_DALITZ;
 0.274  K- pi+ pi+ pi-                               PHSP;
 0.114  K- omega pi+                                 PHSP;
 Enddecay
-CDecay myanti-D0
+CDecay anti-D0sig
 
 End

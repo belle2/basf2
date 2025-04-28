@@ -44,15 +44,16 @@ void NDFinder::init(const NDFinderParameters& ndFinderParameters)
   reset();
 
   // Parameters necessary for the clustering algorithm
-  m_clustererParams.minTotalWeight = ndFinderParameters.minTotalWeight;
-  m_clustererParams.minPeakWeight = ndFinderParameters.minPeakWeight;
-  m_clustererParams.iterations = ndFinderParameters.iterations;
-  m_clustererParams.omegaTrim = ndFinderParameters.omegaTrim;
-  m_clustererParams.phiTrim = ndFinderParameters.phiTrim;
-  m_clustererParams.nOmega = m_nOmega;
-  m_clustererParams.nPhi = m_nPhi;
-  m_clustererParams.nCot = m_nCot;
-  m_clusterer = Clusterizend(m_clustererParams);
+  ClustererParameters clustererParams = {
+    ndFinderParameters.minPeakWeight,
+    ndFinderParameters.iterations,
+    ndFinderParameters.omegaTrim,
+    ndFinderParameters.phiTrim,
+    m_nOmega,
+    m_nPhi,
+    m_nCot
+  };
+  m_clusterer = Clusterizend(clustererParams);
 }
 
 // Add the hit info of a single track segment to the NDFinder
@@ -282,9 +283,6 @@ void NDFinder::runTrackFinding()
       // Readout of the peak cluster weight
       unsigned int peakWeight = cluster.getPeakWeight();
       readoutCluster.push_back(ROOT::Math::XYZVector(peakWeight, 0, 0));
-      // Readout of the total cluster weight
-      unsigned int totalWeight = cluster.getTotalWeight();
-      readoutCluster.push_back(ROOT::Math::XYZVector(totalWeight, 0, 0));
       // Readout of the number of cluster cells
       unsigned short nCells = cluster.getCells().size();
       readoutCluster.push_back(ROOT::Math::XYZVector(nCells, 0, 0));

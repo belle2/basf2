@@ -39,12 +39,9 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            "Cluster pruning: Minimum number of stereo super layer hits related to a cluster "
            "for the cluster to be considered as a track.",
            static_cast<unsigned short>(3));
-  addParam("minTotalWeight", m_minTotalWeight,
-           "Clustering: minimum total weight of all cells in the 3d volume.",
-           static_cast<unsigned short>(100));
   addParam("minPeakWeight", m_minPeakWeight,
            "Clustering: minimum peak cell weight of a cluster.",
-           static_cast<unsigned short>(32));
+           static_cast<unsigned short>(20));
   addParam("iterations", m_iterations,
            "Clustering: Number of iterations for the cluster finding in one Hough space quadrant.",
            static_cast<unsigned short>(1));
@@ -59,10 +56,10 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            false);
   addParam("axialFile", m_axialFile,
            "File name of the axial hit patterns. ",
-           std::string("data/trg/cdc/ndFinderArrayAxialComp.txt.gz"));
+           std::string("data/trg/cdc/ndFinderAxial40x384x9.txt.gz"));
   addParam("stereoFile", m_stereoFile,
            "File name of the stereo hit patterns. ",
-           std::string("data/trg/cdc/ndFinderArrayStereoComp.txt.gz"));
+           std::string("data/trg/cdc/ndFinderStereo40x384x9.txt.gz"));
   addParam("NDFinderInfosName", m_ndFinderInfosName,
            "The name of the StoreArray where the tracks clusters found by this NDFinder Module are stored.",
            std::string("CDCTriggerClusterInfos"));
@@ -79,8 +76,8 @@ void CDCTriggerNDFinderModule::initialize()
   m_ndFinderTracks.registerRelationTo(m_ndFinderInfos);
   NDFinderParameters ndFinderParameters = {
     m_minSuperAxial, m_minSuperStereo,
-    m_minTotalWeight, m_minPeakWeight,
-    m_iterations, m_omegaTrim, m_phiTrim,
+    m_minPeakWeight, m_iterations,
+    m_omegaTrim, m_phiTrim,
     m_storeAdditionalReadout,
     m_axialFile, m_stereoFile
   };

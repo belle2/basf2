@@ -54,13 +54,9 @@ void Clusterizend::iterateOverSection(const std::array<c3index, 2>& sectionBound
       break;
     }
     SimpleCluster newCluster = createCluster(sectionPeak);
-    unsigned int totalWeight = calculateTotalWeight(newCluster);
     newCluster.setPeakCell(sectionPeak);
     newCluster.setPeakWeight(peakWeight);
-    newCluster.setTotalWeight(totalWeight);
-    if (totalWeight >= m_clustererParams.minTotalWeight) {
-      candidateClusters.push_back(newCluster);
-    }
+    candidateClusters.push_back(newCluster);
     if (m_clustererParams.iterations > 1) deletePeakSurroundings(sectionPeak);
   }
 }
@@ -118,17 +114,6 @@ SimpleCluster Clusterizend::createCluster(const cell_index& peakCell)
     fixedCluster.appendCell({omegaLowerLeft, phiLeft, cotPeak});
   }
   return fixedCluster;
-}
-
-// Adds the weight of all cluster cells together
-unsigned int Clusterizend::calculateTotalWeight(const SimpleCluster& cluster)
-{
-  unsigned int totalClusterWeight = 0;
-  std::vector<cell_index> clusterCells = cluster.getCells();
-  for (const cell_index& cell : clusterCells) {
-    totalClusterWeight += (*m_houghSpace)[cell[0]][cell[1]][cell[2]];
-  }
-  return totalClusterWeight;
 }
 
 // Deletes the surroundings of the peak index with a butterfly cutout

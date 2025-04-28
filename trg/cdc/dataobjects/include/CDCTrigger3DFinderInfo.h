@@ -30,7 +30,7 @@ namespace Belle2 {
   private:
     // List of the complete Hough space weights.
     std::vector<ROOT::Math::XYZVector> m_houghSpace = {};
-    // Includes the peak, total and cluster weights, center of gravity and indices.
+    // Includes the peak weight, cluster weights, center of gravity and indices.
     std::vector<ROOT::Math::XYZVector> m_readoutCluster = {};
     // Needed to make the ROOT object storable
     ClassDef(CDCTrigger3DFinderInfo, 2);

@@ -15,20 +15,18 @@
 namespace Belle2 {
   // Struct containing the parameters for the clustering
   struct ClustererParameters  {
-    // Cut on the total weight of all cells in the 3d volume
-    unsigned short minTotalWeight = 100;
     // Cut on the peak cell weight
-    unsigned short minPeakWeight = 32;
+    unsigned short minPeakWeight;
     // Number of iterations of the cluster searching for each Hough space quadrant
-    unsigned short iterations = 1;
+    unsigned short iterations;
     // Number of deleted cells in omega in each direction of the peak
-    unsigned short omegaTrim = 5;
+    unsigned short omegaTrim;
     // Number of deleted cells in phi in each direction of the peak
-    unsigned short phiTrim = 4;
+    unsigned short phiTrim;
     // The Hough space dimensions
-    unsigned short nOmega = 40;
-    unsigned short nPhi = 384;
-    unsigned short nCot = 9;
+    unsigned short nOmega;
+    unsigned short nPhi;
+    unsigned short nCot;
   };
 
   // Type for found clusters
@@ -46,8 +44,6 @@ namespace Belle2 {
     void setPeakCell(const cell_index& peakCell) { m_clusterPeakCell = peakCell; }
     // Set the weight of the peak cluster cell
     void setPeakWeight(const unsigned int peakWeight) { m_clusterPeakWeight = peakWeight; }
-    // Set the total weight of the cluster
-    void setTotalWeight(const unsigned int totalWeight) { m_clusterTotalWeight = totalWeight; }
 
     // Get member cells in the cluster
     std::vector<cell_index> getCells() const { return m_clusterCells; }
@@ -57,8 +53,6 @@ namespace Belle2 {
     cell_index getPeakCell() const { return m_clusterPeakCell; }
     // Get the weight of the peak cluster cell
     unsigned int getPeakWeight() const { return m_clusterPeakWeight; }
-    // Get the total weight of the cluster
-    unsigned int getTotalWeight() const { return m_clusterTotalWeight; }
 
   private:
     // Cluster member cells
@@ -69,8 +63,6 @@ namespace Belle2 {
     cell_index m_clusterPeakCell{{0, 0, 0}};
     // Weight of the peak index
     unsigned int m_clusterPeakWeight{0};
-    // Total weight of the cluster
-    unsigned int m_clusterTotalWeight{0};
   };
 
   // Clustering module
@@ -104,8 +96,6 @@ namespace Belle2 {
     std::pair<cell_index, unsigned int> getSectionPeak(const std::array<c3index, 2>& sectionBounds);
     // Creates the surrounding cluster (fixed shape) around the section peak index
     SimpleCluster createCluster(const cell_index& peakCell);
-    // Adds the weight of all cluster cells together
-    unsigned int calculateTotalWeight(const SimpleCluster& cluster);
     // Deletes the surroundings of such a cluster
     void deletePeakSurroundings(const cell_index& peakCell);
     // Method to delete a omega row for the cluster deletion in deletePeakSurroundings method

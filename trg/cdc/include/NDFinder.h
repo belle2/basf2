@@ -21,24 +21,22 @@ namespace Belle2 {
   // Struct of NDFinder parameters
   struct NDFinderParameters {
     // Required number of axial super layers
-    unsigned short minSuperAxial = 4;
+    unsigned short minSuperAxial;
     // Required number of stereo super layers
-    unsigned short minSuperStereo = 3;
-    // Clustering: Minimum of the total weight in all cells of the 3d volume
-    unsigned short minTotalWeight = 100;
+    unsigned short minSuperStereo;
     // Clustering: Minimum peak cell weight
-    unsigned short minPeakWeight = 32;
+    unsigned short minPeakWeight;
     // Clustering: Number of iterations for the cluster search in each Hough space quadrant
-    unsigned short iterations = 1;
+    unsigned short iterations;
     // Clustering: Number of deleted cells in each omega direction from the maximum
-    unsigned short omegaTrim = 5;
+    unsigned short omegaTrim;
     // Clustering: Number of deleted cells in each phi direction from the maximum
-    unsigned short phiTrim = 4;
+    unsigned short phiTrim;
     // Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class
-    bool storeAdditionalReadout = false;
+    bool storeAdditionalReadout;
     // Axial and stereo hit representations that should be used
-    std::string axialFile = "data/trg/cdc/ndFinderArrayAxialComp.txt.gz";
-    std::string stereoFile = "data/trg/cdc/ndFinderArrayStereoComp.txt.gz";
+    std::string axialFile;
+    std::string stereoFile;
   };
 
   // Struct containing the track segment (hit) information from the Track Segment Finder (TSF)
@@ -205,8 +203,6 @@ namespace Belle2 {
     unsigned short m_nHits{0};
     // Configuration parameters of the 3DFinder
     NDFinderParameters m_ndFinderParams;
-    // Configuration of the clustering module
-    ClustererParameters m_clustererParams;
     // Clustering module
     Clusterizend m_clusterer;
 
@@ -246,7 +242,7 @@ namespace Belle2 {
     static constexpr SectorBinning m_fullBins = {m_nOmega, m_nPhi, m_nCot, m_nTS, m_nPrio}; // 40, 384, 9, 2336, 3
 
     // Acceptance ranges + slot sizes to convert bins to track parameters (for getBinToVal method)
-    static constexpr std::array<double, 2> m_omegaRange = {-4., 4.}; // 1/4 = 0.25 (minimum transverse momentum)
+    static constexpr std::array<double, 2> m_omegaRange = {-4., 4.}; // 1/4 = 0.25 GeV (minimum transverse momentum)
     static constexpr std::array<double, 2> m_phiRange = {0., 11.25};
     static constexpr std::array<double, 2> m_cotRange = {1.8154040548776156, -0.7951509931203085};
     static constexpr double m_binSizeOmega = (m_omegaRange[1] - m_omegaRange[0]) / m_nOmega; // 0.2

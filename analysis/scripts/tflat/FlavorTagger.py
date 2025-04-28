@@ -35,11 +35,29 @@ def get_variables(particle_list, ranked_variable, variables=None, particleNumber
     return var_list
 
 
+def fill_particle_lists(maskName='TFLATDefaultMask', path=None):
+    """
+    Fills the particle lists.
+    """
+
+    # create particle list with pions
+    trk_cut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5'
+    ma.fillParticleList('pi+:tflat', trk_cut, path=path)
+
+    # create particle list with gammas
+    stdPhotons(listtype='tight',  path=path)
+    gamma_cut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5'
+    ma.cutAndCopyList('gamma:tflat', 'gamma:tight', gamma_cut, path=path)
+
+    ma.reconstructDecay('K_S0:inRoe -> pi+:tflat pi-:tflat', '0.40<=M<=0.60', False, path=path)
+    kFit('K_S0:inRoe', 0.01, path=path)
+
+
 def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier='standard_tflat',
                  target='qrCombined', overwrite=False,
                  classifier_args=None,
                  train_valid_fraction=.92, mva_steering_file='analysis/scripts/tflat/tensorflow_tflat_interface.py',
-                 maskName='all',
+                 maskName='TFLATDefaultMask',
                  path=None):
     """
     Interfacing for the Transformer FlavorTagger (TFlat). This function can be used for training (``teacher``), preparation of
@@ -72,12 +90,12 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
             'useCMSFrame(p)',
             'useCMSFrame(cosTheta)',
             'useCMSFrame(phi)',
-            'electronIDNN',
-            'muonIDNN',
-            'kaonIDNN',
-            'pionIDNN',
-            'protonIDNN',
-            'deuteronIDNN',
+            'electronID',
+            'muonID',
+            'kaonID',
+            'pionID',
+            'protonID',
+            'deuteronID',
             'nCDCHits/56',
             'nPXDHits/2',
             'nSVDHits/8',
@@ -88,7 +106,7 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
             'BtagToWBosonVariables(recoilMassSqrd)/15',
             'BtagToWBosonVariables(pMissCMS)',
             'BtagToWBosonVariables(cosThetaMissCMS)',
-            'cosTPTO',
+            'cosTPTO('+maskName+')',
             'clusterEoP',
             'clusterLAT']
 
@@ -102,10 +120,10 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
             'clusterTiming']
 
         roe_variable_list = [
-            'nCleanedECLClusters(isInRestOfEvent == 1)/8',
-            'nCleanedTracks(isInRestOfEvent == 1)/6',
+            'nROE_Photons(' + maskName + ')/8',
+            'nROE_Charged(' + maskName + ', 0)/6',
             'NumberOfKShortsInRoe',
-            'ptTracksRoe',
+            'ptTracksRoe('+maskName+')',
         ]
 
     if classifier_args is None:
@@ -115,35 +133,18 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
 
     output_file_name = os.path.join(working_dir, uniqueIdentifier + '_training_data.root')
 
-    # create roe specific paths
-    roe_path = basf2.create_path()
-    dead_end_path = basf2.create_path()
-
-    # define tflat specific lists to enable multiple calls, if someone really wants to do that
-    extension = particle_lists[0].replace(':', '_to_')
-    roe_particle_list_cut = ''
-    roe_particle_list = 'pi+:tflat' + '_' + extension
-
     tree_name = 'tflat_variables'
-
-    # filter rest of events only for specific particle list
-    ma.signalSideParticleListsFilter(particle_lists, 'hasRestOfEventTracks > 0', roe_path, dead_end_path)
-
-    # create particle list with pions
-    ma.fillParticleList(roe_particle_list, roe_particle_list_cut, path=roe_path)
-
-    trk_cut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and p < infinity'
-    ma.cutAndCopyList('pi+:tflat', roe_particle_list, trk_cut, writeOut=True, path=roe_path)
-
-    stdPhotons(listtype='tight',  path=roe_path)
-    gamma_cut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5'
-    ma.cutAndCopyList('gamma:tflat', 'gamma:tight', gamma_cut, writeOut=True, path=roe_path)
-
-    ma.reconstructDecay('K_S0:inRoe -> pi+:tflat pi-:tflat', '0.40<=M<=0.60', writeOut=True, path=roe_path)
-    kFit('K_S0:inRoe', 0.01, path=roe_path)
-
-    # sort pattern for tagging specific variables
     rank_variable = 'p'
+
+    # create default ROE-mask
+    if maskName == 'TFLATDefaultMask':
+        TFLATDefaultMask = (
+            'TFLATDefaultMask',
+            'thetaInCDCAcceptance and dr<1 and abs(dz)<3 and p<infinity and p >= 0',
+            'thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.03 and clusterReg==2] or \
+                            [E>0.06 and clusterReg==3]]')
+        for name in particle_lists:
+            ma.appendROEMasks(list_name=name, mask_tuples=[TFLATDefaultMask], path=path)
 
     # create tagging specific variables
     if mode != 'expert':
@@ -151,12 +152,25 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
         features += get_variables('gamma:tflat', rank_variable, ecl_variable_list, particleNumber=20)
         features += get_variables('pi+:tflat', rank_variable, roe_variable_list, particleNumber=1)
 
-    ma.rankByHighest('pi+:tflat', rank_variable, path=roe_path)
-    ma.rankByHighest('gamma:tflat', rank_variable, path=roe_path)
+    # create roe specific paths
+    roe_path = basf2.create_path()
+    dead_end_path = basf2.create_path()
 
     if mode == 'sampler':
         if os.path.isfile(output_file_name) and not overwrite:
             B2FATAL(f'Outputfile {output_file_name} already exists. Aborting writeout.')
+
+        # filter rest of events only for specific particle list
+        ma.signalSideParticleListsFilter(
+            particle_lists,
+            'nROE_Charged(' + maskName + ', 0) > 0 and abs(qrCombined) == 1',
+            roe_path,
+            dead_end_path)
+
+        fill_particle_lists(maskName, roe_path)
+
+        ma.rankByHighest('pi+:tflat', rank_variable, path=roe_path)
+        ma.rankByHighest('gamma:tflat', rank_variable, path=roe_path)
 
         # and add target
         all_variables = features + [target]
@@ -175,6 +189,41 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
 
         with open(os.path.join(working_dir, uniqueIdentifier + '_teacher_command'), 'w') as f:
             f.write(extern_command)
+
+        path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+    elif mode == 'expert':
+
+        # filter rest of events only for specific particle list
+        ma.signalSideParticleListsFilter(
+            particle_lists,
+            'nROE_Charged(' + maskName + ', 0) > 0',
+            roe_path,
+            dead_end_path)
+
+        flavorTaggerInfoBuilder = basf2.register_module('FlavorTaggerInfoBuilder')
+        path.add_module(flavorTaggerInfoBuilder)
+
+        fill_particle_lists(maskName, roe_path)
+
+        ma.rankByHighest('pi+:tflat', rank_variable, path=roe_path)
+        ma.rankByHighest('gamma:tflat', rank_variable, path=roe_path)
+
+        expert_module = basf2.register_module('MVAExpert')
+        expert_module.param('listNames', particle_lists)
+        expert_module.param('identifier', uniqueIdentifier)
+        expert_module.param('extraInfoName', 'tflat_output')
+
+        roe_path.add_module(expert_module)
+
+        flavorTaggerInfoFiller = basf2.register_module('FlavorTaggerInfoFiller')
+        flavorTaggerInfoFiller.param('TFLATnn', True)
+        roe_path.add_module(flavorTaggerInfoFiller)
+
+        # Create standard alias for the output of the flavor tagger
+        vm.addAlias('TFLAT_qrCombined', 'qrOutput(TFLAT)')
+
+        path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
     elif mode == 'teacher':
         if not os.path.isfile(output_file_name):
@@ -196,24 +245,3 @@ def FlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier
         specific_options.m_config = json.dumps(classifier_args)
 
         basf2_mva.teacher(general_options, specific_options)
-
-    elif mode == 'expert':
-
-        flavorTaggerInfoBuilder = basf2.register_module('FlavorTaggerInfoBuilder')
-        path.add_module(flavorTaggerInfoBuilder)
-
-        expert_module = basf2.register_module('MVAExpert')
-        expert_module.param('listNames', particle_lists)
-        expert_module.param('identifier', uniqueIdentifier)
-        expert_module.param('extraInfoName', 'tflat_output')
-
-        roe_path.add_module(expert_module)
-
-        flavorTaggerInfoFiller = basf2.register_module('FlavorTaggerInfoFiller')
-        flavorTaggerInfoFiller.param('TFLATnn', True)
-        roe_path.add_module(flavorTaggerInfoFiller)
-
-        # Create standard alias for the output of the flavor tagger
-        vm.addAlias('TFLAT_qrCombined', 'qrOutput(TFLAT)')
-
-    path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

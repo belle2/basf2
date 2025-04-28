@@ -19,12 +19,12 @@ namespace Belle2 {
   typedef c2array::index c2index;
 
   // The Hough space is a 3D array
-  // (omega, phi, theta)
+  // (omega, phi, cot)
   typedef boost::multi_array<unsigned short, 3> c3array;
   typedef c3array::index c3index;
 
   // Store hit patterns in a 5D array
-  // (hitid, prio, omega, phi, theta)
+  // (hitid, prio, omega, phi, cot)
   typedef boost::multi_array<unsigned short, 5> c5array;
   typedef c5array::index c5index;
 

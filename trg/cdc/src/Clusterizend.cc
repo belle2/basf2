@@ -73,10 +73,10 @@ std::pair<cell_index, unsigned int> Clusterizend::getSectionPeak(const std::arra
   for (c3index omegaIdx = 0; omegaIdx < m_clustererParams.nOmega; ++omegaIdx) {
     for (c3index phiIdx = sectionBounds[0]; phiIdx < sectionBounds[1]; ++phiIdx) {
       c3index phiIdxMod = phiIdx % m_clustererParams.nPhi;
-      for (c3index thetaIdx = 0; thetaIdx < m_clustererParams.nTheta; ++thetaIdx) {
-        if ((*m_houghSpace)[omegaIdx][phiIdxMod][thetaIdx] > peakValue) {
-          peakValue = (*m_houghSpace)[omegaIdx][phiIdxMod][thetaIdx];
-          peakCell = {omegaIdx, phiIdxMod, thetaIdx};
+      for (c3index cotIdx = 0; cotIdx < m_clustererParams.nCot; ++cotIdx) {
+        if ((*m_houghSpace)[omegaIdx][phiIdxMod][cotIdx] > peakValue) {
+          peakValue = (*m_houghSpace)[omegaIdx][phiIdxMod][cotIdx];
+          peakCell = {omegaIdx, phiIdxMod, cotIdx};
         }
       }
     }
@@ -89,10 +89,10 @@ SimpleCluster Clusterizend::createCluster(const cell_index& peakCell)
 {
   c3index omegaPeak = peakCell[0];
   c3index phiPeak = peakCell[1];
-  c3index thetaPeak = peakCell[2];
+  c3index cotPeak = peakCell[2];
 
-  c3index thetaLower = thetaPeak - 1;
-  c3index thetaUpper = thetaPeak + 1;
+  c3index cotLower = cotPeak - 1;
+  c3index cotUpper = cotPeak + 1;
 
   c3index phiLeft = (phiPeak - 1 + m_clustererParams.nPhi) % m_clustererParams.nPhi;
   c3index phiRight = (phiPeak + 1 + m_clustererParams.nPhi) % m_clustererParams.nPhi;
@@ -103,19 +103,19 @@ SimpleCluster Clusterizend::createCluster(const cell_index& peakCell)
   // Add in-bound cells to the cluster:
   SimpleCluster fixedCluster;
   fixedCluster.appendCell(peakCell);
-  fixedCluster.appendCell({omegaPeak, phiLeft, thetaPeak});
-  fixedCluster.appendCell({omegaPeak, phiRight, thetaPeak});
-  if (thetaLower >= 0) {
-    fixedCluster.appendCell({omegaPeak, phiPeak, thetaLower});
+  fixedCluster.appendCell({omegaPeak, phiLeft, cotPeak});
+  fixedCluster.appendCell({omegaPeak, phiRight, cotPeak});
+  if (cotLower >= 0) {
+    fixedCluster.appendCell({omegaPeak, phiPeak, cotLower});
   }
-  if (thetaUpper < m_clustererParams.nTheta) {
-    fixedCluster.appendCell({omegaPeak, phiPeak, thetaUpper});
+  if (cotUpper < m_clustererParams.nCot) {
+    fixedCluster.appendCell({omegaPeak, phiPeak, cotUpper});
   }
   if (omegaUpperRight >= 0) {
-    fixedCluster.appendCell({omegaUpperRight, phiRight, thetaPeak});
+    fixedCluster.appendCell({omegaUpperRight, phiRight, cotPeak});
   }
   if (omegaLowerLeft < m_clustererParams.nOmega) {
-    fixedCluster.appendCell({omegaLowerLeft, phiLeft, thetaPeak});
+    fixedCluster.appendCell({omegaLowerLeft, phiLeft, cotPeak});
   }
   return fixedCluster;
 }
@@ -140,7 +140,7 @@ void Clusterizend::deletePeakSurroundings(const cell_index& peakCell)
   c3index omegaLowerBound = std::max<unsigned short>(0, omegaPeak - m_clustererParams.omegaTrim);
   c3index omegaUpperBound = std::min<unsigned short>(m_clustererParams.nOmega, omegaPeak + m_clustererParams.omegaTrim + 1);
 
-  for (c3index thetaIdx = 0; thetaIdx < m_clustererParams.nTheta; ++thetaIdx) {
+  for (c3index cotIdx = 0; cotIdx < m_clustererParams.nCot; ++cotIdx) {
     for (c3index omegaIdx = omegaLowerBound; omegaIdx < omegaUpperBound; ++omegaIdx) {
       c3index phiCell = phiPeak + omegaPeak - omegaIdx;
       c3index relativePhi = phiCell - phiPeak;
@@ -150,7 +150,7 @@ void Clusterizend::deletePeakSurroundings(const cell_index& peakCell)
           phiCell - m_clustererParams.phiTrim,
           static_cast<c3index>(phiCell + m_clustererParams.phiTrim + std::floor(2.4 * relativePhi)),
           omegaIdx,
-          thetaIdx
+          cotIdx
         };
         clearHoughSpaceRow(firstBounds);
       } else if (relativePhi < 0) {
@@ -158,7 +158,7 @@ void Clusterizend::deletePeakSurroundings(const cell_index& peakCell)
           static_cast<c3index>(phiCell - m_clustererParams.phiTrim + std::ceil(2.4 * relativePhi)),
           phiCell + m_clustererParams.phiTrim + 1,
           omegaIdx,
-          thetaIdx
+          cotIdx
         };
         clearHoughSpaceRow(secondBounds);
       } else {
@@ -166,7 +166,7 @@ void Clusterizend::deletePeakSurroundings(const cell_index& peakCell)
           phiCell - m_clustererParams.phiTrim,
           phiCell + m_clustererParams.phiTrim + 1,
           omegaIdx,
-          thetaIdx
+          cotIdx
         };
         clearHoughSpaceRow(thirdBounds);
       }
@@ -179,6 +179,6 @@ void Clusterizend::clearHoughSpaceRow(const DeletionBounds& bounds)
 {
   for (c3index phiIdx = bounds.phiLowerBound; phiIdx < bounds.phiUpperBound; ++phiIdx) {
     c3index phiIdxMod = (phiIdx + m_clustererParams.nPhi) % m_clustererParams.nPhi;
-    (*m_houghSpace)[bounds.omega][phiIdxMod][bounds.theta] = 0;
+    (*m_houghSpace)[bounds.omega][phiIdxMod][bounds.cot] = 0;
   }
 }

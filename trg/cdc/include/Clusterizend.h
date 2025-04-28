@@ -28,7 +28,7 @@ namespace Belle2 {
     // The Hough space dimensions
     unsigned short nOmega = 40;
     unsigned short nPhi = 384;
-    unsigned short nTheta = 9;
+    unsigned short nCot = 9;
   };
 
   // Type for found clusters
@@ -81,7 +81,7 @@ namespace Belle2 {
       c3index phiLowerBound;
       c3index phiUpperBound;
       c3index omega;
-      c3index theta;
+      c3index cot;
     };
 
     // Default constructor

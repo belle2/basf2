@@ -51,7 +51,7 @@ void NDFinder::init(const NDFinderParameters& ndFinderParameters)
   m_clustererParams.phiTrim = ndFinderParameters.phiTrim;
   m_clustererParams.nOmega = m_nOmega;
   m_clustererParams.nPhi = m_nPhi;
-  m_clustererParams.nTheta = m_nTheta;
+  m_clustererParams.nCot = m_nCot;
   m_clusterer = Clusterizend(m_clustererParams);
 }
 
@@ -74,10 +74,10 @@ void NDFinder::initLookUpArrays()
   // Shapes of the arrays holding the hit patterns
   std::array<c2index, 2> shapeHitToSectorIDs = {{m_nTS, m_nPrio}};
   std::array<c5index, 5> shapeCompAxialHitReps = {{m_nAxial, m_nPrio, m_nOmega, m_nPhiComp, 1}};
-  std::array<c5index, 5> shapeCompStereoHitReps = {{m_nStereo, m_nPrio, m_nOmega, m_nPhiComp, m_nTheta}};
-  std::array<c5index, 5> shapeExpAxialHitReps = {{m_nAxial, m_nPrio, m_nOmega, m_nPhiExp, m_nTheta}};
-  std::array<c5index, 5> shapeExpStereoHitReps = {{m_nStereo, m_nPrio, m_nOmega, m_nPhiExp, m_nTheta}};
-  std::array<c3index, 3> shapeHough = {{m_nOmega, m_nPhi, m_nTheta}};
+  std::array<c5index, 5> shapeCompStereoHitReps = {{m_nStereo, m_nPrio, m_nOmega, m_nPhiComp, m_nCot}};
+  std::array<c5index, 5> shapeExpAxialHitReps = {{m_nAxial, m_nPrio, m_nOmega, m_nPhiExp, m_nCot}};
+  std::array<c5index, 5> shapeExpStereoHitReps = {{m_nStereo, m_nPrio, m_nOmega, m_nPhiExp, m_nCot}};
+  std::array<c3index, 3> shapeHough = {{m_nOmega, m_nPhi, m_nCot}};
 
   m_hitToSectorIDs    = new c2array(shapeHitToSectorIDs);
   m_compAxialHitReps  = new c5array(shapeCompAxialHitReps);
@@ -145,8 +145,8 @@ void NDFinder::loadCompressedHitReps(const std::string& fileName, const SectorBi
     for (c5index priorityWire = 0; priorityWire < compBins.nPriorityWires; ++priorityWire) {
       for (c5index omegaIdx = 0; omegaIdx < compBins.omega; ++omegaIdx) {
         for (c5index phiIdx = 0; phiIdx < compBins.phi; ++phiIdx) {
-          for (c5index thetaIdx = 0; thetaIdx < compBins.theta; ++thetaIdx) {
-            compHitsToWeights[hitID][priorityWire][omegaIdx][phiIdx][thetaIdx] = flatArray[arrayIndex];
+          for (c5index cotIdx = 0; cotIdx < compBins.cot; ++cotIdx) {
+            compHitsToWeights[hitID][priorityWire][omegaIdx][phiIdx][cotIdx] = flatArray[arrayIndex];
             ++arrayIndex;
           }
         }
@@ -161,17 +161,17 @@ void NDFinder::fillExpandedHitReps(const SectorBinning& compBins, const c5array&
   for (c5index hitID = 0; hitID < compBins.nHitIDs; ++hitID) {
     for (c5index priorityWire = 0; priorityWire < compBins.nPriorityWires; ++priorityWire) {
       for (c5index omegaIdx = 0; omegaIdx < compBins.omega; ++omegaIdx) {
-        for (c5index thetaIdx = 0; thetaIdx < compBins.theta; ++thetaIdx) {
-          unsigned short phiStart = compHitsToWeights[hitID][priorityWire][omegaIdx][0][thetaIdx];
-          unsigned short nPhiEntries = compHitsToWeights[hitID][priorityWire][omegaIdx][1][thetaIdx];
+        for (c5index cotIdx = 0; cotIdx < compBins.cot; ++cotIdx) {
+          unsigned short phiStart = compHitsToWeights[hitID][priorityWire][omegaIdx][0][cotIdx];
+          unsigned short nPhiEntries = compHitsToWeights[hitID][priorityWire][omegaIdx][1][cotIdx];
           for (c5index phiEntry = 0; phiEntry < nPhiEntries; ++phiEntry) {
             unsigned short currentPhi = phiStart + phiEntry; // currentPhi goes now from [0, 131]
-            expHitsToWeights[hitID][priorityWire][omegaIdx][currentPhi][thetaIdx] =
-              compHitsToWeights[hitID][priorityWire][omegaIdx][phiEntry + 2][thetaIdx];
-            if (compBins.theta == 1) { // Axial case: expand the same curve in all theta bins
-              for (c5index axialThetaIdx = 1; axialThetaIdx < m_nTheta; ++axialThetaIdx) {
-                expHitsToWeights[hitID][priorityWire][omegaIdx][currentPhi][axialThetaIdx] =
-                  compHitsToWeights[hitID][priorityWire][omegaIdx][phiEntry + 2][thetaIdx];
+            expHitsToWeights[hitID][priorityWire][omegaIdx][currentPhi][cotIdx] =
+              compHitsToWeights[hitID][priorityWire][omegaIdx][phiEntry + 2][cotIdx];
+            if (compBins.cot == 1) { // Axial case: expand the same curve in all cot bins
+              for (c5index axialCotIdx = 1; axialCotIdx < m_nCot; ++axialCotIdx) {
+                expHitsToWeights[hitID][priorityWire][omegaIdx][currentPhi][axialCotIdx] =
+                  compHitsToWeights[hitID][priorityWire][omegaIdx][phiEntry + 2][cotIdx];
               }
             }
           }
@@ -197,7 +197,7 @@ void NDFinder::reset()
 
   // Create a new Hough space
   delete m_houghSpace;
-  std::array<c3index, 3> shapeHough = {{m_nOmega, m_nPhi, m_nTheta}};
+  std::array<c3index, 3> shapeHough = {{m_nOmega, m_nPhi, m_nCot}};
   m_houghSpace = new c3array(shapeHough);
 }
 
@@ -242,12 +242,12 @@ unsigned short NDFinder::computePhiSectorStart(unsigned short relativeSectorID)
 void NDFinder::writeHitToHoughSpace(const WireInfo& wireInfo, const c5array& expHitsToWeights)
 {
   c3array& houghSpace = *m_houghSpace;
-  for (unsigned short thetaIdx = 0; thetaIdx < m_nTheta; ++thetaIdx) {
+  for (unsigned short cotIdx = 0; cotIdx < m_nCot; ++cotIdx) {
     for (unsigned short omegaIdx = 0; omegaIdx < m_nOmega; ++omegaIdx) {
       for (unsigned short phiIdx = 0; phiIdx < m_nPhiExp; ++phiIdx) {
         unsigned short houghPhiIdx = (phiIdx + wireInfo.phiSectorStart) % m_nPhi;
-        houghSpace[omegaIdx][houghPhiIdx][thetaIdx] +=
-          expHitsToWeights[wireInfo.relativeWireID][wireInfo.priorityWire][omegaIdx][phiIdx][thetaIdx];
+        houghSpace[omegaIdx][houghPhiIdx][cotIdx] +=
+          expHitsToWeights[wireInfo.relativeWireID][wireInfo.priorityWire][omegaIdx][phiIdx][cotIdx];
       }
     }
   }
@@ -273,8 +273,8 @@ void NDFinder::runTrackFinding()
       // Readout of the complete Hough space
       for (c3index omegaIdx = 0; omegaIdx < m_nOmega; ++omegaIdx) {
         for (c3index phiIdx = 0; phiIdx < m_nPhi; ++phiIdx) {
-          for (c3index thetaIdx = 0; thetaIdx < m_nTheta; ++thetaIdx) {
-            unsigned short element = houghSpace[omegaIdx][phiIdx][thetaIdx];
+          for (c3index cotIdx = 0; cotIdx < m_nCot; ++cotIdx) {
+            unsigned short element = houghSpace[omegaIdx][phiIdx][cotIdx];
             readoutHoughSpace.push_back(ROOT::Math::XYZVector(element, 0, 0));
           }
         }
@@ -351,7 +351,7 @@ unsigned short NDFinder::getHitContribution(const cell_index& peakCell, const un
   unsigned short contribution = 0;
   unsigned short omegaIdx = peakCell[0];
   unsigned short houghPhiIdx = peakCell[1];
-  unsigned short thetaIdx = peakCell[2];
+  unsigned short cotIdx = peakCell[2];
   unsigned short phiSectorStart = m_phiSectorStarts[hitIdx];
 
   // Inverse Hough transformation (inverse of writeHitToHoughSpace method)
@@ -364,9 +364,9 @@ unsigned short NDFinder::getHitContribution(const cell_index& peakCell, const un
 
   if (phiIdx < m_nPhiExp) { // Get the contribution if the hit covers the current phi-area
     if (orientation == 1) { // Axial TS
-      contribution = (*m_expAxialHitReps)[relativeWireID][priorityWire][omegaIdx][phiIdx][thetaIdx];
+      contribution = (*m_expAxialHitReps)[relativeWireID][priorityWire][omegaIdx][phiIdx][cotIdx];
     } else { // Stereo TS
-      contribution = (*m_expStereoHitReps)[relativeWireID][priorityWire][omegaIdx][phiIdx][thetaIdx];
+      contribution = (*m_expStereoHitReps)[relativeWireID][priorityWire][omegaIdx][phiIdx][cotIdx];
     }
   }
   return contribution;
@@ -444,19 +444,19 @@ std::array<double, 3> NDFinder::calculateCenterOfGravity(const SimpleCluster& cl
 {
   double weightedSumOmega = 0.;
   double weightedSumPhi = 0.;
-  double weightedSumTheta = 0.;
+  double weightedSumCot = 0.;
   unsigned int weightSum = 0;
   for (const cell_index& cellIdx : cluster.getCells()) {
     unsigned short cellWeight = (*m_houghSpace)[cellIdx[0]][cellIdx[1]][cellIdx[2]];
     weightedSumOmega += cellIdx[0] * cellWeight;
     weightedSumPhi += cellIdx[1] * cellWeight;
-    weightedSumTheta += cellIdx[2] * cellWeight;
+    weightedSumCot += cellIdx[2] * cellWeight;
     weightSum += cellWeight;
   }
   weightedSumOmega /= weightSum;
   weightedSumPhi /= weightSum;
-  weightedSumTheta /= weightSum;
-  std::array<double, 3> centerOfGravity = {weightedSumOmega, weightedSumPhi, weightedSumTheta};
+  weightedSumCot /= weightSum;
+  std::array<double, 3> centerOfGravity = {weightedSumOmega, weightedSumPhi, weightedSumCot};
   return centerOfGravity;
 }
 
@@ -487,8 +487,7 @@ std::array<double, 3> NDFinder::transformTrackParameters(const std::array<double
   } else {
     transformed[1] = (estimatedParameters[1]) * TMath::DegToRad();
   }
-  // Theta
-  double theta = estimatedParameters[2] * TMath::DegToRad();
-  transformed[2] = cos(theta) / sin(theta);
+  // Cot
+  transformed[2] = estimatedParameters[2];
   return transformed;
 }

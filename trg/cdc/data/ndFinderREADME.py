@@ -32,8 +32,8 @@ import numpy as np
 
 # Files containing the zero suppressed track to hit relations
 # (hit curves in track parameter space).
-fileAxial = 'ndFinderArrayAxialComp.txt.gz'
-fileStereo = 'ndFinderArrayStereoComp.txt.gz'
+fileAxial = 'ndFinderAxial40x384x9.txt.gz'
+fileStereo = 'ndFinderStereo40x384x9.txt.gz'
 
 axialFlat = np.loadtxt(fileAxial, dtype='uint8')
 stereoFlat = np.loadtxt(fileStereo, dtype='uint8')

@@ -62,13 +62,13 @@ namespace Belle2 {
     {
       m_omega = estimatedParameters[0]; // This is the "real" omega (curvature), i.e., sign(q)/(r_2d[cm])
       m_phi = estimatedParameters[1];
-      m_cotTheta = estimatedParameters[2];
+      m_cotCot = estimatedParameters[2];
     }
 
     // Get the track parameters (z always 0)
     double getOmega() const { return m_omega; }
     double getPhi0() const { return m_phi; }
-    double getCot() const { return m_cotTheta; }
+    double getCot() const { return m_cotCot; }
     // Get the number of related Hits
     std::vector<unsigned short> getRelatedHits() const { return m_cluster.getClusterHits(); }
     // Hough space readout (if storeAdditionalReadout true)
@@ -82,7 +82,7 @@ namespace Belle2 {
     // 2D azimuthal angle
     double m_phi;
     // 3D polar angle
-    double m_cotTheta;
+    double m_cotCot;
     // Vector of the indices of the related hits in the list of CDC hits (StoreArray<CDCHits>)
     std::vector<unsigned short> m_relHits;
     // Vector of the weights for each related hit.
@@ -103,7 +103,7 @@ namespace Belle2 {
     struct SectorBinning {
       unsigned short omega;
       unsigned short phi;
-      unsigned short theta;
+      unsigned short cot;
       unsigned short nHitIDs;
       unsigned short nPriorityWires;
     };
@@ -213,7 +213,7 @@ namespace Belle2 {
     /*
       Since the CDC wire pattern is repeated 32 times, the hit IDs are stored for 1/32 of the CDC only.
       The total number of 2336 TS corresponds to (41 axial + 32 stereo) * 32.
-      The number of track bins (full phi) is: (omega, phi, theta) = (40, 384, 9)
+      The number of track bins (full phi) is: (omega, phi, cot) = (40, 384, 9)
       Note: The omega dimension here represents just sign(q)/(p_T[GeV/c]) (0.2 -> inf -> -inf -> -0.2 for 0 -> 19.5 -> 39)
     */
 
@@ -227,7 +227,7 @@ namespace Belle2 {
     // Full Hough space bins
     static constexpr unsigned short m_nOmega = 40; // Bins in the phi dimension
     static constexpr unsigned short m_nPhi = 384; // Bins in the omega dimension
-    static constexpr unsigned short m_nTheta = 9; // Bins in the theta dimension
+    static constexpr unsigned short m_nCot = 9; // Bins in the cot dimension
 
     // CDC symmetry in phi
     static constexpr unsigned short m_phiGeo = 32; // Repetition of the wire pattern
@@ -240,20 +240,20 @@ namespace Belle2 {
 
     // Binnings in different hit pattern arrays
     static constexpr SectorBinning m_compAxialBins = {m_nOmega, m_nPhiComp, 1, m_nAxial, m_nPrio}; // 40, 15, 1, 41, 3
-    static constexpr SectorBinning m_compStereoBins = {m_nOmega, m_nPhiComp, m_nTheta, m_nStereo, m_nPrio}; // 40, 15, 9, 32, 3
-    static constexpr SectorBinning m_expAxialBins = {m_nOmega, m_nPhiExp, m_nTheta, m_nAxial, m_nPrio}; // 40, 132, 9, 32, 3
-    static constexpr SectorBinning m_expStereoBins = {m_nOmega, m_nPhiExp, m_nTheta, m_nStereo, m_nPrio}; // 40, 132, 9, 32, 3
-    static constexpr SectorBinning m_fullBins = {m_nOmega, m_nPhi, m_nTheta, m_nTS, m_nPrio}; // 40, 384, 9, 2336, 3
+    static constexpr SectorBinning m_compStereoBins = {m_nOmega, m_nPhiComp, m_nCot, m_nStereo, m_nPrio}; // 40, 15, 9, 32, 3
+    static constexpr SectorBinning m_expAxialBins = {m_nOmega, m_nPhiExp, m_nCot, m_nAxial, m_nPrio}; // 40, 132, 9, 32, 3
+    static constexpr SectorBinning m_expStereoBins = {m_nOmega, m_nPhiExp, m_nCot, m_nStereo, m_nPrio}; // 40, 132, 9, 32, 3
+    static constexpr SectorBinning m_fullBins = {m_nOmega, m_nPhi, m_nCot, m_nTS, m_nPrio}; // 40, 384, 9, 2336, 3
 
     // Acceptance ranges + slot sizes to convert bins to track parameters (for getBinToVal method)
     static constexpr std::array<double, 2> m_omegaRange = {-4., 4.}; // 1/4 = 0.25 (minimum transverse momentum)
     static constexpr std::array<double, 2> m_phiRange = {0., 11.25};
-    static constexpr std::array<double, 2> m_thetaRange = {19., 140.};
+    static constexpr std::array<double, 2> m_cotRange = {1.8154040548776156, -0.7951509931203085};
     static constexpr double m_binSizeOmega = (m_omegaRange[1] - m_omegaRange[0]) / m_nOmega; // 0.2
     static constexpr double m_binSizePhi = (m_phiRange[1] - m_phiRange[0]) / m_nPhiSector; // 0.9375
-    static constexpr double m_binSizeTheta = (m_thetaRange[1] - m_thetaRange[0]) / m_nTheta; // 13.444
-    static constexpr std::array<std::array<double, 2>, 3> m_acceptanceRanges = {m_omegaRange, m_phiRange, m_thetaRange};
-    static constexpr std::array<double, 3> m_binSizes = {m_binSizeOmega, m_binSizePhi, m_binSizeTheta};
+    static constexpr double m_binSizeCot = (m_cotRange[1] - m_cotRange[0]) / m_nCot; // -0.29
+    static constexpr std::array<std::array<double, 2>, 3> m_acceptanceRanges = {m_omegaRange, m_phiRange, m_cotRange};
+    static constexpr std::array<double, 3> m_binSizes = {m_binSizeOmega, m_binSizePhi, m_binSizeCot};
 
     // Array pointers to the hit representations and Hough space
     /*
@@ -271,7 +271,7 @@ namespace Belle2 {
       2. [priorityWire]: Hit priority wire ([0, 2])
       3. [omegaIdx]: Omega index of the Hough space ([0, 39])
       4. [phiIdx]: Phi start value, number of phi bins, phi values (0, 1, [2, 14])
-      5. [thetaIdx]: Theta index of the Hough space (0 for axial TS, [0, 8] for stereo TS)
+      5. [cotIdx]: Cot index of the Hough space (0 for axial TS, [0, 8] for stereo TS)
 
       to the Hough space weight contribution at the corresponding bin (int, [0, 7])
     */
@@ -284,13 +284,13 @@ namespace Belle2 {
       2. [priorityWire]: Hit priority wire ([0, 2])
       3. [omegaIdx]: Omega index of the Hough space ([0, 39])
       4. [phiIdx]: The actual relative phi index in the Hough space ([0, 131]), phiSectorStart must be added
-      5. [thetaIdx]: Theta index of the Hough space ([0, 8] for both axial and stereo!)
+      5. [cotIdx]: Cot index of the Hough space ([0, 8] for both axial and stereo!)
 
       to the Hough space weight contribution at the corresponding bin (int, [0, 7])
     */
     c5array* m_expAxialHitReps = nullptr;
     c5array* m_expStereoHitReps = nullptr;
-    // The complete Hough space with the size [m_nOmega, m_nPhi, m_nTheta]
+    // The complete Hough space with the size [m_nOmega, m_nPhi, m_nCot]
     c3array* m_houghSpace = nullptr;
   };
 }

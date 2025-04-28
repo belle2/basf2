@@ -20,7 +20,7 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
 {
   setDescription("CDC Trigger NDFinder Module.\n"
                  "Implements a 3D Hough transformation for \n"
-                 "3D track finding in omega, phi, theta. \n"
+                 "3D track finding in omega, phi, cot. \n"
                  "Uses trained hit patterns for axial and \n"
                  "stereo TS and a density based clustering \n"
                  "algorithm.\n");

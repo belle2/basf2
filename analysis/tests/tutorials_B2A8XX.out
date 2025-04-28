@@ -575,7 +575,7 @@ TBranch: FBDT_qrCombined, 0.5488
 TBranch: FANN_qrCombined, -2
 TBranch: qrMC, 0
 TBranch: mcFlavorOfOtherB, nan
-TBranch: qrGNN, 0.5677
+TBranch: qrGNN, -0.09014
 TBranch: qpElectron, -0.1577
 TBranch: hasTrueTargetElectron, 0
 TBranch: isRightCategoryElectron, nan

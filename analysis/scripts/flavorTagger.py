@@ -1054,7 +1054,7 @@ def flavorTagger(
     samplerFileId='',
     prefix='MC16rd_light-2501-betelgeuse',
     useGNN=True,
-    identifierGNN='GFlaT_MC16rd_light-2501-betelgeuse',
+    identifierGNN='GFlaT_MC16rd_light-2501-betelgeuse_tensorflow',
     path=None,
 ):
     """

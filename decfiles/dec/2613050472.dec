@@ -50,13 +50,9 @@ Alias Xi_c+sig Xi_c+
 Alias anti-Xi_c-sig anti-Xi_c-
 ChargeConj Xi_c+sig anti-Xi_c-sig
 
-Alias myXi- Xi-
-Alias myanti-Xi+ anti-Xi+
-ChargeConj myXi- myanti-Xi+
-
-Alias myLambda0 Lambda0
-Alias myanti-Lambda0 anti-Lambda0
-ChargeConj myLambda0 myanti-Lambda0
+Alias Xi-sig Xi-
+Alias anti-Xi+sig anti-Xi+
+ChargeConj Xi-sig anti-Xi+sig
 
 
 Decay vpho
@@ -66,18 +62,18 @@ Decay vpho
 Enddecay
 
 Decay Xi_c+sig
-1.000   myXi- pi+ pi+      PHOTOS PHSP;
+1.000   Xi-sig pi+ pi+      PHOTOS PHSP;
 Enddecay
 CDecay anti-Xi_c-sig
 
-Decay myXi-
-1.0 myLambda0 pi- PHOTOS PHSP;
+Decay Xi-
+1.0 Lambda0sig pi- PHOTOS PHSP;
 Enddecay
-CDecay myanti-Xi+
+CDecay anti-Xi+sig
 
-Decay myLambda0
+Decay Lambda0sig
 1.0 p+ pi- PHOTOS PHSP;
 Enddecay
-CDecay myanti-Lambda0
+CDecay anti-Lambda0sig
 
 End

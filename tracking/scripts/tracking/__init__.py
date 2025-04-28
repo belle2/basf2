@@ -205,6 +205,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
            Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
            Defaults to "VXDTF2"
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
+    :param svd_ckf_mode: how to apply the CKF (with or without SVD standalone tracking). Defaults to "SVD_after".
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found CDC standalone tracks

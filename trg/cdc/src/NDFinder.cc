@@ -73,12 +73,12 @@ void NDFinder::addHit(const HitInfo& hitInfo)
 void NDFinder::initLookUpArrays()
 {
   // Shapes of the arrays holding the hit patterns
-  std::array<c2index, 2> shapeHitToSectorIDs = {{m_nTS, m_nPrio}};
-  std::array<c5index, 5> shapeCompAxialHitReps = {{m_nAxial, m_nPrio, m_nOmega, m_nPhiComp, 1}};
-  std::array<c5index, 5> shapeCompStereoHitReps = {{m_nStereo, m_nPrio, m_nOmega, m_nPhiComp, m_nCot}};
-  std::array<c5index, 5> shapeExpAxialHitReps = {{m_nAxial, m_nPrio, m_nOmega, m_nPhiExp, m_nCot}};
-  std::array<c5index, 5> shapeExpStereoHitReps = {{m_nStereo, m_nPrio, m_nOmega, m_nPhiExp, m_nCot}};
-  std::array<c3index, 3> shapeHough = {{m_nOmega, m_nPhi, m_nCot}};
+  const std::array<c2index, 2> shapeHitToSectorIDs = {{m_nTS, m_nPrio}};
+  const std::array<c5index, 5> shapeCompAxialHitReps = {{m_nAxial, m_nPrio, m_nOmega, m_nPhiComp, 1}};
+  const std::array<c5index, 5> shapeCompStereoHitReps = {{m_nStereo, m_nPrio, m_nOmega, m_nPhiComp, m_nCot}};
+  const std::array<c5index, 5> shapeExpAxialHitReps = {{m_nAxial, m_nPrio, m_nOmega, m_nPhi, m_nCot}};
+  const std::array<c5index, 5> shapeExpStereoHitReps = {{m_nStereo, m_nPrio, m_nOmega, m_nPhi, m_nCot}};
+  const std::array<c3index, 3> shapeHough = {{m_nOmega, m_nPhi, m_nCot}};
 
   m_hitToSectorIDs    = new c2array(shapeHitToSectorIDs);
   m_compAxialHitReps  = new c5array(shapeCompAxialHitReps);
@@ -166,12 +166,12 @@ void NDFinder::fillExpandedHitReps(const SectorBinning& compBins, const c5array&
           unsigned short phiStart = compHitsToWeights[hitID][priorityWire][omegaIdx][0][cotIdx];
           unsigned short nPhiEntries = compHitsToWeights[hitID][priorityWire][omegaIdx][1][cotIdx];
           for (c5index phiEntry = 0; phiEntry < nPhiEntries; ++phiEntry) {
-            unsigned short currentPhi = phiStart + phiEntry; // currentPhi goes now from [0, 131]
-            expHitsToWeights[hitID][priorityWire][omegaIdx][currentPhi][cotIdx] =
+            unsigned short houghPhiIdx = (phiStart + phiEntry) % m_nPhi; // houghPhiIdx goes now over the complete Hough space
+            expHitsToWeights[hitID][priorityWire][omegaIdx][houghPhiIdx][cotIdx] =
               compHitsToWeights[hitID][priorityWire][omegaIdx][phiEntry + 2][cotIdx];
             if (compBins.cot == 1) { // Axial case: expand the same curve in all cot bins
               for (c5index axialCotIdx = 1; axialCotIdx < m_nCot; ++axialCotIdx) {
-                expHitsToWeights[hitID][priorityWire][omegaIdx][currentPhi][axialCotIdx] =
+                expHitsToWeights[hitID][priorityWire][omegaIdx][houghPhiIdx][axialCotIdx] =
                   compHitsToWeights[hitID][priorityWire][omegaIdx][phiEntry + 2][cotIdx];
               }
             }
@@ -194,7 +194,6 @@ void NDFinder::reset()
   m_nHits = 0;
   m_priorityWirePos.clear();
   m_priorityWireTime.clear();
-  m_phiSectorStarts.clear();
 
   // Create a new Hough space
   delete m_houghSpace;
@@ -219,7 +218,7 @@ void NDFinder::processHitForHoughSpace(const unsigned short hitIdx)
   unsigned short orientation = hitToSectorIDs[m_hitIDs[hitIdx]][0];
   unsigned short relativeWireID = hitToSectorIDs[m_hitIDs[hitIdx]][1];
   unsigned short relativeSectorID = hitToSectorIDs[m_hitIDs[hitIdx]][2];
-  unsigned short phiSectorStart = computePhiSectorStart(relativeSectorID);
+  unsigned short phiSectorStart = relativeSectorID * m_nPhiSector;
   unsigned short priorityWire = m_priorityWirePos[hitIdx];
 
   WireInfo wireInfo = {relativeWireID, phiSectorStart, priorityWire};
@@ -230,22 +229,13 @@ void NDFinder::processHitForHoughSpace(const unsigned short hitIdx)
   }
 }
 
-// Computes the phi bin where the corresponding sector starts given the relative SectorID and saves the result
-unsigned short NDFinder::computePhiSectorStart(unsigned short relativeSectorID)
-{
-  // 11/32 phi Sectors (size of the expanded hit representations): Center = 6
-  unsigned short phiSectorStart = ((relativeSectorID - 6) % m_phiGeo + m_phiGeo) % m_phiGeo * m_nPhiSector;
-  m_phiSectorStarts.push_back(phiSectorStart);
-  return phiSectorStart;
-}
-
 // Write (add) a single hit (Hough curve) to the Hough space
 void NDFinder::writeHitToHoughSpace(const WireInfo& wireInfo, const c5array& expHitsToWeights)
 {
   c3array& houghSpace = *m_houghSpace;
   for (unsigned short cotIdx = 0; cotIdx < m_nCot; ++cotIdx) {
     for (unsigned short omegaIdx = 0; omegaIdx < m_nOmega; ++omegaIdx) {
-      for (unsigned short phiIdx = 0; phiIdx < m_nPhiExp; ++phiIdx) {
+      for (unsigned short phiIdx = 0; phiIdx < m_nPhi; ++phiIdx) {
         unsigned short houghPhiIdx = (phiIdx + wireInfo.phiSectorStart) % m_nPhi;
         houghSpace[omegaIdx][houghPhiIdx][cotIdx] +=
           expHitsToWeights[wireInfo.relativeWireID][wireInfo.priorityWire][omegaIdx][phiIdx][cotIdx];
@@ -350,23 +340,23 @@ unsigned short NDFinder::getHitContribution(const cell_index& peakCell, const un
   unsigned short omegaIdx = peakCell[0];
   unsigned short houghPhiIdx = peakCell[1];
   unsigned short cotIdx = peakCell[2];
-  unsigned short phiSectorStart = m_phiSectorStarts[hitIdx];
-
-  // Inverse Hough transformation (inverse of writeHitToHoughSpace method)
-  unsigned short phiIdx = (houghPhiIdx - phiSectorStart + m_nPhi) % m_nPhi;
 
   const c2array& hitToSectorIDs = *m_hitToSectorIDs;
   unsigned short orientation = hitToSectorIDs[m_hitIDs[hitIdx]][0];
   unsigned short relativeWireID = hitToSectorIDs[m_hitIDs[hitIdx]][1];
+  unsigned short relativeSectorID = hitToSectorIDs[m_hitIDs[hitIdx]][2];
+  unsigned short phiSectorStart = relativeSectorID * m_nPhiSector;
   unsigned short priorityWire = m_priorityWirePos[hitIdx];
 
-  if (phiIdx < m_nPhiExp) { // Get the contribution if the hit covers the current phi-area
-    if (orientation == 1) { // Axial TS
-      contribution = (*m_expAxialHitReps)[relativeWireID][priorityWire][omegaIdx][phiIdx][cotIdx];
-    } else { // Stereo TS
-      contribution = (*m_expStereoHitReps)[relativeWireID][priorityWire][omegaIdx][phiIdx][cotIdx];
-    }
+  // Inverse Hough transformation (inverse of writeHitToHoughSpace method)
+  unsigned short phiIdx = (houghPhiIdx - phiSectorStart + m_nPhi) % m_nPhi;
+
+  if (orientation == 1) { // Axial TS
+    contribution = (*m_expAxialHitReps)[relativeWireID][priorityWire][omegaIdx][phiIdx][cotIdx];
+  } else { // Stereo TS
+    contribution = (*m_expStereoHitReps)[relativeWireID][priorityWire][omegaIdx][phiIdx][cotIdx];
   }
+
   return contribution;
 }
 

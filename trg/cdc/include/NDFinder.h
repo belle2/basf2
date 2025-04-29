@@ -158,8 +158,6 @@ namespace Belle2 {
     void fillExpandedHitReps(const SectorBinning& compBins, const c5array& compHitsToWeights, c5array& expHitsToWeights);
     // Process a single axial or stereo hit for the Hough space
     void processHitForHoughSpace(const unsigned short hitIdx);
-    // Computes the phi bin of the sector start, given the relative SectorID. Saves the result in m_phiSectorStarts (see below).
-    unsigned short computePhiSectorStart(unsigned short relativeSectorID);
     // Write (add) a single hit (Hough curve) to the Hough space
     void writeHitToHoughSpace(const WireInfo& hitInfo, const c5array& expHitsToWeights);
     // Core track finding logic in the constructed Hough space
@@ -197,8 +195,6 @@ namespace Belle2 {
     std::vector<unsigned short> m_priorityWirePos;
     // Drift time of the priority wire.
     std::vector<short> m_priorityWireTime;
-    // Start phi-sector index of the hit representation (11/32) in full track parameter space
-    std::vector<unsigned short> m_phiSectorStarts;
     // Counter for the number of hits in the current event
     unsigned short m_nHits{0};
     // Configuration parameters of the 3DFinder
@@ -209,8 +205,8 @@ namespace Belle2 {
     /*
       Since the CDC wire pattern is repeated 32 times, the hit IDs are stored for 1/32 of the CDC only.
       The total number of 2336 TS corresponds to (41 axial + 32 stereo) * 32.
-      The number of track bins (full phi) is: (omega, phi, cot) = (40, 384, 9)
-      Note: The omega dimension here represents just sign(q)/(p_T[GeV/c]) (0.2 -> inf -> -inf -> -0.2 for 0 -> 19.5 -> 39)
+      The number of track bins is (for example): (omega, phi, cot) = (40, 384, 9)
+      Note: The omega dimension here represents just sign(q)/(p_T[GeV/c]) (0.25 -> inf -> -inf -> -0.25 for 0 -> 19.5 -> 39)
     */
 
     // Track segments
@@ -227,24 +223,19 @@ namespace Belle2 {
 
     // CDC symmetry in phi
     static constexpr unsigned short m_phiGeo = 32; // Repetition of the wire pattern
-    static constexpr unsigned short m_nExpPhiSectors = 13; // Number of phi sectors defining the range of the expanded hits
 
     // Phi sectors in the CDC
     static constexpr unsigned short m_nPhiSector = m_nPhi / m_phiGeo; // Bins of one phi sector (12)
-    static constexpr unsigned short m_nPhiComp = 15; // Bins of compressed phi: phi_start, phi_width, phi_0, ..., phi_12
-    static constexpr unsigned short m_nPhiExp =  m_nExpPhiSectors * m_nPhiSector; // Bins of 11 phi sectors (132)
 
-    // Binnings in different hit pattern arrays
+    // Data structure/binning of the compressed hit pattern files (.txt.gz files)
+    static constexpr unsigned short m_nPhiComp = 15; // Bins of compressed phi: phi_start, phi_width, phi_0, ..., phi_12
     static constexpr SectorBinning m_compAxialBins = {m_nOmega, m_nPhiComp, 1, m_nAxial, m_nPrio}; // 40, 15, 1, 41, 3
     static constexpr SectorBinning m_compStereoBins = {m_nOmega, m_nPhiComp, m_nCot, m_nStereo, m_nPrio}; // 40, 15, 9, 32, 3
-    static constexpr SectorBinning m_expAxialBins = {m_nOmega, m_nPhiExp, m_nCot, m_nAxial, m_nPrio}; // 40, 132, 9, 32, 3
-    static constexpr SectorBinning m_expStereoBins = {m_nOmega, m_nPhiExp, m_nCot, m_nStereo, m_nPrio}; // 40, 132, 9, 32, 3
-    static constexpr SectorBinning m_fullBins = {m_nOmega, m_nPhi, m_nCot, m_nTS, m_nPrio}; // 40, 384, 9, 2336, 3
 
     // Acceptance ranges + slot sizes to convert bins to track parameters (for getBinToVal method)
     static constexpr std::array<double, 2> m_omegaRange = {-4., 4.}; // 1/4 = 0.25 GeV (minimum transverse momentum)
-    static constexpr std::array<double, 2> m_phiRange = {0., 11.25};
-    static constexpr std::array<double, 2> m_cotRange = {1.8154040548776156, -0.7951509931203085};
+    static constexpr std::array<double, 2> m_phiRange = {0., 11.25}; // One phi sector (360/32)
+    static constexpr std::array<double, 2> m_cotRange = {1.8154040548776156, -0.7951509931203085}; // => theta in [28.85, 128.49]
     static constexpr double m_binSizeOmega = (m_omegaRange[1] - m_omegaRange[0]) / m_nOmega; // 0.2
     static constexpr double m_binSizePhi = (m_phiRange[1] - m_phiRange[0]) / m_nPhiSector; // 0.9375
     static constexpr double m_binSizeCot = (m_cotRange[1] - m_cotRange[0]) / m_nCot; // -0.29
@@ -265,22 +256,22 @@ namespace Belle2 {
 
       1. [hitID]: Relative hit number of the track segment (axial [0, 40], stereo [0, 31])
       2. [priorityWire]: Hit priority wire ([0, 2])
-      3. [omegaIdx]: Omega index of the Hough space ([0, 39])
+      3. [omegaIdx]: Omega index of the Hough space ([0, m_nOmega - 1])
       4. [phiIdx]: Phi start value, number of phi bins, phi values (0, 1, [2, 14])
-      5. [cotIdx]: Cot index of the Hough space (0 for axial TS, [0, 8] for stereo TS)
+      5. [cotIdx]: Cot index of the Hough space (0 for axial TS, [0, m_nCot - 1] for stereo TS)
 
       to the Hough space weight contribution at the corresponding bin (int, [0, 7])
     */
     c5array* m_compAxialHitReps = nullptr;
     c5array* m_compStereoHitReps = nullptr;
     /*
-      m_expAxialHitReps/m_expStereoHitReps (~ Expands to 11/32 phi sectors) 5D array mapping:
+      m_expAxialHitReps/m_expStereoHitReps (~ expansion of the compressed representations) 5D array mapping:
 
       1. [hitID]: Relative hit number of the track segment (axial [0, 40], stereo [0, 31])
       2. [priorityWire]: Hit priority wire ([0, 2])
-      3. [omegaIdx]: Omega index of the Hough space ([0, 39])
-      4. [phiIdx]: The actual relative phi index in the Hough space ([0, 131]), phiSectorStart must be added
-      5. [cotIdx]: Cot index of the Hough space ([0, 8] for both axial and stereo!)
+      3. [omegaIdx]: Omega index of the Hough space ([0, m_nOmega - 1])
+      4. [phiIdx]: Phi index of the Hough space ([0, m_nPhi - 1])
+      5. [cotIdx]: Cot index of the Hough space ([0, m_nCot - 1] for both axial and stereo!)
 
       to the Hough space weight contribution at the corresponding bin (int, [0, 7])
     */

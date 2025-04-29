@@ -1076,19 +1076,19 @@ def flavorTagger(
       @param particleLists                     The ROEs for flavor tagging are selected from the given particle lists.
       @param mode                              The available modes are
                                                ``Expert`` (default), ``Sampler``, and ``Teacher``. In the ``Expert`` mode
-                                               Flavor Tagging is applied to the analysis,. In the ``Sampler`` mode you save
-                                               save the variables for training. In the ``Teacher`` mode the FlavorTagger is
+                                               Flavor Tagging is applied to the analysis. In the ``Sampler`` mode you save
+                                               the variables for training. In the ``Teacher`` mode the FlavorTagger is
                                                trained, for this step you do not reconstruct any particle or do any analysis,
                                                you just run the flavorTagger alone.
       @param weightFiles                       Weight files name. Default=
-                                               ``B2nunubarBGx1`` (official weight files). If the user self
-                                               wants to train the FlavorTagger, the weightfiles name should correspond to the
-                                               analysed CP channel in order to avoid confusions. The default name
+                                               ``B2nunubarBGx1`` (official weight files). If the user wants to train the
+                                               FlavorTagger themselves, the weightfiles name should correspond to the
+                                               analyzed CP channel in order to avoid confusions. The default name
                                                ``B2nunubarBGx1`` corresponds to
                                                :math:`B^0_{\\rm sig}\\to \\nu \\overline{\\nu}`.
                                                and ``B2JpsiKs_muBGx1`` to
                                                :math:`B^0_{\\rm sig}\\to J/\\psi (\\to \\mu^+ \\mu^-) K_s (\\to \\pi^+ \\pi^-)`.
-                                               BGx1 stays for events simulated with background.
+                                               BGx1 stands for events simulated with background.
       @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
       @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT` (default).
                                                ``FANN-MLP`` is available only with ``prefix=''`` (MC13 weight files).
@@ -1120,11 +1120,12 @@ def flavorTagger(
                                                ``''``: Weight files trained for MC13 samples.
       @param useGNN                            Use GNN-based Flavor Tagger in addition with FastBDT-based one.
                                                Please specify the weight file with the option ``identifierGNN``.
-                                               [Expert] In the sampler mode, training files for GNN-based Flavor Tagger is produced.
+                                               [Expert] In the sampler mode,
+                                               training files for GNN-based Flavor Tagger are produced.
       @param identifierGNN                     The name of weight file of the GNN-based Flavor Tagger.
                                                [Expert] Multiple identifiers can be given with list(str).
-      @param usePIDNN                          if True, PID probabilities calculated from PID neural network are used
-                                               (default is False)
+      @param usePIDNN                          If True, PID probabilities calculated from PID neural network are used
+                                               (default is False). Prefix and identifierGNN must be set accordingly.
       @param path                              Modules are added to this path
 
     """

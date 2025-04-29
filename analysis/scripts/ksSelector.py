@@ -73,7 +73,8 @@ def V0Selector_Training(
     tree_name="tree",
     mva_identifier="MVAFastBDT_V0Selector.root",
     target_variable="isSignal",
-    parameters={}
+    parameters={},
+    options={}
 ):
     """
     Defines the configuration of V0Selector Training.
@@ -84,7 +85,7 @@ def V0Selector_Training(
     @param mva_identifier               Name for output MVA weight file.
     @param target_variable              Target variable for MVA training.
     @param parameters                   hyperparameter for LGBM
-
+    @param options                      MVA options
     """
     trainVars = [
         'cosVertexMomentum',
@@ -106,20 +107,10 @@ def V0Selector_Training(
     general_options.m_identifier = mva_identifier
     general_options.m_variables = basf2_mva.vector(*trainVars)
     general_options.m_target_variable = target_variable
-    fastbdt_options = basf2_mva.FastBDTOptions()
-    basf2_mva.teacher(general_options, fastbdt_options)
-
-    general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector(train_data)
-    general_options.m_treename = tree_name
-    general_options.m_identifier = mva_identifier+'.root'
-    general_options.m_variables = basf2_mva.vector(*trainVars)
-    general_options.m_target_variable = target_variable
+    general_options.m_max_events = 0 if 'max_events' not in options else options['max_events']
 
     python_options = basf2_mva.PythonOptions()
-
-    python_options.m_framework = "custom"
-    python_options.m_steering_file = "mva/scripts/basf2_mva_python_interface/lightgbm.py"
+    python_options.m_framework = "lightgbm"
 
     import json
     param = {'num_leaves': 256,
@@ -131,13 +122,12 @@ def V0Selector_Training(
              # 'stop_round' : 30,
              'path': mva_identifier+'.txt',
              'max_bin': 250,
-             'boosting': ' gbdt',
+             'boosting': 'gbdt',
              'trainFraction': 0.8,
              'min_data_in_leaf': 4000,
              'max_depth': 8,
              'objective': 'cross_entropy'
              }
-
     if isinstance(parameters, dict):
         param.update(parameters)
     config_string = json.dumps(param)
@@ -145,11 +135,10 @@ def V0Selector_Training(
     python_options.m_config = config_string
 
     python_options.m_training_fraction = 1
-
     python_options.m_normalize = False  # we do it inside MVA torch
-
     python_options.m_nIterations = 1
     python_options.m_mini_batch_size = 0
+
     basf2_mva.teacher(general_options, python_options)
 
 
@@ -158,7 +147,8 @@ def LambdaVeto_Training(
     tree_name="tree",
     mva_identifier="MVAFastBDT_LambdaVeto.root",
     target_variable="isSignal",
-    parameters={}
+    parameters={},
+    options={}
 ):
     """
     Defines the configuration of LambdaVeto Training.
@@ -169,6 +159,7 @@ def LambdaVeto_Training(
     @param mva_identifier               Name for output MVA weight file.
     @param target_variable              Target variable for MVA training.
     @param parameters                   hyperparameter for LGBM
+    @param options                      MVA options
     """
     trainVars = [
         'pip_protonID',
@@ -181,26 +172,17 @@ def LambdaVeto_Training(
         'ArmenterosDaughter1Qt',
         'ArmenterosDaughter2Qt'
     ]
+
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector(train_data)
     general_options.m_treename = tree_name
     general_options.m_identifier = mva_identifier
     general_options.m_variables = basf2_mva.vector(*trainVars)
     general_options.m_target_variable = target_variable
-    fastbdt_options = basf2_mva.FastBDTOptions()
-    basf2_mva.teacher(general_options, fastbdt_options)
-
-    general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector(train_data)
-    general_options.m_treename = tree_name
-    general_options.m_identifier = mva_identifier+'.root'
-    general_options.m_variables = basf2_mva.vector(*trainVars)
-    general_options.m_target_variable = target_variable
+    general_options.m_max_events = 0 if 'max_events' not in options else options['max_events']
 
     python_options = basf2_mva.PythonOptions()
-
-    python_options.m_framework = "custom"
-    python_options.m_steering_file = "mva/scripts/basf2_mva_python_interface/lightgbm.py"
+    python_options.m_framework = "lightgbm"
 
     import json
     param = {'num_leaves': 256,
@@ -212,13 +194,12 @@ def LambdaVeto_Training(
              # 'stop_round' : 30,
              'path': mva_identifier+'.txt',
              'max_bin': 250,
-             'boosting': ' dart',
+             'boosting': 'dart',
              'trainFraction': 0.8,
              'min_data_in_leaf': 300,
              'max_depth': 8,
              'objective': 'cross_entropy'
              }
-
     if isinstance(parameters, dict):
         param.update(parameters)
     config_string = json.dumps(param)
@@ -226,12 +207,12 @@ def LambdaVeto_Training(
     python_options.m_config = config_string
 
     python_options.m_training_fraction = 1
-
     python_options.m_normalize = False  # we do it inside MVA torch
-
     python_options.m_nIterations = 1
     python_options.m_mini_batch_size = 0
+
     basf2_mva.teacher(general_options, python_options)
+
 # ****************************************
 # KS Selector MAIN FUNCTION
 # ****************************************

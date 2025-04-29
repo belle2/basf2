@@ -665,19 +665,16 @@ namespace Belle2 {
 
   bool TOPBunchFinderModule::isBucketFilled(int bunchNo)
   {
-    // return true if needed information is not available
+    // return true if needed information is not available or fill pattern offset is not calibrated
 
     if (not m_bunchStructure->isSet()) return true;
     if (m_revo9Counter == 0xFFFF) return true;
+    if (not m_fillPatternOffset.isValid()) return true;
+    if (not m_fillPatternOffset->isCalibrated()) return true;
 
-    // fill pattern offset; it is always zero on MC.
+    // fill pattern offset; it is always zero on MC, because we are not simulating it
 
-    int offset = 0;
-    if (not m_isMC) {
-      if (not m_fillPatternOffset.isValid()) return true;
-      if (not m_fillPatternOffset->isCalibrated()) return true;
-      offset = m_fillPatternOffset->get();
-    }
+    int offset = m_isMC ? 0 : m_fillPatternOffset->get();
 
     // corresponding bucket number and fill status
 

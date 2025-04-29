@@ -80,6 +80,7 @@ def V0Selector_Training(
         mva_identifier="MVA_LightGBM_V0Selector.root",
         target_variable="isSignal",
         parameters={},
+        options={}
         ):
     """
     Defines the configuration of V0Selector Training.
@@ -90,6 +91,7 @@ def V0Selector_Training(
     @param mva_identifier               Name for output MVA weight file.
     @param target_variable              Target variable for MVA training.
     @param parameters                   hyperparameter for LGBM
+    @param options                      MVA options
     """
 
     # Create The GeneralOptions object as always
@@ -114,11 +116,10 @@ def V0Selector_Training(
     general_options.m_identifier = mva_identifier
     general_options.m_variables = basf2_mva.vector(*trainVars)
     general_options.m_target_variable = target_variable
+    general_options.m_max_events = 0 if 'max_events' not in options else options['max_events']
 
     python_options = basf2_mva.PythonOptions()
-
     python_options.m_framework = "lightgbm"
-    python_options.m_steering_file = ""
 
     import json
     param = {'num_leaves': 256,
@@ -156,6 +157,7 @@ def KsVeto_Training(
     mva_identifier="MVA_LightGBM_KsVeto.root",
     target_variable="isSignal",
     parameters={},
+    options={}
 ):
     """
     Defines the configuration of KsVeto Training.
@@ -166,6 +168,7 @@ def KsVeto_Training(
     @param mva_identifier               Name for output MVA weight file.
     @param target_variable              Target variable for MVA training.
     @param parameters                   hyperparameter for LGBM
+    @param options                      MVA options
     """
 
     # Create The GeneralOptions object as always
@@ -186,11 +189,10 @@ def KsVeto_Training(
     general_options.m_identifier = mva_identifier
     general_options.m_variables = basf2_mva.vector(*trainVars)
     general_options.m_target_variable = target_variable
+    general_options.m_max_events = 0 if 'max_events' not in options else options['max_events']
 
     python_options = basf2_mva.PythonOptions()
-
     python_options.m_framework = "lightgbm"
-    python_options.m_steering_file = ""
 
     import json
     param = {'num_leaves': 256,
@@ -215,9 +217,9 @@ def KsVeto_Training(
     python_options.m_config = config_string
 
     python_options.m_normalize = False  # we do it inside MVA torch
-
     python_options.m_nIterations = 1
     python_options.m_mini_batch_size = 0
+
     basf2_mva.teacher(general_options, python_options)
 
 # ****************************************

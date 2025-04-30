@@ -11,16 +11,16 @@
 import b2test_utils as b2tu
 import b2test_utils_analysis as b2tua
 
-#: extend the examples test class to actually run over the V0 selector examples:
+#: extend the examples test class to run over the KS selector examples:
 
 
 class ExamplesTest(b2tua.ExamplesTest):
-    def test_v0selector_examples(self):
+    def test_ksselector_examples(self):
         """
-        Test supported V0 selector examples.
+        Test supported KS selector examples.
         """
 
-        self._test_examples_dir('analysis/examples/V0Selector/', nevents=20)
+        self._test_examples_dir('analysis/examples/V0Selector/', filepattern="*Ks", nevents=20)
 
 
 if __name__ == '__main__':

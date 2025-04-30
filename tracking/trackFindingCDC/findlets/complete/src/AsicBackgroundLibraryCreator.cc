@@ -5,6 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #include <tracking/trackFindingCDC/findlets/complete/AsicBackgroundLibraryCreator.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
@@ -15,10 +16,13 @@
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <framework/logging/Logger.h>
-#include <iostream>
+
 #include <TTree.h>
 #include <TFile.h>
 #include <TBranch.h>
+
+#include <iostream>
+#include <cmath>
 
 using namespace Belle2;
 using namespace CDC;
@@ -47,7 +51,7 @@ float getDist2D(const CDCTrajectory3D& trajectory, const CDCWireHit* wireHit)
     recoPos2D = wirePos2DAtZ + disp2D;
   }
   const float distanceToHit = trajectory2D.getDist2D(recoPos2D);
-  return abs(distanceToHit);
+  return std::abs(distanceToHit);
 }
 
 void AsicBackgroundLibraryCreator::initialize()

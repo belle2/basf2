@@ -10,6 +10,8 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
+#include <cmath>
+
 using namespace Belle2;
 using namespace TrackingUtilities;
 
@@ -30,7 +32,7 @@ DistanceSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CK
 
   if (not fromStateCache.isHitState) {
     // We are coming from a CDC track, so we can use its position to only look for matching ladders
-    if (fabs(phiDiff) < 0.2f and fabs(fromStateCache.theta - toStateCache.theta) < 0.2f) {
+    if (std::abs(phiDiff) < 0.2f and std::abs(fromStateCache.theta - toStateCache.theta) < 0.2f) {
       return 1.0;
     }
     // If the current state (fromState) is a RecoTrack-based state, but no relations could be created
@@ -45,7 +47,7 @@ DistanceSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CK
     return 1.0;
   }
 
-  if (abs(phiDiff) < 0.2f) {
+  if (std::abs(phiDiff) < 0.2f) {
     return 1.0;
   }
 

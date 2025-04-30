@@ -31,8 +31,6 @@
 using namespace Belle2;
 using namespace std;
 
-const DecayDescriptor& DecayDescriptor::s_NULL = DecayDescriptor();
-
 DecayDescriptor::DecayDescriptor() :
   m_mother(),
   m_iDaughter_p(-1),

@@ -21,6 +21,8 @@
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <TDirectory.h>
 #include <TMath.h>
+
+#include <cmath>
 #include <map>
 
 using namespace Belle2;
@@ -218,8 +220,8 @@ void PhysicsObjectsMiraBelleBhabhaModule::event()
   m_h_dD0->Fill((d0[0] + d0[1]) / sqrt(2));
   m_h_dZ0->Fill((z0[0] - z0[1]) / sqrt(2));
   m_h_dPtcms->Fill((ptcms[0] - ptcms[1]) / sqrt(2));
-  m_h_dPhicms->Fill(180 - abs(phicms[0] - phicms[1]));
-  m_h_dThetacms->Fill(abs(thetacms[0] + thetacms[1]) - 180);
+  m_h_dPhicms->Fill(180 - std::abs(phicms[0] - phicms[1]));
+  m_h_dThetacms->Fill(std::abs(thetacms[0] + thetacms[1]) - 180);
   // Event level information
   StoreObjPtr<EventLevelTrackingInfo> elti;
   if (elti) {

@@ -19,8 +19,7 @@ using namespace Belle2;
 std::vector<SimpleCluster> Clusterizend::makeClusters()
 {
   std::vector<SimpleCluster> candidateClusters;
-  c3array houghSpaceBackup;
-  if (m_clustererParams.iterations > 1) houghSpaceBackup = *m_houghSpace;
+  c3array houghSpaceBackup = *m_houghSpace;
   for (unsigned short quadrant = 0; quadrant < 4; ++quadrant) {
     for (unsigned short section = 0; section < 4; ++section) {
       std::array<c3index, 2> sectionBounds = getSectionBounds(quadrant, section);

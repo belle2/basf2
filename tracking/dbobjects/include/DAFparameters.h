@@ -86,7 +86,14 @@ namespace Belle2 {
     {
       m_MaximumFailedHits = maximumfailedhits;
     }
-
+    /** Set the minimum PValue used for the convergence criterion.
+     * (The PValue of the two iterations must be greater than a minimum value, to be considered for the fit convergence)
+     * @param minimumPValue minimum PValue
+     */
+    void setMinimumPValue(const float minimumPValue)
+    {
+      m_MinimumPValue = minimumPValue;
+    }
 
 
     /** Get the DeltaPValue for p-value convergence criterion
@@ -140,6 +147,13 @@ namespace Belle2 {
     {
       return m_MaximumFailedHits;
     }
+    /** Get the minimum PValue used for the convergence criterion.
+    * (The PValue of the two iterations must be greater than a minimum value, to be considered for the fit convergence)
+    */
+    float getMinimumPValue() const
+    {
+      return m_MinimumPValue;
+    }
 
   private:
     /** The DeltaPValue for p-value convergence criterion */
@@ -163,8 +177,9 @@ namespace Belle2 {
     int m_MinimumIterationsForPVal = 5;
     /** The maximum number of failed hits after which the fit should be cancelled.*/
     int m_MaximumFailedHits = 5;
+    /** The minimum allowed pValue for the convergence criterion */
+    float m_MinimumPValue = 0.;
 
-
-    ClassDef(DAFparameters, 1);  /**< ClassDef, necessary for ROOT */
+    ClassDef(DAFparameters, 2);  /**< ClassDef, necessary for ROOT */
   };
 }

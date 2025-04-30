@@ -120,8 +120,8 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             'clusterTiming']
 
         roe_variable_list = [
-            'nROE_Photons(' + maskName + ')/8',
-            'nROE_Charged(' + maskName + ', 0)/6',
+            'nCleanedECLClusters(isInRestOfEvent == 1)/8',
+            'nCleanedTracks(isInRestOfEvent == 1)/6',
             'NumberOfKShortsInRoe',
             'ptTracksRoe('+maskName+')',
         ]

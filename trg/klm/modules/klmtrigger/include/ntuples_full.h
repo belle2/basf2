@@ -634,7 +634,7 @@ namespace nt {
     template <typename... T>
     void emplace_back(T&& ...t)
     {
-      static_assert(sizeof...(t) == sizeof...(Ts), "\n==============missmatched amount of arguments=================\n");
+      static_assert(sizeof...(t) == sizeof...(Ts), "\n==============mismatched amount of arguments=================\n");
       [](auto...) {}(T::get(*this).emplace_back(std::forward<T>(t))...);
     }
 

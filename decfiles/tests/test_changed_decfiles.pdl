@@ -2,15 +2,18 @@
 * Add new aliases here if the test fails with "Unknown particle name" and the particle shouldn't go into evt.pdl.
 * For the test to pass the particle properties are irrelevant, only the name and id must be unique.
 
-*---------------------------------------------------------------------------------------------------------------------------------------
-*                name                              id      mass/GeV       width/GeV max_Dm/GeV 3*charge 2*spin  lifetime*c/mm   PythiaId
-*---------------------------------------------------------------------------------------------------------------------------------------
+*--------------------------------------------------------------------------------------------------------------------------------------
+*                name                              id      mass/GeV       width/GeV max_Dm/GeV 3*charge 2*spin  lifetime*c/mm  PythiaId
+*--------------------------------------------------------------------------------------------------------------------------------------
 
-add  p Particle  Xb                           1111553           1.0             1.0     100e-3        0      2              0          0
-
-add  p Particle  LLP                          100               1.0             1.0     100e-3        0      2              0          0
-add  p Meson     X(3823)                      17443             3.823           0.0     0.0           0      4              0      17443
-add  p Particle  X_2(4013)                    9910440           4.0143          0.004   20e-3         0      4              0    9910440
-add  p Particle  X_0(3915)                    9910441           3.9221          0.020   100e-3        0      0              0    9910441 
-add  p Particle  X_2(4010)                    9900442           4.0130          0.00115 10e-3         0      4              0    9900442
+add  p Particle  Xb                           1111553           1.0             1.0     100e-3        0      2              0         0
+add  p Particle  LLP                          100               1.0             1.0     100e-3        0      2              0         0
+add  p Meson     X(3823)                      17443             3.823           0.0     0.0           0      4              0     17443
+add  p Particle  X_2(4013)                    9910440           4.0143          0.004   20e-3         0      4              0   9910440
+add  p Particle  X_0(3915)                    9910441           3.9221          0.020   100e-3        0      0              0   9910441 
+add  p Particle  X_2(4010)                    9900442           4.0130          0.00115 10e-3         0      4              0   9900442
+add  p Particle  P_Lambda_psis0               9432142           4.3382          0.007   0.0           0      1              0   9432142
+add  p Particle  anti-P_Lambda_psis0         -9432142           4.3382          0.007   0.0           0      1              0  -9432142
+add  p Particle  P_Lambda_psi+                9421142           4.03517208      0.007   0.0           3      1              0   9421142
+add  p Particle  anti-P_Lambda_psi-          -9421142           4.03517208      0.007   0.0          -3      1              0  -9421142
 * No 'end' needed here as the default pdl is concatenated with this file.

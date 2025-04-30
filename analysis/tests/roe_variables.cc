@@ -148,43 +148,43 @@ namespace {
     auto part = myParticles[2];  // B0
     auto* var = Manager::Instance().getVariable("nROE_Charged()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 2);
 
     var = Manager::Instance().getVariable("nROE_Charged(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 1);
 
     var = Manager::Instance().getVariable("nROE_Charged(all)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 2);
 
     var = Manager::Instance().getVariable("nROE_Charged(my_mask, 13)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 0);
 
     var = Manager::Instance().getVariable("nROE_Charged(all, 13)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 0);
 
     var = Manager::Instance().getVariable("nROE_Charged(my_mask, 211)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 1);
 
     var = Manager::Instance().getVariable("nROE_Photons()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 2);
 
     var = Manager::Instance().getVariable("nROE_Photons(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 1);
 
     var = Manager::Instance().getVariable("nROE_NeutralHadrons()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 1);
 
     var = Manager::Instance().getVariable("nROE_NeutralHadrons(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 0);
 
   }
   /*
@@ -197,35 +197,35 @@ namespace {
 
     auto* var = Manager::Instance().getVariable("nROE_Tracks()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 2);
 
     var = Manager::Instance().getVariable("nROE_Tracks(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 1);
 
     var = Manager::Instance().getVariable("nROE_Tracks(all)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 2);
 
     var = Manager::Instance().getVariable("nROE_ECLClusters()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 2);
 
     var = Manager::Instance().getVariable("nROE_ECLClusters(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 1);
 
     var = Manager::Instance().getVariable("nROE_NeutralECLClusters()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 2);
 
     var = Manager::Instance().getVariable("nROE_NeutralECLClusters(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 1);
 
     var = Manager::Instance().getVariable("nROE_KLMClusters");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 1);
   }
   /*
    * Test ROE recoil frame variable
@@ -417,51 +417,51 @@ namespace {
 
     auto* var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_EQ(std::get<double>(var->function(partROE1)), 1);
+    EXPECT_EQ(std::get<bool>(var->function(partROE1)), 1);
 
     var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_EQ(std::get<double>(var->function(partROE2)), 1);
+    EXPECT_EQ(std::get<bool>(var->function(partROE2)), 1);
 
     var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_EQ(std::get<double>(var->function(partROE3)), 1);
+    EXPECT_EQ(std::get<bool>(var->function(partROE3)), 1);
 
     var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_EQ(std::get<double>(var->function(partNotROE)), 0);
+    EXPECT_EQ(std::get<bool>(var->function(partNotROE)), 0);
 
     var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_EQ(std::get<double>(var->function(partNotROE)), 0);
+    EXPECT_EQ(std::get<bool>(var->function(partNotROE)), 0);
 
     var = Manager::Instance().getVariable("passesROEMask(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROE1)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<bool>(var->function(partROE1)), 1);
 
     var = Manager::Instance().getVariable("passesROEMask(all)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROE1)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<bool>(var->function(partROE1)), 1);
 
     var = Manager::Instance().getVariable("passesROEMask(all)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(partNotROE)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<bool>(var->function(partNotROE)), 0);
 
     var = Manager::Instance().getVariable("passesROEMask(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROEnotFromMask)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<bool>(var->function(partROEnotFromMask)), 0);
 
     var = Manager::Instance().getVariable("nROE_ParticlesInList(pi0:vartest)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<int>(var->function(part)), 1);
 
     var = Manager::Instance().getVariable("currentROEIsInList(B0:vartest)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROE1)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<bool>(var->function(partROE1)), 1);
 
     var = Manager::Instance().getVariable("currentROEIsInList(pi0:vartest)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROE1)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<bool>(var->function(partROE1)), 0);
 
     var = Manager::Instance().getVariable("particleRelatedToCurrentROE(PDG)");
     ASSERT_NE(var, nullptr);

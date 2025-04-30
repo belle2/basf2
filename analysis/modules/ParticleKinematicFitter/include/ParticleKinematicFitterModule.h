@@ -91,6 +91,8 @@ namespace Belle2 {
       bool m_updateDaughters;            /**< update daughter kinematics*/
       double m_recoilMass;               /**< Recoil mass for RecoilMass constraint */
       double m_invMass;                  /**< Invariant mass for Mass constraint */
+      std::vector<int> m_listAlternateMassHypo;  /**< index of particles where only direction is used */
+      std::vector<bool> m_listDirectionOnlyParticles;  /**< pdg values for particles where different mass hypo. is used */
 
       // internal variables
       TextTracer* m_textTracer;                           /**< internal text output variable */
@@ -112,6 +114,15 @@ namespace Belle2 {
       // UNUSED YET
       std::string m_decayString;         /**< daughter particles selection */
       DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
+
+      std::string m_decayStringForDirectionOnlyParticles;         /**< direction only particles selection */
+      DecayDescriptor m_decaydescriptorForDirectionOnlyParticles; /**< Decay descriptor of direction only particles selection */
+
+      std::string m_decayStringForAlternateMassParticles;         /**< alternate mass particles selection */
+      DecayDescriptor m_decaydescriptorForAlternateMassParticles; /**< Decay descriptor of alternate particles selection */
+
+      std::string m_decayStringForNeutronVsAntiNeutron;         /**< n or nbar particle tag selection */
+      DecayDescriptor m_decaydescriptorForNeutronVsAntiNeutron; /**< Decay descriptor of n or nbar particle tag selection */
 
       /**
        * Main steering routine for any kinematic fitter
@@ -143,8 +154,10 @@ namespace Belle2 {
        * @param fitter reference to OrcaKinFit fitter object
        * @param particle pointer to particle
        * @param index used to name particles: particle_%index
+       * @param useOnlyDirection flag to indicate if only position information is used
+       * @param massHypoPDG PDG code for alternate mass hypothesis
        */
-      void addParticleToOrcaKinFit(BaseFitter& fitter, Particle* particle, const int index);
+      void addParticleToOrcaKinFit(BaseFitter& fitter, Particle* particle, const int index, bool useOnlyDirection, int massHypoPDG);
 
       /**
        * Adds Orca fit object to the constraints.

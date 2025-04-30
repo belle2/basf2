@@ -315,3 +315,26 @@ void DQMHistAnalysisSVDModule::drawText()
   for (int i = 0; i < (int)m_laddersText.size(); i++) m_laddersText[i]->Draw("same");
   for (int i = 0; i < (int)m_sensorsText.size(); i++) m_sensorsText[i]->Draw("same");
 }
+
+TString DQMHistAnalysisSVDModule::getHistoNameFromCanvas(TString cName, TString view, TString cPrefix, TString hPrefix)
+{
+  TString hName;
+
+  int pos = cName.Last('/');
+
+  if (pos != -1)
+    hName = cName(pos + 1, cName.Length() - pos - 1);
+  else
+    hName = cName;
+
+  hName.ReplaceAll(cPrefix, hPrefix);
+
+  if (!view.IsNull()) {
+    // cut off side info
+    hName.Replace(hName.Length() - 1, 1, "");
+    // append view suffix
+    hName.Append(view);
+  }
+
+  return hName;
+}

@@ -201,8 +201,7 @@ void DQMHistAnalysisInputRootFileModule::event()
   unsigned long long int ts = 0;
   m_file->cd();
   TIter next(m_file->GetListOfKeys());
-  TKey* key = NULL;
-  while ((key = (TKey*)next())) {
+  while (auto key = (TKey*)next()) {
     TClass* cl = gROOT->GetClass(key->GetClassName());
     if (ts == 0) ts = key->GetDatime().Convert();
     if (cl->InheritsFrom("TDirectory")) {
@@ -212,11 +211,10 @@ void DQMHistAnalysisInputRootFileModule::event()
       d->cd();
       TIter nextd(d->GetListOfKeys());
 
-      TKey* dkey;
-      while ((dkey = (TKey*)nextd())) {
-        TClass* dcl = gROOT->GetClass(dkey->GetClassName());
-        if (!dcl->InheritsFrom("TH1")) continue;
-        addToHistList(inputHistList, dirname, dkey);
+      while (auto dkey = (TKey*)nextd()) {
+        if (gROOT->GetClass(dkey->GetClassName())->InheritsFrom("TH1")) {
+          addToHistList(inputHistList, dirname, dkey);
+        }
       }
       m_file->cd();
     } else if (cl->InheritsFrom("TH1")) {

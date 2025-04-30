@@ -205,7 +205,7 @@ void CDCT0CalibrationCollectorModule::collect()
           }
           // Time Walk
           t -= cdcgeo.getTimeWalk(wireid, adc);
-          // substract event t0;
+          // subtract event t0;
           t -= evtT0;
 
           getObjectPtr<TH1F>(Form("hdT_lay%d_cell%d", lay, IWire))->Fill(t - t_fit);

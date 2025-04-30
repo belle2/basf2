@@ -19,7 +19,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dbobjects/BeamSpot.h>
 
-#include <TMatrixFSym.h>
+#include <TMatrixF.h>
 
 #include <boost/algorithm/string.hpp>
 

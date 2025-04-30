@@ -94,7 +94,7 @@ namespace Belle2 {
     /** Get the beginning wire ID of the preselection range(10 wires) for each layer. */
     std::vector<int> getIWireBegin(double phi0, double omega);
 
-    /** 1 cell is selected in each layer to reduce LUT comsumption.
+    /** 1 cell is selected in each layer to reduce LUT consumption.
     This functionality is implemented in the HitmapMaker module in firmware */
     std::vector<int> select5Cells(const CDCTriggerSegmentHit* TS);
 

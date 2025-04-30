@@ -57,7 +57,7 @@ b2.process(main)
 
 
 for i in range(1, 4):
-    fileout = f"dqm_e000{i}r00000{i}.root"
+    fileout = f"dqm_canvas_e000{i}r00000{i}.root"
     expected = ["DQMInfo/c_info", "DAQ/c_Nevent", "DQMInfo/c_expno", "DQMInfo/c_runno", "DQMInfo/c_rtype", f"TEST/c_test{i}"]
     print(f"== resulting file {fileout} content ==")
     f = TFile(fileout, "READ")

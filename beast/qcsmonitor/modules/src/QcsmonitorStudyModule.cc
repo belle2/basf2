@@ -121,7 +121,7 @@ void QcsmonitorStudyModule::initialize()
 
   REG_HISTOGRAM
 
-  //get QCSMONITORS paramters ie energy threshold
+  //get QCSMONITORS parameters ie energy threshold
   getXMLData();
 }
 

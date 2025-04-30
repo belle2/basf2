@@ -476,7 +476,7 @@ void MicrotpcStudyModule::event()
       int irecoil = 0;
       for (auto fract : m_maxEnFrac) { // loop over all recoils in beast/microtpc/data/MICROTPC-recoilProb.xml
         double recoil = gRandom->Uniform(fract) * kin * 1e3; // calculate recoil energy
-        double weight = m_intProb[irecoil]->Eval(kin * 1e3) * trlen; // weight - interaction probability * track lenght
+        double weight = m_intProb[irecoil]->Eval(kin * 1e3) * trlen; // weight - interaction probability * track length
         if (weight < 0) weight = 0;
         h_mctpc_recoil[irecoil]->Fill(ring_section, detNb, recoil); // fill recoil energy
         h_mctpc_recoilW[irecoil]->Fill(ring_section, detNb, recoil, weight); // fill weighted recoil energy
@@ -678,7 +678,7 @@ void MicrotpcStudyModule::getXMLData()
     m_intProb.push_back(gr);
   }
 
-  B2INFO("TpcDigitizer: Aquired tpc locations and gas parameters");
+  B2INFO("TpcDigitizer: Acquired tpc locations and gas parameters");
   B2INFO("              from MICROTPC.xml. There are " << nTPC << " TPCs implemented");
 
 }

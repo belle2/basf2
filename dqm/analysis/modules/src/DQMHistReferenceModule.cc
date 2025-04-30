@@ -9,7 +9,6 @@
 #include <dqm/analysis/modules/DQMHistReferenceModule.h>
 #include <TROOT.h>
 #include <TStyle.h>
-#include <TClass.h>
 #include <TKey.h>
 
 using namespace std;
@@ -101,27 +100,15 @@ void DQMHistReferenceModule::loadReferenceHistos()
 
           while ((hh = (TKey*)next())) {
             if (hh->IsFolder()) continue;
-            TObject* obj = hh->ReadObj(); // ReadObj -> I own it
-            if (obj->IsA()->InheritsFrom("TH1")) {
-              TH1* h = (TH1*)obj;
-              string histname = h->GetName();
-              std::string name = dirname + "/" + histname;
-              auto& n = getRefList()[name];
-              n.m_orghist_name = name;
-              n.m_refhist_name = "ref/" + name;
-              h->SetName((n.m_refhist_name).c_str());
-              h->SetDirectory(0);
-              n.setRefHist(h); // transfer ownership!
-              n.setRefCopy(nullptr);
-              n.setCanvas(nullptr);
-            } else {
-              delete obj;
+            if (gROOT->GetClass(key->GetClassName())->InheritsFrom("TH1")) {
+              addRefHist(dirname, (TH1*)key->ReadObj()); // ReadObj -> I own it, tranfer ownership to function;
             }
           }
-          delete foundDir; // always non-zero
+          delete foundDir; // always non-zero ... runtype or "default"
+          delete detDir; // always non-zero ... detector subdir name
         }
       }
-      delete refdir; // always non-zero
+      delete refdir; // always non-zero ... "ref" folder
     }
   }
 

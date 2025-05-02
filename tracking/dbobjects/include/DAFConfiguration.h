@@ -10,7 +10,7 @@
 #include <TObject.h>
 #include <map>
 
-#include "DAFparameters.h"
+#include <tracking/dbobjects/DAFparameters.h>
 
 namespace Belle2 {
 
@@ -49,9 +49,9 @@ namespace Belle2 {
 
     /** Get the DAFparameters for the specific track fit type
      */
-    DAFparameters getDAFparameters(DAFConfiguration::ETrackFitType trackFitType) const
+    DAFparameters* getDAFparameters(DAFConfiguration::ETrackFitType trackFitType) const
     {
-      std::map<DAFConfiguration::ETrackFitType, DAFparameters>::const_iterator it = m_DAFparameters.find(trackFitType);
+      std::map<DAFConfiguration::ETrackFitType, DAFparameters*>::const_iterator it = m_DAFparameters.find(trackFitType);
       if (it != m_DAFparameters.end()) {
         return it->second;
       } else {
@@ -61,7 +61,7 @@ namespace Belle2 {
 
   private:
     /** The minimum allowed pValue for the convergence criterion */
-    std::map<DAFConfiguration::ETrackFitType, DAFparameters> m_DAFparameters;
+    std::map<DAFConfiguration::ETrackFitType, DAFparameters*> m_DAFparameters;
 
     ClassDef(DAFConfiguration, 1);  /**< ClassDef, necessary for ROOT */
   };

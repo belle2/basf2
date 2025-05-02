@@ -135,19 +135,25 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
   return fitWithoutCheckResult;
 }
 
-void TrackFitter::resetFitterToDBSettings()
+void TrackFitter::resetFitterToDBSettings(const DAFConfiguration::ETrackFitType trackFitType)
 {
-  if (!m_DAFparameters.isValid())
-    B2FATAL("DAF parameters are not available.");
-  genfit::DAF* dafFitter = new genfit::DAF(m_DAFparameters->getAnnealingScheme(),
-                                           m_DAFparameters->getMinimumIterations(),
-                                           m_DAFparameters->getMaximumIterations(),
-                                           m_DAFparameters->getMinimumIterationsForPVal(),
+  if (!m_DAFConfiguration.isValid())
+    B2FATAL("DAF Configuration is not available.");
+
+  DAFparameters* DAFparams = m_DAFConfiguration->getDAFparameters(trackFitType);
+  if (!DAFparams)
+    B2FATAL("DAF parameters for " << trackFitType << " is not available.");
+
+  genfit::DAF* dafFitter = new genfit::DAF(DAFparams->getAnnealingScheme(),
+                                           DAFparams->getMinimumIterations(),
+                                           DAFparams->getMaximumIterations(),
+                                           DAFparams->getMinimumIterationsForPVal(),
                                            true,
-                                           m_DAFparameters->getDeltaPValue(),
-                                           m_DAFparameters->getDeltaWeight(),
-                                           m_DAFparameters->getProbabilityCut());
-  dafFitter->setMaxFailedHits(m_DAFparameters->getMaximumFailedHits());
+                                           DAFparams->getDeltaPValue(),
+                                           DAFparams->getDeltaWeight(),
+                                           DAFparams->getProbabilityCut());
+  //             DAFparams->getMinimumPValue()); // waiting for genfit merge
+  dafFitter->setMaxFailedHits(DAFparams->getMaximumFailedHits());
   m_fitter.reset(dafFitter);
   m_skipDirtyCheck = false;
 }
@@ -164,6 +170,7 @@ void TrackFitter::resetFitterToUserSettings(DAFparameters* DAFparams)
                                            DAFparams->getDeltaPValue(),
                                            DAFparams->getDeltaWeight(),
                                            DAFparams->getProbabilityCut());
+  //                                       DAFparams->getMinimumPValue()); // waiting for genfit merge
   dafFitter->setMaxFailedHits(DAFparams->getMaximumFailedHits());
   m_fitter.reset(dafFitter);
   m_skipDirtyCheck = false;
@@ -171,10 +178,8 @@ void TrackFitter::resetFitterToUserSettings(DAFparameters* DAFparams)
 
 void TrackFitter::resetFitterToCosmicsSettings()
 {
-  // The cosmics parameters are the ones from the DAFparameters constructor
-  DAFparameters* DAFparams = new DAFparameters();
-
-  resetFitterToUserSettings(DAFparams);
+  // If cosmics run it forces to use the c_Cosmics settings in DAFConfiguration
+  resetFitterToDBSettings(DAFConfiguration::c_Cosmics);
 }
 
 void TrackFitter::resetFitter(const std::shared_ptr<genfit::AbsFitter>& fitter)

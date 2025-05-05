@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -126,7 +125,8 @@ def V0Selector_Training(
              'trainFraction': 0.8,
              'min_data_in_leaf': 4000,
              'max_depth': 8,
-             'objective': 'cross_entropy'
+             'objective': 'cross_entropy',
+             'num_threads': 1
              }
     if isinstance(parameters, dict):
         param.update(parameters)
@@ -198,7 +198,8 @@ def LambdaVeto_Training(
              'trainFraction': 0.8,
              'min_data_in_leaf': 300,
              'max_depth': 8,
-             'objective': 'cross_entropy'
+             'objective': 'cross_entropy',
+             'num_threads': 1
              }
     if isinstance(parameters, dict):
         param.update(parameters)

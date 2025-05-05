@@ -31,6 +31,7 @@ def add_analysis_dqm(path):
 
     # muons, Kshorts and pi0s
     ma.fillParticleList('mu+:KLMDQM', 'p>1.5', path=path)
+    ma.fillParticleList('mu+:KLMDQM2', 'p>1.5 and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.fillParticleList('gamma:physDQM', 'E > 0.15', path=path)
     ma.fillParticleList('mu+:physDQM', 'pt>2. and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, True, path)

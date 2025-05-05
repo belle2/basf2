@@ -256,6 +256,12 @@ class Plotter:
         """
         return NotImplemented
 
+    def setAxisLimits(self, factor=0.0):
+        dx = self.xmax - self.xmin
+        dy = self.ymax - self.ymin
+        self.axis.set_xlim((self.xmin - factor*dx, self.xmax + factor*dx))
+        self.axis.set_ylim((self.ymin - factor*dy, self.ymax + factor*dy))
+
     def finish(self, *args, **kwargs):
         """
         Finish plotting and set labels, legends and stuff
@@ -303,9 +309,14 @@ class PurityAndEfficiencyOverCut(Plotter):
 
         cuts = hists.bin_centers
 
-        self.xmin, self.xmax = numpy.nanmin([numpy.nanmin(cuts), self.xmin]), numpy.nanmax([numpy.nanmax(cuts), self.xmax])
-        self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(efficiency), numpy.nanmin(purity), self.ymin]), \
-            numpy.nanmax([numpy.nanmax(efficiency), numpy.nanmax(purity), self.ymax])
+        self.xmin, self.xmax = numpy.nanmin(numpy.append(cuts, self.xmin)), numpy.nanmax(numpy.append(cuts, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(
+            numpy.concatenate(
+                (efficiency, purity, [
+                    self.ymin]))), numpy.nanmax(
+                numpy.concatenate(
+                    (efficiency, purity, [
+                        self.ymax])))
 
         self.set_errorbar_options({'fmt': '-o'})
         self.plots.append(self._plot_datapoints(self.axis, cuts, efficiency, xerr=0, yerr=efficiency_error))
@@ -329,8 +340,7 @@ class PurityAndEfficiencyOverCut(Plotter):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
+        self.setAxisLimits(factor=0)
         self.axis.set_title("Classification Plot")
         self.axis.get_xaxis().set_label_text('Cut Value')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
@@ -346,7 +356,7 @@ class SignalToNoiseOverCut(Plotter):
     #: @var ymax
     #: Maximum y value
 
-    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, normed=True):
+    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
         """
         Add a new curve to the plot
         @param data pandas.DataFrame containing all data
@@ -355,30 +365,50 @@ class SignalToNoiseOverCut(Plotter):
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
         """
-
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
-
         signal2noise, signal2noise_error = hists.get_signal_to_noise(['Signal'], ['Background'])
-
         cuts = hists.bin_centers
 
-        self.xmin, self.xmax = numpy.nanmin([numpy.nanmin(cuts), self.xmin]), numpy.nanmax([numpy.nanmax(cuts), self.xmax])
-        self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(signal2noise), self.ymin]), \
-            numpy.nanmax([numpy.nanmax(signal2noise), self.ymax])
+        # Ensure arrays
+        signal2noise = numpy.asarray(signal2noise)
+        signal2noise_error = numpy.asarray(signal2noise_error)
+        cuts = numpy.asarray(cuts)
+        valid = numpy.isfinite(signal2noise)
+        signal2noise = signal2noise[valid]
+        signal2noise_error = signal2noise_error[valid]
+        cuts = cuts[valid]
+
+        # Determine "best" cut by maximizing Signal to Noise
+        best_idx = numpy.nanargmax(signal2noise)
+        best_cut = cuts[best_idx]
+        best_signal2noise = signal2noise[best_idx]
+
+        self.xmin, self.xmax = numpy.nanmin(numpy.append(cuts, self.xmin)), numpy.nanmax(numpy.append(cuts, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(
+            numpy.append(
+                signal2noise, self.ymin)), numpy.nanmax(
+            numpy.append(
+                signal2noise, self.ymax))
 
         self.set_errorbar_options({'fmt': '-o'})
-        self.plots.append(self._plot_datapoints(self.axis, cuts, signal2noise, xerr=0, yerr=signal2noise_error))
+        p = self._plot_datapoints(self.axis, cuts, signal2noise, xerr=0, yerr=signal2noise_error)
+        self.plots.append(p)
 
-        self.labels.append(column)
+        # Plot best cut point
+        self.axis.plot(best_cut, best_signal2noise, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
+        self.axis.axvline(best_cut, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+        self.axis.axhline(best_signal2noise, color=p[1].get_color(), linestyle='dashed', linewidth=1)
 
+        # Add label with best cut info
+        cut_label = f"{label[:10] if label else column[:10]} (Best cut: {best_cut:.3f}, S/N: {best_signal2noise:.2f})"
+        self.labels.append(cut_label)
         return self
 
     def finish(self):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
+        self.setAxisLimits(factor=0.05)
         self.axis.set_title("Signal to Noise Plot")
         self.axis.get_xaxis().set_label_text('Cut Value')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
@@ -406,25 +436,48 @@ class PurityOverEfficiency(Plotter):
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
         purity, purity_error = hists.get_purity(['Signal'], ['Background'])
+        cuts = hists.bin_centers
 
-        self.xmin, self.xmax = numpy.nanmin([efficiency.min(), self.xmin]), numpy.nanmax([efficiency.max(), self.xmax])
-        self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(purity), self.ymin]), numpy.nanmax([numpy.nanmax(purity), self.ymax])
+        # Ensure arrays
+        efficiency = numpy.asarray(efficiency)
+        purity = numpy.asarray(purity)
+        cuts = numpy.asarray(cuts)
+        valid = numpy.isfinite(purity) & numpy.isfinite(efficiency)
+        efficiency = efficiency[valid]
+        purity = purity[valid]
+        cuts = cuts[valid]
+        efficiency_error = efficiency_error[valid]
+        purity_error = purity_error[valid]
+
+        # Determine "best" cut (closest to point (1,1))
+        distance = numpy.sqrt(numpy.square(1 - purity) + numpy.square(1 - efficiency))
+        best_idx = numpy.argmin(distance)
+        best_cut = cuts[best_idx]
+        best_efficiency = efficiency[best_idx]
+        best_purity = purity[best_idx]
+
+        self.xmin, self.xmax = numpy.nanmin(numpy.append(efficiency, self.xmin)), numpy.nanmax(numpy.append(efficiency, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(purity, self.ymin)), numpy.nanmax(numpy.append(purity, self.ymax))
 
         self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, efficiency, purity, xerr=efficiency_error, yerr=purity_error)
         self.plots.append(p)
-        if label is not None:
-            self.labels.append(label)
-        else:
-            self.labels.append(column)
+
+        # Plot best cut point
+        self.axis.plot(best_efficiency, best_purity, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
+        self.axis.axhline(best_purity, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+        self.axis.axvline(best_efficiency, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+
+        # Add label with best cut info
+        cut_label = f"{label[:10] if label else column[:10]} (Best cut: {best_cut:.3f})"
+        self.labels.append(cut_label)
         return self
 
     def finish(self):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
+        self.setAxisLimits(factor=0)
         self.axis.set_title("ROC Purity Plot")
         self.axis.get_xaxis().set_label_text('Efficiency')
         self.axis.get_yaxis().set_label_text('Purity')
@@ -441,21 +494,6 @@ class RejectionOverEfficiency(Plotter):
     #: @var ymax
     #: Maximum y value
 
-    #: @var fom
-    #: Whether to plot the Figure of Merit (FOM).
-    #: @var twinxax
-    #: Secondary axis used for validation dataset.
-    #: @var twinxaxMax
-    #: Maximum y value for validation dataset.
-
-    def __init__(self, figure=None, axis=None, fom=False):
-        super().__init__(figure, axis)
-        self.fom = fom
-        self.twinxax = None
-        if self.fom:
-            self.twinxax = self.axis.twinx()
-        self.twinxaxMax = 0
-
     def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
         """
         Add a new curve to the ROC plot
@@ -469,79 +507,178 @@ class RejectionOverEfficiency(Plotter):
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
         rejection, rejection_error = hists.get_efficiency(['Background'])
         rejection = 1 - rejection
-        if isinstance(efficiency, int) and not isinstance(rejection, int):
-            efficiency = numpy.array([efficiency] * len(rejection))
-        elif isinstance(rejection, int) and not isinstance(efficiency, int):
-            rejection = numpy.array([rejection] * len(efficiency))
-        elif isinstance(rejection, int) and isinstance(efficiency, int):
-            efficiency = numpy.array([efficiency])
-            rejection = numpy.array([rejection])
+        cuts = hists.bin_centers
 
-        self.xmin, self.xmax = numpy.nanmin([efficiency.min(), self.xmin]), numpy.nanmax([efficiency.max(), self.xmax])
-        self.ymin, self.ymax = numpy.nanmin([rejection.min(), self.ymin]), numpy.nanmax([rejection.max(), self.ymax])
+        # Ensure arrays
+        efficiency = numpy.asarray(efficiency)
+        rejection = numpy.asarray(rejection)
+        cuts = numpy.asarray(cuts)
+        valid = numpy.isfinite(rejection) & numpy.isfinite(efficiency)
+        efficiency = efficiency[valid]
+        rejection = rejection[valid]
+        cuts = cuts[valid]
+        efficiency_error = efficiency_error[valid]
+        rejection_error = rejection_error[valid]
+
+        # Determine "best" cut by maximizing Rejection / Efficiency
+        distance = numpy.sqrt(numpy.square(1 - rejection) + numpy.square(1 - efficiency))
+        best_idx = numpy.argmin(distance)
+        best_cut = cuts[best_idx]
+        best_rejection = rejection[best_idx]
+        best_efficiency = efficiency[best_idx]
+
+        self.xmin, self.xmax = numpy.nanmin(numpy.append(efficiency, self.xmin)), numpy.nanmax(numpy.append(efficiency, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(rejection, self.ymin)), numpy.nanmax(numpy.append(rejection, self.ymax))
 
         auc = numpy.abs(numpy.trapz(rejection, efficiency))
 
         self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, efficiency, rejection, xerr=efficiency_error, yerr=rejection_error)
         self.plots.append(p)
-        if label is not None:
-            self.labels.append(label[:10] + f" ({auc:.2f})")
-        else:
-            self.labels.append(column[:10] + f" ({auc:.2f})")
 
-        if self.fom:  # fom = nSignal / sqrt(nSignal + nBackground)
-            tp, tp_error = hists.get_true_positives(['Signal'])
-            fp, fp_error = hists.get_false_positives(['Background'])
-            if isinstance(tp, int) and not isinstance(fp, int):
-                tp = numpy.array([tp] * len(fp))
-            elif isinstance(fp, int) and not isinstance(tp, int):
-                fp = numpy.array([fp] * len(tp))
-            elif isinstance(fp, int) and isinstance(tp, int):
-                tp = numpy.array([tp])
-                fp = numpy.array([fp])
+        # Plot best cut point
+        self.axis.plot(best_efficiency, best_rejection, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
+        self.axis.axhline(best_rejection, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+        self.axis.axvline(best_efficiency, color=p[1].get_color(), linestyle='dashed', linewidth=1)
 
-            with numpy.errstate(divide='ignore', invalid='ignore'):
-                fom = tp/numpy.sqrt(tp + fp)
-                fom_err = numpy.sqrt(numpy.power((tp+2.*fp)/(2.*numpy.power(tp+fp, 1.5)), 2) * numpy.power(tp_error,
-                                     2) + numpy.power((-1.)*tp/(2.*numpy.power(tp+fp, 1.5)), 2) * numpy.power(fp_error, 2))
-            binsCut = hists.bin_centers
-
-            max_fom = numpy.nanmax(fom)
-            self.twinxaxMax = numpy.nanmax([self.twinxaxMax, max_fom])
-            if numpy.isnan(max_fom).all():
-                max_fom_cut = 0
-            else:
-                max_fom_cut = binsCut[numpy.nanargmax(fom)]
-
-            p2 = self._plot_datapoints(self.twinxax, binsCut, fom, xerr=0, yerr=fom_err)
-            self.twinxax.vlines(max_fom_cut, 0, max_fom, colors=p2[1].get_color(), linestyles='dashed')
-            self.plots.append(p2)
-            if label is not None:
-                self.labels.append(label[:10] + " FOM: " + f"({max_fom:.2f}, {max_fom_cut:.2f})")
-            else:
-                self.labels.append(column[:10] + " FOM: " + f"({max_fom:.2f}, {max_fom_cut:.2f})")
+        # Add label with best cut info
+        cut_label = f"{label[:10] if label else column[:10]} (AUC: {auc:.2f}, Best cut: {best_cut:.3f})"
+        self.labels.append(cut_label)
         return self
 
     def finish(self):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
+        self.setAxisLimits(factor=0)
         self.axis.set_title("ROC Rejection Plot")
         self.axis.get_yaxis().set_label_text('Background Rejection')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
 
-        if self.fom:
-            self.twinxax.set_ylim((0, self.twinxaxMax * 1.1))
-            self.twinxax.set_xlim((0, 1))
-            self.axis.set_xlim((0, 1))
-            self.twinxax.get_yaxis().set_label_text('FOM')
-            self.twinxax.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
-            self.axis.get_yaxis().set_label_text('Signal Efficiency / Cut')
-        else:
-            self.axis.get_xaxis().set_label_text('Signal Efficiency')
+        self.axis.get_xaxis().set_label_text('Signal Efficiency')
+        return self
+
+
+class TrueVsFalsePositiveRate(Plotter):
+    """
+    Plots the true ROC curve: True Positive Rate (TPR) vs False Positive Rate (FPR),
+    and marks the cut that gives the point closest to the ideal (0,1).
+    """
+
+    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
+        hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask},
+                                     weight_column=weight_column)
+
+        tpr, tpr_error = hists.get_efficiency(['Signal'])       # True Positive Rate (TPR)
+        fpr, fpr_error = hists.get_efficiency(['Background'])   # False Positive Rate (FPR)
+        cuts = hists.bin_centers                                 # Cut values for each bin
+
+        # Ensure arrays
+        tpr = numpy.asarray(tpr)
+        fpr = numpy.asarray(fpr)
+        cuts = numpy.asarray(cuts)
+        valid = numpy.isfinite(tpr) & numpy.isfinite(fpr)
+        tpr = tpr[valid]
+        fpr = fpr[valid]
+        cuts = cuts[valid]
+        tpr_error = tpr_error[valid]
+        fpr_error = fpr_error[valid]
+
+        # Determine "best" cut (closest to top-left corner (0,1))
+        distance = numpy.sqrt(numpy.square(fpr) + numpy.square(1 - tpr))
+        best_idx = numpy.argmin(distance)
+        best_cut = cuts[best_idx]
+        best_tpr = tpr[best_idx]
+        best_fpr = fpr[best_idx]
+
+        # Update plot range
+        self.xmin, self.xmax = numpy.nanmin(numpy.append(fpr, self.xmin)), numpy.nanmax(numpy.append(fpr, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(tpr, self.ymin)), numpy.nanmax(numpy.append(tpr, self.ymax))
+
+        auc = numpy.abs(numpy.trapz(tpr, fpr))
+
+        self.set_errorbar_options({'fmt': '-o'})
+        p = self._plot_datapoints(self.axis, fpr, tpr, xerr=fpr_error, yerr=tpr_error)
+        self.plots.append(p)
+
+        # Plot best cut point
+        self.axis.plot(best_fpr, best_tpr, 'x', color=p[1].get_color(), markersize=8)
+        self.axis.axhline(best_tpr, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+        self.axis.axvline(best_fpr, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+
+        # Add label with best cut info
+        cut_label = f"{label[:10] if label else column[:10]} (AUC: {auc:.2f}, Cut: {best_cut:.3f})"
+        self.labels.append(cut_label)
+
+        return self
+
+    def finish(self):
+        self.setAxisLimits(factor=0)
+        self.axis.set_title("True ROC Curve")
+        self.axis.get_xaxis().set_label_text('False Positive Rate (Background Efficiency)')
+        self.axis.get_yaxis().set_label_text('True Positive Rate (Signal Efficiency)')
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
+        return self
+
+
+class PrecisionRecallCurve(Plotter):
+    """
+    Plots the Precision vs Recall curve and marks the cut that gives the point closest to the ideal (1,1).
+    """
+
+    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
+        hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask},
+                                     weight_column=weight_column)
+
+        recall, recall_error = hists.get_efficiency(['Signal'])  # Recall = TPR
+        precision, precision_error = hists.get_purity(['Signal'], ['Background'])
+        cuts = hists.bin_centers
+
+        # Ensure arrays
+        recall = numpy.asarray(recall)
+        precision = numpy.asarray(precision)
+        cuts = numpy.asarray(cuts)
+        valid = numpy.isfinite(precision) & numpy.isfinite(recall)
+        precision = precision[valid]
+        recall = recall[valid]
+        cuts = cuts[valid]
+        recall_error = recall_error[valid]
+        precision_error = precision_error[valid]
+
+        # Determine "best" cut (closest to point (1,1))
+        distance = numpy.sqrt(numpy.square(1 - precision) + numpy.square(1 - recall))
+        best_idx = numpy.argmin(distance)
+        best_cut = cuts[best_idx]
+        best_recall = recall[best_idx]
+        best_precision = precision[best_idx]
+
+        # Update plot range
+        self.xmin, self.xmax = numpy.nanmin(numpy.append(recall, self.xmin)), numpy.nanmax(numpy.append(recall, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(precision, self.ymin)), numpy.nanmax(numpy.append(precision, self.ymax))
+
+        auc = numpy.abs(numpy.trapz(precision, recall))
+
+        self.set_errorbar_options({'fmt': '-o'})
+        p = self._plot_datapoints(self.axis, recall, precision, xerr=recall_error, yerr=precision_error)
+        self.plots.append(p)
+
+        # Plot best cut point
+        self.axis.plot(best_recall, best_precision, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
+        self.axis.axhline(best_precision, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+        self.axis.axvline(best_recall, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+
+        # Add label with best cut info
+        cut_label = f"{label[:10] if label else column[:10]} (AUC: {auc:.2f}, Cut: {best_cut:.3f})"
+        self.labels.append(cut_label)
+
+        return self
+
+    def finish(self):
+        self.setAxisLimits(factor=0)
+        self.axis.set_title("Precision-Recall Curve")
+        self.axis.get_xaxis().set_label_text('Recall (Signal Efficiency)')
+        self.axis.get_yaxis().set_label_text('Precision (Purity)')
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
 
 
@@ -618,9 +755,12 @@ class Diagonal(Plotter):
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         purity, purity_error = hists.get_purity_per_bin(['Signal'], ['Background'])
 
-        self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
-        # self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(purity), self.ymin]), numpy.nanmax([numpy.nanmax(purity), self.ymax])
-        self.ymin, self.ymax = 0, 1
+        self.xmin, self.xmax = numpy.nanmin(
+            numpy.append(
+                hists.bin_centers, self.xmin)), numpy.nanmax(
+            numpy.append(
+                hists.bin_centers, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(purity, self.ymin)), numpy.nanmax(numpy.append(purity, self.ymax))
 
         self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, hists.bin_centers, purity, xerr=hists.bin_widths / 2.0, yerr=purity_error)
@@ -637,8 +777,7 @@ class Diagonal(Plotter):
         """
         self.scale_limits()
         self.axis.plot((0.0, 1.0), (0.0, 1.0), color='black')
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
+        self.setAxisLimits(factor=0)
         self.axis.set_title("Diagonal Plot")
         self.axis.get_xaxis().set_label_text('Classifier Output')
         self.axis.get_yaxis().set_label_text('Purity Per Bin')
@@ -713,9 +852,12 @@ class Distribution(Plotter):
             hist = hist / hists.bin_widths if normalization > 0 else hist
             hist_error = hist_error / hists.bin_widths if normalization > 0 else hist_error
 
-        self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
-        self.ymin = numpy.nanmin([hist.min(), self.ymin])
-        self.ymax = numpy.nanmax([(hist + hist_error).max(), self.ymax])
+        self.xmin, self.xmax = numpy.nanmin(
+            numpy.append(
+                hists.bin_centers, self.xmin)), numpy.nanmax(
+            numpy.append(
+                hists.bin_centers, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(hist, self.ymin)), numpy.nanmax(numpy.append(hist + hist_error, self.ymax))
 
         self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, hists.bin_centers, hist, xerr=hists.bin_widths / 2, yerr=hist_error)
@@ -748,9 +890,7 @@ class Distribution(Plotter):
             return self
 
         self.scale_limits()
-
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
+        self.setAxisLimits(factor=0)
 
         if self.normed_to_all_entries and self.normed_to_bin_width:
             self.axis.get_yaxis().set_label_text('# Entries per Bin / (# Entries * Bin Width)')
@@ -893,9 +1033,13 @@ class Difference(Plotter):
         if self.shift_to_zero:
             difference = difference - numpy.mean(difference)
 
-        self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
-        self.ymin = min((difference - difference_error).min(), self.ymin)
-        self.ymax = max((difference + difference_error).max(), self.ymax)
+        self.xmin, self.xmax = numpy.nanmin(
+            numpy.append(
+                hists.bin_centers, self.xmin)), numpy.nanmax(
+            numpy.append(
+                hists.bin_centers, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(difference - difference_error, self.ymin)
+                                            ), numpy.nanmax(numpy.append(difference + difference_error, self.ymax))
 
         self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, hists.bin_centers, difference, xerr=hists.bin_widths / 2, yerr=difference_error)
@@ -913,8 +1057,7 @@ class Difference(Plotter):
         """
         self.axis.plot((self.xmin, self.xmax), (0, 0), color=line_color, linewidth=4, rasterized=True)
         self.scale_limits()
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
+        self.setAxisLimits(factor=0)
         self.axis.set_title("Difference Plot")
         self.axis.get_yaxis().set_major_locator(matplotlib.ticker.MaxNLocator(5))
         self.axis.get_xaxis().set_label_text(self.x_axis_label)

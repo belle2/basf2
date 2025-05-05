@@ -326,38 +326,48 @@ if __name__ == '__main__':
                             "of the classifiers on training and independent data."
                             "The legend of each plot contains the shortened identifier and the area under the ROC curve"
                             "in parenthesis.")
+        plot_classes = [
+            plotting.SignalToNoiseOverCut,
+            plotting.PurityOverEfficiency,
+            plotting.RejectionOverEfficiency,
+            plotting.TrueVsFalsePositiveRate,
+            plotting.PrecisionRecallCurve,
+        ]
 
-        o += b2latex.Section("ROC Plot")
-        graphics = b2latex.Graphics()
-        p = plotting.RejectionOverEfficiency(fom=True)
-        for i, identifier in enumerate(identifiers):
-            identifier_abbr = identifier_abbreviations[identifier]
-            p.add(
-                test_probability,
-                identifier_abbr,
-                test_target[identifier_abbr] == 1,
-                test_target[identifier_abbr] != 1,
-                label=identifier_abbr)
-        p.finish()
-        p.axis.set_title("ROC Rejection Plot on independent data")
-        p.save('roc_plot_test.pdf')
-        graphics.add('roc_plot_test.pdf', width=1.0)
-        o += graphics.finish()
+        for plot_class in plot_classes:
+            # Start section for each plot
+            o += b2latex.Section(f"{plot_class.__name__} Plot")
 
-        if train_probability:
+            graphics = b2latex.Graphics()
+            p = plot_class()
             for i, identifier in enumerate(identifiers):
-                graphics = b2latex.Graphics()
-                p = plotting.RejectionOverEfficiency(fom=True)
                 identifier_abbr = identifier_abbreviations[identifier]
-                p.add(train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
-                      train_target[identifier_abbr] != 1, label=f'Train {identifier_abbr}')
-                p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
-                      test_target[identifier_abbr] != 1, label=f'Test {identifier_abbr}')
-                p.finish()
-                p.axis.set_title("ROC Rejection Plot for " + identifier)
-                p.save(f'roc_plot_{hash(identifier)}.pdf')
-                graphics.add(f'roc_plot_{hash(identifier)}.pdf', width=1.0)
-                o += graphics.finish()
+                p.add(
+                    test_probability,
+                    identifier_abbr,
+                    test_target[identifier_abbr] == 1,
+                    test_target[identifier_abbr] != 1,
+                    label=identifier_abbr)
+            p.finish()
+            p.axis.set_title(f"{plot_class.__name__} Plot on independent data")
+            p.save(f'{plot_class.__name__.lower()}_plot_test.pdf')
+            graphics.add(f'{plot_class.__name__.lower()}_plot_test.pdf', width=1.0)
+            o += graphics.finish()
+
+            if train_probability:
+                for i, identifier in enumerate(identifiers):
+                    graphics = b2latex.Graphics()
+                    p = plot_class()
+                    identifier_abbr = identifier_abbreviations[identifier]
+                    p.add(train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
+                          train_target[identifier_abbr] != 1, label=f'Train {identifier_abbr}')
+                    p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
+                          test_target[identifier_abbr] != 1, label=f'Test {identifier_abbr}')
+                    p.finish()
+                    p.axis.set_title(f"{plot_class.__name__} Plot for \n" + identifier)
+                    p.save(f'{plot_class.__name__.lower()}_plot_{hash(identifier)}.pdf')
+                    graphics.add(f'{plot_class.__name__.lower()}_plot_{hash(identifier)}.pdf', width=1.0)
+                    o += graphics.finish()
 
         o += b2latex.Section("Classification Results")
         for identifier in identifiers:
@@ -370,21 +380,21 @@ if __name__ == '__main__':
                 p = plotting.Multiplot(plotting.PurityAndEfficiencyOverCut, 2)
             p.add(0, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
                   test_target[identifier_abbr] != 1, normed=True)
-            p.sub_plots[0].axis.set_title(f"Classification result in test data for {identifier}")
+            p.sub_plots[0].axis.set_title(f"Classification result in test data for \n{identifier}")
 
             p.add(1, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
                   test_target[identifier_abbr] != 1, normed=False)
-            p.sub_plots[1].axis.set_title(f"Classification result in test data for {identifier}")
+            p.sub_plots[1].axis.set_title(f"Classification result in test data for \n{identifier}")
             p.finish()
 
             if train_probability:
                 p.add(2, train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
                       train_target[identifier_abbr] != 1, normed=True)
-                p.sub_plots[2].axis.set_title(f"Classification result in training data for {identifier}")
+                p.sub_plots[2].axis.set_title(f"Classification result in training data for \n{identifier}")
 
                 p.add(3, train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
                       train_target[identifier_abbr] != 1, normed=False)
-                p.sub_plots[3].axis.set_title(f"Classification result in training data for {identifier}")
+                p.sub_plots[3].axis.set_title(f"Classification result in training data for \n{identifier}")
 
             p.save(f'classification_result_{hash(identifier)}.pdf')
             graphics.add(f'classification_result_{hash(identifier)}.pdf', width=1)
@@ -428,7 +438,7 @@ if __name__ == '__main__':
                     label='Test')
 
                 p.finish()
-                p.axis.set_title("Diagonal plot for " + identifier)
+                p.axis.set_title("Diagonal plot for \n" + identifier)
                 p.save(f'diagonal_plot_{hash(identifier)}.pdf')
                 graphics.add(f'diagonal_plot_{hash(identifier)}.pdf', width=1.0)
                 o += graphics.finish()
@@ -446,7 +456,7 @@ if __name__ == '__main__':
                       train_mask == 1, train_mask != 1,
                       target == 1, target != 1, )
                 p.finish()
-                p.axis.set_title(f"Overtraining check for {identifier}")
+                p.axis.set_title(f"Overtraining check for \n{identifier}")
                 p.save(f'overtraining_plot_{hash(identifier)}.pdf')
                 graphics.add(f'overtraining_plot_{hash(identifier)}.pdf', width=1.0)
                 o += graphics.finish()

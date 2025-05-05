@@ -259,6 +259,12 @@ class Plotter:
         return NotImplemented
 
     def setAxisLimits(self, factor=0.0):
+        """
+        Sets the limits of the axis with an optional expansion factor.
+
+        Parameters:
+            factor (float): Fraction by which to expand the axis limits beyond the data range.
+        """
         dx = self.xmax - self.xmin
         dy = self.ymax - self.ymin
         self.axis.set_xlim((self.xmin - factor*dx, self.xmax + factor*dx))
@@ -556,6 +562,10 @@ class TrueVsFalsePositiveRate(Plotter):
     Plots the true ROC curve: True Positive Rate (TPR) vs False Positive Rate (FPR),
     and marks the cut that gives the point closest to the ideal (0,1).
     """
+    #: @var xmax
+    #: Maximum x value
+    #: @var ymax
+    #: Maximum y value
 
     def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask},
@@ -613,6 +623,10 @@ class PrecisionRecallCurve(Plotter):
     """
     Plots the Precision vs Recall curve and marks the cut that gives the point closest to the ideal (1,1).
     """
+    #: @var xmax
+    #: Maximum x value
+    #: @var ymax
+    #: Maximum y value
 
     def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask},

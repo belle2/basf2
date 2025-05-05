@@ -373,10 +373,6 @@ class SignalToNoiseOverCut(Plotter):
         signal2noise, signal2noise_error = hists.get_signal_to_noise(['Signal'], ['Background'])
         cuts = hists.bin_centers
 
-        # Ensure arrays
-        signal2noise = numpy.asarray(signal2noise)
-        signal2noise_error = numpy.asarray(signal2noise_error)
-        cuts = numpy.asarray(cuts)
         valid = numpy.isfinite(signal2noise)
         signal2noise = signal2noise[valid]
         signal2noise_error = signal2noise_error[valid]
@@ -442,10 +438,6 @@ class PurityOverEfficiency(Plotter):
         purity, purity_error = hists.get_purity(['Signal'], ['Background'])
         cuts = hists.bin_centers
 
-        # Ensure arrays
-        efficiency = numpy.asarray(efficiency)
-        purity = numpy.asarray(purity)
-        cuts = numpy.asarray(cuts)
         valid = numpy.isfinite(purity) & numpy.isfinite(efficiency)
         efficiency = efficiency[valid]
         purity = purity[valid]
@@ -513,10 +505,6 @@ class RejectionOverEfficiency(Plotter):
         rejection = 1 - rejection
         cuts = hists.bin_centers
 
-        # Ensure arrays
-        efficiency = numpy.asarray(efficiency)
-        rejection = numpy.asarray(rejection)
-        cuts = numpy.asarray(cuts)
         valid = numpy.isfinite(rejection) & numpy.isfinite(efficiency)
         efficiency = efficiency[valid]
         rejection = rejection[valid]
@@ -577,10 +565,6 @@ class TrueVsFalsePositiveRate(Plotter):
         fpr, fpr_error = hists.get_efficiency(['Background'])   # False Positive Rate (FPR)
         cuts = hists.bin_centers                                 # Cut values for each bin
 
-        # Ensure arrays
-        tpr = numpy.asarray(tpr)
-        fpr = numpy.asarray(fpr)
-        cuts = numpy.asarray(cuts)
         valid = numpy.isfinite(tpr) & numpy.isfinite(fpr)
         tpr = tpr[valid]
         fpr = fpr[valid]
@@ -638,10 +622,6 @@ class PrecisionRecallCurve(Plotter):
         precision, precision_error = hists.get_purity(['Signal'], ['Background'])
         cuts = hists.bin_centers
 
-        # Ensure arrays
-        recall = numpy.asarray(recall)
-        precision = numpy.asarray(precision)
-        cuts = numpy.asarray(cuts)
         valid = numpy.isfinite(precision) & numpy.isfinite(recall)
         precision = precision[valid]
         recall = recall[valid]
@@ -1542,7 +1522,7 @@ class CorrelationMatrix(Plotter):
         bckgrd_corr = numpy.corrcoef(numpy.vstack([data[column][bckgrd_mask] for column in columns])) * 100
 
         signal_heatmap = self.signal_axis.imshow(
-            signal_corr,
+            signal_corr[::-1, ::-1],  # <- reverse rows and columns
             cmap=plt.cm.RdBu,
             vmin=-100.0,
             vmax=100.0,
@@ -1550,7 +1530,7 @@ class CorrelationMatrix(Plotter):
             aspect='auto',
             interpolation='nearest')
         self.bckgrd_axis.imshow(
-            bckgrd_corr,
+            bckgrd_corr[::-1, ::-1],  # <- reverse rows and columns
             cmap=plt.cm.RdBu,
             vmin=-100.0,
             vmax=100.0,
@@ -1565,8 +1545,8 @@ class CorrelationMatrix(Plotter):
         self.signal_axis.set_xlabel('Signal')
         self.signal_axis.set_xticks(tick_positions)
         self.signal_axis.set_yticks(tick_positions)
-        self.signal_axis.set_xticklabels(columns, rotation=90, fontsize=font_size)
-        self.signal_axis.set_yticklabels(columns, fontsize=font_size)
+        self.signal_axis.set_xticklabels(reversed(columns), rotation=90, fontsize=font_size)
+        self.signal_axis.set_yticklabels(reversed(columns), fontsize=font_size)
         self.signal_axis.xaxis.tick_top()
         self.signal_axis.invert_yaxis()
 
@@ -1574,20 +1554,20 @@ class CorrelationMatrix(Plotter):
         self.bckgrd_axis.set_xlabel('Background')
         self.bckgrd_axis.set_xticks(tick_positions)
         self.bckgrd_axis.set_yticks(tick_positions)
-        self.bckgrd_axis.set_xticklabels(columns, rotation=90, fontsize=font_size)
-        self.bckgrd_axis.set_yticklabels(columns, fontsize=font_size)
+        self.bckgrd_axis.set_xticklabels(reversed(columns), rotation=90, fontsize=font_size)
+        self.bckgrd_axis.set_yticklabels(reversed(columns), fontsize=font_size)
         self.bckgrd_axis.xaxis.tick_top()
         self.bckgrd_axis.invert_yaxis()
 
         # Add annotation text
         for y in range(num_vars):
             for x in range(num_vars):
-                txt = self.signal_axis.text(x, y, f'{signal_corr[y, x]:.0f}',
+                txt = self.signal_axis.text(x, y, f'{signal_corr[-1-y, -1-x]:.0f}',
                                             ha='center', va='center',
                                             fontsize=font_size,
                                             color='white')
                 txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='k')])
-                txt = self.bckgrd_axis.text(x, y, f'{bckgrd_corr[y, x]:.0f}',
+                txt = self.bckgrd_axis.text(x, y, f'{bckgrd_corr[-1-y, -1-x]:.0f}',
                                             ha='center', va='center',
                                             fontsize=font_size,
                                             color='white')

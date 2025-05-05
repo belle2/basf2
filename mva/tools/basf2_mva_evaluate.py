@@ -288,7 +288,7 @@ if __name__ == '__main__':
         p = plotting.CorrelationMatrix()
         p.add(variables_data, variable_abbreviations.values(),
               test_target[first_identifier_abbr] == 1,
-              test_target[first_identifier_abbr] != 1)
+              test_target[first_identifier_abbr] == 0)
         p.finish()
         p.save('correlation_plot.pdf')
         graphics.add('correlation_plot.pdf', width=1.0)
@@ -300,7 +300,7 @@ if __name__ == '__main__':
             p = plotting.CorrelationMatrix()
             p.add(variables_train_data, variable_abbreviations.values(),
                   train_target[first_identifier_abbr] == 1,
-                  train_target[first_identifier_abbr] != 1)
+                  train_target[first_identifier_abbr] == 0)
             p.finish()
             p.save('correlation_plot_train.pdf')
             graphics.add('correlation_plot_train.pdf', width=1.0)
@@ -312,10 +312,10 @@ if __name__ == '__main__':
             graphics = b2latex.Graphics()
             p = plotting.VerboseDistribution(normed=True, range_in_std=3, x_axis_label=v)
             p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 1, label="Sig")
-            p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] != 1, label="Bkg")
+            p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 0, label="Bkg")
             if train_probability:
                 p.add(variables_train_data, variable_abbr, train_target[first_identifier_abbr] == 1, label="Sig_train")
-                p.add(variables_train_data, variable_abbr, train_target[first_identifier_abbr] != 1, label="Bkg_train")
+                p.add(variables_train_data, variable_abbr, train_target[first_identifier_abbr] == 0, label="Bkg_train")
             p.finish()
             p.save(f'variable_{variable_abbr}_{hash(v)}.pdf')
             graphics.add(f'variable_{variable_abbr}_{hash(v)}.pdf', width=1.0)
@@ -346,7 +346,7 @@ if __name__ == '__main__':
                     test_probability,
                     identifier_abbr,
                     test_target[identifier_abbr] == 1,
-                    test_target[identifier_abbr] != 1,
+                    test_target[identifier_abbr] == 0,
                     label=identifier_abbr)
             p.finish()
             p.axis.set_title(f"{plot_class.__name__} Plot on independent data")
@@ -360,9 +360,9 @@ if __name__ == '__main__':
                     p = plot_class()
                     identifier_abbr = identifier_abbreviations[identifier]
                     p.add(train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
-                          train_target[identifier_abbr] != 1, label=f'Train {identifier_abbr}')
+                          train_target[identifier_abbr] == 0, label=f'Train {identifier_abbr}')
                     p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
-                          test_target[identifier_abbr] != 1, label=f'Test {identifier_abbr}')
+                          test_target[identifier_abbr] == 0, label=f'Test {identifier_abbr}')
                     p.finish()
                     p.axis.set_title(f"{plot_class.__name__} Plot for \n" + identifier)
                     p.save(f'{plot_class.__name__.lower()}_plot_{hash(identifier)}.pdf')
@@ -379,20 +379,20 @@ if __name__ == '__main__':
             else:
                 p = plotting.Multiplot(plotting.PurityAndEfficiencyOverCut, 2)
             p.add(0, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
-                  test_target[identifier_abbr] != 1, normed=True)
+                  test_target[identifier_abbr] == 0, normed=True)
             p.sub_plots[0].axis.set_title(f"Classification result in test data for \n{identifier}")
 
             p.add(1, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
-                  test_target[identifier_abbr] != 1, normed=False)
+                  test_target[identifier_abbr] == 0, normed=False)
             p.sub_plots[1].axis.set_title(f"Classification result in test data for \n{identifier}")
 
             if train_probability:
                 p.add(2, train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
-                      train_target[identifier_abbr] != 1, normed=True)
+                      train_target[identifier_abbr] == 0, normed=True)
                 p.sub_plots[2].axis.set_title(f"Classification result in training data for \n{identifier}")
 
                 p.add(3, train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
-                      train_target[identifier_abbr] != 1, normed=False)
+                      train_target[identifier_abbr] == 0, normed=False)
                 p.sub_plots[3].axis.set_title(f"Classification result in training data for \n{identifier}")
 
             p.figure.subplots_adjust(wspace=0.3, hspace=0.3)
@@ -410,7 +410,7 @@ if __name__ == '__main__':
                 test_probability,
                 identifier_abbr,
                 test_target[identifier_abbr] == 1,
-                test_target[identifier_abbr] != 1,
+                test_target[identifier_abbr] == 0,
                 label=identifier_abbr)
         p.finish()
         p.axis.set_title("Diagonal plot on independent data")
@@ -429,13 +429,13 @@ if __name__ == '__main__':
                     train_probability,
                     identifier_abbr,
                     train_target[identifier_abbr] == 1,
-                    train_target[identifier_abbr] != 1,
+                    train_target[identifier_abbr] == 0,
                     label='Train')
                 p.add(
                     test_probability,
                     identifier_abbr,
                     test_target[identifier_abbr] == 1,
-                    test_target[identifier_abbr] != 1,
+                    test_target[identifier_abbr] == 0,
                     label='Test')
 
                 p.finish()
@@ -454,8 +454,8 @@ if __name__ == '__main__':
                 graphics = b2latex.Graphics()
                 p = plotting.Overtraining()
                 p.add(probability, identifier_abbr,
-                      train_mask == 1, train_mask != 1,
-                      target == 1, target != 1, )
+                      train_mask == 1, train_mask == 0,
+                      target == 1, target == 0, )
                 p.finish()
                 p.axis.set_title(f"Overtraining check for \n{identifier}")
                 p.save(f'overtraining_plot_{hash(identifier)}.pdf')
@@ -477,10 +477,10 @@ if __name__ == '__main__':
             graphics = b2latex.Graphics()
             p = plotting.VerboseDistribution()
             p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 1, label="Sig")
-            p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] != 1, label="Bkg")
+            p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 0, label="Bkg")
             if train_probability:
                 p.add(spectators_train_data, spectator_abbr, train_target[first_identifier_abbr] == 1, label="Sig_train")
-                p.add(spectators_train_data, spectator_abbr, train_target[first_identifier_abbr] != 1, label="Bkg_train")
+                p.add(spectators_train_data, spectator_abbr, train_target[first_identifier_abbr] == 0, label="Bkg_train")
             p.finish()
             p.save(f'spectator_{spectator_abbr}_{hash(spectator)}.pdf')
             graphics.add(f'spectator_{spectator_abbr}_{hash(spectator)}.pdf', width=1.0)
@@ -494,7 +494,7 @@ if __name__ == '__main__':
                 p = plotting.Correlation()
                 p.add(data, spectator_abbr, identifier_abbr, list(range(10, 100, 10)),
                       test_target[identifier_abbr] == 1,
-                      test_target[identifier_abbr] != 1)
+                      test_target[identifier_abbr] == 0)
                 p.finish()
                 p.save(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}.pdf')
                 graphics.add(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}.pdf', width=1.0)
@@ -509,7 +509,7 @@ if __name__ == '__main__':
                     p = plotting.Correlation()
                     p.add(data, spectator_abbr, identifier_abbr, list(range(10, 100, 10)),
                           train_target[identifier_abbr] == 1,
-                          train_target[identifier_abbr] != 1)
+                          train_target[identifier_abbr] == 0)
                     p.finish()
                     p.save(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}_train.pdf')
                     graphics.add(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}_train.pdf', width=1.0)
@@ -524,7 +524,7 @@ if __name__ == '__main__':
                 varSpec_data,
                 list(variable_abbreviations.values()) + list(spectator_abbreviations.values()),
                 test_target[first_identifier_abbr] == 1,
-                test_target[first_identifier_abbr] != 1
+                test_target[first_identifier_abbr] == 0
             )
             p.finish()
             p.save('correlation_spec_plot.pdf')
@@ -539,7 +539,7 @@ if __name__ == '__main__':
                     varSpec_train_data,
                     list(variable_abbreviations.values()) + list(spectator_abbreviations.values()),
                     train_target[first_identifier_abbr] == 1,
-                    train_target[first_identifier_abbr] != 1
+                    train_target[first_identifier_abbr] == 0
                 )
                 p.finish()
                 p.save('correlation_spec_plot_train.pdf')

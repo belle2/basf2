@@ -74,17 +74,19 @@ class Plotter:
     #: Main axis which is used to draw
     axis = None
 
-    def __init__(self, figure=None, axis=None):
+    def __init__(self, figure=None, axis=None, dpi=None):
         """
         Creates a new figure and axis if None is given, sets the default plot parameters
         @param figure default draw figure which is used
         @param axis default draw axis which is used
+        @param dpi default dpi which is used
         """
         b2.B2INFO("Create new figure for class " + str(type(self)))
+        #: set default dpi
+        self.dpi = dpi
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
-            self.figure.set_tight_layout(True)
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=dpi)
         else:
             self.figure = figure
 
@@ -144,7 +146,7 @@ class Plotter:
         b2.B2INFO("Save figure for class " + str(type(self)))
         from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
         canvas = FigureCanvas(self.figure)
-        canvas.print_figure(filename, dpi=50)
+        canvas.print_figure(filename, dpi=self.dpi, bbox_inches='tight')
         return self
 
     def set_plot_options(self, plot_kwargs={'linestyle': ''}):
@@ -296,6 +298,7 @@ class PurityAndEfficiencyOverCut(Plotter):
         @param signal_mask boolean numpy.array defining which events are signal events
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
+        @param normed boolean if True, the efficiency and purity are normalized to 1
         """
 
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
@@ -334,14 +337,15 @@ class PurityAndEfficiencyOverCut(Plotter):
         else:
             self.labels.append("False positive")
 
+        self.axis.set_title("Classification Plot")
+
         return self
 
     def finish(self):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.setAxisLimits(factor=0)
-        self.axis.set_title("Classification Plot")
+        self.setAxisLimits(factor=0.01)
         self.axis.get_xaxis().set_label_text('Cut Value')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
@@ -477,7 +481,7 @@ class PurityOverEfficiency(Plotter):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.setAxisLimits(factor=0)
+        self.setAxisLimits(factor=0.01)
         self.axis.set_title("ROC Purity Plot")
         self.axis.get_xaxis().set_label_text('Efficiency')
         self.axis.get_yaxis().set_label_text('Purity')
@@ -550,7 +554,7 @@ class RejectionOverEfficiency(Plotter):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.setAxisLimits(factor=0)
+        self.setAxisLimits(factor=0.01)
         self.axis.set_title("ROC Rejection Plot")
         self.axis.get_yaxis().set_label_text('Background Rejection')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
@@ -613,7 +617,7 @@ class TrueVsFalsePositiveRate(Plotter):
         return self
 
     def finish(self):
-        self.setAxisLimits(factor=0)
+        self.setAxisLimits(factor=0.01)
         self.axis.set_title("True ROC Curve")
         self.axis.get_xaxis().set_label_text('False Positive Rate (Background Efficiency)')
         self.axis.get_yaxis().set_label_text('True Positive Rate (Signal Efficiency)')
@@ -674,7 +678,7 @@ class PrecisionRecallCurve(Plotter):
         return self
 
     def finish(self):
-        self.setAxisLimits(factor=0)
+        self.setAxisLimits(factor=0.01)
         self.axis.set_title("Precision-Recall Curve")
         self.axis.get_xaxis().set_label_text('Recall (Signal Efficiency)')
         self.axis.get_yaxis().set_label_text('Precision (Purity)')
@@ -691,29 +695,41 @@ class Multiplot(Plotter):
     #: Main axis
     axis = None
 
-    def __init__(self, cls, number_of_plots, figure=None):
+    def __init__(self, cls, number_of_plots, figure=None, dpi=None):
         """
         Creates a new figure if None is given, sets the default plot parameters
+        @param cls class of the plot
+        @param number_of_plots number of plots which should be displayed
         @param figure default draw figure which is used
+        @param dpi default dpi which is used
         """
+        if number_of_plots == 1:
+            gsTuple = (1, 1)
+        elif number_of_plots == 2:
+            gsTuple = (1, 2)
+        elif number_of_plots == 3:
+            gsTuple = (1, 3)
+        elif number_of_plots == 4:
+            gsTuple = (2, 2)
+        elif number_of_plots == 6:
+            gsTuple = (2, 3)
+        else:
+            gsTuple = (int(numpy.ceil(number_of_plots / 3)), 3)
+
+        #: set default dpi
+        self.dpi = dpi
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
-            self.figure.set_tight_layout(True)
+            self.figure = matplotlib.figure.Figure(figsize=(12*gsTuple[1], 8*gsTuple[0]), dpi=dpi)
         else:
             self.figure = figure
 
-        if number_of_plots == 1:
-            gs = matplotlib.gridspec.GridSpec(1, 1)
-        elif number_of_plots == 2:
-            gs = matplotlib.gridspec.GridSpec(1, 2)
-        elif number_of_plots == 3:
-            gs = matplotlib.gridspec.GridSpec(1, 3)
-        else:
-            gs = matplotlib.gridspec.GridSpec(int(numpy.ceil(number_of_plots / 3)), 3)
-
+        gs = matplotlib.gridspec.GridSpec(gsTuple[0], gsTuple[1])
+        #: get grid list of tuples of grid positions
+        grid_list = list(itertools.product(range(gs.nrows), range(gs.ncols)))
         #: the subplots which are displayed in the grid
-        self.sub_plots = [cls(self.figure, self.figure.add_subplot(gs[i // 3, i % 3])) for i in range(number_of_plots)]
+        self.sub_plots = [cls(self.figure, self.figure.add_subplot(gs[grid_list[i][0], grid_list[i][1]]))
+                          for i in range(number_of_plots)]
         #: the axis of the first subplot
         self.axis = self.sub_plots[0].axis
         super().__init__(self.figure, self.axis)
@@ -777,7 +793,7 @@ class Diagonal(Plotter):
         """
         self.scale_limits()
         self.axis.plot((0.0, 1.0), (0.0, 1.0), color='black')
-        self.setAxisLimits(factor=0)
+        self.setAxisLimits(factor=0.01)
         self.axis.set_title("Diagonal Plot")
         self.axis.get_xaxis().set_label_text('Classifier Output')
         self.axis.get_yaxis().set_label_text('Purity Per Bin')
@@ -890,7 +906,7 @@ class Distribution(Plotter):
             return self
 
         self.scale_limits()
-        self.setAxisLimits(factor=0)
+        self.setAxisLimits(factor=0.01)
 
         if self.normed_to_all_entries and self.normed_to_bin_width:
             self.axis.get_yaxis().set_label_text('# Entries per Bin / (# Entries * Bin Width)')
@@ -1057,7 +1073,7 @@ class Difference(Plotter):
         """
         self.axis.plot((self.xmin, self.xmax), (0, 0), color=line_color, linewidth=4, rasterized=True)
         self.scale_limits()
-        self.setAxisLimits(factor=0)
+        self.setAxisLimits(factor=0.01)
         self.axis.set_title("Difference Plot")
         self.axis.get_yaxis().set_major_locator(matplotlib.ticker.MaxNLocator(5))
         self.axis.get_xaxis().set_label_text(self.x_axis_label)
@@ -1080,15 +1096,16 @@ class Overtraining(Plotter):
     #: Axis which shows the difference between training and test background
     axis_d2 = None
 
-    def __init__(self, figure=None):
+    def __init__(self, figure=None, dpi=None):
         """
         Creates a new figure if None is given, sets the default plot parameters
         @param figure default draw figure which is used
         """
+        #: set default dpi
+        self.dpi = dpi
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
-            self.figure.set_tight_layout(True)
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=self.dpi)
         else:
             self.figure = figure
 
@@ -1288,15 +1305,16 @@ class Correlation(Plotter):
     #: Axis which shows shape of background
     axis_d2 = None
 
-    def __init__(self, figure=None):
+    def __init__(self, figure=None, dpi=None):
         """
         Creates a new figure if None is given, sets the default plot parameters
         @param figure default draw figure which is used
         """
+        #: set default dpi
+        self.dpi = dpi
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
-            self.figure.set_tight_layout(True)
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=self.dpi)
         else:
             self.figure = figure
 
@@ -1411,7 +1429,6 @@ class Importance(Plotter):
         @param data pandas.DataFrame containing all data
         @param columns which are used to calculate the correlations
         """
-        self.figure.set_tight_layout(True)
 
         def norm(x):
             width = (numpy.max(x) - numpy.min(x))
@@ -1420,34 +1437,51 @@ class Importance(Plotter):
             return (x - numpy.min(x)) / width * 100
 
         importance_matrix = numpy.vstack([norm(data[column]) for column in columns]).T
-        importance_heatmap = self.axis.pcolor(importance_matrix, cmap=plt.cm.RdBu, vmin=0.0, vmax=100,
-                                              rasterized=True)
+        im = self.axis.imshow(
+            importance_matrix[::-1],  # <- reverse rows
+            cmap=plt.cm.RdBu,
+            vmin=0.0,
+            vmax=100.0,
+            aspect='equal',
+            interpolation='nearest',
+            origin='upper'
+        )
 
-        # put the major ticks at the middle of each cell
-        self.axis.set_yticks(numpy.arange(importance_matrix.shape[0]) + 0.5, minor=False)
-        self.axis.set_xticks(numpy.arange(importance_matrix.shape[1]) + 0.5, minor=False)
+        num_y, num_x = importance_matrix.shape
 
-        self.axis.set_xticklabels(columns, minor=False, rotation=90)
-        self.axis.set_yticklabels(variables, minor=False)
+        # Adjust font size based on matrix size
+        base_font_size = 14
+        font_size = max(6, base_font_size * min(1.0, 25 / max(num_x, num_y)))
 
-        self.axis.xaxis.tick_top()
+        # Tick positions and labels
+        self.axis.set_xticks(numpy.arange(num_x))
+        self.axis.set_yticks(numpy.arange(num_y))
 
-        for y in range(importance_matrix.shape[0]):
-            for x in range(importance_matrix.shape[1]):
-                txt = self.axis.text(x + 0.5, y + 0.5, f'{importance_matrix[y, x]:.0f}',
-                                     size=14,
-                                     horizontalalignment='center',
-                                     verticalalignment='center',
-                                     color='w')
-                txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='k')])
+        self.axis.set_xticklabels(columns, rotation=90, fontsize=font_size)
+        self.axis.set_yticklabels(reversed(variables), fontsize=font_size)
 
-        cb = self.figure.colorbar(importance_heatmap, ticks=[0.0, 100], orientation='vertical')
+        self.axis.tick_params(top=True, bottom=False, labeltop=True, labelbottom=False)
+
+        # Add text annotations
+        for y in range(num_y):
+            for x in range(num_x):
+                value = importance_matrix[-1-y, x]  # Reverse y-axis for correct annotation
+                txt = self.axis.text(
+                    x, y, f'{value:.0f}',
+                    ha='center', va='center',
+                    fontsize=font_size,
+                    color='white'
+                )
+                txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='black')])
+
+        # Colorbar
+        cb = self.figure.colorbar(im, ax=self.axis, ticks=[0.0, 100.0], orientation='vertical')
         cb.ax.set_yticklabels(['low', 'high'])
+        cb.solids.set_rasterized(True)
 
-        # remove whitespace
-        self.axis.set_ylim(0, importance_matrix.shape[0])
-
-        self.axis.set_aspect('equal')
+        # Layout tightening
+        self.axis.set_xlim(-0.5, num_x - 0.5)
+        self.axis.set_ylim(num_y - 0.5, -0.5)  # origin='upper' flips y
 
         return self
 
@@ -1469,15 +1503,17 @@ class CorrelationMatrix(Plotter):
     #: Axis which shows the correlation of the background samples
     bckgrd_axis = None
 
-    def __init__(self, figure=None):
+    def __init__(self, figure=None, dpi=None):
         """
         Creates a new figure if None is given, sets the default plot parameters
         @param figure default draw figure which is used
+        @param dpi default draw dpi which is used
         """
+        #: set default dpi
+        self.dpi = dpi
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
-            self.figure.set_tight_layout(True)
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=self.dpi)
         else:
             self.figure = figure
 
@@ -1499,61 +1535,70 @@ class CorrelationMatrix(Plotter):
         @param data pandas.DataFrame containing all data
         @param columns which are used to calculate the correlations
         """
+        num_vars = len(columns)
+        font_size = max(4, min(14, 200 // num_vars))  # Scale font size
+
         signal_corr = numpy.corrcoef(numpy.vstack([data[column][signal_mask] for column in columns])) * 100
         bckgrd_corr = numpy.corrcoef(numpy.vstack([data[column][bckgrd_mask] for column in columns])) * 100
 
-        signal_heatmap = self.signal_axis.pcolor(signal_corr, cmap=plt.cm.RdBu, vmin=-100.0, vmax=100.0)
-        self.bckgrd_axis.pcolor(bckgrd_corr, cmap=plt.cm.RdBu, vmin=-100.0, vmax=100.0)
+        signal_heatmap = self.signal_axis.imshow(
+            signal_corr,
+            cmap=plt.cm.RdBu,
+            vmin=-100.0,
+            vmax=100.0,
+            origin='upper',
+            aspect='auto',
+            interpolation='nearest')
+        self.bckgrd_axis.imshow(
+            bckgrd_corr,
+            cmap=plt.cm.RdBu,
+            vmin=-100.0,
+            vmax=100.0,
+            origin='upper',
+            aspect='auto',
+            interpolation='nearest')
 
-        self.signal_axis.invert_yaxis()
+        # Tick positions
+        tick_positions = numpy.arange(num_vars)
+
+        # Signal ticks
+        self.signal_axis.set_xlabel('Signal')
+        self.signal_axis.set_xticks(tick_positions)
+        self.signal_axis.set_yticks(tick_positions)
+        self.signal_axis.set_xticklabels(columns, rotation=90, fontsize=font_size)
+        self.signal_axis.set_yticklabels(columns, fontsize=font_size)
         self.signal_axis.xaxis.tick_top()
-        self.bckgrd_axis.invert_yaxis()
+        self.signal_axis.invert_yaxis()
+
+        # Background ticks
+        self.bckgrd_axis.set_xlabel('Background')
+        self.bckgrd_axis.set_xticks(tick_positions)
+        self.bckgrd_axis.set_yticks(tick_positions)
+        self.bckgrd_axis.set_xticklabels(columns, rotation=90, fontsize=font_size)
+        self.bckgrd_axis.set_yticklabels(columns, fontsize=font_size)
         self.bckgrd_axis.xaxis.tick_top()
+        self.bckgrd_axis.invert_yaxis()
 
-        # put the major ticks at the middle of each cell
-        self.signal_axis.set_xticks(numpy.arange(signal_corr.shape[0]) + 0.5, minor=False)
-        self.signal_axis.set_yticks(numpy.arange(signal_corr.shape[1]) + 0.5, minor=False)
-
-        self.signal_axis.set_xticklabels(columns, minor=False, rotation=90)
-        self.signal_axis.set_yticklabels(columns, minor=False)
-
-        # put the major ticks at the middle of each cell
-        self.bckgrd_axis.set_xticks(numpy.arange(bckgrd_corr.shape[0]) + 0.5, minor=False)
-        self.bckgrd_axis.set_yticks(numpy.arange(bckgrd_corr.shape[1]) + 0.5, minor=False)
-
-        self.bckgrd_axis.set_xticklabels(columns, minor=False, rotation=90)
-        self.bckgrd_axis.set_yticklabels(columns, minor=False)
-
-        for y in range(signal_corr.shape[0]):
-            for x in range(signal_corr.shape[1]):
-                txt = self.signal_axis.text(x + 0.5, y + 0.5, f'{signal_corr[y, x]:.0f}',
-                                            size=14,
-                                            horizontalalignment='center',
-                                            verticalalignment='center',
-                                            color='w')
+        # Add annotation text
+        for y in range(num_vars):
+            for x in range(num_vars):
+                txt = self.signal_axis.text(x, y, f'{signal_corr[y, x]:.0f}',
+                                            ha='center', va='center',
+                                            fontsize=font_size,
+                                            color='white')
+                txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='k')])
+                txt = self.bckgrd_axis.text(x, y, f'{bckgrd_corr[y, x]:.0f}',
+                                            ha='center', va='center',
+                                            fontsize=font_size,
+                                            color='white')
                 txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='k')])
 
-        for y in range(bckgrd_corr.shape[0]):
-            for x in range(bckgrd_corr.shape[1]):
-                txt = self.bckgrd_axis.text(x + 0.5, y + 0.5, f'{bckgrd_corr[y, x]:.0f}',
-                                            size=14,
-                                            horizontalalignment='center',
-                                            verticalalignment='center',
-                                            color='w')
-                txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='k')])
-
-        cb = self.figure.colorbar(signal_heatmap, cax=self.colorbar_axis, ticks=[-100, 0, 100], orientation='horizontal')
+        # Colorbar
+        cb = self.figure.colorbar(signal_heatmap, cax=self.colorbar_axis,
+                                  ticks=[-100, 0, 100], orientation='horizontal')
         cb.solids.set_rasterized(True)
         cb.ax.set_xticklabels(['negative', 'uncorrelated', 'positive'])
 
-        self.signal_axis.text(0.5, -1.0, "Signal", horizontalalignment='center')
-        self.bckgrd_axis.text(0.5, -1.0, "Background", horizontalalignment='center')
-
-        # remove whitespace
-        self.signal_axis.set_xlim(0, signal_corr.shape[0])
-        self.signal_axis.set_ylim(0, signal_corr.shape[1])
-        self.bckgrd_axis.set_xlim(0, bckgrd_corr.shape[0])
-        self.bckgrd_axis.set_ylim(0, bckgrd_corr.shape[1])
         return self
 
     def finish(self):

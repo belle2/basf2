@@ -385,7 +385,6 @@ if __name__ == '__main__':
             p.add(1, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
                   test_target[identifier_abbr] != 1, normed=False)
             p.sub_plots[1].axis.set_title(f"Classification result in test data for \n{identifier}")
-            p.finish()
 
             if train_probability:
                 p.add(2, train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
@@ -396,6 +395,8 @@ if __name__ == '__main__':
                       train_target[identifier_abbr] != 1, normed=False)
                 p.sub_plots[3].axis.set_title(f"Classification result in training data for \n{identifier}")
 
+            p.figure.subplots_adjust(wspace=0.3, hspace=0.3)
+            p.finish()
             p.save(f'classification_result_{hash(identifier)}.pdf')
             graphics.add(f'classification_result_{hash(identifier)}.pdf', width=1)
             o += graphics.finish()

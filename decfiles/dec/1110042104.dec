@@ -17,7 +17,7 @@ Alias pi0sig     pi0
 # Upsilon(4S)
 
 Decay Upsilon(4S)
-1.0     B0sig  anti_B0sig  B0  anti-B0  VSS_BMIX dm;
+1.0     B0sig  anti-B0sig  B0  anti-B0  VSS_BMIX dm;
 Enddecay
 
 # B0 -> omega K_S0

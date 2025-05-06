@@ -43,6 +43,13 @@ namespace Belle2 {
      */
     virtual ~RootOutputModule();
 
+    /** Get the name of the branch for anti-particles.
+     *
+     *  @param branchName Name of the branch to be used for the anti-particle.
+     *  @return          Name of the branch for the anti-particle.
+     */
+    static std::string getAntiParticleBranchName(const std::string& branchName);
+
     /** Setting up of various stuff.
      *
      *  Opens a file and creates TTree(s)

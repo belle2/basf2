@@ -8,8 +8,6 @@
 
 #include <boost/python.hpp>
 
-#include <analysis/DecayDescriptor/ParticleListName.h>
-
 #include <framework/modules/rootio/RootOutputModule.h>
 
 #include <framework/io/RootIOUtilities.h>
@@ -25,6 +23,8 @@
 #include <boost/algorithm/string.hpp>
 
 #include <TClonesArray.h>
+#include <TParticlePDG.h>
+#include <TDatabasePDG.h>
 
 #include <regex>
 #include <filesystem>
@@ -136,6 +136,22 @@ RootOutputModule::~RootOutputModule()
   delete m_outputFileMetaData;
 }
 
+std::string RootOutputModule::getAntiParticleBranchName(const std::string& branchName)
+{
+  // Determine PDG code using the particle names defined in evt.pdl
+  std::size_t pos = branchName.find(":");
+  std::string particleName = branchName.substr(0, pos);
+  std::string label = branchName.substr(pos + 1);
+  TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(particleName.c_str());
+  TParticlePDG* antiParticle = particle->AntiParticle();
+  bool isSelfConjugatedParticle = !(antiParticle and (particle != antiParticle));
+  if (isSelfConjugatedParticle) {
+    return nullptr;
+  } else {
+    return std::string(antiParticle->GetName()) + ":" + label;
+  }
+}
+
 void RootOutputModule::initialize()
 {
   //ROOT has a default maximum size of 100GB for trees??? For larger trees it creates a new file and does other things that finally produce crashes.
@@ -173,9 +189,9 @@ void RootOutputModule::initialize()
     std::vector<std::string> antiParticleLists;
     for (auto branchName : m_branchNames[0]) {
       if (branchName.find(":") == std::string::npos) continue;
-      string antiListName = ParticleListName::antiParticleListName(branchName);
+      std::string antiListName = getAntiParticleBranchName(branchName);
       if (!antiListName.empty()) {
-        antiParticleLists.push_back(antiListName);  
+        antiParticleLists.push_back(antiListName);
       }
     }
     m_branchNames[0].insert(m_branchNames[0].end(), antiParticleLists.begin(), antiParticleLists.end());
@@ -183,7 +199,7 @@ void RootOutputModule::initialize()
     std::vector<std::string> exAntiParticleLists;
     for (auto exBranchName : m_excludeBranchNames[0]) {
       if (exBranchName.find(":") == std::string::npos) continue;
-      string exAntiListName = ParticleListName::antiParticleListName(exBranchName);
+      std::string exAntiListName = getAntiParticleBranchName(exBranchName);
       if (!exAntiListName.empty()) {
         exAntiParticleLists.push_back(exAntiListName);  
       }

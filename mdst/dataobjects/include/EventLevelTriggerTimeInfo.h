@@ -12,13 +12,25 @@
 namespace Belle2 {
   /**
    * Storage element for information from the Trigger Timing Distribution (TTD)
+   * and EventT0-related information.
    *
    * Data is required to study injections and injection backgrounds,
-   * as well as for the analysis and simulation of PXD Gated Mode
+   * as well as for the analysis and simulation of PXD Gated Mode.
    **/
   class EventLevelTriggerTimeInfo : public TObject {
 
   public:
+
+    /** Flags for the EventT0 source. */
+    enum EventT0Source : unsigned short {
+      // In case additional subdetectors are included in the EventT0 determination,
+      // they must be added here.
+      // Flags are set in the EventT0Combiner module.
+      c_fromSVD = (1 << 0),
+      c_fromCDC = (1 << 1),
+      c_fromECL = (1 << 2)
+    };
+
     /** Constructor
      *  @param isValid  The information stored in this object is valid
      *  @param isHER    Injection in HER/LER
@@ -31,8 +43,10 @@ namespace Belle2 {
                                        unsigned int timeSinceLastInjection = c_flagNoInjection,
                                        unsigned int timeSincePrevTrigger = 0,
                                        unsigned int bunchNumber = 0) :
-      m_isValid(isValid), m_isHER(isHER), m_revo2(revo2), m_timeSinceLastInjection(timeSinceLastInjection),
-      m_timeSincePrevTrigger(timeSincePrevTrigger), m_bunchNumber(bunchNumber) {}
+      m_isValid(isValid), m_isHER(isHER), m_revo2(revo2), m_eventT0Source(EventT0Source{0}),
+      m_timeSinceLastInjection(timeSinceLastInjection), m_timeSincePrevTrigger(timeSincePrevTrigger),
+      m_bunchNumber(bunchNumber) {}
+
     /// Destructor
     ~EventLevelTriggerTimeInfo() {}
 
@@ -82,7 +96,67 @@ namespace Belle2 {
     /// get the actual (=global) number of the triggered bunch
     int getTriggeredBunchNumberGlobal() const;
 
+    // Setters and getters for EventT0Source flags
+    /// Add the flag c_fromSVD to the EventT0 source mask
+    void addEventT0SourceFromSVD() { setSources<EventT0Source::c_fromSVD>(true); }
+
+    /// Remove the flag c_fromSVD from the EventT0 source mask
+    void unsetEventT0SourceFromSVD() { setSources<EventT0Source::c_fromSVD>(false); }
+
+    /// Return if the c_fromSVD flag is set in the EventT0 source mask
+    bool hasEventT0SourceFromSVD() const { return hasEventT0Sources(EventT0Source::c_fromSVD); }
+
+    /// Add the flag c_fromCDC to the EventT0 source mask
+    void addEventT0SourceFromCDC() { setSources<EventT0Source::c_fromCDC>(true); }
+
+    /// Remove the flag c_fromCDC from the EventT0 source mask
+    void unsetEventT0SourceFromCDC() { setSources<EventT0Source::c_fromCDC>(false); }
+
+    /// Return if the c_fromCDC flag is set in the EventT0 source mask
+    bool hasEventT0SourceFromCDC() const { return hasEventT0Sources(EventT0Source::c_fromCDC); }
+
+    /// Add the flag c_fromECL to the EventT0 source mask
+    void addEventT0SourceFromECL() { setSources<EventT0Source::c_fromECL>(true); }
+
+    /// Remove the flag c_fromECL from the EventT0 source mask
+    void unsetEventT0SourceFromECL() { setSources<EventT0Source::c_fromECL>(false); }
+
+    /// Return if the c_fromECL flag is set in the EventT0 source mask
+    bool hasEventT0SourceFromECL() const { return hasEventT0Sources(EventT0Source::c_fromECL); }
+
+    /// Add a specific flag (or combination of flags) to the EventT0 source mask
+    void addEventT0Sources(EventT0Source sources) { m_eventT0Source = EventT0Source(m_eventT0Source bitor sources); }
+
+    /// Unset a specific flag (or combination of flags) from the EventT0 source mask
+    void unsetEventT0Sources(EventT0Source sources) { m_eventT0Source = EventT0Source(m_eventT0Source bitand ~sources); }
+
+    /// Return if the specific flag is set in the EventT0 source mask
+    bool hasEventT0Sources(EventT0Source sources) const { return EventT0Source(m_eventT0Source bitand sources); }
+
+    /// Reset all the flags from the EventT0 source mask (aka: set the "total" mask to 0)
+    void resetEventT0Sources() { unsetEventT0Sources(c_fromAllSubdetectors); }
+
+    /// Return if at least one flag is set in the EventT0 source mask
+    bool hasAnyEventT0Sources() const { return hasEventT0Sources(c_fromAllSubdetectors); }
+
+    /// Return the EventT0 source mask
+    const EventT0Source& getEventT0Sources() const { return m_eventT0Source; }
+
   private:
+
+    /**
+     * Generic setter for the EventT0Source flags. Used only internally.
+     */
+    template<EventT0Source source>
+    void setSources(bool setTo)
+    {
+      if (setTo) {
+        addEventT0Sources(source);
+      } else {
+        unsetEventT0Sources(source);
+      }
+    }
+
     /**
     * Data stored in this TTD info object is actually valid
     **/
@@ -96,6 +170,10 @@ namespace Belle2 {
     * (PXD needs ~2 revolutions to readout one frame)
     **/
     bool m_revo2;
+    /**
+     * Mask for storing which subdetectors contributed to the EventT0
+     */
+    EventT0Source m_eventT0Source;
     /**
     * Time since the last injection in clock ticks (127MHz=RF/4 clock)
     * Note: A value of 0x7FFFFFFF (see `c_flagNoInjection`) means no injection took place recently
@@ -120,6 +198,10 @@ namespace Belle2 {
     /// This number is defined by the FTSW to indicate no injection happened recently
     static const unsigned int c_flagNoInjection = 0x7FFFFFFF; //! tells ROOT not to write it to file (transient)
 
-    ClassDef(EventLevelTriggerTimeInfo, 1) ///< Storage element for TTD information
+    static constexpr EventT0Source c_fromAllSubdetectors = EventT0Source(EventT0Source::c_fromSVD +
+                                                           EventT0Source::c_fromCDC +
+                                                           EventT0Source::c_fromECL); //! tells ROOT not to write it to file (transient)
+
+    ClassDef(EventLevelTriggerTimeInfo, 2) ///< Storage element for TTD information
   };
 }

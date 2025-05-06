@@ -385,9 +385,12 @@ class SignalToNoiseOverCut(Plotter):
         cuts = cuts[valid]
 
         # Determine "best" cut by maximizing Signal to Noise
-        best_idx = numpy.nanargmax(signal2noise)
-        best_cut = cuts[best_idx]
-        best_signal2noise = signal2noise[best_idx]
+        if len(signal2noise) == 0 or numpy.all(numpy.isnan(signal2noise)):
+            best_idx = None
+        else:
+            best_idx = numpy.nanargmax(signal2noise)
+            best_cut = cuts[best_idx]
+            best_signal2noise = signal2noise[best_idx]
 
         self.xmin, self.xmax = numpy.nanmin(numpy.append(cuts, self.xmin)), numpy.nanmax(numpy.append(cuts, self.xmax))
         self.ymin, self.ymax = numpy.nanmin(
@@ -401,13 +404,14 @@ class SignalToNoiseOverCut(Plotter):
         self.plots.append(p)
 
         # Plot best cut point
-        self.axis.plot(best_cut, best_signal2noise, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
-        self.axis.axvline(best_cut, color=p[1].get_color(), linestyle='dashed', linewidth=1)
-        self.axis.axhline(best_signal2noise, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+        if best_idx is not None:
+            self.axis.plot(best_cut, best_signal2noise, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
+            self.axis.axvline(best_cut, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+            self.axis.axhline(best_signal2noise, color=p[1].get_color(), linestyle='dashed', linewidth=1)
 
-        # Add label with best cut info
-        cut_label = f"{label[:10] if label else column[:10]} (Best cut: {best_cut:.3f}, S/N: {best_signal2noise:.2f})"
-        self.labels.append(cut_label)
+            # Add label with best cut info
+            cut_label = f"{label[:10] if label else column[:10]} (Best cut: {best_cut:.3f}, S/N: {best_signal2noise:.2f})"
+            self.labels.append(cut_label)
         return self
 
     def finish(self):
@@ -453,10 +457,13 @@ class PurityOverEfficiency(Plotter):
 
         # Determine "best" cut (closest to point (1,1))
         distance = numpy.sqrt(numpy.square(1 - purity) + numpy.square(1 - efficiency))
-        best_idx = numpy.argmin(distance)
-        best_cut = cuts[best_idx]
-        best_efficiency = efficiency[best_idx]
-        best_purity = purity[best_idx]
+        if len(distance) == 0 or numpy.all(numpy.isnan(distance)):
+            best_idx = None
+        else:
+            best_idx = numpy.nanargmin(distance)
+            best_cut = cuts[best_idx]
+            best_efficiency = efficiency[best_idx]
+            best_purity = purity[best_idx]
 
         self.xmin, self.xmax = numpy.nanmin(numpy.append(efficiency, self.xmin)), numpy.nanmax(numpy.append(efficiency, self.xmax))
         self.ymin, self.ymax = numpy.nanmin(numpy.append(purity, self.ymin)), numpy.nanmax(numpy.append(purity, self.ymax))
@@ -465,14 +472,15 @@ class PurityOverEfficiency(Plotter):
         p = self._plot_datapoints(self.axis, efficiency, purity, xerr=efficiency_error, yerr=purity_error)
         self.plots.append(p)
 
-        # Plot best cut point
-        self.axis.plot(best_efficiency, best_purity, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
-        self.axis.axhline(best_purity, color=p[1].get_color(), linestyle='dashed', linewidth=1)
-        self.axis.axvline(best_efficiency, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+        if best_idx is not None:
+            # Plot best cut point
+            self.axis.plot(best_efficiency, best_purity, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
+            self.axis.axhline(best_purity, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+            self.axis.axvline(best_efficiency, color=p[1].get_color(), linestyle='dashed', linewidth=1)
 
-        # Add label with best cut info
-        cut_label = f"{label[:10] if label else column[:10]} (Best cut: {best_cut:.3f})"
-        self.labels.append(cut_label)
+            # Add label with best cut info
+            cut_label = f"{label[:10] if label else column[:10]} (Best cut: {best_cut:.3f})"
+            self.labels.append(cut_label)
         return self
 
     def finish(self):
@@ -520,10 +528,13 @@ class RejectionOverEfficiency(Plotter):
 
         # Determine "best" cut by maximizing Rejection / Efficiency
         distance = numpy.sqrt(numpy.square(1 - rejection) + numpy.square(1 - efficiency))
-        best_idx = numpy.argmin(distance)
-        best_cut = cuts[best_idx]
-        best_rejection = rejection[best_idx]
-        best_efficiency = efficiency[best_idx]
+        if len(distance) == 0 or numpy.all(numpy.isnan(distance)):
+            best_idx = None
+        else:
+            best_idx = numpy.nanargmin(distance)
+            best_cut = cuts[best_idx]
+            best_rejection = rejection[best_idx]
+            best_efficiency = efficiency[best_idx]
 
         self.xmin, self.xmax = numpy.nanmin(numpy.append(efficiency, self.xmin)), numpy.nanmax(numpy.append(efficiency, self.xmax))
         self.ymin, self.ymax = numpy.nanmin(numpy.append(rejection, self.ymin)), numpy.nanmax(numpy.append(rejection, self.ymax))
@@ -534,14 +545,15 @@ class RejectionOverEfficiency(Plotter):
         p = self._plot_datapoints(self.axis, efficiency, rejection, xerr=efficiency_error, yerr=rejection_error)
         self.plots.append(p)
 
-        # Plot best cut point
-        self.axis.plot(best_efficiency, best_rejection, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
-        self.axis.axhline(best_rejection, color=p[1].get_color(), linestyle='dashed', linewidth=1)
-        self.axis.axvline(best_efficiency, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+        if best_idx is not None:
+            # Plot best cut point
+            self.axis.plot(best_efficiency, best_rejection, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
+            self.axis.axhline(best_rejection, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+            self.axis.axvline(best_efficiency, color=p[1].get_color(), linestyle='dashed', linewidth=1)
 
-        # Add label with best cut info
-        cut_label = f"{label[:10] if label else column[:10]} (AUC: {auc:.2f}, Best cut: {best_cut:.3f})"
-        self.labels.append(cut_label)
+            # Add label with best cut info
+            cut_label = f"{label[:10] if label else column[:10]} (AUC: {auc:.2f}, Best cut: {best_cut:.3f})"
+            self.labels.append(cut_label)
         return self
 
     def finish(self):
@@ -584,10 +596,13 @@ class TrueVsFalsePositiveRate(Plotter):
 
         # Determine "best" cut (closest to top-left corner (0,1))
         distance = numpy.sqrt(numpy.square(fpr) + numpy.square(1 - tpr))
-        best_idx = numpy.argmin(distance)
-        best_cut = cuts[best_idx]
-        best_tpr = tpr[best_idx]
-        best_fpr = fpr[best_idx]
+        if len(distance) == 0 or numpy.all(numpy.isnan(distance)):
+            best_idx = None
+        else:
+            best_idx = numpy.nanargmin(distance)
+            best_cut = cuts[best_idx]
+            best_tpr = tpr[best_idx]
+            best_fpr = fpr[best_idx]
 
         # Update plot range
         self.xmin, self.xmax = numpy.nanmin(numpy.append(fpr, self.xmin)), numpy.nanmax(numpy.append(fpr, self.xmax))
@@ -599,15 +614,15 @@ class TrueVsFalsePositiveRate(Plotter):
         p = self._plot_datapoints(self.axis, fpr, tpr, xerr=fpr_error, yerr=tpr_error)
         self.plots.append(p)
 
-        # Plot best cut point
-        self.axis.plot(best_fpr, best_tpr, 'x', color=p[1].get_color(), markersize=8)
-        self.axis.axhline(best_tpr, color=p[1].get_color(), linestyle='dashed', linewidth=1)
-        self.axis.axvline(best_fpr, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+        if best_idx is not None:
+            # Plot best cut point
+            self.axis.plot(best_fpr, best_tpr, 'x', color=p[1].get_color(), markersize=8)
+            self.axis.axhline(best_tpr, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+            self.axis.axvline(best_fpr, color=p[1].get_color(), linestyle='dashed', linewidth=1)
 
-        # Add label with best cut info
-        cut_label = f"{label[:10] if label else column[:10]} (AUC: {auc:.2f}, Cut: {best_cut:.3f})"
-        self.labels.append(cut_label)
-
+            # Add label with best cut info
+            cut_label = f"{label[:10] if label else column[:10]} (AUC: {auc:.2f}, Cut: {best_cut:.3f})"
+            self.labels.append(cut_label)
         return self
 
     def finish(self):
@@ -645,10 +660,13 @@ class PrecisionRecallCurve(Plotter):
 
         # Determine "best" cut (closest to point (1,1))
         distance = numpy.sqrt(numpy.square(1 - precision) + numpy.square(1 - recall))
-        best_idx = numpy.argmin(distance)
-        best_cut = cuts[best_idx]
-        best_recall = recall[best_idx]
-        best_precision = precision[best_idx]
+        if len(distance) == 0 or numpy.all(numpy.isnan(distance)):
+            best_idx = None
+        else:
+            best_idx = numpy.nanargmin(distance)
+            best_cut = cuts[best_idx]
+            best_recall = recall[best_idx]
+            best_precision = precision[best_idx]
 
         # Update plot range
         self.xmin, self.xmax = numpy.nanmin(numpy.append(recall, self.xmin)), numpy.nanmax(numpy.append(recall, self.xmax))
@@ -660,15 +678,15 @@ class PrecisionRecallCurve(Plotter):
         p = self._plot_datapoints(self.axis, recall, precision, xerr=recall_error, yerr=precision_error)
         self.plots.append(p)
 
-        # Plot best cut point
-        self.axis.plot(best_recall, best_precision, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
-        self.axis.axhline(best_precision, color=p[1].get_color(), linestyle='dashed', linewidth=1)
-        self.axis.axvline(best_recall, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+        if best_idx is not None:
+            # Plot best cut point
+            self.axis.plot(best_recall, best_precision, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
+            self.axis.axhline(best_precision, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+            self.axis.axvline(best_recall, color=p[1].get_color(), linestyle='dashed', linewidth=1)
 
-        # Add label with best cut info
-        cut_label = f"{label[:10] if label else column[:10]} (AUC: {auc:.2f}, Cut: {best_cut:.3f})"
-        self.labels.append(cut_label)
-
+            # Add label with best cut info
+            cut_label = f"{label[:10] if label else column[:10]} (AUC: {auc:.2f}, Cut: {best_cut:.3f})"
+            self.labels.append(cut_label)
         return self
 
     def finish(self):

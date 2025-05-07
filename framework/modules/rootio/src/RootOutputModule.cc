@@ -133,7 +133,6 @@ RootOutputModule::~RootOutputModule()
   delete m_outputFileMetaData;
 }
 
-
 void RootOutputModule::initialize()
 {
   //ROOT has a default maximum size of 100GB for trees??? For larger trees it creates a new file and does other things that finally produce crashes.
@@ -165,7 +164,6 @@ void RootOutputModule::initialize()
       m_regularFile = false;
     }
   }
-
   openFile();
 }
 

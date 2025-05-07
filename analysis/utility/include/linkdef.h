@@ -20,4 +20,7 @@
 #pragma link C++ class Belle2::DetectorSurface-;
 #pragma link C++ class Belle2::PostProcessingParticleWeighting-;
 
+#pragma link C++ namespace Belle2::EvtPDLUtil;
+#pragma link C++ function Belle2::EvtPDLUtil::addAntiParticleLists;
+
 #endif

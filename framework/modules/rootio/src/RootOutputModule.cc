@@ -23,8 +23,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include <TClonesArray.h>
-#include <TParticlePDG.h>
-#include <TDatabasePDG.h>
 
 #include <regex>
 #include <filesystem>
@@ -125,7 +123,6 @@ Warning:
 
 .. versionadded:: release-03-00-00
 )DOC", m_outputSplitSize);
-  addParam("includeAntiPlists", m_includeAntiPlists, "Include anti particle lists in the output", false);
 
   m_outputFileMetaData = new FileMetaData;
 }
@@ -136,21 +133,6 @@ RootOutputModule::~RootOutputModule()
   delete m_outputFileMetaData;
 }
 
-std::string RootOutputModule::getAntiParticleBranchName(const std::string& branchName)
-{
-  // Determine PDG code using the particle names defined in evt.pdl
-  std::size_t pos = branchName.find(":");
-  std::string particleName = branchName.substr(0, pos);
-  std::string label = branchName.substr(pos + 1);
-  TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(particleName.c_str());
-  TParticlePDG* antiParticle = particle->AntiParticle();
-  bool isSelfConjugatedParticle = !(antiParticle and (particle != antiParticle));
-  if (isSelfConjugatedParticle) {
-    return nullptr;
-  } else {
-    return std::string(antiParticle->GetName()) + ":" + label;
-  }
-}
 
 void RootOutputModule::initialize()
 {
@@ -182,29 +164,6 @@ void RootOutputModule::initialize()
       // any other protocol: not local, don't create directories
       m_regularFile = false;
     }
-  }
-
-  // add anti particle lists to the list of branches to be saved
-  if (m_includeAntiPlists) {
-    std::vector<std::string> antiParticleLists;
-    for (auto branchName : m_branchNames[0]) {
-      if (branchName.find(":") == std::string::npos) continue;
-      std::string antiListName = getAntiParticleBranchName(branchName);
-      if (!antiListName.empty()) {
-        antiParticleLists.push_back(antiListName);
-      }
-    }
-    m_branchNames[0].insert(m_branchNames[0].end(), antiParticleLists.begin(), antiParticleLists.end());
-    
-    std::vector<std::string> exAntiParticleLists;
-    for (auto exBranchName : m_excludeBranchNames[0]) {
-      if (exBranchName.find(":") == std::string::npos) continue;
-      std::string exAntiListName = getAntiParticleBranchName(exBranchName);
-      if (!exAntiListName.empty()) {
-        exAntiParticleLists.push_back(exAntiListName);  
-      }
-    }
-    m_excludeBranchNames[0].insert(m_excludeBranchNames[0].end(), exAntiParticleLists.begin(), exAntiParticleLists.end());
   }
 
   openFile();

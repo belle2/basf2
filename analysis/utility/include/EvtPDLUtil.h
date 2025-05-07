@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace Belle2 {
   /** Utilities for converting PDG codes into particle names.
@@ -44,6 +45,12 @@ namespace Belle2 {
      * Returns the name of the particle ParticleList for particles with given pdg code and with given label.
      */
     std::string particleListName(int pdgCode, const std::string& label);
+
+    /**
+     * Returns the input list with appended anti-particle list names of the particle list names in the input list.
+     * This appending is done only for list names which correspond to a particle list that has an anti-particle.
+     */
+    std::vector<std::string> addAntiParticleLists(const std::vector<std::string>& inputList);
 
     /**
      * Returns electric charge of a particle with given pdg code.

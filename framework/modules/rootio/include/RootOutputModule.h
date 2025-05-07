@@ -43,13 +43,6 @@ namespace Belle2 {
      */
     virtual ~RootOutputModule();
 
-    /** Get the name of the branch for anti-particles.
-     *
-     *  @param branchName Name of the branch to be used for the anti-particle.
-     *  @return          Name of the branch for the anti-particle.
-     */
-    static std::string getAntiParticleBranchName(const std::string& branchName);
-
     /** Setting up of various stuff.
      *
      *  Opens a file and creates TTree(s)
@@ -117,12 +110,6 @@ namespace Belle2 {
      *  These vectors can be configured in the steering file.
      */
     std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
-
-    /** Flag to include anti-particles in the output.
-     *
-     *  This flag is steerable.
-     */
-    bool m_includeAntiPlists;
 
     /** Array of names of branches that should be written out although they are not flagged for writeout.
      *  And usually ignored, use to writeout RestOfEvent.

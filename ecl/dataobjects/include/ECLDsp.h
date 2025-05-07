@@ -41,7 +41,7 @@ namespace Belle2 {
 
     /** Constructor for data*/
     ECLDsp(int CellId, const std::vector<int>& ADCData) :
-      m_CellId(CellId), m_DspAVector(ADCData) {}
+      m_DspAVector(ADCData), m_CellId(CellId) {}
 
     /*! Set Cell ID
      */
@@ -209,7 +209,7 @@ namespace Belle2 {
 
   private:
 
-    int m_CellId{0};                      /**< Cell ID */
+    std::vector <int> m_DspAVector;       /**< Dsp array vith variable length for calibration, tests, etc.  */
     double m_TwoComponentTotalAmp{ -1};   /**< Two comp total amp */
     double m_TwoComponentHadronAmp{ -1};  /**< Two comp hadron amp */
     double m_TwoComponentDiodeAmp{ -1};   /**< Two comp diode amp */
@@ -219,15 +219,16 @@ namespace Belle2 {
     double m_TwoComponentBaseline{1};     /**< Two comp baseline*/
     double m_backgroundPhotonEnergy{ -1}; /**< Pile-up photon energy*/
     double m_backgroundPhotonTime{ -1};   /**< Pile-up photon time*/
+    int m_CellId{0};                      /**< Cell ID */
     TwoComponentFitType m_TwoComponentFitType{poorChi2};  /**< offline fit hypothesis.*/
-    std::vector <int> m_DspAVector;       /**< Dsp array vith variable length for calibration, tests, etc.  */
 
     /** 2 dspa array with variable length*/
     /** 3 Add two component variables*/
     /** 4 Add diode and pile-up photon offline fit hypothesis*/
     /** 5 Added m_TwoComponentSavedChi2[3] to save chi2 for each fit tried */
     /** 6 removed IsData member */
-    ClassDef(ECLDsp, 6);
+    /** 7 Slightly reorder data members to improve memory layout (CW) */
+    ClassDef(ECLDsp, 7);
 
   };
 

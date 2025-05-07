@@ -6,7 +6,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 """
-Log Filter class to replace string occurences in log messages to simplify testing
+Log Filter class to replace string occurrences in log messages to simplify testing
 """
 import re
 

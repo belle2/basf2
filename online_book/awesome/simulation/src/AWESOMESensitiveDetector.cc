@@ -11,7 +11,6 @@
 
 /* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
-#include <framework/geometry/B2Vector3.h>
 
 /* Geant4 headers. */
 #include <G4StepPoint.hh>
@@ -62,7 +61,7 @@ bool AWESOMESensitiveDetector::step(G4Step* step, G4TouchableHistory*)
   /* Store the simulated hit. */
   AWESOMESimHit* simHit = m_SimHits.appendNew();
   simHit->setEnergyDep(energyDep);
-  simHit->setPosition(B2Vector3{position.x(), position.y(), position.z()});
+  simHit->setPosition(ROOT::Math::XYZVector(position));
   simHit->setTime(time);
   /*
    * Add a relation between the current MCParticle and the simulated hit.

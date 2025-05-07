@@ -15,7 +15,7 @@ Gbasf2
     * See `Computing getting started <https://xwiki.desy.de/xwiki/rest/p/c804c>`_.
     * Access to KEKCC or NAF (recommended), or to a system with CentOS 7 or EL9 and CVMFS mounted.
     * A valid `grid certificate <https://xwiki.desy.de/xwiki/rest/p/d9328>`_ installed in ``~/.globus`` and in a web browser.
-    * A working basf2 steering script (see the :ref:`onlinebook_first_steering_file` lesson)
+    * A working `basf2` steering script (see the :ref:`onlinebook_first_steering_file` lesson)
 
     **Questions**:
 
@@ -33,16 +33,16 @@ Gbasf2
     * Check the documentation and ask for help if necessary.
     * Download the output for offline analysis.
 
-Gbasf2 is the command-line client for submitting grid-based basf2 jobs.
+Gbasf2 is the command-line client for submitting grid-based `basf2` jobs.
 Belle II data and MC samples are distributed in many storage sites around the world. Gbasf2 and a set of grid-based user tools (gb2 tools) allow you to access and
 analyze them.
 
-The same basf2 steering files are used when running on the grid. The usual workflow is:
+The same `basf2` steering files are used when running on the grid. The usual workflow is:
 
-* Develop a basf2 steering file.
+* Develop a `basf2` steering file.
 * Test it locally (don't skip this step!).
 * Locate your input files on the grid.
-* Submit jobs to the grid with the same basf2 steering file.
+* Submit jobs to the grid with the same `basf2` steering file.
 * Download the output to perform offline analysis (plots, fits, etc.).
 
 .. warning::
@@ -68,7 +68,7 @@ and verify that you have the prerequisites. You need:
 
     It is required that you join the `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_,
     where you can ask for help and receive announcements on releases and system issues. You can also find more
-    details on the official `gbasf2 documentation page <https://gbasf2.belle2.org/>`_
+    details in the official :doc:`gbasf2 documentation <gbasf2:index>`
 
 
 Setting up gbasf2 via cvmfs
@@ -77,7 +77,7 @@ Setting up gbasf2 via cvmfs
 Since the DIRAC user interface relies on some middleware components, this limits the operating environments in which
 gbasf2 can function. At this moment, only CentOS 7 is supported (it works on other EL9-based operating systems like AlmaLinux 9 but please be aware it is not fully validated).
 
-Also, unfortunately at this moment the basf2 and gbasf2 environments are not compatible. This means gbasf2 requires
+Also, unfortunately at this moment the `basf2` and gbasf2 environments are not compatible. This means gbasf2 requires
 a fresh ssh session (without sourcing ``b2setup``).
 
 .. note::
@@ -128,7 +128,7 @@ A proxy is a short-term credential that verifies your identity, allowing you to 
 Installing gbasf2
 -----------------
 
-The pre-installed gbasf2 on CVMFS is the recommended version (see Setup Gbasf2). However, gbasf2 local installation is available. Please be aware this is not fully tested and not fully supported. If you wish to install gbasf2 locally, follow the instructions on the `gbasf2 documentation <https://gbasf2.belle2.org/gbasf2install.html>`_.
+The pre-installed gbasf2 on CVMFS is the recommended version (see Setup Gbasf2). However, gbasf2 local installation is available. Please be aware this is not fully tested and not fully supported. If you wish to install gbasf2 locally, follow the instructions on the :doc:`gbasf2 documentation <gbasf2:gbasf2install>`.
 
 .. seealso:: https://gbasf2.belle2.org/
 
@@ -185,7 +185,7 @@ is introduced. Each dataset is subdivided by directories with name ``subXX``, wh
     * By design, each datablock contains a maximum of 1000 files.
     * If a dataset contains more than 1000 files, it will be subdivided into at least two datablocks.
 
-The command-line tool for listing the content of a directory on the grid is ``gb2_ds_list``
+The command-line tool for listing the content of a directory on the grid is `gb2_ds_list <BelleDIRAC.Client.gb2_scripts.gb2_ds_list>`
 (it is equivalent to ``ls`` on your local system). You can use it to see how many datablock(s) is/are contained
 in each dataset.
 
@@ -197,7 +197,7 @@ in each dataset.
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Use ``gb2_ds_list`` to see how many datablock(s) is/are contained in the skimmed dataset
+     Use `gb2_ds_list <BelleDIRAC.Client.gb2_scripts.gb2_ds_list>` to see how many datablock(s) is/are contained in the skimmed dataset
 
      ``/belle/Data/release-06-01-11/DB00002058/proc13/prod00029825/e0018/4S_offres/r02559/hadron/14120601/udst``
 
@@ -245,7 +245,7 @@ The ``MC Event types`` box show, by default, the generic samples available (char
 If you want to search
 signal samples, you need to specify the `signal event type <https://xwiki.desy.de/xwiki/rest/p/3a506>`_.
 Also, if you want to search uDST skim samples - which are what we will be using in the examples - you can find them at
-:ref:`skim/doc/04-experts:Skim Registry` section in the basf2 software documentation.
+:ref:`skim/doc/04-experts:Skim Registry` section in the `basf2` software documentation.
 
 .. note::
 
@@ -258,7 +258,7 @@ Also, if you want to search uDST skim samples - which are what we will be using 
 .. note::
 
     For further information about uDST skims, including the skim code and the decay name associated with that code,
-    see the basf2
+    see the `basf2`
     `skim registry <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/skim/scripts/skim/registry.py>`_.
 
 .. admonition:: Exercise
@@ -270,7 +270,7 @@ Also, if you want to search uDST skim samples - which are what we will be using 
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Search the basf2
+     Search the `basf2`
      `skim registry <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/skim/scripts/skim/registry.py>`_ and look
      at the skim codes and names.
 
@@ -291,14 +291,14 @@ Also, if you want to search uDST skim samples - which are what we will be using 
     You can download a list of LFNs from the Dataset Searcher using the button "Download txt file" at the bottom.
 
 
-Another way to interact with the dataset searcher is using the command line tool ``gb2_ds_search``.
+Another way to interact with the dataset searcher is using the command line tool `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>`.
 
 .. admonition:: Exercise
      :class: exercise stacked
 
      Set your gbasf2 environment and try to get the LFNs of MC uubar samples using the same skim code from the
      decay mode above (``14120601``), and using campaign ``MC15rd_b`` along with beam energy of 4S and background
-     level BGx1 using ``gb2_ds_search``.
+     level BGx1 using `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>`.
 
 .. admonition:: Hint
      :class: toggle xhint stacked
@@ -343,12 +343,12 @@ To discover the collection you need, you should first check `Data main page <htt
 and `MC main page <https://xwiki.desy.de/xwiki/rest/p/70b0a>`_, which provide details for the official collections.
 
 If you want to explore the available collections, you can also use the dataset searcher tool. You've already 
-used the ``gb2_ds_search`` tool to search for datasets. Now use the ``collection`` key word to list the available data collections.
+used the `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>` tool to search for datasets. Now use the ``collection`` key word to list the available data collections.
 
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Set your gbasf2 environment and find the available data collections for Moriond2023 using ``gb2_ds_search``.
+     Set your gbasf2 environment and find the available data collections for Moriond2023 using `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>`.
 
 .. admonition:: Hint
      :class: toggle xhint stacked
@@ -379,13 +379,13 @@ and get the metadata for the collection with ``gb2_ds_search collection --get_me
 Submit your first jobs to the Grid
 ----------------------------------
 
-As mentioned before, gbasf2 uses exactly the same steering files of basf2 to submit jobs to the grid. The basic usage is
+As mentioned before, gbasf2 uses exactly the same steering files of `basf2` to submit jobs to the grid. The basic usage is
 
 .. code-block:: bash
 
         gbasf2 <your_steering_file.py> -p <project_name> -s <available_basf2_release>
 
-where ``project_name`` is a name assigned by you, and ``available_basf2_release`` is the available basf2 software
+where ``project_name`` is a name assigned by you, and ``available_basf2_release`` is the available `basf2` software
 version to use.
 
 .. note::
@@ -463,17 +463,17 @@ After verifying that everything is correct, you can confirm the submission.
 .. admonition:: Question
      :class: exercise stacked
 
-     What is the the basf2 release in the example above?
+     What is the the `basf2` release in the example above?
 
 .. admonition:: Solution
      :class: toggle solution
 
-     The basf2 light release is ``light-2311-nebelung``.
+     The `basf2` light release is ``light-2311-nebelung``.
 
 
 .. tip::
 
-    You can check which basf2 releases are available for running jobs on the grid using ``gb2_check_release``.
+    You can check which `basf2` releases are available for running jobs on the grid using ``gb2_check_release``.
 
 .. admonition:: Key points
     :class: key-points
@@ -494,7 +494,7 @@ After verifying that everything is correct, you can confirm the submission.
 
      Submit a gbasf2 job with an steering file built by you in previous chapters of the book, for analyzing
      a datablock of MC15rd_b, MC Event Types ``charged`` at center-of-mass energy ``4S``.
-     Use ``light-2311-nebelung`` of basf2.
+     Use ``light-2311-nebelung`` of `basf2`.
 
      Remember:
 
@@ -545,7 +545,7 @@ There are two ways to monitor your jobs on the grid: command-line tools and the 
 Monitoring in the terminal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For the command-line tools, you can use ``gb2_project_summary``
+For the command-line tools, you can use `gb2_project_summary <BelleDIRAC.Client.gb2_scripts.gb2_project_summary>`
 to have an overview of your project (The flag ``-p`` will specify the project name):
 
 .. code-block:: bash
@@ -562,7 +562,7 @@ to have an overview of your project (The flag ``-p`` will specify the project na
     If no project name is specified, the tool will display information of your projects in the last month.
 
 
-The gb2 tool ``gb2_job_status`` lists all the jobs running in a project, including the status and minor status:
+The gb2 tool `gb2_job_status <BelleDIRAC.Client.gb2_scripts.gb2_job_status>` lists all the jobs running in a project, including the status and minor status:
 
 .. code-block:: bash
 
@@ -635,7 +635,7 @@ You can check the output using ``gb2_ds_list <project_name>``:
 
     To see the size of your output and its location, you can use the flags ``-l`` and ``-lg``.
 
-To actually download the files, use ``gb2_ds_get``:
+To actually download the files, use `gb2_ds_get <BelleDIRAC.Client.gb2_scripts.gb2_ds_get>`:
 
 .. code-block:: bash
 
@@ -652,7 +652,7 @@ To actually download the files, use ``gb2_ds_get``:
 
 .. tip::
 
-    You can enable download in multiple streams using the ``--new`` option of ``gb2_ds_get``, which will speed up the transfer. At some point it will become the default behavior of ``gb2_ds_get``. 
+    You can enable download in multiple streams using the ``--new`` option of `gb2_ds_get <BelleDIRAC.Client.gb2_scripts.gb2_ds_get>`, which will speed up the transfer. At some point it will become the default behavior of `gb2_ds_get <BelleDIRAC.Client.gb2_scripts.gb2_ds_get>`.
 
 .. tip::
 
@@ -729,7 +729,7 @@ related to your job.
     How to download the output sandbox from the Job Monitor.
 
 
-It is also possible to retrieve the log files directly from the command line using ``gb2_job_output``:
+It is also possible to retrieve the log files directly from the command line using `gb2_job_output <BelleDIRAC.Client.gb2_scripts.gb2_job_output>`:
 
 .. code-block:: bash
 
@@ -755,7 +755,7 @@ It is also possible to retrieve the log files directly from the command line usi
 .. admonition:: Solution
      :class: toggle solution
 
-     The file ``basf2helper.py.log`` contains the actual output of your basf2 steering file executed on the grid site.
+     The file ``basf2helper.py.log`` contains the actual output of your `basf2` steering file executed on the grid site.
 
 
 Where to go for help?
@@ -764,7 +764,7 @@ Where to go for help?
 The `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_ is the main channel of communication
 related to issues with the grid. Feel free to ask every time that you need help.
 
-The most useful place to find additional instructions and information about using gbasf2 is `gbasf2.belle2.org <https://gbasf2.belle2.org>`_.
+The most useful place to find additional instructions and information about using gbasf2 is `gbasf2.belle2.org <gbasf2:index>`.
 
 Additionally, some pages at XWiki are prepared with additional information:
 

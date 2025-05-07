@@ -142,7 +142,7 @@ namespace Belle2 {
     /** Level of parent files to be read. */
     int m_parentLevel;
 
-    /** Collect statistics on amount of data read and print statistics (seperate for input & parent files) after processing. */
+    /** Collect statistics on amount of data read and print statistics (separate for input & parent files) after processing. */
     bool m_collectStatistics;
 
     /** experiment, run, event number of first event to load */

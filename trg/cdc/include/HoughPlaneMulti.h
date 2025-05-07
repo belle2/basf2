@@ -29,7 +29,7 @@ namespace Belle2 {
   class TRGCDCHoughPlaneMulti : public TRGCDCHoughPlane {
 
   public:
-    /// Contructor.
+    /// Constructor.
     TRGCDCHoughPlaneMulti(const std::string& name,
                           const TRGCDCHoughTransformation& transformation,
                           unsigned nX,

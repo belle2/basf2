@@ -15,7 +15,7 @@ b2luigi
 
     **Questions**:
 
-    * How do I implement my analysis in a b2luigi workflow?
+    * How do I implement my analysis in a :doc:`b2luigi:index` workflow?
     * How do I automate job submission and job steering on remote computing resources?
 
     **Objectives**:
@@ -25,9 +25,9 @@ b2luigi
 
 `Luigi <https://luigi.readthedocs.io/en/stable/>`_ is a workflow management framework named after a well-known plumber and widely used in industry. It was originally developed by the Spotify group and open-sourced in 2012. In luigi, the workflow logic is decentralized and integrated with the analysis code for every processing step.
 
-For Belle II workflows, the helper package `b2luigi <https://b2luigi.readthedocs.io/en/stable/>`_ adds additional support for remote execution and ROOT file handling. In the following, we will provide a full example of a minimal Belle II analysis, employing gbasf2, basf2 and the LSF batch system. A full guide to b2luigi and luigi can be found elsewhere.
+For Belle II workflows, the helper package :doc:`b2luigi:index` adds additional support for remote execution and ROOT file handling. In the following, we will provide a full example of a minimal Belle II analysis, employing gbasf2, `basf2` and the LSF batch system. A full guide to :doc:`b2luigi:index` and luigi can be found elsewhere.
 
-Let us outline the general processing steps (called tasks in b2luigi) for a generic Belle II workflow:
+Let us outline the general processing steps (called tasks in :doc:`b2luigi:index`) for a generic Belle II workflow:
 
 #. Run and download skims from the grid.
 
@@ -46,7 +46,7 @@ Now let us look at the directed acyclic graph for this workflow:
     :align: center
 
 
-We read it from bottom to top: At the bottom, we see the task *Plot*, which is our final goal and fills some histograms for our reconstructed particles. Above it we see all of its dependencies, i.e. tasks that are required for *Plot*. First there are the merged reconstructed batches, which themselves require the reconstructed batches. We see that the skim is split into three batches, which are reconstructed simultaneously. The reconstructed batches build upon a batch of the skimmed files. b2luigi will build this dependency tree for your workflow and execute it from top to bottom.
+We read it from bottom to top: At the bottom, we see the task *Plot*, which is our final goal and fills some histograms for our reconstructed particles. Above it we see all of its dependencies, i.e. tasks that are required for *Plot*. First there are the merged reconstructed batches, which themselves require the reconstructed batches. We see that the skim is split into three batches, which are reconstructed simultaneously. The reconstructed batches build upon a batch of the skimmed files. :doc:`b2luigi:index` will build this dependency tree for your workflow and execute it from top to bottom.
 
 Typically in Monte-Carlo simulation, you perform these steps multiple times for different event types (B mesons, quark-antiquark continuum etc.). Therefore the full dependency tree might look like this:
 

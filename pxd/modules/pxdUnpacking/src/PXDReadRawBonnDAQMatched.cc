@@ -154,7 +154,7 @@ int PXDReadRawBonnDAQMatchedModule::readOneEvent(unsigned int& rettriggernr)
           togo--;
           data32++;
           data16 += 2;
-          /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
+          /** For one DHC event, we utilize one header (writing out, beware of endianness!) */
           std::vector <unsigned int> m_onsen_header;
 
           /** For one DHC event, we utilize one payload for all DHE/DHP frames */

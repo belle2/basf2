@@ -36,7 +36,7 @@ class printBGInfo(b2.Module):
             i = 0
             for bgInfo in bgInfos:
                 print("===========================")
-                print("* Backgroud info: entry", str(i))
+                print("* Background info: entry", str(i))
                 print("===========================")
                 bgInfo.print()
                 i += 1

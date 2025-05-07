@@ -33,7 +33,6 @@
 #include <TStyle.h>
 #include <fstream>
 #include <framework/logging/Logger.h>
-#include <boost/algorithm/string.hpp>
 
 #include <iostream>
 

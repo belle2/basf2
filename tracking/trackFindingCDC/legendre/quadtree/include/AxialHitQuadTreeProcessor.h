@@ -100,23 +100,23 @@ namespace Belle2 {
       void drawNode(QuadTree* node) const;
 
     private:
-      /// Pinned lookup table for precomputed cosine and sine values
-      const LookupTable<Vector2D>* m_cosSinLookupTable;
+      /// Lambda which holds resolution function for the quadtree
+      PrecisionUtil::PrecisionFunction m_precisionFunction;
 
       /// Local origin on which the phase space coordinates are centered
       Vector2D m_localOrigin;
+
+      /// Pinned lookup table for precomputed cosine and sine values
+      const LookupTable<Vector2D>* m_cosSinLookupTable;
+
+      /// The curvature above which the trajectory is considered a curler.
+      const double c_curlCurv = 0.02;
 
       /**
        *  Indicator whether the two sided phases space insertion check should be used
        *  This option should automatically split back to back tracks in the low curvature regions
        */
       bool m_twoSidedPhaseSpace;
-
-      /// The curvature above which the trajectory is considered a curler.
-      const double c_curlCurv = 0.02;
-
-      /// Lambda which holds resolution function for the quadtree
-      PrecisionUtil::PrecisionFunction m_precisionFunction;
     };
   }
 }

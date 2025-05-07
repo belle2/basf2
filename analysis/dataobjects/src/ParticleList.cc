@@ -16,7 +16,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/HTML.h>
 
-#include <iostream>
 #include <algorithm>
 
 using namespace std;
@@ -194,6 +193,20 @@ Particle* ParticleList::getParticleWithMdstIdx(unsigned int mdstIdx, bool includ
     auto particle = this->getParticle(i, includingAntiList);
 
     if (particle->getMdstArrayIndex() == mdstIdx) {
+      return particle;
+    }
+  }
+  return nullptr;
+}
+
+Particle* ParticleList::getParticleWithMdstSource(int mdstSource, bool includingAntiList) const
+{
+  const unsigned int n = this->getListSize(includingAntiList);
+  for (unsigned i = 0; i < n; i++) {
+
+    auto particle = this->getParticle(i, includingAntiList);
+
+    if (particle->getMdstSource() == mdstSource) {
       return particle;
     }
   }

@@ -18,6 +18,7 @@
 #include <top/dbobjects/TOPNominalQE.h>
 #include <top/dbobjects/TOPCalChannelRQE.h>
 #include <top/dbobjects/TOPCalChannelThresholdEff.h>
+#include <top/dbobjects/TOPCalChannelPulseHeight.h>
 #include <string>
 #include <map>
 
@@ -116,6 +117,12 @@ namespace Belle2 {
        * @return pixel efficiency relative to nominal photocathode
        */
       double getRelativePixelEfficiency(int moduleID, int pixelID) const;
+
+      /**
+       * Returns relative PDE on MC (including CE, tuning factor and threshold efficiency)
+       * @return pixel efficiency on MC relative to nominal photocathode
+       */
+      double getRelativePDEonMC(int moduleID, int pixelID) const;
 
       /**
        * Returns PMT type at a given position
@@ -242,9 +249,14 @@ namespace Belle2 {
       void mapPmtTypeToPositions() const;
 
       /**
-       * Prepares a map of relative pixel efficiencies
+       * Prepares a map of relative pixel quantum times collection efficiencies (relative to nominal one)
        */
       void prepareRelEfficiencies() const;
+
+      /**
+       * Prepares a map of relative pixel photon detection efficiencies on MC
+       */
+      void prepareRelPDEonMC() const;
 
       /**
        * Returns unique PMT ID within the detector
@@ -308,11 +320,13 @@ namespace Belle2 {
       OptionalDBArray<TOPPmtQE> m_pmtQEData; /**< quantum efficiencies */
       DBObjPtr<TOPCalChannelRQE> m_channelRQE; /**< channel relative quantum effi. */
       DBObjPtr<TOPCalChannelThresholdEff> m_thresholdEff; /**< channel threshold effi. */
+      DBObjPtr<TOPCalChannelPulseHeight> m_pulseHeights; /**< channel pulse height parametrizations */
 
       // cache
       mutable TOPNominalQE m_envelopeQE;  /**< envelope quantum efficiency */
       mutable std::map<int, const TOPPmtQE*> m_pmts; /**< QE data mapped to positions */
       mutable std::map<int, double> m_relEfficiencies; /**< pixel relative QE */
+      mutable std::map<int, double> m_relPDEonMC; /**< pixel relative photon detection efficiencies on MC */
       mutable std::map<int, unsigned> m_pmtTypes; /**< PMT types mapped to positions */
 
       // Other

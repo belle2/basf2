@@ -90,6 +90,8 @@ void DQMHistAnalysisSVDClustersOnTrackModule::beginRun()
   m_legProblem->Clear();
   m_legProblem->AddText("ERROR!");
   m_legProblem->AddText(Form("abs(Mean) > %3.1f ns", m_timeThreshold));
+  m_legProblem->AddText("Mean (#pm 40 ns): 0.0 ns");
+
 
   m_legWarning->Clear();
   m_legWarning->AddText("WARNING!");
@@ -97,6 +99,7 @@ void DQMHistAnalysisSVDClustersOnTrackModule::beginRun()
   m_legNormal->Clear();
   m_legNormal->AddText("TIME SHIFT UNDER LIMIT");
   m_legNormal->AddText(Form("abs(Mean) < %3.1f ns", m_timeThreshold));
+  m_legNormal->AddText("Mean (#pm 40 ns): 0.0 ns");
 
   m_legLowStat->Clear();
   m_legLowStat->AddText("Not enough statistics");
@@ -141,7 +144,8 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
 
     m_hClusterOnTrackTime_L456V.Clear();
     m_h->Copy(m_hClusterOnTrackTime_L456V);
-    m_hClusterOnTrackTime_L456V.SetName("ClusterOnTrackTime_L456V");
+    TString hName = getHistoNameFromCanvas(m_cClusterOnTrackTime_L456V->GetName());
+    m_hClusterOnTrackTime_L456V.SetName(hName.Data());
     m_hClusterOnTrackTime_L456V.SetTitle(Form("ClusterOnTrack Time L456V %s", runID.Data()));
 
     if (nEvents > m_statThreshold)
@@ -170,7 +174,9 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
 
     if (m_h != NULL) {
       m_hClusterOnTrackTimeL456V3Samples.Clear();
+      TString hName = getHistoNameFromCanvas(m_cClusterOnTrackTimeL456V3Samples->GetName());
       m_h->Copy(m_hClusterOnTrackTimeL456V3Samples);
+      m_hClusterOnTrackTimeL456V3Samples.SetName(hName.Data());
       m_hClusterOnTrackTimeL456V3Samples.SetTitle(Form("ClusterOnTrack Time L456V 3 samples %s", runID.Data()));
 
       if (nEvents > m_statThreshold)
@@ -231,10 +237,14 @@ int DQMHistAnalysisSVDClustersOnTrackModule::getCanvasStatus(TH1F& histo)
     difference = fabs(mean_PeakInCenter - m_refMeanC);
   }
 
-  if (difference > m_timeThreshold)
+  if (difference > m_timeThreshold) {
     status = error;
-  else
+    TText* text = m_legProblem->GetLine(m_legProblem->GetSize() - 1);
+    text->SetText(text->GetX(), text->GetY(), Form("Mean (#pm 40 ns): %3.1f ns", mean_PeakInCenter));
+  } else {
     status = good;
-
+    TText* text = m_legNormal->GetLine(m_legNormal->GetSize() - 1);
+    text->SetText(text->GetX(), text->GetY(), Form("Mean (#pm 40 ns): %3.1f ns", mean_PeakInCenter));
+  }
   return status;
 }

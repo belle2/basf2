@@ -35,7 +35,7 @@ namespace Belle2 {
       FTBErrorBits = 8,
       /** Number of bits available to represent a FTB Flags Field */
       FTBFlagsBits = 5,
-      /** Number of bits available to represent an Emulated pipeline adress */
+      /** Number of bits available to represent an Emulated pipeline address */
       EMUPipelineAddressBits = 8,
       /** Number of bits available to represent an APV error OR code */
       APVErrorORBits = 4,

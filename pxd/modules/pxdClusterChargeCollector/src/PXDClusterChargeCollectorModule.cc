@@ -208,7 +208,7 @@ void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
 
         // Compute variables from cluster needed for gain estimation
         m_signal = cluster.getCharge();
-        // Fill variabels into tree
+        // Fill variables into tree
         getObjectPtr<TTree>(treename)->Fill();
         // Increment the counter & store charge (optional)
         getObjectPtr<TH1I>("PXDClusterCounter")->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin);
@@ -261,7 +261,7 @@ void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
 
           // Compute variables from cluster needed for gain estimation
           m_signal = cluster.getCharge();
-          // Fill variabels into tree
+          // Fill variables into tree
           getObjectPtr<TTree>(treename)->Fill();
           // Increment the counter & store charge (optional)
           getObjectPtr<TH1I>("PXDClusterCounter")->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin);

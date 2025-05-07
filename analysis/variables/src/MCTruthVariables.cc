@@ -31,6 +31,9 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/BeamParameters.h>
 
+#include <Math/VectorUtil.h>
+
+#include <cmath>
 #include <queue>
 
 namespace Belle2 {
@@ -81,7 +84,7 @@ namespace Belle2 {
     double isCloneTrack(const Particle* particle)
     {
       // neutrals and composites don't make sense
-      if (!Const::chargedStableSet.contains(Const::ParticleType(abs(particle->getPDGCode()))))
+      if (!Const::chargedStableSet.contains(Const::ParticleType(std::abs(particle->getPDGCode()))))
         return Const::doubleNaN;
       // get mcparticle weight (mcmatch weight)
       const auto mcpww = particle->getRelatedToWithWeight<MCParticle>();
@@ -394,7 +397,7 @@ namespace Belle2 {
     ROOT::Math::PxPyPzEVector MCInvisibleP4(const MCParticle* mcparticle)
     {
       ROOT::Math::PxPyPzEVector ResultP4;
-      int pdg = abs(mcparticle->getPDG());
+      int pdg = std::abs(mcparticle->getPDG());
       bool isNeutrino = (pdg == 12 or pdg == 14 or pdg == 16);
 
       if (mcparticle->getNDaughters() > 0) {
@@ -430,7 +433,7 @@ namespace Belle2 {
       const MCParticle* mcB = part->getMCParticle();
       if (!mcB) return Const::doubleNaN;
 
-      int mcParticlePDG = abs(mcB->getPDG());
+      int mcParticlePDG = std::abs(mcB->getPDG());
       if (mcParticlePDG != 511 and mcParticlePDG != 521)
         return Const::doubleNaN;
 
@@ -588,7 +591,7 @@ namespace Belle2 {
 
       // If charged: make sure it was seen in the SVD.
       // If neutral: make sure it was seen in the ECL.
-      return (abs(mcp->getCharge()) > 0) ? seenInSVD(p) : seenInECL(p);
+      return (std::abs(mcp->getCharge()) > 0) ? seenInSVD(p) : seenInECL(p);
     }
 
     double isTrackFound(const Particle* p)
@@ -596,11 +599,15 @@ namespace Belle2 {
       if (p->getParticleSource() != Particle::EParticleSourceObject::c_MCParticle)
         return Const::doubleNaN;
       const MCParticle* tmp_mcP = p->getMCParticle();
-      if (!Const::chargedStableSet.contains(Const::ParticleType(abs(tmp_mcP->getPDG()))))
+      if (!Const::chargedStableSet.contains(Const::ParticleType(std::abs(tmp_mcP->getPDG()))))
         return Const::doubleNaN;
       Track* tmp_track = tmp_mcP->getRelated<Track>();
       if (tmp_track) {
-        const TrackFitResult* tmp_tfr = tmp_track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(tmp_mcP->getPDG())));
+        const TrackFitResult* tmp_tfr = tmp_track->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(tmp_mcP->getPDG())));
+        if (!tmp_tfr) {
+          // p value of TrackFitResult is NaN so cannot check charge
+          return 0;
+        }
         if (tmp_tfr->getChargeSign()*tmp_mcP->getCharge() > 0)
           return 1;
         else
@@ -737,30 +744,30 @@ namespace Belle2 {
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      B2Vector3D herVec = beamParamsDB->getHER().Vect();
-      B2Vector3D lerVec = beamParamsDB->getLER().Vect();
+      ROOT::Math::PxPyPzEVector herVec = beamParamsDB->getHER();
+      ROOT::Math::PxPyPzEVector lerVec = beamParamsDB->getLER();
 
       // only looking at the horizontal (XZ plane) -> set y-coordinates to zero
-      herVec.SetY(0);
-      lerVec.SetY(0);
+      herVec.SetPy(0);
+      lerVec.SetPy(0);
 
       //calculate the crossing angle
-      return herVec.Angle(-lerVec);
+      return ROOT::Math::VectorUtil::Angle(herVec, -lerVec);
     }
 
     double getCrossingAngleY(const Particle*)
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      B2Vector3D herVec = beamParamsDB->getHER().Vect();
-      B2Vector3D lerVec = beamParamsDB->getLER().Vect();
+      ROOT::Math::PxPyPzEVector herVec = beamParamsDB->getHER();
+      ROOT::Math::PxPyPzEVector lerVec = beamParamsDB->getLER();
 
       // only looking at the vertical (YZ plane) -> set x-coordinates to zero
-      herVec.SetX(0);
-      lerVec.SetX(0);
+      herVec.SetPx(0);
+      lerVec.SetPx(0);
 
       //calculate the crossing angle
-      return herVec.Angle(-lerVec);
+      return ROOT::Math::VectorUtil::Angle(herVec, -lerVec);
     }
 
 
@@ -932,7 +939,7 @@ namespace Belle2 {
         return Const::doubleNaN;
 
       int pdg = particle->getPDGCode();
-      if (abs(pdg) != 511 && abs(pdg) != 521 && abs(pdg) != 531)
+      if (std::abs(pdg) != 511 && std::abs(pdg) != 521 && std::abs(pdg) != 531)
         return Const::doubleNaN;
 
       std::vector<const Particle*> daughters = particle->getFinalStateDaughters();
@@ -945,7 +952,7 @@ namespace Belle2 {
         const MCParticle* curMCParticle = daughters[j]->getMCParticle();
         while (curMCParticle != nullptr) {
           pdg = curMCParticle->getPDG();
-          if (abs(pdg) == 511 || abs(pdg) == 521 || abs(pdg) == 531) {
+          if (std::abs(pdg) == 511 || std::abs(pdg) == 521 || std::abs(pdg) == 531) {
             mother_ids.emplace_back(curMCParticle->getArrayIndex());
             break;
           }

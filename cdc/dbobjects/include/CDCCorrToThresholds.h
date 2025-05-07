@@ -70,7 +70,7 @@ namespace Belle2 {
     void dump() const
     {
       std::cout << " " << std::endl;
-      std::cout << "Correction parametres" << std::endl;
+      std::cout << "Correction parameters" << std::endl;
       std::cout << "#entries= " << m_crs.size() << std::endl;
       std::cout << "in order of id and parameter" << std::endl;
 
@@ -101,7 +101,7 @@ namespace Belle2 {
     std::array<float, c_maxNSenseLayers> m_crs; /**< cr array */
 
     ClassDef(CDCCorrToThresholds, 2); /**< ClassDef */
-    // Version histroy:
+    // Version history:
     // v2: original.
   };
 

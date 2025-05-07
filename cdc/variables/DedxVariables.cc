@@ -1,0 +1,224 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+// needed to build variables here
+#include <cdc/variables/DedxVariables.h>
+#include <analysis/VariableManager/Manager.h>
+
+// framework - DataStore
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/Conversion.h>
+
+// dataobjects
+#include <analysis/dataobjects/Particle.h>
+#include <mdst/dataobjects/Track.h>
+#include <cdc/dataobjects/CDCDedxTrack.h>
+
+#include <TString.h>
+
+#include <cmath>
+
+namespace Belle2 {
+
+  /**
+  * CDC dEdx value from particle
+  */
+  CDCDedxTrack const* getDedxFromParticle(Particle const* particle)
+  {
+    const Track* track = particle->getTrack();
+    if (!track) {
+      return nullptr;
+    }
+
+    const CDCDedxTrack* dedxTrack = track->getRelatedTo<CDCDedxTrack>();
+    if (!dedxTrack) {
+      return nullptr;
+    }
+
+    return dedxTrack;
+  }
+
+  namespace Variable {
+
+    double CDCdedx(const Particle* part)
+    {
+      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getDedx();
+      }
+    }
+
+    double CDCdedxnosat(const Particle* part)
+    {
+      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getDedxNoSat();
+      }
+    }
+
+    double pCDC(const Particle* part)
+    {
+      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getMomentum();
+      }
+    }
+
+    double costhCDC(const Particle* part)
+    {
+      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getCosTheta();
+      }
+    }
+
+
+    double CDCdEdx_nhits(const Particle* part)
+    {
+      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->size();
+      }
+    }
+
+    double CDCdEdx_lnhits(const Particle* part)
+    {
+      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getNLayerHits();
+      }
+    }
+
+    double CDCdEdx_lnhitsused(const Particle* part)
+    {
+      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+      if (!dedxTrack) {
+        return -999.0;
+      } else {
+        return dedxTrack->getNLayerHitsUsed();
+      }
+    }
+
+    Manager::FunctionPtr CDCdEdx_PIDvars(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() < 2) {
+        B2ERROR("Min two arguments required to get variables related chi, predicted mean and reso");
+        return nullptr;
+      }
+
+      TString var = "";
+      try {
+        var = arguments[0];
+      } catch (std::invalid_argument& e) {
+        B2ERROR("First argument of variable must be a variable name (chi or pmean or preso)");
+        return nullptr;
+      }
+
+      int pdgCode;
+      try {
+        pdgCode = Belle2::convertString<int>(arguments[1]);
+      } catch (std::invalid_argument& e) {
+        B2ERROR("Second argument of variable must be a PDG code");
+        return nullptr;
+      }
+
+      int index  = -999;
+      if (abs(pdgCode) == Const::electron.getPDGCode())index = 0;
+      else if (abs(pdgCode) == Const::muon.getPDGCode())index = 1;
+      else if (abs(pdgCode) == Const::pion.getPDGCode())index = 2;
+      else if (abs(pdgCode) == Const::kaon.getPDGCode())index = 3;
+      else if (abs(pdgCode) == Const::proton.getPDGCode())index = 4;
+      else if (abs(pdgCode) == Const::deuteron.getPDGCode())index = 5;
+
+      auto func = [index, var](const Particle * part) -> double {
+        const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
+        if (!dedxTrack)
+        {
+          return std::numeric_limits<float>::quiet_NaN();
+        } else
+        {
+          if (var == "chi") return dedxTrack->getChi(index);
+          else if (var == "pmean") return dedxTrack->getPmean(index);
+          else if (var == "preso") return dedxTrack->getPreso(index);
+          else return std::numeric_limits<float>::quiet_NaN();
+        }
+      };
+      return func;
+    }
+
+    double CDCdEdx_chiE(const Particle* part)
+    {
+      static Manager::FunctionPtr pidFunction = CDCdEdx_PIDvars({"chi", "11"});
+      return std::get<double>(pidFunction(part));
+    }
+
+    double CDCdEdx_chiMu(const Particle* part)
+    {
+      static Manager::FunctionPtr pidFunction = CDCdEdx_PIDvars({"chi", "13"});
+      return std::get<double>(pidFunction(part));
+    }
+
+    double CDCdEdx_chiPi(const Particle* part)
+    {
+      static Manager::FunctionPtr pidFunction = CDCdEdx_PIDvars({"chi", "211"});
+      return std::get<double>(pidFunction(part));
+    }
+
+    double CDCdEdx_chiK(const Particle* part)
+    {
+      static Manager::FunctionPtr pidFunction = CDCdEdx_PIDvars({"chi", "321"});
+      return std::get<double>(pidFunction(part));
+    }
+
+    double CDCdEdx_chiP(const Particle* part)
+    {
+      static Manager::FunctionPtr pidFunction = CDCdEdx_PIDvars({"chi", "2212"});
+      return std::get<double>(pidFunction(part));
+    }
+
+    double CDCdEdx_chiD(const Particle* part)
+    {
+      static Manager::FunctionPtr pidFunction = CDCdEdx_PIDvars({"chi", "1000010020"});
+      return std::get<double>(pidFunction(part));
+    }
+
+    VARIABLE_GROUP("CDC dEdx");
+
+    REGISTER_VARIABLE("CDCdEdx", CDCdedx, "CDC dE/dx truncated mean");
+    REGISTER_VARIABLE("CDCdEdxnosat", CDCdedxnosat,
+                      "CDC dE/dx truncated mean without saturation correction (NA for current track level MC)");
+    REGISTER_VARIABLE("pCDC", pCDC, "Momentum valid in the CDC");
+    REGISTER_VARIABLE("costhCDC", costhCDC, "costheta valid in the CDC");
+    REGISTER_VARIABLE("CDCdEdx_nhits", CDCdEdx_nhits, "total hits of dedx track");
+    REGISTER_VARIABLE("CDCdEdx_lnhits", CDCdEdx_lnhits, "layer hits for dedx track");
+    REGISTER_VARIABLE("CDCdEdx_lnhitsused", CDCdEdx_lnhitsused, "truncated hits of dedx track");
+
+    REGISTER_METAVARIABLE("CDCdEdx_PIDvars(var,PDG) var (= chi or pmean or preso) and PDG is of charged particles", CDCdEdx_PIDvars,
+                          "advance CDC dEdx PID related variables for charged particle", Manager::VariableDataType::c_double);
+
+    REGISTER_VARIABLE("CDCdEdx_chiE", CDCdEdx_chiE, "Chi value of electrons from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_chiMu", CDCdEdx_chiMu, "Chi value of muons from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_chiPi", CDCdEdx_chiPi, "Chi value of pions from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_chiK", CDCdEdx_chiK, "Chi value of kaons from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_chiP", CDCdEdx_chiP, "Chi value of protons from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_chiD", CDCdEdx_chiD, "Chi value of duetrons from CDC dEdx");
+  }
+}

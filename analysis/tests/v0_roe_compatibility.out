@@ -11,7 +11,7 @@
 [INFO] Number of ParticleLists to be studied: 1 
 [INFO] RestOfEventInterpreter added ROEMask with specific fractions under name 'cleanMask' with track cuts:  and eclCluster cuts: 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:V0 (gamma:V0)
+[INFO]  o) creating ParticleList with name: gamma:V0
 [INFO]    -> MDST source: V0
 [INFO] ParticleSelector: gamma:conv
 [INFO]    -> With cuts  : daughter(0, isSignal) > 0 and daughter(1, isSignal) >0
@@ -23,7 +23,7 @@
 [INFO]    -> With cuts  : daughter(0, isSignal) > 0 and daughter(1, isSignal) >0
 [INFO] RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: Lambda0 and cut: 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
+[INFO]  o) creating ParticleList with name: K_S0:V0
 [INFO]    -> MDST source: V0
 [INFO] ParticleSelector: K_S0
 [INFO]    -> With cuts  : daughter(0, isSignal) > 0 and daughter(1, isSignal) >0

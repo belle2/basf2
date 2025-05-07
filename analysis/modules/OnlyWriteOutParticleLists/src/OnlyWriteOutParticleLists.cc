@@ -16,7 +16,8 @@ REG_MODULE(OnlyWriteOutParticleLists);
 
 OnlyWriteOutParticleListsModule::OnlyWriteOutParticleListsModule()
 {
-  setDescription("Marks all objects in DataStore except those of type ParticleList as WrtieOut=False. Intedend to run before outputting an index file to remove unnecessary arrays.");
+  setDescription("Marks all objects in DataStore except those of type ParticleList as WriteOut=False. Intended to run before outputting an index file to remove unnecessary arrays.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 void OnlyWriteOutParticleListsModule::initialize()
@@ -25,7 +26,3 @@ void OnlyWriteOutParticleListsModule::initialize()
     entry.second.dontWriteOut = entry.second.objClass != ParticleList::Class();
   }
 }
-
-
-
-

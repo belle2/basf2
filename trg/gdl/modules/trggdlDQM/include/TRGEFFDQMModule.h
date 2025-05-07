@@ -99,6 +99,10 @@ namespace Belle2 {
     TH1F* m_hPt_psnecl          = nullptr;
     TH1F* m_hPt_psnecl_ftdf     = nullptr;
 
+    TH1F* m_nobha_f_phi             = nullptr; // remove the bhabha veto
+    TH1F* m_nobha_f_phi_psnecl      = nullptr; // remove the bhabha veto
+    TH1F* m_nobha_f_phi_psnecl_ftdf = nullptr; // remove the bhabha veto
+
     TH1F* m_nobha_hPt             = nullptr; // remove the bhabha veto
     TH1F* m_nobha_hPt_psnecl      = nullptr; // remove the bhabha veto
     TH1F* m_nobha_hPt_psnecl_ftdf = nullptr; // remove the bhabha veto
@@ -121,6 +125,14 @@ namespace Belle2 {
     TH1F* m_nobha_hP3_y             = nullptr;
     TH1F* m_nobha_hP3_y_psnecl      = nullptr;
     TH1F* m_nobha_hP3_y_psnecl_ftdf = nullptr;
+
+    TH1F* m_nobha_phi_z             = nullptr;
+    TH1F* m_nobha_phi_z_psnecl      = nullptr;
+    TH1F* m_nobha_phi_z_psnecl_ftdf = nullptr;
+
+    TH1F* m_nobha_phi_y             = nullptr;
+    TH1F* m_nobha_phi_y_psnecl      = nullptr;
+    TH1F* m_nobha_phi_y_psnecl_ftdf = nullptr;
 
 
     //-"fyo" with track deleta_phi distribution

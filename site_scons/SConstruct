@@ -200,7 +200,7 @@ elif option == 'opt':
 elif option == 'intel':
     intel_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):
-        if os.path.isfile(os.path.join(dir, 'icpc')):
+        if os.path.isfile(os.path.join(dir, 'icx')):
             intel_dir = dir
             break
     if not intel_dir:
@@ -214,11 +214,11 @@ elif option == 'intel':
     global_env['CC'] = 'icx'
     global_env['CXX'] = 'icpx'
     global_env['FC'] = 'ifort'
-    global_env['AR'] = 'xiar'
-    global_env['LD'] = 'xild'
+    global_env['AR'] = 'ar'
+    global_env['LD'] = 'ld'
     global_env['LINK'] = 'icpx'
     global_env['SHLINK'] = 'icpx'
-    global_env.Append(CCFLAGS=['-fp-model=precise', '-O2', '-Wshadow'])
+    global_env.Append(CCFLAGS=['-fp-model=precise', '-O2', '-Wshadow', '-Wall'])
 elif option == 'clang':
     clang_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):

@@ -341,7 +341,7 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   bool isU = rawCluster.isUSide();
   int size = rawCluster.getSize();
 
-  //first take Event Informations:
+  //first take Event Information:
   StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);
   if (!temp_eventinfo.isValid())
     m_svdEventInfoName = "SVDEventInfoSim";

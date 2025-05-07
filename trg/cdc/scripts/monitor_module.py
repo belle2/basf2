@@ -57,7 +57,7 @@ class Monitor(b2.Module):
 
     def initialize(self):
         """
-        Initilization
+        Initialization
         """
         #: Event info
         self.event_info = Belle2.PyStoreObj('EventMetaData')

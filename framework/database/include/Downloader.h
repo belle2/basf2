@@ -114,7 +114,7 @@ namespace Belle2::Conditions {
     /**
      * This is a special exception in basf2 where an instance of gRandom is NOT used:
      * since this class interacts with the Conditions Database, it might alter the state of the random
-     * number generator in case of connection troubles, loosing our capability to fully reproduce the results.
+     * number generator in case of connection troubles, losing our capability to fully reproduce the results.
      */
     std::unique_ptr<std::mt19937> m_rnd{std::make_unique<std::mt19937>()};
     /** A uniform real distribution for extracting random numbers. See the docstring for `m_rnd` as well. */

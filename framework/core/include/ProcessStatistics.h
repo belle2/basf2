@@ -26,7 +26,7 @@ namespace Belle2 {
    * times a module will be called and the time the module spends in these
    * calls.
    *
-   * Altough this class can be used in C++, its main purpose is to be used
+   * Although this class can be used in C++, its main purpose is to be used
    * in python. In the python environment it is reachable through the
    * "statistics" object in the pybasf2 module. Most simple use is to just
    * print the event statistics after the process loop:

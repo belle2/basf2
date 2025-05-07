@@ -43,7 +43,7 @@ class DataStorePrinter:
     """
     Class to print contents of a StoreObjPtr or StoreArray.
 
-    This class is inteded to print the contents of dataobjects to the standard
+    This class is intended to print the contents of dataobjects to the standard
     output to monitor changes to the contents among versions.
 
     For example:
@@ -52,7 +52,7 @@ class DataStorePrinter:
     >>> printer.print()
 
     will loop over all MCParticle instances in the MCParticles StoreArray and
-    print someting like ::
+    print something like ::
 
         MCParticle#0
           getVertex(): (0,0,0)
@@ -113,7 +113,7 @@ class DataStorePrinter:
                 the object as first argument and the member name to be tested as
                 second argument. The function is supposed to return the list of
                 arguments to pass to the member when calling. Possible return
-                valus for the callable are:
+                values for the callable are:
 
                 * a `list` of arguments to be passed to the member. An empty
                   `list` means to call the member with no arguments.
@@ -182,7 +182,7 @@ class DataStorePrinter:
             # the arguments
             if callable(arguments):
                 all_args = arguments(obj, name)
-                # None means we don't calle the member this time
+                # None means we don't called the member this time
                 if all_args is None:
                     continue
                 # list is one set of arguments, tuple(list) is n set of
@@ -253,8 +253,7 @@ class DataStorePrinter:
         elif isinstance(result, TVector3):
             print("(" + ",".join(f"{result[i]:.6g}" for i in range(3)) + ")")
         elif isinstance(result, XYZVector):
-            print("(" + ",".join(f"{Belle2.B2Vector3D(result)[i]:.6g}" for i in range(3)) + ")")
-            # print("(" + ",".join("%.6g" % x for x in [result.X(), result.Y(), result.Z()]) + ")")
+            print(f"({result.X():.6g},{result.Y():.6g},{result.Z():.6g})")
         elif isinstance(result, TLorentzVector):
             print("(" + ",".join(f"{result[i]:.6g}" for i in range(4)) + ")")
         # or, does it look like a std::pair?

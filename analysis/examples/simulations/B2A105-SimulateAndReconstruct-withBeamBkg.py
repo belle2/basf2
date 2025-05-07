@@ -39,7 +39,7 @@ import os
 my_path = b2.create_path()
 
 # load input ROOT file
-inputMdst(filename=b2.find_file('B2A101-Y4SEventGeneration-evtgen.root'), path=my_path)
+inputMdst(filename=b2.find_file('B2A101-Y4SEventGeneration.root'), path=my_path)
 
 # background files
 # location of the files is obtained from a shell variable - check first if it is set

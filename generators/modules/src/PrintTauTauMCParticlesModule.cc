@@ -12,7 +12,6 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 #include <TDatabasePDG.h>
 
@@ -98,7 +97,7 @@ void PrintTauTauMCParticlesModule::printTree(const MCParticle& mc, int level)
         );
 
   const vector<MCParticle*> daughters = mc.getDaughters();
-  BOOST_FOREACH(MCParticle * daughter, daughters) {
+  for (MCParticle* daughter : daughters) {
     printTree(*daughter, level);
   }
   m_seen[mc.getIndex()] = true;

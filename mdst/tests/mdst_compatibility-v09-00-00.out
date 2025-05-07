@@ -756,7 +756,7 @@ No data for Kinks
 TrackFitResult#0:
 [INFO] Conditions Database: found working metadata provider
 	provider = ${BELLE2_CONDB_METADATA}
-[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] Conditions data: configured globaltag is release-09-00-00
   get4Momentum(): (0.0183815,0.126308,-0.00339338,0.189164)
   getChargeSign(): 1
   getChi2(): 15.4481
@@ -11309,7 +11309,7 @@ EventLevelTriggerTimeInfo:
   getBunchNumber(): 0
 [ERROR] Cannot find payload in any of the configured global tags
 	name = TTDOffsets
-	globaltags = ${default_globaltag}
+	globaltags = release-09-00-00
 	experiment = 0
 	run = 0
 [ERROR] Payload 'TTDOffsets' not found. To get the (uncorrected) information from TTD, use 'getTimeSinceLastInjection() or 'getTimeSinceLastInjectionInMicroSeconds()'.

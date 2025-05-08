@@ -511,24 +511,14 @@ class PostReconstruction:
                 expert.set_log_level(basf2.logging.log_level.ERROR)
                 path.add_module(expert)
 
-                uniqueSignal = basf2.register_module('TagUniqueSignal')
-                uniqueSignal.param('particleList', channel.name)
-                uniqueSignal.param('target', channel.mvaConfig.target)
-                uniqueSignal.param('extraInfoName', 'uniqueSignal')
-                uniqueSignal.set_name('TagUniqueSignal_' + channel.name)
-                # suppress warning that unique signal extra info won't be overwritten if it already exists
-                uniqueSignal.set_log_level(basf2.logging.log_level.ERROR)
-                path.add_module(uniqueSignal)
-
                 if self.config.monitor:
-                    hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)',
+                    hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(SignalProbability)',
                                       channel.mvaConfig.target, 'extraInfo(decayModeID)']
                     hist_variables_2d = [('extraInfo(SignalProbability)', channel.mvaConfig.target),
                                          ('extraInfo(SignalProbability)', 'mcErrors'),
                                          ('extraInfo(SignalProbability)', 'mcParticleStatus'),
                                          ('extraInfo(decayModeID)', channel.mvaConfig.target),
                                          ('extraInfo(decayModeID)', 'mcErrors'),
-                                         ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                          ('extraInfo(decayModeID)', 'mcParticleStatus')]
                     filename = self.config.monitoring_path+'Monitor_PostReconstruction_AfterMVA.root'
                     ma.variablesToHistogram(
@@ -548,7 +538,7 @@ class PostReconstruction:
                                            variable='particleSource', writeOut=True, path=path)
 
             if self.config.monitor:
-                hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)',
+                hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(SignalProbability)',
                                   particle.mvaConfig.target, 'extraInfo(decayModeID)']
                 hist_variables_2d = [('extraInfo(decayModeID)', particle.mvaConfig.target),
                                      ('extraInfo(decayModeID)', 'mcErrors'),
@@ -578,6 +568,15 @@ class PostReconstruction:
 
             ma.rankByHighest(particle.identifier, 'extraInfo(SignalProbability)',
                              particle.postCutConfig.bestCandidateCut, 'postCut_rank', path=path)
+
+            uniqueSignal = basf2.register_module('TagUniqueSignal')
+            uniqueSignal.param('particleList', particle.identifier)
+            uniqueSignal.param('target', particle.mvaConfig.target)
+            uniqueSignal.param('extraInfoName', 'uniqueSignal')
+            uniqueSignal.set_name('TagUniqueSignal_' + particle.identifier)
+            # suppress warning that unique signal extra info won't be overwritten if it already exists
+            uniqueSignal.set_log_level(basf2.logging.log_level.ERROR)
+            path.add_module(uniqueSignal)
 
             if self.config.monitor:
                 hist_variables += ['extraInfo(postCut_rank)']

@@ -9,6 +9,7 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
 #include <analysis/utility/EvtPDLUtil.h>
+#include <TDatabasePDG.h>
 
 #include <stdexcept>
 
@@ -36,3 +37,19 @@ std::string ParticleListName::antiParticleListName(const std::string& listName)
     return EvtPDLUtil::antiParticleListName(pdgCode, mother->getLabel());
 }
 
+std::vector<std::string> ParticleListName::addAntiParticleLists(const std::vector<std::string>& inputList)
+{
+  std::vector<std::string> outputList = inputList;
+  for (const auto& branchName : inputList) {
+    std::size_t pos = branchName.find(":");
+    if (pos != std::string::npos) {
+      TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(branchName.substr(0, pos).c_str());
+      TParticlePDG* antiParticle = particle->AntiParticle();
+      bool isSelfConjugatedParticle = !(antiParticle and (particle != antiParticle));
+      if (!isSelfConjugatedParticle) {
+        outputList.push_back(std::string(antiParticle->GetName()) + ":" + std::string(branchName.substr(pos + 1)));
+      }
+    }
+  }
+  return outputList;
+}

@@ -41,23 +41,6 @@ std::string Belle2::EvtPDLUtil::particleListName(int pdgCode, const std::string&
   return particleName(pdgCode) + ":" + label;
 }
 
-std::vector<std::string> Belle2::EvtPDLUtil::addAntiParticleLists(const std::vector<std::string>& inputList)
-{
-  std::vector<std::string> outputList = inputList;
-  for (const auto& branchName : inputList) {
-    std::size_t pos = branchName.find(":");
-    if (pos != std::string::npos) {
-      TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(branchName.substr(0, pos).c_str());
-      TParticlePDG* antiParticle = particle->AntiParticle();
-      bool isSelfConjugatedParticle = !(antiParticle and (particle != antiParticle));
-      if (!isSelfConjugatedParticle) {
-        outputList.push_back(std::string(antiParticle->GetName()) + ":" + std::string(branchName.substr(pos + 1)));
-      }
-    }
-  }
-  return outputList;
-}
-
 double Belle2::EvtPDLUtil::charge(int pdgCode)
 {
   return TDatabasePDG::Instance()->GetParticle(pdgCode)->Charge() / 3.0;

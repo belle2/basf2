@@ -247,9 +247,7 @@ class TrainingData:
                     inverseSamplingRates[0] = int(nBackground / Teacher.MaximumNumberOfMVASamples) + 1
                 else:
                     inverseSamplingRates[0] = 1
-                inverseSamplingRates[0] = int(inverseSamplingRates[0] * channel.preCutConfig.bkgSamplingFactor)
-                if inverseSamplingRates[0] == 0:
-                    inverseSamplingRates[0] = 1
+                inverseSamplingRates[0] = max(1, int(inverseSamplingRates[0] * channel.preCutConfig.bkgSamplingFactor))
 
                 if nSignal > Teacher.MaximumNumberOfMVASamples and not channel.preCutConfig.noSignalSampling:
                     inverseSamplingRates[1] = int(nSignal / Teacher.MaximumNumberOfMVASamples) + 1
@@ -370,23 +368,18 @@ class PreReconstruction:
                     for igamma in range(len(matches)):
                         start, end = matches[igamma-1].span()
                         tempString = channel.decayString[:start] + '^gamma' + channel.decayString[end:]
-                        ma.fillSignalSideParticleList('gamma:sig_'+str(igamma), tempString, path=Ddaughter_roe_path)
-                        ma.reconstructDecay(
-                            'pi0:veto_' +
-                            str(igamma) +
-                            ' -> gamma:sig_' +
-                            str(igamma) +
-                            ' gamma:roe',
-                            '',
-                            path=Ddaughter_roe_path)
-                        pi0lists.append('pi0:veto_'+str(igamma))
-                    ma.cutAndCopyLists('pi0:veto', pi0lists, '', writeOut=False, path=Ddaughter_roe_path)
-                    ma.rankByLowest('pi0:veto', 'abs( formula(InvM - 0.135) )', 1, path=Ddaughter_roe_path)
+                        ma.fillSignalSideParticleList(f'gamma:sig_{igamma}', tempString, path=Ddaughter_roe_path)
+                        ma.reconstructDecay(f'pi0:veto_{igamma} -> gamma:sig_{igamma} gamma:roe', '', path=Ddaughter_roe_path)
+                        pi0lists.append(f'pi0:veto_{igamma}')
+                    ma.copyLists('pi0:veto', pi0lists, writeOut=False, path=Ddaughter_roe_path)
+                    ma.rankByLowest('pi0:veto', 'abs(dM)', 1, path=Ddaughter_roe_path)
                     ma.matchMCTruth('pi0:veto', path=Ddaughter_roe_path)
-                    ma.variableToSignalSideExtraInfo('pi0:veto', {'InvM': 'pi0vetoMass'}, path=Ddaughter_roe_path)
                     ma.variableToSignalSideExtraInfo(
                         'pi0:veto',
-                        {'formula((daughter(0,E)-daughter(1,E))/(daughter(0,E)+daughter(1,E)))': 'pi0vetoEneAsy'},
+                        {
+                            'InvM': 'pi0vetoMass',
+                            'formula((daughter(0,E)-daughter(1,E))/(daughter(0,E)+daughter(1,E)))': 'pi0vetoEneAsy',
+                        },
                         path=Ddaughter_roe_path
                     )
                     path.for_each('RestOfEvent', 'RestOfEvents', Ddaughter_roe_path)

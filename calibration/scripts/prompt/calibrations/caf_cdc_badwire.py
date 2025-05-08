@@ -89,9 +89,7 @@ def get_calibrations(input_data, **kwargs):
 
 
 def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"]):
-    from tracking import add_prefilter_tracking_reconstruction
     from rawdata import add_unpackers
-    # add_hit_preparation_modules, add_track_finding, add_track_fit_and_track_creator
     # Create an execution path
     path = basf2.create_path()
     branches = ['EventMetaData', 'RawCDCs', 'RawFTSWs']
@@ -102,14 +100,31 @@ def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"]):
     path.add_module("SetupGenfitExtrapolation",
                     energyLossBrems=False, noiseBrems=False)
     add_unpackers(path, components=unpackers)
-    # add_hit_preparation_modules(path, components=unpackers)
 
     # Print some progress messages
     path.add_module("Progress")
-    # Execute CDC track finding
-    add_prefilter_tracking_reconstruction(path, components=["CDC", "ECL"], skipGeometryAdding=False,
-                                          mcTrackFinding=False, trackFitHypotheses=None, reco_tracks="RecoTracks",
-                                          prune_temporary_tracks=True, fit_tracks=True)
+
+    from reconstruction import default_event_abort, add_prefilter_pretracking_reconstruction
+    from tracking import add_prefilter_tracking_reconstruction
+
+    # Do not even attempt at reconstructing events w/ abnormally large occupancy.
+    doom = path.add_module("EventsOfDoomBuster")
+    default_event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
+    path.add_module('StatisticsSummary').set_name('Sum_EventsofDoomBuster')
+
+    Components = ["CDC"]
+    # Add modules that have to be run BEFORE track reconstruction
+    add_prefilter_pretracking_reconstruction(path, components=Components)
+
+    # Add tracking reconstruction modules
+    add_prefilter_tracking_reconstruction(path=path,
+                                          components=Components,
+                                          trackFitHypotheses=[211],
+                                          prune_temporary_tracks=False,
+                                          fit_tracks=True,
+                                          append_full_grid_cdc_eventt0=True,
+                                          skip_full_grid_cdc_eventt0_if_svd_time_present=False)
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
     # Making sure CDC Raw Hits are stored
     for module in path.modules():

@@ -9,12 +9,7 @@
 import basf2
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_cdc import settings as cdc_tracking_calibration
-from prompt.utils import ExpRun
 from ROOT import Belle2
-from caf.framework import Calibration
-from caf import strategies
-from tracking import add_hit_preparation_modules, add_track_finding, add_track_fit_and_track_creator
-from rawdata import add_unpackers
 
 settings = CalibrationSettings(name="CDC badwire",
                                expert_username="manhtt",
@@ -51,10 +46,13 @@ def get_calibrations(input_data, **kwargs):
     basf2.B2INFO("Complete input data selection.")
     basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_mumu)}")
 
+    from prompt.utils import ExpRun
+    from caf.utils import IoV
+    from caf import strategies
     payload_boundaries = []
     payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
     basf2.B2INFO(f"Payload boundaries from expert_config: {payload_boundaries}")
-    from caf.utils import IoV
+
     # The actual value our output IoV payload should have. Notice that we've set it open ended.
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
@@ -69,6 +67,7 @@ def get_calibrations(input_data, **kwargs):
     algo = Belle2.CDC.WireEfficiencyAlgorithm()
     algo.setInputFileNames("histo_badwire.root")
     # Calibration setup
+    from caf.framework import Calibration
     badwire_calib = Calibration("CDC_Badwire",
                                 collector=col,
                                 algorithms=algo,
@@ -90,7 +89,9 @@ def get_calibrations(input_data, **kwargs):
 
 
 def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"]):
-
+    from tracking import add_prefilter_tracking_reconstruction
+    from rawdata import add_unpackers
+    # add_hit_preparation_modules, add_track_finding, add_track_fit_and_track_creator
     # Create an execution path
     path = basf2.create_path()
     branches = ['EventMetaData', 'RawCDCs', 'RawFTSWs']
@@ -101,14 +102,14 @@ def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"]):
     path.add_module("SetupGenfitExtrapolation",
                     energyLossBrems=False, noiseBrems=False)
     add_unpackers(path, components=unpackers)
-    add_hit_preparation_modules(path, components=unpackers)
+    # add_hit_preparation_modules(path, components=unpackers)
 
     # Print some progress messages
     path.add_module("Progress")
-
     # Execute CDC track finding
-    add_track_finding(path, components=unpackers)
-    add_track_fit_and_track_creator(path, trackFitHypotheses=[211])  # pion or muon hypothesis
+    add_prefilter_tracking_reconstruction(path, components=["CDC", "ECL"], skipGeometryAdding=False,
+                                          mcTrackFinding=False, trackFitHypotheses=None, reco_tracks="RecoTracks",
+                                          prune_temporary_tracks=True, fit_tracks=True)
 
     # Making sure CDC Raw Hits are stored
     for module in path.modules():

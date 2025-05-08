@@ -16,8 +16,8 @@ Modular Analysis
 
 Utilities
 +++++++++
-* Added convenience function `ROOT.Belle2.ParticleListName.addAntiParticleLists(inputList)` which returns the same list with appended anti-particle lists of the particle lists in the input list. 
-  The function can be used for a more convenient use of the `branchNames` and similar arguments of the  `RootOuput` module.
+* Added convenience function ROOT.Belle2.ParticleListName.addAntiParticleLists(inputList) which returns the same list with appended anti-particle lists of the particle lists in the input list. 
+  The function can be used for a more convenient use of the branchNames and similar arguments of the RootOuput module.
 
 Changes in the analysis package in light-2503-ceres
 ---------------------------------------------------

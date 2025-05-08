@@ -714,8 +714,8 @@ class Teacher:
                             if not keys:
                                 continue
                             tree = keys[0].ReadObj()
-                            nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')
-                            nBg = tree.GetEntries(channel.mvaConfig.target + ' != 1.0')
+                            nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1')
+                            nBg = tree.GetEntries(channel.mvaConfig.target + ' == 0')
                             if nSig < Teacher.MinimumNumberOfMVASamples:
                                 B2WARNING("Training of MVC failed. "
                                           f"Tree contains too few signal events {nSig}. Ignoring channel {channel}.")

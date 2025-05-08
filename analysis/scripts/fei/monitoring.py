@@ -430,7 +430,7 @@ def MonitorSigProbPlot(particle, filename):
     common = (df['probability'] >= 0) & (df['probability'] <= 1)
     df = df[common]
     p.add(df, 'probability', (df['signal'] == 1), label="Signal")
-    p.add(df, 'probability', (df['signal'] != 1), label="Background")
+    p.add(df, 'probability', (df['signal'] == 0), label="Background")
     p.finish()
     p.axis.set_title("Signal probability")
     p.axis.set_xlabel("Probability")

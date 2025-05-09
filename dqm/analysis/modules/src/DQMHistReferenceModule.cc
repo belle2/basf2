@@ -107,7 +107,7 @@ void DQMHistReferenceModule::loadReferenceHistos()
               addRefHist(dirname, (TH1*)histKey->ReadObj()); // ReadObj -> I own it, tranfer ownership to function
             }
           }
-          delete runtypeDir; // always non-zero as checke above ... runtype or "default"
+          delete runtypeDir; // always non-zero as checked above ... runtype or "default"
         }
         delete detDir; // always non-zero ... detector subdir name
       }

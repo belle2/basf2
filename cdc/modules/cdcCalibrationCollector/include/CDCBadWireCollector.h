@@ -8,16 +8,14 @@
 
 #pragma once
 
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <calibration/CalibrationCollectorModule.h>
+#include <cdc/dataobjects/CDCHit.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <framework/datastore/StoreArray.h>
-#include <Math/Vector3D.h>
 #include <string>
 
 namespace Belle2 {
@@ -62,7 +60,7 @@ namespace Belle2 {
       /**
        * extrapolates the helix fit to a given layer and finds the wire which it would be hitting
        */
-      const TrackFindingCDC::CDCWire& getIntersectingWire(const TVector3& xyz, const TrackFindingCDC::CDCWireLayer& layer,
+      const TrackFindingCDC::CDCWire& getIntersectingWire(const B2Vector3D& xyz, const TrackFindingCDC::CDCWireLayer& layer,
                                                           const Helix& helixFit) const;
 
       StoreArray<Track> m_Tracks;                   /**< Tracks. */

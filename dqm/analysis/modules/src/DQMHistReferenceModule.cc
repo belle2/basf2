@@ -104,7 +104,7 @@ void DQMHistReferenceModule::loadReferenceHistos()
           while ((histKey = (TKey*)nextHistkey())) {
             if (histKey->IsFolder()) continue;
             if (gROOT->GetClass(histKey->GetClassName())->InheritsFrom("TH1")) {
-              addRefHist(dirname, (TH1*)histKey->ReadObj()); // ReadObj -> I own it, tranfer ownership to function
+              addRefHist(detName, (TH1*)histKey->ReadObj()); // ReadObj -> I own it, tranfer ownership to function
             }
           }
           delete runtypeDir; // always non-zero as checked above ... runtype or "default"

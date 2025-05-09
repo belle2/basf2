@@ -244,10 +244,10 @@ class TrainingData:
                 # For some very pure channels (Jpsi), this sampling can be too aggressive and training fails.
                 # It can therefore be disabled in the preCutConfig.
                 if nBackground > Teacher.MaximumNumberOfMVASamples and not channel.preCutConfig.noBackgroundSampling:
-                    inverseSamplingRates[0] = int(nBackground / Teacher.MaximumNumberOfMVASamples) + 1
-                else:
-                    inverseSamplingRates[0] = 1
-                inverseSamplingRates[0] = max(1, int(inverseSamplingRates[0] * channel.preCutConfig.bkgSamplingFactor))
+                    inverseSamplingRates[0] = max(
+                        1, int((int(nBackground / Teacher.MaximumNumberOfMVASamples) + 1) * channel.preCutConfig.bkgSamplingFactor))
+                elif channel.preCutConfig.bkgSamplingFactor > 1:
+                    inverseSamplingRates[0] = int(channel.preCutConfig.bkgSamplingFactor)
 
                 if nSignal > Teacher.MaximumNumberOfMVASamples and not channel.preCutConfig.noSignalSampling:
                     inverseSamplingRates[1] = int(nSignal / Teacher.MaximumNumberOfMVASamples) + 1

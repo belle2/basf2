@@ -67,48 +67,51 @@ void DQMHistReferenceModule::loadReferenceHistos()
 
   B2INFO("DQMHistReference: use reference file " << m_referenceFileName);
 
-  TIter nextkey(refFile->GetListOfKeys());
-  TKey* key;
-  while ((key = (TKey*)nextkey())) {
-    if (key->IsFolder() && string(key->GetName()) == string("ref")) {
-      TDirectory* refdir = (TDirectory*)key->ReadObj(); // ReadObj -> I own it
-      TIter nextDetDir(refdir->GetListOfKeys());
-      TKey* detDir;
+  TIter nextRefDirKey(refFile->GetListOfKeys());
+  TKey* refDirKey;
+  while ((refDirKey = (TKey*)nextRefDirKey())) {
+    if (refDirKey->IsFolder() && string(refDirKey->GetName()) == string("ref")) {
+      TDirectory* refDir = (TDirectory*)refDirKey->ReadObj(); // ReadObj -> I own it, delete later
+      TIter nextDetDirKey(refDir->GetListOfKeys());
+      TKey* detDirKey;
       // detector folders
-      while ((detDir = (TKey*)nextDetDir())) {
-        if (!detDir->IsFolder()) continue;
-        TIter nextTypeDir(((TDirectory*)detDir->ReadObj())->GetListOfKeys());
-        TKey* typeDir;
-        TDirectory* foundDir = NULL;
+      while ((detDirKey = (TKey*)nextDetDirKey())) {
+        if (!detDirKey->IsFolder()) continue;
+        TDirectory* detDir = ((TDirectory*)detDirKey->ReadObj());
+        TIter nextRunTypeDirKey(detDir->GetListOfKeys()); // ReadObj -> Now I own this, so delete later
+        TKey* runtypeDirKey;
+        TDirectory* runtypeDir = nullptr;
         // run type folders (get the run type corresponding folder or use default one)
-        while ((typeDir = (TKey*)nextTypeDir())) {
-          if (!typeDir->IsFolder()) continue;
-          if (string(typeDir->GetName()) == run_type) {
-            foundDir = (TDirectory*)typeDir->ReadObj(); // ReadObj -> I own it
-            break;
+        while ((runtypeDirKey = (TKey*)nextRunTypeDirKey())) {
+          if (!runtypeDirKey->IsFolder()) continue;
+          if (string(runtypeDirKey->GetName()) == run_type) {
+            if (runtypeDir) delete runtypeDir; // if default was loaded before
+            runtypeDir = (TDirectory*)runtypeDirKey->ReadObj(); // ReadObj -> I own it, delete later
+            break; // break directly, otherwise "default" could overwrite it
           }
-          if (string(typeDir->GetName()) == "default") foundDir = (TDirectory*)typeDir->ReadObj(); // ReadObj -> I own it
+          // else we would check if default, which we load as backup
+          if (string(runtypeDirKey->GetName()) == "default") runtypeDir = (TDirectory*)runtypeDirKey->ReadObj(); // ReadObj -> I own it
         }
-        string dirname = detDir->GetName();
-        if (!foundDir) {
-          B2INFO("No run type specific or default references available for " << dirname);
+        string detName = detDir->GetName();
+        if (!runtypeDir) {
+          B2INFO("No run type specific or default references available for " << detName);
         } else {
-          B2INFO("Reading reference histograms for " << dirname << " from run type folder: " << foundDir->GetName());
+          B2INFO("Reading reference histograms for " << detName << " from run type folder: " << runtypeDirKey->GetName());
 
-          TIter next(foundDir->GetListOfKeys());
+          TIter nextHistkey(runtypeDir->GetListOfKeys());
           TKey* histKey;
-
-          while ((histKey = (TKey*)next())) {
+          // now read histograms
+          while ((histKey = (TKey*)nextHistkey())) {
             if (histKey->IsFolder()) continue;
             if (gROOT->GetClass(histKey->GetClassName())->InheritsFrom("TH1")) {
-              addRefHist(dirname, (TH1*)histKey->ReadObj()); // ReadObj -> I own it, tranfer ownership to function;
+              addRefHist(dirname, (TH1*)histKey->ReadObj()); // ReadObj -> I own it, tranfer ownership to function
             }
           }
-          delete foundDir; // always non-zero ... runtype or "default"
-          delete detDir; // always non-zero ... detector subdir name
+          delete runtypeDir; // always non-zero as checke above ... runtype or "default"
         }
+        delete detDir; // always non-zero ... detector subdir name
       }
-      delete refdir; // always non-zero ... "ref" folder
+      delete refDir; // always non-zero ... "ref" folder
     }
   }
 

@@ -59,9 +59,9 @@ AngleAndTimeRelationFilter::operator()(const std::pair<const VXDHoughState*, con
       (absLayerDiff == 2 and absThetaDiff < m_ThetaCutDeltaL2)) {
 
     if (not m_useDeltaTCuts or
-        (m_useDeltaTCuts and
-         abs(currentHitData.uTime - nextHitData.uTime) < m_DeltaTU and
-         abs(currentHitData.vTime - nextHitData.vTime) < m_DeltaTV)) {
+        (m_useDeltaTCuts
+         and std::abs(currentHitData.uTime - nextHitData.uTime) < m_DeltaTU
+         and std::abs(currentHitData.vTime - nextHitData.vTime) < m_DeltaTV)) {
       return 1.0;
     }
 

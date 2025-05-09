@@ -40,6 +40,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
              'num_round': 100,
              'max_bin': 255,
              'boosting': "gbdt",
+             'num_threads': 1
              }
 
     if isinstance(parameters, dict):

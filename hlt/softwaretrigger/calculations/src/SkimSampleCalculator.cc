@@ -619,8 +619,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
         const double recoilP = fr.getMomentum(pIN - V4p1 - V4p2).P();
 
-        const bool radmumu_tag = nTracks < 4 && goodTrk1 == 1 && goodTrk2 == 1 && highestP > 1 && lowestP < 3 && (p1hasKLMid == 1
-                                 || p2hasKLMid == 1) && abs(diffPhi) >= 0.5 * M_PI && recoilP > 0.1 && (enECLTrack1 <= 0.25 || enECLTrack2 <= 0.25);
+        const bool radmumu_tag = nTracks < 4 && goodTrk1 == 1 && goodTrk2 == 1 && highestP > 1 && lowestP < 3
+                                 && (p1hasKLMid == 1 || p2hasKLMid == 1) && std::abs(diffPhi) >= 0.5 * M_PI && recoilP > 0.1
+                                 && (enECLTrack1 <= 0.25 || enECLTrack2 <= 0.25);
 
         if (radmumu_tag) radmumu = 1;
 

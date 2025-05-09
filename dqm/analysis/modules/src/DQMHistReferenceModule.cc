@@ -96,12 +96,12 @@ void DQMHistReferenceModule::loadReferenceHistos()
           B2INFO("Reading reference histograms for " << dirname << " from run type folder: " << foundDir->GetName());
 
           TIter next(foundDir->GetListOfKeys());
-          TKey* hh;
+          TKey* histKey;
 
-          while ((hh = (TKey*)next())) {
-            if (hh->IsFolder()) continue;
-            if (gROOT->GetClass(key->GetClassName())->InheritsFrom("TH1")) {
-              addRefHist(dirname, (TH1*)key->ReadObj()); // ReadObj -> I own it, tranfer ownership to function;
+          while ((histKey = (TKey*)next())) {
+            if (histKey->IsFolder()) continue;
+            if (gROOT->GetClass(histKey->GetClassName())->InheritsFrom("TH1")) {
+              addRefHist(dirname, (TH1*)histKey->ReadObj()); // ReadObj -> I own it, tranfer ownership to function;
             }
           }
           delete foundDir; // always non-zero ... runtype or "default"

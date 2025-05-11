@@ -5,17 +5,11 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
 #include <cdc/modules/cdcCalibrationCollector/CDCBadWireCollector.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <framework/datastore/RelationArray.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <genfit/TrackPoint.h>
-#include <genfit/KalmanFitterInfo.h>
-#include <genfit/MeasurementOnPlane.h>
-#include <genfit/MeasuredStateOnPlane.h>
-//#include <Math/ProbFuncMathCore.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <TH1F.h>
@@ -106,7 +100,7 @@ void CDCBadWireCollectorModule::collect()
 }
 
 void CDCBadWireCollectorModule::finish() {}
-const CDCWire& CDCBadWireCollectorModule::getIntersectingWire(const TVector3& xyz, const CDCWireLayer& layer,
+const CDCWire& CDCBadWireCollectorModule::getIntersectingWire(const B2Vector3D& xyz, const CDCWireLayer& layer,
     const Helix& helixFit) const
 {
   Vector3D crosspoint;
@@ -116,7 +110,7 @@ const CDCWire& CDCBadWireCollectorModule::getIntersectingWire(const TVector3& xy
     const CDCWire& oneWire = layer.getWire(1);
     double newR = oneWire.getWirePos2DAtZ(xyz.Z()).norm();
     double arcLength = helixFit.getArcLength2DAtCylindricalR(newR);
-    TVector3 xyzOnWire = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
+    B2Vector3D xyzOnWire = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
     crosspoint = Vector3D(xyzOnWire);
   }
   const CDCWire& wire = layer.getClosestWire(crosspoint);
@@ -130,7 +124,7 @@ void CDCBadWireCollectorModule::buildEfficiencies(std::vector<unsigned short> wi
     const double radiusofLayer = wireLayer.getRefCylindricalR();
     //simple extrapolation of fit
     const double arcLength = helixFit.getArcLength2DAtCylindricalR(radiusofLayer);
-    const TVector3 xyz = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
+    const B2Vector3D xyz = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
     if (!xyz.X()) continue;
     const CDCWire& wireIntersected = getIntersectingWire(xyz, wireLayer, helixFit);
     unsigned short crossedWire = wireIntersected.getEWire();

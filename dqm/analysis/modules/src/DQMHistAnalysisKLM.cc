@@ -618,14 +618,22 @@ void DQMHistAnalysisKLMModule::updateCanvasStatus(
   }
 }
 
-void DQMHistAnalysisKLMModule::processFeHistogram(TH1* feHist, TH1* denominator, TH1* numerator, TCanvas* canvas)
+
+void DQMHistAnalysisKLMModule::processPlaneHistogram(
+  const std::string& histName, TLatex& latex)
+{
+  // Internally call the main function with a pointer to TLatex
+  processPlaneHistogram(histName, &latex, nullptr);
+}
+
+void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, TH1* denominator, TH1* numerator, TCanvas* canvas)
 {
   if (!feHist) {
-    B2WARNING("processFeHistogram: feHist is null, exiting function.");
+    B2WARNING("processFEHistogram: feHist is null, exiting function.");
     return;
   }
   if (!canvas) {
-    B2WARNING("processFeHistogram: canvas is null, cannot draw histograms.");
+    B2WARNING("processFEHistogram: canvas is null, cannot draw histograms.");
     return;
   }
 
@@ -650,14 +658,14 @@ void DQMHistAnalysisKLMModule::processFeHistogram(TH1* feHist, TH1* denominator,
     TH1* ref = findRefHist(feHist->GetName(), ERefScaling::c_RefScaleNone);
     if (ref) {
       ref->Draw("hist,same");
-      B2INFO("processFeHistogram: Found and drew reference histogram.");
+      B2INFO("processFEHistogram: Found and drew reference histogram.");
     } else {
-      B2WARNING("processFeHistogram: Reference histogram not found.");
+      B2WARNING("processFEHistogram: Reference histogram not found.");
     }
 
     canvas->Modified();
     canvas->Update();
-    B2INFO("processFeHistogram: Updated canvas after first draw.");
+    B2INFO("processFEHistogram: Updated canvas after first draw.");
 
     /* Delta component */
     auto deltaDenom = getDelta("", denominator->GetName());
@@ -683,10 +691,10 @@ void DQMHistAnalysisKLMModule::processFeHistogram(TH1* feHist, TH1* denominator,
       canvas->Modified();
       canvas->Update();
     } else {
-      B2WARNING("processFeHistogram: Delta numerator or denominator not found.");
+      B2WARNING("processFEHistogram: Delta numerator or denominator not found.");
     }
   } else {
-    B2WARNING("processFeHistogram: Skipped histogram processing due to missing numerator/denominator.");
+    B2WARNING("processFEHistogram: Skipped histogram processing due to missing numerator/denominator.");
   }
 }
 
@@ -793,12 +801,12 @@ void DQMHistAnalysisKLMModule::event()
   gStyle->SetPalette(kBird);
   fillMaskedChannelsHistogram("masked_channels");
   latex.SetTextColor(kBlue);
-  processPlaneHistogram("plane_bklm_phi", &latex);
-  processPlaneHistogram("plane_bklm_z", &latex);
-  processPlaneHistogram("plane_eklm", &latex);
+  processPlaneHistogram("plane_bklm_phi", latex);
+  processPlaneHistogram("plane_bklm_z", latex);
+  processPlaneHistogram("plane_eklm", latex);
 
-  processFeHistogram(m_fe_bklm_ratio, feStatus_bklm_scintillator_1, feStatus_bklm_scintillator_0, m_c_fe_bklm_ratio);
-  processFeHistogram(m_fe_eklm_ratio, feStatus_eklm_plane_1, feStatus_eklm_plane_0, m_c_fe_eklm_ratio);
+  processFEHistogram(m_fe_bklm_ratio, feStatus_bklm_scintillator_1, feStatus_bklm_scintillator_0, m_c_fe_bklm_ratio);
+  processFEHistogram(m_fe_eklm_ratio, feStatus_eklm_plane_1, feStatus_eklm_plane_0, m_c_fe_eklm_ratio);
   processPlaneHistogram("fe_bklm_ratio", nullptr, m_fe_bklm_ratio);
   processPlaneHistogram("fe_eklm_ratio", nullptr, m_fe_eklm_ratio);
 

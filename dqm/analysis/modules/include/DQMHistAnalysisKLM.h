@@ -117,6 +117,15 @@ namespace Belle2 {
     void processPlaneHistogram(const std::string& histName, TLatex* latex, TH1* histogram);
 
     /**
+     * Process histogram containing the number of hits in plane.
+     * @param[in]  histName  Histogram name.
+     * @param[out] latex     TLatex to draw messages.
+     */
+    // Overloaded function for backward compatibility (TLatex reference)
+    // so that the above function can be used with or without TLatex for FE histograms.
+    void processPlaneHistogram(const std::string& histName, TLatex& latex);
+
+    /**
     * Helper function to update the canvas status based on dead modules.
     * @param[in] canvas Canvas of interest.
     * @param[in] deadModules List of dead modules.
@@ -136,7 +145,7 @@ namespace Belle2 {
      * @param[in]  numerator Numerator for efficiency hist.
      * @param[in]  canvas Canvas of interest.
      */
-    void processFeHistogram(TH1* feHist,  TH1* denominator, TH1* numerator, TCanvas* canvas);
+    void processFEHistogram(TH1* feHist,  TH1* denominator, TH1* numerator, TCanvas* canvas);
 
     /**
      * Fill histogram containing masked channels per sector.
@@ -200,16 +209,16 @@ namespace Belle2 {
     /** TText for names in plane histograms. */
     TText m_PlaneText;
 
-    /** Histogram for BKLM fe histogram. */
+    /** Histogram for BKLM plane events fraction w/FE. */
     TH1* m_fe_bklm_ratio = NULL;
 
-    /** BKLM plane efficiency canvas */
+    /** Canvas for BKLM plane events fraction w/FE.  */
     TCanvas* m_c_fe_bklm_ratio = NULL;
 
-    /** Histogram for EKLM plane efficiency. */
+    /** Histogram for EKLM plane events fraction w/FE. */
     TH1* m_fe_eklm_ratio = NULL;
 
-    /** EKLM plane efficiency canvas */
+    /** Canvas for EKLM plane events fraction w/FE. */
     TCanvas* m_c_fe_eklm_ratio = NULL;
 
     /** Run type flag for null runs. */

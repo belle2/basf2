@@ -550,7 +550,7 @@ class RadBhabhaV0Control(BaseSkim):
 
     def build_lists(self, path):
 
-        # require Bhabha tracks are high p and E/p is consitent with e+/e-
+        # require Bhabha tracks are high p and E/p is consistent with e+/e-
         BhabhaTrackCuts = ('abs(dr)<0.5 and abs(dz)<2 and pt>0.2 and 0.8<clusterEoP<1.2 and p>1.0 '
                            'and clusterReg==2 and nCDCHits>4')
         BhabhaSystemCuts = '4<M<10 and 0.5<pRecoilTheta<2.25'

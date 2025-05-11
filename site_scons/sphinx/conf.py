@@ -363,6 +363,7 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.11/', None),
                        'pandas': ('https://pandas.pydata.org/docs/', None),
                        'matplotlib': ('https://matplotlib.org/stable/', None),
                        'b2luigi': ('https://b2luigi.belle2.org/', None),
+                       'gbasf2': ('https://gbasf2.belle2.org/', None),
                        'uproot': ('https://uproot.readthedocs.io/en/stable/', None)}
 
 
@@ -409,7 +410,7 @@ def improve_docstring(obj):
     # if tclass:
     #    pyclass.__doc__ += '\n' + tclass.GetTitle()
 
-    doxygen_url = 'https://software.belle2.org/development/class'
+    doxygen_url = 'https://software.belle2.org/development/doxygen/class'
     doxygen_url += '_1_1'.join(classname.split('::'))
     doxygen_url += '.html'
     pyclass.__doc__ += f'\n`Doxygen page for {classname} <{doxygen_url}>`_'

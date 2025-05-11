@@ -24,7 +24,6 @@
 #include <unordered_map>
 #include <algorithm>
 #include <cstdlib>
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;

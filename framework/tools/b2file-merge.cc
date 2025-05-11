@@ -12,6 +12,7 @@
 #include <framework/pcore/Mergeable.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/utilities/KeyValuePrinter.h>
+#include <framework/core/MetadataService.h>
 
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -23,6 +24,7 @@
 #include <filesystem>
 #include <iostream>
 #include <iomanip>
+#include <memory>
 #include <string>
 #include <set>
 #include <regex>
@@ -50,6 +52,7 @@ int main(int argc, char* argv[])
   // Parse options
   std::string outputfilename;
   std::vector<std::string> inputfilenames;
+  std::string jsonfilename;
   po::options_description options("Options");
   options.add_options()
   ("help,h", "print all available options")
@@ -58,6 +61,7 @@ int main(int argc, char* argv[])
   ("force,f", "overwrite existing file")
   ("no-catalog", "don't register output file in file catalog, This is now the default")
   ("add-to-catalog", "register the output file in the file catalog")
+  ("job-information", po::value<std::string>(&jsonfilename), "create json file with metadata of output file and execution status")
   ("quiet,q", "if given don't print infos, just warnings and errors");
   po::positional_options_description positional;
   positional.add("output", 1);
@@ -83,6 +87,12 @@ The following restrictions apply:
   - The event tree needs to contain the same DataStore entries in all files.
 )DOC");
     return 1;
+  }
+
+  //Initialize metadata service
+  MetadataService::Instance();
+  if (!jsonfilename.empty()) {
+    MetadataService::Instance().setJsonFileName(jsonfilename);
   }
 
   // Remove the {module:} from log messages
@@ -174,7 +184,7 @@ The following restrictions apply:
         // Make sure the branch is mergeable
         if(!br) continue;
         if(!br->GetTargetClass()->InheritsFrom(Mergeable::Class())){
-          B2ERROR("Branch " << std::quoted(br->GetName()) << " in persistent tree not inheriting from Mergable");
+          B2ERROR("Branch " << std::quoted(br->GetName()) << " in persistent tree not inheriting from Mergeable");
           continue;
         }
         // Ok, it's an object we now how to handle so get it from the tree
@@ -322,11 +332,13 @@ The following restrictions apply:
       outputMetaData->setRandomSeed("");
   }
   RootIOUtilities::setCreationData(*outputMetaData);
+  // Set (again) the release, since it's overwritten by the previous line
+  outputMetaData->setRelease(outputRelease);
 
   // OK we have a valid FileMetaData and merged all persistent objects, now do
   // the conversion of the event trees and create the output file.
-  TFile output(outputfilename.c_str(), "RECREATE");
-  if (output.IsZombie()) {
+  auto output = std::unique_ptr<TFile>{TFile::Open(outputfilename.c_str(), "RECREATE")};
+  if (output == nullptr or output->IsZombie()) {
     B2ERROR("Could not create output file " << std::quoted(outputfilename));
     return 1;
   }
@@ -335,12 +347,14 @@ The following restrictions apply:
     TTree* outputEventTree{nullptr};
     for (const auto& input : inputfilenames) {
       B2INFO("processing events from " << std::quoted(input + ":" + treeName));
-      TFile tfile(input.c_str());
-      auto* tree = dynamic_cast<TTree*>(tfile.Get(treeName.c_str()));
-      if(!outputEventTree){
-        output.cd();
+      auto tfile = std::unique_ptr<TFile>{TFile::Open(input.c_str(), "READ")};
+      // At this point, we already checked that the input files are valid and exist
+      // so it's safe to access tfile directly
+      auto* tree = dynamic_cast<TTree*>(tfile->Get(treeName.c_str()));
+      if (!outputEventTree){
+        output->cd();
         outputEventTree = tree->CloneTree(0);
-      }else{
+      } else {
         outputEventTree->CopyAddresses(tree);
       }
       // Now let's copy all entries without unpacking (fast), layout the
@@ -351,7 +365,7 @@ The following restrictions apply:
       outputEventTree->CopyAddresses(tree, true);
       // finally clean up and close file.
       delete tree;
-      tfile.Close();
+      tfile->Close();
     }
     assert(outputEventTree);
     // make sure we have an index ...
@@ -360,7 +374,7 @@ The following restrictions apply:
       RootIOUtilities::buildIndex(outputEventTree);
     }
     // and finally write the tree
-    output.cd();
+    output->cd();
     outputEventTree->Write();
     // check if the number of full events in the metadata is zero:
     // if so calculate number of full events now:
@@ -379,7 +393,7 @@ The following restrictions apply:
   }
   B2INFO("Writing FileMetaData");
   // Create persistent tree
-  output.cd();
+  output->cd();
   TTree outputMetaDataTree("persistent", "persistent");
   outputMetaDataTree.Branch("FileMetaData", &outputMetaData);
   for(auto &it: persistentMergeables){
@@ -393,6 +407,14 @@ The following restrictions apply:
     delete val.second.first;
   }
   persistentMergeables.clear();
+  auto outputMetaDataCopy = *outputMetaData;
   delete outputMetaData;
-  output.Close();
+  output->Close();
+
+  // and now add it to the metadata service
+  MetadataService::Instance().addRootOutputFile(outputfilename, &outputMetaDataCopy, "b2file-merge");
+
+  // report completion in job metadata
+  MetadataService::Instance().addBasf2Status("finished successfully");
+  MetadataService::Instance().finishBasf2();
 }

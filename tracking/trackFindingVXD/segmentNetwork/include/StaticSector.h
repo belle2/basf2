@@ -35,12 +35,12 @@ namespace Belle2 {
 
     /** standard constructor */
     StaticSector() :
-      m_secID(FullSecID()), m_compactSecIDsMap(nullptr)
+      m_secID(FullSecID())
     {}
 
     /** constructor */
     explicit StaticSector(FullSecID secID) :
-      m_secID(secID), m_compactSecIDsMap(nullptr)
+      m_secID(secID)
     {}
 
 
@@ -276,11 +276,12 @@ namespace Belle2 {
       B2DEBUG(20, "AFTER: " << filter.getNameAndReference() << std::endl);
     }
 
-    /** stores its own secID */
-    FullSecID m_secID;
-
-    /// map from FullSecID to CompactSecID
-    const CompactSecIDs* m_compactSecIDsMap;
+    /// stores the attached 2-hit filters
+    std::unordered_map<CompactSecIDs::sectorID_t, Filter2sp > m_2spFilters;
+    /// stores the attached 3-hit filters
+    std::unordered_map<CompactSecIDs::secPairID_t, Filter3sp > m_3spFilters;
+    /// stores the attached 4-hit filters
+    std::unordered_map<CompactSecIDs::secTripletID_t, Filter4sp > m_4spFilters;
 
     /// stores innerSecIDs for the attached 2-hit filters
     std::vector< FullSecID                        > m_inner2spSecIDs;
@@ -289,12 +290,11 @@ namespace Belle2 {
     /// stores innerSecIDs for the attached 4-hit filters
     std::vector< std::tuple< FullSecID, FullSecID, FullSecID > > m_inner4spSecIDs;
 
-    /// stores the attached 2-hit filters
-    std::unordered_map<CompactSecIDs::sectorID_t, Filter2sp > m_2spFilters;
-    /// stores the attached 3-hit filters
-    std::unordered_map<CompactSecIDs::secPairID_t, Filter3sp > m_3spFilters;
-    /// stores the attached 4-hit filters
-    std::unordered_map<CompactSecIDs::secTripletID_t, Filter4sp > m_4spFilters;
+    /** stores its own secID */
+    FullSecID m_secID;
+
+    /// map from FullSecID to CompactSecID
+    const CompactSecIDs* m_compactSecIDsMap = nullptr;
 
   };
 

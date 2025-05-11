@@ -185,7 +185,7 @@ namespace Belle2 {
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Parmeters of position element") const override
+    void print(const std::string& title = "Parameters of position element") const override
     {
       std::cout << title << std::endl;
       std::cout << "translations (x,y,z): " << m_x << " " << m_y << " " << m_z << std::endl;

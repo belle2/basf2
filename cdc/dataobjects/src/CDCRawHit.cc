@@ -12,7 +12,7 @@ using namespace std;
 using namespace Belle2;
 
 CDCRawHit::CDCRawHit() :
-  m_status(0), m_triggerNumber(0), m_node(0), m_finess(0), m_board(0),
+  m_triggerNumber(0), m_status(0), m_node(0), m_finess(0), m_board(0),
   m_channel(0), m_triggerTime(0), m_adc(0), m_tdc(0), m_tdc2nd(0), m_tot(0)
 {
 }
@@ -30,8 +30,8 @@ CDCRawHit::CDCRawHit(unsigned short status,
                      unsigned short tdc2,
                      unsigned short tot)
 {
-  m_status = status;
   m_triggerNumber = trgNumber;
+  m_status = status;
   m_node = node;
   m_finess = finess;
   m_board = board;

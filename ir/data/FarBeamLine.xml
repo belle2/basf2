@@ -7,7 +7,7 @@
 
          Following data is defined to Geant4 coordinates (z axis = Belle Solenoid), not for GxGy coordinates.
 
-         Therefore we do not need to rotate all beamline gemetry.   
+         Therefore we do not need to rotate all beamline geometry.   
 
           For example:
 

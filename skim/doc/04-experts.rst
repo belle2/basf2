@@ -204,7 +204,7 @@ Skim flags can also be used in combined skims, with the individual flags being a
 
 .. seealso::
 
-   Skim flags are implemented using two basf2 modules, which are documented in `skim-utils-flags`_.
+   Skim flags are implemented using two ``basf2`` modules, which are documented in `skim-utils-flags`_.
 
 .. _skim-running:
 
@@ -220,7 +220,7 @@ In the skim package, there are command-line tools available for running skims, d
 
 .. tip::
    This tool completely supplants the ``<SkimName>_Skim_Standalone.py`` steering files from
-   previous versions of basf2. The ``standalone/`` and ``combined/`` directories no longer exist in
+   previous versions of ``basf2``. The ``standalone/`` and ``combined/`` directories no longer exist in
    the skim package from version-05-00-00 onwards.
 
 .. argparse::

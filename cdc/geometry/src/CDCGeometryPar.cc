@@ -16,21 +16,14 @@
 #include <cdc/simulation/CDCSimControlPar.h>
 #include <cdc/utilities/OpenFile.h>
 
-//#include <float.h>
-
 #include <cmath>
-#include <boost/format.hpp>
-//#include <iostream>
 #include <iomanip>
 
 #include <boost/iostreams/filtering_stream.hpp>
-//#include <boost/iostreams/device/file.hpp>
-//#include <boost/iostreams/filter/gzip.hpp>
 
 #include <Math/ChebyshevPol.h>
 
 using namespace std;
-using namespace boost;
 using namespace Belle2;
 using namespace CDC;
 
@@ -1426,7 +1419,7 @@ void CDCGeometryPar::calcMeanT0(double minT0, double maxT0, int maxIt, double nS
       B2FATAL("Wire efficiency sum <= 0!");
     }
   }
-  if (it1 == maxIt - 1) B2WARNING("Max. iterations(=" << maxIt << ") needed to calculte the mean t0. Strange.");
+  if (it1 == maxIt - 1) B2WARNING("Max. iterations(=" << maxIt << ") needed to calculate the mean t0. Strange.");
 }
 
 
@@ -2981,7 +2974,7 @@ void CDCGeometryPar::setDisplacement()
 
 void CDCGeometryPar::setShiftInSuperLayer()
 {
-  const unsigned short nLayers[c_nSuperLayers] = {8, 6, 6, 6, 6, 6, 6, 6, 6}; //tentaive
+  const unsigned short nLayers[c_nSuperLayers] = {8, 6, 6, 6, 6, 6, 6, 6, 6}; //tentative
 
   for (unsigned short SLayer = 0; SLayer < c_nSuperLayers; ++SLayer) {
     unsigned short firstCLayer = 0;

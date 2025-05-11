@@ -9,9 +9,6 @@
 /* Own header. */
 #include <analysis/utility/PostProcessingParticleWeighting.h>
 
-/* Basf2 headers. */
-#include <framework/database/Database.h>
-
 using namespace Belle2;
 
 PostProcessingParticleWeighting::PostProcessingParticleWeighting(

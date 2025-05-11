@@ -89,7 +89,7 @@ void PXDInjectionDQMModule::defineHisto()
       TString bufful = buff;
       bufful.ReplaceAll(".", "_");
 
-      /// The number of bins as well as the range MUST be the same here as in the histograms above and in teh DQM analysis code!!!
+      /// The number of bins as well as the range MUST be the same here as in the histograms above and in the DQM analysis code!!!
       /// Reason: Number of entries histogram is shared by all histograms!
       if (m_offlineStudy) {
         hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful,
@@ -163,7 +163,7 @@ void PXDInjectionDQMModule::initialize()
 
 void PXDInjectionDQMModule::beginRun()
 {
-  // Do not assume that everthing is non-zero, e.g. Max might be nullptr
+  // Do not assume that everything is non-zero, e.g. Max might be nullptr
   if (hOccAfterInjLER) hOccAfterInjLER->Reset();
   if (hOccAfterInjHER) hOccAfterInjHER->Reset();
   if (hEOccAfterInjLER) hEOccAfterInjLER->Reset();
@@ -234,7 +234,7 @@ void PXDInjectionDQMModule::event()
         if (hOccAfterInjHERGate) {
           if (m_useClusters) {
             // Cluster does not contain VCellID, need to change histogramm completely
-            // -> doesnt work with clusters!
+            // -> doesn't work with clusters!
             //             for (auto& p : m_storeClusters) {
             //               hOccAfterInjHERGate->Fill(difference, p.getVCellID() / 4);
             //             }
@@ -270,7 +270,7 @@ void PXDInjectionDQMModule::event()
         if (hOccAfterInjLERGate) {
           if (m_useClusters) {
             // Cluster does not contain VCellID, need to change histogramm completely
-            // -> doesnt work with clusters!
+            // -> doesn't work with clusters!
             //             for (auto& p : m_storeClusters) {
             //               hOccAfterInjLERGate->Fill(difference, p.getVCellID() / 4);
             //             }

@@ -258,7 +258,7 @@ void CDCFudgeFactorCalibrationCollectorModule::collect()
 
     // cut on Energy deposite in ECL
     // Keep the same as in the dimuon study script,
-    // Although it is not neccessary to keep this as cut on Etot is enough
+    // Although it is not necessary to keep this as cut on Etot is enough
     double eclTot = eclNeutral + eclTrack;
     if (eclTot > 2 || eclTrack > 2) return;
 

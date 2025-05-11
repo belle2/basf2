@@ -27,7 +27,6 @@
 #pragma link C++ class Belle2::SVDMCClusterTimeFudgeFactor-;
 
 //calibration importers
-#pragma link C++ class Belle2::SVDDatabaseImporter-;
 #pragma link C++ class Belle2::SVDLocalCalibrationsImporter-;
 #pragma link C++ class Belle2::SVDDetectorConfigurationImporter-;
 

@@ -11,13 +11,11 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <cdc/dataobjects/WireID.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <TH1F.h>
 
 //using namespace std;
 using namespace Belle2;
 using namespace CDC;
-using namespace genfit;
 using namespace TrackFindingCDC;
 
 

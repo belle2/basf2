@@ -11,7 +11,7 @@
 #include <framework/core/Path.h>
 
 namespace Belle2 {
-/// Helper utils for path arithmetics needed in the pEventProcessor
+/// Helper utils for path arithmetic needed in the pEventProcessor
   class PathUtils {
   public:
     /**

@@ -190,13 +190,14 @@ namespace Belle2 {
                      const double* fractions,
                      Const::PIDDetectorSet detSet) const;
 
-    Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
-    float m_logl[Const::PIDDetectors::c_size][Const::ChargedStable::c_SetSize]; /**< log likelihoods */
-
     /// Internal storage of pre-official likelihood.
     std::map<std::string, double> m_preOfficialLikelihoods;
 
-    ClassDefOverride(PIDLikelihood, 4); /**< Collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM. */
+    float m_logl[Const::PIDDetectors::c_size][Const::ChargedStable::c_SetSize]; /**< log likelihoods */
+    Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
+
+    ClassDefOverride(PIDLikelihood, 5); /**< Collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM. */
+    // version 5: reorder class members to improve memory layout
 
   };
 

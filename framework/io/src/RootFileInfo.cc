@@ -6,7 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <iostream>
 #include <framework/io/RootFileInfo.h>
 #include <framework/io/RootIOUtilities.h>
 #include <framework/dataobjects/FileMetaData.h>

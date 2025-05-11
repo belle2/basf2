@@ -99,7 +99,10 @@ for branch in tree.GetListOfBranches():
     totalBranches.append(branch.GetName())
 
 if 'FBDT_qrCombined' in totalBranches:
-    methods.append("FBDT")
+    methods.append(("FBDT", "FBDT_qrCombined"))
+
+if 'qrGNN' in totalBranches:
+    methods.append(("GNN", "qrGNN"))
 
 usedCategories = []
 for cat in categories:
@@ -109,7 +112,7 @@ for cat in categories:
 
 categoriesNtupleList = ''
 for category in usedCategories:
-    categoriesNtupleList = categoriesNtupleList + f"Eff_{category}:"
+    categoriesNtupleList = categoriesNtupleList + f":Eff_{category}"
 
 
 # Output Validation file
@@ -119,7 +122,7 @@ outputFile = ROOT.TFile("test6_CPVFlavorTaggerEfficiency.root", "RECREATE")
 outputNtuple = ROOT.TNtuple(
     "FT_Efficiencies",
     "Effective efficiencies of the flavor tagger combiners as well as of the individual tagging categories.",
-    "Eff_FBDT:DeltaEff_FBDT:" + categoriesNtupleList)
+    "Eff_FBDT:DeltaEff_FBDT:Eff_GNN:DeltaEff_GNN" + categoriesNtupleList)
 
 outputNtuple.SetAlias('Description', "These are the effective efficiencies of the flavor tagger combiners as well as of " +
                       "the individual tagging efficiencies.")
@@ -133,7 +136,7 @@ efficienciesForNtuple = []
 
 YmaxForQrPlot = 0
 
-for method in methods:
+for methodName, methodVariable in methods:
     # histogram contains the average r in each of 7 bins -> calculation see below
     histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of 7 bins (B0 and B0bar)', 7,
                             r_subsample)
@@ -159,24 +162,24 @@ for method in methods:
     histo_Cnet_output_B0bar = ROOT.TH1F('Comb_Net_Output_B0bar', 'Combiner network output [not equal to r] '
                                         'for true B0bar (binning 100)', 100, 0.0, 1.0)
     # histogram containing the belle paper plot (qr-tagger output for true B0)
-    histo_belleplotB0 = ROOT.TH1F('qr_' + method + '_B0',
+    histo_belleplotB0 = ROOT.TH1F(f'{methodVariable}_B0',
                                   'BellePlot for true B0 (binning 50)', 50,
                                   -1.0, 1.0)
     # histogram containing the belle paper plot (qr-tagger output for true B0bar)
-    histo_belleplotB0bar = ROOT.TH1F('qr_' + method + '_B0Bar',
+    histo_belleplotB0bar = ROOT.TH1F(f'{methodVariable}_B0Bar',
                                      'BellePlot for true B0Bar (binning 50)',
                                      50, -1.0, 1.0)
 
     # histogram containing the qr plot (qr-tagger output)
-    histo_belleplotBoth = ROOT.TH1F('qr_' + method + '_B0Both',
+    histo_belleplotBoth = ROOT.TH1F(f'{methodVariable}_B0Both',
                                     'qr-tagger output (binning 50)',
                                     50, -1.0, 1.0)
-    # calibration plot for B0. If we get a linear line our MC is fine, than the assumption r ~ 1- 2w is reasonable
+    # calibration plot for B0. If we get a linear line our MC is fine, then the assumption r ~ 1- 2w is reasonable
     # expectation is, that for B0 calibration plot:  qr=0  half B0 and half B0bar, qr = 1 only B0 and qr = -1
     # no B0. Inverse for B0bar calibration plot
-    histo_calib_B0 = ROOT.TH1F('Calibration_' + method + '_B0', 'CalibrationPlot for true B0', 100, -1.0, 1.0)
+    histo_calib_B0 = ROOT.TH1F(f'Calibration_{methodName}_B0', 'CalibrationPlot for true B0', 100, -1.0, 1.0)
     # calibration plot for B0bar calibration plot
-    histo_calib_B0bar = ROOT.TH1F('Calibration_' + method + '_B0Bar',
+    histo_calib_B0bar = ROOT.TH1F(f'Calibration_{methodName}_B0Bar',
                                   'CalibrationPlot for true B0Bar', 100, -1.0,
                                   1.0)
     # belle plot with true B0 and B0bars
@@ -198,34 +201,34 @@ for method in methods:
 
     # filling the histograms
 
-    tree.Draw(method + '_qrCombined>>qr_' + method + '_B0', 'qrMC == 1')
-    tree.Draw(method + '_qrCombined>>qr_' + method + '_B0Bar', 'qrMC == -1')
-    tree.Draw(method + '_qrCombined>>BellePlot_NoCut', 'abs(qrMC) == 1')
-    tree.Draw(method + '_qrCombined>>qr_' + method + '_B0Both', 'abs(qrMC) == 1')
+    tree.Draw(f'{methodVariable}>>{methodVariable}_B0', 'qrMC == 1')
+    tree.Draw(f'{methodVariable}>>{methodVariable}_B0Bar', 'qrMC == -1')
+    tree.Draw(f'{methodVariable}>>BellePlot_NoCut', 'abs(qrMC) == 1')
+    tree.Draw(f'{methodVariable}>>{methodVariable}_B0Both', 'abs(qrMC) == 1')
 
-    tree.Draw(method + '_qrCombined>>Calibration_' + method + '_B0', 'qrMC == 1')
-    tree.Draw(method + '_qrCombined>>Calibration_' + method + '_B0Bar', 'qrMC == -1')
+    tree.Draw(f'{methodVariable}>>Calibration_{methodName}_B0', 'qrMC == 1')
+    tree.Draw(f'{methodVariable}>>Calibration_{methodName}_B0Bar', 'qrMC == -1')
 
     # filling histograms wrong efficiency calculation
-    tree.Draw(method + '_qrCombined>>BellePlot_B0_m0',
-              'qrMC == 1 && ' + method + '_qrCombined>0')
-    tree.Draw(method + '_qrCombined>>BellePlot_B0_m1',
-              'qrMC == 1 && ' + method + '_qrCombined<0')
-    tree.Draw(method + '_qrCombined>>BellePlot_B0_m2',
-              'qrMC == -1 && ' + method + '_qrCombined>0 ')
+    tree.Draw(f'{methodVariable}>>BellePlot_B0_m0',
+              f'qrMC == 1 && {methodVariable}>0')
+    tree.Draw(f'{methodVariable}>>BellePlot_B0_m1',
+              f'qrMC == 1 && {methodVariable}<0')
+    tree.Draw(f'{methodVariable}>>BellePlot_B0_m2',
+              f'qrMC == -1 && {methodVariable}>0 ')
 
     # filling with abs(qr) in one of 7 bins with its weight
     # separate calculation for B0 and B0bar
 
-    tree.Project('Average_r', 'abs(' + method + '_qrCombined)',
-                 'abs(' + method + '_qrCombined)')
-    tree.Project('Average_rB0', 'abs(' + method + '_qrCombined)', 'abs(' + method + '_qrCombined)*(qrMC==1)')
-    tree.Project('Average_rB0bar', 'abs(' + method + '_qrCombined)', 'abs(' + method + '_qrCombined)*(qrMC==-1)')
+    tree.Project('Average_r', f'abs({methodVariable})',
+                 f'abs({methodVariable})')
+    tree.Project('Average_rB0', f'abs({methodVariable})', f'abs({methodVariable})*(qrMC==1)')
+    tree.Project('Average_rB0bar', f'abs({methodVariable})', f'abs({methodVariable})*(qrMC==-1)')
 
     # filling with abs(qr) in one of 7 bins
-    tree.Project('entries_per_bin', 'abs(' + method + '_qrCombined)', 'abs(qrMC) == 1')
-    tree.Project('entries_per_binB0', 'abs(' + method + '_qrCombined)', 'qrMC == 1')
-    tree.Project('entries_per_binB0bar', 'abs(' + method + '_qrCombined)', 'qrMC == -1')
+    tree.Project('entries_per_bin', f'abs({methodVariable})', 'abs(qrMC) == 1')
+    tree.Project('entries_per_binB0', f'abs({methodVariable})', 'qrMC == 1')
+    tree.Project('entries_per_binB0bar', f'abs({methodVariable})', 'qrMC == -1')
 
     # producing the average r histograms
     histo_avr_r.Divide(histo_entries_per_bin)
@@ -239,13 +242,13 @@ for method in methods:
 
     # Fit for calibration plot
     print(' ')
-    print('****************** CALIBRATION CHECK FOR COMBINER USING ' + method + ' ***************************************')
+    print('****************** CALIBRATION CHECK FOR COMBINER USING ' + methodName + ' ***************************************')
     print(' ')
     print('Fit polynomial of first order to the calibration plot. Expected value ~0.5')
     print(' ')
     histo_calib_B0.Fit(diag, 'TEST')
     print('       ')
-    print('****************** MEASURED EFFECTIVE EFFICIENCY FOR COMBINER USING ' + method + ' ***************************')
+    print('****************** MEASURED EFFECTIVE EFFICIENCY FOR COMBINER USING ' + methodName + ' ***************************')
     print('*                                                                                                  *')
     # get total number of entries
     total_entries = histo_entries_per_bin.GetEntries()
@@ -359,7 +362,7 @@ for method in methods:
     histo_belleplotB0bar.SetLineColor(ROOT.kRed)
     # SetLabelSize etc SetTitle
 
-    histo_belleplotB0.SetTitle('; #it{qr}_{' + method + '} ; Events  (Total = ' + f"{f'{total_entries:.0f}':<1}" + ')'
+    histo_belleplotB0.SetTitle('; #it{qr}_{' + methodName + '} ; Events  (Total = ' + f"{f'{total_entries:.0f}':<1}" + ')'
                                )
     histo_belleplotB0.SetMinimum(0)
     histo_belleplotB0.SetMaximum(YmaxForQrPlot)
@@ -391,7 +394,7 @@ for method in methods:
     Canvas1.Update()
 
     with Quiet(ROOT.kError):
-        Canvas1.SaveAs(workingDirectory + '/' + 'test6_CPVFTqr' + method + '_both.pdf')
+        Canvas1.SaveAs(workingDirectory + '/' + 'test6_CPVFTqr' + methodName + '_both.pdf')
 
     # Validation Plot 1
     histo_belleplotBoth.GetXaxis().SetLabelSize(0.04)
@@ -402,7 +405,7 @@ for method in methods:
     histo_belleplotBoth.GetYaxis().SetTitleSize(0.06)
 
     histo_belleplotBoth.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', 'nostats'))
-    histo_belleplotBoth.GetListOfFunctions().Add(ROOT.TNamed('Description', 'Output of the flavor tagger combiner ' + method))
+    histo_belleplotBoth.GetListOfFunctions().Add(ROOT.TNamed('Description', 'Output of the flavor tagger combiner ' + methodName))
     histo_belleplotBoth.GetListOfFunctions().Add(
         ROOT.TNamed(
             'Check',
@@ -411,9 +414,9 @@ for method in methods:
 
     histo_belleplotBoth.SetTitle(
         'Flavor tagger output for combiner ' +
-        method +
+        methodName +
         '; #it{qr}_{' +
-        method +
+        methodName +
         '} ; Events  (Total = ' +
         f"{f'{total_entries:.0f}':<1}" +
         ')')
@@ -428,9 +431,9 @@ for method in methods:
     histo_belleplotB0.SetLineColor(ROOT.kBlue + 2)
     histo_belleplotB0.SetTitle(
         'Flavor tagger output for combiner ' +
-        method +
+        methodName +
         ' for true B^{0}s; #it{qr}_{' +
-        method +
+        methodName +
         '} ; Events  (Total = ' +
         f"{f'{histo_belleplotB0.GetEntries():.0f}':<1}" +
         ')')
@@ -438,7 +441,7 @@ for method in methods:
 
     histo_belleplotB0.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', 'nostats'))
     histo_belleplotB0.GetListOfFunctions().Add(
-        ROOT.TNamed('Description', 'Output of the flavor tagger combiner ' + method + ' for true B0s'))
+        ROOT.TNamed('Description', 'Output of the flavor tagger combiner ' + methodName + ' for true B0s'))
     histo_belleplotB0.GetListOfFunctions().Add(
         ROOT.TNamed(
             'Check',
@@ -456,9 +459,9 @@ for method in methods:
     histo_belleplotB0bar.SetLineColor(ROOT.kBlue + 2)
     histo_belleplotB0bar.SetTitle(
         'Flavor tagger output for combiner ' +
-        method +
+        methodName +
         ' for true #bar{B}^{0}s; #it{qr}_{' +
-        method +
+        methodName +
         '} ; Events  (Total = ' +
         f"{f'{histo_belleplotB0bar.GetEntries():.0f}':<1}" +
         ')')
@@ -471,7 +474,7 @@ for method in methods:
         ROOT.TNamed(
             'Description',
             'Output of the flavor tagger combiner ' +
-            method +
+            methodName +
             ' for true B0bars'))
     histo_belleplotB0bar.GetListOfFunctions().Add(ROOT.TNamed(
         'Check', 'Shape should not change drastically. E.g. Warning if the peak at 0 increases or if the peak at -1 decreases.'))
@@ -498,7 +501,7 @@ for method in methods:
     histo_calib_B0.GetYaxis().SetTitleOffset(0.9)
     histo_calib_B0.SetLineColor(ROOT.kBlue)
 
-    histo_calib_B0.SetTitle('; #it{qr}_{' + method + '} ; Calibration '
+    histo_calib_B0.SetTitle('; #it{qr}_{' + methodName + '} ; Calibration '
                             )
     histo_calib_B0.Draw('hist')
     diag.Draw('SAME')
@@ -517,7 +520,7 @@ for method in methods:
 
     Canvas2.Update()
     with Quiet(ROOT.kError):
-        Canvas2.SaveAs(workingDirectory + '/' + 'test6_CPVFTCalibration_' + method + '_B0.pdf')
+        Canvas2.SaveAs(workingDirectory + '/' + 'test6_CPVFTCalibration_' + methodName + '_B0.pdf')
 
     # Validation Plot 4
 
@@ -525,7 +528,7 @@ for method in methods:
     histo_calib_B0.GetXaxis().SetTitleOffset(0.7)
     histo_calib_B0.SetLineColor(ROOT.kBlue + 2)
     histo_calib_B0.SetTitle('Calibration plot for the flavor tagger combiner ' +
-                            method + ' ; #it{qr}_{' + method + '} ; Calibration')
+                            methodName + ' ; #it{qr}_{' + methodName + '} ; Calibration')
     histo_calib_B0.SetMinimum(-0.2)
     histo_calib_B0.SetMaximum(+1.2)
     histo_calib_B0.SetStats(False)
@@ -535,7 +538,7 @@ for method in methods:
         ROOT.TNamed(
             'Description',
             'Calibration plot for the flavor tagger combiner ' +
-            method +
+            methodName +
             ' for true B0s'))
     histo_calib_B0.GetListOfFunctions().Add(
         ROOT.TNamed('Check', 'Shape should not change drastically. E.g. warning if the shape stops being linear.'))

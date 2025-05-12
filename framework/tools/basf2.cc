@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
     ("package_log_level", prog::value<vector<string> >(),
      "Set package log level. Can be specified multiple times to use more than one package. (Examples: 'klm:INFO or cdc:DEBUG:10') ")
     ("module_log_level", prog::value<vector<string> >(),
-     "Set module log level. Can be specified multiple times to use more than one package. (Examples: 'klm:INFO or cdc:DEBUG:10') ")
+     "Set module log level. Can be specified multiple times to use more than one package. (Examples: 'EventInfoSetter:INFO or CDCDigitizer:DEBUG:10') ")
     ("random-seed", prog::value<string>(),
      "Set the default initial seed for the random number generator. "
      "This does not take precedence over calls to set_random_seed() in the steering file, but just changes the default. "

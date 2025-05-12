@@ -9,7 +9,6 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
 #include <analysis/utility/EvtPDLUtil.h>
-#include <TDatabasePDG.h>
 
 #include <stdexcept>
 

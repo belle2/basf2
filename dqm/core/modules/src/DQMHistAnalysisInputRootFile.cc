@@ -12,7 +12,7 @@
 //-
 
 
-#include <dqm/analysis/modules/DQMHistAnalysisInputRootFile.h>
+#include <dqm/core/modules/DQMHistAnalysisInputRootFile.h>
 
 #include <TROOT.h>
 #include <TKey.h>

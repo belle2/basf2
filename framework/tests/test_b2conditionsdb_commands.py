@@ -52,7 +52,7 @@ if __name__ == '__main__':
             shlex.split(f'b2conditionsdb legacydownload -c main_tag_merge_test_3 {tmpdirname} --run-range 5 0 5 1000'),
             encoding='utf-8').strip().split('\n')
         for line in output:
-            print(line.replace(tmpdirname, "centraldb")[7:])
+            print(line.replace(tmpdirname, "centraldb")[7:].strip())
 
     call_command('b2conditionsdb iovs delete --dry-run main_tag_merge_test_2 --run-range 5 200 5 300')
     call_command('b2conditionsdb iovs delete --dry-run main_tag_merge_test_2 --run-range 5 200 5 300 --fully-contained')

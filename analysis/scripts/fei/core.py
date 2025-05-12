@@ -539,7 +539,7 @@ class PostReconstruction:
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
                     variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                    filename=config.removeJPsiSlash(filename),
+                    filename=filename,
                     ignoreCommandLineOverride=True,
                     directory=config.removeJPsiSlash(f'{particle.identifier}'),
                     path=path)
@@ -552,7 +552,7 @@ class PostReconstruction:
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
                     variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                    filename=config.removeJPsiSlash(filename),
+                    filename=filename,
                     ignoreCommandLineOverride=True,
                     directory=config.removeJPsiSlash(f'{particle.identifier}'),
                     path=path)
@@ -580,7 +580,7 @@ class PostReconstruction:
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
                     variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                    filename=config.removeJPsiSlash(filename),
+                    filename=filename,
                     ignoreCommandLineOverride=True,
                     directory=config.removeJPsiSlash(f'{particle.identifier}'),
                     path=path)
@@ -600,7 +600,7 @@ class PostReconstruction:
                     particle.identifier,
                     variables,
                     treename=config.removeJPsiSlash(f'{particle.identifier} variables'),
-                    filename=config.removeJPsiSlash(filename),
+                    filename=filename,
                     ignoreCommandLineOverride=True,
                     path=path)
         return path

@@ -27,7 +27,6 @@ if __name__ == "__main__":
             path = basf2.Path()
             for m, so in all_modules.items():
                 path.add_module(m)
-                print(f'Log level for module {m}:', basf2.logging.module(m).log_level)
 
             # And print the path: this automatically prints also the module parameters
             basf2.print_path(path)

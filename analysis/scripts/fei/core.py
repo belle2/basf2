@@ -250,7 +250,7 @@ class TrainingData:
                 if nSignal > Teacher.MaximumNumberOfMVASamples and not channel.preCutConfig.noSignalSampling:
                     inverseSamplingRates[1] = int(nSignal / Teacher.MaximumNumberOfMVASamples) + 1
 
-                spectators = [channel.mvaConfig.target] + channel.mvaConfig.spectators
+                spectators = [channel.mvaConfig.target] + channel.mvaConfig.spectators.keys()
                 if channel.mvaConfig.sPlotVariable is not None:
                     spectators.append(channel.mvaConfig.sPlotVariable)
 
@@ -587,13 +587,7 @@ class PostReconstruction:
 
                 variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
                              'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
-                variables += particle.mvaConfig.spectators
-
-                if 'B' in particle.name:
-                    if 'Mbc' not in variables:
-                        variables += ['Mbc']
-                    if 'B_s0' != particle.name and 'cosThetaBetweenParticleAndNominalB' not in variables:
-                        variables += ['cosThetaBetweenParticleAndNominalB']
+                variables += particle.mvaConfig.spectators.keys()
 
                 filename = os.path.join(self.config.monitoring_path, 'Monitor_Final.root')
                 ma.variablesToNtuple(
@@ -730,7 +724,7 @@ class Teacher:
                                 continue
                             variable_str = "' '".join(channel.mvaConfig.variables)
 
-                            spectators = channel.mvaConfig.spectators
+                            spectators = channel.mvaConfig.spectators.keys()
                             if channel.mvaConfig.sPlotVariable is not None:
                                 spectators.append(channel.mvaConfig.sPlotVariable)
                             spectators_str = "' '".join(spectators)

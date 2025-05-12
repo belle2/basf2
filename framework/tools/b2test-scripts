@@ -71,7 +71,7 @@ import xml.etree.ElementTree as ET
 from enum import Enum
 from typing import Dict, List, Tuple, Optional
 
-from b2test_utils import temporary_set_environment, is_ci
+from b2test_utils import temporary_environment, is_ci
 # allow stopping tests with Ctrl+c
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -719,7 +719,10 @@ if __name__ == "__main__":
     with tempfile.TemporaryDirectory() as prepare_path:
         os.chmod(prepare_path, 0o744)  # necessary for the buildbot
         # and temporary set the BELLE2_PREPARE_PATH variable
-        with temporary_set_environment(BELLE2_PREPARE_PATH=prepare_path):
+        with temporary_environment(
+                BELLE2_PREPARE_PATH=prepare_path,
+                OMP_NUM_THREADS='1'  # Limit the number of threads to 1
+        ):
 
             scheduler = TestScheduler(
                 xml_input_file=options.xml_input,

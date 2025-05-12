@@ -44,6 +44,7 @@
 
 #include <TDatabasePDG.h>
 #include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
 
 namespace Belle2 {
   namespace Variable {
@@ -1211,9 +1212,9 @@ namespace Belle2 {
 
           // Calculates the angle between the selected particles
           if (pDaus.size() == 2)
-            return B2Vector3D(pDaus[0].Vect()).Angle(B2Vector3D(pDaus[1].Vect()));
+            return ROOT::Math::VectorUtil::Angle(pDaus[0], pDaus[1]);
           else
-            return B2Vector3D(pDaus[2].Vect()).Angle(B2Vector3D(pDaus[0].Vect() + pDaus[1].Vect()));
+            return ROOT::Math::VectorUtil::Angle(pDaus[2], pDaus[0] + pDaus[1]);
         };
         return func;
       } else {
@@ -1237,7 +1238,7 @@ namespace Belle2 {
         if (grandDaughterIndex >= int(dau->getNDaughters()))
           return Const::doubleNaN;
 
-        B2Vector3D  boost = dau->get4Vector().BoostToCM();
+        ROOT::Math::XYZVector boost = dau->get4Vector().BoostToCM();
 
         ROOT::Math::PxPyPzEVector motherMomentum = - particle->get4Vector();
         motherMomentum = ROOT::Math::Boost(boost) * motherMomentum;
@@ -1245,7 +1246,7 @@ namespace Belle2 {
         ROOT::Math::PxPyPzEVector grandDaughterMomentum = dau->getDaughter(grandDaughterIndex)->get4Vector();
         grandDaughterMomentum = ROOT::Math::Boost(boost) * grandDaughterMomentum;
 
-        return B2Vector3D(motherMomentum.Vect()).Angle(B2Vector3D(grandDaughterMomentum.Vect()));
+        return ROOT::Math::VectorUtil::Angle(motherMomentum, grandDaughterMomentum);
 
       } else {
         B2FATAL("The variable grandDaughterDecayAngle needs exactly two integers as arguments!");
@@ -1293,9 +1294,9 @@ namespace Belle2 {
 
           // Calculates the angle between the selected particles
           if (pDaus.size() == 2)
-            return B2Vector3D(pDaus[0].Vect()).Angle(B2Vector3D(pDaus[1].Vect()));
+            return ROOT::Math::VectorUtil::Angle(pDaus[0], pDaus[1]);
           else
-            return B2Vector3D(pDaus[2].Vect()).Angle(B2Vector3D(pDaus[0].Vect() + pDaus[1].Vect()));
+            return ROOT::Math::VectorUtil::Angle(pDaus[2], pDaus[0] + pDaus[1]);
         };
         return func;
       } else {
@@ -1318,9 +1319,9 @@ namespace Belle2 {
             const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndexi))->getECLClusterEHypothesisBit();
             const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndexj))->getECLClusterEHypothesisBit();
             ClusterUtils clusutils;
-            B2Vector3D pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
-            B2Vector3D pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
-            return pi.Angle(pj);
+            ROOT::Math::PxPyPzEVector pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit));
+            ROOT::Math::PxPyPzEVector pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit));
+            return ROOT::Math::VectorUtil::Angle(pi, pj);
           }
           return Const::doubleNaN;
         }
@@ -1340,10 +1341,10 @@ namespace Belle2 {
             const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndices[1]))->getECLClusterEHypothesisBit();
             const ECLCluster::EHypothesisBit clusterkBit = (particle->getDaughter(daughterIndices[2]))->getECLClusterEHypothesisBit();
             ClusterUtils clusutils;
-            B2Vector3D pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
-            B2Vector3D pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
-            B2Vector3D pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk, clusterkBit)).Vect();
-            return pk.Angle(pi + pj);
+            ROOT::Math::PxPyPzEVector pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit));
+            ROOT::Math::PxPyPzEVector pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit));
+            ROOT::Math::PxPyPzEVector pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk, clusterkBit));
+            return ROOT::Math::VectorUtil::Angle(pk, pi + pj);
           }
           return Const::doubleNaN;
         }
@@ -2846,15 +2847,15 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
+        const auto p_this = frame.getMomentum(particle);
 
         // find the particle index with the smallest opening angle
         double minAngle = 2 * M_PI;
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
-          double angle = p_compare.Angle(p_this);
+          const auto p_compare = frame.getMomentum(compareme);
+          double angle = ROOT::Math::VectorUtil::Angle(p_compare, p_this);
           if (minAngle > angle) minAngle = angle;
         }
         return minAngle;
@@ -2881,7 +2882,7 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
+        const auto p_this = frame.getMomentum(particle);
 
         // find the particle index with the smallest opening angle
         double minAngle = 2 * M_PI;
@@ -2889,8 +2890,8 @@ namespace Belle2 {
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
-          double angle = p_compare.Angle(p_this);
+          const auto p_compare = frame.getMomentum(compareme);
+          double angle = ROOT::Math::VectorUtil::Angle(p_compare, p_this);
           if (minAngle > angle) {
             minAngle = angle;
             iClosest = i;
@@ -2934,7 +2935,7 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
+        const auto p_this = frame.getMomentum(particle);
 
         // find the most back-to-back (the largest opening angle before they
         // start getting smaller again!)
@@ -2942,8 +2943,8 @@ namespace Belle2 {
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
-          double angle = p_compare.Angle(p_this);
+          const auto p_compare = frame.getMomentum(compareme);
+          double angle = ROOT::Math::VectorUtil::Angle(p_compare, p_this);
           if (maxAngle < angle) maxAngle = angle;
         }
         return maxAngle;
@@ -3007,7 +3008,7 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
+        const auto p_this = frame.getMomentum(particle);
 
         // find the most back-to-back (the largest opening angle before they
         // start getting smaller again!)
@@ -3016,8 +3017,8 @@ namespace Belle2 {
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
-          double angle = p_compare.Angle(p_this);
+          const auto p_compare = frame.getMomentum(compareme);
+          double angle = ROOT::Math::VectorUtil::Angle(p_compare, p_this);
           if (maxAngle < angle) {
             maxAngle = angle;
             iMostB2B = i;
@@ -3057,10 +3058,10 @@ namespace Belle2 {
           double maxOpeningAngle = -1;
           for (int i = 0; i < nParticles; i++)
           {
-            B2Vector3D v1 = frame.getMomentum(listOfParticles->getParticle(i)).Vect();
+            ROOT::Math::PxPyPzEVector v1 = frame.getMomentum(listOfParticles->getParticle(i));
             for (int j = i + 1; j < nParticles; j++) {
-              B2Vector3D v2 = frame.getMomentum(listOfParticles->getParticle(j)).Vect();
-              const double angle = v1.Angle(v2);
+              ROOT::Math::PxPyPzEVector v2 = frame.getMomentum(listOfParticles->getParticle(j));
+              const double angle = ROOT::Math::VectorUtil::Angle(v1, v2);
               if (angle > maxOpeningAngle) maxOpeningAngle = angle;
             }
           }

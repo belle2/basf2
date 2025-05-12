@@ -103,7 +103,7 @@ double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
   unsigned short layer = wireID.getICLayer();
 
   //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
-  //Need to reverse calculate the relation between drift lenght and drift time.
+  //Need to reverse calculate the relation between drift length and drift time.
   //  double driftL = std::copysign(m_cdcp.getDriftLength(fabs(driftTime), layer, leftRight, alpha, theta), driftTime);
   //Note: The above treatment for negative drifttime is now done in m_cdcp.getDriftLength, so the line is commented out
   double driftL = m_cdcp.getDriftLength(driftTime, layer, leftRight, alpha, theta);
@@ -121,7 +121,7 @@ double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
 }
 
 
-/** this function returns the variance that is used as the CDC measurment resolution in track fitting */
+/** this function returns the variance that is used as the CDC measurement resolution in track fitting */
 
 double RealisticTDCCountTranslator::getDriftLengthResolution(double driftLength, const WireID&  wireID, bool leftRight, double z,
     double alpha, double theta)

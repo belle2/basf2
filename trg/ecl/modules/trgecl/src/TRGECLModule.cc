@@ -55,19 +55,19 @@ namespace Belle2 {
              _debugLevel);
     addParam("Bhabha",
              _Bhabha,
-             "TRGECL Bhabha method  0 : Belle I, 1 :belle II(defult)",
+             "TRGECL Bhabha method  0 : Belle I, 1 :belle II(default)",
              _Bhabha);
     addParam("Clustering",
              _Clustering,
-             "TRGECL Clustering method  0 : use only ICN, 1 : ICN + Energy(Defult)",
+             "TRGECL Clustering method  0 : use only ICN, 1 : ICN + Energy(Default)",
              _Clustering);
     addParam("ClusterLimit",
              _ClusterLimit,
-             "The Limit number of cluster (Defult:6)",
+             "The Limit number of cluster (Default:6)",
              _ClusterLimit);
     addParam("EventTiming",
              _EventTiming,
-             "TRGECL EventTiming method  0 : Belle I, 1 : Energetic TC, 2 : Energy Weighted timing (defult)",
+             "TRGECL EventTiming method  0 : Belle I, 1 : Energetic TC, 2 : Energy Weighted timing (default)",
              _EventTiming);
     addParam("NofTopTC",
              _NofTopTC,
@@ -87,7 +87,7 @@ namespace Belle2 {
              _SelectEvent);
     addParam("ConditionDB",
              _ConditionDB,
-             "Flag to use Condition Database(Defult 0)",
+             "Flag to use Condition Database(Default 0)",
              _ConditionDB);
     addParam("3DBhabhaVetoInTrackThetaRegion",
              m_3DBhabhaVetoInTrackThetaRegion,

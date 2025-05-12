@@ -184,7 +184,7 @@ namespace Belle2 {
       s.name("ClockCounterBit" + TRGUtilities::itostring(i));
       (* _clockCounter) += s;
 
-      //...Double cicle...
+      //...Double cycle...
       cicle *= 2;
     }
 

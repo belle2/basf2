@@ -755,7 +755,7 @@ namespace Belle2 {
             if (wireHit) {
               // Only check first change. This could become a bug.
               wireTime[iWire] = wire->signal().stateChanges()[0];
-              //cout<<ts.wires()[iWire]->name()<<" Clock: "<< ts.wires()[iWire]->signal().clock().frequency()<<" Drift lenght: "<<wireHit->drift()<<" Drift time: "<<ts.wires()[iWire]->signal().stateChanges()[0]<<endl;
+              //cout<<ts.wires()[iWire]->name()<<" Clock: "<< ts.wires()[iWire]->signal().clock().frequency()<<" Drift length: "<<wireHit->drift()<<" Drift time: "<<ts.wires()[iWire]->signal().stateChanges()[0]<<endl;
             } else
               wireTime[iWire] = 9999;
             //cout<<" "<<wire->name();
@@ -782,7 +782,7 @@ namespace Belle2 {
               if (wireHit) {
                 // Only check first change. This could become a bug.
                 wireTime.push_back(wire->signal().stateChanges()[0]);
-                //cout<<ts.wires()[iWire]->name()<<" Clock: "<< ts.wires()[iWire]->signal().clock().frequency()<<" Drift lenght: "<<wireHit->drift()<<" Drift time: "<<ts.wires()[iWire]->signal().stateChanges()[0]<<endl;
+                //cout<<ts.wires()[iWire]->name()<<" Clock: "<< ts.wires()[iWire]->signal().clock().frequency()<<" Drift length: "<<wireHit->drift()<<" Drift time: "<<ts.wires()[iWire]->signal().stateChanges()[0]<<endl;
               } else
                 wireTime.push_back(9999);
             } // Loop over all extra wires
@@ -798,7 +798,7 @@ namespace Belle2 {
               if (wireHit) {
                 // Only check first change. This could become a bug.
                 wireTime.push_back(wire->signal().stateChanges()[0]);
-                //cout<<ts.wires()[iWire]->name()<<" Clock: "<< ts.wires()[iWire]->signal().clock().frequency()<<" Drift lenght: "<<wireHit->drift()<<" Drift time: "<<ts.wires()[iWire]->signal().stateChanges()[0]<<endl;
+                //cout<<ts.wires()[iWire]->name()<<" Clock: "<< ts.wires()[iWire]->signal().clock().frequency()<<" Drift length: "<<wireHit->drift()<<" Drift time: "<<ts.wires()[iWire]->signal().stateChanges()[0]<<endl;
               } else
                 wireTime.push_back(9999);
             } // Loop over all extra wires
@@ -2991,7 +2991,7 @@ namespace Belle2 {
             if (TRGDebug::level()) {
               if (((lut == 1) || (lut == 2)) && (stateHitPos == 0))
                 cout << TRGDebug::tab()
-                     << "!!! state machines incosistent" << endl;
+                     << "!!! state machines inconsistent" << endl;
             }
           }
         }

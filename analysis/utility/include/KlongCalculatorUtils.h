@@ -17,6 +17,7 @@
 // ROOT
 #include <Math/Vector4D.h>
 
+#include <cmath>
 #include <vector>
 
 namespace Belle2 {
@@ -105,12 +106,12 @@ namespace Belle2 {
 
       missDaughters.SetE(std::sqrt(m_k2 + missDaughters.P2()));
 
-      if (isnan(missDaughters.P()))
+      if (std::isnan(missDaughters.P()))
         return false;
 
       ROOT::Math::PxPyPzEVector mom = pDaughters + missDaughters;
       mom.SetE(std::sqrt(m_b * m_b + mom.P2()));
-      if (isnan(mom.P()))
+      if (std::isnan(mom.P()))
         return false;
 
       KMomentum = missDaughters;

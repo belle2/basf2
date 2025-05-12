@@ -25,6 +25,8 @@
 
 #include <TH1F.h>
 
+#include <cmath>
+
 //using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -45,7 +47,7 @@ CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationColl
            true);
   addParam("storeTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", false);
   addParam("eventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", true);
-  addParam("minimumPt", m_minimumPt, "Tracks with tranverse momentum smaller than this value will not used", 0.15);
+  addParam("minimumPt", m_minimumPt, "Tracks with transverse momentum smaller than this value will not used", 0.15);
   addParam("minimumNDF", m_minimumNDF, "Discard tracks whose degree-of-freedom below this value", 5.);
   addParam("isCosmic", m_isCosmic, "True when we process cosmic events, else False (collision)", m_isCosmic);
   addParam("effStudy", m_effStudy, "When true module collects info only  necessary for wire eff study", false);
@@ -157,7 +159,7 @@ void CDCCalibrationCollectorModule::collect()
     if (!fitresult) continue;
 
     short charge = fitresult->getChargeSign();
-    if (fabs(charge) > 0) {
+    if (std::abs(charge) > 0) {
       nCTracks++;
     }
   }
@@ -271,7 +273,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
         else lr = 0;
 
         //Convert to outgoing
-        if (fabs(alpha) > M_PI / 2) {
+        if (std::abs(alpha) > M_PI / 2) {
           x_b *= -1;
           x_u *= -1;
         }
@@ -281,7 +283,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
         alpha = cdcgeo.getOutgoingAlpha(alpha);
 
         B2DEBUG(99, "x_unbiased " << x_u << " |left_right " << lr);
-        if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(abs(x_u), lay, lr, alpha, theta);}
+        if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha, theta);}
         alpha *= 180 / M_PI;
         theta *= 180 / M_PI;
         //estimate drift time

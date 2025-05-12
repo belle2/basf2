@@ -18,7 +18,7 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
     This function adds the CDC trigger modules to a path.
     @path              modules are added to this path
     @SimulationMode    the simulation mode in TSIM, 1: fast simulation,
-                       trigger algoritm simulation only, no firmware simulation
+                       trigger algorithm simulation only, no firmware simulation
                        2: full simulation, both trigger algorithm and firmware
                        are simulated
     @shortTracks       the standard track finding requires hits in 4 axial super layers.

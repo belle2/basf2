@@ -53,9 +53,10 @@ def charmFlavorTagger(particle_list, uniqueIdentifier='CFT_ragdoll',
         "deltaPhi",
         f"conditionalVariableSelector(deltaPhi_temp>{math.pi},formula(deltaPhi_temp-2*{math.pi}),deltaPhi_temp)")
     va.variables.addAlias("deltaR", "formula(((deltaPhi)**2+(eta-eta_sig)**2)**0.5)")
+    va.variables.addAlias("PID_diff", "formula(pionID-kaonID)")
 
     # split tracks by charge, rank them (keep only the three highest ranking) and write CFT input to extraInfo of signal particle
-    var_list = ['mRecoil', 'pionID', 'kaonID', 'muonID', 'electronID', 'protonID', 'deltaR', 'dr', 'dz']
+    var_list = ['mRecoil', 'PID_diff', 'pionID', 'kaonID', 'muonID', 'electronID', 'protonID', 'deltaR', 'dr', 'dz']
     cft_particle_dict = {'pi+:pos_charge': ['charge > 0 and p < infinity', 'p'],
                          'pi+:neg_charge': ['charge < 0 and p < infinity', 'n']}
 

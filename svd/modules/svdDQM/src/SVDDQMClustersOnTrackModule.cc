@@ -79,9 +79,15 @@ SVDDQMClustersOnTrackModule::~SVDDQMClustersOnTrackModule()
 void SVDDQMClustersOnTrackModule::defineHisto()
 {
 
-  // for test
-  m_addSensorLabel.push_back("L4.1.1");
-  m_addSensorLabel.push_back("L5.2.1");
+  if (!m_svdPlotsConfig.isValid())
+    B2FATAL("no valid configuration found for SVD reconstruction");
+  else
+    B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
+
+  m_3Samples = m_svdPlotsConfig->is3SampleEnable();
+
+  //
+  m_addSensorLabel = m_svdPlotsConfig->getListOfSensors();
 
   if (m_addSensorLabel.size() != 0)
     m_addSensorPlots = true;
@@ -343,7 +349,7 @@ void SVDDQMClustersOnTrackModule::defineHisto()
       int iSensor = id.getSensorNumber();
       VxdID sensorID(iLayer, iLadder, iSensor);
       string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
-      string sensorId = str(format("L%1%.%2%.%3%") % iLayer % iLadder % iSensor);
+      string sensorId = str(format("%1%.%2%.%3%") % iLayer % iLadder % iSensor);
 
       auto it = find(m_addSensorLabel.begin(), m_addSensorLabel.end(), sensorId);
       if (it == m_addSensorLabel.end()) continue;
@@ -502,7 +508,7 @@ void SVDDQMClustersOnTrackModule::event()
       int iSensor = svdCluster.getSensorID().getSensorNumber();
 
       if (m_addSensorPlots) {
-        string sensorId = str(format("L%1%.%2%.%3%") % iLayer % iLadder % iSensor);
+        string sensorId = str(format("%1%.%2%.%3%") % iLayer % iLadder % iSensor);
 
         auto it = find(m_addSensorLabel.begin(), m_addSensorLabel.end(), sensorId);
         if (it != m_addSensorLabel.end()) {

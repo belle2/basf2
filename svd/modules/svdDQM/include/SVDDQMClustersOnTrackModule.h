@@ -15,6 +15,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <svd/dataobjects/SVDEventInfo.h>
+#include <svd/dbobjects/SVDDQMPlotsConfiguration.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventT0.h>
 #include "TList.h"
 #include "TH1F.h"
@@ -66,6 +68,7 @@ namespace Belle2 {
     std::string m_svdEventInfoName;   /**< SVDEventInfo data object  name*/
     StoreObjPtr<SVDEventInfo> m_svdEventInfo;  /**< SVDEventInfo data object */
     StoreObjPtr<EventT0> m_eventT0;  /**< EventT0 data object */
+    DBObjPtr<SVDDQMPlotsConfiguration> m_svdPlotsConfig; /**< SVD DQM plots configuration */
 
     /** StoreArray of the Tracks*/
     StoreArray<Track> m_tracks;
@@ -113,11 +116,6 @@ namespace Belle2 {
     /** SNR of clusters related to tracks  per ladder */
     TH1F** m_clsTrkSNR = nullptr;
 
-    /** charge of clusters related to tracks per layer 3 */
-    TH1F** m_clsTrkChargeL3 = nullptr;
-
-    /** SNR of clusters related to tracks  per layer 3 */
-    TH1F** m_clsTrkSNRL3 = nullptr;
 
     /** u charge of clusters related to tracks for layer 3 sensors */
     TH1F* m_clsTrkChargeU3 = nullptr;

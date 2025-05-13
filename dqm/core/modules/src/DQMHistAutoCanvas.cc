@@ -10,7 +10,7 @@
 // Description : This module auto-plots each histogram in its canvas
 //-
 
-#include <dqm/analysis/modules/DQMHistAutoCanvas.h>
+#include <dqm/core/modules/DQMHistAutoCanvas.h>
 #include <TStyle.h>
 #include <fstream>
 

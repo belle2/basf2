@@ -742,38 +742,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     }
   }
 
-  for (int ladder = 1; ladder <= 2; ++ladder) {
-    for (int sensor = 1; sensor <= 2; ++sensor) {
-
-      TString  name = Form("SVDClsTrk/SVDTRK_ClusterCharge_L3.%d.%d", ladder, sensor);
-      TString  title =  Form("MPVClusterCharge_L3.%d.%d", ladder, sensor);
-      float MPVClusterCharge = nan;
-      TH1F* h_clusterCharge = (TH1F*)findHist(name.Data());
-      if (h_clusterCharge)
-        if (h_clusterCharge->GetEntries() != 0)
-          MPVClusterCharge = xForMaxY(h_clusterCharge);
-
-      if (h_clusterCharge == NULL) {
-        B2INFO("Histograms needed for cluster charge not found");
-      } else {
-        m_monObj->setVariable(title.Data(), MPVClusterCharge);
-      }
-
-      name = Form("SVDClsTrk/SVDTRK_ClusterSNR_L3.%d.%d", ladder, sensor);
-      title = Form("MPVClusterSNR_L3.%d.%d", ladder, sensor);
-      TH1F* h_clusterSNR = (TH1F*)findHist(name.Data());
-      float MPVClusterSNR = nan;
-      if (h_clusterSNR)
-        if (h_clusterSNR->GetEntries() != 0)
-          MPVClusterSNR = xForMaxY(h_clusterSNR);
-
-      if (h_clusterSNR == NULL) {
-        B2INFO("Histograms needed for cluster SNR not found");
-      } else {
-        m_monObj->setVariable(title.Data(), MPVClusterSNR);
-      }
-    }
-  }
 
   B2INFO("DQMHistAnalysisSVDGeneral: endRun called");
 }

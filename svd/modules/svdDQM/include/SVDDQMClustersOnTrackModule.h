@@ -56,6 +56,10 @@ namespace Belle2 {
     /** if true enable 3 samples histograms analysis */
     bool m_3Samples = false;
 
+
+    /** if additional histograms (Charge, SNR, time) for a given list of sensors */
+    bool  m_addSensorPlots = false;
+
     std::string m_svdShaperDigitsName;   /**< SVDShaperDigits data object  name*/
     std::string m_svdRecoDigitsName;   /**< SVDRecoDigits data object  name*/
     std::string m_svdClustersName;   /**< SVDClusters data object  name*/
@@ -74,6 +78,8 @@ namespace Belle2 {
 
     int m_tb = -1; /**< choose one trigger bin, or none if the value is -1*/
 
+    const int m_maxSensorHisto = 5;  /**< maximum number of sensors for additional histogram,  the default value is 5*/
+
     /** list of cumulative histograms */
     TList* m_histoList = nullptr;
 
@@ -84,6 +90,22 @@ namespace Belle2 {
 
     /** Name of the histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
+
+
+    /** u charge of clusters */
+    TH1F** m_clustrkChargeU = nullptr;
+    /** v charge of clusters */
+    TH1F** m_clustrkChargeV = nullptr;
+
+    /** u SNR of clusters per sensor */
+    TH1F** m_clustrkSNRU = nullptr;
+    /** v SNR of clusters per sensor */
+    TH1F** m_clustrkSNRV = nullptr;
+
+    /** u time */
+    TH1F** m_clustrkTimeU = nullptr;
+    /** v time */
+    TH1F** m_clustrkTimeV = nullptr;
 
     /** charge of clusters related to tracks per ladder */
     TH1F** m_clsTrkCharge = nullptr;
@@ -156,6 +178,10 @@ namespace Belle2 {
 
     /** map of ladder index*/
     std::map<std::pair<int, int>, int> m_ladderMap;
+
+    /** vector of sensor label for additional histogram (Charge, SNR, time; U/V) */
+    std::vector<std::string> m_addSensorLabel;
+
 
   };
 

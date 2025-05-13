@@ -102,13 +102,7 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             'dz',
             'dr',
             'chiProb',
-            'BtagToWBosonVariables(EW90)',
-            'BtagToWBosonVariables(recoilMassSqrd)/15',
-            'BtagToWBosonVariables(pMissCMS)',
-            'BtagToWBosonVariables(cosThetaMissCMS)',
-            'cosTPTO('+maskName+')',
-            'clusterEoP',
-            'clusterLAT']
+            'cosTPTO('+maskName+')']
 
         ecl_variable_list = [
             'useCMSFrame(p)',

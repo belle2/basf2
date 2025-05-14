@@ -87,9 +87,9 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     const bool isVirtual  = (status == 4)  || (status == 21) || (status == 22) || (status == 23)
                             //41 through 44 appear for beam particles when there is an ISR photon involved, which would have been originally status numbers 21/22/23 without the ISR photon
                             || (status == 41) || (status == 42) || (status == 43) || (status == 44)
-                            //51 through 73 are numbers which come up for dark mediators (dark gluon, dark Z) which are virtual
+                            //51 through 73 are numbers which come up for outgoing mediators and particles which are virtual
                             || (status == 51) || (status == 52) || (status == 71) || (status == 73)
-                            //83 through 91 are numbers which appear for intermediate virtual dark particles such as dark rhos and dark pions, as well as intermediate SM particles before the final state
+                            //83 through 91 are numbers which appear for intermediate outgoing particles and their decay particles, but are not the final state
                             || (status == 83) || (status == 84)
                             || (status == 91); //hepmc internal status flags. 4 are beam particles, rest could be refined if needed
     const int pdg_code = (*read_particle)->pdg_id() ;
@@ -117,7 +117,9 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
       p.setValidVertex(true);
     }
 
-    if ((status == 21) || (status == 41) || (status == 42))  {      //removes massless beam particles carried over from MadGraph
+    if ((status == 21) || (status == 41)
+        || (status ==
+            42))  {      //removes massless beam particles carried over from MadGraph (41 and 42 are equivalent to 21 but for when there's an ISR photon)
       p.setIgnore(true);    //they are just used for internal bookkeeping and serve no other purpose
     }
 

@@ -352,6 +352,9 @@ def is_still_training(args):
 
 
 if __name__ == '__main__':
+    pid = os.getpid()
+    print(f'FEI training nohup job ID: {pid}', flush=True)
+
     args = getCommandLineOptions()
 
     os.chdir(args.directory)

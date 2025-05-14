@@ -10,7 +10,7 @@
 #include <tracking/trackFitting/measurementCreator/adder/MeasurementAdder.h>
 #include <framework/gearbox/Const.h>
 #include <framework/core/Environment.h>
-#include <tracking/dbobjects/DAFparameters.h>
+#include <tracking/dbobjects/DAFParameters.h>
 #include <tracking/dbobjects/DAFConfiguration.h>
 
 #include <TError.h>
@@ -184,15 +184,15 @@ namespace Belle2 {
 
     /**
     * Use the user settings of the fitter to fit the reco tracks.
-    * The parameters are passed as DAFparameters object.
+    * The parameters are passed as DAFParameters object.
     */
-    void resetFitterToUserSettings(DAFparameters* DAFparams);
+    void resetFitterToUserSettings(DAFParameters* DAFParams);
 
     /**
      * Use the settings of the fitter to fit the reco tracks for cosmics data.
      * This method is called on construction automatically
      * for cosmics data (checked by using Environment object).
-     * The cosmics parameters are the initial ones of the DAFparameters constructor.
+     * The cosmics parameters are the initial ones of the DAFParameters constructor.
      */
     void resetFitterToCosmicsSettings();
 

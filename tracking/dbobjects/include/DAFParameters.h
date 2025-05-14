@@ -14,14 +14,14 @@ namespace Belle2 {
 
   /** The payload containing the DAF parameters.
    */
-  class DAFparameters: public TObject {
+  class DAFParameters: public TObject {
 
   public:
 
     /** Default constructor */
-    DAFparameters() {}
+    DAFParameters() {}
     /** Destructor */
-    ~DAFparameters() {}
+    ~DAFParameters() {}
 
     /** Set the DeltaPValue for p-value convergence criterion
      * @param pvalue Delta pvalue for convergence; [0,1]
@@ -180,6 +180,6 @@ namespace Belle2 {
     /** The minimum allowed pValue for the convergence criterion */
     float m_MinimumPValue = 0.;
 
-    ClassDef(DAFparameters, 2);  /**< ClassDef, necessary for ROOT */
+    ClassDef(DAFParameters, 1);  /**< ClassDef, necessary for ROOT */
   };
 }

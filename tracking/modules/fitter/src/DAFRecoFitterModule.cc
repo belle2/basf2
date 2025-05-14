@@ -8,7 +8,7 @@
 
 #include <tracking/modules/fitter/DAFRecoFitterModule.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
-#include <tracking/dbobjects/DAFparameters.h>
+#include <tracking/dbobjects/DAFParameters.h>
 
 using namespace Belle2;
 
@@ -34,27 +34,27 @@ std::shared_ptr<genfit::AbsFitter> DAFRecoFitterModule::createFitter() const
   // The DAFRecoFitterModule uses the default DAF parameters
   DAFConfiguration::ETrackFitType trackFitType = DAFConfiguration::c_Default;
 
-  DAFparameters* DAFparams = m_DAFConfiguration->getDAFparameters(trackFitType);
-  if (!DAFparams)
+  DAFParameters* DAFParams = m_DAFConfiguration->getDAFParameters(trackFitType);
+  if (!DAFParams)
     B2FATAL("DAF parameters for " << trackFitType << " is not available.");
 
-  if (static_cast<float>(m_param_probabilityCut) != DAFparams->getProbabilityCut()) {
+  if (static_cast<float>(m_param_probabilityCut) != DAFParams->getProbabilityCut()) {
     if (not m_changedParametersMessageWasShown) {
       // Only show this warning the first time a DAF instance is created to avoid spamming logs. Otherwise this warning is shown each event at least once in case of non-default DAF settings / DAF setting not from DB
       B2WARNING("DAF was called with a different probability cut than the database one (new: " << m_param_probabilityCut << " ; DB: " <<
-                DAFparams->getProbabilityCut() << " ). This new value will be used, the other parameters are read from the database");
+                DAFParams->getProbabilityCut() << " ). This new value will be used, the other parameters are read from the database");
       m_changedParametersMessageWasShown = true;
     }
-    std::shared_ptr<genfit::DAF> fitter = std::make_shared<genfit::DAF>(DAFparams->getAnnealingScheme(),
-                                          DAFparams->getMinimumIterations(),
-                                          DAFparams->getMaximumIterations(),
-                                          DAFparams->getMinimumIterationsForPVal(),
+    std::shared_ptr<genfit::DAF> fitter = std::make_shared<genfit::DAF>(DAFParams->getAnnealingScheme(),
+                                          DAFParams->getMinimumIterations(),
+                                          DAFParams->getMaximumIterations(),
+                                          DAFParams->getMinimumIterationsForPVal(),
                                           true,
-                                          DAFparams->getDeltaPValue(),
-                                          DAFparams->getDeltaWeight(),
+                                          DAFParams->getDeltaPValue(),
+                                          DAFParams->getDeltaWeight(),
                                           m_param_probabilityCut);
-    // DAFparams->getMinimumPValue()); // waiting for genfit merge
-    fitter->setMaxFailedHits(DAFparams->getMaximumFailedHits());
+    // DAFParams->getMinimumPValue()); // waiting for genfit merge
+    fitter->setMaxFailedHits(DAFParams->getMaximumFailedHits());
 
     return fitter;
   } else {

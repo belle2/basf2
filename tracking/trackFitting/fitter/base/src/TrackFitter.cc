@@ -140,38 +140,38 @@ void TrackFitter::resetFitterToDBSettings(const DAFConfiguration::ETrackFitType 
   if (!m_DAFConfiguration.isValid())
     B2FATAL("DAF Configuration is not available.");
 
-  DAFparameters* DAFparams = m_DAFConfiguration->getDAFparameters(trackFitType);
-  if (!DAFparams)
+  DAFParameters* DAFParams = m_DAFConfiguration->getDAFParameters(trackFitType);
+  if (!DAFParams)
     B2FATAL("DAF parameters for " << trackFitType << " is not available.");
 
-  genfit::DAF* dafFitter = new genfit::DAF(DAFparams->getAnnealingScheme(),
-                                           DAFparams->getMinimumIterations(),
-                                           DAFparams->getMaximumIterations(),
-                                           DAFparams->getMinimumIterationsForPVal(),
+  genfit::DAF* dafFitter = new genfit::DAF(DAFParams->getAnnealingScheme(),
+                                           DAFParams->getMinimumIterations(),
+                                           DAFParams->getMaximumIterations(),
+                                           DAFParams->getMinimumIterationsForPVal(),
                                            true,
-                                           DAFparams->getDeltaPValue(),
-                                           DAFparams->getDeltaWeight(),
-                                           DAFparams->getProbabilityCut());
-  //             DAFparams->getMinimumPValue()); // waiting for genfit merge
-  dafFitter->setMaxFailedHits(DAFparams->getMaximumFailedHits());
+                                           DAFParams->getDeltaPValue(),
+                                           DAFParams->getDeltaWeight(),
+                                           DAFParams->getProbabilityCut());
+  //             DAFParams->getMinimumPValue()); // waiting for genfit merge
+  dafFitter->setMaxFailedHits(DAFParams->getMaximumFailedHits());
   m_fitter.reset(dafFitter);
   m_skipDirtyCheck = false;
 }
 
-void TrackFitter::resetFitterToUserSettings(DAFparameters* DAFparams)
+void TrackFitter::resetFitterToUserSettings(DAFParameters* DAFParams)
 {
-  if (DAFparams == nullptr)
+  if (DAFParams == nullptr)
     B2FATAL("DAF parameters are not available.");
-  genfit::DAF* dafFitter = new genfit::DAF(DAFparams->getAnnealingScheme(),
-                                           DAFparams->getMinimumIterations(),
-                                           DAFparams->getMaximumIterations(),
-                                           DAFparams->getMinimumIterationsForPVal(),
+  genfit::DAF* dafFitter = new genfit::DAF(DAFParams->getAnnealingScheme(),
+                                           DAFParams->getMinimumIterations(),
+                                           DAFParams->getMaximumIterations(),
+                                           DAFParams->getMinimumIterationsForPVal(),
                                            true,
-                                           DAFparams->getDeltaPValue(),
-                                           DAFparams->getDeltaWeight(),
-                                           DAFparams->getProbabilityCut());
-  //                                       DAFparams->getMinimumPValue()); // waiting for genfit merge
-  dafFitter->setMaxFailedHits(DAFparams->getMaximumFailedHits());
+                                           DAFParams->getDeltaPValue(),
+                                           DAFParams->getDeltaWeight(),
+                                           DAFParams->getProbabilityCut());
+  //                                       DAFParams->getMinimumPValue()); // waiting for genfit merge
+  dafFitter->setMaxFailedHits(DAFParams->getMaximumFailedHits());
   m_fitter.reset(dafFitter);
   m_skipDirtyCheck = false;
 }

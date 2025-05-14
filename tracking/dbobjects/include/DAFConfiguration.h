@@ -10,11 +10,11 @@
 #include <TObject.h>
 #include <map>
 
-#include <tracking/dbobjects/DAFparameters.h>
+#include <tracking/dbobjects/DAFParameters.h>
 
 namespace Belle2 {
 
-  /** The payload containing all the DAFparameters configuration,
+  /** The payload containing all the DAFParameters configuration,
    * one for each different track fit option
    */
   class DAFConfiguration: public TObject {
@@ -44,12 +44,12 @@ namespace Belle2 {
     //   m_ProbabilityCut = probabilitycut;
     // }
 
-    /** Get the DAFparameters for the specific track fit type
+    /** Get the DAFParameters for the specific track fit type
      */
-    DAFparameters* getDAFparameters(DAFConfiguration::ETrackFitType trackFitType) const
+    DAFParameters* getDAFParameters(DAFConfiguration::ETrackFitType trackFitType) const
     {
-      std::map<DAFConfiguration::ETrackFitType, DAFparameters*>::const_iterator it = m_DAFparameters.find(trackFitType);
-      if (it != m_DAFparameters.end()) {
+      std::map<DAFConfiguration::ETrackFitType, DAFParameters*>::const_iterator it = m_DAFParameters.find(trackFitType);
+      if (it != m_DAFParameters.end()) {
         return it->second;
       } else {
         B2FATAL("Track Fit option " << trackFitType << " not found");
@@ -58,7 +58,7 @@ namespace Belle2 {
 
   private:
     /** The minimum allowed pValue for the convergence criterion */
-    std::map<DAFConfiguration::ETrackFitType, DAFparameters*> m_DAFparameters;
+    std::map<DAFConfiguration::ETrackFitType, DAFParameters*> m_DAFParameters;
 
     ClassDef(DAFConfiguration, 1);  /**< ClassDef, necessary for ROOT */
   };

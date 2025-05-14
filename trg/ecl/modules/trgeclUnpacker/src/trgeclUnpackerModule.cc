@@ -761,6 +761,7 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
       for (int i_tc = 0; i_tc < tot_ntc; i_tc++) {
         if (cl_tcid == tc_info[i_tc][0]) {
           cl_timing = tc_info[i_tc][1];
+          break;
         }
       }
       m_TRGECLClusterArray[m_clNum]->setTimeAve(cl_timing);
@@ -1526,6 +1527,7 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
       for (int i_tc = 0; i_tc < tot_ntc; i_tc++) {
         if (cl_tcid == tc_info[i_tc][0]) {
           cl_timing = tc_info[i_tc][1];
+          break;
         }
       }
       m_TRGECLClusterArray[m_clNum]->setTimeAve(cl_timing);

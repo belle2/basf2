@@ -26,12 +26,9 @@ namespace Belle2 {
      * ( or cosmic)
      */
     enum ETrackFitType {
-      c_Default,
-      c_CDConly,
-      c_Cosmics,
-      c_Custom1,
-      c_Custom2,
-      c_Custom3
+      c_Default = 0,     /**< default configuration */
+      c_Cosmics = 1,     /**< configuration for cosmics data reconstruction */
+      c_CDConly = 2      /**< configuration for the CDC-only track fitting */
     };
 
     /** Default constructor */

@@ -84,6 +84,7 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 
     const int status = (*read_particle)->status();
     const bool isFinalstate =  !decay_vertex && status == 1;
+    //the status numbers can be read in more detail here: https://pythia.org/latest-manual/ParticleProperties.html
     const bool isVirtual  = (status == 4)  || (status == 21) || (status == 22) || (status == 23)
                             //41 through 44 appear for beam particles when there is an ISR photon involved, which would have been originally status numbers 21/22/23 without the ISR photon
                             || (status == 41) || (status == 42) || (status == 43) || (status == 44)

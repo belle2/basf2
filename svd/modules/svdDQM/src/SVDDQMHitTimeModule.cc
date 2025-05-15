@@ -40,11 +40,11 @@ void SVDDQMHitTimeModule::defineHisto()
 {
 
   if (!m_svdPlotsConfig.isValid())
-    B2FATAL("no valid configuration found for SVD reconstruction");
-  else
+    B2ERROR("no valid configuration found for SVD reconstruction");
+  else {
     B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
-
-  m_3Samples = m_svdPlotsConfig->is3SampleEnable();
+    m_3Samples = m_svdPlotsConfig->is3SampleEnable();
+  }
 
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();

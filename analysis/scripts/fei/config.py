@@ -47,7 +47,7 @@ FeiConfiguration.legacy.__doc__ = "Pass the summary file of a legacy FEI trainin
                                   " and the algorithm will be able to apply this training."
 FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, b2mva-kekcc-cluster-teacher"
 FeiConfiguration.training.__doc__ = "If you train the FEI set this to True, otherwise to False"
-FeiConfiguration.monitoring_path.__doc__ = "Path were monitoring histograms are stored."
+FeiConfiguration.monitoring_path.__doc__ = "Path where monitoring histograms are stored."
 
 
 MVAConfiguration = collections.namedtuple('MVAConfiguration', 'method, config, variables, target, sPlotVariable')
@@ -76,7 +76,9 @@ PreCutConfiguration.noBackgroundSampling.__doc__ = "For very pure channels, the 
 PreCutConfiguration.bestCandidateVariable.__doc__ = "Variable from the VariableManager which is used to rank all candidates."
 PreCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to keep after the best-candidate ranking."
 PreCutConfiguration.bestCandidateMode.__doc__ = "Either lowest or highest."
-PreCutConfiguration.noSignalSampling.__doc__ = "For channels with unknown br. frac. it is better to keep all signal candidates."
+PreCutConfiguration.noSignalSampling.__doc__ = "For channels with unknown br. frac., the signal sampling factor can be" \
+                                               " overestimated and you loose signal samples in the training." \
+                                               " This disables signal sampling."
 PreCutConfiguration.bkgSamplingFactor.__doc__ = "Add additional multiplicative bkg. sampling factor, less than 1.0 to reduce."
 
 PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value, bestCandidateCut')

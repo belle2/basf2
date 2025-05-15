@@ -29,7 +29,7 @@ namespace Belle2 {
      * Returns sensor list
      * @return  sensor list
      **/
-    std::vector<std::string> getListOfSensors() { return m_svdListOfSensors; }
+    std::vector<std::string> getListOfSensors() const { return m_svdListOfSensors; }
 
     /**
      * Add sensor to list
@@ -41,7 +41,7 @@ namespace Belle2 {
      * Returns 3samples flag
      * @return  3sample flag
      **/
-    bool  is3SampleEnable() { return m_3Samples; }
+    bool  is3SampleEnable() const { return m_3Samples; }
 
     /**
      * Enables 3sample flag

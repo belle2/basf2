@@ -58,7 +58,7 @@ namespace Belle2 {
 
     /** Trigger Summary data object */
     StoreObjPtr<TRGSummary> m_objTrgSummary;
-    /**< SVD DQM plots configuration */
+    /** SVD DQM plots configuration */
     DBObjPtr<SVDDQMPlotsConfiguration> m_svdPlotsConfig;
 
     StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */

@@ -261,7 +261,7 @@ class TrainingData:
                     hist_filename = os.path.join(self.config.monitoring_path, 'Monitor_TrainingData.root')
                     ma.variablesToHistogram(channel.name, variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=config.removeJPsiSlash(hist_filename),
+                                            filename=hist_filename,
                                             ignoreCommandLineOverride=True,
                                             directory=config.removeJPsiSlash(f'{channel.label}'), path=path)
 

@@ -80,14 +80,13 @@ void SVDDQMClustersOnTrackModule::defineHisto()
 {
 
   if (!m_svdPlotsConfig.isValid())
-    B2FATAL("no valid configuration found for SVD reconstruction");
-  else
+    B2ERROR("no valid configuration found for SVD reconstruction");
+  else {
     B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
-
-  m_3Samples = m_svdPlotsConfig->is3SampleEnable();
-
-  //read back from payload
-  m_addSensorLabel = m_svdPlotsConfig->getListOfSensors();
+    //read back from payload
+    m_3Samples = m_svdPlotsConfig->is3SampleEnable();
+    m_addSensorLabel = m_svdPlotsConfig->getListOfSensors();
+  }
 
   if (m_addSensorLabel.size() != 0)
     m_addSensorPlots = true;

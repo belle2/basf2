@@ -115,24 +115,12 @@ void CKFToSVDFindlet::apply()
     return;
   }
 
-  // m_stateCreatorFromTracks.apply(m_cdcRecoTrackVector, m_seedStates);
+  m_stateCreatorFromTracks.apply(m_cdcRecoTrackVector, m_seedStates);
   m_stateCreatorFromHits.apply(m_spacePointVector, m_states);
-  // m_relationCreator.apply(m_seedStates, m_states, m_relations);
+  m_relationCreator.apply(m_seedStates, m_states, m_relations);
 
-  // B2DEBUG(29, "Created " << m_relations.size() << " relations.");
-  // m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
-
-  for (const auto& cdcTrack : m_cdcRecoTrackVector) {
-    m_seedStates.clear();
-    m_stateCreatorFromTracks.apply({cdcTrack}, m_seedStates);
-    // Clear relation vector as we don't want to build up on the previous relations but start fresh
-    checkResizeClear<TrackFindingCDC::WeightedRelation<CKFToSVDState>>(m_relations, 2000);
-    m_relationCreator.apply(m_seedStates, m_states, m_relations);
-
-    B2DEBUG(29, "Created " << m_relations.size() << " relations.");
-
-    m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
-  }
+  B2DEBUG(29, "Created " << m_relations.size() << " relations.");
+  m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
 
   B2DEBUG(29, "Having found " << m_results.size() << " results before overlap check");
 

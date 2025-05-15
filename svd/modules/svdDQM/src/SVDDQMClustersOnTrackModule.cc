@@ -86,11 +86,15 @@ void SVDDQMClustersOnTrackModule::defineHisto()
 
   m_3Samples = m_svdPlotsConfig->is3SampleEnable();
 
-  //
+  //read back from payload
   m_addSensorLabel = m_svdPlotsConfig->getListOfSensors();
 
   if (m_addSensorLabel.size() != 0)
     m_addSensorPlots = true;
+
+  for (auto sensor : m_addSensorLabel) {
+    B2INFO("ClusTrk: additional sensors to be monitored " << sensor);
+  }
 
   // geometry checks
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();

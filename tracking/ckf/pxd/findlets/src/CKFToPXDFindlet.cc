@@ -121,6 +121,10 @@ void CKFToPXDFindlet::apply()
   };
   TrackFindingCDC::erase_remove_if(m_spacePointVector, notFromPXD);
 
+  if (m_spacePointVector.empty()) {
+    return;
+  }
+
   if (m_param_onlyUseTracksWithSVD) {
     const auto hasNoSVD = [this](const RecoTrack * recoTrack) {
       const auto& svdHitList = recoTrack->getSortedSVDHitList();
@@ -130,6 +134,10 @@ void CKFToPXDFindlet::apply()
              : svdHitList.front()->getSensorID().getLayerNumber() > 4;
     };
     TrackFindingCDC::erase_remove_if(m_recoTracksVector, hasNoSVD);
+
+    if (m_recoTracksVector.empty()) {
+      return;
+    }
   }
 
   B2DEBUG(29, "Now have " << m_spacePointVector.size() << " hits.");

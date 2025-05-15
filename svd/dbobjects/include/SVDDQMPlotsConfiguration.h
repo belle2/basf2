@@ -33,7 +33,7 @@ namespace Belle2 {
 
     /**
      * Add sensor to list
-     * @param id: sensor to add (e.g.: 411 for L4_1_1)
+     * @param label: sensor to add (e.g.: "4.1.1" for L4_1_1)
      */
     void addSensorToList(std::string label) { m_svdListOfSensors.push_back(label); }
 

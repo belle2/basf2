@@ -223,7 +223,7 @@ namespace HandleRoot {
         eventMapTVectorD[t_branchName] = new TVectorD();
         (*eventTree)->SetBranchAddress(t_branchName.c_str(), &eventMapTVectorD[t_branchName]);
       } else {
-        cout << "[Warning] HandleRoot::initializeBranches => Type of branch " << t_branchName << " is unkown." << endl;
+        cout << "[Warning] HandleRoot::initializeBranches => Type of branch " << t_branchName << " is unknown." << endl;
       }
     }
   }

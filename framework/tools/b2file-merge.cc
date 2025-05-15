@@ -332,6 +332,8 @@ The following restrictions apply:
       outputMetaData->setRandomSeed("");
   }
   RootIOUtilities::setCreationData(*outputMetaData);
+  // Set (again) the release, since it's overwritten by the previous line
+  outputMetaData->setRelease(outputRelease);
 
   // OK we have a valid FileMetaData and merged all persistent objects, now do
   // the conversion of the event trees and create the output file.

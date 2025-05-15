@@ -162,8 +162,8 @@ void ParticleLoaderModule::initialize()
       // The default list name is "all"
       string listName = mother->getName() + ":all";
 
-      // Full name for ROE, dummy, MCParticle, chargedCluster particles
-      if (m_useROEs or m_useDummy or m_useMCParticles or m_loadChargedCluster)
+      // Full name for ROE, dummy, MCParticle, chargedCluster particles, and (anti-)neutrons
+      if (m_useROEs or m_useDummy or m_useMCParticles or m_loadChargedCluster or abs(pdgCode) == abs(Const::neutron.getPDGCode()))
         listName = mother->getFullName();
       // Kinks get the label "kink"
       else if (nProducts == 1)
@@ -180,7 +180,8 @@ void ParticleLoaderModule::initialize()
       if (!particleList.isOptional()) {
         DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
         particleList.registerInDataStore(flags);
-        if (!isSelfConjugatedParticle) {
+        // Neutrons are not self-conjugated, but we cannot distinguish particle from anti-particle
+        if (!isSelfConjugatedParticle and (abs(pdgCode) != abs(Const::neutron.getPDGCode()) or m_useMCParticles)) {
           StoreObjPtr<ParticleList> antiParticleList(antiListName);
           antiParticleList.registerInDataStore(flags);
         }
@@ -239,7 +240,10 @@ void ParticleLoaderModule::initialize()
         B2ERROR("The sourceParticleListName is not given. The charged ParticleList is required for the chargedCluster loading.");
 
       // add PList to corresponding collection of Lists
-      B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");
+      if (isSelfConjugatedParticle or (abs(pdgCode) == Const::neutron.getPDGCode() and not m_useMCParticles))
+        B2INFO(" o) creating ParticleList with name: " << listName);
+      else
+        B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");
       if (m_useROEs) {
         B2INFO("   -> MDST source: RestOfEvents");
         m_ROE2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
@@ -790,9 +794,7 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
   // loop over all ParticleLists
   for (auto eclKLMCluster2Plist : m_ECLKLMClusters2Plists) {
     string listName = get<c_PListName>(eclKLMCluster2Plist);
-    string antiListName = get<c_AntiPListName>(eclKLMCluster2Plist);
     int pdgCode = get<c_PListPDGCode>(eclKLMCluster2Plist);
-    bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(eclKLMCluster2Plist);
     Const::ParticleType thisType(pdgCode);
 
     StoreObjPtr<ParticleList> plist(listName);
@@ -802,15 +804,6 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
       continue;
     plist.create();
     plist->initialize(pdgCode, listName);
-
-    // create anti-particle list if necessary
-    if (!isSelfConjugatedParticle) {
-      StoreObjPtr<ParticleList> antiPlist(antiListName);
-      antiPlist.create();
-      antiPlist->initialize(-1 * pdgCode, antiListName);
-
-      antiPlist->bindAntiParticleList(*(plist));
-    }
 
     plist->setEditable(true); // :all list is originally reserved. we have to set it as editable.
 

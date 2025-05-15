@@ -11,12 +11,12 @@ import xml.dom
 import numpy as np
 
 """
-Creating the xml file for tickness and density of each cell volume
+Creating the xml file for thickness and density of each cell volume
 for the service matirial.
 
 Two kinds of material can be selected:
 
-1. Defalut value:
+1. Default value:
     The thickness and density calculated from the photo of actual
     cable arrangement and density of each cable.
 
@@ -28,10 +28,10 @@ dom1 = xml.dom.getDOMImplementation()
 doc = dom1.createDocument(None, "TicknessDensity", None)
 top_element = doc.documentElement
 
-# Select which kind of material you want to input. Defalut value: 1, vacuum: 0
-DefalutValue = 0
+# Select which kind of material you want to input. Default value: 1, vacuum: 0
+DefaultValue = 0
 
-if DefalutValue == 0:
+if DefaultValue == 0:
     # Input the thickness of the matirial in the backward gap between CDC and ECL, unit is 'mm'
     thickness_CDCback = (np.ones((16, 144)) * 1.0e-5).ravel()
 
@@ -102,8 +102,8 @@ thickness_list = list(map(str, thickness_CDCback.tolist() +
                           thickness_ECLfor.tolist()))
 
 
-# Density of the servece material in each gap. Unity is 'g/cm3'
-if DefalutValue == 0:
+# Density of the service material in each gap. Unity is 'g/cm3'
+if DefaultValue == 0:
     density_ARICH = (np.ones(3) * 1.29e-10).ravel()
     density_TOPback = (np.ones(1) * 1.29e-10).ravel()
     density_TOPfor = (np.ones(1) * 1.29e-10).ravel()

@@ -140,7 +140,7 @@ namespace Belle2 {
     {
       m_mumuAngle = imumuAngle;
     }
-    //! set 3D Bhabha addtion Angle selection
+    //! set 3D Bhabha addition Angle selection
     void set3DBhabhaAddAngleCut(const std::vector<double>&  i3DBhabhaAddAngleCut)
     {
       m_3DBhabhaAddAngleCut = i3DBhabhaAddAngleCut;
@@ -196,7 +196,7 @@ namespace Belle2 {
     {
       m_ECLBurstThreshold = (double) ECLBurstThreshold;
     }
-    //! set Total Energy Theshold (low, high, lum)
+    //! set Total Energy Threshold (low, high, lum)
     void setTotalEnergyThreshold(const std::vector<double>& iTotalEnergy)
     {
       m_TotalEnergy = iTotalEnergy;
@@ -320,7 +320,7 @@ namespace Belle2 {
     int m_n300MeVCluster;
     //!ECL Burst Bit Threshold
     double m_ECLBurstThreshold;
-    //! Total Energy Theshold (low, high, lum)
+    //! Total Energy Threshold (low, high, lum)
     std::vector<double> m_TotalEnergy;
     //! Low Multiplicity Threshold
     std::vector<double> m_LowMultiThreshold;
@@ -337,9 +337,9 @@ namespace Belle2 {
     TrgEclTiming* m_obj_timing;
     /**  Bhabha object */
     TrgEclBhabha* m_obj_bhabha;
-    /**  Beam Backgroud veto object */
+    /**  Beam Background veto object */
     TrgEclBeamBKG* m_obj_beambkg;
-    /**  Beam Backgroud veto object */
+    /**  Beam Background veto object */
     TrgEclDataBase* m_obj_database;
 
   };

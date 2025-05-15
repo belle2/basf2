@@ -426,7 +426,7 @@ namespace Belle2 {
               outputClock->m_signal.at(iTracker).at(clockCounterWidth + pos)
                 = std_logic(word[wordWidth - 1 - k]);
             } catch (const std::out_of_range& e) {
-              B2DEBUG(20, "Out-of-range access ot outputClock->m_signal.at(iTracker).at(clockCounterWidth + pos)"
+              B2DEBUG(20, "Out-of-range access to outputClock->m_signal.at(iTracker).at(clockCounterWidth + pos)"
                       << LogVar("iTracker", iTracker)
                       << LogVar("clockCounterWidth", clockCounterWidth)
                       << LogVar("post", pos));
@@ -605,7 +605,7 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
   addParam("useDB", m_useDB,
            "Use values stored in the payload of the ConditionsDB."
            "This affects the output scaling of the Neurotrigger as well as the"
-           "bit configuration of its unpacker. If false, an old unpacker version with fixed scalings and old bit adresses is used.",
+           "bit configuration of its unpacker. If false, an old unpacker version with fixed scalings and old bit addresses is used.",
            true);
   addParam("sim13dt", m_sim13dt,
            "Simulate 13 bit drift time by using 2d clock counter value.",

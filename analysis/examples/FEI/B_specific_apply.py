@@ -76,7 +76,7 @@ path.add_module(skimfilter)
 # fei_tag = 'my_specFEI'
 
 # Here we use a prefix of an existing FEI training
-fei_tag = 'FEIv4_2021_MC14_release_05_01_12'
+fei_tag = 'FEIv1_2025_MC16ri_aldebaran_200'
 
 # Add the necessary database
 # b2.conditions.prepend_globaltag('name of database containing the specific training')

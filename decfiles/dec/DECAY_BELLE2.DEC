@@ -9809,7 +9809,30 @@ Decay K_S0
 0.000344328   pi-  e+  nu_e                                PHSP;
 Enddecay
 
-# K_L0 is decayed in GEANT
+Decay K_L0
+0.202464226   pi+  e-  nu_e                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.202464226   pi-  e+  nu_e                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.135033299   pi+  mu-  nu_mu                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.135033299   pi-  mu+  nu_mu                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000025738   pi0  pi+  e-  nu_e                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000025738   pi0  pi-  e+  nu_e                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000006205   pi+  e-  nu_e  e+  e-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000006205   pi-  e+  nu_e  e+  e-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.194795855   pi0  pi0  pi0                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.125231606   pi+  pi-  pi0                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.001880711   pi+  e-  nu_e  gamma                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.001880711   pi-  e+  nu_e  gamma                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000277023   pi+  mu-  nu_mu  gamma                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000277023   pi-  mu+  nu_mu  gamma                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000040995   pi+  pi-  gamma                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000001262   pi0  gamma  gamma                            PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000000016   pi0  gamma  e+  e-                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000545653   gamma  gamma                                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000009265   e+  e-  gamma                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000000355   mu+  mu-  gamma                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000000584   e+  e-  gamma  gamma                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000000007   mu+  mu-  gamma  gamma                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
+Enddecay
 
 # K0
 Decay K0
@@ -13303,31 +13326,6 @@ Decay anti-Omega_cc*-
   0.25 anti-u   d   anti-s     anti-cs_1    PYTHIA 42;
   0.05 anti-u   s   anti-s     anti-cs_0    PYTHIA 42;
   0.03 anti-u   s   anti-s     anti-cs_1    PYTHIA 42;
-Enddecay
-
-Decay K_L0
-0.202464226   pi+  e-  nu_e                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.202464226   pi-  e+  nu_e                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.135033299   pi+  mu-  nu_mu                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.135033299   pi-  mu+  nu_mu                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000025738   pi0  pi+  e-  nu_e                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000025738   pi0  pi-  e+  nu_e                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000006205   pi+  e-  nu_e  e+  e-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000006205   pi-  e+  nu_e  e+  e-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.194795855   pi0  pi0  pi0                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.125231606   pi+  pi-  pi0                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001880711   pi+  e-  nu_e  gamma                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001880711   pi-  e+  nu_e  gamma                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000277023   pi+  mu-  nu_mu  gamma                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000277023   pi-  mu+  nu_mu  gamma                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000040995   pi+  pi-  gamma                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000001262   pi0  gamma  gamma                            PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000016   pi0  gamma  e+  e-                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000545653   gamma  gamma                                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000009265   e+  e-  gamma                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000355   mu+  mu-  gamma                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000584   e+  e-  gamma  gamma                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000007   mu+  mu-  gamma  gamma                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
 
 End

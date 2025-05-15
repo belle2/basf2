@@ -157,7 +157,7 @@ namespace TreeFitter {
           Belle2::Helix helix2 = dau2->particle()->getTrackFitResult()->getHelix();
 
           double flt1(0), flt2(0);
-          Belle2::B2Vector3D v;
+          ROOT::Math::XYZVector v;
           HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
 
           fitparams.getStateVector()(posindex)     = v.X();

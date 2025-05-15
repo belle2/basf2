@@ -81,7 +81,7 @@ void SVDDQMExpressRecoModule::defineHisto()
 {
 
   if (!m_svdPlotsConfig.isValid())
-    B2WARNING("no valid configuration found for SVD reconstruction");
+    B2INFO("no valid configuration found for SVD reconstruction");
   else {
     B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
     m_3Samples = m_svdPlotsConfig->is3SampleEnable();

@@ -212,6 +212,13 @@ void SVDDQMEfficiencyModule::event()
 
 void SVDDQMEfficiencyModule::defineHisto()
 {
+  if (!m_svdPlotsConfig.isValid())
+    B2FATAL("no valid configuration found for SVD reconstruction");
+  else
+    B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
+
+  m_3Samples = m_svdPlotsConfig->is3SampleEnable();
+
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
   if (m_histogramDirectoryName != "") {

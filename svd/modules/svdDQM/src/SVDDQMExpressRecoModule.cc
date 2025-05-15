@@ -79,6 +79,14 @@ SVDDQMExpressRecoModule::~SVDDQMExpressRecoModule()
 
 void SVDDQMExpressRecoModule::defineHisto()
 {
+
+  if (!m_svdPlotsConfig.isValid())
+    B2FATAL("no valid configuration found for SVD reconstruction");
+  else
+    B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
+
+  m_3Samples = m_svdPlotsConfig->is3SampleEnable();
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfLayers() == 0) {
     B2FATAL("Missing geometry for VXD, check steering file.");

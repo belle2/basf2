@@ -16,6 +16,8 @@
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/dataobjects/SVDEventInfo.h>
+#include <svd/dbobjects/SVDDQMPlotsConfiguration.h>
+#include <framework/database/DBObjPtr.h>
 #include <vector>
 #include "TList.h"
 #include "TH1F.h"
@@ -56,6 +58,8 @@ namespace Belle2 {
 
     /** Trigger Summary data object */
     StoreObjPtr<TRGSummary> m_objTrgSummary;
+    /**< SVD DQM plots configuration */
+    DBObjPtr<SVDDQMPlotsConfiguration> m_svdPlotsConfig;
 
     StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
     /** if TRUE: svdTime back in SVD time reference*/

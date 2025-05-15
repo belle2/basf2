@@ -21,6 +21,10 @@
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <svd/dbobjects/SVDDQMPlotsConfiguration.h>
+#include <framework/database/DBObjPtr.h>
+
+
 #include "TH2D.h"
 
 namespace Belle2 {
@@ -65,6 +69,7 @@ namespace Belle2 {
     StoreArray<SVDCluster> m_svdClusters; /**< SVDCluster StoreArray*/
     StoreArray<SVDIntercept> m_intercepts; /**< SVDIntercept StoreArray*/
     StoreArray<RecoTrack> m_recoTracks; /**< RecoTrack StoreArray*/
+    DBObjPtr<SVDDQMPlotsConfiguration> m_svdPlotsConfig; /**< SVD DQM plots configuration */
 
     float m_fiducialU; /**< stay away from the U border by m_fiducialU (in cm)*/
     float m_fiducialV; /**< stay away from the U border by m_fiducialU (in cm)*/

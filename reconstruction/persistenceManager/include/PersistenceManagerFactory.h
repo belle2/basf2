@@ -2,7 +2,7 @@
 
 #include <reconstruction/persistenceManager/PersistenceManager.h>
 
-namespace Belle2::SVD {
+namespace Belle2::VariablePersistenceManager {
 
   /**
    * @class PersistenceManagerFactory
@@ -26,4 +26,4 @@ namespace Belle2::SVD {
     static std::unique_ptr<PersistenceManager> create(const std::string& storageType);
   };
 
-} // namespace Belle2::SVD
+} // namespace Belle2::VariablePersistenceManager

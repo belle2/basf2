@@ -5,7 +5,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/RootMergeable.h>
 
-namespace Belle2::SVD {
+namespace Belle2::VariablePersistenceManager {
 
   /**
    * @class ConcreteVariablesToHistogramPersistenceManager
@@ -35,7 +35,7 @@ namespace Belle2::SVD {
      */
     void initialize(const std::string& fileName,
                     const std::string& directory,
-                    Variables::Variables& variables) override;
+                    Variables& variables) override;
 
     /**
      * @brief Fills histograms with the current set of evaluated variables.
@@ -43,7 +43,7 @@ namespace Belle2::SVD {
      *
      * Each call updates the corresponding histogram with the provided variable values.
      */
-    void addEntry(const Variables::EvaluatedVariables& evaluatedVariables) override;
+    void addEntry(const EvaluatedVariables& evaluatedVariables) override;
 
     /**
      * @brief Writes histogram data to disk.
@@ -67,7 +67,7 @@ namespace Belle2::SVD {
     /**
      * @brief A list of variables associated with the histograms.
      */
-    Variables::Variables m_variables;
+    Variables m_variables;
 
     /**
      * @brief Pointer to the ROOT file object.
@@ -96,4 +96,4 @@ namespace Belle2::SVD {
     void registerHistograms();
   };
 
-} // namespace Belle2::SVD
+} // namespace Belle2::VariablePersistenceManager

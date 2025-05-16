@@ -5,14 +5,14 @@
 #include <framework/pcore/ProcHandler.h>
 
 namespace {
-  namespace Variables = Belle2::SVD::Variables;
+  using namespace Belle2::VariablePersistenceManager;
 
-  std::string typedVariableToLeafName(const Variables::TypedVariable& variable)
+  std::string typedVariableToLeafName(const TypedVariable& variable)
   {
-    std::map<Variables::VariableDataType, std::string> suffix = {
-      {Variables::VariableDataType::c_double, "/D"},
-      {Variables::VariableDataType::c_int, "/I"},
-      {Variables::VariableDataType::c_bool, "/O"}
+    std::map<VariableDataType, std::string> suffix = {
+      {VariableDataType::c_double, "/D"},
+      {VariableDataType::c_int, "/I"},
+      {VariableDataType::c_bool, "/O"}
     };
 
     std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(variable.getName());
@@ -20,7 +20,7 @@ namespace {
   }
 }
 
-namespace Belle2::SVD {
+namespace Belle2::VariablePersistenceManager {
   ConcreteVariablesToNtuplePersistenceManager::ConcreteVariablesToNtuplePersistenceManager()
     : m_tree{"", DataStore::c_Persistent}
   {
@@ -29,7 +29,7 @@ namespace Belle2::SVD {
 
   void ConcreteVariablesToNtuplePersistenceManager::initialize(const std::string& fileName,
       const std::string& treeName,
-      Variables::Variables& variables)
+      Variables& variables)
   {
     m_fileName = fileName;
     m_treeName = treeName;
@@ -39,7 +39,7 @@ namespace Belle2::SVD {
     registerBranches();
   }
 
-  void ConcreteVariablesToNtuplePersistenceManager::addEntry(const Variables::EvaluatedVariables& evaluatedVariables)
+  void ConcreteVariablesToNtuplePersistenceManager::addEntry(const EvaluatedVariables& evaluatedVariables)
   {
     for (const auto& [variableName, value] : evaluatedVariables) {
       std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(variableName.c_str());
@@ -90,20 +90,20 @@ namespace Belle2::SVD {
     for (const auto& variable : m_variables) {
       std::visit([&](const auto & typedVariable) {
         using T = std::decay_t<decltype(typedVariable)>;
-        if constexpr(std::is_same_v<T, Variables::TypedVariable>) {
+        if constexpr(std::is_same_v<T, TypedVariable>) {
           std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(typedVariable.getName().c_str());
           std::string leafName = typedVariableToLeafName(typedVariable);
 
           switch (typedVariable.getDataType()) {
-            case Variables::VariableDataType::c_double:
+            case VariableDataType::c_double:
               m_branchesDouble[branchName] = double{};
               m_tree->get().Branch(branchName.c_str(), &m_branchesDouble[branchName], leafName.c_str());
               break;
-            case Variables::VariableDataType::c_int:
+            case VariableDataType::c_int:
               m_branchesInt[branchName] = int{};
               m_tree->get().Branch(branchName.c_str(), &m_branchesInt[branchName], leafName.c_str());
               break;
-            case Variables::VariableDataType::c_bool:
+            case VariableDataType::c_bool:
               m_branchesBool[branchName] = bool{};
               m_tree->get().Branch(branchName.c_str(), &m_branchesBool[branchName], leafName.c_str());
               break;
@@ -119,7 +119,7 @@ namespace Belle2::SVD {
   }
 
   void ConcreteVariablesToNtuplePersistenceManager::updateBranch(const std::string& branchName,
-      const Variables::VariableType& evaluatedValue)
+      const VariableType& evaluatedValue)
   {
     std::visit([&](auto&& value) {
       using T = std::decay_t<decltype(value)>;

@@ -10,7 +10,7 @@
 #include <framework/pcore/RootMergeable.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-namespace Belle2::SVD {
+namespace Belle2::VariablePersistenceManager {
 
   /**
    * @class ConcreteVariablesToNtuplePersistenceManager
@@ -40,7 +40,7 @@ namespace Belle2::SVD {
      */
     void initialize(const std::string& fileName,
                     const std::string& treeName,
-                    Variables::Variables& variables) override;
+                    Variables& variables) override;
 
     /**
      * @brief Adds a single event's worth of variable data to the TTree.
@@ -50,7 +50,7 @@ namespace Belle2::SVD {
      * Each call updates the branch buffers for the registered variables. The actual
      * storage of these buffers occurs when @c store() is called.
      */
-    void addEntry(const Variables::EvaluatedVariables& evaluatedVariables) override;
+    void addEntry(const EvaluatedVariables& evaluatedVariables) override;
 
     /**
      * @brief Writes the current buffered data to disk.
@@ -74,7 +74,7 @@ namespace Belle2::SVD {
     /**
      * @brief The list of variables that will be written to the TTree.
      */
-    Variables::Variables m_variables;
+    Variables m_variables;
 
     /**
      * @brief Basket size for the TTree branches. Affects I/O efficiency.
@@ -123,7 +123,7 @@ namespace Belle2::SVD {
      * (m_branchesDouble, m_branchesInt, or m_branchesBool) is updated.
      */
     void updateBranch(const std::string& variableName,
-                      const Variables::VariableType& value);
+                      const VariableType& value);
   };
 
-} // namespace Belle2::SVD
+} // namespace Belle2::VariablePersistenceManager

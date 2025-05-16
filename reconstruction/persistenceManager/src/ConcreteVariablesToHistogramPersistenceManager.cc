@@ -8,12 +8,12 @@
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/RootFileCreationManager.h>
 
-namespace Belle2::SVD {
+namespace Belle2::VariablePersistenceManager {
   ConcreteVariablesToHistogramPersistenceManager::ConcreteVariablesToHistogramPersistenceManager() {}
 
   void ConcreteVariablesToHistogramPersistenceManager::initialize(const std::string& fileName,
       const std::string& directoryName,
-      Variables::Variables& variables)
+      Variables& variables)
   {
     m_fileName = fileName;
     m_directory = directoryName;
@@ -23,7 +23,7 @@ namespace Belle2::SVD {
     registerHistograms();
   }
 
-  void ConcreteVariablesToHistogramPersistenceManager::addEntry(const Variables::EvaluatedVariables& evaluatedVariables)
+  void ConcreteVariablesToHistogramPersistenceManager::addEntry(const EvaluatedVariables& evaluatedVariables)
   {
     for (const auto& [variableName, value] : evaluatedVariables) {
       std::visit([&](auto&& val) {
@@ -70,7 +70,7 @@ namespace Belle2::SVD {
     for (const auto& variable : m_variables) {
       std::visit([&](const auto & typedVariable) {
         using T = std::decay_t<decltype(typedVariable)>;
-        if constexpr(std::is_same_v<T, Variables::BinnedVariable>) {
+        if constexpr(std::is_same_v<T, BinnedVariable>) {
           std::string varStr = typedVariable.getName();
           int varNbins = typedVariable.getNbins();
           float low = typedVariable.getLowBin();

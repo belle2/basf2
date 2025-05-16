@@ -5,14 +5,14 @@
 
 #include <reconstruction/persistenceManager/Types.h>
 
-namespace Belle2::SVD {
+namespace Belle2::VariablePersistenceManager {
 
   /**
    * @class PersistenceManager
-   * @brief Abstract base class defining the interface for persisting SVD variables.
+   * @brief Abstract base class defining the interface for persisting variables.
    *
    * Any class implementing this interface is responsible for storing and
-   * retrieving SVD-related data (e.g., variables to ntuples or histograms).
+   * retrieving data (e.g., variables to ntuples or histograms).
    * Concrete implementations must provide the following capabilities:
    *   - Initialization of underlying data structures (e.g., files, trees, histograms)
    *   - Adding or accumulating event entries
@@ -32,7 +32,7 @@ namespace Belle2::SVD {
      */
     virtual void initialize(const std::string& fileName,
                             const std::string& objectName,
-                            Variables::Variables& variables) = 0;
+                            Variables& variables) = 0;
 
     /**
      * @brief Adds a new data entry (event) to the underlying storage.
@@ -42,7 +42,7 @@ namespace Belle2::SVD {
      * should use the provided values to fill or update the data structures (e.g.,
      * histograms, tree branches, or other objects).
      */
-    virtual void addEntry(const Variables::EvaluatedVariables& evaluatedVariables) = 0;
+    virtual void addEntry(const EvaluatedVariables& evaluatedVariables) = 0;
 
     /**
      * @brief Writes the current in-memory data to the final storage medium.
@@ -59,4 +59,4 @@ namespace Belle2::SVD {
     virtual ~PersistenceManager() = default;
   };
 
-} // namespace Belle2::SVD
+} // namespace Belle2::VariablePersistenceManager

@@ -4,7 +4,7 @@
 #include <reconstruction/persistenceManager/ConcreteVariablesToNtuplePersistenceManager.h>
 #include <reconstruction/persistenceManager/ConcreteVariablesToHistogramPersistenceManager.h>
 
-namespace Belle2::SVD {
+namespace Belle2::VariablePersistenceManager {
 
   std::unique_ptr<PersistenceManager> PersistenceManagerFactory::create(const std::string& storageType)
   {

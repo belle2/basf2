@@ -29,7 +29,7 @@ namespace Belle2 {
      * Returns sensor list
      * @return  sensor list
      **/
-    std::vector<std::string> getListOfSensors() const { return m_svdListOfSensors; }
+    const std::vector<std::string> getListOfSensors() const { return m_svdListOfSensors; }
 
     /**
      * Add sensor to list

@@ -79,7 +79,7 @@ class Plotter:
         Creates a new figure and axis if None is given, sets the default plot parameters
         @param figure default draw figure which is used
         @param axis default draw axis which is used
-        @param dpi default dpi which is used
+        @param dpi dpi for the matplotlib figure, if None default is used
         """
         b2.B2INFO("Create new figure for class " + str(type(self)))
         #: set default dpi
@@ -374,6 +374,7 @@ class SignalToNoiseOverCut(Plotter):
         @param signal_mask boolean numpy.array defining which events are signal events
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
         """
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         signal2noise, signal2noise_error = hists.get_signal_to_noise(['Signal'], ['Background'])
@@ -442,6 +443,7 @@ class PurityOverEfficiency(Plotter):
         @param signal_mask boolean numpy.array defining which events are signal events
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
         """
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
@@ -512,6 +514,7 @@ class RejectionOverEfficiency(Plotter):
         @param signal_mask boolean numpy.array defining which events are signal events
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
         """
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
@@ -580,6 +583,15 @@ class TrueVsFalsePositiveRate(Plotter):
     #: Maximum y value
 
     def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
+        """
+        Add a new curve to the ROC plot
+        @param data pandas.DataFrame containing all data
+        @param column which is used to calculate efficiency and purity for different cuts
+        @param signal_mask boolean numpy.array defining which events are signal events
+        @param bckgrd_mask boolean numpy.array defining which events are background events
+        @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
+        """
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask},
                                      weight_column=weight_column)
 
@@ -626,6 +638,9 @@ class TrueVsFalsePositiveRate(Plotter):
         return self
 
     def finish(self):
+        """
+        Sets limits, title, axis-labels and legend of the plot
+        """
         self.setAxisLimits(factor=0.01)
         self.axis.set_title("True ROC Curve")
         self.axis.get_xaxis().set_label_text('False Positive Rate (Background Efficiency)')
@@ -644,6 +659,15 @@ class PrecisionRecallCurve(Plotter):
     #: Maximum y value
 
     def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
+        """
+        Add a new curve to the Precision-Recall plot
+        @param data pandas.DataFrame containing all data
+        @param column which is used to calculate efficiency and purity for different cuts
+        @param signal_mask boolean numpy.array defining which events are signal events
+        @param bckgrd_mask boolean numpy.array defining which events are background events
+        @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
+        """
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask},
                                      weight_column=weight_column)
 
@@ -690,6 +714,9 @@ class PrecisionRecallCurve(Plotter):
         return self
 
     def finish(self):
+        """
+        Sets limits, title, axis-labels and legend of the plot
+        """
         self.setAxisLimits(factor=0.01)
         self.axis.set_title("Precision-Recall Curve")
         self.axis.get_xaxis().set_label_text('Recall (Signal Efficiency)')
@@ -713,7 +740,7 @@ class Multiplot(Plotter):
         @param cls class of the plot
         @param number_of_plots number of plots which should be displayed
         @param figure default draw figure which is used
-        @param dpi default dpi which is used
+        @param dpi dpi for the matplotlib figure, if None default is used
         """
         if number_of_plots == 1:
             gsTuple = (1, 1)
@@ -779,6 +806,7 @@ class Diagonal(Plotter):
         @param signal_mask boolean numpy.array defining which events are signal events
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
         """
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         purity, purity_error = hists.get_purity_per_bin(['Signal'], ['Background'])
@@ -858,6 +886,7 @@ class Distribution(Plotter):
         @param column which is used to calculate distribution histogram
         @param mask boolean numpy.array defining which events are used for the histogram
         @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
         """
         if mask is None:
             mask = numpy.ones(len(data)).astype('bool')
@@ -1112,6 +1141,7 @@ class Overtraining(Plotter):
         """
         Creates a new figure if None is given, sets the default plot parameters
         @param figure default draw figure which is used
+        @param dpi dpi for the matplotlib figure, if None default is used
         """
         #: set default dpi
         self.dpi = dpi
@@ -1262,6 +1292,7 @@ class VerboseDistribution(Plotter):
         @param column which is used to calculate distribution histogram
         @param mask boolean numpy.array defining which events are used for the distribution histogram
         @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
         """
         self.distribution.set_plot_options(self.plot_kwargs)
         self.distribution.set_errorbar_options(self.errorbar_kwargs)
@@ -1321,6 +1352,7 @@ class Correlation(Plotter):
         """
         Creates a new figure if None is given, sets the default plot parameters
         @param figure default draw figure which is used
+        @param dpi dpi for the matplotlib figure, if None default is used
         """
         #: set default dpi
         self.dpi = dpi
@@ -1519,7 +1551,7 @@ class CorrelationMatrix(Plotter):
         """
         Creates a new figure if None is given, sets the default plot parameters
         @param figure default draw figure which is used
-        @param dpi default draw dpi which is used
+        @param dpi dpi for the matplotlib figure, if None default is used
         """
         #: set default dpi
         self.dpi = dpi

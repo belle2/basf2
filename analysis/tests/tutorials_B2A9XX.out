@@ -1,4 +1,4 @@
-[INFO] Steering file: analysis/tests/tutorials_B2A9XX.py
+[INFO] Steering file: tutorials_B2A9XX.py
 TFile: B2A902-PrintOutMCParticles.root
 TTree: variables
 TBranch: __experiment__, 0
@@ -312,8 +312,8 @@ TBranch: E, 3.23
 TBranch: isSignal, 1
 TBranch: mcErrors, 0
 TBranch: mcPDG, 421
-TBranch: CFT_qr, -0.5695
-TBranch: CFT_prob, 0.2152
+TBranch: CFT_qr, -0.2981
+TBranch: CFT_prob, 0.351
 TBranch: K_px, -0.9924
 TBranch: K_py, 2.049
 TBranch: K_pz, 0.8923

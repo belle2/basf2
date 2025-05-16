@@ -314,7 +314,7 @@ void EvtBToDstarlnuNP::CalcAmp(EvtParticle* parent, EvtAmp& amp)
   nu = pnu->spParentNeutrino(), lp0 = plp->spParent(0), lp1 = plp->spParent(1);
 
   /* Various lepton currents */
-  EvtComplex s1, s2, p1, p2;
+  EvtComplex p1, p2;
   EvtVector4C l1, l2, a1, a2;
   EvtTensor4C z1, z2, w1, w2;
   if (lId == EM || lId == MUM || lId == TAUM) {
@@ -322,8 +322,6 @@ void EvtBToDstarlnuNP::CalcAmp(EvtParticle* parent, EvtAmp& amp)
     l2 = EvtLeptonVCurrent(nu, lp1);
     a1 = EvtLeptonACurrent(nu, lp0);
     a2 = EvtLeptonACurrent(nu, lp1);
-    s1 = EvtLeptonSCurrent(nu, lp0);
-    s2 = EvtLeptonSCurrent(nu, lp1);
     p1 = EvtLeptonPCurrent(nu, lp0);
     p2 = EvtLeptonPCurrent(nu, lp1);
     z1 = EvtLeptonTCurrent(nu, lp0);
@@ -334,8 +332,6 @@ void EvtBToDstarlnuNP::CalcAmp(EvtParticle* parent, EvtAmp& amp)
     l2 = EvtLeptonVCurrent(lp1, nu);
     a1 = EvtLeptonACurrent(lp0, nu);
     a2 = EvtLeptonACurrent(lp1, nu);
-    s1 = EvtLeptonSCurrent(lp0, nu);
-    s2 = EvtLeptonSCurrent(lp1, nu);
     p1 = EvtLeptonPCurrent(lp0, nu);
     p2 = EvtLeptonPCurrent(lp1, nu);
     z1 = EvtLeptonTCurrent(lp0, nu);
@@ -452,7 +448,7 @@ double EvtBToDstarlnuNP::CalcMaxProb()
   rho.setDiag(root_part->getSpinStates());
 
   EvtVector4R p4meson, p4lepton, p4nu, p4w;
-  double mass[3], m = root_part->mass(), maxfoundprob = 0.0, prob = -10.0;
+  double mass[3], m = root_part->mass(), maxfoundprob = 0.0;
 
   for (int massiter = 0; massiter < 3; massiter++) {
     mass[0] = EvtPDL::getMeanMass(mId);
@@ -508,9 +504,7 @@ double EvtBToDstarlnuNP::CalcMaxProb()
         //and compare to maxfoundprob.
 
         //Do a little magic to get the probability!!
-        prob = rho.normalizedProb(amp.getSpinDensity());
-
-        probctl[j] = prob;
+        probctl[j] = rho.normalizedProb(amp.getSpinDensity());
       }
 
       //probclt contains prob at ctl=-1,0,1.
@@ -520,7 +514,7 @@ double EvtBToDstarlnuNP::CalcMaxProb()
       double b = 0.5 * (probctl[2] - probctl[0]);
       double c = 0.5 * (probctl[2] + probctl[0]) - probctl[1];
 
-      prob = probctl[0];
+      double prob = probctl[0];
       if (probctl[1] > prob)
         prob = probctl[1];
       if (probctl[2] > prob)

@@ -6,7 +6,7 @@
 #include <TTree.h>
 #include <TFile.h>
 
-#include <svd/persistenceManager/PersistenceManager.h>
+#include <reconstruction/persistenceManager/PersistenceManager.h>
 #include <framework/pcore/RootMergeable.h>
 #include <framework/datastore/StoreObjPtr.h>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <svd/persistenceManager/PersistenceManager.h>
+#include <reconstruction/persistenceManager/PersistenceManager.h>
 
 namespace Belle2::SVD {
 

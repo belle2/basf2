@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include <svd/persistenceManager/Types.h>
+#include <reconstruction/persistenceManager/Types.h>
 
 namespace Belle2::SVD {
 

@@ -1,8 +1,8 @@
 #include <memory>
 #include <framework/logging/Logger.h>
-#include <svd/persistenceManager/PersistenceManagerFactory.h>
-#include <svd/persistenceManager/ConcreteVariablesToNtuplePersistenceManager.h>
-#include <svd/persistenceManager/ConcreteVariablesToHistogramPersistenceManager.h>
+#include <reconstruction/persistenceManager/PersistenceManagerFactory.h>
+#include <reconstruction/persistenceManager/ConcreteVariablesToNtuplePersistenceManager.h>
+#include <reconstruction/persistenceManager/ConcreteVariablesToHistogramPersistenceManager.h>
 
 namespace Belle2::SVD {
 

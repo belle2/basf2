@@ -20,25 +20,22 @@ TrackQualityEstimatorMVAModule::TrackQualityEstimatorMVAModule() : Module()
   setDescription("The quality estimator module for a fully reconstructed track");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  m_cdcRecoTracksStoreArrayBacktrackChain = std::vector<std::string>();
+  m_svdRecoTracksStoreArrayBacktrackChain = std::vector<std::string>();
   addParam("recoTracksStoreArrayName",
            m_recoTracksStoreArrayName,
            "Name of the recoTrack StoreArray.",
            m_recoTracksStoreArrayName);
 
-  addParam("SVDCDCRecoTracksStoreArrayName",
-           m_svdcdcRecoTracksStoreArrayName,
-           "Name of the SVD-CDC StoreArray.",
-           m_svdcdcRecoTracksStoreArrayName);
+  addParam("cdcRecoTracksStoreArrayBacktrackChain",
+           m_cdcRecoTracksStoreArrayBacktrackChain,
+           "Backtrack Chain for finding the CDC StoreArray.",
+           m_cdcRecoTracksStoreArrayBacktrackChain);
 
-  addParam("CDCRecoTracksStoreArrayName",
-           m_cdcRecoTracksStoreArrayName,
-           "Name of the CDC StoreArray.",
-           m_cdcRecoTracksStoreArrayName);
-
-  addParam("SVDRecoTracksStoreArrayName",
-           m_svdRecoTracksStoreArrayName,
-           "Name of the SVD StoreArray.",
-           m_svdRecoTracksStoreArrayName);
+  addParam("svdRecoTracksStoreArrayBacktrackChain",
+           m_svdRecoTracksStoreArrayBacktrackChain,
+           "Backtrack Chain for finding the SVD StoreArray.",
+           m_svdRecoTracksStoreArrayBacktrackChain);
 
   addParam("PXDRecoTracksStoreArrayName",
            m_pxdRecoTracksStoreArrayName,
@@ -85,13 +82,27 @@ void TrackQualityEstimatorMVAModule::event()
 {
   for (RecoTrack& recoTrack : m_recoTracks) {
     const RecoTrack* pxdRecoTrack = recoTrack.getRelatedTo<RecoTrack>(m_pxdRecoTracksStoreArrayName);
-    const RecoTrack* svdcdcRecoTrack =
-      recoTrack.getRelatedTo<RecoTrack>(m_svdcdcRecoTracksStoreArrayName);
-    RecoTrack* cdcRecoTrack{nullptr};
-    RecoTrack* svdRecoTrack{nullptr};
-    if (svdcdcRecoTrack) {
-      cdcRecoTrack = svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_cdcRecoTracksStoreArrayName);
-      svdRecoTrack = svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_svdRecoTracksStoreArrayName);
+
+    RecoTrack* cdcRecoTrack{&recoTrack};
+    int length = m_cdcRecoTracksStoreArrayBacktrackChain.size();
+    // The last item must be "RecoTrack", so begin with the second
+    for (int i = length - 2; i >= 0; i--) {
+      std::string& name = m_cdcRecoTracksStoreArrayBacktrackChain[i];
+      cdcRecoTrack = cdcRecoTrack->getRelatedTo<RecoTrack>(name);
+      if (!cdcRecoTrack) {
+        break;
+      }
+    }
+
+    RecoTrack* svdRecoTrack{&recoTrack};
+    length = m_svdRecoTracksStoreArrayBacktrackChain.size();
+    // The last item must be "RecoTrack", so begin with the second
+    for (int i = length - 2; i >= 0; i--) {
+      std::string& name = m_svdRecoTracksStoreArrayBacktrackChain[i];
+      svdRecoTrack = svdRecoTrack->getRelatedTo<RecoTrack>(name);
+      if (!svdRecoTrack) {
+        break;
+      }
     }
 
     if (m_collectEventFeatures) {

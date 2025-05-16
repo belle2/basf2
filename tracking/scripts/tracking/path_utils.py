@@ -104,7 +104,8 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
 
 
 def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHypotheses=None,
-                                              reco_tracks="RecoTracks", add_mva_quality_indicator=False):
+                                              reco_tracks="RecoTracks", add_mva_quality_indicator=False,
+                                              cdc_backtrack_chain=None, svd_backtrack_chain=None):
     """
     Helper function to add only the modules required to calculate HLT filter decision:
     performing the track fit and the Belle2 track creation to the path.
@@ -114,6 +115,8 @@ def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHyp
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param add_mva_quality_indicator: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found tracks.
+    :param cdc_backtrack_chain: The backtrack relation chain for finding the original CDC RecoTracks.
+    :param svd_backtrack_chain: The backtrack relation chain for finding the original SVD RecoTracks.
     """
 
     # Correct time seed
@@ -126,7 +129,14 @@ def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHyp
     # to add a track quality indicator for classification of fake vs. MC-matched tracks
 
     if add_mva_quality_indicator:
-        path.add_module("TrackQualityEstimatorMVA", collectEventFeatures=True)
+        if cdc_backtrack_chain is None:
+            cdc_backtrack_chain = []
+        if svd_backtrack_chain is None:
+            svd_backtrack_chain = []
+        path.add_module("TrackQualityEstimatorMVA",
+                        collectEventFeatures=True,
+                        cdcRecoTracksStoreArrayBacktrackChain=cdc_backtrack_chain,
+                        svdRecoTracksStoreArrayBacktrackChain=svd_backtrack_chain)
     # create Belle2 Tracks from the genfit Tracks
     # The following particle hypothesis will be fitted: Pion, Kaon and Proton
     # Muon fit is working but gives very similar as the Pion due to the closeness of masses
@@ -391,6 +401,8 @@ def add_svd_track_finding(
         prune_temporary_tracks=True,
         add_mva_quality_indicator=False,
         svd_standalone_mode="VXDTF2",
+        cdc_backtrack_chain=None,
+        svd_backtrack_chain=None,
         **kwargs,
 ):
     """
@@ -424,6 +436,8 @@ def add_svd_track_finding(
     :param svd_standalone_mode: Which SVD standalone tracking is used.
            Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
            Defaults to "VXDTF2"
+    :param cdc_backtrack_chain: The backtrack relation chain for finding the original CDC RecoTracks.
+    :param svd_backtrack_chain: The backtrack relation chain for finding the original SVD RecoTracks.
     """
 
     if not is_detector_present("SVD", components):
@@ -435,7 +449,8 @@ def add_svd_track_finding(
                                     svd_standalone_mode=svd_standalone_mode,
                                     reco_tracks=output_reco_tracks,
                                     add_mva_quality_indicator=add_mva_quality_indicator)
-        return
+        svd_backtrack_chain.append(output_reco_tracks)
+        return cdc_backtrack_chain, svd_backtrack_chain
 
     if use_mc_truth:
         # MC CKF needs MC matching information
@@ -454,6 +469,7 @@ def add_svd_track_finding(
         if add_both_directions:
             add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                                  use_mc_truth=use_mc_truth, direction="forward", **kwargs)
+        svd_backtrack_chain.append(temporary_reco_tracks)
 
     elif svd_ckf_mode == "SVD_before_with_second_ckf":
         add_svd_standalone_tracking(path, components=["SVD"],
@@ -470,6 +486,7 @@ def add_svd_track_finding(
         if add_both_directions:
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                         use_mc_truth=use_mc_truth, direction="forward", **kwargs)
+        svd_backtrack_chain.append(temporary_reco_tracks)
 
     elif svd_ckf_mode == "only_ckf":
         add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
@@ -507,6 +524,7 @@ def add_svd_track_finding(
         if add_both_directions:
             add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                                  use_mc_truth=use_mc_truth, direction="forward", **kwargs)
+        svd_backtrack_chain.append(temporary_reco_tracks)
 
     elif svd_ckf_mode == "SVD_alone":
         add_svd_standalone_tracking(path, components=["SVD"],
@@ -516,6 +534,7 @@ def add_svd_track_finding(
         path.add_module('VXDCDCTrackMerger',
                         CDCRecoTrackColName=input_reco_tracks,
                         VXDRecoTrackColName=temporary_reco_tracks)
+        svd_backtrack_chain.append(temporary_reco_tracks)
 
     elif svd_ckf_mode == "cosmics":
         add_cosmics_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
@@ -536,6 +555,8 @@ def add_svd_track_finding(
     path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=temporary_reco_tracks,
                     CDCRecoTracksStoreArrayName=input_reco_tracks,
                     recoTracksStoreArrayName=combined_svd_cdc_standalone_tracks)
+    cdc_backtrack_chain.append(combined_svd_cdc_standalone_tracks)
+    svd_backtrack_chain.append(combined_svd_cdc_standalone_tracks)
 
     if use_svd_to_cdc_ckf:
         path.add_module("ToCDCCKF",
@@ -555,10 +576,14 @@ def add_svd_track_finding(
                         CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
                         VXDRecoTracksStoreArrayName=combined_svd_cdc_standalone_tracks,
                         recoTracksStoreArrayName=output_reco_tracks)
+        cdc_backtrack_chain.append(output_reco_tracks)
+        svd_backtrack_chain.append(output_reco_tracks)
 
         if prune_temporary_tracks:
             for temp_reco_track in [combined_svd_cdc_standalone_tracks, "CKFCDCRecoTracks"]:
                 path.add_module('PruneRecoTracks', storeArrayName=temp_reco_track).set_name("PruneRecoTracks " + temp_reco_track)
+
+    return (cdc_backtrack_chain, svd_backtrack_chain)
 
 
 def add_svd_standalone_tracking(path,
@@ -1410,7 +1435,9 @@ def add_inverted_svd_cdc_tracking_chain(path,
         # The output of the additional SVD tracking (ToSVDCKF in this case) depends on whether
         # the CKF is the last or second to last algorithm to run. If it's the last one, use 'output_reco_tracks',
         # else use 'CDCSVDRecoTracks'
-        tmp_output_reco_tracks = output_reco_tracks if "before_ToSVDCKF" else combined_reco_tracks_name
+        tmp_output_reco_tracks = output_reco_tracks if temporary_reco_tracks_merging_strategy == "before_ToSVDCKF" \
+            else combined_reco_tracks_name
+        # We do not merge anything in this step, thus cdc_backtrack_chain and svd_backtrack_chain is not needed
         add_svd_track_finding(path,
                               components=components,
                               input_reco_tracks=latest_reco_tracks,

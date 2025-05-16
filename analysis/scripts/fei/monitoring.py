@@ -414,7 +414,7 @@ def MonitorSpectatorPlot(particle, spectator, filename, range=(None, None)):
             common &= (df[spectator] <= range[1])
         df = df[common]
         p.add(df, spectator, (df['signal'] == 1), label="Signal")
-        p.add(df, spectator, (df['signal'] != 1), label="Background")
+        p.add(df, spectator, (df['signal'] == 0), label="Background")
         p.finish()
         p.axis.set_title(f"{spectator} for signal probability >= {cut:.2f}")
         p.axis.set_xlabel(spectator)
@@ -430,7 +430,7 @@ def MonitorROCPlot(particle, filename):
                                     'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
                                    ['unique', 'probability', 'signal'])
     p = plotting.RejectionOverEfficiency()
-    p.add(df, 'probability', df['signal'] == 1, df['signal'] != 1, label='All')
+    p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0, label='All')
     p.finish()
     p.save(filename + '.png')
 
@@ -444,7 +444,7 @@ def MonitorDiagPlot(particle, filename):
                                     'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
                                    ['unique', 'probability', 'signal'])
     p = plotting.Diagonal()
-    p.add(df, 'probability', df['signal'] == 1, df['signal'] != 1)
+    p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0)
     p.finish()
     p.save(filename + '.png')
 

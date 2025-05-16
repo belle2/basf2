@@ -9,7 +9,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-// #include <reconstruction/persistenceManager/PersistenceManager.h>
+#include <reconstruction/persistenceManager/PersistenceManager.h>
 
 /**
  * @struct Counters
@@ -26,6 +26,8 @@ struct Counters {
 };
 
 namespace Belle2::SVD {
+
+  namespace VPM = Belle2::VariablePersistenceManager;
 
   /**
    * @class SVDValidationModule
@@ -81,7 +83,7 @@ namespace Belle2::SVD {
                                                          m_variablesToHistogram; /**< List of (variableName, nBins, lowBin, highBin) defining histograms. */
     std::vector<std::string> m_variableNames;  /**< List of variable names for reference. */
 
-    // std::unique_ptr<PersistenceManager> persistenceManager; /**< Manages the persistence of data (e.g., writing to file). */
+    std::unique_ptr<VPM::PersistenceManager> persistenceManager; /**< Manages the persistence of data (e.g., writing to file). */
   };
 
 } // namespace Belle2::SVD

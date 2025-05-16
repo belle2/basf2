@@ -96,19 +96,19 @@ namespace Belle2 {
 
 
     /** u charge of clusters */
-    TH1F** m_clustrkChargeU = nullptr;
+    TH1F** m_clstrkChargeU = nullptr;
     /** v charge of clusters */
-    TH1F** m_clustrkChargeV = nullptr;
+    TH1F** m_clstrkChargeV = nullptr;
 
     /** u SNR of clusters per sensor */
-    TH1F** m_clustrkSNRU = nullptr;
+    TH1F** m_clstrkSNRU = nullptr;
     /** v SNR of clusters per sensor */
-    TH1F** m_clustrkSNRV = nullptr;
+    TH1F** m_clstrkSNRV = nullptr;
 
     /** u time */
-    TH1F** m_clustrkTimeU = nullptr;
+    TH1F** m_clstrkTimeU = nullptr;
     /** v time */
-    TH1F** m_clustrkTimeV = nullptr;
+    TH1F** m_clstrkTimeV = nullptr;
 
     /** charge of clusters related to tracks per ladder */
     TH1F** m_clsTrkCharge = nullptr;

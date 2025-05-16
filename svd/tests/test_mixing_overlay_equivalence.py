@@ -151,33 +151,56 @@ if __name__ == "__main__":
 
         basf2.B2INFO('Comparing...')
 
-        # Compare diigts stored in the two root files
-        f_mixed = ROOT.TFile('mixedBg.root')
-        tree_mixed = f_mixed.Get('tree')
+        with ROOT.TFile('mixedBg.root') as f_mixed:
+            tree_mixed = f_mixed.Get('tree')
 
-        f_over = ROOT.TFile('overlaidBg.root')
-        tree_over = f_over.Get('tree')
+            with ROOT.TFile('overlaidBg.root') as f_over:
+                tree_over = f_over.Get('tree')
 
-        # We only have a single event in both files
-        n_good = 0
-        for evt1, evt2 in zip(tree_mixed, tree_over):
-            d_mixed = evt1.SVDShaperDigits
-            d_over = evt2.SVDShaperDigits
-            if (len(d_mixed) != len(d_over)):
-                basf2.B2ERROR('Lengths of SVDShaperDigit arrays DIFFER!')
-                break
-            for d1, d2 in zip(d_mixed, d_over):
-                match = True
-                match = match and (d1.getSensorID() == d2.getSensorID())
-                match = match and (d1.isUStrip() == d2.isUStrip())
-                match = match and (d1.getCellID() == d2.getCellID())
-                for s1, s2 in zip(d1.getSamples(), d2.getSamples()):
-                    match = match and (int(s1) == int(s2))
-                if not match:
-                    print(d1.toString())
-                    print(d2.toString())
-                    basf2.B2ERROR('Digits do not match.')
-                else:
-                    n_good += 1
+                class_name = "Belle2::SVDShaperDigit"
 
-        basf2.B2INFO(f'Processed {n_good} matching digits.')
+                digits_mixed = ROOT.TClonesArray(class_name)
+                digits_over = ROOT.TClonesArray(class_name)
+
+                tree_mixed.SetBranchAddress("SVDShaperDigits", digits_mixed)
+                tree_over.SetBranchAddress("SVDShaperDigits", digits_over)
+
+                n_good = 0
+
+                for i in range(tree_mixed.GetEntries()):
+                    tree_mixed.GetEntry(i)
+                    tree_over.GetEntry(i)
+
+                    n_mixed = digits_mixed.GetEntriesFast()
+                    n_over = digits_over.GetEntriesFast()
+
+                    if n_mixed != n_over:
+                        basf2.B2FATAL('Lengths of SVDShaperDigit arrays differ')
+                        break
+
+                    for d1, d2 in zip(digits_mixed, digits_over):
+                        match = (
+                            d1.getSensorID() == d2.getSensorID() and
+                            d1.isUStrip() == d2.isUStrip() and
+                            d1.getCellID() == d2.getCellID()
+                        )
+
+                        samples1 = d1.getSamples()
+                        samples2 = d2.getSamples()
+
+                        if len(samples1) != len(samples2):
+                            match = False
+                        else:
+                            for s1, s2 in zip(samples1, samples2):
+                                if int(s1) != int(s2):
+                                    match = False
+                                    break
+
+                        if not match:
+                            print(d1.toString())
+                            print(d2.toString())
+                            basf2.B2FATAL('Digits do not match.')
+                        else:
+                            n_good += 1
+
+                basf2.B2INFO(f'Processed {n_good} matching digits.')

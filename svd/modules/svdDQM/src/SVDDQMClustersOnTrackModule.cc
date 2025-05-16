@@ -92,7 +92,7 @@ void SVDDQMClustersOnTrackModule::defineHisto()
     m_addSensorPlots = true;
 
   for (auto sensor : m_addSensorLabel) {
-    B2INFO("ClusTrk: additional sensors to be monitored " << sensor);
+    B2DEBUG(20, "ClusTrk: additional sensors to be monitored " << sensor);
   }
 
   // geometry checks

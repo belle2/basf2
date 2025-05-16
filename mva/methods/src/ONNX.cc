@@ -23,31 +23,38 @@ void ONNXExpert::load(Weightfile& weightfile)
                                              Ort::SessionOptions{nullptr});
 }
 
+void ONNXExpert::run(ONNXTensorView& view) const
+{
+  m_session->Run(m_runOptions,
+                 m_inputNames, view.inputTensor(), 1,
+                 m_outputNames, view.outputTensor(), 1);
+}
+
 std::vector<float> ONNXExpert::apply(Dataset& testData) const
 {
-  std::vector<float>& input_data = testData.m_input;
-  std::vector<int64_t> input_shape{1, testData.getNumberOfFeatures()};
-  std::vector<float> output_data(1);
-  std::vector<int64_t> output_shape{1, 1};
-
-  auto memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
-  auto input_tensor = Ort::Value::CreateTensor<float>(
-                        memory_info,
-                        input_data.data(), input_data.size(),
-                        input_shape.data(), input_shape.size());
-  auto output_tensor = Ort::Value::CreateTensor<float>(
-                         memory_info,
-                         output_data.data(), output_data.size(),
-                         output_shape.data(), output_shape.size());
-
+  auto view = ONNXTensorView(testData, 1);
   std::vector<float> result;
-  Ort::RunOptions run_options;
-  const char* input_names[] = {"input"};
-  const char* output_names[] = {"output"};
+  result.reserve(testData.getNumberOfEvents());
   for (unsigned int iEvent = 0; iEvent < testData.getNumberOfEvents(); ++iEvent) {
     testData.loadEvent(iEvent);
-    m_session->Run(run_options, input_names, &input_tensor, 1, output_names, &output_tensor, 1);
-    result.push_back(output_data[0]);
+    run(view);
+    result.push_back(view.outputData()[0]);
+  }
+  return result;
+}
+
+std::vector<std::vector<float>> ONNXExpert::applyMulticlass(Dataset& testData) const
+{
+  auto view = ONNXTensorView(testData, m_general_options.m_nClasses);
+  std::vector<std::vector<float>> result(testData.getNumberOfEvents(),
+                                         std::vector<float>(m_general_options.m_nClasses));
+  for (unsigned int iEvent = 0; iEvent < testData.getNumberOfEvents(); ++iEvent) {
+    testData.loadEvent(iEvent);
+    run(view);
+    auto outputs = view.outputData();
+    for (unsigned int iClass = 0; iClass < m_general_options.m_nClasses; ++iClass) {
+      result[iEvent][iClass] = outputs[iClass];
+    }
   }
   return result;
 }

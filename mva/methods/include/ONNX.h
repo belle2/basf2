@@ -77,6 +77,34 @@ namespace Belle2 {
     };
 
     /**
+     * View a Dataset's m_input as ONNX Tensor
+     * and also set up output buffers/Tensors
+     */
+    class ONNXTensorView {
+    public:
+      ONNXTensorView(Dataset& dataset, int nOutputs)
+        : m_inputShape{1, dataset.getNumberOfFeatures()}, m_outputData(nOutputs),
+          m_outputShape{1, nOutputs}, m_memoryInfo(Ort::MemoryInfo::CreateCpu(
+                                                     OrtDeviceAllocator, OrtMemTypeCPU)),
+          m_inputTensor(Ort::Value::CreateTensor<float>(
+                          m_memoryInfo, dataset.m_input.data(), dataset.m_input.size(),
+                          m_inputShape.data(), m_inputShape.size())),
+          m_outputTensor(Ort::Value::CreateTensor<float>(
+                           m_memoryInfo, m_outputData.data(), m_outputData.size(),
+                           m_outputShape.data(), m_outputShape.size())) {}
+      Ort::Value* inputTensor() { return &m_inputTensor; }
+      Ort::Value* outputTensor() { return &m_outputTensor; }
+      std::vector<float> outputData() { return m_outputData; }
+    private:
+      std::vector<int64_t> m_inputShape;
+      std::vector<float> m_outputData;
+      std::vector<int64_t> m_outputShape;
+      Ort::MemoryInfo m_memoryInfo;
+      Ort::Value m_inputTensor;
+      Ort::Value m_outputTensor;
+    };
+
+    /**
      * Expert for the ONNX MVA method
      */
     class ONNXExpert : public Expert {
@@ -93,8 +121,23 @@ namespace Belle2 {
        */
       virtual std::vector<float> apply(Dataset& testData) const override;
 
+      /**
+       * Apply this expert onto a dataset and return multiple outputs
+       * @param test_data dataset
+       */
+      virtual std::vector<std::vector<float>> applyMulticlass(Dataset& test_data) const override;
+
     private:
+      /**
+       * Run the current inputs through the onnx model
+       * Will retrieve and fill the buffers from the view
+       */
+      void run(ONNXTensorView& view) const;
+
       std::unique_ptr<Ort::Session> m_session;
+      Ort::RunOptions m_runOptions;
+      const char* m_inputNames[1] = {"input"};
+      const char* m_outputNames[1] = {"output"};
     };
   } // namespace MVA
 } // namespace Belle2

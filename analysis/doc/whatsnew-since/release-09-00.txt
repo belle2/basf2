@@ -14,6 +14,11 @@ Modular Analysis
 * Fixed :py:func:`stdV0s.goodBelleKshort` and `loadStdGoodBellePhoton` functions to apply cuts on the corresponding :mdst lists when using b2bii, instead of using `fillParticleList`.
 * Fixed documentation explicitly mentioning that the invariant mass cuts are applied "after the vertex fit" in `stdLambdas`, `stdKshorts` and :py:func:`stdV0s.goodBelleKshort` functions.
 
+Utilities
++++++++++
+* Added convenience function ROOT.Belle2.ParticleListName.addAntiParticleLists(inputList) which returns the same list with appended anti-particle lists of the particle lists in the input list. 
+  The function can be used for a more convenient use of the branchNames and similar arguments of the RootOuput module.
+
 Charm Flavor Tagger
 +++++++++++++++++++
 * Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the

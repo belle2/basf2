@@ -62,7 +62,13 @@ private:
   /** C_T -- tensor current */
   EvtComplex _cT;
 
+  /**
+   * The method to evaluate the maximum decay amplitude.
+   */
   double CalcMaxProb();
 
+  /**
+   * The method to evaluate the decay amplitude.
+   */
   void CalcAmp(EvtParticle*, EvtAmp&);
 };

@@ -176,6 +176,12 @@ static void getFF(double mB, double mV, double q2,
   const double m_c = 1.27, // +- 0.02 GeV PDG
                m_b = 4.18; // +- 0.025 GeV PDG
 
+  double rmB = 1 / mB, r = mV / mB, r2 = r * r;
+  double c = 0.5 / sqrt(mB * mV), mBaV = mB + mV, mBsV = mB - mV, rmBaV = 1 / mBaV, rmBsV = 1 / mBsV;
+  double w = (mB * mB + mV * mV - q2) / (2 * mB * mV), w2 = w * w, sqrtwa1 = sqrt(w + 1);
+  double u = 1 + r2 - 2 * r * w;
+  double z = (sqrtwa1 - sqrt(2)) / (sqrtwa1 + sqrt(2));
+
   /* FF parameter values are taken from Table I of arXiv:2111.01176 */
   const double
   a0f = 0.0123, // +- 0.0001
@@ -220,12 +226,6 @@ static void getFF(double mB, double mV, double q2,
 
   static const double mP0min[] = {6.275, 6.842, 7.250};
   double P0min = BlaschkeFactor(z, sizeof(mP0min) / sizeof(mP0min[0]), mP0min);
-
-  double rmB = 1 / mB, r = mV / mB, r2 = r * r;
-  double c = 0.5 / sqrt(mB * mV), mBaV = mB + mV, mBsV = mB - mV, rmBaV = 1 / mBaV, rmBsV = 1 / mBsV;
-  double w = (mB * mB + mV * mV - q2) / (2 * mB * mV), w2 = w * w, sqrtwa1 = sqrt(w + 1);
-  double u = 1 + r2 - 2 * r * w;
-  double z = (sqrtwa1 - sqrt(2)) / (sqrtwa1 + sqrt(2));
 
   /* Eq. (22) phi_i(z) function evaluations */
   double zm = 1 - z, zp = 1 + z, szm = sqrt(zm), d1 = (1 + r) * zm + 2 * sqrt(r) * zp, d2 = d1 * d1, d4 = d2 * d2;

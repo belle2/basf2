@@ -18,9 +18,21 @@ void ONNXExpert::load(Weightfile& weightfile)
 {
   std::string onnxModelFileName = weightfile.generateFileName();
   weightfile.getFile("ONNX_Modelfile", onnxModelFileName);
+
+  // Ensure single-threaded execution, see
+  // https://onnxruntime.ai/docs/performance/tune-performance/threading.html
+  //
+  // InterOpNumThreads is probably optional (not used in ORT_SEQUENTIAL mode)
+  // Also, in ORT_SEQUENTIAL mode, MLP-like models will always run single threaded,
+  // but maybe not e.g. graph networks which can run in parallel on nodes.
+  // Here, setting IntraOpNumThreads to 1 is important to ensure single-threaded execution.
+  Ort::SessionOptions sessionOptions;
+  sessionOptions.SetIntraOpNumThreads(1);
+  sessionOptions.SetInterOpNumThreads(1);
+  sessionOptions.SetExecutionMode(ORT_SEQUENTIAL); // default, but make it explicit
+
   Ort::Env env;
-  m_session = std::make_unique<Ort::Session>(env, onnxModelFileName.c_str(),
-                                             Ort::SessionOptions{nullptr});
+  m_session = std::make_unique<Ort::Session>(env, onnxModelFileName.c_str(), sessionOptions);
 }
 
 void ONNXExpert::run(ONNXTensorView& view) const

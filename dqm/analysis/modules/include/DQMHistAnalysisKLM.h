@@ -209,23 +209,20 @@ namespace Belle2 {
     /** TText for names in plane histograms. */
     TText m_PlaneText;
 
-    /** Histogram for BKLM plane events fraction w/FE. */
-    TH1* m_fe_bklm_ratio = NULL;
+    /** Histogram for BKLM plane events fraction w/ FE. */
+    TH1* m_fe_bklm_ratio = nullptr;
 
-    /** Canvas for BKLM plane events fraction w/FE.  */
-    TCanvas* m_c_fe_bklm_ratio = NULL;
+    /** Canvas for BKLM plane events fraction w/ FE.  */
+    TCanvas* m_c_fe_bklm_ratio = nullptr;
 
-    /** Histogram for EKLM plane events fraction w/FE. */
-    TH1* m_fe_eklm_ratio = NULL;
+    /** Histogram for EKLM plane events fraction w/ FE. */
+    TH1* m_fe_eklm_ratio = nullptr;
 
-    /** Canvas for EKLM plane events fraction w/FE. */
-    TCanvas* m_c_fe_eklm_ratio = NULL;
+    /** Canvas for EKLM plane events fraction w/ FE. */
+    TCanvas* m_c_fe_eklm_ratio = nullptr;
 
     /** Run type flag for null runs. */
     bool m_IsNullRun;
-
-    /** Run type flag for physics runs. */
-    bool m_IsPhysicsRun;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;

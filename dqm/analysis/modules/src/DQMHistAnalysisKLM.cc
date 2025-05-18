@@ -91,20 +91,24 @@ void DQMHistAnalysisKLMModule::initialize()
   registerEpicsPV("KLM:DeadEndcapModules", "DeadEndcapModules");
 
   gROOT->cd();
-  m_c_fe_bklm_ratio = new TCanvas((m_histogramDirectoryName + "/c_fe_bklm_ratio").data());
-  m_c_fe_eklm_ratio = new TCanvas((m_histogramDirectoryName + "/c_fe_eklm_ratio").data());
+  std::string c_fe_bklm_ratio_name = m_histogramDirectoryName + "/c_fe_bklm_ratio";
+  m_c_fe_bklm_ratio = new TCanvas((c_fe_bklm_ratio_name).c_str());
+  std::string c_fe_eklm_ratio_name = m_histogramDirectoryName + "/c_fe_eklm_ratio";
+  m_c_fe_eklm_ratio = new TCanvas((c_fe_eklm_ratio_name).c_str());
   // Feature extraction status histogram for BKLM
   int bklmSectors = BKLMElementNumbers::getMaximalSectorGlobalNumber(); // 16
   int eklmPlanes = EKLMElementNumbers::getMaximalPlaneGlobalNumber(); // 208
   //BKLM
-  m_fe_bklm_ratio = new TH1F((m_histogramDirectoryName + "/fe_bklm_ratio").data(),
+  std::string fe_bklm_ratio_name = m_histogramDirectoryName + "/fe_bklm_ratio";
+  m_fe_bklm_ratio = new TH1F((fe_bklm_ratio_name).c_str(),
                              "FE Ratio in BKLM",
                              bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
   m_fe_bklm_ratio->GetXaxis()->SetTitle("Scintillator Layer number");
   m_fe_bklm_ratio->SetStats(false);
   m_fe_bklm_ratio->SetOption("HIST");
   //EKLM
-  m_fe_eklm_ratio = new TH1F((m_histogramDirectoryName + "/fe_eklm_ratio").data(),
+  std::string fe_eklm_ratio_name = m_histogramDirectoryName + "/fe_eklm_ratio";
+  m_fe_eklm_ratio = new TH1F((fe_eklm_ratio_name).c_str(),
                              "FE Ratio in EKLM",
                              eklmPlanes, 0.5, 0.5 + eklmPlanes);
   m_fe_eklm_ratio->GetXaxis()->SetTitle("Plane number");
@@ -147,7 +151,6 @@ void DQMHistAnalysisKLMModule::beginRun()
   m_MaskedChannels.clear();
 
   m_IsNullRun = (getRunType() == "null");
-  m_IsPhysicsRun = (getRunType() == "physics");
 }
 
 void DQMHistAnalysisKLMModule::endRun()
@@ -790,11 +793,11 @@ void DQMHistAnalysisKLMModule::event()
   TH1F* feStatus_eklm_plane_0 = (TH1F*)findHist(m_histogramDirectoryName + "/feStatus_eklm_plane_0");
   TH1F* feStatus_eklm_plane_1 = (TH1F*)findHist(m_histogramDirectoryName + "/feStatus_eklm_plane_1");
   /* Check if fe histograms exist*/
-  if ((feStatus_bklm_scintillator_0 == nullptr || feStatus_bklm_scintillator_1 == nullptr) && (m_IsPhysicsRun)) {
+  if ((feStatus_bklm_scintillator_0 == nullptr || feStatus_bklm_scintillator_1 == nullptr)) {
     B2INFO("Histograms needed for BKLM feature extraction computation are not found");
   }
 
-  if ((feStatus_eklm_plane_0 == nullptr || feStatus_eklm_plane_1 == nullptr) && (m_IsPhysicsRun)) {
+  if ((feStatus_eklm_plane_0 == nullptr || feStatus_eklm_plane_1 == nullptr)) {
     B2INFO("Histograms needed for EKLM feature extraction computation are not found");
   }
   /* Reset the color palette to the default one. */

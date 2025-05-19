@@ -7,7 +7,7 @@
 
 #pragma link C++ class Belle2::ExtHit+; // checksum=0x4cc0291c, version=9
 #pragma link C++ class Belle2::TrackClusterSeparation+; // checksum=0x8d25ce5e, version=3
-#pragma link C++ class Belle2::V0ValidationVertex+; // checksum=0x1b03f08a, version=3
+#pragma link C++ class Belle2::V0ValidationVertex+; // checksum=0x56c735b2, version=4
 #pragma link C++ class Belle2::FullSecID+; // checksum=0xa4543536, version=-1
 
 #pragma link C++ class pair <bool, double>+; // checksum=0x90c0afc6, version=-1

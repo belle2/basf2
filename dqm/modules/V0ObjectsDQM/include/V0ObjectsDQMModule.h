@@ -10,9 +10,13 @@
 // Description : Module to monitor displaced vertices
 //-
 
+#pragma once
+
 #include <framework/core/HistoModule.h>
+
+#include <TH2F.h>
+
 #include <string>
-#include "TH2F.h"
 
 namespace Belle2 {
 

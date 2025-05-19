@@ -65,19 +65,7 @@ namespace Belle2 {
     /**
      * Default constructor for ROOT.
      */
-    MCParticle():
-      m_plist(0), m_index(0), m_status(0),
-      m_pdg(0), m_mass(0), m_energy(0),
-      m_momentum_x(0), m_momentum_y(0), m_momentum_z(0),
-      m_validVertex(false), m_productionTime(0),
-      m_productionVertex_x(0), m_productionVertex_y(0),
-      m_productionVertex_z(0),
-      m_decayTime(0), m_decayVertex_x(0),
-      m_decayVertex_y(0), m_decayVertex_z(0),
-      m_mother(0),
-      m_firstDaughter(0), m_lastDaughter(0),
-      m_secondaryPhysicsProcess(0),
-      m_seenIn() {}
+    MCParticle() {}
 
     /**
      * Construct MCParticle from a another MCParticle and the TClonesArray it is stored in.
@@ -88,17 +76,18 @@ namespace Belle2 {
      * @see class MCParticleGraph
      */
     MCParticle(TClonesArray* plist, const MCParticle& p):
-      m_plist(plist), m_index(p.m_index), m_status(p.m_status),
-      m_pdg(p.m_pdg), m_mass(p.m_mass), m_energy(p.m_energy),
-      m_momentum_x(p.m_momentum_x), m_momentum_y(p.m_momentum_y), m_momentum_z(p.m_momentum_z),
-      m_validVertex(p.m_validVertex), m_productionTime(p.m_productionTime),
-      m_productionVertex_x(p.m_productionVertex_x), m_productionVertex_y(p.m_productionVertex_y),
-      m_productionVertex_z(p.m_productionVertex_z),
+      m_plist(plist),
+      m_productionTime(p.m_productionTime), m_productionVertex_x(p.m_productionVertex_x),
+      m_productionVertex_y(p.m_productionVertex_y), m_productionVertex_z(p.m_productionVertex_z),
       m_decayTime(p.m_decayTime), m_decayVertex_x(p.m_decayVertex_x),
       m_decayVertex_y(p.m_decayVertex_y), m_decayVertex_z(p.m_decayVertex_z),
-      m_mother(p.m_mother),
-      m_firstDaughter(p.m_firstDaughter), m_lastDaughter(p.m_lastDaughter),
+      m_pdg(p.m_pdg), m_mass(p.m_mass), m_energy(p.m_energy),
+      m_momentum_x(p.m_momentum_x), m_momentum_y(p.m_momentum_y), m_momentum_z(p.m_momentum_z),
+      m_index(p.m_index),
+      m_mother(p.m_mother), m_firstDaughter(p.m_firstDaughter), m_lastDaughter(p.m_lastDaughter),
       m_secondaryPhysicsProcess(p.m_secondaryPhysicsProcess),
+      m_status(p.m_status),
+      m_validVertex(p.m_validVertex),
       m_seenIn(p.m_seenIn) {}
 
     /**
@@ -525,44 +514,45 @@ namespace Belle2 {
      * This is a transient member and will not be written to file. The pointer
      * will be set correctly on first access after deserialisation
      */
-    TClonesArray* m_plist; //! transient pointer to particle list
+    TClonesArray* m_plist = nullptr; //! transient pointer to particle list
+
+    float m_productionTime = 0;     /**< production time */
+    float m_productionVertex_x = 0; /**< production vertex of particle, x component */
+    float m_productionVertex_y = 0; /**< production vertex of particle, y component */
+    float m_productionVertex_z = 0; /**< production vertex of particle, z component */
+
+    float m_decayTime = 0;          /**< decay time */
+    float m_decayVertex_x = 0;      /**< decay vertex of particle, x component */
+    float m_decayVertex_y = 0;      /**< decay vertex of particle, y component */
+    float m_decayVertex_z = 0;      /**< decay vertex of particle, z component */
+
+    int m_pdg = 0;                  /**< PDG-Code of the particle */
+    float m_mass = 0;               /**< mass of the particle */
+    float m_energy = 0;             /**< energy of the particle */
+    float m_momentum_x = 0;         /**< momentum of particle, x component */
+    float m_momentum_y = 0;         /**< momentum of particle, y component */
+    float m_momentum_z = 0;         /**< momentum of particle, z component */
 
     /**
      * 1-based index of the particle, will be set automatically after
      * deserialisation if needed.
      */
-    int m_index; //! transient 1-based index of particle
+    int m_index = 0; //! transient 1-based index of particle
 
-    unsigned short int m_status;      /**< status code */
-    int m_pdg;                  /**< PDG-Code of the particle */
-    float m_mass;               /**< mass of the particle */
-    float m_energy;             /**< energy of the particle */
-    float m_momentum_x;         /**< momentum of particle, x component */
-    float m_momentum_y;         /**< momentum of particle, y component */
-    float m_momentum_z;         /**< momentum of particle, z component */
+    int m_mother = 0;               /**< 1-based index of the mother particle */
+    int m_firstDaughter = 0;        /**< 1-based index of first daughter particle in collection, 0 if no daughters */
+    int m_lastDaughter = 0;         /**< 1-based index of last daughter particle in collection, 0 if no daughters */
 
-    bool m_validVertex;         /**< indication whether vertex and time information is useful or just default */
+    int m_secondaryPhysicsProcess = 0;  /**< physics process type of a secondary particle */
 
-    float m_productionTime;     /**< production time */
-    float m_productionVertex_x; /**< production vertex of particle, x component */
-    float m_productionVertex_y; /**< production vertex of particle, y component */
-    float m_productionVertex_z; /**< production vertex of particle, z component */
+    unsigned short int m_status = 0;      /**< status code */
 
-    float m_decayTime;          /**< decay time */
-    float m_decayVertex_x;      /**< decay vertex of particle, x component */
-    float m_decayVertex_y;      /**< decay vertex of particle, y component */
-    float m_decayVertex_z;      /**< decay vertex of particle, z component */
-
-    int m_mother;               /**< 1-based index of the mother particle */
-    int m_firstDaughter;        /**< 1-based index of first daughter particle in collection, 0 if no daughters */
-    int m_lastDaughter;         /**< 1-based index of last daughter particle in collection, 0 if no daughters */
+    bool m_validVertex = false;         /**< indication whether vertex and time information is useful or just default */
     static const double c_epsilon;  /**< limit of precision for two doubles to be the same. */
-
-    int m_secondaryPhysicsProcess;  /**< physics process type of a secondary particle */
 
     Const::DetectorSet m_seenIn;  /**< Each bit is a seen-in flag for the corresoponding subdetector of Belle II */
 
-    ClassDefOverride(MCParticle, 5); /**< A Class to store the Monte Carlo particle information. */
+    ClassDefOverride(MCParticle, 6); /**< A Class to store the Monte Carlo particle information. */
 
     friend class FixMergedObjectsModule;
   };

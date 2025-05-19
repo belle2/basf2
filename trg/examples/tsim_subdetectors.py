@@ -35,7 +35,7 @@ main.add_module(babayaganlo)
 # add simulation
 add_simulation(main)
 
-# add trigger simlation of sub detectors (CDC, ECL, and bKLM are included currently)
+# add trigger simulation of sub detectors (CDC, ECL, and bKLM are included currently)
 add_subdetector_tsim(main, component=["CDC", "ECL", "KLM"])
 
 branches = [

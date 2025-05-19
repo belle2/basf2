@@ -14,8 +14,6 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
-#include <cmath>
-
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
 

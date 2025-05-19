@@ -33,7 +33,7 @@ REG_MODULE(TRGRAWDATA);
 TRGRAWDATAModule::TRGRAWDATAModule() : HistoModule()
 {
 
-  setDescription("TRG rawdata analyer");
+  setDescription("TRG rawdata analyser");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("histRecord", m_histRecord,

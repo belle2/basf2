@@ -388,102 +388,22 @@ namespace Belle2 {
         //G4VSolid* s_csibeamhneg = new G4SubtractionSolid("s_csibeamhneg", s_csibeamh_a, s_csibeamh_b, 0, G4ThreeVector(-dw_tpcbeam, 0, 0));
         G4VSolid* s_csibeamh = new G4UnionSolid("s_csibeamh", s_csibeamhpos, s_csibeamhneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
         G4LogicalVolume* l_csibeamh = new G4LogicalVolume(s_csibeamh,  geometry::Materials::get("FG_Epoxy"), "l_csibeamh", 0, 0);
-        int xdimbase = 0;
-        int ydimbase = 0;
-        int zdimbase = 0;
-        int xdimcsiBeamh = 0;
-        int ydimcsiBeamh = 0;
-        int zdimcsiBeamh = 0;
-        int xdimcsiBeamvF = 0;
-        int ydimcsiBeamvF = 0;
-        int zdimcsiBeamvF = 0;
-        int xdimcsiBeamvB = 0;
-        int ydimcsiBeamvB = 0;
-        int zdimcsiBeamvB = 0;
-        int xdimbgobeamv = 0;
-        int ydimbgobeamv = 0;
-        int zdimbgobeamv = 0;
-        int xdimbgobeamh = 0;
-        int ydimbgobeamh = 0;
-        int zdimbgobeamh = 0;
-        int xdimbgobeamt = 0;
-        int ydimbgobeamt = 0;
-        int zdimbgobeamt = 0;
-        int xdimbgobeamb = 0;
-        int ydimbgobeamb = 0;
-        int zdimbgobeamb = 0;
-        int xdimtpcbeamb = 0;
-        int ydimtpcbeamb = 0;
-        int zdimtpcbeamb = 0;
-        /*int xdimtpcbeamhh = 0;
-        int ydimtpcbeamhh = 0;
-        int zdimtpcbeamhh = 0;
-        int xdimtpcbeamvv = 0;
-        int ydimtpcbeamvv = 0;
-        int zdimtpcbeamvv = 0;*/
-        double xbase[100];
-        double ybase[100];
-        double zbase[100];
-        double xcsibeamh[100];
-        double ycsibeamh[100];
-        double zcsibeamh[100];
-        double xcsibeamvF[100];
-        double ycsibeamvF[100];
-        double zcsibeamvF[100];
-        double xcsibeamvB[100];
-        double ycsibeamvB[100];
-        double zcsibeamvB[100];
-        double xbgobeamv[100];
-        double ybgobeamv[100];
-        double zbgobeamv[100];
-        double xbgobeamh[100];
-        double ybgobeamh[100];
-        double zbgobeamh[100];
-        double xbgobeamt[100];
-        double ybgobeamt[100];
-        double zbgobeamt[100];
-        double xbgobeamb[100];
-        double ybgobeamb[100];
-        double zbgobeamb[100];
-        double xtpcbeamb[100];
-        double ytpcbeamb[100];
-        double ztpcbeamb[100];
-        /*double xtpcbeamhh[100];
-        double ytpcbeamhh[100];
-        double ztpcbeamhh[100];
-        double xtpcbeamvv[100];
-        double ytpcbeamvv[100];
-        double ztpcbeamvv[100];*/
 
         double x_offset = activeParams.getLength("x_offset") * CLHEP::cm;
         double y_offset = activeParams.getLength("y_offset") * CLHEP::cm;
 
-        for (double xcsiBeamh : activeParams.getArray("xcsiBeamh", {0})) {
-          xcsiBeamh *= CLHEP::cm;
-          xcsibeamh[xdimcsiBeamh] = xcsiBeamh - x_offset;
-          xdimcsiBeamh++;
-        }
-        for (double ycsiBeamh : activeParams.getArray("ycsiBeamh", {0})) {
-          ycsiBeamh *= CLHEP::cm;
-          ycsibeamh[ydimcsiBeamh] = ycsiBeamh - y_offset;
-          ydimcsiBeamh++;
-        }
-        for (double zcsiBeamh : activeParams.getArray("zcsiBeamh", {0})) {
-          zcsiBeamh *= CLHEP::cm;
-          zcsibeamh[zdimcsiBeamh] = zcsiBeamh;
-          zdimcsiBeamh++;
-        }
-        for (int i = 0; i < xdimcsiBeamh; i++) {
-          G4Transform3D transform = G4Translate3D(xcsibeamh[i], ycsibeamh[i] - dy_tpcbeam,
-                                                  zcsibeamh[i] + 2. * dy_tpcbeam) * G4RotateY3D(90.*CLHEP::deg) * G4RotateZ3D(90.*CLHEP::deg);
+        std::vector<double> xcsiBeamh = activeParams.getArray("xcsiBeamh", {0});
+        std::vector<double> ycsiBeamh = activeParams.getArray("ycsiBeamh", {0});
+        std::vector<double> zcsiBeamh = activeParams.getArray("zcsiBeamh", {0});
+        for (unsigned int i = 0; i < xcsiBeamh.size(); ++i) {
+          xcsiBeamh[i] = xcsiBeamh[i] - x_offset;
+          ycsiBeamh[i] = ycsiBeamh[i] - y_offset;
+          G4Transform3D transform = G4Translate3D(xcsiBeamh[i], ycsiBeamh[i] - dy_tpcbeam,
+                                                  zcsiBeamh[i] + 2. * dy_tpcbeam) * G4RotateY3D(90.*CLHEP::deg) * G4RotateZ3D(90.*CLHEP::deg);
           new G4PVPlacement(transform, l_csibeamh, TString::Format("p_csibeamh1_%d", i).Data(), &topVolume, false, 1);
-          transform = G4Translate3D(xcsibeamh[i], ycsibeamh[i] + dy_tpcbeam,
-                                    zcsibeamh[i] + 2. * dy_tpcbeam) * G4RotateY3D(90.*CLHEP::deg) * G4RotateZ3D(90.*CLHEP::deg);
+          transform = G4Translate3D(xcsiBeamh[i], ycsiBeamh[i] + dy_tpcbeam,
+                                    zcsiBeamh[i] + 2. * dy_tpcbeam) * G4RotateY3D(90.*CLHEP::deg) * G4RotateZ3D(90.*CLHEP::deg);
           new G4PVPlacement(transform, l_csibeamh, TString::Format("p_csibeamh2_%d", i).Data(), &topVolume, false, 1);
-          //PH1SUSTRpos = G4ThreeVector(xcsibeamh[i],ycsibeamh[i],zcsibeamh[i] - dy_tpcbeam);
-          //new G4PVPlacement(rotY, PH1SUSTRpos, l_csibeamh, "p_csibeamh", &topVolume, false, 0);
-          //PH1SUSTRpos = G4ThreeVector(xcsibeamh[i],ycsibeamh[i],zcsibeamh[i] + dy_tpcbeam);
-          //new G4PVPlacement(rotY+rotXx, PH1SUSTRpos, l_csibeamh, "p_csibeamh", &topVolume, false, 0);
         }
 
         G4double dz_csibeamvF = activeParams.getLength("lcsiBeamvF") * CLHEP::cm / 2.;
@@ -496,24 +416,16 @@ namespace Belle2 {
         G4VSolid* s_csibeamvF = new G4UnionSolid("s_csibeamvF", s_csibeamvFpos, s_csibeamvFneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
         G4LogicalVolume* l_csibeamvF = new G4LogicalVolume(s_csibeamvF,  geometry::Materials::get("FG_Epoxy"), "l_csibeamvF", 0, 0);
 
-        for (double xcsiBeamvF : activeParams.getArray("xcsiBeamvF", {0})) {
-          xcsiBeamvF *= CLHEP::cm;
-          xcsibeamvF[xdimcsiBeamvF] = xcsiBeamvF - x_offset;
-          xdimcsiBeamvF++;
-        }
-        for (double ycsiBeamvF : activeParams.getArray("ycsiBeamvF", {0})) {
-          ycsiBeamvF *= CLHEP::cm;
-          ycsibeamvF[ydimcsiBeamvF] = ycsiBeamvF - y_offset ;
-          ydimcsiBeamvF++;
-        }
-        for (double zcsiBeamvF : activeParams.getArray("zcsiBeamvF", {0})) {
-          zcsiBeamvF *= CLHEP::cm;
-          zcsibeamvF[zdimcsiBeamvF] = zcsiBeamvF ;
-          zdimcsiBeamvF++;
-        }
-        for (int i = 0; i < xdimcsiBeamvF; i++) {
-          //PH1SUSTRpos = G4ThreeVector(xcsibeamvF[i],0,zcsibeamh[0] - 2. * dx_tpcbeam);
-          PH1SUSTRpos = G4ThreeVector(xcsibeamvF[i], ycsibeamvF[i], zcsibeamvF[i]);
+        std::vector<double> xcsiBeamvF =
+          activeParams.getArray("xcsiBeamvF", {0});
+        std::vector<double> ycsiBeamvF =
+          activeParams.getArray("ycsiBeamvF", {0});
+        std::vector<double> zcsiBeamvF =
+          activeParams.getArray("zcsiBeamvF", {0});
+        for (unsigned int i = 0; i < xcsiBeamvF.size(); ++i) {
+          xcsiBeamvF[i] = xcsiBeamvF[i] - x_offset;
+          ycsiBeamvF[i] = ycsiBeamvF[i] - y_offset;
+          PH1SUSTRpos = G4ThreeVector(xcsiBeamvF[i], ycsiBeamvF[i], zcsiBeamvF[i]);
           new G4PVPlacement(rotX, PH1SUSTRpos, l_csibeamvF, TString::Format("p_csibeamvF_%d", i).Data(), &topVolume, false, 0);
         }
 
@@ -527,23 +439,16 @@ namespace Belle2 {
         G4VSolid* s_csibeamvB = new G4UnionSolid("s_csibeamvB", s_csibeamvBpos, s_csibeamvBneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
         G4LogicalVolume* l_csibeamvB = new G4LogicalVolume(s_csibeamvB,  geometry::Materials::get("FG_Epoxy"), "l_csibeamvB", 0, 0);
 
-        for (double xcsiBeamvB : activeParams.getArray("xcsiBeamvB", {0})) {
-          xcsiBeamvB *= CLHEP::cm;
-          xcsibeamvB[xdimcsiBeamvB] = xcsiBeamvB - x_offset;
-          xdimcsiBeamvB++;
-        }
-        for (double ycsiBeamvB : activeParams.getArray("ycsiBeamvB", {0})) {
-          ycsiBeamvB *= CLHEP::cm;
-          ycsibeamvB[ydimcsiBeamvB] = ycsiBeamvB - y_offset ;
-          ydimcsiBeamvB++;
-        }
-        for (double zcsiBeamvB : activeParams.getArray("zcsiBeamvB", {0})) {
-          zcsiBeamvB *= CLHEP::cm;
-          zcsibeamvB[zdimcsiBeamvB] = zcsiBeamvB ;
-          zdimcsiBeamvB++;
-        }
-        for (int i = 0; i < xdimcsiBeamvB; i++) {
-          PH1SUSTRpos = G4ThreeVector(xcsibeamvB[i], ycsibeamvB[i], zcsibeamvB[i]);
+        std::vector<double> xcsiBeamvB =
+          activeParams.getArray("xcsiBeamvB", {0});
+        std::vector<double> ycsiBeamvB =
+          activeParams.getArray("ycsiBeamvB", {0});
+        std::vector<double> zcsiBeamvB =
+          activeParams.getArray("zcsiBeamvB", {0});
+        for (unsigned int i = 0; i < xcsiBeamvB.size(); ++i) {
+          xcsiBeamvB[i] = xcsiBeamvB[i] - x_offset;
+          ycsiBeamvB[i] = ycsiBeamvB[i] - y_offset;
+          PH1SUSTRpos = G4ThreeVector(xcsiBeamvB[i], ycsiBeamvB[i], zcsiBeamvB[i]);
           new G4PVPlacement(rotX, PH1SUSTRpos, l_csibeamvB, TString::Format("p_csibeamvB_%d", i).Data(), &topVolume, false, 0);
         }
 
@@ -553,23 +458,13 @@ namespace Belle2 {
         G4VSolid* s_base = new G4SubtractionSolid("s_base", s_base_a, s_base_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
         G4LogicalVolume* l_base = new G4LogicalVolume(s_base,  geometry::Materials::get("FG_Epoxy"), "l_base", 0, 0);
 
-        for (double xBase : activeParams.getArray("xBase", {0})) {
-          xBase *= CLHEP::cm;
-          xbase[xdimbase] = xBase - x_offset;
-          xdimbase++;
-        }
-        for (double yBase : activeParams.getArray("yBase", {0})) {
-          yBase *= CLHEP::cm;
-          ybase[ydimbase] = yBase  - y_offset;
-          ydimbase++;
-        }
-        for (double zBase : activeParams.getArray("zBase", {0})) {
-          zBase *= CLHEP::cm;
-          zbase[zdimbase] = zBase ;
-          zdimbase++;
-        }
-        for (int i = 0; i < xdimbase; i++) {
-          PH1SUSTRpos = G4ThreeVector(xbase[i], ybase[i], zbase[i]);
+        std::vector<double> xBase = activeParams.getArray("xBase", {0});
+        std::vector<double> yBase = activeParams.getArray("yBase", {0});
+        std::vector<double> zBase = activeParams.getArray("zBase", {0});
+        for (unsigned int i = 0; i < xBase.size(); ++i) {
+          xBase[i] = xBase[i] - x_offset;
+          yBase[i] = yBase[i] - y_offset;
+          PH1SUSTRpos = G4ThreeVector(xBase[i], yBase[i], zBase[i]);
           new G4PVPlacement(0, PH1SUSTRpos, l_base, TString::Format("p_base_%d", i).Data(), &topVolume, false, 0);
         }
 
@@ -581,23 +476,12 @@ namespace Belle2 {
         G4VSolid* s_bgobeamv = new G4UnionSolid("s_bgobeamv", s_bgobeamvpos, s_bgobeamvneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
         G4LogicalVolume* l_bgobeamv = new G4LogicalVolume(s_bgobeamv,  geometry::Materials::get("FG_Epoxy"), "l_bgobeamv", 0, 0);
 
-        for (double xbgoBeamv : activeParams.getArray("xbgoBeamv", {0})) {
-          xbgoBeamv *= CLHEP::cm;
-          xbgobeamv[xdimbgobeamv] = xbgoBeamv;
-          xdimbgobeamv++;
-        }
-        for (double ybgoBeamv : activeParams.getArray("ybgoBeamv", {0})) {
-          ybgoBeamv *= CLHEP::cm;
-          ybgobeamv[ydimbgobeamv] = ybgoBeamv  - y_offset;
-          ydimbgobeamv++;
-        }
-        for (double zbgoBeamv : activeParams.getArray("zbgoBeamv", {0})) {
-          zbgoBeamv *= CLHEP::cm;
-          zbgobeamv[zdimbgobeamv] = zbgoBeamv ;
-          zdimbgobeamv++;
-        }
-        for (int i = 0; i < xdimbgobeamv; i++) {
-          PH1SUSTRpos = G4ThreeVector(xbgobeamv[i], ybgobeamv[i], zbgobeamv[i]);
+        std::vector<double> xbgoBeamv = activeParams.getArray("xbgoBeamv", {0});
+        std::vector<double> ybgoBeamv = activeParams.getArray("ybgoBeamv", {0});
+        std::vector<double> zbgoBeamv = activeParams.getArray("zbgoBeamv", {0});
+        for (unsigned int i = 0; i < xbgoBeamv.size(); ++i) {
+          ybgoBeamv[i] = ybgoBeamv[i] - y_offset;
+          PH1SUSTRpos = G4ThreeVector(xbgoBeamv[i], ybgoBeamv[i], zbgoBeamv[i]);
           new G4PVPlacement(rotX, PH1SUSTRpos, l_bgobeamv, TString::Format("p_bgobeamv_%d", i).Data(), &topVolume, false, 0);
         }
 
@@ -609,24 +493,13 @@ namespace Belle2 {
         G4VSolid* s_bgobeamh = new G4UnionSolid("s_bgobeamh", s_bgobeamhpos, s_bgobeamhneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
         G4LogicalVolume* l_bgobeamh = new G4LogicalVolume(s_bgobeamh,  geometry::Materials::get("FG_Epoxy"), "l_bgobeamh", 0, 0);
 
-        for (double xbgoBeamh : activeParams.getArray("xbgoBeamh", {0})) {
-          xbgoBeamh *= CLHEP::cm;
-          xbgobeamh[xdimbgobeamh] = xbgoBeamh;
-          xdimbgobeamh++;
-        }
-        for (double ybgoBeamh : activeParams.getArray("ybgoBeamh", {0})) {
-          ybgoBeamh *= CLHEP::cm;
-          ybgobeamh[ydimbgobeamh] = ybgoBeamh  - y_offset;
-          ydimbgobeamh++;
-        }
-        for (double zbgoBeamh : activeParams.getArray("zbgoBeamh", {0})) {
-          zbgoBeamh *= CLHEP::cm;
-          zbgobeamh[zdimbgobeamh] = zbgoBeamh ;
-          zdimbgobeamh++;
-        }
-        for (int i = 0; i < xdimbgobeamh; i++) {
-          G4Transform3D transform = G4Translate3D(xbgobeamh[i], ybgobeamh[i],
-                                                  zbgobeamh[i] + 2. * dy_tpcbeam) * G4RotateY3D(90.*CLHEP::deg) * G4RotateZ3D(90.*CLHEP::deg);
+        std::vector<double> xbgoBeamh = activeParams.getArray("xbgoBeamh", {0});
+        std::vector<double> ybgoBeamh = activeParams.getArray("ybgoBeamh", {0});
+        std::vector<double> zbgoBeamh = activeParams.getArray("zbgoBeamh", {0});
+        for (unsigned int i = 0; i < xbgoBeamh.size(); ++i) {
+          ybgoBeamh[i] = ybgoBeamh[i] - y_offset;
+          G4Transform3D transform = G4Translate3D(xbgoBeamh[i], ybgoBeamh[i],
+                                                  zbgoBeamh[i] + 2. * dy_tpcbeam) * G4RotateY3D(90.*CLHEP::deg) * G4RotateZ3D(90.*CLHEP::deg);
           new G4PVPlacement(transform, l_bgobeamh, TString::Format("p_bgobeamh_%d", i).Data(), &topVolume, false, 0);
         }
 
@@ -636,23 +509,12 @@ namespace Belle2 {
         G4VSolid* s_bgobeamt = new G4SubtractionSolid("s_bgobeamt", s_bgobeamt_a, s_bgobeamt_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
         G4LogicalVolume* l_bgobeamt = new G4LogicalVolume(s_bgobeamt,  geometry::Materials::get("FG_Epoxy"), "l_bgobeamt", 0, 0);
 
-        for (double xbgoBeamt : activeParams.getArray("xbgoBeamt", {0})) {
-          xbgoBeamt *= CLHEP::cm;
-          xbgobeamt[xdimbgobeamt] = xbgoBeamt;
-          xdimbgobeamt++;
-        }
-        for (double ybgoBeamt : activeParams.getArray("ybgoBeamt", {0})) {
-          ybgoBeamt *= CLHEP::cm;
-          ybgobeamt[ydimbgobeamt] = ybgoBeamt  - y_offset;
-          ydimbgobeamt++;
-        }
-        for (double zbgoBeamt : activeParams.getArray("zbgoBeamt", {0})) {
-          zbgoBeamt *= CLHEP::cm;
-          zbgobeamt[zdimbgobeamt] = zbgoBeamt ;
-          zdimbgobeamt++;
-        }
-        for (int i = 0; i < xdimbgobeamt; i++) {
-          PH1SUSTRpos = G4ThreeVector(xbgobeamt[i], ybgobeamt[i], zbgobeamt[i]);
+        std::vector<double> xbgoBeamt = activeParams.getArray("xbgoBeamt", {0});
+        std::vector<double> ybgoBeamt = activeParams.getArray("ybgoBeamt", {0});
+        std::vector<double> zbgoBeamt = activeParams.getArray("zbgoBeamt", {0});
+        for (unsigned int i = 0; i < xbgoBeamt.size(); ++i) {
+          ybgoBeamt[i] = ybgoBeamt[i] - y_offset;
+          PH1SUSTRpos = G4ThreeVector(xbgoBeamt[i], ybgoBeamt[i], zbgoBeamt[i]);
           new G4PVPlacement(0, PH1SUSTRpos, l_bgobeamt, TString::Format("p_bgobeamt_%d", i).Data(), &topVolume, false, 0);
         }
 
@@ -663,24 +525,14 @@ namespace Belle2 {
         G4VSolid* s_bgobeambneg = new G4SubtractionSolid("s_bgobeambneg", s_bgobeamb_a, s_bgobeamb_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
         G4VSolid* s_bgobeamb = new G4UnionSolid("s_bgobeamb", s_bgobeambpos, s_bgobeambneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
         G4LogicalVolume* l_bgobeamb = new G4LogicalVolume(s_bgobeamb,  geometry::Materials::get("FG_Epoxy"), "l_bgobeamb", 0, 0);
-        for (double xbgoBeamb : activeParams.getArray("xbgoBeamb", {0})) {
-          xbgoBeamb *= CLHEP::cm;
-          xbgobeamb[xdimbgobeamb] = xbgoBeamb - x_offset;
-          xdimbgobeamb++;
-        }
-        for (double ybgoBeamb : activeParams.getArray("ybgoBeamb", {0})) {
-          ybgoBeamb *= CLHEP::cm;
-          ybgobeamb[ydimbgobeamb] = ybgoBeamb  - y_offset;
-          ydimbgobeamb++;
-        }
-        for (double zbgoBeamb : activeParams.getArray("zbgoBeamb", {0})) {
-          zbgoBeamb *= CLHEP::cm;
-          zbgobeamb[zdimbgobeamb] = zbgoBeamb ;
-          zdimbgobeamb++;
-        }
-        for (int i = 0; i < xdimbgobeamb; i++) {
-          G4Transform3D transform = G4Translate3D(xbgobeamb[i], ybgobeamb[i],
-                                                  zbgobeamb[i] + 2. * dy_tpcbeam) * G4RotateY3D(90.*CLHEP::deg) * G4RotateZ3D(90.*CLHEP::deg);
+        std::vector<double> xbgoBeamb = activeParams.getArray("xbgoBeamb", {0});
+        std::vector<double> ybgoBeamb = activeParams.getArray("ybgoBeamb", {0});
+        std::vector<double> zbgoBeamb = activeParams.getArray("zbgoBeamb", {0});
+        for (unsigned int i = 0; i < xbgoBeamb.size(); ++i) {
+          xbgoBeamb[i] = xbgoBeamb[i] - x_offset;
+          ybgoBeamb[i] = ybgoBeamb[i] - y_offset;
+          G4Transform3D transform = G4Translate3D(xbgoBeamb[i], ybgoBeamb[i],
+                                                  zbgoBeamb[i] + 2. * dy_tpcbeam) * G4RotateY3D(90.*CLHEP::deg) * G4RotateZ3D(90.*CLHEP::deg);
           new G4PVPlacement(transform, l_bgobeamb, TString::Format("p_bgobeamb_%d", i).Data(), &topVolume, false, 1);
         }
 
@@ -691,89 +543,18 @@ namespace Belle2 {
         G4VSolid* s_tpcbeambneg = new G4SubtractionSolid("s_tpcbeambneg", s_tpcbeamb_a, s_tpcbeamb_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
         G4VSolid* s_tpcbeamb = new G4UnionSolid("s_tpcbeamb", s_tpcbeambpos, s_tpcbeambneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
         G4LogicalVolume* l_tpcbeamb = new G4LogicalVolume(s_tpcbeamb,  geometry::Materials::get("FG_Epoxy"), "l_tpcbeamb", 0, 0);
-        for (double xtpcBeamb : activeParams.getArray("xtpcBeamb", {0})) {
-          xtpcBeamb *= CLHEP::cm;
-          xtpcbeamb[xdimtpcbeamb] = xtpcBeamb - x_offset;
-          xdimtpcbeamb++;
-        }
-        for (double ytpcBeamb : activeParams.getArray("ytpcBeamb", {0})) {
-          ytpcBeamb *= CLHEP::cm;
-          ytpcbeamb[ydimtpcbeamb] = ytpcBeamb  - y_offset;
-          ydimtpcbeamb++;
-        }
-        for (double ztpcBeamb : activeParams.getArray("ztpcBeamb", {0})) {
-          ztpcBeamb *= CLHEP::cm;
-          ztpcbeamb[zdimtpcbeamb] = ztpcBeamb ;
-          zdimtpcbeamb++;
-        }
-        for (int i = 0; i < xdimtpcbeamb; i++) {
-          G4Transform3D transform = G4Translate3D(xtpcbeamb[i], ytpcbeamb[i],
-                                                  ztpcbeamb[i] + 2. * dy_tpcbeam) * G4RotateY3D(90.*CLHEP::deg) * G4RotateZ3D(90.*CLHEP::deg);
+        std::vector<double> xtpcBeamb = activeParams.getArray("xtpcBeamb", {0});
+        std::vector<double> ytpcBeamb = activeParams.getArray("ytpcBeamb", {0});
+        std::vector<double> ztpcBeamb = activeParams.getArray("ztpcBeamb", {0});
+        for (unsigned int i = 0; i < xtpcBeamb.size(); ++i) {
+          xtpcBeamb[i] = xtpcBeamb[i] - x_offset;
+          ytpcBeamb[i] = ytpcBeamb[i] - y_offset;
+          G4Transform3D transform =
+            G4Translate3D(xtpcBeamb[i], ytpcBeamb[i], ztpcBeamb[i] + 2. * dy_tpcbeam) *
+            G4RotateY3D(90.*CLHEP::deg) * G4RotateZ3D(90.*CLHEP::deg);
           new G4PVPlacement(transform, l_tpcbeamb, TString::Format("p_tpcbeamb_%d", i).Data(), &topVolume, false, 1);
         }
 
-        /*
-        G4double dz_tpcbeamhh = activeParams.getLength("ltpcBeamh") * CLHEP::cm / 2.;
-        G4VSolid* s_tpcbeamhh_a = new G4Box("s_tpcbeamhh_a", dx_tpcbeam, dy_tpcbeam, dz_tpcbeamhh);
-        G4VSolid* s_tpcbeamhh_b = new G4Box("s_tpcbeamhh_b", dx_tpcbeam - 2.*dw_tpcbeam, dy_tpcbeam - dw_tpcbeam, dz_tpcbeamhh);
-        G4VSolid* s_tpcbeamhhpos = new G4SubtractionSolid("s_tpcbeamhhpos", s_tpcbeamhh_a, s_tpcbeamhh_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
-        G4VSolid* s_tpcbeamhhneg = new G4SubtractionSolid("s_tpcbeamhhneg", s_tpcbeamhh_a, s_tpcbeamhh_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
-        G4VSolid* s_tpcbeamhh = new G4UnionSolid("s_tpcbeamhh", s_tpcbeamhhpos, s_tpcbeamhhneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
-        G4LogicalVolume* l_tpcbeamhh = new G4LogicalVolume(s_tpcbeamhh,  geometry::Materials::get("FG_Epoxy") , "l_tpcbeamhh", 0, 0);
-
-        for (double xtpcBeamh : activeParams.getArray("xtpcBeamh", {0})) {
-          xtpcBeamh *= CLHEP::cm;
-          xtpcbeamhh[xdimtpcbeamhh] = xtpcBeamh - x_offset;
-          xdimtpcbeamhh++;
-        }
-        for (double ytpcBeamh : activeParams.getArray("ytpcBeamh", {0})) {
-          ytpcBeamh *= CLHEP::cm;
-          ytpcbeamhh[ydimtpcbeamhh] = ytpcBeamh  - y_offset;
-          ydimtpcbeamhh++;
-        }
-        for (double ztpcBeamh : activeParams.getArray("ztpcBeamh", {0})) {
-          ztpcBeamh *= CLHEP::cm;
-          ztpcbeamhh[zdimtpcbeamhh] = ztpcBeamh ;
-          zdimtpcbeamhh++;
-        }
-        for(int i = 0; i < xdimtpcbeamhh; i++) {
-          double z_tmp = 0;
-          if(i<1)z_tmp = ztpcbeamhh[i] + dy_tpcbeam/2.;
-          else z_tmp = ztpcbeamhh[i] - dy_tpcbeam *1.1;
-          G4Transform3D transform = G4Translate3D(xtpcbeamhh[i],ytpcbeamhh[i],z_tmp) * G4RotateY3D(90.*CLHEP::deg) ;
-          new G4PVPlacement(transform, l_tpcbeamhh, TString::Format("p_tpcbeamhh_%d",i).Data(), &topVolume, false, 1);
-        }
-
-        G4double dz_tpcbeamvv = activeParams.getLength("ltpcBeamv") * CLHEP::cm / 2.;
-        G4VSolid* s_tpcbeamvv_a = new G4Box("s_tpcbeamvv_a", dx_tpcbeam, dy_tpcbeam, dz_tpcbeamvv);
-        G4VSolid* s_tpcbeamvv_b = new G4Box("s_tpcbeamvv_b", dx_tpcbeam - 2.*dw_tpcbeam, dy_tpcbeam - dw_tpcbeam, dz_tpcbeamvv);
-        G4VSolid* s_tpcbeamvvpos = new G4SubtractionSolid("s_tpcbeamvvpos", s_tpcbeamvv_a, s_tpcbeamvv_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
-        G4VSolid* s_tpcbeamvvneg = new G4SubtractionSolid("s_tpcbeamvvneg", s_tpcbeamvv_a, s_tpcbeamvv_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
-        G4VSolid* s_tpcbeamvv = new G4UnionSolid("s_tpcbeamvv", s_tpcbeamvvpos, s_tpcbeamvvneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
-        G4LogicalVolume* l_tpcbeamvv = new G4LogicalVolume(s_tpcbeamvv,  geometry::Materials::get("FG_Epoxy") , "l_tpcbeamvv", 0, 0);
-
-        for (double xtpcBeamv : activeParams.getArray("xtpcBeamv", {0})) {
-          xtpcBeamv *= CLHEP::cm;
-          xtpcbeamvv[xdimtpcbeamvv] = xtpcBeamv - x_offset;
-          xdimtpcbeamvv++;
-        }
-        for (double ytpcBeamv : activeParams.getArray("ytpcBeamv", {0})) {
-          ytpcBeamv *= CLHEP::cm;
-          ytpcbeamvv[ydimtpcbeamvv] = ytpcBeamv  - y_offset;
-          ydimtpcbeamvv++;
-        }
-        for (double ztpcBeamv : activeParams.getArray("ztpcBeamv", {0})) {
-          ztpcBeamv *= CLHEP::cm;
-          ztpcbeamvv[zdimtpcbeamvv] = ztpcBeamv ;
-          zdimtpcbeamvv++;
-        }
-        for(int i = 0; i < xdimtpcbeamvv; i++) {
-          //G4Transform3D transform = G4Translate3D(xtpcbeamvv[i],ytpcbeamvv[i],ztpcbeamvv[i]) * G4RotateY3D(90.*CLHEP::deg) ;
-          //new G4PVPlacement(transform, l_tpcbeamvv, TString::Format("p_tpcbeamvv_%d",i).Data(), &topVolume, false, 1);
-          PH1SUSTRpos = G4ThreeVector(xtpcbeamvv[i],ytpcbeamvv[i],ztpcbeamvv[i]);
-          new G4PVPlacement(rotX, PH1SUSTRpos, l_tpcbeamvv, TString::Format("p_tpcbeamvv_%d",i).Data(), &topVolume, false, 0);
-        }
-        */
         G4double dz_fangsbeamhf = activeParams.getLength("lfangsBeamhf") * CLHEP::cm / 2.;
         G4VSolid* s_fangsbeamhf_a = new G4Box("s_fangsbeamhf_a", dx_tpcbeam, dy_tpcbeam, dz_fangsbeamhf);
         G4VSolid* s_fangsbeamhf_b = new G4Box("s_fangsbeamhf_b", dx_tpcbeam - 2.*dw_tpcbeam, dy_tpcbeam - dw_tpcbeam, dz_fangsbeamhf);

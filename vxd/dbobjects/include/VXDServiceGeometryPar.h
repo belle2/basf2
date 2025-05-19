@@ -47,7 +47,7 @@ namespace Belle2 {
     int m_identifier;
     //! Width in mm
     double m_width;
-    //! Lenght in mm
+    //! Length in mm
     double m_length;
     //! Height in mm
     double m_height;

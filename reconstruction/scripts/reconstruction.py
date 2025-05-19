@@ -107,7 +107,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
     :param trackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
-        the fitted hypotheses are pion, muon and proton, i.e. [211, 321, 2212].
+        the fitted hypotheses are pion, kaon and proton, i.e. [211, 321, 2212].
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
@@ -219,7 +219,7 @@ def add_prefilter_reconstruction(path,
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
     :param trackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
-        the fitted hypotheses are pion, muon and proton, i.e. [211, 321, 2212].
+        the fitted hypotheses are pion, kaon and proton, i.e. [211, 321, 2212].
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the

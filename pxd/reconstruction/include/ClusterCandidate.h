@@ -33,7 +33,7 @@ namespace Belle2 {
       };
       /** Constructor to create an empty Cluster */
       ClusterCandidate():
-        m_merged(0), m_charge(0), m_seed()
+        m_seed(), m_merged(0), m_charge(0)
       {
         m_pixels.reserve(c_defaultCapacity);
       }
@@ -79,14 +79,14 @@ namespace Belle2 {
       const std::vector<Pixel>& pixels() const { return m_pixels; }
 
     protected:
+      /** List of all pixels in the cluster */
+      std::vector<Pixel> m_pixels;
+      /** Seed pixel of the cluster, i.e. the pixel with the highest charge */
+      Pixel m_seed;
       /** Pointer to the cluster this cluster was merged into */
       ClusterCandidate* m_merged;
       /** Charge of the cluster */
       float m_charge;
-      /** Seed pixel of the cluster, i.e. the pixel with the highest charge */
-      Pixel m_seed;
-      /** List of all pixels in the cluster */
-      std::vector<Pixel> m_pixels;
     };
 
   }

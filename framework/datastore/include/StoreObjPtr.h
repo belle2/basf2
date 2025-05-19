@@ -11,8 +11,8 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
 
-#include <stdexcept>
 #include <cassert>
+#include <stdexcept>
 
 namespace Belle2 {
 

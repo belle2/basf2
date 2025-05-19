@@ -8,8 +8,9 @@
 
 #include <analysis/utility/PIDNeuralNetwork.h>
 
-#include <cmath>
+#include <framework/gearbox/Const.h>
 
+#include <cmath>
 
 using namespace Belle2;
 

@@ -14,6 +14,7 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/ParticleList.h>
 
+#include <cmath>
 #include <map>
 #include <TRandom.h>
 #include <Math/Vector4D.h>
@@ -34,6 +35,7 @@ TrackingMomentumScaleFactorsModule::TrackingMomentumScaleFactorsModule() : Modul
 The module modifies the input particleLists by scaling track momenta as given by the parameter scale
 		     
 		     )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("scale", m_scale, "scale factor to be applied to 3-momentum", nan(""));
@@ -44,9 +46,9 @@ The module modifies the input particleLists by scaling track momenta as given by
 
 void TrackingMomentumScaleFactorsModule::initialize()
 {
-  if (!isnan(m_scale) && !m_payloadName.empty()) {
+  if (!std::isnan(m_scale) && !m_payloadName.empty()) {
     B2FATAL("It's not allowed to provide both a valid value for the scale parameter and a non-empty table name. Please decide for one of the two options!");
-  } else if (isnan(m_scale) && m_payloadName.empty()) {
+  } else if (std::isnan(m_scale) && m_payloadName.empty()) {
     B2FATAL("Neither a valid value for the scale parameter nor a non-empty table name was provided. Please set (exactly) one of the two options!");
   } else if (!m_scalingFactorName.empty() && !m_smearingFactorName.empty()) {
     B2FATAL("It's not allowed to provide both a valid value for the scalingFactorName and smearingFactorName. Please set (exactly) one of the two options!");
@@ -148,7 +150,7 @@ void TrackingMomentumScaleFactorsModule::setMomentumScalingFactor(Particle* part
     const ROOT::Math::PxPyPzEVector vec(px, py, pz, E);
     particle->set4Vector(vec);
   } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track) {
-    if (!isnan(m_scale)) {
+    if (!std::isnan(m_scale)) {
       particle->setMomentumScalingFactor(m_scale);
     } else if (!m_scalingFactorName.empty()) {
       particle->setMomentumScalingFactor(getScalingFactor(particle));

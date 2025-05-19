@@ -25,6 +25,7 @@ MCDecayFinderModule::MCDecayFinderModule() : Module(), m_isSelfConjugatedParticl
 {
   //Set module properties
   setDescription("Find decays in MCParticle list matching a given DecayString and create Particles from them.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("decayString", m_strDecay, "DecayDescriptor string.");
   addParam("listName", m_listName, "Name of the output particle list");

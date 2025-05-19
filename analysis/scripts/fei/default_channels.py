@@ -40,6 +40,7 @@ def get_default_channels(
         neutralB=True,
         specific=False,
         removeSLD=False,
+        usePIDNN=False,
         strangeB=False):
     """
     returns list of Particle objects with all default channels for running
@@ -54,6 +55,7 @@ def get_default_channels(
     @param neutralB whether to recombine neutral B mesons (default is True)
     @param specific if True, this adds isInRestOfEvent cut to all FSP
     @param removeSLD if True, removes semileptonic D modes from semileptonic B lists (default is False)
+    @param usePIDNN if True, PID probabilities calculated from PID neural network are used (default is False)
     @param strangeB if True, reconstruct B_s mesons in Upsilon5S decays (default is False)
     """
     if strangeB is True:
@@ -69,6 +71,8 @@ def get_default_channels(
     convertedFromBelle = b2bii.isB2BII()
 
     if convertedFromBelle:
+        if usePIDNN:
+            B2FATAL("The PIDNN variables do not exist for b2bii.")
         # Using Belle specific Variables for e-ID, mu-ID and K-ID
         # atcPIDBelle(3,2) is used as K-ID
         # atcPIDBelle(4,2) and atcPIDBelle(4,3) are used as pr-ID
@@ -76,11 +80,15 @@ def get_default_channels(
         chargedVariables = ['eIDBelle',
                             'atcPIDBelle(3,2)',
                             'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)',
-                            'muIDBelle',
-                            'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
+                            'muIDBelle'
+                            ]
     else:
-        chargedVariables = ['electronID', 'kaonID', 'protonID', 'muonID',
-                            'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
+        if usePIDNN:
+            chargedVariables = ['electronIDNN', 'kaonIDNN', 'protonIDNN', 'muonIDNN']
+        else:
+            chargedVariables = ['electronID', 'kaonID', 'protonID', 'muonID']
+
+    chargedVariables += ['p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
 
     if specific:
         charged_user_cut = '[dr < 2] and [abs(dz) < 4] and isInRestOfEvent > 0.5'
@@ -92,7 +100,8 @@ def get_default_channels(
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='pionID' if not convertedFromBelle else 'atcPIDBelle(2,3)',
+                                        bestCandidateVariable="atcPIDBelle(2,3)" if convertedFromBelle
+                                        else ("pionIDNN" if usePIDNN else "pionID"),
                                         bestCandidateCut=20),
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     pion.addChannel(['pi+:FSP'])
@@ -102,7 +111,8 @@ def get_default_channels(
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='kaonID' if not convertedFromBelle else 'atcPIDBelle(3,2)',
+                                        bestCandidateVariable="atcPIDBelle(3,2)" if convertedFromBelle
+                                        else ("kaonIDNN" if usePIDNN else "kaonID"),
                                         bestCandidateCut=20),
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     kaon.addChannel(['K+:FSP'])
@@ -112,7 +122,8 @@ def get_default_channels(
                                        target='isPrimarySignal'),
                       PreCutConfiguration(userCut=charged_user_cut,
                                           bestCandidateMode='highest',
-                                          bestCandidateVariable='protonID' if not convertedFromBelle else 'atcPIDBelle(4,3)',
+                                          bestCandidateVariable="atcPIDBelle(4,3)" if convertedFromBelle
+                                          else ("protonIDNN" if usePIDNN else "protonID"),
                                           bestCandidateCut=20),
                       PostCutConfiguration(bestCandidateCut=10, value=0.01))
     proton.addChannel(['p+:FSP'])
@@ -122,7 +133,8 @@ def get_default_channels(
                                          target='isPrimarySignal'),
                         PreCutConfiguration(userCut=charged_user_cut,
                                             bestCandidateMode='highest',
-                                            bestCandidateVariable='electronID' if not convertedFromBelle else 'eIDBelle',
+                                            bestCandidateVariable="eIDBelle" if convertedFromBelle
+                                            else ("electronIDNN" if usePIDNN else "electronID"),
                                             bestCandidateCut=10),
                         PostCutConfiguration(bestCandidateCut=5, value=0.01))
     electron.addChannel(['e+:FSP'])
@@ -132,7 +144,8 @@ def get_default_channels(
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='muonID' if not convertedFromBelle else 'muIDBelle',
+                                        bestCandidateVariable="muIDBelle" if convertedFromBelle
+                                        else ("muonIDNN" if usePIDNN else "muonID"),
                                         bestCandidateCut=10),
                     PostCutConfiguration(bestCandidateCut=5, value=0.01))
     muon.addChannel(['mu+:FSP'])

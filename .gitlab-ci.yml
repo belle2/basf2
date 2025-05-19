@@ -24,29 +24,29 @@ workflow:
     # - it is a merge request event
     # - it is a merge commit in the main, release or upgrade branch
     # - we force the pipeline
-    # Moreover, the pipelines are redirected to the runners extagent4 or extagent8
+    # Moreover, the pipelines are redirected to the runners gitlab-runner1 or gitlab-runner2
     # according to some rules defined below
     - &merge_request_rules
       - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_IID =~ /[02468]$/  # merge request event and even merge request ID
         variables:
-          GITLAB_RUNNER: "extagent4"
+          GITLAB_RUNNER: "gitlab-runner2"
       - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_IID =~ /[13579]$/  # merge request event and odd merge request ID
         variables:
-          GITLAB_RUNNER: "extagent8"
+          GITLAB_RUNNER: "gitlab-runner1"
     - &push_rules
       - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == 'main' && $CI_COMMIT_TITLE =~ /Merge branch.*/  # merge commit in main branch
         variables:
-          GITLAB_RUNNER: "extagent4"
+          GITLAB_RUNNER: "gitlab-runner2"
       - if: $CI_PIPELINE_SOURCE == 'push' && ($CI_COMMIT_BRANCH =~ /^release/ || $CI_COMMIT_BRANCH == 'upgrade') && $CI_COMMIT_TITLE =~ /Merge branch.*/  # merge commit in release or upgrade branch
         variables:
-          GITLAB_RUNNER: "extagent8"
+          GITLAB_RUNNER: "gitlab-runner1"
     - &force_rules
       - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'  # forced pipeline
         variables:
-          GITLAB_RUNNER: "extagent4"
+          GITLAB_RUNNER: "gitlab-runner2"
 
 default:
-  image: belle2/belle2-base-ubuntu2004:latest
+  image: belle2/belle2-base-ubuntu2204:latest
   tags:
     - $GITLAB_RUNNER  # The runner is dynamically assigned by the workflow rules
   cache:
@@ -178,7 +178,7 @@ release-validation:
     - *force_rules
     - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $GITLAB_BRANCH_FOR_RELEASE_VALIDATION && $CI_COMMIT_TITLE =~ /Merge branch.*/
       variables:
-        GITLAB_RUNNER: "extagent8"
+        GITLAB_RUNNER: "gitlab-runner1"
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
     # Set release to branch name but replace / with -

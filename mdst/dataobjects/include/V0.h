@@ -30,7 +30,7 @@ namespace Belle2 {
   class V0 : public RelationsObject {
   public:
     /** Constructor without arguments; needed for I/O. */
-    V0();
+    V0() {};
 
     /** Constructor taking two pairs of tracks and trackFitResults, and the fitted vertex coordinates. */
     V0(const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairPositive,
@@ -80,29 +80,29 @@ namespace Belle2 {
     ROOT::Math::XYZVector getFittedVertexPosition() const { return ROOT::Math::XYZVector(m_fittedVertexX, m_fittedVertexY, m_fittedVertexZ); }
 
   private:
-    /** Indicates which positively charged track was used for this V0. */
-    short m_trackIndexPositive;
-
-    /** Indicates which negatively charged track was used for this V0. */
-    short m_trackIndexNegative;
-
-    /** Points to the new TrackFitResult of the positive Track. */
-    short m_trackFitResultIndexPositive;
-
-    /** Points to the new TrackFitResult of the positive Track. */
-    short m_trackFitResultIndexNegative;
-
     /** The X coordinate of the fitted vertex. */
-    Double32_t m_fittedVertexX;
+    Double32_t m_fittedVertexX = 0.0;
 
     /** The Y coordinate of the fitted vertex. */
-    Double32_t m_fittedVertexY;
+    Double32_t m_fittedVertexY = 0.0;
 
     /** The Z coordinate of the fitted vertex. */
-    Double32_t m_fittedVertexZ;
+    Double32_t m_fittedVertexZ = 0.0;
+
+    /** Indicates which positively charged track was used for this V0. */
+    short m_trackIndexPositive = -1;
+
+    /** Indicates which negatively charged track was used for this V0. */
+    short m_trackIndexNegative = -1;
+
+    /** Points to the new TrackFitResult of the positive Track. */
+    short m_trackFitResultIndexPositive = -1;
+
+    /** Points to the new TrackFitResult of the positive Track. */
+    short m_trackFitResultIndexNegative = -1;
 
     /** Macro for ROOTification. */
-    ClassDef(V0, 4);
+    ClassDef(V0, 5);
 
     friend class FixMergedObjectsModule;
   };

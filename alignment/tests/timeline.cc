@@ -22,7 +22,6 @@
 #include <TFile.h>
 
 #include <filesystem>
-#include <iostream>
 #include <string>
 
 using namespace std;
@@ -459,16 +458,16 @@ namespace {
       ASSERT_TRUE(evdep);
 
       auto beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532, 2, 0)));
-      EXPECT_EQ(beam->getIPPosition()[2], 42.);
+      EXPECT_EQ(beam->getIPPosition().Z(), 42.);
 
       beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532, 2, 0)));
-      EXPECT_EQ(beam->getIPPosition()[0], 43.);
+      EXPECT_EQ(beam->getIPPosition().X(), 43.);
 
       beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532 - 1, 2, 0)));
-      EXPECT_EQ(beam->getIPPosition()[2], 0.);
+      EXPECT_EQ(beam->getIPPosition().Z(), 0.);
 
       beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532 - 1, 2, 0)));
-      EXPECT_EQ(beam->getIPPosition()[0], 0.);
+      EXPECT_EQ(beam->getIPPosition().X(), 0.);
     }
     {
       EventMetaData eventMetaData(0, 3);
@@ -480,8 +479,9 @@ namespace {
 
       auto beam2 = (BeamSpot*) file.Get("BeamSpot");
       ASSERT_TRUE(beam2);
-      beam2->getIPPosition().Print();
-      EXPECT_EQ(beam2->getIPPosition()[0], 3.);
+      std::cout << "beam2 IP position(" << beam2->getIPPosition().X() << ", " << beam2->getIPPosition().Y() << ", " <<
+                beam2->getIPPosition().Z() << ")" << std::endl;
+      EXPECT_EQ(beam2->getIPPosition().X(), 3.);
     }
     {
       EventMetaData eventMetaData(0, 4);

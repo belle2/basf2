@@ -23,6 +23,9 @@ Charm Flavor Tagger
 +++++++++++++++++++
 * Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
   function `charmFlavorTagger`) to ``CFT_ceres``. It improves the performance but can only be used since light-2504-deimos.
+Modules
++++++++
+* Fixed a bug in TreeFit in the calculation of the number of degrees of freedom and the resulting p-value (`chiProb`) when ignoring particles in the vertex fit.
 
 Changes in the analysis package in light-2503-ceres
 ---------------------------------------------------

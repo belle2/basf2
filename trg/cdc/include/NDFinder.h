@@ -58,15 +58,15 @@ namespace Belle2 {
         m_houghSpace(std::move(readoutHoughSpace)),
         m_readoutCluster(std::move(readoutCluster))
     {
-      m_omega = estimatedParameters[0]; // This is the "real" omega (curvature), i.e., sign(q)/(r_2d[cm])
+      m_omega = estimatedParameters[0];
       m_phi = estimatedParameters[1];
-      m_cotCot = estimatedParameters[2];
+      m_cot = estimatedParameters[2];
     }
 
     // Get the track parameters (z always 0)
     double getOmega() const { return m_omega; }
     double getPhi0() const { return m_phi; }
-    double getCot() const { return m_cotCot; }
+    double getCot() const { return m_cot; }
     // Get the number of related Hits
     std::vector<unsigned short> getRelatedHits() const { return m_cluster.getClusterHits(); }
     // Hough space readout (if storeAdditionalReadout true)
@@ -75,17 +75,13 @@ namespace Belle2 {
     std::vector<ROOT::Math::XYZVector> getClusterReadout() const { return m_readoutCluster; }
 
   private:
-    // 2D track curvature
+    // 2D track curvature (This is the "real" omega (curvature), i.e., sign(q)/(r_2d[cm]))
     double m_omega;
     // 2D azimuthal angle
     double m_phi;
     // 3D polar angle
-    double m_cotCot;
-    // Vector of the indices of the related hits in the list of CDC hits (StoreArray<CDCHits>)
-    std::vector<unsigned short> m_relHits;
-    // Vector of the weights for each related hit.
-    std::vector<double> m_hitWeights;
-    // The found cluster of the track
+    double m_cot;
+    // The found cluster of the track, including the track segment hits
     SimpleCluster m_cluster;
     // Vector storing the complete Hough space for analysis
     std::vector<ROOT::Math::XYZVector> m_houghSpace;

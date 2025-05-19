@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <dqm/core/modules/DQMHistReferenceModule.h>
+#include <dqm/analysis/modules/DQMHistReferenceModule.h>
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TKey.h>

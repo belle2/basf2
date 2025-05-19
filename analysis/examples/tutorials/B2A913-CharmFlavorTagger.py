@@ -34,7 +34,8 @@ import variables.utils as vu
 cft_path = b2.Path()
 
 # append analysis global tag where the CFT payload is stored
-b2.conditions.append_globaltag(ma.getAnalysisGlobaltag())
+# b2.conditions.append_globaltag(ma.getAnalysisGlobaltag())
+b2.conditions.append_globaltag("analysis_tools_light-2504-deimos")
 
 # load input ROOT file
 ma.inputMdst(filename=b2.find_file('Dst2D0pi.root', 'examples', False),

@@ -38,7 +38,7 @@ TBranch: proPDG, -2212
 TBranch: ArmenterosDaughter1Qt, 0.08783
 TBranch: ArmenterosDaughter2Qt, 0.09088
 TBranch: Mks_Hypo, 0.4169
-TBranch: isNotContinuumEvent, 0
+TBranch: isNotContinuumEvent, False
 TBranch: isSignal, 1
 TBranch: nMCDaughters, 2
 TBranch: mcErrors, 0
@@ -101,7 +101,7 @@ TBranch: proPDG, 211
 TBranch: ArmenterosDaughter1Qt, 0.1118
 TBranch: ArmenterosDaughter2Qt, 0.1118
 TBranch: Mks_Hypo, 0.3903
-TBranch: isNotContinuumEvent, 0
+TBranch: isNotContinuumEvent, False
 TBranch: isSignal, 0
 TBranch: nMCDaughters, 2
 TBranch: mcErrors, 432

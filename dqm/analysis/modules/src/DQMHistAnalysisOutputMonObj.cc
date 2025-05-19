@@ -7,7 +7,7 @@
  **************************************************************************/
 
 
-#include <dqm/core/modules/DQMHistAnalysisOutputMonObj.h>
+#include <dqm/analysis/modules/DQMHistAnalysisOutputMonObj.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>

@@ -388,18 +388,24 @@ namespace Belle2 {
     double getIPX(const Particle*)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       return (beamSpotDB->getIPPosition()).X();
     }
 
     double getIPY(const Particle*)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       return (beamSpotDB->getIPPosition()).Y();
     }
 
     double getIPZ(const Particle*)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       return (beamSpotDB->getIPPosition()).Z();
     }
 
@@ -421,6 +427,8 @@ namespace Belle2 {
       if (isOutOfRange) return Const::doubleNaN;
 
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       return beamSpotDB->getCovVertex()(elementI, elementJ);
     }
 

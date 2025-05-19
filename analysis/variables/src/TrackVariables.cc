@@ -156,6 +156,8 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       auto helix = trackFit->getHelix();
       helix.passiveMoveBy(beamSpotDB->getIPPosition());
       return helix.getD0();
@@ -166,6 +168,8 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       auto helix = trackFit->getHelix();
       helix.passiveMoveBy(beamSpotDB->getIPPosition());
       return helix.getZ0();
@@ -176,6 +180,8 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       auto helix = trackFit->getHelix();
       helix.passiveMoveBy(beamSpotDB->getIPPosition());
       return helix.getPhi0();
@@ -185,7 +191,6 @@ namespace Belle2 {
     {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
-
       double errorSquared = trackFit->getCovariance5()[0][0];
       if (errorSquared <= 0) return Const::doubleNaN;
       return sqrt(errorSquared);

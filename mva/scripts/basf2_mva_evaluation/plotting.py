@@ -221,6 +221,8 @@ class Plotter:
             # TODO: remove in release 8.
             if not isinstance(xerr, (numpy.ndarray, list)):
                 xerr = xerr*numpy.ones(len(x))
+            if not isinstance(yerr, (numpy.ndarray, list)):
+                yerr = yerr*numpy.ones(len(y))
             mask = numpy.logical_and.reduce([numpy.isfinite(v) for v in [x, y, xerr, yerr]])
 
             e = axis.errorbar(
@@ -316,6 +318,13 @@ class PurityAndEfficiencyOverCut(Plotter):
             efficiency, efficiency_error = hists.get_true_positives(['Signal'])
             purity, purity_error = hists.get_false_positives(['Background'])
 
+        if isinstance(efficiency, int) and not isinstance(purity, int):
+            efficiency = numpy.array([efficiency] * len(purity))
+        elif isinstance(purity, int) and not isinstance(efficiency, int):
+            purity = numpy.array([purity] * len(efficiency))
+        elif isinstance(purity, int) and isinstance(efficiency, int):
+            efficiency = numpy.array([efficiency])
+            purity = numpy.array([purity])
         cuts = hists.bin_centers
 
         self.xmin, self.xmax = numpy.nanmin(numpy.append(cuts, self.xmin)), numpy.nanmax(numpy.append(cuts, self.xmax))
@@ -448,14 +457,23 @@ class PurityOverEfficiency(Plotter):
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
         purity, purity_error = hists.get_purity(['Signal'], ['Background'])
+        if isinstance(efficiency, int) and not isinstance(purity, int):
+            efficiency = numpy.array([efficiency] * len(purity))
+        elif isinstance(purity, int) and not isinstance(efficiency, int):
+            purity = numpy.array([purity] * len(efficiency))
+        elif isinstance(purity, int) and isinstance(efficiency, int):
+            efficiency = numpy.array([efficiency])
+            purity = numpy.array([purity])
         cuts = hists.bin_centers
 
         valid = numpy.isfinite(purity) & numpy.isfinite(efficiency)
         efficiency = efficiency[valid]
         purity = purity[valid]
         cuts = cuts[valid]
-        efficiency_error = efficiency_error[valid]
-        purity_error = purity_error[valid]
+        if not isinstance(efficiency_error, int):
+            efficiency_error = efficiency_error[valid]
+        if not isinstance(purity_error, int):
+            purity_error = purity_error[valid]
 
         # Determine "best" cut (closest to point (1,1))
         distance = numpy.sqrt(numpy.square(1 - purity) + numpy.square(1 - efficiency))
@@ -520,14 +538,23 @@ class RejectionOverEfficiency(Plotter):
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
         rejection, rejection_error = hists.get_efficiency(['Background'])
         rejection = 1 - rejection
+        if isinstance(efficiency, int) and not isinstance(rejection, int):
+            efficiency = numpy.array([efficiency] * len(rejection))
+        elif isinstance(rejection, int) and not isinstance(efficiency, int):
+            rejection = numpy.array([rejection] * len(efficiency))
+        elif isinstance(rejection, int) and isinstance(efficiency, int):
+            efficiency = numpy.array([efficiency])
+            rejection = numpy.array([rejection])
         cuts = hists.bin_centers
 
         valid = numpy.isfinite(rejection) & numpy.isfinite(efficiency)
         efficiency = efficiency[valid]
         rejection = rejection[valid]
         cuts = cuts[valid]
-        efficiency_error = efficiency_error[valid]
-        rejection_error = rejection_error[valid]
+        if not isinstance(efficiency_error, int):
+            efficiency_error = efficiency_error[valid]
+        if not isinstance(rejection_error, int):
+            rejection_error = rejection_error[valid]
 
         # Determine "best" cut by maximizing Rejection / Efficiency
         distance = numpy.sqrt(numpy.square(1 - rejection) + numpy.square(1 - efficiency))
@@ -597,14 +624,23 @@ class TrueVsFalsePositiveRate(Plotter):
 
         tpr, tpr_error = hists.get_efficiency(['Signal'])       # True Positive Rate (TPR)
         fpr, fpr_error = hists.get_efficiency(['Background'])   # False Positive Rate (FPR)
+        if isinstance(tpr, int) and not isinstance(fpr, int):
+            tpr = numpy.array([tpr] * len(fpr))
+        elif isinstance(fpr, int) and not isinstance(tpr, int):
+            fpr = numpy.array([fpr] * len(tpr))
+        elif isinstance(fpr, int) and isinstance(tpr, int):
+            tpr = numpy.array([tpr])
+            fpr = numpy.array([fpr])
         cuts = hists.bin_centers                                 # Cut values for each bin
 
         valid = numpy.isfinite(tpr) & numpy.isfinite(fpr)
         tpr = tpr[valid]
         fpr = fpr[valid]
         cuts = cuts[valid]
-        tpr_error = tpr_error[valid]
-        fpr_error = fpr_error[valid]
+        if not isinstance(tpr_error, int):
+            tpr_error = tpr_error[valid]
+        if not isinstance(fpr_error, int):
+            fpr_error = fpr_error[valid]
 
         # Determine "best" cut (closest to top-left corner (0,1))
         distance = numpy.sqrt(numpy.square(fpr) + numpy.square(1 - tpr))
@@ -673,14 +709,23 @@ class PrecisionRecallCurve(Plotter):
 
         recall, recall_error = hists.get_efficiency(['Signal'])  # Recall = TPR
         precision, precision_error = hists.get_purity(['Signal'], ['Background'])
+        if isinstance(recall, int) and not isinstance(precision, int):
+            recall = numpy.array([recall] * len(precision))
+        elif isinstance(precision, int) and not isinstance(recall, int):
+            precision = numpy.array([precision] * len(recall))
+        elif isinstance(precision, int) and isinstance(recall, int):
+            recall = numpy.array([recall])
+            precision = numpy.array([precision])
         cuts = hists.bin_centers
 
         valid = numpy.isfinite(precision) & numpy.isfinite(recall)
         precision = precision[valid]
         recall = recall[valid]
         cuts = cuts[valid]
-        recall_error = recall_error[valid]
-        precision_error = precision_error[valid]
+        if not isinstance(recall_error, int):
+            recall_error = recall_error[valid]
+        if not isinstance(precision_error, int):
+            precision_error = precision_error[valid]
 
         # Determine "best" cut (closest to point (1,1))
         distance = numpy.sqrt(numpy.square(1 - precision) + numpy.square(1 - recall))

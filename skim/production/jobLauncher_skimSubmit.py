@@ -57,14 +57,14 @@ parser.add_argument('-rel',
                     '--release',
                     type=str,
                     default='',
-                    help=" basf2 release to be used. If not provide the one in infoSkim.yaml will be used")
-parser.add_argument(
-    '-samples',
-    '--samples',
-    type=str,
-    default='',
-    help=" The location of YAML to be used in ``b2skim-stats-submit``. If not provided, ``b2skim-stats-submit`` defaults to \
-    the samples of the current campaign i.e. ``/group/belle2/dataprod/MC/SkimTraining/SampleLists/TestFiles.yaml`` on KEKCC.")
+                    help="basf2 release to be used. If not provide the one in infoSkim.yaml will be used")
+parser.add_argument('-samples',
+                    '--samples',
+                    type=str,
+                    default='',
+                    help="the yaml file (with full path) to be used in ``b2skim-stats-submit``.\
+                    If not provided, ``b2skim-stats-submit`` defaults to the samples of the current campaign\
+                    i.e. ``/group/belle2/dataprod/MC/SkimTraining/SampleLists/TestFiles.yaml`` on KEKCC.")
 
 # configuration argument, used for debugging only
 parser.add_argument('-flagged',   '--flagged',          type=int, default=True,        help="set to 0 to disable Flagged skim")

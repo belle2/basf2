@@ -335,7 +335,7 @@ class PreReconstruction:
                         hist_variables_2d = [('extraInfo(signalTarget)', 'extraInfo(decayModeID)')]
                     else:
                         hist_variables = [bc_variable, 'mcErrors', 'mcParticleStatus',
-                                          channel.mvaConfig.target] + channel.mvaConfig.spectators
+                                          channel.mvaConfig.target] + list(channel.mvaConfig.spectators.keys())
                         hist_variables_2d = [(bc_variable, channel.mvaConfig.target),
                                              (bc_variable, 'mcErrors'),
                                              (bc_variable, 'mcParticleStatus')]
@@ -447,7 +447,7 @@ class PreReconstruction:
                         hist_variables_2d = [('extraInfo(signalTarget)', 'extraInfo(decayModeID)')]
                     else:
                         hist_variables = ['chiProb', 'mcErrors', 'mcParticleStatus',
-                                          channel.mvaConfig.target] + channel.mvaConfig.spectators
+                                          channel.mvaConfig.target] + list(channel.mvaConfig.spectators.keys())
                         hist_variables_2d = [('chiProb', channel.mvaConfig.target),
                                              ('chiProb', 'mcErrors'),
                                              ('chiProb', 'mcParticleStatus')]
@@ -531,14 +531,16 @@ class PostReconstruction:
                         hist_variables = ['extraInfo(signalTarget)', 'extraInfo(decayModeID)']
                         hist_variables_2d = [('extraInfo(signalTarget)', 'extraInfo(decayModeID)')]
                     else:
-                        hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)',
-                                          channel.mvaConfig.target, 'extraInfo(decayModeID)'] + channel.mvaConfig.spectators
+                        hist_variables = ['mcErrors',
+                                          'mcParticleStatus',
+                                          'extraInfo(SignalProbability)',
+                                          channel.mvaConfig.target,
+                                          'extraInfo(decayModeID)'] + list(channel.mvaConfig.spectators.keys())
                         hist_variables_2d = [('extraInfo(SignalProbability)', channel.mvaConfig.target),
                                              ('extraInfo(SignalProbability)', 'mcErrors'),
                                              ('extraInfo(SignalProbability)', 'mcParticleStatus'),
                                              ('extraInfo(decayModeID)', channel.mvaConfig.target),
                                              ('extraInfo(decayModeID)', 'mcErrors'),
-                                             ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                              ('extraInfo(decayModeID)', 'mcParticleStatus')]
                         for specVar in channel.mvaConfig.spectators:
                             hist_variables_2d.append(('extraInfo(SignalProbability)', specVar))
@@ -566,8 +568,11 @@ class PostReconstruction:
                     hist_variables = ['extraInfo(signalTarget)', 'extraInfo(decayModeID)']
                     hist_variables_2d = [('extraInfo(signalTarget)', 'extraInfo(decayModeID)')]
                 else:
-                    hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)',
-                                      particle.mvaConfig.target, 'extraInfo(decayModeID)'] + particle.mvaConfig.spectators
+                    hist_variables = ['mcErrors',
+                                      'mcParticleStatus',
+                                      'extraInfo(SignalProbability)',
+                                      particle.mvaConfig.target,
+                                      'extraInfo(decayModeID)'] + list(particle.mvaConfig.spectators.keys())
                     hist_variables_2d = [('extraInfo(decayModeID)', particle.mvaConfig.target),
                                          ('extraInfo(decayModeID)', 'mcErrors'),
                                          ('extraInfo(decayModeID)', 'mcParticleStatus')]

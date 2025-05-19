@@ -59,8 +59,8 @@ namespace Belle2 {
     ROOT::Math::XYZVector getMcDecayVertexFromIP(const MCParticle* mcparticle)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
-      // Since here we return an XYZVector, the check on the validity of the payload
-      // is done in the other functions calling getMcDecayVertexFromIP
+      if (!beamSpotDB.isValid())
+        return ROOT::Math::XYZVector{Const::doubleNaN, Const::doubleNaN, Const::doubleNaN};
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition());
     }
@@ -69,9 +69,6 @@ namespace Belle2 {
     {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getMcDecayVertexFromIP(mcparticle).X();
     }
 
@@ -79,9 +76,6 @@ namespace Belle2 {
     {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getMcDecayVertexFromIP(mcparticle).Y();
     }
 
@@ -89,9 +83,6 @@ namespace Belle2 {
     {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getMcDecayVertexFromIP(mcparticle).Z();
     }
 
@@ -99,9 +90,6 @@ namespace Belle2 {
     {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getMcDecayVertexFromIP(mcparticle).Rho();
     }
 
@@ -109,9 +97,6 @@ namespace Belle2 {
     {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getMcDecayVertexFromIP(mcparticle).R();
     }
 
@@ -139,8 +124,8 @@ namespace Belle2 {
     ROOT::Math::XYZVector getMcProductionVertexFromIP(const MCParticle* mcparticle)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
-      // Since here we return an XYZVector, the check on the validity of the payload
-      // is done in the other functions calling getMcProductionVertexFromIP
+      if (!beamSpotDB.isValid())
+        return ROOT::Math::XYZVector{Const::doubleNaN, Const::doubleNaN, Const::doubleNaN};
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(mcparticle->getProductionVertex() - beamSpotDB->getIPPosition());
     }
@@ -149,9 +134,6 @@ namespace Belle2 {
     {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getMcProductionVertexFromIP(mcparticle).X();
     }
 
@@ -159,9 +141,6 @@ namespace Belle2 {
     {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getMcProductionVertexFromIP(mcparticle).Y();
     }
 
@@ -169,9 +148,6 @@ namespace Belle2 {
     {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getMcProductionVertexFromIP(mcparticle).Z();
     }
 
@@ -228,8 +204,9 @@ namespace Belle2 {
     ROOT::Math::XYZVector getVertexD(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
-      // Since here we return an XYZVector, the check on the validity of the payload
-      // is done in the other functions calling getVertexD
+      if (!beamSpotDB.isValid())
+        return ROOT::Math::XYZVector{Const::doubleNaN, Const::doubleNaN, Const::doubleNaN};
+
       const auto& frame = ReferenceFrame::GetCurrent();
       auto trackFit = part->getTrackFitResult();
       if (!trackFit)
@@ -243,57 +220,36 @@ namespace Belle2 {
 
     double particleDX(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getVertexD(part).X();
     }
 
     double particleDY(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getVertexD(part).Y();
     }
 
     double particleDZ(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getVertexD(part).Z();
     }
 
     double particleDRho(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getVertexD(part).Rho();
     }
 
     double particleDPhi(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getVertexD(part).Phi();
     }
 
     double particleDCosTheta(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return std::cos(getVertexD(part).Theta());
     }
 
     double particleDistance(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      if (!beamSpotDB.isValid())
-        return Const::doubleNaN;
       return getVertexD(part).R();
     }
 

@@ -634,7 +634,7 @@ class PostReconstruction:
                     ma.variablesToExtraInfo(
                         particle.identifier,
                         variables={
-                            "formula(conditionalVariableSelector(extraInfo(uniqueSignal) == 1, 1, 0))": "uniqueSignalTarget"},
+                            'conditionalVariableSelector(extraInfo(uniqueSignal)==1,1,0))': 'uniqueSignalTarget'},
                         path=path)
                     hist_variables = ['extraInfo(uniqueSignalTarget)', 'extraInfo(decayModeID)']
                     hist_variables_2d = [('extraInfo(uniqueSignalTarget)', 'extraInfo(decayModeID)')]
@@ -922,7 +922,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     with an associated signal probability. You have to set configuration.training to False for application mode.
 
     MONITORING
-    You can always turn on the monitoring (configuration.monitor = True),
+    You can always turn on the monitoring (configuration.monitor != False),
     to write out ROOT Histograms of many quantities for each stage,
     using these histograms you can use the printReporting.py or latexReporting.py scripts to automatically create pdf files.
 

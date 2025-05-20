@@ -5,6 +5,10 @@ FEI
 +++
 * Added option to use PIDNN variables instead of PID variables as input features and best candidate variables.
 
+FlavorTagger
+++++++++++++
+* Added option to use PIDNN variables instead of PID variables as input features.
+
 Modular Analysis
 ++++++++++++++++
 * Fixed :py:func:`stdV0s.goodBelleKshort` and `loadStdGoodBellePhoton` functions to apply cuts on the corresponding :mdst lists when using b2bii, instead of using `fillParticleList`.
@@ -15,6 +19,20 @@ Variables
 * Modified whole event variables, e.g., `weDeltae`, to work with ``useXXXFrame`` instead of requiring additional argument.
   A down-side is that if you used for example ``weMissM2(maskname, 0)`` before, you must now use ``useCMSFrame(weMissM2(maskname, 0))``,
   otherwise you're implicitly calling ``weMissM2(maskname, 5)``.
+
+Utilities
++++++++++
+* Added convenience function ROOT.Belle2.ParticleListName.addAntiParticleLists(inputList) which returns the same list with appended anti-particle lists of the particle lists in the input list. 
+  The function can be used for a more convenient use of the branchNames and similar arguments of the RootOuput module.
+
+Charm Flavor Tagger
++++++++++++++++++++
+* Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
+  function `charmFlavorTagger`) to ``CFT_ceres``. It improves the performance but can only be used since light-2504-deimos.
+
+Modules
++++++++
+* Fixed a bug in TreeFit in the calculation of the number of degrees of freedom and the resulting p-value (`chiProb`) when ignoring particles in the vertex fit.
 
 Changes in the analysis package in light-2503-ceres
 ---------------------------------------------------

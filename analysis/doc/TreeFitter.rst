@@ -29,7 +29,7 @@ So for example for :math:`J/\psi \rightarrow l^+ l^-` the calculation is the fol
 :math:`r = 5 (track) + 5 (track) + 4 (kinematic) \\- 3 (track) - 3 (track) \\- 7 (J/\psi:~px, py, pz, E, x, y, z) = 1.`
 
 While for :math:`B \rightarrow D(K \pi \pi^0)\pi`:
-:math:`r = 3\dot 5 (track) + 2 \cdot 3 (gamma) \\+ 3 \cdot 4 (kinematic) + 3 (D:geometric) \\- 6 (B:~x,y,z,px,py,pz) - 7 (D:~x,y,z,tau,px,py,pz) \\- 3 (\pi^0:~px,py,pz) - 3 \cdot 3 (track) \\- 2 \cdot 3 (gamma) = 5.`
+:math:`r = 3 \cdot 5 (track) + 2 \cdot 3 (gamma) \\+ 3 \cdot 4 (kinematic) + 3 (D:geometric) \\- 6 (B:~x,y,z,px,py,pz) - 7 (D:~x,y,z,tau,px,py,pz) \\- 3 (\pi^0:~px,py,pz) - 3 \cdot 3 (track) \\- 2 \cdot 3 (gamma) = 5.`
 
 Citation
 ########

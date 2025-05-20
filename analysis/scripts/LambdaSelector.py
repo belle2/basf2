@@ -136,6 +136,7 @@ def V0Selector_Training(
              'max_bin': 250,
              'boosting': 'gbdt',
              'trainFraction': 0.8,
+             'num_threads': 1
              }
     if isinstance(parameters, dict):
         param.update(parameters)
@@ -209,6 +210,7 @@ def KsVeto_Training(
              'trainFraction': 0.8,
              'min_data_in_leaf': 300,
              'objective': 'cross_entropy',
+             'num_threads': 1
              }
     if isinstance(parameters, dict):
         param.update(parameters)

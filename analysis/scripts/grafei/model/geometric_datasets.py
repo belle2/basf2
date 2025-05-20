@@ -343,4 +343,5 @@ class GraphDataSet(InMemoryDataset):
         data, slices = self.collate(data_list)
         torch.save((data, slices), self.processed_paths[0])
 
+        #: delete attributes
         del self.x, self.y, self.avail_samples, data_list, data, slices

@@ -36,10 +36,15 @@ namespace Belle2 {
         return 0;
       }
 
-      if (auto bp = dynamic_cast<BeamSpot*>(this->getDBObj()))
-        if (param == 1) return bp->getIPPosition().X();
-        else if (param == 2) return bp->getIPPosition().Y();
-        else if (param == 3) return bp->getIPPosition().Z();
+      if (auto bp = dynamic_cast<BeamSpot*>(this->getDBObj())) {
+        if (param == 1) {
+          return bp->getIPPosition().X();
+        } else if (param == 2) {
+          return bp->getIPPosition().Y();
+        } else if (param == 3) {
+          return bp->getIPPosition().Z();
+        }
+      }
 
       B2ERROR("Could not get value for BeamSpot");
       return 0.;

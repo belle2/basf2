@@ -250,7 +250,7 @@ class TrainingData:
                 if nSignal > Teacher.MaximumNumberOfMVASamples and not channel.preCutConfig.noSignalSampling:
                     inverseSamplingRates[1] = int(nSignal / Teacher.MaximumNumberOfMVASamples) + 1
 
-                spectators = [channel.mvaConfig.target]
+                spectators = [channel.mvaConfig.target] + list(channel.mvaConfig.spectators.keys())
                 if channel.mvaConfig.sPlotVariable is not None:
                     spectators.append(channel.mvaConfig.sPlotVariable)
 
@@ -261,7 +261,7 @@ class TrainingData:
                     hist_filename = os.path.join(self.config.monitoring_path, 'Monitor_TrainingData.root')
                     ma.variablesToHistogram(channel.name, variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=config.removeJPsiSlash(hist_filename),
+                                            filename=hist_filename,
                                             ignoreCommandLineOverride=True,
                                             directory=config.removeJPsiSlash(f'{channel.label}'), path=path)
 
@@ -539,7 +539,7 @@ class PostReconstruction:
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
                     variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                    filename=config.removeJPsiSlash(filename),
+                    filename=filename,
                     ignoreCommandLineOverride=True,
                     directory=config.removeJPsiSlash(f'{particle.identifier}'),
                     path=path)
@@ -552,7 +552,7 @@ class PostReconstruction:
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
                     variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                    filename=config.removeJPsiSlash(filename),
+                    filename=filename,
                     ignoreCommandLineOverride=True,
                     directory=config.removeJPsiSlash(f'{particle.identifier}'),
                     path=path)
@@ -580,25 +580,21 @@ class PostReconstruction:
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
                     variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                    filename=config.removeJPsiSlash(filename),
+                    filename=filename,
                     ignoreCommandLineOverride=True,
                     directory=config.removeJPsiSlash(f'{particle.identifier}'),
                     path=path)
 
                 variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
                              'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
-
-                if 'B_s0' == particle.name:
-                    variables += ['Mbc']
-                elif 'B' in particle.name:
-                    variables += ['Mbc', 'cosThetaBetweenParticleAndNominalB']
+                variables += list(particle.mvaConfig.spectators.keys())
 
                 filename = os.path.join(self.config.monitoring_path, 'Monitor_Final.root')
                 ma.variablesToNtuple(
                     particle.identifier,
                     variables,
                     treename=config.removeJPsiSlash(f'{particle.identifier} variables'),
-                    filename=config.removeJPsiSlash(filename),
+                    filename=filename,
                     ignoreCommandLineOverride=True,
                     path=path)
         return path
@@ -728,13 +724,20 @@ class Teacher:
                                 continue
                             variable_str = "' '".join(channel.mvaConfig.variables)
 
+                            spectators = list(channel.mvaConfig.spectators.keys())
+                            if channel.mvaConfig.sPlotVariable is not None:
+                                spectators.append(channel.mvaConfig.sPlotVariable)
+                            spectators_str = "' '".join(spectators)
+
                             command = (f"{self.config.externTeacher}"
                                        f" --method '{channel.mvaConfig.method}'"
                                        f" --target_variable '{channel.mvaConfig.target}'"
                                        f" --treename '{channel.label} variables' --datafile 'training_input.root'"
                                        f" --signal_class 1 --variables '{variable_str}'"
-                                       f" --identifier '{channel.label}.xml'"
-                                       f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1")
+                                       f" --identifier '{channel.label}.xml'")
+                            if len(spectators) > 0:
+                                command += f" --spectators '{spectators_str}'"
+                            command += f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1"
                             B2INFO(f"Used following command to invoke teacher: \n {command}")
                             job_list.append((channel.label, command))
             f.Close()

@@ -31,14 +31,13 @@ def print_summary(p):
         monitoring.MonitorROCPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_ROC'))
         monitoring.MonitorDiagPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Diag'))
         monitoring.MonitorSigProbPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_SigProb'))
-        if p.particle.identifier in ['B+:generic', 'B0:generic']:
-            monitoring.MonitorMbcPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Money'))
-        if p.particle.identifier in ['B+:semileptonic', 'B0:semileptonic']:
-            monitoring.MonitorCosBDLPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Money'))
+        for spectator in p.particle.mvaConfig.spectators.keys():
+            monitoring.MonitorSpectatorPlot(
+                p, spectator, monitoring.removeJPsiSlash(
+                    p.particle.identifier + '_' + spectator + '_Money'), p.particle.mvaConfig.spectators[spectator])
     except Exception as e:
         print('FEI-printReporting Error: Could not create plots for particle', p.particle.identifier, e)
     print("FEI: printReporting - DEBUG: finished plots")
-
     print(bold(p.particle.identifier))
     print('Total cpu time spent reconstructing this particle: ',
           p.module_statistic.particle_time + sum(p.module_statistic.channel_time.values()))

@@ -212,17 +212,9 @@ def create_latex(output_file, monitoringParticle):
         monitoring.MonitorSigProbPlot(p, sigprob_plot_filename)
         o += b2latex.Graphics().add(sigprob_plot_filename + '.png', width=0.8).finish()
 
-        if p.particle.identifier in ['B+:generic', 'B0:generic', 'B_s0:generic']:
-            money_plot_filename = monitoring.removeJPsiSlash(p.particle.identifier + '_Money')
-            monitoring.MonitorMbcPlot(p, money_plot_filename)
-            g = b2latex.Graphics()
-            for filename in glob.glob(money_plot_filename + '_*.png'):
-                g.add(filename, width=0.49)
-            o += g.finish()
-
-        if p.particle.identifier in ['B+:semileptonic', 'B0:semileptonic']:
-            money_plot_filename = monitoring.removeJPsiSlash(p.particle.identifier + '_Money')
-            monitoring.MonitorCosBDLPlot(p, money_plot_filename)
+        for spectator in p.particle.mvaConfig.spectators.keys():
+            money_plot_filename = monitoring.removeJPsiSlash(p.particle.identifier + '_' + spectator + '_Money')
+            monitoring.MonitorSpectatorPlot(p, spectator, money_plot_filename, p.particle.mvaConfig.spectators[spectator])
             g = b2latex.Graphics()
             for filename in glob.glob(money_plot_filename + '_*.png'):
                 g.add(filename, width=0.49)

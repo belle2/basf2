@@ -81,7 +81,7 @@ Prerequisites
 *************
 
 As usual, we start our steering file by importing the  necessary python packages,
-creating a basf2 path and loading input data.
+creating a ``basf2`` path and loading input data.
 In addition to the usual python packages (``basf2`` and `modularAnalysis`) we also import the ``fei`` package.
 
 .. admonition:: Exercise
@@ -175,7 +175,7 @@ The `fei.FeiConfiguration` class controls the other configuration options of the
 Here, the FEI monitoring should be disabled with the appropriate argument (``monitor=False``) as we are not interested in
 the internal performance characteristics of the FEI stages.
 We also have to specify the FEI prefix argument here. This prefix allows distinguishing between different trainings
-in a single Global Tag and is ``prefix=FEIv4_2021_MC14_release_05_01_12`` for the current central training.
+in a single Global Tag and is ``prefix=FEIv1_2025_MC16ri_aldebaran_200`` for the current central training.
 
 
 .. admonition:: Exercise
@@ -599,7 +599,7 @@ There are different implementations of the missing mass squared in *basf2*, this
 B\ :sub:`tag` momentum (here reconstructed by the FEI) and has therefore a high resolution.
 
 A second variable with high separating power is the number of additional charged tracks introduced above.
-This variable is called `nROE_Charged` in basf2. It needs the ROE mask name defined above as an argument in brackets.
+This variable is called `nROE_Charged` in ``basf2``. It needs the ROE mask name defined above as an argument in brackets.
 
 .. admonition:: Exercise
     :class: exercise stacked

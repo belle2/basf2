@@ -26,6 +26,7 @@
 #include <TTree.h>
 
 /* C++ headers. */
+#include <cmath>
 #include <iostream>
 
 using namespace Belle2;
@@ -364,7 +365,7 @@ void eclLeakageCollectorModule::collect()
   //..The nominal and "other" energies may be identical if this is the first or last energy
   double bias = biasNom;
   double peak = peakNom;
-  if (abs(logEOther - logENom) > 0.0001) {
+  if (std::abs(logEOther - logENom) > 0.0001) {
     bias = biasNom + (biasOther - biasNom) * (logESumN - logENom) / (logEOther - logENom);
     peak = peakNom + (peakOther - peakNom) * (logESumN - logENom) / (logEOther - logENom);
   }

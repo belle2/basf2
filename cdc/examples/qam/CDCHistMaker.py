@@ -151,7 +151,7 @@ class CDCHistMakerModule(b2.Module):
 
 def main(exp=1, run=3118, prefix='', dest=''):
 
-    # Seach dst files.
+    # Search dst files.
     files = glob.glob(prefix + f'/dst.cosmic.{exp:0>4}.{run:0>5}' + '*.root')
     # create path
     main = b2.create_path()

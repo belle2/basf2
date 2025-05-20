@@ -394,20 +394,21 @@ def print_belle2_environment():
 
 
 @contextmanager
-def temporary_set_environment(**environ):
+def temporary_environment(**environ):
     """
-    Temporarily set the process environment variables.
-    Inspired by https://stackoverflow.com/a/34333710
+    Context manager that temporarily sets environment variables
+    for the current process. Inspired by https://stackoverflow.com/a/34333710
 
-    >>> with temporary_set_environment(BELLE2_TEMP_DIR='/tmp/belle2'):
+    >>> with temporary_environment(BELLE2_TEMP_DIR='/tmp/belle2'):
     ...   "BELLE2_TEMP_DIR" in os.environ
     True
 
     >>> "BELLE2_TEMP_DIR" in os.environ
     False
 
-    Arguments:
-        environ(dict): Dictionary of environment variables to set
+    Args:
+        **environ: Arbitrary keyword arguments specifying environment
+                   variables and their values.
     """
     old_environ = dict(os.environ)
     os.environ.update(environ)

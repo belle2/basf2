@@ -142,7 +142,7 @@ void RawCOPPER::SetBuffer(int* bufin, int nwords, int delete_flag, int num_event
 {
   if (bufin == NULL) {
     char err_buf[500];
-    sprintf(err_buf, "[DEBUG] bufin is NULL. Exting...\n");
+    sprintf(err_buf, "[DEBUG] bufin is NULL. Exiting...\n");
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf);
   }
@@ -204,7 +204,7 @@ void RawCOPPER::PackDetectorBuf(
                                          detector_buf_4th, nwords_4th,
                                          rawcprpacker_info);
 
-  int delete_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructer is called.
+  int delete_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructor is called.
   SetBuffer(packed_buf, m_nwords, delete_flag, m_num_events, m_num_nodes);
 
   delete_flag = 0; // For m_access, need not to delete m_buffer
@@ -238,7 +238,7 @@ void RawCOPPER::PackDetectorBuf(int* const(&detector_buf_ch)[MAX_PCIE40_CH],
                                          detector_buf_ch, nwords_ch,
                                          rawcprpacker_info);
 
-  int delete_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructer is called.
+  int delete_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructor is called.
   SetBuffer(packed_buf, m_nwords, delete_flag, m_num_events, m_num_nodes);
 
   delete_flag = 0; // For m_access, need not to delete m_buffer
@@ -273,7 +273,7 @@ void RawCOPPER::PackDetectorBuf4DummyData(
                                          detector_buf_4th, nwords_4th,
                                          rawcprpacker_info);
 
-  int delete_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructer is called.
+  int delete_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructor is called.
   SetBuffer(packed_buf, m_nwords, delete_flag, m_num_events, m_num_nodes);
 
   delete_flag = 0; // For m_access, need not to delete m_buffer

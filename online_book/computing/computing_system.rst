@@ -69,7 +69,7 @@ has been written for specific needs of the collaboration.
 The client tools that communicate with DIRAC and BelleDIRAC
 have been organized in a set of tools named **gbasf2**. As an analyst, datasets are
 available for running analysis directly on the grid, download the output and perform the
-:ref:`onlinebook_offline_analysis` on local resources. One convenient feature of gbasf2 is it uses the same basf2
+:ref:`onlinebook_offline_analysis` on local resources. One convenient feature of gbasf2 is it uses the same `basf2`
 steering files used offline as input.
 
 .. admonition:: Key points
@@ -123,7 +123,7 @@ Monte Carlo samples
 ^^^^^^^^^^^^^^^^^^^
 
 In parallel, Monte Carlo (MC) samples are centrally produced in campaigns labeled as MCXX, being 'XX' a sequential
-number (MC10, MC11, etc). Usually, every time a major basf2 release is available, a new campaign is launched.
+number (MC10, MC11, etc). Usually, every time a major `basf2` release is available, a new campaign is launched.
 Details about the produced samples are usually available at
 the `Data Production XWiki pages <https://xwiki.desy.de/xwiki/rest/p/df1b0>`_.
 

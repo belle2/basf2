@@ -507,7 +507,7 @@ void TRGGDLDQMModule::event()
   }
 
 
-  //prepare entAry adress
+  //prepare entAry address
   int clk_map = 0;
   for (int i = 0; i < 320; i++) {
     if (strcmp(entAry[0]->m_unpackername[i], "evt") == 0) evtno = entAry[0]->m_unpacker[i];
@@ -819,7 +819,7 @@ bool TRGGDLDQMModule::anaBitCondition(void)
         }
         reading_word = false;
       } else {
-        // 2nd blank 'xx  ' or leading blanck '^ '
+        // 2nd blank 'xx  ' or leading blank '^ '
       }
     }
   }

@@ -17,7 +17,8 @@ from caf.framework import Calibration, Collection
 from caf.strategies import SequentialBoundaries
 from ROOT.Belle2 import CDCDedxHadSatAlgorithm, CDCDedxHadBGAlgorithm
 from basf2 import create_path, register_module
-from clean_samples import make_pion_kaon_collection, make_proton_collection, make_muon_collection, make_electron_collection
+from cdcdedx_calibration_utils import make_pion_kaon_collection, make_proton_collection
+from cdcdedx_calibration_utils import make_muon_collection, make_electron_collection
 
 from prompt.calibrations.caf_cdcdedx_electron import settings as cdc_dedx_electron
 from prompt.calibrations.caf_top import settings as top

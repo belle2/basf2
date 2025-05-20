@@ -71,7 +71,7 @@ void BGOverlayInputModule::initialize()
   if (m_skipExperimentCheck) {
     B2WARNING(R"RAW(The BGOverlayInput module will skip the check on the experiment number
     consistency between the basf2 process and the beam background files.
-    It will also ingnore run numbers in case of run-dependent MC.
+    It will also ignore run numbers in case of run-dependent MC.
 
     This should be done only if you are extremely sure about what you are doing.
 
@@ -208,7 +208,7 @@ void BGOverlayInputModule::event()
   }
 
   if (m_eventCount == m_firstEvent and !m_start) {
-    B2INFO("BGOverlayInput: events for BG overlay will be re-used");
+    B2INFO("BGOverlayInput: events for BG overlay will be reused");
     bkgInfo->incrementReusedCounter(m_index);
   }
   m_start = false;

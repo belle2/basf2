@@ -20,11 +20,11 @@ namespace Belle2 {
 
     /** Base class to provide Sensor Information for PXD and SVD.
      * This class is meant to provide the basic services like length/thickness
-     * parameters, pixel/stip ID and position calculation and coordinate transformation.
+     * parameters, pixel/strip ID and position calculation and coordinate transformation.
      */
     class SensorInfoBase {
     public:
-      /** Enum specifing the type of sensor the SensorInfo represents */
+      /** Enum specifying the type of sensor the SensorInfo represents */
       enum SensorType {
         PXD = 0,  /**< PXD Sensor */
         SVD = 1,  /**< SVD Sensor */
@@ -35,7 +35,7 @@ namespace Belle2 {
       /** Constructor for a SensorInfo instance
        *
        * this class holds all the information to calculate pixel/strip
-       * positions and ids. it can accomodate rectangular and trapezoidal
+       * positions and ids. it can accommodate rectangular and trapezoidal
        * shapes and also has the possibility to segment the strip/pixelsize
        * once in v, thus having two different pixel sizes in one sensor: vcells
        * pixels from start to splitlength and vcells2 pixels from splitlength
@@ -79,7 +79,7 @@ namespace Belle2 {
         return m_width + (v / m_length + 0.5) * m_deltaWidth;
       }
 
-      /** Convinience Wrapper to return width at backward side.
+      /** Convenience Wrapper to return width at backward side.
        * @return width of the sensor at the backward side
        */
       double getBackwardWidth() const
@@ -87,7 +87,7 @@ namespace Belle2 {
         return getWidth(-0.5 * m_length);
       }
 
-      /** Convinience Wrapper to return width at forward side.
+      /** Convenience Wrapper to return width at forward side.
        * @return width of the sensor at the forward side
        */
       double getForwardWidth() const
@@ -213,7 +213,7 @@ namespace Belle2 {
       /** Return number of pixel/strips in v direction up to change pitch */
       int getVCells2() const { return m_vCells2; }
 
-      /** Check wether a given point is inside the active area.
+      /** Check whether a given point is inside the active area.
        * Optionally, one can specify a tolerance which should be added to the
        * sensor edges to still be considered inside
        * @param u u coordinate to check, supply 0 if not interested
@@ -229,7 +229,7 @@ namespace Belle2 {
         return 0 <= nu && nu <= 1 && 0 <= nv && nv <= 1;
       }
 
-      /** Check wether a given point is inside the active area
+      /** Check whether a given point is inside the active area
        * @param local point in local coordinates
        * @param uTolerance tolerance to be added on each side of the sensor in u direction
        * @param vTolerance tolerance to be added on each side of the sensor in v direction

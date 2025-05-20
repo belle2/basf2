@@ -151,7 +151,7 @@ namespace Belle2 {
     void setLowMultiBit(int LowMultiBit) { m_LowMultiBit = LowMultiBit; }
     //! Set LowMultiBit
     void setmumuBit(int mumuBit) { m_mumuBit = mumuBit; }
-    // Set trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
+    // Set trigger bit of flag(1bit) whether two clusters satisfy 3D Bhabha veto
     // are in CDCTRG region in theta (="InTrack") or not
     // Default "InTrack" is set to be TC ThetaID=3-15
     void set3DBhabhaVetoInTrackFlag(int v3DBhabhaVetoInTrackFlag)
@@ -255,17 +255,17 @@ namespace Belle2 {
     {
       m_EventTimingQualityFlag = vEventTimingQualityFlag;
     }
-    // Set TCId used to determine event timming
+    // Set TCId used to determine event timing
     void setEventTimingTCId(int vEventTimingTCId)
     {
       m_EventTimingTCId = vEventTimingTCId;
     }
-    // Set ThetaID of TC used to determine event timming
+    // Set ThetaID of TC used to determine event timing
     void setEventTimingTCThetaId(int vEventTimingTCThetaId)
     {
       m_EventTimingTCThetaId = vEventTimingTCThetaId;
     }
-    // Set energy of TC used to determine event timming (GeV)
+    // Set energy of TC used to determine event timing (GeV)
     void setEventTimingTCEnergy(double vEventTimingTCEnergy)
     {
       m_EventTimingTCEnergy = vEventTimingTCEnergy;
@@ -437,7 +437,7 @@ namespace Belle2 {
     int m_LowMultiBit;
     //! mumu bit
     int m_mumuBit;
-    // trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
+    // trigger bit of flag(1bit) whether two clusters satisfy 3D Bhabha veto
     // are in CDCTRG region in theta (="InTrack") or not
     int    m_3DBhabhaVetoInTrackFlag;
     // TCIDs of two clusters of 3D Bhabha veto

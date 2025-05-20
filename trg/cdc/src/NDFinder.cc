@@ -60,7 +60,7 @@ void NDFinder::init(unsigned short minWeight, unsigned char minPts,
   loadArray(m_params.stereoFile, m_compStBins, *m_pcompStereo);
   B2DEBUG(25, "loaded zero suppressed stereo array ");
 
-  /** Unpack zero suppresed track to hit relations.*/
+  /** Unpack zero suppressed track to hit relations.*/
   restoreZeros(m_expAxBins, m_compAxBins, *m_parrayAxialExp, *m_pcompAxial);
   B2DEBUG(25, "restored expanded axial array (11/32 phi) ");
   restoreZeros(m_expStBins, m_compStBins, *m_parrayStereoExp, *m_pcompStereo);

@@ -25,6 +25,7 @@
 
 import collections
 import copy
+import re
 import itertools
 import typing
 import basf2
@@ -32,19 +33,21 @@ import basf2
 # Define classes at top level to make them pickable
 # Creates new class via namedtuple, which are like a struct in C
 
-FeiConfiguration = collections.namedtuple('FeiConfiguration', 'prefix, cache, monitor, legacy, externTeacher, training')
-FeiConfiguration.__new__.__defaults__ = ('FEI_TEST', None, True, None, 'basf2_mva_teacher', False)
+FeiConfiguration = collections.namedtuple('FeiConfiguration',
+                                          'prefix, cache, monitor, legacy, externTeacher, training, monitoring_path')
+FeiConfiguration.__new__.__defaults__ = ('FEI_TEST', None, True, None, 'basf2_mva_teacher', False, '')
 FeiConfiguration.__doc__ = "Fei Global Configuration class"
 FeiConfiguration.prefix.__doc__ = "The database prefix used for all weight files"
 FeiConfiguration.cache.__doc__ = "The stage which is passed as input, it is assumed that all previous stages"\
                                  " do not have to be reconstructed again. Can be either a number or"\
                                  " a filename containing a pickled number or"\
                                  " None in this case the environment variable FEI_STAGE is used."
-FeiConfiguration.monitor.__doc__ = "If true, monitor histograms are created"
+FeiConfiguration.monitor.__doc__ = "If not False, monitor histograms are created."
 FeiConfiguration.legacy.__doc__ = "Pass the summary file of a legacy FEI training,"\
                                   " and the algorithm will be able to apply this training."
 FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, b2mva-kekcc-cluster-teacher"
 FeiConfiguration.training.__doc__ = "If you train the FEI set this to True, otherwise to False"
+FeiConfiguration.monitoring_path.__doc__ = "Path where monitoring histograms are stored."
 
 
 MVAConfiguration = collections.namedtuple('MVAConfiguration', 'method, config, variables, target, sPlotVariable')
@@ -60,9 +63,10 @@ MVAConfiguration.target.__doc__ = "Target variable from the VariableManager."
 MVAConfiguration.sPlotVariable.__doc__ = "Discriminating variable used by sPlot to do data-driven training."
 
 
-PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, vertexCut, noBackgroundSampling,'
-                                             'bestCandidateVariable, bestCandidateCut, bestCandidateMode')
-PreCutConfiguration.__new__.__defaults__ = ('', -2, False, None, 0, 'lowest')
+PreCutConfiguration = collections.namedtuple(
+    'PreCutConfiguration', 'userCut, vertexCut, noBackgroundSampling,'
+    'bestCandidateVariable, bestCandidateCut, bestCandidateMode, noSignalSampling, bkgSamplingFactor')
+PreCutConfiguration.__new__.__defaults__ = ('', -2, False, None, 0, 'lowest', False, 1.0)
 PreCutConfiguration.__doc__ = "PreCut configuration class. These cuts is employed before training the mva classifier."
 PreCutConfiguration.userCut.__doc__ = "The user cut is passed directly to the ParticleCombiner."\
                                       " Particles which do not pass this cut are immediately discarded."
@@ -70,8 +74,12 @@ PreCutConfiguration.vertexCut.__doc__ = "The vertex cut is passed as confidence 
 PreCutConfiguration.noBackgroundSampling.__doc__ = "For very pure channels, the background sampling factor is too high" \
                                                    " and the MVA can't be trained. This disables background sampling."
 PreCutConfiguration.bestCandidateVariable.__doc__ = "Variable from the VariableManager which is used to rank all candidates."
-PreCutConfiguration.bestCandidateMode.__doc__ = "Either lowest or highest."
 PreCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to keep after the best-candidate ranking."
+PreCutConfiguration.bestCandidateMode.__doc__ = "Either lowest or highest."
+PreCutConfiguration.noSignalSampling.__doc__ = "For channels with unknown br. frac., the signal sampling factor can be" \
+                                               " overestimated and you loose signal samples in the training." \
+                                               " This disables signal sampling."
+PreCutConfiguration.bkgSamplingFactor.__doc__ = "Add additional multiplicative bkg. sampling factor, less than 1.0 to reduce."
 
 PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value, bestCandidateCut')
 PostCutConfiguration.__new__.__defaults__ = (0.0, 0)
@@ -79,8 +87,10 @@ PostCutConfiguration.__doc__ = "PostCut configuration class. This cut is employe
 PostCutConfiguration.value.__doc__ = "Absolute value used to cut on the SignalProbability of each candidate."
 PostCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to keep, ranked by SignalProbability."
 
-DecayChannel = collections.namedtuple('DecayChannel', 'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID')
-DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None)
+DecayChannel = collections.namedtuple(
+    'DecayChannel',
+    'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID, pi0veto')
+DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None, False)
 DecayChannel.__doc__ = "Decay channel of a Particle."
 DecayChannel.name.__doc__ = "str:Name of the channel e.g. :code:`D0:generic_0`"
 DecayChannel.label.__doc__ = "Label used to identify the decay channel e.g. for weight files independent of decayModeID"
@@ -89,7 +99,7 @@ DecayChannel.daughters.__doc__ = "List of daughter particles of the decay channe
 DecayChannel.mvaConfig.__doc__ = "MVAConfiguration object which is used for this channel."
 DecayChannel.preCutConfig.__doc__ = "PreCutConfiguration object which is used for this channel."
 DecayChannel.decayModeID.__doc__ = "DecayModeID of this channel. Unique ID for each channel of this particle."
-
+DecayChannel.pi0veto.__doc__ = "If true, additional pi0veto variables are added to the MVAs, useful only for decays with gammas."
 
 MonitoringVariableBinning = {'mcErrors': ('mcErrors', 513, -0.5, 512.5),
                              'mcParticleStatus': ('mcParticleStatus', 257, -0.5, 256.5),
@@ -210,12 +220,14 @@ class Particle:
     def addChannel(self,
                    daughters: typing.Sequence[str],
                    mvaConfig: MVAConfiguration = None,
-                   preCutConfig: PreCutConfiguration = None):
+                   preCutConfig: PreCutConfiguration = None,
+                   pi0veto: bool = False):
         """
         Appends a new decay channel to the Particle object.
             @param daughters is a list of pdg particle names e.g. ['pi+','K-']
             @param mvaConfig multivariate analysis configuration
             @param preCutConfig pre cut configuration object
+            @param pi0veto if true, additional pi0veto variables are added to the MVA configuration
         """
         # Append generic label to all defined daughters if no label was set yet
         daughters = [d + ':generic' if ':' not in d else d for d in daughters]
@@ -232,8 +244,51 @@ class Particle:
         # All instances of {} are replaced with all combinations of daughter indices
         mvaVars = []
         for v in mvaConfig.variables:
-            if v.count('{}') <= len(daughters):
+            if v.count('{') == 0:
+                mvaVars.append(v)
+                continue
+            matches = re.findall(r'\{\s*\d*\s*\.\.\s*\d*\s*\}', v)
+            if len(matches) == 0 and v.count('{}') == 0:
+                mvaVars.append(v)
+            elif v.count('{}') > 0 and len(matches) > 0:
+                basf2.B2FATAL(f'Variable {v} contains both '+'{}'+f' and {matches}. Only one is allowed!')
+            elif len(matches) > 0:
+                ranges = []
+                skip = False
+                for match in matches:
+                    tempRange = match[1:-1].split('..')
+                    if tempRange[0] == '':
+                        tempRange[0] = 0
+                    else:
+                        tempRange[0] = int(tempRange[0])
+                        if tempRange[0] >= len(daughters):
+                            basf2.B2INFO(f'Variable {v} contains index {tempRange[0]} which is more than daughters, skipping!')
+                            skip = True
+                            break
+                    if tempRange[1] == '':
+                        tempRange[1] = len(daughters)
+                    else:
+                        tempRange[1] = int(tempRange[1])
+                        if tempRange[1] > len(daughters):
+                            basf2.B2INFO(f'Variable {v} contains index {tempRange[1]} which is more than daughters, skipping!')
+                            skip = True
+                            break
+                    ranges.append(tempRange)
+                if skip:
+                    continue
+                if len(ranges) == 1:
+                    mvaVars += [v.replace(matches[0], str(c)) for c in range(ranges[0][0], ranges[0][1])]
+                else:
+                    for match in matches:
+                        v = v.replace(match, '{}')
+                    mvaVars += [v.format(*c) for c in itertools.product(*[range(r[0], r[1]) for r in ranges])]
+            elif v.count('{}') <= len(daughters):
                 mvaVars += [v.format(*c) for c in itertools.combinations(list(range(0, len(daughters))), v.count('{}'))]
+            elif v.count('{}') > len(daughters):
+                basf2.B2INFO(f'Variable {v} contains more brackets than daughters, which is why it will be ignored!')
+                continue
+            else:
+                basf2.B2FATAL(f'Something went wrong with variable {v}!')
         mvaConfig = mvaConfig._replace(variables=mvaVars)
         # Add new channel
         decayModeID = len(self.channels)
@@ -243,7 +298,8 @@ class Particle:
                                           daughters=daughters,
                                           mvaConfig=mvaConfig,
                                           preCutConfig=preCutConfig,
-                                          decayModeID=decayModeID))
+                                          decayModeID=decayModeID,
+                                          pi0veto=pi0veto))
         return self
 
 # @endcond

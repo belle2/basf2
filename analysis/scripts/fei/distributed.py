@@ -158,7 +158,7 @@ def setup(args):
         for j, data_input in enumerate(data_chunks[i]):
             os.symlink(data_input, f'jobs/{i}/input_{j}.root')
         # Symlink weight directory and basf2_path
-        os.symlink(args.directory + '/collection/localdb', f'jobs/{i}/localdb')
+        os.symlink('../../collection/localdb', f'jobs/{i}/localdb')
 
 
 def create_report(args):
@@ -209,6 +209,10 @@ def submit_job(args, i):
     os.chdir(args.directory + f'/jobs/{i}/')
     if args.site == 'kekcc':
         ret = subprocess.call("bsub -q l -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
+    elif args.site == 'kekccs':
+        ret = subprocess.call(f"bsub -q s -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
+    elif 'kekccX' in args.site:
+        ret = subprocess.call(f"bsub -q l -n {args.site[6:]} -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
     elif args.site == 'kekcc2':
         ret = subprocess.call("bsub -q b2_fei -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
     elif args.site == 'kitekp':
@@ -233,19 +237,19 @@ def do_trainings(args):
         return
     particles, configuration = pickle.load(open('Summary.pickle', 'rb'))
     weightfiles = fei.do_trainings(particles, configuration)
+    os.chdir(args.directory)
     for i in range(args.nJobs):
         for weightfile_on_disk, _ in weightfiles:
-            os.symlink(args.directory + '/collection/' + weightfile_on_disk,
-                       args.directory + f'/jobs/{i}/' + weightfile_on_disk)
+            os.symlink('../../collection/' + weightfile_on_disk, f'jobs/{i}/' + weightfile_on_disk)
     # Check if some xml files are missing
+    os.chdir(args.directory + '/collection')
     xmlfiles = glob.glob("*.xml")
+    os.chdir(args.directory)
     for i in range(args.nJobs):
         for xmlfile in xmlfiles:
-            if not os.path.isfile(args.directory + f'/jobs/{i}/' + xmlfile):
+            if not os.path.isfile(f'/jobs/{i}/' + xmlfile):
                 print("Added missing symlink to ", xmlfile, " in job directory ", i)
-                os.symlink(args.directory + '/collection/' + xmlfile,
-                           args.directory + f'/jobs/{i}/' + xmlfile)
-    os.chdir(args.directory)
+                os.symlink('../../collection/' + xmlfile, f'jobs/{i}/' + xmlfile)
 
 
 def jobs_finished(args):
@@ -296,7 +300,7 @@ def merge_root_files(args):
             if f == 'mcParticlesCount.root':
                 for i in inputs:
                     os.remove(i)
-                    os.symlink(output, i)
+                    os.symlink('../../collection/mcParticlesCount.root', i)
 
 
 def update_input_files(args):

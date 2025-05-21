@@ -329,7 +329,7 @@ class PreReconstruction:
                         ma.variablesToExtraInfo(
                             channel.name,
                             variables={
-                                "formula(conditionalVariableSelector("+channel.mvaConfig.target+" == 1, 1, 0))": "signalTarget"},
+                                f'conditionalVariableSelector({channel.mvaConfig.target}==1,1,0))': 'signalTarget'},
                             path=path)
                         hist_variables = ['extraInfo(signalTarget)', 'extraInfo(decayModeID)']
                         hist_variables_2d = [('extraInfo(signalTarget)', 'extraInfo(decayModeID)')]

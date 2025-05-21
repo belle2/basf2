@@ -131,8 +131,6 @@ MonitoringVariableBinning = {'mcErrors': ('mcErrors', 513, -0.5, 512.5),
                              'extraInfo(postCut_rank)': ('extraInfo(postCut_rank)', 41, -0.5, 40.5),
                              'daughterProductOf(extraInfo(SignalProbability))':
                              ('daughterProductOf(extraInfo(SignalProbability))', 100, 0.0, 1.0),
-                             'extraInfo(signalTarget)': ('extraInfo(signalTarget)', 2, -0.5, 1.5),
-                             'extraInfo(uniqueSignalTarget)': ('extraInfo(uniqueSignalTarget)', 2, -0.5, 1.5),
                              }
 
 

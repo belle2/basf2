@@ -801,7 +801,7 @@ TTree* SVDdEdxValidationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTr
   variables->add(ProtonBinaryElectronProtonIDSVDonly);
   variables->add(ProtonBinaryElectronProtonIDnoSVD);
 
-  RooDataSet* LambdaDataset = new RooDataSet("LambdaDataset", "LambdaDataset", preselTree.get(), *variables);
+  RooDataSet* LambdaDataset = new RooDataSet("LambdaDataset", "LambdaDataset", *variables, Import(*preselTree));
 
   if (LambdaDataset->sumEntries() == 0) {
     B2FATAL("The Lambda dataset is empty, stopping here");
@@ -1152,7 +1152,7 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
   variables->add(SlowPionBinaryElectronPionIDSVDonly);
   variables->add(SlowPionBinaryElectronPionIDnoSVD);
 
-  RooDataSet* DstarDataset = new RooDataSet("DstarDataset", "DstarDataset", preselTree.get(), *variables);
+  RooDataSet* DstarDataset = new RooDataSet("DstarDataset", "DstarDataset", *variables, Import(*preselTree));
 
   if (DstarDataset->sumEntries() == 0) {
     B2FATAL("The Dstar dataset is empty, stopping here");

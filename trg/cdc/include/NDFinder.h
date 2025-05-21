@@ -24,8 +24,6 @@ namespace Belle2 {
     unsigned short minSuperAxial;
     // Required number of stereo super layers
     unsigned short minSuperStereo;
-    // Clustering: Minimum peak cell weight
-    unsigned short minPeakWeight;
     // Clustering: Number of iterations for the cluster search in each Hough space quadrant
     unsigned short iterations;
     // Clustering: Number of deleted cells in each omega direction from the maximum

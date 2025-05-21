@@ -15,8 +15,6 @@
 namespace Belle2 {
   // Struct containing the parameters for the clustering
   struct ClustererParameters  {
-    // Cut on the peak cell weight
-    unsigned short minPeakWeight;
     // Number of iterations of the cluster searching for each Hough space quadrant
     unsigned short iterations;
     // Number of deleted cells in omega in each direction of the peak

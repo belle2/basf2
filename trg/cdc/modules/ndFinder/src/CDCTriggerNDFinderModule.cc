@@ -39,9 +39,6 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            "Cluster pruning: Minimum number of stereo super layer hits related to a cluster "
            "for the cluster to be considered as a track.",
            static_cast<unsigned short>(2));
-  addParam("minPeakWeight", m_minPeakWeight,
-           "Clustering: minimum peak cell weight of a cluster.",
-           static_cast<unsigned short>(20));
   addParam("iterations", m_iterations,
            "Clustering: Number of iterations for the cluster finding in one Hough space quadrant.",
            static_cast<unsigned short>(1));
@@ -77,8 +74,7 @@ void CDCTriggerNDFinderModule::initialize()
   m_ndFinderTracks.registerRelationTo(m_ndFinderInfos);
   NDFinderParameters ndFinderParameters = {
     m_minSuperAxial, m_minSuperStereo,
-    m_minPeakWeight, m_iterations,
-    m_omegaTrim, m_phiTrim,
+    m_iterations, m_omegaTrim, m_phiTrim,
     m_storeAdditionalReadout,
     m_axialFile, m_stereoFile
   };

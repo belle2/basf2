@@ -45,7 +45,6 @@ void NDFinder::init(const NDFinderParameters& ndFinderParameters)
 
   // Parameters necessary for the clustering algorithm
   ClustererParameters clustererParams = {
-    ndFinderParameters.minPeakWeight,
     ndFinderParameters.iterations,
     ndFinderParameters.omegaTrim,
     ndFinderParameters.phiTrim,

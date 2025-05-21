@@ -57,8 +57,6 @@ namespace Belle2 {
     unsigned short m_minSuperAxial;
     // Minimum number of stereo super layers for the cluster to be considered as a track
     unsigned short m_minSuperStereo;
-    // Clustering with 3d volume: Cut on the peak cell weight
-    unsigned short m_minPeakWeight;
     // Clustering with 3d volume: Number of global maximum searches per Hough space quadrant
     unsigned short m_iterations;
     // Clustering with 3d volume: Max deletion in omega (number of cells in each direction from max)

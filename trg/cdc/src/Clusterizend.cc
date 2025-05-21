@@ -49,7 +49,8 @@ void Clusterizend::iterateOverSection(const std::array<c3index, 2>& sectionBound
 {
   for (unsigned short _ = 0; _ < m_clustererParams.iterations; ++_) {
     auto [sectionPeak, peakWeight] = getSectionPeak(sectionBounds);
-    if (peakWeight < m_clustererParams.minPeakWeight || peakWeight == 0) {
+    // Ignore the cluster if the peak  weight is below 10 (reduces processing)
+    if (peakWeight < 10) {
       break;
     }
     SimpleCluster newCluster = createCluster(sectionPeak);

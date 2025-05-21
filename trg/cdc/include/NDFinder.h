@@ -231,9 +231,12 @@ namespace Belle2 {
     // Acceptance ranges + slot sizes to convert bins to track parameters (for getBinToVal method)
     static constexpr std::array<double, 2> m_omegaRange = {-4., 4.}; // 1/4 = 0.25 GeV (minimum transverse momentum)
     static constexpr std::array<double, 2> m_phiRange = {0., 11.25}; // One phi sector (360/32)
-    static constexpr std::array<double, 2> m_cotRange = {1.8154040548776156, -0.7951509931203085}; // => theta in [28.85, 128.49]
-    // IMPORTANT: Use this cot(theta) range when using the shallow (trg/cdc/data/ndFinderStereoShallow40x384x9.txt.gz file):
-    /* static constexpr std::array<double, 2> m_cotRange = {2.3849627654510415, -1.0061730449796316}; // => theta in [22.75, 135.18] */
+    // IMPORTANT: Use this cot(theta) range when using the shallow hit representations (trg/cdc/data/ndFinderStereoShallow40x384x9.txt.gz file):
+    // These are optimized for minSuperAxial = 3 and minSuperStereo = 2
+    static constexpr std::array<double, 2> m_cotRange = {2.3849627654510415, -1.0061730449796316}; // => theta in [22.75, 135.18]
+    // IMPORTANT: Use this cot(theta) range when using the steep hit representations (trg/cdc/data/ndFinderStereoSteep40x384x9.txt.gz file):
+    // These are optimized for minSuperAxial = 4 and minSuperStereo = 3
+    /* static constexpr std::array<double, 2> m_cotRange = {1.8154040548776156, -0.7951509931203085}; // => theta in [28.85, 128.49] */
     static constexpr double m_binSizeOmega = (m_omegaRange[1] - m_omegaRange[0]) / m_nOmega; // 0.2
     static constexpr double m_binSizePhi = (m_phiRange[1] - m_phiRange[0]) / m_nPhiSector; // 0.9375
     static constexpr double m_binSizeCot = (m_cotRange[1] - m_cotRange[0]) / m_nCot; // -0.29

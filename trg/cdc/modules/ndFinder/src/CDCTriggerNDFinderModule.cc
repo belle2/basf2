@@ -34,11 +34,11 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
   addParam("minSuperAxial", m_minSuperAxial,
            "Cluster pruning: Minimum number of axial super layer hits related to a cluster "
            "for the cluster to be considered as a track.",
-           static_cast<unsigned short>(4));
+           static_cast<unsigned short>(3));
   addParam("minSuperStereo", m_minSuperStereo,
            "Cluster pruning: Minimum number of stereo super layer hits related to a cluster "
            "for the cluster to be considered as a track.",
-           static_cast<unsigned short>(3));
+           static_cast<unsigned short>(2));
   addParam("minPeakWeight", m_minPeakWeight,
            "Clustering: minimum peak cell weight of a cluster.",
            static_cast<unsigned short>(20));
@@ -58,9 +58,9 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            "File name of the axial hit patterns (they are the same for the shallow representations).",
            std::string("data/trg/cdc/ndFinderAxial40x384x9.txt.gz"));
   addParam("stereoFile", m_stereoFile,
-           "File name of the stereo hit patterns. Use ndFinderStereoShallow40x384x9.txt.gz"
-           "for shallow hit representations (change range in NDFinder.h).",
-           std::string("data/trg/cdc/ndFinderStereo40x384x9.txt.gz"));
+           "File name of the stereo hit patterns. Use ndFinderStereoSteep40x384x9.txt.gz"
+           "for steep hit representations (change range in NDFinder.h).",
+           std::string("data/trg/cdc/ndFinderStereoSteep40x384x9.txt.gz"));
   addParam("NDFinderInfosName", m_ndFinderInfosName,
            "The name of the StoreArray where the tracks clusters found by this NDFinder Module are stored.",
            std::string("CDCTriggerClusterInfos"));

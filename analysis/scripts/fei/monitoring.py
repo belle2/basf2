@@ -384,7 +384,7 @@ def MonitorSigProbPlot(particle, filename):
     df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
                                    ['extraInfo__bouniqueSignal__bc',
                                     'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
-                                   ['unique', 'probability', 'signal'])
+                                   ['unique', 'probability', 'signal'], max_entries=int(1e8))
 
     p = plotting.VerboseDistribution(range_in_std=5.0)
     common = (df['probability'] >= 0) & (df['probability'] <= 1)
@@ -404,7 +404,7 @@ def MonitorSpectatorPlot(particle, spectator, filename, range=(None, None)):
     df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
                                    ['extraInfo__bouniqueSignal__bc', spectator,
                                     'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
-                                   ['unique', spectator, 'probability', 'signal'])
+                                   ['unique', spectator, 'probability', 'signal'], max_entries=int(1e8))
     for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
         p = plotting.VerboseDistribution(range_in_std=5.0)
         common = (df['probability'] >= cut)
@@ -428,7 +428,7 @@ def MonitorROCPlot(particle, filename):
     df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
                                    ['extraInfo__bouniqueSignal__bc',
                                     'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
-                                   ['unique', 'probability', 'signal'])
+                                   ['unique', 'probability', 'signal'], max_entries=int(1e8))
     p = plotting.RejectionOverEfficiency()
     p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0, label='All')
     p.finish()
@@ -442,7 +442,7 @@ def MonitorDiagPlot(particle, filename):
     df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
                                    ['extraInfo__bouniqueSignal__bc',
                                     'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
-                                   ['unique', 'probability', 'signal'])
+                                   ['unique', 'probability', 'signal'], max_entries=int(1e8))
     p = plotting.Diagonal()
     p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0)
     p.finish()

@@ -42,7 +42,12 @@ FeiConfiguration.cache.__doc__ = "The stage which is passed as input, it is assu
                                  " do not have to be reconstructed again. Can be either a number or"\
                                  " a filename containing a pickled number or"\
                                  " None in this case the environment variable FEI_STAGE is used."
-FeiConfiguration.monitor.__doc__ = "If not False, monitor histograms are created."
+FeiConfiguration.monitor.__doc__ = (
+    "Determines the level of monitoring histograms to create. "
+    "Set to False to disable monitoring. "
+    "Set to 'simple' to enable lightweight histograms. "
+    "Any other value will enable full monitoring histograms."
+)
 FeiConfiguration.legacy.__doc__ = "Pass the summary file of a legacy FEI training,"\
                                   " and the algorithm will be able to apply this training."
 FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, b2mva-kekcc-cluster-teacher"

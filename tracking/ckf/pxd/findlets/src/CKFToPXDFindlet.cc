@@ -162,17 +162,21 @@ void CKFToPXDFindlet::apply()
     TrackFindingCDC::erase_remove_if(usedSpacePoints, notOnLayer);
 
     // Only use subset of hit SpacePoints for inter hit state relation creation if they were used in the previous iteration
-    if (layer == 1 and m_relations.size() > 0) {
+    if (layer == 1 and m_results.size() > 0) {
       std::vector<const SpacePoint*> toSpacePoints;
       toSpacePoints.reserve(m_spacePointVector.size());
 
-      for (const auto& relation : m_relations) {
-        // hit state pointers are the "To"s in the relation, only take those
-        const auto it = std::find(toSpacePoints.begin(), toSpacePoints.end(), relation.getTo()->getHit());
-        if (it == toSpacePoints.end()) {
-          toSpacePoints.push_back(relation.getTo()->getHit());
+      for (const auto& result : m_results) {
+        for (const auto hit : result.getHits()) {
+          if (hit->getType() == VXD::SensorInfoBase::PXD) {
+            if (std::find(toSpacePoints.begin(), toSpacePoints.end(), hit) == toSpacePoints.end()) {
+              toSpacePoints.push_back(hit);
+            }
+          }
         }
       }
+      m_results.clear();
+
       // add SpacePoints used in previous iteration to the set of SpacePoints to be used in next step
       usedSpacePoints.reserve(usedSpacePoints.size() + toSpacePoints.size());
       for (const auto sp : toSpacePoints) {

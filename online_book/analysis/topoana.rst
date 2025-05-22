@@ -379,6 +379,11 @@ Below is an example of the card file.
      topoana
    }
 
+   % Storage type of input raw topology truth information (Six options: AOI, VOI, MSI, MSF, MSD, and MSID. Default: AOI)
+   {
+      MSID
+   }
+
 In the card file, ``#``, ``%``, and the pair of ``{`` and ``}``, are used for
 commenting, prompting, and grouping, respectively.
 The first two items defines the input, the third one specifies the functionality,

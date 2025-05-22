@@ -98,7 +98,16 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     Returns default torch model
     """
 
-    state = State(myModel(number_of_features).to("cpu"))
+    # Note: if you override this function, need to pass all arguments of
+    # get_model that you need explicitly as kwargs to State!
+    state = State(
+        myModel(number_of_features).to("cpu"),
+        number_of_features=number_of_features,
+        number_of_spectators=number_of_spectators,
+        number_of_events=number_of_events,
+        training_fraction=training_fraction,
+        parameters=parameters,
+    )
     print(state.model)
 
     if parameters is None:
@@ -197,26 +206,48 @@ def load(obj):
     """
     Load the trained torch model into state.
     """
+    file_names, files, collection_keys, collections_to_store = obj
+    collections = {key: value for key, value in zip(collection_keys, collections_to_store)}
+
     with tempfile.TemporaryDirectory() as temp_path:
         temp_path = pathlib.Path(temp_path)
 
-        file_names = obj[0]
         for file_index, file_name in enumerate(file_names):
             path = temp_path.joinpath(pathlib.Path(file_name))
             path.parents[0].mkdir(parents=True, exist_ok=True)
-
             with open(path, 'w+b') as file:
-                file.write(bytes(obj[1][file_index]))
+                file.write(bytes(files[file_index]))
 
-        model = pytorch.load(temp_path.joinpath(file_names[0]), pickle_module=PickleModule)
-        model.eval()  # sets dropout and batch norm layers to eval mode
+        # load model
+        try:
+            weights = pytorch.load(temp_path.joinpath(file_names[0]), weights_only=True)
+            state = get_model(
+                **{
+                    k: collections.get(k, None)
+                    for k in [
+                        "number_of_features",
+                        "number_of_spectators",
+                        "number_of_events",
+                        "training_fraction",
+                        "parameters",
+                    ]
+                }
+            )
+            state.model.load_state_dict(weights)
+            model = state.model
+        except pickle.UnpicklingError:
+            # in this case weights_only failed and we may have a legacy model stored via pickle
+            # -> try to unpickle with custom Unpickler
+            model = pytorch.load(temp_path.joinpath(file_names[0]), pickle_module=PickleModule)
+            state = State(model)
+
+        model.eval()
         device = "cpu"
         model.to(device)
-        state = State(model)
 
     # load everything else we saved
-    for index, key in enumerate(obj[2]):
-        setattr(state, key, obj[3][index])
+    for key, value in collections.items():
+        setattr(state, key, value)
     return state
 
 
@@ -229,10 +260,10 @@ def end_fit(state):
         temp_path = pathlib.Path(temp_path)
 
         # this creates:
-        # path/my_model.pt
-        pytorch.save(state.model, temp_path.joinpath('my_model.pt'))
+        # path/weights.pt
+        pytorch.save(state.model.state_dict(), temp_path / "weights.pt")
 
-        file_names = ['my_model.pt']
+        file_names = ['weights.pt']
         files = []
         for file_name in file_names:
             with open(temp_path.joinpath(file_name), 'rb') as file:

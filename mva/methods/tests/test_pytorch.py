@@ -70,7 +70,7 @@ class TestPyTorch(unittest.TestCase):
 
 
                     def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
-                        state = State(Model(number_of_features).to("cpu"))
+                        state = State(Model(number_of_features).to("cpu"), number_of_features=number_of_features)
                         state.optimizer = torch.optim.SGD(state.model.parameters())
                         state.loss_fn = nn.BCELoss
                         state.epoch = 0

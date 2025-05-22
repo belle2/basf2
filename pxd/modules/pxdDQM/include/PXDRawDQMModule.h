@@ -14,6 +14,7 @@
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDRawAdc.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
+#include <vxd/geometry/GeoCache.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <string>
 #include <TH2.h>
@@ -65,6 +66,8 @@ namespace Belle2 {
       /** Input array for DAQ Status. */
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
+      VXD::GeoCache& m_vxdGeometry;
+
       /** Histogram number of raw packets */
       TH1F* hrawPxdPackets = nullptr;
       /** Histogram raw packet size */
@@ -76,19 +79,14 @@ namespace Belle2 {
       /** Histogram Adc 2d hitmap (full frames only) (all pxd) */
       TH2F* hrawPxdAdcMapAll = nullptr;
       /** Histogram 2d hitmap */
-      //TH2F* hrawPxdHitMap[64] = {};
       std::map<VxdID, TH2F*> m_hrawPxdHitMap;
       /** Histogram 2d chargemap */
-      //TH2F* hrawPxdChargeMap[64] = {};
       std::map<VxdID, TH2F*> m_hrawPxdChargeMap;
       /** Histogram raw pixel charge */
-      //TH1F* hrawPxdHitsCharge[64] = {};
       std::map<VxdID, TH1F*> m_hrawPxdHitsCharge;
       /** Histogram raw pixel hit "time" window */
-      //TH1F* hrawPxdHitTimeWindow[64] = {};
       std::map<VxdID, TH1F*> m_hrawPxdHitTimeWindow;
       /** Histogram raw pixel trigger gate window */
-      //TH1F* hrawPxdGateTimeWindow[64] = {};
       std::map<VxdID, TH1F*> m_hrawPxdGateTimeWindow;
 
     };//end class declaration

@@ -7,7 +7,7 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDRawDQMModule.h>
-#include <vxd/geometry/GeoCache.h>
+//#include <vxd/geometry/GeoCache.h>
 
 #include <TDirectory.h>
 #include <boost/format.hpp>
@@ -29,7 +29,8 @@ REG_MODULE(PXDRawDQM);
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDRawDQMModule::PXDRawDQMModule() : HistoModule(), m_storeRawPxdrarray(), m_storeRawHits(), m_storeRawAdcs()
+PXDRawDQMModule::PXDRawDQMModule() : HistoModule(), m_storeRawPxdrarray(), m_storeRawHits(), m_storeRawAdcs(),
+  m_vxdGeometry(GeoCache::getInstance())
 {
   //Set module properties
   setDescription("Monitor raw PXD");
@@ -62,12 +63,12 @@ void PXDRawDQMModule::defineHisto()
   hrawPxdHitsCount = new TH1F("hrawPxdCount", "Pxd Raw Count ;Nr per Event", 8192, 0, 8192);
 
 
-  Belle2::VXD::GeoCache& vxdGeometry(GeoCache::getInstance());
-  std::vector<VxdID> sensors = vxdGeometry.getListOfSensors();
+  //  Belle2::VXD::GeoCache& vxdGeometry(GeoCache::getInstance());
+  std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
   std::sort(sensors.begin(),
             sensors.end());  // make sure it is our natural order
   for (VxdID& avxdid : sensors) {
-    auto&  info = vxdGeometry.getSensorInfo(avxdid);
+    auto&  info = m_vxdGeometry.getSensorInfo(avxdid);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     //Only interested in PXD sensors
     TString buff = (std::string)avxdid;

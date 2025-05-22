@@ -23,9 +23,10 @@ void ONNXExpert::load(Weightfile& weightfile)
   // https://onnxruntime.ai/docs/performance/tune-performance/threading.html
   //
   // InterOpNumThreads is probably optional (not used in ORT_SEQUENTIAL mode)
-  // Also, in ORT_SEQUENTIAL mode, MLP-like models will always run single threaded,
-  // but maybe not e.g. graph networks which can run in parallel on nodes.
-  // Here, setting IntraOpNumThreads to 1 is important to ensure single-threaded execution.
+  // Also, with batch size 1 and ORT_SEQUENTIAL mode, MLP-like models will
+  // always run single threaded, but maybe not e.g. graph networks which can run
+  // in parallel on nodes. Here, setting IntraOpNumThreads to 1 is important to
+  // ensure single-threaded execution.
   Ort::SessionOptions sessionOptions;
   sessionOptions.SetIntraOpNumThreads(1);
   sessionOptions.SetInterOpNumThreads(1);

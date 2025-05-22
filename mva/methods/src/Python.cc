@@ -254,12 +254,12 @@ namespace Belle2 {
         // Generate a unique module
         boost::uuids::random_generator uuid_gen;
         std::string unique_mva_module_name = "unique_module_name" + boost::uuids::to_string(uuid_gen());
-        auto unique_mva_module = type.attr("ModuleType")(unique_mva_module_name.c_str());
+        boost::python::object unique_mva_module = type.attr("ModuleType")(unique_mva_module_name.c_str());
 
         // Copy framework's __dict__ to the new module
         unique_mva_module.attr("__dict__").attr("update")(boost::python::object(framework.attr("__dict__")));
         // Overwrite framework with user-defined code from the steering file
-        builtins.attr("exec")(steering_file_source_code.c_str(), unique_mva_module.attr("__dict__"));
+        builtins.attr("exec")(steering_file_source_code.c_str(), boost::python::object(unique_mva_module.attr("__dict__")));
 
         // Call get_model with the parameters provided by the user
         auto parameters = json.attr("loads")(m_specific_options.m_config.c_str());

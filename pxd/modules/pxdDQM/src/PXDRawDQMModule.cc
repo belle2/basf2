@@ -7,8 +7,8 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDRawDQMModule.h>
-//#include <vxd/geometry/GeoCache.h>
 
+#include <vxd/geometry/GeoCache.h>
 #include <TDirectory.h>
 #include <boost/format.hpp>
 #include <string>
@@ -29,8 +29,7 @@ REG_MODULE(PXDRawDQM);
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDRawDQMModule::PXDRawDQMModule() : HistoModule(), m_storeRawPxdrarray(), m_storeRawHits(), m_storeRawAdcs(),
-  m_vxdGeometry(GeoCache::getInstance())
+PXDRawDQMModule::PXDRawDQMModule() : HistoModule(), m_storeRawPxdrarray(), m_storeRawHits(), m_storeRawAdcs()
 {
   //Set module properties
   setDescription("Monitor raw PXD");
@@ -62,28 +61,25 @@ void PXDRawDQMModule::defineHisto()
 
   hrawPxdHitsCount = new TH1F("hrawPxdCount", "Pxd Raw Count ;Nr per Event", 8192, 0, 8192);
 
-
-  //  Belle2::VXD::GeoCache& vxdGeometry(GeoCache::getInstance());
-  std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
-  std::sort(sensors.begin(),
-            sensors.end());  // make sure it is our natural order
-  for (VxdID& avxdid : sensors) {
-    auto&  info = m_vxdGeometry.getSensorInfo(avxdid);
+  VXD::GeoCache& vxdGeometry(GeoCache::getInstance());
+  std::vector<VxdID> sensors = vxdGeometry.getListOfSensors();
+  for (const VxdID& avxdid : sensors) {
+    const auto&  info = vxdGeometry.getSensorInfo(avxdid);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     //Only interested in PXD sensors
     TString buff = (std::string)avxdid;
     buff.ReplaceAll(".", "_");
 
-    m_hrawPxdHitMap[avxdid] = new TH2F(("hrawPxdHitMap" + buff),
+    m_hrawPxdHitMap[avxdid] = new TH2F(("hrawPxdHitMap_" + buff),
                                        ("Pxd Raw Hit Map, " + buff + ";column;row"), 250,
                                        0, 250, 768, 0, 768);
-    m_hrawPxdChargeMap[avxdid] = new TH2F(("hrawPxdChargeMap" + buff),
+    m_hrawPxdChargeMap[avxdid] = new TH2F(("hrawPxdChargeMap_" + buff),
                                           ("Pxd Raw Charge Map, " + buff + ";column;row"), 250, 0, 250, 768, 0, 768);
-    m_hrawPxdHitsCharge[avxdid] = new TH1F(("hrawPxdHitsCharge" + buff),
+    m_hrawPxdHitsCharge[avxdid] = new TH1F(("hrawPxdHitsCharge_" + buff),
                                            ("Pxd Raw Hit Charge, " + buff + ";Charge"), 256, 0, 256);
-    m_hrawPxdHitTimeWindow[avxdid] = new TH1F(("hrawPxdHitTimeWindow" + buff),
+    m_hrawPxdHitTimeWindow[avxdid] = new TH1F(("hrawPxdHitTimeWindow_" + buff),
                                               ("Pxd Raw Hit Time Window (framenr*192-gate_of_hit), " + buff + ";Time [a.u.]"), 2048, -256, 2048 - 256);
-    m_hrawPxdGateTimeWindow[avxdid] = new TH1F(("hrawPxdGateTimeWindow" + buff),
+    m_hrawPxdGateTimeWindow[avxdid] = new TH1F(("hrawPxdGateTimeWindow_" + buff),
                                                ("Pxd Raw Gate Time Window (framenr*192-triggergate_of_hit), " + buff + ";Time [a.u.]"), 2048, -256, 2048 - 256);
   }
   // cd back to root directory
@@ -131,8 +127,6 @@ void PXDRawDQMModule::event()
     auto layer = currentVxdId.getLayerNumber();/// 1 ... 2
     auto ladder = currentVxdId.getLadderNumber();/// 1 ... 8 and 1 ... 12
     auto sensor = currentVxdId.getSensorNumber();/// 1 ... 2
-
-    if (layer > 2) continue; //check that is PXD, should not happen
 
     // Get startrow and DheID from DAQEvtStats
     const PXDDAQDHEStatus* dhe = (*m_storeDAQEvtStats).findDHE(currentVxdId);

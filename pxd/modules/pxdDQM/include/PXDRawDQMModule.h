@@ -14,7 +14,6 @@
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDRawAdc.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
-#include <vxd/geometry/GeoCache.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <string>
 #include <TH2.h>
@@ -65,8 +64,6 @@ namespace Belle2 {
       StoreArray<PXDRawAdc> m_storeRawAdcs;
       /** Input array for DAQ Status. */
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
-
-      VXD::GeoCache& m_vxdGeometry;
 
       /** Histogram number of raw packets */
       TH1F* hrawPxdPackets = nullptr;

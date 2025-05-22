@@ -75,10 +75,26 @@ def flatten(input_list: List[List[Any]]) -> List[Any]:
     return [item for sublist in input_list for item in sublist]
 
 
+def smart_abbreviation(name):
+    shortName = name
+    shortName = shortName.replace("daughter", "d")
+    shortName = shortName.replace("Angle", "Ang")
+    shortName = shortName.replace("useCMSFrame", "")
+    shortName = shortName.replace("useLabFrame", "")
+    shortName = shortName.replace("useRestFrame", "")
+    shortName = shortName.replace("formula", "")
+    shortName = shortName.replace("(", "")
+    shortName = shortName.replace(")", "")
+    shortName = shortName.replace("conditionalVariableSelector", "")
+    shortName = shortName.replace(",", "")
+    shortName = shortName.replace(" ", "")
+    return shortName
+
+
 def create_abbreviations(names, length=5):
     count = dict()
     for name in names:
-        abbreviation = name[:length]
+        abbreviation = smart_abbreviation(name)[:length]
         if abbreviation not in count:
             count[abbreviation] = 0
         count[abbreviation] += 1
@@ -86,7 +102,7 @@ def create_abbreviations(names, length=5):
 
     count2 = dict()
     for name in names:
-        abbreviation = name[:length]
+        abbreviation = smart_abbreviation(name)[:length]
         abbreviations[name] = abbreviation
         if count[abbreviation] > 1:
             if abbreviation not in count2:
@@ -150,18 +166,53 @@ if __name__ == '__main__':
 
     print("Load variables array")
     rootchain = ROOT.TChain(args.treename)
+    rootchain_spec = ROOT.TChain(args.treename)
     for datafile in datafiles:
         rootchain.Add(datafile)
+        rootchain_spec.Add(datafile)
 
     variables_data = basf2_mva_util.chain2dict(rootchain, root_variables, list(variable_abbreviations.values()))
     spectators_data = basf2_mva_util.chain2dict(rootchain, root_spectators, list(spectator_abbreviations.values()))
+    varSpec_data = basf2_mva_util.chain2dict(
+        rootchain_spec,
+        root_variables +
+        root_spectators,
+        list(
+            variable_abbreviations.values()) +
+        list(
+            spectator_abbreviations.values()))
+
+    if train_probability:
+        rootchain_train = ROOT.TChain(args.treename)
+        rootchain_train_spec = ROOT.TChain(args.treename)
+        for train_datafile in train_datafiles:
+            rootchain_train.Add(train_datafile)
+            rootchain_train_spec.Add(train_datafile)
+        variables_train_data = basf2_mva_util.chain2dict(rootchain_train, root_variables, list(variable_abbreviations.values()))
+        spectators_train_data = basf2_mva_util.chain2dict(rootchain_train, root_spectators, list(spectator_abbreviations.values()))
+        varSpec_train_data = basf2_mva_util.chain2dict(
+            rootchain_train_spec,
+            root_variables +
+            root_spectators,
+            list(
+                variable_abbreviations.values()) +
+            list(
+                spectator_abbreviations.values()))
 
     if args.fillnan:
         for column in variable_abbreviations.values():
             np.nan_to_num(variables_data[column], copy=False)
+            np.nan_to_num(varSpec_data[column], copy=False)
+            if train_probability:
+                np.nan_to_num(variables_train_data[column], copy=False)
+                np.nan_to_num(varSpec_train_data[column], copy=False)
 
         for column in spectator_abbreviations.values():
             np.nan_to_num(spectators_data[column], copy=False)
+            np.nan_to_num(varSpec_data[column], copy=False)
+            if train_probability:
+                np.nan_to_num(spectators_train_data[column], copy=False)
+                np.nan_to_num(varSpec_train_data[column], copy=False)
 
     print("Create latex file")
     # Change working directory after experts run, because they might want to access
@@ -243,16 +294,31 @@ if __name__ == '__main__':
         graphics.add('correlation_plot.pdf', width=1.0)
         o += graphics.finish()
 
+        if train_probability:
+            o += b2latex.SubSection("Correlation on Training Data")
+            graphics = b2latex.Graphics()
+            p = plotting.CorrelationMatrix()
+            p.add(variables_train_data, variable_abbreviations.values(),
+                  train_target[first_identifier_abbr] == 1,
+                  train_target[first_identifier_abbr] == 0)
+            p.finish()
+            p.save('correlation_plot_train.pdf')
+            graphics.add('correlation_plot_train.pdf', width=1.0)
+            o += graphics.finish()
+
         for v in variables:
             variable_abbr = variable_abbreviations[v]
             o += b2latex.SubSection(format.string(v))
             graphics = b2latex.Graphics()
             p = plotting.VerboseDistribution(normed=True, range_in_std=3, x_axis_label=v)
-            p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 1, label="Signal")
-            p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 0, label="Background")
+            p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 1, label="Sig")
+            p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 0, label="Bkg")
+            if train_probability:
+                p.add(variables_train_data, variable_abbr, train_target[first_identifier_abbr] == 1, label="Sig_train")
+                p.add(variables_train_data, variable_abbr, train_target[first_identifier_abbr] == 0, label="Bkg_train")
             p.finish()
-            p.save(f'variable_{hash(v)}.pdf')
-            graphics.add(f'variable_{hash(v)}.pdf', width=1.0)
+            p.save(f'variable_{variable_abbr}_{hash(v)}.pdf')
+            graphics.add(f'variable_{variable_abbr}_{hash(v)}.pdf', width=1.0)
             o += graphics.finish()
 
         o += b2latex.Section("Classifier Plot")
@@ -260,49 +326,77 @@ if __name__ == '__main__':
                             "of the classifiers on training and independent data."
                             "The legend of each plot contains the shortened identifier and the area under the ROC curve"
                             "in parenthesis.")
+        plot_classes = [
+            plotting.SignalToNoiseOverCut,
+            plotting.PurityOverEfficiency,
+            plotting.RejectionOverEfficiency,
+            plotting.TrueVsFalsePositiveRate,
+            plotting.PrecisionRecallCurve,
+        ]
 
-        o += b2latex.Section("ROC Plot")
-        graphics = b2latex.Graphics()
-        p = plotting.RejectionOverEfficiency()
-        for identifier in identifier_abbreviations.values():
-            p.add(test_probability, identifier, test_target[identifier] == 1, test_target[identifier] == 0)
-        p.finish()
-        p.axis.set_title("ROC Rejection Plot on independent data")
-        p.save('roc_plot_test.pdf')
-        graphics.add('roc_plot_test.pdf', width=1.0)
-        o += graphics.finish()
+        for plot_class in plot_classes:
+            # Start section for each plot
+            o += b2latex.Section(f"{plot_class.__name__} Plot")
 
-        if train_probability:
+            graphics = b2latex.Graphics()
+            p = plot_class()
             for i, identifier in enumerate(identifiers):
-                graphics = b2latex.Graphics()
-                p = plotting.RejectionOverEfficiency()
                 identifier_abbr = identifier_abbreviations[identifier]
-                p.add(train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
-                      train_target[identifier_abbr] == 0, label='Train')
-                p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
-                      test_target[identifier_abbr] == 0, label='Test')
-                p.finish()
-                p.axis.set_title(identifier)
-                p.save(f'roc_test_{hash(identifier)}.pdf')
-                graphics.add(f'roc_test_{hash(identifier)}.pdf', width=1.0)
-                o += graphics.finish()
+                p.add(
+                    test_probability,
+                    identifier_abbr,
+                    test_target[identifier_abbr] == 1,
+                    test_target[identifier_abbr] == 0,
+                    label=identifier_abbr)
+            p.finish()
+            p.axis.set_title(f"{plot_class.__name__} Plot on independent data")
+            p.save(f'{plot_class.__name__.lower()}_plot_test.pdf')
+            graphics.add(f'{plot_class.__name__.lower()}_plot_test.pdf', width=1.0)
+            o += graphics.finish()
+
+            if train_probability:
+                for i, identifier in enumerate(identifiers):
+                    graphics = b2latex.Graphics()
+                    p = plot_class()
+                    identifier_abbr = identifier_abbreviations[identifier]
+                    p.add(train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
+                          train_target[identifier_abbr] == 0, label=f'Train {identifier_abbr}')
+                    p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
+                          test_target[identifier_abbr] == 0, label=f'Test {identifier_abbr}')
+                    p.finish()
+                    p.axis.set_title(f"{plot_class.__name__} Plot for \n" + identifier)
+                    p.save(f'{plot_class.__name__.lower()}_plot_{hash(identifier)}.pdf')
+                    graphics.add(f'{plot_class.__name__.lower()}_plot_{hash(identifier)}.pdf', width=1.0)
+                    o += graphics.finish()
 
         o += b2latex.Section("Classification Results")
-
         for identifier in identifiers:
             identifier_abbr = identifier_abbreviations[identifier]
             o += b2latex.SubSection(format.string(identifier_abbr))
             graphics = b2latex.Graphics()
-            p = plotting.Multiplot(plotting.PurityAndEfficiencyOverCut, 2)
+            if train_probability:
+                p = plotting.Multiplot(plotting.PurityAndEfficiencyOverCut, 4)
+            else:
+                p = plotting.Multiplot(plotting.PurityAndEfficiencyOverCut, 2)
             p.add(0, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
                   test_target[identifier_abbr] == 0, normed=True)
-            p.sub_plots[0].axis.set_title(f"Classification result in test data for {identifier}")
+            p.sub_plots[0].axis.set_title(f"Classification result in test data for \n{identifier}")
 
             p.add(1, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
                   test_target[identifier_abbr] == 0, normed=False)
-            p.sub_plots[1].axis.set_title(f"Classification result in test data for {identifier}")
-            p.finish()
+            p.sub_plots[1].axis.set_title(f"Classification result in test data for \n{identifier}")
 
+            if train_probability:
+                p.add(2, train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
+                      train_target[identifier_abbr] == 0, normed=True)
+                p.sub_plots[2].axis.set_title(f"Classification result in training data for \n{identifier}")
+
+                p.add(3, train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
+                      train_target[identifier_abbr] == 0, normed=False)
+                p.sub_plots[3].axis.set_title(f"Classification result in training data for \n{identifier}")
+
+            p.figure.subplots_adjust(wspace=0.3, hspace=0.3)
+            p.finish()
             p.save(f'classification_result_{hash(identifier)}.pdf')
             graphics.add(f'classification_result_{hash(identifier)}.pdf', width=1)
             o += graphics.finish()
@@ -311,9 +405,13 @@ if __name__ == '__main__':
         graphics = b2latex.Graphics()
         p = plotting.Diagonal()
         for identifier in identifiers:
-            o += b2latex.SubSection(format.string(identifier_abbr))
             identifier_abbr = identifier_abbreviations[identifier]
-            p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1, test_target[identifier_abbr] == 0)
+            p.add(
+                test_probability,
+                identifier_abbr,
+                test_target[identifier_abbr] == 1,
+                test_target[identifier_abbr] == 0,
+                label=identifier_abbr)
         p.finish()
         p.axis.set_title("Diagonal plot on independent data")
         p.save('diagonal_plot_test.pdf')
@@ -321,7 +419,33 @@ if __name__ == '__main__':
         o += graphics.finish()
 
         if train_probability:
-            o += b2latex.SubSection("Overtraining Plot")
+            for identifier in identifiers:
+                identifier_abbr = identifier_abbreviations[identifier]
+                o += b2latex.SubSection(format.string(identifier_abbr))
+                graphics = b2latex.Graphics()
+                p = plotting.Diagonal()
+
+                p.add(
+                    train_probability,
+                    identifier_abbr,
+                    train_target[identifier_abbr] == 1,
+                    train_target[identifier_abbr] == 0,
+                    label='Train')
+                p.add(
+                    test_probability,
+                    identifier_abbr,
+                    test_target[identifier_abbr] == 1,
+                    test_target[identifier_abbr] == 0,
+                    label='Test')
+
+                p.finish()
+                p.axis.set_title("Diagonal plot for \n" + identifier)
+                p.save(f'diagonal_plot_{hash(identifier)}.pdf')
+                graphics.add(f'diagonal_plot_{hash(identifier)}.pdf', width=1.0)
+                o += graphics.finish()
+
+        if train_probability:
+            o += b2latex.Section("Overtraining Plot")
             for identifier in identifiers:
                 identifier_abbr = identifier_abbreviations[identifier]
                 probability = {identifier_abbr: np.r_[train_probability[identifier_abbr], test_probability[identifier_abbr]]}
@@ -333,7 +457,7 @@ if __name__ == '__main__':
                       train_mask == 1, train_mask == 0,
                       target == 1, target == 0, )
                 p.finish()
-                p.axis.set_title(f"Overtraining check for {identifier}")
+                p.axis.set_title(f"Overtraining check for \n{identifier}")
                 p.save(f'overtraining_plot_{hash(identifier)}.pdf')
                 graphics.add(f'overtraining_plot_{hash(identifier)}.pdf', width=1.0)
                 o += graphics.finish()
@@ -352,11 +476,14 @@ if __name__ == '__main__':
             o += b2latex.SubSection(format.string(spectator))
             graphics = b2latex.Graphics()
             p = plotting.VerboseDistribution()
-            p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 1, label="Signal")
-            p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 0, label="Background")
+            p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 1, label="Sig")
+            p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 0, label="Bkg")
+            if train_probability:
+                p.add(spectators_train_data, spectator_abbr, train_target[first_identifier_abbr] == 1, label="Sig_train")
+                p.add(spectators_train_data, spectator_abbr, train_target[first_identifier_abbr] == 0, label="Bkg_train")
             p.finish()
-            p.save(f'spectator_{hash(spectator)}.pdf')
-            graphics.add(f'spectator_{hash(spectator)}.pdf', width=1.0)
+            p.save(f'spectator_{spectator_abbr}_{hash(spectator)}.pdf')
+            graphics.add(f'spectator_{spectator_abbr}_{hash(spectator)}.pdf', width=1.0)
             o += graphics.finish()
 
             for identifier in identifiers:
@@ -369,8 +496,54 @@ if __name__ == '__main__':
                       test_target[identifier_abbr] == 1,
                       test_target[identifier_abbr] == 0)
                 p.finish()
-                p.save(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf')
-                graphics.add(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf', width=1.0)
+                p.save(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}.pdf')
+                graphics.add(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}.pdf', width=1.0)
+                o += graphics.finish()
+
+                if train_probability:
+                    o += b2latex.SubSubSection(format.string(spectator) + " with classifier " +
+                                               format.string(identifier) + " on training data")
+                    data = {identifier_abbr: train_probability[identifier_abbr],
+                            spectator_abbr: spectators_train_data[spectator_abbr]}
+                    graphics = b2latex.Graphics()
+                    p = plotting.Correlation()
+                    p.add(data, spectator_abbr, identifier_abbr, list(range(10, 100, 10)),
+                          train_target[identifier_abbr] == 1,
+                          train_target[identifier_abbr] == 0)
+                    p.finish()
+                    p.save(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}_train.pdf')
+                    graphics.add(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}_train.pdf', width=1.0)
+                    o += graphics.finish()
+
+        if len(spectators) > 0:
+            o += b2latex.SubSection("Correlation of Spectators")
+            first_identifier_abbr = list(identifier_abbreviations.values())[0]
+            graphics = b2latex.Graphics()
+            p = plotting.CorrelationMatrix()
+            p.add(
+                varSpec_data,
+                list(variable_abbreviations.values()) + list(spectator_abbreviations.values()),
+                test_target[first_identifier_abbr] == 1,
+                test_target[first_identifier_abbr] == 0
+            )
+            p.finish()
+            p.save('correlation_spec_plot.pdf')
+            graphics.add('correlation_spec_plot.pdf', width=1.0)
+            o += graphics.finish()
+
+            if train_probability:
+                o += b2latex.SubSection("Correlation of Spectators on Training Data")
+                graphics = b2latex.Graphics()
+                p = plotting.CorrelationMatrix()
+                p.add(
+                    varSpec_train_data,
+                    list(variable_abbreviations.values()) + list(spectator_abbreviations.values()),
+                    train_target[first_identifier_abbr] == 1,
+                    train_target[first_identifier_abbr] == 0
+                )
+                p.finish()
+                p.save('correlation_spec_plot_train.pdf')
+                graphics.add('correlation_spec_plot_train.pdf', width=1.0)
                 o += graphics.finish()
 
         if args.compile:

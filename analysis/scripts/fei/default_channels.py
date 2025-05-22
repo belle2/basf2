@@ -617,6 +617,7 @@ def get_default_channels(
 
     BP = Particle('B+',
                   MVAConfiguration(variables=B_vars,
+                                   spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                    target='isSignal'),
                   PreCutConfiguration(userCut=hadronic_user_cut,
                                       bestCandidateMode='highest',
@@ -675,6 +676,7 @@ def get_default_channels(
 
     BP_SL = Particle('B+:semileptonic',
                      MVAConfiguration(variables=B_SL_vars,
+                                      spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                       target='isSignalAcceptMissingNeutrino'),
                      PreCutConfiguration(userCut=semileptonic_user_cut,
                                          bestCandidateMode='highest',
@@ -729,6 +731,7 @@ def get_default_channels(
     if KLong:
         BP_KL = Particle('B+:KL',
                          MVAConfiguration(variables=B_vars,
+                                          spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                           target='isSignal'),
                          PreCutConfiguration(userCut=semileptonic_user_cut,
                                              bestCandidateMode='highest',
@@ -780,6 +783,7 @@ def get_default_channels(
 
     B0 = Particle('B0',
                   MVAConfiguration(variables=B_vars,
+                                   spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                    target='isSignal'),
                   PreCutConfiguration(userCut=hadronic_user_cut,
                                       bestCandidateMode='highest',
@@ -822,6 +826,7 @@ def get_default_channels(
 
     B0_SL = Particle('B0:semileptonic',
                      MVAConfiguration(variables=B_SL_vars,
+                                      spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                       target='isSignalAcceptMissingNeutrino'),
                      PreCutConfiguration(userCut=semileptonic_user_cut,
                                          bestCandidateMode='highest',
@@ -873,6 +878,7 @@ def get_default_channels(
     if KLong:
         B0_KL = Particle('B0:KL',
                          MVAConfiguration(variables=B_vars,
+                                          spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                           target='isSignal'),
                          PreCutConfiguration(userCut=semileptonic_user_cut,
                                              bestCandidateMode='highest',
@@ -930,6 +936,7 @@ def get_default_channels(
 
     BS = Particle('B_s0',
                   MVAConfiguration(variables=Bs_vars,
+                                   spectators={'Mbc': (5.23, None)},
                                    target='isSignal'),
                   PreCutConfiguration(userCut=hadronic_bs_user_cut,
                                       bestCandidateMode='highest',
@@ -1414,6 +1421,7 @@ def get_fr_channels(convertedFromBelle=False):
 
     BP = Particle('B+',
                   MVAConfiguration(variables=B_vars,
+                                   spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                    target='isSignal'),
                   PreCutConfiguration(userCut=hadronic_user_cut,
                                       bestCandidateMode='highest',
@@ -1441,6 +1449,7 @@ def get_fr_channels(convertedFromBelle=False):
 
     B0 = Particle('B0',
                   MVAConfiguration(variables=B_vars,
+                                   spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                    target='isSignal'),
                   PreCutConfiguration(userCut=hadronic_user_cut,
                                       bestCandidateMode='highest',

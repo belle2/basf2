@@ -175,6 +175,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("mcMatchingMode", m_mcMatchingModeString,
            "MC matching mode: 'Direct', or 'GeneratorLevel'",
            std::string("Direct"));
+  addParam("evtgenProcessing", m_evtgenProcessing, "Flag to switch on only evtgen processing", false);
   addParam("matchType2E9oE25Threshold", m_matchType2E9oE25Threshold,
            "clusters with a E9/E25 value above this threshold are classified as neutral even if tracks are matched to their connected region (matchType == 2)",
            -1.1);
@@ -297,20 +298,28 @@ void B2BIIConvertMdstModule::event()
   if (m_convertBeamParameters) {
     // Are we running on MC or DATA?
     Belle::Belle_event_Manager& evman = Belle::Belle_event_Manager::get_manager();
-    Belle::Belle_event& evt = evman[0];
+    if (evman.count() == 0) {
+      if (m_evtgenProcessing)
+        m_realData = false; // <- this is MC sample
+      else
+        B2FATAL("No event found in the event manager, the input mdst file might be corrupted. "
+                "If you are running on evtgen's output, please set the evtgenProcessing flag to true.");
+    } else {
+      Belle::Belle_event& evt = evman[0];
 
-    if (evt.ExpMC() == 2)
-      m_realData = false; // <- this is MC sample
-    else
-      m_realData = true;  // <- this is real data sample
+      if (evt.ExpMC() == 2)
+        m_realData = false; // <- this is MC sample
+      else
+        m_realData = true;  // <- this is real data sample
+    }
 
     // 0. Convert IPProfile to BeamSpot
     convertIPProfile();
 
     // Make sure beam parameters are correct: if they are not found in the
     // database or different from the ones in the database we need to override them
-    if (!m_beamSpotDB || !(m_beamSpot == *m_beamSpotDB) ||
-        !m_collisionBoostVectorDB || !m_collisionInvMDB || !m_collisionAxisCMSDB) {
+    if ((!m_beamSpotDB || !(m_beamSpot == *m_beamSpotDB) ||
+         !m_collisionBoostVectorDB || !m_collisionInvMDB || !m_collisionAxisCMSDB) && !m_evtgenProcessing) {
       if ((!m_beamSpotDB || !m_collisionBoostVectorDB || !m_collisionInvMDB || !m_collisionAxisCMSDB) && !m_realData) {
         B2INFO("No database entry for this run yet, create one");
         StoreObjPtr<EventMetaData> event;
@@ -340,6 +349,11 @@ void B2BIIConvertMdstModule::event()
 
   // 1. Convert MC information
   convertGenHepEvtTable();
+
+  if (m_evtgenProcessing) {
+    B2DEBUG(99, "B2BIIConvertMdst: evtgenProcessing is true, skipping conversion of all reconstruction information");
+    return;
+  }
 
   // 2. Convert Tracking information
   convertMdstChargedTable();

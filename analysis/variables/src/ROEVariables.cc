@@ -1070,11 +1070,12 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle->getDaughter(0), maskName, "6");
-        ROOT::Math::PxPyPzEVector sig4vec = particle->getDaughter(0)->get4Vector();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle->getDaughter(0), maskName, "1");
+        ROOT::Math::PxPyPzEVector sig4vec = frame.getMomentum(particle->getDaughter(0)->get4Vector());
 
         ROOT::Math::PxPyPzEVector bsMom = neutrino4vec + sig4vec;
-        ROOT::Math::PxPyPzEVector bssMom = bsMom + particle->getDaughter(1)->get4Vector();
+        ROOT::Math::PxPyPzEVector bssMom = bsMom + frame.getMomentum(particle->getDaughter(1)->get4Vector());
 
         return bssMom.M() - bsMom.M();
       };
@@ -1083,47 +1084,23 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_DeltaE(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
-      std::string opt;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 1) {
-        maskName = RestOfEvent::c_defaultMaskName;
-        opt = arguments[0];
-      } else if (arguments.size() == 2) {
+      if (arguments.size() == 1)
         maskName = arguments[0];
-        opt = arguments[1];
-      } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function weDeltae");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function weDeltae.");
 
-      auto func = [maskName, opt](const Particle * particle) -> double {
+      auto func = [maskName](const Particle * particle) -> double {
 
         PCmsLabTransform T;
-        ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
-        ROOT::Math::PxPyPzEVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
-        ROOT::Math::PxPyPzEVector sig4vecLAB = particle->get4Vector();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        ROOT::Math::PxPyPzEVector boostvec = frame.getMomentum(T.getBeamFourMomentum());
+        ROOT::Math::PxPyPzEVector sig4vec = frame.getMomentum(particle->get4Vector());
         ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle, maskName, "1");
-        ROOT::Math::PxPyPzEVector neutrino4vecLAB = missing4Vector(particle, maskName, "6");
 
-        double deltaE = Const::doubleNaN;
-
-        // Definition 0: CMS
-        if (opt == "0")
-        {
-          double totalSigEnergy = (sig4vec + neutrino4vec).energy();
-          double E = T.getCMSEnergy() / 2;
-          deltaE = totalSigEnergy - E;
-        }
-
-        // Definition 1: LAB
-        else if (opt == "1")
-        {
-          double Ecms = T.getCMSEnergy();
-          double s = Ecms * Ecms;
-          deltaE = ((sig4vecLAB + neutrino4vecLAB).Dot(boostvec) - s / 2.0) / sqrt(s);
-        }
-
-        else
-          B2FATAL("Option for correctedB_deltae variable should only be 0/1 (CMS/LAB)");
+        double E = T.getCMSEnergy();
+        double deltaE = (sig4vec + neutrino4vec).Dot(boostvec) / E - E / 2.0;
 
         return deltaE;
       };
@@ -1132,61 +1109,50 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_Mbc(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
-      std::string opt;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
       if (arguments.size() == 1) {
-        maskName = RestOfEvent::c_defaultMaskName;
-        opt = arguments[0];
-      } else if (arguments.size() == 2) {
         maskName = arguments[0];
-        opt = arguments[1];
-      } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function weMbc");
+      } else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function weMbc");
 
-      auto func = [maskName, opt](const Particle * particle) -> double {
+      auto func = [maskName](const Particle * particle) -> double {
 
         PCmsLabTransform T;
-        ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        ROOT::Math::PxPyPzEVector boostvec = frame.getMomentum(T.getBeamFourMomentum());
+        ROOT::Math::PxPyPzEVector sig4vec = frame.getMomentum(particle->get4Vector());
+        ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle, maskName, "1");
+
+        ROOT::Math::PxPyPzEVector bmom = sig4vec + neutrino4vec;
+        double Ecms = T.getCMSEnergy();
+        double m2 = pow((Ecms* Ecms / 2.0 + bmom.Vect().Dot(boostvec.Vect())) / boostvec.energy(), 2.0) - bmom.P2();
+        double mbc = m2 > 0 ? sqrt(m2) : 0;
+
+        return mbc;
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr WE_MbcWithdEZero(const std::vector<std::string>& arguments)
+    {
+      std::string maskName = RestOfEvent::c_defaultMaskName;
+
+      if (arguments.size() == 1) {
+        maskName = arguments[0];
+      } else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function weMbc");
+
+      auto func = [maskName](const Particle * particle) -> double {
+
+        PCmsLabTransform T;
         ROOT::Math::PxPyPzEVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
-        ROOT::Math::PxPyPzEVector sig4vecLAB = particle->get4Vector();
-        ROOT::Math::PxPyPzEVector neutrino4vec;
+        ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle, maskName, "7");
 
-        double mbc = Const::doubleNaN;
-
-        // Definition 0: CMS
-        if (opt == "0")
-        {
-          neutrino4vec = missing4Vector(particle, maskName, "1");
-          ROOT::Math::PxPyPzEVector bmom = sig4vec + neutrino4vec;
-          double E = T.getCMSEnergy() / 2;
-          double m2 = E * E - bmom.P2();
-          mbc = m2 > 0 ? sqrt(m2) : 0;
-        }
-
-        // Definition 1: LAB
-        else if (opt == "1")
-        {
-          neutrino4vec = missing4Vector(particle, maskName, "6");
-          ROOT::Math::PxPyPzEVector bmom = sig4vecLAB + neutrino4vec;
-          double Ecms = T.getCMSEnergy();
-          double s = Ecms * Ecms;
-          double m2 = pow((s / 2.0 + bmom.Vect().Dot(boostvec.Vect())) / boostvec.energy(), 2.0) - bmom.P2();
-          mbc = m2 > 0 ? sqrt(m2) : 0;
-        }
-
-        // Definition 2: CMS with factor alpha (so that dE == 0)
-        else if (opt == "2")
-        {
-          neutrino4vec = missing4Vector(particle, maskName, "7");
-          ROOT::Math::PxPyPzEVector bmom = sig4vec + neutrino4vec;
-          double E = T.getCMSEnergy() / 2;
-          double m2 = E * E - bmom.P2();
-          mbc = m2 > 0 ? sqrt(m2) : 0;
-        }
-
-        else
-          B2FATAL("Option for weMbc variable should only be 0/1/2 (CMS/LAB/CMS with factor)");
+        ROOT::Math::PxPyPzEVector bmom = sig4vec + neutrino4vec;
+        double E = T.getCMSEnergy() / 2;
+        double m2 = E * E - bmom.P2();
+        double mbc = m2 > 0 ? sqrt(m2) : 0;
 
         return mbc;
       };
@@ -1416,6 +1382,7 @@ namespace Belle2 {
 
         double pz = 0;
         double energy = 0;
+        const auto& frame = ReferenceFrame::GetCurrent();
 
         // Get all Tracks on reconstructed side
         std::vector<const Particle*> recTrackParticles = particle->getFinalStateDaughters();
@@ -1423,16 +1390,16 @@ namespace Belle2 {
         // Loop the reconstructed side
         for (auto& recTrackParticle : recTrackParticles)
         {
-          pz += recTrackParticle->getPz();
-          energy += recTrackParticle->getEnergy();
+          pz += frame.getMomentum(recTrackParticle->get4Vector()).Pz();
+          energy += frame.getMomentum(recTrackParticle->get4Vector()).E();
         }
 
         // Loop the ROE side
         auto roeParticles = roe->getChargedParticles(maskName);
         for (auto* roeParticle : roeParticles)
         {
-          pz += roeParticle->getPz();
-          energy += roeParticle->getEnergy();
+          pz += frame.getMomentum(roeParticle->get4Vector()).Pz();
+          energy += frame.getMomentum(roeParticle->get4Vector()).E();
         }
 
         return pz / energy;
@@ -1460,7 +1427,8 @@ namespace Belle2 {
           return Const::doubleNaN;
         }
 
-        return missing4Vector(particle, maskName, "5").M2() / (2.0 * missing4Vector(particle, maskName, "5").energy());
+        ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle, maskName, "0");
+        return neutrino4vec.M2() / (2.0 * neutrino4vec.energy());
       };
       return func;
     }
@@ -1496,9 +1464,9 @@ namespace Belle2 {
           return Const::doubleNaN;
 
         // Assumes lepton is the last particle in the reco decay chain!
-        PCmsLabTransform T;
         const Particle* lep = particle->getDaughter(n - 1);
-        ROOT::Math::PxPyPzEVector lep4vec = T.rotateLabToCms() * lep->get4Vector();
+        bool enforceCMSFrame = (option == "4" or option == "7");
+        ROOT::Math::PxPyPzEVector lep4vec = transformVector(lep->get4Vector(), enforceCMSFrame);
         ROOT::Math::PxPyPzEVector nu4vec = missing4Vector(particle, maskName, option);
 
         return (lep4vec + nu4vec).M2();
@@ -1605,21 +1573,21 @@ namespace Belle2 {
 
       auto func = [maskName](const Particle * particle) -> double {
 
-        ROOT::Math::PxPyPzEVector pNu = missing4Vector(particle, maskName, "6");
+        ROOT::Math::PxPyPzEVector pNu = missing4Vector(particle, maskName, "1");
 
+        const auto& frame = ReferenceFrame::GetCurrent();
         ROOT::Math::PxPyPzEVector pLep;
-        // TODO: avoid hardocoded values
         for (unsigned i = 0; i < particle->getNDaughters(); i++)
         {
           int absPDG = abs(particle->getDaughter(i)->getPDGCode());
           if (absPDG == Const::electron.getPDGCode() || absPDG == Const::muon.getPDGCode() || absPDG == 15) {
-            pLep = particle->getDaughter(i)->get4Vector();
+            pLep = frame.getMomentum(particle->getDaughter(i)->get4Vector());
             break;
           }
         }
 
         ROOT::Math::PxPyPzEVector pW = pNu + pLep;
-        ROOT::Math::PxPyPzEVector pB = particle->get4Vector() + pNu;
+        ROOT::Math::PxPyPzEVector pB = frame.getMomentum(particle->get4Vector()) + pNu;
 
         // boost lepton and B momentum to W frame
         ROOT::Math::XYZVector boost2W = pW.BoostToCM();
@@ -1848,6 +1816,18 @@ namespace Belle2 {
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
 
+    ROOT::Math::PxPyPzEVector transformVector(const ROOT::Math::PxPyPzEVector& vec, bool enforceCMSFrame)
+    {
+      if (enforceCMSFrame) {
+        UseReferenceFrame<CMSFrame> cmsFrame;
+        const auto& frame = ReferenceFrame::GetCurrent();
+        return frame.getMomentum(vec);
+      } else {
+        const auto& frame = ReferenceFrame::GetCurrent();
+        return frame.getMomentum(vec);
+      }
+    }
+
     ROOT::Math::PxPyPzEVector missing4Vector(const Particle* particle, const std::string& maskName, const std::string& opt)
     {
       // Get related ROE object
@@ -1859,43 +1839,39 @@ namespace Belle2 {
         return empty;
       }
 
+      bool enforceCMSFrame = (opt == "4" or opt == "7");
       PCmsLabTransform T;
-      ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
-
-      ROOT::Math::PxPyPzEVector rec4vecLAB = particle->get4Vector();
-      ROOT::Math::PxPyPzEVector roe4vecLAB = roe->get4Vector(maskName);
-
-      ROOT::Math::PxPyPzEVector rec4vec = T.rotateLabToCms() * rec4vecLAB;
-      ROOT::Math::PxPyPzEVector roe4vec = T.rotateLabToCms() * roe4vecLAB;
+      ROOT::Math::PxPyPzEVector boostvec = transformVector(T.getBeamFourMomentum(), enforceCMSFrame);
+      ROOT::Math::PxPyPzEVector rec4vec = transformVector(particle->get4Vector(), enforceCMSFrame);
+      ROOT::Math::PxPyPzEVector roe4vec = transformVector(roe->get4Vector(maskName), enforceCMSFrame);
 
       ROOT::Math::PxPyPzEVector miss4vec;
       double E_beam_cms = T.getCMSEnergy() / 2.0;
 
-      // Definition 0: CMS, use energy and momentum of tracks and clusters
-      if (opt == "0") {
-        miss4vec = - (rec4vec + roe4vec);
-        miss4vec.SetE(2 * E_beam_cms - (rec4vec.E() + roe4vec.E()));
+      // Definition 0: use energy and momentum of tracks and clusters
+      if (opt == "0" or opt == "5") {
+        miss4vec = boostvec - (rec4vec + roe4vec);
       }
 
-      // Definition 1: CMS, same as 0, fix Emiss = pmiss
-      else if (opt == "1") {
-        miss4vec = - (rec4vec + roe4vec);
+      // Definition 1: same as 0, fix Emiss = pmiss
+      else if (opt == "1" or opt == "6") {
+        miss4vec = boostvec - (rec4vec + roe4vec);
         miss4vec.SetE(miss4vec.P());
       }
 
-      // Definition 2: CMS, same as 0, fix Eroe = Ecms/2
+      // Definition 2: same as 0, fix Eroe = Ecms/2
       else if (opt == "2") {
-        miss4vec = - (rec4vec + roe4vec);
-        miss4vec.SetE(E_beam_cms - rec4vec.E());
+        miss4vec = boostvec - (rec4vec + roe4vec);
+        miss4vec.SetE(boostvec.E() / 2. - rec4vec.E());
       }
 
-      // Definition 3: CMS, use only energy and momentum of signal side
+      // Definition 3: use only energy and momentum of signal side
       else if (opt == "3") {
-        miss4vec = - rec4vec;
-        miss4vec.SetE(E_beam_cms - rec4vec.E());
+        miss4vec = boostvec - rec4vec;
+        miss4vec.SetE(boostvec.E() / 2. - rec4vec.E());
       }
 
-      // Definition 4: CMS, same as 3, update with direction of ROE momentum
+      // Definition 4: same as 3, update with direction of ROE momentum
       else if (opt == "4") {
         ROOT::Math::XYZVector pB = - roe4vec.Vect();
         pB = 0.340 * pB.Unit();
@@ -1903,18 +1879,7 @@ namespace Belle2 {
         miss4vec.SetPxPyPzE(pB.X(), pB.Y(), pB.Z(), E_beam_cms - rec4vec.E());
       }
 
-      // Definition 5: LAB, use energy and momentum of tracks and clusters from whole event
-      else if (opt == "5") {
-        miss4vec = boostvec - (rec4vecLAB + roe4vecLAB);
-      }
-
-      // Definition 6: LAB, same as 5, fix Emiss = pmiss
-      else if (opt == "6") {
-        miss4vec = boostvec - (rec4vecLAB + roe4vecLAB);
-        miss4vec.SetE(miss4vec.P());
-      }
-
-      // Definition 7: CMS, correct pmiss 3-momentum vector with factor alpha so that dE = 0 (used for Mbc calculation)
+      // Definition 7: correct pmiss 3-momentum vector with factor alpha so that dE = 0 (used for Mbc calculation)
       else if (opt == "7") {
         miss4vec = - (rec4vec + roe4vec);
         miss4vec.SetE(miss4vec.P());
@@ -2188,49 +2153,66 @@ namespace Belle2 {
                           "Returns beam constrained mass of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`. The unit of the beam constrained mass is :math:`\\text{GeV/c}^2`.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weDeltae(maskName, opt)", WE_DeltaE,
-                          "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`. The unit of the energy is ``GeV`` ",
+    REGISTER_METAVARIABLE("weDeltae(maskName)", WE_DeltaE, R"DOC(
+                          Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_{\mathrm{cms}}/2`.
+                          The variable can be used with the ``use***Frame()`` function. The unit of the energy is ``GeV``.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMbc(maskName, opt)", WE_Mbc,
-                          "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`. The unit of the beam constrained mass is :math:`\\text{GeV/c}^2`.",
+    REGISTER_METAVARIABLE("weMbc(maskName)", WE_Mbc, R"DOC(
+                          Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_{\mathrm{cms}}/2`.
+                          The variable can be used with the ``use***Frame()`` function. The unit of the beam constrained mass is :math:`\text{GeV/c}^2`.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissM2(maskName, opt)", WE_MissM2,
-                          "Returns the invariant mass squared of the missing momentum (see :b2:var:`weMissE` possible options). The unit of the invariant mass squared is :math:`[\\text{GeV}/\\text{c}^2]^2`.",
+    REGISTER_METAVARIABLE("weMbcWithdEZero(maskName)", WE_MbcWithdEZero, R"DOC(
+                          Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_{\mathrm{cms}}/2`.
+                          The missing neutrino momentum is scaled so that the energy difference :math:`d_E = 0`. The unit of the beam constrained mass is :math:`\text{GeV/c}^2`.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta,
-                          "Returns the polar angle of the missing momentum (see possible :b2:var:`weMissE` options). The unit of the polar angle is ``rad`` ",
+    REGISTER_METAVARIABLE("weMissM2(maskName, opt)", WE_MissM2, R"DOC(
+                          Returns the invariant mass squared of the missing momentum (see :b2:var:`weMissE` possible options).
+                          The variable can be used with the ``use***Frame()`` function.
+                          The unit of the invariant mass squared is :math:`[\text{GeV}/\text{c}^2]^2`.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissP(maskName, opt)", WE_MissP,
-                          "Returns the magnitude of the missing momentum (see possible :b2:var:`weMissE` options). The unit of the magnitude of missing momentum is ``GeV/c`` ",
+    REGISTER_METAVARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta, R"DOC(
+                          Returns the polar angle of the missing momentum (see possible :b2:var:`weMissE` options).
+                          The variable can be used with the ``use***Frame()`` function.
+                          The unit of the polar angle is ``rad``.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissPx(maskName, opt)", WE_MissPx,
-                          "Returns the x component of the missing momentum (see :b2:var:`weMissE` possible options). The unit of the missing momentum is ``GeV/c`` ",
+    REGISTER_METAVARIABLE("weMissP(maskName, opt)", WE_MissP, R"DOC(
+                          Returns the magnitude of the missing momentum (see possible :b2:var:`weMissE` options).
+                          The variable can be used with the ``use***Frame()`` function.
+                          The unit of the magnitude of missing momentum is ``GeV/c``.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissPy(maskName, opt)", WE_MissPy,
-                          "Returns the y component of the missing momentum (see :b2:var:`weMissE` possible options). The unit of the missing momentum is ``GeV/c`` ",
+    REGISTER_METAVARIABLE("weMissPx(maskName, opt)", WE_MissPx, R"DOC(
+                          Returns the x component of the missing momentum (see :b2:var:`weMissE` possible options).
+                          The variable can be used with the ``use***Frame()`` function.
+                          The unit of the missing momentum is ``GeV/c``.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissPz(maskName, opt)", WE_MissPz,
-                          "Returns the z component of the missing momentum (see :b2:var:`weMissE` possible options). The unit of the missing momentum is ``GeV/c`` ",
+    REGISTER_METAVARIABLE("weMissPy(maskName, opt)", WE_MissPy, R"DOC(
+                          Returns the y component of the missing momentum (see :b2:var:`weMissE` possible options).
+                          The variable can be used with the ``use***Frame()`` function.
+                          The unit of the missing momentum is ``GeV/c``.)DOC",
+                          Manager::VariableDataType::c_double);
+
+    REGISTER_METAVARIABLE("weMissPz(maskName, opt)", WE_MissPz, R"DOC(
+                          Returns the z component of the missing momentum (see :b2:var:`weMissE` possible options).
+                          The variable can be used with the ``use***Frame()`` function.
+                          The unit of the missing momentum is ``GeV/c``.)DOC",
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weMissE(maskName, opt)", WE_MissE,
-                          R"DOC(Returns the energy of the missing momentum. The unit of the Energy is ``GeV`` . Possible options ``opt`` are the following:
+                          R"DOC(Returns the energy of the missing momentum. The variable can be used with the ``use***Frame()`` function. The unit of the Energy is ``GeV`` . Possible options ``opt`` are the following:
 
-- ``0``: CMS, use energy and momentum of charged particles and photons
-- ``1``: CMS, same as ``0``, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}`
-- ``2``: CMS, same as ``0``, fix :math:`E_\mathrm{roe} = E_\mathrm{cms}/2`
-- ``3``: CMS, use only energy and momentum of signal side
-- ``4``: CMS, same as ``3``, update with direction of ROE momentum
-- ``5``: LAB, use energy and momentum of charged particles and photons from whole event
-- ``6``: LAB, same as ``5``, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}``
-- ``7``: CMS, correct pmiss 3-momentum vector with factor alpha so that :math:`d_E = 0`` (used for :math:`M_\mathrm{bc}` calculation).)DOC",
+- ``0``: use energy and momentum of charged particles and photons
+- ``1``: same as ``0``, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}`
+- ``2``: same as ``0``, fix :math:`E_\mathrm{roe} = E_\mathrm{cms}/2`
+- ``3``: use only energy and momentum of signal side
+- ``4``: same as ``3``, update with direction of ROE momentum. Only works in CMS frame.
+- ``7``: correct pmiss 3-momentum vector with factor alpha so that :math:`d_E = 0` (used for :math:`M_\mathrm{bc}` calculation). Only works in CMS frame.)DOC",
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weXiZ(maskName)", WE_xiZ,

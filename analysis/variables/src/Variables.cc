@@ -334,6 +334,9 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
+
       double px = part->getPx();
       double py = part->getPy();
 
@@ -353,6 +356,8 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       return ROOT::Math::VectorUtil::CosTheta(part->getVertex() - beamSpotDB->getIPPosition(), part->getMomentum());
     }
 
@@ -398,6 +403,8 @@ namespace Belle2 {
     double ImpactXY(const Particle* particle)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
 
       ROOT::Math::XYZVector mom = particle->getMomentum();
 

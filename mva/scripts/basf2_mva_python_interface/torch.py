@@ -11,8 +11,10 @@
 
 import tempfile
 import pathlib
+import pickle
 import numpy as np
 import torch as pytorch
+from basf2 import B2INFO
 
 
 class State(object):
@@ -32,6 +34,25 @@ class State(object):
         for key, value in kwargs.items():
             self.collection_keys.append(key)
             setattr(self, key, value)
+
+
+class PickleModule:
+    """
+    Custom PickleModule with a custom Unpickler that tries to find missing classes in the current global namespace.
+
+    This is needed since the move to per-python-mva-method module instances in which the classes live now.
+    """
+    class Unpickler(pickle.Unpickler):
+        def find_class(self, module, name):
+            try:
+                return super().find_class(module, name)
+            except (ModuleNotFoundError, AttributeError):
+                B2INFO(f"Missing class: {module}.{name}")
+                if name in globals():
+                    B2INFO(f"Using `{name}` from global namespace")
+                    return globals()[name]
+                else:
+                    raise
 
 
 def feature_importance(state):
@@ -187,7 +208,7 @@ def load(obj):
             with open(path, 'w+b') as file:
                 file.write(bytes(obj[1][file_index]))
 
-        model = pytorch.load(temp_path.joinpath(file_names[0]))
+        model = pytorch.load(temp_path.joinpath(file_names[0]), pickle_module=PickleModule)
         model.eval()  # sets dropout and batch norm layers to eval mode
         device = "cpu"
         model.to(device)

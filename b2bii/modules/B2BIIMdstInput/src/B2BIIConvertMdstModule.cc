@@ -271,6 +271,9 @@ void B2BIIConvertMdstModule::beginRun()
 {
   B2DEBUG(99, "B2BIIConvertMdst: beginRun called.");
 
+  if (m_evtgenProcessing)
+    return;
+
   if (m_convertBeamParameters) {
     //BeamEnergy class updated by fixmdst module in beginRun()
     Belle::BeamEnergy::begin_run();

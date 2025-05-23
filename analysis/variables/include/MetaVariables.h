@@ -245,6 +245,12 @@ namespace Belle2 {
     Manager::FunctionPtr openingAngle(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the angle between the sum of the momenta of the two given daughters and the missing momentum in the event.
+     * The arguments in the argument vector must be generalized daughter indices.
+     */
+    Manager::FunctionPtr missingAngle(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the angle between daughters:
      * If two indices given: returns the angle between the momenta of the two given daughters.
      * If three indices given: Variable returns the angle between the momentum of the third particle and a vector

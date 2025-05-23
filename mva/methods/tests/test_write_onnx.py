@@ -3,6 +3,7 @@
 from pathlib import Path
 import unittest
 
+import basf2
 import b2test_utils
 import basf2_mva
 import torch
@@ -63,7 +64,7 @@ class TestWriteONNX(unittest.TestCase):
             save_onnx(model, general_options, specific_options, filename)
             with open(filename) as f:
                 xml_new = f.read()
-        ref_path = Path(__file__).parent / filename
+        ref_path = Path(basf2.find_file("mva/methods/tests")) / filename
         try:
             with open(ref_path) as f:
                 xml_ref = f.read()
@@ -72,12 +73,7 @@ class TestWriteONNX(unittest.TestCase):
             with open(ref_path, "w") as f:
                 f.write(xml_new)
             raise Exception(f"Wrote new reference file {str(ref_path)}")
-
-        # regression test w.r.t existing reference xml files
-        if xml_new != xml_ref:
-            import difflib
-            print("\n".join(difflib.unified_diff(xml_ref.splitlines(), xml_new.splitlines())))
-        self.assertTrue(xml_new == xml_ref)
+        self.assertEqual(xml_new, xml_ref)
 
     def test_singleclass(self):
         self.create_and_save(

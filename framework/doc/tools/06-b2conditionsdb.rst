@@ -8,7 +8,6 @@
     :func: get_argument_parser
     :prog: b2conditionsdb
     :nodefault:
-    :absolutecommand:
 
 .. _b2conditionsdb-extract:
 

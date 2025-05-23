@@ -31,7 +31,6 @@ This program is used to run the full physics validation suite
     :func: get_argument_parser
     :prog: b2validation
     :nodefault:
-    :absolutecommand:
 
 ``b2validation-plots``: Compare and plot a selection of revisions
 -----------------------------------------------------------------
@@ -44,7 +43,6 @@ were generated using ``b2validation`` and generate comparison plots:
     :func: get_argument_parser
     :prog: b2validation-plots
     :nodefault:
-    :absolutecommand:
 
 ``b2validation-server``: Run Webserver Displaying the Physics Validation Results
 --------------------------------------------------------------------------------
@@ -57,7 +55,6 @@ results of a physics validation performed with ``b2validation``.
     :func: get_argument_parser
     :prog: b2validation-server
     :nodefault:
-    :absolutecommand:
 
 ``b2validation-bisect``: Find commits which introduced validation degradation
 -----------------------------------------------------------------------------
@@ -67,7 +64,6 @@ results of a physics validation performed with ``b2validation``.
     :func: get_argument_parser
     :prog: b2validation-bisect
     :nodefault:
-    :absolutecommand:
 
 ``b2validation-revisions``: Extract quantities from each revision
 -----------------------------------------------------------------
@@ -77,7 +73,6 @@ results of a physics validation performed with ``b2validation``.
     :func: get_argument_parser
     :prog: b2validation-bisect
     :nodefault:
-    :absolutecommand:
 
 Convenience Functions
 =====================

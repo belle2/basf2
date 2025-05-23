@@ -6,7 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::SVDCluster+; // checksum=0x4a4a8b7e, version=9
-#pragma link C++ class Belle2::SVDModeByte+; // checksum=0x5ede40e5, version=-1
+#pragma link C++ class Belle2::SVDModeByte+; // checksum=0x436eaade, version=-1
 #pragma link C++ class Belle2::SVDDAQDiagnostic+; // checksum=0x10c3ffc4, version=5
 #pragma link C++ class Belle2::SVDRecoDigit+; // checksum=0x9066f67, version=4
 #pragma link C++ class Belle2::SVDRecoTimeBase+; // checksum=0xf6a86f3e, version=2

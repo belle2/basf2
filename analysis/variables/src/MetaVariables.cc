@@ -212,6 +212,38 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr useDaughterRecoilRestFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() >= 2) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var, arguments](const Particle * particle) -> double {
+
+          // Sum of the 4-momenta of all the selected daughters
+          ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
+
+          for (unsigned int i = 1; i < arguments.size(); i++)
+          {
+            auto generalizedIndex = arguments[i];
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            if (dauPart)
+              pSum +=  dauPart->get4Vector();
+            else
+              return Const::doubleNaN;
+          }
+          PCmsLabTransform T;
+          ROOT::Math::PxPyPzEVector recoil = T.getBeamFourMomentum() - pSum;
+          /* Let's use 0 as PDG code to avoid wrong assumptions. */
+          Particle pRecoil(recoil, 0);
+          UseReferenceFrame<RestFrame> frame(&pRecoil);
+          double result = std::get<double>(var->function(particle));
+          return result;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function useDaughterRecoilRestFrame.");
+      }
+    }
+
     Manager::FunctionPtr useMCancestorBRestFrame(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -3576,6 +3608,12 @@ Specifying the lab frame is useful in some corner-cases. For example:
 		      "of the first daughter (0). If the daughter index is invalid, it returns NaN.\n"
 		      "If two or more indices are given, the rest frame of the sum of the daughters is used.",
 		      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useDaughterRecoilRestFrame(variable, daughterIndex_1, [daughterIndex_2, ... daughterIndex_3])", useDaughterRecoilRestFrame,
+                      "Returns the value of the variable in the rest frame of the recoil of the selected daughter particle.\n"
+          "The daughter is identified via generalized daughter index, e.g. ``0:1`` identifies the second daughter (1) "
+          "of the first daughter (0). If the daughter index is invalid, it returns NaN.\n"
+          "If two or more indices are given, the rest frame of the sum of the daughters is used.",
+          Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("useMCancestorBRestFrame(variable)", useMCancestorBRestFrame,
                       "Returns the value of the variable in the rest frame of the ancestor B MC particle.\n"
                       "If no B or no MC-matching is found, it returns NaN.", Manager::VariableDataType::c_double);

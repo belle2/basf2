@@ -991,6 +991,216 @@ namespace Belle2 {
       return -1;
     }
 
+
+    int ccbarTagPartialHelper(
+      const MCParticle* mcParticle,
+      std::vector<Particle*>& recParticles,
+      std::vector<const MCParticle*>& missedParticles
+    )
+    {
+      bool CaughtAll = true;
+      bool missedAll = true;
+      for (auto& mcDaughter : mcParticle->getDaughters()) {
+        if (mcDaughter->getPDG() == 22 && (mcDaughter->getEnergy() < 0.1 || abs(mcDaughter->getMother()->getPDG()) == 10022)) {
+          continue; // ignore radiative photons with energy < 0.1 GeV and ISR as if they are not in the event
+        }
+        // Belle MC legacy remnants
+        if (abs(mcDaughter->getPDG()) == 21) continue; // ignore gluons
+        if (abs(mcDaughter->getPDG()) == 1) continue; // ignore down quarks
+        if (abs(mcDaughter->getPDG()) == 2) continue; // ignore up quarks
+        if (abs(mcDaughter->getPDG()) == 3) continue; // ignore strange quarks
+        if (abs(mcDaughter->getPDG()) == 4) continue; // ignore charm quarks
+        if (abs(mcDaughter->getPDG()) == 5) continue; // ignore bottom quarks
+        if (abs(mcDaughter->getPDG()) == 6) continue; // ignore top quarks
+        // TODO are there any other particles that should be ignored, due to Belle MC generation?
+        auto it = std::find_if(recParticles.begin(), recParticles.end(), [mcDaughter](Particle * rec) { return rec->getMCParticle() == mcDaughter; });
+        if (it != recParticles.end()) {
+          recParticles.erase(it);
+          missedAll = false;
+        } else if (mcDaughter->getNDaughters() == 0) {
+          missedParticles.push_back(mcDaughter);
+          CaughtAll = false;
+        } else {
+          std::vector<const MCParticle*> tempMissedParticles;
+          int status = ccbarTagPartialHelper(mcDaughter, recParticles, tempMissedParticles);
+          if (status == 0) {
+            missedParticles.push_back(mcDaughter);
+            CaughtAll = false;
+          } else if (status == 1) {
+            missedAll = false; // tempMissedParticles is empty
+          } else {
+            missedAll = false;
+            CaughtAll = false;
+            missedParticles.insert(missedParticles.end(), tempMissedParticles.begin(), tempMissedParticles.end());
+          }
+        }
+      }
+      if (missedAll) return 0;
+      else if (CaughtAll) return 1;
+      else return 2;
+    }
+
+    int ccbarTagPartialHelper(
+      const MCParticle* mcParticle,
+      const std::vector<Particle*>& recParticles
+    )
+    {
+      bool CaughtAll = true;
+      bool missedAll = true;
+      for (auto& mcDaughter : mcParticle->getDaughters()) {
+        if (mcDaughter->getPDG() == 22
+            && mcDaughter->getEnergy() < 0.1) continue; // ignore radiative photons with energy < 0.1 GeV as if they are not in the event
+        auto it = std::find_if(recParticles.begin(), recParticles.end(), [mcDaughter](Particle * rec) { return rec->getMCParticle() == mcDaughter; });
+        if (it != recParticles.end()) missedAll = false;
+        else if (mcDaughter->getNDaughters() == 0) CaughtAll = false;
+        else {
+          int status = ccbarTagPartialHelper(mcDaughter, recParticles);
+          if (status == 0) CaughtAll = false;
+          else if (status == 1) missedAll = false;
+          else {
+            missedAll = false;
+            CaughtAll = false;
+          }
+        }
+      }
+      if (missedAll) return 0;
+      else if (CaughtAll) return 1;
+      else return 2;
+    }
+
+    double ccbarTagEventStatus(const Particle* part)
+    {
+      // event part of matching
+      int sigPDGCode = part->getPDGCode() * (-1); // get info about signal particles
+      StoreArray<MCParticle> mcparticles;
+      int eventStatus = 100;
+      for (int i = 0; i < mcparticles.getEntries(); i++) {
+        if (mcparticles[i]->getPDG() == sigPDGCode) {
+          int recStatus = ccbarTagPartialHelper(mcparticles[i], part->getDaughters());
+          if (recStatus == 0) return 0; // 0 not reconstructed
+          else if (recStatus == 2) eventStatus = 200; // 2 partially reconstructed
+        }
+      }
+      return eventStatus;
+    }
+
+    double ccbarTagSignal(const Particle* part)
+    {
+      int returnValue = ccbarTagEventStatus(part);
+      int sigPDGCode = part->getPDGCode() * (-1); // get info about signal particles
+      // reconstruction part of matching, get daughters
+      for (auto& daughter : part->getDaughters()) {
+        if (!daughter->getMCParticle()) return returnValue + 10;
+      }
+
+      // get allMother, potentialSignalLeakage
+      const MCParticle* allMother = nullptr;
+      for (auto& daughter : part->getDaughters()) {
+        const MCParticle* curMCMother = daughter->getMCParticle()->getMother();
+        if (curMCMother == nullptr) return returnValue + 20;
+        else {
+          const MCParticle* grandMother = curMCMother->getMother();
+          while (grandMother != nullptr) {
+            curMCMother = grandMother;
+            grandMother = curMCMother->getMother();
+          }
+
+          if (abs(curMCMother->getPDG()) != 22 && abs(curMCMother->getPDG()) != 23
+              && abs(curMCMother->getPDG() != 10022)) return returnValue + 20;
+          else if (!allMother) allMother = curMCMother;
+          else if (allMother != curMCMother) return returnValue + 20;
+        }
+      }
+
+      // daughter mcErrors ---------------------------------
+      bool hasMissingGamma = false;
+      bool hasMissingNeutrino = false;
+      bool hasDecayInFlight = false;
+      bool hasFSR = false;
+      for (auto& daughter : part->getDaughters()) { // TODO think about less strict conditions
+        int mcError = MCMatching::getMCErrors(daughter, daughter->getMCParticle());
+        if (mcError == MCMatching::c_Correct || mcError == MCMatching::c_MissingResonance) continue;
+        else if (mcError == MCMatching::c_MissGamma) hasMissingGamma = true;
+        else if (mcError == MCMatching::c_MissNeutrino) hasMissingNeutrino = true;
+        else if (mcError == MCMatching::c_DecayInFlight) hasDecayInFlight = true;
+        else if (mcError == MCMatching::c_MissFSR) hasFSR = true;
+        else {
+          returnValue += 30;
+          return returnValue;
+        }
+      }
+      if (hasDecayInFlight) returnValue += 40;
+      else if (hasMissingNeutrino) returnValue += 50;
+      else if (hasMissingGamma) returnValue += 60;
+      else if (hasFSR) returnValue += 70;
+
+      // FEI specific checks
+      std::vector<Particle*> daughters = part->getDaughters();
+      std::vector<const MCParticle*> missedParticles;
+      ccbarTagPartialHelper(allMother, daughters, missedParticles);
+
+      if (daughters.size() > 0) return 1000;
+
+      if (missedParticles.size() == 1) {
+        if (missedParticles[0]->getPDG() == sigPDGCode) return 1;
+        else return 2;
+      } else if (missedParticles.size() > 1) {
+        return 3;
+      }
+
+      return 0;
+    }
+
+    double ccbarTagSignalQuick(const Particle* part)
+    {
+      int sigPDGCode = part->getPDGCode() * (-1); // get info about signal particles
+      // reconstruction part of matching, get daughters
+      for (auto& daughter : part->getDaughters()) {
+        if (!daughter->getMCParticle()) return 10;
+      }
+
+      // get allMother, potentialSignalLeakage
+      const MCParticle* allMother = nullptr;
+      for (auto& daughter : part->getDaughters()) {
+        const MCParticle* curMCMother = daughter->getMCParticle()->getMother();
+        if (curMCMother == nullptr) return 20;
+        else {
+          const MCParticle* grandMother = curMCMother->getMother();
+          while (grandMother != nullptr) {
+            curMCMother = grandMother;
+            grandMother = curMCMother->getMother();
+          }
+
+          if (abs(curMCMother->getPDG()) != 22 && abs(curMCMother->getPDG()) != 23 && abs(curMCMother->getPDG() != 10022)) return 20;
+          else if (!allMother) allMother = curMCMother;
+          else if (allMother != curMCMother) return 20;
+        }
+      }
+
+      // daughter mcErrors ---------------------------------
+      for (auto& daughter : part->getDaughters()) {
+        int mcError = MCMatching::getMCErrors(daughter, daughter->getMCParticle());
+        if (mcError == MCMatching::c_Correct || mcError == MCMatching::c_MissingResonance) continue;
+        else return 30;
+      }
+
+      // FEI specific checks
+      std::vector<Particle*> daughters = part->getDaughters();
+      std::vector<const MCParticle*> missedParticles;
+      ccbarTagPartialHelper(allMother, daughters, missedParticles);
+
+      if (daughters.size() > 0) return 1000;
+
+      if (missedParticles.size() == 1) {
+        if (missedParticles[0]->getPDG() == sigPDGCode) return 1;
+        else return 2;
+      } else if (missedParticles.size() > 1) {
+        return 3;
+      }
+
+      return 0;
+    }
+
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found. \n"
@@ -1003,6 +1213,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignalAcceptBremsPhotons", isSignalAcceptBremsPhotons,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found.\n"
                       "Particles with gamma daughters attached through the bremsstrahlung recovery modules are allowed.");
+    REGISTER_VARIABLE("ccbarTagEventStatus", ccbarTagEventStatus,
+                      "Event status for ccbarTag, returns 100 there is no signal particles in the event, 200 if it was partially absorbed by tag and 0 otherwise.");
+    REGISTER_VARIABLE("ccbarTagSignal", ccbarTagSignal,
+                      "1.0 if ccbar tag quasi particle is 'correctly' reconstructed (SIGNAL) in a ccbar event, \n"
+                      "0.0 if not (specific to the setup of ccbar-FEI).");
+    REGISTER_VARIABLE("ccbarTagSignalQuick", ccbarTagSignalQuick,
+                      "Quickened version of ccbarTagSignal without the information of ccbarTagEventStatus.");
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,

@@ -436,17 +436,17 @@ namespace Belle2 {
     /**
      * Return true if SVD contributed to the final EventT0 determination.
      */
-    bool hasEventT0SourceFromSVD(const Particle*)
+    bool eventT0CalculatedWithSVDInfo(const Particle*);
 
     /**
      * Return true if CDC contributed to the final EventT0 determination.
      */
-    bool hasEventT0SourceFromCDC(const Particle*)
+    bool eventT0CalculatedWithCDCInfo(const Particle*);
 
     /**
      * Return true if ECL contributed to the final EventT0 determination.
      */
-    bool hasEventT0SourceFromECL(const Particle*)
+    bool eventT0CalculatedWithECLInfo(const Particle*);
 
   }
 } // Belle2 namespace

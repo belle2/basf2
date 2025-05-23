@@ -909,29 +909,29 @@ namespace Belle2 {
       }
     }
 
-    bool hasEventT0SourceFromSVD(const Particle*)
+    bool eventT0CalculatedWithSVDInfo(const Particle*)
     {
       StoreObjPtr<EventLevelTriggerTimeInfo> triggerTimeInfo;
       if (!triggerTimeInfo.isValid()) {
-        return Const::doubleNaN;
+        return false;
       }
       return triggerTimeInfo->hasEventT0SourceFromSVD();
     }
 
-    bool hasEventT0SourceFromCDC(const Particle*)
+    bool eventT0CalculatedWithCDCInfo(const Particle*)
     {
       StoreObjPtr<EventLevelTriggerTimeInfo> triggerTimeInfo;
       if (!triggerTimeInfo.isValid()) {
-        return Const::doubleNaN;
+        return false;
       }
       return triggerTimeInfo->hasEventT0SourceFromCDC();
     }
 
-    bool hasEventT0SourceFromECL(const Particle*)
+    bool eventT0CalculatedWithECLInfo(const Particle*)
     {
       StoreObjPtr<EventLevelTriggerTimeInfo> triggerTimeInfo;
       if (!triggerTimeInfo.isValid()) {
-        return Const::doubleNaN;
+        return false;
       }
       return triggerTimeInfo->hasEventT0SourceFromECL();
     }
@@ -1215,15 +1215,15 @@ Returns NaN for data.
 [Eventbased] The energy in laboratory frame of all the photons. from generator.
 
 )DOC","GeV");
-    REGISTER_VARIABLE("hasEventT0SourceFromSVD", hasEventT0SourceFromSVD, R"DOC(
+    REGISTER_VARIABLE("eventT0CalculatedWithSVDInfo", eventT0CalculatedWithSVDInfo, R"DOC(
 [Eventbased] It returns true if the SVD subdetector contributed in the calculation of the EventT0.
 Please note that other subdetectors may also have contributed, so store the variables for these as well.
 )DOC");
-    REGISTER_VARIABLE("hasEventT0SourceFromCDC", hasEventT0SourceFromCDC, R"DOC(
+    REGISTER_VARIABLE("eventT0CalculatedWithCDCInfo", eventT0CalculatedWithCDCInfo, R"DOC(
 [Eventbased] It returns true if the CDC subdetector contributed in the calculation of the EventT0.
 Please note that other subdetectors may also have contributed, so store the variables for these as well.
 )DOC");
-    REGISTER_VARIABLE("hasEventT0SourceFromECL", hasEventT0SourceFromECL, R"DOC(
+    REGISTER_VARIABLE("eventT0CalculatedWithECLInfo", eventT0CalculatedWithECLInfo, R"DOC(
 [Eventbased] It returns true if the ECL subdetector contributed in the calculation of the EventT0.
 Please note that other subdetectors may also have contributed, so store the variables for these as well.
 )DOC");

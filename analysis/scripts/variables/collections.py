@@ -387,7 +387,7 @@ belle_track_hit = [
 
 #: EventT0 sources
 eventT0_sources = [
-    "hasEventT0SourceFromSVD",
-    "hasEventT0SourceFromCDC",
-    "hasEventT0SourceFromECL"
+    "eventT0CalculatedWithSVDInfo",
+    "eventT0CalculatedWithCDCInfo",
+    "eventT0CalculatedWithECLInfo"
 ]

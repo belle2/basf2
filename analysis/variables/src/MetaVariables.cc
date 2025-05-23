@@ -1570,6 +1570,39 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr pValueCombinationOfDaughters(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          double pValueProduct = 1.;
+          if (particle->getNDaughters() == 0)
+          {
+            return Const::doubleNaN;
+          }
+
+          for (unsigned j = 0; j < particle->getNDaughters(); ++j)
+          {
+            double pValue = std::get<double>(var->function(particle->getDaughter(j)));
+            if (pValue < 0) return -1;
+            else pValueProduct *= pValue;
+          }
+
+          double pValueSum = 1.;
+          double factorial = 1.;
+          for (unsigned int i = 1; i < particle->getNDaughters(); ++i)
+          {
+            factorial *= i;
+            pValueSum += pow(-std::log(pValueProduct), i) / factorial;
+          }
+          return pValueProduct * pValueSum;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function pValueCombinationOfDaughters");
+      }
+    }
+
     Manager::FunctionPtr abs(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -3790,6 +3823,9 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "The first variable is returned if the particle passes the cut, and the second variable is returned otherwise.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pValueCombination(p1, p2, ...)", pValueCombination,
                       "Returns the combined p-value of the provided p-values according to the formula given in `Nucl. Instr. and Meth. A 411 (1998) 449 <https://doi.org/10.1016/S0168-9002(98)00293-9>`_ .\n"
+                      "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("pValueCombinationOfDaughters(variable)", pValueCombinationOfDaughters,
+                      "Returns the combined p-value of the daughter p-values according to the formula given in `Nucl. Instr. and Meth. A 411 (1998) 449 <https://doi.org/10.1016/S0168-9002(98)00293-9>`_ .\n"
                       "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"

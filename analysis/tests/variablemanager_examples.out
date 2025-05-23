@@ -6818,7 +6818,7 @@ TBranch: __production__, 0
 TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: nTracks, 10
-TBranch: isMC, 1
+TBranch: isMC, True
 TBranch: year, 2020
 TTree: ntuple
 TBranch: __experiment__, 1003

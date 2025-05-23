@@ -35,7 +35,7 @@ TBranch: pin_cosTheta, -0.4479
 TBranch: ArmenterosLongitudinalMomentumAsymmetry, -0.04743
 TBranch: ArmenterosDaughter1Qt, 0.205
 TBranch: ArmenterosDaughter2Qt, 0.2073
-TBranch: isNotContinuumEvent, 0
+TBranch: isNotContinuumEvent, False
 TBranch: isSignal, 1
 TTree: kstree
 TBranch: __experiment__, 1003
@@ -72,5 +72,5 @@ TBranch: pin_cosTheta, -0.4479
 TBranch: ArmenterosLongitudinalMomentumAsymmetry, -0.04743
 TBranch: ArmenterosDaughter1Qt, 0.205
 TBranch: ArmenterosDaughter2Qt, 0.2073
-TBranch: isNotContinuumEvent, 0
+TBranch: isNotContinuumEvent, False
 TBranch: isSignal, 1

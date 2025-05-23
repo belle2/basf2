@@ -731,12 +731,16 @@ namespace Belle2 {
     double getHEREnergy(const Particle*)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
       return (beamParamsDB->getHER()).E();
     }
 
     double getLEREnergy(const Particle*)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
       return (beamParamsDB->getLER()).E();
     }
 
@@ -744,14 +748,14 @@ namespace Belle2 {
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
       ROOT::Math::PxPyPzEVector herVec = beamParamsDB->getHER();
       ROOT::Math::PxPyPzEVector lerVec = beamParamsDB->getLER();
-
       // only looking at the horizontal (XZ plane) -> set y-coordinates to zero
       herVec.SetPy(0);
       lerVec.SetPy(0);
-
-      //calculate the crossing angle
+      // calculate the crossing angle
       return ROOT::Math::VectorUtil::Angle(herVec, -lerVec);
     }
 
@@ -759,14 +763,14 @@ namespace Belle2 {
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
       ROOT::Math::PxPyPzEVector herVec = beamParamsDB->getHER();
       ROOT::Math::PxPyPzEVector lerVec = beamParamsDB->getLER();
-
       // only looking at the vertical (YZ plane) -> set x-coordinates to zero
       herVec.SetPx(0);
       lerVec.SetPx(0);
-
-      //calculate the crossing angle
+      // calculate the crossing angle
       return ROOT::Math::VectorUtil::Angle(herVec, -lerVec);
     }
 

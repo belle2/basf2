@@ -137,7 +137,6 @@ class TestMultiplePython(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    import unittest
     import b2test_utils
     with b2test_utils.clean_working_directory():
         unittest.main()

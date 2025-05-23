@@ -8,7 +8,6 @@
     :func: get_argument_parser
     :prog: b2conditionsdb
     :nodefault:
-    :nogroupsections:
     :absolutecommand:
 
 .. _b2conditionsdb-extract:
@@ -23,7 +22,6 @@
     :func: get_argument_parser
     :prog: b2conditionsdb-extract
     :nodefaultconst:
-    :nogroupsections:
 
 .. _b2conditionsdb-recommend:
 
@@ -37,7 +35,6 @@
     :func: create_argumentparser
     :prog: b2conditionsdb-recommend
     :nodefaultconst:
-    :nogroupsections:
 
 
 .. _b2conditionsdb-request:
@@ -52,4 +49,3 @@
     :func: get_argument_parser
     :prog: b2conditionsdb-request
     :nodefaultconst:
-    :nogroupsections:

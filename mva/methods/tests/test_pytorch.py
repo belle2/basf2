@@ -24,7 +24,13 @@ def write_dummy_file(variables, size=10, target_variable="mcPDG"):
 
 
 class TestPyTorch(unittest.TestCase):
+    """
+    Tests for the torch python mva method
+    """
     def test_load_and_apply_existing_torch(self):
+        """
+        Test if we can load legacy (pickled) torch model using a KLMMuonIDDNNWeightFile as example
+        """
         method = basf2_mva_util.Method(basf2.find_file("mva/methods/tests/KLMMuonIDDNNWeightFile.xml"))
         write_dummy_file(list(method.general_options.m_variables))
         out1, out2 = method.apply_expert(
@@ -34,6 +40,9 @@ class TestPyTorch(unittest.TestCase):
         self.assertEqual(out2.shape, (10,))
 
     def test_write_new_torch(self):
+        """
+        Test if writing new files (weights only) and reloading them works
+        """
         variables = ["var1", "var2"]
         general_options = basf2_mva.GeneralOptions()
         general_options.m_datafiles = basf2_mva.vector("dummy.root")

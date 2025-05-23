@@ -38,12 +38,21 @@ class State(object):
 
 class PickleModule:
     """
-    Custom PickleModule with a custom Unpickler that tries to find missing classes in the current global namespace.
+    Custom PickleModule with a custom Unpickler
 
-    This is needed since the move to per-python-mva-method module instances in which the classes live now.
+    to be passed via the `pickle_module` argument in `torch.load`
     """
     class Unpickler(pickle.Unpickler):
+        """
+        Custom Unpickler that tries to find missing classes in the current global namespace.
+
+        This is needed since the move to per-python-mva-method module instances in which the classes live now.
+        """
         def find_class(self, module, name):
+            """
+            If class can't be retrieved the regular way,
+            try to take from global namespace
+            """
             try:
                 return super().find_class(module, name)
             except (ModuleNotFoundError, AttributeError):

@@ -68,19 +68,20 @@ void PXDRawDQMModule::defineHisto()
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     //Only interested in PXD sensors
     TString buff = (std::string)avxdid;
+    TString bufful = buff;
     buff.ReplaceAll(".", "_");
 
     m_hrawPxdHitMap[avxdid] = new TH2F(("hrawPxdHitMap_" + buff),
-                                       ("Pxd Raw Hit Map, " + buff + ";column;row"), 250,
+                                       ("Pxd Raw Hit Map, " + bufful + ";column;row"), 250,
                                        0, 250, 768, 0, 768);
     m_hrawPxdChargeMap[avxdid] = new TH2F(("hrawPxdChargeMap_" + buff),
-                                          ("Pxd Raw Charge Map, " + buff + ";column;row"), 250, 0, 250, 768, 0, 768);
+                                          ("Pxd Raw Charge Map, " + bufful + ";column;row"), 250, 0, 250, 768, 0, 768);
     m_hrawPxdHitsCharge[avxdid] = new TH1F(("hrawPxdHitsCharge_" + buff),
-                                           ("Pxd Raw Hit Charge, " + buff + ";Charge"), 256, 0, 256);
+                                           ("Pxd Raw Hit Charge, " + bufful + ";Charge"), 256, 0, 256);
     m_hrawPxdHitTimeWindow[avxdid] = new TH1F(("hrawPxdHitTimeWindow_" + buff),
-                                              ("Pxd Raw Hit Time Window (framenr*192-gate_of_hit), " + buff + ";Time [a.u.]"), 2048, -256, 2048 - 256);
+                                              ("Pxd Raw Hit Time Window (framenr*192-gate_of_hit), " + bufful + ";Time [a.u.]"), 2048, -256, 2048 - 256);
     m_hrawPxdGateTimeWindow[avxdid] = new TH1F(("hrawPxdGateTimeWindow_" + buff),
-                                               ("Pxd Raw Gate Time Window (framenr*192-triggergate_of_hit), " + buff + ";Time [a.u.]"), 2048, -256, 2048 - 256);
+                                               ("Pxd Raw Gate Time Window (framenr*192-triggergate_of_hit), " + bufful + ";Time [a.u.]"), 2048, -256, 2048 - 256);
   }
   // cd back to root directory
   oldDir->cd();

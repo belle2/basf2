@@ -433,6 +433,21 @@ namespace Belle2 {
     */
     double revolutionCounter2(const Particle*);
 
+    /**
+     * Return true if SVD contributed to the final EventT0 determination.
+     */
+    bool hasEventT0SourceFromSVD(const Particle*)
+
+    /**
+     * Return true if CDC contributed to the final EventT0 determination.
+     */
+    bool hasEventT0SourceFromCDC(const Particle*)
+
+    /**
+     * Return true if ECL contributed to the final EventT0 determination.
+     */
+    bool hasEventT0SourceFromECL(const Particle*)
+
   }
 } // Belle2 namespace
 

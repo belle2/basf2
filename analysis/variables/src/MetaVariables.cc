@@ -13,6 +13,7 @@
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/EventKinematics.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
@@ -1244,7 +1245,7 @@ namespace Belle2 {
           ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum(); // Initial state (e+e- momentum in LAB)
           ROOT::Math::PxPyPzEVector pRecoil = frame.getMomentum(pIN - particle->get4Vector());
 
-          return B2Vector3D(pRecoil.Vect()).Angle(B2Vector3D(pSum.Vect()));
+          return ROOT::Math::VectorUtil::Angle(pRecoil.Vect(), pSum.Vect());
         };
         return func;
       } else {
@@ -1287,7 +1288,7 @@ namespace Belle2 {
             }
           }
 
-          return B2Vector3D(pMiss.Vect()).Angle(B2Vector3D(pSum.Vect()));
+          return ROOT::Math::VectorUtil::Angle(pMiss.Vect(), pSum.Vect());
         };
         return func;
       } else {

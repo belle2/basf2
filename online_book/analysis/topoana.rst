@@ -7,9 +7,7 @@ Topology analysis
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 45 min
-
-    **Additional Exercises**: 45 min
+    **Length**: 1-1.5 hrs
 
     **Prerequisites**:
 

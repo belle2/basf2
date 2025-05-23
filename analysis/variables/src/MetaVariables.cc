@@ -1187,6 +1187,39 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr openingAngle(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() >= 1) {
+
+        auto func = [arguments](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return Const::doubleNaN;
+
+          const auto& frame = ReferenceFrame::GetCurrent();
+
+          ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
+          for (auto& generalizedIndex : arguments)
+          {
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            if (dauPart) pSum += frame.getMomentum(dauPart);
+            else {
+              B2WARNING("Trying to access a daughter that does not exist. Index = " << generalizedIndex);
+              return Const::doubleNaN;
+            }
+          }
+
+          PCmsLabTransform T;
+          ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum(); // Initial state (e+e- momentum in LAB)
+          ROOT::Math::PxPyPzEVector pRecoil = frame.getMomentum(pIN - particle->get4Vector());
+
+          return B2Vector3D(pRecoil.Vect()).Angle(B2Vector3D(pSum.Vect()));
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function openingAngle");
+      }
+    }
+
     Manager::FunctionPtr daughterAngle(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2 || arguments.size() == 3) {
@@ -3718,6 +3751,22 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
                       "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
                       "E.g. ``daughterMotherNormDiffOf(1, p)`` returns the normalized momentum difference between the given particle and its second daughter in the lab frame.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("openingAngle(daughterIndex_1, daughterIndex_2, ... )", openingAngle, R"DOC(
+                       Returns the angle in between the momentum recoiling against the particle and the sum of the momenta of the given daughters.
+                       The unit of the angle is ``rad``.
+
+                       The particles are identified via generalized daughter indexes, which are simply colon-separated lists of
+                       daughter indexes, ordered starting from the root particle. For example, ``0:1:3``  identifies the fourth
+                       daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply
+                       identifies the second daughter of the root particle.
+
+                       At least one generalized index has to be given to ``openingAngle``. 
+
+                       .. tip::
+                           ``openingAngle(0)`` will return the angle between pRecoil and the momentum of the first daughter.
+                           ``openingAngle(0, 1)`` will return the angle between pRecoil and the sum of the momenta of the first and second daughter.
+                           ``openingAngle(0:0, 3:0)`` will return the angle between pRecoil and the sum of the momenta of the: first daughter of the first daughter, and
+                           the first daughter of the fourth daughter.)DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("daughterAngle(daughterIndex_1, daughterIndex_2[, daughterIndex_3])", daughterAngle, R"DOC(
                        Returns the angle in between any pair of particles belonging to the same decay tree.
                        The unit of the angle is ``rad``.

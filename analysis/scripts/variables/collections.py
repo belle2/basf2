@@ -384,3 +384,10 @@ belle_track_hit = [
     "BelleLastCDCHitY",
     "BelleLastCDCHitZ"
 ]
+
+#: EventT0 sources
+eventT0_sources = [
+    "hasEventT0SourceFromSVD",
+    "hasEventT0SourceFromCDC",
+    "hasEventT0SourceFromECL"
+]

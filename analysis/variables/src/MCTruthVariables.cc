@@ -1106,7 +1106,7 @@ namespace Belle2 {
           }
 
           if (abs(curMCMother->getPDG()) != 22 && abs(curMCMother->getPDG()) != 23
-              && abs(curMCMother->getPDG() != 10022)) return returnValue + 20;
+              && abs(curMCMother->getPDG()) != 10022) return returnValue + 20;
           else if (!allMother) allMother = curMCMother;
           else if (allMother != curMCMother) return returnValue + 20;
         }
@@ -1139,16 +1139,16 @@ namespace Belle2 {
       std::vector<const MCParticle*> missedParticles;
       ccbarTagPartialHelper(allMother, daughters, missedParticles);
 
-      if (daughters.size() > 0) return 1000;
+      if (daughters.size() > 0) return returnValue + 1000;
 
       if (missedParticles.size() == 1) {
-        if (missedParticles[0]->getPDG() == sigPDGCode) return 1;
-        else return 2;
+        if (missedParticles[0]->getPDG() == sigPDGCode) return returnValue + 1;
+        else return returnValue + 2;
       } else if (missedParticles.size() > 1) {
-        return 3;
+        return returnValue + 3;
       }
 
-      return 0;
+      return returnValue + 0;
     }
 
     double ccbarTagSignalQuick(const Particle* part)
@@ -1171,7 +1171,7 @@ namespace Belle2 {
             grandMother = curMCMother->getMother();
           }
 
-          if (abs(curMCMother->getPDG()) != 22 && abs(curMCMother->getPDG()) != 23 && abs(curMCMother->getPDG() != 10022)) return 20;
+          if (abs(curMCMother->getPDG()) != 22 && abs(curMCMother->getPDG()) != 23 && abs(curMCMother->getPDG()) != 10022) return 20;
           else if (!allMother) allMother = curMCMother;
           else if (allMother != curMCMother) return 20;
         }

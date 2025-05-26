@@ -6,9 +6,7 @@ Generating Monte Carlo
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 30 min
-
-    **Exercises**: 30 min
+    **Length**: 1-1.5 hrs
 
     **Prerequisites**:
 

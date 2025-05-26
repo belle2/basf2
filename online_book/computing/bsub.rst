@@ -6,9 +6,7 @@ Batch submission
 .. sidebar:: Overview
    :class: overview
 
-    **Teaching**: 10 min
-
-    **Exercises**: 10 min
+    **Length**: 15-30 min
 
     **Prerequisites**:
 

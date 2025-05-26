@@ -6,9 +6,7 @@ Collaborative Tools.
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 10 minutes
-
-    **Exercises**: 10 minutes
+    **Length**: 15-30 minutes
 
     **Prerequisites**:
 

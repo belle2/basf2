@@ -6,9 +6,7 @@ Full Event Interpretation
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 10 min
-
-    **Exercises**: 30 min (including processing)
+    **Length**: 1.5-2 hrs
 
     **Prerequisites**:
 

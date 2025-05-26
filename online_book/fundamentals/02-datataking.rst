@@ -6,7 +6,7 @@ Data Taking
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 45 min
+    **Length**: 30-90 min
 
     **Prerequisites**:
 

@@ -163,11 +163,6 @@ Untested method EventLevelTriggerTimeInfo::addEventT0SourceFromCDC
 Untested method EventLevelTriggerTimeInfo::addEventT0SourceFromECL
 Untested method EventLevelTriggerTimeInfo::addEventT0SourceFromSVD
 Untested method EventLevelTriggerTimeInfo::addEventT0Sources
-Untested method EventLevelTriggerTimeInfo::getEventT0Sources
-Untested method EventLevelTriggerTimeInfo::hasAnyEventT0Sources
-Untested method EventLevelTriggerTimeInfo::hasEventT0SourceFromCDC
-Untested method EventLevelTriggerTimeInfo::hasEventT0SourceFromECL
-Untested method EventLevelTriggerTimeInfo::hasEventT0SourceFromSVD
 Untested method EventLevelTriggerTimeInfo::hasEventT0Sources
 Untested method EventLevelTriggerTimeInfo::resetEventT0Sources
 Untested method EventLevelTriggerTimeInfo::setBunchNumber
@@ -9604,6 +9599,7 @@ MCParticle#91:
   isVirtual(): False
 EventLevelTriggerTimeInfo:
   getBunchNumber(): 0
+  getEventT0Sources(): -1718026240
 [ERROR] Cannot find payload in any of the configured global tags
 	name = TTDOffsets
 	globaltags = prerelease-08-00-00d
@@ -9619,6 +9615,10 @@ EventLevelTriggerTimeInfo:
  ... message repeated 1 times
 [ERROR] Payload 'TTDOffsets' not found. To get the (uncorrected) information from TTD, use 'getBunchNumber()'.
   getTriggeredBunchNumberGlobal(): 0
+  hasAnyEventT0Sources(): False
+  hasEventT0SourceFromCDC(): False
+  hasEventT0SourceFromECL(): False
+  hasEventT0SourceFromSVD(): False
   hasInjection(): False
   isHER(): False
   isRevo2(): False
@@ -19318,6 +19318,7 @@ MCParticle#69:
   isVirtual(): False
 EventLevelTriggerTimeInfo:
   getBunchNumber(): 0
+  getEventT0Sources(): -1718026240
 [ERROR] Payload 'TTDOffsets' not found. To get the (uncorrected) information from TTD, use 'getTimeSinceLastInjection() or 'getTimeSinceLastInjectionInMicroSeconds()'.
   getTimeSinceInjectedBunch(): 2147483647
   getTimeSinceInjectedBunchInMicroSeconds(): 1.68802e+07
@@ -19328,6 +19329,10 @@ EventLevelTriggerTimeInfo:
  ... message repeated 1 times
 [ERROR] Payload 'TTDOffsets' not found. To get the (uncorrected) information from TTD, use 'getBunchNumber()'.
   getTriggeredBunchNumberGlobal(): 0
+  hasAnyEventT0Sources(): False
+  hasEventT0SourceFromCDC(): False
+  hasEventT0SourceFromECL(): False
+  hasEventT0SourceFromSVD(): False
   hasInjection(): False
   isHER(): False
   isRevo2(): False
@@ -26077,6 +26082,7 @@ MCParticle#60:
   isVirtual(): False
 EventLevelTriggerTimeInfo:
   getBunchNumber(): 0
+  getEventT0Sources(): -1718026240
 [ERROR] Payload 'TTDOffsets' not found. To get the (uncorrected) information from TTD, use 'getTimeSinceLastInjection() or 'getTimeSinceLastInjectionInMicroSeconds()'.
   getTimeSinceInjectedBunch(): 2147483647
   getTimeSinceInjectedBunchInMicroSeconds(): 1.68802e+07
@@ -26087,6 +26093,10 @@ EventLevelTriggerTimeInfo:
  ... message repeated 1 times
 [ERROR] Payload 'TTDOffsets' not found. To get the (uncorrected) information from TTD, use 'getBunchNumber()'.
   getTriggeredBunchNumberGlobal(): 0
+  hasAnyEventT0Sources(): False
+  hasEventT0SourceFromCDC(): False
+  hasEventT0SourceFromECL(): False
+  hasEventT0SourceFromSVD(): False
   hasInjection(): False
   isHER(): False
   isRevo2(): False

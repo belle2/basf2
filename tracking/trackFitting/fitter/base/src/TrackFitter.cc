@@ -140,7 +140,7 @@ void TrackFitter::resetFitterToDBSettings(const DAFConfiguration::ETrackFitType 
   if (!m_DAFConfiguration.isValid())
     B2FATAL("DAF Configuration is not available.");
 
-  DAFParameters* DAFParams = m_DAFConfiguration->getDAFParameters(trackFitType);
+  const DAFParameters* DAFParams = m_DAFConfiguration->getDAFParameters(trackFitType);
   if (!DAFParams)
     B2FATAL("DAF parameters for " << trackFitType << " is not available.");
 

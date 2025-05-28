@@ -46,7 +46,7 @@ namespace Belle2 {
 
     /** Get the DAFParameters for the specific track fit type
      */
-    DAFParameters* getDAFParameters(DAFConfiguration::ETrackFitType trackFitType) const
+    const DAFParameters* getDAFParameters(DAFConfiguration::ETrackFitType trackFitType) const
     {
       std::map<DAFConfiguration::ETrackFitType, DAFParameters*>::const_iterator it = m_DAFParameters.find(trackFitType);
       if (it != m_DAFParameters.end()) {

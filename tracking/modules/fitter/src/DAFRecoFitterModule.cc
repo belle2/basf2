@@ -34,7 +34,7 @@ std::shared_ptr<genfit::AbsFitter> DAFRecoFitterModule::createFitter() const
   // The DAFRecoFitterModule uses the default DAF parameters
   DAFConfiguration::ETrackFitType trackFitType = DAFConfiguration::c_Default;
 
-  DAFParameters* DAFParams = m_DAFConfiguration->getDAFParameters(trackFitType);
+  const DAFParameters* DAFParams = m_DAFConfiguration->getDAFParameters(trackFitType);
   if (!DAFParams)
     B2FATAL("DAF parameters for " << trackFitType << " is not available.");
 

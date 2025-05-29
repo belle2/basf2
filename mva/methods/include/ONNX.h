@@ -132,6 +132,8 @@ namespace Belle2 {
        */
       void run(ONNXTensorView& view) const;
 
+      Ort::Env m_env;
+      Ort::SessionOptions m_sessionOptions;
       std::unique_ptr<Ort::Session> m_session;
       Ort::RunOptions m_runOptions;
       const char* m_inputNames[1] = {"input"};

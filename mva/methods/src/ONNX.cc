@@ -27,13 +27,11 @@ void ONNXExpert::load(Weightfile& weightfile)
   // always run single threaded, but maybe not e.g. graph networks which can run
   // in parallel on nodes. Here, setting IntraOpNumThreads to 1 is important to
   // ensure single-threaded execution.
-  Ort::SessionOptions sessionOptions;
-  sessionOptions.SetIntraOpNumThreads(1);
-  sessionOptions.SetInterOpNumThreads(1);
-  sessionOptions.SetExecutionMode(ORT_SEQUENTIAL); // default, but make it explicit
+  m_sessionOptions.SetIntraOpNumThreads(1);
+  m_sessionOptions.SetInterOpNumThreads(1);
+  m_sessionOptions.SetExecutionMode(ORT_SEQUENTIAL); // default, but make it explicit
 
-  Ort::Env env;
-  m_session = std::make_unique<Ort::Session>(env, onnxModelFileName.c_str(), sessionOptions);
+  m_session = std::make_unique<Ort::Session>(m_env, onnxModelFileName.c_str(), m_sessionOptions);
 }
 
 void ONNXExpert::run(ONNXTensorView& view) const

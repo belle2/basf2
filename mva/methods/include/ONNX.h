@@ -39,8 +39,7 @@ namespace Belle2 {
        */
       virtual po::options_description getDescription() override
       {
-        po::options_description desc("ONNX options");
-        return desc;
+        return po::options_description("ONNX options");
       }
 
       /**
@@ -66,13 +65,12 @@ namespace Belle2 {
                   const ONNXOptions& specific_options) : Teacher(general_options) {}
 
       /**
-       * Train a mva method using the given dataset returning a Weightfile
-       * @param training_data used to train the method
+       * Just returns a default-initialized weightfile
+       * @param training_data used to train the method (ignored)
        */
       virtual Weightfile train(Dataset& training_data) const override
       {
-        Weightfile w;
-        return w;
+        return Weightfile();
       }
     };
 

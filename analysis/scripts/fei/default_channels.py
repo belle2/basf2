@@ -1080,6 +1080,8 @@ def get_ccbarLambdaC_channels(
     """
     returns list of Particle objects with all default channels for running
     FEI on ccbar to tag Lambda_c+ decays
+    These channel list has not been optimized yet and currenlty serves
+    only as an example for FEI application on ccbar events.
     @param specific if True, this adds isInRestOfEvent cut to all FSP
     @param addPi0 if True, this adds pi0 to all channels
     @param addCharged if True, this adds charged pairs to all channels
@@ -1173,7 +1175,8 @@ def get_ccbarLambdaC_channels(
     if convertedFromBelle:
         gamma_cut = 'goodBelleGamma == 1 and clusterBelleQuality == 0'
     else:
-        gamma_cut = '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09] or [clusterReg == 3 and E > 0.16]]'
+        # Same as goodBelleGamma == 1
+        gamma_cut = '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.05] or [clusterReg == 3 and E > 0.15]]'
     if specific:
         gamma_cut += ' and isInRestOfEvent > 0.5'
 
@@ -1216,29 +1219,15 @@ def get_ccbarLambdaC_channels(
         if specific:
             pi0_cut += ' and isInRestOfEvent > 0.5'
 
-        pi0 = Particle(
-            'pi0',
-            MVAConfiguration(
-                variables=[
-                    'InvM',
-                    'extraInfo(preCut_rank)',
-                    'chiProb',
-                    'abs(BellePi0SigM)',
-                    'eneAsy',
-                    'daughterAngle(0,1)',
-                    'useRestFrame(daughterAngle(0,1))',
-                    'pt',
-                    'pz',
-                    'E'],
-                target='isSignal'),
-            PreCutConfiguration(
-                userCut=pi0_cut,
-                bestCandidateVariable='abs(BellePi0SigM)',
-                bestCandidateCut=20),
-            PostCutConfiguration(
-                bestCandidateCut=10,
-                value=0.01)
-        )
+        pi0 = Particle('pi0',
+                       MVAConfiguration(variables=['InvM', 'extraInfo(preCut_rank)', 'chiProb', 'abs(BellePi0SigM)',
+                                                   'daughterAngle(0,1)', 'pt', 'pz', 'E',
+                                                   'daughter({},E)', 'daughter({},clusterReg)'],
+                                        target='isSignal'),
+                       PreCutConfiguration(userCut=pi0_cut,
+                                           bestCandidateVariable='abs(BellePi0SigM)',
+                                           bestCandidateCut=20),
+                       PostCutConfiguration(bestCandidateCut=10, value=0.01))
         pi0.addChannel(['pi0:FSP'])
 
         Lam_cut = '0.9 < M < 1.3'
@@ -1248,21 +1237,10 @@ def get_ccbarLambdaC_channels(
             'Lambda0',
             MVAConfiguration(
                 variables=[
-                    'dr',
-                    'dz',
-                    'distance',
-                    'significanceOfDistance',
-                    'chiProb',
-                    'M',
-                    'abs(dM)',
-                    'useCMSFrame(E)',
-                    'eneAsy',
-                    'daughterAngle(0,1)',
-                    'useRestFrame(daughterAngle(0,1))',
+                    'dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
+                    'useCMSFrame(E)', 'daughterAngle(0,1)',
                     'cosAngleBetweenMomentumAndVertexVector',
-                    'extraInfo(preCut_rank)',
-                    'extraInfo(goodLambda)',
-                    'extraInfo(ksnbVLike)',
+                    'extraInfo(preCut_rank)', 'extraInfo(goodLambda)', 'extraInfo(ksnbVLike)',
                     'extraInfo(ksnbNoLam)'],
                 target='isSignal'),
             PreCutConfiguration(
@@ -1276,40 +1254,24 @@ def get_ccbarLambdaC_channels(
         L0.addChannel(['Lambda0:V0'])
     else:
         pi0 = Particle('pi0',
-                       MVAConfiguration(variables=[
-                                'M', 'daughter({},extraInfo(SignalProbability))', 'extraInfo(preCut_rank)',
-                                'eneAsy', 'daughterAngle(0,1)', 'useRestFrame(daughterAngle(0,1))', 'pt', 'pz', 'E', 'abs(dM)',
-                                'daughter({},E)', 'daughter({},clusterReg)'
-                            ],
-                            target='isSignal'),
+                       MVAConfiguration(variables=['M', 'daughter({},extraInfo(SignalProbability))', 'extraInfo(preCut_rank)',
+                                                   'daughterAngle(0,1)', 'pt', 'pz', 'E', 'abs(dM)',
+                                                   'daughter({},E)', 'daughter({},clusterReg)', 'eneAsy'],
+                                        target='isSignal'),
                        PreCutConfiguration(userCut='0.08 < M < 0.18',
                                            bestCandidateVariable='abs(dM)',
                                            bestCandidateCut=20),
-                       PostCutConfiguration(bestCandidateCut=10, value=0.01)
-                       )
+                       PostCutConfiguration(bestCandidateCut=10, value=0.01))
         pi0.addChannel(['gamma', 'gamma'])
 
         L0 = Particle(
             'Lambda0',
             MVAConfiguration(
-                variables=[
-                    'dr',
-                    'dz',
-                    'distance',
-                    'significanceOfDistance',
-                    'chiProb',
-                    'M',
-                    'abs(dM)',
-                    'useCMSFrame(E)',
-                    'eneAsy',
-                    'daughterAngle(0,1)',
-                    'useRestFrame(daughterAngle(0,1))',
-                    'daughter({},extraInfo(SignalProbability))',
-                    'useRestFrame(daughter({}, p))',
-                    'cosAngleBetweenMomentumAndVertexVector',
-                    'daughter({}, dz)',
-                    'daughter({}, dr)',
-                    'extraInfo(preCut_rank)'],
+                variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
+                           'useCMSFrame(E)', 'daughterAngle(0,1)',
+                           'daughter({},extraInfo(SignalProbability))',
+                           'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
+                           'daughter({}, dz)', 'daughter({}, dr)', 'extraInfo(preCut_rank)'],
                 target='isSignal'),
             PreCutConfiguration(
                 userCut='0.9 < M < 1.3',
@@ -1328,23 +1290,10 @@ def get_ccbarLambdaC_channels(
         L0.addChannel(
             ['Lambda0:V0'],
             MVAConfiguration(
-                variables=[
-                    'dr',
-                    'dz',
-                    'distance',
-                    'significanceOfDistance',
-                    'chiProb',
-                    'M',
-                    'useCMSFrame(E)',
-                    'eneAsy',
-                    'daughterAngle(0,1)',
-                    'useRestFrame(daughterAngle(0,1))',
-                    'extraInfo(preCut_rank)',
-                    'abs(dM)',
-                    'useRestFrame(daughter({}, p))',
-                    'cosAngleBetweenMomentumAndVertexVector',
-                    'daughter({}, dz)',
-                    'daughter({}, dr)'],
+                variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M',
+                           'useCMSFrame(E)', 'daughterAngle(0,1)', 'extraInfo(preCut_rank)', 'abs(dM)',
+                           'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
+                           'daughter({}, dz)', 'daughter({}, dr)'],
                 target='isSignal'),
             PreCutConfiguration(
                 userCut=Lam_cut,
@@ -1361,24 +1310,11 @@ def get_ccbarLambdaC_channels(
         KS0 = Particle(
             'K_S0',
             MVAConfiguration(
-                variables=[
-                    'dr',
-                    'dz',
-                    'distance',
-                    'significanceOfDistance',
-                    'chiProb',
-                    'M',
-                    'abs(dM)',
-                    'useCMSFrame(E)',
-                    'eneAsy',
-                    'daughterAngle(0,1)',
-                    'useRestFrame(daughterAngle(0,1))',
-                    'cosAngleBetweenMomentumAndVertexVector',
-                    'extraInfo(preCut_rank)',
-                    'extraInfo(goodKs)',
-                    'extraInfo(ksnbVLike)',
-                    'extraInfo(ksnbNoLam)',
-                    'extraInfo(ksnbStandard)'],
+                variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
+                           'useCMSFrame(E)', 'daughterAngle(0,1)',
+                           'cosAngleBetweenMomentumAndVertexVector',
+                           'extraInfo(preCut_rank)', 'extraInfo(goodKs)', 'extraInfo(ksnbVLike)',
+                           'extraInfo(ksnbNoLam)', 'extraInfo(ksnbStandard)'],
                 target='isSignal'),
             PreCutConfiguration(
                 userCut=ks0_cut,
@@ -1393,24 +1329,12 @@ def get_ccbarLambdaC_channels(
         KS0 = Particle(
             'K_S0',
             MVAConfiguration(
-                variables=[
-                    'dr',
-                    'dz',
-                    'distance',
-                    'significanceOfDistance',
-                    'chiProb',
-                    'M',
-                    'abs(dM)',
-                    'useCMSFrame(E)',
-                    'eneAsy',
-                    'daughterAngle(0,1)',
-                    'useRestFrame(daughterAngle(0,1))',
-                    'daughter({},extraInfo(SignalProbability))',
-                    'useRestFrame(daughter({}, p))',
-                    'cosAngleBetweenMomentumAndVertexVector',
-                    'daughter({}, dz)',
-                    'daughter({}, dr)',
-                    'extraInfo(preCut_rank)'],
+                variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
+                           'useCMSFrame(E)', 'daughterAngle(0,1)',
+                           'useRestFrame(daughterAngle(0,1))',
+                           'daughter({},extraInfo(SignalProbability))',
+                           'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
+                           'daughter({}, dz)', 'daughter({}, dr)', 'extraInfo(preCut_rank)', 'eneAsy'],
                 target='isSignal'),
             PreCutConfiguration(
                 userCut='0.4 < M < 0.6',
@@ -1430,23 +1354,10 @@ def get_ccbarLambdaC_channels(
         KS0.addChannel(
             ['K_S0:V0'],
             MVAConfiguration(
-                variables=[
-                    'dr',
-                    'dz',
-                    'distance',
-                    'significanceOfDistance',
-                    'chiProb',
-                    'M',
-                    'useCMSFrame(E)',
-                    'eneAsy',
-                    'daughterAngle(0,1)',
-                    'useRestFrame(daughterAngle(0,1))',
-                    'extraInfo(preCut_rank)',
-                    'abs(dM)',
-                    'useRestFrame(daughter({}, p))',
-                    'cosAngleBetweenMomentumAndVertexVector',
-                    'daughter({}, dz)',
-                    'daughter({}, dr)'],
+                variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M',
+                           'useCMSFrame(E)', 'daughterAngle(0,1)', 'extraInfo(preCut_rank)', 'abs(dM)',
+                           'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
+                           'daughter({}, dz)', 'daughter({}, dr)'],
                 target='isSignal'),
             PreCutConfiguration(
                 userCut=ks0_cut,
@@ -1456,24 +1367,11 @@ def get_ccbarLambdaC_channels(
     SigmaP = Particle(
         'Sigma+',
         MVAConfiguration(
-            variables=[
-                'dr',
-                'dz',
-                'distance',
-                'significanceOfDistance',
-                'chiProb',
-                'M',
-                'abs(dM)',
-                'useCMSFrame(E)',
-                'eneAsy',
-                'daughterAngle(0,1)',
-                'useRestFrame(daughterAngle(0,1))',
-                'daughter({},extraInfo(SignalProbability))',
-                'useRestFrame(daughter({}, p))',
-                'cosAngleBetweenMomentumAndVertexVector',
-                'daughter({}, dz)',
-                'daughter({}, dr)',
-                'extraInfo(preCut_rank)'],
+            variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
+                       'useCMSFrame(E)', 'daughterAngle(0,1)',
+                       'daughter({},extraInfo(SignalProbability))',
+                       'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
+                       'daughter({}, dz)', 'daughter({}, dr)', 'extraInfo(preCut_rank)'],
             target='isSignal'),
         PreCutConfiguration(
             userCut='1.0 < M < 1.4',
@@ -1679,8 +1577,8 @@ def get_ccbarLambdaC_channels(
         'significanceOfFlightDistance',
     ]
 
-    ccbarTag_user_cut = 'mRecoil > 1.8 and mRecoil < 2.6'
-    variables.addAlias('ccbarTagSignalBinary', 'formula( conditionalVariableSelector( ccbarTagSignalQuick == 1, 1, 0 ) )')
+    ccbarTag_user_cut = '1.8 < mRecoil < 2.6'
+    variables.addAlias('ccbarTagSignalBinary', 'conditionalVariableSelector(ccbarTagSignal==1,1,0)')
 
     # region 6th stage
     LambdaCTag = Particle(

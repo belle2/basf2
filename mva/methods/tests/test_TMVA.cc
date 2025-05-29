@@ -137,7 +137,7 @@ namespace {
     specific_options.m_prepareOption = "SplitMode=block:!V";
     specific_options.transform2probability = false;
     specific_options.m_config =
-      "!H:!V:CreateMVAPdfs:NTrees=400:BoostType=Grad:Shrinkage=0.1:nCuts=10:MaxDepth=3:IgnoreNegWeightsInTraining:MinNodeSize=20";
+      "!H:!V:NTrees=400:BoostType=Grad:Shrinkage=0.1:nCuts=10:MaxDepth=3:IgnoreNegWeightsInTraining:MinNodeSize=20";
     TestClassificationDataset dataset({1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                                        1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                                        2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0,
@@ -171,8 +171,6 @@ namespace {
       EXPECT_LE(probabilities[i], -0.8);
       EXPECT_GE(probabilities[i + 1], 0.8);
     }
-
-
   }
 
 

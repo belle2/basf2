@@ -7,9 +7,7 @@ Topology analysis
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 45 min
-
-    **Additional Exercises**: 45 min
+    **Length**: 1-1.5 hrs
 
     **Prerequisites**:
 
@@ -377,6 +375,11 @@ Below is an example of the card file.
    % Common name of output files (Default: Name of the card file)
    {
      topoana
+   }
+
+   % Storage type of input raw topology truth information (Six options: AOI, VOI, MSI, MSF, MSD, and MSID. Default: AOI)
+   {
+      MSID
    }
 
 In the card file, ``#``, ``%``, and the pair of ``{`` and ``}``, are used for

@@ -1220,7 +1220,7 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr openingAngle(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr angleBetweenDaughterAndRecoil(const std::vector<std::string>& arguments)
     {
       if (arguments.size() >= 1) {
 
@@ -1245,15 +1245,15 @@ namespace Belle2 {
           ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum(); // Initial state (e+e- momentum in LAB)
           ROOT::Math::PxPyPzEVector pRecoil = frame.getMomentum(pIN - particle->get4Vector());
 
-          return ROOT::Math::VectorUtil::Angle(pRecoil.Vect(), pSum.Vect());
+          return ROOT::Math::VectorUtil::Angle(pRecoil, pSum);
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function openingAngle");
+        B2FATAL("Wrong number of arguments for meta function angleBetweenDaughterAndRecoil");
       }
     }
 
-    Manager::FunctionPtr missingAngle(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr angleBetweenDaughterAndMissingMomentum(const std::vector<std::string>& arguments)
     {
       if (arguments.size() >= 1) {
         auto func = [arguments](const Particle * particle) -> double {
@@ -1275,7 +1275,7 @@ namespace Belle2 {
           ROOT::Math::PxPyPzEVector missingTotalMomentumLab = T.rotateCmsToLab() * missingTotalMomentumCMS;
 
           const auto& frame = ReferenceFrame::GetCurrent();
-          ROOT::Math::PxPyPzEVector pMiss = frame.getMomentum(missingTotalMomentumLab); // transform from lab to refference frame
+          ROOT::Math::PxPyPzEVector pMiss = frame.getMomentum(missingTotalMomentumLab); // transform from lab to reference frame
 
           ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
           for (auto& generalizedIndex : arguments)
@@ -1288,11 +1288,11 @@ namespace Belle2 {
             }
           }
 
-          return ROOT::Math::VectorUtil::Angle(pMiss.Vect(), pSum.Vect());
+          return ROOT::Math::VectorUtil::Angle(pMiss, pSum);
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function missingAngle");
+        B2FATAL("Wrong number of arguments for meta function angleBetweenDaughterAndMissingMomentum");
       }
     }
 
@@ -3833,7 +3833,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
                       "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
                       "E.g. ``daughterMotherNormDiffOf(1, p)`` returns the normalized momentum difference between the given particle and its second daughter in the lab frame.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("openingAngle(daughterIndex_1, daughterIndex_2, ... )", openingAngle, R"DOC(
+    REGISTER_METAVARIABLE("angleBetweenDaughterAndRecoil(daughterIndex_1, daughterIndex_2, ... )", angleBetweenDaughterAndRecoil, R"DOC(
                        Returns the angle in between the momentum recoiling against the particle and the sum of the momenta of the given daughters.
                        The unit of the angle is ``rad``.
 
@@ -3842,14 +3842,14 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                        daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply
                        identifies the second daughter of the root particle.
 
-                       At least one generalized index has to be given to ``openingAngle``. 
+                       At least one generalized index has to be given to ``angleBetweenDaughterAndRecoil``. 
 
                        .. tip::
-                           ``openingAngle(0)`` will return the angle between pRecoil and the momentum of the first daughter.
-                           ``openingAngle(0, 1)`` will return the angle between pRecoil and the sum of the momenta of the first and second daughter.
-                           ``openingAngle(0:0, 3:0)`` will return the angle between pRecoil and the sum of the momenta of the: first daughter of the first daughter, and
+                           ``angleBetweenDaughterAndRecoil(0)`` will return the angle between pRecoil and the momentum of the first daughter.
+                           ``angleBetweenDaughterAndRecoil(0, 1)`` will return the angle between pRecoil and the sum of the momenta of the first and second daughter.
+                           ``angleBetweenDaughterAndRecoil(0:0, 3:0)`` will return the angle between pRecoil and the sum of the momenta of the: first daughter of the first daughter, and
                            the first daughter of the fourth daughter.)DOC", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("missingAngle(daughterIndex_1, daughterIndex_2, ... )", missingAngle, R"DOC(
+    REGISTER_METAVARIABLE("angleBetweenDaughterAndMissingMomentum(daughterIndex_1, daughterIndex_2, ... )", angleBetweenDaughterAndMissingMomentum, R"DOC(
                       Returns the angle in between the missing momentum in the event and the sum of the momenta of the given daughters.
                       The unit of the angle is ``rad``. EventKinematics module has to be called to use this.
 
@@ -3858,12 +3858,12 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply
                       identifies the second daughter of the root particle.
 
-                      At least one generalized index has to be given to ``missingAngle``. 
+                      At least one generalized index has to be given to ``angleBetweenDaughterAndMissingMomentum``. 
 
                       .. tip::
-                          ``missingAngle(0)`` will return the angle between missMom and the momentum of the first daughter.
-                          ``missingAngle(0, 1)`` will return the angle between missMom and the sum of the momenta of the first and second daughter.
-                          ``missingAngle(0:0, 3:0)`` will return the angle between missMom and the sum of the momenta of the: first daughter of the first daughter, and
+                          ``angleBetweenDaughterAndMissingMomentum(0)`` will return the angle between missMom and the momentum of the first daughter.
+                          ``angleBetweenDaughterAndMissingMomentum(0, 1)`` will return the angle between missMom and the sum of the momenta of the first and second daughter.
+                          ``angleBetweenDaughterAndMissingMomentum(0:0, 3:0)`` will return the angle between missMom and the sum of the momenta of the: first daughter of the first daughter, and
                           the first daughter of the fourth daughter.)DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("daughterAngle(daughterIndex_1, daughterIndex_2[, daughterIndex_3])", daughterAngle, R"DOC(
                        Returns the angle in between any pair of particles belonging to the same decay tree.

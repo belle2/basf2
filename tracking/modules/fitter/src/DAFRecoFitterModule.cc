@@ -23,6 +23,10 @@ DAFRecoFitterModule::DAFRecoFitterModule() : BaseRecoFitterModule()
   addParam("probCut", m_param_probabilityCut,
            "Probability cut for the DAF. Any value between 0 and 1 is possible. Common values are between 0.01 and 0.001",
            TrackFitter::s_defaultProbCut);
+
+  addParam("trackFitType", m_trackFitType,
+           "Type of track fit algorithm to use the corresponding DAFParameter, the list is defined in DAFConfiguration class.",
+           m_trackFitType);
 }
 
 /** Create a DAF fitter */
@@ -31,12 +35,9 @@ std::shared_ptr<genfit::AbsFitter> DAFRecoFitterModule::createFitter() const
   if (!m_DAFConfiguration.isValid())
     B2FATAL("DAF Configuration is not available.");
 
-  // The DAFRecoFitterModule uses the default DAF parameters
-  DAFConfiguration::ETrackFitType trackFitType = DAFConfiguration::c_Default;
-
-  const DAFParameters* DAFParams = m_DAFConfiguration->getDAFParameters(trackFitType);
+  const DAFParameters* DAFParams = m_DAFConfiguration->getDAFParameters(DAFConfiguration::ETrackFitType(m_trackFitType));
   if (!DAFParams)
-    B2FATAL("DAF parameters for " << trackFitType << " is not available.");
+    B2FATAL("DAF parameters for " << m_trackFitType << " is not available.");
 
   if (static_cast<float>(m_param_probabilityCut) != DAFParams->getProbabilityCut()) {
     if (not m_changedParametersMessageWasShown) {

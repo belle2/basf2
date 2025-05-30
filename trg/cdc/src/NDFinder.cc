@@ -430,19 +430,27 @@ bool NDFinder::checkHitSuperLayers(const SimpleCluster& cluster)
 std::array<double, 3> NDFinder::calculateCenterOfGravity(const SimpleCluster& cluster)
 {
   double weightedSumOmega = 0.;
-  double weightedSumPhi = 0.;
+  double weightedSumPhiX = 0.;
+  double weightedSumPhiY = 0.;
   double weightedSumCot = 0.;
   unsigned int weightSum = 0;
   for (const cell_index& cellIdx : cluster.getCells()) {
     unsigned short cellWeight = (*m_houghSpace)[cellIdx[0]][cellIdx[1]][cellIdx[2]];
     weightedSumOmega += cellIdx[0] * cellWeight;
-    weightedSumPhi += cellIdx[1] * cellWeight;
     weightedSumCot += cellIdx[2] * cellWeight;
+    // Adjust for phi dimension wrapping
+    double phiAngle = (2.0 * M_PI * cellIdx[1]) / m_nPhi;
+    weightedSumPhiX += std::cos(phiAngle) * cellWeight;
+    weightedSumPhiY += std::sin(phiAngle) * cellWeight;
     weightSum += cellWeight;
   }
   weightedSumOmega /= weightSum;
-  weightedSumPhi /= weightSum;
   weightedSumCot /= weightSum;
+  double meanPhiAngle = std::atan2(weightedSumPhiY, weightedSumPhiX);
+  if (meanPhiAngle < 0) {
+    meanPhiAngle += 2.0 * M_PI;
+  }
+  double weightedSumPhi = meanPhiAngle * m_nPhi / (2.0 * M_PI);
   std::array<double, 3> centerOfGravity = {weightedSumOmega, weightedSumPhi, weightedSumCot};
   return centerOfGravity;
 }

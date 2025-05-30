@@ -1568,12 +1568,12 @@ def get_ccbarLambdaC_channels(
         'dr', 'dz', 'dx', 'dy', 'distance', 'significanceOfDistance',
         'daughter({},extraInfo(decayModeID))',
         'useCMSFrame(p)',
-        'useCMSFrame(openingAngle(0))',
+        'useCMSFrame(angleBetweenDaughterAndRecoil(0))',
         'vertexDistance',
         'vertexDistanceSignificance',
         'vertexDistanceOfDaughter({})',
         'vertexDistanceOfDaughterSignificance({})',
-        'recoilMassDiff({2..})',
+        'massDiffRecoil({2..})',
         'significanceOfFlightDistance',
     ]
 

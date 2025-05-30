@@ -52,12 +52,11 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            "Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class.",
            false);
   addParam("axialFile", m_axialFile,
-           "File name of the axial hit patterns (they are the same for the shallow representations).",
+           "File name of the axial hit representations.",
            std::string("data/trg/cdc/ndFinderAxial40x384x9.txt.gz"));
   addParam("stereoFile", m_stereoFile,
-           "File name of the stereo hit patterns. Use ndFinderStereoSteep40x384x9.txt.gz"
-           "for steep hit representations (change range in NDFinder.h).",
-           std::string("data/trg/cdc/ndFinderStereoSteep40x384x9.txt.gz"));
+           "File name of the stereo hit representations.",
+           std::string("data/trg/cdc/ndFinderStereo40x384x9.txt.gz"));
   addParam("NDFinderInfosName", m_ndFinderInfosName,
            "The name of the StoreArray where the tracks clusters found by this NDFinder Module are stored.",
            std::string("CDCTriggerClusterInfos"));

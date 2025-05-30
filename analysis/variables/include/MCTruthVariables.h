@@ -382,26 +382,34 @@ namespace Belle2 {
 
     /**
      * returns 1 if the eventParticle daughters were all caught in recParticles, 2 if partially and 0 if none.
-     * if another vector is provided, the function will also return the list of missed particles.
+     * it is used to check if a signal particle is still left on the signal side of the event (what is not caught by the tag side).
      */
     int ccbarTagPartialHelper(const MCParticle* eventParticle, const std::vector<Particle*>& recParticles);
+
+    /**
+     * returns 1 if the eventParticle daughters were all caught in recParticles, 2 if partially and 0 if none.
+     * through and additional vector the function will also return the list of missed particles.
+     * it is used to check what particles are left in the event outside the tag.
+     */
     int ccbarTagPartialHelper(const MCParticle* eventParticle, std::vector<Particle*>& recParticles,
                               std::vector<const MCParticle*>& missedParticles);
 
     /**
-     * returns Event status for ccbarTag, returns 100 there is no signal particles in the event, 200 if it was partially absorbed by tag and 0 otherwise.
+     * returns Event status for ccbarTag, returns 100 there is no signal particles in the event,
+     * 200 if it was partially absorbed by tag and 0 otherwise.
      */
-    double ccbarTagEventStatus(const Particle* part);
+    int ccbarTagEventStatus(const Particle* part);
 
     /**
-     * returns 1.0 if ccbar tag quasi particle is 'correctly' reconstructed (SIGNAL) in a ccbar event, 0.0 if not (specific to the setup of ccbar-FEI).
+     * returns 1 if ccbar tag quasi particle is 'correctly' reconstructed (SIGNAL) in a ccbar event,
+     * 0 and other values if there were errors in reconstruction (specific to the setup of ccbar-FEI).
      */
-    double ccbarTagSignal(const Particle* part);
+    int ccbarTagSignal(const Particle* part);
 
     /**
-     * returns compacted value of a quickened version of ccbarTagSignal without the information of ccbarTagEventStatus."
+     * returns compacted value of a simplified version of ccbarTagSignal without the information of ccbarTagEventStatus."
      */
-    double ccbarTagSignalQuick(const Particle* part);
+    int ccbarTagSignalSimplified(const Particle* part);
   }
 }
 

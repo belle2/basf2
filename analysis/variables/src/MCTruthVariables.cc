@@ -1001,7 +1001,8 @@ namespace Belle2 {
       bool CaughtAll = true;
       bool missedAll = true;
       for (auto& mcDaughter : mcParticle->getDaughters()) {
-        if (mcDaughter->getPDG() == 22 && (mcDaughter->getEnergy() < 0.1 || abs(mcDaughter->getMother()->getPDG()) == 10022)) {
+        if (mcDaughter->getPDG() == Const::photon.getPDGCode() && (mcDaughter->getEnergy() < 0.1
+                                                                   or mcDaughter->hasStatus(MCParticle::c_IsISRPhoton))) {
           continue; // ignore radiative photons with energy < 0.1 GeV and ISR as if they are not in the event
         }
         // Belle MC legacy remnants
@@ -1048,7 +1049,7 @@ namespace Belle2 {
       bool CaughtAll = true;
       bool missedAll = true;
       for (auto& mcDaughter : mcParticle->getDaughters()) {
-        if (mcDaughter->getPDG() == 22
+        if (mcDaughter->getPDG() == Const::photon.getPDGCode()
             && mcDaughter->getEnergy() < 0.1) continue; // ignore radiative photons with energy < 0.1 GeV as if they are not in the event
         auto it = std::find_if(recParticles.begin(), recParticles.end(), [mcDaughter](Particle * rec) { return rec->getMCParticle() == mcDaughter; });
         if (it != recParticles.end()) missedAll = false;
@@ -1068,7 +1069,7 @@ namespace Belle2 {
       else return 2;
     }
 
-    double ccbarTagEventStatus(const Particle* part)
+    int ccbarTagEventStatus(const Particle* part)
     {
       // event part of matching
       int sigPDGCode = part->getPDGCode() * (-1); // get info about signal particles
@@ -1084,7 +1085,7 @@ namespace Belle2 {
       return eventStatus;
     }
 
-    double ccbarTagSignal(const Particle* part)
+    int ccbarTagSignal(const Particle* part)
     {
       int returnValue = ccbarTagEventStatus(part);
       int sigPDGCode = part->getPDGCode() * (-1); // get info about signal particles
@@ -1105,8 +1106,8 @@ namespace Belle2 {
             grandMother = curMCMother->getMother();
           }
 
-          if (abs(curMCMother->getPDG()) != 22 && abs(curMCMother->getPDG()) != 23
-              && abs(curMCMother->getPDG()) != 10022) return returnValue + 20;
+          if (curMCMother->getPDG() != Const::photon.getPDGCode() && curMCMother->getPDG() != 23
+              && curMCMother->getPDG() != 10022) return returnValue + 20;
           else if (!allMother) allMother = curMCMother;
           else if (allMother != curMCMother) return returnValue + 20;
         }
@@ -1116,14 +1117,13 @@ namespace Belle2 {
       bool hasMissingGamma = false;
       bool hasMissingNeutrino = false;
       bool hasDecayInFlight = false;
-      bool hasFSR = false;
       for (auto& daughter : part->getDaughters()) { // TODO think about less strict conditions
         int mcError = MCMatching::getMCErrors(daughter, daughter->getMCParticle());
         if (mcError == MCMatching::c_Correct || mcError == MCMatching::c_MissingResonance) continue;
-        else if (mcError == MCMatching::c_MissGamma) hasMissingGamma = true;
+        else if (mcError == MCMatching::c_MissGamma || mcError == MCMatching::c_MissFSR
+                 || mcError == MCMatching::c_MissPHOTOS) hasMissingGamma = true;
         else if (mcError == MCMatching::c_MissNeutrino) hasMissingNeutrino = true;
         else if (mcError == MCMatching::c_DecayInFlight) hasDecayInFlight = true;
-        else if (mcError == MCMatching::c_MissFSR) hasFSR = true;
         else {
           returnValue += 30;
           return returnValue;
@@ -1132,7 +1132,6 @@ namespace Belle2 {
       if (hasDecayInFlight) returnValue += 40;
       else if (hasMissingNeutrino) returnValue += 50;
       else if (hasMissingGamma) returnValue += 60;
-      else if (hasFSR) returnValue += 70;
 
       // FEI specific checks
       std::vector<Particle*> daughters = part->getDaughters();
@@ -1148,10 +1147,10 @@ namespace Belle2 {
         return returnValue + 3;
       }
 
-      return returnValue + 0;
+      return returnValue;
     }
 
-    double ccbarTagSignalQuick(const Particle* part)
+    int ccbarTagSignalSimplified(const Particle* part)
     {
       int sigPDGCode = part->getPDGCode() * (-1); // get info about signal particles
       // reconstruction part of matching, get daughters
@@ -1171,7 +1170,7 @@ namespace Belle2 {
             grandMother = curMCMother->getMother();
           }
 
-          if (abs(curMCMother->getPDG()) != 22 && abs(curMCMother->getPDG()) != 23 && abs(curMCMother->getPDG()) != 10022) return 20;
+          if (curMCMother->getPDG() != Const::photon.getPDGCode() && curMCMother->getPDG() != 23 && curMCMother->getPDG() != 10022) return 20;
           else if (!allMother) allMother = curMCMother;
           else if (allMother != curMCMother) return 20;
         }
@@ -1216,10 +1215,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("ccbarTagEventStatus", ccbarTagEventStatus,
                       "Event status for ccbarTag, returns 100 there is no signal particles in the event, 200 if it was partially absorbed by tag and 0 otherwise.");
     REGISTER_VARIABLE("ccbarTagSignal", ccbarTagSignal,
-                      "1.0 if ccbar tag quasi particle is 'correctly' reconstructed (SIGNAL) in a ccbar event, \n"
-                      "0.0 if not (specific to the setup of ccbar-FEI).");
-    REGISTER_VARIABLE("ccbarTagSignalQuick", ccbarTagSignalQuick,
-                      "Quickened version of ccbarTagSignal without the information of ccbarTagEventStatus.");
+                      "1 if ccbar tag quasi particle is 'correctly' reconstructed (SIGNAL) in a ccbar event, \n"
+                      "otherwise the following encoding indicating the quality of MC match is passed: \n"
+                      " - first digit entail info about event particles not contained in the tag: 0 = 0 missed, 1 = one signal particle is missed (correct), 2 = one non-signal particle is missed, 3 = multiple missed particles, \n"
+                      " - second digit corresponds to daughter truth matching errors: 10 = non-matched daughter, 20 = non-common mother or background particle, 30 = severe mcError encountered, 40 = decay in flight, 50 = missing neutrino, 60 = missing gamma, \n"
+                      " - third digit corresponds to ccbarTagEventStatus: 100 = no signal particles left in event, 200 = partially absorbed by tag, 0 = at least one signal particle left in event, \n"
+                      " - fourth digit is 1000 if the tag absorbed something too much (like a particle coming from beam bakcground).");
+    REGISTER_VARIABLE("ccbarTagSignalSimplified", ccbarTagSignalSimplified,
+                      "Simplified version of ccbarTagSignal without the information of ccbarTagEventStatus.");
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,

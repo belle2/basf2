@@ -12,7 +12,6 @@
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/B2Vector3.h>
 #include <framework/logging/Logger.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 
@@ -107,9 +106,9 @@ void ParticleVertexFitterModule::initialize()
 
 void ParticleVertexFitterModule::beginRun()
 {
-  //TODO: set magnetic field for each run
-  //m_Bfield = BFieldMap::Instance().getBField(B2Vector3D(0,0,0)).Z();
-  //TODO: set IP spot size for each run
+  // TODO: set magnetic field for each run
+  // m_Bfield = BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
+  // TODO: set IP spot size for each run
 }
 
 void ParticleVertexFitterModule::event()
@@ -129,7 +128,7 @@ void ParticleVertexFitterModule::event()
     }
   }
   if (m_withConstraint == "iptubecut") {  // for development purpose only
-    m_BeamSpotCenter = B2Vector3D(0.001, 0., .013);
+    m_BeamSpotCenter = ROOT::Math::XYZVector(0.001, 0., .013);
     findConstraintBoost(0.03);
   }
   if ((m_vertexFitter == "Rave") && (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"
@@ -149,7 +148,7 @@ void ParticleVertexFitterModule::event()
     }
 
     if (m_withConstraint == "mother") {
-      m_BeamSpotCenter = B2Vector3D(particle->getVertex().x(), particle->getVertex().y(), particle->getVertex().z());
+      m_BeamSpotCenter = particle->getVertex();
       m_beamSpotCov = particle->getVertexErrorMatrix();
     }
 
@@ -498,10 +497,7 @@ bool ParticleVertexFitterModule::doKVertexFit(Particle* mother, bool ipProfileCo
   kv.setMagneticField(m_Bfield);
 
   if (mother->getV0()) {
-    HepPoint3D V0vertex_heppoint(mother->getV0()->getFittedVertexX(),
-                                 mother->getV0()->getFittedVertexY(),
-                                 mother->getV0()->getFittedVertexZ());
-    kv.setInitialVertex(V0vertex_heppoint);
+    kv.setInitialVertex(mother->getV0()->getFittedVertexPosition());
   }
 
   for (auto& child : fitChildren)
@@ -1341,7 +1337,7 @@ bool ParticleVertexFitterModule::doRaveFit(Particle* mother)
 
 
       if (mothSel && nTrk > 1) {
-        analysis::RaveSetup::getInstance()->setBeamSpot(B2Vector3D(pos.x(), pos.y(), pos.z()), RerrMatrix);
+        analysis::RaveSetup::getInstance()->setBeamSpot(pos, RerrMatrix);
         rf.addMother(mother);
         int nKfit = rf.fit();
         rf.updateMother();
@@ -1446,15 +1442,8 @@ bool ParticleVertexFitterModule::addChildofParticletoMassKFit(analysis::MassFour
 
 void ParticleVertexFitterModule::addIPProfileToKFit(analysis::VertexFitKFit& kv)
 {
-  HepPoint3D pos(0.0, 0.0, 0.0);
-  CLHEP::HepSymMatrix covMatrix(3, 0);
-
-  for (int i = 0; i < 3; i++) {
-    pos[i] = m_BeamSpotCenter(i);
-    for (int j = 0; j < 3; j++) {
-      covMatrix[i][j] = m_beamSpotCov(i, j);
-    }
-  }
+  HepPoint3D pos = ROOTToCLHEP::getPoint3D(m_BeamSpotCenter);
+  CLHEP::HepSymMatrix covMatrix = ROOTToCLHEP::getHepSymMatrix(m_beamSpotCov);
 
   kv.setIpProfile(pos, covMatrix);
 }
@@ -1474,7 +1463,7 @@ void ParticleVertexFitterModule::addIPTubeToKFit(analysis::VertexFitKFit& kv)
 
   kv.setIpTubeProfile(
     ROOTToCLHEP::getHepLorentzVector(iptube_mom),
-    ROOTToCLHEP::getPoint3DFromB2Vector(m_BeamSpotCenter),
+    ROOTToCLHEP::getPoint3D(m_BeamSpotCenter),
     err,
     0.);
 }
@@ -1483,8 +1472,7 @@ void ParticleVertexFitterModule::findConstraintBoost(double cut)
 {
   PCmsLabTransform T;
 
-  B2Vector3D boost = T.getBoostVector();
-  B2Vector3D boostDir = boost.Unit();
+  ROOT::Math::XYZVector boostDir = T.getBoostVector().Unit();
 
   TMatrixDSym beamSpotCov = m_beamSpotDB->getCovVertex();
   beamSpotCov(2, 2) = cut * cut;
@@ -1535,12 +1523,12 @@ double ParticleVertexFitterModule::getChi2TracksLBoost(const analysis::VertexFit
 
     TMatrixFSym err = CLHEPToROOT::getTMatrixFSym(trk_i.getError(analysis::KFitConst::kBeforeFit)); // px, py, pz, E, x, y, z
 
-    B2Vector3D x_before = CLHEPToROOT::getXYZVector(trk_i.getPosition(analysis::KFitConst::kBeforeFit));
-    B2Vector3D x_after = CLHEPToROOT::getXYZVector(trk_i.getPosition());
-    B2Vector3D dPos = x_after - x_before;
+    ROOT::Math::XYZVector x_before = CLHEPToROOT::getXYZVector(trk_i.getPosition(analysis::KFitConst::kBeforeFit));
+    ROOT::Math::XYZVector x_after = CLHEPToROOT::getXYZVector(trk_i.getPosition());
+    ROOT::Math::XYZVector dPos = x_after - x_before;
 
     PCmsLabTransform T;
-    B2Vector3D boost3 = T.getBoostVector().Unit();
+    ROOT::Math::XYZVector boost3 = T.getBoostVector().Unit();
     TVectorD boostD(0, 6, 0., 0., 0., 0., boost3.X(), boost3.Y(), boost3.Z(), "END");
 
     double dLBoost = dPos.Dot(boost3);

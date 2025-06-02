@@ -7,11 +7,9 @@
 .. sidebar:: Overview
     :class: overview
 
-    **External Training**: about 3 hours.
+    **External Training**: 3 hrs
 
-    **Teaching**: 10 min
-
-    **Exercises**: 15 min
+    **Length**: 20-30 min
 
     **Prerequisites**:
 

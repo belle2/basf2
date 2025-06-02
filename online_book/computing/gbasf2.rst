@@ -6,9 +6,7 @@ Gbasf2
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 45 min
-
-    **Exercises**: 20-30 min
+    **Length**: 1-1.5 hrs
 
     **Prerequisites**:
 

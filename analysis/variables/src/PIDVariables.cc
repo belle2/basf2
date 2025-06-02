@@ -468,9 +468,9 @@ namespace Belle2 {
         const auto probabilities = neuralNetworkPtr->predict(inputsNN);
 
         // store all probabilities for all hypotheses in extraInfo
-        for (const auto element : probabilities)
+        for (const auto& element : probabilities)
         {
-          const auto [pdgCodeElement, probability] = element;
+          const auto& [pdgCodeElement, probability] = element;
           const_cast<Particle*>(part)->addExtraInfo(neuralNetworkPtr->getExtraInfoName(pdgCodeElement), probability);
         }
 

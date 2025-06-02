@@ -1,27 +1,188 @@
-114
-5.25   
-5 10 30
-40 25
-40 25
-40 25
-40 25
-40 25
-40 25
-40 25
-40 25
-40 25
-40 25
-40 25
-40 25
-30 30
-35 30
-25 40 30 45
-140 220 160 200
-160 200 165 190
-20
-160 200 165 190
-10 20 25 30 
-224
-11
-1
-20 
+#------------------------------------------------------------------
+# ADC to Energy conversion factor in GeV
+#------------------------------------------------------------------
+  0   adc2energy               0.005231
+#------------------------------------------------------------------
+# Energy threshold for lowe, hie, lume in GeV in Lab
+#------------------------------------------------------------------
+  1   lowe                     0.5
+  2   hie                      1.0 
+  3   lume                     3.0
+#------------------------------------------------------------------
+# 2D Bhabha veto in GeV
+# high and low energy cut for 14 forward-backward combinations in theta
+#------------------------------------------------------------------
+  4   bha2d_fw01               4.0
+  5   bha2d_bw01               2.5
+  6   bha2d_fw02               4.0
+  7   bha2d_bw02               2.5
+  8   bha2d_fw03               4.0
+  9   bha2d_bw03               2.5
+ 10   bha2d_fw04               4.0
+ 11   bha2d_bw04               2.5
+ 12   bha2d_fw05               4.0
+ 13   bha2d_bw05               2.5
+ 14   bha2d_fw06               4.0
+ 15   bha2d_bw06               2.5
+ 16   bha2d_fw07               4.0
+ 17   bha2d_bw07               2.5
+ 18   bha2d_fw08               4.0
+ 19   bha2d_bw08               2.5
+ 20   bha2d_fw09               4.0
+ 21   bha2d_bw09               2.5
+ 22   bha2d_fw10               4.0
+ 23   bha2d_bw10               2.5
+ 24   bha2d_fw11               4.0
+ 25   bha2d_bw11               2.5
+ 26   bha2d_fw12               4.0
+ 27   bha2d_bw12               2.5
+ 28   bha2d_fw13               3.0
+ 29   bha2d_bw13               3.0
+ 30   bha2d_fw14               3.5
+ 31   bha2d_bw14               3.0
+#------------------------------------------------------------------
+# 3D Bhabha veto
+# - CLE (L and H) in GeV in CMS
+# - 2 cluster angle phi diff (L and H), and theta sum (L and H) in CMS in degree
+#------------------------------------------------------------------
+ 32   bha3dveto_e_l            3.0
+ 33   bha3dveto_e_h            4.5
+ 34   bha3dveto_phi_d_l      160 
+ 35   bha3dveto_phi_d_h      200 
+ 36   bha3dveto_theta_s_l    165
+ 37   bha3dveto_theta_s_h    190
+#------------------------------------------------------------------
+# 3D Bhabha selection
+# - CLE (L and H) in GeV in CMS
+# - 2 cluster angle phi diff (L and H), and theta sum (L and H) in CMS in degree
+# - Prescale in (FW, BR, BW)
+#------------------------------------------------------------------
+ 38   bha3dsel_e_l             2.5
+ 39   bha3dsel_e_h             4.0 
+ 40   bha3dsel_phi_d_l       140
+ 41   bha3dsel_phi_d_h       220
+ 42   bha3dsel_theta_s_l     160
+ 43   bha3dsel_theta_s_h     200
+ 44   bha3dsel_ps_fw           1
+ 45   bha3dsel_ps_br           1
+ 46   bha3dsel_ps_bw           1
+#------------------------------------------------------------------
+# mumu
+# - CL E cut for 2 clusters in CMS in GeV
+# - 2 cluster angle phi diff (L and H), and theta sum (L and H) in CMS in degree
+#------------------------------------------------------------------
+ 47   mumu_e                   2.0
+ 48   mumu_phi_d_l           160
+ 49   mumu_phi_d_h           200
+ 50   mumu_theta_s_l         165
+ 51   mumu_theta_s_h         190
+#------------------------------------------------------------------
+# lml cluster energy in Lab in GeV
+#------------------------------------------------------------------
+ 52   lml_cl_e_lab_1           0.5
+ 53   lml_cl_e_lab_2           0.3
+ 54   lml_cl_e_lab_3           0.25
+#------------------------------------------------------------------
+# lml cluster energy in CMS in GeV
+#------------------------------------------------------------------
+ 55   lml_cl_e_cms_1           2.0
+ 56   lml_cl_e_cms_2           1.0
+ 57   lml_cl_e_cms_3           0.5
+#------------------------------------------------------------------
+# lml0
+# N(CL)>=X for minimum E CL
+#------------------------------------------------------------------
+ 58   lml00_ncl                1
+#------------------------------------------------------------------
+# lml12
+# N(CL)>=X for minimum E CL
+#------------------------------------------------------------------
+ 59   lml12_ncl                1
+#------------------------------------------------------------------
+# lml13
+# Theta ID selection with bit (17-1)
+# in binary (thetaID 17 to 1) = 0 0000 0111 1110 0000
+#------------------------------------------------------------------
+ 60   lml13_theta_id        2016
+#------------------------------------------------------------------
+# energy burst in lab in GeV
+#------------------------------------------------------------------
+ 61   e_burst                 20.0
+#------------------------------------------------------------------
+# energy selections for EventT0 quality flag
+# - low  energy (GeV) for fine timing
+# - high energy (GeV) for super-fine timing
+#------------------------------------------------------------------
+ 62   event_timing_fine        1.0
+ 63   event_timing_super      20.0
+#------------------------------------------------------------------
+# cluster TC theta region for 3D Bhabha veto CDC in track
+# - low  TC thetaId
+# - high TC thetaId
+#------------------------------------------------------------------
+ 64   bha3d_theta_id_in_trk_l  3
+ 65   bha3d_theta_id_in_trk_h 15
+#------------------------------------------------------------------
+# taub2b
+# 2 cluster angle, phi diff (L, H), theta sum (L, H) in CMS  in degree
+# energy cut on 1 cluster (E<X) in GeV in lab 
+# total energy cut in lab in GeV
+#------------------------------------------------------------------
+ 66   taub2b_phi_d_l         110
+ 67   taub2b_phi_d_h         250
+ 68   taub2b_theta_s_l       130
+ 69   taub2b_theta_s_h       230
+ 70   taub2b_cl_e              1.9
+ 71   taub2b_tot_e             7.0
+#------------------------------------------------------------------
+# hie1 and hie2 
+# 2 cluster angle for Bhabha additional veto bits
+# phi diff (L, H), theta sum (L, H) in CM in degree 
+#------------------------------------------------------------------
+ 72   hie12_phi_d_l          150
+ 73   hie12_phi_d_h          210
+ 74   hie12_theta_s_l        160
+ 75   hie12_theta_s_h        200
+#------------------------------------------------------------------
+# taub2b2
+# (a) 4 par: 2 cluster angle, phi diff (L, H) theta_sum (L, H) in CM in degree
+# (b) 1 par: total energy cut in lab in GeV
+# (c) 1 par: cluster energy in lab for endcap in GeV
+# (d) 1 par: cluster energy in lab for cluster in (a) in GeV
+#------------------------------------------------------------------
+ 76   taub2b2_phi_d_l        120
+ 77   taub2b2_phi_d_h        240
+ 78   taub2b2_theta_s_l      140
+ 79   taub2b2_theta_s_h      220
+ 80   taub2b2_tot_e            7.0
+ 81   taub2b2_cl_e_endcap      3.0
+ 82   taub2b2_cl_e_all         0.162
+#------------------------------------------------------------------
+# taub2b3
+# (a) 4 par: 2 cluster angle, phi diff (L, H) theta_sum (L, H) in CM
+# (b) 1 par: total energy cut in lab
+# (c) 1 par: cluster energy in lab for one of b2b in (a)
+# (d) 1 par: low  cluster energy in lab for all clusters
+# (e) 1 par: high cluster energy in lab for all clusters
+#------------------------------------------------------------------
+ 83   taub2b3_phi_d_l        120
+ 84   taub2b3_phi_d_h        240
+ 85   taub2b3_theta_s_l      140
+ 86   taub2b3_theta_s_h      220
+ 87   taub2b3_tot_e            7.0
+ 88   taub2b3_cl_e_b2b         0.14
+ 89   taub2b3_cl_e_all_l       0.12
+ 90   taub2b3_cl_e_all_h       4.5
+#------------------------------------------------------------------
+# hie4
+# E(CL) cut for lower E cluster in FW or BW
+# in case of 2 clusters in an event in GeV in Lab
+#------------------------------------------------------------------
+ 91   hie4_cl_e                0.5
+#------------------------------------------------------------------
+#
+#------------------------------------------------------------------
+ 92   spare                -1000
+#------------------------------------------------------------------
+# eof
+#------------------------------------------------------------------

@@ -103,7 +103,7 @@ namespace Belle2::Conditions {
       overrideGlobalTags();
     }
     std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", m_defaultMetadataProviderUrl);
-    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", serverList + " /cvmfs/belle.cern.ch/conditions/database.sqlite");
+    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", "/cvmfs/belle.cern.ch/conditions/database.sqlite " + serverList);
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", "/cvmfs/belle.cern.ch/conditions");
   }
 

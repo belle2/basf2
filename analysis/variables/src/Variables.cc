@@ -1307,7 +1307,9 @@ value possible with the information provided.
 
                       Note: This is used like massDiffRecoil(2) when in ccbarFEI you reconstruct eg. Lambda_c+:tag -> D+ p+ pi- 
                       and you want to calculate the mass difference between the recoil (which is the Lambda_c-) 
-                      and the recoil with the pi- which could be coming from Sigma_c--.)DOC", "GeV/:math:`\\text{c}^2`");
+                      and the recoil with the pi- which could be coming from Sigma_c--.
+
+                      )DOC", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,
                       "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.\n\n", "rad");

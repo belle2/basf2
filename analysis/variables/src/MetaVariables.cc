@@ -3834,7 +3834,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
                       "E.g. ``daughterMotherNormDiffOf(1, p)`` returns the normalized momentum difference between the given particle and its second daughter in the lab frame.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("angleBetweenDaughterAndRecoil(daughterIndex_1, daughterIndex_2, ... )", angleBetweenDaughterAndRecoil, R"DOC(
-                       Returns the angle in between the momentum recoiling against the particle and the sum of the momenta of the given daughters.
+                       Returns the angle between the momentum recoiling against the particle and the sum of the momenta of the given daughters.
                        The unit of the angle is ``rad``.
 
                        The particles are identified via generalized daughter indexes, which are simply colon-separated lists of
@@ -3846,11 +3846,13 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
 
                        .. tip::
                            ``angleBetweenDaughterAndRecoil(0)`` will return the angle between pRecoil and the momentum of the first daughter.
+
                            ``angleBetweenDaughterAndRecoil(0, 1)`` will return the angle between pRecoil and the sum of the momenta of the first and second daughter.
+
                            ``angleBetweenDaughterAndRecoil(0:0, 3:0)`` will return the angle between pRecoil and the sum of the momenta of the: first daughter of the first daughter, and
                            the first daughter of the fourth daughter.)DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("angleBetweenDaughterAndMissingMomentum(daughterIndex_1, daughterIndex_2, ... )", angleBetweenDaughterAndMissingMomentum, R"DOC(
-                      Returns the angle in between the missing momentum in the event and the sum of the momenta of the given daughters.
+                      Returns the angle between the missing momentum in the event and the sum of the momenta of the given daughters.
                       The unit of the angle is ``rad``. EventKinematics module has to be called to use this.
 
                       The particles are identified via generalized daughter indexes, which are simply colon-separated lists of
@@ -3862,7 +3864,9 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
 
                       .. tip::
                           ``angleBetweenDaughterAndMissingMomentum(0)`` will return the angle between missMom and the momentum of the first daughter.
+
                           ``angleBetweenDaughterAndMissingMomentum(0, 1)`` will return the angle between missMom and the sum of the momenta of the first and second daughter.
+
                           ``angleBetweenDaughterAndMissingMomentum(0:0, 3:0)`` will return the angle between missMom and the sum of the momenta of the: first daughter of the first daughter, and
                           the first daughter of the fourth daughter.)DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("daughterAngle(daughterIndex_1, daughterIndex_2[, daughterIndex_3])", daughterAngle, R"DOC(

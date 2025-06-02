@@ -388,14 +388,14 @@ namespace Belle2 {
 
     /**
      * returns 1 if the eventParticle daughters were all caught in recParticles, 2 if partially and 0 if none.
-     * through and additional vector the function will also return the list of missed particles.
+     * through an additional vector the function will also return the list of missed particles.
      * it is used to check what particles are left in the event outside the tag.
      */
     int ccbarTagPartialHelper(const MCParticle* eventParticle, std::vector<Particle*>& recParticles,
                               std::vector<const MCParticle*>& missedParticles);
 
     /**
-     * returns Event status for ccbarTag, returns 100 there is no signal particles in the event,
+     * returns Event status for ccbarTag, returns 100 if there is no signal particle in the event,
      * 200 if it was partially absorbed by tag and 0 otherwise.
      */
     int ccbarTagEventStatus(const Particle* part);
@@ -407,7 +407,7 @@ namespace Belle2 {
     int ccbarTagSignal(const Particle* part);
 
     /**
-     * returns compacted value of a simplified version of ccbarTagSignal without the information of ccbarTagEventStatus."
+     * returns compact value of a simplified version of ccbarTagSignal without the information of ccbarTagEventStatus.
      */
     int ccbarTagSignalSimplified(const Particle* part);
   }

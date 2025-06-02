@@ -1213,14 +1213,17 @@ namespace Belle2 {
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found.\n"
                       "Particles with gamma daughters attached through the bremsstrahlung recovery modules are allowed.");
     REGISTER_VARIABLE("ccbarTagEventStatus", ccbarTagEventStatus,
-                      "Event status for ccbarTag, returns 100 there is no signal particles in the event, 200 if it was partially absorbed by tag and 0 otherwise.");
-    REGISTER_VARIABLE("ccbarTagSignal", ccbarTagSignal,
-                      "1 if ccbar tag quasi particle is 'correctly' reconstructed (SIGNAL) in a ccbar event, \n"
-                      "otherwise the following encoding indicating the quality of MC match is passed: \n"
-                      " - first digit entail info about event particles not contained in the tag: 0 = 0 missed, 1 = one signal particle is missed (correct), 2 = one non-signal particle is missed, 3 = multiple missed particles, \n"
-                      " - second digit corresponds to daughter truth matching errors: 10 = non-matched daughter, 20 = non-common mother or background particle, 30 = severe mcError encountered, 40 = decay in flight, 50 = missing neutrino, 60 = missing gamma, \n"
-                      " - third digit corresponds to ccbarTagEventStatus: 100 = no signal particles left in event, 200 = partially absorbed by tag, 0 = at least one signal particle left in event, \n"
-                      " - fourth digit is 1000 if the tag absorbed something too much (like a particle coming from beam bakcground).");
+                      "Event status for ccbarTag, returns 100 if there is no signal particle in the event, 200 if it was partially absorbed by tag and 0 otherwise.");
+    REGISTER_VARIABLE("ccbarTagSignal", ccbarTagSignal, R"DOC(
+                      1 if ccbar tag quasi particle is 'correctly' reconstructed (SIGNAL) in a ccbar event,
+                      otherwise the following encoding indicating the quality of MC match is passed:
+
+                      * first digit entails info about event particles not contained in the tag: 0 = none missed, 1 = one signal particle is missed (correct), 2 = one non-signal particle is missed, 3 = multiple missed particles,
+                      * second digit corresponds to daughter truth matching errors: 10 = non-matched daughter, 20 = non-common mother or background particle, 30 = severe mcError encountered, 40 = decay in flight, 50 = missing neutrino, 60 = missing gamma,
+                      * third digit corresponds to ccbarTagEventStatus: 100 = no signal particles left in event, 200 = partially absorbed by tag, 0 = at least one signal particle left in event,
+                      * fourth digit is 1000 if the tag absorbed something too much (like a particle coming from beam background).
+
+                      )DOC");
     REGISTER_VARIABLE("ccbarTagSignalSimplified", ccbarTagSignalSimplified,
                       "Simplified version of ccbarTagSignal without the information of ccbarTagEventStatus.");
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,

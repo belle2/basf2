@@ -1,4 +1,4 @@
-Changes in the analysis package in light-2504-deimos
+Changes in the analysis package in light-2505-deimos
 ----------------------------------------------------
 
 FEI
@@ -30,7 +30,7 @@ Utilities
 Charm Flavor Tagger
 +++++++++++++++++++
 * Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
-  function `charmFlavorTagger`) to ``CFT_ceres``. It improves the performance but can only be used since light-2504-deimos.
+  function `charmFlavorTagger`) to ``CFT_ceres``. It improves the performance but can only be used since light-2505-deimos.
 
 Modules
 +++++++

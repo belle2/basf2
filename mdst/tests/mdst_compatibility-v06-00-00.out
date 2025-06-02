@@ -7207,7 +7207,7 @@ MCParticle#82:
   isVirtual(): False
 EventLevelTriggerTimeInfo:
   getBunchNumber(): 0
-  getEventT0Sources(): -1718026240
+  getEventT0Sources(): 0
 [ERROR] Cannot find payload in any of the configured global tags
 	name = TTDOffsets
 	globaltags = release-06-00-00, Legacy_CollisionAxisCMS
@@ -15152,7 +15152,7 @@ MCParticle#78:
   isVirtual(): False
 EventLevelTriggerTimeInfo:
   getBunchNumber(): 0
-  getEventT0Sources(): -1718026240
+  getEventT0Sources(): 0
 [ERROR] Payload 'TTDOffsets' not found. To get the (uncorrected) information from TTD, use 'getTimeSinceLastInjection() or 'getTimeSinceLastInjectionInMicroSeconds()'.
   getTimeSinceInjectedBunch(): 2147483647
   getTimeSinceInjectedBunchInMicroSeconds(): 1.68802e+07
@@ -22576,7 +22576,7 @@ MCParticle#90:
   isVirtual(): False
 EventLevelTriggerTimeInfo:
   getBunchNumber(): 0
-  getEventT0Sources(): -1718026240
+  getEventT0Sources(): 0
 [ERROR] Payload 'TTDOffsets' not found. To get the (uncorrected) information from TTD, use 'getTimeSinceLastInjection() or 'getTimeSinceLastInjectionInMicroSeconds()'.
   getTimeSinceInjectedBunch(): 2147483647
   getTimeSinceInjectedBunchInMicroSeconds(): 1.68802e+07

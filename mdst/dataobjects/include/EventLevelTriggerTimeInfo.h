@@ -22,7 +22,7 @@ namespace Belle2 {
   public:
 
     /** Flags for the EventT0 source. */
-    enum EventT0Source : unsigned short {
+    enum EventT0Source : unsigned int {
       // In case additional subdetectors are included in the EventT0 determination,
       // they must be added here.
       // Flags are set in the EventT0Combiner module.

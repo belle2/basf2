@@ -19,6 +19,8 @@ Variables
 * Modified whole event variables, e.g., `weDeltae`, to work with ``useXXXFrame`` instead of requiring additional argument.
   A down-side is that if you used for example ``weMissM2(maskname, 0)`` before, you must now use ``useCMSFrame(weMissM2(maskname, 0))``,
   otherwise you're implicitly calling ``weMissM2(maskname, 5)``.
+* Added new variables `eventT0CalculatedWithSVDInfo`, `eventT0CalculatedWithCDCInfo` and `eventT0CalculatedWithECLInfo`
+  to identify which subdetectors contributed to the final EventT0 determination.
 
 Utilities
 +++++++++

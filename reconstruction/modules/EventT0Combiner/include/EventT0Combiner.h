@@ -11,7 +11,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventT0.h>
-
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 namespace Belle2 {
 
@@ -27,6 +27,9 @@ namespace Belle2 {
     /** Destructor */
     virtual ~EventT0CombinerModule() = default;
 
+    /** Initialize the module */
+    void initialize() override;
+
     /** This method is called for each event. All processing of the event
      * takes place in this method. */
     void event() override;
@@ -38,6 +41,9 @@ namespace Belle2 {
 
     /// Access to global EventT0 which will be read and updated
     StoreObjPtr<EventT0> m_eventT0;
+
+    /// Access to EventLevelTriggerTimeInfo object
+    StoreObjPtr<EventLevelTriggerTimeInfo> m_eventLevelTriggerTimeInfo;
 
   };
 } // Belle2 namespace

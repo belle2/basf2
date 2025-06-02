@@ -55,12 +55,12 @@ namespace Belle2::Conditions {
       const auto gtinfo = get(url);
       return gtinfo.at("globalTagStatus").at("name");
     } catch (std::runtime_error& e) {
-      B2ERROR("Conditions Database: Cannot download information on global tag. Usually this means it "
-              "doesn't exist and you misspelled the name"
-              << LogVar("server url", m_baseUrl) << LogVar("globaltag", name));
+      B2WARNING("Conditions Database: Cannot download information on global tag. "
+                "The database is overloaded or the selected globaltag doesn't exist"
+                << LogVar("server url", m_baseUrl) << LogVar("globaltag", name));
     } catch (std::exception& e) {
-      B2ERROR("Conditions Database: Problem determining global tag status"
-              << LogVar("server url", m_baseUrl) << LogVar("globaltag", name) << LogVar("error", e.what()));
+      B2WARNING("Conditions Database: Problem determining global tag status"
+                << LogVar("server url", m_baseUrl) << LogVar("globaltag", name) << LogVar("error", e.what()));
     }
     return "";
   }
@@ -89,8 +89,8 @@ namespace Belle2::Conditions {
                    ));
       }
     } catch (std::exception& e) {
-      B2ERROR("Conditions Database: Problem parsing payload information."
-              << LogVar("globaltag", globaltag) << LogVar("server url", m_baseUrl) << LogVar("error", e.what()));
+      B2WARNING("Conditions Database: Problem while fetching the list of payloads"
+                << LogVar("globaltag", globaltag) << LogVar("server url", m_baseUrl) << LogVar("query", url) << LogVar("error", e.what()));
       return false;
     }
     return true;

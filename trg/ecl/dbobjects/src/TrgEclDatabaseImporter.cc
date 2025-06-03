@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <map>
 
 using namespace std;
 using namespace Belle2;
@@ -212,7 +213,6 @@ void TrgEclDatabaseImporter::importETMParameter(std::string InputFileName)
   std::vector<double> v_par_value;
   string str_line;
   int cnt_par = 0;
-  int cnt_par_valid = 0;
   while (getline(stream, str_line)) {
     if (str_line.find("#")) {
       std::stringstream sss;
@@ -222,40 +222,40 @@ void TrgEclDatabaseImporter::importETMParameter(std::string InputFileName)
       double tmp_value;
       if (sscanf(sss.str().data(),
                  "%i%99s%lf",
-                 &tmp_id, tmp_name, &tmp_value) != 3) {
+                 &tmp_id, tmp_name, &tmp_value) == 3) {
         string str_tmp_name = string(tmp_name);
         v_par_name.push_back(str_tmp_name);
         v_par_value.push_back(tmp_value);
         cnt_par++;
-        if (str_tmp_name != "spare") {
-          cnt_par_valid++;
-        }
       }
     }
   }
   stream.close();
 
-  B2INFO("The number of parameters (all, valid) in "
+  B2INFO("[TrgEclDatabaseImporter] The number of parameters in "
          << InputFileName
-         << " = ("
-         << cnt_par
-         << ", "
-         << cnt_par_valid
-         << ")");
+         << " = "
+         << cnt_par);
 
   DBImportObjPtr<TRGECLETMParameters> etmpara;
   etmpara.construct();
 
-  etmpara->setnpar(cnt_par_valid);
+  etmpara->setnpar(cnt_par);
+
+  int cnt_spare = 0;
   for (int iii = 0; iii < 300; iii++) {
-    std::string tmp_parname  = "spare";
+    std::string tmp_parname;
     double tmp_parvalue = -1000;
     if (iii < cnt_par) {
       tmp_parname  = v_par_name[iii];
       tmp_parvalue = v_par_value[iii];
+    } else {
+      std::stringstream sss;
+      sss << "spare" << std::setfill('0') << std::setw(3) << cnt_spare;
+      tmp_parname  = sss.str();
+      cnt_spare++;
     }
-    etmpara->setparNames(iii,  tmp_parname);
-    etmpara->setparValues(iii, tmp_parvalue);
+    etmpara->setparMap(tmp_parname, tmp_parvalue);
   }
 
   //Import to DB

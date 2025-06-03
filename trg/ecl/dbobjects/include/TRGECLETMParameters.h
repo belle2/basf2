@@ -11,6 +11,7 @@
 
 #include <TObject.h>
 #include <stdexcept>
+#include <map>
 
 namespace Belle2 {
 
@@ -19,56 +20,33 @@ namespace Belle2 {
   public:
 
     //! Constructor
-    TRGECLETMParameters() : m_parNames{{0}}, m_parValues{0}, m_npar(0) {}
+    TRGECLETMParameters() : m_npar(0) {}
 
     //! set the number of parameters
     void setnpar(int npar)
     {
       m_npar = npar;
     }
-    //! set parameter name
-    void setparNames(int iii, const std::string& parname)
+    //! set parameter map(name and value)
+    void setparMap(std::string parname, double parvalue)
     {
-      m_parNames[iii] = parname;
-    }
-    //! set parameter value
-    void setparValues(int iii, double parvalue)
-    {
-      m_parValues[iii] = parvalue;
+      m_parmap.insert(std::make_pair(parname, parvalue));
     }
     //! get the number of parameters
     int getnpar(void) const
     {
       return m_npar;
     }
-    //! get parameter name
-    const std::string getparNames(int iii) const
+    //! get parameter map(name and value)
+    const std::map<std::string, double>& getparMap(void) const
     {
-      return m_parNames[iii];
-    }
-    //! get parameter value from the index
-    double getparValues(int iii) const
-    {
-      return m_parValues[iii];
-    }
-    //! get parameter value from the parameter name
-    double getparValues(const std::string& parname) const
-    {
-      for (int iii = 0; iii < m_npar; iii++) {
-        if (getparNames(iii) == parname) {
-          return getparValues(iii);
-        }
-      }
-      throw std::invalid_argument("[TRGECLParameters] The parameter does not exist : "
-                                  + parname);
+      return m_parmap;
     }
 
   private :
 
-    //! parameter names
-    std::string m_parNames[300];
-    //! parameter values
-    double m_parValues[300];
+    //! parameter map(name and value)
+    std::map<std::string, double> m_parmap;
     //! the number of valid parameters
     int m_npar;
 

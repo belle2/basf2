@@ -276,7 +276,7 @@ class SplitNMergeSimTask(Basf2Task):
         #: \endcond
     )
     #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
-    queue = 'sx'
+    queue = 's'
 
     #: Name of the ROOT output file with generated and simulated events.
     def output_file_name(self, n_events=None, random_seed=None):
@@ -330,13 +330,16 @@ class SplitNMergeSimTask(Basf2Task):
         """
         create_output_dirs(self)
 
-        file_list = [item for sublist in self.get_input_file_names().values() for item in sublist]
+        file_list = [f for f in self.get_all_input_file_names()]
         print("Merge the following files:")
         print(file_list)
         cmd = ["b2file-merge", "-f"]
         args = cmd + [self.get_output_file_name(self.output_file_name())] + file_list
         subprocess.check_call(args)
+
+    def on_success(self):
         print("Finished merging. Now remove the input files to save space.")
+        file_list = [f for f in self.get_all_input_file_names()]
         for input_file in file_list:
             try:
                 os.remove(input_file)
@@ -395,8 +398,8 @@ class StateRecordingTask(Basf2PathTask):
         path = basf2.create_path()
 
         # get all the file names from the list of input files that are meant for training
-        file_list = [fname for sublist in self.get_input_file_names().values()
-                     for fname in sublist if "generated_mc_N" in fname and "training" in fname and fname.endswith(".root")]
+        file_list = [fname for fname in self.get_all_input_file_names()
+                     if "generated_mc_N" in fname and "training" in fname and fname.endswith(".root")]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")
@@ -675,8 +678,8 @@ class ResultRecordingTask(Basf2PathTask):
         path = basf2.create_path()
 
         # get all the file names from the list of input files that are meant for training
-        file_list = [fname for sublist in self.get_input_file_names().values()
-                     for fname in sublist if "generated_mc_N" in fname and "training" in fname and fname.endswith(".root")]
+        file_list = [fname for fname in self.get_all_input_file_names()
+                     if "generated_mc_N" in fname and "training" in fname and fname.endswith(".root")]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")
@@ -953,8 +956,8 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         path = basf2.create_path()
 
         # get all the file names from the list of input files that are meant for optimisation / validation
-        file_list = [fname for sublist in self.get_input_file_names().values()
-                     for fname in sublist if "generated_mc_N" in fname and "optimisation" in fname and fname.endswith(".root")]
+        file_list = [fname for fname in self.get_all_input_file_names()
+                     if "generated_mc_N" in fname and "optimisation" in fname and fname.endswith(".root")]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")

@@ -7,6 +7,7 @@
 - [Stop/resume](#stopresume)
 - [Rebasing](#rebasing)
 - [Retrain](#retrain)
+- [Reduced](#reduced)
 - [Notes](#notes)
 
 ## Overview
@@ -51,6 +52,37 @@ In order to retrain, the following lines of code need to present in the steering
 ```python
 if pickle.load(open('Summary.pickle', 'rb'))[1].roundMode == 3: 
     output.param('excludeBranchNames', feistate.excludelists)
+```
+
+## Reduced
+Since FEI creates particle lists for every channel, which are then merged and filtered into a single particle list (per particle type),
+there is around 40% of particles in basf2_input/output.root that become redundant after the training. 
+It is possible to minimize the FEI training directory by adding these lines in the steering file:
+
+```python
+output = b2.register_module('RootOutput')
+
+# region for reduced training
+required_lists = feistate.plists + feistate.fsplists
+if len(required_lists) > 0:
+     mod = b2.register_module('RemoveParticlesNotInLists')
+     mod.param('particleLists', required_lists)
+     path.add_module(mod)
+     
+from ROOT import Belle2
+if os.path.exists('basf2_input.root'):  
+  root_file = ROOT.TFile.Open('basf2_input.root', "READ")
+  tree = root_file.Get('tree')
+  datastorelists = []
+  for branch in tree.GetListOfBranches():
+    if ":" not in branch.GetName():
+      datastorelists.append(branch.GetName())
+
+  listWithConjugates = [str(name) for name in list(Belle2.ParticleListName.addAntiParticleLists(required_lists))]
+  output.param('branchNames', listWithConjugates + datastorelists)
+# endregion
+
+path.add_module(output)
 ```
 
 ## Notes

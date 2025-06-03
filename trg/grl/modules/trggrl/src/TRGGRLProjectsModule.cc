@@ -579,10 +579,15 @@ void TRGGRLProjectsModule::event()
   // bha_type13: 33
   bool bha_type13 = (ECLtoGDL[1] & (1 << (33 - 32 * 1))) != 0;
 
-  bool nclst_0 = (eclTrgClusterArray.getEntries() & (1 << 0)) != 0;
-  bool nclst_1 = (eclTrgClusterArray.getEntries() & (1 << 1)) != 0;
-  bool nclst_2 = (eclTrgClusterArray.getEntries() & (1 << 2)) != 0;
-  bool nclst_3 = (eclTrgClusterArray.getEntries() & (1 << 3)) != 0;
+  unsigned int nclst = 0;
+  for (auto& cluster : eclTrgClusterArray) {
+    if (cluster.getMaxThetaId() >= 2 and cluster.getMaxThetaId() <= 15)
+      nclst++;
+  }
+  bool nclst_0 = (nclst & (1 << 0)) != 0;
+  bool nclst_1 = (nclst & (1 << 1)) != 0;
+  bool nclst_2 = (nclst & (1 << 2)) != 0;
+  bool nclst_3 = (nclst & (1 << 3)) != 0;
 
   // ecl_bg_0: 57
   bool ecl_bg_0 = (ECLtoGDL[1] & (1 << (57 - 32 * 1))) != 0;

@@ -81,8 +81,6 @@ namespace Belle2 {
 
     int m_tb = -1; /**< choose one trigger bin, or none if the value is -1*/
 
-    const int m_maxSensorHisto = 5;  /**< maximum number of sensors for additional histogram,  the default value is 5*/
-
     /** list of cumulative histograms */
     TList* m_histoList = nullptr;
 

@@ -362,6 +362,9 @@ class SplitNMergeSimTask(Basf2Task, LSFTask):
         subprocess.check_call(args)
 
     def on_success(self):
+        """
+        On success method.
+        """
         print("Finished merging. Now remove the input files to save space.")
         file_list = [f for f in self.get_all_input_file_names()]
         for input_file in file_list:

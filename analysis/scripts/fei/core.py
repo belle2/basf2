@@ -1113,11 +1113,11 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
                 path.add_path(post_reconstruction.reconstruct())
             if (((configuration.roundMode == 2) or (configuration.roundMode == 3)) and configuration.training):
                 break
-    fsps_of_next_stages = [fsp for sublist in get_stages_from_particles(loader.get_fsp_lists())[stage+1:] for fsp in sublist]
+    fsps_of_all_stages = [fsp for sublist in get_stages_from_particles(loader.get_fsp_lists()) for fsp in sublist]
 
     excludelists = []
     if configuration.training and (configuration.roundMode == 3):
-        dontRemove = used_lists + fsps_of_next_stages
+        dontRemove = used_lists + fsps_of_all_stages
         # cleanup higher stages
         cleanup = basf2.register_module('RemoveParticlesNotInLists')
         print("FEI-REtrain: pruning basf2_input.root of higher stages")
@@ -1132,7 +1132,6 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
                 ROOT.Belle2.ParticleListName.addAntiParticleLists(excludedParticlesNonConjugated))]
         root_file = ROOT.TFile.Open('basf2_input.root', "READ")
         tree = root_file.Get('tree')
-        excludelists = []
         for branch in tree.GetListOfBranches():
             branchName = branch.GetName()
             if any(exParticle in branchName for exParticle in excludedParticles):
@@ -1157,6 +1156,6 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
         save_summary(particles, configuration, stage+1, pickleName=os.path.join(configuration.monitoring_path, 'Summary.pickle'))
 
     # Finally we return the path, the stage and the used lists to the user.
-    return FeiState(path, stage+1, plists=used_lists, fsplists=fsps_of_next_stages, excludelists=excludelists)
+    return FeiState(path, stage+1, plists=used_lists, fsplists=fsps_of_all_stages, excludelists=excludelists)
 
 # @endcond

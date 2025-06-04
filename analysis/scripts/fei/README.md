@@ -63,14 +63,15 @@ It is possible to minimize the FEI training directory by adding these lines in t
 output = b2.register_module('RootOutput')
 
 # region for reduced training
+config = pickle.load(open('Summary.pickle', 'rb'))[1]
 required_lists = feistate.plists + feistate.fsplists
-if len(required_lists) > 0:
+if len(required_lists) > 0 and config.roundMode != 3:
      mod = b2.register_module('RemoveParticlesNotInLists')
      mod.param('particleLists', required_lists)
      path.add_module(mod)
      
 from ROOT import Belle2
-if os.path.exists('basf2_input.root'):  
+if os.path.exists('basf2_input.root') and config.cache > 1:
   root_file = ROOT.TFile.Open('basf2_input.root', "READ")
   tree = root_file.Get('tree')
   datastorelists = []

@@ -140,7 +140,10 @@ you, e.g.::
 """
 
 import itertools
+import os
 import subprocess
+import tempfile
+
 import basf2_mva
 import basf2
 # from tracking import add_track_finding
@@ -164,7 +167,27 @@ except ModuleNotFoundError:
     raise
 
 
-class GenerateSimTask(Basf2PathTask):
+class LSFTask(b2luigi.Task):
+    '''
+    Simple task that defines the configuration of the LSF batch submission.
+    '''
+    batch_system = 'lsf'
+    queue = 's'
+
+    def __init__(self, *args, **kwargs):
+        '''Constructor.'''
+        super().__init__(*args, **kwargs)
+        self.job_name = self.task_id
+
+
+class LSFMemoryIntensiveTask(LSFTask):
+    '''
+    Same as LSFTask, but for memory-intensive tasks.
+    '''
+    job_slots = '4'
+
+
+class GenerateSimTask(Basf2PathTask, LSFTask):
     """
     Generate simulated Monte Carlo with background overlay.
 
@@ -186,8 +209,6 @@ class GenerateSimTask(Basf2PathTask):
         hashed=True
         #: \endcond
     )
-    #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
-    queue = 'l'
 
     #: Name of the ROOT output file with generated and simulated events.
     def output_file_name(self, n_events=None, random_seed=None):
@@ -237,10 +258,16 @@ class GenerateSimTask(Basf2PathTask):
         )
         return path
 
+    def remove_output(self):
+        """
+        Default function from base b2luigi.Task class.
+        """
+        self._remove_output()
+
 
 # I don't use the default MergeTask or similar because they only work if every input file is called the same.
 # Additionally, I want to add more features like deleting the original input to save storage space.
-class SplitNMergeSimTask(Basf2Task):
+class SplitNMergeSimTask(Basf2Task, LSFTask):
     """
     Generate simulated Monte Carlo with background overlay.
 
@@ -262,8 +289,6 @@ class SplitNMergeSimTask(Basf2Task):
         hashed=True
         #: \endcond
     )
-    #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
-    queue = 'sx'
 
     #: Name of the ROOT output file with generated and simulated events.
     def output_file_name(self, n_events=None, random_seed=None):
@@ -317,20 +342,33 @@ class SplitNMergeSimTask(Basf2Task):
         """
         create_output_dirs(self)
 
-        file_list = [item for sublist in self.get_input_file_names().values() for item in sublist]
+        file_list = [f for f in self.get_all_input_file_names()]
         print("Merge the following files:")
         print(file_list)
         cmd = ["b2file-merge", "-f"]
         args = cmd + [self.get_output_file_name(self.output_file_name())] + file_list
         subprocess.check_call(args)
+
+    def on_success(self):
+        """
+        On success method.
+        """
         print("Finished merging. Now remove the input files to save space.")
-        cmd2 = ["rm", "-f"]
-        for tempfile in file_list:
-            args = cmd2 + [tempfile]
-            subprocess.check_call(args)
+        file_list = [f for f in self.get_all_input_file_names()]
+        for input_file in file_list:
+            try:
+                os.remove(input_file)
+            except FileNotFoundError:
+                pass
+
+    def remove_output(self):
+        """
+        Default function from base b2luigi.Task class.
+        """
+        self._remove_output()
 
 
-class ResultRecordingTask(Basf2PathTask):
+class ResultRecordingTask(Basf2PathTask, LSFTask):
     """
     Task to record data for the final result filter. This only requires found and MC-matched SVD and CDC tracks that need to be
     merged, all state filters are set to "all"
@@ -375,8 +413,8 @@ class ResultRecordingTask(Basf2PathTask):
         path = basf2.create_path()
 
         # get all the file names from the list of input files that are meant for training
-        file_list = [fname for sublist in self.get_input_file_names().values()
-                     for fname in sublist if "generated_mc_N" in fname and "training" in fname and fname.endswith(".root")]
+        file_list = [fname for fname in self.get_all_input_file_names()
+                     if "generated_mc_N" in fname and "training" in fname and fname.endswith(".root")]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")
@@ -438,8 +476,14 @@ class ResultRecordingTask(Basf2PathTask):
             result_filter_records_name=self.get_output_file_name(self.result_filter_records_name),
         )
 
+    def remove_output(self):
+        """
+        Default function from base b2luigi.Task class.
+        """
+        self._remove_output()
 
-class CKFResultFilterTeacherTask(Basf2Task):
+
+class CKFResultFilterTeacherTask(Basf2Task, LSFMemoryIntensiveTask):
     """
     A teacher task runs the basf2 mva teacher on the training data provided by a
     data collection task.
@@ -529,8 +573,14 @@ class CKFResultFilterTeacherTask(Basf2Task):
         )
         basf2_mva.download(weightfile_identifier, self.get_output_file_name(weightfile_identifier + ".root"))
 
+    def remove_output(self):
+        """
+        Default function from base b2luigi.Task class.
+        """
+        self._remove_output()
 
-class ValidationAndOptimisationTask(Basf2PathTask):
+
+class ValidationAndOptimisationTask(Basf2PathTask, LSFTask):
 
     """
     Validate the performance of the trained filters by trying various combinations of FastBDT options, as well as cut values for
@@ -589,8 +639,8 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         path = basf2.create_path()
 
         # get all the file names from the list of input files that are meant for optimisation / validation
-        file_list = [fname for sublist in self.get_input_file_names().values()
-                     for fname in sublist if "generated_mc_N" in fname and "optimisation" in fname and fname.endswith(".root")]
+        file_list = [fname for fname in self.get_all_input_file_names()
+                     if "generated_mc_N" in fname and "optimisation" in fname and fname.endswith(".root")]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")
@@ -680,6 +730,12 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         """
         return self.create_optimisation_and_validation_path()
 
+    def remove_output(self):
+        """
+        Default function from base b2luigi.Task class.
+        """
+        self._remove_output()
+
 
 class MainTask(b2luigi.WrapperTask):
     """
@@ -719,6 +775,9 @@ class MainTask(b2luigi.WrapperTask):
     #: Transform dictionary keys (exp. numbers) from strings to int
     bkgfiles_by_exp = {int(key): val for (key, val) in bkgfiles_by_exp.items()}
 
+    #: Use local resources
+    batch_system = 'local'
+
     def requires(self):
         """
         Generate list of tasks that needs to be done for luigi to finish running
@@ -752,6 +811,6 @@ class MainTask(b2luigi.WrapperTask):
 if __name__ == "__main__":
 
     b2luigi.set_setting("env_script", "./setup_basf2.sh")
-    b2luigi.get_setting("batch_system", default="lsf")
+    b2luigi.set_setting("scratch_dir", tempfile.gettempdir())
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MainTask(), workers=workers, batch=True)

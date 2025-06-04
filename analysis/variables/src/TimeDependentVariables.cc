@@ -299,8 +299,9 @@ namespace Belle2 {
     double vertexTruthBoostDirection(const Particle* part)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
       ROOT::Math::XYZVector boostDir = -(beamParamsDB->getHER() + beamParamsDB->getLER()).BoostToCM().Unit();
-
       const MCParticle* mcPart = part->getMCParticle();
       if (!mcPart) return Const::doubleNaN;
       ROOT::Math::XYZVector pos = mcPart->getDecayVertex();
@@ -310,9 +311,10 @@ namespace Belle2 {
     double vertexTruthOrthogonalBoostDirection(const Particle* part)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
       ROOT::Math::XYZVector boost = -(beamParamsDB->getHER() + beamParamsDB->getLER()).BoostToCM();
       ROOT::Math::XYZVector orthBoostDir = getUnitOrthogonal(boost);
-
       const MCParticle* mcPart = part->getMCParticle();
       if (!mcPart) return Const::doubleNaN;
       ROOT::Math::XYZVector pos = mcPart->getDecayVertex();

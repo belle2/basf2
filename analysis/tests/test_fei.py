@@ -651,33 +651,29 @@ class TestPostReconstruction(unittest.TestCase):
 
         path.add_module('MVAExpert', identifier='UNITTEST_pi+:generic ==> pi+:FSP', extraInfoName='SignalProbability',
                         listNames=['pi+:generic_0'])
-        path.add_module('TagUniqueSignal', particleList='pi+:generic_0', target='isPrimarySignal',
-                        extraInfoName='uniqueSignal')
         path.add_module('ParticleListManipulator', outputListName='pi+:generic', inputListNames=['pi+:generic_0'],
                         variable='particleSource', writeOut=True)
         path.add_module('ParticleSelector', decayString='pi+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='pi+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
+        path.add_module('TagUniqueSignal', particleList='pi+:generic', target='isPrimarySignal',
+                        extraInfoName='uniqueSignal')
 
         path.add_module('MVAExpert', identifier='UNITTEST_K+:generic ==> K+:FSP', extraInfoName='SignalProbability',
                         listNames=['K+:generic_0'])
-        path.add_module('TagUniqueSignal', particleList='K+:generic_0', target='isPrimarySignal',
-                        extraInfoName='uniqueSignal')
         path.add_module('ParticleListManipulator', outputListName='K+:generic', inputListNames=['K+:generic_0'],
                         variable='particleSource', writeOut=True)
         path.add_module('ParticleSelector', decayString='K+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='K+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
+        path.add_module('TagUniqueSignal', particleList='K+:generic', target='isPrimarySignal',
+                        extraInfoName='uniqueSignal')
 
         path.add_module('MVAExpert', identifier='UNITTEST_D0:generic ==> K-:generic pi+:generic',
                         extraInfoName='SignalProbability', listNames=['D0:generic_0'])
-        path.add_module('TagUniqueSignal', particleList='D0:generic_0', target='isSignal',
-                        extraInfoName='uniqueSignal')
 
         path.add_module('MVAExpert', identifier='UNITTEST_D0:generic ==> pi-:generic pi+:generic',
                         extraInfoName='SignalProbability', listNames=['D0:generic_1'])
-        path.add_module('TagUniqueSignal', particleList='D0:generic_1', target='isSignal',
-                        extraInfoName='uniqueSignal')
 
         path.add_module('ParticleListManipulator', outputListName='D0:generic',
                         inputListNames=['D0:generic_0', 'D0:generic_1'], variable='particleSource',
@@ -685,6 +681,8 @@ class TestPostReconstruction(unittest.TestCase):
         path.add_module('ParticleSelector', decayString='D0:generic', cut='0.001 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='D0:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
+        path.add_module('TagUniqueSignal', particleList='D0:generic', target='isSignal',
+                        extraInfoName='uniqueSignal')
 
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
@@ -698,33 +696,29 @@ class TestPostReconstruction(unittest.TestCase):
 
         path.add_module('MVAExpert', identifier='pi+:generic ==> pi+:FSP.xml', extraInfoName='SignalProbability',
                         listNames=['pi+:generic_0'])
-        path.add_module('TagUniqueSignal', particleList='pi+:generic_0', target='isPrimarySignal',
-                        extraInfoName='uniqueSignal')
         path.add_module('ParticleListManipulator', outputListName='pi+:generic', inputListNames=['pi+:generic_0'],
                         variable='particleSource', writeOut=True)
         path.add_module('ParticleSelector', decayString='pi+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='pi+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
+        path.add_module('TagUniqueSignal', particleList='pi+:generic', target='isPrimarySignal',
+                        extraInfoName='uniqueSignal')
 
         path.add_module('MVAExpert', identifier='K+:generic ==> K+:FSP.xml', extraInfoName='SignalProbability',
                         listNames=['K+:generic_0'])
-        path.add_module('TagUniqueSignal', particleList='K+:generic_0', target='isPrimarySignal',
-                        extraInfoName='uniqueSignal')
         path.add_module('ParticleListManipulator', outputListName='K+:generic', inputListNames=['K+:generic_0'],
                         variable='particleSource', writeOut=True)
         path.add_module('ParticleSelector', decayString='K+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='K+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
+        path.add_module('TagUniqueSignal', particleList='K+:generic', target='isPrimarySignal',
+                        extraInfoName='uniqueSignal')
 
         path.add_module('MVAExpert', identifier='D0:generic ==> K-:generic pi+:generic.xml',
                         extraInfoName='SignalProbability', listNames=['D0:generic_0'])
-        path.add_module('TagUniqueSignal', particleList='D0:generic_0', target='isSignal',
-                        extraInfoName='uniqueSignal')
 
         path.add_module('MVAExpert', identifier='D0:generic ==> pi-:generic pi+:generic.xml',
                         extraInfoName='SignalProbability', listNames=['D0:generic_1'])
-        path.add_module('TagUniqueSignal', particleList='D0:generic_1', target='isSignal',
-                        extraInfoName='uniqueSignal')
 
         path.add_module('ParticleListManipulator', outputListName='D0:generic',
                         inputListNames=['D0:generic_0', 'D0:generic_1'], variable='particleSource',
@@ -732,6 +726,8 @@ class TestPostReconstruction(unittest.TestCase):
         path.add_module('ParticleSelector', decayString='D0:generic', cut='0.001 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='D0:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
+        path.add_module('TagUniqueSignal', particleList='D0:generic', target='isSignal',
+                        extraInfoName='uniqueSignal')
 
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
@@ -745,11 +741,9 @@ class TestPostReconstruction(unittest.TestCase):
 
         path.add_module('MVAExpert', identifier='UNITTEST_pi+:generic ==> pi+:FSP', extraInfoName='SignalProbability',
                         listNames=['pi+:generic_0'])
-        path.add_module('TagUniqueSignal', particleList='pi+:generic_0', target='isPrimarySignal',
-                        extraInfoName='uniqueSignal')
 
         path.add_module('VariablesToHistogram', particleList='pi+:generic_0',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
+                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus',
                                                                  'extraInfo(SignalProbability)',
                                                                  'isPrimarySignal', 'extraInfo(decayModeID)']),
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(SignalProbability)', 'isPrimarySignal'),
@@ -757,14 +751,13 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('extraInfo(SignalProbability)', 'mcParticleStatus'),
                                                                        ('extraInfo(decayModeID)', 'isPrimarySignal'),
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
-                                                                       ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
                         fileName='Monitor_PostReconstruction_AfterMVA.root', directory='pi+:generic ==> pi+:FSP',
                         ignoreCommandLineOverride=True)
         path.add_module('ParticleListManipulator', outputListName='pi+:generic', inputListNames=['pi+:generic_0'],
                         variable='particleSource', writeOut=True)
         path.add_module('VariablesToHistogram', particleList='pi+:generic',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
+                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus',
                                                                  'extraInfo(SignalProbability)',
                                                                  'isPrimarySignal', 'extraInfo(decayModeID)']),
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isPrimarySignal'),
@@ -774,7 +767,7 @@ class TestPostReconstruction(unittest.TestCase):
                         ignoreCommandLineOverride=True)
         path.add_module('ParticleSelector', decayString='pi+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('VariablesToHistogram', particleList='pi+:generic',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
+                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus',
                                                                  'extraInfo(SignalProbability)',
                                                                  'isPrimarySignal', 'extraInfo(decayModeID)']),
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isPrimarySignal'),
@@ -784,8 +777,10 @@ class TestPostReconstruction(unittest.TestCase):
                         ignoreCommandLineOverride=True)
         path.add_module('BestCandidateSelection', particleList='pi+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
+        path.add_module('TagUniqueSignal', particleList='pi+:generic', target='isPrimarySignal',
+                        extraInfoName='uniqueSignal')
         path.add_module('VariablesToHistogram', particleList='pi+:generic',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
+                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus',
                                                                  'extraInfo(SignalProbability)', 'isPrimarySignal',
                                                                  'extraInfo(decayModeID)', 'extraInfo(postCut_rank)']),
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isPrimarySignal'),
@@ -805,10 +800,8 @@ class TestPostReconstruction(unittest.TestCase):
 
         path.add_module('MVAExpert', identifier='UNITTEST_K+:generic ==> K+:FSP', extraInfoName='SignalProbability',
                         listNames=['K+:generic_0'])
-        path.add_module('TagUniqueSignal', particleList='K+:generic_0', target='isPrimarySignal',
-                        extraInfoName='uniqueSignal')
         path.add_module('VariablesToHistogram', particleList='K+:generic_0',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
+                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus',
                                                                  'extraInfo(SignalProbability)',
                                                                  'isPrimarySignal', 'extraInfo(decayModeID)']),
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(SignalProbability)', 'isPrimarySignal'),
@@ -816,14 +809,13 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('extraInfo(SignalProbability)', 'mcParticleStatus'),
                                                                        ('extraInfo(decayModeID)', 'isPrimarySignal'),
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
-                                                                       ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
                         fileName='Monitor_PostReconstruction_AfterMVA.root', directory='K+:generic ==> K+:FSP',
                         ignoreCommandLineOverride=True)
         path.add_module('ParticleListManipulator', outputListName='K+:generic', inputListNames=['K+:generic_0'],
                         variable='particleSource', writeOut=True)
         path.add_module('VariablesToHistogram', particleList='K+:generic',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
+                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus',
                                                                  'extraInfo(SignalProbability)',
                                                                  'isPrimarySignal', 'extraInfo(decayModeID)']),
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isPrimarySignal'),
@@ -833,7 +825,7 @@ class TestPostReconstruction(unittest.TestCase):
                         ignoreCommandLineOverride=True)
         path.add_module('ParticleSelector', decayString='K+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('VariablesToHistogram', particleList='K+:generic',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
+                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus',
                                                                  'extraInfo(SignalProbability)',
                                                                  'isPrimarySignal', 'extraInfo(decayModeID)']),
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isPrimarySignal'),
@@ -843,8 +835,10 @@ class TestPostReconstruction(unittest.TestCase):
                         ignoreCommandLineOverride=True)
         path.add_module('BestCandidateSelection', particleList='K+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
+        path.add_module('TagUniqueSignal', particleList='K+:generic', target='isPrimarySignal',
+                        extraInfoName='uniqueSignal')
         path.add_module('VariablesToHistogram', particleList='K+:generic',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
+                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus',
                                                                  'extraInfo(SignalProbability)', 'isPrimarySignal',
                                                                  'extraInfo(decayModeID)', 'extraInfo(postCut_rank)']),
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isPrimarySignal'),
@@ -864,10 +858,8 @@ class TestPostReconstruction(unittest.TestCase):
 
         path.add_module('MVAExpert', identifier='UNITTEST_D0:generic ==> K-:generic pi+:generic',
                         extraInfoName='SignalProbability', listNames=['D0:generic_0'])
-        path.add_module('TagUniqueSignal', particleList='D0:generic_0', target='isSignal',
-                        extraInfoName='uniqueSignal')
         path.add_module('VariablesToHistogram', particleList='D0:generic_0',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
+                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus',
                                                                  'extraInfo(SignalProbability)',
                                                                  'isSignal', 'extraInfo(decayModeID)']),
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(SignalProbability)', 'isSignal'),
@@ -875,17 +867,14 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('extraInfo(SignalProbability)', 'mcParticleStatus'),
                                                                        ('extraInfo(decayModeID)', 'isSignal'),
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
-                                                                       ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
                         fileName='Monitor_PostReconstruction_AfterMVA.root', directory='D0:generic ==> K-:generic pi+:generic',
                         ignoreCommandLineOverride=True)
 
         path.add_module('MVAExpert', identifier='UNITTEST_D0:generic ==> pi-:generic pi+:generic',
                         extraInfoName='SignalProbability', listNames=['D0:generic_1'])
-        path.add_module('TagUniqueSignal', particleList='D0:generic_1', target='isSignal',
-                        extraInfoName='uniqueSignal')
         path.add_module('VariablesToHistogram', particleList='D0:generic_1',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
+                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus',
                                                                  'extraInfo(SignalProbability)',
                                                                  'isSignal', 'extraInfo(decayModeID)']),
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(SignalProbability)', 'isSignal'),
@@ -893,7 +882,6 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('extraInfo(SignalProbability)', 'mcParticleStatus'),
                                                                        ('extraInfo(decayModeID)', 'isSignal'),
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
-                                                                       ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
                         fileName='Monitor_PostReconstruction_AfterMVA.root', directory='D0:generic ==> pi-:generic pi+:generic',
                         ignoreCommandLineOverride=True)
@@ -902,7 +890,7 @@ class TestPostReconstruction(unittest.TestCase):
                         inputListNames=['D0:generic_0', 'D0:generic_1'], variable='particleSource',
                         writeOut=True)
         path.add_module('VariablesToHistogram', particleList='D0:generic',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
+                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus',
                                                                  'extraInfo(SignalProbability)',
                                                                  'isSignal', 'extraInfo(decayModeID)']),
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isSignal'),
@@ -912,7 +900,7 @@ class TestPostReconstruction(unittest.TestCase):
                         ignoreCommandLineOverride=True)
         path.add_module('ParticleSelector', decayString='D0:generic', cut='0.001 < extraInfo(SignalProbability)')
         path.add_module('VariablesToHistogram', particleList='D0:generic',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
+                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus',
                                                                  'extraInfo(SignalProbability)',
                                                                  'isSignal', 'extraInfo(decayModeID)']),
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isSignal'),
@@ -922,8 +910,10 @@ class TestPostReconstruction(unittest.TestCase):
                         ignoreCommandLineOverride=True)
         path.add_module('BestCandidateSelection', particleList='D0:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
+        path.add_module('TagUniqueSignal', particleList='D0:generic', target='isSignal',
+                        extraInfoName='uniqueSignal')
         path.add_module('VariablesToHistogram', particleList='D0:generic',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
+                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus',
                                                                  'extraInfo(SignalProbability)', 'isSignal',
                                                                  'extraInfo(decayModeID)', 'extraInfo(postCut_rank)']),
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isSignal'),

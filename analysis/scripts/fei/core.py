@@ -896,7 +896,7 @@ def get_stages_from_particles(particles: typing.Sequence[typing.Union[config.Par
         [p for p in particles if get_pname(p) in ['K_S0', 'Sigma+']],
         [p for p in particles if get_pname(p) in ['D+', 'D0', 'D_s+', 'Lambda_c+'] and 'tag' not in get_plabel(p)],
         [p for p in particles if get_pname(p) in ['D*+', 'D*0', 'D_s*+'] and 'tag' not in get_plabel(p)],
-        [p for p in particles if get_pname(p) in ['B0', 'B+', 'B_s0'] and 'tag' not in get_plabel(p)],
+        [p for p in particles if get_pname(p) in ['B0', 'B+', 'B_s0'] or 'tag' in get_plabel(p)],
         []
     ]
 

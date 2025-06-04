@@ -151,8 +151,8 @@ void TrackFitter::resetFitterToDBSettings(const DAFConfiguration::ETrackFitType 
                                            true,
                                            DAFParams->getDeltaPValue(),
                                            DAFParams->getDeltaWeight(),
-                                           DAFParams->getProbabilityCut());
-  //             DAFParams->getMinimumPValue()); // waiting for genfit merge
+                                           DAFParams->getProbabilityCut(),
+                                           DAFParams->getMinimumPValue());
   dafFitter->setMaxFailedHits(DAFParams->getMaximumFailedHits());
   m_fitter.reset(dafFitter);
   m_skipDirtyCheck = false;
@@ -169,8 +169,8 @@ void TrackFitter::resetFitterToUserSettings(DAFParameters* DAFParams)
                                            true,
                                            DAFParams->getDeltaPValue(),
                                            DAFParams->getDeltaWeight(),
-                                           DAFParams->getProbabilityCut());
-  //                                       DAFParams->getMinimumPValue()); // waiting for genfit merge
+                                           DAFParams->getProbabilityCut(),
+                                           DAFParams->getMinimumPValue());
   dafFitter->setMaxFailedHits(DAFParams->getMaximumFailedHits());
   m_fitter.reset(dafFitter);
   m_skipDirtyCheck = false;

@@ -112,9 +112,6 @@ void SVDDQMClustersOnTrackModule::defineHisto()
     oldDir->cd(m_histogramDirectoryName.c_str());
   }
 
-  // basic constants presets:
-  int nSVDSensors = gTools->getNumberOfSVDSensors();
-
   if (m_addSensorPlots) {
     m_clstrkChargeU = new TH1F*[m_addSensorLabel.size()];
     m_clstrkChargeV = new TH1F*[m_addSensorLabel.size()];
@@ -345,64 +342,56 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   // Additional sensor plots
   //----------------------------------------------------------------
   if (m_addSensorPlots) {
-    for (int i = 0; i < nSVDSensors; i++) {
-      VxdID id = gTools->getSensorIDFromSVDIndex(i);
-      int iLayer = id.getLayerNumber();
-      int iLadder = id.getLadderNumber();
-      int iSensor = id.getSensorNumber();
-      VxdID sensorID(iLayer, iLadder, iSensor);
-      string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
-      string sensorId = str(format("%1%.%2%.%3%") % iLayer % iLadder % iSensor);
+    for (int i = 0; i < (int)m_addSensorLabel.size(); i++) {
 
-      auto it = find(m_addSensorLabel.begin(), m_addSensorLabel.end(), sensorId);
-      if (it == m_addSensorLabel.end()) continue;
-      int idx = distance(m_addSensorLabel.begin(), it);
+      string sensorDescr = m_addSensorLabel[i];
+      replace(sensorDescr.begin(), sensorDescr.end(), '.', '_');
 
       //----------------------------------------------------------------
       // Charge of clusters
       //----------------------------------------------------------------
-      name = str(format("SVDTRK_%1%_ClusterChargeU") % idx);
+      name = str(format("SVDTRK_%1%_ClusterChargeU") % sensorDescr);
       title = str(format("SVD Sensor %1% U-Cluster-on-Track Charge") % sensorDescr);
-      m_clstrkChargeU[idx] = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
-      m_clstrkChargeU[idx]->GetXaxis()->SetTitle("cluster charge [ke-]");
-      m_clstrkChargeU[idx]->GetYaxis()->SetTitle("count");
-      m_histoList->Add(m_clstrkChargeU[idx]);
-      name = str(format("SVDTRK_%1%_ClusterChargeV") % idx);
+      m_clstrkChargeU[i] = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
+      m_clstrkChargeU[i]->GetXaxis()->SetTitle("cluster charge [ke-]");
+      m_clstrkChargeU[i]->GetYaxis()->SetTitle("count");
+      m_histoList->Add(m_clstrkChargeU[i]);
+      name = str(format("SVDTRK_%1%_ClusterChargeV") % sensorDescr);
       title = str(format("SVD Sensor %1% V-Cluster-on-Track Charge") % sensorDescr);
-      m_clstrkChargeV[idx] = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
-      m_clstrkChargeV[idx]->GetXaxis()->SetTitle("cluster charge [ke-]");
-      m_clstrkChargeV[idx]->GetYaxis()->SetTitle("count");
-      m_histoList->Add(m_clstrkChargeV[idx]);
+      m_clstrkChargeV[i] = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
+      m_clstrkChargeV[i]->GetXaxis()->SetTitle("cluster charge [ke-]");
+      m_clstrkChargeV[i]->GetYaxis()->SetTitle("count");
+      m_histoList->Add(m_clstrkChargeV[i]);
       //----------------------------------------------------------------
       // SNR of clusters
       //----------------------------------------------------------------
-      name = str(format("SVDTRK_%1%_ClusterSNRU") % idx);
+      name = str(format("SVDTRK_%1%_ClusterSNRU") % sensorDescr);
       title = str(format("SVD Sensor %1% U-Cluster-on-Track SNR") % sensorDescr);
-      m_clstrkSNRU[idx] = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
-      m_clstrkSNRU[idx]->GetXaxis()->SetTitle("cluster SNR");
-      m_clstrkSNRU[idx]->GetYaxis()->SetTitle("count");
-      m_histoList->Add(m_clstrkSNRU[idx]);
-      name = str(format("SVDTRK_%1%_ClusterSNRV") % idx);
+      m_clstrkSNRU[i] = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
+      m_clstrkSNRU[i]->GetXaxis()->SetTitle("cluster SNR");
+      m_clstrkSNRU[i]->GetYaxis()->SetTitle("count");
+      m_histoList->Add(m_clstrkSNRU[i]);
+      name = str(format("SVDTRK_%1%_ClusterSNRV") % sensorDescr);
       title = str(format("SVD Sensor %1% V-Cluster-on-Track SNR") % sensorDescr);
-      m_clstrkSNRV[idx] = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
-      m_clstrkSNRV[idx]->GetXaxis()->SetTitle("cluster SNR");
-      m_clstrkSNRV[idx]->GetYaxis()->SetTitle("count");
-      m_histoList->Add(m_clstrkSNRV[idx]);
+      m_clstrkSNRV[i] = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
+      m_clstrkSNRV[i]->GetXaxis()->SetTitle("cluster SNR");
+      m_clstrkSNRV[i]->GetYaxis()->SetTitle("count");
+      m_histoList->Add(m_clstrkSNRV[i]);
       //----------------------------------------------------------------
       // Cluster time distribution
       //----------------------------------------------------------------
-      name = str(format("SVDTRK_%1%_ClusterTimeU") % idx);
+      name = str(format("SVDTRK_%1%_ClusterTimeU") % sensorDescr);
       title = Form("SVD Sensor %s U-Cluster-on-Track Time %s", sensorDescr.c_str(), refFrame.Data());
-      m_clstrkTimeU[idx] = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-      m_clstrkTimeU[idx]->GetXaxis()->SetTitle("cluster time (ns)");
-      m_clstrkTimeU[idx]->GetYaxis()->SetTitle("count");
-      m_histoList->Add(m_clstrkTimeU[idx]);
-      name = str(format("SVDTRK_%1%_ClusterTimeV") % idx);
+      m_clstrkTimeU[i] = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+      m_clstrkTimeU[i]->GetXaxis()->SetTitle("cluster time (ns)");
+      m_clstrkTimeU[i]->GetYaxis()->SetTitle("count");
+      m_histoList->Add(m_clstrkTimeU[i]);
+      name = str(format("SVDTRK_%1%_ClusterTimeV") % sensorDescr);
       title = Form("SVD Sensor %s V-Cluster-on-Track Time %s", sensorDescr.c_str(), refFrame.Data());
-      m_clstrkTimeV[idx] = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-      m_clstrkTimeV[idx]->GetXaxis()->SetTitle("cluster time (ns)");
-      m_clstrkTimeV[idx]->GetYaxis()->SetTitle("count");
-      m_histoList->Add(m_clstrkTimeV[idx]);
+      m_clstrkTimeV[i] = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+      m_clstrkTimeV[i]->GetXaxis()->SetTitle("cluster time (ns)");
+      m_clstrkTimeV[i]->GetYaxis()->SetTitle("count");
+      m_histoList->Add(m_clstrkTimeV[i]);
     }
   }
   oldDir->cd();

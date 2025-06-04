@@ -36,29 +36,40 @@ namespace Belle2 {
     /** Destructor */
     ~DAFConfiguration() {}
 
-    // /** Set the probability cut for the weight calculation for the hits
-    // * @param probabilitycut probability cut used in setProbCut and addProbCut method from DAF
-    // */
-    // void setProbabilityCut(const float probabilitycut)
-    // {
-    //   m_ProbabilityCut = probabilitycut;
-    // }
-
     /** Get the DAFParameters for the specific track fit type
      */
     const DAFParameters* getDAFParameters(DAFConfiguration::ETrackFitType trackFitType) const
     {
-      std::map<DAFConfiguration::ETrackFitType, DAFParameters*>::const_iterator it = m_DAFParameters.find(trackFitType);
+      std::map<DAFConfiguration::ETrackFitType, DAFParameters>::const_iterator it = m_DAFParameters.find(trackFitType);
       if (it != m_DAFParameters.end()) {
-        return it->second;
+        return &it->second;
       } else {
         B2FATAL("Track Fit option " << trackFitType << " not found");
       }
     }
 
+    /** Set the DAFParameters for the specific track fit type
+     */
+    void setDAFParameters(DAFConfiguration::ETrackFitType trackFitType,  const DAFParameters* DAFParam)
+    {
+      if (DAFParam == NULL) {
+        B2FATAL("Cannot set DAFParameters since the parameter is NULL");
+      }
+
+      std::map<DAFConfiguration::ETrackFitType, DAFParameters>::const_iterator it = m_DAFParameters.find(trackFitType);
+
+      if (it != m_DAFParameters.end()) {
+        // if it does already exist
+        B2INFO("DAFParameters for track Fit option " << trackFitType << " already exists. Overwriting.");
+      }
+
+      // Setting the corresponding DAFParameter
+      m_DAFParameters[trackFitType] = *DAFParam;
+    }
+
   private:
     /** The minimum allowed pValue for the convergence criterion */
-    std::map<DAFConfiguration::ETrackFitType, DAFParameters*> m_DAFParameters;
+    std::map<DAFConfiguration::ETrackFitType, DAFParameters> m_DAFParameters;
 
     ClassDef(DAFConfiguration, 1);  /**< ClassDef, necessary for ROOT */
   };

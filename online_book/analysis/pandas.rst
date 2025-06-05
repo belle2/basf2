@@ -25,6 +25,7 @@ Importing ROOT files
 Please refer to `uproot <https://uproot.readthedocs.io/en/stable/index.html>` documentation for details. 
 
 To provide quick code snippets, 
+
 .. code:: python 
 
     import uproot
@@ -32,6 +33,7 @@ To provide quick code snippets,
     file = uproot.open("path/to/dataset.root")
 
 Assuming your ROOT file has different TTrees and you just want to access one of them, 
+
 .. code:: python 
 
     tree = uproot.open("path/to/dataset.root:myTree")
@@ -78,6 +80,7 @@ Think of an DataFrame as a table that you can use to compute new
 columns from existing ones and filter based on various conditions.
 
 To illustrate some preliminary examples, we will demonstrate using the following toy example: 
+
 .. code:: python
 
     import pandas as pd
@@ -93,6 +96,7 @@ To illustrate some preliminary examples, we will demonstrate using the following
 
 Method 1: Boolean indexing  
 Simplest method when filtering rows based on conditions applied to individual columns. 
+
 .. code:: python
 
     # keeping events with var1 > 0.5
@@ -110,6 +114,7 @@ Simplest method when filtering rows based on conditions applied to individual co
 
 Method 2: Using df.loc[] accessor 
 For when you need to filter both rows and columns simutaneously. 
+
 .. code:: python
 
     # along with the masks we apply above, we will also only select on the variable columns
@@ -144,6 +149,7 @@ look at the length of the dataframes before and after the filter.
 
 Additionally, you can also plot your dataframes quite easily for inspection. 
 See the code snippet below: 
+
 .. code:: python
 
     import plothist # library developed by Belle II collaborators for beautiful plots 
@@ -167,13 +173,14 @@ See the code snippet below:
 
 
 Slightly advanced topics 
-----------
+-------------------------
 
 **Resampling**:
 
 For some nontrivial tasks (ex. Machine Learning, toy studies), you will need to be able to 
 select on a subset of events at random (ex. bootstrapping, creating training data, etc.). 
 While you are free to create custom solutions, you can also use the following built-in funciton. 
+
 .. code:: python
 
     # Sample 42 random rows with replacement
@@ -195,8 +202,9 @@ For those explicitly doing machine learning, you can also *import sklearn* and u
 **Concatinating**:
 
 For many analyses, you will probably be working with collections (see :ref:`GBASF2_Collections`), where you
- might have a ROOT file corresponding to each collection. Naturally, you might want a way to combine dataframes 
- with the same columns/keys. In this scenario, simply do 
+might have a ROOT file corresponding to each collection. Naturally, you might want a way to combine dataframes 
+with the same columns/keys. In this scenario, simply do 
+
 .. code:: python
 
     # if you have a persistent list and want to combine them all at once. 
@@ -213,6 +221,7 @@ For details, see `here <https://pandas.pydata.org/docs/reference/api/pandas.merg
 
 Let's take an example where you have a dataframe with the three momenta (:math:`p_x, p_y, p_z`) for two different electrons (e1, e2)
 and you forgot to include the energy and momentum magnitude. You can simply take your existing dataframe and add them. 
+
 .. code:: python
 
     # existing df with only the three-momenta and E of your electrons

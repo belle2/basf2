@@ -6,7 +6,7 @@ Reconstruction
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 30 minutes
+    **Length**: 30-60 min
 
     **Prerequisites**:
 

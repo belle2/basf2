@@ -247,7 +247,7 @@ def do_trainings(args):
     os.chdir(args.directory)
     for i in range(args.nJobs):
         for xmlfile in xmlfiles:
-            if not os.path.isfile(f'/jobs/{i}/' + xmlfile):
+            if not (os.path.exists(f'jobs/{i}/' + xmlfile) or os.path.islink(f'jobs/{i}/' + xmlfile)):
                 print("Added missing symlink to ", xmlfile, " in job directory ", i)
                 os.symlink('../../collection/' + xmlfile, f'jobs/{i}/' + xmlfile)
 

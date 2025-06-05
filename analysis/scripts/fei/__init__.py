@@ -20,6 +20,7 @@ __all__ = [
     'FeiState',
     'get_path',
     'get_default_channels',
+    'get_ccbarLambdaC_channels',
     'get_unittest_channels',
     'do_trainings',
     'get_mode_names',
@@ -33,5 +34,5 @@ __all__ = [
 # @endcond
 
 from fei.config import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration, FeiConfiguration, DecayChannel
-from fei.default_channels import get_default_channels, get_unittest_channels, get_mode_names
+from fei.default_channels import get_default_channels, get_ccbarLambdaC_channels, get_unittest_channels, get_mode_names
 from fei.core import get_path, FeiState, do_trainings

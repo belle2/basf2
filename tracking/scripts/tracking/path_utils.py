@@ -9,6 +9,9 @@
 
 from pybasf2 import B2WARNING, B2FATAL
 
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
+from ROOT.Belle2 import DAFConfiguration
+
 from basf2 import register_module
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, add_cosmics_pxd_ckf
 from pxd import add_pxd_reconstruction
@@ -87,7 +90,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
         to the path that sets the quality indicator property of the found tracks.
     """
 
-    add_prefilter_track_fit_and_track_creator(path,
+    add_prefilter_track_fit_and_track_creator(path, components=components,
                                               trackFitHypotheses=trackFitHypotheses,
                                               reco_tracks=reco_tracks,
                                               add_mva_quality_indicator=add_mva_quality_indicator)
@@ -100,13 +103,14 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
         add_prune_tracks(path, components=components, reco_tracks=reco_tracks)
 
 
-def add_prefilter_track_fit_and_track_creator(path, trackFitHypotheses=None,
+def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHypotheses=None,
                                               reco_tracks="RecoTracks", add_mva_quality_indicator=False):
     """
     Helper function to add only the modules required to calculate HLT filter decision:
     performing the track fit and the Belle2 track creation to the path.
 
     :param path: The path to add the tracking reconstruction modules to
+    :param components: the list of geometry components in use or None for all components.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param add_mva_quality_indicator: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found tracks.
@@ -116,8 +120,15 @@ def add_prefilter_track_fit_and_track_creator(path, trackFitHypotheses=None,
     path.add_module("IPTrackTimeEstimator",
                     recoTracksStoreArrayName=reco_tracks, useFittedInformation=False)
     # track fitting
-    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name(
-        "Combined_DAFRecoFitter")
+    if not is_svd_used(components) and not is_pxd_used(components) and is_cdc_used(components):
+        # Use CDC-only DAFParameters
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name(
+            "Combined_DAFRecoFitter", trackFitType=DAFConfiguration.c_CDConly)
+
+    else:
+        # Use the default DAFParameter
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name(
+            "Combined_DAFRecoFitter", trackFitType=DAFConfiguration.c_Default)
     # Add MVA classifier that uses information not included in the calculation of the fit p-value
     # to add a track quality indicator for classification of fake vs. MC-matched tracks
 

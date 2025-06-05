@@ -287,7 +287,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                         skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
     if fit_tracks:
-        add_prefilter_track_fit_and_track_creator(path,
+        add_prefilter_track_fit_and_track_creator(path, components=components,
                                                   trackFitHypotheses=trackFitHypotheses,
                                                   reco_tracks=reco_tracks,
                                                   add_mva_quality_indicator=add_recoTrack_QI)

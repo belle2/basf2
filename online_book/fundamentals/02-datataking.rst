@@ -369,9 +369,8 @@ ARICH
 
     The values of :math:`n_1` and :math:`n_2` were tuned for 1-4 GeV/c pions. 
 
-    For those who would like to read more: 
-    * `arXiv:0504220 <https://arxiv.org/abs/physics/0504220>`_
-    * `arXiv:0603022 <https://arxiv.org/abs/physics/0603022>`_ 
+    For those who would like to read more, see `arXiv:0504220 <https://arxiv.org/abs/physics/0504220>`_ 
+    and `arXiv:0603022. <https://arxiv.org/abs/physics/0603022>`_ 
 
 ECL
     The Electromagnetic Calorimeter (ECL) is chiefly tasked with measuring the

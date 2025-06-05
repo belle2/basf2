@@ -158,7 +158,7 @@ SVD
     The four layers of the SVD system extend the outer radius of the vertex
     detector up to 140 mm.
 
-    .. seealso::
+.. seealso::
 
     For those who are brave enough, see Belle II's SVD Paper: `arXiv:2201.09824 <https://arxiv.org/abs/2201.09824>`_.
 
@@ -367,11 +367,11 @@ ARICH
     If we choose :math:`n_2 > n_1` such that :math:`L\tan\theta_2 = (L+d)\tan\theta_1`, the 
     two rings can overlap in such a way to minimize the ring width for a fixed light yield. 
 
-    The values of :math:`n_1` and :math:`n_2` were tuned for :math:`1-4`GeV pions. 
+    The values of :math:`n_1` and :math:`n_2` were tuned for 1-4 GeV/c pions. 
 
     For those who would like to read more: 
-    - `arXiv:0504220 <https://arxiv.org/abs/physics/0504220>`_
-    - `arXiv:0603022 <https://arxiv.org/abs/physics/0603022>`_ 
+    * `arXiv:0504220 <https://arxiv.org/abs/physics/0504220>`_
+    * `arXiv:0603022 <https://arxiv.org/abs/physics/0603022>`_ 
 
 ECL
     The Electromagnetic Calorimeter (ECL) is chiefly tasked with measuring the
@@ -428,8 +428,8 @@ KLM
     :class: toggle solution
 
     As a minimally ionised particle, it is the only particle that would pass
-    through multiple layers of iron (for :math:`E > 1`GeV) while leaving signals
-    in the active detector material layers. A minor complication is for :math:`E < 1`GeV, 
+    through multiple layers of iron (for :math:`E > 1` GeV) while leaving signals
+    in the active detector material layers. A minor complication is for :math:`E < 1` GeV, 
     there is a good chance of muons being stopped by an iron layer. This is the
     reason why pions with a similar energy could fake muon signals. 
 

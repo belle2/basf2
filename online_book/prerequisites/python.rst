@@ -346,6 +346,7 @@ For any python interpreter, one can also use:
 
   help(object)
 
+.. _pandatutorial_prereq:
 Pandas Tutorial and Python Data Analysis
 ----------------------------------------
 

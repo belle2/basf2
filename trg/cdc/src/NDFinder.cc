@@ -430,27 +430,33 @@ bool NDFinder::checkHitSuperLayers(const SimpleCluster& cluster)
 std::array<double, 3> NDFinder::calculateCenterOfGravity(const SimpleCluster& cluster)
 {
   double weightedSumOmega = 0.;
-  double weightedSumPhiX = 0.;
-  double weightedSumPhiY = 0.;
+  double weightedSumPhi = 0.;
   double weightedSumCot = 0.;
   unsigned int weightSum = 0;
-  for (const cell_index& cellIdx : cluster.getCells()) {
-    unsigned short cellWeight = (*m_houghSpace)[cellIdx[0]][cellIdx[1]][cellIdx[2]];
+  std::vector<cell_index> clusterCells = cluster.getCells();
+  const int peakPhi = clusterCells.front()[1];
+  for (const cell_index& cellIdx : clusterCells) {
+    const unsigned short cellWeight = (*m_houghSpace)[cellIdx[0]][cellIdx[1]][cellIdx[2]];
     weightedSumOmega += cellIdx[0] * cellWeight;
     weightedSumCot += cellIdx[2] * cellWeight;
-    // Adjust for phi dimension wrapping
-    double phiAngle = (2.0 * M_PI * cellIdx[1]) / m_nPhi;
-    weightedSumPhiX += std::cos(phiAngle) * cellWeight;
-    weightedSumPhiY += std::sin(phiAngle) * cellWeight;
+    // Calculate relative phi position to peak
+    int phi = cellIdx[1];
+    int delta = phi - peakPhi;
+    // Wrap-around correction to stay within [-m_nPhi/2, +m_nPhi/2]
+    if (delta > m_nPhi / 2) {
+      delta -= m_nPhi;
+    } else if (delta < -m_nPhi / 2) {
+      delta += m_nPhi;
+    }
+    double unwrappedPhi = peakPhi + delta;
+    weightedSumPhi += unwrappedPhi * cellWeight;
     weightSum += cellWeight;
   }
   weightedSumOmega /= weightSum;
   weightedSumCot /= weightSum;
-  double meanPhiAngle = std::atan2(weightedSumPhiY, weightedSumPhiX);
-  if (meanPhiAngle < 0) {
-    meanPhiAngle += 2.0 * M_PI;
-  }
-  double weightedSumPhi = meanPhiAngle * m_nPhi / (2.0 * M_PI);
+  weightedSumPhi /= weightSum;
+  if (weightedSumPhi >= m_nPhi) weightedSumPhi -= m_nPhi;
+  if (weightedSumPhi < 0) weightedSumPhi += m_nPhi;
   std::array<double, 3> centerOfGravity = {weightedSumOmega, weightedSumPhi, weightedSumCot};
   return centerOfGravity;
 }

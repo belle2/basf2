@@ -18,7 +18,7 @@ This page might also be a useful page for a quick reference on how to exploit pa
 
 Importing ROOT files
 ---------------------------------
-Please refer to `uproot <https://uproot.readthedocs.io/en/stable/index.html>` documentation for details. 
+Please refer to `uproot <https://uproot.readthedocs.io/en/stable/index.html>`_ documentation for details. 
 
 To provide quick code snippets, 
 

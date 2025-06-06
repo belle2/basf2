@@ -111,12 +111,11 @@ void DQMHistAnalysisPXDDAQModule::event()
   {
     std::string name = "PXDDAQError";
 
-//    if (m_hDAQError) { delete m_hDAQError; m_hDAQError = nullptr;}
-
     auto hh1 = findHist(m_histogramDirectoryName, name, true);
     if (hh1) {
       m_cDAQError->Clear();
       m_cDAQError->cd();
+      if (m_hDAQError) { delete m_hDAQError; m_hDAQError = nullptr;}
       m_hDAQError = (TH1D*)hh1->DrawClone("text");
       m_hDAQError->SetName("hPXDDAQError");
       m_hDAQError->SetTitle("PXD Fraction of DAQ Errors");
@@ -175,7 +174,6 @@ void DQMHistAnalysisPXDDAQModule::event()
 
   {
     // DHP histogram
-    //if (m_hMissingDHP) { delete m_hMissingDHP; m_hMissingDHP = nullptr;}
 
     std::string name = "PXDDAQDHPDataMissing";
 
@@ -184,6 +182,7 @@ void DQMHistAnalysisPXDDAQModule::event()
       m_cMissingDHP->Clear();
 
       m_cMissingDHP->cd();
+      if (m_hMissingDHP) { delete m_hMissingDHP; m_hMissingDHP = nullptr;}
       m_hMissingDHP = (TH1F*)hh1->DrawClone("text");
       if (m_hMissingDHP->GetBinContent(0)) {
         m_hMissingDHP->Scale(1.0 / m_hMissingDHP->GetBinContent(0));
@@ -204,8 +203,9 @@ void DQMHistAnalysisPXDDAQModule::event()
   auto* statsum = findHist(m_histogramDirectoryName, name, true);
   if (statsum) {
     // Stat histogram
-    //if (m_hStatistic) { delete m_hStatistic; m_hStatistic = nullptr;}
+    m_cStatistic->Clear();
     m_cStatistic->cd();
+    if (m_hStatistic) delete m_hStatistic;
     m_hStatistic = (TH1D*)statsum->DrawClone("text");
     if (m_hStatistic->GetBinContent(0)) {
       m_hStatistic->Scale(1.0 / m_hStatistic->GetBinContent(0));

@@ -203,9 +203,10 @@ void DQMHistAnalysisPXDDAQModule::event()
   auto* statsum = findHist(m_histogramDirectoryName, name, true);
   if (statsum) {
     // Stat histogram
-    //if (m_hStatistic) { delete m_hStatistic; m_hStatistic = nullptr;}
+    m_cStatistic->Clear();
     m_cStatistic->cd();
-    m_hStatistic = (TH1D*)statsum->DrawClone("text");
+    if (m_hStatistic) delete m_hStatistic;
+    m_hStatistic = statsum->DrawClone("text");
     if (m_hStatistic->GetBinContent(0)) {
       m_hStatistic->Scale(1.0 / m_hStatistic->GetBinContent(0));
       m_hStatistic->Draw("text");

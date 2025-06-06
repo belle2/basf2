@@ -101,8 +101,10 @@ void CDCTriggerNDFinderModule::event()
   std::vector<NDFinderTrack>* resultTracks = m_NDFinder.getFinderTracks();
   for (NDFinderTrack track : *resultTracks) {
     const CDCTriggerTrack* ndFinderTrack =
-      m_ndFinderTracks.appendNew(track.getPhi0(), track.getOmega(),
-                                 0., 0., track.getCot(), 0.);
+      m_ndFinderTracks.appendNew(track.getPhi0(), track.getOmega(), 0., 0., track.getCot(), 0.,
+                                 std::vector<bool>(6, false),
+                                 std::vector<bool>(9, false),
+                                 true);
     std::vector<ROOT::Math::XYZVector> readoutHoughSpace = track.getHoughSpace();
     std::vector<ROOT::Math::XYZVector> readoutCluster = track.getClusterReadout();
     const CDCTrigger3DFinderInfo* ndFinderInfo =

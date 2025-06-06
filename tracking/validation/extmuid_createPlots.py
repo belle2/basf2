@@ -301,18 +301,18 @@ def draw_likelihoods(file_chain):
         momentum = ROOT.Math.XYZVector(px, py, pz)
         isMuon = 'muon' in file_chain.GetFile().GetName()
         for i in range(0, file_chain.GetBranch('KLMMuidLikelihoods').GetNdata()):
-            o = file_chain.GetLeaf('KLMMuidLikelihoods.m_Outcome').GetValue()
+            o = file_chain.GetLeaf('KLMMuidLikelihoods.m_Outcome').GetValue(i)
             outcome.Fill(o)
             if o > 0:
                 # ChargedStable indices: 0=electron, 1=muon, 2=pion, 3=kaon, 4=proton, 5=deuteron
-                llMu = file_chain.GetLeaf('KLMMuidLikelihoods.m_LogL').GetValue(1)
-                llPi = file_chain.GetLeaf('KLMMuidLikelihoods.m_LogL').GetValue(2)
-                blayer = file_chain.GetLeaf('KLMMuidLikelihoods.m_BarrelHitLayer').GetValue()
-                elayer = file_chain.GetLeaf('KLMMuidLikelihoods.m_EndcapHitLayer').GetValue()
-                diffLayer = file_chain.GetLeaf('KLMMuidLikelihoods.m_ExtLayer').GetValue() - \
-                    file_chain.GetLeaf('KLMMuidLikelihoods.m_HitLayer').GetValue()
-                ndof = file_chain.GetLeaf('KLMMuidLikelihoods.m_DegreesOfFreedom').GetValue()
-                chisq = file_chain.GetLeaf('KLMMuidLikelihoods.m_ChiSquared').GetValue()
+                llMu = file_chain.GetLeaf('KLMMuidLikelihoods.m_LogL').GetValue(6*i+1)
+                llPi = file_chain.GetLeaf('KLMMuidLikelihoods.m_LogL').GetValue(6*i+2)
+                blayer = file_chain.GetLeaf('KLMMuidLikelihoods.m_BarrelHitLayer').GetValue(i)
+                elayer = file_chain.GetLeaf('KLMMuidLikelihoods.m_EndcapHitLayer').GetValue(i)
+                diffLayer = file_chain.GetLeaf('KLMMuidLikelihoods.m_ExtLayer').GetValue(i) - \
+                    file_chain.GetLeaf('KLMMuidLikelihoods.m_HitLayer').GetValue(i)
+                ndof = file_chain.GetLeaf('KLMMuidLikelihoods.m_DegreesOfFreedom').GetValue(i)
+                chisq = file_chain.GetLeaf('KLMMuidLikelihoods.m_ChiSquared').GetValue(i)
                 rchisq = -1.0
                 if ndof > 0:
                     rchisq = chisq / ndof

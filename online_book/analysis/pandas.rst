@@ -10,11 +10,11 @@ Pandas
 If you are searching for alternatives to ROOT or starting off in Belle II and don't want to touch
 C++, you've come to the right page. 
 
-While you can find detailed documentation `here <https://pandas.pydata.org/docs/>`_ and an in-depth
-introduction in :ref:`pandatutorial_prereq`, we will try to write this assuming you skipped it and 
-are just familiar with ROOT (and basic python syntax). 
+While you can find detailed documentation from `pandas <https://pandas.pydata.org/docs/>`_ themselves 
+and an in-depth introduction in :ref:`pandatutorial_prereq`, we will try to write this assuming 
+you skipped it and are just familiar with ROOT (and basic python syntax). 
 
-This might also be a useful page for a quick reference on how to exploit pandas. 
+This page might also be a useful page for a quick reference on how to exploit pandas. 
 
 Importing ROOT files
 ---------------------------------
@@ -246,7 +246,7 @@ and you forgot to include the energy and momentum magnitude. You can simply take
     }
     df = df.assign(**new_columns_for_e2)
 
-There are a few other methods that are outlined `here <https://www.geeksforgeeks.org/adding-new-column-to-existing-dataframe-in-pandas/>`_ 
+There are a `couple other methods <https://www.geeksforgeeks.org/adding-new-column-to-existing-dataframe-in-pandas/>`_ 
 but we've tried to outline a few of our favorites methods. 
 
 

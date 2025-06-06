@@ -329,6 +329,7 @@ Another way to interact with the dataset searcher is using the command line tool
 	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00032969/s00/e0026/4S/r00000/uubar/14120601/udst
 
 .. _GBASF2_Collections:
+
 Collections
 ----------------------------------
 

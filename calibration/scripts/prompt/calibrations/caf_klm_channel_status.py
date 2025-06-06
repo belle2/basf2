@@ -40,7 +40,6 @@ settings = CalibrationSettings(
                        INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']],
         'raw_physics': [INPUT_DATA_FILTERS['Run Type']['physics'],
                         f"NOT {INPUT_DATA_FILTERS['Data Tag']['random_calib']}",
-                        INPUT_DATA_FILTERS['Data Tag']['hlt_skim'],
                         INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
     },
     depends_on=[])

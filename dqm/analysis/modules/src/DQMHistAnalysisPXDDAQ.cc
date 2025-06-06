@@ -206,7 +206,7 @@ void DQMHistAnalysisPXDDAQModule::event()
     m_cStatistic->Clear();
     m_cStatistic->cd();
     if (m_hStatistic) delete m_hStatistic;
-    m_hStatistic = statsum->DrawClone("text");
+    m_hStatistic = (TH1D*)statsum->DrawClone("text");
     if (m_hStatistic->GetBinContent(0)) {
       m_hStatistic->Scale(1.0 / m_hStatistic->GetBinContent(0));
       m_hStatistic->Draw("text");

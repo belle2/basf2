@@ -413,7 +413,9 @@ KLM
     the :math:`e^+e^-` collision.
 
     KLM consists of alternating layers of iron and active detector material,
-    where the iron provides the material for :math:`K_L^0` s to interact with. 
+    where the iron provides the material for :math:`K_L^0` s to interact with 
+    (≥3.9 interaction lengths, on top of ECL's 0.8 interaction lengths). 
+    The iron also acts as a magnetic flux return for the solenoid. 
     In the endcaps and first two layers of the barrel, scintillators are used.
     For the rest of the barrel, resistive plate capacitors (RPCs) are used.
 

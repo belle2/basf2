@@ -1,9 +1,5 @@
-.. _onlinebook_pandas:
-
 Pandas
 ======
-
-====
 
 .. sidebar:: Overview
     :class: overview
@@ -214,7 +210,7 @@ The *ignore_index* option is helpful when the index value for each dataframe is 
 If you've encoded some useful information in the dataframe's index, proceed with caution. 
 
 If, for some reason, you care about the index, you would have to be a bit more careful and merge the dataframes. 
-For details, see `here <https://pandas.pydata.org/docs/reference/api/pandas.merge.html>`_.
+For details, see `pandas.merge doc <https://pandas.pydata.org/docs/reference/api/pandas.merge.html>`_.
 
 
 **Adding Variables**:
@@ -250,8 +246,8 @@ and you forgot to include the energy and momentum magnitude. You can simply take
     }
     df = df.assign(**new_columns_for_e2)
 
-There are a few other methods that are outlined :ref:`here <https://www.geeksforgeeks.org/adding-new-column-to-existing-dataframe-in-pandas/>`_ 
-but we've tried to outline a few of our favorites. 
+There are a few other methods that are outlined `here <https://www.geeksforgeeks.org/adding-new-column-to-existing-dataframe-in-pandas/>`_ 
+but we've tried to outline a few of our favorites methods. 
 
 
 .. rubric:: Author(s) of this topic

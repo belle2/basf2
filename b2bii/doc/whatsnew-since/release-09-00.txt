@@ -5,5 +5,5 @@ convertBelleMdstToBelleIIMdst
 +++++++++++++++++++++++++++++
 
 * Added a switch ``evtgenProcessing`` to read the .gen file produced by mcproduzh's evtgen step
- and convert to Belle2 MC Particles.
+  and convert to Belle2 MC Particles.
  

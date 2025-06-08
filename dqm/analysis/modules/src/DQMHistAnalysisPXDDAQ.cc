@@ -133,9 +133,7 @@ void DQMHistAnalysisPXDDAQModule::event()
   }
   {
     // DHC histogram
-    std::string name = "PXDDAQDHCError";
-
-    auto hh1 = findHist(m_histogramDirectoryName, name, true);
+    auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQDHCError", true);
     if (hh1) {
       auto events = hh1->GetBinContent(hh1->GetBin(-1, -1));
       m_cMissingDHC->Clear();
@@ -156,9 +154,7 @@ void DQMHistAnalysisPXDDAQModule::event()
 
   {
     // DHE histogram
-    std::string name = "PXDDAQDHEError";
-
-    auto hh1 = findHist(m_histogramDirectoryName, name, true);
+    auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQDHEError", true);
     if (hh1) {
       auto events = hh1->GetBinContent(hh1->GetBin(-1, -1));
       // first, we have to relate the per-DHE overflow (DHE object count) to the overall overflow (event count)
@@ -179,13 +175,9 @@ void DQMHistAnalysisPXDDAQModule::event()
 
   {
     // DHP histogram
-
-    std::string name = "PXDDAQDHPDataMissing";
-
-    auto hh1 = findHist(m_histogramDirectoryName, name, true);
+    auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQDHPDataMissing", true);
     if (hh1) {
       m_cMissingDHP->Clear();
-
       m_cMissingDHP->cd();
       if (m_hMissingDHP) { delete m_hMissingDHP; m_hMissingDHP = nullptr;}
       m_hMissingDHP = (TH1F*)hh1->DrawClone("text");

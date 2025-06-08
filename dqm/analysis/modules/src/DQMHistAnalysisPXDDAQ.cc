@@ -114,9 +114,8 @@ void DQMHistAnalysisPXDDAQModule::event()
       || m_cStatistic == nullptr) return; // we could assume this
 
   {
-    std::string name = "PXDDAQError";
-
-    auto hh1 = findHist(m_histogramDirectoryName, name, true);
+    // Overall PXD DAQ Error
+    auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQError", true);
     if (hh1) {
       m_cDAQError->Clear();
       m_cDAQError->cd();

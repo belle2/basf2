@@ -100,11 +100,16 @@ void DQMHistAnalysisPXDDAQModule::beginRun()
   m_cMissingDHC->Clear();
   m_cStatistic->Clear();
   m_cStatisticUpd->Clear();
+
+  m_hMissingDHE->Reset();
+  m_hMissingDHC->Reset();
+  if (m_hMissingDHP) m_hMissingDHP->Reset();
+  if (m_hDAQError) m_hDAQError->Reset();
+  if (m_hStatistic) m_hStatistic->Reset();
 }
 
 void DQMHistAnalysisPXDDAQModule::event()
 {
-//   double data = 0.0;
   if (m_cMissingDHP == nullptr || m_cMissingDHE == nullptr || m_cMissingDHC == nullptr
       || m_cStatistic == nullptr) return; // we could assume this
 
@@ -333,4 +338,7 @@ void DQMHistAnalysisPXDDAQModule::terminate()
 
   if (m_hMissingDHC) delete m_hMissingDHC;
   if (m_hMissingDHE) delete m_hMissingDHE;
+  if (m_hDAQError) delete m_hDAQError;
+  if (m_hMissingDHP) delete m_hMissingDHP;
+  if (m_hStatistic) delete m_hStatistic;
 }

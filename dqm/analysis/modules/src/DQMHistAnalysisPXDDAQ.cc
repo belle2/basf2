@@ -119,8 +119,8 @@ void DQMHistAnalysisPXDDAQModule::event()
     if (hh1) {
       m_cDAQError->Clear();
       m_cDAQError->cd();
-      if (m_hDAQError) { delete m_hDAQError; m_hDAQError = nullptr;}
-      m_hDAQError = (TH1D*)hh1->DrawClone("text");
+      if (m_hDAQError) delete m_hDAQError;
+      m_hDAQError = (TH1D*)hh1->DrawClone("text");// or just Clone here and Draw below?
       m_hDAQError->SetName("hPXDDAQError");
       m_hDAQError->SetTitle("PXD Fraction of DAQ Errors");
       if (m_hDAQError->GetBinContent(0)) {
@@ -178,7 +178,7 @@ void DQMHistAnalysisPXDDAQModule::event()
     if (hh1) {
       m_cMissingDHP->Clear();
       m_cMissingDHP->cd();
-      if (m_hMissingDHP) { delete m_hMissingDHP; m_hMissingDHP = nullptr;}
+      if (m_hMissingDHP) delete m_hMissingDHP;
       m_hMissingDHP = (TH1F*)hh1->DrawClone("text");
       if (m_hMissingDHP->GetBinContent(0)) {
         m_hMissingDHP->Scale(1.0 / m_hMissingDHP->GetBinContent(0));

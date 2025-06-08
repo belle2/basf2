@@ -1,4 +1,4 @@
-#include <svd/modules/svdPerformance/SVDValidationModule.h>
+#include <svd/modules/svdPerformance/SVDVariablesToStorageModule.h>
 #include <reconstruction/persistenceManager/PersistenceManagerFactory.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -53,9 +53,9 @@ namespace Belle2::SVD {
   namespace VPM = Belle2::VariablePersistenceManager;
 
   /** Register the module. */
-  REG_MODULE(SVDValidation);
+  REG_MODULE(SVDVariablesToStorage);
 
-  SVDValidationModule::SVDValidationModule() : Module()
+  SVDVariablesToStorageModule::SVDVariablesToStorageModule() : Module()
   {
     addParam("outputFileName", m_fileName, "", m_fileName);
     addParam("containerName", m_containerName, "", m_containerName);
@@ -64,7 +64,7 @@ namespace Belle2::SVD {
     addParam("variablesToHistogram", m_variablesToHistogram, "Variables to store in the histogram.", m_variablesToHistogram);
   }
 
-  void SVDValidationModule::initialize()
+  void SVDVariablesToStorageModule::initialize()
   {
     VPM::Variables variablesToStore;
     if (not m_variablesToNtuple.empty() and not m_variablesToHistogram.empty()) {
@@ -81,7 +81,7 @@ namespace Belle2::SVD {
     persistenceManager->initialize(m_fileName, m_containerName, variablesToStore);
   }
 
-  void SVDValidationModule::event()
+  void SVDVariablesToStorageModule::event()
   {
     StoreObjPtr<ParticleList> particlelist(m_particleListName);
     const auto ncandidates = particlelist->getListSize();
@@ -110,7 +110,7 @@ namespace Belle2::SVD {
     }
   }
 
-  void SVDValidationModule::terminate()
+  void SVDVariablesToStorageModule::terminate()
   {
     persistenceManager->store();
   }

@@ -30,24 +30,24 @@ namespace Belle2::SVD {
   namespace VPM = Belle2::VariablePersistenceManager;
 
   /**
-   * @class SVDValidationModule
+   * @class SVDVariablesToStorageModule
    * @brief A module for validating SVD data. Outputs diagnostic information and stores data to file.
    *
    * This module reads SVD-related data (e.g., clusters) and performs basic validation or
    * analysis. It can write results to an output file, produce histograms for variables,
    * and store data in an ntuple for further examination.
    */
-  class SVDValidationModule : public Module {
+  class SVDVariablesToStorageModule : public Module {
   public:
     /**
-     * @brief Constructs the SVDValidationModule and sets default parameter values.
+     * @brief Constructs the SVDVariablesToStorageModule and sets default parameter values.
      */
-    SVDValidationModule();
+    SVDVariablesToStorageModule();
 
     /**
      * @brief Destructor (default).
      */
-    virtual ~SVDValidationModule() = default;
+    virtual ~SVDVariablesToStorageModule() = default;
 
     /**
      * @brief Initializes the module. Called once before the main event loop.

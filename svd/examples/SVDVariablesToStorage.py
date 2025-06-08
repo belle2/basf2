@@ -28,16 +28,16 @@ from basf2 import conditions as b2conditions
 def addSVDValidationModule(path, storageType):
 
     if (storageType == "ntuple"):
-        path.add_module('SVDValidation',
-                        outputFileName="SVDValidation_ntuple.root",
+        path.add_module('SVDVariablesToStorage',
+                        outputFileName="SVDVariables_ntuple.root",
                         containerName="SVDClusters",
                         particleListName="pi+:all",
                         variablesToNtuple=["SVDClusterCharge", "SVDClusterSNR", "SVDClusterSize", "SVDClusterTime",
                                            "SVDTrackPrime", "SVDResidual", "SVDLayer", "SVDLadder", "SVDSensor", "SVDSide"]
                         ).set_log_level(b2.LogLevel.INFO)
     elif (storageType == "histogram"):
-        path.add_module('SVDValidation',
-                        outputFileName="SVDValidation_histogram.root",
+        path.add_module('SVDVariablesToStorage',
+                        outputFileName="SVDVariables_histogram.root",
                         containerName="SVDClusters",
                         particleListName="pi+:all",
                         variablesToHistogram=[("SVDClusterCharge", 100, 0, 100e3),

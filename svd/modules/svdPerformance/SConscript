@@ -15,6 +15,6 @@ env['LIBS'] = [
     'hlt',
     'hlt_dataobjects',
     'trg_ecl_dataobjects',
-    'reconstruction' # This is wrong
+    'reconstruction_persistenceManager'
     ]
 Return('env')

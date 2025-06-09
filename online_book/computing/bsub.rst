@@ -195,12 +195,16 @@ More information is given `here
 
 Optional
 --------
+Now that you're familiar with the basics, let's go over some commands/options that 
+would be useful, but situational. 
+
+
+.. rubric:: Suspend jobs
+
 In some scenarios you might want to stop the submitted jobs and resume them
 later. For instance this might be due to scheduled maintenance of storage
 elements where the input data is located or the updating of analysis global tags
 that used in your jobs.
-
-.. rubric:: Suspend jobs
 
 To suspend unfinished jobs
 

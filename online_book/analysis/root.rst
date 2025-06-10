@@ -1,6 +1,12 @@
 ROOT
 ====
 
+. sidebar:: Overview
+    :class: overview
+
+    **Length**: 30-60 min
+
+
 If you don't know about ROOT yet, check out the section :ref:`rootintro`.
 You can find the documentation for RDataFrames `here <https://root.cern/doc/master/classROOT_1_1RDataFrame.html>`_.
 

@@ -109,7 +109,7 @@ namespace {
 
   /** TEveGeoShape contains a TGeoShape and feels responsible for deletion; but TGeoShape is owned by global TGeoManager.
    *
-   * What we want is deletion by TEve (after changing events), so we explictly remove the object
+   * What we want is deletion by TEve (after changing events), so we explicitly remove the object
    * from TGeoManager's garbage collection list. (some objects might not be in the list because these
    * things are horribly inconsistent. doesn't hurt to try though.)
    */
@@ -714,7 +714,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
               const TMatrixD& eVec = eigen_values.GetEigenVectors();
               double pseudo_res_0 = m_errorScale * std::sqrt(ev(0));
               double pseudo_res_1 = m_errorScale * std::sqrt(ev(1));
-              // finished calcluating, got the values -----------------------------------
+              // finished calculating, got the values -----------------------------------
 
               // calculate the semiaxis of the error ellipse ----------------------------
               cov_shape->SetShape(new TGeoEltu(pseudo_res_0, pseudo_res_1, 0.0105));
@@ -1153,7 +1153,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
         m_mcparticleTracks[particle].track->AddPathMark(
           TEvePathMark(
             //Add the last trajectory point as decay point to prevent TEve to
-            //propagate beyond the end of the track. So lets compare the adress
+            //propagate beyond the end of the track. So lets compare the address
             //to the address of last point and choose the pathmark accordingly
             (&pt == &trajectory.back()) ? TEvePathMark::kDecay : TEvePathMark::kReference,
             TEveVector(pt.x, pt.y, pt.z),
@@ -1368,7 +1368,7 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
   //eVec(i,j) uses the method/overloaded operator ( . ) of the TMatrixT class to return the matrix entry.
   ROOT::Math::XYZVector eVec2(eVec(0, 1), eVec(1, 1), eVec(2, 1));
   ROOT::Math::XYZVector eVec3(eVec(0, 2), eVec(1, 2), eVec(2, 2));
-  // got everything we need -----------------------------------------------------   //Eigenvalues(semi axis) of the covariance matrix accquired!
+  // got everything we need -----------------------------------------------------   //Eigenvalues(semi axis) of the covariance matrix acquired!
 
 
   TGeoRotation det_rot("det_rot", (eVec1.Theta() * 180) / TMath::Pi(), (eVec1.Phi() * 180) / TMath::Pi(),

@@ -93,7 +93,7 @@ int main(int argc, char** argv)
     std::string key;
     if (line.length() < 3) {
       continue;
-      // check, if line wasnt a pure comment line
+      // check, if line wasn't a pure comment line
     }
     if (line.find('=') == std::string::npos) {
       continue;

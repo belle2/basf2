@@ -1622,7 +1622,7 @@ namespace Belle2 {
                   unsigned iTS = TSIDInSL(trkNN.ts[iSL][0], iSL, iTracker);
                   tsstr += "(SL" + std::to_string(iSL) + ", " + std::to_string(iTS) + ", " + std::to_string(trkNN.ts[iSL][1]) + ", " + std::to_string(
                              trkNN.ts[iSL][2]) + ", " + std::to_string(trkNN.ts[iSL][3]) + "),\n";
-                  // check, wether axials are a subset of 2dfinderTS:
+                  // check, whether axials are a subset of 2dfinderTS:
                   if (iSL % 2 == 0) {
                     if (!(trk2D.ts[iSL / 2][0] == trkNN.ts[iSL][0] &&
                           //trk2D.ts[iSL / 2][1] == trkNN.ts[iSL][1] &&

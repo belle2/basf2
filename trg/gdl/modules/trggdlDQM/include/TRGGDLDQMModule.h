@@ -36,7 +36,7 @@ namespace Belle2 {
   class TRGGDLDQMModule : public HistoModule {
 
   public:
-    //! Costructor
+    //! Constructor
     TRGGDLDQMModule();
     //! Destrunctor
     virtual ~TRGGDLDQMModule() {}
@@ -209,7 +209,7 @@ namespace Belle2 {
       "software_trigger_cut&skim&accept_mumutight"
     };
 
-    //name of histgrams
+    //name of histograms
     std::string skim_smap[nskim_gdldqm] = {
       "all",
       "hadron",

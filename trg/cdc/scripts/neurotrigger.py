@@ -20,7 +20,7 @@ hwneuroinput2dfindertracks = 'CDCTriggerNNInput2DFinderTracks'
 hwneuroinputsegmenthits = 'CDCTriggerNNInputSegmentHits'
 
 
-# sofware neurotracks, that were calculated from hardware 2d-inputtracks
+# software neurotracks, that were calculated from hardware 2d-inputtracks
 # and hardware stereo track segments coming over all 48cc within one event
 # OR
 # standard name for tracks resulting from the software neurotrigger

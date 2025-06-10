@@ -88,7 +88,7 @@ namespace Belle2 {
     std::string firmwareVersion;
     /** Reference to the variable of its Belle2Link delay */
     int& delay;
-    /** counter of trgger signal, total 32 bits, the 20 LSBs recorded in the event header */
+    /** counter of trigger signal, total 32 bits, the 20 LSBs recorded in the event header */
     int& cnttrg;
 
     /** debug level in the steering file */
@@ -278,7 +278,7 @@ namespace Belle2 {
     bool m_decode2DFinderTrack;  /**< flag to decode 2D finder track  */
     bool m_decode2DFinderInputTS;  /**< flag to decode 2D finder input TS */
     bool m_alignFoundTime;  /**< flag to align found time in different sub-modules */
-    int  m_n2DTS = 0; //TODO whats the best def val?  /**< flag to unpack 2D tracker data with 15TS*/
+    int  m_n2DTS = 0; //TODO what's the best def val?  /**< flag to unpack 2D tracker data with 15TS*/
 
     NodeList m_neuroNodeID;  /**< list of (COPPER ID, HSLB ID) of neurotrigger */
     NodeList m_neuroNodeID_pcie40;  /**< list of (PCIe40 ID, ch ID) of neurotrigger */
@@ -379,9 +379,9 @@ namespace Belle2 {
     std::vector<float> m_NNOutputScale;
     /** fake object to assign the user set scaling values to */
     CDCTriggerMLP m_mlp_scale;
-    /** bool value for wether to use the conditions database */
+    /** bool value for whether to use the conditions database */
     bool m_useDB;
-    /** bool value wether to simulate 13 bit drift time by using 2dcc */
+    /** bool value whether to simulate 13 bit drift time by using 2dcc */
     bool m_sim13dt;
     /** PCIe40 data or copper data */
     bool m_pciedata;

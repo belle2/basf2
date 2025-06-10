@@ -82,7 +82,7 @@ namespace Belle2 {
   {
     // register store objects
     m_tracks.isRequired(m_inputCollectionName);
-    // decided wether to load mcparticles or recotracks as training targets.
+    // decided whether to load mcparticles or recotracks as training targets.
     // This has to be done because the train target values are obtained
     // for both classes in a different way.
     if (m_trainOnRecoTracks) {
@@ -254,7 +254,7 @@ namespace Belle2 {
         m_NeuroTrigger.getEventTime(isector, *m_tracks[itrack], m_neuroParameters.et_option(), m_neuroTrackInputMode);
         // check hit pattern
         unsigned long hitPattern = m_NeuroTrigger.getCompleteHitPattern(isector, *m_tracks[itrack], m_neuroTrackInputMode); // xxxxx0xxx
-        // sectorpattern holds the absolut necessary SLs for the expert
+        // sectorpattern holds the absolute necessary SLs for the expert
         unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern(); // 010100010
         // sectorpatternmask holds the SLs, which are generally used to determine the right expert
         unsigned long sectorPatternMask = m_NeuroTrigger[isector].getSLpatternMask(); // 010101010

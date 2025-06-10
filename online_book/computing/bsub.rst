@@ -6,9 +6,7 @@ Batch submission
 .. sidebar:: Overview
    :class: overview
 
-    **Teaching**: 10 min
-
-    **Exercises**: 10 min
+    **Length**: 15-30 min
 
     **Prerequisites**:
 
@@ -137,7 +135,7 @@ and check the output
    Hello world, this is script example.sh.
    Finished!
 
-Use the same method, you can submit Python or basf2 scripts to bqueues!
+Use the same method, you can submit Python or `basf2` scripts to bqueues!
 
 .. code-block:: bash
 
@@ -158,12 +156,12 @@ To check the job status
 .. admonition:: Exercise
    :class: exercise stacked
 
-      Submit a ``basf2`` job to queue ``l``, and then check the status of your jobs.
+      Submit a `basf2` job to queue ``l``, and then check the status of your jobs.
 
 .. admonition:: Hint
    :class: xhint stacked toggle
 
-   A simple ``basf2`` job could be the following:
+   A simple `basf2` job could be the following:
 
    .. code-block:: python
 

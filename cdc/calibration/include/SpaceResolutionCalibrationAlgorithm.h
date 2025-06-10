@@ -46,7 +46,7 @@ namespace Belle2 {
       /// Work with B field or not;
       void setBField(bool bfield) {m_bField = bfield;}
 
-      /// Store histograms durring the calibration or not
+      /// Store histograms during the calibration or not
       void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
 
       /// Enable text output of calibration result
@@ -111,7 +111,7 @@ namespace Belle2 {
       bool m_storeHisto = false; /**<  Store histogram or not*/
       bool m_bField = true;                   /**< Work with BField, fit range and initial parameters is different incase B and noB */
       double m_threshold = 0.6 ; /**< minimal requirement for the fraction of fitted results */
-      double m_sigma[56][2][18][7][8]; /**<new sigma prameters.*/
+      double m_sigma[56][2][18][7][8]; /**<new sigma parameters.*/
       TGraphErrors* m_gFit[56][2][18][7];  /**< sigma*sigma graph for fit*/
       TGraphErrors* m_graph[56][2][18][7];    /**< sigma graph.*/
       TH2F* m_hBiased[56][2][Max_nalpha][Max_ntheta]; /**< 2D histogram of biased residual */
@@ -124,15 +124,15 @@ namespace Belle2 {
 
       int m_nAlphaBins; /**<number of alpha bins*/
       int m_nThetaBins;/**<number of  theta bins*/
-      float m_lowerAlpha[18];/**< Lower boundays of alpha bins. */
-      float m_upperAlpha[18];/**< Upper boundays of alpha bins. */
+      float m_lowerAlpha[18];/**< Lower boundaries of alpha bins. */
+      float m_upperAlpha[18];/**< Upper boundaries of alpha bins. */
       float m_iAlpha[18]; /**< represented alphas of alpha bins. */
-      float m_lowerTheta[7]; /**< Lower boundays of theta bins. */
-      float m_upperTheta[7];/**< Upper boundays of theta bins. */
+      float m_lowerTheta[7]; /**< Lower boundaries of theta bins. */
+      float m_upperTheta[7];/**< Upper boundaries of theta bins. */
       float m_iTheta[7]; /**< represented alphas of theta bins. */
       unsigned short m_sigmaParamMode = 0; /**< sigma mode for this calibration.*/
 
-      double m_sigmaPost[56][2][18][7][8]; /**< sigma prameters before calibration */
+      double m_sigmaPost[56][2][18][7][8]; /**< sigma parameters before calibration */
       unsigned short m_sigmaParamModePost; /**< sigma mode before this calibration.*/
 
       bool  m_textOutput = false; /**< output text file if true */

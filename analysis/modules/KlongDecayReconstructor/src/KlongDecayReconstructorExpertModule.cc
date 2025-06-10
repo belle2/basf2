@@ -21,6 +21,7 @@
 #include <Math/Vector4D.h>
 #include <TMath.h>
 
+#include <cmath>
 #include <memory>
 
 using namespace std;
@@ -179,9 +180,9 @@ void KlongDecayReconstructorExpertModule::event()
 
     ROOT::Math::PxPyPzEVector mom = pDaughters + klDaughters;
     mom.SetE(TMath::Sqrt(mom.P2() + m_b * m_b));
-    if ((!isnan(mom.P())) && is_physical)
+    if ((!std::isnan(mom.P())) && is_physical)
       particle.set4Vector(mom);
-    if (isnan(mom.P()))
+    if (std::isnan(mom.P()))
       is_physical = false;
 
     if (!m_cut->check(&particle))

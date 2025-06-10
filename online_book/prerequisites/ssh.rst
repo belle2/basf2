@@ -6,9 +6,7 @@ SSH - Secure Shell
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 1 h
-
-    **Exercises**: 15 min
+    **Length**: 1.5-3 hrs
 
     **Prerequisites**:
 

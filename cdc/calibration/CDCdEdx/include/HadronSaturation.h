@@ -79,7 +79,7 @@ namespace Belle2 {
     /**
     * functions for the hadron saturation correction
     */
-    static void minuitFunction(int& nDim, double* gout, double& result, double* para, int flg);
+    static void minuitFunction(int&, double*, double& result, double* para, int);
 
   private:
 

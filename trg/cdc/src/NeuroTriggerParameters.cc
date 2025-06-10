@@ -56,7 +56,7 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
     std::string skip;
     if (line.length() < 3) {
       continue;
-      // check, if line wasnt a pure comment line
+      // check, if line wasn't a pure comment line
     }
     bool locked = false; //check, if "==" was used and the variable should be registered as locked
     if (line.find('=') == std::string::npos) {
@@ -69,7 +69,7 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
     if (l  == "=") {
       locked = true;
     }
-    // now find the value that should be asigned to the "par"
+    // now find the value that should be assigned to the "par"
     key = (locked) ? line.substr((line.find('=') + 2), line.length() - line.find('=') - 2) : line.substr((line.find('=') + 1),
           line.length() - line.find('=') - 1);
     if (par == "nInput")         {
@@ -157,8 +157,8 @@ bool NeuroTriggerParameters::checkarr(std::vector<NNTParam<X>> vec)
 
 void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
 {
-  // save all the configuration otions in a file, which can later be used to initialize a new parameter set.
-  // only paramters, that already have been set are saved. parameters which are locked, are written wit a "==".
+  // save all the configuration options in a file, which can later be used to initialize a new parameter set.
+  // only parameters, that already have been set are saved. parameters which are locked, are written with a "==".
   std::ofstream savestream;
   savestream.open(filename);
   savestream << "########################################################" << std::endl;
@@ -379,7 +379,7 @@ std::vector<std::vector<NNTParam<X>>> NeuroTriggerParameters::read2dArray(std::s
   // parse the brackets here to fill the vector: [[1,2], 3,4]]
   key = key.substr(key.find("[") + 1, std::string::npos); // without outer brackets: [1,2], [3,4]
   for (std::size_t ipos = 0; ipos != std::string::npos; ipos = key.find("[", ipos + 1)) {
-    std::string pairstr = key.substr(ipos + 1, key.find("]", ipos + 1) - ipos - 1); // this shopuld be 1,2 now
+    std::string pairstr = key.substr(ipos + 1, key.find("]", ipos + 1) - ipos - 1); // this should be 1,2 now
     std::vector<NNTParam<X>> newpair;
     std::size_t jpos;
     for (jpos = 0; jpos != std::string::npos; jpos = pairstr.find(",", jpos)) {
@@ -397,7 +397,7 @@ std::vector<NNTParam<X>> NeuroTriggerParameters::read1dArray(std::string keyx, b
 {
   std::string key = keyx;
   // parse the brackets here to fill the vector: [[1,2], 3,4]]
-  std::string pairstr = key.substr(1, key.find("]", 1) - 1); // this shopuld be 1,2 now
+  std::string pairstr = key.substr(1, key.find("]", 1) - 1); // this should be 1,2 now
   std::vector<NNTParam<X>> newpair;
   std::size_t jpos;
   for (jpos = 0; jpos != std::string::npos; jpos = pairstr.find(",", jpos)) {

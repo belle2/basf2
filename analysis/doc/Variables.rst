@@ -3,7 +3,7 @@
 Variables
 =========
 
-While ``basf2`` operates on `ParticleList <https://software.belle2.org/|release|/classBelle2_1_1ParticleList.html>`_ s, it is also important to calculate physics quantities associated with a given candidate or event.
+While ``basf2`` operates on :doxygen:`ParticleList <classBelle2_1_1ParticleList>` s, it is also important to calculate physics quantities associated with a given candidate or event.
 
 In ``basf2`` analysis, variables are handled by the `VariableManager`.
 There are many variables available for use in analysis.
@@ -20,7 +20,7 @@ The VariableManager handles all variables in ``basf2`` analysis.
 It is implemented as a `singleton <https://en.wikipedia.org/wiki/Singleton_pattern>`_
 C++ class with a python interface.
 
-The C++ documentation is `here <https://software.belle2.org/development/classBelle2_1_1Variable_1_1Manager.html>`_.
+The C++ documentation is :doxygen:`here <classBelle2_1_1Variable_1_1Manager>`.
 
 .. tip::
 
@@ -258,8 +258,7 @@ Here is a list of trigger variables:
    :group: L1 Trigger
 
 .. tip::
-  Please see the `Trigger Bits section
-  <https://software.belle2.org/development/sphinx/trg/doc/index.html#trigger-bits>`__
+  Please see the :sphinx:`Trigger Bits section <trg/doc/index.html#trigger-bits>`
   for further details.
   
 .. b2-variables::
@@ -735,11 +734,7 @@ Step 3. Implement the function in the source file
     Boost boost2daughter(daughter4Vector.BoostToCM());
     particle4Vector = boost2daughter * particle4Vector;
     gDaughter4Vector = boost2daughter * gDaughter4Vector;
-    B2Vector3D particle3Vector = particle4Vector.Vect();
-    B2Vector3D gDaughter3Vector = gDaughter4Vector.Vect();
-    double numerator = gDaughter3Vector.Dot(particle3Vector);
-    double denominator = (gDaughter3Vector.Mag())*(particle3Vector.Mag());
-    return numerator/denominator;
+    return VectorUtil::CosTheta(particle4Vector, gDaughter4Vector);
   }
 
 Step 4. Register the new variable

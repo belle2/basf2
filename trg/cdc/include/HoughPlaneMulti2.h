@@ -30,7 +30,7 @@ namespace Belle2 {
 
   public:
 
-    /// Contructor.
+    /// Constructor.
     TRGCDCHoughPlaneMulti2(const std::string& name,
                            const TRGCDCHoughTransformation& transformation,
                            unsigned nX,
@@ -70,7 +70,7 @@ namespace Belle2 {
     /// Clears only specified layer ID.
     void clear(unsigned layerId);
 
-    /// Clears entires only.
+    /// Clears entries only.
     void clearCells(void);
 
     /// Voting.

@@ -9,8 +9,8 @@ TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
 TBranch: __eventType__, 
 TBranch: __weight__, 1
-TBranch: isContinuumEvent, 1
-TBranch: isNotContinuumEvent, 0
+TBranch: isContinuumEvent, True
+TBranch: isNotContinuumEvent, False
 TBranch: isSignal, 0
 TBranch: M, 5.114
 TBranch: p, 2.032

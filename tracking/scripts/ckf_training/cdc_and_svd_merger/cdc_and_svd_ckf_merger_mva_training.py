@@ -34,11 +34,11 @@ given set of FastBDT options.
 * The ``ValidationAndOptimisationTask`` uses the trained weight files and cut values
 provided to run the tracking chain with the weight file under test, and also
 runs the tracking validation.
-* Finally, the ``MainTask`` is the "brain" of the script. It invokes the
+* Finally, the ``SummaryTask`` is the "brain" of the script. It invokes the
 ``ValidationAndOptimisationTask`` with the different combinations of FastBDT options
 and cut values on the MVA classifier output.
 
-Due to the dependencies, the calls of the task are reversed. The MainTask
+Due to the dependencies, the calls of the task are reversed. The SummaryTask
 calls the ``ValidationAndOptimisationTask`` with different FastBDT options and cut
 values, and the ``ValidationAndOptimisationTask`` itself calls the required teacher,
 training, and simulation tasks.
@@ -61,7 +61,7 @@ requires both the teacher task, as it needs the weightfile to be present, and
 also a data collection task, because it needs a dataset for testing classifier.
 
 The final task that defines which tasks need to be done for the steering file to
-finish is the ``MainTask``. When you only want to run parts of the
+finish is the ``SummaryTask``. When you only want to run parts of the
 training/validation pipeline, you can comment out requirements in the Master
 task or replace them by lower-level tasks during debugging.
 
@@ -140,6 +140,7 @@ you, e.g.::
 """
 
 import itertools
+import json
 import os
 import subprocess
 import tempfile
@@ -316,12 +317,12 @@ class SplitNMergeSimTask(Basf2Task, LSFTask):
         """
         This task requires several GenerateSimTask to be finished so that he required number of events is created.
         """
-        n_events_per_task = MainTask.n_events_per_task
+        n_events_per_task = SummaryTask.n_events_per_task
         quotient, remainder = divmod(self.n_events, n_events_per_task)
         for i in range(quotient):
             yield GenerateSimTask(
                 bkgfiles_dir=self.bkgfiles_dir,
-                num_processes=MainTask.num_processes,
+                num_processes=SummaryTask.num_processes,
                 random_seed=self.random_seed + '_' + str(i).zfill(3),
                 n_events=n_events_per_task,
                 experiment_number=self.experiment_number,
@@ -329,7 +330,7 @@ class SplitNMergeSimTask(Basf2Task, LSFTask):
         if remainder > 0:
             yield GenerateSimTask(
                 bkgfiles_dir=self.bkgfiles_dir,
-                num_processes=MainTask.num_processes,
+                num_processes=SummaryTask.num_processes,
                 random_seed=self.random_seed + '_' + str(quotient).zfill(3),
                 n_events=remainder,
                 experiment_number=self.experiment_number,
@@ -397,7 +398,7 @@ class ResultRecordingTask(Basf2PathTask, LSFTask):
         This task requires that the training SplitMergeSimTask is finished.
         """
         yield SplitNMergeSimTask(
-            bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
+            bkgfiles_dir=SummaryTask.bkgfiles_by_exp[self.experiment_number],
             random_seed=self.random_seed,
             n_events=self.n_events_training,
             experiment_number=self.experiment_number,
@@ -626,7 +627,7 @@ class ValidationAndOptimisationTask(Basf2PathTask, LSFTask):
             random_seed='training'
         )
         yield SplitNMergeSimTask(
-            bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
+            bkgfiles_dir=SummaryTask.bkgfiles_by_exp[self.experiment_number],
             experiment_number=self.experiment_number,
             n_events=self.n_events_testing,
             random_seed="optimisation",
@@ -737,13 +738,10 @@ class ValidationAndOptimisationTask(Basf2PathTask, LSFTask):
         self._remove_output()
 
 
-class MainTask(b2luigi.WrapperTask):
+class SummaryTask(b2luigi.Task):
     """
-    Wrapper task that needs to finish for b2luigi to finish running this steering file.
-
-    It is done if the outputs of all required subtasks exist.  It is thus at the
-    top of the luigi task graph.  Edit the ``requires`` method to steer which
-    tasks and with which parameters you want to run.
+    Task that collects and summarizes the main figure-of-merits from all the
+    (validation and optimisation) child taks.
     """
     #: Number of events to generate for the training data set.
     n_events_training = b2luigi.get_setting(
@@ -777,6 +775,14 @@ class MainTask(b2luigi.WrapperTask):
 
     #: Use local resources
     batch_system = 'local'
+    #: Output file name
+    output_file_name = 'summary.json'
+
+    def output(self):
+        """
+        Output method.
+        """
+        yield self.add_to_output(self.output_file_name)
 
     def requires(self):
         """
@@ -807,10 +813,50 @@ class MainTask(b2luigi.WrapperTask):
                 result_filter_cut=cut_value,
             )
 
+    def run(self):
+        """
+        Run method.
+        """
+        import ROOT  # noqa
+
+        # These are the "TNtuple" names to check for
+        ntuple_names = (
+            'MCSideTrackingValidationModule_overview_figures_of_merit',
+            'PRSideTrackingValidationModule_overview_figures_of_merit',
+            'PRSideTrackingValidationModule_subdetector_figures_of_merit'
+        )
+
+        # Collect the information in a dictionary...
+        output_dict = {}
+        all_files = self.get_all_input_file_names()
+        for idx, single_file in enumerate(all_files):
+            with ROOT.TFile.Open(single_file, 'READ') as f:
+                branch_data = {}
+                for ntuple_name in ntuple_names:
+                    ntuple = f.Get(ntuple_name)
+                    for i in range(min(1, ntuple.GetEntries())):  # Here we expect only 1 entry
+                        ntuple.GetEntry(i)
+                        for branch in ntuple.GetListOfBranches():
+                            name = branch.GetName()
+                            value = getattr(ntuple, name)
+                            branch_data[name] = value
+                branch_data['file_path'] = single_file
+                output_dict[f'{idx}'] = branch_data
+
+        # ... and store the information in a JSON file
+        with open(self.get_output_file_name(self.output_file_name), 'w') as f:
+            json.dump(output_dict, f, indent=4)
+
+    def remove_output(self):
+        """
+        Default function from base b2luigi.Task class.
+        """
+        self._remove_output()
+
 
 if __name__ == "__main__":
 
     b2luigi.set_setting("env_script", "./setup_basf2.sh")
     b2luigi.set_setting("scratch_dir", tempfile.gettempdir())
     workers = b2luigi.get_setting("workers", default=1)
-    b2luigi.process(MainTask(), workers=workers, batch=True)
+    b2luigi.process(SummaryTask(), workers=workers, batch=True)

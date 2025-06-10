@@ -29,11 +29,17 @@ namespace Belle2 {
     CDCTrigger2DConfig(const CDCTrigger2DConfig& b): TObject(b)
     {
       m_nTS = b.m_nTS;
+      m_fullhit = b.m_fullhit;
+      m_hitthreshold = b.m_hitthreshold;
+      m_ADC = b.m_ADC;
     }
     /** assignment operator */
     CDCTrigger2DConfig& operator=(const CDCTrigger2DConfig& b)
     {
       m_nTS = b.m_nTS;
+      m_fullhit = b.m_fullhit;
+      m_hitthreshold = b.m_hitthreshold;
+      m_ADC = b.m_ADC;
       return *this;
     }
 

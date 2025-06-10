@@ -247,6 +247,9 @@ def add_simulation(
         m.set_name('BGOverlayExecutor_CDC...KLM')
 
     if components is None or 'TRG' in components:
+        if bkgfiles is not None and bkgOverlay:
+            m = path.add_module('BGOverlayExecutor', components=['CDC'], CDCHitsName='CDCHits4Trg')
+            m.set_name('BGOverlayExecutor_TRGCDC')
         add_trigger_simulation(path, simulateT0jitter=simulateT0jitter, FilterEvents=FilterEvents)
 
     # SVD digitization, BG Overlay, sorting and zero suppression

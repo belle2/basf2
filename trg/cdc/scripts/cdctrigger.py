@@ -35,9 +35,7 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
     if SimulationMode == 1:
         # TSF
         path.add_module('CDCTriggerTSF',
-                        ADC_cut_enable=True,
-                        ADC_cut_threshold=10,
-                        ADCflag_low=10,
+                        useDB=True,
                         InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe"),
                         OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe"))
         # 2D finder

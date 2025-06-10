@@ -114,7 +114,9 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("ADCflag_high",
            m_adcflag_high,
            "Assign ADC based flag for full hit tracker. Higher threshold of ADC.",
-           700);
+           10000);
+  addParam("useDB", m_useDB,
+           "Switch to use database to load run dependent parameters. ", true);
 }
 
 void
@@ -356,6 +358,18 @@ CDCTriggerTSFModule::beginRun()
           }
         }
       }
+    }
+  }
+
+  if (m_useDB) {
+    if (not m_cdctrgtsf_DB.isValid()) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      B2ERROR("No database for CDCTRG TSF parameter. exp " << evtMetaData->getExperiment() << " run "
+              << evtMetaData->getRun());
+    } else {
+      m_adcflag = m_cdctrgtsf_DB->getADC();
+      m_adccut = m_cdctrgtsf_DB->getADC_threshold();
+      m_adcflag_high = m_cdctrgtsf_DB->getADC_threshold();
     }
   }
 }

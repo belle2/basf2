@@ -52,7 +52,7 @@ namespace Belle2 {
   class TRGTOPWaveformPlotterModule  : public Module {
 
   public:
-    //! Costructor
+    //! Constructor
     TRGTOPWaveformPlotterModule();
 
     //! Destructor

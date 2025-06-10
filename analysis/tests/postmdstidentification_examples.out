@@ -9,10 +9,10 @@ TBranch: __candidate__, 0
 TBranch: __ncandidates__, 10
 TBranch: __eventType__, 
 TBranch: __weight__, 1
-TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02525
-TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.0007314
-TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.1366
-TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.8374
+TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02931
+TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.002839
+TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.1905
+TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.7773
 TBranch: pidChargedBDTScore__bo2212__cm__spALL__bc, nan
 TBranch: pidChargedBDTScore__bo1000010020__cm__spALL__bc, nan
 TTree: my_p
@@ -24,10 +24,10 @@ TBranch: __candidate__, 0
 TBranch: __ncandidates__, 10
 TBranch: __eventType__, 
 TBranch: __weight__, 1
-TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02525
-TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.0007314
-TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.1366
-TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.8374
+TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02931
+TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.002839
+TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.1905
+TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.7773
 TBranch: pidChargedBDTScore__bo2212__cm__spALL__bc, nan
 TBranch: pidChargedBDTScore__bo1000010020__cm__spALL__bc, nan
 TTree: my_K
@@ -39,10 +39,10 @@ TBranch: __candidate__, 0
 TBranch: __ncandidates__, 10
 TBranch: __eventType__, 
 TBranch: __weight__, 1
-TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02525
-TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.0007314
-TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.1366
-TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.8374
+TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02931
+TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.002839
+TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.1905
+TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.7773
 TBranch: pidChargedBDTScore__bo2212__cm__spALL__bc, nan
 TBranch: pidChargedBDTScore__bo1000010020__cm__spALL__bc, nan
 TTree: my_pi
@@ -54,10 +54,10 @@ TBranch: __candidate__, 0
 TBranch: __ncandidates__, 10
 TBranch: __eventType__, 
 TBranch: __weight__, 1
-TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02525
-TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.0007314
-TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.1366
-TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.8374
+TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02931
+TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.002839
+TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.1905
+TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.7773
 TBranch: pidChargedBDTScore__bo2212__cm__spALL__bc, nan
 TBranch: pidChargedBDTScore__bo1000010020__cm__spALL__bc, nan
 TTree: my_mu
@@ -69,10 +69,10 @@ TBranch: __candidate__, 0
 TBranch: __ncandidates__, 10
 TBranch: __eventType__, 
 TBranch: __weight__, 1
-TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.01819
-TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.002985
-TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.7828
-TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.1961
+TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02405
+TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.1466
+TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.828
+TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.001307
 TBranch: pidChargedBDTScore__bo2212__cm__spALL__bc, nan
 TBranch: pidChargedBDTScore__bo1000010020__cm__spALL__bc, nan
 TTree: my_e
@@ -84,10 +84,10 @@ TBranch: __candidate__, 0
 TBranch: __ncandidates__, 10
 TBranch: __eventType__, 
 TBranch: __weight__, 1
-TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.01819
-TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.002985
-TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.7828
-TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.1961
+TBranch: pidChargedBDTScore__bo11__cm__spALL__bc, 0.02405
+TBranch: pidChargedBDTScore__bo13__cm__spALL__bc, 0.1466
+TBranch: pidChargedBDTScore__bo211__cm__spALL__bc, 0.828
+TBranch: pidChargedBDTScore__bo321__cm__spALL__bc, 0.001307
 TBranch: pidChargedBDTScore__bo2212__cm__spALL__bc, nan
 TBranch: pidChargedBDTScore__bo1000010020__cm__spALL__bc, nan
 TFile: LowEnergyPi0Identification.root

@@ -28,16 +28,16 @@ namespace Belle2 {
      * Returns 1 if a track, ecl or klmCluster associated to particle is in the related RestOfEvent object, 0 otherwise.
      * Also works for composite particles, where all mdst objects of related FSP particles must be in ROE.
      */
-    double isInRestOfEvent(const Particle* particle);
+    bool isInRestOfEvent(const Particle* particle);
     /**
      * Returns 1 if a particle is a clone of signal side final state particles, 0 otherwise.
      */
-    double isCloneOfSignalSide(const Particle* particle);
+    bool isCloneOfSignalSide(const Particle* particle);
 
     /**
      * Returns 1 if a particle has ancestor signal side final state particles, 0 otherwise.
      */
-    double hasAncestorFromSignalSide(const Particle* particle);
+    bool hasAncestorFromSignalSide(const Particle* particle);
 
     /**
      * Prints the indices of all particles in the ROE and the properties of all masks appended to the ROE.
@@ -47,10 +47,9 @@ namespace Belle2 {
 
     /**
      * Returns 1 if there is correct combination of daughter particles between the particle that is the basis of the ROE and the particle loaded from the ROE.
-     * Returns 0 if there is not correct combination.
-     * If there is no daughter particle loaded from the ROE, returns quiet NaN.
+     * Returns 0 if there is not correct combination or if there is no daughter particle loaded from the ROE.
      */
-    double hasCorrectROECombination(const Particle* particle);
+    bool hasCorrectROECombination(const Particle* particle);
 
     /**
      * Helper function for nRemainingTracksInRestOfEventWithMask and nRemainingTracksInRestOfEvent
@@ -75,7 +74,7 @@ namespace Belle2 {
     /**
      * Returns number of remaining KLM clusters in the related RestOfEvent object
      */
-    double nROE_KLMClusters(const Particle* particle);
+    int nROE_KLMClusters(const Particle* particle);
 
     /**
      * Returns true energy of unused tracks and clusters in ROE.
@@ -355,16 +354,18 @@ namespace Belle2 {
     // ------------------------------------------------------------------------------
 
     /**
+     * Helper function to return 4-vector in reference frame that is picked based on an argument
+     */
+    ROOT::Math::PxPyPzEVector transformVector(const ROOT::Math::PxPyPzEVector& vec, bool enforceCMSFrame);
+
+    /**
      * Helper function: Returns the missing 4-momentum vector.
-     * Option 0: CMS: Take momentum and energy of all ROE and REC side tracks and clusters into account ("event based" variable)
-     * Option 1: CMS: Same as option 0, but fix Emiss = pmiss (missing mass set to 0)
-     * Option 2: CMS: Same as option 0, but fix Eroe = Ecms/2 (ignore energy from ROE side)
-     * Option 3: CMS: Don't take any ROE tracks and clusters into account, use signal side only (signal based variable)
-     * Option 4: CMS: Same as option 3, but use the correction of the B meson momentum magnitude in LAB (update with pB in opposite ROE direction)
-     *           system in the opposite direction of the ROE momentum
-     * Option 5: LAB: Use momentum and energy of all ROE and REC side tracks and clusters into account ("event based" variable)
-     * Option 6: LAB: Same as option 5, but fix Emiss = pmiss (missing mass set to 0)
-     * Option 7: LAB: Same as 6, correct pmiss 4vector with factor
+     * Option 0: Take momentum and energy of all ROE and REC side tracks and clusters into account ("event based" variable)
+     * Option 1: Same as option 0, but fix Emiss = pmiss, i.e., set missing mass to 0
+     * Option 2: Same as option 0, but fix Eroe = Ecms/2, i.e., ignore energy from ROE side
+     * Option 3: Don't take any ROE tracks and clusters into account, use signal side only (signal based variable)
+     * Option 4: For energy use only signal side, while for momentum additionally use ROE, but fix the latter's magnitude to 340 MeV/c
+     * Option 7: Same as option 1, but correct pmiss with factor so that dE = 0
      */
     ROOT::Math::PxPyPzEVector missing4Vector(const Particle* particle, const std::string& maskName, const std::string& opt);
 
@@ -378,12 +379,11 @@ namespace Belle2 {
      * Also works for composite particles, where all mdst objects of related FSP particles must be in ROE.
      * This helper function accepts a specific roe object as an argument
      */
-    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe,
-                               const std::string& maskName = RestOfEvent::c_defaultMaskName);
-
+    bool isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe,
+                             const std::string& maskName = RestOfEvent::c_defaultMaskName);
 
     /**
-     * temp
+     * returns Bs* - Bs mass difference
      */
     Manager::FunctionPtr bssMassDifference(const std::vector<std::string>& arguments);
     /**

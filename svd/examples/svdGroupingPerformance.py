@@ -118,22 +118,28 @@ class SVDGroupingPerformance(b2.Module):
 
         timeBin = int(maxTime - minTime)
 
-        #: \cond Doxygen_suppress
+        #: dictionary of TH1F indices
         self.TH1F_Index = {}
+        #: list of TH1F histograms
         self.TH1F_Store = []
         TH1F_Store_Count = 0
 
+        #: dictionary of TH2F indices
         self.TH2F_Index = {}
+        #: list of TH2F histograms
         self.TH2F_Store = []
         TH2F_Store_Count = 0
 
+        #: dictionary of TH2D indices
         self.reso_TH2D_Histogram_Index = {}
+        #: list of TH2D histograms
         self.reso_TH2D_Histograms = []
         reso_TH2D_Histograms_Count = 0
 
+        #: output file name
         self.outputFileName = str(args.fileDir) + str(args.moduleName) + outputFileTag
+        #: output file
         self.f = TFile(self.outputFileName + ".root", "RECREATE")
-        #: \endcond
 
         # EventT0s
 

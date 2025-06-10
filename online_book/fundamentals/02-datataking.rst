@@ -6,7 +6,7 @@ Data Taking
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 45 min
+    **Length**: 30-90 min
 
     **Prerequisites**:
 
@@ -492,7 +492,7 @@ system.
 The HLT system is a computing cluster of about 10000 CPU cores located right next
 to the detector. It receives the full raw subdetector data for each
 triggered event and performs an immediate full reconstruction using the
-exact same basf2 software as is used in offline data analysis. Based on the
+exact same `basf2` software as is used in offline data analysis. Based on the
 result of this reconstruction, events are classified and either stored to a
 local offline storage hard disk drive or discarded. This high level event
 selection is expected to reduce the amount of data written to the offline

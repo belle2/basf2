@@ -36,19 +36,16 @@ namespace TreeFitter {
     /** project this particle constraint  */
     ErrCode projectComposite(const FitParams& fitparams, Projection& p) const;
 
-    /** dimension of the measurement vector */
-    int dimMeas() const        { return m_hasEnergy ? 7 : 6 ; }
-
     /** get dimension of constraint */
     virtual int dim() const override { return m_hasEnergy ? 8 : 7 ; }// (x,y,z,t,px,py,pz,(E))
 
-    /** get dimension  of measurement*/
+    /** get dimension of measurement*/
     int dimM() const        { return m_hasEnergy ? 7 : 6 ; }
 
     /** project this constraint */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const override ;
 
-    /** get ype */
+    /** get type */
     virtual int type() const override { return kComposite ; }
 
     /** get position index in statevectof x,y,z,tau,px,py,pz */

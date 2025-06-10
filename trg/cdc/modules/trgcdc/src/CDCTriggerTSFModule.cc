@@ -103,6 +103,10 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            m_adccut,
            "Threshold for the adc cut for all wires used for TSF.  Default: -1",
            -1);
+  addParam("SaveADC",
+           m_saveadc,
+           "Flag to save ADC for other trg module or not, Default: false",
+           false);
   addParam("ADCflag_low",
            m_adcflag_low,
            "Assign ADC based flag for full hit tracker. Lower threshold of ADC.",
@@ -127,6 +131,7 @@ CDCTriggerTSFModule::initialize()
   }
   if (m_makeRecoLRTable) {
     m_recoTracks.isRequired("RecoTracks");
+    m_cdcHits.isRequired();
     innerRecoLRTable.assign(pow(2, 16), vector<unsigned>(5, 0));
     outerRecoLRTable.assign(pow(2, 12), vector<unsigned>(5, 0));
   }
@@ -493,6 +498,20 @@ CDCTriggerTSFModule::event()
                                           || neibor_hit[isl][(its + 1) % tsLayers[isl]->nCells()] == 1))continue;
 
         const CDCHit* priorityHit = m_cdcHits[s.priority().hit()->iCDCHit()];
+
+        /* generate ADC Pattern for NN*/
+        std::vector<float> fullADC = {};
+        if (m_saveadc) {
+          int nwires = (isl == 0) ? 15 : 11;
+          for (int iwire = 0; iwire < nwires; iwire++) {
+            if (!s[iwire] || !(s[iwire]->hit())) { //Make sure the wire do exist
+              fullADC.push_back(-1);
+              continue;
+            }
+            const CDCHit* cdchit0 = m_cdcHits[s[iwire]->hit()->iCDCHit()];
+            fullADC.push_back(cdchit0->getADCCount());
+          }
+        }
         const CDCTriggerSegmentHit* tsHit =
           m_segmentHits.appendNew(*priorityHit,
                                   s.id(),
@@ -502,9 +521,11 @@ CDCTriggerTSFModule::event()
                                   s.fastestTime(),
                                   s.foundTime(),
                                   -1,
+                                  s.hitPatternTime(),
                                   s.hitPattern(),
+                                  fullADC,
                                   s.hitPattern_adc());
-        float adcSum = 0;
+        unsigned short adcSum = 0;
         // relation to all CDCHits in segment
         for (unsigned iw = 0; iw < s.wires().size(); ++iw) {
           const TRGCDCWire* wire = (TRGCDCWire*)s[iw];

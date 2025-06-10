@@ -70,7 +70,9 @@ namespace Belle2 {
     addParam("gzipFilename", m_filename,
              "Name of the gzip file, where the training samples will be saved.",
              std::string("out.gz"));
-
+    addParam("SaveFakeTrack", m_SaveFakeTrack,
+             "Flag for whether save fake track or not",
+             false);
 
 
 
@@ -123,13 +125,15 @@ namespace Belle2 {
     boost::iostreams::filtering_ostream outStream;
     outStream.push(boost::iostreams::gzip_compressor());
     outStream.push(gzipfile4);
-    CDCTriggerMLPData::NeuroSet<27, 2> sample;
+    int inlen = m_neuroParameters.AdditionWireMode ? 9 * (3 + m_neuroParameters.AdditionInputPerSL) : 27 ;
+    CDCTriggerMLPData::NeuroSet sample(inlen);
     outStream << sample.headline << std::endl;
   }
   void
   CDCTriggerNeuroDataModule::event()
   {
     StoreObjPtr<EventMetaData> evtmetadata;
+    B2DEBUG(150, Form("Number of Track : %d", m_tracks.getEntries()));
     for (int itrack = 0; itrack < m_tracks.getEntries(); ++itrack) {
       // get related MCParticle/RecoTrack for target
       // and retrieve track parameters
@@ -137,60 +141,75 @@ namespace Belle2 {
       //float invptTarget = 0;
       float thetaTarget = 0;
       float zTarget = 0;
+      float PtTarget = 0;
+      bool isFakeTrack = false;
+
       if (m_trainOnRecoTracks) {
         RecoTrack* recoTrack =
           m_tracks[itrack]->getRelatedTo<RecoTrack>(m_targetCollectionName);
         if (!recoTrack) {
-          B2DEBUG(150, "Skipping CDCTriggerTrack without relation to RecoTrack.");
-          continue;
-        }
-        // a RecoTrack has multiple representations for different particle hypothesis
-        // -> just take the first one that does not give errors.
-        const std::vector<genfit::AbsTrackRep*>& reps = recoTrack->getRepresentations();
-        bool foundValidRep = false;
-        for (unsigned irep = 0; irep < reps.size() && !foundValidRep; ++irep) {
-          if (!recoTrack->wasFitSuccessful(reps[irep])) {
+          if (m_SaveFakeTrack)
+            isFakeTrack = true;
+          else {
+            B2DEBUG(150, "Skipping CDCTriggerTrack without relation to RecoTrack.");
             continue;
           }
-
-          // get state (position, momentum etc.) from hit closest to IP and
-          // extrapolate to z-axis (may throw an exception -> continue to next representation)
-          try {
-            genfit::MeasuredStateOnPlane state =
-              recoTrack->getMeasuredStateOnPlaneClosestTo(ROOT::Math::XYZVector(0, 0, 0), reps[irep]);
-            reps[irep]->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
-            // flip tracks if necessary, such that trigger tracks and reco tracks
-            // point in the same direction
-            if (state.getMom().Dot(B2Vector3D(m_tracks[itrack]->getDirection())) < 0) {
-              state.setPosMom(state.getPos(), -state.getMom());
-              state.setChargeSign(-state.getCharge());
+        } else {
+          // a RecoTrack has multiple representations for different particle hypothesis
+          // -> just take the first one that does not give errors.
+          const std::vector<genfit::AbsTrackRep*>& reps = recoTrack->getRepresentations();
+          bool foundValidRep = false;
+          for (unsigned irep = 0; irep < reps.size() && !foundValidRep; ++irep) {
+            if (!recoTrack->wasFitSuccessful(reps[irep])) {
+              continue;
             }
-            // get track parameters
-            //phi0Target = state.getMom().Phi();
-            //invptTarget = state.getCharge() / state.getMom().Pt();
-            thetaTarget = state.getMom().Theta();
-            zTarget = state.getPos().Z();
-          } catch (...) {
+
+            // get state (position, momentum etc.) from hit closest to IP and
+            // extrapolate to z-axis (may throw an exception -> continue to next representation)
+            try {
+              genfit::MeasuredStateOnPlane state =
+                recoTrack->getMeasuredStateOnPlaneClosestTo(ROOT::Math::XYZVector(0, 0, 0), reps[irep]);
+              reps[irep]->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
+              // flip tracks if necessary, such that trigger tracks and reco tracks
+              // point in the same direction
+              if (state.getMom().Dot(B2Vector3D(m_tracks[itrack]->getDirection())) < 0) {
+                state.setPosMom(state.getPos(), -state.getMom());
+                state.setChargeSign(-state.getCharge());
+              }
+              // get track parameters
+              //phi0Target = state.getMom().Phi();
+              //invptTarget = state.getCharge() / state.getMom().Pt();
+              thetaTarget = state.getMom().Theta();
+              zTarget = state.getPos().Z();
+              PtTarget = state.getMom().Pt();
+            } catch (...) {
+              continue;
+            }
+            // break loop
+            foundValidRep = true;
+          }
+          if (!foundValidRep) {
+            B2DEBUG(150, "No valid representation found for RecoTrack, skipping.");
             continue;
           }
-          // break loop
-          foundValidRep = true;
-        }
-        if (!foundValidRep) {
-          B2DEBUG(150, "No valid representation found for RecoTrack, skipping.");
-          continue;
         }
       } else {
         MCParticle* mcTrack =
           m_tracks[itrack]->getRelatedTo<MCParticle>(m_targetCollectionName);
-        if (not mcTrack) {
-          B2DEBUG(150, "Skipping CDCTriggerTrack without relation to MCParticle.");
-          continue;
+        if (!mcTrack) {
+          if (m_SaveFakeTrack)
+            isFakeTrack = true;
+          else {
+            B2DEBUG(150, "Skipping CDCTriggerTrack without relation to MCParticle.");
+            continue;
+          }
+        } else {
+          //phi0Target = mcTrack->getMomentum().Phi();
+          //invptTarget = mcTrack->getCharge() / mcTrack->getMomentum().rho();
+          thetaTarget = mcTrack->getMomentum().Theta();
+          zTarget = mcTrack->getProductionVertex().Z();
+          PtTarget = mcTrack->getMomentum().rho();
         }
-        //phi0Target = mcTrack->getMomentum().Phi();
-        //invptTarget = mcTrack->getCharge() / mcTrack->getMomentum().Pt();
-        thetaTarget = mcTrack->getMomentum().Theta();
-        zTarget = mcTrack->getProductionVertex().Z();
       }
       m_NeuroTrigger.updateTrack(*m_tracks[itrack]);
 
@@ -203,24 +222,33 @@ namespace Belle2 {
 
       // get target values
       std::vector<float> targetRaw = {};
-      if (m_neuroParameters.targetZ)
-        targetRaw.push_back(zTarget);
-      if (m_neuroParameters.targetTheta)
-        targetRaw.push_back(thetaTarget);
+      if (!isFakeTrack) {
+        if (m_neuroParameters.targetZ)
+          targetRaw.push_back(zTarget);
+        if (m_neuroParameters.targetTheta)
+          targetRaw.push_back(thetaTarget);
+      }
       for (unsigned i = 0; i < sectors.size(); ++i) {
         int isector = sectors[i];
-        std::vector<float> target = m_NeuroTrigger[isector].scaleTarget(targetRaw);
-        // skip out of range targets or rescale them
-        bool outOfRange = false;
-        for (unsigned itarget = 0; itarget < target.size(); ++itarget) {
-          if (fabs(target[itarget]) > 1.) {
-            outOfRange = true;
-            target[itarget] /= fabs(target[itarget]);
+        std::vector<float> target;
+        if (isFakeTrack) {
+          target.push_back(2);
+          target.push_back(2);
+        } else {
+          target = m_NeuroTrigger[isector].scaleTarget(targetRaw);
+          // skip out of range targets or rescale them
+          bool outOfRange = false;
+          for (unsigned itarget = 0; itarget < target.size(); ++itarget) {
+            if (fabs(target[itarget]) > 1.) {
+              outOfRange = true;
+              target[itarget] /= fabs(target[itarget]);
+            }
+          }
+          if (!m_neuroParameters.rescaleTarget && outOfRange) {
+            continue;
           }
         }
-        if (!m_neuroParameters.rescaleTarget && outOfRange) {
-          continue;
-        }
+
         //
         // read out or determine event time
         m_NeuroTrigger.getEventTime(isector, *m_tracks[itrack], m_neuroParameters.et_option(), m_neuroTrackInputMode);
@@ -244,12 +272,13 @@ namespace Belle2 {
         // check, if enough axials are there. first, we select the axial bits from the
         // hitpattern (341 = int('101010101',base=2)) and then check if the number of
         // ones is equal or greater than 4.
-        if ((hitPattern & 341) != 341 && // this is an ugly workaround, because popcount is only
-            (hitPattern & 341) != 340 && // available with c++20 and newer
-            (hitPattern & 341) != 337 &&
-            (hitPattern & 341) != 325 &&
-            (hitPattern & 341) != 277 &&
-            (hitPattern & 341) != 85) {
+        int count = 0;
+        unsigned axialPattern = hitPattern & 0b101010101;
+        while (axialPattern) {
+          count += axialPattern & 1;
+          axialPattern >>= 1;
+        }
+        if (count < 4) {
           B2DEBUG(250, "Not enough axial hits (<4), skipping!");
           continue;
         }
@@ -261,9 +290,9 @@ namespace Belle2 {
           hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks[itrack]);
         }
         // add a "sample" it is a full training set including some zeroes for the neurotrigger values (raw and scaled z and theta). Those are sometimes used in the training for reference, but cannot be added here without running *some* neuotrigger instance.
-        CDCTriggerMLPData::NeuroSet<27, 2> sample(m_NeuroTrigger.getInputVector(isector, hitIds).data(), target.data(),
-                                                  evtmetadata->getExperiment(), evtmetadata->getRun(), evtmetadata->getSubrun(), evtmetadata->getEvent(), itrack, i,
-                                                  m_tracks.getEntries(), 0, 0, 0, 0, phi0, theta, invpt);
+        CDCTriggerMLPData::NeuroSet sample(m_NeuroTrigger.getInputVector(isector, hitIds), target,
+                                           evtmetadata->getExperiment(), evtmetadata->getRun(), evtmetadata->getSubrun(), evtmetadata->getEvent(), itrack, i,
+                                           m_tracks.getEntries(), 0, 0, 0, 0, phi0, theta, invpt, PtTarget);
         //check whether we already have enough samples
         m_trainSet[isector].addSample(sample);
         if ((m_trainSet)[isector].nSamples() % 1000 == 0) {
@@ -273,6 +302,7 @@ namespace Belle2 {
         boost::iostreams::filtering_ostream outStream;
         outStream.push(boost::iostreams::gzip_compressor());
         outStream.push(gzipfile4);
+
         outStream << sample << std::endl;
         m_trackcounter++;
       }

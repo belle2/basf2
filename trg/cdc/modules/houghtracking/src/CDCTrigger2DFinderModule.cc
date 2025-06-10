@@ -117,6 +117,9 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
 
   addParam("useadc", m_useadc,
            "Switch to use ADC. Can be used with usehitpattern enabled. ", false);
+
+  addParam("useDB", m_useDB,
+           "Switch to use database to load run dependent parameters. ", true);
 }
 
 void
@@ -157,6 +160,23 @@ CDCTrigger2DFinderModule::initialize()
 
   if (m_suppressClone) {
     B2INFO("2D finder will exit with the first track candidate in time.");
+  }
+}
+
+void
+CDCTrigger2DFinderModule::beginRun()
+{
+  if (m_useDB) {
+    if (not m_cdctrg2d_DB.isValid()) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      B2ERROR("No database for CDCTRG 2D parameter. exp " << evtMetaData->getExperiment() << " run "
+              << evtMetaData->getRun());
+    } else {
+      m_usehitpattern = m_cdctrg2d_DB->getfullhit();
+      m_useadc = m_cdctrg2d_DB->getADC();
+      m_minHits = m_cdctrg2d_DB->gethitthreshold();
+      m_minHitsShort = m_cdctrg2d_DB->gethitthreshold();
+    }
   }
 }
 

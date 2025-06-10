@@ -24,7 +24,7 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    CDCTrigger2DConfig(): m_nTS{0} {}
+    CDCTrigger2DConfig(): m_nTS(10), m_fullhit(false), m_hitthreshold(4), m_ADC(false) {}
     /** copy constructor */
     CDCTrigger2DConfig(const CDCTrigger2DConfig& b): TObject(b)
     {
@@ -48,13 +48,51 @@ namespace Belle2 {
       m_nTS = i;
     }
 
+    /** Get full wire hit enable flag */
+    bool getfullhit() const
+    {
+      return m_fullhit;
+    }
+    /** Set full wire hit enable flag */
+    void setfullhit(bool i)
+    {
+      m_fullhit = i;
+    }
+
+    /** Get the hit threshold */
+    int gethitthreshold() const
+    {
+      return m_hitthreshold;
+    }
+    /** Set the hit threshold */
+    void sethitthreshold(int i)
+    {
+      m_hitthreshold = i;
+    }
+
+    /** Get ADC enable flag */
+    bool getADC() const
+    {
+      return m_ADC;
+    }
+    /** Set ADC enable flag */
+    void setADC(bool i)
+    {
+      m_ADC = i;
+    }
 
   private:
 
     /** Number of TS */
     int m_nTS;
+    /** use full wirehit or not */
+    bool m_fullhit;
+    /** required number of TS or wire hits for 2D track finding*/
+    int m_hitthreshold;
+    /** use ADC or not */
+    bool m_ADC;
 
-    ClassDef(CDCTrigger2DConfig, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(CDCTrigger2DConfig, 2);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
 } // end of namespace Belle2

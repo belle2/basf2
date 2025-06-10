@@ -612,7 +612,7 @@ class ValidationAndOptimisationTask(Basf2PathTask, LSFTask):
         """
         fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
         yield self.add_to_output(
-            f"cdc_svd_merger_ckf_validation{fbdt_string}_{self.result_filter_cut}.root")
+            f"cdc_svd_merger_ckf_validation{fbdt_string}{self.result_filter_cut}.root")
 
     def requires(self):
         """
@@ -716,7 +716,7 @@ class ValidationAndOptimisationTask(Basf2PathTask, LSFTask):
         path.add_module(
             CombinedTrackingValidationModule(
                 output_file_name=self.get_output_file_name(
-                    f"cdc_svd_merger_ckf_validation{fbdt_string}_{self.result_filter_cut}.root"),
+                    f"cdc_svd_merger_ckf_validation{fbdt_string}{self.result_filter_cut}.root"),
                 reco_tracks_name=reco_tracks,
                 mc_reco_tracks_name=mc_reco_tracks,
                 name="",

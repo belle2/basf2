@@ -82,9 +82,9 @@ b2.process(path, max_event=10000)
 assert len(glob.glob('training_input.root')) == 1
 f = ROOT.TFile.Open("training_input.root", "read")
 assert sum(['gamma' == key.GetName()[:5] for key in f.GetListOfKeys()]) == 2
-assert sum(['mu+' == ROOT.Belle2.MakeROOTCompatible.invertMakeROOTCompatible(key.GetName())[:3] for key in f.GetListOfKeys()]) == 1
-assert sum(['pi+' == ROOT.Belle2.MakeROOTCompatible.invertMakeROOTCompatible(key.GetName())[:3] for key in f.GetListOfKeys()]) == 1
-assert sum(['K+' == ROOT.Belle2.MakeROOTCompatible.invertMakeROOTCompatible(key.GetName())[:2] for key in f.GetListOfKeys()]) == 1
+assert sum(['mu__pl' == key.GetName()[:6] for key in f.GetListOfKeys()]) == 1
+assert sum(['pi__pl' == key.GetName()[:6] for key in f.GetListOfKeys()]) == 1
+assert sum(['K__pl' == key.GetName()[:5] for key in f.GetListOfKeys()]) == 1
 f.Close()
 
 # Perform stage 0 training

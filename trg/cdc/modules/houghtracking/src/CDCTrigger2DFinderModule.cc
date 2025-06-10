@@ -169,7 +169,7 @@ CDCTrigger2DFinderModule::beginRun()
   if (m_useDB) {
     if (not m_cdctrg2d_DB.isValid()) {
       StoreObjPtr<EventMetaData> evtMetaData;
-      B2ERROR("No database for CDCTRG 2D parameter. exp " << evtMetaData->getExperiment() << " run "
+      B2FATAL("No database for CDCTRG 2D parameter. exp " << evtMetaData->getExperiment() << " run "
               << evtMetaData->getRun());
     } else {
       m_usehitpattern = m_cdctrg2d_DB->getfullhit();

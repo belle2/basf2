@@ -364,7 +364,7 @@ CDCTriggerTSFModule::beginRun()
   if (m_useDB) {
     if (not m_cdctrgtsf_DB.isValid()) {
       StoreObjPtr<EventMetaData> evtMetaData;
-      B2ERROR("No database for CDCTRG TSF parameter. exp " << evtMetaData->getExperiment() << " run "
+      B2FATAL("No database for CDCTRG TSF parameter. exp " << evtMetaData->getExperiment() << " run "
               << evtMetaData->getRun());
     } else {
       m_adcflag = m_cdctrgtsf_DB->getADC();

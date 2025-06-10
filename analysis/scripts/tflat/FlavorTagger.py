@@ -102,7 +102,13 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             'dz',
             'dr',
             'chiProb',
-            'cosTPTO('+maskName+')']
+            'BtagToWBosonVariables(EW90)',
+            'BtagToWBosonVariables(recoilMassSqrd)/15',
+            'BtagToWBosonVariables(pMissCMS)',
+            'BtagToWBosonVariables(cosThetaMissCMS)',
+            'cosTPTO('+maskName+')',
+            'clusterEoP',
+            'clusterLAT']
 
         ecl_variable_list = [
             'useCMSFrame(p)',
@@ -134,7 +140,7 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
     if maskName == 'TFLATDefaultMask':
         TFLATDefaultMask = (
             'TFLATDefaultMask',
-            'thetaInCDCAcceptance and dr<1 and abs(dz)<3 and p<infinity and p >= 0',
+            'thetaInCDCAcceptance and p<infinity and p >= 0',
             'thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.03 and clusterReg==2] or \
                             [E>0.06 and clusterReg==3]]')
         for name in particle_lists:

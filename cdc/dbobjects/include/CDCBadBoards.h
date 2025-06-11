@@ -33,7 +33,7 @@ namespace Belle2 {
      * @param boardID wire-id to be registered
      * @param eff wire efficiency; specify 0 <= eff < 1 for dead wire; eff > 1 for hot/noisy wire
      */
-    void setWire(const short boardID, double eff = 0)
+    void setBoard(const short boardID, double eff = 0)
     {
       m_boards.insert(std::pair(boardID, eff));
     }
@@ -86,6 +86,20 @@ namespace Belle2 {
       }
     }
 
+    /**
+     * Print out contents
+     */
+    void dump() const
+    {
+      std::cout << " " << std::endl;
+      std::cout << "Bad CDC board list" << std::endl;
+      std::cout << "#entries= " << m_boards.size() << std::endl;
+      if (m_boards.size() > 0) {
+        for (auto const& ent : m_boards) {
+          std::cout << "BoardID: " << ent.first << " Efficiency: " << ent.second << std::endl;
+        }
+      }
+    }
 
   private:
     std::map<unsigned short, float> m_boards; /**< badwire list*/

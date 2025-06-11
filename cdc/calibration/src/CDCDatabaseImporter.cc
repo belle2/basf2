@@ -288,6 +288,35 @@ void Belle2::CDCDatabaseImporter::importBadWire(std::string fileName)
   B2INFO("BadWire table imported to database.");
 }
 
+void Belle2::CDCDatabaseImporter::importBadBoards(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCBadBoards> bb;
+  bb.construct();
+
+  uint iB(0);
+  double effi(0.);
+
+  while (true) {
+    stream >> iB >> effi;
+    if (stream.eof()) break;
+    bb->setBoard(iB, effi);
+  }
+  stream.close();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  bb.import(iov);
+  B2INFO("BadBoard table imported to database.");
+}
+
 
 void Belle2::CDCDatabaseImporter::importPropSpeed(std::string fileName)
 {
@@ -877,6 +906,12 @@ void Belle2::CDCDatabaseImporter::printBadWire()
 {
   DBObjPtr<CDCBadWires> bw;
   bw->dump();
+}
+
+void Belle2::CDCDatabaseImporter::printBadBoards()
+{
+  DBObjPtr<CDCBadBoards> bb;
+  bb->dump();
 }
 
 void Belle2::CDCDatabaseImporter::printPropSpeed()

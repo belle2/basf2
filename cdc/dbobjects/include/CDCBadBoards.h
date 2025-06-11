@@ -73,7 +73,7 @@ namespace Belle2 {
 
     /**
      * Check if the board is hot/noisy
-     * @param  boardId to be checked
+     * @param  boardID to be checked
      * @return true if hot wire; false if not
      */
     bool isHotBoard(const short boardID) const

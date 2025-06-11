@@ -1,3 +1,11 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #include <background/modules/BeamBkgNeutron/BeamBkgNeutronModule.h>
 
 #include <time.h>
@@ -12,8 +20,6 @@
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <top/dataobjects/TOPSimHit.h>
 #include <ecl/dataobjects/ECLSimHit.h>
-// #include <klm/dataobjects/eklm/EKLMSimHit.h>
-// #include <klm/dataobjects/bklm/BKLMSimHit.h>
 #include <klm/dataobjects/KLMSimHit.h>
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 
@@ -122,8 +128,6 @@ namespace Belle2 {
     StoreArray<ARICHSimHit> ARICHSimHits;
     StoreArray<TOPSimHit>   TOPSimHits;
     StoreArray<ECLSimHit>   ECLSimHits;
-//    StoreArray<EKLMSimHit>  EKLMSimHits;
-//    StoreArray<BKLMSimHit>  BKLMSimHits;
     StoreArray<KLMSimHit>   KLMSimHits;
 
     for (Int_t i = 0; i < 13; i++) {
@@ -138,8 +142,6 @@ namespace Belle2 {
     nSimHits[4] = ARICHSimHits.getEntries();
     nSimHits[5] = TOPSimHits.getEntries();
     nSimHits[6] = ECLSimHits.getEntries();
-//    nSimHits[7] = EKLMSimHits.getEntries();
-//    nSimHits[8] = BKLMSimHits.getEntries();
     nSimHits[7] = KLMSimHits.getEntries();
 
     // loop over KLM simHits
@@ -160,8 +162,6 @@ namespace Belle2 {
     RelationIndex<MCParticle, ARICHSimHit> relARICHSimHitToMCParticle(McParticles, ARICHSimHits);
     RelationIndex<MCParticle, TOPSimHit> relTOPSimHitToMCParticle(McParticles, TOPSimHits);
     RelationIndex<MCParticle, ECLSimHit> relECLSimHitToMCParticle(McParticles, ECLSimHits);
-//    RelationIndex<MCParticle, EKLMSimHit> relEKLMSimHitToMCParticle(McParticles, EKLMSimHits);
-//    RelationIndex<MCParticle, BKLMSimHit> relBKLMSimHitToMCParticle(McParticles, BKLMSimHits);
     RelationIndex<MCParticle, KLMSimHit> relKLMSimHitToMCParticle(McParticles, KLMSimHits);
 
     Int_t detID;
@@ -261,39 +261,6 @@ namespace Belle2 {
         }
       }
     }
-    /*
-        //--- EKLM
-        detID = 7;
-        // loop over simhits
-        for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
-          EKLMSimHit* simHit = EKLMSimHits[iHit];
-          // get related MCparticle
-          if (relEKLMSimHitToMCParticle.getFirstElementTo(simHit)) {
-            const MCParticle* currParticle = relEKLMSimHitToMCParticle.getFirstElementTo(simHit)->from;
-            hitPDG[detID] = currParticle->getPDG();
-            if (!currParticle->isPrimaryParticle()) {
-              const MCParticle* momParticle = currParticle->getMother();
-              momPDG[detID] = momParticle->getPDG();
-            }
-          }
-        }
-
-        //--- BKLM
-        detID = 8;
-        // loop over simhits
-        for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
-          BKLMSimHit* simHit = BKLMSimHits[iHit];
-          // get related MCparticle
-          if (relBKLMSimHitToMCParticle.getFirstElementTo(simHit)) {
-            const MCParticle* currParticle = relBKLMSimHitToMCParticle.getFirstElementTo(simHit)->from;
-            hitPDG[detID] = currParticle->getPDG();
-            if (!currParticle->isPrimaryParticle()) {
-              const MCParticle* momParticle = currParticle->getMother();
-              momPDG[detID] = momParticle->getPDG();
-            }
-          }
-        }
-    */
     //--- KLM
     detID = 7;
     // loop over simhits

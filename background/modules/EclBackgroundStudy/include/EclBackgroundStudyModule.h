@@ -1,3 +1,11 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #pragma once
 
 #include <ecl/dataobjects/ECLSimHit.h>
@@ -14,6 +22,10 @@
 #include <TTree.h>
 
 namespace Belle2 {
+
+  /**
+   * EclBackgroundStudy module
+   */
   class EclBackgroundStudyModule : public Module {
   public:
 
@@ -67,15 +79,15 @@ namespace Belle2 {
 
     std::string m_filename; /**< Output file name.   */
 
-    std::vector<int>  m_CellId;
-    std::vector<int>  m_TcId;
-    std::vector<int>  m_Pdg;
-    std::vector<double>  m_Edep;
-    std::vector<double>  m_TimeAve;
-    std::vector<double>  m_FlightTime;
-    std::vector<double>  m_Hadronedep;
+    std::vector<int>  m_CellId; /**< Vector of CellId */
+    std::vector<int>  m_TcId; /**< Vector of TcId */
+    std::vector<int>  m_Pdg; /**< Vector of PDG codes */
+    std::vector<double>  m_Edep; /**< Vector of deposited energies */
+    std::vector<double>  m_TimeAve; /**< Vector of average times */
+    std::vector<double>  m_FlightTime; /**< Vector of flight times */
+    std::vector<double>  m_Hadronedep; /**< Vector of hadronic deposited energies */
 
-    Int_t m_iEntry;
+    Int_t m_iEntry; /**< Entry identifier */
 
     TFile* m_ff;    /**< Output root file.   */
     TTree* m_tree1;   /**< Output tree */

@@ -1299,12 +1299,7 @@ namespace Belle2 {
           ostringstream oss_block_num;
           oss_block_num << i;
 
-          string geo_blockx_name;
-          if (i == block_cut_N) {
-            geo_blockx_name = "geo_" + name + "_name";
-          } else {
-            geo_block_name = "geo_" + name + "_x" + oss_block_num.str() + "_name";
-          }
+          geo_block_name = "geo_" + name + "_x" + oss_block_num.str() + "_name";
           string geo_cut_name = "geo_" + name + "_cut" + oss_block_num.str() + "_name";
 
           double cut_L = m_config.getParameter(prep + "cutL" + oss_block_num.str()) * unitFactor;
@@ -1355,7 +1350,7 @@ namespace Belle2 {
           string phys_block_name = "phys_" + name + "-" + oss_block_num.str() + "_name";
           new G4PVPlacement(block.transform, block.logi, phys_block_name, &topVolume, false, 0);
 
-          elements[name] = block;
+          // elements[name] = block;
         }
       }
 
@@ -1394,12 +1389,7 @@ namespace Belle2 {
 
           //string cut_type = m_config.getParameterStr(prep + "cutType" + oss_block_num.str());
           double cut_type = m_config.getParameter(prep + "cutType" + oss_block_num.str());
-          string geo_layerx_name;
-          if (i == layer_cut_N) {
-            geo_layerx_name = "geo_" + name + "_name";
-          } else {
-            geo_layer_name = "geo_" + name + "_x" + oss_block_num.str() + "_name";
-          }
+          geo_layer_name = "geo_" + name + "_x" + oss_block_num.str() + "_name";
           string geo_cut_name = "geo_" + name + "_cut" + oss_block_num.str() + "_name";
 
           G4VSolid* geo_cut;
@@ -1411,13 +1401,12 @@ namespace Belle2 {
 
             geo_cut = new G4Box(geo_cut_name, cut_W / 2.0, cut_H / 2.0, cut_L / 2.0);
             //} else if(cut_type == "Tubs") {
-          } else if (cut_type != 0.0) {
+          } else {
             double cut_L = m_config.getParameter(prep + "cutL" + oss_block_num.str()) * unitFactor;
             double cut_R = m_config.getParameter(prep + "cutR" + oss_block_num.str()) * unitFactor;
 
             geo_cut = new G4Tubs(geo_cut_name, 0.0, cut_R, cut_L / 2.0, 0.0, 2.0 * M_PI);
-          } else
-            continue;
+          }
 
           double cut_X0 = m_config.getParameter(prep + "cutX0" + oss_block_num.str()) * unitFactor;
           double cut_Y0 = m_config.getParameter(prep + "cutY0" + oss_block_num.str()) * unitFactor;
@@ -1450,7 +1439,7 @@ namespace Belle2 {
         string phys_layer_name = "phys_" + name + "_name";
         new G4PVPlacement(layer.transform, layer.logi, phys_layer_name, &topVolume, false, 0);
 
-        elements[name] = layer;
+        // elements[name] = layer;
       }
 
       //---------------------------

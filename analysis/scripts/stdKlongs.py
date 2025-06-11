@@ -16,13 +16,14 @@ def stdKlongs(listtype='allklm', path=None):
     """
     Warning:
         This function is a placeholder for Klong selections. Currently
-        everything but the 'allklm' list is disabled pending study.
+        everything but the 'allklm' and 'allecl' lists is disabled pending study.
 
-    Prepares the 'K_L0:allklm' list with no cuts (all KLM clusters are loaded).
+    By default, prepares the 'K_L0:allklm' list with no cuts (all KLM clusters are loaded).
+    It's possible to provide the argument 'allecl' to create a list of all ECL clusters loaded as Klong candidates.
 
     Parameters:
         listtype (str): name of standard list options (currently only
-            'all' is supported/recommended)
+            'allklm' and 'allecl' are supported/recommended)
         path (basf2.Path): modules are added to this path
     """
 
@@ -30,6 +31,7 @@ def stdKlongs(listtype='allklm', path=None):
     if listtype == 'allklm':
         B2WARNING('The Klong particles in the list "allklm" are exclusively built from KLMClusters!')
         fillParticleList('K_L0:allklm', '[isFromKLM > 0] and [klmClusterKlId >= 0] and [klmClusterKlId <= 1]', True, path)
+    # all ECL clusters
     elif listtype == 'allecl':
         B2WARNING('The Klong particles in the list "allecl" are exclusively built from ECLClusters!')
         fillParticleList('K_L0:allecl', 'isFromECL > 0', True, path)

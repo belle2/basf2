@@ -91,7 +91,7 @@ namespace Belle2 {
 
     /** Get the electron deposition along constant stepsize.
      * The electron deposition will be sampled between posIn and posOut in
-     * equal steps with a specified length. The acutal sampling length might
+     * equal steps with a specified length. The actual sampling length might
      * differ slightly from the given parameter but will be equal and below the
      * given value for all steps. The returned vector will contain fractions
      * between posIn and posOut and the electrons deposited up to that point.It

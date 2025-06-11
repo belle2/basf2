@@ -41,7 +41,7 @@ namespace Belle2 {
   namespace CDC {
 
     //! The Class for CDC Geometry Parameters
-    /*! This class provides CDC gemetry paramters for simulation, reconstruction and so on.
+    /*! This class provides CDC geometry parameters for simulation, reconstruction and so on.
         These parameters are gotten from gearbox.
     */
     class CDCGeometryPar {
@@ -745,7 +745,7 @@ namespace Belle2 {
       }
 
       /**
-       * Return the nominal spacial resolution.
+       * Return the nominal spatial resolution.
        * (default: 130 um defined in CDC.xml).
        */
 
@@ -803,8 +803,8 @@ namespace Belle2 {
       }
 
       /**
-       * Set the nominal spacial resolution in the unit of um.
-       * @param[in] resol spacial resolution (um)
+       * Set the nominal spatial resolution in the unit of um.
+       * @param[in] resol spatial resolution (um)
        *
        */
 
@@ -1137,7 +1137,7 @@ namespace Belle2 {
       double m_senseWireDensity;                    /*!< The density of sense wires. */
       double m_fieldWireDiameter;                   /*!< The diameter of field wires. */
 
-      double m_globalPhiRotation;  /*!< Global ratation in phi (rad.); only for sence wires now. */
+      double m_globalPhiRotation;  /*!< Global ratation in phi (rad.); only for sense wires now. */
 
       double m_momZ[7];      /*!< Z-cordinates of the cdc mother volume (7 segments). */
       double m_momRmin[7];   /*!< R_min of the cdc mother volume  (7 segments).       */
@@ -1167,7 +1167,7 @@ namespace Belle2 {
       float m_thetaPoints4Sgm[c_maxNThetaPoints]; /*!< theta sampling points for sigma (rad) */
 
       float m_XT[c_maxNSenseLayers][2][c_maxNAlphaPoints][c_maxNThetaPoints][c_nXTParams];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
-      float m_Sigma[c_maxNSenseLayers][2][c_maxNAlphaPoints][c_maxNThetaPoints][c_nSigmaParams];      /*!< position resulution for each layer. */
+      float m_Sigma[c_maxNSenseLayers][2][c_maxNAlphaPoints][c_maxNThetaPoints][c_nSigmaParams];      /*!< position resolution for each layer. */
       float m_propSpeedInv[c_maxNSenseLayers];  /*!< Inverse of propagation speed of the sense wire. */
       float m_t0[c_maxNSenseLayers][c_maxNDriftCells] = {};  /*!< t0 for each sense-wire (in nsec). */
       float m_timeWalkCoef[c_nBoards][2];  /*!< coefficients for time walk. */
@@ -1187,7 +1187,7 @@ namespace Belle2 {
       double m_nominalDriftV;      /*!< Nominal drift velocity (4.0x10^-3 cm/nsec). */
       double m_nominalDriftVInv;   /*!< Inverse of the nominal drift velocity. */
       double m_nominalPropSpeed;   /*!< Nominal propagation speed of the sense wire (27.25 cm/nsec). */
-      double m_nominalSpaceResol;  /*!< Nominal spacial resolution (0.0130 cm). */
+      double m_nominalSpaceResol;  /*!< Nominal spatial resolution (0.0130 cm). */
       double m_maxSpaceResol;      /*!< max space resolution allowed (cm). */
       double m_fudgeFactorForSigma[3];     /*!< Fuge factor for space resol. */
 

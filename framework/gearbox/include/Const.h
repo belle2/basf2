@@ -135,12 +135,12 @@ namespace Belle2 {
         /**
          * Operator ==.
          */
-        bool operator==(const Iterator& iterator);
+        bool operator==(const Iterator& iterator) const;
 
         /**
          * Operator !=.
          */
-        bool operator!=(const Iterator& iterator);
+        bool operator!=(const Iterator& iterator) const;
 
         /**
          * Get index.

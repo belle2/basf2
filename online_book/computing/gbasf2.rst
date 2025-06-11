@@ -6,16 +6,14 @@ Gbasf2
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 45 min
-
-    **Exercises**: 20-30 min
+    **Length**: 1-1.5 hrs
 
     **Prerequisites**:
 
     * See `Computing getting started <https://xwiki.desy.de/xwiki/rest/p/c804c>`_.
     * Access to KEKCC or NAF (recommended), or to a system with CentOS 7 or EL9 and CVMFS mounted.
     * A valid `grid certificate <https://xwiki.desy.de/xwiki/rest/p/d9328>`_ installed in ``~/.globus`` and in a web browser.
-    * A working basf2 steering script (see the :ref:`onlinebook_first_steering_file` lesson)
+    * A working `basf2` steering script (see the :ref:`onlinebook_first_steering_file` lesson)
 
     **Questions**:
 
@@ -33,16 +31,16 @@ Gbasf2
     * Check the documentation and ask for help if necessary.
     * Download the output for offline analysis.
 
-Gbasf2 is the command-line client for submitting grid-based basf2 jobs.
+Gbasf2 is the command-line client for submitting grid-based `basf2` jobs.
 Belle II data and MC samples are distributed in many storage sites around the world. Gbasf2 and a set of grid-based user tools (gb2 tools) allow you to access and
 analyze them.
 
-The same basf2 steering files are used when running on the grid. The usual workflow is:
+The same `basf2` steering files are used when running on the grid. The usual workflow is:
 
-* Develop a basf2 steering file.
+* Develop a `basf2` steering file.
 * Test it locally (don't skip this step!).
 * Locate your input files on the grid.
-* Submit jobs to the grid with the same basf2 steering file.
+* Submit jobs to the grid with the same `basf2` steering file.
 * Download the output to perform offline analysis (plots, fits, etc.).
 
 .. warning::
@@ -77,7 +75,7 @@ Setting up gbasf2 via cvmfs
 Since the DIRAC user interface relies on some middleware components, this limits the operating environments in which
 gbasf2 can function. At this moment, only CentOS 7 is supported (it works on other EL9-based operating systems like AlmaLinux 9 but please be aware it is not fully validated).
 
-Also, unfortunately at this moment the basf2 and gbasf2 environments are not compatible. This means gbasf2 requires
+Also, unfortunately at this moment the `basf2` and gbasf2 environments are not compatible. This means gbasf2 requires
 a fresh ssh session (without sourcing ``b2setup``).
 
 .. note::
@@ -245,7 +243,7 @@ The ``MC Event types`` box show, by default, the generic samples available (char
 If you want to search
 signal samples, you need to specify the `signal event type <https://xwiki.desy.de/xwiki/rest/p/3a506>`_.
 Also, if you want to search uDST skim samples - which are what we will be using in the examples - you can find them at
-:ref:`skim/doc/04-experts:Skim Registry` section in the basf2 software documentation.
+:ref:`skim/doc/04-experts:Skim Registry` section in the `basf2` software documentation.
 
 .. note::
 
@@ -258,7 +256,7 @@ Also, if you want to search uDST skim samples - which are what we will be using 
 .. note::
 
     For further information about uDST skims, including the skim code and the decay name associated with that code,
-    see the basf2
+    see the `basf2`
     `skim registry <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/skim/scripts/skim/registry.py>`_.
 
 .. admonition:: Exercise
@@ -270,7 +268,7 @@ Also, if you want to search uDST skim samples - which are what we will be using 
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Search the basf2
+     Search the `basf2`
      `skim registry <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/skim/scripts/skim/registry.py>`_ and look
      at the skim codes and names.
 
@@ -330,6 +328,7 @@ Another way to interact with the dataset searcher is using the command line tool
 	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00032954/s00/e0026/4S/r00000/uubar/14120601/udst
 	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00032969/s00/e0026/4S/r00000/uubar/14120601/udst
 
+.. _GBASF2_Collections:
 
 Collections
 ----------------------------------
@@ -379,13 +378,13 @@ and get the metadata for the collection with ``gb2_ds_search collection --get_me
 Submit your first jobs to the Grid
 ----------------------------------
 
-As mentioned before, gbasf2 uses exactly the same steering files of basf2 to submit jobs to the grid. The basic usage is
+As mentioned before, gbasf2 uses exactly the same steering files of `basf2` to submit jobs to the grid. The basic usage is
 
 .. code-block:: bash
 
         gbasf2 <your_steering_file.py> -p <project_name> -s <available_basf2_release>
 
-where ``project_name`` is a name assigned by you, and ``available_basf2_release`` is the available basf2 software
+where ``project_name`` is a name assigned by you, and ``available_basf2_release`` is the available `basf2` software
 version to use.
 
 .. note::
@@ -463,17 +462,17 @@ After verifying that everything is correct, you can confirm the submission.
 .. admonition:: Question
      :class: exercise stacked
 
-     What is the the basf2 release in the example above?
+     What is the the `basf2` release in the example above?
 
 .. admonition:: Solution
      :class: toggle solution
 
-     The basf2 light release is ``light-2311-nebelung``.
+     The `basf2` light release is ``light-2311-nebelung``.
 
 
 .. tip::
 
-    You can check which basf2 releases are available for running jobs on the grid using ``gb2_check_release``.
+    You can check which `basf2` releases are available for running jobs on the grid using ``gb2_check_release``.
 
 .. admonition:: Key points
     :class: key-points
@@ -494,7 +493,7 @@ After verifying that everything is correct, you can confirm the submission.
 
      Submit a gbasf2 job with an steering file built by you in previous chapters of the book, for analyzing
      a datablock of MC15rd_b, MC Event Types ``charged`` at center-of-mass energy ``4S``.
-     Use ``light-2311-nebelung`` of basf2.
+     Use ``light-2311-nebelung`` of `basf2`.
 
      Remember:
 
@@ -755,7 +754,7 @@ It is also possible to retrieve the log files directly from the command line usi
 .. admonition:: Solution
      :class: toggle solution
 
-     The file ``basf2helper.py.log`` contains the actual output of your basf2 steering file executed on the grid site.
+     The file ``basf2helper.py.log`` contains the actual output of your `basf2` steering file executed on the grid site.
 
 
 Where to go for help?

@@ -24,6 +24,11 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
+/* ROOT headers. */
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
+
 using namespace std;
 
 namespace Belle2::Variable {
@@ -48,11 +53,11 @@ namespace Belle2::Variable {
     if (!cluster) {
       return 0;
     }
-    const B2Vector3D& pos = cluster->getClusterPosition();
+    const ROOT::Math::XYZVector& pos = cluster->getClusterPosition();
     StoreArray<TrackFitResult> tracks;
     for (const TrackFitResult& track : tracks) {
-      const B2Vector3D& trackPos = track.getPosition();
-      if (trackPos.Angle(pos) < angle) {
+      const ROOT::Math::XYZVector& trackPos = track.getPosition();
+      if (ROOT::Math::VectorUtil::Angle(trackPos, pos) < angle) {
         return 1;
       }
     }
@@ -66,11 +71,11 @@ namespace Belle2::Variable {
     if (!klmCluster) {
       return 0;
     }
-    const B2Vector3D& klmClusterPos = klmCluster->getClusterPosition();
+    const ROOT::Math::XYZVector& klmClusterPos = klmCluster->getClusterPosition();
     StoreArray<ECLCluster> eclClusters;
     for (const ECLCluster& eclCluster : eclClusters) {
-      const B2Vector3D& eclClusterPos = eclCluster.getClusterPosition();
-      if (eclClusterPos.Angle(klmClusterPos) < angle) {
+      const ROOT::Math::XYZVector& eclClusterPos = eclCluster.getClusterPosition();
+      if (ROOT::Math::VectorUtil::Angle(eclClusterPos, klmClusterPos) < angle) {
         return 1;
       }
     }
@@ -232,13 +237,13 @@ namespace Belle2::Variable {
 
     // get the input particle's vector momentum in the CMS frame
     PCmsLabTransform T;
-    const B2Vector3D pCms = (T.rotateLabToCms() * particle->get4Vector()).Vect();
+    const ROOT::Math::PxPyPzEVector pCms = T.rotateLabToCms() * particle->get4Vector();
 
     // find the KLM cluster with the largest angle
     double maxAngle = 0.0;
     for (int iKLM = 0; iKLM < clusters.getEntries(); iKLM++) {
-      const B2Vector3D clusterMomentumCms = (T.rotateLabToCms() * clusters[iKLM]->getMomentum()).Vect();
-      double angle = pCms.Angle(clusterMomentumCms);
+      const ROOT::Math::PxPyPzEVector clusterMomentumCms = T.rotateLabToCms() * clusters[iKLM]->getMomentum();
+      double angle = ROOT::Math::VectorUtil::Angle(pCms, clusterMomentumCms);
       if (angle > maxAngle) maxAngle = angle;
     }
     return maxAngle;

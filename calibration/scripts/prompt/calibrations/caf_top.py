@@ -82,9 +82,10 @@ def get_calibrations(input_data, **kwargs):
                moduleT0_calibration_LL(inputFiles, sample),  # this cal cannot span across experiments
                commonT0_calibration_BF(inputFiles),  # this is run-dep
                offset_calibration(inputFiles),  # this is run-dep
+               photonYields_calibration(inputFiles, sample),  # this cal cannot span across experiments
                calibration_validation(inputFiles, sample)]  # this is run-dep
         cal[1].save_payloads = False  # don't save the rough moduleT0 result
-        cal[5].save_payloads = False  # in fact it does not make any payloads, but produces histograms for validation
+        cal[6].save_payloads = False  # in fact it does not make any payloads, but produces histograms for validation
 
     for c in cal:
         # If it's a SequentialBoundary calibration, check if there is any boundary in the config file

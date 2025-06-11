@@ -519,7 +519,7 @@ def structparser(token):
             return [token]
         # Split the format string into a list of 'q', '4h' etc.
         formatlist = re.findall(STRUCT_SPLIT_RE, m.group('fmt'))
-        # Now deal with mulitiplicative factors, 4h -> hhhh etc.
+        # Now deal with multiplicative factors, 4h -> hhhh etc.
         fmt = ''.join([f[-1] * int(f[:-1]) if len(f) != 1 else
                        f for f in formatlist])
         if endian == '@':
@@ -779,7 +779,7 @@ class Bits(object):
 
     def __new__(cls, auto=None, length=None, offset=None, _cache=None, **kwargs):
         # For instances auto-initialised with a string we intern the
-        # instance for re-use.
+        # instance for reuse.
         if _cache is None:
             _cache = {}
         try:
@@ -1377,7 +1377,7 @@ class Bits(object):
                   "The allowed range is [0, {2}]."
             raise CreationError(msg, uint, length, (1 << length) - 1)
         if uint < 0:
-            raise CreationError("uint cannot be initialsed by a negative number.")
+            raise CreationError("uint cannot be initialised by a negative number.")
         s = hex(uint)[2:]
         s = s.rstrip('L')
         if len(s) & 1:
@@ -3140,7 +3140,7 @@ class BitArray(Bits):
         else:
             if step != 1:
                 # convert to binary string and use string slicing
-                # TODO: Horribly inefficent
+                # TODO: Horribly inefficient
                 temp = list(self._getbin())
                 v = list(Bits(value)._getbin())
                 temp.__setitem__(key, v)
@@ -3224,7 +3224,7 @@ class BitArray(Bits):
         else:
             if step != 1:
                 # convert to binary string and use string slicing
-                # TODO: Horribly inefficent
+                # TODO: Horribly inefficient
                 temp = list(self._getbin())
                 temp.__delitem__(key)
                 self._setbin_unsafe(''.join(temp))
@@ -3816,7 +3816,7 @@ class ConstBitStream(Bits):
         return self._pos // 8
 
     def _setbitpos(self, pos):
-        """Move to absolute postion bit in bitstream."""
+        """Move to absolute position bit in bitstream."""
         if pos < 0:
             raise ValueError("Bit position cannot be negative.")
         if pos > self.len:

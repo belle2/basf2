@@ -56,10 +56,12 @@ Conference proceedings
 Additional publications
 +++++++++++++++++++++++
 
-Here you can find a list of additional Belle II software publications covering algorithms currently under development. When fully implemented in basf2, these publications will be moved in the sections above.
+Here you can find a list of additional Belle II software publications covering algorithms currently under development. When fully implemented in ``basf2``, these publications will be moved in the sections above.
 
 +-------------------------------------------------------------------------------------------+----------------------------------------------------------------------------+------------------------+
 | Title                                                                                     | DOI                                                                        | Topic                  |
 +===========================================================================================+============================================================================+========================+
+| End-to-End Multi-track Reconstruction Using Graph Neural Networks at Belle II             | `10.1007/s41781-025-00135-6 <https://doi.org/10.1007/s41781-025-00135-6>`_ | GNN for CDC tracking   |
++-------------------------------------------------------------------------------------------+----------------------------------------------------------------------------+------------------------+
 | Photon Reconstruction in the Belle II Calorimeter Using Graph Neural Networks             | `10.1007/s41781-023-00105-w <https://doi.org/10.1007/s41781-023-00105-w>`_ | GNN for ECL clustering |
 +-------------------------------------------------------------------------------------------+----------------------------------------------------------------------------+------------------------+

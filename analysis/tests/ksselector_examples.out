@@ -1,0 +1,76 @@
+[INFO] Steering file: analysis/tests/ksselector_examples.py
+TFile: CreateTrainData_Ks.root
+TTree: lambdavetotree
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 25015002
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 2
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: cosVertexMomentum, 1
+TBranch: flightDistance, 2.436
+TBranch: significanceOfDistance, 124.2
+TBranch: cosHelicityAngleMomentum, 0.04788
+TBranch: ImpactXY, 0.01842
+TBranch: decayAngle__bo0__bc, 1.534
+TBranch: decayAngle__bo1__bc, 1.566
+TBranch: daughterAngleDiffInMother, 3.098
+TBranch: daughtersDeltaZ, -1.562
+TBranch: pip_nSVDHits, 0
+TBranch: pip_nPXDHits, 0
+TBranch: pin_nSVDHits, 0
+TBranch: pin_nPXDHits, 0
+TBranch: pip_dr, 0.8167
+TBranch: pin_dr, 0.4357
+TBranch: pip_protonID, 4.1e-08
+TBranch: pin_protonID, 7.513e-38
+TBranch: M_lambda_p, 1.325
+TBranch: M_lambda_antip, 1.296
+TBranch: pip_p, 0.5611
+TBranch: pin_p, 0.6106
+TBranch: pip_cosTheta, -0.834
+TBranch: pin_cosTheta, -0.4479
+TBranch: ArmenterosLongitudinalMomentumAsymmetry, -0.04743
+TBranch: ArmenterosDaughter1Qt, 0.205
+TBranch: ArmenterosDaughter2Qt, 0.2073
+TBranch: isNotContinuumEvent, False
+TBranch: isSignal, 1
+TTree: kstree
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 25015002
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 2
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: cosVertexMomentum, 1
+TBranch: flightDistance, 2.436
+TBranch: significanceOfDistance, 124.2
+TBranch: cosHelicityAngleMomentum, 0.04788
+TBranch: ImpactXY, 0.01842
+TBranch: decayAngle__bo0__bc, 1.534
+TBranch: decayAngle__bo1__bc, 1.566
+TBranch: daughterAngleDiffInMother, 3.098
+TBranch: daughtersDeltaZ, -1.562
+TBranch: pip_nSVDHits, 0
+TBranch: pip_nPXDHits, 0
+TBranch: pin_nSVDHits, 0
+TBranch: pin_nPXDHits, 0
+TBranch: pip_dr, 0.8167
+TBranch: pin_dr, 0.4357
+TBranch: pip_protonID, 4.1e-08
+TBranch: pin_protonID, 7.513e-38
+TBranch: M_lambda_p, 1.325
+TBranch: M_lambda_antip, 1.296
+TBranch: pip_p, 0.5611
+TBranch: pin_p, 0.6106
+TBranch: pip_cosTheta, -0.834
+TBranch: pin_cosTheta, -0.4479
+TBranch: ArmenterosLongitudinalMomentumAsymmetry, -0.04743
+TBranch: ArmenterosDaughter1Qt, 0.205
+TBranch: ArmenterosDaughter2Qt, 0.2073
+TBranch: isNotContinuumEvent, False
+TBranch: isSignal, 1

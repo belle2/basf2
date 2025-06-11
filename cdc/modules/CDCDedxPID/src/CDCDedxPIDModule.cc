@@ -406,10 +406,10 @@ void CDCDedxPIDModule::event()
         const genfit::MeasuredStateOnPlane& mop = fi->getFittedState();
 
         // use the MOP to determine the DOCA and entrance angle
-        B2Vector3D fittedPoca = mop.getPos();
-        const TVector3& pocaMom = mop.getMom();
+        ROOT::Math::XYZVector fittedPoca = ROOT::Math::XYZVector(mop.getPos());
+        const ROOT::Math::XYZVector& pocaMom = ROOT::Math::XYZVector(mop.getMom());
         if (tp == gftrackPoints.begin() || cdcMom == 0) {
-          cdcMom = pocaMom.Mag();
+          cdcMom = pocaMom.R();
           dedxTrack->m_pCDC = cdcMom;
         }
         if (nomom)
@@ -422,13 +422,13 @@ void CDCDedxPIDModule::event()
         //  B2Vector3D pocaOnWire = cdcRecoHit->constructPlane(mop)->getO();
 
         // uses the plane determined by the track fit.
-        B2Vector3D pocaOnWire = mop.getPlane()->getO(); // DOUBLE CHECK THIS --\/
+        ROOT::Math::XYZVector pocaOnWire = ROOT::Math::XYZVector(mop.getPlane()->getO()); // DOUBLE CHECK THIS --\/
 
         // The vector from the wire to the track.
-        B2Vector3D B2WireDoca = fittedPoca - pocaOnWire;
+        ROOT::Math::XYZVector B2WireDoca = fittedPoca - pocaOnWire;
 
         // the sign of the doca is defined here to be positive in the +x dir in the cell
-        double doca = B2WireDoca.Perp();
+        double doca = B2WireDoca.Rho();
         double phidiff = fittedPoca.Phi() - pocaOnWire.Phi();
         // be careful about "wrap around" cases when the poca and wire are close, but
         // the difference in phi is largy
@@ -483,7 +483,7 @@ void CDCDedxPIDModule::event()
           double onedcor = (m_DB1DCell && m_usePrediction && numMCParticles == 0) ? m_DB1DCell->getMean(currentLayer, entAngRS) : 1.0;
 
           // apply the calibration to dE to propagate to both hit and layer measurements
-          // Note: could move the sin(theta) here since it is common accross the track
+          // Note: could move the sin(theta) here since it is common across the track
           //       It is applied in two places below (hit level and layer level)
           double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * dedxTrack->m_cosEdgeCor * dedxTrack->m_timeGain * wiregain *
                               twodcor * onedcor;

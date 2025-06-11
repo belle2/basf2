@@ -32,7 +32,7 @@ particles = fei.get_default_channels(
 )  # [E10]
 # Set up FEI configuration specifying the FEI prefix [S20]
 configuration = fei.FeiConfiguration(
-    prefix="FEIv4_2021_MC14_release_05_01_12", monitor=False
+    prefix="FEIv1_2025_MC16ri_aldebaran_200", monitor=False
 )  # [E20]
 
 # Get FEI path [S30]

@@ -80,12 +80,12 @@ std::vector < short int> Track::getValidIndices() const
 const TrackFitResult* Track::getTrackFitResultWithClosestMassByName(const Const::ChargedStable& requestedType,
     const std::string trackFitResultsName) const
 {
-  // make sure at least one hypothesis exist. No B2 Track should exist which does not have at least
+  // make sure at least one hypothesis exists. No B2 Track should exist which does not have at least
   // one hypothesis
   B2ASSERT("Belle2::Track must always have at least one successfully fitted hypothesis.", getNumberOfFittedHypotheses() > 0);
 
   // find fitted hypothesis which is closest to the mass of our requested particle type
-  auto allFitRes = getTrackFitResultsByName(trackFitResultsName);
+  const auto& allFitRes = getTrackFitResultsByName(trackFitResultsName);
 
   // sort so the closest mass hypothesis fit in the first entry of the vector
   auto bestMassFit = std::min_element(allFitRes.begin(), allFitRes.end(), [requestedType](auto & a, auto & b) {
@@ -104,6 +104,21 @@ const TrackFitResult* Track::getTrackFitResultWithClosestMassByName(const Const:
 const TrackFitResult* Track::getTrackFitResultWithClosestMass(const Const::ChargedStable& requestedType) const
 {
   return getTrackFitResultWithClosestMassByName(requestedType, "");
+}
+
+const TrackFitResult* Track::getTrackFitResultWithBestPValue(const std::string& trackFitResultsName) const
+{
+  // make sure at least one hypothesis exists. No B2 Track should exist which does not have at least
+  // one hypothesis
+  B2ASSERT("Belle2::Track must always have at least one successfully fitted hypothesis.", getNumberOfFittedHypotheses() > 0);
+
+  // sort TrackFitResults by p value
+  const auto& allFitResults = getTrackFitResultsByName(trackFitResultsName);
+  const auto& bestPValueFit = std::max_element(allFitResults.begin(), allFitResults.end(), [](const auto & a, const auto & b) {
+    if (std::isnan(a.second->getPValue())) return true;
+    return a.second->getPValue() < b.second->getPValue();
+  });
+  return bestPValueFit->second;
 }
 
 std::string Track::getInfoHTML() const

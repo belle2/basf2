@@ -77,7 +77,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
     B2INFO("--------- Applyingselection, 2D-region selection parameters: ");
     B2INFO("Upper Line (q, m): " << m_interceptUpperLine << ", " << m_angularCoefficientUpperLine);
     B2INFO("Lower Line (q, m): " << m_interceptLowerLine << ", " << m_angularCoefficientLowerLine);
-  } //B2INFO("Selecton applied : " << m_applyLinearCutsToRemoveBkg);
+  } //B2INFO("Selection applied : " << m_applyLinearCutsToRemoveBkg);
 
   auto __hEventT0vsCoG__ = getObjectPtr<TH3F>("__hEventT0vsCoG__");
   auto __hEventT0__ = getObjectPtr<TH2F>("__hEventT0__");

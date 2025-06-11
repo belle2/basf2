@@ -73,7 +73,7 @@ void PrimitivePlotter::drawCircleArc(float startX,
                                      const AttributeMap& attributeMap  __attribute__((unused)))
 {
   // The actual extend of the circle arc is more complicating.
-  // Please fill in the soultion if you have one.
+  // Please fill in the solution if you have one.
   m_boundingBox &= BoundingBox(startX, startY, endX, endY);
 }
 

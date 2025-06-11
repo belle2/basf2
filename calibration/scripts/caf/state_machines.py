@@ -145,7 +145,7 @@ class Machine():
       initial_state (str):
 
     Base class for a final state machine wrapper.
-    Implements the framwork that a more complex machine can inherit from.
+    Implements the framework that a more complex machine can inherit from.
 
     The `transitions` attribute is a dictionary of trigger name keys, each value of
     which is another dictionary of 'source' states, 'dest' states, and 'conditions'
@@ -261,7 +261,7 @@ class Machine():
     def add_transition(self, trigger, source, dest, conditions=None, before=None, after=None):
         """
         Adds a single transition to the dictionary of possible ones.
-        Trigger is the method name that begins the transtion between the
+        Trigger is the method name that begins the transition between the
         source state and the destination state.
 
         The condition is an optional function that returns True or False
@@ -420,7 +420,7 @@ class CalibrationMachine(Machine):
         #: Calibration object whose state we are modelling
         self.calibration = calibration
         # Monkey Patching for the win!
-        #: Allows calibration object to hold a refernce to the machine controlling it
+        #: Allows calibration object to hold a reference to the machine controlling it
         self.calibration.machine = self
         #: Which iteration step are we in
         self.iteration = iteration
@@ -821,7 +821,7 @@ class CalibrationMachine(Machine):
             self._collector_jobs[collection_name] = job
 
     def _check_valid_collector_output(self):
-        B2INFO("Checking that Collector output exists for all colector jobs "
+        B2INFO("Checking that Collector output exists for all collector jobs "
                f"using {self.calibration.name}.output_patterns.")
         if not self._collector_jobs:
             B2INFO("We're restarting so we'll recreate the collector Job object.")
@@ -926,7 +926,7 @@ class AlgorithmMachine(Machine):
     """
 
     #: Required attributes that must exist before the machine can run properly.
-    #: Some are allowed be values that return False whe tested e.g. "" or []
+    #: Some are allowed to be values that return False when tested e.g. "" or []
     required_attrs = ["algorithm",
                       "dependent_databases",
                       "database_chain",
@@ -957,7 +957,7 @@ class AlgorithmMachine(Machine):
 
         #: Algorithm() object whose state we are modelling
         self.algorithm = algorithm
-        #: Collector output files, will contain all files retured by the output patterns
+        #: Collector output files, will contain all files returned by the output patterns
         self.input_files = []
         #: CAF created local databases from previous calibrations that this calibration/algorithm depends on
         self.dependent_databases = []

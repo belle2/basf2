@@ -181,7 +181,7 @@ namespace Belle2 {
      * @param minSuperAxial minimum number of axial super layers per cluster
      * @param minSuperStereo minimum number of stereo super layers per cluster
      * @param thresh selection of cells for weighted mean track estimation
-     * @param minCells minumum number of cells per cluster
+     * @param minCells minimum number of cells per cluster
      * @param dbscanning when true: dbscan, when false: fixed three dim volume
      * @param minTotalWeight minimum total weight of all cells in the 3d volume
      * @param minPeakWeight minimum peak cell weight
@@ -256,7 +256,7 @@ namespace Belle2 {
     /** main function for track finding */
     void findTracks();
 
-    /** retreive the results */
+    /** retrieve the results */
     std::vector<NDFinderTrack>* getFinderTracks()
     {
       return &m_NDFinderTracks;
@@ -355,7 +355,7 @@ namespace Belle2 {
      * elements: super layer number in [0,1,...,8]*/
     std::vector<unsigned short> m_hitSLIds;
 
-    /** Priority positon within the TS in the current event
+    /** Priority position within the TS in the current event
      * elements basf2: [0,3] first, left, right, no hit
      * elements stored: 3 - basf2prio*/
     std::vector<unsigned short> m_prioPos;

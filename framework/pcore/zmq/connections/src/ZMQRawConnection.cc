@@ -76,7 +76,7 @@ std::vector<zmq::message_t> ZMQRawInput::handleIncomingData()
     return receivedMessages;
   }
   // We can maximal write `remainingSpace` into the buffer. If the message was longer, ZMQ will just cut it.
-  // This means we are loosing data and the buffer size should be increased.
+  // This means we are losing data and the buffer size should be increased.
   if (receivedBytes->untruncated_size > remainingSpace) {
     B2FATAL("The size of the buffer is too small! " << receivedBytes->untruncated_size << " > " << remainingSpace);
   }

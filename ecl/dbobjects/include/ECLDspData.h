@@ -88,7 +88,7 @@ namespace Belle2 {
 
     /**
      * Version of packer used in packCoefVector by default
-     * Versioon of unpacker is dynamically determined from the data.
+     * Version of unpacker is dynamically determined from the data.
      */
     static const short int c_packerVersion = 2;
 

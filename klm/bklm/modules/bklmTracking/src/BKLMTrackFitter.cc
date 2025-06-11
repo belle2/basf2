@@ -335,9 +335,6 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< KLMHit2d* > hitList,
 {
 
 // Fit d = a + bi, where d is dependent direction and i is independent
-
-  std::list< KLMHit2d* >::iterator iHit;
-
   Hep3Vector localHitPos;
   HepMatrix  localHitErr(3, 3, 0);
 
@@ -362,18 +359,15 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< KLMHit2d* > hitList,
   // Error or correlation matrix for coefficients (2x2 matrices)
   HepSymMatrix  V_A, V_A_inverse;
 
-  iHit = hitList.begin();
-  KLMHit2d* hit = *iHit;
-  int section = hit->getSection();
-  int sector  = hit->getSector();
+  int section = (*hitList.begin())->getSection();
+  int sector  = (*hitList.begin())->getSector();
 
   m_GeoPar = GeometryPar::instance();
-  const Belle2::bklm::Module* refMod = m_GeoPar->findModule((*hitList.begin())->getSection(), (*hitList.begin())->getSector(), 1);
+  const Belle2::bklm::Module* refMod = m_GeoPar->findModule(section, sector, 1);
 
   int n = 0;
-  for (iHit = hitList.begin(); iHit != hitList.end(); ++iHit) {
+  for (KLMHit2d* hit : hitList) {
 
-    hit = *iHit;
     if (hit->getSection() != section || hit->getSector() != sector) {
       continue;
     }
@@ -516,9 +510,7 @@ double BKLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
   const Belle2::bklm::Module* corMod;
 
   int n = 0;
-  for (std::list< KLMHit2d* >::iterator iHit = hitList.begin(); iHit != hitList.end(); ++iHit) {
-
-    KLMHit2d* hit = *iHit;
+  for (KLMHit2d* hit : hitList) {
 
     // m_GeoPar = GeometryPar::instance();
     //const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), 1);

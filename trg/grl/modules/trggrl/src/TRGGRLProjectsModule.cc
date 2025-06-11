@@ -105,7 +105,7 @@ TRGGRLProjectsModule::TRGGRLProjectsModule() : Module()
            "Name of the StoreArray holding the tracks made by the neural network (NN).",
            string("TRGCDCNeuroTracks"));
   addParam("2DmatchCollection", m_2DmatchCollectionName,
-           "Name of the StoreArray holding the macthed tracks and clusters made by the 2D fitter.",
+           "Name of the StoreArray holding the matched tracks and clusters made by the 2D fitter.",
            string("TRG2DMatchTracks"));
   addParam("PhimatchCollection", m_phimatch_tracklist, "the 2d tracklist with associated cluster", std::string("TRGPhiMatchTracks"));
   addParam("KLMmatchCollection", m_klmmatch_tracklist, "the 2d tracklist with KLM", std::string("TRGKLMMatchTracks"));
@@ -579,10 +579,13 @@ void TRGGRLProjectsModule::event()
   // bha_type13: 33
   bool bha_type13 = (ECLtoGDL[1] & (1 << (33 - 32 * 1))) != 0;
 
-  bool nclst_0 = (eclTrgClusterArray.getEntries() & (1 << 0)) != 0;
-  bool nclst_1 = (eclTrgClusterArray.getEntries() & (1 << 1)) != 0;
-  bool nclst_2 = (eclTrgClusterArray.getEntries() & (1 << 2)) != 0;
-  bool nclst_3 = (eclTrgClusterArray.getEntries() & (1 << 3)) != 0;
+  unsigned int icn = (ECLtoGDL[1] >> (50 - 32 * 1)) & 0x7F;
+  if (icn > 14)
+    icn = 15;
+  bool nclst_0 = (icn >> 0) & 0x1;
+  bool nclst_1 = (icn >> 1) & 0x1;
+  bool nclst_2 = (icn >> 2) & 0x1;
+  bool nclst_3 = (icn >> 3) & 0x1;
 
   // ecl_bg_0: 57
   bool ecl_bg_0 = (ECLtoGDL[1] & (1 << (57 - 32 * 1))) != 0;

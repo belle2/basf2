@@ -185,8 +185,7 @@ shutil.move("training_input.root",
 assert len(glob.glob('D*.xml')) == 5
 
 # Merge training input files for validation
-subprocess.call(["analysis-fei-mergefiles", "training_input.root"] +
-                glob.glob("training_input_stage*.root"))
+subprocess.call("analysis-fei-mergefiles -o training_input.root -i " + " ".join(glob.glob("training_input_stage*.root")) )
 
 # Expect 4 different training_input*.root files now
 assert len(glob.glob('training_input*.root')) == 4
@@ -221,7 +220,7 @@ assert len(glob.glob('Monitor_ModuleStatistics.root')) == 1
 
 assert len(glob.glob('Monitor_Final.root')) == 1
 f = ROOT.TFile.Open("Monitor_Final.root", "read")
-assert f.GetListOfKeys().GetEntries() == 7
+assert f.GetListOfKeys().GetEntries() == 8
 f.Close()
 
 prereconstruction_files = [

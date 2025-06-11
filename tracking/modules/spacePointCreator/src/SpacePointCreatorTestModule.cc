@@ -38,7 +38,7 @@ SpacePointCreatorTestModule::SpacePointCreatorTestModule() :
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
-           "allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module",
+           "allows the user to set an identifier for this module. Useful if one wants to use several instances of that module",
            std::string(""));
 }
 

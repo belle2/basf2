@@ -14,7 +14,6 @@
 
 #include <TVector3.h>
 
-#include <fstream>
 #include <gtest/gtest.h>
 
 using namespace std;

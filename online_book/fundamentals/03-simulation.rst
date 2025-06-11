@@ -6,7 +6,7 @@ Simulation: The Monte Carlo
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 20 min
+    **Length**: 15-30 min
 
     **Prerequisites**:
 

@@ -189,10 +189,10 @@ void SVDUnpackerModule::event()
 
       std::vector<unsigned short> nWords;
       nWords.reserve(maxNumOfCh);
-      uint32_t*      data32tab[maxNumOfCh]; //vector of pointers
+      std::vector<uint32_t*>      data32tab(maxNumOfCh); //vector of pointers
       for (unsigned int k = 0; k < maxNumOfCh; k++) {
         nWords.push_back(m_rawSVD[i]->GetDetectorNwords(j, k));
-        data32tab[k] = (uint32_t*)m_rawSVD[i]->GetDetectorBuffer(j, k); // points at the begining of the 1st buffer
+        data32tab[k] = (uint32_t*)m_rawSVD[i]->GetDetectorBuffer(j, k); // points at the beginning of the 1st buffer
       }
 
       unsigned short ftbError = 0;
@@ -536,7 +536,7 @@ void SVDUnpackerModule::event()
         //Let's check if all the headers and trailers were in place in the last frame
         if (seenHeadersAndTrailers != 0xf) {
           if (!(seenHeadersAndTrailers & 1)) {B2ERROR("Missing FTB Header is detected. SVD data might be corrupted!" << LogVar("Event number", eventNo) << LogVar("FADC", fadc)); missedHeader = true;}
-          if (!(seenHeadersAndTrailers & 2)) {B2ERROR("Missing FADC Header is detected -> related FADC number couldn't be retreived. SVD data might be corrupted! " << LogVar("Event number", eventNo) << LogVar("previous FADC", fadc)); missedHeader = true;}
+          if (!(seenHeadersAndTrailers & 2)) {B2ERROR("Missing FADC Header is detected -> related FADC number couldn't be retrieved. SVD data might be corrupted! " << LogVar("Event number", eventNo) << LogVar("previous FADC", fadc)); missedHeader = true;}
           if (!(seenHeadersAndTrailers & 4)) {B2ERROR("Missing FADC Trailer is detected. SVD data might be corrupted!" << LogVar("Event number", eventNo) << LogVar("FADC", fadc)); missedTrailer = true;}
           if (!(seenHeadersAndTrailers & 8)) {B2ERROR("Missing FTB Trailer is detected. SVD data might be corrupted!" << LogVar("Event number", eventNo) << LogVar("FADC", fadc)); missedTrailer = true;}
         }

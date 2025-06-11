@@ -131,7 +131,7 @@ const TMatrixD ClusterUtils::GetJacobiMatrix4x6FromCluster(const ECLCluster* clu
   return jacobian;
 }
 
-const TMatrixDSym ClusterUtils::GetCovarianceMatrix3x3FromCluster(const ECLCluster* cluster)
+const TMatrixDSym ClusterUtils::GetCovarianceMatrix3x3FromCluster(const ECLCluster* cluster, int particleHypo)
 {
   // Get the covariance matrix (energy, phi, theta) from the ECL cluster.
   TMatrixDSym covmatecl = cluster->getCovarianceMatrix3x3();
@@ -139,14 +139,39 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix3x3FromCluster(const ECLClust
   /**
    * Replace fixed energy resolution value by derived value from the DB if present
    */
-  if (m_photonEnergyResolutionDB.isValid() and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
-    double pEnergy = cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
-    double pTheta = cluster->getTheta();
-    double pPhi = cluster->getPhi();
+  if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+    if (m_photonEnergyResolutionDB.isValid() and particleHypo == Const::photon.getPDGCode()) {
+      double pEnergy = cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+      double pTheta = cluster->getTheta();
+      double pPhi = cluster->getPhi();
 
-    double energyCovarianceElement = m_photonEnergyResolutionDB->getRelativeEnergyResolution(pEnergy, pTheta, pPhi);
-    if (energyCovarianceElement != -1) {
-      covmatecl(0, 0) = energyCovarianceElement * pEnergy * energyCovarianceElement * pEnergy;
+      double energyCovarianceElement = m_photonEnergyResolutionDB->getRelativeEnergyResolution(pEnergy, pTheta, pPhi);
+      if (energyCovarianceElement != -1) {
+        covmatecl(0, 0) = energyCovarianceElement * pEnergy * energyCovarianceElement * pEnergy;
+      }
+    } else if (particleHypo != Const::photon.getPDGCode()) {
+
+      // Using hadron mass hypothesis but photon cluster reconstruction hypothesis, load correct position resolution from DB
+      // for hadrons, parameterized as function of cluster uncorrected energy
+      double pClusterUncorrEnergy = cluster->getEnergyRaw();
+      double pTheta = cluster->getTheta();
+      double pPhi = cluster->getPhi();
+      if (particleHypo == Const::neutron.getPDGCode() and m_neutronPositionResolutionDB.isValid()) {
+        double phiResolution = m_neutronPositionResolutionDB->getThetaPhiResolution(pClusterUncorrEnergy, pTheta, pPhi, 0);
+        double thetaResolution = m_neutronPositionResolutionDB->getThetaPhiResolution(pClusterUncorrEnergy, pTheta, pPhi, 1);
+        covmatecl(1, 1) = phiResolution * phiResolution;
+        covmatecl(2, 2) = thetaResolution * thetaResolution;
+      } else if (particleHypo == Const::antiNeutron.getPDGCode() and m_antiNeutronPositionResolutionDB.isValid()) {
+        double phiResolution = m_antiNeutronPositionResolutionDB->getThetaPhiResolution(pClusterUncorrEnergy, pTheta, pPhi, 0);
+        double thetaResolution = m_antiNeutronPositionResolutionDB->getThetaPhiResolution(pClusterUncorrEnergy, pTheta, pPhi, 1);
+        covmatecl(1, 1) = phiResolution * phiResolution;
+        covmatecl(2, 2) = thetaResolution * thetaResolution;
+      } else if (particleHypo == Const::Klong.getPDGCode() and m_kaonPositionResolutionDB.isValid()) {
+        double phiResolution = m_kaonPositionResolutionDB->getThetaPhiResolution(pClusterUncorrEnergy, pTheta, pPhi, 0);
+        double thetaResolution = m_kaonPositionResolutionDB->getThetaPhiResolution(pClusterUncorrEnergy, pTheta, pPhi, 1);
+        covmatecl(1, 1) = phiResolution * phiResolution;
+        covmatecl(2, 2) = thetaResolution * thetaResolution;
+      }
     }
   }
 
@@ -219,7 +244,7 @@ const XYZVector ClusterUtils::GetIPPosition()
     B2WARNING("Beamspot not available, using (0, 0, 0) as IP position instead.");
     return XYZVector(0.0, 0.0, 0.0);
   } else
-    return XYZVector(m_beamSpotDB->getIPPosition().X(), m_beamSpotDB->getIPPosition().Y(), m_beamSpotDB->getIPPosition().Z());
+    return m_beamSpotDB->getIPPosition();
 }
 
 // -----------------------------------------------------------------------------

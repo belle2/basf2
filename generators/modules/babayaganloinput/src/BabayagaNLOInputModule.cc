@@ -169,7 +169,7 @@ void BabayagaNLOInputModule::initializeGenerator()
   m_generator.setUserMode(m_userMode);
   m_generator.setMaxPrescale(m_maxprescale);
 
-  // set a nominal value for some intialization inside the generator
+  // set a nominal value for some initialization inside the generator
   const BeamParameters& nominal = s_initial.getBeamParameters();
   double ecmnominal = nominal.getMass();
   m_generator.setCmsEnergyNominal(ecmnominal);

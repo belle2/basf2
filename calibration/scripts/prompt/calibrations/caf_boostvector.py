@@ -12,6 +12,9 @@ Airflow script to perform BoostVector calibration.
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_beamspot import settings as beamspot
+from basf2 import get_file_metadata, B2WARNING
+from reconstruction import prepare_cdst_analysis
+import os
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
@@ -28,10 +31,25 @@ settings = CalibrationSettings(
         INPUT_DATA_FILTERS["Magnet"]["On"]]},
     expert_config={
         "outerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
-        "innerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)"},
+        "innerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
+        "minPXDhits": 0},
     depends_on=[beamspot])
 
 ##############################
+
+
+def is_cDST_file(fName):
+    """ Check if the file is cDST based on the metadata """
+
+    metaData = get_file_metadata(fName)
+    description = metaData.getDataDescription()
+
+    # if dataLevel is missing, determine from file name
+    if 'dataLevel' not in description:
+        B2WARNING('The cdst/mdst info is not stored in file metadata')
+        return ('cdst' in os.path.basename(fName))
+
+    return (description['dataLevel'] == 'cdst')
 
 
 def get_calibrations(input_data, **kwargs):
@@ -71,6 +89,8 @@ def get_calibrations(input_data, **kwargs):
     input_files_physics = list(reduced_file_to_iov_physics.keys())
     basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
 
+    isCDST = is_cDST_file(input_files_physics[0]) if len(input_files_physics) > 0 else True
+
     # Get the overall IoV we our process should cover. Includes the end values that we may want to ignore since our output
     # IoV should be open ended. We could also use this as part of the input data selection in some way.
     requested_iov = kwargs.get("requested_iov", None)
@@ -93,15 +113,16 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.framework import Calibration
     from caf.strategies import SingleIOV
-    from reconstruction import prepare_cdst_analysis
 
     # module to be run prior the collector
     rec_path_1 = create_path()
-    prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
+    if isCDST:
+        prepare_cdst_analysis(path=rec_path_1, components=['SVD', 'CDC', 'ECL', 'KLM'])
 
+    minPXDhits = kwargs['expert_config']['minPXDhits']
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
-    muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
+    muSelection += f' and nPXDHits >= {minPXDhits} and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BV', muSelection, path=rec_path_1)
     ana.reconstructDecay('Upsilon(4S):BV -> mu+:BV mu-:BV', '9.5<M<11.5', path=rec_path_1)
     vertex.treeFit('Upsilon(4S):BV', updateAllDaughters=True, ipConstraint=True, path=rec_path_1)

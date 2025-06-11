@@ -12,8 +12,9 @@ import basf2 as b2
 
 # Many scripts import these functions from `tracking`, so leave these imports here
 from tracking.path_utils import (  # noqa
+    add_default_cdc_svd_tracking_chain,
+    add_inverted_svd_cdc_tracking_chain,
     add_cdc_cr_track_finding,
-    add_cdc_track_finding,
     add_cr_track_fit_and_track_creator,
     add_eclcdc_track_finding,
     add_geometry_modules,
@@ -24,15 +25,12 @@ from tracking.path_utils import (  # noqa
     add_pxd_cr_track_finding,
     add_pxd_track_finding,
     add_svd_track_finding,
-    add_track_fit_and_track_creator,
     add_prefilter_track_fit_and_track_creator,
-    add_vxd_track_finding_vxdtf2,
     add_svd_standalone_tracking,
     is_cdc_used,
     is_ecl_used,
     is_pxd_used,
     is_svd_used,
-    use_local_sectormap,
 )
 
 from pxd import add_pxd_reconstruction
@@ -49,7 +47,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 create_intercepts_for_pxd_ckf=False,
                                 append_full_grid_cdc_eventt0=True,
                                 v0_finding=True, flip_recoTrack=True,
-                                skip_full_grid_cdc_eventt0_if_svd_time_present=True):
+                                skip_full_grid_cdc_eventt0_if_svd_time_present=True,
+                                inverted_tracking=False):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
@@ -129,6 +128,12 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
         append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
         SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
+    :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF,
+        the CDC standalone tracking, a CKF-based merger to merge the standalone RecoTracks, and finally the
+        CDCToSVDSpacePointCKF to add SVD hits to all CDC tracks that don't have SVD hits attached to them.
+        ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
+        One known issue is a reduced hit efficiency when using the full chain.
+        Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
     """
 
     add_prefilter_tracking_reconstruction(
@@ -151,7 +156,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         pxd_filtering_offline=pxd_filtering_offline,
         create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
-        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
+        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
+        inverted_tracking=inverted_tracking)
 
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
@@ -169,12 +175,13 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           prune_temporary_tracks=True, fit_tracks=True,
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                           svd_standalone_mode="VXDTF2",
-                                          use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
+                                          use_svd_to_cdc_ckf=True, svd_ckf_mode="SVD_after", use_ecl_to_cdc_ckf=False,
                                           add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                           pxd_filtering_offline=False,
                                           create_intercepts_for_pxd_ckf=False,
                                           append_full_grid_cdc_eventt0=True,
-                                          skip_full_grid_cdc_eventt0_if_svd_time_present=True):
+                                          skip_full_grid_cdc_eventt0_if_svd_time_present=True,
+                                          inverted_tracking=False):
     """
     This function adds the tracking reconstruction modules required to calculate HLT filter decision
     to a path.
@@ -198,6 +205,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
            Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
            Defaults to "VXDTF2"
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
+    :param svd_ckf_mode: how to apply the CKF (with or without SVD standalone tracking). Defaults to "SVD_after".
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found CDC standalone tracks
@@ -219,6 +227,12 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
         append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
         SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
+    :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF,
+        the CDC standalone tracking, a CKF-based merger to merge the standalone RecoTracks, and finally the
+        CDCToSVDSpacePointCKF to add SVD hits to all CDC tracks that don't have SVD hits attached to them.
+        ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
+        One known issue is a reduced hit efficiency when using the full chain.
+        Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):
@@ -259,11 +273,13 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                           use_second_cdc_hits=use_second_cdc_hits,
                           svd_standalone_mode=svd_standalone_mode,
                           use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
+                          svd_ckf_mode=svd_ckf_mode,
                           use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
                           add_cdcTrack_QI=add_cdcTrack_QI,
                           add_vxdTrack_QI=add_vxdTrack_QI,
                           pxd_filtering_offline=pxd_filtering_offline,
-                          create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf)
+                          create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
+                          inverted_tracking=inverted_tracking)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -292,25 +308,36 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
     :param v0_finding: If false, the V0 module will not be executed
-    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter (only if PXD is present)
+    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter (only if PXD is part of
+        the ``components``). This flag is automatically set to false on HLT and ExpressReco.
     :param mcTrackFinding: Use the MC track finders instead of the realistic ones.
+    :param kink_finding: if true, add the ``KinkFinder`` module to the path. This flag is automatically set to false
+        on HLT and ExpressReco.
     """
 
     # do not add any new modules if no tracking detectors are in the components
     if components and not ('SVD' in components or 'CDC' in components):
         return
 
+    flip_and_refit_temporary_RecoTracks = "RecoTracks_flipped"
+    v0finder_temporary_RecoTracks = "CopiedRecoTracks"
+    kinkfinder_temporary_RecoTracks = "RecoTracksKinkTmp"
+    temporary_reco_track_list = []
+
     # flip & refit to fix the charge of some tracks
     if flip_recoTrack and not mcTrackFinding and is_pxd_used(components):
-        add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
+        add_flipping_of_recoTracks(path, reco_tracks="RecoTracks", reco_tracks_flipped=flip_and_refit_temporary_RecoTracks)
+        temporary_reco_track_list.append(flip_and_refit_temporary_RecoTracks)
 
     # V0 finding
     if v0_finding:
-        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
+        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1, CopiedRecoTracks=v0finder_temporary_RecoTracks)
+        temporary_reco_track_list.append(v0finder_temporary_RecoTracks)
 
     # Kink finding
     if kink_finding:
-        path.add_module('KinkFinder', RecoTracks=reco_tracks)
+        path.add_module('KinkFinder', RecoTracks=reco_tracks, CopiedRecoTracks=kinkfinder_temporary_RecoTracks)
+        temporary_reco_track_list.append(kinkfinder_temporary_RecoTracks)
 
     # estimate the track time
     path.add_module('TrackTimeEstimator')
@@ -324,6 +351,14 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
 
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")
+
+    if prune_temporary_tracks:
+        for temporary_reco_tracks in temporary_reco_track_list:
+            path.add_module(
+                'PruneRecoTracks',
+                storeArrayName=temporary_reco_tracks).set_name(
+                "PruneRecoTracks " +
+                temporary_reco_tracks)
 
 
 def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=None,
@@ -341,7 +376,7 @@ def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=Non
         SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     """
 
-    # Always run SVD EventT0 estimation first so that the CDC based medhod can check whether an SVD based EventT0 exists
+    # Always run SVD EventT0 estimation first so that the CDC based method can check whether an SVD based EventT0 exists
     if is_svd_used(components):
         path.add_module("SVDEventT0Estimator")
 
@@ -428,9 +463,10 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                       add_cdcTrack_QI=True, add_vxdTrack_QI=False,
                       pxd_filtering_offline=False, use_HLT_ROIs=False,
-                      create_intercepts_for_pxd_ckf=False):
+                      create_intercepts_for_pxd_ckf=False,
+                      inverted_tracking=False):
     """
-    Add the CKF to the path with all the track finding related to and needed for it.
+    Add the track finding chain to the path. Depending on the parameters, different tracking chains can be defined and attached.
     :param path: The path to add the tracking reconstruction modules to
     :param reco_tracks: The store array name where to output all tracks
     :param use_mc_truth: Use the truth information in the CKF modules
@@ -458,6 +494,12 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
         for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
         steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
+    :param inverted_tracking: If true, start tracking with SVD standalone track finding, followed by ToCDCCKF,
+        the CDC standalone tracking, a CKF-based merger to merge the standalone RecoTracks, and finally the
+        CDCToSVDSpacePointCKF to add SVD hits to all CDC tracks that don't have SVD hits attached to them.
+        ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
+        One known issue is a reduced hit efficiency when using the full chain.
+        Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return
@@ -498,23 +540,47 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         elif (not use_ecl_to_cdc_ckf) and (not is_svd_used(components)) and is_cdc_used(components):
             cdc_reco_tracks = reco_tracks
 
-    if is_cdc_used(components):
-        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
-                              add_mva_quality_indicator=add_cdcTrack_QI)
-        temporary_reco_track_list.append(cdc_reco_tracks)
-        latest_reco_tracks = cdc_reco_tracks
+    # Default tracking with CDC first, followed by SVD tracking
+    if not inverted_tracking:
+        latest_reco_tracks, tmp_reco_track_list = \
+            add_default_cdc_svd_tracking_chain(path,
+                                               components=components,
+                                               svd_reco_tracks=svd_reco_tracks,
+                                               cdc_reco_tracks=cdc_reco_tracks,
+                                               output_reco_tracks=svd_cdc_reco_tracks,
+                                               use_second_cdc_hits=use_second_cdc_hits,
+                                               add_cdcTrack_QI=add_cdcTrack_QI,
+                                               use_mc_truth=use_mc_truth,
+                                               svd_ckf_mode=svd_ckf_mode,
+                                               add_both_directions=add_both_directions,
+                                               use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
+                                               svd_standalone_mode=svd_standalone_mode,
+                                               add_vxdTrack_QI=add_vxdTrack_QI,
+                                               prune_temporary_tracks=prune_temporary_tracks)
 
-    if is_svd_used(components):
-        add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                              output_reco_tracks=svd_cdc_reco_tracks, use_mc_truth=use_mc_truth,
-                              temporary_reco_tracks=svd_reco_tracks,
-                              svd_ckf_mode=svd_ckf_mode, add_both_directions=add_both_directions,
-                              use_svd_to_cdc_ckf=use_svd_to_cdc_ckf, prune_temporary_tracks=prune_temporary_tracks,
-                              add_mva_quality_indicator=add_vxdTrack_QI,
-                              svd_standalone_mode=svd_standalone_mode)
-        temporary_reco_track_list.append(svd_reco_tracks)
-        temporary_reco_track_list.append(svd_cdc_reco_tracks)
-        latest_reco_tracks = svd_cdc_reco_tracks
+        temporary_reco_track_list.extend(tmp_reco_track_list)
+    else:
+        # add the inverted tracking chain with SVD standalone tracking executed first
+        # ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
+        # One known issue is a reduced hit efficiency when using the full chain.
+        # Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
+        latest_reco_tracks, tmp_reco_track_list = \
+            add_inverted_svd_cdc_tracking_chain(path,
+                                                components=components,
+                                                svd_reco_tracks=svd_reco_tracks,
+                                                cdc_reco_tracks=cdc_reco_tracks,
+                                                svd_cdc_reco_tracks=svd_cdc_reco_tracks,
+                                                use_second_cdc_hits=use_second_cdc_hits,
+                                                add_cdcTrack_QI=add_cdcTrack_QI,
+                                                use_mc_truth=use_mc_truth,
+                                                svd_ckf_mode=svd_ckf_mode,
+                                                add_both_directions=add_both_directions,
+                                                use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
+                                                svd_standalone_mode=svd_standalone_mode,
+                                                add_vxdTrack_QI=add_vxdTrack_QI,
+                                                prune_temporary_tracks=prune_temporary_tracks)
+
+        temporary_reco_track_list.extend(tmp_reco_track_list)
 
     if use_ecl_to_cdc_ckf and is_cdc_used(components):
         add_eclcdc_track_finding(path, components=components, output_reco_tracks=ecl_reco_tracks,
@@ -542,7 +608,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
             roiName = "ROIs"
             intercepts_name = "PXDIntercepts"
             if not use_HLT_ROIs or create_intercepts_for_pxd_ckf:
-                path.add_module("DAFRecoFitter", recoTracksStoreArrayName=latest_reco_tracks)
+                path.add_module("DAFRecoFitter", recoTracksStoreArrayName=latest_reco_tracks).set_name(
+                    f"DAFRecoFitter {latest_reco_tracks}")
 
                 roiName = "ROIs_offline"
                 intercepts_name = "CKF" + intercepts_name
@@ -572,7 +639,11 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     if prune_temporary_tracks:
         for temporary_reco_track_name in temporary_reco_track_list:
             if temporary_reco_track_name != reco_tracks:
-                path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_track_name)
+                path.add_module(
+                    'PruneRecoTracks',
+                    storeArrayName=temporary_reco_track_name).set_name(
+                    "PruneRecoTracks " +
+                    temporary_reco_track_name)
 
 
 def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,
@@ -681,15 +752,15 @@ def add_roiFinder(path, reco_tracks="RecoTracks", intercepts_name="PXDIntercepts
     :param reco_tracks: Which tracks to use in the extrapolation step.
     :param roiName: Name of the produced/stored ROIs.
     """
+    path.add_module('PXDROIFinder', recoTrackListName=reco_tracks,
+                    PXDInterceptListName=intercepts_name, ROIListName=roiName)
 
-    pxdDataRed = b2.register_module('PXDROIFinder')
-    param_pxdDataRed = {
-        'recoTrackListName': reco_tracks,
-        'PXDInterceptListName': intercepts_name,
-        'ROIListName': roiName,
-    }
-    pxdDataRed.param(param_pxdDataRed)
-    path.add_module(pxdDataRed)
+
+def add_roi_payload_assembler(path, ignore_hlt_decision):
+    path.add_module('ROIPayloadAssembler',
+                    ROIListName='ROIs', ROIpayloadName='ROIpayload',
+                    SendAllDownscaler=0, SendROIsDownscaler=1,
+                    AcceptAll=ignore_hlt_decision, NoRejectFlag=False)
 
 
 def add_vxd_standalone_cosmics_finder(
@@ -725,7 +796,7 @@ def add_vxd_standalone_cosmics_finder(
     if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
         path.add_module('PXDSpacePointCreator', SpacePoints=pxd_spacepoints_name)
 
-    # SVDSpacePointCreator is applied in funtion add_svd_reconstruction
+    # SVDSpacePointCreator is applied in function add_svd_reconstruction
 
     track_finder = b2.register_module('TrackFinderVXDCosmicsStandalone')
     track_finder.param('SpacePointTrackCandArrayName', "")

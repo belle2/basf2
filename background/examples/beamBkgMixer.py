@@ -31,7 +31,7 @@ if 'BELLE2_BACKGROUND_MIXING_DIR' not in os.environ:
     sys.exit()
 
 # define background (collision) files
-#    glob.glob is the prefered way to get the list of files:
+#    glob.glob is the preferred way to get the list of files:
 #    (the directory must include only BG files!)
 
 bg = glob.glob(os.environ['BELLE2_BACKGROUND_MIXING_DIR'] + '/*.root')
@@ -39,7 +39,7 @@ if len(bg) == 0:
     b2.B2ERROR('No files found in ', os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
     sys.exit()
 
-# alternative: you can specify files explicitely
+# alternative: you can specify files explicitly
 #
 # dir = '/sw/belle2/bkg/'  # change the directory name if you don't run on KEKCC
 # bg = [

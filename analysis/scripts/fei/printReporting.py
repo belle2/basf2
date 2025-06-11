@@ -14,8 +14,11 @@
  It will print out a summary and create some plots
 """
 
+import sys
+from contextlib import redirect_stdout
 
 import fei.monitoring as monitoring
+from fei.core import get_stages_from_particles
 
 
 def bold(text):
@@ -25,14 +28,17 @@ def bold(text):
 
 def print_summary(p):
     try:
+        print("FEI: printReporting - DEBUG: ", p.particle.identifier)
         monitoring.MonitorROCPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_ROC'))
         monitoring.MonitorDiagPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Diag'))
-        if p.particle.identifier in ['B+:generic', 'B0:generic']:
-            monitoring.MonitorMbcPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Money'))
-        if p.particle.identifier in ['B+:semileptonic', 'B0:semileptonic']:
-            monitoring.MonitorCosBDLPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Money'))
-    except BaseException:
-        pass
+        monitoring.MonitorSigProbPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_SigProb'))
+        for spectator in p.particle.mvaConfig.spectators.keys():
+            monitoring.MonitorSpectatorPlot(
+                p, spectator, monitoring.removeJPsiSlash(
+                    p.particle.identifier + '_' + spectator + '_Money'), p.particle.mvaConfig.spectators[spectator])
+    except Exception as e:
+        print('FEI-printReporting Error: Could not create plots for particle', p.particle.identifier, e)
+    print("FEI: printReporting - DEBUG: finished plots")
     print(bold(p.particle.identifier))
     print('Total cpu time spent reconstructing this particle: ',
           p.module_statistic.particle_time + sum(p.module_statistic.channel_time.values()))
@@ -81,8 +87,25 @@ def print_summary(p):
         print(p.after_classifier[channel.label])
 
 
+# =============================================================================
 if __name__ == '__main__':
     particles, configuration = monitoring.load_config()
-    for particle in particles:
-        monitoringParticle = monitoring.MonitoringParticle(particle)
-        print_summary(monitoringParticle)
+    cache = configuration.cache
+    stages = get_stages_from_particles(particles)
+
+    if len(sys.argv) >= 2:
+        output = sys.argv[1]
+        redirect = open(output, 'w')
+        print('FEI: printReporting; Output redirected to', output)
+    else:
+        redirect = sys.stdout
+
+    with redirect_stdout(redirect):
+        for i in range(cache):
+            for particle in particles:
+                if particle in stages[i]:
+                    print('FEI: printReporting: ', i, particle.identifier)
+                    monitoringParticle = monitoring.MonitoringParticle(particle)
+                    print_summary(monitoringParticle)
+    if len(sys.argv) >= 2:
+        redirect.close()

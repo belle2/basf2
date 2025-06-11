@@ -81,7 +81,7 @@ namespace Belle2 {
 
     };
 
-    // Extra mention of the constexpr such that it aquires external linkage.
+    // Extra mention of the constexpr such that it acquires external linkage.
     template<class ABox, std::size_t... divisions>
     constexpr std::size_t LinearDivision<ABox, divisions...>::s_divisions[sizeof...(divisions)];
   }

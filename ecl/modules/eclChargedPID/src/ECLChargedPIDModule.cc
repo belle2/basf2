@@ -14,6 +14,7 @@
 
 /* C++ headers. */
 #include <algorithm>
+#include <cmath>
 
 using namespace Belle2;
 
@@ -22,7 +23,7 @@ REG_MODULE(ECLChargedPID);
 
 ECLChargedPIDModule::ECLChargedPIDModule() : Module()
 {
-  setDescription("The module implements charged particle identification using ECL-related observables. For each Track matched with a suitable ECLShower, likelihoods for each particle hypothesis are obtained from pdfs stored in a conditions database payload, and then get stored in an ECLPidLikelihood object. The dimensionality of the likelihood depends on how many variables are stored in the payload. The baseline method could be a simple univariate likelihood based on E/p PDFs, but it could be extended to include more ECL quantitites (e.g. shower shape variables, w/ proper decorrelation).");
+  setDescription("The module implements charged particle identification using ECL-related observables. For each Track matched with a suitable ECLShower, likelihoods for each particle hypothesis are obtained from pdfs stored in a conditions database payload, and then get stored in an ECLPidLikelihood object. The dimensionality of the likelihood depends on how many variables are stored in the payload. The baseline method could be a simple univariate likelihood based on E/p PDFs, but it could be extended to include more ECL quantities (e.g. shower shape variables, w/ proper decorrelation).");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -85,7 +86,7 @@ void ECLChargedPIDModule::event()
 
       if (eclShower.getHypothesisId() != ECLShower::c_nPhotons) continue;
       if (m_applyClusterTimingSel) {
-        if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
+        if (std::abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
       }
 
       shEnergy = eclShower.getEnergy();

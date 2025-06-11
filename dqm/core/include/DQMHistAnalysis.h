@@ -14,9 +14,9 @@
 
 #include <framework/core/Module.h>
 #include <dqm/core/MonitoringObject.h>
-#include <dqm/analysis/HistObject.h>
-#include <dqm/analysis/RefHistObject.h>
-#include <dqm/analysis/HistDelta.h>
+#include <dqm/core/HistObject.h>
+#include <dqm/core/RefHistObject.h>
+#include <dqm/core/HistDelta.h>
 #include <TFile.h>
 #include <TH1.h>
 
@@ -56,6 +56,15 @@ namespace Belle2 {
       c_ColorGood = kGreen, /**< Analysis result: Good */
       c_ColorWarning = kYellow, /**< Analysis result: Warning, there may be minor issues */
       c_ColorError = kRed /**< Analysis result: Severe issue found */
+    };
+
+    /**
+     * Reference plot scaling type
+    */
+    enum ERefScaling {
+      c_RefScaleNone = 0, /**< no scaling */
+      c_RefScaleEntries = 1, /**< to number of entries (integral) */
+      c_RefScaleMax = 2 /**< to maximum (bin entry) */
     };
 
     /**
@@ -192,7 +201,8 @@ namespace Belle2 {
      * Get the list of the reference histograms.
      * @return The list of the reference  histograms.
      */
-    static /*const*/ RefList& getRefList() { return s_refList;};
+    // Unused:
+    //static const RefList& getRefList() { return s_refList;};
 
     /**
      * Get the Run Type.
@@ -250,7 +260,7 @@ namespace Belle2 {
      * @param hist histogram to scale to
      * @return The found histogram, or nullptr if not found.
      */
-    static TH1* findRefHist(const std::string& histname, int scaling = 0, const TH1* hist = nullptr);
+    static TH1* findRefHist(const std::string& histname, ERefScaling scaling = ERefScaling::c_RefScaleNone, const TH1* hist = nullptr);
 
     /**
      * Find reference histogram.
@@ -261,7 +271,7 @@ namespace Belle2 {
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findRefHist(const std::string& dirname,
-                            const std::string& histname, int scaling = 0, const TH1* hist = nullptr);
+                            const std::string& histname, ERefScaling scaling = ERefScaling::c_RefScaleNone, const TH1* hist = nullptr);
 
     /** Using the original and reference, create scaled version
      * @param scaling scaling algorithm
@@ -269,7 +279,7 @@ namespace Belle2 {
      * @param ref pointer to reference
      * @return scaled reference
      */
-    static TH1* scaleReference(int scaling, const TH1* hist, TH1* ref);
+    static TH1* scaleReference(ERefScaling scaling, const TH1* hist, TH1* ref);
 
     /**
      * Find histogram in specific TFile (e.g. ref file).
@@ -313,14 +323,12 @@ namespace Belle2 {
     static bool addHist(const std::string& dirname,
                         const std::string& histname, TH1* h);
 
-    // /**
-    //  * Add reference.
-    //  * @param dirname The name of the directory.
-    //  * @param histname The name of the histogram.
-    //  * @param ref The TH1 pointer for the reference.
-    //  */
-    // void addRef(const std::string& dirname,
-    //             const std::string& histname, TH1* ref);
+    /**
+     * Add reference histogram.
+     * @param dirname The name of the directory.
+     * @param hist The TH1 pointer for the reference.
+    */
+    void addRefHist(const std::string& dirname, TH1* hist);
 
 
     /**
@@ -414,7 +422,7 @@ namespace Belle2 {
     /**
      * Extract event processed from daq histogram, called from input module
      */
-    void ExtractEvent(std::vector <TH1*>& hs);
+    void ExtractNEvent(std::vector <TH1*>& hs);
 
     /// EPICS related Functions
 

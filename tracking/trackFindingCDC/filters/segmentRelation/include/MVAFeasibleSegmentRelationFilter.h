@@ -19,7 +19,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Filter for the constuction of segment pairs based on simple criteria without the common fit.
+    /// Filter for the construction of segment pairs based on simple criteria without the common fit.
     class MVAFeasibleSegmentRelationFilter : public MVA<BaseSegmentRelationFilter> {
 
     private:

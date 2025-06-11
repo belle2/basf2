@@ -133,7 +133,7 @@ namespace Belle2 {
 
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
-    if (mapSize == 0) return;
+    if (mapSize <= 0) return;
 
     vector<const TOPDigit*>* sortedDigits = new vector<const TOPDigit*>[mapSize];
 
@@ -202,7 +202,7 @@ namespace Belle2 {
 
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
-    if (mapSize == 0) return;
+    if (mapSize <= 0) return;
 
     auto* sortedDigits = new vector<const TOPRawDigit*>[mapSize];
 
@@ -296,7 +296,7 @@ namespace Belle2 {
 
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
-    if (mapSize == 0) return;
+    if (mapSize <= 0) return;
 
     auto* sortedDigits = new vector<const TOPRawDigit*>[mapSize];
 

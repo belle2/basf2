@@ -49,7 +49,7 @@ void AxialTrackCreatorMCTruth::exposeParameters(ModuleParamList* moduleParamList
   moduleParamList->addParameter(prefixed(prefix, "reconstructedPositions"),
                                 m_param_reconstructedPositions,
                                 "Switch to reconstruct the positions in the tracks "
-                                "immitating the legendre finder.",
+                                "imitating the Legendre finder.",
                                 m_param_reconstructedPositions);
 
   moduleParamList->addParameter(prefixed(prefix, "fit"),
@@ -66,7 +66,7 @@ void AxialTrackCreatorMCTruth::exposeParameters(ModuleParamList* moduleParamList
 
 std::string AxialTrackCreatorMCTruth::getDescription()
 {
-  return "Constructs tracks from wire hits using the mc truth information.";
+  return "Constructs tracks from wire hits using the MC truth information.";
 }
 
 

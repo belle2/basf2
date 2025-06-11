@@ -14,7 +14,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Adds a prefix and captialises the name if necessary to get a camelCase concatenated name.
+    /// Adds a prefix and capitalises the name if necessary to get a camelCase concatenated name.
     inline std::string prefixed(const std::string& prefix, const std::string& name)
     {
       if (prefix == "") {

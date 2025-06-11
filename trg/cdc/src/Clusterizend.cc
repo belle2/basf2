@@ -112,7 +112,7 @@ Clusterizend::dbscan()
       m_houghVisit[iom][iph][ith] = 1;
       std::vector<cell_index> N = regionQuery(entry);
       if (N.size() >= m_params.minPts) {
-        //B2DEBUG(25, "dbscan: starting cluster, neightbors = " << N.size());
+        //B2DEBUG(25, "dbscan: starting cluster, neighbors = " << N.size());
         SimpleCluster newCluster(entry);
         expandCluster(N, newCluster);
         C.push_back(newCluster);
@@ -149,7 +149,7 @@ std::vector<cell_index>
 Clusterizend::getCandidates()
 {
   std::vector<cell_index> candidates;
-  /** all candidiates TODO: select */
+  /** all candidates TODO: select */
   for (c3index iom = 0; iom < 40; iom++) {
     for (c3index iph = 0; iph < 384; iph++) {
       for (c3index ith = 0; ith < 9; ith++) {

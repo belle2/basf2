@@ -141,7 +141,7 @@ void ECLDQMInjectionModule::defineHisto()
 void ECLDQMInjectionModule::initialize()
 {
   REG_HISTOGRAM
-  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failin
+  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
   m_storeHits.isRequired(m_ECLDigitsName);
   m_ECLTrigs.isOptional();
   m_ECLDsps.isOptional();
@@ -155,7 +155,7 @@ void ECLDQMInjectionModule::initialize()
 
 void ECLDQMInjectionModule::beginRun()
 {
-  // Assume that everthing is non-yero ;-)
+  // Assume that everything is non-yero ;-)
   hHitsAfterInjLER->Reset();
   hHitsAfterInjHER->Reset();
   hEHitsAfterInjLER->Reset();

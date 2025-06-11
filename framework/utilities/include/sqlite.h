@@ -234,7 +234,7 @@ namespace sqlite {
       iterator operator++(int) {iterator retval = *this; ++(*this); return retval;}
       /** and equality check */
       bool operator==(const iterator& other) const { return m_row == other.m_row; }
-      /** as well as unequality check */
+      /** as well as inequality check */
       bool operator!=(const iterator& other) const { return m_row != other.m_row; }
       /** and a dereference operator */
       value_type operator*() const { return m_instance->getRow(); }

@@ -9,13 +9,13 @@ The main command line tool for the Belle II Software is ``basf2``::
 
 -h, --help
                        Print all available options.
---info                 Print information about basf2 and the environment.
+--info                 Print information about ``basf2`` and the environment.
 -m ARG, --modules ARG  Without argument this will print a list of all available
                        `Modules <basf2.Module>`. With an extra argument the list can be limited
                        to one package or one specific module.
--v, --version          Print a verbose string with the basf2 version.
---version-short        Print a compact string with the basf2 version.
---license              Print a short version of the basf2 license.
+-v, --version          Print a verbose string with the ``basf2`` version.
+--version-short        Print a compact string with the ``basf2`` version.
+--license              Print a short version of the ``basf2`` license.
 
 .. rubric:: Configuration
 
@@ -29,6 +29,11 @@ The main command line tool for the Belle II Software is ``basf2``::
                           ``packageName:LOGLEVEL`` (e.g. ``cdc:ERROR`` or
                           ``klm:DEBUG:20``). Does not take precedence over
                           ``package.set_log_level()`` in steering file.
+--module_log_level MODULELOGLEVEL
+                          Set a module log level (one of ``DEBUG``, ``INFO``,
+                          ``RESULT``, ``WARNING``, or ``ERROR``). Syntax:
+                          ``packageName:LOGLEVEL`` (e.g. ``cdc:ERROR`` or
+                          ``klm:DEBUG:20``).
 --random-seed SEED        Set the default initial seed for the random number
                           generator. This does not take precedence over calls to
                           ``set_random_seed()`` in the steering file, but just
@@ -96,8 +101,8 @@ The main command line tool for the Belle II Software is ``basf2``::
                         execute the pickled (serialized) path from the given
                         file.
 --job-information arg   Create json file with metadata of output files and
-                        basf2 execution status.
---realm arg             Set the realm of the basf2 execution (``online`` or
+                        ``basf2`` execution status.
+--realm arg             Set the realm of the ``basf2`` execution (``online`` or
                         ``production``).
 --secondary-input arg   Override name of input file for the secondary
                         ``RootInput`` module used for the event embedding. Can
@@ -111,7 +116,7 @@ The main command line tool for the Belle II Software is ``basf2``::
 
 .. rubric:: Examples
 
-The most simple invocation is to just run basf2 with the name of a python
+The most simple invocation is to just run ``basf2`` with the name of a python
 steering file to execute::
 
     $ basf2 steeringfile.py
@@ -124,7 +129,7 @@ To make sure that the arguments are actually passed to the steering file and
 not consumed by ``basf2`` one should use to dashes ``--`` to separate the
 arguments which should be passed to the steering file (useful if, for example,
 a custom argument parser is used). This allows the steering file to handle
-options like ``-o`` which would otherwise be handled by basf2 and not
+options like ``-o`` which would otherwise be handled by ``basf2`` and not
 available in the steering file::
 
     $ basf2 steeringfile.py -- argument1 -o argument3

@@ -43,7 +43,7 @@ Some possible ideas for contributions:
 
 * Fixing wrong/misleading/insufficient documentation
 * Creating new training lessons in the online book
-* Recording video walk throughts for the lessons
+* Recording video walkthroughs for the lessons
 * Hunting for outdated information on XWiki and removing it/bringing it to sphinx
 
 and probably much more issues that you have already noticed yourself.

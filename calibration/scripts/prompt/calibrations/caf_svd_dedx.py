@@ -15,7 +15,7 @@ import basf2 as b2
 
 import modularAnalysis as ma
 import vertex as vx
-import reconstruction as re
+from reconstruction import prepare_user_cdst_analysis
 
 settings = CalibrationSettings(
     name="caf_svd_dedx",
@@ -32,9 +32,10 @@ settings = CalibrationSettings(
     expert_config={
         "isMC": False,
         "listOfMutedCalibrations": [],  # dEdxCalibration, dEdxValidation
-        "rerun_reco": False,  # need to rerun reconstruction for calibration?
-        "rerun_reco_val": True,  # need to rerun reconstruction for validation?
-        "MaxFilesPerRun": 15,
+        "rerun_pid": False,  # need to rerun VXD PID for calibration?
+        "rerun_pid_val": True,  # need to rerun VXD PID for validation?
+        "validation_mode": "basic",  # full or basic; full also produces global PID performance plots
+        "MaxFilesPerRun": 10,  # 15,
         "MaxFilesPerRunValidation": 6,  # be careful in MC to not exclude certain event types
         "MinEvtsPerFile": 1,
         "MaxEvtsPerFile": 20000,  # only if rerun the reco, to prevent jobs >10h
@@ -51,37 +52,17 @@ settings = CalibrationSettings(
     depends_on=[])
 
 
-def create_path(rerun_reco, isMC, expert_config):
+def create_path(rerun_pid, isMC, expert_config):
     rec_path = b2.Path()
 
     # expert_config = kwargs.get("expert_config")
     max_events_per_file = expert_config["MaxEvtsPerFile"]
 
-    if rerun_reco:
-        rec_path.add_module(
-            'RootInput',
-            branchNames=[
-                'RawARICHs',
-                'RawCDCs',
-                'RawECLs',
-                'RawFTSWs',
-                'RawKLMs',
-                'RawPXDs',
-                'RawSVDs',
-                'RawTOPs',
-                'RawTRGs',
-                'RawDataBlock',
-                'RawCOPPER'],
-            entrySequences=[f'0:{max_events_per_file - 1}'],
-            logLevel=b2.LogLevel.ERROR)
-        if not isMC:
-            re.add_unpackers(path=rec_path)
-        else:
-            rec_path.add_module("Gearbox")
-            rec_path.add_module("Geometry")
+    if rerun_pid:
+        rec_path.add_module('RootInput', entrySequences=[f'0:{max_events_per_file - 1}']
+                            )
+        prepare_user_cdst_analysis(rec_path, mc=isMC)
 
-        re.add_reconstruction(path=rec_path, pruneTracks=False)
-        rec_path.add_module('VXDDedxPID')
     else:
         rec_path.add_module('RootInput')
 
@@ -95,7 +76,6 @@ def create_path(rerun_reco, isMC, expert_config):
     ma.fillParticleList('e+:cut', cut='nSVDHits > 0', path=rec_path)  # electron
     # proton. In data, we only see background at p<0.25 GeV which motivates adding this cut.
     ma.fillParticleList('p+:lambda', cut='nCDCHits > 0 and nSVDHits > 0 and p > 0.25', path=rec_path)
-
     # ----------------------------------------------------------------------------
     # Reconstruct D*(D0->K-pi+)pi+ and cc.
     ma.reconstructDecay(decayString='D0:kpi -> K-:cut pi+:cut', cut='1.7 < M < 2.', path=rec_path)
@@ -206,10 +186,13 @@ def get_calibrations(input_data, **kwargs):
 
     isMC = expert_config["isMC"]
     listOfMutedCalibrations = expert_config["listOfMutedCalibrations"]
-    rerun_reco = expert_config["rerun_reco"]
-    rerun_reco_val = expert_config["rerun_reco_val"]
+    rerun_pid = expert_config["rerun_pid"]
+    rerun_pid_val = expert_config["rerun_pid_val"]
     max_files_per_run = expert_config["MaxFilesPerRun"]
     max_files_per_run_validation = expert_config["MaxFilesPerRunValidation"]
+
+    # Choose between the basic (default) or the full validation (produces more plots but depends on the global PID)
+    validation_mode = 1 if expert_config["validation_mode"] == "full" else 0
 
     # If you are using Raw data there's a chance that input files could have zero events.
     # This causes a B2FATAL in basf2 RootInput so the collector job will fail.
@@ -222,10 +205,11 @@ def get_calibrations(input_data, **kwargs):
     input_files_hadron_calib = list(reduced_file_to_iov_hadron_calib.keys())
     basf2.B2INFO(f"Total number of files actually used as input for calibration = {len(input_files_hadron_calib)}")
 
-    reduced_file_to_iov_hadron_validation = filter_by_max_files_per_run(
-        file_to_iov_hadron_calib, max_files_per_run_validation, min_events_per_file)
-    input_files_hadron_validation = list(reduced_file_to_iov_hadron_validation.keys())
-    basf2.B2INFO(f"Total number of files actually used as input for validation = {len(input_files_hadron_validation)}")
+    if "dEdxValidation" not in listOfMutedCalibrations:
+        reduced_file_to_iov_hadron_validation = filter_by_max_files_per_run(
+            file_to_iov_hadron_calib, max_files_per_run_validation, min_events_per_file)
+        input_files_hadron_validation = list(reduced_file_to_iov_hadron_validation.keys())
+        basf2.B2INFO(f"Total number of files actually used as input for validation = {len(input_files_hadron_validation)}")
     # Get the overall IoV we our process should cover. Includes the end values that we may want to ignore since our output
     # IoV should be open ended. We could also use this as part of the input data selection in some way.
     requested_iov = kwargs.get("requested_iov", None)
@@ -246,22 +230,24 @@ def get_calibrations(input_data, **kwargs):
     algo.setDEdxCutoff(expert_config['dedxCutoff'])
     algo.setMinEvtsPerTree(expert_config['MinEvtsPerTree'])
 
-    algo_val = SVDdEdxValidationAlgorithm()
-    algo_val.setMonitoringPlots(True)
-    algo_val.setMinEvtsPerTree(expert_config['MinEvtsPerTree'])
-    algo_val.setNumROCpoints(expert_config['NumROCpoints'])
-    algo_val.setMinROCMomentum(expert_config['MinROCMomentum'])
-    algo_val.setMaxROCMomentum(expert_config['MaxROCMomentum'])
-    algo_val.setNumEffBins(expert_config['NumEffBins'])
-    algo_val.setMaxEffMomentum(expert_config['MaxEffMomentum'])
+    if "dEdxValidation" not in listOfMutedCalibrations:
+        algo_val = SVDdEdxValidationAlgorithm()
+        algo_val.setMonitoringPlots(True)
+        algo_val.setMinEvtsPerTree(expert_config['MinEvtsPerTree'])
+        algo_val.setNumROCpoints(expert_config['NumROCpoints'])
+        algo_val.setMinROCMomentum(expert_config['MinROCMomentum'])
+        algo_val.setMaxROCMomentum(expert_config['MaxROCMomentum'])
+        algo_val.setNumEffBins(expert_config['NumEffBins'])
+        algo_val.setMaxEffMomentum(expert_config['MaxEffMomentum'])
+        algo_val.validationMode(validation_mode)
 
     ###################################################
     # Calibration setup
 
     from caf.framework import Calibration
 
-    rec_path = create_path(rerun_reco, isMC, expert_config)
-    rec_path_validation = create_path(rerun_reco_val, isMC, expert_config)
+    rec_path = create_path(rerun_pid, isMC, expert_config)
+    rec_path_validation = create_path(rerun_pid_val, isMC, expert_config)
 
     dedx_calibration = Calibration("SVDdEdxCalibration",
                                    collector="SVDdEdxCollector",
@@ -269,12 +255,13 @@ def get_calibrations(input_data, **kwargs):
                                    input_files=input_files_hadron_calib,
                                    pre_collector_path=rec_path)
 
-    dedx_validation = Calibration("SVDdEdxValidation",
-                                  collector="SVDdEdxValidationCollector",
-                                  algorithms=[algo_val],
-                                  backend_args={"queue": "l"},
-                                  input_files=input_files_hadron_validation,
-                                  pre_collector_path=rec_path_validation)
+    if "dEdxValidation" not in listOfMutedCalibrations:
+        dedx_validation = Calibration("SVDdEdxValidation",
+                                      collector="SVDdEdxValidationCollector",
+                                      algorithms=[algo_val],
+                                      backend_args={"queue": "l"},
+                                      input_files=input_files_hadron_validation,
+                                      pre_collector_path=rec_path_validation)
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun
     for algorithm in dedx_calibration.algorithms:
@@ -283,7 +270,8 @@ def get_calibrations(input_data, **kwargs):
     # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
     # So we don't bother setting them.
 
-    dedx_validation.depends_on(dedx_calibration)
+    if "dEdxValidation" not in listOfMutedCalibrations:
+        dedx_validation.depends_on(dedx_calibration)
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     list_of_calibrations = []
     if "dEdxCalibration" not in listOfMutedCalibrations:

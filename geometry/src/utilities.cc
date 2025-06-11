@@ -149,7 +149,7 @@ namespace Belle2 {
        * This function subdivides the polyline given by segments to contain a
        * point at every z position in points.  Furthermore, the polyline will
        * be extended to cover the same range of z as the points by appending
-       * the first or last point of points to the polyline if neccessary.
+       * the first or last point of points to the polyline if necessary.
        *
        * This function also checks if the points have ascending z positions.
        *
@@ -186,7 +186,7 @@ namespace Belle2 {
         }
 
         //Now make sure the polyline extend over the same z range by adding the
-        //first/last point of points when neccessary
+        //first/last point of points when necessary
         if (points.front().first < segments.front().first) {
           segments.insert(segments.begin(), points.front());
         }
@@ -230,7 +230,7 @@ namespace Belle2 {
         //We could have more than one point at the same z position for segments
         //going directly along x. because of that we check that the z
         //coordinates for inner and outer line are always the same, reusing one
-        //point if neccessary
+        //point if necessary
         if (!innerPoints.empty() && innerPoints.front().first <= outerPoints.front().first) {
           boost::tie(innerZ, innerX) = innerPoints.front();
           popInner = true;

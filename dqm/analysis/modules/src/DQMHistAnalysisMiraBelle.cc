@@ -28,6 +28,8 @@ DQMHistAnalysisMiraBelleModule::DQMHistAnalysisMiraBelleModule()
   setDescription("Modify and analyze the data quality histograms of MiraBelle");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("scale_dst", m_scale_dst, "Scale factor signal/sideband", 0.09375);
+  addParam("m_reference_hadb", m_reference_hadb, "reference for hadronb2_tight bhabha ratio", 0.193);
+  addParam("m_reference_mumu", m_reference_mumu, "reference for mumu inv mass", 10.568);
 }
 
 DQMHistAnalysisMiraBelleModule::~DQMHistAnalysisMiraBelleModule()
@@ -318,8 +320,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   if (fit_mumumass < 9.) fit_mumumass = 9.;
   if (fit_mumumass > 12.) fit_mumumass = 12.;
   double fit_mumumass_error = f_mumuInvM->GetParError(1);
-  double mumumass_reference = 10.573;
-  double pull_mumumass = (fit_mumumass - mumumass_reference) / fit_mumumass_error;
+  double pull_mumumass = (fit_mumumass - m_reference_mumu) / fit_mumumass_error;
   double fit_sigma_mumu = f_mumuInvM->GetParameter(2);
 
   // set values
@@ -1068,13 +1069,11 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   //pull
   double ratio_pull_hadBhabha = -10.;
   double error_ratio = -10.;
-
   if (bh_ntot != 0) {
     ratio_hadron_bhabha = had_ntot / bh_neve_bhabha;
     //pull
-    double ratio_reference = 0.206;
     error_ratio = ratio_hadron_bhabha * sqrt((1 / had_ntot) + (1 / bh_neve_bhabha));
-    ratio_pull_hadBhabha = (ratio_hadron_bhabha - ratio_reference) / error_ratio;
+    ratio_pull_hadBhabha = (ratio_hadron_bhabha - m_reference_hadb) / error_ratio;
   }
   // set values
   mon_bhabha->setVariable("had_ntot", had_ntot);

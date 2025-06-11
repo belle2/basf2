@@ -88,7 +88,7 @@ display.param('hideVolumes', ['logicalCDC',
 #          will cause the children elements to re-appear (strange, why?!) -
 #          so do not click (expand) it if you do not want it in the extract
 #
-# Some usefull examples:
+# Some useful examples:
 #
 # - You need to escape special characters like '.' (dot) by '\\'
 #   For example to select all volumes which contain 'PXD.ReadoutChips', use:

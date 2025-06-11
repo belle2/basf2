@@ -79,7 +79,7 @@ def main():
         "-s",
         "--show",
         action="store_true",
-        help="Show the overview immediatly."
+        help="Show the overview immediately."
         )
 
     arguments = argument_parser.parse_args()

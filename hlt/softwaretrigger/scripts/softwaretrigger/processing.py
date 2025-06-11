@@ -13,7 +13,7 @@ import tempfile
 import basf2
 
 from softwaretrigger import constants
-from pxd import add_roi_payload_assembler, add_roi_finder
+from tracking import add_roiFinder, add_roi_payload_assembler
 
 from reconstruction import add_reconstruction, add_cosmics_reconstruction
 from softwaretrigger import path_utils
@@ -159,6 +159,7 @@ def add_hlt_processing(path,
                        unpacker_components=None,
                        reco_components=None,
                        create_hlt_unit_histograms=True,
+                       switch_off_slow_modules_for_online=True,
                        **kwargs):
     """
     Add all modules for processing on HLT filter machines
@@ -203,7 +204,13 @@ def add_hlt_processing(path,
     accept_path = basf2.Path()
 
     # Do the reconstruction needed for the HLT decision
-    path_utils.add_pre_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
+    path_utils.add_pre_filter_reconstruction(
+        path,
+        run_type=run_type,
+        components=reco_components,
+        switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
+        **kwargs
+    )
 
     # Perform HLT filter calculation
     path_utils.add_filter_software_trigger(path, store_array_debug_prescale=1)
@@ -229,10 +236,15 @@ def add_hlt_processing(path,
         basf2.B2FATAL(f"The software trigger mode {softwaretrigger_mode} is not supported.")
 
     # For accepted events we continue the reconstruction
-    path_utils.add_post_filter_reconstruction(accept_path, run_type=run_type, components=reco_components)
+    path_utils.add_post_filter_reconstruction(
+        accept_path,
+        run_type=run_type,
+        components=reco_components,
+        switch_off_slow_modules_for_online=switch_off_slow_modules_for_online
+    )
 
     # Only create the ROIs for accepted events
-    add_roi_finder(accept_path)
+    add_roiFinder(accept_path)
     accept_path.add_module('StatisticsSummary').set_name('Sum_ROI_Finder')
 
     # Add the HLT DQM modules only in case the event is accepted
@@ -252,7 +264,7 @@ def add_hlt_processing(path,
     add_roi_payload_assembler(path, ignore_hlt_decision=pxd_ignores_hlt_decision)
     path.add_module('StatisticsSummary').set_name('Sum_ROI_Payload_Assembler')
 
-    # Add the part of the dqm modules, which should run on all events, not only on the accepted onces
+    # Add the part of the dqm modules, which should run on all events, not only on the accepted ones
     path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events,
                            create_hlt_unit_histograms=create_hlt_unit_histograms)
 
@@ -270,6 +282,7 @@ def add_expressreco_processing(path,
                                unpacker_components=None,
                                reco_components=None,
                                do_reconstruction=True,
+                               switch_off_slow_modules_for_online=True,
                                **kwargs):
     """
     Add all modules for processing on the ExpressReco machines
@@ -312,8 +325,13 @@ def add_expressreco_processing(path,
 
     if do_reconstruction:
         if run_type == constants.RunTypes.beam:
-            add_reconstruction(path, components=reco_components, pruneTracks=False,
-                               skipGeometryAdding=True, add_trigger_calculation=False, **kwargs)
+            add_reconstruction(path,
+                               components=reco_components,
+                               pruneTracks=False,
+                               skipGeometryAdding=True,
+                               add_trigger_calculation=False,
+                               switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
+                               **kwargs)
         elif run_type == constants.RunTypes.cosmic:
             add_cosmics_reconstruction(path, components=reco_components, pruneTracks=False,
                                        skipGeometryAdding=True, **kwargs)

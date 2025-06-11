@@ -55,16 +55,16 @@ namespace Belle2 {
     /** If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle. */
     bool m_assignToPrimaries;
 
-    /** If true, all primary MCParticles will be shown, regardless of wether hits are produced. */
+    /** If true, all primary MCParticles will be shown, regardless of whether hits are produced. */
     bool m_showAllPrimaries;
 
     /** If true, secondary MCParticles (and hits created by them) will not be shown. */
     bool m_hideSecondaries;
 
-    /** If true, all charged primary and secondary MCParticles will be shown, regardless of wether hits are produced. */
+    /** If true, all charged primary and secondary MCParticles will be shown, regardless of whether hits are produced. */
     bool m_showCharged;
 
-    /** If true, all neutral primary and secondary MCParticles will be shown, regardless of wether hits are produced. */
+    /** If true, all neutral primary and secondary MCParticles will be shown, regardless of whether hits are produced. */
     bool m_showNeutrals;
 
     /** If true, fitted RecoTracks, GFRave Vertices and ECLGamma objects will be shown in the display. */

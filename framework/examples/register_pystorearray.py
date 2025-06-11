@@ -38,7 +38,7 @@ class SillyGeneratorModule(basf2.Module):
         vertex = ROOT.TVector3(0, 0, 0)
 
         # Sample a random momentum vector of
-        # gaus distributed length and uniform distibuted  direction
+        # gaus distributed length and uniform distributed  direction
         phi = ROOT.gRandom.Uniform(0.0, 2.0 * math.pi)
         costheta = ROOT.gRandom.Uniform(-1.0, 1.0)
         theta = math.acos(costheta)
@@ -76,7 +76,7 @@ class ParticleStatisticsModule(basf2.Module):
         ntuple.create()
         print("IsValid", ntuple.isValid())
         ntuple.obj().assign(ROOT.TNtuple("Particles",  # ROOT name
-                                         "Momentum compontents of the particles",  # ROOT title
+                                         "Momentum components of the particles",  # ROOT title
                                          "px:py:pz"  # Var list
                                          ))
 
@@ -114,7 +114,7 @@ class ParticleStatisticsModule(basf2.Module):
         """terminate"""
         if (not Belle2.ProcHandler.parallelProcessingUsed() or
                 Belle2.ProcHandler.isOutputProcess()):
-            print("Writting objects")
+            print("Writing objects")
             ntuple = Belle2.PyStoreObj("ParticleMomenta", Belle2.DataStore.c_Persistent)
             ntuple.write(self.tfile)
 

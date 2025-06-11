@@ -15,8 +15,6 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace boost;
-using boost::format;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -62,7 +60,7 @@ void HepevtOutputModule::event()
     }
   }
 
-  m_fileStream << format("%10d%10d\n") % eventMetaDataPtr->getEvent() % (nPart - nVirtualPart);
+  m_fileStream << boost::format("%10d%10d\n") % eventMetaDataPtr->getEvent() % (nPart - nVirtualPart);
 
   for (int iPart = 0; iPart < nPart; ++iPart) {
     MCParticle& mcPart = *mcPartCollection[iPart];
@@ -79,13 +77,17 @@ void HepevtOutputModule::event()
       int motherIndex = 0;
       if (mcPart.getMother() != NULL) motherIndex = mcPart.getMother()->getIndex();
 
-      m_fileStream << format("%5i%12i%10i%10i%10i%10i") % isthep % mcPart.getPDG() % motherIndex % motherIndex % mcPart.getFirstDaughter()
+      m_fileStream << boost::format("%5i%12i%10i%10i%10i%10i") % isthep % mcPart.getPDG() % motherIndex % motherIndex %
+                   mcPart.getFirstDaughter()
                    % mcPart.getLastDaughter();
-      m_fileStream << format("%15.6f%15.6f%15.6f%15.6f%15.6f") % mom.X() % mom.Y() % mom.Z() % mcPart.getEnergy() % mcPart.getMass();
-      m_fileStream << format("%15.6f%15.6f%15.6f%15.6f\n") % mcPart.getVertex().X() % mcPart.getVertex().Y() % mcPart.getVertex().Z() %
+      m_fileStream << boost::format("%15.6f%15.6f%15.6f%15.6f%15.6f") % mom.X() % mom.Y() % mom.Z() % mcPart.getEnergy() %
+                   mcPart.getMass();
+      m_fileStream << boost::format("%15.6f%15.6f%15.6f%15.6f\n") % mcPart.getVertex().X() % mcPart.getVertex().Y() %
+                   mcPart.getVertex().Z() %
                    mcPart.getProductionTime();
     } else {
-      m_fileStream << format("%15.6f%15.6f%15.6f%15.6f%15.6f%15i\n") % mom.X() % mom.Y() % mom.Z() % mcPart.getEnergy() % mcPart.getMass()
+      m_fileStream << boost::format("%15.6f%15.6f%15.6f%15.6f%15.6f%15i\n") % mom.X() % mom.Y() % mom.Z() % mcPart.getEnergy() %
+                   mcPart.getMass()
                    % mcPart.getPDG();
     }
   }

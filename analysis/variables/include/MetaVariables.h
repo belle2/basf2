@@ -239,6 +239,18 @@ namespace Belle2 {
     Manager::FunctionPtr daughterMotherNormDiffOf(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the angle between the sum of the momenta of the two given daughters and the momentum recoiling against the particle.
+     * The arguments in the argument vector must be generalized daughter indices.
+     */
+    Manager::FunctionPtr angleBetweenDaughterAndRecoil(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the angle between the sum of the momenta of the two given daughters and the missing momentum in the event.
+     * The arguments in the argument vector must be generalized daughter indices.
+     */
+    Manager::FunctionPtr angleBetweenDaughterAndMissingMomentum(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the angle between daughters:
      * If two indices given: returns the angle between the momenta of the two given daughters.
      * If three indices given: Variable returns the angle between the momentum of the third particle and a vector
@@ -316,6 +328,12 @@ namespace Belle2 {
      * All arguments should be p-values in the range 0 to 1.
      */
     Manager::FunctionPtr pValueCombination(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the combined p-value of the daughter p-values
+     * All arguments should be p-values in the range 0 to 1.
+     */
+    Manager::FunctionPtr pValueCombinationOfDaughters(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the absolute value of a variable of the given particle
@@ -546,6 +564,11 @@ namespace Belle2 {
     Manager::FunctionPtr useDaughterRestFrame(const std::vector<std::string>& arguments);
 
     /**
+     * Returns the value of the variable in the rest frame of the recoil of the daughter identified via generalized index.
+     */
+    Manager::FunctionPtr useDaughterRecoilRestFrame(const std::vector<std::string>& arguments);
+
+    /**
     * Returns a  function that returns the value of a variable calculated using new mass assumptions for the daughters' masses.
     */
     Manager::FunctionPtr  useAlternativeDaughterHypothesis(const std::vector<std::string>& arguments);
@@ -564,6 +587,13 @@ namespace Belle2 {
      * Returns the value of the variable in the rest frame of the ancestor B MC particle.
      */
     Manager::FunctionPtr useMCancestorBRestFrame(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the integer value of a variable of the given particle
+     * First argument in the argument vector must be the name of variable
+     * Second argument is the value for NaN replacement
+     */
+    Manager::FunctionPtr convertToInt(const std::vector<std::string>& arguments);
 
   }
 }

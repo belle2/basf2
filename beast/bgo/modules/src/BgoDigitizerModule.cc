@@ -11,15 +11,14 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/core/RandomNumbers.h>
 
 // ROOT
 #include <Math/Vector3D.h>
 #include <TMath.h>
+#include <TRandom.h>
 
 //c++
 #include <string>
-#include <fstream>
 #include <vector>
 
 using namespace std;
@@ -119,7 +118,7 @@ void BgoDigitizerModule::getXMLData()
     iRange++;
   }
 
-  B2INFO("BgoDigitizer: Aquired bgo locations and gas parameters");
+  B2INFO("BgoDigitizer: Acquired bgo locations and gas parameters");
   B2INFO("              from BGO.xml. There are " << nBGO << " BGOs implemented");
 
 }

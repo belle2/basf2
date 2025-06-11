@@ -11,8 +11,8 @@
 
 #include "trg/klm/modules/klmtrigger/KLMAxis.h"
 
-#include "trg/klm/modules/klmtrigger/KLM_Trig.h"
-#include <trg/klm/modules/klmtrigger/klm_trig_linear_fit.h>
+#include "trg/klm/modules/klmtrigger/klmtrgLayerCounter.h"
+#include <trg/klm/modules/klmtrigger/klmtrgLinearFit.h>
 
 #include <trg/klm/modules/klmtrigger/IO_csv.h>
 
@@ -28,8 +28,7 @@
 // digits
 #include <klm/dataobjects/KLMDigit.h>
 
-#include <trg/klm/dataobjects/KLMTriggerHit.h>
-#include <trg/klm/dataobjects/KLMTriggerTrack.h>
+
 #include <trg/klm/dataobjects/KLMTrgSummary.h>
 #include <trg/klm/dataobjects/KLMTrgFittedTrack.h>
 
@@ -178,19 +177,6 @@ void KLMTriggerModule::initialize()
 
 
 
-
-
-// unused
-
-  StoreArray<KLMTriggerHit> klmTriggerHits(m_klmhitCollectionName);
-  klmTriggerHits.registerInDataStore();
-  klmTriggerHits.registerRelationTo(klmDigits);
-
-  StoreArray<KLMTriggerTrack> klmTriggerTracks(m_klmtrackCollectionName);
-  klmTriggerTracks.registerInDataStore();
-  klmTriggerTracks.registerRelationTo(klmTriggerHits);
-// end unused
-
   if (!m_dump_Path.empty()) {
     get_IO_csv_handle().dump_path  = m_dump_Path;
     get_IO_csv_handle().do_dump    = true;
@@ -218,8 +204,8 @@ void KLMTriggerModule::beginRun()
             << LogVar("exception", e.what()));
   }
   try {
-    m_klmtrg_layer_counter = std::make_shared< Belle2::klmtrg_layer_counter_t>();
-    m_klm_trig_linear_fit = std::make_shared< Belle2::klm_trig_linear_fit_t>();
+    m_klmtrg_layer_counter = std::make_shared< Belle2::klmtrgLayerCounter>();
+    m_klm_trig_linear_fit = std::make_shared< Belle2::klmtrgLinearFit>();
     m_klm_trig_linear_fit->set_y_cutoff(y_cutoff);
     m_klm_trig_linear_fit->set_intercept_cutoff(m_intercept_cutoff);
 
@@ -240,10 +226,10 @@ void KLMTriggerModule::beginRun()
       e.sector       = KLMTriggerParameters->getSector(i);
       e.layer        = KLMTriggerParameters->getLayer(i);
       e.plane        = KLMTriggerParameters->getPlane(i);
-      e.slopeX       = KLMTriggerParameters->getSlopeX(i);
-      e.offsetX      = KLMTriggerParameters->getOffsetX(i);
-      e.slopeY       = KLMTriggerParameters->getSlopeY(i);
-      e.offsetY      = KLMTriggerParameters->getOffsetY(i);
+      e.slopeX.v       = KLMTriggerParameters->getSlopeX(i);
+      e.offsetX.v      = KLMTriggerParameters->getOffsetX(i);
+      e.slopeY.v       = KLMTriggerParameters->getSlopeY(i);
+      e.offsetY.v      = KLMTriggerParameters->getOffsetY(i);
       m_klm_trig_linear_fit->add_geometry(e);
 
     }
@@ -295,7 +281,78 @@ auto push_linear_fit_to_KLMTrgFittedTrack(T1&& linear_fited,  T2& KLMTrgFittedTr
 
 
 
+template <typename T1, typename T2, typename T3>
+auto push_KLMSummary(T1&& m_klmtrg_layer_counter, T2&& m_klm_trig_linear_fit, T3& KLMTrgSummary)
+{
 
+  KLMTrgSummary->setBKLM_back_to_back_flag(
+    m_klmtrg_layer_counter->get_BKLM_back_to_back_flag(KLMElementNumbers::c_BKLM)
+  );
+
+  KLMTrgSummary->setEKLM_back_to_back_flag(
+    m_klmtrg_layer_counter->get_BKLM_back_to_back_flag(KLMElementNumbers::c_EKLM)
+  );
+
+  KLMTrgSummary->setBKLM_n_trg_sectors(
+    m_klmtrg_layer_counter->get_n_sections_trig(KLMElementNumbers::c_BKLM)
+  );
+  KLMTrgSummary->setEKLM_n_trg_sectors(
+    m_klmtrg_layer_counter->get_n_sections_trig(KLMElementNumbers::c_EKLM)
+  );
+  KLMTrgSummary->setSector_mask_Backward_Barrel(
+    m_klmtrg_layer_counter->get_triggermask(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_BackwardSection)
+  );
+
+  KLMTrgSummary->setSector_mask_Forward_Barrel(
+    m_klmtrg_layer_counter->get_triggermask(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_ForwardSection)
+  );
+  KLMTrgSummary->setSector_mask_Backward_Endcap(
+    m_klmtrg_layer_counter->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_BackwardSection)
+  );
+
+  KLMTrgSummary->setSector_mask_Forward_Endcap(
+    m_klmtrg_layer_counter->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_ForwardSection)
+  );
+
+
+
+
+
+
+
+  KLMTrgSummary->setSector_mask_SLF_Backward_Barrel(
+    m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_BackwardSection)
+  );
+
+  KLMTrgSummary->setSector_mask_SLF_Forward_Barrel(
+    m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_ForwardSection)
+  );
+  KLMTrgSummary->setSector_mask_SLF_Backward_Endcap(
+    m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_BackwardSection)
+  );
+
+  KLMTrgSummary->setSector_mask_SLF_Forward_Endcap(
+    m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_ForwardSection)
+  );
+
+
+  KLMTrgSummary->setSector_mask_SLF_OR_Backward_Barrel(
+    m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_BackwardSection)
+  );
+
+  KLMTrgSummary->setSector_mask_SLF_OR_Forward_Barrel(
+    m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_ForwardSection)
+  );
+  KLMTrgSummary->setSector_mask_SLF_OR_Backward_Endcap(
+    m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_BackwardSection)
+  );
+
+  KLMTrgSummary->setSector_mask_SLF_OR_Forward_Endcap(
+    m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_ForwardSection)
+  );
+
+
+}
 
 
 void KLMTriggerModule::event()
@@ -319,7 +376,7 @@ void KLMTriggerModule::event()
       dummy.event_nr    = m_event_nr;
       dummy.subdetector = digit->getSubdetector();
       dummy.section     = digit->getSection();
-      dummy.sector      = digit->getSector();
+      dummy.sector      = digit->getSector() - 1;
       dummy.plane       = digit->getPlane();
       dummy.layer       = digit->getLayer();
       dummy.strip       = digit->getStrip();
@@ -333,72 +390,7 @@ void KLMTriggerModule::event()
 
     push_linear_fit_to_KLMTrgFittedTrack(m_klm_trig_linear_fit->get_result(), KLMTrgFittedTrack_);
 
-    KLMTrgSummary->setBKLM_back_to_back_flag(
-      m_klmtrg_layer_counter->get_BKLM_back_to_back_flag(KLMElementNumbers::c_BKLM)
-    );
-
-    KLMTrgSummary->setEKLM_back_to_back_flag(
-      m_klmtrg_layer_counter->get_BKLM_back_to_back_flag(KLMElementNumbers::c_EKLM)
-    );
-
-    KLMTrgSummary->setBKLM_n_trg_sectors(
-      m_klmtrg_layer_counter->get_n_sections_trig(KLMElementNumbers::c_BKLM)
-    );
-    KLMTrgSummary->setEKLM_n_trg_sectors(
-      m_klmtrg_layer_counter->get_n_sections_trig(KLMElementNumbers::c_EKLM)
-    );
-    KLMTrgSummary->setSector_mask_Backward_Barrel(
-      m_klmtrg_layer_counter->get_triggermask(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_BackwardSection)
-    );
-
-    KLMTrgSummary->setSector_mask_Forward_Barrel(
-      m_klmtrg_layer_counter->get_triggermask(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_ForwardSection)
-    );
-    KLMTrgSummary->setSector_mask_Backward_Endcap(
-      m_klmtrg_layer_counter->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_BackwardSection)
-    );
-
-    KLMTrgSummary->setSector_mask_Forward_Endcap(
-      m_klmtrg_layer_counter->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_ForwardSection)
-    );
-
-
-
-
-
-
-
-    KLMTrgSummary->setSector_mask_SLF_Backward_Barrel(
-      m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_BackwardSection)
-    );
-
-    KLMTrgSummary->setSector_mask_SLF_Forward_Barrel(
-      m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_ForwardSection)
-    );
-    KLMTrgSummary->setSector_mask_SLF_Backward_Endcap(
-      m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_BackwardSection)
-    );
-
-    KLMTrgSummary->setSector_mask_SLF_Forward_Endcap(
-      m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_ForwardSection)
-    );
-
-
-    KLMTrgSummary->setSector_mask_SLF_OR_Backward_Barrel(
-      m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_BackwardSection)
-    );
-
-    KLMTrgSummary->setSector_mask_SLF_OR_Forward_Barrel(
-      m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_ForwardSection)
-    );
-    KLMTrgSummary->setSector_mask_SLF_OR_Backward_Endcap(
-      m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_BackwardSection)
-    );
-
-    KLMTrgSummary->setSector_mask_SLF_OR_Forward_Endcap(
-      m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_ForwardSection)
-    );
-
+    push_KLMSummary(m_klmtrg_layer_counter, m_klm_trig_linear_fit, KLMTrgSummary);
 
   } catch (const std::exception& er) {
     B2FATAL(er.what());

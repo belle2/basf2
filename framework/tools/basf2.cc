@@ -20,8 +20,6 @@
 #include <framework/core/Environment.h>
 #include <framework/core/DataFlowVisualization.h>
 #include <framework/core/MetadataService.h>
-#include <framework/core/Module.h>
-#include <framework/core/ModuleManager.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConfig.h>
@@ -35,7 +33,6 @@
 #include <csignal>
 #include <cstdlib>
 #include <iostream>
-#include <algorithm>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -111,6 +108,8 @@ int main(int argc, char* argv[])
      "Set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
     ("package_log_level", prog::value<vector<string> >(),
      "Set package log level. Can be specified multiple times to use more than one package. (Examples: 'klm:INFO or cdc:DEBUG:10') ")
+    ("module_log_level", prog::value<vector<string> >(),
+     "Set module log level. Can be specified multiple times to use more than one package. (Examples: 'EventInfoSetter:INFO or CDCDigitizer:DEBUG:10') ")
     ("random-seed", prog::value<string>(),
      "Set the default initial seed for the random number generator. "
      "This does not take precedence over calls to set_random_seed() in the steering file, but just changes the default. "
@@ -263,7 +262,7 @@ int main(int argc, char* argv[])
         cmd.push_back(nullptr);
         //And call this thing. Execvp will not return if successful as the
         //current process will be replaced so we do not need to care about what
-        //happens if succesful
+        //happens if successful
         if (execvp(cmd[0], cmd.data()) == -1) {
           int errsv = errno;
           perror("Problem calling valgrind");
@@ -384,6 +383,49 @@ int main(int argc, char* argv[])
           LogSystem::Instance().getPackageLogConfig(packageName).setDebugLevel(debugLevel);
         }
         LogSystem::Instance().getPackageLogConfig(packageName).setLogLevel((LogConfig::ELogLevel)level);
+
+      }
+    }
+
+    // --module_log_level
+    if (varMap.count("module_log_level")) {
+      const auto& moduleLogList = varMap["module_log_level"].as<vector<string>>();
+      const std::string delimiter = ":";
+      for (const std::string& moduleLog : moduleLogList) {
+        if (moduleLog.find(delimiter) == std::string::npos) {
+          B2FATAL("In --module_log_level input " << moduleLog << ", no colon detected. ");
+          break;
+        }
+        /* string parsing for packageName:LOGLEVEL or packageName:DEBUG:LEVEL*/
+        auto moduleName = moduleLog.substr(0, moduleLog.find(delimiter));
+        std::string moduleLogName = moduleLog.substr(moduleLog.find(delimiter) + delimiter.length(), moduleLog.length());
+        int moduleDebugLevel = -1;
+        if ((moduleLogName.find("DEBUG") != std::string::npos) && moduleLogName.length() > 5) {
+          try {
+            moduleDebugLevel = std::stoi(moduleLogName.substr(moduleLogName.find(delimiter) + delimiter.length(), moduleLogName.length()));
+          } catch (std::exception& e) {
+            B2WARNING("In --module_log_level, issue parsing debugLevel. Still setting log level to DEBUG.");
+          }
+          moduleLogName = "DEBUG";
+        }
+
+        int module_level = -1;
+        /* determine log level for module */
+        for (int i = LogConfig::c_Debug; i < LogConfig::c_Fatal; i++) {
+          std::string moduleThisLevel = LogConfig::logLevelToString((LogConfig::ELogLevel)i);
+          if (boost::iequals(moduleLogName, moduleThisLevel)) { //case-insensitive
+            module_level = i;
+            break;
+          }
+        }
+        if (module_level < 0) {
+          B2FATAL("Invalid log level! Needs to be one of DEBUG, INFO, RESULT, WARNING, or ERROR.");
+        }
+        /* set package log level*/
+        if ((moduleLogName == "DEBUG") && (moduleDebugLevel >= 0)) {
+          LogSystem::Instance().getModuleLogConfig(moduleName).setDebugLevel(moduleDebugLevel);
+        }
+        LogSystem::Instance().getModuleLogConfig(moduleName).setLogLevel((LogConfig::ELogLevel)module_level);
 
       }
     }

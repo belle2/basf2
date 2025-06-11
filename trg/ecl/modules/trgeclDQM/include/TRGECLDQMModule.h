@@ -26,7 +26,7 @@ namespace Belle2 {
   class TRGECLDQMModule : public HistoModule {
 
   public:
-    //! Costructor
+    //! Constructor
     TRGECLDQMModule();
     //! Destrunctor
     virtual ~TRGECLDQMModule();

@@ -138,7 +138,7 @@ void OverlapResidualsModule::defineHisto()
                                    "Layer 6: histrogram of residual difference #Delta res_{v} for overlapping SVD hits", 100, -1000, 1000);
   h_V_DeltaRes_SVD_Lyr6->GetXaxis()->SetTitle("#Delta res_{v} (#mum)");
   h_V_DeltaRes_SVD_Lyr6->GetYaxis()->SetTitle("counts");
-  h_SVDstrips_Mult = new TH1F("h_SVDstrips_Mult", "SVD strips multipicity for SVD clusters in overlapping sensors", 15, 0.5, 15.5);
+  h_SVDstrips_Mult = new TH1F("h_SVDstrips_Mult", "SVD strips multiplicity for SVD clusters in overlapping sensors", 15, 0.5, 15.5);
   h_SVDstrips_Mult->GetXaxis()->SetTitle("N. of SVD strips contributing to the cluster");
   h_SVDstrips_Mult->GetYaxis()->SetTitle("counts");
   //Define 2D histograms: difference of u-residuals vs phi of VXD overlaps for each layer (1 to 6)
@@ -741,7 +741,7 @@ void OverlapResidualsModule::event()
                 B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits_1.size() << " != " << svdSize_U_int <<
                         " cluster size");
 
-              //skip clusters created beacuse of missing APV
+              //skip clusters created because of missing APV
               if (svdSize_U_int < 128)
                 for (unsigned int d = 0; d < svdSize_U_int; d++) {
                   svdStripCharge_U_int.push_back(theRecoDigits_1[d]->getCharge());
@@ -795,7 +795,7 @@ void OverlapResidualsModule::event()
               if ((theRecoDigits_2.size() != svdSize_U_ext) && (svdSize_U_ext != 128)) //virtual cluster
                 B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits_2.size() << " != " << svdSize_U_ext <<
                         " cluster size");
-              //skip clusters created beacuse of missing APV
+              //skip clusters created because of missing APV
               if (svdSize_U_ext < 128)
                 for (unsigned int d = 0; d < svdSize_U_ext; d++) {
                   svdStripCharge_U_ext.push_back(theRecoDigits_2[d]->getCharge());
@@ -930,7 +930,7 @@ void OverlapResidualsModule::event()
               if ((theRecoDigits_1.size() != svdSize_V_int) && (svdSize_V_int != 128)) //virtual cluster
                 B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits_1.size() << " != " << svdSize_V_int <<
                         " cluster size");
-              //skip clusters created beacuse of missing APV
+              //skip clusters created because of missing APV
               if (svdSize_V_int < 128)
                 for (unsigned int d = 0; d < svdSize_V_int; d++) {
                   svdStripCharge_V_int.push_back(theRecoDigits_1[d]->getCharge());
@@ -984,7 +984,7 @@ void OverlapResidualsModule::event()
               if ((theRecoDigits_2.size() != svdSize_V_ext) && (svdSize_V_ext != 128)) //virtual cluster
                 B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits_2.size() << " != " << svdSize_V_ext <<
                         " cluster size");
-              //skip clusters created beacuse of missing APV
+              //skip clusters created because of missing APV
               if (svdSize_V_ext < 128)
                 for (unsigned int d = 0; d < svdSize_V_ext; d++) {
                   svdStripCharge_V_ext.push_back(theRecoDigits_2[d]->getCharge());

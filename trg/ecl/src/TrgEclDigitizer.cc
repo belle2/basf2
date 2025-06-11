@@ -385,8 +385,8 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
   //==================
   // (01)noise embedding
   //==================
-  double  tmin_noise = -4; // orignal
-  double tgen = 10.3;   // orignal
+  double  tmin_noise = -4; // original
+  double tgen = 10.3;   // original
   int bkg_level = 1030;
   double ttt0 = 0; // [us]
   /* cppcheck-suppress variableScope */
@@ -395,7 +395,7 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
   double ttt2 = 0; // [us]
   //
   double frac_pileup   = 0.035; // pileup noise fraction?
-  double frac_parallel = 0.023; // parralel noise fraction?
+  double frac_parallel = 0.023; // parallel noise fraction?
   double frac_serial   = 0.055; // serial noise fraction?
   double times_pileup   =  1;   // noise scale based on Belle noise.
   double times_parallel =  3.15;   // noise scale
@@ -519,14 +519,14 @@ TrgEclDigitizer::digitization02(std::vector<std::vector<double>>& TCDigiE, std::
   // (03)noise embedding
   //==================
 
-  double tmin_noise = -4; // orignal
+  double tmin_noise = -4; // original
   double   tgen = 10.3;   //
   int bkg_level = 1030;
   double ttt0 = 0; // [us]
   double ttt1 = 0; // [us]
   double ttt2 = 0; // [us]
   //double frac_pileup   = 0.035; // pileup noise fraction?
-  //double frac_parallel = 0.023; // parralel noise fraction?
+  //double frac_parallel = 0.023; // parallel noise fraction?
   //double frac_serial   = 0.055; // serial noise fraction?
   //double times_pileup   =  1;   // noise scale based on Belle noise.
   //double times_parallel =  1;   // noise scale
@@ -683,7 +683,6 @@ TrgEclDigitizer::FADC(int flag_gen,
     double tt = u_max(u_max(td, t1), u_max(t2, ts)) * 2;
     int flag_once = 0;
     while (flag_once == 0) {
-      double   dt = tt / 1000;
       double tm = 0;
       for (int j = 1; j <= 1000; j++) {
         tc2 = tc - dft;
@@ -697,6 +696,7 @@ TrgEclDigitizer::FADC(int flag_gen,
           tm = tc;
           im = j;
         }
+        double   dt = tt / 1000;
         tc = tc + dt;
       }
       if (im >= 1000) {
@@ -707,7 +707,6 @@ TrgEclDigitizer::FADC(int flag_gen,
       if (ij == 0) {
         ij = 1;
         tc = 0.99 * tm;
-        dt = tm * 0.02 / 1000;
         flag_once = 0;
         continue;
       }

@@ -21,8 +21,8 @@ While the read access to the conditions database is always allowed (e.g.
 for downloading globaltags and payloads), users need a valid JSON Web Token
 (JWT) to authenticate to the conditions database when using this tool for
 creating/manpipulating globaltags or uploading payloads. For practical purposes,
-it is only necessary to know that a JWT is a string containing crypted
-information, and that string is stored in a file. More informations about what
+it is only necessary to know that a JWT is a string containing encrypted
+information, and that string is stored in a file. More information about what
 a JWT is can be found on
 `Wikipedia <https://en.wikipedia.org/wiki/JSON_Web_Token>`_.
 
@@ -285,7 +285,7 @@ def command_tag_create(args, db=None):
     Create a new globaltag
 
     This command creates a new globaltag in the database with the given name
-    and description. The name can only contain alpha-numeric characters and the
+    and description. The name can only contain alphanumeric characters and the
     characters ``+-_:``.
 
     .. warning::
@@ -450,7 +450,7 @@ def command_tag_state(args, db):
        This state is end of life for a globaltag and cannot be transitioned to
        any other state.
 
-    .. versionadded:: release-04-00-00
+    .. note:: Version added: release-04-00-00
     """
     if db is None:
         args.add_argument("tag", metavar="TAGNAME", help="globaltag to be changed")
@@ -546,9 +546,11 @@ def command_diff(args, db):
     the ``--regex`` option is supplied the search term will be interpreted as a
     python regular expression where the case is ignored.
 
-    .. versionchanged:: release-03-00-00
+    .. note:: Version changed: release-03-00-00
+
        modified output structure and added ``--human-readable``
-    .. versionchanged:: after release-04-00-00
+    .. note:: Version changed: after release-04-00-00
+
        added parameter ``--checksums`` and ``--show-ids``
     """
     iovfilter = ItemFilter(args)
@@ -666,11 +668,14 @@ def command_iov(args, db):
     ``--exclude``. If the ``--regex`` option is supplied the search term will
     be interpreted as a Python regular expression where the case is ignored.
 
-    .. versionchanged:: release-03-00-00
+    .. note:: Version changed: release-03-00-00
+
        modified output structure and added ``--human-readable``
-    .. versionchanged:: after release-04-00-00
+    .. note:: Version changed: after release-04-00-00
+
        added parameter ``--checksums`` and ``--show-ids``
-    .. versionchanged:: after release-08-00-04
+    .. note:: Version changed: after release-08-00-04
+
        added parameter ``--run-range``
     """
 
@@ -701,7 +706,7 @@ def command_iov(args, db):
     if not iovfilter.check_arguments():
         return 1
 
-    # Check if the globaltag exists otherwise I get the same result for an emply global tag or for a non-existing one
+    # Check if the globaltag exists otherwise I get the same result for an empty global tag or for a non-existing one
     if db.get_globalTagInfo(args.tag) is None:
         B2ERROR(f"Globaltag '{args.tag}' doesn't exist.")
         return False
@@ -798,7 +803,7 @@ def command_dump(args, db):
     """
     Dump the content of a given payload
 
-    .. versionadded:: release-03-00-00
+    .. note:: Version added: release-03-00-00
 
     This command will dump the payload contents stored in a given payload. One
     can either specify the ``payloadId`` (from a previous output of
@@ -830,7 +835,8 @@ def command_dump(args, db):
     database, its name and revision in the database or from a local file
     provide **one** of the arguments ``-i``, ``-r``, ``-f`` or ``-g``
 
-    .. versionchanged:: after release-04-00-00
+    .. note:: Version changed: after release-04-00-00
+
        added argument ``-r`` to directly dump a payload valid for a given run
        in a given globaltag
     """
@@ -1033,7 +1039,7 @@ def get_argument_parser():
         # the command is top level, e.g. foo, we just use parsers. Otherwise we
         # go look into the dict of subparsers for command chains.
         parent = parsers
-        if(len(parts) > 1):
+        if (len(parts) > 1):
             parent_parser, parent = subparsers[tuple(parts[:-1])]
             # if we are the first subcommand to a given command we have to add
             # the subparsers. do that and add it back to the dict

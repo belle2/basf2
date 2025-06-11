@@ -728,7 +728,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       delete oldshowerposition;
 
       // New position (with reduced number of neighbours)
-      // There are some cases where high backgrounds fake local maxima and the splitted centroid position is far
+      // There are some cases where high backgrounds fake local maxima and the split centroid position is far
       // away from the original LM cell... this will throw a (non fatal) error, and create a cluster with zero energy now).
       B2Vector3D* showerposition = new B2Vector3D(Belle2::ECL::computePositionLiLo(newdigits, newweights, m_liloParameters));
       aECLShower->setTheta(showerposition->Theta());

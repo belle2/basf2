@@ -12,7 +12,6 @@
 #include <TRandom.h>
 #include <gtest/gtest.h>
 #include <cmath>
-#include <iostream>
 
 using namespace Belle2;
 
@@ -38,7 +37,7 @@ namespace {
     // generate random matrix
     for (int i = 0; i < 6; ++i)
       for (int j = 0; j < 6; ++j)
-        cov(i, j) = gRandom->Poisson(20) - 20;
+        cov(i, j) = gRandom->PoissonD(20) - 20;
 
     // symmetrise it to obtain covariance
     cov *= cov.transpose();
@@ -111,7 +110,7 @@ namespace {
     // generate random matrix
     for (int i = 0; i < 6; ++i)
       for (int j = 0; j < 6; ++j)
-        cov(i, j) = gRandom->Poisson(20) - 20;
+        cov(i, j) = gRandom->PoissonD(20) - 20;
 
     // symmetrise it to obtain covariance
     cov *= cov.transpose();

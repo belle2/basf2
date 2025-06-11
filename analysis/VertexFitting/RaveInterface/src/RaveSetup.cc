@@ -9,6 +9,8 @@
 
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 
+#include <framework/geometry/B2Vector3.h>
+
 #include <rave/VacuumPropagator.h>
 #include <rave/MagneticField.h>
 #include <rave/ConstantMagneticField.h>
@@ -69,7 +71,7 @@ void RaveSetup::reset()
 }
 
 
-void RaveSetup::setBeamSpot(const B2Vector3D& beamSpot, const TMatrixDSym& beamSpotCov)
+void RaveSetup::setBeamSpot(const ROOT::Math::XYZVector& beamSpot, const TMatrixDSym& beamSpotCov)
 {
   m_beamSpot = beamSpot;
   m_beamSpotCov.ResizeTo(beamSpotCov);
@@ -91,7 +93,7 @@ void RaveSetup::Print()
       B2INFO("use beam spot is false");
     } else {
       B2INFO("use beam spot is true and beam spot position and covariance matrix are:");
-      getRawInstance()->m_beamSpot.PrintString();
+      B2Vector3D(getRawInstance()->m_beamSpot).PrintString();
       getRawInstance()->m_beamSpotCov.Print();
     }
     B2INFO("the pointer to rave::VertexFactory is " << getRawInstance()->m_raveVertexFactory);

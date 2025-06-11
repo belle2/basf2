@@ -17,6 +17,8 @@
 
 #include <TH2F.h>
 
+#include <cmath>
+
 using namespace Belle2;
 
 /// Register the Module
@@ -233,7 +235,7 @@ void MCTrackCandClassifierModule::event()
       double pt = mom.Rho();
       double x = decayVertex.X();
       double y = decayVertex.Y();
-      double R = 1 / abs(omega); //cm
+      double R = 1 / std::abs(omega); //cm
 
       m_h3_MCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getLambda(), mcParticleInfo.getPphi());
 
@@ -251,7 +253,7 @@ void MCTrackCandClassifierModule::event()
       bool hasTrueHit = true;
       bool isAccepted = true;
       int firstRejectedHit =  Nhits + 1;
-      double prevHitRadius = abs(1 / omega);
+      double prevHitRadius = std::abs(1 / omega);
 
       double lapTime = 2 * M_PI * mcParticle.getEnergy() / 0.299792 / m_magField.Z();
       double FirstHitTime = -1;
@@ -357,8 +359,8 @@ void MCTrackCandClassifierModule::event()
 
         double dR = compute_dR(thetaMS, theDistance(ROOT::Math::XYZVector(0, 0, 0), globalHit));
         m_h1_dR->Fill(dR);
-        m_h1_dRoverR->Fill(dR * abs(omega));
-        m_h1_distOVERdR->Fill((hitRadius - abs(1 / omega)) / dR);
+        m_h1_dRoverR->Fill(dR * std::abs(omega));
+        m_h1_distOVERdR->Fill((hitRadius - std::abs(1 / omega)) / dR);
 
 
         bool accepted2 = true;
@@ -445,7 +447,7 @@ void MCTrackCandClassifierModule::endRun()
 {
   B2INFO("** MCTrackCandClassifier parameters **");
   B2INFO("rootfilename = " << m_rootFileName);
-  B2INFO("use PXD informations = " << m_usePXD);
+  B2INFO("use PXD information = " << m_usePXD);
   B2INFO("--> classification criteria:");
   if (m_applyAnnulus)
     B2INFO("  -)  |d - R| < " << m_nSigma << " dL thetaMS");

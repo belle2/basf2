@@ -90,7 +90,7 @@ namespace Belle2 {
   private:
     std::map<unsigned short, float> m_boards; /**< badwire list*/
 
-    ClassDef(CDCBadBoards, 0); /**< ClassDef */
+    ClassDef(CDCBadBoards, 1); /**< ClassDef */
   };
 
 } // end namespace Belle2

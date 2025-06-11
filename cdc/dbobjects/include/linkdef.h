@@ -8,6 +8,7 @@
 #pragma link C++ class Belle2::CDCChannelMap+; // checksum=0xadcbec5a, version=2
 #pragma link C++ class Belle2::CDCTimeZeros+; // checksum=0x1d1c902a, version=2
 #pragma link C++ class Belle2::CDCBadWires+; // checksum=0xa5fc544e, version=2
+#pragma link C++ class Belle2::CDCBadBoards+; // checksum=0xbb6957ec, version=1
 #pragma link C++ class Belle2::CDCPropSpeeds+; // checksum=0x24873426, version=1
 #pragma link C++ class Belle2::CDCTimeWalks+; // checksum=0xa0bbe541, version=2
 #pragma link C++ class Belle2::CDCXtRelations+; // checksum=0x4c48166, version=2

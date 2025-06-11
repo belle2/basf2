@@ -3,6 +3,12 @@
 A simple python module
 =======================
 
+. sidebar:: Overview
+    :class: overview
+
+    **Length**: 30-45 min
+
+
 This lesson will give you an idea about the structure and use of ``basf2`` modules.
 Most of the modules in our software are implemented in C++ and are made
 available for analysis by `modularAnalysis`. This package consists of python

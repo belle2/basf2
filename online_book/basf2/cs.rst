@@ -6,9 +6,7 @@ Continuum Suppression (CS)
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 1 hour
-
-    **Exercises**: 1.5 hours
+    **Length**: 1.5-2 hrs
 
     **Prerequisites**:
 

@@ -17,8 +17,101 @@ be adapted when changing to the new release.
 Changes since release-09
 ========================
 
+.. admonition:: New and updated packages in externals
+   :class: toggle
+
+   .. list-table:: New and updated packages in externals from v02-02-04 to v02-03-00
+      :widths: 50 25 25
+      :header-rows: 1
+
+      * - package
+        - old version
+        - new version
+      * - doxygen
+        - 1.9.6
+        - 1.13.2
+      * - EvtGen
+        - R02-00-00
+        - R02-00-01
+      * - gcc
+        - 14.1.0
+        - 14.2.0
+      * - ROOT
+        - 6.26/14
+        - 6.32/00
+      * - RooUnfold
+        - 3.0.0
+        - 3.0.2
+      * - VecCore
+        - 0.8.1
+        - 0.8.2
+      * - VGM
+        - 5.2
+        - 5.3
+      * - coloredlogs
+        -
+        - 15.0.1
+      * - human-friendly
+        -
+        - 10.0
+      * - jupyter-resource-usage
+        -
+        - 1.1.0
+      * - onnx
+        -
+        - 1.17.0
+      * - onnxconvert-common
+        -
+        - 1.13.0
+      * - onnxruntime
+        -
+        - 1.21.0
+      * - outcome
+        -
+        - 1.3.0.post0
+      * - psutil
+        - 5.9.8
+        - 6.0.0
+      * - PySocks
+        -
+        - 1.7.1
+      * - selenium
+        -
+        - 4.32.0
+      * - skl2onnx
+        -
+        - 1.18.0
+      * - sortedcontainers
+        -
+        - 2.4.0
+      * - tensorboard
+        - 2.16.2
+        - 2.17.1
+      * - tensorflow
+        - 2.16.1
+        - 2.17.0
+      * - tf2onnx
+        -
+        - 1.8.4
+      * - trio
+        -
+        - 0.30.0
+      * - trio-websocket
+        -
+        - 0.12.2
+      * - uproot
+        - 5.3.7
+        - 5.6.1
+      * - wsproto
+        -
+        - 1.2.0
+      * - xxhash
+        -
+        - 3.5.0
+
 .. include:: analysis/doc/whatsnew-since/release-09-00.txt
 .. include:: mva/doc/whatsnew-since/release-09-00.txt
+.. include:: b2bii/doc/whatsnew-since/release-09-00.txt
 
 .. include:: framework/doc/whatsnew-since/release-09-00.txt
 

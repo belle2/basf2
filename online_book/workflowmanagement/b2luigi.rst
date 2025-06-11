@@ -6,7 +6,7 @@ b2luigi
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 10 minutes
+    **Length**: 15 minutes
 
     **Prerequisites**:
 

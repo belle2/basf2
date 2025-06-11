@@ -205,25 +205,32 @@ CCCCCC
 
       double precision ctau
       common /KK_cntl/ ctau, xpar
+
+      DOUBLE PRECISION  CTALFA  ! lifetime (mm)
+      COMMON /CTALFA/   CTALFA
+
+      double precision ctaulife
+
 c  HepEvt
       INCLUDE 'KK2f/HepEvt.fi'
       
-      do itau=1,2
-         do i=1,nhep
-            if(idhep(i).eq.(itau*30-45)) then
-               p = dsqrt(phep(4,i)*phep(4,i)-phep(5,i)*phep(5,i))
-               betagamma = p/phep(5,i)
-               call KK_RandExp(rvec,1)
-               flen = betagamma*ctau*rvec(1)
-               do j=1,4
-                  vtx0(j) = VHEP(j,jdahep(1,i))-VHEP(j,i)
-                  vtx(j) = flen*phep(j,i)/p - vtx0(j)
-               enddo
-c               write(17,'(9(1x,f13.6))') 
-c     +              flen, (phep(j,i),j=1,5), (vtx0(j),j=1,4)
-               call KK_Shift_Daughters_Vtx(i,vtx)
-            endif
-         enddo
+      do i=1,nhep
+         ctaulife = 0.0D0
+         if (abs(idhep(i)).eq.15) ctaulife = ctau ! tau life time
+         if (abs(idhep(i)).eq.94144) ctaulife = ctalfa ! life time of alpha in tau+- -> lepton+- + alpha
+         if (ctaulife.gt.0.0D0) then
+            p = dsqrt(phep(4,i)*phep(4,i)-phep(5,i)*phep(5,i))
+            betagamma = p/phep(5,i)
+            call KK_RandExp(rvec,1)
+            flen = betagamma*ctaulife*rvec(1)
+            do j=1,4
+               vtx0(j) = VHEP(j,jdahep(1,i))-VHEP(j,i)
+               vtx(j) = flen*phep(j,i)/p - vtx0(j)
+            enddo
+c            write(17,'(9(1x,f13.6))')
+c    +             flen, (phep(j,i),j=1,5), (vtx0(j),j=1,4)
+            call KK_Shift_Daughters_Vtx(i,vtx)
+         endif
       enddo
 
       return

@@ -340,30 +340,42 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), TMath::Sqrt(E0 * E0 - mask4VecCMS.P2()));
 
-    var = Manager::Instance().getVariable("weDeltae(my_mask,0)");
+    var = Manager::Instance().getVariable("useCMSFrame(weDeltae(my_mask))");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), mask4VecCMS.E() + sig4VecCMS.E() - E0);
 
-    var = Manager::Instance().getVariable("weMbc(my_mask,0)");
+    var = Manager::Instance().getVariable("useCMSFrame(weMbc(my_mask))");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), TMath::Sqrt(E0 * E0 - mask4VecCMS.P2()));
 
-    var = Manager::Instance().getVariable("weMbc(all,0)");
+    var = Manager::Instance().getVariable("useCMSFrame(weMbc(all))");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), TMath::Sqrt(E0 * E0 - roe4VecCMS.P2()));
 
     PxPyPzEVector miss4VecCMS = - (sig4VecCMS + mask4VecCMS);
     miss4VecCMS.SetE(2 * E0 - (sig4VecCMS.E() + mask4VecCMS.E()));
 
-    var = Manager::Instance().getVariable("weMissM2(my_mask,0)");
+    var = Manager::Instance().getVariable("useCMSFrame(weMissM2(my_mask,0))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), miss4VecCMS.mag2());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 5.3290705e-15);
 
-    var = Manager::Instance().getVariable("weMissP(my_mask,0)");
+    var = Manager::Instance().getVariable("useCMSFrame(weMissP(my_mask,0))");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), miss4VecCMS.P());
 
-    var = Manager::Instance().getVariable("weMissE(my_mask,0)");
+    var = Manager::Instance().getVariable("useCMSFrame(weMissPx(my_mask,0))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.);
+
+    var = Manager::Instance().getVariable("useCMSFrame(weMissPy(my_mask,0))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.);
+
+    var = Manager::Instance().getVariable("useCMSFrame(weMissPz(my_mask,0))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), - E0 / 2);
+
+    var = Manager::Instance().getVariable("useCMSFrame(weMissE(my_mask,0))");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), miss4VecCMS.E());
 
@@ -384,15 +396,14 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.31122509);
 
-    var = Manager::Instance().getVariable("weQ2lnuSimple(my_mask,0)");
+    var = Manager::Instance().getVariable("useCMSFrame(weQ2lnuSimple(my_mask))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), -1.7763568e-14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.);
 
-    // FIXME: This value is the same as for weQ2lnuSimple
-    // More complicated test setup is required to pass abs(cos_angle_nu) < 1
-    var = Manager::Instance().getVariable("weQ2lnu(my_mask,0)");
+    // FIXME: More complicated test setup is required to pass abs(cos_angle_nu) < 1
+    var = Manager::Instance().getVariable("useCMSFrame(weQ2lnu(my_mask))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), -1.7763568e-14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.9539925e-14);
   }
   /*
    * Test isInROE variables

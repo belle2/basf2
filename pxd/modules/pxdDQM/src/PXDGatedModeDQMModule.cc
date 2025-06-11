@@ -59,54 +59,54 @@ void PXDGatedModeDQMModule::defineHisto()
     // Only interested in PXD sensors
 
     TString buff = (std::string)avxdid;
-    TString bufful = buff;
-    bufful.ReplaceAll(".", "_");
+    TString buffus = buff;
+    buffus.ReplaceAll(".", "_");
 
     for (int rgate = m_perGate ? 0 : 96; rgate <= 96; rgate++) { // 96 is no gating
-      hGatedModeMapLER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapLER_%d_", rgate) + bufful,
+      hGatedModeMapLER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapLER_%d_", rgate) + buffus,
                                                                  Form("PXDGatedModeMapLER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
-      hGatedModeMapHER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapHER_%d_", rgate) + bufful,
+      hGatedModeMapHER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapHER_%d_", rgate) + buffus,
                                                                  Form("PXDGatedModeMapHER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
-      hGatedModeMapCutLER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapCutLER_%d_", rgate) + bufful,
+      hGatedModeMapCutLER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapCutLER_%d_", rgate) + buffus,
           Form("PXDGatedModeMapCutLER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
-      hGatedModeMapCutHER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapCutHER_%d_", rgate) + bufful,
+      hGatedModeMapCutHER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapCutHER_%d_", rgate) + buffus,
           Form("PXDGatedModeMapCutHER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
 
-      hGatedModeMapADCLER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapADCLER_%d_", rgate) + bufful,
+      hGatedModeMapADCLER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapADCLER_%d_", rgate) + buffus,
           Form("PXDGatedModeMapADCLER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
-      hGatedModeMapADCHER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapADCHER_%d_", rgate) + bufful,
+      hGatedModeMapADCHER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapADCHER_%d_", rgate) + buffus,
           Form("PXDGatedModeMapADCHER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
-      hGatedModeMapCutADCLER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapCutADCLER_%d_", rgate) + bufful,
+      hGatedModeMapCutADCLER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapCutADCLER_%d_", rgate) + buffus,
           Form("PXDGatedModeMapCutADCLER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
-      hGatedModeMapCutADCHER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapCutADCHER_%d_", rgate) + bufful,
+      hGatedModeMapCutADCHER[std::make_pair(avxdid, rgate)] = new TH2F(Form("PXDGatedModeMapCutADCHER_%d_", rgate) + buffus,
           Form("PXDGatedModeMapCutADCHER %d ", rgate) + buff + ";U;V", 25, 0, 250, 192, 0, 768);
     }
-    hGatedModeProjLER[avxdid] = new TH2F("PXDGatedModeProjLER_" + bufful,
+    hGatedModeProjLER[avxdid] = new TH2F("PXDGatedModeProjLER_" + buffus,
                                          "PXDGatedModeProjLER " + buff + ";Gate;V", 96, 0, 96, 192, 0, 768);
-    hGatedModeProjHER[avxdid] = new TH2F("PXDGatedModeProjHER_" + bufful,
+    hGatedModeProjHER[avxdid] = new TH2F("PXDGatedModeProjHER_" + buffus,
                                          "PXDGatedModeProjHER " + buff + ";Gate;V", 96, 0, 96, 192, 0, 768);
 
-    hGatedModeMapSubLER[avxdid] = new TH2F("PXDGatedModeMapSubLER_" + bufful,
+    hGatedModeMapSubLER[avxdid] = new TH2F("PXDGatedModeMapSubLER_" + buffus,
                                            "PXDGatedModeMapSubLER " + buff + ";U;V-G", 25, 0, 250, 192, 0, 768);
-    hGatedModeMapSubHER[avxdid] = new TH2F("PXDGatedModeMapSubHER_" + bufful,
+    hGatedModeMapSubHER[avxdid] = new TH2F("PXDGatedModeMapSubHER_" + buffus,
                                            "PXDGatedModeMapSubHER " + buff + ";U;V-G", 25, 0, 250, 192, 0, 768);
-    hGatedModeMapAddLER[avxdid] = new TH2F("PXDGatedModeMapAddLER_" + bufful,
+    hGatedModeMapAddLER[avxdid] = new TH2F("PXDGatedModeMapAddLER_" + buffus,
                                            "PXDGatedModeMapAddLER " + buff + ";U;V+G", 25, 0, 250, 192, 0, 768);
-    hGatedModeMapAddHER[avxdid] = new TH2F("PXDGatedModeMapAddHER_" + bufful,
+    hGatedModeMapAddHER[avxdid] = new TH2F("PXDGatedModeMapAddHER_" + buffus,
                                            "PXDGatedModeMapAddHER " + buff + ";U;V+G", 25, 0, 250, 192, 0, 768);
 
-    hGatedModeProjADCLER[avxdid] = new TH2F("PXDGatedModeProjADCLER_" + bufful,
+    hGatedModeProjADCLER[avxdid] = new TH2F("PXDGatedModeProjADCLER_" + buffus,
                                             "PXDGatedModeProjADCLER " + buff + ";Gate;V", 96, 0, 96, 192, 0, 768);
-    hGatedModeProjADCHER[avxdid] = new TH2F("PXDGatedModeProjADCHER_" + bufful,
+    hGatedModeProjADCHER[avxdid] = new TH2F("PXDGatedModeProjADCHER_" + buffus,
                                             "PXDGatedModeProjADCHER " + buff + ";Gate;V", 96, 0, 96, 192, 0, 768);
 
-    hGatedModeMapSubADCLER[avxdid] = new TH2F("PXDGatedModeMapSubADCLER_" + bufful,
+    hGatedModeMapSubADCLER[avxdid] = new TH2F("PXDGatedModeMapSubADCLER_" + buffus,
                                               "PXDGatedModeMapSubADCLER " + buff + ";U;V-G", 25, 0, 250, 192, 0, 768);
-    hGatedModeMapSubADCHER[avxdid] = new TH2F("PXDGatedModeMapSubADCHER_" + bufful,
+    hGatedModeMapSubADCHER[avxdid] = new TH2F("PXDGatedModeMapSubADCHER_" + buffus,
                                               "PXDGatedModeMapSubADCHER " + buff + ";U;V-G", 25, 0, 250, 192, 0, 768);
-    hGatedModeMapAddADCLER[avxdid] = new TH2F("PXDGatedModeMapAddADCLER_" + bufful,
+    hGatedModeMapAddADCLER[avxdid] = new TH2F("PXDGatedModeMapAddADCLER_" + buffus,
                                               "PXDGatedModeMapAddADCLER " + buff + ";U;V+G", 25, 0, 250, 192, 0, 768);
-    hGatedModeMapAddADCHER[avxdid] = new TH2F("PXDGatedModeMapAddADCHER_" + bufful,
+    hGatedModeMapAddADCHER[avxdid] = new TH2F("PXDGatedModeMapAddADCHER_" + buffus,
                                               "PXDGatedModeMapAddADCHER " + buff + ";U;V+G", 25, 0, 250, 192, 0, 768);
 
   }

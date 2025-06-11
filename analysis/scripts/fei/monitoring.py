@@ -311,7 +311,7 @@ class MonitoringNTuple:
         self.f = ROOT.TFile.Open(filename, 'read')
         print(f'FEI-monitoring: Found {filename}')
         #: Reference to the tree named variables inside the ROOT file
-        self.tree = self.f.Get(f'{treenameprefix} variables')
+        self.tree = self.f.Get(ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(f'{treenameprefix} variables'))
         print(f'FEI-monitoring: Found {treenameprefix} variables')
         #: Filename so we can use it later
         self.filename = filename

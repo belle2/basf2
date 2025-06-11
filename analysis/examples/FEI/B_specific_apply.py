@@ -91,7 +91,7 @@ belle_particles = fei.get_default_channels(KLong=False,
                                            B_extra_cut='nRemainingTracksInEvent <= 3',
                                            specific=True)
 
-configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=False, monitor=False, cache=0)
+configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=False, monitor=False)
 feistate = fei.get_path(belle_particles, configuration)
 
 

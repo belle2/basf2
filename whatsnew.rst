@@ -120,6 +120,9 @@ Changes since release-09
 
 .. include:: analysis/doc/whatsnew-since/release-09-00.txt
 .. include:: mva/doc/whatsnew-since/release-09-00.txt
+.. include:: b2bii/doc/whatsnew-since/release-09-00.txt
+
+.. include:: framework/doc/whatsnew-since/release-09-00.txt
 
 Changes since release-08
 ========================

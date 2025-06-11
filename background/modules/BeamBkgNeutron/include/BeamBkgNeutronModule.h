@@ -87,14 +87,14 @@ namespace Belle2 {
     Float_t mass;   /**< McParticle mass [GeV] */
     Float_t lifeTime;   /**< McParticle lifetime [ns] */
     Int_t PDG; /**< PDG */
-    Int subDet; /**< Subdetector */
-    Int iden; /**< iden */
-    Int trackID; /**< TrackID */
-    Int iEvent; /**< Event identifier */
-    Int iEntry; /**< Entry identifier */
-    Int nSimHits[13]; /**< Array with number of SimHits */
-    Int hitPDG[13]; /**< Array with PDG hits */
-    Int momPDG[13]; /**< Array with PDG momentum */
+    Int_t subDet; /**< Subdetector */
+    Int_t iden; /**< iden */
+    Int_t trackID; /**< TrackID */
+    Int_t iEvent; /**< Event identifier */
+    Int_t iEntry; /**< Entry identifier */
+    Int_t nSimHits[13]; /**< Array with number of SimHits */
+    Int_t hitPDG[13]; /**< Array with PDG hits */
+    Int_t momPDG[13]; /**< Array with PDG momentum */
     Float_t E_start; /**< Starting energy */
     Float_t E_end; /**< Ending energy */
     Float_t eDep; /**< Deposited energy */

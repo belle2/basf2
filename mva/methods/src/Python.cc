@@ -415,6 +415,34 @@ namespace Belle2 {
 
     }
 
+    std::vector<float> PythonExpert::applyArbitrarySize(Dataset& test_data, const unsigned int input_size,
+                                                        const unsigned int output_size) const
+    {
+      auto X = std::unique_ptr<float[]>(new float[input_size]);
+      npy_intp dimensions_X[1] = {static_cast<npy_intp>(input_size)};
+
+      for (unsigned int i = 0; i < input_size; ++i) {
+        X[i] = test_data.m_input[i];
+      }
+
+      std::vector<float> probabilities(output_size, std::numeric_limits<float>::quiet_NaN());
+      try {
+        auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(1, dimensions_X, NPY_FLOAT32, X.get()));
+        auto result = m_framework.attr("apply")(m_state, ndarray_X);
+
+        for (unsigned int i = 0; i < output_size; ++i) {
+          probabilities[i] = static_cast<float>(*static_cast<float*>(PyArray_GETPTR1(reinterpret_cast<PyArrayObject*>(result.ptr()), i)));
+        }
+      } catch (...) {
+        PyErr_Print();
+        PyErr_Clear();
+        B2ERROR("Failed calling applyArbitrarySize in PythonExpert");
+        throw std::runtime_error("Failed calling applyArbitrarySize in PythonExpert");
+      }
+      return probabilities;
+    }
+
+
     std::vector<float> PythonExpert::apply(Dataset& test_data) const
     {
 

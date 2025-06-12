@@ -126,6 +126,9 @@ namespace Belle2 {
        */
       virtual std::vector<float> apply(Dataset& test_data) const override;
 
+      std::vector<float> applyArbitrarySize(Dataset& test_data, const unsigned int input_size,
+                                            const unsigned int output_size) const override;
+
       /**
        * Apply this expert onto a dataset for multiclass problem
        * @param test_data dataset
@@ -135,6 +138,7 @@ namespace Belle2 {
     protected:
       PythonOptions m_specific_options; /**< Method specific options */
       boost::python::object m_framework; /**< Framework module */
+      boost::python::object m_unique_mva_module; /**<  python module containing the mva methods */
       boost::python::object m_state; /**< current state object of method */
       std::vector<float> m_means; /**< Means of all features for normalization */
       std::vector<float> m_stds; /**< Stds of all features for normalization */

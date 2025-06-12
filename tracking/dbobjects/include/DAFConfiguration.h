@@ -11,6 +11,7 @@
 #include <map>
 
 #include <tracking/dbobjects/DAFParameters.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 

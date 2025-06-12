@@ -718,11 +718,11 @@ void Belle2::CDCDatabaseImporter::importAlphaScaleFactors(std::string fileName)
   std::vector<float> coeffs;
 
   std::string line;
+  unsigned short iLayer = 0;
   while (std::getline(stream, line)) {
     std::stringstream ss(line);
     std::string value;
 
-    int iLayer = 0;
     coeffs.clear();
     while (std::getline(ss, value, ',')) {
       coeffs.push_back(std::stod(value));

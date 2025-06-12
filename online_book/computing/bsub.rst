@@ -229,15 +229,15 @@ To resumes suspended jobs
 .. rubric:: Large memory usage
 
 
-In addition, you might have jobs that require more than 8GB of memory. In that case, 
-use the bsub option -n "parallel number X" to give you 8GB :math:`\times` X amount of 
+In addition, you might have jobs that require more than 4GB of memory. In that case, 
+use the bsub option -n "parallel number X" to give you 4GB :math:`\times` X amount of 
 memory. 
 
 To have 16GB of memory on the short job queue
 
 .. code-block:: bash
 
-   bsub -q s -n 2 "bash example.sh"
+   bsub -q s -n 4 "bash example.sh"
 
 
 .. rubric:: Saving job output
@@ -249,7 +249,7 @@ To have 16GB of memory on the short job queue with a log file
 
 .. code-block:: bash
 
-   bsub -q s -n 2 -o logfile.out -e errorfile.err "bash example.sh"
+   bsub -q s -n 4 -o logfile.out -e errorfile.err "bash example.sh"
 
 .. admonition:: Key points
    :class: key-points

@@ -31,6 +31,7 @@
 #include <cdc/dbobjects/CDCXtRelations.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
 #include <cdc/dbobjects/CDCFudgeFactorsForSigma.h>
+#include <cdc/dbobjects/CDCAlphaScaleFactorForAsymmetry.h>
 #include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
@@ -701,6 +702,49 @@ void Belle2::CDCDatabaseImporter::importFFactor(std::string fileName)
   B2INFO("Fudge factor table imported to database.");
 }
 
+void Belle2::CDCDatabaseImporter::importAlphaScaleFactors(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCAlphaScaleFactorForAsymmetry> asf;
+  asf.construct();
+
+  std::vector<float> coeffs;
+
+  std::string line;
+  while (std::getline(stream, line)) {
+    std::stringstream ss(line);
+    std::string value;
+
+    int iLayer = 0;
+    coeffs.clear();
+    while (std::getline(ss, value, ',')) {
+      coeffs.push_back(std::stod(value));
+    }
+    if (coeffs.size() != CDCAlphaScaleFactorForAsymmetry::c_maxNAlphaBins)
+      B2FATAL("The number of alpha scale factors is " << coeffs.size() << " for layer " << iLayer << ", not equal " <<
+              CDCAlphaScaleFactorForAsymmetry::c_maxNAlphaBins << " ! ");
+    asf.setFactors(iLayer, coeffs);
+    iLayer++;
+  }
+
+  stream.close();
+
+  if (iLayer != CDCAlphaScaleFactorForAsymmetry::c_nLayers) B2FATAL("#lines read-in (=" << iLayer << ") is not equal #cdclayers (=" <<
+        CDCAlphaScaleFactorForAsymmetry::c_nLayers << ") !");
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  asf.import(iov);
+  B2INFO("Alpha scale factor table imported to database.");
+}
+
 
 void Belle2::CDCDatabaseImporter::importDisplacement(std::string fileName)
 {
@@ -906,6 +950,12 @@ void Belle2::CDCDatabaseImporter::printFFactor()
 {
   DBObjPtr<CDCFudgeFactorsForSigma> ff;
   ff->dump();
+}
+
+void Belle2::CDCDatabaseImporter::printAlphaScaleFactors()
+{
+  DBObjPtr<CDCAlphaScaleFactorForAsymmetry> asf;
+  asf->dump();
 }
 
 void Belle2::CDCDatabaseImporter::printDisplacement()

@@ -14,13 +14,13 @@ from ROOT.Belle2 import Database, IntervalOfValidity, DAFParameters, DAFConfigur
 
 # Optimisation 2023 #
 parameters = DAFParameters()
-parameters.setDeltaPValue(0.001)
-parameters.setDeltaWeight(0.06)
+parameters.setDeltaPValue(1)
+parameters.setDeltaWeight(0.001)
 parameters.setProbabilityCut(0.001)
-parameters.setAnnealingScheme(2, 0.01, 5)
-parameters.setMinimumIterations(1)
+parameters.setAnnealingScheme(100, 0.1, 5)
+parameters.setMinimumIterations(5)
 parameters.setMaximumIterations(9)
-parameters.setMinimumIterationsForPVal(1)
+parameters.setMinimumIterationsForPVal(5)
 parameters.setMaximumFailedHits(5)
 parameters.setMinimumPValue(0.)
 

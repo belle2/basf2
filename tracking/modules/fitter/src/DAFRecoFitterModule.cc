@@ -35,9 +35,9 @@ std::shared_ptr<genfit::AbsFitter> DAFRecoFitterModule::createFitter() const
   if (!m_DAFConfiguration.isValid())
     B2FATAL("DAF Configuration is not available.");
 
-  const DAFParameters* DAFParams = m_DAFConfiguration->getDAFParameters(DAFConfiguration::ETrackFitType(m_trackFitType));
+  const DAFParameters* DAFParams = m_DAFConfiguration->getDAFParameters((DAFConfiguration::ETrackFitType)m_trackFitType);
   if (!DAFParams)
-    B2FATAL("DAF parameters for " << m_trackFitType << " is not available.");
+    B2FATAL("DAF parameters for " << (short)m_trackFitType << " is not available.");
 
   if (static_cast<float>(m_param_probabilityCut) != DAFParams->getProbabilityCut()) {
     if (not m_changedParametersMessageWasShown) {
@@ -53,8 +53,8 @@ std::shared_ptr<genfit::AbsFitter> DAFRecoFitterModule::createFitter() const
                                           true,
                                           DAFParams->getDeltaPValue(),
                                           DAFParams->getDeltaWeight(),
-                                          m_param_probabilityCut);
-    // DAFParams->getMinimumPValue()); // waiting for genfit merge
+                                          m_param_probabilityCut,
+                                          DAFParams->getMinimumPValue());
     fitter->setMaxFailedHits(DAFParams->getMaximumFailedHits());
 
     return fitter;

@@ -49,14 +49,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     Returns default torch model
     """
 
-    # Since the move to storing weights only for torch we need to pass all arguments of
-    # get_model that are needed to reconstruct our state explicitly as kwargs to State!
-    state = State(
-        myModel(number_of_features).to("cpu"),
-        # In this case we need `number_of_features` and `parameters`
-        number_of_features=number_of_features,
-        parameters=parameters
-    )
+    state = State(myModel(number_of_features).to("cpu"))
     print(state.model)
 
     state.optimizer = torch.optim.SGD(state.model.parameters(), parameters.get('learning_rate', 1e-2))

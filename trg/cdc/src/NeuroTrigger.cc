@@ -1070,6 +1070,7 @@ NeuroTrigger::getInputVector_extrahit(unsigned isector, const vector<unsigned>& 
     std::vector<int> BestLR(nwires, 3);
     std::vector<double> BestDriftTime(nwires, expert.getTMax());
 
+
     for (int i = 0; i < (int)hitpatterntime.size(); i++) {
       bool tag0 = false;
       int remove_id = -1;

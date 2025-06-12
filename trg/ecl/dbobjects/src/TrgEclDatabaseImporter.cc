@@ -242,20 +242,8 @@ void TrgEclDatabaseImporter::importETMParameter(std::string InputFileName)
 
   etmpara->setnpar(cnt_par);
 
-  int cnt_spare = 0;
-  for (int iii = 0; iii < 300; iii++) {
-    std::string tmp_parname;
-    double tmp_parvalue = -1000;
-    if (iii < cnt_par) {
-      tmp_parname  = v_par_name[iii];
-      tmp_parvalue = v_par_value[iii];
-    } else {
-      std::stringstream sss;
-      sss << "spare" << std::setfill('0') << std::setw(3) << cnt_spare;
-      tmp_parname  = sss.str();
-      cnt_spare++;
-    }
-    etmpara->setparMap(tmp_parname, tmp_parvalue);
+  for (int iii = 0; iii < cnt_par; iii++) {
+    etmpara->setparMap(v_par_name[iii], v_par_value[iii]);
   }
 
   //Import to DB

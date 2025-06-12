@@ -1066,15 +1066,10 @@ NeuroTrigger::getInputVector_extrahit(unsigned isector, const vector<unsigned>& 
       B2DEBUG(150, "wire Find hit:  " << j << "  " << hitpatterntime[j] << std::endl);
     }
     int priorID = (iSL == 0) ? (priority == 3 ? 0 : 0 + priority) : (priority == 3 ? 5 : 5 + priority);
-    int BestID[nwires];
-    int BestLR[nwires];
-    double BestDriftTime[nwires];
+    std::vector<int> BestID(nwires, -1);
+    std::vector<int> BestLR(nwires, 3);
+    std::vector<double> BestDriftTime(nwires, expert.getTMax());
 
-    for (int i = 0; i < nwires; i++) {
-      BestID[i] = -1;
-      BestLR[i] = 3;
-      BestDriftTime[i] = expert.getTMax();
-    }
     for (int i = 0; i < (int)hitpatterntime.size(); i++) {
       bool tag0 = false;
       int remove_id = -1;

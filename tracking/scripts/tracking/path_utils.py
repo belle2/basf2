@@ -10,7 +10,6 @@
 from pybasf2 import B2WARNING, B2FATAL
 
 from ROOT import Belle2  # noqa: make the Belle2 namespace available
-from ROOT.Belle2 import DAFConfiguration
 
 from basf2 import register_module
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, add_cosmics_pxd_ckf
@@ -120,15 +119,8 @@ def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHyp
     path.add_module("IPTrackTimeEstimator",
                     recoTracksStoreArrayName=reco_tracks, useFittedInformation=False)
     # track fitting
-    if not is_svd_used(components) and not is_pxd_used(components) and is_cdc_used(components):
-        # Use CDC-only DAFParameters
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name(
-            "Combined_DAFRecoFitter", trackFitType=DAFConfiguration.c_CDConly)
-
-    else:
-        # Use the default DAFParameter
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name(
-            "Combined_DAFRecoFitter", trackFitType=DAFConfiguration.c_Default)
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name(
+        "Combined_DAFRecoFitter")
     # Add MVA classifier that uses information not included in the calculation of the fit p-value
     # to add a track quality indicator for classification of fake vs. MC-matched tracks
 

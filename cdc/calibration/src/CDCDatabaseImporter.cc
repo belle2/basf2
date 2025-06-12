@@ -730,7 +730,7 @@ void Belle2::CDCDatabaseImporter::importAlphaScaleFactors(std::string fileName)
     if (coeffs.size() != CDCAlphaScaleFactorForAsymmetry::c_maxNAlphaBins)
       B2FATAL("The number of alpha scale factors is " << coeffs.size() << " for layer " << iLayer << ", not equal " <<
               CDCAlphaScaleFactorForAsymmetry::c_maxNAlphaBins << " ! ");
-    asf.setFactors(iLayer, coeffs);
+    asf->setFactors(iLayer, coeffs);
     iLayer++;
   }
 

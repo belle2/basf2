@@ -96,7 +96,7 @@ namespace Belle2 {
     }
 
   private:
-    std::map<unsigned short, std::vector<float>> m_Scales;
+    std::map<unsigned short, std::vector<float>> m_Scales; /**< scale factors */
 
     ClassDef(CDCAlphaScaleFactorForAsymmetry, 1); /**< ClassDef */
   };

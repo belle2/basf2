@@ -25,11 +25,11 @@ parameters.setMaximumFailedHits(5)
 parameters.setMinimumPValue(0.)
 
 configuration = DAFConfiguration()
-parameters.setDAFParameters(DAFConfiguration.c_Default, parameters)
-parameters.setDAFParameters(DAFConfiguration.c_Cosmics, parameters)
-parameters.setDAFParameters(DAFConfiguration.c_CDConly, parameters)
+configuration.setDAFParameters(DAFConfiguration.c_Default, parameters)
+configuration.setDAFParameters(DAFConfiguration.c_Cosmics, parameters)
+configuration.setDAFParameters(DAFConfiguration.c_CDConly, parameters)
 
 database = Database.Instance()
 
 iov = IntervalOfValidity(0, 0, -1, -1)  # 1st exp, 1st run, final exp, final run
-database.storeData('DAFConfiguration', parameters, iov)
+database.storeData('DAFConfiguration', configuration, iov)

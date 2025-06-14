@@ -43,8 +43,11 @@ namespace Belle2 {
        */
       virtual std::vector<float> apply(Dataset& test_data) const = 0;
 
-      virtual std::vector<float> applyArbitrarySize(Dataset& test_data, const unsigned int /*input_size*/,
-                                                    const unsigned int /*output_size*/) const
+      /**
+       * Apply this expert onto a dataset where the number of output features may vary in each event (e.g. if algorithms like object condensation are used).
+       * @param test_data dataset
+       */
+      virtual std::vector<float> applyArbitrarySize(Dataset& test_data, const unsigned int /*output_size*/) const
       {
         B2ERROR("Attempted to call applyArbitrarySize() of the abstract base class MVA::Expert. All methods that support multiclass classification should override this definition.");
         (void) test_data;

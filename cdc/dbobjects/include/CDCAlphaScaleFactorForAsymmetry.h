@@ -83,15 +83,16 @@ namespace Belle2 {
       std::cout << " " << std::endl;
       std::cout << "Scale factor list" << std::endl;
       std::cout << "#entries= " << m_Scales.size() << std::endl;
-      std::cout << "in order of iCLayer and factors" << std::endl;
+      std::cout << "the ratio of data to MC for the hit efficiency of positively charged tracks comparing to negitively charged tracks" <<
+                std::endl;
 
       for (auto const& ent : m_Scales) {
-        std::cout << ent.first;
+        std::cout << "Scale factors for Layer " << ent.first << " : ";
         unsigned short np = (ent.second).size();
         for (unsigned short i = 0; i < np; ++i) {
-          std::cout << "  " << (ent.second)[i];
+          std::cout << " Layer: " << ent.first << " Alpha in ( " << i * 0.01 << " , " << (i + 1) * 0.01 << " ), Scale factor: "  <<
+                    (ent.second)[i] << std::endl;
         }
-        std::cout << std::endl;
       }
     }
 

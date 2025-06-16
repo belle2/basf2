@@ -989,7 +989,7 @@ Returns NaN if there is no event-level tracking information available.
 
     REGISTER_VARIABLE("isTrackFlippedAndRefitted", isTrackFlippedAndRefitted, R"DOC(
 Returns 1 if the charged final state particle comes from a track that has been flipped and refitted
-at the end of the reconstruction chain, in particular after the outer detector reconstruction.
+at the end of the tracking chain, in particular before the outer detector reconstruction.
     )DOC");
 
     REGISTER_VARIABLE("trackTime", getTrackTime, R"DOC(

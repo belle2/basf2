@@ -78,12 +78,6 @@ namespace Belle2 {
      */
     void calculateMeans(double& mean, double& truncatedMean, double& truncatedMeanErr, const std::vector<double>& dedx) const;
 
-    /** returns traversed length through active medium of given PXDCluster. */
-    static double getTraversedLength(const PXDCluster* hit, const HelixHelper* helix);
-
-    /** returns traversed length through active medium of given SVDCluster. */
-    static double getTraversedLength(const SVDCluster* hit, const HelixHelper* helix);
-
     /** returns traversed length through active medium of given hit */
     template <class HitClass> static double getTraversedLength(const HitClass* hit, const RecoTrack* recoTrack, double& p);
 

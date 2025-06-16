@@ -11,7 +11,10 @@
 #include <calibration/CalibrationAlgorithm.h>
 
 #include <TH2F.h>
-#include <tuple>
+#include <TF1.h>
+#include <TList.h>
+#include <TTree.h>
+// #include <tuple>
 
 namespace Belle2 {
   /**
@@ -64,17 +67,23 @@ namespace Belle2 {
 
   private:
     bool m_isMakePlots;                                                           /**< produce plots for monitoring */
-    TH2F LambdaMassFit(std::shared_ptr<TTree> preselTree);                        /**< produce histograms for protons */
-    std::tuple<TH2F, TH2F, TH2F> DstarMassFit(std::shared_ptr<TTree> preselTree); /**< produce histograms for K/pi(/mu) */
-    TH2F GammaHistogram(std::shared_ptr<TTree> preselTree);                       /**< produce histograms for e */
+    TTree* LambdaMassFit(std::shared_ptr<TTree> preselTree);                        /**< Mass fit for Lambda->ppi */
+    TList* LambdaHistogramming(TTree* inputTree);                        /**< produce histograms for protons */
+    TTree* DstarMassFit(std::shared_ptr<TTree> preselTree); /**< Mass fit for D*->Dpi */
+    TList* DstarHistogramming(TTree* inputTree);                        /**< produce histograms for K/pi */
+    TList* GammaHistogramming(std::shared_ptr<TTree> preselTree);                       /**< produce histograms for e */
+    TList* GenerateNewHistograms(std::shared_ptr<TTree> ttreeLambda, std::shared_ptr<TTree> ttreeDstar,
+                                 std::shared_ptr<TTree> ttreeGamma);                       /**< generate high-statistics histograms */
     int m_numDEdxBins = 100;                                                 /**< the number of dEdx bins for the payloads */
     int m_numPBins = 69;                                                     /**< the number of momentum bins for the payloads */
     double m_dedxCutoff = 5.e6;                                              /**< the upper edge of the dEdx binning for the payloads */
     int m_MinEvtsPerTree =
       100;                                                 /**< number of events in TTree below which we don't try to fit */
+    int m_toGenerate =
+      500000;                                                     /**< the number of events to be generated in each momentum bin in the new payloads */
     /**
-     * build the binning scheme
-     */
+    * build the binning scheme
+    */
     std::vector<double> CreatePBinningScheme()
     {
       std::vector<double> pbins;
@@ -93,5 +102,68 @@ namespace Belle2 {
 
       return pbins;
     }
+
+
+    TH2F* Normalise2DHisto(TH2F* HistoToNormalise)
+    {
+      for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
+        for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
+          // get rid of the bins with negative weights
+          if (HistoToNormalise->GetBinContent(pbin, dedxbin) <= 1) {
+            HistoToNormalise->SetBinContent(pbin, dedxbin, 0);
+          };
+        }
+        // create a projection (1D histogram) in a given momentum bin
+
+        TH1D* MomentumSlice = (TH1D*)HistoToNormalise->ProjectionY("slice_tr", pbin, pbin);
+        // normalise, but ignore the cases with empty histograms
+        if (MomentumSlice->Integral(0, m_numDEdxBins + 1) > 0) {
+          MomentumSlice->Scale(1. / MomentumSlice->Integral(0, m_numDEdxBins + 1));
+        }
+        // fill back the 2D histogram with the result
+        for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
+          HistoToNormalise->SetBinContent(pbin, dedxbin, MomentumSlice->GetBinContent(dedxbin));
+          HistoToNormalise->SetBinError(pbin, dedxbin, MomentumSlice->GetBinError(dedxbin));
+        }
+      }
+      return HistoToNormalise;
+    }
+
+    TH2D* prepare_new_histogram(TH2F* data_histogram, TString new_name, TF1* betagamma_function, TF1* resolution_function,
+                                double bias_correction)
+    {
+
+      resolution_function->SetRange(0, m_dedxCutoff * 2); // allow the function to take values outside the histogram range
+      TH2D* data_histogram_new = (TH2D*) data_histogram->Clone(new_name);//Form("%s_new", data_histogram->GetName()));
+
+      data_histogram_new->Reset();
+
+      for (int pbin = 1; pbin <= m_numPBins + 1; pbin++) {
+        double mean_dEdx_value = betagamma_function->Eval(data_histogram_new->GetXaxis()->GetBinCenter(pbin));
+        resolution_function->FixParameter(1, mean_dEdx_value + bias_correction);
+
+        // create a projection (1D histogram) in a given momentum bin
+        TH1D* momentum_slice = (TH1D*)data_histogram_new->ProjectionY("slice", pbin, pbin);
+
+        // fill manually (instead of FillRandom) to also preserve events in the overflow bin
+        // this is needed for the correct normalisation
+        for (int iEvent = 0; iEvent < m_toGenerate; iEvent++) {
+          momentum_slice->Fill(resolution_function->GetRandom());
+        }
+
+        // normalise each momentum slice to unity, but ignore the cases with empty histograms
+        if (momentum_slice->Integral(0, m_numDEdxBins + 1) > 0) {
+          momentum_slice->Scale(1. / momentum_slice->Integral(0, m_numDEdxBins + 1));
+        }
+        // fill back the 2D histo with the result
+        for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
+          data_histogram_new->SetBinContent(pbin, dedxbin, momentum_slice->GetBinContent(dedxbin));
+        }
+      }
+
+      return data_histogram_new;
+
+    }
+
   };
 } // namespace Belle2

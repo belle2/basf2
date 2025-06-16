@@ -15,7 +15,7 @@ import basf2 as b2
 
 import modularAnalysis as ma
 import vertex as vx
-from reconstruction import prepare_user_cdst_analysis
+import reconstruction as re
 
 settings = CalibrationSettings(
     name="caf_svd_dedx",
@@ -31,9 +31,9 @@ settings = CalibrationSettings(
 
     expert_config={
         "isMC": False,
-        "listOfMutedCalibrations": [],  # dEdxCalibration, dEdxValidation
-        "rerun_pid": False,  # need to rerun VXD PID for calibration?
-        "rerun_pid_val": True,  # need to rerun VXD PID for validation?
+        "listOfMutedCalibrations": [],  # "dEdxValidation"],  # dEdxCalibration, dEdxValidation
+        "rerun_reco": True,  # need to rerun reconstruction for calibration?
+        "rerun_reco_val": True,  # need to rerun reconstruction for validation?
         "validation_mode": "basic",  # full or basic; full also produces global PID performance plots
         "MaxFilesPerRun": 10,  # 15,
         "MaxFilesPerRunValidation": 6,  # be careful in MC to not exclude certain event types
@@ -52,17 +52,37 @@ settings = CalibrationSettings(
     depends_on=[])
 
 
-def create_path(rerun_pid, isMC, expert_config):
+def create_path(rerun_reco, isMC, expert_config):
     rec_path = b2.Path()
 
     # expert_config = kwargs.get("expert_config")
     max_events_per_file = expert_config["MaxEvtsPerFile"]
 
-    if rerun_pid:
-        rec_path.add_module('RootInput', entrySequences=[f'0:{max_events_per_file - 1}']
-                            )
-        prepare_user_cdst_analysis(rec_path, mc=isMC)
+    if rerun_reco:
+        rec_path.add_module(
+            'RootInput',
+            branchNames=[
+                'RawARICHs',
+                'RawCDCs',
+                'RawECLs',
+                'RawFTSWs',
+                'RawKLMs',
+                'RawPXDs',
+                'RawSVDs',
+                'RawTOPs',
+                'RawTRGs',
+                'RawDataBlock',
+                'RawCOPPER'],
+            entrySequences=[f'0:{max_events_per_file - 1}'],
+            logLevel=b2.LogLevel.ERROR)
+        if not isMC:
+            re.add_unpackers(path=rec_path)
+        else:
+            rec_path.add_module("Gearbox")
+            rec_path.add_module("Geometry")
 
+        re.add_reconstruction(path=rec_path, pruneTracks=False)
+        rec_path.add_module('VXDDedxPID')
     else:
         rec_path.add_module('RootInput')
 
@@ -108,7 +128,8 @@ def create_path(rerun_pid, isMC, expert_config):
         outputListName='Lambda0:cut',
         inputListName='Lambda0:myLambda',
         cut=(
-            "1.10 < InvM < 1.13 and chiProb > 0.001 and distance>1.0 and "
+            "1.10 < InvM < 1.13 and chiProb > 0.001 and distance > 1.0 and "
+            "cosAngleBetweenMomentumAndVertexVector > 0 and "
             "formula(daughter(0,p)) > formula(daughter(1,p)) and convertedPhotonInvariantMass(0,1) > 0.02 and "
             "[[formula((((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+"
             "daughter(1, E))*((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+"
@@ -145,9 +166,10 @@ def create_path(rerun_pid, isMC, expert_config):
         outputListName='gamma:cut',
         inputListName='gamma:myGamma',
         cut=('chiProb > 0.001 and 1 < dr < 12 and InvM < 0.01'
-                      'and convertedPhotonInvariantMass(0,1) < 0.005'
-                      'and -0.05 < convertedPhotonDelR(0,1) < 0.15'
-                      'and -0.05 < convertedPhotonDelZ(0,1) < 0.05'
+                      ' and cosAngleBetweenMomentumAndVertexVector > 0.995'
+                      ' and convertedPhotonInvariantMass(0,1) < 0.005'
+                      ' and -0.05 < convertedPhotonDelR(0,1) < 0.15'
+                      ' and -0.05 < convertedPhotonDelZ(0,1) < 0.05'
              ),
         path=rec_path)
     return rec_path
@@ -186,8 +208,8 @@ def get_calibrations(input_data, **kwargs):
 
     isMC = expert_config["isMC"]
     listOfMutedCalibrations = expert_config["listOfMutedCalibrations"]
-    rerun_pid = expert_config["rerun_pid"]
-    rerun_pid_val = expert_config["rerun_pid_val"]
+    rerun_reco = expert_config["rerun_reco"]
+    rerun_reco_val = expert_config["rerun_reco_val"]
     max_files_per_run = expert_config["MaxFilesPerRun"]
     max_files_per_run_validation = expert_config["MaxFilesPerRunValidation"]
 
@@ -246,12 +268,13 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.framework import Calibration
 
-    rec_path = create_path(rerun_pid, isMC, expert_config)
-    rec_path_validation = create_path(rerun_pid_val, isMC, expert_config)
+    rec_path = create_path(rerun_reco, isMC, expert_config)
+    rec_path_validation = create_path(rerun_reco_val, isMC, expert_config)
 
     dedx_calibration = Calibration("SVDdEdxCalibration",
                                    collector="SVDdEdxCollector",
                                    algorithms=[algo],
+                                   backend_args={"queue": "l", "request_memory": "8 GB"},
                                    input_files=input_files_hadron_calib,
                                    pre_collector_path=rec_path)
 
@@ -259,7 +282,7 @@ def get_calibrations(input_data, **kwargs):
         dedx_validation = Calibration("SVDdEdxValidation",
                                       collector="SVDdEdxValidationCollector",
                                       algorithms=[algo_val],
-                                      backend_args={"queue": "l"},
+                                      backend_args={"queue": "l", "request_memory": "8 GB"},
                                       input_files=input_files_hadron_validation,
                                       pre_collector_path=rec_path_validation)
     # Do this for the default AlgorithmStrategy to force the output payload IoV

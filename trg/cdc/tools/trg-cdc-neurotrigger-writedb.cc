@@ -54,20 +54,24 @@ int main(int argc, char** argv)
   std::string fwnote;
   bool ppbool;
   std::string ppnote;
-
+  std::string datastorename = "";
 
   InputParser input(argc, argv);
   if (input.cmdOptionExists("-h")) {
     std::cout << "A small tool to create ConDB payloads for the Neurotrigger." << std::endl;
-    std::cout << "Usage: \% trg-cdc-neurotrigger-writedb -f example.conf" << std::endl;
+    std::cout << "Usage: \% trg-cdc-neurotrigger-writedb -f example.conf -n exmaple" << std::endl;
   }
   const std::string& filename = input.getCmdOption("-f");
   if (!filename.empty()) {
     configfilename = filename;
   }
 
+  const std::string& storename = input.getCmdOption("-n");
+  if (!storename.empty()) {
+    datastorename = storename;
+  }
   // Creating payload object:
-  DBImportObjPtr<CDCTriggerNeuroConfig> nc;
+  DBImportObjPtr<CDCTriggerNeuroConfig> nc(datastorename);
   nc.construct();
 
   std::ifstream confile;

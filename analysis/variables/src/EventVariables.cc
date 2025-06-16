@@ -909,6 +909,33 @@ namespace Belle2 {
       }
     }
 
+    bool eventT0CalculatedWithSVDInfo(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> triggerTimeInfo;
+      if (!triggerTimeInfo.isValid()) {
+        return false;
+      }
+      return triggerTimeInfo->hasEventT0SourceFromSVD();
+    }
+
+    bool eventT0CalculatedWithCDCInfo(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> triggerTimeInfo;
+      if (!triggerTimeInfo.isValid()) {
+        return false;
+      }
+      return triggerTimeInfo->hasEventT0SourceFromCDC();
+    }
+
+    bool eventT0CalculatedWithECLInfo(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> triggerTimeInfo;
+      if (!triggerTimeInfo.isValid()) {
+        return false;
+      }
+      return triggerTimeInfo->hasEventT0SourceFromECL();
+    }
+
 
     VARIABLE_GROUP("Event");
 
@@ -1188,7 +1215,19 @@ Returns NaN for data.
 [Eventbased] The energy in laboratory frame of all the photons. from generator.
 
 )DOC","GeV");
-
+    REGISTER_VARIABLE("eventT0CalculatedWithSVDInfo", eventT0CalculatedWithSVDInfo, R"DOC(
+[Eventbased] It returns true if the SVD subdetector contributed in the calculation of the EventT0.
+Please note that other subdetectors may also have contributed, so store the variables for these as well.
+)DOC");
+    REGISTER_VARIABLE("eventT0CalculatedWithCDCInfo", eventT0CalculatedWithCDCInfo, R"DOC(
+[Eventbased] It returns true if the CDC subdetector contributed in the calculation of the EventT0.
+Please note that other subdetectors may also have contributed, so store the variables for these as well.
+)DOC");
+    REGISTER_VARIABLE("eventT0CalculatedWithECLInfo", eventT0CalculatedWithECLInfo, R"DOC(
+[Eventbased] It returns true if the ECL subdetector contributed in the calculation of the EventT0.
+Please note that other subdetectors may also have contributed, so store the variables for these as well.
+)DOC");
+    
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0, R"DOC(
 [Eventbased][Calibration] The Event t0, is the time of the event relative to the trigger time.

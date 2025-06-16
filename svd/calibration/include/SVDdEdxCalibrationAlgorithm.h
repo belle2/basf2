@@ -82,7 +82,7 @@ namespace Belle2 {
     int m_toGenerate =
       500000;                                                     /**< the number of events to be generated in each momentum bin in the new payloads */
     /**
-    * build the binning scheme
+    * build the binning scheme for the momentum
     */
     std::vector<double> CreatePBinningScheme()
     {
@@ -103,7 +103,10 @@ namespace Belle2 {
       return pbins;
     }
 
-
+    /**
+    * Normalise an dEdx:momentum histogram in each momentum bin, so that sum of entries in each momentum bin is 1.
+    * Note that this accounts for entries in the underflow/overflow bins.
+    */
     TH2F* Normalise2DHisto(TH2F* HistoToNormalise)
     {
       for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
@@ -129,6 +132,9 @@ namespace Belle2 {
       return HistoToNormalise;
     }
 
+    /**
+    * Generate a new dEdx:momentum histogram from a function that encodes dEdx:momentum trend and a function that encodes dEdx resolution.
+    */
     TH2D* prepare_new_histogram(TH2F* data_histogram, TString new_name, TF1* betagamma_function, TF1* resolution_function,
                                 double bias_correction)
     {

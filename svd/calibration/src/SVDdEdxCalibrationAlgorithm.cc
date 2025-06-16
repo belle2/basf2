@@ -99,18 +99,23 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
 
       if (iPart == 0 && trunmean) {
         hDedxPDFs[iPart] = histoE;
+        hDedxPDFs[iPart]->SetName("hist_d1_11_trunc");
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 1 && trunmean) {
         hDedxPDFs[iPart] = histoMu;
+        hDedxPDFs[iPart]->SetName("hist_d1_13_trunc");
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 2 && trunmean) {
         hDedxPDFs[iPart] = histoPi;
+        hDedxPDFs[iPart]->SetName("hist_d1_211_trunc");
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 3 && trunmean) {
         hDedxPDFs[iPart] = histoK;
+        hDedxPDFs[iPart]->SetName("hist_d1_321_trunc");
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 4 && trunmean) {
         hDedxPDFs[iPart] = histoP;
+        hDedxPDFs[iPart]->SetName("hist_d1_2212_trunc");
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 5 && trunmean) {
         hDedxPDFs[iPart] = histoDeut;
@@ -149,18 +154,19 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
       candEdx->cd(iPart + 1);
       hDedxPDFs[iPart]->SetTitle(Form("%s; p(GeV/c) of %s; dE/dx", hDedxPDFs[iPart]->GetTitle(), part[iPart].data()));
       hDedxPDFs[iPart]->DrawCopy("colz");
-
-      if (m_isMakePlots) {
-        candEdx->SaveAs("PlotsSVDdEdxPDFs_wTruncMean.pdf");
-        TList* l = new TList();
-        for (int iPart = 0; iPart < 6; iPart++) {
-          l->Add(hDedxPDFs[iPart]);
-        }
-        TFile SVDdEdxPDFsPlotFile("PlotsSVDdEdxPDFs_wTruncMean.root", "RECREATE");
-        l->Write("histlist", TObject::kSingleKey);
-        SVDdEdxPDFsPlotFile.Close();
-      }
     }
+
+    if (m_isMakePlots) {
+      candEdx->SaveAs("PlotsSVDdEdxPDFs_wTruncMean.pdf");
+      TList* l = new TList();
+      for (int iPart = 0; iPart < 6; iPart++) {
+        l->Add(hDedxPDFs[iPart]);
+      }
+      TFile SVDdEdxPDFsPlotFile("PlotsSVDdEdxPDFs_wTruncMean.root", "RECREATE");
+      l->Write("histlist", TObject::kSingleKey);
+      SVDdEdxPDFsPlotFile.Close();
+    }
+
     // candEdx->SetTitle(Form("Likehood dist. of charged particles from %s, trunmean = %s", idet.data(), check.str().data()));
   }
 
@@ -273,6 +279,7 @@ TTree* SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselT
   }
 
   TCanvas* canvLambda = new TCanvas("canvLambda", "canvLambda");
+  canvLambda->cd();
   RooPlot* LambdaFitFrame = LambdaDataset->plotOn(InvM.frame(130));
   totalPDFLambda.plotOn(LambdaFitFrame, LineColor(TColor::GetColor("#4575b4")));
 
@@ -403,6 +410,7 @@ TList* SVDdEdxCalibrationAlgorithm::LambdaHistogramming(TTree* inputTree)
   // momentum: for data-MC comparisons
 
   TCanvas* canvLambda = new TCanvas("canvLambda", "canvLambda");
+  canvLambda->cd();
 
 
   TH1F* ProtonProfile_tr = (TH1F*)hLambdaP_tr->ProfileX("ProtonProfile_tr");
@@ -758,6 +766,7 @@ TList* SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* inputTree)
 
 
   TCanvas* canvDstar = new TCanvas("canvDstar2", "canvDstar");
+  canvDstar->cd();
   // produce the 1D profiled
 
 
@@ -768,7 +777,8 @@ TList* SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* inputTree)
   PionProfile_tr->GetXaxis()->SetTitle("Momentum, GeV/c");
   PionProfile_tr->GetYaxis()->SetTitle("dE/dx");
   PionProfile_tr->SetLineColor(kRed);
-  PionProfile_tr->Draw("SAME");
+  PionProfile_tr->Draw();
+  // canvDstar->Print("SVDdEdxCalibrationProfilePion.pdf");
 
   TH1F* PionProfile_bg_tr = (TH1F*)hDstarPi_bg_tr->ProfileX("PionProfile_bg_tr");
   PionProfile_bg_tr->SetTitle("PionProfile");
@@ -779,17 +789,14 @@ TList* SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* inputTree)
   PionProfile_bg_tr->SetLineColor(kRed);
 
 
-  canvDstar->Print("SVDdEdxCalibrationProfilePion.pdf");
-
-
   TH1F* KaonProfile_tr = (TH1F*)hDstarK_tr->ProfileX("KaonProfile_tr");
   KaonProfile_tr->SetTitle("KaonProfile");
   KaonProfile_tr->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
   KaonProfile_tr->GetXaxis()->SetTitle("Momentum, GeV/c");
   KaonProfile_tr->GetYaxis()->SetTitle("dE/dx");
   KaonProfile_tr->SetLineColor(kRed);
-  KaonProfile_tr->Draw("SAME");
-  canvDstar->Print("SVDdEdxCalibrationProfileKaon.pdf");
+  KaonProfile_tr->Draw();
+  // canvDstar->Print("SVDdEdxCalibrationProfileKaon.pdf");
 
 
   TH1F* KaonProfile_bg_tr = (TH1F*)hDstarK_bg_tr->ProfileX("KaonProfile_bg_tr");
@@ -1148,7 +1155,7 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   BetaGammaFunctionProton->FixParameter(6, 0);
   BetaGammaFunctionProton->SetLineColor(ProtonProfile_bg_tr->GetMarkerColor());
 
-  TCanvas* c12 = new TCanvas("Simfit12", "", 10, 10, 1000, 700);
+  // TCanvas* c12 = new TCanvas("Simfit12", "", 10, 10, 1000, 700);
   gStyle->SetOptFit(1111);
   hCombined->Fit("BetaGammaFunctionProton", "0WLS", "", 0.35, 8);
 
@@ -1272,7 +1279,7 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
                                                         histoK_2D->GetXaxis()->FindBin(KaonRangeMax));
 // for protons, there is not enough data in the flat range.
 
-  TCanvas* canvas_reso = new TCanvas("canvas_reso", " ", 1000, 700);
+  // TCanvas* canvas_reso = new TCanvas("canvas_reso", " ", 1000, 700);
   PionResolutionHistogram->Draw();
 
   TF1* PionResolutionFunction = new TF1("PionResolutionFunction",

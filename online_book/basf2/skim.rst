@@ -6,9 +6,7 @@ Skimming
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 25 min
-
-    **Exercises**: 25 min
+    **Length**: 30-45 min
 
     **Prerequisites**:
 

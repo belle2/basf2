@@ -6,9 +6,7 @@ B2BII
 .. sidebar:: Overview
    :class: overview
 
-   **Teaching**: 30 min
-
-   **Exercises**: 60 min
+   **Length**: 1-1.5 hrs
 
    **Prerequisites**:
 

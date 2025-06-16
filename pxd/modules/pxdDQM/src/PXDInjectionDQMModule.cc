@@ -86,46 +86,46 @@ void PXDInjectionDQMModule::defineHisto()
       // Only interested in PXD sensors
 
       TString buff = (std::string)avxdid;
-      TString bufful = buff;
-      bufful.ReplaceAll(".", "_");
+      TString buffus = buff;
+      buffus.ReplaceAll(".", "_");
 
       /// The number of bins as well as the range MUST be the same here as in the histograms above and in the DQM analysis code!!!
       /// Reason: Number of entries histogram is shared by all histograms!
       if (m_offlineStudy) {
-        hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful,
+        hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + buffus,
                                               "PXDOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
-        hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + bufful,
+        hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + buffus,
                                               "PXDOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
         if (m_createMaxHist) {
-          hMaxOccModAfterInjLER[avxdid] = new TH1F("PXDMaxOccInjLER_" + bufful,
+          hMaxOccModAfterInjLER[avxdid] = new TH1F("PXDMaxOccInjLER_" + buffus,
                                                    "PXDMaxOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
-          hMaxOccModAfterInjHER[avxdid] = new TH1F("PXDMaxOccInjHER_" + bufful,
+          hMaxOccModAfterInjHER[avxdid] = new TH1F("PXDMaxOccInjHER_" + buffus,
                                                    "PXDMaxOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
         }
         if (m_createGateHist) {
-          hOccModAfterInjLERGate[avxdid]  = new TH2F("PXDOccInjLERGate_" + bufful, "PXDOccInjLERGate " + buff + ";Time;Gate", 1000, 0, 10000,
+          hOccModAfterInjLERGate[avxdid]  = new TH2F("PXDOccInjLERGate_" + buffus, "PXDOccInjLERGate " + buff + ";Time;Gate", 1000, 0, 10000,
                                                      192, 0,
                                                      192);
-          hOccModAfterInjHERGate[avxdid]  = new TH2F("PXDOccInjHERGate_" + bufful, "PXDOccInjHERGate " + buff + ";Time;Gate", 1000, 0, 10000,
+          hOccModAfterInjHERGate[avxdid]  = new TH2F("PXDOccInjHERGate_" + buffus, "PXDOccInjHERGate " + buff + ";Time;Gate", 1000, 0, 10000,
                                                      192, 0,
                                                      192);
         }
       } else {
-        hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful,
+        hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + buffus,
                                               "PXDOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-        hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + bufful,
+        hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + buffus,
                                               "PXDOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
         if (m_createMaxHist) {
-          hMaxOccModAfterInjLER[avxdid] = new TH1F("PXDMaxOccInjLER_" + bufful,
+          hMaxOccModAfterInjLER[avxdid] = new TH1F("PXDMaxOccInjLER_" + buffus,
                                                    "PXDMaxOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-          hMaxOccModAfterInjHER[avxdid] = new TH1F("PXDMaxOccInjHER_" + bufful,
+          hMaxOccModAfterInjHER[avxdid] = new TH1F("PXDMaxOccInjHER_" + buffus,
                                                    "PXDMaxOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
         }
         if (m_createGateHist) {
-          hOccModAfterInjLERGate[avxdid]  = new TH2F("PXDOccInjLERGate_" + bufful, "PXDOccInjLERGate " + buff + ";Time;Gate", 1000, 0, 10000,
+          hOccModAfterInjLERGate[avxdid]  = new TH2F("PXDOccInjLERGate_" + buffus, "PXDOccInjLERGate " + buff + ";Time;Gate", 1000, 0, 10000,
                                                      192, 0,
                                                      192);
-          hOccModAfterInjHERGate[avxdid]  = new TH2F("PXDOccInjHERGate_" + bufful, "PXDOccInjHERGate " + buff + ";Time;Gate", 1000, 0, 10000,
+          hOccModAfterInjHERGate[avxdid]  = new TH2F("PXDOccInjHERGate_" + buffus, "PXDOccInjHERGate " + buff + ";Time;Gate", 1000, 0, 10000,
                                                      192, 0,
                                                      192);
         }

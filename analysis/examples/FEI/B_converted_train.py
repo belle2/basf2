@@ -50,7 +50,7 @@ if feistate.stage <= 0:
         enableLocalDB=False,
         path=path)
 else:
-    ma.inputMdstList('Belle', [], path)
+    ma.inputMdstList(filelist=[], path=path, environmentType='Belle')
 
 # Add FEI path to the path to be processed
 path.add_path(feistate.path)

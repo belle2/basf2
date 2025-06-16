@@ -187,8 +187,8 @@ bool RootIOUtilities::hasStreamer(const TClass* cl)
 
 bool RootIOUtilities::hasCustomStreamer(const TClass* cl)
 {
-  //does this class have a custom streamer? (magic from from TTree.cxx)
-  return cl->TestBit(TClass::kHasCustomStreamerMember);
+  // Does this class have a custom streamer?
+  return cl->HasCustomStreamerMember();
 }
 
 void RootIOUtilities::setCreationData(FileMetaData& metadata)

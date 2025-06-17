@@ -26,7 +26,7 @@ namespace Belle2 {
      * Enum for identifying the type of track fit algorythm
      * ( or cosmic)
      */
-    enum ETrackFitType {
+    enum ETrackFitType : short {
       c_Default = 0,     /**< default configuration */
       c_Cosmics = 1,     /**< configuration for cosmics data reconstruction */
       c_CDConly = 2      /**< configuration for the CDC-only track fitting */

@@ -69,7 +69,7 @@ import subprocess
 import multiprocessing
 
 # Simple object containing the output of fei
-FeiState = collections.namedtuple('FeiState', 'path, stage, plists')
+FeiState = collections.namedtuple('FeiState', 'path, stage, plists, fsplists, excludelists')
 
 
 class TrainingDataInformation:
@@ -140,7 +140,7 @@ class TrainingDataInformation:
             mc_counts[pdg]['min'] = hist.GetXaxis().GetBinCenter(hist.FindFirstBinAbove(0.0))
 
         mc_counts[0] = {}
-        mc_counts[0]['sum'] = hist.GetEntries()
+        mc_counts[0]['sum'] = hist.GetEntries()  # this is the total number of ALL events, does not matter which hist we take
         root_file.Close()
         return mc_counts
 
@@ -163,6 +163,16 @@ class FSPLoader:
         self.particles = particles
         #: config.FeiConfiguration object
         self.config = config
+
+    def get_fsp_lists(self) -> typing.List[str]:
+        """
+        Returns a list of FSP particle lists which are used in the FEI.
+        This is used to create the RootOutput module.
+        """
+        fsps = ['K+:FSP', 'pi+:FSP', 'e+:FSP', 'mu+:FSP', 'p+:FSP', 'gamma:FSP', 'K_S0:V0', 'Lambda0:V0', 'K_L0:FSP', 'gamma:V0']
+        if b2bii.isB2BII():
+            fsps += ['pi0:FSP']
+        return fsps
 
     def reconstruct(self) -> pybasf2.Path:
         """
@@ -221,11 +231,14 @@ class TrainingData:
         """
         Returns pybasf2.Path which creates the training data for the given particles
         """
+        import ROOT  # noqa
         path = basf2.create_path()
 
         for particle in self.particles:
             pdgcode = abs(pdg.from_name(particle.name))
             nSignal = self.mc_counts[pdgcode]['sum']
+            print(f"FEI-core: TrainingData: nSignal for {particle.name}: {nSignal}")
+
             # For D-Mesons we usually have a efficiency of 10^-3 including branching fraction
             if pdgcode > 400:
                 nSignal /= 1000
@@ -234,6 +247,10 @@ class TrainingData:
                 nSignal /= 10000
 
             for channel in particle.channels:
+                weightfile = f'{channel.label}.xml'
+                if basf2_mva.available(weightfile):
+                    B2INFO(f"FEI-core: Skipping preparing Training Data for {weightfile}, already available")
+                    continue
                 filename = 'training_input.root'
 
                 # nBackground = nEvents * nBestCandidates
@@ -266,9 +283,9 @@ class TrainingData:
                                             directory=config.removeJPsiSlash(f'{channel.label}'), path=path)
 
                 teacher = basf2.register_module('VariablesToNtuple')
-                teacher.set_name('VariablesToNtuple_' + channel.name)
+                teacher.set_name(f'VariablesToNtuple_{channel.name}')
                 teacher.param('fileName', filename)
-                teacher.param('treeName', f'{channel.label} variables')
+                teacher.param('treeName', ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(f'{channel.label} variables'))
                 teacher.param('variables', channel.mvaConfig.variables + spectators)
                 teacher.param('particleList', channel.name)
                 teacher.param('sampling', (channel.mvaConfig.target, inverseSamplingRates))
@@ -313,7 +330,7 @@ class PreReconstruction:
                         channel.daughters[0].split(':')[0]) == pdg.from_name(particle.name)):
                     ma.cutAndCopyList(channel.name, channel.daughters[0], channel.preCutConfig.userCut, writeOut=True, path=path)
                     v2EI = basf2.register_module('VariablesToExtraInfo')
-                    v2EI.set_name('VariablesToExtraInfo_' + channel.name)
+                    v2EI.set_name(f'VariablesToExtraInfo_{channel.name}')
                     v2EI.param('particleList', channel.name)
                     v2EI.param('variables', {f'constant({channel.decayModeID})': 'decayModeID'})
                     # suppress warning that decay mode ID won't be overwritten if it already exists
@@ -360,7 +377,7 @@ class PreReconstruction:
                                      'preCut_rank',
                                      path=path)
                 else:
-                    raise RuntimeError("Unknown bestCandidateMode " + repr(channel.preCutConfig.bestCandidateMode))
+                    raise RuntimeError(f'Unknown bestCandidateMode {repr(channel.preCutConfig.bestCandidateMode)}')
 
                 if 'gamma' in channel.decayString and channel.pi0veto:
                     ma.buildRestOfEvent(channel.name, path=path)
@@ -373,7 +390,7 @@ class PreReconstruction:
                     pi0lists = []
                     for igamma in range(len(matches)):
                         start, end = matches[igamma-1].span()
-                        tempString = channel.decayString[:start] + '^gamma' + channel.decayString[end:]
+                        tempString = f'{channel.decayString[:start]}^gamma{channel.decayString[end:]}'
                         ma.fillSignalSideParticleList(f'gamma:sig_{igamma}', tempString, path=Ddaughter_roe_path)
                         ma.reconstructDecay(f'pi0:veto_{igamma} -> gamma:sig_{igamma} gamma:roe', '', path=Ddaughter_roe_path)
                         pi0lists.append(f'pi0:veto_{igamma}')
@@ -414,7 +431,7 @@ class PreReconstruction:
 
                 if b2bii.isB2BII() and particle.name in ['K_S0', 'Lambda0']:
                     pvfit = basf2.register_module('ParticleVertexFitter')
-                    pvfit.set_name('ParticleVertexFitter_' + channel.name)
+                    pvfit.set_name(f'ParticleVertexFitter_{channel.name}')
                     pvfit.param('listName', channel.name)
                     pvfit.param('confidenceLevel', channel.preCutConfig.vertexCut)
                     pvfit.param('vertexFitter', 'KFit')
@@ -425,7 +442,7 @@ class PreReconstruction:
                     basf2.B2INFO(f"Ignoring vertex fit for {channel.name} because multiple pi0 are not supported yet.")
                 elif len(channel.daughters) > 1:
                     pvfit = basf2.register_module('ParticleVertexFitter')
-                    pvfit.set_name('ParticleVertexFitter_' + channel.name)
+                    pvfit.set_name(f'ParticleVertexFitter_{channel.name}')
                     pvfit.param('listName', channel.name)
                     pvfit.param('confidenceLevel', channel.preCutConfig.vertexCut)
                     pvfit.param('vertexFitter', 'KFit')
@@ -490,7 +507,7 @@ class PostReconstruction:
         for particle in self.particles:
             for channel in particle.channels:
                 # weightfile = self.config.prefix + '_' + channel.label
-                weightfile = channel.label + '.xml'
+                weightfile = f'{channel.label}.xml'
                 if not basf2_mva.available(weightfile):
                     missing += [channel.label]
         return missing
@@ -505,16 +522,17 @@ class PostReconstruction:
         """
         Returns pybasf2.Path which reconstructs the particles and does the vertex fitting if necessary
         """
+        import ROOT  # noqa
         path = basf2.create_path()
 
         for particle in self.particles:
             for channel in particle.channels:
                 expert = basf2.register_module('MVAExpert')
-                expert.set_name('MVAExpert_' + channel.name)
+                expert.set_name(f'MVAExpert_{channel.name}')
                 if self.config.training:
-                    expert.param('identifier', channel.label + '.xml')
+                    expert.param('identifier', f'{channel.label}.xml')
                 else:
-                    expert.param('identifier', self.config.prefix + '_' + channel.label)
+                    expert.param('identifier', f'{self.config.prefix}_{channel.label}')
                 expert.param('extraInfoName', 'SignalProbability')
                 expert.param('listNames', [channel.name])
                 # suppress warning that signal probability won't be overwritten if it already exists
@@ -553,7 +571,7 @@ class PostReconstruction:
 
             cutstring = ''
             if particle.postCutConfig.value > 0.0:
-                cutstring = str(particle.postCutConfig.value) + ' < extraInfo(SignalProbability)'
+                cutstring = f'{particle.postCutConfig.value} < extraInfo(SignalProbability)'
 
             ma.mergeListsWithBestDuplicate(particle.identifier, [c.name for c in particle.channels],
                                            variable='particleSource', writeOut=True, path=path)
@@ -605,7 +623,7 @@ class PostReconstruction:
             uniqueSignal.param('particleList', particle.identifier)
             uniqueSignal.param('target', particle.mvaConfig.target)
             uniqueSignal.param('extraInfoName', 'uniqueSignal')
-            uniqueSignal.set_name('TagUniqueSignal_' + particle.identifier)
+            uniqueSignal.set_name(f'TagUniqueSignal_{particle.identifier}')
             # suppress warning that unique signal extra info won't be overwritten if it already exists
             uniqueSignal.set_log_level(basf2.logging.log_level.ERROR)
             path.add_module(uniqueSignal)
@@ -643,13 +661,13 @@ class PostReconstruction:
                         path=path)
                 else:
                     variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
-                                 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
-                    variables += list(particle.mvaConfig.spectators.keys())
+                                 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'] + list(particle.mvaConfig.spectators.keys())
 
                     ma.variablesToNtuple(
                         particle.identifier,
                         variables,
-                        treename=config.removeJPsiSlash(f'{particle.identifier} variables'),
+                        treename=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(
+                            config.removeJPsiSlash(f'{particle.identifier} variables')),
                         filename=filename,
                         ignoreCommandLineOverride=True,
                         path=path)
@@ -708,7 +726,7 @@ class Teacher:
             <Trivial_output>0</Trivial_output>
             <signal_fraction>0.066082567</signal_fraction>
             """
-        with open(channel + ".xml", "w") as f:
+        with open(f'{channel}.xml', "w") as f:
             f.write(content)
 
     @staticmethod
@@ -728,9 +746,10 @@ class Teacher:
         Upload the weight file into the condition database
         @param channel whose weight file is uploaded
         """
-        disk = channel + '.xml'
-        dbase = self.config.prefix + '_' + channel
+        disk = f'{channel}.xml'
+        dbase = f'{self.config.prefix}_{channel}'
         basf2_mva.upload(disk, dbase)
+        print(f"FEI-core: Uploading {dbase} to localdb")
         return (disk, dbase)
 
     def do_all_trainings(self):
@@ -743,69 +762,90 @@ class Teacher:
         # the ROOT gui-thread is disabled, which otherwise interferes sometimes
         ROOT.PyConfig.StartGuiThread = False
         job_list = []
-        filename = 'training_input.root'
-        if not os.path.isfile(filename):
-            B2WARNING("Training of MVC failed. Couldn't find ROOT file. "
-                      "No weight files will be provided.")
+
+        all_stage_particles = get_stages_from_particles(self.particles)
+        if self.config.cache is None:
+            stagesToTrain = range(1, len(all_stage_particles)+1)
         else:
+            stagesToTrain = [self.config.cache]
+
+        filename = 'training_input.root'
+        if os.path.isfile(filename):
             f = ROOT.TFile.Open(filename, 'read')
             if f.IsZombie():
-                B2WARNING("Training of MVC failed. ROOT file corrupt. "
-                          "No weight files will be provided.")
+                B2WARNING(f'Training of MVC failed: {filename}. ROOT file corrupt. No weight files will be provided.')
             elif len([k.GetName() for k in f.GetListOfKeys()]) == 0:
-                B2WARNING("Training of MVC failed. ROOT file does not contain any trees. "
-                          "No weight files will be provided.")
+                B2WARNING(
+                    f'Training of MVC failed: {filename}. ROOT file has no trees. No weight files will be provided.')
             else:
-                for particle in self.particles:
-                    for channel in particle.channels:
-                        weightfile = channel.label + '.xml'
-                        if not basf2_mva.available(weightfile):
-                            keys = [m for m in f.GetListOfKeys() if f"{channel.label} variables" in m.GetName()]
-                            if not keys:
+                for istage in stagesToTrain:
+                    for particle in all_stage_particles[istage-1]:
+                        for channel in particle.channels:
+                            weightfile = f'{channel.label}.xml'
+                            if basf2_mva.available(weightfile):
+                                B2INFO(f"FEI-core: Skipping {weightfile}, already available")
                                 continue
-                            tree = keys[0].ReadObj()
-                            nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1')
-                            nBg = tree.GetEntries(channel.mvaConfig.target + ' == 0')
-                            if nSig < Teacher.MinimumNumberOfMVASamples:
-                                B2WARNING("Training of MVC failed. "
-                                          f"Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
-                                self.create_fake_weightfile(channel.label)
-                                self.upload(channel.label)
-                                continue
-                            if nBg < Teacher.MinimumNumberOfMVASamples:
-                                B2WARNING("Training of MVC failed. "
-                                          f"Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
-                                self.create_fake_weightfile(channel.label)
-                                self.upload(channel.label)
-                                continue
-                            variable_str = "' '".join(channel.mvaConfig.variables)
+                            else:
+                                treeName = ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(f'{channel.label} variables')
+                                keys = [m for m in f.GetListOfKeys() if treeName in m.GetName()]
+                                if not keys:
+                                    B2WARNING("Training of MVC failed. "
+                                              f"Couldn't find tree for channel {channel}. Ignoring channel.")
+                                    continue
+                                elif len(keys) > 1:
+                                    B2WARNING(f"Found more than one tree for channel {channel}. Taking first tree from: {keys}")
+                                tree = keys[0].ReadObj()
+                                total_entries = tree.GetEntries()
+                                nSig = tree.GetEntries(f'{channel.mvaConfig.target}==1.0')
+                                nBg = tree.GetEntries(f'{channel.mvaConfig.target}==0.0')
+                                B2INFO(
+                                    f'FEI-core: Number of events for channel: {channel.label}, '
+                                    f'Total: {total_entries}, Signal: {nSig}, Background: {nBg}')
+                                if nSig < Teacher.MinimumNumberOfMVASamples:
+                                    B2WARNING("Training of MVC failed. "
+                                              f"Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
+                                    self.create_fake_weightfile(channel.label)
+                                    self.upload(channel.label)
+                                    continue
+                                if nBg < Teacher.MinimumNumberOfMVASamples:
+                                    B2WARNING("Training of MVC failed. "
+                                              f"Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
+                                    self.create_fake_weightfile(channel.label)
+                                    self.upload(channel.label)
+                                    continue
+                                variable_str = "' '".join(channel.mvaConfig.variables)
 
-                            spectators = list(channel.mvaConfig.spectators.keys())
-                            if channel.mvaConfig.sPlotVariable is not None:
-                                spectators.append(channel.mvaConfig.sPlotVariable)
-                            spectators_str = "' '".join(spectators)
+                                spectators = list(channel.mvaConfig.spectators.keys())
+                                if channel.mvaConfig.sPlotVariable is not None:
+                                    spectators.append(channel.mvaConfig.sPlotVariable)
+                                spectators_str = "' '".join(spectators)
 
-                            command = (f"{self.config.externTeacher}"
-                                       f" --method '{channel.mvaConfig.method}'"
-                                       f" --target_variable '{channel.mvaConfig.target}'"
-                                       f" --treename '{channel.label} variables' --datafile 'training_input.root'"
-                                       f" --signal_class 1 --variables '{variable_str}'"
-                                       f" --identifier '{channel.label}.xml'")
-                            if len(spectators) > 0:
-                                command += f" --spectators '{spectators_str}'"
-                            command += f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1"
-                            B2INFO(f"Used following command to invoke teacher: \n {command}")
-                            job_list.append((channel.label, command))
+                                treeName = ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(f'{channel.label} variables')
+                                command = (f"{self.config.externTeacher}"
+                                           f" --method '{channel.mvaConfig.method}'"
+                                           f" --target_variable '{channel.mvaConfig.target}'"
+                                           f" --treename '{treeName}'"
+                                           f" --datafile 'training_input.root'"
+                                           f" --signal_class 1"
+                                           f" --variables '{variable_str}'"
+                                           f" --identifier '{weightfile}'")
+                                if len(spectators) > 0:
+                                    command += f" --spectators '{spectators_str}'"
+                                command += f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1"
+                                B2INFO(f"Used following command to invoke teacher: \n {command}")
+                                job_list.append((channel.label, command))
             f.Close()
-        p = multiprocessing.Pool(None, maxtasksperchild=1)
-        func = functools.partial(subprocess.call, shell=True)
-        p.map(func, [c for _, c in job_list])
-        p.close()
-        p.join()
+
+        if len(job_list) > 0:
+            p = multiprocessing.Pool(None, maxtasksperchild=1)
+            func = functools.partial(subprocess.call, shell=True)
+            p.map(func, [c for _, c in job_list])
+            p.close()
+            p.join()
         weightfiles = []
         for name, _ in job_list:
-            if not basf2_mva.available(name + '.xml'):
-                B2WARNING("Training of MVC failed. For unknown reasons, check the logfile")
+            if not basf2_mva.available(f'{name}.xml'):
+                B2WARNING("Training of MVC failed. For unknown reasons, check the logfile", f'{name}.log')
                 self.create_fake_weightfile(name)
             weightfiles.append(self.upload(name))
         return weightfiles
@@ -826,37 +866,44 @@ def convert_legacy_training(particles: typing.Sequence[config.Particle], configu
 
     for particle in particles:
         for channel in particle.channels:
-            new_weightfile = configuration.prefix + '_' + channel.label
-            old_weightfile = configuration.prefix + '_' + channel2lists[channel.label.replace('Jpsi', 'J/psi')]
+            new_weightfile = f'{configuration.prefix}_{channel.label}'
+            old_weightfile = f'{configuration.prefix}_{channel2lists[channel.label.replace("Jpsi", "J/psi")]}'
             if not basf2_mva.available(new_weightfile):
                 if old_weightfile is None or not basf2_mva.available(old_weightfile):
                     Teacher.create_fake_weightfile(channel.label)
                     teacher.upload(channel.label)
                 else:
-                    basf2_mva.download(old_weightfile, channel.label + '.xml')
+                    basf2_mva.download(old_weightfile, f'{channel.label}.xml')
                     teacher.upload(channel.label)
 
 
-def get_stages_from_particles(particles: typing.Sequence[config.Particle]):
+def get_stages_from_particles(particles: typing.Sequence[typing.Union[config.Particle, str]]):
     """
     Returns the hierarchical structure of the FEI.
     Each stage depends on the particles in the previous stage.
     The final stage is empty (meaning everything is done, and the training is finished at this point).
-    @param particles list of config.Particle objects
+    @param particles list of config.Particle or string objects
     """
+    def get_pname(p):
+        return p.split(":")[0] if isinstance(p, str) else p.name
+
+    def get_plabel(p):
+        return (p.split(":")[1] if isinstance(p, str) else p.label).lower()
+
     stages = [
-        [p for p in particles if p.name in ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'p+', 'K_L0']],
-        [p for p in particles if p.name in ['pi0', 'J/psi', 'Lambda0']],
-        [p for p in particles if p.name in ['K_S0', 'Sigma+']],
-        [p for p in particles if p.name in ['D+', 'D0', 'D_s+', 'Lambda_c+']],
-        [p for p in particles if p.name in ['D*+', 'D*0', 'D_s*+']],
-        [p for p in particles if p.name in ['B0', 'B+', 'B_s0']],
+        [p for p in particles if get_pname(p) in ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'p+', 'K_L0']],
+        [p for p in particles if get_pname(p) in ['pi0', 'J/psi', 'Lambda0']],
+        [p for p in particles if get_pname(p) in ['K_S0', 'Sigma+']],
+        [p for p in particles if get_pname(p) in ['D+', 'D0', 'D_s+', 'Lambda_c+'] and 'tag' not in get_plabel(p)],
+        [p for p in particles if get_pname(p) in ['D*+', 'D*0', 'D_s*+'] and 'tag' not in get_plabel(p)],
+        [p for p in particles if get_pname(p) in ['B0', 'B+', 'B_s0'] or 'tag' in get_plabel(p)],
         []
     ]
 
     for p in particles:
-        if p.name not in [p.name for stage in stages for p in stage]:
-            raise RuntimeError(f"Unknown particle {p.name}: Not implemented in FEI")
+        pname = get_pname(p)
+        if pname not in [pname for stage in stages for p in stage]:
+            raise RuntimeError(f"Unknown particle {pname}: Not implemented in FEI")
 
     return stages
 
@@ -877,6 +924,7 @@ def do_trainings(particles: typing.Sequence[config.Particle], configuration: con
 def save_summary(particles: typing.Sequence[config.Particle],
                  configuration: config.FeiConfiguration,
                  cache: int,
+                 roundMode: int = None,
                  pickleName: str = 'Summary.pickle'):
     """
     Creates the Summary.pickle, which is used to keep track of the stage during the training,
@@ -884,15 +932,16 @@ def save_summary(particles: typing.Sequence[config.Particle],
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
     @param cache current cache level
+    @param roundMode mode of current round of training
     @param pickleName name of the pickle file
     """
-    configuration = config.FeiConfiguration(configuration.prefix, cache,
-                                            configuration.monitor, configuration.legacy, configuration.externTeacher,
-                                            configuration.training)
+    if roundMode is None:
+        roundMode = configuration.roundMode
+    configuration = configuration._replace(cache=cache, roundMode=roundMode)
     # Backup existing Summary.pickle files
-    for i in [8, 7, 6, 5, 4, 3, 2, 1, 0]:
+    for i in range(8, -1, -1):
         if os.path.isfile(f'{pickleName}.backup_{i}'):
-            shutil.copyfile(f'{pickleName}.backup_{i}', f'{pickleName}.backup_{i + 1}')
+            shutil.copyfile(f'{pickleName}.backup_{i}', f'{pickleName}.backup_{i+1}')
     if os.path.isfile(pickleName):
         shutil.copyfile(pickleName, f'{pickleName}.backup_0')
     pickle.dump((particles, configuration), open(pickleName, 'wb'))
@@ -942,6 +991,8 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     # For fitting/training we start by default with -1, meaning we still have to create the TrainingDataInformation,
     # which is used to determine the number of candidates we have to write out for the FSP trainings in stage 0.
     # For inference/application we start by default with 0, because we don't need the TrainingDataInformation in stage 0.
+    # RoundMode plays a similar role as cache,
+    # it is used to keep track in which phase within a stage the basf2 execution stops, relevant only for training.
     # During the training we save the particles and configuration (including the current cache stage) in the Summary.pickle object.
     if configuration.training and (configuration.monitor and (configuration.monitoring_path != '')):
         B2ERROR("FEI-core: Custom Monitoring path is not allowed during training!")
@@ -952,9 +1003,18 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
             pickleName = os.path.join(configuration.monitoring_path, pickleName)
 
         if os.path.isfile(pickleName):
-            print("Cache: Replaced particles and configuration with the ones from Summary.pickle!")
-            particles, configuration = pickle.load(open(pickleName, 'rb'))
+            particles_bkp, config_bkp = pickle.load(open(pickleName, 'rb'))
+            # check if configuration changed
+            for fd in configuration._fields:
+                if fd == 'cache' or fd == 'roundMode':
+                    continue
+                if getattr(configuration, fd) != getattr(config_bkp, fd):
+                    B2WARNING(
+                        f"FEI-core: Configuration changed: {fd} from {getattr(config_bkp, fd)} to {getattr(configuration, fd)}")
+
+            configuration = config_bkp
             cache = configuration.cache
+            print("Cache: Replaced particles from steering and configuration from Summary.pickle: ", cache, configuration.roundMode)
         else:
             if configuration.training:
                 cache = -1
@@ -989,7 +1049,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
         path.add_path(training_data_information.reconstruct())
         if configuration.training:
             save_summary(particles, configuration, 0)
-        return FeiState(path, 0, [])
+        return FeiState(path, 0, [], [], [])
     elif not configuration.training and configuration.monitor:
         path.add_path(training_data_information.reconstruct())
 
@@ -1024,26 +1084,64 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     # intermediate output of RootOutput.
     used_lists = []
     for stage, stage_particles in enumerate(stages):
+        if len(stage_particles) == 0:
+            print(f"Stage {stage}: No particles to reconstruct in this stage, skipping!")
+            continue
+
         pre_reconstruction = PreReconstruction(stage_particles, configuration)
-        if cache <= stage:
+        post_reconstruction = PostReconstruction(stage_particles, configuration)
+
+        if stage >= cache:
             print(f"Stage {stage}: PreReconstruct particles: ", [p.name for p in stage_particles])
             path.add_path(pre_reconstruction.reconstruct())
+            if configuration.training and not (post_reconstruction.available() and configuration.roundMode == 0):
+                print(f"Stage {stage}: Create training data for particles: ", [p.name for p in stage_particles])
+                mc_counts = training_data_information.get_mc_counts()
+                training_data = TrainingData(stage_particles, configuration, mc_counts)
+                path.add_path(training_data.reconstruct())
+                used_lists += [channel.name for particle in stage_particles for channel in particle.channels]
+                break
 
-        post_reconstruction = PostReconstruction(stage_particles, configuration)
-        if configuration.training and not post_reconstruction.available():
-            print(f"Stage {stage}: Create training data for particles: ", [p.name for p in stage_particles])
-            mc_counts = training_data_information.get_mc_counts()
-            training_data = TrainingData(stage_particles, configuration, mc_counts)
-            path.add_path(training_data.reconstruct())
-            used_lists += [channel.name for particle in stage_particles for channel in particle.channels]
-            break
-        if cache <= stage + 1:
-            path.add_path(post_reconstruction.reconstruct())
         used_lists += [particle.identifier for particle in stage_particles]
+        if (stage >= cache - 1) and not ((configuration.roundMode == 1) and configuration.training):
+            if (configuration.roundMode == 3) and configuration.training:
+                print(f"Stage {stage}: BDTs already applied for particles, no postReco needed: ", [p.name for p in stage_particles])
+            else:
+                print(f"Stage {stage}: Apply BDT for particles: ", [p.name for p in stage_particles])
+                if configuration.training and not post_reconstruction.available():
+                    raise RuntimeError("FEI-core: training of current stage was not successful, please retrain!")
+                path.add_path(post_reconstruction.reconstruct())
+            if (((configuration.roundMode == 2) or (configuration.roundMode == 3)) and configuration.training):
+                break
+    fsps_of_all_stages = [fsp for sublist in get_stages_from_particles(loader.get_fsp_lists()) for fsp in sublist]
+
+    excludelists = []
+    if configuration.training and (configuration.roundMode == 3):
+        dontRemove = used_lists + fsps_of_all_stages
+        # cleanup higher stages
+        cleanup = basf2.register_module('RemoveParticlesNotInLists')
+        print("FEI-REtrain: pruning basf2_input.root of higher stages")
+        cleanup.param('particleLists', dontRemove)
+        path.add_module(cleanup)
+
+        # check which lists we have to exclude from the output
+        import ROOT  # noqa
+        excludedParticlesNonConjugated = [p.identifier for p in particles if p.identifier not in dontRemove]
+        excludedParticles = [
+            str(name) for name in list(
+                ROOT.Belle2.ParticleListName.addAntiParticleLists(excludedParticlesNonConjugated))]
+        root_file = ROOT.TFile.Open('basf2_input.root', "READ")
+        tree = root_file.Get('tree')
+        for branch in tree.GetListOfBranches():
+            branchName = branch.GetName()
+            if any(exParticle in branchName for exParticle in excludedParticles):
+                excludelists.append(branchName)
+        print("Exclude lists from output: ", excludelists)
 
     # If we run in monitor mode we are interested in the ModuleStatistics,
     # these statistics contain the runtime for each module which was run.
     if configuration.monitor:
+        print("Add ModuleStatistics")
         output = basf2.register_module('RootOutput')
         output.param('outputFileName', os.path.join(configuration.monitoring_path, 'Monitor_ModuleStatistics.root'))
         output.param('branchNames', ['EventMetaData'])  # cannot be removed, but of only small effect on file size
@@ -1054,9 +1152,10 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     # As mentioned above the FEI keeps track of the stages which are already reconstructed during the training
     # so we write out the Summary.pickle here, and increase the stage by one.
     if configuration.training or configuration.monitor:
-        save_summary(particles, configuration, stage + 1, pickleName=os.path.join(configuration.monitoring_path, 'Summary.pickle'))
+        print("Save Summary.pickle")
+        save_summary(particles, configuration, stage+1, pickleName=os.path.join(configuration.monitoring_path, 'Summary.pickle'))
 
     # Finally we return the path, the stage and the used lists to the user.
-    return FeiState(path, stage + 1, plists=used_lists)
+    return FeiState(path, stage+1, plists=used_lists, fsplists=fsps_of_all_stages, excludelists=excludelists)
 
 # @endcond

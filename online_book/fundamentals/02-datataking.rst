@@ -19,7 +19,7 @@ Data Taking
     * Know the difference between proc and prompt data processing 
 
 One of the most important steps is of course to record the data we want to
-analyse. In this chapter we will go through the important concepts of the Belle
+analyse. In this chapter, we will go through the important concepts of the Belle
 II detector and how we record data. Understanding these concepts is fundamental
 for any analysis.
 
@@ -87,16 +87,16 @@ of the physics program.
 The detector is built around the interaction region, with the goal to
 detect and measure as many of the particles produced in the SuperKEKB collisions
 as possible. Belle II consists of several sub-systems, each one dedicated to a
-specific task: reconstruct the trajectory of charged track, reconstruct the
-energy of photons, identify the particle type or to identify muons and
-reconstruct long-living hadrons. Of course some systems can be used for
+specific task: reconstruct the trajectory of charged tracks, reconstruct the
+energy of photons, identify the particle type, or identify muons and
+reconstruct long-living hadrons. Of course, some systems can be used for
 multiple purposes: for example, the ECL is mainly intended as a device to
 reconstruct photons, but is also used to identify electrons and hadrons.
 
 Due to the asymmetry of the SuperKEKB collisions, the detector is
 asymmetric along the beam axis. In the context of Belle II the "forward"
-direction is the direction in which the high energy electron beam points, while "backward"
-is the direction in which the lower energy positron beam points.
+direction is the direction in which the high energy electron beam points, 
+while "backward" is the direction in which the lower energy positron beam points.
 
 .. seealso::
 
@@ -111,6 +111,8 @@ is the direction in which the lower energy positron beam points.
 
     Nonetheless you should know what it is, because people might mention it.
     You may need to reference it in your thesis.
+
+    Similarly, you can see the SuperKEKB technical design here: `link <https://www-linac.kek.jp/linac-com/report/skb-tdr/>`_
 
 .. figure:: detector_labeled.jpg
     :align: center
@@ -130,9 +132,9 @@ Beam Pipe
     a major source of noise for the innermost detector, the PXD.
 
 PXD
-    The first active system met by the particles that emerge form the IP is the
-    PiXel Detector (PXD). With this Pixel detector can measure the position of
-    each particle going through this detector with very high precision and thus,
+    The first active system met by the particles that emerge from the interaction point 
+    (IP) is the PiXel Detector (PXD). With this, PXD can measure the position 
+    of each particle going through this detector with very high precision and thus,
     when combining different particles, get a very precise determination where
     these particles intersect. This intersection is called vertex and is usually
     where all the particles originate from: either the place of collision or
@@ -141,7 +143,7 @@ PXD
     You can think of the PXD as the inner vertex detector. The PXD is
     constructed from DEPFET silicon sensors segmented into individual 8 million
     pixels of down to 50 × 55 μm² size. It consists of two layers at 14 mm and
-    22 mm radius from the interaction point.
+    22 mm radius from the IP.
 
 SVD
     The Silicon Vertex Detector (SVD) is the outer part of the vertex detector.
@@ -156,13 +158,17 @@ SVD
     The four layers of the SVD system extend the outer radius of the vertex
     detector up to 140 mm.
 
+.. seealso::
+
+    For those who are brave enough, see Belle II's SVD Paper: `arXiv:2201.09824 <https://arxiv.org/abs/2201.09824>`_.
+
 .. _vxd-description:
 
 VXD
     You will occasionally hear people refer to the pair of detectors: PXD+SVD as
     the VerteX Detector (VXD). If you look at :numref:`fig:fundamentals_vxd` you
     can see that this does make sense as both systems are closely integrated
-    with almost no space between them. Technically they are also installed
+    with almost no space between them. Technically, they are also installed
     together as one unit.
 
 .. _fig:fundamentals_vxd:
@@ -230,6 +236,9 @@ CDC
     :numref:`fig:reconstruction-trackfinding`) . This allows for a much better
     point resolution than the wire spacing alone might let you assume.
 
+    In addition, these ionisation signals yield energy loss (dE/dx) measurements, 
+    which are used in particle identification.
+
 .. _fig:fundamentals_CDC:
 .. figure:: cdc.jpg
     :align: center
@@ -267,10 +276,17 @@ TOP
 
     Internal reflection of a laser inside one of the 16 bars of the TOP detector.
 
+.. seealso::
+
+    If you have the time and interest for it, there is a dedicated TOP paper
+    linked below. It covers TOP's hardware, operations, and performance. 
+
+    Belle II's TOP Paper: `arXiv:2504.19090 <https://arxiv.org/abs/2504.19090>`_.
+
 ARICH
     The Aerogel Ring-Imaging Cherenkov detector is another dedicated particle
-    identification subdetector using aerogel as its radiator medium. It covers
-    the forward region of the detector.
+    identification subdetector using two layers of aerogel as its radiator medium. 
+    It covers the forward region of the detector.
 
     Just as with the quartz in TOP, Cherenkov photons are emitted when a charged particle
     of sufficient velocity passes through the aerogel. Contrary to the TOP quartz, the
@@ -321,6 +337,41 @@ ARICH
     However they do loose hermiticity so they sacrifice the possibility to do
     some analysis.
 
+.. admonition:: Optional Question
+    :class: exercise stacked
+
+    Why do we use two different layers of aerogel? Note that the two layers have
+    different indices of refraction (:math:`n_1 =  1.045, n_2 =  1.055`)
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Consider the one layer case, where you have the width :math:`d` of the aerogel layer 
+    and a distance :math:`L` from the aerogel layer to the detection plane. 
+
+.. admonition:: Another hint
+    :class: toggle xhint stacked
+
+    Along with the implied geometric optics exercise, one should to consider the
+    light yield...
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    It is an optimization problem between light yield and resolution. 
+
+    For a fixed layer width :math:`d`, having a single layer with :math:`n_1` would generate 
+    a ring with width :math:`d\tan\theta_1`, which would limit our resolution for a 
+    fixed light yield. 
+
+    If we choose :math:`n_2 > n_1` such that :math:`L\tan\theta_2 = (L+d)\tan\theta_1`, the 
+    two rings can overlap in such a way to minimize the ring width for a fixed light yield. 
+
+    The values of :math:`n_1` and :math:`n_2` were tuned for 1-4 GeV/c pions. 
+
+    For those who would like to read more, see `arXiv:0504220 <https://arxiv.org/abs/physics/0504220>`_ 
+    and `arXiv:0603022. <https://arxiv.org/abs/physics/0603022>`_ 
+
 ECL
     The Electromagnetic Calorimeter (ECL) is chiefly tasked with measuring the
     electromagnetic energy of photons and electrons produced in the collision.
@@ -331,10 +382,10 @@ ECL
     through as a minimum-ionising particle. It therefore provides further
     orthogonal information to the particle-identification system.
 
-    The ECL consists of over 8000 Caesium Iodide crystals which create
-    scintillation light when a particle flies into them. The amount of
-    light is proportional to the energy deposited in the crystal so by measuring
-    it we can measure the energy of the the particle. Of course this assumes the
+    The ECL consists of over 8000 Caesium Iodide crystals (doped with thallium) 
+    which create scintillation light when a particle flies into them. The amount
+    of light is proportional to the energy deposited in the crystal so by measuring
+    it we can measure the energy of the the particle. Of course, this assumes the
     particle is fully stopped and deposits all of its energy in the ECL. This is
     not true for most particles so we need to calibrate the light response to
     energy measurements.
@@ -349,11 +400,40 @@ ECL
     the preamps (which you can't see) to the cables that go to the ShaperDSPs.
     You can also see the cooling lines under the boards.
 
+Superconducting Solenoid
+    While not a detector material, we would be remiss to not mention the existence
+    of our superconducting solenoid, which generates a 1.5T magnetic field that is 
+    invaluable for tracking. 
+
+
 KLM
-    Finally, there is the KLong and Muon (KLM) system.
-    The KLM provides muon identification information to tracks that pass
+    Last but definitely not least, there is the KLong and Muon (KLM) system.
+    KLM provides muon identification information to tracks that pass
     through all other subdetectors and also reconstructs :math:`K_L^0` s from
-    the collision.
+    the :math:`e^+e^-` collision.
+
+    KLM consists of alternating layers of iron and active detector material,
+    where the iron provides the material for :math:`K_L^0` s to interact with 
+    (≥3.9 interaction lengths, on top of ECL's 0.8 interaction lengths). 
+    The iron also acts as a magnetic flux return for the solenoid. 
+    In the endcaps and first two layers of the barrel, scintillators are used.
+    For the rest of the barrel, resistive plate capacitors (RPCs) are used.
+
+.. admonition:: Question
+    :class: exercise stacked
+
+    What about the KLM allows it to identify muons? 
+
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    As a minimally ionised particle, it is the only particle that would pass
+    through multiple layers of iron (for :math:`E > 1` GeV) while leaving signals
+    in the active detector material layers. A minor complication is for :math:`E < 1` GeV, 
+    there is a good chance of muons being stopped by an iron layer. This is the
+    reason why pions with a similar energy could fake muon signals. 
+
 
 .. seealso::
 
@@ -438,8 +518,8 @@ Non-4S
 Triggers and filters
 --------------------
 
-SuperKEKB bunches can cross the interaction region up to every 4 ns. However, in
-the vast majority of cases either no collision (more precisely: no hard
+SuperKEKB bunches can cross the interaction region up to every 4 ns. However, 
+in the vast majority of cases either no collision (more precisely: no hard
 interaction) takes place at all, or the collision results are not interesting
 (for example :math:`e^+e^-\to e^+e^-` events are the most common, but of
 secondary interest to our physics program).
@@ -535,11 +615,11 @@ Since Bhabhas are easily identified even with the limited information available
 to the TRG system, the TRG system will not issue a trigger for every single
 identified Bhabha event, but only for a configurable fraction. This technique of
 intentionally issuing triggers only for fractions of a given event class is
-named prescaling. When working on your own analysis, it is very important to
+named **prescaling**. When working on your own analysis, it is very important to
 keep in mind potential prescaling of the triggers that yield the events you use
 in your analysis. Since the prescaling settings can (and will) change over
 the lifetime of the experiment, updated numbers for each run can be
-found `here <https://xwiki.desy.de/xwiki/rest/p/2471f>`_.. See also
+found `here <https://xwiki.desy.de/xwiki/rest/p/2471f>`_. See also
 `this question <https://questions.belle2.org/question/9437/where-to-find-pre-scaling-factors/>`_.
 for more details.
 
@@ -600,4 +680,5 @@ Oskar Hartbrich,
 Michael Eliachevitch,
 Sam Cunliffe,
 Priyanka Cheema,
-Stefano Lacaprara
+Stefano Lacaprara,
+Tommy Lam

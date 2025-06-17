@@ -36,8 +36,7 @@ namespace Belle2 {
 
     /**
      * Set the factors in the list
-     * @param iCLayer laerID(0-55) or wireID
-     * @param factors factors
+     * @param inputScales factors
      */
     void setFactors(const std::array<std::array<float, c_nAlphaBins>, c_nLayers>& inputScales)
     {

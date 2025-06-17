@@ -6,9 +6,7 @@ Flavor tagging
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 10 min
-
-    **Exercises**: 15 min
+    **Length**: 30-45 min
 
     **Prerequisites**:
 

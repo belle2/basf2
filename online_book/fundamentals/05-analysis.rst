@@ -6,7 +6,7 @@ Analysis
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 30 minutes
+    **Length**: 30-45 min
 
     **Prerequisites**:
 

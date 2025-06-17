@@ -440,7 +440,7 @@ Parameters:
 Warning:
     it's still possible to modify `globaltags` after this call.
 )DOC")
-    .def("disable_globaltag_replay", &Configuration::disableGlobalTagReplay, R"DOC("disable_globaltag_replay()
+    .def("disable_globaltag_replay", &Configuration::disableGlobalTagReplay, R"DOC(disable_globaltag_replay()
 
 Disable global tag replay and revert to the old behavior that the default
 globaltag will be used if no other globaltags are specified.

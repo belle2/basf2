@@ -79,18 +79,18 @@ void PXDROIDQMModule::defineHisto()
       // Only interested in PXD sensors
 
       TString buff = (std::string)avxdid;
-      TString bufful = buff;
-      bufful.ReplaceAll(".", "_");
+      TString buffus = buff;
+      buffus.ReplaceAll(".", "_");
 
       int dhh_id = ((avxdid.getLayerNumber() - 1) << 5) | ((avxdid.getLadderNumber()) << 1) | (avxdid.getSensorNumber() - 1);
 
-      hrawROIHLTmapModule[dhh_id] = new TH2F("hrawROIHLTmap_" + bufful,
+      hrawROIHLTmapModule[dhh_id] = new TH2F("hrawROIHLTmap_" + buffus,
                                              "HLT ROI Middle Map  " + buff + ";Ucell;Vcell", 250, 0, 250, 768, 0, 768);
-      hrawROIHLTsizeModule[dhh_id] = new TH2F("hrawROIHLTsize" + bufful,
+      hrawROIHLTsizeModule[dhh_id] = new TH2F("hrawROIHLTsize" + buffus,
                                               "HLT ROI Size Map " + buff + ";Ucell;Vcell",  50, 0, 200, 50, 0, 200);
-      hrawROIDCmapModule[dhh_id] = new TH2F("hrawROIDCmap_" + bufful,
+      hrawROIDCmapModule[dhh_id] = new TH2F("hrawROIDCmap_" + buffus,
                                             "DC ROI Middle Map  " + buff + ";Ucell;Vcell", 250, 0, 250, 768, 0, 768);
-      hrawROIDCsizeModule[dhh_id] = new TH2F("hrawROIDCsize" + bufful,
+      hrawROIDCsizeModule[dhh_id] = new TH2F("hrawROIDCsize" + buffus,
                                              "DC ROI Size Map " + buff + ";Ucell;Vcell",  50, 0, 200, 50, 0, 200);
     }
   }

@@ -26,14 +26,14 @@ namespace Belle2 {
     //! Set Run Number
     void setRunNumber(int start, int end)
     {
-      startRun = start;
-      endRun = end;
+      m_startRun = start;
+      m_endRun = end;
     }
-    //! Set Experiment Number
+    //! Set Experimnet Number
     void setExpNumber(int start, int end)
     {
-      startExp = start;
-      endExp = end;
+      m_startExp = start;
+      m_endExp = end;
     }
 
   public:
@@ -52,13 +52,13 @@ namespace Belle2 {
 
   private:
     //! Start Experiment Number
-    int startExp;
+    int m_startExp;
     //! Start Run Number
-    int startRun;
+    int m_startRun;
     //! End Experiment Number
-    int endExp;
+    int m_endExp;
     //! End Run Number
-    int endRun;
+    int m_endRun;
   };
 } // End namespace Belle2
 #endif

@@ -11,6 +11,9 @@ from torch import nn
 
 
 def save_onnx(model, general_options, specific_options, identifier):
+    """
+    Export a torch model to onnx and write it into a MVA weightfile
+    """
     import basf2  # noqa
     import ROOT
 
@@ -32,7 +35,15 @@ def save_onnx(model, general_options, specific_options, identifier):
 
 
 class TestWriteONNX(unittest.TestCase):
+    """
+    Tests for writing ONNX MVA weightfiles. In addition to testing the writing
+    mechanism, these serve the purpose of creating test files for other unit tests.
+    """
     def create_and_save(self, n_outputs, filename, weights):
+        """
+        Setup some example options for an ONNX MVA weightfile, save it and compare to reference
+        """
+
         # like in mva/tests/all_classifiers.py
         variables = [
             "p",
@@ -76,6 +87,9 @@ class TestWriteONNX(unittest.TestCase):
         self.assertEqual(xml_new, xml_ref)
 
     def test_singleclass(self):
+        """
+        Write example for single output
+        """
         self.create_and_save(
             1,
             "ONNX.xml",
@@ -89,6 +103,9 @@ class TestWriteONNX(unittest.TestCase):
         )
 
     def test_multiclass(self):
+        """
+        Write example for multiclass outputs
+        """
         self.create_and_save(
             2,
             "ONNX_multiclass.xml",

@@ -77,9 +77,16 @@ namespace Belle2 {
     /**
      * View a Dataset's m_input as ONNX Tensor
      * and also set up output buffers/Tensors
+     *
+     * These views will be passed to Ort::Session::Run
      */
     class ONNXTensorView {
     public:
+      /**
+       * Construct a new ONNXTensorView
+       * @param dataset Dataset whose input vector is supposed to be viewed as ONNX tensor
+       * @param nOutputs Number of output values
+       */
       ONNXTensorView(Dataset& dataset, int nOutputs)
         : m_inputShape{1, dataset.getNumberOfFeatures()}, m_outputData(nOutputs),
           m_outputShape{1, nOutputs}, m_memoryInfo(Ort::MemoryInfo::CreateCpu(
@@ -90,15 +97,49 @@ namespace Belle2 {
           m_outputTensor(Ort::Value::CreateTensor<float>(
                            m_memoryInfo, m_outputData.data(), m_outputData.size(),
                            m_outputShape.data(), m_outputShape.size())) {}
+      /**
+       * Get a pointer to the inputTensor
+       */
       Ort::Value* inputTensor() { return &m_inputTensor; }
+
+      /**
+       * Get a pointer to the outputTensor
+       */
       Ort::Value* outputTensor() { return &m_outputTensor; }
+
+      /**
+       * Get a vector of output values (that may have been filled)
+       */
       std::vector<float> outputData() { return m_outputData; }
     private:
+      /**
+       * Shape of the input Tensor
+       */
       std::vector<int64_t> m_inputShape;
+
+      /**
+       * Output Tensor buffer
+       */
       std::vector<float> m_outputData;
+
+      /**
+       * Shape of the output Tensor
+       */
       std::vector<int64_t> m_outputShape;
+
+      /**
+       * MemoryInfo object to be used when constructing the ONNX Tensors - used to specify device (CPU)
+       */
       Ort::MemoryInfo m_memoryInfo;
+
+      /**
+       * The input Tensor
+       */
       Ort::Value m_inputTensor;
+
+      /**
+       * The output Tensor
+       */
       Ort::Value m_outputTensor;
     };
 
@@ -132,11 +173,34 @@ namespace Belle2 {
        */
       void run(ONNXTensorView& view) const;
 
+      /**
+       * Environment object for ONNX session
+       */
       Ort::Env m_env;
+
+      /**
+       * ONNX session configuration
+       */
       Ort::SessionOptions m_sessionOptions;
+
+      /**
+       * The ONNX inference session
+       */
       std::unique_ptr<Ort::Session> m_session;
+
+      /**
+       * Options to be passed to Ort::Session::Run
+       */
       Ort::RunOptions m_runOptions;
+
+      /**
+       * Input tensor names
+       */
       const char* m_inputNames[1] = {"input"};
+
+      /**
+       * Output tensor names
+       */
       const char* m_outputNames[1] = {"output"};
     };
   } // namespace MVA

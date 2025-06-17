@@ -18,7 +18,8 @@ using namespace Belle2;
 void TrackFitterAndDeleter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackFitType"),
-                                m_trackFitType, "The DAF configuration to use.", m_trackFitType);
+                                m_trackFitType, "Type of track fit algorithm to use the corresponding DAFParameter, the list is defined in DAFConfiguration class.",
+                                m_trackFitType);
 }
 
 void TrackFitterAndDeleter::apply(std::vector<RecoTrack*>& recoTracks)

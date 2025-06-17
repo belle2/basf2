@@ -53,8 +53,8 @@ namespace Belle2 {
      */
     void setDAFParameters(DAFConfiguration::ETrackFitType trackFitType,  const DAFParameters* DAFParam)
     {
-      if (DAFParam == NULL) {
-        B2FATAL("Cannot set DAFParameters since the parameter is NULL");
+      if (DAFParam == nullptr) {
+        B2FATAL("Cannot set DAFParameters since the parameter is nullptr");
       }
 
       std::map<DAFConfiguration::ETrackFitType, DAFParameters>::const_iterator it = m_DAFParameters.find(trackFitType);

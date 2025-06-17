@@ -715,24 +715,29 @@ void Belle2::CDCDatabaseImporter::importAlphaScaleFactors(std::string fileName)
   DBImportObjPtr<CDCAlphaScaleFactorForAsymmetry> asf;
   asf.construct();
 
-  std::vector<float> coeffs;
+  std::array<std::array<float, CDCAlphaScaleFactorForAsymmetry::c_nAlphaBins>, CDCAlphaScaleFactorForAsymmetry::c_nLayers>
+  alphaRatios;
 
   std::string line;
   unsigned short iLayer = 0;
   while (std::getline(stream, line)) {
     std::stringstream ss(line);
     std::string value;
+    if (iLayer == CDCAlphaScaleFactorForAsymmetry::c_nLayers)
+      B2FATAL("The number of layers " << iLayer + 1 << " is more than expected " <<
+              CDCAlphaScaleFactorForAsymmetry::c_nLayers << " ! ");
 
-    coeffs.clear();
+    int iElement = 0;
     while (std::getline(ss, value, ',')) {
-      coeffs.push_back(std::stod(value));
+      if (iElement == CDCAlphaScaleFactorForAsymmetry::c_nAlphaBins)
+        B2FATAL("The number of alpha scale factors is " << iElement + 1 << " for layer " << iLayer << ", not equal " <<
+                CDCAlphaScaleFactorForAsymmetry::c_nAlphaBins << " ! ");
+      alphaRatios[iLayer][iElement] = std::stof(value);
+      iElement++;
     }
-    if (coeffs.size() != CDCAlphaScaleFactorForAsymmetry::c_maxNAlphaBins)
-      B2FATAL("The number of alpha scale factors is " << coeffs.size() << " for layer " << iLayer << ", not equal " <<
-              CDCAlphaScaleFactorForAsymmetry::c_maxNAlphaBins << " ! ");
-    asf->setFactors(iLayer, coeffs);
     iLayer++;
   }
+  asf->setFactors(alphaRatios);
 
   stream.close();
 

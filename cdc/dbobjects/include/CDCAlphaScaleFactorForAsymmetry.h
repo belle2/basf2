@@ -24,7 +24,7 @@ namespace Belle2 {
      * Constants
      */
     enum {c_nLayers       = 56,  /**< no. of layers */
-          c_maxNAlphaBins = 150, /**< max. no. of alpha angle bins */
+          c_nAlphaBins = 150, /**< no. of alpha angle bins per layer*/
          };
 
 
@@ -39,9 +39,9 @@ namespace Belle2 {
      * @param iCLayer laerID(0-55) or wireID
      * @param factors factors
      */
-    void setFactors(unsigned short iCLayer, const std::vector<float>& factors)
+    void setFactors(const std::array<std::array<float, c_nAlphaBins>, c_nLayers>& inputScales)
     {
-      m_Scales.insert(std::pair<unsigned short, std::vector<float>>(iCLayer, factors));
+      m_Scales = inputScales;
     }
 
     /**
@@ -49,13 +49,13 @@ namespace Belle2 {
      */
     unsigned short getEntries() const
     {
-      return m_Scales.size();
+      return c_nLayers * c_nAlphaBins ;
     }
 
     /**
      * Get the whole list
      */
-    std::map<unsigned short, std::vector<float>> getFactors() const
+    std::array<std::array<float, c_nAlphaBins>, c_nLayers> getFactors() const
     {
       return m_Scales;
     }
@@ -65,14 +65,11 @@ namespace Belle2 {
      * @param  iCLayer layerID
      * @return fudge factors for the iCLayer
      */
-    const std::vector<float>& getFactors(unsigned short iCLayer) const
+    std::array<float, c_nAlphaBins> getFactors(unsigned short iCLayer) const
     {
-      std::map<unsigned short, std::vector<float>>::const_iterator it = m_Scales.find(iCLayer);
-      if (it != m_Scales.end()) {
-        return it->second;
-      } else {
-        B2FATAL("Specified iCLayer not found in getFactors !");
-      }
+      if (iCLayer >= c_nLayers)
+        B2FATAL("Required iCLayer is invalid ! Should be 0 to 55 .");
+      return m_Scales[iCLayer] ;
     }
 
     /**
@@ -82,22 +79,20 @@ namespace Belle2 {
     {
       std::cout << " " << std::endl;
       std::cout << "Scale factor list" << std::endl;
-      std::cout << "#entries= " << m_Scales.size() << std::endl;
+      std::cout << "#entries= " << c_nLayers* c_nAlphaBins << std::endl;
       std::cout << "the ratio of data to MC for the hit efficiency of positively charged tracks comparing to negitively charged tracks" <<
                 std::endl;
 
-      for (auto const& ent : m_Scales) {
-        std::cout << "Scale factors for Layer " << ent.first << " : ";
-        unsigned short np = (ent.second).size();
-        for (unsigned short i = 0; i < np; ++i) {
-          std::cout << " Layer: " << ent.first << " Alpha in ( " << i * 0.01 << " , " << (i + 1) * 0.01 << " ), Scale factor: "  <<
-                    (ent.second)[i] << std::endl;
+      for (unsigned short iLayer = 0; iLayer < c_nLayers; iLayer++) {
+        std::cout << "Scale factors for Layer " << iLayer << " : " << std::endl;
+        for (unsigned short i = 0; i < c_nAlphaBins; ++i) {
+          std::cout << " Alpha in ( " << i * 0.01 << " , " << (i + 1) * 0.01 << " ), Scale factor: "  << m_Scales[iLayer][i] << std::endl;
         }
       }
     }
 
   private:
-    std::map<unsigned short, std::vector<float>> m_Scales; /**< scale factors */
+    std::array<std::array<float, c_nAlphaBins>, c_nLayers> m_Scales; /**< scale factors */
 
     ClassDef(CDCAlphaScaleFactorForAsymmetry, 1); /**< ClassDef */
   };

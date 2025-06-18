@@ -277,6 +277,14 @@ void CDCDigitizerModule::initialize()
     B2FATAL("CDCCorrToThresholds invalid!");
   }
 
+  if (m_alphaCorrection) {
+    m_alphaScaleFactorsFromDB = new DBObjPtr<CDCAlphaScaleFactorForAsymmetry>;
+    if ((*m_alphaScaleFactorsFromDB).isValid()) {
+    } else {
+      B2FATAL("CDCAlphaScaleFactorForAsymmetry invalid!");
+    }
+  }
+
 #if defined(CDC_DEBUG)
   cout << " " << endl;
   cout << "CDCDigitizer initialize" << endl;
@@ -701,7 +709,7 @@ void CDCDigitizerModule::event()
       if (alpha_bin > 75) alpha_bin = 75;
       if (alpha_bin < -75) alpha_bin = -75;
       if (alpha_bin < 0) alpha_bin = -1 * (alpha_bin) + 1;
-      double Scale = m_alphaRatios[iLayer][alpha_bin];
+      double Scale = (*m_alphaScaleFactorsFromDB)->getFactors(iLayer)[alpha_bin];
       double random = gRandom->Uniform();
       if ((Scale < 1) && (alpha > 0)) {
         if (random > Scale) continue ; // remove this hit

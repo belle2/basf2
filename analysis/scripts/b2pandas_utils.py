@@ -72,8 +72,9 @@ class VariablesToTable(basf2.Module):
         self._listname = listname
         #: List of variables
         self._variables = list(set(variables))
-        #: Output format
+        #: File type
         file_type = self._filename.split(".")[-1]
+        #: Output format
         if file_type in ["csv"]:
             self._format = "csv"
         elif file_type in ["parquet", "pq"]:

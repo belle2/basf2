@@ -13,6 +13,7 @@
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/EventKinematics.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
@@ -209,6 +210,38 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function useDaughterRestFrame.");
+      }
+    }
+
+    Manager::FunctionPtr useDaughterRecoilRestFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() >= 2) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var, arguments](const Particle * particle) -> double {
+
+          // Sum of the 4-momenta of all the selected daughters
+          ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
+
+          for (unsigned int i = 1; i < arguments.size(); i++)
+          {
+            auto generalizedIndex = arguments[i];
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            if (dauPart)
+              pSum +=  dauPart->get4Vector();
+            else
+              return Const::doubleNaN;
+          }
+          PCmsLabTransform T;
+          ROOT::Math::PxPyPzEVector recoil = T.getBeamFourMomentum() - pSum;
+          /* Let's use 0 as PDG code to avoid wrong assumptions. */
+          Particle pRecoil(recoil, 0);
+          UseReferenceFrame<RestFrame> frame(&pRecoil);
+          double result = std::get<double>(var->function(particle));
+          return result;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function useDaughterRecoilRestFrame.");
       }
     }
 
@@ -1187,6 +1220,82 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr angleBetweenDaughterAndRecoil(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() >= 1) {
+
+        auto func = [arguments](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return Const::doubleNaN;
+
+          const auto& frame = ReferenceFrame::GetCurrent();
+
+          ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
+          for (auto& generalizedIndex : arguments)
+          {
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            if (dauPart) pSum += frame.getMomentum(dauPart);
+            else {
+              B2WARNING("Trying to access a daughter that does not exist. Index = " << generalizedIndex);
+              return Const::doubleNaN;
+            }
+          }
+
+          PCmsLabTransform T;
+          ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum(); // Initial state (e+e- momentum in LAB)
+          ROOT::Math::PxPyPzEVector pRecoil = frame.getMomentum(pIN - particle->get4Vector());
+
+          return ROOT::Math::VectorUtil::Angle(pRecoil, pSum);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function angleBetweenDaughterAndRecoil");
+      }
+    }
+
+    Manager::FunctionPtr angleBetweenDaughterAndMissingMomentum(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() >= 1) {
+        auto func = [arguments](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return Const::doubleNaN;
+
+          StoreObjPtr<EventKinematics> evtShape;
+          if (!evtShape)
+          {
+            B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
+            return Const::doubleNaN;
+          }
+          ROOT::Math::XYZVector missingMomentumCMS = evtShape->getMissingMomentumCMS();
+          ROOT::Math::PxPyPzEVector missingTotalMomentumCMS(missingMomentumCMS.X(),
+                                                            missingMomentumCMS.Y(),
+                                                            missingMomentumCMS.Z(),
+                                                            evtShape->getMissingEnergyCMS());
+          PCmsLabTransform T;
+          ROOT::Math::PxPyPzEVector missingTotalMomentumLab = T.rotateCmsToLab() * missingTotalMomentumCMS;
+
+          const auto& frame = ReferenceFrame::GetCurrent();
+          ROOT::Math::PxPyPzEVector pMiss = frame.getMomentum(missingTotalMomentumLab); // transform from lab to reference frame
+
+          ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
+          for (auto& generalizedIndex : arguments)
+          {
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            if (dauPart) pSum += frame.getMomentum(dauPart);
+            else {
+              B2WARNING("Trying to access a daughter that does not exist. Index = " << generalizedIndex);
+              return Const::doubleNaN;
+            }
+          }
+
+          return ROOT::Math::VectorUtil::Angle(pMiss, pSum);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function angleBetweenDaughterAndMissingMomentum");
+      }
+    }
+
     Manager::FunctionPtr daughterAngle(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2 || arguments.size() == 3) {
@@ -1567,6 +1676,39 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function pValueCombination");
+      }
+    }
+
+    Manager::FunctionPtr pValueCombinationOfDaughters(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          double pValueProduct = 1.;
+          if (particle->getNDaughters() == 0)
+          {
+            return Const::doubleNaN;
+          }
+
+          for (unsigned j = 0; j < particle->getNDaughters(); ++j)
+          {
+            double pValue = std::get<double>(var->function(particle->getDaughter(j)));
+            if (pValue < 0) return -1;
+            else pValueProduct *= pValue;
+          }
+
+          double pValueSum = 1.;
+          double factorial = 1.;
+          for (unsigned int i = 1; i < particle->getNDaughters(); ++i)
+          {
+            factorial *= i;
+            pValueSum += pow(-std::log(pValueProduct), i) / factorial;
+          }
+          return pValueProduct * pValueSum;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function pValueCombinationOfDaughters");
       }
     }
 
@@ -3467,6 +3609,12 @@ Specifying the lab frame is useful in some corner-cases. For example:
 		      "of the first daughter (0). If the daughter index is invalid, it returns NaN.\n"
 		      "If two or more indices are given, the rest frame of the sum of the daughters is used.",
 		      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useDaughterRecoilRestFrame(variable, daughterIndex_1, [daughterIndex_2, ... daughterIndex_3])", useDaughterRecoilRestFrame,
+                      "Returns the value of the variable in the rest frame of the recoil of the selected daughter particle.\n"
+          "The daughter is identified via generalized daughter index, e.g. ``0:1`` identifies the second daughter (1) "
+          "of the first daughter (0). If the daughter index is invalid, it returns NaN.\n"
+          "If two or more indices are given, the rest frame of the sum of the daughters is used.",
+          Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("useMCancestorBRestFrame(variable)", useMCancestorBRestFrame,
                       "Returns the value of the variable in the rest frame of the ancestor B MC particle.\n"
                       "If no B or no MC-matching is found, it returns NaN.", Manager::VariableDataType::c_double);
@@ -3685,6 +3833,42 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
                       "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
                       "E.g. ``daughterMotherNormDiffOf(1, p)`` returns the normalized momentum difference between the given particle and its second daughter in the lab frame.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("angleBetweenDaughterAndRecoil(daughterIndex_1, daughterIndex_2, ... )", angleBetweenDaughterAndRecoil, R"DOC(
+                       Returns the angle between the momentum recoiling against the particle and the sum of the momenta of the given daughters.
+                       The unit of the angle is ``rad``.
+
+                       The particles are identified via generalized daughter indexes, which are simply colon-separated lists of
+                       daughter indexes, ordered starting from the root particle. For example, ``0:1:3``  identifies the fourth
+                       daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply
+                       identifies the second daughter of the root particle.
+
+                       At least one generalized index has to be given to ``angleBetweenDaughterAndRecoil``. 
+
+                       .. tip::
+                           ``angleBetweenDaughterAndRecoil(0)`` will return the angle between pRecoil and the momentum of the first daughter.
+
+                           ``angleBetweenDaughterAndRecoil(0, 1)`` will return the angle between pRecoil and the sum of the momenta of the first and second daughter.
+
+                           ``angleBetweenDaughterAndRecoil(0:0, 3:0)`` will return the angle between pRecoil and the sum of the momenta of the: first daughter of the first daughter, and
+                           the first daughter of the fourth daughter.)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("angleBetweenDaughterAndMissingMomentum(daughterIndex_1, daughterIndex_2, ... )", angleBetweenDaughterAndMissingMomentum, R"DOC(
+                      Returns the angle between the missing momentum in the event and the sum of the momenta of the given daughters.
+                      The unit of the angle is ``rad``. EventKinematics module has to be called to use this.
+
+                      The particles are identified via generalized daughter indexes, which are simply colon-separated lists of
+                      daughter indexes, ordered starting from the root particle. For example, ``0:1:3``  identifies the fourth
+                      daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply
+                      identifies the second daughter of the root particle.
+
+                      At least one generalized index has to be given to ``angleBetweenDaughterAndMissingMomentum``. 
+
+                      .. tip::
+                          ``angleBetweenDaughterAndMissingMomentum(0)`` will return the angle between missMom and the momentum of the first daughter.
+
+                          ``angleBetweenDaughterAndMissingMomentum(0, 1)`` will return the angle between missMom and the sum of the momenta of the first and second daughter.
+
+                          ``angleBetweenDaughterAndMissingMomentum(0:0, 3:0)`` will return the angle between missMom and the sum of the momenta of the: first daughter of the first daughter, and
+                          the first daughter of the fourth daughter.)DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("daughterAngle(daughterIndex_1, daughterIndex_2[, daughterIndex_3])", daughterAngle, R"DOC(
                        Returns the angle in between any pair of particles belonging to the same decay tree.
                        The unit of the angle is ``rad``.
@@ -3790,6 +3974,9 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "The first variable is returned if the particle passes the cut, and the second variable is returned otherwise.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pValueCombination(p1, p2, ...)", pValueCombination,
                       "Returns the combined p-value of the provided p-values according to the formula given in `Nucl. Instr. and Meth. A 411 (1998) 449 <https://doi.org/10.1016/S0168-9002(98)00293-9>`_ .\n"
+                      "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("pValueCombinationOfDaughters(variable)", pValueCombinationOfDaughters,
+                      "Returns the combined p-value of the daughter p-values according to the formula given in `Nucl. Instr. and Meth. A 411 (1998) 449 <https://doi.org/10.1016/S0168-9002(98)00293-9>`_ .\n"
                       "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"

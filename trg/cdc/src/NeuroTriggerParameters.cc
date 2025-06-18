@@ -131,6 +131,10 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
       SLpatternMask = read1dArray<unsigned long>(key, locked);
     } else if (par == "precision")    {
       precision = read1dArray<unsigned>(key, locked);
+    } else if (par == "AdditionWireMode") {
+      AdditionWireMode =  std::stoul(key);
+    } else if (par == "AdditionInputPerSL") {
+      AdditionInputPerSL =  std::stoul(key);
     }
   }
 }
@@ -312,6 +316,21 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
     savestream << print1dArray<unsigned>("precision", precision);
     savestream  << std::endl;
   } else {savestream << "precision = [12, 8, 8, 12, 10, 10]" << std::endl;}
+  savestream << "# Set Addition Wire output mode, 0 for default mode, 1 for full hits case and 2 for selected hits case" <<
+             std::endl;
+  if (AdditionWireMode.isSet()) {
+    savestream << "AdditionWireMode " << (AdditionWireMode.isLocked() ? "== " : "= ") << AdditionWireMode << std::endl;
+    savestream  << std::endl;
+  } else {savestream << "AdditionWireMode = 0" << std::endl;}
+  savestream <<
+             "# Only used when AdditionWireMode != 0, if mode ==1 , InputPerSL can be 11 (only drift time) and 22 (drift time + ADC ); if mode ==2, InputPerSL can be 3 * n , n equal to the number of wire selected "
+             <<
+             std::endl;
+  if (AdditionInputPerSL.isSet()) {
+    savestream << "AdditionInputPerSL " << (AdditionInputPerSL.isLocked() ? "== " : "= ") << AdditionInputPerSL << std::endl;
+    savestream  << std::endl;
+  } else {savestream << "AdditionInputPerSL = 0" << std::endl;}
+
   savestream.close();
 }
 

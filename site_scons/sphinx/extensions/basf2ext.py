@@ -218,7 +218,7 @@ class VariableListDirective(Directive):
                 continue
             if regex_filter and not regex_filter.match(var.name):
                 continue
-            if desc_regex_filter and not desc_regex_filter.match(var.description):
+            if desc_regex_filter and not desc_regex_filter.match(str(var.description)):
                 continue
             all_variables.append(var)
 

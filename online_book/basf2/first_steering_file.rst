@@ -6,9 +6,7 @@ First steering file
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 30 min
-
-    **Exercises**: 90 min
+    **Length**: 1.5-3 hrs
 
     **Prerequisites**:
 

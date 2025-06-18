@@ -19,6 +19,10 @@
 #include <map>
 #include <utility>
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -30,7 +34,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
   m_tdcBinWidth(1.0), m_tdcBinWidthInv(1.0),
   m_tdcResol(0.9825), m_driftV(4.0e-3),
-  m_driftVInv(250.0), m_propSpeedInv(27.25), m_align(true)
+  m_driftVInv(250.0), m_propSpeedInv(27.25), m_alphaCorrection(false), m_align(true)
 {
   // Set description
   setDescription("Creates CDCHits from CDCSimHits.");
@@ -681,6 +685,30 @@ void CDCDigitizerModule::event()
     if (!m_outputNegativeDriftTime &&
         iterSignalMap->second.m_driftTime < 0.) {
       continue;
+    }
+
+    //apply correction on alpha, to calibrate the charge asymmetry at hit-level
+    if (m_alphaCorrection) {
+      int iHits = iterSignalMap->second.m_simHitIndex;
+      m_aCDCSimHit = m_simHits[iHits];
+      m_posWire  = m_aCDCSimHit->getPosWire();
+      m_momentum = m_aCDCSimHit->getMomentum();
+      int iLayer = m_aCDCSimHit->getWireID().getICLayer();
+      double alpha = m_cdcgp->getAlpha(m_posWire, m_momentum);
+      if (alpha > (M_PI / 2)) alpha = alpha - M_PI;
+      if (alpha < -(M_PI / 2)) alpha = alpha + M_PI;
+      int alpha_bin = floor(alpha / 0.01);
+      if (alpha_bin > 75) alpha_bin = 75;
+      if (alpha_bin < -75) alpha_bin = -75;
+      if (alpha_bin < 0) alpha_bin = -1 * (alpha_bin) + 1;
+      double Scale = m_alphaRatios[iLayer][alpha_bin];
+      double random = gRandom->Uniform();
+      if ((Scale < 1) && (alpha > 0)) {
+        if (random > Scale) continue ; // remove this hit
+      }
+      if ((Scale > 1) && (alpha < 0)) {
+        if (random > 1. / Scale) continue ; // remove this hit
+      }
     }
 
     //N.B. No bias (+ or -0.5 count) is introduced on average in digitization by the real TDC (info. from KEK electronics division). So round off (t0 - drifttime) below.

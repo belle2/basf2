@@ -237,7 +237,7 @@ namespace Belle2 {
     double m_overallGainFactor = 1.;  /**< Overall gain factor. */
     double m_degOfSPEOnThreshold = 0; /**< Degree of space charge effect on timing threshold */
     //--- Parameters for alpha correction -------------------------------------------------------------------------------------
-    bool m_alphaCorrection;
+    bool m_alphaCorrection; /**< Switch for alpha correction */
     DBObjPtr<CDCAlphaScaleFactorForAsymmetry>* m_alphaScaleFactorsFromDB =
       nullptr; /**< the ratio of data to MC, for eff(alpha<0)/eff(alpha>0). */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------

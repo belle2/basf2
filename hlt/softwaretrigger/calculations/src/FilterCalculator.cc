@@ -416,11 +416,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     const MaximumPtTrack& negativeTrack = *maximumPCmsTracksC.at(-1);
     const MaximumPtTrack& positiveTrack = *maximumPCmsTracksC.at(1);
 
-    double dphi = std::abs(negativeTrack.p4CMS.Phi() - positiveTrack.p4CMS.Phi()) * TMath::RadToDeg();
-    if (dphi > 180) {
-      dphi = 360 - dphi;
-    }
-    calculationResult["dPhiCmsC"] = dphi;
+    calculationResult["dPhiCmsC"] = std::abs(ROOT::Math::VectorUtil::DeltaPhi(negativeTrack.p4CMS,
+                                             positiveTrack.p4CMS)) * TMath::RadToDeg();
   }
 
 

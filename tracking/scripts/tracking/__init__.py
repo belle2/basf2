@@ -291,6 +291,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                                   trackFitHypotheses=trackFitHypotheses,
                                                   reco_tracks=reco_tracks,
                                                   add_mva_quality_indicator=add_recoTrack_QI)
+    # estimate the track time
+    path.add_module('TrackTimeEstimator')
 
 
 def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, reco_tracks="RecoTracks",
@@ -338,9 +340,6 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     if kink_finding:
         path.add_module('KinkFinder', RecoTracks=reco_tracks, CopiedRecoTracks=kinkfinder_temporary_RecoTracks)
         temporary_reco_track_list.append(kinkfinder_temporary_RecoTracks)
-
-    # estimate the track time
-    path.add_module('TrackTimeEstimator')
 
     add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
                    use_second_cdc_hits=use_second_cdc_hits)

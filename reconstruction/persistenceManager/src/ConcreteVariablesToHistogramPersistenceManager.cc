@@ -1,5 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #include <reconstruction/persistenceManager/ConcreteVariablesToHistogramPersistenceManager.h>
-// #include <reconstruction/persistenceManager/Types.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>

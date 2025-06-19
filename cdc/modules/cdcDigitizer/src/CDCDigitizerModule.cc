@@ -19,7 +19,6 @@
 #include <map>
 #include <utility>
 
-#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -34,7 +33,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
   m_tdcBinWidth(1.0), m_tdcBinWidthInv(1.0),
   m_tdcResol(0.9825), m_driftV(4.0e-3),
-  m_driftVInv(250.0), m_propSpeedInv(27.25), m_alphaCorrection(false), m_align(true)
+  m_driftVInv(250.0), m_propSpeedInv(27.25), m_align(true)
 {
   // Set description
   setDescription("Creates CDCHits from CDCSimHits.");
@@ -74,6 +73,9 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   //Switch to control smearing
   addParam("DoSmearing", m_doSmearing,
            "If false, drift length will not be smeared.", true);
+
+  addParam("DoAlphaCorrection", m_alphaCorrection,
+           "If true, some hits will be removed for better charge asymmetry simulation.", false);
 
   addParam("TrigTimeJitter", m_trigTimeJitter,
            "Magnitude (w) of trigger timing jitter (ns). The trigger timing is randuminzed uniformly in a time window of [-w/2, +w/2].",
@@ -703,13 +705,8 @@ void CDCDigitizerModule::event()
       m_momentum = m_aCDCSimHit->getMomentum();
       int iLayer = m_aCDCSimHit->getWireID().getICLayer();
       double alpha = m_cdcgp->getAlpha(m_posWire, m_momentum);
-      if (alpha > (M_PI / 2)) alpha = alpha - M_PI;
-      if (alpha < -(M_PI / 2)) alpha = alpha + M_PI;
-      int alpha_bin = floor(alpha / 0.01);
-      if (alpha_bin > 75) alpha_bin = 75;
-      if (alpha_bin < -75) alpha_bin = -75;
-      if (alpha_bin < 0) alpha_bin = -1 * (alpha_bin) + 1;
-      double Scale = (*m_alphaScaleFactorsFromDB)->getFactors(iLayer)[alpha_bin];
+
+      double Scale = (*m_alphaScaleFactorsFromDB)->getScaleFactor(iLayer, alpha);
       double random = gRandom->Uniform();
       if ((Scale < 1) && (alpha > 0)) {
         if (random > Scale) continue ; // remove this hit

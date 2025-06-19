@@ -737,7 +737,7 @@ void Belle2::CDCDatabaseImporter::importAlphaScaleFactors(std::string fileName)
     }
     iLayer++;
   }
-  asf->setFactors(alphaRatios);
+  asf->setScaleFactors(alphaRatios);
 
   stream.close();
 

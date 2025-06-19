@@ -89,7 +89,6 @@ namespace Belle2 {
     bool m_useIndividualHits; /**< use individual hits (true) or truncated mean (false) to determine likelihoods */
     bool m_usePXD; /**< use PXD data for likelihood */
     bool m_useSVD; /**< use SVD data for likelihood */
-    double m_trackDistanceThreshhold; /**< track distance threshold */
     bool m_onlyPrimaryParticles; /**< For MC only: if true, only save data for primary particles (as determined by MC truth) */
 
     // required input

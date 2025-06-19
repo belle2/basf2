@@ -41,8 +41,6 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module()
            "For MC only: if true, only save data for primary particles (as determined by MC truth)", false);
   addParam("usePXD", m_usePXD, "Use PXDClusters for dE/dx calculation", false);
   addParam("useSVD", m_useSVD, "Use SVDClusters for dE/dx calculation", true);
-  addParam("trackDistanceThreshold", m_trackDistanceThreshhold,
-           "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
 
   m_eventID = -1;
   m_trackID = 0;

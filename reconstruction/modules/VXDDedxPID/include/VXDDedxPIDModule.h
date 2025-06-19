@@ -82,14 +82,13 @@ namespace Belle2 {
     template <class HitClass> static double getTraversedLength(const HitClass* hit, const RecoTrack* recoTrack, double& p);
 
     /** save energy loss and hit information from SVD/PXDHits to track */
-    template <class HitClass> void saveSiHits(VXDDedxTrack* track, const HelixHelper& helix, const std::vector<HitClass*>& hits,
+    template <class HitClass> void saveSiHits(VXDDedxTrack* track, const std::vector<HitClass*>& hits,
                                               const RecoTrack* recoTrack) const;
 
     // module steering parameters
     bool m_useIndividualHits; /**< use individual hits (true) or truncated mean (false) to determine likelihoods */
     bool m_usePXD; /**< use PXD data for likelihood */
     bool m_useSVD; /**< use SVD data for likelihood */
-    double m_trackDistanceThreshhold; /**< track distance threshold */
     bool m_onlyPrimaryParticles; /**< For MC only: if true, only save data for primary particles (as determined by MC truth) */
 
     // required input

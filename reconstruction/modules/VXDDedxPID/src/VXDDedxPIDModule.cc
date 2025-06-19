@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #include <reconstruction/modules/VXDDedxPID/VXDDedxPIDModule.h>
-#include <reconstruction/modules/VXDDedxPID/HelixHelper.h>
 
 #include <framework/gearbox/Const.h>
 
@@ -42,8 +41,6 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module()
            "For MC only: if true, only save data for primary particles (as determined by MC truth)", false);
   addParam("usePXD", m_usePXD, "Use PXDClusters for dE/dx calculation", false);
   addParam("useSVD", m_useSVD, "Use SVDClusters for dE/dx calculation", true);
-  addParam("trackDistanceThreshold", m_trackDistanceThreshhold,
-           "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
 
   m_eventID = -1;
   m_trackID = 0;
@@ -163,7 +160,6 @@ void VXDDedxPIDModule::event()
     }
 
     // get momentum (at origin) from fit result
-    const ROOT::Math::XYZVector& trackPos = fitResult->getPosition();
     const ROOT::Math::XYZVector& trackMom = fitResult->getMomentum();
     dedxTrack->m_p = trackMom.R();
     dedxTrack->m_cosTheta = cos(trackMom.Theta());
@@ -186,17 +182,14 @@ void VXDDedxPIDModule::event()
     } else // The RecoTrack might not have a fit status for reasons: let's skip it
       continue;
 
-    //used for PXD/SVD hits
-    const HelixHelper helixAtOrigin(trackPos, trackMom, dedxTrack->m_charge);
-
     if (m_usePXD) {
       const std::vector<PXDCluster*>& pxdClusters = recoTrack->getPXDHitList();
-      saveSiHits(dedxTrack.get(), helixAtOrigin, pxdClusters, recoTrack);
+      saveSiHits(dedxTrack.get(), pxdClusters, recoTrack);
     }
 
     if (m_useSVD) {
       const std::vector<SVDCluster*>& svdClusters = recoTrack->getSVDHitList();
-      saveSiHits(dedxTrack.get(), helixAtOrigin, svdClusters, recoTrack);
+      saveSiHits(dedxTrack.get(), svdClusters, recoTrack);
     }
 
     if (dedxTrack->dedx.empty()) {
@@ -306,8 +299,7 @@ template <class HitClass> double VXDDedxPIDModule::getTraversedLength(const HitC
 }
 
 
-template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track, const HelixHelper& helix,
-                                                            const std::vector<HitClass*>& hits,
+template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track, const std::vector<HitClass*>& hits,
                                                             const RecoTrack* recoTrack) const
 {
   const int numHits = hits.size();

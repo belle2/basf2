@@ -87,12 +87,6 @@ namespace Belle2 {
       return m_Scales[iCLayer][alpha_bin];
     }
 
-    int getNBins() const
-    {
-      return c_nAlphaBins ;
-    }
-
-
 
     /**
      * Print all contents

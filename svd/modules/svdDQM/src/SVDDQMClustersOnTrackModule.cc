@@ -44,6 +44,8 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
   //Set module properties
   setDescription("SVD DQM module for clusters related to tracks.");
 
+  vector<string> emptyvector;
+
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If True, skip events rejected by HLT.", bool(true));
   addParam("TriggerBin", m_tb, "select events for a specific trigger bin, if -1 then no selection is applied (default)", int(-1));
@@ -56,6 +58,7 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
   addParam("RecoDigits", m_svdRecoDigitsName, "SVDRecoDigits StoreArray name.", std::string(""));
   addParam("ShaperDigits", m_svdShaperDigitsName, "SVDShaperDigits StoreArray name.", std::string(""));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
+  addParam("AddParSensorLabel", m_addParSensorLabel, "Additionnal sensor list to monitor from module paramter", emptyvector);
 
   m_histoList = new TList();
 
@@ -87,6 +90,9 @@ void SVDDQMClustersOnTrackModule::defineHisto()
     m_3Samples = m_svdPlotsConfig->is3SampleEnable();
     m_addSensorLabel = m_svdPlotsConfig->getListOfSensors();
   }
+
+  if (m_addParSensorLabel.size() != 0)
+    m_addSensorLabel.insert(m_addSensorLabel.end(), m_addParSensorLabel.begin(), m_addParSensorLabel.end());
 
   if (m_addSensorLabel.size() != 0)
     m_addSensorPlots = true;

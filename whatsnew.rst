@@ -20,13 +20,16 @@ Changes since release-09
 .. admonition:: New and updated packages in externals
    :class: toggle
 
-   .. list-table:: New and updated packages in externals from v02-02-04 to v02-03-00
+   .. list-table:: New and updated packages in externals from v02-02-04 to v02-03-01
       :widths: 50 25 25
       :header-rows: 1
 
       * - package
         - old version
         - new version
+      * - boost
+        - 1.85.0
+        - 1.88.0
       * - doxygen
         - 1.9.6
         - 1.13.2
@@ -36,6 +39,9 @@ Changes since release-09
       * - gcc
         - 14.1.0
         - 14.2.0
+      * - ONNX Runtime
+        -
+        - 1.22.0
       * - ROOT
         - 6.26/14
         - 6.32/00
@@ -84,6 +90,9 @@ Changes since release-09
       * - sortedcontainers
         -
         - 2.4.0
+      * - sphinx-argparse
+        - 0.2.0
+        - 0.5.2
       * - tensorboard
         - 2.16.2
         - 2.17.1
@@ -111,6 +120,9 @@ Changes since release-09
 
 .. include:: analysis/doc/whatsnew-since/release-09-00.txt
 .. include:: mva/doc/whatsnew-since/release-09-00.txt
+.. include:: b2bii/doc/whatsnew-since/release-09-00.txt
+
+.. include:: framework/doc/whatsnew-since/release-09-00.txt
 
 Changes since release-08
 ========================

@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #include <reconstruction/modules/VXDDedxPID/VXDDedxPIDModule.h>
-#include <reconstruction/modules/VXDDedxPID/HelixHelper.h>
 
 #include <framework/gearbox/Const.h>
 
@@ -42,8 +41,6 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module()
            "For MC only: if true, only save data for primary particles (as determined by MC truth)", false);
   addParam("usePXD", m_usePXD, "Use PXDClusters for dE/dx calculation", false);
   addParam("useSVD", m_useSVD, "Use SVDClusters for dE/dx calculation", true);
-  addParam("trackDistanceThreshold", m_trackDistanceThreshhold,
-           "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
 
   m_eventID = -1;
   m_trackID = 0;
@@ -163,7 +160,6 @@ void VXDDedxPIDModule::event()
     }
 
     // get momentum (at origin) from fit result
-    const ROOT::Math::XYZVector& trackPos = fitResult->getPosition();
     const ROOT::Math::XYZVector& trackMom = fitResult->getMomentum();
     dedxTrack->m_p = trackMom.R();
     dedxTrack->m_cosTheta = cos(trackMom.Theta());
@@ -186,17 +182,14 @@ void VXDDedxPIDModule::event()
     } else // The RecoTrack might not have a fit status for reasons: let's skip it
       continue;
 
-    //used for PXD/SVD hits
-    const HelixHelper helixAtOrigin(trackPos, trackMom, dedxTrack->m_charge);
-
     if (m_usePXD) {
       const std::vector<PXDCluster*>& pxdClusters = recoTrack->getPXDHitList();
-      saveSiHits(dedxTrack.get(), helixAtOrigin, pxdClusters);
+      saveSiHits(dedxTrack.get(), pxdClusters, recoTrack);
     }
 
     if (m_useSVD) {
       const std::vector<SVDCluster*>& svdClusters = recoTrack->getSVDHitList();
-      saveSiHits(dedxTrack.get(), helixAtOrigin, svdClusters);
+      saveSiHits(dedxTrack.get(), svdClusters, recoTrack);
     }
 
     if (dedxTrack->dedx.empty()) {
@@ -276,50 +269,38 @@ void VXDDedxPIDModule::calculateMeans(double& mean, double& truncatedMean, doubl
   }
 }
 
-double VXDDedxPIDModule::getTraversedLength(const PXDCluster* hit, const HelixHelper* helix)
+template <class HitClass> double VXDDedxPIDModule::getTraversedLength(const HitClass* hit, const RecoTrack* recoTrack, double& p)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   const VXD::SensorInfoBase& sensor = geo.getSensorInfo(hit->getSensorID());
-
-  const ROOT::Math::XYZVector localPos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
-  const ROOT::Math::XYZVector& globalPos = sensor.pointToGlobal(localPos);
-  const ROOT::Math::XYZVector& localMomentum = helix->momentum(helix->pathLengthToPoint(globalPos));
-
   const ROOT::Math::XYZVector& sensorNormal = sensor.vectorToGlobal(ROOT::Math::XYZVector(0.0, 0.0, 1.0));
-  const double angle = ROOT::Math::VectorUtil::Angle(sensorNormal, localMomentum); //includes theta and phi components
 
-  //I'm assuming there's only one hit per sensor, there are _very_ rare exceptions to that (most likely curlers)
-  return TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
-}
+  const auto* hitInfo = recoTrack->getRecoHitInformation(hit);
+  if (not hitInfo) return 0;
 
+  const auto* trackPoint = recoTrack->getCreatedTrackPoint(hitInfo);
+  if (not trackPoint) return 0;
 
-double VXDDedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHelper* helix)
-{
-  static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const VXD::SensorInfoBase& sensor = geo.getSensorInfo(hit->getSensorID());
+  const auto* fitterInfo = trackPoint->getFitterInfo();
+  if (not fitterInfo) return 0;
 
-  ROOT::Math::XYZVector a, b;
-  if (hit->isUCluster()) {
-    const double u = hit->getPosition();
-    a = sensor.pointToGlobal(ROOT::Math::XYZVector(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
-    b = sensor.pointToGlobal(ROOT::Math::XYZVector(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
-  } else {
-    const double v = hit->getPosition();
-    a = sensor.pointToGlobal(ROOT::Math::XYZVector(-0.5 * sensor.getWidth(v), v, 0.0));
-    b = sensor.pointToGlobal(ROOT::Math::XYZVector(+0.5 * sensor.getWidth(v), v, 0.0));
+  double cosTheta = 0;
+  try {
+    const genfit::MeasuredStateOnPlane& mop = fitterInfo->getFittedState();
+    auto pocaMom = ROOT::Math::XYZVector(mop.getMom());
+    p = pocaMom.R();
+    cosTheta = sensorNormal.Dot(pocaMom.Unit());
+  } catch (genfit::Exception&) {
+    B2WARNING("recoTrack: " << recoTrack->getArrayIndex() << ": genfit::MeasuredStateOnPlane exception occured");
+    return 0;
   }
-  const double pathLength = helix->pathLengthToLine(ROOT::Math::XYZVector(a), ROOT::Math::XYZVector(b));
-  const ROOT::Math::XYZVector& localMomentum = helix->momentum(pathLength);
 
-  const ROOT::Math::XYZVector& sensorNormal = sensor.vectorToGlobal(ROOT::Math::XYZVector(0.0, 0.0, 1.0));
-  const double angle = ROOT::Math::VectorUtil::Angle(sensorNormal, localMomentum); //includes theta and phi components
-
-  return TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
+  return std::min(sensor.getWidth(), sensor.getThickness() / std::abs(cosTheta));
 }
 
 
-template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track, const HelixHelper& helix,
-                                                            const std::vector<HitClass*>& hits) const
+template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track, const std::vector<HitClass*>& hits,
+                                                            const RecoTrack* recoTrack) const
 {
   const int numHits = hits.size();
   if (numHits == 0)
@@ -337,6 +318,8 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
   siliconDedx.reserve(numHits);
 
   VxdID prevSensor;
+  double psum = 0;
+  double p = 0;
   for (int i = 0; i < numHits; i++) {
     const HitClass* hit = hits[i];
     if (!hit) {
@@ -348,8 +331,8 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
     assert(layer >= -6 && layer < 0);
 
     //active medium traversed, in cm (can traverse one sensor at most)
-    //assumption: Si detectors are close enough to the origin that helix is still accurate
-    const double totalDistance = getTraversedLength(hit, &helix);
+    double totalDistance = getTraversedLength(hit, recoTrack, p);
+    psum += p;
     const double charge = hit->getCharge();
     const double dedx = charge / totalDistance;
     if (dedx <= 0) {
@@ -357,12 +340,15 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
     } else if (i == 0 or prevSensor != currentSensor) { //only save once per sensor (u and v hits share charge!)
       prevSensor = currentSensor;
       //store data
-      siliconDedx.push_back(dedx);
-      track->m_dedxAvg[currentDetector] += dedx;
-      track->addDedx(layer, totalDistance, dedx);
+      if (totalDistance > 0) {
+        siliconDedx.push_back(dedx);
+        track->m_dedxAvg[currentDetector] += dedx;
+        track->addDedx(layer, totalDistance, dedx);
+      }
     }
 
     track->addHit(currentSensor, layer, charge, totalDistance, dedx);
+    track->m_p = psum / numHits;
   }
 
   //save averages

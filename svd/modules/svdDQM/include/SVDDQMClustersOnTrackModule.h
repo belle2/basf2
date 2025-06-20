@@ -178,6 +178,9 @@ namespace Belle2 {
     /** vector of sensor label for additional histogram (Charge, SNR, time; U/V) */
     std::vector<std::string> m_addSensorLabel;
 
+    /** vector of sensor label for additional histogram (Charge, SNR, time; U/V)  from parameter */
+    std::vector<std::string> m_addParSensorLabel;
+
 
   };
 

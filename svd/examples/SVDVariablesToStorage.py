@@ -10,7 +10,7 @@
 
 ##########################################################################
 #
-# Example Script to use SVDValidationModule on simulation or real data
+# Example Script to use SVDVariablesToStorageModule on simulation or real data
 #
 ##########################################################################
 
@@ -25,7 +25,7 @@ import rawdata as raw
 from basf2 import conditions as b2conditions
 
 
-def addSVDValidationModule(path, storageType):
+def addSVDVariablesToStorageModule(path, storageType):
 
     if (storageType == "ntuple"):
         path.add_module('SVDVariablesToStorage',
@@ -110,9 +110,28 @@ if __name__ == '__main__':
     # Fill particle lists
     ma.fillParticleLists(decayStringsWithCuts=[("pi+:all", "")], path=main)
 
-    # Add SVDValidationModule
-    addSVDValidationModule(main, "ntuple")
-    addSVDValidationModule(main, "histogram")
+    # Add SVDVariablesToStorageModule
+    addSVDVariablesToStorageModule(main, "ntuple")
+    # addSVDVariablesToStorageModule(main, "histogram")
+
+    main.add_module('RootOutput', branchNames=[
+        'EventExtraInfo',
+        'EventMetaData',
+        'Particles',
+        'ParticlesToTrackFitResults',
+        'RecoHitInformations',
+        'RecoHitInformationsToSVDClusters',
+        'RecoTracks',
+        'SVDClusters',
+        'SVDClustersToRecoTracks',
+        'SVDClustersToSVDTrueHits',
+        'SVDRecoTracks',
+        'SVDSimHits',
+        'SVDTrueHits',
+        'TrackFitResults',
+        'Tracks',
+        'TracksToRecoTracks',
+    ])
 
     # Summary
     main.add_module('Progress')

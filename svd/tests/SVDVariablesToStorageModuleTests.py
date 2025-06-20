@@ -31,16 +31,20 @@ class SVDVariablesToStorageModuleTests(unittest.TestCase):
 
         ma.fillParticleList("pi+:all", "", path=main)
 
+        variablesToNtuple = ["SVDClusterCharge", "SVDClusterSNR", "SVDClusterSize", "SVDClusterTime",
+                             "SVDTrackPrime", "SVDResidual", "SVDLayer", "SVDLadder", "SVDSensor", "SVDSide"]
+
         main.add_module("SVDVariablesToStorage",
                         outputFileName=testFile.name,
-                        containerName="SVDClusters",
+                        containerName="SVDClusterVariables",
                         particleListName="pi+:all",
-                        variablesToNtuple=["SVDClusterCharge", "SVDClusterSNR", "SVDClusterSize", "SVDClusterTime",
-                                           "SVDTrackPrime", "SVDResidual", "SVDLayer", "SVDLadder", "SVDSensor", "SVDSide"])
+                        variablesToNtuple=variablesToNtuple)
         b2test_utils.safe_process(main)
         output_file = TFile(testFile.name)
-        ntuple = output_file.Get("SVDClusters")
-        self.assertFalse(ntuple.GetEntries() == 0, "Ntuple is empty")
+        tree = output_file.Get("SVDClusterVariables")
+        self.assertFalse(tree.GetEntries() == 0, "Empty tree!")
+        for variable in variablesToNtuple:
+            self.assertTrue(tree.GetListOfBranches().Contains(variable))
 
         print("Test passed. Cleaning up.")
 

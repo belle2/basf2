@@ -233,7 +233,7 @@ namespace Belle2::Variable {
       }
       try
       {
-        const TVectorD residualMeasurement =  fitterInfo->getResidual(0, false).getState();
+        const TVectorD residualMeasurement = fitterInfo->getResidual(0, false).getState();
         return residualMeasurement.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
       } catch (...)
       {

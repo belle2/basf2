@@ -76,8 +76,13 @@ namespace Belle2 {
 
     double m_InvMDstar;       /**<  Invariant mass of Dstar candidates */
     double m_InvMD0;       /**<  Invariant mass of D0 candidates */
+    double m_D0Momentum;       /**<  Momentum of D0 candidates */
     double m_DeltaM;       /**<  deltaM = m(Dstar)-m(D0) */
+    double m_diraD0;        /**<  direction angle of D0 candidates */
     double m_kaonMomentum;       /**<   momentum for the kaon from the D0 */
+    double m_kaonMomentumX;       /**<   momentum for the kaon from the D0 */
+    double m_kaonMomentumY;       /**<   momentum for the kaon from the D0 */
+    double m_kaonMomentumZ;       /**<   momentum for the kaon from the D0 */
     double m_kaonSVDdEdx;     /**<  SVD dE/dx response for the kaon from the D0 */
     double m_kaonSVDdEdxErr;     /**<  SVD dE/dx uncertainty for the kaon from the D0 */
     double m_kaonSVDdEdxMean;     /**<  SVD dE/dx response (non-truncated) for the kaon from the D0 */
@@ -91,6 +96,9 @@ namespace Belle2 {
     double m_kaonnSVDHits;    /**<  nSVDHits for the kaon from the D0 */
 
     double m_pionDp;    /**<   momentum for the pion from the D0 */
+    double m_pionDMomentumX;       /**<   momentum for the pion from the D0 */
+    double m_pionDMomentumY;       /**<   momentum for the pion from the D0 */
+    double m_pionDMomentumZ;       /**<   momentum for the pion from the D0 */
     double m_pionDSVDdEdx;    /**<  SVD dE/dx response for the pion from the D0 */
     double m_pionDSVDdEdxErr;     /**<  SVD dE/dx uncertainty for the pion from the D0 */
     double m_pionDSVDdEdxMean;     /**<  SVD dE/dx response (non-truncated) for the pion from the D0 */
@@ -104,6 +112,9 @@ namespace Belle2 {
     double m_pionDnSVDHits;    /**<  nSVDHits for the pion from the D0 */
 
     double m_slowPionMomentum;    /**<   momentum for the pion from the Dstar */
+    double m_slowPionMomentumX;       /**<   momentum for the pion from the Dstar */
+    double m_slowPionMomentumY;       /**<   momentum for the pion from the Dstar */
+    double m_slowPionMomentumZ;       /**<   momentum for the pion from the Dstar */
     double m_slowPionSVDdEdx;    /**<  SVD dE/dx response for the pion from the Dstar */
     double m_slowPionSVDdEdxErr;     /**<  SVD dE/dx uncertainty for the pion from the Dstar */
     double m_slowPionSVDdEdxMean;     /**<  SVD dE/dx response (non-truncated) for the pion from the Dstar */
@@ -148,6 +159,15 @@ namespace Belle2 {
     double m_genericp;    /**<   momentum for the generic track */
     double m_genericSVDdEdx;    /**<  SVD dE/dx for the generic track */
     double m_genericnSVDHits;    /**<  nSVDHits for the generic track */
+    double m_genericSVDdEdxErr;     /**<  SVD dE/dx uncertainty for the generic track */
+    double m_genericSVDdEdxMean;     /**<  SVD dE/dx response (non-truncated) for the generic track */
+    double m_genericdEdxTrackMomentum;       /**<   momentum for the generic track, taken from the VXDDedxTrack */
+    int m_genericdEdxTrackNHits;       /**<   number of hits for generic track, taken from the VXDDedxTrack */
+    int m_genericdEdxTrackNHitsUsed;       /**<   number of hits used for dEdx truncated mean for generic track, taken from the VXDDedxTrack */
+    double m_genericdEdxTrackCosTheta;       /**<   cosTheta for the generic track, taken from the VXDDedxTrack */
+    // double m_genericdEdxTrackdx[m_genericdEdxTrackNHits];       /**<   dx (path length) for the generic track, taken from the VXDDedxTrack */
+    // int m_genericdEdxTrackdE[m_genericdEdxTrackNHits];       /**<   dE (ADC counts) for the generic track, taken from the VXDDedxTrack */
+    std::vector<double> m_genericSVDdEdxList;       /**<   SVD dE/dx response for the generic track, per hit */
 
     std::string m_LambdaListName = "";    /**< Name of the Lambda particle list */
     std::string m_DstarListName = "";    /**< Name of the Dstar particle list */

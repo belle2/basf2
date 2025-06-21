@@ -14,7 +14,8 @@
 #include <TF1.h>
 #include <TList.h>
 #include <TTree.h>
-// #include <tuple>
+#include <TProfile.h>
+#include <TDatabasePDG.h>
 
 namespace Belle2 {
   /**
@@ -59,6 +60,11 @@ namespace Belle2 {
      */
     void setMinEvtsPerTree(const double& value) { m_MinEvtsPerTree = value; }
 
+    /**
+     * reimplement the profile histogram calculation
+     */
+    void setCustomProfile(bool value = true) { m_CustomProfile = value; }
+
   protected:
     /**
      * run algorithm on data
@@ -73,14 +79,26 @@ namespace Belle2 {
     TList* DstarHistogramming(TTree* inputTree);                        /**< produce histograms for K/pi */
     TList* GammaHistogramming(std::shared_ptr<TTree> preselTree);                       /**< produce histograms for e */
     TList* GenerateNewHistograms(std::shared_ptr<TTree> ttreeLambda, std::shared_ptr<TTree> ttreeDstar,
-                                 std::shared_ptr<TTree> ttreeGamma);                       /**< generate high-statistics histograms */
+                                 std::shared_ptr<TTree> ttreeGamma, std::shared_ptr<TTree>
+                                 ttreeGeneric);                       /**< generate high-statistics histograms */
     int m_numDEdxBins = 100;                                                 /**< the number of dEdx bins for the payloads */
     int m_numPBins = 69;                                                     /**< the number of momentum bins for the payloads */
+    int m_numBGBins = 69;    /**< the number of beta*gamma bins for the profile and fitting */
     double m_dedxCutoff = 5.e6;                                              /**< the upper edge of the dEdx binning for the payloads */
+    double m_dedxMaxPossible = 7.e6;  /**< the approximate max possible value of dEdx */
     int m_MinEvtsPerTree =
       100;                                                 /**< number of events in TTree below which we don't try to fit */
     int m_toGenerate =
       500000;                                                     /**< the number of events to be generated in each momentum bin in the new payloads */
+    bool m_CustomProfile = 1; /**< reimplement profile histogrma calculation instead of ROOT implementation? */
+
+    const double m_ElectronPDGMass = TDatabasePDG::Instance()->GetParticle(11)->Mass();  /**< PDG mass for the electron */
+    const double m_MuonPDGMass = TDatabasePDG::Instance()->GetParticle(13)->Mass();  /**< PDG mass for the muon */
+    const double m_PionPDGMass = TDatabasePDG::Instance()->GetParticle(211)->Mass();  /**< PDG mass for the charged pion */
+    const double m_KaonPDGMass = TDatabasePDG::Instance()->GetParticle(321)->Mass();  /**< PDG mass for the charged kaon */
+    const double m_ProtonPDGMass = TDatabasePDG::Instance()->GetParticle(2212)->Mass();  /**< PDG mass for the proton */
+    const double m_DeuteronPDGMass = TDatabasePDG::Instance()->GetParticle(1000010020)->Mass();  /**< PDG mass for the deuteron */
+
     /**
     * build the binning scheme for the momentum
     */
@@ -135,39 +153,96 @@ namespace Belle2 {
     /**
     * Generate a new dEdx:momentum histogram from a function that encodes dEdx:momentum trend and a function that encodes dEdx resolution.
     */
-    TH2D* prepare_new_histogram(TH2F* data_histogram, TString new_name, TF1* betagamma_function, TF1* resolution_function,
-                                double bias_correction)
+    TH2F* PrepareNewHistogram(TH2F* DataHistogram, TString NewName, TF1* betagamma_function, TF1* ResolutionFunctionOriginal,
+                              double bias_correction)
     {
+      TF1* ResolutionFunction = (TF1*) ResolutionFunctionOriginal->Clone(Form("%sClone",
+                                ResolutionFunctionOriginal->GetName())); // to avoid modifying the resolution function
+      ResolutionFunction->SetRange(0, m_dedxMaxPossible); // allow the function to take values outside the histogram range
+      TH2F* DataHistogramNew = (TH2F*) DataHistogram->Clone(NewName);//Form("%sNew", DataHistogram->GetName()));
 
-      resolution_function->SetRange(0, m_dedxCutoff * 2); // allow the function to take values outside the histogram range
-      TH2D* data_histogram_new = (TH2D*) data_histogram->Clone(new_name);//Form("%s_new", data_histogram->GetName()));
-
-      data_histogram_new->Reset();
+      DataHistogramNew->Reset();
 
       for (int pbin = 1; pbin <= m_numPBins + 1; pbin++) {
-        double mean_dEdx_value = betagamma_function->Eval(data_histogram_new->GetXaxis()->GetBinCenter(pbin));
-        resolution_function->FixParameter(1, mean_dEdx_value + bias_correction);
+        double mean_dEdx_value = betagamma_function->Eval(DataHistogramNew->GetXaxis()->GetBinCenter(pbin));
+        ResolutionFunction->FixParameter(1, mean_dEdx_value + bias_correction);
 
         // create a projection (1D histogram) in a given momentum bin
-        TH1D* momentum_slice = (TH1D*)data_histogram_new->ProjectionY("slice", pbin, pbin);
+        TH1D* MomentumSlice = (TH1D*)DataHistogramNew->ProjectionY("slice", pbin, pbin);
 
         // fill manually (instead of FillRandom) to also preserve events in the overflow bin
         // this is needed for the correct normalisation
         for (int iEvent = 0; iEvent < m_toGenerate; iEvent++) {
-          momentum_slice->Fill(resolution_function->GetRandom());
+          MomentumSlice->Fill(ResolutionFunction->GetRandom());
         }
 
         // normalise each momentum slice to unity, but ignore the cases with empty histograms
-        if (momentum_slice->Integral(0, m_numDEdxBins + 1) > 0) {
-          momentum_slice->Scale(1. / momentum_slice->Integral(0, m_numDEdxBins + 1));
+        if (MomentumSlice->Integral(0, m_numDEdxBins + 1) > 0) {
+          MomentumSlice->Scale(1. / MomentumSlice->Integral(0, m_numDEdxBins + 1));
         }
         // fill back the 2D histo with the result
         for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
-          data_histogram_new->SetBinContent(pbin, dedxbin, momentum_slice->GetBinContent(dedxbin));
+          DataHistogramNew->SetBinContent(pbin, dedxbin, MomentumSlice->GetBinContent(dedxbin));
+          DataHistogramNew->SetBinError(pbin, dedxbin, MomentumSlice->GetBinError(dedxbin));
         }
       }
 
-      return data_histogram_new;
+      return DataHistogramNew;
+
+    }
+
+    /**
+    * Reimplement the Profile histogram calculation for a 2D histogram. The standard ROOT implementation takes the mean Y at a given X, which produces biased results in case of rapidly-rising distributions with non-Gaussian resolutions. We fit in slices to extract the mean more precisely.
+    */
+    TH1F* PrepareProfile(TH2F* DataHistogram, TString NewName)
+    {
+// define our resolution function: Crystal Ball. Parameter [1] is the mean and [2] is the relative width.
+      TF1* ResolutionFunction = new TF1("ResolutionFunction", "[0]*ROOT::Math::crystalball_function(x,[4],[3],[2]*[1],[1])", 100e3,
+                                        7000e3);
+
+
+      ResolutionFunction->SetNpx(1000);
+
+      ResolutionFunction->SetParameters(1000, 6.e5, 0.1, 1, 1);
+      ResolutionFunction->SetParLimits(0, 0, 1.e6);
+      ResolutionFunction->SetParLimits(1, 3.e5, 7.e6);
+      ResolutionFunction->SetParLimits(2, 0, 10);
+      ResolutionFunction->SetParLimits(3, 0.01, 100);
+      ResolutionFunction->SetParLimits(4, 0.01, 100);
+
+      ResolutionFunction->SetRange(0, m_dedxMaxPossible); // allow the function to take values outside the histogram range
+
+      TH1F* DataHistogramNew = (TH1F*)DataHistogram->ProfileX()->ProjectionX();
+      TH1F* DataHistogramClone = (TH1F*)DataHistogramNew->Clone(Form("%sClone",
+                                                                DataHistogramNew->GetName())); // preserve the original profile for uncertainty cross-checks
+      DataHistogramNew->SetName(NewName);
+      DataHistogramNew->SetTitle(NewName);
+      DataHistogramNew->Reset();
+
+      for (int pbin = 1; pbin <= m_numBGBins; pbin++) {
+        // create a projection (1D histogram) in a given momentum bin
+        TH1F* MomentumSlice = (TH1F*)DataHistogram->ProjectionY("slice", pbin, pbin);
+
+        if (MomentumSlice->Integral() < 1) continue;
+// guesstimate the starting fit values
+        ResolutionFunction->SetParameter(1, MomentumSlice->GetMean());
+        ResolutionFunction->SetParameter(2, MomentumSlice->GetStdDev() / MomentumSlice->GetMean());
+        ResolutionFunction->SetRange(MomentumSlice->GetMean() * 0.2, MomentumSlice->GetMean() * 1.75);
+// fit each slice to extract the mean
+        MomentumSlice->Fit(ResolutionFunction, "RQI");
+
+        double stat_error = DataHistogramClone->GetBinError(pbin);
+// fill back the 1D histo with the result
+        double bincontent = ResolutionFunction->GetParameter(1);
+        double binerror = ResolutionFunction->GetParError(1);
+
+        binerror = std::max(binerror, stat_error);
+
+        DataHistogramNew->SetBinContent(pbin, bincontent);
+        DataHistogramNew->SetBinError(pbin, binerror);
+      }
+
+      return DataHistogramNew;
 
     }
 

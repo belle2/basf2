@@ -31,7 +31,7 @@ settings = CalibrationSettings(
 
     expert_config={
         "isMC": False,
-        "listOfMutedCalibrations": [],  # "dEdxValidation"],  # dEdxCalibration, dEdxValidation
+        "listOfMutedCalibrations": ["dEdxValidation"],  # dEdxCalibration, dEdxValidation
         "rerun_reco": True,  # need to rerun reconstruction for calibration?
         "rerun_reco_val": True,  # need to rerun reconstruction for validation?
         "validation_mode": "basic",  # full or basic; full also produces global PID performance plots
@@ -47,7 +47,8 @@ settings = CalibrationSettings(
         "MinROCMomentum": 0.,
         "MaxROCMomentum": 2.5,
         "NumEffBins": 30,
-        "MaxEffMomentum": 2.5
+        "MaxEffMomentum": 2.5,
+        "CustomProfile": True
         },
     depends_on=[])
 
@@ -89,13 +90,13 @@ def create_path(rerun_reco, isMC, expert_config):
     # Fill particle lists
     ma.fillParticleList("pi+:all", "", path=rec_path)
     ma.fillParticleList("pi+:lambda", "nCDCHits > 0", path=rec_path)  # pi without track quality for reconstructing lambda
-    ma.fillParticleList("pi+:cut", "abs(dr) < 0.5 and abs(dz) < 2 and pValue > 0.00001 and nSVDHits > 1",
+    ma.fillParticleList("pi+:cut", "abs(dr) < 0.5 and abs(dz) < 2 and nSVDHits > 1",
                         path=rec_path)  # pions for reconstructing D and Dstar
 
-    ma.fillParticleList('K-:cut', cut='abs(dr) < 0.5 and abs(dz) < 2 and pValue > 0.00001 and nSVDHits > 1', path=rec_path)  # kaon
+    ma.fillParticleList('K-:cut', cut='abs(dr) < 0.5 and abs(dz) < 2 and nSVDHits > 1', path=rec_path)  # kaon
     ma.fillParticleList('e+:cut', cut='nSVDHits > 0', path=rec_path)  # electron
     # proton. In data, we only see background at p<0.25 GeV which motivates adding this cut.
-    ma.fillParticleList('p+:lambda', cut='nCDCHits > 0 and nSVDHits > 0 and p > 0.25', path=rec_path)
+    ma.fillParticleList('p+:lambda', cut='nCDCHits > 0 and nSVDHits > 0 and p > 0.135', path=rec_path)
     # ----------------------------------------------------------------------------
     # Reconstruct D*(D0->K-pi+)pi+ and cc.
     ma.reconstructDecay(decayString='D0:kpi -> K-:cut pi+:cut', cut='1.7 < M < 2.', path=rec_path)
@@ -152,7 +153,9 @@ def create_path(rerun_reco, isMC, expert_config):
     ma.cutAndCopyList(
         outputListName='D*+:cut',
         inputListName='D*+:myDstar',
-        cut='massDifference(0) < 0.151 and 1.85 < daughter(0, InvM) < 1.88 and 1.95 < InvM < 2.05 and chiProb > 0.001',
+        cut=('massDifference(0) < 0.151 and 1.85 < daughter(0, InvM) < 1.88 and '
+             '1.95 < InvM < 2.05 and chiProb > 0.001 and '
+             'formula(daughter(0,cosAngleBetweenMomentumAndVertexVector))>-0.75'),
         path=rec_path)
 
     # ----------------------------------------------------------------------------
@@ -251,6 +254,7 @@ def get_calibrations(input_data, **kwargs):
     algo.setNumDEdxBins(expert_config['NBinsdEdx'])
     algo.setDEdxCutoff(expert_config['dedxCutoff'])
     algo.setMinEvtsPerTree(expert_config['MinEvtsPerTree'])
+    algo.setCustomProfile(expert_config['CustomProfile'])
 
     if "dEdxValidation" not in listOfMutedCalibrations:
         algo_val = SVDdEdxValidationAlgorithm()

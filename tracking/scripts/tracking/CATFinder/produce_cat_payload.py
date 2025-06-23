@@ -1,3 +1,11 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 import numpy as np
 import os
 
@@ -9,9 +17,22 @@ from torch_geometric.nn import GravNetConv, BatchNorm, global_mean_pool
 
 
 class CDCNet(nn.Module):
-    '''
-    Modular CDCNet for Object Condensation.
-    '''
+    """
+    Modular GNN architecture for object condensation on CDC hits.
+
+    This model processes spatial and detector-related features using
+    a stack of GravNet-based convolutional blocks to predict:
+      - condensation scores (beta values),
+      - latent space coordinates for clustering,
+      - track parameters (momentum, vertex, charge).
+
+    The network is designed to be flexible with respect to the number
+    of layers, feature dimensions, and GravNet configuration.
+
+    Reference:
+    Learning Representations of Irregular Particle-detector Geometry
+    with Distance-weighted Graph Networks (https://arxiv.org/abs/1902.07987)
+    """
 
     def __init__(
         self,
@@ -24,22 +45,18 @@ class CDCNet(nn.Module):
         space_dimensions=4,
         momentum=0.6,
     ):
-        '''
-        The model: number of input features, hidden dimensions and blocks
-        are adjustable
+        """
+        Initializes the CDCNet with the specified architecture parameters.
 
-        input_dim:          number of input features per node
-        k:                  number of k-nearest neighbours for GravNetConv
-        nblocks:            number of blocks the network consists
-        coord_dim:          dimension for object condensation coordinates
-        space_dimensions:   number of space dimensions for GravNetConv
-        momentum:           momentum for batch normalization
-
-        GravNet is from:
-        Learning Representations of Irregular Particle-detector Geometry
-        with Distance-weighted Graph Networks
-        https://arxiv.org/abs/1902.07987
-        '''
+        :param input_dim: Number of input features per node.
+        :param k: Number of nearest neighbors for GravNetConv layers.
+        :param dim1: Hidden feature dimension in GravNet blocks.
+        :param dim2: Output feature dimension per GravNet block.
+        :param nblocks: Number of GravNetConv blocks in the network.
+        :param coord_dim: Number of output dimensions for condensation coordinates.
+        :param space_dimensions: Number of spatial dimensions learned by GravNet.
+        :param momentum: Momentum factor for BatchNorm layers.
+        """
         super().__init__()
 
         self.batch_norm_0 = BatchNorm(input_dim, momentum=0.6)
@@ -110,6 +127,18 @@ class CDCNet(nn.Module):
         self.p_charge_layer = nn.Linear(dim1, 1)  # predict track charge
 
     def forward(self, x, batch):
+        """
+        Forward pass through the CDCNet.
+
+        Applies the GravNetConv blocks and computes predictions for object condensation
+        and track parameters.
+
+        :param x: Node feature tensor of shape [N, input_dim].
+        :param batch: Batch vector assigning each node to a graph [N].
+        :return: Tensor of shape [N, 1 + coord_dim + 3 + 3 + 1] containing:
+                 beta, coordinates, momentum (px, py, pz),
+                 vertex (vx, vy, vz), and charge.
+        """
 
         features = []
         x = self.batch_norm_0(x)
@@ -164,8 +193,21 @@ class CDCNet(nn.Module):
 
 
 class GNNWrapper:
+    """
+    Wrapper class for inference with a trained CDCNet model.
+
+    Handles model loading from disk and preprocessing inputs for evaluation.
+    Designed for integration with basf2's Python MVA interface.
+    """
 
     def __init__(self, model_path, config, device='cpu'):
+        """
+        Loads a trained CDCNet from file and prepares it for inference.
+
+        :param model_path: Path to the `.pt` file containing the model weights.
+        :param config: Configuration dictionary used to define the model architecture.
+        :param device: Torch device to run the model on ('cpu' or 'cuda').
+        """
         self._device = device
         self._config = config
         self._net = CDCNet(
@@ -194,36 +236,69 @@ class GNNWrapper:
         self._net.eval()
 
     def predict(self, X):
-        print("test")
+        """
+        Runs the trained CDCNet model on input data.
+
+        :param X: Numpy array of shape [N, 7] containing preprocessed features.
+        :return: Flattened prediction array containing outputs from the forward pass.
+        """
         with torch.no_grad():
             features = torch.tensor(X, dtype=torch.float32).to(self._device).reshape(-1, 7)
-            print(features)
-            print("TEST")
             batch = torch.zeros(len(features), dtype=torch.int64).to(self._device)
             predictions = self._net(features, batch).numpy().flatten()
             return predictions
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
+    """
+    Placeholder for model initialization in the MVA interface.
+
+    Currently unused in this setup.
+    """
     return None
 
 
 def feature_importance(state):
+    """
+    Returns a list of features ranked by importance.
+
+    Currently unimplemented — returns an empty list.
+
+    :param state: Internal model state (ignored).
+    :return: Empty list.
+    """
     return []
 
 
 def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
+    """
+    Hook called before model training begins.
+
+    Currently unused.
+    """
     return None
 
 
 def partial_fit(state, X, S, y, w, epoch, batch):
+    """
+    Performs a single training step.
+
+    Not implemented — training is not supported in this interface.
+
+    :return: False
+    """
     return False
 
 
 def end_fit(state):
-    '''
-    Load the trained model and prepare for the basf2 integration.
-    '''
+    """
+    Finalizes the model for inference after training.
+
+    Loads configuration and weights from disk, returning a GNNWrapper.
+
+    :param state: Placeholder state object (ignored).
+    :return: A GNNWrapper instance ready for inference.
+    """
     import yaml
 
     model_path = r'/work/lreuter/CAT_event_generation/models/train_bucket36/run_bucket_36_training_mix_pretrained/best_model.pt'
@@ -236,21 +311,36 @@ def end_fit(state):
 
 
 def load(state):
-    '''
-    Return the trained model.
-    '''
+    """
+    Reloads a previously saved model state.
+
+    :param state: The previously saved model state.
+    :return: The unmodified state.
+    """
     return state
 
 
 def apply(state, X):
-    '''
-    Apply the trained model to the input features.
-    '''
+    """
+    Applies the trained model to the given input features.
+
+    :param state: A GNNWrapper instance.
+    :param X: Input features as a NumPy array.
+    :return: Model predictions as a contiguous float32 NumPy array.
+    """
     p = state.predict(X)
     return np.require(p, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
 def produce_dummy_file(file_name):
+    """
+    Produces a dummy ROOT file containing fake training data.
+
+    This is used for testing the MVA integration pipeline. The file includes
+    three float variables ('a', 'b', 'c') and an integer prediction target.
+
+    :param file_name: Path to the output ROOT file.
+    """
     import ROOT
 
     tfile = ROOT.TFile(file_name, 'RECREATE')
@@ -274,7 +364,12 @@ def produce_dummy_file(file_name):
 
 
 if __name__ == '__main__':
+    """
+    Creates a dummy dataset and exports a placeholder CATFinder model.
 
+    NOTE: This is only for testing the MVA export process and should not
+    be used in production.
+    """
     import basf2
     import basf2_mva
 

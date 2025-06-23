@@ -1,4 +1,11 @@
-#include "tracking/modules/CATFinder/HitOrderer.h"
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+#include <tracking/modules/CATFinder/HitOrderer.h>
 
 #include <algorithm>
 #include <limits>
@@ -48,7 +55,7 @@ void HitOrderer::nearestNeighbor(KDTNode* node, const KDTHit& query, KDTHit& bes
 {
   if (!node) return;
   if (!node -> used) {
-    double d = squaredDistance(query, node -> hit);
+    double d = query.squaredDistanceTo(node -> hit);
     if (d < bestDist) {
       bestDist = d;
       best = node -> hit;
@@ -75,13 +82,6 @@ void HitOrderer::freeKDTree(KDTNode* node)
   delete node;
 }
 
-double HitOrderer::squaredDistance(const KDTHit& a, const KDTHit& b)
-{
-  double dx = a.x - b.x;
-  double dy = a.y - b.y;
-  return dx * dx + dy * dy;
-}
-
 std::vector<int> HitOrderer::orderHits(std::vector<double> startPosition, std::vector<std::vector<double>> nodes,
                                        std::vector<int>& CDCHitIndices)
 {
@@ -99,7 +99,7 @@ std::vector<int> HitOrderer::orderHits(std::vector<double> startPosition, std::v
   KDTHit currentHit = kdtHits[0];
   double bestDist = std::numeric_limits<double>::max();
   for (const auto& kdtHit : kdtHits) {
-    double d = squaredDistance({startPosition[0], startPosition[1], -1}, kdtHit);
+    const double d = kdtHit.squaredDistanceTo({startPosition[0], startPosition[1], -1});
     if (d < bestDist) {
       bestDist = d;
       currentHit = kdtHit;
@@ -109,6 +109,7 @@ std::vector<int> HitOrderer::orderHits(std::vector<double> startPosition, std::v
   markUsed(root, currentHit);
 
   std::vector<KDTHit> sortedHits;
+  sortedHits.reserve(kdtHits.size());
   sortedHits.push_back(currentHit);
 
   for (size_t i = 1; i < kdtHits.size(); ++i) {
@@ -130,15 +131,5 @@ std::vector<int> HitOrderer::orderHits(std::vector<double> startPosition, std::v
   }
 
   return sortedIndices;
-
-}
-
-HitOrderer::HitOrderer()
-{
-
-}
-
-HitOrderer::~HitOrderer()
-{
 
 }

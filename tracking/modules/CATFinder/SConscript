@@ -7,6 +7,4 @@ env['LIBS'] = [
   '$ROOT_LIBS'
 ]
 
-env.Append(CPPPATH=['./include'])
-
 Return('env')

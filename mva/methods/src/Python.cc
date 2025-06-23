@@ -415,9 +415,9 @@ namespace Belle2 {
 
     }
 
-    std::vector<float> PythonExpert::applyArbitrarySize(Dataset& test_data, const unsigned int input_size,
-                                                        const unsigned int output_size) const
+    std::vector<float> PythonExpert::applyArbitrarySize(Dataset& test_data, const unsigned int output_size) const
     {
+      const unsigned int input_size = test_data.m_input.size();
       auto X = std::unique_ptr<float[]>(new float[input_size]);
       npy_intp dimensions_X[1] = {static_cast<npy_intp>(input_size)};
 

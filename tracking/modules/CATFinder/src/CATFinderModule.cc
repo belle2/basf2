@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
@@ -40,17 +47,18 @@ void CATFinderModule::initialize()
   m_recoHitInformations.registerRelationTo(m_CDCHits);
   m_CDCRecoTracks.registerRelationTo(m_recoHitInformations);
 
-  CDCGeometryPar = &CDC::CDCGeometryPar::Instance();
-
-  evtNo = 0;
+  m_CDCGeometryPar = &CDC::CDCGeometryPar::Instance();
 }
 
 void CATFinderModule::beginRun()
 {
+
+  m_evtNo = 0;
+
   // Initialize CATFinder weightfile
 
-  if (m_weightfile_representation.isValid()) {
-    std::stringstream ss(m_weightfile_representation -> m_data);
+  if (m_weightfileRepresentation.isValid()) {
+    std::stringstream ss(m_weightfileRepresentation -> m_data);
     auto weightFile = MVA::Weightfile::loadFromStream(ss);
     initializeMVA(weightFile);
   }
@@ -59,22 +67,16 @@ void CATFinderModule::beginRun()
 
 void CATFinderModule::event()
 {
-  ++evtNo;
+  ++m_evtNo;
   preprocess();
   runGNN();
   postprocess();
 }
 
-void CATFinderModule::terminate()
-{
-  return;
-}
-
 void CATFinderModule::preprocess()
 {
   const std::vector<CDCWireHit>& wireHitVector = *m_wireHitVector;
-  std::vector<int> cdcHitIndexVector;
-  int wireHitAmount = wireHitVector.size();
+  const int wireHitAmount = wireHitVector.size();
   prepareVectors();
 
   m_dataset->m_input.clear();
@@ -91,17 +93,17 @@ void CATFinderModule::preprocess()
 
     unsigned short m_clayer = cdcHit.getICLayer();
     unsigned short m_wire = cdcHit.getIWire();
-    auto m_wirePos = CDCGeometryPar -> c_Aligned;
+    auto m_wirePos = m_CDCGeometryPar -> c_Aligned;
 
     double m_tdc = (static_cast<double>(cdcHit.getTDCCount()) - TDC_OFFSET) / TDC_SCALE;
     double m_adc = cdcHit.getADCCount() > ADC_CLIP ? 1. : static_cast<double>(cdcHit.getADCCount()) / ADC_CLIP;
     //unsigned short tot = cdcHit.getTOT();
 
-    B2Vector3D posForward = CDCGeometryPar -> wireForwardPosition(m_clayer, m_wire, m_wirePos);
-    B2Vector3D posBackward = CDCGeometryPar -> wireBackwardPosition(m_clayer, m_wire, m_wirePos);
+    const B2Vector3D posForward = m_CDCGeometryPar -> wireForwardPosition(m_clayer, m_wire, m_wirePos);
+    const B2Vector3D posBackward = m_CDCGeometryPar -> wireBackwardPosition(m_clayer, m_wire, m_wirePos);
 
-    double x = (posForward.x() + posBackward.x()) / 200.;
-    double y = (posForward.y() + posBackward.y()) / 200.;
+    const double x = (posForward.x() + posBackward.x()) / 200.;
+    const double y = (posForward.y() + posBackward.y()) / 200.;
 
     //auto wireHitX = wireHit.getRefPos2D().x();
     //auto wireHitY = wireHit.getRefPos2D().y();
@@ -128,17 +130,17 @@ void CATFinderModule::runGNN()
 {
   // Running and timing the GNN
 
-  auto output = m_expert->applyArbitrarySize(*m_dataset, m_dataset->m_input.size(),
-                                             (m_dataset->m_input.size() / N_INPUT_FEATURES) * 11);
+  const auto output = m_expert->applyArbitrarySize(*m_dataset,
+                                                   (m_dataset->m_input.size() / N_INPUT_FEATURES) * 11);
 
   // Extracting GNN outputs
 
   for (size_t i = 0; i + 8 + LATENT_SPACE_N_DIM <= output.size(); i += N_OUTPUT_FEATURES) {
-    predBetas.push_back(output[i]);
-    coords.push_back(std::vector<double>(output.begin() + i + 1, output.begin() + i + 1 + LATENT_SPACE_N_DIM));
-    predPs.push_back(std::vector<double>(output.begin() + i + 1 + LATENT_SPACE_N_DIM, output.begin() + i + 4 + LATENT_SPACE_N_DIM));
-    predVs.push_back(std::vector<double>(output.begin() + i + 4 + LATENT_SPACE_N_DIM, output.begin() + i + 7 + LATENT_SPACE_N_DIM));
-    predQs.push_back(output[i + N_OUTPUT_FEATURES - 1]);
+    m_predBetas.push_back(output[i]);
+    m_coords.push_back(std::vector<double>(output.begin() + i + 1, output.begin() + i + 1 + LATENT_SPACE_N_DIM));
+    m_predPs.push_back(std::vector<double>(output.begin() + i + 1 + LATENT_SPACE_N_DIM, output.begin() + i + 4 + LATENT_SPACE_N_DIM));
+    m_predVs.push_back(std::vector<double>(output.begin() + i + 4 + LATENT_SPACE_N_DIM, output.begin() + i + 7 + LATENT_SPACE_N_DIM));
+    m_predQs.push_back(output[i + N_OUTPUT_FEATURES - 1]);
   }
 }
 
@@ -147,61 +149,63 @@ void CATFinderModule::postprocess()
 
   // Creating the beta mask
 
-  std::vector<int> betaIndices(predBetas.size());
-  std::vector<int> selectedBetas(predBetas.size());
+  std::vector<int> m_betaIndices(m_predBetas.size());
+  std::vector<int> m_selectedBetas(m_predBetas.size());
 
-  std::iota(betaIndices.begin(), betaIndices.end(), 0);
-  std::sort(betaIndices.begin(), betaIndices.end(),
+  std::iota(m_betaIndices.begin(), m_betaIndices.end(), 0);
+  std::sort(m_betaIndices.begin(), m_betaIndices.end(),
   [&](int i1, int i2) {
-    return predBetas[i1] > predBetas[i2];
+    return m_predBetas[i1] > m_predBetas[i2];
   });
 
-  for (size_t i = 0; i < predBetas.size(); ++i) {
-    selectedBetas[i] = static_cast<int>(predBetas[i] > T_BETA);
+  for (size_t i = 0; i < m_predBetas.size(); ++i) {
+    m_selectedBetas[i] = static_cast<int>(m_predBetas[i] > T_BETA);
   }
 
-  collectOverThreshold(betaIndices, coords, selectedBetas);
+  collectOverThreshold(m_betaIndices, m_coords, m_selectedBetas);
 
 
   // Apply beta mask to GNN outputs
 
-  size_t betasCount = std::count(selectedBetas.begin(), selectedBetas.end(), 1);
-  conPoints.resize(betasCount);
-  conPointPs.resize(betasCount);
-  conPointVs.resize(betasCount);
-  conPointQs.resize(betasCount);
+  const size_t betasCount = std::count(m_selectedBetas.begin(), m_selectedBetas.end(), 1);
+  m_conPoints.resize(betasCount);
+  m_conPointPs.resize(betasCount);
+  m_conPointVs.resize(betasCount);
+  m_conPointQs.resize(betasCount);
 
   size_t j = 0;
-  for (size_t i = 0; i < selectedBetas.size(); ++i) {
-    if (selectedBetas[i]) {
-      conPoints[j] = coords[i];
-      conPointPs[j] = predPs[i];
-      conPointVs[j] = predVs[i];
-      conPointQs[j] = predQs[i];
+  for (size_t i = 0; i < m_selectedBetas.size(); ++i) {
+    if (m_selectedBetas[i]) {
+      m_conPoints[j] = m_coords[i];
+      m_conPointPs[j] = m_predPs[i];
+      m_conPointVs[j] = m_predVs[i];
+      m_conPointQs[j] = m_predQs[i];
       ++j;
     }
   }
 
   // Loop over the condensation points
 
-  for (size_t conPoint = 0; conPoint < conPoints.size(); ++conPoint) {
+  for (size_t conPoint = 0; conPoint < m_conPoints.size(); ++conPoint) {
 
     // Calculate distances of the condensation point to all other points
 
-    const size_t coordSize = coords.size();
+    const size_t coordSize = m_coords.size();
     std::vector<double> r(coordSize);
 
     for (size_t i = 0; i < coordSize; ++i) {
-      r[i] = std::hypot(conPoints[conPoint][0] - coords[i][0],
-                        conPoints[conPoint][1] - coords[i][1],
-                        conPoints[conPoint][2] - coords[i][2]);
+      r[i] = std::hypot(m_conPoints[conPoint][0] - m_coords[i][0],
+                        m_conPoints[conPoint][1] - m_coords[i][1],
+                        m_conPoints[conPoint][2] - m_coords[i][2]);
     }
 
 
     //Calculate CDCHits and GNN nodes assigned to the condensation point
 
     std::vector<int> CDCHitIndices;
+    CDCHitIndices.reserve(r.size());
     std::vector<std::vector<double>> gnnNodes;
+    gnnNodes.reserve(r.size());
 
     for (size_t i = 0; i < r.size(); ++i) {
       if (r[i] < HIT_DISTANCE) {
@@ -209,7 +213,6 @@ void CATFinderModule::postprocess()
         gnnNodes.push_back({m_dataset->m_input[7 * i] * 100, m_dataset->m_input[7 * i + 1] * 100});
       }
     }
-
 
     // Cut on the amount of CDC hits assigned to the condensation point
 
@@ -220,44 +223,36 @@ void CATFinderModule::postprocess()
 
     // Get the momentum and position of the condensation point
 
-    std::vector<double> momentum = {conPointPs[conPoint][0],
-                                    conPointPs[conPoint][1],
-                                    conPointPs[conPoint][2]
-                                   };
+    const ROOT::Math::XYZVector momentum(m_conPointPs[conPoint][0],
+                                         m_conPointPs[conPoint][1],
+                                         m_conPointPs[conPoint][2]
+                                        );
 
-    std::vector<double> position = {conPointVs[conPoint][0] * 100.,
-                                    conPointVs[conPoint][1] * 100.,
-                                    conPointVs[conPoint][2] * 100.
-                                   };
+    const ROOT::Math::XYZVector position(m_conPointVs[conPoint][0] * 100.,
+                                         m_conPointVs[conPoint][1] * 100.,
+                                         m_conPointVs[conPoint][2] * 100.
+                                        );
 
-    if (std::isnan(position[0]) || std::isnan(momentum[0])) {
+    if (std::isnan(position.X()) || std::isnan(momentum.X())) {
       B2WARNING("Skipping track with NaN values.");
       continue;
     }
 
-
     // Get the charge of the condensation point
 
-    auto tCharge = conPointQs[conPoint];
-    short charge;
-
-    tCharge >= 0.5 ? charge = 1 : charge = -1;
+    auto tCharge = m_conPointQs[conPoint];
+    const short charge = (tCharge >= 0.5) ? 1 : -1;
 
     // Order the hits with KDT
 
     HitOrderer hitOrderer;
-    std::vector<int> sortedIndices = hitOrderer.orderHits({0., 0.}, gnnNodes, CDCHitIndices);
+    std::vector<int> sortedIndices = hitOrderer.orderHits({position.X(), position.Y()}, gnnNodes, CDCHitIndices);
 
     // Create a new RecoTrack and fill it with position, momentum and charge information
 
     RecoTrack* cdcRecotrack = m_CDCRecoTracks.appendNew();
-    cdcRecotrack -> setPositionAndMomentum(
-      ROOT::Math::XYZVector(position[0], position[1], position[2]),
-      ROOT::Math::XYZVector(momentum[0], momentum[1], momentum[2])
-    );
-
+    cdcRecotrack -> setPositionAndMomentum(position, momentum);
     cdcRecotrack -> setChargeSeed(charge);
-
 
     // Create a covatiance matrix and add it to the RecoTrack
 
@@ -269,7 +264,6 @@ void CATFinderModule::postprocess()
     }
 
     cdcRecotrack -> setSeedCovariance(seed_cov);
-
 
     // Add the sorted CDCHits to the RecoTrack
 
@@ -298,15 +292,15 @@ void CATFinderModule::collectOverThreshold(std::vector<int> betaIndices, std::ve
                                            std::vector<int>& selectedBetas)
 {
   if (!betaIndices.empty() && betaIndices[0] < coords.size()) {
-    conPoints.push_back(coords[betaIndices[0]]);
+    m_conPoints.push_back(coords[betaIndices[0]]);
   }
 
   for (size_t i = 1; i < betaIndices.size(); ++i) {
     int id = betaIndices[i];
     if (selectedBetas[id]) {
       const std::vector<double>& conCandidate = coords[id];
-      if (isConPointOutOfRadius(conCandidate, conPoints)) {
-        conPoints.push_back(conCandidate);
+      if (isConPointOutOfRadius(conCandidate, m_conPoints)) {
+        m_conPoints.push_back(conCandidate);
       } else {
         selectedBetas[id] = false;
       }
@@ -334,15 +328,15 @@ bool CATFinderModule::isConPointOutOfRadius(const std::vector<double>& pointCand
 void CATFinderModule::prepareVectors()
 {
   // Clearing vectors from previous event
-  predBetas.clear();
-  predQs.clear();
-  conPointQs.clear();
-  predPs.clear();
-  predVs.clear();
-  coords.clear();
-  conPointPs.clear();
-  conPointVs.clear();
-  betaIndices.clear();
-  selectedBetas.clear();
-  conPoints.clear();
+  m_predBetas.clear();
+  m_predQs.clear();
+  m_conPointQs.clear();
+  m_predPs.clear();
+  m_predVs.clear();
+  m_coords.clear();
+  m_conPointPs.clear();
+  m_conPointVs.clear();
+  m_betaIndices.clear();
+  m_selectedBetas.clear();
+  m_conPoints.clear();
 }

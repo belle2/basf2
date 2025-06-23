@@ -83,7 +83,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        append_full_grid_cdc_eventt0=True,
                        legacy_ecl_charged_pid=False, emulate_HLT=False,
                        skip_full_grid_cdc_eventt0_if_svd_time_present=True,
-                       switch_off_slow_modules_for_online=False):
+                       switch_off_slow_modules_for_online=False,
+                       use_cat_finder=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -139,6 +140,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param switch_off_slow_modules_for_online: if true, it switches off some modules in the reconstruction chain by overriding
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
         to true in order to speed up the reconstruction.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
 
     # Set the run for beam data
@@ -171,7 +174,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
                                  append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
-                                 switch_off_slow_modules_for_online=switch_off_slow_modules_for_online)
+                                 switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
+                                 use_cat_finder=use_cat_finder)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
@@ -205,7 +209,8 @@ def add_prefilter_reconstruction(path,
                                  create_intercepts_for_pxd_ckf=False,
                                  append_full_grid_cdc_eventt0=True,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=True,
-                                 switch_off_slow_modules_for_online=False):
+                                 switch_off_slow_modules_for_online=False,
+                                 use_cat_finder=False):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -242,6 +247,8 @@ def add_prefilter_reconstruction(path,
     :param switch_off_slow_modules_for_online: if true, it switches off some modules in the reconstruction chain by overriding
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
         to true in order to speed up the reconstruction.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
 
     # If switch_off_slow_modules_for_online is True, we override some flags to make sure some slow modules are not executed
@@ -273,7 +280,8 @@ def add_prefilter_reconstruction(path,
         pxd_filtering_offline=pxd_filtering_offline,
         create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
-        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
+        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
+        use_cat_finder=use_cat_finder)
 
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Prefilter_Tracking')

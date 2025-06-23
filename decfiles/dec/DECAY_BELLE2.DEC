@@ -4338,8 +4338,7 @@ Decay B+
 0.000000500   D*+  pi0                                     SVS;
 0.000011000   D+  anti-K0                                  PHSP;
 0.000006000   D*+  anti-K0                                 SVS;
-0.0007617290   anti-D0  D_s0*+                             PHSP; #[BF update - PG 09/2020]
-0.017063010   anti-D*0  D_s0*+                             SVS;  #[BF update - PG 09/2020]
+0.000790000   anti-D0  D_s0*+                              PHSP; #[BF update - PG 09/2020]
 0.003091320   D_s1+  anti-D0                               SVS;  #[BF update - PG 09/2020]
 0.011960470   anti-D*0  D_s1+                              SVV_HELAMP 0.4904 0.0 0.7204 0.0 0.4904 0.0; #[BF update - PG 09/2020]
 0.000550000   anti-D0  K+  anti-K0                         PHSP;

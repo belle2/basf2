@@ -35,6 +35,8 @@ REG_MODULE(CATFinder);
 CATFinderModule::CATFinderModule() : Module()
 {
   setDescription("GNN based CDC track finding.");
+  addParam("recoTracksStoreArrayName", m_CDCRecoTracksName, "StoreArray name of the output CDC reco tracks.",
+           m_CDCRecoTracksName);
 }
 
 void CATFinderModule::initialize()
@@ -42,7 +44,7 @@ void CATFinderModule::initialize()
   m_CDCHits.isRequired();
   m_wireHitVector.isRequired();
   m_recoHitInformations.registerInDataStore();
-  m_CDCRecoTracks.registerInDataStore();
+  m_CDCRecoTracks.registerInDataStore(m_CDCRecoTracksName);
   m_CDCHits.registerRelationTo(m_CDCRecoTracks);
   m_recoHitInformations.registerRelationTo(m_CDCHits);
   m_CDCRecoTracks.registerRelationTo(m_recoHitInformations);

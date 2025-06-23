@@ -76,8 +76,10 @@ private:
   StoreArray<CDCHit> m_CDCHits;
   /** Input vector of CDC wire hits for the current event. */
   StoreWrappedObjPtr<std::vector<CDCWireHit>> m_wireHitVector{"CDCWireHitVector"};
+  /** Name of the output store array of reconstructted CDC tracks. */
+  std::string m_CDCRecoTracksName = "";
   /** Output store array of reconstructed CDC tracks. */
-  StoreArray<RecoTrack> m_CDCRecoTracks{"CDCRecoTracks"};
+  StoreArray<RecoTrack> m_CDCRecoTracks;
   /** Output store array of hit information for reconstructed tracks. */
   StoreArray<RecoHitInformation> m_recoHitInformations{"RecoHitInformations"};
 

@@ -306,14 +306,14 @@ void CATFinderModule::collectOverThreshold(const std::vector<int>& betaIndices, 
 bool CATFinderModule::isConPointOutOfRadius(const std::vector<double>& pointCandidate,
                                             const std::vector<std::vector<double>>& points)
 {
-  for (const std::vector<double>& point : points) {
-    double squareSum = 0;
-    for (size_t i  = 0; i < point.size(); ++i) {
-      double diff = pointCandidate[i] - point[i];
-      squareSum += diff * diff;
+  constexpr double thresholdSquared = T_DISTANCE * T_DISTANCE;
+  for (const auto& point : points) {
+    double distanceSquared = 0.0;
+    for (size_t i = 0; i < point.size(); ++i) {
+      const double diff = pointCandidate[i] - point[i];
+      distanceSquared += diff * diff;
     }
-    double distance = std::sqrt(squareSum);
-    if (distance <= T_DISTANCE) {
+    if (distanceSquared <= thresholdSquared) {
       return false;
     }
   }

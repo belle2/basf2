@@ -116,6 +116,8 @@ private:
   static constexpr double LAYER_SCALE = 10;
   /** Dimensionality of the latent space used by the GNN. */
   static constexpr int LATENT_SPACE_N_DIM = 3;
+  /** Scale factor for the spatial coordinates (from basf2 units to internal GNN units). */
+  static constexpr double SPATIAL_COORDINATES_SCALE = 100.;
 
   // GNN inputs
   /** X coordinate of the middle point between the wire ends of a CDC hit. */

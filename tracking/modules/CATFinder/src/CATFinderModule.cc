@@ -93,8 +93,8 @@ void CATFinderModule::preprocess()
     const B2Vector3D posForward = m_CDCGeometryPar->wireForwardPosition(clayer, wire, wirePos);
     const B2Vector3D posBackward = m_CDCGeometryPar->wireBackwardPosition(clayer, wire, wirePos);
 
-    const double x = (posForward.x() + posBackward.x()) / 200.;
-    const double y = (posForward.y() + posBackward.y()) / 200.;
+    const double x = 0.5 * (posForward.x() + posBackward.x()) / SPATIAL_COORDINATES_SCALE;
+    const double y = 0.5 * (posForward.y() + posBackward.y()) / SPATIAL_COORDINATES_SCALE;
 
     //auto wireHitX = wireHit.getRefPos2D().x();
     //auto wireHitY = wireHit.getRefPos2D().y();
@@ -205,7 +205,7 @@ void CATFinderModule::postprocess()
     for (size_t i = 0; i < r.size(); ++i) {
       if (r[i] < HIT_DISTANCE) {
         CDCHitIndices.push_back(i);
-        gnnNodes.push_back({m_dataset->m_input[7 * i] * 100, m_dataset->m_input[7 * i + 1] * 100});
+        gnnNodes.push_back({m_dataset->m_input[7 * i] * SPATIAL_COORDINATES_SCALE, m_dataset->m_input[7 * i + 1] * SPATIAL_COORDINATES_SCALE});
       }
     }
 
@@ -223,9 +223,9 @@ void CATFinderModule::postprocess()
                                          m_conPointPs[conPoint][2]
                                         );
 
-    const ROOT::Math::XYZVector position(m_conPointVs[conPoint][0] * 100.,
-                                         m_conPointVs[conPoint][1] * 100.,
-                                         m_conPointVs[conPoint][2] * 100.
+    const ROOT::Math::XYZVector position(m_conPointVs[conPoint][0] * SPATIAL_COORDINATES_SCALE,
+                                         m_conPointVs[conPoint][1] * SPATIAL_COORDINATES_SCALE,
+                                         m_conPointVs[conPoint][2] * SPATIAL_COORDINATES_SCALE
                                         );
 
     if (std::isnan(position.X()) || std::isnan(momentum.X())) {

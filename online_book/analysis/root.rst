@@ -1,7 +1,7 @@
 ROOT
 ====
 
-. sidebar:: Overview
+.. sidebar:: Overview
     :class: overview
 
     **Length**: 30-60 min

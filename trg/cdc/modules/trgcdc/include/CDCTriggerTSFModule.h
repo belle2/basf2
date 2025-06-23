@@ -97,6 +97,8 @@ namespace Belle2 {
     /** Assign ADC based flag for full hit tracker. Higher threshold of ADC. */
     int m_adcflag_high;
 
+    /** flag for saving adc information or not. Default false**/
+    bool m_saveadc;
   private:
     /** structure to hold pointers to all wires in the CDC */
     std::vector<std::vector<TRGCDCLayer*>> superLayers;

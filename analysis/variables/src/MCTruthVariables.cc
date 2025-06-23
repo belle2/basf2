@@ -1087,6 +1087,11 @@ namespace Belle2 {
 
     int ccbarTagSignal(const Particle* part)
     {
+      if (part->getNDaughters() == 0) {
+        B2WARNING("Particle has no daughters, cannot perform ccbarTagSignal");
+        return -1;
+      }
+
       int returnValue = ccbarTagEventStatus(part);
       int sigPDGCode = part->getPDGCode() * (-1); // get info about signal particles
       // reconstruction part of matching, get daughters
@@ -1152,6 +1157,11 @@ namespace Belle2 {
 
     int ccbarTagSignalSimplified(const Particle* part)
     {
+      if (part->getNDaughters() == 0) {
+        B2WARNING("Particle has no daughters, cannot perform ccbarTagSignalSimplified");
+        return -1;
+      }
+
       int sigPDGCode = part->getPDGCode() * (-1); // get info about signal particles
       // reconstruction part of matching, get daughters
       for (auto& daughter : part->getDaughters()) {
@@ -1222,6 +1232,7 @@ namespace Belle2 {
                       * second digit corresponds to daughter truth matching errors: 10 = non-matched daughter, 20 = non-common mother or background particle, 30 = severe mcError encountered, 40 = decay in flight, 50 = missing neutrino, 60 = missing gamma,
                       * third digit corresponds to ccbarTagEventStatus: 100 = no signal particles left in event, 200 = partially absorbed by tag, 0 = at least one signal particle left in event,
                       * fourth digit is 1000 if the tag absorbed something too much (like a particle coming from beam background).
+                      * return -1 if the particle has no daughters, cannot perform ccbarTagSignal.
 
                       )DOC");
     REGISTER_VARIABLE("ccbarTagSignalSimplified", ccbarTagSignalSimplified,

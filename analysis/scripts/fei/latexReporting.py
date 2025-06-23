@@ -22,6 +22,7 @@
 
 
 from fei import monitoring
+from fei.core import get_stages_from_particles
 
 from B2Tools import b2latex
 from B2Tools import format
@@ -296,6 +297,7 @@ def create_latex(output_file, monitoringParticle):
     o.save(output_file, compile=False)
 
 
+# =============================================================================
 if __name__ == '__main__':
     try:
         output_file = sys.argv[1]
@@ -303,7 +305,12 @@ if __name__ == '__main__':
         raise AttributeError("You have to supply the output tex file.")
 
     particles, configuration = monitoring.load_config()
+    cache = configuration.cache
+    stages = get_stages_from_particles(particles)
     monitoringParticle = []
-    for particle in particles:
-        monitoringParticle.append(monitoring.MonitoringParticle(particle))
+    for i in range(cache):
+        for particle in particles:
+            if particle in stages[i]:
+                print('FEI: latexReporting: ', i, particle.identifier)
+                monitoringParticle.append(monitoring.MonitoringParticle(particle))
     create_latex(output_file, monitoringParticle)

@@ -324,24 +324,42 @@ class TestTrainingData(unittest.TestCase):
         x = fei.core.TrainingData(particles, config, self.mc_counts)
 
         path = basf2.create_path()
-        path.add_module('VariablesToNtuple', fileName='training_input.root', treeName='pi+:generic ==> pi+:FSP variables',
+        path.add_module('VariablesToNtuple', fileName='training_input.root',
+                        treeName=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('pi+:generic ==> pi+:FSP variables'),
                         ignoreCommandLineOverride=True,
                         variables=['p', 'dr', 'isPrimarySignal'],
                         particleList='pi+:generic_0', sampling=('isPrimarySignal', {}))
-        path.add_module('VariablesToNtuple', fileName='training_input.root', treeName='K+:generic ==> K+:FSP variables',
+        path.add_module('VariablesToNtuple', fileName='training_input.root',
+                        treeName=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('K+:generic ==> K+:FSP variables'),
                         ignoreCommandLineOverride=True,
                         variables=['p', 'dr', 'isPrimarySignal'],
                         particleList='K+:generic_0', sampling=('isPrimarySignal', {}))
-        path.add_module('VariablesToNtuple', fileName='training_input.root',
-                        ignoreCommandLineOverride=True,
-                        treeName='D0:generic ==> K-:generic pi+:generic variables',
-                        variables=['M', 'p', 'isSignal'],
-                        particleList='D0:generic_0', sampling=('isSignal', {}))
-        path.add_module('VariablesToNtuple', fileName='training_input.root',
-                        ignoreCommandLineOverride=True,
-                        treeName='D0:generic ==> pi-:generic pi+:generic variables',
-                        variables=['M', 'p', 'isSignal'],
-                        particleList='D0:generic_1', sampling=('isSignal', {}))
+        path.add_module(
+            'VariablesToNtuple',
+            fileName='training_input.root',
+            ignoreCommandLineOverride=True,
+            treeName=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('D0:generic ==> K-:generic pi+:generic variables'),
+            variables=[
+                'M',
+                'p',
+                'isSignal'],
+            particleList='D0:generic_0',
+            sampling=(
+                'isSignal',
+                {}))
+        path.add_module(
+            'VariablesToNtuple',
+            fileName='training_input.root',
+            ignoreCommandLineOverride=True,
+            treeName=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('D0:generic ==> pi-:generic pi+:generic variables'),
+            variables=[
+                'M',
+                'p',
+                'isSignal'],
+            particleList='D0:generic_1',
+            sampling=(
+                'isSignal',
+                {}))
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
 
@@ -356,7 +374,8 @@ class TestTrainingData(unittest.TestCase):
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'p', 'dr', 'isPrimarySignal']),
                         variables_2d=fei.config.variables2binnings_2d([('p', 'isPrimarySignal'), ('dr', 'isPrimarySignal')]),
                         fileName='Monitor_TrainingData.root', directory='pi+:generic ==> pi+:FSP')
-        path.add_module('VariablesToNtuple', fileName='training_input.root', treeName='pi+:generic ==> pi+:FSP variables',
+        path.add_module('VariablesToNtuple', fileName='training_input.root',
+                        treeName=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('pi+:generic ==> pi+:FSP variables'),
                         ignoreCommandLineOverride=True,
                         variables=['p', 'dr', 'isPrimarySignal'],
                         particleList='pi+:generic_0', sampling=('isPrimarySignal', {}))
@@ -365,7 +384,8 @@ class TestTrainingData(unittest.TestCase):
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'p', 'dr', 'isPrimarySignal']),
                         variables_2d=fei.config.variables2binnings_2d([('p', 'isPrimarySignal'), ('dr', 'isPrimarySignal')]),
                         fileName='Monitor_TrainingData.root', directory='K+:generic ==> K+:FSP')
-        path.add_module('VariablesToNtuple', fileName='training_input.root', treeName='K+:generic ==> K+:FSP variables',
+        path.add_module('VariablesToNtuple', fileName='training_input.root',
+                        treeName=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('K+:generic ==> K+:FSP variables'),
                         ignoreCommandLineOverride=True,
                         variables=['p', 'dr', 'isPrimarySignal'],
                         particleList='K+:generic_0', sampling=('isPrimarySignal', {}))
@@ -374,21 +394,37 @@ class TestTrainingData(unittest.TestCase):
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'M', 'p', 'isSignal']),
                         variables_2d=fei.config.variables2binnings_2d([('M', 'isSignal'), ('p', 'isSignal')]),
                         fileName='Monitor_TrainingData.root', directory='D0:generic ==> K-:generic pi+:generic')
-        path.add_module('VariablesToNtuple', fileName='training_input.root',
-                        ignoreCommandLineOverride=True,
-                        treeName='D0:generic ==> K-:generic pi+:generic variables',
-                        variables=['M', 'p', 'isSignal'],
-                        particleList='D0:generic_0', sampling=('isSignal', {}))
+        path.add_module(
+            'VariablesToNtuple',
+            fileName='training_input.root',
+            ignoreCommandLineOverride=True,
+            treeName=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('D0:generic ==> K-:generic pi+:generic variables'),
+            variables=[
+                'M',
+                'p',
+                'isSignal'],
+            particleList='D0:generic_0',
+            sampling=(
+                'isSignal',
+                {}))
         path.add_module('VariablesToHistogram', particleList='D0:generic_1',
                         ignoreCommandLineOverride=True,
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'M', 'p', 'isSignal']),
                         variables_2d=fei.config.variables2binnings_2d([('M', 'isSignal'), ('p', 'isSignal')]),
                         fileName='Monitor_TrainingData.root', directory='D0:generic ==> pi-:generic pi+:generic')
-        path.add_module('VariablesToNtuple', fileName='training_input.root',
-                        ignoreCommandLineOverride=True,
-                        treeName='D0:generic ==> pi-:generic pi+:generic variables',
-                        variables=['M', 'p', 'isSignal'],
-                        particleList='D0:generic_1', sampling=('isSignal', {}))
+        path.add_module(
+            'VariablesToNtuple',
+            fileName='training_input.root',
+            ignoreCommandLineOverride=True,
+            treeName=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('D0:generic ==> pi-:generic pi+:generic variables'),
+            variables=[
+                'M',
+                'p',
+                'isSignal'],
+            particleList='D0:generic_1',
+            sampling=(
+                'isSignal',
+                {}))
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
 
@@ -792,7 +828,8 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('mcParticleStatus', 'extraInfo(postCut_rank)')]),
                         fileName='Monitor_PostReconstruction_AfterRanking.root', directory='pi+:generic',
                         ignoreCommandLineOverride=True)
-        path.add_module('VariablesToNtuple', fileName='Monitor_Final.root', treeName='pi+:generic variables',
+        path.add_module('VariablesToNtuple', fileName='Monitor_Final.root',
+                        treeName=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('pi+:generic variables'),
                         ignoreCommandLineOverride=True,
                         variables=['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
                                    'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
@@ -850,7 +887,8 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('mcParticleStatus', 'extraInfo(postCut_rank)')]),
                         fileName='Monitor_PostReconstruction_AfterRanking.root', directory='K+:generic',
                         ignoreCommandLineOverride=True)
-        path.add_module('VariablesToNtuple', fileName='Monitor_Final.root', treeName='K+:generic variables',
+        path.add_module('VariablesToNtuple', fileName='Monitor_Final.root',
+                        treeName=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('K+:generic variables'),
                         ignoreCommandLineOverride=True,
                         variables=['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
                                    'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
@@ -925,7 +963,8 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('mcParticleStatus', 'extraInfo(postCut_rank)')]),
                         fileName='Monitor_PostReconstruction_AfterRanking.root', directory='D0:generic',
                         ignoreCommandLineOverride=True)
-        path.add_module('VariablesToNtuple', fileName='Monitor_Final.root', treeName='D0:generic variables',
+        path.add_module('VariablesToNtuple', fileName='Monitor_Final.root',
+                        treeName=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('D0:generic variables'),
                         ignoreCommandLineOverride=True,
                         variables=['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', 'isSignal',
                                    'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
@@ -942,7 +981,10 @@ class TestTeacher(unittest.TestCase):
 
         f = ROOT.TFile('training_input.root', 'RECREATE')
         f.cd()
-        tree = ROOT.TTree('pi+:generic ==> pi+:FSP variables', 'pi+:generic ==> pi+:FSP variables')
+
+        tree = ROOT.TTree(
+            ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('pi+:generic ==> pi+:FSP variables'),
+            ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('pi+:generic ==> pi+:FSP variables'))
         isSignal = np.zeros(1, dtype=float)
         p = np.zeros(1, dtype=float)
         pt = np.zeros(1, dtype=float)
@@ -958,7 +1000,9 @@ class TestTeacher(unittest.TestCase):
 
         # Test case, where tree not existent for K+:generic ==> K+:FSP, so skip creating it
 
-        tree = ROOT.TTree('D0:generic ==> K-:generic pi+:generic variables', 'D0:generic ==> K-:generic pi+:generic variables')
+        tree = ROOT.TTree(
+            ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('D0:generic ==> K-:generic pi+:generic variables'),
+            ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('D0:generic ==> K-:generic pi+:generic variables'))
         isSignal = np.zeros(1, dtype=float)
         p = np.zeros(1, dtype=float)
         pt = np.zeros(1, dtype=float)
@@ -973,7 +1017,9 @@ class TestTeacher(unittest.TestCase):
             tree.Fill()
         tree.Write("", ROOT.TObject.kOverwrite)
 
-        tree = ROOT.TTree('D0:generic ==> pi-:generic pi+:generic variables', 'D0:generic ==> pi-:generic pi+:generic variables')
+        tree = ROOT.TTree(
+            ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('D0:generic ==> pi-:generic pi+:generic variables'),
+            ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('D0:generic ==> pi-:generic pi+:generic variables'))
         isSignal = np.zeros(1, dtype=float)
         p = np.zeros(1, dtype=float)
         pt = np.zeros(1, dtype=float)
@@ -1000,6 +1046,14 @@ class TestTeacher(unittest.TestCase):
             os.remove('UNITTEST_D0:generic ==> pi-:generic pi+:generic.xml')
         if os.path.isfile('training_input.root'):
             os.remove('training_input.root')
+        if os.path.isfile('pi+:generic ==> pi+:FSP.xml'):
+            os.remove('pi+:generic ==> pi+:FSP.xml')
+        if os.path.isfile('D0:generic ==> pi-:generic pi+:generic.xml'):
+            os.remove('D0:generic ==> pi-:generic pi+:generic.xml')
+        if os.path.isfile('D0:generic ==> K-:generic pi+:generic.xml'):
+            os.remove('D0:generic ==> K-:generic pi+:generic.xml')
+        if os.path.isfile('TEACHER.xml'):
+            os.remove('TEACHER.xml')
 
     def test_create_fake_weightfile(self):
         self.assertEqual(os.path.isfile('UNITTEST_pi+:generic ==> pi+:FSP.xml'), False)
@@ -1081,9 +1135,9 @@ class TestGetPath(unittest.TestCase):
 
         # No weightfiles were created, hence the algorithm
         # cannot go forward and tries to create the training data again
-        config = fei.config.FeiConfiguration(training=True)
-        feistate = fei.core.get_path(particles, config)
-        self.assertEqual(feistate.stage, 1)
+        with self.assertRaises(RuntimeError):
+            config = fei.config.FeiConfiguration(training=True)
+            feistate = fei.core.get_path(particles, config)
 
         # We create the FSP weightfiles by hand
         fei.core.Teacher.create_fake_weightfile('pi+:generic ==> pi+:FSP')
@@ -1100,9 +1154,9 @@ class TestGetPath(unittest.TestCase):
 
         # No weightfiles were created, hence the algorithm
         # cannot go forward and tries to create the training data again
-        config = fei.config.FeiConfiguration(training=True)
-        feistate = fei.core.get_path(particles, config)
-        self.assertEqual(feistate.stage, 2)
+        with self.assertRaises(RuntimeError):
+            config = fei.config.FeiConfiguration(training=True)
+            feistate = fei.core.get_path(particles, config)
 
         # We create the pi0 weightfile by hand
         fei.core.Teacher.create_fake_weightfile('pi0:generic ==> gamma:generic gamma:generic')
@@ -1168,9 +1222,9 @@ class TestGetPath(unittest.TestCase):
 
         # No weightfiles were created, hence the algorithm
         # cannot go forward and tries to create the training data again
-        config = fei.config.FeiConfiguration(cache=1, training=True)
-        feistate = fei.core.get_path(particles, config)
-        self.assertEqual(feistate.stage, 1)
+        with self.assertRaises(RuntimeError):
+            config = fei.config.FeiConfiguration(cache=1, training=True)
+            feistate = fei.core.get_path(particles, config)
 
         # We create the FSP weightfiles by hand
         fei.core.Teacher.create_fake_weightfile('pi+:generic ==> pi+:FSP')
@@ -1187,16 +1241,16 @@ class TestGetPath(unittest.TestCase):
 
         # No weightfiles were created, hence the algorithm
         # cannot go forward and tries to create the training data again
-        config = fei.config.FeiConfiguration(cache=2, training=True)
-        feistate = fei.core.get_path(particles, config)
-        self.assertEqual(feistate.stage, 2)
+        with self.assertRaises(RuntimeError):
+            config = fei.config.FeiConfiguration(cache=2, training=True)
+            feistate = fei.core.get_path(particles, config)
 
         # No weightfiles were created, hence the algorithm
         # cannot go forward and tries to create the training data again
         # This applies as well if the stage is even bigger
-        config = fei.config.FeiConfiguration(cache=4, training=True)
-        feistate = fei.core.get_path(particles, config)
-        self.assertEqual(feistate.stage, 2)
+        with self.assertRaises(RuntimeError):
+            config = fei.config.FeiConfiguration(cache=4, training=True)
+            feistate = fei.core.get_path(particles, config)
 
         # We create the pi0 weightfile by hand
         fei.core.Teacher.create_fake_weightfile('pi0:generic ==> gamma:generic gamma:generic')

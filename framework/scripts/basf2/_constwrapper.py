@@ -11,6 +11,8 @@
 """
 Modify the PyDBObj and PyDBArray classes to return read only objects to prevent
 accidental changes to the conditions data.
+Also modify the functions fillArray and readArray of the PyStoreArray class to
+ensure a safe and simple usage of those function.
 
 This module does not contain any public functions or variables, it just
 modifies the ROOT interfaces for PyDBObj and PyDBArray to only return read only
@@ -99,6 +101,139 @@ def _PyDBArray__iter__(self):
         yield self[i]
 
 
+numpy_to_cpp = {"int16": "short *",
+                "uint16": "unsigned short *",
+                "int32": "int *",
+                "uint32": "unsigned int *",
+                "int64": "long *",
+                "uint64": "unsigned long *",
+                "float32": "float *",
+                "float64": "double *",
+                "float96": "long double *"}
+
+cpp_to_numpy = {"short": "short",
+                "unsigned short": "ushort",
+                "int": "intc",
+                "unsigned int": "uintc",
+                "long": "long",
+                "unsigned long": "ulong",
+                "float": "single",
+                "double": "double",
+                "long double": "longdouble",
+                "Belle2::VxdID": "ushort"}
+
+
+class ConstructorNotFoundError(Exception):
+    '''
+    Class that throws an exception when a specific constructor is not found.
+    The error message will contain the signature of the wanted constructor,
+    as well as the signature of the available constructors.
+    '''
+    def __init__(self, members, list_constructors, obj_name):
+        '''
+        Parameters:
+        -----------
+        members: dictionary
+            Contains the name of the parameters of the wanted constructor and their types
+
+        list_constructors: list of dictionaries
+            Contains all the available constructors, with the names of their parameters
+            and their types
+
+        obj_name: string
+            Name of the class of which the constructor is wanted
+        '''
+        #: Member contatining the final message of the exception
+        self.message = "No corresponding constructor found. Looking for signature: \n"
+        #: Dictionary
+        self.members = members
+        #: List of constructors
+        self.list_constructors = list_constructors
+        #: Name of the class
+        self.name = obj_name
+        self.message = self.message + self.name + "("
+        self.message = (self.message +
+                        ", ".join([" ".join(i) for i in list(zip(self.members.values(), self.members.keys()))]) +
+                        ")\n Available constructors:\n")
+        for lis in self.list_constructors:
+            self.message = (self.message +
+                            self.name + "(" + ", ".join([" ".join(i) for i in list(zip(lis.values(), lis.keys()))]) + ")\n")
+        super().__init__(self.message)
+
+
+def _wrap_fill_array(func):
+
+    def fill_array(pyStoreArray, **kwargs):
+        import numpy as np
+
+        list_constructors = []
+
+        obj_class = pyStoreArray.getClass()
+        obj_classname = obj_class.GetName()
+
+        for meth in obj_class.GetListOfMethods():
+            if meth.GetName() == obj_classname.split(":")[-1]:  # found one constructor
+                d = {}
+
+                for ar in meth.GetListOfMethodArgs():
+                    d[ar.GetName()] = ar.GetTypeName()
+                list_constructors.append(d)
+
+                # Check if this is the right constructor
+                if d.keys() == kwargs.keys():
+                    break
+
+        else:
+            m_d = {list(kwargs.keys())[i]: numpy_to_cpp[type(list(kwargs.values())[i]
+                                                             [0]).__name__].split("*")[0] for i in range(len(kwargs.keys()))}
+            raise ConstructorNotFoundError(m_d, list_constructors, obj_classname)
+
+        arr_types = []
+        for k in kwargs.keys():
+            if kwargs[k][0].dtype != np.dtype(cpp_to_numpy[d[k]]):
+                try:
+                    kwargs[k] = kwargs[k].astype(cpp_to_numpy[d[k]])
+                except ValueError:
+                    raise ValueError((f"Impossible to convert type of input arrays ({type(kwargs[k][0]).__name__})" +
+                                      f" into the type of the corresponding class member '{k}' ({np.dtype(cpp_to_numpy[d[k]])})"))
+            arr_types.append(numpy_to_cpp[type(kwargs[k][0]).__name__])
+
+        l_arr = list(kwargs.values())
+        if not all(len(l_arr[0]) == len(arr) for arr in l_arr[1:]):
+            raise ValueError("The lengths of the passed arrays are not the same")
+
+        length = len(l_arr[0])
+
+        func[(obj_classname, *arr_types)](pyStoreArray, length, *[kwargs[k] for k in d.keys()])
+
+    return fill_array
+
+
+def _wrap_read_array(func):
+
+    def read_array(pyStoreArray):
+        import numpy as np
+        kwargs = {}
+
+        obj_class = pyStoreArray.getClass()
+        obj_classname = obj_class.GetName()
+
+        fillValuesMethod = obj_class.GetMethodAny("fillValues")
+        if not fillValuesMethod:
+            raise ReferenceError(f"The method fillValues is not implemented for the class {obj_classname}")
+
+        for ar in fillValuesMethod.GetListOfMethodArgs():
+            kwargs.setdefault(ar.GetName(), np.zeros(len(pyStoreArray), dtype=cpp_to_numpy[ar.GetFullTypeName().split("*")[0]]))
+
+        l_types = [numpy_to_cpp[kwargs[v].dtype.name] for v in kwargs.keys()]
+
+        func[(obj_classname, *l_types)](pyStoreArray, *kwargs.values())
+
+        return kwargs
+
+    return read_array
+
+
 @pythonization(namespace="Belle2")
 def _pythonize(klass, name):
     """Adjust the python interface of some Py* classes"""
@@ -124,3 +259,6 @@ def _pythonize(klass, name):
         # make sure that we can iterate over the items in the class
         # pointed to if it allows iteration
         klass.__iter__ = lambda self: iter(self.obj())
+    elif name == "PyStoreArray":
+        klass.fillArray = _wrap_fill_array(klass.fillArray)
+        klass.readArray = _wrap_read_array(klass.readArray)

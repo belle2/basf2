@@ -5,6 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
@@ -13,7 +14,7 @@
 
 #include <tracking/modules/CATFinder/CATFinderModule.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/modules/CATFinder/HitOrderer.h>
+#include <tracking/modules/CATFinder/CATFinderUtils.h>
 
 #include <mva/interface/Weightfile.h>
 #include <mva/interface/Interface.h>
@@ -70,7 +71,7 @@ void CATFinderModule::event()
 
 void CATFinderModule::preprocess()
 {
-  const std::vector<CDCWireHit>& wireHitVector = *m_wireHitVector;
+  const std::vector<TrackFindingCDC::CDCWireHit>& wireHitVector = *m_wireHitVector;
 
   m_dataset->m_input.clear();
   m_dataset->m_input.reserve(wireHitVector.size() * N_INPUT_FEATURES);
@@ -180,11 +181,9 @@ void CATFinderModule::postprocess()
   }
 
   // Loop over the condensation points
-
   for (size_t conPoint = 0; conPoint < m_conPoints.size(); ++conPoint) {
 
     // Calculate distances of the condensation point to all other points
-
     const size_t coordSize = m_coords.size();
     std::vector<double> r(coordSize);
 
@@ -194,9 +193,7 @@ void CATFinderModule::postprocess()
                         m_conPoints[conPoint][2] - m_coords[i][2]);
     }
 
-
     //Calculate CDCHits and GNN nodes assigned to the condensation point
-
     std::vector<int> CDCHitIndices;
     CDCHitIndices.reserve(r.size());
     std::vector<std::vector<double>> gnnNodes;
@@ -210,14 +207,11 @@ void CATFinderModule::postprocess()
     }
 
     // Cut on the amount of CDC hits assigned to the condensation point
-
     if (CDCHitIndices.size() < CDC_HIT_INDICES_CUT) {
-      B2INFO("Skipping contensation point due to CDCHit cut.");
       continue;
     }
 
     // Get the momentum and position of the condensation point
-
     const ROOT::Math::XYZVector momentum(m_conPointPs[conPoint][0],
                                          m_conPointPs[conPoint][1],
                                          m_conPointPs[conPoint][2]
@@ -234,34 +228,28 @@ void CATFinderModule::postprocess()
     }
 
     // Get the charge of the condensation point
-
     auto tCharge = m_conPointQs[conPoint];
     const short charge = (tCharge >= 0.5) ? 1 : -1;
 
     // Order the hits with KDT
-
-    HitOrderer hitOrderer;
+    CATFinderUtils::HitOrderer hitOrderer;
     std::vector<int> sortedIndices = hitOrderer.orderHits({position.X(), position.Y()}, gnnNodes, CDCHitIndices);
 
     // Create a new RecoTrack and fill it with position, momentum and charge information
-
     RecoTrack* cdcRecotrack = m_CDCRecoTracks.appendNew();
     cdcRecotrack -> setPositionAndMomentum(position, momentum);
     cdcRecotrack -> setChargeSeed(charge);
 
     // Create a covatiance matrix and add it to the RecoTrack
-
     auto seed_cov = TMatrixDSym(6);
     for (int i = 0; i < 6; ++i) {
       for (int k = 0; k < 6; ++k) {
         seed_cov[i][k] = 1e-1;
       }
     }
-
     cdcRecotrack -> setSeedCovariance(seed_cov);
 
     // Add the sorted CDCHits to the RecoTrack
-
     int k = 0;
     for (int cdcHitIndex : sortedIndices) {
       cdcRecotrack -> addCDCHit(m_CDCHits[cdcHitIndex], k);

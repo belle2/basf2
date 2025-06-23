@@ -5,10 +5,44 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/modules/CATFinder/HitOrderer.h>
+
+#include <tracking/modules/CATFinder/CATFinderUtils.h>
+#include <framework/logging/Logger.h>
 
 #include <algorithm>
 #include <limits>
+
+
+using namespace Belle2::CATFinderUtils;
+
+
+KDTNodePool::KDTNodePool(size_t capacity) : index(0)
+{
+  pool.resize(capacity);
+  for (size_t i = 0; i < capacity; ++i) {
+    pool[i] = new KDTNode();
+  }
+}
+
+KDTNodePool::~KDTNodePool()
+{
+  for (KDTNode* node : pool) {
+    delete node;
+  }
+}
+
+KDTNode* KDTNodePool::allocate()
+{
+  if (index >= pool.size()) {
+    B2ERROR("KDTNodePool:allocate() exceeded pool capacity.");
+  }
+  return pool[index++];
+}
+
+void KDTNodePool::reset()
+{
+  index = 0;
+}
 
 template<typename Iterator, typename Compare>
 inline void HitOrderer::insertionSort(Iterator begin, Iterator end, Compare cmp)

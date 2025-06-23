@@ -250,8 +250,8 @@ namespace Belle2 {
      * @param coords Latent space coordinates of the nodes.
      * @param selectedBetas Vector indicating whether each node is initially above the beta threshold.
      */
-    void collectOverThreshold(const std::vector<int>& betaIndices, const std::vector<std::vector<double>>& coords,
-                              std::vector<int>& preselectedBetas);
+    void collectOverThreshold(const std::vector<unsigned int>& betaIndices, const std::vector<std::vector<double>>& coords,
+                              std::vector<uint8_t>& selectedBetas);
 
     /**
      * @brief Initializes the MVA expert and dataset from a given weight file.

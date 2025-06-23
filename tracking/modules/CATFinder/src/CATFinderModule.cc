@@ -22,6 +22,7 @@
 
 #include <TMatrixDSym.h>
 #include <cmath>
+#include <cstdint>
 #include <algorithm>
 #include <numeric>
 #include <sstream>
@@ -146,8 +147,8 @@ void CATFinderModule::runGNN()
 void CATFinderModule::postprocess()
 {
   // Creating the beta mask
-  std::vector<int> betaIndices(m_predBetas.size());
-  std::vector<int> selectedBetas(m_predBetas.size());
+  std::vector<unsigned int> betaIndices(m_predBetas.size());
+  std::vector<uint8_t> selectedBetas(m_predBetas.size());
 
   std::iota(betaIndices.begin(), betaIndices.end(), 0);
   std::sort(betaIndices.begin(), betaIndices.end(),
@@ -156,7 +157,7 @@ void CATFinderModule::postprocess()
   });
 
   for (size_t i = 0; i < m_predBetas.size(); ++i) {
-    selectedBetas[i] = static_cast<int>(m_predBetas[i] > T_BETA);
+    selectedBetas[i] = static_cast<uint8_t>(m_predBetas[i] > T_BETA);
   }
 
   collectOverThreshold(betaIndices, m_coords, selectedBetas);
@@ -271,8 +272,9 @@ void CATFinderModule::initializeMVA(MVA::Weightfile& weightfile)
   m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(generalOptions, std::move(dummy), 0));
 }
 
-void CATFinderModule::collectOverThreshold(const std::vector<int>& betaIndices, const std::vector<std::vector<double>>& coords,
-                                           std::vector<int>& selectedBetas)
+void CATFinderModule::collectOverThreshold(const std::vector<unsigned int>& betaIndices,
+                                           const std::vector<std::vector<double>>& coords,
+                                           std::vector<uint8_t>& selectedBetas)
 {
   if (!betaIndices.empty() && betaIndices[0] < coords.size()) {
     m_conPoints.push_back(coords[betaIndices[0]]);
@@ -280,12 +282,12 @@ void CATFinderModule::collectOverThreshold(const std::vector<int>& betaIndices, 
 
   for (size_t i = 1; i < betaIndices.size(); ++i) {
     int id = betaIndices[i];
-    if (selectedBetas[id]) {
+    if (selectedBetas[id] > 0) {
       const std::vector<double>& conCandidate = coords[id];
       if (isConPointOutOfRadius(conCandidate, m_conPoints)) {
         m_conPoints.push_back(conCandidate);
       } else {
-        selectedBetas[id] = false;
+        selectedBetas[id] = 0;
       }
     }
   }

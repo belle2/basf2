@@ -46,28 +46,21 @@ void CATFinderModule::initialize()
   m_CDCHits.registerRelationTo(m_CDCRecoTracks);
   m_recoHitInformations.registerRelationTo(m_CDCHits);
   m_CDCRecoTracks.registerRelationTo(m_recoHitInformations);
-
   m_CDCGeometryPar = &CDC::CDCGeometryPar::Instance();
 }
 
 void CATFinderModule::beginRun()
 {
-
-  m_evtNo = 0;
-
   // Initialize CATFinder weightfile
-
   if (m_weightfileRepresentation.isValid()) {
     std::stringstream ss(m_weightfileRepresentation -> m_data);
     auto weightFile = MVA::Weightfile::loadFromStream(ss);
     initializeMVA(weightFile);
   }
-
 }
 
 void CATFinderModule::event()
 {
-  ++m_evtNo;
   preprocess();
   runGNN();
   postprocess();
@@ -76,31 +69,27 @@ void CATFinderModule::event()
 void CATFinderModule::preprocess()
 {
   const std::vector<CDCWireHit>& wireHitVector = *m_wireHitVector;
-  const int wireHitAmount = wireHitVector.size();
-  prepareVectors();
 
   m_dataset->m_input.clear();
-  m_dataset->m_input.reserve(wireHitAmount * N_INPUT_FEATURES);
+  m_dataset->m_input.reserve(wireHitVector.size() * N_INPUT_FEATURES);
 
-  for (int hitID = 0; hitID < wireHitAmount; ++hitID) {
-    const auto& wireHit = wireHitVector[hitID];
+  for (const auto& wireHit : wireHitVector) {
 
-    if (wireHit.getAutomatonCell().hasMaskedFlag()) {
+    if (wireHit.getAutomatonCell().hasMaskedFlag())
       continue;
-    }
 
     const CDCHit cdcHit = *wireHit.getHit();
 
-    unsigned short m_clayer = cdcHit.getICLayer();
-    unsigned short m_wire = cdcHit.getIWire();
-    auto m_wirePos = m_CDCGeometryPar -> c_Aligned;
+    const unsigned short clayer = cdcHit.getICLayer();
+    const unsigned short wire = cdcHit.getIWire();
+    const auto wirePos = m_CDCGeometryPar->c_Aligned;
 
-    double m_tdc = (static_cast<double>(cdcHit.getTDCCount()) - TDC_OFFSET) / TDC_SCALE;
-    double m_adc = cdcHit.getADCCount() > ADC_CLIP ? 1. : static_cast<double>(cdcHit.getADCCount()) / ADC_CLIP;
+    const double tdc_scaled = (static_cast<double>(cdcHit.getTDCCount()) - TDC_OFFSET) / TDC_SCALE;
+    const double adc_clipped = cdcHit.getADCCount() > ADC_CLIP ? 1. : static_cast<double>(cdcHit.getADCCount()) / ADC_CLIP;
     //unsigned short tot = cdcHit.getTOT();
 
-    const B2Vector3D posForward = m_CDCGeometryPar -> wireForwardPosition(m_clayer, m_wire, m_wirePos);
-    const B2Vector3D posBackward = m_CDCGeometryPar -> wireBackwardPosition(m_clayer, m_wire, m_wirePos);
+    const B2Vector3D posForward = m_CDCGeometryPar->wireForwardPosition(clayer, wire, wirePos);
+    const B2Vector3D posBackward = m_CDCGeometryPar->wireBackwardPosition(clayer, wire, wirePos);
 
     const double x = (posForward.x() + posBackward.x()) / 200.;
     const double y = (posForward.y() + posBackward.y()) / 200.;
@@ -108,34 +97,41 @@ void CATFinderModule::preprocess()
     //auto wireHitX = wireHit.getRefPos2D().x();
     //auto wireHitY = wireHit.getRefPos2D().y();
 
-    double m_slayer = static_cast<double>(cdcHit.getISuperLayer()) / SLAYER_SCALE;
-    double m_clayer_scaled = static_cast<double>(cdcHit.getICLayer()) / CLAYER_SCALE;
-    double m_layer = static_cast<double>(cdcHit.getILayer()) / LAYER_SCALE;
+    const double superlayer_scaled = static_cast<double>(cdcHit.getISuperLayer()) / SLAYER_SCALE;
+    const double clayer_scaled = static_cast<double>(clayer) / CLAYER_SCALE;
+    const double layer_scaled = static_cast<double>(cdcHit.getILayer()) / LAYER_SCALE;
     //double chargeDeposit = wireHit.getRefChargeDeposit();
     //double driftTime = wireHit.getDriftTime();
     //double driftLength = wireHit.getRefDriftLength();
 
     m_dataset->m_input.push_back(x);
     m_dataset->m_input.push_back(y);
-    m_dataset->m_input.push_back(m_tdc);
-    m_dataset->m_input.push_back(m_adc);
-    m_dataset->m_input.push_back(m_slayer);
-    m_dataset->m_input.push_back(m_clayer_scaled);
-    m_dataset->m_input.push_back(m_layer);
-
+    m_dataset->m_input.push_back(tdc_scaled);
+    m_dataset->m_input.push_back(adc_clipped);
+    m_dataset->m_input.push_back(superlayer_scaled);
+    m_dataset->m_input.push_back(clayer_scaled);
+    m_dataset->m_input.push_back(layer_scaled);
   }
+
+  // Final step: let's prepare the vectors for the GNN output and the post-processing.
+  prepareVectors();
 }
 
 void CATFinderModule::runGNN()
 {
-  // Running and timing the GNN
+  // Running the GNN
+  const unsigned int outputSize = (m_dataset->m_input.size() / N_INPUT_FEATURES) * N_OUTPUT_FEATURES;
+  auto output = m_expert->applyArbitrarySize(*m_dataset, outputSize);
 
-  const auto output = m_expert->applyArbitrarySize(*m_dataset,
-                                                   (m_dataset->m_input.size() / N_INPUT_FEATURES) * 11);
-
-  // Extracting GNN outputs
-
-  for (size_t i = 0; i + 8 + LATENT_SPACE_N_DIM <= output.size(); i += N_OUTPUT_FEATURES) {
+  // Extracting the GNN outputs
+  for (size_t i = 0; i + N_OUTPUT_FEATURES <= output.size(); i += N_OUTPUT_FEATURES) {
+    // For each CDCHit, the returned output is the following one:
+    // - 1 double for the beta value
+    // - X doubles for the coordinates of the condensation point in the latent space (e.g.: if the latent space has 3 dimensions, X=3)
+    // - 3 doubles for the coordinates of the predicted momentum
+    // - 3 doubles for the coordinates of the predicted starting point
+    // - 1 double for the predicted charge
+    // We have: 1 + X + 3 + 3 + 1 == N_OUTPUT_FEATURES
     m_predBetas.push_back(output[i]);
     m_coords.push_back(std::vector<double>(output.begin() + i + 1, output.begin() + i + 1 + LATENT_SPACE_N_DIM));
     m_predPs.push_back(std::vector<double>(output.begin() + i + 1 + LATENT_SPACE_N_DIM, output.begin() + i + 4 + LATENT_SPACE_N_DIM));
@@ -146,36 +142,33 @@ void CATFinderModule::runGNN()
 
 void CATFinderModule::postprocess()
 {
-
   // Creating the beta mask
+  std::vector<int> betaIndices(m_predBetas.size());
+  std::vector<int> selectedBetas(m_predBetas.size());
 
-  std::vector<int> m_betaIndices(m_predBetas.size());
-  std::vector<int> m_selectedBetas(m_predBetas.size());
-
-  std::iota(m_betaIndices.begin(), m_betaIndices.end(), 0);
-  std::sort(m_betaIndices.begin(), m_betaIndices.end(),
+  std::iota(betaIndices.begin(), betaIndices.end(), 0);
+  std::sort(betaIndices.begin(), betaIndices.end(),
   [&](int i1, int i2) {
     return m_predBetas[i1] > m_predBetas[i2];
   });
 
   for (size_t i = 0; i < m_predBetas.size(); ++i) {
-    m_selectedBetas[i] = static_cast<int>(m_predBetas[i] > T_BETA);
+    selectedBetas[i] = static_cast<int>(m_predBetas[i] > T_BETA);
   }
 
-  collectOverThreshold(m_betaIndices, m_coords, m_selectedBetas);
+  collectOverThreshold(betaIndices, m_coords, selectedBetas);
 
 
   // Apply beta mask to GNN outputs
-
-  const size_t betasCount = std::count(m_selectedBetas.begin(), m_selectedBetas.end(), 1);
+  const size_t betasCount = std::count(selectedBetas.begin(), selectedBetas.end(), 1);
   m_conPoints.resize(betasCount);
   m_conPointPs.resize(betasCount);
   m_conPointVs.resize(betasCount);
   m_conPointQs.resize(betasCount);
 
   size_t j = 0;
-  for (size_t i = 0; i < m_selectedBetas.size(); ++i) {
-    if (m_selectedBetas[i]) {
+  for (size_t i = 0; i < selectedBetas.size(); ++i) {
+    if (selectedBetas[i]) {
       m_conPoints[j] = m_coords[i];
       m_conPointPs[j] = m_predPs[i];
       m_conPointVs[j] = m_predVs[i];
@@ -258,8 +251,8 @@ void CATFinderModule::postprocess()
 
     auto seed_cov = TMatrixDSym(6);
     for (int i = 0; i < 6; ++i) {
-      for (int j = 0; j < 6; ++j) {
-        seed_cov[i][j] = 1e-1;
+      for (int k = 0; k < 6; ++k) {
+        seed_cov[i][k] = 1e-1;
       }
     }
 
@@ -267,10 +260,10 @@ void CATFinderModule::postprocess()
 
     // Add the sorted CDCHits to the RecoTrack
 
-    int j = 0;
+    int k = 0;
     for (int cdcHitIndex : sortedIndices) {
-      cdcRecotrack -> addCDCHit(m_CDCHits[cdcHitIndex], j);
-      ++j;
+      cdcRecotrack -> addCDCHit(m_CDCHits[cdcHitIndex], k);
+      ++k;
     }
   }
 }
@@ -288,7 +281,7 @@ void CATFinderModule::initializeMVA(MVA::Weightfile& weightfile)
   m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(generalOptions, std::move(dummy), 0));
 }
 
-void CATFinderModule::collectOverThreshold(std::vector<int> betaIndices, std::vector<std::vector<double>> coords,
+void CATFinderModule::collectOverThreshold(const std::vector<int>& betaIndices, const std::vector<std::vector<double>>& coords,
                                            std::vector<int>& selectedBetas)
 {
   if (!betaIndices.empty() && betaIndices[0] < coords.size()) {

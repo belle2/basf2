@@ -115,9 +115,6 @@ private:
   /** Dimensionality of the latent space used by the GNN. */
   static constexpr int LATENT_SPACE_N_DIM = 3;
 
-  /** Event counter tracking the number of processed events. */
-  unsigned long m_evtNo;
-
   // GNN inputs
   /** X coordinate of the middle point between the wire ends of a CDC hit. */
   std::vector<double> m_CDCHitMiddleX;
@@ -254,7 +251,7 @@ private:
    * @param coords Latent space coordinates of the nodes.
    * @param selectedBetas Vector indicating whether each node is initially above the beta threshold.
    */
-  void collectOverThreshold(std::vector<int> betaIndices, std::vector<std::vector<double>> coords,
+  void collectOverThreshold(const std::vector<int>& betaIndices, const std::vector<std::vector<double>>& coords,
                             std::vector<int>& preselectedBetas);
 
   /**

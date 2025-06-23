@@ -143,12 +143,6 @@ void CKFToPXDFindlet::apply()
   B2DEBUG(29, "Now have " << m_spacePointVector.size() << " hits.");
 
   m_stateCreatorFromTracks.apply(m_recoTracksVector, m_seedStates);
-  // m_stateCreatorFromHits.apply(m_spacePointVector, m_states);
-  // m_relationCreator.apply(m_seedStates, m_states, m_relations);
-
-  // B2DEBUG(29, "Created " << m_relations.size() << " relations.");
-
-  // m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
 
   for (const uint layer : {2, 1}) {
     B2DEBUG(29, "layer" << layer);

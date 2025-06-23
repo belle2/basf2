@@ -11,6 +11,7 @@
 import os
 import json
 import tempfile
+import pathlib
 import numpy as np
 
 from basf2_mva_python_interface.tensorflow import State
@@ -100,7 +101,7 @@ def apply(state, X):
     # convert array input to tensor to avoid creating a new graph for each input
     # calling the model directly is faster than using the predict method in most of our applications
     # as we do a loop over events.
-    r = state.model(tf.convert_to_tensor(np.atleast_2d(X), dtype=tf.float32), training=False).numpy()
+    r = state.model.serve(tf.convert_to_tensor(np.atleast_2d(X), dtype=tf.float32)).numpy()
     if r.shape[1] == 1:
         r = r[:, 0]
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
@@ -111,13 +112,17 @@ def load(obj):
     Load Tensorflow model into state
     """
 
-    with tempfile.TemporaryDirectory() as path:
+    with tempfile.TemporaryDirectory() as temp_path:
+        temp_path = pathlib.Path(temp_path)
         file_names = obj[0]
         for file_index, file_name in enumerate(file_names):
-            with open(f'{path}/{file_name}', 'w+b') as file:
+            path = temp_path.joinpath(pathlib.Path(file_name))
+            path.parents[0].mkdir(parents=True, exist_ok=True)
+
+            with open(path, 'w+b') as file:
                 file.write(bytes(obj[1][file_index]))
 
-        model = tf.keras.models.load_model(f'{path}/{file_names[0]}', safe_mode=True)
+        model = tf.saved_model.load(pathlib.Path(temp_path) / 'my_model.keras')
 
     state = State(model=model)
     return state
@@ -157,7 +162,16 @@ def partial_fit(state, X, S, y, w, epoch, batch):
         baseline=None,
         restore_best_weights=True)]
 
-    state.model.fit(X, y, validation_data=(state.Xtest, state.ytest), batch_size=256, epochs=200, callbacks=callbacks, verbose=1)
+    state.model.fit(
+        X,
+        y,
+        validation_data=(
+            state.Xtest,
+            state.ytest),
+        batch_size=256,
+        epochs=200,
+        callbacks=callbacks,
+        verbose=1)
 
     return False
 
@@ -167,10 +181,11 @@ def end_fit(state):
     Store trained keras model
     """
     with tempfile.TemporaryDirectory() as path:
-        state.model.save(os.path.join(path, "my_model.keras"))
-        # model.save creates a single file: my_model.keras
-        file_names = ['my_model.keras']
+        path = pathlib.Path(path)
 
+        state.model.export(os.path.join(path, "my_model.keras"))
+
+        file_names = [f.relative_to(path) for f in path.rglob('*') if f.is_file()]
         files = []
         for file_name in file_names:
             with open(os.path.join(path, file_name), 'rb') as file:

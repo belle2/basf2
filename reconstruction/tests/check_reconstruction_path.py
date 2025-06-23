@@ -15,8 +15,11 @@ If the test fails, it's enough to reproduce the logfile and commit it.
 '''
 
 import basf2 as b2
+import b2test_utils as b2tu
 import reconstruction as re
 
+
+b2tu.configure_logging_for_tests()
 
 main = b2.Path()
 re.add_reconstruction(main)

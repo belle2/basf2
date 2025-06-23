@@ -13,7 +13,7 @@
   4. ECLDigitCalibrator
       backgroundEnergyCut=0.007
       backgroundTimingCut=110.0
-      fileBackgroundName=/gpfs/group/belle/users/giacomo/basf2_01/data/ecl/background_norm.root
+      fileBackgroundName=${BELLE2_SOFTWARE_DIR}/data/ecl/background_norm.root
       simulatePure=False
   5. ECLEventT0
       T0bin=1.0

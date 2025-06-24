@@ -369,7 +369,7 @@ CDCTriggerTSFModule::beginRun()
     } else {
       m_adcflag = m_cdctrgtsf_DB->getADC();
       m_adccut = m_cdctrgtsf_DB->getADC_threshold();
-      m_adcflag_high = m_cdctrgtsf_DB->getADC_threshold();
+      m_adcflag_low = m_cdctrgtsf_DB->getADC_threshold();
     }
   }
 }

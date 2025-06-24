@@ -366,9 +366,9 @@ void SVDdEdxCollectorModule::collect()
       else {m_pionDnSVDHits = trackFitPiFromD->getHitPatternVXD().getNSVDHits();}
 
       m_slowPionMomentum = partPiS->getMomentumMagnitude();
-      m_slowPionMomentumX = partPiS->getPx();
-      m_slowPionMomentumY = partPiS->getPy();
-      m_slowPionMomentumZ = partPiS->getPz();
+      // m_slowPionMomentumX = partPiS->getPx();
+      // m_slowPionMomentumY = partPiS->getPy();
+      // m_slowPionMomentumZ = partPiS->getPz();
       if (!dedxTrackPiS) {
         m_slowPionSVDdEdx = -999.0;
         m_slowPionSVDdEdxErr = -999.0;

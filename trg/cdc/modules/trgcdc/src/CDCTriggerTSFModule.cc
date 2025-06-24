@@ -367,9 +367,10 @@ CDCTriggerTSFModule::beginRun()
       B2FATAL("No database for CDCTRG TSF parameter. exp " << evtMetaData->getExperiment() << " run "
               << evtMetaData->getRun());
     } else {
-      m_adcflag = m_cdctrgtsf_DB->getADC();
+      m_adcflag = m_cdctrgtsf_DB->getuseADC();
       m_adccut = m_cdctrgtsf_DB->getADC_threshold();
       m_adcflag_low = m_cdctrgtsf_DB->getADC_threshold();
+      m_crosstalk_tdcfilter = m_cdctrgtsf_DB->getuseTDCfilter();
     }
   }
 }

@@ -20,28 +20,28 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    CDCTriggerTSFConfig(): m_TDCfilter(false), m_ADC(false), m_ADC_threshold(-1) {}
+    CDCTriggerTSFConfig(): m_useTDCfilter(false), m_useADC(false), m_ADC_threshold(-1) {}
 
     /** Get TDCfilter enable flag */
-    bool getTDCfilter() const
+    bool getuseTDCfilter() const
     {
-      return m_TDCfilter;
+      return m_useTDCfilter;
     }
     /** Set TDCfilter enable flag */
-    void setTDCfilter(bool i)
+    void setuseTDCfilter(bool i)
     {
-      m_TDCfilter = i;
+      m_useTDCfilter = i;
     }
 
     /** Get ADC enable flag */
-    bool getADC() const
+    bool getuseADC() const
     {
-      return m_ADC;
+      return m_useADC;
     }
     /** Set ADC enable flag */
-    void setADC(bool i)
+    void setuseADC(bool i)
     {
-      m_ADC = i;
+      m_useADC = i;
     }
 
     /** Get the ADC_ threshold */
@@ -59,13 +59,13 @@ namespace Belle2 {
   private:
 
     /** use TDCfilter or not */
-    bool m_TDCfilter;
+    bool m_useTDCfilter;
     /** use ADC or not */
-    bool m_ADC;
+    bool m_useADC;
     /** ADC threshold required for each wire*/
     int m_ADC_threshold;
 
-    ClassDef(CDCTriggerTSFConfig, 2);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(CDCTriggerTSFConfig, 3);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
 } // end of namespace Belle2

@@ -41,16 +41,16 @@ void settsfconfig()
   if (ONLINE == 0) {
     for (int i = 0; i < N_config; i++) {
       IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
-      db_tsfconfig->setTDCfilter(TDCfilter[i]);
-      db_tsfconfig->setADC(ADC[i]);
+      db_tsfconfig->setuseTDCfilter(TDCfilter[i]);
+      db_tsfconfig->setuseADC(ADC[i]);
       db_tsfconfig->setADC_threshold(ADC_threshold[i]);
       db_tsfconfig.import(iov);
     }
   } else if (ONLINE == 1) {
     for (int i = N_config - 1; i < N_config; i++) {
       IntervalOfValidity iov(0, 0, -1, -1);
-      db_tsfconfig->setTDCfilter(TDCfilter[i]);
-      db_tsfconfig->setADC(ADC[i]);
+      db_tsfconfig->setuseTDCfilter(TDCfilter[i]);
+      db_tsfconfig->setuseADC(ADC[i]);
       db_tsfconfig->setADC_threshold(ADC_threshold[i]);
       db_tsfconfig.import(iov);
     }

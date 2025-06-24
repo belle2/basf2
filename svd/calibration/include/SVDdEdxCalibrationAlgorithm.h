@@ -153,7 +153,7 @@ namespace Belle2 {
     }
 
     /**
-    * Normalise an dEdx:momentum histogram in each momentum bin, so that sum of entries in each momentum bin is 1.
+    * Normalise a given dEdx:momentum histogram in each momentum bin, so that sum of entries in each momentum bin is 1.
     * Note that this accounts for entries in the underflow/overflow bins.
     */
     TH2F* Normalise2DHisto(TH2F* HistoToNormalise)

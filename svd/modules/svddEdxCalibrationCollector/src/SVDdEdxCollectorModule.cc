@@ -40,7 +40,7 @@ SVDdEdxCollectorModule::SVDdEdxCollectorModule() : CalibrationCollectorModule()
   addParam("LambdaListName", m_LambdaListName, "Name of the Lambda particle list", std::string("Lambda0:cut"));
   addParam("DstarListName", m_DstarListName, "Name of the Dstar particle list", std::string("D*+:cut"));
   addParam("GammaListName", m_GammaListName, "Name of the Gamma particle list", std::string("gamma:cut"));
-  addParam("GenericListName", m_GenericListName, "Name of the generic track particle list", std::string("pi+:cut"));
+  addParam("GenericListName", m_GenericListName, "Name of the genericTrack track particle list", std::string("pi+:cut"));
 }
 
 void SVDdEdxCollectorModule::prepare()
@@ -74,7 +74,7 @@ void SVDdEdxCollectorModule::prepare()
 
   // Specific decay info for all trees
   LambdaTree->Branch<double>("InvM", &m_InvMLambda);
-  LambdaTree->Branch<double>("DIRA", &m_diraLambda);
+  LambdaTree->Branch<double>("DIRA", &m_CosDirAngleLambda);
   LambdaTree->Branch<double>("ProtonMomentum", &m_protonMomentum);
   LambdaTree->Branch<double>("ProtonSVDdEdx", &m_protonSVDdEdx);
   LambdaTree->Branch<double>("ProtonSVDdEdxErr", &m_protonSVDdEdxErr);
@@ -100,7 +100,7 @@ void SVDdEdxCollectorModule::prepare()
   DstarTree->Branch<double>("InvM", &m_InvMDstar);
   DstarTree->Branch<double>("D0InvM", &m_InvMD0);
   DstarTree->Branch<double>("deltaM", &m_DeltaM);
-  DstarTree->Branch<double>("D0DIRA", &m_diraD0);
+  DstarTree->Branch<double>("D0DIRA", &m_CosDirAngleD0);
   // DstarTree->Branch<double>("D0Momentum", &m_D0Momentum);
   DstarTree->Branch<double>("KaonMomentum", &m_kaonMomentum);
   // DstarTree->Branch<double>("KaonMomentumX", &m_kaonMomentumX);
@@ -116,7 +116,7 @@ void SVDdEdxCollectorModule::prepare()
   // DstarTree->Branch<std::vector<double>>("KaonSVDdEdxList", &m_kaonSVDdEdxList);
   DstarTree->Branch<double>("KaonnSVDHits", &m_kaonnSVDHits);
 
-  DstarTree->Branch<double>("PionDMomentum", &m_pionDp);
+  DstarTree->Branch<double>("PionDMomentum", &m_pionDMomentum);
   // DstarTree->Branch<double>("PionDMomentumX", &m_pionDMomentumX);
   // DstarTree->Branch<double>("PionDMomentumY", &m_pionDMomentumY);
   // DstarTree->Branch<double>("PionDMomentumZ", &m_pionDMomentumZ);
@@ -146,7 +146,7 @@ void SVDdEdxCollectorModule::prepare()
 
   GammaTree->Branch<double>("InvM", &m_InvMGamma);
   GammaTree->Branch<double>("dr", &m_drGamma);
-  GammaTree->Branch<double>("DIRA", &m_diraGamma);
+  GammaTree->Branch<double>("DIRA", &m_CosDirAngleGamma);
   GammaTree->Branch<double>("FirstElectronMomentum", &m_firstElectronMomentum);
   GammaTree->Branch<double>("FirstElectronSVDdEdx", &m_firstElectronSVDdEdx);
   GammaTree->Branch<double>("FirstElectronSVDdEdxErr", &m_firstElectronSVDdEdxErr);
@@ -169,16 +169,16 @@ void SVDdEdxCollectorModule::prepare()
   // GammaTree->Branch<std::vector<double>>("SecondElectronSVDdEdxList", &m_secondElectronSVDdEdxList);
   GammaTree->Branch<double>("SecondElectronnSVDHits", &m_secondElectronnSVDHits);
 
-  GenericTree->Branch<double>("TrackMomentum", &m_genericp);
-  GenericTree->Branch<double>("TrackSVDdEdx", &m_genericSVDdEdx);
-  GenericTree->Branch<double>("TrackSVDdEdxErr", &m_genericSVDdEdxErr);
-  // GenericTree->Branch<double>("TrackSVDdEdxMean", &m_genericSVDdEdxMean);
-  GenericTree->Branch<double>("TrackSVDdEdxTrackMomentum", &m_genericdEdxTrackMomentum);
-  GenericTree->Branch<int>("TrackSVDdEdxTrackNHits", &m_genericdEdxTrackNHits);
-  // GenericTree->Branch<int>("TrackSVDdEdxTrackNHitsUsed", &m_genericdEdxTrackNHitsUsed);
-  // GenericTree->Branch<double>("TrackSVDdEdxTrackCosTheta", &m_genericdEdxTrackCosTheta);
-  // GenericTree->Branch<std::vector<double>>("TrackSVDdEdxList", &m_genericSVDdEdxList);
-  GenericTree->Branch<double>("TracknSVDHits", &m_genericnSVDHits);
+  GenericTree->Branch<double>("TrackMomentum", &m_genericTrackMomentum);
+  GenericTree->Branch<double>("TrackSVDdEdx", &m_genericTrackSVDdEdx);
+  GenericTree->Branch<double>("TrackSVDdEdxErr", &m_genericTrackSVDdEdxErr);
+  // GenericTree->Branch<double>("TrackSVDdEdxMean", &m_genericTrackSVDdEdxMean);
+  GenericTree->Branch<double>("TrackSVDdEdxTrackMomentum", &m_genericTrackdEdxTrackMomentum);
+  GenericTree->Branch<int>("TrackSVDdEdxTrackNHits", &m_genericTrackdEdxTrackNHits);
+  // GenericTree->Branch<int>("TrackSVDdEdxTrackNHitsUsed", &m_genericTrackdEdxTrackNHitsUsed);
+  // GenericTree->Branch<double>("TrackSVDdEdxTrackCosTheta", &m_genericTrackdEdxTrackCosTheta);
+  // GenericTree->Branch<std::vector<double>>("TrackSVDdEdxList", &m_genericTrackSVDdEdxList);
+  GenericTree->Branch<double>("TracknSVDHits", &m_genericTracknSVDHits);
 
   // We register the objects so that our framework knows about them.
   // Don't try and hold onto the pointers or fill these objects directly
@@ -233,8 +233,8 @@ void SVDdEdxCollectorModule::collect()
       const VXDDedxTrack* dedxTrackPiFromLambda = getSVDDedxFromParticle(partPiFromLambda);
 
       m_InvMLambda = partLambda->getMass();
-      m_diraLambda = std::get<double>(Variable::Manager::Instance().getVariable(
-                                        std::string("cosAngleBetweenMomentumAndVertexVector"))->function(partLambda));
+      m_CosDirAngleLambda = std::get<double>(Variable::Manager::Instance().getVariable(
+                                               std::string("cosAngleBetweenMomentumAndVertexVector"))->function(partLambda));
 
       m_protonMomentum = partPFromLambda->getMomentumMagnitude();
       if (!dedxTrackPFromLambda) {
@@ -308,8 +308,8 @@ void SVDdEdxCollectorModule::collect()
       m_InvMD0 = partD0->getMass();
       m_DeltaM = m_InvMDstar - m_InvMD0;
       // m_D0Momentum = partD0->getMomentumMagnitude();
-      m_diraD0 = std::get<double>(Variable::Manager::Instance().getVariable(
-                                    std::string("cosAngleBetweenMomentumAndVertexVector"))->function(partD0));;
+      m_CosDirAngleD0 = std::get<double>(Variable::Manager::Instance().getVariable(
+                                           std::string("cosAngleBetweenMomentumAndVertexVector"))->function(partD0));;
 
       m_kaonMomentum = partKFromD->getMomentumMagnitude();
       // m_kaonMomentumX = partKFromD->getPx();
@@ -338,7 +338,7 @@ void SVDdEdxCollectorModule::collect()
       if (!trackFitKFromD) {m_kaonnSVDHits = Const::doubleNaN;}
       else {m_kaonnSVDHits = trackFitKFromD->getHitPatternVXD().getNSVDHits();}
 
-      m_pionDp = partPiFromD->getMomentumMagnitude();
+      m_pionDMomentum = partPiFromD->getMomentumMagnitude();
       // m_pionDMomentumX = partPiFromD->getPx();
       // m_pionDMomentumY = partPiFromD->getPy();
       // m_pionDMomentumZ = partPiFromD->getPz();
@@ -411,8 +411,8 @@ void SVDdEdxCollectorModule::collect()
 
       m_InvMGamma = partGamma->getMass();
       m_drGamma = std::get<double>(Variable::Manager::Instance().getVariable(std::string("dr"))->function(partGamma));
-      m_diraGamma = std::get<double>(Variable::Manager::Instance().getVariable(
-                                       std::string("cosAngleBetweenMomentumAndVertexVector"))->function(partGamma));
+      m_CosDirAngleGamma = std::get<double>(Variable::Manager::Instance().getVariable(
+                                              std::string("cosAngleBetweenMomentumAndVertexVector"))->function(partGamma));
 
       auto trackFitE1FromGamma = partE1FromGamma->getTrackFitResult();
       if (!trackFitE1FromGamma) {m_firstElectronnSVDHits = Const::doubleNaN;}
@@ -474,30 +474,30 @@ void SVDdEdxCollectorModule::collect()
 
       const VXDDedxTrack* dedxTrackGeneric = getSVDDedxFromParticle(partGeneric);
 
-      m_genericp = partGeneric->getMomentumMagnitude();
+      m_genericTrackMomentum = partGeneric->getMomentumMagnitude();
 
       if (!dedxTrackGeneric) {
-        m_genericSVDdEdx = -999.0;
-        m_genericSVDdEdxErr = -999.0;
-        // m_genericSVDdEdxMean = -999.0;
-        m_genericdEdxTrackMomentum = -999.0;
-        m_genericdEdxTrackNHits = -1;
-        // m_genericdEdxTrackNHitsUsed = -1;
-        m_genericdEdxTrackCosTheta = -999.0;
+        m_genericTrackSVDdEdx = -999.0;
+        m_genericTrackSVDdEdxErr = -999.0;
+        // m_genericTrackSVDdEdxMean = -999.0;
+        m_genericTrackdEdxTrackMomentum = -999.0;
+        m_genericTrackdEdxTrackNHits = -1;
+        // m_genericTrackdEdxTrackNHitsUsed = -1;
+        m_genericTrackdEdxTrackCosTheta = -999.0;
       } else {
-        m_genericSVDdEdx = dedxTrackGeneric->getDedx(Const::EDetector::SVD);
-        m_genericSVDdEdxErr = dedxTrackGeneric->getDedxError(Const::EDetector::SVD);
-        // m_genericSVDdEdxMean = dedxTrackGeneric->getDedxMean(Const::EDetector::SVD);
-        m_genericdEdxTrackMomentum = dedxTrackGeneric->getMomentum();
-        m_genericdEdxTrackNHits = (int) dedxTrackGeneric->size();
-        // m_genericdEdxTrackNHitsUsed = (int) dedxTrackGeneric->getNHitsUsed();
-        m_genericdEdxTrackCosTheta = dedxTrackGeneric->getCosTheta();
-        // m_genericSVDdEdxList = dedxTrackGeneric->getDedxList();
+        m_genericTrackSVDdEdx = dedxTrackGeneric->getDedx(Const::EDetector::SVD);
+        m_genericTrackSVDdEdxErr = dedxTrackGeneric->getDedxError(Const::EDetector::SVD);
+        // m_genericTrackSVDdEdxMean = dedxTrackGeneric->getDedxMean(Const::EDetector::SVD);
+        m_genericTrackdEdxTrackMomentum = dedxTrackGeneric->getMomentum();
+        m_genericTrackdEdxTrackNHits = (int) dedxTrackGeneric->size();
+        // m_genericTrackdEdxTrackNHitsUsed = (int) dedxTrackGeneric->getNHitsUsed();
+        m_genericTrackdEdxTrackCosTheta = dedxTrackGeneric->getCosTheta();
+        // m_genericTrackSVDdEdxList = dedxTrackGeneric->getDedxList();
       }
 
       auto trackFitGeneric = partGeneric->getTrackFitResult();
-      if (!trackFitGeneric) {m_genericnSVDHits = Const::doubleNaN;}
-      else {m_genericnSVDHits = trackFitGeneric->getHitPatternVXD().getNSVDHits();}
+      if (!trackFitGeneric) {m_genericTracknSVDHits = Const::doubleNaN;}
+      else {m_genericTracknSVDHits = trackFitGeneric->getHitPatternVXD().getNSVDHits();}
 
       getObjectPtr<TTree>("Generic")->Fill();
     }

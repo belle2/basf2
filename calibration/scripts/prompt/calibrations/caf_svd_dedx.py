@@ -34,27 +34,37 @@ settings = CalibrationSettings(
         "isMC": False,
         "listOfMutedCalibrations": [],  # dEdxCalibration, dEdxValidation
         "rerun_reco": False,  # need to rerun reconstruction for calibration?
+        # This is needed when using release-10 calibration on older CDSTs as the dEdx calculation needs to be rerun.
         "rerun_reco_val": False,  # need to rerun reconstruction for validation?
+        # This is needed when using release-10 calibration on older CDSTs as the dEdx calculation needs to be rerun.
         "rerun_pid_val": True,  # need to rerun PID for validation?
-        "validation_mode": "basic",  # full or basic; full also produces global PID performance plots
+        # The answer is almost always "yes", but this argument is ignored if you are already rerunning the reconstruction.
+        "validation_mode": "basic",  # full or basic validation; full also produces global PID performance plots
         "MaxFilesPerRun": 10,  # 15,
         "MaxFilesPerRunValidation": 6,  # be careful in MC to not exclude certain event types
-        "MinEvtsPerFile": 1,
+        "MinEvtsPerFile": 1,  # sanity check against empty CDSTs
         "MaxEvtsPerFile": 20000,  # only if rerun the reco, to prevent jobs >10h
-        "MinEvtsPerTree": 100,
-        "NBinsP": 69,
-        "NBinsdEdx": 100,
-        "dedxCutoff": 5.e6,
+        "MinEvtsPerTree": 100,  # sanity check against an empty collector-output TTree
+        "NBinsP": 69,  # number of momentum bins in the payload. 69 is the default historically; non-uniform binning is used.
+        "NBinsdEdx": 100,  # number of dEdx bins in the payload. 100 is the default historically.
+        "dedxCutoff": 5.e6,  # max dEdx value in the payload.
+        # Switch on a more precise calculation of the 1D profile for 2D
+        # histograms? Helps with the universality of dEdx:beta*gamma curves
+        # between hadrons.
         "CustomProfile": True,
+        # Fix one of the parameters in the dEdx:beta*gamma fit, which makes the fit much more stable.
         "FixUnstableFitParameter": True,
-        "EventsToGenerate": 5e5,
-        "UsePionBGFunctionForEverything": False,
-        "UseProtonBGFunctionForEverything": False,
-        "NumROCpoints": 175,
-        "MinROCMomentum": 0.,
-        "MaxROCMomentum": 2.5,
-        "NumEffBins": 30,
-        "MaxEffMomentum": 2.5
+        # In case of large changes in dEdx:beta*gamma trend with time, might need to set to False.
+        "EventsToGenerate": 5e5,  # how many events to generate in each momentum bin, for the new payloads?
+        "UsePionBGFunctionForEverything": False,  # if the dEdx:beta*gamma fit is unstable, use the pion fit for all hadrons?
+        # (This can save us if the calibration failed due to e.g. kaon fit issue.)
+        "UseProtonBGFunctionForEverything": False,  # if the dEdx:beta*gamma fit is unstable, use the proton fit for all hadrons?
+        "NumROCpoints": 175,  # only for full validation: number of pionts for the ROC scan
+        "MinROCMomentum": 0.,  # only for full validation: in which momentum range to calculate ROC?
+        "MaxROCMomentum": 2.5,  # only for full validation: in which momentum range to calculate ROC?
+        "NumEffBins": 30,  # validation: how many bins for efficiency plots?
+        "MaxEffMomentum": 2.5  # validation: upper momentum boundary for efficiency plots?
+        # (No separation from SVD above 2.5 GeV or so)
         },
     depends_on=[])
 

@@ -97,27 +97,27 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
 
       if (iPart == 0 && trunmean) {
         hDedxPDFs[iPart] = histoE;
-        hDedxPDFs[iPart]->SetName("hist_d1_11_F_");
+        hDedxPDFs[iPart]->SetName("hist_d1_11_trunc");
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 1 && trunmean) {
         hDedxPDFs[iPart] = histoMu;
-        hDedxPDFs[iPart]->SetName("hist_d1_13_F_");
+        hDedxPDFs[iPart]->SetName("hist_d1_13_trunc");
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 2 && trunmean) {
         hDedxPDFs[iPart] = histoPi;
-        hDedxPDFs[iPart]->SetName("hist_d1_211_F_");
+        hDedxPDFs[iPart]->SetName("hist_d1_211_trunc");
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 3 && trunmean) {
         hDedxPDFs[iPart] = histoK;
-        hDedxPDFs[iPart]->SetName("hist_d1_321_F_");
+        hDedxPDFs[iPart]->SetName("hist_d1_321_trunc");
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 4 && trunmean) {
         hDedxPDFs[iPart] = histoP;
-        hDedxPDFs[iPart]->SetName("hist_d1_2212_F_");
+        hDedxPDFs[iPart]->SetName("hist_d1_2212_trunc");
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 5 && trunmean) {
         hDedxPDFs[iPart] = histoDeut;
-        hDedxPDFs[iPart]->SetName("hist_d1_1000010020_F_");
+        hDedxPDFs[iPart]->SetName("hist_d1_1000010020_trunc");
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 0 && !trunmean) {
         hDedxPDFs[iPart] = &hEmpty;
@@ -326,11 +326,11 @@ TList* SVDdEdxCalibrationAlgorithm::LambdaHistogramming(TTree* inputTree)
   inputTree->SetEstimate(-1);
   std::vector<double> pbins = CreatePBinningScheme();
 
-  TH2F* hLambdaPMomentum = new TH2F("hist_d1_2212_F_Momentum", "hist_d1_2212_F_Momentum;Momentum [GeV/c];dEdx [arb. units]",
+  TH2F* hLambdaPMomentum = new TH2F("hist_d1_2212_truncMomentum", "hist_d1_2212_trunc;Momentum [GeV/c];dEdx [arb. units]",
                                     m_numPBins, pbins.data(), m_numDEdxBins, 0,
                                     m_dedxCutoff);
 
-  inputTree->Draw("ProtonSVDdEdx:ProtonSVDdEdxTrackMomentum>>hist_d1_2212_F_Momentum",
+  inputTree->Draw("ProtonSVDdEdx:ProtonSVDdEdxTrackMomentum>>hist_d1_2212_truncMomentum",
                   "nSignalLambda_sw * (ProtonSVDdEdx>0) * (ProtonSVDdEdxTrackMomentum>0.13)", "goff");
 
 // create isopopulated beta*gamma binning
@@ -348,12 +348,12 @@ TList* SVDdEdxCalibrationAlgorithm::LambdaHistogramming(TTree* inputTree)
   binsMinEdgesP[m_numBGBins + 1] = 50.;
 
 
-  TH2F* hLambdaPBetaGamma = new TH2F("hist_d1_2212_F_BetaGamma", "hist_d1_2212_F_BetaGamma;#beta*#gamma;dEdx [arb. units]",
+  TH2F* hLambdaPBetaGamma = new TH2F("hist_d1_2212_truncBetaGamma", "hist_d1_2212_truncBetaGamma;#beta*#gamma;dEdx [arb. units]",
                                      m_numBGBins, binsMinEdgesP, m_numDEdxBins,
                                      0,
                                      m_dedxMaxPossible);
 
-  inputTree->Draw(Form("ProtonSVDdEdx:ProtonSVDdEdxTrackMomentum/%f>>hist_d1_2212_F_BetaGamma", m_ProtonPDGMass),
+  inputTree->Draw(Form("ProtonSVDdEdx:ProtonSVDdEdxTrackMomentum/%f>>hist_d1_2212_truncBetaGamma", m_ProtonPDGMass),
                   "nSignalLambda_sw * (ProtonSVDdEdx>0) * (ProtonSVDdEdxTrackMomentum>0.13) * (ProtonSVDdEdx>1.2e6 - 1.e6*ProtonSVDdEdxTrackMomentum)",
                   "goff");
 
@@ -542,22 +542,22 @@ TList* SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* inputTree)
   inputTree->SetEstimate(-1);
   std::vector<double> pbins = CreatePBinningScheme();
 
-  TH2F* hDstarKMomentum = new TH2F("hist_d1_321_F_Momentum", "hist_d1_321_F_Momentum;Momentum [GeV/c];dEdx [arb. units]", m_numPBins,
+  TH2F* hDstarKMomentum = new TH2F("hist_d1_321_truncMomentum", "hist_d1_321_trunc;Momentum [GeV/c];dEdx [arb. units]", m_numPBins,
                                    pbins.data(),
                                    m_numDEdxBins, 0, m_dedxCutoff);
   // the pion payload
-  TH2F* hDstarPiMomentum = new TH2F("hist_d1_211_F_Momentum", "hist_d1_211_F_Momentum;Momentum [GeV/c];dEdx [arb. units]", m_numPBins,
+  TH2F* hDstarPiMomentum = new TH2F("hist_d1_211_truncMomentum", "hist_d1_211_trunc;Momentum [GeV/c];dEdx [arb. units]", m_numPBins,
                                     pbins.data(),
                                     m_numDEdxBins, 0, m_dedxCutoff);
 
-  inputTree->Draw("KaonSVDdEdx:KaonSVDdEdxTrackMomentum>>hist_d1_321_F_Momentum", "nSignalDstar_sw * (KaonSVDdEdx>0)", "goff");
+  inputTree->Draw("KaonSVDdEdx:KaonSVDdEdxTrackMomentum>>hist_d1_321_truncMomentum", "nSignalDstar_sw * (KaonSVDdEdx>0)", "goff");
   // the pion one will be built from both pions in the Dstar decay tree
-  TH2F* hDstarPiPart1Momentum = (TH2F*)hDstarPiMomentum->Clone("hist_d1_211_F_Part1Momentum");
-  TH2F* hDstarPiPart2Momentum = (TH2F*)hDstarPiMomentum->Clone("hist_d1_211_F_Part2Momentum");
+  TH2F* hDstarPiPart1Momentum = (TH2F*)hDstarPiMomentum->Clone("hist_d1_211_truncPart1Momentum");
+  TH2F* hDstarPiPart2Momentum = (TH2F*)hDstarPiMomentum->Clone("hist_d1_211_truncPart2Momentum");
 
-  inputTree->Draw("PionDSVDdEdx:PionDSVDdEdxTrackMomentum>>hist_d1_211_F_Part1Momentum", "nSignalDstar_sw * (PionDSVDdEdx>0)",
+  inputTree->Draw("PionDSVDdEdx:PionDSVDdEdxTrackMomentum>>hist_d1_211_truncPart1Momentum", "nSignalDstar_sw * (PionDSVDdEdx>0)",
                   "goff");
-  inputTree->Draw("SlowPionSVDdEdx:SlowPionSVDdEdxTrackMomentum>>hist_d1_211_F_Part2Momentum",
+  inputTree->Draw("SlowPionSVDdEdx:SlowPionSVDdEdxTrackMomentum>>hist_d1_211_truncPart2Momentum",
                   "nSignalDstar_sw * (SlowPionSVDdEdx>0)",
                   "goff");
   hDstarPiMomentum->Add(hDstarPiPart1Momentum);
@@ -586,24 +586,26 @@ TList* SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* inputTree)
   binsMinEdgesPi[0] = 0.1;
   binsMinEdgesPi[m_numBGBins + 1] = 50.;
 
-  TH2F* hDstarKBetaGamma = new TH2F("hist_d1_321_F_BetaGamma", "hist_d1_321_F_BetaGamma;#beta*#gamma;dEdx [arb. units]", m_numBGBins,
+  TH2F* hDstarKBetaGamma = new TH2F("hist_d1_321_truncBetaGamma", "hist_d1_321_truncBetaGamma;#beta*#gamma;dEdx [arb. units]",
+                                    m_numBGBins,
                                     binsMinEdgesK,
                                     m_numDEdxBins, 0, m_dedxMaxPossible);
   // the pion payload
-  TH2F* hDstarPiBetaGamma = new TH2F("hist_d1_211_F_BetaGamma", "hist_d1_211_F_BetaGamma;#beta*#gamma;dEdx [arb. units]", m_numBGBins,
+  TH2F* hDstarPiBetaGamma = new TH2F("hist_d1_211_truncBetaGamma", "hist_d1_211_truncBetaGamma;#beta*#gamma;dEdx [arb. units]",
+                                     m_numBGBins,
                                      binsMinEdgesPi,
                                      m_numDEdxBins, 0, m_dedxMaxPossible);
 
-  inputTree->Draw(Form("KaonSVDdEdx:KaonSVDdEdxTrackMomentum/%f>>hist_d1_321_F_BetaGamma", m_KaonPDGMass),
+  inputTree->Draw(Form("KaonSVDdEdx:KaonSVDdEdxTrackMomentum/%f>>hist_d1_321_truncBetaGamma", m_KaonPDGMass),
                   "nSignalDstar_sw * (KaonSVDdEdx>0)", "goff");
   // the pion one will be built from both pions in the Dstar decay tree
-  TH2F* hDstarPiPart1BetaGamma = (TH2F*)hDstarPiBetaGamma->Clone("hist_d1_211_F_Part1BetaGamma");
-  TH2F* hDstarPiPart2BetaGamma = (TH2F*)hDstarPiBetaGamma->Clone("hist_d1_211_F_Part2BetaGamma");
+  TH2F* hDstarPiPart1BetaGamma = (TH2F*)hDstarPiBetaGamma->Clone("hist_d1_211_truncPart1BetaGamma");
+  TH2F* hDstarPiPart2BetaGamma = (TH2F*)hDstarPiBetaGamma->Clone("hist_d1_211_truncPart2BetaGamma");
 
-  inputTree->Draw(Form("PionDSVDdEdx:PionDSVDdEdxTrackMomentum/%f>>hist_d1_211_F_Part1BetaGamma", m_PionPDGMass),
+  inputTree->Draw(Form("PionDSVDdEdx:PionDSVDdEdxTrackMomentum/%f>>hist_d1_211_truncPart1BetaGamma", m_PionPDGMass),
                   "nSignalDstar_sw * (PionDSVDdEdx>0)",
                   "goff");
-  inputTree->Draw(Form("SlowPionSVDdEdx:SlowPionSVDdEdxTrackMomentum/%f>>hist_d1_211_F_Part2BetaGamma", m_PionPDGMass),
+  inputTree->Draw(Form("SlowPionSVDdEdx:SlowPionSVDdEdxTrackMomentum/%f>>hist_d1_211_truncPart2BetaGamma", m_PionPDGMass),
                   "nSignalDstar_sw * (SlowPionSVDdEdx>0)", "goff");
   hDstarPiBetaGamma->Add(hDstarPiPart1BetaGamma);
   hDstarPiBetaGamma->Add(hDstarPiPart2BetaGamma);
@@ -698,15 +700,15 @@ TList* SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shared_ptr<TTree> pr
   std::vector<double> pbins = CreatePBinningScheme();
 
 
-  TH2F* hGammaEMomentum = new TH2F("hist_d1_11_F_Momentum", "hist_d1_11_F_Momentum;Momentum [GeV/c];dEdx [arb. units]", m_numPBins,
+  TH2F* hGammaEMomentum = new TH2F("hist_d1_11_truncMomentum", "hist_d1_11_trunc;Momentum [GeV/c];dEdx [arb. units]", m_numPBins,
                                    pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
 
-  TH2F* hGammaEPart1Momentum = (TH2F*)hGammaEMomentum->Clone("hist_d1_11_F_Part1Momentum");
-  TH2F* hGammaEPart2Momentum = (TH2F*)hGammaEMomentum->Clone("hist_d1_11_F_Part2Momentum");
+  TH2F* hGammaEPart1Momentum = (TH2F*)hGammaEMomentum->Clone("hist_d1_11_truncPart1Momentum");
+  TH2F* hGammaEPart2Momentum = (TH2F*)hGammaEMomentum->Clone("hist_d1_11_truncPart2Momentum");
 
-  preselTree->Draw("FirstElectronSVDdEdx:FirstElectronSVDdEdxTrackMomentum>>hist_d1_11_F_Part1Momentum",
+  preselTree->Draw("FirstElectronSVDdEdx:FirstElectronSVDdEdxTrackMomentum>>hist_d1_11_truncPart1Momentum",
                    "FirstElectronSVDdEdx>0 && DIRA>0.995 && dr>1.2", "goff");
-  preselTree->Draw("SecondElectronSVDdEdx:SecondElectronSVDdEdxTrackMomentum>>hist_d1_11_F_Part2Momentum",
+  preselTree->Draw("SecondElectronSVDdEdx:SecondElectronSVDdEdxTrackMomentum>>hist_d1_11_truncPart2Momentum",
                    "SecondElectronSVDdEdx>0 && DIRA>0.995 && dr>1.2", "goff");
   hGammaEMomentum->Add(hGammaEPart1Momentum);
   hGammaEMomentum->Add(hGammaEPart2Momentum);
@@ -726,15 +728,17 @@ TList* SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shared_ptr<TTree> pr
   binsMinEdgesE[m_numBGBins + 1] = 10000.;
 
 
-  TH2F* hGammaEBetaGamma = new TH2F("hist_d1_11_F_BetaGamma", "hist_d1_11_F_BetaGamma;#beta*#gamma;dEdx [arb. units]", m_numBGBins,
+  TH2F* hGammaEBetaGamma = new TH2F("hist_d1_11_truncBetaGamma", "hist_d1_11_truncBetaGamma;#beta*#gamma;dEdx [arb. units]",
+                                    m_numBGBins,
                                     binsMinEdgesE,
                                     m_numDEdxBins, 0, m_dedxMaxPossible);
-  TH2F* hGammaEPart1BetaGamma = (TH2F*)hGammaEBetaGamma->Clone("hist_d1_11_F_Part1BetaGamma");
-  TH2F* hGammaEPart2BetaGamma = (TH2F*)hGammaEBetaGamma->Clone("hist_d1_11_F_Part2BetaGamma");
+  TH2F* hGammaEPart1BetaGamma = (TH2F*)hGammaEBetaGamma->Clone("hist_d1_11_truncPart1BetaGamma");
+  TH2F* hGammaEPart2BetaGamma = (TH2F*)hGammaEBetaGamma->Clone("hist_d1_11_truncPart2BetaGamma");
 
-  preselTree->Draw(Form("FirstElectronSVDdEdx:FirstElectronSVDdEdxTrackMomentum/%f>>hist_d1_11_F_Part1BetaGamma", m_ElectronPDGMass),
+  preselTree->Draw(Form("FirstElectronSVDdEdx:FirstElectronSVDdEdxTrackMomentum/%f>>hist_d1_11_truncPart1BetaGamma",
+                        m_ElectronPDGMass),
                    "FirstElectronSVDdEdx>0 && DIRA>0.995 && dr>1.2 && FirstElectronSVDdEdx<1.8e6", "goff");
-  preselTree->Draw(Form("SecondElectronSVDdEdx:SecondElectronSVDdEdxTrackMomentum/%f>>hist_d1_11_F_Part2BetaGamma",
+  preselTree->Draw(Form("SecondElectronSVDdEdx:SecondElectronSVDdEdxTrackMomentum/%f>>hist_d1_11_truncPart2BetaGamma",
                         m_ElectronPDGMass),
                    "SecondElectronSVDdEdx>0 && DIRA>0.995 && dr>1.2 && SecondElectronSVDdEdx<1.8e6", "goff");
   hGammaEBetaGamma->Add(hGammaEPart1BetaGamma);
@@ -793,18 +797,18 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   TTree* treeLambda = LambdaMassFit(ttreeLambda);
   TList* HistListLambda = LambdaHistogramming(treeLambda);
   TH1F* ProtonProfileBetaGamma = (TH1F*) HistListLambda->FindObject("ProtonProfileBetaGamma");
-  TH2F* Proton2DHistogram = (TH2F*) HistListLambda->FindObject("hist_d1_2212_F_Momentum");
+  TH2F* Proton2DHistogram = (TH2F*) HistListLambda->FindObject("hist_d1_2212_truncMomentum");
 
   TTree* treeDstar = DstarMassFit(ttreeDstar);
   TList* HistListDstar = DstarHistogramming(treeDstar);
   TH1F* PionProfileBetaGamma = (TH1F*) HistListDstar->FindObject("PionProfileBetaGamma");
-  TH2F* Pion2DHistogram = (TH2F*) HistListDstar->FindObject("hist_d1_211_F_Momentum");
+  TH2F* Pion2DHistogram = (TH2F*) HistListDstar->FindObject("hist_d1_211_truncMomentum");
   TH1F* KaonProfileBetaGamma = (TH1F*) HistListDstar->FindObject("KaonProfileBetaGamma");
-  TH2F* Kaon2DHistogram = (TH2F*) HistListDstar->FindObject("hist_d1_321_F_Momentum");
+  TH2F* Kaon2DHistogram = (TH2F*) HistListDstar->FindObject("hist_d1_321_truncMomentum");
 
   TList* HistListGamma = GammaHistogramming(ttreeGamma);
   TH1F* ElectronProfileBetaGamma = (TH1F*) HistListGamma->FindObject("ElectronProfileBetaGamma");
-  TH2F* Electron2DHistogram = (TH2F*) HistListGamma->FindObject("hist_d1_11_F_Momentum");
+  TH2F* Electron2DHistogram = (TH2F*) HistListGamma->FindObject("hist_d1_11_truncMomentum");
 
   int cred = TColor::GetColor("#e31a1c");
   PionProfileBetaGamma->SetMarkerSize(4);
@@ -1371,12 +1375,12 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   TH2F* Deuteron2DHistogramNew = PrepareNewHistogram(Proton2DHistogram, "Deuteron2DHistogramNew", MomentumFunctionDeuteron,
                                                      KaonResolutionFunction,
                                                      BiasCorrectionKaon);
-  Deuteron2DHistogramNew->SetTitle("hist_d1_1000010020_F_Momentum");
+  Deuteron2DHistogramNew->SetTitle("hist_d1_1000010020_trunc");
 
 // muons: same as pions, but use the MomentumFunctionMuon
   TH2F* Muon2DHistogramNew = PrepareNewHistogram(Pion2DHistogram, "Muon2DHistogramNew", MomentumFunctionMuon, PionResolutionFunction,
                                                  BiasCorrectionPion);
-  Muon2DHistogramNew->SetTitle("hist_d1_13_F_Momentum");
+  Muon2DHistogramNew->SetTitle("hist_d1_13_trunc");
 
 // same for electrons
   double BiasCorrectionElectron = ElectronResolutionFunction->GetParameter(1) - MomentumFunctionElectron->Eval((

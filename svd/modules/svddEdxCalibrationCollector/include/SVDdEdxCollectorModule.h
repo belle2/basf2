@@ -47,7 +47,7 @@ namespace Belle2 {
 
 
     double m_InvMLambda;       /**<  Invariant mass of Lambda candidates */
-    double m_diraLambda;        /**<  direction angle of Lambda candidates */
+    double m_CosDirAngleLambda;        /**<  Cosine of the angle between momentum and vertex vectors of Lambda candidates */
     double m_protonMomentum;       /**<   momentum for the proton from the Lambda */
     double m_protonSVDdEdx;     /**<  SVD dE/dx response for the proton from the Lambda */
     double m_protonSVDdEdxErr;     /**<  SVD dE/dx uncertainty for the proton from the Lambda */
@@ -74,7 +74,7 @@ namespace Belle2 {
     double m_InvMD0;       /**<  Invariant mass of D0 candidates */
     // double m_D0Momentum;       /**<  Momentum of D0 candidates */
     double m_DeltaM;       /**<  deltaM = m(Dstar)-m(D0) */
-    double m_diraD0;        /**<  direction angle of D0 candidates */
+    double m_CosDirAngleD0;        /**<  Cosine of the angle between momentum and vertex vectors of D0 candidates */
     double m_kaonMomentum;       /**<   momentum for the kaon from the D0 */
     // double m_kaonMomentumX;       /**<   momentum for the kaon from the D0 */
     // double m_kaonMomentumY;       /**<   momentum for the kaon from the D0 */
@@ -89,7 +89,7 @@ namespace Belle2 {
     // std::vector<double> m_kaonSVDdEdxList;       /**<   SVD dE/dx response for the kaon from the D0, per hit */
     double m_kaonnSVDHits;    /**<  nSVDHits for the kaon from the D0 */
 
-    double m_pionDp;    /**<   momentum for the pion from the D0 */
+    double m_pionDMomentum;    /**<   momentum for the pion from the D0 */
     // double m_pionDMomentumX;       /**<   momentum for the pion from the D0 */
     // double m_pionDMomentumY;       /**<   momentum for the pion from the D0 */
     // double m_pionDMomentumZ;       /**<   momentum for the pion from the D0 */
@@ -119,7 +119,7 @@ namespace Belle2 {
 
     double m_InvMGamma;       /**<  Invariant mass of converted photon candidates */
     double m_drGamma;        /**<  dr of converted photon candidates */
-    double m_diraGamma;        /**<  direction angle of converted photon candidates */
+    double m_CosDirAngleGamma;        /**<  Cosine of the angle between momentum and vertex vectors of converted photon candidates */
     double m_firstElectronMomentum;       /**<   momentum for the first electron */
     double m_firstElectronSVDdEdx;     /**<  SVD dE/dx response for the first electron */
     double m_firstElectronSVDdEdxErr;     /**<  SVD dE/dx uncertainty for the first electron */
@@ -142,21 +142,21 @@ namespace Belle2 {
     // std::vector<double> m_secondElectronSVDdEdxList;       /**<   SVD dE/dx response for the second electron, per hit */
     double m_secondElectronnSVDHits;    /**<  nSVDHits for the second electron */
 
-    double m_genericp;    /**<   momentum for the generic track */
-    double m_genericSVDdEdx;    /**<  SVD dE/dx for the generic track */
-    double m_genericnSVDHits;    /**<  nSVDHits for the generic track */
-    double m_genericSVDdEdxErr;     /**<  SVD dE/dx uncertainty for the generic track */
-    // double m_genericSVDdEdxMean;     /**<  SVD dE/dx response (non-truncated) for the generic track */
-    double m_genericdEdxTrackMomentum;       /**<   momentum for the generic track, taken from the VXDDedxTrack */
-    int m_genericdEdxTrackNHits;       /**<   number of hits for generic track, taken from the VXDDedxTrack */
-    // int m_genericdEdxTrackNHitsUsed;       /**<   number of hits used for dEdx truncated mean for generic track, taken from the VXDDedxTrack */
-    double m_genericdEdxTrackCosTheta;       /**<   cosTheta for the generic track, taken from the VXDDedxTrack */
-    // std::vector<double> m_genericSVDdEdxList;       /**<   SVD dE/dx response for the generic track, per hit */
+    double m_genericTrackMomentum;    /**<   momentum for the generic track */
+    double m_genericTrackSVDdEdx;    /**<  SVD dE/dx for the generic track */
+    double m_genericTracknSVDHits;    /**<  nSVDHits for the generic track */
+    double m_genericTrackSVDdEdxErr;     /**<  SVD dE/dx uncertainty for the generic track */
+    // double m_genericTrackSVDdEdxMean;     /**<  SVD dE/dx response (non-truncated) for the generic track */
+    double m_genericTrackdEdxTrackMomentum;       /**<   momentum for the generic track, taken from the VXDDedxTrack */
+    int m_genericTrackdEdxTrackNHits;       /**<   number of hits for generic track, taken from the VXDDedxTrack */
+    // int m_genericTrackdEdxTrackNHitsUsed;       /**<   number of hits used for dEdx truncated mean for generic track, taken from the VXDDedxTrack */
+    double m_genericTrackdEdxTrackCosTheta;       /**<   cosTheta for the generic track, taken from the VXDDedxTrack */
+    // std::vector<double> m_genericTrackSVDdEdxList;       /**<   SVD dE/dx response for the generic track, per hit */
 
     std::string m_LambdaListName = "";    /**< Name of the Lambda particle list */
     std::string m_DstarListName = "";    /**< Name of the Dstar particle list */
     std::string m_GammaListName = "";    /**< Name of the Gamma particle list */
-    std::string m_GenericListName = "";    /**< Name of the pion particle list */
+    std::string m_GenericListName = "";    /**< Name of the generic track particle list */
 
   };
 

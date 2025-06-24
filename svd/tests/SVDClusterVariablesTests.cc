@@ -1,3 +1,11 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #include <variant>
 
 #include <gtest/gtest.h>
@@ -71,6 +79,21 @@ public:
   MOCK_CONST_METHOD0(getV, double());
 };
 
+class MockAbsMeasurement : public genfit::AbsMeasurement {
+public:
+  // Default constructor if needed for some cases, but generally provide valid data
+  MockAbsMeasurement() : genfit::AbsMeasurement(0) {} // Pass a dummy ID
+
+  // Mock all pure virtual methods
+  MOCK_CONST_METHOD0(clone, genfit::AbsMeasurement * ());
+  MOCK_CONST_METHOD0(getDetId, int());
+  MOCK_CONST_METHOD0(getMeasurementId, int());
+  MOCK_CONST_METHOD0(getRawHitCoords, TVectorD());
+  MOCK_CONST_METHOD0(getRawHitCov, TMatrixDSym());
+  MOCK_CONST_METHOD0(getHMatrix, TMatrixDSym());
+  MOCK_CONST_METHOD0(getDimension, int());
+};
+
 class MockTrackPoint : public genfit::TrackPoint {
 public:
   MockTrackPoint() : genfit::TrackPoint(nullptr, nullptr) {}
@@ -121,6 +144,7 @@ public:
 
     m_svdClusters.push_back(m_mockSVDCluster.get());
 
+    // Wire up the mock expectations
     ON_CALL(*m_mockParticle, getTrack()).WillByDefault(Return(m_mockTrack.get()));
     ON_CALL(*m_mockTrack, getRelatedToRecoTrack()).WillByDefault(Return(m_mockRecoTrack.get()));
     ON_CALL(*m_mockRecoTrack, getSVDHitList()).WillByDefault(ReturnRef(m_svdClusters));

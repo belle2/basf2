@@ -13,7 +13,7 @@
 #include <analysis/VertexFitting/KFit/KFitError.h>
 #include <analysis/VertexFitting/KFit/KFitBase.h>
 
-#include <framework/geometry/B2Vector3.h>
+#include <Math/Vector3D.h>
 
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
@@ -45,7 +45,7 @@ namespace Belle2 {
        * @param v initial vertex point
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       setInitialVertex(const B2Vector3D& v);
+      enum KFitError::ECode       setInitialVertex(const ROOT::Math::XYZVector& v);
       /** Set an IP-ellipsoid shape for the vertex constraint fit.
        * @param ip IP position
        * @param ipe error matrix of the IP

@@ -178,7 +178,7 @@ int EvtGenInterface::simulateEvent(MCInitialParticles initial, int inclusiveType
     if (inclusiveType != 0) {
       EvtParticle* p = m_parent;
       // following loop will go through generated event and check it for
-      // presense of inclusive particle
+      // presence of inclusive particle
       do {
         //for (int ii = 0; ii < iPart ; ii++) {
         //std::cout << p->getPDGId() << std::endl;

@@ -92,7 +92,7 @@ namespace Belle2 {
       if (m_warnCount < 10) {
         B2WARNING("StoreArray 'CDCDedxHits' does not exist, returning. Probably running on old cdst.");
       } else if (m_warnCount == 10) {
-        B2WARNING("StoreArray 'CDCDedxHits' does not exist, returning. ...message will be suppresed now.");
+        B2WARNING("StoreArray 'CDCDedxHits' does not exist, returning. ...message will be suppressed now.");
       }
       return;
     }

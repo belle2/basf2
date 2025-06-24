@@ -385,8 +385,8 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
   //==================
   // (01)noise embedding
   //==================
-  double  tmin_noise = -4; // orignal
-  double tgen = 10.3;   // orignal
+  double  tmin_noise = -4; // original
+  double tgen = 10.3;   // original
   int bkg_level = 1030;
   double ttt0 = 0; // [us]
   /* cppcheck-suppress variableScope */
@@ -395,7 +395,7 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
   double ttt2 = 0; // [us]
   //
   double frac_pileup   = 0.035; // pileup noise fraction?
-  double frac_parallel = 0.023; // parralel noise fraction?
+  double frac_parallel = 0.023; // parallel noise fraction?
   double frac_serial   = 0.055; // serial noise fraction?
   double times_pileup   =  1;   // noise scale based on Belle noise.
   double times_parallel =  3.15;   // noise scale
@@ -519,14 +519,14 @@ TrgEclDigitizer::digitization02(std::vector<std::vector<double>>& TCDigiE, std::
   // (03)noise embedding
   //==================
 
-  double tmin_noise = -4; // orignal
+  double tmin_noise = -4; // original
   double   tgen = 10.3;   //
   int bkg_level = 1030;
   double ttt0 = 0; // [us]
   double ttt1 = 0; // [us]
   double ttt2 = 0; // [us]
   //double frac_pileup   = 0.035; // pileup noise fraction?
-  //double frac_parallel = 0.023; // parralel noise fraction?
+  //double frac_parallel = 0.023; // parallel noise fraction?
   //double frac_serial   = 0.055; // serial noise fraction?
   //double times_pileup   =  1;   // noise scale based on Belle noise.
   //double times_parallel =  1;   // noise scale

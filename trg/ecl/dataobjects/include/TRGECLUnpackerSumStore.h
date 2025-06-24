@@ -101,13 +101,13 @@ namespace Belle2 {
     //! The method to set event id
     void setEventId(int eventId) {s_eventId = eventId;}
 
-    //! The mothod to set the sumamry window
+    //! The method to set the summary window
     void setSumNum(int sum_win) {s_sum_win = sum_win;}
 
-    //! The mothod to set the sumamry revoclk
+    //! The method to set the summary revoclk
     void setSumRevo(int sum_revo) {s_sum_revo = sum_revo;}
 
-    //! The mothod to set Timing
+    //! The method to set Timing
     void setTime(int time) {s_time = time;}
 
     //! The method to set Cluster Theta
@@ -118,7 +118,7 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set Cluster Phi
+    //! The method to set Cluster Phi
     void setCLPhi(int cl_phi[6])
     {
       for (int i = 0; i < 6; i++) {
@@ -126,7 +126,7 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set Cluster time
+    //! The method to set Cluster time
     void setCLTime(int cl_time[6])
     {
       for (int i = 0; i < 6; i++) {
@@ -134,7 +134,7 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set Cluster energy
+    //! The method to set Cluster energy
     void setCLEnergy(int cl_energy[6])
     {
       for (int i = 0; i < 6; i++) {
@@ -142,7 +142,7 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set 1GeV Flag
+    //! The method to set 1GeV Flag
     void setCLF1GeV(int cl_1gev[6])
     {
       for (int i = 0; i < 6; i++) {
@@ -150,7 +150,7 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set 2GeV Flag
+    //! The method to set 2GeV Flag
     void setCLF2GeV(int cl_2gev[6])
     {
       for (int i = 0; i < 6; i++) {
@@ -158,7 +158,7 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set Bha Flag
+    //! The method to set Bha Flag
     void setCLFBha(int cl_bha[6])
     {
       for (int i = 0; i < 6; i++) {
@@ -166,133 +166,133 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set Number of Cluster
+    //! The method to set Number of Cluster
     void setNCL(int ncl) {s_ncl = ncl;}
 
-    //! The mothod to set ICN
+    //! The method to set ICN
     void setICN(int icn) {s_icn = icn;}
 
-    //! The mothod to set ICN overflow bit
+    //! The method to set ICN overflow bit
     void setICNOver(int icn_over) {s_icn_over = icn_over;}
 
-    //! The mothod to set Lowmilti bit
+    //! The method to set Lowmilti bit
     void setLowMulti(int low_multi) {s_low_multi = low_multi;}
 
-    //! The mothod to set 3D Bhabha veto bit
+    //! The method to set 3D Bhabha veto bit
     void set3DBhabhaV(int b2bhabhav) {s_b2bhabhav = b2bhabhav;}
 
-    //! The mothod to set 3D Bhabha selection bit
+    //! The method to set 3D Bhabha selection bit
     void set3DBhabhaS(int b2bhabhas) {s_b2bhabhas = b2bhabhas;}
 
-    //! The mothod to set mumu bit
+    //! The method to set mumu bit
     void setMumu(int mumu) {s_mumu = mumu;}
 
-    //! The mothod to set prescale bit
+    //! The method to set prescale bit
     void setPrescale(int prescale) {s_prescale = prescale;}
 
-    //! The mothod to set 2D Bhabha bit
+    //! The method to set 2D Bhabha bit
     void set2DBhabha(int b1bhabha) {s_b1bhabha = b1bhabha;}
 
-    //! The mothod to set 2D Bhabha Type
+    //! The method to set 2D Bhabha Type
     void setBhabhaType(int b1_type) {s_b1_type = b1_type;}
 
-    //! The mothod to set Physics bit
+    //! The method to set Physics bit
     void setPhysics(int physics) {s_physics = physics;}
 
-    //! The mothod to set BG Veto bit
+    //! The method to set BG Veto bit
     void setBG(int bg_veto) {s_bg_veto = bg_veto;}
 
-    //! The mothod to set Total Energy
+    //! The method to set Total Energy
     void setEtot(int etot) {s_etot = etot;}
 
-    //! The mothod to set Total Energy Type
+    //! The method to set Total Energy Type
     void setEtotType(int etot_type) {s_etot_type = etot_type;}
 
-    //! The mothod to set ECL Burst
+    //! The method to set ECL Burst
     void setECLBST(int ecl_bst) {s_ecl_bst = ecl_bst;}
 
-    //! The mothod to set Timing Type
+    //! The method to set Timing Type
     void setTimeType(int time_type) {s_time_type = time_type;}
 
     //! The method to get event id
     int getEventId() const {return s_eventId;}
 
-    //! The mothod to get the sumamry window
+    //! The method to get the summary window
     int getSumNum() const {return s_sum_win;}
 
-    //! The mothod to get the sumamry revoclk
+    //! The method to get the summary revoclk
     int getSumRevo() const {return s_sum_revo;}
 
     //! The method to get Cluster Theta
     const int* getCLTheta() const {return s_cl_theta;}
 
-    //! The mothod to get Cluster Phi
+    //! The method to get Cluster Phi
     const int* getCLPhi() const {return s_cl_phi;}
 
-    //! The mothod to get Cluster time
+    //! The method to get Cluster time
     const int* getCLTime() const {return s_cl_time;}
 
-    //! The mothod to get Cluster energy
+    //! The method to get Cluster energy
     const int* getCLEnergy() const {return s_cl_energy;}
 
-    //! The mothod to get 1GeV Flag
+    //! The method to get 1GeV Flag
     const int* getCL1GeV() const {return s_cl_1gev;}
 
-    //! The mothod to get 2GeV Flag
+    //! The method to get 2GeV Flag
     const int* getCL2GeV() const {return s_cl_2gev;}
 
-    //! The mothod to get Bhabha Flag
+    //! The method to get Bhabha Flag
     const int* getCLBha() const {return s_cl_bha;}
 
-    //! The mothod to get Number of Cluster
+    //! The method to get Number of Cluster
     int getNCL() const {return s_ncl;}
 
-    //! The mothod to get ICN
+    //! The method to get ICN
     int getICN() const {return s_icn;}
 
-    //! The mothod to get ICN overflow bit
+    //! The method to get ICN overflow bit
     int getICNOver() const {return s_icn_over;}
 
-    //! The mothod to get Lowmilti bit
+    //! The method to get Lowmilti bit
     int getLowMulti() const {return s_low_multi;}
 
-    //! The mothod to get 3D Bhabha veto bit
+    //! The method to get 3D Bhabha veto bit
     int get3DBhabhaV() const {return s_b2bhabhav;}
 
-    //! The mothod to get 3D Bhabha selection bit
+    //! The method to get 3D Bhabha selection bit
     int get3DBhabhaS() const {return s_b2bhabhas;}
 
-    //! The mothod to get mumu bit
+    //! The method to get mumu bit
     int getMumu() const {return s_mumu;}
 
-    //! The mothod to get prescale bit
+    //! The method to get prescale bit
     int getPrescale() const {return s_prescale;}
 
-    //! The mothod to get 2D Bhabha bit
+    //! The method to get 2D Bhabha bit
     int get2DBhabha() const {return s_b1bhabha;}
 
-    //! The mothod to get 2D Bhabha Type
+    //! The method to get 2D Bhabha Type
     int getBhabhaType() const {return s_b1_type;}
 
-    //! The mothod to get Physics bit
+    //! The method to get Physics bit
     int getPhysics() const {return s_physics;}
 
-    //! The mothod to get BG Veto bit
+    //! The method to get BG Veto bit
     int getBG() const {return s_bg_veto;}
 
-    //! The mothod to get Total Energy
+    //! The method to get Total Energy
     int getEtot() const {return s_etot;}
 
-    //! The mothod to get Total Energy Type
+    //! The method to get Total Energy Type
     int getEtotType() const {return s_etot_type;}
 
-    //! The mothod to get ECL Burst
+    //! The method to get ECL Burst
     int getECLBST() const {return s_ecl_bst;}
 
-    //! The mothod to get Timing
+    //! The method to get Timing
     int getTime() const {return s_time;}
 
-    //! The mothod to get Timing Type
+    //! The method to get Timing Type
     int getTimeType() const {return s_time_type;}
 
     TRGECLUnpackerSumStore()

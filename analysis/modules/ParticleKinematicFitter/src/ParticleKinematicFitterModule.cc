@@ -281,8 +281,9 @@ bool ParticleKinematicFitterModule::doOrcaKinFitFit(Particle* mother)
       }
       //Always use direction only for neutrons
       if (abs(massHypo) == Const::neutron.getPDGCode()) {
+        if (useDirectionOnly == false)
+          B2WARNING("Neutron mass hypothesis assigned to fit particle but directionOnly flag not specified for same particle.  Setting candidate to useDirectionOnly.");
         useDirectionOnly = true;
-        B2WARNING("Neutron mass hypothesis assigned to fit particle but directionOnly flag not specified for same particle.  Setting candidate to useDirectionOnly.");
         if (flipNeutronPDGsign)  massHypo = -massHypo;
       }
     }

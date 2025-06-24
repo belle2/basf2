@@ -25,7 +25,7 @@ namespace Belle2 {
   class TRGGDLSummaryModule : public Module {
 
   public:
-    //! Costructor
+    //! Constructor
     TRGGDLSummaryModule();
     //! Destrunctor
     virtual ~TRGGDLSummaryModule() {}

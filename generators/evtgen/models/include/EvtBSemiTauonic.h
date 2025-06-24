@@ -59,7 +59,7 @@ namespace Belle2 {
     void initProbMax();
 
     /** The function initializes the decay.
-     * The function reads paramters from the decay file and initializes the parameters for the decay amplitude calculator.
+     * The function reads parameters from the decay file and initializes the parameters for the decay amplitude calculator.
      */
     void init();
 

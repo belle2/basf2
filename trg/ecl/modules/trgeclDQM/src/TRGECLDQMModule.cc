@@ -459,7 +459,8 @@ void TRGECLDQMModule::event()
 
   bool cond_clean, cond_injHER, cond_injLER;
 
-  cond_clean = (6 < running_in_us && running_in_us < 8) && (50 < diff && diff < 70);
+  cond_clean = !((1.2 < running_in_us && running_in_us < 1.6) || (2.2 < running_in_us && running_in_us < 2.4)) && (500 < diff
+               && diff < 15000);
 
   cond_injHER =  isHER && ((diff < 0.5) || ((diff < 20) && (2 < running_in_us && running_in_us < 3)));
   cond_injLER = !isHER && ((diff < 0.5) || ((diff < 20) && (1 < running_in_us && running_in_us < 2)));

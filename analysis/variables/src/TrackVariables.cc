@@ -36,7 +36,7 @@
 namespace Belle2 {
   namespace Variable {
 
-    static const B2Vector3D vecNaN(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
+    static const ROOT::Math::XYZVector vecNaN(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
 
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {
@@ -156,8 +156,10 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       auto helix = trackFit->getHelix();
-      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      helix.passiveMoveBy(beamSpotDB->getIPPosition());
       return helix.getD0();
     }
 
@@ -166,8 +168,10 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       auto helix = trackFit->getHelix();
-      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      helix.passiveMoveBy(beamSpotDB->getIPPosition());
       return helix.getZ0();
     }
 
@@ -176,8 +180,10 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       auto helix = trackFit->getHelix();
-      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      helix.passiveMoveBy(beamSpotDB->getIPPosition());
       return helix.getPhi0();
     }
 
@@ -185,7 +191,6 @@ namespace Belle2 {
     {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
-
       double errorSquared = trackFit->getCovariance5()[0][0];
       if (errorSquared <= 0) return Const::doubleNaN;
       return sqrt(errorSquared);
@@ -272,7 +277,7 @@ namespace Belle2 {
     }
 
     // used in trackHelixExtTheta and trackHelixExtPhi
-    B2Vector3D getPositionOnHelix(const TrackFitResult* trackFit, const std::vector<double>& pars)
+    ROOT::Math::XYZVector getPositionOnHelix(const TrackFitResult* trackFit, const std::vector<double>& pars)
     {
       const double r = pars[0];
       const double zfwd = pars[1];
@@ -299,7 +304,7 @@ namespace Belle2 {
       return h.getPositionAtArcLength2D(l);
     }
 
-    B2Vector3D getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
+    ROOT::Math::XYZVector getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
     {
       if (pars.size() == 4 and pars[3]) {
         const Track* track = part->getTrack();
@@ -325,7 +330,7 @@ namespace Belle2 {
         B2FATAL("Exactly three (+1 optional) parameters (r, zfwd, zbwd, [useHighestProbMass]) required for helixExtTheta.");
       }
 
-      B2Vector3D position = getPositionOnHelix(part, pars);
+      ROOT::Math::XYZVector position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return Const::doubleNaN;
       return position.Theta();
     }
@@ -338,7 +343,7 @@ namespace Belle2 {
         B2FATAL("Exactly three (+1 optional) parameters (r, zfwd, zbwd, [useHighestProbMass]) required for helixExtPhi.");
       }
 
-      B2Vector3D position = getPositionOnHelix(part, pars);
+      ROOT::Math::XYZVector position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return Const::doubleNaN;
       return position.Phi();
     }
@@ -366,7 +371,7 @@ namespace Belle2 {
 
       auto func = [parameters](const Particle * part) -> double {
 
-        B2Vector3D position = getPositionOnHelix(part, parameters);
+        ROOT::Math::XYZVector position = getPositionOnHelix(part, parameters);
         if (position == vecNaN) return Const::doubleNaN;
         return position.Theta();
       };
@@ -396,7 +401,7 @@ namespace Belle2 {
 
       auto func = [parameters](const Particle * part) -> double {
 
-        B2Vector3D position = getPositionOnHelix(part, parameters);
+        ROOT::Math::XYZVector position = getPositionOnHelix(part, parameters);
         if (position == vecNaN) return Const::doubleNaN;
         return position.Phi();
       };
@@ -984,7 +989,7 @@ Returns NaN if there is no event-level tracking information available.
 
     REGISTER_VARIABLE("isTrackFlippedAndRefitted", isTrackFlippedAndRefitted, R"DOC(
 Returns 1 if the charged final state particle comes from a track that has been flipped and refitted
-at the end of the reconstruction chain, in particular after the outer detector reconstruction.
+at the end of the tracking chain, in particular before the outer detector reconstruction.
     )DOC");
 
     REGISTER_VARIABLE("trackTime", getTrackTime, R"DOC(

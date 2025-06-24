@@ -35,12 +35,12 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
-#include <framework/geometry/B2Vector3.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/Conversion.h>
 
 #include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
 #include <TRandom.h>
 #include <TVectorF.h>
 
@@ -334,6 +334,9 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
+
       double px = part->getPx();
       double py = part->getPy();
 
@@ -353,7 +356,9 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
-      return cos((B2Vector3D(part->getVertex()) - beamSpotDB->getIPPosition()).Angle(B2Vector3D(part->getMomentum())));
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
+      return ROOT::Math::VectorUtil::CosTheta(part->getVertex() - beamSpotDB->getIPPosition(), part->getMomentum());
     }
 
     double cosThetaBetweenParticleAndNominalB(const Particle* part)
@@ -390,20 +395,22 @@ namespace Belle2 {
         return Const::doubleNaN;
       }
       PCmsLabTransform T;
-      B2Vector3D th = evtShape->getThrustAxis();
-      B2Vector3D particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
-      return std::cos(th.Angle(particleMomentum));
+      ROOT::Math::XYZVector th = evtShape->getThrustAxis();
+      ROOT::Math::PxPyPzEVector particleMomentum = T.rotateLabToCms() * part->get4Vector();
+      return ROOT::Math::VectorUtil::CosTheta(th, particleMomentum);
     }
 
     double ImpactXY(const Particle* particle)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
 
       ROOT::Math::XYZVector mom = particle->getMomentum();
 
-      ROOT::Math::XYZVector r = particle->getVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition());
+      ROOT::Math::XYZVector r = particle->getVertex() - beamSpotDB->getIPPosition();
 
-      ROOT::Math::XYZVector Bfield = BFieldManager::getInstance().getFieldInTesla(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      ROOT::Math::XYZVector Bfield = BFieldManager::getInstance().getFieldInTesla(beamSpotDB->getIPPosition());
 
       ROOT::Math::XYZVector curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
       double T = TMath::Sqrt(mom.Perp2() - 2.0 * curvature.Dot(r.Cross(mom)) + curvature.Mag2() * r.Perp2());
@@ -419,14 +426,14 @@ namespace Belle2 {
         B2FATAL("You are trying to use an Armenteros variable. The mother particle is required to have exactly two daughters");
 
       const auto& daughters = part -> getDaughters();
-      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
-      B2Vector3D daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
-      B2Vector3D daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
+      ROOT::Math::XYZVector motherMomentum = frame.getMomentum(part).Vect();
+      ROOT::Math::XYZVector daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
+      ROOT::Math::XYZVector daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
 
       int daughter1Charge = daughters[0] -> getCharge();
       int daughter2Charge = daughters[1] -> getCharge();
-      double daughter1Ql = daughter1Momentum.Dot(motherMomentum) / motherMomentum.Mag();
-      double daughter2Ql = daughter2Momentum.Dot(motherMomentum) / motherMomentum.Mag();
+      double daughter1Ql = daughter1Momentum.Dot(motherMomentum) / motherMomentum.R();
+      double daughter2Ql = daughter2Momentum.Dot(motherMomentum) / motherMomentum.R();
 
       double Arm_alpha;
       if (daughter2Charge > daughter1Charge)
@@ -445,9 +452,9 @@ namespace Belle2 {
         B2FATAL("You are trying to use an Armenteros variable. The mother particle is required to have exactly two daughters.");
 
       const auto& daughters = part -> getDaughters();
-      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
-      B2Vector3D daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
-      double qt = daughter1Momentum.Perp(motherMomentum);
+      ROOT::Math::XYZVector motherMomentum = frame.getMomentum(part).Vect().Unit();
+      ROOT::Math::XYZVector daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
+      double qt = std::sqrt(daughter1Momentum.Mag2() - daughter1Momentum.Dot(motherMomentum) * daughter1Momentum.Dot(motherMomentum));
 
       return qt;
     }
@@ -460,9 +467,9 @@ namespace Belle2 {
         B2FATAL("You are trying to use an Armenteros variable. The mother particle is required to have exactly two daughters.");
 
       const auto& daughters = part -> getDaughters();
-      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
-      B2Vector3D daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
-      double qt = daughter2Momentum.Perp(motherMomentum);
+      ROOT::Math::XYZVector motherMomentum = frame.getMomentum(part).Vect().Unit();
+      ROOT::Math::XYZVector daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
+      double qt = std::sqrt(daughter2Momentum.Mag2() - daughter2Momentum.Dot(motherMomentum) * daughter2Momentum.Dot(motherMomentum));
 
       return qt;
     }
@@ -856,6 +863,25 @@ namespace Belle2 {
       ROOT::Math::PxPyPzEVector sigVec = T.rotateLabToCms() * part->getDaughter(1)->get4Vector();
       tagVec.SetE(-beamEnergy);
       return (-tagVec - sigVec).M2();
+    }
+
+    double recoilMassDiff(const Particle* particle, const std::vector<double>& daughters)
+    {
+      if (!particle) return Const::doubleNaN;
+      if (daughters.size() != 1) B2FATAL("recoilMassDiff: currently only one daughter is supported");
+      if (daughters[0] >= particle->getNDaughters()) {
+        B2WARNING("recoilMassDiff: daughter index out of range");
+        return Const::doubleNaN;
+      }
+
+      PCmsLabTransform T;
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
+      const auto& frame = ReferenceFrame::GetCurrent();
+
+      ROOT::Math::PxPyPzEVector particle4Mom = particle->get4Vector();
+      double mRecoil = frame.getMomentum(pIN - particle4Mom).M();
+      double mRecoil_wDaughter = frame.getMomentum(pIN + particle->getDaughter(daughters[0])->get4Vector() - particle4Mom).M();
+      return mRecoil_wDaughter - mRecoil;
     }
 
     double recoilMCDecayType(const Particle* particle)
@@ -1272,6 +1298,18 @@ value possible with the information provided.
                        must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter
 
                        )DOC", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
+    REGISTER_VARIABLE("massDiffRecoil(i)", recoilMassDiff, R"DOC(
+                      mass difference M(Recoil + i-th daughter) - M(Recoil) 
+                      between recoil for a given Particle without a specific daughter and recoil of the Particle. 
+                      
+                      This variable is useful for ccbarFEI training where you tag a Lambda_c+ in the recoil,
+                      and on the tag side you can absorb a pion coming from a Sigma_c.
+
+                      Note: This is used like massDiffRecoil(2) when in ccbarFEI you reconstruct eg. Lambda_c+:tag -> D+ p+ pi- 
+                      and you want to calculate the mass difference between the recoil (which is the Lambda_c-) 
+                      and the recoil with the pi- which could be coming from Sigma_c--.
+
+                      )DOC", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,
                       "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.\n\n", "rad");

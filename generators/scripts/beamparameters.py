@@ -369,7 +369,7 @@ if __name__ == "__main__":
     print(beampos_spot)
     print("Beamspot covariance:")
     print(cov_spot)
-    print("Beamspot dimensions (in mm, axes in arbitary order):")
+    print("Beamspot dimensions (in mm, axes in arbitrary order):")
     print(np.linalg.eig(cov_spot)[0] ** .5 * 10)
 
     # see if we can plot it

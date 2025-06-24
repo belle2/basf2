@@ -41,6 +41,7 @@
 #pragma link C++ class Belle2::CDCCrossTalkLibrary+; // checksum=0x4ace6024, version=2
 #pragma link C++ class Belle2::CDCCorrToThresholds+; // checksum=0xbea4131b, version=2
 #pragma link C++ class Belle2::CDCFudgeFactorsForSigma+; // checksum=0x37bcdd67, version=1
+#pragma link C++ class Belle2::CDCAlphaScaleFactorForAsymmetry+; // checksum=0xd69e0cbf, version=1
 #pragma link C++ class Belle2::CDCdEdxPDFs+; // checksum=0xc074ee36, version=1
 
 #pragma link C++ class Belle2::CDCDedxBadWires+; // checksum=0xa97f8b15, version=1

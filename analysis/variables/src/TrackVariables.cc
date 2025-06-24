@@ -156,6 +156,8 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       auto helix = trackFit->getHelix();
       helix.passiveMoveBy(beamSpotDB->getIPPosition());
       return helix.getD0();
@@ -166,6 +168,8 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       auto helix = trackFit->getHelix();
       helix.passiveMoveBy(beamSpotDB->getIPPosition());
       return helix.getZ0();
@@ -176,6 +180,8 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       auto helix = trackFit->getHelix();
       helix.passiveMoveBy(beamSpotDB->getIPPosition());
       return helix.getPhi0();
@@ -185,7 +191,6 @@ namespace Belle2 {
     {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
-
       double errorSquared = trackFit->getCovariance5()[0][0];
       if (errorSquared <= 0) return Const::doubleNaN;
       return sqrt(errorSquared);
@@ -984,7 +989,7 @@ Returns NaN if there is no event-level tracking information available.
 
     REGISTER_VARIABLE("isTrackFlippedAndRefitted", isTrackFlippedAndRefitted, R"DOC(
 Returns 1 if the charged final state particle comes from a track that has been flipped and refitted
-at the end of the reconstruction chain, in particular after the outer detector reconstruction.
+at the end of the tracking chain, in particular before the outer detector reconstruction.
     )DOC");
 
     REGISTER_VARIABLE("trackTime", getTrackTime, R"DOC(

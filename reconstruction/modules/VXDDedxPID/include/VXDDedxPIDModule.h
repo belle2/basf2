@@ -78,20 +78,17 @@ namespace Belle2 {
      */
     void calculateMeans(double& mean, double& truncatedMean, double& truncatedMeanErr, const std::vector<double>& dedx) const;
 
-    /** returns traversed length through active medium of given PXDCluster. */
-    static double getTraversedLength(const PXDCluster* hit, const HelixHelper* helix);
-
-    /** returns traversed length through active medium of given SVDCluster. */
-    static double getTraversedLength(const SVDCluster* hit, const HelixHelper* helix);
+    /** returns traversed length through active medium of given hit */
+    template <class HitClass> static double getTraversedLength(const HitClass* hit, const RecoTrack* recoTrack, double& p);
 
     /** save energy loss and hit information from SVD/PXDHits to track */
-    template <class HitClass> void saveSiHits(VXDDedxTrack* track, const HelixHelper& helix, const std::vector<HitClass*>& hits) const;
+    template <class HitClass> void saveSiHits(VXDDedxTrack* track, const std::vector<HitClass*>& hits,
+                                              const RecoTrack* recoTrack) const;
 
     // module steering parameters
     bool m_useIndividualHits; /**< use individual hits (true) or truncated mean (false) to determine likelihoods */
     bool m_usePXD; /**< use PXD data for likelihood */
     bool m_useSVD; /**< use SVD data for likelihood */
-    double m_trackDistanceThreshhold; /**< track distance threshold */
     bool m_onlyPrimaryParticles; /**< For MC only: if true, only save data for primary particles (as determined by MC truth) */
 
     // required input

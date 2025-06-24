@@ -322,7 +322,7 @@ TTree* SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselT
 
 TList* SVDdEdxCalibrationAlgorithm::LambdaHistogramming(TTree* inputTree)
 {
-
+  gROOT->SetBatch(true);
   inputTree->SetEstimate(-1);
   std::vector<double> pbins = CreatePBinningScheme();
 
@@ -538,7 +538,7 @@ TTree* SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTr
 
 TList* SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* inputTree)
 {
-
+  gROOT->SetBatch(true);
   inputTree->SetEstimate(-1);
   std::vector<double> pbins = CreatePBinningScheme();
 
@@ -787,6 +787,7 @@ TList* SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shared_ptr<TTree> pr
 TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree> ttreeLambda, std::shared_ptr<TTree> ttreeDstar,
                                                           std::shared_ptr<TTree> ttreeGamma, std::shared_ptr<TTree> ttreeGeneric)
 {
+  gROOT->SetBatch(true);
   gStyle->SetOptStat(0);
 // run the background subtraction and histogramming parts
   TTree* treeLambda = LambdaMassFit(ttreeLambda);

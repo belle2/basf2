@@ -16,6 +16,7 @@ import basf2 as b2
 import modularAnalysis as ma
 import vertex as vx
 import reconstruction as re
+from reconstruction import prepare_user_cdst_analysis
 
 settings = CalibrationSettings(
     name="caf_svd_dedx",
@@ -31,9 +32,10 @@ settings = CalibrationSettings(
 
     expert_config={
         "isMC": False,
-        "listOfMutedCalibrations": ["dEdxValidation"],  # dEdxCalibration, dEdxValidation
-        "rerun_reco": True,  # need to rerun reconstruction for calibration?
-        "rerun_reco_val": True,  # need to rerun reconstruction for validation?
+        "listOfMutedCalibrations": [],  # dEdxCalibration, dEdxValidation
+        "rerun_reco": False,  # need to rerun reconstruction for calibration?
+        "rerun_reco_val": False,  # need to rerun reconstruction for validation?
+        "rerun_pid_val": True,  # need to rerun PID for validation?
         "validation_mode": "basic",  # full or basic; full also produces global PID performance plots
         "MaxFilesPerRun": 10,  # 15,
         "MaxFilesPerRunValidation": 6,  # be careful in MC to not exclude certain event types
@@ -43,17 +45,21 @@ settings = CalibrationSettings(
         "NBinsP": 69,
         "NBinsdEdx": 100,
         "dedxCutoff": 5.e6,
+        "CustomProfile": True,
+        "FixUnstableFitParameter": True,
+        "EventsToGenerate": 5e5,
+        "UsePionBGFunctionForEverything": False,
+        "UseProtonBGFunctionForEverything": False,
         "NumROCpoints": 175,
         "MinROCMomentum": 0.,
         "MaxROCMomentum": 2.5,
         "NumEffBins": 30,
-        "MaxEffMomentum": 2.5,
-        "CustomProfile": True
+        "MaxEffMomentum": 2.5
         },
     depends_on=[])
 
 
-def create_path(rerun_reco, isMC, expert_config):
+def create_path(rerun_reco, rerun_pid, isMC, expert_config):
     rec_path = b2.Path()
 
     # expert_config = kwargs.get("expert_config")
@@ -84,6 +90,9 @@ def create_path(rerun_reco, isMC, expert_config):
 
         re.add_reconstruction(path=rec_path, pruneTracks=False)
         rec_path.add_module('VXDDedxPID')
+    elif rerun_pid:
+        rec_path.add_module('RootInput', entrySequences=[f'0:{max_events_per_file - 1}'])
+        prepare_user_cdst_analysis(rec_path, mc=isMC)
     else:
         rec_path.add_module('RootInput')
 
@@ -213,6 +222,7 @@ def get_calibrations(input_data, **kwargs):
     listOfMutedCalibrations = expert_config["listOfMutedCalibrations"]
     rerun_reco = expert_config["rerun_reco"]
     rerun_reco_val = expert_config["rerun_reco_val"]
+    rerun_pid_val = expert_config["rerun_pid_val"]
     max_files_per_run = expert_config["MaxFilesPerRun"]
     max_files_per_run_validation = expert_config["MaxFilesPerRunValidation"]
 
@@ -254,7 +264,11 @@ def get_calibrations(input_data, **kwargs):
     algo.setNumDEdxBins(expert_config['NBinsdEdx'])
     algo.setDEdxCutoff(expert_config['dedxCutoff'])
     algo.setMinEvtsPerTree(expert_config['MinEvtsPerTree'])
+    algo.setNToGenerate(int(expert_config['EventsToGenerate']))
+    algo.setUsePionBGFunctionForEverything(expert_config['UsePionBGFunctionForEverything'])
+    algo.setUseProtonBGFunctionForEverything(expert_config['UseProtonBGFunctionForEverything'])
     algo.setCustomProfile(expert_config['CustomProfile'])
+    algo.setFixUnstableFitParameter(expert_config['FixUnstableFitParameter'])
 
     if "dEdxValidation" not in listOfMutedCalibrations:
         algo_val = SVDdEdxValidationAlgorithm()
@@ -272,13 +286,13 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.framework import Calibration
 
-    rec_path = create_path(rerun_reco, isMC, expert_config)
-    rec_path_validation = create_path(rerun_reco_val, isMC, expert_config)
+    rec_path = create_path(rerun_reco, False, isMC, expert_config)
+    rec_path_validation = create_path(rerun_reco_val, rerun_pid_val, isMC, expert_config)
 
     dedx_calibration = Calibration("SVDdEdxCalibration",
                                    collector="SVDdEdxCollector",
                                    algorithms=[algo],
-                                   backend_args={"queue": "l", "request_memory": "8 GB"},
+                                   # backend_args={"queue": "l"},
                                    input_files=input_files_hadron_calib,
                                    pre_collector_path=rec_path)
 
@@ -286,7 +300,7 @@ def get_calibrations(input_data, **kwargs):
         dedx_validation = Calibration("SVDdEdxValidation",
                                       collector="SVDdEdxValidationCollector",
                                       algorithms=[algo_val],
-                                      backend_args={"queue": "l", "request_memory": "8 GB"},
+                                      # backend_args={"queue": "l"},
                                       input_files=input_files_hadron_validation,
                                       pre_collector_path=rec_path_validation)
     # Do this for the default AlgorithmStrategy to force the output payload IoV

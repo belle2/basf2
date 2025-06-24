@@ -80,6 +80,16 @@ namespace Belle2 {
      */
     void setFixUnstableFitParameter(bool value = true) { m_FixUnstableFitParameter = value; }
 
+    /**
+     * use the pion beta*gamma function for other hadrons
+     */
+    void setUsePionBGFunctionForEverything(bool value = false) { m_UsePionBGFunctionForEverything = value; }
+
+    /**
+    * use the proton beta*gamma function for other hadrons
+    */
+    void setUseProtonBGFunctionForEverything(bool value = false) { m_UseProtonBGFunctionForEverything = value; }
+
   protected:
     /**
      * run algorithm on data

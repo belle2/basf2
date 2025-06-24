@@ -51,6 +51,11 @@ namespace Belle2 {
     void setNumPBins(const int& value) { m_numPBins = value; }
 
     /**
+     * set the number of beta*gamma bins for the fits
+     */
+    void setNumBGBins(const int& value) { m_numBGBins = value; }
+
+    /**
      * set the upper edge of the dEdx binning for the payloads
      */
     void setDEdxCutoff(const double& value) { m_dedxCutoff = value; }
@@ -61,9 +66,19 @@ namespace Belle2 {
     void setMinEvtsPerTree(const double& value) { m_MinEvtsPerTree = value; }
 
     /**
+     * set the number of events to generate, per momentum bin, for the payloads
+     */
+    void setNToGenerate(const int& value) { m_toGenerate = value; }
+
+    /**
      * reimplement the profile histogram calculation
      */
     void setCustomProfile(bool value = true) { m_CustomProfile = value; }
+
+    /**
+     * In the dEdx:betagamma fit, there is one free parameter that makes fit convergence poor. It is ok to fix it, unless the dEdx behavior changes radically with time.
+     */
+    void setFixUnstableFitParameter(bool value = true) { m_FixUnstableFitParameter = value; }
 
   protected:
     /**
@@ -90,7 +105,13 @@ namespace Belle2 {
       100;                                                 /**< number of events in TTree below which we don't try to fit */
     int m_toGenerate =
       500000;                                                     /**< the number of events to be generated in each momentum bin in the new payloads */
-    bool m_CustomProfile = 1; /**< reimplement profile histogrma calculation instead of ROOT implementation? */
+    bool m_CustomProfile = 1; /**< reimplement profile histogram calculation instead of the ROOT implementation? */
+    bool m_UsePionBGFunctionForEverything =
+      0; /**< Assume that the dEdx:betagamma trend is the same for all hadrons; use the pion trend as representative */
+    bool m_UseProtonBGFunctionForEverything =
+      0; /**< Assume that the dEdx:betagamma trend is the same for all hadrons; use the proton trend as representative */
+    bool m_FixUnstableFitParameter =
+      1;  /**< In the dEdx:betagamma fit, there is one free parameter that makes fit convergence poor. It is ok to fix it, unless the dEdx behavior changes radically with time. */
 
     const double m_ElectronPDGMass = TDatabasePDG::Instance()->GetParticle(11)->Mass();  /**< PDG mass for the electron */
     const double m_MuonPDGMass = TDatabasePDG::Instance()->GetParticle(13)->Mass();  /**< PDG mass for the muon */
@@ -159,7 +180,7 @@ namespace Belle2 {
       TF1* ResolutionFunction = (TF1*) ResolutionFunctionOriginal->Clone(Form("%sClone",
                                 ResolutionFunctionOriginal->GetName())); // to avoid modifying the resolution function
       ResolutionFunction->SetRange(0, m_dedxMaxPossible); // allow the function to take values outside the histogram range
-      TH2F* DataHistogramNew = (TH2F*) DataHistogram->Clone(NewName);//Form("%sNew", DataHistogram->GetName()));
+      TH2F* DataHistogramNew = (TH2F*) DataHistogram->Clone(NewName);
 
       DataHistogramNew->Reset();
 

@@ -21,22 +21,6 @@ namespace Belle2 {
 
     /** Default constructor */
     CDCTriggerTSFConfig(): m_TDCfilter(false), m_ADC(false), m_ADC_threshold(-1) {}
-    /** copy constructor */
-    CDCTriggerTSFConfig(const CDCTriggerTSFConfig& b): TObject(b)
-    {
-      m_TDCfilter = b.m_TDCfilter;
-      m_ADC = b.m_ADC;
-      m_ADC_threshold = b.m_ADC_threshold;
-    }
-    /** assignment operator */
-    CDCTriggerTSFConfig& operator=(const CDCTriggerTSFConfig& b)
-    {
-      m_TDCfilter = b.m_TDCfilter;
-      m_ADC = b.m_ADC;
-      m_ADC_threshold = b.m_ADC_threshold;
-      return *this;
-    }
-
 
     /** Get TDCfilter enable flag */
     bool getTDCfilter() const

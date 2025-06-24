@@ -25,23 +25,6 @@ namespace Belle2 {
 
     /** Default constructor */
     CDCTrigger2DConfig(): m_nTS(10), m_fullhit(false), m_hitthreshold(4), m_ADC(false) {}
-    /** copy constructor */
-    CDCTrigger2DConfig(const CDCTrigger2DConfig& b): TObject(b)
-    {
-      m_nTS = b.m_nTS;
-      m_fullhit = b.m_fullhit;
-      m_hitthreshold = b.m_hitthreshold;
-      m_ADC = b.m_ADC;
-    }
-    /** assignment operator */
-    CDCTrigger2DConfig& operator=(const CDCTrigger2DConfig& b)
-    {
-      m_nTS = b.m_nTS;
-      m_fullhit = b.m_fullhit;
-      m_hitthreshold = b.m_hitthreshold;
-      m_ADC = b.m_ADC;
-      return *this;
-    }
 
     /** Get the number of TS */
     int getnTS() const

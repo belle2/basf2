@@ -78,80 +78,70 @@ void SVDdEdxCollectorModule::prepare()
   LambdaTree->Branch<double>("ProtonMomentum", &m_protonMomentum);
   LambdaTree->Branch<double>("ProtonSVDdEdx", &m_protonSVDdEdx);
   LambdaTree->Branch<double>("ProtonSVDdEdxErr", &m_protonSVDdEdxErr);
-  LambdaTree->Branch<double>("ProtonSVDdEdxMean", &m_protonSVDdEdxMean);
+  // LambdaTree->Branch<double>("ProtonSVDdEdxMean", &m_protonSVDdEdxMean);
   LambdaTree->Branch<double>("ProtonSVDdEdxTrackMomentum", &m_protondEdxTrackMomentum);
   LambdaTree->Branch<int>("ProtonSVDdEdxTrackNHits", &m_protondEdxTrackNHits);
-  LambdaTree->Branch<int>("ProtonSVDdEdxTrackNHitsUsed", &m_protondEdxTrackNHitsUsed);
+  // LambdaTree->Branch<int>("ProtonSVDdEdxTrackNHitsUsed", &m_protondEdxTrackNHitsUsed);
   LambdaTree->Branch<double>("ProtonSVDdEdxTrackCosTheta", &m_protondEdxTrackCosTheta);
-  LambdaTree->Branch<std::vector<double>>("ProtonSVDdEdxList", &m_protonSVDdEdxList);
+  // LambdaTree->Branch<std::vector<double>>("ProtonSVDdEdxList", &m_protonSVDdEdxList);
   LambdaTree->Branch<double>("ProtonnSVDHits", &m_protonnSVDHits);
 
   LambdaTree->Branch<double>("PionLambdaMomentum", &m_pionLambdap);
   LambdaTree->Branch<double>("PionLambdaSVDdEdx", &m_pionLambdaSVDdEdx);
   LambdaTree->Branch<double>("PionLambdaSVDdEdxErr", &m_pionLambdaSVDdEdxErr);
-  LambdaTree->Branch<double>("PionLambdaSVDdEdxMean", &m_pionLambdaSVDdEdxMean);
+  // LambdaTree->Branch<double>("PionLambdaSVDdEdxMean", &m_pionLambdaSVDdEdxMean);
   LambdaTree->Branch<double>("PionLambdaSVDdEdxTrackMomentum", &m_pionLambdadEdxTrackMomentum);
   LambdaTree->Branch<int>("PionLambdaSVDdEdxTrackNHits", &m_pionLambdadEdxTrackNHits);
-  LambdaTree->Branch<int>("PionLambdaSVDdEdxTrackNHitsUsed", &m_pionLambdadEdxTrackNHitsUsed);
+  // LambdaTree->Branch<int>("PionLambdaSVDdEdxTrackNHitsUsed", &m_pionLambdadEdxTrackNHitsUsed);
   LambdaTree->Branch<double>("PionLambdaSVDdEdxTrackCosTheta", &m_pionLambdadEdxTrackCosTheta);
-  LambdaTree->Branch<std::vector<double>>("PionLambdaSVDdEdxList", &m_pionLambdaSVDdEdxList);
+  // LambdaTree->Branch<std::vector<double>>("PionLambdaSVDdEdxList", &m_pionLambdaSVDdEdxList);
   LambdaTree->Branch<double>("PionLambdanSVDHits", &m_pionLambdanSVDHits);
-
-  // double m_protonSVDdEdxErr;     /**<  SVD dE/dx uncertainty for the proton from the Lambda */
-  // double m_protonSVDdEdxMean;     /**<  SVD dE/dx response (non-truncated) for the proton from the Lambda */
-  // double m_protondEdxTrackMomentum;       /**<   momentum for the proton from the Lambda, taken from the VXDDedxTrack */
-  // int m_protondEdxTrackNHits;       /**<   number of hits for proton from the Lambda, taken from the VXDDedxTrack */
-  // int m_protondEdxTrackNHitsUsed;       /**<   number of hits used for dEdx truncated mean for proton from the Lambda, taken from the VXDDedxTrack */
-  // double m_protondEdxTrackCosTheta;       /**<   cosTheta for the proton from the Lambda, taken from the VXDDedxTrack */
-  // double m_protondEdxTrackdx[m_protondEdxTrackNHits];       /**<   dx (path length) for the proton from the Lambda, taken from the VXDDedxTrack */
-  // int m_protondEdxTrackdE[m_protondEdxTrackNHits];       /**<   dE (ADC counts) for the proton from the Lambda, taken from the VXDDedxTrack */
-  // std::vector<double> m_protonSVDdEdxList;       /**<   SVD dE/dx response for the proton from the Lambda, per hit */
 
   DstarTree->Branch<double>("InvM", &m_InvMDstar);
   DstarTree->Branch<double>("D0InvM", &m_InvMD0);
   DstarTree->Branch<double>("deltaM", &m_DeltaM);
   DstarTree->Branch<double>("D0DIRA", &m_diraD0);
-  DstarTree->Branch<double>("D0Momentum", &m_D0Momentum);
+  // DstarTree->Branch<double>("D0Momentum", &m_D0Momentum);
   DstarTree->Branch<double>("KaonMomentum", &m_kaonMomentum);
-  DstarTree->Branch<double>("KaonMomentumX", &m_kaonMomentumX);
-  DstarTree->Branch<double>("KaonMomentumY", &m_kaonMomentumY);
-  DstarTree->Branch<double>("KaonMomentumZ", &m_kaonMomentumZ);
+  // DstarTree->Branch<double>("KaonMomentumX", &m_kaonMomentumX);
+  // DstarTree->Branch<double>("KaonMomentumY", &m_kaonMomentumY);
+  // DstarTree->Branch<double>("KaonMomentumZ", &m_kaonMomentumZ);
   DstarTree->Branch<double>("KaonSVDdEdx", &m_kaonSVDdEdx);
   DstarTree->Branch<double>("KaonSVDdEdxErr", &m_kaonSVDdEdxErr);
-  DstarTree->Branch<double>("KaonSVDdEdxMean", &m_kaonSVDdEdxMean);
+  // DstarTree->Branch<double>("KaonSVDdEdxMean", &m_kaonSVDdEdxMean);
   DstarTree->Branch<double>("KaonSVDdEdxTrackMomentum", &m_kaondEdxTrackMomentum);
   DstarTree->Branch<int>("KaonSVDdEdxTrackNHits", &m_kaondEdxTrackNHits);
-  DstarTree->Branch<int>("KaonSVDdEdxTrackNHitsUsed", &m_kaondEdxTrackNHitsUsed);
+  // DstarTree->Branch<int>("KaonSVDdEdxTrackNHitsUsed", &m_kaondEdxTrackNHitsUsed);
   DstarTree->Branch<double>("KaonSVDdEdxTrackCosTheta", &m_kaondEdxTrackCosTheta);
-  DstarTree->Branch<std::vector<double>>("KaonSVDdEdxList", &m_kaonSVDdEdxList);
+  // DstarTree->Branch<std::vector<double>>("KaonSVDdEdxList", &m_kaonSVDdEdxList);
   DstarTree->Branch<double>("KaonnSVDHits", &m_kaonnSVDHits);
 
   DstarTree->Branch<double>("PionDMomentum", &m_pionDp);
-  DstarTree->Branch<double>("PionDMomentumX", &m_pionDMomentumX);
-  DstarTree->Branch<double>("PionDMomentumY", &m_pionDMomentumY);
-  DstarTree->Branch<double>("PionDMomentumZ", &m_pionDMomentumZ);
+  // DstarTree->Branch<double>("PionDMomentumX", &m_pionDMomentumX);
+  // DstarTree->Branch<double>("PionDMomentumY", &m_pionDMomentumY);
+  // DstarTree->Branch<double>("PionDMomentumZ", &m_pionDMomentumZ);
   DstarTree->Branch<double>("PionDSVDdEdx", &m_pionDSVDdEdx);
   DstarTree->Branch<double>("PionDSVDdEdxErr", &m_pionDSVDdEdxErr);
-  DstarTree->Branch<double>("PionDSVDdEdxMean", &m_pionDSVDdEdxMean);
+  // DstarTree->Branch<double>("PionDSVDdEdxMean", &m_pionDSVDdEdxMean);
   DstarTree->Branch<double>("PionDSVDdEdxTrackMomentum", &m_pionDdEdxTrackMomentum);
   DstarTree->Branch<int>("PionDSVDdEdxTrackNHits", &m_pionDdEdxTrackNHits);
-  DstarTree->Branch<int>("PionDSVDdEdxTrackNHitsUsed", &m_pionDdEdxTrackNHitsUsed);
+  // DstarTree->Branch<int>("PionDSVDdEdxTrackNHitsUsed", &m_pionDdEdxTrackNHitsUsed);
   DstarTree->Branch<double>("PionDSVDdEdxTrackCosTheta", &m_pionDdEdxTrackCosTheta);
-  DstarTree->Branch<std::vector<double>>("PionDSVDdEdxList", &m_pionDSVDdEdxList);
+  // DstarTree->Branch<std::vector<double>>("PionDSVDdEdxList", &m_pionDSVDdEdxList);
   DstarTree->Branch<double>("PionDnSVDHits", &m_pionDnSVDHits);
 
   DstarTree->Branch<double>("SlowPionMomentum", &m_slowPionMomentum);
-  DstarTree->Branch<double>("SlowPionMomentumX", &m_slowPionMomentumX);
-  DstarTree->Branch<double>("SlowPionMomentumY", &m_slowPionMomentumY);
-  DstarTree->Branch<double>("SlowPionMomentumZ", &m_slowPionMomentumZ);
+  // DstarTree->Branch<double>("SlowPionMomentumX", &m_slowPionMomentumX);
+  // DstarTree->Branch<double>("SlowPionMomentumY", &m_slowPionMomentumY);
+  // DstarTree->Branch<double>("SlowPionMomentumZ", &m_slowPionMomentumZ);
   DstarTree->Branch<double>("SlowPionSVDdEdx", &m_slowPionSVDdEdx);
   DstarTree->Branch<double>("SlowPionSVDdEdxErr", &m_slowPionSVDdEdxErr);
-  DstarTree->Branch<double>("SlowPionSVDdEdxMean", &m_slowPionSVDdEdxMean);
+  // DstarTree->Branch<double>("SlowPionSVDdEdxMean", &m_slowPionSVDdEdxMean);
   DstarTree->Branch<double>("SlowPionSVDdEdxTrackMomentum", &m_slowPiondEdxTrackMomentum);
   DstarTree->Branch<int>("SlowPionSVDdEdxTrackNHits", &m_slowPiondEdxTrackNHits);
-  DstarTree->Branch<int>("SlowPionSVDdEdxTrackNHitsUsed", &m_slowPiondEdxTrackNHitsUsed);
+  // DstarTree->Branch<int>("SlowPionSVDdEdxTrackNHitsUsed", &m_slowPiondEdxTrackNHitsUsed);
   DstarTree->Branch<double>("SlowPionSVDdEdxTrackCosTheta", &m_slowPiondEdxTrackCosTheta);
-  DstarTree->Branch<std::vector<double>>("SlowPionSVDdEdxList", &m_slowPionSVDdEdxList);
+  // DstarTree->Branch<std::vector<double>>("SlowPionSVDdEdxList", &m_slowPionSVDdEdxList);
   DstarTree->Branch<double>("SlowPionnSVDHits", &m_slowPionnSVDHits);
 
   GammaTree->Branch<double>("InvM", &m_InvMGamma);
@@ -160,34 +150,34 @@ void SVDdEdxCollectorModule::prepare()
   GammaTree->Branch<double>("FirstElectronMomentum", &m_firstElectronMomentum);
   GammaTree->Branch<double>("FirstElectronSVDdEdx", &m_firstElectronSVDdEdx);
   GammaTree->Branch<double>("FirstElectronSVDdEdxErr", &m_firstElectronSVDdEdxErr);
-  GammaTree->Branch<double>("FirstElectronSVDdEdxMean", &m_firstElectronSVDdEdxMean);
+  // GammaTree->Branch<double>("FirstElectronSVDdEdxMean", &m_firstElectronSVDdEdxMean);
   GammaTree->Branch<double>("FirstElectronSVDdEdxTrackMomentum", &m_firstElectrondEdxTrackMomentum);
   GammaTree->Branch<int>("FirstElectronSVDdEdxTrackNHits", &m_firstElectrondEdxTrackNHits);
-  GammaTree->Branch<int>("FirstElectronSVDdEdxTrackNHitsUsed", &m_firstElectrondEdxTrackNHitsUsed);
+  // GammaTree->Branch<int>("FirstElectronSVDdEdxTrackNHitsUsed", &m_firstElectrondEdxTrackNHitsUsed);
   GammaTree->Branch<double>("FirstElectronSVDdEdxTrackCosTheta", &m_firstElectrondEdxTrackCosTheta);
-  GammaTree->Branch<std::vector<double>>("FirstElectronSVDdEdxList", &m_firstElectronSVDdEdxList);
+  // GammaTree->Branch<std::vector<double>>("FirstElectronSVDdEdxList", &m_firstElectronSVDdEdxList);
   GammaTree->Branch<double>("FirstElectronnSVDHits", &m_firstElectronnSVDHits);
 
   GammaTree->Branch<double>("SecondElectronMomentum", &m_secondElectronMomentum);
   GammaTree->Branch<double>("SecondElectronSVDdEdx", &m_secondElectronSVDdEdx);
   GammaTree->Branch<double>("SecondElectronSVDdEdxErr", &m_secondElectronSVDdEdxErr);
-  GammaTree->Branch<double>("SecondElectronSVDdEdxMean", &m_secondElectronSVDdEdxMean);
+  // GammaTree->Branch<double>("SecondElectronSVDdEdxMean", &m_secondElectronSVDdEdxMean);
   GammaTree->Branch<double>("SecondElectronSVDdEdxTrackMomentum", &m_secondElectrondEdxTrackMomentum);
   GammaTree->Branch<int>("SecondElectronSVDdEdxTrackNHits", &m_secondElectrondEdxTrackNHits);
-  GammaTree->Branch<int>("SecondElectronSVDdEdxTrackNHitsUsed", &m_secondElectrondEdxTrackNHitsUsed);
+  // GammaTree->Branch<int>("SecondElectronSVDdEdxTrackNHitsUsed", &m_secondElectrondEdxTrackNHitsUsed);
   GammaTree->Branch<double>("SecondElectronSVDdEdxTrackCosTheta", &m_secondElectrondEdxTrackCosTheta);
-  GammaTree->Branch<std::vector<double>>("SecondElectronSVDdEdxList", &m_secondElectronSVDdEdxList);
+  // GammaTree->Branch<std::vector<double>>("SecondElectronSVDdEdxList", &m_secondElectronSVDdEdxList);
   GammaTree->Branch<double>("SecondElectronnSVDHits", &m_secondElectronnSVDHits);
 
   GenericTree->Branch<double>("TrackMomentum", &m_genericp);
   GenericTree->Branch<double>("TrackSVDdEdx", &m_genericSVDdEdx);
   GenericTree->Branch<double>("TrackSVDdEdxErr", &m_genericSVDdEdxErr);
-  GenericTree->Branch<double>("TrackSVDdEdxMean", &m_genericSVDdEdxMean);
+  // GenericTree->Branch<double>("TrackSVDdEdxMean", &m_genericSVDdEdxMean);
   GenericTree->Branch<double>("TrackSVDdEdxTrackMomentum", &m_genericdEdxTrackMomentum);
   GenericTree->Branch<int>("TrackSVDdEdxTrackNHits", &m_genericdEdxTrackNHits);
-  GenericTree->Branch<int>("TrackSVDdEdxTrackNHitsUsed", &m_genericdEdxTrackNHitsUsed);
-  GenericTree->Branch<double>("TrackSVDdEdxTrackCosTheta", &m_genericdEdxTrackCosTheta);
-  GenericTree->Branch<std::vector<double>>("TrackSVDdEdxList", &m_genericSVDdEdxList);
+  // GenericTree->Branch<int>("TrackSVDdEdxTrackNHitsUsed", &m_genericdEdxTrackNHitsUsed);
+  // GenericTree->Branch<double>("TrackSVDdEdxTrackCosTheta", &m_genericdEdxTrackCosTheta);
+  // GenericTree->Branch<std::vector<double>>("TrackSVDdEdxList", &m_genericSVDdEdxList);
   GenericTree->Branch<double>("TracknSVDHits", &m_genericnSVDHits);
 
   // We register the objects so that our framework knows about them.
@@ -250,21 +240,20 @@ void SVDdEdxCollectorModule::collect()
       if (!dedxTrackPFromLambda) {
         m_protonSVDdEdx = -999.0;
         m_protonSVDdEdxErr = -999.0;
-        m_protonSVDdEdxMean = -999.0;
+        // m_protonSVDdEdxMean = -999.0;
         m_protondEdxTrackMomentum = -999.0;
         m_protondEdxTrackNHits = -1;
-        m_protondEdxTrackNHitsUsed = -1;
+        // m_protondEdxTrackNHitsUsed = -1;
         m_protondEdxTrackCosTheta = -999.0;
-        // m_protonSVDdEdxList = dedxTrackPFromLambda->getDedxList();
       } else {
         m_protonSVDdEdx = dedxTrackPFromLambda->getDedx(Const::EDetector::SVD);
         m_protonSVDdEdxErr = dedxTrackPFromLambda->getDedxError(Const::EDetector::SVD);
-        m_protonSVDdEdxMean = dedxTrackPFromLambda->getDedxMean(Const::EDetector::SVD);
+        // m_protonSVDdEdxMean = dedxTrackPFromLambda->getDedxMean(Const::EDetector::SVD);
         m_protondEdxTrackMomentum = dedxTrackPFromLambda->getMomentum();
         m_protondEdxTrackNHits = (int) dedxTrackPFromLambda->size();
-        m_protondEdxTrackNHitsUsed = (int) dedxTrackPFromLambda->getNHitsUsed();
+        // m_protondEdxTrackNHitsUsed = (int) dedxTrackPFromLambda->getNHitsUsed();
         m_protondEdxTrackCosTheta = dedxTrackPFromLambda->getCosTheta();
-        m_protonSVDdEdxList = dedxTrackPFromLambda->getDedxList();
+        // m_protonSVDdEdxList = dedxTrackPFromLambda->getDedxList();
       }
       auto trackFitPFromLambda = partPFromLambda->getTrackFitResult();
       if (!trackFitPFromLambda) {m_protonnSVDHits = Const::doubleNaN;}
@@ -274,20 +263,20 @@ void SVDdEdxCollectorModule::collect()
       if (!dedxTrackPiFromLambda) {
         m_pionLambdaSVDdEdx = -999.0;
         m_pionLambdaSVDdEdxErr = -999.0;
-        m_pionLambdaSVDdEdxMean = -999.0;
+        // m_pionLambdaSVDdEdxMean = -999.0;
         m_pionLambdadEdxTrackMomentum = -999.0;
         m_pionLambdadEdxTrackNHits = -1;
-        m_pionLambdadEdxTrackNHitsUsed = -1;
+        // m_pionLambdadEdxTrackNHitsUsed = -1;
         m_pionLambdadEdxTrackCosTheta = -999.0;
       } else {
         m_pionLambdaSVDdEdx = dedxTrackPiFromLambda->getDedx(Const::EDetector::SVD);
         m_pionLambdaSVDdEdxErr = dedxTrackPiFromLambda->getDedxError(Const::EDetector::SVD);
-        m_pionLambdaSVDdEdxMean = dedxTrackPiFromLambda->getDedxMean(Const::EDetector::SVD);
+        // m_pionLambdaSVDdEdxMean = dedxTrackPiFromLambda->getDedxMean(Const::EDetector::SVD);
         m_pionLambdadEdxTrackMomentum = dedxTrackPiFromLambda->getMomentum();
         m_pionLambdadEdxTrackNHits = (int) dedxTrackPiFromLambda->size();
-        m_pionLambdadEdxTrackNHitsUsed = (int) dedxTrackPiFromLambda->getNHitsUsed();
+        // m_pionLambdadEdxTrackNHitsUsed = (int) dedxTrackPiFromLambda->getNHitsUsed();
         m_pionLambdadEdxTrackCosTheta = dedxTrackPiFromLambda->getCosTheta();
-        m_pionLambdaSVDdEdxList = dedxTrackPiFromLambda->getDedxList();
+        // m_pionLambdaSVDdEdxList = dedxTrackPiFromLambda->getDedxList();
       }
       auto trackFitPiFromLambda = partPiFromLambda->getTrackFitResult();
       if (!trackFitPiFromLambda) {m_pionLambdanSVDHits = Const::doubleNaN;}
@@ -318,31 +307,31 @@ void SVDdEdxCollectorModule::collect()
       m_InvMDstar = partDstar->getMass();
       m_InvMD0 = partD0->getMass();
       m_DeltaM = m_InvMDstar - m_InvMD0;
-      m_D0Momentum = partD0->getMomentumMagnitude();
+      // m_D0Momentum = partD0->getMomentumMagnitude();
       m_diraD0 = std::get<double>(Variable::Manager::Instance().getVariable(
                                     std::string("cosAngleBetweenMomentumAndVertexVector"))->function(partD0));;
 
       m_kaonMomentum = partKFromD->getMomentumMagnitude();
-      m_kaonMomentumX = partKFromD->getPx();
-      m_kaonMomentumY = partKFromD->getPy();
-      m_kaonMomentumZ = partKFromD->getPz();
+      // m_kaonMomentumX = partKFromD->getPx();
+      // m_kaonMomentumY = partKFromD->getPy();
+      // m_kaonMomentumZ = partKFromD->getPz();
       if (!dedxTrackKFromD) {
         m_kaonSVDdEdx = -999.0;
         m_kaonSVDdEdxErr = -999.0;
-        m_kaonSVDdEdxMean = -999.0;
+        // m_kaonSVDdEdxMean = -999.0;
         m_kaondEdxTrackMomentum = -999.0;
         m_kaondEdxTrackNHits = -1;
-        m_kaondEdxTrackNHitsUsed = -1;
+        // m_kaondEdxTrackNHitsUsed = -1;
         m_kaondEdxTrackCosTheta = -999.0;
       } else {
         m_kaonSVDdEdx = dedxTrackKFromD->getDedx(Const::EDetector::SVD);
         m_kaonSVDdEdxErr = dedxTrackKFromD->getDedxError(Const::EDetector::SVD);
-        m_kaonSVDdEdxMean = dedxTrackKFromD->getDedxMean(Const::EDetector::SVD);
+        // m_kaonSVDdEdxMean = dedxTrackKFromD->getDedxMean(Const::EDetector::SVD);
         m_kaondEdxTrackMomentum = dedxTrackKFromD->getMomentum();
         m_kaondEdxTrackNHits = (int) dedxTrackKFromD->size();
-        m_kaondEdxTrackNHitsUsed = (int) dedxTrackKFromD->getNHitsUsed();
+        // m_kaondEdxTrackNHitsUsed = (int) dedxTrackKFromD->getNHitsUsed();
         m_kaondEdxTrackCosTheta = dedxTrackKFromD->getCosTheta();
-        m_kaonSVDdEdxList = dedxTrackKFromD->getDedxList();
+        // m_kaonSVDdEdxList = dedxTrackKFromD->getDedxList();
       }
 
       auto trackFitKFromD = partKFromD->getTrackFitResult();
@@ -350,26 +339,26 @@ void SVDdEdxCollectorModule::collect()
       else {m_kaonnSVDHits = trackFitKFromD->getHitPatternVXD().getNSVDHits();}
 
       m_pionDp = partPiFromD->getMomentumMagnitude();
-      m_pionDMomentumX = partPiFromD->getPx();
-      m_pionDMomentumY = partPiFromD->getPy();
-      m_pionDMomentumZ = partPiFromD->getPz();
+      // m_pionDMomentumX = partPiFromD->getPx();
+      // m_pionDMomentumY = partPiFromD->getPy();
+      // m_pionDMomentumZ = partPiFromD->getPz();
       if (!dedxTrackPiFromD) {
         m_pionDSVDdEdx = -999.0;
         m_pionDSVDdEdxErr = -999.0;
-        m_pionDSVDdEdxMean = -999.0;
+        // m_pionDSVDdEdxMean = -999.0;
         m_pionDdEdxTrackMomentum = -999.0;
         m_pionDdEdxTrackNHits = -1;
-        m_pionDdEdxTrackNHitsUsed = -1;
+        // m_pionDdEdxTrackNHitsUsed = -1;
         m_pionDdEdxTrackCosTheta = -999.0;
       } else {
         m_pionDSVDdEdx = dedxTrackPiFromD->getDedx(Const::EDetector::SVD);
         m_pionDSVDdEdxErr = dedxTrackPiFromD->getDedxError(Const::EDetector::SVD);
-        m_pionDSVDdEdxMean = dedxTrackPiFromD->getDedxMean(Const::EDetector::SVD);
+        // m_pionDSVDdEdxMean = dedxTrackPiFromD->getDedxMean(Const::EDetector::SVD);
         m_pionDdEdxTrackMomentum = dedxTrackPiFromD->getMomentum();
         m_pionDdEdxTrackNHits = (int) dedxTrackPiFromD->size();
-        m_pionDdEdxTrackNHitsUsed = (int) dedxTrackPiFromD->getNHitsUsed();
+        // m_pionDdEdxTrackNHitsUsed = (int) dedxTrackPiFromD->getNHitsUsed();
         m_pionDdEdxTrackCosTheta = dedxTrackPiFromD->getCosTheta();
-        m_pionDSVDdEdxList = dedxTrackPiFromD->getDedxList();
+        // m_pionDSVDdEdxList = dedxTrackPiFromD->getDedxList();
       }
 
       auto trackFitPiFromD = partPiFromD->getTrackFitResult();
@@ -383,20 +372,20 @@ void SVDdEdxCollectorModule::collect()
       if (!dedxTrackPiS) {
         m_slowPionSVDdEdx = -999.0;
         m_slowPionSVDdEdxErr = -999.0;
-        m_slowPionSVDdEdxMean = -999.0;
+        // m_slowPionSVDdEdxMean = -999.0;
         m_slowPiondEdxTrackMomentum = -999.0;
         m_slowPiondEdxTrackNHits = -1;
-        m_slowPiondEdxTrackNHitsUsed = -1;
+        // m_slowPiondEdxTrackNHitsUsed = -1;
         m_slowPiondEdxTrackCosTheta = -999.0;
       } else {
         m_slowPionSVDdEdx = dedxTrackPiS->getDedx(Const::EDetector::SVD);
         m_slowPionSVDdEdxErr = dedxTrackPiS->getDedxError(Const::EDetector::SVD);
-        m_slowPionSVDdEdxMean = dedxTrackPiS->getDedxMean(Const::EDetector::SVD);
+        // m_slowPionSVDdEdxMean = dedxTrackPiS->getDedxMean(Const::EDetector::SVD);
         m_slowPiondEdxTrackMomentum = dedxTrackPiS->getMomentum();
         m_slowPiondEdxTrackNHits = (int) dedxTrackPiS->size();
-        m_slowPiondEdxTrackNHitsUsed = (int) dedxTrackPiS->getNHitsUsed();
+        // m_slowPiondEdxTrackNHitsUsed = (int) dedxTrackPiS->getNHitsUsed();
         m_slowPiondEdxTrackCosTheta = dedxTrackPiS->getCosTheta();
-        m_slowPionSVDdEdxList = dedxTrackPiS->getDedxList();
+        // m_slowPionSVDdEdxList = dedxTrackPiS->getDedxList();
       }
       auto trackFitPiS = partPiS->getTrackFitResult();
       if (!trackFitPiS) {m_slowPionnSVDHits = Const::doubleNaN;}
@@ -438,40 +427,40 @@ void SVDdEdxCollectorModule::collect()
       if (!dedxTrackE1FromGamma) {
         m_firstElectronSVDdEdx = -999.0;
         m_firstElectronSVDdEdxErr = -999.0;
-        m_firstElectronSVDdEdxMean = -999.0;
+        // m_firstElectronSVDdEdxMean = -999.0;
         m_firstElectrondEdxTrackMomentum = -999.0;
         m_firstElectrondEdxTrackNHits = -1;
-        m_firstElectrondEdxTrackNHitsUsed = -1;
+        // m_firstElectrondEdxTrackNHitsUsed = -1;
         m_firstElectrondEdxTrackCosTheta = -999.0;
       } else {
         m_firstElectronSVDdEdx = dedxTrackE1FromGamma->getDedx(Const::EDetector::SVD);
         m_firstElectronSVDdEdxErr = dedxTrackE1FromGamma->getDedxError(Const::EDetector::SVD);
-        m_firstElectronSVDdEdxMean = dedxTrackE1FromGamma->getDedxMean(Const::EDetector::SVD);
+        // m_firstElectronSVDdEdxMean = dedxTrackE1FromGamma->getDedxMean(Const::EDetector::SVD);
         m_firstElectrondEdxTrackMomentum = dedxTrackE1FromGamma->getMomentum();
         m_firstElectrondEdxTrackNHits = (int) dedxTrackE1FromGamma->size();
-        m_firstElectrondEdxTrackNHitsUsed = (int) dedxTrackE1FromGamma->getNHitsUsed();
+        // m_firstElectrondEdxTrackNHitsUsed = (int) dedxTrackE1FromGamma->getNHitsUsed();
         m_firstElectrondEdxTrackCosTheta = dedxTrackE1FromGamma->getCosTheta();
-        m_firstElectronSVDdEdxList = dedxTrackE1FromGamma->getDedxList();
+        // m_firstElectronSVDdEdxList = dedxTrackE1FromGamma->getDedxList();
       }
 
       m_secondElectronMomentum = partE2FromGamma->getMomentumMagnitude();
       if (!dedxTrackE2FromGamma) {
         m_secondElectronSVDdEdx = -999.0;
         m_secondElectronSVDdEdxErr = -999.0;
-        m_secondElectronSVDdEdxMean = -999.0;
+        // m_secondElectronSVDdEdxMean = -999.0;
         m_secondElectrondEdxTrackMomentum = -999.0;
         m_secondElectrondEdxTrackNHits = -1;
-        m_secondElectrondEdxTrackNHitsUsed = -1;
+        // m_secondElectrondEdxTrackNHitsUsed = -1;
         m_secondElectrondEdxTrackCosTheta = -999.0;
       } else {
         m_secondElectronSVDdEdx = dedxTrackE2FromGamma->getDedx(Const::EDetector::SVD);
         m_secondElectronSVDdEdxErr = dedxTrackE2FromGamma->getDedxError(Const::EDetector::SVD);
-        m_secondElectronSVDdEdxMean = dedxTrackE2FromGamma->getDedxMean(Const::EDetector::SVD);
+        // m_secondElectronSVDdEdxMean = dedxTrackE2FromGamma->getDedxMean(Const::EDetector::SVD);
         m_secondElectrondEdxTrackMomentum = dedxTrackE2FromGamma->getMomentum();
         m_secondElectrondEdxTrackNHits = (int) dedxTrackE2FromGamma->size();
-        m_secondElectrondEdxTrackNHitsUsed = (int) dedxTrackE2FromGamma->getNHitsUsed();
+        // m_secondElectrondEdxTrackNHitsUsed = (int) dedxTrackE2FromGamma->getNHitsUsed();
         m_secondElectrondEdxTrackCosTheta = dedxTrackE2FromGamma->getCosTheta();
-        m_secondElectronSVDdEdxList = dedxTrackE2FromGamma->getDedxList();
+        // m_secondElectronSVDdEdxList = dedxTrackE2FromGamma->getDedxList();
       }
 
       getObjectPtr<TTree>("Gamma")->Fill();
@@ -490,20 +479,20 @@ void SVDdEdxCollectorModule::collect()
       if (!dedxTrackGeneric) {
         m_genericSVDdEdx = -999.0;
         m_genericSVDdEdxErr = -999.0;
-        m_genericSVDdEdxMean = -999.0;
+        // m_genericSVDdEdxMean = -999.0;
         m_genericdEdxTrackMomentum = -999.0;
         m_genericdEdxTrackNHits = -1;
-        m_genericdEdxTrackNHitsUsed = -1;
+        // m_genericdEdxTrackNHitsUsed = -1;
         m_genericdEdxTrackCosTheta = -999.0;
       } else {
         m_genericSVDdEdx = dedxTrackGeneric->getDedx(Const::EDetector::SVD);
         m_genericSVDdEdxErr = dedxTrackGeneric->getDedxError(Const::EDetector::SVD);
-        m_genericSVDdEdxMean = dedxTrackGeneric->getDedxMean(Const::EDetector::SVD);
+        // m_genericSVDdEdxMean = dedxTrackGeneric->getDedxMean(Const::EDetector::SVD);
         m_genericdEdxTrackMomentum = dedxTrackGeneric->getMomentum();
         m_genericdEdxTrackNHits = (int) dedxTrackGeneric->size();
-        m_genericdEdxTrackNHitsUsed = (int) dedxTrackGeneric->getNHitsUsed();
+        // m_genericdEdxTrackNHitsUsed = (int) dedxTrackGeneric->getNHitsUsed();
         m_genericdEdxTrackCosTheta = dedxTrackGeneric->getCosTheta();
-        m_genericSVDdEdxList = dedxTrackGeneric->getDedxList();
+        // m_genericSVDdEdxList = dedxTrackGeneric->getDedxList();
       }
 
       auto trackFitGeneric = partGeneric->getTrackFitResult();

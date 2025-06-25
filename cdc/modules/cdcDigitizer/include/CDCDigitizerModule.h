@@ -73,7 +73,6 @@ namespace Belle2 {
       if (m_wireGainFromDB) delete m_wireGainFromDB;
       if (m_xTalkFromDB) delete m_xTalkFromDB;
       if (m_corrToThresholdFromDB) delete m_corrToThresholdFromDB;
-      //if (m_alphaCorrection) delete m_alphaScaleFactorsFromDB;
     };
 
   private:

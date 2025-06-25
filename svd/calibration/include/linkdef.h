@@ -41,6 +41,5 @@
 #pragma link C++ class Belle2::SVDTimeValidationAlgorithm-;
 #pragma link C++ class Belle2::SVDdEdxCalibrationAlgorithm-;
 #pragma link C++ class Belle2::SVDdEdxValidationAlgorithm-;
-#pragma link C++ class Belle2::SVDClusterAbsoluteTimeShifterAlgorithm-;
 
 #endif

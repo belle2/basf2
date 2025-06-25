@@ -298,15 +298,14 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
 const CDCWire& CDCCalibrationCollectorModule::getIntersectingWire(const ROOT::Math::XYZVector& xyz, const CDCWireLayer& layer,
     const Helix& helixFit) const
 {
-  Vector3D crosspoint;
+  ROOT::Math::XYZVector crosspoint;
   if (layer.isAxial())
-    crosspoint = Vector3D(xyz);
+    crosspoint = xyz;
   else {
     const CDCWire& oneWire = layer.getWire(1);
     double newR = oneWire.getWirePos2DAtZ(xyz.Z()).R();
     double arcLength = helixFit.getArcLength2DAtCylindricalR(newR);
-    ROOT::Math::XYZVector xyzOnWire = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
-    crosspoint = Vector3D(xyzOnWire);
+    crosspoint = helixFit.getPositionAtArcLength2D(arcLength);
   }
 
   const CDCWire& wire = layer.getClosestWire(crosspoint);

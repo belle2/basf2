@@ -18,6 +18,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <string>
 
+#include <Math/Vector3D.h>
+
 namespace Belle2 {
   namespace CDC {
 
@@ -60,7 +62,7 @@ namespace Belle2 {
       /**
        * extrapolates the helix fit to a given layer and finds the wire which it would be hitting
        */
-      const CDCWire& getIntersectingWire(const B2Vector3D& xyz, const CDCWireLayer& layer,
+      const CDCWire& getIntersectingWire(const ROOT::Math::XYZVector& xyz, const CDCWireLayer& layer,
                                          const Helix& helixFit) const;
 
       StoreArray<Track> m_Tracks;                   /**< Tracks. */

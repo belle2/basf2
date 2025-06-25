@@ -11,6 +11,7 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <cdc/topology/CDCWireTopology.h>
 #include <cdc/dataobjects/WireID.h>
+
 #include <TH1F.h>
 
 //using namespace std;
@@ -98,18 +99,17 @@ void CDCBadWireCollectorModule::collect()
 }
 
 void CDCBadWireCollectorModule::finish() {}
-const CDCWire& CDCBadWireCollectorModule::getIntersectingWire(const B2Vector3D& xyz, const CDCWireLayer& layer,
+const CDCWire& CDCBadWireCollectorModule::getIntersectingWire(const ROOT::Math::XYZVector& xyz, const CDCWireLayer& layer,
     const Helix& helixFit) const
 {
-  Vector3D crosspoint;
+  ROOT::Math::XYZVector crosspoint;
   if (layer.isAxial())
-    crosspoint = Vector3D(xyz);
+    crosspoint = xyz;
   else {
     const CDCWire& oneWire = layer.getWire(1);
     double newR = oneWire.getWirePos2DAtZ(xyz.Z()).R();
     double arcLength = helixFit.getArcLength2DAtCylindricalR(newR);
-    B2Vector3D xyzOnWire = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
-    crosspoint = Vector3D(xyzOnWire);
+    crosspoint = helixFit.getPositionAtArcLength2D(arcLength);
   }
   const CDCWire& wire = layer.getClosestWire(crosspoint);
   return wire;
@@ -122,7 +122,7 @@ void CDCBadWireCollectorModule::buildEfficiencies(std::vector<unsigned short> wi
     const double radiusofLayer = wireLayer.getRefCylindricalR();
     //simple extrapolation of fit
     const double arcLength = helixFit.getArcLength2DAtCylindricalR(radiusofLayer);
-    const B2Vector3D xyz = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
+    const ROOT::Math::XYZVector xyz = helixFit.getPositionAtArcLength2D(arcLength);
     if (!xyz.X()) continue;
     const CDCWire& wireIntersected = getIntersectingWire(xyz, wireLayer, helixFit);
     unsigned short crossedWire = wireIntersected.getEWire();

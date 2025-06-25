@@ -101,7 +101,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         If true, prune them.
     :param fit_tracks: if false, the final track find and the TrackCreator module will no be executed
     :param with_ca: If true, in the CDC track finding the cellular automaton algorithm will be used too,
-    after the global algorithm (Legendre).
+        after the global algorithm (Legendre).
     :param use_second_cdc_hits: if true, the second hit information will be used in the CDC track finding.
     :param trackFitHypotheses: which pdg hypothesis to fit. Defaults to [211, 321, 2212].
     :param svd_standalone_mode: Which SVD standalone tracking is used.
@@ -205,7 +205,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         If true, prune them.
     :param fit_tracks: If false, the final track find and the TrackCreator module will no be executed
     :param with_ca: If true, in the CDC track finding the cellular automaton algorithm will be used too,
-    after the global algorithm (Legendre).
+        after the global algorithm (Legendre).
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
     :param svd_standalone_mode: Which SVD standalone tracking is used.
@@ -484,7 +484,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
            Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
            Defaults to "VXDTF2"
     :param with_ca: if true, in the CDC track finding the cellular automaton algorithm will be used too,
-    after the global algorithm (Legendre)
+        after the global algorithm (Legendre)
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
     :param components: the list of geometry components in use or None for all components.
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.

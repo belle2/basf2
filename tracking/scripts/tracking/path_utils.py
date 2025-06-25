@@ -647,7 +647,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     :param path: basf2 path
     :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
     :param with_ca: If true, the cellular automaton track finder algorithm will be used too,
-    after the global algorithm (Legendre)
+        after the global algorithm (Legendre)
     :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_mva_quality_indicator: Add the TFCDC_TrackQualityEstimator module to set the CDC quality
            indicator property of the CDC ``output_reco_tracks``
@@ -1218,7 +1218,7 @@ def add_default_cdc_svd_tracking_chain(path,
     :param cdc_reco_tracks: name of the CDC standalone RecoTracks StoreArray
     :param output_reco_tracks: name of the combined CDC+SVD RecoTracks StoreArray that is the final result of this tracking path
     :param with_ca: If true, in the CDC track finding the cellular automaton algorithm will be used too,
-    after the global algorithm (Legendre)
+        after the global algorithm (Legendre)
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found CDC standalone tracks
@@ -1309,7 +1309,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
            Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
            Defaults to "VXDTF2"
     :param with_ca: If true, in the CDC track finding the cellular automaton algorithm will be used too,
-    after the global algorithm (Legendre)
+        after the global algorithm (Legendre)
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found CDC standalone tracks

@@ -39,7 +39,7 @@ from pxd import add_pxd_reconstruction
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
-                                with_ca=False,
+                                with_cdc_cellular_automaton=False,
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                 svd_standalone_mode="VXDTF2",
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
@@ -100,7 +100,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param prune_temporary_tracks: if false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
     :param fit_tracks: if false, the final track find and the TrackCreator module will no be executed
-    :param with_ca: If true, in the CDC track finding the cellular automaton algorithm will be used too,
+    :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
         after the global algorithm (Legendre).
     :param use_second_cdc_hits: if true, the second hit information will be used in the CDC track finding.
     :param trackFitHypotheses: which pdg hypothesis to fit. Defaults to [211, 321, 2212].
@@ -148,7 +148,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         reco_tracks=reco_tracks,
         prune_temporary_tracks=prune_temporary_tracks,
         fit_tracks=fit_tracks,
-        with_ca=with_ca,
+        with_cdc_cellular_automaton=with_cdc_cellular_automaton,
         use_second_cdc_hits=use_second_cdc_hits,
         skipHitPreparerAdding=skipHitPreparerAdding,
         svd_standalone_mode=svd_standalone_mode,
@@ -177,7 +177,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdding=False,
                                           mcTrackFinding=False, trackFitHypotheses=None, reco_tracks="RecoTracks",
                                           prune_temporary_tracks=True, fit_tracks=True,
-                                          with_ca=False,
+                                          with_cdc_cellular_automaton=False,
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                           svd_standalone_mode="VXDTF2",
                                           use_svd_to_cdc_ckf=True, svd_ckf_mode="SVD_after", use_ecl_to_cdc_ckf=False,
@@ -204,7 +204,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
     :param fit_tracks: If false, the final track find and the TrackCreator module will no be executed
-    :param with_ca: If true, in the CDC track finding the cellular automaton algorithm will be used too,
+    :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
         after the global algorithm (Legendre).
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
@@ -277,7 +277,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     else:
         add_track_finding(path, components=components, reco_tracks=reco_tracks,
                           prune_temporary_tracks=prune_temporary_tracks,
-                          with_ca=with_ca,
+                          with_cdc_cellular_automaton=with_cdc_cellular_automaton,
                           use_second_cdc_hits=use_second_cdc_hits,
                           svd_standalone_mode=svd_standalone_mode,
                           use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
@@ -464,7 +464,7 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
 
 
 def add_track_finding(path, components=None, reco_tracks="RecoTracks",
-                      prune_temporary_tracks=True, with_ca=False, use_second_cdc_hits=False,
+                      prune_temporary_tracks=True, with_cdc_cellular_automaton=False, use_second_cdc_hits=False,
                       use_mc_truth=False, svd_ckf_mode="SVD_after", add_both_directions=True,
                       svd_standalone_mode="VXDTF2",
                       use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
@@ -483,7 +483,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     :param svd_standalone_mode: Which SVD standalone tracking is used.
            Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
            Defaults to "VXDTF2"
-    :param with_ca: if true, in the CDC track finding the cellular automaton algorithm will be used too,
+    :param with_cdc_cellular_automaton: if true, in the CDC track finding the cellular automaton algorithm will be used too,
         after the global algorithm (Legendre)
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
     :param components: the list of geometry components in use or None for all components.
@@ -557,7 +557,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                                                svd_reco_tracks=svd_reco_tracks,
                                                cdc_reco_tracks=cdc_reco_tracks,
                                                output_reco_tracks=svd_cdc_reco_tracks,
-                                               with_ca=with_ca,
+                                               with_cdc_cellular_automaton=with_cdc_cellular_automaton,
                                                use_second_cdc_hits=use_second_cdc_hits,
                                                add_cdcTrack_QI=add_cdcTrack_QI,
                                                use_mc_truth=use_mc_truth,
@@ -580,7 +580,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                                                 svd_reco_tracks=svd_reco_tracks,
                                                 cdc_reco_tracks=cdc_reco_tracks,
                                                 svd_cdc_reco_tracks=svd_cdc_reco_tracks,
-                                                with_ca=with_ca,
+                                                with_cdc_cellular_automaton=with_cdc_cellular_automaton,
                                                 use_second_cdc_hits=use_second_cdc_hits,
                                                 add_cdcTrack_QI=add_cdcTrack_QI,
                                                 use_mc_truth=use_mc_truth,

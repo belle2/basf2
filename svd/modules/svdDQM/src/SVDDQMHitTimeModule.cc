@@ -7,11 +7,14 @@
  **************************************************************************/
 
 #include <svd/modules/svdDQM/SVDDQMHitTimeModule.h>
+#include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/HistoModule.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <TDirectory.h>
 
 using namespace Belle2;
+using namespace SoftwareTrigger;
 
 REG_MODULE(SVDDQMHitTime);
 
@@ -44,6 +47,7 @@ void SVDDQMHitTimeModule::defineHisto()
   else {
     B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
     m_3Samples = m_svdPlotsConfig->is3SampleEnable();
+    m_skipRejectedEvents = m_svdPlotsConfig->isSkippedRejectedEvents();
   }
 
   TDirectory* oldDir = gDirectory;
@@ -244,6 +248,11 @@ void SVDDQMHitTimeModule::beginRun()
 //---------------------------------
 void SVDDQMHitTimeModule::event()
 {
+  //check HLT decision and increase number of events only if the event has been accepted
+  if (m_skipRejectedEvents && (m_resultStoreObjectPointer.isValid())) {
+    const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
+    if (!eventAccepted) return;
+  }
 
   if (!m_TrgResult.isValid()) {
     B2WARNING("Missing TRGSummary, SVDDQMHitTime is skipped.");

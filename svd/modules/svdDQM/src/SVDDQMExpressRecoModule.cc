@@ -51,7 +51,6 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
            std::string("SVDShaperDigits"));
   addParam("Clusters", m_storeSVDClustersName, "Cluster StoreArray name.",
            std::string("SVDClusters"));
-  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If True, skip events rejected by HLT.", bool(true));
   addParam("ShowAllHistos", m_ShowAllHistos, "Flag to show all histos in DQM, default = 0.", int(0));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
            "if True, svd time back in SVD time reference.", bool(false));
@@ -85,6 +84,7 @@ void SVDDQMExpressRecoModule::defineHisto()
   else {
     B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
     m_3Samples = m_svdPlotsConfig->is3SampleEnable();
+    m_skipRejectedEvents = m_svdPlotsConfig->isSkippedRejectedEvents();
   }
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();

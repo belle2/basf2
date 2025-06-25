@@ -7,11 +7,13 @@
  **************************************************************************/
 
 #include <svd/modules/svdDQM/SVDDQMEfficiencyModule.h>
+#include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 
 #include "TDirectory.h"
 
 using namespace Belle2;
+using namespace SoftwareTrigger;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -77,6 +79,11 @@ void SVDDQMEfficiencyModule::initialize()
 
 void SVDDQMEfficiencyModule::event()
 {
+  if (m_skipRejectedEvents && (m_resultStoreObjectPointer.isValid())) {
+    const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
+    if (!eventAccepted) return;
+  }
+
   if (!m_svdClusters.isValid()) {
     B2INFO("SVDClusters array is missing, no SVD efficiencies");
     return;
@@ -217,6 +224,7 @@ void SVDDQMEfficiencyModule::defineHisto()
   else {
     B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
     m_3Samples = m_svdPlotsConfig->is3SampleEnable();
+    m_skipRejectedEvents = m_svdPlotsConfig->isSkippedRejectedEvents();
   }
 
   // Create a separate histogram directory and cd into it.

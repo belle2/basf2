@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <svd/dbobjects/SVDDQMPlotsConfiguration.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <framework/database/DBObjPtr.h>
 
 
@@ -69,6 +70,9 @@ namespace Belle2 {
     /** if true enable 3 samples histograms analysis */
     bool m_3Samples = false;
 
+    /** if true skip events rejected by HLT */
+    bool m_skipRejectedEvents = false;
+
     StoreObjPtr<TRGSummary>    m_objTrgSummary;   /**< Trigger Summary data object */
 
     /** L1 timing source from getTimeType() in TRGSummary
@@ -81,6 +85,7 @@ namespace Belle2 {
     StoreObjPtr<EventT0> m_eventT0 ;  /**< EventT0 data object */
     StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
     StoreArray<SVDCluster> m_clusters ;  /**< Store array for clusters*/
+    StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer; /**< Store Object for reading the trigger decision. */
     DBObjPtr<SVDDQMPlotsConfiguration> m_svdPlotsConfig; /**< SVD DQM plots configuration */
 
     TH1F* m_l3v_bhabha_L1_ECLTRG{nullptr}; /**< svd time histogram for bhabha events wrt the ECL trigger time*/

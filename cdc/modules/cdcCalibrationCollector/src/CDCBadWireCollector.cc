@@ -8,15 +8,15 @@
 #include <cdc/modules/cdcCalibrationCollector/CDCBadWireCollector.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <framework/datastore/RelationArray.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <cdc/topology/CDCWireTopology.h>
 #include <cdc/dataobjects/WireID.h>
 #include <TH1F.h>
 
 //using namespace std;
 using namespace Belle2;
 using namespace CDC;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 REG_MODULE(CDCBadWireCollector);
@@ -106,7 +106,7 @@ const CDCWire& CDCBadWireCollectorModule::getIntersectingWire(const B2Vector3D& 
     crosspoint = Vector3D(xyz);
   else {
     const CDCWire& oneWire = layer.getWire(1);
-    double newR = oneWire.getWirePos2DAtZ(xyz.Z()).norm();
+    double newR = oneWire.getWirePos2DAtZ(xyz.Z()).R();
     double arcLength = helixFit.getArcLength2DAtCylindricalR(newR);
     B2Vector3D xyzOnWire = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
     crosspoint = Vector3D(xyzOnWire);
@@ -117,7 +117,7 @@ const CDCWire& CDCBadWireCollectorModule::getIntersectingWire(const B2Vector3D& 
 
 void CDCBadWireCollectorModule::buildEfficiencies(std::vector<unsigned short> wireHits, const Helix helixFit)
 {
-  static const TrackFindingCDC::CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+  static const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
     const double radiusofLayer = wireLayer.getRefCylindricalR();
     //simple extrapolation of fit

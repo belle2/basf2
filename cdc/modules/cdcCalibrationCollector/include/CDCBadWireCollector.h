@@ -12,9 +12,9 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
+#include <cdc/topology/CDCWire.h>
 #include <framework/datastore/StoreArray.h>
 #include <string>
 
@@ -60,13 +60,13 @@ namespace Belle2 {
       /**
        * extrapolates the helix fit to a given layer and finds the wire which it would be hitting
        */
-      const TrackFindingCDC::CDCWire& getIntersectingWire(const B2Vector3D& xyz, const TrackFindingCDC::CDCWireLayer& layer,
-                                                          const Helix& helixFit) const;
+      const CDCWire& getIntersectingWire(const B2Vector3D& xyz, const CDCWireLayer& layer,
+                                         const Helix& helixFit) const;
 
       StoreArray<Track> m_Tracks;                   /**< Tracks. */
       StoreArray<TrackFitResult> m_TrackFitResults; /**< Track fit results. */
       StoreArray<CDCHit> m_CDCHits;                 /**< CDC hits. */
-      TrackFindingCDC::StoreWrappedObjPtr<std::vector<TrackFindingCDC::CDCTrack>> m_CDCTracks; /**< CDC tracks. */
+      TrackingUtilities::StoreWrappedObjPtr<std::vector<TrackingUtilities::CDCTrack>> m_CDCTracks; /**< CDC tracks. */
 
       std::string m_trackArrayName;                              /**< Belle2::Track StoreArray name. */
       std::string m_cdcHitArrayName;                             /**< Belle2::CDCHit StoreArray name*/

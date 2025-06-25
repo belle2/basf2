@@ -31,6 +31,8 @@ namespace Belle2 {
       ;
     }
 
+    /*                              Setters                                   */
+
     /*! Set  Cell ID
      */
     void setCellId(int CellId) { m_CellId = CellId; }
@@ -53,12 +55,17 @@ namespace Belle2 {
     */
     void setChi(int Chi) { m_Chi = Chi; }
 
+    /** Set hadron fraction
+     * See ecl/utility/include/ECLRawDataHadron.h for details.
+     */
+    void setHadronFraction(float fraction) { m_HadronFraction = fraction; }
+
+    /*                              Getters                                   */
 
     /*! Get Cell ID
      * @return cell ID
      */
     int getCellId() const { return m_CellId; }
-
 
     /*! Get Fitting Amplitude
      * @return Fitting Amplitude
@@ -80,6 +87,11 @@ namespace Belle2 {
      */
     int getChi() const { return m_Chi; }
 
+    /** Get hadron fraction
+     * See setHadronFraction for details
+     */
+    float getHadronFraction() const { return m_HadronFraction; }
+
     /**
      * Find ECLDigit by Cell ID using linear search.
      * This is shown to be faster than getRelated(..) method.
@@ -88,14 +100,16 @@ namespace Belle2 {
 
   private:
 
-    int m_CellId;      /**< Cell ID */
-    int m_Amp;         /**< Fitting Amplitude */
-    int m_TimeFit;     /**< Fitting Time */
-    int m_Quality;     /**< Fitting Quality */
-    int m_Chi;    /**< Fitting chi2-squared */
+    int m_CellId;            /**< Cell ID */
+    int m_Amp;               /**< Fitting Amplitude */
+    int m_TimeFit;           /**< Fitting Time */
+    int m_Quality;           /**< Fitting Quality */
+    int m_Chi;               /**< Fitting chi2-squared */
+    float m_HadronFraction;  /**< Hadron component fraction */
 
     // 2: r25301, data member changed to ints
-    ClassDef(ECLDigit, 2);/**< ClassDef */
+    // 3: added m_HadronFraction data member
+    ClassDef(ECLDigit, 3);/**< ClassDef */
 
   };
 

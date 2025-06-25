@@ -58,7 +58,7 @@ namespace Belle2 {
 
     /** Trigger Summary data object */
     StoreObjPtr<TRGSummary> m_objTrgSummary;
-    /** SVD DQM plots configuration */
+    /**< SVD DQM plots configuration */
     DBObjPtr<SVDDQMPlotsConfiguration> m_svdPlotsConfig;
 
     StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
@@ -67,8 +67,8 @@ namespace Belle2 {
 
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
-    /** if true skip events rejected by HLT (default)*/
-    bool m_skipRejectedEvents = true;
+    /** if true skip events rejected by HLT */
+    bool m_skipRejectedEvents = false;
 
     /** additional plots flag*/
     bool m_additionalPlots = false;

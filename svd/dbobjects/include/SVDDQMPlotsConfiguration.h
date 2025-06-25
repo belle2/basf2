@@ -48,12 +48,26 @@ namespace Belle2 {
      */
     void enable3Sample() { m_3Samples = true; }
 
-
     /**
      * Disables 3sample flag
      */
     void disable3Sample() { m_3Samples = false; }
 
+    /**
+     * Returns HLT skipped event flag
+     * @return HLT skipped event flag
+     **/
+    bool  isSkippedRejectedEvents() const { return m_skipRejectedEvents; }
+
+    /**
+     * Enables HLT skipped event flag
+     */
+    void enableSkippedRejectedEvents() { m_skipRejectedEvents = true; }
+
+    /**
+     * Disables HLT skipped event flag
+     */
+    void disableSkippedRejectedEvents() { m_skipRejectedEvents = false; }
 
     /**
      * Get the unique ID  of the payload
@@ -71,6 +85,8 @@ namespace Belle2 {
     /** flag for 3 samples histograns */
     bool m_3Samples = false;
 
+    /** if true skip events rejected by HLT */
+    bool m_skipRejectedEvents = false;
 
     /** list of sensors */
     std::vector<std::string> m_svdListOfSensors;

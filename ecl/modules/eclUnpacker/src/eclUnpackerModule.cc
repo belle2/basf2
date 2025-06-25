@@ -22,6 +22,7 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/utility/ECLDspUtilities.h>
+#include <ecl/utility/ECLRawDataHadron.h>
 
 using namespace std;
 using namespace Belle2;
@@ -37,32 +38,41 @@ using namespace ECL;
 Data format of data packet from shaperDSP (32 bit words)
 
 ---------------------------------------------------------------------------------------
-Offset              |          MSW(16 bits)         |               LSW(16 bits)      |
+Offset              |         MSW(16 bits)          |          LSW(16 bits)           |
 --------------------------------------------------------------------------------------|
                     |                               |                                 |
-0                   |              0x10             |  4+DSP_NUM+ADC_NUM*SAMPLES_NUM  |
-                    |                               |          (Packet length)        |
+0                   |     b[31..24] - package ID    |  4+DSP_NUM+ADC_NUM*SAMPLES_NUM  |
+                    |     b[23..21] - data format   |         (Packet length)         |
+                    | (0x0 - standard data)         |         (maxlen = 2052)         |
+                    | (0x4 - hadron component data) |                                 |
+                    |                               |                                 |
+                    |     b[20..16] - package type  |                                 |
+                    |                 (type = 0x10) |                                 |
+                    |                               |                                 |
 --------------------------------------------------------------------------------------|
                     |                                                                 |
-1                   |     b[28..24] – number of active ADC data channels (ADC_NUM)    |
+1                   |     b[31..30] – 0
+                    |     b[  29  ] – Burst suppression bit                           |
+                    |     b[28..24] – number of active ADC data channels (ADC_NUM)    |
                     |     b[22..16] – ADC samples per channel (SAMPLES_NUM)           |
-                    |     b[12..8]  – number of active DSP channels (DSP_NUM          |
+                    |     b[12..8]  – number of active DSP channels (DSP_NUM)         |
                     |     b[7..0]   – trigger phase                                   |
                     |                                                                 |
 --------------------------------------------------------------------------------------|
-2                   |     b[31…16] – dsp_mask        |      b[15…0] – trigger tag     |
+2                   |     b[31…16] – dsp_mask        |      b[15..0] – trigger tag    |
                     |                                |                                |
 --------------------------------------------------------------------------------------|
-3                   |                0               |         b[15…0] – adc_mask     |
+3                   |               0                |      b[15..0] – adc_mask       |
                     |                                |                                |
 --------------------------------------------------------------------------------------|
 4…3+DSP_NUM         |     b[31..30] – quality flag                                    |
                     |                 quality = 0 : good fit                          |
                     |                 quality = 1 : internal error of approximation   |
-                    |                 quality = 2 : A < A_th,                         |
-                    |                            time is replace with chi2            |
-                    |                 quality = 3 : bad fit, A > A_thr                |
-                    |     b[29..18] – reconstructed time (chi2 if qality = 2)         |
+                    |                               (e.g. integer overflow/underflow) |
+                    |                 quality = 2 : A < A_thr,                        |
+                    |                               time is replaced with chi2        |
+                    |                 quality = 3 : bad fit, χ2 > χ2_thr, A > A_thr   |
+                    |     b[29..18] – reconstructed time (or chi2 if quality = 2)     |
                     |                 chi2 = m<<(p*2), m = b[29:27], p = b[26:18]     |
                     |     b[17..0]  – reconstructed amplitude                         |
                     |                                                                 |
@@ -259,6 +269,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
   int dspMask = 0, triggerTag = 0;
   int nShapers;
   int adcMask, adcHighMask, dspTime, dspAmplitude, dspQualityFlag;
+  int dspHadronFraction;
   // Mask of shapers that discarded waveform data due to beam burst suppression
   int burstSuppressionMask;
 
@@ -349,10 +360,11 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         B2DEBUG_eclunpacker(22, "iCrate = " << iCrate << " iShaper = " << iShaper);
         B2DEBUG_eclunpacker(22, "Shaper HEADER = 0x" << std::hex << value << " dataLength = " << std::dec << shaperDataLength);
         // check shaperDSP header
-        if ((value & 0x00FF0000) != 0x00100000) {
+        if ((value & 0x001F0000) != 0x00100000) {
           doBadHeaderReport(iCrate);
           throw Bad_ShaperDSP_header();
         }
+        int dataFormat = (value >> 21) & 0x7;
 
         value = readNextCollectorWord();
         burstSuppressionMask |= ((value >> 29) & 1) << (iShaper - 1); // burst suppression bit
@@ -398,15 +410,33 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         int newEclDigitsIdx[ECL_CHANNELS_IN_SHAPER] = {};
 
         nRead = 0;
+        dspHadronFraction = 0;
         // read DSP data (quality, fitted time, amplitude)
         for (ind = 0; ind < ECL_CHANNELS_IN_SHAPER; ind++) {
           // check if DSP channel is active
           if (((1 << ind) & dspMask) != (1 << ind)) continue;
           iChannel = ind + 1;
           value = readNextCollectorWord();
-          dspTime = (int)(value << 2) >> 20;
-          dspQualityFlag = (value >> 30) & 0x3;
-          dspAmplitude  = (value & 0x3FFFF) - 128;
+          if ((dataFormat & 4) == 0) {
+            // Standard data format
+            // bits 31..30
+            dspQualityFlag = (value >> 30) & 0x3;
+            // bits 29..18
+            dspTime        = (int)(value << 2) >> 20;
+            // bits 17..0
+            dspAmplitude   = (value & 0x3FFFF) - 128;
+          } else {
+            // Data format with hadron component
+            using namespace Belle2::ECL::RawDataHadron;
+            // bits 31..30
+            dspQualityFlag     = (value >> 30) & 0x3;
+            // bits 29..19
+            dspTime            = unpackTime((value >> 19) & 0x7FF);
+            // bits 18..5
+            dspAmplitude       = unpackAmplitude((value >> 5) & 0x3FFF);
+            // bits 4..0
+            dspHadronFraction  = unpackHadronFraction(value & 0x1F);
+          }
           nRead++;
 
           cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
@@ -424,6 +454,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           newEclDigit->setCellId(cellID);
           newEclDigit->setAmp(dspAmplitude);
           newEclDigit->setQuality(dspQualityFlag);
+          newEclDigit->setHadronFraction(dspHadronFraction);
           if (dspQualityFlag == 2) {
             // amplitude is lower than threshold value time = trg_time => fit_time = 0
             newEclDigit->setTimeFit(0);

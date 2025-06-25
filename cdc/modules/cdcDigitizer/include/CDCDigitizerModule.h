@@ -73,7 +73,7 @@ namespace Belle2 {
       if (m_wireGainFromDB) delete m_wireGainFromDB;
       if (m_xTalkFromDB) delete m_xTalkFromDB;
       if (m_corrToThresholdFromDB) delete m_corrToThresholdFromDB;
-      if (m_alphaCorrection) delete m_alphaScaleFactorsFromDB;
+      //if (m_alphaCorrection) delete m_alphaScaleFactorsFromDB;
     };
 
   private:
@@ -238,8 +238,8 @@ namespace Belle2 {
     double m_degOfSPEOnThreshold = 0; /**< Degree of space charge effect on timing threshold */
     //--- Parameters for alpha correction -------------------------------------------------------------------------------------
     bool m_alphaCorrection; /**< Switch for alpha correction */
-    DBObjPtr<CDCAlphaScaleFactorForAsymmetry>* m_alphaScaleFactorsFromDB =
-      nullptr; /**< the ratio of data to MC, for eff(alpha<0)/eff(alpha>0). */
+    OptionalDBObjPtr<CDCAlphaScaleFactorForAsymmetry>
+    m_alphaScaleFactorsFromDB; /**< the ratio of data to MC, for eff(alpha<0)/eff(alpha>0). */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
     bool m_addTimeWalk; /**< A switch used to control adding time-walk delay into the total drift time or not */

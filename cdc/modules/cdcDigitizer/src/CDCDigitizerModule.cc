@@ -19,9 +19,6 @@
 #include <map>
 #include <utility>
 
-#include <fstream>
-#include <sstream>
-
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -280,9 +277,7 @@ void CDCDigitizerModule::initialize()
   }
 
   if (m_alphaCorrection) {
-    m_alphaScaleFactorsFromDB = new DBObjPtr<CDCAlphaScaleFactorForAsymmetry>;
-    if ((*m_alphaScaleFactorsFromDB).isValid()) {
-    } else {
+    if (!m_alphaScaleFactorsFromDB.isValid()) {
       B2FATAL("CDCAlphaScaleFactorForAsymmetry invalid!");
     }
   }
@@ -706,7 +701,7 @@ void CDCDigitizerModule::event()
       int iLayer = m_aCDCSimHit->getWireID().getICLayer();
       double alpha = m_cdcgp->getAlpha(m_posWire, m_momentum);
 
-      double Scale = (*m_alphaScaleFactorsFromDB)->getScaleFactor(iLayer, alpha);
+      double Scale = m_alphaScaleFactorsFromDB->getScaleFactor(iLayer, alpha);
       double random = gRandom->Uniform();
       if ((Scale < 1) && (alpha > 0)) {
         if (random > Scale) continue ; // remove this hit

@@ -93,10 +93,11 @@ void DQMHistReferenceModule::loadReferenceHistos()
           if (string(runtypeDirKey->GetName()) == "default") runtypeDir = (TDirectory*)runtypeDirKey->ReadObj(); // ReadObj -> I own it
         }
         string detName = detDir->GetName();
+        // Attention, runtypeDir and runtypeDirKey could be zero here
         if (!runtypeDir) {
           B2INFO("No run type specific or default references available for " << detName);
         } else {
-          B2INFO("Reading reference histograms for " << detName << " from run type folder: " << runtypeDirKey->GetName());
+          B2INFO("Reading reference histograms for " << detName << " from run type folder: " << runtypeDir->GetName());
 
           TIter nextHistkey(runtypeDir->GetListOfKeys());
           TKey* histKey;

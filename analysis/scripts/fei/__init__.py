@@ -19,7 +19,9 @@ Detailed usage examples can be found in analysis/examples/FEI/
 __all__ = [
     'FeiState',
     'get_path',
+    'get_stages_from_particles',
     'get_default_channels',
+    'get_ccbarLambdaC_channels',
     'get_unittest_channels',
     'do_trainings',
     'get_mode_names',
@@ -29,9 +31,10 @@ __all__ = [
     'PostCutConfiguration',
     'FeiConfiguration',
     'DecayChannel',
+    'save_summary'
 ]
 # @endcond
 
 from fei.config import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration, FeiConfiguration, DecayChannel
-from fei.default_channels import get_default_channels, get_unittest_channels, get_mode_names
-from fei.core import get_path, FeiState, do_trainings
+from fei.default_channels import get_default_channels, get_ccbarLambdaC_channels, get_unittest_channels, get_mode_names
+from fei.core import get_path, FeiState, do_trainings, get_stages_from_particles, save_summary

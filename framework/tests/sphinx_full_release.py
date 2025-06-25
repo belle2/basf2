@@ -24,11 +24,14 @@ if __name__ == "__main__":
 
     #: ignore strange backward compatibility warning
     ignorebackward = '_BACKWARD_BACKWARD_WARNING_H'
+    #: ignore false-positive warning from sphinx-argparse
+    ignoreprocessstatistics = 'ProcessStatistics.ModuleStatistics'
 
     sphinx_output_dir = os.getenv("BELLE2_SPHINX_OUTPUTDIR")
     check_error_free(
         "b2code-sphinx-warnings", "sphinx", None,
         lambda x:
-        re.findall(ignorebackward, x),
+        re.findall(ignorebackward, x) or
+        re.findall(ignoreprocessstatistics, x),
         ["-o", sphinx_output_dir] if sphinx_output_dir else []
     )

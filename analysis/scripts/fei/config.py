@@ -34,19 +34,25 @@ import basf2
 # Creates new class via namedtuple, which are like a struct in C
 
 FeiConfiguration = collections.namedtuple('FeiConfiguration',
-                                          'prefix, cache, monitor, legacy, externTeacher, training, monitoring_path')
-FeiConfiguration.__new__.__defaults__ = ('FEI_TEST', None, True, None, 'basf2_mva_teacher', False, '')
+                                          'prefix, cache, monitor, legacy, externTeacher, training, roundMode, monitoring_path')
+FeiConfiguration.__new__.__defaults__ = ('FEI_TEST', None, True, None, 'basf2_mva_teacher', False, 0, '')
 FeiConfiguration.__doc__ = "Fei Global Configuration class"
 FeiConfiguration.prefix.__doc__ = "The database prefix used for all weight files"
 FeiConfiguration.cache.__doc__ = "The stage which is passed as input, it is assumed that all previous stages"\
                                  " do not have to be reconstructed again. Can be either a number or"\
                                  " a filename containing a pickled number or"\
                                  " None in this case the environment variable FEI_STAGE is used."
-FeiConfiguration.monitor.__doc__ = "If not False, monitor histograms are created."
+FeiConfiguration.monitor.__doc__ = (
+    "Determines the level of monitoring histograms to create. "
+    "Set to False to disable monitoring. "
+    "Set to 'simple' to enable lightweight histograms. "
+    "Any other value will enable full monitoring histograms."
+)
 FeiConfiguration.legacy.__doc__ = "Pass the summary file of a legacy FEI training,"\
                                   " and the algorithm will be able to apply this training."
 FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, b2mva-kekcc-cluster-teacher"
 FeiConfiguration.training.__doc__ = "If you train the FEI set this to True, otherwise to False"
+FeiConfiguration.roundMode.__doc__ = "Round mode for the training. 0 default, 1 resuming, 2 finishing, 3 retraining."
 FeiConfiguration.monitoring_path.__doc__ = "Path where monitoring histograms are stored."
 
 
@@ -126,6 +132,8 @@ MonitoringVariableBinning = {'mcErrors': ('mcErrors', 513, -0.5, 512.5),
                              'extraInfo(postCut_rank)': ('extraInfo(postCut_rank)', 41, -0.5, 40.5),
                              'daughterProductOf(extraInfo(SignalProbability))':
                              ('daughterProductOf(extraInfo(SignalProbability))', 100, 0.0, 1.0),
+                             'pValueCombinationOfDaughters(extraInfo(SignalProbability))':
+                             ('pValueCombinationOfDaughters(extraInfo(SignalProbability))', 100, 0.0, 1.0),
                              }
 
 

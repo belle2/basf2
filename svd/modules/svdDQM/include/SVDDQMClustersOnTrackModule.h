@@ -76,8 +76,8 @@ namespace Belle2 {
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
 
-    /** if true skip events rejected by HLT (default)*/
-    bool m_skipRejectedEvents = true;
+    /** if true skip events rejected by HLT */
+    bool m_skipRejectedEvents = false;
 
     int m_tb = -1; /**< choose one trigger bin, or none if the value is -1*/
 
@@ -175,11 +175,11 @@ namespace Belle2 {
     /** map of ladder index*/
     std::map<std::pair<int, int>, int> m_ladderMap;
 
-    /** vector of sensor label for additional histogram (Charge, SNR, time; U/V) */
-    std::vector<std::string> m_addSensorLabel;
+    /** list of sensor  to monitor (Charge, SNR, time; U/V)  taken from DB (payload)*/
+    std::vector<std::string> m_listOfSensorsToMonitor;
 
-    /** vector of sensor label for additional histogram (Charge, SNR, time; U/V)  from parameter */
-    std::vector<std::string> m_addParSensorLabel;
+    /** additional list of sensor  to monitor (Charge, SNR, time; U/V)  from parameter */
+    std::vector<std::string> m_additionalSensorsToMonitor;
 
 
   };

@@ -44,10 +44,7 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
   //Set module properties
   setDescription("SVD DQM module for clusters related to tracks.");
 
-  vector<string> emptyvector;
-
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If True, skip events rejected by HLT.", bool(true));
   addParam("TriggerBin", m_tb, "select events for a specific trigger bin, if -1 then no selection is applied (default)", int(-1));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
            std::string("SVDClsTrk"));
@@ -58,7 +55,8 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
   addParam("RecoDigits", m_svdRecoDigitsName, "SVDRecoDigits StoreArray name.", std::string(""));
   addParam("ShaperDigits", m_svdShaperDigitsName, "SVDShaperDigits StoreArray name.", std::string(""));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
-  addParam("AddParSensorLabel", m_addParSensorLabel, "Additionnal sensor list to monitor from module paramter", emptyvector);
+  addParam("AdditionalSensorsToMonitor", m_additionalSensorsToMonitor, "Additionnal sensor list to monitor",
+           m_additionalSensorsToMonitor);
 
   m_histoList = new TList();
 
@@ -88,16 +86,18 @@ void SVDDQMClustersOnTrackModule::defineHisto()
     B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
     //read back from payload
     m_3Samples = m_svdPlotsConfig->is3SampleEnable();
-    m_addSensorLabel = m_svdPlotsConfig->getListOfSensors();
+    m_listOfSensorsToMonitor = m_svdPlotsConfig->getListOfSensors();
+    m_skipRejectedEvents = m_svdPlotsConfig->isSkippedRejectedEvents();
   }
 
-  if (m_addParSensorLabel.size() != 0)
-    m_addSensorLabel.insert(m_addSensorLabel.end(), m_addParSensorLabel.begin(), m_addParSensorLabel.end());
+  if (m_additionalSensorsToMonitor.size() != 0)
+    m_listOfSensorsToMonitor.insert(m_listOfSensorsToMonitor.end(), m_additionalSensorsToMonitor.begin(),
+                                    m_additionalSensorsToMonitor.end());
 
-  if (m_addSensorLabel.size() != 0)
+  if (m_listOfSensorsToMonitor.size() != 0)
     m_addSensorPlots = true;
 
-  for (auto sensor : m_addSensorLabel) {
+  for (auto sensor : m_listOfSensorsToMonitor) {
     B2DEBUG(20, "ClusTrk: additional sensors to be monitored " << sensor);
   }
 
@@ -119,12 +119,12 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   }
 
   if (m_addSensorPlots) {
-    m_clstrkChargeU = new TH1F*[m_addSensorLabel.size()];
-    m_clstrkChargeV = new TH1F*[m_addSensorLabel.size()];
-    m_clstrkSNRU    = new TH1F*[m_addSensorLabel.size()];
-    m_clstrkSNRV    = new TH1F*[m_addSensorLabel.size()];
-    m_clstrkTimeU   = new TH1F*[m_addSensorLabel.size()];
-    m_clstrkTimeV   = new TH1F*[m_addSensorLabel.size()];
+    m_clstrkChargeU = new TH1F*[m_listOfSensorsToMonitor.size()];
+    m_clstrkChargeV = new TH1F*[m_listOfSensorsToMonitor.size()];
+    m_clstrkSNRU    = new TH1F*[m_listOfSensorsToMonitor.size()];
+    m_clstrkSNRV    = new TH1F*[m_listOfSensorsToMonitor.size()];
+    m_clstrkTimeU   = new TH1F*[m_listOfSensorsToMonitor.size()];
+    m_clstrkTimeV   = new TH1F*[m_listOfSensorsToMonitor.size()];
   }
 
   int ChargeBins = 80;
@@ -348,9 +348,9 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   // Additional sensor plots
   //----------------------------------------------------------------
   if (m_addSensorPlots) {
-    for (int i = 0; i < (int)m_addSensorLabel.size(); i++) {
+    for (int i = 0; i < (int)m_listOfSensorsToMonitor.size(); i++) {
 
-      string sensorDescr = m_addSensorLabel[i];
+      string sensorDescr = m_listOfSensorsToMonitor[i];
       replace(sensorDescr.begin(), sensorDescr.end(), '.', '_');
 
       //----------------------------------------------------------------
@@ -508,9 +508,9 @@ void SVDDQMClustersOnTrackModule::event()
       if (m_addSensorPlots) {
         string sensorId = str(format("%1%.%2%.%3%") % iLayer % iLadder % iSensor);
 
-        auto it = find(m_addSensorLabel.begin(), m_addSensorLabel.end(), sensorId);
-        if (it != m_addSensorLabel.end()) {
-          int idx = distance(m_addSensorLabel.begin(), it);
+        auto it = find(m_listOfSensorsToMonitor.begin(), m_listOfSensorsToMonitor.end(), sensorId);
+        if (it != m_listOfSensorsToMonitor.end()) {
+          int idx = distance(m_listOfSensorsToMonitor.begin(), it);
 
           if (svdCluster.isUCluster()) {
             if (m_clstrkChargeU[idx]) m_clstrkChargeU[idx]->Fill(svdCluster.getCharge() / 1000.0);

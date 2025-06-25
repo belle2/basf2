@@ -181,6 +181,7 @@ class LSFTask(b2luigi.Task):
     def __init__(self, *args, **kwargs):
         """Constructor."""
         super().__init__(*args, **kwargs)
+        #: set the job name (inherited variable)
         self.job_name = self.task_id
 
 

@@ -52,13 +52,14 @@ namespace Belle2 {
      * ALGORITHM DESCRIPTION
      *
      *   Each saved waveform increases beam burst suppression
-     *   counter by 11 us.
-     *   When counter passes the threshold of 50 us, waveforms
-     *   are no longer saved until counter is below 50 us again.
+     *   counter by 11 μs.
+     *   When counter passes the threshold of 50 μs, waveforms
+     *   are no longer saved until counter is below 50 μs again.
      *
+     * \code
      *       ------------------>
      *
-     *      \ +11 us /  \ +11 us /
+     *      \ +11 μs /  \ +11 μs /
      *       \~~~~~~/    \~~~~~~/
      *        \~~~~/      \~~~~/
      *         \__/        \__/
@@ -72,17 +73,18 @@ namespace Belle2 {
      *                            +                   +  Block waveform data
      *                            +                   +  ^
      *                            +                   +  |
-     *                      50 us +.......................
+     *                      50 μs +.......................
      *                            +                   +  |
      *                            +~~~~~~~~~~~~~~~~~~~+  v
      *                            +~~~~~~~~~~~~~~~~~~~+  Do not block
      *                            +~~~~~~~~~~~~~~~~~~~+  waveform data
      *                            +~~~~~~~~~~~~~~~~~~~+
      *                            +++++++++++++++++++++++>
-     *                                                   🌢 -1 us
+     *                                                   ~ -1 μs
      *
-     *                                                   🌢 -1 us
+     *                                                   ~ -1 μs
      *
+     * \endcode
      * @brief Return burst suppression mask. 0--suppression inactive, 1--active.
      * @return Burst suppression mask (12 bits, 1 bit per each ShaperDSP)
      */

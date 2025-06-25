@@ -85,7 +85,7 @@ TBranch: CleoConeCS__bo6__bc, 0.743
 TBranch: CleoConeCS__bo7__bc, 0.1164
 TBranch: CleoConeCS__bo8__bc, 1.426
 TBranch: CleoConeCS__bo9__bc, 1.326
-TBranch: isNotContinuumEvent, 1
+TBranch: isNotContinuumEvent, True
 TBranch: extraInfo__boFastBDT__bc, 1
 TBranch: transformedNetworkOutput__boFastBDT__cm0__pt1__cm1__pt0__bc, inf
 TFile: B2A704-EventShape.root

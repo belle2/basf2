@@ -15,6 +15,8 @@
 #include <TDatabasePDG.h>
 #include <Math/Vector3D.h>
 
+#include <cmath>
+
 using namespace Belle2;
 using namespace ROOT::Math;
 
@@ -52,7 +54,7 @@ void TrackFitResultEstimatorModule::initialize()
     B2ERROR("Invalid input ParticleList name: " << m_inputListName);
 
   const int pdg = decaydescriptor.getMother()->getPDGCode();
-  if (abs(TDatabasePDG::Instance()->GetParticle(pdg)->Charge()) > 3)
+  if (std::abs(TDatabasePDG::Instance()->GetParticle(pdg)->Charge()) > 3)
     B2WARNING("The absolute value of charge of input ParticleList is grater than 1. Helix requires abs(charge) <= 1. "
               "The sign of charge will be used instead.");
 
@@ -70,7 +72,7 @@ void TrackFitResultEstimatorModule::event()
 
   XYZVector position(0,0,0);
   if (m_beamSpotDB)
-    position = XYZVector(m_beamSpotDB->getIPPosition().X(), m_beamSpotDB->getIPPosition().Y(), m_beamSpotDB->getIPPosition().Z());
+    position = m_beamSpotDB->getIPPosition();
 
   const double bfield = BFieldManager::getFieldInTesla(position).Z();
 
@@ -81,8 +83,8 @@ void TrackFitResultEstimatorModule::event()
       B2ERROR("Particle is already related to the Track or TrackFitResult object.");
 
     int charge = part->getCharge();
-    if (abs(charge)>1)
-      charge = charge / abs(charge);
+    if (std::abs(charge)>1)
+      charge = charge / std::abs(charge);
 
     TrackFitResult* trkfit = m_trackfitresults.appendNew(position,
                                                          part->getMomentum(),

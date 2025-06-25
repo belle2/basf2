@@ -6,11 +6,9 @@ Command Line Tutorial (Bash)
 .. sidebar:: Overview
     :class: overview
 
-    **External training**: 4h30
+    **External training**: 4.5 hrs
 
-    **Teaching**: 30 min
-
-    **Exercises**: 10 min
+    **Length**: 45-60 min
 
     **Prerequisites**:
 

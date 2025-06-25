@@ -120,9 +120,9 @@ namespace Belle2 {
    * ParticleGenerator is a generator for all the particles combined from the given ParticleLists.
    */
   class ParticleGenerator {
-  public:
 
   public:
+
     /**
      * Initialises the generator to produce the given type of sublist
      * @param decayString
@@ -258,10 +258,11 @@ namespace Belle2 {
     unsigned int m_numberOfLists; /**< Number of lists which are combined */
     std::vector<StoreObjPtr<ParticleList>> m_plists; /**< particle lists */
 
-    ListIndexGenerator
-    m_listIndexGenerator;   /**< listIndexGenerator makes the combinations of the types of sublists of the ParticleLists */
-    ParticleIndexGenerator
-    m_particleIndexGenerator; /**< particleIndexGenerator makes the combinations of indices stored in the sublists of the ParticleLists */
+    /** Makes the combinations of the types of sublists of the ParticleLists. */
+    ListIndexGenerator m_listIndexGenerator;
+
+    /** Makes the combinations of indices stored in the sublists of the ParticleLists. */
+    ParticleIndexGenerator m_particleIndexGenerator;
 
     const StoreArray<Particle> m_particleArray; /**< Global list of particles. */
     std::vector<Particle*> m_particles; /**< Pointers to the particle objects of the current combination */

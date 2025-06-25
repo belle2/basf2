@@ -9,7 +9,9 @@
 #pragma once
 
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/B2Vector3.h>
+
+#include <Math/Vector2D.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   class Particle;
@@ -261,7 +263,7 @@ namespace Belle2 {
     double convertedPhotonZ(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /** helper function that returns the estimated vertex in the transverse plane */
-    TVector2 convertedPhotonXY(const Particle* gamma, const std::vector<double>& daughterIndices);
+    ROOT::Math::XYVector convertedPhotonXY(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /**
      * returns the estimated X-coordinate of the two-track system assuming it's a converted photon
@@ -281,7 +283,7 @@ namespace Belle2 {
     /**
      * helper function that returns the estimated 3-momentum of the two-track system assuming it's a converted photon
      */
-    B2Vector3D convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices);
+    ROOT::Math::XYZVector convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /**
      * returns the estimated x-component of momentum of the two-track system assuming it's a converted photon

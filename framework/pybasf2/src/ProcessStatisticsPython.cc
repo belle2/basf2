@@ -144,7 +144,7 @@ difference in resident memory before and after the `event() <Module.event>` call
     Memory consumption is reporting the difference in memory usage as reported
     by the kernel before and after the call. This is not the maximum memory the
     module has consumed. Negative values indicate that this module has freed
-    momemory which was allocated in other modules or function calls.
+    memory which was allocated in other modules or function calls.
 
 Information on other calls like `initialize() <Module.initialize>`,
 `terminate() <Module.terminate>`, etc. are also available through the different

@@ -11,7 +11,8 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/dataobjects/Particle.h>
 #include <framework/logging/Logger.h>
-#include <framework/geometry/B2Vector3.h>
+
+#include <Math/Vector3D.h>
 
 namespace TreeFitter {
 
@@ -55,7 +56,7 @@ namespace TreeFitter {
   {
     if (m_beamSpot && m_isBeamSpot && m_constraintDimension == 3) {
       m_covariance = Eigen::Matrix<double, 3, 3>::Zero(3, 3);
-      const Belle2::B2Vector3D& vertexVector = m_beamSpot->getIPPosition();
+      const ROOT::Math::XYZVector& vertexVector = m_beamSpot->getIPPosition();
       const TMatrixDSym& covVertex = m_beamSpot->getCovVertex();
       m_posVec(0) = vertexVector.X();
       m_posVec(1) = vertexVector.Y();
@@ -69,7 +70,7 @@ namespace TreeFitter {
 
     } else if (m_beamSpot && m_isBeamSpot && m_constraintDimension == 2) {
       m_covariance = Eigen::Matrix<double, 2, 2>::Zero(2, 2);
-      const Belle2::B2Vector3D& vertexVector = m_beamSpot->getIPPosition();
+      const ROOT::Math::XYZVector& vertexVector = m_beamSpot->getIPPosition();
       const TMatrixDSym& covVertex = m_beamSpot->getCovVertex();
       m_posVec(0) = vertexVector.X();
       m_posVec(1) = vertexVector.Y();

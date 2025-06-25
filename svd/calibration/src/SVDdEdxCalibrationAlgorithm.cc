@@ -174,7 +174,7 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
   variables->add(exp);
   variables->add(run);
 
-  RooDataSet* LambdaDataset = new RooDataSet("LambdaDataset", "LambdaDataset", preselTree.get(), *variables);
+  RooDataSet* LambdaDataset = new RooDataSet("LambdaDataset", "LambdaDataset", *variables, Import(*preselTree));
 
   if (LambdaDataset->sumEntries() == 0) {
     B2FATAL("The Lambda dataset is empty, stopping here");
@@ -371,7 +371,7 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   variables->add(exp);
   variables->add(run);
 
-  RooDataSet* DstarDataset = new RooDataSet("DstarDataset", "DstarDataset", preselTree.get(), *variables);
+  RooDataSet* DstarDataset = new RooDataSet("DstarDataset", "DstarDataset", *variables, Import(*preselTree));
 
   if (DstarDataset->sumEntries() == 0) {
     B2FATAL("The Dstar dataset is empty, stopping here");

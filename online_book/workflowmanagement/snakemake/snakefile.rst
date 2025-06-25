@@ -2,6 +2,11 @@
 
 Workflow Logic Code in the Snakefile
 ====================================
+   
+.. sidebar:: Overview
+    :class: overview
+
+    **Length**: 30-45 min
 
 In snakemake all workflow logic is centralized in the so-called *snakefile*, similar to a make file. All analysis code is detached in separate scripts, with minimal adaptations to accommodate them in the workflow logic. Snakemake supports multiple programming languages; we will stick to Python.
 

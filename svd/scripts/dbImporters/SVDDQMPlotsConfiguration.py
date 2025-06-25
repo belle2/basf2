@@ -64,14 +64,14 @@ if __name__ == "__main__":
         print(" ", sensor)
 
     print("")
-    print("3Samples", param["3Samples"])
+    print("3Samples:", param["3Samples"])
 
     if (param["3Samples"] == 1):
         payload.enable3Sample()
     else:
         payload.disable3Sample()
 
-    print("skipHLTRejectedEvents", param["skipHLTRejectedEvents"])
+    print("skipHLTRejectedEvents:", param["skipHLTRejectedEvents"])
 
     if (param["skipHLTRejectedEvents"] == 1):
         payload.enableSkippedRejectedEvents()

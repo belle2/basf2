@@ -76,7 +76,7 @@ def default_event_abort(module, condition, error_flag):
 
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
-                       with_ca=False,
+                       with_cdc_cellular_automaton=False,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
                        pxd_filtering_offline=False,
@@ -111,7 +111,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         the fitted hypotheses are pion, kaon and proton, i.e. [211, 321, 2212].
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
-    :param with_ca: If true, in the CDC track finding the cellular automaton algorithm will be used too,
+    :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
     after the global algorithm (Legendre).
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
@@ -166,7 +166,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  add_modules_for_trigger_calculation=add_trigger_calculation,
                                  skipGeometryAdding=skipGeometryAdding,
                                  trackFitHypotheses=trackFitHypotheses,
-                                 with_ca=with_ca,
+                                 with_ca=with_cdc_cellular_automaton,
                                  use_second_cdc_hits=use_second_cdc_hits,
                                  add_muid_hits=add_muid_hits,
                                  reconstruct_cdst=reconstruct_cdst,

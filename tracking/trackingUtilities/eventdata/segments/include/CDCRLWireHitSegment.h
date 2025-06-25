@@ -7,6 +7,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment.h>
 
 #include <vector>
@@ -16,7 +17,6 @@ namespace Belle2 {
     class CDCWire;
   }
   namespace TrackingUtilities {
-    class CDCRLWireHit;
 
     /// A segment consisting of two dimensional reconstructed hits
     class CDCRLWireHitSegment :  public CDCSegment<CDCRLWireHit> {

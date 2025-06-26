@@ -270,6 +270,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
   int nShapers;
   int adcMask, adcHighMask, dspTime, dspAmplitude, dspQualityFlag;
   int dspHadronFraction;
+  unsigned int dataFormat;
   // Mask of shapers that discarded waveform data due to beam burst suppression
   int burstSuppressionMask;
 
@@ -364,7 +365,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           doBadHeaderReport(iCrate);
           throw Bad_ShaperDSP_header();
         }
-        int dataFormat = (value >> 21) & 0x7;
+        dataFormat = (value >> 21) & 0x7;
 
         value = readNextCollectorWord();
         burstSuppressionMask |= ((value >> 29) & 1) << (iShaper - 1); // burst suppression bit
@@ -454,7 +455,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           newEclDigit->setCellId(cellID);
           newEclDigit->setAmp(dspAmplitude);
           newEclDigit->setQuality(dspQualityFlag);
-          newEclDigit->setHadronFraction(dspHadronFraction);
+          newEclDigit->setPackedHadronFraction(dspHadronFraction);
+          newEclDigit->setDataFormat(dataFormat);
           if (dspQualityFlag == 2) {
             // amplitude is lower than threshold value time = trg_time => fit_time = 0
             newEclDigit->setTimeFit(0);

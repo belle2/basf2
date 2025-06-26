@@ -1351,6 +1351,9 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   double BiasCorrectionProton = KaonResolutionFunction->GetParameter(1) - MomentumFunctionProton->Eval(3.);
   B2INFO("BiasCorrectionProton = " << BiasCorrectionProton);
 
+  if ((BiasCorrectionProton / BiasCorrectionKaon)  > 1.5) BiasCorrectionProton =
+      BiasCorrectionKaon; // probably something went wrong due to low statistics
+
   // back to kaons: generate a new payload
   TH2F* Kaon2DHistogramNew = PrepareNewHistogram(Kaon2DHistogram, Form("%sNew", Kaon2DHistogram->GetName()), MomentumFunctionKaon,
                                                  KaonResolutionFunction, BiasCorrectionKaon);

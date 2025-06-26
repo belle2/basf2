@@ -54,6 +54,8 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
   addParam("Clusters", m_svdClustersName, "SVDCluster StoreArray name.", std::string(""));
   addParam("RecoDigits", m_svdRecoDigitsName, "SVDRecoDigits StoreArray name.", std::string(""));
   addParam("ShaperDigits", m_svdShaperDigitsName, "SVDShaperDigits StoreArray name.", std::string(""));
+  addParam("useParamFromDB", m_useParamFromDB, "use SVDDQMPlotsConfiguration from DB", bool(true));
+  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If True, skip events rejected by HLT.", bool(true));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
   addParam("AdditionalSensorsToMonitor", m_additionalSensorsToMonitor, "Additionnal sensor list to monitor",
            m_additionalSensorsToMonitor);
@@ -79,15 +81,18 @@ SVDDQMClustersOnTrackModule::~SVDDQMClustersOnTrackModule()
 
 void SVDDQMClustersOnTrackModule::defineHisto()
 {
-
-  if (!m_svdPlotsConfig.isValid())
-    B2FATAL("no valid configuration found for SVD reconstruction");
-  else {
-    B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
-    //read back from payload
-    m_3Samples = m_svdPlotsConfig->is3SampleEnable();
-    m_listOfSensorsToMonitor = m_svdPlotsConfig->getListOfSensors();
-    m_skipRejectedEvents = m_svdPlotsConfig->isSkippedRejectedEvents();
+  if (m_useParamFromDB) {
+    if (!m_svdPlotsConfig.isValid())
+      B2FATAL("no valid configuration found for SVD reconstruction");
+    else {
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
+      //read back from payload
+      m_3Samples = m_svdPlotsConfig->isPlotsFor3SampleMonitoring();
+      m_listOfSensorsToMonitor = m_svdPlotsConfig->getListOfSensors();
+      m_skipRejectedEvents = m_svdPlotsConfig->isSkipHLTRejectedEvents();
+      printf("3sample %d\n", m_3Samples);
+      printf("skipRejectedEvents %d\n", m_skipRejectedEvents);
+    }
   }
 
   if (m_additionalSensorsToMonitor.size() != 0)

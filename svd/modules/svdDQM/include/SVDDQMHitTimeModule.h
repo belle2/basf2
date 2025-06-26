@@ -73,6 +73,9 @@ namespace Belle2 {
     /** if true skip events rejected by HLT */
     bool m_skipRejectedEvents = false;
 
+    /** if true read back from DB configuration parameters */
+    bool m_useParamFromDB = true;
+
     StoreObjPtr<TRGSummary>    m_objTrgSummary;   /**< Trigger Summary data object */
 
     /** L1 timing source from getTimeType() in TRGSummary

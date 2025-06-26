@@ -294,7 +294,7 @@ void TrgEclCluster::setBarrelICN(int Method)
       if (!(tc_lower != 0 && tc_lower_left != 0)) {
 
         if (Method == 1) {
-          // for cluster method2(Consider TC energy in oderto find the center of cluster)
+          // for cluster method2(Consider TC energy in oder to find the center of cluster)
           int maxTCid = 0;
           double maxTCEnergy = 0;
           for (int iTC = 0; iTC < 9; iTC++) { //find center of Cluster
@@ -488,9 +488,9 @@ TrgEclCluster::setForwardICN(int Method)
     TCFirePosition[m_TCId[ihit] - 1][2] = (m_TCMap->getTCPosition(m_TCId[ihit])).Z();
 
     //------------------------------------
-    // To rearrange the hit map
+    // To rearrange the hitted map
     //
-    //   original       converted
+    //   orignal       converted
     //  (<- Theta)    (<- Theta)
     //
     //   3  2  1       64 32  0
@@ -1010,9 +1010,9 @@ void TrgEclCluster::setBackwardICN(int Method)
     TCFirePosition[m_TCId[ihit] - 513][2] = (m_TCMap->getTCPosition(m_TCId[ihit])).Z();
 
     //------------------------------------
-    // To rearrange the hit map
+    // To rearrange the hitted map
     //
-    //   original       converted
+    //   orignal       converted
     //  (<- Theta)    (<- Theta)
     //
     //     516  515       32  0
@@ -1466,9 +1466,9 @@ TrgEclCluster::setForwardICN()
 
 
     //------------------------------------
-    // To rearrange the hit map
+    // To rearrange the hitted map
     //
-    //   original       converted
+    //   orignal       converted
     //  (<- Theta)    (<- Theta)
     //
     //   3  2  1       64 32  0
@@ -1619,9 +1619,9 @@ int TrgEclCluster::setBackwardICN()
 
     //    TCFire[m_TCId[ihit] - 513] = m_TCId[ihit];
     //------------------------------------
-    // To rearrange the hit map
+    // To rearrange the hitted map
     //
-    //   original       converted
+    //   orignal       converted
     //  (<- Theta)    (<- Theta)
     //
     //     516  515       32  0

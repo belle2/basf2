@@ -35,7 +35,7 @@ namespace Belle2 {
 
     /** Destructor */
     virtual ~TRGECLFAMModule();
-    /** Initializes TRGECLFAMModule. */
+    /** Initilizes TRGECLFAMModule. */
     virtual void initialize() override;
     /** Called when new run started.*/
     virtual void beginRun() override;
@@ -70,7 +70,7 @@ namespace Belle2 {
     /** Set Shaping Function */
     int m_FADC;
     /** Use Condition DB*/
-    int m_ConditionDB;
+    bool m_ConditionDB;
     /** Set source of TC data (1:=ECLHit or 2:=ECLSimHit or 3:=ECLHit+TRGECLBGTCHit) */
     /** ("1:=ECLHit" is used for signal w/o bkg, and real time background monitor) */
     int m_SourceOfTC;

@@ -11,7 +11,7 @@
 import basf2 as b2
 
 
-def add_ecl_trigger(path, SourceOfTC=3, ETMConditionDB=1):
+def add_ecl_trigger(path, SourceOfTC=3, ETMConditionDB=True):
     """
     add ecl trigger module to path
     """
@@ -29,7 +29,7 @@ def add_ecl_trigger(path, SourceOfTC=3, ETMConditionDB=1):
     trgecl = b2.register_module("TRGECL")
     # trgecl.logging.log_level = LogLevel.DEBUG
 
-    # flag of ConditionDB (0:=not use ConditionDB, 1:=use ConditionDB)
+    # flag of ConditionDB (False:=not use ConditionDB, True:=use ConditionDB)
     trgecl.param('ConditionDB', ETMConditionDB)
 
     # Output Clustering method(0: Use only ICN, 1: ICN + Max TC)

@@ -37,7 +37,7 @@ namespace Belle2 {
     /** Copy constructor, deleted. */
     TrgEclBhabha(TrgEclBhabha&) = delete;
 
-    /** Assignment operator, deleted. */
+    /** Assignement operator, deleted. */
     TrgEclBhabha& operator=(TrgEclBhabha&) = delete;
 
   public:
@@ -97,7 +97,7 @@ namespace Belle2 {
     void setmumuThreshold(double mumuThreshold) { m_mumuThreshold = mumuThreshold; }
     //! set mumu bit Angle selection
     void setmumuAngle(const std::vector<int>& imumuAngle) { m_mumuAngle = imumuAngle; }
-    //! set hie12 3D Bhabha addition Angle selection
+    //! set hie12 3D Bhabha addtion Angle selection
     void sethie12BhabhaVetoAngle(const std::vector<int>& ihie12BhabhaVetoAngle)
     {
       m_hie12BhabhaVetoAngle = ihie12BhabhaVetoAngle;
@@ -148,7 +148,7 @@ namespace Belle2 {
     {
       m_hie4LowCLELabCut = hie4LowCLELabCut;
     }
-    //! get trigger bit of flag(1bit) whether two clusters satisfy 3D Bhabha veto
+    //! get trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
     //! are in CDCTRG region in theta (="InTrack") or not
     int get3DBhabhaVetoInTrackFlag(void)
     {
@@ -310,9 +310,9 @@ namespace Belle2 {
     double m_taub2b3CLEb2bLabCut;
     //! taub2b3 cluster energy cut (GeV) for all clusters in lab
     std::vector<double> m_taub2b3CLELabCut;
-    //! (hie4) CL E cut for minimum energy cluster in Lab in GeV
+    //! (hie4) CL E cut for miniimum energy cluster in Lab in GeV
     double m_hie4LowCLELabCut;
-    //! trigger bit of flag(1bit) whether two clusters satisfy 3D Bhabha veto
+    //! trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
     //! are in CDCTRG region in theta (="InTrack") or not
     int                 m_3DBhabhaVetoInTrackFlag;
     //! TCIDs of two clusters of 3D Bhabha veto

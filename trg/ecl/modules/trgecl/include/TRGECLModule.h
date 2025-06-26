@@ -17,7 +17,6 @@
 #include "trg/ecl/dataobjects/TRGECLHit.h"
 #include "trg/ecl/dataobjects/TRGECLTrg.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
-#include "trg/ecl/dbobjects/TRGECLETMPara.h"
 
 #include <map>
 
@@ -35,7 +34,7 @@ namespace Belle2 {
     /** Destructor  */
     virtual ~TRGECLModule();
 
-    /** Initializes TRGECLModule.*/
+    /** Initilizes TRGECLModule.*/
     virtual void initialize() override;
 
     /** Called when new run started.*/
@@ -98,17 +97,17 @@ namespace Belle2 {
     int m_EventTiming;
     //! Trigger decision time window
     double m_TimeWindow;
-    //! Trigger decision overlap window in order to avoid boundary effect
+    //! Trigger decision overlap window in oder to avoid boundary effect
     double m_OverlapWindow;
     //! # of considered TC in energy weighted Timing method
     int m_NofTopTC;
     //! Event selection
     int m_SelectEvent;
     //! Flag to use Condition DB
-    int m_ConditionDB;
+    bool m_ConditionDB;
     //! conversion factor of ADC to Energy in GeV
     double m_ADCtoEnergy;
-    //! Total Energy Threshold (low, high, lum) in Lab in GeV
+    //! Total Energy Theshold (low, high, lum) in Lab in GeV
     std::vector<double> m_TotalEnergy;
     //! 2D Bhabha Energy Threshold
     std::vector<double> m_2DBhabhaThresholdFWD;
@@ -167,7 +166,7 @@ namespace Belle2 {
     double m_taub2b3CLEb2bLabCut;
     //! taub2b3 cluster energy cut(low and high) in lab for all clusters (GeV)
     std::vector<double> m_taub2b3CLELabCut;
-    //! (hie4) CL E cut for minimum energy cluster
+    //! (hie4) CL E cut for miniimum energy cluster
     double m_hie4LowCLELabCut;
 
     //! ETM (ecl trigger master) to generate all trigger bits of ecl trigger
@@ -177,7 +176,7 @@ namespace Belle2 {
     StoreArray<TRGECLHit> m_TRGECLHit;
     /** output for TRGECLTrg */
     StoreArray<TRGECLTrg> m_TRGECLTrg;
-    /** output for TRGECLCluster */
+    // /** output for TRGECLCluster */
     StoreArray<TRGECLCluster> m_TRGECLCluster;
 
   };

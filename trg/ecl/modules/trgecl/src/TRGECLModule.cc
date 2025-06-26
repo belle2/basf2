@@ -44,7 +44,7 @@ namespace Belle2 {
     Module::Module(), m_debugLevel(0), m_Bhabha(0),
     m_Clustering(1), m_ClusterLimit(6), m_EventTiming(1),
     m_TimeWindow(250.0), m_OverlapWindow(125.0), m_NofTopTC(3),
-    m_SelectEvent(1), m_ConditionDB(1)
+    m_SelectEvent(1), m_ConditionDB(true)
   {
 
     string desc = "TRGECLModule(" + version() + ")";
@@ -335,7 +335,7 @@ namespace Belle2 {
   TRGECLModule::beginRun()
   {
 
-    if (m_ConditionDB == 1) {
+    if (m_ConditionDB) {
 
       //! read parameters from conditionDB
       DBObjPtr<TRGECLETMParameters> m_ETMParameters;

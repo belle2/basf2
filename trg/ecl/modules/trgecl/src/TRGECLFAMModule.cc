@@ -48,7 +48,7 @@ namespace Belle2 {
       m_famana(0),
       m_SetTCEThreshold(100.0),
       m_FADC(1),
-      m_ConditionDB(0),
+      m_ConditionDB(false),
       m_SourceOfTC(3)
   {
 
@@ -74,7 +74,7 @@ namespace Belle2 {
              "Select source of TC data(1:=ECLHit or 2:=ECLSimHit or 3:=ECLHit+TRGECLBGTCHit)",
              m_SourceOfTC);
 
-    if (m_ConditionDB == 1) { //Use global tag
+    if (m_ConditionDB) { //Use global tag
       m_FAMPara.addCallback(this, &TRGECLFAMModule::beginRun);
     }
     B2DEBUG(100, "TRGECLFAMModule ... created");
@@ -113,6 +113,9 @@ namespace Belle2 {
     m_TRGECLWaveform.registerInDataStore();
     m_TRGECLHit.registerInDataStore();
     m_TRGECLFAMAna.registerInDataStore();
+    // This object is registered by few packages. Let's be agnostic about the
+    // execution order of the modules: the first package run registers the module
+    m_eventLevelClusteringInfo.isOptional() ? m_eventLevelClusteringInfo.isRequired() :
     m_eventLevelClusteringInfo.registerInDataStore();
 
     //    m_FAMPara = new DBObjPtr<TRGECLFAMPara>;
@@ -123,9 +126,9 @@ namespace Belle2 {
   void
   TRGECLFAMModule::beginRun()
   {
-    if (m_ConditionDB == 0) {
+    if (!m_ConditionDB) {
       m_TCEThreshold.resize(576, m_SetTCEThreshold);
-    } else if (m_ConditionDB == 1) { //Use global tag
+    } else { //Use global tag
       m_TCEThreshold.resize(576, 0);
       for (const auto& para : m_FAMPara) {
         m_TCEThreshold[para.getTCId() - 1] = (int)((para.getThreshold()) * (para.getConversionFactor()));

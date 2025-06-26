@@ -105,7 +105,7 @@ namespace Belle2 {
     //! Event selection
     int m_SelectEvent;
     //! Flag to use Condition DB
-    int m_ConditionDB;
+    bool m_ConditionDB;
     //! conversion factor of ADC to Energy in GeV
     double m_ADCtoEnergy;
     //! Total Energy Threshold (low, high, lum) in Lab in GeV

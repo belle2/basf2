@@ -441,15 +441,6 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
                    taub2b2Flag,
                    taub2b3Flag);
 
-    // makeTriggerBit(hit, Timing, 0, timingsource, E_phys,
-    //                bhabha2D, physics, bhabhabit, icn, beambkgtag,
-    //                flagoverflow, bhabha3D_veto, m_Lowmultibit,
-    //                bhabha3D_sel, mumu, bhabhaprescale, E_burst,
-    //                EventTimingQualityFlag,
-    //                bhabha3DVetoInTrackFlag,
-    //                bhabha3DSelectionThetaFlag,
-    //                taub2bFlag, 0, taub2b2Flag, taub2b3Flag);
-
     int m_hitEneNum = 0;
     StoreArray<TRGECLTrg> trgEcltrgArray;
     trgEcltrgArray.appendNew();

@@ -15,7 +15,6 @@
 ##########################################################################
 
 import basf2 as b2
-# from basf2 import conditions as b2conditions
 import tracking as trk
 import simulation as sim
 import svd as svd

@@ -13,6 +13,8 @@
 #include <trg/grl/GRLNeuro.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <trg/grl/dataobjects/GRLMLPData.h>
+#include <framework/database/DBObjPtr.h>
+#include <trg/grl/dbobjects/TRGGRLConfig.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventExtraInfo.h>
 
@@ -33,6 +35,9 @@ namespace Belle2 {
      * Initialize the networks and register datastore objects.
      */
     virtual void initialize() override;
+
+    /** Register run-dependent DataStore arrays. */
+    virtual void beginRun() override;
 
     /** Called once for each event.
      * Prepare input and target for each track and store it.
@@ -82,6 +87,9 @@ namespace Belle2 {
     std::string m_HistFileName;
     /** name of TRG GRL information object */
     std::string m_TrgGrlInformationName;
+
+    /** dbobject to store grl config */
+    DBObjPtr<TRGGRLConfig> m_db_trggrlconfig;
 
     /** TCID of a given TRGcluster */
     std::vector<int> TCThetaID;

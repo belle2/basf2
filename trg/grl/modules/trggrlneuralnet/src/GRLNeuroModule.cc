@@ -142,6 +142,18 @@ GRLNeuroModule::initialize()
 }
 
 void
+GRLNeuroModule::beginRun()
+{
+  if (not m_db_trggrlconfig.isValid()) {
+    StoreObjPtr<EventMetaData> evtMetaData;
+    B2FATAL("No database for TRG GRL config. exp " << evtMetaData->getExperiment() << " run "
+            << evtMetaData->getRun());
+  } else {
+    m_nn_thres[0] = m_db_trggrlconfig->get_ecltaunn_threshold();
+  }
+}
+
+void
 GRLNeuroModule::event()
 {
   //inputs and outputs

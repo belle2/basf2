@@ -618,23 +618,23 @@ void SVDUnpackerModule::event()
 
 
   // Detect upset APVs and report/treat
-  auto major_apv = max_element(apvsByPipeline.begin(), apvsByPipeline.end(),
-                               [](const decltype(apvsByPipeline)::value_type & p1,
-                                  const decltype(apvsByPipeline)::value_type & p2) -> bool
+  auto majorAPV = max_element(apvsByPipeline.begin(), apvsByPipeline.end(),
+                              [](const decltype(apvsByPipeline)::value_type & p1,
+                                 const decltype(apvsByPipeline)::value_type & p2) -> bool
   { return p1.second.size() < p2.second.size(); }
-                              );
+                             );
   // We set emuPipelineAddress fields in diagnostics to this.
   if (m_emulatePipelineAddress)
     for (auto& p : m_storeDAQDiagnostics)
-      p.setEmuPipelineAddress(major_apv->first);
+      p.setEmuPipelineAddress(majorAPV->first);
 
-  unsigned short size_apvsByPipeline = apvsByPipeline.size();
-  if (major_apv->first == 255) size_apvsByPipeline = 1;
+  unsigned short apvsByPipelineSize = apvsByPipeline.size();
+  if (majorAPV->first == 255) apvsByPipelineSize = 1;
 
   // And report any upset apvs or update records
-  if (size_apvsByPipeline > 1)
+  if (apvsByPipelineSize > 1)
     for (const auto& p : apvsByPipeline) {
-      if (p.first == major_apv->first or p.first == 255) continue;
+      if (p.first == majorAPV->first or p.first == 255) continue;
       for (const auto& fadcApv : p.second) {
         // We have an upset APV. Look if it is a known one.
         auto upsetRec = m_upsetAPVs.find(make_pair(fadcApv.first, fadcApv.second));

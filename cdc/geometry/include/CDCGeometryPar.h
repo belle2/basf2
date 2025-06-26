@@ -69,24 +69,26 @@ namespace Belle2 {
       //! Gets geometry parameters from database.
       void readFromDB(const CDCGeometry&);
 
-      //      /**
-      //       * Read z-corrections.
-      //       * @param GearDir Gear Dir.
-      //       */
-      //      void readDeltaz(const GearDir);
-      //
-      //      /**
-      //       * Read z-corrections from DB.
-      //       *
-      //       */
-      //      void readDeltaz(const CDCGeometry&);
+#if 0
+      /**
+       * Read z-corrections.
+       * @param GearDir Gear Dir.
+       */
+      void readDeltaz(const GearDir);
 
-      //      /**
-      //       * Open a file
-      //       * @param[in] ifs input file-stream
-      //       * @param[in] fileName0 file-name on cdc/data directory
-      //       */
-      //      void openFile(std::ifstream& ifs, const std::string& fileName0) const;
+      /**
+       * Read z-corrections from DB.
+       *
+       */
+      void readDeltaz(const CDCGeometry&);
+
+      /**
+       * Open a file
+       * @param[in] ifs input file-stream
+       * @param[in] fileName0 file-name on cdc/data directory
+       */
+      void openFile(std::ifstream& ifs, const std::string& fileName0) const;
+#endif
 
       /**
        * Read displacement or (mis)alignment params from text file.
@@ -195,12 +197,14 @@ namespace Belle2 {
        */
       void calcMeanT0(double minT0 = 3800, double maxT0 = 5800, int maxIt = 10, double nStdv = 3, double epsi = 0.1);
 
-      //      /**
-      //       * Read bad-wires (from a file).
-      //       * @param GearDir Gear Dir.
-      //       * @param mode 0: read simulation file, 1: read reconstruction file.
-      //       */
-      //      void readBadWire(const GearDir, int mode = 0);
+#if 0
+      /**
+       * Read bad-wires (from a file).
+       * @param GearDir Gear Dir.
+       * @param mode 0: read simulation file, 1: read reconstruction file.
+       */
+      void readBadWire(const GearDir, int mode = 0);
+#endif
 
       /**
        * Set bad-wires (from DB)

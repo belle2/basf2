@@ -10,7 +10,7 @@
 #pragma link C++ class Belle2::ECLLocalMaximum+; // checksum=0x508c657d, version=3
 #pragma link C++ class Belle2::ECLConnectedRegion+; // checksum=0xa7247f52, version=2
 #pragma link C++ class Belle2::ECLPureCsIInfo+; // checksum=0x2710b222, version=2
-#pragma link C++ class Belle2::ECLDigit+; // checksum=0xf9f86a3a, version=3
+#pragma link C++ class Belle2::ECLDigit+; // checksum=0x93164e6c, version=2
 #pragma link C++ class Belle2::ECLCalDigit+; // checksum=0x2beba43a, version=8
 #pragma link C++ class Belle2::ECLDsp+; // checksum=0x2a74d1c2, version=7
 #pragma link C++ class Belle2::ECLDspWithExtraMCInfo+; // checksum=0xaf5bfaae, version=2

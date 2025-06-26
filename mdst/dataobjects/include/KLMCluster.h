@@ -128,6 +128,91 @@ namespace Belle2 {
     bool getAssociatedTrackFlag() const;
 
     /**
+     * Get KLM cluster-track rotation angle.
+     * @return KLM rotation angle to the nearest track.
+     */
+    inline float getClusterTrackRotationAngle() const
+    {return m_klmClusterTrackRotationAngle;}
+
+    /**
+     * Get KLM cluster-track separation angle.
+     * @return KLM cluster separation angle to the nearest track.
+     */
+    inline float getClusterTrackSeparationAngle() const
+    {return m_klmClusterTrackSeparationAngle;}
+
+    /**
+     * Get KLM cluster-track distance.
+     * @return KLM cluster separation from the nearest track.
+     */
+    inline float getClusterTrackSeparation() const
+    {return m_klmClusterTrackSeparation;}
+
+    /**
+     * Get KLM variance of the 1st axis from PCA.
+     * @return KLM KLM variance of the 1st axis from PCA.
+     */
+    inline float getClusterPCAStd1() const
+    {return m_cluStd1;}
+
+    /**
+     * Get KLM variance of the 2nd axis from PCA.
+     * @return KLM KLM variance of the 2nd axis from PCA.
+     */
+    inline float getClusterPCAStd2() const
+    {return m_cluStd2;}
+
+    /**
+     * Get KLM variance of the 3rd axis from PCA.
+     * @return KLM KLM variance of the 3rd axis from PCA.
+     */
+    inline float getClusterPCAStd3() const
+    {return m_cluStd3;}
+
+    /**
+     * Set KLM cluster-track rotation angle.
+     * @param[in]  rotation angle to the nearest track.
+     */
+    void setClusterTrackRotationAngle(float rotation)
+    {m_klmClusterTrackRotationAngle = rotation;}
+
+    /**
+     * Set KLM cluster-track separation angle.
+     * @param[in]  separation angle to the nearest track.
+     */
+    void setClusterTrackSeparationAngle(float separation)
+    {m_klmClusterTrackSeparationAngle = separation;}
+
+    /**
+     * Set minimum KLM cluster-track distance.
+     * @param[in]  rotation angle to the nearest track.
+     */
+    void setClusterTrackSeparation(float dist)
+    {m_klmClusterTrackSeparation = dist;}
+
+    /**
+     * Set variance of the 1st axis, from PCA.
+     * @param[in]  variance of the 1st axis from PCA.
+     */
+    void setClusterPCAStd1(float std1)
+    {m_cluStd1 = std1;}
+
+    /**
+     * Set variance of the 2nd axis, from PCA.
+     * @param[in]  variance of the 2nd axis from PCA.
+     */
+    void setClusterPCAStd2(float std2)
+    {m_cluStd2 = std2;}
+
+    /**
+     * Set variance of the 3rd axis, from PCA.
+     * @param[in]  variance of the 3rd axis from PCA.
+     */
+    void setClusterPCAStd3(float std3)
+    {m_cluStd3 = std3;}
+
+
+    /**
      * Set time.
      * @param[in] time Time.
      */
@@ -191,8 +276,27 @@ namespace Belle2 {
     /** Absolute value of momentum, 0 means unknown. */
     float m_p;
 
+    /** Track-cluster rotation angle. */
+    float m_klmClusterTrackRotationAngle;
+
+    /** Track-cluster separation angle. */
+    float m_klmClusterTrackSeparationAngle;
+
+    /** Track-cluster separation (distance). */
+    float m_klmClusterTrackSeparation;
+
+    /** Variance of axis 1 (from Cluster Shape PCA). */
+    float m_cluStd1;
+
+    /** Variance of axis 2 (from Cluster Shape PCA). */
+    float m_cluStd2;
+
+    /** Variance of axis 3 (from Cluster Shape PCA). */
+    float m_cluStd3;
+
+
     /** Needed to make objects storable. */
-    ClassDef(Belle2::KLMCluster, 3);
+    ClassDef(Belle2::KLMCluster, 4);
 
   };
 

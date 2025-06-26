@@ -31,6 +31,8 @@ SVDDQMHitTimeModule::SVDDQMHitTimeModule(): HistoModule()
            std::string(""));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
            "if True, svd time back in SVD time reference", bool(false));
+  addParam("useParamFromDB", m_useParamFromDB, "use SVDDQMPlotsConfiguration from DB", bool(true));
+  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If True, skip events rejected by HLT.", bool(true));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
 }
 
@@ -41,13 +43,14 @@ SVDDQMHitTimeModule::~SVDDQMHitTimeModule() { }
 //---------------------------------
 void SVDDQMHitTimeModule::defineHisto()
 {
-
-  if (!m_svdPlotsConfig.isValid())
-    B2FATAL("no valid configuration found for SVD reconstruction");
-  else {
-    B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
-    m_3Samples = m_svdPlotsConfig->is3SampleEnable();
-    m_skipRejectedEvents = m_svdPlotsConfig->isSkippedRejectedEvents();
+  if (m_useParamFromDB) {
+    if (!m_svdPlotsConfig.isValid())
+      B2FATAL("no valid configuration found for SVD reconstruction");
+    else {
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
+      m_3Samples = m_svdPlotsConfig->isPlotsFor3SampleMonitoring();
+      m_skipRejectedEvents = m_svdPlotsConfig->isSkipHLTRejectedEvents();
+    }
   }
 
   TDirectory* oldDir = gDirectory;

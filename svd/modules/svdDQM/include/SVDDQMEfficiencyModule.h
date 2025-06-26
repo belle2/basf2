@@ -26,7 +26,6 @@
 
 #include <framework/database/DBObjPtr.h>
 
-
 #include "TH2D.h"
 
 namespace Belle2 {
@@ -95,6 +94,8 @@ namespace Belle2 {
     bool m_3Samples = false;  /**< if true enable 3 samples histograms analysis */
 
     bool m_skipRejectedEvents = false;   /**< if true skip events rejected by HLT */
+
+    bool m_useParamFromDB = true; /**< if true read back from DB configuration parameters */
 
     bool m_saveExpertHistos; /**< save additional histograms id set True*/
 

@@ -61,6 +61,8 @@ SVDDQMEfficiencyModule::SVDDQMEfficiencyModule() : HistoModule(), m_geoCache(VXD
   addParam("fiducialV", m_fiducialV, "Fiducial Area, V direction.", float(0.5));
   addParam("maxHalfResidU", m_maxResidU, "half window for cluster search around intercept, U direction.", float(0.05));
   addParam("maxHalfResidV", m_maxResidV, "half window for cluster search around intercept, V direction.", float(0.05));
+  addParam("useParamFromDB", m_useParamFromDB, "use SVDDQMPlotsConfiguration from DB", bool(true));
+  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If True, skip events rejected by HLT.", bool(true));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
 }
 
@@ -221,12 +223,14 @@ void SVDDQMEfficiencyModule::event()
 
 void SVDDQMEfficiencyModule::defineHisto()
 {
-  if (!m_svdPlotsConfig.isValid())
-    B2FATAL("no valid configuration found for SVD reconstruction");
-  else {
-    B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
-    m_3Samples = m_svdPlotsConfig->is3SampleEnable();
-    m_skipRejectedEvents = m_svdPlotsConfig->isSkippedRejectedEvents();
+  if (m_useParamFromDB) {
+    if (!m_svdPlotsConfig.isValid())
+      B2FATAL("no valid configuration found for SVD reconstruction");
+    else {
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
+      m_3Samples = m_svdPlotsConfig->isPlotsFor3SampleMonitoring();
+      m_skipRejectedEvents = m_svdPlotsConfig->isSkipHLTRejectedEvents();
+    }
   }
 
   // Create a separate histogram directory and cd into it.

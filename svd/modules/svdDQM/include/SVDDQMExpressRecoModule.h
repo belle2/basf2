@@ -67,6 +67,7 @@ namespace Belle2 {
 
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
+
     /** if true skip events rejected by HLT */
     bool m_skipRejectedEvents = false;
 
@@ -75,6 +76,9 @@ namespace Belle2 {
 
     /** if true enable 3 samples histograms analysis */
     bool m_3Samples = false;
+
+    /** if true read back from DB configuration parameters */
+    bool m_useParamFromDB = true;
 
     /** list of cumulative histograms */
     TList* m_histoList = nullptr;

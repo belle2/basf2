@@ -79,6 +79,9 @@ namespace Belle2 {
     /** if true skip events rejected by HLT */
     bool m_skipRejectedEvents = false;
 
+    /** if true read back from DB configuration parameters */
+    bool m_useParamFromDB = true;
+
     int m_tb = -1; /**< choose one trigger bin, or none if the value is -1*/
 
     /** list of cumulative histograms */

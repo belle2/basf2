@@ -1554,6 +1554,8 @@ Returns MVA classifier that uses pulse shape discrimination to identify electrom
 
 - 1 for electromagnetic showers
 - 0 for hadronic showers
+
+For details, see the following `PSD arxiv paper <https://arxiv.org/pdf/2007.09642>`_  
 )DOC");
     REGISTER_VARIABLE("clusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits, R"DOC(
 Returns ECL cluster's number of hadron digits in cluster (pulse shape discrimination variable).

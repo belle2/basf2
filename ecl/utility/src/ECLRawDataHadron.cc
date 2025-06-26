@@ -1,3 +1,11 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #include <ecl/utility/ECLRawDataHadron.h>
 
 #ifdef ECL_RAW_DATA_HADRON_STANDALONE_BUILD
@@ -163,49 +171,50 @@ namespace Belle2::ECL::RawDataHadron {
   /*                             Hadron fraction                              */
   /* ------------------------------------------------------------------------ */
 
+  /**
+   * @brief Basically the fastest algorithm for approximate integer division (with the precision (1/32)).
+   *
+   * Algorithm description
+   * =====================
+   *
+   * Calculating (n / m)
+   *
+   * 1. Determine p \in [0, 18], such that:
+   *
+   *         ⎛      p ⎞
+   *  32 <=  ⎝ m / 2  ⎠ < 64
+   *
+   * 2. Define shifted (divided) values n_S, m_S:
+   *
+   *            p
+   *  n  = n / 2  ∈ [0, 63]
+   *   S
+   *            p
+   *  m  = m / 2  ∈ [32, 63]
+   *   S
+   *
+   * 3. Calculate (n / m) as follows:
+   *
+   * \frac{n}{m} = \frac{n_S}{m_S} = n_S \cdot \left( \frac{2^{16}}{m_S} \right) \cdot \frac{1}{2^{16}}
+   *
+   *       n          ⎛  16 ⎞
+   *   n    S         ⎜ 2   ⎟     1
+   *   ─ = ── = n   ∙ ⎜ ─── ⎟  ∙ ───
+   *   m   m     S    ⎜ m   ⎟     16
+   *        S         ⎝  S  ⎠    2
+   *
+   *   ┌─────────────└───────┘────────────────────────────────┐
+   *    Since m_S can take only 32 different values, we
+   *    pre-calculate 32 different constants for (2^{16} / m_S)
+   *
+   * 4. Correction to improve division accuracy:
+   *
+   *  Instead of n_S, use (n_S + m_S / 2), this will result in
+   *  correct rounding for the division.
+   *
+   */
   int integer_division_32(int dividend, int divisor)
   {
-    // Basically the fastest algorithm for approximate integer division.
-    // (with the precision (1/32))
-    //
-    // Algorithm description
-    // =====================
-    //
-    // Calculating (n / m)
-    //
-    // 1. Determine p \in [0, 18], such that:
-    //
-    //         ⎛      p ⎞
-    //  32 <=  ⎝ m / 2  ⎠ < 64
-    //
-    // 2. Define shifted (divided) values n_S, m_S:
-    //
-    //            p
-    //  n  = n / 2  ∈ [0, 63]
-    //   S
-    //            p
-    //  m  = m / 2  ∈ [32, 63]
-    //   S
-    //
-    // 3. Calculate (n / m) as follows:
-    //
-    // \frac{n}{m} = \frac{n_S}{m_S} = n_S \cdot \left( \frac{2^{16}}{m_S} \right) \cdot \frac{1}{2^{16}}
-    //
-    //       n          ⎛  16 ⎞
-    //   n    S         ⎜ 2   ⎟     1
-    //   ─ = ── = n   ∙ ⎜ ─── ⎟  ∙ ───
-    //   m   m     S    ⎜ m   ⎟     16
-    //        S         ⎝  S  ⎠    2
-    //
-    //   ┌─────────────└───────┘────────────────────────────────┐
-    //    Since m_S can take only 32 different values, we
-    //    pre-calculate 32 different constants for (2^{16} / m_S)
-    //
-    // 4. Correction to improve division accuracy:
-    //
-    //  Instead of n_S, use (n_S + m_S / 2), this will result in
-    //  correct rounding for the division.
-    //
     if (divisor < 32)
       // Division can be done for divisor < 32 but it is meaningless:
       //  hadron component fit is meaningless for amp < 32

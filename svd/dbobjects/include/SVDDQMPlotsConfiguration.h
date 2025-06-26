@@ -41,33 +41,24 @@ namespace Belle2 {
      * Returns 3samples flag
      * @return  3sample flag
      **/
-    bool  is3SampleEnable() const { return m_3Samples; }
+    bool  isPlotsFor3SampleMonitoring() const { return m_3Samples; }
 
     /**
      * Enables 3sample flag
      */
-    void enable3Sample() { m_3Samples = true; }
+    void enablePlotsFor3SampleMonitoring() { m_3Samples = true; }
 
-    /**
-     * Disables 3sample flag
-     */
-    void disable3Sample() { m_3Samples = false; }
 
     /**
      * Returns HLT skipped event flag
      * @return HLT skipped event flag
      **/
-    bool  isSkippedRejectedEvents() const { return m_skipRejectedEvents; }
+    bool  isSkipHLTRejectedEvents() const { return m_skipHLTRejectedEvents; }
 
     /**
      * Enables HLT skipped event flag
      */
-    void enableSkippedRejectedEvents() { m_skipRejectedEvents = true; }
-
-    /**
-     * Disables HLT skipped event flag
-     */
-    void disableSkippedRejectedEvents() { m_skipRejectedEvents = false; }
+    void enableSkipHLTRejectedEvents() { m_skipHLTRejectedEvents = true; }
 
     /**
      * Get the unique ID  of the payload
@@ -86,12 +77,12 @@ namespace Belle2 {
     bool m_3Samples = false;
 
     /** if true skip events rejected by HLT */
-    bool m_skipRejectedEvents = false;
+    bool m_skipHLTRejectedEvents = false;
 
     /** list of sensors */
     std::vector<std::string> m_svdListOfSensors;
 
-    ClassDef(SVDDQMPlotsConfiguration, 1); /**< needed by root*/
+    ClassDef(SVDDQMPlotsConfiguration, 2); /**< needed by root*/
 
   };
 

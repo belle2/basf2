@@ -78,7 +78,7 @@
 
 #pragma link C++ class Belle2::SVDdEdxPDFs+; // checksum=0x6d7012eb, version=1
 
-#pragma link C++ class Belle2::SVDDQMPlotsConfiguration +; // checksum=0x19c11367, version=1
+#pragma link C++ class Belle2::SVDDQMPlotsConfiguration +; // checksum=0xcc833139, version=2
 
 #endif
 

@@ -787,8 +787,8 @@ Decay B0
 0.000253950   omega  anti-D0                               SVS;  #[BF update - PG 09/2020]
 0.000364180   anti-D*0  omega                              SVV_HELAMP 0.283 0.0 0.932 0.0 0.228 0.0;  #[BF update - PG 09/2020]
 
-0.007378570   D_s0*+  D-                                   PHSP; #[BF update - PG 09/2020]
-0.017687170   D*-  D_s0*+                                  SVS;  #[BF update - PG 09/2020]
+0.001050000   D_s0*+  D-                                   PHSP; #[BF update - PDG 105]
+0.001500000   D*-  D_s0*+                                  SVS;  #[BF update - arxiv:hep-ex/0408041]
 0.003547860   D_s1+  D-                                    SVS;  #[BF update - PG 09/2020]
 0.009282570   D*-  D_s1+                                   SVV_HELAMP 0.4904 0. 0.7204 0. 0.4904 0.0; #[BF update - PG 09/2020]
 
@@ -4339,6 +4339,7 @@ Decay B+
 0.000011000   D+  anti-K0                                  PHSP;
 0.000006000   D*+  anti-K0                                 SVS;
 0.000790000   anti-D0  D_s0*+                              PHSP; #[BF update - PG 09/2020]
+0.000900000   anti-D*0  D_s0*+                             SVS; # [BF update - arxiv:hep-ex/0408041]
 0.003091320   D_s1+  anti-D0                               SVS;  #[BF update - PG 09/2020]
 0.011960470   anti-D*0  D_s1+                              SVV_HELAMP 0.4904 0.0 0.7204 0.0 0.4904 0.0; #[BF update - PG 09/2020]
 0.000550000   anti-D0  K+  anti-K0                         PHSP;

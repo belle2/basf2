@@ -93,13 +93,14 @@ GRLNeuroModule::GRLNeuroModule() : Module()
            string("TRGECLClusters"));
   addParam("MVACut", m_nn_thres,
            "Cut value applied to the MLP output",
-  {0.4});
+  {-1});
 }
 
 
 void
 GRLNeuroModule::initialize()
 {
+  m_parameters.nMLP = 1;
 
   m_GRLNeuro.initialize(m_parameters);
   for (unsigned it = 0; it < m_parameters.nMLP; it++) {
@@ -125,15 +126,8 @@ GRLNeuroModule::initialize()
     CellLab.SetPz(CellPosition.Unit().Z());
     CellLab.SetE(1.);
 
-    //..cotan Theta and phi in lab
-    //TCPhiLab.push_back(CellPosition.Phi());
-    //double tantheta = tan(CellPosition.Theta());
-    //TCcotThetaLab.push_back(1. / tantheta);
-
-    //..Corresponding 4 vector in the COM frame
-    ROOT::Math::PxPyPzEVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
-    TCThetaCOM.push_back(CellCOM.Theta()*TMath::RadToDeg());
-    TCPhiCOM.push_back(CellCOM.Phi()*TMath::RadToDeg() + 180.0);
+    TCThetaLab.push_back(CellLab.Theta()*TMath::RadToDeg());
+    TCPhiLab.push_back(CellLab.Phi()*TMath::RadToDeg() + 180.0);
 
   }
   if (m_saveHist) {
@@ -153,42 +147,67 @@ GRLNeuroModule::event()
   //inputs and outputs
   std::vector<float> MLPinput;
   MLPinput.clear();
-  MLPinput.assign(19, 0);
+  MLPinput.assign(24, 0);
 
   //ECL input
   //..Use only clusters within 100 ns of event timing (from ECL).
   //StoreArray<TRGECLTrg> trgArray;
   StoreArray<TRGECLCluster> eclTrgClusterArray(m_TrgECLClusterName);
   StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
-  //int ntrgArray = trgArray.getEntries();
-  //double EventTiming = -9999.;
-  //if (ntrgArray > 0) {EventTiming = trgArray[0]->getEventTiming();}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  std::vector<std::tuple<float, float, float, float>> eclClusters;
+///
   int necl = eclTrgClusterArray.getEntries();
   for (int ic = 0; ic < necl; ic++) {
     int TC = eclTrgClusterArray[ic]->getMaxTCId();
-    MLPinput[ic] = eclTrgClusterArray[ic]->getEnergyDep() * 1000.0;
-    MLPinput[ic + 6] =  TCThetaCOM[TC - 1];
-    MLPinput[ic + 12] = TCPhiCOM[TC - 1];
+    float energy = eclTrgClusterArray[ic]->getEnergyDep() * 1000.0;
+    float theta = TCThetaLab[TC - 1];
+    float phi = TCPhiLab[TC - 1];
+    float time = eclTrgClusterArray[ic]->getTimeAve();
+    eclClusters.emplace_back(energy, theta, phi, time);
   }
 
-  //Energy, theta and phi data are the quantized.
-  //Energy: LSB = ADC count (5MeV)
-  //theta : 0 ~ 180∘, LSB = 1.40625∘
-  //phi : 0 ~ 360∘, LSB = 1.40625∘
-  float LSB_ADC   = 1 / 5.0;
-  float LSB_agnle = 1 / 1.40625;
-  std::for_each(MLPinput.begin() + 0,  MLPinput.begin() + 6,    [LSB_ADC](float & x) { x = std::ceil(x * LSB_ADC); });
-  std::for_each(MLPinput.begin() + 6,  MLPinput.begin() + 12, [LSB_agnle](float & x) { x = std::ceil(x * LSB_agnle);});
-  std::for_each(MLPinput.begin() + 12, MLPinput.begin() + 18, [LSB_agnle](float & x) { x = std::ceil(x * LSB_agnle); });
-  MLPinput[18] = necl;
+  std::sort(eclClusters.begin(), eclClusters.end(),
+            [](const std::tuple<float, float, float, float>& a,
+  const std::tuple<float, float, float, float>& b) {
+    return std::get<0>(a) > std::get<0>(b);
+  });
 
-//cout<<"input: ";
-//for(int i=0;i<19;i++){
-//cout<<MLPinput[i]<<" ";
-//}
-//cout<<endl;
+
+
+// MLPinput
+  for (size_t i = 0; i < std::min(eclClusters.size(), size_t(6)); i++) {
+    MLPinput[i]  = std::get<0>(eclClusters[i]); // E
+    MLPinput[6 + i]  = std::get<1>(eclClusters[i]); // Theta
+    MLPinput[12 + i] = std::get<2>(eclClusters[i]); // Phi
+    MLPinput[18 + i]  = std::get<3>(eclClusters[i]); // time
+  }
+
+
+
+  // //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  //Energy, theta and phi data are the quantized.
+  //Energy: LSB = ADC count (5.5MeV)
+  //theta : 0 ~ 180∘, LSB = 1.6025∘
+  //phi : 0 ~ 360∘, LSB = 1.6025∘
+  float LSB_ADC   = 1 / 5.5;
+  float LSB_agnle = 1 / 1.6025;
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  std::for_each(MLPinput.begin() + 0, MLPinput.begin() + 6, [LSB_ADC](float & x) { x = std::ceil(x * LSB_ADC); });
+  std::for_each(MLPinput.begin() + 6,  MLPinput.begin() + 12,  [LSB_agnle](float & x) { x = std::ceil(x * LSB_agnle);});
+  std::for_each(MLPinput.begin() + 12,  MLPinput.begin() + 18, [LSB_agnle](float & x) { x = std::ceil(x * LSB_agnle); });
+
+//new add
+//  float LSB_time = 1.0f;
+//  std::for_each(MLPinput.begin() + 18, MLPinput.begin() + 24, [](float &x) {
+//      x = std::ceil(x);
+//      x = std::min(x, 255.0f);
+//     x = std::max(x, 0.0f);
+//  });
+
+
   float target = m_GRLNeuro.runMLP(0, MLPinput);
-//cout<<"output: "<<target<<endl;
   if (m_saveHist) {
     h_target[0]->Fill(target);
   }

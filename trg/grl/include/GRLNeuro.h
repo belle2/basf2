@@ -71,8 +71,6 @@ namespace Belle2 {
 
     /** Set parameters and get some network independent parameters. */
     void initialize(const Parameters& p);
-    /** Set parameters and get some network independent parameters. */
-    //void initialize(const std::vector<float>& nodes);
 
     /** return reference to a neural network */
     GRLMLP& operator[](unsigned index) { return m_MLPs[index]; }
@@ -81,14 +79,6 @@ namespace Belle2 {
     /** return number of neural networks */
     unsigned nSectors() const { return m_MLPs.size(); }
 
-    /** ReLu activation function*/
-    float relu(float x);
-
-    /** change the precision of number, m = number of integer bits, n = number of decimal**/
-    float float_to_fixed(float num, int m, int n);
-
-    /** discrete sigmoid activation function (1024 bins) **/
-    float mysigmiod(float num);
     /** Save MLPs to file.
      * @param filename name of the TFile to write to
      * @param arrayname name of the TObjArray holding the MLPs in the file

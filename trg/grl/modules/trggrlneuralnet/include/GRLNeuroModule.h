@@ -13,6 +13,8 @@
 #include <trg/grl/GRLNeuro.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <trg/grl/dataobjects/GRLMLPData.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <TH1D.h>
 
@@ -70,7 +72,7 @@ namespace Belle2 {
     int trainMode;
     /** Name of the StoreArray containing the ECL clusters. */
     std::string m_TrgECLClusterName;
-    /** Number of nodes in all layers. */
+    /** Number of nodes in all laysers. */
     std::vector<float> m_nNodes;
     /** cut on MVA to separate signal */
     std::vector<float> m_nn_thres;
@@ -84,11 +86,15 @@ namespace Belle2 {
     /** TCID of a given TRGcluster */
     std::vector<int> TCThetaID;
     /** Azimuth angle  of a given TRGcluster */
-    std::vector<float> TCPhiCOM;
-    /** Polar angle  of a given TRGcluster */
-    std::vector<float> TCThetaCOM;
+    ///////////////////////////////////////////////////////////////////////////
+    std::vector<double> TCThetaLab;
+    std::vector<double> TCPhiLab;
+//////////////////////////////////////////////////////////////////////
     /** Histograms to save the NN classifiers */
     std::vector<TH1D*> h_target;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
 
   };
 }

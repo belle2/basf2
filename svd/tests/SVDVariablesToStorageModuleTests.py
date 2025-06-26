@@ -12,7 +12,7 @@ import unittest
 import tempfile
 import b2test_utils
 import modularAnalysis as ma
-from basf2 import create_path, find_file
+from basf2 import create_path
 from ROOT import TFile
 
 
@@ -26,7 +26,7 @@ class SVDVariablesToStorageModuleTests(unittest.TestCase):
 
         main = create_path()
 
-        input_file = find_file('svd/tests/SVDVariablesToStorage_test_data.root')
+        input_file = b2test_utils.require_file('SVDClusters.root', 'validation')
         ma.inputMdst(input_file, path=main)
 
         ma.fillParticleList("pi+:all", "", path=main)

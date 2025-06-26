@@ -21,7 +21,8 @@ import conditions_db as cdb
 
 if __name__ == '__main__':
 
-    b2tu.skip_test('Test currently disabled due to CDB troubles')
+    if b2tu.is_cdb_down():
+        b2tu.skip_test('Test currently disabled due to CDB troubles')
 
     tags = ['main_tag_merge_test_1', 'main_tag_merge_test_2', 'main_tag_merge_test_3']
     final_tag = 'main_tag_merge_test_0'

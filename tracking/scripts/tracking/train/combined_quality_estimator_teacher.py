@@ -897,7 +897,7 @@ class CDCQEDataCollectionTask(Basf2PathTask):
             filter_choice = "recording"
             # tracking.add_hit_preparation_modules(path)  # only needed for SVD and
             # PXD hit preparation. Does not change the CDC output.
-        tracking.add_cdc_track_finding(path, with_ca=False, add_mva_quality_indicator=True)
+        tracking.add_cdc_track_finding(path, with_cdc_cellular_automaton=False, add_mva_quality_indicator=True)
 
         basf2.set_module_parameters(
             path,

@@ -362,7 +362,8 @@ void TRGECLDQMModule::event()
   }
   TrgEclDataBase _database;
 
-  const double m_3DBhabhaThreshold[2] = {30, 45}; //  /10 MeV
+  std::vector<double> _3DBhabhaThreshold;
+  _3DBhabhaThreshold = {30, 45}; //  /10 MeV
 
 
   bool BtoBFlag = false;
@@ -384,10 +385,10 @@ void TRGECLDQMModule::event()
   int thetaSum = theta1 + theta2;
   if (dphi > 160 && thetaSum > 165 && thetaSum < 190) {BtoBFlag = true;}
 
-  if ((maxClusterEnergy[0] > m_3DBhabhaThreshold[0] * energy1 * 10 &&
-       maxClusterEnergy[1] > m_3DBhabhaThreshold[0] * energy2 * 10) &&
-      (maxClusterEnergy[0] > m_3DBhabhaThreshold[1] * energy1 * 10 ||
-       maxClusterEnergy[1] > m_3DBhabhaThreshold[1] * energy2 * 10)) {
+  if ((maxClusterEnergy[0] > _3DBhabhaThreshold[0] * energy1 * 10 &&
+       maxClusterEnergy[1] > _3DBhabhaThreshold[0] * energy2 * 10) &&
+      (maxClusterEnergy[0] > _3DBhabhaThreshold[1] * energy1 * 10 ||
+       maxClusterEnergy[1] > _3DBhabhaThreshold[1] * energy2 * 10)) {
     if (BtoBFlag) {BhabhaFlag = true;}
   }
 
@@ -400,7 +401,7 @@ void TRGECLDQMModule::event()
   const int NofTCHit = m_TCId.size();
 
   int nTCHitPerClk_total[8] = {0};
-  int nTCHitPerClk_part[3][8] = {{0}};
+  int nTCHitPerClk_part[3][8] = {0};
   double totalEnergy = 0;
   TrgEclMapping* a = new TrgEclMapping();
   double max = 0;
@@ -458,8 +459,7 @@ void TRGECLDQMModule::event()
 
   bool cond_clean, cond_injHER, cond_injLER;
 
-  cond_clean = !((1.2 < running_in_us && running_in_us < 1.6) || (2.2 < running_in_us && running_in_us < 2.4)) && (500 < diff
-               && diff < 15000);
+  cond_clean = (6 < running_in_us && running_in_us < 8) && (50 < diff && diff < 70);
 
   cond_injHER =  isHER && ((diff < 0.5) || ((diff < 20) && (2 < running_in_us && running_in_us < 3)));
   cond_injLER = !isHER && ((diff < 0.5) || ((diff < 20) && (1 < running_in_us && running_in_us < 2)));

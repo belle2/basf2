@@ -35,12 +35,12 @@ namespace Belle2 {
     /** Copy constructor, deleted. */
     TrgEclCluster(TrgEclCluster&) = delete;
 
-    /** Assignement operator, deleted. */
+    /** Assignment operator, deleted. */
     TrgEclCluster& operator=(TrgEclCluster&) = delete;
 
   public:
 
-    //! initalization
+    //! initialization
     void initialize(void);
     /** set ICN for each part(Fw,Br,Bw) */
     void setICN(const std::vector<int>&);
@@ -53,13 +53,13 @@ namespace Belle2 {
     /** calculate 3x3 TC hit map for ICN in Barrel */
     void setBarrelICNsub(int, std::vector<int>,
                          int&, int&, int&, int&, int&, int&, int&, int&);
-    /**  calculate Belle2 Cluster in Foward endcap */
+    /**  calculate Belle2 Cluster in Forward endcap */
     void setForwardICN(int);
     /** calculate Belle 2 Cluster in Backward endcap */
     void setBackwardICN(int);
     /**  calculate Belle ICN in Barrel */
     int setBarrelICN();
-    /**  calculate Belle  ICN in Foward endcap */
+    /**  calculate Belle  ICN in Forward endcap */
     int setForwardICN();
     /** calculate Belle ICN in Backward endcap */
     int setBackwardICN();
@@ -122,7 +122,7 @@ namespace Belle2 {
     int m_Method;
     /** the Limit Number of Cluster */
     int m_LimitNCluster;
-    /** Position calculation method(0:Most energetic TC Postion,  1 : Energy weighted Postion) */
+    /** Position calculation method(0:Most energetic TC Position,  1 : Energy weighted Position) */
     int m_Position;
 
 
@@ -135,7 +135,7 @@ namespace Belle2 {
     /** TC energy  */
     std::vector<double> m_Energy;
 
-    /** Quadrant for Beam Backgournd veto */
+    /** Quadrant for Beam Background veto */
     std::vector<std::vector<int>> m_Quadrant;
 
     /**  cluster in barrel */

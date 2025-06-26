@@ -48,7 +48,7 @@ namespace Belle2 {
       m_famana(0),
       m_SetTCEThreshold(100.0),
       m_FADC(1),
-      m_ConditionDB(false),
+      m_ConditionDB(0),
       m_SourceOfTC(3)
   {
 
@@ -74,7 +74,7 @@ namespace Belle2 {
              "Select source of TC data(1:=ECLHit or 2:=ECLSimHit or 3:=ECLHit+TRGECLBGTCHit)",
              m_SourceOfTC);
 
-    if (m_ConditionDB) { //Use global tag
+    if (m_ConditionDB == 1) { //Use global tag
       m_FAMPara.addCallback(this, &TRGECLFAMModule::beginRun);
     }
     B2DEBUG(100, "TRGECLFAMModule ... created");
@@ -113,9 +113,6 @@ namespace Belle2 {
     m_TRGECLWaveform.registerInDataStore();
     m_TRGECLHit.registerInDataStore();
     m_TRGECLFAMAna.registerInDataStore();
-    // This object is registered by few packages. Let's be agnostic about the
-    // execution order of the modules: the first package run registers the module
-    m_eventLevelClusteringInfo.isOptional() ? m_eventLevelClusteringInfo.isRequired() :
     m_eventLevelClusteringInfo.registerInDataStore();
 
     //    m_FAMPara = new DBObjPtr<TRGECLFAMPara>;
@@ -126,9 +123,9 @@ namespace Belle2 {
   void
   TRGECLFAMModule::beginRun()
   {
-    if (!m_ConditionDB) {
+    if (m_ConditionDB == 0) {
       m_TCEThreshold.resize(576, m_SetTCEThreshold);
-    } else { //Use global tag
+    } else if (m_ConditionDB == 1) { //Use global tag
       m_TCEThreshold.resize(576, 0);
       for (const auto& para : m_FAMPara) {
         m_TCEThreshold[para.getTCId() - 1] = (int)((para.getThreshold()) * (para.getConversionFactor()));
@@ -167,7 +164,7 @@ namespace Belle2 {
       // no-fit method = backup method 1
       obj_trgeclDigi->digitization01(m_TCDigiE, m_TCDigiT);
     } else if (m_famMethod == 3) {
-      // orignal method = backup method 2
+      // original method = backup method 2
       obj_trgeclDigi->digitization02(m_TCDigiE, m_TCDigiT);
     }
     obj_trgeclDigi->save(m_nEvent);
@@ -182,7 +179,7 @@ namespace Belle2 {
 
     if (m_famMethod == 1) { obj_trgeclfit->FAMFit01(m_TCDigiE, m_TCDigiT); }      // fitting method
     else if (m_famMethod == 2) { obj_trgeclfit->FAMFit02(m_TCDigiE, m_TCDigiT); } // no-fit method = backup method 1
-    else if (m_famMethod == 3) { obj_trgeclfit->FAMFit03(m_TCDigiE, m_TCDigiT); } // orignal method = backup method 2
+    else if (m_famMethod == 3) { obj_trgeclfit->FAMFit03(m_TCDigiE, m_TCDigiT); } // original method = backup method 2
     obj_trgeclfit-> save(m_nEvent);
 
     // Count number of trigger cells in each ECL region for EventLevelClusteringInfo

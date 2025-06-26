@@ -39,9 +39,9 @@ namespace Belle2 {
     double getCMEnergy(int);
     /** TC CM Phi  */
     int get3DBhabhaLUT(int);
-    //! Make Fitter Coefficients from Signal PDF and Noise covariance metrix
+    //! Make Fitter Coefficients from Signal PDF and Noise covariance matrix
     void MakeFitterCoefficient(const std::vector<int>&, std::vector<int>);
-    //! Util to interpalate Signal Shape
+    //! Util to interpolate Signal Shape
     double interFADC(double, std::vector<int>);
 
   private:

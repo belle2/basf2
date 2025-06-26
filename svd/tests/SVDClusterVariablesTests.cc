@@ -9,7 +9,6 @@
 #include <variant>
 
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/Track.h>
@@ -23,13 +22,10 @@
 #include <svd/variables/SVDClusterVariables.h>
 
 using namespace Belle2;
-using ::testing::Return;
-using ::testing::ReturnRef;
-using ::testing::_;
 
 namespace {
 
-  const Belle2::VxdID defaultVxdID = Belle2::VxdID("1.1.1");
+  const Belle2::VxdID defaultVxdID = Belle2::VxdID("3.2.1");
   const bool defaultIsU = true;
   const double defaultPosition = 1.0;
   const double defaultPositionErr = 0.01;
@@ -54,8 +50,10 @@ namespace {
 
 namespace Belle2::SVD {
 
+  /** Text fixture for SVD variables. */
   class SVDVariableTest : public ::testing::Test {
   public:
+    /** Set up test environment */
     void SetUp() override
     {
       std::string storeArrayNameOfParticles = "Particles";
@@ -106,59 +104,67 @@ namespace Belle2::SVD {
       m_recoTracks[0]->addSVDHit(m_svdClusters[0], 0);
     }
 
-    StoreArray<Particle> m_particles;
-    StoreArray<Track> m_tracks;
-    StoreArray<RecoTrack> m_recoTracks;
-    StoreArray<SVDCluster> m_svdClusters;
-    StoreArray<TrackFitResult> m_trackFitResults;
-    StoreArray<RecoHitInformation> m_recoHitInformations;
+    StoreArray<Particle> m_particles; /**< StoreArray for Particle objects */
+    StoreArray<Track> m_tracks; /**< StoreArray for Track objects */
+    StoreArray<RecoTrack> m_recoTracks; /**< StoreArray for RecoTrack objects */
+    StoreArray<SVDCluster> m_svdClusters; /**< StoreArray for SVDCluster objects */
+    StoreArray<TrackFitResult> m_trackFitResults; /**< StoreArray for TrackFitResult objects */
+    StoreArray<RecoHitInformation> m_recoHitInformations; /**< StoreArray for RecoHitInformation objects */
   };
 
-  struct SVDVariableParam {
-    std::function<Belle2::Variable::Manager::FunctionPtr(const std::vector<std::string>&)> variableFunction;
-    std::variant<double, int, bool> expectedValue;
-    std::string testName;
-  };
-
-  class SVDParameterizedVariableTest : public SVDVariableTest,
-    public ::testing::WithParamInterface<SVDVariableParam> {
-  };
-
-  TEST_P(SVDParameterizedVariableTest, CheckDefaultValues)
+  /** Test SVDClusterCharge */
+  TEST_F(SVDVariableTest, SVDClusterCharge)
   {
-    const auto& param = GetParam();
-
-    auto varFunc = param.variableFunction({"0"});
-    auto resultVariant = varFunc(m_particles[0]);
-
-    std::visit([&resultVariant](auto&& expected) {
-      using T = std::decay_t<decltype(expected)>;
-      try {
-        const T& actual = std::get<T>(resultVariant);
-        if constexpr(std::is_same_v<T, double>) {
-          EXPECT_DOUBLE_EQ(actual, expected);
-        } else {
-          EXPECT_EQ(actual, expected);
-        }
-      } catch (const std::bad_variant_access& ex) {
-        FAIL() << "Mismatched variant types in test. Expected " << typeid(T).name()
-               << " but got another type from the variable function.";
-      }
-    }, param.expectedValue);
+    EXPECT_DOUBLE_EQ(Variable::SVDClusterCharge(m_particles[0], {0}), defaultClsCharge);
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterCharge(nullptr,        {0})));
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterCharge(m_particles[0], {1})));
   }
 
-  INSTANTIATE_TEST_SUITE_P(
-    SVDVariableTests,
-    SVDParameterizedVariableTest,
-    ::testing::Values(
-      SVDVariableParam{Belle2::Variable::SVDClusterCharge, defaultClsCharge, "SVDClusterCharge"},
-      SVDVariableParam{Belle2::Variable::SVDClusterSNR, defaultClsSNR, "SVDClusterSNR"},
-      SVDVariableParam{Belle2::Variable::SVDClusterSize, defaultClsSize, "SVDClusterSize"},
-      SVDVariableParam{Belle2::Variable::SVDClusterTime, defaultClsTime, "SVDClusterTime"}
-    ),
-    [](const ::testing::TestParamInfo<SVDVariableParam>& paramInfo)
+  /** Test SVDClusterSNR */
+  TEST_F(SVDVariableTest, SVDClusterSNR)
   {
-    return paramInfo.param.testName;
+    EXPECT_DOUBLE_EQ(Variable::SVDClusterSNR(m_particles[0], {0}), defaultClsSNR);
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterSNR(nullptr,        {0})));
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterSNR(m_particles[0], {1})));
   }
-  );
+
+  /** Test SVDClusterTime */
+  TEST_F(SVDVariableTest, SVDClusterTime)
+  {
+    EXPECT_DOUBLE_EQ(Variable::SVDClusterTime(m_particles[0], {0}), defaultClsTime);
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterTime(nullptr,        {0})));
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterTime(m_particles[0], {1})));
+  }
+
+  /** Test SVDClusterSize */
+  TEST_F(SVDVariableTest, SVDClusterSize)
+  {
+    EXPECT_EQ(Variable::SVDClusterSize(m_particles[0], {0}), defaultClsSize);
+    EXPECT_EQ(Variable::SVDClusterSize(nullptr,        {0}), -1);
+    EXPECT_EQ(Variable::SVDClusterSize(m_particles[0], {1}), -1);
+  }
+
+  /** SVDLayer */
+  TEST_F(SVDVariableTest, SVDLayer)
+  {
+    EXPECT_EQ(Variable::SVDLayer(m_particles[0], {0}), defaultVxdID.getLayerNumber());
+    EXPECT_EQ(Variable::SVDLayer(nullptr,        {0}), -1);
+    EXPECT_EQ(Variable::SVDLayer(m_particles[0], {1}), -1);
+  }
+
+  /** Test SVDLadder */
+  TEST_F(SVDVariableTest, SVDLadder)
+  {
+    EXPECT_EQ(Variable::SVDLadder(m_particles[0], {0}), defaultVxdID.getLadderNumber());
+    EXPECT_EQ(Variable::SVDLadder(nullptr,        {0}), -1);
+    EXPECT_EQ(Variable::SVDLadder(m_particles[0], {1}), -1);
+  }
+
+  /** Test SVDSensor */
+  TEST_F(SVDVariableTest, SVDSensor)
+  {
+    EXPECT_EQ(Variable::SVDSensor(m_particles[0], {0}), defaultVxdID.getSensorNumber());
+    EXPECT_EQ(Variable::SVDSensor(nullptr,        {0}), -1);
+    EXPECT_EQ(Variable::SVDSensor(m_particles[0], {1}), -1);
+  }
 } // namespace Belle2::SVD

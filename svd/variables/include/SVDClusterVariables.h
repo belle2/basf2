@@ -13,16 +13,16 @@
 #include <vector>
 
 namespace Belle2::Variable {
-  Manager::FunctionPtr SVDClusterCharge(const std::vector<std::string>& arguments);
-  Manager::FunctionPtr SVDClusterSNR(const std::vector<std::string>& arguments);
-  Manager::FunctionPtr SVDClusterSize(const std::vector<std::string>& arguments);
-  Manager::FunctionPtr SVDClusterTime(const std::vector<std::string>& arguments);
-  Manager::FunctionPtr SVDTrackPrime(const std::vector<std::string>& arguments);
-  Manager::FunctionPtr SVDTrackPositionErrorUnbiased(const std::vector<std::string>& arguments);
-  Manager::FunctionPtr SVDTruePosition(const std::vector<std::string>& arguments);
-  Manager::FunctionPtr SVDResidual(const std::vector<std::string>& arguments);
-  Manager::FunctionPtr SVDLayer(const std::vector<std::string>& arguments);
-  Manager::FunctionPtr SVDLadder(const std::vector<std::string>& arguments);
-  Manager::FunctionPtr SVDSensor(const std::vector<std::string>& arguments);
-  Manager::FunctionPtr SVDSide(const std::vector<std::string>& arguments);
+  double SVDClusterCharge(const Particle*, const std::vector<double>& indices);
+  double SVDClusterSNR(const Particle*, const std::vector<double>& indices);
+  int SVDClusterSize(const Particle*, const std::vector<double>& indices);
+  double SVDClusterTime(const Particle*, const std::vector<double>& indices);
+  double SVDTrackPrime(const Particle*, const std::vector<double>& indices);
+  double SVDTrackPositionErrorUnbiased(const Particle*, const std::vector<double>& indices);
+  double SVDTruePosition(const Particle*, const std::vector<double>& indices);
+  double SVDResidual(const Particle*, const std::vector<double>& indices);
+  int SVDLayer(const Particle*, const std::vector<double>& indices);
+  int SVDLadder(const Particle*, const std::vector<double>& indices);
+  int SVDSensor(const Particle*, const std::vector<double>& indices);
+  bool SVDSide(const Particle*, const std::vector<double>& indices);
 }

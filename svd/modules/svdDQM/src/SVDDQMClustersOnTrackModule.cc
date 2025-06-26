@@ -90,8 +90,6 @@ void SVDDQMClustersOnTrackModule::defineHisto()
       m_3Samples = m_svdPlotsConfig->isPlotsFor3SampleMonitoring();
       m_listOfSensorsToMonitor = m_svdPlotsConfig->getListOfSensors();
       m_skipRejectedEvents = m_svdPlotsConfig->isSkipHLTRejectedEvents();
-      printf("3sample %d\n", m_3Samples);
-      printf("skipRejectedEvents %d\n", m_skipRejectedEvents);
     }
   }
 

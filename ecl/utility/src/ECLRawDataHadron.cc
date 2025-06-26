@@ -217,7 +217,7 @@ namespace Belle2::ECL::RawDataHadron {
       fprintf(stderr, "\033[0m\n");
       return 0; // exit(1);
     }
-    if (divisor >= (1 << 19) || divisor < 0) {
+    if (divisor >= (1 << 19)) {
       fprintf(stderr, "\n\033[31m");
       fprintf(stderr, "%s:%d: Error! Divisor outside of expected range: %d\n", __FILE__, __LINE__, divisor);
       fprintf(stderr, "\033[0m\n");
@@ -268,7 +268,7 @@ namespace Belle2::ECL::RawDataHadron {
     int m_S = divisor  >> p;
 
     // The values of round((2^16) / m_S), where m_S is in 32..63 range
-    int precalculated_constants[] = {
+    const int precalculated_constants[] = {
       // round(2**16 / (x+0.5)) for x in range(32, 64)
       // ===>
       2016, 1956, 1900, 1846, 1796, 1748, 1702, 1659,

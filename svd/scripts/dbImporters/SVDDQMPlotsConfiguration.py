@@ -67,16 +67,12 @@ if __name__ == "__main__":
     print("3Samples:", param["3Samples"])
 
     if (param["3Samples"] == 1):
-        payload.enable3Sample()
-    else:
-        payload.disable3Sample()
+        payload.enablePlotsFor3SampleMonitoring()
 
     print("skipHLTRejectedEvents:", param["skipHLTRejectedEvents"])
 
     if (param["skipHLTRejectedEvents"] == 1):
-        payload.enableSkippedRejectedEvents()
-    else:
-        payload.disableSkippedRejectedEvents()
+        payload.enableSkipHLTRejectedEvents()
 
     # write out the payload to localdb directory
     Belle2.Database.Instance().storeData(Belle2.SVDDQMPlotsConfiguration.name, payload, iov)

@@ -79,13 +79,16 @@ void SVDUnpackerDQMModule::defineHisto()
   const unsigned short Bins_BadHeader = 1;
   const unsigned short Bins_MissedTrailer = 1;
   const unsigned short Bins_MissedHeader = 1;
+  const unsigned short Bins_SEURecoData = 1;
 
 
-  const unsigned short nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
-                               Bins_BadMapping + Bins_BadHeader + Bins_MissedTrailer + Bins_MissedHeader;
+  const unsigned short nBins = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
+                               Bins_BadMapping + Bins_BadHeader + Bins_MissedTrailer + Bins_MissedHeader + Bins_SEURecoData;
 
-  m_DQMUnpackerHisto = new TH2F("DQMUnpackerHisto", "SVD Data Format Monitor", nBits, 1, nBits + 1, 52, 1, 53);
+  m_DQMUnpackerHisto = new TH2F("DQMUnpackerHisto", "SVD Data Format Monitor", nBins, 1, nBins + 1, 52, 1, 53);
   m_DQMEventFractionHisto = new TH1F("DQMEventFractionHisto", "SVD Error Fraction Event Counter", 2, 0, 2);
+  m_DQMseuEventFractionHisto = new TH1F("DQMseuEventFractionHisto", "SVD SEU Fraction Event Counter", 2, 0, 2);
+  m_DQMseuFADCFractionHisto = new TH1F("DQMseuFADCFractionHisto", "SVD with SEU Fraction Counter", 52, 1, 53);
   m_DQMnSamplesHisto = new TH2F("DQMnSamplesHisto", "nAPVsamples VS DAQMode", 3, 1, 4, 2, 1, 3);
   m_DQMnSamplesHisto2 = new TH2F("DQMnSamplesHisto2", "nAPVsamples VS DAQMode", 2, 1, 3, 2, 1, 3);
   m_DQMtrgQuality = new TH2F("DQMtrgQuality", "nAPVsamples VS trgQuality", 4, 1, 5, 2, 1, 3);
@@ -95,7 +98,15 @@ void SVDUnpackerDQMModule::defineHisto()
 
   m_DQMEventFractionHisto->GetYaxis()->SetTitle("# of Events");
   m_DQMEventFractionHisto->GetYaxis()->SetTitleOffset(1.5);
-  m_DQMEventFractionHisto->SetMinimum(0);
+  m_DQMEventFractionHisto->SetMinimum(0.7);
+
+  m_DQMseuEventFractionHisto->GetYaxis()->SetTitle("# of Events");
+  m_DQMseuEventFractionHisto->GetYaxis()->SetTitleOffset(1.5);
+  m_DQMseuEventFractionHisto->SetMinimum(0.7);
+
+  m_DQMseuFADCFractionHisto->GetYaxis()->SetTitle("# of Events");
+  m_DQMseuFADCFractionHisto->GetYaxis()->SetTitleOffset(1.5);
+  m_DQMseuFADCFractionHisto->SetMinimum(0.7);
 
   m_DQMnSamplesHisto->GetXaxis()->SetTitle("DAQ Mode");
   m_DQMnSamplesHisto->GetYaxis()->SetTitle("number of APV samples");
@@ -106,7 +117,7 @@ void SVDUnpackerDQMModule::defineHisto()
   m_DQMtrgQuality->GetXaxis()->SetTitle("TRG Quality");
   m_DQMtrgQuality->GetYaxis()->SetTitle("number of APV samples");
 
-  TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV", "EVTmatch", "missHead", "missTrail", "badMapping"};
+  TString Xlabels[nBins] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "errSYNC", "EVTmatch", "missHead", "missTrail", "badMapping", "SEURecovery"};
 
   TString Ysamples[2] = {"3", "6"};
   TString Xsamples[3] = {"3 samples", "6 samples", "3/6 mixed"};
@@ -114,7 +125,7 @@ void SVDUnpackerDQMModule::defineHisto()
   TString Xquality[4] = {"coarse", "fine", "super fine", "no TRGSummary"};
 
   //preparing X axis of the DQMUnpacker histograms
-  for (unsigned short i = 0; i < nBits; i++) m_DQMUnpackerHisto->GetXaxis()->SetBinLabel(i + 1, Xlabels[i].Data());
+  for (unsigned short i = 0; i < nBins; i++) m_DQMUnpackerHisto->GetXaxis()->SetBinLabel(i + 1, Xlabels[i].Data());
 
   //preparing X and Y axis of the DQMnSamples histograms
   for (unsigned short i = 0; i < 3; i++) m_DQMnSamplesHisto->GetXaxis()->SetBinLabel(i + 1, Xsamples[i].Data());
@@ -130,6 +141,10 @@ void SVDUnpackerDQMModule::defineHisto()
   m_DQMEventFractionHisto->GetXaxis()->SetBinLabel(1, "OK");
   m_DQMEventFractionHisto->GetXaxis()->SetBinLabel(2, "Error(s)");
 
+  m_DQMseuEventFractionHisto->GetXaxis()->SetBinLabel(1, "OK");
+  m_DQMseuEventFractionHisto->GetXaxis()->SetBinLabel(2, "SEU Recovery");
+
+  m_DQMseuFADCFractionHisto->GetXaxis()->SetTitle("number of FADCs with SEU recovery dummy data");
 
   oldDir->cd();
 }
@@ -172,6 +187,25 @@ void SVDUnpackerDQMModule::beginRun()
     TString title = tmp(0, pos - 2);
     m_DQMEventFractionHisto->SetTitle(title + runID);
     m_DQMEventFractionHisto->Reset();
+  }
+
+
+  if (m_DQMseuEventFractionHisto != nullptr) {
+    TString tmp = m_DQMseuEventFractionHisto->GetTitle();
+    Int_t pos = tmp.Last('~');
+    if (pos == -1) pos = tmp.Length() + 2;
+    TString title = tmp(0, pos - 2);
+    m_DQMseuEventFractionHisto->SetTitle(title + runID);
+    m_DQMseuEventFractionHisto->Reset();
+  }
+
+  if (m_DQMseuFADCFractionHisto != nullptr) {
+    TString tmp = m_DQMseuFADCFractionHisto->GetTitle();
+    Int_t pos = tmp.Last('~');
+    if (pos == -1) pos = tmp.Length() + 2;
+    TString title = tmp(0, pos - 2);
+    m_DQMseuFADCFractionHisto->SetTitle(title + runID);
+    m_DQMseuFADCFractionHisto->Reset();
   }
 
   if (m_DQMnSamplesHisto != nullptr) {
@@ -241,8 +275,10 @@ void SVDUnpackerDQMModule::event()
     return;
   }
 
-
   m_badEvent = 0;
+  m_seuEvent = 0;
+  m_seuFADCs.clear();
+
   m_nEvents++;
 
   // filling nSamplesHisto
@@ -279,6 +315,7 @@ void SVDUnpackerDQMModule::event()
     m_badTrailer = m_svdDAQDiagnostics[i]->getBadTrailer();
     m_missedHeader = m_svdDAQDiagnostics[i]->getMissedHeader();
     m_missedTrailer = m_svdDAQDiagnostics[i]->getMissedTrailer();
+    m_seuRecoData = m_svdDAQDiagnostics[i]->getSEURecoData();
 
     m_fadcNo = m_svdDAQDiagnostics[i]->getFADCNumber();
     //apvNo = m_svdDAQDiagnostics[i]->getAPVNumber();
@@ -335,18 +372,24 @@ void SVDUnpackerDQMModule::event()
       }
 
       if (m_apvError != 0) {
-        if (m_apvError & 1) m_DQMUnpackerHisto->Fill(10, ybin->second);
-        if (m_apvError & 2) m_DQMUnpackerHisto->Fill(11, ybin->second);
-        if (m_apvError & 4) m_DQMUnpackerHisto->Fill(12, ybin->second);
-        if (m_apvError & 8) m_DQMUnpackerHisto->Fill(13, ybin->second);
+        if (m_apvError & 8) m_DQMUnpackerHisto->Fill(10, ybin->second);
+        if (m_apvError & 4) m_DQMUnpackerHisto->Fill(11, ybin->second);
+        if (m_apvError & 2) m_DQMUnpackerHisto->Fill(12, ybin->second);
+        if (m_apvError & 1) m_DQMUnpackerHisto->Fill(13, ybin->second);
       }
 
       if (!m_apvMatch) m_DQMUnpackerHisto->Fill(14, ybin->second);
       if (!m_fadcMatch) m_DQMUnpackerHisto->Fill(15, ybin->second);
       if (m_upsetAPV) m_DQMUnpackerHisto->Fill(16, ybin->second);
+      if (m_seuRecoData) {
+        m_DQMUnpackerHisto->Fill(21, ybin->second);
+        m_seuEvent = 1;
+        m_seuFADCs.insert(ybin->first);
+      }
 
     }
   } //end Diagnostics loop
+
 
   if (m_changeFADCaxis) {
     for (auto& iFADC : m_fadc_map)  m_DQMUnpackerHisto->GetYaxis()->SetBinLabel(iFADC.second, to_string(iFADC.first).c_str());
@@ -360,6 +403,17 @@ void SVDUnpackerDQMModule::event()
     m_DQMEventFractionHisto->Fill(m_badEvent);
   }
 
+  if (m_DQMseuEventFractionHisto != nullptr) {
+    TString histoSEUFractionTitle = TString::Format("SVD SEU events,  Exp %d Run %d", m_expNumber, m_runNumber);
+    m_DQMseuEventFractionHisto->SetTitle(histoSEUFractionTitle.Data());
+    m_DQMseuEventFractionHisto->Fill(m_seuEvent);
+  }
+
+  if (m_DQMseuFADCFractionHisto != nullptr) {
+    TString histoSEUFADCFractionTitle = TString::Format("SVD FADC fraction with SEU,  Exp %d Run %d", m_expNumber, m_runNumber);
+    m_DQMseuFADCFractionHisto->SetTitle(histoSEUFADCFractionTitle.Data());
+    if (m_seuFADCs.size() > 0) m_DQMseuFADCFractionHisto->Fill(m_seuFADCs.size());
+  }
 } // end event function
 
 

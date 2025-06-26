@@ -1187,10 +1187,12 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   TF1* MomentumFunctionDeuteron = (TF1*) BetaGammaFunctionProton->Clone("MomentumFunctionDeuteron");
   MomentumFunctionDeuteron->SetParameter(2, m_DeuteronPDGMass);
   MomentumFunctionDeuteron->SetRange(0.01, 5.5);
+  MomentumFunctionDeuteron->SetLineColor(kRed);
 
   TF1* MomentumFunctionMuon = (TF1*) BetaGammaFunctionPion->Clone("MomentumFunctionMuon");
   MomentumFunctionMuon->SetParameter(2, m_MuonPDGMass);
   MomentumFunctionMuon->SetRange(0.01, 5.5);
+  MomentumFunctionMuon->SetLineColor(kRed);
 
 // overlay all fits in one plot
 
@@ -1208,7 +1210,6 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   MomentumFunctionPion->Draw("SAME");
   MomentumFunctionKaon->Draw("SAME");
   MomentumFunctionProton->Draw("SAME");
-  MomentumFunctionDeuteron->SetLineColor(kRed);
   MomentumFunctionDeuteron->Draw("SAME");
   OverlayAllTracksCanvas->SetLogx();
   OverlayAllTracksCanvas->SetLogz();

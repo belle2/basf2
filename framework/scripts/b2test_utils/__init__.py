@@ -412,3 +412,17 @@ def is_ci() -> bool:
         "y",
         "on",
     ]
+
+
+def is_cdb_down() -> bool:
+    """
+    Returns true if the Conditions Database (CDB) is currently unavailable or slow to respond.
+    The 'BELLE2_IS_CDB_DOWN' environment variable can be used to dynamically exclude some
+    tests that rely on the CDB in case of problems.
+    """
+    return os.environ.get("BELLE2_IS_CDB_DOWN", "no").lower() in [
+        "yes",
+        "1",
+        "y",
+        "on",
+    ]

@@ -114,6 +114,7 @@ void SVDUnpackerModule::beginRun()
   nTriggerMatchErrors = -1;
   nEventMatchErrors = -1;
   nUpsetAPVsErrors = -1;
+  nSEURecoveryCase = -1;
   nErrorFieldErrors = -1;
   nMissingAPVsErrors = -1;
   nFADCMatchErrors = -1;
@@ -379,6 +380,17 @@ void SVDUnpackerModule::event()
             vDiagnostic_ptr.push_back(currentDAQDiagnostic);
 
             apvsByPipeline[pipAddr].insert(make_pair(fadc, apv));
+
+            // Let's check if the data frame does not come after APV header with piplAddr = 255 (special SEU recovery pseudo-data)
+            if (pipAddr == 255) {
+              data32_it++;
+              m_data32 = *data32_it;
+              if (m_data_A.check == 0) B2ERROR("The strip data frame is detected for the special SEU recovery mode. " << LogVar("pipline address",
+                                                 pipAddr) << "This is unexpected!");
+              data32_it--;
+              m_data32 = *data32_it;
+            }
+
           } //is APV Header
 
           if (m_data_A.check == 0) { // data
@@ -573,20 +585,56 @@ void SVDUnpackerModule::event()
     }
   }
 
+
+  // Check if we have special data for SEU recovery mode (pipAddr = 0xFF)
+  // If so, let's monitor affected FADC/APV's and the event range with seuRecMap
+  auto itPtr = apvsByPipeline.find(255);
+  if (itPtr != apvsByPipeline.end()) {
+    for (const auto& fadcApv : itPtr->second) {
+
+      auto seuRec = m_seuRecMap.find(make_pair(fadcApv.first, fadcApv.second));
+      if (seuRec != m_seuRecMap.end()) {
+        if (seuRec->second.first > eventNo)
+          seuRec->second.first = eventNo;
+        if (seuRec->second.second < eventNo)
+          seuRec->second.second = eventNo;
+      } else {
+        nSEURecoveryCase++;
+        m_seuRecMap.insert(make_pair(
+                             make_pair(fadcApv.first, fadcApv.second),
+                             make_pair(eventNo, eventNo)
+                           ));
+        if (!(nSEURecoveryCase % m_errorRate))
+          B2ERROR("Special Recovery Data (Dummy APV Header) found due to the detection of Single Event Upset (SEU)!!!" << LogVar("APV",
+                  int(fadcApv.second)) << LogVar("FADC", int(fadcApv.first)) << LogVar("Event number", eventNo));
+
+      }
+      for (auto& pp : m_storeDAQDiagnostics) {
+        if (pp.getFADCNumber() == fadcApv.first and pp.getAPVNumber() == fadcApv.second)
+          pp.setSEURecoData(true);
+      }
+    }
+  }
+
+
   // Detect upset APVs and report/treat
-  auto major_apv = max_element(apvsByPipeline.begin(), apvsByPipeline.end(),
-                               [](const decltype(apvsByPipeline)::value_type & p1,
-                                  const decltype(apvsByPipeline)::value_type & p2) -> bool
+  auto majorAPV = max_element(apvsByPipeline.begin(), apvsByPipeline.end(),
+                              [](const decltype(apvsByPipeline)::value_type & p1,
+                                 const decltype(apvsByPipeline)::value_type & p2) -> bool
   { return p1.second.size() < p2.second.size(); }
-                              );
+                             );
   // We set emuPipelineAddress fields in diagnostics to this.
   if (m_emulatePipelineAddress)
     for (auto& p : m_storeDAQDiagnostics)
-      p.setEmuPipelineAddress(major_apv->first);
+      p.setEmuPipelineAddress(majorAPV->first);
+
+  unsigned short apvsByPipelineSize = apvsByPipeline.size();
+  if (majorAPV->first == 255) apvsByPipelineSize = 1;
+
   // And report any upset apvs or update records
-  if (apvsByPipeline.size() > 1)
+  if (apvsByPipelineSize > 1)
     for (const auto& p : apvsByPipeline) {
-      if (p.first == major_apv->first) continue;
+      if (p.first == majorAPV->first or p.first == 255) continue;
       for (const auto& fadcApv : p.second) {
         // We have an upset APV. Look if it is a known one.
         auto upsetRec = m_upsetAPVs.find(make_pair(fadcApv.first, fadcApv.second));
@@ -603,14 +651,17 @@ void SVDUnpackerModule::event()
                                make_pair(fadcApv.first, fadcApv.second),
                                make_pair(eventNo, eventNo)
                              ));
-          for (auto& pp : m_storeDAQDiagnostics) {
 
-            if (pp.getFADCNumber() == fadcApv.first and pp.getAPVNumber() == fadcApv.second)
-              pp.setUpsetAPV(true);
-          }
           if (!(nUpsetAPVsErrors % m_errorRate)) B2ERROR("Upset APV detected!!!" << LogVar("APV", int(fadcApv.second)) << LogVar("FADC",
                                                            int(fadcApv.first)) << LogVar("Event number", eventNo));
         }
+
+        for (auto& pp : m_storeDAQDiagnostics) {
+
+          if (pp.getFADCNumber() == fadcApv.first and pp.getAPVNumber() == fadcApv.second)
+            pp.setUpsetAPV(true);
+        }
+
       }
     }
 
@@ -636,6 +687,7 @@ void SVDUnpackerModule::event()
 
 void SVDUnpackerModule::endRun()
 {
+
   // Summary report on missing APVs
   if (m_missingAPVs.size() > 0) {
     B2WARNING("SVDUnpacker summary 1: Missing APVs");
@@ -649,6 +701,14 @@ void SVDUnpackerModule::endRun()
       B2WARNING(LogVar("Upset APV", upst.first.second) << LogVar("FADC", upst.first.first) <<
                 LogVar("since event", upst.second.first) << LogVar("to event", upst.second.second));
   }
+
+  if (m_seuRecMap.size() > 0) {
+    B2WARNING("SVDUnpacker summary 2: Special SEU Recovery Data");
+    for (const auto& seu : m_seuRecMap)
+      B2WARNING(LogVar("SEU recovery data: APV", seu.first.second) << LogVar("FADC", seu.first.first) <<
+                LogVar("since event", seu.second.first) << LogVar("to event", seu.second.second));
+  }
+
 }
 
 

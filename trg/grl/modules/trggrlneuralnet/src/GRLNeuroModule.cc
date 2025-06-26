@@ -204,11 +204,11 @@ GRLNeuroModule::event()
   //theta : 0 ~ 180∘, LSB = 1.6025∘
   //phi : 0 ~ 360∘, LSB = 1.6025∘
   float LSB_ADC   = 1 / 5.5;
-  float LSB_agnle = 1 / 1.6025;
+  float LSB_angle = 1 / 1.6025;
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   std::for_each(MLPinput.begin() + 0, MLPinput.begin() + 6, [LSB_ADC](float & x) { x = std::ceil(x * LSB_ADC); });
-  std::for_each(MLPinput.begin() + 6,  MLPinput.begin() + 12,  [LSB_agnle](float & x) { x = std::ceil(x * LSB_agnle);});
-  std::for_each(MLPinput.begin() + 12,  MLPinput.begin() + 18, [LSB_agnle](float & x) { x = std::ceil(x * LSB_agnle); });
+  std::for_each(MLPinput.begin() + 6,  MLPinput.begin() + 12,  [LSB_angle](float & x) { x = std::ceil(x * LSB_angle);});
+  std::for_each(MLPinput.begin() + 12,  MLPinput.begin() + 18, [LSB_angle](float & x) { x = std::ceil(x * LSB_angle); });
 
 //new add
 //  float LSB_time = 1.0f;

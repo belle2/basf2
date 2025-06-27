@@ -20,4 +20,3 @@ TBranch: SVDLayer, 3
 TBranch: SVDLadder, 1
 TBranch: SVDSensor, 2
 TBranch: SVDSide, True
-Test passed. Cleaning up.

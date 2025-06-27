@@ -74,6 +74,11 @@ void ElectronValCollectorModule::prepare()
   tRadee->Branch<double>("p", &m_p);
   tRadee->Branch<double>("pt", &m_pt);
   tRadee->Branch<double>("dedx", &m_dedx);
+  tRadee->Branch("enta", &m_enta);
+  tRadee->Branch("entaRS", &m_entaRS);
+  tRadee->Branch("layer", &m_layer);
+  tRadee->Branch("dedxhit", &m_dedxhit);
+
 
   tBhabha->Branch<double>("dedx", &m_dedx);
   tBhabha->Branch<double>("costh", &m_costh);
@@ -250,11 +255,17 @@ void ElectronValCollectorModule::collect()
 
     // Make sure to remove all the data in vectors from the previous track
     m_wire.clear();
+    m_layer.clear();
     m_dedxhit.clear();
+    m_enta.clear();
+    m_entaRS.clear();
 
     for (int i = 0; i < m_nhits; ++i) {
       m_wire.push_back(dedxTrack->getWire(i));
+      m_layer.push_back(dedxTrack->getHitLayer(i));
       m_dedxhit.push_back(dedxTrack->getDedx(i));
+      m_enta.push_back(dedxTrack->getEnta(i));
+      m_entaRS.push_back(dedxTrack->getEntaRS(i));
     }
 
     // Track and/or hit information filled as per config

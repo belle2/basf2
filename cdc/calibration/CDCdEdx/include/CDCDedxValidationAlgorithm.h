@@ -21,6 +21,9 @@
 #include <cdc/dbobjects/CDCDedxWireGain.h>
 #include <cdc/dbobjects/CDCDedxCosineCor.h>
 #include <cdc/dbobjects/CDCDedx1DCell.h>
+#include <cdc/dbobjects/CDCDedxRunGain.h>
+#include <cdc/dbobjects/CDCDedxBadWires.h>
+
 #include <framework/database/Database.h>
 #include <framework/database/DBStore.h>
 #include <framework/database/Configuration.h>
@@ -272,6 +275,14 @@ namespace Belle2 {
     OnedData getonedgain(int experiment, int run);
 
     /**
+     * @brief Retrieve run gain data from DB.
+     * @param experiment Experiment number
+     * @param run Run number
+     * @return double
+     */
+    double getrungain(int experiment, int run);
+
+    /**
     * @brief Clear current DB pointers and state
     */
     void resetDatabase();
@@ -301,12 +312,15 @@ namespace Belle2 {
     double* m_tedges; /**< internal time array (copy of vtlocaledges) */
     unsigned int m_tbins;  /**< internal time bins */
 
+    int m_eaBin; /**< # of bins for entrance angle */
+    double m_eaMin; /**< lower edge of entrance angle */
+    double m_eaMax; /**< upper edge of entrance angle */
+
     std::array<std::string, 2> m_sring{"ler", "her"}; /**< injection ring name */
 
     std::string m_suffix; /**< suffix string to separate plots */
 
     DBObjPtr<CDCGeometry> m_cdcGeo; /**< Geometry of CDC */
-    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
 
     /** Testing payload location. */
     std::string m_testingPayloadName = "";

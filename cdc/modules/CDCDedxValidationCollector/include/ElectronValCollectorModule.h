@@ -91,6 +91,9 @@ namespace Belle2 {
     /// hit level information
     std::vector<int> m_wire;       /**< wire number for the hit */
     std::vector<double> m_dedxhit; /**< dE/dx for the hit */
+    std::vector<int> m_layer;      /**< continuous layer number for the hit */
+    std::vector<double> m_enta;    /**< entrance angle for the hit */
+    std::vector<double> m_entaRS;    /**< rescaled entrance angle for the hit */
 
   };
 }

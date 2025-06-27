@@ -12,27 +12,45 @@ Implements cosgain correction
 
 import pandas as pd
 import matplotlib.pyplot as plt
-import ROOT
+import matplotlib.ticker as ticker
+# import ROOT
 from ROOT.Belle2 import CDCDedxValidationAlgorithm
-ROOT.gROOT.SetBatch(True)
+from matplotlib.backends.backend_pdf import PdfPages
+
+# ROOT.gROOT.SetBatch(True)
 
 
-def hist(y_min=None, y_max=None, x_min=None, x_max=None, xlabel="", ylabel="", space=None, fs1=20, fs2=8, font=18, rota=30):
-    import matplotlib.ticker as ticker
-    figs, axes = plt.subplots(1, 1, figsize=(fs1, fs2))
+def hist(y_min=None, y_max=None, x_min=None, x_max=None,
+         xlabel="", ylabel="", space=None, fx=1, fy=1,
+         fs1=20, fs2=8, font=18, rota=30, ax=None):
+    """
+    Configure histogram-style plot appearance.
 
-    if y_min or y_max is not None:
-        axes.set_ylim(y_min, y_max)
-    if x_min or x_max is not None:
-        axes.set_xlim(x_min, x_max)
+    If `ax` is None, applies to the current pyplot figure.
+    If `ax` is provided, applies to that axis (for subplots).
+    """
+    if ax is None:
+        fig, ax = plt.subplots(fx, fy, figsize=(fs1, fs2))
+    else:
+        fig = ax.get_figure()
 
-    plt.xlabel(xlabel, fontsize=font)
-    plt.ylabel(ylabel, fontsize=font)
-    plt.xticks(fontsize=font, rotation=rota)
-    plt.yticks(fontsize=font)
+    if y_min is not None or y_max is not None:
+        ax.set_ylim(y_min, y_max)
+    if x_min is not None or x_max is not None:
+        ax.set_xlim(x_min, x_max)
+
+    ax.set_xlabel(xlabel, fontsize=font)
+    ax.set_ylabel(ylabel, fontsize=font)
+    ax.tick_params(axis='x', labelsize=font, rotation=rota)
+    ax.tick_params(axis='y', labelsize=font)
+
     if space is not None:
-        axes.xaxis.set_major_locator(ticker.MultipleLocator(space))
-    plt.grid()
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(space))
+
+    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.3f'))
+    ax.grid()
+
+    return fig, ax
 
 
 def parse_database(database_file, calib_key):
@@ -94,19 +112,22 @@ def process_cosgain(ccpath, gt):
             df_new = pd.DataFrame([[x] for x in new_cc], columns=['cosgain'])
             df_costh = pd.DataFrame([[x] for x in costh], columns=['costh'])
 
-            # Cosine gain
-            hist(0.7, 1.3, xlabel=r"$cos\theta$", ylabel="dE/dx avg. mean ($e^{+}e^{-}$)", fs1=12, fs2=8)
-            plt.plot(df_costh['costh'], df_new['cosgain'], '*', rasterized=True, label="costh (new)")
-            plt.plot(df_costh['costh'], df_prev['cosgain'], '*', rasterized=True, label="costh (prev)")
-            plt.legend(fontsize=25)
-            plt.tight_layout()
-            plt.savefig(f'plots/constant/cosgain_e{exp}_r{run}.png')
-            plt.close()
+            pdf_path = f'plots/constant/cosgain_e{exp}_r{run}.pdf'
+            with PdfPages(pdf_path) as pdf:
+                fig, axes = plt.subplots(1, 2, figsize=(20, 6))
 
-            # Cosine difference gain
-            hist(-0.05, 0.05, xlabel=r"$cos\theta$", ylabel="Gain Difference (new - prev)", fs1=12, fs2=8)
-            plt.plot(df_costh['costh'], df_new['cosgain']-df_prev['cosgain'], '*', rasterized=True, label="diff(new-old)")
-            plt.legend(fontsize=25)
-            plt.tight_layout()
-            plt.savefig(f'plots/constant/cosgain_diff_e{exp}_r{run}.png')
-            plt.close()
+                # Left plot
+                hist(0.7, 1.3, xlabel=r"$\cos\theta$", ylabel="dE/dx avg. mean ($e^{+}e^{-}$)", ax=axes[0])
+                axes[0].plot(df_costh['costh'], df_new['cosgain'], '*', label='new')
+                axes[0].plot(df_costh['costh'], df_prev['cosgain'], '*', label='prev')
+                axes[0].legend()
+
+                # Right plot
+                hist(0.99, 1.01, xlabel=r"$\cos\theta$", ylabel="Gain Ratio (new/prev)", ax=axes[1])
+                axes[1].plot(df_costh['costh'], df_new['cosgain']/df_prev['cosgain'], '*', label='ratio')
+                axes[1].legend()
+
+                fig.suptitle(f"CosGain Calibration - Experiment {exp}", fontsize=20)
+                fig.tight_layout()
+                pdf.savefig(fig)
+                plt.close(fig)

@@ -11,11 +11,9 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import ROOT
 from ROOT.Belle2 import CDCDedxValidationAlgorithm
 import process_cosgain as cg
-
-ROOT.gROOT.SetBatch(True)
+from matplotlib.backends.backend_pdf import PdfPages
 
 
 def remove_nowg(df):
@@ -25,6 +23,12 @@ def remove_nowg(df):
     # Outer layers: index >= 1280 and wiregain != 0
     ol = df.loc[(df.index >= 1280) & (df['wiregain'] != 0)].copy()
 
+    return il, ol
+
+
+def sep_inout(df):
+    il = df[df.index < 8].copy()
+    ol = df[df.index >= 8].copy()
     return il, ol
 
 
@@ -58,78 +62,9 @@ def process_wiregain_pair(cal, exp, run, database_file, gt):
     return il_prev, ol_prev, il_new, ol_new
 
 
-def plot_wiregain_overlay(il_prev, ol_prev, il_new, ol_new, exp, run):
-    """Plot wiregain overlay of previous and new payloads."""
-    colors = {
-        "il_prev": "#8c564b",  # brown
-        "il_new": "#ff69b4",   # hot pink
-        "ol_prev": "#17becf",  # cyan
-        "ol_new": "#2ca02c"    # green
-    }
-    markers = {
-        "il_prev": "o", "il_new": "s",
-        "ol_prev": "^", "ol_new": "D"
-    }
-
-    cg.hist(0., 4, xlabel="#wire", ylabel="wg constant", space=1000)
-    plt.plot(il_prev['wiregain'], marker=markers["il_prev"], color=colors["il_prev"],
-             linestyle='None', markersize=5, alpha=0.7, label="Inner layer (prev)")
-    plt.plot(il_new['wiregain'], marker=markers["il_new"], color=colors["il_new"],
-             linestyle='None', markersize=5, alpha=0.7, label="Inner layer (new)")
-    plt.plot(ol_prev['wiregain'], marker=markers["ol_prev"], color=colors["ol_prev"],
-             linestyle='None', markersize=5, alpha=0.7, label="Outer layer (prev)")
-    plt.plot(ol_new['wiregain'], marker=markers["ol_new"], color=colors["ol_new"],
-             linestyle='None', markersize=5, alpha=0.7, label="Outer layer (new)")
-    plt.legend(fontsize=20)
-    plt.tight_layout()
-    plt.savefig(f'plots/constant/wiregain_e{exp}_r{run}.png')
-    plt.close()
-
-
-def plot_wiregain_ratio(il_new, il_prev, ol_new, ol_prev, exp, run):
-    """Plot the ratio of new to old wiregains."""
-    il_r = il_new['wiregain'] / il_prev['wiregain']
-    ol_r = ol_new['wiregain'] / ol_prev['wiregain']
-    il_r, ol_r = il_r.dropna(), ol_r.dropna()
-
-    cg.hist(0.5, 1.5, xlabel="#wire", ylabel="wiregain ratio", space=1000)
-    plt.plot(il_r, '*', rasterized=True, label='Inner Layer')
-    plt.plot(ol_r, '*', rasterized=True, label='Outer Layer')
-    plt.legend(fontsize=20)
-    plt.tight_layout()
-    plt.savefig(f'plots/constant/wiregain_ratio_e{exp}_r{run}.png')
-    plt.clf()
-
-
-def plot_wiregain_diff(il_r, ol_r, exp, run):
-    """Plot the difference (Δ) of wiregain ratios."""
-    cg.hist(x_min=0.7, x_max=1.5, xlabel=r"$\Delta$ wiregains", ylabel="Normalized count", fs1=10, fs2=6)
-
-    scale1 = 1 / il_r.shape[0] if il_r.shape[0] > 0 else 1
-    scale2 = 1 / ol_r.shape[0] if ol_r.shape[0] > 0 else 1
-
-    counts1, bins1 = np.histogram(il_r, bins=200)
-    plt.hist(bins1[:-1], bins=200, histtype='step', linewidth=2.5,
-             weights=counts1 * scale1, label=r'$\Delta$ gain IL')
-
-    counts2, bins2 = np.histogram(ol_r, bins=200)
-    plt.hist(bins2[:-1], bins=200, histtype='step', linewidth=2.5,
-             weights=counts2 * scale2, label=r'$\Delta$ gain OL')
-
-    plt.legend(fontsize=20)
-    plt.tight_layout()
-    plt.savefig(f'plots/constant/wiregain_hist_e{exp}_r{run}.png')
-    plt.close()
-
-
-def sep_inout(df):
-    il = df[df.index < 8].copy()
-    ol = df[df.index >= 8].copy()
-    return il, ol
-
-
 def process_layermean(cal, exp, run, database_file, gt):
-    """Process wiregain for a given exp-run pair."""
+
+    # Also add layer mean plots
     cal.setGlobalTag(gt)
     prev_data = cal.getwiregain(exp, run)
     cal.setGlobalTag("")
@@ -137,64 +72,133 @@ def process_layermean(cal, exp, run, database_file, gt):
     new_data = cal.getwiregain(exp, run)
     cal.setTestingPayload("")
 
-    # Extract layermean vectors
-    prev_lm = prev_data.layermean if prev_data else []
-    new_lm = new_data.layermean if new_data else []
+    df_prev_lm = pd.DataFrame([[x] for x in prev_data.layermean], columns=['layergain'])
+    df_new_lm = pd.DataFrame([[x] for x in new_data.layermean], columns=['layergain'])
 
-    # Skip empty payloads
-    if not prev_lm or not new_lm:
-        print(f"[WARNING] Empty layermean data for exp={exp}, run={run}. Skipping.")
-        return None, None
+    il_lm_prev, ol_lm_prev = sep_inout(df_prev_lm)
+    il_lm_new, ol_lm_new = sep_inout(df_new_lm)
 
-    # Convert to DataFrames
-    df_prev = pd.DataFrame([[x] for x in prev_lm], columns=['layergain'])
-    df_new = pd.DataFrame([[x] for x in new_lm], columns=['layergain'])
+    il_ratio = (il_lm_new['layergain'] / il_lm_prev['layergain']).dropna()
+    ol_ratio = (ol_lm_new['layergain'] / ol_lm_prev['layergain']).dropna()
 
-    # Split into inner and outer layers
-    il_prev, ol_prev = sep_inout(df_prev)
-    il_new, ol_new = sep_inout(df_new)
+    return il_ratio, ol_ratio
 
-    il_ratio = il_new['layergain'].values
-    ol_ratio = ol_new['layergain'].values
 
-    cg.hist(0.9, 1.1, xlabel="#layer", ylabel="layer average", space=5, fs1=10, fs2=6)
-    plt.plot(range(len(il_ratio)), il_ratio, '*', label="Inner Layers", rasterized=True)
-    plt.plot(range(len(ol_ratio)), ol_ratio, '*', label="Outer Layers", rasterized=True)
+def plot_wiregain_all(il_prev, ol_prev, il_new, ol_new, exp, run, pdf, il_lay, ol_lay):
+    """Plot overlay, ratio and difference into a single PDF page."""
 
-    plt.legend(fontsize=25)
-    plt.savefig(f'plots/constant/layergain_hist_e{exp}_r{run}.png')
+    fig, ax = plt.subplots(2, 2, figsize=(20, 12))
+
+    # 1. Wiregain overlay (top-left)
+    ax[0, 0].set_title("Inner previous Wiregain")
+    cg.hist(0., 4, xlabel="#wire", ylabel="wg constant", space=100, ax=ax[0, 0])
+    ax[0, 0].plot(il_prev['wiregain'], 'o', label="Inner (prev)", markersize=5, alpha=0.7)
+    ax[0, 0].legend(fontsize=12)
+
+    ax[0, 1].set_title("Outer previous Wiregain")
+    cg.hist(0., 3, xlabel="#wire", ylabel="wg constant", space=1000, ax=ax[0, 1])
+    ax[0, 1].plot(ol_prev['wiregain'], '^', label="Outer (prev)", markersize=5, alpha=0.7)
+    ax[0, 1].legend(fontsize=12)
+
+    ax[1, 0].set_title("Inner new Wiregain")
+    cg.hist(0., 4, xlabel="#wire", ylabel="wg constant", space=100, ax=ax[1, 0])
+    ax[1, 0].plot(il_new['wiregain'], 's', label="Inner (new)", markersize=5, alpha=0.7)
+    ax[1, 0].legend(fontsize=12)
+
+    ax[1, 1].set_title("Outer new Wiregain")
+    cg.hist(0., 3, xlabel="#wire", ylabel="wg constant", space=1000, ax=ax[1, 1])
+    ax[1, 1].plot(ol_new['wiregain'], 'D', label="Outer (new)", markersize=5, alpha=0.7)
+    ax[1, 1].legend(fontsize=12)
+
+    fig.suptitle(f"WireGain Calibration - Experiment {exp}", fontsize=20)
+    plt.tight_layout()
+    pdf.savefig(fig)
+    plt.close(fig)
+
+    fig, ax = plt.subplots(2, 2, figsize=(20, 12))
+
+    # # 2. Ratio (top-right)
+    ax[0, 0].set_title("Inner Wiregain Ratio")
+    il_r = (il_new['wiregain'] / il_prev['wiregain']).dropna()
+    ol_r = (ol_new['wiregain'] / ol_prev['wiregain']).dropna()
+    cg.hist(0.7, 1.5, xlabel="#wire", ylabel="wiregain ratio", space=100, ax=ax[0, 0])
+    ax[0, 0].plot(il_r, '*', rasterized=True, label='Inner Layer')
+    ax[0, 0].legend(fontsize=12)
+
+    ax[0, 1].set_title("Outer Wiregain Ratio")
+    il_r = (il_new['wiregain'] / il_prev['wiregain']).dropna()
+    ol_r = (ol_new['wiregain'] / ol_prev['wiregain']).dropna()
+    cg.hist(0.7, 1.5, xlabel="#wire", ylabel="wiregain ratio", space=1000, ax=ax[0, 1])
+    ax[0, 1].plot(ol_r, '*', rasterized=True, label='Outer Layer')
+    ax[0, 1].legend(fontsize=12)
+
+    # 4. Ratio (middle-right)
+    ax[1, 0].set_title("Inner Wiregain Ratio (zoom)")
+    cg.hist(0.92, 1.05, xlabel="#wire", ylabel="wiregain ratio", space=100, ax=ax[1, 0])
+    ax[1, 0].plot(il_r, '*', rasterized=True, label='Inner Layer')
+    ax[1, 0].legend(fontsize=12)
+
+    ax[1, 1].set_title("Outer Wiregain Ratio (zoom)")
+    cg.hist(0.92, 1.05, xlabel="#wire", ylabel="wiregain ratio", space=1000, ax=ax[1, 1])
+    ax[1, 1].plot(ol_r, '*', rasterized=True, label='Outer Layer')
+    ax[1, 1].legend(fontsize=12)
+
+    plt.tight_layout()
+    pdf.savefig(fig)
+    plt.close(fig)
+
+    fig, ax = plt.subplots(1, 2, figsize=(20, 6))
+
+    # 5. Ratio Histogram  (bottom -left)
+    ax[0].set_title("Wiregain Ratio histo")
+    cg.hist(x_min=0.7, x_max=1.5, xlabel=r"$\Delta$ wiregains", ylabel="Normalized count", fs1=10, fs2=6, ax=ax[0])
+
+    scale1 = 1 / il_r.shape[0] if il_r.shape[0] > 0 else 1
+    scale2 = 1 / ol_r.shape[0] if ol_r.shape[0] > 0 else 1
+
+    counts1, bins1 = np.histogram(il_r, bins=200)
+    counts2, bins2 = np.histogram(ol_r, bins=200)
+
+    ax[0].hist(bins1[:-1], bins=200, histtype='step', linewidth=2.5,
+               weights=counts1 * scale1, label='Inner layer')
+    ax[0].hist(bins2[:-1], bins=200, histtype='step', linewidth=2.5,
+               weights=counts2 * scale2, label='Outer Layer')
+
+    ax[0].legend(fontsize=12)
+
+    # 6. Layer Gain Ratio (bottom-right)
+    ax[1].set_title("Layer Gain Ratio")
+    cg.hist(0.9, 1.1, xlabel="#layer", ylabel="layer average ratio", space=5, fs1=10, fs2=6, ax=ax[1])
+    ax[1].plot(il_lay, '*', label="Inner Layers")
+    ax[1].plot(ol_lay, '*', label="Outer Layers")
+    ax[1].legend(fontsize=12)
+
+    plt.tight_layout()
+    pdf.savefig(fig)
+    plt.close(fig)
 
 
 def process_wiregain(wgpath, gt):
     """Main function to process wiregain data and generate plots."""
     import os
     os.makedirs('plots/constant', exist_ok=True)
-
     database_file = f'{wgpath}/database.txt'
 
-    # Parse the database to get exp -> [runs] mapping
     exp_run_dict = cg.parse_database(database_file, "dbstore/CDCDedxWireGain")
 
-    # Process each exp-run pair
     for exp, run_list in exp_run_dict.items():
         for run in run_list:
             print(f"[INFO] Processing exp={exp}, run={run}")
             cal = CDCDedxValidationAlgorithm()
-
-            # Process wiregain for the exp-run pair
             il_prev, ol_prev, il_new, ol_new = process_wiregain_pair(cal, exp, run, database_file, gt)
 
             if il_prev is None or ol_prev is None or il_new is None or ol_new is None:
                 continue
 
-            # Plot wiregain overlay
-            plot_wiregain_overlay(il_prev, ol_prev, il_new, ol_new, exp, run)
+            il_lay, ol_lay = process_layermean(cal, exp, run, database_file, gt)
 
-            # Plot wiregain ratio
-            plot_wiregain_ratio(il_new, il_prev, ol_new, ol_prev, exp, run)
+            pdf_path = f'plots/constant/wiregain_e{exp}_r{run}.pdf'
+            with PdfPages(pdf_path) as pdf:
+                plot_wiregain_all(il_prev, ol_prev, il_new, ol_new, exp, run, pdf, il_lay, ol_lay)
 
-            # Plot difference in wiregains (Δ)
-            plot_wiregain_diff(il_new['wiregain'] / il_prev['wiregain'], ol_new['wiregain'] / ol_prev['wiregain'], exp, run)
-            # process layermean
-            process_layermean(cal, exp, run, database_file, gt)
     return exp_run_dict

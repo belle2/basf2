@@ -27,6 +27,9 @@ CDCDedxValidationAlgorithm::CDCDedxValidationAlgorithm() :
   m_momBins(80),
   m_momMin(0.0),
   m_momMax(8.0),
+  m_eaBin(316),
+  m_eaMin(-TMath::Pi() / 2),
+  m_eaMax(+TMath::Pi() / 2),
   m_suffix("")
 {
   // Set module properties
@@ -42,11 +45,10 @@ CalibrationAlgorithm::EResult CDCDedxValidationAlgorithm::calibrate()
 
   getExpRunInfo();
 
-  gSystem->Exec("mkdir -p plots/run");
-  gSystem->Exec("mkdir -p plots/costh");
-  gSystem->Exec("mkdir -p plots/mom");
-  gSystem->Exec("mkdir -p plots/wire");
-  gSystem->Exec("mkdir -p plots/injection");
+  std::vector<std::string> subdirs = {"run", "costh", "mom", "wire", "injection", "oneD"};
+  for (const auto& dir : subdirs) {
+    gSystem->Exec(Form("mkdir -p plots/%s", dir.c_str()));
+  }
 
   // Get data objects
   auto tBhabha = getObjectPtr<TTree>("tBhabha");
@@ -94,12 +96,18 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   double dedx, costh, p, injtime = 0.0, injring = 1.0;
   int charge;
 
+  std::vector<double>* dedxhit = 0, *enta = 0;
+  std::vector<int>* layer = 0;
+
   ttree->SetBranchAddress("dedx", &dedx);
   ttree->SetBranchAddress("p", &p);
   ttree->SetBranchAddress("costh", &costh);
   ttree->SetBranchAddress("charge", &charge);
   ttree->SetBranchAddress("injtime", &injtime);
   ttree->SetBranchAddress("injring", &injring);
+  ttree->SetBranchAddress("dedxhit", &dedxhit);
+  ttree->SetBranchAddress("entaRS", &enta);
+  ttree->SetBranchAddress("layer", &layer);
 
   std::vector<double> vtlocaledges;
   defineTimeBins(vtlocaledges);
@@ -107,15 +115,15 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   m_tedges = &vtlocaledges[0];
 
   std::array<std::array<std::vector<TH1D*>, 2>, 3> hdedx_mom;
-  std::array<std::vector<TH1D*>, 2> hdedx_mom_peaks;
+  std::array<std::vector<TH1D*>, 2> hdedx_mom_peaks, hdedx_inj, hdedx_oned;
   TH1D* htimes = new TH1D("htimes", "", m_tbins, m_tedges);
-  std::array<std::vector<TH1D*>, 2> hdedx_inj;
 
   const double momBinWidth = (m_momMax - m_momMin) / m_momBins;
   const double momBinW = (4.0 - m_momMin) / 4;
 
   std::string scos[3] = {"acos", "posCosth", "negCosth"};
   std::string stype[2] = {"posi", "elec"};
+  std::string sLayer[2] = {"IL", "OL"};
 
   // Define histograms for momentum bins and charge types
   for (int ic = 0; ic < 3; ic++) {
@@ -129,10 +137,14 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   for (unsigned int ir = 0; ir < 2; ir++) {
     hdedx_inj[ir].resize(m_tbins);
     hdedx_mom_peaks[ir].resize(4);
+    hdedx_oned[ir].resize(m_eaBin);
+
     defineHisto(hdedx_inj[ir], "inj", m_sring[ir].data());
     defineHisto(hdedx_mom_peaks[ir], "mom_peaks", Form("%s", stype[ir].data()));
+    defineHisto(hdedx_oned[ir], "oned", Form("%s", sLayer[ir].data()));
   }
 
+  double eaBW = (m_eaMax - m_eaMin) / m_eaBin;
   double icos[2] = {0, -1};
   double chgtype;
 
@@ -143,10 +155,8 @@ void CDCDedxValidationAlgorithm::radeeValidation()
     // Skip invalid events
     if (dedx <= 0 || injtime < 0 || injring < 0) continue;
 
-    // Calculate momentum bin index
+    // Calculate momentum bin index for hdedx_mom
     int binIndex = static_cast<int>((abs(p) - m_momMin) / momBinWidth);
-    if (binIndex < 0 || binIndex >= m_momBins)
-      continue;
 
     // Determine cos(theta) category
     icos[1] = (costh > 0) ? 1 : ((costh < 0) ? 2 : 0);
@@ -154,29 +164,45 @@ void CDCDedxValidationAlgorithm::radeeValidation()
     // Determine charge type
     chgtype = (charge > 0) ? 0 : 1;
 
-    // Fill momentum histograms
-    hdedx_mom[icos[0]][chgtype][binIndex]->Fill(dedx);
-    hdedx_mom[icos[1]][chgtype][binIndex]->Fill(dedx);
+    // Fill momentum histograms (only if binIndex is valid)
+    if (binIndex >= 0 && binIndex < m_momBins) {
+      hdedx_mom[icos[0]][chgtype][binIndex]->Fill(dedx);
+      hdedx_mom[icos[1]][chgtype][binIndex]->Fill(dedx);
+    }
 
-    //add larger times to the last bin
+    // Add larger times to the last bin
     if (injtime > m_tedges[m_tbins]) injtime = m_tedges[m_tbins] - 10.0;
 
-    //injection ring
+    // Injection ring type
     int wr = (injring > 0.5) ? 1 : 0;
 
-    //injection time bin
+    // Injection time bin
     unsigned int tb = htimes->GetXaxis()->FindBin(injtime);
     tb = std::min(tb, static_cast<unsigned int>(m_tbins)) - 1;
 
-    // Fill injection time and dE/dx
+    // Fill injection time and dE/dx histograms
     htimes->Fill(injtime);
     hdedx_inj[wr][tb]->Fill(dedx);
 
-    // Fill momentum histograms
+    // Fill hdedx_mom_peaks with its own binning
     int binI = static_cast<int>((abs(p) - m_momMin) / momBinW);
-    if (binI < 0 || binI >= 4) continue;
-    hdedx_mom_peaks[chgtype][binI]->Fill(dedx);
+    if (binI >= 0 && binI < 4) {
+      hdedx_mom_peaks[chgtype][binI]->Fill(dedx);
+    }
+
+    // Fill dE/dx in enta bins from hits
+    for (unsigned int j = 0; j < dedxhit->size(); ++j) {
+      if (dedxhit->at(j) == 0) continue;
+
+      double entaval = enta->at(j);
+      int ibin = std::floor((entaval - m_eaMin) / eaBW);
+      if (ibin < 0 || ibin >= m_eaBin) continue;
+
+      int mL = (layer->at(j) < 8) ? 0 : 1;
+      hdedx_oned[mL][ibin]->Fill(dedxhit->at(j));
+    }
   }
+
 
   for (int ic = 0; ic < 3; ic++)
     for (int it = 0; it < 2; ++it)
@@ -184,6 +210,7 @@ void CDCDedxValidationAlgorithm::radeeValidation()
 
   for (int it = 0; it < 2; ++it) {
     printCanvas(hdedx_inj[it], Form("plots/injection/dedx_vs_inj_%s_%s", m_sring[it].data(), m_suffix.data()), "inj");
+    printCanvas(hdedx_oned[it], Form("plots/oneD/dedx_vs_1D_%s_%s", sLayer[it].data(), m_suffix.data()), "oned");
   }
 
   printCanvasdEdx(hdedx_mom_peaks, Form("plots/mom/dedxpeaks_vs_mom_%s", m_suffix.data()), "mom");
@@ -237,37 +264,40 @@ void CDCDedxValidationAlgorithm::bhabhaValidation()
 
     // Check if a dE/dx histogram for this run number already exists
     if (hdedx_run.find(run) == hdedx_run.end()) {
-      // Create a new histogram for dE/dx for this run
       std::string histName = Form("hist_dedx_run_%d", run);
       std::string histTitle = Form("dE/dx Histogram for Run %d", run);
-      hdedx_run[run] = new TH1D(histName.data(), histTitle.data(), m_dedxBins, m_dedxMin, m_dedxMax); // dE/dx histogram
+      hdedx_run[run] = new TH1D(histName.data(), histTitle.data(), m_dedxBins, m_dedxMin, m_dedxMax);
     }
 
+    // Fill run-specific histogram
     hdedx_run[run]->Fill(dedx);
+
+    // Fill cos(theta) histograms (all charge + by charge sign)
     int binIndex = static_cast<int>((costh - m_cosMin) / cosBinWidth);
-    if (binIndex < 0 || binIndex >= m_cosBins)
-      continue;
+    if (binIndex >= 0 && binIndex < m_cosBins) {
+      hdedx_cos[0][binIndex]->Fill(dedx);  // All charge
 
-    hdedx_cos[0][binIndex]->Fill(dedx);  // Fill histograms for all charge
+      if (charge > 0)
+        hdedx_cos[1][binIndex]->Fill(dedx);
+      else if (charge < 0)
+        hdedx_cos[2][binIndex]->Fill(dedx);
+    }
 
-    if (charge > 0)
-      hdedx_cos[1][binIndex]->Fill(dedx); // Fill histograms for charge > 0
-    else if (charge < 0)
-      hdedx_cos[2][binIndex]->Fill(dedx);  // Fill histograms for charge < 0
-
+    // Fill dE/dx for each wire hit
     for (unsigned int j = 0; j < wire->size(); ++j) {
       int jwire = wire->at(j);
       double jhitdedx = dedxhit->at(j);
       hdedxhit[jwire]->Fill(jhitdedx);
     }
 
+    // Fill cos(theta) peaks histograms
     int binI = static_cast<int>((costh - m_cosMin) / cosBinW);
-    if (binI < 0 || binI >= 4)
-      continue;
-    if (charge > 0)
-      hdedx_cos_peaks[0][binI]->Fill(dedx);
-    else if (charge < 0)
-      hdedx_cos_peaks[1][binI]->Fill(dedx);
+    if (binI >= 0 && binI < 4) {
+      if (charge > 0)
+        hdedx_cos_peaks[0][binI]->Fill(dedx);
+      else if (charge < 0)
+        hdedx_cos_peaks[1][binI]->Fill(dedx);
+    }
   }
 
   printCanvasRun(hdedx_run, Form("plots/run/dedx_vs_run_%s", m_suffix.data()));
@@ -287,6 +317,8 @@ void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, std::str
 
   if (var == "mom") {
     xbins = m_momBins; xmin = m_momMin; xmax = m_momMax;
+  } else if (var == "oned") {
+    xbins = m_eaBin; xmin = m_eaMin; xmax = m_eaMax; m_dedxBins = 250;
   } else if (var == "costh") {
     xbins = m_cosBins; xmin = m_cosMin; xmax = m_cosMax;
   } else if (var == "inj") {
@@ -299,7 +331,7 @@ void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, std::str
     xbins = c_nSenseWires; m_dedxBins = 250;
   }
 
-  if (var == "costh" || var == "mom" || var == "mom_peaks" || var == "cos_peaks") {
+  if (var == "costh" || var == "mom" || var == "mom_peaks" || var == "cos_peaks" || var == "oned") {
     binWidth = (xmax - xmin) / xbins;
   }
 
@@ -307,7 +339,7 @@ void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, std::str
     std::string title = Form("dedxhit-dist, wire:%d", ic);
     std::string name = Form("hdedx_%s_%d", var.data(), ic);
 
-    if (var == "costh" || var == "mom" || var == "mom_peaks" || var == "cos_peaks") {
+    if (var == "costh" || var == "mom" || var == "mom_peaks" || var == "cos_peaks" || var == "oned") {
       double min = ic * binWidth + xmin;
       double max = min + binWidth;
       title = Form("%s: (%0.02f, %0.02f) %s", var.data(), min, max, stype.data());
@@ -379,8 +411,10 @@ void CDCDedxValidationAlgorithm::printCanvasdEdx(std::array<std::vector<TH1D*>, 
     htemp[0][i]->SetLineColor(8);
     htemp[1][i]->SetLineColor(9);
     htemp[0][i]->SetTitle(Form("%s: (%0.02f, %0.02f)", svar.data(), min, max));
-    htemp[0][i] ->Scale(1 / htemp[0][i]->GetEntries());
-    htemp[1][i] ->Scale(1 / htemp[1][i]->GetEntries());
+    if (htemp[0][i]->GetEntries() > 0)
+      htemp[0][i]->Scale(1 / htemp[0][i]->GetEntries());
+    if (htemp[1][i]->GetEntries() > 0)
+      htemp[1][i]->Scale(1 / htemp[1][i]->GetEntries());
 
     if (htemp[1][i]->GetMaximum() > htemp[0][i]->GetMaximum())
       htemp[0][i]->SetMaximum(htemp[1][i]->GetMaximum());
@@ -394,14 +428,13 @@ void CDCDedxValidationAlgorithm::printCanvasdEdx(std::array<std::vector<TH1D*>, 
     lego->AddEntry(htemp[1][i], "e-", "l");
     lego->Draw("same");
 
-    if ((i + 1) % 4 == 0) {
+    if ((i + 1) % 4 == 0 || i == xbins - 1) {
       ctmp->SetBatch(kTRUE);
       ctmp->Print(psname.str().c_str());
-      ctmp->Clear("D");
+      if ((i + 1) % 4 == 0) ctmp->Clear("D");
     }
   }
 
-  ctmp->Print(psname.str().c_str());
   psname.str("");
   psname << Form("%s.pdf]", namesfx.data());
   ctmp->Print(psname.str().c_str());
@@ -416,6 +449,8 @@ void CDCDedxValidationAlgorithm::printCanvas(std::vector<TH1D*>& htemp, std::str
 
   if (svar == "mom") {
     xbins = m_momBins; xmin = m_momMin; xmax = m_momMax;
+  } else if (svar == "oned") {
+    xbins = m_eaBin; xmin = m_eaMin; xmax = m_eaMax;
   } else if (svar == "costh") {
     xbins = m_cosBins; xmin = m_cosMin; xmax = m_cosMax;
   }  else if (svar == "inj") {
@@ -439,30 +474,43 @@ void CDCDedxValidationAlgorithm::printCanvas(std::vector<TH1D*>& htemp, std::str
 
   std::ofstream outFile;
   outFile.open(Form("%s.txt", namesfx.data()));
+  CDCDedxWireGainAlgorithm wireg;
 
   // Iterate through the histograms and plot them in the canvas
   for (int i = 0; i < xbins; ++i) {
 
     ctmp->cd(i % 16 + 1);
-
-    double mean, meanErr, sigma, sigmaErr;
-    fit(htemp[i], mean, meanErr, sigma, sigmaErr);
-
     TPaveText pt(0.6, 0.73, 0.85, 0.89, "NBNDC");
     setTextCosmetics(pt, kBlack);
 
-    if (svar == "mom" || svar == "costh" || svar == "mom_peaks") {
+    if (svar == "oned") {
+      unsigned int minbin, maxbin;
+      wireg.getTruncatedBins(htemp[i], minbin, maxbin);
+      htemp[i]->SetTitle(Form("dedxhit-dist, entabin: %d ;%d;%d", i, minbin, maxbin));
+
+      double dedxmean  = wireg.getTruncationMean(htemp[i], minbin, maxbin);
+
       const double binWidth = (xmax - xmin) / xbins;
       double binCenter = xmin + (i + 0.5) * binWidth; // Calculate bin center for cos(theta) or mom
 
-      outFile << binCenter << " " <<  mean << " " << meanErr << " " << sigma << " " << sigmaErr << std::endl;
+      outFile << binCenter << " " <<  dedxmean << std::endl;
     } else {
-      std::string label = getTimeBinLabel(m_tedges[i], i);
-      outFile << i << " " << label << " " <<  mean << " " << meanErr << " " << sigma << " " << sigmaErr << std::endl;
-    }
-    pt.AddText(Form("#mu_{fit}: %0.03f#pm%0.03f", mean, meanErr));
-    pt.AddText(Form("#sigma_{fit}: %0.03f#pm%0.03f", sigma, sigmaErr));
+      double mean, meanErr, sigma, sigmaErr;
+      fit(htemp[i], mean, meanErr, sigma, sigmaErr);
 
+      if (svar == "mom" || svar == "costh" || svar == "mom_peaks") {
+        const double binWidth = (xmax - xmin) / xbins;
+        double binCenter = xmin + (i + 0.5) * binWidth; // Calculate bin center for cos(theta) or mom
+
+        outFile << binCenter << " " <<  mean << " " << meanErr << " " << sigma << " " << sigmaErr << std::endl;
+      } else {
+        std::string label = getTimeBinLabel(m_tedges[i], i);
+        outFile << i << " " << label << " " <<  mean << " " << meanErr << " " << sigma << " " << sigmaErr << std::endl;
+      }
+
+      pt.AddText(Form("#mu_{fit}: %0.03f#pm%0.03f", mean, meanErr));
+      pt.AddText(Form("#sigma_{fit}: %0.03f#pm%0.03f", sigma, sigmaErr));
+    }
     htemp[i]->SetStats(0);
     htemp[i]->DrawCopy("");
     pt.DrawClone("same");
@@ -595,9 +643,11 @@ void CDCDedxValidationAlgorithm::wireGain(std::vector<TH1D*>& hdedxhit)
 
   std::vector<double> vdedx_means;
   std::vector<double> layermean(c_maxNSenseLayers);
+  std::vector<double> lgmean(c_maxNSenseLayers);
 
-  std::ofstream outFile, outFileLayer, outFileAvg;
-  outFile.open(Form("plots/wire/dedx_mean_wire_%s.txt", m_suffix.data()));
+  std::ofstream outFile, outFileLayer, outFileAvg, outFilebdwire;
+  outFile.open(Form("plots/wire/dedx_mean_gwire_%s.txt", m_suffix.data()));
+  outFilebdwire.open(Form("plots/wire/dedx_mean_badwire_%s.txt", m_suffix.data()));
   outFileLayer.open(Form("plots/wire/dedx_mean_layer_%s.txt", m_suffix.data()));
   outFileAvg.open(Form("plots/wire/dedx_mean_layer_avg_%s.txt", m_suffix.data()));
 
@@ -607,11 +657,14 @@ void CDCDedxValidationAlgorithm::wireGain(std::vector<TH1D*>& hdedxhit)
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
   CDCDedxWireGainAlgorithm wireg;
 
+  DBObjPtr<CDCDedxBadWires> Badwire;
+
   int jwire = -1;
   for (unsigned int il = 0; il < c_maxNSenseLayers; ++il) {
 
-    int activewires = 0;
+    int activewires = 0, goodwires = 0;
     layermean[il] = 0.0;
+    lgmean[il] = 0.0;
 
     for (unsigned int iw = 0; iw < cdcgeo.nWiresInLayer(il); ++iw) {
       jwire++;
@@ -623,17 +676,28 @@ void CDCDedxValidationAlgorithm::wireGain(std::vector<TH1D*>& hdedxhit)
       double dedxmean  = wireg.getTruncationMean(hdedxhit[jwire], minbin, maxbin);
       vdedx_means.push_back(dedxmean);
 
-      outFile << jwire << " " << dedxmean << std::endl;
+      if (Badwire->getBadWireStatus(jwire) == kTRUE)
+        outFilebdwire << jwire << " " << dedxmean << std::endl;
+      else
+        outFile << jwire << " " << dedxmean << std::endl;
 
       if (vdedx_means.at(jwire) > 0) {
         layermean[il] += vdedx_means.at(jwire);
         activewires++;
+        if (Badwire->getBadWireStatus(jwire) != kTRUE) {
+          lgmean[il] += vdedx_means.at(jwire);
+          goodwires++;
+        }
       }
     }
 
     if (activewires > 0) layermean[il] /= activewires;
     else layermean[il] = 1.0;
-    outFileLayer << il << " " << layermean[il] << std::endl;
+
+    if (goodwires > 0) lgmean[il] /= goodwires;
+    else lgmean[il] = 1.0;
+
+    outFileLayer << il << " " << layermean[il] << " " << lgmean[il] << std::endl;
 
     //calculate outer layer average for active layer
     if (il >= 8 && layermean[il] > 0) {
@@ -647,6 +711,7 @@ void CDCDedxValidationAlgorithm::wireGain(std::vector<TH1D*>& hdedxhit)
   outFileAvg << layeravg << std::endl;
 
   outFile.close();
+  outFilebdwire.close();
   outFileLayer.close();
   outFileAvg.close();
   printCanvasWire(hdedxhit, Form("plots/wire/dedx_vs_wire_%s", m_suffix.data()), vdedx_means);
@@ -853,6 +918,17 @@ OnedData CDCDedxValidationAlgorithm::getonedgain(int experiment, int run)
   resetDatabase();
   return {inner1D, outer1D, Enta};
 
+}
+
+double CDCDedxValidationAlgorithm::getrungain(int experiment, int run)
+{
+
+  DatabaseIN(experiment, run);
+
+  DBObjPtr<CDCDedxRunGain> RunGain;
+  if (!RunGain.isValid())  B2FATAL("Run gain data are not valid.");
+  double gain = RunGain->getRunGain();
+  return gain;
 }
 
 void CDCDedxValidationAlgorithm::resetDatabase()

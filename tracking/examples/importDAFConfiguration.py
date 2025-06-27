@@ -10,20 +10,26 @@
 
 # Import DAFparameters payloads
 from ROOT import Belle2  # noqa: make the Belle2 namespace available
-from ROOT.Belle2 import Database, IntervalOfValidity, DAFparameters
+from ROOT.Belle2 import Database, IntervalOfValidity, DAFParameters, DAFConfiguration
 
 # Optimisation 2023 #
-parameters = DAFparameters()
-parameters.setDeltaPValue(0.001)
-parameters.setDeltaWeight(0.06)
+parameters = DAFParameters()
+parameters.setDeltaPValue(1)
+parameters.setDeltaWeight(0.001)
 parameters.setProbabilityCut(0.001)
-parameters.setAnnealingScheme(2, 0.01, 5)
-parameters.setMinimumIterations(1)
+parameters.setAnnealingScheme(100, 0.1, 5)
+parameters.setMinimumIterations(5)
 parameters.setMaximumIterations(9)
-parameters.setMinimumIterationsForPVal(1)
+parameters.setMinimumIterationsForPVal(5)
 parameters.setMaximumFailedHits(5)
+parameters.setMinimumPValue(0.)
+
+configuration = DAFConfiguration()
+configuration.setDAFParameters(DAFConfiguration.c_Default, parameters)
+configuration.setDAFParameters(DAFConfiguration.c_Cosmics, parameters)
+configuration.setDAFParameters(DAFConfiguration.c_CDConly, parameters)
 
 database = Database.Instance()
 
 iov = IntervalOfValidity(0, 0, -1, -1)  # 1st exp, 1st run, final exp, final run
-database.storeData('DAFparameters', parameters, iov)
+database.storeData('DAFConfiguration', configuration, iov)

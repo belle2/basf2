@@ -86,7 +86,8 @@ namespace Belle2 {
     int m_runNumber = 0; /**< run number*/
 
     bool m_badEvent = false; /**<indicates if the particular event has any SVD error*/
-    bool m_seuEvent = false;  /**<indicates if the particular event has SEU recovery case*/
+    bool m_seuRecoEvent = false;  /**<indicates if the particular event is SEU recovery case*/
+    bool m_seuEvent = false;  /**<indicates if the particular event is SEU case*/
 
     unsigned int m_nEvents = 0;  /**<event counter */
     unsigned int m_nBadEvents = 0;  /**<counter of events with any kind of error*/
@@ -115,9 +116,10 @@ namespace Belle2 {
 
     //histograms
     TH2F* m_DQMUnpackerHisto = nullptr; /**< TH2F histogram with Unpacking errors*/
-    TH1F* m_DQMEventFractionHisto = nullptr; /**< TH1F histogram showing the fraction of events affected by errors*/
-    TH1F* m_DQMseuEventFractionHisto = nullptr; /**< TH1F histogram showing the fraction of events with SEU recovery case*/
-    TH1F* m_DQMseuFADCFractionHisto = nullptr; /**< TH1F histogram showing the fraction of FADC affected by SEU*/
+    TH1F* m_DQMErrorEventsHisto = nullptr; /**< TH1F histogram showing the fraction of events affected by errors*/
+    TH1F* m_DQMSeuRecoveryEventsHisto = nullptr; /**< TH1F histogram showing the fraction of events with SEU recovery case*/
+    TH1F* m_DQMSeuEventsHisto = nullptr; /**< TH1F histogram showing the fraction of SEU events*/
+    TH1F* m_DQMSeuRecoveryFADCsEventHisto = nullptr; /**< TH1F histogram showing the number of FADC with SEU recoveries per event*/
     TH2F* m_DQMnSamplesHisto = nullptr; /**< TH2F histogram showing number of samples in data VS daqMode */
     TH2F* m_DQMnSamplesHisto2 = nullptr; /**< TH2F histogram showing number of samples in data VS daqMode (2bins only) */
     TH2F* m_DQMtrgQuality = nullptr; /**< TH2F histogram showing number of samples in data VS Trigger Quality */

@@ -1,0 +1,23 @@
+[INFO] Steering file: SVDVariablesToStorageModuleTests.py
+[INFO] Starting event processing, random seed is set to 'caa0d6d9369e16a86eab6e598163c30832947061639a4d0e53a9232c1381d29f'
+[INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/SVDClusters.root
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
+[INFO]    -> MDST source: Tracks
+[INFO] Conditions Database: found working metadata provider
+	provider = ${BELLE2_CONDB_METADATA}
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] Writing Ntuple: SVDClusterVariables
+TFile: /tmp/tmp_tyxgorf
+TTree: SVDClusterVariables
+TBranch: SVDClusterCharge, 7.712e+04
+TBranch: SVDClusterSNR, 34.59
+TBranch: SVDClusterSize, 4
+TBranch: SVDClusterTime, -0.848
+TBranch: SVDTrackPrime, nan
+TBranch: SVDResidual, nan
+TBranch: SVDLayer, 3
+TBranch: SVDLadder, 1
+TBranch: SVDSensor, 2
+TBranch: SVDSide, True
+Test passed. Cleaning up.

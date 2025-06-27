@@ -22,6 +22,8 @@ class SVDVariablesToStorageModuleTests(unittest.TestCase):
     def test(self):
         """ Test of SVDVariablesToStorageModule """
 
+        b2test_utils.configure_logging_for_tests()
+
         testFile = tempfile.NamedTemporaryFile()
 
         main = create_path()

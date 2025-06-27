@@ -1,0 +1,11 @@
+Changes in the tracking package since release-07-00
+----------------------------------------------------
+
+* Addition of the track flip and refit algortihm. This algorithm identifies tracks which have been falsely fitted in the wrong direction, by employing a BDT. 
+Once these have been identified the track's direction is inverted and the track refitted. Another BDT decides if the inverted track or the original track is 
+kept. The algorithm results in more tracks with correct charge assignment which increases efficiency. 
+
+* The possibility to adjust parameters of the DAF fitting algorithm has been added to improve the performance of the DAF fit. For this the DAF fitter in the genfit package 
+was altered. 
+
+*

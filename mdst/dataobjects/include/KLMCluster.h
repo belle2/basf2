@@ -129,45 +129,45 @@ namespace Belle2 {
 
     /**
      * Get KLM cluster-track rotation angle.
-     * @return KLM rotation angle to the nearest track.
+     * @return KLM rotation angle to the nearest track [rad].
      */
     inline float getClusterTrackRotationAngle() const
     {return m_klmClusterTrackRotationAngle;}
 
     /**
      * Get KLM cluster-track separation angle.
-     * @return KLM cluster separation angle to the nearest track.
+     * @return KLM cluster separation angle to the nearest track [rad].
      */
     inline float getClusterTrackSeparationAngle() const
     {return m_klmClusterTrackSeparationAngle;}
 
     /**
      * Get KLM cluster-track distance.
-     * @return KLM cluster separation from the nearest track.
+     * @return KLM cluster separation from the nearest track [cm].
      */
     inline float getClusterTrackSeparation() const
     {return m_klmClusterTrackSeparation;}
 
     /**
-     * Get KLM variance of the 1st axis from PCA.
-     * @return KLM KLM variance of the 1st axis from PCA.
+     * Get std deviation of the 1st axis from PCA.
+     * @return  std deviation of the 1st axis from PCA [cm].
      */
-    inline float getClusterPCAStd1() const
-    {return m_cluStd1;}
+    inline float getShapeStdDev1() const
+    {return m_shapeStdDev1;}
 
     /**
-     * Get KLM variance of the 2nd axis from PCA.
-     * @return KLM KLM variance of the 2nd axis from PCA.
+     * Get KLM variancestd deviation of the 2nd axis from PCA.
+     * @return variance of the 2nd axis from PCA.
      */
-    inline float getClusterPCAStd2() const
-    {return m_cluStd2;}
+    inline float getShapeStdDev2() const
+    {return m_shapeStdDev2;}
 
     /**
-     * Get KLM variance of the 3rd axis from PCA.
-     * @return KLM KLM variance of the 3rd axis from PCA.
+     * Get std deviation of the 3rd axis from PCA.
+     * @return std deviation of the 3rd axis from PCA.
      */
-    inline float getClusterPCAStd3() const
-    {return m_cluStd3;}
+    inline float getShapeStdDev3() const
+    {return m_shapeStdDev3;}
 
     /**
      * Set KLM cluster-track rotation angle.
@@ -185,36 +185,36 @@ namespace Belle2 {
 
     /**
      * Set minimum KLM cluster-track distance.
-     * @param[in]  rotation angle to the nearest track.
+     * @param[in]  rotation angle to the nearest track [cm].
      */
     void setClusterTrackSeparation(float dist)
     {m_klmClusterTrackSeparation = dist;}
 
     /**
      * Set variance of the 1st axis, from PCA.
-     * @param[in]  variance of the 1st axis from PCA.
+     * @param[in]  variance of the 1st axis from PCA [cm].
      */
-    void setClusterPCAStd1(float std1)
-    {m_cluStd1 = std1;}
+    void setShapeStdDev1(float std1)
+    {m_shapeStdDev1 = std1;}
 
     /**
      * Set variance of the 2nd axis, from PCA.
-     * @param[in]  variance of the 2nd axis from PCA.
+     * @param[in]  variance of the 2nd axis from PCA [cm].
      */
-    void setClusterPCAStd2(float std2)
-    {m_cluStd2 = std2;}
+    void setShapeStdDev2(float std2)
+    {m_shapeStdDev2 = std2;}
 
     /**
      * Set variance of the 3rd axis, from PCA.
-     * @param[in]  variance of the 3rd axis from PCA.
+     * @param[in]  variance of the 3rd axis from PCA [cm].
      */
-    void setClusterPCAStd3(float std3)
-    {m_cluStd3 = std3;}
+    void setShapeStdDev3(float std3)
+    {m_shapeStdDev3 = std3;}
 
 
     /**
      * Set time.
-     * @param[in] time Time.
+     * @param[in] time Time [ns].
      */
     void setTime(float time)
     {m_time = time;}
@@ -235,9 +235,9 @@ namespace Belle2 {
 
     /**
      * Set global position.
-     * @param[in] globalX X coordinate.
-     * @param[in] globalY Y coordinate.
-     * @param[in] globalZ Z coordinate.
+     * @param[in] globalX X coordinate [cm].
+     * @param[in] globalY Y coordinate [cm].
+     * @param[in] globalZ Z coordinate [cm].
      */
     void setClusterPosition(float globalX, float globalY, float globalZ)
     {
@@ -286,13 +286,13 @@ namespace Belle2 {
     float m_klmClusterTrackSeparation;
 
     /** Variance of axis 1 (from Cluster Shape PCA). */
-    float m_cluStd1;
+    float m_shapeStdDev1;
 
     /** Variance of axis 2 (from Cluster Shape PCA). */
-    float m_cluStd2;
+    float m_shapeStdDev2;
 
     /** Variance of axis 3 (from Cluster Shape PCA). */
-    float m_cluStd3;
+    float m_shapeStdDev3;
 
 
     /** Needed to make objects storable. */

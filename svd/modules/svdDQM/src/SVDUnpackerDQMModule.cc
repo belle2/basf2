@@ -437,7 +437,7 @@ void SVDUnpackerDQMModule::event()
   }
 
   if (m_DQMSeuRecoveryFADCsEventHisto != nullptr) {
-    TString histoSEURecoFADCsTitle = TString::Format("SVD FADC fraction with SEU,  Exp %d Run %d", m_expNumber, m_runNumber);
+    TString histoSEURecoFADCsTitle = TString::Format("SVD FADCs with SEU Recovery,  Exp %d Run %d", m_expNumber, m_runNumber);
     m_DQMSeuRecoveryFADCsEventHisto->SetTitle(histoSEURecoFADCsTitle.Data());
     if (m_seuFADCs.size() > 0) m_DQMSeuRecoveryFADCsEventHisto->Fill(m_seuFADCs.size());
   }

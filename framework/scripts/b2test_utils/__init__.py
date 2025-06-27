@@ -394,20 +394,21 @@ def print_belle2_environment():
 
 
 @contextmanager
-def temporary_set_environment(**environ):
+def temporary_environment(**environ):
     """
-    Temporarily set the process environment variables.
-    Inspired by https://stackoverflow.com/a/34333710
+    Context manager that temporarily sets environment variables
+    for the current process. Inspired by https://stackoverflow.com/a/34333710
 
-    >>> with temporary_set_environment(BELLE2_TEMP_DIR='/tmp/belle2'):
+    >>> with temporary_environment(BELLE2_TEMP_DIR='/tmp/belle2'):
     ...   "BELLE2_TEMP_DIR" in os.environ
     True
 
     >>> "BELLE2_TEMP_DIR" in os.environ
     False
 
-    Arguments:
-        environ(dict): Dictionary of environment variables to set
+    Args:
+        **environ: Arbitrary keyword arguments specifying environment
+                   variables and their values.
     """
     old_environ = dict(os.environ)
     os.environ.update(environ)
@@ -425,6 +426,20 @@ def is_ci() -> bool:
     tests are run.
     """
     return os.environ.get("BELLE2_IS_CI", "no").lower() in [
+        "yes",
+        "1",
+        "y",
+        "on",
+    ]
+
+
+def is_cdb_down() -> bool:
+    """
+    Returns true if the Conditions Database (CDB) is currently unavailable or slow to respond.
+    The 'BELLE2_IS_CDB_DOWN' environment variable can be used to dynamically exclude some
+    tests that rely on the CDB in case of problems.
+    """
+    return os.environ.get("BELLE2_IS_CDB_DOWN", "no").lower() in [
         "yes",
         "1",
         "y",

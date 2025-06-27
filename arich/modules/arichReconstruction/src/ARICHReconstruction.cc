@@ -21,6 +21,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/VectorUtil.h>
 
+#include <cmath>
 #include <vector>
 #include <Math/Vector3D.h>
 #include <TRandom3.h>
@@ -664,7 +665,7 @@ namespace Belle2 {
       exppho[iHyp] = nSig_w_acc[iHyp][m_nAerogelLayers] * (1 - wideGaussFract) + wideGaussFract * 0.7 *
                      nSig_wo_accInt[iHyp][m_nAerogelLayers] + nBgr[iHyp];
       logL[iHyp] -= exppho[iHyp];
-      if (isnan(logL[iHyp]) || isinf(logL[iHyp])) {
+      if (std::isnan(logL[iHyp]) || std::isinf(logL[iHyp])) {
         B2WARNING("ARICHReconstruction: log likelihood value infinite! Flat background hit probability is " << ebgri[iHyp] << "!");
         logL[iHyp] = 0;
       }

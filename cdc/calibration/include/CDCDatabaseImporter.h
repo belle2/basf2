@@ -164,6 +164,17 @@ namespace Belle2 {
     void printFFactor();
 
     /**
+     * Import alpha scale factors table to the database.
+     */
+    void importAlphaScaleFactors(std::string fileName);
+    /**
+     * Get the fudge factor table from the database and
+     * print it.
+     */
+    void printAlphaScaleFactors();
+
+
+    /**
      * Import displacement of wire position to the database.
      */
     void importDisplacement(std::string fileName);

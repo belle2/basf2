@@ -60,7 +60,7 @@ void BFieldComponentQuad::initialize()
     return;
   }
 
-  // check if input files exsits
+  // check if input files exist
   string fullPathMapHER = FileSystem::findFile("/data/" + m_mapFilenameHER);
   if (!FileSystem::fileExists(fullPathMapHER)) {
     B2FATAL("The HER quadrupole magnetic field map file '" << m_mapFilenameHER << "' could not be found !");
@@ -225,7 +225,7 @@ void BFieldComponentQuad::initialize()
   m_l3 = proc3(params_ler, p0_LER);
 
   /** In case several maps in the same position we can simply
-   * sum up all matricies since magnetic field has superposition
+   * sum up all matrices since magnetic field has superposition
    * properties as well as keep only one vector of parameters for each
    * beamline
    *
@@ -246,7 +246,7 @@ void BFieldComponentQuad::initialize()
   };
   merge(m_h3, hleak3);
 
-  /** calculate ranges where quadrupole lenses continously fill the
+  /** calculate ranges where quadrupole lenses continuously fill the
    * beamline
    *
    * @param v lense vector
@@ -300,7 +300,7 @@ void BFieldComponentQuad::initialize()
    *
    * @param ap the vector of lenses
    * @param v  the vector of ranges
-   * @return   the vector of iterators which points to the begining of the continous area of lenses
+   * @return   the vector of iterators which points to the beginning of the continuous area of lenses
    */
   auto associate_lenses = [](const vector<ParamPoint3>& ap, const ranges_t& v) {
     vector<std::vector<ParamPoint3>::const_iterator> res;

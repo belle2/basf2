@@ -46,7 +46,7 @@ workflow:
           GITLAB_RUNNER: "gitlab-runner2"
 
 default:
-  image: belle2/belle2-base-ubuntu2004:latest
+  image: belle2/belle2-base-ubuntu2204:latest
   tags:
     - $GITLAB_RUNNER  # The runner is dynamically assigned by the workflow rules
   cache:

@@ -13,7 +13,7 @@
 # Date: 20231003
 #
 
-PythiaBothParam StringFlav:probStoUD=0.390
+PythiaAliasParam StringFlav:probStoUD=0.390
 
 #
 Decay Upsilon(4S)

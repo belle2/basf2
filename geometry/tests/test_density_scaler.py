@@ -8,7 +8,7 @@
 
 '''
 Test if the DensityScaler module works.
-N.B.: this test can not be run in a light-release enviroment.
+N.B.: this test can not be run in a light-release environment.
 '''
 
 import basf2 as b2

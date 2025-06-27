@@ -55,7 +55,7 @@ running check_11_branches: Check that merging fails if the branches in the event
 check_11_branches passed
 running check_12_hadded: Check that merging fails if the file has more then one entry in the persistent tree
 hadd Target file: test11.root
-hadd compression setting for all output: 1
+hadd compression setting for all output: 101
 hadd Source file 1: test1.root
 hadd Source file 2: test1.root
 hadd Target path: test11.root:/

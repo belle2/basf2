@@ -1,4 +1,5 @@
 [INFO] Steering file: SVDVariablesToStorageModuleTests.py
+[INFO] The random number seed is set to "something important"
 [INFO] Starting event processing, random seed is set to 'something important'
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/SVDClusters.root
 [INFO] ParticleLoader's Summary of Actions:
@@ -8,7 +9,7 @@
 	provider = ${BELLE2_CONDB_METADATA}
 [INFO] Conditions data: configured globaltag is ${default_globaltag}
 [INFO] Writing Ntuple: SVDClusterVariables
-TFile: /tmp/tmp8ej18xbg
+TFile: SVDVariablesToStorageModuleTests.root
 TTree: SVDClusterVariables
 TBranch: SVDClusterCharge, 7.712e+04
 TBranch: SVDClusterSNR, 34.59

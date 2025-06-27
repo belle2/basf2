@@ -9,11 +9,10 @@
 ##########################################################################
 
 import unittest
-import tempfile
 import b2test_utils
 import b2test_utils_analysis
 import modularAnalysis as ma
-from basf2 import create_path
+from basf2 import create_path, set_random_seed
 
 
 class SVDVariablesToStorageModuleTests(unittest.TestCase):
@@ -22,9 +21,9 @@ class SVDVariablesToStorageModuleTests(unittest.TestCase):
     def test(self):
         """ Test of SVDVariablesToStorageModule """
 
-        b2test_utils.configure_logging_for_tests()
+        set_random_seed("something important")
 
-        testFile = tempfile.NamedTemporaryFile()
+        b2test_utils.configure_logging_for_tests()
 
         main = create_path()
 
@@ -37,12 +36,12 @@ class SVDVariablesToStorageModuleTests(unittest.TestCase):
                              "SVDTrackPrime", "SVDResidual", "SVDLayer", "SVDLadder", "SVDSensor", "SVDSide"]
 
         main.add_module("SVDVariablesToStorage",
-                        outputFileName=testFile.name,
+                        outputFileName="SVDVariablesToStorageModuleTests.root",
                         containerName="SVDClusterVariables",
                         particleListName="pi+:all",
                         variablesToNtuple=variablesToNtuple)
         b2test_utils.safe_process(main)
-        b2test_utils_analysis.scanTTree(testFile.name)
+        b2test_utils_analysis.scanTTree("SVDVariablesToStorageModuleTests.root")
         print("Test passed. Cleaning up.")
 
 

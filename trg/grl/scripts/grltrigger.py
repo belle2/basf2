@@ -45,7 +45,3 @@ def add_grl_trigger(path, SimulationMode=1):
         'TRGGRLInjectionVetoFromOverlay',
         TRGGRLInfoName=_TRGGRLInfo
     )
-
-    objects = b2.register_module('TRGGRLProjects')
-    objects.param('SimulationMode', SimulationMode)
-    path.add_module(objects)

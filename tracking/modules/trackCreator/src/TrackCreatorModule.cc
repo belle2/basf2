@@ -98,8 +98,13 @@ void TrackCreatorModule::event()
       double initialTotalMomentum = recoTrack.getMomentumSeed().R(); // this is the MomentumSeed
       if (!m_useSeedMomentumRange) {
         // if we decide to use the previous track fit momentum for the trackFitMomentumRange selection
-        genfit::MeasuredStateOnPlane msop = recoTrack.getMeasuredStateOnPlaneFromFirstHit();
-        initialTotalMomentum =  recoTrack.getCardinalRepresentation()->getMomMag(msop);
+        if (recoTrack.wasFitSuccessful()) {
+          // If the previous fit has been successful
+          genfit::MeasuredStateOnPlane msop = recoTrack.getMeasuredStateOnPlaneFromFirstHit();
+          initialTotalMomentum =  recoTrack.getCardinalRepresentation()->getMomMag(msop);
+        } else {
+          B2DEBUG(25, "No previous successful fit, using seed value instead");
+        }
       }
 
       B2DEBUG(25, "Trying to fit with PDG = " << pdg);

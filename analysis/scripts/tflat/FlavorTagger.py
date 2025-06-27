@@ -95,7 +95,7 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             'kaonID',
             'pionID',
             'protonID',
-            'deuteronID',
+            # 'deuteronID',
             'nCDCHits/56',
             'nPXDHits/2',
             'nSVDHits/8',
@@ -106,7 +106,7 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             # 'BtagToWBosonVariables(recoilMassSqrd)/15',
             # 'BtagToWBosonVariables(pMissCMS)',
             # 'BtagToWBosonVariables(cosThetaMissCMS)',
-            'cosTPTO('+maskName+')',
+            # 'cosTPTO('+maskName+')',
             'clusterEoP',
             'clusterLAT']
 
@@ -116,8 +116,8 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             'useCMSFrame(phi)',
             'clusterE1E9',
             'clusterE9E21',
-            'clusterLAT',
-            'clusterTiming']
+            'clusterLAT']
+        # 'clusterTiming']
 
         roe_variable_list = [
             'nCleanedECLClusters(isInRestOfEvent == 1)/8',
@@ -140,7 +140,7 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
     if maskName == 'TFLATDefaultMask':
         TFLATDefaultMask = (
             'TFLATDefaultMask',
-            'thetaInCDCAcceptance and p<infinity and p >= 0',
+            'thetaInCDCAcceptance and p<infinity and p >= 0 and dr<1 and abs(dz)<3',
             'thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.03 and clusterReg==2] or \
                             [E>0.06 and clusterReg==3]]')
         for name in particle_lists:

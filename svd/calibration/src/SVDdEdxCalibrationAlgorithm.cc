@@ -834,29 +834,11 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   ElectronProfileBetaGamma->SetMarkerColor(cgreen);
   ElectronProfileBetaGamma->SetLineColor(cgreen);
 
-  // reject bins with too large uncertainties - should not be necessary anymore
-  // for (int i = 1; i <= ProtonProfileBetaGamma->GetNbinsX();
-  //      i++) if (ProtonProfileBetaGamma->GetBinError(i) / ProtonProfileBetaGamma->GetBinContent(i) > 0.15)
-  //     ProtonProfileBetaGamma->SetBinContent(i,
-  //                                           0);
-
-
-  // for (int i = 1; i <= KaonProfileBetaGamma->GetNbinsX();
-  //      i++) if (KaonProfileBetaGamma->GetBinError(i) / KaonProfileBetaGamma->GetBinContent(i) > 0.15) KaonProfileBetaGamma->SetBinContent(
-  //            i, 0);
-
-
-  // for (int i = 1; i <= PionProfileBetaGamma->GetNbinsX();
-  //      i++) if (PionProfileBetaGamma->GetBinError(i) / PionProfileBetaGamma->GetBinContent(i) > 0.15) PionProfileBetaGamma->SetBinContent(
-  //            i, 0);
-
-
 // prepare the fitting
 
   PionProfileBetaGamma->GetYaxis()->SetRangeUser(5.e5, 5.5e6);
   KaonProfileBetaGamma->GetYaxis()->SetRangeUser(5.e5, 5.5e6);
   ProtonProfileBetaGamma->GetYaxis()->SetRangeUser(5.e5, 5.5e6);
-
 
 // enhance the proton histogram (which ends at beta*gamma around 3) by adding pion data above this value – otherwise the fit is very unstable
   auto PionEdges = PionProfileBetaGamma->GetXaxis()->GetXbins()->GetArray();
@@ -1252,7 +1234,10 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
 
   TF1* PionResolutionFunction = new TF1("PionResolutionFunction",
                                         "[0]*TMath::Landau(x, [1], [1]*[2])*TMath::Gaus(x, [1], [1]*[2]*[4]) + [3]*TMath::Gaus(x, [1], [1]*[2]*[5])", 100e3, 1500e3);
-
+// parameter [1] is the mean of the Landau
+// parameter [2] is the relative resolution (w.r.t. the mean) of the Landau
+// parameters [4]-[5] are the relative resolution of Gauss contributions w.r.t. that of Landau
+// parameters [0] and [3] are fractions of the two components
   PionResolutionFunction->SetParameters(1, 6.e5, 0.1, 0.5, 2, 1);
   PionResolutionFunction->SetParLimits(0, 0, 500);
   PionResolutionFunction->SetParLimits(1, 3.e5, 8.e5);

@@ -68,7 +68,7 @@ namespace Belle2 {
     /**
      * set the number of events to generate, per momentum bin, for the payloads
      */
-    void setNToGenerate(const int& value) { m_toGenerate = value; }
+    void setNEventsToGenerate(const int& value) { m_NToGenerate = value; }
 
     /**
      * reimplement the profile histogram calculation
@@ -113,7 +113,7 @@ namespace Belle2 {
     double m_dedxMaxPossible = 7.e6;  /**< the approximate max possible value of dEdx */
     int m_MinEvtsPerTree =
       100;                                                 /**< number of events in TTree below which we don't try to fit */
-    int m_toGenerate =
+    int m_NToGenerate =
       500000;                                                     /**< the number of events to be generated in each momentum bin in the new payloads */
     bool m_CustomProfile = 1; /**< reimplement profile histogram calculation instead of the ROOT implementation? */
     bool m_UsePionBGFunctionForEverything =
@@ -203,7 +203,7 @@ namespace Belle2 {
 
         // fill manually (instead of FillRandom) to also preserve events in the overflow bin
         // this is needed for the correct normalisation
-        for (int iEvent = 0; iEvent < m_toGenerate; iEvent++) {
+        for (int iEvent = 0; iEvent < m_NToGenerate; iEvent++) {
           MomentumSlice->Fill(ResolutionFunction->GetRandom());
         }
 

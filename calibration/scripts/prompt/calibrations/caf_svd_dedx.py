@@ -55,7 +55,7 @@ settings = CalibrationSettings(
         # Fix one of the parameters in the dEdx:beta*gamma fit, which makes the fit much more stable.
         "FixUnstableFitParameter": True,
         # In case of large changes in dEdx:beta*gamma trend with time, might need to set to False.
-        "EventsToGenerate": 5e5,  # how many events to generate in each momentum bin, for the new payloads?
+        "NEventsToGenerate": 5e5,  # how many events to generate in each momentum bin, for the new payloads?
         "UsePionBGFunctionForEverything": False,  # if the dEdx:beta*gamma fit is unstable, use the pion fit for all hadrons?
         # (This can save us if the calibration failed due to e.g. kaon fit issue.)
         "UseProtonBGFunctionForEverything": False,  # if the dEdx:beta*gamma fit is unstable, use the proton fit for all hadrons?
@@ -274,7 +274,7 @@ def get_calibrations(input_data, **kwargs):
     algo.setNumDEdxBins(expert_config['NBinsdEdx'])
     algo.setDEdxCutoff(expert_config['dedxCutoff'])
     algo.setMinEvtsPerTree(expert_config['MinEvtsPerTree'])
-    algo.setNToGenerate(int(expert_config['EventsToGenerate']))
+    algo.setNEventsToGenerate(int(expert_config['NEventsToGenerate']))
     algo.setUsePionBGFunctionForEverything(expert_config['UsePionBGFunctionForEverything'])
     algo.setUseProtonBGFunctionForEverything(expert_config['UseProtonBGFunctionForEverything'])
     algo.setCustomProfile(expert_config['CustomProfile'])

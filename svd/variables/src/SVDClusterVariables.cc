@@ -9,9 +9,9 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <analysis/dataobjects/Particle.h>
+#include <svd/variables/SVDClusterVariables.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <analysis/VariableManager/Manager.h>
 
 namespace {
   Belle2::RecoTrack* getRecoTrack(const Belle2::Particle* particle)
@@ -326,11 +326,11 @@ namespace Belle2::Variable {
   REGISTER_VARIABLE("SVDTruePosition(i)", SVDTruePosition,
                     "Returns the true position of the i-th SVD cluster related to the Particle.");
   REGISTER_VARIABLE("SVDLayer(i)", SVDLayer,
-                    "Returns the layer number of the i-th SVD cluster related to the Particle.");
+                    "Returns the layer number of the i-th SVD cluster related to the Particle. If no SVD cluster is found, returns -1.");
   REGISTER_VARIABLE("SVDLadder(i)", SVDLadder,
-                    "Returns the ladder number of the i-th SVD cluster related to the Particle.");
+                    "Returns the ladder number of the i-th SVD cluster related to the Particle. If no SVD cluster is found, returns -1.");
   REGISTER_VARIABLE("SVDSensor(i)", SVDSensor,
-                    "Returns the sensor number of the i-th SVD cluster related to the Particle.");
+                    "Returns the sensor number of the i-th SVD cluster related to the Particle. If no SVD cluster is found, returns -1.");
   REGISTER_VARIABLE("SVDSide(i)", SVDSide,
                     "Returns true if the i-th SVD cluster related to the Particle is a U cluster.");
 }

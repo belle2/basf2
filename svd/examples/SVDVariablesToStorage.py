@@ -17,7 +17,7 @@
 import basf2 as b2
 import tracking as trk
 import simulation as sim
-import svd as svd
+import svd
 import glob
 import modularAnalysis as ma
 import rawdata as raw

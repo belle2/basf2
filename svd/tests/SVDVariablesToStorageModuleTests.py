@@ -11,9 +11,9 @@
 import unittest
 import tempfile
 import b2test_utils
+import b2test_utils_analysis
 import modularAnalysis as ma
 from basf2 import create_path
-from ROOT import TFile
 
 
 class SVDVariablesToStorageModuleTests(unittest.TestCase):
@@ -40,12 +40,7 @@ class SVDVariablesToStorageModuleTests(unittest.TestCase):
                         particleListName="pi+:all",
                         variablesToNtuple=variablesToNtuple)
         b2test_utils.safe_process(main)
-        output_file = TFile(testFile.name)
-        tree = output_file.Get("SVDClusterVariables")
-        self.assertFalse(tree.GetEntries() == 0, "Empty tree!")
-        for variable in variablesToNtuple:
-            self.assertTrue(tree.GetListOfBranches().Contains(variable))
-
+        b2test_utils_analysis.scanTTree(testFile.name)
         print("Test passed. Cleaning up.")
 
 

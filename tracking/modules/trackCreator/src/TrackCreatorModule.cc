@@ -50,8 +50,8 @@ TrackCreatorModule::TrackCreatorModule() :
   addParam("useBFieldAtHit", m_useBFieldAtHit, "Flag to calculate the BField at the used hit "
            "(closest to IP or first one), instead of the one at the POCA. Use this for cosmics to prevent problems, when cosmics reconstruction end up in the QCS magnet.",
            m_useBFieldAtHit);
-  addParam("useSeedMomentumRange", m_useSeedMomentumRange, "Flag to use the momentum seed of the RecoTrack "
-           "for the TrackFitMomentumRange selection. By default the fitted value is used",  m_useSeedMomentumRange);
+  addParam("useSeedForTrackFitMomentumRange", m_useSeedForTrackFitMomentumRange, "Flag to use the momentum seed of the RecoTrack "
+           "for the TrackFitMomentumRange selection. By default the fitted value is used",  m_useSeedForTrackFitMomentumRange);
 
 }
 
@@ -96,7 +96,7 @@ void TrackCreatorModule::event()
       // Otherwise fits them with the default fitter.
 
       double initialTotalMomentum = recoTrack.getMomentumSeed().R(); // this is the MomentumSeed
-      if (!m_useSeedMomentumRange) {
+      if (!m_useSeedForTrackFitMomentumRange) {
         // if we decide to use the previous track fit momentum for the trackFitMomentumRange selection
         if (recoTrack.wasFitSuccessful()) {
           // If the previous fit has been successful

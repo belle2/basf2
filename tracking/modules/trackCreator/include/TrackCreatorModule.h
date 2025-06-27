@@ -71,7 +71,7 @@ namespace Belle2 {
     bool m_useBFieldAtHit = false;
 
     /// Flag to use the momentum seed of the RecoTrack for the TrackFitMomentumRange selection (instead of the fitted value)
-    bool m_useSeedMomentumRange = false;
+    bool m_useSeedForTrackFitMomentumRange = false;
 
     /// TrackFitMomentumRange Database OjbPtr
     DBObjPtr<TrackFitMomentumRange> m_trackFitMomentumRange;

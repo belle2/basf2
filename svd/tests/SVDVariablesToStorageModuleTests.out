@@ -7,7 +7,7 @@
 [INFO]    -> MDST source: Tracks
 [INFO] Conditions Database: found working metadata provider
 	provider = ${BELLE2_CONDB_METADATA}
-[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] Conditions data: configured globaltag is main_2024-12-20
 [INFO] Writing Ntuple: SVDClusterVariables
 TFile: SVDVariablesToStorageModuleTests.root
 TTree: SVDClusterVariables

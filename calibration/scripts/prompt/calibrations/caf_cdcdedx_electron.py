@@ -406,9 +406,9 @@ def onedcell_algo():
 
 def validation_algo():
     """
-    Create oned cell calibration algorithm.
+    Create validation algorithm
     Returns:
-        algo : oned cell correction algorithm
+        algo : validation algorithm
     """
     algo = CDCDedxValidationAlgorithm()
     return algo

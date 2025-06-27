@@ -13,11 +13,8 @@ Implements cosgain correction
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-# import ROOT
 from ROOT.Belle2 import CDCDedxValidationAlgorithm
 from matplotlib.backends.backend_pdf import PdfPages
-
-# ROOT.gROOT.SetBatch(True)
 
 
 def hist(y_min=None, y_max=None, x_min=None, x_max=None,

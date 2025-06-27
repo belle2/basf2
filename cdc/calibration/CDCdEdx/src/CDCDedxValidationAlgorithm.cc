@@ -53,13 +53,13 @@ CalibrationAlgorithm::EResult CDCDedxValidationAlgorithm::calibrate()
   // Get data objects
   auto tBhabha = getObjectPtr<TTree>("tBhabha");
 
-  // require at least 100 tracks (arbitrary for now)
+  // require at least 100 tracks
   if (tBhabha->GetEntries() < 100) return c_NotEnoughData;
 
   // Get data objects
   auto tRadee = getObjectPtr<TTree>("tRadee");
 
-  // require at least 100 tracks (arbitrary for now)
+  // require at least 100 tracks
   if (tRadee->GetEntries() < 100) return c_NotEnoughData;
 
   bhabhaValidation();
@@ -380,7 +380,6 @@ void CDCDedxValidationAlgorithm::printCanvasdEdx(std::array<std::vector<TH1D*>, 
   psname << Form("%s.pdf", namesfx.data());
 
   // Iterate through the histograms and plot them in the canvas
-
   for (int i = 0; i < xbins; ++i) {
 
     ctmp->cd(i % 4 + 1);

@@ -229,7 +229,10 @@ void KLMClusterAnaModule::event()
     for (const KLMHit2d* hit2d : klmHit2ds) {
       clusterShape->addRelationTo(hit2d);
     }
-
+    // Fill relevant KLMCluster data members
+    klmcluster.setShapeStdDev1(sqrt(clusterShape->getVariance1()));
+    klmcluster.setShapeStdDev2(sqrt(clusterShape->getVariance2()));
+    klmcluster.setShapeStdDev3(sqrt(clusterShape->getVariance3()));
   }
 
 }

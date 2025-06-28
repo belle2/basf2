@@ -626,10 +626,10 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
             klmHit[c].setTrackRotationAngle(extState.directionAtIP.angle(mom));
             klmHit[c].setTrackClusterInitialSeparationAngle(extState.directionAtIP.angle(klmPos));
           }
-          KLMCluster* cluster = (*klmClusterInfo)[c].first;
-          cluster->setClusterTrackSeparation(klmHit[c].getDistance() / CLHEP::cm);
-          cluster->setClusterTrackSeparationAngle(klmHit[c].getTrackClusterSeparationAngle());
-          cluster->setClusterTrackRotationAngle(klmHit[c].getTrackRotationAngle());
+          // KLMCluster *cluster = (*klmClusterInfo)[c].first;
+          // cluster->setClusterTrackSeparation(klmHit[c].getDistance()/CLHEP::cm);
+          // cluster->setClusterTrackSeparationAngle(klmHit[c].getTrackClusterSeparationAngle());
+          // cluster->setClusterTrackRotationAngle(klmHit[c].getTrackRotationAngle());
         }
       }
     }
@@ -687,6 +687,11 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
         continue;
       }
       TrackClusterSeparation* h = m_trackClusterSeparations.appendNew(klmHit[c]);
+      // Add the following three quantities to the KLMCluster data members
+      (*klmClusterInfo)[c].first->setClusterTrackSeparation(klmHit[c].getDistance() / CLHEP::cm);
+      (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(klmHit[c].getTrackClusterSeparationAngle());
+      (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(klmHit[c].getTrackRotationAngle());
+      //
       (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackSep
       if (extState.track != nullptr) {
         extState.track->addRelationTo(h); // relation Track to TrackSep
@@ -704,7 +709,6 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
       }
     }
   }
-
 }
 
 // Swim one track for EXT until it stops or leaves the ECL-bounding  cylinder

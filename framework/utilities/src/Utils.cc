@@ -16,7 +16,11 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-#include <boost/process.hpp>
+#include <boost/process/v1/args.hpp>
+#include <boost/process/v1/child.hpp>
+#include <boost/process/v1/io.hpp>
+#include <boost/process/v1/pipe.hpp>
+#include <boost/process/v1/search_path.hpp>
 
 #include <sys/time.h>
 #include <unistd.h>
@@ -100,7 +104,7 @@ namespace Belle2::Utils {
   std::string getCommandOutput(const std::string& command, const std::vector<std::string>& arguments,
                                bool searchPath)
   {
-    namespace bp = boost::process;
+    namespace bp = boost::process::v1;
     auto cmd = searchPath ? bp::search_path(command) : boost::filesystem::path(command);
     bp::ipstream cmdOut;
     bp::child child(cmd, bp::args(arguments), bp::std_in.close(), bp::std_out > cmdOut);

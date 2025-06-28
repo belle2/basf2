@@ -39,14 +39,15 @@ namespace Belle2 {
 
   public:
 
-    int GetBeamBkg(std::vector<std::vector<double>>);
+    //! get beambkg bit array
+    int getBeamBkg(std::vector<std::vector<double>>);
 
   private:
-    //
+
     /** 4 region along r phi plane  */
-    int Quadrant[3][4];
+    int m_Quadrant[3][4];
     /** Object of TC Mapping */
-    TrgEclMapping* _TCMap;
+    TrgEclMapping* m_TCMap;
   };
 //
 //

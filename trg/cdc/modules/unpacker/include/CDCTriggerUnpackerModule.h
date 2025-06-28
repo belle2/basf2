@@ -306,6 +306,9 @@ namespace Belle2 {
 
     /** bitstream of Neuro input and output (including intermediate results) */
     StoreArray<CDCTriggerUnpacker::NNBitStream> m_bitsNN;
+    /** bitstream of DNN input and output (including intermediate results) */
+
+    StoreArray<CDCTriggerUnpacker::DNNBitStream> m_bitsDNN;
 
     /** store object for unpacked etf event time from neuro b2link */
     StoreObjPtr<BinnedEventT0> m_ETFTime;
@@ -352,14 +355,26 @@ namespace Belle2 {
     unsigned m_exp = 0;
     /** run number */
     unsigned m_run = 0;
-
+    /* name for neurotrigger array*/
+    std::string m_neuro_track_name;
+    /*name for unpacked Neurotrigger input all stereo TSs array*/
+    std::string m_neuro_in_sTS_name;
+    /*name for unpacked Neurotrigger selected TSs array*/
+    std::string m_neuro_select_TS_name;
+    /*name for unpacked Neurotrigger input 2d tracks array*/
+    std::string m_neuro_in_2dtrack_name;
+    /*name for unpacked Neurotrigger input ETF T0 array*/
+    std::string m_neuro_in_etf_name;
+    /*name for unpacked Neurotrigger scaled input array*/
+    std::string m_neuro_scaled_input_name;
+    /*name for config saved in datastore*/
+    std::string m_neurotrigger_config_name;
     /** vector holding the pointers to all the dynamically allocated SubTriggers */
     std::vector<SubTrigger*> m_subTrigger;
-
     //condition database for number of TS in 2D
     DBObjPtr<CDCTrigger2DConfig> m_dbn2DTS;
     /** current neurotrigger config from database; used for unscaling network target */
-    DBObjPtr<CDCTriggerNeuroConfig> m_cdctriggerneuroconfig;
+    DBObjPtr<CDCTriggerNeuroConfig>* m_cdctriggerneuroconfig;
     /** output scale for the neural network output */
     std::vector<float> m_NNOutputScale;
     /** fake object to assign the user set scaling values to */
@@ -370,6 +385,8 @@ namespace Belle2 {
     bool m_sim13dt;
     /** PCIe40 data or copper data */
     bool m_pciedata;
+    /** flag for unpacking DNN or not */
+    bool m_isDNN;
   };
 
 

@@ -192,7 +192,7 @@ CDCTrigger2DFinderModule::event()
 
     if (m_usehitpattern) {
       unsigned hitpattern;
-      if (m_useadc) hitpattern = m_segmentHits[iHit]->gethitpattern_adc();
+      if (m_useadc) hitpattern = m_segmentHits[iHit]->getadcpattern();
       else          hitpattern = m_segmentHits[iHit]->gethitpattern();
       int nhitpattern = 0;
       if (iSL == 0)nhitpattern = 15;

@@ -18,6 +18,7 @@ import sys
 from contextlib import redirect_stdout
 
 import fei.monitoring as monitoring
+from fei.core import get_stages_from_particles
 
 
 def bold(text):
@@ -86,19 +87,25 @@ def print_summary(p):
         print(p.after_classifier[channel.label])
 
 
+# =============================================================================
 if __name__ == '__main__':
     particles, configuration = monitoring.load_config()
+    cache = configuration.cache
+    stages = get_stages_from_particles(particles)
 
     if len(sys.argv) >= 2:
         output = sys.argv[1]
         redirect = open(output, 'w')
-        print('Output redirected to', output)
+        print('FEI: printReporting; Output redirected to', output)
     else:
         redirect = sys.stdout
 
     with redirect_stdout(redirect):
-        for particle in particles:
-            monitoringParticle = monitoring.MonitoringParticle(particle)
-            print_summary(monitoringParticle)
+        for i in range(cache):
+            for particle in particles:
+                if particle in stages[i]:
+                    print('FEI: printReporting: ', i, particle.identifier)
+                    monitoringParticle = monitoring.MonitoringParticle(particle)
+                    print_summary(monitoringParticle)
     if len(sys.argv) >= 2:
         redirect.close()

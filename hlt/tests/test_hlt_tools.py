@@ -27,9 +27,13 @@ if __name__ == '__main__':
         # Check if b2hlt_triggers works.
         # 1: b2hlt_triggers print
         subprocess.check_call(['b2hlt_triggers', 'print', '--database', 'online'])
-        # 2: b2hlt_triggers download
-        subprocess.check_call(['b2hlt_triggers', 'download', '--database', 'online'])
-        # 3: b2hlt_triggers add_cut
-        subprocess.check_call(['b2hlt_triggers', 'add_cut', 'filter', 'accept_goats', '[nTrkLoose > 0]', '10', 'False'])
-        # 4: b2hlt_triggers remove_cut
-        subprocess.check_call(['b2hlt_triggers', 'remove_cut', 'skim', 'accept_bhabha'])
+
+        if not b2tu.is_cdb_down():
+            # 2: b2hlt_triggers download
+            subprocess.check_call(['b2hlt_triggers', 'download', '--database', 'online'])
+
+            # 3: b2hlt_triggers add_cut
+            subprocess.check_call(['b2hlt_triggers', 'add_cut', 'filter', 'accept_goats', '[nTrkLoose > 0]', '10', 'False'])
+
+            # 4: b2hlt_triggers remove_cut
+            subprocess.check_call(['b2hlt_triggers', 'remove_cut', 'skim', 'accept_bhabha'])

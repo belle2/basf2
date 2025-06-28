@@ -26,7 +26,7 @@ namespace Belle2 {
     bool isConnected() final;
   private:
     /// asio service for handling the requests
-    boost::asio::io_service m_ioservice;
+    boost::asio::io_context m_ioservice;
     /// the socket to the UDP server
     boost::asio::ip::udp::socket m_socket;
     /// the remote endpoint we send to

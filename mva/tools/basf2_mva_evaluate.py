@@ -495,6 +495,7 @@ if __name__ == '__main__':
                 p.add(data, spectator_abbr, identifier_abbr, list(range(10, 100, 10)),
                       test_target[identifier_abbr] == 1,
                       test_target[identifier_abbr] == 0)
+                p.figure.subplots_adjust(hspace=0.5)
                 p.finish()
                 p.save(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}.pdf')
                 graphics.add(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}.pdf', width=1.0)
@@ -510,6 +511,7 @@ if __name__ == '__main__':
                     p.add(data, spectator_abbr, identifier_abbr, list(range(10, 100, 10)),
                           train_target[identifier_abbr] == 1,
                           train_target[identifier_abbr] == 0)
+                    p.figure.subplots_adjust(hspace=0.5)
                     p.finish()
                     p.save(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}_train.pdf')
                     graphics.add(f'correlation_plot_{spectator_abbr}_{hash(spectator)}_{hash(identifier)}_train.pdf', width=1.0)

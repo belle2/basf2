@@ -156,8 +156,8 @@ namespace Belle2 {
     {return m_shapeStdDev1;}
 
     /**
-     * Get KLM variancestd deviation of the 2nd axis from PCA.
-     * @return variance of the 2nd axis from PCA.
+     * Get KLM std deviation of the 2nd axis from PCA.
+     * @return std deviation of the 2nd axis from PCA.
      */
     inline float getShapeStdDev2() const
     {return m_shapeStdDev2;}
@@ -171,42 +171,42 @@ namespace Belle2 {
 
     /**
      * Set KLM cluster-track rotation angle.
-     * @param[in]  rotation angle to the nearest track.
+     * @param[in] rotation angle to the nearest track.
      */
     void setClusterTrackRotationAngle(float rotation)
     {m_klmClusterTrackRotationAngle = rotation;}
 
     /**
      * Set KLM cluster-track separation angle.
-     * @param[in]  separation angle to the nearest track.
+     * @param[in] separation angle to the nearest track.
      */
     void setClusterTrackSeparationAngle(float separation)
     {m_klmClusterTrackSeparationAngle = separation;}
 
     /**
-     * Set minimum KLM cluster-track distance.
-     * @param[in]  rotation angle to the nearest track [cm].
+     * Set KLM cluster-track distance.
+     * @param[in] dist distance to the nearest track.
      */
     void setClusterTrackSeparation(float dist)
     {m_klmClusterTrackSeparation = dist;}
 
     /**
-     * Set variance of the 1st axis, from PCA.
-     * @param[in]  variance of the 1st axis from PCA [cm].
+     * Set std deviation of the 1st axis, from PCA.
+     * @param[in] std1 : std deviation of the 1st axis from PCA [cm].
      */
     void setShapeStdDev1(float std1)
     {m_shapeStdDev1 = std1;}
 
     /**
-     * Set variance of the 2nd axis, from PCA.
-     * @param[in]  variance of the 2nd axis from PCA [cm].
+     * Set std deviation of the 2nd axis, from PCA.
+     * @param[in] std2 : std deviation of the 2nd axis from PCA [cm].
      */
     void setShapeStdDev2(float std2)
     {m_shapeStdDev2 = std2;}
 
     /**
-     * Set variance of the 3rd axis, from PCA.
-     * @param[in]  variance of the 3rd axis from PCA [cm].
+     * Set std deviation of the 3rd axis, from PCA.
+     * @param[in] std3 : std deviation of the 3rd axis from PCA [cm].
      */
     void setShapeStdDev3(float std3)
     {m_shapeStdDev3 = std3;}
@@ -285,13 +285,13 @@ namespace Belle2 {
     /** Track-cluster separation (distance). */
     float m_klmClusterTrackSeparation;
 
-    /** Variance of axis 1 (from Cluster Shape PCA). */
+    /** Std deviation of axis 1 (from Cluster Shape PCA). */
     float m_shapeStdDev1;
 
-    /** Variance of axis 2 (from Cluster Shape PCA). */
+    /** Std deviation of axis 2 (from Cluster Shape PCA). */
     float m_shapeStdDev2;
 
-    /** Variance of axis 3 (from Cluster Shape PCA). */
+    /** Std deviation of axis 3 (from Cluster Shape PCA). */
     float m_shapeStdDev3;
 
 

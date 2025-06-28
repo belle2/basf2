@@ -179,7 +179,7 @@ std::tuple<bool, std::optional<double>> DQMHistAnalysisEventT0TriggerJitterModul
   //SETUP gSTYLE - all plots
   gStyle->SetOptFit(1111);
 
-  h->DrawClone();
+  h->Draw();
   fitf.DrawClone("same");
   gauss1.DrawClone("same");
   gauss2.DrawClone("same");

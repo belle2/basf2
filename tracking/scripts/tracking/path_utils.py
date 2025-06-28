@@ -9,6 +9,8 @@
 
 from pybasf2 import B2WARNING, B2FATAL
 
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
+
 from basf2 import register_module
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, add_cosmics_pxd_ckf
 from pxd import add_pxd_reconstruction
@@ -87,7 +89,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
         to the path that sets the quality indicator property of the found tracks.
     """
 
-    add_prefilter_track_fit_and_track_creator(path,
+    add_prefilter_track_fit_and_track_creator(path, components=components,
                                               trackFitHypotheses=trackFitHypotheses,
                                               reco_tracks=reco_tracks,
                                               add_mva_quality_indicator=add_mva_quality_indicator)
@@ -100,13 +102,14 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
         add_prune_tracks(path, components=components, reco_tracks=reco_tracks)
 
 
-def add_prefilter_track_fit_and_track_creator(path, trackFitHypotheses=None,
+def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHypotheses=None,
                                               reco_tracks="RecoTracks", add_mva_quality_indicator=False):
     """
     Helper function to add only the modules required to calculate HLT filter decision:
     performing the track fit and the Belle2 track creation to the path.
 
     :param path: The path to add the tracking reconstruction modules to
+    :param components: the list of geometry components in use or None for all components.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param add_mva_quality_indicator: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found tracks.
@@ -161,7 +164,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
     path.add_module("DAFRecoFitter",
                     recoTracksStoreArrayName=reco_tracks,
                     probCut=0.00001,
-                    pdgCodesToUseForFitting=13)
+                    pdgCodesToUseForFitting=13).set_name(f"DAFRecoFitter {reco_tracks}")
 
     # Correct time seed
     path.add_module("PlaneTriggerTrackTimeEstimator",
@@ -175,7 +178,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
     path.add_module("DAFRecoFitter",
                     recoTracksStoreArrayName=reco_tracks,
                     pdgCodesToUseForFitting=13
-                    )
+                    ).set_name(f"DAFRecoFitter {reco_tracks}")
 
     if event_timing_extraction:
         # Extract the time
@@ -191,7 +194,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
                         # probCut=0.00001,
                         recoTracksStoreArrayName=reco_tracks,
                         pdgCodesToUseForFitting=13
-                        )
+                        ).set_name(f"DAFRecoFitter {reco_tracks}")
 
     # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
@@ -210,6 +213,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
 def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                    reco_tracks="RecoTracks", use_second_cdc_hits=False,
                    split_after_delta_t=-1.0, matching_method="hit",
+                   relate_tracks_to_mcparticles=True,
                    chi2_cutoffs=[128024, 95, 173, 424, 90, 424],
                    chi2_linalg=False):
     """
@@ -227,6 +231,9 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                                 distance between two adjacent SimHits is more than the given value
     :param matching_method:     hit: uses the hit-matching
                                 chi2: uses the chi2-matching
+    :param relate_tracks_to_mcparticles:    If True (default), Tracks are related to MCParticles. Only works
+                                            if the TrackCreator is in the path before. Needs to be set to False
+                                            if only track finding is performed, but no Tracks are created.
     :param chi2_cutoffs:        If chi2 matching method is used, this list defines the individual cut-off values
                                 for the chi2 values. Thereby each charged stable particle gets its cut-off
                                 value. The order of the pdgs is [11,13,211,2212,321,1000010020]. The default
@@ -253,7 +260,8 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                         UseSVDHits=is_svd_used(components),
                         UseCDCHits=is_cdc_used(components))
 
-        path.add_module('TrackToMCParticleRelator')
+        if relate_tracks_to_mcparticles:
+            path.add_module('TrackToMCParticleRelator')
 
     elif (matching_method == "chi2"):
         print("Warning: The Chi2MCTrackMatcherModule is currently not fully developed and tested!")
@@ -629,7 +637,7 @@ def add_svd_standalone_tracking(path,
         raise ValueError(f"Do not understand the svd_standalone_mode {svd_standalone_mode}")
 
 
-def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
+def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_cdc_cellular_automaton=False,
                           use_second_hits=False, add_mva_quality_indicator=True,
                           reattach_hits=False, skip_WireHitPreparer=False):
     """
@@ -641,6 +649,8 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
 
     :param path: basf2 path
     :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
+    :param with_cdc_cellular_automaton: If true, the cellular automaton track finder algorithm will be used too,
+        after the global algorithm (Legendre)
     :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_mva_quality_indicator: Add the TFCDC_TrackQualityEstimator module to set the CDC quality
            indicator property of the CDC ``output_reco_tracks``
@@ -692,7 +702,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
 
     output_tracks = "CDCTrackVector"
 
-    if with_ca:
+    if with_cdc_cellular_automaton:
         output_tracks = "CombinedCDCTrackVector"
         path.add_module("TFCDC_TrackFinderSegmentPairAutomaton",
                         tracks="CDCTrackVector2")
@@ -712,7 +722,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                         "Small",
                     ])
 
-    if with_ca:
+    if with_cdc_cellular_automaton:
         # Add curlers in the axial inner most superlayer
         path.add_module("TFCDC_TrackCreatorSingleSegments",
                         inputTracks=output_tracks,
@@ -1190,6 +1200,7 @@ def add_default_cdc_svd_tracking_chain(path,
                                        svd_reco_tracks,
                                        cdc_reco_tracks,
                                        output_reco_tracks,
+                                       with_cdc_cellular_automaton=False,
                                        use_second_cdc_hits=False,
                                        add_cdcTrack_QI=True,
                                        use_mc_truth=False,
@@ -1209,6 +1220,8 @@ def add_default_cdc_svd_tracking_chain(path,
     :param svd_reco_tracks: name of the SVD standalone RecoTracks StoreArray
     :param cdc_reco_tracks: name of the CDC standalone RecoTracks StoreArray
     :param output_reco_tracks: name of the combined CDC+SVD RecoTracks StoreArray that is the final result of this tracking path
+    :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
+        after the global algorithm (Legendre)
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found CDC standalone tracks
@@ -1235,8 +1248,12 @@ def add_default_cdc_svd_tracking_chain(path,
     latest_reco_tracks = None
 
     if is_cdc_used(components):
-        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
-                              add_mva_quality_indicator=add_cdcTrack_QI)
+        add_cdc_track_finding(
+            path,
+            with_cdc_cellular_automaton=with_cdc_cellular_automaton,
+            use_second_hits=use_second_cdc_hits,
+            output_reco_tracks=cdc_reco_tracks,
+            add_mva_quality_indicator=add_cdcTrack_QI)
         temporary_reco_track_list.append(cdc_reco_tracks)
         latest_reco_tracks = cdc_reco_tracks
 
@@ -1269,6 +1286,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
                                         output_reco_tracks="CombinedSVDCDCRecoTracks",
                                         add_vxdTrack_QI=True,
                                         svd_standalone_mode="VXDTF2",
+                                        with_cdc_cellular_automaton=False,
                                         use_second_cdc_hits=False,
                                         add_cdcTrack_QI=True,
                                         use_mc_truth=False,
@@ -1297,6 +1315,8 @@ def add_inverted_svd_cdc_tracking_chain(path,
     :param svd_standalone_mode: Which SVD standalone tracking is used.
            Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
            Defaults to "VXDTF2"
+    :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
+        after the global algorithm (Legendre)
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found CDC standalone tracks
@@ -1333,7 +1353,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
         temporary_reco_track_list.append(svd_reco_tracks)
         latest_reco_tracks = svd_reco_tracks
 
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks)
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks).set_name(f"DAFRecoFitter {svd_reco_tracks}")
 
     if is_cdc_used(components):
         path.add_module("TFCDC_WireHitPreparer",
@@ -1366,6 +1386,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
         latest_reco_tracks = svd_cdc_reco_tracks
 
         add_cdc_track_finding(path,
+                              with_cdc_cellular_automaton=with_cdc_cellular_automaton,
                               use_second_hits=use_second_cdc_hits,
                               output_reco_tracks=cdc_reco_tracks,
                               add_mva_quality_indicator=add_cdcTrack_QI,

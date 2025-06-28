@@ -121,7 +121,7 @@ TagVertexModule::TagVertexModule() : Module(),
 void TagVertexModule::initialize()
 {
   // magnetic field
-  m_Bfield = BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(m_BeamSpotCenter)).Z();
+  m_Bfield = BFieldManager::getFieldInTesla(m_BeamSpotCenter).Z();
   // RAVE setup
   analysis::RaveSetup::initialize(1, m_Bfield);
   B2INFO("TagVertexModule : magnetic field = " << m_Bfield);
@@ -280,7 +280,7 @@ bool TagVertexModule::doVertexFit(const Particle* Breco)
 
   //make the beam spot bigger for the standard constraint
 
-  double beta = PCmsLabTransform().getBoostVector().Mag();
+  double beta = PCmsLabTransform().getBoostVector().R();
   double bg = beta / sqrt(1 - beta * beta);
 
   //TODO: What's the origin of these numbers?
@@ -405,7 +405,7 @@ pair<ROOT::Math::XYZVector, TMatrixDSym> TagVertexModule::findConstraint(const P
 
 
   // rotate err-matrix such that eZ goes to pBtagEstimate
-  TMatrixD Tube = rotateTensor(B2Vector3D(pBtagEstimate.Vect()), TubeZ);
+  TMatrixD Tube = rotateTensor(pBtagEstimate.Vect(), TubeZ);
 
   // Standard algorithm needs no shift
   return make_pair(m_BeamSpotCenter, toSymMatrix(Tube));
@@ -451,8 +451,7 @@ pair<ROOT::Math::XYZVector, TMatrixDSym> TagVertexModule::findConstraintBTube(co
     B2DEBUG(10, "Brec decay vertex after fit: " << printVector(tubecreatorBCopy->getVertex()));
     B2DEBUG(10, "Brec direction before fit: " << printVector(float(1. / Breco->getP()) * Breco->getMomentum()));
     B2DEBUG(10, "Brec direction after fit: " << printVector(float(1. / tubecreatorBCopy->getP()) * tubecreatorBCopy->getMomentum()));
-    B2DEBUG(10, "IP position: " << printVector(ROOT::Math::XYZVector(m_BeamSpotCenter.X(), m_BeamSpotCenter.Y(),
-                                               m_BeamSpotCenter.Z())));
+    B2DEBUG(10, "IP position: " << printVector(m_BeamSpotCenter));
     B2DEBUG(10, "IP covariance: " << printMatrix(m_BeamSpotCov));
     B2DEBUG(10, "Brec primary vertex: " << printVector(tubecreatorBCopy->getVertex()));
     B2DEBUG(10, "Brec PV covariance: " << printMatrix(pv));
@@ -464,7 +463,7 @@ pair<ROOT::Math::XYZVector, TMatrixDSym> TagVertexModule::findConstraintBTube(co
 
 
   // make rotation matrix from z axis to BTag line of flight
-  TMatrixD longerrorRotated = rotateTensor(B2Vector3D(pBtag.Vect()), longerror);
+  TMatrixD longerrorRotated = rotateTensor(pBtag.Vect(), longerror);
 
   //pvNew will correspond to the covariance matrix of the B tube
   TMatrixD pvNew = TMatrixD(pv) + longerrorRotated;
@@ -503,7 +502,7 @@ pair<ROOT::Math::XYZVector, TMatrixDSym> TagVertexModule::findConstraintBoost(do
   TMatrixD longerror(3, 3); longerror(2, 2) = cut * cut;
   longerror(0, 0) = longerror(1, 1) = d * d;
 
-  B2Vector3D boostDir = PCmsLabTransform().getBoostVector().Unit();
+  ROOT::Math::XYZVector boostDir = PCmsLabTransform().getBoostVector().Unit();
 
   TMatrixD longerrorRotated = rotateTensor(boostDir, longerror);
 
@@ -761,11 +760,11 @@ analysis::VertexFitKFit TagVertexModule::doSingleKfit(vector<ParticleAndWeight>&
       err.sub(5, ROOTToCLHEP::getHepSymMatrix(m_pvCov));
       kFit.setIpTubeProfile(
         ROOTToCLHEP::getHepLorentzVector(m_tagMomentum),
-        ROOTToCLHEP::getPoint3DFromB2Vector(m_constraintCenter),
+        ROOTToCLHEP::getPoint3D(m_constraintCenter),
         err,
         0.);
     } else {
-      kFit.setIpProfile(ROOTToCLHEP::getPoint3DFromB2Vector(m_constraintCenter),
+      kFit.setIpProfile(ROOTToCLHEP::getPoint3D(m_constraintCenter),
                         ROOTToCLHEP::getHepSymMatrix(m_constraintCov));
     }
   }
@@ -777,7 +776,7 @@ analysis::VertexFitKFit TagVertexModule::doSingleKfit(vector<ParticleAndWeight>&
       if (pawi.mcParticle) {
         addedOK = kFit.addTrack(
                     ROOTToCLHEP::getHepLorentzVector(pawi.mcParticle->get4Vector()),
-                    ROOTToCLHEP::getPoint3DFromB2Vector(getTruePoca(pawi)),
+                    ROOTToCLHEP::getPoint3D(getTruePoca(pawi)),
                     ROOTToCLHEP::getHepSymMatrix(pawi.particle->getMomentumVertexErrorMatrix()),
                     pawi.particle->getCharge());
       } else {
@@ -787,7 +786,7 @@ analysis::VertexFitKFit TagVertexModule::doSingleKfit(vector<ParticleAndWeight>&
       if (pawi.mcParticle) {
         addedOK = kFit.addTrack(
                     ROOTToCLHEP::getHepLorentzVector(pawi.mcParticle->get4Vector()),
-                    ROOTToCLHEP::getPoint3DFromB2Vector(getRollBackPoca(pawi)),
+                    ROOTToCLHEP::getPoint3D(getRollBackPoca(pawi)),
                     ROOTToCLHEP::getHepSymMatrix(pawi.particle->getMomentumVertexErrorMatrix()),
                     pawi.particle->getCharge());
       } else {
@@ -887,9 +886,9 @@ bool TagVertexModule::makeGeneralFitKFit()
 void TagVertexModule::deltaT(const Particle* Breco)
 {
 
-  B2Vector3D boost = PCmsLabTransform().getBoostVector();
-  ROOT::Math::XYZVector boostDir = ROOT::Math::XYZVector(boost.Unit());
-  double bg = boost.Mag() / sqrt(1 - boost.Mag2());
+  ROOT::Math::XYZVector boost = PCmsLabTransform().getBoostVector();
+  ROOT::Math::XYZVector boostDir = boost.Unit();
+  double bg = boost.R() / sqrt(1 - boost.Mag2());
   double c = Const::speedOfLight / 1000.; // cm ps-1
 
   //Reconstructed DeltaL & DeltaT in the boost direction
@@ -907,7 +906,7 @@ void TagVertexModule::deltaT(const Particle* Breco)
   if (m_mcLifeTimeReco  == -1 || m_mcTagLifeTime == -1)
     m_mcDeltaTau =  realNaN;
 
-  TVectorD bVec = toVec(B2Vector3D(boostDir));
+  TVectorD bVec = toVec(boostDir);
 
   //TagVertex error in boost dir
   m_tagVlErr = sqrt(m_tagVErrMatrix.Similarity(bVec));
@@ -922,7 +921,7 @@ void TagVertexModule::deltaT(const Particle* Breco)
   m_truthTagVl = m_mcTagV.Dot(boostDir);
 
   // calculate tagV component and error in the direction orthogonal to the boost
-  B2Vector3D oboost = getUnitOrthogonal(B2Vector3D(boostDir));
+  ROOT::Math::XYZVector oboost = getUnitOrthogonal(boostDir);
   TVectorD oVec = toVec(oboost);
 
   //TagVertex error in boost-orthogonal dir
@@ -1006,7 +1005,7 @@ ROOT::Math::XYZVector TagVertexModule::getRollBackPoca(ParticleAndWeight const& 
     return ROOT::Math::XYZVector(0., 0., 0.);
   }
 
-  return paw.particle->getTrackFitResult()->getPosition() - paw.mcParticle->getProductionVertex() + ROOT::Math::XYZVector(m_mcTagV);
+  return paw.particle->getTrackFitResult()->getPosition() - paw.mcParticle->getProductionVertex() + m_mcTagV;
 }
 
 void TagVertexModule::resetReturnParams()

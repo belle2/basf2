@@ -206,7 +206,9 @@ def add_mdst_dump(path, print_untested=False, print_mutable=True):
             "isValid", "hasInjection", "isHER", "isRevo2",
             "getTimeSinceLastInjection", "getTimeSincePrevTrigger", "getBunchNumber",
             "getTimeSinceLastInjectionInMicroSeconds", "getTimeSincePrevTriggerInMicroSeconds",
-            "getTimeSinceInjectedBunch", "getTimeSinceInjectedBunchInMicroSeconds", "getTriggeredBunchNumberGlobal"
+            "getTimeSinceInjectedBunch", "getTimeSinceInjectedBunchInMicroSeconds", "getTriggeredBunchNumberGlobal",
+            "hasEventT0SourceFromSVD", "hasEventT0SourceFromCDC", "hasEventT0SourceFromECL", "hasAnyEventT0Sources",
+            "getEventT0Sources"
             ], array=False),
     ]
     path.add_module(PrintObjectsModule(mdst_dataobjects, print_untested))

@@ -299,8 +299,8 @@ TBranch: klmClusterTheta, 1.47
 TBranch: klmClusterPhi, 2.371
 TBranch: nKLMClusterTrackMatches, 1
 TBranch: nMatchedKLMClusters, nan
-TBranch: isFromECL, 0
-TBranch: isFromKLM, 1
+TBranch: isFromECL, False
+TBranch: isFromKLM, True
 TTree: klong
 TBranch: __experiment__, 0
 TBranch: __run__, 0
@@ -397,7 +397,7 @@ TBranch: clusterSecondMoment, 0.4688
 TBranch: clusterTheta, 0.6785
 TBranch: clusterTiming, -0.9766
 TBranch: clusterTrackMatch, 0
-TBranch: goodBelleGamma, 1
+TBranch: goodBelleGamma, True
 TTree: muon
 TBranch: __experiment__, 0
 TBranch: __run__, 0

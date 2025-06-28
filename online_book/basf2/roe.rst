@@ -6,9 +6,7 @@ The Rest of Event (ROE)
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 10-20 min
-
-    **Exercises**: 10-20 min
+    **Length**: 30-60 min
 
     **Prerequisites**:
 

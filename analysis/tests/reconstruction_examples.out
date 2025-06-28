@@ -370,7 +370,7 @@ TBranch: __weight__, 1
 TBranch: isSignal, 0
 TBranch: Mbc, 5.242
 TBranch: deltaE, -3.943
-TBranch: isUnspecified, 0
+TBranch: isUnspecified, False
 TBranch: Xsd_px, 0.3492
 TBranch: Xsd_py, -0.34
 TBranch: Xsd_pz, 0.3247

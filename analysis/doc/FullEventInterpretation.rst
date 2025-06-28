@@ -813,7 +813,7 @@ The FEI is optimized for maximum speed, but the default configuration is not sui
 * Add extra cuts before the combination of the B mesons, e.g. the cut on Mbc is by default for hadronic B mesons only >5.2. There is a parameter called B_extra_cut in the get_default_channels function.
 * Add a skim cut on the number of tracks. Just add an applyEventCuts to your path before running the FEI. In fact, the maximum number of tracks for a correct B candidate is 7 (not in theory, but in practice). Hence, If you know you only want one track on the signal side. You can discard all events with more than 8 tracks from the beginning, without losing any correctly reconstructed signal events. This is of course not possible for an inclusive signal-side.
 
-With FEIv4 you don't need to re-train anything if you apply the above mentioned changes. Deactivating channels and tightening cuts is fine. For instance, I made a large study on the influence of the track-cut described above, and it doesn't matter at all if you use choose a different cut than the one used during the training.
+You don't need to re-train anything if you apply the above mentioned changes. Deactivating channels and tightening cuts is fine. For instance, a large study has been conducted on the influence of the track-cut described above, and it turned out that it doesn't matter at all if you choose a different cut than the one used during the training.
 
 
 Resources, Publications etc.

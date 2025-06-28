@@ -14,6 +14,8 @@
 #include <TF1.h>
 #include <TH2D.h>
 
+#include <cmath>
+
 using namespace Belle2;
 
 
@@ -113,7 +115,7 @@ void CDCDedxValidationModule::event()
     if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
       fTrkEoverP = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (mTrack->getMomentum().R());
       if (fCollType == "bhabha" || fCollType == "radbhabha") {
-        if (abs(fTrkEoverP - 1.0) >= 0.2)continue;
+        if (std::abs(fTrkEoverP - 1.0) >= 0.2)continue;
         ((TH1D*)fBasic->FindObject(Form("hEOverP_AR")))->Fill(double(fTrkEoverP));
       }
     } else {

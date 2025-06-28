@@ -24,6 +24,8 @@
 
 #include <TH1F.h>
 
+#include <cmath>
+
 //using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -156,7 +158,7 @@ void CDCCalibrationCollectorModule::collect()
     if (!fitresult) continue;
 
     short charge = fitresult->getChargeSign();
-    if (fabs(charge) > 0) {
+    if (std::abs(charge) > 0) {
       nCTracks++;
     }
   }
@@ -270,7 +272,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
         else lr = 0;
 
         //Convert to outgoing
-        if (fabs(alpha) > M_PI / 2) {
+        if (std::abs(alpha) > M_PI / 2) {
           x_b *= -1;
           x_u *= -1;
         }
@@ -280,7 +282,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
         alpha = cdcgeo.getOutgoingAlpha(alpha);
 
         B2DEBUG(99, "x_unbiased " << x_u << " |left_right " << lr);
-        if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(abs(x_u), lay, lr, alpha, theta);}
+        if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha, theta);}
         alpha *= 180 / M_PI;
         theta *= 180 / M_PI;
         //estimate drift time

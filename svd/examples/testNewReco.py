@@ -33,9 +33,11 @@ class SVDClustersQuickCheck(b2.Module):
     def initialize(self):
         '''define histograms'''
 
-        #: \cond Doxygen_suppress
+        #: list of test histograms
         self.test = []
+        #: another list of test histograms
         self.testNew = []
+        #: \cond Doxygen_suppress
         self.size = TH1F("cl_size", "Cluster Size", 20, 0, 20)
         self.sizeNew = TH1F("clNew_size", "New Cluster Size", 20, 0, 20)
         self.time = TH1F("cl_time", "Cluster Time", 300, -100, 200)
@@ -270,9 +272,11 @@ class SVDRecoDigitsQuickCheck(b2.Module):
     def initialize(self):
         '''define histograms'''
 
-        #: \cond Doxygen_suppress
+        #: list of test histograms
         self.test = []
+        #: another list of test histograms
         self.testNew = []
+        #: \cond Doxygen_suppress
         self.time = TH1F("rd_time", "RecoDigit Time", 300, -100, 200)
         self.timeNew = TH1F("rdNew_time", "New RecoDigit Time", 300, -100, 200)
         self.charge = TH1F("rd_charge", "RecoDigit Charge", 300, 0, 100000)

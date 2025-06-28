@@ -296,7 +296,7 @@ namespace Belle2 {
 
 
     /** Needed to make objects storable. */
-    ClassDef(Belle2::KLMCluster, 4);
+    ClassDef(Belle2::KLMCluster, 5);
 
   };
 

@@ -15,8 +15,6 @@
 #include <trg/grl/dataobjects/GRLMLPData.h>
 #include <framework/database/DBObjPtr.h>
 #include <trg/grl/dbobjects/TRGGRLConfig.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <TH1D.h>
 
@@ -97,12 +95,12 @@ namespace Belle2 {
     ///////////////////////////////////////////////////////////////////////////
     std::vector<double> TCThetaLab;
     std::vector<double> TCPhiLab;
-//////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////
     /** Histograms to save the NN classifiers */
     std::vector<TH1D*> h_target;
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
+    /** flag to use database to load config */
+    bool m_useDB;
 
   };
 }

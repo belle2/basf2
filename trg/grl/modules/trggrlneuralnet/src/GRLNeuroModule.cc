@@ -94,20 +94,15 @@ GRLNeuroModule::GRLNeuroModule() : Module()
   addParam("MVACut", m_nn_thres,
            "Cut value applied to the MLP output",
   {-1});
+  addParam("useDB", m_useDB,
+           "Flag to use database to set config", true);
 }
 
 
 void
 GRLNeuroModule::initialize()
 {
-  m_parameters.nMLP = 1;
 
-  m_GRLNeuro.initialize(m_parameters);
-  for (unsigned it = 0; it < m_parameters.nMLP; it++) {
-    if (!m_GRLNeuro.load(it, m_weightFileNames[it], m_biasFileNames[it])) {
-      B2ERROR("NeuroTrigger could not be loaded correctly.");
-    }
-  }
   TrgEclMapping* trgecl_obj = new TrgEclMapping();
   for (int tc = 1; tc <= 576; tc++) {
     TCThetaID.push_back(trgecl_obj->getTCThetaIdFromTCId(tc));
@@ -130,12 +125,6 @@ GRLNeuroModule::initialize()
     TCPhiLab.push_back(CellLab.Phi()*TMath::RadToDeg() + 180.0);
 
   }
-  if (m_saveHist) {
-    for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {
-      h_target.push_back(new TH1D(("h_target_" + to_string(isector)).c_str(),
-                                  ("h_target_" + to_string(isector)).c_str(),  100, 0.0, 1.0));
-    }
-  }
 
   delete trgecl_obj;
 
@@ -144,22 +133,42 @@ GRLNeuroModule::initialize()
 void
 GRLNeuroModule::beginRun()
 {
-  if (not m_db_trggrlconfig.isValid()) {
-    StoreObjPtr<EventMetaData> evtMetaData;
-    B2FATAL("No database for TRG GRL config. exp " << evtMetaData->getExperiment() << " run "
-            << evtMetaData->getRun());
-  } else {
-    m_nn_thres[0] = m_db_trggrlconfig->get_ecltaunn_threshold();
+  if (m_useDB) {
+    if (not m_db_trggrlconfig.isValid()) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      B2FATAL("No database for TRG GRL config. exp " << evtMetaData->getExperiment() << " run "
+              << evtMetaData->getRun());
+    } else {
+      m_parameters.nMLP           = m_db_trggrlconfig->get_ecltaunn_nMLP();
+      m_parameters.multiplyHidden = m_db_trggrlconfig->get_ecltaunn_multiplyHidden();
+      m_parameters.nHidden        = m_db_trggrlconfig->get_ecltaunn_nHidden();
+      m_parameters.n_cdc_sector   = m_db_trggrlconfig->get_ecltaunn_n_cdc_sector();
+      m_parameters.n_ecl_sector   = m_db_trggrlconfig->get_ecltaunn_n_ecl_sector();
+      m_parameters.i_cdc_sector   = m_db_trggrlconfig->get_ecltaunn_i_cdc_sector();
+      m_parameters.i_ecl_sector   = m_db_trggrlconfig->get_ecltaunn_i_ecl_sector();
+      m_nn_thres[0]               = m_db_trggrlconfig->get_ecltaunn_threshold();
+
+      m_GRLNeuro.initialize(m_parameters);
+
+      for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {
+        if (!m_GRLNeuro.load(isector, m_db_trggrlconfig->get_ecltaunn_weight()[isector], m_db_trggrlconfig->get_ecltaunn_bias()[isector])) {
+          B2ERROR("weight of GRL ecltaunn could not be loaded correctly.");
+        }
+      }
+    }
+  }
+
+  if (m_saveHist) {
+    for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {
+      h_target.push_back(new TH1D(("h_target_" + to_string(isector)).c_str(),
+                                  ("h_target_" + to_string(isector)).c_str(),  100, 0.0, 1.0));
+    }
   }
 }
 
 void
 GRLNeuroModule::event()
 {
-  //inputs and outputs
-  std::vector<float> MLPinput;
-  MLPinput.clear();
-  MLPinput.assign(24, 0);
 
   //ECL input
   //..Use only clusters within 100 ns of event timing (from ECL).
@@ -185,9 +194,11 @@ GRLNeuroModule::event()
     return std::get<0>(a) > std::get<0>(b);
   });
 
+  // MLPinput
+  std::vector<float> MLPinput;
+  MLPinput.clear();
+  MLPinput.assign(24, 0);
 
-
-// MLPinput
   for (size_t i = 0; i < std::min(eclClusters.size(), size_t(6)); i++) {
     MLPinput[i]  = std::get<0>(eclClusters[i]); // E
     MLPinput[6 + i]  = std::get<1>(eclClusters[i]); // Theta

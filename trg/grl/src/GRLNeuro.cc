@@ -579,3 +579,10 @@ bool GRLNeuro::load(unsigned isector, const string& weightfilename, const string
 
 
 
+bool GRLNeuro::load(unsigned isector, std::vector<float> warray, std::vector<float> barray)
+{
+  GRLMLP& expert = m_MLPs[isector];
+  expert.setWeights(warray);
+  expert.setBias(barray);
+  return true;
+}

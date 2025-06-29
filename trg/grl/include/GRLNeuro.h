@@ -91,6 +91,13 @@ namespace Belle2 {
      * @return true if the MLPs were loaded correctly
      */
     bool load(unsigned isector, const std::string& wfilename, const std::string& bfilename);
+    /** Load MLPs from file.
+     * @param isector index of the MLP
+     * @param weight array from database
+     * @param bias array from database
+     * @return true if the MLPs were loaded correctly
+     */
+    bool load(unsigned isector, std::vector<float> weight, std::vector<float> bias);
 
     /** Run an expert MLP.
      * @param isector index of the MLP

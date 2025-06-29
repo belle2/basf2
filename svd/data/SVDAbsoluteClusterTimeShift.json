@@ -1,0 +1,24 @@
+{
+    "_COMMENT": "First version for release-10",
+
+    "uniqueID": {
+	"INFO": { "source": "AllZeros",
+		  "useFor": "noShift",
+		  "config": "AllSensors",
+		  "tag": "rel10-v0"
+		}
+    },
+
+    "shiftValue" : {
+	"CoG3" : {
+	    "L3SU": 0,
+	    "L3SV": 0,
+	    "L4SU": 0,
+	    "L4SV": 0,
+	    "L5SU": 0,
+	    "L5SV": 0,
+	    "L6SU": 0,
+	    "L6SV": 0
+	}
+    }
+}

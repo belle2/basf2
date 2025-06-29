@@ -60,7 +60,8 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
   auto ttreeGamma = getObjectPtr<TTree>("Gamma");
   auto ttreeGeneric = getObjectPtr<TTree>("Generic");
 
-  if (ttreeLambda->GetEntries() < m_MinEvtsPerTree) {
+  if ((ttreeLambda->GetEntries() < m_MinEvtsPerTree) || (ttreeDstar->GetEntries() < m_MinEvtsPerTree)
+      || (ttreeGamma->GetEntries() < m_MinEvtsPerTree)) {
     B2WARNING("Not enough data for calibration.");
     return c_NotEnoughData;
   }
@@ -98,51 +99,39 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
       if (iPart == 0 && trunmean) {
         hDedxPDFs[iPart] = histoE;
         hDedxPDFs[iPart]->SetName("hist_d1_11_trunc");
-        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 1 && trunmean) {
         hDedxPDFs[iPart] = histoMu;
         hDedxPDFs[iPart]->SetName("hist_d1_13_trunc");
-        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 2 && trunmean) {
         hDedxPDFs[iPart] = histoPi;
         hDedxPDFs[iPart]->SetName("hist_d1_211_trunc");
-        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 3 && trunmean) {
         hDedxPDFs[iPart] = histoK;
         hDedxPDFs[iPart]->SetName("hist_d1_321_trunc");
-        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 4 && trunmean) {
         hDedxPDFs[iPart] = histoP;
         hDedxPDFs[iPart]->SetName("hist_d1_2212_trunc");
-        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 5 && trunmean) {
         hDedxPDFs[iPart] = histoDeut;
         hDedxPDFs[iPart]->SetName("hist_d1_1000010020_trunc");
-        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 0 && !trunmean) {
         hDedxPDFs[iPart] = &hEmpty;
         hDedxPDFs[iPart]->SetName("hist_d1_11");
-        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 1 && !trunmean) {
         hDedxPDFs[iPart] = &hEmpty;
         hDedxPDFs[iPart]->SetName("hist_d1_13");
-        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 2 && !trunmean) {
         hDedxPDFs[iPart] = &hEmpty;
         hDedxPDFs[iPart]->SetName("hist_d1_211");
-        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 3 && !trunmean) {
         hDedxPDFs[iPart] = &hEmpty;
         hDedxPDFs[iPart]->SetName("hist_d1_321");
-        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 4 && !trunmean) {
         hDedxPDFs[iPart] = &hEmpty;
         hDedxPDFs[iPart]->SetName("hist_d1_2212");
-        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 5 && !trunmean) {
         hDedxPDFs[iPart] = &hEmpty;
         hDedxPDFs[iPart]->SetName("hist_d1_1000010020");
-        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       }
 
       else

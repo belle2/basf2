@@ -13,6 +13,7 @@ Script to perform the SVD dE/dx calibration
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 import basf2 as b2
 
+from softwaretrigger.constants import HLT_INPUT_OBJECTS
 import modularAnalysis as ma
 import vertex as vx
 import reconstruction as re
@@ -76,25 +77,15 @@ def create_path(rerun_reco, rerun_pid, isMC, expert_config):
     max_events_per_file = expert_config["MaxEvtsPerFile"]
 
     if rerun_reco:
-        rec_path.add_module(
-            'RootInput',
-            branchNames=[
-                'RawARICHs',
-                'RawCDCs',
-                'RawECLs',
-                'RawFTSWs',
-                'RawKLMs',
-                'RawPXDs',
-                'RawSVDs',
-                'RawTOPs',
-                'RawTRGs',
-                'RawDataBlock',
-                'RawCOPPER'],
-            entrySequences=[f'0:{max_events_per_file - 1}'],
-            logLevel=b2.LogLevel.ERROR)
         if not isMC:
+            rec_path.add_module(
+                'RootInput',
+                branchNames=HLT_INPUT_OBJECTS,
+                entrySequences=[f'0:{max_events_per_file - 1}'],
+                logLevel=b2.LogLevel.ERROR)
             re.add_unpackers(path=rec_path)
         else:
+            rec_path.add_module('RootInput', entrySequences=[f'0:{max_events_per_file - 1}'])
             rec_path.add_module("Gearbox")
             rec_path.add_module("Geometry")
 

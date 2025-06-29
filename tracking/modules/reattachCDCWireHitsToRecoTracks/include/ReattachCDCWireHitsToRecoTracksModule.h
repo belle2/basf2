@@ -10,6 +10,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dbobjects/DAFConfiguration.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
@@ -17,10 +18,10 @@
 namespace Belle2 {
 
   /**
-   * Module to loop over low-ADC/TOT CDCWireHits and fitted RecoTracks,
-   * and reattach the hits to the tracks if they are closer
-   * than a given distance. Then, the tracks are refitted.
-   */
+    * Module to loop over low-ADC/TOT CDCWireHits and fitted RecoTracks,
+    * and reattach the hits to the tracks if they are closer
+    * than a given distance. Then, the tracks are refitted.
+    */
   class ReattachCDCWireHitsToRecoTracksModule : public Module {
 
   public:
@@ -102,5 +103,8 @@ namespace Belle2 {
     std::unordered_map<RecoTrack*, std::vector<CDCHit*> > m_mapToHitsOnTrack;
     /// Map from a RecoTrack ptr to the vector of the hits that need to be added to this track.
     std::unordered_map<RecoTrack*, std::vector<HitToAddInfo> > m_mapToHitsToAdd;
+
+    /// Track Fit type to select the proper DAFParameter from DAFConfiguration; by default c_CDConly
+    short m_trackFitType = DAFConfiguration::c_CDConly;
   };
 }

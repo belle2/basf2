@@ -8,6 +8,7 @@
 #pragma once
 
 #include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/dbobjects/DAFConfiguration.h>
 
 namespace Belle2 {
   class RecoTrack;
@@ -16,7 +17,15 @@ namespace Belle2 {
    */
   class TrackFitterAndDeleter : public TrackingUtilities::Findlet<RecoTrack*> {
   public:
+    /// Expose the parameters of the sub findlets.
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
     /// Fit the tracks and remove unfittable ones.
     void apply(std::vector<RecoTrack*>& recoTracks) override;
+
+  private:
+    /// Track Fit type to select the proper DAFParameter from DAFConfiguration; by default c_Default
+    int m_trackFitType = DAFConfiguration::c_Default;
+
   };
 }

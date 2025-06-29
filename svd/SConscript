@@ -5,6 +5,7 @@ env['LIBS'] = [
     'genfit2', '$ROOT_LIBS', 'Geom', 'vxd', 'vxd_dbobjects',
     'vxd_dataobjects',
     'svd_dataobjects', 'mdst_dataobjects',
+    'tracking_dataobjects',
     'simulation_dataobjects',
     'calibration','calibration_dataobjects', 
     'RooFit', 'RooFitCore', 'RooStats'

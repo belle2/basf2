@@ -75,9 +75,12 @@ namespace Belle2 {
     double m_cutDigitEnergyForEnergy; /**< Minimum digit energy to be included in the shower energy calculation*/
     double m_cutDigitTimeResidualForEnergy; /**< Maximum time residual to be included in the shower energy calculation*/
     int m_useOptimalNumberOfDigitsForEnergy; /**< Optimize the number of neighbours for energy calculations */
+    int m_removeShiftedLMs; /**< Remove LMs if the splitter shifted the centroid position too much  */
+    double m_sharingDistanceMolierMultiplier; /**< Maximum distance d to use when sharing energy d = m_sharingDistanceMolierMultiplier*c_molierRadius/
 
     /** nOptimal payload */
-    DBObjPtr<ECLnOptimal> m_eclNOptimal;
+    DBObjPtr<ECLnOptimal>
+    m_eclNOptimal; /**< DB object to store the optimal number of crystals which is stored with clusters for calibration */
     TH2F m_nOptimal2D; /**< 2D hist of nOptimal for Ebin vs groupID */
     std::vector<int> m_groupNumber; /**< group number for each crystal */
     const int m_nLeakReg = 3; /**< 3 ECL regions: 0 = forward, 1 = barrel, 2 = backward */

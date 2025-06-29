@@ -85,7 +85,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             SVDInterceptListName='SVDIntercepts')
             path.add_module('SVDDQMEfficiency')
             # SVD CLUSTERS ON TRACK
-            path.add_module('SVDDQMClustersOnTrack', AdditionalSensorsToMonitor=[])
+            path.add_module('SVDDQMClustersOnTrack')
             # SVD DOSE
             add_svd_dqm_dose(path, 'SVDShaperDigitsZS5')
 

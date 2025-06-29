@@ -626,10 +626,6 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
             klmHit[c].setTrackRotationAngle(extState.directionAtIP.angle(mom));
             klmHit[c].setTrackClusterInitialSeparationAngle(extState.directionAtIP.angle(klmPos));
           }
-          // KLMCluster *cluster = (*klmClusterInfo)[c].first;
-          // cluster->setClusterTrackSeparation(klmHit[c].getDistance()/CLHEP::cm);
-          // cluster->setClusterTrackSeparationAngle(klmHit[c].getTrackClusterSeparationAngle());
-          // cluster->setClusterTrackRotationAngle(klmHit[c].getTrackRotationAngle());
         }
       }
     }

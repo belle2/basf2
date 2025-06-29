@@ -99,13 +99,13 @@ namespace Belle2 {
   private:
     bool m_isMakePlots;                                                           /**< produce plots for monitoring */
     TTree* LambdaMassFit(std::shared_ptr<TTree> preselTree);                        /**< Mass fit for Lambda->ppi */
-    TList* LambdaHistogramming(TTree* inputTree);                        /**< produce histograms for protons */
+    std::unique_ptr<TList> LambdaHistogramming(TTree* inputTree);                        /**< produce histograms for protons */
     TTree* DstarMassFit(std::shared_ptr<TTree> preselTree); /**< Mass fit for D*->Dpi */
-    TList* DstarHistogramming(TTree* inputTree);                        /**< produce histograms for K/pi */
-    TList* GammaHistogramming(std::shared_ptr<TTree> preselTree);                       /**< produce histograms for e */
-    TList* GenerateNewHistograms(std::shared_ptr<TTree> ttreeLambda, std::shared_ptr<TTree> ttreeDstar,
-                                 std::shared_ptr<TTree> ttreeGamma, std::shared_ptr<TTree>
-                                 ttreeGeneric);                       /**< generate high-statistics histograms */
+    std::unique_ptr<TList> DstarHistogramming(TTree* inputTree);                        /**< produce histograms for K/pi */
+    std::unique_ptr<TList> GammaHistogramming(std::shared_ptr<TTree> preselTree);                       /**< produce histograms for e */
+    std::unique_ptr<TList> GenerateNewHistograms(std::shared_ptr<TTree> ttreeLambda, std::shared_ptr<TTree> ttreeDstar,
+                                                 std::shared_ptr<TTree> ttreeGamma, std::shared_ptr<TTree>
+                                                 ttreeGeneric);                       /**< generate high-statistics histograms */
     int m_numDEdxBins = 100;                                                 /**< the number of dEdx bins for the payloads */
     int m_numPBins = 69;                                                     /**< the number of momentum bins for the payloads */
     int m_numBGBins = 69;    /**< the number of beta*gamma bins for the profile and fitting */

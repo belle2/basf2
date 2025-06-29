@@ -66,7 +66,7 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
   }
 
   // call the calibration function
-  TList* GeneratedList = GenerateNewHistograms(ttreeLambda, ttreeDstar, ttreeGamma, ttreeGeneric);
+  std::unique_ptr<TList> GeneratedList = GenerateNewHistograms(ttreeLambda, ttreeDstar, ttreeGamma, ttreeGeneric);
 
   TH2F* histoE = (TH2F*) GeneratedList->FindObject("Electron2DHistogramNew");
   TH2F* histoMu = (TH2F*) GeneratedList->FindObject("Muon2DHistogramNew");
@@ -156,7 +156,7 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
 
     if (m_isMakePlots) {
       candEdx->SaveAs("PlotsSVDdEdxPDFs_wTruncMean.pdf");
-      TList* l = new TList();
+      std::unique_ptr<TList> l(new TList());
       for (int iPart = 0; iPart < 6; iPart++) {
         l->Add(hDedxPDFs[iPart]);
       }
@@ -277,29 +277,31 @@ TTree* SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselT
     B2INFO("Lambda: Fit warning: covariance quality " << covqual);
   }
 
-  TCanvas* canvLambda = new TCanvas("canvLambda", "canvLambda");
-  canvLambda->cd();
-  RooPlot* LambdaFitFrame = LambdaDataset->plotOn(InvM.frame(130));
-  totalPDFLambda.plotOn(LambdaFitFrame, LineColor(TColor::GetColor("#4575b4")));
-
-  double chisquare = LambdaFitFrame->chiSquare();
-  B2INFO("Lambda: Fit chi2 = " << chisquare);
-  totalPDFLambda.paramOn(LambdaFitFrame, Layout(0.6, 0.96, 0.93), Format("NEU", AutoPrecision(2)));
-  LambdaFitFrame->getAttText()->SetTextSize(0.03);
-
-  totalPDFLambda.plotOn(LambdaFitFrame, Components("LambdaSignalPDF"), LineColor(TColor::GetColor("#d73027")));
-  totalPDFLambda.plotOn(LambdaFitFrame, Components("BkgPolyPDF"), LineColor(TColor::GetColor("#fc8d59")));
-  totalPDFLambda.plotOn(LambdaFitFrame, LineColor(TColor::GetColor("#4575b4")));
-
-  LambdaFitFrame->GetXaxis()->SetTitle("m(p#pi^{-}) (GeV/c^{2})");
-
-  LambdaFitFrame->Draw();
-
   if (m_isMakePlots) {
+    TCanvas* canvLambda = new TCanvas("canvLambda", "canvLambda");
+    canvLambda->cd();
+    RooPlot* LambdaFitFrame = LambdaDataset->plotOn(InvM.frame(130));
+    totalPDFLambda.plotOn(LambdaFitFrame, LineColor(TColor::GetColor("#4575b4")));
+
+    double chisquare = LambdaFitFrame->chiSquare();
+    B2INFO("Lambda: Fit chi2 = " << chisquare);
+    totalPDFLambda.paramOn(LambdaFitFrame, Layout(0.6, 0.96, 0.93), Format("NEU", AutoPrecision(2)));
+    LambdaFitFrame->getAttText()->SetTextSize(0.03);
+
+    totalPDFLambda.plotOn(LambdaFitFrame, Components("LambdaSignalPDF"), LineColor(TColor::GetColor("#d73027")));
+    totalPDFLambda.plotOn(LambdaFitFrame, Components("BkgPolyPDF"), LineColor(TColor::GetColor("#fc8d59")));
+    totalPDFLambda.plotOn(LambdaFitFrame, LineColor(TColor::GetColor("#4575b4")));
+
+    LambdaFitFrame->GetXaxis()->SetTitle("m(p#pi^{-}) (GeV/c^{2})");
+
+    LambdaFitFrame->Draw();
+
+
     canvLambda->Print("SVDdEdxCalibrationFitLambda.pdf");
     TFile LambdaFitPlotFile("SVDdEdxCalibrationLambdaFitPlotFile.root", "RECREATE");
     canvLambda->Write();
     LambdaFitPlotFile.Close();
+    delete canvLambda;
   }
   RooStats::SPlot* sPlotDatasetLambda = new RooStats::SPlot("sData", "An SPlot", *LambdaDataset, &totalPDFLambda,
                                                             RooArgList(nSignalLambda, nBkgLambda));
@@ -320,7 +322,7 @@ TTree* SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselT
   return treeLambdaSWeighted;
 }
 
-TList* SVDdEdxCalibrationAlgorithm::LambdaHistogramming(TTree* inputTree)
+std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::LambdaHistogramming(TTree* inputTree)
 {
   gROOT->SetBatch(true);
   inputTree->SetEstimate(-1);
@@ -360,18 +362,14 @@ TList* SVDdEdxCalibrationAlgorithm::LambdaHistogramming(TTree* inputTree)
   // produce the 1D profile
   // momentum: for data-MC comparisons
 
-  TCanvas* canvLambda = new TCanvas("canvLambda", "canvLambda");
-  canvLambda->cd();
-
-
   TH1F* ProtonProfileMomentum = (TH1F*)hLambdaPMomentum->ProfileX("ProtonProfileMomentum");
   ProtonProfileMomentum->SetTitle("ProtonProfile");
   ProtonProfileMomentum->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
   ProtonProfileMomentum->GetXaxis()->SetTitle("Momentum, GeV/c");
   ProtonProfileMomentum->GetYaxis()->SetTitle("dE/dx");
   ProtonProfileMomentum->SetLineColor(kRed);
-  ProtonProfileMomentum->Draw();
 
+  //beta*gamma: for the fit
   TH1F* ProtonProfileBetaGamma = (TH1F*)hLambdaPBetaGamma->ProfileX("ProtonProfileBetaGamma");
   if (m_CustomProfile) {
     ProtonProfileBetaGamma = PrepareProfile(hLambdaPBetaGamma, "ProtonProfileBetaGamma");
@@ -386,7 +384,7 @@ TList* SVDdEdxCalibrationAlgorithm::LambdaHistogramming(TTree* inputTree)
   // for each momentum bin, normalize the pdf
   hLambdaPMomentum = Normalise2DHisto(hLambdaPMomentum);
 
-  TList* histList = new TList;
+  std::unique_ptr<TList> histList(new TList);
   histList->Add(ProtonProfileMomentum);
   histList->Add(ProtonProfileBetaGamma);
   histList->Add(hLambdaPMomentum);
@@ -504,16 +502,17 @@ TTree* SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTr
   totalPDFDstar.plotOn(DstarFitFrame, LineColor(TColor::GetColor("#4575b4")));
 
   DstarFitFrame->GetXaxis()->SetTitle("#Deltam [GeV/c^{2}]");
-  TCanvas* canvDstar = new TCanvas("canvDstar", "canvDstar");
-  canvDstar->cd();
-
-  DstarFitFrame->Draw();
-
   if (m_isMakePlots) {
+    TCanvas* canvDstar = new TCanvas("canvDstar", "canvDstar");
+    canvDstar->cd();
+
+    DstarFitFrame->Draw();
+
     canvDstar->Print("SVDdEdxCalibrationFitDstar.pdf");
     TFile DstarFitPlotFile("SVDdEdxCalibrationDstarFitPlotFile.root", "RECREATE");
     canvDstar->Write();
     DstarFitPlotFile.Close();
+    delete canvDstar;
   }
 
   /////////////////// SPlot ///////////////////////////////////////////////////////////
@@ -536,7 +535,7 @@ TTree* SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTr
   return treeDstarSWeighted;
 }
 
-TList* SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* inputTree)
+std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* inputTree)
 {
   gROOT->SetBatch(true);
   inputTree->SetEstimate(-1);
@@ -612,20 +611,15 @@ TList* SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* inputTree)
 
 
 
-  TCanvas* canvDstar = new TCanvas("canvDstar2", "canvDstar");
-  canvDstar->cd();
-  // produce the 1D profiled
+  // produce the 1D profiles
 
 
   TH1F* PionProfileMomentum = (TH1F*)hDstarPiMomentum->ProfileX("PionProfileMomentum");
   PionProfileMomentum->SetTitle("PionProfile");
-  // canvDstar->SetTicky(1);
   PionProfileMomentum->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
   PionProfileMomentum->GetXaxis()->SetTitle("Momentum, GeV/c");
   PionProfileMomentum->GetYaxis()->SetTitle("dE/dx");
   PionProfileMomentum->SetLineColor(kRed);
-  PionProfileMomentum->Draw();
-  // canvDstar->Print("SVDdEdxCalibrationProfilePion.pdf");
 
   TH1F* PionProfileBetaGamma = (TH1F*)hDstarPiBetaGamma->ProfileX("PionProfileBetaGamma");
   if (m_CustomProfile) {
@@ -644,8 +638,6 @@ TList* SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* inputTree)
   KaonProfileMomentum->GetXaxis()->SetTitle("Momentum, GeV/c");
   KaonProfileMomentum->GetYaxis()->SetTitle("dE/dx");
   KaonProfileMomentum->SetLineColor(kRed);
-  KaonProfileMomentum->Draw();
-  // canvDstar->Print("SVDdEdxCalibrationProfileKaon.pdf");
 
 
   TH1F* KaonProfileBetaGamma = (TH1F*)hDstarKBetaGamma->ProfileX("KaonProfileBetaGamma");
@@ -668,7 +660,7 @@ TList* SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* inputTree)
   hDstarPiMomentum->Sumw2();
   hDstarPiMomentum = Normalise2DHisto(hDstarPiMomentum);
 
-  TList* histList = new TList;
+  std::unique_ptr<TList> histList(new TList);
   histList->Add(KaonProfileMomentum);
   histList->Add(KaonProfileBetaGamma);
   histList->Add(hDstarKMomentum);
@@ -687,7 +679,7 @@ TList* SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* inputTree)
 }
 
 
-TList* SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shared_ptr<TTree> preselTree)
+std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shared_ptr<TTree> preselTree)
 {
   B2INFO("Histogramming the converted photon selection...");
   gROOT->SetBatch(true);
@@ -746,19 +738,14 @@ TList* SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shared_ptr<TTree> pr
 
 
   // produce the 1D profile (for data-MC comparisons)
-  TCanvas* canvGamma = new TCanvas("canvGamma", "canvGamma");
-  canvGamma->cd();
-
-
   TH1F* ElectronProfileMomentum = (TH1F*)hGammaEMomentum->ProfileX("ElectronProfileMomentum");
   ElectronProfileMomentum->SetTitle("ElectronProfile");
   ElectronProfileMomentum->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
   ElectronProfileMomentum->GetXaxis()->SetTitle("Momentum, GeV/c");
   ElectronProfileMomentum->GetYaxis()->SetTitle("dE/dx");
   ElectronProfileMomentum->SetLineColor(kRed);
-  ElectronProfileMomentum->Draw();
 
-
+// beta*gamma profile for the fit
   TH1F* ElectronProfileBetaGamma = (TH1F*)hGammaEBetaGamma->ProfileX("ElectronProfileBetaGamma");
   if (m_CustomProfile) {
     ElectronProfileBetaGamma = PrepareProfile(hGammaEBetaGamma, "ElectronProfileBetaGamma");
@@ -773,7 +760,7 @@ TList* SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shared_ptr<TTree> pr
 
   hGammaEMomentum = Normalise2DHisto(hGammaEMomentum);
 
-  TList* histList = new TList;
+  std::unique_ptr<TList> histList(new TList);
   histList->Add(ElectronProfileMomentum);
   histList->Add(ElectronProfileBetaGamma);
   histList->Add(hGammaEMomentum);
@@ -788,25 +775,26 @@ TList* SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shared_ptr<TTree> pr
 
 }
 
-TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree> ttreeLambda, std::shared_ptr<TTree> ttreeDstar,
-                                                          std::shared_ptr<TTree> ttreeGamma, std::shared_ptr<TTree> ttreeGeneric)
+std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree> ttreeLambda,
+    std::shared_ptr<TTree> ttreeDstar,
+    std::shared_ptr<TTree> ttreeGamma, std::shared_ptr<TTree> ttreeGeneric)
 {
   gROOT->SetBatch(true);
   gStyle->SetOptStat(0);
 // run the background subtraction and histogramming parts
   TTree* treeLambda = LambdaMassFit(ttreeLambda);
-  TList* HistListLambda = LambdaHistogramming(treeLambda);
+  std::unique_ptr<TList> HistListLambda = LambdaHistogramming(treeLambda);
   TH1F* ProtonProfileBetaGamma = (TH1F*) HistListLambda->FindObject("ProtonProfileBetaGamma");
   TH2F* Proton2DHistogram = (TH2F*) HistListLambda->FindObject("hist_d1_2212_truncMomentum");
 
   TTree* treeDstar = DstarMassFit(ttreeDstar);
-  TList* HistListDstar = DstarHistogramming(treeDstar);
+  std::unique_ptr<TList> HistListDstar = DstarHistogramming(treeDstar);
   TH1F* PionProfileBetaGamma = (TH1F*) HistListDstar->FindObject("PionProfileBetaGamma");
   TH2F* Pion2DHistogram = (TH2F*) HistListDstar->FindObject("hist_d1_211_truncMomentum");
   TH1F* KaonProfileBetaGamma = (TH1F*) HistListDstar->FindObject("KaonProfileBetaGamma");
   TH2F* Kaon2DHistogram = (TH2F*) HistListDstar->FindObject("hist_d1_321_truncMomentum");
 
-  TList* HistListGamma = GammaHistogramming(ttreeGamma);
+  std::unique_ptr<TList> HistListGamma = GammaHistogramming(ttreeGamma);
   TH1F* ElectronProfileBetaGamma = (TH1F*) HistListGamma->FindObject("ElectronProfileBetaGamma");
   TH2F* Electron2DHistogram = (TH2F*) HistListGamma->FindObject("hist_d1_11_truncMomentum");
 
@@ -1012,30 +1000,29 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   B2INFO("p5: " << BetaGammaFunctionProton->GetParameter(5) << " +- " << BetaGammaFunctionProton->GetParError(5));
   B2INFO("p6: " << BetaGammaFunctionProton->GetParameter(6) << " +- " << BetaGammaFunctionProton->GetParError(6));
 
+  if (m_isMakePlots) {
 // plot a summary of all beta*gamma fits for hadrons
-  TCanvas* CombinedCanvasHadrons = new TCanvas("CombinedCanvasHadrons", "Hadron beta*gamma fits", 10, 10, 1000, 700);
-  gStyle->SetOptFit(1111);
+    TCanvas* CombinedCanvasHadrons = new TCanvas("CombinedCanvasHadrons", "Hadron beta*gamma fits", 10, 10, 1000, 700);
+    gStyle->SetOptFit(1111);
 
-
-  PionProfileBetaGamma->Draw();
-  PionProfileBetaGamma->GetListOfFunctions()->Add(BetaGammaFunctionPion);
-  KaonProfileBetaGamma->Draw("SAME");
-  KaonProfileBetaGamma->GetListOfFunctions()->Add(BetaGammaFunctionKaon);
-  ProtonProfileBetaGamma->Draw("SAME");
-  ProtonProfileBetaGamma->GetListOfFunctions()->Add(BetaGammaFunctionProton);
+    PionProfileBetaGamma->Draw();
+    PionProfileBetaGamma->GetListOfFunctions()->Add(BetaGammaFunctionPion);
+    KaonProfileBetaGamma->Draw("SAME");
+    KaonProfileBetaGamma->GetListOfFunctions()->Add(BetaGammaFunctionKaon);
+    ProtonProfileBetaGamma->Draw("SAME");
+    ProtonProfileBetaGamma->GetListOfFunctions()->Add(BetaGammaFunctionProton);
 // BetaGammaFunctionPion->Draw("SAME");
 // BetaGammaFunctionKaon->Draw("SAME");
 // BetaGammaFunctionProton->Draw("SAME");
-  auto legend = new TLegend(0.4, 0.7, 0.65, 0.9);
-  legend->AddEntry(PionProfileBetaGamma, "Pions", "lep");
-  legend->AddEntry(KaonProfileBetaGamma, "Kaons", "lep");
-  legend->AddEntry(ProtonProfileBetaGamma, "Protons", "lep");
-  legend->Draw();
+    auto legend = new TLegend(0.4, 0.7, 0.65, 0.9);
+    legend->AddEntry(PionProfileBetaGamma, "Pions", "lep");
+    legend->AddEntry(KaonProfileBetaGamma, "Kaons", "lep");
+    legend->AddEntry(ProtonProfileBetaGamma, "Protons", "lep");
+    legend->Draw();
 
-  gPad->SetLogx();
-  gPad->SetLogy();
+    gPad->SetLogx();
+    gPad->SetLogy();
 
-  if (m_isMakePlots) {
     CombinedCanvasHadrons->Print("HadronBetaGammaFits.pdf");
     TFile HadronFitPlotFile("SVDdEdxCalibrationHadronFitPlotFile.root", "RECREATE");
     PionProfileBetaGamma->Write();
@@ -1047,6 +1034,7 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
     BetaGammaFunctionProton->Write();
     CombinedCanvasHadrons->Write();
     HadronFitPlotFile.Close();
+    delete CombinedCanvasHadrons;
   }
 
 
@@ -1097,7 +1085,7 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
 
 
 // electrons
-  TCanvas* ElectronCanvas = new TCanvas("ElectronCanvas", "Electron histogram", 10, 10, 1000, 700);
+
   TF1* BetaGammaFunctionElectron = new TF1("BetaGammaFunctionElectron", "[0] + [1]* x", 1, 10000.);
   BetaGammaFunctionElectron->SetParameters(6.e5, -1);
   BetaGammaFunctionElectron->SetParLimits(0, 3.e5, 8.e5);
@@ -1119,18 +1107,20 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   ElectronProfileBetaGamma->SetLineWidth(2);
   ElectronProfileBetaGamma->GetYaxis()->SetRangeUser(5e5, 1e6);
   ElectronProfileBetaGamma->GetListOfFunctions()->Add(BetaGammaFunctionElectron);
-  ElectronProfileBetaGamma->Draw();
-
-  gPad->SetLogx();
-
 
   if (m_isMakePlots) {
+    TCanvas* ElectronCanvas = new TCanvas("ElectronCanvas", "Electron histogram", 10, 10, 1000, 700);
+    ElectronProfileBetaGamma->Draw();
+
+    gPad->SetLogx();
+
     ElectronCanvas->Print("ElectronBetaGammaFits.pdf");
     TFile ElectronFitPlotFile("SVDdEdxCalibrationElectronFitPlotFile.root", "RECREATE");
     ElectronProfileBetaGamma->Write();
     BetaGammaFunctionElectron->Write();
     ElectronCanvas->Write();
     ElectronFitPlotFile.Close();
+    delete ElectronCanvas;
   }
 
   TF1* MomentumFunctionElectron = (TF1*) BetaGammaFunctionElectron->Clone("MomentumFunctionElectron");
@@ -1165,6 +1155,7 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   CanvasOverlays->cd(3); Kaon2DHistogram->Draw();  MomentumFunctionKaon->Draw("SAME");
   CanvasOverlays->cd(4); Proton2DHistogram->Draw();  MomentumFunctionProton->Draw("SAME");
   CanvasOverlays->Print("SVDdEdxOverlaysFitsHistos.pdf");
+  delete CanvasOverlays;
 
   TF1* MomentumFunctionDeuteron = (TF1*) BetaGammaFunctionProton->Clone("MomentumFunctionDeuteron");
   MomentumFunctionDeuteron->SetParameter(2, m_DeuteronPDGMass);
@@ -1196,19 +1187,19 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   OverlayAllTracksCanvas->SetLogx();
   OverlayAllTracksCanvas->SetLogz();
 
-  if (m_isMakePlots) {
-    OverlayAllTracksCanvas->Print("SVDdEdxAllTracksWithFits.pdf");
-    TFile OverlayAllTracksPlotFile("SVDdEdxCalibrationOverlayAllTracks.root", "RECREATE");
-    AllTracksHistogram->Write();
-    MomentumFunctionElectron->Write();
-    MomentumFunctionMuon->Write();
-    MomentumFunctionPion->Write();
-    MomentumFunctionKaon->Write();
-    MomentumFunctionProton->Write();
-    MomentumFunctionDeuteron->Write();
-    OverlayAllTracksCanvas->Write();
-    OverlayAllTracksPlotFile.Close();
-  }
+  OverlayAllTracksCanvas->Print("SVDdEdxAllTracksWithFits.pdf");
+  TFile OverlayAllTracksPlotFile("SVDdEdxCalibrationOverlayAllTracks.root", "RECREATE");
+  AllTracksHistogram->Write();
+  MomentumFunctionElectron->Write();
+  MomentumFunctionMuon->Write();
+  MomentumFunctionPion->Write();
+  MomentumFunctionKaon->Write();
+  MomentumFunctionProton->Write();
+  MomentumFunctionDeuteron->Write();
+  OverlayAllTracksCanvas->Write();
+  OverlayAllTracksPlotFile.Close();
+  delete OverlayAllTracksCanvas;
+
 
 // resolution studies //
 
@@ -1230,7 +1221,6 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
                                                               Kaon2DHistogram->GetXaxis()->FindBin(KaonRangeMax));
 // for protons, there is not enough data in the flat range.
 
-  // PionResolutionHistogram->Draw();
 
   TF1* PionResolutionFunction = new TF1("PionResolutionFunction",
                                         "[0]*TMath::Landau(x, [1], [1]*[2])*TMath::Gaus(x, [1], [1]*[2]*[4]) + [3]*TMath::Gaus(x, [1], [1]*[2]*[5])", 100e3, 1500e3);
@@ -1293,14 +1283,13 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   B2INFO("resolution for electrons: fit status" << FitResultResolutionElectron->Status());
 
   // plot all the resolution fits
-  TCanvas* CanvasResolutions = new TCanvas("CanvasResolutions", "Resolutions", 1200, 650);
-  CanvasResolutions->Divide(3, 1);
-  CanvasResolutions->cd(1); PionResolutionHistogram->Draw();
-  CanvasResolutions->cd(2); KaonResolutionHistogram->Draw();
-  CanvasResolutions->cd(3); ElectronResolutionHistogram->Draw();
-
-
   if (m_isMakePlots) {
+    TCanvas* CanvasResolutions = new TCanvas("CanvasResolutions", "Resolutions", 1200, 650);
+    CanvasResolutions->Divide(3, 1);
+    CanvasResolutions->cd(1); PionResolutionHistogram->Draw();
+    CanvasResolutions->cd(2); KaonResolutionHistogram->Draw();
+    CanvasResolutions->cd(3); ElectronResolutionHistogram->Draw();
+
     CanvasResolutions->Print("SVDdEdxResolutions.pdf");
     TFile OverlayResolutionsPlotFile("SVDdEdxCalibrationResolutions.root", "RECREATE");
     PionResolutionHistogram->Write();
@@ -1385,17 +1374,16 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   Electron2DHistogramResidual->SetMaximum(0.15);
 
 // plot the summary of all the distributions
-  TCanvas* CanvasSummaryGenerated = new TCanvas("CanvasSummaryGenerated", "Generated payloads", 1700, 850);
-  CanvasSummaryGenerated->Divide(3, 2);
-  CanvasSummaryGenerated->cd(1); Electron2DHistogramNew->Draw("COLZ");
-  CanvasSummaryGenerated->cd(2); Muon2DHistogramNew->Draw("COLZ");
-  CanvasSummaryGenerated->cd(3); Pion2DHistogramNew->Draw("COLZ");
-  CanvasSummaryGenerated->cd(4); Kaon2DHistogramNew->Draw("COLZ");
-  CanvasSummaryGenerated->cd(5); Proton2DHistogramNew->Draw("COLZ");
-  CanvasSummaryGenerated->cd(6); Deuteron2DHistogramNew->Draw("COLZ");
-
-
   if (m_isMakePlots) {
+    TCanvas* CanvasSummaryGenerated = new TCanvas("CanvasSummaryGenerated", "Generated payloads", 1700, 850);
+    CanvasSummaryGenerated->Divide(3, 2);
+    CanvasSummaryGenerated->cd(1); Electron2DHistogramNew->Draw("COLZ");
+    CanvasSummaryGenerated->cd(2); Muon2DHistogramNew->Draw("COLZ");
+    CanvasSummaryGenerated->cd(3); Pion2DHistogramNew->Draw("COLZ");
+    CanvasSummaryGenerated->cd(4); Kaon2DHistogramNew->Draw("COLZ");
+    CanvasSummaryGenerated->cd(5); Proton2DHistogramNew->Draw("COLZ");
+    CanvasSummaryGenerated->cd(6); Deuteron2DHistogramNew->Draw("COLZ");
+
     CanvasSummaryGenerated->Print("SVDdEdxGeneratedPayloads.pdf");
     TFile SummaryGeneratedPlotFile("SVDdEdxCalibrationSummaryGenerated.root", "RECREATE");
     Electron2DHistogramNew->Write();
@@ -1405,17 +1393,15 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
     Proton2DHistogramNew->Write();
     Deuteron2DHistogramNew->Write();
     SummaryGeneratedPlotFile.Close();
-  }
-
-  TCanvas* CanvasSummaryData = new TCanvas("CanvasSummaryData", "Data distributions", 1700, 850);
-  CanvasSummaryData->Divide(3, 2);
-  CanvasSummaryData->cd(1); Electron2DHistogram->Draw("COLZ");
-  CanvasSummaryData->cd(3); Pion2DHistogram->Draw("COLZ");
-  CanvasSummaryData->cd(4); Kaon2DHistogram->Draw("COLZ");
-  CanvasSummaryData->cd(5); Proton2DHistogram->Draw("COLZ");
 
 
-  if (m_isMakePlots) {
+    TCanvas* CanvasSummaryData = new TCanvas("CanvasSummaryData", "Data distributions", 1700, 850);
+    CanvasSummaryData->Divide(3, 2);
+    CanvasSummaryData->cd(1); Electron2DHistogram->Draw("COLZ");
+    CanvasSummaryData->cd(3); Pion2DHistogram->Draw("COLZ");
+    CanvasSummaryData->cd(4); Kaon2DHistogram->Draw("COLZ");
+    CanvasSummaryData->cd(5); Proton2DHistogram->Draw("COLZ");
+
     CanvasSummaryData->Print("SVDdEdxDataDistributions.pdf");
     TFile SummaryDataPlotFile("SVDdEdxCalibrationSummaryData.root", "RECREATE");
     Electron2DHistogram->Write();
@@ -1423,16 +1409,16 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
     Kaon2DHistogram->Write();
     Proton2DHistogram->Write();
     SummaryDataPlotFile.Close();
-  }
 
-  TCanvas* CanvasSummaryResiduals = new TCanvas("CanvasSummaryResiduals", "Residuals", 1700, 850);
-  CanvasSummaryResiduals->Divide(3, 2);
-  CanvasSummaryResiduals->cd(1); Electron2DHistogramResidual->Draw("COLZ");
-  CanvasSummaryResiduals->cd(3); Pion2DHistogramResidual->Draw("COLZ");
-  CanvasSummaryResiduals->cd(4); Kaon2DHistogramResidual->Draw("COLZ");
-  CanvasSummaryResiduals->cd(5); Proton2DHistogramResidual->Draw("COLZ");
 
-  if (m_isMakePlots) {
+    TCanvas* CanvasSummaryResiduals = new TCanvas("CanvasSummaryResiduals", "Residuals", 1700, 850);
+    CanvasSummaryResiduals->Divide(3, 2);
+    CanvasSummaryResiduals->cd(1); Electron2DHistogramResidual->Draw("COLZ");
+    CanvasSummaryResiduals->cd(3); Pion2DHistogramResidual->Draw("COLZ");
+    CanvasSummaryResiduals->cd(4); Kaon2DHistogramResidual->Draw("COLZ");
+    CanvasSummaryResiduals->cd(5); Proton2DHistogramResidual->Draw("COLZ");
+
+
     CanvasSummaryResiduals->Print("SVDdEdxResiduals.pdf");
     TFile SummaryResidualsPlotFile("SVDdEdxCalibrationSummaryResiduals.root", "RECREATE");
     Electron2DHistogramResidual->Write();
@@ -1450,7 +1436,7 @@ TList* SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::shared_ptr<TTree>
   Deuteron2DHistogramNew->SetName("Deuteron2DHistogramNew");
 
   // return all the generated payloads
-  TList* histList = new TList;
+  std::unique_ptr<TList> histList(new TList);
   histList->Add(Electron2DHistogramNew);
   histList->Add(Muon2DHistogramNew);
   histList->Add(Pion2DHistogramNew);

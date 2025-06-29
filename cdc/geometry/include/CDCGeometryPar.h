@@ -17,6 +17,7 @@
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCBadWires.h>
+#include <cdc/dbobjects/CDCBadBoards.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
@@ -206,6 +207,11 @@ namespace Belle2 {
        * Set bad-wires (from DB)
        */
       void setBadWire();
+
+      /**
+       * Set bad-boards (from DB)
+       */
+      void setBadBoard();
 
       /**
        * Read channel map between wire-id and electronics-id.
@@ -829,12 +835,11 @@ namespace Belle2 {
        */
       inline bool isBadWire(const WireID& wid)
       {
-        //        std::map<unsigned short, float>::iterator it = m_badWire.find(wid.getEWire());
-        //        bool torf = (it != m_badWire.end()) ? true : false;
-        //        return torf;
+        double eff = 0;
+        bool badBoard = *m_badBoardsFromDB ? (*m_badBoardsFromDB)->isDeadBoard(getBoardID(wid), eff) : false;
+        if (badBoard) return badBoard;
         bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isBadWire(wid) : false;
         return torf;
-
       }
 
       /**
@@ -842,6 +847,8 @@ namespace Belle2 {
        */
       inline bool isDeadWire(const WireID& wid, double& eff)
       {
+        bool badBoard = *m_badBoardsFromDB ? (*m_badBoardsFromDB)->isDeadBoard(getBoardID(wid), eff) : false;
+        if (badBoard) return badBoard;
         bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isDeadWire(wid, eff) : false;
         return torf;
       }
@@ -851,6 +858,8 @@ namespace Belle2 {
        */
       inline bool isHotWire(const WireID& wid)
       {
+        bool hotBoard = *m_badBoardsFromDB ? (*m_badBoardsFromDB)->isHotBoard(getBoardID(wid)) : false;
+        if (hotBoard) return hotBoard;
         bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isHotWire(wid) : false;
         return torf;
       }
@@ -1178,9 +1187,6 @@ namespace Belle2 {
       std::map<WireID, unsigned short> m_wireToBoard;  /*!< map relating wire-id and board-id. */
       std::map<WireID, unsigned short> m_wireToChannel; /*!< map relating wire-id and channel-id. */
       unsigned short m_boardAndChannelToWire[c_nBoards][48]; /*!< array relating board-channel-id and wire-id. */
-
-      //      std::map<unsigned short, float> m_badWire;  /*!< list of bad-wires. */
-
       unsigned short m_tdcOffset;  /*!< Not used; to be removed later. */
       double m_clockFreq4TDC;      /*!< Clock frequency used for TDC (GHz). */
       double m_tdcBinWidth;        /*!< TDC bin width (nsec/bin). */
@@ -1193,6 +1199,7 @@ namespace Belle2 {
 
       DBObjPtr<CDCTimeZeros>* m_t0FromDB; /*!< t0s retrieved from DB. */
       DBObjPtr<CDCBadWires>* m_badWireFromDB; /*!< bad-wires retrieved from DB. */
+      DBObjPtr<CDCBadBoards>* m_badBoardsFromDB; /*!< bad-boards retrieved from DB. */
       DBObjPtr<CDCPropSpeeds>* m_propSpeedFromDB; /*!< prop.-speeds retrieved from DB. */
       DBObjPtr<CDCTimeWalks>* m_timeWalkFromDB; /*!< time-walk coeffs. retrieved from DB. */
       DBObjPtr<CDCXtRelations>* m_xtRelFromDB; /*!< xt params. retrieved from DB (new). */

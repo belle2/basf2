@@ -24,6 +24,7 @@ from tracking.root_utils import root_cd, root_save_name
 from tracking.validation import statistics
 
 import logging
+# @cond internal_test
 
 
 def get_logger():
@@ -2383,3 +2384,5 @@ def test():
 
 if __name__ == '__main__':
     test()
+
+# @endcond

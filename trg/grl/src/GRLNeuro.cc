@@ -399,8 +399,6 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
   vector<float> layeroutput3 = {};
   vector<float> layeroutput4 = {};
 
-  unsigned ib = 0;
-  unsigned io = 0;
   /////////////////////////////////////////////////////////////
   for (size_t i = 0; i < layerinput.size(); ++i) {
     layerinput[i] = sim_fix_input_layer_t(layerinput[i]);

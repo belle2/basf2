@@ -17,7 +17,7 @@ from softwaretrigger.constants import HLT_INPUT_OBJECTS
 import modularAnalysis as ma
 import vertex as vx
 import reconstruction as re
-from reconstruction import prepare_user_cdst_analysis
+from reconstruction import prepare_user_cdst_analysis, DIGITS_OBJECTS
 
 settings = CalibrationSettings(
     name="caf_svd_dedx",
@@ -85,7 +85,11 @@ def create_path(rerun_reco, rerun_pid, isMC, expert_config):
                 logLevel=b2.LogLevel.ERROR)
             re.add_unpackers(path=rec_path)
         else:
-            rec_path.add_module('RootInput', entrySequences=[f'0:{max_events_per_file - 1}'])
+            rec_path.add_module('RootInput', branchNames=list(DIGITS_OBJECTS) + [
+                'MCParticles',
+                'EventLevelTriggerTimeInfo',
+                'SoftwareTriggerResult',
+                'TRGSummary'], entrySequences=[f'0:{max_events_per_file - 1}'])
             rec_path.add_module("Gearbox")
             rec_path.add_module("Geometry")
 
@@ -293,7 +297,6 @@ def get_calibrations(input_data, **kwargs):
     dedx_calibration = Calibration("SVDdEdxCalibration",
                                    collector="SVDdEdxCollector",
                                    algorithms=[algo],
-                                   # backend_args={"queue": "l"},
                                    input_files=input_files_hadron_calib,
                                    pre_collector_path=rec_path)
 
@@ -301,7 +304,6 @@ def get_calibrations(input_data, **kwargs):
         dedx_validation = Calibration("SVDdEdxValidation",
                                       collector="SVDdEdxValidationCollector",
                                       algorithms=[algo_val],
-                                      # backend_args={"queue": "l"},
                                       input_files=input_files_hadron_validation,
                                       pre_collector_path=rec_path_validation)
     # Do this for the default AlgorithmStrategy to force the output payload IoV

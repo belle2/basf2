@@ -8,4 +8,3 @@ kept. The algorithm results in more tracks with correct charge assignment which 
 * The possibility to adjust parameters of the DAF fitting algorithm has been added to improve the performance of the DAF fit. For this the DAF fitter in the genfit package 
 was altered. 
 
-*

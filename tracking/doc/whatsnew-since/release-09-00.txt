@@ -13,4 +13,4 @@ Convenience Functions
 
 * it is now possible to append the Cellular Automaton pattern recognition to the path via python parameter
 
-* it is now possible to run the so-called inverted tracking chain (SVD before CDC)
+* it is now possible to run the so-called inverted tracking chain (SVD before CDC) easily by changing a python parameter

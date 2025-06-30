@@ -11,9 +11,11 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import ROOT
 from ROOT.Belle2 import CDCDedxValidationAlgorithm
 import process_cosgain as cg
 from matplotlib.backends.backend_pdf import PdfPages
+ROOT.gROOT.SetBatch(True)
 
 
 def remove_nowg(df):

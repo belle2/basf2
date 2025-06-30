@@ -167,6 +167,8 @@ static TMatrixT<double> spatialVariances(std::vector<double> xcoord, std::vector
 KLMClusterAnaModule::KLMClusterAnaModule() : Module()
 {
   setDescription("Module for extracting KLM cluster shape information via PCA.");
+
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 KLMClusterAnaModule::~KLMClusterAnaModule()

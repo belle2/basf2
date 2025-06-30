@@ -16,6 +16,8 @@
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/dataobjects/SVDEventInfo.h>
+#include <svd/dbobjects/SVDDQMPlotsConfiguration.h>
+#include <framework/database/DBObjPtr.h>
 #include <vector>
 #include "TList.h"
 #include "TH1F.h"
@@ -56,6 +58,8 @@ namespace Belle2 {
 
     /** Trigger Summary data object */
     StoreObjPtr<TRGSummary> m_objTrgSummary;
+    /** SVD DQM plots configuration */
+    DBObjPtr<SVDDQMPlotsConfiguration> m_svdPlotsConfig;
 
     StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
     /** if TRUE: svdTime back in SVD time reference*/
@@ -63,14 +67,18 @@ namespace Belle2 {
 
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
-    /** if true skip events rejected by HLT (default)*/
-    bool m_skipRejectedEvents = true;
+
+    /** if true skip events rejected by HLT */
+    bool m_skipRejectedEvents = false;
 
     /** additional plots flag*/
     bool m_additionalPlots = false;
 
     /** if true enable 3 samples histograms analysis */
     bool m_3Samples = false;
+
+    /** if true read back from DB configuration parameters */
+    bool m_useParamFromDB = true;
 
     /** list of cumulative histograms */
     TList* m_histoList = nullptr;

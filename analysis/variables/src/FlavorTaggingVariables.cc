@@ -40,7 +40,7 @@
 
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
-#include <framework/geometry/B2Vector3.h>
+#include <Math/VectorUtil.h>
 
 #include <algorithm>
 #include <cmath>
@@ -150,11 +150,11 @@ namespace Belle2 {
         }
       }
 
-      const B2Vector3D thrustO = Thrust::calculateThrust(p_cms_roe);
-      const B2Vector3D pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
+      const ROOT::Math::XYZVector thrustO = Thrust::calculateThrust(p_cms_roe);
+      const ROOT::Math::PxPyPzEVector pAxis = PCmsLabTransform::labToCms(part->get4Vector());
 
       double result = 0 ;
-      if (pAxis == pAxis) result = abs(cos(pAxis.Angle(thrustO)));
+      if (pAxis == pAxis) result = abs(ROOT::Math::VectorUtil::CosTheta(pAxis, thrustO));
 
       return result;
     }
@@ -227,12 +227,12 @@ namespace Belle2 {
           }
         }
 
-        const B2Vector3D thrustO  = Thrust::calculateThrust(p_cms_roe);
-        const B2Vector3D pAxis = PCmsLabTransform::labToCms(particle->get4Vector()).Vect();
+        const ROOT::Math::XYZVector thrustO  = Thrust::calculateThrust(p_cms_roe);
+        const ROOT::Math::PxPyPzEVector pAxis = PCmsLabTransform::labToCms(particle->get4Vector());
 
         double result = 0 ;
         if (pAxis == pAxis)
-          result = abs(cos(pAxis.Angle(thrustO))); // abs??
+          result = abs(ROOT::Math::VectorUtil::CosTheta(pAxis, thrustO)); // abs??
 
         return result;
 

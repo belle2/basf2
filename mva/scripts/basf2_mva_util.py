@@ -13,7 +13,7 @@ from basf2 import B2WARNING
 import basf2_mva
 
 
-def chain2dict(chain, tree_columns, dict_columns=None):
+def chain2dict(chain, tree_columns, dict_columns=None, max_entries=None):
     """
     Convert a ROOT.TChain into a dictionary of np.arrays
     @param chain the ROOT.TChain
@@ -27,6 +27,18 @@ def chain2dict(chain, tree_columns, dict_columns=None):
     try:
         from ROOT import RDataFrame
         rdf = RDataFrame(chain)
+        if max_entries is not None:
+            nEntries = rdf.Count().GetValue()
+            if nEntries > max_entries:
+                B2WARNING(
+                    "basf2_mva_util (chain2dict): Number of entries in the chain is larger than the maximum allowed entries: " +
+                    str(nEntries) +
+                    " > " +
+                    str(max_entries))
+                skip = nEntries // max_entries
+                rdf_subset = rdf.Filter("rdfentry_ % " + str(skip) + " == 0")
+                rdf = rdf_subset
+
         d = np.column_stack(list(rdf.AsNumpy(tree_columns).values()))
         d = np.core.records.fromarrays(d.transpose(), names=dict_columns)
     except ImportError:
@@ -274,5 +286,5 @@ class Method:
                 [*branch_names, ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(expert_target)],
                 [*output_names, stripped_expert_target])
 
-        return (d[self.identifier] if self.general_options.m_nClasses <= 2 else np.array([d[x]
+        return (d[str(self.identifier)] if self.general_options.m_nClasses <= 2 else np.array([d[x]
                 for x in output_names]).T), d[stripped_expert_target]

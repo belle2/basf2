@@ -6,9 +6,7 @@ Full Event Interpretation
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 10 min
-
-    **Exercises**: 30 min (including processing)
+    **Length**: 1.5-2 hrs
 
     **Prerequisites**:
 
@@ -175,7 +173,7 @@ The `fei.FeiConfiguration` class controls the other configuration options of the
 Here, the FEI monitoring should be disabled with the appropriate argument (``monitor=False``) as we are not interested in
 the internal performance characteristics of the FEI stages.
 We also have to specify the FEI prefix argument here. This prefix allows distinguishing between different trainings
-in a single Global Tag and is ``prefix=FEIv4_2021_MC14_release_05_01_12`` for the current central training.
+in a single Global Tag and is ``prefix=FEIv1_2025_MC16ri_aldebaran_200`` for the current central training.
 
 
 .. admonition:: Exercise

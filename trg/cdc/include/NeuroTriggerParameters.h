@@ -183,7 +183,10 @@ namespace Belle2 {
      *min_etfcc_fastestpriority
      */
     NNTParam<unsigned> ETOption;
-
+    /** Flag for the addtional wire input usage: 0 for default, 1 selected additional wire, 2 for full wire input*/
+    NNTParam<unsigned> AdditionWireMode;
+    /** Number for the addtional wire input per SL*/
+    NNTParam<unsigned> AdditionInputPerSL;
     /** Phi region for which MLP is used in degree for all networks. */
     std::vector<std::vector<NNTParam<float>>> phiRangeUse;
     /** Theta region for which MLP is used in degree for all networks. */

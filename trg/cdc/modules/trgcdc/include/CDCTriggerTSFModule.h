@@ -22,6 +22,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <trg/cdc/dbobjects/CDCTriggerDeadch.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <trg/cdc/dbobjects/CDCTriggerTSFConfig.h>
 
 namespace Belle2 {
   typedef HepGeom::Point3D<double> Point3D;
@@ -97,6 +98,8 @@ namespace Belle2 {
     /** Assign ADC based flag for full hit tracker. Higher threshold of ADC. */
     int m_adcflag_high;
 
+    /** flag for saving adc information or not. Default false**/
+    bool m_saveadc;
   private:
     /** structure to hold pointers to all wires in the CDC */
     std::vector<std::vector<TRGCDCLayer*>> superLayers;
@@ -130,6 +133,11 @@ namespace Belle2 {
     /** relate all cdchtis to ts, not just opriority wire */
     bool m_relateAllHits;
 
+    /** switch to use database to load run dependent parameter*/
+    bool m_useDB;
+
+    /** run dependent parameter database of TSF */
+    DBObjPtr<CDCTriggerTSFConfig> m_cdctrgtsf_DB;
 
   };
 

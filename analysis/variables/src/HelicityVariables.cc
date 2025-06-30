@@ -20,6 +20,7 @@
 
 #include <Math/Boost.h>
 #include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
 using namespace ROOT::Math;
 #include <cmath>
 
@@ -30,8 +31,8 @@ namespace Belle2 {
     {
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      B2Vector3D motherBoost = frame.getMomentum(part).BoostToCM();
-      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
+      XYZVector motherBoost = frame.getMomentum(part).BoostToCM();
+      PxPyPzEVector motherMomentum = frame.getMomentum(part);
       const auto& daughters = part -> getDaughters() ;
 
       if (daughters.size() == 2) {
@@ -69,7 +70,7 @@ namespace Belle2 {
 
           pGamma = Boost(motherBoost) * pGamma;
 
-          return std::cos(motherMomentum.Angle(pGamma.Vect()));
+          return VectorUtil::CosTheta(motherMomentum, pGamma);
 
         } else {
           PxPyPzEVector pDaughter1 = frame.getMomentum(daughters[0]);
@@ -78,9 +79,9 @@ namespace Belle2 {
           pDaughter1 = Boost(motherBoost) * pDaughter1;
           pDaughter2 = Boost(motherBoost) * pDaughter2;
 
-          B2Vector3D p12 = (pDaughter2 - pDaughter1).Vect();
+          PxPyPzEVector p12 = pDaughter2 - pDaughter1;
 
-          return std::cos(motherMomentum.Angle(p12));
+          return VectorUtil::CosTheta(motherMomentum, p12);
         }
 
       } else if (daughters.size() == 3) {
@@ -93,12 +94,12 @@ namespace Belle2 {
         pDaughter2 = Boost(motherBoost) * pDaughter2;
         pDaughter3 = Boost(motherBoost) * pDaughter3;
 
-        B2Vector3D p12 = (pDaughter2 - pDaughter1).Vect();
-        B2Vector3D p13 = (pDaughter3 - pDaughter1).Vect();
+        XYZVector p12 = (pDaughter2 - pDaughter1).Vect();
+        XYZVector p13 = (pDaughter3 - pDaughter1).Vect();
 
-        B2Vector3D n = p12.Cross(p13);
+        XYZVector n = p12.Cross(p13);
 
-        return std::cos(motherMomentum.Angle(n));
+        return VectorUtil::CosTheta(motherMomentum, n);
 
       }  else return Const::doubleNaN;
 
@@ -108,8 +109,8 @@ namespace Belle2 {
     {
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      B2Vector3D motherBoost = frame.getMomentum(part).BoostToCM();
-      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
+      XYZVector motherBoost = frame.getMomentum(part).BoostToCM();
+      PxPyPzEVector motherMomentum = frame.getMomentum(part);
       const auto& daughters = part -> getDaughters() ;
 
 
@@ -125,7 +126,7 @@ namespace Belle2 {
         }
         pGamma = Boost(motherBoost) * pGamma;
 
-        return std::cos(motherMomentum.Angle(pGamma.Vect()));
+        return VectorUtil::CosTheta(motherMomentum, pGamma);
 
       } else if (daughters.size() == 2) { // only for pi0 -> gamma gamma, gamma -> e+ e-
 
@@ -156,7 +157,7 @@ namespace Belle2 {
 
         pGamma = Boost(motherBoost) * pGamma;
 
-        return std::cos(motherMomentum.Angle(pGamma.Vect()));
+        return VectorUtil::CosTheta(motherMomentum, pGamma);
 
       } else return Const::doubleNaN;
 
@@ -180,12 +181,12 @@ namespace Belle2 {
       PxPyPzEVector part4Vector = part->get4Vector();
       PxPyPzEVector mother4Vector = mother->get4Vector();
 
-      B2Vector3D motherBoost = mother4Vector.BoostToCM();
+      XYZVector motherBoost = mother4Vector.BoostToCM();
 
       beam4Vector = Boost(motherBoost) * beam4Vector;
       part4Vector = Boost(motherBoost) * part4Vector;
 
-      return - part4Vector.Vect().Dot(beam4Vector.Vect()) / part4Vector.P() / beam4Vector.P();
+      return - VectorUtil::CosTheta(part4Vector, beam4Vector);
     }
 
 
@@ -210,13 +211,13 @@ namespace Belle2 {
       PxPyPzEVector daughter4Vector = daughter->get4Vector();
       PxPyPzEVector grandDaughter4Vector = grandDaughter->get4Vector();
 
-      B2Vector3D daughterBoost = daughter4Vector.BoostToCM();
+      XYZVector daughterBoost = daughter4Vector.BoostToCM();
 
       // We boost the momentum of the mother and of the granddaughter to the reference frame of the daughter.
       grandDaughter4Vector = Boost(daughterBoost) * grandDaughter4Vector;
       mother4Vector = Boost(daughterBoost) * mother4Vector;
 
-      return - grandDaughter4Vector.Vect().Dot(mother4Vector.Vect()) / grandDaughter4Vector.P() / mother4Vector.P();
+      return - VectorUtil::CosTheta(grandDaughter4Vector, mother4Vector);
     }
 
     double cosAcoplanarityAngle(const Particle* mother, const std::vector<double>& granddaughters)
@@ -248,9 +249,9 @@ namespace Belle2 {
       PxPyPzEVector grandDaughter4Vector1 = grandDaughter1->get4Vector();
       PxPyPzEVector grandDaughter4Vector2 = grandDaughter2->get4Vector();
 
-      B2Vector3D motherBoost = mother4Vector.BoostToCM();
-      B2Vector3D daughter1Boost = daughter4Vector1.BoostToCM();
-      B2Vector3D daughter2Boost = daughter4Vector2.BoostToCM();
+      XYZVector motherBoost = mother4Vector.BoostToCM();
+      XYZVector daughter1Boost = daughter4Vector1.BoostToCM();
+      XYZVector daughter2Boost = daughter4Vector2.BoostToCM();
 
       // Boosting daughters to reference frame of the mother
       daughter4Vector1 = Boost(motherBoost) * daughter4Vector1;
@@ -261,10 +262,10 @@ namespace Belle2 {
       grandDaughter4Vector2 = Boost(daughter2Boost) * grandDaughter4Vector2;
 
       // We calculate the normal vectors of the decay two planes
-      B2Vector3D normalVector1 = daughter4Vector1.Vect().Cross(grandDaughter4Vector1.Vect());
-      B2Vector3D normalVector2 = daughter4Vector2.Vect().Cross(grandDaughter4Vector2.Vect());
+      XYZVector normalVector1 = daughter4Vector1.Vect().Cross(grandDaughter4Vector1.Vect());
+      XYZVector normalVector2 = daughter4Vector2.Vect().Cross(grandDaughter4Vector2.Vect());
 
-      return std::cos(normalVector1.Angle(normalVector2));
+      return VectorUtil::CosTheta(normalVector1, normalVector2);
     }
 
     double cosHelicityAnglePrimary(const Particle* part)
@@ -318,12 +319,12 @@ namespace Belle2 {
       PxPyPzEVector jDaughter4Vector = jDaughter->get4Vector();
 
       PxPyPzEVector resonance4Vector = iDaughter4Vector + jDaughter4Vector;
-      B2Vector3D resonanceBoost = resonance4Vector.BoostToCM();
+      XYZVector resonanceBoost = resonance4Vector.BoostToCM();
 
       iDaughter4Vector = Boost(resonanceBoost) * iDaughter4Vector;
       mother4Vector = Boost(resonanceBoost) * mother4Vector;
 
-      return - iDaughter4Vector.Vect().Dot(mother4Vector.Vect()) / iDaughter4Vector.P() / mother4Vector.P();
+      return - VectorUtil::CosTheta(iDaughter4Vector, mother4Vector);
     }
 
     Manager::FunctionPtr momentaTripleProduct(const std::vector<std::string>& arguments)
@@ -350,7 +351,7 @@ namespace Belle2 {
         PxPyPzEVector jDaughter4Vector = jDaughter->get4Vector();
         PxPyPzEVector kDaughter4Vector = kDaughter->get4Vector();
 
-        B2Vector3D motherBoost = mother4Vector.BoostToCM();
+        XYZVector motherBoost = mother4Vector.BoostToCM();
 
         // We boost the momenta of offspring to the reference frame of the mother.
         iDaughter4Vector = Boost(motherBoost) * iDaughter4Vector;
@@ -358,7 +359,7 @@ namespace Belle2 {
         kDaughter4Vector = Boost(motherBoost) * kDaughter4Vector;
 
         // cross product: p_j x p_k
-        B2Vector3D jkDaughterCrossProduct = jDaughter4Vector.Vect().Cross(kDaughter4Vector.Vect());
+        XYZVector jkDaughterCrossProduct = jDaughter4Vector.Vect().Cross(kDaughter4Vector.Vect());
         // triple product: p_i * (p_j x p_k)
         return iDaughter4Vector.Vect().Dot(jkDaughterCrossProduct) ;
       };

@@ -411,9 +411,9 @@ void CDCDedxValidationAlgorithm::printCanvasdEdx(std::array<std::vector<TH1D*>, 
     htemp[1][i]->SetLineColor(9);
     htemp[0][i]->SetTitle(Form("%s: (%0.02f, %0.02f)", svar.data(), min, max));
     if (htemp[0][i]->GetEntries() > 0)
-      htemp[0][i]->Scale(1 / htemp[0][i]->GetEntries());
+      htemp[0][i]->Scale(1.0 / htemp[0][i]->GetEntries());
     if (htemp[1][i]->GetEntries() > 0)
-      htemp[1][i]->Scale(1 / htemp[1][i]->GetEntries());
+      htemp[1][i]->Scale(1.0 / htemp[1][i]->GetEntries());
 
     if (htemp[1][i]->GetMaximum() > htemp[0][i]->GetMaximum())
       htemp[0][i]->SetMaximum(htemp[1][i]->GetMaximum());

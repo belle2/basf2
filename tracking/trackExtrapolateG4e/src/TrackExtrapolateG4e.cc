@@ -687,7 +687,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
       (*klmClusterInfo)[c].first->setClusterTrackSeparation(klmHit[c].getDistance() / CLHEP::cm);
       (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(klmHit[c].getTrackClusterSeparationAngle());
       (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(klmHit[c].getTrackRotationAngle());
-      //
+
       (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackSep
       if (extState.track != nullptr) {
         extState.track->addRelationTo(h); // relation Track to TrackSep

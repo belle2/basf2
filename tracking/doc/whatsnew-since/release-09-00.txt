@@ -4,7 +4,7 @@ Changes in the tracking package since release-09-00
 Track Fit
 ++++++++++
 
-* it's now possible to use different configurations of the Deterministic Annealing Filter (DAF) for track fits of: (1) cosmics, (2) track fit after the CDC patter recognition (i.e. the fit in the toSVD CKF), (3) all other fits
+* it's now possible to use different configurations of the Deterministic Annealing Filter (DAF) for track fits of: (1) cosmics, (2) track fit after the CDC pattern recognition (i.e. the fit in the toSVD CKF), (3) all other fits
 
 * the TrackFitMomentumRange, that determines the momentum ranges in which a track fit for a mass hypothesis should be run, now uses the fitted momentum when available, instead of the RecoTrack seed momentum
 

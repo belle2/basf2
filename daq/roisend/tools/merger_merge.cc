@@ -18,6 +18,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <algorithm>
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <netdb.h>
@@ -942,11 +943,23 @@ main(int argc, char* argv[])
                       *triggers.begin(), *(--triggers.end()), missing_walk_index, triggers.size(),
                       *(--triggers.end()) - *triggers.begin(), event_number_max, mod, hlts[mod]);
         }
-        printf("\nMIN ");
+
+        auto minIt = std::ranges::min_element(hlt_min.begin(), hlt_min.end(),
+        [](const auto & a, const auto & b) {
+          return a.second < b.second;
+        });
+
+        // Find the element with the maximum value
+        auto maxIt = std::ranges::max_element(hlt_max.begin(), hlt_max.end(),
+        [](const auto & a, const auto & b) {
+          return a.second < b.second;
+        });
+
+        printf("\nMIN %u, ", minIt->second);
         for (auto& h : hlt_min) printf("%u, ", h.second);
-        printf("\nMAX ");
+        printf("\nMAX %u, ", maxIt->second);
         for (auto& h : hlt_max) printf("%u, ", h.second);
-        printf("\nDIF ");
+        printf("\nDIF %um ", maxIt->second - minIt->second);
         for (auto& h : hlt_max) printf("%u, ", h.second - hlt_min[h.first]);
         printf("\n");
         hlt_min.clear();

@@ -112,7 +112,15 @@ namespace Belle2 {
      * print it.
      */
     void printBadWire();
-
+    /**
+     * Import badboards table to the data base.
+     */
+    void importBadBoards(std::string fileName);
+    /**
+     * Get the badboard table from the database and
+     * print it.
+     */
+    void printBadBoards();
     /**
      * Import propspeed table to the database.
      */

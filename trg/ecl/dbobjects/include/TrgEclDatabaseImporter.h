@@ -29,7 +29,7 @@ namespace Belle2 {
       m_startRun = start;
       m_endRun = end;
     }
-    //! Set Experimnet Number
+    //! Set Experiment Number
     void setExpNumber(int start, int end)
     {
       m_startExp = start;

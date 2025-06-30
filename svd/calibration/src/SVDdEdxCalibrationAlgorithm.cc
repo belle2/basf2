@@ -89,13 +89,12 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
 
   std::array<std::string, 6> part = {"Electron", "Muon", "Pion", "Kaon", "Proton", "Deuteron"};
 
-  TCanvas* candEdx = new TCanvas("candEdx", "SVD dEdx payloads", 1200, 700);
+  std::unique_ptr<TCanvas> candEdx(new TCanvas("candEdx", "SVD dEdx payloads", 1200, 700));
   candEdx->Divide(3, 2);
   gStyle->SetOptStat(11);
 
   for (bool trunmean : {false, true}) {
     for (int iPart = 0; iPart < 6; iPart++) {
-
       if (iPart == 0 && trunmean) {
         hDedxPDFs[iPart] = histoE;
         hDedxPDFs[iPart]->SetName("hist_d1_11_trunc");
@@ -132,9 +131,7 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
       } else if (iPart == 5 && !trunmean) {
         hDedxPDFs[iPart] = &hEmpty;
         hDedxPDFs[iPart]->SetName("hist_d1_1000010020");
-      }
-
-      else
+      } else
         hDedxPDFs[iPart] = &hEmpty;
       payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
 
@@ -149,6 +146,7 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
       for (int iPart = 0; iPart < 6; iPart++) {
         l->Add(hDedxPDFs[iPart]);
       }
+
       TFile SVDdEdxPDFsPlotFile("PlotsSVDdEdxPDFs_wTruncMean.root", "RECREATE");
       l->Write("histlist", TObject::kSingleKey);
       SVDdEdxPDFsPlotFile.Close();
@@ -156,6 +154,7 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
 
     // candEdx->SetTitle(Form("Likehood dist. of charged particles from %s, trunmean = %s", idet.data(), check.str().data()));
   }
+
 
   saveCalibration(payload, "SVDdEdxPDFs");
   B2INFO("SVD dE/dx calibration done!");
@@ -1362,6 +1361,13 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
   Electron2DHistogramResidual->SetMinimum(-0.15);
   Electron2DHistogramResidual->SetMaximum(0.15);
 
+  Electron2DHistogramNew->SetName("Electron2DHistogramNew");
+  Muon2DHistogramNew->SetName("Muon2DHistogramNew");
+  Pion2DHistogramNew->SetName("Pion2DHistogramNew");
+  Kaon2DHistogramNew->SetName("Kaon2DHistogramNew");
+  Proton2DHistogramNew->SetName("Proton2DHistogramNew");
+  Deuteron2DHistogramNew->SetName("Deuteron2DHistogramNew");
+
 // plot the summary of all the distributions
   if (m_isMakePlots) {
     TCanvas* CanvasSummaryGenerated = new TCanvas("CanvasSummaryGenerated", "Generated payloads", 1700, 850);
@@ -1417,12 +1423,6 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
     SummaryResidualsPlotFile.Close();
   }
 
-  Electron2DHistogramNew->SetName("Electron2DHistogramNew");
-  Muon2DHistogramNew->SetName("Muon2DHistogramNew");
-  Pion2DHistogramNew->SetName("Pion2DHistogramNew");
-  Kaon2DHistogramNew->SetName("Kaon2DHistogramNew");
-  Proton2DHistogramNew->SetName("Proton2DHistogramNew");
-  Deuteron2DHistogramNew->SetName("Deuteron2DHistogramNew");
 
   // return all the generated payloads
   std::unique_ptr<TList> histList(new TList);

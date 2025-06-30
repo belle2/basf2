@@ -1,3 +1,7 @@
 Changes in the tracking package since release-08-00
 ----------------------------------------------------
 
+* The Kink finding was added to the tracking algorithms, which runs in the default chain. 
+It identifies charged particles that decay in flight and are then either reconstructed as one single or two tracks.
+New Kink objects have been added to store additional TrackFitResults. Information on Kinks can be retrieved via analysis variables. 
+Further information can be found here: `:ref:tracking_kinkFinding`.

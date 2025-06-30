@@ -284,10 +284,47 @@ namespace Belle2::Variable {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster)
       return Const::doubleNaN;
-    auto trackWithWeight = cluster->getRelatedFromWithWeight<Track>();
-    if (!trackWithWeight.first)
+    return cluster->getClusterTrackSeparation();
+  }
+
+  double klmClusterTrackSeparationAngle(const Particle* particle)
+  {
+    const KLMCluster* cluster = particle->getKLMCluster();
+    if (!cluster)
       return Const::doubleNaN;
-    return 1. / trackWithWeight.second;
+    return cluster->getClusterTrackSeparationAngle();
+  }
+
+  double klmClusterTrackRotationAngle(const Particle* particle)
+  {
+    const KLMCluster* cluster = particle->getKLMCluster();
+    if (!cluster)
+      return Const::doubleNaN;
+    return cluster->getClusterTrackRotationAngle();
+  }
+
+  double klmClusterShapeStdDev1(const Particle* particle)
+  {
+    const KLMCluster* cluster = particle->getKLMCluster();
+    if (!cluster)
+      return Const::doubleNaN;
+    return cluster->getShapeStdDev1();
+  }
+
+  double klmClusterShapeStdDev2(const Particle* particle)
+  {
+    const KLMCluster* cluster = particle->getKLMCluster();
+    if (!cluster)
+      return Const::doubleNaN;
+    return cluster->getShapeStdDev2();
+  }
+
+  double klmClusterShapeStdDev3(const Particle* particle)
+  {
+    const KLMCluster* cluster = particle->getKLMCluster();
+    if (!cluster)
+      return Const::doubleNaN;
+    return cluster->getShapeStdDev3();
   }
 
   VARIABLE_GROUP("KLM Cluster and KlongID");
@@ -366,7 +403,22 @@ Returns the number of Tracks matched to the KLMCluster associated to this Partic
                      Returns the number of ECLClusters matched to the KLMCluster associated to this Particle.
               )DOC");
   REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
-                    "Returns the distance between the Track and the KLMCluster associated to this Particle. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
+                    "Returns the distance between KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.",
                     "cm");
+  REGISTER_VARIABLE("klmClusterTrackRotationAngle", klmClusterTrackRotationAngle,
+                    "Returns the angle between the direction at the IP and at the POCA to the KLMCluster associated to this Particle for the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
+                    "rad");
+  REGISTER_VARIABLE("klmClusterTrackSeparationAngle", klmClusterTrackSeparationAngle,
+                    "Returns the angle between the KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship"
+                    "rad");
 
+  REGISTER_VARIABLE("klmClusterShapeStdDev1", klmClusterShapeStdDev1,
+                    "Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns NaN if this KLMCluster contains only one KLMHit2d cluster."
+                    "cm");
+  REGISTER_VARIABLE("klmClusterShapeStdDev2", klmClusterShapeStdDev2,
+                    "Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns NaN if this KLMCluster contains only one KLMHit2d cluster."
+                    "cm");
+  REGISTER_VARIABLE("klmClusterShapeStdDev3", klmClusterShapeStdDev3,
+                    "Returns the std deviation of the 3rd axis from a PCA of the KLMCluster associated to this Particle. This variable returns NaN if this KLMCluster contains only one KLMHit2d cluster."
+                    "cm");
 }

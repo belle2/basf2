@@ -105,6 +105,12 @@ klm_cluster = [
     'klmClusterIsBackwardEKLM',
     'klmClusterTheta',
     'klmClusterPhi',
+    'klmClusterTrackDistance',
+    'klmClusterTrackSeparationAngle',
+    'klmClusterTrackRotationAngle',
+    'klmClusterShapeStdDev1',
+    'klmClusterShapeStdDev2',
+    'klmClusterShapeStdDev3',
     'nKLMClusterTrackMatches',
     'nMatchedKLMClusters',
 ]

@@ -155,7 +155,6 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
     // candEdx->SetTitle(Form("Likehood dist. of charged particles from %s, trunmean = %s", idet.data(), check.str().data()));
   }
 
-
   saveCalibration(payload, "SVDdEdxPDFs");
   B2INFO("SVD dE/dx calibration done!");
 
@@ -266,7 +265,7 @@ TTree* SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselT
   }
 
   if (m_isMakePlots) {
-    TCanvas* canvLambda = new TCanvas("canvLambda", "canvLambda");
+    std::unique_ptr<TCanvas> canvLambda(new TCanvas("canvLambda", "canvLambda"));
     canvLambda->cd();
     RooPlot* LambdaFitFrame = LambdaDataset->plotOn(InvM.frame(130));
     totalPDFLambda.plotOn(LambdaFitFrame, LineColor(TColor::GetColor("#4575b4")));
@@ -289,7 +288,6 @@ TTree* SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselT
     TFile LambdaFitPlotFile("SVDdEdxCalibrationLambdaFitPlotFile.root", "RECREATE");
     canvLambda->Write();
     LambdaFitPlotFile.Close();
-    delete canvLambda;
   }
   RooStats::SPlot* sPlotDatasetLambda = new RooStats::SPlot("sData", "An SPlot", *LambdaDataset, &totalPDFLambda,
                                                             RooArgList(nSignalLambda, nBkgLambda));
@@ -491,7 +489,7 @@ TTree* SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTr
 
   DstarFitFrame->GetXaxis()->SetTitle("#Deltam [GeV/c^{2}]");
   if (m_isMakePlots) {
-    TCanvas* canvDstar = new TCanvas("canvDstar", "canvDstar");
+    std::unique_ptr<TCanvas> canvDstar(new TCanvas("canvDstar", "canvDstar"));
     canvDstar->cd();
 
     DstarFitFrame->Draw();
@@ -500,7 +498,6 @@ TTree* SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTr
     TFile DstarFitPlotFile("SVDdEdxCalibrationDstarFitPlotFile.root", "RECREATE");
     canvDstar->Write();
     DstarFitPlotFile.Close();
-    delete canvDstar;
   }
 
   /////////////////// SPlot ///////////////////////////////////////////////////////////
@@ -990,7 +987,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
 
   if (m_isMakePlots) {
 // plot a summary of all beta*gamma fits for hadrons
-    TCanvas* CombinedCanvasHadrons = new TCanvas("CombinedCanvasHadrons", "Hadron beta*gamma fits", 10, 10, 1000, 700);
+    std::unique_ptr<TCanvas> CombinedCanvasHadrons(new TCanvas("CombinedCanvasHadrons", "Hadron beta*gamma fits", 10, 10, 1000, 700));
     gStyle->SetOptFit(1111);
 
     PionProfileBetaGamma->Draw();
@@ -1022,7 +1019,6 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
     BetaGammaFunctionProton->Write();
     CombinedCanvasHadrons->Write();
     HadronFitPlotFile.Close();
-    delete CombinedCanvasHadrons;
   }
 
 
@@ -1097,7 +1093,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
   ElectronProfileBetaGamma->GetListOfFunctions()->Add(BetaGammaFunctionElectron);
 
   if (m_isMakePlots) {
-    TCanvas* ElectronCanvas = new TCanvas("ElectronCanvas", "Electron histogram", 10, 10, 1000, 700);
+    std::unique_ptr<TCanvas> ElectronCanvas(new TCanvas("ElectronCanvas", "Electron histogram", 10, 10, 1000, 700));
     ElectronProfileBetaGamma->Draw();
 
     gPad->SetLogx();
@@ -1108,7 +1104,6 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
     BetaGammaFunctionElectron->Write();
     ElectronCanvas->Write();
     ElectronFitPlotFile.Close();
-    delete ElectronCanvas;
   }
 
   TF1* MomentumFunctionElectron = (TF1*) BetaGammaFunctionElectron->Clone("MomentumFunctionElectron");
@@ -1136,14 +1131,13 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
   MomentumFunctionKaon->SetLineWidth(4);
 
   gStyle->SetOptFit(1111);
-  TCanvas* CanvasOverlays = new TCanvas("CanvasOverlays", "overlays", 1300, 1000);
+  std::unique_ptr<TCanvas> CanvasOverlays(new TCanvas("CanvasOverlays", "overlays", 1300, 1000));
   CanvasOverlays->Divide(2, 2);
   CanvasOverlays->cd(1); Electron2DHistogram->Draw();   MomentumFunctionElectron->Draw("SAME");
   CanvasOverlays->cd(2); Pion2DHistogram->Draw();  MomentumFunctionPion->Draw("SAME");
   CanvasOverlays->cd(3); Kaon2DHistogram->Draw();  MomentumFunctionKaon->Draw("SAME");
   CanvasOverlays->cd(4); Proton2DHistogram->Draw();  MomentumFunctionProton->Draw("SAME");
   CanvasOverlays->Print("SVDdEdxOverlaysFitsHistos.pdf");
-  delete CanvasOverlays;
 
   TF1* MomentumFunctionDeuteron = (TF1*) BetaGammaFunctionProton->Clone("MomentumFunctionDeuteron");
   MomentumFunctionDeuteron->SetParameter(2, m_DeuteronPDGMass);
@@ -1157,7 +1151,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
 
 // overlay all fits in one plot
 
-  TCanvas* OverlayAllTracksCanvas = new TCanvas("OverlayAllTracksCanvas", "The Ultimate Plot", 10, 10, 1000, 700);
+  std::unique_ptr<TCanvas> OverlayAllTracksCanvas(new TCanvas("OverlayAllTracksCanvas", "The Ultimate Plot", 10, 10, 1000, 700));
 
   TH2F* AllTracksHistogram = new TH2F("AllTracksHistogram", "AllTracksHistogram;Momentum [GeV/c];dEdx [arb. units]", 1000, 0.05, 5,
                                       1000, 2.e5, 6.e6);
@@ -1186,7 +1180,6 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
   MomentumFunctionDeuteron->Write();
   OverlayAllTracksCanvas->Write();
   OverlayAllTracksPlotFile.Close();
-  delete OverlayAllTracksCanvas;
 
 
 // resolution studies //

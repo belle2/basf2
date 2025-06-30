@@ -15,6 +15,8 @@ from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 from tracking.run.mixins import PostProcessingRunMixin
 from tracking.run.utilities import NonstrictChoices
 
+# @cond internal_test
+
 
 class TrainingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
     """Prepare and execute a basf2 job to train neural network, postprocess, and inspect"""
@@ -122,3 +124,5 @@ class TrainingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
             self.output_file_name = self.sample_file_name[:-len(".root")] + ".overview.root"
 
         super().postprocess()
+
+# @endcond

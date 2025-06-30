@@ -365,7 +365,8 @@ void TRGGRLDQMModule::event()
 
   bool cond_clean, cond_injHER, cond_injLER;
 
-  cond_clean = (6 < running_in_us && running_in_us < 8) && (50 < diff_in_ms && diff_in_ms < 70);
+  cond_clean = !((1.2 < running_in_us && running_in_us < 1.6) || (2.2 < running_in_us && running_in_us < 2.4)) && (500 < diff_in_ms
+               && diff_in_ms < 15000);
 
   cond_injHER =  m_trgTime->isHER() && ((diff_in_ms < 0.5) || ((diff_in_ms < 20) && (2 < running_in_us && running_in_us < 3)));
   cond_injLER = !m_trgTime->isHER() && ((diff_in_ms < 0.5) || ((diff_in_ms < 20) && (1 < running_in_us && running_in_us < 2)));

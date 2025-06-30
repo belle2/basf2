@@ -53,6 +53,11 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
       (*m_badWireFromDB).addCallback(this, &CDCGeometryPar::setBadWire);
     }
   }
+  // Bad boards are on DB only:
+  m_badBoardsFromDB = new DBObjPtr<CDCBadBoards>;
+  if ((*m_badBoardsFromDB).isValid()) {
+    (*m_badBoardsFromDB).addCallback(this, &CDCGeometryPar::setBadBoard);
+  }
 
   if (gcp.getPropSpeedInputType()) {
     m_propSpeedFromDB = new DBObjPtr<CDCPropSpeeds>;
@@ -1430,6 +1435,11 @@ void CDCGeometryPar::setBadWire()
   calcMeanT0();
 }
 
+// Set bad-boards
+void CDCGeometryPar::setBadBoard()
+{
+  calcMeanT0();
+}
 
 // Set prop.-speed (from DB)
 void CDCGeometryPar::setPropSpeed()

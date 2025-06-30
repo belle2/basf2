@@ -37,10 +37,13 @@ using namespace std;
 #define ERR_FPRINTF (fprintf)
 #define ERROR(func) { fprintf(stderr, "[ERROR] %s:%d: "#func"(): %s\n", __FILE__, __LINE__, strerror(errno));}
 
-std::map<int, std::string> myconn;
-std::map<int, unsigned int> mycount;
-std::set<int> hltused; // we want a sorted list
+std::map<int, std::string> myconn; // file descriptor to IP string
+std::map<int, int> fd_to_hlt; // file descripto to HLT unit
+std::map<int, unsigned int> mycount; // ROIs per file descriptor, 0 summary
+std::set<int> hltused; // a sorted list of active hlt units
 std::vector<int> hlts; // initialized on run START
+std::map<int, unsigned int> hlt_min; // minimum trigger number from file descriptor in last intervall
+std::map<int, unsigned int> hlt_max; // maximum trigger number from file descriptor in last intervall
 
 std::set<int> triggers;
 unsigned int event_number_max = 0;
@@ -644,7 +647,7 @@ main(int argc, char* argv[])
   /* argv copy */
   char* p;
 
-//   p = argv[1];
+//   p = argv[1]; // we do not want to change parameters, yet, even removing unused
 //   strcpy(shmname, p);
 //
 //   p = argv[2];
@@ -744,6 +747,8 @@ main(int argc, char* argv[])
       got_sigusr1 = false;
       ERR_FPRINTF(stderr, "[INFO] Got SIGUSR1, Run START\n");
       print_stat();
+      hlt_min.clear(); // reset on run start
+      hlt_max.clear();
     }
     if (got_sigusr2) {
       got_sigusr2 = false;
@@ -793,6 +798,7 @@ main(int argc, char* argv[])
       if (ptr) {
         int nr = atoi(ptr + 1);
         hltused.insert(nr);
+        fd_to_hlt[t] = nr;
       }
 
       fflush(stdout);
@@ -848,7 +854,7 @@ main(int argc, char* argv[])
           // extract trigger number, run+exp nr and fill it in a table.
 
           int runnr = 0;
-          int eventnr = 0;
+          unsigned int eventnr = 0;
 
           // From ROIpayload.h
           //     enum { OFFSET_MAGIC = 0, OFFSET_LENGTH = 1, OFFSET_HEADER = 2, OFFSET_TRIGNR = 3, OFFSET_RUNNR = 4, OFFSET_ROIS = 5};
@@ -865,7 +871,7 @@ main(int argc, char* argv[])
           }
 
           if (runnr > current_runnr) {
-            ERR_FPRINTF(stderr, "[WARNING] merger_merge: run number increases: got %d current %d trig %d\n", runnr, current_runnr,
+            ERR_FPRINTF(stderr, "[WARNING] merger_merge: run number increases: got %d current %d trig %u\n", runnr, current_runnr,
                         eventnr);
             print_stat();
             clear_triggers();
@@ -873,13 +879,15 @@ main(int argc, char* argv[])
             enable_check = true;
           } else if (runnr < current_runnr) {
             // got some event from old run
-            ERR_FPRINTF(stderr, "[WARNING] merger_merge: got trigger from older run: got %d current %d trig %d\n", runnr, current_runnr,
+            ERR_FPRINTF(stderr, "[WARNING] merger_merge: got trigger from older run: got %d current %d trig %u\n", runnr, current_runnr,
                         eventnr);
           }
 
           if (runnr == current_runnr) {
             // seperate if, as we might set it in the if above
             if (enable_check) check_event_nr(eventnr);
+            if (hlt_min[fd] == 0 or hlt_min[fd] > eventnr) hlt_min[fd] = eventnr;
+            if (hlt_max[fd] < eventnr) hlt_max[fd] = eventnr;
           } // if we end the if here, we will send out old events to ONSEN!
 
           n_bytes_to_onsen = n_bytes_from_hltout;
@@ -934,6 +942,15 @@ main(int argc, char* argv[])
                       *triggers.begin(), *(--triggers.end()), missing_walk_index, triggers.size(),
                       *(--triggers.end()) - *triggers.begin(), event_number_max, mod, hlts[mod]);
         }
+        printf("\nMIN ");
+        for (auto& h : hlt_min) printf("%u, ", h.second);
+        printf("\nMAX ");
+        for (auto& h : hlt_max) printf("%u, ", h.second);
+        printf("\nDIF ");
+        for (auto& h : hlt_max) printf("%u, ", h.second - hlt_min[h.first]);
+        printf("\n");
+        hlt_min.clear();
+        hlt_max.clear();
       }
     }
   }

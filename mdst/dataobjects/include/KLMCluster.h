@@ -15,6 +15,7 @@
 
 /* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
+#include <framework/gearbox/Const.h>
 
 namespace Belle2 {
 
@@ -131,22 +132,19 @@ namespace Belle2 {
      * Get KLM cluster-track rotation angle.
      * @return KLM rotation angle to the nearest track [rad].
      */
-    inline float getClusterTrackRotationAngle() const
-    {return m_klmClusterTrackRotationAngle;}
+    inline float getClusterTrackRotationAngle() const { return m_clusterTrackRotationAngle; }
 
     /**
      * Get KLM cluster-track separation angle.
      * @return KLM cluster separation angle to the nearest track [rad].
      */
-    inline float getClusterTrackSeparationAngle() const
-    {return m_klmClusterTrackSeparationAngle;}
+    inline float getClusterTrackSeparationAngle() const { return m_clusterTrackSeparationAngle; }
 
     /**
      * Get KLM cluster-track distance.
      * @return KLM cluster separation from the nearest track [cm].
      */
-    inline float getClusterTrackSeparation() const
-    {return m_klmClusterTrackSeparation;}
+    inline float getClusterTrackSeparation() const { return m_clusterTrackSeparation; }
 
     /**
      * Get std deviation of the 1st axis from PCA.
@@ -174,21 +172,27 @@ namespace Belle2 {
      * @param[in] rotation angle to the nearest track.
      */
     void setClusterTrackRotationAngle(float rotation)
-    {m_klmClusterTrackRotationAngle = rotation;}
+    {
+      m_clusterTrackRotationAngle = rotation;
+    }
 
     /**
      * Set KLM cluster-track separation angle.
      * @param[in] separation angle to the nearest track.
      */
     void setClusterTrackSeparationAngle(float separation)
-    {m_klmClusterTrackSeparationAngle = separation;}
+    {
+      m_clusterTrackSeparationAngle = separation;
+    }
 
     /**
      * Set KLM cluster-track distance.
      * @param[in] dist distance to the nearest track.
      */
     void setClusterTrackSeparation(float dist)
-    {m_klmClusterTrackSeparation = dist;}
+    {
+      m_clusterTrackSeparation = dist;
+    }
 
     /**
      * Set std deviation of the 1st axis, from PCA.
@@ -277,23 +281,22 @@ namespace Belle2 {
     float m_p;
 
     /** Track-cluster rotation angle. */
-    float m_klmClusterTrackRotationAngle;
+    float m_clusterTrackRotationAngle = Const::floatNaN;
 
     /** Track-cluster separation angle. */
-    float m_klmClusterTrackSeparationAngle;
+    float m_clusterTrackSeparationAngle = Const::floatNaN;
 
     /** Track-cluster separation (distance). */
-    float m_klmClusterTrackSeparation;
+    float m_clusterTrackSeparation = Const::floatNaN;
 
     /** Std deviation of axis 1 (from Cluster Shape PCA). */
-    float m_shapeStdDev1;
+    float m_shapeStdDev1 = 0;
 
     /** Std deviation of axis 2 (from Cluster Shape PCA). */
-    float m_shapeStdDev2;
+    float m_shapeStdDev2 = 0;
 
     /** Std deviation of axis 3 (from Cluster Shape PCA). */
-    float m_shapeStdDev3;
-
+    float m_shapeStdDev3 = 0;
 
     /** Needed to make objects storable. */
     ClassDef(Belle2::KLMCluster, 4);

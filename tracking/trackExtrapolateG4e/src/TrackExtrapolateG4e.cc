@@ -684,9 +684,15 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
       }
       TrackClusterSeparation* h = m_trackClusterSeparations.appendNew(klmHit[c]);
       // Add the following three quantities to the KLMCluster data members
-      (*klmClusterInfo)[c].first->setClusterTrackSeparation(klmHit[c].getDistance() / CLHEP::cm);
-      (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(klmHit[c].getTrackClusterSeparationAngle());
-      (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(klmHit[c].getTrackRotationAngle());
+      if (h != nullptr) {
+        (*klmClusterInfo)[c].first->setClusterTrackSeparation(klmHit[c].getDistance() / CLHEP::cm);
+        (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(klmHit[c].getTrackClusterSeparationAngle());
+        (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(klmHit[c].getTrackRotationAngle());
+      } else {
+        (*klmClusterInfo)[c].first->setClusterTrackSeparation(Const::doubleNaN);
+        (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(Const::doubleNaN);
+        (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(Const::doubleNaN);
+      }
 
       (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackSep
       if (extState.track != nullptr) {

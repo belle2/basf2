@@ -19,6 +19,8 @@ namespace Belle2 {
     /**
      * Options for the ONNX MVA method.
      */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
     class ONNXOptions : public SpecificOptions {
 
     public:
@@ -73,6 +75,7 @@ namespace Belle2 {
         return Weightfile();
       }
     };
+#pragma GCC diagnostic pop
 
     /**
      * View a Dataset's m_input as ONNX Tensor

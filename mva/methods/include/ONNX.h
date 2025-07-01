@@ -19,22 +19,18 @@ namespace Belle2 {
     /**
      * Options for the ONNX MVA method.
      */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
     class ONNXOptions : public SpecificOptions {
 
     public:
       /**
        * Load mechanism to load Options from a xml tree
-       * @param pt xml tree
        */
-      virtual void load(const boost::property_tree::ptree& pt) override {}
+      virtual void load(const boost::property_tree::ptree&) override {}
 
       /**
        * Save mechanism to store Options in a xml tree
-       * @param pt xml tree
        */
-      virtual void save(boost::property_tree::ptree& pt) const override {}
+      virtual void save(boost::property_tree::ptree&) const override {}
 
       /**
        * Returns a program options description for all available options
@@ -61,21 +57,18 @@ namespace Belle2 {
        * Constructs a new teacher using the GeneralOptions and specific options of
        * this training
        * @param general_options defining all shared options
-       * @param specific_options defining all method specific options
        */
       ONNXTeacher(const GeneralOptions& general_options,
-                  const ONNXOptions& specific_options) : Teacher(general_options) {}
+                  const ONNXOptions&) : Teacher(general_options) {}
 
       /**
        * Just returns a default-initialized weightfile
-       * @param training_data used to train the method (ignored)
        */
-      virtual Weightfile train(Dataset& training_data) const override
+      virtual Weightfile train(Dataset&) const override
       {
         return Weightfile();
       }
     };
-#pragma GCC diagnostic pop
 
     /**
      * View a Dataset's m_input as ONNX Tensor

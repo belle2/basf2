@@ -5254,9 +5254,9 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
   getClusterPosition(): (-158.414,-207.063,52.42)
-  getClusterTrackRotationAngle(): -1.58819e-23
-  getClusterTrackSeparation(): -1.58819e-23
-  getClusterTrackSeparationAngle(): -1.58819e-23
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -5280,17 +5280,17 @@ KLMCluster#0:
     -> KlIds#0 (weight: 3.48866e-09)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#13 (weight: 1)
-  getShapeStdDev1(): -1.58819e-23
-  getShapeStdDev2(): -1.58819e-23
-  getShapeStdDev3(): -1.58819e-23
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 26.3476
 KLMCluster#1:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
   getClusterPosition(): (-149.5,52.3,283.9)
-  getClusterTrackRotationAngle(): -1.58819e-23
-  getClusterTrackSeparation(): -1.58819e-23
-  getClusterTrackSeparationAngle(): -1.58819e-23
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.965665
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -5314,9 +5314,9 @@ KLMCluster#1:
     -> KlIds#1 (weight: 3.48866e-09)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#48 (weight: 1)
-  getShapeStdDev1(): -1.58819e-23
-  getShapeStdDev2(): -1.58819e-23
-  getShapeStdDev3(): -1.58819e-23
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 12.6532
 KlId#0:
   getKlId(): 3.48866e-09
@@ -13120,9 +13120,9 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
   getClusterPosition(): (-204.037,32.912,16.7)
-  getClusterTrackRotationAngle(): -1.58819e-23
-  getClusterTrackSeparation(): -1.58819e-23
-  getClusterTrackSeparationAngle(): -1.58819e-23
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -13147,17 +13147,17 @@ KLMCluster#0:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#5 (weight: 0.211196)
     -> MCParticles#40 (weight: 0.788804)
-  getShapeStdDev1(): -1.58819e-23
-  getShapeStdDev2(): -1.58819e-23
-  getShapeStdDev3(): -1.58819e-23
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 14.7607
 KLMCluster#1:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
   getClusterPosition(): (-16.3,173.5,283.9)
-  getClusterTrackRotationAngle(): -1.58819e-23
-  getClusterTrackSeparation(): -1.58819e-23
-  getClusterTrackSeparationAngle(): -1.58819e-23
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 1.01648
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -13181,9 +13181,9 @@ KLMCluster#1:
     -> KlIds#1 (weight: 3.48866e-09)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#52 (weight: 1)
-  getShapeStdDev1(): -1.58819e-23
-  getShapeStdDev2(): -1.58819e-23
-  getShapeStdDev3(): -1.58819e-23
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 12.743
 KlId#0:
   getKlId(): 3.48866e-09

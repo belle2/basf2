@@ -3406,9 +3406,9 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
   getClusterPosition(): (116.9,-153.5,-189.9)
-  getClusterTrackRotationAngle(): -1.58819e-23
-  getClusterTrackSeparation(): -1.58819e-23
-  getClusterTrackSeparationAngle(): -1.58819e-23
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -3432,17 +3432,17 @@ KLMCluster#0:
     -> KlIds#0 (weight: 0.00763695)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#35 (weight: 1)
-  getShapeStdDev1(): -1.58819e-23
-  getShapeStdDev2(): -1.58819e-23
-  getShapeStdDev3(): -1.58819e-23
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 13.665
 KLMCluster#1:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
   getClusterPosition(): (204.037,-27.088,190.3)
-  getClusterTrackRotationAngle(): -1.58819e-23
-  getClusterTrackSeparation(): -1.58819e-23
-  getClusterTrackSeparationAngle(): -1.58819e-23
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 1.58513
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -3467,9 +3467,9 @@ KLMCluster#1:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#29 (weight: 0.317079)
     -> MCParticles#30 (weight: 0.682921)
-  getShapeStdDev1(): -1.58819e-23
-  getShapeStdDev2(): -1.58819e-23
-  getShapeStdDev3(): -1.58819e-23
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 13.665
 KlId#0:
   getKlId(): 0.00763695
@@ -11547,9 +11547,9 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
   getClusterPosition(): (-35.088,204.029,40.7)
-  getClusterTrackRotationAngle(): -1.58819e-23
-  getClusterTrackSeparation(): -1.58819e-23
-  getClusterTrackSeparationAngle(): -1.58819e-23
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 2.62755
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -11573,9 +11573,9 @@ KLMCluster#0:
     -> KlIds#0 (weight: 0.000836096)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#8 (weight: 1)
-  getShapeStdDev1(): -1.58819e-23
-  getShapeStdDev2(): -1.58819e-23
-  getShapeStdDev3(): -1.58819e-23
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 17.4597
 KlId#0:
   getKlId(): 0.000836096

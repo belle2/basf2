@@ -3460,9 +3460,9 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (-103.915,184.401,111.3)
-  getClusterTrackRotationAngle(): -1.58819e-23
-  getClusterTrackSeparation(): -1.58819e-23
-  getClusterTrackSeparationAngle(): -1.58819e-23
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.814642
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -3485,17 +3485,17 @@ KLMCluster#0:
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#22 (weight: 1)
-  getShapeStdDev1(): -1.58819e-23
-  getShapeStdDev2(): -1.58819e-23
-  getShapeStdDev3(): -1.58819e-23
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 2.62976
 KLMCluster#1:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (-112.272,188.926,257.3)
-  getClusterTrackRotationAngle(): -1.58819e-23
-  getClusterTrackSeparation(): -1.58819e-23
-  getClusterTrackSeparationAngle(): -1.58819e-23
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -3518,9 +3518,9 @@ KLMCluster#1:
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#22 (weight: 1)
-  getShapeStdDev1(): -1.58819e-23
-  getShapeStdDev2(): -1.58819e-23
-  getShapeStdDev3(): -1.58819e-23
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 2.62976
 No data for KlId
 No data for TRGSummary
@@ -18539,9 +18539,9 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (154.939,133.602,163.3)
-  getClusterTrackRotationAngle(): -1.58819e-23
-  getClusterTrackSeparation(): -1.58819e-23
-  getClusterTrackSeparationAngle(): -1.58819e-23
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -18564,9 +18564,9 @@ KLMCluster#0:
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#70 (weight: 1)
-  getShapeStdDev1(): -1.58819e-23
-  getShapeStdDev2(): -1.58819e-23
-  getShapeStdDev3(): -1.58819e-23
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 2.63636
 No data for KlId
 No data for TRGSummary

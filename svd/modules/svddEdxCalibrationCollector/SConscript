@@ -5,12 +5,6 @@ env['LIBS'] = [
     '$ROOT_LIBS',
     'calibration',
     'analysis_dataobjects',
-<<<<<<< HEAD
     'reconstruction_dataobjects'
-=======
-    'analysis',
-    'reconstruction_dataobjects',
-    'mdst_dataobjects'
->>>>>>> 88386c660 (add missing scons dependencies)
     ]
 Return('env')

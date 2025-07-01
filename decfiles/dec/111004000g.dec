@@ -22,12 +22,12 @@ Decay B0sig
 0.5     a_1+sig   pi-         PHOTOS SVS;
 0.5     a_1-sig   pi+         PHOTOS SVS;
 Enddecay
-CDecay
+CDecay anti-B0sig
 
 Decay a_1+sig
 1.0     sigma_0sig  pi+      VSS;
 Enddecay
-CDecay
+CDecay a_1-sig
 
 Decay sigma_0sig
 1.0     pi+  pi-    PHSP;

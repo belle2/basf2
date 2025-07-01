@@ -135,6 +135,7 @@ Changes since release-09
 .. include:: b2bii/doc/whatsnew-since/release-09-00.txt
 
 .. include:: framework/doc/whatsnew-since/release-09-00.txt
+.. include:: tracking/doc/whatsnew-since/release-09-00.txt
 
 Changes since release-08
 ========================

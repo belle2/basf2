@@ -13,9 +13,11 @@ Script to perform the SVD dE/dx calibration
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 import basf2 as b2
 
+from softwaretrigger.constants import HLT_INPUT_OBJECTS
 import modularAnalysis as ma
 import vertex as vx
-from reconstruction import prepare_user_cdst_analysis
+import reconstruction as re
+from reconstruction import prepare_user_cdst_analysis, DIGITS_OBJECTS
 
 settings = CalibrationSettings(
     name="caf_svd_dedx",
@@ -32,50 +34,83 @@ settings = CalibrationSettings(
     expert_config={
         "isMC": False,
         "listOfMutedCalibrations": [],  # dEdxCalibration, dEdxValidation
-        "rerun_pid": False,  # need to rerun VXD PID for calibration?
-        "rerun_pid_val": True,  # need to rerun VXD PID for validation?
-        "validation_mode": "basic",  # full or basic; full also produces global PID performance plots
+        "rerun_reco": False,  # need to rerun reconstruction for calibration?
+        # This is needed when using release-10 calibration on older CDSTs as the dEdx calculation needs to be rerun.
+        "rerun_reco_val": False,  # need to rerun reconstruction for validation?
+        # This is needed when using release-10 calibration on older CDSTs as the dEdx calculation needs to be rerun.
+        "rerun_pid_val": True,  # need to rerun PID for validation?
+        # The answer is almost always "yes", but this argument is ignored if you are already rerunning the reconstruction.
+        "validation_mode": "basic",  # full or basic validation; full also produces global PID performance plots
         "MaxFilesPerRun": 10,  # 15,
         "MaxFilesPerRunValidation": 6,  # be careful in MC to not exclude certain event types
-        "MinEvtsPerFile": 1,
+        "MinEvtsPerFile": 1,  # sanity check against empty CDSTs
         "MaxEvtsPerFile": 20000,  # only if rerun the reco, to prevent jobs >10h
-        "MinEvtsPerTree": 100,
-        "NBinsP": 69,
-        "NBinsdEdx": 100,
-        "dedxCutoff": 5.e6,
-        "NumROCpoints": 175,
-        "MinROCMomentum": 0.,
-        "MaxROCMomentum": 2.5,
-        "NumEffBins": 30,
-        "MaxEffMomentum": 2.5
+        "MinEvtsPerTree": 100,  # sanity check against an empty collector-output TTree
+        "NBinsP": 69,  # number of momentum bins in the payload. 69 is the default historically; non-uniform binning is used.
+        "NBinsdEdx": 100,  # number of dEdx bins in the payload. 100 is the default historically.
+        "dedxCutoff": 5.e6,  # max dEdx value in the payload.
+        # Switch on a more precise calculation of the 1D profile for 2D
+        # histograms? Helps with the universality of dEdx:beta*gamma curves
+        # between hadrons.
+        "CustomProfile": True,
+        # Fix one of the parameters in the dEdx:beta*gamma fit, which makes the fit much more stable.
+        "FixUnstableFitParameter": True,
+        # In case of large changes in dEdx:beta*gamma trend with time, might need to set to False.
+        "NEventsToGenerate": 5e5,  # how many events to generate in each momentum bin, for the new payloads?
+        "UsePionBGFunctionForEverything": False,  # if the dEdx:beta*gamma fit is unstable, use the pion fit for all hadrons?
+        # (This can save us if the calibration failed due to e.g. kaon fit issue.)
+        "UseProtonBGFunctionForEverything": False,  # if the dEdx:beta*gamma fit is unstable, use the proton fit for all hadrons?
+        "NumROCpoints": 175,  # only for full validation: number of pionts for the ROC scan
+        "MinROCMomentum": 0.,  # only for full validation: in which momentum range to calculate ROC?
+        "MaxROCMomentum": 2.5,  # only for full validation: in which momentum range to calculate ROC?
+        "NumEffBins": 30,  # validation: how many bins for efficiency plots?
+        "MaxEffMomentum": 2.5  # validation: upper momentum boundary for efficiency plots?
+        # (No separation from SVD above 2.5 GeV or so)
         },
     depends_on=[])
 
 
-def create_path(rerun_pid, isMC, expert_config):
+def create_path(rerun_reco, rerun_pid, isMC, expert_config):
     rec_path = b2.Path()
 
     # expert_config = kwargs.get("expert_config")
     max_events_per_file = expert_config["MaxEvtsPerFile"]
 
-    if rerun_pid:
-        rec_path.add_module('RootInput', entrySequences=[f'0:{max_events_per_file - 1}']
-                            )
-        prepare_user_cdst_analysis(rec_path, mc=isMC)
+    if rerun_reco:
+        if not isMC:
+            rec_path.add_module(
+                'RootInput',
+                branchNames=HLT_INPUT_OBJECTS,
+                entrySequences=[f'0:{max_events_per_file - 1}'],
+                logLevel=b2.LogLevel.ERROR)
+            re.add_unpackers(path=rec_path)
+        else:
+            rec_path.add_module('RootInput', branchNames=list(DIGITS_OBJECTS) + [
+                'MCParticles',
+                'EventLevelTriggerTimeInfo',
+                'SoftwareTriggerResult',
+                'TRGSummary'], entrySequences=[f'0:{max_events_per_file - 1}'])
+            rec_path.add_module("Gearbox")
+            rec_path.add_module("Geometry")
 
+        re.add_reconstruction(path=rec_path, pruneTracks=False)
+        rec_path.add_module('VXDDedxPID')
+    elif rerun_pid:
+        rec_path.add_module('RootInput', entrySequences=[f'0:{max_events_per_file - 1}'])
+        prepare_user_cdst_analysis(rec_path, mc=isMC)
     else:
         rec_path.add_module('RootInput')
 
     # Fill particle lists
     ma.fillParticleList("pi+:all", "", path=rec_path)
     ma.fillParticleList("pi+:lambda", "nCDCHits > 0", path=rec_path)  # pi without track quality for reconstructing lambda
-    ma.fillParticleList("pi+:cut", "abs(dr) < 0.5 and abs(dz) < 2 and pValue > 0.00001 and nSVDHits > 1",
+    ma.fillParticleList("pi+:cut", "abs(dr) < 0.5 and abs(dz) < 2 and nSVDHits > 1",
                         path=rec_path)  # pions for reconstructing D and Dstar
 
-    ma.fillParticleList('K-:cut', cut='abs(dr) < 0.5 and abs(dz) < 2 and pValue > 0.00001 and nSVDHits > 1', path=rec_path)  # kaon
+    ma.fillParticleList('K-:cut', cut='abs(dr) < 0.5 and abs(dz) < 2 and nSVDHits > 1', path=rec_path)  # kaon
     ma.fillParticleList('e+:cut', cut='nSVDHits > 0', path=rec_path)  # electron
     # proton. In data, we only see background at p<0.25 GeV which motivates adding this cut.
-    ma.fillParticleList('p+:lambda', cut='nCDCHits > 0 and nSVDHits > 0 and p > 0.25', path=rec_path)
+    ma.fillParticleList('p+:lambda', cut='nCDCHits > 0 and nSVDHits > 0 and p > 0.135', path=rec_path)
     # ----------------------------------------------------------------------------
     # Reconstruct D*(D0->K-pi+)pi+ and cc.
     ma.reconstructDecay(decayString='D0:kpi -> K-:cut pi+:cut', cut='1.7 < M < 2.', path=rec_path)
@@ -108,7 +143,8 @@ def create_path(rerun_pid, isMC, expert_config):
         outputListName='Lambda0:cut',
         inputListName='Lambda0:myLambda',
         cut=(
-            "1.10 < InvM < 1.13 and chiProb > 0.001 and distance>1.0 and "
+            "1.10 < InvM < 1.13 and chiProb > 0.001 and distance > 1.0 and "
+            "cosAngleBetweenMomentumAndVertexVector > 0 and "
             "formula(daughter(0,p)) > formula(daughter(1,p)) and convertedPhotonInvariantMass(0,1) > 0.02 and "
             "[[formula((((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+"
             "daughter(1, E))*((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+"
@@ -131,7 +167,9 @@ def create_path(rerun_pid, isMC, expert_config):
     ma.cutAndCopyList(
         outputListName='D*+:cut',
         inputListName='D*+:myDstar',
-        cut='massDifference(0) < 0.151 and 1.85 < daughter(0, InvM) < 1.88 and 1.95 < InvM < 2.05 and chiProb > 0.001',
+        cut=('massDifference(0) < 0.151 and 1.85 < daughter(0, InvM) < 1.88 and '
+             '1.95 < InvM < 2.05 and chiProb > 0.001 and '
+             'formula(daughter(0,cosAngleBetweenMomentumAndVertexVector))>-0.75'),
         path=rec_path)
 
     # ----------------------------------------------------------------------------
@@ -145,9 +183,10 @@ def create_path(rerun_pid, isMC, expert_config):
         outputListName='gamma:cut',
         inputListName='gamma:myGamma',
         cut=('chiProb > 0.001 and 1 < dr < 12 and InvM < 0.01'
-                      'and convertedPhotonInvariantMass(0,1) < 0.005'
-                      'and -0.05 < convertedPhotonDelR(0,1) < 0.15'
-                      'and -0.05 < convertedPhotonDelZ(0,1) < 0.05'
+                      ' and cosAngleBetweenMomentumAndVertexVector > 0.995'
+                      ' and convertedPhotonInvariantMass(0,1) < 0.005'
+                      ' and -0.05 < convertedPhotonDelR(0,1) < 0.15'
+                      ' and -0.05 < convertedPhotonDelZ(0,1) < 0.05'
              ),
         path=rec_path)
     return rec_path
@@ -186,7 +225,8 @@ def get_calibrations(input_data, **kwargs):
 
     isMC = expert_config["isMC"]
     listOfMutedCalibrations = expert_config["listOfMutedCalibrations"]
-    rerun_pid = expert_config["rerun_pid"]
+    rerun_reco = expert_config["rerun_reco"]
+    rerun_reco_val = expert_config["rerun_reco_val"]
     rerun_pid_val = expert_config["rerun_pid_val"]
     max_files_per_run = expert_config["MaxFilesPerRun"]
     max_files_per_run_validation = expert_config["MaxFilesPerRunValidation"]
@@ -229,6 +269,11 @@ def get_calibrations(input_data, **kwargs):
     algo.setNumDEdxBins(expert_config['NBinsdEdx'])
     algo.setDEdxCutoff(expert_config['dedxCutoff'])
     algo.setMinEvtsPerTree(expert_config['MinEvtsPerTree'])
+    algo.setNEventsToGenerate(int(expert_config['NEventsToGenerate']))
+    algo.setUsePionBGFunctionForEverything(expert_config['UsePionBGFunctionForEverything'])
+    algo.setUseProtonBGFunctionForEverything(expert_config['UseProtonBGFunctionForEverything'])
+    algo.setCustomProfile(expert_config['CustomProfile'])
+    algo.setFixUnstableFitParameter(expert_config['FixUnstableFitParameter'])
 
     if "dEdxValidation" not in listOfMutedCalibrations:
         algo_val = SVDdEdxValidationAlgorithm()
@@ -246,8 +291,8 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.framework import Calibration
 
-    rec_path = create_path(rerun_pid, isMC, expert_config)
-    rec_path_validation = create_path(rerun_pid_val, isMC, expert_config)
+    rec_path = create_path(rerun_reco, False, isMC, expert_config)
+    rec_path_validation = create_path(rerun_reco_val, rerun_pid_val, isMC, expert_config)
 
     dedx_calibration = Calibration("SVDdEdxCalibration",
                                    collector="SVDdEdxCollector",
@@ -259,7 +304,6 @@ def get_calibrations(input_data, **kwargs):
         dedx_validation = Calibration("SVDdEdxValidation",
                                       collector="SVDdEdxValidationCollector",
                                       algorithms=[algo_val],
-                                      backend_args={"queue": "l"},
                                       input_files=input_files_hadron_validation,
                                       pre_collector_path=rec_path_validation)
     # Do this for the default AlgorithmStrategy to force the output payload IoV

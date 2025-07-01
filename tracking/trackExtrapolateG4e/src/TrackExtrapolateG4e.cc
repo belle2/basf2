@@ -683,20 +683,20 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
         continue;
       }
       TrackClusterSeparation* h = m_trackClusterSeparations.appendNew(klmHit[c]);
-      // Add the following three quantities to the KLMCluster data members
+      // Add the following three quantities to the KLMCluster data members and store some relations
+      // To be safe, add them only if h is a valid object
       if (h != nullptr) {
-        (*klmClusterInfo)[c].first->setClusterTrackSeparation(klmHit[c].getDistance() / CLHEP::cm);
-        (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(klmHit[c].getTrackClusterSeparationAngle());
-        (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(klmHit[c].getTrackRotationAngle());
+        (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackClusterSeparation
+        (*klmClusterInfo)[c].first->setClusterTrackSeparation(h->getDistance() / CLHEP::cm);
+        (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(h->getTrackClusterSeparationAngle());
+        (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(h->getTrackRotationAngle());
+        if (extState.track != nullptr) {
+          extState.track->addRelationTo(h); // relation Track to TrackClusterSeparation
+        }
       } else {
         (*klmClusterInfo)[c].first->setClusterTrackSeparation(Const::doubleNaN);
         (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(Const::doubleNaN);
         (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(Const::doubleNaN);
-      }
-
-      (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackSep
-      if (extState.track != nullptr) {
-        extState.track->addRelationTo(h); // relation Track to TrackSep
       }
       if (klmHit[c].getDistance() < minDistance) {
         closestCluster = c;

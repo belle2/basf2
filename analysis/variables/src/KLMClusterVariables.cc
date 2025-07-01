@@ -413,12 +413,12 @@ Returns the number of Tracks matched to the KLMCluster associated to this Partic
                     "rad");
 
   REGISTER_VARIABLE("klmClusterShapeStdDev1", klmClusterShapeStdDev1,
-                    "Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns NaN if this KLMCluster contains only one KLMHit2d cluster."
+                    "Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster."
                     "cm");
   REGISTER_VARIABLE("klmClusterShapeStdDev2", klmClusterShapeStdDev2,
-                    "Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns NaN if this KLMCluster contains only one KLMHit2d cluster."
+                    "Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster."
                     "cm");
   REGISTER_VARIABLE("klmClusterShapeStdDev3", klmClusterShapeStdDev3,
-                    "Returns the std deviation of the 3rd axis from a PCA of the KLMCluster associated to this Particle. This variable returns NaN if this KLMCluster contains only one KLMHit2d cluster."
+                    "Returns the std deviation of the 3rd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster."
                     "cm");
 }

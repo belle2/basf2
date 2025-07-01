@@ -150,22 +150,19 @@ namespace Belle2 {
      * Get std deviation of the 1st axis from PCA.
      * @return  std deviation of the 1st axis from PCA [cm].
      */
-    inline float getShapeStdDev1() const
-    {return m_shapeStdDev1;}
+    inline float getShapeStdDev1() const { return m_shapeStdDev1; }
 
     /**
      * Get KLM std deviation of the 2nd axis from PCA.
      * @return std deviation of the 2nd axis from PCA.
      */
-    inline float getShapeStdDev2() const
-    {return m_shapeStdDev2;}
+    inline float getShapeStdDev2() const { return m_shapeStdDev2; }
 
     /**
      * Get std deviation of the 3rd axis from PCA.
      * @return std deviation of the 3rd axis from PCA.
      */
-    inline float getShapeStdDev3() const
-    {return m_shapeStdDev3;}
+    inline float getShapeStdDev3() const { return m_shapeStdDev3; }
 
     /**
      * Set KLM cluster-track rotation angle.
@@ -199,43 +196,54 @@ namespace Belle2 {
      * @param[in] std1 : std deviation of the 1st axis from PCA [cm].
      */
     void setShapeStdDev1(float std1)
-    {m_shapeStdDev1 = std1;}
+    {
+      m_shapeStdDev1 = std1;
+    }
 
     /**
      * Set std deviation of the 2nd axis, from PCA.
      * @param[in] std2 : std deviation of the 2nd axis from PCA [cm].
      */
     void setShapeStdDev2(float std2)
-    {m_shapeStdDev2 = std2;}
+    {
+      m_shapeStdDev2 = std2;
+    }
 
     /**
      * Set std deviation of the 3rd axis, from PCA.
      * @param[in] std3 : std deviation of the 3rd axis from PCA [cm].
      */
     void setShapeStdDev3(float std3)
-    {m_shapeStdDev3 = std3;}
-
+    {
+      m_shapeStdDev3 = std3;
+    }
 
     /**
      * Set time.
      * @param[in] time Time [ns].
      */
     void setTime(float time)
-    {m_time = time;}
+    {
+      m_time = time;
+    }
 
     /**
      * Set number of layers with hits.
      * @param[in] layers Number of layers with hits.
      */
     void setLayers(int layers)
-    {m_layers = layers;}
+    {
+      m_layers = layers;
+    }
 
     /**
      * Set number of the innermost layer with hits.
      * @param[in] innermostLayer Number of the innermost layer with hits.
      */
     void setInnermostLayer(int innermostLayer)
-    {m_innermostLayer = innermostLayer;}
+    {
+      m_innermostLayer = innermostLayer;
+    }
 
     /**
      * Set global position.
@@ -255,7 +263,9 @@ namespace Belle2 {
      * @param[in] momentumMag Momentum magnitude.
      */
     void setMomentumMag(float momentumMag)
-    {m_p = momentumMag;}
+    {
+      m_p = momentumMag;
+    }
 
   private:
 
@@ -302,6 +312,4 @@ namespace Belle2 {
     ClassDef(Belle2::KLMCluster, 4);
 
   };
-
 }
-

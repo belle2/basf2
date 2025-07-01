@@ -232,7 +232,7 @@ void KLMClusterAnaModule::event()
       clusterShape->addRelationTo(hit2d);
     }
     // Fill relevant KLMCluster data members
-    if (1 == nHits) {
+    if (nHits == 1) {
       klmcluster.setShapeStdDev1(0);
       klmcluster.setShapeStdDev2(0);
       klmcluster.setShapeStdDev3(0);

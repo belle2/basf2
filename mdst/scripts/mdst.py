@@ -177,6 +177,9 @@ def add_mdst_dump(path, print_untested=False, print_mutable=True):
             "getClusterPosition", "getPosition", "getMomentumMag", "getEnergy",
             "getMomentum", "getError4x4", "getError7x7",
             "getAssociatedEclClusterFlag", "getAssociatedTrackFlag",
+            "getClusterTrackRotationAngle", "getClusterTrackSeparationAngle",
+            "getClusterTrackSeparation",
+            "getShapeStdDev1", "getShapeStdDev2", "getShapeStdDev3"
         ], {
             "getRelationsWith": ["KlIds", "MCParticles"],
         }),

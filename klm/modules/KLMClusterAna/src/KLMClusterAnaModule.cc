@@ -167,6 +167,8 @@ static TMatrixT<double> spatialVariances(std::vector<double> xcoord, std::vector
 KLMClusterAnaModule::KLMClusterAnaModule() : Module()
 {
   setDescription("Module for extracting KLM cluster shape information via PCA.");
+
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 KLMClusterAnaModule::~KLMClusterAnaModule()
@@ -229,9 +231,15 @@ void KLMClusterAnaModule::event()
     for (const KLMHit2d* hit2d : klmHit2ds) {
       clusterShape->addRelationTo(hit2d);
     }
-
+    // Fill relevant KLMCluster data members
+    if (nHits == 1) {
+      klmcluster.setShapeStdDev1(0);
+      klmcluster.setShapeStdDev2(0);
+      klmcluster.setShapeStdDev3(0);
+    } else {
+      klmcluster.setShapeStdDev1(sqrt(clusterShape->getVariance1()));
+      klmcluster.setShapeStdDev2(sqrt(clusterShape->getVariance2()));
+      klmcluster.setShapeStdDev3(sqrt(clusterShape->getVariance3()));
+    }
   }
-
 }
-
-

@@ -24,5 +24,6 @@
 #include <mva/methods/Reweighter.h>
 #include <mva/methods/RegressionFastBDT.h>
 #include <mva/methods/Trivial.h>
+#include <mva/methods/ONNX.h>
 
 #endif

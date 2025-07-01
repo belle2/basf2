@@ -297,6 +297,12 @@ TBranch: klmClusterIsForwardEKLM, 0
 TBranch: klmClusterIsBackwardEKLM, 0
 TBranch: klmClusterTheta, 1.47
 TBranch: klmClusterPhi, 2.371
+TBranch: klmClusterTrackDistance, nan
+TBranch: klmClusterTrackSeparationAngle, nan
+TBranch: klmClusterTrackRotationAngle, nan
+TBranch: klmClusterShapeStdDev1, 0
+TBranch: klmClusterShapeStdDev2, 0
+TBranch: klmClusterShapeStdDev3, 0
 TBranch: nKLMClusterTrackMatches, 1
 TBranch: nMatchedKLMClusters, nan
 TBranch: isFromECL, False
@@ -338,6 +344,12 @@ TBranch: klmClusterIsForwardEKLM, 0
 TBranch: klmClusterIsBackwardEKLM, 0
 TBranch: klmClusterTheta, 1.47
 TBranch: klmClusterPhi, 2.371
+TBranch: klmClusterTrackDistance, nan
+TBranch: klmClusterTrackSeparationAngle, nan
+TBranch: klmClusterTrackRotationAngle, nan
+TBranch: klmClusterShapeStdDev1, 0
+TBranch: klmClusterShapeStdDev2, 0
+TBranch: klmClusterShapeStdDev3, 0
 TBranch: nKLMClusterTrackMatches, 1
 TBranch: nMatchedKLMClusters, nan
 TTree: phot

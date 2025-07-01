@@ -15,6 +15,7 @@
 
 /* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
+#include <framework/gearbox/Const.h>
 
 namespace Belle2 {
 
@@ -128,31 +129,127 @@ namespace Belle2 {
     bool getAssociatedTrackFlag() const;
 
     /**
+     * Get KLM cluster-track rotation angle.
+     * @return KLM rotation angle to the nearest track [rad].
+     */
+    inline float getClusterTrackRotationAngle() const { return m_clusterTrackRotationAngle; }
+
+    /**
+     * Get KLM cluster-track separation angle.
+     * @return KLM cluster separation angle to the nearest track [rad].
+     */
+    inline float getClusterTrackSeparationAngle() const { return m_clusterTrackSeparationAngle; }
+
+    /**
+     * Get KLM cluster-track distance.
+     * @return KLM cluster separation from the nearest track [cm].
+     */
+    inline float getClusterTrackSeparation() const { return m_clusterTrackSeparation; }
+
+    /**
+     * Get std deviation of the 1st axis from PCA.
+     * @return  std deviation of the 1st axis from PCA [cm].
+     */
+    inline float getShapeStdDev1() const { return m_shapeStdDev1; }
+
+    /**
+     * Get KLM std deviation of the 2nd axis from PCA.
+     * @return std deviation of the 2nd axis from PCA.
+     */
+    inline float getShapeStdDev2() const { return m_shapeStdDev2; }
+
+    /**
+     * Get std deviation of the 3rd axis from PCA.
+     * @return std deviation of the 3rd axis from PCA.
+     */
+    inline float getShapeStdDev3() const { return m_shapeStdDev3; }
+
+    /**
+     * Set KLM cluster-track rotation angle.
+     * @param[in] rotation angle to the nearest track.
+     */
+    void setClusterTrackRotationAngle(float rotation)
+    {
+      m_clusterTrackRotationAngle = rotation;
+    }
+
+    /**
+     * Set KLM cluster-track separation angle.
+     * @param[in] separation angle to the nearest track.
+     */
+    void setClusterTrackSeparationAngle(float separation)
+    {
+      m_clusterTrackSeparationAngle = separation;
+    }
+
+    /**
+     * Set KLM cluster-track distance.
+     * @param[in] dist distance to the nearest track.
+     */
+    void setClusterTrackSeparation(float dist)
+    {
+      m_clusterTrackSeparation = dist;
+    }
+
+    /**
+     * Set std deviation of the 1st axis, from PCA.
+     * @param[in] std1 : std deviation of the 1st axis from PCA [cm].
+     */
+    void setShapeStdDev1(float std1)
+    {
+      m_shapeStdDev1 = std1;
+    }
+
+    /**
+     * Set std deviation of the 2nd axis, from PCA.
+     * @param[in] std2 : std deviation of the 2nd axis from PCA [cm].
+     */
+    void setShapeStdDev2(float std2)
+    {
+      m_shapeStdDev2 = std2;
+    }
+
+    /**
+     * Set std deviation of the 3rd axis, from PCA.
+     * @param[in] std3 : std deviation of the 3rd axis from PCA [cm].
+     */
+    void setShapeStdDev3(float std3)
+    {
+      m_shapeStdDev3 = std3;
+    }
+
+    /**
      * Set time.
-     * @param[in] time Time.
+     * @param[in] time Time [ns].
      */
     void setTime(float time)
-    {m_time = time;}
+    {
+      m_time = time;
+    }
 
     /**
      * Set number of layers with hits.
      * @param[in] layers Number of layers with hits.
      */
     void setLayers(int layers)
-    {m_layers = layers;}
+    {
+      m_layers = layers;
+    }
 
     /**
      * Set number of the innermost layer with hits.
      * @param[in] innermostLayer Number of the innermost layer with hits.
      */
     void setInnermostLayer(int innermostLayer)
-    {m_innermostLayer = innermostLayer;}
+    {
+      m_innermostLayer = innermostLayer;
+    }
 
     /**
      * Set global position.
-     * @param[in] globalX X coordinate.
-     * @param[in] globalY Y coordinate.
-     * @param[in] globalZ Z coordinate.
+     * @param[in] globalX X coordinate [cm].
+     * @param[in] globalY Y coordinate [cm].
+     * @param[in] globalZ Z coordinate [cm].
      */
     void setClusterPosition(float globalX, float globalY, float globalZ)
     {
@@ -166,7 +263,9 @@ namespace Belle2 {
      * @param[in] momentumMag Momentum magnitude.
      */
     void setMomentumMag(float momentumMag)
-    {m_p = momentumMag;}
+    {
+      m_p = momentumMag;
+    }
 
   private:
 
@@ -191,10 +290,26 @@ namespace Belle2 {
     /** Absolute value of momentum, 0 means unknown. */
     float m_p;
 
+    /** Track-cluster rotation angle. */
+    float m_clusterTrackRotationAngle = Const::floatNaN;
+
+    /** Track-cluster separation angle. */
+    float m_clusterTrackSeparationAngle = Const::floatNaN;
+
+    /** Track-cluster separation (distance). */
+    float m_clusterTrackSeparation = Const::floatNaN;
+
+    /** Std deviation of axis 1 (from Cluster Shape PCA). */
+    float m_shapeStdDev1 = 0;
+
+    /** Std deviation of axis 2 (from Cluster Shape PCA). */
+    float m_shapeStdDev2 = 0;
+
+    /** Std deviation of axis 3 (from Cluster Shape PCA). */
+    float m_shapeStdDev3 = 0;
+
     /** Needed to make objects storable. */
-    ClassDef(Belle2::KLMCluster, 3);
+    ClassDef(Belle2::KLMCluster, 4);
 
   };
-
 }
-

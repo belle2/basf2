@@ -7,11 +7,14 @@
  **************************************************************************/
 
 #include <svd/modules/svdDQM/SVDDQMHitTimeModule.h>
+#include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/HistoModule.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <TDirectory.h>
 
 using namespace Belle2;
+using namespace SoftwareTrigger;
 
 REG_MODULE(SVDDQMHitTime);
 
@@ -28,6 +31,8 @@ SVDDQMHitTimeModule::SVDDQMHitTimeModule(): HistoModule()
            std::string(""));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
            "if True, svd time back in SVD time reference", bool(false));
+  addParam("useParamFromDB", m_useParamFromDB, "use SVDDQMPlotsConfiguration from DB", bool(true));
+  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If True, skip events rejected by HLT.", bool(true));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
 }
 
@@ -38,6 +43,15 @@ SVDDQMHitTimeModule::~SVDDQMHitTimeModule() { }
 //---------------------------------
 void SVDDQMHitTimeModule::defineHisto()
 {
+  if (m_useParamFromDB) {
+    if (!m_svdPlotsConfig.isValid())
+      B2FATAL("no valid configuration found for SVD reconstruction");
+    else {
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
+      m_3Samples = m_svdPlotsConfig->isPlotsFor3SampleMonitoring();
+      m_skipRejectedEvents = m_svdPlotsConfig->isSkipHLTRejectedEvents();
+    }
+  }
 
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
@@ -237,6 +251,11 @@ void SVDDQMHitTimeModule::beginRun()
 //---------------------------------
 void SVDDQMHitTimeModule::event()
 {
+  //check HLT decision and increase number of events only if the event has been accepted
+  if (m_skipRejectedEvents && (m_resultStoreObjectPointer.isValid())) {
+    const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
+    if (!eventAccepted) return;
+  }
 
   if (!m_TrgResult.isValid()) {
     B2WARNING("Missing TRGSummary, SVDDQMHitTime is skipped.");

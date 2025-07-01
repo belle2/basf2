@@ -20,7 +20,7 @@ Changes since release-09
 .. admonition:: New and updated packages in externals
    :class: toggle
 
-   .. list-table:: New and updated packages in externals from v02-02-04 to v02-03-01
+   .. list-table:: New and updated packages in externals from v02-02-04 to v02-03-02
       :widths: 50 25 25
       :header-rows: 1
 
@@ -44,7 +44,7 @@ Changes since release-09
         - 1.22.0
       * - ROOT
         - 6.26/14
-        - 6.32/00
+        - 6.32/14
       * - RooUnfold
         - 3.0.0
         - 3.0.2
@@ -78,12 +78,24 @@ Changes since release-09
       * - psutil
         - 5.9.8
         - 6.0.0
+      * - PySide6
+        -
+        - 6.9.1
+      * - PySide6-Addons
+        -
+        - 6.9.1
+      * - PySide6-Essentials
+        -
+        - 6.9.1
       * - PySocks
         -
         - 1.7.1
       * - selenium
         -
         - 4.32.0
+      * - shiboken6
+        -
+        - 6.9.1
       * - skl2onnx
         -
         - 1.18.0
@@ -123,6 +135,7 @@ Changes since release-09
 .. include:: b2bii/doc/whatsnew-since/release-09-00.txt
 
 .. include:: framework/doc/whatsnew-since/release-09-00.txt
+.. include:: tracking/doc/whatsnew-since/release-09-00.txt
 
 Changes since release-08
 ========================

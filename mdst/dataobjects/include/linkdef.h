@@ -11,7 +11,7 @@
 #pragma link C++ class vector<Belle2::MCParticle*>+; // checksum=0xd52f5001, version=6
 #pragma link C++ class Belle2::PIDLikelihood+; // checksum=0x464bbb0c, version=5
 #pragma link C++ class Belle2::ECLCluster+; // checksum=0xa63078a4, version=16
-#pragma link C++ class Belle2::KLMCluster+; // checksum=0xbac40bc7, version=4
+#pragma link C++ class Belle2::KLMCluster+; // checksum=0x27dc43b1, version=4
 #pragma link C++ class Belle2::KlId+; // checksum=0xdc073aa, version=2
 
 #pragma link C++ class Belle2::EventLevelClusteringInfo+; // checksum=0x71a4f53c, version=4

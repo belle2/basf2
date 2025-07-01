@@ -58,6 +58,8 @@
       maxSplits=10
       minimumSharedEnergy=2.5000000000000005e-05
       positionMethod=lilo
+      removeShiftedLMs=0
+      sharingDistanceMolierMultiplier=50.0
       shiftTolerance=0.1
       threshold=0.0075
       useOptimalNumberOfDigitsForEnergy=1
@@ -416,6 +418,7 @@
       thirdLowFilterParameters={}
       thirdLowUseNStates=0
       thirdToggleOnLayer=-99
+      trackFitType=2
       updateEqualFilter=all
       updateEqualFilterParameters={}
       updateEqualUseNStates=0
@@ -499,6 +502,7 @@
       thirdLowFilterParameters={}
       thirdLowUseNStates=0
       thirdToggleOnLayer=-99
+      trackFitType=2
       updateEqualFilter=all
       updateEqualFilterParameters={}
       updateEqualUseNStates=0
@@ -594,6 +598,7 @@
       recoTracksStoreArrayName=CDCRecoTracks
       resortHits=False
       svdHitsStoreArrayName=
+      trackFitType=2
   53. CDCToSVDSeedCKF_backward
       advanceEqualFilter=all
       advanceEqualFilterParameters={}
@@ -650,6 +655,7 @@
       thirdLowUseNStates=0
       thirdToggleOnLayer=-99
       toRelationStoreArrayName=SVDRecoTracks
+      trackFitType=2
       updateEqualFilter=all
       updateEqualFilterParameters={}
       updateEqualUseNStates=0
@@ -676,6 +682,7 @@
       recoTracksStoreArrayName=CDCRecoTracks
       resortHits=False
       svdHitsStoreArrayName=
+      trackFitType=2
   55. CDCToSVDSeedCKF_forward
       advanceEqualFilter=all
       advanceEqualFilterParameters={}
@@ -732,6 +739,7 @@
       thirdLowUseNStates=0
       thirdToggleOnLayer=-99
       toRelationStoreArrayName=SVDRecoTracks
+      trackFitType=2
       updateEqualFilter=all
       updateEqualFilterParameters={}
       updateEqualUseNStates=0
@@ -781,6 +789,7 @@
       statePreFilter=all
       statePreFilterParameters={}
       trackFindingDirection=forward
+      trackFitType=0
       writeOutDirection=backward
   58. CDCCKFTracksCombiner
       CDCRecoTracksStoreArrayName=CKFCDCRecoTracks
@@ -805,6 +814,7 @@
       recoTracksStoreArrayName=SVDCDCRecoTracks
       resortHits=False
       svdHitsStoreArrayName=
+      trackFitType=0
   62. ToPXDCKF_backward
       advanceEqualFilter=all
       advanceEqualFilterParameters={}
@@ -877,6 +887,7 @@
       thirdLowFilterParameters={}
       thirdLowUseNStates=0
       thirdToggleOnLayer=-99
+      trackFitType=0
       updateEqualFilter=all
       updateEqualFilterParameters={}
       updateEqualUseNStates=0
@@ -903,6 +914,7 @@
       recoTracksStoreArrayName=SVDCDCRecoTracks
       resortHits=False
       svdHitsStoreArrayName=
+      trackFitType=0
   64. ToPXDCKF_forward
       advanceEqualFilter=all
       advanceEqualFilterParameters={}
@@ -975,6 +987,7 @@
       thirdLowFilterParameters={}
       thirdLowUseNStates=0
       thirdToggleOnLayer=-99
+      trackFitType=0
       updateEqualFilter=all
       updateEqualFilterParameters={}
       updateEqualUseNStates=0
@@ -1054,6 +1067,7 @@
       recoTracksStoreArrayName=RecoTracks
       resortHits=False
       svdHitsStoreArrayName=
+      trackFitType=0
   74. TrackCreator
       beamAxis=[0.0, 0.0, 1.0]
       beamSpot=[0.0, 0.0, 0.0]
@@ -1063,6 +1077,7 @@
       trackFitResultColName=
       useBFieldAtHit=False
       useClosestHitToIP=False
+      useSeedForTrackFitMomentumRange=False
   75. TrackTimeEstimator
   76. Sum_Prefilter_Tracking
   77. Ext
@@ -1093,9 +1108,10 @@
       ClusterMode=AnyHit
       ClusteringAngle=0.26
       PositionMode=FirstLayer
-  83. MCMatcherKLMClusters
+  83. KLMClusterAna
+  84. MCMatcherKLMClusters
       Hit2dRelations=False
-  84. Muid
+  85. Muid
       EnableVisualization=False
       MaxDistSigma=3.5
       MaxDt=10000.0
@@ -1112,7 +1128,7 @@
       magneticCacheDistance=0.0
       magneticFieldStepper=default
       pdgCodes=[]
-  85. ECLTrackClusterMatching
+  86. ECLTrackClusterMatching
       brlEdgeTheta=0.1
       matchingConsistency=1e-06
       matchingPTThreshold=0.3
@@ -1120,25 +1136,25 @@
       skipZeroChargeTracks=False
       useAngularDistanceMatching=True
       useOptimizedMatchingConsistency=True
-  86. ECLClusterProperties
+  87. ECLClusterProperties
       trackClusterRelationName=AngularDistance
-  87. Sum_Prefilter_PostTracking
-  88. SoftwareTrigger
+  88. Sum_Prefilter_PostTracking
+  89. SoftwareTrigger
       baseIdentifier=filter
       debugOutputFileName=software_trigger_debug.root
       preScaleStoreDebugOutputToDataStore=0
       resultStoreArrayName=
       storeDebugOutputToROOTFile=False
       useRandomNumbersForPreScale=True
-  89. Sum_HLT_Filter_Calculation
-  90. FlipQuality_1stMVA
+  90. Sum_HLT_Filter_Calculation
+  91. FlipQuality_1stMVA
       identifier=TRKTrackFlipAndRefit_MVA1_weightfile
       indexOfFlippingMVA=1
       recoTracksStoreArrayName=RecoTracks
-  91. RecoTracksReverter
+  92. RecoTracksReverter
       inputStoreArrayName=RecoTracks
       outputStoreArrayName=RecoTracks_flipped
-  92. Combined_DAFRecoFitter_flipped
+  93. Combined_DAFRecoFitter_flipped
       bklmHitsStoreArrayName=
       cdcHitsStoreArrayName=
       correctSeedCharge=False
@@ -1151,7 +1167,8 @@
       recoTracksStoreArrayName=RecoTracks_flipped
       resortHits=False
       svdHitsStoreArrayName=
-  93. IPTrackTimeEstimator
+      trackFitType=0
+  94. IPTrackTimeEstimator
       pdgCodeToUseForEstimation=211
       readoutPosition=[0.0, 0.0, 0.0]
       readoutPositionPropagationSpeed=29.9792458
@@ -1159,7 +1176,7 @@
       timeOffset=0.0
       useFittedInformation=False
       useReadoutPosition=False
-  94. TrackCreator_flipped
+  95. TrackCreator_flipped
       beamAxis=[0.0, 0.0, 1.0]
       beamSpot=[0.0, 0.0, 0.0]
       pdgCodes=[211, 321, 2212]
@@ -1168,11 +1185,12 @@
       trackFitResultColName=TrackFitResults_flipped
       useBFieldAtHit=False
       useClosestHitToIP=False
-  95. FlipQuality_2ndMVA
+      useSeedForTrackFitMomentumRange=False
+  96. FlipQuality_2ndMVA
       identifier=TRKTrackFlipAndRefit_MVA2_weightfile
       indexOfFlippingMVA=2
       recoTracksStoreArrayName=RecoTracks
-  96. FlippedRecoTracksMerger
+  97. FlippedRecoTracksMerger
       bklmHitsStoreArrayName=
       cdcHitsStoreArrayName=
       eklmHitsStoreArrayName=
@@ -1180,7 +1198,7 @@
       inputStoreArrayNameFlipped=RecoTracks_flipped
       pxdHitsStoreArrayName=
       svdHitsStoreArrayName=
-  97. V0Finder
+  98. V0Finder
       CopiedRecoTracks=CopiedRecoTracks
       RecoTracks=RecoTracks
       TrackFitResults=
@@ -1199,13 +1217,13 @@
       useNewV0Fitter=False
       v0FitterMode=1
       vertexChi2CutOutside=10000.0
-  98. KinkFinder
+  99. KinkFinder
       CopiedRecoTracks=RecoTracksKinkTmp
       Kinks=
       RecoTracks=RecoTracks
       TrackFitResults=
       Tracks=
-  99. TrackFinderMCTruthRecoTracks
+  100. TrackFinderMCTruthRecoTracks
       AllowFirstCDCSuperLayerOnly=False
       EnergyCut=0.0
       MergeDecayInFlight=False
@@ -1235,7 +1253,7 @@
       onlyCheckDirectParentPdgCode=False
       useCDCLayers=[]
       useCDCSuperLayers=[]
-  100. MCRecoTracksMatcher
+  101. MCRecoTracksMatcher
       MinimalEfficiency=0.05
       MinimalPurity=0.6666666666666666
       TracksStoreArrayName=
@@ -1246,23 +1264,23 @@
       mcRecoTracksStoreArrayName=MCRecoTracks
       prRecoTracksStoreArrayName=RecoTracks
       useFittedTracks=True
-  101. TrackToMCParticleRelator
+  102. TrackToMCParticleRelator
       MCParticlesName=
       RecoTracksName=
       TracksName=
-  102. PruneRecoHits
-  103. PruneRecoTracks RecoTracks_flipped
+  103. PruneRecoHits
+  104. PruneRecoTracks RecoTracks_flipped
       removeHits=False
       storeArrayName=RecoTracks_flipped
-  104. PruneRecoTracks CopiedRecoTracks
+  105. PruneRecoTracks CopiedRecoTracks
       removeHits=False
       storeArrayName=CopiedRecoTracks
-  105. PruneRecoTracks RecoTracksKinkTmp
+  106. PruneRecoTracks RecoTracksKinkTmp
       removeHits=False
       storeArrayName=RecoTracksKinkTmp
-  106. Sum_Postfilter_Tracking
-  107. CDCDedxHitSaver
-  108. CDCDedxPIDCreator
+  107. Sum_Postfilter_Tracking
+  108. CDCDedxHitSaver
+  109. CDCDedxPIDCreator
       dedxTracksName=
       enableDebugOutput=False
       likelihoodsName=
@@ -1270,15 +1288,15 @@
       removeLowest=0.05
       trackLevel=True
       useBackHalfCurlers=False
-  109. VXDDedxPID
+  110. VXDDedxPID
       onlyPrimaryParticles=False
       useIndividualHits=False
       usePXD=False
       useSVD=True
-  110. TOPChannelMasker
+  111. TOPChannelMasker
       maskUncalibratedChannelT0=True
       maskUncalibratedTimebase=True
-  111. TOPBunchFinder
+  112. TOPBunchFinder
       autoRange=False
       bunchesPerSSTclk=24
       correctDigits=True
@@ -1303,7 +1321,7 @@
       useMCTruth=False
       usePIDLikelihoods=False
       useTimeSeed=True
-  112. TOPReconstructor
+  113. TOPReconstructor
       PDGCode=-1
       TOPDigitCollectionName=
       TOPLikelihoodCollectionName=
@@ -1312,46 +1330,46 @@
       maxTime=0.0
       minTime=0.0
       pTCut=0.27
-  113. ARICHFillHits
+  114. ARICHFillHits
       MagFieldCorrection=0
       bitMask=255
       fillAll=0
       maxApdHits=18
       maxHapdHits=100
-  114. ARICHReconstructor
+  115. ARICHReconstructor
       inputTrackType=0
       storePhotons=1
       trackAngleResolution=0.002
       trackPositionResolution=0.1
       useAlignment=True
       useMirrorAlignment=True
-  115. OnlineEventT0Creator
+  116. OnlineEventT0Creator
       executeThisModule=False
-  116. ECLFillCellIdMapping
-  117. ECLChargedPIDMVA
+  117. ECLFillCellIdMapping
+  118. ECLChargedPIDMVA
       payloadName=ECLChargedPidMVAWeights
-  118. MdstPID
+  119. MdstPID
       subtractMaximum=False
-  119. KLMMuonIDDNNExpert
-  120. KLMExpert
+  120. KLMMuonIDDNNExpert
+  121. KLMExpert
       classifierPath=KLM_fBDT_10xbkg100k
-  121. ClusterMatcher
+  122. ClusterMatcher
       coneInRad=0.25999999046325684
-  122. ECLTrackBremFinder
+  123. ECLTrackBremFinder
       clusterAcceptanceFactor=10.0
       clusterDistanceCut=0.05000000074505806
       eclClustersStoreArrayName=
       recoTracksStoreArrayName=
       tracksStoreArrayName=
       virtualHitRadii=[]
-  123. PruneRecoTracks RecoTracks
+  124. PruneRecoTracks RecoTracks
       removeHits=False
       storeArrayName=RecoTracks
-  124. PruneGenfitTracks
+  125. PruneGenfitTracks
       pruneFlags=FL
       storeArrayName=GF2Tracks
-  125. Sum_Postfilter_PostTracking
-  126. ParticleLoader_pi+:skim
+  126. Sum_Postfilter_PostTracking
+  127. ParticleLoader_pi+:skim
       addDaughters=False
       decayStrings=['pi+:skim']
       dummyCovMatrix=10000.0
@@ -1371,7 +1389,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  127. PListCopy_pi+:skim
+  128. PListCopy_pi+:skim
       cut=
       ignoreMotherFlavor=False
       inputListNames=['pi+:all']
@@ -1379,10 +1397,10 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  128. ParticleSelector_applyCuts_pi+:skim
+  129. ParticleSelector_applyCuts_pi+:skim
       cut=pt>0.2 and abs(d0) < 2 and abs(z0) < 4
       decayString=pi+:skim
-  129. ParticleLoader_pi+:hadb
+  130. ParticleLoader_pi+:hadb
       addDaughters=False
       decayStrings=['pi+:hadb']
       dummyCovMatrix=10000.0
@@ -1402,7 +1420,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  130. PListCopy_pi+:hadb
+  131. PListCopy_pi+:hadb
       cut=
       ignoreMotherFlavor=False
       inputListNames=['pi+:all']
@@ -1410,10 +1428,10 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  131. ParticleSelector_applyCuts_pi+:hadb
+  132. ParticleSelector_applyCuts_pi+:hadb
       cut=p>0.1 and abs(d0) < 2 and abs(z0) < 4
       decayString=pi+:hadb
-  132. ParticleLoader_pi+:tau
+  133. ParticleLoader_pi+:tau
       addDaughters=False
       decayStrings=['pi+:tau']
       dummyCovMatrix=10000.0
@@ -1433,7 +1451,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  133. PListCopy_pi+:tau
+  134. PListCopy_pi+:tau
       cut=
       ignoreMotherFlavor=False
       inputListNames=['pi+:all']
@@ -1441,10 +1459,10 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  134. ParticleSelector_applyCuts_pi+:tau
+  135. ParticleSelector_applyCuts_pi+:tau
       cut=abs(d0) < 2 and abs(z0) < 8
       decayString=pi+:tau
-  135. ParticleLoader_gamma:skim
+  136. ParticleLoader_gamma:skim
       addDaughters=False
       decayStrings=['gamma:skim']
       dummyCovMatrix=10000.0
@@ -1464,7 +1482,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  136. PListCopy_gamma:skim
+  137. PListCopy_gamma:skim
       cut=
       ignoreMotherFlavor=False
       inputListNames=['gamma:all']
@@ -1472,13 +1490,13 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  137. ParticleSelector_applyCuts_gamma:skim
+  138. ParticleSelector_applyCuts_gamma:skim
       cut=E>0.1
       decayString=gamma:skim
-  138. ParticleSelector_applyCuts_gamma:skim
+  139. ParticleSelector_applyCuts_gamma:skim
       cut=isFromECL
       decayString=gamma:skim
-  139. ParticleLoader_K_S0:V0_ToFit -> pi+ pi-
+  140. ParticleLoader_K_S0:V0_ToFit -> pi+ pi-
       addDaughters=False
       decayStrings=['K_S0:V0_ToFit -> pi+ pi-']
       dummyCovMatrix=10000.0
@@ -1498,7 +1516,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  140. PListCopy_K_S0:V0_ToFit
+  141. PListCopy_K_S0:V0_ToFit
       cut=
       ignoreMotherFlavor=False
       inputListNames=['K_S0:V0']
@@ -1506,7 +1524,7 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  141. ParticleVertexFitter_K_S0:V0_ToFit
+  142. ParticleVertexFitter_K_S0:V0_ToFit
       confidenceLevel=0.0
       decayString=
       fitType=vertex
@@ -1517,10 +1535,10 @@
       updateDaughters=False
       vertexFitter=KFit
       withConstraint=
-  142. ParticleSelector_applyCuts_K_S0:V0_ToFit
+  143. ParticleSelector_applyCuts_K_S0:V0_ToFit
       cut=0.450 < M < 0.550
       decayString=K_S0:V0_ToFit
-  143. ParticleLoader_pi+:all
+  144. ParticleLoader_pi+:all
       addDaughters=False
       decayStrings=['pi+:all']
       dummyCovMatrix=10000.0
@@ -1540,7 +1558,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  144. ParticleCombiner_K_S0:RD -> pi+:all pi-:all
+  145. ParticleCombiner_K_S0:RD -> pi+:all pi-:all
       allowChargeViolation=False
       chargeConjugation=True
       cut=0.3 < M < 0.7
@@ -1550,7 +1568,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  145. ParticleVertexFitter_K_S0:RD
+  146. ParticleVertexFitter_K_S0:RD
       confidenceLevel=0.0
       decayString=
       fitType=vertex
@@ -1561,10 +1579,10 @@
       updateDaughters=False
       vertexFitter=KFit
       withConstraint=
-  146. ParticleSelector_applyCuts_K_S0:RD
+  147. ParticleSelector_applyCuts_K_S0:RD
       cut=0.450 < M < 0.550
       decayString=K_S0:RD
-  147. PListMerger_K_S0:merged
+  148. PListMerger_K_S0:merged
       cut=
       ignoreMotherFlavor=False
       inputListNames=['K_S0:V0_ToFit', 'K_S0:RD']
@@ -1572,7 +1590,7 @@
       preferLowest=True
       variable=particleSource
       writeOut=False
-  148. PListCutAndCopy_K_S0:dstSkim
+  149. PListCutAndCopy_K_S0:dstSkim
       cut=goodBelleKshort == 1
       ignoreMotherFlavor=False
       inputListNames=['K_S0:merged']
@@ -1580,7 +1598,7 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  149. ParticleLoader_Lambda0:V0_ToFit -> p+ pi-
+  150. ParticleLoader_Lambda0:V0_ToFit -> p+ pi-
       addDaughters=False
       decayStrings=['Lambda0:V0_ToFit -> p+ pi-']
       dummyCovMatrix=10000.0
@@ -1600,7 +1618,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  150. PListCopy_Lambda0:V0_ToFit
+  151. PListCopy_Lambda0:V0_ToFit
       cut=
       ignoreMotherFlavor=False
       inputListNames=['Lambda0:V0']
@@ -1608,7 +1626,7 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  151. TreeFitter_Lambda0:V0_ToFit
+  152. TreeFitter_Lambda0:V0_ToFit
       autoSetGeoConstraintAndMergeVertices=True
       confidenceLevel=0.0
       convergencePrecision=0.01
@@ -1630,17 +1648,17 @@
       sharedVertexList=[]
       treatAsInvisible=
       updateAllDaughters=False
-  152. ParticleSelector_applyCuts_Lambda0:V0_ToFit
+  153. ParticleSelector_applyCuts_Lambda0:V0_ToFit
       cut=1.10 < M < 1.13
       decayString=Lambda0:V0_ToFit
-  153. DuplicateVertexMarker
+  154. DuplicateVertexMarker
       extraInfoName=highQualityVertex
       particleList=Lambda0:V0_ToFit
       prioritiseV0=False
-  154. ParticleSelector_applyCuts_Lambda0:V0_ToFit
+  155. ParticleSelector_applyCuts_Lambda0:V0_ToFit
       cut=extraInfo(highQualityVertex)
       decayString=Lambda0:V0_ToFit
-  155. ParticleLoader_pi+:all
+  156. ParticleLoader_pi+:all
       addDaughters=False
       decayStrings=['pi+:all']
       dummyCovMatrix=10000.0
@@ -1660,7 +1678,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  156. ParticleLoader_p+:all
+  157. ParticleLoader_p+:all
       addDaughters=False
       decayStrings=['p+:all']
       dummyCovMatrix=10000.0
@@ -1680,7 +1698,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  157. ParticleCombiner_Lambda0:RD -> p+:all pi-:all
+  158. ParticleCombiner_Lambda0:RD -> p+:all pi-:all
       allowChargeViolation=False
       chargeConjugation=True
       cut=0.9 < M < 1.3
@@ -1690,7 +1708,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  158. TreeFitter_Lambda0:RD
+  159. TreeFitter_Lambda0:RD
       autoSetGeoConstraintAndMergeVertices=True
       confidenceLevel=0.0
       convergencePrecision=0.01
@@ -1712,17 +1730,17 @@
       sharedVertexList=[]
       treatAsInvisible=
       updateAllDaughters=False
-  159. ParticleSelector_applyCuts_Lambda0:RD
+  160. ParticleSelector_applyCuts_Lambda0:RD
       cut=1.10 < M < 1.13
       decayString=Lambda0:RD
-  160. DuplicateVertexMarker
+  161. DuplicateVertexMarker
       extraInfoName=highQualityVertex
       particleList=Lambda0:RD
       prioritiseV0=False
-  161. ParticleSelector_applyCuts_Lambda0:RD
+  162. ParticleSelector_applyCuts_Lambda0:RD
       cut=extraInfo(highQualityVertex)
       decayString=Lambda0:RD
-  162. PListMerger_Lambda0:merged
+  163. PListMerger_Lambda0:merged
       cut=
       ignoreMotherFlavor=False
       inputListNames=['Lambda0:V0_ToFit', 'Lambda0:RD']
@@ -1730,7 +1748,7 @@
       preferLowest=True
       variable=particleSource
       writeOut=False
-  163. ParticleLoader_K+:dstSkim
+  164. ParticleLoader_K+:dstSkim
       addDaughters=False
       decayStrings=['K+:dstSkim']
       dummyCovMatrix=10000.0
@@ -1750,7 +1768,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  164. PListCopy_K+:dstSkim
+  165. PListCopy_K+:dstSkim
       cut=
       ignoreMotherFlavor=False
       inputListNames=['K+:all']
@@ -1758,10 +1776,10 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  165. ParticleSelector_applyCuts_K+:dstSkim
+  166. ParticleSelector_applyCuts_K+:dstSkim
       cut=abs(d0) < 2 and abs(z0) < 4
       decayString=K+:dstSkim
-  166. ParticleLoader_pi+:dstSkim
+  167. ParticleLoader_pi+:dstSkim
       addDaughters=False
       decayStrings=['pi+:dstSkim']
       dummyCovMatrix=10000.0
@@ -1781,7 +1799,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  167. PListCopy_pi+:dstSkim
+  168. PListCopy_pi+:dstSkim
       cut=
       ignoreMotherFlavor=False
       inputListNames=['pi+:all']
@@ -1789,10 +1807,10 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  168. ParticleSelector_applyCuts_pi+:dstSkim
+  169. ParticleSelector_applyCuts_pi+:dstSkim
       cut=abs(d0) < 2 and abs(z0) < 4
       decayString=pi+:dstSkim
-  169. ParticleLoader_gamma:loose
+  170. ParticleLoader_gamma:loose
       addDaughters=False
       decayStrings=['gamma:loose']
       dummyCovMatrix=10000.0
@@ -1812,7 +1830,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  170. PListCopy_gamma:loose
+  171. PListCopy_gamma:loose
       cut=
       ignoreMotherFlavor=False
       inputListNames=['gamma:all']
@@ -1820,13 +1838,13 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  171. ParticleSelector_applyCuts_gamma:loose
+  172. ParticleSelector_applyCuts_gamma:loose
       cut=theta > 0.296706 and theta < 2.61799 and     [[clusterReg == 1 and E > 0.03] or [clusterReg == 2 and E > 0.02] or [clusterReg == 3 and E > 0.03]] and     [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1]
       decayString=gamma:loose
-  172. ParticleSelector_applyCuts_gamma:loose
+  173. ParticleSelector_applyCuts_gamma:loose
       cut=isFromECL
       decayString=gamma:loose
-  173. ParticleCombiner_pi0:loose -> gamma:loose gamma:loose
+  174. ParticleCombiner_pi0:loose -> gamma:loose gamma:loose
       allowChargeViolation=False
       chargeConjugation=True
       cut=0.075 < M < 0.175
@@ -1836,7 +1854,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  174. PListCutAndCopy_pi0:veryLooseFit
+  175. PListCutAndCopy_pi0:veryLooseFit
       cut=
       ignoreMotherFlavor=False
       inputListNames=['pi0:loose']
@@ -1844,7 +1862,7 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  175. ParticleVertexFitter_pi0:veryLooseFit
+  176. ParticleVertexFitter_pi0:veryLooseFit
       confidenceLevel=0.0
       decayString=
       fitType=mass
@@ -1855,7 +1873,7 @@
       updateDaughters=False
       vertexFitter=KFit
       withConstraint=
-  176. ParticleCombiner_D0:ch1 -> K-:dstSkim pi+:dstSkim
+  177. ParticleCombiner_D0:ch1 -> K-:dstSkim pi+:dstSkim
       allowChargeViolation=False
       chargeConjugation=True
       cut=1.7 < M < 2.1
@@ -1865,7 +1883,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  177. ParticleCombiner_D0:ch2 -> K-:dstSkim pi+:dstSkim pi0:veryLooseFit
+  178. ParticleCombiner_D0:ch2 -> K-:dstSkim pi+:dstSkim pi0:veryLooseFit
       allowChargeViolation=False
       chargeConjugation=True
       cut=1.7 < M < 2.1
@@ -1875,7 +1893,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  178. ParticleCombiner_D0:ch3 -> K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim
+  179. ParticleCombiner_D0:ch3 -> K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim
       allowChargeViolation=False
       chargeConjugation=True
       cut=1.7 < M < 2.1
@@ -1885,7 +1903,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  179. ParticleCombiner_D0:ch4 -> K_S0:dstSkim pi+:dstSkim pi-:dstSkim
+  180. ParticleCombiner_D0:ch4 -> K_S0:dstSkim pi+:dstSkim pi-:dstSkim
       allowChargeViolation=False
       chargeConjugation=True
       cut=1.7 < M < 2.1
@@ -1895,7 +1913,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  180. ParticleCombiner_D*+:ch1 -> D0:ch1 pi+:all
+  181. ParticleCombiner_D*+:ch1 -> D0:ch1 pi+:all
       allowChargeViolation=False
       chargeConjugation=True
       cut=useCMSFrame(p) > 2.2 and massDifference(0) < 0.16
@@ -1905,7 +1923,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  181. ParticleCombiner_D*+:ch2 -> D0:ch2 pi+:all
+  182. ParticleCombiner_D*+:ch2 -> D0:ch2 pi+:all
       allowChargeViolation=False
       chargeConjugation=True
       cut=useCMSFrame(p) > 2.2 and massDifference(0) < 0.16
@@ -1915,7 +1933,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  182. ParticleCombiner_D*+:ch3 -> D0:ch3 pi+:all
+  183. ParticleCombiner_D*+:ch3 -> D0:ch3 pi+:all
       allowChargeViolation=False
       chargeConjugation=True
       cut=useCMSFrame(p) > 2.2 and massDifference(0) < 0.16
@@ -1925,7 +1943,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  183. ParticleCombiner_D*+:ch4 -> D0:ch4 pi+:all
+  184. ParticleCombiner_D*+:ch4 -> D0:ch4 pi+:all
       allowChargeViolation=False
       chargeConjugation=True
       cut=useCMSFrame(p) > 2.2 and massDifference(0) < 0.16
@@ -1935,7 +1953,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  184. PListCopy_D*+:d0pi
+  185. PListCopy_D*+:d0pi
       cut=
       ignoreMotherFlavor=False
       inputListNames=['D*+:ch1', 'D*+:ch2', 'D*+:ch3', 'D*+:ch4']
@@ -1943,7 +1961,7 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  185. ParticleLoader_pi+:offip
+  186. ParticleLoader_pi+:offip
       addDaughters=False
       decayStrings=['pi+:offip']
       dummyCovMatrix=10000.0
@@ -1963,7 +1981,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  186. PListCopy_pi+:offip
+  187. PListCopy_pi+:offip
       cut=
       ignoreMotherFlavor=False
       inputListNames=['pi+:all']
@@ -1971,10 +1989,10 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  187. ParticleSelector_applyCuts_pi+:offip
+  188. ParticleSelector_applyCuts_pi+:offip
       cut=[abs(z0) > 10] and [nSVDHits >=3 or nCDCHits >= 20]
       decayString=pi+:offip
-  188. ParticleLoader_pi+:GoodTrackForHLT
+  189. ParticleLoader_pi+:GoodTrackForHLT
       addDaughters=False
       decayStrings=['pi+:GoodTrackForHLT']
       dummyCovMatrix=10000.0
@@ -1994,7 +2012,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  189. PListCopy_pi+:GoodTrackForHLT
+  190. PListCopy_pi+:GoodTrackForHLT
       cut=
       ignoreMotherFlavor=False
       inputListNames=['pi+:all']
@@ -2002,10 +2020,10 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  190. ParticleSelector_applyCuts_pi+:GoodTrackForHLT
+  191. ParticleSelector_applyCuts_pi+:GoodTrackForHLT
       cut=abs(d0) < 2 and abs(z0) < 5
       decayString=pi+:GoodTrackForHLT
-  191. ParticleLoader_K+:GoodTrackForHLT
+  192. ParticleLoader_K+:GoodTrackForHLT
       addDaughters=False
       decayStrings=['K+:GoodTrackForHLT']
       dummyCovMatrix=10000.0
@@ -2025,7 +2043,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  192. PListCopy_K+:GoodTrackForHLT
+  193. PListCopy_K+:GoodTrackForHLT
       cut=
       ignoreMotherFlavor=False
       inputListNames=['K+:all']
@@ -2033,10 +2051,10 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  193. ParticleSelector_applyCuts_K+:GoodTrackForHLT
+  194. ParticleSelector_applyCuts_K+:GoodTrackForHLT
       cut=abs(d0) < 2 and abs(z0) < 5
       decayString=K+:GoodTrackForHLT
-  194. ParticleLoader_gamma:GoodPi0ForHLT
+  195. ParticleLoader_gamma:GoodPi0ForHLT
       addDaughters=False
       decayStrings=['gamma:GoodPi0ForHLT']
       dummyCovMatrix=10000.0
@@ -2056,7 +2074,7 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=True
-  195. PListCopy_gamma:GoodPi0ForHLT
+  196. PListCopy_gamma:GoodPi0ForHLT
       cut=
       ignoreMotherFlavor=False
       inputListNames=['gamma:all']
@@ -2064,13 +2082,13 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=True
-  196. ParticleSelector_applyCuts_gamma:GoodPi0ForHLT
+  197. ParticleSelector_applyCuts_gamma:GoodPi0ForHLT
       cut=[clusterReg == 1 and E > 0.02250] or                                                 [clusterReg == 2 and E > 0.020] or                                                 [clusterReg == 3 and E > 0.020]
       decayString=gamma:GoodPi0ForHLT
-  197. ParticleSelector_applyCuts_gamma:GoodPi0ForHLT
+  198. ParticleSelector_applyCuts_gamma:GoodPi0ForHLT
       cut=isFromECL
       decayString=gamma:GoodPi0ForHLT
-  198. ParticleCombiner_pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT
+  199. ParticleCombiner_pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=0.105 < M < 0.150
@@ -2080,10 +2098,10 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=True
-  199. MCMatch_pi0:GoodPi0ForHLT
+  200. MCMatch_pi0:GoodPi0ForHLT
       listName=pi0:GoodPi0ForHLT
       looseMCMatching=False
-  200. ParticleCombiner_D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT
+  201. ParticleCombiner_D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=1.7 < M < 2.0
@@ -2093,7 +2111,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  201. ParticleCombiner_D0:Kpipi0ForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi0:GoodPi0ForHLT
+  202. ParticleCombiner_D0:Kpipi0ForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi0:GoodPi0ForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=1.7 < M < 2.0
@@ -2103,7 +2121,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  202. ParticleCombiner_D0:KpipipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT pi-:GoodTrackForHLT
+  203. ParticleCombiner_D0:KpipipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT pi-:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=1.7 < M < 2.0
@@ -2113,7 +2131,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  203. ParticleCombiner_D+:KpipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT
+  204. ParticleCombiner_D+:KpipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=1.8 < M < 1.9
@@ -2123,7 +2141,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  204. ParticleCombiner_D*+:D0_KpiForHLT -> D0:KpiForHLT pi+:GoodTrackForHLT
+  205. ParticleCombiner_D*+:D0_KpiForHLT -> D0:KpiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=massDifference(0) < 0.16
@@ -2133,7 +2151,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  205. ParticleCombiner_D*+:D0_Kpipi0ForHLT -> D0:Kpipi0ForHLT pi+:GoodTrackForHLT
+  206. ParticleCombiner_D*+:D0_Kpipi0ForHLT -> D0:Kpipi0ForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=massDifference(0) < 0.16
@@ -2143,7 +2161,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  206. ParticleCombiner_D*+:D0_KpipipiForHLT -> D0:KpipipiForHLT pi+:GoodTrackForHLT
+  207. ParticleCombiner_D*+:D0_KpipipiForHLT -> D0:KpipipiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=massDifference(0) < 0.16
@@ -2153,7 +2171,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  207. ParticleCombiner_B+:BtoD0pi_KpiForHLT -> anti-D0:KpiForHLT pi+:GoodTrackForHLT
+  208. ParticleCombiner_B+:BtoD0pi_KpiForHLT -> anti-D0:KpiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=Mbc > 5.15 and abs(deltaE) < 0.5
@@ -2163,7 +2181,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  208. ParticleCombiner_B+:BtoD0pi_Kpipi0ForHLT -> anti-D0:Kpipi0ForHLT pi+:GoodTrackForHLT
+  209. ParticleCombiner_B+:BtoD0pi_Kpipi0ForHLT -> anti-D0:Kpipi0ForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=Mbc > 5.15 and abs(deltaE) < 0.3
@@ -2173,7 +2191,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  209. ParticleCombiner_B+:BtoD0pi_KpipipiForHLT -> anti-D0:KpipipiForHLT pi+:GoodTrackForHLT
+  210. ParticleCombiner_B+:BtoD0pi_KpipipiForHLT -> anti-D0:KpipipiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=Mbc > 5.15 and abs(deltaE) < 0.3
@@ -2183,7 +2201,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  210. ParticleCombiner_B0:B0toDpi_KpipiForHLT -> D-:KpipiForHLT pi+:GoodTrackForHLT
+  211. ParticleCombiner_B0:B0toDpi_KpipiForHLT -> D-:KpipiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=5.15 < Mbc and abs(deltaE) < 0.3
@@ -2193,7 +2211,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  211. ParticleCombiner_B0:B0toDstarPi_D0pi_KpiForHLT -> D*-:D0_KpiForHLT pi+:GoodTrackForHLT
+  212. ParticleCombiner_B0:B0toDstarPi_D0pi_KpiForHLT -> D*-:D0_KpiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=5.15 < Mbc and abs(deltaE) < 0.3
@@ -2203,7 +2221,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  212. ParticleCombiner_B0:B0toDstarPi_D0pi_KpipipiForHLT -> D*-:D0_KpipipiForHLT pi+:GoodTrackForHLT
+  213. ParticleCombiner_B0:B0toDstarPi_D0pi_KpipipiForHLT -> D*-:D0_KpipipiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=5.15 < Mbc and abs(deltaE) < 0.3
@@ -2213,7 +2231,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  213. ParticleCombiner_B0:B0toDstarPi_D0pi_Kpipi0ForHLT -> D*-:D0_Kpipi0ForHLT pi+:GoodTrackForHLT
+  214. ParticleCombiner_B0:B0toDstarPi_D0pi_Kpipi0ForHLT -> D*-:D0_Kpipi0ForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=5.15 < Mbc and abs(deltaE) < 0.3
@@ -2223,7 +2241,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  214. PListCopy_B+:BtoCharmForHLT
+  215. PListCopy_B+:BtoCharmForHLT
       cut=
       ignoreMotherFlavor=False
       inputListNames=['B+:BtoD0pi_KpiForHLT', 'B+:BtoD0pi_Kpipi0ForHLT', 'B+:BtoD0pi_KpipipiForHLT']
@@ -2231,7 +2249,7 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  215. PListCopy_B0:BtoCharmForHLT
+  216. PListCopy_B0:BtoCharmForHLT
       cut=
       ignoreMotherFlavor=False
       inputListNames=['B0:B0toDpi_KpipiForHLT', 'B0:B0toDstarPi_D0pi_KpiForHLT', 'B0:B0toDstarPi_D0pi_KpipipiForHLT', 'B0:B0toDstarPi_D0pi_Kpipi0ForHLT']
@@ -2239,11 +2257,11 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  216. SoftwareTrigger
+  217. SoftwareTrigger
       baseIdentifier=skim
       debugOutputFileName=software_trigger_debug.root
       preScaleStoreDebugOutputToDataStore=0
       resultStoreArrayName=
       storeDebugOutputToROOTFile=False
       useRandomNumbersForPreScale=True
-  217. Sum_HLT_Skim_Calculation
+  218. Sum_HLT_Skim_Calculation

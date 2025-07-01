@@ -102,6 +102,7 @@
       DebugLevel4XTalk=21
       DegOfSPEOnThreshold=0.0
       DigitalGain=7.0
+      DoAlphaCorrection=False
       DoSmearing=True
       EDepInGasMode=0
       EffWForGasGainSmearing=0.0266
@@ -200,10 +201,19 @@
       TOPDigitsName=
       bkgInfoName=
       components=['CDC', 'TOP', 'ARICH', 'KLM']
-  14. CDCTriggerTSF
+  14. BGOverlayExecutor_TRGCDC
+      ARICHDigitsName=
+      CDCHitsName=CDCHits4Trg
+      KLMDigitsName=
+      PXDDigitsName=
+      SVDShaperDigitsName=
+      TOPDigitsName=
+      bkgInfoName=
+      components=['CDC']
+  15. CDCTriggerTSF
       ADC_cut_enable=False
       ADC_cut_threshold=-1
-      ADCflag_high=700
+      ADCflag_high=10000
       ADCflag_low=10
       CDCHitCollectionName=CDCHits4Trg
       ClockSimulation=False
@@ -220,7 +230,8 @@
       outerRecoLRTableFilename=outerRecoLRTable.dat
       outerTrueLRTableFilename=outerTrueLRTable.dat
       relateAllHits=True
-  15. CDCTrigger2DFinder
+      useDB=True
+  16. CDCTrigger2DFinder
       clusterCollectionName=
       clusterPattern=True
       clusterSizeX=3
@@ -230,8 +241,8 @@
       hitRelationsFromCorners=False
       ignore2ndPriority=False
       minCells=2
-      minHits=16
-      minHitsShort=16
+      minHits=4
+      minHitsShort=4
       minPt=0.3
       nCellsPhi=160
       nCellsR=34
@@ -242,10 +253,11 @@
       storeHoughPlane=0
       suppressClone=False
       testFilename=
+      useDB=True
       usePriorityPosition=True
       useadc=False
-      usehitpattern=True
-  16. CDCTriggerHoughETF
+      usehitpattern=False
+  17. CDCTriggerHoughETF
       arrivalOrder=0
       clusterCollectionName=
       clusterPattern=True
@@ -277,7 +289,7 @@
       useHighPassTimingList=True
       usePriorityPosition=True
       usePriorityTiming=True
-  17. CDCTrigger2DFitter
+  18. CDCTrigger2DFitter
       EventTimeName=
       hitCollectionName=
       inputCollectionName=TRGCDC2DFinderTracks
@@ -285,14 +297,14 @@
       outputCollectionName=TRGCDC2DFitterTracks
       useDriftTime=True
       xtSimple=False
-  18. CDCTrigger3DFitter
+  19. CDCTrigger3DFitter
       CDCHitCollectionName=CDCHits4Trg
       EventTimeName=
       TSHitCollectionName=
       inputCollectionName=TRGCDC2DFinderTracks
       minVoteCounts=8
       outputCollectionName=TRGCDC3DFitterTracks
-  19. CDCTriggerNeuro
+  20. CDCTriggerNeuro
       EventTimeName=
       NeuroHWTrackInputMode=False
       arrayname=MLPs
@@ -307,7 +319,7 @@
       precision=[12, 8, 8, 12, 10, 10]
       realinputCollectionName=CDCTriggerNNInput2DFinderTracks
       writeMLPinput=False
-  20. CDCTriggerTrackCombiner
+  21. CDCTriggerTrackCombiner
       finder2DCollectionName=TRGCDC2DFinderTracks
       fitter2DCollectionName=TRGCDC2DFitterTracks
       fitter3DCollectionName=TRGCDC3DFitterTracks
@@ -316,9 +328,9 @@
       outputCollectionName=TRGCDCTracks
       thetaDefinition=avg
       zDefinition=min
-  21. TRGECLFAM
+  22. TRGECLFAM
       BeamBkgTag=0
-      ConditionDB=0
+      ConditionDB=False
       DebugLevel=0
       FAMAnaTable=0
       FAMBinTimeInterval=125
@@ -327,38 +339,52 @@
       SourceOfTC=3
       TCThreshold=100
       TCWaveform=0
-  22. TRGECL
-      3DBhabhaAddAngleCut=[150.0, 210.0, 160.0, 200.0]
+  23. TRGECL
       3DBhabhaVetoInTrackThetaRegion=[3, 15]
+      ADCtoEnergy=0.0
       Bhabha=0
+      Bhabha2DThresholdBWD=[2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 3.0, 3.0]
+      Bhabha2DThresholdFWD=[4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 3.0, 3.5]
+      Bhabha3DSelectionAngle=[140, 220, 160, 200]
+      Bhabha3DSelectionPreScale=[1, 1, 1]
+      Bhabha3DSelectionThreshold=[2.5, 4.0]
+      Bhabha3DVetoAngle=[160, 200, 165, 190]
+      Bhabha3DVetoThreshold=[3.0, 4.5]
       ClusterLimit=6
       Clustering=1
-      ConditionDB=0
+      ConditionDB=True
       DebugLevel=0
+      ECLBurstThreshold=20.0
       EventSelect=1
       EventTiming=1
-      EventTimingQualityThresholds=[0.5, 10.0]
+      EventTimingQualityThreshold=[1.0, 20.0]
       NofTopTC=3
       OverlapWindow=125.0
       Taub2b2AngleCut=[120, 240, 140, 220]
-      Taub2b2CLECut=0.162
-      Taub2b2CLEEndcapCut=3.0
+      Taub2b2CLELabCut=[0.162, 3.0]
       Taub2b2EtotCut=7.0
       Taub2b3AngleCut=[120, 240, 140, 220]
-      Taub2b3CLEHighCut=4.5
-      Taub2b3CLELowCut=0.12
-      Taub2b3CLEb2bCut=0.14
+      Taub2b3CLELabCut=[0.12, 4.5]
+      Taub2b3CLEb2bLabCut=0.14
       Taub2b3EtotCut=7.0
       Taub2bAngleCut=[110, 250, 130, 230]
-      Taub2bClusterECut1=1.9
-      Taub2bClusterECut2=999.0
+      Taub2bCLELabCut=1.9
       Taub2bEtotCut=7.0
       TimeWindow=250.0
-  23. KLMTrigger
+      TotalEnergyCut=[0.5, 1.0, 3.0]
+      hie12BhabhaVetoAngle=[150, 210, 160, 200]
+      lml00NCLforMinE=1
+      lml12NCLforMinE=1
+      lml13ThetaIdSelection=2016
+      lmlCLECMSCut=[2.0, 1.0, 0.5]
+      lmlCLELabCut=[0.5, 0.3, 0.25]
+      mumuAngle=[160, 200, 165, 190]
+      mumuThreshold=2.0
+  24. KLMTrigger
       CSV_Dump_Path=
       intercept_cutoff=500
       y_cutoff=500
-  24. TRGGRLMatch
+  25. TRGGRLMatch
       2DmatchCollection=TRG2DMatchTracks
       2DtrackCollection=TRGCDC2DFinderTracks
       3DmatchCollection=TRG3DMatchTracks
@@ -380,33 +406,34 @@
       grlitCollectionName=TRGGRLInnerTracks
       grlstCollectionName=TRGGRLShortTracks
       hitCollectionName=
-  25. GRLNeuro
+  26. GRLNeuro
       HistFileName=hist.root
-      MVACut=[0.4000000059604645]
+      MVACut=[-1.0]
       SaveHist=False
       TRGECLClusters=TRGECLClusters
       TrgGrlInformation=TRGGRLObjects
-      biasFiles=['${BELLE2_SOFTWARE_DIR}/data/trg/grl/bias.dat']
-      i_cdc_sector=[0.0]
-      i_ecl_sector=[19.0]
+      biasFiles=['']
+      i_cdc_sector=[]
+      i_ecl_sector=[]
       multiplyHidden=False
-      nHidden=[[20.0, 20.0]]
-      nMLP=1
-      n_cdc_sector=0
-      n_ecl_sector=1
+      nHidden=[]
+      nMLP=1112866815
+      n_cdc_sector=167772224
+      n_ecl_sector=1426063359
       outputScale=[[-1.0, 1.0]]
-      weightFiles=['${BELLE2_SOFTWARE_DIR}/data/trg/grl/weights.dat']
-  26. TRGGRLProjects
+      useDB=True
+      weightFiles=['']
+  27. TRGGRLProjects
       2DfinderCollection=TRGCDC2DFinderTracks
       2DmatchCollection=TRG2DMatchTracks
       3DfitterCollection=TRGCDC3DFitterTracks
       3DmatchCollection=TRG3DMatchTracks
       ClusEngThreshold=[0.1, 0.3, 1.0, 2.0]
       ConfigFile=
-      DebugLevel=0
+      DebugLevel=143056976
       ECLClusterTimeWindow=100.0
       FastSimulationMode=0
-      FirmwareSimulationMode=0
+      FirmwareSimulationMode=143067288
       GRLphotonCollection=TRGGRLPhotons
       KLMTrgSummaryCollection=KLMTrgSummary
       KLMmatchCollection=TRGKLMMatchTracks
@@ -416,10 +443,10 @@
       TRGECLClusters=TRGECLClusters
       TRGECLTrgs=TRGECLTrgs
       TrgGrlInformation=TRGGRLObjects
-  27. TRGGRLInjectionVetoFromOverlay
+  28. TRGGRLInjectionVetoFromOverlay
       TRGGRLInfoName=TRGGRLObjects
       extensionName=_beamBG
-  28. TRGGDL
+  29. TRGGDL
       Belle2Phase=Phase3
       ConfigFile=TRGGDLConfig.dat
       FastSimulationMode=0
@@ -431,7 +458,7 @@
       simulateT0jitter=True
       timquality_threshold_fine=10.0
       timquality_threshold_sfin=-1.0
-  29. SVDEventInfoSetter
+  30. SVDEventInfoSetter
       SVDEventInfo=SVDEventInfoSim
       TRGSummaryName=TRGSummary
       crossTalk=False
@@ -442,7 +469,7 @@
       runType=2
       triggerType=3
       useDB=True
-  30. SVDDigitizer
+  31. SVDDigitizer
       ADCSamplingTime=-1.0
       BetaPrimeDecayTimeU=250.0
       BetaPrimeDecayTimeV=250.0
@@ -463,7 +490,7 @@
       signalsList=
       statisticsFilename=
       storeWaveforms=False
-  31. BGOverlayExecutor_SVD
+  32. BGOverlayExecutor_SVD
       ARICHDigitsName=
       CDCHitsName=
       KLMDigitsName=
@@ -472,13 +499,13 @@
       TOPDigitsName=
       bkgInfoName=
       components=['SVD']
-  32. SVDShaperDigitSorter
+  33. SVDShaperDigitSorter
       digits=
       digitsToMCParticles=
       digitsToTrueHits=
       particles=
       truehits=
-  33. SVDZeroSuppressionEmulator
+  34. SVDZeroSuppressionEmulator
       FADCmode=True
       SNthreshold=3.0
       ShaperDigits=
@@ -486,7 +513,7 @@
       ShaperDigitsOUT=
       createOUTStripsList=False
       numberOfSamples=1
-  34. ROIfindingConditionFromDB
+  35. ROIfindingConditionFromDB
 
       (? >=1[ActivatePXDPixelMasker -> ActivatePXDGainCalibrator -> PXDDigitizer -> BGOverlayExecutor_PXD -> PXDDigitSorter -> RegisterEventLevelTrackingInfo__ROI -> __ROISVDClusterizer -> __ROISVDMissingAPVsClusterCreator -> SVDTrackingEventLevelMdstInfoFiller__ROI -> __ROISVDTimeGrouping -> RegisterEventLevelTrackingInfo__ROI -> __ROISVDSpacePointCreator -> SetupGenfitExtrapolationForPXDDataReduction -> RegisterEventLevelTrackingInfo__ROI -> SectorMapBootstrap -> SegmentNetworkProducer -> TrackFinderVXDCellOMat -> AddVXDTrackCandidateSubSets -> QualityEstimatorVXD -> BestVXDTrackCandidatesSelector -> SPTCvirtualIPRemover -> SVDOverlapResolver -> SPTCmomentumSeedRetriever -> SPTC2RTConverter -> SVD-only DAFRecoFitter -> PXDROIFinder -> PXDdigiFilter -> PruneDataStore] ):
         1. ActivatePXDPixelMasker
@@ -708,6 +735,7 @@
             recoTracksStoreArrayName=__ROIsvdRecoTracks
             resortHits=False
             svdHitsStoreArrayName=__ROIsvdClusters
+            trackFitType=0
         26. PXDROIFinder
             PXDInterceptListName=PXDIntercepts
             ROIFindingForDQM=False
@@ -775,4 +803,4 @@
             particles=
             trimDigits=True
             truehits=
-  35. Sum_Simulation
+  36. Sum_Simulation

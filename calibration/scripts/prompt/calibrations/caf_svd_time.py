@@ -48,7 +48,7 @@ settings = CalibrationSettings(name="caf_svd_time",
                                depends_on=[cdc_tracking_calibration],  # SVD time depends on CDC tracking calibration
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
-                                   "listOfMutedCalibrations": [],  # "rawTimeCalibration", "timeShiftCalibration", "timeValidation"
+                                   "listOfMutedCalibrations": [],  # "rawTimeCalibration", "timeShiftCalibration", "timeValidation",
                                    "max_events_per_run":  10000,
                                    "max_events_per_file": 5000,
                                    "isMC": False,
@@ -307,7 +307,7 @@ def create_pre_collector_path(
 def get_calibrations(input_data, **kwargs):
 
     from ROOT import Belle2  # noqa: make the Belle2 namespace available
-    from ROOT.Belle2 import SVDClusterTimeShifterAlgorithm
+    from ROOT.Belle2 import SVDClusterTimeShifterAlgorithm, SVDClusterAbsoluteTimeShifterAlgorithm
 
     file_to_iov_physics = input_data["hadron_calib"]
     expert_config = kwargs.get("expert_config")
@@ -556,6 +556,108 @@ def get_calibrations(input_data, **kwargs):
 
     if "timeShiftCalibration" not in listOfMutedCalibrations:
         list_of_calibrations.append(shift_calibration)
+
+    #########################################################
+    # SVD Cluster Time Shifter                              #
+    #########################################################
+
+    SVDClustersOnTrackPrefix = "SVDClustersOnTrack"
+
+    shift_clusterizers_onTracks = []
+    for alg in timeAlgorithms:
+        cluster = create_svd_clusterizer(
+            name=f"ClusterReconstruction_{alg}",
+            clusters=f"{SVDClustersOnTrackPrefix}_{alg}",
+            shaper_digits=NEW_SHAPER_DIGITS_NAME,
+            time_algorithm=alg,
+            shiftSVDClusterTime=False
+            )
+        shift_clusterizers_onTracks.append(cluster)
+
+    shift_pre_collector_path = create_pre_collector_path(
+        clusterizers=shift_clusterizers_onTracks,
+        isMC=isMC, max_events_per_run=max_events_per_run,
+        max_events_per_file=max_events_per_file,
+        useSVDGrouping=useSVDGrouping)
+
+    shift_collector = b2.register_module("SVDClusterTimeShifterCollector")
+    shift_collector.set_name("SVDClusterTimeShifterCollector")
+    shift_collector.param("MaxClusterSize", 6)
+    shift_collector.param("EventT0Name", "EventT0")
+    shift_collector.param("SVDClustersOnTrackPrefix", f"{SVDClustersOnTrackPrefix}")
+    shift_collector.param("TimeAlgorithms", timeAlgorithms)
+
+    shift_algo = SVDClusterTimeShifterAlgorithm(f"{calType}_{now.isoformat()}_INFO:_"
+                                                f"Exp{expNum}_runsFrom{firstRun}to{lastRun}")
+    shift_algo.setMinEntries(100)
+    shift_algo.setMaximumAllowedShift(15.)
+    shift_algo.setTimeAlgorithm(timeAlgorithms)
+
+    shift_calibration = Calibration("SVDClusterTimeShifter",
+                                    collector=shift_collector,
+                                    algorithms=shift_algo,
+                                    input_files=good_input_files,
+                                    pre_collector_path=shift_pre_collector_path)
+
+    shift_calibration.strategies = strategies.SingleIOV
+
+    for algorithm in shift_calibration.algorithms:
+        algorithm.params = {"apply_iov": output_iov}
+
+    if "timeShiftCalibration" not in listOfMutedCalibrations:
+        list_of_calibrations.append(shift_calibration)
+
+    #########################################################
+    # Absolute SVD Cluster Time Shifter                              #
+    #########################################################
+
+    SVDClustersOnTrackPrefix = "SVDClustersOnTrack"
+
+    absolute_shift_clusterizers_onTracks = []
+
+    # not entirely clear to me if it's needed to reconstruct some of these, i think yes as they are attached to a calibration ?
+    # do they need to have a different name to prevent any issue ?
+    for alg in timeAlgorithms:
+        cluster = create_svd_clusterizer(
+            name=f"ClusterReconstruction_{alg}",
+            clusters=f"{SVDClustersOnTrackPrefix}_{alg}",
+            shaper_digits=NEW_SHAPER_DIGITS_NAME,
+            time_algorithm=alg,
+            # shiftSVDClusterTime=None # leave this one as None (default), it's the shift based on size
+            )
+        absolute_shift_clusterizers_onTracks.append(cluster)
+
+    absolute_shift_pre_collector_path = create_pre_collector_path(
+        clusterizers=absolute_shift_clusterizers_onTracks,
+        isMC=isMC, max_events_per_run=max_events_per_run,
+        max_events_per_file=max_events_per_file,
+        useSVDGrouping=useSVDGrouping)
+
+    absolute_shift_collector = b2.register_module("SVDClusterAbsoluteTimeShifterCollector")
+    absolute_shift_collector.set_name("SVDClusterAbsoluteTimeShifterCollector")
+    absolute_shift_collector.param("EventT0Name", "EventT0")
+    absolute_shift_collector.param("SVDClustersOnTrackPrefix", f"{SVDClustersOnTrackPrefix}")
+    absolute_shift_collector.param("TimeAlgorithms", timeAlgorithms)
+
+    absolute_shift_algo = SVDClusterAbsoluteTimeShifterAlgorithm(f"{calType}_{now.isoformat()}_INFO:_"
+                                                                 f"Exp{expNum}_runsFrom{firstRun}to{lastRun}")
+    shift_algo.setMinEntries(100)
+    shift_algo.setMaximumAllowedShift(15.)
+    shift_algo.setTimeAlgorithm(timeAlgorithms)
+    print(f'Time algorithms for absolute shift: {timeAlgorithms}')
+    absolute_shift_calibration = Calibration("SVDClusterAbsoluteTimeShifter",
+                                             collector=absolute_shift_collector,
+                                             algorithms=absolute_shift_algo,
+                                             input_files=good_input_files,
+                                             pre_collector_path=absolute_shift_pre_collector_path)
+
+    absolute_shift_calibration.strategies = strategies.SingleIOV
+
+    for algorithm in absolute_shift_calibration.algorithms:
+        algorithm.params = {"apply_iov": output_iov}
+
+    if "AbsolutetimeShiftCalibration" not in listOfMutedCalibrations:
+        list_of_calibrations.append(absolute_shift_calibration)
 
     #########################################################
     # Add new fake calibration to run validation collectors #

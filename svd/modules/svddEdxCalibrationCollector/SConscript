@@ -6,6 +6,7 @@ env['LIBS'] = [
     'calibration',
     'analysis_dataobjects',
     'analysis',
-    'reconstruction_dataobjects'
+    'reconstruction_dataobjects',
+    'mdst_dataobjects'
     ]
 Return('env')

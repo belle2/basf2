@@ -12,7 +12,7 @@
 Alias sigma_0sig  sigma_0   # f0(500) in PDG
 Alias a_1+sig     a_1+
 Alias a_1-sig     a_1-
-ChargeConj        a1+sig  a1-sig
+ChargeConj        a_1+sig  a_1-sig
 
 Decay Upsilon(4S)
 1.0     B0sig   anti-B0sig  B0  anti-B0        VSS_BMIX dm;

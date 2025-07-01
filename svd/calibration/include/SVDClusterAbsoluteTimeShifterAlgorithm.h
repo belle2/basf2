@@ -46,7 +46,7 @@ namespace Belle2 {
     std::string m_id = ""; /**< Parameter given to set the UniqueID of the payload*/
     float m_maximumAllowedShift = 15; /**< Allowed deviation of clsOnTracks histo wrt EventT0 histo */
     int m_minEntries = 0; /**< Set the minimum number of entries required in the histograms*/
-    std::vector<TString> m_timeAlgorithms = {"CoG3"}; // Hardcoding before the list is given by the calibration script, "ELS3", "CoG6"}; /**< List of time algorithms to calibrate */
+    std::vector<TString> m_timeAlgorithms = {"CoG3"}; /**< Hardcoding before the list is given by the calibration script, "ELS3", "CoG6"}; List of time algorithms to calibrate */
   };
 
   /** Single gauss function, where

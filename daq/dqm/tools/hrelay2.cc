@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <fstream>
 
 #include <daq/dqm/HistoRelay2.h>
 
@@ -26,6 +27,10 @@ int main(int argc, char** argv)
   int port = atoi(argv[3]);
   int interval = atoi(argv[4]);
 
+  // Create empty file before starting
+  std::ofstream ofs(string("/dev/shm/") + file);
+  if (ofs.is_open()) ofs.close();
+
   HistoRelay2 hrelay2(file, dest, port);
 
   for (;;) {
@@ -38,5 +43,3 @@ int main(int argc, char** argv)
   }
 
 }
-
-

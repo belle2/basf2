@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 
   // Create empty file before starting
   auto filepath = string("/dev/shm/") + file;
-  auto dqmhisto = new TFile(filepath.c_str(), "RECREATE");
+  auto dqmhisto = new TFile(filepath.c_str(), "UPDATE");
   if (dqmhisto == nullptr) {
     printf("Failed to allocate TFile %s", filepath.c_str());
     exit(-1);

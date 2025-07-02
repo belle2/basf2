@@ -28,7 +28,7 @@ int main(int argc, char** argv)
   int interval = atoi(argv[4]);
 
   // Create empty file before starting
-  std::ofstream ofs(string("/dev/shm/") + file);
+  ofstream ofs(string("/dev/shm/") + file);
   if (ofs.is_open()) ofs.close();
 
   HistoRelay2 hrelay2(file, dest, port);

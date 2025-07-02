@@ -166,6 +166,7 @@ def add_hlt_processing(path,
                        reco_components=None,
                        create_hlt_unit_histograms=True,
                        switch_off_slow_modules_for_online=True,
+                       hlt_prefilter_mode=constants.HLTprefilterModes.monitor,
                        **kwargs):
     """
     Add all modules for processing on HLT filter machines
@@ -205,6 +206,24 @@ def add_hlt_processing(path,
     # Unpack the event content
     add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
     path.add_module('StatisticsSummary').set_name('Sum_Unpackers')
+
+    # HLT prefilter
+    HLTprefilter = basf2.register_module("HLTprefilter")
+    # Only turn on the HLTprefilter (by branching the path) if filtering is turned on
+    if hlt_prefilter_mode == constants.HLTprefilterModes.filter:
+        # Perform the HLT prefilter decision
+        hlt_prefilter_module = path.add_module(HLTprefilter)
+        # There are two possibilities for the output of this module
+        # (1) the event is dismissed -> nothing is stored
+        path_utils.hlt_prefilter_event_abort(hlt_prefilter_module, ">=1")
+        # (2) the event is accepted -> proceed to HLT reconstruction
+        hlt_prefilter_module.if_value("==0", path, basf2.AfterConditionPath.CONTINUE)
+    elif hlt_prefilter_mode == constants.HLTprefilterModes.monitor:
+        # Perform the HLT prefilter decision and proceed to HLT reconstruction
+        hlt_prefilter_module = path.add_module(HLTprefilter)
+    else:
+        basf2.B2FATAL(f"The HLT prefilter mode {hlt_prefilter_mode} is not supported.")
+    path.add_module('StatisticsSummary').set_name('Sum_HLTprefilter')
 
     # Build one path for all accepted events...
     accept_path = basf2.Path()

@@ -55,6 +55,14 @@ class EventDistributionModes(Enum):
     zmqbasf2 = "zmqbasf2"
 
 
+class HLTprefilterModes(Enum):
+    """Enum of possible HLT prefilter modes"""
+    #: monitor (thank you documentation check)
+    monitor = "monitor"
+    #: filter (thank you documentation check)
+    filter = "filter"
+
+
 #: Always store those objects
 ALWAYS_SAVE_OBJECTS = ["EventMetaData", "RawFTSWs", "ROIpayload", "SoftwareTriggerResult", "SoftwareTriggerVariables",
                        "TRGSummary"]

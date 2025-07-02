@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <fstream>
+#include <TFile.h>
 
 #include <daq/dqm/HistoRelay2.h>
 
@@ -28,8 +28,19 @@ int main(int argc, char** argv)
   int interval = atoi(argv[4]);
 
   // Create empty file before starting
-  ofstream ofs(string("/dev/shm/") + file);
-  if (ofs.is_open()) ofs.close();
+  auto filepath = string("/dev/shm/") + file;
+  auto dqmhisto = new TFile(filepath.c_str(), "RECREATE");
+  if (dqmhisto == nullptr) {
+    printf("Failed to allocate TFile %s", filepath.c_str());
+    exit(-1);
+  } else if (!dqmhisto->IsOpen()) {
+    printf("Failed to create or open %s", filepath.c_str());
+    delete dqmhisto;
+    exit(-1);
+  } else {
+    dqmhisto->Close();
+    delete dqmhisto;
+  }
 
   HistoRelay2 hrelay2(file, dest, port);
 

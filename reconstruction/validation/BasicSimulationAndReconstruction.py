@@ -10,7 +10,7 @@
 
 """
 <header>
-  <contact>christian.wessel@belle2.org</contact>
+  <contact>giacomo.pietro@kit.edu</contact>
   <input>EvtGenSimNoBkg.root</input>
   <output>BasicSimulationAndReconstruction.root</output>
   <description>
@@ -27,7 +27,7 @@ from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
 
 NAME = 'Basic detector simulation and reconstruction'
-CONTACT = 'christian.wessel@belle2.org'
+CONTACT = 'giacomo.pietro@kit.edu'
 INPUT_FILE = '../EvtGenSimNoBkg.root'
 OUTPUT_FILE = 'BasicSimulationAndReconstruction.root'
 

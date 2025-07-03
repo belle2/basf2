@@ -45,17 +45,24 @@ void HLTprefilterModule::event()
   } catch (const std::exception&) {
   }
 
-  bool timing_window;
-  if (m_TTDInfo->isValid()) {
-    double timeSinceLastInj = m_TTDInfo->getTimeSinceLastInjection() / m_globalClock;
-    double timeInBeamCycle = timeSinceLastInj - (int)(timeSinceLastInj / m_revolutionTime) * m_revolutionTime;
+  injection_strip = false;
 
-    timing_window = (5000 < timeSinceLastInj && timeSinceLastInj < 20000 && 1.25 < timeInBeamCycle && timeInBeamCycle < 1.55)
-                    || (600 < timeSinceLastInj && timeSinceLastInj < 20000 && 2.2 < timeInBeamCycle && timeInBeamCycle < 2.33);
+  // Tag events from active window
+  if (index == 1) {
+    if (m_TTDInfo->isValid()) {
+      double timeSinceLastInj = m_TTDInfo->getTimeSinceLastInjection() / m_globalClock;
+      double timeInBeamCycle = timeSinceLastInj - (int)(timeSinceLastInj / m_revolutionTime) * m_revolutionTime;
+
+      bool timing_window = (5000 < timeSinceLastInj && timeSinceLastInj < 20000 && 1.25 < timeInBeamCycle && timeInBeamCycle < 1.55)
+                           || (600 < timeSinceLastInj && timeSinceLastInj < 20000 && 2.2 < timeInBeamCycle && timeInBeamCycle < 2.33);
+
+      if (timing_window) {
+        injection_strip = true;
+      }
+    }
   }
 
-  injection_strip = (index == 1 && timing_window);
-  if (injection_strip) {
+  if (injection_strip == true) {
     B2ERROR("Skip event --> Removing injection strips as prefilter" <<
             LogVar("event", m_eventInfo->getEvent()) <<
             LogVar("run", m_eventInfo->getRun()) <<

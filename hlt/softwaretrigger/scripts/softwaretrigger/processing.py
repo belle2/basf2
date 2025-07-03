@@ -215,7 +215,7 @@ def add_hlt_processing(path,
         hlt_prefilter_module = path.add_module(HLTprefilter)
         # There are two possibilities for the output of this module
         # (1) the event is dismissed -> nothing is stored
-        path_utils.hlt_prefilter_event_abort(hlt_prefilter_module, ">=1")
+        path_utils.HLTprefilter_event_abort(hlt_prefilter_module, ">=1", ROOT.Belle2.EventMetaData.c_HLTprefilterDiscard)
         # (2) the event is accepted -> proceed to HLT reconstruction
         hlt_prefilter_module.if_value("==0", path, basf2.AfterConditionPath.CONTINUE)
     elif hlt_prefilter_mode == constants.HLTprefilterModes.monitor:

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <hlt/HLTprefilter/HLTprefilterModule.h>
+#include <hlt/modules/HLTprefilter/HLTprefilterModule.h>
 
 #include <framework/logging/Logger.h>
 

@@ -257,3 +257,20 @@ def hlt_event_abort(module, condition, error_flag):
     module.if_value(condition, p, basf2.AfterConditionPath.CONTINUE)
     if error_flag == ROOT.Belle2.EventMetaData.c_HLTDiscard:
         p.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')
+
+
+def HLTprefilter_event_abort(module, condition, error_flag):
+    """
+    Create a discard path suitable for HLTprefilter, i.e. set an error flag and
+    keep only the metadata.
+    """
+
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
+
+    p = basf2.Path()
+    p.add_module("EventErrorFlag", errorFlag=error_flag)
+    add_store_only_metadata_path(p)
+    module.if_value(condition, p, basf2.AfterConditionPath.CONTINUE)
+    if error_flag == ROOT.Belle2.EventMetaData.c_HLTprefilterDiscard:
+        p.add_module('StatisticsSummary').set_name('Sum_HLTprefilter_Discard')

@@ -9,6 +9,7 @@
 #pragma once
 
 /* Basf2 headers. */
+#include <hlt/dbobjects/HLTprefilterParameters.h>
 #include <framework/dbobjects/BunchStructure.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 #include <framework/core/Module.h>
@@ -64,6 +65,24 @@ namespace Belle2 {
     double m_revolutionTime = bunchStructure.getRFBucketsPerRevolution() / (clockSettings.getAcceleratorRF() * 1e3);
     /// Define the c_globalClock
     double m_globalClock = clockSettings.getGlobalClockFrequency() * 1e3;
+
+    /// Define thresholds for variables. By default, no events are skipped based upon these requirements.
+    /// Minimum threshold of timeSinceLastInjection for LER injection
+    double m_LERtimeSinceLastInjectionMin = 0;
+    /// Maximum threshold of timeSinceLastInjection for LER injection
+    double m_LERtimeSinceLastInjectionMax = 0;
+    /// Minimum threshold of timeSinceLastInjection for HER injection
+    double m_HERtimeSinceLastInjectionMin = 0;
+    /// Maximum threshold of timeSinceLastInjection for HER injection
+    double m_HERtimeSinceLastInjectionMax = 0;
+    /// Minimum threshold of timeInBeamCycle for LER injection
+    double m_LERtimeInBeamCycleMin = 0;
+    /// Maximum threshold of timeInBeamCycle for LER injection
+    double m_LERtimeInBeamCycleMax = 0;
+    /// Minimum threshold of timeInBeamCycle for HER injection
+    double m_HERtimeInBeamCycleMin = 0;
+    /// Maximum threshold of timeInBeamCycle for HER injection
+    double m_HERtimeInBeamCycleMax = 0;
 
     /// Trigger summary
     StoreObjPtr<TRGSummary> m_trgSummary;

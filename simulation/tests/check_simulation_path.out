@@ -1,0 +1,803 @@
+[INFO] Steering file: simulation/tests/check_simulation_path.py
+
+**************************************************************
+ Geant4 version Name: geant4-11-02-patch-01    (16-February-2024)
+                       Copyright : Geant4 Collaboration
+                      References : NIM A 506 (2003), 250-303
+                                 : IEEE-TNS 53 (2006), 270-278
+                                 : NIM A 835 (2016), 186-225
+                             WWW : http://geant4.org/
+**************************************************************
+
+[INFO] Modules and parameter settings in the path:
+  1. Sum_PreSimulation
+  2. BGOverlayInput
+      bkgInfoName=
+      extensionName=_beamBG
+      ignoreRunNumbers=False
+      inputFileNames=['dummy.root']
+      skipExperimentCheck=False
+  3. Gearbox
+      backends=['file:']
+      fileName=geometry/Belle2.xml
+      override=[]
+      overrideMultiple=[]
+      overridePrefix=/Detector
+  4. Geometry
+      additionalComponents=[]
+      assignRegions=False
+      components=[]
+      createPayloads=False
+      excludedComponents=[]
+      geometryPath=/Detector
+      geometryType=0
+      ignoreIfPresent=False
+      payloadIov=[0, 0, -1, -1]
+      useDB=True
+  5. EventT0Generator
+      coreGaussWidth=5.6
+      coreGaussWidthCosmics=13.0
+      fixedT0=nan
+      isCosmics=False
+      maximumT0=nan
+      tailGaussFraction=0.08
+      tailGaussFractionCosmics=0.09
+      tailGaussMeanCosmics=28.0
+      tailGaussWidth=14.5
+      tailGaussWidthCosmics=15.0
+  6. SimulateEventLevelTriggerTimeInfo
+  7. FullSim
+      ARICHTOPProductionCut=0.02
+      AbsorbersRadii=[]
+      BremsstrahlungPhotonsEnergyCut=10.0
+      CDCProductionCut=0.0
+      ECLProductionCut=0.0
+      EmProcessVerbosity=0
+      EnableVisualization=False
+      HadronProcessVerbosity=0
+      InputMCParticleCollection=
+      KLMProductionCut=0.0
+      MaxNumberSteps=100000
+      MonopoleMagCharge=1.0
+      PXDProductionCut=0.0
+      PairConversionsEnergyCut=10.0
+      PhotonFraction=0.5
+      PhysicsList=Belle2
+      ProductionCut=0.07
+      RegisterMonopoles=False
+      RegisterOptics=True
+      RunEventVerbosity=0
+      SVDProductionCut=0.0
+      SecondariesEnergyCut=1.0
+      StandardEM=False
+      StoreAllSecondaries=False
+      StoreBremsstrahlungPhotons=False
+      StoreOpticalPhotons=False
+      StorePairConversions=False
+      ThresholdImportantEnergy=0.25
+      ThresholdTrials=10
+      TrackingVerbosity=0
+      UICommandsAtIdle=[]
+      UICommandsAtPreInit=[]
+      UseHighPrecisionNeutrons=False
+      deltaChordInMagneticField=0.25
+      magneticCacheDistance=0.0
+      magneticField=default
+      trajectoryDistanceTolerance=0.0005
+      trajectoryStore=0
+  8. CDCDigitizer
+      ADCBinWidth=2.0
+      ADCThreshold=2
+      AddFudgeFactorForSigma=1.0
+      AddInWirePropagationDelay=True
+      AddInWirePropagationDelay4Bg=True
+      AddTimeOfFlight=True
+      AddTimeOfFlight4Bg=True
+      AddTimeWalk=True
+      AddXTalk=True
+      AnalogGain=1.09
+      CDCSimHistToCDCHitsName=
+      CorrectForWireSag=True
+      DebugLevel=20
+      DebugLevel4XTalk=21
+      DegOfSPEOnThreshold=0.0
+      DigitalGain=7.0
+      DoAlphaCorrection=False
+      DoSmearing=True
+      EDepInGasMode=0
+      EffWForGasGainSmearing=0.0266
+      ExtraADCSmearing=False
+      Fraction=1.0
+      GasGainSmearing=True
+      IncludeEarlyXTalks=True
+      InputCDCSimHitsName=
+      Issue2ndHitWarning=True
+      MCParticlesToCDCSimHitsName=
+      MatchAllMCParticles=False
+      MatchFirstMCParticles=False
+      Mean1=0.0
+      Mean2=0.0
+      OffsetForGetTriggerBin=1
+      OptionalAllMCParticlesToHitsName=AllMatchedParticles
+      OptionalFirstMCParticlesToHitsName=FirstMatchedParticles
+      Output2ndHit=False
+      OutputCDCHitsName=
+      OutputCDCHitsName4Trg=CDCHits4Trg
+      OutputNegativeDriftTime=True
+      OverallGainFactor=1.0
+      Randomization=True
+      Resolution1=0.013
+      Resolution2=0.0
+      ShiftOfTimeWindowIn32Count=153
+      SpaceChargeEffect=True
+      Synchronization=True
+      TDCThreshold4Inner=150.0
+      TDCThreshold4Outer=250.0
+      TDCThresholdOffset=3828.0
+      ThetaOfPolyaFunction=0.5
+      TreatNegT0WiresAsGood=True
+      TrgTimingOffsetInCount=4
+      TrigTimeJitter=0.0
+      UseDB4EDepToADC=True
+      UseDB4FEE=True
+      UseDB4RunGain=True
+      UseSimpleDigitization=False
+      tMaxInner=300.0
+      tMaxOuter=500.0
+      tMin=-100.0
+  9. TOPDigitizer
+      ADCmax=2000.0
+      ADCp1=1.0
+      ADCp2=1.025
+      ADCx0=204.1
+      allChannels=False
+      darkNoise=0.0
+      electronicJitter=-1.0
+      hysteresis=10
+      lookBackWindows=0
+      minWidthXheight=100.0
+      rmsNoise=9.7
+      simulateTTS=True
+      threshold=40
+      thresholdCount=3
+      timeZeroJitter=0.015
+      useDatabase=True
+      useSampleTimeCalibration=False
+      useWaveforms=True
+  10. ARICHDigitizer
+      BackgroundHits=0.066
+      MagneticFieldDistorsion=0
+      TimeWindow=250.0
+      TimeWindowStart=-50.0
+  11. ECLDigitizer
+      ADCThreshold=25
+      Background=True
+      Calibration=False
+      CompressionAlgorithm=0
+      DiodeDeposition=True
+      DspDataTest=False
+      DspWithExtraMCInfoThreshold=0.02
+      HadronPulseShapes=True
+      StoreDspWithExtraMCInfo=False
+      TriggerTime=False
+      WaveformMaker=False
+      WaveformThresholdOverride=-1.0
+      eclWaveformsName=
+      unitscale=-1.0
+      useWaveformParameters=True
+  12. KLMDigitizer
+      CreateMultiStripDigits=True
+      Debug=False
+      DigitizationInitialTime=-5
+      Efficiency=Plane
+      SaveFPGAFit=False
+      SimulationMode=Generic
+  13. BGOverlayExecutor_CDC...KLM
+      ARICHDigitsName=
+      CDCHitsName=
+      KLMDigitsName=
+      PXDDigitsName=
+      SVDShaperDigitsName=
+      TOPDigitsName=
+      bkgInfoName=
+      components=['CDC', 'TOP', 'ARICH', 'KLM']
+  14. BGOverlayExecutor_TRGCDC
+      ARICHDigitsName=
+      CDCHitsName=CDCHits4Trg
+      KLMDigitsName=
+      PXDDigitsName=
+      SVDShaperDigitsName=
+      TOPDigitsName=
+      bkgInfoName=
+      components=['CDC']
+  15. CDCTriggerTSF
+      ADC_cut_enable=False
+      ADC_cut_threshold=-1
+      ADCflag_high=10000
+      ADCflag_low=10
+      CDCHitCollectionName=CDCHits4Trg
+      ClockSimulation=False
+      Crosstalk_tdcfilter=False
+      Deadchannel=True
+      InnerTSLUTFile=${BELLE2_SOFTWARE_DIR}/data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe
+      OuterTSLUTFile=${BELLE2_SOFTWARE_DIR}/data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe
+      SaveADC=False
+      TSHitCollectionName=
+      innerRecoLRTableFilename=innerRecoLRTable.dat
+      innerTrueLRTableFilename=innerTrueLRTable.dat
+      makeRecoLRTable=False
+      makeTrueLRTable=False
+      outerRecoLRTableFilename=outerRecoLRTable.dat
+      outerTrueLRTableFilename=outerTrueLRTable.dat
+      relateAllHits=True
+      useDB=True
+  16. CDCTrigger2DFinder
+      clusterCollectionName=
+      clusterPattern=True
+      clusterSizeX=3
+      clusterSizeY=3
+      connect=6
+      hitCollectionName=
+      hitRelationsFromCorners=False
+      ignore2ndPriority=False
+      minCells=2
+      minHits=4
+      minHitsShort=4
+      minPt=0.3
+      nCellsPhi=160
+      nCellsR=34
+      onlyLocalMax=False
+      outputCollectionName=TRGCDC2DFinderTracks
+      requireSL0=False
+      shiftPt=0
+      storeHoughPlane=0
+      suppressClone=False
+      testFilename=
+      useDB=True
+      usePriorityPosition=True
+      useadc=False
+      usehitpattern=False
+  17. CDCTriggerHoughETF
+      arrivalOrder=0
+      clusterCollectionName=
+      clusterPattern=True
+      clusterSizeX=3
+      clusterSizeY=3
+      connect=6
+      hitCollectionName=
+      hitRelationsFromCorners=False
+      ignore2ndPriority=False
+      minCells=2
+      minHits=4
+      minHitsShort=4
+      minPt=0.3
+      nCellsPhi=160
+      nCellsR=34
+      offset=-10
+      onlyLocalMax=False
+      outputCollectionName=TRGCDCETFTracks
+      outputEventTimeName=
+      requireSL0=False
+      shiftPt=0
+      storeHoughPlane=0
+      storeTracks=False
+      suppressClone=False
+      t0CalcMethod=0
+      testFilename=
+      timeWindowBegin=40
+      timeWindowEnd=0
+      useHighPassTimingList=True
+      usePriorityPosition=True
+      usePriorityTiming=True
+  18. CDCTrigger2DFitter
+      EventTimeName=
+      hitCollectionName=
+      inputCollectionName=TRGCDC2DFinderTracks
+      minHits=2
+      outputCollectionName=TRGCDC2DFitterTracks
+      useDriftTime=True
+      xtSimple=False
+  19. CDCTrigger3DFitter
+      CDCHitCollectionName=CDCHits4Trg
+      EventTimeName=
+      TSHitCollectionName=
+      inputCollectionName=TRGCDC2DFinderTracks
+      minVoteCounts=8
+      outputCollectionName=TRGCDC3DFitterTracks
+  20. CDCTriggerNeuro
+      EventTimeName=
+      NeuroHWTrackInputMode=False
+      arrayname=MLPs
+      et_option=
+      filename=
+      fixedPoint=False
+      hardwareCompatibilityMode=False
+      hitCollectionName=
+      inputCollectionName=TRGCDC2DFinderTracks
+      min4axials=True
+      outputCollectionName=TRGCDCNeuroTracks
+      precision=[12, 8, 8, 12, 10, 10]
+      realinputCollectionName=CDCTriggerNNInput2DFinderTracks
+      writeMLPinput=False
+  21. CDCTriggerTrackCombiner
+      finder2DCollectionName=TRGCDC2DFinderTracks
+      fitter2DCollectionName=TRGCDC2DFitterTracks
+      fitter3DCollectionName=TRGCDC3DFitterTracks
+      hitCollectionName=
+      neuroCollectionName=TRGCDCNeuroTracks
+      outputCollectionName=TRGCDCTracks
+      thetaDefinition=avg
+      zDefinition=min
+  22. TRGECLFAM
+      BeamBkgTag=0
+      ConditionDB=False
+      DebugLevel=0
+      FAMAnaTable=0
+      FAMBinTimeInterval=125
+      FAMFitMethod=1
+      ShapingFunction=1
+      SourceOfTC=3
+      TCThreshold=100
+      TCWaveform=0
+  23. TRGECL
+      3DBhabhaVetoInTrackThetaRegion=[3, 15]
+      ADCtoEnergy=0.0
+      Bhabha=0
+      Bhabha2DThresholdBWD=[2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 3.0, 3.0]
+      Bhabha2DThresholdFWD=[4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 3.0, 3.5]
+      Bhabha3DSelectionAngle=[140, 220, 160, 200]
+      Bhabha3DSelectionPreScale=[1, 1, 1]
+      Bhabha3DSelectionThreshold=[2.5, 4.0]
+      Bhabha3DVetoAngle=[160, 200, 165, 190]
+      Bhabha3DVetoThreshold=[3.0, 4.5]
+      ClusterLimit=6
+      Clustering=1
+      ConditionDB=True
+      DebugLevel=0
+      ECLBurstThreshold=20.0
+      EventSelect=1
+      EventTiming=1
+      EventTimingQualityThreshold=[1.0, 20.0]
+      NofTopTC=3
+      OverlapWindow=125.0
+      Taub2b2AngleCut=[120, 240, 140, 220]
+      Taub2b2CLELabCut=[0.162, 3.0]
+      Taub2b2EtotCut=7.0
+      Taub2b3AngleCut=[120, 240, 140, 220]
+      Taub2b3CLELabCut=[0.12, 4.5]
+      Taub2b3CLEb2bLabCut=0.14
+      Taub2b3EtotCut=7.0
+      Taub2bAngleCut=[110, 250, 130, 230]
+      Taub2bCLELabCut=1.9
+      Taub2bEtotCut=7.0
+      TimeWindow=250.0
+      TotalEnergyCut=[0.5, 1.0, 3.0]
+      hie12BhabhaVetoAngle=[150, 210, 160, 200]
+      lml00NCLforMinE=1
+      lml12NCLforMinE=1
+      lml13ThetaIdSelection=2016
+      lmlCLECMSCut=[2.0, 1.0, 0.5]
+      lmlCLELabCut=[0.5, 0.3, 0.25]
+      mumuAngle=[160, 200, 165, 190]
+      mumuThreshold=2.0
+  24. KLMTrigger
+      CSV_Dump_Path=
+      intercept_cutoff=500
+      y_cutoff=500
+  25. TRGGRLMatch
+      2DmatchCollection=TRG2DMatchTracks
+      2DtrackCollection=TRGCDC2DFinderTracks
+      3DmatchCollection=TRG3DMatchTracks
+      3DtrackCollection=TRGCDCNeuroTracks
+      DphidMatch=2
+      DrMatch=25.0
+      DzMatch=30.0
+      Ephoton=1.0
+      FastSimulationMode=0
+      FirmwareSimulationMode=0
+      GRLphotonCollection=TRGGRLPhotons
+      KLMMatch=32.5
+      KLMTrgrSummary=KLMTrgSummary
+      KLMmatchCollection=TRGKLMMatchTracks
+      PhimatchCollection=TRGPhiMatchTracks
+      SimulationMode=1
+      TRGECLClusterCollection=TRGECLClusters
+      TrgGrlInformation=TRGGRLObjects
+      grlitCollectionName=TRGGRLInnerTracks
+      grlstCollectionName=TRGGRLShortTracks
+      hitCollectionName=
+  26. GRLNeuro
+      HistFileName=hist.root
+      MVACut=[-1.0]
+      SaveHist=False
+      TRGECLClusters=TRGECLClusters
+      TrgGrlInformation=TRGGRLObjects
+      biasFiles=['']
+      i_cdc_sector=[0.0]
+      i_ecl_sector=[24.0]
+      multiplyHidden=False
+      nHidden=[[64.0, 64.0]]
+      nMLP=1
+      n_cdc_sector=0
+      n_ecl_sector=1
+      outputScale=[[-1.0, 1.0]]
+      useDB=True
+      weightFiles=['']
+  27. TRGGRLProjects
+      2DfinderCollection=TRGCDC2DFinderTracks
+      2DmatchCollection=TRG2DMatchTracks
+      3DfitterCollection=TRGCDC3DFitterTracks
+      3DmatchCollection=TRG3DMatchTracks
+      ClusEngThreshold=[0.1, 0.3, 1.0, 2.0]
+      ConfigFile=
+      ECLClusterTimeWindow=100.0
+      GRLphotonCollection=TRGGRLPhotons
+      KLMTrgSummaryCollection=KLMTrgSummary
+      KLMmatchCollection=TRGKLMMatchTracks
+      NNCollection=TRGCDCNeuroTracks
+      PhimatchCollection=TRGPhiMatchTracks
+      SimulationMode=1
+      TRGECLClusters=TRGECLClusters
+      TRGECLTrgs=TRGECLTrgs
+      TrgGrlInformation=TRGGRLObjects
+  28. TRGGRLInjectionVetoFromOverlay
+      TRGGRLInfoName=TRGGRLObjects
+      extensionName=_beamBG
+  29. TRGGDL
+      Belle2Phase=Phase3
+      ConfigFile=TRGGDLConfig.dat
+      FastSimulationMode=0
+      FirmwareSimulationMode=0
+      SimulationMode=1
+      algFilePath=ftd.alg
+      algFromDB=True
+      debugLevel=0
+      simulateT0jitter=True
+      timquality_threshold_fine=10.0
+      timquality_threshold_sfin=-1.0
+  30. SVDEventInfoSetter
+      SVDEventInfo=SVDEventInfoSim
+      TRGSummaryName=TRGSummary
+      crossTalk=False
+      daqMode=2
+      eventType=0
+      fixedTriggerBin=999
+      relativeShift=0
+      runType=2
+      triggerType=3
+      useDB=True
+  31. SVDDigitizer
+      ADCSamplingTime=-1.0
+      BetaPrimeDecayTimeU=250.0
+      BetaPrimeDecayTimeV=250.0
+      FADCmode=True
+      MCParticles=
+      PoissonSmearing=True
+      RandomizeEventTimes=False
+      SVDEventInfo=SVDEventInfoSim
+      SegmentLength=0.02
+      ShaperDigits=
+      SimHits=
+      StartSampling=-2.0
+      TimeFrameHigh=150.0
+      TimeFrameLow=-300.0
+      TrueHits=
+      ZeroSuppressionCut=3.0
+      numberOfSamples=1
+      signalsList=
+      statisticsFilename=
+      storeWaveforms=False
+  32. BGOverlayExecutor_SVD
+      ARICHDigitsName=
+      CDCHitsName=
+      KLMDigitsName=
+      PXDDigitsName=
+      SVDShaperDigitsName=
+      TOPDigitsName=
+      bkgInfoName=
+      components=['SVD']
+  33. SVDShaperDigitSorter
+      digits=
+      digitsToMCParticles=
+      digitsToTrueHits=
+      particles=
+      truehits=
+  34. SVDZeroSuppressionEmulator
+      FADCmode=True
+      SNthreshold=3.0
+      ShaperDigits=
+      ShaperDigitsIN=
+      ShaperDigitsOUT=
+      createOUTStripsList=False
+      numberOfSamples=1
+  35. ROIfindingConditionFromDB
+
+      (? >=1[ActivatePXDPixelMasker -> ActivatePXDGainCalibrator -> PXDDigitizer -> BGOverlayExecutor_PXD -> PXDDigitSorter -> RegisterEventLevelTrackingInfo__ROI -> __ROISVDClusterizer -> __ROISVDMissingAPVsClusterCreator -> SVDTrackingEventLevelMdstInfoFiller__ROI -> __ROISVDTimeGrouping -> RegisterEventLevelTrackingInfo__ROI -> __ROISVDSpacePointCreator -> SetupGenfitExtrapolationForPXDDataReduction -> RegisterEventLevelTrackingInfo__ROI -> SectorMapBootstrap -> SegmentNetworkProducer -> TrackFinderVXDCellOMat -> AddVXDTrackCandidateSubSets -> QualityEstimatorVXD -> BestVXDTrackCandidatesSelector -> SPTCvirtualIPRemover -> SVDOverlapResolver -> SPTCmomentumSeedRetriever -> SPTC2RTConverter -> SVD-only DAFRecoFitter -> PXDROIFinder -> PXDdigiFilter -> PruneDataStore] ):
+        1. ActivatePXDPixelMasker
+        2. ActivatePXDGainCalibrator
+        3. PXDDigitizer
+            ADCUnit=130.0
+            Digits=pxd_unfiltered_digits
+            ElectronGroupSize=100
+            ElectronMaxSteps=200
+            ElectronStepTime=1.0
+            ElectronicEffects=True
+            ElectronicNoise=150.0
+            GatingTime=400.0
+            GatingWithoutReadout=True
+            GatingWithoutReadoutTime=1400.0
+            Gq=0.6
+            HardwareDelay=0.0
+            IntegrationWindow=True
+            MCParticles=
+            PedestalMean=100.0
+            PedestalRMS=30.0
+            PoissonSmearing=True
+            SegmentLength=0.005
+            SimHits=
+            TrueHits=
+        4. BGOverlayExecutor_PXD
+            ARICHDigitsName=
+            CDCHitsName=
+            KLMDigitsName=
+            PXDDigitsName=pxd_unfiltered_digits
+            SVDShaperDigitsName=
+            TOPDigitsName=
+            bkgInfoName=
+            components=['PXD']
+        5. PXDDigitSorter
+            digits=pxd_unfiltered_digits
+            digitsToMCParticles=
+            digitsToTrueHits=
+            merge=True
+            particles=
+            trimDigits=True
+            truehits=
+        6. RegisterEventLevelTrackingInfo__ROI
+            EventLevelTrackingInfoName=EventLevelTrackingInfo__ROI
+        7. __ROISVDClusterizer
+            AdjacentSN=3.0
+            ClusterSN=0.0
+            Clusters=__ROIsvdClusters
+            EventInfo=SVDEventInfo
+            MCParticles=
+            SVDTrueHits=
+            SeedSN=5.0
+            ShaperDigits=
+            chargeAlgorithm3Samples=not set
+            chargeAlgorithm6Samples=not set
+            positionAlgorithm3Samples=not set
+            positionAlgorithm6Samples=not set
+            returnClusterRawTime=False
+            shiftSVDClusterTime=True
+            stripChargeAlgorithm3Samples=not set
+            stripChargeAlgorithm6Samples=not set
+            stripTimeAlgorithm3Samples=not set
+            stripTimeAlgorithm6Samples=not set
+            timeAlgorithm3Samples=not set
+            timeAlgorithm6Samples=not set
+            useDB=True
+        8. __ROISVDMissingAPVsClusterCreator
+            Clusters=
+            SNR=15.0
+            charge=20000.0
+            firstFrame=0
+            nFakeClusters=4
+            seedCharge=10000.0
+            size=128
+            time=0.0
+            timeError=10.0
+        9. SVDTrackingEventLevelMdstInfoFiller__ROI
+            EventLevelTrackingInfoName=EventLevelTrackingInfo__ROI
+            svdClustersName=__ROIsvdClusters
+        10. __ROISVDTimeGrouping
+            SVDClusters=__ROIsvdClusters
+            SVDEventInfo=SVDEventInfo
+            acceptSigmaN=7.0
+            expectedSignalTimeCenter=0.0
+            expectedSignalTimeMax=50.0
+            expectedSignalTimeMin=-50.0
+            fillSigmaN=3.0
+            fitRangeHalfWidth=5.0
+            forceGroupingFromDB=True
+            fracThreshold=0.05000000074505806
+            includeOutOfRangeClusters=True
+            isEnabledIn3Samples=False
+            isEnabledIn6Samples=False
+            maxGroups=20
+            maxSigma=15.0
+            minSigma=1.0
+            rebinningFactor=2
+            removeSigmaN=7.0
+            signalLifetime=30.0
+            tRangeHigh=160.0
+            tRangeLow=-160.0
+            useParamFromDB=True
+            writeGroupInfo=True
+        11. RegisterEventLevelTrackingInfo__ROI
+            EventLevelTrackingInfoName=EventLevelTrackingInfo__ROI
+        12. __ROISVDSpacePointCreator
+            EventLevelTrackingInfoName=EventLevelTrackingInfo__ROI
+            MinClusterTime=-20.0
+            NameOfInstance=SVDSpacePoints
+            OnlySingleClusterSpacePoints=False
+            SVDClusters=__ROIsvdClusters
+            SVDEventInfo=SVDEventInfo
+            SpacePoints=SVDSpacePoints__ROI
+            forceGroupingFromDB=True
+            formSingleSignalGroup=False
+            inputPDF=/data/svd/spacePointQICalibration.root
+            numMaxSpacePoints=70000
+            numberOfSignalGroups=1
+            useDBForSNRFraction=True
+            useLegacyNaming=True
+            useParamFromDB=True
+            useQualityEstimator=False
+            useSVDGroupInfoIn3Sample=False
+            useSVDGroupInfoIn6Sample=False
+            useSVDSpacePointSNRFractionFor3Samples=False
+            useSVDSpacePointSNRFractionFor6Samples=False
+        13. SetupGenfitExtrapolationForPXDDataReduction
+            MSCModel=Highland
+            energyLossBetheBloch=True
+            energyLossBrems=True
+            ignoreIfPresent=True
+            noEffects=False
+            noiseBetheBloch=True
+            noiseBrems=True
+            noiseCoulomb=True
+            useVXDAlignment=True
+            whichGeometry=Geant4
+        14. RegisterEventLevelTrackingInfo__ROI
+            EventLevelTrackingInfoName=EventLevelTrackingInfo__ROI
+        15. SectorMapBootstrap
+            ReadSecMapFromDB=True
+            ReadSectorMap=False
+            SectorMapsInputFile=SVDSectorMap_v000.root
+            SectorMapsOutputFile=SectorMaps.root
+            SetupToRead=SVDOnlyDefault
+            WriteSectorMap=False
+            threeHitFilterAdjustFunctions=[]
+            twoHitFilterAdjustFunctions=[]
+        16. SegmentNetworkProducer
+            EventLevelTrackingInfoName=EventLevelTrackingInfo__ROI
+            NetworkOutputName=SegmentNetwork__ROI
+            SpacePointsArrayNames=['SVDSpacePoints__ROI']
+            addVirtualIP=False
+            allFiltersOff=False
+            maxAddedConnections=300000
+            maxAddedHitConnections=200000
+            maxConnections=30000
+            maxHitConnections=8000
+            maxNetworkSize=40000
+            printNetworkToMathematica=False
+            printNetworks=False
+            sectorMapName=SVDOnlyDefault
+            virtualIPCoorindates=[0.0, 0.0, 0.0]
+            virtualIPErrors=[0.2, 0.2, 1.0]
+        17. TrackFinderVXDCellOMat
+            EventLevelTrackingInfoName=EventLevelTrackingInfo__ROI
+            NetworkName=SegmentNetwork__ROI
+            SpacePointTrackCandArrayName=SPTrackCands__ROI
+            maxFamilies=10000
+            maxPaths=400000
+            printNetworks=False
+            selectBestPerFamily=True
+            setFamilies=True
+            storeSubsets=False
+            strictSeeding=True
+            xBestPerFamily=30
+        18. AddVXDTrackCandidateSubSets
+            MinOriginalSpacePoints=4
+            NameSpacePointTrackCands=SPTrackCands__ROI
+        19. QualityEstimatorVXD
+            EstimationMethod=tripletFit
+            MCRecoTracksStoreArrayName=MCRecoTracks
+            MCStrictQualityEstimator=True
+            SpacePointTrackCandsStoreArrayName=SPTrackCands__ROI
+        20. BestVXDTrackCandidatesSelector
+            NameSpacePointTrackCands=SPTrackCands__ROI
+            NewNameSpacePointTrackCands=SPTrackCands__ROI
+            SubsetCreation=False
+            SubsetSize=1000
+        21. SPTCvirtualIPRemover
+            doCheckOnly=False
+            maxTCLengthForVIPKeeping=0
+            tcArrayName=SPTrackCands__ROI
+        22. SVDOverlapResolver
+            NameSVDClusters=__ROIsvdClusters
+            NameSpacePointTrackCands=SPTrackCands__ROI
+            ResolveMethod=greedy
+            minActivityState=0.699999988079071
+        23. SPTCmomentumSeedRetriever
+            tcArrayName=SPTrackCands__ROI
+        24. SPTC2RTConverter
+            pxdClustersName=
+            pxdHitsStoreArrayName=
+            recoHitInformationStoreArrayName=
+            recoTracksStoreArrayName=__ROIsvdRecoTracks
+            spacePointsTCsStoreArrayName=SPTrackCands__ROI
+            svdClustersName=__ROIsvdClusters
+            svdHitsStoreArrayName=__ROIsvdClusters
+        25. SVD-only DAFRecoFitter
+            bklmHitsStoreArrayName=
+            cdcHitsStoreArrayName=
+            correctSeedCharge=False
+            eklmHitsStoreArrayName=
+            initializeCDCTranslators=True
+            monopoleMagCharge=1.0
+            pdgCodesToUseForFitting=[211]
+            probCut=0.001
+            pxdHitsStoreArrayName=
+            recoTracksStoreArrayName=__ROIsvdRecoTracks
+            resortHits=False
+            svdHitsStoreArrayName=__ROIsvdClusters
+            trackFitType=0
+        26. PXDROIFinder
+            PXDInterceptListName=PXDIntercepts
+            ROIFindingForDQM=False
+            ROIListName=ROIs
+            maxWidthU=0.5
+            maxWidthV=0.5
+            numSigmaTotU=10.0
+            numSigmaTotV=10.0
+            overrideDBROICalculation=False
+            recoTrackListName=__ROIsvdRecoTracks
+            sigmaSystU=0.025
+            sigmaSystV=0.025
+            tolerancePhi=0.15
+            toleranceZ=0.5
+        27. PXDdigiFilter
+            CreateOutside=False
+            PXDDigitsInsideROIName=PXDDigits
+            PXDDigitsName=pxd_unfiltered_digits
+            PXDDigitsOutsideROIName=PXDDigitsOUT
+            ROIidsName=ROIs
+            overrideDB=False
+            usePXDDataReduction=True
+        28. PruneDataStore
+            keepMatchedEntries=False
+            matchEntries=['ROIs', '__ROIsvdRecoDigits', '__ROIsvdClusters', '__ROIsvdRecoTracks', 'SPTrackCands__ROI', 'SpacePoints__ROI', 'SegmentNetwork__ROI', 'PXDInterceptsToROIs', 'RecoHitInformationsTo__ROIsvdClusters', 'SpacePoints__ROITo__ROIsvdClusters', '__ROIsvdClustersToMCParticles', '__ROIsvdRecoDigitsToMCParticles', '__ROIsvdClustersTo__ROIsvdRecoDigits', '__ROIsvdClustersToSVDTrueHits', '__ROIsvdClustersTo__ROIsvdRecoTracks', '__ROIsvdRecoTracksToPXDIntercepts', '__ROIsvdRecoTracksToRecoHitInformations', '__ROIsvdRecoTracksToSPTrackCands__ROI', 'pxd_unfiltered_digits', 'pxd_unfiltered_digitsToMCParticles', 'pxd_unfiltered_digitsToPXDDigits', 'pxd_unfiltered_digitsToPXDTrueHits']
+
+      (? <1[ActivatePXDPixelMasker -> ActivatePXDGainCalibrator -> PXDDigitizer -> BGOverlayExecutor_PXD -> PXDDigitSorter] ):
+        1. ActivatePXDPixelMasker
+        2. ActivatePXDGainCalibrator
+        3. PXDDigitizer
+            ADCUnit=130.0
+            Digits=PXDDigits
+            ElectronGroupSize=100
+            ElectronMaxSteps=200
+            ElectronStepTime=1.0
+            ElectronicEffects=True
+            ElectronicNoise=150.0
+            GatingTime=400.0
+            GatingWithoutReadout=True
+            GatingWithoutReadoutTime=1400.0
+            Gq=0.6
+            HardwareDelay=0.0
+            IntegrationWindow=True
+            MCParticles=
+            PedestalMean=100.0
+            PedestalRMS=30.0
+            PoissonSmearing=True
+            SegmentLength=0.005
+            SimHits=
+            TrueHits=
+        4. BGOverlayExecutor_PXD
+            ARICHDigitsName=
+            CDCHitsName=
+            KLMDigitsName=
+            PXDDigitsName=PXDDigits
+            SVDShaperDigitsName=
+            TOPDigitsName=
+            bkgInfoName=
+            components=['PXD']
+        5. PXDDigitSorter
+            digits=PXDDigits
+            digitsToMCParticles=
+            digitsToTrueHits=
+            merge=True
+            particles=
+            trimDigits=True
+            truehits=
+  36. Sum_Simulation

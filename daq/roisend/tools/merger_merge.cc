@@ -955,13 +955,9 @@ main(int argc, char* argv[])
           return a.second < b.second;
         });
 
-        printf("\nMIN %u, ", minIt->second);
-        for (auto& h : hlt_min) printf("%u, ", h.second);
-        printf("\nMAX %u, ", maxIt->second);
-        for (auto& h : hlt_max) printf("%u, ", h.second);
-        printf("\nDIF %um ", maxIt->second - minIt->second);
-        for (auto& h : hlt_max) printf("%u, ", h.second - hlt_min[h.first]);
-        printf("\n");
+        ERR_FPRINTF(stderr, "[INFO] ALL, %u, %u, %u\n", minIt->second, maxIt->second, maxIt->second - minIt->second);
+        for (auto& h : hlt_max) ERR_FPRINTF(stderr, "[INFO] HLT%u, %u, %u, %u\n", fd_to_hlt[h.first], hlt_min[h.first], h.second,
+                                              h.second - hlt_min[h.first]);
         hlt_min.clear();
         hlt_max.clear();
       }

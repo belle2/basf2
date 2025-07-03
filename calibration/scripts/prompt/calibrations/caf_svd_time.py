@@ -558,15 +558,13 @@ def get_calibrations(input_data, **kwargs):
         list_of_calibrations.append(shift_calibration)
 
     #########################################################
-    # Absolute SVD Cluster Time Shifter                              #
+    # Absolute SVD Cluster Time Shifter                     #
     #########################################################
 
     SVDClustersOnTrackPrefix = "SVDClustersOnTrack"
 
     absolute_shift_clusterizers_onTracks = []
 
-    # not entirely clear to me if it's needed to reconstruct some of these, i think yes as they are attached to a calibration ?
-    # do they need to have a different name to prevent any issue ?
     for alg in timeAlgorithms:
         cluster = create_svd_clusterizer(
             name=f"ClusterReconstruction_{alg}",

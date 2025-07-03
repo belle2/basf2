@@ -37,6 +37,7 @@ collection = ["pion_kaon", "electron", "muon", "proton"]
 settings = CalibrationSettings(
     name="CDC dedx Hadron Calibrations",
     expert_username="renu",
+    subsystem_responsible_gitlab_username="dongthanh.ht",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["hadron_calib", "bhabha_all_calib", "radmumu_calib"],
@@ -53,7 +54,8 @@ settings = CalibrationSettings(
                    "bgpar": {"muon": [12, 2.85, 28.85], "proton": [20, 0.33, 0.85]},
                    "cosbins": {"muon": 24, "proton": 20},
                    },
-    depends_on=[cdc_dedx_electron, top])
+    depends_on=[cdc_dedx_electron, top],
+    produced_payloads=["CDCDedxHadronCor", "CDCDedxMeanPars", "CDCDedxSigmaPars"])
 
 ##############################
 

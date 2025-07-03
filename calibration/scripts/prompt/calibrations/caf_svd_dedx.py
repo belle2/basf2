@@ -22,6 +22,7 @@ from reconstruction import prepare_user_cdst_analysis, DIGITS_OBJECTS
 settings = CalibrationSettings(
     name="caf_svd_dedx",
     expert_username="lisovsky",
+    subsystem_responsible_gitlab_username="giulio.dujany",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["hadron_calib"],
@@ -67,7 +68,8 @@ settings = CalibrationSettings(
         "MaxEffMomentum": 2.5  # validation: upper momentum boundary for efficiency plots?
         # (No separation from SVD above 2.5 GeV or so)
         },
-    depends_on=[])
+    depends_on=[],
+    produced_payloads=["SVDdEdxPDFs"])
 
 
 def create_path(rerun_reco, rerun_pid, isMC, expert_config):

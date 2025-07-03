@@ -15,6 +15,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 settings = CalibrationSettings(
     name="ARICH channel masks",
     expert_username="kspenko",
+    subsystem_responsible_gitlab_username="kristof.spenko",
     description=__doc__,
     input_data_formats=["raw"],
     input_data_names=["bhabha_all_calib"],
@@ -23,7 +24,8 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"]]},
-    depends_on=[])
+    depends_on=[],
+    produced_payloads=['ARICHChannelMask'])
 
 ##############################
 

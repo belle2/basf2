@@ -113,7 +113,7 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
         TH1F* hist = (TH1F*)__hClsOnTrack__->ProjectionX(Form("hClsTimeOnTracks_L%dS%c", layer, (side == 0 ? 'U' : 'V')), LayerSensorID,
                                                          LayerSensorID, "");
 
-        hist->SetTitle(Form("Cluster Time in L%d%d", layer, (side == 0 ? 'U' : 'V')));
+        hist->SetTitle(Form("Cluster Time in L%dS%c", layer, (side == 0 ? 'U' : 'V')));
         hist->SetDirectory(0);
 
         B2INFO("Histogram: " << hist->GetName() <<

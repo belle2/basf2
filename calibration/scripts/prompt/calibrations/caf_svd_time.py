@@ -558,56 +558,6 @@ def get_calibrations(input_data, **kwargs):
         list_of_calibrations.append(shift_calibration)
 
     #########################################################
-    # SVD Cluster Time Shifter                              #
-    #########################################################
-
-    SVDClustersOnTrackPrefix = "SVDClustersOnTrack"
-
-    shift_clusterizers_onTracks = []
-    for alg in timeAlgorithms:
-        cluster = create_svd_clusterizer(
-            name=f"ClusterReconstruction_{alg}",
-            clusters=f"{SVDClustersOnTrackPrefix}_{alg}",
-            shaper_digits=NEW_SHAPER_DIGITS_NAME,
-            time_algorithm=alg,
-            shiftSVDClusterTime=False
-            )
-        shift_clusterizers_onTracks.append(cluster)
-
-    shift_pre_collector_path = create_pre_collector_path(
-        clusterizers=shift_clusterizers_onTracks,
-        isMC=isMC, max_events_per_run=max_events_per_run,
-        max_events_per_file=max_events_per_file,
-        useSVDGrouping=useSVDGrouping)
-
-    shift_collector = b2.register_module("SVDClusterTimeShifterCollector")
-    shift_collector.set_name("SVDClusterTimeShifterCollector")
-    shift_collector.param("MaxClusterSize", 6)
-    shift_collector.param("EventT0Name", "EventT0")
-    shift_collector.param("SVDClustersOnTrackPrefix", f"{SVDClustersOnTrackPrefix}")
-    shift_collector.param("TimeAlgorithms", timeAlgorithms)
-
-    shift_algo = SVDClusterTimeShifterAlgorithm(f"{calType}_{now.isoformat()}_INFO:_"
-                                                f"Exp{expNum}_runsFrom{firstRun}to{lastRun}")
-    shift_algo.setMinEntries(100)
-    shift_algo.setMaximumAllowedShift(15.)
-    shift_algo.setTimeAlgorithm(timeAlgorithms)
-
-    shift_calibration = Calibration("SVDClusterTimeShifter",
-                                    collector=shift_collector,
-                                    algorithms=shift_algo,
-                                    input_files=good_input_files,
-                                    pre_collector_path=shift_pre_collector_path)
-
-    shift_calibration.strategies = strategies.SingleIOV
-
-    for algorithm in shift_calibration.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
-
-    if "timeShiftCalibration" not in listOfMutedCalibrations:
-        list_of_calibrations.append(shift_calibration)
-
-    #########################################################
     # Absolute SVD Cluster Time Shifter                              #
     #########################################################
 

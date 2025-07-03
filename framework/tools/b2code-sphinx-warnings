@@ -40,4 +40,15 @@ if [ "$use_temp_dir" = true ]; then
 fi
 
 # build sphinx documentation with html option
-b2code-sphinx-build --output-dir ${output_dir} -t html -q "$@" 2>&1 | grep WARNING && exit 1 || exit 0
+output=$(b2code-sphinx-build --output-dir ${output_dir} -t html -q "$@" 2>&1)
+status=$?
+
+# Check the exit status
+if [ $status -ne 0 ]; then
+    echo "b2code-sphinx-build failed with exit code $status"
+    exit $status
+elif echo "$output" | grep "WARNING"; then
+    exit 1
+else
+    exit 0
+fi

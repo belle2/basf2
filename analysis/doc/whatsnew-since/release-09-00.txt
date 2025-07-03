@@ -1,9 +1,10 @@
-Changes in the analysis package in light-2504-d
------------------------------------------------
+Changes in the analysis package in light-2505-deimos
+----------------------------------------------------
 
 FEI
 +++
 * Added option to use PIDNN variables instead of PID variables as input features and best candidate variables.
+* Added first support for running FEI on ccbar events using custom truth matching for defining the training target.
 
 FlavorTagger
 ++++++++++++
@@ -14,6 +15,20 @@ Modular Analysis
 * Fixed :py:func:`stdV0s.goodBelleKshort` and `loadStdGoodBellePhoton` functions to apply cuts on the corresponding :mdst lists when using b2bii, instead of using `fillParticleList`.
 * Fixed documentation explicitly mentioning that the invariant mass cuts are applied "after the vertex fit" in `stdLambdas`, `stdKshorts` and :py:func:`stdV0s.goodBelleKshort` functions.
 
+Variables
++++++++++
+* Modified whole event variables, e.g., `weDeltae`, to work with ``useXXXFrame`` instead of requiring additional argument.
+  A down-side is that if you used for example ``weMissM2(maskname, 0)`` before, you must now use ``useCMSFrame(weMissM2(maskname, 0))``,
+  otherwise you're implicitly calling ``weMissM2(maskname, 5)``.
+* Added new variables `eventT0CalculatedWithSVDInfo`, `eventT0CalculatedWithCDCInfo` and `eventT0CalculatedWithECLInfo`
+  to identify which subdetectors contributed to the final EventT0 determination.
+* Added variable `pValueCombinationOfDaughters`, which for a given p-value variable returns its combination among all daughters of the particle (the combination is calculated the same way as in `pValueCombination`).
+* Added custom truth matching for quasi particle ccbar tags, in the form of three variables: `ccbarTagSignal`, `ccbarTagSignalSimplified` and `ccbarTagEventStatus` (important for training FEI on ccbar events).
+* Added variable `angleBetweenDaughterAndRecoil`, which for a given particle returns the angle between its recoil momentum and the momentum of its daughter(s).
+* Added variable `angleBetweenDaughterAndMissingMomentum`, which for a given particle returns the angle between the missing momentum in the event (requires `buildEventKinematics`) and the momentum of its daughter(s).
+* Added a new reference frame convenience variable `useDaughterRecoilRestFrame`, which transforms to the rest frame of the recoil of the specified particle's daughter(s).
+* Added variable `massDiffRecoil`, which returns the mass difference between recoil for a given particle without a specific daughter and the recoil of the particle. 
+
 Utilities
 +++++++++
 * Added convenience function ROOT.Belle2.ParticleListName.addAntiParticleLists(inputList) which returns the same list with appended anti-particle lists of the particle lists in the input list. 
@@ -22,7 +37,11 @@ Utilities
 Charm Flavor Tagger
 +++++++++++++++++++
 * Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
-  function `charmFlavorTagger`) to ``CFT_ceres``. It improves the performance but can only be used since light-2504-deimos.
+  function `charmFlavorTagger`) to ``CFT_ceres``. It improves the performance but can only be used since light-2505-deimos.
+
+Modules
++++++++
+* Fixed a bug in TreeFit in the calculation of the number of degrees of freedom and the resulting p-value (`chiProb`) when ignoring particles in the vertex fit.
 
 Changes in the analysis package in light-2503-ceres
 ---------------------------------------------------

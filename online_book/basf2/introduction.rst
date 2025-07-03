@@ -6,9 +6,7 @@ The basics.
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 20 min
-
-    **Exercises**: 10-20 min
+    **Length**: 30-60 min
 
     **Prerequisites**:
 

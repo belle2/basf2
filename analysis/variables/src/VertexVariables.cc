@@ -59,6 +59,8 @@ namespace Belle2 {
     ROOT::Math::XYZVector getMcDecayVertexFromIP(const MCParticle* mcparticle)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return ROOT::Math::XYZVector{Const::doubleNaN, Const::doubleNaN, Const::doubleNaN};
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition());
     }
@@ -122,6 +124,8 @@ namespace Belle2 {
     ROOT::Math::XYZVector getMcProductionVertexFromIP(const MCParticle* mcparticle)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return ROOT::Math::XYZVector{Const::doubleNaN, Const::doubleNaN, Const::doubleNaN};
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(mcparticle->getProductionVertex() - beamSpotDB->getIPPosition());
     }
@@ -200,6 +204,9 @@ namespace Belle2 {
     ROOT::Math::XYZVector getVertexD(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return ROOT::Math::XYZVector{Const::doubleNaN, Const::doubleNaN, Const::doubleNaN};
+
       const auto& frame = ReferenceFrame::GetCurrent();
       auto trackFit = part->getTrackFitResult();
       if (!trackFit)
@@ -255,6 +262,8 @@ namespace Belle2 {
       // r &= \sqrt{\vec{x}*\vec{x}}
       // and V_{ij} is the covariance matrix
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       const auto& frame = ReferenceFrame::GetCurrent();
       const ROOT::Math::XYZVector& vertex = frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition());
       const TMatrixFSym& vertexErr = frame.getVertexErrorMatrix(static_cast<TMatrixDSym>(part->getVertexErrorMatrix()) +

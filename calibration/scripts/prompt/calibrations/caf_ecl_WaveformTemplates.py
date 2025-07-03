@@ -17,6 +17,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 settings = CalibrationSettings(
     name="ecl_WaveformTemplateShapeCalibration",
     expert_username="longos",
+    subsystem_responsible_gitlab_username="hearty",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["gamma_gamma_calib"],
@@ -27,7 +28,11 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],
-    expert_config={})
+    expert_config={
+        "C2_MinEnergyThreshold": 2.0,
+        "nFilesCollector": 50
+    },
+    produced_payloads=["ECLWaveformTemplate"])
 
 
 # --------------------------------------------------------------
@@ -82,7 +87,7 @@ def get_calibrations(input_data, **kwargs):
 
         highLimit = (batchsize*(i+1))
 
-        if(highLimit > 8736):
+        if (highLimit > 8736):
             highLimit = 8736
 
         print("lowLimit,highLimit", lowLimit, highLimit)

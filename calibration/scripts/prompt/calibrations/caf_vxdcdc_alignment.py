@@ -62,6 +62,7 @@ quality_flags = [INPUT_DATA_FILTERS["Run Type"]["physics"],
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="Full VXD and CDC Alignment",
                                expert_username="bilkat",
+                               subsystem_responsible_gitlab_username="tadeas.bilka",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=collection_names,
@@ -73,7 +74,8 @@ settings = CalibrationSettings(name="Full VXD and CDC Alignment",
                                },
 
                                expert_config=default_config,
-                               depends_on=[cdc_calibration, svd_time_calibration])
+                               depends_on=[cdc_calibration, svd_time_calibration],
+                               produced_payloads=["VXDAlignment", "CDCAlignment"])
 
 
 def select_files(all_input_files, min_events, max_processed_events_per_file):

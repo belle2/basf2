@@ -37,6 +37,7 @@ now = datetime.datetime.now()
 
 settings = CalibrationSettings(name="caf_svd_time",
                                expert_username="gdujany",
+                               subsystem_responsible_gitlab_username="giulio.dujany",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["hadron_calib"],
@@ -60,7 +61,11 @@ settings = CalibrationSettings(name="caf_svd_time",
                                    "rangeRawTimeForIoVELS3": [20., 80.],
                                    "useRawtimeForTracking": False,
                                    "useSVDGrouping": True
-                               })
+                               },
+                               produced_payloads=["SVD3SampleCoGTimeCalibrations",
+                                                  "SVD3SampleELSTimeCalibrations",
+                                                  "SVDCoGTimeCalibrations",
+                                                  "SVDClusterTimeShifter"])
 
 ##################################################################
 # Remove Module from the Path

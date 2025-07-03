@@ -30,6 +30,7 @@ import copy
 settings = CalibrationSettings(
     name="ECL crystal and crate time calibrations and validations",
     expert_username="hearty",
+    subsystem_responsible_gitlab_username="hearty",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib", "hadron_calib"],
@@ -51,7 +52,8 @@ settings = CalibrationSettings(
     expert_config={"numCrysCrateIterations": 1,
                    "maxNumberEvents": 50000000,
                    "payload_boundaries": [],
-                   "t0_bhabhaToHadron_correction": 0})
+                   "t0_bhabhaToHadron_correction": 0},
+    produced_payloads=["ECLCrateTimeOffset", "ECLCrystalTimeOffset"])
 
 
 ##############################

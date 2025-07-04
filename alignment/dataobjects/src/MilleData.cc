@@ -8,9 +8,6 @@
 
 #include <alignment/dataobjects/MilleData.h>
 
-#include <framework/utilities/FileSystem.h>
-
-#include <cstdlib>
 #include <filesystem>
 
 using namespace std;
@@ -76,7 +73,7 @@ void MilleData::open(string filename)
   }
   m_binary = new gbl::MilleBinary(filename, m_doublePrecision);
   if (m_absFilePaths)
-    m_files.push_back(FileSystem::findFile(string(std::filesystem::absolute(filename))));
+    m_files.push_back(string(std::filesystem::absolute(filename)));
   else
     m_files.push_back(filename);
 

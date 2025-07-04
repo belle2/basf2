@@ -16,7 +16,6 @@
 #include <string>
 #include <vector>
 #include <TString.h>
-#include <TH1F.h>
 #include <TH2F.h>
 
 #include <svd/dataobjects/SVDCluster.h>

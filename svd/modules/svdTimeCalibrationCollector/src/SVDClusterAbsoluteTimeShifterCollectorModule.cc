@@ -51,9 +51,6 @@ void SVDClusterAbsoluteTimeShifterCollectorModule::prepare()
       break;
     }
 
-  int numberOfSensorBin = 2 * int(allSensors.size());
-  B2INFO("Number of SensorBin: " << numberOfSensorBin);
-
   for (auto alg : m_timeAlgorithms) {
 
     // 12 bins for L1-6 U-V sides
@@ -66,17 +63,6 @@ void SVDClusterAbsoluteTimeShifterCollectorModule::prepare()
     registerObject<TH2F>(__hClsOnTrack__->GetName(), __hClsOnTrack__);
   }
 
-  TH1F* __hBinToSensorMap__ = new TH1F("__hBinToSensorMap__", "__BinToSensorMap__",
-                                       numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
-  int tmpBinCnt = 0;
-  for (auto sensor : allSensors) {
-    for (auto view : {'U', 'V'}) {
-      tmpBinCnt++;
-      TString binLabel = TString::Format("L%iS%iS%c", sensor.getLayerNumber(), sensor.getSensorNumber(), view);
-      __hBinToSensorMap__->GetXaxis()->SetBinLabel(tmpBinCnt, binLabel);
-    }
-  }
-  registerObject<TH1F>(__hBinToSensorMap__->GetName(), __hBinToSensorMap__);
 }
 
 void SVDClusterAbsoluteTimeShifterCollectorModule::startRun()
@@ -84,7 +70,6 @@ void SVDClusterAbsoluteTimeShifterCollectorModule::startRun()
   for (auto alg : m_timeAlgorithms) {
     getObjectPtr<TH2F>(("hClsTimeOnTracks_" + alg).data())->Reset();
   }
-  getObjectPtr<TH1F>("__hBinToSensorMap__")->Reset();
 }
 
 void SVDClusterAbsoluteTimeShifterCollectorModule::collect()

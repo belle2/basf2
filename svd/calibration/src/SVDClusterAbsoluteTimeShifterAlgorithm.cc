@@ -71,8 +71,6 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
   fn_doubleGaus->SetParLimits(5, 0.5, 25.);
 
 
-  auto __hBinToSensorMap__ = getObjectPtr<TH1F>("__hBinToSensorMap__");
-
   for (auto alg : m_timeAlgorithms) {
 
     B2INFO("Calculating shift for algorithm " << alg);

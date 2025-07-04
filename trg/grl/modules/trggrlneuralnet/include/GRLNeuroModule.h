@@ -91,11 +91,11 @@ namespace Belle2 {
 
     /** TCID of a given TRGcluster */
     std::vector<int> TCThetaID;
-    /** Azimuth angle  of a given TRGcluster */
-    ///////////////////////////////////////////////////////////////////////////
+    /** Polar angle of a given TRGcluster */
     std::vector<double> TCThetaLab;
+    /** Azimuthal angle of a given TRGcluster */
     std::vector<double> TCPhiLab;
-    //////////////////////////////////////////////////////////////////////
+
     /** Histograms to save the NN classifiers */
     std::vector<TH1D*> h_target;
 

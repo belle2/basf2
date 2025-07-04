@@ -13,6 +13,7 @@
 #include <dqm/modules/PhysicsObjectsDQM/PhysicsObjectsDQMModule.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/variables/EventShapeVariables.h>
+#include <analysis/variables/BelleVariables.h>
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <mdst/dataobjects/Track.h>
@@ -90,6 +91,13 @@ void PhysicsObjectsDQMModule::defineHisto()
   m_h_physicsresults->GetXaxis()->SetBinLabel(4, "Hadronb2_tight");
   m_h_physicsresults->GetXaxis()->SetBinLabel(5, "mumu_tight");
   m_h_physicsresults->GetXaxis()->SetBinLabel(6, "bhabha_all");
+
+// Monitoring variables for prefilter
+  m_h_nKshortAllH = new TH1F("hist_nKshortAllH", "hist_nKshortAllH", 50, 0.45, 0.55);
+  m_h_nKshortActiveH = new TH1F("hist_nKshortActiveH", "hist_nKshortActiveH", 50, 0.45, 0.55);
+  m_h_nKshortActiveNotTimeH = new TH1F("hist_nKshortActiveNotTimeH", "hist_nKshortActiveNotTimeH", 50, 0.45, 0.55);
+  //m_h_nKshortActiveNotCDCECLH = new TH1F("hist_nKshortActiveNotCDCECLH", "hist_nKshortActiveNotCDCECLH", 50, 0.45, 0.55);
+
   oldDir->cd();
 }
 
@@ -110,6 +118,10 @@ void PhysicsObjectsDQMModule::beginRun()
   m_h_mUPS->Reset();
   m_h_R2->Reset();
   m_h_physicsresults->Reset();
+  m_h_nKshortAllH->Reset();
+  m_h_nKshortActiveH->Reset();
+  m_h_nKshortActiveNotTimeH->Reset();
+  //m_h_nKshortActiveNotCDCECLH->Reset();
 }
 
 
@@ -132,6 +144,58 @@ void PhysicsObjectsDQMModule::event()
   }
 
   const std::map<std::string, int>& results = result->getResults();
+
+  //--- Prefilter monitoring ---//
+  // Check if events pass HLT cut //
+  if (results.find(m_triggerIdentifierHLT) == results.end()) {
+    //Cannot find the m_triggerIdentifierHLT
+    B2WARNING("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifierHLT);
+  } else {
+    const bool HLT_accept = (result->getResult("software_trigger_cut&filter&total_result") == SoftwareTriggerCutResult::c_accept);
+    if (HLT_accept != false) {
+
+      //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
+      int index = 0; //events accepted in the passive veto window but not in the active
+      try {
+        if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1; //events in active veto
+      } catch (const std::exception&) {
+      }
+
+      std::string HLTprefilter_Injection_Strip = "software_trigger_cut&filter&HLTprefilter_InjectionStrip";
+      //std::string HLTprefilter_CDCECL_Cut = "software_trigger_cut&filter&HLTprefilter_CDCECLthreshold";
+      bool injStrip = false;
+      //bool cdceclcut = false;
+
+      if (results.find(HLTprefilter_Injection_Strip) != results.end()) {
+        injStrip = (result->getResult(HLTprefilter_Injection_Strip) == SoftwareTriggerCutResult::c_accept);
+      }
+//      if (results.find(HLTprefilter_CDCECL_Cut) != results.end()) {
+//        cdceclcut = (result->getResult(HLTprefilter_CDCECL_Cut) == SoftwareTriggerCutResult::c_accept);
+//      }
+
+      // Iterate over Ks particle list //
+      StoreObjPtr<ParticleList> ks0Particles(m_ks0PListName);
+
+      if (ks0Particles.isValid() && abs(ks0Particles->getPDGCode()) == Const::Kshort.getPDGCode()) {
+        for (unsigned int i = 0; i < ks0Particles->getListSize(); i++) {
+          Particle* mergeKsCand = ks0Particles->getParticle(i);
+          const double isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
+          double ks_merged_mass = mergeKsCand->getMass();
+
+          if (isKsCandGood && 0.45 < ks_merged_mass && ks_merged_mass < 0.55) {
+            m_h_nKshortAllH->Fill(ks_merged_mass);                   // Fill all Ks events
+            if (index == 1) {
+              m_h_nKshortActiveH->Fill(ks_merged_mass);              // Fill Ks events from active veto
+              if (injStrip != true)
+                m_h_nKshortActiveNotTimeH->Fill(ks_merged_mass);     // Fill Ks events retained after timing cut of HLTprefilter
+//              if (cdceclcut != true)
+//                m_h_nKshortActiveNotCDCECLH->Fill(ks_merged_mass);   // Fill Ks events retained after CDC-ECL cut of HLTprefilter
+            }
+          }
+        }
+      }
+    }
+  }
 
   if (results.find(m_triggerIdentifier) == results.end()) {
     //Cannot find the m_triggerIdentifier, move on to mumu

@@ -182,6 +182,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["clusterEPosC"] = NAN; /**< clusterE lab of max p positively charged track GeV */
   calculationResult["dPhiCmsC"] = NAN; /**< delta phi cms of max p positive and negative tracks deg */
 
+  //..Filters lines for HLTprefilter decision
+  calculationResult["HLTprefilter_InjectionStrip"] = 0; /**< Events in the injection strip */
+  /**calculationResult["HLTprefilter_CDCECLthreshold"] = 0;*/ /**< Events in the injection strip */
 
   // Passed on L1 information
   if (m_l1Trigger.isValid()) {
@@ -1046,5 +1049,14 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     delete vertexFit;
 
   }
+
+  // Filter lines for HLTprefilter
+  if (injection_strip) {
+    calculationResult["HLTprefilter_InjectionStrip"] = 1;
+  }
+
+//  if (cdcecl_threshold) {
+//    calculationResult["HLTprefilter_CDCECLthreshold"] = 1;
+//  }
 
 }

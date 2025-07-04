@@ -12,6 +12,12 @@
 
 #include <framework/core/HistoModule.h>
 
+#include <framework/datastore/StoreObjPtr.h>
+
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+
+#include <mdst/dataobjects/TRGSummary.h>
+
 #include <TH1F.h>
 
 #include <string>
@@ -105,6 +111,20 @@ namespace Belle2 {
 
     /** Name of the pi hadron particle list */
     std::string m_hadbphysDQM = "";
+
+    /** Objects relevant to HLTprefilter monitoring */
+    /** trigger summary */
+    StoreObjPtr<TRGSummary> m_trgSummary;
+
+    /** Trigger identifier string used to select events for HLTprefilter histograms */
+    std::string m_triggerIdentifierHLT = "";
+
+    /** Histograms for Ks */
+    TH1F* m_h_nKshortAllH = nullptr; /** Histogram for Ks events */
+    TH1F* m_h_nKshortActiveH = nullptr; /** Histogram for Ks events : active veto */
+    TH1F* m_h_nKshortActiveNotTimeH = nullptr; /** Histogram for Ks events : && active veto && !timing cut */
+    /*TH1F* m_h_nKshortActiveNotCDCECLH = nullptr;*/ /* Histogram for Ks events : && active veto && !cdcecl cut */
+
   };
 
 } // end namespace Belle2

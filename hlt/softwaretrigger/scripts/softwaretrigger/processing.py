@@ -213,14 +213,13 @@ def add_hlt_processing(path,
     if hlt_prefilter_mode == constants.HLTprefilterModes.filter:
         # Perform the HLT prefilter decision
         hlt_prefilter_module = path.add_module(HLTprefilter)
-        # There are two possibilities for the output of this module
-        # (1) the event is dismissed -> nothing is stored
+        print(hlt_prefilter_module)
+        # Abort reconstruction of events from injection background
         path_utils.HLTprefilter_event_abort(hlt_prefilter_module, ">=1", ROOT.Belle2.EventMetaData.c_HLTprefilterDiscard)
-        # (2) the event is accepted -> proceed to HLT reconstruction
-        hlt_prefilter_module.if_value("==0", path, basf2.AfterConditionPath.CONTINUE)
     elif hlt_prefilter_mode == constants.HLTprefilterModes.monitor:
         # Perform the HLT prefilter decision and proceed to HLT reconstruction
         hlt_prefilter_module = path.add_module(HLTprefilter)
+        print(hlt_prefilter_module)
     else:
         basf2.B2FATAL(f"The HLT prefilter mode {hlt_prefilter_mode} is not supported.")
     path.add_module('StatisticsSummary').set_name('Sum_HLTprefilter')

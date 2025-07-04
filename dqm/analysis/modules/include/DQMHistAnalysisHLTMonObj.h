@@ -10,6 +10,14 @@
 
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
+#include "RooRealVar.h"
+#include "RooGaussian.h"
+#include "RooAddPdf.h"
+#include "RooArgList.h"
+#include "RooArgSet.h"
+#include "RooChebychev.h"
+#include "RooMsgService.h"
+#include "RooFit.h"
 
 namespace Belle2 {
 

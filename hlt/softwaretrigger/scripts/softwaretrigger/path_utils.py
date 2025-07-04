@@ -269,8 +269,4 @@ def HLTprefilter_event_abort(module, condition, error_flag):
     import ROOT  # noqa
 
     p = basf2.Path()
-    p.add_module("EventErrorFlag", errorFlag=error_flag)
-    add_store_only_metadata_path(p)
-    module.if_value(condition, p, basf2.AfterConditionPath.CONTINUE)
-    if error_flag == ROOT.Belle2.EventMetaData.c_HLTprefilterDiscard:
-        p.add_module('StatisticsSummary').set_name('Sum_HLTprefilter_Discard')
+    module.if_value(condition, p, basf2.AfterConditionPath.END)

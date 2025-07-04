@@ -30,12 +30,10 @@ int main(int argc, char** argv)
   // Create empty file before starting
   auto filepath = string("/dev/shm/") + file;
   auto dqmhisto = new TFile(filepath.c_str(), "NEW");
-  if (dqmhisto == nullptr) {
-    printf("Failed to allocate TFile %s", filepath.c_str());
-    exit(-1);
-  } else {
-    delete dqmhisto;
+  if (dqmhisto->IsOpen()) {
+    dqmhisto->Close();
   }
+  delete dqmhisto;
 
   HistoRelay2 hrelay2(file, dest, port);
 

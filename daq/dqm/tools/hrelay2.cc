@@ -29,16 +29,11 @@ int main(int argc, char** argv)
 
   // Create empty file before starting
   auto filepath = string("/dev/shm/") + file;
-  auto dqmhisto = new TFile(filepath.c_str(), "UPDATE");
+  auto dqmhisto = new TFile(filepath.c_str(), "NEW");
   if (dqmhisto == nullptr) {
     printf("Failed to allocate TFile %s", filepath.c_str());
     exit(-1);
-  } else if (!dqmhisto->IsOpen()) {
-    printf("Failed to create or open %s", filepath.c_str());
-    delete dqmhisto;
-    exit(-1);
   } else {
-    dqmhisto->Close();
     delete dqmhisto;
   }
 

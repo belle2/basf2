@@ -101,14 +101,16 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
     onePad.Draw();
 
 
-    for (int layer = 1; layer <= 6; layer++) {
+    for (int layer = 3; layer <= 6; layer++) {
       for (int side = 0; side < 2; side++) { // 0 for U, 1 for V
         int LayerSensorID = 2 * layer - side; // 1-based index
+
+
 
         TString binLabel = TString::Format("L%iS%c", layer, (side == 0 ? 'U' : 'V'));
         TH1F* hist = (TH1F*)__hClsOnTrack__->ProjectionX(Form("hClsTimeOnTracks_L%dS%c", layer, (side == 0 ? 'U' : 'V')), LayerSensorID,
                                                          LayerSensorID, "");
-
+        B2INFO('doing bin label: ' << binLabel);
         hist->SetTitle(Form("Cluster Time in L%dS%c", layer, (side == 0 ? 'U' : 'V')));
         hist->SetDirectory(0);
 

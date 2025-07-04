@@ -11,8 +11,8 @@
 #include <framework/utilities/FileSystem.h>
 
 #include <cstdlib>
+#include <filesystem>
 
-char* full_path = realpath("foo.dat", NULL);
 using namespace std;
 using namespace Belle2;
 
@@ -76,7 +76,7 @@ void MilleData::open(string filename)
   }
   m_binary = new gbl::MilleBinary(filename, m_doublePrecision);
   if (m_absFilePaths)
-    m_files.push_back(FileSystem::findFile(string(realpath(filename.c_str(), NULL))));
+    m_files.push_back(FileSystem::findFile(string(std::filesystem::absolute(filename))));
   else
     m_files.push_back(filename);
 

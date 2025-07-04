@@ -12,6 +12,9 @@
 // Basf2 headers.
 #include <hlt/utilities/Units.h>
 
+// Roofit header
+#include "RooFitResult.h"
+
 // C++ headers
 #include <regex>
 
@@ -266,6 +269,86 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
     if (h_memoryUnit && bgunit > 0) memunit = h_memoryUnit->GetBinLowEdge(h_memoryUnit->FindLastBinAbove(0.) + 1);
     m_monObj->setVariable(("memory_HLT" + std::to_string(index)).c_str(), memunit);
   }
+
+  //--- HLTprefilter monitoring ---//
+  //--- Fit variable ---//
+  RooRealVar* mass = new RooRealVar("mass", "M", 0.45, 0.55);
+
+  //--- Signal double gaussian ---//
+  RooRealVar mean1("#mu_{1}", "MEAN of 1st gaussian", 0.498, 0.49, 0.51);
+  RooRealVar sigma1("#sigma_{1}", "Sigma of 1st gaussian", 0.002, 0.0001, 0.05);
+  RooGaussian gauss1("gauss1", "1st gaussian PDF", *mass, mean1, sigma1);
+
+  RooRealVar sigma2("#sigma_{2}", "Sigma of 1st gaussian", 0.02, 0.0001, 0.05);
+  RooGaussian gauss2("gauss2", "2nd gaussian PDF", *mass, mean1, sigma2);
+
+  RooRealVar frac("frac", "fraction", 0.6, 0.4, 0.8);
+  RooAddPdf double_gauss("double_gauss", "add two gaussian", RooArgList(gauss1, gauss2), RooArgSet(frac));
+
+
+  //--- Chebychev background first order ---//
+  RooRealVar slope1("s_{1}", "Slope of Polynomial", 0.5, -2.0, 2.0);
+  RooChebychev chebpol("chebpol", "Chebshev Polynomial ", *mass, RooArgList(slope1));
+
+  //--- Signal and Background yields ---//
+  RooRealVar sig("N_{sig}", "SIGNAL EVENTS", 1000, 10, 5000000);
+  RooRealVar bkg("N_{bkg}", "SIGNAL EVENTS", 2000, 100, 20000000);
+
+  //--- Total fit pdf ---//
+  RooAddPdf depdf("depdf", "Two Gaussian + ", RooArgList(double_gauss, chebpol), RooArgList(sig, bkg));
+
+  // Silence uneccesary warnings //
+  RooMsgService::instance().setSilentMode(true);
+  RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
+
+  double nKs_all = 0;
+  double nKs_active = 0;
+  double nKs_activeNotTime = 0;
+  //double nKs_activeNotCDCECL = 0;
+
+  auto m_hKshortAllH = findHist("PhysicsObjects/hist_nKshortAllH");
+  auto m_hKshortActiveH = findHist("PhysicsObjects/hist_nKshortActiveH");
+  auto m_hKshortActiveNotTimeH = findHist("PhysicsObjects/hist_nKshortActiveNotTimeH");
+  //auto m_hKshortActiveNotCDCECLH = findHist("PhysicsObjects/hist_nKshortActiveNotCDCECLH");
+
+  if (m_hKshortAllH) {
+    RooDataHist* KsHist_all = new RooDataHist("KsHist_all", "Histogram data", RooArgList(*mass), m_hKshortAllH);
+    depdf.fitTo(*KsHist_all, RooFit::Minos(true));
+    nKs_all = sig.getValV();
+    delete KsHist_all;
+  }
+  m_monObj->setVariable("nKs_all_hlt", nKs_all);
+
+  if (m_hKshortActiveH) {
+    RooDataHist* KsHist_active = new RooDataHist("KsHist_active", "Histogram data", RooArgList(*mass), m_hKshortActiveH);
+    depdf.fitTo(*KsHist_active, RooFit::Minos(true));
+    nKs_active = sig.getValV();
+    delete KsHist_active;
+  }
+  m_monObj->setVariable("nKs_activeVeto_hlt", nKs_active);
+
+  if (m_hKshortActiveNotTimeH) {
+    RooDataHist* KsHist_activeNotTime = new RooDataHist("KsHist_activeNotTime", "Histogram data", RooArgList(*mass),
+                                                        m_hKshortActiveNotTimeH);
+    depdf.fitTo(*KsHist_activeNotTime, RooFit::Minos(true));
+    nKs_activeNotTime = sig.getValV();
+    delete KsHist_activeNotTime;
+  }
+  m_monObj->setVariable("nKs_activeVetoPrefilterTime_hlt", nKs_activeNotTime);
+  /*
+    if (m_hKshortActiveNotCDCECLH) {
+
+      RooDataHist* KsHist_activeNotCDCECL = new RooDataHist("KsHist_activeNotCDCECL", "Histogram data", RooArgList(*mass),
+                                                            m_hKshortActiveNotCDCECLH);
+      depdf.fitTo(*KsHist_activeNotCDCECL, RooFit::Minos(true));
+      nKs_activeNotCDCECL = sig.getValV();
+      delete KsHist_activeNotCDCECL;
+    }
+
+    m_monObj->setVariable("nKs_activeVetoPrefilterCDCECL_hlt", nKs_activeNotCDCECL);
+  */
+  delete mass;
+
 
   B2DEBUG(20, "DQMHistAnalysisHLTMonObj : endRun called");
 }

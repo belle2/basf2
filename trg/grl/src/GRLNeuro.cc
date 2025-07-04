@@ -376,7 +376,8 @@ std::vector<float> sim_dense_0_iq(const std::vector<float>& input)
   for (size_t i = 0; i < input.size(); ++i) {
     int total_bits = dense_0_iq_config[i].first;
     int int_bits = dense_0_iq_config[i].second;
-    output.push_back(sim_ap_fixed(input[i], total_bits, int_bits, RND, SAT_SYM));
+
+    output.push_back(sim_ap_fixed(input[i], total_bits, int_bits, true, true));
   }
   return output;
 }

@@ -29,13 +29,6 @@ using namespace CDC;
 using namespace std;
 
 // ==========  ap_fixed<Total, Int, AP_TRN, AP_SAT> ==========
-const int TRN = 0;
-const int RND = 1;
-const int NONE = 0;
-const int SAT = 1;
-const int WRAP = 2;
-const int SAT_SYM = 3;
-
 
 float sim_fixed(float val, int total_bits, int int_bits,
                 bool is_signed = true,

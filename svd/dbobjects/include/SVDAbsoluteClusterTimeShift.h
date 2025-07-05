@@ -79,7 +79,6 @@ namespace Belle2 {
     /**
      * Returns the types of sensor grouping.
      * @param layer : layer number
-     * @param sensor : sensor number
      * @param isU : is U side?
      * @return TString : type of sensor group
      **/

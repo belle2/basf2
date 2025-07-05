@@ -683,9 +683,20 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
         continue;
       }
       TrackClusterSeparation* h = m_trackClusterSeparations.appendNew(klmHit[c]);
-      (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackSep
-      if (extState.track != nullptr) {
-        extState.track->addRelationTo(h); // relation Track to TrackSep
+      // Add the following three quantities to the KLMCluster data members and store some relations
+      // To be safe, add them only if h is a valid object
+      if (h != nullptr) {
+        (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackClusterSeparation
+        (*klmClusterInfo)[c].first->setClusterTrackSeparation(h->getDistance() / CLHEP::cm);
+        (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(h->getTrackClusterSeparationAngle());
+        (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(h->getTrackRotationAngle());
+        if (extState.track != nullptr) {
+          extState.track->addRelationTo(h); // relation Track to TrackClusterSeparation
+        }
+      } else {
+        (*klmClusterInfo)[c].first->setClusterTrackSeparation(Const::doubleNaN);
+        (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(Const::doubleNaN);
+        (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(Const::doubleNaN);
       }
       if (klmHit[c].getDistance() < minDistance) {
         closestCluster = c;
@@ -700,7 +711,6 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
       }
     }
   }
-
 }
 
 // Swim one track for EXT until it stops or leaves the ECL-bounding  cylinder

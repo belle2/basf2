@@ -102,9 +102,10 @@ namespace Belle2::Conditions {
       fillFromEnv(m_globalTags, "BELLE2_CONDB_GLOBALTAG", "");
       overrideGlobalTags();
     }
-    std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", m_defaultMetadataProviderUrl);
-    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", "/cvmfs/belle.cern.ch/conditions/database.sqlite " + serverList);
-    fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", "/cvmfs/belle.cern.ch/conditions");
+    std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", m_defaultRemoteMetadataProviderServer);
+    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", std::string{m_defaultLocalMetadataProviderPath + "/database.sqlite "} +
+                serverList);
+    fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", m_defaultLocalMetadataProviderPath);
   }
 
   void Configuration::reset()
@@ -511,7 +512,7 @@ want to be able to use the software without internet connection after they
 downloaded a snapshot of the necessary globaltags with ``b2conditionsdb download``
 to point to this location.
 )DOC")
-    .add_property("default_metadata_provider_url", &Configuration::getDefaultMetadataProviderUrl, R"DOC(
+    .add_property("default_metadata_provider_server", &Configuration::getDefaultRemoteMetadataProviderServer, R"DOC(
 URL of the default central metadata provider to look for payloads in the
 conditions database.
 )DOC")

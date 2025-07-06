@@ -56,11 +56,11 @@ namespace Belle2::Conditions {
       return gtinfo.at("globalTagStatus").at("name");
     } catch (std::runtime_error& e) {
       B2WARNING("Conditions Database: Cannot download information on global tag. "
-                "The database is overloaded or the selected globaltag doesn't exist"
-                << LogVar("server url", m_baseUrl) << LogVar("globaltag", name));
+                "Either the database is overloaded or the selected globaltag doesn't exist"
+                << LogVar("server url", m_baseUrl) << LogVar("globaltag", name) << LogVar("query", url));
     } catch (std::exception& e) {
       B2WARNING("Conditions Database: Problem determining global tag status"
-                << LogVar("server url", m_baseUrl) << LogVar("globaltag", name) << LogVar("error", e.what()));
+                << LogVar("server url", m_baseUrl) << LogVar("globaltag", name) << LogVar("query", url) << LogVar("error", e.what()));
     }
     return "";
   }

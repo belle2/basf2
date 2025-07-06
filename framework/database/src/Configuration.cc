@@ -102,9 +102,12 @@ namespace Belle2::Conditions {
       fillFromEnv(m_globalTags, "BELLE2_CONDB_GLOBALTAG", "");
       overrideGlobalTags();
     }
-    std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", m_defaultRemoteMetadataProviderServer);
-    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", std::string{m_defaultLocalMetadataProviderPath + "/database.sqlite "} +
-                serverList);
+    const std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", "");
+    // The list of the metadata providers we are going to query:
+    const std::string metatadaProviders = serverList + " " + // First, the list of servers provided via env. variable
+                                          m_defaultLocalMetadataProviderPath + "/database.sqlite" + " " +  // Then the default local provider (CVMFS)
+                                          m_defaultRemoteMetadataProviderServer;  // And finally, the default remote provider (BNL)
+    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", metatadaProviders);
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", m_defaultLocalMetadataProviderPath);
   }
 

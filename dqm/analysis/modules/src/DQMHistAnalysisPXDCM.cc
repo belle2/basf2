@@ -46,8 +46,8 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   addParam("errorOutside", m_errorOutside, "error level for outside fraction", 1e-4);
   addParam("upperLine", m_upperLine, "upper threshold and line for outside fraction", 17);
 
-  addParam("gateMaskModuleList", m_parModuleList, "Module List for Gate Masking");
-  addParam("gateMaskGateList", m_parGateList, "Gate List for Gate Masking");
+  addParam("gateMaskModuleList", m_parModuleList, "Module List for Gate Masking", std::vector <std::string> ());
+  addParam("gateMaskGateList", m_parGateList, "Gate List for Gate Masking", std::vector <std::vector<int>>());
   addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)", std::vector<int>());
 
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");

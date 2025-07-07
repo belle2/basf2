@@ -47,7 +47,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
   addParam("alarmAdhoc", m_alarmAdhoc, "Generate Alarm from adhoc values", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
-  addParam("excluded", m_excluded, "the list of excluded modules, indices from 0 to 39");
+  addParam("excluded", m_excluded, "the list of excluded modules, indices from 0 to 39", std::vector<int>());
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 

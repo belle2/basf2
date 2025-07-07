@@ -48,7 +48,7 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
 
   addParam("gateMaskModuleList", m_parModuleList, "Module List for Gate Masking");
   addParam("gateMaskGateList", m_parGateList, "Gate List for Gate Masking");
-  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)", std::vector<int>());
 
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }

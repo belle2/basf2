@@ -12,8 +12,8 @@ from prompt.calibrations.caf_cdc import settings as cdc_tracking_calibration
 from ROOT import Belle2
 
 settings = CalibrationSettings(name="CDC badwire",
-                               expert_username="manhtt",
-                               subsystem_responsible_gitlab_username="dongthanh.ht",
+                               expert_username="ttmanh",
+                               subsystem="cdc",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["mumu_tight_or_highm_calib"],

@@ -15,7 +15,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 settings = CalibrationSettings(
     name="ecl_cluster_energy",
     expert_username="hearty",
-    subsystem_responsible_gitlab_username="hearty",
+    subsystem="ecl",
     description=__doc__,
     input_data_formats=["mdst"],
     input_data_names=["single_gamma_mc"],

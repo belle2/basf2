@@ -27,8 +27,8 @@ from prompt.utils import filter_by_max_files_per_run
 #: Required variable - tells the automated system some details of this script
 settings = CalibrationSettings(
     name="TOP post-tracking calibration",
-    expert_username="skohani",
-    subsystem_responsible_gitlab_username="kohani",
+    expert_username="kohani",
+    subsystem="top",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["mumu_tight_or_highm_calib"],

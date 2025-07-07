@@ -20,8 +20,8 @@ from prompt.utils import filter_by_max_files_per_run
 #: Required variable - tells the automated system some details of this script
 settings = CalibrationSettings(
     name="TOP pre-tracking calibration",
-    expert_username="skohani",
-    subsystem_responsible_gitlab_username="kohani",
+    expert_username="kohani",
+    subsystem="top",
     description=__doc__,
     input_data_formats=["raw"],
     input_data_names=["hadron_calib"],

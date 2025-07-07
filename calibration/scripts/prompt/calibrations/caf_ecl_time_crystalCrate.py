@@ -30,7 +30,7 @@ import copy
 settings = CalibrationSettings(
     name="ECL crystal and crate time calibrations and validations",
     expert_username="hearty",
-    subsystem_responsible_gitlab_username="hearty",
+    subsystem="ecl",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib", "hadron_calib"],

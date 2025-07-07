@@ -17,8 +17,8 @@ from caf import strategies
 # ..Tell the automated script some required details
 settings = CalibrationSettings(
     name="ecl_autocovariance",
-    expert_username="longos",
-    subsystem_responsible_gitlab_username="hearty",
+    expert_username="savino.longo",
+    subsystem="ecl",
     description=__doc__,
     input_data_formats=["raw"],
     input_data_names=["delayedbhabha_calib"],

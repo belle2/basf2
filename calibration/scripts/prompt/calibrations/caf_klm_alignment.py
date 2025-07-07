@@ -41,7 +41,7 @@ from prompt.calibrations.caf_klm_channel_status import settings as caf_klm_chann
 settings = CalibrationSettings(
     name="KLM alignmnent",
     expert_username="nbrenny",
-    subsystem_responsible_gitlab_username="cchen23",
+    subsystem="klm",
     description=__doc__,
     input_data_formats=["raw"],
     input_data_names=[

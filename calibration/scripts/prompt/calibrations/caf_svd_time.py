@@ -36,8 +36,8 @@ random.seed(42)
 now = datetime.datetime.now()
 
 settings = CalibrationSettings(name="caf_svd_time",
-                               expert_username="gdujany",
-                               subsystem_responsible_gitlab_username="giulio.dujany",
+                               expert_username="giulio.dujany",
+                               subsystem="svd",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["hadron_calib"],

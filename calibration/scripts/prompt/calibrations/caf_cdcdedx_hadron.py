@@ -36,8 +36,8 @@ collection = ["pion_kaon", "electron", "muon", "proton"]
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="CDC dedx Hadron Calibrations",
-    expert_username="renu",
-    subsystem_responsible_gitlab_username="dongthanh.ht",
+    expert_username="renu92garg",
+    subsystem="cdc",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["hadron_calib", "bhabha_all_calib", "radmumu_calib"],

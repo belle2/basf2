@@ -20,8 +20,8 @@ from reconstruction import prepare_user_cdst_analysis
 
 settings = CalibrationSettings(
     name="caf_svd_dedx",
-    expert_username="lisovsky",
-    subsystem_responsible_gitlab_username="giulio.dujany",
+    expert_username="lisovskyi",
+    subsystem="svd",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["hadron_calib"],

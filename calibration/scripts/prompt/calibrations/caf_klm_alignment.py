@@ -66,15 +66,14 @@ settings = CalibrationSettings(
                             "events_per_file": 1000,
                             "millepede_entries": 1000000,
                             "millepede_entries_exp7": 500000},
-    produced_payloads=[
-                                "EKLMAlignment_CORRECTIONS",
-                                "BKLMAlignment_CORRECTIONS",
-                                "EKLMAlignment",
-                                "BKLMAlignment",
-                                "EKLMAlignment_ERRORS",
-                                "BKLMAlignment_ERRORS",
-                                "EKLMSegmentAlignment_ERRORS",
-                                "EKLMSegmentAlignment_CORRECTIONS"])
+    produced_payloads=["EKLMAlignment_CORRECTIONS",
+                       "BKLMAlignment_CORRECTIONS",
+                       "EKLMAlignment",
+                       "BKLMAlignment",
+                       "EKLMAlignment_ERRORS",
+                       "BKLMAlignment_ERRORS",
+                       "EKLMSegmentAlignment_ERRORS",
+                       "EKLMSegmentAlignment_CORRECTIONS"])
 
 
 def select_input_files(file_to_iov_physics, file_to_iov_cosmic,

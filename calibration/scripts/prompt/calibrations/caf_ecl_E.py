@@ -44,7 +44,7 @@ settings = CalibrationSettings(
     depends_on=[],
     expert_config={"eCmsScale": 1.0,  # Ecms/10.58, typically 0.9943 for offpeak
                    "ee5x5_min_entries": 100},
-    produced_payloads=[" ECLCrystalEnergy", "ECLExpMuMuE", "ECLCrystalEnergyMuMu", "ECLExpGammaGammaE",
+    produced_payloads=["ECLCrystalEnergy", "ECLExpMuMuE", "ECLCrystalEnergyMuMu", "ECLExpGammaGammaE",
                        "ECLCrystalEnergyGammaGamma", "ECLExpee5x5E", "ECLCrystalEnergyee5x5", "ECLeedPhiData",
                        "ECLeedPhiMC"])
 

@@ -20,8 +20,8 @@ from prompt.calibrations.caf_klm_strip_efficiency import settings as caf_klm_str
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="BeamSpot Calibrations",
-    expert_username="zlebcr",
-    subsystem_responsible_gitlab_username="mahood",
+    expert_username="zlebcik",
+    subsystem="beam",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["mumu_tight_or_highm_calib"],

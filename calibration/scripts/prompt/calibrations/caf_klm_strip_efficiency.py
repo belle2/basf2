@@ -26,7 +26,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 settings = CalibrationSettings(
     name='KLM strip efficiency',
     expert_username='nbrenny',
-    subsystem_responsible_gitlab_username='cchen23',
+    subsystem='klm',
     description=__doc__,
     input_data_formats=['cdst'],
     input_data_names=['hlt_mumu'],

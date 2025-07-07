@@ -19,8 +19,8 @@ import os
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="BoostVector Calibrations",
-    expert_username="zlebcr",
-    subsystem_responsible_gitlab_username="mahood",
+    expert_username="zlebcik",
+    subsystem="beam",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["mumu_tight_or_highm_calib"],

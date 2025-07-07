@@ -30,7 +30,7 @@ from prompt.utils import events_in_basf2_file
 settings = CalibrationSettings(
     name='KLM channel status',
     expert_username='ph21c026',
-    subsystem_responsible_gitlab_username='cchen23',
+    subsystem='klm',
     description=__doc__,
     input_data_formats=['raw'],
     input_data_names=['raw_beam', 'raw_cosmic', 'raw_physics'],

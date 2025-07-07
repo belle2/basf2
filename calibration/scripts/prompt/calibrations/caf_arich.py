@@ -14,8 +14,8 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="ARICH channel masks",
-    expert_username="kspenko",
-    subsystem_responsible_gitlab_username="kristof.spenko",
+    expert_username="kristof.spenko",
+    subsystem="arich",
     description=__doc__,
     input_data_formats=["raw"],
     input_data_names=["bhabha_all_calib"],

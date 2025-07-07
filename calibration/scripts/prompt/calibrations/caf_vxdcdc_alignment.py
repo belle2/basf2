@@ -61,8 +61,8 @@ quality_flags = [INPUT_DATA_FILTERS["Run Type"]["physics"],
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="Full VXD and CDC Alignment",
-                               expert_username="bilkat",
-                               subsystem_responsible_gitlab_username="tadeas.bilka",
+                               expert_username="tadeas.bilka",
+                               subsystem="alignment",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=collection_names,

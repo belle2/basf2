@@ -72,6 +72,9 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
             This username will be used to assign the default responsible person for submitting and checking prompt
             calibration jobs.
 
+        subsystem (str): The name of the subsystem that this calibration is for.
+        e.g. "cdc", "ecl", "klm", "svd", "top", "beam", etc.
+
         description (str): Long form description of the calibration and what it does. Feel free to make this as long as you need.
 
         input_data_formats (frozenset(str)): The data formats {'raw', 'cdst', 'mdst', 'udst'} of the input files
@@ -104,6 +107,8 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
             input data between different IoV ranges. Or you might want to send if options like the maximum events per
             input file to process. The value in your settings object will be the *default*, but you can override the value via
             the caf_config.json sent into ``b2caf-prompt-run``.
+
+        produced_payloads (list(str)): The names of the payloads that this calibration script produces.
     """
 
     #: Allowed data file formats. You should use these values for `CalibrationSettings.input_data_formats`.

@@ -20,7 +20,7 @@
 #include <RooAbsPdf.h>
 #include <RooPlot.h>
 #include <RooFitResult.h>
-
+#include "RooMsgService.h"
 
 using namespace std;
 using namespace Belle2;
@@ -167,6 +167,10 @@ void DQMHistAnalysisPXDTrackChargeModule::beginRun()
 
 void DQMHistAnalysisPXDTrackChargeModule::event()
 {
+  // need to be done every event in case someone else modifies it.
+  RooMsgService::instance().setSilentMode(true);
+  RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
+
   gStyle->SetOptStat(0);
   gStyle->SetStatStyle(1);
   gStyle->SetOptDate(22);// Date and Time in Bottom Right, does no work

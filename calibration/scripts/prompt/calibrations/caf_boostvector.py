@@ -35,7 +35,7 @@ settings = CalibrationSettings(
         "innerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
         "minPXDhits": 0},
     depends_on=[beamspot],
-    produced_payloads=[])
+    produced_payloads=["CollisionBoostVector"])
 
 ##############################
 

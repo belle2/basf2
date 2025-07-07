@@ -59,7 +59,7 @@ settings = CalibrationSettings(
         "eCMSmumuShift": 10e-3,
         "minPXDhits": 0},
     depends_on=[boostvector],
-    produced_payloads=[])
+    produced_payloads=["CollisionInvariantMass"])
 
 ##############################
 

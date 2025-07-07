@@ -36,7 +36,7 @@ settings = CalibrationSettings(
         "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)",
         "minPXDhits": 0},
     depends_on=[caf_cdc_dedx_electron, caf_cdc_dedx_hadron, caf_top, caf_klm_strip_efficiency],
-    produced_payloads=["BeamSpot", "CollisionBoostVector", "CollisionInvariantMass", "BeamParameters"])
+    produced_payloads=["BeamSpot"])
 
 ##############################
 

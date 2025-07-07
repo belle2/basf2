@@ -54,12 +54,14 @@ INPUT_DATA_FILTERS = {"Magnet": {"On": "On",
 class CalibrationSettings(namedtuple('CalSet_Factory',
                                      ["name",
                                       "expert_username",
+                                      "subsystem",
                                       "description",
                                       "input_data_formats",
                                       "input_data_names",
                                       "input_data_filters",
                                       "depends_on",
-                                      "expert_config"])):
+                                      "expert_config",
+                                      "produced_payloads"])):
     """
     Simple class to hold and display required information for a prompt calibration script (process).
 

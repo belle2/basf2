@@ -712,6 +712,7 @@ void TrackExtrapolateG4e::findClosestTrackToKLMClusters()
   for (auto& klmCluster : m_klmClusters) {
     const auto& trackClusterSeparations = klmCluster.getRelationsWith<TrackClusterSeparation>();
 
+    // If there are no TrackClusterSeparation objects related to this cluster, set NaN
     if (trackClusterSeparations.size() == 0) {
       klmCluster.setClusterTrackSeparation(Const::doubleNaN);
       klmCluster.setClusterTrackSeparationAngle(Const::doubleNaN);
@@ -719,14 +720,13 @@ void TrackExtrapolateG4e::findClosestTrackToKLMClusters()
       continue;
     }
 
+    // Look for the closest track by comparing the TrackClusterSeparation objects
     const auto closestSeparationIterator = std::min_element(trackClusterSeparations.begin(), trackClusterSeparations.end(),
     [](const auto & a, const auto & b) {
       return a.getDistance() < b.getDistance();
     });
 
-    if (closestSeparationIterator == trackClusterSeparations.end())
-      continue;
-
+    // We found the closest track, let's set the cluster properties accordingly
     const auto& closestSeparation = *closestSeparationIterator;
     klmCluster.setClusterTrackSeparation(closestSeparation.getDistance() / CLHEP::cm);
     klmCluster.setClusterTrackSeparationAngle(closestSeparation.getTrackClusterSeparationAngle());

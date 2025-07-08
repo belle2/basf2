@@ -31,7 +31,7 @@ from prompt.calibrations.example_simple import settings as example_simple
 #: Tells the automated system some details of this script. The input_data_filters is only used for automated calibration (optional).
 settings = CalibrationSettings(name="Example Complex",
                                expert_username="ddossett",
-                               subsystem="subsystem",
+                               subsystem="example",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["physics", "cosmics", "Bcosmics"],

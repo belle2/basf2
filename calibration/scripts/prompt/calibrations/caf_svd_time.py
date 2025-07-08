@@ -48,7 +48,8 @@ settings = CalibrationSettings(name="caf_svd_time",
                                depends_on=[cdc_tracking_calibration],  # SVD time depends on CDC tracking calibration
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
-                                   "listOfMutedCalibrations": ["rawTimeCalibration", "timeShiftCalibration", "timeValidation",],  #
+                                   # AbsoluteTimeShiftCalibration
+                                   "listOfMutedCalibrations": ["rawTimeCalibration", "timeShiftCalibration", "timeValidation",],
                                    "max_events_per_run":  10000,
                                    "max_events_per_file": 5000,
                                    "isMC": False,
@@ -604,7 +605,7 @@ def get_calibrations(input_data, **kwargs):
     for algorithm in absolute_shift_calibration.algorithms:
         algorithm.params = {"apply_iov": output_iov}
 
-    if "AbsolutetimeShiftCalibration" not in listOfMutedCalibrations:
+    if "AbsoluteTimeShiftCalibration" not in listOfMutedCalibrations:
         list_of_calibrations.append(absolute_shift_calibration)
 
     #########################################################
@@ -729,6 +730,20 @@ def get_calibrations(input_data, **kwargs):
         list_of_calibrations.append(val_calibration)
 
     for item in range(len(list_of_calibrations) - 1):
-        list_of_calibrations[item + 1].depends_on(list_of_calibrations[item])
+        # Absolute time shift calibration does not depend on any other calibration
+        if "AbsoluteTimeShiftCalibration" in list_of_calibrations[item].name():
+            if len(list_of_calibrations) > 1:
+                print(" WARNING : AbsoluteTimeShiftCalibration should not depend on any other calibration.")
+                print("Not setting dependencies to or from other calibrations.")
+            continue
+        #  and make sure no other calibration depends on it
+        elif "AbsoluteTimeShiftCalibration" in list_of_calibrations[item + 1].name():
+            # if item + 1 is not the last calibration in the list
+            if item + 1 < len(list_of_calibrations) - 1:
+                #  set the dependency to the next one
+                list_of_calibrations[item + 2].depends_on(list_of_calibrations[item])
+            #  no else because in this case it's the last calibration in the list
+        else:
+            list_of_calibrations[item + 1].depends_on(list_of_calibrations[item])
 
     return list_of_calibrations

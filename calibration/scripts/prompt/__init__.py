@@ -116,8 +116,9 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
     #  They are here for completeness.
     allowed_data_formats = frozenset({"raw", "cdst", "mdst", "udst"})
 
-    def __new__(cls, name, expert_username, description,
-                input_data_formats=None, input_data_names=None, input_data_filters=None, depends_on=None, expert_config=None):
+    def __new__(cls, name, expert_username, subsystem, description,
+                input_data_formats=None, input_data_names=None, input_data_filters=None,
+                depends_on=None, expert_config=None, produced_payloads=None):
         """
         The special method to create the tuple instance. Returning the instance
         calls the __init__ method
@@ -168,8 +169,9 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
         else:
             depends_on = []
 
-        return super().__new__(cls, name, expert_username, description,
-                               input_data_formats, input_data_names, input_data_filters, depends_on, expert_config)
+        return super().__new__(cls, name, expert_username, subsystem, description,
+                               input_data_formats, input_data_names, input_data_filters,
+                               depends_on, expert_config, produced_payloads)
 
     def json_dumps(self):
         """
@@ -179,24 +181,28 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
         depends_on_names = [calibration_settings.name for calibration_settings in self.depends_on]
         return json.dumps({"name": self.name,
                            "expert_username": self.expert_username,
+                           "subsystem": self.subsystem,
                            "input_data_formats": list(self.input_data_formats),
                            "input_data_names": list(self.input_data_names),
                            "input_data_filters": self.input_data_filters,
                            "depends_on": list(depends_on_names),
                            "description": self.description,
-                           "expert_config": self.expert_config
+                           "expert_config": self.expert_config,
+                           "produced_payloads": self.produced_payloads
                            })
 
     def __str__(self):
         depends_on_names = [calibration_settings.name for calibration_settings in self.depends_on]
         output_str = str(self.__class__.__name__) + f"(name='{self.name}'):\n"
         output_str += f"  expert_username='{self.expert_username}'\n"
+        output_str += f"  subsystem='{self.subsystem}'\n"
         output_str += f"  input_data_formats={list(self.input_data_formats)}\n"
         output_str += f"  input_data_names={list(self.input_data_names)}\n"
         output_str += f"  input_data_filters={list(self.input_data_filters)}\n"
         output_str += f"  depends_on={list(depends_on_names)}\n"
         output_str += f"  description='{self.description}'\n"
-        output_str += f"  expert_config={self.expert_config}"
+        output_str += f"  expert_config={self.expert_config}\n"
+        output_str += f"  produced_payloads={self.produced_payloads}"
         return output_str
 
 

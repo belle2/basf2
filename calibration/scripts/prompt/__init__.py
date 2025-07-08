@@ -73,7 +73,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
             calibration jobs.
 
         subsystem (str): The name of the subsystem that this calibration is for.
-        e.g. "cdc", "ecl", "klm", "svd", "top", "beam", etc.
+            e.g. "cdc", "ecl", "klm", "svd", "top", "beam", etc.
 
         description (str): Long form description of the calibration and what it does. Feel free to make this as long as you need.
 

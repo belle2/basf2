@@ -114,7 +114,7 @@ def compose_axis_label(quantity_name, unit=None):
     return axis_label
 
 
-def find_object_recursive(tfile, name):
+def find_object_recursive(tFileOrTDirectory, name):
     """
     Recursively search for an object in a ROOT file by name.
 
@@ -122,26 +122,26 @@ def find_object_recursive(tfile, name):
     - Then searches subdirectories recursively.
     - Includes fallback using gDirectory in case ROOT key table is incomplete.
 
-        @param tfile (ROOT.TDirectory or ROOT.TFile): The file or directory to search in.
+        @param tFileOrTDirectory (ROOT.TDirectory or ROOT.TFile): The file or directory to search in.
         @param name (str): The name of the object to find.
 
         @return ROOT object or None if not found.
     """
 
     # Try top-level first
-    obj = tfile.Get(name)
+    obj = tFileOrTDirectory.Get(name)
     if obj:
         return obj
     # Fallback: sometimes objects are accessible only via gDirectory (rare ROOT quirk)
-    # ROOT.gDirectory.cd(tfile.GetPath())
+    # ROOT.gDirectory.cd(tFileOrTDirectory.GetPath())
     # obj = ROOT.gROOT.FindObject(name)
     # if obj:
     #    return obj
 
     # If not found, check each key and recurse into subdirectories
-    for key in tfile.GetListOfKeys():
+    for key in tFileOrTDirectory.GetListOfKeys():
         if key.GetClassName() == 'TDirectoryFile':
-            subdir = tfile.Get(key.GetName())
+            subdir = tFileOrTDirectory.Get(key.GetName())
             obj = find_object_recursive(subdir, name)
             if obj:
                 return obj

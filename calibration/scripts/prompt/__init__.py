@@ -148,6 +148,12 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
         else:
             input_data_filters = {}
 
+        # Check that the subsystem is among the allowed ones
+        allowed_subsystems = {"pxd", "svd", "cdc", "ecl", "top", "arich",
+                              "klm", "trigger", "tracking", "alignment", "beam", "example"}
+        if subsystem not in allowed_subsystems:
+            raise ValueError(f"subsystem must be one of {allowed_subsystems}, but got '{subsystem}'")
+
         if expert_config:
             # Check that it's a dictionary and not some other valid JSON object
             if not isinstance(expert_config, dict):

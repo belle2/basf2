@@ -16,7 +16,8 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 # ..Tell the automated script some required details
 settings = CalibrationSettings(
     name="ecl_WaveformTemplateShapeCalibration",
-    expert_username="longos",
+    expert_username="savino.longo",
+    subsystem="ecl",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["gamma_gamma_calib"],
@@ -30,7 +31,8 @@ settings = CalibrationSettings(
     expert_config={
         "C2_MinEnergyThreshold": 2.0,
         "nFilesCollector": 50
-    })
+    },
+    produced_payloads=["ECLWaveformTemplate"])
 
 
 # --------------------------------------------------------------

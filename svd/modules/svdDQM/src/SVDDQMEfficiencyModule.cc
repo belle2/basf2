@@ -62,7 +62,7 @@ SVDDQMEfficiencyModule::SVDDQMEfficiencyModule() : HistoModule(), m_geoCache(VXD
   addParam("maxHalfResidU", m_maxResidU, "half window for cluster search around intercept, U direction.", float(0.05));
   addParam("maxHalfResidV", m_maxResidV, "half window for cluster search around intercept, V direction.", float(0.05));
   addParam("useParamFromDB", m_useParamFromDB, "use SVDDQMPlotsConfiguration from DB", bool(true));
-  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If True, skip events rejected by HLT.", bool(true));
+  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If True, skip events rejected by HLT.", bool(false));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
 }
 

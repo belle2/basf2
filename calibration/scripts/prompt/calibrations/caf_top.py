@@ -27,7 +27,8 @@ from prompt.utils import filter_by_max_files_per_run
 #: Required variable - tells the automated system some details of this script
 settings = CalibrationSettings(
     name="TOP post-tracking calibration",
-    expert_username="skohani",
+    expert_username="kohani",
+    subsystem="top",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["mumu_tight_or_highm_calib"],
@@ -41,7 +42,8 @@ settings = CalibrationSettings(
         "max_files_per_run": 20,
         "payload_boundaries": None,
         "request_memory": "8 GB"
-    })
+    },
+    produced_payloads=["TOPCalModuleT0", "TOPCalCommonT0", "TOPCalEventT0Offset"])
 
 
 # Required function

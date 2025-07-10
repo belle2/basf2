@@ -87,8 +87,8 @@ void SVDUnpackerDQMModule::defineHisto()
 
   m_DQMUnpackerHisto = new TH2F("DQMUnpackerHisto", "SVD Data Format Monitor", nBins, 1, nBins + 1, 52, 1, 53);
   m_DQMErrorEventsHisto = new TH1F("DQMErrorEventsHisto", "SVD Error Event Counter", 2, 0, 2);
-  m_DQMSeuRecoveryEventsHisto = new TH1F("DQMSeuRecoveryEventsHisto", "SVD Events with SEU Recoveries Counter", 2, 0, 2);
-  m_DQMSeuEventsHisto = new TH1F("DQMSeuEventsHisto", "SVD Events with SEU Counter", 2, 0, 2);
+  m_DQMSeuRecoveryEventsHisto = new TH1F("DQMSeuRecoveryEventsHisto", "SVD Empty Data Events (SEURecovery) counter", 2, 0, 2);
+  m_DQMSeuEventsHisto = new TH1F("DQMSeuEventsHisto", "SVD SEU Detected Events Counter", 2, 0, 2);
   m_DQMSeuRecoveryFADCsEventHisto = new TH1F("DQMSeuRecoveryFADCsEventHisto", "Number of FADCs with SEU Recoveries per Event", 52, 1,
                                              53);
   m_DQMnSamplesHisto = new TH2F("DQMnSamplesHisto", "nAPVsamples VS DAQMode", 3, 1, 4, 2, 1, 3);
@@ -425,13 +425,14 @@ void SVDUnpackerDQMModule::event()
   }
 
   if (m_DQMSeuRecoveryEventsHisto != nullptr) {
-    TString histoSEURecoTitle = TString::Format("SVD SEU recovery events,  Exp %d Run %d", m_expNumber, m_runNumber);
+    TString histoSEURecoTitle = TString::Format("SVD Empty Data Events (SEURecovery),  Exp %d Run %d", m_expNumber, m_runNumber);
     m_DQMSeuRecoveryEventsHisto->SetTitle(histoSEURecoTitle.Data());
     m_DQMSeuRecoveryEventsHisto->Fill(m_seuRecoEvent);
   }
 
   if (m_DQMSeuEventsHisto != nullptr) {
-    TString histoSEUTitle = TString::Format("SVD SEU events,  Exp %d Run %d", m_expNumber, m_runNumber);
+    TString histoSEUTitle = TString::Format("SVD SEU Detected Events (errAPV or errDET or errSYNC),  Exp %d Run %d", m_expNumber,
+                                            m_runNumber);
     m_DQMSeuEventsHisto->SetTitle(histoSEUTitle.Data());
     m_DQMSeuEventsHisto->Fill(m_seuEvent);
   }

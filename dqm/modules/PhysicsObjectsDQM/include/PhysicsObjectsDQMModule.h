@@ -123,7 +123,7 @@ namespace Belle2 {
     TH1F* m_h_nKshortAllH = nullptr; /** Histogram for Ks events */
     TH1F* m_h_nKshortActiveH = nullptr; /** Histogram for Ks events : active veto */
     TH1F* m_h_nKshortActiveNotTimeH = nullptr; /** Histogram for Ks events : && active veto && !timing cut */
-    /*TH1F* m_h_nKshortActiveNotCDCECLH = nullptr;*/ /* Histogram for Ks events : && active veto && !cdcecl cut */
+    TH1F* m_h_nKshortActiveNotCDCECLH = nullptr; /* Histogram for Ks events : && active veto && !cdcecl cut */
 
   };
 

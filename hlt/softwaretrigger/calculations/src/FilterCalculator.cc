@@ -81,6 +81,10 @@ void FilterCalculator::requireStoreArrays()
   m_eclClusters.isRequired();
   m_l1Trigger.isOptional();
   m_bitsNN.isOptional();
+  m_trgSummary.isOptional();
+  m_TTDInfo.isOptional();
+  m_cdcHits.isOptional();
+  m_eclDigits.isOptional();
 }
 
 void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
@@ -184,7 +188,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
 
   //..Filters lines for HLTprefilter decision
   calculationResult["HLTprefilter_InjectionStrip"] = 0; /**< Events in the injection strip */
-  /**calculationResult["HLTprefilter_CDCECLthreshold"] = 0;*/ /**< Events in the injection strip */
+  calculationResult["HLTprefilter_CDCECLthreshold"] = 0; /**< Events with high CDC-ECL occupancy */
 
   // Passed on L1 information
   if (m_l1Trigger.isValid()) {
@@ -1050,13 +1054,42 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
 
   }
 
-  // Filter lines for HLTprefilter
-  if (injection_strip) {
-    calculationResult["HLTprefilter_InjectionStrip"] = 1;
+  // HLT prefilter stuff
+  //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
+  int index = 0; //events accepted in the passive veto window but not in the active
+  try {
+    if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1; //events in active veto
+  } catch (const std::exception&) {
   }
 
-//  if (cdcecl_threshold) {
-//    calculationResult["HLTprefilter_CDCECLthreshold"] = 1;
-//  }
+  // Check if event is in active veto
+  if (index == 1) {
+
+    // Check if event is in injection strip
+    if (m_TTDInfo.isValid()) {
+      double c_revolutionTime = m_bunchStructure->getRFBucketsPerRevolution() / (m_clockSettings->getAcceleratorRF() * 1e3);
+      double c_globalClock = m_clockSettings->getGlobalClockFrequency() * 1e3;
+
+      double timeSinceLastInj = m_TTDInfo->getTimeSinceLastInjection() / c_globalClock;
+      double timeInBeamCycle = timeSinceLastInj - (int)(timeSinceLastInj / c_revolutionTime) * c_revolutionTime;
+
+      bool timing_window = (5000 < timeSinceLastInj && timeSinceLastInj < 20000 && 1.25 < timeInBeamCycle && timeInBeamCycle < 1.55)
+                           || (600 < timeSinceLastInj && timeSinceLastInj < 20000 && 2.2 < timeInBeamCycle && timeInBeamCycle < 2.33);
+
+      if (timing_window) {
+        calculationResult["HLTprefilter_InjectionStrip"] = 1;
+      }
+    }
+
+    // Check if event has high CDC-ECL occupancy
+    const uint32_t NcdcHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
+    const uint32_t NeclDigits = m_eclDigits.isOptional() ? m_eclDigits.getEntries() : 0;
+    bool cdcecl_cut = NcdcHits > 2500 && NeclDigits > 3000;
+
+    if (cdcecl_cut) {
+      calculationResult["HLTprefilter_CDCECLthreshold"] = 1;
+    }
+  }
+
 
 }

@@ -14,6 +14,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <mdst/dataobjects/TRGSummary.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <vector>
 #include <string>
 
@@ -85,6 +86,12 @@ namespace Belle2 {
 
       /// Processing time distribution of events not passing passive injection veto
       TH1F* m_processingTimeNotPassiveVeto;
+
+      /// Processing time distribution of events not passing passive injection veto and retained after HLTprefilter timing cuts
+      TH1F* m_processingTimeNotPassiveVetoTimingCut;
+
+      /// Processing time distribution of events not passing passive injection veto and retained after HLTprefilter CDC-ECL cuts
+      TH1F* m_processingTimeNotPassiveVetoCdcEclCut;
 
       /// Processing time vs nSVDShaperDigits distribution of events passing passive injection veto
       TH2F* m_procTimeVsnSVDShaperDigitsPassiveVeto;
@@ -169,6 +176,9 @@ namespace Belle2 {
 
       /// Number of bins for the histograms of nECLDigits
       const double m_nECLDigitsNBins = 100;
+
+      /// TRG result
+      StoreObjPtr<SoftwareTriggerResult> m_triggerResult;
 
       /// TRG Summary
       StoreObjPtr<TRGSummary> m_trgSummary;

@@ -18,7 +18,7 @@
 using namespace Belle2;
 
 MVAExpert::MVAExpert(const std::string& identifier,
-                     std::vector<Named<float*>> namedVariables)
+                     std::vector<TrackingUtilities::Named<float*>> namedVariables)
   : m_allNamedVariables(std::move(namedVariables))
   , m_identifier(identifier)
 {
@@ -53,7 +53,7 @@ void MVAExpert::beginRun()
 
         auto itNamedVariable = std::find_if(m_allNamedVariables.begin(),
                                             m_allNamedVariables.end(),
-        [expectedName](const Named<Float_t*>& namedVariable) {
+        [expectedName](const TrackingUtilities::Named<Float_t*>& namedVariable) {
           return namedVariable.getName() == expectedName;
         });
 

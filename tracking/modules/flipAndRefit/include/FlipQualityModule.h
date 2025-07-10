@@ -55,7 +55,7 @@ namespace Belle2 {
 
     std::unique_ptr<FlipRecoTrackExtractor> m_recoTrackExtractor; /**< the dataExtractor for the 1st MVA */
     std::unique_ptr<FlipRecoTrackExtractor2nd> m_recoTrackExtractor2nd; /**< the dataExtractor for the 2nd MVA */
-    std::vector<Named<float*>>  m_variableSet; /**< the variable set for the MVA */
+    std::vector<TrackingUtilities::Named<float*>>  m_variableSet; /**< the variable set for the MVA */
 
     std::string m_recoTracksStoreArrayName = "RecoTracks"; /**< the recoTracks StoreArray Name*/
     StoreArray<RecoTrack> m_recoTracks; /**< Store Array of the recoTracks*/

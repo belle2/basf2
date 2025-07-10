@@ -78,6 +78,6 @@ namespace Belle2 {
     std::unique_ptr<HitInfoExtractor> m_hitInfoExtractor;
 
     /// set of named variables to be used in MVA
-    std::vector<Named<float*>>  m_variableSet;
+    std::vector<TrackingUtilities::Named<float*>>  m_variableSet;
   };
 }

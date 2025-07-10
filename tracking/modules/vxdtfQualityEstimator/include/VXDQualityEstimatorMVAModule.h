@@ -87,7 +87,7 @@ namespace Belle2 {
     std::unique_ptr<ClusterInfoExtractor> m_clusterInfoExtractor;
 
     /** set of named variables to be used in MVA */
-    std::vector<Named<float*>>  m_variableSet;
+    std::vector<TrackingUtilities::Named<float*>>  m_variableSet;
 
     /** number of SpacePoints in SPTC as additional info for MVA,
      * type is float to be consistent with m_variableSet (and MVA implementation) */

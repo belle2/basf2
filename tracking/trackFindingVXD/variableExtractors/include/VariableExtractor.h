@@ -9,7 +9,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <tracking/trackFindingVXD/utilities/Named.h>
+#include <tracking/trackingUtilities/utilities/Named.h>
 #include <unordered_map>
 
 
@@ -20,7 +20,7 @@ namespace Belle2 {
 
   protected:
     /// add a variable to the variable set
-    void addVariable(const std::string& identifier, std::vector<Named<float*>>& variables)
+    void addVariable(const std::string& identifier, std::vector<TrackingUtilities::Named<float*>>& variables)
     {
       //todo: verify if it is faster to check explicitly or not
       auto value = m_variables.emplace(identifier, NAN).first;

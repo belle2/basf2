@@ -23,7 +23,7 @@ namespace Belle2 {
   public:
 
     /// Define names of variables that get extracted
-    explicit FlipRecoTrackExtractor2nd(std::vector<Named<float*>>& variableSet, const std::string& prefix = ""):
+    explicit FlipRecoTrackExtractor2nd(std::vector<TrackingUtilities::Named<float*>>& variableSet, const std::string& prefix = ""):
       VariableExtractor(), m_prefix(prefix)
     {
       addVariable(prefix + "flipped_pz_estimate", variableSet);

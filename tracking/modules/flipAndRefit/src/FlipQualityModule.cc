@@ -43,7 +43,7 @@ namespace Belle2 {
       B2FATAL("no input value extractor!");
     }
     // The supported methods have to be initialized once (calling it more than once is save)
-    m_mvaExpert = std::make_unique<MVAExpert>(m_identifier, m_variableSet);
+    m_mvaExpert = std::make_unique<TrackingUtilities::MVAExpert>(m_identifier, m_variableSet);
     m_mvaExpert->initialize();
   }
 

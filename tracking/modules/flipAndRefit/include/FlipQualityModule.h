@@ -7,7 +7,7 @@
  **************************************************************************/
 
 #pragma once
-#include <tracking/trackFindingVXD/mva/MVAExpert.h>
+#include <tracking/trackingUtilities/mva/MVAExpert.h>
 
 #include <framework/core/Module.h>
 #include <tracking/modules/flipAndRefit/utilities/FlipRecoTrackExtractor.h>
@@ -51,7 +51,7 @@ namespace Belle2 {
 
     std::string m_identifier; /**< database identifier or filename of the weightfile */
     int m_flipMVAIndex = 1;  /**< index of the QI (must be 1 or 2)  */
-    std::unique_ptr<MVAExpert> m_mvaExpert; /**< Pointer to the current MVA Expert  */
+    std::unique_ptr<TrackingUtilities::MVAExpert> m_mvaExpert; /**< Pointer to the current MVA Expert  */
 
     std::unique_ptr<FlipRecoTrackExtractor> m_recoTrackExtractor; /**< the dataExtractor for the 1st MVA */
     std::unique_ptr<FlipRecoTrackExtractor2nd> m_recoTrackExtractor2nd; /**< the dataExtractor for the 2nd MVA */

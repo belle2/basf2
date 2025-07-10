@@ -9,7 +9,7 @@
 #pragma once
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
-#include <tracking/trackFindingVXD/mva/MVAExpert.h>
+#include <tracking/trackingUtilities/mva/MVAExpert.h>
 #include <tracking/trackFindingVXD/variableExtractors/ClusterInfoExtractor.h>
 #include <tracking/trackFindingVXD/variableExtractors/QEResultsExtractor.h>
 
@@ -77,7 +77,7 @@ namespace Belle2 {
     std::unique_ptr<QualityEstimatorBase> m_estimator;
 
     /** pointer to the object to interact with the MVA package */
-    std::unique_ptr<MVAExpert> m_mvaExpert;
+    std::unique_ptr<TrackingUtilities::MVAExpert> m_mvaExpert;
 
     /** pointer to object that extracts the results from the estimation method
     * (including QI, chi2, p_t and p_mag) */

@@ -62,7 +62,7 @@ void VXDQualityEstimatorMVAModule::initialize()
     m_clusterInfoExtractor = std::make_unique<ClusterInfoExtractor>(m_variableSet, m_UseTimingInfo);
   }
 
-  m_mvaExpert = std::make_unique<MVAExpert>(m_weightFileIdentifier, m_variableSet);
+  m_mvaExpert = std::make_unique<TrackingUtilities::MVAExpert>(m_weightFileIdentifier, m_variableSet);
   m_mvaExpert->initialize();
 
   // create pointer to chosen estimator

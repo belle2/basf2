@@ -7,7 +7,7 @@
  **************************************************************************/
 
 #pragma once
-#include <tracking/trackFindingVXD/mva/MVAExpert.h>
+#include <tracking/trackingUtilities/mva/MVAExpert.h>
 
 #include <tracking/trackFitting/trackQualityEstimator/variableExtractors/EventInfoExtractor.h>
 #include <tracking/trackFitting/trackQualityEstimator/variableExtractors/RecoTrackExtractor.h>
@@ -66,7 +66,7 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_recoTracks;
 
     /// pointer to the object to interact with the MVA package
-    std::unique_ptr<MVAExpert> m_mvaExpert;
+    std::unique_ptr<TrackingUtilities::MVAExpert> m_mvaExpert;
 
     /// pointer to object that extracts info from the whole event
     std::unique_ptr<EventInfoExtractor> m_eventInfoExtractor;

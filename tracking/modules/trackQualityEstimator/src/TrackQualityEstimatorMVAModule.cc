@@ -71,7 +71,7 @@ void TrackQualityEstimatorMVAModule::initialize()
   m_subRecoTrackExtractor = std::make_unique<SubRecoTrackExtractor>(m_variableSet);
   m_hitInfoExtractor = std::make_unique<HitInfoExtractor>(m_variableSet);
 
-  m_mvaExpert = std::make_unique<MVAExpert>(m_weightFileIdentifier, m_variableSet);
+  m_mvaExpert = std::make_unique<TrackingUtilities::MVAExpert>(m_weightFileIdentifier, m_variableSet);
   m_mvaExpert->initialize();
 }
 

@@ -7,10 +7,13 @@
  **************************************************************************/
 
 #pragma once
+
+#include <tracking/trackingUtilities/utilities/Named.h>
+
 #include <vector>
 #include <string>
-#include <tracking/trackingUtilities/utilities/Named.h>
 #include <unordered_map>
+#include <cmath>
 
 
 namespace Belle2 {

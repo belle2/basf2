@@ -55,6 +55,9 @@ PhysicsObjectsDQMModule::PhysicsObjectsDQMModule() : HistoModule()
   addParam("TriggerIdentifierHadronb2", m_triggerIdentifierHadronb2,
            "Trigger identifier string used to select events for the hadronb2 histograms",
            std::string("software_trigger_cut&skim&accept_hadronb2"));
+  addParam("TriggerIdentifierHLT", m_triggerIdentifierHLT,
+           "Trigger identifier string used to select events for the HLTprefilter histograms",
+           std::string("software_trigger_cut&filter&total_result"));
   addParam("PI0PListName", m_pi0PListName, "Name of the pi0 particle list", std::string("pi0:physDQM"));
   addParam("KS0PListName", m_ks0PListName, "Name of the KS0 particle list", std::string("K_S0:physDQM"));
   addParam("UpsPListName", m_upsPListName, "Name of the Ups particle list", std::string("Upsilon:physDQM"));
@@ -96,7 +99,7 @@ void PhysicsObjectsDQMModule::defineHisto()
   m_h_nKshortAllH = new TH1F("hist_nKshortAllH", "hist_nKshortAllH", 50, 0.45, 0.55);
   m_h_nKshortActiveH = new TH1F("hist_nKshortActiveH", "hist_nKshortActiveH", 50, 0.45, 0.55);
   m_h_nKshortActiveNotTimeH = new TH1F("hist_nKshortActiveNotTimeH", "hist_nKshortActiveNotTimeH", 50, 0.45, 0.55);
-  //m_h_nKshortActiveNotCDCECLH = new TH1F("hist_nKshortActiveNotCDCECLH", "hist_nKshortActiveNotCDCECLH", 50, 0.45, 0.55);
+  m_h_nKshortActiveNotCDCECLH = new TH1F("hist_nKshortActiveNotCDCECLH", "hist_nKshortActiveNotCDCECLH", 50, 0.45, 0.55);
 
   oldDir->cd();
 }
@@ -121,7 +124,7 @@ void PhysicsObjectsDQMModule::beginRun()
   m_h_nKshortAllH->Reset();
   m_h_nKshortActiveH->Reset();
   m_h_nKshortActiveNotTimeH->Reset();
-  //m_h_nKshortActiveNotCDCECLH->Reset();
+  m_h_nKshortActiveNotCDCECLH->Reset();
 }
 
 
@@ -151,7 +154,7 @@ void PhysicsObjectsDQMModule::event()
     //Cannot find the m_triggerIdentifierHLT
     B2WARNING("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifierHLT);
   } else {
-    const bool HLT_accept = (result->getResult("software_trigger_cut&filter&total_result") == SoftwareTriggerCutResult::c_accept);
+    const bool HLT_accept = (result->getResult(m_triggerIdentifierHLT) == SoftwareTriggerCutResult::c_accept);
     if (HLT_accept != false) {
 
       //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
@@ -162,16 +165,16 @@ void PhysicsObjectsDQMModule::event()
       }
 
       std::string HLTprefilter_Injection_Strip = "software_trigger_cut&filter&HLTprefilter_InjectionStrip";
-      //std::string HLTprefilter_CDCECL_Cut = "software_trigger_cut&filter&HLTprefilter_CDCECLthreshold";
+      std::string HLTprefilter_CDCECL_Cut = "software_trigger_cut&filter&HLTprefilter_CDCECLthreshold";
       bool injStrip = false;
-      //bool cdceclcut = false;
+      bool cdceclcut = false;
 
       if (results.find(HLTprefilter_Injection_Strip) != results.end()) {
-        injStrip = (result->getResult(HLTprefilter_Injection_Strip) == SoftwareTriggerCutResult::c_accept);
+        injStrip = (result->getNonPrescaledResult(HLTprefilter_Injection_Strip) == SoftwareTriggerCutResult::c_accept);
       }
-//      if (results.find(HLTprefilter_CDCECL_Cut) != results.end()) {
-//        cdceclcut = (result->getResult(HLTprefilter_CDCECL_Cut) == SoftwareTriggerCutResult::c_accept);
-//      }
+      if (results.find(HLTprefilter_CDCECL_Cut) != results.end()) {
+        cdceclcut = (result->getResult(HLTprefilter_CDCECL_Cut) == SoftwareTriggerCutResult::c_accept);
+      }
 
       // Iterate over Ks particle list //
       StoreObjPtr<ParticleList> ks0Particles(m_ks0PListName);
@@ -186,10 +189,10 @@ void PhysicsObjectsDQMModule::event()
             m_h_nKshortAllH->Fill(ks_merged_mass);                   // Fill all Ks events
             if (index == 1) {
               m_h_nKshortActiveH->Fill(ks_merged_mass);              // Fill Ks events from active veto
-              if (injStrip != true)
-                m_h_nKshortActiveNotTimeH->Fill(ks_merged_mass);     // Fill Ks events retained after timing cut of HLTprefilter
-//              if (cdceclcut != true)
-//                m_h_nKshortActiveNotCDCECLH->Fill(ks_merged_mass);   // Fill Ks events retained after CDC-ECL cut of HLTprefilter
+              if (!injStrip)
+                m_h_nKshortActiveNotTimeH->Fill(ks_merged_mass);       // Fill Ks events retained after timing cut of HLTprefilter
+              if (!cdceclcut)
+                m_h_nKshortActiveNotCDCECLH->Fill(ks_merged_mass);   // Fill Ks events retained after CDC-ECL cut of HLTprefilter
             }
           }
         }

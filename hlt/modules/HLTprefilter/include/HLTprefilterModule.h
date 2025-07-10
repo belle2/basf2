@@ -9,7 +9,6 @@
 #pragma once
 
 /* Basf2 headers. */
-#include <hlt/dbobjects/HLTprefilterParameters.h>
 #include <framework/dbobjects/BunchStructure.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 #include <framework/core/Module.h>
@@ -18,7 +17,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 /* C++ headers. */
 #include <cstdint>
 
@@ -26,7 +25,7 @@ namespace Belle2 {
   /**
    * Prefilter module to suppress the injection background
    */
-  class HLTprefilterModule : public Module {
+  class HLTprefilterModule final : public Module {
 
   public:
 
@@ -44,27 +43,14 @@ namespace Belle2 {
 
     /**
      * Flag each event.
-     * True if event exceeds `nCDCHitsMax or nECLDigitsMax`.
-     * In that case, the event should be skipped for reco.
+     * True if event is inside injection background.
+     * In that case, the event should be skipped from HLT processing.
      */
     void event() final;
 
   private:
     /// Event Meta Data Store ObjPtr
     StoreObjPtr<EventMetaData> m_eventInfo;
-
-    /// Store array for injection time info.
-    StoreObjPtr<EventLevelTriggerTimeInfo> m_TTDInfo;
-
-    /// Define global constants for timing variables
-    /// Define object for BunchStructure class
-    Belle2::BunchStructure bunchStructure;
-    /// Define object for HardwareClockSettings class
-    Belle2::HardwareClockSettings clockSettings;
-    /// Define the c_revolutionTime
-    double m_revolutionTime = bunchStructure.getRFBucketsPerRevolution() / (clockSettings.getAcceleratorRF() * 1e3);
-    /// Define the c_globalClock
-    double m_globalClock = clockSettings.getGlobalClockFrequency() * 1e3;
 
     /// Define thresholds for variables. By default, no events are skipped based upon these requirements. (Set everything to zero by default)
     /// Minimum threshold of timeSinceLastInjection for LER injection
@@ -86,6 +72,15 @@ namespace Belle2 {
 
     /// Trigger summary
     StoreObjPtr<TRGSummary> m_trgSummary;
+
+    /// Store array object for injection time info.
+    StoreArray<RawFTSW> m_rawTTD;
+
+    /// Define object for BunchStructure class
+    DBObjPtr<BunchStructure> m_bunchStructure; /**< bunch structure (fill pattern) */
+    /// Define object for HardwareClockSettings class
+    DBObjPtr<HardwareClockSettings> m_clockSettings; /**< hardware clock settings */
+
 
     /// HLTprefilter result with timing cuts
     bool injection_strip;

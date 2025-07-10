@@ -9,11 +9,17 @@
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
-#include <hlt/modules/HLTprefilter/HLTprefilterModule.h>
+#include <framework/dbobjects/BunchStructure.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TRGSummary.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <ecl/dataobjects/ECLDigit.h>
 #include <trg/cdc/Unpacker.h>
 #include <framework/gearbox/Unit.h>
 
@@ -78,8 +84,20 @@ namespace Belle2::SoftwareTrigger {
     /// minimum d0 for well understood magnetic field, if z0 is large (cm)
     double m_goodMagneticRegionD0 = 26.5;
 
-    /// Objects relevant to HLT prefilter monitoring
-    bool injection_strip;
-    //bool cdcecl_threshold;
+    /// Store array for injection time info.
+    StoreObjPtr<EventLevelTriggerTimeInfo> m_TTDInfo;
+    /// Define object for BunchStructure class
+    DBObjPtr<BunchStructure> m_bunchStructure; /**< bunch structure (fill pattern) */
+    /// Define object for HardwareClockSettings class
+    DBObjPtr<HardwareClockSettings> m_clockSettings; /**< hardware clock settings */
+    /// Trigger summary
+    StoreObjPtr<TRGSummary> m_trgSummary;
+
+    /// CDChits StoreArray
+    StoreArray<CDCHit> m_cdcHits;
+
+    /// ECLDigits StoreArray
+    StoreArray<ECLDigit> m_eclDigits;
+
   };
 }

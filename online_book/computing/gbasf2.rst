@@ -11,7 +11,7 @@ Gbasf2
     **Prerequisites**:
 
     * See `Computing getting started <https://xwiki.desy.de/xwiki/rest/p/c804c>`_.
-    * Access to KEKCC or NAF (recommended), or to a system with CentOS 7 or EL9 and CVMFS mounted.
+    * Access to KEKCC or NAF (recommended), or to a system with EL9 and CVMFS mounted.
     * A valid `grid certificate <https://xwiki.desy.de/xwiki/rest/p/d9328>`_ installed in ``~/.globus`` and in a web browser.
     * A working `basf2` steering script (see the :ref:`onlinebook_first_steering_file` lesson)
 
@@ -57,7 +57,7 @@ The same `basf2` steering files are used when running on the grid. The usual wor
 Go to `computing getting started <https://xwiki.desy.de/xwiki/rest/p/c804c>`_
 and verify that you have the prerequisites. You need:
 
-* Access to KEKCC or NAF (recommended), or to a system with CentOS 7 and CVMFS mounted.
+* Access to KEKCC or NAF (recommended), or to a system with EL9 and CVMFS mounted.
 * A valid grid certificate issued within a year and `installed <https://xwiki.desy.de/xwiki/rest/p/c804c/#H2.Installyourcertificate>`_ in ``~/.globus`` in ``.pem`` format.
 * Belle Virtual Organization (VO) membership registered or renewed within a year. You can check your status at `VOMS server <https://voms.cc.kek.jp:8443/voms/belle/>`_.
 * Registration in `DIRAC <https://xwiki.desy.de/xwiki/rest/p/c804c/#H7.RegisterwithDIRAC>`_.
@@ -73,8 +73,7 @@ Setting up gbasf2 via cvmfs
 ---------------------------
 
 Since the DIRAC user interface relies on some middleware components, this limits the operating environments in which
-gbasf2 can function. At this moment, only CentOS 7 is supported (it works on other EL9-based operating systems like 
-AlmaLinux 9 but please be aware it is not fully validated).
+gbasf2 can function. At this moment, only EL9/Rocky9/AlmaLinux9 are guranteed support (CentOS 7 is now being phased out).
 
 Also, unfortunately at this moment the `basf2` and gbasf2 environments are not compatible. This means gbasf2 requires
 a fresh ssh session (without sourcing ``b2setup``).

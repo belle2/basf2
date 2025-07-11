@@ -58,10 +58,8 @@ Go to `computing getting started <https://xwiki.desy.de/xwiki/rest/p/c804c>`_
 and verify that you have the prerequisites. You need:
 
 * Access to KEKCC or NAF (recommended), or to a system with CentOS 7 and CVMFS mounted.
-* A valid grid certificate issued within a year and `installed <https://xwiki.desy.de/xwiki/rest/p/c804c/#H2.Installyourcertificate>`_ 
-in ``~/.globus`` in ``.pem`` format.
-* Belle Virtual Organization (VO) membership registered or renewed within a year. You can check your status at
-  `VOMS server <https://voms.cc.kek.jp:8443/voms/belle/>`_.
+* A valid grid certificate issued within a year and `installed <https://xwiki.desy.de/xwiki/rest/p/c804c/#H2.Installyourcertificate>`_ in ``~/.globus`` in ``.pem`` format.
+* Belle Virtual Organization (VO) membership registered or renewed within a year. You can check your status at `VOMS server <https://voms.cc.kek.jp:8443/voms/belle/>`_.
 * Registration in `DIRAC <https://xwiki.desy.de/xwiki/rest/p/c804c/#H7.RegisterwithDIRAC>`_.
 
 .. note::
@@ -704,7 +702,7 @@ Sometimes, things do not go well. A few jobs can fail because a large list of re
 * A job took too long at a site 
 * etc.
 
-For beginners, consider the the following: 
+For users, consider the the following set of conditions: 
 
 .. code-block:: python
 

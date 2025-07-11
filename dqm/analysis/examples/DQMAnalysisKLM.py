@@ -19,7 +19,7 @@ for tag in useful_tags:
 # Create main path.
 main = basf2.create_path()
 
-# random run with reasonable statistics
+# random run with reasonable statistics (check rundb.belle2.org)
 exp_num = 35
 run_num = 2291
 exp = "0"*(4-len(str(exp_num)))+str(exp_num)
@@ -39,7 +39,7 @@ main.add_module('DQMHistAnalysisInputRootFile',
 main.add_module("DQMHistAutoCanvas",
                 IncludeFolders=["KLM", "KLMEfficiencyDQM"])
 
-# used by DQMHistAnalysisKLM2 for plotting eff. ratios
+# used by DQMHistAnalysisKLM2 for calculating eff. ratios
 reference = basf2.register_module('DQMHistReference')
 reference.param('ReferenceFile', 'refHisto.root')  # also obtained from dqm.belle2.org
 main.add_module(reference)

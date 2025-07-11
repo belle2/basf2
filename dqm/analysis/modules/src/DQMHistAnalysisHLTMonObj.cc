@@ -304,12 +304,12 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   double nKs_all = 0;
   double nKs_active = 0;
   double nKs_activeNotTime = 0;
-  //double nKs_activeNotCDCECL = 0;
+  double nKs_activeNotCDCECL = 0;
 
   auto m_hKshortAllH = findHist("PhysicsObjects/hist_nKshortAllH");
   auto m_hKshortActiveH = findHist("PhysicsObjects/hist_nKshortActiveH");
   auto m_hKshortActiveNotTimeH = findHist("PhysicsObjects/hist_nKshortActiveNotTimeH");
-  //auto m_hKshortActiveNotCDCECLH = findHist("PhysicsObjects/hist_nKshortActiveNotCDCECLH");
+  auto m_hKshortActiveNotCDCECLH = findHist("PhysicsObjects/hist_nKshortActiveNotCDCECLH");
 
   if (m_hKshortAllH) {
     RooDataHist* KsHist_all = new RooDataHist("KsHist_all", "Histogram data", RooArgList(*mass), m_hKshortAllH);
@@ -335,18 +335,17 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
     delete KsHist_activeNotTime;
   }
   m_monObj->setVariable("nKs_activeVetoPrefilterTime_hlt", nKs_activeNotTime);
-  /*
-    if (m_hKshortActiveNotCDCECLH) {
 
-      RooDataHist* KsHist_activeNotCDCECL = new RooDataHist("KsHist_activeNotCDCECL", "Histogram data", RooArgList(*mass),
-                                                            m_hKshortActiveNotCDCECLH);
-      depdf.fitTo(*KsHist_activeNotCDCECL, RooFit::Minos(true));
-      nKs_activeNotCDCECL = sig.getValV();
-      delete KsHist_activeNotCDCECL;
-    }
+  if (m_hKshortActiveNotCDCECLH) {
+    RooDataHist* KsHist_activeNotCDCECL = new RooDataHist("KsHist_activeNotCDCECL", "Histogram data", RooArgList(*mass),
+                                                          m_hKshortActiveNotCDCECLH);
+    depdf.fitTo(*KsHist_activeNotCDCECL, RooFit::Minos(true));
+    nKs_activeNotCDCECL = sig.getValV();
+    delete KsHist_activeNotCDCECL;
+  }
 
-    m_monObj->setVariable("nKs_activeVetoPrefilterCDCECL_hlt", nKs_activeNotCDCECL);
-  */
+  m_monObj->setVariable("nKs_activeVetoPrefilterCDCECL_hlt", nKs_activeNotCDCECL);
+
   delete mass;
 
 

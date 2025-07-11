@@ -18,7 +18,10 @@ REG_MODULE(HLTprefilter);
 HLTprefilterModule::HLTprefilterModule() : Module()
 {
   // Set module properties
-  setDescription(R"DOC(Prefilter module to suppress the injection background)DOC");
+  setDescription(R"DOC(
+This module filters the injection background based on predefined selections.
+* This is meant to be registered in the path *after* the unpacking, but *before* HLT processing.
+)DOC");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 }
@@ -30,10 +33,30 @@ void HLTprefilterModule::initialize()
   m_eventInfo.isRequired();
   m_trgSummary.isOptional();
   m_rawTTD.isOptional();
+  m_cdcHits.isOptional();
+  m_eclDigits.isOptional();
 }
 
 void HLTprefilterModule::beginRun()
 {
+/*	
+  if (!m_hltPrefilterParameters.isValid())
+    B2FATAL("HLTprefilter parameters are not available.");
+  m_LERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMin();
+  m_LERtimeSinceLastInjectionMax = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMax();
+  m_HERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getHERtimeSinceLastInjectionMin();
+  m_HERtimeSinceLastInjectionMax = m_hltPrefilterParameters->getHERtimeSinceLastInjectionMax();
+  m_LERtimeInBeamCycleMin = m_hltPrefilterParameters->getLERtimeInBeamCycleMin();
+  m_LERtimeInBeamCycleMax = m_hltPrefilterParameters->getLERtimeInBeamCycleMax();
+  m_HERtimeInBeamCycleMin = m_hltPrefilterParameters->getHERtimeInBeamCycleMin();
+  m_HERtimeInBeamCycleMax = m_hltPrefilterParameters->getHERtimeInBeamCycleMax();
+
+  m_cdcHitsMax = m_hltPrefilterParameters->getCDCHitsMax();
+  m_eclDigitsMax = m_hltPrefilterParameters->getECLDigitsMax();
+
+  m_HLTprefilterMode = m_hltPrefilterParameters->getHLTprefilterMode();
+
+*/
 }
 
 void HLTprefilterModule::event()
@@ -47,6 +70,7 @@ void HLTprefilterModule::event()
   }
 
   injection_strip = false;
+  cdcecl_threshold = false;
 
   // Tag events from active window
   if (index == 1) {
@@ -70,16 +94,34 @@ void HLTprefilterModule::event()
         injection_strip = true;
 
     }
+  
+    const uint32_t NcdcHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
+    const uint32_t NeclDigits = m_eclDigits.isOptional() ? m_eclDigits.getEntries() : 0;
+    if (NcdcHits > m_cdcHitsMax && NeclDigits > m_eclDigitsMax)
+      cdcecl_threshold = true;
+
   }
 
   if (injection_strip) {
-    B2ERROR("Skip event --> Removing injection strips as prefilter" <<
+    B2ERROR("Skip event --> HLTprefilter tagged this event to be from injection strips" <<
             LogVar("event", m_eventInfo->getEvent()) <<
             LogVar("run", m_eventInfo->getRun()) <<
             LogVar("exp", m_eventInfo->getExperiment()));
   }
 
-  setReturnValue(injection_strip);
+  if (cdcecl_threshold) {
+    B2ERROR("Skip event --> HLTprefilter tagged this event with high CDC-ECL occupancy" <<
+            LogVar("event", m_eventInfo->getEvent()) <<
+            LogVar("run", m_eventInfo->getRun()) <<
+            LogVar("exp", m_eventInfo->getExperiment()));
+  }
+
+  if (m_HLTprefilterMode == 0)
+    setReturnValue(injection_strip);
+  else
+    setReturnValue(cdcecl_threshold);
+
+
 
 }
 

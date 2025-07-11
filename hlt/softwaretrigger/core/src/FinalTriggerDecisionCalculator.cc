@@ -86,11 +86,6 @@ SoftwareTriggerCutResult FinalTriggerDecisionCalculator::getModuleResult(const S
       continue;
     }
 
-    // Skip HLT prefilter lines from contributing to the decision
-    if (isHLTPrefilterLine(cutName)) {
-      continue;
-    }
-
     const SoftwareTriggerCutResult cutResult = static_cast<SoftwareTriggerCutResult>(resultWithName.second);
 
     if (cutResult == SoftwareTriggerCutResult::c_accept) {
@@ -113,11 +108,5 @@ SoftwareTriggerCutResult FinalTriggerDecisionCalculator::getModuleResult(const S
       return SoftwareTriggerCutResult::c_reject;
     }
   }
-}
-
-
-bool SoftwareTrigger::FinalTriggerDecisionCalculator::isHLTPrefilterLine(const std::string& cutName)
-{
-  return cutName.find("HLTprefilter") != std::string::npos;
 }
 

@@ -14,7 +14,7 @@ env['LIBS'] = [
     'analysis',
     'trg_cdc_dataobjects',
     'rawdata_dataobjects',
-    'ecl_dataobjects' 
+    'ecl_dataobjects'
 ]   
 
 Return('env')

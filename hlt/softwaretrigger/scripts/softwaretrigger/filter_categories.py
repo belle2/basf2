@@ -132,8 +132,8 @@ OBSOLETE = [
 
 # HLTprefilter lines
 HLT_PREFILTER = [
-    "filter HLTprefilter InjectionStrip"
-    # "filter HLTprefilter CDCECLthreshold"
+    "filter HLTprefilter InjectionStrip",
+    "filter HLTprefilter CDCECLthreshold"
         ]
 
 

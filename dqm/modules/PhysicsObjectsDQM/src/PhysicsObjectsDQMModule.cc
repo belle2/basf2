@@ -173,7 +173,7 @@ void PhysicsObjectsDQMModule::event()
         injStrip = (result->getNonPrescaledResult(HLTprefilter_Injection_Strip) == SoftwareTriggerCutResult::c_accept);
       }
       if (results.find(HLTprefilter_CDCECL_Cut) != results.end()) {
-        cdceclcut = (result->getResult(HLTprefilter_CDCECL_Cut) == SoftwareTriggerCutResult::c_accept);
+        cdceclcut = (result->getNonPrescaledResult(HLTprefilter_CDCECL_Cut) == SoftwareTriggerCutResult::c_accept);
       }
 
       // Iterate over Ks particle list //

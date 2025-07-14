@@ -95,18 +95,12 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             'kaonID',
             'pionID',
             'protonID',
-            # 'deuteronID',
             'nCDCHits/56',
             'nPXDHits/2',
             'nSVDHits/8',
             'dz',
             'dr',
             'chiProb',
-            # 'BtagToWBosonVariables(EW90)',
-            # 'BtagToWBosonVariables(recoilMassSqrd)/15',
-            # 'BtagToWBosonVariables(pMissCMS)',
-            # 'BtagToWBosonVariables(cosThetaMissCMS)',
-            # 'cosTPTO('+maskName+')',
             'clusterEoP',
             'clusterLAT']
 
@@ -117,11 +111,10 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             'clusterE1E9',
             'clusterE9E21',
             'clusterLAT']
-        # 'clusterTiming']
 
         roe_variable_list = [
-            'nCleanedECLClusters(isInRestOfEvent == 1)/8',
-            'nCleanedTracks(isInRestOfEvent == 1)/6',
+            'countInList(gamma:tflat)/8',
+            'countInList(pi+:tflat)/6',
             'NumberOfKShortsInRoe',
             'ptTracksRoe('+maskName+')',
         ]

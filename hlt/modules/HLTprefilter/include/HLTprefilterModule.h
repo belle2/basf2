@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 /* HLT headers. */
-//#include <hlt/dbobjects/HLTprefilterParameters.h>
+#include <hlt/dbobjects/HLTprefilterParameters.h>
 
 /* Basf2 headers. */
 #include <framework/dbobjects/BunchStructure.h>
@@ -106,7 +106,7 @@ namespace Belle2 {
     uint32_t m_HLTprefilterMode = 0; /** == 0 for timing cuts, == 1 for CDC-ECL cut */
 
     /// HLTprefilterParameters Database OjbPtr
-    /*DBObjPtr<HLTprefilterParameters> m_hltPrefilterParameters;*/ /**< HLT prefilter parameters */
+    DBObjPtr<HLTprefilterParameters> m_hltPrefilterParameters; /**< HLT prefilter parameters */
 
 
   };

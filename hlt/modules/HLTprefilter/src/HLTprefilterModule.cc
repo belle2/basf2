@@ -32,7 +32,7 @@ void HLTprefilterModule::initialize()
 {
   m_eventInfo.isRequired();
   m_trgSummary.isOptional();
-  m_rawTTD.isOptional();
+  m_TTDInfo.isOptional();
   m_cdcHits.isOptional();
   m_eclDigits.isOptional();
 }
@@ -75,14 +75,12 @@ void HLTprefilterModule::event()
   // Tag events from active window
   if (index == 1) {
 
-    if (m_rawTTD.getEntries() != 0) {
+    if (m_TTDInfo.isValid()) {
 
-      RawFTSW* theTTD = m_rawTTD[0];
       double c_revolutionTime = m_bunchStructure->getRFBucketsPerRevolution() / (m_clockSettings->getAcceleratorRF() * 1e3);
       double c_globalClock = m_clockSettings->getGlobalClockFrequency() * 1e3;
 
-
-      double timeSinceLastInj = theTTD->GetTimeSinceLastInjection(0) / c_globalClock;
+      double timeSinceLastInj = m_TTDInfo->getTimeSinceLastInjection() / c_globalClock;
       double timeInBeamCycle = timeSinceLastInj - (int)(timeSinceLastInj / c_revolutionTime) * c_revolutionTime;
 
       bool LER_strip = (m_LERtimeSinceLastInjectionMin < timeSinceLastInj && timeSinceLastInj < m_LERtimeSinceLastInjectionMax

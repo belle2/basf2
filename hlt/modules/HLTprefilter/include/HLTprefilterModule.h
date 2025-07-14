@@ -18,7 +18,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
-#include <rawdata/dataobjects/RawFTSW.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 /* C++ headers. */
@@ -59,7 +59,7 @@ namespace Belle2 {
     StoreObjPtr<TRGSummary> m_trgSummary;
 
     /// Store array object for injection time info.
-    StoreArray<RawFTSW> m_rawTTD;
+    StoreObjPtr<EventLevelTriggerTimeInfo> m_TTDInfo;
 
     /// Define object for BunchStructure class
     DBObjPtr<BunchStructure> m_bunchStructure; /**< bunch structure (fill pattern) */

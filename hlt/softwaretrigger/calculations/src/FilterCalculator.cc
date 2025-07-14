@@ -1084,7 +1084,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     // Check if event has high CDC-ECL occupancy
     const uint32_t NcdcHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
     const uint32_t NeclDigits = m_eclDigits.isOptional() ? m_eclDigits.getEntries() : 0;
-    bool cdcecl_cut = NcdcHits > 2500;// && NeclDigits > 3000;
+    bool cdcecl_cut = NcdcHits > 2500 && NeclDigits > 3000;
 
     if (cdcecl_cut) {
       calculationResult["HLTprefilter_CDCECLthreshold"] = 1;

@@ -344,7 +344,7 @@ void TrgEclCluster::setBarrelICN(int Method)
             indexNeighboringTC[6] = maxTCid +   1 - 81;
             indexNeighboringTC[7] = maxTCid -  11 - 81;
           }
-          // check out of boudary(0-431) of TCFire array
+          // check out of boundary(0-431) of TCFire array
           for (int jjj = 0; jjj < 8; jjj++) {
             if (indexNeighboringTC[jjj] <=  -1 ||
                 indexNeighboringTC[jjj] >= (int) TCFire.size()) {
@@ -363,7 +363,7 @@ void TrgEclCluster::setBarrelICN(int Method)
             indexNeighboringTC[6] = -1;
             indexNeighboringTC[7] = -1;
           }
-          // set TC hit flag for 8 TCs surrouding maxTC
+          // set TC hit flag for 8 TCs surrounding maxTC
           for (int jjj = 0; jjj < 8; jjj++) {
             if (indexNeighboringTC[jjj] >= 0) {
               m_TempCluster[jjj + 1] = TCFire.at(indexNeighboringTC[jjj]);

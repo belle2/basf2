@@ -8,17 +8,9 @@
 import basf2
 from softwaretrigger import constants
 from softwaretrigger.processing import setup_basf2_and_db, start_zmq_path, finalize_zmq_path, add_expressreco_processing
-from sys import argv
 
 
-args_list = [
-    "--input", argv[1],
-    "--output", argv[2],
-    "--dqm", argv[3],
-    "--udp-hostname", argv[4],
-    "--udp-port", argv[5],
-]
-args = setup_basf2_and_db(zmq=True, args_list=args_list)
+args = setup_basf2_and_db(zmq=True)
 
 path, reco_path = start_zmq_path(args, location=constants.Location.expressreco)
 add_expressreco_processing(reco_path, run_type=constants.RunTypes.beam)

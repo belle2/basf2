@@ -21,7 +21,7 @@ from geometry import check_components
 from rawdata import add_unpackers
 
 
-def setup_basf2_and_db(zmq=False, args_list=None):
+def setup_basf2_and_db(zmq=False):
     """
     Setup local database usage for HLT
     """
@@ -65,7 +65,7 @@ def setup_basf2_and_db(zmq=False, args_list=None):
     parser.add_argument('--udp-port', type=int,
                         help="set port number for UDP logging connection", default=None)
 
-    args = parser.parse_args(args=args_list)
+    args = parser.parse_args()
 
     # Local DB specification
     basf2.conditions.override_globaltags()

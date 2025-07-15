@@ -10,17 +10,9 @@ from softwaretrigger import constants
 from softwaretrigger.processing import finalize_zmq_path, setup_basf2_and_db, start_zmq_path
 from pxd import add_pxd_percentframe
 from tracking import add_roi_payload_assembler
-from sys import argv
 
 
-args_list = [
-    "--input", argv[1],
-    "--output", argv[2],
-    "--dqm", argv[3],
-    "--udp-hostname", argv[4],
-    "--udp-port", argv[5],
-]
-args = setup_basf2_and_db(zmq=True, args_list=args_list)
+args = setup_basf2_and_db(zmq=True)
 
 path, reco_path = start_zmq_path(args, location=constants.Location.hlt)
 add_pxd_percentframe(reco_path, fraction=0.1, random_position=True)

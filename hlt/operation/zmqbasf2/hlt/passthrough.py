@@ -12,11 +12,12 @@ from pxd import add_pxd_percentframe
 from tracking import add_roi_payload_assembler
 
 
-args = setup_basf2_and_db(zmq=True)
+args = setup_basf2_and_db(event_distribution_mode=constants.EventDistributionModes.zmqbasf2)
 
-path, reco_path = start_zmq_path(args, location=constants.Location.hlt)
-add_pxd_percentframe(reco_path, fraction=0.1, random_position=True)
-add_roi_payload_assembler(reco_path, ignore_hlt_decision=True)
+path, reco_path = start_zmq_path(args, location=constants.Location.hlt,
+                                 event_distribution_mode=constants.EventDistributionModes.zmqbasf2)
+add_pxd_percentframe(path, fraction=0.1, random_position=True)
+add_roi_payload_assembler(path, ignore_hlt_decision=True)
 finalize_zmq_path(path, args, location=constants.Location.hlt)
 
 basf2.print_path(path)

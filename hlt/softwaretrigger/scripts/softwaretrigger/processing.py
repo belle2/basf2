@@ -28,10 +28,6 @@ def setup_basf2_and_db(event_distribution_mode=constants.EventDistributionModes.
     parser = argparse.ArgumentParser(description='basf2 for online')
 
     if event_distribution_mode == constants.EventDistributionModes.ringbuffer:
-        parser.add_argument("--input", required=True, type=str, help="ZMQ Address of the distributor process")
-        parser.add_argument("--output", required=True, type=str, help="ZMQ Address of the collector process")
-        parser.add_argument("--dqm", required=True, type=str, help="ZMQ Address of the histoserver process")
-    else:
         parser.add_argument('input_buffer_name', type=str,
                             help='Input Ring Buffer names')
         parser.add_argument('output_buffer_name', type=str,
@@ -50,6 +46,10 @@ def setup_basf2_and_db(event_distribution_mode=constants.EventDistributionModes.
         parser.add_argument('--no-output',
                             help="Don't write any output files",
                             action="store_true", default=False)
+    else:
+        parser.add_argument("--input", required=True, type=str, help="ZMQ Address of the distributor process")
+        parser.add_argument("--output", required=True, type=str, help="ZMQ Address of the collector process")
+        parser.add_argument("--dqm", required=True, type=str, help="ZMQ Address of the histoserver process")
 
     parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count() - 5,
                         help='Number of parallel processes to use')

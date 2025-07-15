@@ -33,6 +33,7 @@
 #define TRGECLCLUSTER_SHORT_NAMES
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
 
 #include <trg/ecl/TrgEclCluster.h>
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
@@ -304,72 +305,70 @@ void TrgEclCluster::setBarrelICN(int Method)
               maxTCid = m_TempCluster[iTC];
             }
           }
+          // maxTCid is in barral
+          if (maxTCid <  81 ||
+              maxTCid > 512) {
+            B2ERROR("maxTCID is out of barrel region : maxTCID = " << maxTCid);
+          }
+
           m_TempCluster[0] = maxTCid;
 
+          // 8 TCs surrounding maxTC
+          int indexNeighboringTC[8] = {0};
+          // set neighboring TC ID of maxTC by taking boundary condtion into account
           if (maxTCid < 93) {
-
-            m_TempCluster[1] = TCFire[maxTCid + 420 - 81 ] ;
-            m_TempCluster[2] = TCFire[maxTCid + 419 - 81 ] ;
-            m_TempCluster[3] = TCFire[maxTCid - 1 - 81 ] ;
-            m_TempCluster[4] = TCFire[maxTCid + 11 - 81 ] ;
-            m_TempCluster[5] = TCFire[maxTCid + 12 - 81 ] ;
-            m_TempCluster[6] = TCFire[maxTCid + 13 - 81 ] ;
-            m_TempCluster[7] = TCFire[maxTCid + 1 - 81 ] ;
-            m_TempCluster[8] = TCFire[maxTCid + 421 - 81 ] ;
-
-            if ((maxTCid - 81) % 12 == 0) {
-              m_TempCluster[2] = 0 ;
-              m_TempCluster[3] = 0 ;
-              m_TempCluster[4] = 0 ;
-            }
-            if ((maxTCid - 81) % 12 == 11) {
-              m_TempCluster[6] = 0 ;
-              m_TempCluster[7] = 0 ;
-              m_TempCluster[8] = 0 ;
+            indexNeighboringTC[0] = maxTCid + 420 - 81;
+            indexNeighboringTC[1] = maxTCid + 419 - 81;
+            indexNeighboringTC[2] = maxTCid -   1 - 81;
+            indexNeighboringTC[3] = maxTCid +  11 - 81;
+            indexNeighboringTC[4] = maxTCid +  12 - 81;
+            indexNeighboringTC[5] = maxTCid +  13 - 81;
+            indexNeighboringTC[6] = maxTCid +   1 - 81;
+            indexNeighboringTC[7] = maxTCid + 421 - 81;
+          } else if (maxTCid < 501) {
+            indexNeighboringTC[0] = maxTCid -  12 - 81;
+            indexNeighboringTC[1] = maxTCid -  13 - 81;
+            indexNeighboringTC[2] = maxTCid -   1 - 81;
+            indexNeighboringTC[3] = maxTCid +  11 - 81;
+            indexNeighboringTC[4] = maxTCid +  12 - 81;
+            indexNeighboringTC[5] = maxTCid +  13 - 81;
+            indexNeighboringTC[6] = maxTCid +   1 - 81;
+            indexNeighboringTC[7] = maxTCid -  11 - 81;
+          } else {
+            indexNeighboringTC[0] = maxTCid -  12 - 81;
+            indexNeighboringTC[1] = maxTCid -  13 - 81;
+            indexNeighboringTC[2] = maxTCid -   1 - 81;
+            indexNeighboringTC[3] = maxTCid - 421 - 81;
+            indexNeighboringTC[4] = maxTCid - 420 - 81;
+            indexNeighboringTC[5] = maxTCid - 419 - 81;
+            indexNeighboringTC[6] = maxTCid +   1 - 81;
+            indexNeighboringTC[7] = maxTCid -  11 - 81;
+          }
+          // check out of boudary(0-431) of TCFire array
+          for (int jjj = 0; jjj < 8; jjj++) {
+            if (indexNeighboringTC[jjj] <=  -1 ||
+                indexNeighboringTC[jjj] >= (int) TCFire.size()) {
+              indexNeighboringTC[jjj] = -1;
             }
           }
-          if (maxTCid > 92 && maxTCid < 501) {
-
-            m_TempCluster[1] = TCFire[maxTCid - 12 - 81] ;
-            // cppcheck-suppress negativeContainerIndex
-            m_TempCluster[2] = TCFire[maxTCid - 13 - 81] ;
-            m_TempCluster[3] = TCFire[maxTCid - 1 - 81] ;
-            m_TempCluster[4] = TCFire[maxTCid + 11 - 81] ;
-            m_TempCluster[5] = TCFire[maxTCid + 12 - 81] ;
-            m_TempCluster[6] = TCFire[maxTCid + 13 - 81] ;
-            m_TempCluster[7] = TCFire[maxTCid + 1 - 81] ;
-            m_TempCluster[8] = TCFire[maxTCid - 11 - 81] ;
-
-            if ((maxTCid - 81) % 12 == 0) {
-              m_TempCluster[2] = 0;
-              m_TempCluster[3] = 0;
-              m_TempCluster[4] = 0;
-            }
-            if ((maxTCid - 81) % 12 == 11) {
-              m_TempCluster[6] = 0;
-              m_TempCluster[7] = 0;
-              m_TempCluster[8] = 0;
-            }
+          // check forward and backward side boundary in barrel
+          if ((maxTCid - 81) % 12 == 0) {
+            // forward side in barral
+            indexNeighboringTC[1] = -1;
+            indexNeighboringTC[2] = -1;
+            indexNeighboringTC[3] = -1;
+          } else if ((maxTCid - 81) % 12 == 11) {
+            // backward side in barral
+            indexNeighboringTC[5] = -1;
+            indexNeighboringTC[6] = -1;
+            indexNeighboringTC[7] = -1;
           }
-          if (maxTCid > 500) {
-            m_TempCluster[1] = TCFire[maxTCid - 12 - 81] ;
-            m_TempCluster[2] = TCFire[maxTCid - 13 - 81] ;
-            m_TempCluster[3] = TCFire[maxTCid - 1 - 81] ;
-            // cppcheck-suppress negativeContainerIndex
-            m_TempCluster[4] = TCFire[maxTCid - 421 - 81] ;
-            m_TempCluster[5] = TCFire[maxTCid - 420 - 81] ;
-            m_TempCluster[6] = TCFire[maxTCid - 419 - 81] ;
-            m_TempCluster[7] = TCFire[maxTCid + 1 - 81] ;
-            m_TempCluster[8] = TCFire[maxTCid - 11 - 81] ;
-            if ((maxTCid - 81) % 12 == 0) {
-              m_TempCluster[2] = 0 ;
-              m_TempCluster[3] = 0 ;
-              m_TempCluster[4] = 0 ;
-            }
-            if ((maxTCid - 81) % 12 == 11) {
-              m_TempCluster[6] = 0 ;
-              m_TempCluster[7] = 0 ;
-              m_TempCluster[8] = 0 ;
+          // set TC hit flag for 8 TCs surrouding maxTC
+          for (int jjj = 0; jjj < 8; jjj++) {
+            if (indexNeighboringTC[jjj] >= 0) {
+              m_TempCluster[jjj + 1] = TCFire.at(indexNeighboringTC[jjj]);
+            } else {
+              m_TempCluster[jjj + 1] = 0;
             }
           }
         }

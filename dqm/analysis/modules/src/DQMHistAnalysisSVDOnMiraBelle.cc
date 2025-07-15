@@ -13,6 +13,9 @@
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoTools.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+
 
 #include <dqm/analysis/modules/DQMHistAnalysisSVDOnMiraBelle.h>
 
@@ -76,6 +79,14 @@ void DQMHistAnalysisSVDOnMiraBelleModule::initialize()
     m_SVDModules.push_back(aVxdID); // reorder, sort would be better
   }
   std::sort(m_SVDModules.begin(), m_SVDModules.end());  // back to natural order
+
+  if (!m_svdPlotsConfig.isValid())
+    B2FATAL("no valid configuration found for SVD reconstruction");
+  else {
+    B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
+    //read back from payload
+    m_listOfSensorsToMonitor = m_svdPlotsConfig->getListOfSensors();
+  }
 
   B2DEBUG(20, "DQMHistAnalysisSVDOnMiraBelle: initialized.");
 }
@@ -531,11 +542,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   }
 
   // Cluster on track peculiar sensors
-  std::vector<string> clstrkSensorLabel = {"3.1.1", "3.1.2", "3.2.1", "3.2.2", "4.1.1", "4.3.3",  "4.6.1",  "4.6.2",  "4.10.2", "5.1.3", "5.1.4", "5.8.1",
-                                           "5.8.2", "5.9.2", "5.9.4", "6.4.3", "6.6.4", "6.10.1", "6.10.2", "6.10.3", "6.11.5", "6.12.4"
-                                          };
-
-  for (const auto& it : clstrkSensorLabel) {
+  for (const auto& it : m_listOfSensorsToMonitor) {
     string sensorDescr = it;
     replace(sensorDescr.begin(), sensorDescr.end(), '.', '_');
 

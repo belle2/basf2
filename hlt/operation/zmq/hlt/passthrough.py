@@ -15,9 +15,10 @@ from pxd import add_pxd_percentframe
 from tracking import add_roi_payload_assembler
 
 
-args = setup_basf2_and_db(zmq=True)
+args = setup_basf2_and_db(event_distribution_mode=constants.EventDistributionModes.zmq)
 
-path, reco_path = start_zmq_path(args, location=constants.Location.hlt)
+path, reco_path = start_zmq_path(args, location=constants.Location.hlt,
+                                 event_distribution_mode=constants.EventDistributionModes.zmq)
 add_pxd_percentframe(reco_path, fraction=0.1, random_position=True)
 add_roi_payload_assembler(reco_path, ignore_hlt_decision=True)
 finalize_zmq_path(path, args, location=constants.Location.hlt)

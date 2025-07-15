@@ -13,10 +13,11 @@ from softwaretrigger import constants
 from softwaretrigger.processing import setup_basf2_and_db, start_zmq_path, finalize_zmq_path, add_hlt_processing
 
 
-args = setup_basf2_and_db(zmq=True)
+args = setup_basf2_and_db(event_distribution_mode=constants.EventDistributionModes.zmq)
 
 path, reco_path = start_zmq_path(args, location=constants.Location.hlt)
-add_hlt_processing(path, run_type=constants.RunTypes.cosmic, do_reconstruction=False)
+add_hlt_processing(path, run_type=constants.RunTypes.cosmic, do_reconstruction=False,
+                   event_distribution_mode=constants.EventDistributionModes.zmq)
 finalize_zmq_path(path, args, location=constants.Location.hlt)
 
 basf2.print_path(path)

@@ -13,9 +13,10 @@ from softwaretrigger import constants
 from softwaretrigger.processing import finalize_zmq_path, setup_basf2_and_db, start_zmq_path
 
 
-args = setup_basf2_and_db(zmq=True)
+args = setup_basf2_and_db(event_distribution_mode=constants.EventDistributionModes.zmq)
 
-path, reco_path = start_zmq_path(args, location=constants.Location.expressreco)
+path, reco_path = start_zmq_path(args, location=constants.Location.expressreco,
+                                 event_distribution_mode=constants.EventDistributionModes.zmq)
 
 # Monitor/Debug modules
 reco_path.add_module('MonitorData')

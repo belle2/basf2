@@ -1055,6 +1055,21 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   }
 
   // HLT prefilter stuff
+  /*
+    if (!m_hltPrefilterParameters.isValid())
+      B2FATAL("HLTprefilter parameters are not available.");
+    m_LERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMin();
+    m_LERtimeSinceLastInjectionMax = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMax();
+    m_HERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getHERtimeSinceLastInjectionMin();
+    m_HERtimeSinceLastInjectionMax = m_hltPrefilterParameters->getHERtimeSinceLastInjectionMax();
+    m_LERtimeInBeamCycleMin = m_hltPrefilterParameters->getLERtimeInBeamCycleMin();
+    m_LERtimeInBeamCycleMax = m_hltPrefilterParameters->getLERtimeInBeamCycleMax();
+    m_HERtimeInBeamCycleMin = m_hltPrefilterParameters->getHERtimeInBeamCycleMin();
+    m_HERtimeInBeamCycleMax = m_hltPrefilterParameters->getHERtimeInBeamCycleMax();
+
+    m_cdcHitsMax = m_hltPrefilterParameters->getCDCHitsMax();
+    m_eclDigitsMax = m_hltPrefilterParameters->getECLDigitsMax();
+  */
   //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
   int index = 0; //events accepted in the passive veto window but not in the active
   try {
@@ -1073,8 +1088,13 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       double timeSinceLastInj = m_TTDInfo->getTimeSinceLastInjection() / c_globalClock;
       double timeInBeamCycle = timeSinceLastInj - (int)(timeSinceLastInj / c_revolutionTime) * c_revolutionTime;
 
-      bool timing_window = (5000 < timeSinceLastInj && timeSinceLastInj < 20000 && 1.25 < timeInBeamCycle && timeInBeamCycle < 1.55)
-                           || (600 < timeSinceLastInj && timeSinceLastInj < 20000 && 2.2 < timeInBeamCycle && timeInBeamCycle < 2.33);
+      bool LER_strip = (m_LERtimeSinceLastInjectionMin < timeSinceLastInj && timeSinceLastInj < m_LERtimeSinceLastInjectionMax
+                        && m_LERtimeInBeamCycleMin < timeInBeamCycle && timeInBeamCycle < m_LERtimeInBeamCycleMax);
+      bool HER_strip = (m_HERtimeSinceLastInjectionMin < timeSinceLastInj && timeSinceLastInj < m_HERtimeSinceLastInjectionMax
+                        && m_HERtimeInBeamCycleMin < timeInBeamCycle && timeInBeamCycle < m_HERtimeInBeamCycleMax);
+
+
+      bool timing_window = LER_strip || HER_strip;
 
       if (timing_window) {
         calculationResult["HLTprefilter_InjectionStrip"] = 1;
@@ -1084,7 +1104,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     // Check if event has high CDC-ECL occupancy
     const uint32_t NcdcHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
     const uint32_t NeclDigits = m_eclDigits.isOptional() ? m_eclDigits.getEntries() : 0;
-    bool cdcecl_cut = NcdcHits > 2500 && NeclDigits > 3000;
+    bool cdcecl_cut = NcdcHits > m_cdcHitsMax && NeclDigits > m_eclDigitsMax;
 
     if (cdcecl_cut) {
       calculationResult["HLTprefilter_CDCECLthreshold"] = 1;

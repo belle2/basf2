@@ -9,6 +9,7 @@
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
+//#include <hlt/dbobjects/HLTprefilterParameters.h>
 #include <framework/dbobjects/BunchStructure.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 #include <framework/database/DBObjPtr.h>
@@ -84,6 +85,7 @@ namespace Belle2::SoftwareTrigger {
     /// minimum d0 for well understood magnetic field, if z0 is large (cm)
     double m_goodMagneticRegionD0 = 26.5;
 
+    /// Objects relevant to HLTprefilter monitoring
     /// Store array for injection time info.
     StoreObjPtr<EventLevelTriggerTimeInfo> m_TTDInfo;
     /// Define object for BunchStructure class
@@ -98,6 +100,35 @@ namespace Belle2::SoftwareTrigger {
 
     /// ECLDigits StoreArray
     StoreArray<ECLDigit> m_eclDigits;
+
+    /// HLTprefilterParameters Database OjbPtr
+    /*DBObjPtr<HLTprefilterParameters> m_hltPrefilterParameters;*/ /**< HLT prefilter parameters */
+
+    /// Define thresholds for variables. By default, no events are skipped based upon these requirements. (Set everything to zero by default)
+    /// Minimum threshold of timeSinceLastInjection for LER injection
+    double m_LERtimeSinceLastInjectionMin = 0;
+    /// Maximum threshold of timeSinceLastInjection for LER injection
+    double m_LERtimeSinceLastInjectionMax = 0;
+    /// Minimum threshold of timeSinceLastInjection for HER injection
+    double m_HERtimeSinceLastInjectionMin = 0;
+    /// Maximum threshold of timeSinceLastInjection for HER injection
+    double m_HERtimeSinceLastInjectionMax = 0;
+    /// Minimum threshold of timeInBeamCycle for LER injection
+    double m_LERtimeInBeamCycleMin = 0;
+    /// Maximum threshold of timeInBeamCycle for LER injection
+    double m_LERtimeInBeamCycleMax = 0;
+    /// Minimum threshold of timeInBeamCycle for HER injection
+    double m_HERtimeInBeamCycleMin = 0;
+    /// Maximum threshold of timeInBeamCycle for HER injection
+    double m_HERtimeInBeamCycleMax = 0;
+
+    /// Define thresholds for variables. By default, no events are skipped based upon these requirements.
+    /// Maximum threshold for CDC Hits
+    double m_cdcHitsMax = 1e9;
+    /// Maximum threshold for ECL digits
+    double m_eclDigitsMax = 1e9;
+
+
 
   };
 }

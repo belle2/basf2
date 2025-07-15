@@ -68,21 +68,21 @@ namespace Belle2 {
 
     /// Define thresholds for variables. By default, no events are skipped based upon these requirements. (Set everything to zero by default)
     /// Minimum threshold of timeSinceLastInjection for LER injection
-    double m_LERtimeSinceLastInjectionMin = 5000;
+    double m_LERtimeSinceLastInjectionMin = 0;
     /// Maximum threshold of timeSinceLastInjection for LER injection
-    double m_LERtimeSinceLastInjectionMax = 20000;
+    double m_LERtimeSinceLastInjectionMax = 0;
     /// Minimum threshold of timeSinceLastInjection for HER injection
-    double m_HERtimeSinceLastInjectionMin = 600;
+    double m_HERtimeSinceLastInjectionMin = 0;
     /// Maximum threshold of timeSinceLastInjection for HER injection
-    double m_HERtimeSinceLastInjectionMax = 20000;
+    double m_HERtimeSinceLastInjectionMax = 0;
     /// Minimum threshold of timeInBeamCycle for LER injection
-    double m_LERtimeInBeamCycleMin = 1.25;
+    double m_LERtimeInBeamCycleMin = 0;
     /// Maximum threshold of timeInBeamCycle for LER injection
-    double m_LERtimeInBeamCycleMax = 1.55;
+    double m_LERtimeInBeamCycleMax = 0;
     /// Minimum threshold of timeInBeamCycle for HER injection
-    double m_HERtimeInBeamCycleMin = 2.2;
+    double m_HERtimeInBeamCycleMin = 0;
     /// Maximum threshold of timeInBeamCycle for HER injection
-    double m_HERtimeInBeamCycleMax = 2.33;
+    double m_HERtimeInBeamCycleMax = 0;
 
     /// HLTprefilter result with timing cuts
     bool injection_strip; /** < HLT prefilter decision for injection strip */
@@ -95,9 +95,9 @@ namespace Belle2 {
 
     /// Define thresholds for variables. By default, no events are skipped based upon these requirements.
     /// Maximum threshold for CDC Hits
-    double m_cdcHitsMax = 2500;
+    double m_cdcHitsMax = 1e9;
     /// Maximum threshold for ECL digits
-    double m_eclDigitsMax = 3000;
+    double m_eclDigitsMax = 1e9;
 
     /// HLTprefilter result with CDC-ECL cuts
     bool cdcecl_threshold; /** < HLT prefilter decision using CDC-ECL cuts */

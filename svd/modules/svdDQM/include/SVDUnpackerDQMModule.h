@@ -14,6 +14,7 @@
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <mdst/dataobjects/TRGSummary.h>
+#include <svd/dataobjects/SVDSummaryPlots.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
@@ -107,7 +108,7 @@ namespace Belle2 {
     bool m_seuRecoData = false; /**<special SEU recovery data*/
 
     unsigned short m_fadcNo = 0; /**<fadc number*/
-    //unsigned short apvNo;
+    unsigned short m_apvNo = 0; /**<apv number*/
 
     std::unordered_set<unsigned char>* m_FADCs; /**< FADC boards number*/
     std::unordered_set<unsigned char> m_seuFADCs; /**< FADC numbers affected by SEU*/
@@ -116,13 +117,13 @@ namespace Belle2 {
 
     //histograms
     TH2F* m_DQMUnpackerHisto = nullptr; /**< TH2F histogram with Unpacking errors*/
-    TH1F* m_DQMErrorEventsHisto = nullptr; /**< TH1F histogram showing the fraction of events affected by errors*/
-    TH1F* m_DQMSeuRecoveryEventsHisto = nullptr; /**< TH1F histogram showing the fraction of events with SEU recovery case*/
-    TH1F* m_DQMSeuEventsHisto = nullptr; /**< TH1F histogram showing the fraction of SEU events*/
+    TH1F* m_DQMErrorEventsHisto = nullptr; /**< TH1F histogram showing the events affected by errors*/
     TH1F* m_DQMSeuRecoveryFADCsEventHisto = nullptr; /**< TH1F histogram showing the number of FADC with SEU recoveries per event*/
     TH2F* m_DQMnSamplesHisto = nullptr; /**< TH2F histogram showing number of samples in data VS daqMode */
     TH2F* m_DQMnSamplesHisto2 = nullptr; /**< TH2F histogram showing number of samples in data VS daqMode (2bins only) */
     TH2F* m_DQMtrgQuality = nullptr; /**< TH2F histogram showing number of samples in data VS Trigger Quality */
+
+    SVDSummaryPlots* m_SEUonSensors = nullptr; /**< histogram showing SEU Reco events for given sensor */
 
   };
 

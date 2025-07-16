@@ -1016,6 +1016,10 @@ class DarkShower(BaseSkim):
 
 @fancy_skim_header
 class ALP2Gamma(BaseSkim):
+    """
+    **Physics channel**: :math:`B \\to a(\\to \\gamma \\gamma)`
+    """
+
     __authors__ = ["Hyuna Kim"]
     __contact__ = __liaison__
     __description__ = (

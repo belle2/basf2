@@ -10,7 +10,8 @@
 #include <tracking/trackFitting/measurementCreator/adder/MeasurementAdder.h>
 #include <framework/gearbox/Const.h>
 #include <framework/core/Environment.h>
-#include <tracking/dbobjects/DAFparameters.h>
+#include <tracking/dbobjects/DAFParameters.h>
+#include <tracking/dbobjects/DAFConfiguration.h>
 
 #include <TError.h>
 
@@ -113,6 +114,25 @@ namespace Belle2 {
    * -> Always refit (not only when using non default parameters or hit content has changed or track representation is new).
    *
    * If resortHits is True, the hits are resorted while fitting (e.g. using the track length) if the underlying fitter supports it.
+   *
+   *
+   * Non-default DAF parameters
+   * ------------------------
+   *
+   * The parameters of the DAF algorithm are taken from the DB, where default settings are provided.
+   * In some cases it is needed to use different parameters, such as for cosmics data or after the
+   * CDC-only track finding. The list of track fit options is defined in the enum DAFConfiguration::ETrackFitType,
+   * in order to use one of these options the constructor call becomes:
+   *
+   * TrackFitter trackFitter(DAFConfiguration::c_Cosmics);
+   * ... or ...
+   * TrackFitter trackFitter(DAFConfiguration::c_CDConly);
+   * ...
+   *
+   * and so on, according to the desired track fit option. Leaving the argument empty corresponds to:
+   *
+   * TrackFitter trackFitter(DAFConfiguration::c_Default);
+   *
    */
   class TrackFitter {
   public:
@@ -124,7 +144,8 @@ namespace Belle2 {
     static constexpr unsigned int s_defaultMaxFailedHits = 5;
 
     /// Create a new fitter instance.
-    TrackFitter(const std::string& storeArrayNameOfPXDHits = "",
+    TrackFitter(const DAFConfiguration::ETrackFitType trackFitType = DAFConfiguration::c_Default,
+                const std::string& storeArrayNameOfPXDHits = "",
                 const std::string& storeArrayNameOfSVDHits = "",
                 const std::string& storeArrayNameOfCDCHits = "",
                 const std::string& storeArrayNameOfBKLMHits = "",
@@ -138,7 +159,7 @@ namespace Belle2 {
         resetFitterToCosmicsSettings();
       } else {
         // Resetting with parameters for beam data
-        resetFitterToDBSettings();
+        resetFitterToDBSettings(trackFitType);
       }
     }
 
@@ -157,20 +178,21 @@ namespace Belle2 {
      * Use the DB settings of the fitter to fit the reco tracks.
      * This method is called on construction automatically
      * for non cosmics data (checked by using Environment object).
+     * @param trackFitType track fit type
      */
-    void resetFitterToDBSettings();
+    void resetFitterToDBSettings(const DAFConfiguration::ETrackFitType trackFitType = DAFConfiguration::c_Default);
 
     /**
     * Use the user settings of the fitter to fit the reco tracks.
-    * The parameters are passed as DAFparameters object.
+    * The parameters are passed as DAFParameters object.
     */
-    void resetFitterToUserSettings(DAFparameters* DAFparams);
+    void resetFitterToUserSettings(DAFParameters* DAFParams);
 
     /**
      * Use the settings of the fitter to fit the reco tracks for cosmics data.
      * This method is called on construction automatically
      * for cosmics data (checked by using Environment object).
-     * The cosmics parameters are the initial ones of the DAFparameters constructor.
+     * The cosmics parameters are the initial ones of the DAFParameters constructor.
      */
     void resetFitterToCosmicsSettings();
 
@@ -320,8 +342,8 @@ namespace Belle2 {
     /// Control the output level of the ROOT functions used by the GenFit fitter. Default is increased from kError to kFatal;
     Int_t m_gErrorIgnoreLevel = kFatal;
 
-    /// DAF parameters Database OjbPtr
-    DBObjPtr<DAFparameters> m_DAFparameters;
+    /// DAF configuration Database OjbPtr
+    DBObjPtr<DAFConfiguration> m_DAFConfiguration;
 
     /**
      * Helper function to do the fit.

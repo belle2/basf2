@@ -413,13 +413,16 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
     if (isMC) {
       alterClusterPosition();
       alterClusterTime();
-    } else {
+    }
+
+    //shift cluster time:
+    //1. by cluster size
+    //2. by absolute value
+    if (!m_returnRawClusterTime &&  m_shiftSVDClusterTime)
       if (m_svdClusterTimeShifter.isValid() &&
-          !m_returnRawClusterTime &&
-          m_shiftSVDClusterTime) {
+          m_svdAbsTimeShift.isValid()) {
         shiftSVDClusterTime();
       }
-    }
   }
 }
 
@@ -568,13 +571,19 @@ void SVDClusterizerModule::shiftSVDClusterTime()
   TString algo = m_timeRecoWith6SamplesAlgorithm;
   if (m_numberOfAcquiredSamples == 3) algo = m_timeRecoWith3SamplesAlgorithm;
 
+  //cluster-size dependent shift
   clsTime -= m_svdClusterTimeShifter->getClusterTimeShift(algo,
                                                           m_storeClusters[clsIndex]->getSensorID().getLayerNumber(),
                                                           m_storeClusters[clsIndex]->getSensorID().getSensorNumber(),
                                                           m_storeClusters[clsIndex]->isUCluster(),
                                                           m_storeClusters[clsIndex]->getSize());
+  //absolute shift
+  clsTime -= m_svdAbsTimeShift->getAbsTimeShift(algo,
+                                                m_storeClusters[clsIndex]->getSensorID().getLayerNumber(),
+                                                m_storeClusters[clsIndex]->isUCluster());
 
   m_storeClusters[clsIndex]->setClsTime(clsTime);
+
 }
 
 void SVDClusterizerModule::endRun()

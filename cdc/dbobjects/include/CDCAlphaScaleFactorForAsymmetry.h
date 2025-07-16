@@ -23,7 +23,7 @@ namespace Belle2 {
     /**
      * Constants
      */
-    enum {c_nLayers       = 56,  /**< no. of layers */
+    enum {c_nLayers    = 56,  /**< no. of layers */
           c_nAlphaBins = 150, /**< no. of alpha angle bins per layer*/
          };
 
@@ -38,7 +38,7 @@ namespace Belle2 {
      * Set the factors in the list
      * @param inputScales factors
      */
-    void setFactors(const std::array<std::array<float, c_nAlphaBins>, c_nLayers>& inputScales)
+    void setScaleFactors(const std::array<std::array<float, c_nAlphaBins>, c_nLayers>& inputScales)
     {
       m_Scales = inputScales;
     }
@@ -54,7 +54,7 @@ namespace Belle2 {
     /**
      * Get the whole list
      */
-    std::array<std::array<float, c_nAlphaBins>, c_nLayers> getFactors() const
+    std::array<std::array<float, c_nAlphaBins>, c_nLayers> getScaleFactors() const
     {
       return m_Scales;
     }
@@ -62,14 +62,30 @@ namespace Belle2 {
     /**
      * Get the factors for the iCLayer
      * @param  iCLayer layerID
-     * @return fudge factors for the iCLayer
+     * @return scale factors for the iCLayer
      */
-    std::array<float, c_nAlphaBins> getFactors(unsigned short iCLayer) const
+    std::array<float, c_nAlphaBins> getScaleFactors(unsigned short iCLayer) const
     {
       if (iCLayer >= c_nLayers)
         B2FATAL("Required iCLayer is invalid ! Should be 0 to 55 .");
       return m_Scales[iCLayer] ;
     }
+
+    /**
+     * Get the factor for one hit
+     * @param iCLayer layerID
+     * @param alpha alpha value
+     * @return the scale factor for this hit
+     */
+    double getScaleFactor(unsigned short iCLayer, double alpha) const
+    {
+      if (alpha > (M_PI / 2)) alpha = alpha - M_PI;
+      if (alpha < -(M_PI / 2)) alpha = alpha + M_PI;
+      int alpha_bin = std::trunc(std::abs(alpha) / c_AlphaBinWidth);
+      if (alpha_bin > c_nAlphaBins) alpha_bin = c_nAlphaBins - 1 ;
+      return m_Scales[iCLayer][alpha_bin];
+    }
+
 
     /**
      * Print all contents
@@ -92,7 +108,7 @@ namespace Belle2 {
 
   private:
     std::array<std::array<float, c_nAlphaBins>, c_nLayers> m_Scales; /**< scale factors */
-
+    double c_AlphaBinWidth = 0.01; /**< bin width on alpha */
     ClassDef(CDCAlphaScaleFactorForAsymmetry, 1); /**< ClassDef */
   };
 

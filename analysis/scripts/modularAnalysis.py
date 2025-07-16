@@ -469,11 +469,14 @@ def correctBrems(outputList,
     the particle's track, set by the ``ECLTrackBremFinder`` module during reconstruction.
 
     Warning:
-        This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
-        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) do.
-        However, studies by the tau WG revealed that the cuts applied by the ``ECLTrackBremFinder`` module are too tight.
-        These will be loosened but this will only have effect with proc13 and MC15.
-        If your analysis is very sensitive to the Bremsstrahlung corrections, it is advised to use `correctBremsBelle`.
+        So far, there haven't been any comprehensive comparisons of the performance of the `BremsFinder` module, which
+        is called in this function, with the `BelleBremRecovery` module, which is called via the `correctBremsBelle`
+        function. If your analysis is very sensitive to the Bremsstrahlung corrections, it is currently advised to use
+        `correctBremsBelle`.
+
+        The reason is that studies by the tau WG revealed that in the past the cuts applied by the
+        ``ECLTrackBremFinder`` module were too tight. They were only loosened for proc16 and MC16. New performance
+        studies are needed to verify that now this module outperforms the Belle-like approach.
 
     Information:
         A detailed description of how the weights are set can be found directly at the documentation of the

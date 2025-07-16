@@ -86,14 +86,14 @@ void SVDUnpackerDQMModule::defineHisto()
                                Bins_BadMapping + Bins_BadHeader + Bins_MissedTrailer + Bins_MissedHeader + Bins_SEURecoData;
 
   m_DQMUnpackerHisto = new TH2F("DQMUnpackerHisto", "SVD Data Format Monitor", nBins, 1, nBins + 1, 52, 1, 53);
-  m_DQMErrorEventsHisto = new TH1F("DQMErrorEventsHisto", "SVD Error Event Counter", 2, 0, 2);
-  m_DQMSeuRecoveryEventsHisto = new TH1F("DQMSeuRecoveryEventsHisto", "SVD Empty Data Events (SEURecovery) counter", 2, 0, 2);
-  m_DQMSeuEventsHisto = new TH1F("DQMSeuEventsHisto", "SVD SEU Detected Events Counter", 2, 0, 2);
-  m_DQMSeuRecoveryFADCsEventHisto = new TH1F("DQMSeuRecoveryFADCsEventHisto", "Number of FADCs with SEU Recoveries per Event", 52, 1,
-                                             53);
+  m_DQMErrorEventsHisto = new TH1F("DQMErrorEventsHisto", "SVD Errors Event Counter", 4, 0, 4);
+  m_DQMSeuRecoveryFADCsEventHisto = new TH1F("DQMSeuRecoveryFADCsEventHisto", "Number of FADCs with SEURecovery", 52, 1, 53);
   m_DQMnSamplesHisto = new TH2F("DQMnSamplesHisto", "nAPVsamples VS DAQMode", 3, 1, 4, 2, 1, 3);
   m_DQMnSamplesHisto2 = new TH2F("DQMnSamplesHisto2", "nAPVsamples VS DAQMode", 2, 1, 3, 2, 1, 3);
   m_DQMtrgQuality = new TH2F("DQMtrgQuality", "nAPVsamples VS trgQuality", 4, 1, 5, 2, 1, 3);
+
+  m_SEUonSensors = new SVDSummaryPlots("SEURecoOnSensors@view",
+                                       "SVD SEU (errAPV or errDET or errSYNC) detected on Sensors for the @view/@side");
 
   m_DQMUnpackerHisto->GetYaxis()->SetTitle("FADC board");
   m_DQMUnpackerHisto->GetYaxis()->SetTitleOffset(1.2);
@@ -102,17 +102,10 @@ void SVDUnpackerDQMModule::defineHisto()
   m_DQMErrorEventsHisto->GetYaxis()->SetTitleOffset(1.5);
   m_DQMErrorEventsHisto->SetMinimum(0.7);
 
-  m_DQMSeuRecoveryEventsHisto->GetYaxis()->SetTitle("# of Events");
-  m_DQMSeuRecoveryEventsHisto->GetYaxis()->SetTitleOffset(1.5);
-  m_DQMSeuRecoveryEventsHisto->SetMinimum(0.7);
-
-  m_DQMSeuEventsHisto->GetYaxis()->SetTitle("# of Events");
-  m_DQMSeuEventsHisto->GetYaxis()->SetTitleOffset(1.5);
-  m_DQMSeuEventsHisto->SetMinimum(0.7);
-
   m_DQMSeuRecoveryFADCsEventHisto->GetYaxis()->SetTitle("# of Events");
   m_DQMSeuRecoveryFADCsEventHisto->GetYaxis()->SetTitleOffset(1.5);
   m_DQMSeuRecoveryFADCsEventHisto->SetMinimum(0.7);
+  m_DQMSeuRecoveryFADCsEventHisto->SetMaximum(1.0);
 
   m_DQMnSamplesHisto->GetXaxis()->SetTitle("DAQ Mode");
   m_DQMnSamplesHisto->GetYaxis()->SetTitle("number of APV samples");
@@ -144,16 +137,12 @@ void SVDUnpackerDQMModule::defineHisto()
   for (unsigned short i = 0; i < 4; i++) m_DQMtrgQuality->GetXaxis()->SetBinLabel(i + 1, Xquality[i].Data());
   for (unsigned short i = 0; i < 2; i++) m_DQMtrgQuality->GetYaxis()->SetBinLabel(i + 1, Ysamples[i].Data());
 
-  m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(1, "OK");
-  m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(2, "Error(s)");
+  m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(1, "No Errors");
+  m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(2, "Any Error");
+  m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(3, "SEU Event");
+  m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(4, "Empty Event (Recovery)");
 
-  m_DQMSeuRecoveryEventsHisto->GetXaxis()->SetBinLabel(1, "OK");
-  m_DQMSeuRecoveryEventsHisto->GetXaxis()->SetBinLabel(2, "SEU Recovery");
-
-  m_DQMSeuEventsHisto->GetXaxis()->SetBinLabel(1, "OK");
-  m_DQMSeuEventsHisto->GetXaxis()->SetBinLabel(2, "SEU Event");
-
-  m_DQMSeuRecoveryFADCsEventHisto->GetXaxis()->SetTitle("number of FADCs with SEU recovery dummy data");
+  m_DQMSeuRecoveryFADCsEventHisto->GetXaxis()->SetTitle("number of affected FADCs");
 
   oldDir->cd();
 }
@@ -196,25 +185,6 @@ void SVDUnpackerDQMModule::beginRun()
     TString title = tmp(0, pos - 2);
     m_DQMErrorEventsHisto->SetTitle(title + runID);
     m_DQMErrorEventsHisto->Reset();
-  }
-
-
-  if (m_DQMSeuRecoveryEventsHisto != nullptr) {
-    TString tmp = m_DQMSeuRecoveryEventsHisto->GetTitle();
-    Int_t pos = tmp.Last('~');
-    if (pos == -1) pos = tmp.Length() + 2;
-    TString title = tmp(0, pos - 2);
-    m_DQMSeuRecoveryEventsHisto->SetTitle(title + runID);
-    m_DQMSeuRecoveryEventsHisto->Reset();
-  }
-
-  if (m_DQMSeuEventsHisto != nullptr) {
-    TString tmp = m_DQMSeuEventsHisto->GetTitle();
-    Int_t pos = tmp.Last('~');
-    if (pos == -1) pos = tmp.Length() + 2;
-    TString title = tmp(0, pos - 2);
-    m_DQMSeuEventsHisto->SetTitle(title + runID);
-    m_DQMSeuEventsHisto->Reset();
   }
 
   if (m_DQMSeuRecoveryFADCsEventHisto != nullptr) {
@@ -337,7 +307,7 @@ void SVDUnpackerDQMModule::event()
     m_seuRecoData = m_svdDAQDiagnostics[i]->getSEURecoData();
 
     m_fadcNo = m_svdDAQDiagnostics[i]->getFADCNumber();
-    //apvNo = m_svdDAQDiagnostics[i]->getAPVNumber();
+    m_apvNo = m_svdDAQDiagnostics[i]->getAPVNumber();
 
     // insert FADCnumber into the map (if not already there) and assign the next bin to it.
     if (m_changeFADCaxis) {
@@ -362,7 +332,16 @@ void SVDUnpackerDQMModule::event()
         }
       }
 
-      if (m_apvError & 8 or m_apvError & 4 or m_upsetAPV) m_seuEvent = 1;
+      if (m_apvError & 8 or m_apvError & 4 or m_upsetAPV) {
+        m_seuEvent = 1;
+
+        //let's retrieve the sensor info for this SEU case
+        SVDOnlineToOfflineMap::SensorInfo theVxdInfo = m_map->getSensorInfo(m_fadcNo, m_apvNo);
+        VxdID::baseType theVxdID = theVxdInfo.m_sensorID;
+        bool side = theVxdInfo.m_uSide;
+
+        m_SEUonSensors->fill(theVxdID, side, 1);
+      }
 
       if (m_badHeader) m_DQMUnpackerHisto->Fill(17, ybin->second);
       if (m_missedHeader) m_DQMUnpackerHisto->Fill(18, ybin->second);
@@ -403,9 +382,11 @@ void SVDUnpackerDQMModule::event()
       if (!m_fadcMatch) m_DQMUnpackerHisto->Fill(15, ybin->second);
       if (m_upsetAPV) m_DQMUnpackerHisto->Fill(16, ybin->second);
       if (m_seuRecoData) {
+
         m_DQMUnpackerHisto->Fill(21, ybin->second);
         m_seuRecoEvent = 1;
         m_seuFADCs.insert(ybin->first);
+
       }
 
     }
@@ -419,28 +400,22 @@ void SVDUnpackerDQMModule::event()
   m_errorFraction = 100 * float(m_nBadEvents) / float(m_nEvents);
 
   if (m_DQMErrorEventsHisto != nullptr) {
-    TString histoErrorTitle = TString::Format("SVD bad events,  Exp %d Run %d", m_expNumber, m_runNumber);
+    TString histoErrorTitle = TString::Format("SVD Events with errors,  Exp %d Run %d", m_expNumber, m_runNumber);
     m_DQMErrorEventsHisto->SetTitle(histoErrorTitle.Data());
-    m_DQMErrorEventsHisto->Fill(m_badEvent);
-  }
-
-  if (m_DQMSeuRecoveryEventsHisto != nullptr) {
-    TString histoSEURecoTitle = TString::Format("SVD Empty Data Events (SEURecovery),  Exp %d Run %d", m_expNumber, m_runNumber);
-    m_DQMSeuRecoveryEventsHisto->SetTitle(histoSEURecoTitle.Data());
-    m_DQMSeuRecoveryEventsHisto->Fill(m_seuRecoEvent);
-  }
-
-  if (m_DQMSeuEventsHisto != nullptr) {
-    TString histoSEUTitle = TString::Format("SVD SEU Detected Events (errAPV or errDET or errSYNC),  Exp %d Run %d", m_expNumber,
-                                            m_runNumber);
-    m_DQMSeuEventsHisto->SetTitle(histoSEUTitle.Data());
-    m_DQMSeuEventsHisto->Fill(m_seuEvent);
+    if (!m_badEvent) m_DQMErrorEventsHisto->Fill(0);
+    else m_DQMErrorEventsHisto->Fill(1);
+    if (m_seuEvent) m_DQMErrorEventsHisto->Fill(2);
+    if (m_seuRecoEvent) m_DQMErrorEventsHisto->Fill(3);
   }
 
   if (m_DQMSeuRecoveryFADCsEventHisto != nullptr) {
-    TString histoSEURecoFADCsTitle = TString::Format("SVD FADCs with SEU Recovery,  Exp %d Run %d", m_expNumber, m_runNumber);
+    TString histoSEURecoFADCsTitle = TString::Format("Number of FADCs with Empty Data (SEURecovery) per Event,  Exp %d Run %d",
+                                                     m_expNumber, m_runNumber);
     m_DQMSeuRecoveryFADCsEventHisto->SetTitle(histoSEURecoFADCsTitle.Data());
-    if (m_seuFADCs.size() > 0) m_DQMSeuRecoveryFADCsEventHisto->Fill(m_seuFADCs.size());
+    if (m_seuFADCs.size() > 0) {
+      m_DQMSeuRecoveryFADCsEventHisto->SetMaximum(-1111);
+      m_DQMSeuRecoveryFADCsEventHisto->Fill(m_seuFADCs.size());
+    }
   }
 } // end event function
 

@@ -49,7 +49,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     parameters["clip_value"] = 4
     parameters['mask_value'] = 0
     parameters['num_trk'] = 10
-    parameters['num_trk_features'] = 17
+    parameters['num_trk_features'] = 14  # 17
     parameters['num_ecl'] = 20
     parameters['num_ecl_features'] = 6
     parameters['num_roe'] = 1

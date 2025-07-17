@@ -1015,32 +1015,40 @@ class DarkShower(BaseSkim):
 
 
 @fancy_skim_header
-class ALP2Gamma(BaseSkim):
+class BtoKa_aTo2Gamma(BaseSkim):
     """
-    **Physics channel**: :math:`B \\to a(\\to \\gamma \\gamma)`
+    **Physics channel**: :math:`B \\to K^{(*)}a(\\to \\gamma \\gamma)`
+
+    Skim list contains candidates for the axion-like particles produced in B meson decay with kaon.
     """
 
     __authors__ = ["Hyuna Kim"]
     __contact__ = __liaison__
     __description__ = (
         "Dark sector skim list for the ALP 2-photon analysis: "
-        ":math:`B \\to a(\\to \\gamma \\gamma)`"
+        ":math:`B \\to K^{(*)}a(\\to \\gamma \\gamma)`"
     )
     __category__ = "physics, dark sector"
     ApplyHLTHadronCut = False
 
     def build_lists(self, path):
+        from stdV0s import stdKshorts
+
         kaons = (
             'K+:mk_ALP2Gamma',
-            'kaonID > 0.1'
+            'kaonID > 0.1 and dr < 3.0 and abs(dz) < 4.0'
         )
-
+        pions = (
+            'pi+:mk_ALP2Gamma',
+            'pionID > 0.1 and dr < 3.0 and abs(dz) < 4.0'
+        )
         gamma = (
             'gamma:g_ALP2Gamma',
             '[E > 0.05]'
         )
 
-        ma.fillParticleLists([kaons, gamma], path=path)
+        ma.fillParticleLists([kaons, pions, gamma], path=path)
+        stdKshorts(path=path)
 
         ma.reconstructDecay(
             'A0:rec_ALP2Gamma -> gamma:g_ALP2Gamma gamma:g_ALP2Gamma',
@@ -1049,9 +1057,39 @@ class ALP2Gamma(BaseSkim):
         )
 
         ma.reconstructDecay(
-            'B+:rec_ALP2Gamma -> K+:mk_ALP2Gamma A0:rec_ALP2Gamma',
+            'K*0:mk_ALP2Gamma -> K-:mk_ALP2Gamma pi+:mk_ALP2Gamma',
+            cut='0.8 < M < 1.0',
+            path=path
+        )
+
+        ma.reconstructDecay(
+            'K*+:mk_ALP2Gamma -> K_S0:merged pi+:mk_ALP2Gamma',
+            cut='0.8 < M < 1.0',
+            path=path
+        )
+
+        ma.reconstructDecay(
+            'B+:dm1 -> K+:mk_ALP2Gamma A0:rec_ALP2Gamma',
             cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
             path=path
         )
 
-        return ["B+:rec_ALP2Gamma"]
+        ma.reconstructDecay(
+            'B+:dm2 -> K*+:mk_ALP2Gamma A0:rec_ALP2Gamma',
+            cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
+            path=path
+        )
+
+        ma.reconstructDecay(
+            'B0:dm1 -> K_S0:merged A0:rec_ALP2Gamma',
+            cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
+            path=path
+        )
+
+        ma.reconstructDecay(
+            'B0:dm2 -> K*0:mk_ALP2Gamma A0:rec_ALP2Gamma',
+            cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
+            path=path
+        )
+
+        return ["B+:dm1", "B+:dm2", "B0:dm1", "B0:dm2"]

@@ -176,6 +176,14 @@ void StatisticsTimingHLTDQMModule::defineHisto()
   m_procTimeVsnECLDigitsNotPassiveVeto->SetXTitle("nECLDigits");
   m_procTimeVsnECLDigitsNotPassiveVeto->SetYTitle("Processing time [ms]");
 
+  m_TimeSinceLastInjectionVsTimeInBeamCycle = new TH2F("TimeSinceLastInjectionVsTimeInBeamCycle",
+                                                       "Time since last injection [ms] vs Time in beam cycle [ms] vs",
+                                                       100, 0, 30000,
+                                                       100, 0, 10);
+  m_TimeSinceLastInjectionVsTimeInBeamCycle->StatOverflows(true);
+  m_TimeSinceLastInjectionVsTimeInBeamCycle->SetXTitle("Time since last injection [ms]");
+  m_TimeSinceLastInjectionVsTimeInBeamCycle->SetYTitle("Time in beam cycle [ms]");
+
   if (oldDirectory) {
     oldDirectory->cd();
   }
@@ -188,6 +196,7 @@ void StatisticsTimingHLTDQMModule::initialize()
   m_svdShaperDigits.isOptional();
   m_cdcHits.isOptional();
   m_eclDigits.isOptional();
+  m_TTDInfo.isOptional();
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -347,6 +356,18 @@ void StatisticsTimingHLTDQMModule::event()
   }
 
   m_lastProcessingTimeSum = processingTimeSum;
+
+  if (m_TTDInfo.isValid()) {
+
+    double c_revolutionTime = m_bunchStructure->getRFBucketsPerRevolution() / (m_clockSettings->getAcceleratorRF() * 1e3);
+    double c_globalClock = m_clockSettings->getGlobalClockFrequency() * 1e3;
+
+    double timeSinceLastInj = m_TTDInfo->getTimeSinceLastInjection() / c_globalClock;
+    double timeInBeamCycle = timeSinceLastInj - (int)(timeSinceLastInj / c_revolutionTime) * c_revolutionTime;
+
+    m_TimeSinceLastInjectionVsTimeInBeamCycle->Fill(timeSinceLastInj, timeInBeamCycle);
+  }
+
 }
 
 void StatisticsTimingHLTDQMModule::beginRun()
@@ -387,6 +408,7 @@ void StatisticsTimingHLTDQMModule::beginRun()
   m_procTimeVsnCDCHitsNotPassiveVeto->Reset();
   m_procTimeVsnECLDigitsPassiveVeto->Reset();
   m_procTimeVsnECLDigitsNotPassiveVeto->Reset();
+  m_TimeSinceLastInjectionVsTimeInBeamCycle->Reset();
 
 }
 

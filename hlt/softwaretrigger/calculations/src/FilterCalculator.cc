@@ -1056,19 +1056,19 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
 
   // HLT prefilter stuff
   /*
-    if (!m_hltPrefilterParameters.isValid())
-      B2FATAL("HLTprefilter parameters are not available.");
-    m_LERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMin();
-    m_LERtimeSinceLastInjectionMax = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMax();
-    m_HERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getHERtimeSinceLastInjectionMin();
-    m_HERtimeSinceLastInjectionMax = m_hltPrefilterParameters->getHERtimeSinceLastInjectionMax();
-    m_LERtimeInBeamCycleMin = m_hltPrefilterParameters->getLERtimeInBeamCycleMin();
-    m_LERtimeInBeamCycleMax = m_hltPrefilterParameters->getLERtimeInBeamCycleMax();
-    m_HERtimeInBeamCycleMin = m_hltPrefilterParameters->getHERtimeInBeamCycleMin();
-    m_HERtimeInBeamCycleMax = m_hltPrefilterParameters->getHERtimeInBeamCycleMax();
+      if (!m_hltPrefilterParameters.isValid())
+        B2FATAL("HLTprefilter parameters are not available.");
+      m_LERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMin();
+      m_LERtimeSinceLastInjectionMax = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMax();
+      m_HERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getHERtimeSinceLastInjectionMin();
+      m_HERtimeSinceLastInjectionMax = m_hltPrefilterParameters->getHERtimeSinceLastInjectionMax();
+      m_LERtimeInBeamCycleMin = m_hltPrefilterParameters->getLERtimeInBeamCycleMin();
+      m_LERtimeInBeamCycleMax = m_hltPrefilterParameters->getLERtimeInBeamCycleMax();
+      m_HERtimeInBeamCycleMin = m_hltPrefilterParameters->getHERtimeInBeamCycleMin();
+      m_HERtimeInBeamCycleMax = m_hltPrefilterParameters->getHERtimeInBeamCycleMax();
 
-    m_cdcHitsMax = m_hltPrefilterParameters->getCDCHitsMax();
-    m_eclDigitsMax = m_hltPrefilterParameters->getECLDigitsMax();
+      m_cdcHitsMax = m_hltPrefilterParameters->getCDCHitsMax();
+      m_eclDigitsMax = m_hltPrefilterParameters->getECLDigitsMax();
   */
   //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
   int index = 0; //events accepted in the passive veto window but not in the active

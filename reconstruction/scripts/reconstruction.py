@@ -9,8 +9,8 @@
 ##########################################################################
 
 # Limit the number of threads spawned by external libraries (e.g. XGBoost)
-# import os
-# os.environ['OMP_THREAD_LIMIT'] = "1"  # noqa
+import os
+os.environ['OMP_THREAD_LIMIT'] = "1"  # noqa
 
 import basf2
 

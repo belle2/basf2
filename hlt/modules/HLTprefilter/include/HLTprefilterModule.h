@@ -8,6 +8,7 @@
 #pragma once
 /* HLT headers. */
 //#include <hlt/dbobjects/HLTprefilterParameters.h>
+#include <hlt/softwaretrigger/core/utilities.h>
 
 /* Basf2 headers. */
 #include <framework/dbobjects/BunchStructure.h>
@@ -108,6 +109,8 @@ namespace Belle2 {
     /// HLTprefilterParameters Database OjbPtr
     /*DBObjPtr<HLTprefilterParameters> m_hltPrefilterParameters;*/ /**< HLT prefilter parameters */
 
+    // Prescale for accepting HLTprefilter lines, by default none are accepted
+    unsigned int m_HLTprefilterPrescale = 0;
 
   };
 }

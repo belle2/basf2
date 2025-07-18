@@ -117,6 +117,9 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
 
   addParam("useadc", m_useadc,
            "Switch to use ADC. Can be used with usehitpattern enabled. ", false);
+
+  addParam("useDB", m_useDB,
+           "Switch to use database to load run dependent parameters. ", true);
 }
 
 void
@@ -161,6 +164,23 @@ CDCTrigger2DFinderModule::initialize()
 }
 
 void
+CDCTrigger2DFinderModule::beginRun()
+{
+  if (m_useDB) {
+    if (not m_cdctrg2d_DB.isValid()) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      B2FATAL("No database for CDCTRG 2D parameter. exp " << evtMetaData->getExperiment() << " run "
+              << evtMetaData->getRun());
+    } else {
+      m_usehitpattern = m_cdctrg2d_DB->getfullhit();
+      m_useadc = m_cdctrg2d_DB->getADC();
+      m_minHits = m_cdctrg2d_DB->gethitthreshold();
+      m_minHitsShort = m_cdctrg2d_DB->gethitthreshold();
+    }
+  }
+}
+
+void
 CDCTrigger2DFinderModule::event()
 {
   /* Clean hits */
@@ -192,7 +212,7 @@ CDCTrigger2DFinderModule::event()
 
     if (m_usehitpattern) {
       unsigned hitpattern;
-      if (m_useadc) hitpattern = m_segmentHits[iHit]->gethitpattern_adc();
+      if (m_useadc) hitpattern = m_segmentHits[iHit]->getadcpattern();
       else          hitpattern = m_segmentHits[iHit]->gethitpattern();
       int nhitpattern = 0;
       if (iSL == 0)nhitpattern = 15;

@@ -3,8 +3,10 @@ Import('env')
 env['LIBS'] = [
     'framework', 'geometry', 'simulation', 'svd_dbobjects',
     'genfit2', '$ROOT_LIBS', 'Geom', 'vxd', 'vxd_dbobjects',
-    'vxd_dataobjects', 'mva_dataobjects',
+    'vxd_dataobjects',
     'svd_dataobjects', 'mdst_dataobjects',
+    'tracking_dataobjects',
+    'analysis', 'analysis_dataobjects',
     'simulation_dataobjects',
     'calibration','calibration_dataobjects', 
     'RooFit', 'RooFitCore', 'RooStats'

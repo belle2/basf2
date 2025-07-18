@@ -49,11 +49,11 @@ namespace Belle2 {
     /// Layer rotation in global X-Y plane (gamma) at backward endplate
     static const baseType layerPhi = 6;
 
-    /// Layer shift in global X  dX = foward - backward endplate
+    /// Layer shift in global X  dX = forward - backward endplate
     static const baseType layerDx = 11;
-    /// Layer shift in global Y  dY = foward - backward endplate
+    /// Layer shift in global Y  dY = forward - backward endplate
     static const baseType layerDy = 12;
-    /// Layer rotation in global X-Y plane (gamma)  dPhi = foward - backward endplate
+    /// Layer rotation in global X-Y plane (gamma)  dPhi = forward - backward endplate
     static const baseType layerDPhi = 16;
 
     /// Constructor

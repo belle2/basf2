@@ -177,6 +177,15 @@ def get_argument_parser():
         help="yaml containing the default release and the GTs",
     )
 
+    parser.add_argument(
+        "--samples",
+        "-samples",
+        type=str,
+        default='',
+        help="the yaml file (with full path) to be used in ``b2skim-stats-submit``.\
+        If not provided, ``b2skim-stats-submit`` defaults to the samples of the current campaign\
+        i.e. ``/group/belle2/dataprod/mc/skimtraining/samplelists/testfiles.yaml`` on KEKCC.")
+
     return parser
 
 
@@ -191,6 +200,7 @@ def init_info(info):
     infoDict['fei_gt'] = yaml_info['GT']['FEI']
     infoDict['ana_gt'] = yaml_info['GT']['analysis']
     infoDict['pid_gt'] = yaml_info['GT']['PID']
+    infoDict['campaign'] = yaml_info['campaign']
 
     return infoDict
 
@@ -421,12 +431,12 @@ def register(dataset_type, skim=None, json_dir=None, release=None, camp=None):
                 if result.returncode != 0:
                     print(f"Error executing command: {result.stderr}")
             else:
-                print(f'PATH DOESNT EXIST: {path}')
+                print(f'PATH DOESN"T EXIST: {path}')
 
     print(f'# {counter} commands executed')
 
 
-def upload_files(json_dir, release):
+def upload_files(json_dir, release, campaignDict):
     '''
     look for all prods in "Initialized" or "Registered" state and upload the skim scripts for them
     it would be better if this could know what prods already have files uploaded
@@ -449,14 +459,15 @@ def upload_files(json_dir, release):
 
             # upload skim files
             for prod, camp in zip(prod_list, camp_list):
-                if 'bucket' in camp or 'PromptExp' in camp:
-                    camp = 'prompt'
-                elif 'proc13' in camp:
-                    camp = 'proc13'
-                elif 'MC15rd_a' in camp:
-                    camp = 'MC15rd_a'
-                elif 'MC15rd_b' in camp:
-                    camp = 'MC15rd_b'
+
+                # Find the proper campaign directory according to the dictionary in the infoYaml.
+                # The directory name is defined by b2skim-prod (args.json step) using the info encoded in the registry yaml
+                for key, campList in campaignDict.items():
+                    for campName in campList:
+                        if campName in camp:
+                            camp = key
+                            break
+
                 script_dir = f'{json_dir}skim/{camp}/{release}/SkimScripts'
                 command = ['gb2_prod_uploadFile', '-p', prod]
                 result_upload = subprocess.run(command, cwd=script_dir, capture_output=True, text=True)
@@ -501,7 +512,7 @@ def approve_prods():
 
 def cleanDirectory(lpn_dir):
     # no longer relevant with lpn search using collection
-    # removes empty files in lpn list directory, incase you search for lpns that don't exist
+    # removes empty files in lpn list directory, in case you search for lpns that don't exist
     # e.g. selecting "--camp allprompt and --energy all" will result in a bunch of empty files
 
     for root, dirs, files in os.walk(lpn_dir):
@@ -586,13 +597,12 @@ def getDirs(data, base_dir):
     return json_dir, yaml_dir, lpn_dir, stats_dir
 
 
-def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=False):
+def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=False, samples=False):
     for skim in skims:
         print(f'Submitting combined skim {skim} for stats')
         if skim == 'FEI':
             # Include analysis globaltag for FEI
             print(f'Skimming FEI. Using --analysis-globaltag {info["fei_gt"]}')
-            print(f'b2skim-stats-submit -c {stats_dir}{inputYaml.split("/")[-1]} {skim} --analysis-globaltag {info["fei_gt"]}')
             # This is the {inputYaml} in '/MC/skim/stats' folder
             command = [
                 'b2skim-stats-submit',
@@ -601,14 +611,22 @@ def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=F
                 skim,
                 '--analysis-globaltag',
                 info["fei_gt"]]
+            if samples:
+                command.append(f"--sample-yaml {samples}")
+            print(" ".join(command))
             result = subprocess.run(command, capture_output=True, text=True)
             if result.returncode != 0:
                 print(f"Error submitting stats for {skim}: {result.stderr}")
         if skim == 'SystematicsCombinedHadronic' or skim == 'SystematicsCombinedLowMulti':
             # Systematic skims get submitted as single skims (not combined)
-            print(f'b2skim-stats-submit -s {skim}')
             command = ['b2skim-stats-submit', '-s', skim]
+
+            if samples:
+                command.append(f"--sample-yaml {samples}")
+
+            print(" ".join(command))
             result = subprocess.run(command, capture_output=True, text=True)
+
             if result.returncode != 0:
                 print(f"Error submitting stats for {skim}: {result.stderr}")
         else:
@@ -622,6 +640,8 @@ def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=F
                 command += f' --pid-globaltag {info["pid_gt"]}'
             if flagged:
                 command += ' --flagged'
+            if samples:
+                command += f" --sample-yaml {samples}"
             print(command)
             result = subprocess.run(command.split(), capture_output=True, text=True)
             if result.returncode != 0:
@@ -674,7 +694,8 @@ def main():
             gt=args.analysis_GT,
             pidgt=args.PID_GT,
             flagged=args.flagged,
-            inputYaml=args.inputYaml)
+            inputYaml=args.inputYaml,
+            samples=args.samples)
 
     elif args.stats_print:
         printStats(args.skims, stats_dir, args.flagged)
@@ -684,7 +705,8 @@ def main():
 
     elif args.upload:
         release = getRelease(infoDict, args.release)
-        upload_files(json_dir, release)
+        campaignDict = infoDict['campaign']
+        upload_files(json_dir, release, campaignDict)
 
     elif args.data:
 
@@ -727,7 +749,8 @@ def main():
 
         elif args.jsons or args.register:
 
-            mctypes = getMCtype(args.mctype)
+            if args.jsons:
+                mctypes = getMCtype(args.mctype)
             skims = args.skims
             release = getRelease(infoDict, args.release)
             for skim in skims:
@@ -750,7 +773,7 @@ def main():
                     register(dataset_type='mcrd', skim=skim, json_dir=json_dir, release=release)
 
     elif args.mcri:
-        print('MC run indepentent is not supported anymore. Please use --mcrd.')
+        print('MC run independent is not supported anymore. Please use --mcrd.')
     if args.lpns:
         print('Checking for empty files to remove...')
         cleanDirectory(lpn_dir)

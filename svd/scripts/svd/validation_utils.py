@@ -44,7 +44,7 @@ def get_combined(histos, pattern):
 
     Parameters:
     histos (dict{label : TH1}): dictionary of
-    patern (str): shell-styel matching pattern
+    pattern (str): shell-styel matching pattern
     '''
 
     good_keys = [key for key in histos.keys() if fnmatch.fnmatch(key, pattern)]
@@ -63,7 +63,7 @@ def get_combined(histos, pattern):
 
 def get_histo_offTracks(histo_all, histo_onTracks):
     '''
-    Substract the histogram with the clusters on tracks from the histogram with all the clusters
+    Subtract the histogram with the clusters on tracks from the histogram with all the clusters
     to get the histogram with the clusters off tracks
     '''
     try:

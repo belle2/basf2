@@ -266,13 +266,13 @@ namespace Belle2 {
 
     // ******************** get<I>(?) ********************
 
-    /// Functor to get the I part (as of std::get<I>) from an arbitrary objects.
+    /// Functor to get the I part (as of `std::get<I>`) from an arbitrary objects.
     template<int I>
     struct Get {
       /// Marker function for the isFunctor test
       operator FunctorTag();
 
-      /// Operator getting the I part (as of std::get<I>) of an arbitrary object
+      /// Operator getting the I part (as of `std::get<I>`) of an arbitrary object
       template <class T>
       auto operator()(const T& t) const -> decltype(std::get<I>(t))
       {
@@ -281,7 +281,7 @@ namespace Belle2 {
       }
     };
 
-    /// Meta-functor to get the I part (as of std::get<I>) of an object returned from another functor.
+    /// Meta-functor to get the I part (as of `std::get<I>`) of an object returned from another functor.
     template <int I, class AFunctor = Id>
     using GetOf = Composition<Get<I>, AFunctor>;
 

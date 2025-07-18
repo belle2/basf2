@@ -47,7 +47,7 @@ class PythonVariableManager:
         Wrapper around Manager::addAlias(const std::string& alias, const std::string& variable).
         '''
         instance = PythonVariableManager._instance()
-        assert(instance.addAlias(alias, variable))
+        assert (instance.addAlias(alias, variable))
         return alias
 
     def printAliases(self):
@@ -76,7 +76,7 @@ class PythonVariableManager:
         Wrapper around Manager::addCollection(const std::string& collection, const std::vector<std::string>& variables)
         '''
         instance = PythonVariableManager._instance()
-        assert(instance.addCollection(*args))
+        assert (instance.addCollection(*args))
 
     def getCollection(self, collection):
         '''
@@ -105,6 +105,13 @@ class PythonVariableManager:
         '''
         instance = PythonVariableManager._instance()
         return instance.evaluate(variable, particle)
+
+    def evaluateVariables(self, variables, plist):
+        '''
+        Wrapper around Manager::evaluateVariables(const std::vector<std::string>& varNames, const ParticleList* plist).
+        '''
+        instance = PythonVariableManager._instance()
+        return instance.evaluateVariables(variables, plist.obj())
 
     def getNames(self):
         '''

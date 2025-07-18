@@ -159,9 +159,9 @@ namespace {
 
   // regularize autocovariance function by multiplying it by the step
   // function so elements above u0 become 0 and below are untouched.
-  void regularize(double* dst, const double* src, const int n, const double u0 = 13.0, const double u1 = 0.8)
+  void regularize(double* dst, const double* src, const int n, double u0, double u1, double u2)
   {
-    for (int k = 0; k < n; k++) dst[k] = src[k] / (1 + exp((k - u0) / u1));
+    for (int k = 1; k < n; k++) dst[k] = u2 * src[k] / (1 + exp((k - u0) / u1));
   }
 
   // transform autocovariance function of c_NFitPoints elements to the covariance matrix
@@ -204,6 +204,7 @@ ECLWaveformFitModule::ECLWaveformFitModule()
   addParam("CovarianceMatrix", m_CovarianceMatrix,
            "Option to use crystal-dependent covariance matrices (false uses identity matrix).",
            true);
+  addParam("RegParam1", m_u1, "u1 parameter for regularization function).", 1.0);
 }
 
 ECLWaveformFitModule::~ECLWaveformFitModule()
@@ -266,8 +267,31 @@ void ECLWaveformFitModule::beginRun()
       m_AutoCovariance->getAutoCovariance(id, buf);
       double x0 = c_NFitPoints;
       std::memcpy(reg, buf, c_NFitPoints * sizeof(double));
-      while (!makecovariance(m_PackedCovariance[id - 1], c_NFitPoints, reg))
-        regularize(buf, reg, c_NFitPoints, x0 -= 1, 1);
+      bool invertSuccess = makecovariance(m_PackedCovariance[id - 1], c_NFitPoints, reg);
+      double param_u2 = 1.0;
+      int idToLoad = id;
+      while (invertSuccess == false) {
+
+        /* as x0-=1 iterates off-diagonal are suppressed. */
+        regularize(buf, reg, c_NFitPoints, x0 -= 1, m_u1, param_u2);
+        invertSuccess = makecovariance(m_PackedCovariance[id - 1], c_NFitPoints, reg);
+
+        /* set off-diagonals to zero for final attempt*/
+        if (x0 == 1)  param_u2 = 0.0;
+
+        /* Indicates problem with matrix as identity should be invertible*/
+        if (x0 == 0) {
+          B2WARNING("Could not invert matrix for id " << id);
+          B2WARNING("Loading neighbour matrix for id " << id);
+          if (idToLoad > 1) {
+            m_AutoCovariance->getAutoCovariance(idToLoad = -1, buf);
+          } else {
+            m_AutoCovariance->getAutoCovariance(idToLoad += 1, buf);
+          }
+          std::memcpy(reg, buf, c_NFitPoints * sizeof(double));
+        }
+
+      }
     }
   } else {
     /* Default covariance matrix is identity for all crystals. */

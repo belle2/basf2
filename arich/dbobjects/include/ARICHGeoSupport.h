@@ -253,7 +253,7 @@ namespace Belle2 {
     }
 
     /**
-     * Get box paramaters
+     * Get box parameters
      * @param i box index
      * @return box parameters
      */

@@ -19,10 +19,9 @@
 
 #include <set>
 #include <regex>
-#include <TPython.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "main_2024-07-19"
+#define CURRENT_DEFAULT_TAG "main_2025-06-30"
 
 namespace py = boost::python;
 
@@ -441,7 +440,7 @@ Parameters:
 Warning:
     it's still possible to modify `globaltags` after this call.
 )DOC")
-    .def("disable_globaltag_replay", &Configuration::disableGlobalTagReplay, R"DOC("disable_globaltag_replay()
+    .def("disable_globaltag_replay", &Configuration::disableGlobalTagReplay, R"DOC(disable_globaltag_replay()
 
 Disable global tag replay and revert to the old behavior that the default
 globaltag will be used if no other globaltags are specified.
@@ -601,7 +600,7 @@ Parameters:
   backoff_factor (int): backoff factor for retries in seconds. Retries are
       performed using something similar to binary backoff: For retry :math:`n`
       and a ``backoff_factor`` :math:`f` we wait for a random time chosen
-      uniformely from the interval :math:`[1, (2^{n} - 1) \times f]` in
+      uniformly from the interval :math:`[1, (2^{n} - 1) \times f]` in
       seconds.
 )DOC")
     .def("set_globaltag_callback", &Configuration::setGlobaltagCallbackPy, R"DOC(set_globaltag_callback(function)

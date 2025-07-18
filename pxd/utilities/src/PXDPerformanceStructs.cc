@@ -38,7 +38,7 @@ namespace Belle2 {
       // The recoTracks collection shouldn't be empty
       if (!recoTracks.size()) return nullptr;
 
-      // Propogate a track state back to the module of interest
+      // Propagate a track state back to the module of interest
       // as PXDIntercept doesn't contain global track point,
       // cos(incident angle), and the expected charge from the hit.
       const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(sensorID);
@@ -63,7 +63,7 @@ namespace Belle2 {
                          sensorInfo.getVCellID(pxdIntercept.getCoorV()));
       chargeMPV = getDeltaP(intersec_p.Mag(), length, mass) / ADUToEnergy;
 
-      // Return pointer of the relatd RecoTrack for accessing additional info.
+      // Return pointer of the related RecoTrack for accessing additional info.
       return recoTracks[0];
     }
 

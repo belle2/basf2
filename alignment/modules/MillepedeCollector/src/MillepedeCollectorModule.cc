@@ -380,6 +380,10 @@ void MillepedeCollectorModule::collect()
       TMatrixD extProjection(5, 3);
       TMatrixD locProjection(3, 5);
 
+      // geometric constaint: 3 common (position) parameters + 3 external (curv., directions) per daughter
+      TMatrixD innerTrafo(5, 3 + 3 * mother->getDaughters().size());
+      unsigned int iCol(3);
+
       bool first(true);
       for (auto& track : getParticlesTracks(mother->getDaughters())) {
         if (first) {
@@ -388,9 +392,17 @@ void MillepedeCollectorModule::collect()
           locProjection = getLocalToGlobalTransform(track->getFittedState()).GetSub(0, 2, 0, 4);
           first = false;
         }
+
+        innerTrafo.Zero();
+        innerTrafo.SetSub(3, 0, getGlobalToLocalTransform(track->getFittedState()).GetSub(3, 4, 0, 2));
+        innerTrafo[0][iCol++] = 1.;
+        innerTrafo[1][iCol++] = 1.;
+        innerTrafo[2][iCol++] = 1.;
+
+
         daughters.push_back({
           gbl->collectGblPoints(track, track->getCardinalRep()),
-          getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2)
+          innerTrafo
         });
       }
 
@@ -406,7 +418,7 @@ void MillepedeCollectorModule::collect()
         extMeasurements[1] = vertexResidual[1];
         extMeasurements[2] = vertexResidual[2];
 
-        TMatrixD extDeriv(3, 3);
+        TMatrixD extDeriv(3, 9);
         extDeriv.Zero();
         // beam vertex constraint
         extDeriv(0, 0) = 1.;
@@ -430,7 +442,7 @@ void MillepedeCollectorModule::collect()
           alignment::GlobalDerivatives globals(labels, derivatives);
           // Add derivatives for vertex calibration to first point of first trajectory
           // NOTE: use GlobalDerivatives operators vector<int> and TMatrixD which filter
-          // the derivatives to not pass those with zero labels (usefull to get rid of some params)
+          // the derivatives to not pass those with zero labels (useful to get rid of some params)
           std::vector<int> lab(globals); TMatrixD der(globals);
 
           // Transformation from local system at (vertex) point to global (vx,vy,vz)
@@ -477,7 +489,7 @@ void MillepedeCollectorModule::collect()
           TMatrixD locDerivs2D = (extProjection * der).GetSub(3, 4, 0, 2);
 
           // Attach the primary beamspot vertex position as a measurement at 1st point
-          // of first trajectory (and optionaly also the global derivatives for beamspot alignment
+          // of first trajectory (and optionally also the global derivatives for beamspot alignment
           daughters[0].first[0].addMeasurement(locRes2D, locPrec2D);
           if (!lab.empty()) {
             daughters[0].first[0].addGlobals(lab, locDerivs2D);
@@ -856,7 +868,7 @@ void MillepedeCollectorModule::collect()
 
         // Add derivatives for vertex calibration to first point of first trajectory
         // NOTE: use GlobalDerivatives operators vector<int> and TMatrixD which filter
-        // the derivatives to not pass those with zero labels (usefull to get rid of some params)
+        // the derivatives to not pass those with zero labels (useful to get rid of some params)
         std::vector<int> lab(globals); TMatrixD der(globals);
 
         // I want: dlocal/dext = dlocal/dtwobody * dtwobody/dext = dfdextPlusMinus * dtwobody/dext
@@ -1211,7 +1223,7 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
             continue;
           }
           Belle2::AlignableSVDRecoHit2D* hit = new Belle2::AlignableSVDRecoHit2D(*hitU, *hitV);
-          // insert measurement before point i (increases number of currect point to i+1)
+          // insert measurement before point i (increases number of correct point to i+1)
           gfTrack.insertMeasurement(hit, i);
           // now delete current point (at its original place, we have the new 2D recohit)
           gfTrack.deletePoint(i + 1);

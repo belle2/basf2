@@ -44,7 +44,7 @@ namespace Belle2 {
     /** Construct with a given name */
     explicit ModuleStatistics(const std::string& name = ""): m_index(0), m_name(name) {}
 
-    /** Add a time and memory measurment to the counter of a given type.
+    /** Add a time and memory measurement to the counter of a given type.
      * @param type Type of counter to add the value to
      * @param time time used during execution
      * @param memory memory size change during execution

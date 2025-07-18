@@ -13,7 +13,6 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -30,8 +29,8 @@ BgoModule::BgoModule() : Module(), m_intParameter(0), m_doubleParameter(0), m_st
   setDescription("Creates BGO crystals - sub-detector of BEASTII");
 
   //We can define parameters which can be set from the steering file. The arguments are:
-  // name, reference to the veriable where the value will be stored, description, default value
-  //If the default value is ommited the user has to specify this parameter, otherwise an error is produced
+  // name, reference to the variable where the value will be stored, description, default value
+  //If the default value is omitted the user has to specify this parameter, otherwise an error is produced
   addParam("intParameter", m_intParameter,
            "Useless parameter of type integer", 0);
   addParam("doubleParameter", m_doubleParameter,
@@ -60,7 +59,7 @@ void BgoModule::initialize()
   StoreArray<BgoSimHit>  simHits;
   RelationArray relMCSimHit(mcParticles, simHits);
   if (!(mcParticles.isRequired() && simHits.isRequired() && relMCSimHit.isRequired())) {
-    //Fatal is not neccessary here as the storeArrays should just look
+    //Fatal is not necessary here as the storeArrays should just look
     //empty if not registered but let's make sure everything is present
     B2FATAL("Not all collections found, exiting processing");
   }
@@ -103,10 +102,9 @@ void BgoModule::event()
   int nMCParticles = mcParticles.getEntries();
   for (int i = 0; i < nMCParticles; ++i) {
     MCParticle& mcp = *mcParticles[i];
-    //Find all BgoSimHits which point from that MCParticle using a typedef and BOOST_FOREACH
-    //The typedef is needed as BOOST_FOREACH is a macro and cannot handle anything including a comma
+    // Find all BgoSimHits which point from that MCParticle.
     typedef RelationIndex<MCParticle, BgoSimHit>::Element relMCSimHit_Element;
-    BOOST_FOREACH(const relMCSimHit_Element & relation, relMCSimHit.getElementsFrom(mcp)) {
+    for (const relMCSimHit_Element& relation : relMCSimHit.getElementsFrom(mcp)) {
       B2INFO("MCParticle #" << i << " created the AwesomSimHit #" << relation.indexTo
              << " which has an energy deposition of " << relation.to->getEnergyDep());
     }

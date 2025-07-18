@@ -8,21 +8,12 @@
 
 #include <arich/modules/arichBtest/arichBtestModule.h>
 
-//include <boost/format.hpp>
-//include <boost/foreach.hpp>
-
-
 // Framework - DataStore
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-
-
-#include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
-
 
 // Hit classes
 #include <arich/dataobjects/ARICHDigit.h>
@@ -564,7 +555,7 @@ namespace Belle2 {
   void arichBtestModule::terminate()
   {
     int j = 1;
-    BOOST_FOREACH(const std::string & fname, m_runList) {
+    for (const std::string& fname : m_runList) {
       B2INFO(m_eveList[j] << " events processed from file " << fname);
       j++;
     }

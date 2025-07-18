@@ -104,7 +104,7 @@ def create_testfile_ntuple(input, output, treeNames=["tree", "anotherTree"], **a
     )
 
     # update release in metadata to avoid 'modified-xxx' warnings
-    metadata = get_metadata(output)
+    metadata = basf2.get_file_metadata(output)
     metadata.setCreationData(
         metadata.getDate(), metadata.getSite(), metadata.getUser(), "test-release"
     )
@@ -114,14 +114,6 @@ def create_testfile_ntuple(input, output, treeNames=["tree", "anotherTree"], **a
     t.Fill()
     t.Write()
     f.Close()
-
-
-def get_metadata(name="output.root"):
-    """Get the metadata out of a root file"""
-    out = ROOT.TFile(name)
-    t = out.Get("persistent")
-    t.GetEntry(0)
-    return FileMetaData(t.FileMetaData)
 
 
 def merge_files(*args, output="output.root", filter_modified=False):
@@ -189,7 +181,7 @@ basf2.process(main)
 
 
 def check_01_existing():
-    """Check that merging a non exsiting file fails"""
+    """Check that merging a non existing file fails"""
     create_testfile_direct("test2.root")
     return merge_files("/test1.root") != 0 and merge_files("test2.root") == 0
 
@@ -223,7 +215,7 @@ def check_05_release():
 
 
 def check_06_empty_release():
-    """Check that merging fails with empty release valuses"""
+    """Check that merging fails with empty release values"""
     create_testfile_direct("test1.root")
     create_testfile_direct("test2.root", release="")
     return merge_files("test1.root", "test2.root") != 0
@@ -308,7 +300,7 @@ def check_15_noeventbranches():
 
 
 def check_16_nonmergeable():
-    """Check that merging fails if there are mutiple mergeable persistent trees"""
+    """Check that merging fails if there are multiple mergeable persistent trees"""
     f = ROOT.TFile("test1.root", "RECREATE")
     t = ROOT.TTree("persistent", "persistent")
     meta = FileMetaData()
@@ -343,7 +335,7 @@ def check_17_checkparentLFN():
     create_testfile_direct("test1.root", m1)
     create_testfile_direct("test2.root", m2)
     merge_files("test1.root", "test2.root")
-    meta = get_metadata()
+    meta = basf2.get_file_metadata("output.root")
     should_be = [e for e in sorted(set(parents[0] + parents[1]))]
     is_actual = [meta.getParent(i) for i in range(meta.getNParents())]
     return should_be == is_actual
@@ -364,7 +356,7 @@ def check_18_checkEventNr():
         files.append(f"test{i}.root")
         create_testfile_direct(files[-1], meta)
     merge_files(*files)
-    meta = get_metadata()
+    meta = basf2.get_file_metadata("output.root")
     return (
         sum(evtNr) == meta.getNEvents()
         and sum(evtNrFullEvents) == meta.getNFullEvents()
@@ -402,7 +394,7 @@ def check_19_lowhigh():
         high = max(lowhigh[i] for i in indices if lowhigh[i] != (-1, -1, 0))
         if merge_files("-f", "--no-catalog", *(files[i] for i in indices)) != 0:
             return False
-        meta = get_metadata()
+        meta = basf2.get_file_metadata("output.root")
         if (
             meta.getExperimentLow() != low[0]
             or meta.getRunLow() != low[1]
@@ -484,7 +476,7 @@ def check_23_legacy_ip():
     )
     if merge_files("test1.root", "test2.root") != 0:
         return False
-    meta = get_metadata()
+    meta = basf2.get_file_metadata("output.root")
     return meta.getDatabaseGlobalTag() == "test_globaltag"
 
 
@@ -496,7 +488,7 @@ def check_24_legacy_ip_middle():
     )
     if merge_files("test1.root", "test2.root") != 0:
         return False
-    meta = get_metadata()
+    meta = basf2.get_file_metadata("output.root")
     return meta.getDatabaseGlobalTag() == "test_globaltag,other"
 
 
@@ -506,7 +498,7 @@ def check_25_legacy_ip_only():
     create_testfile_direct("test2.root", global_tag="Legacy_IP_Information")
     if merge_files("test1.root", "test2.root") != 0:
         return False
-    meta = get_metadata()
+    meta = basf2.get_file_metadata("output.root")
     return meta.getDatabaseGlobalTag() == ""
 
 
@@ -520,7 +512,7 @@ def check_26_ntuple_merge():
 
 
 def check_27_ntuple_trees():
-    """Check that ntuple merge failes if the tree names are different"""
+    """Check that ntuple merge fails if the tree names are different"""
     create_testfile("test1.root")
     create_testfile("test2.root")
     create_testfile_ntuple(input="test1.root", output="ntuple1.root")
@@ -528,6 +520,22 @@ def check_27_ntuple_trees():
         input="test2.root", output="ntuple2.root", treeNames=["differentTree", "tree"]
     )
     return merge_files("ntuple1.root", "ntuple2.root") != 0
+
+
+def check_28_streaming():
+    """Check if we can merge streamed input files"""
+    # Here we use as input a mdst file from GitHub
+    input_file = 'https://github.com/belle2/basf2/raw/refs/heads/main/mdst/tests/mdst-v09-00-00.root'
+    return merge_files(input_file) == 0
+
+
+def check_29_parent_release():
+    """Check that merging files does not modify the release version in the metadata."""
+    create_testfile_direct("test1.root", release="abcd")
+    create_testfile_direct("test2.root", release="abcd")
+    merge_files("test1.root", "test2.root", output="output.root")
+    meta = basf2.get_file_metadata("output.root")
+    return meta.getRelease() == "abcd"
 
 
 def check_XX_filemetaversion():

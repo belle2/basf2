@@ -6,9 +6,7 @@ Event display
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 5 min
-
-    **Exercises**: 5 min
+    **Length**: 15 min
 
     **Prerequisites**:
 
@@ -27,7 +25,7 @@ In the last six lessons you built up a realistic steering file step by step.
 Congratulations for making it to this point! 🍰
 
 You probably already have developed quite a nice feeling for how to work with
-basf2. There is much more to learn, but the remaining topics are more
+``basf2``. There is much more to learn, but the remaining topics are more
 specialized and might not apply to every analysis.
 
 All of the following lessons (from here out) are largely self-contained and

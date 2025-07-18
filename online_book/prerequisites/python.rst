@@ -6,11 +6,9 @@ Python
 .. sidebar:: Overview
     :class: overview
 
-    **External Training**: about 7 hours.
+    **External Training**: 7 hrs
 
-    **Teaching**: 1 hour
-
-    **Exercises**: 30 min
+    **Length**: 1.5-3 hrs
 
     **Prerequisites**:
 
@@ -347,6 +345,8 @@ For any python interpreter, one can also use:
 .. code:: ipython3
 
   help(object)
+
+.. _pandatutorial_prereq:
 
 Pandas Tutorial and Python Data Analysis
 ----------------------------------------

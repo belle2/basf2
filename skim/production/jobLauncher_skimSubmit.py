@@ -57,13 +57,20 @@ parser.add_argument('-rel',
                     '--release',
                     type=str,
                     default='',
-                    help=" basf2 release to be used. If not provide the one in infoSkim.yaml will be used")
+                    help="basf2 release to be used. If not provide the one in infoSkim.yaml will be used")
+parser.add_argument('-samples',
+                    '--samples',
+                    type=str,
+                    default='',
+                    help="the yaml file (with full path) to be used in ``b2skim-stats-submit``.\
+                    If not provided, ``b2skim-stats-submit`` defaults to the samples of the current campaign\
+                    i.e. ``/group/belle2/dataprod/MC/SkimTraining/SampleLists/TestFiles.yaml`` on KEKCC.")
 
 # configuration argument, used for debugging only
 parser.add_argument('-flagged',   '--flagged',          type=int, default=True,        help="set to 0 to disable Flagged skim")
 parser.add_argument('-data',   '--data',          type=int, default=True,        help="set to 0 to disabled data run")
 parser.add_argument('-MC',   '--MC',          type=int, default=True,        help="set to 0 to disabled MC run")
-parser.add_argument('-dry',   '--dry',          type=int, default=False,        help="set to 1 to dry run, no commands exectuted")
+parser.add_argument('-dry',   '--dry',          type=int, default=False,        help="set to 1 to dry run, no commands executed")
 
 # steps to be run arguments (NB: you cannot mix in the same config basf2 and gbasf2 steps!)
 parser.add_argument('-s1',   '--lpns',          action="store_true",        help="create LPNS (gbasf2)")
@@ -104,7 +111,7 @@ except BaseException:
 
 
 if args.lpns:  # step1 - gbasf2, once per campaign, one command for data and one for MC
-    print('>>>> Step 1: retrive LPNS')
+    print('>>>> Step 1: retrieve LPNS')
 
     command = f'python3 skimSubmit.py --lpns  --base_dir {args.base_dir} --collectionYaml {args.collections}'
 
@@ -133,7 +140,7 @@ if args.yaml:  # step2 - basf2 once per campaign, one command for data and one f
             subprocess.run(command_data.split(), text=True)
 
     if args.MC:
-        command_MC = command + ' --mcrd --bkg BGx1'
+        command_MC = command + ' --mcrd --bg BGx1'
         print(colored(f'>>>> Executed command: {command_MC}', 'green'))
         if not args.dry:
             subprocess.run(command_MC.split(), text=True)
@@ -141,7 +148,7 @@ if args.yaml:  # step2 - basf2 once per campaign, one command for data and one f
 
 if args.stats_submit:  # step3 - basf2, loop on skim, common for data and MC
     print(colored('>>>> Step 3: create stats for all the skims ', 'blue', attrs=['bold']))
-    print('>>>> NB:bsub used, will take a wile to submit and to run)', 'red')
+    print('>>>> NB:bsub used, will take a while to submit and to run)', 'red')
 
     if args.flagged:
         flaggedString = ' --flagged '
@@ -157,6 +164,10 @@ if args.stats_submit:  # step3 - basf2, loop on skim, common for data and MC
                 GTstring += ' --PID_GT 1 '
         command = f'python3 skimSubmit.py --stats_submit --skims {skim} {flaggedString} {GTstring} ' \
                   f' --base_dir {args.base_dir} --inputYaml {args.skim} --infoYaml {args.info}'
+
+        if args.samples:
+            command += f" --samples {args.samples}"
+
         print(colored(f'>>>> Executed command: {command}', 'green'))
         if not args.dry:
             subprocess.run(command.split(), text=True)

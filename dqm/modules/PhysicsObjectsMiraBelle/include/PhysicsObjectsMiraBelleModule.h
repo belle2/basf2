@@ -6,10 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//#include <framework/core/Module.h>
+#pragma once
+
 #include <framework/core/HistoModule.h>
+
+#include <TH1F.h>
+
 #include <string>
-#include "TH1F.h"
 
 namespace Belle2 {
   /** A module template.

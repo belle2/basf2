@@ -8,47 +8,31 @@
 
 #pragma once
 
+#include <utility>
 #include <framework/datastore/RelationsObject.h>
 #include "Math/Vector3D.h"
 
 namespace Belle2 {
 
-  /** Extra info created by the 3D finder of the CDC trigger. */
+  // Extra info for analysis of the 3DFinder of the CDC trigger
   class CDCTrigger3DFinderInfo : public RelationsObject {
   public:
-    /** default constructor */
-    CDCTrigger3DFinderInfo():
-      m_houghspace(std::vector<ROOT::Math::XYZVector>()), m_ndreadout(std::vector<ROOT::Math::XYZVector>()) { }
+    // Default constructor
+    CDCTrigger3DFinderInfo() = default;
+    // Constructor with arguments
+    CDCTrigger3DFinderInfo(std::vector<ROOT::Math::XYZVector> houghSpace,
+                           std::vector<ROOT::Math::XYZVector> readoutCluster)
+      : m_houghSpace(std::move(houghSpace)), m_readoutCluster(std::move(readoutCluster)) {}
+    // Return the Hough space and/or the cluster readout
+    std::vector<ROOT::Math::XYZVector> getHoughSpace() const { return m_houghSpace; }
+    std::vector<ROOT::Math::XYZVector> getClusterReadout() const { return m_readoutCluster; }
 
-    /** constructor with arguments */
-    CDCTrigger3DFinderInfo(std::vector<ROOT::Math::XYZVector>& houghspace, std::vector<ROOT::Math::XYZVector>& ndreadout):
-      m_houghspace(houghspace), m_ndreadout(ndreadout) { }
-
-    /** destructor, empty because we don't allocate memory anywhere. */
-    ~CDCTrigger3DFinderInfo() { }
-
-    /** get list of cell member indices */
-    std::vector<ROOT::Math::XYZVector> getHoughSpace() const { return m_houghspace; }
-
-    std::vector<ROOT::Math::XYZVector> getNDReadout() const { return m_ndreadout; }
-
-    // setters
-    /** set int values */
-    void setInfoInts(std::vector<ROOT::Math::XYZVector> houghspace, std::vector<ROOT::Math::XYZVector> ndreadout)
-    {
-      m_houghspace = houghspace;
-      m_ndreadout = ndreadout;
-    }
-
-  protected:
-
-    /** list of hough space weights */
-    std::vector<ROOT::Math::XYZVector> m_houghspace = {};
-
-    /** list of cell indices of all cluster */
-    std::vector<ROOT::Math::XYZVector> m_ndreadout = {};
-
-    //! Needed to make the ROOT object storable
-    ClassDef(CDCTrigger3DFinderInfo, 1);
+  private:
+    // List of the complete Hough space weights.
+    std::vector<ROOT::Math::XYZVector> m_houghSpace = {};
+    // Includes the peak weight, cluster weights, center of gravity and indices.
+    std::vector<ROOT::Math::XYZVector> m_readoutCluster = {};
+    // Needed to make the ROOT object storable
+    ClassDef(CDCTrigger3DFinderInfo, 2);
   };
 }

@@ -44,7 +44,7 @@ extern "C" {
   /** Wrap Phokhara random number generator and use ROOT.
    * This method returns an array of random numbers in the range ]0,1[
    * @param drvec array to store the random numbers
-   * @param lenght size of the array
+   * @param length size of the array
    */
   void phokhara_rndmarray(double* drvec, const int* lengt)
   {
@@ -165,7 +165,7 @@ void Phokhara::setDefaultSettings()
 
 void Phokhara::init(const std::string& paramFile)
 {
-  B2INFO("Phokhara::init, using paramater file: " << paramFile);
+  B2INFO("Phokhara::init, using parameter file: " << paramFile);
 
   if (paramFile.empty()) B2FATAL("Phokhara: The specified param file is empty!");
   phokhara_set_parameter_file(paramFile.c_str());
@@ -306,8 +306,8 @@ void Phokhara::applySettings()
   m_npar[33]  = m_IFSNLO;
   m_npar[34]  = m_alpha;
   m_npar[35]  = m_pionff;
-  m_npar[36]  = m_pionstructure;
-  m_npar[37]  = m_kaonff;
+  m_npar[36]  = m_kaonff;
+  m_npar[37]  = m_pionstructure;
   m_npar[38]  = m_narres;
   m_npar[39]  = m_protonff;
   m_npar[40]  = m_fullNLO;

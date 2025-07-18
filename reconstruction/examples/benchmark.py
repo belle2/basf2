@@ -141,5 +141,8 @@ for category in categories:
             output.write(f' {fraction:.4f}')
         output.write('\n')
 
+if output is not None:
+    output.close()
+
 # fail if above limit
 sys.exit(0 if max_fraction <= 1 else 1)

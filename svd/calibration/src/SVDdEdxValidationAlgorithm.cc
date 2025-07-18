@@ -584,7 +584,7 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
         SelectedSignalIntegral = DataFrameSignalAll.Filter(SelectedSignalCut.GetTitle()).Sum(SignalWeightName).GetValue();
       }
 
-      // special treatement for pions: add also the slow pions from Dstar to gain low-momentum coverage
+      // special treatment for pions: add also the slow pions from Dstar to gain low-momentum coverage
       if (strncmp(SignalVarName.Data(), "PionD", 5) == 0) {
         TString SignalVarNameSlow = "SlowPion";
         TCut SelectedSignalCutSlow = Form("(%s%s%s > %s)", SignalVarNameSlow.Data(), PIDVarName.Data(), PIDDetectors[i].Data(),
@@ -623,7 +623,7 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
 
   std::unique_ptr<ROOT::RDF::RNode> DataFrameSlowFakeAll;
 
-  // special treatement for pions: add also the slow pions from Dstar to gain low-momentum coverage
+  // special treatment for pions: add also the slow pions from Dstar to gain low-momentum coverage
   if (strncmp(FakeVarName.Data(), "PionD", 5) == 0) {
 
     TString FakeVarNameSlow = "SlowPion";
@@ -801,7 +801,7 @@ TTree* SVDdEdxValidationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTr
   variables->add(ProtonBinaryElectronProtonIDSVDonly);
   variables->add(ProtonBinaryElectronProtonIDnoSVD);
 
-  RooDataSet* LambdaDataset = new RooDataSet("LambdaDataset", "LambdaDataset", preselTree.get(), *variables);
+  RooDataSet* LambdaDataset = new RooDataSet("LambdaDataset", "LambdaDataset", *variables, Import(*preselTree));
 
   if (LambdaDataset->sumEntries() == 0) {
     B2FATAL("The Lambda dataset is empty, stopping here");
@@ -1152,7 +1152,7 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
   variables->add(SlowPionBinaryElectronPionIDSVDonly);
   variables->add(SlowPionBinaryElectronPionIDnoSVD);
 
-  RooDataSet* DstarDataset = new RooDataSet("DstarDataset", "DstarDataset", preselTree.get(), *variables);
+  RooDataSet* DstarDataset = new RooDataSet("DstarDataset", "DstarDataset", *variables, Import(*preselTree));
 
   if (DstarDataset->sumEntries() == 0) {
     B2FATAL("The Dstar dataset is empty, stopping here");

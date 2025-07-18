@@ -16,8 +16,6 @@ import numpy as np
 
 from basf2_mva_python_interface.tensorflow import State
 
-from tflat.tensorflow_tflat_model import get_tflat_model
-
 from keras.losses import binary_crossentropy
 import tensorflow as tf
 
@@ -32,6 +30,8 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     :param parameters: as dictionary encoded json object
     :return: State obj
     """
+
+    from tflat.tensorflow_tflat_model import get_tflat_model
 
     # get all parameters, if they are not available, use default values
     if parameters is None:

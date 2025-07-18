@@ -109,8 +109,8 @@ namespace Belle2 {
     /// HLTprefilterParameters Database OjbPtr
     /*DBObjPtr<HLTprefilterParameters> m_hltPrefilterParameters;*/ /**< HLT prefilter parameters */
 
-    // Prescale for accepting HLTprefilter lines, by default none are accepted
-    unsigned int m_HLTprefilterPrescale = 0;
+    // Prescale for accepting HLTprefilter lines, by default we randomly accept 1 out of every 1000 events
+    unsigned int m_HLTprefilterPrescale = 1000;
 
   };
 }

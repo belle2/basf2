@@ -39,7 +39,7 @@ namespace Belle2 {
       m_cdcHitsMax = 1e9;
       m_eclDigitsMax = 1e9;
       m_HLTprefilterMode = 0;
-      m_HLTprefilterPrescale = 0;
+      m_HLTprefilterPrescale = 1000;
     }
 
     /**

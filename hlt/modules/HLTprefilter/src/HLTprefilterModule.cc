@@ -55,6 +55,10 @@ void HLTprefilterModule::beginRun()
   m_eclDigitsMax = m_hltPrefilterParameters->getECLDigitsMax();
 
   m_HLTprefilterMode = m_hltPrefilterParameters->getHLTprefilterMode();
+
+  m_HLTprefilterPrescale = m_hltPrefilterParameters->getHLTprefilterPrescale();
+
+
 */
 }
 
@@ -87,15 +91,14 @@ void HLTprefilterModule::event()
       bool HER_strip = (m_HERtimeSinceLastInjectionMin < timeSinceLastInj && timeSinceLastInj < m_HERtimeSinceLastInjectionMax
                         && m_HERtimeInBeamCycleMin < timeInBeamCycle && timeInBeamCycle < m_HERtimeInBeamCycleMax);
 
-      if (LER_strip || HER_strip)
-        injection_strip = true;
-
+      if ((LER_strip || HER_strip) && !Belle2::SoftwareTrigger::makePreScale(m_HLTprefilterPrescale)) 
+	      injection_strip = true;
     }
   
     const uint32_t NcdcHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
     const uint32_t NeclDigits = m_eclDigits.isOptional() ? m_eclDigits.getEntries() : 0;
-    if (NcdcHits > m_cdcHitsMax && NeclDigits > m_eclDigitsMax)
-      cdcecl_threshold = true;
+    if (NcdcHits > m_cdcHitsMax && NeclDigits > m_eclDigitsMax && !Belle2::SoftwareTrigger::makePreScale(m_HLTprefilterPrescale)) 
+          cdcecl_threshold = true;
 
   }
 

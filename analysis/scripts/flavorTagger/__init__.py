@@ -13,12 +13,13 @@
 # * and to test the flavor tagger.           *
 # ********************************************
 
-import os
-from fTagger import utils
-from .core.flavor_tagger import flavor_tagger
-filepath = os.path.join(os.path.dirname(__file__), 'statics/output_vars.yaml')
+import basf2
+from flavorTagger import utils
+from .core.flavorTagger import flavorTagger
+filepath = basf2.find_file('data/analysis/output_vars.yaml')
 flavor_tagging = utils.read_yaml(filepath)["output_vars"]
 
-# only public interfaces, to make package doc nicer. Also the only things imported by 'from fei import *'
-__all__ = ['utils', 'flavor_tagger', 'flavor_tagging']
+# @cond internal
+# only public interfaces, to make package doc nicer. Also the only things imported by 'from flavorTagger import *'
+__all__ = ['utils', 'flavorTagger', 'flavor_tagging']
 # @endcond

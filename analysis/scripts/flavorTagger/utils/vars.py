@@ -11,7 +11,7 @@ def set_output_vars():
     """
 
     # imports
-    import os
+    import basf2
     from variables import variables as va
     import variables.utils as vu
 
@@ -33,7 +33,7 @@ def set_output_vars():
         va.addAlias(aliasForIsRightCategory, f'isTrueFTCategory({category})')
 
     # get output vars list
-    filepath = os.path.join(os.path.dirname(__file__), '..', 'statics/output_vars.yaml')
+    filepath = basf2.find_file('data/analysis/output_vars.yaml')
     flavor_tagging_vars = read_yaml(filepath)["output_vars"]
 
     # add output vars to flavor tagger collection
@@ -45,14 +45,14 @@ def set_FT_pid_aliases(type="Current", exp_type="Belle2"):
     This function adds the pid aliases needed by the flavor tagger.
     """
     # imports
-    import os
+    import basf2
     from variables import variables as va
 
     # define a function to set alias
     def set_alias(alias, var): return va.addAlias(alias, var)
 
     # get list of aliases
-    filepath = os.path.join(os.path.dirname(__file__), '..', 'statics/pid_alias.yaml')
+    filepath = basf2.find_file('data/analysis/pid_alias.yaml')
     alias_list = read_yaml(filepath)[type]
 
     for alias, var in alias_list["Common"].items():
@@ -61,7 +61,7 @@ def set_FT_pid_aliases(type="Current", exp_type="Belle2"):
         set_alias(alias, var)   # exp specific alias
 
 
-def set_GFlat_aliases(categories):
+def set_GFlat_aliases(categories, usePIDNN):
     """
     This function adds aliases for the GNN-based flavor tagger.
     """
@@ -85,12 +85,12 @@ def set_GFlat_aliases(categories):
         'px_c': 'px*charge',
         'py_c': 'py*charge',
         'pz_c': 'pz*charge',
-        'electronID_c': 'electronID*charge',
-        'muonID_c': 'muonID*charge',
-        'pionID_c': 'pionID*charge',
-        'kaonID_c': 'kaonID*charge',
-        'protonID_c': 'protonID*charge',
-        'deuteronID_c': 'deuteronID*charge',
+        'electronID_c': 'electronIDNN*charge' if usePIDNN else 'electronID*charge',
+        'muonID_c': 'muonIDNN*charge' if usePIDNN else 'muonID*charge',
+        'pionID_c': 'pionIDNN*charge' if usePIDNN else 'pionID*charge',
+        'kaonID_c': 'kaonIDNN*charge' if usePIDNN else 'kaonID*charge',
+        'protonID_c': 'protonIDNN*charge' if usePIDNN else 'protonID*charge',
+        'deuteronID_c': 'deuteronIDNN*charge' if usePIDNN else 'deuteronID*charge',
         'electronID_noSVD_noTOP_c': 'electronID_noSVD_noTOP*charge',
     }
 

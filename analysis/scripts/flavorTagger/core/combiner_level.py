@@ -1,6 +1,6 @@
 # this script applies the combiner level classifier
 
-from fTagger.utils import get_Belle_or_Belle2
+from flavorTagger.utils import get_Belle_or_Belle2
 import os
 
 

@@ -1,6 +1,6 @@
 # this script applies the event level classifier
 
-from fTagger.utils import get_available_categories
+from flavorTagger.utils import get_available_categories
 import os
 
 

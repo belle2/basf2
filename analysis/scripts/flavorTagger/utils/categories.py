@@ -1,8 +1,5 @@
 # This script contains a list of categories available for event level training
 
-# imports
-
-
 def get_available_categories():
     """
     Gets all available categories for eventlevel FT training.

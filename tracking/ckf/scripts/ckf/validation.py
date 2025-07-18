@@ -116,7 +116,7 @@ class VxdCdcMergerHarvesterMCSide(HarvestingModule):
             if not merged_vxd_track:
                 # Case 5
                 flag_correct_not_merged_vxdmissing = True
-            # If merged track i is not emtpy, merger made a mistake
+            # If merged track i is not empty, merger made a mistake
             else:
                 # Case 3 !!
                 flag_incorrect_merged_vxdwrong_although_not_there = True

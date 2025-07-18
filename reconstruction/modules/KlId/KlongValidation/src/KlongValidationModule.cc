@@ -66,7 +66,7 @@ void KlongValidationModule::initialize()
                                5);
   m_effMom    = new TH1F("Momentum Efficiency obtained from cluster", "Efficiency Momentum;Momentum [GeV];Efficiency", 25, 0, 5);
 
-  m_fakePhi_Pass     = new TH1F("Phi Fake Passsed", "Fake Passed #Phi;#Phi [rad];Count", 32, -3.2, 3.2);
+  m_fakePhi_Pass     = new TH1F("Phi Fake Passed", "Fake Passed #Phi;#Phi [rad];Count", 32, -3.2, 3.2);
   m_fakePhi     = new TH1F("Phi Fake Rate", "Fake Rate #Phi;#Phi [rad];Fake Rate", 32, -3.2, 3.2);
 
   m_fakeTheta_Pass = new TH1F("Theta Fake Passed", "Fake Passed #Theta;#Theta [rad];Count", 32, 0, 3.2);
@@ -75,7 +75,7 @@ void KlongValidationModule::initialize()
   m_fakeMom_Pass   = new TH1F("Momentum Fake Passed", "Momentum Fake Passed;Momentum [GeV];Count", 25, 0, 5);
   m_fakeMom     = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum [GeV];Fake Rate", 25, 0, 5);
 
-  m_time     = new TH1F("KLM Cluster Time", "Cluster Timing;Cluster time [ns];Count", 200, -30, 70);
+  m_time     = new TH1F("KLM Cluster Time", "Cluster Timing;Cluster time [ns];Count", 100, -30, 70);
   m_trackSep     = new TH1F("KLM trackSeperation Distance", "KLM trackSeperation Distance;Distance [mm];Count", 100, 0, 4000);
   m_nLayer     = new TH1F("KLM N-Layer", "N-layer;N-layer;count", 20, 0, 20);
 
@@ -204,7 +204,7 @@ void KlongValidationModule::event()
     m_trackFlag->SetMinimum(0.);
     m_ECLFlag->SetMinimum(0.);
 
-    //fil all to normalise later
+    //fill all to normalise later
     m_Phi_all -> Fill(m_phi);
     m_Theta_all -> Fill(m_theta);
     m_Mom_all -> Fill(m_momentum);

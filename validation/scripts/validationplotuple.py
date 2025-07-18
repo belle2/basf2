@@ -36,27 +36,23 @@ class Plotuple:
     A Plotuple is either a Plot or an N-Tuple
 
     @var work_folder: the work folder containing the results and plots
-    @var root_objects: A list of Root-objects which belong
+    @var _root_objects: A list of Root-objects which belong
         together (i.e. should be drawn into one histogram or one table)
-    @var revisions: The list of revisions
+    @var _revisions: The list of revisions
     @var warnings: A list of warnings that occurred while creating the
         plots/tables for this Plotuple object
-    @var reference: The reference RootObject for this Plotuple
-    @var elements: The elements (RootObject of different revisions) for this
+    @var _reference: The reference RootObject for this Plotuple
+    @var _elements: The elements (RootObject of different revisions) for this
         Plotuple
-    @var newest: The newest element in elements
+    @var _newest: The newest element in elements
     @var key: The key of the object within the corresponding ROOT file
     @var type: The type of the elements (TH1, TH2, TNtuple)
-    @var description: The description of this Plotuple object
-    @var check: Hint how the Plotuple object should look like
+    @var _description: The description of this Plotuple object
+    @var _check: Hint how the Plotuple object should look like
     @var contact: The contact person for this Plotuple object
     @var package: The package to which this Plotuple object belongs to
     @var rootfile: The rootfile to which the Plotuple object belongs to
-    @var chi2test_result: The result of the Chi^2-Test. By default, there is no
-        such result. If the Chi^2-Test has been performed, this variable holds
-        the information between which objects it has been performed.
-    @var pvalue: The p-value that the Chi^2-Test returned
-    @var file: The file, in which the histogram or the HMTL-table (for
+    @var _file: The file, in which the histogram or the HMTL-table (for
         n-tuples) are stored (without the file extension!)
     """
 
@@ -218,8 +214,6 @@ class Plotuple:
         # used to store HTML user content
         elif self.type == "TNamed":
             self.create_html_content()
-        elif self.type == "TASImage":
-            self.create_image_plot()
         elif self.type == "TNtuple":
             self.create_ntuple_table_json()
         elif self.type == "meta":
@@ -324,91 +318,6 @@ class Plotuple:
         if tf1:
             function_list = obj.GetListOfFunctions()
             function_list.Remove(tf1)
-
-    # TODO: is this actually used or can it be removed ?
-    def create_image_plot(self):
-        """!
-        Creates image plot for TASImage-objects.
-        @return: None
-        """
-
-        # Create a ROOT canvas on which we will draw our histograms
-        self._width = 700
-        if len(self._elements) > 4:
-            canvas = ROOT.TCanvas("", "", 700, 1050)
-            self._height = 1050
-        else:
-            canvas = ROOT.TCanvas("", "", 700, 525)
-            self._height = 525
-
-        # Split the canvas into enough parts to fit all image_objects
-        # Find numbers x and y so that x*y = N (number of histograms to be
-        # plotted), and x,y close to sqrt(N)
-
-        if len(self._root_objects) == 1:
-            x = y = 1
-        elif len(self._root_objects) == 2:
-            x = 2
-            y = 1
-        else:
-            x = 2
-            y = int(math.floor((len(self._root_objects) + 1) / 2))
-
-        # Actually split the canvas and go to the first pad ('sub-canvas')
-        canvas.Divide(x, y)
-        pad = canvas.cd(1)
-        pad.SetFillColor(ROOT.kWhite)
-
-        # If there is a reference object, plot it first
-        if self._reference is not None:
-            self._draw_ref(pad)
-
-        # Now draw the normal plots
-        items_to_plot_count = len(self._elements)
-        for plot in reversed(self._elements):
-
-            # Get the index of the current plot
-            index = index_from_revision(plot.revision, self._work_folder)
-            style = get_style(index, items_to_plot_count)
-
-            self._remove_stats_tf1(plot.object)
-
-            # Set line properties accordingly
-            plot.object.SetLineColor(style.GetLineColor())
-            plot.object.SetLineWidth(style.GetLineWidth())
-            plot.object.SetLineStyle(style.GetLineStyle())
-
-            # Switch to the correct sub-panel of the canvas. If a ref-plot
-            # exists, we have to go one panel further compared to the
-            # no-ref-case
-            if self._reference is not None:
-                i = 2
-            else:
-                i = 1
-
-            pad = canvas.cd(self._elements.index(plot) + i)
-            pad.SetFillColor(ROOT.kWhite)
-
-            # Draw the reference on the canvas
-            self._draw_root_object(
-                self.type, plot.object, plot.object.GetOption()
-            )
-            pad.Update()
-            pad.GetFrame().SetFillColor(ROOT.kWhite)
-
-            # Write the title in the correct color
-            title = pad.GetListOfPrimitives().FindObject("title")
-            if title:
-                title.SetTextColor(style.GetLineColor())
-
-        # Save the plot as PNG and PDF
-        canvas.Print(os.path.join(self._plot_folder, self.get_png_filename()))
-        canvas.Print(os.path.join(self._plot_folder, self.get_pdf_filename()))
-
-        self._file = os.path.join(
-            self._plot_folder,
-            f"{strip_ext(self.rootfile)}_{self.key}",
-        )
 
     def get_png_filename(self):
         return f"{strip_ext(self.rootfile)}_{self.key}.png"
@@ -604,7 +513,7 @@ class Plotuple:
 
         # Add reference legend entry last for neatness
         if self._reference is not None:
-            legend.AddEntry(self._reference.object, 'reference')
+            legend.AddEntry(self._reference.object, self._reference.revision)
 
         legend.Draw()
 

@@ -31,6 +31,9 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/BeamParameters.h>
 
+#include <Math/VectorUtil.h>
+
+#include <cmath>
 #include <queue>
 
 namespace Belle2 {
@@ -81,7 +84,7 @@ namespace Belle2 {
     double isCloneTrack(const Particle* particle)
     {
       // neutrals and composites don't make sense
-      if (!Const::chargedStableSet.contains(Const::ParticleType(abs(particle->getPDGCode()))))
+      if (!Const::chargedStableSet.contains(Const::ParticleType(std::abs(particle->getPDGCode()))))
         return Const::doubleNaN;
       // get mcparticle weight (mcmatch weight)
       const auto mcpww = particle->getRelatedToWithWeight<MCParticle>();
@@ -135,6 +138,24 @@ namespace Belle2 {
         curMCParticle = curMCMother;
       }
       return curMCParticle->getArrayIndex();
+    }
+
+    double genQ2PmPd(const Particle* part, const std::vector<double>& daughter_indices)
+    {
+      const MCParticle* mcparticle = part->getMCParticle();
+      if (!mcparticle) return Const::doubleNaN;
+
+      auto daughters = mcparticle->getDaughters();
+
+      ROOT::Math::PxPyPzEVector  p4Daughters;
+      for (auto& double_daughter : daughter_indices) {
+        unsigned long daughter = std::lround(double_daughter);
+        if (daughter >= daughters.size()) return Const::doubleNaN;
+
+        p4Daughters += daughters[daughter]->get4Vector();
+      }
+      auto p4Mother = mcparticle->get4Vector();
+      return (p4Mother - p4Daughters).mag2();
     }
 
     double genMotherPDG(const Particle* part)
@@ -376,7 +397,7 @@ namespace Belle2 {
     ROOT::Math::PxPyPzEVector MCInvisibleP4(const MCParticle* mcparticle)
     {
       ROOT::Math::PxPyPzEVector ResultP4;
-      int pdg = abs(mcparticle->getPDG());
+      int pdg = std::abs(mcparticle->getPDG());
       bool isNeutrino = (pdg == 12 or pdg == 14 or pdg == 16);
 
       if (mcparticle->getNDaughters() > 0) {
@@ -412,7 +433,7 @@ namespace Belle2 {
       const MCParticle* mcB = part->getMCParticle();
       if (!mcB) return Const::doubleNaN;
 
-      int mcParticlePDG = abs(mcB->getPDG());
+      int mcParticlePDG = std::abs(mcB->getPDG());
       if (mcParticlePDG != 511 and mcParticlePDG != 521)
         return Const::doubleNaN;
 
@@ -541,6 +562,26 @@ namespace Belle2 {
       return tauDecay->getTauMinusMcProng();
     }
 
+    double tauPlusEgstar(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return 0;
+      }
+      return tauDecay->getTauPlusEgstar();
+    }
+
+    double tauMinusEgstar(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return 0;
+      }
+      return tauDecay->getTauMinusEgstar();
+    }
+
     double isReconstructible(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
@@ -550,7 +591,7 @@ namespace Belle2 {
 
       // If charged: make sure it was seen in the SVD.
       // If neutral: make sure it was seen in the ECL.
-      return (abs(mcp->getCharge()) > 0) ? seenInSVD(p) : seenInECL(p);
+      return (std::abs(mcp->getCharge()) > 0) ? seenInSVD(p) : seenInECL(p);
     }
 
     double isTrackFound(const Particle* p)
@@ -558,11 +599,15 @@ namespace Belle2 {
       if (p->getParticleSource() != Particle::EParticleSourceObject::c_MCParticle)
         return Const::doubleNaN;
       const MCParticle* tmp_mcP = p->getMCParticle();
-      if (!Const::chargedStableSet.contains(Const::ParticleType(abs(tmp_mcP->getPDG()))))
+      if (!Const::chargedStableSet.contains(Const::ParticleType(std::abs(tmp_mcP->getPDG()))))
         return Const::doubleNaN;
       Track* tmp_track = tmp_mcP->getRelated<Track>();
       if (tmp_track) {
-        const TrackFitResult* tmp_tfr = tmp_track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(tmp_mcP->getPDG())));
+        const TrackFitResult* tmp_tfr = tmp_track->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(tmp_mcP->getPDG())));
+        if (!tmp_tfr) {
+          // p value of TrackFitResult is NaN so cannot check charge
+          return 0;
+        }
         if (tmp_tfr->getChargeSign()*tmp_mcP->getCharge() > 0)
           return 1;
         else
@@ -686,12 +731,16 @@ namespace Belle2 {
     double getHEREnergy(const Particle*)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
       return (beamParamsDB->getHER()).E();
     }
 
     double getLEREnergy(const Particle*)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
       return (beamParamsDB->getLER()).E();
     }
 
@@ -699,30 +748,30 @@ namespace Belle2 {
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      B2Vector3D herVec = beamParamsDB->getHER().Vect();
-      B2Vector3D lerVec = beamParamsDB->getLER().Vect();
-
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
+      ROOT::Math::PxPyPzEVector herVec = beamParamsDB->getHER();
+      ROOT::Math::PxPyPzEVector lerVec = beamParamsDB->getLER();
       // only looking at the horizontal (XZ plane) -> set y-coordinates to zero
-      herVec.SetY(0);
-      lerVec.SetY(0);
-
-      //calculate the crossing angle
-      return herVec.Angle(-lerVec);
+      herVec.SetPy(0);
+      lerVec.SetPy(0);
+      // calculate the crossing angle
+      return ROOT::Math::VectorUtil::Angle(herVec, -lerVec);
     }
 
     double getCrossingAngleY(const Particle*)
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      B2Vector3D herVec = beamParamsDB->getHER().Vect();
-      B2Vector3D lerVec = beamParamsDB->getLER().Vect();
-
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
+      ROOT::Math::PxPyPzEVector herVec = beamParamsDB->getHER();
+      ROOT::Math::PxPyPzEVector lerVec = beamParamsDB->getLER();
       // only looking at the vertical (YZ plane) -> set x-coordinates to zero
-      herVec.SetX(0);
-      lerVec.SetX(0);
-
-      //calculate the crossing angle
-      return herVec.Angle(-lerVec);
+      herVec.SetPx(0);
+      lerVec.SetPx(0);
+      // calculate the crossing angle
+      return ROOT::Math::VectorUtil::Angle(herVec, -lerVec);
     }
 
 
@@ -822,13 +871,79 @@ namespace Belle2 {
       return weightsum;
     }
 
+    // Helper function for particleClusterTotalMCMatchWeightForKlong
+    void getKlongWeightMap(const Particle* particle, std::map<int, double>& mapMCParticleIndxAndWeight)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+
+      for (unsigned int i = 0; i < mcps.size(); ++i) {
+        double weight = mcps.weight(i);
+        const MCParticle* mcp = mcps[i];
+
+        while (mcp) {
+          if (mcp->getPDG() == 130) {
+            int index = mcp->getArrayIndex();
+            if (mapMCParticleIndxAndWeight.find(index) != mapMCParticleIndxAndWeight.end()) {
+              mapMCParticleIndxAndWeight.at(index) = mapMCParticleIndxAndWeight.at(index) + weight;
+            } else {
+              mapMCParticleIndxAndWeight.insert({index, weight});
+            }
+            break;
+          } else {
+            mcp = mcp->getMother();
+          }
+        }
+      }
+    }
+
+    double particleClusterTotalMCMatchWeightForKlong(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return Const::doubleNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return Const::doubleNaN;
+
+      std::map<int, double> mapMCParticleIndxAndWeight;
+      getKlongWeightMap(particle, mapMCParticleIndxAndWeight);
+
+      double totalWeight = 0;
+      for (const auto& map : mapMCParticleIndxAndWeight) {
+        totalWeight += map.second;
+      }
+
+      return totalWeight;
+    }
+
+    double particleClusterTotalMCMatchWeightForBestKlong(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return Const::doubleNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return Const::doubleNaN;
+
+      std::map<int, double> mapMCParticleIndxAndWeight;
+      getKlongWeightMap(particle, mapMCParticleIndxAndWeight);
+
+      if (mapMCParticleIndxAndWeight.size() == 0)
+        return 0.0;
+
+      auto maxMap = std::max_element(mapMCParticleIndxAndWeight.begin(), mapMCParticleIndxAndWeight.end(),
+      [](const auto & x, const auto & y) { return x.second < y.second; }
+                                    );
+
+      return maxMap->second;
+    }
+
     double isBBCrossfeed(const Particle* particle)
     {
       if (particle == nullptr)
         return Const::doubleNaN;
 
       int pdg = particle->getPDGCode();
-      if (abs(pdg) != 511 && abs(pdg) != 521 && abs(pdg) != 531)
+      if (std::abs(pdg) != 511 && std::abs(pdg) != 521 && std::abs(pdg) != 531)
         return Const::doubleNaN;
 
       std::vector<const Particle*> daughters = particle->getFinalStateDaughters();
@@ -841,7 +956,7 @@ namespace Belle2 {
         const MCParticle* curMCParticle = daughters[j]->getMCParticle();
         while (curMCParticle != nullptr) {
           pdg = curMCParticle->getPDG();
-          if (abs(pdg) == 511 || abs(pdg) == 521 || abs(pdg) == 531) {
+          if (std::abs(pdg) == 511 || std::abs(pdg) == 521 || std::abs(pdg) == 531) {
             mother_ids.emplace_back(curMCParticle->getArrayIndex());
             break;
           }
@@ -860,6 +975,241 @@ namespace Belle2 {
         return 1;
     }
 
+    int ancestorBIndex(const Particle* particle)
+    {
+      const MCParticle* mcpart = particle->getMCParticle();
+
+      while (mcpart) {
+        int pdg = std::abs(mcpart->getPDG());
+
+        if ((pdg == 521) || (pdg == 511))
+          return mcpart->getArrayIndex();
+
+        mcpart = mcpart->getMother();
+      }
+
+      return -1;
+    }
+
+
+    int ccbarTagPartialHelper(
+      const MCParticle* mcParticle,
+      std::vector<Particle*>& recParticles,
+      std::vector<const MCParticle*>& missedParticles
+    )
+    {
+      bool CaughtAll = true;
+      bool missedAll = true;
+      for (auto& mcDaughter : mcParticle->getDaughters()) {
+        if (mcDaughter->getPDG() == Const::photon.getPDGCode() && (mcDaughter->getEnergy() < 0.1
+                                                                   or mcDaughter->hasStatus(MCParticle::c_IsISRPhoton))) {
+          continue; // ignore radiative photons with energy < 0.1 GeV and ISR as if they are not in the event
+        }
+        // Belle MC legacy remnants
+        if (abs(mcDaughter->getPDG()) == 21) continue; // ignore gluons
+        if (abs(mcDaughter->getPDG()) == 1) continue; // ignore down quarks
+        if (abs(mcDaughter->getPDG()) == 2) continue; // ignore up quarks
+        if (abs(mcDaughter->getPDG()) == 3) continue; // ignore strange quarks
+        if (abs(mcDaughter->getPDG()) == 4) continue; // ignore charm quarks
+        if (abs(mcDaughter->getPDG()) == 5) continue; // ignore bottom quarks
+        if (abs(mcDaughter->getPDG()) == 6) continue; // ignore top quarks
+        // TODO are there any other particles that should be ignored, due to Belle MC generation?
+        auto it = std::find_if(recParticles.begin(), recParticles.end(), [mcDaughter](Particle * rec) { return rec->getMCParticle() == mcDaughter; });
+        if (it != recParticles.end()) {
+          recParticles.erase(it);
+          missedAll = false;
+        } else if (mcDaughter->getNDaughters() == 0) {
+          missedParticles.push_back(mcDaughter);
+          CaughtAll = false;
+        } else {
+          std::vector<const MCParticle*> tempMissedParticles;
+          int status = ccbarTagPartialHelper(mcDaughter, recParticles, tempMissedParticles);
+          if (status == 0) {
+            missedParticles.push_back(mcDaughter);
+            CaughtAll = false;
+          } else if (status == 1) {
+            missedAll = false; // tempMissedParticles is empty
+          } else {
+            missedAll = false;
+            CaughtAll = false;
+            missedParticles.insert(missedParticles.end(), tempMissedParticles.begin(), tempMissedParticles.end());
+          }
+        }
+      }
+      if (missedAll) return 0;
+      else if (CaughtAll) return 1;
+      else return 2;
+    }
+
+    int ccbarTagPartialHelper(
+      const MCParticle* mcParticle,
+      const std::vector<Particle*>& recParticles
+    )
+    {
+      bool CaughtAll = true;
+      bool missedAll = true;
+      for (auto& mcDaughter : mcParticle->getDaughters()) {
+        if (mcDaughter->getPDG() == Const::photon.getPDGCode()
+            && mcDaughter->getEnergy() < 0.1) continue; // ignore radiative photons with energy < 0.1 GeV as if they are not in the event
+        auto it = std::find_if(recParticles.begin(), recParticles.end(), [mcDaughter](Particle * rec) { return rec->getMCParticle() == mcDaughter; });
+        if (it != recParticles.end()) missedAll = false;
+        else if (mcDaughter->getNDaughters() == 0) CaughtAll = false;
+        else {
+          int status = ccbarTagPartialHelper(mcDaughter, recParticles);
+          if (status == 0) CaughtAll = false;
+          else if (status == 1) missedAll = false;
+          else {
+            missedAll = false;
+            CaughtAll = false;
+          }
+        }
+      }
+      if (missedAll) return 0;
+      else if (CaughtAll) return 1;
+      else return 2;
+    }
+
+    int ccbarTagEventStatus(const Particle* part)
+    {
+      // event part of matching
+      int sigPDGCode = part->getPDGCode() * (-1); // get info about signal particles
+      StoreArray<MCParticle> mcparticles;
+      int eventStatus = 100;
+      for (int i = 0; i < mcparticles.getEntries(); i++) {
+        if (mcparticles[i]->getPDG() == sigPDGCode) {
+          int recStatus = ccbarTagPartialHelper(mcparticles[i], part->getDaughters());
+          if (recStatus == 0) return 0; // 0 not reconstructed
+          else if (recStatus == 2) eventStatus = 200; // 2 partially reconstructed
+        }
+      }
+      return eventStatus;
+    }
+
+    int ccbarTagSignal(const Particle* part)
+    {
+      if (part->getNDaughters() == 0) {
+        B2WARNING("Particle has no daughters, cannot perform ccbarTagSignal");
+        return -1;
+      }
+
+      int returnValue = ccbarTagEventStatus(part);
+      int sigPDGCode = part->getPDGCode() * (-1); // get info about signal particles
+      // reconstruction part of matching, get daughters
+      for (auto& daughter : part->getDaughters()) {
+        if (!daughter->getMCParticle()) return returnValue + 10;
+      }
+
+      // get allMother, potentialSignalLeakage
+      const MCParticle* allMother = nullptr;
+      for (auto& daughter : part->getDaughters()) {
+        const MCParticle* curMCMother = daughter->getMCParticle()->getMother();
+        if (curMCMother == nullptr) return returnValue + 20;
+        else {
+          const MCParticle* grandMother = curMCMother->getMother();
+          while (grandMother != nullptr) {
+            curMCMother = grandMother;
+            grandMother = curMCMother->getMother();
+          }
+
+          if (curMCMother->getPDG() != Const::photon.getPDGCode() && curMCMother->getPDG() != 23
+              && curMCMother->getPDG() != 10022) return returnValue + 20;
+          else if (!allMother) allMother = curMCMother;
+          else if (allMother != curMCMother) return returnValue + 20;
+        }
+      }
+
+      // daughter mcErrors ---------------------------------
+      bool hasMissingGamma = false;
+      bool hasMissingNeutrino = false;
+      bool hasDecayInFlight = false;
+      for (auto& daughter : part->getDaughters()) { // TODO think about less strict conditions
+        int mcError = MCMatching::getMCErrors(daughter, daughter->getMCParticle());
+        if (mcError == MCMatching::c_Correct || mcError == MCMatching::c_MissingResonance) continue;
+        else if (mcError == MCMatching::c_MissGamma || mcError == MCMatching::c_MissFSR
+                 || mcError == MCMatching::c_MissPHOTOS) hasMissingGamma = true;
+        else if (mcError == MCMatching::c_MissNeutrino) hasMissingNeutrino = true;
+        else if (mcError == MCMatching::c_DecayInFlight) hasDecayInFlight = true;
+        else {
+          returnValue += 30;
+          return returnValue;
+        }
+      }
+      if (hasDecayInFlight) returnValue += 40;
+      else if (hasMissingNeutrino) returnValue += 50;
+      else if (hasMissingGamma) returnValue += 60;
+
+      // FEI specific checks
+      std::vector<Particle*> daughters = part->getDaughters();
+      std::vector<const MCParticle*> missedParticles;
+      ccbarTagPartialHelper(allMother, daughters, missedParticles);
+
+      if (daughters.size() > 0) return returnValue + 1000;
+
+      if (missedParticles.size() == 1) {
+        if (missedParticles[0]->getPDG() == sigPDGCode) return returnValue + 1;
+        else return returnValue + 2;
+      } else if (missedParticles.size() > 1) {
+        return returnValue + 3;
+      }
+
+      return returnValue;
+    }
+
+    int ccbarTagSignalSimplified(const Particle* part)
+    {
+      if (part->getNDaughters() == 0) {
+        B2WARNING("Particle has no daughters, cannot perform ccbarTagSignalSimplified");
+        return -1;
+      }
+
+      int sigPDGCode = part->getPDGCode() * (-1); // get info about signal particles
+      // reconstruction part of matching, get daughters
+      for (auto& daughter : part->getDaughters()) {
+        if (!daughter->getMCParticle()) return 10;
+      }
+
+      // get allMother, potentialSignalLeakage
+      const MCParticle* allMother = nullptr;
+      for (auto& daughter : part->getDaughters()) {
+        const MCParticle* curMCMother = daughter->getMCParticle()->getMother();
+        if (curMCMother == nullptr) return 20;
+        else {
+          const MCParticle* grandMother = curMCMother->getMother();
+          while (grandMother != nullptr) {
+            curMCMother = grandMother;
+            grandMother = curMCMother->getMother();
+          }
+
+          if (curMCMother->getPDG() != Const::photon.getPDGCode() && curMCMother->getPDG() != 23 && curMCMother->getPDG() != 10022) return 20;
+          else if (!allMother) allMother = curMCMother;
+          else if (allMother != curMCMother) return 20;
+        }
+      }
+
+      // daughter mcErrors ---------------------------------
+      for (auto& daughter : part->getDaughters()) {
+        int mcError = MCMatching::getMCErrors(daughter, daughter->getMCParticle());
+        if (mcError == MCMatching::c_Correct || mcError == MCMatching::c_MissingResonance) continue;
+        else return 30;
+      }
+
+      // FEI specific checks
+      std::vector<Particle*> daughters = part->getDaughters();
+      std::vector<const MCParticle*> missedParticles;
+      ccbarTagPartialHelper(allMother, daughters, missedParticles);
+
+      if (daughters.size() > 0) return 1000;
+
+      if (missedParticles.size() == 1) {
+        if (missedParticles[0]->getPDG() == sigPDGCode) return 1;
+        else return 2;
+      } else if (missedParticles.size() > 1) {
+        return 3;
+      }
+
+      return 0;
+    }
+
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found. \n"
@@ -872,10 +1222,37 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignalAcceptBremsPhotons", isSignalAcceptBremsPhotons,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found.\n"
                       "Particles with gamma daughters attached through the bremsstrahlung recovery modules are allowed.");
+    REGISTER_VARIABLE("ccbarTagEventStatus", ccbarTagEventStatus,
+                      "Event status for ccbarTag, returns 100 if there is no signal particle in the event, 200 if it was partially absorbed by tag and 0 otherwise.");
+    REGISTER_VARIABLE("ccbarTagSignal", ccbarTagSignal, R"DOC(
+                      1 if ccbar tag quasi particle is 'correctly' reconstructed (SIGNAL) in a ccbar event,
+                      otherwise the following encoding indicating the quality of MC match is passed:
+
+                      * first digit entails info about event particles not contained in the tag: 0 = none missed, 1 = one signal particle is missed (correct), 2 = one non-signal particle is missed, 3 = multiple missed particles,
+                      * second digit corresponds to daughter truth matching errors: 10 = non-matched daughter, 20 = non-common mother or background particle, 30 = severe mcError encountered, 40 = decay in flight, 50 = missing neutrino, 60 = missing gamma,
+                      * third digit corresponds to ccbarTagEventStatus: 100 = no signal particles left in event, 200 = partially absorbed by tag, 0 = at least one signal particle left in event,
+                      * fourth digit is 1000 if the tag absorbed something too much (like a particle coming from beam background).
+                      * return -1 if the particle has no daughters, cannot perform ccbarTagSignal.
+
+                      )DOC");
+    REGISTER_VARIABLE("ccbarTagSignalSimplified", ccbarTagSignalSimplified,
+                      "Simplified version of ccbarTagSignal without the information of ccbarTagEventStatus.");
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
                       "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.  :noindex:");
+
+    REGISTER_VARIABLE("genQ2PmPd(i,j,...)", genQ2PmPd, R"DOC(
+                       Returns the generated four momentum transfer squared :math:`q^2` calculated as :math:`q^2 = (p_m - p_{d_i} - p_{d_j} - ...)^2`.
+
+                       Here :math:`p_m` is the four momentum of the given (mother) particle,
+                       and :math:`p_{d_{i,j,...}}` are the daughter particles with indices given as arguments .
+                       The ordering of daughters is as defined in the DECAY.DEC file used in the generation, with the numbering starting at :math:`N=0`.
+
+                       Returns NaN if no related MCParticle could be found.
+                       Returns NaN if any of the given indices is larger than the number of daughters of the given particle.
+
+                       )DOC", ":math:`[\\text{GeV}/\\text{c}]^2`");
 
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
                       "Check the array index of a particles generated mother");
@@ -886,6 +1263,8 @@ namespace Belle2 {
     // variable in sphinx
     REGISTER_VARIABLE("isBBCrossfeed", isBBCrossfeed,
                       "Returns 1 for crossfeed in reconstruction of given B meson, 0 for no crossfeed and NaN for no true B meson or failed truthmatching.");
+    REGISTER_VARIABLE("ancestorBIndex", ancestorBIndex,
+                      "Returns array index of B ancestor, or -1 if no B or no MC-matching is found.");
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle\n\n", "GeV/c");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
@@ -1078,6 +1457,10 @@ List of possible values (taken from the Geant4 source of
                       "[Eventbased] Prong for the positive tau lepton in a tau pair generated event.");
     REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
                       "[Eventbased] Prong for the negative tau lepton in a tau pair generated event.");
+    REGISTER_VARIABLE("tauPlusEgstar", tauPlusEgstar,
+                      "[Eventbased] Energy of radiated gamma from positive tau lepton in a tau pair generated event.");
+    REGISTER_VARIABLE("tauMinusEgstar", tauMinusEgstar,
+                      "[Eventbased] Energy of radiated gamma from negative tau lepton in a tau pair generated event.");
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,
@@ -1085,7 +1468,7 @@ List of possible values (taken from the Geant4 source of
     REGISTER_VARIABLE("seenInPXD", seenInPXD,
                       "Returns 1.0 if the MC particle was seen in the PXD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("isTrackFound", isTrackFound,
-                      "works on charged stable particle list created from MCParticles, returns NaN if not ; returns 1.0 if there is a reconstructed track related to the charged stable MCParticle with the correct charge, return -1.0 if the reconstucted track has the wrong charge, return 0.0 when no reconstructed track is found.");
+                      "works on charged stable particle list created from MCParticles, returns NaN if not ; returns 1.0 if there is a reconstructed track related to the charged stable MCParticle with the correct charge, return -1.0 if the reconstructed track has the wrong charge, return 0.0 when no reconstructed track is found.");
     REGISTER_VARIABLE("seenInSVD", seenInSVD,
                       "Returns 1.0 if the MC particle was seen in the SVD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInCDC", seenInCDC,
@@ -1110,6 +1493,12 @@ List of possible values (taken from the Geant4 source of
                       "Returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
     REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight,
                       "Returns the sum of all weights of the ECLCluster -> MCParticles relations.");
+
+    REGISTER_VARIABLE("clusterTotalMCMatchWeightForKlong", particleClusterTotalMCMatchWeightForKlong,
+                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is a Klong or daughter of a Klong");
+    REGISTER_VARIABLE("clusterTotalMCMatchWeightForBestKlong", particleClusterTotalMCMatchWeightForBestKlong,
+                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is the same Klong or daughter of the Klong. If multiple MC Klongs are related to the ECLCluster, returns the sum of weights for the best matched Klong.");
+
 
   }
 }

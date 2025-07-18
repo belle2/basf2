@@ -48,8 +48,9 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
            "Minimal number of processed events required to print error messages", 10000.);
   addParam("MinEntries", m_minEntries,
            "Minimal number for delta histogram updates", 50000.);
+  addParam("MessageThreshold", m_MessageThreshold,
+           "Max number of messages to show up in channel occupancy plots", 12);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
-  addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
   m_2DHitsLine.SetLineColor(kRed);
@@ -74,22 +75,45 @@ void DQMHistAnalysisKLMModule::initialize()
             << LogVar("Threshold for hot channels", m_ThresholdForHot)
             << LogVar("Threshold for masked channels", m_ThresholdForMasked));
 
-  if (m_refFileName != "") {
-    m_refFile = TFile::Open(m_refFileName.data(), "READ");
-  }
-
   // register plots for delta histogramming
   addDeltaPar(m_histogramDirectoryName, "time_rpc", HistDelta::c_Entries, m_minEntries, 1);
   addDeltaPar(m_histogramDirectoryName, "time_scintillator_bklm", HistDelta::c_Entries, m_minEntries, 1);
   addDeltaPar(m_histogramDirectoryName, "time_scintillator_eklm", HistDelta::c_Entries, m_minEntries, 1);
 
+  addDeltaPar(m_histogramDirectoryName, "feStatus_bklm_scintillator_layers_0", HistDelta::c_Entries, m_minEntries, 1);
+  addDeltaPar(m_histogramDirectoryName, "feStatus_bklm_scintillator_layers_1", HistDelta::c_Entries, m_minEntries, 1);
+  addDeltaPar(m_histogramDirectoryName, "feStatus_eklm_plane_0", HistDelta::c_Entries, m_minEntries, 1);
+  addDeltaPar(m_histogramDirectoryName, "feStatus_eklm_plane_1", HistDelta::c_Entries, m_minEntries, 1);
+
   //register EPICS PVs
   registerEpicsPV("KLM:MaskedChannels", "MaskedChannels");
   registerEpicsPV("KLM:DeadBarrelModules", "DeadBarrelModules");
   registerEpicsPV("KLM:DeadEndcapModules", "DeadEndcapModules");
-  updateEpicsPVs(5.0);
 
   gROOT->cd();
+  std::string c_fe_bklm_ratio_name = m_histogramDirectoryName + "/c_fe_bklm_ratio";
+  m_c_fe_bklm_ratio = new TCanvas((c_fe_bklm_ratio_name).c_str());
+  std::string c_fe_eklm_ratio_name = m_histogramDirectoryName + "/c_fe_eklm_ratio";
+  m_c_fe_eklm_ratio = new TCanvas((c_fe_eklm_ratio_name).c_str());
+  // Feature extraction status histogram for BKLM
+  int bklmSectors = BKLMElementNumbers::getMaximalSectorGlobalNumber(); // 16
+  int eklmPlanes = EKLMElementNumbers::getMaximalPlaneGlobalNumber(); // 208
+  //BKLM
+  std::string fe_bklm_ratio_name = m_histogramDirectoryName + "/fe_bklm_ratio";
+  m_fe_bklm_ratio = new TH1F((fe_bklm_ratio_name).c_str(),
+                             "FE Ratio in BKLM",
+                             bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
+  m_fe_bklm_ratio->GetXaxis()->SetTitle("Scintillator Layer number");
+  m_fe_bklm_ratio->SetStats(false);
+  m_fe_bklm_ratio->SetOption("HIST");
+  //EKLM
+  std::string fe_eklm_ratio_name = m_histogramDirectoryName + "/fe_eklm_ratio";
+  m_fe_eklm_ratio = new TH1F((fe_eklm_ratio_name).c_str(),
+                             "FE Ratio in EKLM",
+                             eklmPlanes, 0.5, 0.5 + eklmPlanes);
+  m_fe_eklm_ratio->GetXaxis()->SetTitle("Plane number");
+  m_fe_eklm_ratio->SetStats(false);
+  m_fe_eklm_ratio->SetOption("HIST");
 
   std::string str;
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
@@ -110,21 +134,10 @@ void DQMHistAnalysisKLMModule::initialize()
     }
   }
 
-
-  //search for reference
-  if (m_refFile && m_refFile->IsOpen()) {
-    B2INFO("KLM DQMHistAnalysis: reference root file (" << m_refFileName << ") FOUND, able to read ref histograms");
-
-  } else
-    B2WARNING("KLM DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed");
 }
 
 void DQMHistAnalysisKLMModule::terminate()
 {
-  if (m_refFile) {
-    m_refFile->Close();
-    delete m_refFile;
-  }
 }
 
 void DQMHistAnalysisKLMModule::beginRun()
@@ -157,7 +170,7 @@ void DQMHistAnalysisKLMModule::endRun()
     m_monObj->setVariable("BKLM_Scint_Time_Peak", max_position);
   }
 
-  TH1* time_scint_eklm = findHist(m_histogramDirectoryName + "/time_scintillator_bklm");
+  TH1* time_scint_eklm = findHist(m_histogramDirectoryName + "/time_scintillator_eklm");
   if (time_scint_eklm) {
     hist_max_bin = time_scint_eklm->GetMaximumBin();
     max_position = time_scint_eklm->GetXaxis()->GetBinCenter(hist_max_bin);
@@ -172,18 +185,18 @@ double DQMHistAnalysisKLMModule::getProcessedEvents()
     /* Set the minimal number of processed events to 0 if we can't determine the processed events. */
     m_MinProcessedEventsForMessages = 0.;
   }
-  return DQMHistAnalysisModule::getEventProcessed();
+  return (double) DQMHistAnalysisModule::getEventProcessed();
 }
 
 void DQMHistAnalysisKLMModule::deltaDrawer(TH1* delta, TH1* histogram, TCanvas* canvas)
 {
   if (delta != nullptr) {
-    auto scale = delta->Integral();
-    if (scale > 0. && histogram->Integral() > 0) scale = histogram->Integral() / delta->Integral();
-    else scale = 1.0;
+    Double_t scale = (Double_t) histogram->Integral(); //want delta and histo to have same norm
 
     // delta != nullptr should take care of whether update condition is met.
-    delta->DrawNormalized("SAME", scale);
+    delta->SetLineColor(kBlackBody); //random choice of not green or blue
+    delta->SetLineStyle(4);
+    delta->DrawNormalized("SAME", scale); //normalize delta to histo
     canvas->Modified();
     canvas->Update();
   }
@@ -210,15 +223,10 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   deltaDrawer(delta, histogram, canvas); //draw normalized delta on top
   n = histogram->GetXaxis()->GetNbins();
 
-  /* call reference histograms */
-  TH1* ref_histogram = nullptr;
+  /* call reference histograms from base class*/
+  TH1* ref_histogram = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+  if (ref_histogram) {ref_histogram->Draw("hist,same");}
   float ref_average = 0;
-  if (m_refFile && m_refFile->IsOpen()) {
-    ref_histogram = (TH1*)m_refFile->Get(histogram->GetName());
-    if (!ref_histogram) {
-      B2WARNING("Unable to find " << histogram->GetName() << "in reference file.");
-    }
-  }
 
   if (ref_histogram != nullptr) {
     for (i = 1; i <= n; i++) {
@@ -251,6 +259,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     }
   }
   unsigned int activeModuleChannels = 0;
+  int message_counter = 0;
   for (it = moduleHitMap.begin(); it != moduleHitMap.end(); ++it) {
     KLMModuleNumber moduleNumber = it->first;
     if (it->second != 0) {
@@ -270,6 +279,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     str = "No data from lane " + std::to_string(electronicsChannel->getLane());
     latex.DrawLatexNDC(x, y, str.c_str());
     y -= 0.05;
+    message_counter++;
     /* Store the module number, used later in processPlaneHistogram
      * to color the canvas with red and to raise up an alarm. */
     if (channelSubdetector == KLMElementNumbers::c_BKLM) {
@@ -291,6 +301,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     return;
   average /= activeModuleChannels;
   ref_average /= activeModuleChannels;
+
   for (i = 1; i <= n; ++i) {
     KLMChannelNumber channelIndex = std::round(histogram->GetBinCenter(i));
     KLMChannelNumber channelNumber =
@@ -327,10 +338,19 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       str += ("L" + std::to_string(electronicsChannel->getLane()) +
               " A" + std::to_string(electronicsChannel->getAxis()) +
               " Ch" + std::to_string(electronicsChannel->getChannel()));
-      latex.DrawLatexNDC(x, y, str.c_str());
-      y -= 0.05;
+      message_counter++;
+      if (message_counter <= m_MessageThreshold) {
+        latex.DrawLatexNDC(x, y, str.c_str());
+        y -= 0.05;
+      }
     }
   }
+  if (message_counter > m_MessageThreshold) {
+    std::string verbose_message = " more messages";
+    verbose_message = std::to_string(message_counter - m_MessageThreshold) + verbose_message;
+    latex.DrawLatexNDC(x, y, verbose_message.c_str());
+  }
+
 
   // for hot/masked channels, log scale plots (reference and main)
   if (histogram->GetMaximum()*n > histogram->Integral()*m_ThresholdForLog && average * activeModuleChannels > m_MinHitsForFlagging) {
@@ -360,8 +380,8 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       divisions = 7;
       shift = 1;
     } else {
-      divisions = 8;
-      shift = 8;
+      divisions = BKLMElementNumbers::getMaximalSectorNumber();
+      shift = BKLMElementNumbers::getMaximalSectorNumber();
     }
     for (int k = 0; k < divisions; k++) {
       xLine = (histogram->GetXaxis()->GetBinLowEdge(bin) - canvas->GetX1()) / (canvas->GetX2() - canvas->GetX1());
@@ -400,6 +420,7 @@ void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(
     m_2DHitsLine.DrawLine(-110, 80, 110, 80);
   }
   canvas->Modified();
+  canvas->Update();
 }
 
 void DQMHistAnalysisKLMModule::processTimeHistogram(
@@ -428,6 +449,9 @@ void DQMHistAnalysisKLMModule::processTimeHistogram(
       B2INFO("DQMHistAnalysisKLM: Time Delta Entries is " << delta->GetEntries());
       deltaDrawer(delta, histogram, canvas);
     }
+    //reference check
+    TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+    if (ref) {ref->Draw("hist,same");}
   }
 }
 
@@ -467,112 +491,213 @@ void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
   histogram->SetStats(false);
   histogram->Draw();
   canvas->Modified();
+  canvas->Update();
 }
+
+void DQMHistAnalysisKLMModule::processPlaneHistogram(
+  const std::string& histName, TLatex* latex = nullptr, TH1* histogram = nullptr)
+{
+  // If no histogram is provided, try to retrieve it by name
+  if (!histogram) {
+    histogram = findHist(m_histogramDirectoryName + "/" + histName);
+    if (!histogram) {
+      B2WARNING("KLM DQM histogram " + m_histogramDirectoryName + "/" << histName << " is not found.");
+      return;
+    }
+  }
+
+  TCanvas* canvas = findCanvas(m_histogramDirectoryName + "/c_" + histName);
+  if (!canvas) {
+    B2WARNING("KLM DQM histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
+    return;
+  }
+  // Set up the canvas
+  canvas->Clear();
+  canvas->cd();
+  histogram->SetStats(false);
+  histogram->Draw();
+
+  // Overlay reference histogram if available
+  TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+  if (ref) {
+    ref->Draw("hist,same");
+  }
+
+  // Define variables for text and alarm positioning
+  double xAlarm = 0.15, yAlarm = 0.8;
+  int message_counter = 0;
+  std::string name;
+
+  // Determine if histogram is BKLM or EKLM and process accordingly
+  bool isBKLM = histName.find("bklm") != std::string::npos;
+
+  // Check if "fe" is in histName to adjust maximalLayer
+  bool isFE = histName.find("fe") != std::string::npos;
+
+  if (isBKLM) {
+    // Use a different maximalLayer if "fe" is found in the name
+    const int maximalLayer = isFE ? BKLMElementNumbers::getMaximalSectorGlobalNumber() / 8 :
+                             BKLMElementNumbers::getMaximalLayerNumber();
+
+    for (int sector = 0; sector < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sector) {
+      int bin = maximalLayer * sector + 1;
+      double xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
+      double xText = histogram->GetXaxis()->GetBinLowEdge(bin + maximalLayer / 2);
+      double yText = gPad->GetUymin() + 0.98 * (gPad->GetUymax() - gPad->GetUymin());
+
+      if (sector > 0) {
+        m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
+      }
+
+      name = (sector < BKLMElementNumbers::getMaximalSectorNumber() ? "BB" : "BF") +
+             std::to_string(sector % BKLMElementNumbers::getMaximalSectorNumber());
+      m_PlaneText.DrawText(xText, yText, name.c_str());
+    }
+    // Only update canvas status if latex is provided
+    if (latex) {
+      updateCanvasStatus(canvas, m_DeadBarrelModules, latex, message_counter, xAlarm, yAlarm);
+    }
+  } else {
+    const double maximalLayer = EKLMElementNumbers::getMaximalLayerGlobalNumber();
+    const double maxPlane = EKLMElementNumbers::getMaximalPlaneNumber() * EKLMElementNumbers::getMaximalSectorNumber();
+
+    for (int layerGlobal = 1; layerGlobal <= maximalLayer; ++layerGlobal) {
+      int bin = maxPlane * layerGlobal + 1;
+      double xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
+      double xText = histogram->GetXaxis()->GetBinLowEdge(bin - maxPlane / 2);
+      double yText = gPad->GetUymin() + 0.98 * (gPad->GetUymax() - gPad->GetUymin());
+
+      if (layerGlobal < maximalLayer) {
+        m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
+      }
+
+      int section, layer;
+      m_EklmElementNumbers->layerNumberToElementNumbers(layerGlobal, &section, &layer);
+      name = (section == EKLMElementNumbers::c_BackwardSection ? "B" : "F") + std::to_string(layer);
+      m_PlaneText.DrawText(xText, yText, name.c_str());
+    }
+
+    // Only update canvas status if latex is provided
+    if (latex) {
+      updateCanvasStatus(canvas, m_DeadEndcapModules, latex, message_counter, xAlarm, yAlarm);
+    }
+  }
+
+  // Display additional message if message threshold exceeded
+  if (latex && message_counter > m_MessageThreshold) {
+    std::string verbose_string = std::to_string(message_counter - m_MessageThreshold) + " more messages";
+    latex->DrawLatexNDC(xAlarm, yAlarm, verbose_string.c_str());
+  }
+
+  canvas->Modified();
+  canvas->Update();
+}
+
+// Helper function to update canvas status based on dead modules
+void DQMHistAnalysisKLMModule::updateCanvasStatus(
+  TCanvas* canvas, const std::vector<KLMModuleNumber>& deadModules,
+  TLatex* latex, int& message_counter, double xAlarm, double yAlarm)
+{
+  if (deadModules.empty()) {
+    colorizeCanvas(canvas, c_StatusGood);
+  } else if (m_ProcessedEvents > m_MinProcessedEventsForMessages) {
+    for (const KLMModuleNumber& module : deadModules) {
+      int moduleSubdetector, moduleSection, moduleSector, moduleLayer;
+      m_ElementNumbers->moduleNumberToElementNumbers(module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
+
+      std::string alarm = "No data from " + m_ElementNumbers->getSectorDAQName(moduleSubdetector, moduleSection, moduleSector)
+                          + ", layer " + std::to_string(moduleLayer);
+      message_counter++;
+      if (message_counter <= m_MessageThreshold) {
+        latex->DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+        yAlarm -= 0.05;
+      }
+    }
+    if (!m_IsNullRun) {
+      colorizeCanvas(canvas, c_StatusError);
+    }
+  } else {
+    colorizeCanvas(canvas, c_StatusTooFew);
+  }
+}
+
 
 void DQMHistAnalysisKLMModule::processPlaneHistogram(
   const std::string& histName, TLatex& latex)
 {
+  // Internally call the main function with a pointer to TLatex
+  processPlaneHistogram(histName, &latex, nullptr);
+}
 
-  TH1* histogram = findHist(m_histogramDirectoryName + "/" + histName);
-  if (histogram == nullptr) {
-    B2WARNING("KLM DQM histogram " + m_histogramDirectoryName + "/" << histName << " is not found.");
+void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, TH1* denominator, TH1* numerator, TCanvas* canvas)
+{
+  if (!feHist) {
+    B2WARNING("processFEHistogram: feHist is null, exiting function.");
     return;
   }
-  TCanvas* canvas = findCanvas(m_histogramDirectoryName + "/c_" + histName);
-  if (canvas == nullptr) {
-    B2WARNING("KLM DQM histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
+  if (!canvas) {
+    B2WARNING("processFEHistogram: canvas is null, cannot draw histograms.");
     return;
-  } else {
-    std::string name, alarm;
-    int moduleSubdetector, moduleSection, moduleSector, moduleLayer;
-    double xAlarm = 0.15;
-    double yAlarm = 0.8;
-    canvas->Clear();
-    canvas->cd();
-    histogram->SetStats(false);
-    histogram->Draw();
-    if (histName.find("bklm") != std::string::npos) {
-      /* First draw the vertical lines and the sector names. */
-      const int maximalLayer = BKLMElementNumbers::getMaximalLayerNumber();
-      for (int sector = 0; sector < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sector) {
-        int bin = maximalLayer * sector + 1;
-        double xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
-        double xText = histogram->GetXaxis()->GetBinLowEdge(bin + maximalLayer / 2);
-        double yText = gPad->GetUymin() + 0.98 * (gPad->GetUymax() - gPad->GetUymin());
-        if (sector > 0)
-          m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
-        name = "B";
-        if (sector < 8)
-          name += "B";
-        else
-          name += "F";
-        name += std::to_string(sector % 8);
-        m_PlaneText.DrawText(xText, yText, name.c_str());
-      }
-      /* Then, color the canvas with red if there is a dead module
-      * and write an error message. */
-      if (m_DeadBarrelModules.size() == 0) {
-        colorizeCanvas(canvas, c_StatusGood);
-      } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
-        for (KLMModuleNumber module : m_DeadBarrelModules) {
-          m_ElementNumbers->moduleNumberToElementNumbers(
-            module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
-          alarm = "No data from " + m_ElementNumbers->getSectorDAQName(moduleSubdetector, moduleSection, moduleSector);
-          alarm += ", layer " + std::to_string(moduleLayer);
-          latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-          yAlarm -= 0.05;
-        }
-        if (m_IsNullRun == false) {
-          colorizeCanvas(canvas, c_StatusError);
-        }
-      } //end of enough statistics condition
-      else {
-        colorizeCanvas(canvas, c_StatusTooFew);
-      }
+  }
+
+  feHist->Reset();
+  std::unique_ptr<TH1> feClone(static_cast<TH1*>(feHist->Clone())); // Clone feHist
+
+  canvas->cd();
+
+  if (denominator != nullptr && numerator != nullptr) {
+    // Clone numerator and denominator into unique_ptrs to ensure they are deleted automatically
+    auto tempNumerator = std::unique_ptr<TH1>(static_cast<TH1*>(numerator->Clone()));
+    auto tempSum = std::unique_ptr<TH1>(static_cast<TH1*>(denominator->Clone()));
+
+    // Add numerator to denominator to get the sum (denominator + numerator)
+    tempSum->Add(numerator);
+
+    // Divide numerator by (denominator + numerator) and store result in feHist
+    feHist->Divide(tempNumerator.get(), tempSum.get(), 1.0, 1.0, "B");
+    feHist->Draw();
+
+    // Reference check
+    TH1* ref = findRefHist(feHist->GetName(), ERefScaling::c_RefScaleNone);
+    if (ref) {
+      ref->Draw("hist,same");
+      B2INFO("processFEHistogram: Found and drew reference histogram.");
     } else {
-      /* First draw the vertical lines and the sector names. */
-      const double maximalLayer = EKLMElementNumbers::getMaximalLayerGlobalNumber();
-      const double maxPlane = EKLMElementNumbers::getMaximalPlaneNumber() * EKLMElementNumbers::getMaximalSectorNumber();
-      for (int layerGlobal = 1; layerGlobal <= maximalLayer; ++layerGlobal) {
-        int bin = maxPlane * layerGlobal + 1;
-        double xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
-        double xText = histogram->GetXaxis()->GetBinLowEdge(bin - maxPlane / 2);
-        double yText = gPad->GetUymin() + 0.98 * (gPad->GetUymax() - gPad->GetUymin());
-        if (layerGlobal < maximalLayer)
-          m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
-        int section, layer;
-        m_EklmElementNumbers->layerNumberToElementNumbers(
-          layerGlobal, &section, &layer);
-        if (section == EKLMElementNumbers::c_BackwardSection)
-          name = "B";
-        else
-          name = "F";
-        name += std::to_string(layer);
-        m_PlaneText.DrawText(xText, yText, name.c_str());
-      }
-      /* Then, color the canvas with red if there is a dead module
-      * and write an error message. */
-      if (m_DeadEndcapModules.size() == 0) {
-        colorizeCanvas(canvas, c_StatusGood);
-      } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
-        for (KLMModuleNumber module : m_DeadEndcapModules) {
-          m_ElementNumbers->moduleNumberToElementNumbers(
-            module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
-          alarm = "No data from " + m_ElementNumbers->getSectorDAQName(moduleSubdetector, moduleSection, moduleSector);
-          alarm += ", layer " + std::to_string(moduleLayer);
-          latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-          yAlarm -= 0.05;
-        }
-        if (m_IsNullRun == false) {
-          colorizeCanvas(canvas, c_StatusError);
-        }
-      } //end of high statistics condition
-      else {
-        colorizeCanvas(canvas, c_StatusTooFew);
-      }
+      B2WARNING("processFEHistogram: Reference histogram not found.");
     }
+
     canvas->Modified();
     canvas->Update();
+    B2INFO("processFEHistogram: Updated canvas after first draw.");
+
+    /* Delta component */
+    auto deltaDenom = getDelta("", denominator->GetName());
+    auto deltaNumer = getDelta("", numerator->GetName());
+
+    UpdateCanvas(canvas->GetName(), (feHist != nullptr));
+    if ((deltaNumer != nullptr) && (deltaDenom != nullptr)) {
+      B2INFO("DQMHistAnalysisKLM: FE Ratio Delta Num/Denom Entries is "
+             << deltaNumer->GetEntries() << "/" << deltaDenom->GetEntries());
+
+      // Clone deltaNumer and deltaDenom into unique_ptrs to create the delta sum
+      auto deltaTempNumerator = std::unique_ptr<TH1>(static_cast<TH1*>(deltaNumer->Clone()));
+      auto deltaTempSum = std::unique_ptr<TH1>(static_cast<TH1*>(deltaDenom->Clone()));
+
+      // Add delta numerator and denominator
+      deltaTempSum->Add(deltaNumer);
+
+      // Divide deltaNumer by (deltaDenom + deltaNumer) and store in feClone
+      feClone->Divide(deltaTempNumerator.get(), deltaTempSum.get(), 1.0, 1.0, "B");
+      feClone->SetLineColor(kOrange);
+      feClone->DrawCopy("SAME");
+
+      canvas->Modified();
+      canvas->Update();
+    } else {
+      B2WARNING("processFEHistogram: Delta numerator or denominator not found.");
+    }
+  } else {
+    B2WARNING("processFEHistogram: Skipped histogram processing due to missing numerator/denominator.");
   }
 }
 
@@ -661,6 +786,20 @@ void DQMHistAnalysisKLMModule::event()
       }
     }
   }
+  /* Obtain plots necessary for FE Ratio plots */
+  TH1F* feStatus_bklm_scintillator_0 = (TH1F*)findHist(m_histogramDirectoryName + "/feStatus_bklm_scintillator_layers_0");
+  TH1F* feStatus_bklm_scintillator_1 = (TH1F*)findHist(m_histogramDirectoryName + "/feStatus_bklm_scintillator_layers_1");
+
+  TH1F* feStatus_eklm_plane_0 = (TH1F*)findHist(m_histogramDirectoryName + "/feStatus_eklm_plane_0");
+  TH1F* feStatus_eklm_plane_1 = (TH1F*)findHist(m_histogramDirectoryName + "/feStatus_eklm_plane_1");
+  /* Check if fe histograms exist*/
+  if ((feStatus_bklm_scintillator_0 == nullptr || feStatus_bklm_scintillator_1 == nullptr)) {
+    B2INFO("Histograms needed for BKLM feature extraction computation are not found");
+  }
+
+  if ((feStatus_eklm_plane_0 == nullptr || feStatus_eklm_plane_1 == nullptr)) {
+    B2INFO("Histograms needed for EKLM feature extraction computation are not found");
+  }
   /* Reset the color palette to the default one. */
   gStyle->SetPalette(kBird);
   fillMaskedChannelsHistogram("masked_channels");
@@ -669,18 +808,40 @@ void DQMHistAnalysisKLMModule::event()
   processPlaneHistogram("plane_bklm_z", latex);
   processPlaneHistogram("plane_eklm", latex);
 
+  processFEHistogram(m_fe_bklm_ratio, feStatus_bklm_scintillator_1, feStatus_bklm_scintillator_0, m_c_fe_bklm_ratio);
+  processFEHistogram(m_fe_eklm_ratio, feStatus_eklm_plane_1, feStatus_eklm_plane_0, m_c_fe_eklm_ratio);
+  processPlaneHistogram("fe_bklm_ratio", nullptr, m_fe_bklm_ratio);
+  processPlaneHistogram("fe_eklm_ratio", nullptr, m_fe_eklm_ratio);
+
+
   processTimeHistogram("time_rpc");
   processTimeHistogram("time_scintillator_bklm");
   processTimeHistogram("time_scintillator_eklm");
 
   B2DEBUG(20, "Updating EPICS PVs for DQMHistAnalysisKLM");
-  // only update PVs if there's enough statistics
-  if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
-    setEpicsPV("MaskedChannels", (double)m_MaskedChannels.size());
-    setEpicsPV("DeadBarrelModules", (double)m_DeadBarrelModules.size());
-    setEpicsPV("DeadEndcapModules", (double)m_DeadEndcapModules.size());
-    B2DEBUG(20, "DQMHistAnalysisKLM: MaskedChannels " << m_MaskedChannels.size());
-    B2DEBUG(20, "DQMHistAnalysisKLM: DeadBarrelModules " << m_DeadBarrelModules.size());
-    B2DEBUG(20, "DQMHistAnalysisKLM: DeadEndcapModules " << m_DeadEndcapModules.size());
+  // only update PVs if there's enough statistics and datasize != 0
+  // Check if it's a null run, if so, don't update EPICS PVs
+  if (m_IsNullRun) {
+    B2INFO("DQMHistAnalysisKLM: Null run detected. No PV Update.");
+    return;
   }
+  auto* daqDataSize = findHist("DAQ/KLMDataSize");
+  double meanDAQDataSize = 0.;
+  if (daqDataSize != nullptr) {
+    meanDAQDataSize = daqDataSize->GetMean();
+  } else
+    B2WARNING("DQMHistAnalysisKLM: Cannot find KLMDataSize");
+  if ((daqDataSize != nullptr) and (meanDAQDataSize != 0.)) {
+    if (m_ProcessedEvents > m_MinProcessedEventsForMessages) {
+      setEpicsPV("MaskedChannels", (double)m_MaskedChannels.size());
+      setEpicsPV("DeadBarrelModules", (double)m_DeadBarrelModules.size());
+      setEpicsPV("DeadEndcapModules", (double)m_DeadEndcapModules.size());
+      B2DEBUG(20, "DQMHistAnalysisKLM: MaskedChannels " << m_MaskedChannels.size());
+      B2DEBUG(20, "DQMHistAnalysisKLM: DeadBarrelModules " << m_DeadBarrelModules.size());
+      B2DEBUG(20, "DQMHistAnalysisKLM: DeadEndcapModules " << m_DeadEndcapModules.size());
+    }
+  } else
+    B2INFO("DQMHistAnalysisKLM: KLM Not included. No PV Update. ");
+
+
 }

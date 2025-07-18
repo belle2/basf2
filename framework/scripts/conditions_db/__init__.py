@@ -62,7 +62,8 @@ def get_cdb_authentication_token(path=None):
     Helper function for correctly retrieving the CDB authentication token (either via file or via issuing server).
 
     :param path: Path to a file containing a CDB authentication token; if None, the function will use
-           a default path (``${HOME}/b2cdb_${BELLE2_USER}.token`` or ``/tmp/b2cdb_${BELLE2_USER}.token``) to look for a token.
+           a default path (``${HOME}/b2cdb_${BELLE2_USER}.token`` or ``$TMPFILE/b2cdb_${BELLE2_USER}.token``)
+           to look for a token.
     """
     # if we pass a path, let's use it for getting the token, otherwise use the default one
     if path:
@@ -301,7 +302,7 @@ class ConditionsDB:
             #: base url to be prepended to all requests
             self._base_url = url.rstrip("/") + "/"
             try:
-                req = self._session.request("HEAD", self._base_url + "v2/globalTags")
+                req = self._session.request("HEAD", self._base_url + "v2/globalTagStatus")
                 req.raise_for_status()
             except requests.RequestException as e:
                 B2WARNING(f"Problem connecting to {url}:\n     {e}\n Trying next server ...")

@@ -32,7 +32,7 @@ namespace Belle2 {
     /// Destructor
     virtual ~TRGGRLProjectsModule() {};
 
-    /// Initilizes TRGGRLProjectsModule.
+    /// Initializes TRGGRLProjectsModule.
     virtual void initialize() override;
 
     /// Called when new run started.
@@ -56,9 +56,6 @@ namespace Belle2 {
   private: // Parameters
 //    StoreObjPtr<TRGGRLInfo> m_TRGGRLInfo; /**< output for TRGGRLInfo */
 
-    /// Debug level.
-    int _debugLevel;
-
     /**choose the corresponding trigger menu of Belle2 phase*/
     std::string m_belle2phase;
 
@@ -68,13 +65,6 @@ namespace Belle2 {
     /// Mode for TRGGRL simulation. 0th bit : fast simulation switch,
     /// 1st bit : firmware simulation switch.
     int m_simulationMode;
-
-    /// Switch for the fast simulation. 0:do everything, 1:stop after
-    /// the track segment simulation. Default is 0.
-    int m_fastSimulationMode;
-
-    /// Switch for the firmware simulation. 0:do nothing, 1:do everything
-    int m_firmwareSimulationMode;
 
     /** Name of the StoreArray holding the matched 2D tracks */
     std::string m_2DmatchCollectionName;
@@ -113,6 +103,8 @@ namespace Belle2 {
     /**convert the unit of angle from rad to degree*/
     //double m_RtD;
 
+    /**the collection of unknown bits (not ready in TSIM)*/
+    std::vector<std::string> m_falsebits;
 
   };
 

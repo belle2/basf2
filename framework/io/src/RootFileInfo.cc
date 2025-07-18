@@ -31,7 +31,11 @@ namespace Belle2::RootIOUtilities {
     };
     // So get the trees from the file and store them in the members
     getTree("persistent", c_treeNames[DataStore::c_Persistent], m_persistent);
-    getTree("event", c_treeNames[DataStore::c_Event], m_events);
+    auto description = getFileMetaData().getDataDescription();
+    auto isNtuple = description.find("isNtupleMetaData");
+    if ((isNtuple == description.end()) || (isNtuple->second != "True")) {
+      getTree("event", c_treeNames[DataStore::c_Event], m_events);
+    }
     // And finally check the number of entries in the persistent tree
     if (auto npersistent = m_persistent->GetEntries(); npersistent != 1) {
       throw std::runtime_error("Expected exactly one entry in persistent tree, found " + std::to_string(npersistent));
@@ -72,6 +76,18 @@ namespace Belle2::RootIOUtilities {
     return *cache;
   }
 
+  const std::set<std::string> RootFileInfo::getNtupleBranchNames(std::string treeName)
+  {
+    std::set<std::string> branches;
+    auto* tree = dynamic_cast<TTree*>(m_file->Get(treeName.c_str()));
+    for (const TObject* obj : * (tree->GetListOfBranches())) {
+      const auto* branch = dynamic_cast<const TBranch*>(obj);
+      if (!branch) throw std::runtime_error("Entry in list of branches is no branch");
+      branches.emplace(branch->GetName());
+    }
+    return branches;
+  }
+
   void RootFileInfo::checkMissingBranches(const std::set<std::string>& required, bool persistent)
   {
     // So let's get the list of existing branches
@@ -89,6 +105,19 @@ namespace Belle2::RootIOUtilities {
       }
       throw std::runtime_error(message.str());
     }
+  }
+
+  const std::set<std::string> RootFileInfo::getTreeNames()
+  {
+    std::set<std::string> treeNames;
+    TList* keylist = m_file->GetListOfKeys();
+    TIter next(keylist);
+    while (auto&& key = next()) {
+      if (strcmp(key->GetName(), "persistent") != 0) {
+        treeNames.emplace(key->GetName());
+      }
+    }
+    return treeNames;
   }
 
   /* Destructor. Declared here to allow forward declaration of TFile,TTree,... in header */

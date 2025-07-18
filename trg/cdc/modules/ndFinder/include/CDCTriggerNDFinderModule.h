@@ -8,23 +8,26 @@
 
 #pragma once
 
+#include <string>
 #include "framework/core/Module.h"
 #include "framework/datastore/StoreArray.h"
 #include "trg/cdc/dataobjects/CDCTriggerTrack.h"
+#include "trg/cdc/dataobjects/CDCTrigger3DFinderInfo.h"
 #include "trg/cdc/dataobjects/CDCTriggerSegmentHit.h"
 #include "trg/cdc/NDFinder.h"
+#include "trg/cdc/Clusterizend.h"
 
 namespace Belle2 {
 
-  /** CDC Trigger NDFinder Module */
+  // CDC Trigger NDFinder Module
   class CDCTriggerNDFinderModule : public Module {
   public:
-    /** Constructor */
+    // Constructor
     CDCTriggerNDFinderModule();
-    /** Destructor */
+    // Destructor
     virtual ~CDCTriggerNDFinderModule();
 
-    /** Module functions */
+    // Module functions
     virtual void initialize() override;
     virtual void beginRun() override;
     virtual void event() override;
@@ -32,50 +35,39 @@ namespace Belle2 {
     virtual void terminate() override;
 
   private:
+    // Name for TS hits
+    std::string m_trackSegmentHitsName;
+    // Name for NDFinder tracks
+    std::string m_ndFinderTracksName;
+    // Name for NDFinder Track To Hit Array
+    std::string m_ndFinderTrackToHitArrayName;
+    // Name for the NDFinder Cluster Data
+    std::string m_ndFinderInfosName;
 
-    /** Name for TS hits */
-    std::string m_TrackSegmentHitsName;
-    /** Name for NDFinder tracks */
-    std::string m_NDFinderTracksName;
-    /** Name for NDFinder Track To Hit Array */
-    std::string m_NDFinderTrackToHitArrayName;
+    // StoreArray for TS hits
+    StoreArray<CDCTriggerSegmentHit> m_trackSegmentHits;
+    // StoreArray for 2D finder tracks from unpacker
+    StoreArray<CDCTriggerTrack> m_ndFinderTracks;
+    // StoreArray for NDFinder Cluster Data
+    StoreArray<CDCTrigger3DFinderInfo> m_ndFinderInfos;
 
-    /** StoreArray for TS hits */
-    StoreArray<CDCTriggerSegmentHit> m_TrackSegmentHits;
-    /** StoreArray for 2D finder tracks from unpacker */
-    StoreArray<CDCTriggerTrack> m_NDFinderTracks;
-
-    /** Instance of the 3D Track Finder */
+    // Instance of the 3D Track Finder
     NDFinder m_NDFinder;
-    /** Cluster pruning: Minimum number of hits related to a cluster
-     * for the cluster to be considered as a track */
-    int m_minhits;
-    /** Cluster pruning: Minimum number of axial hits related to a cluster
-     * for the cluster to be considered as a track */
-    int m_minhits_axial;
-    /** Clustering: Minimum weight of a cell in Hough space
-     * for the cell to be considered as a cluster member */
-    int m_minweight;
-    /** Clustering: Minimum number of neighbor cells with minweight
-     * for a cell to be considered a core cell */
-    int m_minpts;
-    /** Track estimation: Minimum weight of a cluster member cell
-     * relative to the peak weight of the cluster
-     * for the cell to enter in the weighted mean
-     * track parameter value estimation */
-    double m_thresh;
-    /** Hit to cluster assignment:
-     * Minimum relative weight contribution to the largest cluster */
-    double m_minassign;
-    /** Clustering: consider diagonal neighbors */
-    bool m_diagonal;
-    /**Clustering: minimum number of cells for a cluster */
-    int m_mincells;
-    /** Print Hough planes and verbose output */
-    bool m_verbose;
-    /** File name of the axial hit patterns */
+    // Minimum number of axial super layers for the cluster to be considered as a track
+    unsigned short m_minSuperAxial;
+    // Minimum number of stereo super layers for the cluster to be considered as a track
+    unsigned short m_minSuperStereo;
+    // Clustering with 3d volume: Number of global maximum searches per Hough space quadrant
+    unsigned short m_iterations;
+    // Clustering with 3d volume: Max deletion in omega (number of cells in each direction from max)
+    unsigned short m_omegaTrim;
+    // Clustering with 3d volume: Max deletion in phi (number of cells in each direction from max)
+    unsigned short m_phiTrim;
+    // Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class
+    bool m_storeAdditionalReadout;
+    // File name of the axial hit patterns
     std::string m_axialFile;
-    /** File name of the stereo hit patterns */
+    // File name of the stereo hit patterns
     std::string m_stereoFile;
   };
 }

@@ -4,17 +4,17 @@
 #pragma link off all classes;
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
-#pragma link C++ class Belle2::Particle+; // checksum=0xb9d445e0, version=17
+#pragma link C++ class Belle2::Particle+; // checksum=0x3fd26c63, version=18
 #pragma link C++ class Belle2::ParticleList+; // checksum=0xa5bad8a, version=4
 #pragma link C++ class Belle2::RestOfEvent+; // checksum=0xe86f1658, version=8
-#pragma link C++ class Belle2::TagVertex+; // checksum=0xf7b6169c, version=6
+#pragma link C++ class Belle2::TagVertex+; // checksum=0x329aa3d0, version=7
 #pragma link C++ class Belle2::ContinuumSuppression+; // checksum=0x8f4ac744, version=2
 #pragma link C++ class Belle2::FlavorTaggerInfo+; // checksum=0xa85ce063, version=4
 #pragma link C++ class Belle2::FlavorTaggerInfoMap+; // checksum=0xcdef997a, version=3
 #pragma link C++ class Belle2::StringWrapper+; // checksum=0xf15ef1c4, version=1
 #pragma link C++ class Belle2::EventShapeContainer+; // checksum=0xe048bccd, version=2
 #pragma link C++ class Belle2::EventKinematics+; // checksum=0xabfc6580, version=3
-#pragma link C++ class Belle2::TauPairDecay+; // checksum=0x15ea58a, version=1
+#pragma link C++ class Belle2::TauPairDecay+; // checksum=0x3ecb631d, version=2
 #pragma link C++ class Belle2::ECLEnergyCloseToTrack+; // checksum=0xeadb37d4, version=1
 #pragma link C++ class Belle2::ECLTRGInformation+; // checksum=0x744abff9, version=3
 #pragma link C++ class Belle2::ECLTriggerCell+; // checksum=0xfcbe0110, version=2

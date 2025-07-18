@@ -33,11 +33,6 @@ namespace Belle2 {
     DQMHistAnalysisPXDCMModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisPXDCMModule();
-
-    /**
      * Initializer.
      */
     void initialize(void) override final;
@@ -62,19 +57,19 @@ namespace Belle2 {
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
-    /** Update entry intervall */
+    /** Update entry interval */
     int m_minEntries = 10000;
 
-    /** warn level for mean adhoc plot */
-    double m_warnMeanAdhoc{};
-    /** error level for mean adhoc plot */
-    double m_errorMeanAdhoc{};
+    /** warn level for mean */
+    double m_warnMean{};
+    /** error level for mean */
+    double m_errorMean{};
     /** warn level for outside fraction */
-    double m_warnOutsideAdhoc{};
+    double m_warnOutside{};
     /** error level for outside fraction */
-    double m_errorOutsideAdhoc{};
+    double m_errorOutside{};
     /** threshold level/line for outside fraction */
-    int m_upperLineAdhoc{};
+    int m_upperLine{};
     /** Indizes of excluded PXD Modules */
     std::vector<int> m_excluded;
 
@@ -93,10 +88,10 @@ namespace Belle2 {
     TH2D* m_hCommonModeDelta = nullptr;
     //! Final Canvas
     TCanvas* m_cCommonModeDelta = nullptr;
-    //! Line in the Canvas to guide the eye
-    TLine* m_line1 = nullptr;
-    //! Line in the Canvas to guide the eye
-    TLine* m_lineA = nullptr;
+    //! Line in the Canvas to guide the eye, target CM
+    TLine* m_line10 = nullptr;
+    //! Line in the Canvas to guide the eye, outside boundary
+    TLine* m_lineOutside = nullptr;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

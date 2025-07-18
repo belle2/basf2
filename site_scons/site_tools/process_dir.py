@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -216,7 +215,7 @@ def process_dir(
     entries = os.listdir(dir_name)
     exclude_dirs = set()
     if (os.path.exists(os.path.join(dir_name, '.excluded_directories'))):
-        f = open('.excluded_directories', 'r')
+        f = open('.excluded_directories')
         for line in f.readlines():
             exclude_dirs.add(line.rstrip('\n'))
         f.close()

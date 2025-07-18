@@ -21,7 +21,8 @@ from caf import strategies
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="CDC Tracking",
-                               expert_username="dvthanh",
+                               expert_username="dongthanh.ht",
+                               subsystem="cdc",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["mumu_tight_or_highm_calib", "hadron_calib", "cosmic_calib"],
@@ -52,8 +53,8 @@ settings = CalibrationSettings(name="CDC Tracking",
                                    "calib_mode": "quick",  # manual or predefined: quick, full
                                    "calibration_procedure": {"tz0": 1, "xt0": 0, "sr_tz0": 0, "tz2": 0},
                                    "payload_boundaries": [],
-                                   "backend_args": {"request_memory": "4 GB"}
-                               })
+                                   "backend_args": {"request_memory": "4 GB"}},
+                               produced_payloads=["CDCTimeZeros", "CDCTimeWalk", "CDCXtRelations", "CDCSpaceResols"])
 
 
 def select_files(all_input_files, min_events, max_events, max_processed_events_per_file, max_job=800, min_events_per_file=500):
@@ -124,7 +125,7 @@ def get_calibrations(input_data, **kwargs):
 
     fraction_of_event_for_types = expert_config["fractions_for_each_type"]
     max_jobs = expert_config["max_job_for_each_type"]
-    basf2.B2INFO(f"Number of job for each type are limitted at [di-muon, hadron, cosmic]: {max_jobs}")
+    basf2.B2INFO(f"Number of job for each type are limited at [di-muon, hadron, cosmic]: {max_jobs}")
     basf2.B2INFO(f"Fraction for [di-muon, hadron, cosmic]: {fraction_of_event_for_types}")
     if len(fraction_of_event_for_types) != 3:
         basf2.B2FATAL("fraction of event must be an array with the size of 3, with order [mumu, hadron, cosmic]")

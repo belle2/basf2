@@ -8,14 +8,15 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# use to import parmeters from xml files to corresponding database classes
+# use to import parameters from xml files to corresponding database classes
 # uncomment the desired function
-# optionaly IOV of created payload can be set as
+# optionally IOV of created payload can be set as
 # basf2 arich/utility/scripts/ARICHImportPrametersToDB.py -- 3 0 3 -1
 # for example for all runs of experiment 3
 # arguments: 1 experimentLow, 2 runLow, 3 experimentHigh , 4 runHigh
 
 import basf2 as b2
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import ARICHDatabaseImporter
 import sys
 
@@ -69,7 +70,7 @@ if argc == 5:
 
 # import simulation parameters
 # ARICHSimulationPar is DB class, used by ARICH simulation/reconstruction software,
-# that holds QE vs. wavelenght curve, and some other parameters of photon detection.
+# that holds QE vs. wavelength curve, and some other parameters of photon detection.
 # The parameters are read from arich/data/ARICH-SimulationPar.xml
 
 # dbImporter.importSimulationParams()

@@ -18,7 +18,7 @@ main = b2.create_path()
 
 # Modules
 inroot = b2.register_module('DQMHistAnalysisInputRootFile')
-inroot.param('FileList', '/group/belle2/phase3/dqm/dqmsrv1/e0017/dqmhisto/hltdqm_e0017r000060.root')
+inroot.param('FileList', '/home/t2k/taichiro/public/erecodqm_e0026r001675.root')
 main.add_module(inroot)
 # main.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
 
@@ -31,7 +31,7 @@ output.param('SaveHistos', False)
 output.param('SaveCanvases', True)
 main.add_module(output)
 
-# Process mian path.
+# Process main path.
 b2.process(main)
 
 # Statistics.

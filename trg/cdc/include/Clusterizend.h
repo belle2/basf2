@@ -6,193 +6,101 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef CLUSTERIZEND_H
-#define CLUSTERIZEND_H
+#pragma once
 
-#include <cmath>
-
+#include <vector>
+#include <utility>
+#include <array>
 
 namespace Belle2 {
-  struct clusterer_params  {
-    /** minimum weight for a cluster cell */
-    unsigned short minweight      =    24;
-    /** minimum number of neighbours for a cluster core cell */
-    unsigned short minpts         =    1;
-    /** Consider diagonal adjacent cells as neighbors */
-    bool diagonal                 =    true;
-    /** Ordering of track parameters and position of cyclic variable (phi) */
-    std::vector<bool> var_cyclic = {false, true, false};
-    std::vector<std::string> var_labels = {"omega", "phi", "theta"};
+  // Struct containing the parameters for the clustering
+  struct ClustererParameters  {
+    // Number of iterations of the cluster searching for each Hough space quadrant
+    unsigned short iterations;
+    // Number of deleted cells in omega in each direction of the peak
+    unsigned short omegaTrim;
+    // Number of deleted cells in phi in each direction of the peak
+    unsigned short phiTrim;
+    // The Hough space dimensions
+    unsigned short nOmega;
+    unsigned short nPhi;
+    unsigned short nCot;
   };
 
-
-  /** Type for found clusters */
+  // Type for found clusters
   class SimpleCluster {
   public:
-    SimpleCluster()
-    {
-      setParams(3);
-      initClCellsNew();
-    }
-    explicit SimpleCluster(cell_index entry)
-    {
-      setParams(3);
-      initClCellsNew();
-      append(entry);
-    }
-    virtual ~SimpleCluster() {}
-    void initClCellsNew()
-    {
-      unsigned short init_ClSize = 0;
-      unsigned short default_value = 0;
-      cell_index cell(m_dim, default_value);
-      std::vector<cell_index> C(init_ClSize, cell);
-      m_C = C;
-    }
-    void setParams(unsigned short dim)
-    {
-      m_dim = dim;
-      m_orientSum = 0;
-    }
-    /** Get member cells in the cluster */
-    std::vector<cell_index> getEntries()
-    {
-      return m_C;
-    }
-    /** Add a track-space cell to the cluster */
-    void append(cell_index next_entry)
-    {
-      m_C.push_back(next_entry);
-    }
-    /** Relate a hit to the cluster */
-    void add_hit(unsigned short hit, unsigned short weight, unsigned short orient)
-    {
-      m_hits.push_back(hit);
-      m_hitWeights.push_back(weight);
-      m_orientSum += orient; /** orient == 1: axial, orient == 0: stereo */
-    }
-    /** Get number related axial hits */
-    unsigned long get_naxial()
-    {
-      return m_orientSum;
-    }
-    /** Get number related stereo hits */
-    unsigned long get_nstereo()
-    {
-      return m_hits.size() - m_orientSum;
-    }
-    /** Get ids of related hits (indices of the TS StoreArray) */
-    std::vector<unsigned short> get_hits()
-    {
-      return m_hits;
-    }
-    /** Get weight contribution of each related hit to the cluster */
-    std::vector<unsigned short> get_weights()
-    {
-      return m_hitWeights;
-    }
-    /** SimpleCluster */
+    // Default constructor
+    SimpleCluster() = default;
+
+    // Add a track-space cell to the cluster
+    void appendCell(const cell_index& newClusterCell) { m_clusterCells.push_back(newClusterCell); }
+    // Relate a hit to the cluster
+    void addHitToCluster(unsigned short hit) { m_clusterHits.push_back(hit); }
+
+    // Set the peak index (found as the section peak) of the cluster
+    void setPeakCell(const cell_index& peakCell) { m_clusterPeakCell = peakCell; }
+    // Set the weight of the peak cluster cell
+    void setPeakWeight(const unsigned int peakWeight) { m_clusterPeakWeight = peakWeight; }
+
+    // Get member cells in the cluster
+    std::vector<cell_index> getCells() const { return m_clusterCells; }
+    // Get the TS hits added to this cluster
+    std::vector<unsigned short> getClusterHits() const { return m_clusterHits; }
+    // Get the peak index (found as the section peak) from the cluster
+    cell_index getPeakCell() const { return m_clusterPeakCell; }
+    // Get the weight of the peak cluster cell
+    unsigned int getPeakWeight() const { return m_clusterPeakWeight; }
+
   private:
-    /** Cluster member cells */
-    std::vector<cell_index> m_C;
-    /** Dimension of the track space (3 for omega, phi, theta) */
-    unsigned short m_dim;
-    /** Cluster related hits ids */
-    std::vector<unsigned short> m_hits;
-    /** Cluster related hits weights */
-    std::vector<unsigned short> m_hitWeights;
-    /** Sum of related hit orientations (== number of related axials) */
-    unsigned short m_orientSum;
+    // Cluster member cells
+    std::vector<cell_index> m_clusterCells;
+    // Cluster related hits ids
+    std::vector<unsigned short> m_clusterHits;
+    // Peak index (found as the section maximum)
+    cell_index m_clusterPeakCell{{0, 0, 0}};
+    // Weight of the peak index
+    unsigned int m_clusterPeakWeight{0};
   };
 
-
-  /** Clustering module */
+  // Clustering module
   class Clusterizend {
   public:
-    Clusterizend()
-    {
-    }
-    virtual ~Clusterizend() {}
-    explicit Clusterizend(const clusterer_params& params): m_params(params)
-    {
-    }
+    // Struct containing the deletion bounds of a omega row
+    struct DeletionBounds {
+      c3index phiLowerBound;
+      c3index phiUpperBound;
+      c3index omega;
+      c3index cot;
+    };
 
-    clusterer_params getParams()
-    {
-      return m_params;
-    }
+    // Default constructor
+    Clusterizend() = default;
 
-    void setPlaneShape(std::vector<ushort> planeShape)
-    {
-      m_dimsize = planeShape.size();
-      m_planeShape = planeShape;
-      m_valmax = std::vector<ushort>(m_planeShape);
-      for (ushort idim = 0; idim < m_dimsize; idim++) {
-        m_valmax[idim] -= 1;
-      }
-      m_valmax.push_back(1);
+    // To set custom clustering parameters
+    explicit Clusterizend(const ClustererParameters& parameters): m_clustererParams(parameters) {}
 
-    }
-    /** Next event initialization:
-     * set a new hough space for clustering and track finding */
-    void setNewPlane(c3array& houghmap_plain)
-    {
-      m_houghVals = &houghmap_plain;
-      m_houghVisit = c3array(m_c3shape);
-    }
+    // Set a new Hough space for clustering and track finding
+    void setNewPlane(c3array& houghSpace) { m_houghSpace = &houghSpace; }
+    // Create all the clusters in the Hough space
+    std::vector<SimpleCluster> makeClusters();
 
-    /** Clustering logic */
-
-    /** Get neighboring cells before and after a cell in track space
-     * before and after is defined along the track parameter axes given by dim. */
-    bool has_before(cell_index entry, ushort dim);
-
-    cell_index before(cell_index entry, ushort dim);
-
-    bool has_after(cell_index entry, ushort dim);
-
-    cell_index after(cell_index entry, ushort dim);
-
-    void blockcheck(std::vector<cell_index>* neighbors, cell_index elem, ushort dim);
-
-    std::vector<cell_index>  regionQuery(cell_index entry);
-
-    std::vector<SimpleCluster> dbscan();
-
-    void expandCluster(std::vector<cell_index>& N, SimpleCluster& C);
-
-    std::vector<cell_index> getCandidates();
-
-
-    template<class T>
-    std::string printVector(std::vector<T> vecX)
-    {
-      std::stringstream result;
-      result << " ";
-      for (T& elem : vecX) { result << elem << " ";}
-      std::string rest;
-      result >> rest;
-      result >> rest;
-      return result.str();
-    }
-
-    template<class T>
-    std::string printCells(std::vector<T> vecX)
-    {
-      std::stringstream result;
-      for (T& elem : vecX) { result << " {" << printVector(elem) << "}";}
-      return result.str();
-    }
-    /** Clusterizend */
   private:
-    clusterer_params m_params;
-    std::vector<ushort> m_planeShape;
-    std::vector<ushort> m_valmax;
-    ushort m_dimsize;
-    boost::array<c3index, 3> m_c3shape =  {{ 40, 384, 9 }};
-    c3array* m_houghVals{0};
-    c3array m_houghVisit = c3array(m_c3shape);
+    // Get the phi bounds of one quadrant section
+    std::array<c3index, 2> getSectionBounds(const unsigned short quadrant, const unsigned section);
+    // Iterate m_clustererParams.iterations times over one section
+    void iterateOverSection(const std::array<c3index, 2>& sectionBounds, std::vector<SimpleCluster>& candidateClusters);
+    // Returns the global section peak index and weight
+    std::pair<cell_index, unsigned int> getSectionPeak(const std::array<c3index, 2>& sectionBounds);
+    // Creates the surrounding cluster (fixed shape) around the section peak index
+    SimpleCluster createCluster(const cell_index& peakCell);
+    // Deletes the surroundings of such a cluster
+    void deletePeakSurroundings(const cell_index& peakCell);
+    // Method to delete a omega row for the cluster deletion in deletePeakSurroundings method
+    void clearHoughSpaceRow(const DeletionBounds& bounds);
+    // The struct holding the cluster parameters
+    ClustererParameters m_clustererParams;
+    // Pointer to the Hough space
+    c3array* m_houghSpace{0};
   };
 }
-
-#endif

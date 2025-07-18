@@ -146,7 +146,7 @@ class Ana(b2.Module):
     """analyze the difference between 2D with and without clone suppression"""
 
     def initialize(self):
-        """Initilization of Ana"""
+        """Initialization of Ana"""
         #: EventMetaData
         self.event_info = Belle2.PyStoreObj('EventMetaData')
         #: MCParticles

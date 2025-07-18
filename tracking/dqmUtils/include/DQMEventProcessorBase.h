@@ -47,6 +47,8 @@ namespace Belle2 {
     void produce1Dres() {m_produce1Dres = true;};
     /**Call this if you want to produce 2D Track Residual plots for each VXD sensor */
     void produce2Dres() {m_produce2Dres = true;};
+    /**Call this if you want to produce 2D Track-Related Cluster plots*/
+    void produceTRClusters() {m_produceTRClusters = true;};
 
   protected:
     /** Find RecoTrack for given track. Calls ProcessSuccesfulFit if the RecoTrack has a successful fit. */
@@ -112,6 +114,9 @@ namespace Belle2 {
 
     /** if true, produce 2D Track residuals plots for each VXD sensor*/
     bool m_produce2Dres = false;
+
+    /** if true, produce 2D Track-Related Cluster plots*/
+    bool m_produceTRClusters = false;
 
     /** index of track (with valid TrackFitResult and related RecoTrack) */
     int m_iTrack = 0;

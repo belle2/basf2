@@ -11,11 +11,17 @@ Airflow script to perform BeamSpot calibration.
 """
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
+from prompt.calibrations.caf_cdcdedx_electron import settings as caf_cdc_dedx_electron
+from prompt.calibrations.caf_cdcdedx_hadron import settings as caf_cdc_dedx_hadron
+# todo: add svd dedx in release-9
+from prompt.calibrations.caf_top import settings as caf_top
+from prompt.calibrations.caf_klm_strip_efficiency import settings as caf_klm_strip_efficiency
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="BeamSpot Calibrations",
-    expert_username="zlebcr",
+    expert_username="zlebcik",
+    subsystem="beam",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["mumu_tight_or_highm_calib"],
@@ -27,8 +33,10 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
     expert_config={
         "outerLoss": "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)",
-        "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)"},
-    depends_on=[])
+        "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)",
+        "minPXDhits": 0},
+    depends_on=[caf_cdc_dedx_electron, caf_cdc_dedx_hadron, caf_top, caf_klm_strip_efficiency],
+    produced_payloads=["BeamSpot"])
 
 ##############################
 
@@ -80,7 +88,7 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Algorithm setup
-
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import BeamSpotAlgorithm
     from basf2 import create_path, register_module
     import modularAnalysis as ana
@@ -94,9 +102,10 @@ def get_calibrations(input_data, **kwargs):
     # module to be run prior the collector
     rec_path_1 = create_path()
 
+    minPXDhits = kwargs['expert_config']['minPXDhits']
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
-    muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
+    muSelection += f' and nPXDHits >= {minPXDhits} and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BS', muSelection, path=rec_path_1)
     ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=rec_path_1)
 

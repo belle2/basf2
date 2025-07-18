@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <TVector3.h>
-#include <TRotation.h>
+#include <Math/Vector3D.h>
+#include <Math/Rotation3D.h>
 
 namespace Belle2 {
   namespace arich {
@@ -23,7 +23,7 @@ namespace Belle2 {
       \param s vector of initial photon direction
       \param n quotient of media refractive indices (n_2/n_1), assumes normal vector of boundary plane in z direction.
     */
-    TVector3 Refraction(const TVector3 s,  const double n);
+    ROOT::Math::XYZVector Refraction(const ROOT::Math::XYZVector s,  const double n);
 
     //! Computes photon direction after refraction.
     /*!
@@ -32,26 +32,26 @@ namespace Belle2 {
       \param n quotient of media refractive indices (n_2/n_1)
       \param a photon direction after refraction
     */
-    int Refraction(TVector3 s, TVector3 norm, double n, TVector3& a);
+    int Refraction(ROOT::Math::XYZVector s, ROOT::Math::XYZVector norm, double n, ROOT::Math::XYZVector& a);
 
     //! Returns unit vector with polar angle theta and azimuth fi.
     /*!
       \param theta polar angle
       \param fi azumuthal angle
      */
-    TVector3 setThetaPhi(double theta, double fi);
+    ROOT::Math::XYZVector setThetaPhi(double theta, double fi);
 
     //! Returns matrix for transformation from "track" coordinate system to "global" coordinate system.
     /*!
       \param r vector of track direction
      */
-    TRotation TransformFromFixed(TVector3 r);
+    ROOT::Math::Rotation3D TransformFromFixed(ROOT::Math::XYZVector r);
 
     //! Returns matrix for transformation from global coordinate system to "track" coordinate system.
     /*!
       \param r vector of track direction.
     */
-    TRotation TransformToFixed(TVector3 r);
+    ROOT::Math::Rotation3D TransformToFixed(ROOT::Math::XYZVector r);
 
     //! Returns expected emission angle of Cherenkov photon, emitted by particle
     /*!

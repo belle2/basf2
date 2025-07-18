@@ -73,6 +73,9 @@ namespace Belle2 {
     /** Name tag that will be attached to the output file*/
     std::string m_PARAMNameTag;
 
+    /** output directory */
+    std::string m_PARAMoutputDir = "./";
+
     /** Names of the variables to be produced and collected */
     std::vector <
     SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> > >

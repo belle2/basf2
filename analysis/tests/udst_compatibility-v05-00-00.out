@@ -9,9 +9,11 @@ Untested method Particle::forEachDaughter
 Untested method Particle::getAllDaughters
 Untested method Particle::getArrayPointer
 Untested method Particle::getEnergyLossCorrection
+Untested method Particle::getKink
 Untested method Particle::getMomentumLossCorrectionFactor
 Untested method Particle::getMostLikelyTrackFitResult
 Untested method Particle::getPDGLifetime
+Untested method Particle::getTrackFitResultIndex
 Untested method Particle::isCopyOf
 Untested method Particle::isMostLikely
 Untested method Particle::isMostLikelyTrackFitResult
@@ -35,8 +37,16 @@ Untested method Particle::setVertex
 Untested method Particle::updateJacobiMatrix
 Untested method Particle::updateMomentum
 Untested method Particle::writeExtraInfo
+Untested method EventExtraInfo::addEventTypeIfNotSet
+Untested method EventExtraInfo::addExtraStringInfo
+Untested method EventExtraInfo::getEventType
+Untested method EventExtraInfo::getExtraStringInfo
+Untested method EventExtraInfo::getStringInfoNames
+Untested method EventExtraInfo::hasExtraStringInfo
 Untested method EventExtraInfo::removeExtraInfo
+Untested method EventExtraInfo::removeExtraStringInfo
 Untested method EventExtraInfo::setExtraInfo
+Untested method EventExtraInfo::setExtraStringInfo
 [INFO] ========================================================================
 [INFO] >>> Start new run: 0
 [INFO] ------------------------------------------------------------------------

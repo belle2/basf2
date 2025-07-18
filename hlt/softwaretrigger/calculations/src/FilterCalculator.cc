@@ -10,6 +10,7 @@
 
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
 
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
@@ -19,6 +20,7 @@
 
 #include <framework/logging/Logger.h>
 
+#include <cmath>
 #include <numeric>
 #include <stdexcept>
 #include <optional>
@@ -134,6 +136,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["eeBrem"] = 0;
   calculationResult["isrRadBhabha"] = 0;
   calculationResult["muonPairECL"] = 0;
+  calculationResult["ggHighPt"] = 0;
   calculationResult["selectee1leg1trk"] = 0;
   calculationResult["selectee1leg1clst"] = 0;
   calculationResult["selectee"] = 0;
@@ -170,6 +173,15 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["singleTagHighMassB"] = 0; /**< single tag higher mass */
   calculationResult["radBhabhaB"] = 0; /**< radiative Bhabha, recoil p in detector */
 
+  //..Tracks without a requirement on nCDCHits
+  calculationResult["nTrackC"] = 0; /**< number of "C" tracks */
+  calculationResult["maximumPCMSC"] = NAN; /**< maximum pcms of "C" tracks GeV/c */
+  calculationResult["pCmsNegC"] = NAN; /**< pCms of maximum p negatively charged track GeV/c */
+  calculationResult["clusterENegC"] = NAN; /**< clusterE lab of max p negatively charged track GeV */
+  calculationResult["pCmsPosC"] = NAN; /**< pCms of maximum p positively charged track  GeV/c */
+  calculationResult["clusterEPosC"] = NAN; /**< clusterE lab of max p positively charged track GeV */
+  calculationResult["dPhiCmsC"] = NAN; /**< delta phi cms of max p positive and negative tracks deg */
+
 
   // Passed on L1 information
   if (m_l1Trigger.isValid()) {
@@ -200,9 +212,16 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     } catch (const std::exception&) {
       lml1 = false;
     }
+    bool l1_bit_f;
+    try {
+      l1_bit_f = m_l1Trigger->testPsnm("fpre");
+    } catch (const std::exception&) {
+      l1_bit_f = false;
+    }
     calculationResult["bha3d"] = bha3d;
     calculationResult["bhapur"] = bhapurPsnm;
     calculationResult["bhapur_lml1"] = lml1 and bhapurFtdl;
+    calculationResult["l1_bit_f"] = l1_bit_f;
   } else {
     calculationResult["l1_trigger_random"] = 1; // save every event if no L1 trigger info
     calculationResult["l1_trigger_delayed_bhabha"] = 0;
@@ -210,6 +229,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     calculationResult["bha3d"] = 0;
     calculationResult["bhapur"] = 0;
     calculationResult["bhapur_lml1"] = 0;
+    calculationResult["l1_bit_f"] = 0;
   }
 
   // Every 256th event has CDC NN trigger information
@@ -237,38 +257,81 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     { -1, {}}, {1, {}}
   };
 
+  //..Pointers to the two "C" tracks with maximum pCms (no requirement on nCDC hits)
+  std::map<short, std::optional<MaximumPtTrack>> maximumPCmsTracksC = {
+    { -1, {}}, {1, {}}
+  };
+
+  //------------------------------------------------------------
   // --- Track variables -- //
   for (const Track& track : m_tracks) {
     const TrackFitResult* trackFitResult = track.getTrackFitResultWithClosestMass(Const::pion);
     if (not trackFitResult) {
-      // Hu? No track fit result for pion? Ok, lets skip this track
+      // Huh? No track fit result for pion? Ok, lets skip this track
       continue;
     }
 
-    // TODO: Temporary cut on number of CDC hits
-    if (trackFitResult->getHitPatternCDC().getNHits() == 0) {
-      continue;
-    }
-
-    // Count loose and tight tracks
+    //..Track properties. Only use tracks with defined charge.
+    const short charge = trackFitResult->getChargeSign();
+    if (charge == 0) {continue;}
     const double z0 = trackFitResult->getZ0();
+    const ROOT::Math::PxPyPzEVector& momentumLab = trackFitResult->get4Momentum();
+    const ROOT::Math::PxPyPzEVector momentumCMS = boostrotate.rotateLabToCms() * momentumLab;
+    const double pCMS = momentumCMS.P();
+    const double pLab = momentumLab.P();
+    const double trackTime = track.getTrackTime();
+    const double pT = trackFitResult->getTransverseMomentum();
+    const int nCDCHits = (int)(0.5 + trackFitResult->getHitPatternCDC().getNHits());
+    double clusterELab = 0.;
+    for (auto& cluster : track.getRelationsTo<ECLCluster>()) {
+      if (cluster.hasHypothesis(Belle2::ECLCluster::EHypothesisBit::c_nPhotons)) {
+        clusterELab += cluster.getEnergy(Belle2::ECLCluster::EHypothesisBit::c_nPhotons);
+      }
+    }
+    const double clusterECMS = clusterELab * pCMS / pLab;
+
+
+    //------------------------------------------------------------
+    //..New list without a requirement on number of CDC hits
+    bool goodTrackCTime = true;
+    if (std::abs(trackTime) > 15.) {goodTrackCTime = false;}
+    if (std::abs(z0) < 1. and goodTrackCTime and pCMS > 0.2) {
+      calculationResult["nTrackC"] += 1;
+      if (std::isnan(calculationResult["maximumPCMSC"]) or pCMS > calculationResult["maximumPCMSC"]) {
+        calculationResult["maximumPCMSC"] = pCMS;
+      }
+    }
+
+    //..Store maximum pCms positive and negative tracks
+    const auto& currentMaximumC = maximumPCmsTracksC.at(charge);
+    if (not currentMaximumC or pCMS > currentMaximumC->pCMS) {
+      MaximumPtTrack newMaximum;
+      newMaximum.pT = pT;
+      newMaximum.track = &track;
+      newMaximum.pCMS = pCMS;
+      newMaximum.pLab = pLab;
+      newMaximum.p4CMS = momentumCMS;
+      newMaximum.p4Lab = momentumLab;
+      newMaximum.clusterEnergySumLab = clusterELab;
+      newMaximum.clusterEnergySumCMS = clusterECMS;
+      maximumPCmsTracksC[charge] = newMaximum;
+    }
+
+    //------------------------------------------------------------
+    //..Now original loose and tight tracks, which require nCDC hits
+    // TODO: Temporary cut on number of CDC hits
+    if (nCDCHits == 0) {
+      continue;
+    }
+
+    // Count tight tracks
     if (std::abs(z0) < m_tightTrkZ0) {
       calculationResult["nTrkTight"] += 1;
     }
 
-    // From here on use only tracks with defined charge
-    const short charge = trackFitResult->getChargeSign();
-    if (charge == 0) {
-      continue;
-    }
 
-    const ROOT::Math::PxPyPzEVector& momentumLab = trackFitResult->get4Momentum();
-    const ROOT::Math::PxPyPzEVector momentumCMS = boostrotate.rotateLabToCms() * momentumLab;
-    double pCMS = momentumCMS.P();
-    double pLab = momentumLab.P();
-
+    //------------------------------------------------------------
     // Find the maximum pt negative [0] and positive [1] tracks without z0 cut
-    const double pT = trackFitResult->getTransverseMomentum();
     const auto& currentMaximum = maximumPtTracksWithoutZCut.at(charge);
     if (not currentMaximum or pT > currentMaximum->pT) {
       MaximumPtTrack newMaximum;
@@ -278,9 +341,13 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       newMaximum.pLab = pLab;
       newMaximum.p4CMS = momentumCMS;
       newMaximum.p4Lab = momentumLab;
+      newMaximum.clusterEnergySumLab = clusterELab;
+      newMaximum.clusterEnergySumCMS = clusterECMS;
       maximumPtTracksWithoutZCut[charge] = newMaximum;
     }
 
+
+    //------------------------------------------------------------
     // Loose tracks
     if (std::abs(z0) < m_looseTrkZ0) {
       calculationResult["nTrkLoose"] += 1;
@@ -305,13 +372,15 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
         newMaximum.pLab = momentumLab.P();
         newMaximum.p4CMS = momentumCMS;
         newMaximum.p4Lab = momentumLab;
+        newMaximum.clusterEnergySumLab = clusterELab;
+        newMaximum.clusterEnergySumCMS = clusterECMS;
         maximumPtTracks[charge] = newMaximum;
       }
     }
 
     //..New tighter track definitions.
     //  We can use pCMS and charge from above, because every looseB track is also a loose track
-    if (trackFitResult->getHitPatternCDC().getNHits() >= 5) {
+    if (nCDCHits >= 5) {
       if (std::abs(z0) < 1.) {calculationResult["nTrkTightB"] += 1;}
       if (std::abs(z0) < 5.) {
         calculationResult["nTrkLooseB"] += 1;
@@ -326,6 +395,35 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   } // End loop over tracks
 
 
+  //------------------------------------------------------------
+  //..Store the "C" track calculations
+  for (short charge : { -1, 1}) {
+    auto& maximumPcmsTrackC = maximumPCmsTracksC.at(charge);
+    if (not maximumPcmsTrackC) {
+      continue;
+    }
+
+    //..Calculations for each track
+    if (charge == -1) {
+      calculationResult["pCmsNegC"] = maximumPcmsTrackC->pCMS;
+      calculationResult["clusterENegC"] = maximumPcmsTrackC->clusterEnergySumLab;
+    } else {
+      calculationResult["pCmsPosC"] = maximumPcmsTrackC->pCMS;
+      calculationResult["clusterEPosC"] = maximumPcmsTrackC->clusterEnergySumLab;
+    }
+  }
+
+  //..Calculations using both highest-pCms C tracks
+  if (maximumPCmsTracksC.at(-1) and maximumPCmsTracksC.at(1)) {
+    const MaximumPtTrack& negativeTrack = *maximumPCmsTracksC.at(-1);
+    const MaximumPtTrack& positiveTrack = *maximumPCmsTracksC.at(1);
+
+    calculationResult["dPhiCmsC"] = std::abs(ROOT::Math::VectorUtil::DeltaPhi(negativeTrack.p4CMS,
+                                             positiveTrack.p4CMS)) * TMath::RadToDeg();
+  }
+
+
+  //------------------------------------------------------------
   // -- Cluster variables -- //
   std::vector<SelectedECLCluster> selectedClusters;
   for (const ECLCluster& cluster : m_eclClusters) {
@@ -339,7 +437,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
 
     const double dt99 = cluster.getDeltaTime99();
 
-    // Store infos if above the single photon threshold
+    // Store cluster information
     SelectedECLCluster selectedCluster;
     selectedCluster.p4Lab = cUtil.Get4MomentumFromCluster(&cluster, clustervertex,
                                                           Belle2::ECLCluster::EHypothesisBit::c_nPhotons);
@@ -473,7 +571,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
         calculationResult["n2GeVPhotonEndcap"] += 1;
       }
     }
-  }
+  } // end of loop over clusters
+
+  //..Order clusters by CMS energy
   std::sort(selectedClusters.begin(), selectedClusters.end(), [](const auto & lhs, const auto & rhs) {
     return lhs.energyCMS > rhs.energyCMS;
   });
@@ -484,16 +584,6 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     if (not maximumPtTrack) {
       continue;
     }
-
-    // Prep max two tracks for Bhabha and two-photon lepton selections
-    // Track / cluster matching
-    for (auto& cluster : maximumPtTrack->track->getRelationsTo<ECLCluster>()) {
-      if (cluster.hasHypothesis(Belle2::ECLCluster::EHypothesisBit::c_nPhotons)) {
-        maximumPtTrack->clusterEnergySumLab += cluster.getEnergy(Belle2::ECLCluster::EHypothesisBit::c_nPhotons);
-      }
-    }
-    maximumPtTrack->clusterEnergySumCMS =
-      maximumPtTrack->clusterEnergySumLab * maximumPtTrack->pCMS / maximumPtTrack->pLab;
 
     // Single leg Bhabha selections
     if (maximumPtTrack->clusterEnergySumCMS > 4.5) {
@@ -548,8 +638,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     const ROOT::Math::PxPyPzEVector p4Miss = p4ofCOM - negativeTrack.p4CMS - positiveTrack.p4CMS;
     const double pmissTheta = p4Miss.Theta() * TMath::RadToDeg();
     const double pmissp = p4Miss.P();
-    const double relMissAngle0 = B2Vector3D(negativeTrack.p4CMS.Vect()).Angle(B2Vector3D(p4Miss.Vect())) * TMath::RadToDeg();
-    const double relMissAngle1 = B2Vector3D(positiveTrack.p4CMS.Vect()).Angle(B2Vector3D(p4Miss.Vect())) * TMath::RadToDeg();
+    const double relMissAngle0 = ROOT::Math::VectorUtil::Angle(negativeTrack.p4CMS, p4Miss) * TMath::RadToDeg();
+    const double relMissAngle1 = ROOT::Math::VectorUtil::Angle(positiveTrack.p4CMS, p4Miss) * TMath::RadToDeg();
 
     const bool electronEP = positiveClusterSum > 0.8 * positiveP or negativeClusterSum > 0.8 * negativeP;
     const bool notMuonPair = negativeClusterSumLab > 1 or positiveClusterSumLab > 1;
@@ -611,7 +701,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     }
   }
 
-  //..Bhabha and gamma gamma vetoes using two maximum-energy clusters
+  //..Filters and vetoes using two maximum-energy clusters
   if (selectedClusters.size() >= 2) {
     const SelectedECLCluster& firstCluster = selectedClusters[0];
     const SelectedECLCluster& secondCluster = selectedClusters[1];
@@ -697,7 +787,20 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       calculationResult["muonPairECL"] = 1;
     }
 
-  }
+    //..diPhoton line
+    const double thetaLab0 = firstCluster.p4Lab.Theta() * TMath::RadToDeg();
+    const double thetaLab1 = secondCluster.p4Lab.Theta() * TMath::RadToDeg();
+    const bool inHieRegion0 = thetaLab0 > 26. and thetaLab0 < 130.;
+    const bool inHieRegion1 = thetaLab1 > 26. and thetaLab1 < 130.;
+    const bool firstIsNeutral = not firstCluster.isTrack;
+    const bool secondIsNeutral = not secondCluster.isTrack;
+
+    if (secondEnergy > 0.3 and inHieRegion0 and inHieRegion1 and firstIsNeutral and secondIsNeutral) {
+      const ROOT::Math::PxPyPzEVector ggP4CMS = firstCluster.p4CMS + secondCluster.p4CMS;
+      if (ggP4CMS.pt() > 1.) {calculationResult["ggHighPt"] = 1;}
+    }
+
+  } // end of two-clusters lines
 
   // Bhabha accept triggers.
   // Use theta_lab of negative track if available; otherwise cluster.
@@ -755,7 +858,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     for (int iflat = 0; iflat < 9; iflat++) {
       const std::string& eeFlatName = "eeFlat" + std::to_string(iflat);
       calculationResult[eeFlatName] =
-        thetaFlatten > flatBoundaries[iflat] and thetaFlatten < flatBoundaries[iflat + 1];
+        thetaFlatten >= flatBoundaries[iflat] and thetaFlatten < flatBoundaries[iflat + 1];
       if (calculationResult[eeFlatName]) {
         calculationResult["selectee"] = 1;
       }
@@ -856,17 +959,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
 
       const double maxNegpT = negTrack->pT;
       const double maxPospT = posTrack->pT;
-
-      auto accumulatePhotonEnergy = [](double result, const auto & cluster) {
-        return result + (cluster.hasHypothesis(Belle2::ECLCluster::EHypothesisBit::c_nPhotons) ? cluster.getEnergy(
-                           Belle2::ECLCluster::EHypothesisBit::c_nPhotons) : 0);
-      };
-
-      const auto& clustersOfNegTrack = negTrack->track->getRelationsTo<ECLCluster>();
-      const auto& clustersOfPosTrack = posTrack->track->getRelationsTo<ECLCluster>();
-
-      const double maxClusterENeg = std::accumulate(clustersOfNegTrack.begin(), clustersOfNegTrack.end(), 0.0, accumulatePhotonEnergy);
-      const double maxClusterEPos = std::accumulate(clustersOfPosTrack.begin(), clustersOfPosTrack.end(), 0.0, accumulatePhotonEnergy);
+      const double maxClusterENeg = negTrack->clusterEnergySumLab;
+      const double maxClusterEPos = posTrack->clusterEnergySumLab;
 
       const ROOT::Math::PxPyPzEVector& momentumLabNeg(negTrack->p4Lab);
       const ROOT::Math::PxPyPzEVector& momentumLabPos(posTrack->p4Lab);
@@ -877,8 +971,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       const double& d0Pos = posTrack->track->getTrackFitResultWithClosestMass(Const::pion)->getD0();
 
       // Select cosmic using these tracks
-      const bool goodMagneticRegion = (z0Neg<m_goodMagneticRegionZ0 or abs(d0Neg)>m_goodMagneticRegionD0)
-                                      and (z0Pos<m_goodMagneticRegionZ0 or abs(d0Pos)>m_goodMagneticRegionD0);
+      const bool goodMagneticRegion = (z0Neg<m_goodMagneticRegionZ0 or std::abs(d0Neg)>m_goodMagneticRegionD0)
+                                      and (z0Pos<m_goodMagneticRegionZ0 or std::abs(d0Pos)>m_goodMagneticRegionD0);
       if (maxNegpT > m_cosmicMinPt and maxPospT > m_cosmicMinPt and maxClusterENeg < m_cosmicMaxClusterEnergy
           and maxClusterEPos < m_cosmicMaxClusterEnergy and goodMagneticRegion) {
         double dphiLab = std::abs(momentumLabNeg.Phi() - momentumLabPos.Phi()) * TMath::RadToDeg();
@@ -922,7 +1016,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     const double vertexXY = vertexLocation.perp();
     const double vertexTheta = vertexLocation.theta() * TMath::RadToDeg();
 
-    //..Angular differance of two tracks to reject cosmics
+    //..Angular differaence of two tracks to reject cosmics
     //  Tolerance could be reduced from 10 deg to 2 deg if needed for physics reasons,
     //  for a 5% increase in the rate of selected displaced vertex triggers.
     //  See https://gitlab.desy.de/belle2/software/basf2/-/merge_requests/1867

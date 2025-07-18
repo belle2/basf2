@@ -10,7 +10,8 @@
 
 #include <analysis/VariableManager/Manager.h>
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/B2Vector3.h>
+
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   class Particle;
@@ -98,6 +99,21 @@ namespace Belle2 {
      * returns the track's slope
      */
     double trackTanLambda(const Particle* part);
+
+    /**
+     * returns the track's D0 impact parameter with respect to IP
+     */
+    double trackD0FromIP(const Particle* part);
+
+    /**
+     * returns the track's Z0 impact parameter with respect to IP
+     */
+    double trackZ0FromIP(const Particle* part);
+
+    /**
+     * returns the track's transverse momentum angle with respect to IP
+     */
+    double trackPhi0FromIP(const Particle* part);
 
     /**
      * returns the track's D0 impact parameter error
@@ -216,6 +232,21 @@ namespace Belle2 {
      */
     double trackFitHypothesisPDG(const Particle* part);
 
+    /** MC value of the helix parameter d0 for the given particle */
+    double getHelixMCD0(const Particle* part);
+
+    /** MC value of the helix parameter phi0 for the given particle */
+    double getHelixMCPhi0(const Particle* part);
+
+    /** MC value of the helix parameter omega for the given particle */
+    double getHelixMCOmega(const Particle* part);
+
+    /** MC value of the helix parameter z0 for the given particle */
+    double getHelixMCZ0(const Particle* part);
+
+    /** MC value of the helix parameter tanLambda for the given particle */
+    double getHelixMCTanLambda(const Particle* part);
+
     /** mc-meas/err_meas for the respective helix parameter for the given particle */
     double getHelixD0Pull(const Particle* part);
 
@@ -232,7 +263,7 @@ namespace Belle2 {
     double getHelixTanLambdaPull(const Particle* part);
 
     /** helper function to get the position on the Helix */
-    B2Vector3D getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
+    ROOT::Math::XYZVector getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
 
     /** 1 if the track that has been flipped and refitted in the refining step */
     double isTrackFlippedAndRefitted(const Particle* part);
@@ -242,4 +273,3 @@ namespace Belle2 {
 
   }
 } // Belle2 namespace
-

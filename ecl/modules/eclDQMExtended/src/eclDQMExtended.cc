@@ -440,6 +440,11 @@ void ECLDQMEXTENDEDModule::beginRun()
   h_qualityfail_cellid->Reset();
   h_qualityfail_shaperid->Reset();
   h_qualityfail_crateid->Reset();
+  h_fail_shaperid->Reset();
+  h_fail_crateid->Reset();
+
+  //2D histograms reset.
+
   if (m_SaveDetailedFitData) {
     h_ampdiff_cellid->Reset();
     h_timediff_cellid->Reset();

@@ -21,7 +21,7 @@ namespace Belle2 {
 
     extern template class TrackFindingCDC::MVA<BaseAxialSegmentPairFilter>;
 
-    /// Filter for the constuction of segment pairs based on simple criteria without the common fit.
+    /// Filter for the construction of segment pairs based on simple criteria without the common fit.
     class MVAFeasibleAxialSegmentPairFilter : public MVA<BaseAxialSegmentPairFilter> {
 
     private:

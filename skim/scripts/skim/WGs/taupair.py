@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -23,7 +22,7 @@ import variables.collections as vc
 import variables.utils as vu
 
 __liaison__ = "Kenji Inami <kenji.inami@desy.de>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 def tauskim_particle_selection(label, path):
@@ -45,7 +44,6 @@ def tauskim_particle_selection(label, path):
         gammaForPi0Cuts += ' and abs(clusterTiming) < 200'
         gammaForPi0Cuts += ' and thetaInCDCAcceptance'
         gammaForPi0Cuts += ' and clusterNHits > 1.5'
-        gammaForPi0Cuts += ' and [[minC2TDist > 40] or [E > 0.4]]'  # new
         gammaForPi0 = f'gamma:looseForPi0{label}{g}'
         gammaForPi0lists.append(gammaForPi0)
         ma.cutAndCopyLists(gammaForPi0, 'gamma:all', gammaForPi0Cuts, path=path)
@@ -83,15 +81,17 @@ def tauskim_particle_selection(label, path):
                             Pi0Cut, path=path)
 
     ma.copyLists(f'pi0:{label}', Pi0lists, path=path)
+    ma.cutAndCopyList(f'gamma:pi0_{label}', 'gamma:all', f'isDescendantOfList(pi0:{label}) == 1', path=path)
 
     # gamma
     gammaCuts = 'E > 0.2'
-    gammaCuts += ' and [[minC2TDist > 40] or [E > 0.4]]'
     gammaCuts += ' and abs(clusterTiming) < 200'
     gammaCuts += ' and thetaInCDCAcceptance'
     gammaCuts += ' and clusterNHits > 1.5'
     gammaCuts += f' and isDescendantOfList(pi0:{label}) == 0'
-    ma.cutAndCopyList(f'gamma:{label}', 'gamma:all', gammaCuts, path=path)
+    ma.cutAndCopyList(f'gamma:nonpi0_{label}', 'gamma:all', gammaCuts, path=path)
+
+    ma.copyLists(f'gamma:{label}', [f'gamma:pi0_{label}', f'gamma:nonpi0_{label}'], path=path)
 
 
 @fancy_skim_header
@@ -112,6 +112,7 @@ class TauLFV(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
+    ApplyHLTHadronCut = False
     produce_on_tau_samples = False  # retention is too high on taupair
     validation_sample = _VALIDATION_SAMPLE
 
@@ -327,6 +328,7 @@ class TauGeneric(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
+    ApplyHLTHadronCut = False
     produce_on_tau_samples = False  # retention is too high on taupair
     validation_sample = _VALIDATION_SAMPLE
 
@@ -338,7 +340,8 @@ class TauGeneric(BaseSkim):
         """
         Set particle lists and variables for TauGeneric skim.
 
-        **Output particle lists**: ``pi+:tauskim, pi0:tauskim, gamma:tauskim, pi+:S1/S2, pi0:S1/S2, gamma:S1/S2``
+        **Output particle lists**:
+        * ``pi+:tauskim, pi0:tauskim, gamma:pi0_tauskim, gamma:nonpi0_tauskim, gamma:tauskim, pi+:S1/S2, pi0:S1/S2, gamma:S1/S2``
 
         **Variables**:
 
@@ -346,17 +349,17 @@ class TauGeneric(BaseSkim):
         * ``netCharge``: total net charge of good tracks
         * ``nTracksS1/nTracksS2:`` number of good tracks in each hemisphere ``S1/S2`` divided by thrust axis
         * ``invMS1/invMS2``: invariant mass of particles in each hemisphere
-        * ``maxPt``: maximum Pt amoung good tracks
+        * ``maxPt``: maximum Pt among good tracks
         * ``E_ECLtrk``: total ECL energy of good tracks
         """
 
         tauskim_particle_selection("tauskim", path)
 
         # Get EventShape variables
-        ma.buildEventShape(["pi+:tauskim", "pi0:tauskim", "gamma:tauskim"],
+        ma.buildEventShape(["pi+:tauskim", "gamma:tauskim"],
                            allMoments=False, foxWolfram=False, cleoCones=False,
                            sphericity=False, jets=False, path=path)
-        ma.buildEventKinematics(["pi+:tauskim", "pi0:tauskim", "gamma:tauskim"], path=path)
+        ma.buildEventKinematics(["pi+:tauskim", "gamma:tauskim"], path=path)
 
         # Split in signal and tag
         ma.cutAndCopyList("pi+:S1", "pi+:tauskim", "cosToThrustOfEvent > 0", path=path)
@@ -410,21 +413,19 @@ class TauGeneric(BaseSkim):
         # NOTE: the validation package is not part of the light releases, so this import
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
+        from ROOT import Belle2
 
-        vm.addAlias('Theta_miss', 'formula(missingMomentumOfEvent_theta*180/3.14159)')
+        vm.addAlias('Theta_miss', f'formula(missingMomentumOfEvent_theta/{Belle2.Unit.deg})')
 
         # add contact information to histogram
         contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
         ma.copyLists('tau+:generic', self.SkimLists, path=path)
-        ma.rankByHighest(particleList='tau+:generic',
-                         variable='p',
-                         numBest=1,
-                         path=path)
+        path = self.skim_event_cuts(cut='nParticlesInList(tau+:generic) > 0', path=path)
 
         create_validation_histograms(
             rootfile=f'{self}_Validation.root',
-            particlelist='tau+:generic',
+            particlelist='',
             variables_1d=[
                 ('nGoodTracks', 7, 1, 8, '', contact, '', ''),
                 ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),
@@ -457,6 +458,7 @@ class TauThrust(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
+    ApplyHLTHadronCut = False
     produce_on_tau_samples = False  # retention is too high on taupair
     validation_sample = _VALIDATION_SAMPLE
 
@@ -468,7 +470,8 @@ class TauThrust(BaseSkim):
         """
         Set particle lists and variables for TauThrust skim.
 
-        **Constructed particle lists**: ``pi+:thrust, gamma:thrust, pi+:thrustS1/thrustS2, pi0:thrust``
+        **Constructed particle lists**:
+        * ``pi+:thrust, pi0:thust, gamma:pi0_thrust, gamma:nonpi0_thrust, gamma:thrust, pi+:thrustS1/thrustS2``
 
         **Variables**:
 
@@ -480,10 +483,10 @@ class TauThrust(BaseSkim):
         tauskim_particle_selection("thrust", path)
 
         # Get EventShape variables
-        ma.buildEventShape(['pi+:thrust', 'pi0:thrust', 'gamma:thrust'],
+        ma.buildEventShape(['pi+:thrust', 'gamma:thrust'],
                            allMoments=False, foxWolfram=False, cleoCones=False,
                            sphericity=False, jets=False, path=path)
-        ma.buildEventKinematics(['pi+:thrust', 'pi0:thrust', 'gamma:thrust'], path=path)
+        ma.buildEventKinematics(['pi+:thrust', 'gamma:thrust'], path=path)
 
         # Split in signal and tag
         ma.cutAndCopyList('pi+:thrustS1', 'pi+:thrust', 'cosToThrustOfEvent > 0', path=path)
@@ -523,20 +526,15 @@ class TauThrust(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        contact = "kenji@hepl.phys.nagoya-u.ac.jp"
-
-        ma.rankByHighest(particleList='tau+:thrust',
-                         variable='p',
-                         numBest=1,
-                         path=path)
+        path = self.skim_event_cuts(cut='nParticlesInList(tau+:thrust) > 0', path=path)
 
         create_validation_histograms(
             rootfile=f'{self}_Validation.root',
-            particlelist='tau+:thrust',
+            particlelist='',
             variables_1d=[
-                ('nGoodTracksThrust', 7, 1, 8, '', contact, '', ''),
-                ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),
-                ('thrust', 50, 0.75, 1, '', contact, '', '')],
+                ('nGoodTracksThrust', 7, 1, 8, '', self.__contact__, '', ''),
+                ('visibleEnergyOfEventCMS', 40, 0, 12, '', self.__contact__, '', ''),
+                ('thrust', 50, 0.8, 1, '', self.__contact__, '', '')],
             path=path)
 
 ############################################################
@@ -561,6 +559,7 @@ class TauKshort(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
+    ApplyHLTHadronCut = False
     produce_on_tau_samples = False  # retention is too high on taupair
     validation_sample = _VALIDATION_SAMPLE
 
@@ -577,7 +576,8 @@ class TauKshort(BaseSkim):
         """
         Set particle lists and variables for TauKshort skim.
 
-        **Constructed particle lists**: ``pi+:tauKs, gamma:tauKs, pi+:tauKsS1/tauKsS2, pi0:tauKs``
+        **Constructed particle lists**:
+        * ``pi+:tauKs, pi0:tauKs, gamma:pi0_tauKs, gamma:nonpi0_tauKs, gamma:tauKs, pi+:tauKsS1/tauKsS2``
 
         **Variables**:
 
@@ -599,11 +599,11 @@ class TauKshort(BaseSkim):
 
         # Get EventShape variables
         ma.buildEventShape(
-            ['pi+:tauKs_notKs', 'pi+:tauKs_kshort', 'pi0:tauKs', 'gamma:tauKs'],
+            ['pi+:tauKs_notKs', 'pi+:tauKs_kshort', 'gamma:tauKs'],
             allMoments=False, foxWolfram=False, cleoCones=False,
             sphericity=False, jets=False, path=path)
         ma.buildEventKinematics(
-            ['pi+:tauKs_notKs', 'pi+:tauKs_kshort', 'pi0:tauKs', 'gamma:tauKs'],
+            ['pi+:tauKs_notKs', 'pi+:tauKs_kshort', 'gamma:tauKs'],
             path=path)
 
         # reconstruct

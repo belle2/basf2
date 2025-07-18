@@ -10,7 +10,6 @@
 // Description : DQM module, which gives histograms showing the efficiency of PXD sensors
 //-
 
-
 #include <dqm/analysis/modules/DQMHistAnalysisPXDEff.h>
 #include <TROOT.h>
 #include <TLatex.h>
@@ -48,12 +47,8 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
   addParam("alarmAdhoc", m_alarmAdhoc, "Generate Alarm from adhoc values", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
-  addParam("excluded", m_excluded, "the list of excluded modules, indices from 0 to 39");
+  addParam("excluded", m_excluded, "the list of excluded modules, indices from 0 to 39", std::vector<int>());
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
-}
-
-DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule()
-{
 }
 
 void DQMHistAnalysisPXDEffModule::initialize()
@@ -140,13 +135,14 @@ void DQMHistAnalysisPXDEffModule::initialize()
                                     m_nrxbins, 0, m_nrxbins);
   m_eEffAllUpdate->SetConfidenceLevel(m_confidence);
 
+  m_eEffAllUpdate->Paint("AP");
   setLabels(m_eEffAllUpdate->GetPaintedGraph());
 
   m_monObj->addCanvas(m_cEffAll);
   m_monObj->addCanvas(m_cEffAllUpdate);
 
   registerEpicsPV("PXD:Eff:Status", "Status");
-  registerEpicsPV("PXD:Eff:Overall", "Overall");
+  registerEpicsPV("PXD:Eff:Overall", "All");
   registerEpicsPV("PXD:Eff:L1", "L1");
   registerEpicsPV("PXD:Eff:L2", "L2");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
@@ -171,41 +167,48 @@ void DQMHistAnalysisPXDEffModule::beginRun()
 
   // Reset TEfficiency and get (new) alarm limits from PVs
   // no way to reset TEfficiency, do it bin by bin
-  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    int j = i + 1;
-    m_eEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
-    m_eEffAll->SetTotalEvents(j, 0);
-    m_eEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-    m_eEffAllUpdate->SetTotalEvents(j, 0);
+  for (int i = 0; i < m_nrxbins; i++) {
+    int bin = i + 1;
+    m_eEffAll->SetPassedEvents(bin, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
+    m_eEffAll->SetTotalEvents(bin, 0);
+    m_eEffAllUpdate->SetPassedEvents(bin, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+    m_eEffAllUpdate->SetTotalEvents(bin, 0);
 
-    m_warnlevelmod[m_PXDModules[i]] = m_warnlevel;
-    m_errorlevelmod[m_PXDModules[i]] = m_errorlevel;
+    if (i < int(m_PXDModules.size())) { // only for modules
+      m_warnlevelmod[m_PXDModules[i]] = m_warnlevel;
+      m_errorlevelmod[m_PXDModules[i]] = m_errorlevel;
 
-    // get warn and error limit
-    // as the same array as above, we assume chid exists
-    double dummy, loerr = 0, lowarn = 0;
-    if (requestLimitsFromEpicsPVs((std::string)m_PXDModules[i], loerr, lowarn, dummy, dummy)) {
-      m_hErrorLine->SetBinContent(i + 1, loerr);
-      if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = loerr;
-      m_hWarnLine->SetBinContent(i + 1, lowarn);
-      if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = lowarn;
+      // get warn and error limit
+      // as the same array as above, we assume chid exists
+      double dummy, loerr = 0, lowarn = 0;
+      if (requestLimitsFromEpicsPVs((std::string)m_PXDModules[i], loerr, lowarn, dummy, dummy)) {
+        m_hErrorLine->SetBinContent(bin, loerr);
+        if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = loerr;
+        m_hWarnLine->SetBinContent(bin, lowarn);
+        if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = lowarn;
+      }
     }
-
   }
   {
     double dummy, loerr = 0, lowarn = 0;
+    m_warnlevelmod["L1"] = m_warnlevel;
+    m_errorlevelmod["L1"] = m_errorlevel;
     if (requestLimitsFromEpicsPVs("L1", loerr, lowarn, dummy, dummy)) {
       m_hErrorLine->SetBinContent(m_PXDModules.size() + 1, loerr);
       if (m_perModuleAlarm) m_errorlevelmod["L1"] = loerr;
       m_hWarnLine->SetBinContent(m_PXDModules.size() + 1, lowarn);
       if (m_perModuleAlarm) m_warnlevelmod["L1"] = lowarn;
     }
+    m_warnlevelmod["L2"] = m_warnlevel;
+    m_errorlevelmod["L2"] = m_errorlevel;
     if (requestLimitsFromEpicsPVs("L2", loerr, lowarn, dummy, dummy)) {
       m_hErrorLine->SetBinContent(m_PXDModules.size() + 2, loerr);
       if (m_perModuleAlarm) m_errorlevelmod["L2"] = loerr;
       m_hWarnLine->SetBinContent(m_PXDModules.size() + 2, lowarn);
       if (m_perModuleAlarm) m_warnlevelmod["L2"] = lowarn;
     }
+    m_warnlevelmod["All"] = m_warnlevel;
+    m_errorlevelmod["All"] = m_errorlevel;
     if (requestLimitsFromEpicsPVs("All", loerr, lowarn, dummy, dummy)) {
       m_hErrorLine->SetBinContent(m_PXDModules.size() + 3, loerr);
       if (m_perModuleAlarm) m_errorlevelmod["All"] = loerr;
@@ -290,7 +293,7 @@ void DQMHistAnalysisPXDEffModule::event()
   {
     // First create some 2d overview of efficiency for all modules
     // This is not taken into account for efficiency calculation as
-    // there may be update glitches dues to seperate histograms
+    // there may be update glitches dues to separate histograms
     // The histograms
     bool updateinner = false, updateouter = false;
     for (auto aPXDModule : m_PXDModules) {
@@ -306,13 +309,13 @@ void DQMHistAnalysisPXDEffModule::event()
         locationMatches = m_histogramDirectoryName + "/" + locationMatches;
       }
 
-      auto Hits = (TH1*)findHist(locationHits, true);// check if updated
-      auto Matches = (TH1*)findHist(locationMatches, true);// check if updated
+      auto Hits = findHist(locationHits, true);// check if updated
+      auto Matches = findHist(locationMatches, true);// check if updated
 
       if (Hits == nullptr && Matches == nullptr) continue; // none updated
 
-      if (Hits == nullptr) Hits = (TH1*)findHist(locationHits); // actually, this should not happen ...
-      if (Matches == nullptr) Matches = (TH1*)findHist(locationMatches); // ... as updates should coincide
+      if (Hits == nullptr) Hits = findHist(locationHits); // actually, this should not happen ...
+      if (Matches == nullptr) Matches = findHist(locationMatches); // ... as updates should coincide
 
       // Finding only one of them should only happen in very strange situations... still better check
       if (Hits && Matches) {
@@ -377,7 +380,7 @@ void DQMHistAnalysisPXDEffModule::event()
 // (avoid possible update glitches from daq/dqm framework side)
 // The bins per module are read out and filled into an TEfficiency as total and passed events into bin
 // Summaries for L1, L2, Overall are added, too
-  auto Combined = (TH1*)findHist(m_histogramDirectoryName, "PXD_Eff_combined", true);// only if updated
+  auto Combined = findHist(m_histogramDirectoryName, "PXD_Eff_combined", true);// only if updated
 
   if (Combined) {
     // only if histogram was changed
@@ -429,7 +432,7 @@ void DQMHistAnalysisPXDEffModule::event()
       // workaround for excluded module
       if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
 
-      // get the errors and check for limits for each bin seperately ...
+      // get the errors and check for limits for each bin separately ...
 
       if (nhit >= m_minEntries) {
         error_flag |= check_error_level(bin, aModule);
@@ -489,15 +492,22 @@ void DQMHistAnalysisPXDEffModule::event()
         gr->Draw("AP");
 
         for (auto& it : m_excluded) {
-          auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
-          tt->SetTextSize(0.035);
-          tt->SetTextAngle(90);// Rotated
-          tt->SetTextAlign(12);// Centered
+          static std::map <int, TLatex*> ltmap;
+          auto tt = ltmap[it];
+          if (!tt) {
+            tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+            tt->SetTextSize(0.035);
+            tt->SetTextAngle(90);// Rotated
+            tt->SetTextAlign(12);// Centered
+            ltmap[it] = tt;
+          } else {
+            tt->SetY(scale_min);
+          }
           tt->Draw();
         }
 
 
-        EStatus all_stat = makeStatus(all >= 100., warn_flag, error_flag);
+        EStatus all_stat = makeStatus(all >= m_minEntries, warn_flag, error_flag);
         colorizeCanvas(m_cEffAll, all_stat);
 
         m_hWarnLine->Draw("same,hist");
@@ -563,10 +573,16 @@ void DQMHistAnalysisPXDEffModule::event()
       if (gr3) gr3->Draw("P"); // both in one plot
 
       for (auto& it : m_excluded) {
-        auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
-        tt->SetTextSize(0.035);
-        tt->SetTextAngle(90);// Rotated
-        tt->SetTextAlign(12);// Centered
+        std::map <int, TLatex*> ltmap;
+        auto tt = ltmap[it];
+        if (!tt) {
+          tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+          tt->SetTextSize(0.035);
+          tt->SetTextAngle(90);// Rotated
+          tt->SetTextAlign(12);// Centered
+        } else {
+          tt->SetY(scale_min);
+        }
         tt->Draw();
       }
 
@@ -592,7 +608,7 @@ void DQMHistAnalysisPXDEffModule::event()
     setEpicsPV("Status", stat_data);
     // only update if statistics is reasonable, we dont want "0" drops between runs!
     if (stat_data != c_StatusTooFew) {
-      setEpicsPV("Overall", var_efficiency);
+      setEpicsPV("All", var_efficiency);
       setEpicsPV("L1", var_efficiencyL1);
       setEpicsPV("L2", var_efficiencyL2);
     }
@@ -602,5 +618,27 @@ void DQMHistAnalysisPXDEffModule::event()
 void DQMHistAnalysisPXDEffModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
+
+  for (VxdID& aPXDModule : m_PXDModules) {
+    if (m_cEffModules[aPXDModule]) delete m_cEffModules[aPXDModule];
+    if (m_eEffModules[aPXDModule]) delete m_eEffModules[aPXDModule];
+  }
+
+  if (m_hEffAllLastTotal) delete m_hEffAllLastTotal;
+  if (m_hEffAllLastPassed) delete m_hEffAllLastPassed;
+
+  if (m_cInnerMap) delete m_cInnerMap;
+  if (m_cOuterMap) delete m_cOuterMap;
+  if (m_hInnerMap) delete m_hInnerMap;
+  if (m_hOuterMap) delete m_hOuterMap;
+
+  if (m_hErrorLine) delete m_hErrorLine;
+  if (m_hWarnLine) delete m_hWarnLine;
+
+  if (m_cEffAll) delete m_cEffAll;
+  if (m_eEffAll) delete m_eEffAll;
+
+  if (m_cEffAllUpdate) delete m_cEffAllUpdate;
+  if (m_eEffAllUpdate) delete m_eEffAllUpdate;
 }
 

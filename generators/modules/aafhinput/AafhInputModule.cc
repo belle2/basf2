@@ -23,7 +23,7 @@ REG_MODULE(AafhInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-AafhInputModule::AafhInputModule() : Module(), m_initial(BeamParameters::c_smearALL)
+AafhInputModule::AafhInputModule() : GeneratorBaseModule(), m_initial(BeamParameters::c_smearALL)
 {
   // Set module properties
   setDescription("AAFH Generator to generate non-radiative two-photon events like e+e- -> e+e-e+e-");
@@ -55,12 +55,12 @@ AafhInputModule::AafhInputModule() : Module(), m_initial(BeamParameters::c_smear
   addParam("subgeneratorWeights", m_subgeneratorWeights,
            "relative weights of the subgenerators: this must be a list of four "
            "or eight values (first four are interpreted as WAP, rest as WBP) "
-           "which specify the relativ weights for each of the "
-           "four sub generators. The orginial code states that it the program "
+           "which specify the relative weights for each of the "
+           "four sub generators. The original code states that it the program "
            "run most efficient when the maximum weight is equal in all sub "
            "generators and that if one wants to be sure that all peaks in the "
            "differential cross section are accounted the chance to enter each "
-           "sub generator should be equal. Values which try to fullfill both "
+           "sub generator should be equal. Values which try to fulfill both "
            "conditions are printed at after generation when the output level "
            "is set to INFO",
            m_generator.getGeneratorWeights());
@@ -86,7 +86,7 @@ AafhInputModule::AafhInputModule() : Module(), m_initial(BeamParameters::c_smear
            m_generator.getParticle());
 }
 
-void AafhInputModule::initialize()
+void AafhInputModule::generatorInitialize()
 {
   m_mcparticles.registerInDataStore();
 
@@ -94,7 +94,7 @@ void AafhInputModule::initialize()
   m_initial.initialize();
 }
 
-void AafhInputModule::event()
+void AafhInputModule::generatorEvent()
 {
 
   // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)

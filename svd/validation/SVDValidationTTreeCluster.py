@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -75,7 +74,7 @@ class SVDValidationTTreeCluster(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(SVDValidationTTreeCluster, self).__init__()
+        super().__init__()
 
         #: Output ROOT file
         self.file = ROOT.TFile('../SVDValidationTTreeCluster.root', 'recreate')
@@ -133,7 +132,7 @@ class SVDValidationTTreeCluster(b2.Module):
             cluster_truehits = cluster.getRelationsTo('SVDTrueHits')
 
             # Sensor identification
-            sensorInfo = Belle2.VXD.GeoCache.get(cluster.getSensorID())
+            sensorInfo = Belle2.VXD.GeoCache.getInstance().getSensorInfo(cluster.getSensorID())
             sensorID = cluster.getSensorID()
             self.data.sensor_id = int(sensorID)
             sensorNum = sensorID.getSensorNumber()

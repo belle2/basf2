@@ -136,7 +136,7 @@ namespace Belle2 {
        *  @param      cov2  Covariance matrix to the second parameters
        *  @param[out] par   Averaged parameters
        *  @param[out] cov   Averaged covariance matrix
-       *  @return           Chi square deviation of orignal parameters to the average
+       *  @return           Chi square deviation of original parameters to the average
        */
       template <int N>
       static double average(const ParameterVector<N>& par1,
@@ -167,7 +167,7 @@ namespace Belle2 {
        *  @param      cov2        Covariance matrix to the second parameters
        *  @param[out] par         Averaged parameters
        *  @param[out] cov         Averaged covariance matrix
-       *  @return                 Chi square deviation of orignal parameters to the average
+       *  @return                 Chi square deviation of original parameters to the average
        */
       template <int M, int N1>
       static double average(const ParameterVector<N1>& par1,
@@ -239,7 +239,7 @@ namespace Belle2 {
        *  @param          ambiguity1  Projection ambiguity of the first parameters
        *  @param[in, out] par2        Second parameters - updated inplace
        *  @param[in, out] cov2        Second covariance matrix - updated inplace
-       *  @return                     Chi square deviation of orignal parameters to the average
+       *  @return                     Chi square deviation of original parameters to the average
        */
       template <int M, int N1>
       static double kalmanUpdate(const ParameterVector<N1>& par1,

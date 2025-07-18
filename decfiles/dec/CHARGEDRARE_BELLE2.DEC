@@ -1132,7 +1132,7 @@ Decay B+Rare
 # Others are ASSUMED like that. The ratio D-rho+/D-pi+ is same as the ratioD+K*0/D+K0.
 #
 0.000000220   K*0  D+                                      SVS;
-0.000000020   D+  K+  pi-                                  PHSP;
+0.000005600   D+  K+  pi-                                  PHSP; #[BF update - SB 06/2024]
 0.000000010   D+  K0  pi0                                  PHSP;
 0.000000180   D*+  K*0                                     SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
 0.000000150   D*+  K+  pi-                                 PHSP;
@@ -2278,7 +2278,7 @@ Decay B-Rare
 # Others are ASSUMED like that. The ratio D-rho+/D-pi+ is same as the ratioD+K*0/D+K0.
 #
 0.000000220   anti-K*0  D-                                 SVS;
-0.000000020   D-  K-  pi+                                  PHSP;
+0.000005600   D-  K-  pi+                                  PHSP; #[BF update - SB 06/2024]
 0.000000010   D-  anti-K0  pi0                             PHSP;
 0.000000180   D*-  anti-K*0                                SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
 0.000000150   D*-  K-  pi+                                 PHSP;

@@ -80,12 +80,11 @@ def command_tag_merge(args, db=None):
     The result is equivalent to having multiple globaltags setup in the conditions
     access for basf2 (highest priority goes first).
 
-    Warning:
+    .. warning::
+
       The order of the globaltags is highest priority first, so payloads from
       globaltags earlier on the command line will be taken with before globaltags
       from later tags.
-
-      This command requires that all globaltags are overlap free.
 
     For each globaltag in the list we copy all payloads to the output globaltag
     if there is no payload of that name valid for the given interval of validity
@@ -97,18 +96,18 @@ def command_tag_merge(args, db=None):
 
     For example:
 
-    globaltag A contains ::
+    Globaltag ``A`` contains ::
 
         payload1, rev 2, valid from 1,0 to 1,10
         payload1, rev 3, valid from 1,20 to 1,22
         payload2, rev 1, valid from 1,0 to 1,-1
 
-    globaltag B contains ::
+    Globaltag ``B`` contains ::
 
         payload1, rev 1, valid from 1,1 to 1,30
         payload2, rev 2, valid from 0,1 to 1,20
 
-    Then running ``b2conditionsdb tag merge -o output A B``, the output globaltag
+    Then running ``b2conditionsdb tag merge -o C A B``, the output globaltag ``C``
     after the merge will contain::
 
         payload1, rev 2, valid from 1,0 to 1,10
@@ -131,7 +130,7 @@ def command_tag_merge(args, db=None):
         payload1, rev 3, valid from 1,20 to 1,21
         payload2, rev 1, valid from 1,0 to 1,21
 
-    .. versionadded:: release-05-01-00
+    .. note:: Version added: release-05-01-00
     """
 
     if db is None:
@@ -287,54 +286,61 @@ def command_tag_runningupdate(args, db=None):
        first run for the update to be valid or later
     3. Optionally, make sure all payloads in the staging tag end in an open iov.
 
-    Example:
+    .. rubric:: Examples
 
-        running tag contains ::
+    Running tag contains ::
 
-            payload1, rev 1, valid from 0,1 to 1,0
-            payload1, rev 2, valid from 1,1 to -1,-1
-            payload2, rev 1, valid from 0,1 to -1,-1
-            payload3, rev 1, valid from 0,1 to 1,0
-            payload4, rev 1, valid from 0,1 to -1,-1
-            payload5, rev 1, valid from 0,1 to -1,-1
+        payload1, rev 1, valid from 0,1 to 1,0
+        payload1, rev 2, valid from 1,1 to -1,-1
+        payload2, rev 1, valid from 0,1 to -1,-1
+        payload3, rev 1, valid from 0,1 to 1,0
+        payload4, rev 1, valid from 0,1 to -1,-1
+        payload5, rev 1, valid from 0,1 to -1,-1
 
-        staging tag contains ::
+    Staging tag contains ::
 
-            payload1, rev 3, valid from 0,0 to 1,8
-            payload1, rev 4, valid from 1,9 to 1,20
-            payload2, rev 2, valid from 1,5 to 1,20
-            payload3, rev 2, valid from 0,0 to -1,-1
-            payload4, rev 1, valid from 0,0 to 1,20
+        payload1, rev 3, valid from 0,0 to 1,8
+        payload1, rev 4, valid from 1,9 to 1,20
+        payload2, rev 2, valid from 1,5 to 1,20
+        payload3, rev 2, valid from 0,0 to -1,-1
+        payload4, rev 1, valid from 0,0 to 1,20
 
-        Then running ``b2conditionsdb tag runningupdate running staging --run 1 2 --allow-closed``,
-        the running globaltag after the update will contain ::
+    Then running ``b2conditionsdb tag runningupdate running staging --run 1 2 --allow-closed``,
+    the running globaltag after the update will contain ::
 
-            payload1, rev 1, valid from 0,1 to 1,0
-            payload1, rev 2, valid from 1,1 to 1,1
-            payload1, rev 3, valid from 1,2 to 1,8
-            payload1, rev 4, valid from 1,9 to 1,20
-            payload2, rev 1, valid from 0,1 to 1,4
-            payload2, rev 2, valid from 1,5 to 1,20
-            payload3, rev 1, valid from 0,1 to 1,0
-            payload3, rev 2, valid from 1,2 to -1,-1
-            payload4, rev 1, valid from 0,1 to 1,20
-            payload5, rev 1, valid from 0,1 to -1,-1
+        payload1, rev 1, valid from 0,1 to 1,0
+        payload1, rev 2, valid from 1,1 to 1,1
+        payload1, rev 3, valid from 1,2 to 1,8
+        payload1, rev 4, valid from 1,9 to 1,20
+        payload2, rev 1, valid from 0,1 to 1,4
+        payload2, rev 2, valid from 1,5 to 1,20
+        payload3, rev 1, valid from 0,1 to 1,0
+        payload3, rev 2, valid from 1,2 to -1,-1
+        payload4, rev 1, valid from 0,1 to 1,20
+        payload5, rev 1, valid from 0,1 to -1,-1
 
-        Note that
+    Note that
 
         - the start of payload1 and payload3 in staging has been adjusted
+
         - payload2 in the running tag as been closed at 1,4, just before the
           validity from the staging tag
+
         - payload3 was already closed in the running tag so no change is
           performed. This might result in gaps but is intentional
+
         - payload4 was not closed at rim 1,2 because the staging tag had the same
           revision of the payload so the these were merged to one long validity.
+
         - payload5 was not closed as there was no update to it in the staging tag.
           If we would have run with ``--full-replacement`` it would have been closed.
+
         - if we would have chosen ``--run 1 1`` the update would have failed because
           payload1, rev2 in running starts at 1,1 so we would have a conflict
+
         - if we would have chosen ``--run 1 6`` the update would have failed because
           payload2 in the staging tag starts before this run
+
         - if we would have chosen to open the final iovs in staging by using
           ``--fix-closed``, payload1, rev 4; payload2, rev 2 and payload4 rev 1
           would be valid until -1,-1 after the running tag. In fact, payload 4
@@ -526,8 +532,8 @@ class CommandIoVsHelper:
         self._args.add_argument(
             "--iov-pattern",
             default=None,
-            help="whitespace-separated string with pattern of the iov to be replaced. "
-            " Use * to mark the fields that shold be ignored. Valid patterns are 0 0 -1 -1"
+            help="whitespace-separated string with pattern of the iov to be considered. "
+            " Use * to mark the fields that should be ignored. Valid patterns are 0 0 -1 -1"
             " (a very specific IoV),  0 * -1 -1 (any iov that starts in any run of exp 0 and ends exactly in exp -1, run -1)"
             ", * * 3 45 (any Iov ending in exp 3, run 45, regardless from where it starts).")
         self._args.add_argument("--run-range", nargs=4, default=None, type=int,
@@ -535,11 +541,11 @@ class CommandIoVsHelper:
                                 help="Can be four numbers to limit the run range to be considered"
                                 " Only iovs overlapping, even partially, with this range will be considered.")
         self._args.add_argument("--fully-contained", action="store_true",
-                                help="If given together with --run_range limit the list of payloads "
+                                help="If given together with ``--run_range`` limit the list of payloads "
                                 "to the ones fully contained in the given run range")
         if self.whichcommand == "copy":
             self._args.add_argument("--set-run-range", action="store_true",
-                                    help="If given together with --run_range modify the interval of validity"
+                                    help="If given together with ``--run_range`` modify the interval of validity"
                                     " of partially overlapping iovs to be fully contained in the given run range")
         self.iovfilter.add_arguments("payloads")
         self._args.add_argument("--revision", metavar='revision', type=int,

@@ -65,10 +65,12 @@ class RenderDocstring(Directive):
     want to write the example in Google Docstring and keep that synchronous
     with a reStructuredText version
     """
+    #: \cond Doxygen_suppress
     has_content = True
     option_spec = {
         "lines": directives.unchanged
     }
+    #: \endcond
 
     def run(self):
         """Just pass on the content to the autodoc-process-docstring event and
@@ -76,7 +78,7 @@ class RenderDocstring(Directive):
         env = self.state.document.settings.env
         content = list(self.content)
         try:
-            start_index, end_index = [int(e) for e in self.options.get("lines", None).split(",")]
+            start_index, end_index = (int(e) for e in self.options.get("lines", None).split(","))
             content = content[start_index:end_index]
         except Exception:
             pass
@@ -88,6 +90,7 @@ class RenderDocstring(Directive):
         return parse_with_titles(self.state, content)
 
 
+#: \cond Doxygen_suppress
 class ModuleListDirective(Directive):
     has_content = False
     option_spec = {
@@ -99,17 +102,20 @@ class ModuleListDirective(Directive):
         "regex-filter": directives.unchanged,
         "io-plots": directives.flag,
     }
+#: \endcond
 
     def show_module(self, module, library):
         description = module.description().splitlines()
+        for i, line in enumerate(description):
+            description[i] = line.replace('|release|', self.state.document.settings.env.app.config.release)
         # pretend to be the autodoc extension to let other events process
         # the doc string. Enables Google/Numpy docstrings as well as a bit
         # of doxygen docstring conversion we have
         env = self.state.document.settings.env
         env.app.emit('autodoc-process-docstring', "b2:module", module.name(), module, None, description)
         description += ["", "",
-                        ":Package: %s" % module.package(),
-                        ":Library: %s" % os.path.basename(library),
+                        f":Package: {module.package()}",
+                        f":Library: {os.path.basename(library)}",
                         ]
 
         if "no-parameters" not in self.options:
@@ -117,26 +123,26 @@ class ModuleListDirective(Directive):
             required_params = []
             for p in module.available_params():
                 dest = required_params if p.forceInSteering else optional_params
-                default = "" if p.forceInSteering else ", default={default!r}".format(default=p.default)
+                default = "" if p.forceInSteering else f", default={p.default!r}"
                 param_desc = p.description.splitlines()
                 # run the description through autodoc event to get
                 # Google/Numpy/doxygen style as well
                 env.app.emit('autodoc-process-docstring', 'b2:module:param', module.name() + '.' + p.name, p, None, param_desc)
                 param_desc = textwrap.indent("\n".join(param_desc), 8 * " ").splitlines()
-                dest += ["    * **{name}** *({type}{default})*".format(name=p.name, type=p.type, default=default)]
+                dest += [f"    * **{p.name}** *({p.type}{default})*"]
                 dest += param_desc
 
-            if(required_params):
+            if (required_params):
                 description += [":Required Parameters:", "    "] + required_params
-            if(optional_params):
+            if (optional_params):
                 description += [":Parameters:", "    "] + optional_params
 
         if "io-plots" in self.options:
-            image = "build/ioplots/%s.png" % module.name()
+            image = f"build/ioplots/{module.name()}.png"
             if os.path.exists(image):
-                description += [":IO diagram:", "    ", "    .. image:: /%s" % image]
+                description += [":IO diagram:", "    ", f"    .. image:: /{image}"]
 
-        content = [".. b2:module:: {module}".format(module=module.name())] + self.noindex + ["    "]
+        content = [f".. b2:module:: {module.name()}"] + self.noindex + ["    "]
         content += ["    " + e for e in description]
         return parse_with_titles(self.state, content)
 
@@ -178,6 +184,7 @@ class ModuleListDirective(Directive):
         return all_nodes
 
 
+#: \cond Doxygen_suppress
 class VariableListDirective(Directive):
     has_content = False
     option_spec = {
@@ -187,6 +194,7 @@ class VariableListDirective(Directive):
         "description-regex-filter": directives.unchanged,
         "noindex": directives.flag,
     }
+#: \endcond
 
     def run(self):
         from ROOT import Belle2
@@ -210,7 +218,7 @@ class VariableListDirective(Directive):
                 continue
             if regex_filter and not regex_filter.match(var.name):
                 continue
-            if desc_regex_filter and not desc_regex_filter.match(var.description):
+            if desc_regex_filter and not desc_regex_filter.match(str(var.description)):
                 continue
             all_variables.append(var)
 
@@ -276,6 +284,46 @@ def gitlab_issue_role(role, rawtext, text, lineno, inliner, options=None, conten
     return [nodes.reference(rawtext, text=text, refuri=url)], []
 
 
+def doxygen_role(role, rawtext, text, lineno, inliner, options=None, content=None):
+    if content is None:
+        content = []
+    if options is None:
+        options = {}
+    release_version = inliner.document.settings.env.app.config.release
+    match = re.match(r'(.+?)<(.+?)>', text)
+    if match:
+        display_text, url_text = match.groups()
+    else:
+        display_text = text
+        url_text = text
+    if "html#" in url_text:
+        url = f"https://software.belle2.org/{release_version}/doxygen/{url_text}"
+    else:
+        url = f"https://software.belle2.org/{release_version}/doxygen/{url_text}.html"
+
+    return [nodes.reference(rawsource=rawtext, text=display_text, refuri=url)], []
+
+
+def sphinx_role(role, rawtext, text, lineno, inliner, options=None, content=None):
+    if content is None:
+        content = []
+    if options is None:
+        options = {}
+    release_version = inliner.document.settings.env.app.config.release
+    match = re.match(r'(.+?)<(.+?)>', text)
+    if match:
+        display_text, url_text = match.groups()
+    else:
+        display_text = text
+        url_text = text
+    if "html#" in url_text:
+        url = f"https://software.belle2.org/{release_version}/sphinx/{url_text}"
+    else:
+        url = f"https://software.belle2.org/{release_version}/sphinx/{url_text}.html"
+
+    return [nodes.reference(rawsource=rawtext, text=display_text, refuri=url)], []
+
+
 def setup(app):
     import basf2
     basf2.logging.log_level = basf2.LogLevel.WARNING
@@ -288,6 +336,8 @@ def setup(app):
     app.add_directive("b2-variables", VariableListDirective)
     app.add_directive("docstring", RenderDocstring)
     app.add_role("issue", gitlab_issue_role)
+    app.add_role("doxygen", doxygen_role)
+    app.add_role("sphinx", sphinx_role)
     app.connect('html-page-context', html_page_context)
 
     # Sadly sphinx does not seem to add labels to custom indices ... :/

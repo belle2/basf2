@@ -14,7 +14,6 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/TagVertex.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 //utilities
 #include <analysis/utility/DistanceTools.h>
@@ -24,8 +23,10 @@
 
 // framework aux
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/B2Vector3.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
+#include <Math/VectorUtil.h>
 #include <TMatrixD.h>
 #include <TVectorD.h>
 
@@ -41,7 +42,7 @@ namespace Belle2 {
     using RotationTools::getUnitOrthogonal;
     using RotationTools::toVec;
 
-    static const B2Vector3D vecNaN(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
+    static const ROOT::Math::XYZVector vecNaN(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
 
     //   ############################################## Time Dependent CPV Analysis Variables  ###############################################
 
@@ -86,6 +87,26 @@ namespace Belle2 {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert) return Const::doubleNaN;
       return vert->getMCTagVertex().Z();
+    }
+
+    double particleTagVCov(const Particle* particle, const std::vector<double>& element)
+    {
+      int elementI = int(std::lround(element[0]));
+      int elementJ = int(std::lround(element[1]));
+
+      if (elementI < 0 || elementI > 2) {
+        B2WARNING("Index is out of boundaries [0 - 2]:" << LogVar("i", elementI));
+        return Const::doubleNaN;
+      }
+      if (elementJ < 0 || elementJ > 2) {
+        B2WARNING("Index is out of boundaries [0 - 2]:" << LogVar("j", elementJ));
+        return Const::doubleNaN;
+      }
+
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert) return Const::doubleNaN;
+      TMatrixDSym TagVErr = vert->getTagVertexErrMatrix();
+      return TagVErr(elementI, elementJ);
     }
 
     double particleTagVxErr(const Particle* particle)
@@ -184,7 +205,7 @@ namespace Belle2 {
 
     double particleDeltaTBelle(const Particle* particle)
     {
-      double beta = PCmsLabTransform().getBoostVector().Mag();
+      double beta = PCmsLabTransform().getBoostVector().R();
       double bg = beta / sqrt(1 - beta * beta);
       double c = Const::speedOfLight / 1000.; // cm ps-1
       return particleDeltaZ(particle) / bg / c;
@@ -209,7 +230,7 @@ namespace Belle2 {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert) return Const::doubleNaN;
 
-      double beta = PCmsLabTransform().getBoostVector().Mag();
+      double beta = PCmsLabTransform().getBoostVector().R();
       double bg = beta / sqrt(1 - beta * beta);
       double c = Const::speedOfLight / 1000.; // cm ps-1
       return vert->getMCDeltaT() * bg * c;
@@ -240,7 +261,7 @@ namespace Belle2 {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert) return Const::doubleNaN;
 
-      double beta = PCmsLabTransform().getBoostVector().Mag();
+      double beta = PCmsLabTransform().getBoostVector().R();
       double bg = beta / sqrt(1 - beta * beta);
       double c = Const::speedOfLight / 1000.; // cm ps-1
       return vert->getDeltaT() * bg * c;
@@ -251,7 +272,7 @@ namespace Belle2 {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert) return Const::doubleNaN;
 
-      double beta = PCmsLabTransform().getBoostVector().Mag();
+      double beta = PCmsLabTransform().getBoostVector().R();
       double bg = beta / sqrt(1 - beta * beta);
       double c = Const::speedOfLight / 1000.; // cm ps-1
       return vert->getDeltaTErr() * bg * c;
@@ -261,40 +282,42 @@ namespace Belle2 {
 
     double vertexBoostDirection(const Particle* part)
     {
-      B2Vector3D boostDir = PCmsLabTransform().getBoostVector().Unit();
-      B2Vector3F pos = part->getVertex();
+      ROOT::Math::XYZVector boostDir = PCmsLabTransform().getBoostVector().Unit();
+      ROOT::Math::XYZVector pos = part->getVertex();
       return pos.Dot(boostDir);
     }
 
     double vertexOrthogonalBoostDirection(const Particle* part)
     {
-      B2Vector3D boost = PCmsLabTransform().getBoostVector();
-      B2Vector3D orthBoostDir = getUnitOrthogonal(boost);
+      ROOT::Math::XYZVector boost = PCmsLabTransform().getBoostVector();
+      ROOT::Math::XYZVector orthBoostDir = getUnitOrthogonal(boost);
 
-      B2Vector3F pos = part->getVertex();
+      ROOT::Math::XYZVector pos = part->getVertex();
       return pos.Dot(orthBoostDir);
     }
 
     double vertexTruthBoostDirection(const Particle* part)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
-      B2Vector3D boostDir = -(beamParamsDB->getHER() + beamParamsDB->getLER()).BoostToCM().Unit();
-
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
+      ROOT::Math::XYZVector boostDir = -(beamParamsDB->getHER() + beamParamsDB->getLER()).BoostToCM().Unit();
       const MCParticle* mcPart = part->getMCParticle();
       if (!mcPart) return Const::doubleNaN;
-      B2Vector3D pos = mcPart->getDecayVertex();
+      ROOT::Math::XYZVector pos = mcPart->getDecayVertex();
       return pos.Dot(boostDir);
     }
 
     double vertexTruthOrthogonalBoostDirection(const Particle* part)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
-      B2Vector3D boost = -(beamParamsDB->getHER() + beamParamsDB->getLER()).BoostToCM();
-      B2Vector3D orthBoostDir = getUnitOrthogonal(boost);
-
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
+      ROOT::Math::XYZVector boost = -(beamParamsDB->getHER() + beamParamsDB->getLER()).BoostToCM();
+      ROOT::Math::XYZVector orthBoostDir = getUnitOrthogonal(boost);
       const MCParticle* mcPart = part->getMCParticle();
       if (!mcPart) return Const::doubleNaN;
-      B2Vector3D pos = mcPart->getDecayVertex();
+      ROOT::Math::XYZVector pos = mcPart->getDecayVertex();
       return pos.Dot(orthBoostDir);
     }
 
@@ -361,10 +384,9 @@ namespace Belle2 {
     double particleCosThetaBoostDirection(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
-      B2Vector3D boost = PCmsLabTransform().getBoostVector();
+      ROOT::Math::XYZVector boost = PCmsLabTransform().getBoostVector();
       ROOT::Math::PxPyPzEVector pxpypze = frame.getMomentum(part);
-      B2Vector3D momentum(pxpypze.Px(), pxpypze.Py(), pxpypze.Pz());
-      return cos(momentum.Angle(boost));
+      return ROOT::Math::VectorUtil::CosTheta(pxpypze, boost);
     }
 
     double particleInternalTagVMCFlavor(const Particle* part)
@@ -462,10 +484,83 @@ namespace Belle2 {
       if (vert->getConstraintType() == "noConstraint") return Const::doubleNaN;
       const Particle* tagParticle(vert->getVtxFitParticle(trackIndexInt));
       if (!tagParticle) return Const::doubleNaN;
+      const TrackFitResult* tagTrackFitResult = tagParticle->getTrackFitResult();
+      if (!tagTrackFitResult) return Const::doubleNaN;
 
-      return DistanceTools::trackToVtxDist(tagParticle->getTrackFitResult()->getPosition(),
+      return DistanceTools::trackToVtxDist(tagTrackFitResult->getPosition(),
                                            tagParticle->getMomentum(),
                                            vert->getConstraintCenter());
+    }
+
+    double getY4Sx(const Particle* part)
+    {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return Const::doubleNaN;
+      return vert->getConstraintCenter().X();
+    }
+
+    double getY4Sy(const Particle* part)
+    {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return Const::doubleNaN;
+      return vert->getConstraintCenter().Y();
+    }
+
+    double getY4Sz(const Particle* part)
+    {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return Const::doubleNaN;
+      return vert->getConstraintCenter().Z();
+    }
+
+    double getSigBdecayTime(const Particle* part)
+    {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return Const::doubleNaN;
+      ROOT::Math::XYZVector vtxY4S  = vert->getConstraintCenter(); // Y4Svtx
+      ROOT::Math::XYZVector vtxSigB = part->getVertex();  // SignalB vertex
+      ROOT::Math::PxPyPzEVector p4Sig = part->get4Vector(); // SigB 4-momentum
+      ROOT::Math::XYZVector nSig = p4Sig.Vect().Unit(); // SigB momentum direction
+
+      // Notice that for beta*gamma we use p / m, not p / mPDG which has worse resolution
+      double betaSig = p4Sig.Beta();
+      double gammaSig = 1 / sqrt(1 - betaSig * betaSig);
+      double c = Const::speedOfLight / 1000.; // cm ps-1
+
+      // The projection of the flight path into the SigB momentum direction is used.
+      // I.e. the decay time can be negative
+      double tSig = (vtxSigB - vtxY4S).Dot(nSig) / (c * betaSig * gammaSig);
+      return tSig;
+    }
+
+    double getTagBdecayTime(const Particle* part)
+    {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return Const::doubleNaN;
+
+      ROOT::Math::XYZVector vtxY4S  = vert->getConstraintCenter(); // Y4Svtx
+      ROOT::Math::XYZVector vtxTagB = vert->getTagVertex();  // TagB vertex
+      ROOT::Math::PxPyPzEVector p4Sig = part->get4Vector(); // SigB 4-momentum
+      ROOT::Math::PxPyPzEVector p4SigCms = PCmsLabTransform().labToCms(p4Sig);
+      // Assuming that pSigCms + pTagCms == 0
+      ROOT::Math::PxPyPzEVector p4TagCms(-p4SigCms.px(), -p4SigCms.py(), -p4SigCms.pz(), p4SigCms.E());
+      ROOT::Math::PxPyPzEVector p4Tag = PCmsLabTransform().cmsToLab(p4TagCms);
+      ROOT::Math::XYZVector nTag = p4Tag.Vect().Unit(); // TagB momentum direction
+
+      // Notice that for beta*gamma we use p / m, not p / mPDG which has worse resolution
+      double betaTag = p4Tag.Beta();
+      double gammaTag = 1 / sqrt(1 - betaTag * betaTag);
+      double c = Const::speedOfLight / 1000.; // cm ps-1
+
+      // The projection of the flight path into the TagB momentum direction is used.
+      // I.e. the decay time can be negative
+      double tTag = (vtxTagB - vtxY4S).Dot(nTag) / (c * betaTag * gammaTag);
+      return tTag;
+    }
+
+    double getDeltaT3D(const Particle* part)
+    {
+      return getSigBdecayTime(part) - getTagBdecayTime(part);
     }
 
     double tagTrackDistanceToConstraintErr(const Particle* part, const std::vector<double>& trackIndex)
@@ -479,11 +574,13 @@ namespace Belle2 {
       if (vert->getConstraintType() == "noConstraint") return Const::doubleNaN;
       const Particle* tagParticle(vert->getVtxFitParticle(trackIndexInt));
       if (!tagParticle) return Const::doubleNaN;
+      const TrackFitResult* tagTrackFitResult = tagParticle->getTrackFitResult();
+      if (!tagTrackFitResult) return Const::doubleNaN;
 
       //recover the covariance matrix associated to the position of the tag track
       TMatrixDSym trackPosCovMat = tagParticle->getVertexErrorMatrix();
 
-      return DistanceTools::trackToVtxDistErr(tagParticle->getTrackFitResult()->getPosition(),
+      return DistanceTools::trackToVtxDistErr(tagTrackFitResult->getPosition(),
                                               tagParticle->getMomentum(),
                                               vert->getConstraintCenter(),
                                               trackPosCovMat,
@@ -549,8 +646,10 @@ namespace Belle2 {
 
       const Particle* particle = vert->getVtxFitParticle(trackIndexInt);
       if (!particle) return Const::doubleNaN;
+      const TrackFitResult* trackFitResult = particle->getTrackFitResult();
+      if (!trackFitResult) return Const::doubleNaN;
 
-      return DistanceTools::trackToVtxDist(particle->getTrackFitResult()->getPosition(),
+      return DistanceTools::trackToVtxDist(trackFitResult->getPosition(),
                                            particle->getMomentum(),
                                            vert->getTagVertex());
     }
@@ -565,6 +664,8 @@ namespace Belle2 {
 
       const Particle* tagParticle(vert->getVtxFitParticle(trackIndexInt));
       if (!tagParticle) return Const::doubleNaN;
+      const TrackFitResult* tagTrackFitResult = tagParticle->getTrackFitResult();
+      if (!tagTrackFitResult) return Const::doubleNaN;
 
       //recover the covariance matrix associated to the position of the tag track
       TMatrixDSym trackPosCovMat = tagParticle->getVertexErrorMatrix();
@@ -575,7 +676,7 @@ namespace Belle2 {
 
       TMatrixDSym emptyMat(3);
 
-      return DistanceTools::trackToVtxDistErr(tagParticle->getTrackFitResult()->getPosition(),
+      return DistanceTools::trackToVtxDistErr(tagTrackFitResult->getPosition(),
                                               tagParticle->getMomentum(),
                                               vert->getTagVertex(),
                                               trackPosCovMat,
@@ -604,16 +705,16 @@ namespace Belle2 {
       const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
       if (!mcParticle) return Const::doubleNaN;
 
-      B2Vector3D mcTagV = vert->getMCTagVertex();
-      if (mcTagV(0)  == Const::doubleNaN)                                        return Const::doubleNaN;
-      if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0)          return Const::doubleNaN;
+      ROOT::Math::XYZVector mcTagV = vert->getMCTagVertex();
+      if (mcTagV.X() == Const::doubleNaN)                        return Const::doubleNaN;
+      if (mcTagV.X() == 0 && mcTagV.Y() == 0 && mcTagV.Z() == 0) return Const::doubleNaN;
 
       return DistanceTools::trackToVtxDist(mcParticle->getProductionVertex(),
                                            mcParticle->getMomentum(),
                                            mcTagV);
     }
 
-    B2Vector3D tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex)
+    ROOT::Math::XYZVector tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return vecNaN;
@@ -624,9 +725,9 @@ namespace Belle2 {
       const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
       if (!mcParticle) return vecNaN;
 
-      B2Vector3D mcTagV = vert->getMCTagVertex();
-      if (mcTagV(0)  == Const::doubleNaN)                                        return vecNaN;
-      if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0)          return vecNaN;
+      ROOT::Math::XYZVector mcTagV = vert->getMCTagVertex();
+      if (mcTagV.X() == Const::doubleNaN)                        return vecNaN;
+      if (mcTagV.X() == 0 && mcTagV.Y() == 0 && mcTagV.Z() == 0) return vecNaN;
 
       return DistanceTools::trackToVtxVec(mcParticle->getProductionVertex(),
                                           mcParticle->getMomentum(),
@@ -635,23 +736,23 @@ namespace Belle2 {
 
     double tagTrackTrueVecToTagVX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      B2Vector3D result = tagTrackTrueVecToTagV(part, trackIndex);
-      return result(0);
+      ROOT::Math::XYZVector result = tagTrackTrueVecToTagV(part, trackIndex);
+      return result.X();
     }
 
     double tagTrackTrueVecToTagVY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      B2Vector3D result = tagTrackTrueVecToTagV(part, trackIndex);
-      return result(1);
+      ROOT::Math::XYZVector result = tagTrackTrueVecToTagV(part, trackIndex);
+      return result.Y();
     }
 
     double tagTrackTrueVecToTagVZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      B2Vector3D result = tagTrackTrueVecToTagV(part, trackIndex);
-      return result(2);
+      ROOT::Math::XYZVector result = tagTrackTrueVecToTagV(part, trackIndex);
+      return result.Z();
     }
 
-    B2Vector3D tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex)
+    ROOT::Math::XYZVector tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return vecNaN;
@@ -667,23 +768,23 @@ namespace Belle2 {
 
     double tagTrackTrueMomentumX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      B2Vector3D pTrue = tagTrackTrueMomentum(part, trackIndex);
-      return pTrue(0);
+      ROOT::Math::XYZVector pTrue = tagTrackTrueMomentum(part, trackIndex);
+      return pTrue.X();
     }
 
     double tagTrackTrueMomentumY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      B2Vector3D pTrue = tagTrackTrueMomentum(part, trackIndex);
-      return pTrue(1);
+      ROOT::Math::XYZVector pTrue = tagTrackTrueMomentum(part, trackIndex);
+      return pTrue.Y();
     }
 
     double tagTrackTrueMomentumZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      B2Vector3D pTrue = tagTrackTrueMomentum(part, trackIndex);
-      return pTrue(2);
+      ROOT::Math::XYZVector pTrue = tagTrackTrueMomentum(part, trackIndex);
+      return pTrue.Z();
     }
 
-    B2Vector3D tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex)
+    ROOT::Math::XYZVector tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return vecNaN;
@@ -699,20 +800,20 @@ namespace Belle2 {
 
     double tagTrackTrueOriginX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      B2Vector3D origin = tagTrackTrueOrigin(part, trackIndex);
-      return origin(0);
+      ROOT::Math::XYZVector origin = tagTrackTrueOrigin(part, trackIndex);
+      return origin.X();
     }
 
     double tagTrackTrueOriginY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      B2Vector3D origin = tagTrackTrueOrigin(part, trackIndex);
-      return origin(1);
+      ROOT::Math::XYZVector origin = tagTrackTrueOrigin(part, trackIndex);
+      return origin.Y();
     }
 
     double tagTrackTrueOriginZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      B2Vector3D origin = tagTrackTrueOrigin(part, trackIndex);
-      return origin(2);
+      ROOT::Math::XYZVector origin = tagTrackTrueOrigin(part, trackIndex);
+      return origin.Z();
     }
 
     int fitTruthStatus(const Particle* part)
@@ -899,6 +1000,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVxErr", particleTagVxErr, "Tag vertex X component uncertainty\n\n", "cm");
     REGISTER_VARIABLE("TagVyErr", particleTagVyErr, "Tag vertex Y component uncertainty\n\n", "cm");
     REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z component uncertainty\n\n", "cm");
+    REGISTER_VARIABLE("TagVCov(i,j)", particleTagVCov,
+                      "returns the (i,j)-th element of the Tag vertex covariance matrix (3x3).\n"
+                      "Order of elements in the covariance matrix is: x, y, z.\n\n", "cm, cm, cm");
+
     REGISTER_VARIABLE("TagVpVal", particleTagVpVal, "Tag vertex p-Value");
     REGISTER_VARIABLE("TagVNTracks", particleTagVNTracks, "Number of tracks in the tag vertex");
     REGISTER_VARIABLE("TagVType", particleTagVType,
@@ -965,6 +1070,34 @@ namespace Belle2 {
                       "Returns the error of the vertex in the boost direction\n\n", "cm");
     REGISTER_VARIABLE("OBoostErr", vertexErrOrthBoostDirection,
                       "Returns the error of the vertex in the direction orthogonal to the boost\n\n", "cm");
+
+    REGISTER_VARIABLE("Y4SvtxX", getY4Sx, "Returns X component of Y4S vertex.\n"
+                                          "The result is meaningful and nontrivial when the signal B vertex "
+                                          "is determined by `vertex.treeFit` with ``ipConstraint=True`` and the `vertex.TagV` is called with the ``tube`` constraint.\n\n", "cm");
+
+    REGISTER_VARIABLE("Y4SvtxY", getY4Sy, "Returns Y component of Y4S vertex.\n"
+                                          "The result is meaningful and nontrivial when the signal B vertex "
+                                          "is determined by `vertex.treeFit` with ``ipConstraint=True`` and the `vertex.TagV` is called with the ``tube`` constraint.\n\n", "cm");
+
+    REGISTER_VARIABLE("Y4SvtxZ", getY4Sz, "Returns Z component of Y4S vertex.\n"
+                                          "The result is meaningful and nontrivial when the signal B vertex "
+                                          "is determined by `vertex.treeFit` with ``ipConstraint=True`` and the `vertex.TagV` is called with the ``tube`` constraint.\n\n", "cm");
+
+
+    REGISTER_VARIABLE("tSigB", getSigBdecayTime, "Returns the proper decay time of the fully reconstructed signal B meson.\n"
+                                                 "The result is meaningful and nontrivial when the signal B vertex "
+                                                 "is determined by `vertex.treeFit` with ``ipConstraint=True`` and the `vertex.TagV` is called with the ``tube`` constraint.\n\n", "ps");
+
+    REGISTER_VARIABLE("tTagB", getTagBdecayTime, "Returns the proper decay time of the tagged B meson.\n"
+                                                 "The result is meaningful and nontrivial when the signal B vertex "
+                                                 "is determined by `vertex.treeFit` with ``ipConstraint=True`` and the `vertex.TagV` is called with the ``tube`` constraint.\n\n", "ps");
+
+    REGISTER_VARIABLE("DeltaT3D", getDeltaT3D, R"DOC(
+    Returns the :math:`\Delta t` variable calculated as a difference of :b2:var:`tSigB` and :b2:var:`tTagB`, i.e. not from the projection along boost vector axis.
+
+    The result is meaningful and nontrivial when the signal B vertex is determined by `vertex.treeFit` with ``ipConstraint=True`` and the `vertex.TagV` is called with the ``tube`` constraint.
+
+                                               )DOC", "ps");
 
     REGISTER_VARIABLE("TagVLBoost", tagVBoostDirection,
                       "Returns the TagV component in the boost direction\n\n", "cm");

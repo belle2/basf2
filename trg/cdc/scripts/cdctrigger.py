@@ -18,7 +18,7 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
     This function adds the CDC trigger modules to a path.
     @path              modules are added to this path
     @SimulationMode    the simulation mode in TSIM, 1: fast simulation,
-                       trigger algoritm simulation only, no firmware simulation
+                       trigger algorithm simulation only, no firmware simulation
                        2: full simulation, both trigger algorithm and firmware
                        are simulated
     @shortTracks       the standard track finding requires hits in 4 axial super layers.
@@ -35,23 +35,14 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
     if SimulationMode == 1:
         # TSF
         path.add_module('CDCTriggerTSF',
+                        useDB=True,
                         InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe"),
                         OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe"))
         # 2D finder
-        if shortTracks:
-            minHitsShort = 3
-        else:
-            minHitsShort = 4
-        if lowPt:
-            minPt = 0.255
-        else:
-            minPt = 0.3
         path.add_module('CDCTrigger2DFinder',
-                        minHits=4, minHitsShort=minHitsShort, minPt=minPt)
+                        useDB=True)
 
-        # Old ETF
-        # path.add_module('CDCTriggerETF', trueEventTime=trueEventTime)
-        # ETF priority fastest timings among 2D Tracks
+        # ETF
         path.add_module('CDCTriggerHoughETF')
 
         # fitters

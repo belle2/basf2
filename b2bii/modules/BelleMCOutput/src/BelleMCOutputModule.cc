@@ -195,7 +195,7 @@ void BelleMCOutputModule::event()
                       m_BeamParameters->getVertex().Z()) /
                      Unit::mm / (2.0 * 0.1 * Const::speedOfLight);
   /*
-   * Regeneration of MCParticle array. It is necesary because in basf the
+   * Regeneration of MCParticle array. It is necessary because in basf the
    * long-lived particles (K_S0, K_L0, Lambda, neutron, pi, K, mu)
    * are decayed by GEANT3.
    */

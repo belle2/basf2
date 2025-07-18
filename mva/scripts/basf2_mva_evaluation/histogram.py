@@ -88,11 +88,14 @@ class Histograms:
             if len(bins) == 1:
                 bins = numpy.array([bins[0]-1, bins[0]+1])
 
+        #: create histogram
         self.hist, self.bins = numpy.histogram(data[column][isfinite], bins=bins,
                                                weights=None if weight_column is None else data[weight_column])
+        #: bin centers
         self.bin_centers = (self.bins + numpy.roll(self.bins, 1))[1:] / 2.0
-        # Subtract a small number from the bin width, otherwise the errorband plot is unstable.
+        #: Subtract a small number from the bin width, otherwise the errorband plot is unstable.
         self.bin_widths = (self.bins - numpy.roll(self.bins, 1))[1:] - 0.00001
+        #: initialize empty dictionary for histograms
         self.hists = dict()
         for name, mask in masks.items():
             self.hists[name] = numpy.histogram(data[column][mask & isfinite], bins=self.bins,
@@ -168,8 +171,9 @@ class Histograms:
         cumsignal = (signal.sum() - signal.cumsum()).astype('float')
         cumbckgrd = (bckgrd.sum() - bckgrd.cumsum()).astype('float')
 
-        purity = cumsignal / (cumsignal + cumbckgrd)
-        purity_error = binom_error(cumsignal, cumsignal + cumbckgrd)
+        with numpy.errstate(divide='ignore', invalid='ignore'):
+            purity = cumsignal / (cumsignal + cumbckgrd)
+            purity_error = binom_error(cumsignal, cumsignal + cumbckgrd)
         return purity, purity_error
 
     def get_signal_to_noise(self, signal_names, bckgrd_names):
@@ -183,8 +187,9 @@ class Histograms:
         cumsignal = (signal.sum() - signal.cumsum()).astype('float')
         cumbckgrd = (bckgrd.sum() - bckgrd.cumsum()).astype('float')
 
-        signal2noise = cumsignal / (cumsignal + cumbckgrd)**0.5
-        signal2noise_error = numpy.sqrt(cumsignal / (cumsignal + cumbckgrd) + (cumsignal / (2 * (cumsignal + cumbckgrd)))**2)
+        with numpy.errstate(divide='ignore', invalid='ignore'):
+            signal2noise = cumsignal / (cumsignal + cumbckgrd)**0.5
+            signal2noise_error = numpy.sqrt(cumsignal * cumbckgrd) / (cumsignal + cumbckgrd)
         return signal2noise, signal2noise_error
 
     def get_purity_per_bin(self, signal_names, bckgrd_names):
@@ -198,6 +203,7 @@ class Histograms:
         signal = signal.astype('float')
         bckgrd = bckgrd.astype('float')
 
-        purity = signal / (signal + bckgrd)
-        purity_error = binom_error(signal, signal + bckgrd)
+        with numpy.errstate(divide='ignore', invalid='ignore'):
+            purity = signal / (signal + bckgrd)
+            purity_error = binom_error(signal, signal + bckgrd)
         return purity, purity_error

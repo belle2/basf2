@@ -110,13 +110,13 @@ namespace Belle2 {
       // other
       double m_activePixels[40] = {0}; /**< number  of active pixels in sensor */
       double m_activeAreas[40] = {0}; /**< area of active pixels in sensor */
-      double m_segmentActivePixels[240] = {0}; /**< number of active pixels in v segements */
+      double m_segmentActivePixels[240] = {0}; /**< number of active pixels in v segments */
       double m_segmentActiveAreas[240] = {0}; /**< area of active pixels in v segments */
     };
 
     inline const PXD::SensorInfo& PXDHitRateCounter::getInfo(VxdID sensorID) const
     {
-      return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     }
 
   } // Background namespace

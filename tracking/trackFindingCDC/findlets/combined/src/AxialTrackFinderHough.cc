@@ -109,7 +109,7 @@ std::vector<ParameterVariantMap>
 AxialTrackFinderHough::getDefaultFineRelaxationSchedule() const
 {
   std::vector<ParameterVariantMap> result;
-  // Relaxation schedule of the original hough implemenation
+  // Relaxation schedule of the original hough implementation
   // Augmented by the road search parameters
   // Note: distinction between integer and double literals is essential
   // For the record: the setting seem a bit non-sensical, but work kind of well, experimentation needed.

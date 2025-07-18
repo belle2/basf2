@@ -1,0 +1,164 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""
+Script that provides decay file information.
+"""
+
+import basf2 as b2
+import os
+import sys
+import pdg
+
+
+_dec_directory = 'decfiles/dec/'
+_main_decay_file = 'DECAY_BELLE2.DEC'
+
+
+def get_argparse():
+    """
+    Get the command line arguments for the script.
+    """
+    import argparse
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="""Script that provides decay file information.
+        Use cases:
+
+        1. Print out the signal decay file. For example, ``b2help-decay print 1141540100.dec`` with or without file extension.
+        2. Find the signal decay file. For example, ``b2help-decay find K_S0 J/psi B0`` outputs the list of decay files that contain K_S0, J/psi, and B0.
+           One can print out the decay file information by ``b2help-decay print <decay_file_name>``.
+        3. Find the signal decay line in BELLE2_DECAY.DEC. For example, ``b2help-decay find K_S0 J/psi -m B0 -b`` outputs the list of decay lines 
+           that contain K_S0, J/psi coming from mother particle B0. Particle multiplicity is considered but charge conjugation is not.
+        """
+    )
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    parser_print = subparsers.add_parser('print', description='Print out a signal decay file')
+    parser_print.add_argument("signal", help="Name of the decay file")
+    parser_find = subparsers.add_parser('find', description='Find a signal decay file or a decay inside DECAY_BELLE2.DEC')
+    parser_find.add_argument("daughters", nargs='+', help="Names of the daughter particles")
+    parser_find.add_argument("-m", "--mother", help="Name of the mother particle", default=None)
+    parser_find.add_argument("-b", "--decay_belle2", action='store_true', help="Search for decay in the DECAY_BELLE2.DEC")
+    return parser
+
+def print_file(signal_name: str):
+    """
+    Print the decay file information.
+    """
+    ext = '.dec'
+    if not signal_name.endswith(ext):
+        signal_name = signal_name + ext
+    file_name = b2.find_file(os.path.join(_dec_directory, signal_name))
+    if os.path.exists(file_name):
+        with open(file_name, 'r') as f:
+            print(f.read())
+    else:
+        print(f"Decay file {signal_name} not found.")
+        sys.exit(1)
+
+def find_signal_decay(mother: str, daughters: list):
+    """
+    Find the signal decay file.
+    """
+    found = False
+    local_dec_directory = b2.find_file(_dec_directory)
+
+    for file in os.listdir(local_dec_directory):
+        if file.endswith('.dec'):
+            with open(os.path.join(local_dec_directory, file), 'r') as f:
+                lines = f.read()
+            if all(daughter in lines for daughter in daughters):
+                # Mother particle is treated as a daughter particle here
+                # to avoid confusion with aliases and charge conjugations
+                if mother and mother not in lines:
+                    continue
+                descriptor = 'Not found'
+                with open(os.path.join(local_dec_directory, file), 'r') as f:
+                    for line in f.readlines():
+                        if line.startswith('#') and ('Descriptor:' in line or 'Description:' in line):
+                            descriptor = line.split(':')[1].strip()
+                print(f"Found decay file: {file} Descriptor: {descriptor}")
+                found = True
+    if not found:
+        if mother:
+            print(f"Decay file for mother {mother} and daughters {daughters} not found.")
+        else:
+            print(f"Decay file for daughters {daughters} not found.")
+        sys.exit(1)
+
+def find_signal_decay_belle2(mother: str, daughters: list):
+    """
+    Find the signal decay file in the DECAY_BELLE2.DEC file.
+    """ 
+    if not mother:
+        print("Mother particle is required for the search in the DECAY_BELLE2.DEC file.")
+        sys.exit(1)
+    dec_file = b2.find_file(os.path.join(_dec_directory, _main_decay_file))
+    print(f"Searching for decays of {mother} mother to {daughters} daughters in the DECAY_BELLE2.DEC file...")
+    with open(dec_file, 'r') as f:
+        lines = f.readlines()
+    start_line = -1
+    end_line = -1
+    for i, content_line in enumerate(lines):
+        if content_line.startswith('Decay') and content_line.strip().endswith(mother):
+            start_line = i
+        if start_line >= 0 and 'Enddecay' in content_line:
+            end_line = i
+            break
+    if start_line < 0 or end_line < 0:
+        print(f"Decay for mother {mother} have not been found in the DECAY_BELLE2.DEC file.")
+        sys.exit(1) 
+    found = False
+    total_br = 0
+    duplicates = [particle for particle in set(daughters) if daughters.count(particle) > 1]
+    for line in lines[start_line + 1:end_line]:
+        if content_line.startswith('#'):
+            continue
+        # Remove comments for particle finding, but print them later
+        content_line = line.split('#')[0]
+        if all(daughter in content_line for daughter in daughters):
+            # Make sure that the all duplicate particles are present in the line
+            skip = False
+            for duplicate in duplicates:
+                if daughters.count(duplicate) != content_line.count(duplicate):
+                    skip = True
+            if skip:
+                continue
+            print(line.strip())
+            total_br += float(content_line.split(' ')[0])
+            found = True
+    if not found:
+        print(f"Decays of {mother} to {daughters} daughters have not been found in the DECAY_BELLE2.DEC file.")
+        sys.exit(1)
+    print(f'Total Branching Ratio: {total_br:0.9f}')
+
+def main():
+    """
+    Main function.
+    """
+    parser = get_argparse()
+    args = parser.parse_args()
+    if args.command == 'print':
+        print_file(signal_name=args.signal)
+    if args.command == 'find':
+        for daughter in args.daughters:
+            if not pdg.search(daughter):
+                print(f"Invalid particle name: {daughter}")
+                sys.exit(1)
+        if args.mother and not pdg.search(args.mother):
+            print(f"Invalid particle name: {args.mother}")
+            sys.exit(1)
+        if args.decay_belle2:
+            find_signal_decay_belle2(mother=args.mother, daughters=args.daughters)
+        else:
+            find_signal_decay(mother=args.mother, daughters=args.daughters)
+
+if __name__ == '__main__':
+    main()

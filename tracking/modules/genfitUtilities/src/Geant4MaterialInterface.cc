@@ -87,7 +87,7 @@ namespace Belle2 {
 
   private:
     /**
-     * Stores whether a problematic exception occured.
+     * Stores whether a problematic exception occurred.
      */
     bool m_inFailureState = false;
   };

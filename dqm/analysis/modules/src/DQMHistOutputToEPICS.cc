@@ -38,16 +38,10 @@ DQMHistOutputToEPICSModule::DQMHistOutputToEPICSModule()
 
 DQMHistOutputToEPICSModule::~DQMHistOutputToEPICSModule()
 {
-#ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
-#endif
 }
 
 void DQMHistOutputToEPICSModule::initialize()
 {
-#ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-#endif
   for (auto& it : m_histlist) {
     if (it.size() < 2) {
       B2WARNING("Histolist with wrong nr of parameters " << it.size());
@@ -66,9 +60,6 @@ void DQMHistOutputToEPICSModule::initialize()
 #endif
   }
 
-#ifdef _BELLE2_EPICS
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-#endif
   B2DEBUG(99, "DQMHistOutputToEPICS: initialized.");
 }
 
@@ -106,7 +97,7 @@ void DQMHistOutputToEPICSModule::event()
     int length = it->data.size();
     TH1* hh1 = findHist(it->histoname);
     if (hh1 && hh1->GetNcells() > 2 && length > 0  && length == int(ca_element_count(it->mychid))) {
-      // If bin count doesnt match, we loose bins but otherwise ca_array_put will complain
+      // If bin count doesn't match, we loose bins but otherwise ca_array_put will complain
       // We fill up the array with ZEROs otherwise
       if (hh1->GetDimension() == 1) {
         int i = 0;
@@ -129,7 +120,6 @@ void DQMHistOutputToEPICSModule::event()
       SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, (void*)it->data.data()), "ca_set failure");
     }
   }
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
 
@@ -168,7 +158,6 @@ void DQMHistOutputToEPICSModule::terminate()
     if (it->mychid) SEVCHK(ca_clear_channel(it->mychid), "ca_clear_channel failure");
     if (it->mychid_last) SEVCHK(ca_clear_channel(it->mychid_last), "ca_clear_channel failure");
   }
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
 

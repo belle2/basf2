@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -32,7 +31,7 @@ output.param('SaveHistos', False)
 output.param('SaveCanvases', True)
 main.add_module(output)
 
-# Process mian path.
+# Process main path.
 b2.process(main)
 
 # Statistics.

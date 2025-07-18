@@ -96,7 +96,7 @@ def main():
         ecldspToDat(path, dsp_data)
 
 ################################################
-# AUXILLARY FUNCTIONS
+# AUXILIARY FUNCTIONS
 ################################################
 
 def ecldspFromDat(path_list):
@@ -229,7 +229,7 @@ def ecldspFromDB(db_tag, exp, run):
     return dsp_list
 
 ################################################
-# AUXILLARY FUNCTIONS
+# AUXILIARY FUNCTIONS
 
 def getEclDspFile(path_list, crate, board):
     """

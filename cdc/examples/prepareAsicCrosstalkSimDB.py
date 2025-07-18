@@ -24,6 +24,7 @@ import numpy as np
 from scipy.interpolate import UnivariateSpline
 
 import basf2
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import FileSystem
 from ROOT.Belle2 import CDCDatabaseImporter
 from ROOT import TH1F, TFile
@@ -55,7 +56,7 @@ bad_boards = {'22': [24, 196],
               }
 # Input arguments
 if len(sys.argv) != 5:
-    sys.exit("Four arguments are required: input_root, output_path, experiemnt numebr and data_type")
+    sys.exit("Four arguments are required: input_root, output_path, experiemnt number and data_type")
 InputFile = sys.argv[1]
 OutputPath = sys.argv[2]
 exp = sys.argv[3]

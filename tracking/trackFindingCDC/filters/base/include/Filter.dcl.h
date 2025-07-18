@@ -15,6 +15,8 @@
 
 #include <string>
 
+#include <vector>
+
 namespace Belle2 {
   class ModuleParamList;
 
@@ -37,15 +39,6 @@ namespace Belle2 {
 
       /// Make destructor of interface class virtual
       virtual ~Filter();
-
-      /**
-       *  Expose the set of parameters of the filter to the module parameter list.
-       *
-       *  Note that not all filters have yet exposed their parameters in this way.
-       *
-       *  This method is deprecated as the exposeParams below uses a less compile heavy equivalent.
-       */
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
       /// Indicates if the filter requires Monte Carlo information.
       virtual bool needsTruthInformation();
@@ -70,6 +63,14 @@ namespace Belle2 {
        *             NAN if the object is rejected. Nullptr is always rejected.
        */
       Weight operator()(const Object* obj);
+
+      /**
+       * Function to evaluate a vector of objects
+       * Base implementation applies the function to each object. Can be optimized for MVA filters
+       * @param objs A vector of pointers to objects
+       * @return A vector of float or NAN values. See above
+       */
+      virtual std::vector<float> operator()(const std::vector <Object*>& objs);
     };
   }
 }

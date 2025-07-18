@@ -144,7 +144,7 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 void PrintDataTemplateModule::checkFTSWver2(RawFTSW* rawftsw, int i)
 {
   //
-  // Double check by comparing extracted values with ones at https://confluence.desy.de/display/BI/DAQ+TimingDistribution (ver.26)
+  // Double check by comparing extracted values with ones at https://xwiki.desy.de/xwiki/rest/p/a2bb3
   //
 
   int* buf = rawftsw->GetBuffer(i);
@@ -347,12 +347,12 @@ void PrintDataTemplateModule::printPXDEvent(RawPXD* raw_pxd)
                    ((temp_buf[ pos + 1 ] >> 24) & 0xff);
       }
 
-//         printf("Event mixing is occured. hlt %.8x dhh %.8x onsen %.8x %.8x %.8x nf %d\n", hlttrg, dhh_trg, onsen_trg,
+//         printf("Event mixing is occurred. hlt %.8x dhh %.8x onsen %.8x %.8x %.8x nf %d\n", hlttrg, dhh_trg, onsen_trg,
 //          temp_buf[ nframes + 2 + pos ], temp_buf[ nframes + 3 + pos ], nframesv[ i ] );
       printf("Event tag(16bits) in PXD data : frame %.2d hlt %.4x onsen %.4x dhh %.4x\n", i + 1, hlttrg & 0xffff, onsen_trg & 0xffff,
              dhh_trg & 0xffff);
       if (((dhh_trg & 0xffff) != (hlttrg & 0xffff)) || ((dhh_trg & 0xffff) != (onsen_trg & 0xffff))) {
-        printf("### ERROR !! Event mixing occured. :  frame %d hlt %.4x onsen %.4x dhh %.4x\n", i + 1, hlttrg & 0xffff, onsen_trg & 0xffff,
+        printf("### ERROR !! Event mixing occurred. :  frame %d hlt %.4x onsen %.4x dhh %.4x\n", i + 1, hlttrg & 0xffff, onsen_trg & 0xffff,
                dhh_trg & 0xffff);
       }
       pos += nframesv[ i ] / 4;

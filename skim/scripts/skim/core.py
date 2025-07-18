@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -492,7 +491,7 @@ class CombinedSkim(BaseSkim):
 
     The heavy-lifting functions `BaseSkim.additional_setup`, `BaseSkim.build_lists` and
     `BaseSkim.output_udst` are modified to loop over the corresponding functions of each
-    invididual skim. The `load_standard_lists` method is also modified to load all
+    individual skim. The `load_standard_lists` method is also modified to load all
     required lists, without accidentally loading a list twice.
 
     Calling an instance of the `CombinedSkim` class will load all the required particle

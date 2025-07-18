@@ -22,6 +22,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 #: Tells the automated system some details of this script. The input_data_filters is only used for automated calibration (optional).
 settings = CalibrationSettings(name="Example Simple",
                                expert_username="ddossett",
+                               subsystem="example",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["physics"],
@@ -31,7 +32,8 @@ settings = CalibrationSettings(name="Example Simple",
                                                                INPUT_DATA_FILTERS["Beam Energy"]["4S"],
                                                                INPUT_DATA_FILTERS["Run Type"]["physics"]]},
                                depends_on=[],
-                               expert_config={})
+                               expert_config={},
+                               produced_payloads=[])
 
 ##############################
 
@@ -105,7 +107,7 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Algorithm setup
-
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import TestCalibrationAlgorithm
 
     alg_test = TestCalibrationAlgorithm()

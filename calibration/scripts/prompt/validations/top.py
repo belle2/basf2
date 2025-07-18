@@ -16,6 +16,7 @@ from prompt import ValidationSettings
 from ROOT import TFile, TH1F, TGraph, TCanvas, TLegend, gROOT, gStyle, PyConfig
 from basf2 import B2ERROR
 import sys
+import glob
 
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='TOP post-tracking calibration',
@@ -138,7 +139,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
                 graphs.append(g_under)
     canvas.Print(outputFileName)
 
-    # make plots of channelT0 residual distirbutions
+    # make plots of channelT0 residual distributions
 
     canvas.Clear()
     canvas.Divide(4, 4)
@@ -264,6 +265,8 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
                 h.SetMinimum(0.0)
                 h.SetMaximum(1.05)
                 text = h.GetTitle().split(',')[0]
+                if text == "Active":
+                    text += " channels"
                 h.SetTitle(name)
                 h.SetLineColor(i+1)
                 h.Draw(opt)
@@ -338,6 +341,9 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
 
     canvas.Clear()
     canvas.Divide(2, 2)
+    gStyle.SetOptStat("e")
+    gStyle.SetStatY(0.99)
+
     offsets = [file_in.Get("svdOffset"), file_in.Get("cdcOffset")]
     sigmas = [file_in.Get("svdSigma"), file_in.Get("cdcSigma")]
     components = ['SVD', 'CDC']
@@ -407,6 +413,49 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
             h.Draw()
 
     canvas.Print(outputFileName)
+    gStyle.SetOptStat(0)
+
+    # plot RQE
+
+    gStyle.SetOptStat("rmei")
+    canvas.Clear()
+    canvas.Divide(2, 2)
+
+    rqe_path = job_path + '/TOP_photonYields/0/algorithm_output/photonYields-*.root'
+    rqeFileNames = glob.glob(rqe_path)
+    if len(rqeFileNames) == 0:
+        B2ERROR(rqe_path + ": no such files")
+    rqeFiles = []
+    rqeHistos = []
+    for fileName in sorted(rqeFileNames):
+        rqeFile = TFile.Open(fileName)
+        if not rqeFile:
+            B2ERROR(rqeFile + ": can't be open")
+            continue
+        rqeFiles.append(rqeFile)
+        histos = [rqeFile.Get("RQE"), rqeFile.Get("RQEerr")]
+        expNo = fileName.split('/')[-1].split('-')[1]
+        for h in histos:
+            if h:
+                h.SetTitle(expNo)
+        rqeHistos += histos
+        if len(rqeHistos) == 4:
+            for i, h in enumerate(rqeHistos):
+                canvas.cd(1 + i)
+                if h:
+                    h.Draw()
+            canvas.Print(outputFileName)
+            rqeHistos = []
+            canvas.Clear()
+            canvas.Divide(2, 2)
+
+    if len(rqeHistos) > 0:
+        for i, h in enumerate(rqeHistos):
+            canvas.cd(1 + i)
+            if h:
+                h.Draw()
+        canvas.Print(outputFileName)
+    gStyle.SetOptStat(0)
 
     # close pdf file
 

@@ -112,6 +112,7 @@ def configure_logging_for_tests(user_replacements=None):
     3. Intercept all log messages and replace
 
         * the current working directory in log messaged with ``${cwd}``
+        * the current release version with ``${release_version}``
         * the current default globaltags with ``${default_globaltag}``
         * the contents of the following environment variables with their name
           (or the listed replacement string):
@@ -147,6 +148,10 @@ def configure_logging_for_tests(user_replacements=None):
     # current directory should go first and might be overridden if for example
     # the BELLE2_LOCAL_DIR is identical to the current working directory
     replacements = OrderedDict()
+    try:
+        replacements[basf2.version.get_version()] = "${release_version}"
+    except Exception:
+        pass
     replacements[", ".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
     # add a special replacement for the CDB metadata provider URL, since it's not set via env. variable
     replacements[basf2.conditions.default_metadata_provider_url] = "${BELLE2_CONDB_METADATA}"
@@ -365,6 +370,19 @@ def skip_test_if_light(py_case=None):
         skip_test(reason="We're in a light build.", py_case=py_case)
 
 
+def skip_test_if_central(py_case=None):
+    """
+    Skips the test if we are using a central release (and have no local
+    git repository)
+
+    Parameters:
+        py_case (unittest.TestCase): if this is to be skipped within python's
+            native unittest then pass the TestCase instance
+    """
+    if "BELLE2_RELEASE_DIR" in os.environ:
+        skip_test(reason="We're in a central release.", py_case=py_case)
+
+
 def print_belle2_environment():
     """
     Prints all the BELLE2 environment variables on the screen.
@@ -376,20 +394,21 @@ def print_belle2_environment():
 
 
 @contextmanager
-def temporary_set_environment(**environ):
+def temporary_environment(**environ):
     """
-    Temporarily set the process environment variables.
-    Inspired by https://stackoverflow.com/a/34333710
+    Context manager that temporarily sets environment variables
+    for the current process. Inspired by https://stackoverflow.com/a/34333710
 
-    >>> with temporary_set_environment(BELLE2_TEMP_DIR='/tmp/belle2'):
+    >>> with temporary_environment(BELLE2_TEMP_DIR='/tmp/belle2'):
     ...   "BELLE2_TEMP_DIR" in os.environ
     True
 
     >>> "BELLE2_TEMP_DIR" in os.environ
     False
 
-    Arguments:
-        environ(dict): Dictionary of environment variables to set
+    Args:
+        **environ: Arbitrary keyword arguments specifying environment
+                   variables and their values.
     """
     old_environ = dict(os.environ)
     os.environ.update(environ)
@@ -407,6 +426,20 @@ def is_ci() -> bool:
     tests are run.
     """
     return os.environ.get("BELLE2_IS_CI", "no").lower() in [
+        "yes",
+        "1",
+        "y",
+        "on",
+    ]
+
+
+def is_cdb_down() -> bool:
+    """
+    Returns true if the Conditions Database (CDB) is currently unavailable or slow to respond.
+    The 'BELLE2_IS_CDB_DOWN' environment variable can be used to dynamically exclude some
+    tests that rely on the CDB in case of problems.
+    """
+    return os.environ.get("BELLE2_IS_CDB_DOWN", "no").lower() in [
         "yes",
         "1",
         "y",

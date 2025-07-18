@@ -50,7 +50,7 @@ unpacked_dataobjects = [
 def unpack_and_print_files(filenames):
     """
     process a given files and print its unpacked raw contents
-    Needs to all happen in one process call, otherwise the Geomtery would
+    Needs to all happen in one process call, otherwise the Geometry would
     be loaded multiple times, which results in an error
     """
 

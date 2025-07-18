@@ -26,7 +26,7 @@ HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_
 
   //Parameter definition
   addParam("inputFileList", m_inputFileNames, "List of names of HepMC2 files");
-  addParam("ignoreReadEventNr", m_ignorereadEventNr, "Parallel pythia can have dublicate event nrs.", false);
+  addParam("ignoreReadEventNr", m_ignorereadEventNr, "Parallel pythia can have duplicate event nrs.", false);
   addParam("runNum", m_runNum, "Run number", -1);
   addParam("expNum", m_expNum, "Experiment number", -1);
   addParam("minEvt", m_minEvent, "Start converting at event number.", -1);
@@ -34,16 +34,20 @@ HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated.", false);
   addParam("nVirtualParticles", m_nVirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", false);
+  addParam("createEventMetaData", m_createEventMetaData,
+           "Boolean to indicate whether the event numbers from input file should be used.", true);
 }
 
 
 void HepMCInputModule::initialize()
 {
-  if (m_expNum < 0 or m_runNum < 0)
-    B2FATAL("The exp. and run numbers are not properly initialized: please set the 'expNum' and 'runNum' parameters of the HepMCInput module.");
+  if (m_createEventMetaData) {
+    if (m_expNum < 0 or m_runNum < 0)
+      B2FATAL("The exp. and run numbers are not properly initialized: please set the 'expNum' and 'runNum' parameters of the HepMCInput module.");
 
-  m_eventMetaDataPtr.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
-  B2INFO("HepMCInput acts as input module for this process. This means the exp., run and event numbers will be set by this module.");
+    m_eventMetaDataPtr.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+    B2INFO("HepMCInput acts as input module for this process. This means the exp., run and event numbers will be set by this module.");
+  }
 
   m_hepmcreader.reset(new HepMCReader(m_minEvent, m_maxEvent));
 
@@ -82,15 +86,17 @@ void HepMCInputModule::event()
     m_mcParticleGraph.clear();
     double weight = 1;
     int id = m_hepmcreader->getEvent(m_mcParticleGraph, weight);
-    if (id > -1 && !m_ignorereadEventNr) {
-      m_evtNum = id;
-    } else {
-      id = ++m_evtNum;
+    if (m_createEventMetaData) {
+      if (id > -1 && !m_ignorereadEventNr) {
+        m_evtNum = id;
+      } else {
+        id = ++m_evtNum;
+      }
+      B2DEBUG(20, "Setting exp " << m_expNum << " run " << m_runNum << " event " << id << ".");
+      m_eventMetaDataPtr->setExperiment(m_expNum);
+      m_eventMetaDataPtr->setRun(m_runNum);
+      m_eventMetaDataPtr->setEvent(id);
     }
-    B2DEBUG(20, "Setting exp " << m_expNum << " run " << m_runNum << " event " << id << ".");
-    m_eventMetaDataPtr->setExperiment(m_expNum);
-    m_eventMetaDataPtr->setRun(m_runNum);
-    m_eventMetaDataPtr->setEvent(id);
     if (m_useWeights) { m_eventMetaDataPtr->setGeneratedWeight(weight); }
     m_mcParticleGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
   } catch (HepMCReader::HepMCInvalidEventError&) {

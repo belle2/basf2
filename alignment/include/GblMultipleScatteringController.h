@@ -33,12 +33,11 @@ namespace Belle2 {
      * inside CDC. Currently by checking the volume name
      * in the middle of entry and exit vectors.
      *
-     * The first two arguments are unused in our implementation, so they are not explicitely named here,
+     * The first two arguments are unused in our implementation, so they are not explicitly named here,
      * even though they are present in the base class genfit::GblTrackSegmentController.
      *
      * @param scatTheta Total MS variance accumulated in segment
      * @param fitter Pointer to the fitter
-     * @return void
      */
     virtual void controlTrackSegment(TVector3, TVector3, double scatTheta, genfit::GblFitter* fitter);
 //     virtual void controlTrackSegment(B2Vector3D, B2Vector3D, double scatTheta, genfit::GblFitter* fitter);

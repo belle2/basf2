@@ -12,9 +12,12 @@
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <mdst/dataobjects/TRGSummary.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/dataobjects/SVDEventInfo.h>
+#include <svd/dbobjects/SVDDQMPlotsConfiguration.h>
+#include <framework/database/DBObjPtr.h>
 #include <vector>
 #include "TList.h"
 #include "TH1F.h"
@@ -53,17 +56,29 @@ namespace Belle2 {
 
   private:
 
+    /** Trigger Summary data object */
+    StoreObjPtr<TRGSummary> m_objTrgSummary;
+    /** SVD DQM plots configuration */
+    DBObjPtr<SVDDQMPlotsConfiguration> m_svdPlotsConfig;
+
     StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
     /** if TRUE: svdTime back in SVD time reference*/
     bool m_desynchSVDTime = false;
 
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
-    /** if true skip events rejected by HLT (default)*/
-    bool m_skipRejectedEvents = true;
+
+    /** if true skip events rejected by HLT */
+    bool m_skipRejectedEvents = false;
 
     /** additional plots flag*/
     bool m_additionalPlots = false;
+
+    /** if true enable 3 samples histograms analysis */
+    bool m_3Samples = false;
+
+    /** if true read back from DB configuration parameters */
+    bool m_useParamFromDB = true;
 
     /** list of cumulative histograms */
     TList* m_histoList = nullptr;
@@ -183,34 +198,44 @@ namespace Belle2 {
     TH1F** m_stripCountGroupId0V = nullptr;
 
     /** u strip count for 3 samples */
-    TH1F** m_strip3CountU = nullptr;
+    TH1F** m_strip3SampleCountU = nullptr;
     /** v strip count  for 3 samples*/
-    TH1F** m_strip3CountV = nullptr;
+    TH1F** m_strip3SampleCountV = nullptr;
     /** u strip count (online Zero Suppression)  for 3 samples*/
-    TH1F** m_onlineZSstrip3CountU = nullptr;
+    TH1F** m_onlineZSstrip3SampleCountU = nullptr;
     /** v strip count (online Zero Suppression  for 3 samples*/
-    TH1F** m_onlineZSstrip3CountV = nullptr;
+    TH1F** m_onlineZSstrip3SampleCountV = nullptr;
 
 
     /** u strip count for 6 samples */
-    TH1F** m_strip6CountU = nullptr;
+    TH1F** m_strip6SampleCountU = nullptr;
     /** v strip count  for 3 samples*/
-    TH1F** m_strip6CountV = nullptr;
+    TH1F** m_strip6SampleCountV = nullptr;
     /** u strip count (online Zero Suppression)  for 6 samples*/
-    TH1F** m_onlineZSstrip6CountU = nullptr;
+    TH1F** m_onlineZSstrip6sampleCountU = nullptr;
     /** v strip count (online Zero Suppression  for 6 samples*/
-    TH1F** m_onlineZSstrip6CountV = nullptr;
+    TH1F** m_onlineZSstrip6sampleCountV = nullptr;
 
     /** u size */
     TH1F** m_clusterSizeU = nullptr;
     /** v size */
     TH1F** m_clusterSizeV = nullptr;
 
-    /** time group id for 3 samples**/
-    TH2F* m_cluster3TimeGroupId = nullptr;
+    /** time group id for  U side**/
+    TH2F* m_clusterTimeGroupIdU = nullptr;
+    /** time group id for  V side**/
+    TH2F* m_clusterTimeGroupIdV = nullptr;
 
-    /** time group id for 6 samples**/
-    TH2F* m_cluster6TimeGroupId = nullptr;
+
+    /** time group id for  U side for fine trigger**/
+    TH2F* m_clusterTimeFineGroupIdU = nullptr;
+    /** time group id for  V side for fine trigger**/
+    TH2F* m_clusterTimeFineGroupIdV = nullptr;
+
+    /** time group id for  U side for coarse trigger**/
+    TH2F* m_clusterTimeCoarseGroupIdU = nullptr;
+    /** time group id for  V side for coarse trigger**/
+    TH2F* m_clusterTimeCoarseGroupIdV = nullptr;
 
     /** u time */
     TH1F** m_clusterTimeU = nullptr;
@@ -230,22 +255,22 @@ namespace Belle2 {
     TH1F* m_clusterTimeV456 = nullptr;
 
     /** u Time of clusters for layer 3 sensors  for 3 samples*/
-    TH1F* m_cluster3TimeU3 = nullptr;
+    TH1F* m_cluster3SampleTimeU3 = nullptr;
     /** v Time of clusters for layer 3  sensors   for 3 samples*/
-    TH1F* m_cluster3TimeV3 = nullptr;
+    TH1F* m_cluster3SampleTimeV3 = nullptr;
     /** u Time of clusters for layer 4,5,6 sensors  for 3 samples*/
-    TH1F* m_cluster3TimeU456 = nullptr;
+    TH1F* m_cluster3SampleTimeU456 = nullptr;
     /** v Time of clusters for layer 4,5,6 sensors  for 3 samples*/
-    TH1F* m_cluster3TimeV456 = nullptr;
+    TH1F* m_cluster3SampleTimeV456 = nullptr;
 
     /** u Time of clusters for layer 3 sensors   for 6 samples*/
-    TH1F* m_cluster6TimeU3 = nullptr;
+    TH1F* m_cluster6SampleTimeU3 = nullptr;
     /** v Time of clusters for layer 3  sensors  for 6 samples*/
-    TH1F* m_cluster6TimeV3 = nullptr;
+    TH1F* m_cluster6SampleTimeV3 = nullptr;
     /** u Time of clusters for layer 4,5,6 sensors  for 6 samples */
-    TH1F* m_cluster6TimeU456 = nullptr;
+    TH1F* m_cluster6SampleTimeU456 = nullptr;
     /** v Time of clusters for layer 4,5,6 sensors  for 6 samples */
-    TH1F* m_cluster6TimeV456 = nullptr;
+    TH1F* m_cluster6SampleTimeV456 = nullptr;
 
     //----------------------------------------------------------------
     // Additional histograms for out of ExpressReco

@@ -10,14 +10,12 @@
 #include <ecl/modules/eclLeakageCollector/eclLeakageCollectorModule.h>
 
 /* ECL headers. */
-#include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLLeakagePosition.h>
 #include <ecl/dataobjects/ECLElementNumbers.h>
 
 /* Basf2 headers. */
-#include <framework/gearbox/Const.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/geometry/VectorUtil.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -25,10 +23,10 @@
 /* Root headers. */
 #include <Math/Vector3D.h>
 #include <Math/VectorUtil.h>
-#include <TMath.h>
 #include <TTree.h>
 
 /* C++ headers. */
+#include <cmath>
 #include <iostream>
 
 using namespace Belle2;
@@ -367,7 +365,7 @@ void eclLeakageCollectorModule::collect()
   //..The nominal and "other" energies may be identical if this is the first or last energy
   double bias = biasNom;
   double peak = peakNom;
-  if (abs(logEOther - logENom) > 0.0001) {
+  if (std::abs(logEOther - logENom) > 0.0001) {
     bias = biasNom + (biasOther - biasNom) * (logESumN - logENom) / (logEOther - logENom);
     peak = peakNom + (peakOther - peakNom) * (logESumN - logENom) / (logEOther - logENom);
   }

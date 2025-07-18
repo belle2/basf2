@@ -50,8 +50,8 @@ namespace Belle2 {
   public:
 
 
-    /** Constructor - prepares ttree. Without calling the initializer-functions this Object is still not working! */
-    RawSecMapRootInterface(const std::string& mapName,  const std::string& tag) :
+    /** Constructor - prepares TTree. Without calling the initializer-functions this Object is still not working! */
+    RawSecMapRootInterface(const std::string& mapName,  const std::string& tag, const std::string& outputdir = "./") :
       m_name(mapName),
       m_tree2Hit((m_name + std::string("2Hit")), DataStore::c_Persistent),
       m_data2Hit({}),
@@ -60,10 +60,10 @@ namespace Belle2 {
 
     {
       // the "create" option results in the file not being opened if already existing
-      std::string fileName = mapName + "_" + tag +  ".root";
+      std::string fileName = outputdir + "/" + mapName + "_" + tag +  ".root";
       m_file = new TFile((fileName).c_str(), "CREATE");
       if (!m_file->IsOpen()) {
-        B2FATAL("File was not opened! File name: " << fileName << " (maybe it already esists!?)");
+        B2FATAL("File was not opened! File name: " << fileName << " (maybe it already exists!?)");
       }
       m_file->cd();
     }

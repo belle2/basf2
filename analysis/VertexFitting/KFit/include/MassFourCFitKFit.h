@@ -175,13 +175,13 @@ namespace Belle2 {
       /** Array of flags whether the track property is fixed at the mass. */
       std::vector<int> m_IsFixMass;
 
-      /** # of constrainted mass . */
+      /** # of constrained mass . */
       int m_ConstraintMassCount;
 
-      /** constrainted mass */
+      /** constrained mass */
       std::vector<double> m_ConstraintMassList;
 
-      /** Daughter track id of constrainted particle*/
+      /** Daughter track id of constrained particle*/
       std::vector<std::pair<int, int>> m_ConstraintMassChildLists;
     };
 

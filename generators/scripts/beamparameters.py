@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 Scripts and functions to set the BeamParameters from known configurations
 """
@@ -187,8 +195,11 @@ def calculate_beamspot(pos_her, pos_ler, size_her, size_ler, angle_her, angle_le
 
 
 def add_beamparameters(path, name, E_cms=None, **argk):
-    """Add BeamParameter module to a given path
-
+    """Add BeamParameter module to a given path.
+       Note that if you append this to the path, you will not
+       read the configuration of BeamParameters from the database
+       Beware that this function does not mimic at all the behaviour
+       of the official MC samples.
     Args:
         path (basf2.Path instance): path to add the module to
         name (str): name of the beamparameter settings to use
@@ -268,6 +279,74 @@ def calculate_beamparameters(name, E_cms=None):
     return values
 
 
+def _get_collisions_invariant_mass(experiment, run, verbose=False):
+    """
+    Convenient function for getting the collisions invariant mass by querying the BeamParameters object in the Conditions Database.
+    Calling this function directly might have undesired side effects: users should always use
+    :func:`get_collisions_invariant_mass()` in their steering files.
+
+    Args:
+        experiment (int): experiment number of the basf2 process
+        run (int): run number of the basf2 process
+        verbose (bool): if True, it prints some INFO messages, e.g. the invariant mass retrieved from the CDB
+    """
+    from ROOT import Belle2 as B2  # noqa
+    # Initialize the datastore and create an EventMetaData object
+    B2.DataStore.Instance().setInitializeActive(True)
+    event_meta_data = B2.PyStoreObj('EventMetaData')
+    event_meta_data.registerInDataStore()
+    event_meta_data.assign(B2.EventMetaData(0, run, experiment), True)
+    B2.DataStore.Instance().setInitializeActive(False)
+    # Get the invariant mass by querying the database
+    beams = B2.PyDBObj('BeamParameters')
+    if not beams.isValid():
+        B2FATAL('BeamParameters is not valid')
+    collisions_invariant_mass = beams.getMass()
+    # Print some messages if requested
+    if verbose:
+        B2INFO('Info for BeamParameters:\n'
+               f'  collisions invariant mass [GeV]: {collisions_invariant_mass}\n'
+               f'  IoV: {beams.getIoV().getExperimentLow()}, {beams.getIoV().getRunLow()}, '
+               f'{beams.getIoV().getExperimentHigh()}. {beams.getIoV().getRunHigh()}\n'
+               f'  revision: {beams.getRevision()}\n'
+               f'  globaltag: {beams.getGlobaltag()}')
+    # Before returning, run some cleanup
+    B2.DataStore.Instance().reset()
+    B2.Database.reset()
+    return collisions_invariant_mass
+
+
+def get_collisions_invariant_mass(experiment, run, verbose=False):
+    """
+    Convenient function for getting the collisions invariant mass by querying the BeamParameters object in the Conditions Database.
+    It is useful for setting the center of mass energy when producing Monte Carlo samples with external generators (e.g. MadGraph,
+    WHIZARD) which are not directly interfaced with basf2.
+
+    Args:
+        experiment (int): experiment number of the basf2 process
+        run (int): run number of the basf2 process
+        verbose (bool): if True, it prints some INFO messages, e.g. the invariant mass retrieved from the CDB
+    """
+
+    def _run_function_in_process(func, *args, **kwargs):
+        """
+        Small helper function for running another function in a process and thus avoiding undesired side effects.
+        """
+        from multiprocessing import Pool  # noqa
+        # Create a Pool with a single process
+        with Pool(processes=1) as pool:
+            # Use apply_async to execute the function and get the result
+            result = pool.apply_async(func, args, kwargs)
+            # Wait for the result and retrieve it
+            output = result.get()
+        return output
+
+    # Run _get_collisions_invariant_mass with the helper function to avoid issues with basf2
+    return _run_function_in_process(
+        func=_get_collisions_invariant_mass, experiment=experiment, run=run, verbose=verbose
+    )
+
+
 if __name__ == "__main__":
     # if called directly we will
     # 1. calculate the beamspot for the SuperKEKB preset and display it if possible
@@ -290,7 +369,7 @@ if __name__ == "__main__":
     print(beampos_spot)
     print("Beamspot covariance:")
     print(cov_spot)
-    print("Beamspot dimensions (in mm, axes in arbitary order):")
+    print("Beamspot dimensions (in mm, axes in arbitrary order):")
     print(np.linalg.eig(cov_spot)[0] ** .5 * 10)
 
     # see if we can plot it

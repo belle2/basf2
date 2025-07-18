@@ -8,11 +8,10 @@
 
 #include <arich/utility/ARICHChannelHist.h>
 #include <framework/logging/Logger.h>
-#include <math.h>
 #include <iostream>
 #include <algorithm>
 #include <TGraph.h>
-#include <TVector2.h>
+#include <Math/Vector2D.h>
 #include <TList.h>
 
 using namespace std;
@@ -65,7 +64,7 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
       float r = rs[iring];
       float dphi = 2.*M_PI / nhapds[iring];
       float fi = dphi / 2. + ihapd * dphi;
-      TVector2 centerPos(r * cos(fi), r * sin(fi));
+      ROOT::Math::XYVector centerPos(r * cos(fi), r * sin(fi));
       for (int i = 0; i < 5; i++) {
         float rotX = X[i] * cos(fi) - Y[i] * sin(fi);
         float rotY = X[i] * sin(fi) + Y[i] * cos(fi);
@@ -95,9 +94,11 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
 
         unsigned chX = chmap[chID] % 12;
         unsigned chY = chmap[chID] / 12;
-        TVector2 hapdPos(r * cos(fi), r * sin(fi));
-        TVector2 locPos(chns[chX], chns[chY]);
-        TVector2 centerPos = hapdPos + locPos.Rotate(fi);
+        ROOT::Math::XYVector hapdPos(r * cos(fi), r * sin(fi));
+        ROOT::Math::XYVector locPos(chns[chX], chns[chY]);
+        ROOT::Math::XYVector rotatedLocPos(locPos.X() * std::cos(fi) - locPos.Y() * std::sin(fi),
+                                           locPos.X() * std::sin(fi) + locPos.Y() * std::cos(fi));
+        ROOT::Math::XYVector centerPos = hapdPos + rotatedLocPos;
 
         for (int i = 0; i < 5; i++) {
           float rotX = X[i] * cos(fi) - Y[i] * sin(fi);
@@ -122,10 +123,12 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
       float dphi = 2.*M_PI / nhapds[iring];
       float fi = dphi / 2. + ihapd * dphi;
       float r = rs[iring];
-      TVector2 hapdPos(r * cos(fi), r * sin(fi));
+      ROOT::Math::XYVector hapdPos(r * cos(fi), r * sin(fi));
       for (int chipID = 0; chipID < 4; chipID++) {
-        TVector2 locPos(-size + (chipID / 2)*size * 2, size - (chipID % 2)*size * 2);
-        TVector2 centerPos = hapdPos + locPos.Rotate(fi);
+        ROOT::Math::XYVector locPos(-size + (chipID / 2)*size * 2, size - (chipID % 2)*size * 2);
+        ROOT::Math::XYVector rotatedLocPos(locPos.X() * std::cos(fi) - locPos.Y() * std::sin(fi),
+                                           locPos.X() * std::sin(fi) + locPos.Y() * std::cos(fi));
+        ROOT::Math::XYVector centerPos = hapdPos + rotatedLocPos;
 
         for (int i = 0; i < 5; i++) {
           float rotX = X[i] * cos(fi) - Y[i] * sin(fi);
@@ -235,6 +238,7 @@ void ARICHChannelHist::fillFromTH1(TH1* hist)
 
 void ARICHChannelHist::setPoly(TH2Poly* poly)
 {
+  if (poly == nullptr) return;
 
   if (poly->GetNumberOfBins() == 0) {
     for (const auto&& bin : *fBins) {

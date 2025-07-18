@@ -13,10 +13,7 @@ namespace Belle2 {
   namespace HLTUnits {
 
     /** Maximum number of HLT units used during the experiment. */
-    static constexpr unsigned int max_hlt_units = 12;
-
-    /** Location of HLT unit number information. */
-    static constexpr char hlt_unit_file[] = "/home/usr/hltdaq/HLT.UnitNumber";
+    static constexpr unsigned int max_hlt_units = 15;
 
   }
 

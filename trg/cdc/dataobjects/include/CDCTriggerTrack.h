@@ -98,6 +98,46 @@ namespace Belle2 {
       m_qualityvector(qualityvector),
       m_etf_unpacked(0),
       m_etf_recalced(0) { }
+
+
+    /** 3D constructor with p
+     *  @param phi0           The angle between the transverse momentum and the x axis and in [-pi, pi].
+     *  @param omega          The signed curvature of the track where the sign is given by the charge of the particle.
+     *  @param chi2D          Chi2 value of the 2D fit.
+     *  @param z0             The z coordinate of the perigee.
+     *  @param cotTheta       The slope of the track in the sz plane (dz/ds).
+     *  @param chi3D          Chi2 value of the 3D fit.
+     *  @param foundoldtrack  vector with boolean information whether an old 2dtrack was found
+     *  @param driftthreshold vector with boolean information whether drift time was within the timing window
+     *  @param valstereobit   switch whether at least 3 valid stereo ts found in the NNInput
+     *  @param expert         whether to use expert network
+     *  @param tsvector       vector of which track segments were used
+     *  @param time           found time for firmware tracks.
+     *  @param quadrant       iTracker of the unpacked quadrant.
+     *  @param qualityvector  quality flag bit
+     *  @param prob           the probability of bkg track
+     */
+    CDCTriggerTrack(double phi0, double omega, double chi2D,
+                    double z0, double cotTheta, double prob, double chi3D,
+                    const std::vector<bool>& foundoldtrack = std::vector<bool>(6, false),
+                    const std::vector<bool>& driftthreshold = std::vector<bool>(9, false),
+                    bool valstereobit = false,
+                    int expert = -1,
+                    const std::vector<unsigned>& tsvector = std::vector<unsigned>(9, 0),
+                    short time = 0, short quadrant = -1,
+                    unsigned qualityvector = 0):
+      Helix(0., phi0, omega, z0, cotTheta), m_prob(prob), m_chi2D(chi2D), m_chi3D(chi3D), m_time(time), m_quadrant(quadrant),
+      m_foundoldtrack(foundoldtrack),
+      m_driftthreshold(driftthreshold),
+      m_valstereobit(valstereobit),
+      m_expert(expert),
+      m_tsvector(tsvector),
+      m_qualityvector(qualityvector),
+      m_etf_unpacked(0),
+      m_etf_recalced(0) { }
+
+
+
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerTrack() { }
 
@@ -144,6 +184,7 @@ namespace Belle2 {
     {
       m_qualityvector = m_qualityvector ^ newbits;
     }
+
     unsigned getQualityVector() const {return m_qualityvector;}
     void setHasETFTime(bool x) {m_hasETFTime = x;}
     bool getHasETFTime() const {return m_hasETFTime;}
@@ -173,13 +214,30 @@ namespace Belle2 {
     {
       m_rawinput = input;
     }
+    void setProb(const float input)
+    {
+      m_prob = input;
+    }
+    void setNNTToGDL(const bool nntgdl)
+    {
+      m_nntgdl = nntgdl;
+    }
+    void setSTTToGDL(const bool sttgdl)
+    {
+      m_sttgdl = sttgdl;
+    }
     int getRawPhi0() const {return m_rawphi0;}
     int getRawOmega() const {return m_rawomega;}
     int getRawZ() const {return m_rawz;}
     int getRawTheta() const {return m_rawtheta;}
+    double getProb() const {return m_prob;}
     std::vector<int> getRawInput() const {return m_rawinput;}
+    bool getNNTToGDL() const {return m_nntgdl;}
+    bool getSTTToGDL() const {return m_sttgdl;}
 
   protected:
+    double m_prob;
+
     float m_chi2D;
     /** chi2 value from 3D fitter */
     float m_chi3D;
@@ -222,8 +280,12 @@ namespace Belle2 {
     int m_rawz{0};
     int m_rawtheta{0};
     std::vector<int> m_rawinput;
+    /** nnt decision that the firmware passed to gdl */
+    bool m_nntgdl{0};
+    /** stt decision that the firmware passed to gdl */
+    bool m_sttgdl{0};
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerTrack, 13);
+    ClassDef(CDCTriggerTrack, 14);
 
   };
 }

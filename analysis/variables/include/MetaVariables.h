@@ -115,6 +115,12 @@ namespace Belle2 {
     Manager::FunctionPtr angleToMostB2BInList(const std::vector<std::string>& arguments);
 
     /**
+     * Returns a function which returns the abs(phi difference) to the most back-to-back
+     * in phi (closest to 180 degrees) particle in the provided particle list.
+     */
+    Manager::FunctionPtr deltaPhiToMostB2BPhiInList(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the product of a variable over all daughters of the given particle
      * First argument in the argument vector must be the name of variable
      */
@@ -233,6 +239,18 @@ namespace Belle2 {
     Manager::FunctionPtr daughterMotherNormDiffOf(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the angle between the sum of the momenta of the two given daughters and the momentum recoiling against the particle.
+     * The arguments in the argument vector must be generalized daughter indices.
+     */
+    Manager::FunctionPtr angleBetweenDaughterAndRecoil(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the angle between the sum of the momenta of the two given daughters and the missing momentum in the event.
+     * The arguments in the argument vector must be generalized daughter indices.
+     */
+    Manager::FunctionPtr angleBetweenDaughterAndMissingMomentum(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the angle between daughters:
      * If two indices given: returns the angle between the momenta of the two given daughters.
      * If three indices given: Variable returns the angle between the momentum of the third particle and a vector
@@ -310,6 +328,12 @@ namespace Belle2 {
      * All arguments should be p-values in the range 0 to 1.
      */
     Manager::FunctionPtr pValueCombination(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the combined p-value of the daughter p-values
+     * All arguments should be p-values in the range 0 to 1.
+     */
+    Manager::FunctionPtr pValueCombinationOfDaughters(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the absolute value of a variable of the given particle
@@ -392,7 +416,7 @@ namespace Belle2 {
      * Returns function which returns the variable of the nth Monte Carlo daughter of the given particle.
      * First argument in the argument vector must be an integer corresponding to the nth Monte Carlo daughter.
      * As the order of the Monte Carlo daughter generally differs from the order of the reconstructed
-     * daughters, one might need to write out additional information to identify the Monte Carlo Daugther
+     * daughters, one might need to write out additional information to identify the Monte Carlo Daughter
      * particles.
      * Second argument must be a valid variable.
      * If the particle is not matched to a MC particle or does not have a nth MC daughter NaN is returned.
@@ -500,9 +524,19 @@ namespace Belle2 {
     Manager::FunctionPtr medianValueInList(const std::vector<std::string>& arguments);
 
     /**
+    * Returns function which returns the sum of the given variable of the particles in the given particle list.
+    */
+    Manager::FunctionPtr sumValueInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the product of the given variable of the particles in the given particle list.
+    */
+    Manager::FunctionPtr productValueInList(const std::vector<std::string>& arguments);
+
+    /**
     * Returns a function which returns the value of a variable obtained combining an arbitrary subset of particles in the decay tree, passed as
     * generalized indices. daughterCombination(M, 0, 3, 4) will return the invariant mass of the system made of the first, fourth and
-    * fifth daugther of a particle.
+    * fifth daughter of a particle.
     */
     Manager::FunctionPtr daughterCombination(const std::vector<std::string>& arguments);
 
@@ -530,6 +564,11 @@ namespace Belle2 {
     Manager::FunctionPtr useDaughterRestFrame(const std::vector<std::string>& arguments);
 
     /**
+     * Returns the value of the variable in the rest frame of the recoil of the daughter identified via generalized index.
+     */
+    Manager::FunctionPtr useDaughterRecoilRestFrame(const std::vector<std::string>& arguments);
+
+    /**
     * Returns a  function that returns the value of a variable calculated using new mass assumptions for the daughters' masses.
     */
     Manager::FunctionPtr  useAlternativeDaughterHypothesis(const std::vector<std::string>& arguments);
@@ -543,6 +582,18 @@ namespace Belle2 {
      * return number of TrackFitResults for a given particleTyle
      */
     Manager::FunctionPtr nTrackFitResults(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the value of the variable in the rest frame of the ancestor B MC particle.
+     */
+    Manager::FunctionPtr useMCancestorBRestFrame(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the integer value of a variable of the given particle
+     * First argument in the argument vector must be the name of variable
+     * Second argument is the value for NaN replacement
+     */
+    Manager::FunctionPtr convertToInt(const std::vector<std::string>& arguments);
 
   }
 }

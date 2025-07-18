@@ -6,368 +6,273 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef NDFINDER_H
-#define NDFINDER_H
+#pragma once
 
-#include <cmath>
+#include <string>
+#include <vector>
+#include <array>
+#include <utility>
+#include <Math/Vector3D.h>
 #include "trg/cdc/NDFinderDefs.h"
 #include "trg/cdc/Clusterizend.h"
 
 namespace Belle2 {
 
-  struct cellweight {
-    cell_index index;
-    ushort weight;
+  // Struct of NDFinder parameters
+  struct NDFinderParameters {
+    // Required number of axial super layers
+    unsigned short minSuperAxial;
+    // Required number of stereo super layers
+    unsigned short minSuperStereo;
+    // Clustering: Number of iterations for the cluster search in each Hough space quadrant
+    unsigned short iterations;
+    // Clustering: Number of deleted cells in each omega direction from the maximum
+    unsigned short omegaTrim;
+    // Clustering: Number of deleted cells in each phi direction from the maximum
+    unsigned short phiTrim;
+    // Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class
+    bool storeAdditionalReadout;
+    // Axial and stereo hit representations that should be used
+    std::string axialFile;
+    std::string stereoFile;
   };
 
-  /** Store track parameters of found tracks. */
+  // Struct containing the track segment (hit) information from the Track Segment Finder (TSF)
+  struct HitInfo {
+    unsigned short hitID;
+    unsigned short hitSLID;
+    unsigned short hitPrioPos;
+    short hitPrioTime;
+  };
+
+  // Class for a found NDFinder track
   class NDFinderTrack {
   public:
-    NDFinderTrack(std::vector<double> values, const SimpleCluster& cluster):
-      m_cluster(cluster)
+    NDFinderTrack(std::array<double, 3> estimatedParameters,
+                  SimpleCluster&& cluster,
+                  std::vector<ROOT::Math::XYZVector>&& readoutHoughSpace,
+                  std::vector<ROOT::Math::XYZVector>&& readoutCluster)
+      : m_cluster(std::move(cluster)),
+        m_houghSpace(std::move(readoutHoughSpace)),
+        m_readoutCluster(std::move(readoutCluster))
     {
-      m_omega = values[0];
-      m_phi = values[1];
-      m_cotTheta = values[2];
+      m_omega = estimatedParameters[0];
+      m_phi = estimatedParameters[1];
+      m_cot = estimatedParameters[2];
     }
 
-    /** Default destructor. */
-    virtual ~NDFinderTrack() {}
-    double getOmega()
-    {
-      return m_omega;
-    }
-    double getPhi0()
-    {
-      return m_phi;
-    }
-    double getCot()
-    {
-      return m_cotTheta;
-    }
-    double get_nRelHits()
-    {
-      return m_cluster.get_hits().size();
-    }
-    std::vector<unsigned short> get_relHits()
-    {
-      return m_cluster.get_hits();
-    }
-    std::vector<unsigned short> get_relHitsWeights()
-    {
-      return m_cluster.get_weights();
-    }
-    void reset()
-    {
-      m_omega = 0.;
-      m_phi = 0.;
-      m_cotTheta = 0.;
-    }
+    // Get the track parameters (z always 0)
+    double getOmega() const { return m_omega; }
+    double getPhi0() const { return m_phi; }
+    double getCot() const { return m_cot; }
+    // Get the number of related Hits
+    std::vector<unsigned short> getRelatedHits() const { return m_cluster.getClusterHits(); }
+    // Hough space readout (if storeAdditionalReadout true)
+    std::vector<ROOT::Math::XYZVector> getHoughSpace() const { return m_houghSpace; }
+    // Cluster readout (if storeAdditionalReadout true)
+    std::vector<ROOT::Math::XYZVector> getClusterReadout() const { return m_readoutCluster; }
 
   private:
-    /** 2D track curvature */
+    // 2D track curvature (This is the "real" omega (curvature), i.e., sign(q)/(r_2d[cm]))
     double m_omega;
-    /** 2D azimuthal angle */
+    // 2D azimuthal angle
     double m_phi;
-    /** 3D polar angle */
-    double m_cotTheta;
-    /** vector of the indices of the related hits
-     *  in the list of CDC hits (StoreArray<CDCHits>) */
-    std::vector<unsigned short> m_relHits;
-    /** vector of the weights for each related hit. */
-    std::vector<double> m_hitWeights;
+    // 3D polar angle
+    double m_cot;
+    // The found cluster of the track, including the track segment hits
     SimpleCluster m_cluster;
+    // Vector storing the complete Hough space for analysis
+    std::vector<ROOT::Math::XYZVector> m_houghSpace;
+    // Vector storing cluster informations for analysis
+    std::vector<ROOT::Math::XYZVector> m_readoutCluster;
   };
 
 
-  /** Class to represent the CDC NDFinder.
-   *
-   */
+  // Class to represent the CDC NDFinder.
   class NDFinder {
   public:
-
-    /** Struct of ndFinder parameters */
-    struct ndparameters {
-      /** Zero-Suppressed trained hit data */
-      std::string axialFile = "data/trg/cdc/ndFinderArrayAxialComp.txt.gz";
-      std::string stereoFile = "data/trg/cdc/ndFinderArrayStereoComp.txt.gz";
-
-      /** Clustering options */
-      /**  Only accept clusters with minhits */
-      long unsigned int minhits  = 4;
-      /**  Required number of axial hits per track */
-      long unsigned int minhits_axial  = 0;
-      /**  Members must have thresh x maxweight of cluster */
-      float thresh            = 0.85;
-
-      /** Required relative weight contribution to assign a hit to a cluster */
-      float minassign = 0.2;
-
-      /** Minimum numeber of cells in the track parameter space */
-      long unsigned int mincells  = 5;
-
-      /** CDC symmetry: repeat wire pattern 32 times in phi */
-      unsigned short phigeo = 32;
-      ///** CDC symmetry: phi range covered by hit data [0 .. phigeo] */
-      unsigned short parcels = 7;
-      /** CDC symmetry: phi range covered by expanded hit data [0 .. phigeo] */
-      unsigned short parcelsExp = 11;
+    // Data type to collect a binning
+    struct SectorBinning {
+      unsigned short omega;
+      unsigned short phi;
+      unsigned short cot;
+      unsigned short nHitIDs;
+      unsigned short nPriorityWires;
     };
-    std::vector<std::vector<float>> m_acceptRanges;
-    std::vector<float> m_slotsizes;
 
+    // Collection of the hit information needed for the hit representations
+    struct WireInfo {
+      unsigned short relativeWireID;
+      unsigned short phiSectorStart;
+      unsigned short priorityWire;
+    };
 
+    // Collection of the hit contribution information needed for the hit to cluster relations
+    struct ContributionInfo {
+      unsigned short hitIndex;
+      unsigned short contribution;
+      unsigned short superLayer;
+      short priorityTime;
+    };
 
-    /** Default constructor. */
-    NDFinder() {}
+    // Default constructor
+    NDFinder() = default;
 
-    /** Default destructor. */
+    // Destructor
     virtual ~NDFinder()
     {
-      delete m_parrayAxial;
-      delete m_parrayStereo;
-      delete m_phoughPlane;
-      delete m_parrayHitMod;
-      delete m_pcompAxial;
-      delete m_pcompStereo;
-      delete m_parrayAxialExp;
-      delete m_parrayStereoExp;
+      delete m_hitToSectorIDs;
+      delete m_compAxialHitReps;
+      delete m_compStereoHitReps;
+      delete m_expAxialHitReps;
+      delete m_expStereoHitReps;
+      delete m_houghSpace;
     }
 
-
-    /** initialization */
-
-    /** Set parameters
-     * @param minweight minimum weight of cluster member cells
-     * @param minpts minimum neighboring cells with minweight for core cells
-     * @param diagonal consider diagonal neighbor cells in the clustering
-     * @param minhits minimum number of hits per cluster
-     * @param minhits_axial minimum number of axial hits per cluster
-     * @param thresh selection of cells for weighted mean track estimation
-     * @param minassign hit to cluster assigment critical limit
-     * @param mincells minumum number of cells per cluster
-     * @param verbose print Hough planes and verbose output
-     * @param axialFile axial hit data
-     * @param stereoFile stereo hit data
-     * */
-    void init(int minweight, int minpts, bool diagonal,
-              int minhits, int minhits_axial, double thresh, double minassign,
-              int mincells, bool verbose, std::string& axialFile, std::string& stereoFile);
-
-    /** Initialize the binnings and reserve the arrays */
-    void initBins();
-
-    /** Load an NDFinder array of hit representations in track phase space.
-     * Used to load axial and stereo hit arrays.
-     * Represented in a 7/32 phi sector of the CDC. */
-    void loadArray(const std::string& filename, ndbinning bins, c5array& hitsToTracks);
-    /** Restore non-zero suppressed hit curves.
-     * will make m_params.arrayAxialFile and m_params.arrayStereoFile obsolete */
-    void restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, const c5array& compArray);
-
-    /** Squeeze phi-axis in a 2D (omega,phi) plane
-     * @param writeArray write into this array
-     * @param readArray read from this array
-     * @param outparcels number of 1/32 sectors in output plane
-     * @param inparcels number of 1/32 sectors in input plane
-     * @param ihit hit index
-     * @param iprio prio index
-     * @param itheta theta index
-     * @param nomega number of omega points
-     */
-    void squeezeOne(c5array& writeArray, c5array& readArray, int outparcels, int inparcels, c5index ihit, c5index iprio, c5index itheta,
-                    c5elem nomega);
-
-    /** Loop over all hits and theta bins and squeeze all
-     * 2D (omega,phi) planes */
-    void squeezeAll(ndbinning writebins, c5array& writeArray, c5array& readArray, int outparcels, int inparcels);
-
-    /** Initialize hit modulo mappings */
-    void initHitModAxSt(c2array& hitMod);
-
-    /** NDFinder reset data structure to process next event */
-    void reset()
-    {
-      m_NDFinderTracks.clear();
-      m_hitIds.clear();
-      m_prioPos.clear();
-      m_nHits = 0;
-      m_vecDstart.clear();
-      m_hitOrients.clear();
-      delete m_phoughPlane;
-      m_phoughPlane = new c3array(m_pc3shape);
-    }
-
-    /** Debug: print configured parameters */
-    void printParams();
-
-    /** fill hit info of the event */
-    void addHit(unsigned short hitId, unsigned short hitPrioPos)
-    {
-      if (hitPrioPos > 0) { // skip "no hit"
-        m_hitIds.push_back(hitId);
-        m_prioPos.push_back(3 - hitPrioPos);
-        m_nHits++;
-      }
-    }
-
-    /** main function for track finding */
+    // Initialization of the NDFinder (parameters and lookup tables)
+    void init(const NDFinderParameters& ndFinderParameters);
+    // Reset the NDFinder data structure to process next event
+    void reset();
+    // Add the hit info of a single track segment to the NDFinder
+    void addHit(const HitInfo& hitInfo);
+    // Main function for track finding
     void findTracks();
+    // Retreive the results
+    std::vector<NDFinderTrack>* getFinderTracks() { return &m_ndFinderTracks; }
 
-    /** retreive the results */
-    std::vector<NDFinderTrack>* getFinderTracks()
-    {
-      return &m_NDFinderTracks;
-    }
-
-    /** Debug Tool: Print part of the houghmap */
-    void printArray3D(c3array& hitsToTracks, ndbinning bins, ushort, ushort, ushort, ushort);
-
-    /** NDFinder internal functions for track finding*/
+    // NDFinder: Internal functions for track finding
   protected:
+    // Initialize the arrays LUT arrays
+    void initLookUpArrays();
+    // Fills the m_hitToSectorIDs (see below) array with the hit to orientation/sectorWire/sectorID relations
+    void initHitToSectorMap();
+    // Fills the m_compAxialHitReps/m_compStereoHitReps (see below) arrays with the hit representations (hits to weights)
+    void loadCompressedHitReps(const std::string& fileName, const SectorBinning& compBins, c5array& compHitsToWeights);
+    // Fills the m_expAxialHitReps/m_expStereoHitReps (see below) arrays with the expanded hit representations (hits to weights)
+    void fillExpandedHitReps(const SectorBinning& compBins, const c5array& compHitsToWeights, c5array& expHitsToWeights);
+    // Process a single axial or stereo hit for the Hough space
+    void processHitForHoughSpace(const unsigned short hitIdx);
+    // Write (add) a single hit (Hough curve) to the Hough space
+    void writeHitToHoughSpace(const WireInfo& hitInfo, const c5array& expHitsToWeights);
+    // Core track finding logic in the constructed Hough space
+    void runTrackFinding();
+    // Relate the hits in the peak of the cluster to the cluster. Applies a cut on the clusters.
+    std::vector<SimpleCluster> relateHitsToClusters(std::vector<SimpleCluster>& clusters);
+    // Create hits to clusters confusion matrix
+    std::vector<std::vector<unsigned short>> getHitsVsClustersTable(const std::vector<SimpleCluster>& clusters);
+    // Returns the hit contribution of a TS at a certain cluster cell (= peak/maximum cell)
+    unsigned short getHitContribution(const cell_index& peakCell, const unsigned short hitIdx);
+    // Extract relevant hit information (hitIdx, contribution, super layer, drift time)
+    std::vector<ContributionInfo> extractContributionInfos(const std::vector<unsigned short>& clusterHits);
+    // Find the hit with the maximum contribution in a given super layer
+    int getMaximumHitInSuperLayer(const std::vector<ContributionInfo>& contributionInfos, unsigned short superLayer);
+    // Cut on the number of hit axial/stereo super layers
+    bool checkHitSuperLayers(const SimpleCluster& cluster);
+    // Calculate the center of gravity (weighted mean) for the track parameters
+    std::array<double, 3> calculateCenterOfGravity(const SimpleCluster& cluster);
+    // Transform the center of gravity (cells) into the estimated track parameters
+    std::array<double, 3> getTrackParameterEstimate(const std::array<double, 3>& centerOfGravity);
+    // Transform to physical units
+    std::array<double, 3> transformTrackParameters(const std::array<double, 3>& estimatedParameters);
+    // Transverse momentum (which is 1/omega, in GeV/c) to radius (in cm)
+    static inline double getTrackRadius(double transverseMomentum) { return transverseMomentum * 1e11 / (3e8 * 1.5); }
 
-    /** Core track finding logic in the constructed houghmap */
-    void getCM();
-
-    /** Add a single axial or stereo hit to the houghmap.
-     * Determines the phi window of the hit in the full houghmap (Dstart, Dend).
-     * Uses: m_arrayHitMod
-     * Fills: m_vecDstart, m_hitOrients   */
-    void addLookup(unsigned short ihit);
-
-    /** In place array addition to houghmap Comp: A = A + B */
-    void addC3Comp(ushort hitr, ushort prio, const c5array& hitsToTracks,
-                   short Dstart, ndbinning bins);
-
-    /** Create hits to clusters confusion matrix */
-    std::vector<std::vector<unsigned short>> getHitsVsClusters(
-                                            std::vector<SimpleCluster>& clusters);
-
-    /** Peak cell in cluster */
-    cell_index getMax(const std::vector<cell_index>&);
-
-    /** Determine weight contribution of a single hit to a single cell.
-     * Used to create the hitsVsClusters confusion matrix. */
-    ushort hitContrib(cell_index peak, ushort ihit);
-
-    /** Use confusion matrix to related hits to clusters.
-     * Remove small clusters with less than minhits related hits. */
-    std::vector<SimpleCluster> relateHitsToClusters(
-      std::vector<std::vector<unsigned short>>& hitsVsClusters,
-      std::vector<SimpleCluster>& clusters);
-
-    /** Determine the best cluster for a single hit,
-     * given hitsVsClusters confusion matrix */
-    int hitToCluster(std::vector<std::vector<unsigned short>>& hitsVsClusters,
-                     unsigned short hit);
-
-    /** Candidate cells as seed for the clustering.
-     * Selects all cells with weight > minweight */
-    std::vector<cellweight> getHighWeight(std::vector<cell_index> entries, float cutoff);
-
-    /** Calculate the weighted center of a cluster */
-    std::vector<double> getWeightedMean(std::vector<cellweight>);
-
-    /** Scale the weighted center to track parameter values */
-    std::vector<double> getBinToVal(std::vector<double>);
-
-    /** Transverse momentum to radius */
-    double cdc_track_radius(double pt)
-    {
-      return pt * 1e11 / (3e8 * 1.5); // div (c * B)
-    }
-
-    /** Calculate physical units */
-    float transformVar(float estVal, int idx);
-    std::vector<double> transform(std::vector<double> estimate);
-
-    /** NDFinder */
+    // NDFinder: Member data stores
   private:
-
-    /** Shapes of the arrays holding the hit patterns */
-    boost::array<c5index, 5> m_pc5shapeax;
-    boost::array<c5index, 5> m_pc5shapest;
-    boost::array<c3index, 3> m_pc3shape;
-    boost::array<c2index, 2> m_pc2shapeHitMod;
-    boost::array<c5index, 5> m_pc5shapeCompAx;
-    boost::array<c5index, 5> m_pc5shapeCompSt;
-    boost::array<c5index, 5> m_pc5shapeExpAx;
-    boost::array<c5index, 5> m_pc5shapeExpSt;
-
-    /** Array pointers to the hit patterns */
-    c5array* m_parrayAxial = nullptr;
-    c5array* m_parrayStereo = nullptr;
-    c3array* m_phoughPlane = nullptr;
-    c2array* m_parrayHitMod = nullptr;
-    c5array* m_pcompAxial = nullptr;
-    c5array* m_pcompStereo = nullptr;
-    c5array* m_parrayAxialExp = nullptr;
-    c5array* m_parrayStereoExp = nullptr;
-
-    /** Number of first priority wires in each super layer (TS per SL) */
-    std::vector<int> m_nWires;
-
-    /** Result: vector of the found tracks */
-    std::vector<NDFinderTrack> m_NDFinderTracks;
-
-    /** TS-Ids of the hits in the current event
-     * elements: [0,2335] for 2336 TS in total*/
-    std::vector<unsigned short> m_hitIds;
-
-    /** Priority positon within the TS in the current event
-     * elements basf2: [0,3] first, left, right, no hit
-     * elements stored: 3 - basf2prio*/
-    std::vector<unsigned short> m_prioPos;
-
-    /** Orients
-     * TS-Ids of the hits in the current event
-     * elements: [0,2335] for 2336 TS in total*/
-    std::vector<unsigned short> m_hitOrients;
-
-    /** Phi-start of 7/32 hit representation in full track parameter space.
-     * Used to get the weight contribution of a hit to a cluster. */
-    std::vector<short> m_vecDstart;
-
-    /** Counter for the number of hits in the current event */
+    // Result: Vector of the found tracks
+    std::vector<NDFinderTrack> m_ndFinderTracks;
+    // TS-IDs of the hits in the current event: Elements = [0,2335] for 2336 TS in total
+    std::vector<unsigned short> m_hitIDs;
+    // SL-IDs of the hits in the current event: Elements = Super layer number in [0,1,...,8]
+    std::vector<unsigned short> m_hitSLIDs;
+    // Priority positon within the TS. Elements basf2: [0,3] first, left, right, no hit
+    std::vector<unsigned short> m_priorityWirePos;
+    // Drift time of the priority wire.
+    std::vector<short> m_priorityWireTime;
+    // Counter for the number of hits in the current event
     unsigned short m_nHits{0};
+    // Configuration parameters of the 3DFinder
+    NDFinderParameters m_ndFinderParams;
+    // Clustering module
+    Clusterizend m_clusterer;
 
-    /** Configuration parameters of the 3DFinder */
-    ndparameters m_params;
+    /*
+      Since the CDC wire pattern is repeated 32 times, the hit IDs are stored for 1/32 of the CDC only.
+      The total number of 2336 TS corresponds to (41 axial + 32 stereo) * 32.
+      The number of track bins is (for example): (omega, phi, cot) = (40, 384, 9)
+      Note: The omega dimension here represents just sign(q)/(p_T[GeV/c]) (0.25 -> inf -> -inf -> -0.25 for 0 -> 19.5 -> 39)
+    */
 
-    /** Binnings in different hit pattern arrays */
-    ndbinning m_axbins;
-    ndbinning m_stbins;
-    ndbinning m_fullbins;
-    ndbinning m_compaxbins;
-    ndbinning m_compstbins;
-    ndbinning m_expaxbins;
-    ndbinning m_expstbins;
+    // Track segments
+    static constexpr unsigned short m_nTS = 2336; // Number of track segments
+    static constexpr unsigned short m_nSL = 9; // Number of super layers
+    static constexpr unsigned short m_nAxial = 41; // Number of unique axial track segments
+    static constexpr unsigned short m_nStereo = 32; // Number of unique stereo track segments
+    static constexpr unsigned short m_nPrio = 3; // Number of priority wires
 
-    /** Configuration of the clustering module */
-    clusterer_params m_clusterer_params;
-    std::vector<ushort> m_planeShape;
+    // Full Hough space bins
+    static constexpr unsigned short m_nOmega = 40; // Bins in the phi dimension
+    static constexpr unsigned short m_nPhi = 384; // Bins in the omega dimension
+    static constexpr unsigned short m_nCot = 9; // Bins in the cot dimension
 
-    /** Default bins */
-    unsigned short m_nPhiFull{0};
-    unsigned short m_nPhiOne{0};
-    unsigned short m_nPhiComp{0};
-    unsigned short m_nPhiExp{0};
-    unsigned short m_nPhiUse{0};
-    unsigned short m_nOmega{0};
-    unsigned short m_nTheta{0};
+    // CDC symmetry in phi
+    static constexpr unsigned short m_phiGeo = 32; // Repetition of the wire pattern
 
-    unsigned short m_nSL{0};
-    unsigned short m_nTS{0};
-    unsigned short m_nAx{0};
-    unsigned short m_nSt{0};
-    unsigned short m_nPrio{0};
+    // Phi sectors in the CDC
+    static constexpr unsigned short m_nPhiSector = m_nPhi / m_phiGeo; // Bins of one phi sector (12)
 
-    /** Clustering module */
-    Belle2::Clusterizend m_clusterer;
+    // Data structure/binning of the compressed hit pattern files (.txt.gz files)
+    static constexpr unsigned short m_nPhiComp = 15; // Bins of compressed phi: phi_start, phi_width, phi_0, ..., phi_12
+    static constexpr SectorBinning m_compAxialBins = {m_nOmega, m_nPhiComp, 1, m_nAxial, m_nPrio}; // 40, 15, 1, 41, 3
+    static constexpr SectorBinning m_compStereoBins = {m_nOmega, m_nPhiComp, m_nCot, m_nStereo, m_nPrio}; // 40, 15, 9, 32, 3
 
-    /** Print Hough planes and verbose output */
-    bool m_verbose{false};
+    // Acceptance ranges + slot sizes to convert bins to track parameters (for getBinToVal method)
+    static constexpr std::array<double, 2> m_omegaRange = {-4., 4.}; // 1/4 = 0.25 GeV (minimum transverse momentum)
+    static constexpr std::array<double, 2> m_phiRange = {0., 11.25}; // One phi sector (360/32)
+    // These are optimized for minSuperAxial = 3 and minSuperStereo = 2
+    static constexpr std::array<double, 2> m_cotRange = {2.3849627654510415, -1.0061730449796316}; // => theta in [22.75, 135.18]
+    static constexpr double m_binSizeOmega = (m_omegaRange[1] - m_omegaRange[0]) / m_nOmega; // 0.2
+    static constexpr double m_binSizePhi = (m_phiRange[1] - m_phiRange[0]) / m_nPhiSector; // 0.9375
+    static constexpr double m_binSizeCot = (m_cotRange[1] - m_cotRange[0]) / m_nCot; // -0.377
+    static constexpr std::array<std::array<double, 2>, 3> m_acceptanceRanges = {m_omegaRange, m_phiRange, m_cotRange};
+    static constexpr std::array<double, 3> m_binSizes = {m_binSizeOmega, m_binSizePhi, m_binSizeCot};
+
+    // Array pointers to the hit representations and Hough space
+    /*
+      m_hitToSectorIDs: 2D array mapping TS-ID ([0, 2335]) to:
+
+      - [0]: Orientation (1 = axial, 0 = stereo)
+      - [1]: Relative wire ID in the sector ([0, 40] for axials, [0, 31] for stereos)
+      - [2]: Relative phi-sector ID in the super layer ([0, 31] in each SL)
+    */
+    c2array* m_hitToSectorIDs = nullptr;
+    /*
+      m_compAxialHitReps/m_compStereoHitReps (~ Compressed in phi (width, start, values)) 5D array mapping:
+
+      1. [hitID]: Relative hit number of the track segment (axial [0, 40], stereo [0, 31])
+      2. [priorityWire]: Hit priority wire ([0, 2])
+      3. [omegaIdx]: Omega index of the Hough space ([0, m_nOmega - 1])
+      4. [phiIdx]: Phi start value, number of phi bins, phi values (0, 1, [2, 14])
+      5. [cotIdx]: Cot index of the Hough space (0 for axial TS, [0, m_nCot - 1] for stereo TS)
+
+      to the Hough space weight contribution at the corresponding bin (int, [0, 7])
+    */
+    c5array* m_compAxialHitReps = nullptr;
+    c5array* m_compStereoHitReps = nullptr;
+    /*
+      m_expAxialHitReps/m_expStereoHitReps (~ expansion of the compressed representations) 5D array mapping:
+
+      1. [hitID]: Relative hit number of the track segment (axial [0, 40], stereo [0, 31])
+      2. [priorityWire]: Hit priority wire ([0, 2])
+      3. [omegaIdx]: Omega index of the Hough space ([0, m_nOmega - 1])
+      4. [phiIdx]: Phi index of the Hough space ([0, m_nPhi - 1])
+      5. [cotIdx]: Cot index of the Hough space ([0, m_nCot - 1] for both axial and stereo!)
+
+      to the Hough space weight contribution at the corresponding bin (int, [0, 7])
+    */
+    c5array* m_expAxialHitReps = nullptr;
+    c5array* m_expStereoHitReps = nullptr;
+    // The complete Hough space with the size [m_nOmega, m_nPhi, m_nCot]
+    c3array* m_houghSpace = nullptr;
   };
 }
-#endif
-

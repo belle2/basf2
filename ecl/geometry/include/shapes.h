@@ -29,7 +29,7 @@ namespace Belle2 {
 
       /** get solid */
       G4VSolid* get_solid(const std::string& prefix, double wrapthick, G4Translate3D& shift) const;
-      /** get tesselated solid */
+      /** get tessellated solid */
       virtual G4VSolid* get_tesselatedsolid(const std::string& prefix, double wrapthick, G4Translate3D& shift) const = 0;
       /** get trapezoid */
       virtual G4VSolid* get_trapezoid(const std::string& prefix, double wrapthick, G4Translate3D& shift) const = 0;

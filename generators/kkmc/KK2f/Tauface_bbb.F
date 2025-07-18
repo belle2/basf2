@@ -411,6 +411,9 @@ C =======================================================================
 C switch to initialize that all modes are represented equally.
       INTEGER IFEQUALBR
       COMMON /IFEQUALBR/ IFEQUALBR
+      INTEGER IUSER,SELUSER
+      INTEGER USERACTIVE
+      COMMON /USERACTIVE/ USERACTIVE(100)
 C==========================================================================
 
 C      PARAMETER (NMODE=196,NM1=40,NM2=71,NM3=19,NM4=32,NM5=21,NM6=13)
@@ -1214,8 +1217,8 @@ C=================================================
         IF(II.EQ.67) NAMES(I-NLT)='  TAU-  --> mu- a0(980) !nu_tau' ! TauDecayModeBBB = 369 ! a0(980)->pi0eta(pi0pi0pi0) 
         IF(II.EQ.68) NAMES(I-NLT)='  TAU-  --> mu- a0(980) !nu_tau' ! TauDecayModeBBB = 370 ! a0(980)->pi0eta(pi+pi-pi0) 
         IF(II.EQ.69) NAMES(I-NLT)='  TAU-  --> mu- a0(980) !nu_tau' ! TauDecayModeBBB = 371 ! a0(980)->pi0eta(pi+pi-gamma) 
-        IF(II.EQ.70) NAMES(I-NLT)='  TAU-  --> e-  invi    !nu_tau' ! TauDecayModeBBB = 372
-        IF(II.EQ.71) NAMES(I-NLT)='  TAU-  --> mu- invi    !nu_tau' ! TauDecayModeBBB = 373
+        IF(II.EQ.70) NAMES(I-NLT)='  TAU-  --> e-  alfa    !nu_tau' ! TauDecayModeBBB = 372
+        IF(II.EQ.71) NAMES(I-NLT)='  TAU-  --> mu- alfa    !nu_tau' ! TauDecayModeBBB = 373
         IF(II.EQ.72) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 374
         IF(II.EQ.73) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 375
         IF(II.EQ.74) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 376
@@ -1389,7 +1392,7 @@ C      GAMPRT(15 ) = 0.000195 !± 0.000038! 0.000150 ! 26           ! pi-2pi0eta
        GAMPRT(39 ) = 0.000044 !± 0.000009! 0.000150 ! 26           ! pi-2pi0eta (ex K0), eta->pi+pi-pi0  :  0.000195 * 0.2292 = 0.000044694;  0.000038 * 0.2292 = 0.0000087096
        GAMPRT(40 ) = 0.000010 !± 0.000002! 0.000150 ! 26           ! pi-2pi0eta (ex K0), eta->pi+pi-gamma:  0.000195 * 0.0499 = 0.0000097305; 0.000038 * 0.0499 = 0.0000018962
        GAMPRT(5  ) = 0.000028 !± 0.000015! 0.000028 ! 37           ! e-e-e+
-       GAMPRT(110) = 0.001789 !± 0.005914! 0.001300 ! 21           ! pi-omega(->pi0gam)=pi-pi0gamma; 0.019494 * (1-0.893- 0.0153)= 0.0017875998 ; 0.0645 * (1-0.893- 0.0153) = 0.005914
+       GAMPRT(110) = 0.001789 !± 0.000059! 0.001300 ! 21           ! pi-omega(->pi0gam)=pi-pi0gamma; 0.019494 * (1-0.893- 0.0153)= 0.0017875998 ; 0.000645 * (1-0.893- 0.0153) = 0.000059
        GAMPRT(341) = 0.000238 !± 0.000000 ! -1          ! pi-gamma (a1-  ->pi-gamma) (0.092595 + 0.089868) * 0.0021 - 0.00011472345 - 0.000028 = 0.0003831723-0.00011472345-0.000028=0.00026844885-0.000028 = 0.000240 -0.000002 [rounding issues] = 0.000238
        GAMPRT(342) = 0.000115 !± 0.000000 ! -1          ! pi-gamma (rho- ->pi-gamma) .254941*4.5e-4 = 0.00011472345
        
@@ -1417,6 +1420,32 @@ C      CALL INIOFC ! dummy for now anyway
          ENDIF
       ENDDO
       WRITE(IOUT,'(''NCHAN, KSUM, SUM = '',2I4,1X,F10.7)') NCHAN, KSUM, SUM
+
+      IF(IFEQUALBR.LT.0) THEN   ! uniform  initialization useful for some tests only
+         DO K=1,NCHAN
+            ACTIVE(K)=0
+         ENDDO
+         KSUM=0
+         DO K=1,NCHAN
+            SELUSER=0
+            DO IUSER=1,-IFEQUALBR
+               IF (K.EQ.USERACTIVE(IUSER)) THEN
+                  SELUSER = 1
+                  GOTO 100
+               ENDIF
+            ENDDO
+ 100        IF (SELUSER.EQ.1) THEN
+               KSUM=KSUM+1
+               ACTIVE(KSUM)=K
+               IF (K.LE.NLT) THEN
+                  PRINT*, '0 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,OLDNAMES(K),' GAMPRT = ',GAMPRT(K)
+               ELSE
+                  PRINT*, 'N KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT),' GAMPRT = ',GAMPRT(K)
+               ENDIF
+            ENDIF
+         ENDDO
+         WRITE(IOUT,'(''IFEQUALBR, KSUM, GAMPRT = '',2I4,1X,F10.7)') IFEQUALBR, KSUM, GAMPRT(1)
+      ENDIF
 
       IF(IFEQUALBR.EQ.1) THEN   ! uniform  initialization useful for some tests only
          DO K=1,NCHAN
@@ -1539,11 +1568,22 @@ C      CALL INIOFC ! dummy for now anyway
       COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
       INTEGER CHCONJUGATE
       COMMON /CHCONJUGATE/ CHCONJUGATE
+      INTEGER TauToElOrMu
+      COMMON /TauToElOrMu/ TauToElOrMu
       INTEGER JAKT ! temporary place holder for JAK1
       DATA    JAKT /-1/
       SAVE    JAKT
       REAL    RRR(1)
+      REAL    RRR1(1)
       IF (KTO.EQ.1) THEN  
+         IF (TauToElOrMu.EQ.1) THEN
+            CALL KKMC_RANMAR(RRR1,1)
+            IF (RRR1(1).GT.0.5) THEN
+               JAK2 = 1
+            ELSE
+               JAK2 = 2
+            ENDIF
+         ENDIF
          IF (CHCONJUGATE.EQ.1) THEN  
             CALL KKMC_RANMAR(RRR,1)
             IF (RRR(1).GT.0.5) THEN ! swap JAK1/JAK2 for alternate events

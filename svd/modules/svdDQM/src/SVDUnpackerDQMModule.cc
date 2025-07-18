@@ -87,7 +87,7 @@ void SVDUnpackerDQMModule::defineHisto()
 
   m_DQMUnpackerHisto = new TH2F("DQMUnpackerHisto", "SVD Data Format Monitor", nBins, 1, nBins + 1, 52, 1, 53);
   m_DQMErrorEventsHisto = new TH1F("DQMErrorEventsHisto", "SVD Errors Event Counter", 4, 0, 4);
-  m_DQMSeuRecoveryFADCsEventHisto = new TH1F("DQMSeuRecoveryFADCsEventHisto", "Number of FADCs with SEURecovery", 52, 1, 53);
+  m_DQMSeuRecoveryFADCsEventHisto = new TH1F("DQMSeuRecoveryFADCsEventHisto", "Number of FADCs with SEURecovery", 53, 0, 53);
   m_DQMnSamplesHisto = new TH2F("DQMnSamplesHisto", "nAPVsamples VS DAQMode", 3, 1, 4, 2, 1, 3);
   m_DQMnSamplesHisto2 = new TH2F("DQMnSamplesHisto2", "nAPVsamples VS DAQMode", 2, 1, 3, 2, 1, 3);
   m_DQMtrgQuality = new TH2F("DQMtrgQuality", "nAPVsamples VS trgQuality", 4, 1, 5, 2, 1, 3);

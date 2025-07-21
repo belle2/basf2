@@ -1,0 +1,6 @@
+Changes in the analysis package in light-2507-europa
+----------------------------------------------------
+
+stdCharged
+++++++++++
+* Removed the selection on `nCDCHits` to match the recommendation for release-08 samples.

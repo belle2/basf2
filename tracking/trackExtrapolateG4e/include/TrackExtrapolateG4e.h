@@ -239,6 +239,9 @@ namespace Belle2 {
     //! Swim a single track (EXT) until it stops or leaves the target cylinder
     void swim(ExtState&, G4ErrorFreeTrajState&);
 
+    //! Find the closest Track to each KLMCluster and fill the corresponding fields of KLMCluster objects
+    void findClosestTrackToKLMClusters();
+
     //! Register the list of geant4 physical volumes whose entry/exit
     //! points will be saved during extrapolation
     void registerVolumes();

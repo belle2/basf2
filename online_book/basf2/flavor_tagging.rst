@@ -86,8 +86,8 @@ start right away!
 .. admonition:: Exercise
     :class: stacked exercise
 
-    Add the the
-    ``flavorTagger.flavor_tagging`` variable collection to your output
+    Add the
+    ``flavor_tagging`` variable collection to your output
     variables
 
 .. admonition:: Solution

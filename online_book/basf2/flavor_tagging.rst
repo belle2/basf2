@@ -115,18 +115,13 @@ Good!
 Now let's talk about the output of the flavor tagger. This is the value
 :math:`q\cdot r`, where :math:`q=-1` corresponds to a :math:`\bar B^0` and
 :math:`q=+1` to :math:`B^0`. :math:`r` is called the dilution factor. It's 0
-if the algorighm can't decide between both options for :math:`q` and 1 if the
-algorithm is certain about it's decision.
+if the algorithm can't decide between both options for :math:`q` and 1 if the
+algorithm is certain about its decision.
 
 The variable ``FBDT_qrCombined`` is the :math:`q\cdot r` result of one of the
 models of the `FlavorTagger` (a *fast boosted decision tree*).
 It can also be ``NaN`` to signal that not a single charged
 track in the ROE was found, so that the algorithm can't work.
-
-.. note::
-
-    In releases before release-05, a value of :math:`\pm 2` was used instead of
-    ``NaN``.
 
 Part of the variables you just added was also ``qrMC`` for the "true" (MC level) flavor of the :math:`B_\text{tag}`.
 It can take the numbers

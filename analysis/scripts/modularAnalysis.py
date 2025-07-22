@@ -3146,7 +3146,7 @@ def oldwritePi0EtaVeto(
 def writePi0EtaVeto(
     particleList,
     decayString,
-    mode='standardMC15rd',
+    mode='standardMC16rd',
     selection='',
     path=None,
     suffix='',
@@ -3156,8 +3156,8 @@ def writePi0EtaVeto(
     etaPayloadNameOverride=None,
     etaSoftPhotonCutOverride=None,
     requireSoftPhotonIsInROE=False,
-    pi0Selection='[0.03 < M < 0.23]',
-    etaSelection='[0.25 < M < 0.75]'
+    pi0Selection='',
+    etaSelection=''
 ):
     """
     Give pi0/eta probability for hard photon.
@@ -3255,16 +3255,10 @@ def writePi0EtaVeto(
     if (requireSoftPhotonIsInROE):
         B2WARNING("Requiring the soft photon to being in the ROE was not done for the MVA training. "
                   "Please check the results carefully.")
-    if (mode == 'standardMC15rd' or mode == 'tightMC15rd'):
-        if (pi0Selection != '[0.03 < M < 0.23]' or etaSelection != '[0.25 < M < 0.75]'):
-            B2WARNING(
-                "Personal selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
-                "Please check the results carefully.")
-    else:
-        if (pi0Selection != '' or etaSelection != ''):
-            B2WARNING(
-                "Personal selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
-                "Please check the results carefully.")
+    if (pi0Selection != '' or etaSelection != ''):
+        B2WARNING(
+            "Personal selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
+            "You may get NAN value. Please check the results carefully.")
 
     renameSuffix = False
 

@@ -87,6 +87,7 @@ def run_b2analysis():
     """
     Function to produce the validation ntuples via basf2.
     """
+    basf2.set_random_seed(1337)
     main = basf2.Path()
     inputMdst(INPUT_FILENAME, path=main)
     add_reconstruction(path=main)

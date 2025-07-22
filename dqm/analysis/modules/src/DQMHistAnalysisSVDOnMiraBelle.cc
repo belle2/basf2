@@ -544,10 +544,12 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   // Cluster on track peculiar sensors
   for (const auto& it : m_listOfSensorsToMonitor) {
     string sensorDescr = it;
+    string valueLabel = it;
     replace(sensorDescr.begin(), sensorDescr.end(), '.', '_');
+    valueLabel.erase(remove(valueLabel.begin(), valueLabel.end(), '.'), valueLabel.end());
 
     TString  name = Form("SVDClsTrk/SVDTRK_%s_ClusterChargeU", sensorDescr.c_str());
-    TString title = Form("MPVClusterChargeU_L%s", sensorDescr.c_str());
+    TString title = Form("MPVClusterChargeL%sU", valueLabel.c_str());
     TString title1 = "";
     TH1F* h_clusterCharge = (TH1F*)findHist(name.Data());
     float MPVClusterCharge = nan;
@@ -562,7 +564,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     }
 
     name = Form("SVDClsTrk/SVDTRK_%s_ClusterChargeV", sensorDescr.c_str());
-    title = Form("MPVClusterChargeV_L%s", sensorDescr.c_str());
+    title = Form("MPVClusterChargeL%sV", valueLabel.c_str());
     h_clusterCharge = (TH1F*)findHist(name.Data());
     MPVClusterCharge = nan;
     if (h_clusterCharge)
@@ -576,7 +578,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     }
 
     name = Form("SVDClsTrk/SVDTRK_%s_ClusterSNRU", sensorDescr.c_str());
-    title = Form("MPVClusterSNRU_L%s", sensorDescr.c_str());
+    title = Form("MPVClusterSNRL%sU", valueLabel.c_str());
     TH1F* h_clusterSNR = (TH1F*)findHist(name.Data());
     float MPVClusterSNR = nan;
     if (h_clusterSNR)
@@ -590,7 +592,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     }
 
     name = Form("SVDClsTrk/SVDTRK_%s_ClusterSNRV", sensorDescr.c_str());
-    title = Form("MPVClusterSNRV_L%s", sensorDescr.c_str());
+    title = Form("MPVClusterSNRL%sV", valueLabel.c_str());
     h_clusterSNR = (TH1F*)findHist(name.Data());
     MPVClusterSNR = nan;
     if (h_clusterSNR)
@@ -604,8 +606,8 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     }
 
     name = Form("SVDClsTrk/SVDTRK_%s_ClusterTimeU", sensorDescr.c_str());
-    title = Form("MPVClusterTimeU_L%s", sensorDescr.c_str());
-    title1 = Form("FWHMClusterTimeU_L%s", sensorDescr.c_str());
+    title = Form("MPVClusterTimeL%sU", valueLabel.c_str());
+    title1 = Form("FWHMClusterTimeL%sU", valueLabel.c_str());
     TH1F* h_clusterTime = (TH1F*)findHist(name.Data());
     float MPVClusterTime = nan;
     float FWHMClusterTime = nan;
@@ -623,8 +625,8 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     }
 
     name = Form("SVDClsTrk/SVDTRK_%s_ClusterTimeV", sensorDescr.c_str());
-    title = Form("MPVClusterTimeV_L%s", sensorDescr.c_str());
-    title1 = Form("FWHMClusterTimeV_L%s", sensorDescr.c_str());
+    title = Form("MPVClusterTimeL%sV", valueLabel.c_str());
+    title1 = Form("FWHMClusterTimeL%sV", valueLabel.c_str());
     h_clusterTime = (TH1F*)findHist(name.Data());
     MPVClusterTime = nan;
     FWHMClusterTime = nan;

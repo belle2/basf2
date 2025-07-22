@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <TFile.h>
 
 #include <daq/dqm/HistoRelay2.h>
 
@@ -26,6 +27,14 @@ int main(int argc, char** argv)
   int port = atoi(argv[3]);
   int interval = atoi(argv[4]);
 
+  // Create empty file before starting
+  auto filepath = string("/dev/shm/") + file;
+  auto dqmhisto = new TFile(filepath.c_str(), "NEW");
+  if (dqmhisto->IsOpen()) {
+    dqmhisto->Close();
+  }
+  delete dqmhisto;
+
   HistoRelay2 hrelay2(file, dest, port);
 
   for (;;) {
@@ -38,5 +47,3 @@ int main(int argc, char** argv)
   }
 
 }
-
-

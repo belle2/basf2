@@ -14,8 +14,6 @@
 #include <genfit/MaterialEffects.h>
 #include <map>
 
-using namespace std;
-
 namespace Belle2 {
 
   //-----------------------------------------------------------------
@@ -60,15 +58,21 @@ namespace Belle2 {
 
     // loop over tracks and save CDC hits stored in recoTracks
     for (const auto& track : m_tracks) {
+
       const RecoTrack* recoTrack = track.getRelatedTo<RecoTrack>();
+
       if (not recoTrack) {
         B2WARNING("No related recoTrack for this track");
         continue;
       }
-      if (recoTrack->getTrackFitStatus()->isTrackPruned()) {
-        B2ERROR("GFTrack is pruned, please run CDCDedxHitSaver only on unpruned tracks! Skipping this track.");
+
+      if (recoTrack->hasTrackFitStatus()) {
+        if (recoTrack->getTrackFitStatus()->isTrackPruned()) {
+          B2ERROR("GFTrack is pruned, please run CDCDedxHitSaver only on unpruned tracks! Skipping this track.");
+          continue;
+        }
+      } else // The RecoTrack might not have a fit status for reasons: let's skip it
         continue;
-      }
 
       // loop over hits of this track
       for (const auto& hitPoint : recoTrack->getHitPointsWithMeasurement()) {
@@ -96,7 +100,7 @@ namespace Belle2 {
           auto wts = kalmanFitterInfo->getWeights();
           double wt = 0;
           for (double w : wts) if (w > wt) wt = w; // take the largest one (there should be always two, but safer to do in this way)
-          weights[abs(rep->getPDG())] = wt;
+          weights[std::abs(rep->getPDG())] = wt;
         }
 
         // get needed vectors, save the hit and add relation to track

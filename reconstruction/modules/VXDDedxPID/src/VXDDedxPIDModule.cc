@@ -178,10 +178,13 @@ void VXDDedxPIDModule::event()
 
     // Check to see if the track is pruned. We use the cardinal representation for this, as we do not expect that one
     // representation is pruned whereas the other is not.
-    if (recoTrack->getTrackFitStatus()->isTrackPruned()) {
-      B2ERROR("GFTrack is pruned, please run VXDDedxPID only on unpruned tracks! Skipping this track.");
+    if (recoTrack->hasTrackFitStatus()) {
+      if (recoTrack->getTrackFitStatus()->isTrackPruned()) {
+        B2ERROR("GFTrack is pruned, please run VXDDedxPID only on unpruned tracks! Skipping this track.");
+        continue;
+      }
+    } else // The RecoTrack might not have a fit status for reasons: let's skip it
       continue;
-    }
 
     //used for PXD/SVD hits
     const HelixHelper helixAtOrigin(trackPos, trackMom, dedxTrack->m_charge);

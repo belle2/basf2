@@ -20,7 +20,8 @@ from reconstruction import prepare_user_cdst_analysis
 
 settings = CalibrationSettings(
     name="caf_svd_dedx",
-    expert_username="lisovsky",
+    expert_username="lisovskyi",
+    subsystem="svd",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["hadron_calib"],
@@ -50,7 +51,8 @@ settings = CalibrationSettings(
         "NumEffBins": 30,
         "MaxEffMomentum": 2.5
         },
-    depends_on=[])
+    depends_on=[],
+    produced_payloads=["SVDdEdxPDFs"])
 
 
 def create_path(rerun_pid, isMC, expert_config):

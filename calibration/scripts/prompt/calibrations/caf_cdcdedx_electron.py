@@ -30,7 +30,8 @@ ROOT.gROOT.SetBatch(True)
 
 settings = CalibrationSettings(
     name="CDC dedx",
-    expert_username="renu",
+    expert_username="renu92garg",
+    subsystem="cdc",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib"],
@@ -53,7 +54,9 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS['Beam Energy']['4S'],
             INPUT_DATA_FILTERS['Beam Energy']['Continuum'],
             INPUT_DATA_FILTERS['Beam Energy']['Scan']]},
-    depends_on=[])
+    depends_on=[],
+    produced_payloads=["CDCDedxInjectionTime", "CDCDedxCosineEdge", "CDCDedxBadWires",
+                       "CDCDedxWireGain", "CDCDedx1DCell", "CDCDedxCosineCor", "CDCDedxRunGain"])
 
 
 def get_calibrations(input_data, **kwargs):

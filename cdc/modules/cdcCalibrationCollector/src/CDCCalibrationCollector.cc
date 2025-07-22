@@ -163,32 +163,10 @@ void CDCCalibrationCollectorModule::collect()
   // WireID collection finished
 
   const int nTr = m_Tracks.getEntries();
-  // count number of charged track if B-field is availbale
-  // Skip events which have number of charged tracks <= 1.
-  if (m_bField) {
-    int nCTracks  = 0;
-    for (int i = 0; i < nTr; ++i) {
-      const Belle2::Track* b2track = m_Tracks[i];
-      const Belle2::TrackFitResult* fitresult = b2track->getTrackFitResultWithClosestMass(Const::muon);
-      if (!fitresult) continue;
-
-      short charge = fitresult->getChargeSign();
-      if (fabs(charge) > 0) {
-        nCTracks++;
-      }
-    }
-    if (nCTracks <= 1) {
-      return ;
-    } else {
-      getObjectPtr<TH1F>("hNTracks")->Fill(nCTracks);
-    }
-  } else {
-    getObjectPtr<TH1F>("hNTracks")->Fill(nTr);
-  }
-
   const int nHits = m_CDCHits.getEntries();
   const int nWires = 14336;
   float oc = static_cast<float>(nHits) / static_cast<float>(nWires);
+  getObjectPtr<TH1F>("hNTracks")->Fill(nTr);
   getObjectPtr<TH1F>("hOccupancy")->Fill(oc);
 
   for (int i = 0; i < nTr; ++i) {

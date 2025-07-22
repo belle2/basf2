@@ -181,13 +181,26 @@ void StatisticsTimingHLTDQMModule::initialize()
   REG_HISTOGRAM
 
   if (m_param_create_hlt_unit_histograms) {
-    std::ifstream file;
-    file.open(HLTUnits::hlt_unit_file);
-    if (file.good()) {
-      std::string host;
-      getline(file, host);
-      m_hlt_unit = atoi(host.substr(3, 2).c_str());
-      file.close();
+    // Read the HLT unit's hostname straight from the HLT worker
+    FILE* pipe = popen("hostname -d", "r");
+    if (pipe) {
+      char buffer[128];
+      std::string host = "";
+
+      while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        host += buffer;
+      }
+
+      pclose(pipe);
+
+      // Trim space and new line
+      host.erase(std::remove_if(host.begin(), host.end(), ::isspace), host.end());
+
+      if (host.rfind("hlt", 0) == 0 && host.length() == 5) {
+        m_hlt_unit = std::atoi(host.substr(3, 2).c_str());
+      } else {
+        B2WARNING("HLT unit number not found");
+      }
     } else {
       B2WARNING("HLT unit number not found");
     }

@@ -93,7 +93,7 @@ Environment::Environment() :
   m_numberProcessesOverride(-1),
   m_logLevelOverride(LogConfig::c_Default),
   m_visualizeDataFlow(false),
-  m_noStats(false),
+  m_stats(false),
   m_dryRun(false),
   m_mcEvents(0),
   m_run(-1),

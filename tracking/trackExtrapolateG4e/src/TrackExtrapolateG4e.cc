@@ -408,6 +408,9 @@ void TrackExtrapolateG4e::event(bool byMuid)
     } // Ext track loop
   } // byMuid
 
+  if (byMuid) {
+    findClosestTrackToKLMClusters();
+  }
 }
 
 void TrackExtrapolateG4e::endRun(bool)
@@ -683,20 +686,11 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
         continue;
       }
       TrackClusterSeparation* h = m_trackClusterSeparations.appendNew(klmHit[c]);
-      // Add the following three quantities to the KLMCluster data members and store some relations
-      // To be safe, add them only if h is a valid object
       if (h != nullptr) {
         (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackClusterSeparation
-        (*klmClusterInfo)[c].first->setClusterTrackSeparation(h->getDistance() / CLHEP::cm);
-        (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(h->getTrackClusterSeparationAngle());
-        (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(h->getTrackRotationAngle());
         if (extState.track != nullptr) {
           extState.track->addRelationTo(h); // relation Track to TrackClusterSeparation
         }
-      } else {
-        (*klmClusterInfo)[c].first->setClusterTrackSeparation(Const::doubleNaN);
-        (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(Const::doubleNaN);
-        (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(Const::doubleNaN);
       }
       if (klmHit[c].getDistance() < minDistance) {
         closestCluster = c;
@@ -710,6 +704,33 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
         extState.track->addRelationTo((*klmClusterInfo)[closestCluster].first, 1. / (minDistance / CLHEP::cm));
       }
     }
+  }
+}
+
+void TrackExtrapolateG4e::findClosestTrackToKLMClusters()
+{
+  for (auto& klmCluster : m_klmClusters) {
+    const auto& trackClusterSeparations = klmCluster.getRelationsWith<TrackClusterSeparation>();
+
+    // If there are no TrackClusterSeparation objects related to this cluster, set NaN
+    if (trackClusterSeparations.size() == 0) {
+      klmCluster.setClusterTrackSeparation(Const::doubleNaN);
+      klmCluster.setClusterTrackSeparationAngle(Const::doubleNaN);
+      klmCluster.setClusterTrackRotationAngle(Const::doubleNaN);
+      continue;
+    }
+
+    // Look for the closest track by comparing the TrackClusterSeparation objects
+    const auto closestSeparationIterator = std::min_element(trackClusterSeparations.begin(), trackClusterSeparations.end(),
+    [](const auto & a, const auto & b) {
+      return a.getDistance() < b.getDistance();
+    });
+
+    // We found the closest track, let's set the cluster properties accordingly
+    const auto& closestSeparation = *closestSeparationIterator;
+    klmCluster.setClusterTrackSeparation(closestSeparation.getDistance() / CLHEP::cm);
+    klmCluster.setClusterTrackSeparationAngle(closestSeparation.getTrackClusterSeparationAngle());
+    klmCluster.setClusterTrackRotationAngle(closestSeparation.getTrackRotationAngle());
   }
 }
 

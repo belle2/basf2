@@ -7,7 +7,7 @@
 
 #pragma link C++ class Belle2::SVDCluster+; // checksum=0x860cad2c, version=8
 #pragma link C++ class Belle2::SVDModeByte+; // checksum=0x5ede40e5, version=-1
-#pragma link C++ class Belle2::SVDDAQDiagnostic+; // checksum=0x10c3ffc4, version=5
+#pragma link C++ class Belle2::SVDDAQDiagnostic+; // checksum=0x63b3864c, version=6 
 #pragma link C++ class Belle2::SVDRecoDigit+; // checksum=0x359100bf, version=3
 #pragma link C++ class Belle2::SVDRecoTimeBase+; // checksum=0xf6a86f3e, version=2
 #pragma link C++ class Belle2::SVDShaperDigit+; // checksum=0x855d9163, version=5

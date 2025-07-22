@@ -64,7 +64,7 @@ bvars = vc.reco_stats + \
     vc.deltae_mbc + \
     vc.mc_truth + \
     vc.roe_multiplicities + \
-    ft.flavor_tagging + \
+    ['flavor_tagging'] + \
     vc.tag_vertex + \
     vc.mc_tag_vertex + \
     vertex_vars + \

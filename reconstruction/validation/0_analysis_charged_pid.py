@@ -11,7 +11,7 @@
 """
 <header>
   <input>PartGunChargedStableGenSim.root</input>
-  <output>ChargedPID_Validation.root,Detector_ChargedPID_Validation.root</output>
+  <output>Global_ChargedPID_Validation.root,Detector_ChargedPID_Validation.root</output>
   <contact>Sviatoslav Bilokin (sviatoslav.bilokin@desy.de)</contact>
   <description>
   Check the PID efficiency and fake rates

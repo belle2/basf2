@@ -21,7 +21,8 @@ from prompt.calibrations.caf_klm_strip_efficiency import settings as caf_klm_str
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="BeamSpot Calibrations",
-    expert_username="zlebcr",
+    expert_username="zlebcik",
+    subsystem="beam",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["mumu_tight_or_highm_calib"],
@@ -35,7 +36,8 @@ settings = CalibrationSettings(
         "outerLoss": "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)",
         "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)",
         "minPXDhits": 0},
-    depends_on=[caf_cdc_dedx_electron, caf_cdc_dedx_hadron, caf_svd_dedx, caf_top, caf_klm_strip_efficiency])
+    depends_on=[caf_cdc_dedx_electron, caf_cdc_dedx_hadron, caf_svd_dedx, caf_top, caf_klm_strip_efficiency],
+    produced_payloads=["BeamSpot"])
 
 ##############################
 

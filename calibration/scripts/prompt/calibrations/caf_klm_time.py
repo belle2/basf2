@@ -24,7 +24,8 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name='KLM time',
-                               expert_username='seemac',
+                               expert_username='amubarak',
+                               subsystem='klm',
                                description=__doc__,
                                input_data_formats=['cdst'],
                                input_data_names=['hlt_mumu'],
@@ -33,9 +34,9 @@ settings = CalibrationSettings(name='KLM time',
                                                 INPUT_DATA_FILTERS['Data Tag']['mumu_tight_or_highm_calib'],
                                                 INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
                                },
-                               depends_on=[])
+                               depends_on=[],
+                               produced_payloads=["KLMTimeConstants", "KLMTimeCableDelay", "KLMTimeResolution"])
 
-##############################
 
 ##############################
 # REQUIRED FUNCTION #

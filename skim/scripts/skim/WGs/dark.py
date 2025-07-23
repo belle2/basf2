@@ -1037,8 +1037,11 @@ class BtoK_ALP2Gamma(BaseSkim):
     __category__ = "physics, dark sector"
     ApplyHLTHadronCut = False
 
-    def build_lists(self, path):
+    def load_standard_lists(self, path):
         from stdV0s import stdKshorts
+        stdKshorts(path=path)
+
+    def build_lists(self, path):
 
         kaons = (
             'K+:BtoK_ALP2Gamma',
@@ -1054,10 +1057,13 @@ class BtoK_ALP2Gamma(BaseSkim):
         )
 
         ma.fillParticleLists([kaons, pions, photons], path=path)
-        stdKshorts(path=path)
+        ma.cutAndCopyList(
+            "K_S0:BtoK_ALP2Gamma",
+            "K_S0:merged",
+            path=path)
 
         ma.reconstructDecay(
-            'A0:BtoK_ALP2Gamma -> gamma:BtoK_ALP2Gamma gamma:BtoK_ALP2Gamma',
+            'A0:rec_BtoK_ALP2Gamma -> gamma:BtoK_ALP2Gamma gamma:BtoK_ALP2Gamma',
             cut='[daughter(0,E) > daughter(1,E)]',
             path=path
         )
@@ -1068,28 +1074,28 @@ class BtoK_ALP2Gamma(BaseSkim):
             path=path
         )
         ma.reconstructDecay(
-            'K*+:BtoK_ALP2Gamma -> K_S0:merged pi+:BtoK_ALP2Gamma',
+            'K*+:BtoK_ALP2Gamma -> K_S0:BtoK_ALP2Gamma pi+:BtoK_ALP2Gamma',
             cut='0.8 < M < 1.0',
             path=path
         )
 
         ma.reconstructDecay(
-            'B+:B2K+_ALP2Gamma -> K+:BtoK_ALP2Gamma  A0:BtoK_ALP2Gamma',
+            'B+:B2K+_ALP2Gamma -> K+:BtoK_ALP2Gamma  A0:rec_BtoK_ALP2Gamma',
             cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
             path=path
         )
         ma.reconstructDecay(
-            'B+:B2K_ALP2Gamma  -> K*+:BtoK_ALP2Gamma  A0:BtoK_ALP2Gamma',
+            'B+:B2K_ALP2Gamma  -> K*+:BtoK_ALP2Gamma  A0:rec_BtoK_ALP2Gamma',
             cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
             path=path
         )
         ma.reconstructDecay(
-            'B0:B2KS_ALP2Gamma -> K_S0:merged        A0:BtoK_ALP2Gamma',
+            'B0:B2KS_ALP2Gamma -> K_S0:BtoK_ALP2Gamma   A0:rec_BtoK_ALP2Gamma',
             cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
             path=path
         )
         ma.reconstructDecay(
-            'B0:B2K0_ALP2Gamma -> K*0:BtoK_ALP2Gamma  A0:BtoK_ALP2Gamma',
+            'B0:B2K0_ALP2Gamma -> K*0:BtoK_ALP2Gamma  A0:rec_BtoK_ALP2Gamma',
             cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
             path=path
         )

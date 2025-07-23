@@ -1015,18 +1015,24 @@ class DarkShower(BaseSkim):
 
 
 @fancy_skim_header
-class BtoKa_aTo2Gamma(BaseSkim):
+class BtoK_ALP2Gamma(BaseSkim):
     """
     **Physics channel**: :math:`B \\to K^{(*)}a(\\to \\gamma \\gamma)`
 
-    Skim list contains candidates for the axion-like particles produced in B meson decay with kaon.
+    **Cuts applied:**
+    - Kaons (``BtoK_ALP2Gamma``): ``kaonID > 0.1``, ``dr < 3.0``, ``abs(dz) < 4.0``
+    - Pions (``BtoK_ALP2Gamma``): ``pionID > 0.1``, ``dr < 3.0``, ``abs(dz) < 4.0``
+    - Photons (``BtoK_ALP2Gamma``): ``E > 0.05``
+    - A0 candidate: daughter(0,E) > daughter(1,E)
+    - K*0/K*+: 0.8 < M < 1.0
+    - B candidates: Mbc > 5.20, abs(deltaE) < 1.0
     """
 
     __authors__ = ["Hyuna Kim"]
     __contact__ = __liaison__
     __description__ = (
-        "Dark sector skim list for the ALP 2-photon analysis: "
-        ":math:`B \\to K^{(*)}a(\\to \\gamma \\gamma)`"
+        "Dark-sector skim selecting :math:`B \\to K^{(*)}a(\\to \\gamma \\gamma)` "
+        "candidates by reconstructing A0->gamma gamma, K*->Kpi resonances, and B meson decay chains."
     )
     __category__ = "physics, dark sector"
     ApplyHLTHadronCut = False
@@ -1035,61 +1041,62 @@ class BtoKa_aTo2Gamma(BaseSkim):
         from stdV0s import stdKshorts
 
         kaons = (
-            'K+:mk_ALP2Gamma',
+            'K+:BtoK_ALP2Gamma',
             'kaonID > 0.1 and dr < 3.0 and abs(dz) < 4.0'
         )
         pions = (
-            'pi+:mk_ALP2Gamma',
+            'pi+:BtoK_ALP2Gamma',
             'pionID > 0.1 and dr < 3.0 and abs(dz) < 4.0'
         )
-        gamma = (
-            'gamma:g_ALP2Gamma',
+        photons = (
+            'gamma:BtoK_ALP2Gamma',
             '[E > 0.05]'
         )
 
-        ma.fillParticleLists([kaons, pions, gamma], path=path)
+        ma.fillParticleLists([kaons, pions, photons], path=path)
         stdKshorts(path=path)
 
         ma.reconstructDecay(
-            'A0:rec_ALP2Gamma -> gamma:g_ALP2Gamma gamma:g_ALP2Gamma',
+            'A0:BtoK_ALP2Gamma -> gamma:BtoK_ALP2Gamma gamma:BtoK_ALP2Gamma',
             cut='[daughter(0,E) > daughter(1,E)]',
             path=path
         )
 
         ma.reconstructDecay(
-            'K*0:mk_ALP2Gamma -> K-:mk_ALP2Gamma pi+:mk_ALP2Gamma',
+            'K*0:BtoK_ALP2Gamma -> K-:BtoK_ALP2Gamma pi+:BtoK_ALP2Gamma',
+            cut='0.8 < M < 1.0',
+            path=path
+        )
+        ma.reconstructDecay(
+            'K*+:BtoK_ALP2Gamma -> K_S0:merged pi+:BtoK_ALP2Gamma',
             cut='0.8 < M < 1.0',
             path=path
         )
 
         ma.reconstructDecay(
-            'K*+:mk_ALP2Gamma -> K_S0:merged pi+:mk_ALP2Gamma',
-            cut='0.8 < M < 1.0',
+            'B+:B2K+_ALP2Gamma -> K+:BtoK_ALP2Gamma  A0:BtoK_ALP2Gamma',
+            cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
             path=path
         )
-
         ma.reconstructDecay(
-            'B+:dm1 -> K+:mk_ALP2Gamma A0:rec_ALP2Gamma',
+            'B+:B2K_ALP2Gamma  -> K*+:BtoK_ALP2Gamma  A0:BtoK_ALP2Gamma',
+            cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
+            path=path
+        )
+        ma.reconstructDecay(
+            'B0:B2KS_ALP2Gamma -> K_S0:merged        A0:BtoK_ALP2Gamma',
+            cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
+            path=path
+        )
+        ma.reconstructDecay(
+            'B0:B2K0_ALP2Gamma -> K*0:BtoK_ALP2Gamma  A0:BtoK_ALP2Gamma',
             cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
             path=path
         )
 
-        ma.reconstructDecay(
-            'B+:dm2 -> K*+:mk_ALP2Gamma A0:rec_ALP2Gamma',
-            cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
-            path=path
-        )
-
-        ma.reconstructDecay(
-            'B0:dm1 -> K_S0:merged A0:rec_ALP2Gamma',
-            cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
-            path=path
-        )
-
-        ma.reconstructDecay(
-            'B0:dm2 -> K*0:mk_ALP2Gamma A0:rec_ALP2Gamma',
-            cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
-            path=path
-        )
-
-        return ["B+:dm1", "B+:dm2", "B0:dm1", "B0:dm2"]
+        return [
+            "B+:B2K+_ALP2Gamma",
+            "B+:B2K_ALP2Gamma",
+            "B0:B2KS_ALP2Gamma",
+            "B0:B2K0_ALP2Gamma"
+        ]

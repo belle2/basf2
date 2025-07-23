@@ -19,7 +19,7 @@ using namespace std;
 
 namespace Belle2 {
 
-  REG_MODULE(TRGGDL);
+  REG_MODULE(TRGGDL)
 
   TRGGDL*
   TRGGDLModule::_gdl = 0;

@@ -13,60 +13,60 @@
 #include <array>
 
 namespace Belle2 {
-  // Struct containing the parameters for the clustering
+  /** Struct containing the parameters for the clustering */
   struct ClustererParameters  {
-    // Number of iterations of the cluster searching for each Hough space quadrant
+    /** Number of iterations of the cluster searching for each Hough space quadrant */
     unsigned short iterations;
-    // Number of deleted cells in omega in each direction of the peak
+    /** Number of deleted cells in omega in each direction of the peak */
     unsigned short omegaTrim;
-    // Number of deleted cells in phi in each direction of the peak
+    /** Number of deleted cells in phi in each direction of the peak */
     unsigned short phiTrim;
-    // The Hough space dimensions
+    /** The Hough space dimensions */
     unsigned short nOmega;
     unsigned short nPhi;
     unsigned short nCot;
   };
 
-  // Type for found clusters
+  /** Type for found clusters */
   class SimpleCluster {
   public:
     // Default constructor
     SimpleCluster() = default;
 
-    // Add a track-space cell to the cluster
+    /** Add a track-space cell to the cluster */
     void appendCell(const cell_index& newClusterCell) { m_clusterCells.push_back(newClusterCell); }
-    // Relate a hit to the cluster
+    /** Relate a hit to the cluster */
     void addHitToCluster(unsigned short hit) { m_clusterHits.push_back(hit); }
 
-    // Set the peak index (found as the section peak) of the cluster
+    /** Set the peak index (found as the section peak) of the cluster */
     void setPeakCell(const cell_index& peakCell) { m_clusterPeakCell = peakCell; }
-    // Set the weight of the peak cluster cell
+    /** Set the weight of the peak cluster cell */
     void setPeakWeight(const unsigned int peakWeight) { m_clusterPeakWeight = peakWeight; }
 
-    // Get member cells in the cluster
+    /** Get member cells in the cluster */
     std::vector<cell_index> getCells() const { return m_clusterCells; }
-    // Get the TS hits added to this cluster
+    /** Get the TS hits added to this cluster */
     std::vector<unsigned short> getClusterHits() const { return m_clusterHits; }
-    // Get the peak index (found as the section peak) from the cluster
+    /** Get the peak index (found as the section peak) from the cluster */
     cell_index getPeakCell() const { return m_clusterPeakCell; }
-    // Get the weight of the peak cluster cell
+    /** Get the weight of the peak cluster cell */
     unsigned int getPeakWeight() const { return m_clusterPeakWeight; }
 
   private:
-    // Cluster member cells
+    /** Cluster member cells */
     std::vector<cell_index> m_clusterCells;
-    // Cluster related hits ids
+    /** Cluster related hits ids */
     std::vector<unsigned short> m_clusterHits;
-    // Peak index (found as the section maximum)
+    /** Peak index (found as the section maximum) */
     cell_index m_clusterPeakCell{{0, 0, 0}};
-    // Weight of the peak index
+    /** Weight of the peak index */
     unsigned int m_clusterPeakWeight{0};
   };
 
-  // Clustering module
+  /** Clustering module */
   class Clusterizend {
   public:
-    // Struct containing the deletion bounds of a omega row
+    /** Struct containing the deletion bounds of a omega row */
     struct DeletionBounds {
       c3index phiLowerBound;
       c3index phiUpperBound;
@@ -77,30 +77,30 @@ namespace Belle2 {
     // Default constructor
     Clusterizend() = default;
 
-    // To set custom clustering parameters
+    /** To set custom clustering parameters */
     explicit Clusterizend(const ClustererParameters& parameters): m_clustererParams(parameters) {}
 
-    // Set a new Hough space for clustering and track finding
+    /** Set a new Hough space for clustering and track finding */
     void setNewPlane(c3array& houghSpace) { m_houghSpace = &houghSpace; }
-    // Create all the clusters in the Hough space
+    /** Create all the clusters in the Hough space */
     std::vector<SimpleCluster> makeClusters();
 
   private:
-    // Get the phi bounds of one quadrant section
+    /** Get the phi bounds of one quadrant section */
     std::array<c3index, 2> getSectionBounds(const unsigned short quadrant, const unsigned section);
-    // Iterate m_clustererParams.iterations times over one section
+    /** Iterate m_clustererParams.iterations times over one section */
     void iterateOverSection(const std::array<c3index, 2>& sectionBounds, std::vector<SimpleCluster>& candidateClusters);
-    // Returns the global section peak index and weight
+    /** Returns the global section peak index and weight */
     std::pair<cell_index, unsigned int> getSectionPeak(const std::array<c3index, 2>& sectionBounds);
-    // Creates the surrounding cluster (fixed shape) around the section peak index
+    /** Creates the surrounding cluster (fixed shape) around the section peak index */
     SimpleCluster createCluster(const cell_index& peakCell);
-    // Deletes the surroundings of such a cluster
+    /** Deletes the surroundings of such a cluster */
     void deletePeakSurroundings(const cell_index& peakCell);
-    // Method to delete a omega row for the cluster deletion in deletePeakSurroundings method
+    /** Method to delete a omega row for the cluster deletion in deletePeakSurroundings method */
     void clearHoughSpaceRow(const DeletionBounds& bounds);
-    // The struct holding the cluster parameters
+    /** The struct holding the cluster parameters */
     ClustererParameters m_clustererParams;
-    // Pointer to the Hough space
+    /** Pointer to the Hough space */
     c3array* m_houghSpace{0};
   };
 }

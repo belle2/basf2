@@ -14,25 +14,26 @@
 
 namespace Belle2 {
 
-  // Extra info for analysis of the 3DFinder of the CDC trigger
+  /** Extra info for analysis of the 3DFinder of the CDC trigger */
   class CDCTrigger3DFinderInfo : public RelationsObject {
   public:
     // Default constructor
     CDCTrigger3DFinderInfo() = default;
-    // Constructor with arguments
+    /** Constructor with arguments */
     CDCTrigger3DFinderInfo(std::vector<ROOT::Math::XYZVector> houghSpace,
                            std::vector<ROOT::Math::XYZVector> readoutCluster)
       : m_houghSpace(std::move(houghSpace)), m_readoutCluster(std::move(readoutCluster)) {}
-    // Return the Hough space and/or the cluster readout
+    /** Return the Hough space */
     std::vector<ROOT::Math::XYZVector> getHoughSpace() const { return m_houghSpace; }
+    /** Return the cluster readout */
     std::vector<ROOT::Math::XYZVector> getClusterReadout() const { return m_readoutCluster; }
 
   private:
-    // List of the complete Hough space weights.
+    /** List of the complete Hough space weights. */
     std::vector<ROOT::Math::XYZVector> m_houghSpace = {};
-    // Includes the peak weight, cluster weights, center of gravity and indices.
+    /** Includes the peak weight, cluster weights, center of gravity and indices. */
     std::vector<ROOT::Math::XYZVector> m_readoutCluster = {};
-    // Needed to make the ROOT object storable
+    /** Needed to make the ROOT object storable */
     ClassDef(CDCTrigger3DFinderInfo, 2);
   };
 }

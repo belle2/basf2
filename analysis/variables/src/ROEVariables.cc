@@ -1671,7 +1671,7 @@ namespace Belle2 {
       mode = arguments[0];
 
       if (mode != "standard" and mode != "tight" and mode != "cluster" and mode != "both" and mode != "standardMC15rd"
-          and mode != "tightMC15rd")
+          and mode != "tightMC15rd" and mode != "standardMC16rd" and mode != "tightMC16rd")
         B2ERROR("the given argument is not supported in pi0Prob!");
 
       auto func = [mode](const Particle * particle) -> double {
@@ -1729,6 +1729,24 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return Const::doubleNaN;
           }
+        } else if (mode == "standardMC16rd")
+        {
+          if (particle->hasExtraInfo("Pi0ProbOriginMC16rd")) {
+            return particle->getExtraInfo("Pi0ProbOriginMC16rd");
+          } else {
+            B2WARNING("Pi0ProbOriginMC16rd is not registered in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return Const::doubleNaN;
+          }
+        } else if (mode == "tightMC16rd")
+        {
+          if (particle->hasExtraInfo("Pi0ProbTightEnergyThresholdMC16rd")) {
+            return particle->getExtraInfo("Pi0ProbTightEnergyThresholdMC16rd");
+          } else {
+            B2WARNING("Pi0ProbTightEnergyThresholdMC16rd is not registered in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return Const::doubleNaN;
+          }
         } else
         {
           return Const::doubleNaN;
@@ -1746,7 +1764,7 @@ namespace Belle2 {
       mode = arguments[0];
 
       if (mode != "standard" and mode != "tight" and mode != "cluster" and mode != "both" and mode != "standardMC15rd"
-          and mode != "tightMC15rd")
+          and mode != "tightMC15rd" and mode != "standardMC16rd" and mode != "tightMC16rd")
         B2ERROR("the given argument is not supported in etaProb!");
 
       auto func = [mode](const Particle * particle) -> double {
@@ -1801,6 +1819,24 @@ namespace Belle2 {
             return particle->getExtraInfo("EtaProbTightEnergyThresholdMC15rd");
           } else {
             B2WARNING("EtaProbTightEnergyThresholdMC15rd is not registered in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return Const::doubleNaN;
+          }
+        } else if (mode == "standardMC16rd")
+        {
+          if (particle->hasExtraInfo("EtaProbOriginMC16rd")) {
+            return particle->getExtraInfo("EtaProbOriginMC16rd");
+          } else {
+            B2WARNING("EtaProbOriginMC16rd is not registered in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return Const::doubleNaN;
+          }
+        } else if (mode == "tightMC16rd")
+        {
+          if (particle->hasExtraInfo("EtaProbTightEnergyThresholdMC16rd")) {
+            return particle->getExtraInfo("EtaProbTightEnergyThresholdMC16rd");
+          } else {
+            B2WARNING("EtaProbTightEnergyThresholdMC16rd is not registered in extraInfo! \n"
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return Const::doubleNaN;
           }
@@ -2270,6 +2306,8 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
                       "- ``standardMC15rd``: loose energy cut is applied to soft photon and the weight files are trained using MC15rd \n"
                       "- ``tightMC15rd``: tight energy cut is applied to soft photon and the weight files are trained using MC15rd \n\n"
+                      "- ``standardMC16rd``: loose energy cut is applied to soft photon and the weight files are trained using MC16rd \n"
+                      "- ``tightMC16rd``: tight energy cut is applied to soft photon and the weight files are trained using MC16rd \n\n"
                       "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("etaProb(mode)", etaProb,
@@ -2281,6 +2319,8 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
                       "- ``standardMC15rd``: loose energy cut is applied to soft photon and the weight files are trained using MC15rd \n"
                       "- ``tightMC15rd``: tight energy cut is applied to soft photon and the weight files are trained using MC15rd \n\n"
+                      "- ``standardMC16rd``: loose energy cut is applied to soft photon and the weight files are trained using MC16rd \n"
+                      "- ``tightMC16rd``: tight energy cut is applied to soft photon and the weight files are trained using MC16rd \n\n"
                       "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.", Manager::VariableDataType::c_double);
 
   }

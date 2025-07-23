@@ -1151,10 +1151,20 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
                     trackColName='MDSTTracks')  # , useClosestHitToIP=True, useBFieldAtHit=True)
                 new_path.add_module(
                     "TrackQETrainingDataCollector",
-                    TrainingDataOutputName=self.get_output_file_name(self.get_records_file_name()),
+                    TrainingDataOutputName=self.get_output_file_name(
+                        self.get_records_file_name()),
                     collectEventFeatures=True,
-                    SVDPlusCDCStandaloneRecoTracksStoreArrayName="SVDPlusCDCStandaloneRecoTracks",
-                )
+                    cdcRecoTracksStoreArrayBacktrackChain=[
+                        "CDCRecoTracks",
+                        "SVDPlusCDCStandaloneRecoTracks",
+                        "SVDCDCRecoTracks",
+                        "RecoTracks"],
+                    svdRecoTracksStoreArrayBacktrackChain=[
+                        "SVDRecoTracks",
+                        "SVDPlusCDCStandaloneRecoTracks",
+                        "SVDCDCRecoTracks",
+                        "RecoTracks"],
+                 )
                 module_found = True
         if not module_found:
             raise KeyError(f"No module {track_qe_module_name} found in path")

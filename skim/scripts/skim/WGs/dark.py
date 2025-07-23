@@ -16,6 +16,7 @@ import pdg
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdMu, stdPi, stdK
 from stdPhotons import stdPhotons
+from stdV0s import stdKshorts
 import vertex as vertex
 
 __liaison__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
@@ -1038,7 +1039,7 @@ class BtoK_ALP2Gamma(BaseSkim):
     ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        from stdV0s import stdKshorts
+        # from stdV0s import stdKshorts
         stdKshorts(path=path)
 
     def build_lists(self, path):

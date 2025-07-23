@@ -16,10 +16,8 @@ If the test fails, it's enough to reproduce the logfile and commit it.
 
 import basf2 as b2
 import b2test_utils as b2tu
-from pxd import add_pxd_percentframe
 from softwaretrigger import constants
-from softwaretrigger.processing import add_hlt_processing
-from tracking import add_roi_payload_assembler
+from softwaretrigger.processing import add_hlt_processing, add_hlt_passthrough
 
 
 b2tu.configure_logging_for_tests()
@@ -41,6 +39,5 @@ b2.print_path(path=main_filter, defaults=True)
 # This checks the path used by passthrough
 b2.B2INFO('basf2 path for passthrough:')
 main_pass = b2.Path()
-add_pxd_percentframe(main_pass, fraction=0.1, random_position=True)
-add_roi_payload_assembler(main_pass, ignore_hlt_decision=True)
+add_hlt_passthrough(main_pass)
 b2.print_path(path=main_pass)

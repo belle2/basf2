@@ -74,10 +74,10 @@ namespace Belle2 {
 
   private:
 
-    //** number of layers in Super layer**/
+    /** number of layers in Super layer */
     const static int MAX_N_LAYERS = 8;
 
-    /** Dead channel mapping in each superlayer, layer, ch*/
+    /** Dead channel mapping in each superlayer, layer, ch */
     bool m_deadch[c_nSuperLayers][MAX_N_LAYERS][c_maxNDriftCells];
 
     ClassDef(CDCTriggerDeadch, 1);  /**< ClassDef, must be the last term before the closing {}*/

@@ -713,7 +713,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 
   //make decay string for tau-
   m_tauminusdecaymode = "";
-  for (unsigned iorder = 0; iorder < 46; ++iorder) {
+  for (unsigned iorder = 0; iorder < OrderedList.size(); ++iorder) {
     int ii = OrderedList[iorder];
     //
     for (unsigned int i = 0; i < vec_dau_tauminus.size(); i++) {
@@ -735,7 +735,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 
   //make decay string for tau+
   m_tauplusdecaymode = "";
-  for (unsigned iorder = 0; iorder < 46; ++iorder) {
+  for (unsigned iorder = 0; iorder < OrderedList.size(); ++iorder) {
     int ii = OrderedList[iorder];
     //
     for (unsigned int i = 0; i < vec_dau_tauplus.size(); i++) {

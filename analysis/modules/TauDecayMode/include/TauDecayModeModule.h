@@ -38,7 +38,7 @@ namespace Belle2 {
 
   protected:
 
-    std::string m_printmode; /**< Parameter passed by the user to indicated the informationt to be printed */
+    std::string m_printmode; /**< Parameter passed by the user to indicate the information to be printed */
 
   private:
 

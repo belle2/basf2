@@ -392,7 +392,7 @@ def pre_collector(max_events=None, is_cosmic=False, use_badWires=False):
     return reco_path
 
 
-def collector(bField=True, is_cosmic=False, granularity='all'):
+def collector(is_cosmic=False, granularity='all'):
     """
     Create a cdc calibration collector
     Parameters:
@@ -407,7 +407,6 @@ def collector(bField=True, is_cosmic=False, granularity='all'):
                           granularity=granularity,
                           calExpectedDriftTime=True,
                           eventT0Extraction=True,
-                          bField=bField,
                           isCosmic=is_cosmic
                           )
     return col

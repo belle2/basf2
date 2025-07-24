@@ -33,7 +33,8 @@
 #define BOOST_MULTI_ARRAY_NO_GENERATORS
 
 namespace Belle2 {
-  REG_MODULE(CDCTriggerNeuroData)
+  /// Register the module
+  REG_MODULE(CDCTriggerNeuroData);
 
   CDCTriggerNeuroDataModule::CDCTriggerNeuroDataModule() : Module()
   {

@@ -18,8 +18,8 @@
 using namespace std;
 
 namespace Belle2 {
-
-  REG_MODULE(TRGGDL)
+  /// Register the module
+  REG_MODULE(TRGGDL);
 
   TRGGDL*
   TRGGDLModule::_gdl = 0;

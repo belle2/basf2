@@ -1021,13 +1021,13 @@ namespace Belle2 {
 //  Target Variables ----------------------------------------------------------------------------------------------
 
     // Lists used in target variables
-    static const std::vector<int> charmMesons = {
+    constexpr std::array<int, 18> charmMesons = {
       411 /*D+*/, 413 /*D*+*/, 415/*D_2*+*/, 421 /*D0*/, 423 /*D*0*/, 425/*D_2*0*/, 431/*D_s+*/, 433/*D_s*+*/, 435/*D_s2*+*/,
       10411 /*D_0*+*/, 10413 /*D_1+*/, 10421 /*D_0*0*/, 10423 /*D_10*/, 10431 /*D_s0*+*/, 10433/*D'_s1+*/,
       20413 /*D'_1+*/, 20423 /*D'_10*/, 20433/*D_s1+*/,
     };
 
-    static const std::vector<int> charmBaryons = {
+    constexpr std::array<int, 22> charmBaryons = {
       4112 /*Sigma_c0*/, 4114 /*Sigma_c*0*/, 4122 /*Lambda_c+*/, 4132 /*Xi_c0*/,
       4212 /*Sigma_c+*/, 4214 /*Sigma_c*+*/, 4222 /*Sigma_c++*/, 4224 /*sigma_c*++*/, 4232 /*Xi_c+*/,
       4312 /*Xi'_c0*/, 4314 /*Xi_c*0*/, 4322 /*Xi'_c+*/, 4324 /*Xi_c*+*/, 4332 /*Omega_c0*/, 4334 /*Omega_c*0*/,
@@ -1036,7 +1036,7 @@ namespace Belle2 {
       4444 /*Omega_ccc++ not in evt.pdl*/
     };
 
-    static const std::vector<int> qqbarMesons = {
+    constexpr std::array<int, 80> qqbarMesons = {
       // light qqbar
       111 /*pi0*/, 113 /*rho_0*/, 115 /*a_20*/, 117 /*rho(3)(1690)0*/, 119 /*a_4(1970)0*/,
       10111 /*pi(2S)0*/, 10113 /*b_10*/, 10115 /*pi(2)(1670)0*/,
@@ -1077,7 +1077,7 @@ namespace Belle2 {
       9000445 /*? not in evt.pdl*/,
     };
 
-    static const std::vector<int> flavorConservingMesons = {
+    constexpr std::array<int, 63> flavorConservingMesons = {
       // Excited light mesons that can decay into hadrons conserving flavor
       213 /*rho+*/, 215 /*a_2+*/, 217 /*rho(3)(1690)+*/, 219 /*a_4(1970)+*/,
       10211 /*a(0)(1450)+*/, 10213 /*b_1+*/, 10215 /*pi(2)(1670)+*/,

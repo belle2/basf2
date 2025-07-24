@@ -92,13 +92,13 @@ namespace Belle2 {
     std::string m_file_plus;
 
     /** PDG codes accepted as charged final state particles in generation: {e, mu, pi, K, p} */
-    static constexpr int finalStatePDGs[5] = { 11, 13, 211, 321, 2212 };
+    static constexpr std::array<int, 5> finalStatePDGs = { 11, 13, 211, 321, 2212 };
 
     /** PDG codes of neutrinos in final state particles in generation: {nu_e, nu_mu, mu_tau} */
-    static constexpr int Neutrinos[3] = { 12, 14, 16 };
+    static constexpr std::array<int, 3> Neutrinos = { 12, 14, 16 };
 
     /** PDG codes of ORDERED particles */
-    static constexpr int OrderedList[46] = {
+    static constexpr std::array<int, 46> OrderedList = {
       16, -16, 14, -14, 12, -12, // neutrinos
       11, -11, 13, -13, -211, 211, -321, 321, -2212, 2212, // charged final state particles
       111, 310, 130, 221, 223, 331, 333, //neutral mesons

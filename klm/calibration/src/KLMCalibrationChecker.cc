@@ -81,7 +81,7 @@ void KLMCalibrationChecker::resetDatabase()
 {
   /* Reset both DataStore and Database. */
   DataStore::Instance().reset();
-  Database::Instance().reset(false);
+  Database::Instance().reset(true); // keep the configuration
   DBStore::Instance().reset(false);
 }
 

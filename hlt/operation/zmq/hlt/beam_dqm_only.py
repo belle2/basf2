@@ -17,7 +17,7 @@ args = setup_basf2_and_db(event_distribution_mode=constants.EventDistributionMod
 
 path, reco_path = start_zmq_path(args, location=constants.Location.hlt,
                                  event_distribution_mode=constants.EventDistributionModes.zmq)
-add_hlt_processing(path, run_type=constants.RunTypes.beam, do_reconstruction=False)
+add_hlt_processing(reco_path, run_type=constants.RunTypes.beam, do_reconstruction=False)
 finalize_zmq_path(path, args, location=constants.Location.hlt)
 
 basf2.print_path(path)

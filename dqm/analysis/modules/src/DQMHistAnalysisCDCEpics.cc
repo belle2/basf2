@@ -214,8 +214,16 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_histmd_ladc->SetMinimum(0);
     m_histmd_ladc->SetMaximum(y_max * 1.20);
     m_histmd_ladc->Draw("hist");
-    getSuperLayerLines(sl_lines, y_max);
-    for (TLine* line : sl_lines)line->Draw("same");
+    for (int bin : slindex) {
+      TLine* line = new TLine(bin, 0, bin, y_max * 1.20);
+      if (bin == 14 || bin == 38)line->SetLineColor(kRed);// U-type
+      else if (bin == 26 || bin == 50)line->SetLineColor(kGreen);// V-type
+      else line->SetLineColor(kBlack);// A-type
+      line->SetLineStyle(2);
+      line->SetLineWidth(2);
+      line->SetBit(kCanDelete);
+      line->Draw("same");
+    }
     c_histmd_ladc->Update();
     UpdateCanvas(c_histmd_ladc);
   }
@@ -484,10 +492,6 @@ void DQMHistAnalysisCDCEpicsModule::event()
 //------------------------------------
 void DQMHistAnalysisCDCEpicsModule::endRun()
 {
-  // delete each line to free memory
-  for (TLine* line : sl_lines)delete line;
-  sl_lines.clear();
-
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: end run");
 }
 

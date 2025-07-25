@@ -255,9 +255,9 @@ namespace TreeFitter {
     const int momindex = momIndex();
 
     const double tau = fitparams.getStateVector()(tauindex);
-    Eigen::Matrix < double, 1, -1, 1, 1, 3 > x_vec = fitparams.getStateVector().segment(posindex, dim);
-    Eigen::Matrix < double, 1, -1, 1, 1, 3 > x_m = fitparams.getStateVector().segment(posindexmother, dim);
-    Eigen::Matrix < double, 1, -1, 1, 1, 3 > p_vec = fitparams.getStateVector().segment(momindex, dim);
+    Eigen::VectorXd x_vec = fitparams.getStateVector().segment(posindex, dim);
+    Eigen::VectorXd x_m   = fitparams.getStateVector().segment(posindexmother, dim);
+    Eigen::VectorXd p_vec = fitparams.getStateVector().segment(momindex, dim);
     const double mom = p_vec.norm();
     const double mom3 = mom * mom * mom;
 
@@ -291,19 +291,17 @@ namespace TreeFitter {
       B2FATAL("Dimension of Geometric constraint is not 2 or 3. This will crash many things. You should feel bad.");
     }
 
+    // --- Fill residuals and remaining Jacobian entries ---
+    /** the direction of the momentum is very well known from the kinematic constraints
+     *  that is why we do not extract the distance as a vector here
+     */
+    Eigen::VectorXd residuals = x_m + tau * p_vec / mom - x_vec;
+    p.getResiduals().segment(0, dim) = residuals;
+
     for (int row = 0; row < dim; ++row) {
-
-      double posxmother = x_m(row);
-      double posx       = x_vec(row);
-      double momx       = p_vec(row);
-
-      /** the direction of the momentum is very well known from the kinematic constraints
-       *  that is why we do not extract the distance as a vector here
-       * */
-      p.getResiduals()(row) = posxmother + tau * momx / mom - posx ;
       p.getH()(row, posindexmother + row) = 1;
       p.getH()(row, posindex + row) = -1;
-      p.getH()(row, tauindex) = momx / mom;
+      p.getH()(row, tauindex) = p_vec(row) / mom;
     }
 
     return ErrCode(ErrCode::Status::success);
@@ -353,26 +351,21 @@ namespace TreeFitter {
     for (const auto* daughter : m_daughters) {
       //dr/dx = d/dx m2-{E1+E2+...}^2+{p1+p2+...}^2 = 2*x (x= E or p)
       const int momindex = daughter->momIndex();
-      p.getH()(0, momindex)     = 2.0 * px;
-      p.getH()(0, momindex + 1) = 2.0 * py;
-      p.getH()(0, momindex + 2) = 2.0 * pz;
+      Eigen::Vector3d mom(px, py, pz);
+      p.getH().block<1, 3>(0, momindex) = 2.0 * mom;
 
       if (daughter->hasEnergy()) {
         p.getH()(0, momindex + 3) = -2.0 * E;
       } else {
-        const double px_daughter = fitparams.getStateVector()(momindex);
-        const double py_daughter = fitparams.getStateVector()(momindex + 1);
-        const double pz_daughter = fitparams.getStateVector()(momindex + 2);
+        Eigen::Vector3d mom_daughter = fitparams.getStateVector().segment<3>(momindex);
         double m = 0;
         if (daughter->particle()->hasExtraInfo("treeFitterMassConstraintValue")) {
           m = daughter->particle()->getExtraInfo("treeFitterMassConstraintValue");
         } else m = daughter->particle()->getPDGMass();
 
-        const double E_daughter = std::sqrt(m * m + px_daughter * px_daughter + py_daughter * py_daughter + pz_daughter * pz_daughter);
+        const double E_daughter = std::sqrt(m * m + mom_daughter.squaredNorm());
         const double E_by_E_daughter = E / E_daughter;
-        p.getH()(0, momindex)     -= 2.0 * E_by_E_daughter * px_daughter;
-        p.getH()(0, momindex + 1) -= 2.0 * E_by_E_daughter * py_daughter;
-        p.getH()(0, momindex + 2) -= 2.0 * E_by_E_daughter * pz_daughter;
+        p.getH().block<1, 3>(0, momindex) -= 2.0 * E_by_E_daughter * mom_daughter;
       }
 
     }
@@ -387,19 +380,16 @@ namespace TreeFitter {
     else mass = particle()->getPDGMass();
     const double mass2 = mass * mass;
     const int momindex = momIndex();
-    const double px = fitparams.getStateVector()(momindex);
-    const double py = fitparams.getStateVector()(momindex + 1);
-    const double pz = fitparams.getStateVector()(momindex + 2);
-    const double E  = fitparams.getStateVector()(momindex + 3);
+    Eigen::Vector4d state = fitparams.getStateVector().segment<4>(momindex);
+    Eigen::Vector3d p3 = state.head<3>();
+    const double E = state(3);
 
     /** be aware that the signs here are important
      * E-|p|-m extracts a negative mass and messes with the momentum !
      * */
-    p.getResiduals()(0) = mass2 - E * E + px * px + py * py + pz * pz;
+    p.getResiduals()(0) = mass2 - E * E + p3.squaredNorm();
 
-    p.getH()(0, momindex)     = 2.0 * px;
-    p.getH()(0, momindex + 1) = 2.0 * py;
-    p.getH()(0, momindex + 2) = 2.0 * pz;
+    p.getH().block<1, 3>(0, momindex) = 2.0 * p3;
     p.getH()(0, momindex + 3) = -2.0 * E;
 
     // TODO 0 in most cases -> needs special treatment if width=0 to not crash chi2 calculation

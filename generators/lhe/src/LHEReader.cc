@@ -31,7 +31,6 @@ void LHEReader::open(const string& filename)
   if (!m_input) throw(LHECouldNotOpenFileError() << filename);
 }
 
-
 int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 {
   int nparticles = readEventHeader(eventWeight);
@@ -91,7 +90,6 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
       }
     }
 
-
     // initial 2 (e+/e-), virtual 3 (Z/gamma*)
     // check if particle should be made virtual according to steering options:
     if (i < m_indexVirtual && i >= m_indexInitial)
@@ -121,7 +119,6 @@ bool LHEReader::skipEvents(int n)
   return true;
 }
 
-
 //===================================================================
 //                  Protected methods
 //===================================================================
@@ -143,8 +140,6 @@ std::string LHEReader::getLine()
   return line;
 }
 
-
-// int LHEReader::readEventHeader(int& eventID, double& eventWeight)
 int LHEReader::readEventHeader(double& eventWeight)
 {
 
@@ -182,15 +177,15 @@ int LHEReader::readEventHeader(double& eventWeight)
     }
   }
 
-  switch (fields.size()) {
-    default:
-      eventWeight = 1.0;
-      nparticles = static_cast<int>(fields[0]); //other fields in LHE contain effective couplings
-      break;
+  if (fields.size() < 3) {
+    nparticles = static_cast<int>(fields[0]);
+    eventWeight = 1.0;
+  } else {
+    nparticles = static_cast<int>(fields[0]);
+    eventWeight = static_cast<double>(fields[2]);
   }
   return nparticles;
 }
-
 
 int LHEReader::readParticle(MCParticleGraph::GraphParticle& particle)
 {

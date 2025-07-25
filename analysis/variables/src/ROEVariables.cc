@@ -2305,7 +2305,7 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "- ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
                       "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
                       "- ``standardMC15rd``: loose energy cut is applied to soft photon and the weight files are trained using MC15rd \n"
-                      "- ``tightMC15rd``: tight energy cut is applied to soft photon and the weight files are trained using MC15rd \n\n"
+                      "- ``tightMC15rd``: tight energy cut is applied to soft photon and the weight files are trained using MC15rd \n"
                       "- ``standardMC16rd``: loose energy cut is applied to soft photon and the weight files are trained using MC16rd \n"
                       "- ``tightMC16rd``: tight energy cut is applied to soft photon and the weight files are trained using MC16rd \n\n"
                       "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.", Manager::VariableDataType::c_double);
@@ -2318,7 +2318,7 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "- ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
                       "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
                       "- ``standardMC15rd``: loose energy cut is applied to soft photon and the weight files are trained using MC15rd \n"
-                      "- ``tightMC15rd``: tight energy cut is applied to soft photon and the weight files are trained using MC15rd \n\n"
+                      "- ``tightMC15rd``: tight energy cut is applied to soft photon and the weight files are trained using MC15rd \n"
                       "- ``standardMC16rd``: loose energy cut is applied to soft photon and the weight files are trained using MC16rd \n"
                       "- ``tightMC16rd``: tight energy cut is applied to soft photon and the weight files are trained using MC16rd \n\n"
                       "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.", Manager::VariableDataType::c_double);

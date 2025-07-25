@@ -3276,8 +3276,8 @@ def writePi0EtaVeto(
                                     (default is None)
     @param requireSoftPhotonIsInROE specify if the soft photons used to build pi0 and eta candidates have to be in the current ROE
                                     or not. Default is False, i.e. all soft photons in the event are used.
-    @param pi0Selection     Selection for the pi0 reconstruction. Default is '(0.03 < M < 0.23)'.
-    @param etaSelection     Selection for the eta reconstruction. Default is '(0.25 < M < 0.75)'.
+    @param pi0Selection     Selection for the pi0 reconstruction. Default is "".
+    @param etaSelection     Selection for the eta reconstruction. Default is "".
     """
 
     import b2bii

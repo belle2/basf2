@@ -191,9 +191,7 @@ namespace TreeFitter {
     int posindex = posIndex();
     if (hasPosition() &&
         mother() &&
-        fitparams.getStateVector()(posindex) == 0 &&
-        fitparams.getStateVector()(posindex + 1) == 0 && \
-        fitparams.getStateVector()(posindex + 2) == 0) {
+        fitparams.getStateVector().segment<3>(posindex).isZero()) {
       const int posindexmom = mother()->posIndex();
       const int dim = m_config->m_originDimension; //TODO access mother?
       fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmom, dim);

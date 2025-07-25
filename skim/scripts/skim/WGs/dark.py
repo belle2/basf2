@@ -1053,7 +1053,7 @@ class BtoK_ALP2Gamma(BaseSkim):
             'pionID > 0.1 and dr < 3.0 and abs(dz) < 4.0'
         )
         photons = (
-            'gamma:BtoK_ALP2Gamma',
+            'gamma:g_BtoK_ALP2Gamma',
             '[E > 0.05]'
         )
 
@@ -1061,10 +1061,11 @@ class BtoK_ALP2Gamma(BaseSkim):
         ma.cutAndCopyList(
             "K_S0:BtoK_ALP2Gamma",
             "K_S0:merged",
+            cut='',
             path=path)
 
         ma.reconstructDecay(
-            'A0:rec_BtoK_ALP2Gamma -> gamma:BtoK_ALP2Gamma gamma:BtoK_ALP2Gamma',
+            'A0:rec_BtoK_ALP2Gamma -> gamma:g_BtoK_ALP2Gamma gamma:g_BtoK_ALP2Gamma',
             cut='[daughter(0,E) > daughter(1,E)]',
             path=path
         )

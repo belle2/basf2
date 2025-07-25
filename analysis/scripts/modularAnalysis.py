@@ -3287,9 +3287,17 @@ def writePi0EtaVeto(
     if (requireSoftPhotonIsInROE):
         B2WARNING("Requiring the soft photon to being in the ROE was not done for the MVA training. "
                   "Please check the results carefully.")
-    if (pi0Selection != '' or etaSelection != ''):
+    showWarning = False
+
+    if (mode == 'standardMC15rd' or mode == 'tightMC15rd'):
+        if (pi0Selection != '[0.03 < M < 0.23]' or etaSelection != '[0.25 < M < 0.75]'):
+            showWarning = True
+    else:
+        if (pi0Selection != '' or etaSelection != ''):
+            showWarning = True
+    if showWarning:
         B2WARNING(
-            "Personal selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
+            "Selection criteria for the pi0 or the eta during reconstructDecay differ from those used during the MVA training. "
             "You may get NAN value. Please check the results carefully.")
 
     renameSuffix = False

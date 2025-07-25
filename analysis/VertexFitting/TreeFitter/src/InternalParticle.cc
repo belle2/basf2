@@ -157,12 +157,10 @@ namespace TreeFitter {
           Belle2::Helix helix2 = dau2->particle()->getTrackFitResult()->getHelix();
 
           double flt1(0), flt2(0);
-          ROOT::Math::XYZVector v;
+          Eigen::Vector3d v;
           HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
 
-          fitparams.getStateVector()(posindex)     = v.X();
-          fitparams.getStateVector()(posindex + 1) = v.Y();
-          fitparams.getStateVector()(posindex + 2) = v.Z();
+          fitparams.getStateVector().segment<3>(posindex) = v;
 
           dau1->setFlightLength(flt1);
           dau2->setFlightLength(flt2);

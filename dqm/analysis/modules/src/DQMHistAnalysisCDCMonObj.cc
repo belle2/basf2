@@ -203,9 +203,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 {
   B2DEBUG(20, "end run");
 
-  m_hADC = (TH2F*)findHist(Form("%s/%s", m_name_dir.c_str(), m_hname_badc.c_str()));
-  m_hTDC = (TH2F*)findHist(Form("%s/%s", m_name_dir.c_str(), m_hname_btdc.c_str()));
-  m_hHit = (TH2F*)findHist(Form("%s/%s", m_name_dir.c_str(), m_hname_hits.c_str()));
+  m_hADC = (TH2F*)findHist(m_name_dir + "/" + m_hname_badc);
+  m_hTDC = (TH2F*)findHist(m_name_dir + "/" + m_hname_btdc);
+  m_hHit = (TH2F*)findHist(m_name_dir + "/" + m_hname_hits);
 
   if (m_hADC == nullptr) {
     m_monObj->setVariable("comment", "No ADC histograms of CDC in file");

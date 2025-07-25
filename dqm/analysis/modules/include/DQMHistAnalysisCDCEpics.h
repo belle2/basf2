@@ -98,25 +98,6 @@ namespace Belle2 {
      */
     void fillEffiTH2(TH2F* hist, TH2F* attached, TH2F* expected, TH2F* efficiency) ;
 
-    /**
-     * Create vertical lines for Super lines
-     */
-    std::vector<TLine*> getSuperLayerLines(std::vector<TLine*>& vec_lines, double y_max)
-    {
-      std::vector<int> slindex = {8, 14, 20, 26, 32, 38, 44, 50, 56};
-      for (int bin : slindex) {
-        TLine* line = new TLine(bin, 0, bin, y_max * 1.20);
-        if (bin == 14 || bin == 38)line->SetLineColor(kRed);// U-type
-        else if (bin == 26 || bin == 50)line->SetLineColor(kGreen);// V-type
-        else line->SetLineColor(kBlack);// A-type
-        line->SetLineStyle(2);
-        line->SetLineWidth(2);
-        line->SetBit(kCanDelete);
-        vec_lines.push_back(line);
-      }
-      return vec_lines;
-    }
-
   protected:
 
     //Canvas for DQM analysis IR plots
@@ -181,7 +162,7 @@ namespace Belle2 {
     double m_phialarm;/**< alram thershold for phi differences */
     double m_phiwarn;/**< warn thershold for phi differences */
 
-    std::vector<TLine*> sl_lines; /**< lines for superlayers */
+    std::vector<int> slindex = {8, 14, 20, 26, 32, 38, 44, 50, 56}; /**< CDC SL numbers */
 
     TH1D* m_hists_lADC[56]; /**< ADC histograms with track associated hits for each board (0-299) */
     TH1D* m_hists_bADC[300]; /**< ADC histograms with track associated hits for each board (0-299) */

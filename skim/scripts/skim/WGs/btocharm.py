@@ -280,7 +280,7 @@ class B0toDpi_KpipiLooseDelE(BaseSkim):
 
     Note:
         This skim uses `skim.standardlists.charm.loadStdDplus_Kpipi`, where :math:`D^-`
-        channel is defined.
+        channel is defined. It is exactly as B0toDpi_Kpipi with a wider deltaEcut abs(deltaE) < 0.45
     """
 
     __authors__ = ["Sourav Dey"]

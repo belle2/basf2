@@ -83,6 +83,7 @@ namespace Belle2 {
       m_cdcHitsMax = NcdcHitsMax;
       m_eclDigitsMax = NeclDigitsMax;
       m_HLTprefilterMode = HLTprefilterMode;
+      m_HLTprefilterPrescale = HLTprefilterPrescale;
     }
 
     /**
@@ -297,7 +298,7 @@ namespace Belle2 {
     * Get the prescale for HLTprefilter result
     * @param[in] HLTprefilterPrescale.
     */
-    uint32_t getHLTprefilterPrescale() const
+    unsigned int getHLTprefilterPrescale() const
     {
       return m_HLTprefilterPrescale;
     }

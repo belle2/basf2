@@ -15,7 +15,7 @@ from ROOT.Belle2 import HLTprefilterParameters, Database, IntervalOfValidity
 
 parameters = HLTprefilterParameters()
 
-parameters.setLERtimeSinceLastInjectionMin(5000)
+parameters.setLERtimeSinceLastInjectionMin(1000)
 parameters.setLERtimeSinceLastInjectionMax(20000)
 parameters.setHERtimeSinceLastInjectionMin(600)
 parameters.setHERtimeSinceLastInjectionMax(20000)
@@ -28,6 +28,8 @@ parameters.setECLDigitsMax(3000)
 parameters.setCDCHitsMax(2500)
 
 parameters.setHLTprefilterMode(0)
+
+parameters.setHLTprefilterPrescale(1000)
 
 database = Database.Instance()
 

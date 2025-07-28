@@ -41,10 +41,7 @@ namespace Belle2 {
     std::string m_particleListName;  /**< Name of the ParticleList */
     std::string m_ROEMask;  /**< ROE mask */
 
-    /** print an event for debugging purposes */
-    void printEvent();
-    /** print a particle for debugging purposes */
-    void printParticle(const Particle* particle);
+    /** calculate continuum suppression quantities */
+    void addContinuumSuppression(const Particle* particle);
   };
 }
-

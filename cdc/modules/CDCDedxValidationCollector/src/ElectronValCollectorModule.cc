@@ -8,6 +8,15 @@
 
 #include <cdc/modules/CDCDedxValidationCollector/ElectronValCollectorModule.h>
 
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <framework/dataobjects/EventMetaData.h>
+
+#include <TTree.h>
+#include <TH1D.h>
+#include <TH1I.h>
+#include <TMath.h>
+
 using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module

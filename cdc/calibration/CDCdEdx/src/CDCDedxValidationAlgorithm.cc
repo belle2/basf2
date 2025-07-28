@@ -7,6 +7,25 @@
  **************************************************************************/
 
 #include <cdc/calibration/CDCdEdx/CDCDedxValidationAlgorithm.h>
+#include <cdc/calibration/CDCdEdx/CDCDedxWireGainAlgorithm.h>
+
+#include <cdc/dbobjects/CDCDedxWireGain.h>
+#include <cdc/dbobjects/CDCDedxCosineCor.h>
+#include <cdc/dbobjects/CDCDedx1DCell.h>
+#include <cdc/dbobjects/CDCDedxRunGain.h>
+#include <cdc/dbobjects/CDCDedxBadWires.h>
+#include <framework/database/IntervalOfValidity.h>
+
+#include <framework/database/Database.h>
+#include <framework/database/DBStore.h>
+#include <framework/database/Configuration.h>
+
+#include <cmath>
+#include <TTree.h>
+#include <TMap.h>
+#include <TLegend.h>
+#include <TF1.h>
+
 
 using namespace Belle2;
 using namespace CDC;

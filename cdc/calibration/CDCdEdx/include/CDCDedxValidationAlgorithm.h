@@ -10,35 +10,18 @@
 
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
 
 #include <cdc/dbobjects/CDCGeometry.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeometryParConstants.h>
 
-#include <cdc/calibration/CDCdEdx/CDCDedxWireGainAlgorithm.h>
-
-#include <cdc/dbobjects/CDCDedxWireGain.h>
-#include <cdc/dbobjects/CDCDedxCosineCor.h>
-#include <cdc/dbobjects/CDCDedx1DCell.h>
-#include <cdc/dbobjects/CDCDedxRunGain.h>
-#include <cdc/dbobjects/CDCDedxBadWires.h>
-
-#include <framework/database/Database.h>
-#include <framework/database/DBStore.h>
-#include <framework/database/Configuration.h>
-
-#include <fstream>
 #include <vector>
 #include <string>
-#include <cmath>
-#include <TTree.h>
-#include <TMap.h>
+
 #include <TPaveText.h>
-#include <TF1.h>
 #include <TH1D.h>
 #include <TCanvas.h>
-#include <TLegend.h>
+
 
 /**
  * @brief Container for wire gain data

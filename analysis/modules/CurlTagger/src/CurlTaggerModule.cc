@@ -149,7 +149,7 @@ void CurlTaggerModule::event()
         if (bundlesResponse.size() > 0) {
           auto maxElement = std::max_element(bundlesResponse.begin(), bundlesResponse.end());
           if (*maxElement > m_ResponseCut) {
-            int maxPosition = std::distance(std::begin(bundlesResponse), maxElement);
+            int maxPosition = std::distance(bundlesResponse.begin(), maxElement);
             bundles[maxPosition].addParticle(iPart);
             addedParticleToBundle = true;
           }

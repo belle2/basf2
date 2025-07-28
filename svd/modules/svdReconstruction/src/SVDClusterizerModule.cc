@@ -357,7 +357,7 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   //--------------
   double time = std::numeric_limits<double>::quiet_NaN();
   double timeError = std::numeric_limits<double>::quiet_NaN();
-  int firstFrame = std::numeric_limits<int>::quiet_NaN();
+  int firstFrame = 0;
 
   double charge = std::numeric_limits<double>::quiet_NaN();
   double seedCharge = std::numeric_limits<float>::quiet_NaN();

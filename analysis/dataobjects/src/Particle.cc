@@ -1491,10 +1491,10 @@ std::pair<Const::ChargedStable, const TrackFitResult*> Particle::getMostLikelyTr
 
   // Find the track fit with the highest pValue
   auto trackFitResults = track->getTrackFitResults();
-  auto it_maxPValue = std::max_element(std::begin(trackFitResults), std::end(trackFitResults),
+  auto it_maxPValue = std::max_element(trackFitResults.begin(), trackFitResults.end(),
   [](auto tfrAndM1, auto tfrAndM2) {return tfrAndM1.second->getPValue() < tfrAndM2.second->getPValue();});
 
-  return trackFitResults[std::distance(std::begin(trackFitResults), it_maxPValue)];
+  return trackFitResults[std::distance(trackFitResults.begin(), it_maxPValue)];
 
 }
 

@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 #include <tracking/ckf/cdc/filters/paths/CDCPathFilterFactory.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>

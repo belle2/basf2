@@ -152,7 +152,7 @@ Code structure
 
 In my opinion the best way to use and learn about the FEI is to read the code itself. I wrote an extensive documentation. Hence I describe here the code structure. If you don't want to read code, you can just skip this part.
 
-The FEI is completely written in Python and does only use general purpose basf2 modules. You can find the code under: ``analysis/scripts/fei/``
+The FEI is completely written in Python and does only use general purpose ``basf2`` modules. You can find the code under: ``analysis/scripts/fei/``
 
 config.py
 *********
@@ -229,7 +229,7 @@ Most stages consists of:
 *    Apply a multivariate classification method
 *    Apply more Cuts
 
- The FEI will reconstruct these 7 stages during the training phase, since the stages depend on one another, you have to run basf2 multiple (7) times on the same data to train all the necessary multivariate classifiers.
+ The FEI will reconstruct these 7 stages during the training phase, since the stages depend on one another, you have to run ``basf2`` multiple (7) times on the same data to train all the necessary multivariate classifiers.
 
 Since running a 7-phase training by hand would be very difficult there is a tool which implements the training (including distributing the jobs on a cluster, merging the training files, running the training, ...)
 
@@ -278,7 +278,7 @@ A typical training of the generic FEI will take about a week on the new KEKCC cl
 distributed.py
 **************
 
-This script can be used to train the FEI on a cluster like available at KEKCC. All you need is a basf2 steering file (see ``analysis/examples/FEI/`` ) and some MC O(100) million
+This script can be used to train the FEI on a cluster like available at KEKCC. All you need is a ``basf2`` steering file (see ``analysis/examples/FEI/`` ) and some MC O(100) million
 
 The script will automatically create some directories collection containing weightfiles, monitoring files and other stuff jobs containing temporary files during the training (can be deleted afterwards)
 
@@ -325,7 +325,7 @@ In general a FEI training steering file consists of
 
 * a decay channel configuration usually you can just use the default configuration in fei.get_default_channels. This configuration defines all the channels which should be reconstructed, the cuts, and the mva methods. You can write your own configuration, just take a look in ``analysis/scripts/fei/default_channels.py``
 * a FeiConfiguration object, this defines the database prefix for the weightfiles and some other things which influence the training (e.g. if you want to run with the monitoring)
-* a feistate object, which contains the basf2 path for the current stage, you get this with the get_path function
+* a feistate object, which contains the `basf2.Path` for the current stage, you get this with the get_path function
 
 The user is responsible for writing the input and output part of the steering file. Depending on the training mode (generic / specific) this part is different for each training (see below for examples).
 The FEI algorithm itself just assumes that the DataStore already contains a valid reconstructed event, and starts to reconstruct B mesons. During the training the steering file is executed multiple times. The first time it is called with the Monte Carlo files you provided, and the complete DataStore is written out at the end. The following calls must receive the previous output as input.
@@ -415,7 +415,7 @@ General Workflow Concept
 
 The :doc:`b2luigi:index` workflow of running FEI on the grid is constructed from 4 building blocks contained in `fei_grid_workflow.py`_:
 
-* ``FEIAnalysisTask`` and ``FEIAnalysisSummaryTask``: these tasks are performed to produce FEI training inputs based on ``mdst`` samples. They are used to run a `basf2` steering file for FEI on the grid using :doc:`gbasf2:index` as grid submission tool. In one instance of ``FEIAnalysisSummaryTask``, several instances of ``FEIAnalysisTask`` are created, based on the provided dataset list. This allows to run this step on an unlimited number of input files.
+* ``FEIAnalysisTask`` and ``FEIAnalysisSummaryTask``: these tasks are performed to produce FEI training inputs based on ``mdst`` samples. They are used to run a ``basf2`` steering file for FEI on the grid using :doc:`gbasf2:index` as grid submission tool. In one instance of ``FEIAnalysisSummaryTask``, several instances of ``FEIAnalysisTask`` are created, based on the provided dataset list. This allows to run this step on an unlimited number of input files.
 * ``MergeOutputsTask``: After all outputs produced by ``FEIAnalysisSummaryTask`` are downloaded, they need to be merged into a single file to be able to run the MVA training on it.
 * ``FEITrainingTask``: Performs the MVA training on merged outputs produced by ``MergeOutputsTask``.
 * ``PrepareInputsTask``: After a certain stage of MVA training is performed, all ingredients to produce FEI training inputs for the next stage require an upload to the grid storage elements. This is accomplished by this task, such that the ``FEIAnalysisSummaryTask`` can be run for the next stage based on these uploaded ingredients.
@@ -462,7 +462,7 @@ The :doc:`b2luigi:index` configuration of the FEI grid workflow is handled by th
 * ``gbasf2_release``: The release to be used on the grid. Please make a choice here depending on what is supported by the :doc:`gbasf2:index` release you have checked out. You don't have to worry about the case, that the developments in `basf2` specific to running FEI training on the grid might not be contained in the official release. The FEI training steering file is adapted such, that it can run both with a development and an official release.
 * ``gbasf2_print_status_updates``: Convenient option to monitor the progress of running :doc:`gbasf2:index` tasks submitted by the FEI grid workflow, so it is good to set it to ``true``. As an alternative, the progress can also be monitored with the **Job Monitor** application of `Belle II DIRAC`_.
 * ``gbasf2_noscout``: Option to disable scouting, which would slow down the progress, so it is set to ``true``. Feel free to activate it for testing purposes.
-* ``gbasf2_basf2opt``: To reduce the amount of print output of the :doc:`gbasf2:index` jobs, this option should be set to ``"-l ERROR"``, which is then passed to the `basf2` steering file. Having too many print outputs may cause problems on the grid worker nodes.
+* ``gbasf2_basf2opt``: To reduce the amount of print output of the :doc:`gbasf2:index` jobs, this option should be set to ``"-l ERROR"``, which is then passed to the ``basf2`` steering file. Having too many print outputs may cause problems on the grid worker nodes.
 * ``gbasf2_max_retries``: An option that handles how often a job is allowed to be resubmitted, before its :doc:`gbasf2:index` task is marked as failed in the :doc:`b2luigi:index` workflow. Since it is well possible that individual jobs fail due to connection issues or temporarily bad sites, it is good to set that option to a relatively high number, e.g. 5 or even 10. Of course, you are advised to have a look at log files of failed jobs in any case, e.g. by using `Belle II DIRAC`_ for that.
 * ``gbasf2_download_logs``: To reduce the overall time of the FEI grid workflow, this option should be disabled by setting it to ``false``. You can have a look at specific job logs by using `Belle II DIRAC`_.
 * ``remote_tmp_directory``: This option is used by the ``PrepareInputsTask`` to upload tarballs of input files required by ``FEIAnalysisTask`` running on the grid. The directory specified in this option serves as a main directory, where several subdirectories will be created by the uploads performed by ``PrepareInputsTask``. To be able to access your temporary user folders on remote storage elements, the directory name should contain ``/belle/user/<your-grid-username>``.
@@ -474,9 +474,9 @@ The :doc:`b2luigi:index` configuration of the FEI grid workflow is handled by th
 B_generic_train.py
 ------------------
 
-In contrast to the original steering file from ``analysis/examples/FEI/B_generic_train.py``, it is adapted to run both locally on your machine in the development setup of `basf2`, as well as to run on remote resources using an official `basf2` release and a pickled path created from the steering file. To achieve this, two steps are performed:
+In contrast to the original steering file from ``analysis/examples/FEI/B_generic_train.py``, it is adapted to run both locally on your machine in the development setup of ``basf2``, as well as to run on remote resources using an official ``basf2`` release and a pickled path created from the steering file. To achieve this, two steps are performed:
 
-* The path creation is summarized in a corresponding function ``def create_fei_path(filelist=[], cache=0, monitor=False, verbose=False):``, which returns a `basf2` path. This function is then used within the :doc:`b2luigi:index` setup to create a corresponding fixed and pickled `basf2` path.
+* The path creation is summarized in a corresponding function ``def create_fei_path(filelist=[], cache=0, monitor=False, verbose=False):``, which returns a `basf2.Path`. This function is then used within the :doc:`b2luigi:index` setup to create a corresponding fixed and pickled `basf2.Path`.
 * The adaptions of histogram and n-tuple outputs needed for FEI training are reduced to a small set of files to avoid long lasting downloads of a large set of small files. In case these adaptions are not in an official release yet, which is supported by :doc:`gbasf2:index`, these need to be done by hand. This is accomplished within the ``for``-loops ``for m in path.modules():``.
 
 .. _fei-ana:
@@ -513,7 +513,7 @@ To spawn several instances of ``FEIAnalysisTask`` at a certain stage, the follow
 * Time stamp of inputs listed above, which were successfully uploaded to TMP-SE as a tarball by ``PrepareInputsTask`` of the previous stage.
 
 During the sequential execution of all required instances of ``FEIAnalysisTask``, symlinks are created for all input files (``mcParticlesCount.root`` and ``*.xml``, where applicable)
-to the current directory to correctly configure the `basf2` path. The path is then pickled by :doc:`b2luigi:index` and send out to the grid with :doc:`gbasf2:index` with an appropriate configuration of the grid
+to the current directory to correctly configure the `basf2.Path`. The path is then pickled by :doc:`b2luigi:index` and send out to the grid with :doc:`gbasf2:index` with an appropriate configuration of the grid
 path to the inputs tarball. The jobs are then monitored with corresponding :doc:`gbasf2:index` tools and are resubmitted, if necessary. As soon as all jobs of an instance of ``FEIAnalysisTask``
 are successfully completed, the job outputs required for further processing are downloaded.
 
@@ -531,7 +531,7 @@ This is a huge problem because of the fact, that individual jobs may fail for se
 a task submitted with :doc:`gbasf2:index` to the grid may be delayed significantly by potentially only a few restarted jobs, which have to be run again for a long time.
 
 A possible way out of this problem would be to split the processing per job by the number of events to be processed, and not by the number of files. This is not (yet) supported
-by :doc:`gbasf2:index`, but may be accomplished by passing ``-n`` and ``--skip-events`` options to `basf2` via ``gbasf2_basf2opt``
+by :doc:`gbasf2:index`, but may be accomplished by passing ``-n`` and ``--skip-events`` options to ``basf2`` via ``gbasf2_basf2opt``
 of :doc:`b2luigi:index`. In that case, a :doc:`gbasf2:index` task would need to be started for a single file only.
 
 To realize this within the workflow constructed in `fei_grid_workflow.py`_, the modules ``FEIAnalysisTask``
@@ -572,11 +572,11 @@ therefore this is only done once.
 
 After the database ``files_database.json`` is created, the maximum number of events stored in the files is determined per dataset corresponding to a single line in the original dataset list.
 Based on these numbers, and the value of ``n_events`` in the ``processing_type`` dictionary for a considered stage, the number of instances of ``FEIAnalysisTask`` to be spawned is computed
-for each single dataset. Furthermore, the corresponding `basf2` option values for ``-n`` and ``--skip-events``, and
+for each single dataset. Furthermore, the corresponding ``basf2`` option values for ``-n`` and ``--skip-events``, and
 a partial dataset list are constructed and then passed to the corresponding ``FEIAnalysisTask`` instance, which is extended with further properties ``process_events`` and ``skip_events`` to pass
-them to `basf2`.
+them to ``basf2``.
 
-The options ``-n`` and ``--skip-events`` of `basf2` take care automatically of cases, when the number of remaining events to be processed from a file is smaller than configured by ``-n`` or
+The options ``-n`` and ``--skip-events`` of ``basf2`` take care automatically of cases, when the number of remaining events to be processed from a file is smaller than configured by ``-n`` or
 the option ``--skip-events`` exceeds the maximum number of events in a file. In consequence, all files processed in an event-based manner are processed correctly.
 In summary, each instance of ``FEIAnalysisTask`` starts a :doc:`gbasf2:index` task, which is configured to process all files from the assigned
 dataset, using the same fixed subset of events from the input files.
@@ -605,7 +605,7 @@ MergeOutputsTask
 ----------------
 
 After all outputs from instances of ``FEIAnalysisTask`` are downloaded and listed by the ``FEIAnalysisSummaryTask`` in ``list_of_output_directories.json``, the outputs from the various jobs need to be
-merged into a single file. This is accomplished by ``MergeOutputsTask`` using the information from ``list_of_output_directories.json`` and the (adapted) script ``analysis-fei-mergefiles`` from `basf2`.
+merged into a single file. This is accomplished by ``MergeOutputsTask`` using the information from ``list_of_output_directories.json`` and the (adapted) script ``analysis-fei-mergefiles`` from ``basf2``.
 
 This task depends on the ``FEIAnalysisSummaryTask`` running directly before it to be finished successfully, and has the following settings:
 
@@ -642,7 +642,7 @@ Following inputs are required for ``FEITrainingTask`` depending on the current s
 For the required inputs listed above, symlinks are created to the current directory for stages 0 to 6. In case of merged ``training_input.root`` files from stages 0 to 5 to create
 ``training_input_merged.root``, the paths to the original files are used directly to merge them.
 
-To correctly configure the training for stages 0 to 5, the `basf2` path needs to be created again to have the ``Summary.pickle`` file created, containing a local pickled version of the path.
+To correctly configure the training for stages 0 to 5, the `basf2.Path` needs to be created again to have the ``Summary.pickle`` file created, containing a local pickled version of the path.
 After that, the ``do_trainings(particles, configuration)`` function of the ``fei`` package is called to start BDT trainings needed for the current stage.
 
 For stage 6, the scripts ``analysis/scripts/fei/printReporting.py`` and ``analysis/scripts/fei/latexReporting.py`` are executed on top of the inputs provided via symlinks, and the script
@@ -699,7 +699,7 @@ Tips and Tricks
 In this concluding section of running FEI training on the grid, a few tips and tricks are given, such that you get a better feeling what to expect from the workflow and which pitfalls you may encounter,
 especially when running on the grid.
 
-* In general, you should always test the setup locally before submitting it to the grid. Therefore, please adapt your steering file equivalent to `B_generic_train.py <https://gitlab.desy.de/belle2/performance/fei/grid-workflow/-/blob/main/B_generic_train.py>`_ in such a way, that you would be able to run it both locally (potentially with a development version of `basf2`) and on the grid (using an official `basf2` release).
+* In general, you should always test the setup locally before submitting it to the grid. Therefore, please adapt your steering file equivalent to `B_generic_train.py <https://gitlab.desy.de/belle2/performance/fei/grid-workflow/-/blob/main/B_generic_train.py>`_ in such a way, that you would be able to run it both locally (potentially with a development version of ``basf2``) and on the grid (using an official ``basf2`` release).
 * To test the workflow on the grid in a fast way, you can construct the dataset list provided to the ``gbasf2_input_dslist`` setting using individual file paths as content instead of dataset paths, and setting the maximum number of events to a small value, e.g. 10. There are several possibilities to do that. You can either set it directly for the ``FEIAnalysisTask`` using the ``max_event`` task parameter (see :doc:`b2luigi documentation <b2luigi:index>`), or extend the setting ``gbasf2_basf2opt`` from ``"-l ERROR"`` to ``"-l ERROR -n 10"``. The training itself will then have no meaning, since too few events for training, but you would be able to test the technical setup with that approach.
 * To run instances of ``FEIAnalysisTask`` efficiently on the grid, you should prepare yourself well for that.
 
@@ -751,10 +751,10 @@ If you are on KEKCC and get a crash you probably forgot to set the correct ``LD_
 
 ``export LD_LIBRARY_PATH=/sw/belle/local/neurobayes/lib/:$LD_LIBRARY_PATH``
 
-You have to set this AFTER you set up basf2, otherwise basf2 will override the LD_LIBRARY_PATH again.
+You have to set this AFTER you set up ``basf2``, otherwise ``basf2`` will override the LD_LIBRARY_PATH again.
 
-Note that the NeuroBayes libraries which are shipped with the basf2 externals are only dummy libraries which are used during the linking of b2bii.
-They do not contain any NeuroBayes code, only functions with the correct signatures which will crash if they are called. Therefore it is important that the correct NeuroBayes libraries are found by the runtime-linker BEFORE the libraries shipped with basf2. This means you have to add the neurobayes path before the library path of the externals.
+Note that the NeuroBayes libraries which are shipped with the ``basf2`` externals are only dummy libraries which are used during the linking of b2bii.
+They do not contain any NeuroBayes code, only functions with the correct signatures which will crash if they are called. Therefore it is important that the correct NeuroBayes libraries are found by the runtime-linker BEFORE the libraries shipped with ``basf2``. This means you have to add the neurobayes path before the library path of the externals.
 
 Running FEI on converted Belle MC outside of KEK
 ************************************************
@@ -794,11 +794,11 @@ Since the latest neurobayes release 4.3.1 this license requirement is no longer 
 
 Neurobayes versions for Ubuntu (instead of SL6) are available as well.
 
-Anyway don't forget to add neurobayes to your ``LD_LIBRARY_PATH`` **after(!)** you set up basf2
+Anyway don't forget to add neurobayes to your ``LD_LIBRARY_PATH`` **after(!)** you set up ``basf2``
 
 ``export LD_LIBRARY_PATH=/sw/belle/local/neurobayes/lib/:$LD_LIBRARY_PATH``
 
-Btw, the Neurobayes libraries which are shipped with the basf2 externals are only dummy libraries which will just crash if you try to use them.
+Btw, the Neurobayes libraries which are shipped with the ``basf2`` externals are only dummy libraries which will just crash if you try to use them.
 They are only used so everybody can compile b2bii (because you require the libraries to link the b2bii modules).
 
 
@@ -813,7 +813,7 @@ The FEI is optimized for maximum speed, but the default configuration is not sui
 * Add extra cuts before the combination of the B mesons, e.g. the cut on Mbc is by default for hadronic B mesons only >5.2. There is a parameter called B_extra_cut in the get_default_channels function.
 * Add a skim cut on the number of tracks. Just add an applyEventCuts to your path before running the FEI. In fact, the maximum number of tracks for a correct B candidate is 7 (not in theory, but in practice). Hence, If you know you only want one track on the signal side. You can discard all events with more than 8 tracks from the beginning, without losing any correctly reconstructed signal events. This is of course not possible for an inclusive signal-side.
 
-With FEIv4 you don't need to re-train anything if you apply the above mentioned changes. Deactivating channels and tightening cuts is fine. For instance, I made a large study on the influence of the track-cut described above, and it doesn't matter at all if you use choose a different cut than the one used during the training.
+You don't need to re-train anything if you apply the above mentioned changes. Deactivating channels and tightening cuts is fine. For instance, a large study has been conducted on the influence of the track-cut described above, and it turned out that it doesn't matter at all if you choose a different cut than the one used during the training.
 
 
 Resources, Publications etc.

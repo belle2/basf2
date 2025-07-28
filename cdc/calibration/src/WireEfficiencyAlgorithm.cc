@@ -7,18 +7,13 @@
  **************************************************************************/
 
 #include <cdc/calibration/WireEfficiencyAlgorithm.h>
-
 #include <calibration/CalibrationAlgorithm.h>
-
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
-
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dbobjects/CDCBadWires.h>
-
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
-
 #include <TH2F.h>
 #include <TFitResult.h>
 #include <TH1F.h>
@@ -30,9 +25,8 @@
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
-WireEfficiencyAlgorithm::WireEfficiencyAlgorithm(): CalibrationAlgorithm("CDCCalibrationCollector")
+WireEfficiencyAlgorithm::WireEfficiencyAlgorithm(): CalibrationAlgorithm("CDCBadWireCollector")
 {
-
   setDescription(
     " -------------------------- Wire Efficiency Estimation Algorithm -------------------------\n"
   );
@@ -62,24 +56,20 @@ bool WireEfficiencyAlgorithm::buildEfficiencies()
 
   for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
     unsigned short layerNo = wireLayer.getICLayer();
-    B2INFO("Got layer " << layerNo);
-    std::string m_nameOfLayer = std::string("effLayer_").append(std::to_string(layerNo));
-    std::string m_titleOfLayer = std::string("Efficiency of wires in layer ").append(std::to_string(layerNo));
-    B2INFO("Built names for " << layerNo);
+    //B2INFO("Got layer " << layerNo);
+    //std::string m_nameOfLayer = std::string("effLayer_").append(std::to_string(layerNo));
+    //std::string m_titleOfLayer = std::string("Efficiency of wires in layer ").append(std::to_string(layerNo));
+    //B2INFO("Built names for " << layerNo);
 
     unsigned short nzbins = 30 - layerNo / 7;
     unsigned short nwidbins = cdcgeo.nWiresInLayer(layerNo);
     double widbins[2] = { -0.5, cdcgeo.nWiresInLayer(layerNo) - 0.5};
     double zbins[2] = {wireLayer.getBackwardZ(), wireLayer.getForwardZ()};
 
-    B2INFO("Built bins for " << layerNo);
-
-    TEfficiency* effInLayer = new TEfficiency(m_nameOfLayer.c_str(), m_titleOfLayer.c_str(), nzbins, zbins[0], zbins[1], nwidbins,
-                                              widbins[0], widbins[1]);
-    B2INFO("TEfficiency for " << layerNo << "successfully built");
-
+    TEfficiency* effInLayer = new TEfficiency(Form("effLayer_%d", layerNo), Form("Hit efficiency pf L%d ; z (cm) ; IWire ", layerNo),
+                                              nzbins, zbins[0], zbins[1], nwidbins,  widbins[0], widbins[1]);
     m_efficiencyList->Add(effInLayer);
-    B2INFO("Teff for layer " << layerNo << " was sucessfully listed.");
+    B2INFO("Teff for layer " << layerNo << " was successfully listed.");
   }
   TFile* outputCollection = new TFile("LayerEfficiencies.root", "RECREATE");
 
@@ -142,7 +132,7 @@ void WireEfficiencyAlgorithm::detectBadWires()
     int nonZeroWires = 0;
     for (int i = 0; i <= passedProjectedY->GetNbinsX(); ++i) {
       float efficiencyAtBin = efficiencyProjectedY->GetEfficiency(i);
-      if (efficiencyAtBin > 0.4) {
+      if (efficiencyAtBin > 0.2) {
         totalAverage += efficiencyAtBin;
         nonZeroWires++;
       }
@@ -165,6 +155,12 @@ void WireEfficiencyAlgorithm::detectBadWires()
       // if not a single hit within the central area of wire then mark it as bad
       if (!singleWirePassed->Integral(minFitBin, maxFitBin)) {
         double wireID = passed->GetYaxis()->GetBinCenter(i);
+        unsigned short maxWires = CDCGeometryPar::Instance().nWiresInLayer(layerNo);
+        if (wireID < 0 || wireID >= maxWires) {
+          B2ERROR("Invalid wireID: " << wireID << " for LayerID: " << layerNo
+                  << ". Max wires: " << maxWires);
+          continue; // remove invalid wireID
+        }
         m_badWireList->setWire(layerNo, round(wireID), 0);
         continue;
       }
@@ -180,7 +176,7 @@ void WireEfficiencyAlgorithm::detectBadWires()
       // applies a chi test on the wire
       float p_value = chiTest(graphSingleWireEfficiency, graphEfficiencyProjected, minFitRange, maxFitRange);
       // check three conditions and decide if wire should be marked as bad
-      bool averageCondition = (0.95 * totalAverage) > (singleWireEfficiencyFromFit + 5 * singleWireUpErrorFromFit);
+      bool averageCondition = (0.95 * totalAverage) > (singleWireEfficiencyFromFit + 3 * singleWireUpErrorFromFit);
       bool pvalueCondition = p_value < 0.01;
       bool generalCondition = singleWireEfficiencyFromFit < 0.4;
       if (generalCondition || (averageCondition && pvalueCondition)) {
@@ -192,7 +188,7 @@ void WireEfficiencyAlgorithm::detectBadWires()
   }
   m_badWireList->outputToFile("wireFile.txt");
   saveCalibration(m_badWireList, "CDCBadWires");
-  B2INFO("Bad wire list sucessfully saved.");
+  B2INFO("Bad wire list successfully saved.");
 }
 
 double WireEfficiencyAlgorithm::chiTest(TGraphAsymmErrors* graph1, TGraphAsymmErrors* graph2, double minValue, double maxValue)

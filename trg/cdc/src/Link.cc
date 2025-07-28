@@ -31,66 +31,66 @@ namespace Belle2 {
 
   bool TRGCDCLink::ms_smallcell(false);
   bool TRGCDCLink::ms_superb(false);
-  unsigned TRGCDCLink::_nL = 56;
-  unsigned TRGCDCLink::_nSL = 9;
-  unsigned TRGCDCLink::_nSLA = 5;
-  unsigned* TRGCDCLink::_nHitsSL = 0;
-  vector<TCLink*> TRGCDCLink::_all;
+  unsigned TRGCDCLink::m_nL = 56;
+  unsigned TRGCDCLink::m_nSL = 9;
+  unsigned TRGCDCLink::m_nSLA = 5;
+  unsigned* TRGCDCLink::m_nHitsSL = 0;
+  vector<TCLink*> TRGCDCLink::m_all;
 
   TRGCDCLink::TRGCDCLink(TRGCDCTrack* t,
                          const TRGCDCCellHit* h,
                          const HepGeom::Point3D<double>& p)
-    : _track(t),
-      _hit(h),
-      _position(p),
-      _dPhi(0),
-      _leftRight(0),
-      _pull(0),
-      _link(0),
-      _fit2D(0)
+    : m_track(t),
+      m_hit(h),
+      m_position(p),
+      m_dPhi(0),
+      m_leftRight(0),
+      m_pull(0),
+      m_link(0),
+      m_fit2D(0)
   {
     if (h) {
-      _drift[0] = h->drift(0);
-      _drift[1] = h->drift(1);
-      _dDrift[0] = h->dDrift(0);
-      _dDrift[1] = h->dDrift(1);
+      m_drift[0] = h->drift(0);
+      m_drift[1] = h->drift(1);
+      m_dDrift[0] = h->dDrift(0);
+      m_dDrift[1] = h->dDrift(1);
     } else {
-      _drift[0] = 0.;
-      _drift[1] = 0.;
-      _dDrift[0] = 0.;
-      _dDrift[1] = 0.;
+      m_drift[0] = 0.;
+      m_drift[1] = 0.;
+      m_dDrift[0] = 0.;
+      m_dDrift[1] = 0.;
     }
 
     for (unsigned i = 0; i < 7; ++i)
-      _neighbor[i] = NULL;
+      m_neighbor[i] = NULL;
 
     if (h) {
-      _onTrack = _onWire = h->xyPosition();
+      m_onTrack = m_onWire = h->xyPosition();
     }
   }
 
   TRGCDCLink::TRGCDCLink(const TRGCDCLink& l)
-    : _track(l._track),
-      _hit(l._hit),
-      _onTrack(l._onTrack),
-      _onWire(l._onWire),
-      _position(l._position),
-      _dPhi(l._dPhi),
-      _leftRight(l._leftRight),
-      _zStatus(l._zStatus),
-      _zPair(l._zPair),
-      _pull(l._pull),
-      _link(l._link),
-      _fit2D(l._fit2D)
+    : m_track(l.m_track),
+      m_hit(l.m_hit),
+      m_onTrack(l.m_onTrack),
+      m_onWire(l.m_onWire),
+      m_position(l.m_position),
+      m_dPhi(l.m_dPhi),
+      m_leftRight(l.m_leftRight),
+      m_zStatus(l.m_zStatus),
+      m_zPair(l.m_zPair),
+      m_pull(l.m_pull),
+      m_link(l.m_link),
+      m_fit2D(l.m_fit2D)
   {
-    _drift[0] = l._drift[0];
-    _drift[1] = l._drift[1];
-    _dDrift[0] = l._dDrift[0];
-    _dDrift[1] = l._dDrift[1];
+    m_drift[0] = l.m_drift[0];
+    m_drift[1] = l.m_drift[1];
+    m_dDrift[0] = l.m_dDrift[0];
+    m_dDrift[1] = l.m_dDrift[1];
     for (unsigned i = 0; i < 7; ++i)
-      _neighbor[i] = l._neighbor[i];
+      m_neighbor[i] = l.m_neighbor[i];
     for (unsigned i = 0; i < 4; ++i)
-      _arcZ[i] = l._arcZ[i];
+      m_arcZ[i] = l.m_arcZ[i];
   }
 
   TRGCDCLink::~TRGCDCLink()
@@ -120,7 +120,7 @@ namespace Belle2 {
   void
   TRGCDCLink::nHits(const vector<TRGCDCLink*>& links, unsigned* nHits)
   {
-    for (unsigned i = 0; i < _nL; i++)
+    for (unsigned i = 0; i < m_nL; i++)
       nHits[i] = 0;
     unsigned nLinks = links.size();
     for (unsigned i = 0; i < nLinks; i++)
@@ -130,8 +130,6 @@ namespace Belle2 {
   void
   TRGCDCLink::nHitsSuperLayer(const vector<TRGCDCLink*>& links, unsigned* nHits)
   {
-    for (unsigned i = 0; i < _nSL; i++)
-      nHits[i] = 0;
     const unsigned nLinks = links.size();
     for (unsigned i = 0; i < nLinks; i++)
       ++nHits[links[i]->cell()->superLayerId()];
@@ -160,7 +158,7 @@ namespace Belle2 {
 
     //...Output...
     cout << pre;
-    if (_hit) {
+    if (m_hit) {
       cout << cell()->name();
     } else {
       cout << "No hit linked";
@@ -181,17 +179,17 @@ namespace Belle2 {
     if (pull)
       cout << "[pul=" << this->pull() << "]";
     if (flag) {
-      if (_hit) {
-        if (_hit->state() & CellHitFindingValid)
+      if (m_hit) {
+        if (m_hit->state() & CellHitFindingValid)
           cout << "o";
-        if (_hit->state() & CellHitFittingValid)
+        if (m_hit->state() & CellHitFittingValid)
           cout << "+";
-        if (_hit->state() & CellHitInvalidForFit)
+        if (m_hit->state() & CellHitInvalidForFit)
           cout << "x";
       }
     }
     if (stereo) {
-      cout << "{" << leftRight() << "," << _zStatus << "}";
+      cout << "{" << leftRight() << "," << m_zStatus << "}";
     }
     if (pos) {
       cout << ",pos=" << position();
@@ -652,10 +650,10 @@ namespace Belle2 {
     clearBufferSL();
     unsigned n = links.size();
     for (unsigned i = 0; i < n; i++)
-      ++_nHitsSL[links[i]->cell()->superLayerId()];
+      ++m_nHitsSL[links[i]->cell()->superLayerId()];
     unsigned sl = 0;
-    for (unsigned i = 0; i < _nSL; i++)
-      if (_nHitsSL[i] >= minN)
+    for (unsigned i = 0; i < m_nSL; i++)
+      if (m_nHitsSL[i] >= minN)
         sl |= (1 << i);
     return sl;
   }
@@ -671,7 +669,7 @@ namespace Belle2 {
     }
 
     unsigned l = 0;
-    for (unsigned i = 0; i < _nSL; i++) {
+    for (unsigned i = 0; i < m_nSL; i++) {
       if (l0 & (1 << i)) ++l;
     }
     return l;
@@ -683,10 +681,10 @@ namespace Belle2 {
     clearBufferSL();
     unsigned n = links.size();
     for (unsigned i = 0; i < n; i++)
-      ++_nHitsSL[links[i]->cell()->superLayerId()];
+      ++m_nHitsSL[links[i]->cell()->superLayerId()];
     unsigned sl = 0;
-    for (unsigned i = 0; i < _nSL; i++)
-      if (_nHitsSL[i] >= minN)
+    for (unsigned i = 0; i < m_nSL; i++)
+      if (m_nHitsSL[i] >= minN)
         ++sl;
     return sl;
   }
@@ -699,14 +697,14 @@ namespace Belle2 {
 //  unsigned nHits[6] = {0, 0, 0, 0, 0, 0};
     for (unsigned i = 0; i < n; i++)
       if (links[i]->cell()->axial())
-        ++_nHitsSL[links[i]->cell()->axialStereoSuperLayerId()];
+        ++m_nHitsSL[links[i]->cell()->axialStereoSuperLayerId()];
 //      ++nHits[links[i]->cell()->superLayerId() / 2];
     unsigned j = 0;
-    while (_nHitsSL[j] == 0) ++j;
+    while (m_nHitsSL[j] == 0) ++j;
     unsigned nMissing = 0;
     unsigned nMax = 0;
-    for (unsigned i = j; i < _nSLA; i++) {
-      if (+_nHitsSL[i] == 0) ++nMissing;
+    for (unsigned i = j; i < m_nSLA; i++) {
+      if (+m_nHitsSL[i] == 0) ++nMissing;
       else {
         if (nMax < nMissing) nMax = nMissing;
         nMissing = 0;
@@ -766,9 +764,12 @@ namespace Belle2 {
   {
 //  unsigned n[11];
     static unsigned* n = new unsigned[Belle2::TRGCDC::getTRGCDC()->nSuperLayers()];
+    for (unsigned i = 0; i < m_nSL; i++) {
+      n[i] = 0;
+    }
     nHitsSuperLayer(links, n);
     string nh = "";
-    for (unsigned i = 0; i < _nSL; i++) {
+    for (unsigned i = 0; i < m_nSL; i++) {
       nh += TRGUtil::itostring(n[i]);
       if (i % 2) nh += ",";
       else if (i < 10) nh += "-";
@@ -802,10 +803,10 @@ namespace Belle2 {
     static bool first = true;
     if (first) {
       const Belle2::TRGCDC& cdc = * Belle2::TRGCDC::getTRGCDC();
-      _nL = cdc.nLayers();
-      _nSL = cdc.nSuperLayers();
-      _nSLA = cdc.nAxialSuperLayers();
-      _nHitsSL = new unsigned[_nSL];
+      m_nL = cdc.nLayers();
+      m_nSL = cdc.nSuperLayers();
+      m_nSLA = cdc.nAxialSuperLayers();
+      m_nHitsSL = new unsigned[m_nSL];
       first = false;
     }
   }
@@ -828,8 +829,8 @@ namespace Belle2 {
   const TRGCDCWire*
   TRGCDCLink::wire(void) const
   {
-    if (_hit)
-      return dynamic_cast<const TRGCDCWire*>(& _hit->cell());
+    if (m_hit)
+      return dynamic_cast<const TRGCDCWire*>(& m_hit->cell());
     return 0;
   }
 
@@ -844,15 +845,15 @@ namespace Belle2 {
   void
   TRGCDCLink::removeAll(void)
   {
-    while (_all.size())
-      delete _all.back();
+    while (m_all.size())
+      delete m_all.back();
   }
 
   void*
   TRGCDCLink::operator new (size_t size)
   {
     void* p = malloc(size);
-    _all.push_back(static_cast<TRGCDCLink*>(p));
+    m_all.push_back(static_cast<TRGCDCLink*>(p));
 
 //     cout << ">---------------------" << endl;
 //     for (unsigned i = 0; i < _all.size(); i++)
@@ -864,11 +865,11 @@ namespace Belle2 {
   void
   TRGCDCLink::operator delete (void* t)
   {
-    for (vector<TRGCDCLink*>::iterator it = _all.begin();
-         it != _all.end();
+    for (vector<TRGCDCLink*>::iterator it = m_all.begin();
+         it != m_all.end();
          ++it) {
       if ((* it) == static_cast<TRGCDCLink*>(t)) {
-        _all.erase(it);
+        m_all.erase(it);
         break;
       }
     }

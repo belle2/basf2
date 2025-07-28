@@ -60,14 +60,14 @@ void ECLCompressBGOverlayModule::event()
   if (m_eclDsps.getEntries() != ec.m_nch) return;
 
   // sort by cell id
-  unsigned short indx[ec.m_nch], count = 0;
-  memset(indx, 0xff, sizeof(indx));
+  std::vector<unsigned short> indx(ec.m_nch, 0xff);
+  unsigned short count = 0;
   for (const auto& t : m_eclDsps) indx[t.getCellId() - 1] = count++;
 
   // check that all crystals are here
   for (auto t : indx) if (t >= ec.m_nch) return;
 
-  int FitA[ec.m_nsmp]; // buffer for a waveform
+  std::vector<int> FitA(ec.m_nsmp); // buffer for a waveform
 
   // compress waveforms
   BitStream out(ec.m_nch * ec.m_nsmp);
@@ -85,8 +85,8 @@ void ECLCompressBGOverlayModule::event()
     for (int i = 0; i < ECL::ECL_CRATES; i++) out.putNBits(ttime[i], 7);
   }
   for (int j = 0; j < ec.m_nch; j++) {
-    m_eclDsps[indx[j]]->getDspA(FitA);
-    m_comp->compress(out, FitA);
+    m_eclDsps[indx[j]]->getDspA(FitA.data());
+    m_comp->compress(out, FitA.data());
   }
   out.resize();
 

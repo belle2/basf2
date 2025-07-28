@@ -83,7 +83,7 @@ namespace Belle2 {
     */
     PIDDetectorWeights(const std::string& weightsCSVFileName)
     {
-      m_weightsRDataFrame = ROOT::RDF::MakeCsvDataFrame(weightsCSVFileName);
+      m_weightsRDataFrame = ROOT::RDF::FromCSV(weightsCSVFileName);
       fillWeightsTablePerHypoFromRDF();
     };
 

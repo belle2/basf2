@@ -25,6 +25,8 @@
 
 #include <TH1F.h>
 
+#include <cmath>
+
 //using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -40,12 +42,12 @@ CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationColl
   setDescription("Collector module for cdc calibration");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("recoTracksColName", m_recoTrackArrayName, "Name of collection hold genfit::Track", std::string(""));
-  addParam("bField", m_bField, "If true -> #Params ==5 else #params ==4 for calculate P-Val", false);
+  //addParam("bField", m_bField, "If true -> #Params ==5 else #params ==4 for calculate P-Val", false);
   addParam("calExpectedDriftTime", m_calExpectedDriftTime, "if true module will calculate expected drift time, it take a time",
            true);
   addParam("storeTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", false);
   addParam("eventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", true);
-  addParam("minimumPt", m_minimumPt, "Tracks with tranverse momentum smaller than this value will not used", 0.15);
+  addParam("minimumPt", m_minimumPt, "Tracks with transverse momentum smaller than this value will not used", 0.15);
   addParam("minimumNDF", m_minimumNDF, "Discard tracks whose degree-of-freedom below this value", 5.);
   addParam("isCosmic", m_isCosmic, "True when we process cosmic events, else False (collision)", m_isCosmic);
   addParam("effStudy", m_effStudy, "When true module collects info only  necessary for wire eff study", false);
@@ -116,6 +118,18 @@ void CDCCalibrationCollectorModule::prepare()
   registerObject<TH1F>("hEventT0", m_hEventT0);
   registerObject<TH1F>("hNTracks", m_hNTracks);
   registerObject<TH1F>("hOccupancy", m_hOccupancy);
+
+  ROOT::Math::XYZVector pos(0, 0, 0);
+  ROOT::Math::XYZVector bfield = BFieldManager::getFieldInTesla(pos);
+  if (bfield.Z() > 0.5) {
+    m_bField = true;
+    B2INFO("CDCCalibrationCollector: Magnetic field is ON");
+  } else {
+    m_bField = false;
+    B2INFO("CDCCalibrationCollector: Magnetic field is OFF");
+  }
+  B2INFO("BField at (0,0,0)  = " << bfield.R());
+
 }
 
 void CDCCalibrationCollectorModule::collect()
@@ -149,28 +163,10 @@ void CDCCalibrationCollectorModule::collect()
   // WireID collection finished
 
   const int nTr = m_Tracks.getEntries();
-  // Skip events which have number of charged tracks <= 1.
-  int nCTracks  = 0;
-  for (int i = 0; i < nTr; ++i) {
-    const Belle2::Track* b2track = m_Tracks[i];
-    const Belle2::TrackFitResult* fitresult = b2track->getTrackFitResultWithClosestMass(Const::muon);
-    if (!fitresult) continue;
-
-    short charge = fitresult->getChargeSign();
-    if (fabs(charge) > 0) {
-      nCTracks++;
-    }
-  }
-
-  if (nCTracks <= 1) {
-    return ;
-  } else {
-    getObjectPtr<TH1F>("hNTracks")->Fill(nCTracks);
-  }
-
   const int nHits = m_CDCHits.getEntries();
   const int nWires = 14336;
   float oc = static_cast<float>(nHits) / static_cast<float>(nWires);
+  getObjectPtr<TH1F>("hNTracks")->Fill(nTr);
   getObjectPtr<TH1F>("hOccupancy")->Fill(oc);
 
   for (int i = 0; i < nTr; ++i) {
@@ -271,7 +267,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
         else lr = 0;
 
         //Convert to outgoing
-        if (fabs(alpha) > M_PI / 2) {
+        if (std::abs(alpha) > M_PI / 2) {
           x_b *= -1;
           x_u *= -1;
         }
@@ -281,7 +277,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
         alpha = cdcgeo.getOutgoingAlpha(alpha);
 
         B2DEBUG(99, "x_unbiased " << x_u << " |left_right " << lr);
-        if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(abs(x_u), lay, lr, alpha, theta);}
+        if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha, theta);}
         alpha *= 180 / M_PI;
         theta *= 180 / M_PI;
         //estimate drift time

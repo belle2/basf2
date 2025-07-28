@@ -38,7 +38,7 @@ namespace Belle2 {
     /// Destructor
     virtual ~TRGGDLModule();
 
-    /// Initilizes TRGGDLModule.
+    /// Initializes TRGGDLModule.
     virtual void initialize() override;
 
     /// Called when new run started.
@@ -63,10 +63,10 @@ namespace Belle2 {
 
   private: // Parameters
 
-    /**< required input for TRGGRLInfo */
+    /** required input for TRGGRLInfo */
     StoreObjPtr<TRGGRLInfo> m_TRGGRLInfo;
 
-    /**< output for TRGSummary */
+    /** output for TRGSummary */
     StoreObjPtr<TRGSummary> m_TRGSummary;
 
     /// Debug level.
@@ -89,10 +89,10 @@ namespace Belle2 {
     /// Switch for algorithm source. False when using local .alg file.
     bool _algFromDB;
 
-    // Phase
+    /// Phase
     std::string _Phase;
 
-    // Path to algorithm file
+    /// Path to algorithm file
     std::string _algFilePath;
 
     /// Threshold to determine timing quality flag with MC truth: super fine

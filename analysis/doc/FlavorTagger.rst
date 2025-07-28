@@ -191,7 +191,7 @@ Saving to nTuples
 The flavor tagger provides the output of the two combiners and the outputs
 of the 13 categories. It provides also the MC information relevant for the categories.
 To save this information you just have to add the predefined list
-``ft.flavor_tagging``
+``flavor_tagging``
 to the variables that you use as argument for the module :func:`modularAnalysis.variablesToNtuple`.
 
 The two available combiners provide two different flavor tags which can be
@@ -285,12 +285,12 @@ or not (with exceptions for kaons).
 Efficiency Calculation and Validation Plots
 -------------------------------------------
 
-If you want to calculate the efficiency of the FlavorTagger on your own File and produce qr plots, use the script
-analysis/release-validation/CPVTools/flavorTaggerEfficiency.py giving your file and the ntuple tree name as arguments:
+If you want to calculate the efficiency of the FlavorTagger on your own file and produce qr plots, use the script
+`flavorTaggerEfficiency.py <https://gitlab.desy.de/belle2/performance/releasevalidation/-/blob/main/CPVTools/flavorTaggerEfficiency.py>`_ giving your file and the ntuple tree name as arguments:
 
 ::
 
-  basf2 flavorTaggerEfficiency.py 'YourFiles*WithWildcards??.root' Youtreename
+  basf2 flavorTaggerEfficiency.py 'YourFiles*WithWildcards??.root' YourTreeName
 
 Tutorials
 ---------
@@ -306,31 +306,6 @@ at `GitLab <https://gitlab.desy.de/belle2/software/training/handsonexercises>`_.
 
 Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://gitlab.desy.de/belle2/software/training/b2-starterkit/-/blob/main/B2T_Advanced_3_FlavorTagger.ipynb>`_
 (Jupyter notebook) under the latest `b2-starter-kit <https://gitlab.desy.de/belle2/software/training/b2-starterkit>`_ tutorials.
-
-As further examples you can have a look on the scripts used to generate the weight files at kekcc once a release is tagged.
-You find them under:
-
-::
-
-  analysis/release-validation/CPVTools/
-
-You can train and test the flavor tagger, and evaluate its performance by yourself running:
-
-::
-
-  sh CPVToolsValidatorInParalell.sh Belle2 nunubar nunubar BGx1 yourPathForWeightFiles yourPathForAnalyzedMdst
-
-Note:
-
-The convention is BGx0 for no machine background and BGx1 for MC with machine background. The process is defined in:
-
-::
-
-  flavorTaggerVertexingValidation.py
-
-
-If you are interested in the validation of the flavor tagger, have a look at the `flavortaggingvalidation <https://gitlab.desy.de/belle2/data-production/validation/flavortaggingvalidation>`_ repository.
-
 
 Functions
 ---------

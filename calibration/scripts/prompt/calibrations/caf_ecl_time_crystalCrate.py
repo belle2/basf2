@@ -30,6 +30,7 @@ import copy
 settings = CalibrationSettings(
     name="ECL crystal and crate time calibrations and validations",
     expert_username="hearty",
+    subsystem="ecl",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib", "hadron_calib"],
@@ -51,7 +52,8 @@ settings = CalibrationSettings(
     expert_config={"numCrysCrateIterations": 1,
                    "maxNumberEvents": 50000000,
                    "payload_boundaries": [],
-                   "t0_bhabhaToHadron_correction": 0})
+                   "t0_bhabhaToHadron_correction": 0},
+    produced_payloads=["ECLCrateTimeOffset", "ECLCrystalTimeOffset"])
 
 
 ##############################
@@ -103,7 +105,7 @@ def get_calibrations(input_data, **kwargs):
     print("expert_config:  maxNumEventsCrystalCalib = ", maxNumEventsCrystalCalib)
 
     # Determine how large of an offset should be applied to correct for
-    # differences in the CDC event t0 in bhabha and hadronic events
+    # differences in the SVD event t0 in bhabha and hadronic events
     t0_bhabhaToHadron_correction = expert_config["t0_bhabhaToHadron_correction"]
     print("expert_config:  t0_bhabhaToHadron_correction = ", t0_bhabhaToHadron_correction)
 
@@ -223,8 +225,7 @@ def get_calibrations(input_data, **kwargs):
     prepare_cdst_analysis(rec_path_bhabha, components=['SVD', 'CDC', 'ECL', 'KLM'])
 
     # ====================================================
-    # t0BiasCorrection = -0.9  # Correct for the CDC t0 bias in ns
-    t0BiasCorrection = t0_bhabhaToHadron_correction  # Correct for the CDC t0 bias in ns
+    t0BiasCorrection = t0_bhabhaToHadron_correction  # Correct for the SVD t0 bias in ns
     # ====================================================
 
     col_bhabha = register_module('ECLBhabhaTCollector')
@@ -472,7 +473,7 @@ def get_calibrations(input_data, **kwargs):
         if 'Geometry' not in rec_path_bhabha_val:
             rec_path_bhabha_val.add_module('Geometry', useDB=True)
 
-        # exclude PXD and PID, so only CDC and ECL used for eventT0
+        # exclude PXD and PID; not needed
         prepare_user_cdst_analysis(rec_path_bhabha_val, components=['SVD', 'CDC', 'ECL', 'KLM'])
         col_bhabha_val = register_module('eclBhabhaTimeCalibrationValidationCollector')
         col_bhabha_val.param('timeAbsMax', 70)
@@ -548,7 +549,7 @@ def get_calibrations(input_data, **kwargs):
         if 'Geometry' not in rec_path_hadron_val:
             rec_path_hadron_val.add_module('Geometry', useDB=True)
 
-        # exclude PXD and PID, so only CDC and ECL used for eventT0
+        # exclude PXD and PID; not needed
         prepare_user_cdst_analysis(rec_path_hadron_val, components=['SVD', 'CDC', 'ECL', 'KLM'])
         col_hadron_val = register_module('eclHadronTimeCalibrationValidationCollector')
         col_hadron_val.param('timeAbsMax', 70)

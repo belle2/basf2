@@ -19,8 +19,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include <chrono>
-#include <functional>
-#include <limits>
 #include <thread>
 
 namespace Belle2::Conditions {

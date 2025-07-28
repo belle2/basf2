@@ -469,11 +469,14 @@ def correctBrems(outputList,
     the particle's track, set by the ``ECLTrackBremFinder`` module during reconstruction.
 
     Warning:
-        This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
-        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) do.
-        However, studies by the tau WG revealed that the cuts applied by the ``ECLTrackBremFinder`` module are too tight.
-        These will be loosened but this will only have effect with proc13 and MC15.
-        If your analysis is very sensitive to the Bremsstrahlung corrections, it is advised to use `correctBremsBelle`.
+        So far, there haven't been any comprehensive comparisons of the performance of the `BremsFinder` module, which
+        is called in this function, with the `BelleBremRecovery` module, which is called via the `correctBremsBelle`
+        function. If your analysis is very sensitive to the Bremsstrahlung corrections, it is currently advised to use
+        `correctBremsBelle`.
+
+        The reason is that studies by the tau WG revealed that in the past the cuts applied by the
+        ``ECLTrackBremFinder`` module were too tight. They were only loosened for proc16 and MC16. New performance
+        studies are needed to verify that now this module outperforms the Belle-like approach.
 
     Information:
         A detailed description of how the weights are set can be found directly at the documentation of the
@@ -883,7 +886,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     * neutral final state particles
         - "gamma"           (input ``mdst`` type = ECLCluster)
         - "K_S0", "Lambda0" (input ``mdst`` type = V0)
-        - "K_L0"            (input ``mdst`` type = KLMCluster or ECLCluster)
+        - "K_L0", "n0"      (input ``mdst`` type = KLMCluster or ECLCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -909,6 +912,18 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
         klongs = ('K_L0', 'isFromKLM > 0')
         fillParticleLists([kaons, pions, klongs], path=mypath)
 
+    * Charged kinks final state particles (input ``mdst`` type = Kink)
+
+    Note:
+        To reconstruct charged particle kink you must specify the daughter.
+
+    For example, to load Kinks as :math:`K^- \\to \\pi^-\\pi^0` decays from Kinks:
+
+    .. code-block:: python
+
+        kinkKaons = ('K- -> pi-', yourCut)
+        fillParticleLists([kaons, pions, v0lambdas, kinkKaons], path=mypath)
+
 
     Parameters:
         decayStringsWithCuts (list): A list of python ntuples of (decayString, cut).
@@ -917,7 +932,9 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      If the input MDST type is V0 the whole
                                      decay chain needs to be specified, so that
                                      the user decides and controls the daughters
-                                     ' order (e.g. ``K_S0 -> pi+ pi-``)
+                                     ' order (e.g. ``K_S0 -> pi+ pi-``).
+                                     If the input MDST type is Kink the decay chain needs to be specified
+                                     with only one daughter (e.g. ``K- -> pi-``).
                                      The cut is the selection criteria
                                      to be added to the ParticleList. It can be an empty string.
         writeOut (bool):             whether RootOutput module should save the created ParticleList
@@ -944,14 +961,19 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
             raise ValueError("Invalid decay string")
         # need to check some logic to unpack possible scenarios
         if decayDescriptor.getNDaughters() > 0:
-            # ... then we have an actual decay in the decay string which must be a V0
-            # the particle loader automatically calls this "V0" so we have to copy over
+            # ... then we have an actual decay in the decay string which must be a V0 (if more than 1 daughter)
+            # or a kink (if 1 daughter)
+            # the particle loader automatically calls this "V0" or "kink", respectively, so we have to copy over
             # the list to name/format that user wants
-            if decayDescriptor.getMother().getLabel() != 'V0':
+            if (decayDescriptor.getNDaughters() == 1) and (decayDescriptor.getMother().getLabel() != 'kink'):
+                copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':kink',
+                         writeOut, path)
+            if (decayDescriptor.getNDaughters() > 1) and (decayDescriptor.getMother().getLabel() != 'V0'):
                 copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
-        elif decayDescriptor.getMother().getLabel() != 'all':
-            # then we have a non-V0 particle which the particle loader automatically calls "all"
-            # as with the special V0 case we have to copy over the list to the name/format requested
+        elif (decayDescriptor.getMother().getLabel() != 'all' and
+              abs(decayDescriptor.getMother().getPDGCode()) != Belle2.Const.neutron.getPDGCode()):
+            # then we have a non-V0/kink particle which the particle loader automatically calls "all"
+            # as with the special V0 and kink cases we have to copy over the list to the name/format requested
             copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
 
         # optionally apply a cut
@@ -984,7 +1006,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     * neutral final state particles
         - "gamma"           (input ``mdst`` type = ECLCluster)
         - "K_S0", "Lambda0" (input ``mdst`` type = V0)
-        - "K_L0"            (input ``mdst`` type = KLMCluster or ECLCluster)
+        - "K_L0", "n0"      (input ``mdst`` type = KLMCluster or ECLCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -1008,10 +1030,24 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
 
         fillParticleList('K_L0', 'isFromKLM > 0', path=mypath)
 
+    * Charged kinks final state particles (input ``mdst`` type = Kink)
+
+    .. note::
+        To reconstruct charged particle kink you must specify the daughter.
+
+    For example, to load Kinks as :math:`K^- \\to \\pi^-\\pi^0` decays from Kinks:
+
+    .. code-block:: python
+
+        fillParticleList('K- -> pi-', yourCut, path=mypath)
+
+
     Parameters:
         decayString (str):           Type of Particle and determines the name of the ParticleList.
                                      If the input MDST type is V0 the whole decay chain needs to be specified, so that
-                                     the user decides and controls the daughters' order (e.g. ``K_S0 -> pi+ pi-``)
+                                     the user decides and controls the daughters' order (e.g. ``K_S0 -> pi+ pi-``).
+                                     If the input MDST type is Kink the decay chain needs to be specified
+                                     with only one daughter (e.g. ``K- -> pi-``).
         cut (str):                   Particles need to pass these selection criteria to be added to the ParticleList
         writeOut (bool):             whether RootOutput module should save the created ParticleList
         path (basf2.Path):           modules are added to this path
@@ -1036,14 +1072,20 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     if not decayDescriptor.init(decayString):
         raise ValueError("Invalid decay string")
     if decayDescriptor.getNDaughters() > 0:
-        # ... then we have an actual decay in the decay string which must be a V0
-        # the particle loader automatically calls this "V0" so we have to copy over
+        # ... then we have an actual decay in the decay string which must be a V0 (if more than 1 daughter)
+        # or a kink (if 1 daughter)
+        # the particle loader automatically calls this "V0" or "kink", respectively, so we have to copy over
         # the list to name/format that user wants
-        if decayDescriptor.getMother().getLabel() != 'V0':
-            copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
-    elif decayDescriptor.getMother().getLabel() != 'all':
-        # then we have a non-V0 particle which the particle loader automatically calls "all"
-        # as with the special V0 case we have to copy over the list to the name/format requested
+        if (decayDescriptor.getNDaughters() == 1) and (decayDescriptor.getMother().getLabel() != 'kink'):
+            copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':kink',
+                     writeOut, path)
+        if (decayDescriptor.getNDaughters() > 1) and (decayDescriptor.getMother().getLabel() != 'V0'):
+            copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut,
+                     path)
+    elif (decayDescriptor.getMother().getLabel() != 'all' and
+          abs(decayDescriptor.getMother().getPDGCode()) != Belle2.Const.neutron.getPDGCode()):
+        # then we have a non-V0/kink particle which the particle loader automatically calls "all"
+        # as with the special V0 and kink cases we have to copy over the list to the name/format requested
         copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
 
     # optionally apply a cut
@@ -1540,7 +1582,7 @@ def applyEventCuts(cut, path, metavariables=None):
                    'sin', 'asin',
                    'exp', 'log', 'log10',
                    'min', 'max',
-                   'isNAN']
+                   'isNAN', 'ifNANgiveX']
     if metavariables:
         metavar_ids += metavariables
 
@@ -3104,7 +3146,7 @@ def oldwritePi0EtaVeto(
 def writePi0EtaVeto(
     particleList,
     decayString,
-    mode='standardMC15rd',
+    mode='standardMC16rd',
     selection='',
     path=None,
     suffix='',
@@ -3114,16 +3156,45 @@ def writePi0EtaVeto(
     etaPayloadNameOverride=None,
     etaSoftPhotonCutOverride=None,
     requireSoftPhotonIsInROE=False,
-    pi0Selection='[0.03 < M < 0.23]',
-    etaSelection='[0.25 < M < 0.75]'
+    pi0Selection='',
+    etaSelection=''
 ):
     """
     Give pi0/eta probability for hard photon.
 
     In the default weight files a value of 1.4 GeV is set as the lower limit for the hard photon energy in the CMS frame.
-    For MC15rd weight files, the BtoXGamma skim is applied during the MVA training.
+    For MC15rd/MC16rd weight files, the BtoXGamma skim is applied during the MVA training.
 
-    The current default weight files are optimised using MC15rd. The weight files for MC12 (last version) are still available.
+    The current default weight files are for MC16rd. The weight files for MC15rd/MC12 are still available.
+
+    The input variables of the mva training for pi0 veto using MC16rd are:
+
+    * M: Invariant mass of pi0 candidates
+    * cosHelicityAngleMomentum: Cosine of angle between momentum difference of the photons in the pi0 rest frame
+      and momentum of pi0 in lab frame
+    * daughter(1,E): soft photon energy in lab frame
+    * daughter(1,clusterTheta): soft photon ECL cluster's polar angle
+    * daughter(1,clusterLAT): soft photon lateral energy distribution
+    * daughter(1,beamBackgroundSuppression): soft photon beam background suppression MVA output
+    * daughter(1,fakePhotonSuppression): soft photon fake photon suppression MVA output
+
+    The input variables of the mva training for eta veto using MC16rd are:
+
+    * M: Invariant mass of eta candidates
+    * cosHelicityAngleMomentum: Cosine of angle between momentum difference of the photons in the eta rest frame
+      and momentum of eta in lab frame
+    * daughter(1,E): soft photon energy in lab frame
+    * daughter(1,clusterTheta): soft photon ECL cluster's polar angle
+    * daughter(1,clusterLAT): soft photon lateral energy distribution
+    * daughter(1,clusterNHits): soft photon total crystal weights sum(w_i) with w_i<=1
+    * daughter(1,clusterE1E9): soft photon ratio between energies of central crystal and inner 3x3 crystals
+    * daughter(1,clusterE9E21): soft photon ratio of energies in inner 3x3 crystals and 5x5 crystals without corners
+    * daughter(1,clusterSecondMoment): soft photon second moment
+    * daughter(1,clusterAbsZernikeMoment40): soft photon Zernike moment 40
+    * daughter(1,clusterAbsZernikeMoment51): soft photon Zernike moment 51
+    * daughter(1,beamBackgroundSuppression): soft photon beam background suppression MVA output
+    * daughter(1,fakePhotonSuppression): soft photon fake photon suppression MVA output
+
 
     The input variables of the mva training for pi0 veto using MC15rd are:
 
@@ -3169,6 +3240,8 @@ def writePi0EtaVeto(
     * both: tight energy cut and clusterNHits cut are applied to soft photon
     * standardMC15rd: loose energy cut is applied to soft photon and the weight files are trained using MC15rd
     * tightMC15rd: tight energy cut is applied to soft photon and the weight files are trained using MC15rd
+    * standardMC16rd: loose energy cut is applied to soft photon and the weight files are trained using MC16rd
+    * tightMC16rd: tight energy cut is applied to soft photon and the weight files are trained using MC16rd
 
     The final probability of the pi0/eta veto is stored as an extraInfo. If no suffix is set it can be obtained from the variables
     `pi0Prob`/`etaProb`. Otherwise, it is available as '{Pi0, Eta}ProbOrigin', '{Pi0, Eta}ProbTightEnergyThreshold', '{Pi0,
@@ -3189,7 +3262,8 @@ def writePi0EtaVeto(
 
     @param particleList     the input ParticleList
     @param decayString 		specify Particle to be added to the ParticleList
-    @param mode				choose one mode out of 'standardMC15rd', 'tightMC15rd', 'standard', 'tight', 'cluster' and 'both'
+    @param mode				choose one mode out of 'standardMC16rd', 'tightMC16rd', 'standardMC15rd', 'tightMC15rd',
+                                    'standard', 'tight', 'cluster' and 'both'
     @param selection 		selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       		modules are added to this path
     @param suffix           optional suffix to be appended to the usual extraInfo name
@@ -3202,8 +3276,8 @@ def writePi0EtaVeto(
                                     (default is None)
     @param requireSoftPhotonIsInROE specify if the soft photons used to build pi0 and eta candidates have to be in the current ROE
                                     or not. Default is False, i.e. all soft photons in the event are used.
-    @param pi0Selection     Selection for the pi0 reconstruction. Default is '(0.03 < M < 0.23)'.
-    @param etaSelection     Selection for the eta reconstruction. Default is '(0.25 < M < 0.75)'.
+    @param pi0Selection     Selection for the pi0 reconstruction. Default is "".
+    @param etaSelection     Selection for the eta reconstruction. Default is "".
     """
 
     import b2bii
@@ -3213,16 +3287,18 @@ def writePi0EtaVeto(
     if (requireSoftPhotonIsInROE):
         B2WARNING("Requiring the soft photon to being in the ROE was not done for the MVA training. "
                   "Please check the results carefully.")
+    showWarning = False
+
     if (mode == 'standardMC15rd' or mode == 'tightMC15rd'):
         if (pi0Selection != '[0.03 < M < 0.23]' or etaSelection != '[0.25 < M < 0.75]'):
-            B2WARNING(
-                "Personal selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
-                "Please check the results carefully.")
+            showWarning = True
     else:
         if (pi0Selection != '' or etaSelection != ''):
-            B2WARNING(
-                "Personal selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
-                "Please check the results carefully.")
+            showWarning = True
+    if showWarning:
+        B2WARNING(
+            "Selection criteria for the pi0 or the eta during reconstructDecay differ from those used during the MVA training. "
+            "You may get NAN value. Please check the results carefully.")
 
     renameSuffix = False
 
@@ -3248,7 +3324,9 @@ def writePi0EtaVeto(
                     'cluster': 'LargeClusterSize',
                     'both': 'TightEnrgyThresholdAndLargeClusterSize',
                     'standardMC15rd': 'OriginMC15rd',
-                    'tightMC15rd': 'TightEnergyThresholdMC15rd'}
+                    'tightMC15rd': 'TightEnergyThresholdMC15rd',
+                    'standardMC16rd': 'OriginMC16rd',
+                    'tightMC16rd': 'TightEnergyThresholdMC16rd'}
 
     dictPi0EnergyCut = {
         'standard': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
@@ -3256,7 +3334,9 @@ def writePi0EtaVeto(
         'cluster': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
         'both': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
         'standardMC15rd': '[[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
-        'tightMC15rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
+        'tightMC15rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
+        'standardMC16rd': '[[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+        'tightMC16rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
 
     dictEtaEnergyCut = {
         'standard': '[[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]]',
@@ -3264,42 +3344,54 @@ def writePi0EtaVeto(
         'cluster': '[[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]]',
         'both': '[[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]]',
         'standardMC15rd': '[[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
-        'tightMC15rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
+        'tightMC15rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
+        'standardMC16rd': '[[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+        'tightMC16rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
 
     dictNHitsTimingCut = {'standard': 'clusterNHits >= 0 and abs(clusterTiming)<clusterErrorTiming',
                           'tight': 'clusterNHits >= 0 and abs(clusterTiming)<clusterErrorTiming',
                           'cluster': 'clusterNHits >= 2 and abs(clusterTiming)<clusterErrorTiming',
                           'both': 'clusterNHits >= 2 and abs(clusterTiming)<clusterErrorTiming',
                           'standardMC15rd': 'clusterNHits > 1.5 and abs(clusterTiming) < 200',
-                          'tightMC15rd': 'clusterNHits > 1.5 and abs(clusterTiming) < 200'}
+                          'tightMC15rd': 'clusterNHits > 1.5 and abs(clusterTiming) < 200',
+                          'standardMC16rd': 'clusterNHits > 1.5 and abs(clusterTiming) < 200',
+                          'tightMC16rd': 'clusterNHits > 1.5 and abs(clusterTiming) < 200'}
 
     dictPi0PayloadName = {'standard': 'Pi0VetoIdentifierStandard',
                           'tight': 'Pi0VetoIdentifierWithHigherEnergyThreshold',
                           'cluster': 'Pi0VetoIdentifierWithLargerClusterSize',
                           'both': 'Pi0VetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize',
                           'standardMC15rd': 'Pi0VetoIdentifierStandardMC15rd',
-                          'tightMC15rd': 'Pi0VetoIdentifierWithHigherEnergyThresholdMC15rd'}
+                          'tightMC15rd': 'Pi0VetoIdentifierWithHigherEnergyThresholdMC15rd',
+                          'standardMC16rd': 'Pi0VetoIdentifierStandardMC16rd',
+                          'tightMC16rd': 'Pi0VetoIdentifierWithHigherEnergyThresholdMC16rd'}
 
     dictEtaPayloadName = {'standard': 'EtaVetoIdentifierStandard',
                           'tight': 'EtaVetoIdentifierWithHigherEnergyThreshold',
                           'cluster': 'EtaVetoIdentifierWithLargerClusterSize',
                           'both': 'EtaVetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize',
                           'standardMC15rd': 'EtaVetoIdentifierStandardMC15rd',
-                          'tightMC15rd': 'EtaVetoIdentifierWithHigherEnergyThresholdMC15rd'}
+                          'tightMC15rd': 'EtaVetoIdentifierWithHigherEnergyThresholdMC15rd',
+                          'standardMC16rd': 'EtaVetoIdentifierStandardMC16rd',
+                          'tightMC16rd': 'EtaVetoIdentifierWithHigherEnergyThresholdMC16rd'}
 
     dictPi0ExtraInfoName = {'standard': 'Pi0ProbOrigin',
                             'tight': 'Pi0ProbTightEnergyThreshold',
                             'cluster': 'Pi0ProbLargeClusterSize',
                             'both': 'Pi0ProbTightEnergyThresholdAndLargeClusterSize',
                             'standardMC15rd': 'Pi0ProbOriginMC15rd',
-                            'tightMC15rd': 'Pi0ProbTightEnergyThresholdMC15rd'}
+                            'tightMC15rd': 'Pi0ProbTightEnergyThresholdMC15rd',
+                            'standardMC16rd': 'Pi0ProbOriginMC16rd',
+                            'tightMC16rd': 'Pi0ProbTightEnergyThresholdMC16rd'}
 
     dictEtaExtraInfoName = {'standard': 'EtaProbOrigin',
                             'tight': 'EtaProbTightEnergyThreshold',
                             'cluster': 'EtaProbLargeClusterSize',
                             'both': 'EtaProbTightEnergyThresholdAndLargeClusterSize',
                             'standardMC15rd': 'EtaProbOriginMC15rd',
-                            'tightMC15rd': 'EtaProbTightEnergyThresholdMC15rd'}
+                            'tightMC15rd': 'EtaProbTightEnergyThresholdMC15rd',
+                            'standardMC16rd': 'EtaProbOriginMC16rd',
+                            'tightMC16rd': 'EtaProbTightEnergyThresholdMC16rd'}
 
     ListName = dictListName[mode]
     Pi0EnergyCut = dictPi0EnergyCut[mode]
@@ -3645,15 +3737,14 @@ def buildEventShape(inputListNames=None,
     time. By default the calculation of the high-order moments (5-8) is turned off.
     Switching off an option will make the corresponding variables not available.
 
-    Warning:
-       The user can provide as many particle lists
-       as needed, using also combined particles, but the function will always assume that
-       the lists are independent.
-       If the lists provided by the user contain several times the same track (either with
-       different mass hypothesis, or once as an independent particle and once as daughter of a
-       combined particle) the results won't be reliable.
-       A basic check for duplicates is available setting the checkForDuplicate flags.
-
+    Info:
+       The user can provide as many particle lists as needed, using also composite particles.
+       In these cases, it is recommended to activate the checkForDuplicates flag since it
+       will eliminate duplicates, e.g., if the same track is provided multiple times
+       (either with different mass hypothesis or once as an independent particle and once
+       as daughter of a composite particle). The first occurrence will be used in the
+       calculations so the order in which the particle lists are given as well as within
+       the particle lists matters.
 
     @param inputListNames     List of ParticleLists used to calculate the
                               event shape variables. If the list is empty the default
@@ -3679,7 +3770,8 @@ def buildEventShape(inputListNames=None,
                               Requires thrust = True.
     @param sphericity         Enables the calculation of the sphericity-related quantities.
     @param checkForDuplicates Perform a check for duplicate particles before adding them. Regardless of the value of this option,
-                              it is recommended to consider sanitizing the lists you are passing to the function.
+                              it is recommended to consider sanitizing the lists you are passing to the function since this will
+                              speed up the processing.
 
     """
 
@@ -4446,6 +4538,26 @@ def getAnalysisGlobaltagB2BII() -> str:
     return recommended_b2bii_analysis_global_tag()
 
 
+def getECLKLID(particleList: str, variable='ECLKLID', path=None):
+    """
+    The function calculates the PID value for Klongs that are constructed from ECL cluster.
+
+    @param particleList     the input ParticleList
+    @param variable         the variable name for Klong ID
+    @param path             modules are added to this path
+    """
+
+    import b2bii
+
+    if b2bii.isB2BII():
+        B2ERROR("The ECL variables based Klong Identification is only available for Belle II data.")
+
+    from variables import variables
+    path.add_module('MVAExpert', listNames=particleList, extraInfoName='ECLKLID', identifier='ECLKLID')
+
+    variables.addAlias(variable, 'conditionalVariableSelector(isFromECL and PDG==130, extraInfo(ECLKLID), constant(NaN))')
+
+
 def getNbarIDMVA(particleList: str, path=None):
     """
     This function can give a score to predict if it is a anti-n0.
@@ -4553,7 +4665,7 @@ def updateMassHypothesis(particleList, pdg, writeOut=False, path=None):
 func_requiring_analysisGT = [
     correctTrackEnergy, scaleTrackMomenta, smearTrackMomenta, oldwritePi0EtaVeto, writePi0EtaVeto, lowEnergyPi0Identification,
     getBeamBackgroundProbability, getFakePhotonProbability, tagCurlTracks, applyChargedPidMVA, correctEnergyBias,
-    addPhotonEfficiencyRatioVariables, addPi0VetoEfficiencySystematics, getNbarIDMVA]
+    addPhotonEfficiencyRatioVariables, addPi0VetoEfficiencySystematics, getNbarIDMVA, getECLKLID]
 for _ in func_requiring_analysisGT:
     _.__doc__ += "\n    .. note:: This function (optionally) requires a payload stored in the analysis GlobalTag. "\
                     "Please append or prepend the latest one from `getAnalysisGlobaltag` or `getAnalysisGlobaltagB2BII`.\n"

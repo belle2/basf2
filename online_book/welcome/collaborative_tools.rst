@@ -6,9 +6,7 @@ Collaborative Tools.
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 10 minutes
-
-    **Exercises**: 10 minutes
+    **Length**: 15-30 minutes
 
     **Prerequisites**:
 
@@ -488,7 +486,7 @@ A bit more about working with GitLab
      Go to https://gitlab.desy.de
 
      * What's displayed at the dashboard/home screen?
-     * Find the main Belle II basf2 repository.
+     * Find the main Belle II `basf2` repository.
      * Look at the commits.
 
 

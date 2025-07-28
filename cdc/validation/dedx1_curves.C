@@ -8,6 +8,7 @@
 /*
 <header>
   <input>ParticleGunSimRec_dedx.root</input>
+  <output>dedx_curves.root</output>
   <contact>renu2@andrew.cmu.edu</contact>
   <description>Plot dE/dx over momentum</description>
   </header>

@@ -6,7 +6,7 @@ Analysis
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 30 minutes
+    **Length**: 30-45 min
 
     **Prerequisites**:
 
@@ -165,7 +165,7 @@ Combined particles
    long as all its decay products are measured. One can then proceed further and combine combined particles
    to move upwards in a decay tree, until the desired step is reached.
    The creation of combined particles is done at the analysis level by the final user, using the tools
-   provided by the basf2 analysis package.
+   provided by the `basf2` analysis package.
 
 V0
    Finally, there's a class of combined particle that require a special treatment, and are therefore provided

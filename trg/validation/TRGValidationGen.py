@@ -21,6 +21,7 @@ from simulation import add_simulation
 import reconstruction as re
 import mdst
 
+b2.set_random_seed(1337)
 
 main = b2.create_path()
 eventinfosetter = b2.register_module('EventInfoSetter')

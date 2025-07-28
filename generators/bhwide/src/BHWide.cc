@@ -34,7 +34,7 @@ extern "C" {
   /** Wrap BHwide random number generator and use ROOT.
    * This method returns an array of random numbers in the range ]0,1[
    * @param drvec array to store the random numbers
-   * @param lenght size of the array
+   * @param length size of the array
    */
   void varran_(double* drvec, const int* lengt)
   {
@@ -119,18 +119,18 @@ void BHWide::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector verte
   int mode = 0;
   bhwide_(&mode, m_xpar, m_npar);
 
-  //Store the initial particles as virtual particles into the MCParticleGraph
-  storeParticle(mcGraph, momset_.q1, 11, vertex, boost, true);
-  storeParticle(mcGraph, momset_.p1, -11, vertex, boost, true);
+  //Store the initial particles as initial particles into the MCParticleGraph
+  storeParticle(mcGraph, momset_.q1, 11, vertex, boost, false, true, false);
+  storeParticle(mcGraph, momset_.p1, -11, vertex, boost, false, true, false);
 
   //Store the final state positron and electron into the MCParticleGraph
-  storeParticle(mcGraph, momset_.q2, 11, vertex, boost);
-  storeParticle(mcGraph, momset_.p2, -11, vertex, boost);
+  storeParticle(mcGraph, momset_.q2, 11, vertex, boost, false, false, false);
+  storeParticle(mcGraph, momset_.p2, -11, vertex, boost, false, false, false);
 
-  //Store the real photons into the MCParticleGraph
+  //Store all the photons as ISR/FSR particles into the MCParticleGraph
   for (int iPhot = 0; iPhot <  momset_.nphot; ++iPhot) {
     double photMom[4] = {momset_.phit[0][iPhot], momset_.phit[1][iPhot], momset_.phit[2][iPhot], momset_.phit[3][iPhot]};
-    storeParticle(mcGraph, photMom, 22, vertex, boost);
+    storeParticle(mcGraph, photMom, 22, vertex, boost, false, false, true);
   }
 }
 
@@ -183,20 +183,10 @@ void BHWide::applySettings()
   bhwide_(&mode, m_xpar, m_npar);
 }
 
-
 void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
-                           ROOT::Math::LorentzRotation boost,
-                           bool isVirtual, bool isInitial)
+                           ROOT::Math::LorentzRotation boost, bool isVirtual, bool isInitial, bool isISRFSR)
 {
-  //  //Create particle
-  //MCParticleGraph::GraphParticle& part = mcGraph.addParticle();
-  //if (!isVirtual) {
-  //  part.setStatus(MCParticle::c_PrimaryParticle);
-  //} else {
-  //  part.setStatus(MCParticle::c_IsVirtual);
-  //}
-  //Create particle
-  // RG 6/25/14 Add new flag for ISR "c_Initial"
+  // Create particle
   MCParticleGraph::GraphParticle& part = mcGraph.addParticle();
   if (isVirtual) {
     part.setStatus(MCParticle::c_IsVirtual);
@@ -210,8 +200,8 @@ void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg,
   // all particles produced by BHWIDE are stable
   part.addStatus(MCParticle::c_StableInGenerator);
 
-  // all photons from BHWIDE are ISR or FSR
-  if (pdg == 22 && !isVirtual) {
+  // all photons from BHWIDE are ISR/FSR
+  if (isISRFSR) {
     part.addStatus(MCParticle::c_IsISRPhoton);
     part.addStatus(MCParticle::c_IsFSRPhoton);
   }
@@ -223,13 +213,13 @@ void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg,
   part.setMass(TDatabasePDG::Instance()->GetParticle(pdg)->Mass());
   part.setEnergy(mom[3]);
 
-  //boost
+  // boost
   ROOT::Math::PxPyPzEVector p4 = part.get4Vector();
   p4.SetPz(-1.0 * p4.Pz()); //BHWIDE uses other direction convention
   p4 = boost * p4;
   part.set4Vector(p4);
 
-  //set vertex
+  // set vertex
   if (!isInitial) {
     ROOT::Math::XYZVector v3 = part.getProductionVertex();
     v3 = v3 + vertex;

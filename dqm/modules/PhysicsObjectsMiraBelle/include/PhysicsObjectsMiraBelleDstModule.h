@@ -7,10 +7,12 @@
  **************************************************************************/
 
 #pragma once
-//#include <framework/core/Module.h>
+
 #include <framework/core/HistoModule.h>
+
+#include <TH1F.h>
+
 #include <string>
-#include "TH1F.h"
 
 namespace Belle2 {
   /** DQM modules to monitor D* related variables */

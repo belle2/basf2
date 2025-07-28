@@ -30,20 +30,14 @@
 using namespace std;
 using namespace Belle2;
 using namespace TRGCDCT3DCONVERTERSPACE;
-//! Register Module
-REG_MODULE(TRGCDCT3DConverter);
 
-string TRGCDCT3DConverterModule::version() const
-{
-  return string("1.00");
-}
+REG_MODULE(TRGCDCT3DConverter);
 
 TRGCDCT3DConverterModule::TRGCDCT3DConverterModule()
   : Module::Module()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
-  string desc = "TRGCDCT3DConverterModule(" + version() + ")";
-  setDescription(desc);
+  setDescription("TRGCDCT3DConverter module");
   addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
            string("CDCTriggerSegmentHits0"));
@@ -77,7 +71,6 @@ TRGCDCT3DConverterModule::TRGCDCT3DConverterModule()
   addParam("isVerbose", m_isVerbose,
            "If not zero, prints detail information.",
            unsigned(0));
-  B2INFO("TRGCDCT3DConverter: Constructor done.");
 }
 
 TRGCDCT3DConverterModule::~TRGCDCT3DConverterModule()
@@ -268,7 +261,7 @@ int TRGCDCT3DConverterModule::toSigned(int value, int nBits)
   return value;
 }
 
-////obselete
+////obsolete
 //int TRGCDCT3DConverterModule::t2DRhoTot3DRho(int value, bool isSigned)
 //{
 //  if (value == 0) return 2047;
@@ -986,7 +979,7 @@ void TRGCDCT3DConverterModule::store3DFirmwareData(boost::multi_array<double, 3>
 
     //cout<<iClk<<" "<<t3d_fnf<<" "<<t3d_oldfnf<<endl;
 
-//The evtTime information was for debugging, but the currnet firmware doese not output the evtTime information corresponding to every track.
+//The evtTime information was for debugging, but the current firmware does not output the evtTime information corresponding to every track.
 
     t3DFirmwareInfo[0][iClk][0] = t3d_fnf[5];
     t3DFirmwareInfo[0][iClk][1] = t3d_oldfnf[5];
@@ -1336,7 +1329,7 @@ void TRGCDCT3DConverterModule::debug3DFirmware()
       TRGCDCFitter3D::getStereoXt(stGeometry["priorityLayer"], stXts);
       //Fitter3DUtility::loadStereoXt("TODOdata/stereoXt",4,stXts);
 
-      //// Calcualte phi3D
+      //// Calculate phi3D
       //vector<double> stTSs(4);
       //Fitter3DUtility::calPhiFast(stGeometry, stXts, eventTimeValid, eventTime, rawStTSs, stTSs);
       //cout<<"    [calPhi] "<<stTSs[0]<<" "<<stTSs[1]<<" "<<stTSs[2]<<" "<<stTSs[3]<<endl;
@@ -1554,7 +1547,7 @@ void TRGCDCT3DConverterModule::filter3DData(boost::multi_array<double, 3>& t3DFi
       if (t3DFirmwareInfo[iTrack][iClk][0] == 0) continue;
       //cout<<iClk<<" 2d: "<<t3DFirmwareInfo[iTrack][iClk][0]<<" tsf: "<<t3DFirmwareInfo[iTrack][iClk][2]<<" evt: "<<t3DFirmwareInfo[iTrack][iClk][3]<<" isOld: "<<t3DFirmwareInfo[iTrack][iClk][1]<<endl;
       // TSFValid
-//t3DFirmwareInfo[iTrack][iClk][0] (t3d_fnf) := t2d_fnf & TSFValid, so using t3d_fnf is alreay sufficient
+//t3DFirmwareInfo[iTrack][iClk][0] (t3d_fnf) := t2d_fnf & TSFValid, so using t3d_fnf is already sufficient
 //      if (t3DFirmwareInfo[iTrack][iClk][2] == 0) continue;
       // EventTimeValid
 //      if (t3DFirmwareInfo[iTrack][iClk][3] == 0) continue;

@@ -24,11 +24,9 @@ Writes out Variables to a flat `ROOT`_ TTree (it is also possible to write out s
 
 Candidate-wise
 ~~~~~~~~~~~~~~
-For each candidate in the given `ParticleList`_, there will be one entry in the TTree containing the desired Variables.
+For each candidate in the given :doxygen:`ParticleList <classBelle2_1_1ParticleList>`, there will be one entry in the TTree containing the desired Variables.
 In other words, this produces a candidate-based ROOT file.
 Here is an example of use:
-
-.. _ParticleList: https://software.belle2.org/development/classBelle2_1_1ParticleList.html
 
 .. code-block:: python
  

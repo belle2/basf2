@@ -1,5 +1,5 @@
-How to write basf2 code (coding conventions)
-============================================
+How to write ``basf2`` code (coding conventions)
+================================================
 
 The following rules and conventions should ensure a good usability and maintainability of
 the Belle II software. They are written for C++, but have to be followed for Python code
@@ -45,7 +45,7 @@ Please, please avoid:
 Directories structure
 ---------------------
 
-By default, one shared library is created per basf2 package and is installed in a
+By default, one shared library is created per ``basf2`` package and is installed in a
 top-level ``lib`` directory that is included in the user's library path. The build system
 treats the package's contents in pre-defined subdirectories as follows:
 
@@ -53,7 +53,7 @@ treats the package's contents in pre-defined subdirectories as follows:
   of the code written in C++.
 
 * ``modules``: the code is compiled into a shared library and installed in a top-level
-  ``module`` directory, so that it can be dynamically loaded by basf2.
+  ``module`` directory, so that it can be dynamically loaded by ``basf2``.
 
 * ``tools``: C++ code is compiled into an executable and installed in a top-level ``bin``
   directory that is included in the user's path; executable scripts, usually written in
@@ -151,7 +151,7 @@ Name                     Description
 *DET* **Clusterizer**    class (usually a module, see below) that creates hits from digits
 *DET* **Trigger** *Xyz*   classes for detector related triggers
 *Xyz* **Collection**     a class for an array of objects of class *Xyz*, if not a ``StoreArray``
-*Xyz* **Module**         a basf2 module class
+*Xyz* **Module**         a ``basf2`` module class
 *Xyz* **Base**           a class whose main purpose is to serve as a base class for derived classes
 Abc *Xyz*                Classes derived from *Xyz* **Base**
 *Xyz* **Error**          an exception class
@@ -163,7 +163,7 @@ Abc *Xyz*                Classes derived from *Xyz* **Base**
    :width: 300px
    :align: center
    
-   Object naming conventions in basf2.
+   Object naming conventions in ``basf2``.
 
 .. warning::
 
@@ -267,7 +267,7 @@ costs a few CPU clock cycles, while retrieving data from RAM usually costs O(100
 clock cycles.
 
 Additionally, ordering the data types as described above will lead to a smaller memory
-footprint of the class, which is critical for basf2 on the HLT.
+footprint of the class, which is critical for ``basf2`` on the HLT.
 
 Because usually classes contain several data members, there is no clear rule where to add
 classes as data members in other classes, usually it would be at position 1, 2, or 3.
@@ -290,7 +290,7 @@ Data objects
 1. Place all classes that should be used in the data store and written to output files into
    the ``dataobjects`` folder.
 
-2. These classes must not depend on any other basf2 code. The only exception are other data
+2. These classes must not depend on any other ``basf2`` code. The only exception are other data
    objects classes and the core framework.
 
 3. Classes that will be stored as single objects (not in ``TClonesArrays``) in the data store
@@ -337,7 +337,7 @@ Use the logging system:
   useful for developers. The following debug levels should be used
   
   * 0-9 for user code. The use case is that a user wants to debug their analysis code. Debug
-    levels below 10 must not be used is basf2 code.
+    levels below 10 must not be used is ``basf2`` code.
     
   * 10-19 for analysis package code. The use case is that a user wants to debug problems in
     analysis jobs with the help of experts.
@@ -454,6 +454,9 @@ what should be documented, and how:
   * Each method needs a comment describing at least the input and output quantities.
   
   * Comments on data members are encouraged, unless their meaning is obvious.
+    *Python*: Each data member needs to be preceded by a comment as seen in the Python example
+    `here <https://xwiki.desy.de/xwiki/short/e2e4a>`_. Note that the syntax is different - 
+    they need to start with either ``#:`` or ``##``. 
   
   * Comments on design decisions and implementation details may be added if appropriate.
     External documentation may be more useful to describe the overall design.
@@ -488,3 +491,4 @@ Further Suggestions
     of a one-dimensional C array or ``boost::multi_array`` instead of multi-dimensional C arrays.
     See these `slides <http://kds.kek.jp/getFile.py/access?contribId=0&resId=0&materialId=slides&confId=19219>`_
     or `mail <https://belle2.kek.jp/sympa/arc/software/2015-07/msg00061.html>`_ for more information.
+

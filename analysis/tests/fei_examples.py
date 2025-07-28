@@ -21,7 +21,7 @@ class ExamplesTest(b2tua.ExamplesTest):
         Test supported FEI examples.
         """
 
-        self._test_examples_dir('analysis/examples/FEI/')
+        self._test_examples_dir('analysis/examples/FEI/', cleanup=True)
 
 
 if __name__ == '__main__':

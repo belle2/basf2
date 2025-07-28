@@ -275,7 +275,7 @@ namespace Belle2 {
       auto after = traversal.begin();
       while (after->length < midLength) ++after;
       //Now we have an iterator after the half length. We know that the first
-      //step contains length 0 so we can savely subtract one to get the one
+      //step contains length 0 so we can safely subtract one to get the one
       //before
       auto before = after - 1;
       //the midpoint is in between so calculate the fractions from both sides

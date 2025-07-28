@@ -92,7 +92,7 @@ b2.conditions.append_globaltag(ma.getAnalysisGlobaltag())
 
 # The default working directory is '.'
 # Note that if you also train by yourself the weights of the trained Methods are saved therein.
-# To save CPU time the weight files should be saved in the same server were you run.
+# To save CPU time the weight files should be saved in the same server where you run.
 #
 # NEVER set uploadToDatabaseAfterTraining to True if you are not a librarian!!!
 #
@@ -101,19 +101,12 @@ b2.conditions.append_globaltag(ma.getAnalysisGlobaltag())
 # to avoid that the flavor tagger learns asymmetries on the tag side.
 # Only this kind of weight files are supported since release-03-01-00.
 
-weightfiles = 'B2nunubarBGx1'
-
 # Flavor Tagging Function. Default Expert mode to use the official weight files.
 ft.flavorTagger(
     particleLists=['B0:sig'],
-    weightFiles=weightfiles,
+    useGNN=False,
     path=cp_val_path)
 
-# By default the flavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.
-# If you want to train or test the Flavor Tagger only for one of them you have to specify it like:
-#
-# combinerMethods=['TMVA-FBDT']
-#
 # All available categories are:
 # [
 # 'Electron',
@@ -130,9 +123,10 @@ ft.flavorTagger(
 # 'MaximumPstar',
 # 'KaonPion']
 #
-# If you want to train yourself, have a look at the scripts under analysis/release-validation/CPVTools/
-# in principle you need only to run CPVToolsValidatorInParalell.sh
-# If you train the  event and combiner levels, you need two different samples of at least 500k events (one for each sampler).
+# If you want to train yourself, have a look at the scripts at
+# https://gitlab.desy.de/belle2/performance/releasevalidation/-/tree/main/CPVTools
+# In principle, you only need to run CPVToolsValidatorInParalell.sh
+# If you train the event and combiner levels, you need two different samples of at least 500k events (one for each sampler).
 # The different samples are needed to avoid biases between levels.
 # We mean 500k of correctly corrected and MC matched neutral Bs. (isSignal > 0)
 # You can also train the event level for all categories and then train the combiner
@@ -181,7 +175,7 @@ bvars = vc.reco_stats + \
     vertex_vars
 
 # Attention: the collection of flavor tagging variables is defined in the flavorTagger
-bvars += ft.flavor_tagging
+bvars += ['flavor_tagging']
 
 # Create aliases to save information for different particles
 bvars = bvars + \
@@ -209,9 +203,3 @@ b2.process(cp_val_path)
 
 # print out the summary
 print(b2.statistics)
-
-# If you want to calculate the efficiency of the FlavorTagger on your own
-# File use the script analysis/release-validation/CPVTools/flavorTaggerEfficiency.py giving
-# your file and the treename as arguments:
-
-# basf2 flavorTaggerEfficiency.py 'YourFilesWithWildCards.root' 'B0tree'

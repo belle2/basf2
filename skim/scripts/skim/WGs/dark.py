@@ -1021,12 +1021,13 @@ class BtoK_ALP2Gamma(BaseSkim):
     **Physics channel**: :math:`B \\to K^{(*)}a(\\to \\gamma \\gamma)`
 
     **Cuts applied:**
-    - Kaons (``BtoK_ALP2Gamma``): ``kaonID > 0.1``, ``dr < 3.0``, ``abs(dz) < 4.0``
-    - Pions (``BtoK_ALP2Gamma``): ``pionID > 0.1``, ``dr < 3.0``, ``abs(dz) < 4.0``
-    - Photons (``BtoK_ALP2Gamma``): ``E > 0.05``
-    - A0 candidate: daughter(0,E) > daughter(1,E)
-    - K*0/K*+: 0.8 < M < 1.0
-    - B candidates: Mbc > 5.20, abs(deltaE) < 1.0
+
+    * Kaons:BtoK_ALP2Gamma -> ``kaonID > 0.1``, ``dr < 3.0``, ``abs(dz) < 4.0``
+    * Pions:BtoK_ALP2Gamma-> ``pionID > 0.1``, ``dr < 3.0``, ``abs(dz) < 4.0``
+    * Photons:BtoK_ALP2Gamma-> ``E > 0.05``
+    * A0 candidate: daughter(0,E) > daughter(1,E)
+    * K*0/K*+: 0.8 < M < 1.0
+    * B candidates: Mbc > 5.20, abs(deltaE) < 1.0
     """
 
     __authors__ = ["Hyuna Kim"]

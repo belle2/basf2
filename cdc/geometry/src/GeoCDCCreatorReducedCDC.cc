@@ -20,7 +20,6 @@
 #include <boost/format.hpp>
 
 #include <G4Material.hh>
-#include <G4ProductionCuts.hh>
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Torus.hh>

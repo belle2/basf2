@@ -11,7 +11,6 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/database/DBObjPtr.h>
 
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -19,12 +18,10 @@
 #include <cdc/dataobjects/CDCDedxTrack.h>
 #include <cdc/dbobjects/CDCDedxRunGain.h>
 
-
-#include "TH1D.h"
-#include "TF1.h"
-#include "TList.h"
-#include "TFile.h"
-#include "TString.h"
+#include <TFile.h>
+#include <TH1D.h>
+#include <TList.h>
+#include <TString.h>
 
 namespace Belle2 {
 

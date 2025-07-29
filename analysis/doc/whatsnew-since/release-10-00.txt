@@ -18,3 +18,11 @@ Variables
 +++++++++
 * The variables `pi0Prob(mode) <pi0Prob>` and `etaProb(mode) <etaProb>` are extended to MC16 version
   and accept the modes ``standardMC16rd`` and ``tightMC16rd``.
+
+Continuum Suppression
++++++++++++++++++++++
+* Added the module parameter ``performIPProfileFit``  to the `ContinuumSuppressionBuilder` module, which allows to
+  perform a vertex fit with IP profile constraint for the ROE tracks before they are used as input for the calculation
+  of the continuum suppression variables.
+* The wrapper function `buildContinuumSuppression` has the new argument ``ipprofile_fit`` to enable the vertex fit
+  described above.

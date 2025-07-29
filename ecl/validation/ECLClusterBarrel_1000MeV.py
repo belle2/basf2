@@ -11,7 +11,7 @@
 """
 <header>
 <output>ECLClusterOutputBarrel_1000MeV.root</output>
-<contact>Priyanka Cheema, pche3675@uni.sydney.edu.au</contact>
+<contact>Priyanka Cheema, priyanka.cheema@kit.edu</contact>
 </header>
 """
 

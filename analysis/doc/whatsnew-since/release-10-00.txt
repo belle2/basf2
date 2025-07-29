@@ -1,0 +1,20 @@
+Changes in the analysis package in light-2507-europa
+----------------------------------------------------
+
+stdCharged
+++++++++++
+* Removed the selection on `nCDCHits` to match the recommendation for release-08 samples.
+
+FlavorTagger
+++++++++++++
+* Refactored flavor tagging scripts, which for analysts however only means that now the flavor tagging variables are
+  available via the collection ``flavor_tagging`` and not via ``flavorTagger.flavor_tagging``.
+
+Modular Analysis
+++++++++++++++++
+* Added options to `writePi0EtaVeto` to use the weight files trained using MC16rd: ``standardMC16rd`` and ``tightMC16rd``.
+
+Variables
++++++++++
+* The variables `pi0Prob(mode) <pi0Prob>` and `etaProb(mode) <etaProb>` are extended to MC16 version
+  and accept the modes ``standardMC16rd`` and ``tightMC16rd``.

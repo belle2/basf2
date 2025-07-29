@@ -16,10 +16,10 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 
+#include <TH1D.h>
+#include <TH2D.h>
+
 #include <vector>
-#include "TH1F.h"
-#include "TH1D.h"
-#include "TH2D.h"
 
 namespace Belle2 {
 

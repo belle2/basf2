@@ -264,7 +264,7 @@ namespace Belle2 {
       double phi0;
       /// all TS of a 2D track
       tsOutArray ts;
-      // hw values of 2dtrack
+      /// hw values of 2dtrack
       int hwOmega{0};
       int hwPhi0{0};
     };
@@ -287,7 +287,7 @@ namespace Belle2 {
       /// input Alpha list of a NN track
       std::array<float, 9> inputAlpha;
       std::array<int, 9> rawinputAlpha;
-      //  input extra time list of a NN track
+      /// input extra time list of a NN track
       std::array<std::array<float, 11>, 4> inputExtraT;
       std::array<std::array<float, 11>, 4> rawinputExtraT;
       /// input TS list of a NN track

@@ -7,6 +7,14 @@
  **************************************************************************/
 
 #include <cdc/calibration/CDCdEdx/CDCDedx1DCellAlgorithm.h>
+
+#include <TCanvas.h>
+#include <TLegend.h>
+#include <TMath.h>
+#include <TPad.h>
+#include <TRandom.h>
+#include <TStyle.h>
+
 #include <cmath>
 
 using namespace Belle2;

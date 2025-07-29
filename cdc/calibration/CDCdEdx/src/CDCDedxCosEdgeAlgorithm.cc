@@ -9,7 +9,6 @@
 #include <TF1.h>
 #include <TCanvas.h>
 #include <TH1I.h>
-#include <TLegend.h>
 
 #include <cdc/calibration/CDCdEdx/CDCDedxCosEdgeAlgorithm.h>
 

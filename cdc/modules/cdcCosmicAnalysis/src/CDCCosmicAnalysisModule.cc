@@ -13,7 +13,6 @@
 #include <framework/datastore/RelationArray.h>
 
 #include <Math/ProbFuncMathCore.h>
-#include "algorithm"
 
 using namespace std;
 using namespace Belle2;

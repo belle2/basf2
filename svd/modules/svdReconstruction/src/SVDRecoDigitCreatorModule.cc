@@ -188,7 +188,7 @@ void SVDRecoDigitCreatorModule::event()
       double timeError = std::numeric_limits<float>::quiet_NaN();
       double charge = std::numeric_limits<float>::quiet_NaN();
       float chargeError = std::numeric_limits<float>::quiet_NaN();
-      int firstFrame = std::numeric_limits<int>::quiet_NaN();
+      int firstFrame = 0;
       std::vector<float> probabilities = {0.5};
       double chi2 = std::numeric_limits<double>::quiet_NaN();
 

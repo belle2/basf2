@@ -175,7 +175,7 @@ bvars = vc.reco_stats + \
     vertex_vars
 
 # Attention: the collection of flavor tagging variables is defined in the flavorTagger
-bvars += ft.flavor_tagging
+bvars += ['flavor_tagging']
 
 # Create aliases to save information for different particles
 bvars = bvars + \

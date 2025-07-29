@@ -31,9 +31,9 @@ Decay B0Rare
 
 # b -> u l nu
 #
-# pi: FF values from HFLAV 2016. [BF update PDG2023]
-0.000150000   pi-  e+  nu_e                                BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
-0.000150000   pi-  mu+  nu_mu                              BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
+# pi: FF values from HFLAV 2023. [BF update PDG2023]
+0.000150000   pi-  e+  nu_e                                BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[BCL update - AN 07/2025]
+0.000150000   pi-  mu+  nu_mu                              BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[BCL update - AN 07/2025]
 
 # rho, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
 # fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
@@ -47,8 +47,8 @@ Decay B0Rare
 0.001701000   Xu-  e+  nu_e                                VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30  3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 0.001701000   Xu-  mu+  nu_mu                              VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000096150   pi-  tau+  nu_tau                            BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BCL model update - KMA 06/2022] #[BF update - AN 11/2023]
-0.000157290   rho-  tau+  nu_tau                           BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (arXiv:2104.05739). #[BCL model update - KMA 06/2022] #[BF update - AN 11/2023]
+0.000096150   pi-  tau+  nu_tau                            BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - AN 11/2023] #[BCL update HFLAV 2023 - AN 07/2025]
+0.000157290   rho-  tau+  nu_tau                           BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (arXiv:2104.05739). #[BF update - AN 11/2023]
 0.000090000   a_1-  tau+  nu_tau                           ISGW2;
 0.000008000   b_1-  tau+  nu_tau                           ISGW2;
 0.000008000   a_0-  tau+  nu_tau                           ISGW2;
@@ -1342,9 +1342,9 @@ Decay anti-B0Rare
 
 # b -> u l nu
 #
-# pi: FF values from HFLAV 2016. [BF update PDG2023]
-0.000150000   pi+  e-  anti-nu_e                           BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
-0.000150000   pi+  mu-  anti-nu_mu                         BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
+# pi: FF values from HFLAV 2023. [BF update PDG2023]
+0.000150000   pi+  e-  anti-nu_e                           BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[BCL update - AN 07/2025]
+0.000150000   pi+  mu-  anti-nu_mu                         BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[BCL update - AN 07/2025]
 
 # rho, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
 # fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
@@ -1358,7 +1358,7 @@ Decay anti-B0Rare
 0.001701000   Xu+  e-  anti-nu_e                           VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 0.001701000   Xu+  mu-  anti-nu_mu                         VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000096150   pi+  tau-  anti-nu_tau                       BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BCL model update - KMA 06/2022] # [BF update - AN 11/2023]
+0.000096150   pi+  tau-  anti-nu_tau                       BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - AN 11/2023] #[BCL update HFLAV 2023 - AN 07/2025]
 0.000157290   rho+  tau-  anti-nu_tau                      BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (arXiv:2104.05739). #[BCL model update - KMA 06/2022]  # [BF update - AN 11/2023]
 0.000090000   a_1+  tau-  anti-nu_tau                      ISGW2;
 0.000008000   b_1+  tau-  anti-nu_tau                      ISGW2;

@@ -26,13 +26,13 @@ exp = "0"*(4-len(str(exp_num)))+str(exp_num)
 run = "0"*(6-len(str(run_num)))+str(run_num)
 
 # downloaded from dqm.belle2.org
-file = f"hlt_dqm_histo_e{exp}r{run}.root"
+dqm_histo_file = f"hlt_dqm_histo_e{exp}r{run}.root"
 
 # Input module.
 main.add_module('DQMHistAnalysisInputRootFile',
                 Experiment=exp_num,
                 RunList=[run_num],
-                FileList=[file],
+                FileList=[dqm_histo_file],
                 SelectHistograms=['KLM/*', 'KLMEfficiencyDQM/*', 'DAQ/*', 'DQMInfo/*'])
 
 # Plot some canvases from Input

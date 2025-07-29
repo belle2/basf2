@@ -11,7 +11,7 @@ Gbasf2
     **Prerequisites**:
 
     * See `Computing getting started <https://xwiki.desy.de/xwiki/rest/p/c804c>`_.
-    * Access to KEKCC or NAF (recommended), or to a system with CentOS 7 or EL9 and CVMFS mounted.
+    * Access to KEKCC or NAF (recommended), or to a system with EL9 and CVMFS mounted.
     * A valid `grid certificate <https://xwiki.desy.de/xwiki/rest/p/d9328>`_ installed in ``~/.globus`` and in a web browser.
     * A working `basf2` steering script (see the :ref:`onlinebook_first_steering_file` lesson)
 
@@ -32,7 +32,8 @@ Gbasf2
     * Download the output for offline analysis.
 
 Gbasf2 is the command-line client for submitting grid-based `basf2` jobs.
-Belle II data and MC samples are distributed in many storage sites around the world. Gbasf2 and a set of grid-based user tools (gb2 tools) allow you to access and
+Belle II data and MC samples are distributed in many storage sites around the world. 
+Gbasf2 and a set of grid-based user tools (gb2 tools) allow you to access and
 analyze them.
 
 The same `basf2` steering files are used when running on the grid. The usual workflow is:
@@ -56,10 +57,9 @@ The same `basf2` steering files are used when running on the grid. The usual wor
 Go to `computing getting started <https://xwiki.desy.de/xwiki/rest/p/c804c>`_
 and verify that you have the prerequisites. You need:
 
-* Access to KEKCC or NAF (recommended), or to a system with CentOS 7 and CVMFS mounted.
+* Access to KEKCC or NAF (recommended), or to a system with EL9 and CVMFS mounted.
 * A valid grid certificate issued within a year and `installed <https://xwiki.desy.de/xwiki/rest/p/c804c/#H2.Installyourcertificate>`_ in ``~/.globus`` in ``.pem`` format.
-* Belle Virtual Organization (VO) membership registered or renewed within a year. You can check your status at
-  `VOMS server <https://voms.cc.kek.jp:8443/voms/belle/>`_.
+* Belle Virtual Organization (VO) membership registered or renewed within a year. You can check your status at `VOMS server <https://voms.cc.kek.jp:8443/voms/belle/>`_.
 * Registration in `DIRAC <https://xwiki.desy.de/xwiki/rest/p/c804c/#H7.RegisterwithDIRAC>`_.
 
 .. note::
@@ -73,7 +73,7 @@ Setting up gbasf2 via cvmfs
 ---------------------------
 
 Since the DIRAC user interface relies on some middleware components, this limits the operating environments in which
-gbasf2 can function. At this moment, only CentOS 7 is supported (it works on other EL9-based operating systems like AlmaLinux 9 but please be aware it is not fully validated).
+gbasf2 can function. At this moment, only EL9/Rocky9/AlmaLinux9 are guranteed support (CentOS 7 is now being phased out).
 
 Also, unfortunately at this moment the `basf2` and gbasf2 environments are not compatible. This means gbasf2 requires
 a fresh ssh session (without sourcing ``b2setup``).
@@ -87,13 +87,16 @@ a fresh ssh session (without sourcing ``b2setup``).
 
         chmod 600 ~/.globus/userkey.pem
 
-If your computing system has access to cvmfs (e.g. at KEKCC), the simplest way to use gbasf2 is via a central installation. The following command sets all the necessary environment variables and initializes a grid proxy for you (you will be asked to enter your credentials for this).
+If your computing system has access to cvmfs (e.g. at KEKCC), the simplest way to use gbasf2 is via a central installation. 
+The following command sets all the necessary environment variables and initializes a grid proxy for you 
+(you will be asked to enter your credentials for this).
 
 .. code-block:: bash
 
     source /cvmfs/belle.kek.jp/grid/gbasf2/pro/bashrc
 
-It will request your certificate passphrase. If the command finishes without errors and you see information related to your certificate, similar to that below, your proxy has been successfully set:
+It will request your certificate passphrase. If the command finishes without errors and you see information related 
+to your certificate, similar to that below, your proxy has been successfully set:
 
 .. code-block:: bash
 
@@ -115,7 +118,9 @@ It will request your certificate passphrase. If the command finishes without err
 
 That's it! You are ready to run grid jobs!
 
-A proxy is a short-term credential that verifies your identity, allowing you to perform operations on the grid. By default your proxy is valid for 24h. If it expires, you need to execute ``gb2_proxy_init -g belle`` again if you have already setup gbasf2 in the same shell (terminal).
+A proxy is a short-term credential that verifies your identity, allowing you to perform operations on the grid. 
+By default your proxy is valid for 24h. If it expires, you need to execute ``gb2_proxy_init -g belle`` again 
+if you have already setup gbasf2 in the same shell (terminal).
 
 .. note::
 
@@ -126,7 +131,9 @@ A proxy is a short-term credential that verifies your identity, allowing you to 
 Installing gbasf2
 -----------------
 
-The pre-installed gbasf2 on CVMFS is the recommended version (see Setup Gbasf2). However, gbasf2 local installation is available. Please be aware this is not fully tested and not fully supported. If you wish to install gbasf2 locally, follow the instructions on the :doc:`gbasf2 documentation <gbasf2:gbasf2install>`.
+The pre-installed gbasf2 on CVMFS is the recommended version (see Setup Gbasf2). 
+However, gbasf2 local installation is available. Please be aware this is not fully tested and not fully supported. 
+If you wish to install gbasf2 locally, follow the instructions on the :doc:`gbasf2 documentation <gbasf2:gbasf2install>`.
 
 .. seealso:: https://gbasf2.belle2.org/
 
@@ -215,8 +222,61 @@ in each dataset.
     Sometimes, in the documentation (such as in the XWiki pages) we refer to the **logical path name** (LPN)
     of datasets and datablocks, while for files we use LFN. In practice, LFN and LPN are the same thing.
 
+
+Collections
+----------------------------------
+
+Rather than expect every analyst to discover the data and MC samples useful for analysis by themselves,
+the data production team prepares ``collections`` of LFNs. This provides a common, immutable, intuitive resource,
+which can help to avoid errors related to missing or using incorrect samples for an analysis. You can discover 
+collections in the same way as for LFNs.
+
+To discover the collection you need, you should first check `Data main page <https://xwiki.desy.de/xwiki/rest/p/ed439>`_ 
+and `MC main page <https://xwiki.desy.de/xwiki/rest/p/70b0a>`_, which provide details for the official collections.
+
+If you want to explore the available collections, you can also use the dataset searcher tool. You've already 
+used the `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>` tool to search for datasets. Now use the ``collection`` 
+key word to list the available data collections.
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Set your gbasf2 environment and find the available data collections for Moriond2023 using
+      `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>`.
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     Use ``--help`` and ``--usage`` to get all the available options
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     The execution and result from the command line are as follows:
+
+     .. code-block:: bash
+
+         gb2_ds_search collection --list_all_collections /belle/collection/Data/Moriond2023*
+
+You can also do things like list the datasets within a collection with ``gb2_ds_search collection --list_datasets <COLLECTION>`` 
+and get the metadata for the collection with ``gb2_ds_search collection --get_metadata <COLLECTION>``.
+
+.. admonition:: Key points
+    :class: key-points
+
+    * Collections contain a complete sample of a particular type, e.g. the Moriond 2023 data sample
+
+    * You should always refer to the data production pages to find the recommended collections.
+
+
 The Dataset Searcher
 ^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+
+    Unless recommended by experts (or you're an expert yourself), the following section is something that 
+    contains very useful information but should be used with caution and wherewithal. 
+
 
 The Dataset Searcher is a web application to find datasets on the grid.
 Go to the `DIRAC webportal <https://dirac.cc.kek.jp:8443/DIRAC/>`_ and then open
@@ -329,49 +389,6 @@ Another way to interact with the dataset searcher is using the command line tool
 	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00032969/s00/e0026/4S/r00000/uubar/14120601/udst
 
 .. _GBASF2_Collections:
-
-Collections
-----------------------------------
-
-Rather than expect every analyst to use the dataset searcher to discover the data and MC samples useful for analysis,
-the data production team prepares ``collections`` of LFNs. This provides a common, immutable, intuitive resource,
-which can help to avoid errors related to missing or using incorrect samples for an analysis. You can discover 
-collections in the same way as for LFNs.
-
-To discover the collection you need, you should first check `Data main page <https://xwiki.desy.de/xwiki/rest/p/ed439>`_ 
-and `MC main page <https://xwiki.desy.de/xwiki/rest/p/70b0a>`_, which provide details for the official collections.
-
-If you want to explore the available collections, you can also use the dataset searcher tool. You've already 
-used the `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>` tool to search for datasets. Now use the ``collection`` key word to list the available data collections.
-
-.. admonition:: Exercise
-     :class: exercise stacked
-
-     Set your gbasf2 environment and find the available data collections for Moriond2023 using `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>`.
-
-.. admonition:: Hint
-     :class: toggle xhint stacked
-
-     Use ``--help`` and ``--usage`` to get all the available options
-
-.. admonition:: Solution
-     :class: toggle solution
-
-     The execution and result from the command line are as follows:
-
-     .. code-block:: bash
-
-         gb2_ds_search collection --list_all_collections /belle/collection/Data/Moriond2023*
-
-You can also do things like list the datasets within a collection with ``gb2_ds_search collection --list_datasets <COLLECTION>`` 
-and get the metadata for the collection with ``gb2_ds_search collection --get_metadata <COLLECTION>``.
-
-.. admonition:: Key points
-    :class: key-points
-
-    * Collections contain a complete sample of a particular type, e.g. the Moriond 2023 data sample
-
-    * You should always refer to the data production pages to find the recommended collections.
 
 
 
@@ -681,7 +698,31 @@ Sometimes, things do not go well. A few jobs can fail because a large list of re
 * A timeout in the transfer of a file between sites.
 * A central service not available for a short period of time.
 * An issue in the site hosting the job.
+* A job took too long at a site 
 * etc.
+
+For users, consider the the following set of conditions: 
+
+.. code-block:: python
+
+    condition1 = "Has it been less than a week?"
+    if condition1 is True: "Wait"
+    else: 
+        corollary1_1 = "Has it been assigned to a site?" 
+        if corollary1_1 is True: "Wait, we don't have control over the sites"
+        else: 
+            corollary1_2 = "Have you set the cputime to your job?"
+            if corollary1_2 is False: "Please consider resubmitting with cputime included"
+    
+    condition2 = "Has it been longer than 2 weeks?"
+    if condntion2 is True: 
+        corollary2_1 = "Are all the jobs in the project stuck in 'Waiting/Not Finishing'?"
+        if corollary2_1 is True: "Contact expert using comp_users_forum"
+        else: 
+            corollary2_2 = "Is there a steady stream of jobs completing?"
+            if corollary2_2 is True: "Please wait..."
+            else: "contact expert"
+
 
 Some of my jobs failed
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -757,6 +798,26 @@ It is also possible to retrieve the log files directly from the command line usi
      The file ``basf2helper.py.log`` contains the actual output of your `basf2` steering file executed on the grid site.
 
 
+Good practices 
+^^^^^^^^^^^^^^^
+
+To prevent many jobs failing and for your jobs to run faster, let's summarize some good practices all analysts should do. 
+
+* Please check that your code can run locally. While not completely foolproof, this will save you plenty of heartache (i.e. section above).
+* Lookout for new features (ex. ``gb2_ds_get --new`` allows multithreaded download)
+* Use collections when applicable. Develop skims for your benefit. 
+* Consider :ref:`onlinebook_workflowmanagement_b2luigi` for automating some of the steps outlined above. 
+* Properly setting CPU time for your jobs. 
+
+
+To prevent your jobs from being stuck in waiting caused by an overestimated CPU time, you can set either 
+the ``--cputime`` or the ``--evtpersec`` option. To figure out what number to set, run your script on KEKCC and 
+set your time to 20 * <total time on KEKCC in minutes>. 
+
+For details, see `gbasf2's section on CPU time. <https://gbasf2.belle2.org/runningJobs.html#setting-the-cpu-time>`_ .
+
+
+
 Where to go for help?
 ---------------------
 
@@ -779,4 +840,4 @@ You can also ask in `questions.belle2.org <https://questions.belle2.org/question
 
 .. rubric:: Author of this lesson
 
-Michel Villanueva, Justin Guilliams, Jake Bennett
+Michel Villanueva, Justin Guilliams, Jake Bennett, Quinn Campagna, Tommy Lam

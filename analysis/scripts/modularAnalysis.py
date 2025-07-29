@@ -469,11 +469,14 @@ def correctBrems(outputList,
     the particle's track, set by the ``ECLTrackBremFinder`` module during reconstruction.
 
     Warning:
-        This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
-        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) do.
-        However, studies by the tau WG revealed that the cuts applied by the ``ECLTrackBremFinder`` module are too tight.
-        These will be loosened but this will only have effect with proc13 and MC15.
-        If your analysis is very sensitive to the Bremsstrahlung corrections, it is advised to use `correctBremsBelle`.
+        So far, there haven't been any comprehensive comparisons of the performance of the `BremsFinder` module, which
+        is called in this function, with the `BelleBremRecovery` module, which is called via the `correctBremsBelle`
+        function. If your analysis is very sensitive to the Bremsstrahlung corrections, it is currently advised to use
+        `correctBremsBelle`.
+
+        The reason is that studies by the tau WG revealed that in the past the cuts applied by the
+        ``ECLTrackBremFinder`` module were too tight. They were only loosened for proc16 and MC16. New performance
+        studies are needed to verify that now this module outperforms the Belle-like approach.
 
     Information:
         A detailed description of how the weights are set can be found directly at the documentation of the
@@ -3143,7 +3146,7 @@ def oldwritePi0EtaVeto(
 def writePi0EtaVeto(
     particleList,
     decayString,
-    mode='standardMC15rd',
+    mode='standardMC16rd',
     selection='',
     path=None,
     suffix='',
@@ -3153,16 +3156,45 @@ def writePi0EtaVeto(
     etaPayloadNameOverride=None,
     etaSoftPhotonCutOverride=None,
     requireSoftPhotonIsInROE=False,
-    pi0Selection='[0.03 < M < 0.23]',
-    etaSelection='[0.25 < M < 0.75]'
+    pi0Selection='',
+    etaSelection=''
 ):
     """
     Give pi0/eta probability for hard photon.
 
     In the default weight files a value of 1.4 GeV is set as the lower limit for the hard photon energy in the CMS frame.
-    For MC15rd weight files, the BtoXGamma skim is applied during the MVA training.
+    For MC15rd/MC16rd weight files, the BtoXGamma skim is applied during the MVA training.
 
-    The current default weight files are optimised using MC15rd. The weight files for MC12 (last version) are still available.
+    The current default weight files are for MC16rd. The weight files for MC15rd/MC12 are still available.
+
+    The input variables of the mva training for pi0 veto using MC16rd are:
+
+    * M: Invariant mass of pi0 candidates
+    * cosHelicityAngleMomentum: Cosine of angle between momentum difference of the photons in the pi0 rest frame
+      and momentum of pi0 in lab frame
+    * daughter(1,E): soft photon energy in lab frame
+    * daughter(1,clusterTheta): soft photon ECL cluster's polar angle
+    * daughter(1,clusterLAT): soft photon lateral energy distribution
+    * daughter(1,beamBackgroundSuppression): soft photon beam background suppression MVA output
+    * daughter(1,fakePhotonSuppression): soft photon fake photon suppression MVA output
+
+    The input variables of the mva training for eta veto using MC16rd are:
+
+    * M: Invariant mass of eta candidates
+    * cosHelicityAngleMomentum: Cosine of angle between momentum difference of the photons in the eta rest frame
+      and momentum of eta in lab frame
+    * daughter(1,E): soft photon energy in lab frame
+    * daughter(1,clusterTheta): soft photon ECL cluster's polar angle
+    * daughter(1,clusterLAT): soft photon lateral energy distribution
+    * daughter(1,clusterNHits): soft photon total crystal weights sum(w_i) with w_i<=1
+    * daughter(1,clusterE1E9): soft photon ratio between energies of central crystal and inner 3x3 crystals
+    * daughter(1,clusterE9E21): soft photon ratio of energies in inner 3x3 crystals and 5x5 crystals without corners
+    * daughter(1,clusterSecondMoment): soft photon second moment
+    * daughter(1,clusterAbsZernikeMoment40): soft photon Zernike moment 40
+    * daughter(1,clusterAbsZernikeMoment51): soft photon Zernike moment 51
+    * daughter(1,beamBackgroundSuppression): soft photon beam background suppression MVA output
+    * daughter(1,fakePhotonSuppression): soft photon fake photon suppression MVA output
+
 
     The input variables of the mva training for pi0 veto using MC15rd are:
 
@@ -3208,6 +3240,8 @@ def writePi0EtaVeto(
     * both: tight energy cut and clusterNHits cut are applied to soft photon
     * standardMC15rd: loose energy cut is applied to soft photon and the weight files are trained using MC15rd
     * tightMC15rd: tight energy cut is applied to soft photon and the weight files are trained using MC15rd
+    * standardMC16rd: loose energy cut is applied to soft photon and the weight files are trained using MC16rd
+    * tightMC16rd: tight energy cut is applied to soft photon and the weight files are trained using MC16rd
 
     The final probability of the pi0/eta veto is stored as an extraInfo. If no suffix is set it can be obtained from the variables
     `pi0Prob`/`etaProb`. Otherwise, it is available as '{Pi0, Eta}ProbOrigin', '{Pi0, Eta}ProbTightEnergyThreshold', '{Pi0,
@@ -3228,7 +3262,8 @@ def writePi0EtaVeto(
 
     @param particleList     the input ParticleList
     @param decayString 		specify Particle to be added to the ParticleList
-    @param mode				choose one mode out of 'standardMC15rd', 'tightMC15rd', 'standard', 'tight', 'cluster' and 'both'
+    @param mode				choose one mode out of 'standardMC16rd', 'tightMC16rd', 'standardMC15rd', 'tightMC15rd',
+                                    'standard', 'tight', 'cluster' and 'both'
     @param selection 		selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       		modules are added to this path
     @param suffix           optional suffix to be appended to the usual extraInfo name
@@ -3241,8 +3276,8 @@ def writePi0EtaVeto(
                                     (default is None)
     @param requireSoftPhotonIsInROE specify if the soft photons used to build pi0 and eta candidates have to be in the current ROE
                                     or not. Default is False, i.e. all soft photons in the event are used.
-    @param pi0Selection     Selection for the pi0 reconstruction. Default is '(0.03 < M < 0.23)'.
-    @param etaSelection     Selection for the eta reconstruction. Default is '(0.25 < M < 0.75)'.
+    @param pi0Selection     Selection for the pi0 reconstruction. Default is "".
+    @param etaSelection     Selection for the eta reconstruction. Default is "".
     """
 
     import b2bii
@@ -3252,16 +3287,18 @@ def writePi0EtaVeto(
     if (requireSoftPhotonIsInROE):
         B2WARNING("Requiring the soft photon to being in the ROE was not done for the MVA training. "
                   "Please check the results carefully.")
+    showWarning = False
+
     if (mode == 'standardMC15rd' or mode == 'tightMC15rd'):
         if (pi0Selection != '[0.03 < M < 0.23]' or etaSelection != '[0.25 < M < 0.75]'):
-            B2WARNING(
-                "Personal selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
-                "Please check the results carefully.")
+            showWarning = True
     else:
         if (pi0Selection != '' or etaSelection != ''):
-            B2WARNING(
-                "Personal selection criteria for the pi0 or the eta during reconstructDecay were not used during the MVA training. "
-                "Please check the results carefully.")
+            showWarning = True
+    if showWarning:
+        B2WARNING(
+            "Selection criteria for the pi0 or the eta during reconstructDecay differ from those used during the MVA training. "
+            "You may get NAN value. Please check the results carefully.")
 
     renameSuffix = False
 
@@ -3287,7 +3324,9 @@ def writePi0EtaVeto(
                     'cluster': 'LargeClusterSize',
                     'both': 'TightEnrgyThresholdAndLargeClusterSize',
                     'standardMC15rd': 'OriginMC15rd',
-                    'tightMC15rd': 'TightEnergyThresholdMC15rd'}
+                    'tightMC15rd': 'TightEnergyThresholdMC15rd',
+                    'standardMC16rd': 'OriginMC16rd',
+                    'tightMC16rd': 'TightEnergyThresholdMC16rd'}
 
     dictPi0EnergyCut = {
         'standard': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
@@ -3295,7 +3334,9 @@ def writePi0EtaVeto(
         'cluster': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
         'both': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
         'standardMC15rd': '[[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
-        'tightMC15rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
+        'tightMC15rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
+        'standardMC16rd': '[[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+        'tightMC16rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
 
     dictEtaEnergyCut = {
         'standard': '[[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]]',
@@ -3303,42 +3344,54 @@ def writePi0EtaVeto(
         'cluster': '[[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]]',
         'both': '[[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]]',
         'standardMC15rd': '[[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
-        'tightMC15rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
+        'tightMC15rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
+        'standardMC16rd': '[[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+        'tightMC16rd': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
 
     dictNHitsTimingCut = {'standard': 'clusterNHits >= 0 and abs(clusterTiming)<clusterErrorTiming',
                           'tight': 'clusterNHits >= 0 and abs(clusterTiming)<clusterErrorTiming',
                           'cluster': 'clusterNHits >= 2 and abs(clusterTiming)<clusterErrorTiming',
                           'both': 'clusterNHits >= 2 and abs(clusterTiming)<clusterErrorTiming',
                           'standardMC15rd': 'clusterNHits > 1.5 and abs(clusterTiming) < 200',
-                          'tightMC15rd': 'clusterNHits > 1.5 and abs(clusterTiming) < 200'}
+                          'tightMC15rd': 'clusterNHits > 1.5 and abs(clusterTiming) < 200',
+                          'standardMC16rd': 'clusterNHits > 1.5 and abs(clusterTiming) < 200',
+                          'tightMC16rd': 'clusterNHits > 1.5 and abs(clusterTiming) < 200'}
 
     dictPi0PayloadName = {'standard': 'Pi0VetoIdentifierStandard',
                           'tight': 'Pi0VetoIdentifierWithHigherEnergyThreshold',
                           'cluster': 'Pi0VetoIdentifierWithLargerClusterSize',
                           'both': 'Pi0VetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize',
                           'standardMC15rd': 'Pi0VetoIdentifierStandardMC15rd',
-                          'tightMC15rd': 'Pi0VetoIdentifierWithHigherEnergyThresholdMC15rd'}
+                          'tightMC15rd': 'Pi0VetoIdentifierWithHigherEnergyThresholdMC15rd',
+                          'standardMC16rd': 'Pi0VetoIdentifierStandardMC16rd',
+                          'tightMC16rd': 'Pi0VetoIdentifierWithHigherEnergyThresholdMC16rd'}
 
     dictEtaPayloadName = {'standard': 'EtaVetoIdentifierStandard',
                           'tight': 'EtaVetoIdentifierWithHigherEnergyThreshold',
                           'cluster': 'EtaVetoIdentifierWithLargerClusterSize',
                           'both': 'EtaVetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize',
                           'standardMC15rd': 'EtaVetoIdentifierStandardMC15rd',
-                          'tightMC15rd': 'EtaVetoIdentifierWithHigherEnergyThresholdMC15rd'}
+                          'tightMC15rd': 'EtaVetoIdentifierWithHigherEnergyThresholdMC15rd',
+                          'standardMC16rd': 'EtaVetoIdentifierStandardMC16rd',
+                          'tightMC16rd': 'EtaVetoIdentifierWithHigherEnergyThresholdMC16rd'}
 
     dictPi0ExtraInfoName = {'standard': 'Pi0ProbOrigin',
                             'tight': 'Pi0ProbTightEnergyThreshold',
                             'cluster': 'Pi0ProbLargeClusterSize',
                             'both': 'Pi0ProbTightEnergyThresholdAndLargeClusterSize',
                             'standardMC15rd': 'Pi0ProbOriginMC15rd',
-                            'tightMC15rd': 'Pi0ProbTightEnergyThresholdMC15rd'}
+                            'tightMC15rd': 'Pi0ProbTightEnergyThresholdMC15rd',
+                            'standardMC16rd': 'Pi0ProbOriginMC16rd',
+                            'tightMC16rd': 'Pi0ProbTightEnergyThresholdMC16rd'}
 
     dictEtaExtraInfoName = {'standard': 'EtaProbOrigin',
                             'tight': 'EtaProbTightEnergyThreshold',
                             'cluster': 'EtaProbLargeClusterSize',
                             'both': 'EtaProbTightEnergyThresholdAndLargeClusterSize',
                             'standardMC15rd': 'EtaProbOriginMC15rd',
-                            'tightMC15rd': 'EtaProbTightEnergyThresholdMC15rd'}
+                            'tightMC15rd': 'EtaProbTightEnergyThresholdMC15rd',
+                            'standardMC16rd': 'EtaProbOriginMC16rd',
+                            'tightMC16rd': 'EtaProbTightEnergyThresholdMC16rd'}
 
     ListName = dictListName[mode]
     Pi0EnergyCut = dictPi0EnergyCut[mode]

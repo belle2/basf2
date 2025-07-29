@@ -43,7 +43,7 @@ namespace Belle2 {
       for (unsigned idx = 0; idx <= c_nTCs; idx++) {
         m_timingTC[idx] = std::numeric_limits<float>::quiet_NaN();
         m_timingTCECLCalDigit[idx] = std::numeric_limits<float>::quiet_NaN();
-        m_hitWinTC[idx] = std::numeric_limits<int>::quiet_NaN();
+        m_hitWinTC[idx] = 0;
       }
     }
 

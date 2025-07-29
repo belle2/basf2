@@ -41,13 +41,13 @@ namespace Belle2 {
     // *64*0.375/8 = 8 * 0.375 = 3
     static constexpr int timeOfWindows[] = {0, 428 * 3, 852 * 3, 1280 * 3, 1708 * 3, 2132 * 3, 2560 * 3, 2988 * 3, 3412 * 3};
 
-    // L1 latency in FTSW clock cycles
+    //! L1 latency in FTSW clock cycles
     static constexpr int latencyL1 = 611;
 
-    // time correction in ns (estimated by comparing trigger readout with main readout
+    //! time correction in ns (estimated by comparing trigger readout with main readout
     static constexpr int timeCorrection = 14;
 
-    // max number of FTSW clocks in revo9 cycle
+    //! max number of FTSW clocks in revo9 cycle
     static constexpr int revo9CounterMax = 1280 * 9;
 
     /**
@@ -78,7 +78,7 @@ namespace Belle2 {
 
   protected:
 
-    int m_eventNumber;    /**Event number (according to L1/global) */
+    int m_eventNumber;    /**< Event number (according to L1/global) */
 
   private:
 

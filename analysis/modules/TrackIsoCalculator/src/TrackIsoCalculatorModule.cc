@@ -259,7 +259,7 @@ void TrackIsoCalculatorModule::event()
           continue;
         }
 
-        const auto minDist = *std::min_element(std::begin(iDistancesAndRefMdstSources), std::end(iDistancesAndRefMdstSources),
+        const auto minDist = *std::min_element(iDistancesAndRefMdstSources.begin(), iDistancesAndRefMdstSources.end(),
         [](const auto & l, const auto & r) {return l.first < r.first;});
 
         auto jParticle = m_pListReference->getParticleWithMdstSource(minDist.second);

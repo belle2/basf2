@@ -760,6 +760,7 @@ def add_klm_modules(path, components=None):
     if components is None or 'KLM' in components:
         path.add_module('KLMReconstructor')
         path.add_module('KLMClustersReconstructor')
+        path.add_module('KLMClusterAna')
 
 
 def add_klm_mc_matcher_module(path, components=None):

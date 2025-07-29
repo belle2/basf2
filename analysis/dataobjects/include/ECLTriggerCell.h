@@ -25,7 +25,7 @@ namespace Belle2 {
       m_thetaId(0),
       m_phiId(0),
       m_TCId(0),
-      m_hitWindow(std::numeric_limits<int>::quiet_NaN()),
+      m_hitWindow(0),
       m_FADC(0.),
       m_timing(std::numeric_limits<double>::quiet_NaN()),
       m_evtTiming(std::numeric_limits<double>::quiet_NaN()),

@@ -57,7 +57,7 @@ namespace Belle2 {
   private:
     /** holding the value */
     T m_value;
-    /* saves the "set" state */
+    /** saves the "set" state */
     bool m_set = false;
     /** saves the "locked" state */
     bool m_locked = false;

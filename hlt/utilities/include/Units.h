@@ -13,7 +13,7 @@ namespace Belle2 {
   namespace HLTUnits {
 
     /** Maximum number of HLT units used during the experiment. */
-    static constexpr unsigned int max_hlt_units = 12;
+    static constexpr unsigned int max_hlt_units = 15;
 
   }
 

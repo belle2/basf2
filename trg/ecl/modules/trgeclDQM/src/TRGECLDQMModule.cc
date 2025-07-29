@@ -33,13 +33,13 @@ TRGECLDQMModule::TRGECLDQMModule() : HistoModule()
   setDescription("DQM for ECL Trigger system");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  TCId.clear();
-  TCHitWin.clear();
-  TCEnergy.clear();
-  TCTiming.clear();
-  RevoFAM.clear();
-  RevoTrg.clear();
-  FineTiming.clear();
+  m_TCId.clear();
+  m_TCHitWin.clear();
+  m_TCEnergy.clear();
+  m_TCTiming.clear();
+  m_RevoFAM.clear();
+  m_RevoTrg.clear();
+  m_FineTiming.clear();
 
   addParam("ECLNTC_grpclk", m_grpclknum, "The number of clocks to group N(TC)", 2);
 }
@@ -141,10 +141,10 @@ void TRGECLDQMModule::initialize()
   // calls back the defineHisto() function, but the HistoManager module has to be in the path
   REG_HISTOGRAM
 
-  trgeclHitArray.registerInDataStore();
-  trgeclEvtArray.registerInDataStore();
-  trgeclCluster.registerInDataStore();
-  trgeclSumArray.registerInDataStore();
+  m_trgeclHitArray.registerInDataStore();
+  m_trgeclEvtArray.registerInDataStore();
+  m_trgeclCluster.registerInDataStore();
+  m_trgeclSumArray.registerInDataStore();
 }
 
 void TRGECLDQMModule::beginRun()
@@ -158,13 +158,13 @@ void TRGECLDQMModule::endRun() { } void TRGECLDQMModule::terminate()
 
 void TRGECLDQMModule::event()
 {
-  TCId.clear();
-  TCHitWin.clear();
-  TCEnergy.clear();
-  TCTiming.clear();
-  RevoFAM.clear();
-  RevoTrg.clear();
-  FineTiming.clear();
+  m_TCId.clear();
+  m_TCHitWin.clear();
+  m_TCEnergy.clear();
+  m_TCTiming.clear();
+  m_RevoFAM.clear();
+  m_RevoTrg.clear();
+  m_FineTiming.clear();
 
   //    StoreArray<TRGECLUnpackerStore> trgeclHitArray;
   /* cppcheck-suppress variableScope */
@@ -178,8 +178,8 @@ void TRGECLDQMModule::event()
   double HitCalTiming = 0;
   int CheckSum = 0;
 
-  for (int iii = 0; iii < trgeclEvtArray.getEntries(); iii++) {
-    TRGECLUnpackerEvtStore* aTRGECLUnpackerEvtStore = trgeclEvtArray[iii];
+  for (int iii = 0; iii < m_trgeclEvtArray.getEntries(); iii++) {
+    TRGECLUnpackerEvtStore* aTRGECLUnpackerEvtStore = m_trgeclEvtArray[iii];
 
     HitFineTiming = aTRGECLUnpackerEvtStore ->  getEvtTime();
     HitRevoTrg = aTRGECLUnpackerEvtStore -> getL1Revo();
@@ -187,7 +187,7 @@ void TRGECLDQMModule::event()
     CheckSum =  aTRGECLUnpackerEvtStore -> getEvtExist() ;
 
 
-    RevoTrg.push_back(HitRevoTrg);
+    m_RevoTrg.push_back(HitRevoTrg);
 
 
 
@@ -196,8 +196,8 @@ void TRGECLDQMModule::event()
 
 
 
-  for (int ii = 0; ii < trgeclHitArray.getEntries(); ii++) {
-    TRGECLUnpackerStore* aTRGECLUnpackerStore = trgeclHitArray[ii];
+  for (int iii = 0; iii < m_trgeclHitArray.getEntries(); iii++) {
+    TRGECLUnpackerStore* aTRGECLUnpackerStore = m_trgeclHitArray[iii];
     int TCID = (aTRGECLUnpackerStore->getTCId());
     int hit_win =  aTRGECLUnpackerStore -> getHitWin();
     HitEnergy =  aTRGECLUnpackerStore -> getTCEnergy();
@@ -208,16 +208,16 @@ void TRGECLDQMModule::event()
     HitCalTiming = aTRGECLUnpackerStore ->getTCCALTime() ;
     HitRevoFam = aTRGECLUnpackerStore-> getRevoFAM() ;
 
-    TCId.push_back(TCID);
-    TCHitWin.push_back(hit_win);
-    TCEnergy.push_back(HitEnergy);
-    TCTiming.push_back(HitTiming);
-    RevoFAM.push_back(HitRevoFam);
-    FineTiming.push_back(HitCalTiming);
+    m_TCId.push_back(TCID);
+    m_TCHitWin.push_back(hit_win);
+    m_TCEnergy.push_back(HitEnergy);
+    m_TCTiming.push_back(HitTiming);
+    m_RevoFAM.push_back(HitRevoFam);
+    m_FineTiming.push_back(HitCalTiming);
   }
   //
   //
-  if (TCId.size() == 0) {return;}
+  if (m_TCId.size() == 0) {return;}
 
   /* cppcheck-suppress variableScope */
   int phy;
@@ -246,8 +246,8 @@ void TRGECLDQMModule::event()
   //  int s_hit_win= 0;
   std::vector<int> trgbit ;
   trgbit.resize(44, 0);
-  for (int iii = 0; iii < trgeclSumArray.getEntries(); iii++) {
-    TRGECLUnpackerSumStore* aTRGECLUnpackerSumStore = trgeclSumArray[iii];
+  for (int iii = 0; iii < m_trgeclSumArray.getEntries(); iii++) {
+    TRGECLUnpackerSumStore* aTRGECLUnpackerSumStore = m_trgeclSumArray[iii];
 
     tsource = aTRGECLUnpackerSumStore ->getTimeType();
     phy     = aTRGECLUnpackerSumStore ->getPhysics();
@@ -314,7 +314,7 @@ void TRGECLDQMModule::event()
   //
 
   TrgEclCluster  _TCCluster ;
-  _TCCluster.setICN(TCId, TCEnergy, TCTiming);
+  _TCCluster.setICN(m_TCId, m_TCEnergy, m_TCTiming);
 
   int c = _TCCluster.getNofCluster();
   h_Cluster->Fill(c);
@@ -325,8 +325,8 @@ void TRGECLDQMModule::event()
   ClusterEnergy.clear();
   MaxTCId.clear();
 
-  for (int iii = 0; iii < trgeclCluster.getEntries(); iii++) {
-    TRGECLCluster* aTRGECLCluster = trgeclCluster[iii];
+  for (int iii = 0; iii < m_trgeclCluster.getEntries(); iii++) {
+    TRGECLCluster* aTRGECLCluster = m_trgeclCluster[iii];
     int maxTCId    = aTRGECLCluster ->getMaxTCId();
     double clusterenergy  = aTRGECLCluster ->getEnergyDep();
     double clustertiming  =  aTRGECLCluster -> getTimeAve();
@@ -362,14 +362,12 @@ void TRGECLDQMModule::event()
   }
   TrgEclDataBase _database;
 
-  std::vector<double> _3DBhabhaThreshold;
-  _3DBhabhaThreshold = {30, 45}; //  /10 MeV
-
+  const double m_3DBhabhaThreshold[2] = {30, 45}; //  /10 MeV
 
   bool BtoBFlag = false;
   bool BhabhaFlag = false;
-  int lut1 = _database.Get3DBhabhaLUT(maxCenterTCId[0]);
-  int lut2 = _database.Get3DBhabhaLUT(maxCenterTCId[1]);
+  int lut1 = _database.get3DBhabhaLUT(maxCenterTCId[0]);
+  int lut2 = _database.get3DBhabhaLUT(maxCenterTCId[1]);
   int energy1 = 15 & lut1;
   int energy2 = 15 & lut2;
   lut1 >>= 4;
@@ -385,10 +383,10 @@ void TRGECLDQMModule::event()
   int thetaSum = theta1 + theta2;
   if (dphi > 160 && thetaSum > 165 && thetaSum < 190) {BtoBFlag = true;}
 
-  if ((maxClusterEnergy[0] * 0.1) > _3DBhabhaThreshold[0] * energy1
-      && (maxClusterEnergy[1] * 0.1) > _3DBhabhaThreshold[0] * (energy2)
-      && ((maxClusterEnergy[0] * 0.1) > _3DBhabhaThreshold[1] * energy1
-          || (maxClusterEnergy[1] * 0.1) > _3DBhabhaThreshold[1] * (energy2))) {
+  if ((maxClusterEnergy[0] > m_3DBhabhaThreshold[0] * energy1 * 10 &&
+       maxClusterEnergy[1] > m_3DBhabhaThreshold[0] * energy2 * 10) &&
+      (maxClusterEnergy[0] > m_3DBhabhaThreshold[1] * energy1 * 10 ||
+       maxClusterEnergy[1] > m_3DBhabhaThreshold[1] * energy2 * 10)) {
     if (BtoBFlag) {BhabhaFlag = true;}
   }
 
@@ -398,7 +396,7 @@ void TRGECLDQMModule::event()
   }
 
 
-  const int NofTCHit = TCId.size();
+  const int NofTCHit = m_TCId.size();
 
   int nTCHitPerClk_total[8] = {0};
   int nTCHitPerClk_part[3][8] = {{0}};
@@ -413,39 +411,39 @@ void TRGECLDQMModule::event()
   isHER = m_trgTime->isHER();
 
   for (int ihit = 0; ihit < NofTCHit ; ihit ++) {
-    h_TCId -> Fill(TCId[ihit]);
-    h_TCthetaId -> Fill(a -> getTCThetaIdFromTCId(TCId[ihit]));
+    h_TCId -> Fill(m_TCId[ihit]);
+    h_TCthetaId -> Fill(a -> getTCThetaIdFromTCId(m_TCId[ihit]));
     {
-      if (a->getTCThetaIdFromTCId(TCId[ihit]) < 4) {
-        h_TCphiId_FWD -> Fill(a->getTCPhiIdFromTCId(TCId[ihit]));
-      } else if (a->getTCThetaIdFromTCId(TCId[ihit]) > 3 && a->getTCThetaIdFromTCId(TCId[ihit]) < 16) {
-        h_TCphiId_BR -> Fill(a->getTCPhiIdFromTCId(TCId[ihit]));
+      if (a->getTCThetaIdFromTCId(m_TCId[ihit]) < 4) {
+        h_TCphiId_FWD -> Fill(a->getTCPhiIdFromTCId(m_TCId[ihit]));
+      } else if (a->getTCThetaIdFromTCId(m_TCId[ihit]) > 3 && a->getTCThetaIdFromTCId(m_TCId[ihit]) < 16) {
+        h_TCphiId_BR -> Fill(a->getTCPhiIdFromTCId(m_TCId[ihit]));
       } else {
-        h_TCphiId_BWD -> Fill(a->getTCPhiIdFromTCId(TCId[ihit]));
+        h_TCphiId_BWD -> Fill(a->getTCPhiIdFromTCId(m_TCId[ihit]));
 
       }
     }
-    h_TCEnergy -> Fill(TCEnergy[ihit]);
-    h_Narrow_TCEnergy -> Fill(TCEnergy[ihit]);
-    h_Cal_TCTiming -> Fill(FineTiming[ihit]);
+    h_TCEnergy -> Fill(m_TCEnergy[ihit]);
+    h_Narrow_TCEnergy -> Fill(m_TCEnergy[ihit]);
+    h_Cal_TCTiming -> Fill(m_FineTiming[ihit]);
 
-    if (max < TCEnergy[ihit]) {
-      max = TCEnergy[ihit];
-      caltrgtiming = FineTiming[ihit];
+    if (max < m_TCEnergy[ihit]) {
+      max = m_TCEnergy[ihit];
+      caltrgtiming = m_FineTiming[ihit];
     }
 
-    totalEnergy += TCEnergy[ihit];
-    double timing = 8 * HitRevoTrg - (128 * RevoFAM[ihit] + TCTiming[ihit]);
+    totalEnergy += m_TCEnergy[ihit];
+    double timing = 8 * HitRevoTrg - (128 * m_RevoFAM[ihit] + m_TCTiming[ihit]);
     if (timing < 0) {timing = timing + 10240;}
     h_TCTiming->Fill(timing);
-    nTCHitPerClk_total[TCHitWin[ihit]]++;
+    nTCHitPerClk_total[m_TCHitWin[ihit]]++;
 
-    if (TCId[ihit] <= 80) {
-      nTCHitPerClk_part[0][TCHitWin[ihit]]++;
-    } else if (80 < TCId[ihit] && TCId[ihit] <= 512) {
-      nTCHitPerClk_part[1][TCHitWin[ihit]]++;
+    if (m_TCId[ihit] <= 80) {
+      nTCHitPerClk_part[0][m_TCHitWin[ihit]]++;
+    } else if (80 < m_TCId[ihit] && m_TCId[ihit] <= 512) {
+      nTCHitPerClk_part[1][m_TCHitWin[ihit]]++;
     } else {
-      nTCHitPerClk_part[2][TCHitWin[ihit]]++;
+      nTCHitPerClk_part[2][m_TCHitWin[ihit]]++;
     }
   }
 

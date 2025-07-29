@@ -15,7 +15,18 @@
 
 #include <analysis/dataobjects/RestOfEvent.h>
 
+#include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/utility/ROOTToCLHEP.h>
+
+#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+
+#include <framework/dataobjects/Helix.h>
+
+#include <framework/geometry/BFieldManager.h>
+
+#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <vector>
 #include <Math/Vector3D.h>
@@ -39,9 +50,8 @@ ContinuumSuppressionBuilderModule::ContinuumSuppressionBuilderModule() : Module(
 
   // Parameter definitions
   addParam("particleList", m_particleListName, "Name of the ParticleList", std::string(""));
-
   addParam("ROEMask", m_ROEMask, "ROE mask", std::string(RestOfEvent::c_defaultMaskName));
-
+  addParam("performIPProfileFit", m_ipProfileFit, "switch to turn on vertex fit of tracks with IP profile constraint", false);
 }
 
 void ContinuumSuppressionBuilderModule::initialize()
@@ -61,10 +71,17 @@ void ContinuumSuppressionBuilderModule::initialize()
   // Output
   m_csarray.registerInDataStore(m_ROEMask);
   StoreArray<Particle>().registerRelationTo(m_csarray);
+
+  // set magnetic field
+  m_Bfield = BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
 }
 
 void ContinuumSuppressionBuilderModule::event()
 {
+  m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
+  m_beamSpotCov.ResizeTo(3, 3);
+  m_beamSpotCov = m_beamSpotDB->getCovVertex();
+
   for (unsigned i = 0; i < m_plist->getListSize(); i++) {
     addContinuumSuppression(m_plist->getParticle(i));
   }
@@ -72,10 +89,8 @@ void ContinuumSuppressionBuilderModule::event()
 
 void ContinuumSuppressionBuilderModule::addContinuumSuppression(const Particle* particle)
 {
-  // Output
-  StoreArray<ContinuumSuppression> qqArray(m_ROEMask);
   // Create ContinuumSuppression object
-  ContinuumSuppression* qqVars = qqArray.appendNew();
+  ContinuumSuppression* qqVars = m_csarray.appendNew();
 
   // Create relation: Particle <-> ContinuumSuppression
   particle->addRelationTo(qqVars);
@@ -150,10 +165,9 @@ void ContinuumSuppressionBuilderModule::addContinuumSuppression(const Particle* 
 
     for (const Particle* chargedROEParticle : chargedROEParticles) {
 
-      // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
-      // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
+      ROOT::Math::PxPyPzEVector p = ipProfileFit(chargedROEParticle);
 
-      ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * chargedROEParticle->get4Vector();
+      ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * p;
 
       p_cms_all.push_back(p_cms);
       p_cms_roe.push_back(p_cms);
@@ -274,4 +288,47 @@ void ContinuumSuppressionBuilderModule::addContinuumSuppression(const Particle* 
   qqVars->addKsfwFS1(ksfwFS1);
   qqVars->addCleoConesALL(cleoConesAll);
   qqVars->addCleoConesROE(cleoConesROE);
+}
+
+ROOT::Math::PxPyPzEVector ContinuumSuppressionBuilderModule::ipProfileFit(const Particle* particle)
+{
+  // Return original particle if vertex fit is not requested
+  if (!m_ipProfileFit) return particle->get4Vector();
+
+  // Access track fit result of particle
+  const TrackFitResult* trackFitResult = particle->getTrackFitResult();
+  if (!trackFitResult) return particle->get4Vector();
+
+  // Move helix of TrackFitResult by IP position
+  Helix helix = trackFitResult->getHelix();
+  helix.passiveMoveBy(m_BeamSpotCenter);
+
+  // Reject particle movements that push helix too far away
+  if (std::abs(helix.getD0()) > 5.0 || std::abs(helix.getZ0()) > 10.0) return particle->get4Vector();
+
+  // Create particle with shifted vertex position
+  ROOT::Math::XYZVector p_helix = helix.getMomentum(m_Bfield);
+  double shiftedParticleMass = particle->getPDGMass();
+  double shiftedParticleEnergy = std::sqrt(p_helix.Mag2() + shiftedParticleMass * shiftedParticleMass);
+  ROOT::Math::PxPyPzEVector momentumOfShiftedParticle(p_helix.X(), p_helix.y(), p_helix.Z(), shiftedParticleEnergy);
+  const Particle shiftedParticle(momentumOfShiftedParticle, particle->getPDGCode());
+
+  // Perform vertex fit with IP profile constraint
+  analysis::VertexFitKFit kv;
+  kv.setMagneticField(m_Bfield);
+  kv.addParticle(&shiftedParticle);
+  kv.setIpProfile(ROOTToCLHEP::getPoint3D(m_BeamSpotCenter), ROOTToCLHEP::getHepSymMatrix(m_beamSpotCov));
+  enum analysis::KFitError::ECode fitError = kv.doFit();
+  if (fitError != analysis::KFitError::kNoError) return particle->get4Vector();
+
+  // Calculate updated particle momentum
+  analysis::MakeMotherKFit kmm;
+  kmm.setMagneticField(m_Bfield);
+  kmm.addTrack(kv.getTrackMomentum(0), kv.getTrackPosition(0), kv.getTrackError(0), kv.getTrack(0).getCharge());
+  kmm.setTrackVertexError(kv.getTrackVertexError(0));
+  kmm.setVertex(kv.getVertex());
+  kmm.setVertexError(kv.getVertexError());
+  fitError = kmm.doMake();
+  if (fitError != analysis::KFitError::kNoError) return particle->get4Vector();
+  return CLHEPToROOT::getLorentzVector(kmm.getMotherMomentum());
 }

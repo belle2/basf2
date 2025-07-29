@@ -13,8 +13,11 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+
+#include <mdst/dbobjects/BeamSpot.h>
 
 #include <string>
 
@@ -36,12 +39,21 @@ namespace Belle2 {
   private:
 
     StoreArray<ContinuumSuppression> m_csarray; /**< StoreArray of ContinuumSuppression */
-    StoreObjPtr<ParticleList> m_plist; /**< input particle list */
+    StoreObjPtr<ParticleList> m_plist;          /**< input particle list */
+    DBObjPtr<BeamSpot> m_beamSpotDB;            /**< Beam spot database object */
 
-    std::string m_particleListName;  /**< Name of the ParticleList */
-    std::string m_ROEMask;  /**< ROE mask */
+    ROOT::Math::XYZVector m_BeamSpotCenter;     /**< Beam spot position */
+    TMatrixDSym m_beamSpotCov;                  /**< Beam spot covariance matrix */
+
+    std::string m_particleListName;             /**< Name of the ParticleList */
+    std::string m_ROEMask;                      /**< ROE mask */
+    double m_Bfield;                            /**< magnetic field from data base */
+    bool m_ipProfileFit;                        /**< Switch to turn on / off vertex fit of tracks with IP profile constraint */
 
     /** calculate continuum suppression quantities */
     void addContinuumSuppression(const Particle* particle);
+
+    /** get 4Vector for CS calculation with or without IP profile fit */
+    ROOT::Math::PxPyPzEVector ipProfileFit(const Particle* particle);
   };
 }

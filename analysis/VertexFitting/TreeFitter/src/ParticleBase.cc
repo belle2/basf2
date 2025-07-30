@@ -382,12 +382,15 @@ namespace TreeFitter {
     const int momindex = momIndex();
     Eigen::Vector4d state = fitparams.getStateVector().segment<4>(momindex);
     Eigen::Vector3d p3 = state.head<3>();
+    const double px = state(0);
+    const double py = state(1);
+    const double pz = state(2);
     const double E = state(3);
 
     /** be aware that the signs here are important
      * E-|p|-m extracts a negative mass and messes with the momentum !
      * */
-    p.getResiduals()(0) = mass2 - E * E + p3.squaredNorm();
+    p.getResiduals()(0) = mass2 - E * E + px * px + py * py + pz * pz;
 
     p.getH().block<1, 3>(0, momindex) = 2.0 * p3;
     p.getH()(0, momindex + 3) = -2.0 * E;

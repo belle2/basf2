@@ -85,9 +85,9 @@ The main command line tool for the Belle II Software is ``basf2``::
                         out.ps``.
 --visualize-dataflow    Generate data flow diagram (``dataflow.dot``) for the
                         executed steering file.
---no-stats              Disable collection of statistics during event
-                        processing. Useful for very high-rate applications,
-                        but produces empty table with ``print(statistics)``.
+--stats                 Enable collection of statistics during event
+                        processing. Slows down execution time, but otherwise
+                        ``print(statistics)`` creates a table with 0s only.
 --dry-run               Read steering file, but do not start any event
                         processing when process(path) is called. Prints
                         information on input/output files that would be used

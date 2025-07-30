@@ -16,7 +16,6 @@
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 

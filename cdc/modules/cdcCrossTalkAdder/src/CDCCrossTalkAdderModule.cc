@@ -8,7 +8,6 @@
 
 #include <cdc/modules/cdcCrossTalkAdder/CDCCrossTalkAdderModule.h>
 
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>

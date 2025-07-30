@@ -23,7 +23,7 @@ ProcessStatistics* ProcessStatisticsPython::getWrapped()
   StoreObjPtr<ProcessStatistics> stats("", DataStore::c_Persistent);
   if (!stats) {
     if (!Environment::Instance().getDryRun()) {
-      B2ERROR("ProcessStatistics data object is not available, you either disabled statistics with --no-stats or didn't run process(path) yet.");
+      B2ERROR("ProcessStatistics data object is not available, you either didn't enable statistics with --stats or didn't run process(path) yet.");
     }
     return nullptr;
   }

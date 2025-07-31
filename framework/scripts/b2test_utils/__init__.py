@@ -153,8 +153,10 @@ def configure_logging_for_tests(user_replacements=None):
     except Exception:
         pass
     replacements[", ".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
-    # add a special replacement for the CDB metadata provider server, since it's not set via env. variable
-    replacements[basf2.conditions.default_metadata_provider_server] = "${BELLE2_CONDB_METADATA}"
+    # add a special replacement for the CDB metadata provider, since it's not set via env. variable
+    # use the first metadata provider in the list for the replacement
+    if len(basf2.conditions.metadata_providers) > 0:
+        replacements[basf2.conditions.metadata_providers[0]] = "${BELLE2_CONDB_METADATA}"
     # Let's be lazy and take the environment variables from the docstring so we don't have to repeat them here
     for env_name, replacement in re.findall(":envvar:`(.*?)`(?:.*``(.*?)``)?", configure_logging_for_tests.__doc__):
         if not replacement:

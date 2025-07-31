@@ -153,5 +153,3 @@ b2conditions.prepend_globaltag("data_reprocessing_prompt")
 # b2.process(main, max_event=3000)      # reasonable stats and speed for a quick test
 # b2.process(main, max_event=30)        # fast test
 b2.process(main)                      # process all events
-
-print(b2.statistics)

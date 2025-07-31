@@ -56,7 +56,6 @@ for use_pp in [False, True]:
         else:
             print(path)
             basf2.process(path)
-        # print(statistics)
         # initialize/terminate once
         assert basf2.statistics.get(pgun).calls(basf2.statistics.INIT) == 1
         assert basf2.statistics.get(testmod).calls(basf2.statistics.INIT) == 1

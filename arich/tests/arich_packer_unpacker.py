@@ -102,4 +102,3 @@ progress = b2.register_module('Progress')
 main.add_module(progress)
 
 b2.process(main)
-print(b2.statistics)

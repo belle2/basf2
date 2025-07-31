@@ -22,7 +22,6 @@ def run_lms_generation(event_codes):
         main.add_module('EventInfoSetter')
         lms.add_generators(path=main, event_codes=event_codes)
         b2.process(main, n_events)
-        print(b2.statistics)
 
 
 # Check if llXX and hhISR productions work fine.

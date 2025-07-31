@@ -69,5 +69,4 @@ mdst.add_mdst_output(
 main.add_module('Progress')
 # main
 b2.process(main)
-print(b2.statistics)
 # ===<END>

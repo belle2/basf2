@@ -12,7 +12,7 @@
 # This steering file shows how to use overrides for xml files
 ############################################################
 
-from basf2 import Path, process, statistics
+from basf2 import Path, process
 
 main = Path()
 # EventInfoSetter - generate event meta data
@@ -67,4 +67,3 @@ gearbox.param({
 
 # Process all events
 process(main)
-print(statistics(statistics.BEGIN_RUN))

@@ -68,5 +68,5 @@ mypath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 # print(help(ma.variablesToNtuple))
 
 # process the data
-basf2.process(mypath)
+basf2.process(mypath, calculateStatistics=True)
 print(basf2.statistics)

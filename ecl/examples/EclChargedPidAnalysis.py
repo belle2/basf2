@@ -39,5 +39,5 @@ mainPath.add_module(eclChargedPIDDataAnalysis)
 
 # Process the events and print call statistics
 mainPath.add_module('Progress')
-b2.process(mainPath)
+b2.process(mainPath, calculateStatistics=True)
 print(b2.statistics)

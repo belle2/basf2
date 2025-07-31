@@ -81,5 +81,5 @@ data_writer.param("useKLM", useKLM)
 data_writer.param("useECL", useECL)
 mypath.add_module(data_writer)
 
-b2.process(mypath)
+b2.process(mypath, calculateStatistics=True)
 print(b2.statistics)

@@ -34,5 +34,5 @@ eventWisePrinter.set_name("ExtraInfoPrinter_Event")
 eventWisePrinter.param('particleList', '')
 main.add_module(eventWisePrinter)
 
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 print(basf2.statistics)

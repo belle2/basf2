@@ -73,5 +73,5 @@ Y4SvariableList += vu.create_aliases(commonVariables, 'daughter(1, {variable})',
 ma.variablesToNtuple('B0:tag', variables=BvariableList, filename='ROE_BtagBsig.root', treename='btag', path=myMain)
 ma.variablesToNtuple('Upsilon(4S):all', variables=Y4SvariableList, filename='ROE_BtagBsig.root', treename='btagbsig', path=myMain)
 
-basf2.process(myMain)
+basf2.process(myMain, calculateStatistics=True)
 print(basf2.statistics)

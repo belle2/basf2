@@ -161,5 +161,5 @@ ma.variablesToNtuple(decayString='B0',
                      filename=outfile,
                      path=my_path)
 
-b2.process(my_path)
+b2.process(my_path, calculateStatistics=True)
 print(b2.statistics)

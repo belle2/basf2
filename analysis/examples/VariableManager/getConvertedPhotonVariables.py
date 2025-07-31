@@ -80,7 +80,7 @@ ma.variablesToNtuple('gamma:conv', tuple_vars, filename='output.root', treename=
 # progress
 progress = b2.register_module('Progress')
 path.add_module(progress)
-b2.process(path=path)
+b2.process(path=path, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

@@ -137,7 +137,7 @@ variablesToNtuple('D0:du', dstu,
 
 
 # Process the events
-b2.process(my_path)
+b2.process(my_path, calculateStatistics=True)
 
 # print out the summary
 print(b2.statistics)

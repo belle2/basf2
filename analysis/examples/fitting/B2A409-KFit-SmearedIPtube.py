@@ -84,7 +84,7 @@ variablesToNtuple('B0:iptube20um', B0_vars,
                   filename=output_file, treename='B0tree_smear20um', path=my_path)
 
 # Process the events
-b2.process(my_path)
+b2.process(my_path, calculateStatistics=True)
 
 # print out the summary
 print(b2.statistics)

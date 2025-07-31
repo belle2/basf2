@@ -52,7 +52,7 @@ add_evtgen_generator(mypath, 'signal', b2.find_file('arich/examples/B2kpi.dec'))
 add_mdst_output(mypath, True, options.filename)
 
 # process all modules added to the mypath path
-b2.process(mypath)
+b2.process(mypath, calculateStatistics=True)
 
 # print out the summary
 print(b2.statistics)

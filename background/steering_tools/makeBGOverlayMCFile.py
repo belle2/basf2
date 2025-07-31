@@ -159,7 +159,7 @@ main.add_module('RootOutput', outputFileName='BGforOverlay.root', branchNames=br
 main.add_module('Progress')
 
 # Process events
-process(main)
+process(main, calculateStatistics=True)
 
 # Print call statistics
 print(statistics)

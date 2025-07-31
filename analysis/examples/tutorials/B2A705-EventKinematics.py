@@ -51,6 +51,6 @@ ma.buildEventKinematicsFromMC(path=my_path)
 ma.variablesToNtuple('', [*vc.event_kinematics, *vc.mc_event_kinematics], filename='B2A705-EventKinematics.root', path=my_path)
 
 # Process the events
-b2.process(my_path)
+b2.process(my_path, calculateStatistics=True)
 # print out the summary
 print(b2.statistics)

@@ -59,7 +59,7 @@ ma.variablesToNtuple('K_S0:standard',
                      treename='tree',
                      path=my_path)
 
-b2.process(my_path)
+b2.process(my_path, calculateStatistics=True)
 
 # print out the summary
 print(b2.statistics)

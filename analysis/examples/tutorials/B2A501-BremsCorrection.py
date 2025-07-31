@@ -136,7 +136,7 @@ ma.variablesToNtuple(decayString='J/psi:MC',
                      path=my_path)
 
 # process the events
-b2.process(my_path)
+b2.process(my_path, calculateStatistics=True)
 
 # print out the summary
 print(b2.statistics)

@@ -269,7 +269,7 @@ if __name__ == "__main__":
     )
 
     # Process
-    b2.process(path)
+    b2.process(path, calculateStatistics=True)
 
     # print out the summary
     print(b2.statistics)

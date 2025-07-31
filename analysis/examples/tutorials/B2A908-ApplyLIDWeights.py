@@ -225,7 +225,7 @@ def main():
                          path=path)
 
     # Process the events.
-    b2.process(path)
+    b2.process(path, calculateStatistics=True)
 
     # Print out the summary.
     print(b2.statistics)

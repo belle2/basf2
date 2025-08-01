@@ -118,7 +118,6 @@ void ParticleVertexFitterModule::event()
 
   m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
   m_beamSpotCov.ResizeTo(3, 3);
-  TMatrixDSym beamSpotCov(3);
   if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamSpotDB->getCovVertex();
   if (m_withConstraint == "iptube") {
     if (m_smearing > 0 && m_vertexFitter == "KFit") {

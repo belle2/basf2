@@ -64,9 +64,9 @@ namespace Belle2 {
     et[0] = et[1] = 0;
 
     // -- SIG A --- Use B primary daughters - (Belle: use_finalstate_for_sig == 0) --------
-    std::vector<Belle2::Particle*> signalDaughters = particle->getDaughters();
+    std::vector<Particle*> signalDaughters = particle->getDaughters();
 
-    for (const Belle2::Particle* sigFS0 : signalDaughters) {
+    for (const Particle* sigFS0 : signalDaughters) {
       ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * sigFS0->get4Vector();
 
       p_cms_q_sigA.emplace_back(p_cms, sigFS0->getCharge());
@@ -76,9 +76,9 @@ namespace Belle2 {
     }
 
     // -- SIG B --- Use B final-state daughters - (Belle: use_finalstate_for_sig == 1) ----
-    std::vector<const Belle2::Particle*> signalFSParticles = particle->getFinalStateDaughters();
+    std::vector<const Particle*> signalFSParticles = particle->getFinalStateDaughters();
 
-    for (const Belle2::Particle* sigFS1 : signalFSParticles) {
+    for (const Particle* sigFS1 : signalFSParticles) {
       ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * sigFS1->get4Vector();
 
       p_cms_all.push_back(p_cms);

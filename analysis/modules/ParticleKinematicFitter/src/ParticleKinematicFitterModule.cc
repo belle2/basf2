@@ -734,7 +734,7 @@ void ParticleKinematicFitterModule::addUnmeasuredGammaToOrcaKinFit(BaseFitter& f
 
 bool ParticleKinematicFitterModule::updateOrcaKinFitDaughters(BaseFitter& fitter, Particle* mother)
 {
-  std::vector <Belle2::Particle*> bDau = mother->getDaughters();
+  std::vector <Particle*> bDau = mother->getDaughters();
   std::vector <BaseFitObject*>* fitObjectContainer = fitter.getFitObjects();
 
   const unsigned nd = bDau.size();
@@ -801,7 +801,7 @@ bool ParticleKinematicFitterModule::updateOrcaKinFitDaughters(BaseFitter& fitter
 void ParticleKinematicFitterModule::updateMapOfTrackAndDaughter(unsigned& l, std::vector<std::vector<unsigned>>& pars,
     std::vector<unsigned>& parm, std::vector<Particle*>&  allparticles, const Particle* daughter)
 {
-  std::vector <Belle2::Particle*> dDau = daughter->getDaughters();
+  std::vector <Particle*> dDau = daughter->getDaughters();
   for (unsigned ichild = 0; ichild < daughter->getNDaughters(); ichild++) {
     const Particle* child = daughter->getDaughter(ichild);
     std::vector<unsigned> pard;

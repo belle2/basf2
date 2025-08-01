@@ -651,7 +651,7 @@ VertexFitKFit::prepareInputMatrix() {
     // charge , mass , a
     tmp_property[index][0] =  track.getCharge();
     tmp_property[index][1] =  track.getMass();
-    const double c = Belle2::Const::speedOfLight * 1e-4;
+    const double c = Const::speedOfLight * 1e-4;
     tmp_property[index][2] = -c * m_MagneticField * track.getCharge();
     index++;
   }

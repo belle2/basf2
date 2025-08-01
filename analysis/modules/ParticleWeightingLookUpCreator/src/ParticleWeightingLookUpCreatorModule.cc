@@ -92,9 +92,9 @@ void ParticleWeightingLookUpCreatorModule::initialize()
   B2INFO("Printing LookUp table");
   table.printParticleWeightingLookUpTable();
 
-  Belle2::DBImportObjPtr<Belle2::ParticleWeightingLookUpTable> importer{m_tableName};
+  DBImportObjPtr<ParticleWeightingLookUpTable> importer{m_tableName};
   importer.construct(table);
-  importer.import(Belle2::IntervalOfValidity(m_experimentLow, m_runLow, m_experimentHigh, m_runHigh));
+  importer.import(IntervalOfValidity(m_experimentLow, m_runLow, m_experimentHigh, m_runHigh));
 
 }
 

@@ -573,8 +573,8 @@ bool TagVertexModule::compBrecoBgen(const Particle* Breco, const MCParticle* Bge
 
   bool isDecMode = true;
 
-  const std::vector<Belle2::Particle*> recDau = Breco->getDaughters();
-  const std::vector<Belle2::MCParticle*> genDau = Bgen->getDaughters();
+  const std::vector<Particle*> recDau = Breco->getDaughters();
+  const std::vector<MCParticle*> genDau = Bgen->getDaughters();
 
   if (recDau.size() > 0 && genDau.size() > 0) {
     for (auto dauRec : recDau) {

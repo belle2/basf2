@@ -111,7 +111,7 @@ void MCMatcherParticlesModule::setLooseMCMatch(const Particle* particle)
     return;
 
   // get all FS daughters
-  vector<const Belle2::Particle*> fsDaughters = particle->getFinalStateDaughters();
+  vector<const Particle*> fsDaughters = particle->getFinalStateDaughters();
 
   // map for counting how many times given mcparticle is mother of daughters
   CounterMap motherCount;

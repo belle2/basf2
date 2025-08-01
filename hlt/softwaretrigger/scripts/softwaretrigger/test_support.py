@@ -240,7 +240,7 @@ def test_script(script_location, input_file_name, temp_dir):
         subprocess.check_call(cmd2)
 
 
-def test_folder(location, run_type, exp_number, phase, passthrough=False,
+def test_folder(location, run_type, exp_number, event_distribution, passthrough=False,
                 simulate_events_of_doom_buster=False):
     """
     Run all hlt operation scripts in a given folder
@@ -255,8 +255,8 @@ def test_folder(location, run_type, exp_number, phase, passthrough=False,
     :param run_type: cosmic or beam, depending on which operation files to run
                      and which input to simulate
     :param exp_number: which experiment number to simulate
-    :param phase:    where to look for the operation files (will search in the folder
-                     hlt/operation/{phase}/global/{location}/evp_scripts/)
+    :param event_distribution: where to look for the operation files (will search in the folder
+                     hlt/operation/{event_distribution}/{location}/)
     :param passthrough: only relevant for express reco: If true don't create a
                      software trigger result in the input file to test running
                      express reco if hlt is in passthrough mode
@@ -273,7 +273,7 @@ def test_folder(location, run_type, exp_number, phase, passthrough=False,
     input_file_name = get_file_name(
         prepare_path, run_type, location, passthrough, simulate_events_of_doom_buster)
 
-    script_dir = basf2.find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
+    script_dir = basf2.find_file(f"hlt/operation/{event_distribution}/{location.name}/")
     run_at_least_one = False
     for script_location in glob(os.path.join(script_dir, f"run_{run_type.name}*.py")):
         run_at_least_one = True

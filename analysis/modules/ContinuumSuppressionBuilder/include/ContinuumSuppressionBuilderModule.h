@@ -9,7 +9,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 
@@ -19,6 +18,7 @@
 #include <string>
 
 namespace Belle2 {
+  class Particle;
   /**
    * Creates for each Particle in given ParticleList an ContinuumSuppression
    * dataobject and makes basf2 relation between them.

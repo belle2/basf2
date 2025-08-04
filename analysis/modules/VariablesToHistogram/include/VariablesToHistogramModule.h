@@ -11,7 +11,6 @@
 #include <analysis/VariableManager/Manager.h>
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/RootMergeable.h>
 
 #include <TH1D.h>
@@ -21,6 +20,7 @@
 #include <vector>
 
 namespace Belle2 {
+  template <class T> class StoreObjPtr;
 
   /** Module to calculate variables specified by the user for a given ParticleList
    *  and save them into an Histogram.

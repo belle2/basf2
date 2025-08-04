@@ -29,8 +29,13 @@
 #include <analysis/utility/DistanceTools.h>
 #include <analysis/utility/RotationTools.h>
 
-// vertex fitting
-#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+// rave
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
+
+#include <CLHEP/Geometry/Point3D.h>
+#include <CLHEP/Matrix/SymMatrix.h>
+#include <CLHEP/Vector/LorentzVector.h>
 
 // mdst dataobject
 #include <mdst/dataobjects/HitPatternVXD.h>

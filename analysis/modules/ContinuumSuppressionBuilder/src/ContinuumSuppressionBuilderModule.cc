@@ -9,6 +9,7 @@
 #include <analysis/modules/ContinuumSuppressionBuilder/ContinuumSuppressionBuilderModule.h>
 
 #include <analysis/ContinuumSuppression/ContinuumSuppression.h>
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 
 using namespace Belle2;

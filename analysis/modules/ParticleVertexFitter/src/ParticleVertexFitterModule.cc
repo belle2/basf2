@@ -31,6 +31,19 @@
 
 // KFit
 #include <analysis/VertexFitting/KFit/KFitConst.h>
+#include <analysis/VertexFitting/KFit/MassFitKFit.h>
+#include <analysis/VertexFitting/KFit/FourCFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassFourCFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassPointingVertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassVertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
+#include <analysis/VertexFitting/KFit/RecoilMassKFit.h>
+
+// Rave
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
+#include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
 #include <TVector.h>
 #include <TRotation.h>

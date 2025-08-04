@@ -11,11 +11,14 @@
 // kinfitter
 #include <analysis/modules/ParticleKinematicFitter/ParticleKinematicFitterModule.h>
 #include <analysis/OrcaKinFit/BaseFitObject.h>
+#include <analysis/OrcaKinFit/BaseFitter.h>
 #include <analysis/OrcaKinFit/OPALFitterGSL.h>
 #include <analysis/OrcaKinFit/JetFitObject.h>
 #include <analysis/OrcaKinFit/NewtonFitterGSL.h>
 #include <analysis/OrcaKinFit/NewFitterGSL.h>
+#include <analysis/OrcaKinFit/ParticleFitObject.h>
 #include <analysis/OrcaKinFit/PxPyPzMFitObject.h>
+#include <analysis/OrcaKinFit/TextTracer.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
 

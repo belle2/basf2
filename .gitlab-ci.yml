@@ -14,8 +14,6 @@ variables:
   GITLAB_IS_FIRST_STAGE: "no"
   GITLAB_FORCE_RUNNING_PIPELINE: "no"
   GITLAB_RUNNER: "none"
-  # Define cvmfs as source for conditions metadata
-  BELLE2_CONDB_METADATA: "/cvmfs/belle.cern.ch/conditions/database.sqlite"
   # The other BELLE2_ variables are defined in the "Variables" section of the CI/CD settings
 
 workflow:

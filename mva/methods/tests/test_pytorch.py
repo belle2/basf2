@@ -14,6 +14,8 @@ import uproot
 
 
 def write_dummy_file(variables, size=10, target_variable="mcPDG"):
+    # Set the random seed
+    np.random.seed(42)
     data = np.random.normal(size=[size, len(variables) + 1])
     tree = {}
     for i, name in enumerate(variables):

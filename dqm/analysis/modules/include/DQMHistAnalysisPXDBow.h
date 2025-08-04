@@ -5,10 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : DQMHistAnalysisPXDBow.h
-// Description : An example module for DQM histogram analysis
-//-
 
 #pragma once
 
@@ -19,7 +15,7 @@
 #include <TCanvas.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /*! Module to monitor the PXD bowing*/
 
   class DQMHistAnalysisPXDBowModule final : public DQMHistAnalysisModule {
 
@@ -31,10 +27,6 @@ namespace Belle2 {
      */
     DQMHistAnalysisPXDBowModule();
 
-    /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisPXDBowModule();
 
     /**
      * Initializer.
@@ -67,10 +59,9 @@ namespace Belle2 {
     //! Parameters accessible from basf2 scripts
   private:
     //! name of histogram directory
-    std::string m_histogramDirectoryName;
+    std::string m_histogramDirectoryName{""};
 
     //! Data members
-  private:
     /** The final drawing canvas. */
     TCanvas* m_cResV = nullptr;
 
@@ -80,9 +71,10 @@ namespace Belle2 {
     //! vector for the IDs of all forward PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
-    Float_t m_roiThreshold{0.1};
-    Float_t m_statThreshold{300};
-    Float_t m_sagittaThreshold{0.06};
+    float m_roiThreshold{0.1};/** Threshold values for warning flag on the resV, the value is related on the dimesion of the ROI*/
+    float m_statThreshold{300};/** Threshold values for statistic flag on the plotted histograms*/
+    float m_sagittaThreshold{0.06};/** Threshold values for error flag on the sagitta*/
+    /** name of the module which distribution will be plotted on the dqm*/
     std::string m_moduleName{"2.2.1"};
   };
 } // end namespace Belle2

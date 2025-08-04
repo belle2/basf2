@@ -13,7 +13,6 @@
 #include <genfit/Track.h>
 #include <mdst/dataobjects/Track.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
-//#include <tracking/dbobjects/ROICalculationParameters.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <vxd/geometry/GeoCache.h>
 #include "TDirectory.h"
@@ -64,7 +63,7 @@ void PXDDQMBowingModule::initialize()
     RecoTrack::registerRequiredRelations(m_outputRecoTracks);
   }
 
-  /// get the bowing amplitude from the aligment
+  /// get the bowing amplitude from the alignment
   DBObjPtr<VXDAlignment> alignment;
   VXD::GeoCache& geometry(VXD::GeoCache::getInstance());
   std::vector<VxdID> sensors = geometry.getListOfSensors();
@@ -99,90 +98,85 @@ void PXDDQMBowingModule::event()
   /// loop on particle list
   auto nParticles = m_ParticleList->getListSize();
   for (unsigned int iParticle = 0; iParticle < nParticles; ++iParticle) {
-    try {
-      auto particle = m_ParticleList->getParticle(iParticle);
-      auto b2track = particle->getTrack();
-      if (!b2track) {
-        B2ERROR("No Track for particle.");
-        continue;
+    auto particle = m_ParticleList->getParticle(iParticle);
+    auto b2track = particle->getTrack();
+    if (!b2track) {
+      B2ERROR("No Track for particle.");
+      continue;
+    }
+
+    /// selection: high momentum track from IP
+    const TrackFitResult* fitResult = b2track->getTrackFitResultWithClosestMass(Const::pion);
+    ROOT::Math::XYZVector mom = fitResult->getMomentum();
+    const auto px = mom.X();
+    const auto py = mom.Y();
+    const auto pz = mom.Z();
+    const auto p = TMath::Sqrt(px * px + py * py + pz * pz);
+    if (p < m_cutP) continue;
+    Helix helix = fitResult->getHelix();
+    const auto d0 = helix.getD0();
+    const auto z0 = helix.getZ0();
+    if (TMath::Abs(d0) > m_cutD0 || TMath::Abs(z0) > m_cutZ0) continue;
+
+    auto recoTrack = b2track->getRelatedTo<RecoTrack>();
+    if (!recoTrack) {
+      B2ERROR("No RecoTrack for Track");
+      continue;
+    }
+    /// copy track without hits
+    auto noPXDTrack = recoTrack->copyToStoreArray(m_outputRecoTracks);
+    int sortingPar = 0;
+    /// add SVD hits
+    for (const auto& hit : recoTrack->getSortedSVDHitList()) {
+      noPXDTrack->addSVDHit(hit, sortingPar);
+      sortingPar++;
+    }
+    /// add CDC hits
+    for (const auto& hit : recoTrack->getSortedCDCHitList()) {
+      noPXDTrack->addCDCHit(hit, sortingPar);
+      sortingPar++;
+    }
+    /// refit the track without PXD hits
+    TrackFitter fitter;
+    fitter.fit(*noPXDTrack);
+    /// get the original genfit track to get the PXDhits
+    genfit::Track& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
+    for (unsigned int i = 0; i < track.getNumPoints() - 1; ++i) {
+      if (!track.getPoint(i)->hasRawMeasurements()) continue;
+
+      PXDRecoHit* hit = dynamic_cast<PXDRecoHit*>(track.getPoint(i)->getRawMeasurement(0));
+      if (!hit) continue;
+
+      auto fitterInfo = track.getPoint(i)->getFitterInfo();
+      if (fitterInfo) {
+        auto vxdid = VxdID(hit->getPlaneId());
+        if (vxdid.getSensorNumber() != 1) continue;
+        auto plane = fitterInfo->getPlane();
+        bool biased = true;
+        auto state = fitterInfo->getFittedState(biased).getState();
+        auto residual = fitterInfo->getResidual(0, biased).getState();
+
+        auto hitposU = state[3] + residual[0];
+        auto hitposV = state[4] + residual[1];
+
+        auto noPXDState = genfit::StateOnPlane(noPXDTrack->getMeasuredStateOnPlaneFromFirstHit());
+        noPXDState.extrapolateToPlane(plane);
+
+        auto noPXDhitPredU = noPXDState.getState()[3];
+        auto noPXDhitPredV = noPXDState.getState()[4];
+
+        auto noPXDhitPredVp = noPXDState.getState()[2];
+
+        auto residualU = hitposU - noPXDhitPredU;
+
+        if (TMath::Abs(residualU) > m_cutResU) continue;
+        const auto residualV = hitposV - noPXDhitPredV;
+        const auto residualW = residualV / noPXDhitPredVp;
+        const auto sagitta = residualW + m_dwAlignment[vxdid];
+
+        if (m_hResV[vxdid]) m_hResV[vxdid]->Fill(residualV);
+        if (m_hSagitta[vxdid] && hitposV < -2) m_hSagitta[vxdid]->Fill(sagitta);
       }
-
-      /// selection: high momentum track from IP
-      const TrackFitResult* fitResult = b2track->getTrackFitResultWithClosestMass(Const::pion);
-      ROOT::Math::XYZVector mom = fitResult->getMomentum();
-      auto px = mom.X();
-      auto py = mom.Y();
-      auto pz = mom.Z();
-      auto p = TMath::Sqrt(px * px + py * py + pz * pz);
-      if (p < m_cutP) continue;
-      Helix helix = fitResult->getHelix();
-      auto d0 = helix.getD0();
-      auto z0 = helix.getZ0();
-      if (TMath::Abs(d0) > m_cutD0 || TMath::Abs(z0) > m_cutZ0) continue;
-
-      auto recoTrack = b2track->getRelatedTo<RecoTrack>();
-      if (!recoTrack) {
-        B2ERROR("No RecoTrack for Track");
-        continue;
-      }
-      /// copy track without hits
-      auto noPXDTrack = recoTrack->copyToStoreArray(m_outputRecoTracks);
-      int sortingPar = 0;
-      /// add SVD hits
-      for (auto hit : recoTrack->getSortedSVDHitList()) {
-        noPXDTrack->addSVDHit(hit, sortingPar);
-        sortingPar++;
-      }
-      /// add CDC hits
-      for (auto hit : recoTrack->getSortedCDCHitList()) {
-        noPXDTrack->addCDCHit(hit, sortingPar);
-        sortingPar++;
-      }
-      /// refit the track without PXD hits
-      Belle2::TrackFitter fitter;
-      fitter.fit(*noPXDTrack);
-      /// get the original genfit track to get the PXDhits
-      genfit::Track& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
-      for (unsigned int i = 0; i < track.getNumPoints() - 1; ++i) {
-        if (!track.getPoint(i)->hasRawMeasurements()) continue;
-
-        Belle2::PXDRecoHit* hit = dynamic_cast<Belle2::PXDRecoHit*>(track.getPoint(i)->getRawMeasurement(0));
-        if (!hit) continue;
-
-        auto fitterInfo = track.getPoint(i)->getFitterInfo();
-        if (fitterInfo) {
-          auto vxdid = Belle2::VxdID(hit->getPlaneId());
-          if (vxdid.getSensorNumber() != 1) continue;
-          auto plane = fitterInfo->getPlane();
-          bool biased = true;
-          auto state = fitterInfo->getFittedState(biased).getState();
-          auto residual = fitterInfo->getResidual(0, biased).getState();
-
-          auto hitposU = state[3] + residual[0];
-          auto hitposV = state[4] + residual[1];
-
-          auto noPXDState = genfit::StateOnPlane(noPXDTrack->getMeasuredStateOnPlaneFromFirstHit());
-          noPXDState.extrapolateToPlane(plane);
-
-          auto noPXDhitPredU = noPXDState.getState()[3];
-          auto noPXDhitPredV = noPXDState.getState()[4];
-
-          auto noPXDhitPredVp = noPXDState.getState()[2];
-
-          auto residualU = hitposU - noPXDhitPredU;
-
-          if (TMath::Abs(residualU) > m_cutResU) continue;
-          auto residualV = hitposV - noPXDhitPredV;
-          auto residualW = residualV / noPXDhitPredVp;
-          auto sagitta = residualW + m_dwAlignment[vxdid];
-
-          if (m_hResV[vxdid]) m_hResV[vxdid]->Fill(residualV);
-          if (m_hSagitta[vxdid] && hitposV < -2) m_hSagitta[vxdid]->Fill(sagitta);
-        }
-      }
-    }/// end try
-    catch (...) {
-      B2ERROR("Some error in Residual Collector");
     }
   }/// end loop on particle
 }
@@ -195,7 +189,6 @@ void PXDDQMBowingModule::defineHisto()
     oldDir->cd(m_histogramDirectoryName.c_str());
   }
   VXD::GeoCache& vxdGeometry(VXD::GeoCache::getInstance());
-  //  auto vxdGeometry = VXD::GeoCache::getInstance();
   std::vector<VxdID> sensors = vxdGeometry.getListOfSensors();
   std::sort(sensors.begin(), sensors.end());  // make sure it is our natural order
   for (VxdID& avxdid : sensors) {

@@ -8,12 +8,10 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisPXDBow.h>
 
-//#include <alignment/dbobjects/VXDAlignment.h>
 #include <tracking/dbobjects/ROICalculationParameters.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <TString.h>
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -49,11 +47,6 @@ DQMHistAnalysisPXDBowModule::DQMHistAnalysisPXDBowModule()
 }
 
 
-DQMHistAnalysisPXDBowModule::~DQMHistAnalysisPXDBowModule()
-{
-  // if this function is not needed, please remove
-}
-
 void DQMHistAnalysisPXDBowModule::initialize()
 {
   B2DEBUG(20, "DQMHistAnalysisPXDBow: initialized.");
@@ -66,7 +59,7 @@ void DQMHistAnalysisPXDBowModule::initialize()
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD || aVxdID.getSensorNumber() != 1) continue;
-    m_PXDModules.push_back(aVxdID); // reorder, sort would be better
+    m_PXDModules.push_back(aVxdID); // reorder
 
     if (VxdID(m_moduleName) == aVxdID) valideModule++;
 
@@ -75,12 +68,11 @@ void DQMHistAnalysisPXDBowModule::initialize()
     replace(buff.begin(), buff.end(), '.', '_');
     registerEpicsPV("PXD:meanResV:" + buff, "meanResV:" + (std::string)aVxdID);
     registerEpicsPV("PXD:sigmaResV:" + buff, "sigmaResV:" + (std::string)aVxdID);
-    registerEpicsPV("PXD:resV:" + buff, "resV:" + (std::string)aVxdID);// |mean| + 3 sigma
     registerEpicsPV("PXD:sagitta:" + buff, "sagitta:" + (std::string)aVxdID);
   }
 
   if (valideModule == 0) {
-    B2WARNING("Invalide moduleName, only PXD forward module are accetable, nameModule parameter set to default (2.2.1)");
+    B2WARNING("Invalid moduleName, only PXD forward module are acceptable, nameModule parameter set to default (2.2.1)");
     m_moduleName = "2.2.1";
   }
 
@@ -104,13 +96,6 @@ void DQMHistAnalysisPXDBowModule::beginRun()
   DBObjPtr<ROICalculationParameters> roiParams;
   if (!roiParams.isValid()) B2WARNING("Cannot get roi parameters, ROI v half size defined as default (0.1 cm)");
   m_roiThreshold = roiParams->getSigmaSystV() * roiParams->getNumSigmaTotV() / 2;
-  //B2INFO("RoI v size is " << m_roiThreshold);
-
-  /// allert limits for PVs
-  //double bowWarnHi = m_roiThreshold, bowAllarmHi = NAN, bowWarnLo = NAN, bowAllarmLo = NAN;
-  //requestLimitsFromEpicsPVs("resV:"+ (std::string)aVxdID, bowAllarmLo, bowWarnLo, bowWarnHi, bowAllarmHi);
-  //double bowWarnHi = m_sagittaThreshold, bowAllarmHi = NAN, bowWarnLo = -m_sagittaThreshold, bowAllarmLo = NAN;
-  //requestLimitsFromEpicsPVs("sagitta:"+ (std::string)aVxdID, bowAllarmLo, bowWarnLo, bowWarnHi, bowAllarmHi);
 }
 
 void DQMHistAnalysisPXDBowModule::event()
@@ -140,13 +125,12 @@ void DQMHistAnalysisPXDBowModule::event()
 
         setEpicsPV("meanResV:" + buff, meanResV);
         setEpicsPV("stdResV:" + buff, stdResV);
-        setEpicsPV("resV:" + buff, resV);
         setEpicsPV("sagitta:" + buff, bowAmplitude);
       } else
         enough = false;
 
       if (aPXDModule == VxdID(m_moduleName)) {
-        EStatus status = makeStatus(enough, errorflag, warnflag);//what if more than one is true????
+        EStatus status = makeStatus(enough, errorflag, warnflag);
         TH1* h = findHist(m_histogramDirectoryName + "resV_" + buff, true);
         if (h != NULL) {
           m_hResV.Clear();
@@ -174,6 +158,5 @@ void DQMHistAnalysisPXDBowModule::terminate()
 {
   // if this function is not needed, please remove
   B2DEBUG(20, "terminate called");
-  //delete m_cResV;
 }
 

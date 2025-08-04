@@ -21,7 +21,8 @@ from caf import strategies
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="CDC Tracking",
-                               expert_username="dvthanh",
+                               expert_username="guanyu",
+                               subsystem="cdc",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["mumu_tight_or_highm_calib", "hadron_calib", "cosmic_calib"],

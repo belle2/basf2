@@ -8,6 +8,7 @@
 
 #include <framework/core/ProcessStatistics.h>
 
+#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/gearbox/Unit.h>
@@ -55,6 +56,10 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
                                               const std::vector<ModuleStatistics>* modules, bool html) const
 {
   const ModuleStatistics& global = getGlobal();
+  if (!Environment::Instance().getStats()) {
+    B2WARNING("The calculation of the statistics wasn't enabled during processing. The requested table cannot be printed.");
+    return "";
+  }
   if (!modules) modules = &(getAll());
   int moduleNameLength = 21; //minimum: 80 characters
   const int lengthOfRest = 80 - moduleNameLength;

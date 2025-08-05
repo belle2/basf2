@@ -34,6 +34,9 @@ string ProcessStatisticsPython::getStatisticsString()
 {
   if (!getWrapped())
     return "";
+  if (getWrapped()->getStatisticsPrintStatus(m_type))
+    return "";
+  getWrapped()->setStatisticsPrintStatus(m_type, true);
   return getWrapped()->getStatisticsString(m_type, m_modules.empty() ? nullptr : &m_modules);
 }
 
@@ -41,6 +44,9 @@ string ProcessStatisticsPython::getStatisticsStringHTML()
 {
   if (!getWrapped())
     return "";
+  if (getWrapped()->getStatisticsPrintStatus(m_type))
+    return "";
+  getWrapped()->setStatisticsPrintStatus(m_type, true);
   return getWrapped()->getStatisticsString(m_type, m_modules.empty() ? nullptr : &m_modules, true);
 }
 

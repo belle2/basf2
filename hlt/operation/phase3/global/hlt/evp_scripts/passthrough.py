@@ -21,4 +21,4 @@ add_roi_payload_assembler(path, ignore_hlt_decision=True)
 finalize_path(path, args, location=constants.Location.hlt)
 
 basf2.print_path(path)
-basf2.process(path)
+basf2.process(path, calculateStatistics=True)

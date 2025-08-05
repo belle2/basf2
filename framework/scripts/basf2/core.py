@@ -239,6 +239,9 @@ def process(path, max_event=0, calculateStatistics=False):
         pybasf2._process(path, max_event)
     else:
         pybasf2._process(path)
+    if calculateStatistics:
+        from basf2 import statistics
+        print(statistics)
 
 
 def set_log_level(level):

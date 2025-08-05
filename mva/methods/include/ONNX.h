@@ -16,6 +16,174 @@
 
 namespace Belle2 {
   namespace MVA {
+    namespace ONNX {
+
+      /**
+       * Holds information for an input tensor to a ONNX model
+       * A map of shared pointers to Tensor can be passed to ONNXSession::run
+       */
+      class Tensor {
+        /**
+         * The flat data buffer
+         */
+        std::vector<float> m_values;
+
+        /**
+         * The dimensions of the tensor
+         */
+        std::vector<int64_t> m_shape;
+
+        Ort::MemoryInfo m_memoryInfo;
+
+      public:
+        /**
+         * Construct from size and shape
+         */
+        Tensor(size_t size, std::vector<int64_t> shape)
+          : m_values(size), m_shape(std::move(shape)),
+            m_memoryInfo(
+              Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)) {}
+
+        /**
+         * Construct from values of another vector (will be copied) and shape
+         */
+        Tensor(std::vector<float> values, std::vector<int64_t> shape)
+          : m_values(std::move(values)), m_shape(std::move(shape)),
+            m_memoryInfo(
+              Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)) {}
+
+        /**
+         * Construct as shared pointer from size and shape
+         *
+         * Exists mainly for convenience to construct a shared pointer to
+         * Tensor from initializer lists, e.g.
+         *
+         * @code
+         * auto input = Tensor::make_shared(batchSize * nFeatures,
+         *                                  {batchSize, nFeatures});
+         * @endcode
+         */
+        static auto make_shared(size_t size, std::vector<int64_t> shape)
+        {
+          return std::make_shared<Tensor>(size, std::move(shape));
+        }
+
+        /**
+         * Construct as shared pointer from another vector (will be copied) and shape
+         *
+         * Exists mainly for convenience to construct a shared pointer to
+         * Tensor from initializer lists, e.g. to create a Tensor with 3
+         * values and shape (1, 3):
+         *
+         * @code
+         * auto input = Tensor::make_shared({v1, v2, v3}, {1, 3});
+         * @endcode
+         */
+        static auto make_shared(std::vector<float> values,
+                                std::vector<int64_t> shape)
+        {
+          return std::make_shared<Tensor>(std::move(values), std::move(shape));
+        }
+
+        auto& at(size_t index) { return m_values.at(index); }
+        auto& at(std::vector<size_t> index)
+        {
+          size_t flat_index = 0;
+          size_t stride = 1;
+          for (int64_t i = m_shape.size() - 1; i >= 0; --i) {
+            flat_index += index[i] * stride;
+            stride *= m_shape[i];
+          }
+          return at(flat_index);
+        }
+
+        void setValues(const std::vector<float>& values)
+        {
+          if (m_values.size() != values.size()) {
+            throw std::out_of_range("Size of new values vector differs from internal size");
+          }
+          m_values = values;
+        }
+        Ort::Value createOrtTensor()
+        {
+          return Ort::Value::CreateTensor(m_memoryInfo, m_values.data(),
+                                          m_values.size(), m_shape.data(),
+                                          m_shape.size());
+        }
+      };
+
+
+      class Session {
+      public:
+        Session(const char* filename)
+        {
+          // Ensure single-threaded execution, see
+          // https://onnxruntime.ai/docs/performance/tune-performance/threading.html
+          //
+          // InterOpNumThreads is probably optional (not used in ORT_SEQUENTIAL mode)
+          // Also, with batch size 1 and ORT_SEQUENTIAL mode, MLP-like models will
+          // always run single threaded, but maybe not e.g. graph networks which can
+          // run in parallel on nodes. Here, setting IntraOpNumThreads to 1 is
+          // important to ensure single-threaded execution.
+          m_sessionOptions.SetIntraOpNumThreads(1);
+          m_sessionOptions.SetInterOpNumThreads(1);
+          m_sessionOptions.SetExecutionMode(
+            ORT_SEQUENTIAL); // default, but make it explicit
+
+          m_session =
+            std::make_unique<Ort::Session>(m_env, filename, m_sessionOptions);
+        }
+
+        void run(const std::map<std::string, std::shared_ptr<Tensor>>& inputMap,
+                 const std::map<std::string, std::shared_ptr<Tensor>>& outputMap)
+        {
+          std::vector<Ort::Value> inputs;
+          std::vector<Ort::Value> outputs;
+          std::vector<const char*> inputNames;
+          std::vector<const char*> outputNames;
+          for (auto& x : inputMap) {
+            inputNames.push_back(x.first.c_str());
+            inputs.push_back(std::move(x.second->createOrtTensor()));
+          }
+          for (auto& x : outputMap) {
+            outputNames.push_back(x.first.c_str());
+            outputs.push_back(std::move(x.second->createOrtTensor()));
+          }
+          run(inputNames, inputs, outputNames, outputs);
+        }
+
+        void run(const std::vector<const char*>& inputNames,
+                 std::vector<Ort::Value>& inputs,
+                 const std::vector<const char*>& outputNames,
+                 std::vector<Ort::Value>& outputs)
+        {
+          m_session->Run(m_runOptions, inputNames.data(), inputs.data(), inputs.size(),
+                         outputNames.data(), outputs.data(), outputs.size());
+        }
+
+      private:
+        /**
+         * Environment object for ONNX session
+         */
+        Ort::Env m_env;
+
+        /**
+         * ONNX session configuration
+         */
+        Ort::SessionOptions m_sessionOptions;
+
+        /**
+         * The ONNX inference session
+         */
+        std::unique_ptr<Ort::Session> m_session;
+
+        /**
+         * Options to be passed to Ort::Session::Run
+         */
+        Ort::RunOptions m_runOptions;
+      };
+    } // namespace ONNX
+
     /**
      * Options for the ONNX MVA method.
      */
@@ -71,77 +239,8 @@ namespace Belle2 {
     };
 
     /**
-     * View a Dataset's m_input as ONNX Tensor
-     * and also set up output buffers/Tensors
-     *
-     * These views will be passed to Ort::Session::Run
-     */
-    class ONNXTensorView {
-    public:
-      /**
-       * Construct a new ONNXTensorView
-       * @param dataset Dataset whose input vector is supposed to be viewed as ONNX tensor
-       * @param nOutputs Number of output values
-       */
-      ONNXTensorView(Dataset& dataset, int nOutputs)
-        : m_inputShape{1, dataset.getNumberOfFeatures()}, m_outputData(nOutputs),
-          m_outputShape{1, nOutputs}, m_memoryInfo(Ort::MemoryInfo::CreateCpu(
-                                                     OrtDeviceAllocator, OrtMemTypeCPU)),
-          m_inputTensor(Ort::Value::CreateTensor<float>(
-                          m_memoryInfo, dataset.m_input.data(), dataset.m_input.size(),
-                          m_inputShape.data(), m_inputShape.size())),
-          m_outputTensor(Ort::Value::CreateTensor<float>(
-                           m_memoryInfo, m_outputData.data(), m_outputData.size(),
-                           m_outputShape.data(), m_outputShape.size())) {}
-      /**
-       * Get a pointer to the inputTensor
-       */
-      Ort::Value* inputTensor() { return &m_inputTensor; }
-
-      /**
-       * Get a pointer to the outputTensor
-       */
-      Ort::Value* outputTensor() { return &m_outputTensor; }
-
-      /**
-       * Get a vector of output values (that may have been filled)
-       */
-      std::vector<float> outputData() { return m_outputData; }
-    private:
-      /**
-       * Shape of the input Tensor
-       */
-      std::vector<int64_t> m_inputShape;
-
-      /**
-       * Output Tensor buffer
-       */
-      std::vector<float> m_outputData;
-
-      /**
-       * Shape of the output Tensor
-       */
-      std::vector<int64_t> m_outputShape;
-
-      /**
-       * MemoryInfo object to be used when constructing the ONNX Tensors - used to specify device (CPU)
-       */
-      Ort::MemoryInfo m_memoryInfo;
-
-      /**
-       * The input Tensor
-       */
-      Ort::Value m_inputTensor;
-
-      /**
-       * The output Tensor
-       */
-      Ort::Value m_outputTensor;
-    };
-
-    /**
-     * Expert for the ONNX MVA method
-     */
+    * Expert for the ONNX MVA method
+    */
     class ONNXExpert : public Expert {
     public:
       /**
@@ -164,40 +263,9 @@ namespace Belle2 {
 
     private:
       /**
-       * Run the current inputs through the onnx model
-       * Will retrieve and fill the buffers from the view
+       * The ONNX inference session wrapper
        */
-      void run(ONNXTensorView& view) const;
-
-      /**
-       * Environment object for ONNX session
-       */
-      Ort::Env m_env;
-
-      /**
-       * ONNX session configuration
-       */
-      Ort::SessionOptions m_sessionOptions;
-
-      /**
-       * The ONNX inference session
-       */
-      std::unique_ptr<Ort::Session> m_session;
-
-      /**
-       * Options to be passed to Ort::Session::Run
-       */
-      Ort::RunOptions m_runOptions;
-
-      /**
-       * Input tensor names
-       */
-      const char* m_inputNames[1] = {"input"};
-
-      /**
-       * Output tensor names
-       */
-      const char* m_outputNames[1] = {"output"};
+      std::unique_ptr<ONNX::Session> m_session;
     };
   } // namespace MVA
 } // namespace Belle2

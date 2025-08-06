@@ -67,7 +67,7 @@ struct EvtLinSample {
   /**
    * The primary constructor with an actual shape to generate
    */
-  EvtLinSample(const std::vector<EvtPointf>& _v) { init(_v); }
+  explicit EvtLinSample(const std::vector<EvtPointf>& _v) { init(_v); }
 
   /**
    * The method to initialize data
@@ -457,7 +457,7 @@ static std::vector<double> getgrid(const std::vector<BW_t*>& reso)
 
   std::sort(en.begin(), en.end());
 
-  for (std::vector<double>::iterator it = en.begin(); it != en.end(); it++) {
+  for (std::vector<double>::iterator it = en.begin(); it != en.end(); ++it) {
     if (*it > smax) {
       en.erase(it, en.end());
       break;
@@ -761,7 +761,7 @@ void EvtbTosllNPR::init()
 
 }
 
-static std::complex<double> h(double q2, double mq)
+static std::complex<double> hfun(double q2, double mq)
 {
   const double mu = 4.8;    // mu = m_b = 4.8 GeV
   if (mq == 0.0)
@@ -782,16 +782,18 @@ static EvtComplex C9(double q2, std::complex<double> hReso = std::complex<double
   double C1 = -0.257, C2 = 1.009, C3 = -0.005, C4 = -0.078, C5 = 0, C6 = 0.001;
   std::complex<double> Y = (hReso) *
                            (4 / 3. * C1 + C2 + 6 * C3 + 60 * C5);
-  Y -= 0.5 * h(q2, m_b) * (7 * C3 + 4 / 3. * C4 + 76 * C5 + 64 / 3. * C6);
-  Y -= 0.5 * h(q2, 0.0) * (C3 + 4 / 3. * C4 + 16 * C5 + 64 / 3. * C6);
+  Y -= 0.5 * hfun(q2, m_b) * (7 * C3 + 4 / 3. * C4 + 76 * C5 + 64 / 3. * C6);
+  Y -= 0.5 * hfun(q2, 0.0) * (C3 + 4 / 3. * C4 + 16 * C5 + 64 / 3. * C6);
   Y += 4 / 3. * C3 + 64 / 9. * C5 + 64 / 27. * C6;
   return EvtComplex(4.211 + real(Y), imag(Y));
 }
 
 static std::complex<double> interpol(const hvec_t& v, double s)
 {
-  double m_c = 1.3;    // quark masses
-  if (!v.size()) return h(s, m_c);
+  if (!v.size()) {
+    double m_c = 1.3;    // quark masses
+    return hfun(s, m_c);
+  }
   int j = std::lower_bound(v.begin(), v.end(), s, [](const helem_t& a, double b) { return a.first < b; }) - v.begin();
 
   double dx = v[j].first - v[j - 1].first;

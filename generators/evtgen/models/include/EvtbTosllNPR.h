@@ -20,8 +20,12 @@ struct BW_t;
 typedef std::pair<double, std::complex<double>> helem_t;
 typedef std::vector<helem_t> hvec_t;
 
-// Description: Implementation of the b->sll decays with resonances according to Rusa and Rahul
-
+/**
+ * Description: Implementation of the B->K(*)l^+l^- decays with New
+ * Physics contributions and c\bar{c} resonances included at the
+ * amplitude level according to the note by Rahul Sinha and Rusa
+ * Mandal
+ */
 class EvtbTosllNPR : public EvtDecayAmp {
 public:
   /**
@@ -50,19 +54,41 @@ public:
   void initProbMax() override;
 
 private:
-  EvtComplex m_dc7;     // delta C_7eff -- addition to NNLO SM value
-  EvtComplex m_dc9;     // delta C_9eff -- addition to NNLO SM value
-  EvtComplex m_dc10;    // delta C_10eff -- addition to NNLO SM value
-  EvtComplex m_c7p;     // C'_7eff -- right hand polarizations
-  EvtComplex m_c9p;     // C'_9eff -- right hand polarizations
-  EvtComplex m_c10p;    // c'_10eff -- right hand polarizations
-  EvtComplex m_cS;      // (C_S - C'_S) -- scalar right and left polarizations
-  EvtComplex m_cP;    // (C_P - C'_P) -- pseudo-scalar right and left polarizations
-  int m_flag{0}; // flag is set nonzero to include resonances
-  std::vector<BW_t*> m_rs; // vector with c\bar{c} resonance lineshapes
-  EvtLinSample* m_ls{0}; // piece-wise interpolation of maximum of the matrix element depend on q^2
+  /** delta C_7eff -- addition to NNLO SM value */
+  EvtComplex m_dc7;
 
-  hvec_t m_reso;    // tabulated resonance contribution
+  /** delta C_9eff -- addition to NNLO SM value */
+  EvtComplex m_dc9;
+
+  /** delta C_10eff -- addition to NNLO SM value */
+  EvtComplex m_dc10;
+
+  /** C'_7eff -- right hand polarizations */
+  EvtComplex m_c7p;
+
+  /** C'_9eff -- right hand polarizations */
+  EvtComplex m_c9p;
+
+  /** c'_10eff -- right hand polarizations */
+  EvtComplex m_c10p;
+
+  /** (C_S - C'_S) -- scalar right and left polarizations */
+  EvtComplex m_cS;
+
+  /** (C_P - C'_P) -- pseudo-scalar right and left polarizations */
+  EvtComplex m_cP;
+
+  /** flag is set nonzero to include resonances */
+  int m_flag{0};
+
+  /** vector with c\bar{c} resonance lineshapes */
+  std::vector<BW_t*> m_rs;
+
+  /** piece-wise interpolation of maximum of the matrix element depend on q^2 */
+  EvtLinSample* m_ls{0};
+
+  /** tabulated resonance contribution */
+  hvec_t m_reso;
 
   /**
    * The method to evaluate the maximum decay amplitude.

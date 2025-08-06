@@ -48,8 +48,15 @@ EvtDecayBase* EvtbTosllNPR::clone()
   return new EvtbTosllNPR;
 }
 
+/**
+ * Description: struct for 2-dimensional point in the float format
+ * instead of double to save memory
+ */
 struct EvtPointf {
-  float x, y;
+  /** x coordinate */
+  float x;
+  /** y coordinate */
+  float y;
 };
 
 static void EvtLeptonVandACurrents(EvtVector4C&, EvtVector4C&, const EvtDiracSpinor&, const EvtDiracSpinor&);
@@ -80,8 +87,11 @@ struct EvtLinSample {
    */
   std::pair<double, double> operator()(double) const;
 
-  std::vector<EvtPointf> m_v; // shape data
-  std::vector<double> m_I; // integral data
+  /** shape data */
+  std::vector<EvtPointf> m_v;
+
+  /** cumulative integral data */
+  std::vector<double> m_I;
 };
 
 
@@ -212,9 +222,14 @@ std::pair<double, double> EvtLinSample::operator()(double r) const
  * Description: The class to treat resonances, their lineshapes, and dispersion relation integral
  */
 struct BW_t {
-  double Mv2; // resonance mass squared
-  double Gv2; // resonance width squared
-  double A; // resonance total amplitude
+  /** resonance mass squared */
+  double Mv2;
+
+  /** resonance width squared */
+  double Gv2;
+
+  /** resonance total amplitude */
+  double A;
 
   /**
    * m is the mass of a resonance

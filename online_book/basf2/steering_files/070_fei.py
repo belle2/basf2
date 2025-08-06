@@ -74,5 +74,4 @@ ma.variablesToNtuple(
 )
 #  [E41|E50]
 # Process events
-b2.process(main)
-print(b2.statistics)
+b2.process(main, calculateStatistics=True)

@@ -87,7 +87,7 @@ The main command line tool for the Belle II Software is ``basf2``::
                         executed steering file.
 --stats                 Enable collection of statistics during event
                         processing. Slows down execution time, but otherwise
-                        ``print(statistics)`` creates a table with 0s only.
+                        ``print(statistics)`` won't print a table with meaningful values.
 --dry-run               Read steering file, but do not start any event
                         processing when process(path) is called. Prints
                         information on input/output files that would be used

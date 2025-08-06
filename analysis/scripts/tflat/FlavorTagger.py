@@ -95,14 +95,15 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             'kaonID',
             'pionID',
             'protonID',
-            # 'nCDCHits/56',
-            # 'nPXDHits/2',
-            # 'nSVDHits/8',
+            'nCDCHits/56',
+            'nPXDHits/2',
+            'nSVDHits/8',
             'dz',
             'dr',
             'chiProb',
-            'clusterEoP',
-            'clusterLAT']
+            # 'clusterEoP',
+            # 'clusterLAT',
+        ]
 
         ecl_variable_list = [
             'useCMSFrame(p)',
@@ -110,7 +111,8 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             'useCMSFrame(phi)',
             'clusterE1E9',
             'clusterE9E21',
-            'clusterLAT']
+            'clusterLAT',
+        ]
 
         roe_variable_list = [
             'countInList(gamma:tflat)/8',

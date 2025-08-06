@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
+//#include "TDecayChannel.h"
 
 #include "generators/evtgen/EvtGenModelRegister.h"
 #include "generators/evtgen/models/EvtbTosllNPR.h"
@@ -52,16 +54,53 @@ struct EvtPointf {
 
 static void EvtLeptonVandACurrents(EvtVector4C&, EvtVector4C&, const EvtDiracSpinor&, const EvtDiracSpinor&);
 
+/**
+ * Description: The simple helper class to generate arbitrary
+ * distribution based on a linear piece-wise approximation of it
+ */
 struct EvtLinSample {
+  /**
+   * The default constructor
+   */
   EvtLinSample() {}
+
+  /**
+   * The primary constructor with an actual shape to generate
+   */
   EvtLinSample(const std::vector<EvtPointf>& _v) { init(_v); }
+
+  /**
+   * The method to initialize data
+   */
   void init(const std::vector<EvtPointf>& _v);
+
+  /**
+   * The operator to return <x,weight> depend on argument in [0,1]
+   * range which represent fraction of the total distribution integral
+   */
   std::pair<double, double> operator()(double) const;
 
-  std::vector<EvtPointf> m_v;
-  std::vector<double> m_I;
+  std::vector<EvtPointf> m_v; // shape data
+  std::vector<double> m_I; // integral data
 };
 
+
+/**
+ * This function generates three-body decay which help to improve
+ * efficiency for the B->K*l+l- generation which has very complicated
+ * properties and it makes it very inefficient for ordinary phase
+ * space generation due to very large and narrow peaks in l+l-
+ * invariant mass spectrum. Here the invariant mass of particles 1(l-)
+ * and 2(l+) are generated according to the distribution ls which is a
+ * linear piece-wise approximation of the matrix element maximum for
+ * particular value of q^2 = (p_l+ + p_l-)^2.
+ * M is B meson mass
+ * m1 is positron mass
+ * m2 is electron mass
+ * m3 is K* mass
+ * p4 is a return (generated) 4-momentum array
+ * ls is linear piece-wise approximation of (p_l+ + p_l-)^2 distribution
+ */
 static double PhaseSpacePole2(double M, double m1, double m2, double m3, EvtVector4R* p4, const EvtLinSample* ls)
 {
   const EvtLinSample& g = *ls;
@@ -131,6 +170,10 @@ void EvtbTosllNPR::decay(EvtParticle* p)
   CalcAmp(p, _amp2);
 }
 
+/**
+ * The method to initialize a cumulative integral of the piece-wise
+ * approximation provided as input _v
+ */
 void EvtLinSample::init(const std::vector<EvtPointf>& _v)
 {
   m_v = _v;
@@ -142,6 +185,10 @@ void EvtLinSample::init(const std::vector<EvtPointf>& _v)
     m_I[i] *= norm;
 }
 
+/**
+ * Sample from the cumulative integral and return q^2 and the
+ * associated weight
+ */
 std::pair<double, double> EvtLinSample::operator()(double r) const
 {
   int j = upper_bound(m_I.begin(), m_I.end(), r) - m_I.begin();
@@ -161,9 +208,21 @@ std::pair<double, double> EvtLinSample::operator()(double r) const
   return std::make_pair(z, f0 + (df / dx) * (z - x0));
 }
 
+/**
+ * Description: The class to treat resonances, their lineshapes, and dispersion relation integral
+ */
 struct BW_t {
-  double Mv2, Gv2, A;
+  double Mv2; // resonance mass squared
+  double Gv2; // resonance width squared
+  double A; // resonance total amplitude
 
+  /**
+   * m is the mass of a resonance
+   * gtot is the total width of a resonance
+   * ghad is the hadronic width of a resonance
+   * bll is the leptonic width of a resonance
+   * alpha is the fine structure constant (it might depend on energy scale)
+   */
   BW_t(double m, double gtot, double ghad, double bll, double alpha = 1 / 137.035999084)
   {
     //        const double alpha = 1 / 137.035999084;    // (+-21) PDG 2021
@@ -172,12 +231,18 @@ struct BW_t {
     A = (9 / (alpha * alpha)) * bll * gtot * ghad;
   }
 
+  /**
+   * resonance shape
+   */
   double R(double s) const
   {
     double z = s - Mv2, z2 = z * z;
     return A * s / (z2 + Mv2 * Gv2);
   }
 
+  /**
+   * the first derivative of a resonance shape
+   */
   double Rp(double s) const
   {
     double z = s - Mv2, z2 = z * z, t = 1 / (z2 + Mv2 * Gv2);
@@ -185,6 +250,9 @@ struct BW_t {
     return A * t;
   }
 
+  /**
+   * the second derivative of a resonance shape
+   */
   double Rpp(double s) const
   {
     double z = s - Mv2, z2 = z * z, t = 1 / (z2 + Mv2 * Gv2);
@@ -192,8 +260,10 @@ struct BW_t {
     return A * t;
   }
 
-  // dispersion relation indefinite integral: s is the parmeter, sp is
-  // the integration variable
+  /**
+   * Dispersion relation indefinite integral: s is the parmeter, sp is
+   * the integration variable
+   */
   double DRIntegral(double s, double sp) const
   {
     double zp = sp - Mv2, zp2 = zp * zp;
@@ -203,6 +273,12 @@ struct BW_t {
     return A * (0.5 * log(ds * ds / (zp2 + GM2)) - z * atan(zp / GM) / GM) / (z2 + GM2);
   }
 
+  /**
+   * Based on the resonance parameters place knots for linear
+   * piece-wise approximation with enough precision.  The current
+   * method might be not optimal but the better strategy requires more
+   * investigations.
+   */
   void addknots(std::vector<double>& en) const
   {
     double Mv = sqrt(Mv2), Gv = sqrt(Gv2);
@@ -253,6 +329,10 @@ struct BW_t {
   }
 };
 
+/**
+ * c\bar{c} continuum contribution to R(s). It is a crude
+ * approximation just to have it.
+ */
 static double Rcont(double s)
 {
   //    const double mb = 4.18 /* +0.03 -0.02 [GeV] */, mb2 = mb * mb;
@@ -263,30 +343,40 @@ static double Rcont(double s)
   return 1.02;
 }
 
-BW_t jpsi(3.0969, 0.0926 / 1000, 0.0926 / 1000 * 0.877, 0.05971);
-BW_t psi2s(3.6861, 0.294 / 1000, 0.294 / 1000 * 0.9785, 0.00793);
-BW_t psi3770(3773.7 / 1000, 27.2 / 1000, 27.2 / 1000, 1e-5);
-BW_t psi4040(4039 / 1000., 80 / 1000., 80 / 1000., 1.07e-5);
-BW_t psi4160(4191 / 1000., 70 / 1000., 70 / 1000., 6.9e-6);
-BW_t psi4230(4220 / 1000., 60 / 1000., 60 / 1000., 1e-5);
-
-static double uR(double s, double wjpsi, double wpsi2s, double wrest)
+/**
+ * c\bar{c} contribution with resonances to R(s). J/psi and psi(2S)
+ * resonances specifically treated with additional weights to simulate
+ * hadronic phases.
+ */
+static double uR(double s, double wjpsi, double wpsi2s, double wrest, const std::vector<BW_t*>& res)
 {
-  return Rcont(s) + wjpsi * jpsi.R(s) + wpsi2s * psi2s.R(s) + wrest * (psi3770.R(s) + psi4040.R(s) + psi4160.R(s) + psi4230.R(s));
+  double sum = 0;
+  for (unsigned i = 2; i < res.size(); i++) sum += res[i]->R(s);
+  return Rcont(s) + wjpsi * res[0]->R(s) + wpsi2s * res[1]->R(s) + wrest * sum;
+  //  return Rcont(s) + wjpsi * jpsi.R(s) + wpsi2s * psi2s.R(s) + wrest * (psi3770.R(s) + psi4040.R(s) + psi4160.R(s) + psi4230.R(s));
 }
 
+/**
+ * dispersion relation integral of a linear function
+ */
 static double linint(double a, double b, double s, double sp)
 {
   double x = std::abs(sp - s);
   return ((a * s - b) * log(x) + b * log(sp)) / s;
 }
 
+/**
+ * dispersion relation integral of a constant function
+ */
 static double cnstint(double c, double s, double sp)
 {
   double x = std::abs(sp - s);
   return c * (log(x) - log(sp)) / s;
 }
 
+/**
+ * dispersion relation integral of the continuum crude approximation Rcont(s)
+ */
 static double DRIcont(double s)
 {
   // !!! check mb value!!!
@@ -297,24 +387,38 @@ static double DRIcont(double s)
   return (linint(a, b, s, s1) - linint(a, b, s, s0)) - cnstint(c, s, s1);
 }
 
-static double DRInt(double s, double wjpsi, double wpsi2s, double wrest)
+/**
+ * Dispersion relation integral of the c\bar{c} contribution with
+ * resonances to R(s). J/psi and psi(2S) resonances specifically
+ * treated with additional weights to simulate hadronic phases.
+ */
+static double DRInt(double s, double wjpsi, double wpsi2s, double wrest, const std::vector<BW_t*>& res)
 {
-  const double Mpi = 1.3957061e-01, ct = 4 * Mpi * Mpi;
-  auto Integ = [ct, s](const BW_t & r) {return r.DRIntegral(s, 1e8) - r.DRIntegral(s, ct);};
-  return DRIcont(s) + wjpsi * Integ(jpsi) + wpsi2s * Integ(psi2s) + wrest * (Integ(psi3770) + Integ(psi4040) + Integ(psi4160) + Integ(
-           psi4230));
+  static const double Mpi = Belle2::EvtGenDatabasePDG::Instance()->GetParticle("pi+")->Mass(); //charged pion mass
+  const double ct = 4 * Mpi * Mpi;
+  auto Integ = [ct, s](const BW_t * r) {return r->DRIntegral(s, 1e8) - r->DRIntegral(s, ct);};
+  double sum = 0;
+  for (unsigned i = 2; i < res.size(); i++) sum += Integ(res[i]);
+  return DRIcont(s) + wjpsi * Integ(res[0]) + wpsi2s * Integ(res[1]) + wrest * sum;
 }
 
-static std::vector<double> getgrid(int reso)
+/**
+ * Place knots of the linear piece-wise approximation of the maximum
+ * of the matrix element along q^2 variable to then generate q^2
+ * according to it.
+ */
+static std::vector<double> getgrid(const std::vector<BW_t*>& reso)
 {
-  const double m_c = 1.3, m_s = 0.2, m_e = 0.511e-3, MD0 = 1864.84 / 1000;
+  const double m_c = 1.3, m_s = 0.2;
+
+  static const double m_e = Belle2::EvtGenDatabasePDG::Instance()->GetParticle("e-")->Mass(); // electron mass
+  static const double MD0 = Belle2::EvtGenDatabasePDG::Instance()->GetParticle("D0")->Mass(); // D0 mass
 
   std::vector<double> en;
-  if (reso) {
-    std::vector<BW_t> v = { jpsi, psi2s, psi3770, psi4040, psi4160, psi4230 };
-    for (const auto& t : v)
-      t.addknots(en);
-
+  if (reso.size() > 0) {
+    for (const auto t : reso)
+      t->addknots(en);
+    const BW_t& jpsi = *(reso[0]);
     en.push_back(jpsi.Mv2 + 0.1);
     en.push_back(jpsi.Mv2 - 0.1);
     en.push_back(jpsi.Mv2 + 0.08);
@@ -350,8 +454,7 @@ static std::vector<double> getgrid(int reso)
     en.push_back(4 * m_s * m_s + t0);
     en.push_back(4 * m_s * m_s - t0);
   }
-  en.push_back(0x1.27397cfb13b38p + 0);
-  en.push_back(10);
+
   std::sort(en.begin(), en.end());
 
   for (std::vector<double>::iterator it = en.begin(); it != en.end(); it++) {
@@ -436,7 +539,7 @@ void EvtbTosllNPR::initProbMax()
 
   double m0 = EvtPDL::getMinMass(mId);
   double q2max = (m - m0) * (m - m0);
-  v = getgrid(m_flag);
+  v = getgrid(m_rs);
   m0 = mH[0];
   //loop over q2
   for (double q2 : v) {
@@ -485,11 +588,7 @@ void EvtbTosllNPR::initProbMax()
   root_part->deleteTree();
 
   m_ls->init(pp);
-  maxprobfound *= 8e-8 * 1.1;
-  maxprobfound *= 1.3;
-  maxprobfound *= 1.5; // large eta
-  maxprobfound = std::min(20., maxprobfound);
-  B2WARNING("Max prob " << maxprobfound << std::flush);
+  maxprobfound = 4;
   setProbMax(maxprobfound);
 }
 
@@ -605,23 +704,56 @@ void EvtbTosllNPR::init()
     }
   }
   m_ls = new EvtLinSample;
-  if (!m_flag) return;
 
-  std::vector<double> v = getgrid(m_flag);
+  if (!m_flag) return;
+  // BW_t jpsi(3.0969, 0.0926 / 1000, 0.0926 / 1000 * 0.877, 0.05971);
+  // BW_t psi2s(3.6861, 0.294 / 1000, 0.294 / 1000 * 0.9785, 0.00793);
+  // BW_t psi3770(3773.7 / 1000, 27.2 / 1000, 27.2 / 1000, 1e-5);
+  // BW_t psi4040(4039 / 1000., 80 / 1000., 80 / 1000., 1.07e-5);
+  // BW_t psi4160(4191 / 1000., 70 / 1000., 70 / 1000., 6.9e-6);
+  // BW_t psi4230(4220 / 1000., 60 / 1000., 60 / 1000., 1e-5);
+
+  TParticlePDG* p_jpsi = Belle2::EvtGenDatabasePDG::Instance()->GetParticle("J/psi");
+  // B2WARNING("extracting leptonic width"<<std::flush);
+  // TDecayChannel *c_jpsi = p_jpsi->DecayChannel(1);
+  // B2WARNING("Br = "<<c_jpsi->BranchingRatio());
+  BW_t* jpsi = new BW_t(p_jpsi->Mass(), p_jpsi->Width(),  p_jpsi->Width() * 0.877, 0.05971);
+  m_rs.push_back(jpsi);
+
+  TParticlePDG* p_psi2s = Belle2::EvtGenDatabasePDG::Instance()->GetParticle("psi(2S)");
+  BW_t* psi2s = new BW_t(p_psi2s->Mass(), p_psi2s->Width(),  p_psi2s->Width() * 0.9785, 0.00793);
+  m_rs.push_back(psi2s);
+
+  TParticlePDG* p_psi3770 = Belle2::EvtGenDatabasePDG::Instance()->GetParticle("psi(3770)");
+  BW_t* psi3770 = new BW_t(p_psi3770->Mass(), p_psi3770->Width(), p_psi3770->Width(), 1e-5);
+  m_rs.push_back(psi3770);
+
+  TParticlePDG* p_psi4040 = Belle2::EvtGenDatabasePDG::Instance()->GetParticle("psi(4040)");
+  BW_t* psi4040 = new BW_t(p_psi4040->Mass(), p_psi4040->Width(), p_psi4040->Width(), 1.07e-5);
+  m_rs.push_back(psi4040);
+
+  TParticlePDG* p_psi4160 = Belle2::EvtGenDatabasePDG::Instance()->GetParticle("psi(4160)");
+  BW_t* psi4160 = new BW_t(p_psi4160->Mass(), p_psi4160->Width(), p_psi4160->Width(), 6.9e-6);
+  m_rs.push_back(psi4160);
+
+  BW_t* psi4230 = new BW_t(4220 / 1000., 60 / 1000., 60 / 1000., 1e-5);
+  m_rs.push_back(psi4230);
+
+  std::vector<double> v = getgrid(m_rs);
   std::complex<double> eiphi = exp(1i * phi), pJpsi = Nr * exp(1i * theta_Jpsi), ppsi2S = Nr * exp(1i * theta_psi2S);
-  // constants have to be synchronized with src/EvtGenModels/EvtbTosllVectorAmpNP.cpp
+
   const double C1 = -0.257, C2 = 1.009, C3 = -0.005, C5 = 0;
   double sc = 1.0 / (4.0 / 3.0 * C1 + C2 + 6.0 * C3 + 60.0 * C5);
   const double m_b = 4.8, m_c = 1.3;
   for (auto t : v) {
     // Eq. 13, 14, and 15 in Emi's note. For the default theta_Jpsi=0 and theta_psi2S=0 it is identical to the Rahul's dispersion relation
     double re = -8.0 / 9.0 * log(m_c / m_b) - 4.0 / 9.0 +
-                t / 3.0 * DRInt(t, real(pJpsi), real(ppsi2S), Nr) - M_PI / 3 * uR(t, imag(pJpsi), imag(ppsi2S), 0);
+                t / 3.0 * DRInt(t, real(pJpsi), real(ppsi2S), Nr, m_rs) - M_PI / 3 * uR(t, imag(pJpsi), imag(ppsi2S), 0, m_rs);
     double im =
-      t / 3.0 * DRInt(t, imag(pJpsi), imag(ppsi2S), 0) + M_PI / 3 * uR(t, real(pJpsi), real(ppsi2S), Nr);
+      t / 3.0 * DRInt(t, imag(pJpsi), imag(ppsi2S), 0, m_rs) + M_PI / 3 * uR(t, real(pJpsi), real(ppsi2S), Nr, m_rs);
     std::complex<double> r(re, im);
     if (eta == 0.0) {
-      double z = t - jpsi.Mv2;
+      double z = t - jpsi->Mv2;
       r += eiphi * (n1 * sc / (z * z + d1));    // bump under J/psi as a non-factorizable contribution
     }
     m_reso.push_back(std::make_pair(t, r));

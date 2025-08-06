@@ -16,6 +16,7 @@
 
 class EvtParticle;
 struct EvtLinSample;
+struct BW_t;
 typedef std::pair<double, std::complex<double>> helem_t;
 typedef std::vector<helem_t> hvec_t;
 
@@ -58,6 +59,7 @@ private:
   EvtComplex m_cS;      // (C_S - C'_S) -- scalar right and left polarizations
   EvtComplex m_cP;    // (C_P - C'_P) -- pseudo-scalar right and left polarizations
   int m_flag{0}; // flag is set nonzero to include resonances
+  std::vector<BW_t*> m_rs; // vector with c\bar{c} resonance lineshapes
   EvtLinSample* m_ls{0}; // piece-wise interpolation of maximum of the matrix element depend on q^2
 
   hvec_t m_reso;    // tabulated resonance contribution

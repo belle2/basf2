@@ -16,6 +16,7 @@ import pdg
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdMu, stdPi, stdK
 from stdPhotons import stdPhotons
+from stdV0s import stdKshorts
 import vertex as vertex
 
 __liaison__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
@@ -1012,3 +1013,99 @@ class DarkShower(BaseSkim):
         )
 
         return [f"K_S0:{skim_str}"]
+
+
+@fancy_skim_header
+class BtoK_ALP2Gamma(BaseSkim):
+    """
+    **Physics channel**: :math:`B \\to K^{(*)}a(\\to \\gamma \\gamma)`
+
+    **Cuts applied:**
+
+    * Kaons:BtoK_ALP2Gamma -> ``kaonID > 0.1``, ``dr < 3.0``, ``abs(dz) < 4.0``
+    * Pions:BtoK_ALP2Gamma-> ``pionID > 0.1``, ``dr < 3.0``, ``abs(dz) < 4.0``
+    * Photons:BtoK_ALP2Gamma-> ``E > 0.05``
+    * A0 candidate: daughter(0,E) > daughter(1,E)
+    * K*0/K*+: 0.8 < M < 1.0
+    * B candidates: Mbc > 5.20, abs(deltaE) < 1.0
+    """
+
+    __authors__ = ["Hyuna Kim"]
+    __contact__ = __liaison__
+    __description__ = (
+        "Dark-sector skim selecting :math:`B \\to K^{(*)}a(\\to \\gamma \\gamma)` "
+        "candidates by reconstructing A0->gamma gamma, K*->Kpi resonances, and B meson decay chains."
+    )
+    __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        # from stdV0s import stdKshorts
+        stdKshorts(path=path)
+
+    def build_lists(self, path):
+
+        kaons = (
+            'K+:BtoK_ALP2Gamma',
+            'kaonID > 0.1 and dr < 3.0 and abs(dz) < 4.0'
+        )
+        pions = (
+            'pi+:BtoK_ALP2Gamma',
+            'pionID > 0.1 and dr < 3.0 and abs(dz) < 4.0'
+        )
+        photons = (
+            'gamma:g_BtoK_ALP2Gamma',
+            '[E > 0.05]'
+        )
+
+        ma.fillParticleLists([kaons, pions, photons], path=path)
+        ma.cutAndCopyList(
+            "K_S0:BtoK_ALP2Gamma",
+            "K_S0:merged",
+            cut='',
+            path=path)
+
+        ma.reconstructDecay(
+            'A0:rec_BtoK_ALP2Gamma -> gamma:g_BtoK_ALP2Gamma gamma:g_BtoK_ALP2Gamma',
+            cut='[daughter(0,E) > daughter(1,E)]',
+            path=path
+        )
+
+        ma.reconstructDecay(
+            'K*0:BtoK_ALP2Gamma -> K-:BtoK_ALP2Gamma pi+:BtoK_ALP2Gamma',
+            cut='0.8 < M < 1.0',
+            path=path
+        )
+        ma.reconstructDecay(
+            'K*+:BtoK_ALP2Gamma -> K_S0:BtoK_ALP2Gamma pi+:BtoK_ALP2Gamma',
+            cut='0.8 < M < 1.0',
+            path=path
+        )
+
+        ma.reconstructDecay(
+            'B+:B2K+_ALP2Gamma -> K+:BtoK_ALP2Gamma  A0:rec_BtoK_ALP2Gamma',
+            cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
+            path=path
+        )
+        ma.reconstructDecay(
+            'B+:B2K_ALP2Gamma  -> K*+:BtoK_ALP2Gamma  A0:rec_BtoK_ALP2Gamma',
+            cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
+            path=path
+        )
+        ma.reconstructDecay(
+            'B0:B2KS_ALP2Gamma -> K_S0:BtoK_ALP2Gamma   A0:rec_BtoK_ALP2Gamma',
+            cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
+            path=path
+        )
+        ma.reconstructDecay(
+            'B0:B2K0_ALP2Gamma -> K*0:BtoK_ALP2Gamma  A0:rec_BtoK_ALP2Gamma',
+            cut='[Mbc > 5.20] and [abs(deltaE) < 1.0]',
+            path=path
+        )
+
+        return [
+            "B+:B2K+_ALP2Gamma",
+            "B+:B2K_ALP2Gamma",
+            "B0:B2KS_ALP2Gamma",
+            "B0:B2K0_ALP2Gamma"
+        ]

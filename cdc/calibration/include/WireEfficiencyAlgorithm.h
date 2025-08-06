@@ -15,7 +15,7 @@
 #include <cdc/dbobjects/CDCGeometry.h>
 #include <cdc/dbobjects/CDCBadWires.h>
 
-#include "string"
+#include <string>
 
 namespace Belle2 {
   namespace CDC {

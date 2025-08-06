@@ -12,13 +12,8 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
-#include <genfit/Track.h>
-
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
@@ -30,24 +25,17 @@
 #include <cdc/dbobjects/CDCDedxWireGain.h>
 #include <cdc/dbobjects/CDCDedxRunGain.h>
 #include <cdc/dbobjects/CDCDedxCosineCor.h>
-#include <cdc/dbobjects/CDCDedxInjectionTime.h>
 #include <cdc/dbobjects/CDCDedx2DCell.h>
 #include <cdc/dbobjects/CDCDedx1DCell.h>
 #include <cdc/dbobjects/CDCDedxInjectionTime.h>
 #include <cdc/dbobjects/CDCDedxADCNonLinearity.h>
 #include <cdc/dbobjects/CDCDedxCosineEdge.h>
 #include <cdc/dbobjects/CDCDedxHadronCor.h>
-#include <reconstruction/dataobjects/DedxConstants.h>
-
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/utility/ReferenceFrame.h>
 
 #include <vector>
 
 #include <TFile.h>
 #include <TTree.h>
-#include <TString.h>
 
 class TH2F;
 

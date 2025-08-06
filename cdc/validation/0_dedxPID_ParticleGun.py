@@ -20,6 +20,8 @@
 import basf2
 from reconstruction import add_reconstruction
 
+basf2.set_random_seed(1337)
+
 main = basf2.create_path()
 
 # Read input.

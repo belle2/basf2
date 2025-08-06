@@ -10,17 +10,15 @@
 import basf2
 import hbasf2
 from softwaretrigger import constants
-from softwaretrigger.processing import finalize_zmq_path, setup_basf2_and_db, start_zmq_path
-from pxd import add_pxd_percentframe
-from tracking import add_roi_payload_assembler
+from softwaretrigger.processing import setup_basf2_and_db, start_zmq_path, finalize_zmq_path, add_expressreco_processing
 
 
-args = setup_basf2_and_db(zmq=True)
+args = setup_basf2_and_db(event_distribution_mode=constants.EventDistributionModes.zmq)
 
-path, reco_path = start_zmq_path(args, location=constants.Location.hlt)
-add_pxd_percentframe(reco_path, fraction=0.1, random_position=True)
-add_roi_payload_assembler(reco_path, ignore_hlt_decision=True)
-finalize_zmq_path(path, args, location=constants.Location.hlt)
+path, reco_path = start_zmq_path(args, location=constants.Location.expressreco,
+                                 event_distribution_mode=constants.EventDistributionModes.zmq)
+add_expressreco_processing(reco_path, run_type=constants.RunTypes.beam, do_reconstruction=False)
+finalize_zmq_path(path, args, location=constants.Location.expressreco)
 
 basf2.print_path(path)
 hbasf2.process(path, [args.dqm, args.output], True)

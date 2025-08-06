@@ -19,5 +19,5 @@ if __name__ == "__main__":
         test_folder(location=constants.Location.expressreco,
                     run_type=constants.RunTypes.beam,
                     exp_number=1003,
-                    phase="phase3",
+                    event_distribution="ringbuffer",
                     passthrough=True)

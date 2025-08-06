@@ -43,5 +43,4 @@ mypath.add_module('VariablesToEventBasedTree',
                   event_variables=['nTracks', 'isMC'])
 
 # process the data
-basf2.process(mypath, calculateStatistics=True)
-print(basf2.statistics)
+basf2.process(mypath)

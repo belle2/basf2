@@ -80,7 +80,4 @@ ma.variablesToNtuple('B0:scaled', B0_vars,
                      filename=outputfile, treename='B0_scaled', path=my_path)
 
 # process the events
-b2.process(my_path, calculateStatistics=True)
-
-# print out the summary
-print(b2.statistics)
+b2.process(my_path)

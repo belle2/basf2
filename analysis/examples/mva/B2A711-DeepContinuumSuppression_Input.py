@@ -190,8 +190,7 @@ ma.variablesToNtuple('B0', variables + contVars, treename='tree', filename=outfi
 # Loop over each possible ROE (1 for every B candidate) in every event
 firstpath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
-basf2.process(firstpath, calculateStatistics=True)
-print(basf2.statistics)
+basf2.process(firstpath)
 
 # Shuffle Data. Use only if enough Ram is available
 try:

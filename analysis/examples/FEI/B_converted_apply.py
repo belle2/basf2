@@ -91,4 +91,3 @@ ma.variablesToNtuple('B0:semileptonic',
 
 # Process 100 events
 b2.process(path, max_event=100, calculateStatistics=True)
-print(b2.statistics)

@@ -54,6 +54,3 @@ my_path.add_module('RootOutput', outputFileName='B2A101-Y4SEventGeneration.root'
 
 # process all modules added to the path
 b2.process(path=my_path, calculateStatistics=True)
-
-# print out the summary
-print(b2.statistics)

@@ -200,6 +200,3 @@ ma.summaryOfLists(particleLists=['J/psi:mumu', 'B0:sig'],
 
 # Process the events
 b2.process(cp_val_path, calculateStatistics=True)
-
-# print out the summary
-print(b2.statistics)

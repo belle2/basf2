@@ -94,7 +94,4 @@ vars = ['combinationID',
 variablesToNtuple('vpho:bhabha', vars, filename='bhabha.root', path=mypath)
 
 # Process the events
-b2.process(mypath, calculateStatistics=True)
-
-# print out the summary
-print(b2.statistics)
+b2.process(mypath)

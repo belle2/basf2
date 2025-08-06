@@ -85,7 +85,4 @@ variableList += ['dmID']
 ma.variablesToNtuple('B0', variables=variableList, filename="Reconstruct_jpsi_kl_example.root", treename='tree', path=main)
 
 # Process all modules added to the main path
-basf2.process(main, calculateStatistics=True)
-
-# Print out the summary
-print(basf2.statistics)
+basf2.process(main)

@@ -148,7 +148,6 @@ for list_tree_tuple in list_tree_tuples:
         path=main_path
     )
 
-basf2.process(main_path, calculateStatistics=True)
-print(basf2.statistics)
+basf2.process(main_path)
 
 # @endcond

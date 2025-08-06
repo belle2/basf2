@@ -187,5 +187,4 @@ ma.variablesToNtuple('B0', variables + expertVars, treename='tree', filename=out
 
 main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
-basf2.process(main, calculateStatistics=True)
-print(basf2.statistics)
+basf2.process(main)

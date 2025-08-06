@@ -67,7 +67,4 @@ ma.variablesToNtuple(decayString='gamma:sel',
                      path=my_path)
 
 # process the events
-b2.process(my_path, calculateStatistics=True)
-
-# print out the summary
-print(b2.statistics)
+b2.process(my_path)

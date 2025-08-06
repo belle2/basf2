@@ -56,5 +56,4 @@ for i, module in enumerate(mypath.modules()):
 # I could use python's native print()
 
 # process the data
-basf2.process(mypath, calculateStatistics=True)
-print(basf2.statistics)
+basf2.process(mypath)

@@ -44,5 +44,4 @@ mypath.add_module('VariablesToHistogram',
 # print(help(ma.variablesToHistogram))
 
 # process the data
-basf2.process(mypath, calculateStatistics=True)
-print(basf2.statistics)
+basf2.process(mypath)

@@ -52,5 +52,3 @@ ma.variablesToNtuple('', [*vc.event_kinematics, *vc.mc_event_kinematics], filena
 
 # Process the events
 b2.process(my_path, calculateStatistics=True)
-# print out the summary
-print(b2.statistics)

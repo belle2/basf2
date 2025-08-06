@@ -86,6 +86,3 @@ ma.variablesToNtuple(decayString='D0:sig',
 
 # Process the events
 b2.process(cft_path, calculateStatistics=True)
-
-# print out the summary
-print(b2.statistics)

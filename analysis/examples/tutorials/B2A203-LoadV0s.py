@@ -91,7 +91,4 @@ ma.variablesToNtuple(treename='lambda_std',
                      path=my_path)
 
 
-b2.process(my_path, calculateStatistics=True)
-
-# print out the summary
-print(b2.statistics)
+b2.process(my_path)

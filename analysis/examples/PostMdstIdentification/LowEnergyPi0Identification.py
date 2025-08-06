@@ -75,7 +75,4 @@ ma.variablesToNtuple('pi0:gamma', pi0_vars, filename=filename, treename='t1', pa
 analysis_path.add_module('Progress')
 
 # Process the events.
-basf2.process(analysis_path, calculateStatistics=True)
-
-# Print out the summary.
-print(basf2.statistics)
+basf2.process(analysis_path)

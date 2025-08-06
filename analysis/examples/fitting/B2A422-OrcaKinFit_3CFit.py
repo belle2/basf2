@@ -76,7 +76,4 @@ variablesToNtuple('beam:kinfit', Auvars,
                   filename=output_file, treename='A_mm_kinfit', path=mypath)
 
 # Process the events
-b2.process(mypath, calculateStatistics=True)
-
-# print out the summary
-print(b2.statistics)
+b2.process(mypath)

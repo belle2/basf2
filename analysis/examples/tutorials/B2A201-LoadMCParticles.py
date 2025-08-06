@@ -67,7 +67,4 @@ ma.printList(list_name='K-:gen', full=False, path=my_path)
 ma.printList(list_name='anti-p-:gen', full=False, path=my_path)
 
 # Process the events
-b2.process(my_path, calculateStatistics=True)
-
-# print out the summary
-print(b2.statistics)
+b2.process(my_path)

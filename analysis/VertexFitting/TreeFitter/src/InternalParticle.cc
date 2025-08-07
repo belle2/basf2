@@ -57,9 +57,9 @@ namespace TreeFitter {
       B2ERROR("Trying to create an InternalParticle from NULL. This should never happen.");
     }
 
-    m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
-                                 std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end()
-                       or m_particle->hasExtraInfo("treeFitterMassConstraint");
+    m_massconstraint = std::find_if(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
+    [pdg = std::abs(m_particle->getPDGCode())](int val) { return std::abs(val) == pdg; }) != config.m_massConstraintListPDG.end()
+    or m_particle->hasExtraInfo("treeFitterMassConstraint");
 
     m_beamconstraint = (std::abs(m_particle->getPDGCode()) == config.m_beamConstraintPDG);
 

@@ -279,7 +279,7 @@ class B0toDpi_KpipiLooseDelE(BaseSkim):
     * ``abs(deltaE) < 0.45``
 
     Note:
-
+         This skim is the same as B0toDpi_Kpipi, with the only difference of a larger deltaE cut (abs(deltaE) < 0.45).
     """
 
     __authors__ = ["Sourav Dey"]

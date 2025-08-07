@@ -279,10 +279,7 @@ class B0toDpi_KpipiLooseDelE(BaseSkim):
     * ``abs(deltaE) < 0.45``
 
     Note:
-        This skim is same as B0toDpi_Kpipi, with the only difference of a
-        larger deltaE cut (abs(deltaE) < 0.45).
-        As for B0toDpi_Kpipi, this skim uses skim.standardlists.charm.loadStdDplus_Kpipi,
-        where :math:`D^-` channel is defined.
+
     """
 
     __authors__ = ["Sourav Dey"]

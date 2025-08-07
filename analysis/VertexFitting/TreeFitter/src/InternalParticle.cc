@@ -71,9 +71,9 @@ namespace TreeFitter {
       and this->mother();
 
       // use geo constraint if this particle is in the list to constrain
-      m_geo_constraint = std::find(config.m_geoConstraintListPDG.begin(),
-                                   config.m_geoConstraintListPDG.end(),
-                                   std::abs(m_particle->getPDGCode())) != config.m_geoConstraintListPDG.end()  && this->mother() && !m_shares_vertex_with_mother;
+      m_geo_constraint = std::find_if(config.m_geoConstraintListPDG.begin(), config.m_geoConstraintListPDG.end(),
+      [pdg = std::abs(m_particle->getPDGCode())](int val) { return std::abs(val) == pdg; }) != config.m_geoConstraintListPDG.end()
+      and this->mother() and !m_shares_vertex_with_mother;
     } else {
       m_shares_vertex_with_mother = this->mother() && m_isStronglyDecayingResonance;
       m_geo_constraint = this->mother() && !m_shares_vertex_with_mother;

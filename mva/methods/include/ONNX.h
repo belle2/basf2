@@ -20,7 +20,7 @@ namespace Belle2 {
 
       /**
        * Holds information for an input tensor to a ONNX model
-       * A map of shared pointers to Tensor can be passed to ONNXSession::run
+       * A map of shared pointers to Tensor can be passed to Session::run
        */
       class Tensor {
         /**
@@ -115,51 +115,13 @@ namespace Belle2 {
 
       class Session {
       public:
-        Session(const char* filename)
-        {
-          // Ensure single-threaded execution, see
-          // https://onnxruntime.ai/docs/performance/tune-performance/threading.html
-          //
-          // InterOpNumThreads is probably optional (not used in ORT_SEQUENTIAL mode)
-          // Also, with batch size 1 and ORT_SEQUENTIAL mode, MLP-like models will
-          // always run single threaded, but maybe not e.g. graph networks which can
-          // run in parallel on nodes. Here, setting IntraOpNumThreads to 1 is
-          // important to ensure single-threaded execution.
-          m_sessionOptions.SetIntraOpNumThreads(1);
-          m_sessionOptions.SetInterOpNumThreads(1);
-          m_sessionOptions.SetExecutionMode(
-            ORT_SEQUENTIAL); // default, but make it explicit
-
-          m_session =
-            std::make_unique<Ort::Session>(m_env, filename, m_sessionOptions);
-        }
-
+        Session(const char* filename);
         void run(const std::map<std::string, std::shared_ptr<Tensor>>& inputMap,
-                 const std::map<std::string, std::shared_ptr<Tensor>>& outputMap)
-        {
-          std::vector<Ort::Value> inputs;
-          std::vector<Ort::Value> outputs;
-          std::vector<const char*> inputNames;
-          std::vector<const char*> outputNames;
-          for (auto& x : inputMap) {
-            inputNames.push_back(x.first.c_str());
-            inputs.push_back(std::move(x.second->createOrtTensor()));
-          }
-          for (auto& x : outputMap) {
-            outputNames.push_back(x.first.c_str());
-            outputs.push_back(std::move(x.second->createOrtTensor()));
-          }
-          run(inputNames, inputs, outputNames, outputs);
-        }
-
+                 const std::map<std::string, std::shared_ptr<Tensor>>& outputMap);
         void run(const std::vector<const char*>& inputNames,
                  std::vector<Ort::Value>& inputs,
                  const std::vector<const char*>& outputNames,
-                 std::vector<Ort::Value>& outputs)
-        {
-          m_session->Run(m_runOptions, inputNames.data(), inputs.data(), inputs.size(),
-                         outputNames.data(), outputs.data(), outputs.size());
-        }
+                 std::vector<Ort::Value>& outputs);
 
       private:
         /**

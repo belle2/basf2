@@ -1,3 +1,12 @@
+Changes in the analysis package in light-2509-fornax
+----------------------------------------------------
+
+TreeFitter
+++++++++++
+* Fixed a bug so that the pdg values and particle names that can be used to define which particles should be
+  mass-constrained are allowed to be negative or particle names with an associated negative pdg code like for most
+  anti-particles.
+
 Changes in the analysis package in light-2507-europa
 ----------------------------------------------------
 

@@ -101,8 +101,8 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             'dz',
             'dr',
             'chiProb',
-            # 'clusterEoP',
-            # 'clusterLAT',
+            'clusterEoP',
+            'clusterLAT',
         ]
 
         ecl_variable_list = [

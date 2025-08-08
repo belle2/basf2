@@ -19,14 +19,25 @@ namespace Belle2 {
     namespace ONNX {
 
       /**
+       * Interface class to put Tensor instances of potentially different types into a map
+       * (needed for Session::run)
+       */
+      class BaseTensor {
+      public:
+        virtual ~BaseTensor() {}
+        virtual Ort::Value createOrtTensor() = 0;
+      };
+
+      /**
        * Holds information for an input tensor to a ONNX model
        * A map of shared pointers to Tensor can be passed to Session::run
        */
-      class Tensor {
+      template <typename T>
+      class Tensor : public BaseTensor {
         /**
          * The flat data buffer
          */
-        std::vector<float> m_values;
+        std::vector<T> m_values;
 
         /**
          * The dimensions of the tensor
@@ -47,7 +58,7 @@ namespace Belle2 {
         /**
          * Construct from values of another vector (will be copied) and shape
          */
-        Tensor(std::vector<float> values, std::vector<int64_t> shape)
+        Tensor(std::vector<T> values, std::vector<int64_t> shape)
           : m_values(std::move(values)), m_shape(std::move(shape)),
             m_memoryInfo(
               Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)) {}
@@ -59,7 +70,7 @@ namespace Belle2 {
          * Tensor from initializer lists, e.g.
          *
          * @code
-         * auto input = Tensor::make_shared(batchSize * nFeatures,
+         * auto input = Tensor<float>::make_shared(batchSize * nFeatures,
          *                                  {batchSize, nFeatures});
          * @endcode
          */
@@ -76,10 +87,10 @@ namespace Belle2 {
          * values and shape (1, 3):
          *
          * @code
-         * auto input = Tensor::make_shared({v1, v2, v3}, {1, 3});
+         * auto input = Tensor<float>::make_shared({v1, v2, v3}, {1, 3});
          * @endcode
          */
-        static auto make_shared(std::vector<float> values,
+        static auto make_shared(std::vector<T> values,
                                 std::vector<int64_t> shape)
         {
           return std::make_shared<Tensor>(std::move(values), std::move(shape));
@@ -97,7 +108,7 @@ namespace Belle2 {
           return at(flat_index);
         }
 
-        void setValues(const std::vector<float>& values)
+        void setValues(const std::vector<T>& values)
         {
           if (m_values.size() != values.size()) {
             throw std::out_of_range("Size of new values vector differs from internal size");
@@ -116,8 +127,8 @@ namespace Belle2 {
       class Session {
       public:
         Session(const char* filename);
-        void run(const std::map<std::string, std::shared_ptr<Tensor>>& inputMap,
-                 const std::map<std::string, std::shared_ptr<Tensor>>& outputMap);
+        void run(const std::map<std::string, std::shared_ptr<BaseTensor>>& inputMap,
+                 const std::map<std::string, std::shared_ptr<BaseTensor>>& outputMap);
         void run(const std::vector<const char*>& inputNames,
                  std::vector<Ort::Value>& inputs,
                  const std::vector<const char*>& outputNames,

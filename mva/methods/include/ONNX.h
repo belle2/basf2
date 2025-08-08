@@ -124,6 +124,39 @@ namespace Belle2 {
       };
 
 
+      /**
+       * Wrapper around Ort::Session. The purpose is to set up the default
+       * settings (e.g. single threaded execution) and provide a run method that
+       * works with a custom Tensor class that is somewhat easier to handle
+       * compared to Ort::Value instances.
+       *
+       * Example usage running a hypothetical ONNX model with 2 input tensors
+       * "a", "b" with types float, int64_t, shapes (1, 3) and (1, 8, 5) and a
+       * float output tensor named "output" with shape (1, 5):
+       *
+       * @code
+       * #include <mva/methods/ONNX.h>
+       * using Belle2::MVA::ONNX::Tensor;
+       *
+       * Belle2::MVA::ONNX::Session session("my_model.onnx");
+       *
+       * auto input_a = Tensor<float>::make_shared(3, {1, 3});
+       * auto input_b = Tensor<int64_t>::make_shared(8 * 5, {1, 8, 5});
+       * auto output = Tensor<float>::make_shared(5, {1, 5});
+       *
+       * input_b->at({0, 2, 4}) = 42; // example for filling data using multi dimensional indexing
+       *
+       * session.run({{"a", input_a}, {"b", input_b}}, {"output", output}); // will fill output values
+       *
+       * int output_3 = output->at(3) // get 3rd output value - example for 1-dimensional indexing
+       * @endcode
+       *
+       * Note: This method will not work with Tensor<bool> since the underlying
+       * std::vector<bool> does not support getting a pointer to an array. If
+       * you have a model with boolean inputs, either convert it to accept a
+       * different type (e.g. uint8_t) or use Session::run with Ort::Value
+       * instances.
+       */
       class Session {
       public:
         Session(const char* filename);

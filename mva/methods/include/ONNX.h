@@ -29,7 +29,7 @@ namespace Belle2 {
       };
 
       /**
-       * Holds information for an input tensor to a ONNX model
+       * Holds information for an input or output tensor to a ONNX model.
        * A map of shared pointers to Tensor can be passed to Session::run
        */
       template <typename T>
@@ -56,12 +56,21 @@ namespace Belle2 {
               Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)) {}
 
         /**
-         * Construct from values of another vector (will be copied) and shape
+         * Construct from values of another vector (will be copied) and shape.
          */
         Tensor(std::vector<T> values, std::vector<int64_t> shape)
           : m_values(std::move(values)), m_shape(std::move(shape)),
             m_memoryInfo(
-              Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)) {}
+              Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU))
+        {
+          size_t expected_size = 1;
+          for (auto n : m_shape) expected_size *= n;
+          if (expected_size != m_values.size()) {
+            throw std::length_error(
+              "Size of the given values vector (" + std::to_string(m_values.size()) + ") "
+              "does not match the product of the shape dimensions (" + std::to_string(expected_size) + ")");
+          }
+        }
 
         /**
          * Construct as shared pointer from size and shape
@@ -108,10 +117,17 @@ namespace Belle2 {
           return at(flat_index);
         }
 
+        /**
+         * Update the whole flat values vector (values will be copied).
+         * The size of the passed values vector has to match the internal size
+         * (product of shape dimensions).
+         */
         void setValues(const std::vector<T>& values)
         {
           if (m_values.size() != values.size()) {
-            throw std::out_of_range("Size of new values vector differs from internal size");
+            throw std::out_of_range(
+              "Size of new values vector (" + std::to_string(values.size()) + ") "
+              "differs from internal size (" + std::to_string(m_values.size()) + ")");
           }
           m_values = values;
         }

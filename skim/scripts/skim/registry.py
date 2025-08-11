@@ -111,6 +111,7 @@ _RegisteredSkims = [
     # Add when skim script is ready
     ("14161400", "btocharm", "BtoDstarpipipi0_D0pi_Kpi"),
     ("14120600", "btocharm", "B0toDpi_Kpipi"),
+    ("14120602", "btocharm", "B0toDpi_KpipiLooseDelE"),
     ("14120601", "btocharm", "B0toDpi_Kspi"),   # B0 -> D-(Ks pi-)pi+
     # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k+ pi-
     ("14120700", "btocharm", "B0toDstarPi_D0pi_Kpi"),
@@ -145,7 +146,6 @@ _RegisteredSkims = [
     ("14121403", "btocharm", "BtoDsDsst_Kpi_KK"),
     ("14123300", "btocharm", "antiB0toDpipi0_Kpipi"),
     ("14163400", "btocharm", "antiB0toDsDsst_Kpi0"),
-
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),
     ("15420100", "quarkonium", "BottomoniumEtabExclusive"),

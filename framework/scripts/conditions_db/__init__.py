@@ -232,7 +232,7 @@ class ConditionsDB:
     """Class to interface conditions db REST interface"""
 
     #: base url to the conditions db to be used if no custom url is given
-    BASE_URLS = [conditions.default_metadata_provider_url]
+    BASE_URLS = [conditions.default_metadata_provider_server]
 
     class RequestError(RuntimeError):
         """Class to be thrown by request() if there is any error"""

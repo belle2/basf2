@@ -12,7 +12,6 @@
 #include "TDirectory.h"
 #include "TFile.h"
 #include "TGraphErrors.h"
-#include "vector"
 #include "TROOT.h"
 
 using namespace std;

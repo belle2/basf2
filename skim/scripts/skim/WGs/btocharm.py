@@ -267,6 +267,43 @@ class B0toDpi_Kpipi(BaseSkim):
 
 
 @fancy_skim_header
+class B0toDpi_KpipiLooseDelE(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to D^{-} (D^{0} \\to K^+ \\pi^- \\pi^-) \\pi^+`
+
+    Cuts applied:
+
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.45``
+
+    Note:
+         This skim is the same as B0toDpi_Kpipi, with the only difference of a larger deltaE cut (abs(deltaE) < 0.45).
+         As for B0toDpi_Kpipi, this skim uses skim.standardlists.charm.loadStdDplus_Kpipi,
+         where :math:`D^0` channel is defined.
+    """
+
+    __authors__ = ["Sourav Dey"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdDplus_Kpipi(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "5.2 < Mbc and abs(deltaE) < 0.45"
+        ma.reconstructDecay("B0:Dpi_KpipiLooseDelE -> D-:Kpipi pi+:GoodTrack", Bcuts, 0, path=path)
+
+        return ["B0:Dpi_KpipiLooseDelE"]
+
+
+@fancy_skim_header
 class BptoD0etapi_Kpi(BaseSkim):
     """
     Reconstructed decay modes:

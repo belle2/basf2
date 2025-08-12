@@ -14,10 +14,9 @@ import tempfile
 import basf2
 from softwaretrigger import constants, path_utils
 from geometry import check_components
-from pxd import add_pxd_percentframe
+from pxd import add_roi_finder, add_roi_payload_assembler, add_pxd_percentframe
 from rawdata import add_unpackers
 from reconstruction import add_reconstruction, add_cosmics_reconstruction
-from tracking import add_roiFinder, add_roi_payload_assembler
 
 
 def setup_basf2_and_db(zmq=False):
@@ -243,7 +242,7 @@ def add_hlt_processing(path,
     )
 
     # Only create the ROIs for accepted events
-    add_roiFinder(accept_path)
+    add_roi_finder(accept_path)
     accept_path.add_module('StatisticsSummary').set_name('Sum_ROI_Finder')
 
     # Add the HLT DQM modules only in case the event is accepted

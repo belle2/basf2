@@ -8,10 +8,8 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 
-#include <mdst/dataobjects/TrackFitResult.h>
 //std
 #include <string>
 
@@ -27,9 +25,8 @@
 // for intercepting rave output
 #include <framework/utilities/IOIntercept.h>
 
-#include <iostream>
-
 namespace Belle2 {
+  class Particle;
 
   namespace analysis {
     /**

@@ -14,7 +14,6 @@
 
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/geometry/BFieldManager.h>
-#include <framework/gearbox/Unit.h>
 
 namespace {
 

@@ -6,15 +6,16 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <cstdio>
-
 #include <analysis/VertexFitting/KFit/RecoilMassKFit.h>
+
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
 #include <framework/gearbox/Const.h>
 
+#include <cstdio>
+
 #include <TMath.h>
-#include <TMatrixFSym.h>
 
 using namespace std;
 using namespace Belle2;

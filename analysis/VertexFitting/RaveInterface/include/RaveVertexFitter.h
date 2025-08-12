@@ -8,12 +8,11 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 
 //std
 #include <string>
-#include <iostream>
+#include <vector>
 
 //rave
 #include <rave/Track.h>
@@ -23,6 +22,7 @@
 #include <Math/Vector3D.h>
 
 namespace Belle2 {
+  class Particle;
   class TrackFitResult;
 
   namespace analysis {

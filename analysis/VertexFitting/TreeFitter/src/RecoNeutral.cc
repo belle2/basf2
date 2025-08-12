@@ -83,7 +83,7 @@ namespace TreeFitter {
   ErrCode RecoNeutral::initParams()
   {
     ROOT::Math::XYZVector clusterCenter;
-    double energy;
+    double energy = 0.;
     m_covariance = Eigen::Matrix<double, 4, 4>::Zero(4, 4);
     if (m_particleSource == Belle2::Particle::EParticleSourceObject::c_KLMCluster) {
       const Belle2::KLMCluster* cluster = particle()->getKLMCluster();

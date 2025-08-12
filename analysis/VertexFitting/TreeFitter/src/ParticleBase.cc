@@ -20,6 +20,8 @@
 #include <analysis/VertexFitting/TreeFitter/Resonance.h>
 #include <analysis/VertexFitting/TreeFitter/Origin.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
+#include <analysis/VertexFitting/TreeFitter/Projection.h>
 
 namespace TreeFitter {
 

@@ -7,10 +7,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
+#include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
+#include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
+#include <analysis/VertexFitting/TreeFitter/Projection.h>
 
 namespace TreeFitter {
 

@@ -7,11 +7,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <analysis/dataobjects/Particle.h>
-
 #include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
+
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
+#include <analysis/VertexFitting/TreeFitter/Projection.h>
+#include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
+
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/V0.h>
 

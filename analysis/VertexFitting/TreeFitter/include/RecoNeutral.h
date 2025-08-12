@@ -10,6 +10,8 @@
 
 #include <analysis/VertexFitting/TreeFitter/RecoParticle.h>
 
+#include <Eigen/Core>
+
 namespace TreeFitter {
 
   /** representation of the neutral particle constraint */

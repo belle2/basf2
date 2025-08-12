@@ -18,6 +18,7 @@
 #include <analysis/VertexFitting/TreeFitter/RecoNeutral.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
+#include <analysis/VertexFitting/TreeFitter/Projection.h>
 
 #include <framework/gearbox/Const.h>
 

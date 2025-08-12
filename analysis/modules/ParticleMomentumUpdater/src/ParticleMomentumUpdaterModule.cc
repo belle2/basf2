@@ -7,9 +7,12 @@
  **************************************************************************/
 
 #include <analysis/modules/ParticleMomentumUpdater/ParticleMomentumUpdaterModule.h>
+
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
 #include <analysis/utility/PCmsLabTransform.h>

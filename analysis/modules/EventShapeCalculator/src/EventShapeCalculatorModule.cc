@@ -22,9 +22,6 @@
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
 #include <analysis/ContinuumSuppression/SphericityEigenvalues.h>
 
-#include <Math/Vector4D.h>
-
-
 using namespace std;
 using namespace Belle2;
 

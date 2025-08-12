@@ -13,15 +13,15 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
-#include <framework/database/DBObjPtr.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <analysis/dbobjects/PIDDetectorWeights.h>
 
 
 namespace Belle2 {
+  template<class T> class DBObjPtr;
+  class PIDDetectorWeights;
 
   /**
    * Calculate track isolation variables on the input ParticleList.

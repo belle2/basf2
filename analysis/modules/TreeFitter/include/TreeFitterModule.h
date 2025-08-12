@@ -19,7 +19,6 @@
 #include <Eigen/Dense>
 
 namespace Belle2 {
-  class Particle;
 
   /** Module to fit an entire decay tree.
    * The newton method is used to minimize the chi2 derivative.

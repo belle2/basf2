@@ -11,6 +11,7 @@
 //ANALYSIS
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dbobjects/ChargedPidMVAWeights.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/variables/ECLVariables.h>

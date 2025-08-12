@@ -101,8 +101,7 @@ ma.reconstructDecay(decayString='B0   -> K_S0 pi0',
 ma.matchMCTruth(list_name='B0', path=my_path)
 ma.buildRestOfEvent(target_list_name='B0', path=my_path)
 
-# The momentum cuts used to be hard-coded in the continuum suppression module. They can now be applied
-# via this mask. The nCDCHits requirement is new, and is recommended to remove VXD-only fake tracks.
+# define mask with momentum cuts and requirement of at least one CDC hit to remove VXD-only fake tracks
 cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
 ma.appendROEMasks(list_name='B0',
                   mask_tuples=[cleanMask],
@@ -110,6 +109,7 @@ ma.appendROEMasks(list_name='B0',
 
 ma.buildContinuumSuppression(list_name='B0',
                              roe_mask='cleanMask',
+                             ipprofile_fit=False,
                              path=my_path)
 
 # Define the variables for training.

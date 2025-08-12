@@ -251,7 +251,7 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
 
       if (m_checkForDuplicates) {
 
-        std::vector<const Belle2::Particle*> finalStateDaughters = part->getFinalStateDaughters();
+        std::vector<const Particle*> finalStateDaughters = part->getFinalStateDaughters();
 
         for (const auto fsp : finalStateDaughters) {
           int mdstSource = fsp->getMdstSource();

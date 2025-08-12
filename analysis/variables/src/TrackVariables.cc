@@ -496,13 +496,13 @@ namespace Belle2 {
     }
 
     // Build a Helix from a MCParticle's kinematics. Does NOT check for null pointer!!!
-    Belle2::Helix getMCHelix(const MCParticle* mcparticle)
+    Helix getMCHelix(const MCParticle* mcparticle)
     {
       const ROOT::Math::XYZVector mcProdVertex = mcparticle->getVertex();
       const ROOT::Math::XYZVector mcMomentum = mcparticle->getMomentum();
-      const double BzAtProdVertex = Belle2::BFieldManager::getFieldInTesla(mcProdVertex).Z();
+      const double BzAtProdVertex = BFieldManager::getFieldInTesla(mcProdVertex).Z();
       const double mcParticleCharge = mcparticle->getCharge();
-      return Belle2::Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
+      return Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
     }
 
     double getMCHelixParameterAtIndex(const Particle* particle, const int index)
@@ -512,7 +512,7 @@ namespace Belle2 {
       const MCParticle* mcparticle = particle->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
 
-      const Belle2::Helix mcHelix(getMCHelix(mcparticle));
+      const Helix mcHelix(getMCHelix(mcparticle));
       const std::vector<double> mcHelixPars{mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(), mcHelix.getZ0(), mcHelix.getTanLambda()};
       return mcHelixPars.at(index);
     }
@@ -524,12 +524,12 @@ namespace Belle2 {
       const MCParticle* mcparticle = particle->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
 
-      const Belle2::TrackFitResult* trackfit =  particle->getTrackFitResult();
+      const TrackFitResult* trackfit =  particle->getTrackFitResult();
       if (!trackfit) return Const::doubleNaN;
 
-      const Belle2::UncertainHelix measHelix = trackfit->getUncertainHelix();
+      const UncertainHelix measHelix = trackfit->getUncertainHelix();
       const TMatrixDSym& measCovariance = measHelix.getCovariance();
-      const Belle2::Helix mcHelix(getMCHelix(mcparticle));
+      const Helix mcHelix(getMCHelix(mcparticle));
 
       const std::vector<double> mcHelixPars   = {mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(), mcHelix.getZ0(), mcHelix.getTanLambda()};
       const std::vector<double> measHelixPars = {measHelix.getD0(), measHelix.getPhi0(), measHelix.getOmega(), measHelix.getZ0(), measHelix.getTanLambda()};

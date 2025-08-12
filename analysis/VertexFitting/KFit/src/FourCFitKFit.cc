@@ -335,7 +335,7 @@ FourCFitKFit::prepareInputMatrix() {
       // charge, mass, a
       m_property[index][0] =  track.getCharge();
       m_property[index][1] =  track.getMass();
-      const double c = Belle2::Const::speedOfLight * 1e-4;
+      const double c = Const::speedOfLight * 1e-4;
       m_property[index][2] = -c * m_MagneticField * track.getCharge();
       index++;
     }
@@ -378,7 +378,7 @@ FourCFitKFit::prepareInputMatrix() {
       // charge, mass, a
       m_property[index][0] =  track.getCharge();
       m_property[index][1] =  track.getMass();
-      const double c = Belle2::Const::speedOfLight * 1e-4;
+      const double c = Const::speedOfLight * 1e-4;
       m_property[index][2] = -c * m_MagneticField * track.getCharge();
       index++;
     }

@@ -40,7 +40,7 @@ ParticleMomentumUpdaterModule::ParticleMomentumUpdaterModule() : Module()
 void ParticleMomentumUpdaterModule::initialize()
 {
   StoreObjPtr<ParticleList>().isRequired(m_particleList);
-  StoreArray<Belle2::Particle> particles;
+  StoreArray<Particle> particles;
   particles.isRequired();
 
   bool valid = m_pDDescriptorDaughters.init(m_decayStringDaughters);
@@ -85,7 +85,7 @@ void ParticleMomentumUpdaterModule::event()
     if (targetP == iParticle) {
       iParticle->set4Vector(boost4Vector - daughters4Vector);
     } else {
-      Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetP);
+      Particle* daughterCopy = ParticleCopy::copyParticle(targetP);
       daughterCopy->set4Vector(boost4Vector - daughters4Vector);
       bool isReplaced = iParticle->replaceDaughterRecursively(targetP, daughterCopy);
       if (!isReplaced)

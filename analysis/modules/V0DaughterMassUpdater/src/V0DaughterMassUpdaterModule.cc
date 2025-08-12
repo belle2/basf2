@@ -48,7 +48,7 @@ void V0DaughterMassUpdaterModule::event()
         if (iParticle->getParticleSource() != Particle::EParticleSourceObject::c_Composite)
           B2FATAL("This V0 particle is not a composite particle!");
         else {
-          std::vector<Belle2::Particle*> dau = iParticle -> getDaughters();
+          std::vector<Particle*> dau = iParticle -> getDaughters();
           if (dau.size() != 2)
             B2FATAL("This V0 particle has " << dau.size() << " daughters, the number of daughters has to be 2.");
           else {

@@ -767,7 +767,7 @@ if __name__ == '__main__':
     # 7. We clean the job directories so they can be used during the next stage again.
     if get_training_cache(args)[0] is not None and get_training_cache(args)[0] > args.end:
         raise RuntimeError(
-            f'FEI-distributed: Check args.end this doesnt make sense: {args.end}, training is at {get_training_cache(args)}')
+            f"FEI-distributed: Check args.end this doesn't make sense: {args.end}, training is at {get_training_cache(args)}")
 
     while get_training_cache(args)[1] != 2:
         if get_training_cache(args)[0] is None or get_training_cache(

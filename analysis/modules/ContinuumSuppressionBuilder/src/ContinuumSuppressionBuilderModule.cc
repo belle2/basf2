@@ -13,6 +13,7 @@
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
 #include <analysis/ContinuumSuppression/CleoCones.h>
 
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 
 #include <analysis/utility/CLHEPToROOT.h>

@@ -130,7 +130,7 @@ namespace Belle2 {
       }
       int pdgCode;
       try {
-        pdgCode = Belle2::convertString<int>(arguments[0]);
+        pdgCode = convertString<int>(arguments[0]);
       } catch (std::invalid_argument& e) {
         B2ERROR("First argument of pidLogLikelihoodValueExpert must be a PDG code");
         return nullptr;
@@ -161,13 +161,13 @@ namespace Belle2 {
       }
       int pdgCodeHyp, pdgCodeTest;
       try {
-        pdgCodeHyp = Belle2::convertString<int>(arguments[0]);
+        pdgCodeHyp = convertString<int>(arguments[0]);
       } catch (std::invalid_argument& e) {
         B2ERROR("First argument of pidDeltaLogLikelihoodValueExpert must be a PDG code");
         return nullptr;
       }
       try {
-        pdgCodeTest = Belle2::convertString<int>(arguments[1]);
+        pdgCodeTest = convertString<int>(arguments[1]);
       } catch (std::invalid_argument& e) {
         B2ERROR("Second argument of pidDeltaLogLikelihoodValueExpert must be a PDG code");
         return nullptr;
@@ -198,13 +198,13 @@ namespace Belle2 {
       }
       int pdgCodeHyp = 0, pdgCodeTest = 0;
       try {
-        pdgCodeHyp = Belle2::convertString<int>(arguments[0]);
+        pdgCodeHyp = convertString<int>(arguments[0]);
       } catch (std::invalid_argument& e) {
         B2ERROR("First argument of pidPairProbabilityExpert must be PDG code");
         return nullptr;
       }
       try {
-        pdgCodeTest = Belle2::convertString<int>(arguments[1]);
+        pdgCodeTest = convertString<int>(arguments[1]);
       } catch (std::invalid_argument& e) {
         B2ERROR("Second argument of pidPairProbabilityExpert must be PDG code");
         return nullptr;
@@ -235,7 +235,7 @@ namespace Belle2 {
       }
       int pdgCodeHyp = 0;
       try {
-        pdgCodeHyp = Belle2::convertString<int>(arguments[0]);
+        pdgCodeHyp = convertString<int>(arguments[0]);
       } catch (std::invalid_argument& e) {
         B2ERROR("First argument of pidProbabilityExpert must be PDG code");
         return nullptr;
@@ -270,7 +270,7 @@ namespace Belle2 {
       }
       int pdgCodeHyp = 0;
       try {
-        pdgCodeHyp = Belle2::convertString<int>(arguments[0]);
+        pdgCodeHyp = convertString<int>(arguments[0]);
       } catch (std::invalid_argument& e) {
         B2ERROR("First argument of pidLogarithmicProbabilityExpert must be PDG code");
         return nullptr;
@@ -324,7 +324,7 @@ namespace Belle2 {
 
       int pdgCode;
       try {
-        pdgCode = Belle2::convertString<int>(arguments[1]);
+        pdgCode = convertString<int>(arguments[1]);
       } catch (std::invalid_argument& e) {
         B2ERROR("Second argument of pidWeightedLogLikelihoodValueExpert must be a PDG code");
         return nullptr;
@@ -368,7 +368,7 @@ namespace Belle2 {
 
       int pdgCodeHyp = 0;
       try {
-        pdgCodeHyp = Belle2::convertString<int>(arguments[1]);
+        pdgCodeHyp = convertString<int>(arguments[1]);
       } catch (std::invalid_argument& e) {
         B2ERROR("Second argument of pidWeightedProbabilityExpert must be PDG code");
         return nullptr;
@@ -434,7 +434,7 @@ namespace Belle2 {
       }
       int pdgCode;
       try {
-        pdgCode = abs(Belle2::convertString<int>(arguments[0]));
+        pdgCode = abs(convertString<int>(arguments[0]));
       } catch (std::invalid_argument& e) {
         B2ERROR("First argument of pidNeuralNetworkValueExpert must be a PDG code");
         return nullptr;
@@ -491,13 +491,13 @@ namespace Belle2 {
 
       int pdgCodeHyp = 0, pdgCodeTest = 0;
       try {
-        pdgCodeHyp = Belle2::convertString<int>(arguments[1]);
+        pdgCodeHyp = convertString<int>(arguments[1]);
       } catch (std::invalid_argument& e) {
         B2ERROR("Second argument of pidWeightedPairProbabilityExpert must be PDG code");
         return nullptr;
       }
       try {
-        pdgCodeTest = Belle2::convertString<int>(arguments[2]);
+        pdgCodeTest = convertString<int>(arguments[2]);
       } catch (std::invalid_argument& e) {
         B2ERROR("Third argument of pidWeightedPairProbabilityExpert must be PDG code");
         return nullptr;
@@ -805,7 +805,7 @@ namespace Belle2 {
 
       int hypPdgId;
       try {
-        hypPdgId = Belle2::convertString<int>(arguments.at(0));
+        hypPdgId = convertString<int>(arguments.at(0));
       } catch (std::invalid_argument& e) {
         B2ERROR("First argument of pidChargedBDTScore must be an integer (PDG code).");
         return nullptr;
@@ -835,13 +835,13 @@ namespace Belle2 {
 
       int hypPdgId, testPdgId;
       try {
-        hypPdgId = Belle2::convertString<int>(arguments.at(0));
+        hypPdgId = convertString<int>(arguments.at(0));
       } catch (std::invalid_argument& e) {
         B2ERROR("First argument of pidPairChargedBDTScore must be an integer (PDG code).");
         return nullptr;
       }
       try {
-        testPdgId = Belle2::convertString<int>(arguments.at(1));
+        testPdgId = convertString<int>(arguments.at(1));
       } catch (std::invalid_argument& e) {
         B2ERROR("First argument of pidPairChargedBDTScore must be an integer (PDG code).");
         return nullptr;

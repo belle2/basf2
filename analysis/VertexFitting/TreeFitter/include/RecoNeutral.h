@@ -12,15 +12,15 @@
 
 namespace TreeFitter {
 
-  /** representation of the Klong constraint */
-  class RecoKlong : public RecoParticle {
+  /** representation of the neutral particle constraint */
+  class RecoNeutral : public RecoParticle {
 
   public:
     /** constructor */
-    RecoKlong(Belle2::Particle* bc, const ParticleBase* mother) ;
+    RecoNeutral(Belle2::Particle* bc, const ParticleBase* mother) ;
 
     /** destructor */
-    virtual ~RecoKlong() {};
+    virtual ~RecoNeutral() {};
 
     /** init particle with mother */
     virtual ErrCode initParticleWithMother(FitParams& fitparams) override;
@@ -34,11 +34,11 @@ namespace TreeFitter {
     /** update or init params */
     ErrCode initParams();
 
-    /** project klong constraint */
+    /** project neutral particle constraint */
     ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const override;
 
     /** sets the size of the corresponding residual projection */
-    virtual int dimM() const override { return m_dim; }
+    virtual int dimM() const override { return dim(); }
 
     /** how should the energy be calculated ? from momentum or from E ?  */
     virtual bool hasEnergy() const override { return false; }
@@ -47,27 +47,21 @@ namespace TreeFitter {
     virtual int dim() const override { return m_dim; }
 
     /** type */
-    virtual int type()     const override { return kRecoKlong ; }
+    virtual int type() const override { return kRecoNeutral ; }
 
     /** add to list */
     virtual void addToConstraintList(constraintlist& alist, int depth) const override
     {
-      alist.push_back(Constraint(this, Constraint::klong, depth, dimM())) ;
+      alist.push_back(Constraint(this, Constraint::neutralHadron, depth, dimM())) ;
     }
-
-    /** has energy in fit params? */
-    static bool useEnergy(Belle2::Particle& cand) ;
 
   private:
 
     /** dimension of residuals and 'width' of H */
     const int m_dim;
 
-    /** was initialized* */
+    /** was initialized */
     bool m_init ;
-
-    /** has energy ins statevector */
-    bool m_useEnergy ;
 
     /** constrains measured params (x_c, y_c, z_c, E_c) */
     Eigen::Matrix<double, 1, 4> m_clusterPars;
@@ -77,11 +71,19 @@ namespace TreeFitter {
 
     /** index with the highest momentum. We have to make sure this does not change during the fit.  */
     int m_i1;
-    /** random index */
+    /** random other index */
     int m_i2;
-    /**  another random index */
+    /** another random index */
     int m_i3;
+
+    /** scale the momentum / energy by this correction factor */
+    const float m_momentumScalingFactor;
+
+    /** invariant mass */
+    const double m_mass;
+
+    /** (mdst) source of particle */
+    const Belle2::Particle::EParticleSourceObject m_particleSource;
   };
 
 }
-

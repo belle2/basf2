@@ -34,8 +34,7 @@ namespace TreeFitter {
                          kInternalParticle,
                          kRecoTrack,
                          kResonance,
-                         kRecoPhoton,
-                         kRecoKlong,
+                         kRecoNeutral,
                          kMissingParticle
                         };
 

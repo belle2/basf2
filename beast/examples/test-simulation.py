@@ -113,7 +113,7 @@ main.add_module(output)
 main.add_module(progress)
 
 # Now lets do the processing of the microtpc events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics of our microtpc event processing
 print(b2.statistics)

@@ -145,4 +145,3 @@ ma.variablesToNtuple(decayString='B0',
                      path=main)
 
 b2.process(main)
-print(b2.statistics)

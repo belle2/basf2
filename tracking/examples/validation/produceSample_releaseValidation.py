@@ -64,7 +64,7 @@ def main():
             'TracksToMCParticles'])
 
     basf2.print_path(path)
-    basf2.process(path)
+    basf2.process(path, calculateStatistics=True)
 
     logging.basicConfig(level=logging.INFO)
 

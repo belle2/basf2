@@ -106,5 +106,5 @@ if save_output:
                                         'RawPXDs',
                                         'RawTOPs'])
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

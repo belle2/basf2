@@ -38,4 +38,3 @@ mypath.add_module(
 
 # process the data
 basf2.process(mypath)
-print(basf2.statistics)

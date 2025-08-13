@@ -162,7 +162,7 @@ def main(exp=1, run=3118, prefix='', dest=''):
     main.add_module(CDCHistMakerModule(exp, run, dest))
     main.add_module('Progress')
     # process events and print call statistics
-    b2.process(main)
+    b2.process(main, calculateStatistics=True)
     print(b2.statistics)
 
 

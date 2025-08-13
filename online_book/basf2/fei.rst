@@ -298,7 +298,13 @@ candidate.
         :start-at: S50
         :end-at: E50
 
-You can now execute your steering file which should look somewhat like this:
+The FEI is quite complex and internally calls many modules. It can be useful to get an overview of all modules that are
+processed as well as statistics on their memory consumption and execution time. Since the calculation of these
+statistics takes time itself, it is by default turned off. However, you can enable it by setting the argument
+``calculateStatistics`` of the `basf2.process` function to ``True``. This will automatically print out a table that
+lists all modules and their statistics in the event loop.
+
+Execute your steering file which should look somewhat like this:
 
 .. admonition:: Final steering file
     :class: toggle solution

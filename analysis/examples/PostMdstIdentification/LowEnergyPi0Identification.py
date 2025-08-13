@@ -76,6 +76,3 @@ analysis_path.add_module('Progress')
 
 # Process the events.
 basf2.process(analysis_path)
-
-# Print out the summary.
-print(basf2.statistics)

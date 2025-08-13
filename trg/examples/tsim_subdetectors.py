@@ -57,6 +57,6 @@ main.add_module('RootOutput', branchNames=branches)
 
 
 # main
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)
 # ===<END>

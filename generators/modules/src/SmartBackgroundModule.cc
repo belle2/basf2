@@ -35,6 +35,10 @@ SmartBackgroundModule::SmartBackgroundModule() : Module()
   addParam("eventType", m_eventType, "Event type (charged, mixed, uubar, ccbar, ddbar, ssbar, taupair)", std::string("charged"));
   addParam("debugMode", m_debugMode,
            "Debug mode execution (in debug mode, no events are discarded and NN predictions are saved to the event extra info)", false);
+  addParam("activationOverride", m_activationOverride, "Override parameters (a, b) of the activation function (clipped exponential)",
+           false);
+  addParam("activationOverrideParams", m_activationOverrideParams,
+           "Parameters (a, b) of the activation function (clipped expnential)", std::vector<float>({0.5, 0.0}));
 
 }
 
@@ -43,11 +47,21 @@ void SmartBackgroundModule::initialize()
 
   // Check parameters
   if (c_skimcodesMapping.find(m_skimCode) == c_skimcodesMapping.end()) {
-    B2FATAL("Provided skim code " << m_skimCode << " is unknown. Check documentation for allowed skim codes.");
+    B2FATAL("SmartBkg: Provided skim code " << m_skimCode << " is unknown. Check documentation for allowed skim codes.");
   }
   if (c_eventtypeMapping.find(m_eventType) == c_eventtypeMapping.end()) {
-    B2FATAL("Provided event type " << m_eventType <<
+    B2FATAL("SmartBkg: Provided event type " << m_eventType <<
             " is unknown. Allowed event types: charged, mixed, uubar, ddbar, ssbar, ccbar, taupair.");
+  }
+  if (m_activationOverride) {
+    if (m_activationOverrideParams.size() != 2) {
+      B2FATAL("SmartBkg: activationOverrideParams must be a vector of size 2, got " << m_activationOverrideParams.size());
+    }
+    B2DEBUG(20, "SmartBkg: Activation override is enabled, using custom parameters (a, b) = (" << m_activationOverrideParams[0] << ", "
+            << m_activationOverrideParams[1] << ")");
+    if (m_activationOverrideParams[0] == 0.5 && m_activationOverrideParams[1] == 0.0) {
+      B2WARNING("SmartBkg: Activation override parameters (a, b) are used but set to default values (0.5, 0.0), is this what you want?");
+    }
   }
 
   // Load model from payload
@@ -91,7 +105,7 @@ void SmartBackgroundModule::event()
 
   // Warning about 100 particle truncation
   if (numParticles > 100) {
-    B2DEBUG(20, "More than 100 MC particles in event, cutting off excess particles");
+    B2DEBUG(20, "SmartBkg: More than 100 MC particles in event, cutting off excess particles");
   }
 
   // Set event type input
@@ -122,7 +136,8 @@ void SmartBackgroundModule::event()
       int pdg = p.getPDG();
       int pdgMapped = c_pdgMapping.at(pdg);
       if (!pdgMapped) {
-        B2WARNING("Encountered particle with unknown pdg: " << pdg << ", assigning out-of-distribution value 0 as mapped pdg input.");
+        B2WARNING("SmartBkg: Encountered particle with unknown pdg: " << pdg <<
+                  ", assigning out-of-distribution value 0 as mapped pdg input.");
         pdgMapped = 0;
       }
       pdgTensor->at({0, i}) = pdgMapped;
@@ -151,7 +166,12 @@ void SmartBackgroundModule::event()
 
   // Extract prediction for selected skim
   size_t skimIndex = c_skimcodesMapping.at(m_skimCode);
-  float prediction = activation(outputTensor->at({0, skimIndex}), c_aMapping.at(m_skimCode), c_bMapping.at(m_skimCode));
+  float prediction;
+  if (m_activationOverride) {
+    prediction = activation(outputTensor->at({0, skimIndex}), m_activationOverrideParams[0], m_activationOverrideParams[1]);
+  } else {
+    prediction = activation(outputTensor->at({0, skimIndex}), c_aMapping.at(m_skimCode), c_bMapping.at(m_skimCode));
+  }
 
   // Save weight to extra info
   if (!m_debugMode) {
@@ -163,11 +183,15 @@ void SmartBackgroundModule::event()
   // Importance sampling
   if (!m_debugMode) {
     double randomNum = gRandom->Uniform(0, 1);
-    B2DEBUG(1, "prediction " << prediction << " random " << randomNum << " weight " << 1 / prediction);
     bool returnValue = randomNum < prediction;
     this->setReturnValue(returnValue);
+    if (returnValue) {
+      B2DEBUG(20, "SmartBkg prediction is " << prediction << "; event is kept and weight is set to " << 1 / prediction);
+    } else {
+      B2DEBUG(20, "SmartBkg prediction is " << prediction << "; event is discarded");
+    }
   } else {
-    this->setReturnValue(false);
+    this->setReturnValue(true);
   }
 
 }

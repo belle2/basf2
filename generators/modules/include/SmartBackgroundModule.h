@@ -147,11 +147,30 @@ namespace Belle2 {
       {"ccbar", 0}, {"charged", 1}, {"ddbar", 2}, {"mixed", 3}, {"ssbar", 4}, {"taupair", 5}, {"uubar", 6}
     };
 
+    /**
+     * Event type (module parameter)
+     */
     std::string m_eventType;
 
+    /**
+     * Activation function override parameters (module parameter)
+     */
+    std::vector<float> m_activationOverrideParams;
+
+    /**
+     * Skim code (module parameter)
+     */
     int m_skimCode;
 
+    /**
+     * Whether to execute in debug mode (module parameter)
+     */
     bool m_debugMode;
+
+    /**
+     * Whether to override activation function parameters (module parameter)
+     */
+    bool m_activationOverride;
 
   };
 

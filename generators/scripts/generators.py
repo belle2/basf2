@@ -91,7 +91,9 @@ def add_smartbkg_filtering(
         event_type,
         path,
         empty_path=None,
-        debug_mode=False):
+        debug_mode=False,
+        activation_override=False,
+        activation_override_params=(0.5, 0.0)):
     """
         Adds event preselection based on the smartBKG neural network.
         Should be used only for directly skimmed MC productions.
@@ -110,6 +112,8 @@ def add_smartbkg_filtering(
             empty_path (basf2.Path or None): path rejected events are given to
             debug_mode (bool): enables debug mode (events are never rejected, instead the neural network prediction
                                is written to the event extra info as 'SmartBKG_Prediction')
+            activation_override (bool): overrides activation function parameters (a, b) with custom values
+            activation_override_params (tuple(float, float)): custom parameters (a, b) for the activation function
     """
 
     sbkg = b2.register_module("SmartBackground")
@@ -117,6 +121,11 @@ def add_smartbkg_filtering(
     sbkg.param("skimCode", skim_code)
     sbkg.param("eventType", event_type)
     sbkg.param("debugMode", debug_mode)
+    if activation_override:
+        sbkg.param("activationOverride", activation_override)
+        if len(activation_override_params) != 2:
+            b2.B2FATAL("add_smartbkg_filtering: activation_override_params must be a list or tuple of two floats (a, b)")
+        sbkg.param("activationOverrideParams", [float(x) for x in activation_override_params])
     path.add_module(sbkg)
     if empty_path is None:
         empty_path = b2.create_path()

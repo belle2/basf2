@@ -9,8 +9,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-
-#include <onnxruntime/onnxruntime_cxx_api.h>
+#include <mva/methods/ONNX.h>
 
 namespace Belle2 {
 
@@ -41,39 +40,9 @@ namespace Belle2 {
     float activation(float, float, float);
 
     /**
-     * Environment object for ONNX session
-     */
-    Ort::Env m_env;
-
-    /**
-     * ONNX session configuration
-     */
-    Ort::SessionOptions m_sessionOptions;
-
-    /**
      * The ONNX inference session
      */
-    std::unique_ptr<Ort::Session> m_session;
-
-    /**
-     * Options to be passed to Ort::Session::Run
-     */
-    Ort::RunOptions m_runOptions;
-
-    /**
-     * ONNX memory info
-     */
-    Ort::MemoryInfo m_memoryInfo = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
-
-    /**
-     * Names of the NN inputs.
-     */
-    const char* c_inputNames[5] = {"x", "pdg", "mother", "mask", "c"};
-
-    /**
-     * Name of NN output.
-     */
-    const char* c_outputNames[1] = {"output"};
+    std::unique_ptr<MVA::ONNX::Session> m_session;
 
     /**
      * Mapping of PDG numbers to consecutive integers.
@@ -136,7 +105,7 @@ namespace Belle2 {
     /**
      * Mapping of skimcodes to output indices
      */
-    const std::unordered_map<int, int> c_skimcodesMapping = {
+    const std::unordered_map<int, size_t> c_skimcodesMapping = {
       {11180500, 0}, {11180600, 1}, {11640100, 2}, {12160100, 3}, {12160200, 4}, {12160300, 5}, {12160400, 6}, {13160200, 7}, {13160300, 8},
       {14120300, 9}, {14120600, 10}, {14121100, 11}, {14140100, 12}, {14140101, 13}, {14140102, 14}, {14140200, 15}, {14141000, 16}, {14141001, 17},
       {14141002, 18}, {15410300, 19}, {15420100, 20}, {15440100, 21}, {16460200, 22}, {17230100, 23}, {17230200, 24}, {17230400, 25}, {17230500, 26},

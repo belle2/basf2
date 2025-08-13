@@ -16,6 +16,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBAccessorBase.h>
 #include <framework/database/DBStoreEntry.h>
+#include <mva/methods/ONNX.h>
 
 #include <TRandom.h>
 #include <TMath.h>
@@ -53,13 +54,8 @@ void SmartBackgroundModule::initialize()
   auto accessor = DBAccessorBase(DBStoreEntry::c_RawFile, std::string("SmartBKGWeights.onnx"), true);
   std::string filename = accessor.getFilename();
 
-  // Session options
-  m_sessionOptions.SetIntraOpNumThreads(1);
-  m_sessionOptions.SetInterOpNumThreads(1);
-  m_sessionOptions.SetExecutionMode(ORT_SEQUENTIAL);
-
   // initialize ONNX session
-  m_session = std::make_unique<Ort::Session>(m_env, filename.c_str(), m_sessionOptions);
+  m_session = std::make_unique<MVA::ONNX::Session>(filename.c_str());
 
 }
 
@@ -83,28 +79,15 @@ void SmartBackgroundModule::event()
   unsigned numParticles = mcparticles.getEntries();
   StoreObjPtr<EventExtraInfo> eventExtraInfo;
 
-  // Create vector of input tensors for the five inputs of the SmartBKG model
-  std::vector<Ort::Value> inputs;
-  float xArray[100 * 8];
-  int64_t xShape[] = {1, 100, 8};
-  inputs.push_back(Ort::Value::CreateTensor(m_memoryInfo, xArray, 100 * 8, xShape, 3));
-  int32_t pdgArray[100];
-  int64_t pdgShape[] = {1, 100};
-  inputs.push_back(Ort::Value::CreateTensor(m_memoryInfo, pdgArray, 100, pdgShape, 2));
-  int32_t motherArray[100];
-  int64_t motherShape[] = {1, 100};
-  inputs.push_back(Ort::Value::CreateTensor(m_memoryInfo, motherArray, 100, motherShape, 2));
-  uint8_t maskArray[100];
-  int64_t maskShape[] = {1, 100};
-  inputs.push_back(Ort::Value::CreateTensor(m_memoryInfo, maskArray, 100, maskShape, 2));
-  int32_t cArray[1];
-  int64_t cShape[] = {1};
-  inputs.push_back(Ort::Value::CreateTensor(m_memoryInfo, cArray, 1, cShape, 1));
+  // Create input tensors for the five inputs of the SmartBKG model
+  auto xTensor = MVA::ONNX::Tensor<float>::make_shared(100 * 8, {1, 100, 8});
+  auto pdgTensor = MVA::ONNX::Tensor<int32_t>::make_shared(100, {1, 100});
+  auto motherTensor = MVA::ONNX::Tensor<int32_t>::make_shared(100, {1, 100});
+  auto maskTensor = MVA::ONNX::Tensor<uint8_t>::make_shared(100, {1, 100});
+  auto cTensor = MVA::ONNX::Tensor<int32_t>::make_shared(1, {1});
 
   // Create output tensor
-  float outputArray[51];
-  int64_t outputShape[] = {1, 51};
-  auto outputTensor = Ort::Value::CreateTensor(m_memoryInfo, outputArray, 51, outputShape, 2);
+  auto outputTensor = MVA::ONNX::Tensor<float>::make_shared(51, {1, 51});
 
   // Warning about 100 particle truncation
   if (numParticles > 100) {
@@ -112,14 +95,14 @@ void SmartBackgroundModule::event()
   }
 
   // Set event type input
-  cArray[0] = c_eventtypeMapping.at(m_eventType);
+  cTensor->at(0) = c_eventtypeMapping.at(m_eventType);
 
   // Loop over particles and set particle wise inputs
   for (unsigned i = 0; i < 100; ++i) {
     if (i < numParticles) {
 
       // If particle exists set mask to 0
-      maskArray[i] = 0;
+      maskTensor->at({0, i}) = 0;
 
       const MCParticle& p = *mcparticles[i];
 
@@ -132,7 +115,7 @@ void SmartBackgroundModule::event()
                     energy, static_cast<float>(momentum.X()), static_cast<float>(momentum.Y()), static_cast<float>(momentum.Z())
                    };
       for (unsigned j = 0; j < 8; ++j) {
-        xArray[i * 8 + j] = x[j];
+        xTensor->at({0, i, j}) = x[j];
       }
 
       // Set mapped PDG code input
@@ -142,7 +125,7 @@ void SmartBackgroundModule::event()
         B2WARNING("Encountered particle with unknown pdg: " << pdg << ", assigning out-of-distribution value 0 as mapped pdg input.");
         pdgMapped = 0;
       }
-      pdgArray[i] = pdgMapped;
+      pdgTensor->at({0, i}) = pdgMapped;
 
       // Set mother index input
       MCParticle* mother = p.getMother();
@@ -150,25 +133,25 @@ void SmartBackgroundModule::event()
       if (mother) {
         motherindex = mother->getArrayIndex();
       }
-      motherArray[i] = motherindex;
+      motherTensor->at({0, i}) = motherindex;
 
     } else {
       // If particle does not exist, set mask to 1 and all inputs to 0
-      maskArray[i] = 1;
+      maskTensor->at({0, i}) = 1;
       for (unsigned j = 0; j < 8; ++j) {
-        xArray[i * 8 + j] = 0;
+        xTensor->at({0, i, j}) = 0;
       }
-      pdgArray[i] = 0;
-      motherArray[i] = 0;
+      pdgTensor->at({0, i}) = 0;
+      motherTensor->at({0, i}) = 0;
     }
   }
 
   // Perform inference
-  m_session->Run(m_runOptions, c_inputNames, inputs.data(), inputs.size(), c_outputNames, &outputTensor, 1);
+  m_session->run({{"x", xTensor}, {"pdg", pdgTensor}, {"mother", motherTensor}, {"mask", maskTensor}, {"c", cTensor}}, {{"output", outputTensor}});
 
   // Extract prediction for selected skim
-  int skimIndex = c_skimcodesMapping.at(m_skimCode);
-  float prediction = activation(outputArray[skimIndex], c_aMapping.at(m_skimCode), c_bMapping.at(m_skimCode));
+  size_t skimIndex = c_skimcodesMapping.at(m_skimCode);
+  float prediction = activation(outputTensor->at({0, skimIndex}), c_aMapping.at(m_skimCode), c_bMapping.at(m_skimCode));
 
   // Save weight to extra info
   if (!m_debugMode) {

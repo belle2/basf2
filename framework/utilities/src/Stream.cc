@@ -13,8 +13,6 @@
 #include <TObject.h>
 #include <TMessage.h>
 
-#include <boost/algorithm/string/replace.hpp>
-
 using namespace Belle2;
 
 namespace {
@@ -27,7 +25,6 @@ namespace {
     }
   };
 }
-
 
 std::string Stream::serializeAndEncode(const TObject* obj)
 {
@@ -59,14 +56,6 @@ std::string Stream::serializeAndEncode(const TObject* obj)
 
   const std::string& encodedStr(TBase64::Encode(buf, len).Data());
   return encodedStr;
-}
-
-std::string Stream::escapeXML(const std::string& xmlString)
-{
-  //avoid nesting CDATA sections...
-  std::string newString(xmlString);
-  boost::replace_all(newString, "]]>", "]]]]><![CDATA[>");
-  return "<![CDATA[" + newString + "]]>";
 }
 
 TObject* Stream::deserializeEncodedRawData(const std::string& base64Data)

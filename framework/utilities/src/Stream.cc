@@ -7,8 +7,6 @@
  **************************************************************************/
 #include <framework/utilities/Stream.h>
 
-#include <framework/logging/Logger.h>
-
 #include <TBase64.h>
 #include <TObject.h>
 #include <TMessage.h>
@@ -33,11 +31,7 @@ std::string Stream::serializeAndEncode(const TObject* obj)
   TMessage msg(kMESS_OBJECT);
   msg.SetWriteMode();
 
-  // Currently disabled, but can be made to work by copying the input buffer in deserializeEncodedRawData
-  // However, this is a workaround and thus doesn't seem like a good idea.
-  // Once https://sft.its.cern.ch/jira/browse/ROOT-4550 is fixed, this can simply be turned on,
-  // but make sure to check that old (uncompressed) data can still be deserialized.
-  msg.SetCompressionLevel(0);
+  msg.SetCompressionLevel(1);
 
   msg.WriteObject(obj);
   msg.Compress(); //only does something if compression active
@@ -46,13 +40,12 @@ std::string Stream::serializeAndEncode(const TObject* obj)
   char* buf = msg.Buffer();
   UInt_t len = msg.Length();
 
-  if (msg.CompBuffer()) {
-    B2FATAL("compression used, but broken thanks to ROOT");
-    /* for future use?
-    buf = msg.CompBuffer();
-    len = msg.CompLength();
-    */
-  }
+  // using the compressed buffer causes a seg fault (double free)
+  // this can be tested with the unit-test StreamTest.raw
+  // if (msg.CompBuffer()) {
+  //   buf = msg.CompBuffer();
+  //   len = msg.CompLength();
+  // }
 
   const std::string& encodedStr(TBase64::Encode(buf, len).Data());
   return encodedStr;

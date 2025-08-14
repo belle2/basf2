@@ -101,7 +101,7 @@ def add_smartbkg_filtering(
         Given a specific skim the neural network predicts the probability of the event passing the skim.
         The event is then kept in the given path with this probability or otherwise discarded to the empty path.
         Kept events are weighted with their inverse probability to ensure unbiased distributions
-        (weights are saved to the event extra info as 'SmartBKG_Weight').
+        (weights are saved to the event meta data).
         Use case is the reduction of simulation time for directly skimmed MC productions.
 
         Parameters:

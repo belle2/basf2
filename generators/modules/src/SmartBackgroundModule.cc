@@ -6,14 +6,16 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// TODOs: set payload name in python? StoreObjPtr fuer MCParticle List?, eventExtraInfo as member?
+// TODOs: make convenience function safer, write example script, write documentation/description
+// set payload name in python? StoreObjPtr fuer MCParticle List?
 
 #include <generators/modules/SmartBackgroundModule.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/database/DBAccessorBase.h>
 #include <framework/database/DBStoreEntry.h>
 #include <mva/methods/ONNX.h>
@@ -32,13 +34,13 @@ SmartBackgroundModule::SmartBackgroundModule() : Module()
   setDescription("mva method to speed up skimmed simulation");
 
   addParam("skimCode", m_skimCode, "Skim LFN code");
-  addParam("eventType", m_eventType, "Event type (charged, mixed, uubar, ccbar, ddbar, ssbar, taupair)", std::string("charged"));
+  addParam("eventType", m_eventType, "Event type (charged, mixed, uubar, ccbar, ddbar, ssbar, taupair)");
   addParam("debugMode", m_debugMode,
            "Debug mode execution (in debug mode, no events are discarded and NN predictions are saved to the event extra info)", false);
   addParam("activationOverride", m_activationOverride, "Override parameters (a, b) of the activation function (clipped exponential)",
            false);
   addParam("activationOverrideParams", m_activationOverrideParams,
-           "Parameters (a, b) of the activation function (clipped expnential)", std::vector<float>({0.5, 0.0}));
+           "Parameters (a, b) of the activation function (clipped exponential)", std::vector<float>({0.5, 0.0}));
 
 }
 
@@ -91,7 +93,6 @@ void SmartBackgroundModule::event()
   // Load store array of MC particles and the event extra info
   StoreArray<MCParticle> mcparticles;
   unsigned numParticles = mcparticles.getEntries();
-  StoreObjPtr<EventExtraInfo> eventExtraInfo;
 
   // Create input tensors for the five inputs of the SmartBKG model
   auto xTensor = MVA::ONNX::Tensor<float>::make_shared(100 * 8, {1, 100, 8});
@@ -173,10 +174,12 @@ void SmartBackgroundModule::event()
     prediction = activation(outputTensor->at({0, skimIndex}), c_aMapping.at(m_skimCode), c_bMapping.at(m_skimCode));
   }
 
-  // Save weight to extra info
+  // Save weight to event meta data / prediction to event extra info
   if (!m_debugMode) {
-    eventExtraInfo->addExtraInfo("SmartBKG_Weight", 1 / prediction);
+    StoreObjPtr<EventMetaData> eventMetaData;
+    eventMetaData->setGeneratedWeight(eventMetaData->getGeneratedWeight() * (1.0 / prediction));
   } else {
+    StoreObjPtr<EventExtraInfo> eventExtraInfo;
     eventExtraInfo->addExtraInfo("SmartBKG_Prediction", prediction);
   }
 

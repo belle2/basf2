@@ -48,9 +48,9 @@ namespace Belle2 {
     /// Name of the PXD StoreArray
     std::string m_pxdRecoTracksStoreArrayName = "PXDRecoTracks";
     /// Backtrack chain for finding the CDC StoreArray
-    std::vector<std::string> m_cdcRecoTracksStoreArrayBacktrackChain;
+    std::vector<std::string> m_cdcRecoTracksStoreArrayBacktrackChain = std::vector<std::string>();
     /// Backtrack chain for finding the SVD StoreArray
-    std::vector<std::string> m_svdRecoTracksStoreArrayBacktrackChain;
+    std::vector<std::string> m_svdRecoTracksStoreArrayBacktrackChain = std::vector<std::string>();
     /** Name of the StoreArray with mdst Tracks from track fit */
     std::string m_tracksStoreArrayName = "Tracks";
 

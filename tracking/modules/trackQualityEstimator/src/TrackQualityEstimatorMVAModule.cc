@@ -20,8 +20,6 @@ TrackQualityEstimatorMVAModule::TrackQualityEstimatorMVAModule() : Module()
   setDescription("The quality estimator module for a fully reconstructed track");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  m_cdcRecoTracksStoreArrayBacktrackChain = std::vector<std::string>();
-  m_svdRecoTracksStoreArrayBacktrackChain = std::vector<std::string>();
   addParam("recoTracksStoreArrayName",
            m_recoTracksStoreArrayName,
            "Name of the recoTrack StoreArray.",
@@ -85,7 +83,10 @@ void TrackQualityEstimatorMVAModule::event()
 
     RecoTrack* cdcRecoTrack{&recoTrack};
     int length = m_cdcRecoTracksStoreArrayBacktrackChain.size();
-    // The last item must be "RecoTrack", so begin with the second
+    // The last item must be "RecoTrack"
+    if (m_cdcRecoTracksStoreArrayBacktrackChain[length - 1] != "RecoTrack") {
+      B2ERROR("The last item of CDC backtrack chain is not \"RecoTrack\".");
+    }
     for (int i = length - 2; i >= 0; i--) {
       std::string& name = m_cdcRecoTracksStoreArrayBacktrackChain[i];
       cdcRecoTrack = cdcRecoTrack->getRelatedTo<RecoTrack>(name);
@@ -96,7 +97,10 @@ void TrackQualityEstimatorMVAModule::event()
 
     RecoTrack* svdRecoTrack{&recoTrack};
     length = m_svdRecoTracksStoreArrayBacktrackChain.size();
-    // The last item must be "RecoTrack", so begin with the second
+    // The last item must be "RecoTrack"
+    if (m_svdRecoTracksStoreArrayBacktrackChain[length - 1] != "RecoTrack") {
+      B2ERROR("The last item of SVD backtrack chain is not \"RecoTrack\".");
+    }
     for (int i = length - 2; i >= 0; i--) {
       std::string& name = m_svdRecoTracksStoreArrayBacktrackChain[i];
       svdRecoTrack = svdRecoTrack->getRelatedTo<RecoTrack>(name);

@@ -19,8 +19,6 @@ TrackQETrainingDataCollectorModule::TrackQETrainingDataCollectorModule() : Modul
   setDescription("Module to collect training data for a specified qualityEstimator and store it in a root file.");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
-  m_cdcRecoTracksStoreArrayBacktrackChain = std::vector<std::string>();
-  m_svdRecoTracksStoreArrayBacktrackChain = std::vector<std::string>();
   addParam("recoTracksStoreArrayName",
            m_recoTracksStoreArrayName,
            "Name of the recoTrack StoreArray.",
@@ -91,7 +89,10 @@ void TrackQETrainingDataCollectorModule::event()
     // CDC tracks from CDC-standalone tracking
     const RecoTrack* cdcRecoTrackPtr{&recoTrack};
     int length = m_cdcRecoTracksStoreArrayBacktrackChain.size();
-    // The last item must be "RecoTrack", so begin with the second
+    // The last item must be "RecoTrack"
+    if (m_cdcRecoTracksStoreArrayBacktrackChain[length - 1] != "RecoTrack") {
+      B2ERROR("The last item of CDC backtrack chain is not \"RecoTrack\".");
+    }
     for (int i = length - 2; i >= 0; i--) {
       std::string& name = m_cdcRecoTracksStoreArrayBacktrackChain[i];
       cdcRecoTrackPtr = cdcRecoTrackPtr->getRelatedTo<RecoTrack>(name);
@@ -103,7 +104,10 @@ void TrackQETrainingDataCollectorModule::event()
     // SVD tracks from VXDTF2 (SVD-standalone) tracking
     const RecoTrack* svdRecoTrackPtr{&recoTrack};
     length = m_svdRecoTracksStoreArrayBacktrackChain.size();
-    // The last item must be "RecoTrack", so begin with the second
+    // The last item must be "RecoTrack"
+    if (m_svdRecoTracksStoreArrayBacktrackChain[length - 1] != "RecoTrack") {
+      B2ERROR("The last item of SVD backtrack chain is not \"RecoTrack\".");
+    }
     for (int i = length - 2; i >= 0; i--) {
       std::string& name = m_svdRecoTracksStoreArrayBacktrackChain[i];
       svdRecoTrackPtr = svdRecoTrackPtr->getRelatedTo<RecoTrack>(name);

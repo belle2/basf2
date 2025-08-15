@@ -18,7 +18,7 @@
 #include <framework/core/Module.h>
 
 #include <memory>
-#include <vector>
+
 
 namespace Belle2 {
 
@@ -49,9 +49,9 @@ namespace Belle2 {
     /// Name of the recoTrack StoreArray
     std::string m_recoTracksStoreArrayName = "RecoTracks";
     /// Backtrack chain for finding the CDC StoreArray
-    std::vector<std::string> m_cdcRecoTracksStoreArrayBacktrackChain;
+    std::vector<std::string> m_cdcRecoTracksStoreArrayBacktrackChain = std::vector<std::string>();
     /// Backtrack chain for finding the SVD StoreArray
-    std::vector<std::string> m_svdRecoTracksStoreArrayBacktrackChain;
+    std::vector<std::string> m_svdRecoTracksStoreArrayBacktrackChain = std::vector<std::string>();
     /// Name of the PXD StoreArray
     std::string m_pxdRecoTracksStoreArrayName = "PXDRecoTracks";
 

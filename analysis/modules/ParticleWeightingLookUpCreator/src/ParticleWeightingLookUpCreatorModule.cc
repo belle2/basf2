@@ -9,6 +9,8 @@
 // Own header.
 #include <analysis/modules/ParticleWeightingLookUpCreator/ParticleWeightingLookUpCreatorModule.h>
 
+#include <analysis/dbobjects/ParticleWeightingBinLimits.h>
+
 // framework aux
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/database/DBImportObjPtr.h>

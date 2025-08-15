@@ -7,8 +7,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
+
 #include <framework/gearbox/Const.h>
 
 using namespace std;

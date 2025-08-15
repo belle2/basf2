@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
-#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 
 //root
 #include <Math/ProbFunc.h>
@@ -21,8 +20,7 @@
 #include <rave/KinematicConstraintBuilder.h>
 #include <rave/VertexFactory.h>
 
-
-//#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/Particle.h>
 
 //c++ std lib
 using std::string;

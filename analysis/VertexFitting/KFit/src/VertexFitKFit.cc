@@ -7,15 +7,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 
 #include <algorithm>
 #include <cstdio>
 
 #include <TMath.h>
-#include <TMatrixFSym.h>
 
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
-#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/ROOTToCLHEP.h>
 #include <framework/gearbox/Const.h>

@@ -227,7 +227,8 @@ void KLMDQM2Module::findMatchingDigit(
           digit.getSection() == hitData->section &&
           digit.getLayer() == hitData->layer &&
           digit.getSector() == hitData->sector &&
-          digit.getPlane() == hitData->plane))
+          digit.getPlane() == hitData->plane) ||
+        !digit.isGood())
       continue;
 
     // Defining quantities for distance cut
@@ -236,12 +237,17 @@ void KLMDQM2Module::findMatchingDigit(
 
     if (digit.isMultiStrip()) {
       // Due to a firmware bug, we have to be wary with the allowed distance...
-      stripPosition = 0.5 * (digit.getLastStrip() + digit.getStrip());
-      allowedDistance1D *= (digit.getLastStrip() - digit.getStrip() + 1);
-    }
-    if (fabs(stripPosition - hitData->strip) < allowedDistance1D) {
-      hitData->digit = &digit;
-      return;
+      // to deal with this we directly check if hit lies inside the multi-strip range
+      if (hitData->strip >= digit.getStrip() && hitData->strip <= digit.getLastStrip()) {
+        hitData->digit = &digit;
+        return;
+      }
+    } else {
+      // Single-strip digit: use normal ±allowedDistance
+      if (fabs(stripPosition - hitData->strip) < allowedDistance1D) {
+        hitData->digit = &digit;
+        return;
+      }
     }
   }
 }

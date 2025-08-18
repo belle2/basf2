@@ -247,7 +247,6 @@ void KLMDQM2Module::findMatchingDigit(
   }
 }
 
-
 void KLMDQM2Module::addHit(
   std::map<KLMPlaneNumber, struct HitData>& hitMap,
   KLMPlaneNumber planeGlobal, struct HitData* hitData)

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// TODOs: make convenience function safer, write example script, write documentation/description
+// TODOs: make convenience function safer, write example script, write documentation/description, load maps from config,
 // set payload name in python? StoreObjPtr fuer MCParticle List?
 
 #include <generators/modules/SmartBackgroundModule.h>
@@ -20,13 +20,18 @@
 #include <framework/database/DBStoreEntry.h>
 #include <mva/methods/ONNX.h>
 
+#include <string>
+#include <vector>
+#include <memory>
+
 #include <TRandom.h>
 #include <TMath.h>
 
-using namespace std;
 using namespace Belle2;
 
 REG_MODULE(SmartBackground);
+
+class Module;
 
 SmartBackgroundModule::SmartBackgroundModule() : Module()
 {
@@ -122,16 +127,16 @@ void SmartBackgroundModule::event()
       const MCParticle& p = *mcparticles[i];
 
       // Set momentum and vertex 4-vector inputs
-      float energy = p.getEnergy();
       ROOT::Math::XYZVector momentum = p.getMomentum();
-      float prodT = p.getProductionTime();
       ROOT::Math::XYZVector vertex = p.getVertex();
-      float x[8] = {prodT, static_cast<float>(vertex.X()), static_cast<float>(vertex.Y()), static_cast<float>(vertex.Z()),
-                    energy, static_cast<float>(momentum.X()), static_cast<float>(momentum.Y()), static_cast<float>(momentum.Z())
-                   };
-      for (unsigned j = 0; j < 8; ++j) {
-        xTensor->at({0, i, j}) = x[j];
-      }
+      xTensor->at({0, i, 0}) = p.getProductionTime();
+      xTensor->at({0, i, 1}) = vertex.X();
+      xTensor->at({0, i, 2}) = vertex.Y();
+      xTensor->at({0, i, 3}) = vertex.Z();
+      xTensor->at({0, i, 4}) = p.getEnergy();
+      xTensor->at({0, i, 5}) = momentum.X();
+      xTensor->at({0, i, 6}) = momentum.Y();
+      xTensor->at({0, i, 7}) = momentum.Z();
 
       // Set mapped PDG code input
       int pdg = p.getPDG();
@@ -166,12 +171,12 @@ void SmartBackgroundModule::event()
   m_session->run({{"x", xTensor}, {"pdg", pdgTensor}, {"mother", motherTensor}, {"mask", maskTensor}, {"c", cTensor}}, {{"output", outputTensor}});
 
   // Extract prediction for selected skim
-  size_t skimIndex = c_skimcodesMapping.at(m_skimCode);
+  uint16_t skimIndex = c_skimcodesMapping.at(m_skimCode);
   float prediction;
   if (m_activationOverride) {
-    prediction = activation(outputTensor->at({0, skimIndex}), m_activationOverrideParams[0], m_activationOverrideParams[1]);
+    prediction = this->activation(outputTensor->at({0, skimIndex}), m_activationOverrideParams[0], m_activationOverrideParams[1]);
   } else {
-    prediction = activation(outputTensor->at({0, skimIndex}), c_aMapping.at(m_skimCode), c_bMapping.at(m_skimCode));
+    prediction = this->activation(outputTensor->at({0, skimIndex}), c_aMapping.at(m_skimCode), c_bMapping.at(m_skimCode));
   }
 
   // Save weight to event meta data / prediction to event extra info

@@ -11,6 +11,11 @@
 #include <framework/core/Module.h>
 #include <mva/methods/ONNX.h>
 
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <memory>
+
 namespace Belle2 {
 
   class SmartBackgroundModule : public Module {
@@ -105,7 +110,7 @@ namespace Belle2 {
     /**
      * Mapping of skimcodes to output indices
      */
-    const std::unordered_map<int, size_t> c_skimcodesMapping = {
+    const std::unordered_map<int, uint16_t> c_skimcodesMapping = {
       {11180500, 0}, {11180600, 1}, {11640100, 2}, {12160100, 3}, {12160200, 4}, {12160300, 5}, {12160400, 6}, {13160200, 7}, {13160300, 8},
       {14120300, 9}, {14120600, 10}, {14121100, 11}, {14140100, 12}, {14140101, 13}, {14140102, 14}, {14140200, 15}, {14141000, 16}, {14141001, 17},
       {14141002, 18}, {15410300, 19}, {15420100, 20}, {15440100, 21}, {16460200, 22}, {17230100, 23}, {17230200, 24}, {17230400, 25}, {17230500, 26},

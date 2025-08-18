@@ -237,20 +237,16 @@ void KLMDQM2Module::findMatchingDigit(
 
     if (digit.isMultiStrip()) {
       // Due to a firmware bug, we have to be wary with the allowed distance...
-      // to deal with this we directly check if hit lies inside the multi-strip range
-      if (hitData->strip >= digit.getStrip() && hitData->strip <= digit.getLastStrip()) {
-        hitData->digit = &digit;
-        return;
-      }
-    } else {
-      // Single-strip digit: use normal ±allowedDistance
-      if (fabs(stripPosition - hitData->strip) < allowedDistance1D) {
-        hitData->digit = &digit;
-        return;
-      }
+      stripPosition = 0.5 * (digit.getLastStrip() + digit.getStrip());
+      allowedDistance1D *= (digit.getLastStrip() - digit.getStrip() + 1);
+    }
+    if (fabs(stripPosition - hitData->strip) < allowedDistance1D) {
+      hitData->digit = &digit;
+      return;
     }
   }
 }
+
 
 void KLMDQM2Module::addHit(
   std::map<KLMPlaneNumber, struct HitData>& hitMap,

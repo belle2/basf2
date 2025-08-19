@@ -70,8 +70,8 @@ std::vector<float> ONNXExpert::apply(Dataset& testData) const
 {
   auto nFeatures = testData.getNumberOfFeatures();
   auto nEvents = testData.getNumberOfEvents();
-  auto input = Tensor<float>::make_shared(nFeatures, {1, nFeatures});
-  auto output = Tensor<float>::make_shared(1, {1, 1});
+  auto input = Tensor<float>::make_shared({1, nFeatures});
+  auto output = Tensor<float>::make_shared({1, 1});
   std::vector<float> result;
   result.reserve(nEvents);
   for (unsigned int iEvent = 0; iEvent < nEvents; ++iEvent) {
@@ -88,8 +88,8 @@ std::vector<std::vector<float>> ONNXExpert::applyMulticlass(Dataset& testData) c
   unsigned int nClasses = m_general_options.m_nClasses;
   auto nFeatures = testData.getNumberOfFeatures();
   auto nEvents = testData.getNumberOfEvents();
-  auto input = Tensor<float>::make_shared(nFeatures, {1, nFeatures});
-  auto output = Tensor<float>::make_shared(nClasses, {1, nClasses});
+  auto input = Tensor<float>::make_shared({1, nFeatures});
+  auto output = Tensor<float>::make_shared({1, nClasses});
   std::vector<std::vector<float>> result(nEvents, std::vector<float>(nClasses));
   for (unsigned int iEvent = 0; iEvent < nEvents; ++iEvent) {
     testData.loadEvent(iEvent);

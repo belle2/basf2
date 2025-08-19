@@ -62,17 +62,43 @@ namespace Belle2 {
          */
         Ort::MemoryInfo m_memoryInfo;
 
+        /**
+         * Calculates the internal vector size from the product of the shape dimensions
+         */
+        size_t sizeFromShape(const std::vector<int64_t>& shape)
+        {
+          size_t size = 1;
+          for (auto n : shape) size *= n;
+          return size;
+        }
+
+        /**
+         * Checks if all shape dimensions are positive
+         *
+         * @throws std::invalid_argument if any shape dimension is negative
+         */
+        void checkShapePositive()
+        {
+          for (auto n : m_shape) {
+            if (n < 0) throw std::invalid_argument("All shape dimensions must be positive");
+          }
+        }
+
       public:
         /**
-         * @brief Constructs a tensor from size and shape
+         * @brief Constructs a tensor from shape
          *
-         * @param size Number of elements in the tensor.
          * @param shape Shape of the tensor.
+         *
+         * @throws std::invalid_argument if any shape dimension is negative
          */
-        Tensor(size_t size, std::vector<int64_t> shape)
-          : m_values(size), m_shape(std::move(shape)),
+        Tensor(std::vector<int64_t> shape)
+          : m_values(sizeFromShape(shape)), m_shape(std::move(shape)),
             m_memoryInfo(
-              Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)) {}
+              Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU))
+        {
+          checkShapePositive();
+        }
 
 
         /**
@@ -85,38 +111,36 @@ namespace Belle2 {
          * @param shape Shape of the tensor.
          *
          * @throws std::length_error if the size of values does not match the expected size.
+         * @throws std::invalid_argument if any shape dimension is negative
          */
         Tensor(std::vector<T> values, std::vector<int64_t> shape)
           : m_values(std::move(values)), m_shape(std::move(shape)),
             m_memoryInfo(
               Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU))
         {
-          size_t expected_size = 1;
-          for (auto n : m_shape) expected_size *= n;
-          if (expected_size != m_values.size()) {
+          if (sizeFromShape(m_shape) != m_values.size()) {
             throw std::length_error(
               "Size of the given values vector (" + std::to_string(m_values.size()) + ") "
-              "does not match the product of the shape dimensions (" + std::to_string(expected_size) + ")");
+              "does not match the product of the shape dimensions (" + std::to_string(sizeFromShape(m_shape)) + ")");
           }
+          checkShapePositive();
         }
 
         /**
-         * @brief Convenience method to create a shared pointer to a Tensor from size and shape.
+         * @brief Convenience method to create a shared pointer to a Tensor from shape.
          *
          * Useful for constructing shared pointers from initializer lists, e.g.
          *
          * @code
-         * auto input = Tensor<float>::make_shared(batchSize * nFeatures,
-         *                                         {batchSize, nFeatures});
+         * auto input = Tensor<float>::make_shared({batchSize, nFeatures});
          * @endcode
          *
-         * @param size Number of elements.
          * @param shape Shape of the tensor.
          * @return Shared pointer to the created Tensor.
          */
-        static auto make_shared(size_t size, std::vector<int64_t> shape)
+        static auto make_shared(std::vector<int64_t> shape)
         {
-          return std::make_shared<Tensor>(size, std::move(shape));
+          return std::make_shared<Tensor>(std::move(shape));
         }
 
         /**
@@ -172,6 +196,11 @@ namespace Belle2 {
           size_t flat_index = 0;
           size_t stride = 1;
           for (int64_t i = m_shape.size() - 1; i >= 0; --i) {
+            if (index[i] >= static_cast<size_t>(m_shape[i])) {
+              throw std::out_of_range(
+                "index " + std::to_string(index[i]) + " is out of bounds for axis "
+                + std::to_string(i) + " with size " + std::to_string(m_shape[i]));
+            }
             flat_index += index[i] * stride;
             stride *= m_shape[i];
           }

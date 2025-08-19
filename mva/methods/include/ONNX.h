@@ -302,7 +302,7 @@ namespace Belle2 {
         *
         * @param filename Path to the ONNX model file.
         */
-        Session(const char* filename);
+        Session(const std::string filename);
 
         /**
         * @brief Runs inference on the model using named Tensor maps.

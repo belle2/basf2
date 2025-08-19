@@ -15,7 +15,7 @@
 using namespace Belle2::MVA;
 using namespace Belle2::MVA::ONNX;
 
-Session::Session(const char* filename)
+Session::Session(const std::string filename)
 {
   // Ensure single-threaded execution, see
   // https://onnxruntime.ai/docs/performance/tune-performance/threading.html
@@ -29,7 +29,7 @@ Session::Session(const char* filename)
   m_sessionOptions.SetInterOpNumThreads(1);
   m_sessionOptions.SetExecutionMode(ORT_SEQUENTIAL); // default, but make it explicit
 
-  m_session = std::make_unique<Ort::Session>(m_env, filename, m_sessionOptions);
+  m_session = std::make_unique<Ort::Session>(m_env, filename.c_str(), m_sessionOptions);
 }
 
 void Session::run(const std::map<std::string, std::shared_ptr<BaseTensor>>& inputMap,

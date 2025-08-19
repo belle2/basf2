@@ -15,11 +15,22 @@ from torch import nn
 
 
 class Model(nn.Module):
+    """
+    Example model with 2 different input tensors
+    """
     def __init__(self):
+        """
+        Intialize with a single Linear layer
+        """
         super().__init__()
+
+        #: linear Layer with 8 inputs, 2 outputs
         self.linear = nn.Linear(8, 2)
 
     def forward(self, a, b):
+        """
+        Run the forward pass - a and b are concatenated and b is flattened
+        """
         return self.linear(torch.cat([a, b.reshape(-1, 6).float()], axis=1))
 
 

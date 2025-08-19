@@ -32,4 +32,15 @@ namespace {
   {
     EXPECT_THROW(Tensor<int>({1, 2, 3}, {2, 2}), std::length_error);
   }
+  TEST(ONNXStandaloneTest, RunStandaloneModel)
+  {
+    // Testfile created with mva/examples/onnx/write_test_file.py
+    Session session(Belle2::FileSystem::findFile("mva/methods/tests/ModelForStandalone.onnx"));
+    auto input_a = Tensor<float>::make_shared({0.5309f, 0.4930f}, {1, 2});
+    auto input_b = Tensor<int64_t>::make_shared({1, 0, 1, 1, -1, 0}, {1, 2, 3});
+    auto output = Tensor<float>::make_shared({1, 2});
+    session.run({{"a", input_a}, {"b", input_b}}, {{"output", output}});
+    EXPECT_NEAR(output->at(0), -0.0614375323, 0.000000001);
+    EXPECT_NEAR(output->at(1), 0.3322576284, 0.000000001);
+  }
 }

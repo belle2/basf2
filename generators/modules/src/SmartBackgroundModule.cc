@@ -100,14 +100,14 @@ void SmartBackgroundModule::event()
   unsigned numParticles = mcparticles.getEntries();
 
   // Create input tensors for the five inputs of the SmartBKG model
-  auto xTensor = MVA::ONNX::Tensor<float>::make_shared(100 * 8, {1, 100, 8});
-  auto pdgTensor = MVA::ONNX::Tensor<int32_t>::make_shared(100, {1, 100});
-  auto motherTensor = MVA::ONNX::Tensor<int32_t>::make_shared(100, {1, 100});
-  auto maskTensor = MVA::ONNX::Tensor<uint8_t>::make_shared(100, {1, 100});
-  auto cTensor = MVA::ONNX::Tensor<int32_t>::make_shared(1, {1});
+  auto xTensor = MVA::ONNX::Tensor<float>::make_shared({1, 100, 8});
+  auto pdgTensor = MVA::ONNX::Tensor<int32_t>::make_shared({1, 100});
+  auto motherTensor = MVA::ONNX::Tensor<int32_t>::make_shared({1, 100});
+  auto maskTensor = MVA::ONNX::Tensor<uint8_t>::make_shared({1, 100});
+  auto cTensor = MVA::ONNX::Tensor<int32_t>::make_shared({1});
 
   // Create output tensor
-  auto outputTensor = MVA::ONNX::Tensor<float>::make_shared(51, {1, 51});
+  auto outputTensor = MVA::ONNX::Tensor<float>::make_shared({1, 51});
 
   // Warning about 100 particle truncation
   if (numParticles > 100) {

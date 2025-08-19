@@ -175,6 +175,19 @@ def run_test(testinformation):
         print(f"Testfile {testinformation.name} with extension {testinformation.extension} not supported")
 
 
+def prepare_ipynb():
+    """Start a notebook and import basf2 modules to avoid timeouts of actual tests"""
+
+    try:
+        nb = nbformat.v4.new_notebook()
+        nb.cells.append(nbformat.v4.new_code_cell('import basf2\nimport mdst\nimport modularAnalysis'))
+        ep = ExecutePreprocessor(timeout=300, kernel_name='python3')
+        ep.preprocess(nb, resources={})
+    except Exception as exception:
+        print('Jupyter notebook preparation failed with exception:')
+        print(exception)
+
+
 def run_test_ipynb(testinformation):
     """Run the test within a jupyter notebook
     Currently not supported is skipping ipynb's and forwarding output of the notebook
@@ -666,6 +679,8 @@ class TestScheduler:
     def _run_tests(self, tests: List[TestInformation], prepare_step: bool = False,
                    root_el: Optional[ET.Element] = None) -> ET.Element:
         print(f'Collected {len(tests)} {"prepare steps" if prepare_step else "tests"}...', flush=True)
+        if not is_ci() and any([test.extension == '.ipynb' for test in tests]):
+            prepare_ipynb()
         if self.nprocess > 1:
             with ThreadPoolExecutor(max_workers=self.nprocess) as pool:
                 # run tests in multiple threads but consume the iterator right away to

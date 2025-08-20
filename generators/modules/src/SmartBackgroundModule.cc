@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// TODOs: make convenience function safer, write example script, write documentation/description
-// set payload name in python? StoreObjPtr fuer MCParticle List?
+// TODOs: write documentation/description, set payload name in python?
 
 #include <generators/modules/SmartBackgroundModule.h>
 #include <generators/dbobjects/SmartBackgroundConfig.h>

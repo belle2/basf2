@@ -95,7 +95,7 @@ def add_smartbkg_filtering(
         activation_override=False,
         activation_override_params=(0.5, 0.0)):
     """
-        Adds event preselection based on the smartBKG neural network.
+        Adds event preselection based on the SmartBkg neural network.
         Should be used only for directly skimmed MC productions.
         Must be added to the path after the generator.add_abc_generator but before simulation.add_simulation modules.
         Given a specific skim the neural network predicts the probability of the event passing the skim.
@@ -115,6 +115,45 @@ def add_smartbkg_filtering(
             activation_override (bool): overrides activation function parameters (a, b) with custom values
             activation_override_params (tuple(float, float)): custom parameters (a, b) for the activation function
     """
+
+    # Find EvtGen or KKMC modules on the path to check if given event type matches simulated one and warn the user if not
+    found = False
+    if event_type in ["charged", "mixed"]:
+        for mod in path.modules():
+            if mod.name() == "EvtGenInput":
+                found = True
+                for param in mod.available_params():
+                    if param.name == "userDECFile":
+                        if event_type not in param.values:
+                            b2.B2WARNING(
+                                f"SmartBkg: Event type is set to '{event_type}' but EvtGenInput module "
+                                f"decay file is set to '{param.values}'. Is this what you want?"
+                            )
+                        break
+                break
+        if not found:
+            b2.B2WARNING(f"SmartBkg: Event type is set to '{event_type}' but no EvtGenInput module could be found on the path.")
+    elif event_type in ["uubar", "ddbar", "ssbar", "ccbar", "taupair"]:
+        for mod in path.modules():
+            if mod.name() == "KKGenInput":
+                found = True
+                for param in mod.available_params():
+                    if param.name == "tauinputFile":
+                        if ((event_type != "taupair" and event_type not in param.values) or
+                                (event_type == "taupair" and "tauola" not in param.values)):
+                            b2.B2WARNING(
+                                f"SmartBkg: Event type is set to '{event_type}' but KKGenInput module "
+                                f"input file is set to '{param.values}'. Is this what you want?"
+                            )
+                        break
+                break
+        if not found:
+            b2.B2WARNING(f"SmartBkg: Event type is set to '{event_type}' but no KKGenInput module could be found on the path.")
+    else:
+        b2.B2FATAL(
+            "add_smartbkg_filtering: event type must be charged, mixed, uubar, ddbar, ssbar, ccbar or taupair, "
+            f"received '{event_type}'"
+        )
 
     sbkg = b2.register_module("SmartBackground")
     skim_code = int(skim_code)

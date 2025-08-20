@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// TODOs: write documentation/description, set payload name in python?
+// TODOs: write documentation, set payload name in python?
 
 #include <generators/modules/SmartBackgroundModule.h>
 #include <generators/dbobjects/SmartBackgroundConfig.h>
@@ -37,12 +37,19 @@ class Module;
 SmartBackgroundModule::SmartBackgroundModule() : Module()
 {
 
-  setDescription("mva method to speed up skimmed simulation");
-
+  setDescription("Event preselector based on the SmartBkg neural network. "
+                 "Should be used only for directly skimmed MC productions. "
+                 "Must be added to the path after the MC generator module but before simulation. "
+                 "Given a specific skim the neural network predicts the probability of the event passing the skim. "
+                 "The module returns 0 with this probability or otherwise 1. "
+                 "Events are then weighted with their inverse probability "
+                 "(weights are saved in the event meta data, by multiplying them to the generator weight). "
+                 "Use case is the reduction of simulation time for directly skimmed MC productions.");
   addParam("skimCode", m_skimCode, "Skim LFN code");
   addParam("eventType", m_eventType, "Event type (charged, mixed, uubar, ccbar, ddbar, ssbar, taupair)");
   addParam("debugMode", m_debugMode,
-           "Debug mode execution (in debug mode, no events are discarded and NN predictions are saved to the event extra info)", false);
+           "Debug mode execution (in debug mode, always returns 1 and NN predictions are saved to the event extra info "
+           "as 'SmartBKG_Prediction')", false);
   addParam("activationOverride", m_activationOverride, "Override parameters (a, b) of the activation function (clipped exponential)",
            false);
   addParam("activationOverrideParams", m_activationOverrideParams,
@@ -71,8 +78,8 @@ void SmartBackgroundModule::initialize()
     if (m_activationOverrideParams.size() != 2) {
       B2FATAL("SmartBkg: activationOverrideParams must be a vector of size 2, got " << m_activationOverrideParams.size());
     }
-    B2DEBUG(20, "SmartBkg: Activation override is enabled, using custom parameters (a, b) = (" << m_activationOverrideParams[0] << ", "
-            << m_activationOverrideParams[1] << ")");
+    B2DEBUG(20, "SmartBkg: Activation override is enabled, using custom parameters (a, b) = (" << m_activationOverrideParams[0] <<
+            ", " << m_activationOverrideParams[1] << ")");
     if (m_activationOverrideParams[0] == 0.5 && m_activationOverrideParams[1] == 0.0) {
       B2WARNING("SmartBkg: Activation override parameters (a, b) are used but set to default values (0.5, 0.0), is this what you want?");
     }

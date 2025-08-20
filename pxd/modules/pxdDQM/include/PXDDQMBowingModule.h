@@ -52,19 +52,20 @@ namespace Belle2 {
     std::string m_particleListName{""};  /**< Name of the particle list to which the module is applied */
 
 
-    StoreObjPtr<ParticleList> m_ParticleList;
-    StoreArray<RecoTrack> m_recoTracks;
-    StoreArray<RecoTrack> m_outputRecoTracks;
+    StoreObjPtr<ParticleList>
+    m_ParticleList; /**< particle list on which run the module (need to be charged particles to have some results)*/
+    StoreArray<RecoTrack> m_recoTracks;/**< store array of the recoTracks related to the particles selected with m_ParticleList*/
+    StoreArray<RecoTrack> m_outputRecoTracks; /**< tracks without the PDX hits*/
 
-    Double_t m_cutResU;
-    Double_t m_cutP;
-    Double_t m_cutD0;
-    Double_t m_cutZ0;
+    Double_t m_cutResU; /**<value fot the cut on absolute value of the u residuals*/
+    Double_t m_cutP; /**< value fot the cut on the momentum of the particle*/
+    Double_t m_cutD0; /**< value fot the cut on absolute value of the track parameter d0*/
+    Double_t m_cutZ0; /**< value fot the cut on absolute value of the track parameter z0*/
 
-    Double_t m_rangeV;
-    Double_t m_rangeS;
-    int m_binsV;
-    int m_binsS;
+    Double_t m_rangeV; /**< range for the histos of the v residuls*/
+    Double_t m_rangeS; /**< range for the histos of the sagitta*/
+    int m_binsV; /**< number of bins for the histograms of the v residuals*/
+    int m_binsS; /**< number of bins for the histograms of the sagitta*/
 
     std::map<VxdID, Double_t> m_dwAlignment; /**< Bowing amplitude of the PXD modules inside the alignment */
 

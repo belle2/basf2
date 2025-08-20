@@ -101,13 +101,13 @@ void DQMHistAnalysisPXDBowModule::beginRun()
 void DQMHistAnalysisPXDBowModule::event()
 {
   for (VxdID& aPXDModule : m_PXDModules) {
-    bool enough = false, warnflag = false, errorflag = false;
     auto buff = (std::string)m_moduleName;
     std::replace(buff.begin(), buff.end(), '.', '_');
 
     TH1* hV = getDelta(m_histogramDirectoryName + "resV_" + buff, true);
     TH1* hS = getDelta(m_histogramDirectoryName + "sagitta_" + buff, true);
     if (hS != NULL && hV != NULL) {
+      bool enough = false, warnflag = false, errorflag = false;
       B2DEBUG(20, "Histos resS_" << buff << " and resV_" << buff << " found");
       if (hS->GetEntries() > m_statThreshold) {
         enough = true;

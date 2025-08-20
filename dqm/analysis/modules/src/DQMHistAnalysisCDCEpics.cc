@@ -76,7 +76,7 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   c_hist_crphi = new TCanvas("CDC/c_hist_crphi", "c_hist_crphi", 500, 400);
   c_hist_hitsphi = new TCanvas("CDC/c_hist_hitsphi", "c_hist_hitsphi", 500, 400);
 
-  //CR alram reference
+  //CR alarm reference
   if (m_fname_refphi != "") {
     m_fileRefPhi = TFile::Open(m_fname_refphi.data(), "READ");
     if (m_fileRefPhi && m_fileRefPhi->IsOpen()) {
@@ -325,30 +325,35 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_hist_crphi->SetTitle("cdc-track #phi (IP + hadrons);cdc-track #phi;norm entries");
     if (m_hist_crphi) {
       double maxnow = m_hist_crphi->Integral();
-      m_hist_crphi->Scale(1.0 / maxnow);
-      if (maxnow < 10000) isFew = true;
-      else {
-        if (m_histref_phiindex) {
-          m_hist_refphi = m_histref_phiindex->ProjectionX("histphi_ip_hadronsref", 7, 7, "");
-          double nbinref = m_hist_refphi->GetNbinsX();
-          double nbinnow = m_hist_crphi->GetNbinsX();
-          if (nbinref == nbinnow) { //same bins
-            double maxref = m_hist_refphi->Integral();
-            m_hist_refphi->Scale(1.0 / maxref);
-            double maxphidiff = 0;
-            double maxphidiff_angle = 0;
-            for (int iphi = 0; iphi < nbinnow; iphi++) {
-              double icnow = m_hist_crphi->GetBinContent(iphi + 1);
-              double icref = m_hist_refphi->GetBinContent(iphi + 1);
-              double phidiff = fabs(icnow - icref);
-              if (phidiff > m_phiwarn)isWarn = true;
-              if (phidiff > m_phialarm)isAlarm = true;
-              if (phidiff > maxphidiff) {
-                maxphidiff = phidiff;
-                maxphidiff_angle = m_hist_crphi->GetBinLowEdge(iphi + 1) + m_hist_crphi->GetBinWidth(iphi + 1);
+      if (maxnow > 0) {
+        m_hist_crphi->Scale(1.0 / maxnow);
+        if (maxnow < 10000) {
+          isFew = true;
+        } else {
+          if (m_histref_phiindex) {
+            m_hist_refphi = m_histref_phiindex->ProjectionX("histphi_ip_hadronsref", 7, 7, "");
+            double nbinref = m_hist_refphi->GetNbinsX();
+            double nbinnow = m_hist_crphi->GetNbinsX();
+            if (nbinref == nbinnow) { //same bins
+              double maxref = m_hist_refphi->Integral();
+              if (maxref > 0) {
+                m_hist_refphi->Scale(1.0 / maxref);
+                double maxphidiff = 0;
+                double maxphidiff_angle = 0;
+                for (int iphi = 0; iphi < nbinnow; iphi++) {
+                  double icnow = m_hist_crphi->GetBinContent(iphi + 1);
+                  double icref = m_hist_refphi->GetBinContent(iphi + 1);
+                  double phidiff = fabs(icnow - icref);
+                  if (phidiff > m_phiwarn)isWarn = true;
+                  if (phidiff > m_phialarm)isAlarm = true;
+                  if (phidiff > maxphidiff) {
+                    maxphidiff = phidiff;
+                    maxphidiff_angle = m_hist_crphi->GetBinLowEdge(iphi + 1) + m_hist_crphi->GetBinWidth(iphi + 1);
+                  }
+                }
+                m_hist_crphi->SetTitle(Form("%s (diff = %0.03f at %0.1f)", m_hist_crphi->GetTitle(), maxphidiff, maxphidiff_angle));
               }
             }
-            m_hist_crphi->SetTitle(Form("%s (diff = %0.03f at %0.1f)", m_hist_crphi->GetTitle(), maxphidiff, maxphidiff_angle));
           }
         }
       }

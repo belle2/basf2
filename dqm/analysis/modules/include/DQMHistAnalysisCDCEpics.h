@@ -25,6 +25,9 @@
 
 namespace Belle2 {
 
+
+  constexpr int kNumLayers = 56;   /**< number of CDC layers */
+  constexpr int kNumBoards = 300;  /**< number of CDC boards */
   /**
    * Make summary of data quality from reconstruction
    */
@@ -125,7 +128,7 @@ namespace Belle2 {
     TH2F* m_hist_attach_eff[3] = {nullptr}; /**< for above*/
     TH2Poly* m_hist_attach_eff_Poly[3] = {nullptr}; /**< for above*/
     TH1F* m_hist_wire_attach_eff_1d = nullptr; /**< for above*/
-    double lbinEdges[56] = {0.0}; /**< vector for radius edge 56*/
+    double lbinEdges[kNumLayers] = {0.0}; /**< vector for radius edge 56*/
 
     TLine* m_line_ladc  = nullptr; /**< line for lower ADC window */
     TLine* m_line_hadc  = nullptr; /**< line for higher ADC window */
@@ -159,13 +162,13 @@ namespace Belle2 {
     double m_mintdc;/**< min tdc median thershold accepted */
     double m_maxtdc;/**< max tdc median thershold accepted */
     double m_phistop;/**< stop thershold for phi differences */
-    double m_phialarm;/**< alram thershold for phi differences */
+    double m_phialarm;/**< alarm thershold for phi differences */
     double m_phiwarn;/**< warn thershold for phi differences */
 
     std::vector<int> slindex = {8, 14, 20, 26, 32, 38, 44, 50, 56}; /**< CDC SL numbers */
 
-    TH1D* m_hists_lADC[56]; /**< ADC histograms with track associated hits for each board (0-299) */
-    TH1D* m_hists_bADC[300]; /**< ADC histograms with track associated hits for each board (0-299) */
-    TH1D* m_hists_bTDC[300]; /**< TDC histograms with track associated hits for each board (0-299) */
+    TH1D* m_hists_lADC[kNumLayers]; /**< ADC histograms with track associated hits for each board (0-299) */
+    TH1D* m_hists_bADC[kNumBoards]; /**< ADC histograms with track associated hits for each board (0-299) */
+    TH1D* m_hists_bTDC[kNumBoards]; /**< TDC histograms with track associated hits for each board (0-299) */
   };
 } // Belle2 namespace

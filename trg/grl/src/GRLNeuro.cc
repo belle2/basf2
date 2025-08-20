@@ -28,25 +28,47 @@ using namespace Belle2;
 using namespace CDC;
 using namespace std;
 
-// ==========  ap_fixed<Total, Int, AP_TRN, AP_SAT> ==========
+float sim_ap_ufixed(float val, int W, int I)
+{
+  if (W == 0) {
+    return 0.0f;
+  }
 
-float sim_fixed(float val, int total_bits, int int_bits,
-                bool is_signed = true,
-                int rounding = 0,
-                int saturation = 1)
+  int F = W - I;
+  float scale = std::pow(2.0f, F);
+
+  int64_t fixed_val = static_cast<int64_t>(std::round(val * scale));
+
+  int64_t max_val = (1LL << W) - 1;
+
+  fixed_val = fixed_val % (max_val + 1);
+  if (fixed_val < 0) fixed_val += (max_val + 1);
+
+  return static_cast<float>(fixed_val) / scale;
+}
+
+
+
+// ========== ap_fixed  ====== trunc + wrap ==========
+inline float sim_fixed(float val, int total_bits, int int_bits,
+                       bool is_signed = true,
+                       int rounding = 0,     // 0: trunc, 1: round
+                       int saturation = 2)   // 2: wrap
 {
   int frac_bits = total_bits - int_bits;
   float scale = std::pow(2.0f, frac_bits);
-  float scaled_val = val * scale;
 
+
+  float scaled_val = val * scale;
   int64_t fixed_val;
-  if (rounding == 1)
+  if (rounding == 1) {
     fixed_val = static_cast<int64_t>(std::round(scaled_val));
-  else
+  } else {
     fixed_val = static_cast<int64_t>(std::trunc(scaled_val));
+  }
+
 
   int64_t max_val, min_val;
-
   if (is_signed) {
     max_val = (1LL << (total_bits - 1)) - 1;
     min_val = -(1LL << (total_bits - 1));
@@ -55,230 +77,32 @@ float sim_fixed(float val, int total_bits, int int_bits,
     min_val = 0;
   }
 
-  //  wrap
-  if (fixed_val > max_val || fixed_val < min_val) {
-    switch (saturation) {
-      case 1:
-        fixed_val = std::min(std::max(fixed_val, min_val), max_val);
-        break;
-      case 2:
-        if (is_signed) {
-          int64_t mod = 1LL << total_bits;
-          fixed_val = (fixed_val + mod) % mod;
-          if (fixed_val >= (1LL << (total_bits - 1)))
-            fixed_val -= (1LL << total_bits);
-        } else {
-          fixed_val = fixed_val % (1LL << total_bits);
+  switch (saturation) {
+    case 2: // wrap
+      if (is_signed) {
+        int64_t mod = 1LL << total_bits;
+        fixed_val = (fixed_val + mod) % mod;
+        if (fixed_val >= (1LL << (total_bits - 1))) {
+          fixed_val -= mod;
         }
-        break;
-      case 3:
-        if (val >= 0)
-          fixed_val = std::min(fixed_val, max_val);
-        else
-          fixed_val = std::max(fixed_val, min_val);
-        break;
-      case 0:
-      default:
-        break;
-    }
+      } else {
+        fixed_val = fixed_val % (1LL << total_bits);
+      }
+      break;
+    case 1: // saturate
+      fixed_val = std::min(std::max(fixed_val, min_val), max_val);
+      break;
+    case 3: // saturate by sign
+      fixed_val = (val >= 0) ? std::min(fixed_val, max_val)
+                  : std::max(fixed_val, min_val);
+      break;
+    case 0:
+    default: // none
+      break;
   }
 
   return static_cast<float>(fixed_val) / scale;
 }
-
-// dense_0
-inline float sim_fix_dense_0_accum_t(float x)  { return sim_fixed(x, 24, 16); }
-inline float sim_fix_dense_0_t(float x)        { return sim_fixed(x, 20, 16); }
-inline float sim_fix_dense_0_weight_t(float x) { return sim_fixed(x, 10, 2); }
-inline float sim_fix_dense_0_bias_t(float x)   { return sim_fixed(x, 5, 1); }
-
-// dense_0_relu
-inline float sim_fix_dense_0_relu_t(float x)        { return sim_fixed(x, 15, 11, false); }
-inline float sim_fix_dense_0_relu_table_t(float x)  { return sim_fixed(x, 18, 8); }
-
-// dense_1
-inline float sim_fix_dense_1_iq_t(float x)          { return sim_fixed(x, 14, 11, false); }
-inline float sim_fix_dense_1_accum_t(float x)       { return sim_fixed(x, 23, 14); }
-inline float sim_fix_dense_1_t(float x)             { return sim_fixed(x, 19, 14); }
-inline float sim_fix_dense_1_weight_t(float x)      { return sim_fixed(x, 8, 2); }
-inline float sim_fix_dense_1_bias_t(float x)        { return sim_fixed(x, 5, 1); }
-
-// dense_1_relu
-inline float sim_fix_dense_1_relu_t(float x)        { return sim_fixed(x, 15, 10, false); }
-inline float sim_fix_dense_1_relu_table_t(float x)  { return sim_fixed(x, 18, 8); }
-
-// dense_2
-inline float sim_fix_dense_2_iq_t(float x)          { return sim_fixed(x, 14, 10, false); }
-inline float sim_fix_dense_2_accum_t(float x)       { return sim_fixed(x, 19, 10); }
-inline float sim_fix_dense_2_weight_t(float x)      { return sim_fixed(x, 8, 1); }
-inline float sim_fix_dense_2_bias_t(float x)        { return sim_fixed(x, 1, 0, false); }
-
-// dense_2  result_t，RND + 2 + UNSIGNED = false
-inline float sim_fix_result_t(float x)
-{
-  return sim_fixed(x, 15, 8, true, 1, 2);
-}
-
-
-float sim_float_to_ufixed(float val, int W, int I)
-{
-  int F = W - I;
-  float scale = std::pow(2.0f, F);
-  float rounded = std::round(val * scale) / scale;
-
-  //  [0, 2^I - 1 - 1/scale]
-  float max_val = std::pow(2.0f, I) - 1.0f / scale;
-  float min_val = 0.0f;
-
-  if (rounded > max_val) return max_val;
-  if (rounded < min_val) return min_val;
-
-  return rounded;
-}
-
-float sim_dense_1_input_quant(unsigned index, float val)
-{
-  switch (index) {
-    case 0:  return sim_float_to_ufixed(val, 7, 8);
-    case 1:  return sim_float_to_ufixed(val, 12, 9);
-    case 2:  return sim_float_to_ufixed(val, 14, 11);
-    case 3:  return sim_float_to_ufixed(val, 11, 9);
-    case 4:  return sim_float_to_ufixed(val, 7, 7);
-    case 5:  return sim_float_to_ufixed(val, 4, 9);
-    case 6:  return sim_float_to_ufixed(val, 13, 10);
-    case 7:  return sim_float_to_ufixed(val, 10, 8);
-    case 8:  return sim_float_to_ufixed(val, 9, 8);
-    case 9:  return sim_float_to_ufixed(val, 8, 8);
-    case 10: return sim_float_to_ufixed(val, 8, 7);
-    case 11: return sim_float_to_ufixed(val, 12, 10);
-    case 12: return sim_float_to_ufixed(val, 7, 7);
-    case 13: return sim_float_to_ufixed(val, 6, 9);
-    case 14: return sim_float_to_ufixed(val, 11, 10);
-    case 15: return sim_float_to_ufixed(val, 9, 7);
-    case 16: return sim_float_to_ufixed(val, 14, 11);
-    case 17: return sim_float_to_ufixed(val, 13, 10);
-    case 18: return sim_float_to_ufixed(val, 8, 11);
-    case 19: return sim_float_to_ufixed(val, 10, 8);
-    case 20: return sim_float_to_ufixed(val, 7, 7);
-    case 21: return sim_float_to_ufixed(val, 12, 10);
-    case 22: return sim_float_to_ufixed(val, 7, 8);
-    case 23: return sim_float_to_ufixed(val, 4, 7);
-    case 24: return sim_float_to_ufixed(val, 13, 10);
-    case 25: return sim_float_to_ufixed(val, 6, 5);
-    case 26: return sim_float_to_ufixed(val, 12, 10);
-    case 27: return sim_float_to_ufixed(val, 7, 9);
-    case 28: return sim_float_to_ufixed(val, 11, 10);
-    case 29: return sim_float_to_ufixed(val, 12, 10);
-    case 30: return sim_float_to_ufixed(val, 13, 10);
-    case 31: return sim_float_to_ufixed(val, 11, 10);
-    case 32: return sim_float_to_ufixed(val, 12, 10);
-    case 33: return sim_float_to_ufixed(val, 12, 9);
-    case 34: return sim_float_to_ufixed(val, 14, 11);
-    case 35: return sim_float_to_ufixed(val, 12, 10);
-    case 36: return sim_float_to_ufixed(val, 12, 10);
-    case 37: return sim_float_to_ufixed(val, 10, 10);
-    case 38: return sim_float_to_ufixed(val, 11, 10);
-    case 39: return sim_float_to_ufixed(val, 13, 10);
-    case 40: return sim_float_to_ufixed(val, 10, 10);
-    case 41: return sim_float_to_ufixed(val, 7, 9);
-    case 42: return sim_float_to_ufixed(val, 11, 10);
-    case 43: return sim_float_to_ufixed(val, 7, 8);
-    case 44: return sim_float_to_ufixed(val, 10, 8);
-    case 45: return 0.0f;
-    case 46: return sim_float_to_ufixed(val, 7, 8);
-    case 47: return sim_float_to_ufixed(val, 5, 7);
-    case 48: return 0.0f;
-    case 49: return sim_float_to_ufixed(val, 11, 11);
-    case 50: return sim_float_to_ufixed(val, 13, 10);
-    case 51: return sim_float_to_ufixed(val, 7, 8);
-    case 52: return sim_float_to_ufixed(val, 11, 11);
-    case 53: return sim_float_to_ufixed(val, 14, 11);
-    case 54: return sim_float_to_ufixed(val, 7, 7);
-    case 55: return sim_float_to_ufixed(val, 3, 7);
-    case 56: return sim_float_to_ufixed(val, 8, 9);
-    case 57: return sim_float_to_ufixed(val, 8, 8);
-    case 58: return sim_float_to_ufixed(val, 13, 10);
-    case 59: return sim_float_to_ufixed(val, 11, 9);
-    case 60: return sim_float_to_ufixed(val, 11, 9);
-    case 61: return sim_float_to_ufixed(val, 11, 8);
-    case 62: return sim_float_to_ufixed(val, 10, 9);
-    case 63: return sim_float_to_ufixed(val, 7, 9);
-    default: return val;
-  }
-}
-
-float sim_dense_2_input_quant(unsigned index, float val)
-{
-  switch (index) {
-    case 0:  return sim_float_to_ufixed(val, 3, -1);
-    case 1:  return sim_float_to_ufixed(val, 13, 9);
-    case 2:  return 0.0f;
-    case 3:  return sim_float_to_ufixed(val, 10, 6);
-    case 4:  return sim_float_to_ufixed(val, 9, 5);
-    case 5:  return sim_float_to_ufixed(val, 10, 6);
-    case 6:  return sim_float_to_ufixed(val, 8, 6);
-    case 7:  return sim_float_to_ufixed(val, 14, 10);
-    case 8:  return 0.0f;
-    case 9:  return 0.0f;
-    case 10: return 0.0f;
-    case 11: return sim_float_to_ufixed(val, 10, 6);
-    case 12: return sim_float_to_ufixed(val, 9, 5);
-    case 13: return sim_float_to_ufixed(val, 1, 5);
-    case 14: return sim_float_to_ufixed(val, 8, 5);
-    case 15: return 0.0f;
-    case 16: return sim_float_to_ufixed(val, 9, 5);
-    case 17: return sim_float_to_ufixed(val, 13, 9);
-    case 18: return sim_float_to_ufixed(val, 10, 6);
-    case 19: return sim_float_to_ufixed(val, 10, 7);
-    case 20: return sim_float_to_ufixed(val, 7, 3);
-    case 21: return 0.0f;
-    case 22: return sim_float_to_ufixed(val, 11, 7);
-    case 23: return sim_float_to_ufixed(val, 10, 6);
-    case 24: return sim_float_to_ufixed(val, 11, 7);
-    case 25: return 0.0f;
-    case 26: return sim_float_to_ufixed(val, 10, 6);
-    case 27: return 0.0f;
-    case 28: return 0.0f;
-    case 29: return sim_float_to_ufixed(val, 9, 5);
-    case 30: return sim_float_to_ufixed(val, 3, 4);
-    case 31: return sim_float_to_ufixed(val, 10, 7);
-    case 32: return 0.0f;
-    case 33: return sim_float_to_ufixed(val, 10, 7);
-    case 34: return 0.0f;
-    case 35: return sim_float_to_ufixed(val, 8, 7);
-    case 36: return sim_float_to_ufixed(val, 7, 3);
-    case 37: return sim_float_to_ufixed(val, 9, 5);
-    case 38: return sim_float_to_ufixed(val, 11, 7);
-    case 39: return sim_float_to_ufixed(val, 4, 5);
-    case 40: return sim_float_to_ufixed(val, 10, 6);
-    case 41: return sim_float_to_ufixed(val, 10, 6);
-    case 42: return sim_float_to_ufixed(val, 12, 9);
-    case 43: return sim_float_to_ufixed(val, 10, 6);
-    case 44: return sim_float_to_ufixed(val, 6, 6);
-    case 45: return sim_float_to_ufixed(val, 7, 3);
-    case 46: return sim_float_to_ufixed(val, 10, 6);
-    case 47: return sim_float_to_ufixed(val, 9, 5);
-    case 48: return sim_float_to_ufixed(val, 7, 4);
-    case 49: return sim_float_to_ufixed(val, 10, 6);
-    case 50: return sim_float_to_ufixed(val, 13, 9);
-    case 51: return 0.0f;
-    case 52: return sim_float_to_ufixed(val, 9, 5);
-    case 53: return sim_float_to_ufixed(val, 10, 8);
-    case 54: return 0.0f;
-    case 55: return sim_float_to_ufixed(val, 9, 5);
-    case 56: return sim_float_to_ufixed(val, 9, 5);
-    case 57: return sim_float_to_ufixed(val, 13, 9);
-    case 58: return 0.0f;
-    case 59: return sim_float_to_ufixed(val, 10, 7);
-    case 60: return sim_float_to_ufixed(val, 10, 6);
-    case 61: return sim_float_to_ufixed(val, 8, 4);
-    case 62: return sim_float_to_ufixed(val, 10, 6);
-    case 63: return 0.0f;
-    default: return val;
-  }
-}
-
-
 
 void
 GRLNeuro::initialize(const Parameters& p)
@@ -325,61 +149,62 @@ GRLNeuro::initialize(const Parameters& p)
     nNodes.push_back(nTarget);
     unsigned short targetVars = int(p.targetresult);
     vector<float> outputScale = (p.outputScale.size() == 1) ? p.outputScale[0] : p.outputScale[iMLP];
-    m_MLPs.push_back(GRLMLP(nNodes, targetVars, outputScale));
+    GRLMLP grlmlp_temp = GRLMLP(nNodes, targetVars, outputScale);
+    grlmlp_temp.set_total_bit_bias(p.total_bit_bias[iMLP]);
+    grlmlp_temp.set_int_bit_bias(p.int_bit_bias[iMLP]);
+    grlmlp_temp.set_is_signed_bias(p.is_signed_bias[iMLP]);
+    grlmlp_temp.set_rounding_bias(p.rounding_bias[iMLP]);
+    grlmlp_temp.set_saturation_bias(p.saturation_bias[iMLP]);
+    grlmlp_temp.set_total_bit_accum(p.total_bit_accum[iMLP]);
+    grlmlp_temp.set_int_bit_accum(p.int_bit_accum[iMLP]);
+    grlmlp_temp.set_is_signed_accum(p.is_signed_accum[iMLP]);
+    grlmlp_temp.set_rounding_accum(p.rounding_accum[iMLP]);
+    grlmlp_temp.set_saturation_accum(p.saturation_accum[iMLP]);
+    grlmlp_temp.set_total_bit_weight(p.total_bit_weight[iMLP]);
+    grlmlp_temp.set_int_bit_weight(p.int_bit_weight[iMLP]);
+    grlmlp_temp.set_is_signed_weight(p.is_signed_weight[iMLP]);
+    grlmlp_temp.set_rounding_weight(p.rounding_weight[iMLP]);
+    grlmlp_temp.set_saturation_weight(p.saturation_weight[iMLP]);
+    grlmlp_temp.set_total_bit_relu(p.total_bit_relu[iMLP]);
+    grlmlp_temp.set_int_bit_relu(p.int_bit_relu[iMLP]);
+    grlmlp_temp.set_is_signed_relu(p.is_signed_relu[iMLP]);
+    grlmlp_temp.set_rounding_relu(p.rounding_relu[iMLP]);
+    grlmlp_temp.set_saturation_relu(p.saturation_relu[iMLP]);
+    grlmlp_temp.set_total_bit(p.total_bit[iMLP]);
+    grlmlp_temp.set_int_bit(p.int_bit[iMLP]);
+    grlmlp_temp.set_is_signed(p.is_signed[iMLP]);
+    grlmlp_temp.set_rounding(p.rounding[iMLP]);
+    grlmlp_temp.set_saturation(p.saturation[iMLP]);
+    grlmlp_temp.set_W_input(p.W_input[iMLP]);
+    grlmlp_temp.set_I_input(p.I_input[iMLP]);
+    m_MLPs.push_back(grlmlp_temp);
+    //m_MLPs.push_back(GRLMLP(nNodes, targetVars, outputScale));
   }
 }
 
-
-float sim_ap_fixed(float val, int total_bits = 12, int int_bits = 12,
-                   bool round = true, bool wrap = true)
+// ==================== input_layer_t ====================
+// HLS: ap_ufixed<12,12,AP_RND,AP_WRAP,0>
+inline float sim_fix_input_layer_t(float val)
 {
-  int frac_bits = total_bits - int_bits;  //
-  float scale = std::pow(2, frac_bits);   // scale = 1
+  const int W = 12;
+  const int I = 12;   // int
+  const int F = W - I; // float
+  //const bool is_signed = false; // ap_ufixed //not used
 
-  // Apply rounding if needed
-  float scaled_val = val * scale;
-  int fixed_val = round ? std::round(scaled_val) : std::floor(scaled_val);
+  double scaled = val * std::pow(2.0, F); //
+  long long q = llrint(scaled); // round-to-even (C99)
 
-  int max_int = std::pow(2, total_bits) - 1;  // For 12-bit unsigned, max = 4095
-  int raw_val;
+  // wrap
+  //unsigned long long max_val = (1ULL << W) - 1; // 2^12 - 1 = 4095 //not used
+  if (q < 0) {
 
-  if (wrap) {
-    //
-    raw_val = fixed_val & max_int;  // == fixed_val % (1 << total_bits)
+    q = (q % (1ULL << W) + (1ULL << W)) % (1ULL << W);
   } else {
-    //
-    raw_val = std::min(std::max(fixed_val, 0), max_int);
+    q = q % (1ULL << W);
   }
 
-  return raw_val / scale;
+  return (float)q / std::pow(2.0, F); //
 }
-
-//
-float sim_fix_input_layer_t(float val)
-{
-  return sim_ap_fixed(val, 12, 12, true, true);  // AP_RND + AP_WRAP
-}
-
-std::vector<float> sim_dense_0_iq(const std::vector<float>& input)
-{
-  const std::vector<std::pair<int, int>> dense_0_iq_config = {
-    {12, 5}, {12, 4}, {10, 6}, {8, 4}, {8, 4}, {9, 5},
-    {6, 2}, {8, 3}, {6, 3}, {5, 4}, {7, 4}, {9, 5},
-    {8, 2}, {8, 2}, {6, 3}, {5, 3}, {8, 4}, {6, 2}
-  };
-
-  std::vector<float> output;
-  output.reserve(input.size());
-  for (size_t i = 0; i < input.size(); ++i) {
-    int total_bits = dense_0_iq_config[i].first;
-    int int_bits = dense_0_iq_config[i].second;
-    output.push_back(sim_ap_fixed(input[i], total_bits, int_bits, true, true));
-
-  }
-  return output;
-}
-///////////////////////////////////////////////////////////////
-
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -391,137 +216,99 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
   const GRLMLP& expert = m_MLPs[isector];
   vector<float> weights = expert.getWeights();
   vector<float> bias = expert.getBias();
+  vector<int> total_bit_bias = expert.get_total_bit_bias();
+  vector<int> int_bit_bias = expert.get_int_bit_bias();
+  vector<bool> is_signed_bias = expert.get_is_signed_bias();
+  vector<int> rounding_bias = expert.get_rounding_bias();
+  vector<int> saturation_bias = expert.get_saturation_bias();
+  vector<int> total_bit_accum = expert.get_total_bit_accum();
+  vector<int> int_bit_accum = expert.get_int_bit_accum();
+  vector<bool> is_signed_accum = expert.get_is_signed_accum();
+  vector<int> rounding_accum = expert.get_rounding_accum();
+  vector<int> saturation_accum = expert.get_saturation_accum();
+  vector<int> total_bit_weight = expert.get_total_bit_weight();
+  vector<int> int_bit_weight = expert.get_int_bit_weight();
+  vector<bool> is_signed_weight = expert.get_is_signed_weight();
+  vector<int> rounding_weight = expert.get_rounding_weight();
+  vector<int> saturation_weight = expert.get_saturation_weight();
+  vector<int> total_bit_relu = expert.get_total_bit_relu();
+  vector<int> int_bit_relu = expert.get_int_bit_relu();
+  vector<bool> is_signed_relu = expert.get_is_signed_relu();
+  vector<int> rounding_relu = expert.get_rounding_relu();
+  vector<int> saturation_relu = expert.get_saturation_relu();
+  vector<int> total_bit = expert.get_total_bit();
+  vector<int> int_bit = expert.get_int_bit();
+  vector<bool> is_signed = expert.get_is_signed();
+  vector<int> rounding = expert.get_rounding();
+  vector<int> saturation = expert.get_saturation();
+  vector<vector<int>> W_input = expert.get_W_input();
+  vector<vector<int>> I_input = expert.get_I_input();
+
+  //input layer
   vector<float> layerinput = input;
-
-  vector<float> layeroutput2 = {};
-  vector<float> layeroutput3 = {};
-  vector<float> layeroutput4 = {};
-
-  /////////////////////////////////////////////////////////////
   for (size_t i = 0; i < layerinput.size(); ++i) {
     layerinput[i] = sim_fix_input_layer_t(layerinput[i]);
   }
-  layeroutput2.clear();
-  layeroutput2.assign(expert.getNumberOfNodesLayer(2), 0.);
 
-  unsigned num_inputs = layerinput.size();
-  unsigned num_neurons = expert.getNumberOfNodesLayer(2);  // 64
-  for (unsigned io = 0; io < num_neurons; ++io) {
-    float bias_raw = bias[io];
-    float bias_fixed = sim_fix_dense_0_bias_t(bias_raw);
-    float bias_contrib = sim_fix_dense_0_accum_t(bias_fixed);
-    layeroutput2[io] = bias_contrib;
-  }
-
+  //hidden layer and output layer
+  vector<float> layeroutput = {};
+  unsigned num_layers = expert.getNumberOfLayers();
+  unsigned num_total_neurons = 0;
   unsigned iw = 0;
-//  input*weight
-  for (unsigned ii = 0; ii < num_inputs; ++ii) {
-    float input_val = layerinput[ii];
+  for (unsigned i_layer = 0; i_layer < num_layers - 1; i_layer++) {
+    //read bias
+    unsigned num_neurons = expert.getNumberOfNodesLayer(i_layer + 1);
+    layeroutput.clear();
+    layeroutput.assign(num_neurons, 0.);
+    layeroutput.shrink_to_fit();
     for (unsigned io = 0; io < num_neurons; ++io) {
-      float weight_raw = weights[iw];
-      float weight_fixed = sim_fix_dense_0_weight_t(weight_raw);
-      float product = input_val * weight_fixed;
-      float contrib = sim_fix_dense_0_accum_t(product);
+      float bias_raw = bias[io + num_total_neurons];
+      float bias_fixed   = sim_fixed(bias_raw, total_bit_bias[i_layer], int_bit_bias[i_layer], is_signed_bias[i_layer],
+                                     rounding_bias[i_layer], saturation_bias[i_layer]);
+      float bias_contrib = sim_fixed(bias_fixed, total_bit_accum[i_layer], int_bit_accum[i_layer], is_signed_accum[i_layer],
+                                     rounding_accum[i_layer], saturation_accum[i_layer]);
+      layeroutput[io] = bias_contrib;
+    }
+    num_total_neurons += num_neurons;
 
-      layeroutput2[io] += contrib;
+    //input*weight
+    unsigned num_inputs = layerinput.size();
+    for (unsigned ii = 0; ii < num_inputs; ++ii) {
+      float input_val = layerinput[ii];
+      for (unsigned io = 0; io < num_neurons; ++io) {
+        float weight_raw = weights[iw];
+        float weight_fixed = sim_fixed(weight_raw, total_bit_weight[i_layer], int_bit_weight[i_layer], is_signed_weight[i_layer],
+                                       rounding_weight[i_layer], saturation_weight[i_layer]);
+        float product = input_val * weight_fixed;
+        float contrib = sim_fixed(product, total_bit_accum[i_layer], int_bit_accum[i_layer], is_signed_accum[i_layer],
+                                  rounding_accum[i_layer], saturation_accum[i_layer]);
+        layeroutput[io] += contrib;
+        ++iw;
+      }
+    }
 
-      ++iw;
+    if (i_layer < num_layers - 2) {
+      //relu
+      for (unsigned io = 0; io < num_neurons; ++io) {
+        float fixed_val = sim_fixed(layeroutput[io], total_bit[i_layer], int_bit[i_layer], is_signed[i_layer], rounding[i_layer],
+                                    saturation[i_layer]);
+        float relu_val = (fixed_val > 0) ? fixed_val : 0;
+        layeroutput[io] = sim_fixed(relu_val, total_bit_relu[i_layer], int_bit_relu[i_layer], is_signed_relu[i_layer],
+                                    rounding_relu[i_layer], saturation_relu[i_layer]);
+      }
+
+      //input to next layer
+      layerinput.clear();
+      layerinput.assign(num_neurons, 0);
+      layerinput.shrink_to_fit();
+      for (unsigned i = 0; i < num_neurons; ++i) {
+        layerinput[i] = sim_ap_ufixed(layeroutput[i], W_input[i_layer][i], I_input[i_layer][i]);
+      }
+    } else {
+      return layeroutput[0];
     }
   }
-
-
-//apply activation function, ReLU for hidden layer and output layer
-// === dense_0_t + ReLU  ===
-  std::vector<float> layeroutput2_fixed_relu(num_neurons);
-
-  for (unsigned io = 0; io < num_neurons; ++io) {
-    // dense_0_t）
-    float fixed_val = sim_fix_dense_0_t(layeroutput2[io]);
-
-    // ReLU
-    float relu_val = (fixed_val > 0) ? fixed_val : 0;
-
-    layeroutput2_fixed_relu[io] = relu_val;
-
-  }
-
-  std::vector<float> dense1_input(64);
-  for (unsigned i = 0; i < 64; ++i) {
-    dense1_input[i] = sim_dense_1_input_quant(i, layeroutput2_fixed_relu[i]);
-  }
-
-  layeroutput3.clear();
-  layeroutput3.assign(expert.getNumberOfNodesLayer(1), 0.);
-  unsigned num_inputs_1 = layeroutput2_fixed_relu.size();
-  unsigned num_neurons_1 = expert.getNumberOfNodesLayer(2);
-  for (unsigned io = 64; io < num_neurons_1 + 64; ++io) {
-    float bias_raw = bias[io];
-    float bias_fixed = sim_fix_dense_1_bias_t(bias_raw);
-    float bias_contrib = sim_fix_dense_1_accum_t(bias_fixed);
-    layeroutput3[io - 64] = bias_contrib;
-
-  }
-
-
-  for (unsigned ii = 0; ii < num_inputs_1; ++ii) {
-    float input_val = dense1_input[ii];
-    for (unsigned io = 0; io < num_neurons_1; ++io) {
-
-      float weight_raw = weights[iw];
-
-      float weight_fixed = sim_fix_dense_1_weight_t(weight_raw);
-      float product = input_val * weight_fixed;
-      float contrib = sim_fix_dense_1_accum_t(product);
-
-      layeroutput3[io] += contrib;
-      ++iw;
-    }
-  }
-
-
-  std::vector<float> layeroutput3_fixed_relu(num_neurons);
-
-
-  for (unsigned io = 0; io < num_neurons_1; ++io) {
-    float fixed_val = sim_fix_dense_1_t(layeroutput3[io]);
-    // ReLU
-    float relu_val = (fixed_val > 0) ? fixed_val : 0;
-
-    layeroutput3_fixed_relu[io] = relu_val;
-
-  }
-  std::vector<float> dense2_input(64);
-  for (unsigned i = 0; i < 64; ++i) {
-    dense2_input[i] = sim_dense_2_input_quant(i, layeroutput3_fixed_relu[i]);
-  }
-  layeroutput4.clear();
-  layeroutput4.assign(expert.getNumberOfNodesLayer(3), 0.);
-
-  unsigned num_inputs_2 = layeroutput2_fixed_relu.size();
-  unsigned num_neurons_2 = expert.getNumberOfNodesLayer(3);
-  for (unsigned io = 128; io < num_neurons_2 + 128; ++io) {
-    float bias_raw = bias[io];
-    float bias_fixed = sim_fix_dense_2_bias_t(bias_raw);
-    float bias_contrib = sim_fix_dense_2_accum_t(bias_fixed);
-    layeroutput4[io - 128] = bias_contrib;
-
-  }
-
-  for (unsigned ii = 0; ii < num_inputs_2; ++ii) {
-    float input_val = dense2_input[ii];
-    for (unsigned io = 0; io < num_neurons_2; ++io) {
-      float weight_raw = weights[iw];
-      float weight_fixed = sim_fix_dense_2_weight_t(weight_raw);
-      float product = input_val * weight_fixed;
-      float contrib = sim_fix_dense_2_accum_t(product);
-
-      layeroutput4[io] += contrib;
-
-      ++iw;
-    }
-  }
-  return layeroutput4[0];
-
+  return 0;
 }
 
 

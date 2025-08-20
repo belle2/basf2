@@ -146,6 +146,33 @@ GRLNeuroModule::beginRun()
       m_parameters.i_cdc_sector   = m_db_trggrlconfig->get_ecltaunn_i_cdc_sector();
       m_parameters.i_ecl_sector   = m_db_trggrlconfig->get_ecltaunn_i_ecl_sector();
       m_nn_thres[0]               = m_db_trggrlconfig->get_ecltaunn_threshold();
+      m_parameters.total_bit_bias  = m_db_trggrlconfig->get_ecltaunn_total_bit_bias();
+      m_parameters.int_bit_bias    = m_db_trggrlconfig->get_ecltaunn_int_bit_bias();
+      m_parameters.is_signed_bias  = m_db_trggrlconfig->get_ecltaunn_is_signed_bias();
+      m_parameters.rounding_bias   = m_db_trggrlconfig->get_ecltaunn_rounding_bias();
+      m_parameters.saturation_bias = m_db_trggrlconfig->get_ecltaunn_saturation_bias();
+      m_parameters.total_bit_accum  = m_db_trggrlconfig->get_ecltaunn_total_bit_accum();
+      m_parameters.int_bit_accum    = m_db_trggrlconfig->get_ecltaunn_int_bit_accum();
+      m_parameters.is_signed_accum  = m_db_trggrlconfig->get_ecltaunn_is_signed_accum();
+      m_parameters.rounding_accum   = m_db_trggrlconfig->get_ecltaunn_rounding_accum();
+      m_parameters.saturation_accum = m_db_trggrlconfig->get_ecltaunn_saturation_accum();
+      m_parameters.total_bit_weight  = m_db_trggrlconfig->get_ecltaunn_total_bit_weight();
+      m_parameters.int_bit_weight    = m_db_trggrlconfig->get_ecltaunn_int_bit_weight();
+      m_parameters.is_signed_weight  = m_db_trggrlconfig->get_ecltaunn_is_signed_weight();
+      m_parameters.rounding_weight   = m_db_trggrlconfig->get_ecltaunn_rounding_weight();
+      m_parameters.saturation_weight = m_db_trggrlconfig->get_ecltaunn_saturation_weight();
+      m_parameters.total_bit_relu  = m_db_trggrlconfig->get_ecltaunn_total_bit_relu();
+      m_parameters.int_bit_relu    = m_db_trggrlconfig->get_ecltaunn_int_bit_relu();
+      m_parameters.is_signed_relu  = m_db_trggrlconfig->get_ecltaunn_is_signed_relu();
+      m_parameters.rounding_relu   = m_db_trggrlconfig->get_ecltaunn_rounding_relu();
+      m_parameters.saturation_relu = m_db_trggrlconfig->get_ecltaunn_saturation_relu();
+      m_parameters.total_bit  = m_db_trggrlconfig->get_ecltaunn_total_bit();
+      m_parameters.int_bit    = m_db_trggrlconfig->get_ecltaunn_int_bit();
+      m_parameters.is_signed  = m_db_trggrlconfig->get_ecltaunn_is_signed();
+      m_parameters.rounding   = m_db_trggrlconfig->get_ecltaunn_rounding();
+      m_parameters.saturation = m_db_trggrlconfig->get_ecltaunn_saturation();
+      m_parameters.W_input = m_db_trggrlconfig->get_ecltaunn_W_input();
+      m_parameters.I_input = m_db_trggrlconfig->get_ecltaunn_I_input();
 
       m_GRLNeuro.initialize(m_parameters);
 
@@ -227,7 +254,6 @@ GRLNeuroModule::event()
 //      x = std::min(x, 255.0f);
 //     x = std::max(x, 0.0f);
 //  });
-
 
   float target = m_GRLNeuro.runMLP(0, MLPinput);
   if (m_saveHist) {

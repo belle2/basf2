@@ -105,6 +105,7 @@ namespace Belle2::Conditions {
     const std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", "");
     // The list of the metadata providers we are going to query:
     const std::string metatadaProviders = serverList + " " + // First, the list of servers provided via env. variable
+                                          m_defaultNewCentralMetadataProviderServer + " " +  // Then the new central provider
                                           m_defaultLocalMetadataProviderPath + "/database.sqlite" + " " +  // Then the default local provider (CVMFS)
                                           m_defaultRemoteMetadataProviderServer;  // And finally, the default remote provider (BNL)
     fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", metatadaProviders);
@@ -518,6 +519,10 @@ to point to this location.
     .add_property("default_metadata_provider_server", &Configuration::getDefaultRemoteMetadataProviderServer, R"DOC(
 URL of the default central metadata provider to look for payloads in the
 conditions database.
+)DOC")
+    .add_property("default_new_central_metadata_provider_server", &Configuration::getDefaultNewCentralMetadataProviderServer, R"DOC(
+URL of the default new central metadata provider to look for payloads in the
+conditions database. This points to the new central server.
 )DOC")
     .add_property("payload_locations", &Configuration::getPayloadLocationsPy, &Configuration::setPayloadLocationsPy, R"DOC(
 List of payload locations to search for payloads which have been found by any of

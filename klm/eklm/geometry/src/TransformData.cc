@@ -24,7 +24,6 @@ using namespace Belle2;
 
 EKLM::TransformData::TransformData(bool global, Displacement displacementType)
 {
-  /* cppcheck-suppress variableScope */
   int iSection, iLayer, iSector, iPlane, iSegment, iStrip, sector, segment;
   int nSections, nLayers, nSectors, nPlanes, nStrips, nSegments, nStripsSegment;
   int nDetectorLayers;
@@ -135,7 +134,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
             /* First plane is rotated. */
             if (iPlane == 1) {
               [[clang::suppress]]
-              if (m_PlaneDisplacement[iSection - 1] &&
+              if (m_PlaneDisplacement[iSection - 1] && // cppcheck-suppress syntaxError
                   m_PlaneDisplacement[iSection - 1][iLayer - 1] &&
                   m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1]) {
                 m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1] =
@@ -197,7 +196,6 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
 EKLM::TransformData::~TransformData()
 {
   int iSection, iLayer, iSector, iPlane;
-  /* cppcheck-suppress variableScope */
   int nSections, nLayers, nDetectorLayers, nSectors, nPlanes;
   nSections = m_GeoDat->getNSections();
   nLayers = m_GeoDat->getNLayers();
@@ -248,7 +246,6 @@ EKLM::TransformData::~TransformData()
 void EKLM::TransformData::transformsToGlobal()
 {
   int iSection, iLayer, iSector, iPlane, iSegment, iStrip;
-  /* cppcheck-suppress variableScope */
   int nSections, nLayers, nDetectorLayers, nSectors, nPlanes, nSegments, nStrips;
   nSections = m_GeoDat->getNSections();
   nLayers = m_GeoDat->getNLayers();
@@ -458,12 +455,9 @@ int EKLM::TransformData::getSectorByPosition(
 int EKLM::TransformData::getStripsByIntersection(
   const HepGeom::Point3D<double>& intersection, int* strip1, int* strip2) const
 {
-  /* cppcheck-suppress variableScope */
   int section, layer, sector, plane, segment, strip, stripSegment, stripGlobal;
-  /* cppcheck-suppress variableScope */
   int nLayers, nPlanes, nSegments, nStripsSegment, minDistanceSegment;
   double solenoidCenter, firstLayerCenter, layerShift;
-  /* cppcheck-suppress variableScope */
   double x, y, z, l, minY, maxY;
   double minDistance = 0, minDistanceNew, stripWidth;
   HepGeom::Point3D<double> intersectionClhep, intersectionLocal;

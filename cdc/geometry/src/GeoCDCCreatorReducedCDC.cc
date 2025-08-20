@@ -1317,7 +1317,7 @@ namespace Belle2 {
         if (ribID > 109 && ribID < 126) // H2O tube (rmin = 0)
           logicalV = new G4LogicalVolume(tubeShape, medH2O,  logicalName, 0, 0, 0);
         [[clang::suppress]]
-        if (ribID > 127 && ribID < 132) // HV bundle
+        if (ribID > 127 && ribID < 132)  // cppcheck-suppress syntaxError // HV bundle
           logicalV = new G4LogicalVolume(boxShape, medHV,  logicalName, 0, 0, 0);
         /*if( ribID > 145 && ribID < 149 )// Fiber box
           logicalV = new G4LogicalVolume(boxShape, medFiber,  logicalName, 0, 0, 0);

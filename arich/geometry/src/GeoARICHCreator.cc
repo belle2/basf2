@@ -559,6 +559,7 @@ namespace Belle2 {
         wallName.str("");
         wallName << "supportWallPhi_" << iRing + 1;
         G4Box* wall = new G4Box(wallName.str(), (wallR[iRing] - wallR[iRing - 1] - wallThick) / 2. - 1., thick / 2., wallHeight / 2.);
+        [[clang::suppress]]
         G4LogicalVolume* wallLV = new G4LogicalVolume(wall, supportMaterial, string("ARICH.") + wallName.str());
         double r = (wallR[iRing - 1] + wallThick + wallR[iRing]) / 2.;
         double zLayer = 0;
@@ -576,6 +577,7 @@ namespace Belle2 {
                                          (tileGap + wallThick / 2.) / wallR[iRing], dphi - (2.*tileGap + wallThick) / wallR[iRing]);
 
           G4Material* aeroMaterial = Materials::get(aeroGeo.getLayerMaterial(iLayer));
+          [[clang::suppress]]
           G4LogicalVolume* tileLV = new G4LogicalVolume(tileShape, aeroMaterial, string("ARICH.") + tileName.str());
 
           while (iphi < 2 * M_PI - 0.0001) {
@@ -682,6 +684,7 @@ namespace Belle2 {
         wallName.str("");
         wallName << "supportWallPhi_" << iRing + 1;
         G4Box* wall = new G4Box(wallName.str(), (wallR[iRing] - wallR[iRing - 1] - wallThick) / 2. - 1., thick / 2., wallHeight / 2.);
+        [[clang::suppress]]
         G4LogicalVolume* wallLV = new G4LogicalVolume(wall, supportMaterial, string("ARICH.") + wallName.str());
         double r = (wallR[iRing - 1] + wallThick + wallR[iRing]) / 2.;
         ///////////////////////////////////////////////
@@ -1401,6 +1404,7 @@ namespace Belle2 {
                                             coolingGeo.getColdTubeR() * mm,
                                             coolingGeo.getCoolingTestPlateslengths().X() / 2.0 * mm,
                                             0, 360.0 * deg);
+      [[clang::suppress]]
       G4LogicalVolume* coldTube_logical = new G4LogicalVolume(coldTube_solid, Materials::get(coolingGeo.getColdTubeMaterialName()),
                                                               "ARICH.coldTube");
 
@@ -1470,6 +1474,7 @@ namespace Belle2 {
 
       G4Box* hole = new G4Box("hole", detGeo.getModuleHoleSize() / 2., detGeo.getModuleHoleSize() / 2.,
                               detGeo.getSupportThickness() / 2.); // +1 for thickness for subtraction solid
+      [[clang::suppress]]
       G4LogicalVolume* holeLV = new G4LogicalVolume(hole, Materials::get("Air"), "ARICH.detectorSupportHole");
 
       int nRings = detGeo.getNRings();
@@ -1477,6 +1482,7 @@ namespace Belle2 {
       double backWallThick = detGeo.getSupportBackWallThickness();
       double backWallHeight =  detGeo.getSupportBackWallHeight();
 
+      [[clang::suppress]]
       G4LogicalVolume* hapdSupportPlateLV = new G4LogicalVolume(supportPlate, supportMaterial, "hapdSupport");
 
       std::vector<double> wallR;

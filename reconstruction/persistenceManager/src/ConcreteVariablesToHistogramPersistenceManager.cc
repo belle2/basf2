@@ -32,10 +32,10 @@ namespace Belle2::VariablePersistenceManager {
 
   void ConcreteVariablesToHistogramPersistenceManager::addEntry(const EvaluatedVariables& evaluatedVariables)
   {
-    for (const auto& [variableName, value] : evaluatedVariables) {
+    for (const auto& variable : evaluatedVariables) {
       std::visit([&](auto&& val) {
-        (*m_histograms[variableName])->get().Fill(val);
-      }, value);
+        (*m_histograms[variable.first])->get().Fill(val);
+      }, variable.second);
     }
   }
 

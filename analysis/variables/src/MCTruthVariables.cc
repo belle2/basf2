@@ -1196,6 +1196,7 @@ namespace Belle2 {
       // FEI specific checks
       std::vector<Particle*> daughters = part->getDaughters();
       std::vector<const MCParticle*> missedParticles;
+      assert(allMother);
       ccbarTagPartialHelper(allMother, daughters, missedParticles);
 
       if (daughters.size() > 0) return 1000;

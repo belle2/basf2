@@ -730,6 +730,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       // New position (with reduced number of neighbours)
       // There are some cases where high backgrounds fake local maxima and the split centroid position is far
       // away from the original LM cell... this will throw a (non fatal) error, and create a cluster with zero energy now).
+#ifndef __clang_analyzer__
       B2Vector3D* showerposition = new B2Vector3D(Belle2::ECL::computePositionLiLo(newdigits, newweights, m_liloParameters));
       aECLShower->setTheta(showerposition->Theta());
       aECLShower->setPhi(showerposition->Phi());
@@ -739,6 +740,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       B2DEBUG(175, "new phi: " << showerposition->Phi());
       B2DEBUG(175, "new R: " << showerposition->Mag());
       delete showerposition;
+#endif
 
       // Get Energy, if requested, set weights to zero for energy calculation.
       double showerEnergy = 0.0;

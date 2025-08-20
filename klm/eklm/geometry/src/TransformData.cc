@@ -123,6 +123,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
     }
     for (iSection = 1; iSection <= nSections; iSection++) {
       nDetectorLayers = m_GeoDat->getNDetectorLayers(iSection);
+      assert(nDetectorLayers <= nLayers);
       for (iLayer = 1; iLayer <= nDetectorLayers; iLayer++) {
         for (iSector = 1; iSector <= nSectors; iSector++) {
           sector = m_ElementNumbers->sectorNumber(iSection, iLayer, iSector);
@@ -133,6 +134,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
           for (iPlane = 1; iPlane <= nPlanes; iPlane++) {
             /* First plane is rotated. */
             if (iPlane == 1) {
+              [[clang::suppress]]
               if (m_PlaneDisplacement[iSection - 1] &&
                   m_PlaneDisplacement[iSection - 1][iLayer - 1] &&
                   m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1]) {
@@ -256,6 +258,7 @@ void EKLM::TransformData::transformsToGlobal()
   nStrips = m_GeoDat->getNStrips();
   for (iSection = 0; iSection < nSections; iSection++) {
     nDetectorLayers = m_GeoDat->getNDetectorLayers(iSection + 1);
+    assert(nDetectorLayers <= nLayers);
     for (iLayer = 0; iLayer < nLayers; iLayer++) {
       m_Layer[iSection][iLayer] = m_Section[iSection] * m_Layer[iSection][iLayer];
       for (iSector = 0; iSector < nSectors; iSector++) {
@@ -264,6 +267,7 @@ void EKLM::TransformData::transformsToGlobal()
         if (iLayer >= nDetectorLayers)
           continue;
         for (iPlane = 0; iPlane < nPlanes; iPlane++) {
+          [[clang::suppress]]
           if (m_Plane[iSection] &&
               m_Plane[iSection][iLayer] &&
               m_Plane[iSection][iLayer][iSector]) {

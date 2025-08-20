@@ -24,6 +24,7 @@ using namespace Belle2;
 
 EKLM::TransformData::TransformData(bool global, Displacement displacementType)
 {
+  /* cppcheck-suppress variableScope */
   int iSection, iLayer, iSector, iPlane, iSegment, iStrip, sector, segment;
   int nSections, nLayers, nSectors, nPlanes, nStrips, nSegments, nStripsSegment;
   int nDetectorLayers;
@@ -134,19 +135,12 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
             /* First plane is rotated. */
             if (iPlane == 1) {
               [[clang::suppress]]
-              if (m_PlaneDisplacement[iSection - 1] && // cppcheck-suppress syntaxError
-                  m_PlaneDisplacement[iSection - 1][iLayer - 1] &&
-                  m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1]) {
-                m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1] =
-                  HepGeom::Translate3D(
-                    sectorAlignment->getDeltaV() * CLHEP::cm / Unit::cm,
-                    sectorAlignment->getDeltaU() * CLHEP::cm / Unit::cm, 0) *
-                  HepGeom::RotateZ3D(-sectorAlignment->getDeltaGamma() *
-                                     CLHEP::rad / Unit::rad);
-              } else {
-                //NOTE: this check is only to suppress clang warnings
-                B2FATAL("Missing m_PlaneDisplacement allocation for section/layer/sector in TransformData.cc");
-              }
+              m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1] =
+                HepGeom::Translate3D(
+                  sectorAlignment->getDeltaV() * CLHEP::cm / Unit::cm,
+                  sectorAlignment->getDeltaU() * CLHEP::cm / Unit::cm, 0) *
+                HepGeom::RotateZ3D(-sectorAlignment->getDeltaGamma() *
+                                   CLHEP::rad / Unit::rad);
             } else {
               m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1] =
                 HepGeom::Translate3D(
@@ -196,6 +190,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
 EKLM::TransformData::~TransformData()
 {
   int iSection, iLayer, iSector, iPlane;
+  /* cppcheck-suppress variableScope */
   int nSections, nLayers, nDetectorLayers, nSectors, nPlanes;
   nSections = m_GeoDat->getNSections();
   nLayers = m_GeoDat->getNLayers();
@@ -246,6 +241,7 @@ EKLM::TransformData::~TransformData()
 void EKLM::TransformData::transformsToGlobal()
 {
   int iSection, iLayer, iSector, iPlane, iSegment, iStrip;
+  /* cppcheck-suppress variableScope */
   int nSections, nLayers, nDetectorLayers, nSectors, nPlanes, nSegments, nStrips;
   nSections = m_GeoDat->getNSections();
   nLayers = m_GeoDat->getNLayers();
@@ -255,7 +251,6 @@ void EKLM::TransformData::transformsToGlobal()
   nStrips = m_GeoDat->getNStrips();
   for (iSection = 0; iSection < nSections; iSection++) {
     nDetectorLayers = m_GeoDat->getNDetectorLayers(iSection + 1);
-    assert(nDetectorLayers <= nLayers);
     for (iLayer = 0; iLayer < nLayers; iLayer++) {
       m_Layer[iSection][iLayer] = m_Section[iSection] * m_Layer[iSection][iLayer];
       for (iSector = 0; iSector < nSectors; iSector++) {
@@ -265,16 +260,9 @@ void EKLM::TransformData::transformsToGlobal()
           continue;
         for (iPlane = 0; iPlane < nPlanes; iPlane++) {
           [[clang::suppress]]
-          if (m_Plane[iSection] &&
-              m_Plane[iSection][iLayer] &&
-              m_Plane[iSection][iLayer][iSector]) {
-            m_Plane[iSection][iLayer][iSector][iPlane] =
-              m_Sector[iSection][iLayer][iSector] *
-              m_Plane[iSection][iLayer][iSector][iPlane];
-          } else {
-            //NOTE: this check is only to suppress clang warnings
-            B2FATAL("Missing m_Plane allocation for section/layer/sector");
-          }
+          m_Plane[iSection][iLayer][iSector][iPlane] =
+            m_Sector[iSection][iLayer][iSector] *
+            m_Plane[iSection][iLayer][iSector][iPlane];
           for (iSegment = 0; iSegment < nSegments; iSegment++) {
             m_Segment[iSection][iLayer][iSector][iPlane][iSegment] =
               m_Plane[iSection][iLayer][iSector][iPlane] *
@@ -455,9 +443,12 @@ int EKLM::TransformData::getSectorByPosition(
 int EKLM::TransformData::getStripsByIntersection(
   const HepGeom::Point3D<double>& intersection, int* strip1, int* strip2) const
 {
+  /* cppcheck-suppress variableScope */
   int section, layer, sector, plane, segment, strip, stripSegment, stripGlobal;
+  /* cppcheck-suppress variableScope */
   int nLayers, nPlanes, nSegments, nStripsSegment, minDistanceSegment;
   double solenoidCenter, firstLayerCenter, layerShift;
+  /* cppcheck-suppress variableScope */
   double x, y, z, l, minY, maxY;
   double minDistance = 0, minDistanceNew, stripWidth;
   HepGeom::Point3D<double> intersectionClhep, intersectionLocal;

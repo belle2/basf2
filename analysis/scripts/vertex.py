@@ -260,7 +260,8 @@ def treeFit(
         conf_level (float):  minimum value of the confidence level to accept the fit.
             Setting this parameter to -1 selects all particle candidates.
             The value of 0 rejects the particle candidates with failed fit.
-        massConstraint (list(int, str)): list of PDG ids or names of the particles which are mass-constrained
+        massConstraint (list(int, str)): list of PDG ids (positive and negative values are allowed) or names of the
+            (anti-)particles which are mass-constrained
         ipConstraint (bool): constrain head production vertex to IP (x-y-z) constraint
         updateAllDaughters (bool): if true the entire tree will be updated with the fitted values
             for momenta and vertex position. Otherwise only the momenta of the head of the tree will be updated,

@@ -82,8 +82,5 @@ progress = b2.register_module('Progress')
 path.add_module(progress)
 b2.process(path=path)
 
-# Print call statistics
-print(b2.statistics)
-
 
 # @endcond

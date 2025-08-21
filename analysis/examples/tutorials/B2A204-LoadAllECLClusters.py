@@ -95,6 +95,3 @@ variablesToNtuple('vpho:bhabha', vars, filename='bhabha.root', path=mypath)
 
 # Process the events
 b2.process(mypath)
-
-# print out the summary
-print(b2.statistics)

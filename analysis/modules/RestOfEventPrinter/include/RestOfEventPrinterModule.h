@@ -10,9 +10,8 @@
 #include <framework/core/Module.h>
 #include <string>
 
-#include <analysis/dataobjects/Particle.h>
-
 namespace Belle2 {
+  class Particle;
 
   /**
    * prints ROE information and masks to screen

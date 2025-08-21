@@ -10,6 +10,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <analysis/variables/TrackVariables.h>
@@ -21,6 +22,7 @@
 
 //Module Includes
 #include <analysis/modules/CurlTagger/Bundle.h>
+#include <analysis/modules/CurlTagger/Selector.h>
 #include <analysis/modules/CurlTagger/SelectorCut.h>
 #include <analysis/modules/CurlTagger/SelectorMVA.h>
 

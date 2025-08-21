@@ -208,7 +208,7 @@ svd.add_svd_reconstruction(main)
 main.add_module(printWeights)
 
 # generate events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # show call statistics
 print(b2.statistics)

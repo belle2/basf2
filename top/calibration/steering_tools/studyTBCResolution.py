@@ -157,7 +157,7 @@ class TOPTBCResolution(b2.Module):
         digits = Belle2.PyStoreArray('TOPDigits')
 
         for ipulse1, digit1 in enumerate(digits):
-            if(self.ignoreNotCalibrated and not digit1.isTimeBaseCalibrated()):
+            if (self.ignoreNotCalibrated and not digit1.isTimeBaseCalibrated()):
                 continue
             if (digit1.getHitQuality() != 0 and
                 digit1.getPulseHeight() > self.m_calpulseMinAmp and
@@ -168,7 +168,7 @@ class TOPTBCResolution(b2.Module):
                 slotID = digit1.getModuleID()
                 hwchan = digit1.getChannel()
                 for ipulse2, digit2 in enumerate(digits, start=ipulse1 + 1):
-                    if(self.ignoreNotCalibrated and not digit2.isTimeBaseCalibrated()):
+                    if (self.ignoreNotCalibrated and not digit2.isTimeBaseCalibrated()):
                         continue
 
                     if (digit2.getHitQuality() != 0 and
@@ -406,7 +406,3 @@ main.add_module(progress)
 
 # Process events
 b2.process(main)
-
-# Print call statistics
-print(b2.statistics)
-print(b2.statistics(b2.statistics.TERM))

@@ -296,7 +296,7 @@ readB2LMain.add_module(cdctrg)
 # process(savedGeneratorMain)
 
 # read B2L data
-b2.process(readB2LMain)
+b2.process(readB2LMain, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

@@ -7,8 +7,10 @@
  **************************************************************************/
 
 #include <analysis/dataobjects/TagVertex.h>
+#include <analysis/dataobjects/Particle.h>
 
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
 

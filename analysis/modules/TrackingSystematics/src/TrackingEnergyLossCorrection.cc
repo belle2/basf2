@@ -10,9 +10,13 @@
 #include <analysis/modules/TrackingSystematics/TrackingEnergyLossCorrection.h>
 
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
 
 #include <Math/Vector4D.h>
 

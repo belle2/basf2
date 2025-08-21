@@ -53,5 +53,5 @@ add_mdst_output(main)
 # add_cdst_output(main)
 
 # process events and print call statistics
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

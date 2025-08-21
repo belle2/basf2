@@ -160,6 +160,8 @@ void CDCFudgeFactorCalibrationCollectorModule::collect()
   StoreObjPtr<ParticleList> gamma_list(m_GammaListName);
   int nG = gamma_list->getListSize();
   B2DEBUG(29, "Number of gamma: " << nG);
+  eclNeutral = 0;
+  eclTrack = 0;
   for (int i = 0; i < nG; ++i) {
     Particle* gamma = gamma_list->getParticle(i);
     eclNeutral += gamma->getEnergy();
@@ -168,7 +170,7 @@ void CDCFudgeFactorCalibrationCollectorModule::collect()
   /************************************/
   PCmsLabTransform T;
   //now start to collect dimuon parameters
-  double   thetaPos(0), thetaNeg(0);
+  double thetaPos(0), thetaNeg(0);
   int charge_sum = 0;
 
   for (int i = 0; i < nCandidates; ++i) {

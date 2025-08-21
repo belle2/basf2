@@ -20,9 +20,11 @@ namespace TreeFitter {
     Composite(particle, mother, config),
     m_massconstraint(false)
   {
-    m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
-                                 std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end()
-                       or m_particle->hasExtraInfo("treeFitterMassConstraint");
+    m_massconstraint = std::find_if(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
+    [pdg = std::abs(m_particle->getPDGCode())](int val) {
+      return std::abs(val) == pdg;
+    }) != config.m_massConstraintListPDG.end()
+    or m_particle->hasExtraInfo("treeFitterMassConstraint");
   }
 
   ErrCode RecoResonance::initParticleWithMother([[gnu::unused]] FitParams& fitparams)

@@ -9,12 +9,11 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
-#include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
-
-#include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
+  template<class T> class DBObjPtr;
+  class Particle;
+  class ParticleWeightingLookUpTable;
 
   /**
   * Tracking energy systematics module: allows for the application of an additive energy correction which is read from a ParticleWeightingLookUpTable payload

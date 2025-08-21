@@ -2938,13 +2938,14 @@ def printROEInfo(mask_names=None, full_print=False,
     path.add_module(printMask)
 
 
-def buildContinuumSuppression(list_name, roe_mask, path):
+def buildContinuumSuppression(list_name, roe_mask, ipprofile_fit=False, path=None):
     """
     Creates for each Particle in the given ParticleList a ContinuumSuppression
     dataobject and makes basf2 relation between them.
 
     :param list_name: name of the input ParticleList
     :param roe_mask: name of the ROE mask
+    :param ipprofile_fit: turn on vertex fit of input tracks with IP profile constraint
     :param path: modules are added to this path
     """
 
@@ -2952,6 +2953,7 @@ def buildContinuumSuppression(list_name, roe_mask, path):
     qqBuilder.set_name('QQBuilder_' + list_name)
     qqBuilder.param('particleList', list_name)
     qqBuilder.param('ROEMask', roe_mask)
+    qqBuilder.param('performIPProfileFit', ipprofile_fit)
     path.add_module(qqBuilder)
 
 

@@ -242,7 +242,7 @@ bool Variable::Manager::createVariable(const std::string& name)
       std::vector<double> arguments;
       for (auto& arg : functionArguments) {
         double number = 0;
-        number = Belle2::convertString<double>(arg);
+        number = convertString<double>(arg);
         arguments.push_back(number);
       }
       auto pfunc = parameterIter->second->function;
@@ -272,8 +272,8 @@ bool Variable::Manager::createVariable(const std::string& name)
       py::tuple expression_tuple = py::extract<boost::python::tuple>(b2parser_namespace.attr("parse_expression")(name));
       try {
         // Compile ExpressionNode
-        std::shared_ptr<const AbstractExpressionNode<Belle2::Variable::Manager>> expression_node =
-              NodeFactory::compile_expression_node<Belle2::Variable::Manager>(expression_tuple);
+        std::shared_ptr<const AbstractExpressionNode<Variable::Manager>> expression_node =
+              NodeFactory::compile_expression_node<Variable::Manager>(expression_tuple);
         // Create lambda capturing the ExpressionNode
         Variable::Manager::FunctionPtr func = [expression_node](const Particle * object) -> VarVariant {
           return expression_node->evaluate(object);
@@ -304,7 +304,7 @@ bool Variable::Manager::createVariable(const std::string& fullname, const std::s
     std::vector<double> arguments;
     for (auto& arg : functionArguments) {
       double number = 0;
-      number = Belle2::convertString<double>(arg);
+      number = convertString<double>(arg);
       arguments.push_back(number);
     }
     auto pfunc = parameterIter->second->function;

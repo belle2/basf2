@@ -144,4 +144,3 @@ if __name__ == '__main__':
 
     # Actually run everything
     b2.process(path)
-    print(b2.statistics)

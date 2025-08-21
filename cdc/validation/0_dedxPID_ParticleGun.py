@@ -51,4 +51,3 @@ main.add_module(output)
 main.add_module("ProgressBar")
 
 basf2.process(main)
-print(basf2.statistics)

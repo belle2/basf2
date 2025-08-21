@@ -35,7 +35,7 @@ LHEInputModule::LHEInputModule() : Module(),
   addParam("runNum", m_runNum, "Run number", -1);
   addParam("expNum", m_expNum, "Experiment number", -1);
   addParam("skipEvents", m_skipEventNumber, "Skip this number of events before starting.", 0);
-  addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated (not implemented yet).", false);
+  addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated.", false);
   addParam("nInitialParticles", m_nInitial, "Number of MCParticles at the beginning of the events that should be flagged c_Initial.",
            0);
   addParam("nVirtualParticles", m_nVirtual,

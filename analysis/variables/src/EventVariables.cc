@@ -503,7 +503,7 @@ namespace Belle2 {
     {
       StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
       if (!evtShape) {
-        B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
+        B2WARNING("Cannot find missing momentum information from MC, did you forget to use the buildEventKinematicsFromMC module?");
         return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMomentumCMS().R();
@@ -569,7 +569,7 @@ namespace Belle2 {
     {
       StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
       if (!evtShape) {
-        B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
+        B2WARNING("Cannot find missing momentum information from MC, did you forget to use the buildEventKinematicsFromMC module?");
         return Const::doubleNaN;
       }
       double missing = evtShape->getMissingEnergyCMS();
@@ -592,7 +592,7 @@ namespace Belle2 {
     {
       StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
       if (!evtShape) {
-        B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
+        B2WARNING("Cannot find missing momentum information from MC, did you forget to use the buildEventKinematicsFromMC module?");
         return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMass2();
@@ -614,7 +614,7 @@ namespace Belle2 {
     {
       StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
       if (!evtShape) {
-        B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
+        B2WARNING("Cannot find missing momentum information from MC, did you forget to use the buildEventKinematicsFromMC module?");
         return Const::doubleNaN;
       }
       double visible = evtShape->getVisibleEnergyCMS();
@@ -637,7 +637,7 @@ namespace Belle2 {
     {
       StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
       if (!evtShape) {
-        B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
+        B2WARNING("Cannot find missing momentum information from MC, did you forget to use the buildEventKinematicsFromMC module?");
         return Const::doubleNaN;
       }
       double energyOfPhotons = evtShape->getTotalPhotonsEnergy();

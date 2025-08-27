@@ -16,12 +16,12 @@
 #include <analysis/VertexFitting/TreeFitter/Composite.h>
 #include <analysis/VertexFitting/TreeFitter/RecoResonance.h>
 #include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
-
-#include <analysis/VertexFitting/TreeFitter/RecoPhoton.h>
-#include <analysis/VertexFitting/TreeFitter/RecoKlong.h>
+#include <analysis/VertexFitting/TreeFitter/RecoNeutral.h>
 #include <analysis/VertexFitting/TreeFitter/Resonance.h>
 #include <analysis/VertexFitting/TreeFitter/Origin.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
+#include <analysis/VertexFitting/TreeFitter/Projection.h>
 
 namespace TreeFitter {
 
@@ -113,10 +113,10 @@ namespace TreeFitter {
       rc = new RecoResonance(particle, mother, config);
     } else if (particle->getTrack()) { // external reconstructed track
       rc = new RecoTrack(particle, mother);
-    } else if (particle->getECLCluster()) { // external reconstructed photon
-      rc = new RecoPhoton(particle, mother);
-    } else if (particle->getKLMCluster()) { // external reconstructed klong
-      rc = new RecoKlong(particle, mother);
+    } else if (particle->getParticleSource() == Belle2::Particle::EParticleSourceObject::c_ECLCluster
+               or particle->getParticleSource() == Belle2::Particle::EParticleSourceObject::c_KLMCluster) {
+      // external reconstructed neutral final-state particle
+      rc = new RecoNeutral(particle, mother);
     } else if (particle->getMdstArrayIndex()) { // external composite e.g. V0
       rc = new InternalParticle(particle, mother, config, forceFitAll);
     } else { // 'internal' particles

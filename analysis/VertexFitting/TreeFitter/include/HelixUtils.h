@@ -10,8 +10,14 @@
 
 #include <string>
 
-#include <framework/dataobjects/Helix.h>
 #include <Eigen/Core>
+
+#include <Math/Vector3D.h>
+
+namespace Belle2 {
+  class Helix;
+}
+
 namespace TreeFitter {
 
   /**  utility for helix<->x,p conversions

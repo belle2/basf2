@@ -60,7 +60,7 @@ namespace Belle2 {
     if (detector != Dedx::c_PXD and detector != Dedx::c_SVD) return;
 
     if (truncated) {
-      addLogLikelihoods(PDFs, m_dedxAvgTruncated[detector], 1e-3);
+      addLogLikelihoods(PDFs, m_dedxAvgTruncated[detector], 4e-5);
     } else {
       for (size_t i = 0; i < dedx.size(); i++) {
         if (detector == Dedx::c_PXD and std::abs(dedxLayer[i]) > 2) continue;

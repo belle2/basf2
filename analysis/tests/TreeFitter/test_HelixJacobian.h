@@ -13,7 +13,6 @@
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Const.h>
-#include <framework/gearbox/Unit.h>
 
 namespace {
 

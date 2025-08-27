@@ -178,7 +178,7 @@ main_path.add_module('Geometry')
 printCrystals = printCrystals()
 main_path.add_module(printCrystals)
 
-basf2.process(main_path)
+basf2.process(main_path, calculateStatistics=True)
 print(basf2.statistics)
 
 # @endcond

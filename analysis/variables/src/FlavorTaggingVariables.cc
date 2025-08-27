@@ -26,6 +26,7 @@
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
+#include <analysis/dataobjects/FlavorTaggerInfoMap.h>
 #include <analysis/ContinuumSuppression/Thrust.h>
 
 #include <mdst/dataobjects/MCParticle.h>

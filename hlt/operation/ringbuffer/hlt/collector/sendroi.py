@@ -106,4 +106,4 @@ main.add_module(ds2raw)
 
 
 # Run
-b2.process(main)
+b2.process(main, calculateStatistics=True)

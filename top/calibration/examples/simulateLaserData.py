@@ -109,7 +109,7 @@ main.add_module('SeqRootOutput', saveObjs=['EventMetaData', 'RawTOPs'], outputFi
 main.add_module('Progress')
 
 # Process events
-process(main)
+process(main, calculateStatistics=True)
 
 # Print call statistics
 print(statistics)

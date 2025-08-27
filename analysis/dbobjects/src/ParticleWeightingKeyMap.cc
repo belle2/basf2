@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <analysis/dbobjects/ParticleWeightingKeyMap.h>
+#include <analysis/dbobjects/ParticleWeightingAxis.h>
+#include <analysis/dbobjects/ParticleWeightingBinLimits.h>
 #include <framework/logging/Logger.h>
 
 #include <utility>

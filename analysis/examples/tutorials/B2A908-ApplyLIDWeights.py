@@ -227,9 +227,6 @@ def main():
     # Process the events.
     b2.process(path)
 
-    # Print out the summary.
-    print(b2.statistics)
-
 
 if __name__ == "__main__":
 

@@ -22,4 +22,6 @@ add_hlt_processing(reco_path, run_type=constants.RunTypes.beam,
 finalize_zmq_path(path, args, location=constants.Location.hlt)
 
 basf2.print_path(path)
+import ROOT  # noqa
+ROOT.Belle2.Environment.Instance().setStats(True)
 hbasf2.process(path, [args.dqm, args.output], True)

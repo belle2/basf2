@@ -581,7 +581,7 @@ namespace Belle2 {
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
         try {
-          pdgCode = Belle2::convertString<int>(arguments[1]);
+          pdgCode = convertString<int>(arguments[1]);
         } catch (std::invalid_argument&) {
           B2ERROR("First argument of nROE_Charged must be a PDG code");
           return nullptr;

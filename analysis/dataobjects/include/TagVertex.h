@@ -14,13 +14,9 @@
 #include <TMatrixDSym.h>
 #include <string>
 
-// DataObjects
-#include <mdst/dataobjects/MCParticle.h>
-#include <analysis/dataobjects/Particle.h>
-
 namespace Belle2 {
-
-
+  class MCParticle;
+  class Particle;
 
   /**
    * TagVertex data object: contains Btag Vertex and DeltaT

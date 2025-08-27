@@ -361,36 +361,36 @@ TFile: inclusiveReconstruction.root
 TTree: variables
 TBranch: __experiment__, 1003
 TBranch: __run__, 0
-TBranch: __event__, 9
+TBranch: __event__, 2
 TBranch: __production__, 0
 TBranch: __candidate__, 0
-TBranch: __ncandidates__, 2468
+TBranch: __ncandidates__, 5
 TBranch: __eventType__, 
 TBranch: __weight__, 1
-TBranch: isSignal, 0
-TBranch: Mbc, 5.242
-TBranch: deltaE, -3.943
+TBranch: isSignal, nan
+TBranch: Mbc, 5.218
+TBranch: deltaE, -2.237
 TBranch: isUnspecified, False
-TBranch: Xsd_px, 0.3492
-TBranch: Xsd_py, -0.34
-TBranch: Xsd_pz, 0.3247
-TBranch: Xsd_E, 0.9665
+TBranch: Xsd_px, -0.3852
+TBranch: Xsd_py, -0.03088
+TBranch: Xsd_pz, 0.5706
+TBranch: Xsd_E, 1.723
 TBranch: Xsd_isSignal, 0
-TBranch: Xsd_mcErrors, 48
+TBranch: Xsd_mcErrors, 304
 TBranch: Xsd_isUnspecified, 1
-TBranch: e_1_px, 0.1423
-TBranch: e_1_py, -0.001529
-TBranch: e_1_pz, -0.08281
-TBranch: e_1_E, 0.1647
+TBranch: e_1_px, 1.337
+TBranch: e_1_py, 0.001549
+TBranch: e_1_pz, 0.3685
+TBranch: e_1_E, 1.387
 TBranch: e_1_isSignal, 0
-TBranch: e_1_mcErrors, 132
+TBranch: e_1_mcErrors, 128
 TBranch: e_1_isUnspecified, 0
-TBranch: e_2_px, 0.2234
-TBranch: e_2_py, 0.08354
-TBranch: e_2_pz, 0.2063
-TBranch: e_2_E, 0.3153
-TBranch: e_2_isSignal, 1
-TBranch: e_2_mcErrors, 0
+TBranch: e_2_px, 0.04207
+TBranch: e_2_py, 0.1143
+TBranch: e_2_pz, 0.001823
+TBranch: e_2_E, 0.1218
+TBranch: e_2_isSignal, nan
+TBranch: e_2_mcErrors, 512
 TBranch: e_2_isUnspecified, 0
 TFile: neutralHadron4MomentumCalculation.root
 TTree: nbar
@@ -404,19 +404,18 @@ TBranch: __eventType__,
 TBranch: __weight__, 1
 TBranch: p, 0.01963
 TTree: B0
-No entry found
-TBranch: __experiment__
-TBranch: __run__
-TBranch: __event__
-TBranch: __production__
-TBranch: __candidate__
-TBranch: __ncandidates__
-TBranch: __eventType__
-TBranch: __weight__
-TBranch: deltaE
-TBranch: M
-TBranch: daughter__bo2__cmp__bc
-TBranch: daughter__bo2__cmclusterE__bc
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 516
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: deltaE, 0.07595
+TBranch: M, 5.28
+TBranch: daughter__bo2__cmp__bc, 2.428
+TBranch: daughter__bo2__cmclusterE__bc, 0.01963
 TFile: reconstructMCDecay.root
 TTree: variables
 No entry found

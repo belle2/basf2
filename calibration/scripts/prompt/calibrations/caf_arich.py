@@ -14,7 +14,8 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="ARICH channel masks",
-    expert_username="kspenko",
+    expert_username="kristof.spenko",
+    subsystem="arich",
     description=__doc__,
     input_data_formats=["raw"],
     input_data_names=["bhabha_all_calib"],
@@ -23,7 +24,8 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"]]},
-    depends_on=[])
+    depends_on=[],
+    produced_payloads=['ARICHChannelMask'])
 
 ##############################
 

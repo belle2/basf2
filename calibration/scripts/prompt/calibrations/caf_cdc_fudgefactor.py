@@ -20,7 +20,8 @@ from vertex import treeFit
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="CDC Sigma fudge factor",
-                               expert_username="dvthanh",
+                               expert_username="dongthanh.ht",
+                               subsystem="cdc",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["mumu_tight_or_highm_calib"],
@@ -37,7 +38,8 @@ settings = CalibrationSettings(name="CDC Sigma fudge factor",
                                    "vertex_fit": 0,
                                     "payload_boundaries": [],
                                    "backend_args": {"request_memory": "4 GB"}
-                               })
+                               },
+                               produced_payloads=["CDCFudgeFactorsForSigma"])
 
 
 ################################################

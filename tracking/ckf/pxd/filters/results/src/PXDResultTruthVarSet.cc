@@ -10,6 +10,7 @@
 
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

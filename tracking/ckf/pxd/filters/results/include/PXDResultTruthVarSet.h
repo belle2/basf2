@@ -14,10 +14,10 @@
 #include <tracking/ckf/pxd/utilities/PXDMCUtil.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 namespace Belle2 {
   class CKFToPXDResult;
+  class EventMetaData;
 
   /// Names of the variables to be generated.
   constexpr

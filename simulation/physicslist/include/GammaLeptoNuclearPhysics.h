@@ -9,13 +9,13 @@
 #pragma once
 
 #include "G4VPhysicsConstructor.hh"
-#include "G4GammaParticipants.hh"
-#include "G4QGSModel.hh"
 
 class G4TheoFSGenerator;
 class G4ExcitedStringDecay;
 class G4QGSMFragmentation;
 class G4GeneratorPrecompoundInterface;
+class G4GammaParticipants;
+template<class T> class G4QGSModel;
 
 namespace Belle2 {
 

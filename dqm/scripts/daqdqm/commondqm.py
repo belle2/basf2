@@ -120,7 +120,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         # TTD trigger and bunch injection monitoring
         path.add_module('TTDDQM')
 
-    if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
+    if dqm_mode in ["dont_care", "filtered"]:
         # HLT
         hlt_trigger_lines_in_plot = []
         hlt_skim_lines_in_plot = []
@@ -350,14 +350,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         add_mirabelle_dqm(path)
         get_hadB_path(path)
-
-    # KLM2 (requires mu+ particle list from add_analysis_dqm)
-    if (components is None or ('KLM' in components and 'CDC' in components)) and (dqm_mode in ["dont_care", "filtered"]):
-        path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM',
-                        MinimalMatchingDigits=12,
-                        MinimalMatchingDigitsOuterLayers=0,
-                        MinimalMomentumNoOuterLayers=4.0,
-                        SoftwareTriggerName="")
 
     # We want to see the datasize of all events after removing the raw data
     if dqm_mode in ["dont_care", "all_events"]:

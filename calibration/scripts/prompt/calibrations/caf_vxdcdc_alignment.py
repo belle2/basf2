@@ -50,7 +50,9 @@ default_config = {
     "hadron.max_processed_events_per_file": 1000,
     "mumu.max_processed_events_per_file": 5000,
     "offip.max_processed_events_per_file": 2000,
-    "stage1.method": "decomposition"
+    "beamspot.min_pxd_hits": 0,
+    "stage1.method": "decomposition",
+    "stage1.z_offset": True
 }
 
 quality_flags = [INPUT_DATA_FILTERS["Run Type"]["physics"],
@@ -59,7 +61,8 @@ quality_flags = [INPUT_DATA_FILTERS["Run Type"]["physics"],
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="Full VXD and CDC Alignment",
-                               expert_username="bilkat",
+                               expert_username="tadeas.bilka",
+                               subsystem="alignment",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=collection_names,
@@ -71,7 +74,8 @@ settings = CalibrationSettings(name="Full VXD and CDC Alignment",
                                },
 
                                expert_config=default_config,
-                               depends_on=[cdc_calibration, svd_time_calibration])
+                               depends_on=[cdc_calibration, svd_time_calibration],
+                               produced_payloads=["VXDAlignment", "CDCAlignment"])
 
 
 def select_files(all_input_files, min_events, max_processed_events_per_file):
@@ -304,7 +308,7 @@ def create_beamspot(files, cfg):
 
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
-    muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
+    muSelection += f' and nPXDHits >= {cfg["beamspot.min_pxd_hits"]} and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BS', muSelection, path=path)
     ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=path)
 
@@ -354,7 +358,7 @@ def create_stage1(files, cfg):
         timedep=None,
         constraints=[
             alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),
-            alignment.constraints.CDCLayerConstraints(z_offset=False, z_scale=False, twist=False),
+            alignment.constraints.CDCLayerConstraints(z_offset=cfg["stage1.z_offset"], z_scale=False, twist=False),
             alignment.constraints.CDCWireConstraints(layer_rigid=True, layer_radius=[53], cdc_radius=True, hemisphere=[55])
         ],
         fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=False)

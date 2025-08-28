@@ -169,7 +169,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           prune_temporary_tracks=True, fit_tracks=True,
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                           svd_standalone_mode="VXDTF2",
-                                          use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
+                                          use_svd_to_cdc_ckf=True, svd_ckf_mode="SVD_after", use_ecl_to_cdc_ckf=False,
                                           add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                           pxd_filtering_offline=False,
                                           create_intercepts_for_pxd_ckf=False,
@@ -198,6 +198,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
            Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
            Defaults to "VXDTF2"
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
+    :param svd_ckf_mode: how to apply the CKF (with or without SVD standalone tracking). Defaults to "SVD_after".
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found CDC standalone tracks
@@ -259,6 +260,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                           use_second_cdc_hits=use_second_cdc_hits,
                           svd_standalone_mode=svd_standalone_mode,
                           use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
+                          svd_ckf_mode=svd_ckf_mode,
                           use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
                           add_cdcTrack_QI=add_cdcTrack_QI,
                           add_vxdTrack_QI=add_vxdTrack_QI,
@@ -275,6 +277,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                                   trackFitHypotheses=trackFitHypotheses,
                                                   reco_tracks=reco_tracks,
                                                   add_mva_quality_indicator=add_recoTrack_QI)
+    # estimate the track time
+    path.add_module('TrackTimeEstimator')
 
 
 def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, reco_tracks="RecoTracks",
@@ -314,9 +318,6 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     # Kink finding
     if kink_finding:
         path.add_module('KinkFinder', RecoTracks=reco_tracks)
-
-    # estimate the track time
-    path.add_module('TrackTimeEstimator')
 
     add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
                    use_second_cdc_hits=use_second_cdc_hits)

@@ -7,12 +7,9 @@
 ##########################################################################
 
 """
-Airflow script for automatic CDC dEdx calibration. It is currently for the electron based
-calibration, where at present only RunGain, injection time, Cosine and WireGain are implimented.
-The remaining two 2D and 1D will be implimented in the near future.
-
-Second part called "Hadron calibration" are not compitable with CAF/AirFlow
-and will be done offline for a while.
+Airflow script for automatic CDC dEdx calibration. It is the electron based
+calibration, where at present only RunGain, injection time, Cosine, WireGain and 1D are implemented.
+The remaining two 2D will be implemented in the near future.
 """
 
 import ROOT
@@ -33,7 +30,8 @@ ROOT.gROOT.SetBatch(True)
 
 settings = CalibrationSettings(
     name="CDC dedx",
-    expert_username="renu",
+    expert_username="renu92garg",
+    subsystem="cdc",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib"],
@@ -56,7 +54,9 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS['Beam Energy']['4S'],
             INPUT_DATA_FILTERS['Beam Energy']['Continuum'],
             INPUT_DATA_FILTERS['Beam Energy']['Scan']]},
-    depends_on=[])
+    depends_on=[],
+    produced_payloads=["CDCDedxInjectionTime", "CDCDedxCosineEdge", "CDCDedxBadWires",
+                       "CDCDedxWireGain", "CDCDedx1DCell", "CDCDedxCosineCor", "CDCDedxRunGain"])
 
 
 def get_calibrations(input_data, **kwargs):

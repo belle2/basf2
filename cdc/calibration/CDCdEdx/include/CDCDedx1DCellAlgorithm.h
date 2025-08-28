@@ -202,10 +202,11 @@ namespace Belle2 {
 
   private:
 
-    double m_eaMin; /**< lower edge of enta angle */
-    double m_eaMax; /**< upper edge of enta angle */
-    double m_eaBW; /**< binwdith of enta angle bin */
-    int m_eaBin; /**< # of bins for enta angle */
+    double m_eaMin; /**< lower edge of entrance angle */
+    double m_eaMax; /**< upper edge of entrance angle */
+    double m_eaBW; /**< binwdith of entrance angle bin */
+    int m_eaBin; /**< # of bins for entrance angle */
+    int m_eaB; /**< reset # of bins for entrance angle for each experiment */
 
     double m_dedxMin;  /**< lower edge of dedxhit */
     double m_dedxMax;  /**< upper edge of dedxhit */

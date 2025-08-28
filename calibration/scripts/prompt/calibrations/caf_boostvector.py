@@ -12,16 +12,15 @@ Airflow script to perform BoostVector calibration.
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_beamspot import settings as beamspot
-from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 from basf2 import get_file_metadata, B2WARNING
-import rawdata as rd
-import reconstruction as re
+from reconstruction import prepare_cdst_analysis
 import os
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="BoostVector Calibrations",
-    expert_username="zlebcr",
+    expert_username="zlebcik",
+    subsystem="beam",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["mumu_tight_or_highm_calib"],
@@ -35,7 +34,8 @@ settings = CalibrationSettings(
         "outerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
         "innerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
         "minPXDhits": 0},
-    depends_on=[beamspot])
+    depends_on=[beamspot],
+    produced_payloads=["CollisionBoostVector"])
 
 ##############################
 
@@ -118,9 +118,7 @@ def get_calibrations(input_data, **kwargs):
     # module to be run prior the collector
     rec_path_1 = create_path()
     if isCDST:
-        rec_path_1.add_module("RootInput", branchNames=ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS)
-        rd.add_unpackers(rec_path_1)
-        re.add_reconstruction(rec_path_1)
+        prepare_cdst_analysis(path=rec_path_1, components=['SVD', 'CDC', 'ECL', 'KLM'])
 
     minPXDhits = kwargs['expert_config']['minPXDhits']
     muSelection = '[p>1.0]'

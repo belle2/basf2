@@ -91,6 +91,8 @@ void DQMHistAnalysisTRGGDLModule::initialize()
   }
   m_c_pure_eff = new TCanvas("TRGGDL/hGDL_ana_pure_eff");
 
+  // Mirabelle
+  m_mon_h_eff_shifter_fast = getMonitoringObject("trg");
 
 
 #ifdef _BELLE2_EPICS
@@ -776,6 +778,32 @@ void DQMHistAnalysisTRGGDLModule::event()
 void DQMHistAnalysisTRGGDLModule::endRun()
 {
   B2DEBUG(20, "DQMHistAnalysisTRGGDL : endRun called");
+
+  // mirabelle
+  const char* mon_eff_shifter[n_eff_shifter] = {
+    "CDC_fff",
+    "CDC_ffo",
+    "CDC_ffy",
+    "CDC_fyo",
+    "ECL_hie",
+    "ECL_c4",
+    "BKLM_b2b",
+    "EKLM_b2b",
+    "CDC_BKLM_lt1",
+    "CDC_ECL_lt1",
+    "ECL_EKLM_lt0",
+    "CDC_syo",
+    "CDC_yio",
+    "CDC_stt"
+  };  // The name of the Mirabelle variable for the bin labels of the simplified efficiency histogram.
+  for (int i = 1; i <= n_eff_shifter; i++) {
+    B2DEBUG(1, "The name for MonitoringObject histogram is " << mon_eff_shifter[i - 1] << "  " << m_h_eff_shifter_fast->GetBinContent(
+              i) << "   " << m_h_eff_shifter_fast->GetBinError(i));
+    m_mon_h_eff_shifter_fast->setVariable(mon_eff_shifter[i - 1],
+                                          m_h_eff_shifter_fast->GetBinContent(i),
+                                          m_h_eff_shifter_fast->GetBinError(i),
+                                          m_h_eff_shifter_fast->GetBinError(i));
+  }
 }
 
 void DQMHistAnalysisTRGGDLModule::terminate()

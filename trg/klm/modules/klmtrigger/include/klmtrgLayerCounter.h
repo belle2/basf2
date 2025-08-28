@@ -15,7 +15,7 @@
 namespace Belle2 {
 
 
-  class klmtrg_layer_counter_t {
+  class klmtrgLayerCounter {
   public:
     void clear_layersUsed();
     void add_layersUsed(int layersUsed);

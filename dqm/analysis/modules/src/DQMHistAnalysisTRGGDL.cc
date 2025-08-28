@@ -44,11 +44,6 @@ DQMHistAnalysisTRGGDLModule::DQMHistAnalysisTRGGDLModule()
 
 DQMHistAnalysisTRGGDLModule::~DQMHistAnalysisTRGGDLModule()
 {
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
 }
 
 void DQMHistAnalysisTRGGDLModule::initialize()
@@ -97,7 +92,6 @@ void DQMHistAnalysisTRGGDLModule::initialize()
 
 #ifdef _BELLE2_EPICS
   if (getUseEpics()) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     for (int i = 0; i < n_eff_shifter; i++) {
       std::string aa = "TRGAna:eff_shift_" + std::to_string(i);
       SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[i]), "ca_create_channel failure");
@@ -108,7 +102,6 @@ void DQMHistAnalysisTRGGDLModule::initialize()
       std::string aa = "TRGAna:entry_" + std::to_string(i);
       SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid_entry[i]), "ca_create_channel failure");
     }
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
 
@@ -769,7 +762,6 @@ void DQMHistAnalysisTRGGDLModule::event()
 
       if (mychid_entry[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid_entry[i], (void*)&data), "ca_set failure");
     }
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
 
@@ -816,7 +808,6 @@ void DQMHistAnalysisTRGGDLModule::terminate()
     for (auto i = 0; i < nskim_gdldqm; i++) {
       if (mychid_entry[i]) SEVCHK(ca_clear_channel(mychid_entry[i]), "ca_clear_channel failure");
     }
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
   B2DEBUG(20, "terminate called");

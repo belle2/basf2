@@ -47,7 +47,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
   addParam("alarmAdhoc", m_alarmAdhoc, "Generate Alarm from adhoc values", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
-  addParam("excluded", m_excluded, "the list of excluded modules, indices from 0 to 39");
+  addParam("excluded", m_excluded, "the list of excluded modules, indices from 0 to 39", std::vector<int>());
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
@@ -293,7 +293,7 @@ void DQMHistAnalysisPXDEffModule::event()
   {
     // First create some 2d overview of efficiency for all modules
     // This is not taken into account for efficiency calculation as
-    // there may be update glitches dues to seperate histograms
+    // there may be update glitches dues to separate histograms
     // The histograms
     bool updateinner = false, updateouter = false;
     for (auto aPXDModule : m_PXDModules) {
@@ -432,7 +432,7 @@ void DQMHistAnalysisPXDEffModule::event()
       // workaround for excluded module
       if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
 
-      // get the errors and check for limits for each bin seperately ...
+      // get the errors and check for limits for each bin separately ...
 
       if (nhit >= m_minEntries) {
         error_flag |= check_error_level(bin, aModule);

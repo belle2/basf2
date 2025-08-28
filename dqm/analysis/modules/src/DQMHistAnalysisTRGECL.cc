@@ -34,7 +34,7 @@ DQMHistAnalysisTRGECLModule::DQMHistAnalysisTRGECLModule()
 
   addParam("MinEntryForFit",
            m_MinEntryForFit,
-           "set minimum numeber of entries for fit (default=200)",
+           "set minimum number of entries for fit (default=200)",
            m_MinEntryForFit);
 }
 
@@ -72,7 +72,7 @@ void DQMHistAnalysisTRGECLModule::initialize()
   h_EventTimingEnergyFraction->SetLineColor(4);
   h_EventTimingEnergyFraction->SetMinimum(0);
 
-  // set EventT0 histgram names
+  // set EventT0 histogram names
   s_histNameEventT0 = std::vector<std::string>(15, "");
   for (int iii = 0; iii < 15; iii++) {
     std::stringstream ss1, ss2;
@@ -213,7 +213,7 @@ void DQMHistAnalysisTRGECLModule::getEventT0(std::vector<std::string> s_HistName
       if (nToFit > m_MinEntryForFit &&
           nToFit > 200) {
 
-        // peform fit on EventT0 and get peak position and width
+        // perform fit on EventT0 and get peak position and width
         fitEventT0(hhh, par_fit);
 
       }
@@ -245,7 +245,7 @@ void DQMHistAnalysisTRGECLModule::fitEventT0(TH1* hist,
                     x_min,
                     x_max,
                     3);
-  // set inititial parameters of Gaussian
+  // set initial parameters of Gaussian
   f1->SetParameters(v_norm, v_mean, v_rms);
 
   // perform fit

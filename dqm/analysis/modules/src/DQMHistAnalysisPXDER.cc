@@ -85,7 +85,7 @@ void DQMHistAnalysisPXDERModule::initialize()
     int iSensor = 0;
     getIDsFromIndex(i, iLayer, iLadder, iSensor);
     VxdID sensorID(iLayer, iLadder, iSensor);
-    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     //----------------------------------------------------------------
     // Number of fired pixels per frame
@@ -259,8 +259,8 @@ void DQMHistAnalysisPXDERModule::event()
   // Compare histograms with reference histograms and create flags:
   for (int i = 0; i < c_nPXDSensors; i++) {
     double pars[2];
-    pars[0] = 0.01;// Probabilty value error?
-    pars[1] = 0.05;// Probabilty value warning?
+    pars[0] = 0.01;// Probability value error?
+    pars[1] = 0.05;// Probability value warning?
 
     double m_NoOfEvents = 1., m_NoOfEventsRef = 1.; // workaround
 
@@ -343,7 +343,7 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, d
     flagInt += temp->GetBinContent(j + 1);
     flagrInt += refhist->GetBinContent(j + 1);
   }
-  if (NEvents < 100) {  // not enough information for comparition
+  if (NEvents < 100) {  // not enough information for comparison
     iret = -1;
     flaghist->SetBinContent(bin + 1, -1);
     return iret;

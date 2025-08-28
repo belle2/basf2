@@ -10,7 +10,6 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 
-#include <TFile.h>
 #include <TCanvas.h>
 #include <TH1.h>
 #include <TH2.h>
@@ -155,6 +154,11 @@ namespace Belle2 {
     void makePMTHitRatesPlots();
 
     /**
+     * Makes projections of injection BG plots
+     */
+    void makeInjectionBGPlots();
+
+    /**
      * Sets MiraBelle variables from the histogram with bins corresponding to slot numbers.
      * @param variableName variable name
      * @param histogram histogram with bins corresponding to slot numbers
@@ -250,7 +254,6 @@ namespace Belle2 {
     std::vector<double> m_eventT0RmsAlarmLevels = {10, 20}; /**< alarm levels for r.m.s. of event T0 [ ns] */
     std::vector<double> m_offsetMeanAlarmLevels = {0.2, 0.5}; /**< alarm levels for mean of bunch offset [ns] */
     std::vector<double> m_offsetRmsAlarmLevels = {0.25, 0.50}; /**< alarm levels for r.m.s. of bunch offset [ns] */
-    std::string m_refFileName; /**< file name of reference histograms */
 
     // other
 
@@ -264,9 +267,6 @@ namespace Belle2 {
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
     std::string m_runType; /**< Run type */
     double m_numEvents = 0; /**< number of events processed with TOPDQM module */
-
-    TFile* m_refFile = nullptr; /**< file containing reference histograms */
-    std::map<std::string, TH1F*> m_refTimingHisto; /**< timing reference histograms for different run types */
 
     TH1D* m_photonYields = nullptr; /**< photon yields per slot */
     TH1D* m_backgroundRates = nullptr; /**< background rates per slot */
@@ -287,6 +287,10 @@ namespace Belle2 {
 
     std::vector<TH1F*> m_pmtHitRates; /**< histograms of PMT hits per event (index = slot - 1) */
     std::vector<TCanvas*> m_c_pmtHitRates; /**< Canvases of PMT hits per event (index = slot - 1) */
+
+    std::map<std::string, TCanvas*> m_c_injBGs; /**< Canvases for projections of injection BG histograms */
+    std::map<std::string, TProfile*> m_profiles; /**< profiles of injection BG */
+    std::map<std::string, TH1D*> m_projections; /**< projections of injection BG */
 
     std::vector<TLine*> m_asicWindowsBandLines; /**< lines denoting a band of good windows */
     std::vector<TLine*> m_verticalLines; /**< vertical lines splitting slots */

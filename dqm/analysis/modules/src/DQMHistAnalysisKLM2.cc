@@ -32,8 +32,7 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   setDescription("Module used to analyze KLM Efficiency DQM histograms (depends on tracking variables).");
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
   addParam("RefHistogramDirectoryName", m_refHistogramDirectoryName, "Name of ref histogram directory",
-           std::string("ref/KLMEfficiencyDQM"));
-  addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
+           std::string("KLMEfficiencyDQM"));
   addParam("RunStopThreshold", m_stopThr, "Set stop threshold", float(0.20));
   addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0.5));
   addParam("WarnThreshold", m_warnThr, "Set warn threshold", float(0.92));
@@ -62,80 +61,6 @@ void DQMHistAnalysisKLM2Module::initialize()
   registerEpicsPV("KLM:Eff:nEffEKLMLayers", "nEffEKLMLayers");
   registerEpicsPV("KLM:Eff:2DEffSettings", "2DEffSettings");
 
-  if (m_refFileName != "") {
-    m_refFile = TFile::Open(m_refFileName.data(), "READ");
-  }
-
-  // Get Reference Histograms
-  if (m_refFile && m_refFile->IsOpen()) {
-    B2INFO("DQMHistAnalysisKLM2: reference root file (" << m_refFileName << ") FOUND, able to read ref histograms");
-
-    m_ref_efficiencies_bklm = (TH1F*)m_refFile->Get((m_refHistogramDirectoryName + "/eff_bklm_plane").data());
-    if (m_ref_efficiencies_bklm != nullptr) {
-      B2INFO("DQMHistAnalysisKLM2: eff_bklm_plane histogram was found in reference");
-      m_ref_efficiencies_bklm->SetLineColor(2);
-      m_ref_efficiencies_bklm->SetOption("HIST");
-      m_ref_efficiencies_bklm->SetStats(false);
-    } else {
-      B2WARNING("DQMHistAnalysisKLM2: eff_bklm_plane histogram not found in reference");
-      m_ref_efficiencies_bklm = new TH1F("eff_bklm_plane", "Plane Efficiency in BKLM", BKLMElementNumbers::getMaximalLayerGlobalNumber(),
-                                         0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
-      for (int lay_id = 0; lay_id < BKLMElementNumbers::getMaximalLayerGlobalNumber(); lay_id++) {
-        if (m_ratio) {
-          m_ref_efficiencies_bklm->SetBinContent(lay_id + 1, 1);
-        } else {
-          m_ref_efficiencies_bklm->SetBinContent(lay_id + 1, 0);
-        }
-      }
-    }
-
-
-    m_ref_efficiencies_eklm = (TH1F*)m_refFile->Get((m_refHistogramDirectoryName + "/eff_eklm_plane").data());
-    if (m_ref_efficiencies_eklm != nullptr) {
-      B2INFO("DQMHistAnalysisKLM2: eff_eklm_plane histogram was found in reference");
-      m_ref_efficiencies_eklm->SetLineColor(2);
-      m_ref_efficiencies_eklm->SetOption("HIST");
-      m_ref_efficiencies_eklm->SetStats(false);
-    } else {
-      B2WARNING("DQMHistAnalysisKLM2: eff_eklm_plane histogram not found in reference");
-      m_ref_efficiencies_eklm = new TH1F("eff_eklm_plane", "Plane Efficiency in EKLM", EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
-                                         0.5, 0.5 + EKLMElementNumbers::getMaximalPlaneGlobalNumber());
-      for (int lay_id = 0; lay_id < EKLMElementNumbers::getMaximalPlaneGlobalNumber(); lay_id++) {
-        if (m_ratio) {
-          m_ref_efficiencies_eklm->SetBinContent(lay_id + 1, 1);
-        } else {
-          m_ref_efficiencies_eklm->SetBinContent(lay_id + 1, 0);
-        }
-      }
-    }
-  } else {
-    B2WARNING("DQMHistAnalysisKLM2: reference root file (" << m_refFileName << ") not found, or closed");
-
-    // Switch to absolute 2D efficiencies if reference histogram is not found
-    m_stopThr = 0.0;
-    m_alarmThr = 0.35;
-    m_warnThr = 0.5; //contigency value to still spot some problems
-    m_ref_efficiencies_bklm = new TH1F("eff_bklm_plane", "Plane Efficiency in BKLM", BKLMElementNumbers::getMaximalLayerGlobalNumber(),
-                                       0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
-    for (int lay_id = 0; lay_id < BKLMElementNumbers::getMaximalLayerGlobalNumber(); lay_id++) {
-      if (m_ratio) {
-        m_ref_efficiencies_bklm->SetBinContent(lay_id + 1, 1);
-      } else {
-        m_ref_efficiencies_bklm->SetBinContent(lay_id + 1, 0);
-      }
-    }
-
-    m_ref_efficiencies_eklm = new TH1F("eff_eklm_plane", "Plane Efficiency in EKLM", EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
-                                       0.5, 0.5 + EKLMElementNumbers::getMaximalPlaneGlobalNumber());
-    for (int lay_id = 0; lay_id < EKLMElementNumbers::getMaximalPlaneGlobalNumber(); lay_id++) {
-      if (m_ratio) {
-        m_ref_efficiencies_eklm->SetBinContent(lay_id + 1, 1);
-      } else {
-        m_ref_efficiencies_eklm->SetBinContent(lay_id + 1, 0);
-      }
-    }
-
-  }
   gROOT->cd();
   m_c_eff_bklm = new TCanvas((m_histogramDirectoryName + "/c_eff_bklm_plane").data());
   m_c_eff_eklm = new TCanvas((m_histogramDirectoryName + "/c_eff_eklm_plane").data());
@@ -264,37 +189,61 @@ void DQMHistAnalysisKLM2Module::initialize()
 
 }
 
+void DQMHistAnalysisKLM2Module::initialize2DRefHistogram(TH1*& hist, const std::string& histName, const std::string& title,
+                                                         int maxLayer)
+{
+  // Get reference histogram using the base class method
+  hist = findRefHist(m_refHistogramDirectoryName, histName, ERefScaling::c_RefScaleNone);
+
+  if (hist) {
+    B2INFO("DQMHistAnalysisKLM2: " + histName + " histogram was found in reference");
+    hist->SetLineColor(2);
+    hist->SetOption("HIST");
+    hist->SetStats(false);
+  } else {
+    B2WARNING("DQMHistAnalysisKLM2: " + histName + " histogram not found in reference");
+    hist = new TH1F(histName.c_str(), title.c_str(), maxLayer, 0.5, 0.5 + maxLayer);
+    for (int lay_id = 0; lay_id < maxLayer; lay_id++) {
+      hist->SetBinContent(lay_id + 1, m_ratio ? 1 : 0);
+    }
+  }
+}
 
 void DQMHistAnalysisKLM2Module::beginRun()
 {
   m_IsPhysicsRun = (getRunType() == "physics");
   m_IsNullRun = (getRunType() == "null");
 
+  // Initialize reference histograms for 2D efficiency plots
+  initialize2DRefHistogram(m_ref_efficiencies_bklm, "eff_bklm_plane", "Plane Efficiency in BKLM",
+                           BKLMElementNumbers::getMaximalLayerGlobalNumber());
+
+  initialize2DRefHistogram(m_ref_efficiencies_eklm, "eff_eklm_plane", "Plane Efficiency in EKLM",
+                           EKLMElementNumbers::getMaximalPlaneGlobalNumber());
+
   double unused = NAN;
   //ratio/diff mode should only be possible if references exist
-  if (m_refFile && m_refFile->IsOpen()) {
-    // values for LOLO, LOW & High error are used for (run-)stopThr, alarmThr and warnThr settings
-    // default values should be initially defined in input parameters?
-    double tempStop = (double) m_stopThr;
-    double tempAlarm = (double) m_alarmThr;
-    double tempWarn = (double) m_warnThr;
-    requestLimitsFromEpicsPVs("2DEffSettings", tempStop, tempAlarm, tempWarn, unused);
+  // values for LOLO, LOW & High error are used for (run-)stopThr, alarmThr and warnThr settings
+  // default values should be initially defined in input parameters?
+  double tempStop = (double) m_stopThr;
+  double tempAlarm = (double) m_alarmThr;
+  double tempWarn = (double) m_warnThr;
+  requestLimitsFromEpicsPVs("2DEffSettings", tempStop, tempAlarm, tempWarn, unused);
 
-    // Create an array of the Thresholds
-    double valuesThr[] = { tempStop, tempAlarm, tempWarn };
+  // Create an array of the Thresholds
+  double valuesThr[] = { tempStop, tempAlarm, tempWarn };
 
-    // Sort the array from lowest to highest
-    std::sort(std::begin(valuesThr), std::end(valuesThr));
+  // Sort the array from lowest to highest
+  std::sort(std::begin(valuesThr), std::end(valuesThr));
 
-    // Assign the sorted threshold values
-    m_stopThr = (float)(valuesThr[0]);   // lowest value i.e, //lolo
-    m_alarmThr = (float)(valuesThr[1]);  // middle value i.e, //low
-    m_warnThr = (float)(valuesThr[2]);   // highest value i.e, //high
+  // Assign the sorted threshold values
+  m_stopThr = (float)(valuesThr[0]);   // lowest value i.e, //lolo
+  m_alarmThr = (float)(valuesThr[1]);  // middle value i.e, //low
+  m_warnThr = (float)(valuesThr[2]);   // highest value i.e, //high
 
-    // EPICS should catch if this happens but just in case
-    if (m_alarmThr > m_warnThr || m_stopThr > m_warnThr || m_stopThr > m_alarmThr) {
-      B2WARNING("DQMHistAnalysisKLM2Module: Found that alarmThr or alarmStop is greater than warnThr...");
-    }
+  // EPICS should catch if this happens but just in case
+  if (m_alarmThr > m_warnThr || m_stopThr > m_warnThr || m_stopThr > m_alarmThr) {
+    B2WARNING("DQMHistAnalysisKLM2Module: Found that alarmThr or alarmStop is greater than warnThr...");
   }
   m_BKLMLayerWarn = 5;
   m_EKLMLayerWarn = 5;
@@ -363,11 +312,16 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
 {
   effHist->Reset();
   std::unique_ptr<TH1> effClone(static_cast<TH1*>
-                                (effHist->Clone()));   // Clone effHist, will be useful for delta plots & Smart pointer will mange memory leak
+                                (effHist->Clone()));   // Clone effHist, will be useful for delta plots & Smart pointer will manage memory leak
   canvas->cd();
   if (denominator != nullptr && numerator != nullptr) {
     effHist->Divide(numerator, denominator, 1, 1, "B");
     effHist->Draw();
+
+    //reference check
+    TH1* ref = findRefHist(effHist->GetName(), ERefScaling::c_RefScaleNone);
+    if (ref) {ref->Draw("hist,same");}
+
     canvas->Modified();
     canvas->Update();
 
@@ -383,7 +337,7 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
       B2INFO("DQMHistAnalysisKLM2: Eff Delta Num/Denom Entries is " << deltaNumer->GetEntries() << "/" << deltaDenom->GetEntries());
       effClone->Divide(deltaNumer, deltaDenom, 1, 1, "B");
       effClone->SetLineColor(kOrange);
-      effClone->DrawCopy("SAME"); // managed by ROOT, so it helpes in plotting even if obj deleted by smart pointer
+      effClone->DrawCopy("SAME"); // managed by ROOT, so it helps in plotting even if obj deleted by smart pointer
       canvas->Modified();
       canvas->Update();
     }
@@ -452,7 +406,7 @@ void DQMHistAnalysisKLM2Module::processPlaneHistogram(
 
 void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   TH1* mainHist, TH1* refHist, TH2* eff2dHist, TH2* errHist, int layers, int sectors, bool ratioPlot,
-  int* pvcount, double layerLimit, TCanvas* eff2dCanv)
+  int& pvcount, double layerLimit, TCanvas* eff2dCanv)
 {
 
   int i = 0;
@@ -470,10 +424,11 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   bool setWarn = false;
   bool setFew = false;
   int mainEntries;
+  int layercount = 0;
 
   errHist->Reset(); // Reset histogram
 
-  *pvcount = 0; //initialize to zero
+  pvcount = 0; // Initialize to zero
   mainEntries = mainHist->GetEntries();
 
   for (int binx = 0; binx < sectors; binx++) {
@@ -504,7 +459,8 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
 
         if (ratioPlot) {
           eff2dVal = mainEff / refEff;
-          if (eff2dVal < alarmThr) {errHist->SetBinContent(binx + 1, biny + 1, eff2dVal);}
+          // Set threshold to warnThr("high") to capture efficiency drops across layers earlier
+          if (eff2dVal < warnThr) {errHist->SetBinContent(binx + 1, biny + 1, eff2dVal);}
         } else {
           eff2dVal = (mainEff - refEff) / pow(pow(mainErr, 2) + pow(refErr, 2), 0.5);
         }
@@ -526,11 +482,13 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
           setFew = true;
         } else {
           if (eff2dVal < warnThr) {
-            *pvcount += 1;
+            pvcount += 1;
             if ((eff2dVal <= alarmThr) && (eff2dVal >= stopThr)) {
               setWarn = true;
+              layercount++;                  // Increment layercount when alarm condition is met
             } else if (eff2dVal < stopThr) {
               setAlarm = true;
+              layercount++;                  // Increment layercount when a stop condition is met
             }
           }
         }
@@ -541,7 +499,10 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
 
   }//end of bin x
 
-  if (*pvcount > (int) layerLimit) {
+  if ((pvcount - layercount) > (int) layerLimit) {
+    setWarn = true;
+  }
+  if (layercount > (int) layerLimit) {
     setAlarm = true;
   }
 
@@ -618,12 +579,12 @@ void DQMHistAnalysisKLM2Module::event()
   /* Make Diff 2D plots */
   process2DEffHistogram(m_eff_bklm, m_ref_efficiencies_bklm, m_eff2d_bklm, m_err_bklm,
                         BKLMElementNumbers::getMaximalLayerNumber(), BKLMElementNumbers::getMaximalSectorGlobalNumber(),
-                        m_ratio, &m_nEffBKLMLayers, m_BKLMLayerWarn, m_c_eff2d_bklm);
+                        m_ratio, m_nEffBKLMLayers, m_BKLMLayerWarn, m_c_eff2d_bklm);
 
   process2DEffHistogram(m_eff_eklm, m_ref_efficiencies_eklm, m_eff2d_eklm, m_err_eklm,
                         EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),
                         EKLMElementNumbers::getMaximalPlaneGlobalNumber() / EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),
-                        m_ratio, &m_nEffEKLMLayers, m_EKLMLayerWarn, m_c_eff2d_eklm);
+                        m_ratio, m_nEffEKLMLayers, m_EKLMLayerWarn, m_c_eff2d_eklm);
   /* Set EPICS PV Values*/
   B2DEBUG(20, "DQMHistAnalysisKLM2: Updating EPICS PVs");
   // only update PVs if there's enough statistics and datasize != 0

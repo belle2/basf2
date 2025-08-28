@@ -41,7 +41,7 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   addParam("UpperWarnLimit", m_meanUpperWarn, "Mean Reduction High limit for warning", double(NAN)); // default is NAN =disable
   addParam("UpperErrorLimit", m_meanUpperAlarm, "Mean Reduction High limit for alarms", double(NAN)); // default is NAN =disable
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
-  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)", std::vector<int>());
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 
@@ -164,7 +164,7 @@ void DQMHistAnalysisPXDReductionModule::event()
     // std::replace( name.begin(), name.end(), '.', '_');
 
     TH1* hh1 = getDelta(m_histogramDirectoryName, name);
-    // no inital sampling, we should get plenty of statistics
+    // no initial sampling, we should get plenty of statistics
     if (hh1) {
       auto mean = hh1->GetMean();
       m_hReduction->SetBinContent(i + 1, mean);
@@ -179,7 +179,7 @@ void DQMHistAnalysisPXDReductionModule::event()
     // ignore modules in exclude list
     if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
     auto mean = m_hReduction->GetBinContent(i + 1);
-    if (mean > 0) { // onyl for valid values
+    if (mean > 0) { // only for valid values
       ireduction += mean; // well fit would be better
       ireductioncnt++;
     }

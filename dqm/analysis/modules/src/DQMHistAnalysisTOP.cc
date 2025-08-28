@@ -14,6 +14,7 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TProfile.h>
+#include <TProfile2D.h>
 #include <TString.h>
 #include <map>
 
@@ -65,8 +66,6 @@ DQMHistAnalysisTOPModule::DQMHistAnalysisTOPModule(): DQMHistAnalysisModule()
            "alarm levels for mean of bunch offset [ns]", m_offsetMeanAlarmLevels);
   addParam("offsetRmsAlarmLevels", m_offsetRmsAlarmLevels,
            "alarm levels for r.m.s. of bunch offset [ns]", m_offsetRmsAlarmLevels);
-  addParam("ReferenceFile", m_refFileName, "file name of reference histograms",
-           std::string("/home/group/dqmdaq/references/refHisto.root"));
 
   B2DEBUG(20, "DQMHistAnalysisTOP: Constructor done.");
 }
@@ -182,6 +181,16 @@ void DQMHistAnalysisTOPModule::initialize()
     m_c_pmtHitRates.push_back(new TCanvas(cname.c_str(), ctitle.c_str()));
   }
 
+  for (std::string name : {
+         "nhitInjLER", "nhitInjHER", "nhitInjLERcut", "nhitInjHERcut",
+         "eventInjLER", "eventInjHER", "eventInjLERcut", "eventInjHERcut"
+       }) {
+    for (std::string proj : {"_px", "_py"}) {
+      std::string cname = "TOP/c_" + name + proj;
+      m_c_injBGs[cname] = new TCanvas(cname.c_str(), (name + proj).c_str());
+    }
+  }
+
   m_text1 = new TPaveText(0.125, 0.8, 0.675, 0.88, "NDC");
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
@@ -211,17 +220,6 @@ void DQMHistAnalysisTOPModule::initialize()
 void DQMHistAnalysisTOPModule::beginRun()
 {
   m_mirabelleVariables.clear();
-
-  // open the reference file and get reference histograms (closed and map cleared in endRun)
-  m_refFile = TFile::Open(m_refFileName.c_str());
-  if (m_refFile and m_refFile->IsOpen()) {
-    m_refTimingHisto["default"] = (TH1F*) m_refFile->Get("ref/TOP/default/goodHitTimes");
-    m_refTimingHisto["debug"] = (TH1F*) m_refFile->Get("ref/TOP/debug/goodHitTimes");
-    m_refTimingHisto["physics"] = (TH1F*) m_refFile->Get("ref/TOP/physics/goodHitTimes");
-    m_refTimingHisto["cosmics"] = (TH1F*) m_refFile->Get("ref/TOP/cosmics/goodHitTimes");
-  } else {
-    B2ERROR("Can't open reference file: " << m_refFileName);
-  }
 
   B2DEBUG(20, "DQMHistAnalysisTOP: beginRun called.");
 }
@@ -292,6 +290,9 @@ void DQMHistAnalysisTOPModule::event()
   // PMT hit rates
   makePMTHitRatesPlots();
 
+  // Injection BG
+  makeInjectionBGPlots();
+
   // Set Epics variables
   setEpicsVariables();
 
@@ -301,20 +302,12 @@ void DQMHistAnalysisTOPModule::event()
 
 void DQMHistAnalysisTOPModule::endRun()
 {
-  // these two histograms do not exist anymore since file is closed, therefore
-  m_photonYields = nullptr;
-  m_backgroundRates = nullptr;
-
   // add MiraBelle monitoring
 
   for (const auto& var : m_mirabelleVariables) {
     m_monObj->setVariable(var.first, var.second);
     B2DEBUG(20, var.first << " " << var.second);
   }
-
-  // close the reference file and clear the histogram container
-  if (m_refFile and m_refFile->IsOpen()) m_refFile->Close();
-  m_refTimingHisto.clear();
 
   B2DEBUG(20, "DQMHistAnalysisTOP : endRun called");
 }
@@ -496,11 +489,7 @@ void DQMHistAnalysisTOPModule::updateTimingCanvas()
   int alarmState = c_Gray;
 
   auto* h = (TH1F*) findHist("TOP/goodHitTimes");
-  TH1F* href = nullptr;
-  if (m_refFile and m_refFile->IsOpen()) {
-    auto it = m_refTimingHisto.find(m_runType);
-    href = (it != m_refTimingHisto.end()) ? it->second : m_refTimingHisto["default"];
-  }
+  auto* href = (TH1F*) findRefHist("TOP/goodHitTimes");
   if (h and href) {
     double n = h->Integral();
     double nref = href->Integral();
@@ -865,6 +854,55 @@ void DQMHistAnalysisTOPModule::makePMTHitRatesPlots()
     h->Draw();
     canvas->Modified();
   }
+}
+
+
+void DQMHistAnalysisTOPModule::makeInjectionBGPlots()
+{
+  for (std::string name : {"nhitInjLER", "nhitInjHER", "nhitInjLERcut", "nhitInjHERcut"}) {
+    std::string hname = "TOP/" + name;
+    auto* h = (TProfile2D*) findHist(hname);
+    if (not h) continue;
+    for (std::string proj : {"_px", "_py"}) {
+      std::string cname = "TOP/c_" + name + proj;
+      auto* canvas = m_c_injBGs[cname];
+      if (not canvas) continue;
+      canvas->Clear();
+      canvas->cd();
+      auto& hproj = m_profiles[cname];
+      if (hproj) delete hproj;
+      hproj = (proj == "_px") ? h->ProfileX((hname + proj).c_str()) : h->ProfileY((hname + proj).c_str());
+      std::string xtitle = (proj == "_px") ? h->GetXaxis()->GetTitle() : h->GetYaxis()->GetTitle();
+      hproj->SetXTitle(xtitle.c_str());
+      hproj->SetYTitle(h->GetZaxis()->GetTitle());
+      hproj->SetMinimum(0);
+      hproj->Draw("hist");
+      canvas->Modified();
+    }
+  }
+
+  for (std::string name : {"eventInjLER", "eventInjHER", "eventInjLERcut", "eventInjHERcut"}) {
+    std::string hname = "TOP/" + name;
+    auto* h = (TH2F*) findHist(hname);
+    if (not h) continue;
+    for (std::string proj : {"_px", "_py"}) {
+      std::string cname = "TOP/c_" + name + proj;
+      auto* canvas = m_c_injBGs[cname];
+      if (not canvas) continue;
+      canvas->Clear();
+      canvas->cd();
+      auto& hproj = m_projections[cname];
+      if (hproj) delete hproj;
+      hproj = (proj == "_px") ? h->ProjectionX((hname + proj).c_str()) : h->ProjectionY((hname + proj).c_str());
+      std::string xtitle = (proj == "_px") ? h->GetXaxis()->GetTitle() : h->GetYaxis()->GetTitle();
+      hproj->SetXTitle(xtitle.c_str());
+      hproj->SetYTitle(h->GetZaxis()->GetTitle());
+      hproj->SetMinimum(0);
+      hproj->Draw("hist");
+      canvas->Modified();
+    }
+  }
+
 }
 
 

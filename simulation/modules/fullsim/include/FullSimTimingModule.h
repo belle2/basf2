@@ -9,12 +9,19 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <simulation/kernel/StepTiming.h>
 #include <map>
 
 class TProfile;
 
+class G4Track;
+class G4LogicalVolume;
+class G4Region;
+
 namespace Belle2 {
+  namespace Simulation {
+    class StepTiming;
+  }
+
   /**
    * \addtogroup modules
    * @{ FullSimTimingModule @}

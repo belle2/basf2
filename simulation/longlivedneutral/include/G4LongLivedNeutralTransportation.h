@@ -8,9 +8,7 @@
 
 // modified from GEANT4 G4Transportation class
 
-
-#ifndef G4LongLivedNeutralTransportation_hh
-#define G4LongLivedNeutralTransportation_hh 1
+#pragma once
 
 #include "G4VProcess.hh"
 #include "G4FieldManager.hh"
@@ -265,5 +263,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif

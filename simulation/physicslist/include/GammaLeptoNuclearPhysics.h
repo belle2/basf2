@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef GAMMALEPTONUCLEARPHYSICS_H
-#define GAMMALEPTONUCLEARPHYSICS_H
+#pragma once
 
 #include "G4VPhysicsConstructor.hh"
 #include "G4GammaParticipants.hh"
@@ -63,5 +62,3 @@ namespace Belle2 {
   } // end of namespace Simulation
 
 } // end of namespace Belle2
-
-#endif // GAMMALEPTONUCLEARPHYSICS_H

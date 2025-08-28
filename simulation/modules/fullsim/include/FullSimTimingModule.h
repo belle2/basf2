@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef SIMULATION_MODULES_FULLSIM_FULLSIMTIMINGMODULE_H
-#define SIMULATION_MODULES_FULLSIM_FULLSIMTIMINGMODULE_H
 
 #include <framework/core/Module.h>
 #include <simulation/kernel/StepTiming.h>
@@ -79,5 +77,3 @@ namespace Belle2 {
     bool m_isInitialized {false};
   };
 }
-
-#endif // SIMULATION_MODULES_FULLSIM_FULLSIMTIMINGMODULE_H

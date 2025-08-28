@@ -9,8 +9,7 @@
 // It is the main interface for the user to define the setup and
 // start the propagation. Initializes GEANT4 for the propagation.
 
-#ifndef EXTMANAGER_H
-#define EXTMANAGER_H
+#pragma once
 
 #include <globals.hh>
 #include <G4ApplicationState.hh>
@@ -137,5 +136,3 @@ namespace Belle2 {
   } // end of namespace Simulation
 
 } // end of namespace Belle2
-
-#endif // EXTMANAGER_H

@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef BELLE2PHYSICSLIST_H
-#define BELLE2PHYSICSLIST_H
+#pragma once
 
 #include "G4VModularPhysicsList.hh"
 
@@ -97,5 +96,3 @@ namespace Belle2 {
   } // end of namespace Simulation
 
 } // end of namespace Belle2
-
-#endif // BELLE2PHYSICSLIST_H

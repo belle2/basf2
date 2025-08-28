@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef SIMULATION_DATAOBJECTS_MCTRAJECTORYPOINT_H
-#define SIMULATION_DATAOBJECTS_MCTRAJECTORYPOINT_H
 
 namespace Belle2 {
   /** Small struct to encode a position/momentum without additional overhead */
@@ -24,5 +22,3 @@ namespace Belle2 {
     float pz; /**< momentum along z */
   };
 } //Belle2 namespace
-
-#endif // SIMULATION_DATAOBJECTS_TRAJECTORYPOINT_H

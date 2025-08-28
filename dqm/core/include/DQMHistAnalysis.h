@@ -14,9 +14,9 @@
 
 #include <framework/core/Module.h>
 #include <dqm/core/MonitoringObject.h>
-#include <dqm/analysis/HistObject.h>
-#include <dqm/analysis/RefHistObject.h>
-#include <dqm/analysis/HistDelta.h>
+#include <dqm/core/HistObject.h>
+#include <dqm/core/RefHistObject.h>
+#include <dqm/core/HistDelta.h>
 #include <TFile.h>
 #include <TH1.h>
 
@@ -95,6 +95,7 @@ namespace Belle2 {
      * Clear all static global lists
     */
     void clearlist(void);
+
 
   private:
     /**

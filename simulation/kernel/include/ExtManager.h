@@ -13,7 +13,6 @@
 
 #include <globals.hh>
 #include <G4ApplicationState.hh>
-#include <G4ErrorPropagatorData.hh>
 #include <G4ErrorPropagator.hh>
 
 class G4ErrorTarget;

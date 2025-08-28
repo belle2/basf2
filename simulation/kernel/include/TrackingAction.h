@@ -16,6 +16,7 @@
 #include <G4UserTrackingAction.hh>
 
 namespace Belle2 {
+  class MCParticleTrajectory;
 
   namespace Simulation {
 

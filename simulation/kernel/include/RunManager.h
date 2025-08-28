@@ -9,7 +9,8 @@
 #pragma once
 
 #include <G4RunManager.hh>
-#include <G4AssemblyVolume.hh>
+
+class G4AssemblyVolume;
 
 namespace Belle2 {
 

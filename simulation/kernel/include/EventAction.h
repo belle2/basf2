@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
@@ -20,7 +19,7 @@ class G4Event;
 
 namespace Belle2 {
 
-  class MCParticleGraph;
+  class EventMetaData;
 
   namespace Simulation {
 

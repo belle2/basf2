@@ -9,8 +9,9 @@
 #pragma once
 
 #include <G4VSteppingVerbose.hh>
-#include <G4LogicalVolume.hh>
-#include <G4Track.hh>
+
+class G4LogicalVolume;
+class G4Track;
 
 namespace Belle2 {
   namespace Simulation {

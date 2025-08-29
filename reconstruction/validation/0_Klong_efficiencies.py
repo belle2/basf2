@@ -62,4 +62,3 @@ main.add_module('KlongValidation',
 main.add_module('Progress')
 
 b2.process(main)
-print(b2.statistics)

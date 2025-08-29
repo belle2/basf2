@@ -46,7 +46,7 @@ main.add_module("FullSim", PhysicsList="Belle2", RunEventVerbosity=0,
 main.add_module("RootOutput", outputFileName="EvtGenSimNoBkgYesBrems.root")
 
 # run it
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

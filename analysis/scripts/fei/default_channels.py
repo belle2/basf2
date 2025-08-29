@@ -1080,7 +1080,7 @@ def get_ccbarLambdaC_channels(
     """
     returns list of Particle objects with all default channels for running
     FEI on ccbar to tag Lambda_c+ decays
-    These channel list has not been optimized yet and currenlty serves
+    These channel list has not been optimized yet and currently serves
     only as an example for FEI application on ccbar events.
     @param specific if True, this adds isInRestOfEvent cut to all FSP
     @param addPi0 if True, this adds pi0 to all channels

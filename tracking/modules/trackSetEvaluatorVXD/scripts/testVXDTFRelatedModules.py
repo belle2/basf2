@@ -369,5 +369,3 @@ if useDisplay:
 
 # Process events
 b2.process(main)
-
-print(b2.statistics)

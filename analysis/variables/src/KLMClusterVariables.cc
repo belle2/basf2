@@ -260,7 +260,7 @@ namespace Belle2::Variable {
 
   double nMatchedKLMClusters(const Particle* particle)
   {
-    Belle2::Particle::EParticleSourceObject particleSource = particle->getParticleSource();
+    Particle::EParticleSourceObject particleSource = particle->getParticleSource();
     if (particleSource == Particle::EParticleSourceObject::c_Track) {
       return particle->getTrack()->getRelationsTo<KLMCluster>().size();
     } else if (particleSource == Particle::EParticleSourceObject::c_ECLCluster) {

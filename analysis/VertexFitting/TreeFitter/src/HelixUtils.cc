@@ -7,12 +7,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
+
 #include <TMath.h>
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-
-#include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
+#include <framework/dataobjects/Helix.h>
 
 #include <algorithm>
 #include <initializer_list>

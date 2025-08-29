@@ -7,9 +7,13 @@
  **************************************************************************/
 
 #include <analysis/modules/TrackIsoCalculator/TrackIsoCalculatorModule.h>
+
+#include <analysis/dbobjects/PIDDetectorWeights.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/DetectorSurface.h>
+
+#include <framework/database/DBObjPtr.h>
 
 #include <cmath>
 #include <boost/algorithm/string.hpp>

@@ -8,6 +8,8 @@
 
 #include <analysis/modules/ParticleMCDecayString/ParticleMCDecayStringModule.h>
 
+#include <analysis/dataobjects/Particle.h>
+
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/logging/Logger.h>

@@ -17,6 +17,14 @@ be adapted when changing to the new release.
 Changes since release-10
 ========================
 
+.. rubric:: Calculation and printing of processing statistics
+
+The calculation of the processing statistics is by default turned off. It can be enabled for debugging purposes, e.g.,
+to learn about the execution time of a steering file so that it can be provided to gbasf2 jobs, by setting the argument
+``calculateStatistics`` of the `basf2.process` function to ``True``. For the hlt scripts it remains enabled to monitor
+the execution time and memory consumption. It is not necessary to explicitly print the statistics since this is
+automatically done when switching the calculation on.
+
 .. include:: analysis/doc/whatsnew-since/release-10-00.txt
 
 Changes since release-09

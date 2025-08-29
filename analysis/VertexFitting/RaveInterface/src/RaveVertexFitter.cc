@@ -8,18 +8,17 @@
 
 
 #include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
-#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
-#include <mdst/dataobjects/Track.h>
+#include <analysis/dataobjects/Particle.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <rave/VertexFactory.h>
 
 //root
 #include <Math/ProbFunc.h>
-#include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+
 //stl
 using std::string;
-#include <vector>
 using std::vector;
 
 using namespace Belle2;

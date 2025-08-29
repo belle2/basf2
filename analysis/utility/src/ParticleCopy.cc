@@ -52,7 +52,7 @@ Particle* ParticleCopy::copyParticle(const Particle* original)
   return copy;
 }
 
-void ParticleCopy::copyDaughters(Belle2::Particle* mother)
+void ParticleCopy::copyDaughters(Particle* mother)
 {
   // If the particle has undergone Bremsstrahlung correction, removing its
   // daughters (the original lepton and potential photons) and then appending

@@ -63,6 +63,7 @@ void ONNXExpert::load(Weightfile& weightfile)
 {
   std::string onnxModelFileName = weightfile.generateFileName();
   weightfile.getFile("ONNX_Modelfile", onnxModelFileName);
+  weightfile.getOptions(m_general_options);
   m_session = std::make_unique<Session>(onnxModelFileName.c_str());
 }
 

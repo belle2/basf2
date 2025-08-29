@@ -665,7 +665,7 @@ const Particle* Particle::getDaughter(unsigned i) const
   return static_cast<Particle*>(getArrayPointer()->At(m_daughterIndices[i]));
 }
 
-std::vector<Belle2::Particle*> Particle::getDaughters() const
+std::vector<Particle*> Particle::getDaughters() const
 {
   const unsigned int nDaughters = getNDaughters();
   std::vector<Particle*> daughters(nDaughters);
@@ -677,7 +677,7 @@ std::vector<Belle2::Particle*> Particle::getDaughters() const
   return daughters;
 }
 
-std::vector<const Belle2::Particle*> Particle::getFinalStateDaughters() const
+std::vector<const Particle*> Particle::getFinalStateDaughters() const
 {
   std::vector<const Particle*> fspDaughters;
   fillFSPDaughters(fspDaughters);
@@ -685,7 +685,7 @@ std::vector<const Belle2::Particle*> Particle::getFinalStateDaughters() const
   return fspDaughters;
 }
 
-std::vector<const Belle2::Particle*> Particle::getAllDaughters() const
+std::vector<const Particle*> Particle::getAllDaughters() const
 {
   std::vector<const Particle*> allDaughters;
   fillAllDaughters(allDaughters);
@@ -938,7 +938,7 @@ const TrackFitResult* Particle::getTrackFitResult() const
   auto* selftrack = this->getTrack();
   if (selftrack)
     return selftrack->getTrackFitResultWithClosestMass(
-             Belle2::Const::ChargedStable(std::abs(this->getPDGCode())));
+             Const::ChargedStable(std::abs(this->getPDGCode())));
 
   // otherwise we're probably not a track based particle
   return nullptr;
@@ -1060,7 +1060,7 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
     // indexString is a string. First try to convert it into an int
     int dauIndex = 0;
     try {
-      dauIndex = Belle2::convertString<int>(indexString);
+      dauIndex = convertString<int>(indexString);
     } catch (std::invalid_argument&) {
       B2WARNING("Found the string " << indexString << "instead of a daughter index.");
       return nullptr;
@@ -1196,7 +1196,7 @@ void Particle::storeJacobiMatrix(const TMatrixF& m)
 }
 
 
-void Particle::fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const
+void Particle::fillFSPDaughters(std::vector<const Particle*>& fspDaughters) const
 {
   // this is FSP
   if (getNDaughters() == 0) {
@@ -1209,7 +1209,7 @@ void Particle::fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughte
     getDaughter(i)->fillFSPDaughters(fspDaughters);
 }
 
-void Particle::fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const
+void Particle::fillAllDaughters(std::vector<const Particle*>& allDaughters) const
 {
   // this is FSP
   if (getNDaughters() == 0)

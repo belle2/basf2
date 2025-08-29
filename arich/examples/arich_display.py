@@ -95,7 +95,7 @@ main.add_module('Progress')
 arichHists.if_value('==1', displ)
 
 # process
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # print stats
 print(b2.statistics)

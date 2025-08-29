@@ -124,7 +124,7 @@ class TOPLaserHistogrammerModule(b2.Module):
         digits = Belle2.PyStoreArray('TOPDigits')
         nhits = [0 for i in range(16)]
         for digit in digits:
-            if(not self.ignoreNotCalibrated and not digit.isTimeBaseCalibrated()):
+            if (not self.ignoreNotCalibrated and not digit.isTimeBaseCalibrated()):
                 continue
             if (digit.getHitQuality() == 1 and
                 digit.getPulseWidth() > self.m_minWidth and digit.getPulseWidth() < self.m_maxWidth and
@@ -252,11 +252,6 @@ main.add_module(progress)
 
 # Process events
 b2.process(main)
-
-# Print call statistics
-print(b2.statistics)
-print(b2.statistics(b2.statistics.TERM))
-
 
 fitLaserResolution(dataFile=outfile, outputFile='laserResolutionResults.root', pdfType='cb', saveFits=True)
 plotLaserResolution()

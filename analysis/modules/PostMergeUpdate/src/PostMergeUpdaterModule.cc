@@ -116,7 +116,7 @@ void PostMergeUpdaterModule::event()
       const ROOT::Math::XYZVector origSpot(xv2, yv2, zv2);
 
       // Now vertex from DB:
-      static DBObjPtr<Belle2::BeamSpot> beamSpotDB;
+      static DBObjPtr<BeamSpot> beamSpotDB;
       const ROOT::Math::XYZVector beamSpot = beamSpotDB->getIPPosition();
 
       const ROOT::Math::Rotation3D rot = tag_vertex_rotation();

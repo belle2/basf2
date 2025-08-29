@@ -10,10 +10,10 @@
 
 #include <analysis/modules/CurlTagger/Selector.h>
 
-#include <analysis/dataobjects/Particle.h>
 #include <vector>
 
 namespace Belle2 {
+  class Particle;
   namespace CurlTagger {
 
     /** Simple cut based selector for curl tracks taken from Belle note 1079 */

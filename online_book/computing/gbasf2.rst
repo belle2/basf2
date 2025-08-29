@@ -810,9 +810,12 @@ To prevent many jobs failing and for your jobs to run faster, let's summarize so
 * Properly setting CPU time for your jobs. 
 
 
-To prevent your jobs from being stuck in waiting caused by an overestimated CPU time, you can set either 
-the ``--cputime`` or the ``--evtpersec`` option. To figure out what number to set, run your script on KEKCC and 
-set your time to 20 * <total time on KEKCC in minutes>. 
+To prevent your jobs from being stuck in waiting caused by an overestimated CPU time, you can set either the
+``--cputime`` or the ``--evtpersec`` option. To figure out what number to set, enable the calculation of the processing
+statistics by setting the argument ``calculateStatistics`` of the `basf2.process` function in your script to ``True``.
+Then run it on KEKCC and set your time to 20 * <total time on KEKCC in minutes>. Don't forget to disable the statistics
+calculation in your script again before submitting your jobs since the calculation is quite time-consuming and you
+probably want to have your jobs finish as quickly as possible.
 
 For details, see `gbasf2's section on CPU time. <https://gbasf2.belle2.org/runningJobs.html#setting-the-cpu-time>`_ .
 

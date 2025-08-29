@@ -95,7 +95,7 @@ namespace TreeFitter {
     static double helixPoca(const Belle2::Helix& helix1,
                             const Belle2::Helix& helix2,
                             double& flt1, double& flt2,
-                            ROOT::Math::XYZVector& vertex, bool parallel = false) ;
+                            Eigen::Vector3d& vertex, bool parallel = false) ;
 
     /** POCA between a track and a point */
     static double helixPoca(const Belle2::Helix& helix, const ROOT::Math::XYZVector& point,

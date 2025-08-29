@@ -217,7 +217,7 @@ namespace TreeFitter {
   double HelixUtils::helixPoca(const Belle2::Helix& helix1,
                                const Belle2::Helix& helix2,
                                double& flt1, double& flt2,
-                               ROOT::Math::XYZVector& vertex, bool parallel)
+                               Eigen::Vector3d& vertex, bool parallel)
   {
 
     const double d0_1     = helix1.getD0();
@@ -357,9 +357,9 @@ namespace TreeFitter {
       }
     }
 
-    vertex.SetX(0.5 * (x1[ibest] + x2[ibest]));
-    vertex.SetY(0.5 * (y1[ibest] + y2[ibest]));
-    vertex.SetZ(0.5 * (z1 + z2));
+    vertex.x() = 0.5 * (x1[ibest] + x2[ibest]);
+    vertex.y() = 0.5 * (y1[ibest] + y2[ibest]);
+    vertex.z() = 0.5 * (z1 + z2);
 
     return std::hypot(x2[ibest] - x1[ibest], y2[ibest] - y1[ibest], z2 - z1);
   }

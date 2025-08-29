@@ -69,7 +69,7 @@ void HadronSaturation::fillSample(TString infilename)
 
     // fill the vectors
     for (unsigned int j = 0; j < satTree->GetEntries(); ++j) {
-      satTree->GetEvent(j);
+      satTree->GetEntry(j);
       if (satdedxerr == 0) continue;
       m_dedx.push_back(satdedx);
       m_dedxerror.push_back(satdedxerr);

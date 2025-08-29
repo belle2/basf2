@@ -99,7 +99,7 @@ void HadronPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, c
 
   for (unsigned int index = 0; index < hadron->GetEntries(); ++index) {
 
-    hadron->GetEvent(index);
+    hadron->GetEntry(index);
 
     double bg;      // track beta-gamma
     bg = fabs(p) / mass;
@@ -117,7 +117,10 @@ void HadronPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, c
     if (pdg == "proton") if ((dedxnosat - 0.45) * abs(p) * abs(p) < m_cut)continue;
 
     int bgBin = (int)((bg - m_bgMin) / (m_bgMax - m_bgMin) * m_bgBins);
+    bgBin  = std::max(0, std::min(bgBin, m_bgBins - 1));
+
     int cosBin = (int)((costh - m_cosMin) / (m_cosMax - m_cosMin) * m_cosBins);
+    cosBin = std::max(0, std::min(cosBin, m_cosBins - 1));
 
     double dedx_new = dedxnosat;
 
@@ -284,10 +287,14 @@ void HadronPrep::setPars(TFile*& outfile, std::map<int, std::vector<TH1F*>>& hde
       //1. -------------------------
       // fit the dE/dx distribution in bins of beta-gamma and cosine
       HadronBgPrep prep;
-      prep.fit(hdedx_bgcosth[i][j],  pdg.data());
-      satdedx = m_means[i][j] = hdedx_bgcosth[i][j]->GetFunction("gaus")->GetParameter(1);
-      satdedxerr = m_errors[i][j] = hdedx_bgcosth[i][j]->GetFunction("gaus")->GetParError(1);
-      satdedxwidth = hdedx_bgcosth[i][j]->GetFunction("gaus")->GetParameter(2);
+      gstatus stats;
+      prep.fit(hdedx_bgcosth[i][j],  pdg.data(), stats);
+      if (stats == OK) {
+        satdedx = m_means[i][j] = hdedx_bgcosth[i][j]->GetFunction("gaus")->GetParameter(1);
+        satdedxerr = m_errors[i][j] = hdedx_bgcosth[i][j]->GetFunction("gaus")->GetParError(1);
+        satdedxwidth = hdedx_bgcosth[i][j]->GetFunction("gaus")->GetParameter(2);
+      } else { satdedx = 0.0; satdedxerr = 0.0; satdedxwidth = 0.0;}
+
 
       //Be careful to not set for every particle
       if (satdedx > m_dedxmax) m_dedxmax = satdedx;

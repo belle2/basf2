@@ -125,7 +125,7 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
 
   for (unsigned int index = 0; index < entries; ++index) {
 
-    hadron->GetEvent(index);
+    hadron->GetEntry(index);
 
     int chg = (charge < 0) ? 1 : 0;
     double bg = fabs(p) / mass;
@@ -178,6 +178,8 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
 
     // make histograms of dE/dx vs. cos(theta) for validation
     int icos = (int)((costh + 1) / cosstep);
+    icos = std::min(m_cosBins - 1, icos);
+
     hchicos_allbg[chg][icos]->Fill(chi_new);
 
     if (bgBin <= int(m_bgBins / 3)) hchicos_1by3bg[chg][icos]->Fill(chi_new);
@@ -388,29 +390,39 @@ void HadronBgPrep::setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>&
     satbg = m_bgMin + 0.5 * bgstep + i * bgstep;
     satcosth = 0.0;
 
-    satbg_avg = m_sumbg[i] / m_sumsize[i];
-    satcosth_avg = m_sumcos[i] / m_sumsize[i];
-    satdedxres_avg = m_sumres_square[i] / m_sumsize[i];
+    satbg_avg = (m_sumsize[i] > 0) ? m_sumbg[i] / m_sumsize[i] : 0.0;
+    satcosth_avg = (m_sumsize[i] > 0) ? m_sumcos[i] / m_sumsize[i] : 0.0;
+    satdedxres_avg = (m_sumsize[i] > 0) ? m_sumres_square[i] / m_sumsize[i] : 0.0;
 
     //1. -------------------------
     // fit the dE/dx distribution in bins of beta-gamma
-    fit(hdedx_bg[i],  pdg.data());
-    satdedx = m_means[i] = hdedx_bg[i]->GetFunction("gaus")->GetParameter(1);
-    satdedxerr = m_errors[i] = hdedx_bg[i]->GetFunction("gaus")->GetParError(1);
-    satdedxwidth = hdedx_bg[i]->GetFunction("gaus")->GetParameter(2);
+    gstatus bgstat;
+    fit(hdedx_bg[i],  pdg.data(), bgstat);
+    if (bgstat == OK) {
+      satdedx = m_means[i] = hdedx_bg[i]->GetFunction("gaus")->GetParameter(1);
+      satdedxerr = m_errors[i] = hdedx_bg[i]->GetFunction("gaus")->GetParError(1);
+      satdedxwidth = hdedx_bg[i]->GetFunction("gaus")->GetParameter(2);
+    } else { satdedx = 0.0; satdedxerr = 0.0; satdedxwidth = 0.0;}
 
     //2. -------------------------
     // fit the chi distribution  in bins of beta-gamma
-    fit(hchi_bg[i], pdg.data());
-    satchi = hchi_bg[i]->GetFunction("gaus")->GetParameter(1);
-    satchierr  = hchi_bg[i]->GetFunction("gaus")->GetParError(1);
-    satchiwidth = hchi_bg[i]->GetFunction("gaus")->GetParameter(2);
-    satchiwidth_err = hchi_bg[i]->GetFunction("gaus")->GetParError(2);
+    gstatus chistat;
+    fit(hchi_bg[i], pdg.data(), chistat);
+    if (bgstat == OK) {
+      satchi = hchi_bg[i]->GetFunction("gaus")->GetParameter(1);
+      satchierr  = hchi_bg[i]->GetFunction("gaus")->GetParError(1);
+      satchiwidth = hchi_bg[i]->GetFunction("gaus")->GetParameter(2);
+      satchiwidth_err = hchi_bg[i]->GetFunction("gaus")->GetParError(2);
+    } else { satchi = 0.0; satchierr = 0.0; satchiwidth = 0.0; satchiwidth_err = 0.0;}
+
 
     //3. -------------------------
     // fit the chi distribution  in bins of beta-gamma
-    fit(hionzsigma_bg[i], pdg.data());
-    sationzres = hionzsigma_bg[i]->GetFunction("gaus")->GetParameter(2);
+    gstatus ionstat;
+    fit(hionzsigma_bg[i], pdg.data(), ionstat);
+    if (ionstat == OK) {
+      sationzres = hionzsigma_bg[i]->GetFunction("gaus")->GetParameter(2);
+    } else sationzres = 0.0;
 
     // fill the tree for this bin
     satTree->Fill();
@@ -445,13 +457,16 @@ void HadronBgPrep::setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>&
       inj_avg = m_suminj[i] / m_injsize[i];
 
       // fit the dE/dx distribution in bins of injection time'
-      fit(hchi_inj[ir][i],  pdg.data());
-
-      mean = hchi_inj[ir][i]->GetFunction("gaus")->GetParameter(1);
-      mean_err = hchi_inj[ir][i]->GetFunction("gaus")->GetParError(1);
-      sigma = hchi_inj[ir][i]->GetFunction("gaus")->GetParameter(2);
-      sigma_err = hchi_inj[ir][i]->GetFunction("gaus")->GetParError(2);
-
+      gstatus injstat;
+      fit(hchi_inj[ir][i],  pdg.data(), injstat);
+      if (injstat == OK) {
+        mean = hchi_inj[ir][i]->GetFunction("gaus")->GetParameter(1);
+        mean_err = hchi_inj[ir][i]->GetFunction("gaus")->GetParError(1);
+        sigma = hchi_inj[ir][i]->GetFunction("gaus")->GetParameter(2);
+        sigma_err = hchi_inj[ir][i]->GetFunction("gaus")->GetParError(2);
+      } else {
+        mean = 0.0; mean_err = 0.0; sigma = 0.0; sigma_err = 0.0;
+      }
       injTree->Fill();
     }
 
@@ -461,9 +476,9 @@ void HadronBgPrep::setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>&
 }
 
 //----------------------------------------
-void HadronBgPrep::fit(TH1F*& hist, const std::string& pdg)
+void HadronBgPrep::fit(TH1F*& hist, const std::string& pdg, gstatus& status)
 {
-  gstatus status;
+
   if (pdg == "pion") fitGaussianWRange(hist, status, 1.0);
   else fitGaussianWRange(hist, status, 2.0);
 
@@ -541,35 +556,51 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
   for (int c = 0; c < 2; ++c) {
     for (int i = 0; i < m_cosBins; ++i) {
       if (hchicos_allbg[c][i]->Integral() > 100) {
-        fit(hchicos_allbg[c][i],  pdg.data());
-        chicos[c][i] = hchicos_allbg[c][i]->GetFunction("gaus")->GetParameter(1);
-        chicoserr[c][i] = hchicos_allbg[c][i]->GetFunction("gaus")->GetParError(1);
-        sigmacos[c][i] = hchicos_allbg[c][i]->GetFunction("gaus")->GetParameter(2);
-        sigmacoserr[c][i] = hchicos_allbg[c][i]->GetFunction("gaus")->GetParError(2);
+        gstatus allbgstat;
+        fit(hchicos_allbg[c][i],  pdg.data(), allbgstat);
+        if (allbgstat == OK) {
+          chicos[c][i] = hchicos_allbg[c][i]->GetFunction("gaus")->GetParameter(1);
+          chicoserr[c][i] = hchicos_allbg[c][i]->GetFunction("gaus")->GetParError(1);
+          sigmacos[c][i] = hchicos_allbg[c][i]->GetFunction("gaus")->GetParameter(2);
+          sigmacoserr[c][i] = hchicos_allbg[c][i]->GetFunction("gaus")->GetParError(2);
+        } else { chicos[c][i] = 0.0; chicoserr[c][i] = 0.0; sigmacos[c][i] = 0.0; sigmacoserr[c][i] = 0.0;}
       }
 
       if (hchicos_1by3bg[c][i]->Integral() > 100) {
-        fit(hchicos_1by3bg[c][i],  pdg.data());
-        chicos_1b3bg[c][i] = hchicos_1by3bg[c][i]->GetFunction("gaus")->GetParameter(1);
-        chicos_1b3bgerr[c][i] = hchicos_1by3bg[c][i]->GetFunction("gaus")->GetParError(1);
-        sigmacos_1b3bg[c][i] = hchicos_1by3bg[c][i]->GetFunction("gaus")->GetParameter(2);
-        sigmacos_1b3bgerr[c][i] = hchicos_1by3bg[c][i]->GetFunction("gaus")->GetParError(2);
+        gstatus all1bgstat;
+
+        fit(hchicos_1by3bg[c][i],  pdg.data(), all1bgstat);
+        if (all1bgstat == OK) {
+          chicos_1b3bg[c][i] = hchicos_1by3bg[c][i]->GetFunction("gaus")->GetParameter(1);
+          chicos_1b3bgerr[c][i] = hchicos_1by3bg[c][i]->GetFunction("gaus")->GetParError(1);
+          sigmacos_1b3bg[c][i] = hchicos_1by3bg[c][i]->GetFunction("gaus")->GetParameter(2);
+          sigmacos_1b3bgerr[c][i] = hchicos_1by3bg[c][i]->GetFunction("gaus")->GetParError(2);
+        } else { chicos_1b3bg[c][i] = 0.0; chicos_1b3bgerr[c][i] = 0.0; sigmacos_1b3bg[c][i] = 0.0; sigmacos_1b3bgerr[c][i] = 0.0;}
+
       }
 
       if (hchicos_2by3bg[c][i]->Integral() > 100) {
-        fit(hchicos_2by3bg[c][i],  pdg.data());
-        chicos_2b3bg[c][i] = hchicos_2by3bg[c][i]->GetFunction("gaus")->GetParameter(1);
-        chicos_2b3bgerr[c][i] = hchicos_2by3bg[c][i]->GetFunction("gaus")->GetParError(1);
-        sigmacos_2b3bg[c][i] = hchicos_2by3bg[c][i]->GetFunction("gaus")->GetParameter(2);
-        sigmacos_2b3bgerr[c][i] = hchicos_2by3bg[c][i]->GetFunction("gaus")->GetParError(2);
+        gstatus all2bgstat;
+        fit(hchicos_2by3bg[c][i],  pdg.data(), all2bgstat);
+        if (all2bgstat == OK) {
+          chicos_2b3bg[c][i] = hchicos_2by3bg[c][i]->GetFunction("gaus")->GetParameter(1);
+          chicos_2b3bgerr[c][i] = hchicos_2by3bg[c][i]->GetFunction("gaus")->GetParError(1);
+          sigmacos_2b3bg[c][i] = hchicos_2by3bg[c][i]->GetFunction("gaus")->GetParameter(2);
+          sigmacos_2b3bgerr[c][i] = hchicos_2by3bg[c][i]->GetFunction("gaus")->GetParError(2);
+        } else { chicos_2b3bg[c][i] = 0.0; chicos_2b3bgerr[c][i] = 0.0; sigmacos_2b3bg[c][i] = 0.0; sigmacos_2b3bgerr[c][i] = 0.0;}
+
       }
 
       if (hchicos_3by3bg[c][i]->Integral() > 100) {
-        fit(hchicos_3by3bg[c][i],  pdg.data());
-        chicos2[c][i] = hchicos_3by3bg[c][i]->GetFunction("gaus")->GetParameter(1);
-        chicos2err[c][i] = hchicos_3by3bg[c][i]->GetFunction("gaus")->GetParError(1);
-        sigmacos2[c][i] = hchicos_3by3bg[c][i]->GetFunction("gaus")->GetParameter(2);
-        sigmacos2err[c][i] = hchicos_3by3bg[c][i]->GetFunction("gaus")->GetParError(2);
+        gstatus all3bgstat;
+        fit(hchicos_3by3bg[c][i],  pdg.data(), all3bgstat);
+        if (all3bgstat == OK) {
+          chicos2[c][i] = hchicos_3by3bg[c][i]->GetFunction("gaus")->GetParameter(1);
+          chicos2err[c][i] = hchicos_3by3bg[c][i]->GetFunction("gaus")->GetParError(1);
+          sigmacos2[c][i] = hchicos_3by3bg[c][i]->GetFunction("gaus")->GetParameter(2);
+          sigmacos2err[c][i] = hchicos_3by3bg[c][i]->GetFunction("gaus")->GetParError(2);
+        } else { chicos2[c][i] = 0.0; chicos2err[c][i] = 0.0; sigmacos2[c][i] = 0.0; sigmacos2err[c][i] = 0.0;}
+
       }
     }
   }

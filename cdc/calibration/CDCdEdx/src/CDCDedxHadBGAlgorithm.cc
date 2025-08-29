@@ -258,46 +258,62 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, cons
     // --------------------------------------------------
     // Fill the histograms to be fitted
 
-    for (unsigned int index = 0; index < hadron->GetEntries(); ++index) {
+    for (Long64_t index = 0; index < hadron->GetEntries(); ++index) {
 
-      hadron->GetEvent(index);
-      double bg;      // track beta-gamma
-      bg = fabs(p) / mass;
+      hadron->GetEntry(index);
+      double bg = std::fabs(p) / mass;
 
-      if (fabs(p) > 8.0)continue;   //unphysical tracks
+      if (std::fabs(p) > 8.0) continue;   // unphysical tracks
 
-      // clean up bad events and restrict the momentum range
-      if (svar == "nhit") {if (nhits <  lower || nhits  > upper) continue;}
-      else if (svar == "costh") {if (costh > upper || costh < lower)continue;}
+      if (svar == "nhit") {
+        if (nhits < lower || nhits > upper) continue;
+      } else if (svar == "costh") {
+        if (costh > upper || costh < lower) continue;
+      }
 
-      if (dedxnosat <= 0)continue;
-      if (costh != costh)continue;
+      if (dedxnosat <= 0) continue;
+      if (!(costh == costh)) continue; // NaN check
 
-      if (particle == "proton") {if ((dedxnosat - 0.45)*abs(p)*abs(p) < m_cut) continue;}
+      if (particle == "proton") {
+        if ((dedxnosat - 0.45) * std::abs(p) * std::abs(p) < m_cut) continue;
+      }
 
-      if (particle == "electron" || particle == "muon") {if (fabs(p) > 2.0) continue;}
+      if (particle == "electron" || particle == "muon") {
+        if (std::fabs(p) > 2.0) continue;
+      }
 
       double dedx_new = had.D2I(costh, had.I2D(costh, 1.0) * dedxnosat);
-
       double dedx_cur = mgpar.getMean(bg);
 
       if (svar == "nhit") {
         double res_cor = sgpar.cosPrediction(costh) * sgpar.ionzPrediction(dedx_cur) * timereso;
-        int nhitBin = (int)((fabs(nhits) - lower) / nstep);
-        if (res_cor != 0) hdedx_var[nhitBin]->Fill((dedx_new - dedx_cur) / res_cor);
-        sumvar[nhitBin] += nhits;
-        sumsize[nhitBin] += 1;
-      } else if (svar == "costh") {
+        int nhitBin = static_cast<int>((std::fabs(nhits) - lower) / nstep);
+        // clamp
+        if (nhitBin < 0) nhitBin = 0;
+        else if (nhitBin >= nbins) nhitBin = nbins - 1;
 
-        double res_cor = sgpar.nhitPrediction(nhits) * sgpar.ionzPrediction(dedx_cur) * timereso;
-        int cosBin = (int)((costh - lower) / (upper - lower) * nbins);
+        if (res_cor != 0 && nhitBin >= 0 && nhitBin < (int)hdedx_var.size())
+          hdedx_var[nhitBin]->Fill((dedx_new - dedx_cur) / res_cor);
 
-        if (res_cor != 0) hdedx_var[cosBin]->Fill((dedx_new - dedx_cur) / res_cor);
+        if (nhitBin >= 0 && nhitBin < nbins) {
+          sumvar[nhitBin] += nhits;
+          sumsize[nhitBin] += 1;
+        }
+      } else { // costh
+        double denom = (upper - lower);
+        int cosBin = static_cast<int>((costh - lower) / denom * nbins);
+        // clamp
+        if (cosBin < 0) cosBin = 0;
+        else if (cosBin >= nbins) cosBin = nbins - 1;
 
-        sumvar[cosBin] += costh;
-        sumsize[cosBin] += 1;
+        if (cosBin >= 0 && cosBin < (int)hdedx_var.size()) {
+          double res_cor = sgpar.nhitPrediction(nhits) * sgpar.ionzPrediction(dedx_cur) * timereso;
+          if (res_cor != 0) hdedx_var[cosBin]->Fill((dedx_new - dedx_cur) / res_cor);
+          sumvar[cosBin] += costh;
+          sumsize[cosBin] += 1;
+        }
       }
-    }// end of event loop
+    }
 
     // --------------------------------------------------
     // FIT IN BINS OF NHIT
@@ -316,34 +332,39 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, cons
     tTree->Branch("chisigma_err", &sigma_err, "chisigma_err/D");
 
     double avg_sigma = 0.0;
-    std::vector<double> var(nbins), varres(nbins), varreserr(nbins);
+    std::vector<double> var(nbins), varres(nbins), varreserr(nbins), varmean(nbins), varmeanerr(nbins);
 
     int count_bins = 0;
     for (int i = 0; i < nbins; ++i) {
 
-      varres[i] = 0.0;
-      varreserr[i] = 0.0;
-      var[i] = sumvar[i] / sumsize[i];
+      varres[i] = 0.0, varmean[i] = 0.0;
+      varreserr[i] = 0.0, varmeanerr[i] = 0.0;
+      var[i] = (sumsize[i] > 0) ? (sumvar[i] / sumsize[i]) : 0.0;
 
       // fit the dE/dx distribution in bins of injection time'
       if (hdedx_var[i]->Integral() > 100) {
-        prep.fit(hdedx_var[i],  particle.data());
-        varres[i] = hdedx_var[i]->GetFunction("gaus")->GetParameter(2);;
-        varreserr[i] = hdedx_var[i]->GetFunction("gaus")->GetParError(2);
+        gstatus stats;
+        prep.fit(hdedx_var[i],  particle.data(), stats);
+        if (stats == OK) {
+          varmean[i] =  hdedx_var[i]->GetFunction("gaus")->GetParameter(1);
+          varmeanerr[i] =  hdedx_var[i]->GetFunction("gaus")->GetParError(1);
+          varres[i] = hdedx_var[i]->GetFunction("gaus")->GetParameter(2);;
+          varreserr[i] = hdedx_var[i]->GetFunction("gaus")->GetParError(2);
+        }
         count_bins++;
         avg_sigma += varres[i];
 
       }
     }
-    if (count_bins > 0) avg_sigma = avg_sigma / count_bins;
+    if (count_bins > 0) avg_sigma /= count_bins;
     for (int i = 0; i < nbins; ++i) {
 
       if (avg_sigma > 0) {
-        sigma = varres[i] = varres[i] / avg_sigma;
-        sigma_err = varreserr[i] = varreserr[i] / avg_sigma;
+        sigma = varres[i] / avg_sigma;
+        sigma_err = varreserr[i] / avg_sigma;
       }
-      mean =  hdedx_var[i]->GetFunction("gaus")->GetParameter(1);
-      mean_err =  hdedx_var[i]->GetFunction("gaus")->GetParError(1);
+      mean = varmean[i];
+      mean_err =  varmeanerr[i];
       avg = var[i];
       tTree->Fill();
     }

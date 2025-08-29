@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdClusterPositionCollector/PXDClusterPositionCollectorModule.h>
+#include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <vxd/geometry/GeoCache.h>

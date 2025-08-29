@@ -12,9 +12,9 @@
 #include <map>
 
 #include <pxd/dbobjects/PXDClusterShapeClassifierPar.h>
-#include <pxd/dbobjects/PXDClusterOffsetPar.h>
 
 namespace Belle2 {
+  class PXDClusterOffsetPar;
 
 
   /** The class for PXD cluster position lookup table payload

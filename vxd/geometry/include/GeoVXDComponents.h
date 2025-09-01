@@ -9,14 +9,16 @@
 #ifndef GEOVXDCOMPONENTS_H
 #define GEOVXDCOMPONENTS_H
 
-#include <vxd/geometry/SensorInfoBase.h>
-
 #include <string>
 #include <vector>
 
 class G4LogicalVolume;
 
 namespace Belle2 {
+  namespace VXD {
+    class SensorInfoBase;
+  }
+
   /** Class holding all parameters to place a VXD geometry subcomponent */
   class VXDGeoPlacement {
   public:

@@ -11,12 +11,14 @@
 #define VXD_GEOMETRY_GEOVXDRADIATONSENSORS_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
+
 #include <vector>
 #include <string>
-#include <G4LogicalVolume.hh>
-#include <framework/gearbox/GearDir.h>
+
+class G4LogicalVolume;
 
 namespace Belle2 {
+  class GearDir;
 
   /** class to create the diamond radiation sensor geometry if defined */
   class GeoVXDRadiationSensors {

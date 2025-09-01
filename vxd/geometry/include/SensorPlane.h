@@ -10,7 +10,6 @@
 #define VXD_SENSORPLANE_H
 
 #include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/SensorInfoBase.h>
 #include <framework/logging/Logger.h>
 //ROOT CINT has problems with the boost classes used by the GeoCache but it
 //does not need to see them anyway
@@ -23,6 +22,8 @@
 
 namespace Belle2 {
   namespace VXD {
+    class SensorInfoBase;
+
     /**
      * A Finite plane of one VXD Sensor.
      * This class takes the SensorID of the sensor and gets the dimensions from the SensorInfo of that Sensor.

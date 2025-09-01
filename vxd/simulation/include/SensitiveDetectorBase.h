@@ -22,6 +22,8 @@
 namespace Belle2 {
   /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD */
   namespace VXD {
+    class SensorInfoBase;
+
     /** Base class for Sensitive Detector implementation of PXD and SVD.
      *
      * This base class provides common access to sensor information (like

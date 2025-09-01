@@ -10,13 +10,14 @@
 #define VXD_MISALIGNMENT_CACHE_H
 
 #include <vxd/dataobjects/VxdID.h>
-#include <vxd/dataobjects/VXDTrueHit.h>
 #include <unordered_map>
 #include <tuple>
 
 #include <TGeoMatrix.h>
 
 namespace Belle2 {
+  class VXDTrueHit;
+
   /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD */
   namespace VXD {
     /**

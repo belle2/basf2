@@ -8,9 +8,8 @@
 
 #pragma once
 
-#include <vxd/dataobjects/VxdID.h>
-
 namespace Belle2 {
+  class VxdID;
 
   namespace PXD {
     /** Class to make the mapping between u/v cell ID of pixels back to

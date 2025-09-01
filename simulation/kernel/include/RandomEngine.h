@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef SIMULATION_KERNEL_RANDOMENGINE_H
-#define SIMULATION_KERNEL_RANDOMENGINE_H
 
 #include <CLHEP/Random/Random.h>
 #include <framework/core/RandomGenerator.h>
@@ -49,4 +47,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif // SIMULATION_KERNEL_RANDOMENGINE_H

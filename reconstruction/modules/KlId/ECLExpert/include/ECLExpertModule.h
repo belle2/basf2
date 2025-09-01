@@ -12,17 +12,19 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KlId.h>
-
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-#include <mva/interface/Weightfile.h>
-#include <mva/interface/Expert.h>
-
 #include <string>
 
 
 namespace Belle2 {
+  class ECLCluster;
+  class KlId;
+  class DatabaseRepresentationOfWeightfile;
+
+  namespace MVA {
+    class Weightfile;
+    class Expert;
+    class SingleDataset;
+  }
 
 
   /** Module to perform the ECL Klong ID classification. This module only classifies ECL clusters.

@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef VXD_MISALIGNMENT_CACHE_H
-#define VXD_MISALIGNMENT_CACHE_H
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 #include <unordered_map>
@@ -98,4 +97,3 @@ namespace Belle2 {
     };
   }
 } //Belle2 namespace
-#endif

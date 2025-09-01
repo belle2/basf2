@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef VXD_SENSORPLANE_H
-#define VXD_SENSORPLANE_H
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/logging/Logger.h>
@@ -104,5 +103,3 @@ namespace Belle2 {
     };
   } // vxd namespace
 } // Belle2 namespace
-
-#endif /* VXD_SENSORPLANE_H */

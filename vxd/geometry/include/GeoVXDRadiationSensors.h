@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef VXD_GEOMETRY_GEOVXDRADIATONSENSORS_H
-#define VXD_GEOMETRY_GEOVXDRADIATONSENSORS_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
@@ -52,4 +50,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif // VXD_GEOMETRY_GEOVXDRADIATONSENSORS_H

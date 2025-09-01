@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef GEOVXDCOMPONENTS_H
-#define GEOVXDCOMPONENTS_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -227,5 +226,3 @@ namespace Belle2 {
   };
 
 } // namespace Belle2
-
-#endif /* GEOVXDCOMPONENTS_H */

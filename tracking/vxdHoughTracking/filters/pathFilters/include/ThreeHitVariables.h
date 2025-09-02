@@ -8,7 +8,6 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/filters/pathFilters/TwoHitVariables.h>
-#include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/geometry/B2Vector3.h>
 
 #include <cmath>

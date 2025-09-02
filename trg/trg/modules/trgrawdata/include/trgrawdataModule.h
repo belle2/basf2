@@ -8,47 +8,20 @@
 #ifndef TRGRAWDATAModule_h
 #define TRGRAWDATAModule_h
 
-#include <stdlib.h>
-#include <string>
 #include <iostream>
 #include <vector>
-#include <sys/uio.h>
 
-#include <rawdata/dataobjects/RawTRG.h>
-
-#include <framework/pcore/EvtMessage.h>
-
-#include <framework/datastore/StoreArray.h>
-// #include <framework/core/Module.h>
 #include <framework/core/HistoModule.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
-#include <mdst/dbobjects/TRGGDLDBBadrun.h>
-#include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
-
-#include <rawdata/dataobjects/RawDataBlock.h>
-#include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawTLU.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <sys/resource.h>
-
-#include <TDirectory.h>
-#include <TH2I.h>
-#include <TH1I.h>
-#include <TString.h>
+#include <TH2D.h>
 
 namespace Belle2 {
+  class EventMetaData;
+  class TRGGDLDBUnpacker;
 
   static const int intNaN = std::numeric_limits<int>::quiet_NaN();
 
-//class TRGRAWDATAModule : public Module {
   class TRGRAWDATAModule : public HistoModule {
 
   public:

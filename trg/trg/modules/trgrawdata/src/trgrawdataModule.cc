@@ -6,30 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 #include <trg/trg/modules/trgrawdata/trgrawdataModule.h>
-
-#include <rawdata/modules/PrintDataTemplate.h>
-#include <framework/datastore/StoreObjPtr.h>
+#include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dbobjects/RunInfo.h>
-#include <framework/datastore/DataStore.h>
+#include <rawdata/dataobjects/RawTRG.h>
 
 #include <string.h>
-#include <unistd.h>
-
-#include <TPostScript.h>
-#include <TCanvas.h>
-#include <TStyle.h>
 
 using namespace std;
 using namespace Belle2;
-using namespace GDL;
 
 
 REG_MODULE(TRGRAWDATA);
 
-// TRGRAWDATAModule::TRGRAWDATAModule() : Module()
 TRGRAWDATAModule::TRGRAWDATAModule() : HistoModule()
 {
 

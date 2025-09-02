@@ -133,7 +133,7 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   m_tbins = vtlocaledges.size() - 1;
   m_tedges = &vtlocaledges[0];
 
-  std::array<std::array<std::vector<TH1D*>, 2>, 3> hdedx_mom;
+  std::array<std::array<std::vector<TH1D*>, 2>, 3> hdedx_mom, hdedx_mom_inCos;
   std::array<std::vector<TH1D*>, 2> hdedx_mom_peaks, hdedx_inj, hdedx_oned;
   TH1D* htimes = new TH1D("htimes", "", m_tbins, m_tedges);
 
@@ -148,7 +148,10 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   for (int ic = 0; ic < 3; ic++) {
     for (int it = 0; it < 2; ++it) {
       hdedx_mom[ic][it].resize(m_momBins);
+      hdedx_mom_inCos[ic][it].resize(m_momBins);
+
       defineHisto(hdedx_mom[ic][it], "mom", Form("%s_%s", scos[ic].data(), stype[it].data()));
+      defineHisto(hdedx_mom_inCos[ic][it], "mom", Form("inCos_%s_%s", scos[ic].data(), stype[it].data()));
     }
   }
 
@@ -187,6 +190,11 @@ void CDCDedxValidationAlgorithm::radeeValidation()
     if (binIndex >= 0 && binIndex < m_momBins) {
       hdedx_mom[icos[0]][chgtype][binIndex]->Fill(dedx);
       hdedx_mom[icos[1]][chgtype][binIndex]->Fill(dedx);
+
+      if (costh > -0.3 && costh < 0.3) {
+        hdedx_mom_inCos[icos[0]][chgtype][binIndex]->Fill(dedx);
+        hdedx_mom_inCos[icos[1]][chgtype][binIndex]->Fill(dedx);
+      }
     }
 
     // Add larger times to the last bin
@@ -223,10 +231,13 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   }
 
 
-  for (int ic = 0; ic < 3; ic++)
-    for (int it = 0; it < 2; ++it)
+  for (int ic = 0; ic < 3; ic++) {
+    for (int it = 0; it < 2; ++it) {
       printCanvas(hdedx_mom[ic][it], Form("plots/mom/dedx_vs_mom_%s_%s_%s", scos[ic].data(), stype[it].data(), m_suffix.data()), "mom");
-
+      printCanvas(hdedx_mom_inCos[ic][it], Form("plots/mom/dedx_vs_mom_inCos_%s_%s_%s", scos[ic].data(), stype[it].data(),
+                                                m_suffix.data()), "mom");
+    }
+  }
   for (int it = 0; it < 2; ++it) {
     printCanvas(hdedx_inj[it], Form("plots/injection/dedx_vs_inj_%s_%s", m_sring[it].data(), m_suffix.data()), "inj");
     printCanvas(hdedx_oned[it], Form("plots/oneD/dedx_vs_1D_%s_%s", sLayer[it].data(), m_suffix.data()), "oned");
@@ -533,14 +544,14 @@ void CDCDedxValidationAlgorithm::printCanvas(std::vector<TH1D*>& htemp, std::str
     htemp[i]->DrawCopy("");
     pt.DrawClone("same");
 
-    if ((i + 1) % 16 == 0) {
+    if ((i + 1) % 16 == 0 || ((i + 1) == xbins)) {
       ctmp->SetBatch(kTRUE);
       ctmp->Print(psname.str().c_str());
       ctmp->Clear("D");
     }
   }
 
-  ctmp->Print(psname.str().c_str());
+  // ctmp->Print(psname.str().c_str());
   psname.str("");
   psname << Form("%s.pdf]", namesfx.data());
   ctmp->Print(psname.str().c_str());

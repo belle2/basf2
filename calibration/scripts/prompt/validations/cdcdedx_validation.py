@@ -250,63 +250,65 @@ def injection_validation(path, suffix):
         plt.close()
 
 
-def mom_validation(path, suffix):
-    try:
-        val_path_el = os.path.join(path, "plots", "mom", f"dedx_vs_mom_acos_elec_{suffix}.txt")
-        val_path_po = os.path.join(path, "plots", "mom", f"dedx_vs_mom_acos_posi_{suffix}.txt")
-        df_el = pd.read_csv(val_path_el, sep=" ", header=None, names=["mom", "mean", "mean_err", "reso", "reso_err"])
-        df_po = pd.read_csv(val_path_po, sep=" ", header=None, names=["mom", "mean", "mean_err", "reso", "reso_err"])
-    except FileNotFoundError:
-        logger.error(f"Momentum data files not found in {path}/plots/mom/")
-        return
-
-    df_el['mom'] *= -1
-    pdf_path = os.path.join("plots", "validation", f"dedx_vs_mom_{suffix}.pdf")
+def mom_validation(path, suffix, modes=("acos", "negCosth", "posCosth"), prefix=""):
+    pdf_path = os.path.join("plots", "validation", f"dedx_vs_mom_{prefix}{suffix}.pdf")
     os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
 
     with PdfPages(pdf_path) as pdf:
-        fig, ax = plt.subplots(2, 2, figsize=(20, 12))
+        for mode in modes:
+            try:
+                val_path_el = os.path.join(path, "plots", "mom", f"dedx_vs_mom_{prefix}{mode}_elec_{suffix}.txt")
+                val_path_po = os.path.join(path, "plots", "mom", f"dedx_vs_mom_{prefix}{mode}_posi_{suffix}.txt")
 
-        ymin = df_el[df_el['mean'] > 0]['mean'].min()
-        ymax = df_el['mean'].max()
-        pc.hist(x_min=-7.0, x_max=7.0, y_min=ymin-0.01, y_max=ymax+0.01,
-                xlabel="Momentum", ylabel="dE/dx mean", space=1, ax=ax[0, 0])
-        ax[0, 0].errorbar(df_el['mom'], df_el['mean'], yerr=df_el['mean_err'],
-                          fmt='*', markersize=10, rasterized=True, label='electron')
-        ax[0, 0].errorbar(df_po['mom'], df_po['mean'], yerr=df_po['mean_err'],
-                          fmt='*', markersize=10, rasterized=True, label='positron')
-        ax[0, 0].legend(fontsize=17)
-        ax[0, 0].set_title('dE/dx Mean vs momentum', fontsize=14)
+                df_el = pd.read_csv(val_path_el, sep=" ", header=None,
+                                    names=["mom", "mean", "mean_err", "reso", "reso_err"])
+                df_po = pd.read_csv(val_path_po, sep=" ", header=None,
+                                    names=["mom", "mean", "mean_err", "reso", "reso_err"])
+            except FileNotFoundError:
+                logger.error(f"Momentum data files not found for mode={mode} in {path}/plots/mom/")
+                continue
 
-        pc.hist(x_min=-7.0, x_max=7.0, y_min=0.04, y_max=0.1, xlabel="Momentum", ylabel="dE/dx reso", space=1, ax=ax[0, 1])
-        ax[0, 1].errorbar(df_el['mom'], df_el['reso'], yerr=df_el['reso_err'],
-                          fmt='*', markersize=10, rasterized=True, label='electron')
-        ax[0, 1].errorbar(df_po['mom'], df_po['reso'], yerr=df_po['reso_err'],
-                          fmt='*', markersize=10, rasterized=True, label='positron')
-        ax[0, 1].legend(fontsize=17)
-        ax[0, 1].set_title('dE/dx resolution vs momentum', fontsize=14)
+            df_el['mom'] *= -1
 
-        pc.hist(x_min=-3.0, x_max=3.0, y_min=ymin-0.01, y_max=ymax+0.01,
-                xlabel="Momentum", ylabel="dE/dx mean", space=1, ax=ax[1, 0])
-        ax[1, 0].errorbar(df_el['mom'], df_el['mean'], yerr=df_el['mean_err'],
-                          fmt='*', markersize=10, rasterized=True, label='electron')
-        ax[1, 0].errorbar(df_po['mom'], df_po['mean'], yerr=df_po['mean_err'],
-                          fmt='*', markersize=10, rasterized=True, label='positron')
-        ax[1, 0].legend(fontsize=17)
-        ax[1, 0].set_title('dE/dx Mean vs momentum (zoomed)', fontsize=14)
+            fig, ax = plt.subplots(2, 2, figsize=(20, 12))
 
-        pc.hist(x_min=-3.0, x_max=3.0, y_min=0.04, y_max=0.1, xlabel="Momentum", ylabel="dE/dx reso", space=1, ax=ax[1, 1])
-        ax[1, 1].errorbar(df_el['mom'], df_el['reso'], yerr=df_el['reso_err'],
-                          fmt='*', markersize=10, rasterized=True, label='electron')
-        ax[1, 1].errorbar(df_po['mom'], df_po['reso'], yerr=df_po['reso_err'],
-                          fmt='*', markersize=10, rasterized=True, label='positron')
-        ax[1, 1].legend(fontsize=17)
-        ax[1, 1].set_title('dE/dx Mean vs momentum (zoomed)', fontsize=14)
+            ymin = df_el[df_el['mean'] > 0]['mean'].min()
+            ymax = df_el['mean'].max()
 
-        fig.suptitle("dE/dx vs Momentum", fontsize=20)
-        plt.tight_layout()
-        pdf.savefig(fig)
-        plt.close()
+            panels = [
+                {"xlim": (-7, 7), "ylim": (ymin-0.01, ymax+0.01),
+                 "ylabel": "dE/dx mean", "df_col": "mean", "err_col": "mean_err",
+                 "title": "dE/dx Mean vs momentum"},
+                {"xlim": (-7, 7), "ylim": (0.04, 0.1),
+                 "ylabel": "dE/dx reso", "df_col": "reso", "err_col": "reso_err",
+                 "title": "dE/dx resolution vs momentum"},
+                {"xlim": (-3, 3), "ylim": (ymin-0.01, ymax+0.01),
+                 "ylabel": "dE/dx mean", "df_col": "mean", "err_col": "mean_err",
+                 "title": "dE/dx Mean vs momentum (zoomed)"},
+                {"xlim": (-3, 3), "ylim": (0.04, 0.1),
+                 "ylabel": "dE/dx reso", "df_col": "reso", "err_col": "reso_err",
+                 "title": "dE/dx resolution vs momentum (zoomed)"},
+            ]
+
+            for ax_i, panel in zip(ax.flat, panels):
+                pc.hist(x_min=panel["xlim"][0], x_max=panel["xlim"][1],
+                        y_min=panel["ylim"][0], y_max=panel["ylim"][1],
+                        xlabel="Momentum", ylabel=panel["ylabel"],
+                        space=1, ax=ax_i)
+
+                ax_i.errorbar(df_el['mom'], df_el[panel["df_col"]],
+                              yerr=df_el[panel["err_col"]],
+                              fmt='*', markersize=10, rasterized=True, label='electron')
+                ax_i.errorbar(df_po['mom'], df_po[panel["df_col"]],
+                              yerr=df_po[panel["err_col"]],
+                              fmt='*', markersize=10, rasterized=True, label='positron')
+                ax_i.legend(fontsize=17)
+                ax_i.set_title(panel["title"], fontsize=14)
+
+            fig.suptitle(f"dE/dx vs Momentum ({prefix}{mode})", fontsize=20)
+            plt.tight_layout()
+            pdf.savefig(fig)
+            plt.close()
 
 
 def oneDcell_validation(path, suffix):
@@ -406,6 +408,8 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
             logger.info("Processing momentum validation plots...")
             mom_validation(val_path, suffix)
 
+            logger.info("Processing momentum validation plots in cos bins...")
+            mom_validation(val_path, suffix, prefix="inCos_")
             logger.info("Processing 1D validation plots...")
             oneDcell_validation(val_path, suffix)
 

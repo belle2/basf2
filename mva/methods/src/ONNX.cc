@@ -41,11 +41,11 @@ void Session::run(const std::map<std::string, std::shared_ptr<BaseTensor>>& inpu
   std::vector<const char*> outputNames;
   for (auto& x : inputMap) {
     inputNames.push_back(x.first.c_str());
-    inputs.push_back(std::move(x.second->createOrtTensor()));
+    inputs.push_back(x.second->createOrtTensor());
   }
   for (auto& x : outputMap) {
     outputNames.push_back(x.first.c_str());
-    outputs.push_back(std::move(x.second->createOrtTensor()));
+    outputs.push_back(x.second->createOrtTensor());
   }
   run(inputNames, inputs, outputNames, outputs);
 }

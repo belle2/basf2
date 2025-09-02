@@ -6,23 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef TRGTOPWAVEFORMTIMESTAMPSSLOT_H
-#define TRGTOPWAVEFORMTIMESTAMPSSLOT_H
+#pragma once
 
-//#pragma once
-
-//#include <TObject.h>
 #include <framework/datastore/RelationsObject.h>
 
-#include <vector>
-
-#include <trg/top/dataobjects/TRGTOPWaveFormTimeStamp.h>
-
 namespace Belle2 {
+  class TRGTOPWaveFormTimeStamp;
 
 
-  //! Example Detector
-  //  class TRGTOPWaveFormTimeStampsSlot : public TObject {
+  //! TRGTOPWaveFormTimeStampsSlot
   class TRGTOPWaveFormTimeStampsSlot : public RelationsObject {
 
   public:
@@ -67,18 +59,12 @@ namespace Belle2 {
     int getNumberOfActualTimeStamps() const { return m_numberOfActualTimeStamps;}
     int getFirstActualTimeStampValue() const { return m_firstActualTimeStampValue;}
     int getFirstActualTimeStampClockCycle() const { return m_firstActualTimeStampClockCycle;}
-    //int get() const { return m_;}
-
-    //Need namespace qualifier because ROOT CINT has troubles otherwise
-    //    const std::vector<Belle2::TRGTOPTimeStamp> getTimeStamps() { return m_timeStamps; }
 
     void setSlotId(int slotId);
     void setNumberOfTimeStamps(int numberOfTimeStamps);
     void setNumberOfActualTimeStamps(int numberOfActualTimeStamps);
     void setFirstActualTimeStampValue(int firstActualTimeStampValue);
     void setFirstActualTimeStampClockCycle(int firstActualTimeStampClockCycle);
-
-    //void set(int );
 
     void addTimeStamp(TRGTOPWaveFormTimeStamp timeStamp);
 
@@ -99,15 +85,9 @@ namespace Belle2 {
     //! first actual timestamp's clock cycle
     int m_firstActualTimeStampClockCycle;
 
-    //! vector of timestamps
-    //    std::vector<TRGTOPTimeStamp> m_timeStamps; /**<  a vector of slot-level TOP timing decisions */
-
     /** the class title*/
     ClassDef(TRGTOPWaveFormTimeStampsSlot, 15);
 
   };
 
 } //end namespace Belle2
-
-#endif
-

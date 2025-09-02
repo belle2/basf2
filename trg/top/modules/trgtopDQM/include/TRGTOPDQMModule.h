@@ -15,37 +15,21 @@
 //---------------------------------------------------------------
 // Description : DQM module for TRGTOP
 //---------------------------------------------------------------
-#ifndef TRGGRLDQMMODULE_h
-#define TRGGRLDQMMODULE_h
+#pragma once
 
 #include <framework/core/HistoModule.h>
-
-#include <trg/gdl/dataobjects/TRGGDLUnpackerStore.h>
-#include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
-#include <trg/gdl/TrgBit.h>
 #include <framework/database/DBObjPtr.h>
-#include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
-#include <mdst/dbobjects/TRGGDLDBInputBits.h>
-#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
-
-#include "trg/grl/dataobjects/TRGGRLUnpackerStore.h"
-
-#include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
-#include "trg/ecl/TrgEclMapping.h"
-
-#include "trg/top/dataobjects/TRGTOPUnpackerStore.h"
-#include "trg/top/dataobjects/TRGTOPSlotTiming.h"
+#include <framework/datastore/StoreArray.h>
 
 #include <string>
-#include <algorithm>
 
 #include <TH1I.h>
 #include <TH2I.h>
 #include <TH3I.h>
-#include <TH1F.h>
-#include <TH2F.h>
 
 namespace Belle2 {
+  class TRGECLUnpackerStore;
+  class TRGGDLDBUnpacker;
 
   class TRGTOPDQMModule : public HistoModule {
 
@@ -399,5 +383,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif

@@ -216,6 +216,8 @@ void TRGRAWDATAModule::initialize()
       aBitMap_extra[i][2] = m_unpacker->getBitMap_extra(i, 2);
     }
 
+    int LeafBitMap[200] = {0};
+    char LeafNames[200][100] = {{0}};
     for (int i = 0; i < 200; i++) {
       LeafBitMap[i] = m_unpacker->getLeafMap(i);
       std::cout << "LeafBitMap[" << i << "] = " << m_unpacker->getLeafMap(i) << std::endl;
@@ -251,27 +253,6 @@ void TRGRAWDATAModule::initialize()
                   << " bit length)" << std::endl;
       }
     }
-
-  }
-  for (int i = 0; i < 50; i++) {
-    cntr_bad_odr[i] = 0;
-    cntr_bad_ddd[i] = 0;
-    cntr_bad_nwd[i] = 0;
-
-    cntr_nw3[i] = 0;
-    cntr_nw3_badvet[i] = 0;
-    cntr_nw3_badtrg[i] = 0;
-    cntr_nw3_badrvc[i] = 0;
-
-    cntr_nwn[i] = 0;
-    cntr_nwn_badvet[i] = 0;
-    cntr_nwn_badtrg[i] = 0;
-    cntr_nwn_badrvc[i] = 0;
-
-    cntr_nwn_badbbb[i] = 0;
-    cntr_nwn_badddd[i] = 0;
-
-    cntr_nwe_badnwd[i] = 0;
 
   }
 

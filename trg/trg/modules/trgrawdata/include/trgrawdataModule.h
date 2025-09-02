@@ -396,9 +396,6 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
     std::vector<std::vector<int>> BitMap;
-    int LeafBitMap[320] = {0};
-    char LeafNames[320][100] = {{0}};
-
   };
 
 }

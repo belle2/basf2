@@ -8,6 +8,8 @@
 
 #include <framework/logging/Logger.h>
 #include <pxd/reconstruction/PXDClusterPositionEstimator.h>
+#include <pxd/reconstruction/Pixel.h>
+#include <pxd/dataobjects/PXDCluster.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>

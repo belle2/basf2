@@ -36,7 +36,7 @@ Decay K*+sig
 Enddecay
 
 Decay K*-sig
-1.0   K_L0       pi+   VSS;
+1.0   K_L0       pi-   VSS;
 Enddecay
 
 End
